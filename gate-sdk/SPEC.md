@@ -1603,14 +1603,17 @@ the delta that claimed to be exhaustive:
 first so the measurement has something to falsify.** All five members assert over
 **kit-authored** files — a vendored kit's own `smoke/`, `gate-tests/`,
 `templates/` and registry rows — never over adopter-authored content, so a
-binary-less consumer losing the five should lose no class `installer_smoke`'s
-value arm measures, and the aggregate price should be zero on that oracle.
+binary-less consumer losing the five should lose no class of adopter-authored
+content at all: the omitted roster grows by five and the residual behind it is
+unchanged.
 
 **The run agrees, and the price is zero.** Against the post-cohort registry every
 profile's battery is green on a freshly vendored consumer, with the ported
 members omitted-and-declared exactly where the payload carries no binary — the
 arm that asserts that equality is the suite's own, so no roster is transcribed
-here — and the value arm reports the same
+here, and that assertion is the residual's oracle rather than the value arm the
+criterion named at the time. The value arm, a claim about the product and not
+about the residual, reports the same
 verdict on every profile it reported before: the planted defect is green, and
 green once fixed. The suite's only failure is the markdown-link class the held
 row already owns, so no class this cohort could have emptied changed hands. The

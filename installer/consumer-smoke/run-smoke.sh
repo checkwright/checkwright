@@ -16,7 +16,7 @@ say() { printf '  %s\n' "$*"; }
 fail() { printf 'INSTALLER-SMOKE: FAIL — %s\n' "$*"; exit 1; }
 blocked() { printf 'INSTALLER-SMOKE: %s\n' "$*" >&2; exit 2; }
 
-# spec: installer/README.md §The consumer smoke — cargo and rustc join the preflight because the artifact arm builds the binary it packs; they refuse here with every other missing tool, since a machine that cannot compile the crate has not falsified the install path
+# spec: installer/README.md §The consumer smoke — cargo and rustc join the preflight because the smoke builds the binary the main payload carries; they refuse here with every other missing tool, since a machine that cannot compile the crate has not falsified the install path
 for tool in npm node jq git tar sha256sum cargo rustc; do
     command -v "$tool" >/dev/null 2>&1 || blocked "$tool not found on PATH — the smoke cannot run."
 done
@@ -214,7 +214,7 @@ assert_install() {   # $1 = profile, $2 = scratch consumer dir
                 || { printf '%s\n' "$out" >&2; fail "$profile: the queue file init seeded does not satisfy the section contract queue-kit's own gate reads"; }
             say "queue: $(grep -m1 '^QUEUE-SECTIONS:' <<<"$out")"
         else
-            # spec: installer/README.md §The gate binary — a host the payload carries no artifact for has this member omitted-and-declared by the same selection the artifact arm above asserts, so the install carries no gate to read the contract with; the seeded file is still asserted to exist, and the omission is recorded rather than passed over silently
+            # spec: installer/README.md §The gate binary — a host the payload carries no artifact for has this member omitted-and-declared by the same selection the binary-less leg asserts, so the install carries no gate to read the contract with; the seeded file is still asserted to exist, and the omission is recorded rather than passed over silently
             say "queue: seeded; the section floor dispatches to a binary this payload carries none of, so it is omitted-and-declared and asserts nothing here"
         fi
     else
@@ -443,7 +443,7 @@ done
 
 ENTRY=("$CW")
 RUN_PATH="$TOOLMASK:$PATH"
-# spec: installer/README.md §The consumer smoke — masking is per-arm, which is what lets this arm exist without weakening the preflight the artifact arm depends on; the mask is proved rather than assumed for the same reason the Node-free one is
+# spec: installer/README.md §The consumer smoke — masking is per-arm, which is what lets this arm exist without weakening the preflight the build step depends on; the mask is proved rather than assumed for the same reason the Node-free one is
 for masked in cargo rustc; do
     resolved="$( PATH="$RUN_PATH" bash -c "command -v $masked" 2>/dev/null )"
     [[ "$resolved" == "$TOOLMASK/$masked" ]] \

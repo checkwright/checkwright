@@ -1174,10 +1174,13 @@ refuses at the same preflight when either is missing — a machine that cannot
 compile the crate has not falsified the install path.
 
 **What it costs to run, because the precondition above is only expensive if you
-know that.** Measured 2026-08-09 on one developer machine, twice independently:
-the whole smoke — four profiles × install + battery + value arm, three packs, an
-npm install and a release build of the crate — took **227 seconds**, inside a
-full `evidence-kit/bin/run-validate.sh` whose 24 suites finished in about 536.
+know that.** Re-measured 2026-08-13 on one developer machine, against
+the composition this section describes — four profiles × install + battery +
+value arm, the binary-less leg, four packs, an npm install and one release build
+of the crate — the whole smoke took **272 seconds**. The 2026-08-09 measurement
+it replaces was 227 over a composition with one arm fewer, taken twice
+independently inside a full `evidence-kit/bin/run-validate.sh` whose 24 suites
+finished in about 536.
 So it fits one ordinary foreground invocation and needs no session-window
 planning, and the clean worktree it holds is held for minutes rather than for a
 working session. That is a **dated measurement on one machine, not a live claim**
