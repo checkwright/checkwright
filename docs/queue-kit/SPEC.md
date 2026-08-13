@@ -515,6 +515,13 @@ The icebox is *derived* here rather than configured twice: a non-empty
 required-sections set, and when it is empty every icebox regex is the empty
 string so each reader degrades to "no icebox" rather than to "every section".
 
+**That degradation is the reader's to complete, not the library's.** The empty
+regex only *carries* the "no icebox" answer; an awk consumer must test it
+explicitly (`iceboxre != "" && $0 ~ iceboxre`), because awk's `$0 ~ ""` matches
+every line and an unguarded match therefore degrades to exactly the "every
+section" reading the empty string was chosen to avoid. Any reader of an
+optional section regex owes that guard.
+
 `QUEUE_TASK_SECTIONS` is that composition itself — the active sections, the
 deferred section, and a configured icebox, in configured order — exposed rather
 than consumed and discarded. `QUEUE_TASK_RE` is built from it, and a reader that
@@ -550,9 +557,10 @@ gate to the binary substrate), so `check-queue-slug-liveness` and
 `check-task-conservation` call a Rust reimplementation of that helper while
 `bin/queue-edges.sh` keeps calling this one; the same is true of the section
 regexes, every one of which a `bin/` script still reads directly. The split is
-**permanent** — seven consumers still source this library, five `bin/` scripts
-plus `check-roadmap-fresh` and `check-queue-prose-precondition` — so the shell
-form cannot be deleted the way a ported primitive's is, and a port-time
+**permanent** — every `bin/` script in the kit still sources this library, and so
+do `check-roadmap-fresh` and `check-queue-prose-precondition`
+(`grep -rl lib/queue.sh queue-kit/bin queue-kit/checks` is the roster) — so the
+shell form cannot be deleted the way a ported primitive's is, and a port-time
 byte-identity proof would expire at the next edit to either side. What holds the
 two equal from here is `gate-tests/queue-lib-parity.test.sh`: it feeds one canned
 corpus to both and compares their **classification** of it byte for byte
@@ -560,8 +568,9 @@ corpus to both and compares their **classification** of it byte for byte
 criterion 6's *machine-held* disposition rather than its duplication-absent one
 (gate-sdk/SPEC.md §The port-candidate criteria, criterion 6).
 
-The obligation covers **one helper and seven globals**, and nothing else is owed
-one. The crate's `done_slugs` has no counterpart here and needs none: a shell
+The obligation covers **one helper — `queue_live_slugs` — and every derived
+global this library exports** (`grep -n '^QUEUE_[A-Z_]*=' queue-kit/lib/queue.sh`),
+and nothing else is owed one. The crate's `done_slugs` has no counterpart here and needs none: a shell
 twin with no caller is a duplication removal disposes of, which enforcement-first
 ranks above gating it, and the bound on that disposition is undocumented surface
 — no section named it, which is what separates it from the section regexes, every

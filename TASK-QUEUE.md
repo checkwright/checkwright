@@ -5338,6 +5338,37 @@
   has to be found and merged by a later close reading 5000 lines of queue.
   Filed 2026-08-13 by close, from its own backlog-eviction step.
 
+- **settings-allow-dead-path-residue** [design-pending] — every gate cohort's port leaves the
+  committed allow-list naming a script the port deleted, and nothing resolves that list against
+  the working tree.
+  **Measured at this close, correcting the filing bullet:** three entries name an absent path,
+  not the two the bullet claimed. Two are this cohort's
+  (`bash canon-kit/checks/check-comment-tier.sh` and its `*` twin); the third names
+  `lifecycle-kit/checks/check-stage-evidence.sh` and was left by the **previous** cohort,
+  unnoticed for a whole iteration. The residue therefore accumulates per cohort rather than
+  arriving once, with 63 of 103 registered gates still unported.
+  **The bullet's harmlessness conclusion holds; its mechanism does not.** It reads the entries as
+  shadowed by the generic `bash */checks/check-*.sh *` glob. In fact the path is gone, so no
+  command can reach the grant at all and the generic glob is irrelevant to it. Nothing breaks
+  either way — the cost is a permission roster naming paths every reader must re-verify against
+  the tree.
+  **The class is gateable, which is why this files as a gate and not a sweep.** The predicate is
+  one line: every committed allow entry naming a repo-relative `.sh` path resolves in the tree.
+  Enforcement-first ranks the gate above the one-time prune, and the prune alone re-arms at the
+  next cohort. **Open:** whether it extends `check-settings-pins` (context-kit) or lands in
+  guard-kit, which owns the allow-list tooling but not the pins gate.
+  **The settings edit is operator-owned and stays that way** — the file is configuration, which
+  is why the build session filed rather than fixed it. The gate is not: it reads the file and
+  writes nothing.
+  **Proposed, not made, for the same operator pass:** `bash gate-sdk/bin/port-blockers.sh` is
+  granted only by the gitignored local overlay and prompted four times this iteration. It is a
+  read-only kit tool the port track calls at every scope, so it belongs in the committed set as
+  a glob. A session may propose a standing grant and may not widen its own.
+  **Cost while deferred:** one to two dead entries per cohort, unbounded across the remaining
+  port, on a roster whose every reader re-derives which of its lines still mean anything.
+  Filed 2026-08-13 by close, draining the gap inbox; the three-entry count is this close's own
+  probe over the committed allow-list, not the bullet's claim.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
@@ -5368,10 +5399,6 @@
 - **scratch-execution-allowlist-bar** [design-pending] — Each close re-derives this standing bar.
 
 ## Done
-
-- native-diff-renderer-hoist
-- queue-lib-dual-implementation-parity
-- lifecycle-gate-test-runner-holdouts
 
 ## Lessons Learned
 

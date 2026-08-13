@@ -67,7 +67,11 @@ what you buy. The contract is lifecycle-kit/SPEC.md §The survey record.
 
 **Label every delta with its work class.** In the amendment's §What changes,
 every delta carries a **work-class** tag — either **mechanical** or
-**design-bearing**. A delta is **mechanical** when executing it demands only
+**design-bearing** — written **inline, at the end of the delta's own lead
+sentence**, never collected into a separate roster at the section's head or
+foot. A roster is a second copy of the labelling that drifts from the deltas it
+labels the moment one is split or reordered, and its reader (the lead, at
+batch-cut) is scanning the deltas themselves. A delta is **mechanical** when executing it demands only
 oracle-running — running a fixed verification battery, a rename/merge sweep, a
 mechanical pin — with low generative judgment. It is **design-bearing** when
 executing it demands generative or verificational judgment — authoring a

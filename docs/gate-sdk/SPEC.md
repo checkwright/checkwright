@@ -1173,7 +1173,10 @@ design time; the last three were paid for, and each is named with what it cost.
    rides with it: the instrument packs a payload stamped with a commit, so it
    refuses a dirty worktree and the measurement runs **after** the cohort's own
    commit — from a clean checkout of it when a concurrent session holds the tree
-   dirty.
+   dirty. That checkout is reached **by cwd, not by path**: the packer tests
+   dirtiness where it is invoked, so running it by absolute path while the cwd
+   sits in the dirty tree packs the dirty tree and refuses, however clean the
+   checkout the path pointed at.
 
    **What the value arm is, and what it is not.** It plants a real defect in
    adopter-authored prose and asserts that some profile below the maximum catches
@@ -3400,6 +3403,12 @@ assertion the moment a gate ported. The ordering is binding: a ported gate's
 pair passes against the subcommand **before** the script it replaces is
 deleted, never after.
 
+**Every subdirectory of a tests dir is read as a case pair.** The runner globs
+`<tests-dir>/*/` and demands `good/` and `bad/` under each, so a directory that
+is not a gate's fixture pair is not ignored — it reds as a missing case dir. A
+bespoke `*.test.sh` therefore keeps its corpus inline (or under the scratch dir)
+rather than in a sibling directory beside itself.
+
 **A bespoke `*.test.sh` reaches its gate the same way, through `gate_run`**
 (`lib/test-hermetic.sh`): it names a gate and a checks dir, never a script path,
 so a member's port leaves its behavioral tests untouched. Two mechanics make
@@ -4418,7 +4427,11 @@ file is invisible to `git ls-files`, so it is compiled but not stamped. This is
 bounded by the same fact that makes the stamp worth having — an untracked file is
 not in the commit either, so the state the gate governs is exactly the state the
 stamp describes. A file added and staged in the same commit is tracked at the
-gate's read and is covered.
+gate's read and is covered — **provided the build ran after the `git add`**. The
+producer reads `ls-files` too, so building while a new source file is still
+untracked bakes a stamp computed without it; staging the file then moves the tree
+side and not the baked one, and the commit reds on a rebuild that has already
+run. A commit introducing a crate file stages first and builds second.
 
 **The two sides.** The producer is `native/build.rs`, which bakes the stamp in as
 a compile-time constant and is re-run by `cargo:rerun-if-changed=` on exactly the
