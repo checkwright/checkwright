@@ -27,7 +27,7 @@ declare -p GUARD_KIT_BREADTH_PROBES >/dev/null 2>&1 || GUARD_KIT_BREADTH_PROBES=
 declare -p GUARD_KIT_RO_SCRIPTS >/dev/null 2>&1 || GUARD_KIT_RO_SCRIPTS=("check-*.sh")
 declare -p GUARD_KIT_SCRATCH_DIRS >/dev/null 2>&1 || GUARD_KIT_SCRATCH_DIRS=(".tmp")
 declare -p GUARD_KIT_RO_BINS >/dev/null 2>&1 || GUARD_KIT_RO_BINS=(
-    grep egrep fgrep rg head tail cat wc sort uniq cut tr nl rev tac paste comm column diff jq find ls
+    grep egrep fgrep rg head tail cat wc sort uniq cut tr nl rev tac paste comm column diff jq find ls xargs
 )
 
 guard_read_command() {
@@ -85,20 +85,21 @@ guard_allow_match() {
 guard_skeleton() {
     local cmd="$1"
     shift
-    local c want_sq=0 want_dq=0 want_hd=0
+    local c want_sq=0 want_dq=0 want_hd=0 want_hdq=0
     for c in "$@"; do
         case "$c" in
             sq) want_sq=1 ;;
             dq) want_dq=1 ;;
             hd) want_hd=1 ;;
+            hdq) want_hdq=1 ;;
         esac
     done
 
     # comment-tier-exempt: measured local fact — jumping between significant characters rather than stepping per character took a 355-char command from 2.3ms to 0.17ms, at fourteen call sites per guarded call
     local nl=$'\n'
     local live_class="[\"'\\\\<${nl}]*" dq_class="[\"\\\\]*"
-    local n=${#cmd} i=0 out='' span='' state=none ch rest chunk line term body
-    local -a pending=()
+    local n=${#cmd} i=0 out='' span='' state=none ch rest chunk line term body quoted
+    local -a pending=() pending_q=()
     while ((i < n)); do
         rest="${cmd:i}"
         if [[ "$state" == sq ]]; then
@@ -164,6 +165,10 @@ guard_skeleton() {
                     out+="${BASH_REMATCH[0]}"
                     ((i += ${#BASH_REMATCH[0]}))
                     term="${BASH_REMATCH[1]}"
+                    case "$term" in
+                        \"*\" | \'*\') pending_q+=(1) ;;
+                        *) pending_q+=(0) ;;
+                    esac
                     term="${term#[\"\']}"
                     term="${term%[\"\']}"
                     pending+=("$term")
@@ -175,7 +180,9 @@ guard_skeleton() {
                 ((i++))
                 while ((${#pending[@]} > 0)); do
                     term="${pending[0]}"
+                    quoted="${pending_q[0]}"
                     pending=("${pending[@]:1}")
+                    pending_q=("${pending_q[@]:1}")
                     body=''
                     while ((i < n)); do
                         rest="${cmd:i}"
@@ -186,7 +193,11 @@ guard_skeleton() {
                         ((i > n)) && i=$n
                     done
                     if [[ -n "$body" ]]; then
-                        if ((want_hd)); then out+='HD'$'\n'; else out+="$body"; fi
+                        if ((want_hd)) || { ((want_hdq)) && ((quoted)); }; then
+                            out+='HD'$'\n'
+                        else
+                            out+="$body"
+                        fi
                     fi
                     if ((i < n)); then
                         rest="${cmd:i}"
@@ -305,13 +316,13 @@ guard_rule_abs_prefix() {
 
 guard_rule_expansion() {
     local cmd="$1" sqexp expn
-    # spec: guard-kit/SPEC.md §The generic ruleset — 'sq' only: a double-quoted "$x" still
-    # expands, and an unquoted-delimiter heredoc body expands too, so both stay live here.
-    sqexp="$(guard_skeleton "$cmd" sq)"
+    # spec: guard-kit/SPEC.md §The generic ruleset — a double-quoted "$x" still expands, so 'dq'
+    # stays live; a quoted-delimiter heredoc body cannot, which is what 'hdq' names
+    sqexp="$(guard_skeleton "$cmd" sq hdq)"
     if grep -qE '\$\{|\$\(|<\(|\$[A-Za-z_]' <<<"$sqexp"; then
         guard_block "avoid shell variables/expansions (\$VAR, \${...}, \$(...), <(...)) — the harness's matcher refuses every expansion, so no allowlist entry can match the command and it costs an out-of-band permission decision. Inline the literal path, use a relative path, or 'git -C <dir>'. If you genuinely need the expansion, run it yourself with !<command>."
     fi
-    expn="$(guard_skeleton "$cmd" sq dq)"
+    expn="$(guard_skeleton "$cmd" sq dq hdq)"
     if grep -qE '(^|[;(]|&&|\|\|)[[:space:]]*[A-Za-z_][A-Za-z0-9_]*=[^[:space:];|&]*[[:space:]]*($|;)' <<<"$expn"; then
         guard_block "avoid shell variable assignments (NAME=value; ... \$NAME) — they defeat allowlist matching, so the call costs an out-of-band permission decision no allowlist entry can pre-empt. Inline the literal value/path at each use site, or 'git -C <dir>'. If you genuinely need it, run it yourself with !<command>."
     fi
@@ -393,6 +404,34 @@ _guard_is_cat_read() {
         case "$tok" in -*) ;; *) operands=$((operands + 1)) ;; esac
     done
     [[ "$operands" == 1 ]]
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 13's xargs discriminator: xargs runs a command rather than filtering text, so the segment is read-only only when the command it runs is itself on the roster
+_guard_is_ro_xargs() {
+    local seg="${1#"${1%%[![:space:]]*}"}" tok want_arg=0 cmdtok='' b i n
+    local -a toks
+    read -ra toks <<<"$seg"
+    [[ "${toks[0]:-}" == xargs ]] || return 1
+    n=${#toks[@]}
+    for ((i = 1; i < n; i++)); do
+        tok="${toks[i]}"
+        if [[ "$want_arg" == 1 ]]; then want_arg=0; continue; fi
+        case "$tok" in
+            -0 | -t | -r | -x | -p | --null | --no-run-if-empty | --verbose | --exit | --interactive | --open-tty) ;;
+            -I | -L | -n | -P | -s | -E | -d | -a) want_arg=1 ;;
+            -[0ILnPsEdae]*) ;;
+            --*=*) ;;
+            -*) return 1 ;;
+            *) cmdtok="$tok"; break ;;
+        esac
+    done
+    [[ -z "$cmdtok" ]] && return 0
+    [[ "$cmdtok" == xargs ]] && return 1
+    case "$cmdtok" in echo | printf) return 0 ;; esac
+    for b in "${GUARD_KIT_RO_BINS[@]}"; do
+        [[ "$cmdtok" == "$b" ]] && return 0
+    done
+    return 1
 }
 
 # spec: guard-kit/SPEC.md §The generic ruleset — one segment is a bare find listing: leads with find, carries no action predicate
@@ -517,6 +556,7 @@ guard_rule_ro_pipeline() {
         [[ -z "$seg" ]] && continue
         _guard_is_banner "$seg" && continue
         first="${seg%%[[:space:]]*}"
+        [[ "$first" == xargs ]] && { _guard_is_ro_xargs "$seg" || return 0; }
         matched=0
         for b in "${GUARD_KIT_RO_BINS[@]}"; do
             [[ "$first" == "$b" ]] && { matched=1; break; }

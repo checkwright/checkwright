@@ -98,10 +98,21 @@ sanctions them. The copy gains the normalizer's behavior by calling it, not by
 carrying a second copy of it.
 
 `xargs` joining `GUARD_KIT_RO_BINS`' default is a **default value change on an
-existing kit knob**, not new rule content: the roster's twenty-two members are
-read-only POSIX text tools, `xargs` is one, and the knob has been consumer-
+existing kit knob**, not new rule content, and the knob has been consumer-
 overridable since it shipped. No project vocabulary enters the kit, and the
 provenance seam is untouched.
+
+**Corrected at build, and the correction is why delta (4) grew a predicate.**
+This section originally read *the roster's twenty-two members are read-only
+POSIX text tools, `xargs` is one*. The second clause is false: `xargs` is a
+command **executor**, not a text filter, so it breaks rule 13's safety argument
+that every roster-led segment is read-only. Probed with `xargs` added bare, all
+four of `find . -type f | xargs rm -rf`,
+`grep -rln foo src | xargs sed -i s/a/b/`, `ls | xargs chmod 777` and
+`git status | xargs rm -rf` returned a silent `allow` — and rule 13 grants and
+exits at #13, so rule 16's tracked-`rm` block at #16 never runs. Operator-ruled
+2026-08-13: roster membership **plus a discriminator**, an `xargs` segment
+counting read-only only when the command it runs is itself a roster binary.
 
 ## What changes
 
@@ -110,13 +121,22 @@ provenance seam is untouched.
 **(1) `guard_skeleton <cmd> <inert-class>…` — one context-aware normalizer, and
 the only place a rule learns what part of a command is live.** [design-bearing]
 It returns the command with every region of the named inert classes replaced by
-a placeholder token, leaving everything else byte-identical. Three classes,
-which is the whole domain:
+a placeholder token, leaving everything else byte-identical. Four classes:
 
 - **`sq`** — single-quoted spans.
 - **`dq`** — double-quoted spans.
 - **`hd`** — heredoc bodies, from the line after an opener to its terminator
   line.
+- **`hdq`** — the subset of `hd` whose delimiter is **quoted** (`<<'EOF'`).
+  **Added at build; the design shipped with three and three did not reach the
+  glyph entry's own stated case.** That entry names *a `$(...)` … inside a
+  heredoc body — journal prose, a queue entry being appended, a commit message*,
+  and §What the probes found names it too — yet rule 6 cannot declare `hd`
+  (an unquoted delimiter really does expand), so with three classes it kept
+  blocking exactly that. A quoted delimiter makes the **shell** the guarantee
+  that the body cannot expand, so `hdq` is strictly narrowing and hides no live
+  substitution. Attested live: the build session's own commit was refused for a
+  substitution named in the prose of a `git commit -F - <<'MSG'` body.
 
 Each rule names the classes inert **for it**, in one argument, at one call site.
 That is the design's whole content: the classes were never the disagreement —
@@ -193,11 +213,23 @@ and the entry was wrong about it; the correction rides delta (8).
 already have.** [design-bearing] The bare-`find` and bare-`cat` rules both
 tolerate a literal `echo`/`printf` banner between reads, on the stated ground
 that a banner is the natural separator of a batched read. The read-only pipeline
-rule has no such tolerance and `echo` is not a roster binary, so a
-grep-banner-ls sequence falls through where the same sequence without the banner
-is granted. `_guard_is_banner` already exists and is already used by both
-neighbours; this is the third caller. The asymmetry is the accident, not the
-tolerance.
+rule has no such tolerance and `echo` is not a roster binary, so a banner
+segment costs the grant. `_guard_is_banner` already exists and is already used
+by both neighbours; this is the third caller. The asymmetry is the accident, not
+the tolerance.
+
+**Corrected at build; this delta's original ground was false and its scope is
+narrower than that ground implied.** It originally read *a grep-banner-ls
+sequence falls through where the same sequence without the banner is granted*.
+Probed: `grep foo a.md; ls` **also** falls through, because rule 13 refuses any
+`;`, `&&`, `||` or `&` outright — so the banner was never what cost that grant,
+and no banner tolerance alone can reach a `;`-sequence. Admitting those
+separators was tried and declined 2026-08-13: it flipped four existing verdicts
+to silent grants, two of which defeat a sibling rule's stated purpose —
+`cat a.md && cat b.md` and `cat a.md; find lib -type f` are exactly what rules 9
+and 10 are *placed before the auto-allow rules* to steer. The tolerance
+therefore lands as literally written, among pipe segments, and the DoD shape
+*a banner between read segments* drops with the separator widening.
 
 **(6) The read-only pipeline rule's lead predicate widens from a roster binary
 to a roster binary *or a bare committed allow entry*.** [design-bearing] This is

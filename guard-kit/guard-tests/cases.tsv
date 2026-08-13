@@ -36,7 +36,13 @@ fallthrough	cat <<'EOF' > .tmp/note.md@NL@the path @ROOT@/tools/report.py is ste
 block	echo $(pwd)
 block	P=/tmp/x
 fallthrough	awk '$1' data.txt
+# 'hdq': an unquoted delimiter expands, so its body stays live; a quoted one
+# cannot expand, and the shell is what guarantees that — so its body is inert
 block	cat <<EOF > .tmp/n.md@NL@value is $(date)@NL@EOF
+fallthrough	cat <<'EOF' > .tmp/n.md@NL@value is $(date)@NL@EOF
+# reaches rule 15's advisory, which is the correct verdict for a commit -F; the
+# point is that rule 6 no longer blocks it before rule 15 is ever consulted
+advise	git commit -F - <<'MSG'@NL@names a $(cmd) in the body@NL@MSG
 
 # rule 7 — unquoted brace glyph: bare {} placeholder rewritten, expansions blocked.
 #          'sq dq hd': '{' is a matcher glyph, not an expansion, so a
@@ -110,6 +116,17 @@ fallthrough	echo a | echo b
 allow	git status | head
 allow	git status | head -20
 block	git status | awk '{print}'
+# xargs is on the roster but executes rather than filters, so it is granted only
+# when the command it runs is itself a roster binary. The refusing cases are the
+# point of the discriminator: each is a write, and each is silently granted
+# without it.
+allow	find . -type f | xargs wc -l
+allow	grep -rl foo src | xargs -n1 head -5
+allow	find . -type f -print0 | xargs -0 grep -l needle
+fallthrough	find . -type f | xargs rm -rf
+fallthrough	grep -rln foo src | xargs sed -i s/a/b/
+block	ls | xargs chmod 777
+block	ls | xargs xargs rm
 
 # rule 14 — decorated allowlisted bare lead with an unmatched segment blocked;
 #           chaining steer, redirect steer, and the untouched non-firing cases

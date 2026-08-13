@@ -137,10 +137,13 @@ Primitives a consumer guard composes; each emits the harness's
 - `guard_skeleton <cmd> <inert-class>…` — the context-aware normalizer, and the
   only place a rule learns what part of a command is live. It returns the command
   with every region of the named inert classes replaced by a placeholder token,
-  leaving everything else byte-identical. Three classes, which is the whole
-  domain: **`sq`** (single-quoted spans), **`dq`** (double-quoted spans), and
-  **`hd`** (heredoc bodies, from the line after an opener to its terminator
-  line). Each rule names the classes inert **for it**, in one argument, at one
+  leaving everything else byte-identical. Four classes: **`sq`** (single-quoted
+  spans), **`dq`** (double-quoted spans), **`hd`** (heredoc bodies, from the line
+  after an opener to its terminator line), and **`hdq`** — the subset of `hd`
+  whose **delimiter is quoted** (`<<'EOF'`), where the shell itself guarantees
+  the body does not expand. `hdq` exists because that guarantee is what lets the
+  one rule that must keep heredoc bodies live keep only the bodies that can
+  actually expand. Each rule names the classes inert **for it**, in one argument, at one
   call site — the classes were never the disagreement, since every rule agrees
   that *some* regions are inert; the disagreement was that each decided privately
   and none recorded why. Not a hook primitive, and a pure function of its
@@ -174,7 +177,11 @@ property the class rests on.
 **Two bounds, stated rather than discovered later.** A heredoc with an
 **unquoted** delimiter does expand, so `hd` is not inert for the expansion rule
 even though it is inert for every glyph rule — which is why classes are declared
-per rule and not fixed per region. And the normalizer models **quoting, not
+per rule and not fixed per region, and why the rule that cannot take `hd` takes
+`hdq` instead rather than going without. Only the delimiter's quoting decides
+this, never the body's content, so the test is decidable at the opener; a
+delimiter escaped rather than quoted (`<<\EOF`) is not recognized and its body
+stays live, which is the conservative direction. And the normalizer models **quoting, not
 shell semantics**: a construct that survives its scan and is not one of the three
 classes is treated as live, the fail-toward-matching direction and the one a
 guard should err in. That bound is why the command/process-substitution and
@@ -277,14 +284,18 @@ load-bearing where noted.
    `git` is excluded — rule 2 already owns its `-C` handling.
 6. **Shell expansion / assignment** — a residual `${…}`/`$(…)`/`<(…)`/
    `$NAME` in the skeleton is blocked (the harness's matcher refuses every
-   expansion before allowlist matching). **Declares `sq`** for the expansion
-   check and **`sq dq`** for the assignment check, and both halves of that are
-   deliberate rather than inherited. Only *single*-quoted regions are inert for
-   the expansion check: inside single quotes `$` is literal (`awk '$1'`), but a
-   double-quoted `"$x"` still expands and must stay visible — and by the same
-   argument `hd` is **not** declared here, since an unquoted-delimiter heredoc
-   body expands too. The assignment check adds `dq` because a `NAME="value"`
-   assigns whatever the quotes hold. A standalone `NAME=value` assignment is
+   expansion before allowlist matching). **Declares `sq hdq`** for the expansion
+   check and **`sq dq hdq`** for the assignment check, and every part of that is
+   deliberate rather than inherited. `dq` stays live for the expansion check:
+   inside single quotes `$` is literal (`awk '$1'`), but a double-quoted `"$x"`
+   still expands and must stay visible. `hd` is **not** declared, since an
+   unquoted-delimiter heredoc body expands too — but `hdq` is, because a
+   **quoted** delimiter makes the shell itself the guarantee that the body
+   cannot expand. That is what stops the rule refusing prose that merely
+   *names* a substitution: a journal entry, a queue entry being appended, or a
+   commit message written through `git commit -F - <<'MSG'`. The assignment
+   check adds `dq` because a `NAME="value"` assigns whatever the quotes hold. A
+   standalone `NAME=value` assignment is
    caught separately, since the expansion check only sees a *used* `$VAR`.
 7. **Unquoted brace glyph** — the harness's matcher refuses the bare `{` glyph
    before allowlist matching, the same behavior class rule 6 pre-empts for
@@ -395,7 +406,19 @@ load-bearing where noted.
     or an fd-dup. Declares `sq dq hd`. Conservative by construction:
     command/process substitution, a leftover quote after normalization, any
     statement separator, a non-`/dev/null` redirect, or a `find` with a write
-    action all refuse and fall through. Two carve-outs widen the grant, and
+    action all refuse and fall through. **`xargs` is on the roster but is not
+    a text filter — it executes a command** — so it carries a discriminator
+    rather than riding the leads-with test: an `xargs` segment counts read-only
+    only when the command it runs is itself a roster binary (or absent, since
+    bare `xargs` defaults to `echo`). Without it, roster membership alone would
+    silently grant `find . -type f | xargs rm -rf` and
+    `grep -rln foo src | xargs sed -i s/a/b/`. Unrecognized `xargs` options and
+    a nested `xargs` decline rather than guess. The discriminator makes an
+    `xargs` segment exactly as safe as the segment it runs and no safer, which
+    is the honest bound: roster membership does not by itself prove an
+    *invocation* read-only (`sort -o` writes a file), and that weaker predicate
+    is a separate, already-filed gap this rule inherits rather than introduces.
+    Two carve-outs widen the grant, and
     neither widens it past what the segment-by-segment safety argument already
     covers:
     - **A literal `echo`/`printf` banner segment is skipped**, the tolerance
@@ -757,7 +780,8 @@ repo's layout as defaults):
 - `GUARD_KIT_RO_SCRIPTS` — array of globs eligible for the
   absolute→relative rewrite (rule 4); default `("check-*.sh")`.
 - `GUARD_KIT_RO_BINS` — read-only pipeline roster (rule 13); default the
-  grep/head/cat/find/jq family.
+  grep/head/cat/find/jq family, plus `xargs`, whose membership is qualified by
+  rule 13's discriminator rather than granting on the leads-with test alone.
 - `GUARD_KIT_SCRATCH_DIRS` — gitignored scratch dirs named in the
   rule-3 corrective message; default `(".tmp")`.
 
