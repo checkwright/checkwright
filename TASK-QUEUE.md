@@ -3190,7 +3190,7 @@
 
 - **exit-echo-decoration-guard-vs-habit** [design-pending] — an agent chains otherwise
   allowlisted read-only commands into one probe, and the whole probe prompts.
-  recurrence: exit-echo-decoration-guard-vs-habit 2026-08-06
+  recurrence: exit-echo-decoration-guard-vs-habit 2026-08-06 2026-08-13
   Stage sessions join independent read-only calls — `grep`, `find`, `cat`, `ls`, `echo`, git
   subcommands — into one multi-statement `Bash` call, which resolves to no single allowlist
   glob and prompts every time; the trailing `; echo EXIT:$?` decoration is one shape of the
@@ -3638,6 +3638,15 @@
   step produces. The design work is also half done and unowned — `installer/README.md` already
   records this design's named re-entry and its two candidate shapes, so what is missing is the
   unit, not the thinking.
+  **Distinctness is not readiness, and the entry read as ready until 2026-08-13.** The paragraph
+  above records that the *jobs* are separate and omitted that one **gates** the other:
+  `native/targets.list` states the widening trigger is `platform-support-ci-matrix` landing a CI
+  leg, "after which widening is one line here plus one runner mapping" — and that entry is
+  demand-gated with both un-defer triggers unfired (re-verified at the 2026-08-13 drain: every
+  workflow leg is still `ubuntu-latest`, and no adopter or promotion is recorded anywhere). So a
+  scope session ranking off this entry alone reads "blocked on a design pick" where the truth is
+  "blocked on a design pick **and** on an unfired upstream trigger". Both surfaces were right and
+  only their union was legible; this paragraph is the union.
   **Why `[design-pending]`:** the two candidate shapes differ in what they cost the publish
   workflow and in whether cross-compilation or a matrix of runners carries it, and choosing
   between them is the unit's substance rather than a detail inside it.
@@ -3814,6 +3823,7 @@
 
 - **guard-glyph-match-context-blind** [design-pending] — the guard matches its trigger glyphs
   inside quoted and heredoc bodies, so writing *about* the guard is refused by it.
+  recurrence: guard-glyph-match-context-blind 2026-08-13
   `scripts/bash-guard.sh` tests the whole command string, so a `$(...)`, a brace expansion or the
   repo-root absolute path appearing inside a **heredoc body** — journal prose, a queue entry
   being appended, a commit message — trips the same refusal as the executable form. The refusal
@@ -3833,7 +3843,15 @@
   Filed 2026-08-08 at scope on the lead's ruling, from this session's own refusal count. It
   duplicates neither `guard-command-prefix-wrapper` (transparent prefixes, measured at ~32% of
   prompting calls) nor `exit-echo-decoration-guard-vs-habit` (decoration on an allowlisted
-  command); this is the guard refusing a string that was never going to be executed.
+  command).
+  **2026-08-13 widens the shape past "a string never going to be executed", and that widening
+  raises the cost rather than restating it.** A *working* command — a double-quoted POSIX regex
+  quantifier in a grep pattern — trips the same brace-expansion block: re-probed at the drain
+  against `scripts/bash-guard.sh` itself, the double-quoted form exits 2 and the single-quoted
+  respelling auto-allows. Same mechanism the design note already names (`guard_rule_brace_glyph`
+  strips only single-quoted spans before matching), but a quantifier in a live command cannot be
+  avoided by writing the sentence differently, so the deferred cost is no longer bounded by
+  sessions that document their own tooling.
 
 - **audit-class-corpus-attestation** [design-pending] — an un-gateable-class audit stamps a
   **verdict**, not the corpus it read, so a false negative is indistinguishable from a clean tree.
@@ -5077,6 +5095,86 @@
   re-derived under the mechanism that actually applies, so the allowlist may be
   simultaneously wider than security wants and narrower than the short-circuit rewards.
   Non-rotting: nothing in the tree degrades while it sits.
+
+- **docs-corpus-derivation-manifest-divergence** [design-pending] — two gates declare a
+  byte-identical `# graph:` couple and walk different corpora, so the manifest asserts a
+  sameness the code does not honour.
+  `canon-kit/checks/check-docs-link-convention.sh` derives its corpus with a bare `find` over
+  the docs root — a filesystem walk that sees **untracked** files — while
+  `site-kit/checks/check-docs-render-fidelity.sh` derives its own from `git ls-files`, tracked
+  only, plus an underscore-directory exclusion and a `gate_path_pruned` filter the first gate
+  has neither of. Both declare
+  `couples=docs/*.md,docs/*/index.md,docs/posts/*.md dir=one valve=none tier=precommit`,
+  identical to the byte.
+  **Demonstrated, not reasoned:** at the 2026-08-13 drain an isolated checkout gained one
+  untracked markdown page under the docs root; link-convention's page count went 70 → 71 and
+  render-fidelity's stayed at 70. An untracked page is inside one gate's corpus and outside the
+  other's with nothing in either manifest showing it.
+  **Why `[design-pending]`:** which derivation is *correct* is the substance, and both have a
+  live reason. Render-fidelity gates what the published site will contain, which is the tracked
+  set; link-convention gates authoring conventions, where catching a page before it is staged is
+  arguably the point. Converging them silently would weaken one gate; declaring the divergence in
+  the manifests needs a `# graph:` field that does not exist. Adjacent second finding from the
+  same read, reported as observed: link-convention calls bare `find` rather than the shared
+  `gate_find` wrapper, so it does not honour the SDK prune set — verified null in effect today
+  (no directory under the docs root matches the default prune set), a latent inconsistency
+  rather than a live symptom.
+  **Cost while deferred:** the graph artifact and the enforcement map both read `couples=`, so
+  two gates with materially different reach present as interchangeable to every derived
+  projection and to any port cohort selected on identical couples — which is the concrete bite,
+  since such a cohort would merge these two and then fail parity on exactly the untracked case.
+  Filed 2026-08-13 by close, draining the gap inbox; surfaced by a scope census and re-verified
+  at the drain against both sources plus the empirical probe above.
+
+- **expected-permission-mode-undeclared** [design-pending] — the repo governs its allowlist and
+  its bash guard but states nowhere which permission mode it expects to run under.
+  `.claude/settings.json` carries a 120-entry `permissions.allow` and no `defaultMode`, and no
+  tracked surface names an expected mode either — re-verified at the 2026-08-13 drain by a tree
+  grep, whose only hits were queue prose *about* the user-level setting. Neither the allowlist
+  nor the guard can therefore be judged correct or stale without an out-of-band probe.
+  **The failure this was measured from:** a lead session ran roughly two hours in `acceptEdits`
+  while the user settings specified `auto`, across four stage boundaries, and neither operator
+  nor lead noticed — the symptom presented as "auto mode is not reducing prompts". The root
+  cause is harness-side and filed upstream; what stays repo-side is that the guard's own blocking
+  rationale is mode-**conditional** — false under `auto`, true under `acceptEdits` and default —
+  and no doc records which mode it is written against.
+  **Why `[design-pending]`:** the unit could declare an expected mode in tracked settings, or
+  make the guard read the mode rather than assume it (`permission_mode` arrives on every
+  `PreToolUse` payload and `scripts/bash-guard.sh` discards it), and those differ in whether the
+  repo *constrains* the operator or *adapts* to them. Distinct from
+  `bash-guard-auto-mode-rationale`, which reworded the guard's messages to be mode-independent
+  and is done: this is the repo declaring an expectation, a different assertion.
+  **Relationship to `guard-grant-review`, stated without pre-empting it:** the mode is an input
+  to that entry's open narrow-or-declare direction, since it changes whether a grant is load-
+  bearing at all. Naming the dependence is not choosing the direction, which is operator-class
+  and unruled.
+  **Cost while deferred:** every session that reasons about the allowlist or the guard re-derives
+  the mode by probe, and a mode drift costs hours before it presents as anything legible.
+  Filed 2026-08-13 by close, draining the gap inbox; filed by the lead and re-verified here.
+
+- **lead-state-durable-home** [design-pending] — the lead template forbids the lead from writing
+  lifecycle state and gives lead state no durable home either, so it lives only in the
+  conversation.
+  `lifecycle-kit/templates/lead.md` §Channel design assigns the **resume journal** to the *stage
+  session* — the lead reads it and is forbidden to delete it — and §Stamps are authoritative
+  rules out every lifecycle write. Re-verified at the 2026-08-13 drain by reading the template
+  end to end: across 438 lines there is no lead-side journal, state file, or capture obligation
+  of any kind. The claim is about an absence and that read is what settles it.
+  **What has no home:** the batch roster and its tiering rationale, findings carried between
+  batches, operator items awaiting a ruling, and anything learned mid-iteration that no stage
+  owns. Measured, not inferred: a full investigation's findings existed nowhere but a transcript
+  until the operator prompted the lead to write them down — after that session's second
+  compaction.
+  **Why `[design-pending]`:** the fix shape is a lead-journal obligation with a stated cadence
+  (on dispatch, on completion notification, on any ruling or finding), but its *home* is the open
+  question: `.tmp/` is swept at the scope boundary, which is right for per-iteration state and
+  wrong for anything crossing it, and a tracked home collides with the invariant that the lead
+  writes no governed state. Distinct from the gap inbox and the survey record, which are capture
+  channels for findings a *stage* will drain, not a place a lead's own working state persists.
+  **Cost while deferred:** compounding with session length — every lead compaction degrades or
+  loses state, and the loss is silent, since a degraded roster reads exactly like a short one.
+  Filed 2026-08-13 by close, draining the gap inbox; a lead filing, re-verified at the drain by
+  reading the template end to end, the search an absence claim needs.
 
 ## Icebox
 

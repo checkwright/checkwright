@@ -250,7 +250,16 @@ link — an application of the load-trigger residency rule to the doctrine itsel
     dispatch, where no oracle is running and standing one up costs a grep. It
     binds a *relayed* claim as hard as an authored one: forwarding an unverified
     premise is asserting it, and the forwarder owns the probe the originator
-    skipped.
+    skipped. It binds **outbound** claims too, and that reach does not follow
+    from the inward examples: proposing that the operator file a report, open an
+    issue, or escalate to a vendor asserts the thing is *unreported* — a claim
+    about the world the proposal presumes, and one search from settled. Attested:
+    a session drafted a complete vendor bug report and handed it over; the issue
+    was already documented upstream, with duplicates. The operator searched, the
+    session had not — and that same session had been corrected once that day for
+    relaying an unverified premise, so holding the general rule is what failed to
+    prevent the outbound instance. That is why the case is named here rather than
+    left to be derived from the rule.
     *Under agent work:* an agent's prose reads identically whether it was
     measured or inferred, so an unprobed premise enters the record
     indistinguishable from a verified one and is inherited downstream as settled
