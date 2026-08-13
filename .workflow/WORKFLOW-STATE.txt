@@ -9,3 +9,4 @@ native-ere-matcher-and-held-suites spec ac6ea34e 2026-08-13
 native-ere-matcher-and-held-suites align a7d80257 2026-08-13
 native-ere-matcher-and-held-suites build aa48199e 2026-08-13
 native-ere-matcher-and-held-suites validate abec6978 2026-08-13
+native-ere-matcher-and-held-suites close ade01ec1 2026-08-13
