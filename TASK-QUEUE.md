@@ -3625,33 +3625,29 @@
   before ranking it, because the promotion dividend lives in the total and in no single entry.
   The `survey-engagement` audit class then asks each close whether that pass ran, and declares
   its only residue to be "the survey's own reasoning".
-  **Attested this close: that residue does not carry the claim.** Scope's reasoning landed in a
-  commit message recording *conclusions* — three premise falsifications, and one entry's
-  self-declared strongest ground engaged and answered rather than merely refuted, which is the
-  counter-evidence half done properly. Nothing in any artifact says whether an edge sum was
-  taken for any candidate, so the audit can neither confirm nor fault it. An audit that cannot
-  return either verdict is not un-gateable, it is unanswerable.
-  **One named alternative happened on its own, 2026-08-08.** The next iteration's scope landed
-  its ranking survey in the survey record with `bin/queue-edges.sh` named as an oracle and the
-  inbound totals written into the finding itself — per-candidate sums for the recurrence cluster
-  and for the trajectory-sequence candidates. "Folding the sum into the existing survey record"
-  is therefore a shipped instance rather than a hypothetical, and this close's `survey-engagement`
-  audit was answerable and passed on it. What stays open is that nothing *required* it: the audit
-  is unanswerable again the moment a survey omits the sums.
-  **That moment arrived at the very next iteration, 2026-08-09 — the entry predicted its own
-  recurrence and the prediction held one iteration later.** `install-profile-seam`'s scope ran
-  three surveys; the ranking one ("Which Deferred entries cluster onto a shared surface and
-  mechanism") censused 129 Deferred entries and produced the seven-cluster ranking the cut was
-  argued from, naming `bin/queue-index.sh` as its oracle and **not** `queue-edges.sh`. Its
-  counter-evidence work is entirely premise-falsification (it lists five stale premises); no
-  inbound sum appears for any candidate. So `survey-engagement` was answerable in one
-  iteration and unanswerable in the next, on the same roster line, with nothing changed but
-  the survey — which is the strongest available argument that the requirement is real and the
-  residue is not. **No `recurrence:` date is stamped, and the decline is deliberate:** this
-  was observed by a rostered close audit rather than through the gap-inbox capture channel,
-  and whether such an observation may stamp directly is the open question
-  `recurrence-drain-input-widening` holds. Attested here as prose, consistently with the two
-  other out-of-channel recurrences that close recorded the same way.
+  **The residue does not carry the claim, and four dated observations now settle it** — the
+  question is answered, so the narration of each is compressed to what it proved.
+  **2026-08-07:** scope's reasoning landed only as conclusions in a commit message. Its
+  counter-evidence half was done properly, but nothing in any artifact said whether an edge sum
+  was taken, so the audit could return neither verdict — **unanswerable, not un-gateable.**
+  **2026-08-08 — answerable, and passed.** Scope named `bin/queue-edges.sh` as an oracle in the
+  survey record and wrote per-candidate inbound totals into the finding. "Fold the sum into the
+  existing survey record" is therefore a **shipped instance**, not a hypothetical design option.
+  **2026-08-09 and 2026-08-12 — unanswerable again, twice.** Both ranked (129 Deferred entries
+  into seven clusters; 85 shell gates into three cohorts) and the second recommended against a
+  group by name, so the due-condition fired squarely on each. Both named a different oracle —
+  `bin/queue-index.sh`, then `bin/port-blockers.sh` — and neither records an inbound sum for any
+  candidate. Both did premise-falsification well, and the second did it very well (refuting a
+  member's inclusion from the source, surfacing a spec-versus-oracle contradiction rather than
+  picking a side, stating its own limit). So the split is stable: the falsification half is
+  healthy and the aggregation half is simply absent.
+  **The alternation is the evidence, and it is what makes this the requirement's property rather
+  than any session's.** Answerable once, unanswerable three times, on one roster line, with
+  nothing changed but the survey — and the entry predicted its own recurrence before two of them.
+  **No `recurrence:` date is stamped, and the decline is deliberate and unchanged:** every one of
+  these came from the rostered close audit rather than the gap-inbox capture channel, and whether
+  such an observation may stamp directly is the open question `recurrence-drain-input-widening`
+  holds. Attested as prose, consistently with the other out-of-channel recurrences.
   **Why `[design-pending]`:** the cheap fix — have the survey cite its edge sums — risks
   becoming ceremony, a stage writing down that it did the thing rather than doing it. The
   honest alternatives are a survey artifact the sum lands in, folding the sum into the existing
