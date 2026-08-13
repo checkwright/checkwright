@@ -6,6 +6,7 @@ mod gates;
 mod proc;
 mod queue;
 mod spec;
+mod stages;
 mod walk;
 
 use std::process::exit;

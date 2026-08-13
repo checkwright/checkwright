@@ -1,32 +1,15 @@
 // spec: queue-kit/SPEC.md §lib/queue.sh — the Rust counterpart of queue-kit/lib/queue.sh's
 // shared surface: the derived section matchers and the slug adapters. The shell library is
 // not retired, so this module sits beside it rather than replacing it
-// spec: gate-sdk/SPEC.md §lib/gate.sh — the bridged value, tab-split. The crate holds no
-// default for a bridged knob, so an absent variable is an error rather than a fallback;
-// an empty one is a resolved-empty value, which is why the two part company here.
+// spec: gate-sdk/SPEC.md §lib/gate.sh — the bridged read has exactly one implementation in
+// the crate, `walk`'s; these two are the queue-kit-facing spelling of it, so a second copy
+// of the unset-is-an-error rule cannot drift from the first
 pub fn knob_array(name: &str) -> Result<Vec<String>, String> {
-    let raw = std::env::var(format!("GATE_SDK_KNOB_{}", name)).map_err(|_| {
-        format!(
-            "GATE_SDK_KNOB_{} is unset — the gate was invoked without the config bridge \
-             gate_command emits, so {} could not be resolved",
-            name, name
-        )
-    })?;
-    if raw.is_empty() {
-        return Ok(Vec::new());
-    }
-    Ok(raw.split('\t').map(String::from).collect())
+    crate::walk::knob_array(name)
 }
 
 pub fn knob_scalar(name: &str) -> Result<String, String> {
-    let raw = std::env::var(format!("GATE_SDK_KNOB_{}", name)).map_err(|_| {
-        format!(
-            "GATE_SDK_KNOB_{} is unset — the gate was invoked without the config bridge \
-             gate_command emits, so {} could not be resolved",
-            name, name
-        )
-    })?;
-    Ok(raw)
+    crate::walk::knob_scalar(name)
 }
 
 // spec: queue-kit/SPEC.md §lib/queue.sh — the section vocabulary every derived matcher below

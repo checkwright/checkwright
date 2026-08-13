@@ -1,0 +1,3 @@
+# graph: couples=.gitattributes,lifecycle-kit/lib/stages.sh dir=one valve=none tier=precommit
+# install: on-surface
+# spec: lifecycle-kit/SPEC.md §check-merge-attrs — bidirectional parity between the derived iteration-scoped supersede set and the merge=iteration-scoped lines in .gitattributes (a smuggled ours-driver attribute on a path outside the set is the reverse-direction safety edge), plus forward-only parity for the derived union set (the gap inbox must carry merge=union; the git-native union driver is legitimate consumer usage elsewhere, so no reverse edge)

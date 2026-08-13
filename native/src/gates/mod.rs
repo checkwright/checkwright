@@ -4,13 +4,17 @@ pub mod action_gh_repo;
 pub mod action_pinning;
 pub mod assertion_strength;
 pub mod docs_cmd;
+pub mod gap_inbox_neutrality;
 pub mod install_claim;
 pub mod kit_registration;
 pub mod knob_citation;
+pub mod lesson_disposition;
+pub mod lifecycle_registration;
 pub mod manifest_count;
 pub mod manifest_temporal;
 pub mod md_refs;
 pub mod measured_claim;
+pub mod merge_attrs;
 pub mod payload_claim;
 pub mod prose_enum;
 pub mod queue_entry_budget;
@@ -18,8 +22,14 @@ pub mod queue_hygiene;
 pub mod queue_sections;
 pub mod queue_slug_liveness;
 pub mod queue_wrap;
+pub mod scratch_citation;
+pub mod shim_restatement;
+pub mod skill_binding;
 pub mod smoke_entry_guard;
 pub mod spec_fence_balance;
+pub mod stage_evidence;
+pub mod stage_skill_coverage;
+pub mod survey_record;
 pub mod tag_lead_line;
 pub mod task_conservation;
 pub mod task_names;
@@ -420,6 +430,121 @@ pub const REGISTRY: &[GateEntry] = &[
         &["?"],
         &["GATE_KIT_ROOTS_HERE"],
         "gate-sdk",
+    ),
+    // spec: gate-sdk/SPEC.md §The first cohort, and the rule that selects the next — the
+    // lifecycle-kit cohort shares a config surface rather than a corpus walk, so each member
+    // declares its own knobs plus every knob a shared derivation it calls is computed from
+    (
+        "check-stage-skill-coverage",
+        stage_skill_coverage::run,
+        &["?"],
+        &["LIFECYCLE_KIT_SKILLS_DIR", "LIFECYCLE_KIT_STAGES"],
+        "lifecycle-kit",
+    ),
+    (
+        "check-skill-binding",
+        skill_binding::run,
+        &["?"],
+        &["LIFECYCLE_KIT_SKILLS_DIR"],
+        "lifecycle-kit",
+    ),
+    // spec: gate-sdk/SPEC.md §check-reads-couples — an empty walk-root set for the members
+    // that read named files rather than listing a directory: there is no root for the
+    // recorder to observe, the shape the queue-kit cohort's file readers declare
+    (
+        "check-lifecycle-registration",
+        lifecycle_registration::run,
+        &[],
+        &[
+            "LIFECYCLE_KIT_AGENT_FILE",
+            "LIFECYCLE_KIT_STAGES",
+            "LIFECYCLE_KIT_QUEUE_FILE",
+        ],
+        "lifecycle-kit",
+    ),
+    (
+        "check-gap-inbox-neutrality",
+        gap_inbox_neutrality::run,
+        &[],
+        &["LIFECYCLE_KIT_GAP_INBOX_FILE"],
+        "lifecycle-kit",
+    ),
+    (
+        "check-merge-attrs",
+        merge_attrs::run,
+        &[],
+        &[
+            "LIFECYCLE_KIT_STATE_FILE",
+            "LIFECYCLE_KIT_LESSON_EVIDENCE_FILE",
+            "LIFECYCLE_KIT_SURVEY_RECORD_FILE",
+            "LIFECYCLE_KIT_BOUNDARY_TRUNCATE",
+            "LIFECYCLE_KIT_GAP_INBOX_FILE",
+        ],
+        "lifecycle-kit",
+    ),
+    (
+        "check-stage-evidence",
+        stage_evidence::run,
+        &[],
+        &[
+            "LIFECYCLE_KIT_QUEUE_FILE",
+            "LIFECYCLE_KIT_STATE_FILE",
+            "LIFECYCLE_KIT_STAGES",
+            "LIFECYCLE_KIT_FIRST_STAGE",
+            "LIFECYCLE_KIT_WAIVER_TOKEN",
+            "LIFECYCLE_KIT_SESSION_BOUNDARY",
+        ],
+        "lifecycle-kit",
+    ),
+    (
+        "check-lesson-disposition",
+        lesson_disposition::run,
+        &[],
+        &[
+            "LIFECYCLE_KIT_QUEUE_FILE",
+            "LIFECYCLE_KIT_LESSON_EVIDENCE_FILE",
+        ],
+        "lifecycle-kit",
+    ),
+    (
+        "check-survey-record",
+        survey_record::run,
+        &[],
+        &["LIFECYCLE_KIT_SURVEY_RECORD_FILE"],
+        "lifecycle-kit",
+    ),
+    // spec: gate-sdk/SPEC.md §check-reads-couples — two `?` and not one: the skills-dir listing
+    // and the per-kit templates walk are separate call sites with separately unbounded roots,
+    // which is the arity the shell parser's own skipped-and-counted accounting has
+    (
+        "check-shim-restatement",
+        shim_restatement::run,
+        &["?", "?"],
+        &[
+            "GATE_PRUNE_DIRS",
+            "GATE_KIT_ROOTS_REL",
+            "LIFECYCLE_KIT_SKILLS_DIR",
+            "LIFECYCLE_KIT_SHIM_NGRAM",
+            "LIFECYCLE_KIT_SHIM_DEDUP_CORPUS",
+            "LIFECYCLE_KIT_AGENT_FILE",
+        ],
+        "lifecycle-kit",
+    ),
+    // spec: lifecycle-kit/SPEC.md §check-scratch-citation — the surface globs expand from the
+    // invoking directory through one `**`-capable listing, so one unbounded root; the four
+    // supersede knobs ride because the forbidden-target set is derived from them
+    (
+        "check-scratch-citation",
+        scratch_citation::run,
+        &["?"],
+        &[
+            "LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS",
+            "LIFECYCLE_KIT_STATE_FILE",
+            "LIFECYCLE_KIT_LESSON_EVIDENCE_FILE",
+            "LIFECYCLE_KIT_SURVEY_RECORD_FILE",
+            "LIFECYCLE_KIT_BOUNDARY_TRUNCATE",
+        ],
+        "lifecycle-kit",
     ),
 ];
 

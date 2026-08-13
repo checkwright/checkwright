@@ -10,3 +10,11 @@ check-measured-claim
 check-install-claim
 check-payload-claim
 check-manifest-temporal
+check-stage-skill-coverage
+check-lifecycle-registration
+check-skill-binding
+check-merge-attrs
+check-stage-evidence
+check-lesson-disposition
+check-survey-record
+check-shim-restatement

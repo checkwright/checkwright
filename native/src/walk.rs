@@ -22,7 +22,7 @@ pub fn prune_dirs() -> Result<Vec<String>, String> {
 // spec: gate-sdk/SPEC.md §lib/gate.sh — the bridged read of one tab-joined array knob,
 // the shape `prune_dirs` above has; an absent variable is an error because the crate holds
 // no default for a bridged knob, and an empty one is a resolved-empty set.
-fn bridged_array(knob: &str) -> Result<Vec<String>, String> {
+pub fn knob_array(knob: &str) -> Result<Vec<String>, String> {
     let var = format!("GATE_SDK_KNOB_{}", knob);
     let raw = std::env::var(&var).map_err(|_| {
         format!(
@@ -41,14 +41,14 @@ fn bridged_array(knob: &str) -> Result<Vec<String>, String> {
 // never re-derived, because the fallback predicate is anchored at the shell library's own
 // location and a binary the installer copies elsewhere cannot recover it
 pub fn kit_roots() -> Result<Vec<String>, String> {
-    bridged_array("GATE_KIT_ROOTS_HERE")
+    knob_array("GATE_KIT_ROOTS_HERE")
 }
 
 // spec: gate-sdk/SPEC.md §lib/gate.sh — `gate_kit_roots_rel`'s value, bridged rather than
 // derived from `kit_roots` above: the anchor relating the two spellings is not recoverable
 // from the absolute set once GATE_SDK_KIT_DIRS overrides it.
 pub fn kit_roots_rel() -> Result<Vec<String>, String> {
-    bridged_array("GATE_KIT_ROOTS_REL")
+    knob_array("GATE_KIT_ROOTS_REL")
 }
 
 // spec: gate-sdk/SPEC.md §lib/gate.sh — the bridged read of one scalar knob. A scalar is a

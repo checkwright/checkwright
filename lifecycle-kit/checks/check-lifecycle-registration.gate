@@ -1,0 +1,3 @@
+# graph: couples=CLAUDE.md,lifecycle-kit/lib/stages.sh dir=one valve=none tier=precommit
+# install: on-surface
+# spec: lifecycle-kit/SPEC.md §check-lifecycle-registration — the always-loaded agent file carries a lifecycle-kit marker block whose content byte-matches the block regenerated from the live stage machine, fail-closed when the target or a marker is missing

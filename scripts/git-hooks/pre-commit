@@ -134,7 +134,7 @@ if staged_matches 'CLAUDE.md' 'doctrine-kit/DOCTRINE.md'; then
 fi
 
 if staged_matches 'CLAUDE.md' 'lifecycle-kit/lib/stages.sh'; then
-    run_gate check-lifecycle-registration lifecycle-kit/checks/check-lifecycle-registration.sh
+    run_gate check-lifecycle-registration env GATE_SDK_KNOB_LIFECYCLE_KIT_AGENT_FILE=CLAUDE.md $'GATE_SDK_KNOB_LIFECYCLE_KIT_STAGES=scope\tspec\talign\tbuild\tvalidate\tclose' GATE_SDK_KNOB_LIFECYCLE_KIT_QUEUE_FILE=TASK-QUEUE.md native/target/release/checkwright-gates check-lifecycle-registration
 fi
 
 run_gate check-kit-ref-liveness scripts/check-kit-ref-liveness.sh
@@ -198,7 +198,7 @@ if staged_matches 'scripts/identity.conf'; then
 fi
 
 if staged_matches 'TASK-QUEUE.md' '.workflow/WORKFLOW-STATE.txt'; then
-    run_gate check-stage-evidence lifecycle-kit/checks/check-stage-evidence.sh
+    run_gate check-stage-evidence env GATE_SDK_KNOB_LIFECYCLE_KIT_QUEUE_FILE=TASK-QUEUE.md GATE_SDK_KNOB_LIFECYCLE_KIT_STATE_FILE=.workflow/WORKFLOW-STATE.txt $'GATE_SDK_KNOB_LIFECYCLE_KIT_STAGES=scope\tspec\talign\tbuild\tvalidate\tclose' GATE_SDK_KNOB_LIFECYCLE_KIT_FIRST_STAGE=scope GATE_SDK_KNOB_LIFECYCLE_KIT_WAIVER_TOKEN=align-waived GATE_SDK_KNOB_LIFECYCLE_KIT_SESSION_BOUNDARY=iteration native/target/release/checkwright-gates check-stage-evidence
 fi
 
 if staged_matches 'TASK-QUEUE.md' '.workflow/WORKFLOW-STATE.txt'; then
@@ -206,23 +206,23 @@ if staged_matches 'TASK-QUEUE.md' '.workflow/WORKFLOW-STATE.txt'; then
 fi
 
 if staged_matches '.claude/commands/*.md'; then
-    run_gate check-stage-skill-coverage lifecycle-kit/checks/check-stage-skill-coverage.sh
+    run_gate check-stage-skill-coverage env GATE_SDK_KNOB_LIFECYCLE_KIT_SKILLS_DIR=.claude/commands $'GATE_SDK_KNOB_LIFECYCLE_KIT_STAGES=scope\tspec\talign\tbuild\tvalidate\tclose' native/target/release/checkwright-gates check-stage-skill-coverage
 fi
 
 if staged_matches '.claude/commands/*.md' 'lifecycle-kit/templates/stages/*.md' 'lifecycle-kit/templates/lead.md' 'lifecycle-kit/templates/release-sweep.md' 'lifecycle-kit/templates/upgrade.md' 'lifecycle-kit/templates/consult.md' 'delegation-kit/templates/agent-execution.md'; then
-    run_gate check-skill-binding lifecycle-kit/checks/check-skill-binding.sh
+    run_gate check-skill-binding env GATE_SDK_KNOB_LIFECYCLE_KIT_SKILLS_DIR=.claude/commands native/target/release/checkwright-gates check-skill-binding
 fi
 
 if staged_matches '.claude/commands/*.md' 'CLAUDE.md' 'gate-sdk/templates/*.md' 'canon-kit/templates/*.md' 'context-kit/templates/*.md' 'delegation-kit/templates/*.md' 'doctrine-kit/templates/*.md' 'drift-kit/templates/*.md' 'evidence-kit/templates/*.md' 'guard-kit/templates/*.md' 'lifecycle-kit/templates/*.md' 'queue-kit/templates/*.md' 'site-kit/templates/*.md' 'lifecycle-kit/templates/stages/*.md'; then
-    run_gate check-shim-restatement lifecycle-kit/checks/check-shim-restatement.sh
+    run_gate check-shim-restatement env $'GATE_SDK_KNOB_GATE_PRUNE_DIRS=target\t.git\tnode_modules\t.tmp\tgate-tests\tworktrees' $'GATE_SDK_KNOB_GATE_KIT_ROOTS_REL=gate-sdk\tcanon-kit\tcontext-kit\tdelegation-kit\tdoctrine-kit\tdrift-kit\tevidence-kit\tguard-kit\tlifecycle-kit\tqueue-kit\tsite-kit' GATE_SDK_KNOB_LIFECYCLE_KIT_SKILLS_DIR=.claude/commands GATE_SDK_KNOB_LIFECYCLE_KIT_SHIM_NGRAM=9 GATE_SDK_KNOB_LIFECYCLE_KIT_SHIM_DEDUP_CORPUS= GATE_SDK_KNOB_LIFECYCLE_KIT_AGENT_FILE=CLAUDE.md native/target/release/checkwright-gates check-shim-restatement
 fi
 
 if staged_matches 'TASK-QUEUE.md' '.workflow/lesson-evidence.txt'; then
-    run_gate check-lesson-disposition lifecycle-kit/checks/check-lesson-disposition.sh
+    run_gate check-lesson-disposition env GATE_SDK_KNOB_LIFECYCLE_KIT_QUEUE_FILE=TASK-QUEUE.md GATE_SDK_KNOB_LIFECYCLE_KIT_LESSON_EVIDENCE_FILE=.workflow/lesson-evidence.txt native/target/release/checkwright-gates check-lesson-disposition
 fi
 
 if staged_matches '.gitattributes' 'lifecycle-kit/lib/stages.sh'; then
-    run_gate check-merge-attrs lifecycle-kit/checks/check-merge-attrs.sh
+    run_gate check-merge-attrs env GATE_SDK_KNOB_LIFECYCLE_KIT_STATE_FILE=.workflow/WORKFLOW-STATE.txt GATE_SDK_KNOB_LIFECYCLE_KIT_LESSON_EVIDENCE_FILE=.workflow/lesson-evidence.txt GATE_SDK_KNOB_LIFECYCLE_KIT_SURVEY_RECORD_FILE=.workflow/survey-record.md $'GATE_SDK_KNOB_LIFECYCLE_KIT_BOUNDARY_TRUNCATE=.workflow/validate-evidence.txt\t.workflow/release-disposition.txt' GATE_SDK_KNOB_LIFECYCLE_KIT_GAP_INBOX_FILE=.workflow/gap-inbox.md native/target/release/checkwright-gates check-merge-attrs
 fi
 
 if staged_matches '.workflow/*' 'gate-sdk/SPEC.md' 'canon-kit/SPEC.md' 'context-kit/SPEC.md' 'delegation-kit/SPEC.md' 'doctrine-kit/SPEC.md' 'drift-kit/SPEC.md' 'evidence-kit/SPEC.md' 'guard-kit/SPEC.md' 'lifecycle-kit/SPEC.md' 'queue-kit/SPEC.md' 'site-kit/SPEC.md' '.claude/commands/*.md' '.gitignore'; then
@@ -230,15 +230,15 @@ if staged_matches '.workflow/*' 'gate-sdk/SPEC.md' 'canon-kit/SPEC.md' 'context-
 fi
 
 if staged_matches '.workflow/survey-record.md'; then
-    run_gate check-survey-record lifecycle-kit/checks/check-survey-record.sh
+    run_gate check-survey-record env GATE_SDK_KNOB_LIFECYCLE_KIT_SURVEY_RECORD_FILE=.workflow/survey-record.md native/target/release/checkwright-gates check-survey-record
 fi
 
 if staged_matches 'TASK-QUEUE.md' '*/SPEC.md' 'gate-sdk/lib/stages.sh' 'canon-kit/lib/stages.sh' 'context-kit/lib/stages.sh' 'delegation-kit/lib/stages.sh' 'doctrine-kit/lib/stages.sh' 'drift-kit/lib/stages.sh' 'evidence-kit/lib/stages.sh' 'guard-kit/lib/stages.sh' 'lifecycle-kit/lib/stages.sh' 'queue-kit/lib/stages.sh' 'site-kit/lib/stages.sh'; then
-    run_gate check-scratch-citation lifecycle-kit/checks/check-scratch-citation.sh
+    run_gate check-scratch-citation env $'GATE_SDK_KNOB_LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS=TASK-QUEUE.md\t*/SPEC.md' GATE_SDK_KNOB_LIFECYCLE_KIT_STATE_FILE=.workflow/WORKFLOW-STATE.txt GATE_SDK_KNOB_LIFECYCLE_KIT_LESSON_EVIDENCE_FILE=.workflow/lesson-evidence.txt GATE_SDK_KNOB_LIFECYCLE_KIT_SURVEY_RECORD_FILE=.workflow/survey-record.md $'GATE_SDK_KNOB_LIFECYCLE_KIT_BOUNDARY_TRUNCATE=.workflow/validate-evidence.txt\t.workflow/release-disposition.txt' native/target/release/checkwright-gates check-scratch-citation
 fi
 
 if staged_matches '.workflow/gap-inbox.md'; then
-    run_gate check-gap-inbox-neutrality lifecycle-kit/checks/check-gap-inbox-neutrality.sh
+    run_gate check-gap-inbox-neutrality env GATE_SDK_KNOB_LIFECYCLE_KIT_GAP_INBOX_FILE=.workflow/gap-inbox.md native/target/release/checkwright-gates check-gap-inbox-neutrality
 fi
 
 if staged_matches 'TASK-QUEUE.md'; then
@@ -356,7 +356,7 @@ if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md'; then
 fi
 
 if staged_matches '*.md' 'scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh'; then
-    run_gate check-measured-claim env $'GATE_SDK_KNOB_CANON_KIT_MEASURED_CLAIMS_CMD=bash scripts/measured-claims.sh' $'GATE_SDK_KNOB_CANON_KIT_MEASURED_SURFACE_GLOBS=CLAUDE.md\tREADME.md\tCONTRIBUTING.md\tCODE_OF_CONDUCT.md\tSECURITY.md\tRELEASING.md\tROADMAP.md\tTRAJECTORY.md\t*/SPEC.md\t*/README.md\treserve/*/README.md\tdoctrine-kit/DOCTRINE.md\tdocs/*.md\tdocs/*/index.md\tdocs/posts/*.md\t.claude/commands/*.md' GATE_SDK_KNOB_CANON_KIT_MEASURED_KEYS=ported-gate-members GATE_SDK_KNOB_CANON_KIT_MEASURED_VALUES=26 native/target/release/checkwright-gates check-measured-claim
+    run_gate check-measured-claim env $'GATE_SDK_KNOB_CANON_KIT_MEASURED_CLAIMS_CMD=bash scripts/measured-claims.sh' $'GATE_SDK_KNOB_CANON_KIT_MEASURED_SURFACE_GLOBS=CLAUDE.md\tREADME.md\tCONTRIBUTING.md\tCODE_OF_CONDUCT.md\tSECURITY.md\tRELEASING.md\tROADMAP.md\tTRAJECTORY.md\t*/SPEC.md\t*/README.md\treserve/*/README.md\tdoctrine-kit/DOCTRINE.md\tdocs/*.md\tdocs/*/index.md\tdocs/posts/*.md\t.claude/commands/*.md' GATE_SDK_KNOB_CANON_KIT_MEASURED_KEYS=ported-gate-members GATE_SDK_KNOB_CANON_KIT_MEASURED_VALUES=36 native/target/release/checkwright-gates check-measured-claim
 fi
 
 if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md' '.gitignore'; then

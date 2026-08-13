@@ -1,0 +1,3 @@
+# graph: couples=.workflow/survey-record.md dir=one valve=none tier=precommit
+# install: on-surface
+# spec: lifecycle-kit/SPEC.md §check-survey-record — every survey block carries its whole witness: the four keys in order, a full-sha rev naming a real commit, a non-empty corpus and a non-empty oracle
