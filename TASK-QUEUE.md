@@ -15,6 +15,65 @@
 
 ## Technical Debt
 
+- **gap-bullet-premise-verification** — a gap-inbox bullet asserts mechanism under no
+  verification bar, and a false one is paid by whoever drains it.
+  **Shape ruled 2026-08-13 by the operator, and it is the one this entry already named as
+  the one to beat:** re-verification becomes a **named step of the close drain**, and the
+  capture-time affordance is untouched. `bin/file-gap.sh` gains no prompt and no grammar,
+  so the inbox's founding reason — deferred capture is no capture — is not traded away to
+  fix a different failure mode. The two rejected shapes are recorded so the choice is not
+  re-litigated: a filing-time prompt for the establishing command, and a grammar separating
+  observation from inferred mechanism. Both add friction at the moment the inbox exists to
+  keep cheap.
+  **Why the drain is where it works, from three firings.** Two of the three bullets
+  re-verified at the 2026-08-07 boundary were false at their central claim, both filed by
+  one close: one asserted the npm approval environment did not gate the `v0.18.0` publish
+  (it gated — the deployment held 77 seconds and an approval is recorded), the other that
+  `check-graph` prints no regeneration command on a red verdict (it prints both, with
+  resolved knob paths). Each fell to a single command. The 2026-08-13 instance carried two
+  false premises at once and is the one that settles the shape: its inferred mechanism was
+  caught by the filer re-reading the source before the drain, while its motivating symptom
+  was caught only by the draining session's four probes. **The step that reliably ran was
+  the drain.**
+  **Deliverable:** the close template's drain step names re-verification explicitly — per
+  bullet, the claim and the command that establishes it — and the drain's output records
+  which bullets were re-verified and what fell. Adds no governed name.
+  **Distinct from `close-generated-finding-route`**, which owns *when* a close-generated
+  finding is drained; this owns whether its factual claims were ever checked.
+  Filed 2026-07-31 at scope; recurrence stamped 2026-08-07 and 2026-08-13; promoted
+  2026-08-13 at scope on the counted-recurrence rule, the operator ruling the shape.
+
+- **bash-guard-auto-mode-rationale** — the guard's messages assert a consequence the
+  harness no longer produces. They say a decorated command "forces a permission prompt no
+  allowlist entry suppresses"; under auto mode a decorated command does not prompt, it
+  routes to a classifier model.
+  **Scoped by operator ruling 2026-08-13 to parts (1) and (2). Part (3) is not in this
+  entry** — `guard-grant-review` carries it, blocked until the breadth direction arrives.
+  **The mechanism, verified at the 2026-08-13 drain against the vendor permission-modes
+  page** rather than inferred from it: an allow, ask or deny match resolves immediately;
+  read-only actions and working-directory edits auto-approve; everything else goes to the
+  classifier. A match short-circuits the classifier entirely — no model call — with writes
+  to protected paths the sole exception.
+  **The guard still earns its keep, for a reason other than the one it states.** Steering a
+  command into its bare allowlisted form keeps it at the match step rather than the
+  classifier, which is cheaper in latency and tokens and needs no peer model. A second
+  rationale is untouched by any of this: the tool-hygiene rules — Read over `cat`/`sed`, the
+  repo scratch dir over `/tmp` — hold in every permission mode, and they are why the guard
+  is not merely a prompt-avoidance device.
+  **Deliverable (1):** re-word every message naming a prompt as the consequence. Hard
+  constraint: a session may run in any permission mode, so a message re-pinned to auto is as
+  wrong as the one it replaces — the wording must be true under all modes without naming one.
+  **Deliverable (2):** rule whether the serialization cost is still worth paying now that
+  the consequence is a model call rather than a block. An economics call over a cost this
+  repo does not measure, so it is answered with a stated rationale rather than a number.
+  Scope: prose in guard-kit's message set plus its decision-table cases. No new gate, and
+  the guard's mechanism is unchanged.
+  **Live evidence from the promoting session:** four refusals in roughly twelve bash calls
+  at scope 2026-08-13, including a shape the entry had not measured — a POSIX regex
+  quantifier inside a *quoted* grep pattern tripping the brace-expansion refusal.
+  Filed 2026-08-13 by close from its own gap-inbox drain; promoted and scoped 2026-08-13 at
+  scope on the operator ruling.
+
 ## Deferred
 
 - **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability] —
@@ -1125,48 +1184,6 @@
   Surfaced 2026-07-31 by the lead, deliberately **not** filed to the inbox on the
   ground that filing it there would compound the defect it names; drained by close
   in the same pass as the inbox.
-
-- **gap-bullet-premise-verification** [design-pending] — a gap-inbox bullet
-  asserts mechanism under no verification bar, and a false one is paid by
-  whoever drains it.
-  recurrence: gap-bullet-premise-verification 2026-08-07 2026-08-13
-  Two of the three bullets re-verified at this boundary were
-  false at their central claim, both filed by the same close: one asserted the
-  npm approval environment did not gate the `v0.18.0` publish (it gated — the
-  deployment held 77 seconds and an approval is recorded), the other that
-  `check-graph` prints no regeneration command on a red verdict (it prints both,
-  with resolved knob paths). Each was falsified by a single command.
-  **Third instance, 2026-08-13, and the first that argues for the cheap fix.** One bullet
-  carried two false premises at once: an inferred mechanism — that auto mode drops a
-  verb-scoped allow rule — read off a category description instead of the enumeration
-  under it, and a motivating symptom, that a breadth finding re-reports at every close,
-  which four probes at the drain contradicted. The inference was caught by the filer
-  re-reading the source before the drain; the symptom was not, and only the draining
-  session's probes found it. That split is evidence for the candidate shape this entry
-  already calls the one to beat: the failure mode is not filers who never check, it is
-  that nothing *asks*, and the step that reliably ran was the drain.
-  **Why this is not `close-generated-finding-route`'s ground.** That entry owns
-  *when* a close-generated finding gets drained; this one owns whether its
-  factual claims were ever checked. A correctly-routed bullet carrying a false
-  mechanism lands in the queue as a false premise — and this queue's own
-  convention of dating premise corrections into entry bodies is the evidence
-  that such a premise can then survive iterations before anyone re-derives it.
-  **Why `[design-pending]`:** the affordance must not become a checkpoint. The
-  inbox exists because deferred capture is no capture, so a verification bar
-  that slows filing would trade a known failure mode for the one the inbox was
-  built to prevent. Candidate shapes, with different costs: `bin/file-gap.sh`
-  prompting for the command that establishes the claim, a grammar separating
-  observation from inferred mechanism, or leaving capture untouched and making
-  re-verification an explicit named step of the drain. The third adds no capture
-  friction at all and is the one to beat.
-  **Cost while deferred:** paid by the draining session, which either re-derives
-  the mechanism or promotes a false premise into the queue where it reads as
-  established; two instances in one boundary, from one close. Low and
-  non-rotting — nothing in the tree degrades while it sits.
-  Debt: a filing-or-drain discipline over an existing affordance; adds no
-  governed name unless a grammar lands.
-  Filed 2026-07-31 at scope from its own gap-inbox disposition; the lead ruled
-  the observation durable but outside this iteration's ruled unit set.
 
 - **post-immutability-machine-read-carveout** [design-pending] — the post
   immutability rule and the machine-readable-note rule are stated on two pages
@@ -5184,39 +5201,30 @@
   Filed 2026-08-13 by close from its own gap-inbox drain; the instance-vs-gap split and both
   premise corrections are the drain's.
 
-- **bash-guard-auto-mode-rationale** [design-pending] — the guard's messages assert a
-  consequence the harness no longer produces. Its steering messages say a decorated command
-  "forces a permission prompt no allowlist entry suppresses"; under auto mode a decorated
-  command does not prompt, it routes to a classifier model.
-  **The mechanism, verified at this drain against the vendor permission-modes page** rather
-  than inferred from it: the decision order is (1) an allow, ask or deny match resolves
-  immediately, (2) read-only actions and working-directory edits auto-approve, (3) everything
-  else goes to the classifier. A match short-circuits the classifier entirely — no model call
-  — with writes to protected paths the sole exception, which route to the classifier even on
-  a match.
-  **The guard still earns its keep, for a reason other than the one it states.** Steering a
-  command into its bare allowlisted form keeps it at step 1 rather than step 3, which is
-  cheaper in latency and tokens and needs no peer model. A second rationale is untouched by
-  any of this: the tool-hygiene rules — Read over `cat`/`sed`, the repo scratch dir over
-  `/tmp` — hold in every permission mode, and they are why the guard is not merely a
-  prompt-avoidance device.
-  **Deliverable, three parts:** re-word the messages that name a prompt as the consequence;
-  decide whether the serialization cost is still worth paying now that the consequence is a
-  model call rather than a block; and re-derive which allowlist entries are worth keeping,
-  given that it is the match that buys the short-circuit. Cost: prose in guard-kit's message
-  set plus its decision-table cases; no new gate, and the guard's mechanism is unchanged.
-  **Why `[design-pending]`:** only the first part is an edit, and even it has a hard
-  constraint — a session may run in any permission mode, so a message re-pinned to auto is as
-  wrong as the one it replaces, and the wording must be true under all modes without naming
-  one. The second part is an economics call over a cost this repo does not currently measure.
-  The third changes what the repo grants, which is the operator-intent surface
-  `settings-allow-intended-breadth-declaration` turns on, so it sequences after that entry's
-  breadth ruling.
-  **Cost while deferred:** paid per firing by every session the guard steers, and rising —
-  auto mode becomes the default for new Pro, Max and Team sessions on 2026-08-14, so the
-  stated rationale is wrong for the mode most readers will be in. Non-rotting otherwise:
-  nothing in the tree degrades while it sits, and the guard keeps working throughout.
-  Filed 2026-08-13 by close from its own gap-inbox drain.
+- **guard-grant-review** [design-pending] [blocked-by: settings-allow-intended-breadth-declaration]
+  — which allowlist grants are worth keeping, once it is the **match** that buys the
+  short-circuit rather than the prompt-avoidance the guard's messages claim.
+  Split from `bash-guard-auto-mode-rationale` 2026-08-13 at scope, on the operator ruling
+  that scoped that entry to its first two parts. This is its third: re-derive the grant set,
+  given that an allow match resolves immediately and skips the classifier entirely, so a
+  surviving broad rule *saves* model calls rather than buying nothing.
+  **Why blocked rather than merely deferred:** it changes what the repo grants, which is the
+  operator-intent surface `settings-allow-intended-breadth-declaration` turns on. The
+  2026-08-13 ruling selected that entry's *disposition* — a direction is given now rather
+  than deferred — but **did not state the direction**, and supplying one is operator-class
+  (TRAJECTORY.md §How to read a ruling recorded here). So this entry stays unstarted.
+  **Where the direction lands when it arrives — stated so it is not re-derived, and without
+  pre-empting what it says:** TRAJECTORY.md §The closed rulings is the governed home, that
+  file being the project's ruling record, pointing at guard-kit/SPEC.md
+  §compare-settings-allow, which owns the narrow-or-declare disposition pair a direction
+  chooses between. This matters because the 2026-08-13 breadth ruling currently lives in
+  **no** governed surface — only a drained gap bullet and a commit message, which
+  spec-over-precedent says is not ground truth. Naming the home is what stops the next
+  ruling landing the same way.
+  **Cost while deferred:** the guard keeps steering against a grant set nobody has
+  re-derived under the mechanism that actually applies, so the allowlist may be
+  simultaneously wider than security wants and narrower than the short-circuit rewards.
+  Non-rotting: nothing in the tree degrades while it sits.
 
 ## Icebox
 

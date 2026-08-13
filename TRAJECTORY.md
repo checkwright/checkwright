@@ -273,6 +273,22 @@ it reopens none, because what a developer builds from is the artifact that is
 public already. Recorded because the question is worth asking once and expensive
 to ask twice — the two paths sound like a disclosure change and are not one.
 
+**The fifth cohort is the ERE-matcher trio — ruled 2026-08-13 by the operator.**
+`check-install-claim`, `check-payload-claim` and `check-manifest-temporal`: the
+three `spec_manifest_files` members held out of the canon-kit cohort on the ERE
+engine, taken now by paying that engine once. Two alternatives were put and
+declined — the gates sitting in blocker-free groups (a `docs/posts` trio and the
+stage-stamp pair), and a set combining those with this trio — so **the cohort is
+not to be widened**. The ground for preferring the harder set: those groups are
+the last blocker-free multi-member ones, so taking them first defers the hard
+core that sets the completion date rather than moving it. The two
+baseline-held suites ride with the cohort — `installer_smoke` and `upgrade`,
+each attributed to a port-created hole that every further cohort widens, and
+neither entry citing the other, so the sum was invisible until it was summed.
+Cohort composition itself is owned by gate-sdk/SPEC.md §The first cohort, and
+the rule that selects the next; this records the ruling, not the design.
+**Discharged when the trio lands.**
+
 What the sequence names next, after the port: `companion-toolkit-profile`.
 
 `instruction-surface-bash-focus` unblocks on a threshold rather than a date,
