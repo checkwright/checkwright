@@ -95,7 +95,9 @@ must have to git alone.**
    explicitly not claimed.
 4. **Footprint is a first-class cost.** An adopter installs, tries, and
    uninstalls without growing their managed code base or their dependency set.
-   The trial lifecycle is part of the product, not an afterthought.
+   The trial lifecycle is part of the product, not an afterthought. *The
+   adopter's* set is the one this bounds — the build graph behind the binaries
+   is a different set, ruled below.
 5. **Non-technical adopters are a design constraint.** A prose-profile consumer
    will not install a toolchain and may not have one. Any step that assumes a
    developer machine excludes them.
@@ -224,6 +226,21 @@ that grounds it: the ruling is stated *for* `preview`, so the flip to `stable` a
 `v1.0.0` reopens it rather than inheriting it. Nothing here narrows the operator
 direction trigger, which remains available for exactly the urgent case this
 paragraph declines to automate.
+
+**Objective 4 constrains the adopter's dependency set, never the crate's build
+graph — ruled 2026-08-14, and it was never otherwise.** The two sets are
+different things and reading them as one is what made a prohibition appear that
+had never been stated: the adopter's set is what they install and can uninstall,
+which is git plus pre-compiled binaries; the crate's build graph is resolved and
+compiled by contributors and CI, and no consumer ever receives, resolves or
+compiles it (install-time builds from vendored source are void under objectives
+1, 2 and 5). So the `native/` crate is under **no** no-external-dependencies
+prohibition and never was. Recorded because the false reading was not merely
+held — it was cited as a *ground* in four places in gate-sdk/SPEC.md and encoded
+in a passing test before an operator correction caught it, which is the cost of
+leaving an objective's scope to be inferred. What the ruling does **not** touch:
+the dependency **bar** the crate applies to a candidate dependency is
+engineering judgment owned by gate-sdk/SPEC.md, and nothing here loosens it.
 
 ## PRIORITY DIRECTIVE — the port track's sequence
 

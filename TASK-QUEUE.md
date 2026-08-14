@@ -5765,6 +5765,14 @@
   seventh MSRV surface (`docs/site-architecture.md`, quoting the toolchain floor inside a
   *format example*), and batch 2's `canon-kit/SPEC.md` born-native passage, which the flip
   falsifies. Neither shipped wrong, because the grep ran; nothing made it run.
+  **A third instance survived even the grep, and it is the sharpest evidence here.** The
+  `capability-pendency-after-landing` audit at the close of the same iteration found an
+  **eighth** MSRV surface still reading 1.56: `context-kit/SPEC.md` §The rendered verdict,
+  whose format example renders the very element the section twelve lines above declares must
+  be re-derived at every dependency change. So the page naming the hazard carried an
+  uncorrected instance of it, past the amendment, past align, past a removals-propagated grep,
+  and past a battery that stayed green. **Format examples are the shape that survives**, and
+  that is the pattern any scanner here would have to key on.
   **The converse of an existing entry, and the distinction is load-bearing.**
   `amendment-update-target-coverage` (icebox) owns a roster *entry* naming no owning delta — a
   listed target with no claim. This owns a *target with no entry*, which no scan over the

@@ -1624,10 +1624,13 @@ every gate. **The instrument that makes the rule applicable is
 the still-shell members by derived corpus derivation, largest group first, with
 the mechanically derivable criterion columns beside each member — so "largest",
 "criteria-clearing" and "sharing one corpus derivation" are each read off a run
-rather than off a session's reading of the tree. Its output is advisory and its
-key is deliberately not fused with `couples=`, so a group whose members' corpora
-visibly diverge is a **finding the selecting session adjudicates**, never a
-cohort the tool cut. A cohort that retires a **blocker** several later cohorts are queued
+rather than off a session's reading of the tree. **What the tool means by "one
+corpus derivation" is not obvious from the phrase and is specified at
+§port-blockers** — a two-factor key, neither of which is `couples=`; read it
+there before reasoning about why two members did or did not group. Its output is
+advisory and its key is deliberately not fused with `couples=`, so a group whose
+members' corpora visibly diverge is a **finding the selecting session
+adjudicates**, never a cohort the tool cut. A cohort that retires a **blocker** several later cohorts are queued
 behind outranks a larger one that retires none, which is the exception §The POSIX
 ERE matcher works and `check-roadmap-fresh`'s hold worked before it. Shared derivation is the axis because it is what made this cohort
 cheap: the walk is ported once and proved N times, and the parity comparison is

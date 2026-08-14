@@ -326,9 +326,14 @@ The constrained members and what forces each:
   (gate-sdk/SPEC.md §The settings cohort, and the crate's first dependency) is
   above the `edition = "2021"` floor of 1.56 that governed while the graph was
   empty. It is re-derived against the lock at any dependency change rather than
-  recalled, and a move carries every surface stating it — including
-  `docs/site-architecture.md`, which quotes this element as its format example and
-  is machine-checked by nothing. It is also a `check-crate-arms` input: clippy
+  recalled, and a move carries every surface stating it — including **§The
+  rendered verdict below and `docs/site-architecture.md`, both of which quote
+  this element as a *format example***, and both machine-checked by nothing. That
+  pair is named rather than described because a format example is the shape a
+  floor move keeps missing: it reads as illustration, so it survives the grep a
+  reader runs for the surface. The 1.56 → 1.71 move missed
+  `docs/site-architecture.md` at authoring and this section's own example at the
+  merge, the second caught only by a close-stage audit. It is also a `check-crate-arms` input: clippy
   suppresses a lint whose suggested API postdates the declared floor, so raising
   the floor un-suppresses lints against code no change touched.
   `cargo` is the member rather than `rustc` because `cargo build` is what the
@@ -364,7 +369,7 @@ not one.
 for a constrained member, the constraint and its verdict — `` (floor 4.3, ok) ``,
 `` (requires GNU — below contract) ``, `` (floor 4.3 — unverified) ``; an
 unconstrained member carries no parenthetical. A member carrying an audience
-carries it here too, as `` (floor 1.56, contributor-only, ok) ``, and every line
+carries it here too, as `` (floor 1.71, contributor-only, ok) ``, and every line
 that names such a member is marked the same way — the absent list and the
 below-contract list included, because those are the two lines on which *below a
 floor that is yours* and *below a floor you are not on the hook for* would
