@@ -62,6 +62,24 @@ deliverable, so check it against what the deltas actually mandate rather than
 against the sentence it heads. And every `## Existing sections updated` entry
 must name the delta that owns it (canon-kit/templates/SPEC-amendment.md).
 
+**A grammar the amendment states about a tool's behaviour is run against that
+tool.** An amendment modelling something outside itself — a filter language, an
+option parser, a file format — is a *claim about a program*, and reading it is
+not testing it. One invocation settles it. Attested: an amendment specified a
+pin-path grammar admitting a leading bracket step, the gate refused any path not
+opening with `.`, and the tool being modelled read a leading `["k"]` as an array
+literal rather than an index — a three-way disagreement that passed authoring and
+this audit and was caught by the first differential run at build.
+
+**The `## Existing sections updated` roster is checked from the tree, not from
+the amendment.** A roster entry with no delta is visible on the document; a
+*surface with no entry* is not, because the evidence is in the tree. When a delta
+replaces a literal — a version, a floor, a policy phrase — grep the tree for the
+old one and reconcile every survivor against the roster. Attested twice in one
+iteration, both times a documentation surface reading as commentary that the
+grep found and the amendment did not name (`amendment-roster-omission-detection`
+owns whether any of this is gateable).
+
 **Every amendment's "wires cleanly against the current tree" is a hypothesis,
 and the align audit is its first test.** Authoring a producer silently asserts
 the consumer's read side already matches — it rarely does. Verify every

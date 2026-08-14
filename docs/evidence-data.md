@@ -90,3 +90,4 @@
 | native-lifecycle-cohort-and-guard-friction | sc sp a b v c | 6f/1d | 2 · ≤0d | 24s clean | 103 |
 | native-comment-surface-cohort-and-port-residue | sc sp a b v c | 4f/0d | 3 · ≤0d | 24s clean | 103 |
 | native-port-grouping-and-eighth-cohort | sc sp a b v c | 5f/2d | 5 · ≤0d | 24s clean | 104 |
+| json-reader-cohort-and-native-by-default | sc sp a b v c | 4f/3d | 2 · ≤0d | 24s clean | 104 |

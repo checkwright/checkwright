@@ -2837,10 +2837,18 @@
 
 - **dead-queue-citation-report** [design-pending] — an in-body citation that resolves to no
   live entry reads exactly like one that does, and nothing names the difference.
+  recurrence: dead-queue-citation-report 2026-08-14
   queue-kit/SPEC.md §The tag algebra rules the in-body single-backtick slug a *reference*
   rather than a membership claim, aggregated by `bin/queue-edges.sh` and "audited by
   nothing". That is a deliberate choice and stays right — entries legitimately name landed
   work and no gate may punish it — but its cost is now attested rather than hypothetical.
+  **Re-attested 2026-08-14**, one iteration after the last correction and inside a single
+  iteration's own lifetime: `consumer-gate-port-disposition`, filed that morning at scope,
+  cited `port-corpus-grouping-census-unbought`, a slug resolving nowhere in the tree. The
+  citing text was rewritten later the same day for an unrelated reason (`a8354823`), so the
+  instance is gone and the class is not — nothing found it but a reader.
+  `check-queue-slug-liveness` does not reach it: the citation is backticked prose, which the
+  SPEC deliberately rules a reference rather than a membership claim.
   **The attestation.** Three ruled-and-deleted slugs were cited across four live entries, and
   two of those entries argued *from* them in the present tense: one framed a "Boundary with
   the two live companions" whose companions were both dead and settled. A scope session
@@ -5161,6 +5169,21 @@
 - **lead-state-durable-home** [design-pending] — the lead template forbids the lead from writing
   lifecycle state and gives lead state no durable home either, so it lives only in the
   conversation.
+  recurrence: lead-state-durable-home 2026-08-14
+  **Re-attested 2026-08-14, and sharpened from a missing feature to a defect.** The absence is
+  not merely unprovided-for: delegation-kit/templates/agent-execution.md binds its durability
+  rule to whoever holds findings they will act on and closes the role loophole in its own
+  words — *"Neither the supervising role nor a session running outside any dispatch is
+  exempt: the axis is what the session can do at this moment, never what it is"* — and a lead
+  can commit. So the rule **names** the lead and hands it no discharge path, which is a
+  broken obligation rather than an unbuilt convenience. Re-verified at the 2026-08-14 drain:
+  the four `journal` mentions in `lifecycle-kit/templates/lead.md` are all the *stage
+  session's* journal, and nothing anywhere mints, requires or checks a lead-side one.
+  Measured cost that iteration: six operator rulings, three stage returns and an
+  operator-corrected premise carried with nothing durable behind them, and no journal existed
+  until the operator asked at the fourth stage boundary — by which point a compaction had
+  made one stage session unreachable by name. That loss is worse than the 2026-08-13
+  attestation's and is why the recurrence is stamped rather than the entry merely re-read.
   `lifecycle-kit/templates/lead.md` §Channel design assigns the **resume journal** to the *stage
   session* — the lead reads it and is forbidden to delete it — and §Stamps are authoritative
   rules out every lifecycle write. Re-verified at the 2026-08-13 drain by reading the template
@@ -5626,6 +5649,164 @@
   behind once it has been followed correctly.
   Filed 2026-08-14 by close at the release boundary, and drained in the same session — the
   cursor was already at close, so no later stage existed to drain it.
+
+- **born-native-flip-enforcement-gate** [design-pending] — the born-native default is held by
+  discipline alone, and the cheapest enforcing shape is now priced rather than refused.
+  **This is the enforcement residue of a closed ruling, not a challenge to it.** TRAJECTORY.md
+  §The closed rulings records the 2026-08-14 flip; gate-sdk/SPEC.md §The port-candidate
+  criteria states the ground as **cost rather than impossibility** and files the disposition
+  here rather than flagging and skipping it.
+  **What changed at the merge, and it was measured rather than reasoned.** The shape was first
+  refused on the ground that no discriminator exists while the port runs — a newly authored
+  shell gate being indistinguishable from one still awaiting its port. A build session probed
+  that ground and found it **false**: `git log --diff-filter=A` dates every declaration file,
+  so demanding the `# substrate: shell — <cause>` header only of a member whose declaration
+  entered history after the flip's own commit needs **zero** retrospective declarations,
+  against the sixty the per-gate-header shape demands. The measurement is on the survey record
+  (2026-08-14 build): 1697 ms over 72 paths at two `git log` calls each, 5/72 rename
+  false-positives, all five resolved by `--follow`. `gates.yml` already checks out at full
+  depth for `check-trajectory-fresh`, so the CI precondition is paid.
+  **What it still costs, stated so the entry is not read as shovel-ready.** `--follow` is a
+  heuristic and not a guarantee; the anchor is a literal commit no derivation produces; and as
+  weighed the shape is **publisher-local**, because in a vendored tree every declaration file
+  was added by the vendoring commit and the assertion would redden a consumer's whole registry.
+  That last cost is smaller than it looks — the default's domain is exactly the crate-carrying
+  tree — but making the shape consumer-safe is design work it has not had, and that work is
+  what holds this entry at `[design-pending]`.
+  **DISTINCT from `born-native-omission-accumulation`**, which owns criterion 5's omission pile
+  and would not redden if the flip were enforced perfectly. This entry owns whether the flip is
+  enforced at all. The two refused shapes stay refused on their own grounds (a maintained
+  baseline roster rots at every cohort; the per-gate header becomes cheap only once the residue
+  is small, which is its own revisit condition).
+  **Cost while deferred:** every gate authored while the port runs is a coin flip against a
+  rule nothing reads, and the failure is invisible — a shell gate born after the flip looks
+  exactly like one of the sixty awaiting a port, which is the same indistinguishability the
+  refusal was built on and the discriminator dissolves.
+  Filed 2026-08-14 by close, draining two gap-inbox bullets — the batch-1 filing whose "no
+  discriminator exists" premise the batch-2 probe falsified, merged into the corrected one.
+
+- **false-ground-citation-propagation** [design-pending] — a premise cited as a *ground* into a
+  closed ruling is load-bearing and nothing re-checks it.
+  **The attestation, and it is this repo's own.** A false premise — that the `native/` crate
+  may take no Rust dependencies — was cited as a ground in **four** places in gate-sdk/SPEC.md
+  (the `check-gate-binary-fresh` git-is-the-hasher ruling, the `upgrade-smoke` cost claim, and
+  two cohort sections justifying a hand-written ERE engine) and encoded in a *passing* cargo
+  test, before an operator correction caught it 2026-08-14. All four were fixed at `82e1d9f6`
+  and the sweep for a fifth came back empty; re-verified at the 2026-08-14 drain, which found
+  no residue.
+  **What has no owner.** Spec-over-precedent makes the owner doc ground truth, which is right —
+  but it means a ground stated once and restated as a citation elsewhere gets *more* attested
+  with every restatement, while nothing re-reads the source. The premise here was never true;
+  it was inferred from a grep, relayed, and then argued from.
+  **Why this is not a reflex gate.** A gate cannot judge a premise's truth, and the entry does
+  not pretend otherwise. What might be decidable is the narrower shape: a ground stated in one
+  section and *restated as a citation* in others, where the restatement drifts from or outlives
+  its source. `check-spec-pointer` and the citation-liveness family already hold neighbouring
+  classes, so the design question is whether a ground can be marked at its source such that its
+  citations are mechanically findable — and whether that marking is worth its authoring tax.
+  **Cost while deferred:** low frequency, high blast radius. Each instance is cheap to fix once
+  found and expensive to find, and the finding channel is an operator reading a sentence.
+  Filed 2026-08-14 by close, draining a gap-inbox bullet; the four fixes and the empty
+  fifth-instance sweep were re-verified at the drain rather than taken on the bullet's word.
+
+- **msrv-move-clippy-arm-coupling** [design-pending] — raising the crate's toolchain floor
+  un-suppresses clippy lints against unchanged code, and no surface budgets the pass.
+  **Measured 2026-08-14, by a controlled single-line experiment at HEAD rather than inferred.**
+  Clippy suppresses a lint whose suggested API postdates the declared `rust-version`, so moving
+  `native/Cargo.toml`'s floor changes what `check-crate-arms` reports without a line of the
+  crate changing. The 1.56 → 1.71 move surfaced **four findings in three modules the ninth
+  cohort never edited**.
+  **The coupling is now stated and is held by nothing.** context-kit/SPEC.md carries the
+  sentence, in its own words machine-checked by nothing. Before this iteration no surface
+  coupled the floor to the lint arm at all.
+  **Why `[design-pending]`:** the obvious gate — red when `rust-version` moves without a clippy
+  run in the same unit — asserts over a *commit shape* rather than a tree state, which is the
+  class this repo's gates deliberately avoid, and a freshness stamp would be a maintained
+  artifact derivation-first refuses. The plausible alternative is a *stage* obligation
+  (a floor move budgets the pass) rather than a gate, in which case this entry closes against
+  that rule instead of shipping one — and saying so is the design call.
+  **Cost while deferred:** a floor move is rare and its surprise is total. The next one lands
+  an unbudgeted lint worklist on whichever unit moves the floor, which is never the unit that
+  planned for it.
+  Filed 2026-08-14 by close, draining a gap-inbox bullet; the context-kit sentence was
+  re-verified at the drain.
+
+- **validate-baseline-suite-coverage** [design-pending] — two validate suites carry no
+  held-constant-red baseline row, so a regression in either passes the baseline arm silently.
+  **Verified at the 2026-08-14 drain by diffing the two files' suite columns**, not taken from
+  the bullet: `.workflow/validate-baseline.txt` carries rows for **22** suites while
+  `run-validate.sh` runs **24**. The two with no row are `dispatch_guard_tests` and
+  `native_crate`.
+  **Pre-existing, and an omission rather than lag.** Both suites predate the baseline's last
+  edit (`eb94126b`, 2026-08-13), so nothing about this iteration introduced it.
+  **The consequence is narrow and real.** `diff-baseline` flags a *new* failure against a
+  *listed* scenario, so a regression in either suite is caught only by the suite failing
+  outright — which is exactly the coverage the held-constant mechanism exists to add on top of.
+  `native_crate` is the sharper half: it is the crate's own 92-test suite, it now spans a
+  dependency graph and an MSRV floor that both moved this iteration, and it is the arm the next
+  port cohort leans on hardest.
+  **Why `[design-pending]` and not a two-line fix:** which scenarios are worth holding constant
+  is an evidence-kit judgment, not a mechanical backfill — a baseline row is a *claim* that a
+  verdict is expected to stay put, and adding twenty-four rows because twenty-four suites exist
+  is the maintained-roster shape derivation-first refuses. The design call is whether the
+  baseline is per-suite or per-scenario for a suite this size.
+  **DISTINCT from `baseline-row-prose-coupling-gate`**, which is prose asserting what the
+  baseline holds; this is the baseline not holding it.
+  **Cost while deferred:** the two suites keep their weakest protection while the crate is the
+  fastest-moving surface in the tree.
+  Filed 2026-08-14 by close, draining a gap-inbox bullet the lead filed after the validate
+  session declined to act on its own finding unilaterally.
+
+- **amendment-roster-omission-detection** [design-pending] — an amendment's `## Existing
+  sections updated` roster can be short by a surface, and only a grep finds the missing one.
+  **Two-for-two in one iteration, which is what bought the entry.** Both misses were
+  documentation surfaces that read as commentary and are machine-checked by nothing, and both
+  were found by a removals-propagated grep rather than by reading the amendment: batch 1's
+  seventh MSRV surface (`docs/site-architecture.md`, quoting the toolchain floor inside a
+  *format example*), and batch 2's `canon-kit/SPEC.md` born-native passage, which the flip
+  falsifies. Neither shipped wrong, because the grep ran; nothing made it run.
+  **The converse of an existing entry, and the distinction is load-bearing.**
+  `amendment-update-target-coverage` (icebox) owns a roster *entry* naming no owning delta — a
+  listed target with no claim. This owns a *target with no entry*, which no scan over the
+  amendment alone can see, because the evidence is in the tree rather than in the document.
+  **Why `[design-pending]`:** the general form is not gateable — deciding which surfaces an
+  amendment *should* have listed is the semantics of the change. The narrow slice that might
+  be is a **literal-substitution** amendment: one declaring an old literal and its replacement
+  could be checked by grepping the tree for survivors of the old literal not named in the
+  roster. Both attested misses are exactly that slice — a version string and a policy phrase.
+  The cost is a new amendment-grammar field (old→new) that every amendment then pays whether
+  or not it substitutes anything, and whether that tax is worth the slice is the design call.
+  The cheaper non-gate alternative is the align-stage rule landed at this close, which makes
+  the grep a step rather than a habit; this entry is the assertion that rule stands in for.
+  **Cost while deferred:** bounded and self-limiting — the miss is caught by the next reader
+  who greps, and the failure mode is a stale sentence rather than broken behaviour. Filed
+  because it recurred immediately, not because it is urgent.
+  Filed 2026-08-14 by close, from its own lesson triage.
+
+- **gap-capture-argv-prompt-friction** [design-pending] — the mandated capture tools take their
+  prose as an argv string, so every filing whose prose contains shell punctuation costs an
+  out-of-band permission decision.
+  **Diagnosed rather than allowlisted, per the triage criterion.** `bash
+  lifecycle-kit/bin/file-gap.sh *` is **already** in the committed allowlist, alongside
+  `file-survey.sh *` and `kfric.sh *` — so this is not missing coverage. The harness matcher
+  refuses a command whose text carries an expansion or a redirect, and gap prose routinely
+  carries both: a backticked slug is command substitution, and a bullet describing
+  `jq -r … 2>/dev/null` contains a redirect operator inside its quotes. The glob cannot help,
+  because the match never gets that far.
+  **Measured this iteration:** `file-gap.sh` prompted **4** times, `file-survey.sh` and
+  `kfric.sh` once each — six out-of-band decisions on the three tools the repo *mandates* for
+  in-the-moment capture, which is the exact path CLAUDE.md says deferred capture ruins.
+  **Deliverable, and it is small:** a body-from-file arm — `file-gap.sh --from <path>` reading
+  the prose from a scratch file written with the editor tool — is a fully static command the
+  matcher can grant. The same arm serves `file-survey.sh` and `kfric.sh`, whose `<finding>`
+  fields have the same shape. What needs deciding is whether the arm is per-tool or a shared
+  helper in `lifecycle-kit/lib/`, and whether the argv form stays (it should — a short gap is
+  one call).
+  **Why it is not a guard rule:** there is no better *form* to steer to today, which is what a
+  guard rule requires. The form has to exist first.
+  **Cost while deferred:** a friction tax that scales with how carefully a bullet is written,
+  which taxes exactly the good filings.
+  Filed 2026-08-14 by close, from the prompt-friction triage.
 
 ## Icebox
 
