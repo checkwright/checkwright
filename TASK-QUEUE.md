@@ -12,13 +12,7 @@
 
 ## New Features
 
-## Technical Debt
-
-## Deferred
-
-
-
-- **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
+- **native-gate-port-remaining-corpus** [spec: SPEC-eighth-cohort.md] [roadmap: now/reliability]
   — the whole battery onto the binary, and the shell surface down to its residue.
   roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
   The entry stays deferred rather than moving to `## Done`: it is the **whole corpus**, 63 of
@@ -66,8 +60,13 @@
   lifecycle-kit cohort; re-promoted 2026-08-13 at spec between the last two, and again the
   same day at spec for the comment-surface cohort.
   and demoted again 2026-08-13 at build for the comment-surface cohort.
+  Re-promoted 2026-08-14 at spec for the eighth cohort. Its members are **not** named in the
+  amendment: they are selected by running `port-blockers.sh --group`, the arm
+  `port-corpus-grouping-census-unbought` builds, so that unit must land first and the two
+  cannot be batched as parallel siblings. The terminal move is a **demotion**, not Done.
 
-- **port-corpus-grouping-census-unbought** [design-pending] — the remaining corpus has never
+- **port-corpus-grouping-census-unbought** [spec: SPEC-port-group.md]
+  — the remaining corpus has never
   been grouped by shared corpus derivation, and two dispatches failed to buy it.
   The cohort selection rule is "the largest set of criteria-clearing gates sharing one corpus
   derivation" (gate-sdk/SPEC.md §The first cohort, and the rule that selects the next), so a
@@ -75,8 +74,8 @@
   largest blocks — gate-sdk's 26 still-shell gates and `scripts/`' 13 — have **never** been
   grouped, so every cohort ruling to date has been taken against candidates surfaced by
   reading rather than against a complete partition.
-  **Why `[design-pending]`:** the open question is what shape of work settles it, not how to
-  run one more sweep. Three candidates, none ruled: derive the grouping mechanically from the
+  **Why it needed design:** the open question was what shape of work settles it, not how to
+  run one more sweep. Three candidates, none ruled at filing: derive the grouping from the
   `# graph:` `couples=` manifests plus each gate's corpus primitive call (cheap, machine-
   checkable, but `couples=` is trigger-shaped and over-selects — the same term confusion
   criterion 4 already warns about); extend `bin/port-blockers.sh` with a `--group` arm so the
@@ -96,6 +95,84 @@
   own selection rule as written.
   Filed 2026-08-13 at scope on lead disposition, under scope-gated intake: filed as costed
   work, not started.
+  Promoted 2026-08-14 at spec. The amendment takes candidates (1) and (2) together — `--group`
+  is the housing, the derived key is the key — and rejects (3). Both candidate keys were
+  measured to **over-select**: `couples=` is trigger-shaped by criterion 4's own words, and
+  `gate_kit_roots` alone has ten callers sharing no corpus. The key is set-equality over two
+  factors, and undecidable members are counted, never guessed into a group.
+
+- **settings-allow-dead-path-residue** [spec: SPEC-settings-paths.md]
+  — every gate cohort's port leaves the
+  committed allow-list naming a script the port deleted, and nothing resolves that list against
+  the working tree.
+  **Measured at this close, correcting the filing bullet:** three entries name an absent path,
+  not the two the bullet claimed. Two are this cohort's
+  (`bash canon-kit/checks/check-comment-tier.sh` and its `*` twin); the third names
+  `lifecycle-kit/checks/check-stage-evidence.sh` and was left by the **previous** cohort,
+  unnoticed for a whole iteration. The residue therefore accumulates per cohort rather than
+  arriving once, with 63 of 103 registered gates still unported.
+  **The bullet's harmlessness conclusion holds; its mechanism does not.** It reads the entries as
+  shadowed by the generic `bash */checks/check-*.sh *` glob. In fact the path is gone, so no
+  command can reach the grant at all and the generic glob is irrelevant to it. Nothing breaks
+  either way — the cost is a permission roster naming paths every reader must re-verify against
+  the tree.
+  **The class is gateable, which is why this files as a gate and not a sweep.** The predicate is
+  one line: every committed allow entry naming a repo-relative `.sh` path resolves in the tree.
+  Enforcement-first ranks the gate above the one-time prune, and the prune alone re-arms at the
+  next cohort.
+  **The settings edit is operator-owned and stays that way** — the file is configuration, which
+  is why the build session filed rather than fixed it. The gate is not: it reads the file and
+  writes nothing.
+  **Proposed, not made, for the same operator pass:** `bash gate-sdk/bin/port-blockers.sh` is
+  granted only by the gitignored local overlay and prompted four times this iteration. It is a
+  read-only kit tool the port track calls at every scope, so it belongs in the committed set as
+  a glob. A session may propose a standing grant and may not widen its own.
+  **Cost while deferred:** one to two dead entries per cohort, unbounded across the remaining
+  port, on a roster whose every reader re-derives which of its lines still mean anything.
+  Filed 2026-08-13 by close, draining the gap inbox; the three-entry count is this close's own
+  probe over the committed allow-list, not the bullet's claim.
+  Promoted 2026-08-14 at spec, with the open placement question **ruled**: a new gate
+  `check-settings-paths` in **context-kit**, not a second assertion mode on `check-settings-pins`
+  and not guard-kit, which ships no gates and whose advisory ruling is scoped to the gitignored
+  overlay. The dead-entry count was re-measured and holds at three. **Sequencing:** the gate reds
+  on this tree the day it registers, and only an operator may prune — so the prune precedes
+  registration.
+
+- **pack-installer-root-provenance** [spec: SPEC-pack-root.md]
+  — the smoke packs whatever tree the
+  caller's cwd is in, and reports success either way.
+  recurrence: pack-installer-root-provenance 2026-08-05
+  `scripts/pack-installer.sh` resolves its root from cwd (`git rev-parse --show-toplevel`)
+  while `installer/consumer-smoke/run-smoke.sh` resolves its repo from its own path. Run the
+  smoke from a linked worktree or any second checkout and the two disagree: pack assembles
+  the payload from cwd's tree, the smoke asserts against it, and the run looks entirely
+  normal — it even prints a PACK line naming the *other* tree's commit. The failure is not a
+  red that needs explaining; it is a **green that asserts nothing about the tree under test**,
+  which is the worse half of the two.
+  **Measured, not theoretical:** it produced two green-but-meaningless smoke runs during that
+  iteration's batch C before anyone noticed the PACK line named the wrong commit, and it
+  recurred 2026-08-05 (the date above) costing `install-claim-contract`'s build another full
+  ~10-minute run that proved nothing.
+  **A second precondition trap on the same seam, found the same day.** The suite packs four
+  separate times across its own ~10-minute run, so `pack-installer.sh`'s dirty-worktree refusal
+  fires against whatever the tree looks like minutes in rather than at invocation. Any concurrent
+  edit — an ordinary thing during a run that long — surfaces as a refusal whose message is about
+  the worktree and not about the timing, so the reading is a broken installer rather than a
+  precondition checked at the wrong moment.
+  **Cost while deferred:** the installer's only end-to-end oracle can pass without testing the
+  tree being released, and the condition that triggers it — working from a worktree — is
+  exactly the setup a parallel iteration uses.
+  Filed 2026-08-04 at close from the gap inbox; found by build.
+  Promoted 2026-08-14 at spec, taking the **parameter** and retiring the either/or: a refusal
+  needs the caller's root to compare against, which *is* the parameter under another name. The
+  "touches every call site" objection was measured false — five call sites, four in one file,
+  and `--root` is optional so the workflow caller is untouched. The refusal's own filed framing
+  was corrected: the check already sits early *within* each pack invocation; the lateness is the
+  suite invoking pack four times.
+
+## Technical Debt
+
+## Deferred
 
 - **consumer-gate-port-disposition** [design-pending] — this repo's own 13 gates are a fifth
   of the remaining port and no rule says where they land.
@@ -2674,39 +2751,6 @@
   discounts the true one. Already paid twice this iteration, including one bullet filed
   against master on the strength of it and retracted.
   Filed 2026-08-04 at close from the gap inbox; the false red corrected in place mid-iteration.
-
-- **pack-installer-root-provenance** [design-pending] — the smoke packs whatever tree the
-  caller's cwd is in, and reports success either way.
-  recurrence: pack-installer-root-provenance 2026-08-05
-  `scripts/pack-installer.sh` resolves its root from cwd (`git rev-parse --show-toplevel`)
-  while `installer/consumer-smoke/run-smoke.sh` resolves its repo from its own path. Run the
-  smoke from a linked worktree or any second checkout and the two disagree: pack assembles
-  the payload from cwd's tree, the smoke asserts against it, and the run looks entirely
-  normal — it even prints a PACK line naming the *other* tree's commit. The failure is not a
-  red that needs explaining; it is a **green that asserts nothing about the tree under test**,
-  which is the worse half of the two.
-  **Measured, not theoretical:** it produced two green-but-meaningless smoke runs during that
-  iteration's batch C before anyone noticed the PACK line named the wrong commit, and it
-  recurred 2026-08-05 (the date above) costing `install-claim-contract`'s build another full
-  ~10-minute run that proved nothing.
-  **A second precondition trap on the same seam, found the same day.** The upgrade arm packs
-  *mid-run*, so `pack-installer.sh`'s dirty-worktree refusal fires against whatever the tree
-  looks like minutes into a ~10-minute suite rather than at invocation. Any concurrent edit
-  — an ordinary thing during a run that long — surfaces as a refusal whose message is about
-  the worktree and not about the timing, so the reading is a broken installer rather than a
-  precondition checked at the wrong moment. Same root as the cwd defect: `pack-installer.sh`
-  asserts against a tree it resolves for itself at a moment it chooses, while its caller
-  believes it fixed both.
-  **Deliverable:** give `pack-installer.sh` a root the caller passes, or have it refuse when
-  its own resolved root and the invoking script's disagree. The refusal is the smaller change
-  and fails closed; the parameter is the cleaner contract and moves the choice to every
-  caller. Left open because the second answer touches every call site. The precondition half
-  is separable and cheaper: hoist the worktree check to invocation, so the suite refuses
-  before spending ten minutes rather than during them.
-  **Cost while deferred:** the installer's only end-to-end oracle can pass without testing the
-  tree being released, and the condition that triggers it — working from a worktree — is
-  exactly the setup a parallel iteration uses.
-  Filed 2026-08-04 at close from the gap inbox; found by build.
 
 - **session-model-identity-verification** [design-pending] — a session cannot report or
   verify the model tier it is running at.
@@ -5385,37 +5429,6 @@
   **Cost while deferred:** one duplicated entry per recurring sweep per close, each of which then
   has to be found and merged by a later close reading 5000 lines of queue.
   Filed 2026-08-13 by close, from its own backlog-eviction step.
-
-- **settings-allow-dead-path-residue** [design-pending] — every gate cohort's port leaves the
-  committed allow-list naming a script the port deleted, and nothing resolves that list against
-  the working tree.
-  **Measured at this close, correcting the filing bullet:** three entries name an absent path,
-  not the two the bullet claimed. Two are this cohort's
-  (`bash canon-kit/checks/check-comment-tier.sh` and its `*` twin); the third names
-  `lifecycle-kit/checks/check-stage-evidence.sh` and was left by the **previous** cohort,
-  unnoticed for a whole iteration. The residue therefore accumulates per cohort rather than
-  arriving once, with 63 of 103 registered gates still unported.
-  **The bullet's harmlessness conclusion holds; its mechanism does not.** It reads the entries as
-  shadowed by the generic `bash */checks/check-*.sh *` glob. In fact the path is gone, so no
-  command can reach the grant at all and the generic glob is irrelevant to it. Nothing breaks
-  either way — the cost is a permission roster naming paths every reader must re-verify against
-  the tree.
-  **The class is gateable, which is why this files as a gate and not a sweep.** The predicate is
-  one line: every committed allow entry naming a repo-relative `.sh` path resolves in the tree.
-  Enforcement-first ranks the gate above the one-time prune, and the prune alone re-arms at the
-  next cohort. **Open:** whether it extends `check-settings-pins` (context-kit) or lands in
-  guard-kit, which owns the allow-list tooling but not the pins gate.
-  **The settings edit is operator-owned and stays that way** — the file is configuration, which
-  is why the build session filed rather than fixed it. The gate is not: it reads the file and
-  writes nothing.
-  **Proposed, not made, for the same operator pass:** `bash gate-sdk/bin/port-blockers.sh` is
-  granted only by the gitignored local overlay and prompted four times this iteration. It is a
-  read-only kit tool the port track calls at every scope, so it belongs in the committed set as
-  a glob. A session may propose a standing grant and may not widen its own.
-  **Cost while deferred:** one to two dead entries per cohort, unbounded across the remaining
-  port, on a roster whose every reader re-derives which of its lines still mean anything.
-  Filed 2026-08-13 by close, draining the gap inbox; the three-entry count is this close's own
-  probe over the committed allow-list, not the bullet's claim.
 
 ## Icebox
 
