@@ -5,3 +5,4 @@
 ---
 
 json-reader-cohort-and-native-by-default scope a4fd05aa 2026-08-14
+json-reader-cohort-and-native-by-default spec ae57a452 2026-08-14
