@@ -1479,7 +1479,11 @@ must not apply the parity criterion to a member that has no second substrate:
   uncovered set is every macOS adopter rather than a narrow hypothetical. Under
   the flipped default that subtraction attaches to **every** new gate, which is
   why it is exception class (b)'s subject below and why its accumulation *rate*
-  is owned elsewhere rather than here (`born-native-omission-accumulation`).
+  is owned elsewhere rather than here (`born-native-omission-accumulation`). The
+  growth therefore has an observer from the day the flip lands rather than being
+  a change nothing watches: each born-native member adds one to the set an
+  artifact-free install omits, which is exactly the roster the binary-less leg
+  above derives and asserts complete at a non-zero count.
 - **6 and 7 bind unchanged**, and a born-native gate is designed to clear them at
   authoring time rather than owing the work afterwards, which is most of why it is
   cheap: the substrate it needs already exists or it is not born native. Under a
