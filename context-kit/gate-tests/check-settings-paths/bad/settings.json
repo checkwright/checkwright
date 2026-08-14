@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bash tools/real-tool.sh)",
+      "Bash(bash tools/removed-gate.sh)",
+      "Bash(bash tools/removed-gate.sh *)",
+      "Bash(env DEMO_FLAG=1 bash tools/removed-gate.sh)",
+      "Bash(bash */checks/check-*.sh)",
+      "Bash(git add *)"
+    ]
+  }
+}

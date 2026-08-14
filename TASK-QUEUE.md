@@ -65,43 +65,6 @@
   `port-corpus-grouping-census-unbought` builds, so that unit must land first and the two
   cannot be batched as parallel siblings. The terminal move is a **demotion**, not Done.
 
-- **settings-allow-dead-path-residue** [spec: SPEC-settings-paths.md]
-  — every gate cohort's port leaves the
-  committed allow-list naming a script the port deleted, and nothing resolves that list against
-  the working tree.
-  **Measured at this close, correcting the filing bullet:** three entries name an absent path,
-  not the two the bullet claimed. Two are this cohort's
-  (`bash canon-kit/checks/check-comment-tier.sh` and its `*` twin); the third names
-  `lifecycle-kit/checks/check-stage-evidence.sh` and was left by the **previous** cohort,
-  unnoticed for a whole iteration. The residue therefore accumulates per cohort rather than
-  arriving once, with 63 of 103 registered gates still unported.
-  **The bullet's harmlessness conclusion holds; its mechanism does not.** It reads the entries as
-  shadowed by the generic `bash */checks/check-*.sh *` glob. In fact the path is gone, so no
-  command can reach the grant at all and the generic glob is irrelevant to it. Nothing breaks
-  either way — the cost is a permission roster naming paths every reader must re-verify against
-  the tree.
-  **The class is gateable, which is why this files as a gate and not a sweep.** The predicate is
-  one line: every committed allow entry naming a repo-relative `.sh` path resolves in the tree.
-  Enforcement-first ranks the gate above the one-time prune, and the prune alone re-arms at the
-  next cohort.
-  **The settings edit is operator-owned and stays that way** — the file is configuration, which
-  is why the build session filed rather than fixed it. The gate is not: it reads the file and
-  writes nothing.
-  **Proposed, not made, for the same operator pass:** `bash gate-sdk/bin/port-blockers.sh` is
-  granted only by the gitignored local overlay and prompted four times this iteration. It is a
-  read-only kit tool the port track calls at every scope, so it belongs in the committed set as
-  a glob. A session may propose a standing grant and may not widen its own.
-  **Cost while deferred:** one to two dead entries per cohort, unbounded across the remaining
-  port, on a roster whose every reader re-derives which of its lines still mean anything.
-  Filed 2026-08-13 by close, draining the gap inbox; the three-entry count is this close's own
-  probe over the committed allow-list, not the bullet's claim.
-  Promoted 2026-08-14 at spec, with the open placement question **ruled**: a new gate
-  `check-settings-paths` in **context-kit**, not a second assertion mode on `check-settings-pins`
-  and not guard-kit, which ships no gates and whose advisory ruling is scoped to the gitignored
-  overlay. The dead-entry count was re-measured and holds at three. **Sequencing:** the gate reds
-  on this tree the day it registers, and only an operator may prune — so the prune precedes
-  registration.
-
 ## Technical Debt
 
 ## Deferred
@@ -5396,6 +5359,7 @@
 - pack-installer-root-provenance
 - port-corpus-grouping-census-unbought
 - port-blockers-scan-truncation
+- settings-allow-dead-path-residue
 
 ## Lessons Learned
 

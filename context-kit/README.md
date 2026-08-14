@@ -30,6 +30,7 @@ hook approximation and the session-context template also expect
    ```
    check-brevity
    check-settings-pins
+   check-settings-paths
    check-memory-off
    check-footprint-fresh
    ```
@@ -41,7 +42,9 @@ hook approximation and the session-context template also expect
    The memory-off gates are inert until you opt in — `check-settings-pins`
    skips clean with no pins file, so create `settings-pins.conf` (one
    `<jq path> = <expected JSON>` per line) naming the keys to hold, e.g. the
-   auto-memory-disabling ones. `check-footprint-fresh` byte-gates a committed
+   auto-memory-disabling ones. `check-settings-paths` needs no manifest: it
+   reads the same settings file and holds every allow-list grant naming a
+   literal `.sh` path against the tree. `check-footprint-fresh` byte-gates a committed
    `docs/footprint.md` against `bin/footprint.sh --emit`; register it when you
    publish that projection.
 

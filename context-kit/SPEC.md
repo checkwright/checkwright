@@ -629,6 +629,85 @@ gate's reach. That residue is unclosable here rather than merely unbuilt: neithe
 tier leaves an artifact in the tree, and the command line does not exist until
 the session starts.
 
+## check-settings-paths
+
+`checks/check-settings-paths.sh` (hermetic, `precommit`) holds the second
+invariant over the same tracked file: every entry in
+`CONTEXT_KIT_SETTINGS_FILE`'s `permissions.allow[]` whose command token is a
+**literal** repo-relative `.sh` path resolves in the working tree. The knob is
+reused, not introduced — §check-settings-pins already owns it and its default.
+
+The class it defends is a standing property of a gate port rather than a
+one-time count: replacing a kit's `checks/<gate>.sh` with a `<gate>.gate`
+descriptor strands every allow entry naming the old path, and this repo
+accumulated such entries one cohort apart before the gate existed. A dead grant
+breaks nothing — no command can reach it — so the cost is a permission roster
+whose every reader must re-verify which lines still mean anything.
+
+**The extraction predicate**, scoped against the shapes a permission array
+actually carries. A candidate is taken only from an entry of the form
+`Bash(<command>)`; leading `env NAME=VALUE` assignments and a `bash`/`sh`
+interpreter word are skipped, and the first remaining token is the candidate. A
+candidate not ending in `.sh` is out of scope — a bare command names no path,
+and a non-`.sh` path entry (a log truncation, a scratch removal) names a
+runtime-created gitignored path whose absence is its ordinary state, so
+existence is the wrong predicate for it. A candidate **containing `*`** is a
+pattern, intentionally polymorphic over files that need not exist today, and is
+skipped. That rule is scoped to the *command token*, not the entry: this repo's
+standing shape for a grant taking arguments is a bare entry beside a
+`*`-suffixed twin, and the twin's path is as literal — and as strandable — as
+the bare form's, so it stays in scope.
+
+Splitting the grant into tokens must not expand it. An unquoted array
+assignment would glob a pattern grant against the tree and then assert an
+arbitrary first match, which greens the whole pattern class instead of skipping
+it while leaving the checked count silently inflated; the implementation splits
+with `read -ra`, which does not expand.
+
+Dispositions: exit 1 lists each violating entry verbatim beside the path that
+did not resolve, so the reader can repoint or drop the grant without re-deriving
+which token was read. The clean line reports the **checked count**, which is
+what distinguishes a predicate that scoped to the array from one that vacuously
+matched nothing. Fail-closed (exit 2) on no `jq`, and on a settings file that is
+unreadable or not JSON — the sibling gate reads the same file on the same terms,
+and the file is this gate's sole subject rather than an opt-in manifest, so
+there is no absent-surface skip to grant. A `--fixture <dir>` mode reads
+`<dir>/settings.json` and resolves candidates against `<dir>`, which is the
+hermetic mode the `good/`+`bad/` fixture pair drives.
+
+The pair pins the scoping, not merely the verdict. `good/` carries every
+skipped shape — pattern tokens, bare non-path commands, non-`.sh` paths —
+alongside resolving literals in all three extraction shapes (bare,
+`env`-prefixed, trailing-flag), and its expectation pins the **checked count**:
+the pattern-expansion defect above passes an exit-code-only fixture, because an
+expanded pattern resolves by construction, and is visible only in the count.
+`bad/` carries a dead path in the bare, `*`-twin and `env`-prefixed shapes
+beside one resolving grant, so a broken extraction arm shows as a missing
+finding rather than a still-red exit.
+
+Its `# graph:` manifest names the settings file as its subject and the check
+script globs as a **reverse trigger** — a cohort deleting a ported gate's `.sh`
+is exactly the edit that strands a grant, so it must re-run the gate. The
+distinction is recorded because gate-sdk/SPEC.md's port criterion 4 turns on it,
+and a later port reading that couple as content would misclassify the member.
+The trigger is a partial route by construction: the generated hook reads staged
+`ACMR` paths, so a *deleted* `.sh` never matches it. What the trigger catches is
+the ordinary edit that strands a grant; what catches the cohort is the full
+battery, which runs whole-tree with no trigger filter.
+
+`jq` is not on `GATE_SDK_PROGRAM_FLOOR`, so this gate fails port criterion 7 the
+day it lands and owes designed-away work at its port. That is recorded here
+rather than discovered there: criterion 7 is an ordering signal, not an
+eligibility screen, and hand-rolling a JSON-array scan over floor programs would
+buy a fragile parser to dodge a dependency the sibling gate already carries on
+the same file. One parsing story for the settings file across every reader in
+the tree is worth more than the criterion.
+
+**The gate is not the prune.** It reads the settings file and writes nothing,
+but it reds the moment it registers on a tree carrying stranded entries, and the
+settings file is operator-owned configuration a session may not edit. The
+landing order is therefore fixed: the operator prunes, then the gate registers.
+
 ## check-memory-off
 
 `checks/check-memory-off.sh` (local-environment class, the check-identity
@@ -686,10 +765,12 @@ context-kit/
   bin/run-index-tests.sh         # expected-output runner for the bin tools
   checks/check-brevity.sh
   checks/check-settings-pins.sh  # hermetic: pins hold against the settings file
+  checks/check-settings-paths.sh # hermetic: literal .sh grants resolve in the tree
   checks/check-memory-off.sh     # local-environment: memory dir + local overrides
   checks/check-footprint-fresh.sh # hermetic: docs/footprint.md byte-fresh vs the emitter
   gate-tests/check-brevity/{good,bad}/
   gate-tests/check-settings-pins/{good,bad}/
+  gate-tests/check-settings-paths/{good,bad}/
   gate-tests/check-memory-off/{good,bad}/
   gate-tests/check-footprint-fresh/{good,bad}/
   gate-tests/check-brevity.test.sh      # the unmatched-section axis the pair cannot hold
@@ -765,8 +846,9 @@ as defaults):
 - `CONTEXT_KIT_BREVITY_POINTER_RE` — the "cites a deeper doc" pattern;
   default `§`.
 - `CONTEXT_KIT_SETTINGS_FILE` — the tracked harness settings file
-  check-settings-pins verifies and whose `.local.json` sibling check-memory-off
-  scans; default `.claude/settings.json`.
+  check-settings-pins and check-settings-paths each verify, on a different
+  invariant, and whose `.local.json` sibling check-memory-off scans; default
+  `.claude/settings.json`.
 - `CONTEXT_KIT_SETTINGS_PINS` — the pins manifest; default
   `${GATE_SDK_GATES_DIR:-scripts}/settings-pins.conf`.
 - `CONTEXT_KIT_MEMORY_DIRS` — space-separated glob list of harness memory dirs

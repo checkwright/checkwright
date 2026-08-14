@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bash tools/real-tool.sh)",
+      "Bash(bash tools/real-tool.sh *)",
+      "Bash(env DEMO_FLAG=1 bash tools/real-tool.sh)",
+      "Bash(bash tools/real-tool.sh --write)",
+      "Bash(bash tools/*.sh)",
+      "Bash(bash */checks/check-*.sh)",
+      "Bash(git add *)",
+      "Bash(shellcheck *)",
+      "Bash(: > .workflow/prompt-friction.log)",
+      "Bash(rm .tmp/*)"
+    ]
+  }
+}

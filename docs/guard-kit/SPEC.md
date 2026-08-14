@@ -659,6 +659,17 @@ place holds back for an attested miss. What replaces the gate is a scheduled
 reader — §The close-stage triage step — the same mechanism the redundancy
 criterion has relied on since it shipped.
 
+**That ruling is about this subject, not about allow-list checking generally**,
+and the boundary is stated because the section otherwise reads as covering the
+whole surface and the next reader re-derives it. Both clauses are load-bearing
+and both fail on the *committed* file: it is tracked, so CI sees it, and "does
+this path exist" is a binary filesystem fact no operator intent can move. A
+committed-allow-list predicate of that shape is therefore gated, and gated
+elsewhere — context-kit/SPEC.md §check-settings-paths, with the kit that already
+owns the committed settings file as a gate subject. This kit holds the three
+`.permissions.allow[]` readers in the tree and still ships no gates; co-location
+by parsing technique does not outrank placement by governed surface.
+
 `--count` emits both bare counts on one line, redundancy first and breadth
 second.
 

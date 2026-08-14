@@ -22,3 +22,4 @@ check-comment-tier
 check-spec-pointer
 check-todo-task-liveness
 check-deprecation-task
+check-settings-paths

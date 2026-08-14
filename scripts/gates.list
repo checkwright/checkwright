@@ -103,6 +103,7 @@ check-rule-citation
 check-agent-tier-explicit
 check-brevity
 check-settings-pins
+check-settings-paths
 check-memory-off
 check-template-copy-parity
 check-template-registry-parity

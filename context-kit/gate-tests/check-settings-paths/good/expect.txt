@@ -1,0 +1,1 @@
+SETTINGS-PATHS: clean (4 literal .sh grant(s)

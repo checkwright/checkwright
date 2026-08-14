@@ -1,0 +1,3 @@
+Bash(bash tools/removed-gate.sh) — no such file: tools/removed-gate.sh
+Bash(bash tools/removed-gate.sh *) — no such file: tools/removed-gate.sh
+Bash(env DEMO_FLAG=1 bash tools/removed-gate.sh) — no such file: tools/removed-gate.sh

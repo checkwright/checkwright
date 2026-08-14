@@ -427,6 +427,10 @@ if staged_matches '.claude/settings.json' 'scripts/settings-pins.conf'; then
     run_gate check-settings-pins context-kit/checks/check-settings-pins.sh
 fi
 
+if staged_matches '.claude/settings.json' 'gate-sdk/checks/*.sh' 'canon-kit/checks/*.sh' 'context-kit/checks/*.sh' 'delegation-kit/checks/*.sh' 'doctrine-kit/checks/*.sh' 'drift-kit/checks/*.sh' 'evidence-kit/checks/*.sh' 'guard-kit/checks/*.sh' 'lifecycle-kit/checks/*.sh' 'queue-kit/checks/*.sh' 'site-kit/checks/*.sh' 'scripts/check-*.sh'; then
+    run_gate check-settings-paths context-kit/checks/check-settings-paths.sh
+fi
+
 run_gate check-memory-off context-kit/checks/check-memory-off.sh
 
 if staged_matches '*/templates/*.sh' 'scripts/*.sh'; then

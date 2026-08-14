@@ -10,6 +10,7 @@ cat >> scripts/gates.list <<'EOF'
 check-brevity
 check-memory-off
 check-settings-pins
+check-settings-paths
 EOF
 
 cp "$SMOKE_KIT_ROOT/templates/context-config.sh"  scripts/context-config.sh
