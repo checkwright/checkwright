@@ -236,12 +236,15 @@ array and is the change that ships beside it:
   readers and the section stops being the knob's only home.
 - **context-kit/SPEC.md §Layout and configuration** — owned by delta 1: the
   kit's gate roster gains a member.
-- **guard-kit/SPEC.md §compare-settings-allow** — owned by the placement ruling.
-  Its advisory placement ruling reads as covering allow-list checking generally;
-  it gains the boundary this amendment establishes — that ruling is about the
-  gitignored overlay and operator-intent breadth, and a committed-file
-  filesystem-fact predicate is gated elsewhere. Without this the next reader
-  re-derives the same question, and this amendment is that re-derivation.
+- **guard-kit/SPEC.md §compare-settings-allow** — **owned by delta 1**
+  (corrected at align: "The placement ruling" section names the reasoning, but
+  the update target is delta 1's placement of the new gate in context-kit
+  rather than guard-kit). Its advisory placement ruling reads as covering
+  allow-list checking generally; it gains the boundary this amendment
+  establishes — that ruling is about the gitignored overlay and operator-intent
+  breadth, and a committed-file filesystem-fact predicate is gated elsewhere.
+  Without this the next reader re-derives the same question, and this amendment
+  is that re-derivation.
 - **`scripts/gates.list`** — registration, owned by delta 1.
 - **README.md and the enforcement map / graph artifact** — owned by delta 1: a
   new gate stales the generated projections rostered in

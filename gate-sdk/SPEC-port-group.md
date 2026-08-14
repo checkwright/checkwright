@@ -211,11 +211,12 @@ whose output is byte-unchanged by this amendment.
   derive-don't-record doctrine and the one-command derivation for a *single*
   primitive's leftovers; it is updated to name `--group` as the whole-corpus
   form of the same doctrine, so the two are not read as rival instruments.
-- **gate-sdk/SPEC.md §The port-candidate criteria, criterion 6** — owned by the
-  amendment's framing paragraph. Criterion 6 asks whether a member's corpus
-  derivation is self-contained and is answered per member by hand; it gains a
-  pointer to `--group` as the derived roster, matching criterion 7's existing
-  pointer to the default arm.
+- **gate-sdk/SPEC.md §The port-candidate criteria, criterion 6** — **owned by
+  delta 1** (corrected at align: the framing paragraph names the reasoning, but
+  the update target is the same `--group` arm delta 1 introduces). Criterion 6
+  asks whether a member's corpus derivation is self-contained and is answered
+  per member by hand; it gains a pointer to `--group` as the derived roster,
+  matching criterion 7's existing pointer to the default arm.
 
 ## Definition of Done
 
