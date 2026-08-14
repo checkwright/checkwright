@@ -385,7 +385,7 @@ pub mod recorder {
     use std::cell::RefCell;
 
     thread_local! {
-        static OBSERVED: RefCell<Option<Vec<String>>> = RefCell::new(None);
+        static OBSERVED: RefCell<Option<Vec<String>>> = const { RefCell::new(None) };
     }
 
     pub fn start() {
@@ -541,33 +541,96 @@ mod tests {
         );
     }
 
-    // spec: gate-sdk/SPEC.md §check-reads-couples — the same assertion's other half: a
-    // vendored walker cannot be caught by a spelling roster, so the empty dependency set
-    // that rules one out is asserted instead of assumed.
+    // spec: gate-sdk/SPEC.md §The settings cohort, and the crate's first dependency — one entry
+    // per crate in the resolved graph, with the clause of the dependency bar it was admitted
+    // under
+    const ADMITTED_CRATES: &[(&str, &str)] = &[
+        ("itoa", "integer formatting; no walk, no subprocess, no socket"),
+        ("memchr", "byte search; no walk, no subprocess, no socket"),
+        (
+            "proc-macro2",
+            "build-time token plumbing, lock-only (not feature-activated); no walk",
+        ),
+        (
+            "quote",
+            "build-time token plumbing, lock-only (not feature-activated); no walk",
+        ),
+        (
+            "serde",
+            "serialization traits, lock-only (not feature-activated); no walk",
+        ),
+        ("serde_core", "serialization traits; no walk, no subprocess, no socket"),
+        (
+            "serde_derive",
+            "proc macro, build-time and lock-only (not feature-activated); no walk",
+        ),
+        (
+            "serde_json",
+            "the JSON reader this cohort took; parses from a string the gate reads, so no walk of its own",
+        ),
+        (
+            "syn",
+            "build-time parser, lock-only (not feature-activated); no walk",
+        ),
+        (
+            "unicode-ident",
+            "build-time character classification, lock-only (not feature-activated); no walk",
+        ),
+        ("zmij", "float formatting; no walk, no subprocess, no socket"),
+    ];
+
+    // spec: gate-sdk/SPEC.md §check-reads-couples — the same assertion's other half: a vendored
+    // walker cannot be caught by a spelling roster, so the graph that could carry one is held to
+    // an allowlist instead of assumed empty
     #[test]
-    fn the_crate_vendors_no_walker_because_it_vendors_nothing() {
-        let manifest = Path::new(env!("CARGO_MANIFEST_DIR")).join("Cargo.toml");
-        let text = fs::read_to_string(&manifest)
-            .unwrap_or_else(|e| panic!("cannot read {}: {}", manifest.display(), e));
-        let mut in_deps = false;
-        let mut declared: Vec<String> = Vec::new();
+    fn every_crate_in_the_resolved_graph_is_admitted_by_name() {
+        let lock = Path::new(env!("CARGO_MANIFEST_DIR")).join("Cargo.lock");
+        let text = fs::read_to_string(&lock).unwrap_or_else(|e| {
+            panic!(
+                "cannot read {}: {} — the lock is tracked precisely so this assertion has a \
+                 graph to read without resolving one from the network",
+                lock.display(),
+                e
+            )
+        });
+        let mut resolved: Vec<String> = Vec::new();
         for line in text.lines() {
             let t = line.trim();
-            if t.starts_with('[') {
-                in_deps = t == "[dependencies]";
-                continue;
-            }
-            if in_deps && !t.is_empty() && !t.starts_with('#') {
-                declared.push(t.to_string());
+            if let Some(rest) = t.strip_prefix("name = \"") {
+                if let Some(name) = rest.strip_suffix('"') {
+                    if name != "checkwright-gates" {
+                        resolved.push(name.to_string());
+                    }
+                }
             }
         }
         assert!(
-            declared.is_empty(),
-            "the crate now declares dependencies ({:?}). A vendored walker would bypass \
-             walk.rs's recorder and unverify unit test A — confirm the new dependency \
-             performs no filesystem walk, then widen this test deliberately rather than \
-             deleting it",
-            declared
+            !resolved.is_empty(),
+            "the lock named no dependency — with an empty graph this assertion holds over \
+             nothing, so read it as unverified rather than as clean"
+        );
+        let unadmitted: Vec<&String> = resolved
+            .iter()
+            .filter(|n| !ADMITTED_CRATES.iter().any(|(a, _)| *a == n.as_str()))
+            .collect();
+        assert!(
+            unadmitted.is_empty(),
+            "the resolved graph carries crate(s) no clause admits ({:?}). A vendored walker \
+             would bypass walk.rs's recorder and unverify unit test A — confirm each new crate \
+             performs no filesystem walk, spawns no subprocess and opens no socket, then add it \
+             to ADMITTED_CRATES with the clause it was admitted under",
+            unadmitted
+        );
+        let stale: Vec<&str> = ADMITTED_CRATES
+            .iter()
+            .map(|(n, _)| *n)
+            .filter(|n| !resolved.iter().any(|r| r == n))
+            .collect();
+        assert!(
+            stale.is_empty(),
+            "ADMITTED_CRATES names crate(s) the resolved graph no longer carries ({:?}) — an \
+             allowlist that outlives its graph stops being the machine-held form of the bar",
+            stale
         );
     }
 }

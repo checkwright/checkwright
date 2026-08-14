@@ -1,6 +1,11 @@
 target/
 node_modules/
 Cargo.lock
+# the gate crate's resolved graph is tracked, and only that one: walk.rs's
+# dependency allowlist, the publish matrix and check-gate-binary-fresh's
+# git-ls-files source stamp all read it (gate-sdk/SPEC.md §The settings cohort,
+# and the crate's first dependency). reserve/ is a name placeholder, not a build.
+!native/Cargo.lock
 .tmp/
 # persistent account-bearing measurement trends (drift-kit/SPEC.md §Layout and
 # configuration, DRIFT_KIT_METRIC_DIR) — samples carry account UUIDs and session
