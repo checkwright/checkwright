@@ -124,8 +124,9 @@ load behind that trigger, so they are not resident here.
   account-bearing (drift-kit/SPEC.md §Layout and configuration); `.workflow/`
   holds two tiers — tracked checked projections beside gitignored local capture
   (gate-sdk/SPEC.md §The workflow directory). `BRIEF.local.md` (private brief),
-  `OPS.local.md` (private ops runbook — DNS records + GitHub repo-settings
-  desired state; consult it for domain or repo-settings work), and `ENV.local.md`
+  `OPS.local.md` (private ops runbook — DNS, GitHub repo-settings desired state,
+  and the release account and push transport; consult it before any domain,
+  repo-settings **or release** work), and `ENV.local.md`
   (context-kit's probed machine profile plus hand-authored gotchas — seed with
   `bash context-kit/bin/env-probe.sh`, context-kit/SPEC.md §bin/env-probe) are
   gitignored, local-only.
