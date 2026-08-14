@@ -5847,8 +5847,6 @@
 
 ## Done
 
-- born-native-gate-default
-
 ## Lessons Learned
 
 
