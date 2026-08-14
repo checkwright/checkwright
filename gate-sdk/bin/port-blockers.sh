@@ -219,6 +219,8 @@ function skiparray(l, k, m,   d) {
         if (c == "\047") { addc(c); sq = 1; i++; continue }
         if (c == "\"") { addc(c); dq = 1; i++; continue }
 
+        if (c == "<" && substr(line, i + 1, 2) == "<<") { endword(); i += 3; cmdpos = 0; continue }
+
         if (c == "<" && substr(line, i + 1, 1) == "<" && substr(line, i + 2, 1) != "<") {
             endword()
             j = i + 2
@@ -259,6 +261,7 @@ function skiparray(l, k, m,   d) {
         if (c == "{" || c == "(") { endword(); if (c == "(") push(0); cmdpos = 1; i++; continue }
         if (c == ")") {
             endword()
+            if (sp > 0) { pop(); cmdpos = 0; i++; continue }
             if (incase()) { cst[clvl] = 3; cmdpos = 1; i++; continue }
             pop(); cmdpos = 0; i++; continue
         }
