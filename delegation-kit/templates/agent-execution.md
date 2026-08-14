@@ -197,6 +197,22 @@ drift: do not delete it on sight, and when either rule changes here, propagate.
   part that binds you: **a dispatcher handing out work that will need a mid-run
   channel grants a durable path with it**, and reads that path itself.
 
+- **A finished child is addressed by the task-id its completion notification
+  carried, never by its name.** Resuming a returned agent to correct or extend
+  its work is the cheap alternative to a cold re-dispatch, and it is the one
+  that keeps the child's own reasoning instead of paying to rebuild it. The name
+  is not a durable address for that: measured here, a name live at dispatch
+  resolved to *no agent of that name is reachable* once the dispatching session
+  had been compacted, with the agent listing reporting none reachable at all,
+  while the task-id from the notification resumed the same child from its
+  transcript. Which of the two voids the name — the compaction, or the child
+  merely having finished — is untested; the task-id survived both, and the
+  notification states outright that it is the handle the child may notify under
+  again, so it is the address to hold. It is also the address to **write down**:
+  the notification lives in the context that dies, so a dispatcher who may want
+  that child later records the task-id under the durability rule below rather
+  than trusting the scroll to still be there.
+
 - **Findings you will act on are durable before you act on them.** A child's
   return value lives only in your context, and your context dies with your
   session. Before you *act* on a dispatched agent's findings — edit against
