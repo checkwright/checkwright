@@ -3578,45 +3578,44 @@
   worse than a skipped audit — the roster reads as coverage.
   Filed 2026-08-07 by close, performing the `survey-engagement` audit its roster made due.
 
-- **release-runbook-identity-diagnosis** [design-pending] — the runbook reads a 404 as a
-  permission fault on a machine where it is an identity fault.
-  `RELEASING.md` step 4 treats a 404 on a write to the repo as a permission signature and
-  prescribes fixing the permission. That inference holds only where the host CLI is
-  authenticated as exactly one account. Where it holds two and the active one lacks push, the
-  same 404 appears with the permission model already correct — and the prescribed resolution
-  points at granting push to the account the private brief rules must **not** hold the
-  namespace, so following the runbook literally walks a session across the identity boundary
-  the brief exists to protect.
-  **Reachability, not merely wording.** Step 6 is unreachable from a session whose active
-  account is the non-owning one. A close that defers its release never meets this; a close that
-  cuts one meets it mid-cut, with a note committed and a tag pending.
-  **Correction 2026-08-08 at scope, oracle-settled — the class may be real, but both of the
-  concrete grounds this entry was filed on are false at HEAD.** (1) A prior revision offered the
-  unreachability above as "the most likely reason the last tag's Release body was never
-  written". The premise fails: `gh release view v0.22.0` returns a written body — a pointer to
-  the release post — and all four assets attached, the tarball, its checksum, and the one-triple
-  gate binary with its checksum. Step 6 was reached on the last cut. (2) The entry's scenario
-  needs the *active* host-CLI account to be the non-owning one; `gh api user` resolves it to the
-  namespace-owning identity, so the plural-identity 404 is **latent rather than armed**, and the
-  runbook's inference is untested here rather than demonstrated wrong. Note also that
-  `RELEASING.md:148-166` already carries the credential precondition, the permission-not-scope
-  test (`gh api repos/<owner>/<repo> --jq .permissions`), the 404-signature clause, and the
-  explicit rule "Resolve it by fixing the permission, **never by switching identity**" — so the
-  runbook is substantially further along than this body describes. The residual worth keeping is
-  narrow and unchanged in kind: where the active account is the non-owning one, "fix the
-  permission" resolves to granting push to the account the private brief rules must not hold the
-  namespace. **Re-ground this entry before `spec` authors against it** — its current evidence
-  cannot carry a design.
-  **Why `[design-pending]`:** the fix is not a sentence. A runbook diagnosing across a plural
-  identity has to establish which account is active and whether that account owns the namespace
-  *before* it reads any status code, and where that check belongs — a preflight step, step 4's
-  own prose, or a probe the procedure runs — is open. Part of why the runbook never said it is
-  that the desired account state is private-ops content and cannot land on a tracked surface,
-  so the runbook can name the discriminator but not its expected value.
-  **Cost while deferred:** the outward-facing half of the release path is blocked behind a
-  diagnosis that is wrong here and reads as authoritative, and the fix it prescribes is the one
-  action the identity boundary forbids.
-  Filed 2026-08-08 by close, draining the gap inbox; found at scope. Sibling on the same step:
+- **release-runbook-identity-diagnosis** [design-pending] — where the which-account-is-active
+  check belongs in the release procedure is unplaced; the diagnosis itself is now settled.
+  A refused write on a machine authenticated as several accounts is an *identity* fault, not a
+  permission one: the same 404 appears with the permission model already correct, and reading
+  it as permission points the resolution at granting write to the account the private brief
+  rules must **not** hold the namespace.
+  **Reachability, not merely wording.** A close that defers its release never meets this; a
+  close that *cuts* one meets it mid-cut, with a note committed and a tag pending.
+  **Armed and demonstrated 2026-08-14** — this supersedes the 2026-08-08 correction that judged
+  it latent, which is the ground that fell. The close session of
+  `native-port-grouping-and-eighth-cohort` ran `gh api repos/<owner>/<repo> --jq .permissions`
+  with the **non-owning** account active, read `push: false`, applied the runbook literally, and
+  reported the release blocked on a permission defect. Selecting the owning account returned
+  `admin/maintain/pull/push/triage` all true. Cost paid: a stage session's forward motion, at
+  exactly the mid-cut point predicted above.
+  **The other 2026-08-08 ground stays answered and is not re-opened:** the speculation that this
+  fault explained the last tag's unwritten Release body was falsified by `gh release view
+  v0.22.0` — a written body and all four assets — so step 6 was reached on the last cut, and
+  that half of the original filing is closed rather than carried.
+  **Resolution direction, settled 2026-08-14 and the reverse of what the runbook said.**
+  Selecting the designated release account is correct; "fix the permission" is not the slower
+  resolution but the **prohibited** one. This entry's former residual is now its finding.
+  **The sentence-level half landed 2026-08-14 and is not this entry's remaining work:**
+  RELEASING.md's never-switch-identity prohibition is deleted, replaced by an
+  identity-before-status-code rule; the recording obligation is kept as that clause's real
+  content; and the ops-runbook pointer is re-scoped out of the keyless-operator branch. The
+  2026-08-08 observation that the runbook was "further along than this body describes" is spent
+  with it — the text it cited no longer exists.
+  **Why `[design-pending]`, unchanged: the fix is not a sentence.** Where the
+  which-account-is-active check belongs — its own preflight step, step 4's prose, or a probe the
+  procedure runs — is open design, and the sentence fix does not answer it. The constraint on
+  any answer: the desired account state is private-ops content and cannot land on a tracked
+  surface, so the tracked runbook may name the discriminator but never its expected value.
+  **Cost while deferred:** no longer a wrong-and-authoritative diagnosis — that is fixed. What
+  remains is that the check lives in prose a session must remember to apply rather than in a
+  step it cannot skip, so the failure recurs on any release cut by a session that reads past it.
+  Filed 2026-08-08 by close, draining the gap inbox; found at scope. Re-grounded 2026-08-14 by
+  close on operator direction. Sibling on the same step:
   `release-drain-ordering-contradiction` covers step 4's drain/tag ordering, this its diagnosis.
 
 - **gate-binary-target-roster-widening** [design-pending] [roadmap: next/reliability] — the
@@ -5512,8 +5511,10 @@
   **Both surfaces were repaired in that same commit**, so this entry is not the fix: the
   pointer was re-scoped, the precondition now states that `permissions.push` answers for
   whichever account is *active* and that a machine may carry several logins, and the
-  never-switch-identity clause was narrowed to what it means — it bars *evading* a genuine
-  denial by hopping identities, and does not bar *selecting* the designated release account.
+  never-switch-identity prohibition was **deleted** rather than narrowed — it was wrong in the
+  case that occurs here, and `release-runbook-identity-diagnosis` owns why. What replaced it is
+  an identity-before-status-code rule plus the recording obligation the old clause was really
+  carrying.
   **What survives the fix, and is why this is filed.** No gate holds a tracked pointer's
   *scope* against what its untracked target owns. This is the second surface where that gap
   has cost a session — the ops runbook's SSH-transport entry was the first — and the class is

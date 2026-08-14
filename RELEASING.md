@@ -178,17 +178,34 @@ by lifecycle-kit/SPEC.md §templates/stages/; cite it, never restate it here.
    - **A 404 on a write is a permission signature, not a missing object.** GitHub
      masks an unauthorized write as an absent resource, so a `gh release edit`
      returning 404 against a Release that plainly exists means *not permitted*.
-   - **Resolve a genuine denial by fixing the permission, never by switching
-     identity — and note precisely what that does not cover.** The clause bars
-     *evading* a denial: hopping to some other authenticated identity to get past
-     a 404 leaves the real defect — an account that cannot write where this
-     runbook assumes it can — in place and unrecorded. It does **not** bar
-     *selecting* the release account the ops runbook designates on a machine
-     carrying several logins. That is the precondition being satisfied rather
-     than evaded, and it happens before any write is attempted rather than in
-     response to a refusal. Reading the clause the wider way turns a one-command
-     account selection into a release-stopping blocker, which is the failure this
-     paragraph exists to prevent.
+   - **Identity before status code — establish who is writing before you read
+     what the write returned.** On any refused write, the first question is not
+     *what does this code mean* but **which account is active, and is it the
+     release account the ops runbook designates**. Answer that first, every time.
+     A refusal from an account that was never the intended writer carries no
+     information about permission at all, and interpreting it as one is how a
+     correct permission model gets read as a defect.
+
+     **Selecting the designated release account is the expected resolution, not
+     an evasion.** This runbook previously said the opposite — *resolve by fixing
+     the permission, never by switching identity* — and that instruction was
+     wrong in the case that actually occurs here. Where the active account is not
+     the release account, "fix the permission" resolves to granting write to an
+     account that must not hold it, so the old rule prescribed the one action the
+     identity boundary forbids while forbidding the one that is correct. Select
+     the designated account and proceed.
+
+     **What survives is the recording obligation, which was the clause's real
+     content.** Do not leave a discrepancy between the account this runbook
+     expects to write and the account that actually did, unrecorded — that is the
+     thing a silent identity switch would have buried, and it is worth a line in
+     the ops runbook whenever it happens. Recording is the duty; the prohibition
+     never was.
+
+     **The discriminator is named here; its value is not.** Which account is the
+     release account is private-ops content and does not belong on a tracked
+     surface, so this file names *what to check* and the local ops runbook owns
+     *what the answer must be*.
 
 5. **Watch the publish workflow — both channels.** Pushing the tag is what
    publishes the installer package: `.github/workflows/publish.yml` fires on the
