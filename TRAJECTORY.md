@@ -182,7 +182,14 @@ restated here. Ruled with criterion 5's cost in hand and against the recording
 session's own lean, which is why it is recorded rather than argued: a
 `.gate`-declared member is *omitted* on a platform `native/targets.list` carries
 no artifact for, that roster is one target today, and the flip therefore attaches
-that omission to every new gate. What the ruling does not do is widen the
+that omission to every new gate. **Re-affirmed the same day on corrected
+evidence, recorded because the first ruling was taken on an understated one.**
+The uncovered platform set was put to the operator as narrow and Windows-shaped;
+`native/targets.list` ships a single target, so the set is **every macOS adopter**
+today, for whom omit-and-declare is already the normal path. The operator
+re-affirmed the flip against that cost, unchanged. This records what the ruling
+was weighed against — it is not a re-opening, and the ruling stands as ruled.
+What the ruling does not do is widen the
 roster; the residue it creates is costed and filed as
 `born-native-omission-accumulation`, and the roster's own widening trigger
 (`platform-support-ci-matrix` landing a CI leg) is unchanged.
