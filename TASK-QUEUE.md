@@ -12,36 +12,6 @@
 
 ## New Features
 
-- **born-native-gate-default** [spec: SPEC-born-native.md]
-  — new gates are born native by default; shell becomes the exception, and the exception is
-  empty until a criterion says which causes count.
-  **Operator-ruled 2026-08-14, re-affirmed the same day on corrected criterion-5 evidence.**
-  The ruling, its grounds and what it was weighed against are recorded at
-  [TRAJECTORY.md](TRAJECTORY.md) §The closed rulings; this entry is the work and restates
-  neither.
-  **The exception criterion is inside the unit, not an add-on.** "Shell by exception with
-  cause" is unimplementable while nothing says which causes count, so `SPEC-born-native.md`
-  closes three classes — the gate audits the dispatch relation; the gate's subject is a
-  platform the target roster does not cover; the rule needs substrate the crate does not carry
-  — and enumerates the refused causes, including the criterion-5 argument that is true of every
-  born-native gate and would swallow the rule the day it landed.
-  **It also fixes the default's domain, which the ruling did not state.** The default binds a
-  tree carrying the crate a gate would compile into, so the consumer-facing authoring path is
-  deliberately unchanged: an adopter receives no gate implementation source and cannot author a
-  compiled gate at all, which makes a flipped walkthrough false on its face rather than merely
-  premature.
-  **Enforcement is procedural, with the ground stated rather than skipped.** No discriminator
-  separates a newly authored shell gate from the unported residue, so any assertion over shell
-  gates reddens that whole residue; the two buildable shapes are refused with the condition
-  that would revisit each.
-  **Cost of not doing it:** every gate landing while the port runs adds shell the port then
-  owes, against a delivery rate of two to three ports per iteration — the denominator the
-  2026-08-09 ASAP directive is racing, and the only measure taken so far that acts on it.
-  The criterion-5 residue the flip creates belongs to `born-native-omission-accumulation` and
-  is not closed here.
-  Authored and promoted 2026-08-14 at spec, the amendment being the promotion; no deferred
-  entry preceded it, the ruling having opened the unit directly.
-
 ## Technical Debt
 
 ## Deferred
@@ -5687,6 +5657,8 @@
 - **scratch-execution-allowlist-bar** [design-pending] — Each close re-derives this standing bar.
 
 ## Done
+
+- born-native-gate-default
 
 ## Lessons Learned
 

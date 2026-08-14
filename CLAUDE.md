@@ -67,11 +67,14 @@ command in [docs/site-architecture.md](docs/site-architecture.md) §Generated
 projections, which also carries the full fan-out a new gate stales; each
 freshness gate prints its own command on red.
 
-New gates copy `gate-sdk/templates/check-skeleton.sh` and ship with a
-`good/`+`bad/` fixture pair; the four contracts (output, fail-closed,
-fixture-pair, self-lint) are specified in [gate-sdk/SPEC.md](gate-sdk/SPEC.md)
-and enforced by the meta-gates — a red gate is fixed, never bypassed with
-`--no-verify` except as a one-off with cause.
+New gates here are **born native** — a Rust module plus a `.gate` descriptor;
+shell needs a cause from the three closed exception classes, stated in the gate's
+own SPEC section (gate-sdk/SPEC.md §The port-candidate criteria, which also owns
+the crate-carrying domain that keeps a vendoring consumer on shell). Either
+substrate ships with a `good/`+`bad/` fixture pair; the four contracts (output,
+fail-closed, fixture-pair, self-lint) are specified in
+[gate-sdk/SPEC.md](gate-sdk/SPEC.md) and enforced by the meta-gates — a red gate
+is fixed, never bypassed with `--no-verify` except as a one-off with cause.
 
 Comments are directives, else deleted — a passing `check-comment-tier` is the
 floor, not licence to keep a comment. Blessing a restatement (relocating prose

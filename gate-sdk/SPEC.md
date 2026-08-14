@@ -551,6 +551,11 @@ removable only when its guarantee is delivered another way or was never
 attested. What stays human is the irreducibly semantic judgment alone — *is
 this prose still true?*
 
+This section rules *whether* a gate is built; **what substrate it is built on**
+is one step further and is ruled at §The port-candidate criteria, where new gates
+are born native by default in a tree carrying the crate and shell is an exception
+needing a stated cause.
+
 ## Enforcement tiers
 
 Three concentric tiers, each an outer backstop for the one inside it:
@@ -1404,20 +1409,51 @@ design time; the last three were paid for, and each is named with what it cost.
    into it until the binary answers `--needs`. That is the pressure the sequencing
    below rests on, and it is why the arm is scheduled rather than left open.
 
-**A born-native gate is the first member these criteria do not describe, and only
-some of them bind on it.** The roster is stated over *ports* — a gate that exists
-in shell and is being moved — so a gate landed as a Rust module and a `.gate`
-descriptor with no shell original (canon-kit/SPEC.md §check-measured-claim is the
-first, operator-ruled 2026-08-12) reads them as follows, and a later reader must
-not apply the parity criterion to a member that has no second substrate:
+**New gates are born native by default; shell is the exception and it needs a
+stated cause** — operator-ruled 2026-08-14 and re-affirmed the same day on
+corrected criterion-5 evidence (TRAJECTORY.md §The closed rulings). This reverses
+the prior default, under which a born-native gate was a design ruling taken per
+gate. It is the only measure so far aimed at the port's *denominator* rather than
+its remainder: while the port runs at two to three members an iteration, every
+gate landing in shell adds one the port then owes.
+
+**The default's domain is a tree that carries the crate the gate would compile
+into** (`GATE_SDK_NATIVE_CRATE`). Where the authoring tree does not — every
+vendoring consumer — shell is not an exception but the only substrate, and the
+consumer-facing authoring path is unchanged. This is not a narrowing of the
+ruling but the only reading a consumer can execute: an adopter receives no gate
+implementation source (TRAJECTORY.md §The objectives, §Consumer payload), and
+`native/` ships no `checks/` and no `smoke/`, so `gate_kit_roots` never selects
+it and `init` never vendors it. An adopter therefore cannot author a compiled
+gate at all, which is why `templates/check-skeleton.sh`, gate-sdk/README.md's
+first-gate walkthrough and §Consumer smoke's kit-landing checklist stay exactly
+as they are: a flipped walkthrough would be false on its face rather than merely
+premature. What the domain decides is which surfaces the flip reaches —
+publisher-facing ones (this section, and CLAUDE.md's always-loaded authoring
+line) change; consumer-facing ones do not.
+
+**A born-native gate is the member these criteria do not describe, and only some
+of them bind on it.** The roster is stated over *ports* — a gate that exists in
+shell and is being moved — so a gate landed as a Rust module and a `.gate`
+descriptor with no shell original (canon-kit/SPEC.md §check-measured-claim was
+the first, operator-ruled 2026-08-12) reads them as follows, and a later reader
+must not apply the parity criterion to a member that has no second substrate:
 
 - **1 and 3 bind unchanged.** It registers in `gates.list` and it lands in the
   generated hook, so `check-graph` proves its manifest the same way.
 - **2 does not bind.** Parity is *between substrates*, and a gate with one
   implementation has none to prove against. Its `good/`+`bad/` pair is its whole
   oracle, exactly as it would be for a new shell gate — which is a weaker
-  guarantee than a ported member's parity run, and the reason a born-native gate
-  is a design ruling rather than a default.
+  guarantee than a ported member's parity run. That observation survives the flip
+  intact; what changes is the conclusion drawn from it, which is now **the
+  accepted price rather than the reason to ship shell**. The trade reversed
+  because its other side changed, and this is recorded rather than presenting the
+  new default as self-evident: under the 2026-08-09 directive the corpus ports in
+  full, so shipping a new gate in shell does not *avoid* the compiled
+  implementation — it defers it, adds a parity run that would not otherwise be
+  owed, and grows the denominator the directive is racing. The weaker oracle is
+  paid once; the deferred port is paid again at every cohort cut that has to
+  sequence it.
 - **4 does not bind** where the gate's **assertion target** is not gate source —
   criterion 4's own predicate above, applied unchanged. A **conservation-table row
   may still be owed**, because `couples=` can reach a declaration-path-processing
@@ -1433,10 +1469,126 @@ not apply the parity criterion to a member that has no second substrate:
   for, so on an uncovered platform a born-native gate does not run *where a shell
   gate would have*. For a port that trade is neutral — the shell form is deleted
   either way; for a born-native gate it is a real subtraction against the
-  alternative of shipping shell, and it is what the operator ruling weighs.
+  alternative of shipping shell, and it is what the operator ruling weighed —
+  in its corrected form, `native/targets.list` shipping one target, so the
+  uncovered set is every macOS adopter rather than a narrow hypothetical. Under
+  the flipped default that subtraction attaches to **every** new gate, which is
+  why it is exception class (b)'s subject below and why its accumulation *rate*
+  is owned elsewhere rather than here (`born-native-omission-accumulation`).
 - **6 and 7 bind unchanged**, and a born-native gate is designed to clear them at
   authoring time rather than owing the work afterwards, which is most of why it is
-  cheap: the substrate it needs already exists or it is not born native.
+  cheap: the substrate it needs already exists or it is not born native. Under a
+  *default* that last clause would read as a licence — any gate can be declared
+  un-bornable — which is exactly what exception class (c) below bounds.
+
+**The flip is not a discount, and two of the criteria above are *more*
+load-bearing under a default rather than less.** The `good/`+`bad/` pair is now
+the gate's entire oracle in the ordinary case instead of the exceptional one, and
+the `--reads` declaration plus assertion C's conservation row (§Meta-gate
+conservation for the binary substrate) are owed at authoring time rather than
+deferred to a port. A born-native gate shipping without them ships *less*
+coverage than the shell gate it replaced, which is the one outcome the flip must
+not produce.
+
+**The exception criterion: three closed classes, each with a stated cause.**
+Shell is taken only under one of these, and the gate's own SPEC section states
+which class and why. A fourth class is an amendment, not a judgment call.
+
+- **(a) The gate audits the dispatch relation.** A gate whose assertion is about
+  whether a gate declares itself, or whether a descriptor and a subcommand agree,
+  stays shell — a compiled form could pass *itself* with a broken binary, which is
+  a false green. This class is **not new**: §Meta-gate conservation for the binary
+  substrate already rules it — *a gate whose assertion is about the dispatch
+  mechanism stays shell; a gate that merely reads declaration paths as content may
+  port* — and `check-gate-substrate-parity` and `check-install-disposition` are
+  its live members, each held on exactly that ground in its own row there. The
+  criterion adopts that ruling rather than inventing a parallel one.
+  **Permanent**; the cause is the class.
+
+  `check-crate-arms` is **not** a member of this class, named because the
+  mechanical reading puts it here. That same section states it sits *outside* the
+  conservation table's derivation entirely — its `couples=` covers no registry
+  member's declaration path — and its permanent-shell ground is instead criteria 4
+  and 7: a gate running `cargo test` over the crate cannot live inside the
+  artifact it tests, and its rule invokes `cargo` (criterion 7's worked-example
+  passage above records it as *a different case*). Two permanently-shell causes,
+  not one; folding the second into class (a) is what would blur the class's own
+  ground.
+- **(b) The gate's subject is a platform the target roster does not cover.**
+  Criterion 5 omits a `.gate` member on exactly the platforms `native/targets.list`
+  carries no artifact for. A gate whose findings arise *on* those platforms would
+  therefore be omitted precisely where it is the only reader — the one case where
+  born-native does not merely weaken the oracle but deletes it at the point of
+  use. **Ends when the target lands**, so the cause names the target, and the gate
+  ports under the ordinary criteria once `platform-support-ci-matrix` widens the
+  roster.
+- **(c) The rule needs substrate the crate does not carry, and building it is not
+  that unit's work.** Criteria 6 and 7 bind on a born-native gate unchanged, so
+  the bound on this class is what keeps them from reading as a licence: the cause
+  **names the missing substrate and the entry that owns it**, and the gate lands
+  shell inside the port corpus with its blocker already declared. That is strictly
+  better than the pre-flip state, where the same gate landed shell and its blocker
+  had to be re-derived by `port-blockers.sh` at some later cohort cut.
+  **Temporary by construction** — it expires when the substrate lands.
+
+**The cause is recorded in the gate's own SPEC section**, beside the rule it
+governs, on the same terms every other design ruling for that gate is recorded —
+never in a central roster, which would be a maintained list of the residue that
+derivation-first refuses and that rots at every port. It is reachable there
+because that section is written in the same unit as the gate (§Consumer smoke's
+kit-landing checklist), and it has three readers rather than none: the reviewing
+session, which finds it where every other ruling for that gate already lives; the
+port-track selector, for which a class-(c) cause states a blocker and its owning
+entry that `bash gate-sdk/bin/port-blockers.sh` can derive but not attribute; and
+the session landing the missing substrate or the missing target, for which a
+class-(b) or class-(c) cause *is* the list of gates that become portable with it.
+
+**What the classes deliberately exclude**, because an exception criterion is
+defined by its refusals: *the rule is easier to write in shell*, *the author is
+faster in bash*, *the corpus is small*, and *it is only a temporary gate* are none
+of them causes. Nor is *criterion 5 makes it a real subtraction* on its own —
+that is true of **every** born-native gate, so admitting it would swallow the rule
+the day it landed. Class (b) is the sharpened form of that argument and the only
+form of it that survives.
+
+**No gate enforces the flip, and the ground is cost rather than impossibility.**
+The distinction is stated because the stronger claim was made and then measured
+false. Three enforceable shapes have been weighed:
+
+- **A per-gate `# substrate: shell — <cause>` header asserted over every shell
+  member.** Buildable today and the shape that would work — but it demands one
+  retrospective declaration per unported member, sixty against this tree at the
+  flip, each deleted again as its member ports. It becomes cheap when the residue
+  is small, which is the condition to revisit it under.
+- **A baseline roster of today's shell members that a gate diffs against.** A
+  maintained roster, which derivation-first refuses, and it rots at every cohort
+  cut.
+- **A git-anchored discriminator** — the same header, demanded only of a member
+  whose declaration file entered the history after the flip's own commit. This
+  shape was first refused on the ground that **no** discriminator exists while the
+  port runs, a newly authored shell gate being indistinguishable from one still
+  awaiting its port. Measured at the merge, that ground is false:
+  `git log --diff-filter=A` dates every declaration file, this repo already checks
+  out at full depth because `check-trajectory-fresh` reads the commit graph, and
+  the scan costs about a second over the whole check corpus. Needing no
+  retrospective sweep, it is strictly cheaper than the first shape. What it costs
+  instead is three things rather than one impossibility: a rename re-dates a file,
+  so the plain form false-positives — five of seventy-two paths on this tree, all
+  resolved by `--follow`, which is a heuristic and not a guarantee; the anchor is
+  a literal commit no derivation produces; and as weighed it is **publisher-local**,
+  because in a vendored tree every declaration file was added by the vendoring
+  commit and the assertion would redden a consumer's whole registry. That last
+  cost is smaller than it looks, the default's domain being exactly the
+  crate-carrying tree, but making the shape consumer-safe is design work it has
+  not had.
+
+The flip therefore rests on this section and on CLAUDE.md's always-loaded
+authoring line, and the enforcement disposition is **filed rather than
+flagged-and-skipped** per the gap-disposition rule — the unit that landed the flip
+did not open the work of landing a gate, and which iteration builds one is not
+this section's to rule. Enforcement-first is not waived: it ranks a gate above
+discipline *where a gate is available*, and the shape now known to be available is
+unbudgeted rather than unavailable.
 
 ### The first cohort, and the rule that selects the next
 

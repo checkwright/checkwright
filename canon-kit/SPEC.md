@@ -915,10 +915,14 @@ oracle is its `good/`+`bad/` pair, exactly like any new shell gate's, with
 a consumer whose host the release publishes no artifact for, so on an uncovered
 platform this gate does not run where a shell gate would have. That is the port's
 standing cost, already accepted for the members whose shell forms were deleted, and
-it is why the omit-and-declare path exists — a paid price, not an open risk. What
-stays open is only its reach: this settles *this* gate, and a reader weighing a
-second born-native gate weighs the cost again rather than citing this one as
-blanket precedent.
+it is why the omit-and-declare path exists — a paid price, not an open risk. Its
+reach stayed deliberately open here — *this* gate settled, a second one weighing
+the cost again rather than citing this one as blanket precedent — and that
+question has since been **closed by ruling rather than by precedent**: new gates
+in a crate-carrying tree are born native by default, with shell an exception
+under one of three stated classes (gate-sdk/SPEC.md §The port-candidate
+criteria). The refusal above is unaffected in its own terms: what settles the
+second gate is the ruling, never this section.
 
 ### check-prose-enum
 
