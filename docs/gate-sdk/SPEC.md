@@ -1581,9 +1581,9 @@ with its port work named and owed:
 - **`check-queue-prose-precondition` — an ERE engine.** It does not *transport*
   `QUEUE_KIT_PRECONDITION_REGEX` across the bridge, it **interprets** it, and the
   knob is consumer config carrying an arbitrary POSIX ERE; its `awk` also runs
-  `gsub` with alternation, groups and negated classes. The crate vendors nothing —
-  asserted rather than assumed, by the unit test that fails the build on a
-  non-empty dependency list — so porting it means hand-writing an ERE engine. Its
+  `gsub` with alternation, groups and negated classes, so porting it means an ERE
+  engine — hand-written here, on the span semantics §The POSIX ERE matcher fixes
+  rather than on any bar against depending on one. Its
   own `gsub` runs over a pattern baked literally into awk source, which a port
   hand-compiles, so the substitution engine an earlier sizing put inside this hold
   is outside it (§The POSIX ERE matcher). Sizing a subset to this consumer's one
@@ -1865,9 +1865,7 @@ other half was found at implementation:
   pattern per transport, the second one pattern per disclosure class, the third
   every `CANON_KIT_TEMPORAL_MARKERS` entry. Bridging the vocabulary as *data*
   removes the interpreter the binary would have spawned; it does not remove the
-  regex the binary must then apply. The crate vendors nothing — asserted by
-  `native/src/walk.rs`'s own test, which fails the build on a non-empty
-  `[dependencies]` — so a port hand-writes the engine. Sizing one to this
+  regex the binary must then apply, so a port owes an engine. Sizing one to this
   consumer's patterns is **foreclosed** by the argument this section already
   makes for `check-queue-prose-precondition` and criterion 6 makes for globs;
   that foreclosure binds the pattern **grammar** the engine accepts and not its
@@ -3758,9 +3756,17 @@ a failure mode that reads as a broken tag if it is met at implementation time
 instead of ruled here. The worktree is added under the scratch base and
 trap-removed, so its `native/target/` is scratch as well and the host's build
 output — what `check-gate-binary-fresh` judges — is untouched. The cost is not
-what it looks like: the crate declares no dependencies at any tag, so a cold
-release build is a few hundred milliseconds against a suite that vendors,
-installs and runs the whole battery twice.
+what it looks like, and the figure is **measured rather than argued from the
+manifest**: a cold `cargo build --release` of this crate from an empty target
+directory took **≈2.5 s** (2026-08-14, one Linux machine, `--offline`), against a
+suite that vendors, installs and runs the whole battery twice. The claim this
+replaces reasoned from an empty dependency table to *"a few hundred
+milliseconds"*, and was wrong by an order of magnitude in a direction no reader
+would check — the crate is forty-odd modules at `opt-level = 2`, which is what
+the wall clock is spent on, not on resolving dependencies. Re-measure rather than
+re-derive: the number moves with the module count and with any dependency the
+crate takes, and a dependency also makes a **cold registry fetch** part of the
+first build on a machine that has none.
 
 **A ref carrying no crate is a branch, not a special case.** Whether a binary is
 needed at all comes from `csmoke_gate_descriptors` (§Consumer smoke) — the same
@@ -4721,17 +4727,24 @@ committing runs the descriptor-named gate **against the stale binary**, where it
 passes on the old implementation. A gate reporting clean on code that is not what
 is committed is the vacuous green the whole battery exists to refuse.
 
-**git is the hasher, and that is the ruling the design turns on.** The crate
-declares no dependencies at all, so a content digest is not free: adding a digest
-crate puts a first dependency into the artifact every adopter's machine carries,
-and hand-rolling SHA-256 puts a cryptographic primitive into a crate whose point
-is being small and auditable-by-fixture. Hashing is also the classic place two
-implementations drift — a Rust digest and a shell digest over "the same" input set
-are one canonicalization disagreement away from a permanent false red. git is
-already the sole runtime dependency the trajectory commits to, shelled out rather
-than embedded, and content-addressed hashing is its native operation. So both
-sides call **the same tool with the same arguments**: one algorithm, rather than
-two implementations of one algorithm.
+**git is the hasher, and that is the ruling the design turns on.** Hashing is the
+classic place two implementations drift — a Rust digest and a shell digest over
+"the same" input set are one canonicalization disagreement away from a permanent
+false red. git is already the sole runtime dependency the trajectory commits to,
+shelled out rather than embedded, and content-addressed hashing is its native
+operation. So both sides call **the same tool with the same arguments**: one
+algorithm, rather than two implementations of one algorithm.
+
+**One ground this ruling used to carry has been deleted as false, and deleting it
+is not reopening the ruling.** The text argued additionally that a digest crate
+*"puts a first dependency into the artifact every adopter's machine carries"*.
+That conflates two different dependency sets, and the operator corrected it on
+2026-08-14: the constraint is the **adopter's** — their machine requires only git
+and the pre-compiled binaries (TRAJECTORY.md §The objectives, objective 4) — and
+it says nothing about the crate's build graph, which no adopter ever receives,
+resolves or compiles. The drift argument above is the ruling's ground and is
+untouched by the correction: two implementations of one hash is the risk, whoever
+wrote either.
 
 **The source stamp.** git's content identity for the crate's tracked source set,
 computed by three invocations that are identical on both sides:

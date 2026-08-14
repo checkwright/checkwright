@@ -564,10 +564,9 @@ mod tests {
         assert!(
             declared.is_empty(),
             "the crate now declares dependencies ({:?}). A vendored walker would bypass \
-             walk.rs's recorder and unverify unit test A, and an empty dependency set is \
-             also what gate-sdk/SPEC.md's vendoring model states the payload rests on — \
-             confirm the new dependency performs no filesystem walk, then widen this test \
-             deliberately rather than deleting it",
+             walk.rs's recorder and unverify unit test A — confirm the new dependency \
+             performs no filesystem walk, then widen this test deliberately rather than \
+             deleting it",
             declared
         );
     }
