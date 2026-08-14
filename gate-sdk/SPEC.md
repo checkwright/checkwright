@@ -1256,8 +1256,14 @@ design time; the last three were paid for, and each is named with what it cost.
    corpus, and it shrinks as targets are published rather than being repaired by
    the cohort that caused it.
 6. **Its corpus derivation is self-contained**, unless the duplication the port
-   creates is machine-held. Found at re-selection, one step earlier than
-   criterion 5: `check-spec-fence-balance`, which the amendment named, derives
+   creates is machine-held. **The roster for this criterion is derived too, and
+   by the same tool criterion 7 uses**: `bash gate-sdk/bin/port-blockers.sh
+   --group` partitions the still-shell members by derived corpus derivation
+   (§port-blockers), so *which members share a derivation* is read off a run
+   rather than answered by hand, per member, at cohort-cut time. What the arm
+   emits is a decidable partition plus a counted remainder; the *unless* clause
+   below stays a judgment no column reports. Found at re-selection, one step
+   earlier than criterion 5: `check-spec-fence-balance`, which the amendment named, derives
    its corpus from a config-driven shell derivation and is not `mode=staged`, so
    a ported form must re-implement that derivation with nothing holding the two
    copies together. `check-action-pinning` was selected instead.
@@ -1441,7 +1447,15 @@ is criterion 7's own case, above.
 
 **The next cohort is the largest set of criteria-clearing gates sharing one
 corpus derivation** — an ordering rule, not a bound: the 2026-08-09 ruling ports
-every gate. A cohort that retires a **blocker** several later cohorts are queued
+every gate. **The instrument that makes the rule applicable is
+`bash gate-sdk/bin/port-blockers.sh --group`** (§port-blockers): it partitions
+the still-shell members by derived corpus derivation, largest group first, with
+the mechanically derivable criterion columns beside each member — so "largest",
+"criteria-clearing" and "sharing one corpus derivation" are each read off a run
+rather than off a session's reading of the tree. Its output is advisory and its
+key is deliberately not fused with `couples=`, so a group whose members' corpora
+visibly diverge is a **finding the selecting session adjudicates**, never a
+cohort the tool cut. A cohort that retires a **blocker** several later cohorts are queued
 behind outranks a larger one that retires none, which is the exception §The POSIX
 ERE matcher works and `check-roadmap-fresh`'s hold worked before it. Shared derivation is the axis because it is what made this cohort
 cheap: the walk is ported once and proved N times, and the parity comparison is
@@ -1460,7 +1474,12 @@ descriptor beside its former script: the still-shell consumers of a shared
 derivation are the `*/checks/*.sh` files naming it that have **no** sibling
 `.gate`. Deriving it beats a roster that would rot at every cohort
 (derivation-first), and stating the command once is what stops each sizing
-session re-inventing it.
+session re-inventing it. **`--group` is the whole-corpus form of the same
+doctrine, not a rival instrument**: the one-liner above answers *what is left of
+one named primitive*, and `--group` answers *how the whole remaining registry
+partitions* without being told a primitive to ask about. A session that already
+has a primitive in hand uses the one-liner; a session choosing which primitive to
+take next runs the arm.
 
 **What this cohort landed.** Both rules ship as
 compiled subcommands, proved byte-identical against the shell gates on each
@@ -3852,14 +3871,20 @@ not a silent regrowth.
 
 ### port-blockers
 
-The criterion-7 roster, derived at each invocation. Run
-`bash gate-sdk/bin/port-blockers.sh` from the repo root: for every `gates.list`
-member it resolves the declaration path and reports the external programs the
-rule requires beyond `GATE_SDK_PROGRAM_FLOOR`, one
-`<member><TAB><program><TAB><file:line>` row each, then a trailing line counting
-members scanned and members carrying a requirement it could not decide. **Why the
-roster is derived rather than written down** is §The port-candidate criteria's,
-criterion 7; this section owns how.
+The derived roster for **two** criteria on one walk, at each invocation. Run
+`bash gate-sdk/bin/port-blockers.sh` from the repo root: the default arm answers
+criterion 7, and `--group` answers criterion 6 — both over the same registry,
+through the same `gates_list_members` / `gate_resolve` path. **Why either roster
+is derived rather than written down** is §The port-candidate criteria's,
+criteria 7 and 6; this section owns how. The arms are **exclusive**: `--group`
+replaces the criterion-7 report rather than appending to it, and the default
+arm's output is byte-unchanged by the second arm's existence.
+
+**The default arm answers criterion 7.** For every `gates.list` member it
+resolves the declaration path and reports the external programs the rule requires
+beyond `GATE_SDK_PROGRAM_FLOOR`, one `<member><TAB><program><TAB><file:line>` row
+each, then a trailing line counting members scanned and members carrying a
+requirement it could not decide.
 
 **Three derivation inputs, in descending confidence.** The `command -v <prog>`
 guard, already this tree's convention for announcing exactly this dependency — a
@@ -3880,22 +3905,122 @@ interpreter (`type -t`), a property of bash rather than a roster to maintain. An
 hook — marks a name a function however the scan would otherwise classify it, the
 exact mirror of the `command -v` guard.
 
+**The `--group` arm answers criterion 6.** It emits a **corpus-derivation
+partition over the still-shell members**, groups ordered by size descending, each
+member's row carrying the criterion columns below with its expanded `couples=`
+beside it, then a trailing line counting members scanned, groups formed, members
+undecidable, and members already ported and excluded. Its consumer is a **human**
+session at exactly one transition — cutting the next port cohort under §The first
+cohort, and the rule that selects the next — and its enabling configuration is
+the one the default arm already resolves, `gate_sdk_gates_dir` for the registry
+and `gate_kit_roots` for the resolve dirs, so the arm introduces no knob and no
+new default to be unset anywhere. **Why this arm belongs on this tool rather than
+in a new one**: criterion 6 is a question of exactly the same kind about exactly
+the same corpus as criterion 7, answered today only by hand, per member, at
+cohort-cut time — and the arm needs a command-position tokenizer over every
+registered gate's declaration, which this tool is the only thing in the tree that
+has.
+
+**The grouping key is set-equality over two derived factors**: the pair
+(kit-library call set, content-glob set), each sorted and de-duplicated, with two
+members grouping together when both sets are equal. A single shared call is not
+evidence of a shared derivation and the tool never treats it as one, because
+**both** single-factor candidates were measured to over-select and neither
+under-selects. `couples=` over-selects by criterion 4's own words — the expanded
+field is deliberately **trigger**-shaped and wide on purpose. A bare
+**primitive-call** key over-selects by more: `gate_kit_roots` alone has ten gate
+callers spanning canon-kit, gate-sdk and `scripts/` that share no corpus whatever.
+`check-shellcheck` is the worked case in both directions — it *does* call
+`gate_kit_roots`, then composes four fixed subdirectory names and a `*.sh` glob on
+top of it, while `bin/port-blockers.sh` composes the same call with one
+subdirectory. Same primitive, different corpus.
+
+- **Kit-library call set** — the command-position words the scan emits that the
+  gate itself, or a kit library it can source, defines as a shell function. This
+  arm is the default arm's own filter **inverted**: a name the default arm
+  discards *because* it is not an external program is exactly what the key is
+  made of. So there is no maintained list of "corpus primitives" anywhere, and
+  the tool never classifies which library calls yield a corpus — it compares
+  whole sets, which is what collapses the ten-caller over-selection above.
+- **Content-glob set** — the literal extension-glob tokens (`*.sh`, `*.md`,
+  `*.rs`, `*.gate`, `*.list`, …) carried by the declaration's **non-comment**
+  lines. This is the factor that separates members composing the same root source
+  differently, which is the `check-shellcheck` case. Reading it off non-comment
+  lines alone is what keeps the `# graph:` manifest out of the key, which the
+  next paragraph is the whole reason for.
+
+**`couples=` is a printed column, never a key factor.** Each member's expanded
+`couples=` prints beside it, read through the same `gate_manifest_field` +
+`gate_expand_couples_var` helpers `check-graph` and the generated hook read, so
+this report cannot disagree with them about what a manifest says. It is a
+**cross-check**: fusing a deliberately trigger-shaped field into a content key is
+the over-selection criterion 4 names, and burying it inside one fused key would
+hide the disagreement the reader most needs to see. Where members share a key and
+diverge in `couples=`, the divergence is a **finding for the cohort session to
+adjudicate**, not something the tool resolves.
+
+**Already-ported members are excluded and counted, not reported undecidable.** A
+member resolving to a `.gate` descriptor leaves the partition entirely and is
+counted in the trailing line. This is a deliberate divergence from the default
+arm, where such a member prints `?` because its external-program requirement
+genuinely cannot be asked; here there is no open question, because the grouping
+exists to order the *remaining* corpus and a ported member is not in it.
+
+**Cheap criterion columns, so the selection rule is applicable end to end.** That
+rule wants the largest set of **criteria-clearing** gates sharing one corpus
+derivation, so each member's row carries the three criteria that are mechanically
+derivable: **criterion 2** as `c2=pair` / `c2=no-fixture` / `c2=none`, read
+through the fixture dirs §check-gate-fixture-coverage resolves and in that order,
+so the report and that gate cannot disagree about whether a member carries a
+pair; **criterion 3** as `c3=<tier>` from the manifest; and **criterion 7** as
+`c7=`, the default arm's own verdict for that member — `clean`, the programs it
+requires, or `?`. Criterion 1 is true by construction, the walk being the
+registry. Criteria 4, 5 and 6 are **not** emitted: each needs judgment the tool
+cannot take — a self-referential parity oracle, an aggregate binary-less
+residual, whether a duplication is machine-held — and emitting a guess at them
+would invite a cohort to be cut on the tool's authority instead of the session's.
+No field is emitted without a named reader at a named transition, and those three
+columns were considered and **removed** under that rule, since their only honest
+reader would have had to disregard them.
+
 **Undecidable is reported, never guessed**, adopting §check-reads-couples'
-precedent: a command-position expansion whose default cannot be resolved prints
+precedent, and the ruling is stated once for the tool rather than per arm. In the
+default arm, a command-position expansion whose default cannot be resolved prints
 `?`, and so does a member declaring through a `.gate` descriptor, whose rule is a
 binary subcommand with no `--needs` to ask (§The `# graph:` manifest). A tool that
 reported nothing for an unresolvable knob would reproduce the very false negative
 the derivation exists to close — the dependency that is never spelled in the
-gate's source at all.
+gate's source at all. In `--group`, a still-shell member whose key is empty in
+**both** factors — no kit-library call and no content glob the tool can see —
+prints `?` with its declaration path and is counted; it is never placed in a
+group, and empty-keyed members are never grouped **with each other**, because
+sharing an absence of evidence is not sharing a derivation. What the arm emits is
+therefore a **decidable partition plus a counted remainder**, never a complete
+partition claimed as one — which is precisely what two failed read-only sweeps
+could not deliver.
 
-It is a tool, not a gate: no `# graph:` manifest, no fixture pair, and nothing
-machine-parses its output — the report is read by the session choosing a cohort,
-which is the transition where the answer is needed. **No freshness gate
-accompanies it, and that is enforcement-first rather than an omission**: a gate
-would have to compare the derivation against a stored expectation, which is the
-maintained roster re-entering by the back door, wrong for every consumer whose
-configuration differs. Removing the duplication outranks gating it, and criterion
-7 states no roster for a freshness gate to hold.
+**Arguments, now that the tool has a mode.** It takes no positional arguments and
+gains none, so §The `bin/`-tool contract's free-text rule does not bind it. Two of
+that contract's three behaviors are adopted anyway: `-h` / `--help` prints usage
+on **stdout** at exit **0**, and an unrecognized argument is a **refusal** — usage
+on stderr, exit 2. The contract states that refusal for a leading-`-` argument;
+since this tool has no positionals, a bare word is unrecognized on the same
+footing and is refused identically. `--` is **not** adopted: it ends option
+processing in favor of free-text positionals, and this tool has none to end it in
+favor of. The ground is the cost that section already measures — a session that
+ran a stage writer with `--help`, got `'--help' is not a lifecycle stage` in place
+of usage, and went three guards deep working around a contract the usage text
+would have told it did not exist. A tool with one undiscoverable mode is that cost
+waiting to be paid; a tool with none was not.
+
+It is a tool, not a gate: **neither arm** carries a `# graph:` manifest or a
+fixture pair, and nothing machine-parses either output — both reports are read by
+the session choosing a cohort, which is the transition where the answers are
+needed. **No freshness gate accompanies it, and that is enforcement-first rather
+than an omission**: a gate would have to compare the derivation against a stored
+expectation, which is the maintained roster re-entering by the back door, wrong
+for every consumer whose configuration differs. Removing the duplication outranks
+gating it, and criteria 6 and 7 state no roster for a freshness gate to hold.
 
 ### check-shellcheck
 

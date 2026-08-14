@@ -1,13 +1,50 @@
 #!/usr/bin/env bash
 # spec: gate-sdk/SPEC.md §The port-candidate criteria — criterion 7's roster, derived from the tree at each invocation rather than stated anywhere; a literal roster cannot be correct for every consumer because a renderer/command knob is consumer config
-# usage: port-blockers.sh
-#   each registered gate's external-program requirements beyond GATE_SDK_PROGRAM_FLOOR, as '<member><TAB><program><TAB><file:line>' rows plus a trailing scanned/undecidable count line — the criterion-7 input a porting session reads when it sequences a cohort.
-#   advisory by construction: never joins gates.list and nothing parses the output; a requirement it cannot resolve prints '?' and is counted, never guessed.
+# spec: gate-sdk/SPEC.md §port-blockers — criterion 6's roster on the same tool and the same walk: the --group arm partitions the still-shell members by derived corpus derivation, so one tool is the derived roster for both criteria and neither is a maintained list
+# usage: port-blockers.sh [--group]
+#   default arm: each registered gate's external-program requirements beyond GATE_SDK_PROGRAM_FLOOR, as '<member><TAB><program><TAB><file:line>' rows plus a trailing scanned/undecidable count line — the criterion-7 input a porting session reads when it sequences a cohort; advisory, never parsed, and what it cannot decide prints '?' and is counted.
+#   --group: the corpus-derivation partition over the still-shell members, groups largest first, each member carrying its criterion 2/3/7 columns and its expanded couples= — the criterion-6 input the session cutting the next cohort reads, advisory on the same terms and with an undecidable count of its own.
 set -uo pipefail
 
 SDK="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # shellcheck source=../lib/gate.sh
 source "$SDK/lib/gate.sh"
+
+pb_usage() {
+    cat <<'EOF'
+usage: port-blockers.sh [--group]
+
+  (no argument)  criterion 7: every registered gate's external-program
+                 requirements beyond GATE_SDK_PROGRAM_FLOOR, one
+                 '<member><TAB><program><TAB><file:line>' row each.
+  --group        criterion 6: the corpus-derivation partition over the
+                 still-shell members, largest group first, each member
+                 carrying its criterion 2/3/7 columns and expanded couples=.
+  -h, --help     this text.
+
+Both arms are advisory: nothing parses either output, and what cannot be
+decided prints '?' and is counted rather than guessed.
+EOF
+}
+
+# spec: gate-sdk/SPEC.md §port-blockers — the two argument behaviors the tool adopts from §The bin/-tool contract now that it has a mode; the tool takes no positionals, so a non-option word is unrecognized on the same footing as an unknown flag
+MODE=default
+case "${1-}" in
+    "") ;;
+    --group) MODE=group ;;
+    -h | --help)
+        pb_usage
+        exit 0
+        ;;
+    *)
+        pb_usage >&2
+        exit 2
+        ;;
+esac
+if [[ $# -gt 1 ]]; then
+    pb_usage >&2
+    exit 2
+fi
 
 GATES_DIR="$(gate_sdk_gates_dir)"
 LIST="$GATES_DIR/gates.list"
@@ -19,6 +56,11 @@ LIST="$GATES_DIR/gates.list"
 # spec: gate-sdk/SPEC.md §lib/gate.sh — the resolution dirs gate_check_dirs yields, taken through gate_kit_roots_rel so every evidence path this report prints is repo-relative: the report is read beside a diff and cited in a session note, where an absolute clone path resolves for nobody
 CHECK_DIRS=("$GATES_DIR")
 while IFS= read -r _pb_root; do CHECK_DIRS+=("${_pb_root%/}/checks"); done < <(gate_kit_roots_rel)
+unset _pb_root
+
+# spec: gate-sdk/SPEC.md §port-blockers — criterion 2's column reads the fixture dirs check-gate-fixture-coverage resolves, in that order, so the report and the gate can never disagree about whether a member carries a pair
+TESTS_DIRS=("${GATE_SDK_TESTS_DIR:-$GATES_DIR/gate-tests}")
+while IFS= read -r _pb_root; do TESTS_DIRS+=("${_pb_root%/}/gate-tests"); done < <(gate_kit_roots_rel)
 unset _pb_root
 
 # spec: gate-sdk/SPEC.md §The port-candidate criteria — a name defined as a shell function by the gate itself or by any kit library it can source is not an external program; the set is derived from the tree, so a kit that adds a helper never has to be listed here
@@ -237,10 +279,36 @@ scanned=0
 undecidable=0
 rows=""
 
+declare -A GROUP_ROWS=()
+declare -A GROUP_COUNT=()
+group_unkeyed=""
+group_unkeyed_n=0
+ported_excluded=0
+
 record() {
     rows+="$1"$'\t'"$2"$'\t'"$3"$'\n'
-    [[ "$2" == "?" ]] && member_undecidable=1
+    if [[ "$2" == "?" ]]; then
+        member_undecidable=1
+    else
+        member_progs+="$2,"
+    fi
     return 0
+}
+
+# spec: gate-sdk/SPEC.md §port-blockers — the content-glob factor is read from the declaration's non-comment lines only, which is what keeps the `# graph:` manifest out of the key: couples= is a printed cross-check and never a key factor
+pb_glob_set() {
+    local set
+    set="$(grep -v '^[[:space:]]*#' "$1" | grep -Eo '\*\.[A-Za-z0-9]+' | sort -u | tr '\n' ',')"
+    printf '%s\n' "${set%,}"
+}
+
+pb_criterion2() {
+    local m="$1" decl="$2" t
+    for t in "${TESTS_DIRS[@]}"; do
+        [[ -d "$t/$m/good" && -d "$t/$m/bad" ]] && { printf 'pair\n'; return 0; }
+    done
+    grep -Eq '^# no-fixture:' "$decl" && { printf 'no-fixture\n'; return 0; }
+    printf 'none\n'
 }
 
 # spec: gate-sdk/SPEC.md §The port-candidate criteria — a knob's value is resolved through lib/gate.sh's own bridge resolver, the one place a knob default is read, so this report can never disagree with what a dispatched binary is handed
@@ -257,12 +325,18 @@ while IFS= read -r member; do
     [[ -n "$member" ]] || continue
     scanned=$((scanned + 1))
     member_undecidable=0
+    member_progs=""
     decl="$(gate_resolve "$member" "${CHECK_DIRS[@]}")" || {
         echo "port-blockers: $member is registered but resolves to no declaration path" >&2
         exit 2
     }
     # spec: gate-sdk/SPEC.md §The `# graph:` manifest — a .gate member's rule is a binary subcommand this tool cannot parse and no --needs flag answers yet, so it is counted undecidable rather than reported clean
+    # spec: gate-sdk/SPEC.md §port-blockers — a ported member leaves the partition entirely rather than printing '?': the grouping exists to order the *remaining* corpus, so there is no open question to report, which is the deliberate divergence from the default arm's undecidable treatment
     if [[ "$decl" == *.gate ]]; then
+        if [[ "$MODE" == group ]]; then
+            ported_excluded=$((ported_excluded + 1))
+            continue
+        fi
         record "$member" "?" "$decl (binary substrate; no --needs)"
         undecidable=$((undecidable + 1))
         continue
@@ -270,6 +344,7 @@ while IFS= read -r member; do
 
     declare -A seen=()
     declare -A LOCAL_FUNCS=()
+    declare -A libcalls=()
     while IFS= read -r _pb_fn; do [[ -n "$_pb_fn" ]] && LOCAL_FUNCS["$_pb_fn"]=1; done < <(
         grep -Eo '^[[:space:]]*(function[[:space:]]+)?[A-Za-z_][A-Za-z0-9_]*[[:space:]]*\(\)' "$decl" |
             sed -E 's/^[[:space:]]*(function[[:space:]]+)?//; s/[[:space:]]*\(\)$//'
@@ -294,16 +369,73 @@ while IFS= read -r member; do
                 evidence="$evidence (\$$word)"
                 ;;
         esac
-        [[ -n "${LOCAL_FUNCS[$prog]+x}" || -n "${FUNCS[$prog]+x}" ]] && continue
+        # spec: gate-sdk/SPEC.md §port-blockers — the kit-library call factor is exactly this filter inverted: a name the default arm discards because it is not an external program is what the grouping key is made of, so no roster of "corpus primitives" is maintained anywhere
+        [[ -n "${LOCAL_FUNCS[$prog]+x}" || -n "${FUNCS[$prog]+x}" ]] && {
+            libcalls["$prog"]=1
+            continue
+        }
         [[ -n "${FLOOR[$prog]+x}" ]] && continue
         _pb_is_builtin "$prog" && continue
         [[ -n "${seen[$prog]+x}" ]] && continue
         seen["$prog"]=1
         record "$member" "$prog" "$evidence"
     done < <(awk "$PB_SCAN" "$decl")
-    unset seen LOCAL_FUNCS
+
+    if [[ "$MODE" == group ]]; then
+        libkey=""
+        if [[ ${#libcalls[@]} -gt 0 ]]; then
+            libkey="$(printf '%s\n' "${!libcalls[@]}" | sort -u | tr '\n' ',')"
+            libkey="${libkey%,}"
+        fi
+        globkey="$(pb_glob_set "$decl")"
+        # spec: gate-sdk/SPEC.md §port-blockers — a member empty in both factors is reported, never grouped, and never grouped with another empty-keyed member: sharing an absence of evidence is not sharing a derivation
+        if [[ -z "$libkey" && -z "$globkey" ]]; then
+            group_unkeyed+="  ?  $member"$'\t'"$decl"$'\n'
+            group_unkeyed_n=$((group_unkeyed_n + 1))
+        else
+            if [[ "$member_undecidable" -eq 1 ]]; then
+                c7="?"
+            elif [[ -z "$member_progs" ]]; then
+                c7="clean"
+            else
+                c7="${member_progs%,}"
+            fi
+            c2="$(pb_criterion2 "$member" "$decl")"
+            c3="$(gate_manifest_field "$decl" tier)"
+            gate_expand_couples_var couples_exp "$(gate_manifest_field "$decl" couples)"
+            key="libs=${libkey:--} globs=${globkey:--}"
+            GROUP_ROWS["$key"]+="$(printf '  %-36s c2=%-10s c3=%-9s c7=%s\n      couples=%s' \
+                "$member" "$c2" "${c3:--}" "$c7" "${couples_exp:--}")"$'\n'
+            GROUP_COUNT["$key"]=$((${GROUP_COUNT["$key"]:-0} + 1))
+        fi
+    fi
+
+    unset seen LOCAL_FUNCS libcalls
     [[ "$member_undecidable" -eq 1 ]] && undecidable=$((undecidable + 1))
 done < <(gates_list_members "$LIST")
+
+if [[ "$MODE" == group ]]; then
+    groups=0
+    while IFS=$'\t' read -r n key; do
+        [[ -n "$key" ]] || continue
+        groups=$((groups + 1))
+        printf 'group %d: %d member(s)\n  key: %s\n' "$groups" "$n" "$key"
+        printf '%s' "${GROUP_ROWS["$key"]}"
+        printf '\n'
+    done < <(
+        for key in "${!GROUP_ROWS[@]}"; do
+            printf '%d\t%s\n' "${GROUP_COUNT["$key"]}" "$key"
+        done | sort -t$'\t' -k1,1nr -k2,2
+    )
+    if [[ -n "$group_unkeyed" ]]; then
+        printf 'undecidable (no kit-library call and no content glob this tool can see):\n'
+        printf '%s\n' "${group_unkeyed%$'\n'}"
+        printf '\n'
+    fi
+    printf 'port-blockers --group: %d member(s) scanned, %d group(s) formed, %d undecidable, %d already ported and excluded\n' \
+        "$scanned" "$groups" "$group_unkeyed_n" "$ported_excluded"
+    exit 0
+fi
 
 [[ -n "$rows" ]] && printf '%s' "$rows" | sort
 printf 'port-blockers: %d member(s) scanned, %d with a requirement this report could not decide\n' \

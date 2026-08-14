@@ -35,10 +35,13 @@ honest:
   substrate: resolves the crate from `GATE_SDK_NATIVE_CRATE`, passes trailing
   arguments to cargo (so a per-target build reuses it), and returns cargo's own
   exit code. Every reader of that command cites this script rather than copying it.
-- `bin/port-blockers.sh` — the port-sequencing report: per registered gate, the
-  external programs its rule requires beyond `GATE_SDK_PROGRAM_FLOOR`, derived
-  from the tree rather than listed anywhere, plus a count of the members it could
-  not decide. Advisory — never a `gates.list` member, and nothing parses it.
+- `bin/port-blockers.sh` — the port-sequencing report, in two exclusive arms.
+  The default arm gives, per registered gate, the external programs its rule
+  requires beyond `GATE_SDK_PROGRAM_FLOOR`; `--group` partitions the still-shell
+  members by derived corpus derivation, largest group first, with the
+  mechanically derivable port criteria beside each member. Both derive from the
+  tree rather than from a list anywhere, and both count what they could not
+  decide. Advisory — never a `gates.list` member, and nothing parses either.
 - `checks/` — the meta-gates that hold the family to its own standard:
   ShellCheck self-lint, the output contract, the fail-closed contract, fixture
   coverage, SPEC↔code assertion coupling, exemption-list hygiene, and manifest

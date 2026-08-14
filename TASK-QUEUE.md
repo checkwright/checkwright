@@ -65,42 +65,6 @@
   `port-corpus-grouping-census-unbought` builds, so that unit must land first and the two
   cannot be batched as parallel siblings. The terminal move is a **demotion**, not Done.
 
-- **port-corpus-grouping-census-unbought** [spec: SPEC-port-group.md]
-  — the remaining corpus has never
-  been grouped by shared corpus derivation, and two dispatches failed to buy it.
-  The cohort selection rule is "the largest set of criteria-clearing gates sharing one corpus
-  derivation" (gate-sdk/SPEC.md §The first cohort, and the rule that selects the next), so a
-  selector needs that grouping over the whole remaining set. It does not exist. The two
-  largest blocks — gate-sdk's 26 still-shell gates and `scripts/`' 13 — have **never** been
-  grouped, so every cohort ruling to date has been taken against candidates surfaced by
-  reading rather than against a complete partition.
-  **Why it needed design:** the open question was what shape of work settles it, not how to
-  run one more sweep. Three candidates, none ruled at filing: derive the grouping from the
-  `# graph:` `couples=` manifests plus each gate's corpus primitive call (cheap, machine-
-  checkable, but `couples=` is trigger-shaped and over-selects — the same term confusion
-  criterion 4 already warns about); extend `bin/port-blockers.sh` with a `--group` arm so the
-  grouping becomes a maintained tool output rather than a survey (derivation-first, and the
-  tool already walks the registry); or accept that the residue is small enough to rule
-  per-cohort and retire the rule's whole-corpus premise.
-  **What was tried, so a third attempt is not re-bought blind.** Two delegated read-only
-  sweeps over the 67-member set. The first never returned inside ~50 minutes and could not be
-  stopped by its dispatcher; the second time-boxed itself and returned partial — a verified
-  hold table and six of the nine ERE-roster members, with the gate-sdk-26 and `scripts/`-13
-  grouping explicitly unfinished. The failure mode is the corpus size against a per-gate read:
-  67 gates each needing a manifest read plus enough body to name a derivation is not a
-  single-agent sweep, which is the finding a third identical dispatch would buy again.
-  **Cost while deferred:** each cohort ruling is taken against an incomplete rival set, so the
-  ordering rule's "largest" is unverifiable and a genuinely larger clean group inside those 39
-  gates would stay invisible — the port could run to completion having never once applied its
-  own selection rule as written.
-  Filed 2026-08-13 at scope on lead disposition, under scope-gated intake: filed as costed
-  work, not started.
-  Promoted 2026-08-14 at spec. The amendment takes candidates (1) and (2) together — `--group`
-  is the housing, the derived key is the key — and rejects (3). Both candidate keys were
-  measured to **over-select**: `couples=` is trigger-shaped by criterion 4's own words, and
-  `gate_kit_roots` alone has ten callers sharing no corpus. The key is set-equality over two
-  factors, and undecidable members are counted, never guessed into a group.
-
 - **settings-allow-dead-path-residue** [spec: SPEC-settings-paths.md]
   — every gate cohort's port leaves the
   committed allow-list naming a script the port deleted, and nothing resolves that list against
@@ -5430,6 +5394,7 @@
 ## Done
 
 - pack-installer-root-provenance
+- port-corpus-grouping-census-unbought
 
 ## Lessons Learned
 
