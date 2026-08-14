@@ -170,6 +170,23 @@ a published digest* and may **not** say *reproducible*. What opacity buys, what
 it does not extend to, and why the claim is raised cost of analysis rather than
 confidentiality are owned by gate-sdk/SPEC.md §Consumer payload.
 
+**New gates are born native by default; shell is the exception, and it needs a
+stated cause — ruled 2026-08-14.** This reverses the default recorded at
+gate-sdk/SPEC.md §The port-candidate criteria, where a born-native gate was "a
+design ruling rather than a default", and it is the only measure taken so far
+that acts on the port's *denominator* rather than its remainder: under the prior
+default every gate landed while the port ran added shell the port then owed.
+The mechanism — the exception criterion that makes "with cause" operable — is
+owed to that same section by the amendment this ruling opens, and is not
+restated here. Ruled with criterion 5's cost in hand and against the recording
+session's own lean, which is why it is recorded rather than argued: a
+`.gate`-declared member is *omitted* on a platform `native/targets.list` carries
+no artifact for, that roster is one target today, and the flip therefore attaches
+that omission to every new gate. What the ruling does not do is widen the
+roster; the residue it creates is costed and filed as
+`born-native-omission-accumulation`, and the roster's own widening trigger
+(`platform-support-ci-matrix` landing a CI leg) is unchanged.
+
 **The release policy's security-or-supply-chain trigger reads narrowly — ruled
 2026-08-05.** It fires on a vulnerability or a compromised artifact. An
 **install-path data-loss repair does not fire it**, however severe, and however
@@ -252,6 +269,16 @@ refuses an implementation source inside a vendoring kit root. **Operator-answere
 it reopens none, because what a developer builds from is the artifact that is
 public already. Recorded because the question is worth asking once and expensive
 to ask twice — the two paths sound like a disclosure change and are not one.
+
+**The consumer's own gates port into `native/` — ruled 2026-08-14.** The 13
+gates this repo declares under `scripts/` become subcommands of the existing
+multi-call binary rather than a second consumer-owned crate or a sanctioned
+shell block, so no part of the remaining corpus is now without a destination.
+The ruling's grounds, the cost it accepts — an adopter's binary carries
+subcommands implementing another project's repo rules, which they can never
+register — and the tranche that discharges it are the queue entry's:
+`consumer-gate-port-disposition`. Recorded here because it binds every remaining
+cohort's ordering and the entry that owns it eventually leaves the queue.
 
 What the sequence names next, after the port: `companion-toolkit-profile`.
 

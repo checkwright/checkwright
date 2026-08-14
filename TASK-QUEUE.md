@@ -66,48 +66,114 @@
   rejected and on whose authority, and the price it paid are canonical at gate-sdk/SPEC.md
   §The canonical-spec `spec_canonical_specs` cohort. The terminal move is a **demotion**.
 
-- **consumer-gate-port-disposition** [design-pending] — this repo's own 13 gates are a fifth
-  of the remaining port and no rule says where they land.
-  **The seam question is OPEN and this entry deliberately states no leaning** — it records
-  the fork and its costs so the ruling is taken once, with the alternatives already priced.
-  **The class, measured 2026-08-14 at scope:** the 13 gates declared under `scripts/` are
-  **100% unported** — no `.gate` beside any of them — against 63 unported of 103 registered
-  overall, so they are 21% of what the port has left. They are Checkwright's own rules about
-  Checkwright's own tree: docs mirror and nav, install toolchain, npm publish spec, release
-  bump and channel parity, trajectory freshness, value rollup, tightened-gates grammar,
-  kit-ref liveness.
-  **Why they are a class and not 13 ordinary members.** They sit in the *consumer's own
-  gates directory*, whose defining property gate-sdk/SPEC.md §upgrade-smoke already states:
-  a gate living solely there "cannot appear in a vendored tree". Meanwhile
+- **consumer-gate-port-disposition** [design-pending] — the destination is ruled; what remains
+  is the tranche that ports this repo's own 13 gates into `native/`.
+  **Operator-ruled 2026-08-14: PORT INTO `native/`.** The 13 gates declared under `scripts/`
+  become subcommands of the existing multi-call binary. The seam fork this entry opened is
+  **closed** — a later session does not re-litigate it, and the two refused alternatives (a
+  second consumer-owned crate under `GATE_SDK_NATIVE_CRATE`; shell residue justified as a
+  class) are not re-priced here. The ruling was taken *without* making the tranche that
+  iteration's unit, so the destination is settled and the tranche schedules later.
+  **The class, re-measured 2026-08-14 at scope against the post-eighth-cohort registry:** the
+  13 are **100% unported** — no `.gate` beside any of them — against **62 unported of 104
+  registered**, so they are 21% of what the port has left. The figures this entry was filed
+  with, 63 of 103, were taken before the eighth cohort landed and are corrected here rather
+  than annotated. They are Checkwright's own rules about Checkwright's own tree: docs mirror,
+  nav and kit parity, install toolchain, installer dependency floor, npm publish spec, release
+  bump and channel parity, trajectory freshness, value rollup, tightened-gates grammar and
+  note parity, kit-ref liveness.
+  **What the ruling accepts, recorded so the tranche does not re-open it.** They sit in the
+  *consumer's own gates directory*, whose defining property gate-sdk/SPEC.md §upgrade-smoke
+  states: a gate living solely there "cannot appear in a vendored tree". Meanwhile
   `scripts/pack-installer.sh` packs the prebuilt binaries built from the `native/` crate into
-  the payload (gate-sdk/SPEC.md §Consumer payload). So porting one into `native/src/gates/`
-  ships it as a subcommand in **every adopter's binary**, and the consumer-only property that
-  defines the class is exactly what the port's default destination destroys.
-  **The three ways out, none ruled:**
-  1. *Port into `native/`.* Cheapest mechanically, and it keeps one crate. Cost: adopters
-     carry subcommands implementing another project's repo rules, which they can never
-     register — against TRAJECTORY.md's objective 4, footprint as a first-class cost.
-  2. *A second, consumer-owned crate.* `GATE_SDK_NATIVE_CRATE` already makes this
-     expressible, so the knob is not the obstacle. Cost: two crates to build, publish and
-     keep current, and `check-gate-substrate-parity`'s owner column plus assertion E must
-     reason across both rather than one.
-  3. *Shell residue, justified as a class.* Cost: TRAJECTORY.md §PRIORITY DIRECTIVE admits
-     residue only case by case and refuses a protected category, so this owes 13 separate
-     justifications, not one; and it leaves the largest single shell block standing against
-     objective 6.
-  **Why nobody has hit this yet, which is the part a later reader will not re-derive.**
+  the payload (gate-sdk/SPEC.md §Consumer payload). So an adopter's binary carries subcommands
+  implementing another project's repo rules, which they can never register. That is the cost
+  the ruling took, against TRAJECTORY.md's objective 4; the tranche's design owns how the
+  unregistrable subcommands are declared, not whether they ship.
+  **Why nobody hit this before, which is the part a later reader will not re-derive.**
   Checkwright is both the kit publisher and a consumer of its own kits, and that dual role
-  collapses the distinction the question turns on: `native/` is at once the crate this repo
+  collapses the distinction the question turned on: `native/` is at once the crate this repo
   ports *into* and the crate whose binary ships *out*. A single-role tree would have met the
-  fork on its first consumer gate. `port-corpus-grouping-census-unbought` names this block
-  only as ungrouped — a grouping problem — and no surface anywhere names it as a seam
-  problem, which is why the census landing would surface a group with no rule to apply.
-  **Cost while deferred:** the port's remaining ordering is taken over a corpus a fifth of
-  which has no destination, so any cohort reaching `scripts/` stalls at implementation time
-  on a question that wants an operator, not a builder — the failure mode criterion 7 exists
-  to prevent, arriving through the seam instead of through a dependency.
-  Filed 2026-08-14 at scope on operator direction, under scope-gated intake: filed as costed
-  work, not started, with the seam ruling explicitly left open.
+  fork on its first consumer gate.
+  **The cheapest first mover is named: `check-installer-no-deps`.** It was weighed for the
+  ninth cohort's membership and excluded with cause — that cohort buys a JSON reader, and
+  membership beyond what proves the engine adds risk without adding the payoff — so it enters
+  here instead, as one gate over one small corpus (`installer/package.json`) with the jq
+  engine already paid by the time the tranche runs.
+  **Cost while deferred:** now bounded rather than open. No cohort stalls on an unanswered
+  question any more; what remains is 13 gates of ordinary port work whose ordering competes
+  with every other member, and a tranche deferred long enough that the largest single shell
+  block keeps standing against objective 6.
+  Filed 2026-08-14 at scope on operator direction, under scope-gated intake, with the seam
+  ruling left open; ruled and re-scoped 2026-08-14 at scope, premise corrected off a live
+  `port-blockers.sh --group` run.
+
+- **born-native-omission-accumulation** [design-pending] — the born-native flip attaches
+  criterion 5's omission to every future gate, and nothing measures the pile.
+  **This is the costed residue of a closed ruling, not a challenge to it.** TRAJECTORY.md
+  §The closed rulings records the 2026-08-14 flip to native-by-default; this entry exists
+  because that ruling's own cost has no owner, and the gap-disposition rule forbids
+  flagging it and moving on.
+  **The mechanism, from the surfaces that already state it.** gate-sdk/SPEC.md §The
+  port-candidate criteria, criterion 5: a `.gate`-declared member is **omitted** from the
+  `gates.list` of a consumer whose host the roster carries no artifact for, arriving as a
+  declared absence rather than a broken battery. For a *port* that trade is neutral, since
+  the shell form is deleted either way. For a born-native gate it is "a real subtraction
+  against the alternative of shipping shell" — the SPEC's own words, written when
+  born-native was the exception.
+  **What changes under the flip, and it is a rate rather than an event.** Every new gate is
+  now born native unless an exception is argued, so the omitted set on an uncovered host
+  grows monotonically at the rate the battery grows. `native/targets.list` ships **one**
+  target, `x86_64-unknown-linux-gnu`, and states its own grounds: it is the only platform
+  any workflow has a runner for. So the uncovered set today is not a hypothetical Windows
+  adopter — it is **every macOS adopter**, for whom omit-and-declare is already the normal
+  path on day one.
+  **Why the existing entries do not cover it.** `gate-binary-target-roster-widening` owns
+  widening the roster and `platform-support-ci-matrix` owns the CI leg that is its stated
+  trigger; both are about *closing* the gap. Neither owns the *accumulation* the flip
+  creates while the gap stays open, and neither would redden if it grew without bound.
+  **What is genuinely open:** whether the right instrument is a measurement (a count of
+  omitted members per uncovered target, so the pile is visible), a bound (a policy ceiling
+  on how far the omitted set may grow before widening is forced), or nothing beyond the
+  exception rule the flip's own amendment must state — in which case this entry closes
+  against that amendment rather than shipping.
+  **Cost while deferred:** an adopter class the project has never observed installing
+  silently loses more of the battery every iteration, and the first evidence of how much
+  would arrive from a macOS preview adopter rather than from the tree — the exact
+  order the launch readiness rule exists to avoid.
+  Filed 2026-08-14 at scope, dispositioning the criterion-5 consequence of the same
+  session's born-native ruling, under the gap-disposition rule.
+
+- **installer-jq-silent-degradation** [design-pending] — the shipped installer shells to a
+  non-floor program and reads empty values when it is missing.
+  **Measured at scope 2026-08-14 by reading the source, not inferred.**
+  `installer/lib/init.sh` calls `jq -r` at lines 54, 55, 76, 77 and 78, each with
+  `2>/dev/null`. On a machine without `jq` the installer therefore reads an empty version,
+  an empty commit, and an empty prior-file and artifact-lock set — and proceeds. The same
+  shape is in `installer/lib/diff.sh`, `doctor.sh`, `uninstall.sh` and
+  `installer/lib/common/lock.sh`.
+  **Why this is a floor violation and not a portability nicety.** `jq` is not in
+  `GATE_SDK_PROGRAM_FLOOR` (gate-sdk/lib/gate.sh), the set the payload is entitled to assume
+  present. TRAJECTORY.md's objective 1 collapses the consumer's runtime dependency set to
+  git alone, and this sits on the **install path**, which is the first thing an evaluator
+  runs and the surface the trajectory's time-to-first-value argument is staked on.
+  **The failure direction is the aggravating half.** It fails *open*. An empty prior-file
+  set makes `init` read a first-time install where an upgrade exists, which is the
+  `install-claim-contract` class of silent revert reached through a missing program instead
+  of a missing flag. A refusal naming the missing program would be strictly better and is
+  the cheap floor if the port is judged the expensive one.
+  **DISTINCT from two live entries.** `guard-advise-jq-dependency` is guard-kit's
+  `guard_advise` primitive losing an *advisory*; `stage-economics-smoke-jq-arm-dormant` is a
+  smoke arm that never runs. This is the shipped installer, and what is lost is a correct
+  install rather than a message. The three share a shape and no fix.
+  **Boundary with the port:** the ninth cohort's JSON reader is a *crate* module and does not
+  reach bash, so it does not close this. `install-step-relocation` is where the fix lands if
+  the answer is to move these steps behind the binary's invoke.
+  **Cost while deferred:** every jq-less adopter is one wrong install away from the defect
+  class the release policy's narrow reading already declines to fire on, and the population
+  it would land on grows the moment the preview cohort — non-technical adopters, by the
+  readiness ruling — starts installing.
+  Filed 2026-08-14 at scope, dispositioning a gap-inbox bullet the same session filed.
 
 - **recurrence-drain-input-widening** [design-pending] — a recurrence with no bullet is uncounted.
   recurrence: recurrence-drain-input-widening 2026-08-09
