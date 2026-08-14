@@ -2098,12 +2098,35 @@ The case holds the **compiled** prune, since the member now dispatches to the
 binary; the shell twin the surviving callers use is covered by nothing, which is
 filed rather than absorbed (`spec-prune-normalisation-shell-oracle`).
 
-**Criterion 5's price.** Both members are `zero-config`, so both are seeded into a
-freshly initialised consumer's registry and both are lost on a host the payload
-carries no artifact for — the growing direction of the same install-disposition
-predicate that made the lifecycle-kit cohort's growth zero. The measured residual
-and its acceptability ruling are recorded below, from the binary-less leg run
-against the post-cohort registry.
+**Criterion 5's price, measured.** The binary-less leg reports **twelve** omitted
+members against the post-cohort registry, where the comment cohort recorded ten.
+The growth is **two against two ported members** — both are `zero-config`, so both
+are seeded into a freshly initialised consumer's registry and both are therefore
+losable, which is the growing direction of the same install-disposition predicate
+that made the lifecycle-kit cohort's growth zero. Measured after this cohort's own
+commit, from a clean tree, through the repaired invocation contract: the smoke
+resolves its own tree from its script path and passes it to the packer as
+`--root`. The first attempt refused instead of measuring, because a concurrent
+edit dirtied the worktree mid-run — the cleanliness test is per pack invocation
+and names the root it read, so that refusal is the instrument working rather than
+a flake.
+
+**The judgment is *accept and declare*, and what distinguishes it from the comment
+cohort's identical verdict is that no class empties.** On an uncovered platform an
+adopter loses the Definition-of-Done singleton and the derivable-section density
+budget, declared in its own `gates.list` rather than arriving as a broken battery.
+The canonical-spec corpus still carries a **shell** auditor there,
+`check-spec-embedded-source`, so what an uncovered host loses is two structural
+assertions over a corpus that remains guarded — not the whole surface the comment
+cohort's ten took with them. The two rivals are refused with cause and the first
+is refused harder here than usual: restoring the class shell-side would reinstate
+a second `spec_canonical_specs` implementation, which is the exact duplication
+this cohort's criterion-6 discharge exists by removing, and enforcement-first
+ranks removal above gating it; a binary-gated declaration the adopter receives is
+what the omit path already is. The honest limit rides with the ruling — this is a
+real subtraction for an uncovered host, it lands because the 2026-08-09 directive
+ports the whole corpus, and it shrinks as targets are published rather than being
+repaired by the cohort that caused it.
 
 ### The POSIX ERE matcher
 
