@@ -270,8 +270,8 @@ it reopens none, because what a developer builds from is the artifact that is
 public already. Recorded because the question is worth asking once and expensive
 to ask twice — the two paths sound like a disclosure change and are not one.
 
-**The consumer's own gates port into `native/` — ruled 2026-08-14.** The 13
-gates this repo declares under `scripts/` become subcommands of the existing
+**The consumer's own gates port into `native/` — ruled 2026-08-14.** The gates
+this repo declares under `scripts/` become subcommands of the existing
 multi-call binary rather than a second consumer-owned crate or a sanctioned
 shell block, so no part of the remaining corpus is now without a destination.
 The ruling's grounds, the cost it accepts — an adopter's binary carries
