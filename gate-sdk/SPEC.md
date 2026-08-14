@@ -4017,12 +4017,27 @@ could not deliver.
 
 **The tokenizer rules that were bugs first, stated here because reading the
 source alone reaches the wrong verdict on one of them.** A **here-string** is
-consumed as a single redirection operator, ahead of the heredoc branch; and a `)`
-**pops a pushed substitution frame** where one is open, ahead of any
+consumed as a single redirection operator, ahead of the heredoc branch; and
+**inside `[[ … ]]` only**, a `)` pops a pushed substitution frame ahead of any
 case-pattern reading. Both were repaired after the scan was found abandoning most
 declarations part-way and reporting the unread remainder as *clean* — a silent
 under-report in both arms, and a false green in the criterion-7 roster that stood
 through every cohort delivered before it.
+
+**The double-bracket scoping on that second rule is load-bearing, and the
+unscoped form was tried and caught.** Popping whenever a frame is open is the
+obvious spelling and it is wrong: a genuine `case` pattern inside a command
+substitution — `$( case "$x" in a) … esac )` — then has its `a)` steal the frame,
+which the pre-repair code read correctly. Scoping the pop to the double-bracket
+state is what makes the repair a removal rather than a trade, because inside
+`[[ … ]]` a `)` is never a case-pattern close, and the in-case predicate's fault
+was conflating that state with a real `case` context in the first place.
+**An end-of-file balance check cannot see the difference**: an early pop drives
+the frame depth to zero, the real closing `)` then lands on an empty stack and is
+absorbed, and the file balances at EOF by coincidence while everything after the
+`case` is lost. That is why this pair is covered behaviourally in `smoke/` by a
+declaration carrying both shapes, per §The `bin/`-tool contract's ruling that a
+`bin/` tool earns behavioural coverage rather than a fixture pair.
 
 The here-string case is the one to state rather than leave to a reader. The
 heredoc branch **does** carry a here-string guard — it declines `<<` as a heredoc
@@ -4035,9 +4050,7 @@ and early is what makes the repair total, because an operator consumed whole
 cannot be re-entered part-way. The `)` case is independent and reached through
 `[[ … ]]`: the in-case predicate is true whenever the double-bracket state is set,
 so a `)` closing a command substitution inside a conditional was read as a
-case-pattern terminator and the restored quoting state was lost. A pushed frame is
-unambiguous evidence that the `)` closes it; the case-pattern reading is the guess
-that belongs second.
+case-pattern terminator and the restored quoting state was lost.
 
 The repair **raises** the undecidable count, and that is it working: lines the
 scan never reached carry command-position expansions it cannot resolve, and each

@@ -102,3 +102,43 @@ grep -q 'pre-commit: check-shellcheck failed' <<<"$out" || { echo "smoke(hook): 
 grep -q 'unused_var' <<<"$out" || { echo "smoke(hook): red hook output not verbatim" >&2; exit 1; }
 git reset -q -- scripts/smoke-hook-probe.sh
 rm scripts/smoke-hook-probe.sh
+
+# spec: gate-sdk/SPEC.md §port-blockers — the tokenizer rules, exercised behaviourally because
+# the tool is a bin/ tool and owed no fixture pair: a scan that truncates at a here-string, or
+# steals a case-pattern close inside a substitution, reports the trailing requirement as absent
+pb="$(mktemp -d)"
+printf '%s\n' 'check-smoke-tokenizer' > "$pb/gates.list"
+cat > "$pb/check-smoke-tokenizer.sh" <<'EOF'
+#!/usr/bin/env bash
+# graph: couples=scripts/gates.list dir=one valve=none tier=precommit
+set -uo pipefail
+if [[ -n "$(pb_alpha_prog)" ]]; then
+    pb_bravo_prog
+fi
+v="$( case "$1" in a) pb_charlie_prog ;; *) pb_delta_prog ;; esac )"
+read -r w <<<"$v"
+for f in ./*.sh; do pb_tail_prog "$f" "$w"; done
+fail_closed 0 SMOKE-TOKENIZER probe
+EOF
+pb_run() { GATE_SDK_GATES_DIR="$pb" bash "$SDK/bin/port-blockers.sh" "$@"; }
+
+out="$(pb_run)" || { echo "smoke(port-blockers): default arm exited non-zero" >&2; exit 1; }
+for prog in pb_bravo_prog pb_charlie_prog pb_delta_prog pb_tail_prog; do
+    grep -q "	$prog	" <<<"$out" || {
+        echo "smoke(port-blockers): scan lost $prog — the tokenizer truncated: $out" >&2; exit 1; }
+done
+if grep -q 'pb_alpha_prog' <<<"$out"; then
+    echo "smoke(port-blockers): reported a word inside [[ ]], which is not command position: $out" >&2; exit 1
+fi
+
+out="$(pb_run --group)" || { echo "smoke(port-blockers): --group exited non-zero" >&2; exit 1; }
+grep -q '1 group(s) formed, 0 undecidable' <<<"$out" || {
+    echo "smoke(port-blockers): --group did not key a fully-scannable member: $out" >&2; exit 1; }
+grep -q 'libs=fail_closed globs=\*.sh' <<<"$out" || {
+    echo "smoke(port-blockers): --group key lost a factor: $out" >&2; exit 1; }
+
+if pb_run --nope >/dev/null 2>&1; then
+    echo "smoke(port-blockers): an unrecognized argument was not refused" >&2; exit 1
+fi
+pb_run --help >/dev/null || { echo "smoke(port-blockers): --help did not exit 0" >&2; exit 1; }
+rm -rf "$pb"

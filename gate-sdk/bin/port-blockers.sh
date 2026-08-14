@@ -261,7 +261,7 @@ function skiparray(l, k, m,   d) {
         if (c == "{" || c == "(") { endword(); if (c == "(") push(0); cmdpos = 1; i++; continue }
         if (c == ")") {
             endword()
-            if (sp > 0) { pop(); cmdpos = 0; i++; continue }
+            if (dbrack && sp > 0) { pop(); cmdpos = 0; i++; continue }
             if (incase()) { cst[clvl] = 3; cmdpos = 1; i++; continue }
             pop(); cmdpos = 0; i++; continue
         }
