@@ -5523,11 +5523,6 @@
 
 ## Done
 
-- pack-installer-root-provenance
-- port-corpus-grouping-census-unbought
-- port-blockers-scan-truncation
-- settings-allow-dead-path-residue
-
 ## Lessons Learned
 
 
