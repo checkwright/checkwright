@@ -2436,11 +2436,23 @@ the compiled side answer a question `jq` was never asked. The arm needs `jq` at
 this repo's floor while the two held members below keep `jq` in the battery.
 
 **Criterion 5, priced by measurement.** Both members are `install: on-surface`, so
-the lifecycle-kit cohort's precedent predicted a binary-less residual growth of
-**zero**, and the measurement ruled rather than the prediction: growth is zero, a
-member no `init` seeds cannot be a member an artifact-free `init` loses. The
-`on-surface` limit is restated rather than banked — an adopter who later brings
-the surface into existence on a binary-less host **does** lose the member.
+the lifecycle-kit cohort's precedent **predicted** a binary-less residual growth
+of zero. Measured with `installer_smoke`'s binary-less leg after this cohort's own
+commit: **12 members omitted and declared**, and the prose profile's descriptor
+set is untouched by the cohort, so growth is **zero** and the prediction holds.
+
+**What that measurement does and does not reach, because the leg is scoped.** The
+binary-less leg runs the **prose** profile, which vendors `gate-sdk` and
+`canon-kit` — not `context-kit` — so it structurally cannot see either member of
+this cohort, and its unchanged 12 is evidence that nothing *else* moved rather
+than evidence about these two. What carries the zero on `delegation` and `full`,
+which do vendor `context-kit`, is the `on-surface` disposition alone: a member no
+`init` seeds cannot be a member an artifact-free `init` loses. That limit is
+restated rather than banked — an adopter who later brings
+`.claude/settings.json` into existence on a binary-less host **does** lose both
+members. A cohort whose members land in a profile the binary-less leg actually
+installs gets a real measurement where this one gets a scoped one, and should not
+read this section as precedent that the leg covers every port.
 
 **Two members a mechanical reading puts in are excluded, each with its ground.**
 `check-memory-off` is **held on criterion 2**, named and not ported: its
