@@ -12,61 +12,6 @@
 
 ## New Features
 
-- **native-gate-port-remaining-corpus** [spec: SPEC-json-cohort.md] [roadmap: now/reliability]
-  — the whole battery onto the binary, and the shell surface down to its residue.
-  roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
-  The entry stays deferred rather than moving to `## Done`: it is the **whole corpus**, 62 of
-  104 registered gates remain unported, and a Done move would assert a finished port and
-  silently drop it from the **public** roadmap projection, which reads `[roadmap:]` tags off
-  live entries.
-  **Operator-ruled 2026-08-09: complete the port, ASAP.** The ruling, its grounds and its
-  supersession of the 2026-08-06 measurement-locus clause are recorded in
-  [TRAJECTORY.md](TRAJECTORY.md) §PRIORITY DIRECTIVE — the port track's sequence. This entry is
-  the work, and does not restate them. What it inherits unchanged: gate-sdk/SPEC.md §Porting a
-  gate to the binary substrate for the porting procedure, §Consumer payload for the payload
-  rule.
-  **The scope the ruling fixes.** Everything portable ports — the gates, the runners, and the
-  install-lifecycle scripts alike. Surviving shell is **residue justified case by case**, never
-  a protected category, so "it is orchestration" is not by itself an answer. Adopters install a
-  **pre-compiled binary or build from source, their choice**; both paths ship. *From source*
-  means a developer clones the **public repository** — source never enters the payload, so the
-  disclosure boundary is untouched and assertion E still binds (operator-answered 2026-08-09).
-  **The known irreducible, named so nobody reads it as non-compliance.** Something must run
-  before the binary exists, and fetching-and-executing the first artifact cannot itself be that
-  artifact. So the **bootstrap** — in shell, or absorbed by the transport, since the payload
-  ships as an npm package and a Release tarball and npm can carry per-platform binaries — is the
-  one place shell may be unavoidable. Naming it is not designing it; the design is this unit's.
-  **Wall-clock is the weaker argument and is answered:** the battery is under 6%
-  of validate, so the win is retiring shell *sources* the payload carries, not faster execution.
-  **This answers the toolchain-free objection:** the installer smoke's toolchain-free arm is
-  satisfied by the pre-compiled path, not by retaining shell gates. `powershell-installer-surface`
-  moves with it — one implementation across platforms shrinks its cover to the bootstrap.
-  **Eight cohorts closed, and gate-sdk/SPEC.md §The first cohort is canonical for all** — the
-  members, each cohort's delivered count, the holds and their grounds live there, so this entry
-  states what remains rather than restating them. Every held member is **sequencing with port
-  work owed, never exclusion**, and what each owes is on
-  `cohort-held-members-port-prerequisites`, which owns the roster and the kits
-  it spans; a kit count copied here would be a second one to drift, and was.
-  **Cost while deferred:** large and known — 62 gates plus the runners and the install-lifecycle
-  layer, and every gate landed meanwhile adds shell to the eventual port. Not a single-iteration
-  delta; scope owns the decomposition, and the criterion-relaxation question is closed at
-  gate-sdk/SPEC.md §The port-candidate criteria — an ordering signal, never an eligibility screen.
-  `gate-battery-parallel-execution` and
-  `gate-battery-result-cache` say the port subsumes them: closure candidates as it lands.
-  Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
-  direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope. Since then it is
-  promoted at spec and demoted at build once per cohort — canon-kit, kit-roots, ERE,
-  lifecycle-kit and comment-surface through 2026-08-13, the eighth cohort 2026-08-14.
-  That eighth is the first whose members were **selected by running** `port-blockers.sh
-  --group` rather than read off the tree; what the run yielded, the two larger groups it
-  rejected and on whose authority, and the price it paid are canonical at gate-sdk/SPEC.md
-  §The canonical-spec `spec_canonical_specs` cohort. The terminal move is a **demotion**.
-  Re-promoted 2026-08-14 at spec for the **ninth** cohort, `SPEC-json-cohort.md`: two members
-  taken under the selection rule's documented override rather than by size, the size arm being
-  exhausted at a largest-takeable group of one. What it retires is the `jq` blocker; the JSON
-  reader behind that is a **dependency rather than a built engine**, the crate's first, after
-  the operator corrected the premise that it could take none.
-
 - **born-native-gate-default** [spec: SPEC-born-native.md]
   — new gates are born native by default; shell becomes the exception, and the exception is
   empty until a criterion says which causes count.
@@ -100,6 +45,56 @@
 ## Technical Debt
 
 ## Deferred
+
+- **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
+  — the whole battery onto the binary, and the shell surface down to its residue.
+  roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
+  The entry stays deferred rather than moving to `## Done`: it is the **whole corpus**, 60 of
+  104 registered gates remain unported, and a Done move would assert a finished port and
+  silently drop it from the **public** roadmap projection, which reads `[roadmap:]` tags off
+  live entries.
+  **Operator-ruled 2026-08-09: complete the port, ASAP.** The ruling, its grounds and its
+  supersession of the 2026-08-06 measurement-locus clause are recorded in
+  [TRAJECTORY.md](TRAJECTORY.md) §PRIORITY DIRECTIVE — the port track's sequence. This entry is
+  the work, and does not restate them. What it inherits unchanged: gate-sdk/SPEC.md §Porting a
+  gate to the binary substrate for the porting procedure, §Consumer payload for the payload
+  rule.
+  **The scope the ruling fixes.** Everything portable ports — the gates, the runners, and the
+  install-lifecycle scripts alike. Surviving shell is **residue justified case by case**, never
+  a protected category, so "it is orchestration" is not by itself an answer. Adopters install a
+  **pre-compiled binary or build from source, their choice**; both paths ship. *From source*
+  means a developer clones the **public repository** — source never enters the payload, so the
+  disclosure boundary is untouched and assertion E still binds (operator-answered 2026-08-09).
+  **The known irreducible, named so nobody reads it as non-compliance.** Something must run
+  before the binary exists, and fetching-and-executing the first artifact cannot itself be that
+  artifact. So the **bootstrap** — in shell, or absorbed by the transport, since the payload
+  ships as an npm package and a Release tarball and npm can carry per-platform binaries — is the
+  one place shell may be unavoidable. Naming it is not designing it; the design is this unit's.
+  **Wall-clock is the weaker argument and is answered:** the battery is under 6%
+  of validate, so the win is retiring shell *sources* the payload carries, not faster execution.
+  **This answers the toolchain-free objection:** the installer smoke's toolchain-free arm is
+  satisfied by the pre-compiled path, not by retaining shell gates. `powershell-installer-surface`
+  moves with it — one implementation across platforms shrinks its cover to the bootstrap.
+  **Nine cohorts closed; gate-sdk/SPEC.md §The first cohort, and the rule that selects the next
+  is canonical for every one of them** — members, delivered counts, holds, grounds and each
+  cohort's own price live there, so this entry states what remains rather than restating them.
+  From the eighth on, members are **selected by running** `port-blockers.sh --group` rather than
+  read off the tree. The ninth landed 2026-08-14 and is the one whose cost outran its port:
+  it took the crate's **first dependency** rather than building an engine, which moved the
+  toolchain floor 1.56 → 1.71 — and an MSRV move turns out to be a `check-crate-arms` input, so
+  a later floor bump budgets a clippy pass nothing announced. **44 of 104 ported.**
+  Every held member is **sequencing with port work owed, never exclusion**, and what each owes
+  is on `cohort-held-members-port-prerequisites`, which owns the roster and the kits it spans;
+  a kit count copied here would be a second one to drift, and was.
+  **Cost while deferred:** large and known — 60 gates plus the runners and the install-lifecycle
+  layer, and every gate landed meanwhile adds shell to the eventual port. Not a single-iteration
+  delta; scope owns the decomposition, and the criterion-relaxation question is closed at
+  gate-sdk/SPEC.md §The port-candidate criteria — an ordering signal, never an eligibility screen.
+  `gate-battery-parallel-execution` and
+  `gate-battery-result-cache` say the port subsumes them: closure candidates as it lands.
+  Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
+  direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope. Since then it is
+  promoted at spec and demoted at build once per cohort, and the terminal move is a **demotion**.
 
 - **consumer-gate-port-disposition** [design-pending] — the destination is ruled; what remains
   is the tranche that ports this repo's own 13 gates into `native/`.
