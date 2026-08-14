@@ -53,9 +53,12 @@ impl Path {
         // form's own `[[ "$path" != .* ]]` pre-check preserved; that section owns why a
         // leading `[` cannot be admitted
         if b[0] != '.' {
-            return Err(PathError::at(
-                "a pin path opens with '.'; a leading '[' is a jq array literal, not an index step",
-            ));
+            return Err(PathError::at(&if b[0] == '[' {
+                "a pin path opens with '.'; a leading '[' is a jq array literal, not an index step"
+                    .to_string()
+            } else {
+                format!("a pin path opens with '.', not '{}'", b[0])
+            }));
         }
         let mut steps = Vec::new();
         let mut i = 0usize;
