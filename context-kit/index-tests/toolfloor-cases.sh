@@ -22,8 +22,8 @@ cases=(
     'bash:4.0|GNU bash, no version here'
     'bash:4.0:GNU|GNU bash, version 5.2.37(1)-release'
     'bash:4.0:GNU|bosh, version 3.1'
-    'cargo:1.56::contributor|cargo 1.86.0 (adbf5df3f 2026-01-01)'
-    'cargo:1.56::contributor|cargo 1.40.0'
+    'cargo:1.71::contributor|cargo 1.86.0 (adbf5df3f 2026-01-01)'
+    'cargo:1.71::contributor|cargo 1.40.0'
 )
 
 for c in "${cases[@]}"; do
@@ -32,11 +32,11 @@ done
 
 # spec: context-kit/SPEC.md §Testing — the audience axis is pinned in its own table because no verdict reads it: these cases assert the fourth field's present, empty and omitted forms and the consumer-side predicate over each, the emptiness rule being the part a reader is likeliest to get wrong
 audience_cases=(
-    'cargo:1.56::contributor'
+    'cargo:1.71::contributor'
     'cargo:::contributor'
     'awk::GNU:contributor'
-    'cargo:1.56::'
-    'cargo:1.56'
+    'cargo:1.71::'
+    'cargo:1.71'
     'cargo'
     'awk::GNU'
 )

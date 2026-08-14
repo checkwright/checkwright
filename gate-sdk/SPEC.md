@@ -820,7 +820,7 @@ answering a question assertion C never asked.
 | `check-shellcheck` | **Retired with cause** — no shell exists to lint. `cargo clippy` at deny-warnings is the substrate equivalent and runs in CI, not as a gate. |
 | `check-gate-output` | **Ported and strengthened for the fixtured corpus; source-grep retained for the one member outside it, over the corpus that member's rule now lives in.** The source-grep for `: clean`/`help:` was always a proxy for behavior; for the fixtured members the assertion now runs in `run-gate-tests.sh` (§run-gate-tests) against the case's real output, on **shell gates too**. The remaining member, `check-task-conservation` (`# no-fixture:` per queue-kit/SPEC.md §check-task-conservation — a HEAD-vs-worktree diff has no static-fixture representation), has no case for a runtime assertion to reach, so the source-grep stays its only oracle. Retiring the static half outright would zero out that member's output-contract coverage — the exact vacuity this table exists to close. **That member has since ported**, which is why this row is not "unchanged": its declaration path is now a descriptor, which by the closed field roster cannot hold the strings, so corpus *and* emitter alternation follow the rule to the implementation module, and a tree carrying no crate declares the member out of reach rather than reddening (§check-gate-output owns the resolution and its two branches). |
 | `check-gate-fail-closed` | **Retired with cause, and the cause is narrower than it first read.** For a member that reads files, the defect (branching on a captured value's emptiness when the subprocess died) is unrepresentable: there is no subprocess, and a fallible read returns a `Result` that cannot be ignored. A real substrate win, stated as one. **It is representable for a member that spawns one**, and the queue-kit cohort landed the first: `Command::output()` returning `Ok` means the *spawn* succeeded, never that the program did, so reading `stdout` while ignoring `status` reproduces the defect exactly. The disposition is unchanged — this gate's corpus is `check-*.sh` and it could not scan a Rust module either way — and the property is held crate-side rather than by review: the spawn wrapper and its unit tests (§Fail-closed contract) leave a gate module unable to construct a `Command` at all, and unable to reach stdout without the status having been read. Machine-held rather than remembered, which is the same answer the `check-reads-couples` row below gives to the same problem, and what keeps this retirement honest. |
-| `check-reads-couples` | **Retained, with a binary-side equivalent.** Its shell parser finds no walks in a binary gate and would print `clean` — the single worst vacuity available here — so the substrate answers instead of the parser: the binary carries a `--reads <name>` arm printing one line per walk root, a repo-relative path or `?`, and the gate consumes that report into its existing coverage assertion (§check-reads-couples). The declaration is **registry data held to executed behavior**, which is what separates it from the unbound self-declaration this gate exists to refuse: each gate's roots are declared beside its dispatch entry in the crate's registry (an entry added without them fails to compile), the crate's single sanctioned walk implementation records the roots it is invoked with, and two unit tests close the loop — **A**, every member run over its own `gate-tests/<name>/{good,bad}/` cases with recording on, observed roots a subset of declared; **B**, no module outside that walk implementation names a filesystem-walk API or vendors a walker, because a direct walk would be invisible to the recorder and unverify A. The precedent is the `check-knob-default-coupling` row below: an executed assertion is the answer where a static gate would be vacuous. The refusal survives only where the gate still cannot see — an absent or non-executable binary, and a non-zero `--reads` — and there is deliberately no descriptor-level opt-out, which the consumption path does not reinstate: a port ends this assertion by answering it (§check-reads-couples). |
+| `check-reads-couples` | **Retained, with a binary-side equivalent.** Its shell parser finds no walks in a binary gate and would print `clean` — the single worst vacuity available here — so the substrate answers instead of the parser: the binary carries a `--reads <name>` arm printing one line per walk root, a repo-relative path or `?`, and the gate consumes that report into its existing coverage assertion (§check-reads-couples). The declaration is **registry data held to executed behavior**, which is what separates it from the unbound self-declaration this gate exists to refuse: each gate's roots are declared beside its dispatch entry in the crate's registry (an entry added without them fails to compile), the crate's single sanctioned walk implementation records the roots it is invoked with, and two unit tests close the loop — **A**, every member run over its own `gate-tests/<name>/{good,bad}/` cases with recording on, observed roots a subset of declared; **B**, no module outside that walk implementation names a filesystem-walk API, because a direct walk would be invisible to the recorder and unverify A. B's vendored half is held by an **allowlist over the resolved graph**: a spelling roster cannot catch a walker inside a dependency, so every crate in the tracked `Cargo.lock` — transitive included, since a transitive crate walks as visibly as a direct one — is admitted by name with the clause of the dependency bar it cleared (§The settings cohort, and the crate's first dependency), and the assertion reds both on an unadmitted crate and on an allowlist entry absent from the graph. Reading only the `[dependencies]` table would admit an entire subtree unexamined, which is why the lock is tracked rather than gitignored. The precedent is the `check-knob-default-coupling` row below: an executed assertion is the answer where a static gate would be vacuous. The refusal survives only where the gate still cannot see — an absent or non-executable binary, and a non-zero `--reads` — and there is deliberately no descriptor-level opt-out, which the consumption path does not reinstate: a port ends this assertion by answering it (§check-reads-couples). |
 | `check-gate-assertions` | **Retained, corpus extended** to the gate's Rust module; the `# assertion` marker matches on its token, independent of the comment leader. |
 | `check-gate-exemption-tasks` | **Retained, corpus extended** the same way. |
 | `check-comment-tier` | **Retained, corpus extended** to the implementation module and the `.gate` descriptor, whose own lines are directives by construction. Mechanism: the shared primitive `comment_surface` carries `*.gate` **and `*.rs`** arms — widened once, for every caller (see the `check-spec-pointer` row). The implementation arm is the load-bearing one: locality-class directives stay in the implementation by the reader partition (§The `# graph:` manifest), so without it they would go dark exactly where they still apply. **This member is itself `.gate`-dispatched** since the seventh cohort, so it now audits its own declaration — which is why its trigger names `*.gate` and `*.rs` and why its fixture pair, not the live tree, is what proves those arms. |
@@ -835,7 +835,7 @@ answering a question assertion C never asked.
 | `check-gate-substrate-parity` | **Retained by construction** — it is substrate-sensitive by the same derivation it performs, and it reads declaration paths both as text and as a *set*, which is precisely what it exists to see. It stays a shell gate (§check-gate-substrate-parity), so the auditor never depends on the substrate it audits. Its own row is written out rather than left to the section's prose mention: assertion C is satisfied by any occurrence of a member's name in this section, and a gate passing its own assertion by being *discussed* is a coincidence, not a disposition. |
 | `check-install-disposition` | **Retained, and substrate-blind by construction** — it reads both declaration spellings as text, taking the `# install:` header line off a `.gate` descriptor exactly as off a `.sh` implementation, because a ported gate is still a gate a kit ships and its disposition is a property of the gate rather than of its substrate (§The install disposition). A port therefore moves nothing here: the declaration travels with the descriptor, which is the same file the installer's payload already carries. It stays a shell gate for the reason the sibling auditors do — the assertion that a gate declares itself must not depend on the substrate the declaration might name. |
 | `check-docs-cmd`, `check-install-claim`, `check-payload-claim`, `check-queue-slug-liveness` | **Survive unchanged — reverse triggers.** Each names `scripts/*.sh`/`kit:*.sh` in `couples=` only so that a script change re-runs it; the corpus each actually scans is the governed-doc set, and none reads a gate script's *content* as its assertion target. `check-docs-cmd` is worth naming: it will correctly — not vacuously — red on a doc still fencing a deleted `.sh` path after a port. That is real signal. Every member of this row is a ported one — `check-queue-slug-liveness` since the queue-kit cohort, `check-docs-cmd` since the canon-kit one, and the remaining pair since the ERE cohort — so the row describes `.gate`-declared gates throughout; the reasoning is unaffected, because what they scan is the governed-doc set rather than any gate's content. |
-| `check-settings-paths` | **Survives unchanged — reverse trigger, and a port is its subject rather than its blind spot.** Its `couples=` names `kit:checks/*.sh` only so that a check-script edit re-runs it; what it scans is the committed permission allow-list, never a gate script's content. A port is the event it exists for: replacing `checks/<gate>.sh` with a descriptor strands every allow entry naming the old path, so the gate reddens *because* of a port rather than falling silent after one — the shape `check-docs-cmd` has in the row above. Two limits are recorded rather than left to be re-derived. The glob is deliberately not widened to `*.gate`, because a descriptor path is not something a `Bash(…)` grant invokes and the widening would add no assertion. And the trigger is a **partial route by construction**: the generated hook matches staged `ACMR` paths, so a *deleted* `.sh` never fires it; what catches a cohort's stranded grants is the whole-tree battery, which runs with no trigger filter. The trigger still earns its place — it catches the ordinary edit that strands a grant — but it is not what makes the gate's landing order necessary (context-kit/SPEC.md §check-settings-paths). |
+| `check-settings-paths` | **Survives unchanged — reverse trigger, and a port is its subject rather than its blind spot.** Its `couples=` names `kit:checks/*.sh` only so that a check-script edit re-runs it; what it scans is the committed permission allow-list, never a gate script's content. A port is the event it exists for: replacing `checks/<gate>.sh` with a descriptor strands every allow entry naming the old path, so the gate reddens *because* of a port rather than falling silent after one — the shape `check-docs-cmd` has in the row above. Two limits are recorded rather than left to be re-derived. The glob is deliberately not widened to `*.gate`, because a descriptor path is not something a `Bash(…)` grant invokes and the widening would add no assertion. And the trigger is a **partial route by construction**: the generated hook matches staged `ACMR` paths, so a *deleted* `.sh` never fires it; what catches a cohort's stranded grants is the whole-tree battery, which runs with no trigger filter. The trigger still earns its place — it catches the ordinary edit that strands a grant — but it is not what makes the gate's landing order necessary (context-kit/SPEC.md §check-settings-paths). **This member is itself `.gate`-dispatched from the settings cohort**, so the row describes a ported gate: the reverse trigger and both limits above are properties of its rule, not of its substrate, and survived the port unchanged. |
 | `check-prose-enum` | **Corpus extended to the Rust module — it was never a pure reverse trigger.** This gate was grouped with the reverse triggers above on the ground that none of them reads a gate's *content*; that ground was **false for this one**, and the queue-kit port is what exposed it. Its enum derivation (`scripts/enum-sets.sh`) reads the queue tag vocabulary out of `check-tag-lead-line`'s own class table, deliberately — *"read from the gate rather than re-listed here, so a rename cannot leave the two spellings disagreeing"* — so deleting that gate's script broke the derivation and the gate exited 2 rather than passing vacuously, which is the fail-closed behavior working. The corpus follows the rule to where it now lives, `native/src/gates/tag_lead_line.rs`'s `CLASSES` table, keeping the read-from-the-owner property and its one-table fail-closed anchor. **The gate is itself a ported member since the canon-kit cohort**, so a gate whose input is a gate's content is now gate content — and its own derivation crosses the bridge as *data*, which is what keeps the compiled form from spawning the emitter it reads. |
 | `check-measured-claim` | **Retained, and sensitive through its oracle rather than its corpus — the first born-native member to take a row.** What it scans is the governed-prose surface, so by corpus it is a reverse trigger like the row above. What makes it substrate-sensitive is the consumer oracle behind `CANON_KIT_MEASURED_CLAIMS_CMD`, which its `couples=` reaches through `scripts/*.sh`: this repo's emitter counts how much of the registry resolves to a `.gate` descriptor, so it reads declaration paths **as a set**, the shape `check-gate-binary-fresh` has. A port therefore *moves its value*, which is the mechanism working rather than a blind spot — the number a marked sentence states is about the port, and the sentence reddens when the port advances without it. The design that landed the gate predicted no row here, on the premise that its `couples=` named no declaration path; the emitter coupling the same design requires falsifies that premise, and the row is recorded rather than the coupling dropped, because dropping it would leave the oracle's own source outside the trigger set. **The row and criterion 4 are independent facts, and this is the case that proved it**: the criterion binds on a gate's assertion target, this gate's is the governed-prose surface, so it clears — while the transitive reach through its emitter is precisely what assertion C is shaped to see (§The port-candidate criteria, criterion 4). |
 | `check-spec-embedded-source` | **Survives unchanged — reverse trigger of the same shape.** Its `couples=` extension list (`*.rs`, `*.sh`, `*.toml`, …) is the roster of **languages it recognizes inside fenced blocks**, not a reference to gate declarations; its scanned corpus is the canonical specs and amendments. It already carries `*.rs`, so a ported gate's Rust module is inside its trigger set with no widening. |
@@ -2179,6 +2179,20 @@ no future consumer can turn a match test into a substitution. Reading the
 foreclosure across both axes would buy a `gsub` implementation with no caller in
 the corpus that justifies the engine.
 
+**Why the engine stays hand-written now that the crate may take dependencies.**
+This section once justified the hand-roll partly on the crate vendoring nothing;
+that clause is retired — the settings cohort took `serde_json` under a stated bar
+(§The settings cohort, and the crate's first dependency), so *"why is there a
+hand-written regex engine?"* is a live question rather than a settled one. The
+answer does not rest on the retired premise: the contract below is **POSIX
+leftmost-longest span reporting**, which is the semantics `awk`'s
+`RSTART`/`RLENGTH` gives and which the ecosystem's ordinary matchers do not —
+leftmost-**first** is the common default, and this section already records that
+the two agree on every `is_match` and disagree on spans. A dependency with the
+wrong span semantics would be a silent regression in exactly the place a
+boolean-only oracle cannot see. Replacing the engine is therefore a costed design
+question with a real candidate set, not a cleanup a passing cohort performs.
+
 **The contract.** `native/src/ere.rs` accepts **POSIX ERE in full**: alternation,
 concatenation, `*` `+` `?`, intervals `{n}` `{n,}` `{n,m}`, grouping, `.`,
 anchors `^` `$`, bracket expressions with ranges, negation and the POSIX
@@ -2335,6 +2349,134 @@ crate's one sanctioned spawn site, an LCS walk needs none, and a spawned rendere
 would reinstate per member exactly the external-program dependency
 TRAJECTORY.md objective 1 exists to collapse. Stated here so the cheapest wrong
 implementation is refused by a rule rather than by whoever reviews that port.
+
+### The settings cohort, and the crate's first dependency
+
+**Two members: `check-settings-paths` and `check-settings-pins`** (context-kit),
+and what the cohort buys is a JSON reader. It is named for the precedent it
+actually sets — the first dependency — and deliberately **not** on §The POSIX ERE
+matcher's engine pattern: that engine had to be **built**, and paying it against
+three members was what justified the override there. A JSON reader did not have
+to be built. What this cohort paid was a `cargo add`, and a later reader must not
+cite it as precedent for *"what it buys is the engine"*.
+
+**Selection evidence, from a `--group` run at the cut** (2026-08-14):
+**104 members scanned, 47 groups formed, 0 undecidable, 42 already ported** — 62
+remaining shell. Group sizes are 1×14, 2×2 and 44 singletons, and the 14-member
+group is operator-ruled not a cohort (§The canonical-spec cohort: `fail_closed`
+derives no corpus), while each 2-member group holds one member that stays shell.
+So the **largest takeable derivation group is one member**: the selection rule's
+size arm is exhausted, and this cohort is selected under the documented override
+— *a cohort that retires a blocker several later cohorts are queued behind
+outranks a larger one that retires none*. The undecidable count is the bound on
+that claim, and it is zero.
+
+**The two members share no `--group` key, and that is recorded rather than
+smoothed over.** `check-settings-paths` cut as `libs=fail_closed globs=*.sh` and
+`check-settings-pins` as `libs=gates_list_members globs=-` — two singletons. What
+they share is the **`couples=` corpus**, `.claude/settings.json`, and the
+criterion-7 `jq` blocker; the tool's key is (libs, globs) and does not see either.
+Since the cohort was selected by the override rather than by grouping, a shared
+key was never what justified it — but a later reader comparing this section to the
+tool's output would otherwise conclude one of them was wrong.
+
+**The dependency, and the bar it cleared.** `native/Cargo.toml` takes
+`serde_json` and the cohort implements no JSON parser. The crate is under no
+no-dependency prohibition and never was: the constraint is the **adopter's** —
+their machine requires only git and the prebuilt binaries — and TRAJECTORY.md
+§The objectives' objective 4 governs what an adopter installs, saying nothing
+about a build graph no consumer ever receives, resolves or compiles. The bar a
+candidate clears, a bar rather than a precedent: it performs **no filesystem
+walk** (the condition `native/src/walk.rs`'s own assertion states), spawns no
+subprocess, opens no socket, its MSRV is at or below the crate's floor or the
+floor moves deliberately, and its **transitive** set is small, enumerable, and
+admitted under the same clauses. The resolved graph is **11 packages** — five
+feature-activated (`serde_json`, `serde_core`, `memchr`, `itoa`, `zmij`) and six
+carried by the lock as unactivated optional deps — each named with its admitting
+clause in `walk.rs`'s allowlist, which is the machine-held form of this bar rather
+than a second list beside it.
+
+**The floor moved, and the measurement is what moved it.** Taking the dependency
+raised the crate's MSRV from **1.56 to 1.71** — the binding crate is `zmij`, and
+it binds through the activated set, so no feature trim avoids it. The alternative
+was priced: pinning a pre-`zmij` `serde_json` would hold 1.56 at the cost of
+freezing a dependency at an EOL version, which contradicts the maintained-
+dependency premise the bar rests on.
+
+**An MSRV bump is a `check-crate-arms` input, which no surface said.** Clippy
+suppresses a lint whose suggested API postdates the declared `rust-version`, so
+raising the floor **un-suppresses lints against unchanged code**: this bump
+surfaced four findings in modules the cohort never edited. Confirmed by controlled
+experiment rather than inferred — HEAD's tree with only the `rust-version` line
+changed reproduces exactly those four, and zero at 1.56. A later floor move
+budgets for a clippy pass it did not write, and the four were fixed here.
+
+**The pin-path layer is what the cohort authors, and it is the only new surface.**
+`Path::compile(&str) -> Result<Path, PathError>` and its evaluation over a
+`serde_json::Value`, with exactly two consumers —
+`native/src/gates/settings_pins.rs` and `native/src/gates/settings_paths.rs`
+(which takes no path expression at all: its allow-array access is kit-owned and
+hand-compiled, §The POSIX ERE matcher's boundary applied unchanged). No filter
+language, no mutation, no second grammar. The grammar, its refusals, the
+structural comparison and the two deliberately-preserved shell semantics are
+context-kit/SPEC.md §check-settings-pins'.
+
+**The acceptance oracle is a differential run against the shell gate's own
+verdict**, generated over path shapes rather than document shapes: with a
+dependency the arm proves the layer this cohort authors, and a generator varying
+documents would spend its budget re-testing `serde_json`. It compares verdicts
+rather than `jq`'s rendered stdout, because that rendering is version-dependent
+and an oracle pinned to those bytes would fail on a contributor's newer `jq` while
+the gate was correct. It models the **gate**, not the tool: the shell refuses a
+path not opening with `.` before `jq` ever sees it, and the arm earned that
+distinction by catching a real divergence — `jq` reads a leading `["k"]` as an
+array *literal* and returns `["k"]`, so a grammar admitting one would have made
+the compiled side answer a question `jq` was never asked. The arm needs `jq` at
+**contributor** time, which touches criterion 7 not at all and adds nothing to
+this repo's floor while the two held members below keep `jq` in the battery.
+
+**Criterion 5, priced by measurement.** Both members are `install: on-surface`, so
+the lifecycle-kit cohort's precedent predicted a binary-less residual growth of
+**zero**, and the measurement ruled rather than the prediction: growth is zero, a
+member no `init` seeds cannot be a member an artifact-free `init` loses. The
+`on-surface` limit is restated rather than banked — an adopter who later brings
+the surface into existence on a binary-less host **does** lose the member.
+
+**Two members a mechanical reading puts in are excluded, each with its ground.**
+`check-memory-off` is **held on criterion 2**, named and not ported: its
+`--fixture <dir>` arm is a different code path from its live arm, whose corpus is
+the harness memory directory under `HOME` and is not in the tree at all, so the
+pair proves nothing about the part being ported. What it owes is criterion 2's
+**constructed-scenario** discharge, and that is the cohort taking it. Its blocker
+is the oracle, not the dependency, so this cohort's reader does not unblock it.
+`check-installer-no-deps` is **excluded with cause**: as the first
+`scripts/`-declared gate to enter `native/` it would drag in the tranche's
+unanswered first-mover questions — whether a consumer-declared member earns a
+conservation row, how assertion B's owner column reads a member no kit ships —
+which are `consumer-gate-port-disposition`'s design work and are budgeted there.
+Its *other* original ground, that membership beyond what proves the engine adds
+risk without payoff, is materially weaker now the engine is a dependency rather
+than a build; it is recorded as **retired** rather than quietly kept, and the
+exclusion does not rest on it.
+
+**The honest claim about `jq`, which is the one this cohort must not overstate.**
+After the cohort, `jq` is retired from the battery **but for those two members**,
+both with named owners. It is **not** retired from the shipped install path at
+all — `installer/lib/` shells to it and degrades silently, which
+`installer-jq-silent-degradation` owns. *"The cohort retires jq"* is false in both
+directions.
+
+**The provenance seam, ruled here because a settings reader is where it bites.**
+The pin-path layer carries no settings key, no pin path and no permission
+vocabulary: the pins manifest and the settings file are consumer config, and the
+grammar is sized to a grammar rather than to a corpus, so there is nothing for a
+project term to attach to. The permission-entry grammar `check-settings-paths`
+hand-compiles is a **public harness format**, the same class as the `# graph:`
+manifest grammar the crate already parses. The seam reaches the dependency too,
+and the reading is short: a general-purpose JSON parser is **grammar, not
+vocabulary**, so it can no more carry a project term than `ere.rs` could. What the
+seam still forbids is a *consumer-shaped* dependency — one selected because it
+encodes some tree's terms — and the bar above excludes that class by construction.
 
 ### What the reverted port established
 
@@ -3753,15 +3895,26 @@ trap-removed, so its `native/target/` is scratch as well and the host's build
 output — what `check-gate-binary-fresh` judges — is untouched. The cost is not
 what it looks like, and the figure is **measured rather than argued from the
 manifest**: a cold `cargo build --release` of this crate from an empty target
-directory took **≈2.5 s** (2026-08-14, one Linux machine, `--offline`), against a
-suite that vendors, installs and runs the whole battery twice. The claim this
-replaces reasoned from an empty dependency table to *"a few hundred
-milliseconds"*, and was wrong by an order of magnitude in a direction no reader
-would check — the crate is forty-odd modules at `opt-level = 2`, which is what
-the wall clock is spent on, not on resolving dependencies. Re-measure rather than
-re-derive: the number moves with the module count and with any dependency the
-crate takes, and a dependency also makes a **cold registry fetch** part of the
-first build on a machine that has none.
+directory took **≈4.1 s** (2026-08-14, one Linux machine, `--offline`, warm
+registry cache), against a suite that vendors, installs and runs the whole battery
+twice. It was ≈2.5 s immediately before the settings cohort took `serde_json`, and
+the claim *those* figures replaced reasoned from an empty dependency table to *"a
+few hundred milliseconds"* — wrong by an order of magnitude in a direction no
+reader would check, because the crate is forty-odd modules at `opt-level = 2`,
+which is what the wall clock is spent on rather than dependency resolution.
+Re-measure rather than re-derive: the number moves with the module count and with
+any dependency the crate takes.
+
+**The dependency also ended this build's network independence, and the failure is
+hard rather than slow.** Measured: an empty cargo home plus `--offline` now
+**fails outright** (`no matching package named serde_json`), where before the
+cohort that leg succeeded because an empty dependency table needs no registry at
+all. The worktree build shares the host's cargo home, so a contributor who has
+built the crate once is warm and unaffected; a fresh machine and every CI runner
+are cold, and neither `.github/workflows/publish.yml` nor `gates.yml` provisions
+a cargo cache. Whether to provision one, vendor the graph, or accept the fetch is
+open and unbudgeted here — recorded rather than absorbed, because it moves a cost
+from the contributor onto this suite's environment assumptions.
 
 **A ref carrying no crate is a branch, not a special case.** Whether a binary is
 needed at all comes from `csmoke_gate_descriptors` (§Consumer smoke) — the same

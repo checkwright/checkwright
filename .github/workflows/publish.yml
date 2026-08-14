@@ -86,8 +86,9 @@ jobs:
 
       # Stays a bash `run:` on the runner's preinstalled cargo (no setup-rust
       # action) to keep the checkout+bash tamper floor .github/workflows/gates.yml
-      # states. The crate's dependency set is empty, which is what makes a matrix
-      # leg network-free and cheap.
+      # states. Since the settings cohort the crate carries dependencies, so a leg
+      # is no longer network-free: every leg fetches the tracked lock's crates from
+      # the registry on a cold cache, and no cargo cache is provisioned here.
       - name: build the gate binary for ${{ matrix.target }}
         env:
           TARGET: ${{ matrix.target }}

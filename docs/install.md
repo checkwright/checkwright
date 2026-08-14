@@ -100,9 +100,10 @@ your `PATH`, and the note says what breaks without it:
 - `shellcheck` — the `check-shellcheck` meta-gate runs
   [ShellCheck](https://www.shellcheck.net/) over every shipped script, and a
   lint finding blocks the commit.
-- `cargo` (≥ 1.56, @contributor) — a **contributor** requirement with **no install-time role at
+- `cargo` (≥ 1.71, @contributor) — a **contributor** requirement with **no install-time role at
   all**: the `native/` crate carries the gate implementations that dispatch to a
-  binary subcommand, and the floor is the crate's `edition = "2021"`. Gates in
+  binary subcommand, and the floor is the highest MSRV in the crate's resolved
+  dependency graph. Gates in
   this repo now dispatch there, so a contributor builds the binary
   (`bash gate-sdk/bin/build-native.sh`) **before
   committing** — `cargo test` compiles a different artifact and does not
@@ -189,8 +190,8 @@ that has to resolve your platform before any binary can run. It is deliberately
 small enough to exist twice, which is what would make a native Windows path
 possible where the roster above can only offer WSL.
 
-<!-- measured: ported-gate-members=42 -->
-That direction is now underway rather than announced: 42 gates in the battery
+<!-- measured: ported-gate-members=44 -->
+That direction is now underway rather than announced: 44 gates in the battery
 dispatch to the compiled binary today, and the rest is still shell. The
 requirements above are what the shell gates actually invoke, so they stand until
 the gates that invoke them do not. When a requirement drops it drops from that

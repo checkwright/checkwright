@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: gate-sdk/SPEC.md §upgrade-smoke — the two-phase upgrade proof on the consumer-smoke mechanics; the 'upgrade' validate suite each validate stage re-runs, and (TO=HEAD, the default) the standing pre-release assertion that the working tree upgrades cleanly from the last tag. Each phase runs its own ref's gate binary, built from a detached worktree at that ref. Harness-less: bare bash + git + cargo, never the network.
+# spec: gate-sdk/SPEC.md §upgrade-smoke — the two-phase upgrade proof on the consumer-smoke mechanics; the 'upgrade' validate suite each validate stage re-runs, and (TO=HEAD, the default) the standing pre-release assertion that the working tree upgrades cleanly from the last tag. Each phase runs its own ref's gate binary, built from a detached worktree at that ref. Harness-less: bare bash + git + cargo. Not network-free since the crate took its first dependency — a worktree build shares the host cargo home, so a warm registry cache needs no fetch and a cold one does.
 set -uo pipefail
 
 SDK="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

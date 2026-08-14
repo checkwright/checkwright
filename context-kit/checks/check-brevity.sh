@@ -9,28 +9,8 @@ SDK="${GATE_SDK_ROOT:-$KIT/../gate-sdk}"
 # shellcheck source=../../gate-sdk/lib/gate.sh
 source "$SDK/lib/gate.sh"
 
-_ck_cfg="${CONTEXT_KIT_CONFIG_FILE:-}"
-if [[ -n "$_ck_cfg" ]]; then
-    [[ -f "$_ck_cfg" ]] || {
-        echo "context-kit: CONTEXT_KIT_CONFIG_FILE not found: $_ck_cfg" >&2
-        exit 2
-    }
-    # shellcheck source=/dev/null  # consumer config path is resolved at runtime
-    source "$_ck_cfg"
-else
-    _ck_cfg="${GATE_SDK_GATES_DIR:-scripts}/context-config.sh"
-    if [[ -f "$_ck_cfg" ]]; then
-        # shellcheck source=/dev/null  # consumer config path is resolved at runtime
-        source "$_ck_cfg"
-    fi
-fi
-unset _ck_cfg
-: "${CONTEXT_KIT_BREVITY_FILE:=CLAUDE.md}"
-: "${CONTEXT_KIT_BREVITY_SECTION:=## Shared conventions}"
-: "${CONTEXT_KIT_BREVITY_BUDGET:=4}"
-: "${CONTEXT_KIT_BREVITY_POINTER_RE:=§}"
-[[ "$CONTEXT_KIT_BREVITY_BUDGET" =~ ^[0-9]+$ ]] \
-    || { echo "check-brevity: CONTEXT_KIT_BREVITY_BUDGET must be an integer: $CONTEXT_KIT_BREVITY_BUDGET" >&2; exit 2; }
+# shellcheck source=../lib/context.sh
+source "$KIT/lib/context.sh"
 
 if [[ $# -gt 0 ]]; then
     BREVITY_FILE="$1"

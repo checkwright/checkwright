@@ -304,7 +304,7 @@ The constrained members and what forces each:
   the battery at all rather than failing one gate. The representative member is
   the binary carrying a forcing construct, which is also the floor predicate's
   own comparison tool.
-- `cargo:1.56::contributor` — a **contributor-side** floor, never a runtime one,
+- `cargo:1.71::contributor` — a **contributor-side** floor, never a runtime one,
   and that reading is now declared on the element and read by name rather than
   left as an aside: the audience field is what the consumer-side predicate
   above resolves, so the sentence is enforced instead of merely written. It
@@ -316,14 +316,22 @@ The constrained members and what forces each:
   this repo today, its first cohort having landed. Everywhere else it stays the weaker
   **contributor/build** floor: a consumer tree receives a prebuilt binary and never
   a crate, so nothing there compiles at commit time. Both tiers rest on the same
-  forcing fact —
-  the `native/` crate's `edition = "2021"`, the first edition rustc accepts at
-  1.56. `cargo` is the member rather than `rustc` because `cargo build` is what the
+  forcing fact — the **highest MSRV in the crate's resolved dependency graph**,
+  which since the settings cohort took the crate's first dependency
+  (gate-sdk/SPEC.md §The settings cohort, and the crate's first dependency) is
+  above the `edition = "2021"` floor of 1.56 that governed while the graph was
+  empty. It is re-derived against the lock at any dependency change rather than
+  recalled, and a move carries every surface stating it — including
+  `docs/site-architecture.md`, which quotes this element as its format example and
+  is machine-checked by nothing. It is also a `check-crate-arms` input: clippy
+  suppresses a lint whose suggested API postdates the declared floor, so raising
+  the floor un-suppresses lints against code no change touched.
+  `cargo` is the member rather than `rustc` because `cargo build` is what the
   contributor routine and the `gates` workflow actually invoke, and the two ship as
   one toolchain sharing a version banner — the representative-member rule the
-  `sort::coreutils` entry above states. The floor tracks the edition the crate
-  declares, not whatever rustc a given box happens to carry; pinning the latter
-  would be exactly the aspiration this section's rule forbids. Runtime is
+  `sort::coreutils` entry above states. The floor tracks what the crate and its
+  graph actually require, not whatever rustc a given box happens to carry; pinning
+  the latter would be exactly the aspiration this section's rule forbids. Runtime is
   unaffected: git remains the sole runtime dependency of a ported gate, shelled out
   rather than embedded (TRAJECTORY.md §The closed rulings owns that constraint).
 Every other member is a bare name — no construct in the battery forces a version
@@ -594,25 +602,75 @@ dir, the untracked local settings) is a local-environment scan, CI-neutral
 
 ## check-settings-pins
 
-`checks/check-settings-pins.sh` (hermetic, `precommit`) is the identity.conf
-pattern pointed at harness config. Every pin in `CONTEXT_KIT_SETTINGS_PINS`
+`checks/check-settings-pins.gate` (hermetic, `precommit`, dispatched to the gate
+binary — gate-sdk/SPEC.md §The settings cohort, and the crate's first dependency)
+is the identity.conf pattern pointed at harness config. Every pin in
+`CONTEXT_KIT_SETTINGS_PINS`
 (default `${GATE_SDK_GATES_DIR:-scripts}/settings-pins.conf`) holds against
 the tracked settings file `CONTEXT_KIT_SETTINGS_FILE` (default
-`.claude/settings.json`). Grammar: one `<jq path> = <expected JSON>` per line,
-`#` comments and blanks ignored; the expected side is the exact `jq -c`
-rendering (`false`, `"1"`, `{"k":1}`). General-purpose by construction — any
+`.claude/settings.json`). Grammar: one `<path> = <expected JSON>` per line,
+`#` comments and blanks ignored. General-purpose by construction — any
 settings key is pinnable — this consumer's first pins hold the
 auto-memory-disabling keys.
+
+**The left-hand side is a path expression, not a `jq` filter**, and the grammar
+is complete:
+
+```
+path   := '.' | step+
+step   := '.' ident | '.' '"' string '"' | '[' '"' string '"' ']' | '[' int ']'
+ident  := [A-Za-z_][A-Za-z0-9_]*
+int    := '-'? [0-9]+
+```
+
+A path **opens with `.`**; everything else — pipes, filters, `?` error
+suppression, slices, iteration, functions, arithmetic — is refused, and the gate
+turns that refusal into **exit 2 naming the offending pin, the knob it came from,
+and the construct**. The leading-`.` rule is load-bearing rather than tidy: `jq`
+reads a leading `["k"]` as an array *literal* and returns `["k"]`, so admitting
+one would answer a question `jq` was never asked. This is a narrowing of a
+consumer config surface, taken openly and refusing loudly outside the subset — not
+the silent mis-scan the ERE cohort's foreclosure forbids, which binds *sizing an
+implementation* to one consumer's usage while the documented grammar stays wider.
+The knob's whole documented job is naming a settings key, which a path expression
+expresses in full. Operator-ruled 2026-08-14, with a filter crate (`jaq`) priced
+against it and declined; a later reader must not reopen it on the observation that
+such a crate exists, because that observation is what the ruling was made against.
+
+**The right-hand side is a JSON value, and the comparison is structural** — the
+`jq -c` *rendering* is not the contract. A byte-rendering contract is unachievable
+across `jq` versions and therefore cannot be a parity target: `jq` 1.6 re-renders
+every number through a double where 1.7 preserves an unmutated literal, so
+`{"x":1e3}` renders `1000` under one and `1e3` under the other, and a crate
+holding byte parity with "`jq -c`" would be holding parity with whichever `jq` the
+comparison ran against. Structural comparison has no such dependency and diverges
+from the shell only in the forgiving direction — an expected side written with
+non-canonical spacing now matches. Part of what *structural* means is one explicit
+rule the object model does not give free: **numbers compare by their `f64` value
+wherever they occur, every other shape by the parsed value's own equality**. The
+parser's own equality separates `1` from `1.0` by variant where `jq` calls them
+one value, and `jq`'s equality is not shallow, so a pin nested one level deep
+would otherwise report a mismatch nobody would think to test for.
+
+Two semantics are **preserved deliberately rather than improved**, because a port
+proves parity and does not repair rules. A path evaluating to `null` is the
+**absent** branch, whether the key is absent or explicitly `null`: the shell
+cannot tell the two apart and the compiled form can, so reproducing the
+conflation is the faithful port, and a session wanting the distinction files an
+entry against this section. And **indexing follows `jq`'s own type rules** — a
+field step on `null` yields `null`; a field step on a string, number, boolean or
+array, and an index step on an object, are errors the gate classifies as a
+malformed pin.
 
 Dispositions: a pin whose path resolves to the expected value passes; a path
 present with a different value is the legible violation (exit 1, each finding
 reading path, expected, and actual). Fail-closed (exit 2) on an unreadable or
-non-JSON settings file, no `jq`, a malformed pin line, or a pin naming a key
-**absent** from the settings file — an absent key is a desynced manifest (the
-pins and the settings are one repo's tracked config, edited together), not the
-legible drift a red is for. Absent pins file: the opt-in-off state, a clean
-skip. Ships a `good/`+`bad/` fixture pair and registers in the consumer's
-`gates.list` (this repo's included).
+non-JSON settings file, a malformed pin line, a pin outside the path grammar, or
+a pin naming a key **absent** from the settings file — an absent key is a desynced
+manifest (the pins and the settings are one repo's tracked config, edited
+together), not the legible drift a red is for. Absent pins file: the opt-in-off
+state, a clean skip. Ships a `good/`+`bad/` fixture pair and registers in the
+consumer's `gates.list` (this repo's included).
 
 **What a pin is worth depends on which tiers can outrank the file it pins**, and
 the gate reads exactly one tier. The harness resolves settings across five, in
@@ -631,7 +689,9 @@ the session starts.
 
 ## check-settings-paths
 
-`checks/check-settings-paths.sh` (hermetic, `precommit`) holds the second
+`checks/check-settings-paths.gate` (hermetic, `precommit`, dispatched to the gate
+binary alongside its sibling — gate-sdk/SPEC.md §The settings cohort, and the
+crate's first dependency) holds the second
 invariant over the same tracked file: every entry in
 `CONTEXT_KIT_SETTINGS_FILE`'s `permissions.allow[]` whose command token is a
 **literal** repo-relative `.sh` path resolves in the working tree. The knob is
@@ -658,17 +718,19 @@ standing shape for a grant taking arguments is a bare entry beside a
 `*`-suffixed twin, and the twin's path is as literal — and as strandable — as
 the bare form's, so it stays in scope.
 
-Splitting the grant into tokens must not expand it. An unquoted array
-assignment would glob a pattern grant against the tree and then assert an
-arbitrary first match, which greens the whole pattern class instead of skipping
-it while leaving the checked count silently inflated; the implementation splits
-with `read -ra`, which does not expand.
+Splitting the grant into tokens must not expand it. Globbing a pattern grant
+against the tree and then asserting an arbitrary first match would green the whole
+pattern class instead of skipping it, while leaving the checked count silently
+inflated. The shell form protected that with `read -ra`, which does not expand;
+the compiled form splits on ASCII whitespace, which has no expansion to suppress.
+The property is the same and it is the property, not the idiom, that the fixture
+pair's checked count pins.
 
 Dispositions: exit 1 lists each violating entry verbatim beside the path that
 did not resolve, so the reader can repoint or drop the grant without re-deriving
 which token was read. The clean line reports the **checked count**, which is
 what distinguishes a predicate that scoped to the array from one that vacuously
-matched nothing. Fail-closed (exit 2) on no `jq`, and on a settings file that is
+matched nothing. Fail-closed (exit 2) on a settings file that is
 unreadable or not JSON — the sibling gate reads the same file on the same terms,
 and the file is this gate's sole subject rather than an opt-in manifest, so
 there is no absent-surface skip to grant. A `--fixture <dir>` mode reads
@@ -695,13 +757,18 @@ The trigger is a partial route by construction: the generated hook reads staged
 the ordinary edit that strands a grant; what catches the cohort is the full
 battery, which runs whole-tree with no trigger filter.
 
-`jq` is not on `GATE_SDK_PROGRAM_FLOOR`, so this gate fails port criterion 7 the
-day it lands and owes designed-away work at its port. That is recorded here
-rather than discovered there: criterion 7 is an ordering signal, not an
-eligibility screen, and hand-rolling a JSON-array scan over floor programs would
-buy a fragile parser to dodge a dependency the sibling gate already carries on
-the same file. One parsing story for the settings file across every reader in
-the tree is worth more than the criterion.
+**The criterion-7 debt this gate landed carrying is paid, and this paragraph is
+the record that it was.** `jq` is not on `GATE_SDK_PROGRAM_FLOOR`, so the gate
+failed port criterion 7 the day it landed and owed designed-away work at its port.
+That work is the settings cohort (gate-sdk/SPEC.md §The settings cohort, and the
+crate's first dependency), which retired the requirement for this member and its
+sibling by taking a JSON reader into the crate rather than by hand-rolling a
+parser to dodge a dependency — the outcome this paragraph predicted when it said
+one parsing story for the settings file is worth more than the criterion. `jq`
+remains required by `check-memory-off` (held on criterion 2) and
+`check-installer-no-deps` (excluded with cause), so it is retired from the battery
+for these two members and not from the battery outright, and not from the shipped
+install path at all.
 
 **The gate is not the prune.** It reads the settings file and writes nothing,
 but it reds the moment it registers on a tree carrying stranded entries, and the
@@ -756,6 +823,7 @@ context-kit/
   bin/md-index.sh
   bin/md-section.sh
   bin/pub-index.sh               # dispatcher over the per-language extractors
+  lib/context.sh                 # sourced config loader + the kit's knob defaults; the config bridge sources it
   lib/toolfloor.sh               # sourceable owner: the probe roster + the floor predicate
   lib/pub-lang/rust.sh           # shipped extractor: Rust public items
   lib/pub-lang/ts.sh             # shipped extractor: TypeScript export surface
@@ -764,8 +832,8 @@ context-kit/
   bin/env-probe.sh               # derives the marker-bounded local env profile
   bin/run-index-tests.sh         # expected-output runner for the bin tools
   checks/check-brevity.sh
-  checks/check-settings-pins.sh  # hermetic: pins hold against the settings file
-  checks/check-settings-paths.sh # hermetic: literal .sh grants resolve in the tree
+  checks/check-settings-pins.gate  # hermetic, binary-dispatched: pins hold against the settings file
+  checks/check-settings-paths.gate # hermetic, binary-dispatched: literal .sh grants resolve in the tree
   checks/check-memory-off.sh     # local-environment: memory dir + local overrides
   checks/check-footprint-fresh.sh # hermetic: docs/footprint.md byte-fresh vs the emitter
   gate-tests/check-brevity/{good,bad}/
@@ -800,6 +868,31 @@ Config follows the established kit pattern: copy
 what the consumer left unset, and a set-but-missing `CONTEXT_KIT_CONFIG_FILE`
 exits 2 rather than silently running on defaults. Knobs (this repo's layout
 as defaults):
+
+### lib/context.sh
+
+**The one home of the consumer-config load and of every knob default above**, a
+sourceable library on queue-kit's `lib/queue.sh` shape: it loads the consumer
+config first, then defaults each knob the consumer left unset, then refuses a
+malformed value rather than running on it. Every context-kit gate and `bin/` tool
+sources it instead of re-defaulting, which is the single-home form
+`check-knob-default-coupling` asserts and what keeps a shell-side and a bridged
+value one value rather than two.
+
+**The config bridge is what forces a library rather than a convention.**
+`gate-sdk/lib/gate.sh`'s `_gate_knob_value` sources `<kit>/lib/*.sh` in a subshell
+and **exits 2 on a knob the sourced library does not define**, so a
+`.gate`-dispatched member whose knobs were defaulted inside a check script would
+resolve none of them. That mechanism is indifferent to what any crate links: a
+member receives its knobs this way whatever the binary carries.
+
+**Every default here is repo-relative, and that is a bridge requirement rather
+than a style.** A bridged value is baked verbatim into the tracked pre-commit
+hook, so an absolute path would pin one clone's layout into a committed artifact.
+The one knob whose natural value *is* absolute — `CONTEXT_KIT_MEMORY_DIRS`,
+naming a harness directory under `HOME` — defaults to empty and is derived
+lazily by `context_memory_dir_default()` at its one reader, which also keeps a
+`git` subprocess off the path of every unrelated knob resolution.
 
 - `CONTEXT_KIT_SURFACES` — array of always-loaded files; default
   `("CLAUDE.md")`. The measured surface is agent-file-name-agnostic: a consumer

@@ -25,6 +25,9 @@ pub mod queue_sections;
 pub mod queue_slug_liveness;
 pub mod queue_wrap;
 pub mod scratch_citation;
+pub mod settings_paths;
+pub mod settings_pins;
+pub mod settings_pins_parity;
 pub mod shim_restatement;
 pub mod skill_binding;
 pub mod smoke_entry_guard;
@@ -671,6 +674,23 @@ pub const REGISTRY: &[GateEntry] = &[
             "LIFECYCLE_KIT_BOUNDARY_TRUNCATE",
         ],
         "lifecycle-kit",
+    ),
+    // spec: gate-sdk/SPEC.md §The settings cohort, and the crate's first dependency — both
+    // members read named files rather than walking, so each declares an empty walk-root set,
+    // the shape the queue-kit cohort's file readers already declare
+    (
+        "check-settings-paths",
+        settings_paths::run,
+        &[],
+        &["CONTEXT_KIT_SETTINGS_FILE"],
+        "context-kit",
+    ),
+    (
+        "check-settings-pins",
+        settings_pins::run,
+        &[],
+        &["CONTEXT_KIT_SETTINGS_FILE", "CONTEXT_KIT_SETTINGS_PINS"],
+        "context-kit",
     ),
 ];
 

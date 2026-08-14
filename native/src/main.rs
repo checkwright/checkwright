@@ -4,6 +4,7 @@
 mod diff;
 mod ere;
 mod gates;
+mod json;
 mod proc;
 mod queue;
 mod spec;

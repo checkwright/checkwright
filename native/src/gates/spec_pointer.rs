@@ -414,7 +414,7 @@ fn heading_text(line: &str) -> Option<String> {
     }
     Some(
         line[s..]
-            .trim_end_matches(|c: char| c == ' ' || c == '\t')
+            .trim_end_matches([' ', '\t'])
             .to_string(),
     )
 }

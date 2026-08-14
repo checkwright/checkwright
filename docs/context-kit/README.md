@@ -46,7 +46,9 @@ hook approximation and the session-context template also expect
    generated pre-commit hook: `bash gate-sdk/bin/gen-pre-commit.sh --write`.
    The memory-off gates are inert until you opt in — `check-settings-pins`
    skips clean with no pins file, so create `settings-pins.conf` (one
-   `<jq path> = <expected JSON>` per line) naming the keys to hold, e.g. the
+   `<path> = <expected JSON>` per line, the path a dot/bracket path expression
+   rather than an arbitrary `jq` filter — SPEC.md §check-settings-pins) naming
+   the keys to hold, e.g. the
    auto-memory-disabling ones. `check-settings-paths` needs no manifest: it
    reads the same settings file and holds every allow-list grant naming a
    literal `.sh` path against the tree. `check-footprint-fresh` byte-gates a committed

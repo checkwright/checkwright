@@ -1,0 +1,3 @@
+# graph: couples=.claude/settings.json,kit:checks/*.sh,scripts/check-*.sh dir=one valve=none tier=precommit
+# install: on-surface
+# spec: context-kit/SPEC.md §check-settings-paths — every committed allow-list entry whose command token is a literal repo-relative .sh path resolves in the working tree

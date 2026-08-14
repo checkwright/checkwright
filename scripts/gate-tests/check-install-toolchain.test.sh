@@ -70,7 +70,7 @@ check_case "page-invents-a-floor" "$tmp/e" 1 "roster says (none), page says (≥
 
 # F — the audience axis renders and reaches parity: a roster element carrying the
 # fourth field is clean only against a bullet that publishes it.
-write_case "$tmp/f" '- `cargo` (≥ 1.56, @contributor) — builds the crate.' 'cargo:1.56::contributor'
+write_case "$tmp/f" '- `cargo` (≥ 1.71, @contributor) — builds the crate.' 'cargo:1.71::contributor'
 check_case "audience-in-parity" "$tmp/f" 0 "INSTALL-TOOLCHAIN: clean"
 
 # G — the silent failure this axis makes possible, caught: a member quietly
@@ -87,8 +87,8 @@ check_case "page-invents-an-audience" "$tmp/h" 1 "roster says (none), page says 
 # I — the sigil is what keeps the positional reader honest: an audience token
 # stripped of its `@` is an implementation token, and must red as one rather
 # than being silently accepted on the axis it was meant for.
-write_case "$tmp/i" '- `cargo` (≥ 1.56, contributor) — builds the crate.' 'cargo:1.56::contributor'
-check_case "audience-without-its-sigil" "$tmp/i" 1 "page says (≥ 1.56, contributor)"
+write_case "$tmp/i" '- `cargo` (≥ 1.71, contributor) — builds the crate.' 'cargo:1.71::contributor'
+check_case "audience-without-its-sigil" "$tmp/i" 1 "page says (≥ 1.71, contributor)"
 
 if [[ "$fails" -gt 0 ]]; then
     echo "check-install-toolchain.test: $fails assertion(s) failed"

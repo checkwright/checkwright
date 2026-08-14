@@ -1,1 +1,2 @@
 # contract: gate-sdk/SPEC.md §upgrade-smoke — the accumulating tightened-gates declaration; one bare kit-shipped gate name per data line, appended by the build stage that lands or tightens it, composed into the release note and drained to this header at the tag.
+check-settings-pins

@@ -166,7 +166,7 @@ recoverable:
   token, and audience, since each bullet's parenthetical renders its roster
   element verbatim
   (`` - `bash` (≥ 4.3) — … ``, `` - `awk` (GNU) — … ``,
-  `` - `cargo` (≥ 1.56, @contributor) — … ``, the axes comma-joined,
+  `` - `cargo` (≥ 1.71, @contributor) — … ``, the axes comma-joined,
   no parenthetical for an unconstrained member). The audience carries a leading
   `@` for the same reason the floor carries `≥`: the gate's reader is
   positional, so an axis with no sigil would be indistinguishable from the

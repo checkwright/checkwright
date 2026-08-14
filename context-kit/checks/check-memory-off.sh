@@ -13,30 +13,8 @@ SDK="${GATE_SDK_ROOT:-$KIT/../gate-sdk}"
 # shellcheck source=../../gate-sdk/lib/gate.sh
 source "$SDK/lib/gate.sh"
 
-_ck_cfg="${CONTEXT_KIT_CONFIG_FILE:-}"
-if [[ -n "$_ck_cfg" ]]; then
-    [[ -f "$_ck_cfg" ]] || {
-        echo "context-kit: CONTEXT_KIT_CONFIG_FILE not found: $_ck_cfg" >&2
-        exit 2
-    }
-    # shellcheck source=/dev/null  # consumer config path is resolved at runtime
-    source "$_ck_cfg"
-else
-    _ck_cfg="${GATE_SDK_GATES_DIR:-scripts}/context-config.sh"
-    if [[ -f "$_ck_cfg" ]]; then
-        # shellcheck source=/dev/null  # consumer config path is resolved at runtime
-        source "$_ck_cfg"
-    fi
-fi
-unset _ck_cfg
-
-# spec: context-kit/SPEC.md §Layout and configuration — the harness names each project's dir by its absolute path with '/' and '.' folded to '-'; a knob because the layout moves (the plugin-marketplace ruling)
-memory_dir_default() {
-    local top
-    top="$(git rev-parse --show-toplevel 2>/dev/null)" || return 0
-    [[ -n "$top" ]] || return 0
-    printf '%s/.claude/projects/%s/memory\n' "$HOME" "$(printf '%s' "$top" | tr '/.' '-')"
-}
+# shellcheck source=../lib/context.sh
+source "$KIT/lib/context.sh"
 
 MODE=live
 FIXTURE_DIR=""
@@ -55,11 +33,9 @@ if [[ "$MODE" == fixture ]]; then
     PINS_FILE="$FIXTURE_DIR/settings-pins.conf"
     LOCAL_SETTINGS="$FIXTURE_DIR/settings.local.json"
 else
-    : "${CONTEXT_KIT_SETTINGS_FILE:=.claude/settings.json}"
-    : "${CONTEXT_KIT_SETTINGS_PINS:=${GATE_SDK_GATES_DIR:-scripts}/settings-pins.conf}"
     PINS_FILE="$CONTEXT_KIT_SETTINGS_PINS"
     LOCAL_SETTINGS="${CONTEXT_KIT_SETTINGS_FILE%.json}.local.json"
-    memdirs="${CONTEXT_KIT_MEMORY_DIRS:-$(memory_dir_default)}"
+    memdirs="${CONTEXT_KIT_MEMORY_DIRS:-$(context_memory_dir_default)}"
     for pat in $memdirs; do
         for d in $pat; do
             [[ -e "$d" ]] && MEM_DIRS+=("$d")

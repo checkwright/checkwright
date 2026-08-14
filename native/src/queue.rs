@@ -83,7 +83,7 @@ pub fn is_section_line(line: &str) -> bool {
 // section matchers share; trailing whitespace is the only slack the regex allows
 pub fn heading_name(line: &str) -> Option<&str> {
     let rest = line.strip_prefix("## ")?;
-    Some(rest.trim_end_matches(|c: char| c == ' ' || c == '\t'))
+    Some(rest.trim_end_matches([' ', '\t']))
 }
 
 // spec: queue-kit/SPEC.md §The tag algebra — the Lessons heading is fixed spelling, read by
@@ -220,7 +220,7 @@ pub fn live_slugs(text: &str, sec: &Sections) -> Vec<String> {
 // carried into the done section with its live shape intact matches neither grammar
 pub fn bare_bullet_slug(line: &str) -> Option<&str> {
     let rest = strip_bullet_lead(line)?;
-    let trimmed = rest.trim_end_matches(|c: char| c == ' ' || c == '\t');
+    let trimmed = rest.trim_end_matches([' ', '\t']);
     let b = trimmed.as_bytes();
     if b.is_empty() || !is_slug_head(b[0]) {
         return None;
