@@ -65,29 +65,6 @@
   `port-corpus-grouping-census-unbought` builds, so that unit must land first and the two
   cannot be batched as parallel siblings. The terminal move is a **demotion**, not Done.
 
-- **port-blockers-scan-truncation** [spec: SPEC-scan-truncation.md]
-  — the port-sequencing report stops reading a declaration part-way and calls the
-  remainder clean.
-  **Found by running the tool, not by reading it**, at the `--group` arm's first live
-  invocation: most still-shell registered members leave the tokenizer in a broken state at
-  EOF, so both arms under-report. The criterion-7 roster has therefore been reporting
-  *clean* where it had simply stopped reading — a false green for its whole life, and every
-  port cohort delivered so far was sequenced against it.
-  **Two independent causes.** A here-string is captured as a heredoc whose delimiter never
-  recurs, so every line after the first one in a declaration is skipped; and inside a
-  double-bracket conditional a `)` closing a command substitution is read as a case-pattern
-  close, so the frame never pops and the quoting state corrupts. The first is the dominant
-  one; the second rides with it and is reached through a different door.
-  **Why it is a unit rather than an in-flight edit:** the fix changes the default arm's
-  output, and `port-corpus-grouping-census-unbought` landed on a proved claim that adding
-  the `--group` arm left that output byte-identical. Folding the repair into that session
-  would have falsified the claim in the same breath as making it.
-  **What it unblocks:** `native-gate-port-remaining-corpus` selects its cohort off
-  `--group`, and a partition derived from truncated keys is the incomplete rival set that
-  entry's own cost field is about. That cohort was held rather than cut on it.
-  Filed 2026-08-14 at build on lead ruling, with the amendment authored in the same unit —
-  a two-function repair whose design was already stated in gate-sdk/SPEC.md §port-blockers.
-
 - **settings-allow-dead-path-residue** [spec: SPEC-settings-paths.md]
   — every gate cohort's port leaves the
   committed allow-list naming a script the port deleted, and nothing resolves that list against
@@ -5418,6 +5395,7 @@
 
 - pack-installer-root-provenance
 - port-corpus-grouping-census-unbought
+- port-blockers-scan-truncation
 
 ## Lessons Learned
 

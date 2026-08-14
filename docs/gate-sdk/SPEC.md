@@ -1374,6 +1374,18 @@ design time; the last three were paid for, and each is named with what it cost.
    family and its walk and reads no knob, and the fact that stops it is one none
    of the six criteria sees.
 
+   **`check-gate-assertions` requires `paste`, and how it surfaced is the part
+   worth keeping.** The program is not on the floor, so this is owed port work of
+   exactly the shape the worked example above describes — a dependency designed
+   away, embedded or replaced. It was **invisible for the roster's whole life**:
+   the scan abandoned that declaration before reaching the call and reported the
+   member clean, which is the failure mode §port-blockers now records under its
+   repaired tokenizer rules. Named here rather than in a commit message because a
+   member the roster reported clean and now reports blocked reads like drift
+   unless the reason is written down — and because it is the standing evidence
+   that a *derived* roster still has to be re-derived by a **repaired**
+   derivation, never trusted because it is derived.
+
    **`check-crate-arms` is a different case under the same criterion, and it is
    named so no later cohort reads it as owed work.** Its rule is an invocation of
    `cargo`, so criterion 7 blocks it — but unlike the worked example above, the
@@ -3882,8 +3894,12 @@ criterion 7, and `--group` answers criterion 6 — both over the same registry,
 through the same `gates_list_members` / `gate_resolve` path. **Why either roster
 is derived rather than written down** is §The port-candidate criteria's,
 criteria 7 and 6; this section owns how. The arms are **exclusive**: `--group`
-replaces the criterion-7 report rather than appending to it, and the default
-arm's output is byte-unchanged by the second arm's existence.
+replaces the criterion-7 report rather than appending to it, and **adding** the
+second arm changed no byte of the default arm's output — proved by run against a
+clean checkout at the time. That is a fact about that change and **not** a
+standing guarantee that the arm's output never moves: the truncation repair below
+moved it deliberately, and a session diffing two runs across that commit is
+seeing the repair rather than a regression.
 
 **The default arm answers criterion 7.** For every `gates.list` member it
 resolves the declaration path and reports the external programs the rule requires
@@ -4004,22 +4020,34 @@ therefore a **decidable partition plus a counted remainder**, never a complete
 partition claimed as one — which is precisely what two failed read-only sweeps
 could not deliver.
 
-**A measured limit both arms carry today, and it is larger than the undecidable
-count above.** The scan is a hand-written tokenizer, and against this tree it does
-not reach EOF in a clean state for most still-shell members. Two independent
-causes, both measured rather than reasoned: a **here-string** is captured as a
-heredoc whose delimiter never recurs, so everything after the first `<<<` in a
-declaration is skipped; and inside `[[ … ]]` the `)` closing a command
-substitution is read as a case-pattern close, so the substitution frame is never
-popped and the quoting state corrupts for the rest of the file. The failure is
-**silent in both directions** — a truncated scan reports no requirement rather
-than `?`, so the criterion-7 roster under-reports instead of declaring itself
-undecidable, and `--group` derives a truncated key. This is recorded rather than
-left to be rediscovered because the undecidable count is *not* the honest bound
-while it stands, and a session sequencing a cohort off either arm is reading a
-partial scan. The measurement, its oracle and its per-member evidence are in the
-survey record; the repair is filed as work rather than taken in flight, because it
-changes the default arm's output and is a unit of its own.
+**The tokenizer rules that were bugs first, stated here because reading the
+source alone reaches the wrong verdict on one of them.** A **here-string** is
+consumed as a single redirection operator, ahead of the heredoc branch; and a `)`
+**pops a pushed substitution frame** where one is open, ahead of any
+case-pattern reading. Both were repaired after the scan was found abandoning most
+declarations part-way and reporting the unread remainder as *clean* — a silent
+under-report in both arms, and a false green in the criterion-7 roster that stood
+through every cohort delivered before it.
+
+The here-string case is the one to state rather than leave to a reader. The
+heredoc branch **does** carry a here-string guard — it declines `<<` as a heredoc
+introducer when a third `<` follows — so a reader who finds that guard concludes
+the defect cannot exist. The guard is **bypassed, not absent**: the generic
+redirect branch below it consumed the first `<` alone, and the scan re-entered at
+the second, where the guard's own condition was satisfied and the heredoc branch
+fired on an operand that never recurs as a delimiter. Consuming the operator whole
+and early is what makes the repair total, because an operator consumed whole
+cannot be re-entered part-way. The `)` case is independent and reached through
+`[[ … ]]`: the in-case predicate is true whenever the double-bracket state is set,
+so a `)` closing a command substitution inside a conditional was read as a
+case-pattern terminator and the restored quoting state was lost. A pushed frame is
+unambiguous evidence that the `)` closes it; the case-pattern reading is the guess
+that belongs second.
+
+The repair **raises** the undecidable count, and that is it working: lines the
+scan never reached carry command-position expansions it cannot resolve, and each
+is now reported `?` rather than passed over. A lower count under a blind scan was
+never the better number.
 
 **Arguments, now that the tool has a mode.** It takes no positional arguments and
 gains none, so §The `bin/`-tool contract's free-text rule does not bind it. Two of
