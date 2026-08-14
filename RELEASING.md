@@ -145,25 +145,50 @@ by lifecycle-kit/SPEC.md §templates/stages/; cite it, never restate it here.
    `<iteration> release vX.Y.Z — <basis>` into the disposition evidence, in the
    commit the tag names.
 
-   **The credential precondition — test the permission, not the scope.** The
-   closing session runs steps 4-7 itself when it holds the credentials (the
-   default); only a genuinely keyless sandbox defers these to the operator, whose
-   push mechanics live in the local ops runbook, outside the tree. The property
-   that decides it is the repository's own **`permissions.push` for the active
-   account**, read with `gh api repos/<owner>/<repo> --jq .permissions`. The two
-   things a session reaches for instead each prove nothing: `gh auth status`
-   reports a token's **scopes**, and a scope is a *ceiling* on what a token may
-   attempt rather than a grant of what the account may do on this repository; and
-   a working `git push` over SSH uses a key and never consults the `gh` token at
-   all, so it says nothing about API writes. Two clauses ride with it, placed
+   **The credential precondition — test the permission, and test it for the
+   right account.** The closing session runs steps 4-7 itself when it holds the
+   credentials (the default); only a genuinely keyless sandbox defers these to
+   the operator.
+
+   **Read the local ops runbook first, in either branch.** It is outside the tree
+   and it owns the two mechanics this file deliberately does not carry: which
+   account is designated to release, and the exact push transport for the master
+   push and the tag push. That pointer is **not** scoped to the keyless-operator
+   case — a credentialed closing session performing its own push is its primary
+   reader, because the transport that works here is environmental and can change
+   without any tracked surface moving.
+
+   The property that decides the precondition is the repository's own
+   **`permissions.push`**, read with `gh api repos/<owner>/<repo> --jq
+   .permissions`. **It answers for whichever account is currently active, and a
+   machine may carry more than one login.** So a `false` is not yet a finding:
+   first check *which* account is active against the release account the ops
+   runbook designates, select that account if it is not the active one, and only
+   then read the result as a fact about permission. A session that skips this
+   step reads an unselected login as a permission defect and stops a release
+   that was never blocked.
+
+   The two things a session reaches for instead each prove nothing: `gh auth
+   status` reports a token's **scopes**, and a scope is a *ceiling* on what a
+   token may attempt rather than a grant of what the account may do on this
+   repository; and a git push transport that works elsewhere says nothing about
+   API writes, nor about whether that transport still works here — the ops
+   runbook owns the one that does. Two clauses ride with it, placed
    here because a session will need them mid-release with a tag already public:
    - **A 404 on a write is a permission signature, not a missing object.** GitHub
      masks an unauthorized write as an absent resource, so a `gh release edit`
      returning 404 against a Release that plainly exists means *not permitted*.
-   - **Resolve it by fixing the permission, never by switching identity.**
-     Switching to another authenticated account gets past the 404 and leaves the
-     real defect — an account that cannot write where this runbook assumes it can
-     — in place and unrecorded.
+   - **Resolve a genuine denial by fixing the permission, never by switching
+     identity — and note precisely what that does not cover.** The clause bars
+     *evading* a denial: hopping to some other authenticated identity to get past
+     a 404 leaves the real defect — an account that cannot write where this
+     runbook assumes it can — in place and unrecorded. It does **not** bar
+     *selecting* the release account the ops runbook designates on a machine
+     carrying several logins. That is the precondition being satisfied rather
+     than evaded, and it happens before any write is attempted rather than in
+     response to a refusal. Reading the clause the wider way turns a one-command
+     account selection into a release-stopping blocker, which is the failure this
+     paragraph exists to prevent.
 
 5. **Watch the publish workflow — both channels.** Pushing the tag is what
    publishes the installer package: `.github/workflows/publish.yml` fires on the

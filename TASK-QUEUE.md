@@ -5492,6 +5492,43 @@
   file — a cohort pricing criterion 5 reads the prose first.
   Filed 2026-08-14 by close, from its own gap-inbox drain and staleness review.
 
+- **tracked-to-untracked-pointer-scope** [design-pending] — a tracked doc pointing at an
+  untracked one can scope the pointer to the wrong reader, and nothing holds the scope
+  against what the target actually owns.
+  **The instance, fixed 2026-08-14 rather than deferred.** RELEASING.md's credential
+  precondition read *"only a genuinely keyless sandbox defers these to the operator, **whose**
+  push mechanics live in the local ops runbook"*. The possessive attached to the operator, so
+  the pointer appeared to belong to the keyless branch — while the ops runbook actually owns
+  the push transport and the release-account selection for the **credentialed closing
+  session's own** push, which is its primary reader. A careful session reads the clause, is
+  never sent to the runbook, and stops.
+  **Attested, not hypothesised.** This close read `gh api repos/<owner>/<repo> --jq
+  .permissions` as `push: false`, applied the precondition literally, and escalated the
+  release as blocked on a permission defect. The machine carries two `gh` logins and the
+  non-writing one was merely *active*; selecting the maintainer account returned full write.
+  The runbook already carried the account roster, the working transport, and the line *"check
+  the pushing identity, not the `gh` login, if this regresses again"* — the session never
+  reached any of it.
+  **Both surfaces were repaired in that same commit**, so this entry is not the fix: the
+  pointer was re-scoped, the precondition now states that `permissions.push` answers for
+  whichever account is *active* and that a machine may carry several logins, and the
+  never-switch-identity clause was narrowed to what it means — it bars *evading* a genuine
+  denial by hopping identities, and does not bar *selecting* the designated release account.
+  **What survives the fix, and is why this is filed.** No gate holds a tracked pointer's
+  *scope* against what its untracked target owns. This is the second surface where that gap
+  has cost a session — the ops runbook's SSH-transport entry was the first — and the class is
+  wider than releases: any tracked-to-untracked pointer can name *which branch may read it*
+  instead of *what the target owns*, and only the second is checkable against the target.
+  **Deliverable candidate, not ruled:** a stated rule that a tracked-to-untracked pointer
+  names the target's ownership rather than its readership, plus whatever partial oracle that
+  admits. The honest limit is that the target is untracked by design, so no scanner can read
+  it; what may be gateable is the *shape* of the pointing sentence, not its truth.
+  **Cost while deferred:** low frequency, high per-occurrence — the two known firings each
+  cost a stage session's forward motion, and both were resolved only by a second reader who
+  happened to hold the environmental fact.
+  Filed 2026-08-14 by close, on operator direction, and drained in the same session that
+  filed it — the cursor was already at close, so no later stage existed to drain it.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
