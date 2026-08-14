@@ -4004,6 +4004,23 @@ therefore a **decidable partition plus a counted remainder**, never a complete
 partition claimed as one — which is precisely what two failed read-only sweeps
 could not deliver.
 
+**A measured limit both arms carry today, and it is larger than the undecidable
+count above.** The scan is a hand-written tokenizer, and against this tree it does
+not reach EOF in a clean state for most still-shell members. Two independent
+causes, both measured rather than reasoned: a **here-string** is captured as a
+heredoc whose delimiter never recurs, so everything after the first `<<<` in a
+declaration is skipped; and inside `[[ … ]]` the `)` closing a command
+substitution is read as a case-pattern close, so the substitution frame is never
+popped and the quoting state corrupts for the rest of the file. The failure is
+**silent in both directions** — a truncated scan reports no requirement rather
+than `?`, so the criterion-7 roster under-reports instead of declaring itself
+undecidable, and `--group` derives a truncated key. This is recorded rather than
+left to be rediscovered because the undecidable count is *not* the honest bound
+while it stands, and a session sequencing a cohort off either arm is reading a
+partial scan. The measurement, its oracle and its per-member evidence are in the
+survey record; the repair is filed as work rather than taken in flight, because it
+changes the default arm's output and is a unit of its own.
+
 **Arguments, now that the tool has a mode.** It takes no positional arguments and
 gains none, so §The `bin/`-tool contract's free-text rule does not bind it. Two of
 that contract's three behaviors are adopted anyway: `-h` / `--help` prints usage
