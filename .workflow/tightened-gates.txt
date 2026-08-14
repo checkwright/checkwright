@@ -23,3 +23,5 @@ check-spec-pointer
 check-todo-task-liveness
 check-deprecation-task
 check-settings-paths
+check-spec-dod-singleton
+check-spec-derivable-section

@@ -135,6 +135,30 @@ pub fn prune_kit_roots(root: &str, files: Vec<PathBuf>) -> Result<Vec<PathBuf>, 
         .collect())
 }
 
+// spec: canon-kit/SPEC.md §lib/spec.sh — `spec_canonical_specs`: the SPEC-name find,
+// `templates/`-filtered and kit-root pruned. Lifted out of `manifest_files`' default branch
+// below rather than written twice, so the two sets cannot disagree about which specs exist.
+pub fn canonical_specs(root: &str) -> Result<Vec<PathBuf>, String> {
+    let spec_name = knob("CANON_KIT_SPEC_NAME")?;
+    let specs = walk::find_named(Path::new(root), &[spec_name.as_str()])?
+        .into_iter()
+        .filter(|p| !under_templates(&p.display().to_string()))
+        .collect();
+    prune_kit_roots(root, specs)
+}
+
+// spec: canon-kit/SPEC.md §lib/spec.sh — the sorted spelling the two spec-corpus members read,
+// where the shell pipes the finder through `sort`. A byte sort, per the kit-roots cohort's
+// ruling that the compiled form implements set semantics rather than a locale's collation.
+pub fn canonical_specs_sorted(root: &str) -> Result<Vec<String>, String> {
+    let mut out: Vec<String> = canonical_specs(root)?
+        .into_iter()
+        .map(|p| p.display().to_string())
+        .collect();
+    out.sort();
+    Ok(out)
+}
+
 // spec: canon-kit/SPEC.md §lib/spec.sh — `spec_manifest_files`, all three branches in the
 // one place the cohort calls. The `CLAUDE.md` find is neither `templates/`-filtered nor
 // kit-root pruned while the other two are; the asymmetry is reproduced, not tidied.
@@ -149,12 +173,7 @@ pub fn manifest_files(root: &str) -> Result<Vec<PathBuf>, String> {
             }
         }
     } else {
-        let spec_name = knob("CANON_KIT_SPEC_NAME")?;
-        let specs = walk::find_named(rootp, &[spec_name.as_str()])?
-            .into_iter()
-            .filter(|p| !under_templates(&p.display().to_string()))
-            .collect();
-        out.extend(prune_kit_roots(root, specs)?);
+        out.extend(canonical_specs(root)?);
 
         let readmes = walk::find_named(rootp, &["README.md"])?
             .into_iter()

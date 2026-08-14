@@ -151,6 +151,22 @@ unset _sk_dp
 # shellcheck disable=SC2034  # consumed by sourcing gates, never within this lib
 SPEC_SECTION_RE="^## "
 
+# spec: canon-kit/SPEC.md §lib/spec.sh — lexical normalisation of an absolute path, the shell
+#   twin of the crate's `walk::normalize_abs`: an empty or `.` component drops, `..` pops, and
+#   no symlink resolves. Every path the prune below compares crosses it, or none do.
+_spec_norm_abs() {   # sets _SPEC_NORM
+    local p="${1%/}/" seg out=""
+    while [[ -n "$p" ]]; do
+        seg="${p%%/*}"; p="${p#*/}"
+        case "$seg" in
+            ''|.) ;;
+            ..)   out="${out%/*}" ;;
+            *)    out="$out/$seg" ;;
+        esac
+    done
+    _SPEC_NORM="${out:-/}"
+}
+
 # spec: canon-kit/SPEC.md §lib/spec.sh — finders skip templates/ stubs and vendored kit roots under the scan root (an ancestor kit root never prunes)
 _spec_prune_kit_roots() {
     if [[ "$CANON_KIT_SCAN_KIT_ROOTS" == "1" ]]; then cat; return 0; fi
@@ -161,13 +177,13 @@ _spec_prune_kit_roots() {
         ./*) root_abs="$PWD/${root#./}" ;;
         *)   root_abs="$PWD/$root" ;;
     esac
-    root_abs="${root_abs%/}"
+    _spec_norm_abs "$root_abs"; root_abs="$_SPEC_NORM"
     local -a roots=()
     local r rabs f fabs keep
     while IFS= read -r r; do
         [[ -n "$r" ]] || continue
         [[ "$r" == /* ]] && rabs="$r" || rabs="$PWD/$r"
-        rabs="${rabs%/}"
+        _spec_norm_abs "$rabs"; rabs="$_SPEC_NORM"
         [[ "$rabs" == "$root_abs/"* ]] || continue   # only a vendored subtree prunes
         roots+=("$rabs")
     done < <(gate_kit_roots)
@@ -175,6 +191,7 @@ _spec_prune_kit_roots() {
     while IFS= read -r f; do
         [[ -n "$f" ]] || continue
         [[ "$f" == /* ]] && fabs="$f" || fabs="$PWD/${f#./}"
+        _spec_norm_abs "$fabs"; fabs="$_SPEC_NORM"
         keep=1
         for r in "${roots[@]}"; do
             [[ "$fabs" == "$r/"* ]] && { keep=0; break; }

@@ -12,11 +12,15 @@
 
 ## New Features
 
-- **native-gate-port-remaining-corpus** [spec: SPEC-eighth-cohort.md] [roadmap: now/reliability]
+## Technical Debt
+
+## Deferred
+
+- **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
   — the whole battery onto the binary, and the shell surface down to its residue.
   roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
-  The entry stays deferred rather than moving to `## Done`: it is the **whole corpus**, 63 of
-  103 registered gates remain unported, and a Done move would assert a finished port and
+  The entry stays deferred rather than moving to `## Done`: it is the **whole corpus**, 62 of
+  104 registered gates remain unported, and a Done move would assert a finished port and
   silently drop it from the **public** roadmap projection, which reads `[roadmap:]` tags off
   live entries.
   **Operator-ruled 2026-08-09: complete the port, ASAP.** The ruling, its grounds and its
@@ -41,33 +45,26 @@
   **This answers the toolchain-free objection:** the installer smoke's toolchain-free arm is
   satisfied by the pre-compiled path, not by retaining shell gates. `powershell-installer-surface`
   moves with it — one implementation across platforms shrinks its cover to the bootstrap.
-  **Seven cohorts closed, and gate-sdk/SPEC.md §The first cohort is canonical for all** — the
+  **Eight cohorts closed, and gate-sdk/SPEC.md §The first cohort is canonical for all** — the
   members, each cohort's delivered count, the holds and their grounds live there, so this entry
   states what remains rather than restating them. Every held member is **sequencing with port
   work owed, never exclusion**, and what each owes is on
   `cohort-held-members-port-prerequisites`, which owns the roster and the kits
   it spans; a kit count copied here would be a second one to drift, and was.
-  **Cost while deferred:** large and known — 63 gates plus the runners and the install-lifecycle
+  **Cost while deferred:** large and known — 62 gates plus the runners and the install-lifecycle
   layer, and every gate landed meanwhile adds shell to the eventual port. Not a single-iteration
   delta; scope owns the decomposition, and the criterion-relaxation question is closed at
   gate-sdk/SPEC.md §The port-candidate criteria — an ordering signal, never an eligibility screen.
   `gate-battery-parallel-execution` and
   `gate-battery-result-cache` say the port subsumes them: closure candidates as it lands.
   Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
-  direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope; promoted and
-  demoted 2026-08-12 for the canon-kit cohort; re-promoted 2026-08-12 at spec; demoted again
-  2026-08-13 at build for the kit-roots cohort, again for the ERE cohort, and again for the
-  lifecycle-kit cohort; re-promoted 2026-08-13 at spec between the last two, and again the
-  same day at spec for the comment-surface cohort.
-  and demoted again 2026-08-13 at build for the comment-surface cohort.
-  Re-promoted 2026-08-14 at spec for the eighth cohort. Its members are **not** named in the
-  amendment: they are selected by running `port-blockers.sh --group`, the arm
-  `port-corpus-grouping-census-unbought` builds, so that unit must land first and the two
-  cannot be batched as parallel siblings. The terminal move is a **demotion**, not Done.
-
-## Technical Debt
-
-## Deferred
+  direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope. Since then it is
+  promoted at spec and demoted at build once per cohort — canon-kit, kit-roots, ERE,
+  lifecycle-kit and comment-surface through 2026-08-13, the eighth cohort 2026-08-14.
+  That eighth is the first whose members were **selected by running** `port-blockers.sh
+  --group` rather than read off the tree; what the run yielded, the two larger groups it
+  rejected and on whose authority, and the price it paid are canonical at gate-sdk/SPEC.md
+  §The canonical-spec `spec_canonical_specs` cohort. The terminal move is a **demotion**.
 
 - **consumer-gate-port-disposition** [design-pending] — this repo's own 13 gates are a fifth
   of the remaining port and no rule says where they land.

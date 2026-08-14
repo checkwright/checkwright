@@ -28,6 +28,8 @@ pub mod scratch_citation;
 pub mod shim_restatement;
 pub mod skill_binding;
 pub mod smoke_entry_guard;
+pub mod spec_derivable_section;
+pub mod spec_dod_singleton;
 pub mod spec_fence_balance;
 pub mod spec_pointer;
 pub mod stage_evidence;
@@ -214,6 +216,41 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_MEASURED_SURFACE_GLOBS",
             "CANON_KIT_MEASURED_KEYS",
             "CANON_KIT_MEASURED_VALUES",
+        ],
+        "canon-kit",
+    ),
+    // spec: gate-sdk/SPEC.md §The canonical-spec `spec_canonical_specs` cohort — two members
+    // sharing one corpus derivation, so each declares that derivation's knob set beside its
+    // own rule's knobs and nothing else
+    // spec: gate-sdk/SPEC.md §check-reads-couples — `?` because the scan root is the member's
+    // own first argument with a `.` default, the variable-first-argument shape the shell
+    // parser calls undecidable
+    (
+        "check-spec-dod-singleton",
+        spec_dod_singleton::run,
+        &["?"],
+        &[
+            "GATE_PRUNE_DIRS",
+            "GATE_KIT_ROOTS_HERE",
+            "CANON_KIT_SPEC_NAME",
+            "CANON_KIT_SCAN_KIT_ROOTS",
+            "CANON_KIT_DOD_HEADING",
+            "CANON_KIT_DOD_MODE",
+        ],
+        "canon-kit",
+    ),
+    (
+        "check-spec-derivable-section",
+        spec_derivable_section::run,
+        &["?"],
+        &[
+            "GATE_PRUNE_DIRS",
+            "GATE_KIT_ROOTS_HERE",
+            "CANON_KIT_SPEC_NAME",
+            "CANON_KIT_SCAN_KIT_ROOTS",
+            "CANON_KIT_BANNED_HEADINGS",
+            "CANON_KIT_DERIVABLE_DENSITY",
+            "CANON_KIT_DERIVABLE_POINTER_REGEX",
         ],
         "canon-kit",
     ),

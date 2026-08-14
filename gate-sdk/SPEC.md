@@ -1803,6 +1803,18 @@ file and be false for every other (CLAUDE.md §The provenance seam), where the
 bare glob matches the corpus derivation exactly and over-selection in a
 trigger-shaped set is cheap by design.
 
+**The eighth cohort is the first the selection rule chose rather than a reader**,
+and its own section is where that matters: §The canonical-spec
+`spec_canonical_specs` cohort records the members, the group key, the group size
+and the undecidable count from the `--group` run, the two larger groups it
+rejected and on what authority, and the price. Two facts belong here rather than
+there, because they are about the **rule** and not about that cohort. A group's
+key being non-empty does not make it a shared derivation — the run's largest group
+shares only the fail-closed guard, which derives no corpus. And the tool's columns
+are not the whole screen: the group it ranks second contains a member
+§Meta-gate conservation for the binary substrate holds on shell, which no column
+reports and which a selector applying the run mechanically would have taken.
+
 ### The canon-kit `spec_manifest_files` cohort
 
 **The shared derivation is compiled.** `native/src/spec.rs` carries all three
@@ -1997,6 +2009,101 @@ appeared. The held `installer_smoke fail` row in
 `.workflow/validate-baseline.txt` is **not** this cohort's price: it records the
 markdown-link hole `port-criterion-aggregate-cost-blindness` half (2) owns, which
 this cohort neither widens nor repairs.
+
+### The canonical-spec `spec_canonical_specs` cohort
+
+**The eighth cohort, and the first selected by running the selection rule rather
+than by reading candidates off the tree.** Two members —
+`check-spec-dod-singleton` and `check-spec-derivable-section` — sharing the group
+key `libs=fail_closed,spec_canonical_specs globs=-`, taken from a
+`bash gate-sdk/bin/port-blockers.sh --group` run that scanned **104** members,
+formed **48** groups, reported **0 undecidable** and excluded **40** already
+ported. The undecidable count is recorded because it is the bound on the claim
+that this group was the largest: at zero, the partition speaks for the whole
+still-shell registry and the ordering rule was applied against complete
+information. That is the first cohort able to say so, and it is a property of the
+**repaired** scan rather than of this cohort — the tokenizer truncation that made
+every earlier cohort's roster a silent under-report is what the zero rests on
+(§port-blockers).
+
+**Two larger groups were rejected, and recording why is what keeps the rule
+usable.** The run's largest group carried 14 members on the key
+`libs=fail_closed globs=-`. It is **not a cohort**: `fail_closed` is the
+fail-closed guard and derives no corpus, so those members share the *absence* of a
+derivation, which this section already rules is not a shared derivation, and
+reaching that state through a non-empty key does not change the substance
+(operator-ruled 2026-08-14). The tool's own contract predicts this reading — its
+key is deliberately advisory and a group whose members' `couples=` visibly diverge
+is a finding the selecting session adjudicates, never a cohort the tool cut. The
+next group by size, `check-install-disposition` + `check-readme-roster`, clears
+every mechanically-derived column and is still **not takeable whole**:
+§Meta-gate conservation for the binary substrate rules `check-install-disposition`
+a gate that **stays shell**, because its assertion is about the declaration and
+dispatch relation and a compiled form could pass itself with a broken binary. It
+is a member the port does not take, on the same footing as `check-crate-arms`, and
+a selector reading only the tool's columns would have taken it. The remaining
+two-member groups fail a column outright: one carries a `ruby` requirement
+(criterion 7), the other is this cohort.
+
+**What the cohort fails is criterion 3, and that is why it outranks the
+alternatives.** Both members are `tier=align-only`, so they do not land in the
+generated hook and a green `check-graph` after the port is not the end-to-end
+proof of the manifest surviving the substrate change that criterion 3 buys. The
+manifests are still read — the graph artifact covers every registered member —
+so what is lost is the hook arm of that proof and nothing else. Against it, every
+alternative of equal size fails **criterion 4 or 7**, which this section sequences
+**last and budgets for** because each carries a design problem rather than a
+weaker proof. A group failing only criterion 3 is therefore ahead of a group
+failing 4, and it is also the larger of the two once the held member leaves group
+2. `scripts/`-declared members were excluded from this cohort by its amendment;
+the run surfaced none at or near the top, so the exclusion never bound.
+
+**Criterion 6 is discharged by the corpus derivation already being compiled.**
+`spec_canonical_specs` is the SPEC-name find, `templates/`-filtered and kit-root
+pruned — every piece of which `native/src/spec.rs` already carried inside
+`manifest_files`' default branch since the canon-kit cohort. The port **lifts it
+out** rather than writing a second copy beside it, so the manifest set and the
+canonical-spec set cannot disagree about which specs exist. The shell form stays,
+because `check-surface-duplication` and `check-spec-embedded-source` still call
+it: this is the *unless* clause's live-consumer disposition, the same one
+queue-kit's `lib/queue.sh` takes, and not the emptied-primitive disposition the
+seventh cohort earned.
+
+**The edge-root arm disagreed, and the compiled side read the rule correctly.**
+Parity ran over both fixture pairs, the live tree at four scan-root spellings and
+a differential edge tree at nine knob settings — 30 comparisons, byte-identical on
+stdout, stderr and exit code, run while both implementations still existed. Two of
+those comparisons failed first: at a `..` scan root the shell prune kept **22**
+canonical specs where the compiled form kept 11. `_spec_prune_kit_roots` is a
+prefix test, and it normalised neither the scan root nor the file paths, so a
+`..` component made every comparison fail and pruned nothing at all — the corpus
+silently widening rather than reddening. The rule it is measured against says a
+file under a kit root that is a strict descendant of the scan root is excluded,
+and at a `..` root the kit roots are such descendants; the compiled side is
+therefore right and **the shell was repaired before the port**, so the parity run
+proves the repaired behaviour rather than freezing the defect. This is the same
+class §The port-candidate criteria records the comment cohort finding, reached
+through the scan root instead of the file path, and it is the standing evidence
+for that criterion's rule that a disagreement is adjudicated against the
+requirement and never against whichever side moved.
+
+**What the repair's oracle can and cannot see, stated because the cohort paid to
+find out.** `check-spec-dod-singleton.test.sh` gains a `..`-root case. It was
+verified to red under an **asymmetric** break of the normalisation and to stay
+green under a **symmetric** one — dropping `..` from every path alike leaves the
+prefix test succeeding by coincidence, exactly as an end-of-file balance check
+cannot see an early tokenizer pop. An oracle for a normalisation defect must
+therefore break one side only, and a control that transforms both proves nothing.
+The case holds the **compiled** prune, since the member now dispatches to the
+binary; the shell twin the surviving callers use is covered by nothing, which is
+filed rather than absorbed (`spec-prune-normalisation-shell-oracle`).
+
+**Criterion 5's price.** Both members are `zero-config`, so both are seeded into a
+freshly initialised consumer's registry and both are lost on a host the payload
+carries no artifact for — the growing direction of the same install-disposition
+predicate that made the lifecycle-kit cohort's growth zero. The measured residual
+and its acceptability ruling are recorded below, from the binary-less leg run
+against the post-cohort registry.
 
 ### The POSIX ERE matcher
 
