@@ -834,11 +834,10 @@ registered as a validate suite so a bit-rotted activation path is a red
 validate rather than a discovery at announcement.
 
 **The smoke packs the tree it lives in, by construction — the current directory
-does not select it.** The script resolves that tree from its own path (`$REPO`,
-at `consumer-smoke/run-smoke.sh:5-6`) and hands it to
-`scripts/pack-installer.sh --root "$REPO"` at every one of its four pack call
-sites, so the packed tree and the asserted tree are the same tree whatever
-directory you invoke from. A clone's copy invoked by absolute path, a second
+does not select it.** The script resolves that tree from its own path and hands
+it to `scripts/pack-installer.sh --root` at every one of its pack call sites, so
+the packed tree and the asserted tree are the same tree whatever directory you
+invoke from. A clone's copy invoked by absolute path, a second
 checkout, a linked worktree: all pack the tree the script belongs to. The
 packer's flag roster has exactly one tier and it is the script itself —
 `bash scripts/pack-installer.sh --help` prints it on stdout at exit 0 — so no
@@ -857,8 +856,8 @@ root for exactly this reason, so a reviewer scanning smoke output can see which
 tree the run described instead of inferring it from a twelve-character hash.
 
 **The tree must be clean, and the suite says so before it spends ten minutes
-proving it.** `run-smoke.sh:23-24` asserts `$REPO` is clean in its preflight,
-beside the tool checks and before the first build step. The packer keeps its own
+proving it.** The smoke asserts that tree is clean in its preflight, beside the
+tool checks and before the first build step. The packer keeps its own
 dirty-worktree refusal — the preflight removes the common case but not the real
 one, since the suite packs four separate times across a ~10-minute run and a
 concurrent edit mid-run trips a check the caller did not choose the moment for.

@@ -2911,7 +2911,18 @@
 
 - **poll-sleep-guard-steer** [design-pending] — polling to wait is the one half of the
   never-poll rule that leaves a tracked artifact, and nothing reads it.
-  `bash guard-kit/bin/scan-prompts.sh` ranked bare `sleep` as this iteration's **top**
+  recurrence: poll-sleep-guard-steer 2026-08-14
+  **The 2026-08-14 firing, and its honest magnitude.** One instance, not sixteen: a build
+  session ran `bash installer/consumer-smoke/run-smoke.sh` and then `sleep 180; echo waited`
+  in the foreground. Unambiguously the finding — a foreground sleep standing in for a wait on
+  background work — and unambiguously smaller than the founding instance. It came through the
+  close-stage prompt-friction triage rather than through a gap bullet, and it is stamped anyway
+  because the declaration is the only durable record and is not re-derivable once the log is
+  cleared. The two `until`/`while` condition loops beside it in the same log are **not**
+  instances: this entry expressly rules `until <cond>; do sleep N; done` legitimate, and their
+  defect is the predicate, filed separately as `waiter-predicate-self-match`.
+  **The founding instance (2026-08-05).** `bash guard-kit/bin/scan-prompts.sh` ranked bare
+  `sleep` as that iteration's **top**
   prompting pattern at 16 calls — a session waiting on background work by sleeping in the
   foreground, roughly forty minutes of turns spent not-waiting-correctly. It is the same
   rule `waiting-rule-fourth-firing-post-fix` records, approached from the opposite
@@ -4935,9 +4946,21 @@
   **Not blocking the audit it came from:** all seven findings that close's
   `internal-identifier-restatement` sweep fixed fail **both** readings, so the ruling changes
   nothing already landed.
+  **A third population, found 2026-08-14 and settled by neither reading — the cross-kit
+  citation.** `gate-sdk/SPEC.md` §The canonical-spec `spec_canonical_specs` cohort names and
+  describes the algorithmic fault of `_spec_prune_kit_roots`, which is **canon-kit's**
+  underscore-prefixed helper with zero callers outside `canon-kit/lib/spec.sh`. The fork above is
+  posed as a kit's own SPEC inventorying its own helpers; here one kit's governed doc names
+  another kit's private helper, and the file-level reading — "a shipped vendored library is a
+  public contract, so *its owning* section may name its exports" — is silent on a section that
+  does not own it. Recorded rather than ruled, and the entry is **not** widened by fiat: whichever
+  reading the deliverable adopts must say what it does with a citation that crosses kits, because
+  a sweep will keep meeting this shape. Re-escalated to the lead at the 2026-08-14 close.
   **Cost while deferred:** every run of that rostered audit re-derives the same fork over the
-  same two libraries, and two auditors can reach opposite verdicts on identical prose.
-  Filed 2026-08-13 by close, raised by the delegated identifier sweep, which declined to rule it.
+  same two libraries, and two auditors can reach opposite verdicts on identical prose. With the
+  cross-kit shape added, the fork now has a branch no reading answers at all.
+  Filed 2026-08-13 by close, raised by the delegated identifier sweep, which declined to rule it;
+  third population added 2026-08-14 by close from the same rostered sweep, which declined again.
 
 - **settings-allow-intended-breadth-declaration** [design-pending] — `compare-settings-allow`
   offers the operator two dispositions and ships a mechanism for one.
@@ -5321,6 +5344,153 @@
   **Cost while deferred:** one duplicated entry per recurring sweep per close, each of which then
   has to be found and merged by a later close reading 5000 lines of queue.
   Filed 2026-08-13 by close, from its own backlog-eviction step.
+
+- **pack-installer-payload-kit-set-anchor** [design-pending] — the packer enumerates kit
+  *names* from its own tree and copies kit *contents* from the tree `--root` names.
+  `gate_kit_roots_rel` anchors on `gate_sdk_root` — the gate-sdk library's own location via
+  `BASH_SOURCE` — so the emitted relative roots are the packer's own tree's kit set. The pack
+  loop then `cd`s to the resolved `--root` and copies each of those relative names from *there*,
+  with a `[[ -d "$kit" ]] || continue` that silently drops any kit the named tree lacks. A kit the
+  named tree has but the packer's tree does not is never enumerated at all. Either direction
+  yields a narrower-or-wrong payload behind an ordinary green PACK line.
+  **Re-verified at this close**, not relayed: `gate-sdk/lib/gate.sh:252-264` (`gate_sdk_root`
+  anchor), `:315-332` (the rel cache, filled at *source* time — before `pack-installer.sh:55`
+  `cd`s), and `scripts/pack-installer.sh:107-112` (the copy loop and its skip guard). The claim
+  holds as filed and is slightly wider than filed: the drop is bidirectional, not only a
+  narrowing.
+  **DISTINCT from `pack-installer-root-provenance`** (closed at this iteration, in `## Done`):
+  that entry was the packer's *git/cwd* root resolution and `--root` closed it. This is the
+  kit-root *enumeration*, a different resolution path in the same script, which `--root` does not
+  reach. Filing it against the closed entry would re-open finished work.
+  **Options, neither ruled — the choice is envelope-shaped:** refuse a `--root` that is not the
+  packer's own work tree (making the flag the assertion its amendment says it enables), or
+  re-anchor the enumeration on the resolved root so names and contents come from one tree.
+  **Cost while deferred:** nil from any shipped caller — all five real call sites pass a root
+  equal to the script's own tree, so the two agree today. The cost is a trap armed for the first
+  caller that uses `--root` for what it was built for: packing a tree other than the packer's.
+  Filed 2026-08-14 by close, draining the gap inbox; the bullet came from the `--root` build batch.
+
+- **waiter-predicate-self-match** [design-pending] — `until ! pgrep -f '<script>'` can never
+  exit, because `pgrep -f` matches the waiter's own argv.
+  **Re-verified live at this close** with a script name that exists nowhere in the tree:
+  `bash -c 'pgrep -af "cw-probe-nonexistent-script.sh"'` matched **two** processes — the harness's
+  outer `bash -c` wrapper and the inner one — and exited 0. So the condition is permanently true
+  and the loop is unbounded. The claim is established and is *stronger* than filed: the harness's
+  own wrapper argv matches too, so the defect does not depend on how the waiter is spelled.
+  **Attested cost:** this iteration's build batch A ran two such waiters against `run-smoke.sh`;
+  both survived the smoke's terminal line and were still running when `TaskStop` reported success.
+  The observed price was the Bash tool's 600s foreground cap absorbing an infinite loop, which
+  reads from outside as a fixed ten-minute wait. Nothing reds — the work completes correctly and
+  the only symptom is wall-clock, which is why no existing oracle sees it.
+  **Deliverable:** rule the sanctioned form and put it where a waiting session reads it — the
+  bracket trick (`pgrep -f '[r]un-smoke.sh'`), matching a recorded PID rather than a pattern, or
+  waiting on the work's own artifact. A `bash-guard` rule steering off the self-matching shape is
+  the enforcement half and is mechanically decidable (the pattern is a literal in the argv).
+  **Distinct from** `poll-sleep-guard-steer` and `waiting-rule-fourth-firing-post-fix`: this
+  session chose the documented `run_in_background` + `until` pattern *correctly*, and the
+  predicate inside it was the defect.
+  **Cost while deferred:** ten wall-clock minutes per occurrence, silently, on any session that
+  reaches for the obvious spelling — and it is the obvious spelling.
+  Filed 2026-08-14 by close, draining the gap inbox; the bullet came from build batch A, which
+  paid the ten minutes.
+
+- **harness-wait-primitive-unnamed** [design-pending] — the in-turn waiting rule names "the
+  harness's waiting primitive" in the singular, and the harness has two with opposite reactivity.
+  `delegation-kit/templates/agent-execution.md:43-45` tells a dispatched session to "loop on the
+  work's own artifact (evidence file, lock, exit marker) with the harness's waiting primitive" —
+  **re-verified at this close by reading those lines**; the phrase is singular and names nothing.
+  The two candidates differ by exactly the wall-clock property the rule exists to buy: a
+  backgrounded shell `until` loop fires one notification the moment its condition goes true, while
+  `Monitor` armed with an unbounded command stays armed to its `timeout_ms` deadline even after
+  the event fires.
+  **Second half — an interaction, not a separate defect.** Build batch A's *first* instinct was
+  the correct artifact wait (`until grep -q` on the runner's own output), and the repo's own
+  bash guard rejected it for naming the harness scratchpad path — **re-verified**: the guard
+  blocks the `/tmp/claude-...` prefix and steers to repo-local `.tmp/`. The guard is *correct*;
+  what is missing is that the doctrine never says the artifact belongs in `.tmp/`, so the guard's
+  refusal reads as a refusal of artifact-waiting itself and steered the session onto the
+  process-liveness form that then broke (`waiter-predicate-self-match`).
+  **Deliverable:** name the primitive in the doctrine bullet, and say in the same breath that the
+  awaited artifact goes in repo-local `.tmp/`. Small edit; the reason it is a task and not an
+  in-flight fix is that ruling *which* primitive is the sanctioned one is a delegation-kit
+  contract call, not a wording call.
+  **Distinct from `waiter-predicate-self-match`:** that entry is the broken predicate; this is the
+  doctrine-and-guard interaction that selected the shape it lived in.
+  **Cost while deferred:** every dispatched session re-derives which primitive to use, and the
+  guard keeps steering away from the artifact wait the doctrine's own words prefer.
+  Filed 2026-08-14 by close, draining the gap inbox; the bullet came from build batch A, beside
+  the broken predicate it selected.
+
+- **consumer-smoke-targeted-mode-registrar-scope** [design-pending] — the consumer smoke's
+  targeted single-kit form fails on a cross-kit registration dependency that the targeting severs.
+  **Re-verified live at this close**, at HEAD, on a clean tree: `bash
+  gate-sdk/bin/run-consumer-smoke.sh gate-sdk` exits 1 with `7 unregistered gate(s) probed (3
+  self-declared, 1 hand-declared, 3 unaccounted)`, naming `check-action-gh-repo`,
+  `check-action-pinning` and `check-action-run-shell`, each `scratch exit 0`. The untargeted run
+  is clean. **Pre-existing and unrelated to this iteration** — the lead confirmed both forms
+  independently at HEAD.
+  **Cause, probed rather than relayed.** An earlier telling blamed a `# smoke-unregistered:`
+  declaration honoured only from the shipping kit; that is wrong — no such line names any
+  `check-action-*` gate. The three gates are **shipped** by gate-sdk but **registered** by
+  site-kit's `smoke/install.sh`, the kit that writes the workflow surface they read. The
+  accounting derives the shipping kit from the `checks/` walk and honours registration from
+  whichever kit wrote it, so the untargeted run — which installs site-kit — is clean. Targeted at
+  gate-sdk alone, site-kit never installs, nothing registers them, and they probe exit 0, so
+  neither exemption opens: self-declaration needs a scratch exit 2, hand-declaration needs a line
+  from the shipping kit, which gate-sdk does not carry for them.
+  **Options, neither ruled:** the targeted mode carries the kits that register the restricted
+  kit's gates, or the accounting goes root-aware (a gate whose registrar is outside the selected
+  roots is out of scope, not unaccounted).
+  **Cost while deferred:** the trap is misattribution, and it has already nearly fired — this
+  iteration's batch-B session almost charged the pre-existing failure to its own change. Any later
+  session running the targeted form after touching a `smoke/install.sh` will read the same red as
+  its own.
+  Filed 2026-08-14 by close, draining the gap inbox (filed there mid-iteration).
+
+- **spec-prune-normalisation-shell-oracle** [design-pending] — the shell twin of the
+  `_spec_prune_kit_roots` normalisation repair is covered by no standing oracle.
+  `canon-kit/lib/spec.sh`'s `_spec_prune_kit_roots` compared unnormalised paths, so a `..` scan
+  root pruned nothing at all and silently widened every caller's corpus; the eighth cohort's
+  edge-root parity run caught it and repaired it with `_spec_norm_abs`. The only standing
+  assertion is `check-spec-dod-singleton.test.sh`'s prune-through-dotdot case, and that member now
+  dispatches to the binary, so it holds the **crate's** normalisation, not the shell's.
+  **Re-verified at this close**, not relayed: `canon-kit/checks/` carries only
+  `check-spec-dod-singleton.gate` and `check-spec-derivable-section.gate` (both `.sh` files
+  deleted), while `canon-kit/lib/spec.sh:171-201` still routes three surviving shell gates through
+  the repaired prune — `check-surface-duplication.sh:34` (via `spec_canonical_specs`),
+  `check-spec-embedded-source.sh:42-43` (both readers) and `check-amendment-queue.sh:96,106` (via
+  `spec_amendments`), plus the README reader at `spec.sh:223`. None of the three has a `.test.sh`
+  scenario runner. The bullet named two of the three; the third is `check-amendment-queue`.
+  **Deliverable:** a scenario runner for one still-shell caller carrying the `..`-root case, or the
+  assertion folded into an existing canon-kit runner. **Note the control discipline the cohort
+  paid for:** a *symmetric* break of the normaliser is invisible to this assertion, so the oracle
+  must be an asymmetric one.
+  **Cost while deferred:** the shell prune can regress to the pre-repair behaviour with a green
+  battery, silently widening every surviving caller's corpus on any consumer leaving
+  `CANON_KIT_SCAN_KIT_ROOTS` at 0. This repo sets it to 1, so the repo's own battery is blind to
+  the regression by construction — the cost lands entirely on adopters.
+  Filed 2026-08-14 by close, draining the gap inbox; the bullet came from the eighth cohort's
+  build session, which paid for the repair and declined to absorb its coverage hole.
+
+- **baseline-row-prose-coupling-gate** [design-pending] — governed prose asserts what
+  `.workflow/validate-baseline.txt` holds, and nothing checks it against the file.
+  **The instance that bought this entry** was fixed at this close, not deferred: `gate-sdk/SPEC.md`
+  claimed in two places that the baseline carried a held `installer_smoke fail` row. It was flipped
+  to `pass` in `97683db2`, so a cohort pricing criterion 5 read a pointer to a mechanism it could
+  not find, and the cheapest wrong conclusion was that the row had been dropped rather than earned
+  out. Both sentences were re-worded at this close.
+  **Why it is gateable, unlike its neighbours.** The general class — prose making claims about
+  machine surfaces — is the human-audit class `gate-spec-claim-assertion-parity` already rules
+  ungateable. This slice is not: a sentence naming `.workflow/validate-baseline.txt` and quoting a
+  `<suite> <verdict>` pair is a decidable pattern, and the live file is a two-column lookup. The
+  scanner reds when a quoted verdict disagrees with the row.
+  **Deliverable:** a canon-kit gate over governed prose citing that file, with the `good`/`bad`
+  fixture pair, plus a ruling on the past-tense form — a sentence deliberately recording a
+  *retired* row (both repaired sentences are now exactly that) must not red, so the predicate needs
+  a tense or a citation convention to key on. That convention is the design question.
+  **Cost while deferred:** low and slow, but it recurs on exactly the readers who most need the
+  file — a cohort pricing criterion 5 reads the prose first.
+  Filed 2026-08-14 by close, from its own gap-inbox drain and staleness review.
 
 ## Icebox
 

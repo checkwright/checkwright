@@ -1205,9 +1205,12 @@ design time; the last three were paid for, and each is named with what it cost.
    designed answer named in its amendment: restore the class shell-side, make it
    binary-gated by a declaration the adopter receives, or accept and document.
    What a cohort may not do is land **unpriced**, and while an aggregate price
-   stands unpaid the held `installer_smoke fail` row in
-   `.workflow/validate-baseline.txt` is what keeps it visible — a machine-held
-   record of an unpaid price.
+   stands unpaid a held `fail` row in `.workflow/validate-baseline.txt` is what
+   keeps it visible — a machine-held record of an unpaid price. Read the file,
+   not this sentence, for whether any such row stands: the `installer_smoke`
+   row this clause was first written against was earned out in `97683db2` and
+   reads `pass` today, so the mechanism is live and its founding instance is
+   not.
 
    **Its honest limit, narrowed rather than deleted.** The *number* is
    machine-derived and its completeness is machine-asserted, so a cohort can no
@@ -2010,10 +2013,12 @@ green once fixed. The suite's only failure is the markdown-link class the held
 row already owns, so no class this cohort could have emptied changed hands. The
 falsifier was available and did not fire: a newly lost class would have shown as
 a value-arm class this consumer used to catch, or as a red battery, and neither
-appeared. The held `installer_smoke fail` row in
-`.workflow/validate-baseline.txt` is **not** this cohort's price: it records the
-markdown-link hole `port-criterion-aggregate-cost-blindness` half (2) owns, which
-this cohort neither widens nor repairs.
+appeared. The `installer_smoke fail` row that stood held in
+`.workflow/validate-baseline.txt` at the time was **not** this cohort's price: it
+recorded the markdown-link hole `port-criterion-aggregate-cost-blindness` half
+(2) owns, which this cohort neither widened nor repaired. That row was earned out
+to `pass` in `97683db2`; the sentence is kept in the past tense rather than
+deleted because it is what discharged this cohort's price question.
 
 ### The canonical-spec `spec_canonical_specs` cohort
 
@@ -3101,8 +3106,14 @@ reader needs outlive the refactor that renames a helper:
 - `gate_fixture_suites` is the single source both the CI workflow
   (`.github/workflows/gates.yml`) and evidence-kit's validate config loop over,
   so adding a kit enrols its fixtures with no hand-list to drift.
-- `gate_kit_roots_rel` emits the roots repo-root-relative — the anchor the
-  couples globs share.
+- `gate_kit_roots_rel` emits the roots relative to **the directory holding the
+  kits**, which it derives from `gate_sdk_root` — the library's own location,
+  never the caller's working directory and never the git toplevel. That is the
+  anchor the couples globs share, and it is cwd-independent by design so a
+  `cd`-ing caller still gets stable names. The consequence a caller must hold:
+  the *names* come from the library's own tree, so a script that resolves those
+  relative roots against some other tree gets one tree's kit set spelled over
+  another tree's contents.
 - **`GATE_SDK_PROGRAM_FLOOR` is the one home of the payload's assumed-program
   set**, read by §port-blockers at the transition where a command-position word is
   classified as a criterion-7 requirement or discarded. It is a kit default rather
