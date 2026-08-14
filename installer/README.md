@@ -833,17 +833,38 @@ the same owner.
 registered as a validate suite so a bit-rotted activation path is a red
 validate rather than a discovery at announcement.
 
-**Run it with the current directory inside the tree under test.** The script
-resolves that tree from its own path, while `scripts/pack-installer.sh` — which
-it invokes to build the payload — resolves the tree it packs from the current
-directory. Invoke a clone's copy by path from somewhere else and the two
-disagree silently: the run packs the *invoking* tree and asserts a green
-activation path for source the clone never contributed, printing an ordinary
-success. Use `env -C <clone>` for a second checkout or a worktree. The rule is
-stated as an invocation requirement because that is what it is under either
-resolution of the disagreement: today nothing detects it, and a version that
-refuses on a mismatch would refuse exactly the invocations this sentence tells
-you not to make.
+**The smoke packs the tree it lives in, by construction — the current directory
+does not select it.** The script resolves that tree from its own path (`$REPO`,
+at `consumer-smoke/run-smoke.sh:5-6`) and hands it to
+`scripts/pack-installer.sh --root "$REPO"` at every one of its four pack call
+sites, so the packed tree and the asserted tree are the same tree whatever
+directory you invoke from. A clone's copy invoked by absolute path, a second
+checkout, a linked worktree: all pack the tree the script belongs to. The
+packer's flag roster has exactly one tier and it is the script itself —
+`bash scripts/pack-installer.sh --help` prints it on stdout at exit 0 — so no
+doc carries a second copy to drift.
+
+*The former invocation requirement is retired, not merely unstated.* Until
+`--root` existed, this section carried a standing rule — "run it with the
+current directory inside the tree under test", with `env -C <clone>` as the
+remedy — because the packer resolved its root from the current directory while
+the smoke resolved its own from its script path, and nothing detected the
+disagreement: the run packed the *invoking* tree and printed an ordinary success
+for source the clone never contributed. That rule is now false rather than
+merely unnecessary — following it changes nothing, and a reader who restores it
+is guarding a hole that `--root` closed. The `PACK:` line names its resolved
+root for exactly this reason, so a reviewer scanning smoke output can see which
+tree the run described instead of inferring it from a twelve-character hash.
+
+**The tree must be clean, and the suite says so before it spends ten minutes
+proving it.** `run-smoke.sh:23-24` asserts `$REPO` is clean in its preflight,
+beside the tool checks and before the first build step. The packer keeps its own
+dirty-worktree refusal — the preflight removes the common case but not the real
+one, since the suite packs four separate times across a ~10-minute run and a
+concurrent edit mid-run trips a check the caller did not choose the moment for.
+That late refusal names the root it resolved and states that the check is
+per-invocation, so it reads as a precondition checked at an awkward moment
+rather than as a broken installer.
 
 It builds the host gate binary, packs the package around it, installs it **from
 the resulting tarball with

@@ -21,6 +21,42 @@ unit's selection step can run. The two cannot be batched as parallel siblings
 even though both touch `gate-sdk/bin/port-blockers.sh` and
 `gate-sdk/SPEC.md`.
 
+**The iteration's full build order, ruled by the lead 2026-08-14 and recorded
+here before any session acts on it.** Four units, one order, and the open
+question `context-kit/SPEC-settings-paths.md` left for the lead is closed by it:
+
+1. **`SPEC-pack-root.md`** — it repairs the instrument this amendment's delta 4
+   measures its criterion-5 residual with. A dependency, not a preference:
+   measuring before it lands reads a residual through the invocation contract
+   §4 already says to follow *after* the repair.
+2. **`SPEC-port-group.md`**, then **this amendment** — the sequential dependency
+   stated just above; this cohort's members are selected off `--group`'s output.
+3. **An operator prune** of the `.claude/settings.json` allow entries this
+   cohort's deletions strand. Operator-owned: a session may not widen or edit
+   its own permission surface. `630e77fa` is the precedent for the action.
+4. **`SPEC-settings-paths.md`** — `check-settings-paths` registers last, against
+   an already-cleaned tree.
+
+**Why the gate registers last rather than first**, since first is the reflex and
+enforcement-first is the reflex's usual warrant: registering before the cohort
+does not merely hold a documented red, it can block this cohort's own deletion
+commit from landing at all. The unconditional route is the battery — CLAUDE.md
+§This repo is governed by its own kits requires a full `run-gates.sh` before
+committing, and the battery runs whole-tree with no trigger filter, so the gate
+reds on the stranded entries regardless of what any commit stages. The
+pre-commit hook is a second route and a **contingent** one, corrected here
+against the tree rather than assumed: the hook reads
+`git diff --cached --diff-filter=ACMR`, so a ported member's **deleted** `.sh`
+is invisible to the gate's `kit:checks/*.sh` reverse trigger and the `.gate`
+descriptor replacing it does not match `*.sh`. It fires only when the cohort
+commit incidentally also modifies some other `checks/*.sh` — which the previous
+cohort's commit `25ee00e9` did, by exactly one file
+(`gate-sdk/checks/check-workflow-tiering.sh`). So the ordering is right and its
+ground is the battery; a later reader must not re-derive the pre-commit route as
+the load-bearing one. This applies delta 5 of `SPEC-settings-paths.md` —
+operator prunes, then the gate registers — to the instance both amendments
+already predict.
+
 ## What changes
 
 ### 1. The cohort is selected by running the tool, and the run is recorded

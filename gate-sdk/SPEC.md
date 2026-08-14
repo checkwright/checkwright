@@ -1168,10 +1168,16 @@ design time; the last three were paid for, and each is named with what it cost.
    rides with it: the instrument packs a payload stamped with a commit, so it
    refuses a dirty worktree and the measurement runs **after** the cohort's own
    commit — from a clean checkout of it when a concurrent session holds the tree
-   dirty. That checkout is reached **by cwd, not by path**: the packer tests
-   dirtiness where it is invoked, so running it by absolute path while the cwd
-   sits in the dirty tree packs the dirty tree and refuses, however clean the
-   checkout the path pointed at.
+   dirty. That checkout is reached **by path, and cwd does not select it**: the
+   smoke resolves its own tree from its script path and passes it to the packer
+   as `--root`, so invoking `<clean-checkout>/installer/consumer-smoke/run-smoke.sh`
+   from anywhere measures that checkout. The instruction this paragraph carried
+   until `pack-installer-root-provenance` landed was the exact opposite — "by
+   cwd, not by path", on the packer's old cwd-derived root — and it is retired
+   rather than merely superseded: following it now steers the measurement at
+   whichever tree the shell happened to sit in. Cleanliness is still tested
+   per pack invocation against the resolved root, so a concurrent session
+   dirtying *that* checkout mid-run still refuses, naming the root it read.
 
    **What the value arm is, and what it is not.** It plants a real defect in
    adopter-authored prose and asserts that some profile below the maximum catches

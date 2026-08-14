@@ -138,38 +138,6 @@
   on this tree the day it registers, and only an operator may prune — so the prune precedes
   registration.
 
-- **pack-installer-root-provenance** [spec: SPEC-pack-root.md]
-  — the smoke packs whatever tree the
-  caller's cwd is in, and reports success either way.
-  recurrence: pack-installer-root-provenance 2026-08-05
-  `scripts/pack-installer.sh` resolves its root from cwd (`git rev-parse --show-toplevel`)
-  while `installer/consumer-smoke/run-smoke.sh` resolves its repo from its own path. Run the
-  smoke from a linked worktree or any second checkout and the two disagree: pack assembles
-  the payload from cwd's tree, the smoke asserts against it, and the run looks entirely
-  normal — it even prints a PACK line naming the *other* tree's commit. The failure is not a
-  red that needs explaining; it is a **green that asserts nothing about the tree under test**,
-  which is the worse half of the two.
-  **Measured, not theoretical:** it produced two green-but-meaningless smoke runs during that
-  iteration's batch C before anyone noticed the PACK line named the wrong commit, and it
-  recurred 2026-08-05 (the date above) costing `install-claim-contract`'s build another full
-  ~10-minute run that proved nothing.
-  **A second precondition trap on the same seam, found the same day.** The suite packs four
-  separate times across its own ~10-minute run, so `pack-installer.sh`'s dirty-worktree refusal
-  fires against whatever the tree looks like minutes in rather than at invocation. Any concurrent
-  edit — an ordinary thing during a run that long — surfaces as a refusal whose message is about
-  the worktree and not about the timing, so the reading is a broken installer rather than a
-  precondition checked at the wrong moment.
-  **Cost while deferred:** the installer's only end-to-end oracle can pass without testing the
-  tree being released, and the condition that triggers it — working from a worktree — is
-  exactly the setup a parallel iteration uses.
-  Filed 2026-08-04 at close from the gap inbox; found by build.
-  Promoted 2026-08-14 at spec, taking the **parameter** and retiring the either/or: a refusal
-  needs the caller's root to compare against, which *is* the parameter under another name. The
-  "touches every call site" objection was measured false — five call sites, four in one file,
-  and `--root` is optional so the workflow caller is untouched. The refusal's own filed framing
-  was corrected: the check already sits early *within* each pack invocation; the lateness is the
-  suite invoking pack four times.
-
 ## Technical Debt
 
 ## Deferred
@@ -5460,6 +5428,8 @@
 - **scratch-execution-allowlist-bar** [design-pending] — Each close re-derives this standing bar.
 
 ## Done
+
+- pack-installer-root-provenance
 
 ## Lessons Learned
 

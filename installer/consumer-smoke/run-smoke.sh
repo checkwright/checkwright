@@ -61,7 +61,8 @@ say "built $NATIVE_BIN for $HOST_TARGET with the sidecar this leg emitted"
 printf 'pack\n'
 VERSION="$(git -C "$REPO" describe --tags --abbrev=0 2>/dev/null)"; VERSION="${VERSION#v}"
 [[ -n "$VERSION" ]] || VERSION="0.0.0-smoke"
-PACK_OUT="$(INSTALLER_PACK_TMP_DIR="$SCRATCH" bash "$REPO/scripts/pack-installer.sh" \
+# spec: installer/README.md §The consumer smoke — --root "$REPO" is what makes the packed tree and the asserted tree the same tree by construction: $REPO is script-path-derived, so without it the current directory selects what gets packed and a run from a second checkout greens while asserting nothing about the tree under test
+PACK_OUT="$(INSTALLER_PACK_TMP_DIR="$SCRATCH" bash "$REPO/scripts/pack-installer.sh" --root "$REPO" \
     --version "$VERSION" --out "$SCRATCH" --artifacts "$SCRATCH/artifacts" 2>&1)" \
     || { printf '%s\n' "$PACK_OUT" >&2; blocked "the pack step failed."; }
 say "$(grep -m1 '^PACK:' <<<"$PACK_OUT")"
@@ -374,7 +375,7 @@ resolves_profile "$BARE_PROFILE" \
 printf 'binary-less leg (%s, payload packed with no artifact)\n' "$BARE_PROFILE"
 BARE="$SCRATCH/bare"
 mkdir -p "$BARE"
-PACK_OUT="$(INSTALLER_PACK_TMP_DIR="$SCRATCH" bash "$REPO/scripts/pack-installer.sh" --version "$VERSION" --out "$BARE" 2>&1)" \
+PACK_OUT="$(INSTALLER_PACK_TMP_DIR="$SCRATCH" bash "$REPO/scripts/pack-installer.sh" --root "$REPO" --version "$VERSION" --out "$BARE" 2>&1)" \
     || { printf '%s\n' "$PACK_OUT" >&2; blocked "the binary-less pack step failed."; }
 say "$(grep -m1 '^PACK:' <<<"$PACK_OUT")"
 shopt -s nullglob
@@ -475,7 +476,7 @@ upgrade_direction "$VERSION" "$UP_VERSION" \
     || fail "the arm derived $UP_VERSION from $VERSION, which is not the upgrade direction — it would assert the downgrade refusal instead"
 UP="$SCRATCH/upgrade"
 mkdir -p "$UP"
-PACK_OUT="$(INSTALLER_PACK_TMP_DIR="$SCRATCH" bash "$REPO/scripts/pack-installer.sh" --version "$UP_VERSION" --out "$UP" 2>&1)" \
+PACK_OUT="$(INSTALLER_PACK_TMP_DIR="$SCRATCH" bash "$REPO/scripts/pack-installer.sh" --root "$REPO" --version "$UP_VERSION" --out "$UP" 2>&1)" \
     || { printf '%s\n' "$PACK_OUT" >&2; blocked "the upgrade pack step failed."; }
 say "$(grep -m1 '^PACK:' <<<"$PACK_OUT")"
 shopt -s nullglob
@@ -547,7 +548,7 @@ upgrade_direction "$UP_VERSION" "$UP2_VERSION" \
     || fail "the arm derived $UP2_VERSION from $UP_VERSION, which is not the upgrade direction — it would assert the downgrade refusal instead"
 UP2="$SCRATCH/upgrade2"
 mkdir -p "$UP2"
-PACK_OUT="$(INSTALLER_PACK_TMP_DIR="$SCRATCH" bash "$REPO/scripts/pack-installer.sh" --version "$UP2_VERSION" --out "$UP2" 2>&1)" \
+PACK_OUT="$(INSTALLER_PACK_TMP_DIR="$SCRATCH" bash "$REPO/scripts/pack-installer.sh" --root "$REPO" --version "$UP2_VERSION" --out "$UP2" 2>&1)" \
     || { printf '%s\n' "$PACK_OUT" >&2; blocked "the second upgrade pack step failed."; }
 say "$(grep -m1 '^PACK:' <<<"$PACK_OUT")"
 shopt -s nullglob

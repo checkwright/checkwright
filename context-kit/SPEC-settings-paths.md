@@ -161,21 +161,38 @@ a grant with args) rather than a single glob — the same shape the neighbouring
 calls at every scope, and this iteration's `SPEC-port-group.md` adds a second
 arm to it, so the call count rises rather than falls; that is now discharged.
 
-**Open at align, not resolved here — a second instance of this same class
-arrives in this iteration, and the two amendments do not yet agree on its
-order.** `gate-sdk/SPEC-eighth-cohort.md` deletes ported members' `.sh` files as
-its whole point, and its own text names the consequence: "this cohort is
-precisely the event that creates such entries... the new gate will red on them,
-and the fix is an operator settings edit the build session may not make."
-That amendment names the collision; this one does not, and neither states an
-order. Unlike the class measured above, this instance is **not yet
-resolved** — landing this gate before the eighth cohort risks the eighth
-cohort's own commit going unfixably red; landing the eighth cohort first and
-this gate after risks this gate registering red on entries only an operator can
-clear, exactly the sequencing problem delta 5 already names for the prior
-class. This is filed as an open cross-unit question for the lead rather than
-ruled here (align/turn-end escalation), since it is a build-ordering decision
-across two components, not a fact this session's oracles settle.
+**Opened at align, closed by the lead 2026-08-14 — the second instance of this
+same class arrives in this iteration, and the build order is now ruled.**
+`gate-sdk/SPEC-eighth-cohort.md` deletes ported members' `.sh` files as its whole
+point, and its own text names the consequence: "this cohort is precisely the
+event that creates such entries... the new gate will red on them, and the fix is
+an operator settings edit the build session may not make." That amendment named
+the collision; neither stated an order.
+
+**The ruling: this gate registers last.** The iteration's order is
+`SPEC-pack-root.md` → `SPEC-port-group.md` → `SPEC-eighth-cohort.md` → an
+**operator prune** of the entries the cohort's deletions strand → this
+amendment. The full order and the reasoning behind the first hop live in
+gate-sdk/SPEC-eighth-cohort.md, which owns it; this section states only what
+binds here. Delta 5's rule — operator prunes, then the gate registers — is
+therefore applied unchanged to this second instance rather than re-decided, and
+`630e77fa` remains the precedent for the operator action.
+
+**The ground is the battery, not the hook** — recorded because the pre-commit
+route is the one a reader reaches for and it does not carry the argument.
+Registering this gate before the cohort would not merely hold a documented red:
+CLAUDE.md §This repo is governed by its own kits requires a full `run-gates.sh`
+before committing and the battery runs whole-tree with no trigger filter, so the
+gate reds on the stranded entries whatever a given commit stages, and the
+cohort's own commit could not land. The generated hook is a **contingent**
+second route, measured rather than assumed: it reads
+`git diff --cached --diff-filter=ACMR`, so a ported member's **deleted** `.sh`
+never reaches delta 1's `kit:checks/*.sh` reverse trigger and the `.gate`
+descriptor replacing it does not match `*.sh`. It fires only on an incidental
+co-staged `checks/*.sh` edit — one such file in the previous cohort's commit
+`25ee00e9`. The reverse trigger is still correct and still earns its place: it
+catches the *ordinary* edit that strands an entry. It simply is not what makes
+the ordering necessary.
 
 ## Producers and consumers
 
@@ -268,6 +285,9 @@ array and is the change that ships beside it:
       tasks.
 - [ ] **Sequencing honored** — the operator prune precedes registration; the
       build session does not edit `.claude/settings.json`. Discharged for the
-      class measured at filing (`630e77fa`); **open** for the class
-      `SPEC-eighth-cohort.md` creates in this same iteration until the lead
-      rules the build order between the two units (see delta 5).
+      class measured at filing (`630e77fa`). For the class
+      `SPEC-eighth-cohort.md` creates in this same iteration, the lead ruled the
+      build order 2026-08-14 (see delta 5): this unit builds **last**, after the
+      cohort and after the operator prune its deletions require. A build session
+      reaching this unit with the prune not yet done stops and escalates rather
+      than registering the gate or editing the file.

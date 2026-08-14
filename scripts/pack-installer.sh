@@ -1,32 +1,59 @@
 #!/usr/bin/env bash
 # spec: CLAUDE.md §Housekeeping — assemble the installer package out of tree and npm-pack it there; the payload is derived from the repo's own kit roots at pack time, so no second copy of any kit is ever checked in or written inside the worktree
-#
-# usage: pack-installer.sh [--version <semver>] [--out <dir>] [--artifacts <dir>]
-#   --version default: the newest reachable git tag; --out default: INSTALLER_PACK_TMP_DIR
-#   --artifacts <dir>/<target>/ holds a roster target's binary + sidecar; omitted, none pack
 set -uo pipefail
 
 SDK="${GATE_SDK_ROOT:-"${BASH_SOURCE[0]%/*}/../gate-sdk"}"
 # shellcheck source=../gate-sdk/lib/gate.sh
 source "$SDK/lib/gate.sh"
 
-ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || {
-    echo "pack-installer: not inside a git work tree — the payload's commit stamp has no source." >&2
-    exit 2
+usage() {
+    printf 'usage: %s [--version <semver>] [--out <dir>] [--artifacts <dir>] [--root <dir>] [-h|--help]\n' \
+        "${0##*/}"
+    printf '  --version    default: the newest reachable git tag\n'
+    printf '  --out        default: INSTALLER_PACK_TMP_DIR\n'
+    printf '  --artifacts  <dir>/<target>/ holds a roster target'\''s binary + sidecar; omitted, none pack\n'
+    printf '  --root       the work-tree top level packed and stamped; default: the git toplevel of the current directory\n'
 }
-cd "$ROOT" || exit 2
 
 VERSION=""
 OUT=""
 ARTIFACTS=""
+ROOT=""
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --version) VERSION="${2:-}"; shift 2 ;;
         --out) OUT="${2:-}"; shift 2 ;;
         --artifacts) ARTIFACTS="${2:-}"; shift 2 ;;
+        --root) ROOT="${2:-}"; shift 2 ;;
+        # spec: installer/README.md §The consumer smoke — help is adopted on its own merits and does not extend gate-sdk/SPEC.md §The bin/-tool contract to a consumer's scripts/: with four flags the packer is past the point where an unknown-argument refusal is the only discovery route
+        -h|--help) usage; exit 0 ;;
         *) echo "pack-installer: unknown argument: $1" >&2; exit 2 ;;
     esac
 done
+
+# spec: installer/README.md §The consumer smoke — a caller that already holds the tree it means says so, rather than letting the current directory select one it never named; the value is validated to a work-tree top level because silently promoting a subdirectory to its toplevel is the same silent correction this flag exists to remove
+if [[ -n "$ROOT" ]]; then
+    [[ -d "$ROOT" ]] || {
+        echo "pack-installer: --root is not a directory: $ROOT" >&2
+        exit 2
+    }
+    ROOT_TOP="$(git -C "$ROOT" rev-parse --show-toplevel 2>/dev/null)" || {
+        echo "pack-installer: --root is not inside a git work tree: $ROOT" >&2
+        exit 2
+    }
+    [[ "$(cd "$ROOT" && pwd -P)" == "$(cd "$ROOT_TOP" && pwd -P)" ]] || {
+        echo "pack-installer: --root names a subdirectory of the work tree at $ROOT_TOP, not its top level: $ROOT" >&2
+        echo "  help: pass the top level; promoting a subdirectory to it would pack a tree you did not name." >&2
+        exit 2
+    }
+else
+    ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || {
+        echo "pack-installer: not inside a git work tree — the payload's commit stamp has no source." >&2
+        exit 2
+    }
+fi
+cd "$ROOT" || exit 2
+ROOT="$(pwd -P)"
 
 for tool in npm jq git; do
     command -v "$tool" >/dev/null 2>&1 || {
@@ -42,7 +69,8 @@ done
 
 # spec: CLAUDE.md §Housekeeping — a dirty tree would stamp a commit that does not describe the payload, and that stamp is the whole of what makes a vendored tree resolvable to an upstream state
 if [[ -n "$(git status --porcelain)" ]]; then
-    echo "pack-installer: the worktree is dirty — refusing to stamp a commit the payload does not match." >&2
+    echo "pack-installer: the worktree at $ROOT is dirty — refusing to stamp a commit the payload does not match." >&2
+    echo "  help: this is checked once per invocation, against the tree as it is now — not as it was when your run started, so a concurrent edit during a long run trips it here rather than at the point you invoked the run." >&2
     echo "  help: commit or stash first; the stamp is what makes the vendoring auditable." >&2
     exit 2
 fi
@@ -141,5 +169,5 @@ shopt -u nullglob
 }
 mv "${tarballs[0]}" "$OUT/" || exit 2
 
-echo "PACK: ${OUT%/}/${tarballs[0]##*/} (version $VERSION, commit ${COMMIT:0:12}, $packed kit(s) in payload, $artifacts prebuilt gate binary/binaries)"
+echo "PACK: ${OUT%/}/${tarballs[0]##*/} (version $VERSION, commit ${COMMIT:0:12}, root $ROOT, $packed kit(s) in payload, $artifacts prebuilt gate binary/binaries)"
 exit 0
