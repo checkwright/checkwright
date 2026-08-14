@@ -2,4 +2,3 @@
 # One line per iteration at its release boundary, close-written; the line
 # grammar is lifecycle-kit/SPEC.md §templates/stages/'s, not restated here.
 
-native-port-grouping-and-eighth-cohort release v0.23.0 — minor: Tightened gates non-empty (26 declarations), no decommission so not a major; cadence floor met (newest tag v0.22.0 creatordate 2026-08-07, >7d) and operator-directed to cut
