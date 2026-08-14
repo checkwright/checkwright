@@ -187,13 +187,10 @@ by lifecycle-kit/SPEC.md §templates/stages/; cite it, never restate it here.
      correct permission model gets read as a defect.
 
      **Selecting the designated release account is the expected resolution, not
-     an evasion.** This runbook previously said the opposite — *resolve by fixing
-     the permission, never by switching identity* — and that instruction was
-     wrong in the case that actually occurs here. Where the active account is not
-     the release account, "fix the permission" resolves to granting write to an
-     account that must not hold it, so the old rule prescribed the one action the
-     identity boundary forbids while forbidding the one that is correct. Select
-     the designated account and proceed.
+     an evasion.** Where the active account is not the release account, "fix the
+     permission" resolves to granting write to an account that must not hold it —
+     the one action the identity boundary forbids. Select the designated account
+     and proceed.
 
      **What survives is the recording obligation, which was the clause's real
      content.** Do not leave a discrepancy between the account this runbook
