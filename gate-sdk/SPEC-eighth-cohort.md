@@ -173,11 +173,17 @@ conditions, not the subjects:
   and are regenerated with the cohort; each prints its own regen command on red.
 - **`check-settings-paths`** (this iteration's `context-kit/SPEC-settings-paths.md`)
   — **reds on a committed allow entry naming a deleted `.sh`.** This cohort is
-  precisely the event that creates such entries: the two live dead entries were
-  left by the two previous cohorts. So this cohort will create more, and the new
-  gate will red on them, and the fix is an **operator** settings edit the build
-  session may not make. The interaction is named here because the two units are
-  in the same iteration and neither entry mentions the other.
+  precisely the event that creates such entries: the three dead entries left by
+  the two previous cohorts were pruned by the operator in `630e77fa`, ahead of
+  this iteration's build, but this cohort creates the *next* instance of the same
+  class by construction. So this cohort will create more, and the new gate will
+  red on them, and the fix is an **operator** settings edit the build session may
+  not make. **Corrected at align: both entries now name this interaction**
+  (`SPEC-settings-paths.md` delta 5 was updated to cross-reference it), but
+  **neither states an order** — whether this cohort's commit must land, and a
+  second operator prune pass run, before `check-settings-paths` registers, or
+  whether registration is deferred past this iteration, is left to the lead
+  rather than assumed by either amendment.
 
 ## Existing sections updated
 

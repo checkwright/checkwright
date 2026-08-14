@@ -5,15 +5,27 @@ committed permission allow-list entry naming a literal repo-relative `.sh` path
 resolves in the working tree.
 
 **The class, re-measured at this stage rather than carried from the filing.**
-Three array entries name two absent paths in `.claude/settings.json`:
+Three array entries named two absent paths in `.claude/settings.json`:
 `canon-kit/checks/check-comment-tier.sh` (entries at `:58` and `:59`, the bare
 and `*` forms) and `lifecycle-kit/checks/check-stage-evidence.sh` (`:46`). Both
-are **native-port residue** — each kit's `checks/check-X.sh` was replaced by a
+were **native-port residue** — each kit's `checks/check-X.sh` was replaced by a
 `checks/check-X.gate` descriptor and the grant was never repointed. Of 81 allow
-entries, 54 name a `.sh` path token; 46 of those are literal single paths and 44
-resolve. The two that do not accumulated **one cohort apart**, which is the
+entries, 54 named a `.sh` path token; 46 of those were literal single paths and
+44 resolved. The two that did not accumulated **one cohort apart**, which is the
 entry's central claim and it holds: this is one to two dead entries per cohort,
 unbounded across the 63 members still unported.
+
+**Corrected at align: the measured class no longer exists on this tree.** The
+operator pruned all three entries and granted `gate-sdk/bin/port-blockers.sh` in
+the same pass, in `630e77fa` ("chore(settings): prune dead gate paths, grant
+port-blockers"), landed by the lead on the escalation this amendment's spec
+session raised — see delta 5 below, corrected to match. The gate's invariant,
+manifest and fixture pair are unchanged by this: the class it defends against is
+a standing property of the port (one to two dead entries per still-unported
+cohort), not a one-time count, and `good/`/`bad/` fixtures carry synthetic
+`settings.json` snapshots rather than a slice of the live file (delta 3), so
+this measurement's staleness touches only the narrative above, not the gate's
+design.
 
 ## The placement ruling
 
@@ -122,29 +134,48 @@ parser to avoid a debt the sibling gate already carries on the same file. Taking
 `jq` keeps one parsing story for the settings file across every reader in the
 tree.
 
-### 5. The prune is operator-owned and is **not** part of this work
+### 5. The prune is operator-owned, and it has already run for the entries this amendment measured
 
-The three dead entries stay in `.claude/settings.json` until an **operator**
-removes them. **[design-bearing — and it is a sequencing constraint, not an
-implementation note.]**
+The three dead entries named above stayed in `.claude/settings.json` until an
+**operator** removed them, and that removal has now happened. **[design-bearing
+— and it is a sequencing constraint, not an implementation note.]**
 
 The file is configuration; a session may propose a standing grant and may not
 widen its own, and this entry's filing session recorded that the settings edit
 "is operator-owned and stays that way". The gate itself reads the file and
 writes nothing, so the gate is not operator-owned — but **the gate goes red on
-this tree the moment it registers**, because the violations it was built for are
-live. Landing order is therefore: operator prunes, then the gate registers. A
-build session that lands the gate first reds the whole battery and cannot fix it
-within its own authority. This constraint is escalated to the lead alongside
-this amendment rather than left for build to discover at its first `run-gates`.
+a tree carrying the violations it was built for the moment it registers**.
+Landing order is therefore: operator prunes, then the gate registers. This
+constraint was escalated to the lead alongside this amendment rather than left
+for build to discover at its first `run-gates`, and the lead landed the prune in
+`630e77fa` before this iteration's align stage — **confirmed at align**: the
+operator prune precedes registration, holds for the class this amendment
+measured, and the build session lands the gate on an already-clean tree for that
+class.
 
-**Proposed for the same operator pass, and proposed only.**
-`bash gate-sdk/bin/port-blockers.sh` is granted solely by the gitignored local
-overlay and prompted four times during the filing iteration. It is a read-only
-kit tool the port track calls at every scope — and this iteration's
-`SPEC-port-group.md` adds a second arm to it, so the call count rises rather
-than falls. It belongs in the committed set as a glob. Recorded as a proposal
-for the operator, not an action for build.
+**Granted for the same operator pass**, not merely proposed:
+`bash gate-sdk/bin/port-blockers.sh` was granted in `630e77fa`, as two literal
+entries (the bare form and its `*`-suffixed twin, this repo's standing shape for
+a grant with args) rather than a single glob — the same shape the neighbouring
+`build-native.sh` grant already uses. It is a read-only kit tool the port track
+calls at every scope, and this iteration's `SPEC-port-group.md` adds a second
+arm to it, so the call count rises rather than falls; that is now discharged.
+
+**Open at align, not resolved here — a second instance of this same class
+arrives in this iteration, and the two amendments do not yet agree on its
+order.** `gate-sdk/SPEC-eighth-cohort.md` deletes ported members' `.sh` files as
+its whole point, and its own text names the consequence: "this cohort is
+precisely the event that creates such entries... the new gate will red on them,
+and the fix is an operator settings edit the build session may not make."
+That amendment names the collision; this one does not, and neither states an
+order. Unlike the class measured above, this instance is **not yet
+resolved** — landing this gate before the eighth cohort risks the eighth
+cohort's own commit going unfixably red; landing the eighth cohort first and
+this gate after risks this gate registering red on entries only an operator can
+clear, exactly the sequencing problem delta 5 already names for the prior
+class. This is filed as an open cross-unit question for the lead rather than
+ruled here (align/turn-end escalation), since it is a build-ordering decision
+across two components, not a fact this session's oracles settle.
 
 ## Producers and consumers
 
@@ -233,4 +264,7 @@ array and is the change that ships beside it:
 - [ ] **Gaps filed** — cross-component gaps found during the work filed as debt
       tasks.
 - [ ] **Sequencing honored** — the operator prune precedes registration; the
-      build session does not edit `.claude/settings.json`.
+      build session does not edit `.claude/settings.json`. Discharged for the
+      class measured at filing (`630e77fa`); **open** for the class
+      `SPEC-eighth-cohort.md` creates in this same iteration until the lead
+      rules the build order between the two units (see delta 5).

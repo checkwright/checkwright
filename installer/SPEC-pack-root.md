@@ -76,20 +76,26 @@ simply has no way to say that the path is also the subject. After this delta the
 smoke's packed tree and its asserted tree are the same tree **by construction**,
 which is the property the queue entry asked for.
 
-### 4. The cleanliness precondition is hoisted to the suite's own preflight
+### 4. The cleanliness precondition, re-verified rather than hoisted — it is already in the suite's preflight
 
-`run-smoke.sh` asserts its `$REPO` worktree is clean **once, in its preflight**,
-before any of the ~10-minute run. **[design-bearing]**
+**Corrected at align, against the tree rather than the filing.** `run-smoke.sh`
+already asserts its `$REPO` worktree is clean once, in its preflight, before any
+of the ~10-minute run (`installer/consumer-smoke/run-smoke.sh:23-24`, landed
+2026-07-26 in `bb4cc6594`, weeks before this iteration). **[mechanical — confirmed,
+not added]**
 
-This is the separable, cheaper half the queue entry identified, and the survey
-sharpened where it belongs: the packer's dirty-worktree refusal
-(`scripts/pack-installer.sh:44`) already sits **early within each invocation** —
-before the assembly, the kit-roots copy and `npm pack`. The lateness is not
-inside the packer at all; it is that the suite invokes the packer four times
-spread across its own run, so a tree that was dirty at second zero is first
-reported minutes in, by the second, third or fourth call. Hoisting the check to
-the preflight makes the common case — *already dirty when you started* — refuse
-before the suite spends ten minutes.
+The delta as filed described this as work to do ("hoisted to the suite's own
+preflight"), on the framing that the packer's dirty-worktree refusal
+(`scripts/pack-installer.sh:44`) is the only cleanliness check in the run and
+fires late because the suite calls the packer four times. That diagnosis of the
+*lateness* is correct and is what delta 5 answers. But the *remedy* it named —
+add a single preflight assertion — is not new work: the preflight assertion
+already exists, already runs once, and already sits before the suite's first
+`printf 'build …'` line. This amendment's build session owes **no code change**
+for this delta; it owes only confirming the existing check still holds after
+deltas 1–3 land (it does — it asserts against `$REPO`, the same variable delta 3
+threads into the packer, so no divergence is introduced) and citing the existing
+line range in the merged spec rather than describing a hoist that never happens.
 
 ### 5. The packer's refusal message distinguishes a timing fact from a broken tool
 
@@ -164,18 +170,22 @@ positionals, and the packer has none.
   missed at: a reviewer scanning smoke output to confirm the run described the
   tree under review.
 
-**The preflight cleanliness assertion (new state).**
+**The preflight cleanliness assertion (pre-existing state, confirmed rather than
+added).**
 
-- **Producer** — `run-smoke.sh`'s preflight, unconditionally, against `$REPO`.
+- **Producer** — `run-smoke.sh`'s preflight, unconditionally, against `$REPO`,
+  already live at `:23-24` since `bb4cc6594` (2026-07-26).
 - **Consumer** — the suite's own `blocked`/`fail` path, before any profile
   installs.
 
-**This delta narrows no corpus.** It adds a flag, a field, a message and an
-early assertion; it prunes no file, no glob and no declaration, so
-causal-completeness point 5's red-condition enumeration has no subject. The
-existing dirty-worktree refusal is **retained**, not replaced — delta 4 adds an
-earlier check rather than moving the late one, so no fail-closed path is
-removed.
+**This delta narrows no corpus.** It adds a flag and a field (deltas 1–2), a
+call-site change (delta 3) and a message (delta 5); it prunes no file, no glob
+and no declaration, so causal-completeness point 5's red-condition enumeration
+has no subject. The existing dirty-worktree refusal is **retained**, not
+replaced — delta 5 adds detail to the late message rather than moving the
+check, so no fail-closed path is removed. Delta 4 changes no code: the
+preflight assertion it describes was already load-bearing before this amendment
+was filed.
 
 ## Existing sections updated
 
