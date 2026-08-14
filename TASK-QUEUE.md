@@ -63,7 +63,9 @@
   §The canonical-spec `spec_canonical_specs` cohort. The terminal move is a **demotion**.
   Re-promoted 2026-08-14 at spec for the **ninth** cohort, `SPEC-json-cohort.md`: two members
   taken under the selection rule's documented override rather than by size, the size arm being
-  exhausted at a largest-takeable group of one, and what it buys is a JSON reader in the crate.
+  exhausted at a largest-takeable group of one. What it retires is the `jq` blocker; the JSON
+  reader behind that is a **dependency rather than a built engine**, the crate's first, after
+  the operator corrected the premise that it could take none.
 
 - **born-native-gate-default** [spec: SPEC-born-native.md]
   — new gates are born native by default; shell becomes the exception, and the exception is
