@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: native-port-grouping-and-eighth-cohort
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -96,6 +96,49 @@
   own selection rule as written.
   Filed 2026-08-13 at scope on lead disposition, under scope-gated intake: filed as costed
   work, not started.
+
+- **consumer-gate-port-disposition** [design-pending] — this repo's own 13 gates are a fifth
+  of the remaining port and no rule says where they land.
+  **The seam question is OPEN and this entry deliberately states no leaning** — it records
+  the fork and its costs so the ruling is taken once, with the alternatives already priced.
+  **The class, measured 2026-08-14 at scope:** the 13 gates declared under `scripts/` are
+  **100% unported** — no `.gate` beside any of them — against 63 unported of 103 registered
+  overall, so they are 21% of what the port has left. They are Checkwright's own rules about
+  Checkwright's own tree: docs mirror and nav, install toolchain, npm publish spec, release
+  bump and channel parity, trajectory freshness, value rollup, tightened-gates grammar,
+  kit-ref liveness.
+  **Why they are a class and not 13 ordinary members.** They sit in the *consumer's own
+  gates directory*, whose defining property gate-sdk/SPEC.md §upgrade-smoke already states:
+  a gate living solely there "cannot appear in a vendored tree". Meanwhile
+  `scripts/pack-installer.sh` packs the prebuilt binaries built from the `native/` crate into
+  the payload (gate-sdk/SPEC.md §Consumer payload). So porting one into `native/src/gates/`
+  ships it as a subcommand in **every adopter's binary**, and the consumer-only property that
+  defines the class is exactly what the port's default destination destroys.
+  **The three ways out, none ruled:**
+  1. *Port into `native/`.* Cheapest mechanically, and it keeps one crate. Cost: adopters
+     carry subcommands implementing another project's repo rules, which they can never
+     register — against TRAJECTORY.md's objective 4, footprint as a first-class cost.
+  2. *A second, consumer-owned crate.* `GATE_SDK_NATIVE_CRATE` already makes this
+     expressible, so the knob is not the obstacle. Cost: two crates to build, publish and
+     keep current, and `check-gate-substrate-parity`'s owner column plus assertion E must
+     reason across both rather than one.
+  3. *Shell residue, justified as a class.* Cost: TRAJECTORY.md §PRIORITY DIRECTIVE admits
+     residue only case by case and refuses a protected category, so this owes 13 separate
+     justifications, not one; and it leaves the largest single shell block standing against
+     objective 6.
+  **Why nobody has hit this yet, which is the part a later reader will not re-derive.**
+  Checkwright is both the kit publisher and a consumer of its own kits, and that dual role
+  collapses the distinction the question turns on: `native/` is at once the crate this repo
+  ports *into* and the crate whose binary ships *out*. A single-role tree would have met the
+  fork on its first consumer gate. `port-corpus-grouping-census-unbought` names this block
+  only as ungrouped — a grouping problem — and no surface anywhere names it as a seam
+  problem, which is why the census landing would surface a group with no rule to apply.
+  **Cost while deferred:** the port's remaining ordering is taken over a corpus a fifth of
+  which has no destination, so any cohort reaching `scripts/` stalls at implementation time
+  on a question that wants an operator, not a builder — the failure mode criterion 7 exists
+  to prevent, arriving through the seam instead of through a dependency.
+  Filed 2026-08-14 at scope on operator direction, under scope-gated intake: filed as costed
+  work, not started, with the seam ruling explicitly left open.
 
 - **recurrence-drain-input-widening** [design-pending] — a recurrence with no bullet is uncounted.
   recurrence: recurrence-drain-input-widening 2026-08-09
@@ -2302,28 +2345,33 @@
   Verified 2026-08-03: `check-reads-couples`' root resolver handles a bare quoted literal,
   a KIT-prefixed token and a REPO_ROOT-prefixed token, and nothing else — so a walk root
   held in a *variable* falls to skipped and is never checked.
-  **The live instance is this repo's own gate.** `check-gate-substrate-parity` assertion D
-  walks the crate source recursively, but the gate's `couples=` never named it, so an
-  implementation edit that plants a manifest-class annotation does not re-fire the gate at
-  pre-commit. That hole stood for an unknown period with no couples token to re-fire it —
-  the skipped bucket doing nothing. Assertion E's `couples=` widening fixed the same defect
-  class for the crate root; assertion E's new kit-root walk lands in the same bucket. The
-  instance fix is one manifest token pair mirroring what `check-reads-couples` already
-  couples, and it is deliberately **not** landed bare: enforcement-first binds the instance
-  fix to the check that catches the class, so both land in this unit.
+  **The assertion-D instance has since LANDED — corrected 2026-08-14 at scope**, which the
+  prose below claimed open and no longer does. `check-gate-substrate-parity`'s manifest now
+  reads `couples=…,native/*,…`; the generated hook guards it with `staged_matches …
+  'native/*' …`, and `staged_matches` compares with bash `[[ "$f" == $pat ]]`, where `*`
+  crosses `/` — so a crate-source edit **does** re-fire the gate. Assertion E's `couples=`
+  widening is evidently what paid it. Kept because a later reader meets the same trap: the
+  entry read as a live enforcement hole for an unknown period after the hole closed, and a
+  scope ranking off it ranks a fixed instance as currently-broken.
+  **The class is untouched and is now this entry's whole substance** — the resolver, not any
+  one gate. A pinning instance must therefore be chosen from the still-skipped set rather
+  than inherited from assertion D; which one is open, and enforcement-first still binds
+  whichever is chosen to the check that catches the class.
   **The decidable subset, with no false-positive surface:** an assignment whose value is a
   parameter expansion with a literal default — the universal kit idiom CLAUDE.md
   §Conventions declares. Following one such assignment in the same file would have caught
   assertion D.
-  **Deliverable:** that resolver extension, the assertion-D couples fix as its pinning
-  instance, and a named cadence for the residue.
+  **Deliverable:** that resolver extension, a pinning instance drawn from the still-skipped
+  set, and a named cadence for the residue.
   **Why `[design-pending]`:** the residue is the open design. A truly dynamic root stays
   undecidable, so per the enforcement-first false-positive carve-out it needs a named
   cadence rather than a bare counter — and today the count is printed and nothing reviews
   it. Whether that cadence is a roster class, a close step or a threshold is unruled.
   **Cost while deferred:** every gate whose walk root is a variable is uncoupled and
-  silently under-triggered, and the repo's own substrate-parity gate is one of them — a
-  green battery that never re-ran the assertion.
+  silently under-triggered, with no way to tell which. Measured 2026-08-14: `check-reads-couples`
+  reports 0 resolvable walk(s) covered against 37 undecidable skipped-and-counted, and
+  nothing reviews the 37 — so the next such hole is found the way assertion D's was, by
+  someone noticing.
   Filed 2026-08-03 at close from the gap inbox, merging the assertion-D instance into its
   class; both found by build batch 2.
 
