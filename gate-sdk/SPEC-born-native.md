@@ -71,10 +71,20 @@ states which class and why. A fourth class is an amendment, not a judgment call.
   is a false green. This class is **not new**: §Meta-gate conservation for the
   binary substrate already rules it (*"a gate whose assertion is about the
   dispatch mechanism stays shell; a gate that merely reads declaration paths as
-  content may port"*) and `check-gate-substrate-parity`, `check-install-disposition`
-  and `check-crate-arms` are its live members. The exception criterion adopts the
-  existing ruling rather than inventing a parallel one. **Permanent**; the cause
-  is the class.
+  content may port"*) and `check-gate-substrate-parity` and
+  `check-install-disposition` are its live members, each held shell in that
+  section's own rows on exactly this ground. `check-crate-arms` is **not** a
+  member of this class, checked rather than assumed: that same section states it
+  sits *outside* the conservation table's derivation entirely (its `couples=`
+  covers no registry member's declaration path), and its permanent-shell ground
+  is instead criteria 4 and 7 — a gate running `cargo test` over the crate cannot
+  live inside the artifact it tests, and its rule invokes `cargo` — recorded at
+  §The port-candidate criteria's worked-example passage as *"a different case"*
+  from the dispatch-relation one. Two permanently-shell gates, two distinct
+  causes; naming both here rather than folding the second into class (a) is what
+  keeps the class's own ground exact. The exception criterion adopts the
+  existing dispatch-relation ruling rather than inventing a parallel one.
+  **Permanent**; the cause is the class.
 - **(b) The gate's subject is a platform the target roster does not cover.**
   Criterion 5 omits a `.gate` member on exactly the platforms `native/targets.list`
   carries no artifact for. A gate whose findings arise *on* those platforms would
@@ -246,7 +256,8 @@ amendment in this iteration and its absence here should read as a verdict.
   ruling opens"*; on merge it is no longer owed, and the sentence becomes a
   pointer to the delivered criterion. The ruling text itself, including the
   re-affirmation, is not rewritten.
-- **`docs/` mirror** — the generated projection of both changed specs regenerates
+- **`docs/` mirror** — owned by deltas 1, 3 and 5, mechanically: the generated
+  projection of gate-sdk/SPEC.md and CLAUDE.md, both changed above, regenerates
   with the merge, per its rostered regen command.
 - **Deliberately not updated:** `gate-sdk/templates/check-skeleton.sh`,
   gate-sdk/README.md's first-gate walkthrough, and the kit-landing checklist

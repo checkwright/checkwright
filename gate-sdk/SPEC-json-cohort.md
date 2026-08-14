@@ -181,6 +181,15 @@ proves parity and does not repair rules:
   on an object, are **errors**, which the gate classifies as a malformed pin
   (exit 2) exactly as the shell's non-zero `jq` status does today.
 
+**A third piece of what "structural comparison" means is delta 2's, cited rather
+than restated so a reader of this delta alone does not miss it.**
+`serde_json::Value`'s own equality compares a `Number` by variant, so a bare
+`Value::eq` would call `1` and `1.0` unequal where `jq` calls them the same
+value; delta 2 rules numbers compare by their `f64` value instead, everything
+else by `Value`'s own equality. That rule is part of this delta's contract, not
+a separate one — it is stated once, in delta 2, because that is where the
+dependency's surprise lives.
+
 **Operator-ruled 2026-08-14 alongside delta 3, and untouched by the dependency
 correction.** This delta's ground is a property of `jq`'s own output across its
 versions, not of what the crate may link, so taking `serde_json` neither
@@ -377,7 +386,9 @@ observation. The test's own failure message already prescribes this delta —
 deliberately rather than deleting it"* — which is foresight paying, and this
 cohort is the first case to spend it.
 
-Two changes, each with its ground:
+One change is still owed here; a second scheduled by an earlier draft of this
+delta has already landed as debt outside it, and is recorded so a later reader
+does not go looking for it:
 
 - **The allowlist is over the resolved graph (`Cargo.lock`), not the direct
   `[dependencies]` table.** A transitive crate walks the filesystem exactly as
@@ -398,13 +409,14 @@ Two changes, each with its ground:
   becomes tracked with the dependency, in the same commit, and the `.gitignore`
   line goes with it. Found by sweep, not assumed — this amendment asserted a
   "committed `Cargo.lock`" one draft earlier and the tree did not have one.
-- **One clause of the failure message is deleted as false**: *"an empty
-  dependency set is also what gate-sdk/SPEC.md's vendoring model states the
-  payload rests on"*. The payload rests on a **prebuilt binary**; the crate is
-  never vendored and its build graph never reaches a consumer. That clause is one
-  of the instances of the conflation the operator corrected, and it is fixed
-  here rather than left because a test's message is read exactly when someone is
-  deciding whether to add a dependency.
+
+**The failure message's false clause is already gone.** An earlier draft of this
+delta scheduled *"an empty dependency set is also what gate-sdk/SPEC.md's
+vendoring model states the payload rests on"* for deletion here; that clause was
+corrected as debt at the same round-2 sweep that fixed the other conflation
+instances (`native/src/walk.rs`, commit `82e1d9f6`), and the message on the tree
+today carries no such text. There is nothing left for this delta to do to the
+message beyond the widening above and the rename below.
 
 ### 14. The toolchain floor is re-derived, never assumed to hold
 
@@ -415,10 +427,13 @@ stating it. **[mechanical]**
 The roster is six surfaces, swept rather than recalled, because a floor bump that
 misses one is a silent disagreement between what the tree requires and what it
 tells a contributor to install: `native/Cargo.toml`'s `rust-version`;
-`context-kit/lib/toolfloor.sh`'s `PROBE_SET`; context-kit/SPEC.md's prose
-documenting that floor; `docs/install.md`'s Requirements bullet;
+context-kit/SPEC.md's prose documenting that floor; `context-kit/lib/toolfloor.sh`'s
+`PROBE_SET`; `docs/install.md`'s Requirements bullet;
 `scripts/check-install-toolchain.sh`, the freshness gate holding the last two in
-parity; and the toolchain fixtures under `context-kit/index-tests/` and
+parity — measured against the tree: its own `# graph:` line and header both name
+`docs/install.md` and `context-kit/lib/toolfloor.sh` as the pair it holds, so
+context-kit/SPEC.md's prose is machine-checked by nothing and a floor bump must
+edit it by hand; and the toolchain fixtures under `context-kit/index-tests/` and
 `scripts/gate-tests/`, which **hardcode the value in their own cases** and would
 therefore keep passing against a stale one rather than catching the drift.
 
@@ -460,10 +475,12 @@ question, and the answer is recorded here so a later reader does not read
 `native/src/ere.rs` as a casualty of a premise that turned out false.
 **[design-bearing]**
 
-§The POSIX ERE matcher justifies the hand-roll partly on *"the crate vendors
-nothing — asserted rather than assumed, by the unit test that fails the build on
-a non-empty dependency list"*. That clause is **retired** by delta 2's
-correction. The engine stays anyway, on a ground the correction does not touch:
+§The POSIX ERE matcher **used to** justify the hand-roll partly on *"the crate
+vendors nothing — asserted rather than assumed, by the unit test that fails the
+build on a non-empty dependency list"*; that clause is **retired** by delta 2's
+correction and is already gone from the section's text, corrected as debt at the
+same round-2 sweep as delta 13's walk.rs message (commit `82e1d9f6`) rather than
+by this delta. The engine stays anyway, on a ground the correction does not touch:
 its contract is **POSIX leftmost-longest** span reporting, which is the semantics
 `awk`'s `RSTART`/`RLENGTH` gives and which the ecosystem's ordinary matchers do
 not — leftmost-first is the common default, and §The POSIX ERE matcher already
@@ -477,9 +494,13 @@ cohort performs in passing, and this amendment does **not** open it.
 
 **This amendment introduces one new interface (the pin-path layer), one new
 configuration surface (the context-kit library), one new build-graph dependency,
-and no new state, event, message or field.** A port re-implements existing rules
-on the compiled substrate; the descriptors, the dispatch seam, the manifest
-format and the parity harness exist and are unchanged.
+one new field (delta 13's allowlist entry, below), and no new state, event or
+message.** A port re-implements existing rules on the compiled substrate; the
+descriptors, the dispatch seam, the manifest format and the parity harness exist
+and are unchanged — which is also why the pins gate's finding record and the
+paths gate's checked count, both named below, are not counted as new: a
+pin-comparison mismatch and a checked-entry count are shapes the shell gates
+already emit, carried forward by the port rather than invented by it.
 
 - **The pin-path layer** (delta 2). Producer: the crate, compiled into the
   binary. Consumers: exactly two, both named — `native/src/gates/settings_pins.rs`
@@ -524,12 +545,15 @@ format and the parity harness exist and are unchanged.
   how blind the "largest takeable group is one" claim was, and the residual to
   know which value class is already thin.
 
-**Every new field has a named reader.** The dependency's `Value` carries no
-fields of ours; the pins gate's finding record (pin path, expected, actual) is
-read by the operator at exit 1 and by the fixture pair's `expect.txt`, and the
-paths gate's checked count is read by its `good/` expectation — which is the one
-that catches a predicate that vacuously matched nothing. The allowlist entries
-delta 13 adds carry one field each, the admitting clause, and its reader is the
+**Every field this cohort carries or adds has a named reader — the one it adds
+and the two it only carries forward.** The dependency's `Value` carries no
+fields of ours; the pins gate's finding record (pin path, expected, actual),
+carried forward from the shell gate rather than new, is read by the operator at
+exit 1 and by the fixture pair's `expect.txt`, and the paths gate's checked
+count, likewise carried forward, is read by its `good/` expectation — which is
+the one that catches a predicate that vacuously matched nothing. The allowlist
+entries delta 13 adds are this cohort's one new field each, the admitting
+clause, and its reader is the
 next session weighing a dependency.
 
 ### The narrowings, and each reader's red condition
@@ -618,9 +642,13 @@ so the readers are enumerated by **what makes each red**, never by subject.
 - **context-kit/SPEC.md §check-settings-pins** — owned by deltas 3, 4, 6. The
   grammar sentence (*"one `<jq path> = <expected JSON>` per line … the expected
   side is the exact `jq -c` rendering"*) is replaced by delta 3's path grammar
-  and delta 4's structural comparison; the absent-key disposition gains the
-  null-conflation rule; the fail-closed roster loses *"no `jq`"* and gains *a pin
-  outside the path grammar*.
+  and delta 4's structural comparison, which itself states delta 2's
+  numeric-equality clause (numbers compare by `f64`, everything else by
+  `Value`'s own equality) as part of what "structural" means, so the merge does
+  not strand that rule in a dependency-choice delta a reader of this section
+  would not think to open; the absent-key disposition gains the null-conflation
+  rule; the fail-closed roster loses *"no `jq`"* and gains *a pin outside the
+  path grammar*.
 - **context-kit/SPEC.md §check-settings-paths** — owned by deltas 5, 6. Its
   closing criterion-7 paragraph (*"`jq` is not on `GATE_SDK_PROGRAM_FLOOR`, so
   this gate fails port criterion 7 the day it lands and owes designed-away work
@@ -684,7 +712,8 @@ so the readers are enumerated by **what makes each red**, never by subject.
 - [ ] **The dependency cleared the bar and the machine holds it** — each crate in
       the resolved graph admitted under a named clause of delta 2; the walk.rs
       assertion widened to that allowlist over the **lock**, not the manifest,
-      renamed, and its false clause deleted; `native/Cargo.lock` tracked and its
+      and renamed (its message's false clause was already corrected as debt at
+      `82e1d9f6`, before this delta); `native/Cargo.lock` tracked and its
       `.gitignore` line removed in the same commit.
 - [ ] **The floor and the build costs are measured, not assumed** — the MSRV
       re-derived against the resolved graph and, if moved, moved on all six
