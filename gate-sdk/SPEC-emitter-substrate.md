@@ -86,9 +86,17 @@ Three properties follow and are stated so the following cohort inherits them:
   are repo-internal generators reached from documented regen commands and from their own
   comparators, both of which move in this unit; there is no third caller, and a compatibility
   arm would be a second spelling of exactly the thing being retired.
-- **The arm is the *only* public entry point; the emission itself is a library function.** Each
-  emitter lands as `pub fn emit(...) -> Result<String, …>` in its own module, with the `--emit-…`
-  arm a thin `println!` wrapper. §4 and §5 are why that split is not decoration.
+- **The arm is the only entry point *into the crate*; the emission itself is a library function.**
+  Each emitter lands as `pub fn emit(...) -> Result<String, …>` in its own module, with the
+  `--emit-…` arm a thin `println!` wrapper. §4 and §5 are why that split is not decoration.
+  **A documented regen command stands in front of the arm, and must**, because a non-gate arm
+  receives no configuration: the config bridge is built by `gate_command` for a `.gate`-declared
+  member alone, and `native/src/walk.rs`'s `kit_roots` is transported rather than re-derived by
+  standing crate invariant, so a bare binary invocation cannot resolve what the enforcement-map
+  emitter reads. The front-end is an arm on `gate-sdk/bin/run-gates.sh`, which already sources the
+  shell library and already owns bridged dispatch, so the emitter port adds no shell file and the
+  526 lines of emission logic still die. This is a *reachability* claim discharged, not a second
+  spelling: nothing else may enter the crate's emission path.
 
 **Why `--emit-<projection>` and not a single `--emit <projection>` taking an operand.** The
 operand form reads better and is refused: it puts the projection's identity in *data* rather than
@@ -96,6 +104,13 @@ in the arm, so a typo resolves at run time instead of at the match, and — deci
 a dispatch table for a set the crate otherwise keys by function name, which is the "no mapping
 table exists to drift" property `gates/mod.rs` states for the gate roster and there is no reason
 to abandon one arm-class over.
+
+**Both premises are about Rust, so this refusal governs the crate arm and nothing else.**
+`run-gates.sh` is already a dispatcher, already carries a dispatch table by nature, and has no
+checked match to protect, so neither premise transfers to it. The shell front-end therefore spells
+the projection however that script already spells dispatch, operand form included, while the crate
+arm stays `--emit-<projection>`. Recorded so a later reader does not read the two surfaces as
+governed by one rule.
 
 ### 3. The three emitters port, and `enforcement-map.sh`'s `jq` dependency dies with it
 
@@ -265,7 +280,9 @@ own record of that claim is the thing this delta makes true rather than a second
 
 **Nine documented commands and the prose around them name `bash <script> --emit`** —
 mechanical **[mechanical]**. No gate reads a regen command, so the roster is enumerated here
-rather than left to a grep under build pressure. The moving citations: `docs/site-architecture.md`
+rather than left to a grep under build pressure. **Each moves to the `run-gates.sh` front-end
+form, not to a bare binary invocation** — §2 is why — so a regen command stays runnable by hand in
+a fresh shell. The moving citations: `docs/site-architecture.md`
 §Generated projections (the three regen commands, the sentence stating that the rollup reads the
 two emitters live, and the ordering hazard that footprint regenerates *after* `git add`);
 each freshness gate's own failure text, which prints its regen command on red; `docs/value.md`,
@@ -288,7 +305,10 @@ case where that cost compounds.
 **Three `--emit-<projection>` arms (§2, §3).** *Producer:* `native/src/main.rs`'s top-level match,
 before the registry lookup. Its enabling configuration is nothing — the arms are compiled into the
 binary the payload already ships and the battery already dispatches to, so they are reachable on
-the ordinary path in every consumer, not only in tests. *Consumers, both named at named
+the ordinary path in every consumer, not only in tests. **That is a reachability claim and not a
+claim that an arm consumes no inputs**: an arm needing configuration receives it from the
+`run-gates.sh` front-end §2 puts in front of it, which is a *caller*, never an enabling condition a
+consumer has to satisfy. *Consumers, both named at named
 transitions:* (i) the **regen command** in `docs/site-architecture.md`, read by the session
 refreshing a stale projection, at the moment its freshness gate goes red; and (ii) **nothing
 else** — the comparators and the rollup deliberately do **not** consume the arms, they consume the
