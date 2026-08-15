@@ -12,6 +12,91 @@
 
 ## New Features
 
+- **freshness-emitter-port-cohort** [spec: SPEC-emitter-substrate.md] — the generated-projection
+  freshness family is six comparator+emitter pairs, and every emitter is still shell.
+  **WIDENED 3 → 6 at scope 2026-08-15, on a census filed to the survey record** (question: which
+  comparators and emitters are still shell; oracle `bash gate-sdk/bin/port-blockers.sh --group`).
+  The witness was re-run at spec — corpus clean since the recorded rev, oracle verdict unchanged —
+  so the census was cited rather than re-bought.
+  **SCOPED by operator ruling 2026-08-15 to the value-rollup triple**, which is tight rather than
+  merely adjacent: docs/site-architecture.md §Generated projections states `gen-value-rollup.sh`
+  reads the other two emitters **live**, so porting `enforcement-map.sh` (273),
+  `footprint.sh` (129) and `gen-value-rollup.sh` (124) together makes that join in-process — 526
+  lines, plus the two still-shell comparators over them. `gen-docs-mirror.sh`, `trajectory.sh`
+  and `roadmap.sh` stay on this entry for a following cohort, which is why the terminal move here
+  is the **demotion** branch and not a Done move: the deliverable is a six-member corpus and the
+  amendment delivers three.
+  **Selected over the tool's largest advisory group, and the adjudication is recorded because
+  gate-sdk/SPEC.md §The first cohort reserves it to the selecting session:** group 1 is largest at
+  9 but its key is `libs=fail_closed globs=-` with no shared glob walk and visibly divergent
+  member corpora — the null-key residue bucket, not a shared corpus derivation, so the size arm is
+  exhausted a fourth time. This unit rides the documented blocker-retiring override instead.
+  **The design question is ANSWERED at spec and the answer lives in the amendment**, not here: a
+  ported emitter is a non-gate arm of the binary, the class the substrate already runs six arms
+  under and had never named. That retires `check-roadmap-fresh`'s unruled-emitter-design hold on
+  `cohort-held-members-port-prerequisites`, which is what earns the override above.
+  **Cost while deferred:** six shell emitters keep bash in the dependency floor against
+  TRAJECTORY.md objectives 1 and 6, three of them behind already-compiled comparators.
+  Filed 2026-08-15 by close, draining two gap-inbox bullets filed at spec and at build for the
+  same finding; both stated DISTINCT from `consumer-gate-port-disposition`, which the eleventh
+  cohort retired, and the drain confirmed the distinction rather than inheriting it.
+
+- **waiting-rule-carrier-reach** [spec: SPEC-liveness-record.md] — a backgrounded shell producer
+  has no liveness record, and the one signal a supervisor trusts is silent about it.
+  recurrence: waiting-rule-carrier-reach 2026-08-11 2026-08-15
+  **The unit is the shell-child class alone**, by operator ruling 2026-08-15 on the recurrence
+  threshold this entry reached. The 2026-08-15 narrowing **stands unreversed**, and the reach-axis
+  re-scope was put to the operator as operator-class and **not taken**; evidence recorded here
+  stays inside the class.
+  **The founding instance.** A validate session backgrounded its own `run-validate.sh` and ended
+  the turn to wait on it; the observer died, the shell child survived orphaned and still writing,
+  and the harness fired a completion notification anyway — that notification means only "no live
+  `Agent` children" and is silent about a backgrounded shell child. Nothing was lost (the lead
+  read the process table and barred a second producer). Distinct because a shell child is not an
+  agent, so no agent definition governs it however many carry the clause.
+  **Firings five, seven and eight — ANSWERED.** Five was a carrier omitting the clause (scope's
+  `audit-sweep`); that gap is **closed**, re-verified 2026-08-15. Seven and eight had the rule
+  provably loaded and broke it anyway — the sibling prose-versus-enforcement framing
+  (`waiting-rule-fourth-firing-post-fix`), not reach. Firings nine to eleven were landed for the
+  next scope to weigh; they have been weighed, and the ruling above is the outcome.
+  **The design question is ANSWERED at spec and the answer lives in the amendment**, not here: the
+  awaited artifact is a launch-time liveness record the launcher writes, in the grammar
+  `check-producer-liveness` already reads, so the second reader costs nothing. Provenance seam
+  held: notification semantics are harness vocabulary, so the kit states the obligation and not
+  the mechanism.
+  **Cost while deferred:** a backgrounded producer under a session with no live lead is lost
+  silently — the founding instance cost nothing only because a lead happened to be watching.
+  Filed 2026-08-06 by close, draining the gap inbox and the lead's separately held incident.
+
+- **installer-jq-silent-degradation** [spec: SPEC-jq-floor.md] — the shipped installer refuses
+  without `jq`, and blames the artifact for a defect a missing program caused.
+  **THE FILED PREMISE WAS FALSIFIED AT SPEC, by probe rather than by reading.** This entry
+  asserted the installer "reads an empty version, an empty commit, and an empty prior-file and
+  artifact-lock set — and proceeds", failing *open*, of the `install-claim-contract` silent-revert
+  class. With `jq` masked off `PATH`: `installer/lib/init.sh:54`'s substitution exits 127,
+  `:56`'s `[[ -n "$VERSION" ]] || die` **fires and exits 2**, and lines 76-78 are never reached;
+  `lock.sh:14`'s `lock_schema_ok` ends with an explicit `|| return 1`, so `:64` dies too. The
+  installer **fails closed with a misdiagnosis** — it never proceeds and never writes.
+  **The corrected defect, and it is still a defect.** Three refusals blame the package and the
+  manifest for a missing program; the remedy appears in no message, no `help:` line, and not in
+  `installer/README.md` §Requirements. `installer/lib/doctor.sh:80` already gets it right, so the
+  idiom is in-tree and the unit generalizes it.
+  **`jq` is not in `GATE_SDK_PROGRAM_FLOOR`** (gate-sdk/lib/gate.sh), the set the payload is
+  entitled to assume present, and this sits on the **install path** — the surface TRAJECTORY.md's
+  objective 1 and the time-to-first-value argument are staked on.
+  **No test anywhere runs `jq`-free:** `installer/consumer-smoke/run-smoke.sh` requires `jq` in
+  its own preflight, so every arm — including both masked arms — runs with it present.
+  **DISTINCT from two live entries.** `guard-advise-jq-dependency` is guard-kit's `guard_advise`
+  losing an *advisory*; `stage-economics-smoke-jq-arm-dormant` is a smoke arm that never runs.
+  **Boundary with the port:** `install-step-relocation` owns moving these steps behind the
+  binary's invoke, and this unit neither discharges nor narrows it.
+  **RULED INTO THE `freshness-emitter-substrate` ITERATION by operator ruling 2026-08-15**, over
+  the scope session's own recommendation to leave it deferred, and **scoped to the cheap refusal
+  floor** — a refusal naming the missing program. That deliverable survives the correction
+  unchanged; what the correction reaches is the severity ground, escalated at spec rather than
+  absorbed.
+  Filed 2026-08-14 at scope, dispositioning a gap-inbox bullet the same session filed.
+
 ## Technical Debt
 
 ## Deferred
@@ -94,44 +179,6 @@
   order the launch readiness rule exists to avoid.
   Filed 2026-08-14 at scope, dispositioning the criterion-5 consequence of the same
   session's born-native ruling, under the gap-disposition rule.
-
-- **installer-jq-silent-degradation** [design-pending] — the shipped installer shells to a
-  non-floor program and reads empty values when it is missing.
-  **Measured at scope 2026-08-14 by reading the source, not inferred.**
-  `installer/lib/init.sh` calls `jq -r` at lines 54, 55, 76, 77 and 78, each with
-  `2>/dev/null`. On a machine without `jq` the installer therefore reads an empty version,
-  an empty commit, and an empty prior-file and artifact-lock set — and proceeds. The same
-  shape is in `installer/lib/diff.sh`, `doctor.sh`, `uninstall.sh` and
-  `installer/lib/common/lock.sh`.
-  **Why this is a floor violation and not a portability nicety.** `jq` is not in
-  `GATE_SDK_PROGRAM_FLOOR` (gate-sdk/lib/gate.sh), the set the payload is entitled to assume
-  present. TRAJECTORY.md's objective 1 collapses the consumer's runtime dependency set to
-  git alone, and this sits on the **install path**, which is the first thing an evaluator
-  runs and the surface the trajectory's time-to-first-value argument is staked on.
-  **The failure direction is the aggravating half.** It fails *open*. An empty prior-file
-  set makes `init` read a first-time install where an upgrade exists, which is the
-  `install-claim-contract` class of silent revert reached through a missing program instead
-  of a missing flag. A refusal naming the missing program would be strictly better and is
-  the cheap floor if the port is judged the expensive one.
-  **DISTINCT from two live entries.** `guard-advise-jq-dependency` is guard-kit's
-  `guard_advise` primitive losing an *advisory*; `stage-economics-smoke-jq-arm-dormant` is a
-  smoke arm that never runs. This is the shipped installer, and what is lost is a correct
-  install rather than a message. The three share a shape and no fix.
-  **Boundary with the port:** the ninth cohort's JSON reader is a *crate* module and does not
-  reach bash, so it does not close this. `install-step-relocation` is where the fix lands if
-  the answer is to move these steps behind the binary's invoke.
-  **RULED INTO THE `freshness-emitter-substrate` ITERATION by operator ruling 2026-08-15**, over
-  the scope session's own recommendation to leave it deferred; `spec` performs the queue promotion
-  when it authors the amendment. Ground taken: it qualifies unambiguously under the private
-  brief's arm 1, and the preview cohort is the population that certainly lacks `jq`.
-  **Scoped to the cheap refusal floor** this entry already names — a refusal naming the missing
-  program, over the failing-open reads in `installer/lib/init.sh`. The relocation answer is **not
-  this unit's to discharge** and stays where the pointer above already puts it.
-  **Cost while deferred:** every jq-less adopter is one wrong install away from the defect
-  class the release policy's narrow reading already declines to fire on, and the population
-  it would land on grows the moment the preview cohort — non-technical adopters, by the
-  readiness ruling — starts installing.
-  Filed 2026-08-14 at scope, dispositioning a gap-inbox bullet the same session filed.
 
 - **recurrence-drain-input-widening** [design-pending] — a recurrence with no bullet is uncounted.
   recurrence: recurrence-drain-input-widening 2026-08-09
@@ -2990,56 +3037,6 @@
   design fork rather than a build. The unit set is closed; this records the decline against the
   coupling and reopens nothing.
   Filed 2026-08-06 by close, recording this iteration's central incident.
-
-- **waiting-rule-carrier-reach** [design-pending] — the residency rule reaches the sessions
-  whose definitions name it, and both firings this iteration were outside that set.
-  recurrence: waiting-rule-carrier-reach 2026-08-11 2026-08-15
-  **Firings five, seven and eight — ANSWERED, compressed rather than dropped.** Five was a carrier
-  omitting the clause (scope's `audit-sweep`); that gap is **closed**, re-verified 2026-08-15.
-  Seven and eight had the rule provably loaded and broke it anyway — the sibling
-  prose-versus-enforcement framing (`waiting-rule-fourth-firing-post-fix`), not reach.
-  **Sixth firing — the shell-child class, and the one this entry now reduces to.** The validate
-  session backgrounded its own `run-validate.sh` and ended the turn to wait on it; the observer
-  died, the shell child survived orphaned and still writing, and the harness fired a completion
-  notification anyway — that notification means only "no live `Agent` children" and is silent
-  about a backgrounded shell child. Nothing was lost (the lead read the process table and barred
-  a second producer). Distinct because a shell child is not an agent, so no agent definition
-  governs it however many carry the clause, and the one signal a supervisor trusts is wrong.
-  **Why `[design-pending]`:** the two candidate homes trade off and neither covers both classes.
-  Per-type definitions are maintenance a newly added type silently opts out of; a standing clause
-  in the dispatch-prompt template reaches every type but only through prose a dispatcher must
-  remember to send. Neither answers the shell-child class, where the honest fix may be a liveness
-  read rather than a rule. Provenance seam: notification semantics are harness vocabulary, so a
-  kit states the obligation and not the mechanism.
-  **Cost while deferred:** every dispatch to a type whose definition omits the clause is
-  unprotected, and a backgrounded producer under a session with no live lead is lost
-  silently — the sixth firing cost nothing only because a lead happened to be watching.
-  **RULED INTO THE `freshness-emitter-substrate` ITERATION, NARROWLY, by operator ruling
-  2026-08-15**, on the recurrence threshold this entry reached — a threshold entry is
-  dispositioned rather than outranked in silence. `spec` performs the queue promotion when it
-  authors the amendment. The 2026-08-15 re-deferral this supersedes narrowed the entry and that
-  **narrowing stands unreversed**: its ground was that the corrected premise closes the founding
-  reach gap and the family resolves to one enforcement-shaped answer, shipped as
-  `poll-sleep-guard-steer`, `waiter-predicate-self-match`, `harness-wait-primitive-unnamed`. The
-  reach-axis re-scope was put to the operator as operator-class and **not taken**. So the unit is
-  the **shell-child class alone** — a liveness read on a backgrounded producer, which no agent
-  definition governs and no part of the enforcement half addressed — and evidence recorded here
-  stays inside that class.
-  **Ninth to eleventh firings, 2026-08-15 — the first evidence gathered AFTER both halves landed,
-  and it argues this entry back up.** Held by the lead as observation rather than as argument, in
-  the same iteration that shipped the doctrine and guard rules 12-13: (9) the attested build-batch
-  instance already recorded beside `waiter-predicate-self-match`; (10) a stage session dispatched
-  **after** the doctrine landed ended its turn to wait rather than waiting in-turn; (11) the same
-  session repeated it, launching a watcher to watch the first watcher, while carrying the
-  imperative in the agent definition it runs under.
-  **Why this is not more of seven and eight.** Those predate the enforcement half. These postdate
-  both halves, so the re-deferral's ground — that the family "resolves to one enforcement-shaped
-  answer" — is now testable, and for the agent-session class it reads as falsified: the
-  enforcement works and the doctrine is sound, and what fails is the rule reaching the session at
-  the moment it needs it. A twelfth, weaker instance from this close's own friction triage: 14
-  `cat >>` heredoc journal appends against a carrier that says the agent `Write`s the journal.
-  That evidence was landed for the next scope to weigh; it has been weighed — the ruling above.
-  Filed 2026-08-06 by close, draining the gap inbox and the lead's separately held incident.
 
 - **amendment-dod-sibling-dependence** [design-pending] — an amendment's DoD is written as if
   its unit were the iteration's only one.
@@ -5909,45 +5906,6 @@
   `audit-class-corpus-attestation` records. Paid at every close that reads the roster.
   Filed 2026-08-15 by close, on the lead's corpus ruling; scope-gated intake, so it is filed
   costed rather than swept by the session that received the ruling.
-
-- **freshness-emitter-port-cohort** [design-pending] — the generated-projection freshness family
-  is six comparator+emitter pairs, and every emitter is still shell.
-  **WIDENED 3 → 6 at scope 2026-08-15, on a census filed to the survey record** (question: which
-  comparators and emitters are still shell; oracle `bash gate-sdk/bin/port-blockers.sh --group`).
-  The three this entry was filed for — `scripts/gen-value-rollup.sh`,
-  `scripts/gen-docs-mirror.sh`, `drift-kit/bin/trajectory.sh` — have native comparators. The
-  census found three more pairs the entry never named: `gate-sdk/bin/enforcement-map.sh` and
-  `context-kit/bin/footprint.sh`, whose comparators `check-enforcement-fresh` and
-  `check-footprint-fresh` are **also still shell** and criteria-clearing, and
-  `queue-kit/bin/roadmap.sh`, whose comparator is the held member. Six emitters, 971 lines.
-  **SCOPED by operator ruling 2026-08-15 to the value-rollup triple**, which is tight rather than
-  merely adjacent: docs/site-architecture.md §Generated projections states `gen-value-rollup.sh`
-  reads the other two emitters **live**, so porting `enforcement-map.sh` (273),
-  `footprint.sh` (129) and `gen-value-rollup.sh` (124) together makes that join in-process — 526
-  lines, plus the two still-shell comparators over them. `gen-docs-mirror.sh`, `trajectory.sh`
-  and `roadmap.sh` stay on this entry for a following cohort.
-  **Selected over the tool's largest advisory group, and the adjudication is recorded because
-  gate-sdk/SPEC.md §The first cohort reserves it to the selecting session:** group 1 is largest at
-  9 but its key is `libs=fail_closed globs=-` with no shared glob walk and visibly divergent
-  member corpora — the null-key residue bucket, not a shared corpus derivation, so the size arm is
-  exhausted a fourth time. This unit rides the documented blocker-retiring override instead.
-  The eleventh cohort (gate-sdk/SPEC.md §The consumer remainder cohort) states the transferable
-  conclusion in its own words: the cheap cohort here is the **emitters**, not the gates, because a
-  ported byte-comparator spawning a shell emitter removes no shell. This entry banks it.
-  **Why `[design-pending]`:** an emitter is not a gate — it has no `.gate` descriptor, no
-  `good/`+`bad/` fixture pair, and no place in `gates.list`, so the shipped porting procedure
-  does not describe it and the substrate contract has no representation for a ported emitter.
-  Whether these become binary subcommands, stay shell behind a native comparator, or dissolve
-  into the comparator itself is the open call — **one ruling this unit owes, answered once and
-  applied six times.** It also discharges `check-roadmap-fresh`'s unresolved emitter design (three
-  candidates, none ruled), which is the same question one member over; that retires a hold on
-  `cohort-held-members-port-prerequisites` and is what earns this unit the blocker-retiring
-  override above.
-  **Cost while deferred:** six shell emitters keep bash in the dependency floor against
-  TRAJECTORY.md objectives 1 and 6, three of them behind already-compiled comparators.
-  Filed 2026-08-15 by close, draining two gap-inbox bullets filed at spec and at build for the
-  same finding; both stated DISTINCT from `consumer-gate-port-disposition`, which the eleventh
-  cohort retired, and the drain confirmed the distinction rather than inheriting it.
 
 - **consumer-guard-rule-verification-lane** [design-pending] — a consumer's own bash-guard rules
   have no verification lane anywhere in the tree.
