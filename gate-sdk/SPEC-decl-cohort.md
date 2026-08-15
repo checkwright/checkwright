@@ -105,7 +105,8 @@ ties on the path's byte order. A token outside that grammar is **exit 2** naming
 the token, the file or disposition line it came from, and the grammar.
 **[design-bearing]**
 
-**Operator-ruled 2026-08-15 at spec: ships as authored — option (a), the
+**Lead-ruled 2026-08-15 at align dispatch, from the governed surfaces
+(derivable, not operator-escalated): ships as authored — option (a), the
 refusal stands, and the ordering ruling stays deferred to the session that
 first cuts a prerelease.**
 
