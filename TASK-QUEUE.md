@@ -3056,7 +3056,7 @@
 
 - **waiting-rule-carrier-reach** [design-pending] — the residency rule reaches the sessions
   whose definitions name it, and both firings this iteration were outside that set.
-  recurrence: waiting-rule-carrier-reach 2026-08-11
+  recurrence: waiting-rule-carrier-reach 2026-08-11 2026-08-15
   **Fifth firing — a carrier that names the rule nowhere.** Scope's `audit-sweep` for the
   port-candidate census ended its turn on a live child fork with no census, and had to be
   resumed by message. The four firings `waiting-rule-fourth-firing-post-fix` records all ran
@@ -3100,7 +3100,7 @@
   **Eighth firing, 2026-08-11:** rule loaded, named and restated back — and broken anyway.
   **The ground this answers:** if reach is not the binding constraint, widening carriers — both
   candidate homes above — buys less than it appears to, and the two entries likely resolve to
-  one enforcement-shaped answer rather than two prose-shaped ones. Eight firings, the last two
+  one enforcement-shaped answer rather than two prose-shaped ones. Nine firings, the last three
   with the rule provably in context, is now the argument rather than a hypothesis.
   Filed 2026-08-06 by close, draining the gap inbox and the lead's separately held incident.
 
@@ -4535,17 +4535,17 @@
   by answering, evict to the icebox, or relocate grounds to a linked entry — the last
   **authorization-gated, not self-served**. So a session facing a full entry and holding a
   *mandatory* one-line write has no self-served move that preserves the record.
-  **Second instance of a class already recorded once:**
-  `deferred-release-declaration-accumulation` documents a 2026-08-09 deferral whose declarations
-  "could not land here at all", riding a disposition line instead — **"chosen by the cap rather
-  than by design"**.
-  **This close is the second, and it is sharper because the displaced write is obligatory.**
-  The gap-inbox drain (lifecycle-kit/SPEC.md §The committed gap inbox) *must* append a
-  `recurrence:` date in the same commit that truncates the inbox — that commit is the audit
-  artifact, so the write is not optional and is not deferrable. Measured at `465ea869`:
-  `spec-measured-count-gate` stood at **exactly 50 lines**, `waiting-rule-carrier-reach` at
-  **49**. The stamp is one line, so it alone put the first entry over cap and consumed the
-  second's whole headroom; each firing's own evidence went to the commit message instead.
+  recurrence: entry-cap-displaces-mandated-writes 2026-08-15
+  **Four firings on 2026-08-15 against a promotion threshold of 2** — an 11-line cull at scope
+  (both entries left at 49/50) and three over two build batches — plus a fifth to seat this line.
+  **First recorded instance:** `deferred-release-declaration-accumulation`'s 2026-08-09 deferral,
+  whose declarations "could not land here at all" and rode a disposition line instead — **"chosen
+  by the cap rather than by design"**.
+  **The obligatory-write instance is the sharp one.** The gap-inbox drain
+  (lifecycle-kit/SPEC.md §The committed gap inbox) *must* append a `recurrence:` date in the
+  commit that truncates the inbox — that commit is the audit artifact, so the write is neither
+  optional nor deferrable. At `465ea869` `spec-measured-count-gate` stood at exactly 50 and
+  `waiting-rule-carrier-reach` at 49; one stamp overran the first and spent the second's headroom.
   **The ordering is the defect, and a line count will not reconstruct it.** What got compressed
   was *peer-authored grounds*; what it made room for was a *mechanical, fixed-width stamp*. The
   cap cannot tell those apart, so under pressure it always spends argued content to seat
@@ -4626,6 +4626,11 @@
 
 - **entry-headroom-unexposed** [design-pending] — the cap is enforced by a gate and exposed by
   nothing, so every session sizing an edit hand-rolls the measurement it then trusts.
+  recurrence: entry-headroom-unexposed 2026-08-15
+  **2026-08-15, and the shape is exposure rather than the hand-rolled parse.** That close reached
+  for `--extent` (oracle-first, so defect 3 did not recur) and still had to read the cap literal
+  out of `queue-kit/lib/queue.sh` and subtract by hand, four times over one iteration — defect 1
+  in its milder form, and the last step no tool supplies is exactly the one still missing.
   `check-queue-entry-budget` computes each entry's line count in order to enforce
   `QUEUE_KIT_ENTRY_LINE_CAP` (default 50). Headroom is that computation one output away, so what
   is missing is **exposure, not capability** — and the gap is narrower still than that, because
@@ -5816,6 +5821,104 @@
   **Cost while deferred:** a friction tax that scales with how carefully a bullet is written,
   which taxes exactly the good filings.
   Filed 2026-08-14 by close, from the prompt-friction triage.
+
+- **bridged-knob-owner-for-consumer-gate** [design-pending] — the config bridge resolves a knob
+  by the knob's own name, so a consumer-declared ported gate that needs a consumer-owned knob
+  fails closed on every invocation with no library able to answer it.
+  **The mechanism, read at the drain rather than taken from the filing.**
+  `gate-sdk/lib/gate.sh`'s `_gate_knob_owning_kit` tries each `gate_kit_roots` basename,
+  upper-cased with hyphens to underscores, as a `<KIT>_` prefix on the knob, and falls back to
+  `gate_sdk_root`; `_gate_knob_value` then sources only that kit's `lib/*.sh` in a subshell. A
+  knob no kit's prefix claims therefore resolves to gate-sdk, whose library does not define it —
+  the bridge's first refusal, exit 2, on every invocation of that member.
+  **The filing's mechanism was wrong in a load-bearing way, and the correction narrows this.**
+  The bullet read it as "a gate in the consumer gates dir has no owning kit"; the gate's
+  *location* plays no part, and a consumer gate declaring `GATE_SDK_WORKFLOW_DIR` resolves
+  today. What is actually absent is the consumer's own config seam — the `gate-sdk-config.sh`
+  in the gates dir that `lib/gate.sh` auto-sources for layout knobs — from `_gate_knob_value`'s
+  search path. The gap is one missing source, not a missing owner.
+  **Visible today as an asymmetry rather than a red.** `native/src/gates/release_bump.rs` and
+  `native/src/gates/tightened_gates_note_parity.rs` each hardcode a workflow-dir const while
+  `gate-sdk/bin/upgrade-smoke.sh` resolves the same file through `GATE_SDK_WORKFLOW_DIR`. The
+  tenth cohort's three members declare no knobs, so nothing fails yet.
+  **DISTINCT from `consumer-gate-port-disposition`, which it cites rather than re-files.** That
+  entry owns the *declaration* question — the owner column and the conservation row, authored
+  this iteration — and this owns the *dispatch* question, which that amendment names and
+  deliberately leaves unanswered because no member of its first tranche declares a knob.
+  **Why `[design-pending]`:** three candidates trade off. Add the consumer config seam to the
+  resolver's search path (widest, but a consumer file's globals then enter the same subshell as
+  the kit libraries, which the per-knob subshell exists to keep apart). Require a ported consumer
+  gate to spell its knob with an existing kit's prefix (costs nothing to build, and makes a
+  consumer-owned knob wear a kit's name, a provenance-seam inversion). Or let the `.gate`
+  descriptor name its resolving library, which is precise and adds a descriptor field whose only
+  user would be this case.
+  **Cost while deferred:** paid in full by the first knob-declaring member of the remaining
+  consumer tranche, and paid as exit 2 on every invocation — a gate that cannot run rather than
+  one that answers wrongly, so it surfaces loudly rather than silently. Zero until then, which
+  is why it files rather than fixes: nothing is wrong in the tree today.
+  Filed 2026-08-15 by close, draining the gap inbox; mechanism re-derived against
+  `gate-sdk/lib/gate.sh` at the drain and the bullet's account corrected here.
+
+- **consumer-gate-roster-unread** [design-pending] — no roster reader covers a consumer-declared
+  gate, so one added to or deleted from the consumer gates dir drops out of nothing.
+  **Verified at the drain.** `check-readme-roster`'s corpus is `gate_kit_roots`, and it skips any
+  root carrying no `checks/` directory. The consumer gates dir is neither, so the ten
+  `check-*.sh` and three `.gate` members living there are named by no README roster in either
+  direction — the kit-README marker block that makes a kit's own roster falsifiable has no
+  counterpart for them.
+  **What does cover them, and why none of it is a roster.** They register in `gates.list`, each
+  carries a `# graph:` manifest, and each owes a fixture pair. Every one of those is a
+  *mechanism* obligation discharged by a machine-readable artifact; none asserts that a
+  human-readable document names the gate, which is exactly what the marker block buys.
+  **Pre-existing rather than opened by the tenth cohort's port** — measured while surveying that
+  port's readers, and unchanged by it in either direction.
+  **DISTINCT from `consumer-gate-port-disposition`, which owns porting these gates and not their
+  documentation coverage.** Porting all thirteen would leave this exactly where it is: the corpus
+  predicate is the kit root, not the substrate, so a ported consumer gate is as unrostered as a
+  shell one.
+  **Why `[design-pending]`:** the roster's home is the open question, and it is a seam question.
+  A vendoring consumer has no kit README to hold the block and may have no README at all, so
+  widening `check-readme-roster`'s corpus to the gates dir needs a consumer-named document knob
+  — a kit gate acquiring a consumer-shaped surface. The alternative routes the coverage through
+  a *generated* projection instead: the enforcement map already enumerates every registered gate,
+  so a check over generated output would be freshness rather than parity, and derivation-first
+  reads that as the cheaper answer. Which is right turns on whether the roster is meant to be
+  *authored* — a claim a human can get wrong, and so worth gating — or merely *available*.
+  **Cost while deferred:** a consumer gate can be added or removed with no prose anywhere
+  noticing, so "what does this repo enforce beyond its kits" is answerable only by listing a
+  directory. Paid by every reader who asks it, and paid silently — there is no red.
+  Filed 2026-08-15 by close, draining the gap inbox.
+
+- **declaration-lib-refusal-output-leak** [design-pending] — both declaration-library token
+  walkers emit resolved tokens onto the same stream as their refusal, so a container mixing a
+  readable and an unreadable bullet reports the readable one as unreadable.
+  **Verified at the drain, in both holders.** In `gate-sdk/lib/declaration.sh`,
+  `decl_section_tokens` prints each good token as it walks, then appends the offending lines and
+  returns 1; `decl_record_tokens` has the identical shape. One stream carries two meanings and
+  the caller cannot tell which line is which.
+  **Consequence, and why nothing is red.** `check-tightened-gates-grammar`'s finding list names
+  a readable bullet as having an unreadable lead token, and
+  `check-tightened-gates-note-parity`'s exit-2 diagnostic carries the same pollution. **Verdicts
+  are unaffected** — a clean container still resolves clean and a polluted one still refuses —
+  so the defect lives entirely in the text a reader is sent to act on.
+  **Preserved rather than repaired at the tenth cohort's port, deliberately.** Delta 4 of that
+  amendment rules that a port proves parity and does not fix rules, so
+  `native/src/declaration.rs` reproduces the leak faithfully and
+  `gate-sdk/gate-tests/declaration-lib-parity.test.sh` holds both holders to it. The doctrine
+  deferred the repair out of the port; it did not schedule it.
+  **The repair is known and cannot be one-sided:** buffer the resolved tokens until the loop
+  ends and emit them only on success, **in both holders in one unit**, or the parity test reds.
+  It rides a binary rebuild and whatever the two gates' fixture pairs assert about their output.
+  **Why `[design-pending]` rather than a ready task:** the repair *site* is genuinely open.
+  Buffering in the library changes a shipped output contract on two substrates at once; filtering
+  at the two readers changes one substrate and leaves the library's stream ambiguous for the next
+  caller. The first is correct and wider, the second smaller and defers the ambiguity.
+  **Cost while deferred:** paid only when a mixed container actually refuses — a rare shape,
+  since the declaration file is machine-appended — and paid as a reader sent to the wrong line by
+  the one output whose job is to say where the defect is. Low, and non-rotting in content; but it
+  does not decay either, because the parity test now pins the defect across both substrates.
+  Filed 2026-08-15 by close, draining the gap inbox; not fixed inline because the change is
+  shipped-output work across two substrates, which scope-gated intake files rather than starts.
 
 ## Icebox
 
