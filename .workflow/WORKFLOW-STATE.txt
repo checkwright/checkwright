@@ -10,3 +10,4 @@ consumer-cohort-completion-and-wait-enforcement align a8d63822 2026-08-15
 consumer-cohort-completion-and-wait-enforcement build ad81007f 2026-08-15
 consumer-cohort-completion-and-wait-enforcement build a70ff354 2026-08-15
 consumer-cohort-completion-and-wait-enforcement validate ad031b72 2026-08-15
+consumer-cohort-completion-and-wait-enforcement close a897247c 2026-08-15
