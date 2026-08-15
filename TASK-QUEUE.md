@@ -51,6 +51,8 @@
   which §The first cohort reserves to it. Criterion 6 carried forward so `spec` does not
   re-derive it: `gate-sdk/bin/upgrade-smoke.sh` keeps `lib/declaration.sh` **dual** — the
   `spec_manifest_files` disposition, never the seventh cohort's delete-the-shell-form outcome.
+  Seam ruled clean: the library parameterises its section name, its token grammar is generic, and
+  the section names are published — grammar crosses into the crate, vocabulary does not.
   Every held member is **sequencing with port work owed, never exclusion**, and what each owes
   is on `cohort-held-members-port-prerequisites`, which owns the roster and the kits it spans;
   a kit count copied here would be a second one to drift, and was.
