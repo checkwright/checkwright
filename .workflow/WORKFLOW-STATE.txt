@@ -10,3 +10,4 @@ declaration-cohort-and-consumer-first-mover align a2b245b1 2026-08-15
 declaration-cohort-and-consumer-first-mover build aad0f680 2026-08-15
 declaration-cohort-and-consumer-first-mover build a08c7ac9 2026-08-15
 declaration-cohort-and-consumer-first-mover validate af20fc68 2026-08-15
+declaration-cohort-and-consumer-first-mover close a9eee1fa 2026-08-15
