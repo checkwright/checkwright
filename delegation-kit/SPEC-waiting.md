@@ -73,7 +73,7 @@ class of work has one at all** — design-bearing, because the second half is wh
 closes the attested failure rather than the first **[design-bearing]**.
 
 The artifact goes in **repo-local `.tmp/` in the main checkout** — the identical
-scoping the resume-journal rule already carries three bullets down (*never a
+scoping the resume-journal rule already carries seven bullets down (*never a
 temporary worktree, which is deleted with it; never a system temp dir, which a
 restart wipes*), widened from the journal to any artifact a session waits on. The
 widening is stated as a widening so the two do not drift into two rules.
@@ -226,7 +226,8 @@ consumer copies inside a unit about waiting.
 **The seam is read from the owner doc rather than from precedent, and the reading
 is recorded once for both rules.** CLAUDE.md §The provenance seam is a *privacy*
 boundary over **private rule content** — term lists, coupling vocabularies,
-glossary bodies, product constant sets — on the ground that a kit literal carrying
+glossary bodies, wire-contract couplings, product constant sets — on the ground
+that a kit literal carrying
 a private vocabulary publishes it. A harness tool name is public, documented,
 shared by every consumer of that harness, and publishes nothing; it is not private
 rule content and the seam does not reach it. What a kit literal naming one
@@ -249,8 +250,9 @@ enumerated here rather than left to a grep at build time. The references that mo
 inside `guard-kit/SPEC.md`, the mentions of rules 13 and 14 in rule 8's placement
 clause, rule 9's producer clause, rule 13's own two carve-outs, rule 14's ordering
 clause, rule 15's placement clause, rule 16's block-not-advise clause, the
-`GUARD_KIT_RO_BINS` and `GUARD_KIT_SETTINGS` knob entries in §Layout and
-configuration, and the *rules 8/13/14/16* and *rules 9, 10, 11, 13 and 16* rosters
+`GUARD_KIT_RO_BINS` knob entry in §Layout and configuration (its sibling
+`GUARD_KIT_SETTINGS` entry carries no rule-number citation and has nothing to
+move), and the *rules 8/13/14/16* and *rules 9, 10, 11, 13 and 16* rosters
 in §The guard framework; inside `guard-kit/lib/guard.sh`, the five `# spec:` lines
 naming rules 13 and 14 and the `guard_split_compound` header's *rules 8/13/14/16*.
 Rule 15's own note — that DOCTRINE.md is cited by **name** and not by number
@@ -264,10 +266,17 @@ a bare imperative** — mechanical **[mechanical]**. §Operative residency's
 restatement sanction names *Background + notification, never poll* explicitly, the
 template's own header says *when either rule changes here, propagate*, and the
 copies live in this consumer's `.claude/agents/stage-session.md` and
-`.claude/agents/audit-sweep.md`. Both carry the imperative half and both take
-delta 1's naming and delta 2's `.tmp/` clause. The restatement stays an imperative
-with an adjacent citation — it does not absorb delta 3's rejected-alternative
-reasoning, which is amendment-tier and stays behind the pointer.
+`.claude/agents/audit-sweep.md`, and the two carry the rule unevenly today: the
+former cites *Background + notification, never poll* by name and restates its
+wait mechanics at length; the latter's current copy is three lines with no
+citation and no mention of a primitive or a home, framed narrowly around its own
+turn-end rule. Both must come to carry the imperative half **and** take delta 1's
+naming and delta 2's `.tmp/` clause — the target is symmetric even though the
+starting text is not, so the build edit is a genuine addition to
+`audit-sweep.md`, not a copy of `stage-session.md`'s paragraph. The restatement
+stays an imperative with an adjacent citation, sized to each file's own voice —
+it does not absorb delta 3's rejected-alternative reasoning, which is
+amendment-tier and stays behind the pointer.
 
 ### 9. Nothing in this unit claims the sleep half was already enforced
 

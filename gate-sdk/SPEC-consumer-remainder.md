@@ -418,9 +418,9 @@ short-circuited inside the binary.
   unqualified reading into a row recording that it is itself `.gate`-dispatched
   from this cohort, and that its `scripts/*.sh` coupling no longer covers any
   registry member's declaration path while `kit:*.sh` still does.
-- **§check-gate-substrate-parity** — assertion B's owner clause gains its first
-  *ten-member* exercise; the section records that the `-` sentinel and the
-  publishing-tree scope rule are now proved over the whole consumer gates
+- **§check-gate-substrate-parity** — delta 8. Assertion B's owner clause gains
+  its first *ten-member* exercise; the section records that the `-` sentinel and
+  the publishing-tree scope rule are now proved over the whole consumer gates
   directory rather than over three members. No assertion changes.
 - **§The declaration cohort** — the config-bridge question it named and
   deliberately did not answer is re-pointed (delta 6): it is owed by the first
@@ -434,8 +434,9 @@ short-circuited inside the binary.
   question criterion 7 does not reach* gains its worked instance: three members
   spawning unported emitters clear the criterion and are held by delta 3's
   accounting instead.
-- **docs/install.md** — the marked `ported-gate-members` literal moves 47 → 57,
-  and the surrounding sentence with it; the generated hook bakes the same value.
+- **docs/install.md** — delta 11. The marked `ported-gate-members` literal moves
+  47 → 57, and the surrounding sentence with it; the generated hook bakes the
+  same value.
 - **TASK-QUEUE.md** — `consumer-gate-port-disposition` moves to `## Done`
   (delta 13); `native-gate-port-remaining-corpus` records 57 of 104 ported and the
   eleventh cohort, and demotes as it always has.
