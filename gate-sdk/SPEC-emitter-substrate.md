@@ -135,11 +135,55 @@ transcription **[design-bearing]**.
 
 The evidence config that `enforcement-map.sh` reaches by `source` is the one input whose port is
 not mechanical: a sourced shell file is not readable by a Rust module without re-implementing
-shell assignment semantics. The design position is that it is read as the **declaration** grammar
-it actually is (a flat `KEY=value` set), and a value the flat reader cannot resolve is a
-**fail-closed refusal naming the key**, never a silent empty — the direction every other reader
-in this tree takes. If the file in practice carries shell the flat reader cannot take, that is a
-finding for the build session to file rather than to work around by keeping a shell hop.
+shell assignment semantics. **It is not a flat `KEY=value` file and cannot be read as one.**
+`scripts/evidence-config.sh` builds `EVIDENCE_KIT_SUITES` by iterating `gate_fixture_suites`,
+declaring one `EVIDENCE_KIT_RUN_<suite>` per row as it goes; that loop contributes eleven of the
+twenty-four suites, and the remaining thirteen are consumer declarations no derivation reaches. A
+flat reader therefore resolves neither half on its own, and the crate cannot recover the roster by
+deriving it either.
+
+**So the ported emitter receives its configuration rather than parsing it**, through the
+substrate's existing config bridge — the same transport every ported gate already rides, carrying
+values the shell library resolved by sourcing the owning kit's `lib/*.sh`, which sources the
+consumer config, which runs the loop. Nothing about the evidence config is special to the crate;
+it is simply not the emitter's job to interpret it. What this costs is one extension to the bridge
+protocol, §3a below, and no new `EVIDENCE_KIT_*` knob at all.
+
+**The three interests the flat-reader mechanism was carrying survive intact, and they are what
+this design is held to:** no subprocess spawned from inside the emitter — the failure §4 retires;
+**fail-closed rather than silent-empty** on a value that does not resolve, naming what did not;
+and **no shell interpreter reimplemented in Rust**, which receiving rather than parsing satisfies
+completely rather than approximately.
+
+### 3a. The config bridge gains a prefix-form knob declaration
+
+**A declared knob name may be a prefix, and the bridge resolves every variable matching it** —
+design-bearing, because it widens a protocol every ported gate rides **[design-bearing]**.
+
+`--knobs` publishes a **static** roster, so a member cannot name knobs whose names depend on
+another knob's *value* — which is exactly `EVIDENCE_KIT_RUN_<suite>`'s shape. The prefix form
+closes that, and the widening lands in gate-sdk's bridge rather than in evidence-kit's knob
+roster, which is why this is the shape the operator took: no consumer-facing contract gains a
+member.
+
+Three properties, each stated because leaving it to the implementation is how a protocol acquires
+an accidental contract:
+
+- **Ordering, anchored explicitly.** The bridge resolves a prefix against the variables defined at
+  the point `_gate_knob_value` has finished sourcing the owning kit's `lib/*.sh` — the same
+  instant a static knob's value is read, not some later one. "After the kit lib is sourced" means
+  after *that* source completes, which is what puts the consumer config's loop-declared variables
+  in scope, since the kit library is what sources the consumer config.
+- **Fail-closed, and distinct from a static knob's empty.** A static knob that resolves to the
+  empty string is a *resolved-empty set* and passes; a **prefix matching no variable at all** is a
+  refusal naming the prefix, because the member asked for a family and the family is absent — the
+  same distinction `walk.rs` already draws between an unset bridged knob and an empty one, applied
+  one level up.
+- **A prefix is a resolution set, never a roster.** It says *resolve values for these names*, never
+  *these are the members*. The roster comes from the roster knob: `suite_rows` iterates
+  `EVIDENCE_KIT_SUITES` and looks each name up. This is load-bearing rather than pedantic —
+  `EVIDENCE_KIT_RUN_ID` matches the prefix and is evidence-kit's run identifier, not a suite. A
+  reader treating the matched set as the roster would emit it as one.
 
 ### 4. The two comparators port, and they call the emitter in-process
 
@@ -293,8 +337,20 @@ touched, which is generated and must be regenerated rather than hand-edited.
 ## Producers and consumers
 
 **This amendment introduces one contract class, three non-gate arms, two registry gates, one
-shared library module and one transition-scoped parity arm. It introduces no new knob, no new
-tag, no new evidence surface, and no new committed file.**
+shared library module, one transition-scoped parity arm and one extension to the config-bridge
+protocol. It introduces no new tag, no new evidence surface, and no new committed file.**
+
+**The prefix-form knob declaration (§3a).** *Producer:* the config bridge — `gate_command` reading
+a member's `--knobs` output and `_gate_knob_value` resolving each name, both in
+`gate-sdk/lib/gate.sh`. Its enabling configuration is nothing: the bridge already runs for every
+`.gate`-dispatched member, and a member declaring no prefix is unaffected. *Consumer:* the ported
+`check-enforcement-fresh`, at every battery run, reading the resolved `EVIDENCE_KIT_RUN_<suite>`
+family to attribute each validate suite to its enforcing kit. **Its fields have named readers:**
+the resolved values are read by the emitter's suite rows at render, and the *set* of matched names
+is read by nothing — deliberately, per §3a's third property, since the roster comes from
+`EVIDENCE_KIT_SUITES`. **This introduces no `EVIDENCE_KIT_*` knob**, which is the whole reason the
+widening lands here: evidence-kit's consumer-facing roster is untouched, and the added contract is
+gate-sdk's own transport.
 
 **The non-gate arm class (§1).** *Producer:* this amendment, landing in gate-sdk/SPEC.md.
 *Consumer:* the session porting a non-gate thing to the binary — a human or agent reader, never a
@@ -378,6 +434,12 @@ inspection.
   criterion-7 external-program dependency is retired by the port rather than waived, and the
   section records it as an instance of the directive's *the technical problems those criteria name
   are engineering work the port owes, not exclusions it may take*.
+- **gate-sdk/SPEC.md §lib/gate.sh** — §3a, the bridge-protocol extension, and the reason this
+  amendment's component footprint reaches gate-sdk's transport at all. The section documents
+  `gate_command`'s argv resolution and `_gate_knob_value`'s per-knob resolution; both gain the
+  prefix form, with its ordering anchor, its fail-closed-on-no-match rule, and the statement that a
+  prefix is a resolution set and never a roster. The `--knobs` arm's own description gains the
+  prefix as a legal element of what a member may publish.
 - **gate-sdk/SPEC.md §lib/inject.sh** — §6. The section gains the Rust counterpart, the shared
   read half, the explicit statement that the shell library survives for its remaining shell
   callers, and the statement that the write half's absent-marker handling diverges from (tightens)
@@ -451,5 +513,9 @@ inspection.
       the retired "not one of them is ported" claim; nothing dangles.
 - [ ] **The terminal move is the demotion, not Done** — the queue entry returns to deferred under
       `[design-pending]`, keeping its `[roadmap:]` tag and its place in the public projection.
-- [ ] **Gaps filed** — anything the evidence-config flat reader could not take, and any following-
+- [ ] **The prefix form is held by a fixture pair** — §3a changes gate-sdk mechanism every ported
+      gate rides, so it lands under the four gate-sdk contracts like any other: a `good/`+`bad/`
+      pair driving a prefix that matches and a prefix that matches nothing, the second proving the
+      refusal rather than a resolved-empty pass.
+- [ ] **Gaps filed** — anything the evidence-config bridge read could not take, and any following-
       cohort obligation this unit discovered, filed rather than absorbed.
