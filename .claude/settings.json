@@ -124,6 +124,8 @@
       "Bash(mkdir -p *)",
       "Bash(echo *)",
       "Bash(printf *)",
+      "Bash(df *)",
+      "Bash(du *)",
       "Bash(wc *)",
       "Bash(head)",
       "Bash(head *)",
