@@ -3126,10 +3126,14 @@ never seed them, and no adopter has ever had them, so the cohort takes nothing
 from any consumer and the prediction was **zero** growth. N members each
 individually runnable is not a measurement, which is why the ground does not
 discharge the criterion; measured with `installer_smoke`'s binary-less leg from a
-clean checkout after this cohort's own commit, the omitted-and-declared count is
-recorded against the ninth and tenth cohorts' 12. The judgment was fixed in
-advance, and a non-zero would have been a finding about the measurement as much
-as about the cohort.
+clean checkout reached by path, after this cohort's own commit: **12 members
+omitted and declared**, the same figure the ninth and tenth cohorts measured, so
+growth is **zero** and the cohort lands on that finding. The judgment was fixed
+in advance, and a non-zero would have been a finding about the measurement as
+much as about the cohort — which is what makes the third identical reading worth
+recording rather than skipping. The consumer-declared ground is restated here
+rather than banked, because it is what makes the zero predictable rather than
+lucky: a residual counts what a consumer *loses*, and no consumer ever had these.
 
 ### What the reverted port established
 
