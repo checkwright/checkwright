@@ -137,7 +137,7 @@ Primitives a consumer guard composes; each emits the harness's
   the string matches a committed allow pattern, with the harness `:*` prefix
   idiom (`Bash(printf:*)` ≡ any `printf …`) normalized to a trailing `*`. Not a
   hook primitive — a shared helper, one implementation behind
-  compare-settings-allow's redundancy detection and rule 14's silent-grant
+  compare-settings-allow's redundancy detection and rule 16's silent-grant
   guard so the two never drift.
 - `guard_skeleton <cmd> <inert-class>…` — the context-aware normalizer, and the
   only place a rule learns what part of a command is live. It returns the command
@@ -156,7 +156,7 @@ Primitives a consumer guard composes; each emits the harness's
 - `guard_split_compound <skeleton>` — the compound splitter: emits one segment
   per line, splitting on the harness's statement separators (`;`, `&&`, `||`,
   `|`). Also not a hook primitive — the single implementation every consumer
-  that reasons *per segment* shares (rules 8/13/14/16, the read-compound
+  that reasons *per segment* shares (rules 8/12/15/16/18, the read-compound
   carve-out of rules 9/10, and scan-prompts' `allowed()`), so the harness's
   per-segment matching surface is modelled in exactly one place and cannot drift
   between them. Fed a `guard_skeleton` view, so a separator inside a quoted
@@ -190,12 +190,22 @@ stays live, which is the conservative direction. And the normalizer models **quo
 shell semantics**: a construct that survives its scan and is not one of the three
 classes is treated as live, the fail-toward-matching direction and the one a
 guard should err in. That bound is why the command/process-substitution and
-backtick tests in rules 9, 10, 11, 13 and 16 read the **raw** command rather than
+backtick tests in rules 9, 10, 11, 12, 13, 15 and 18 read the **raw** command
+rather than
 a skeleton and must keep doing so — a `"$(…)"` inside double quotes still
 executes, so a rule that declared `dq` inert for *that* test would hand an
 auto-allow to a command substitution it could not see. Those tests are
-conservative declines, not verdict matching; every rule that reaches a verdict
-reaches it off a skeleton.
+conservative declines, not verdict matching.
+
+**Rule 12 is the one rule that reaches its verdict off the raw command, and the
+exception is forced rather than chosen.** Its predicate is *the pattern literal
+`-f` will scan argv for*, and a skeleton replaces exactly that literal with a
+placeholder — the quoted operand is the normal spelling — so a skeleton view
+would blind the rule to the only thing it tests. It pays for the exception in the
+same conservative direction every other clause takes: it declines outright on any
+expansion, substitution or backtick (rule 6 blocks those shapes anyway), and a
+pattern operand carrying a stray quote — the evidence that the compound split
+landed *inside* a quoted span — declines rather than guesses at the operand.
 
 **The payload carries the live permission mode, and no accessor above reads it.**
 `PreToolUse` delivers `permission_mode` alongside the fields
@@ -260,11 +270,40 @@ and names none. What a project blocks or steers is its own toolchain knowledge
 and stays in its copy, which is why the copy legitimately diverges from the
 template here and why no rule content crosses into the kit.
 
+**Placement is a verification decision before it is a seam one, and this is the
+sentence that makes the contract usable.** The generic lane carries §Testing's
+decision-table obligation — every rule there owes a firing and a non-firing case,
+and the table is the only instrument that reads a *block* at all. The consumer
+lane carries none: a rule in a consumer's copy is reachable by no table in this
+kit, so it ships hand-verified and its narrowing cannot be measured. A rule that
+qualifies for either lane therefore belongs in the generic one. That a consumer's
+own rules have no verification lane at all is a real gap and a separate one; it
+is named here rather than solved, since solving it designs a testing lane for
+consumer copies.
+
 ## The generic ruleset
 
-Rules that encode **harness behavior**, not any project's toolchain —
-shipped as `lib/guard.sh` functions the template guard invokes. Order is
-load-bearing where noted.
+Rules that encode **harness or shell-substrate behavior**, never any project's
+toolchain — shipped as `lib/guard.sh` functions the template guard invokes. Order
+is load-bearing where noted.
+
+**The shell-substrate half of that clause was added for rule 12, and it admits
+nothing a project owns.** A `-f` pattern match seeing the matcher's own argv is a
+property of the shell substrate every consumer of this kit runs on — neither
+harness behavior nor any project's toolchain — so the narrower sentence left it
+in a gap it had no reason to leave. A project's toolchain stays out on the same
+words as before.
+
+**Naming one harness's forms in a corrective costs portability, not privacy, and
+the cost is recorded rather than pre-paid.** Rule 13's block message names a
+backgrounded condition wait and the harness's event-stream form, because a
+corrective that named neither would be unfollowable. A harness tool name is
+public, documented, and shared by every consumer of that harness, so it is not
+private rule content and the provenance seam — a privacy boundary over private
+vocabularies (CLAUDE.md §The provenance seam) — does not reach it. What such a
+literal does cost is portability: a second harness with different form names is
+what would force these into a configurable slot, and building that slot before
+that harness exists would be designing against no case.
 
 1. **`cd` in a compound command** — blocked: cwd drift, plus a compound the
    allowlist cannot match, so the call is decided out of band. Corrective form:
@@ -343,7 +382,7 @@ load-bearing where noted.
    so `-e`/`-f` consume their argument and the first bare operand is the script
    — a *second* bare operand is the file that fires the rule. **Placed before
    both auto-allow rules:** a consumer that widens `GUARD_KIT_RO_BINS` with
-   `sed` would otherwise have rule 13 silently grant an in-place rewrite.
+   `sed` would otherwise have rule 15 silently grant an in-place rewrite.
 9. **Listing-only `find`** — a bare `find` that only lists is blocked with
    the steer to the harness's Glob tool (the same shape as rule 8's `sed`
    read-steer: a better tool exists, and Glob returns paths registered for a
@@ -356,7 +395,7 @@ load-bearing where noted.
    batch of independent listings, exactly what the Glob steer collapses into one
    call. A literal `echo`/`printf` banner segment between them is the natural
    separator of such a batch and is tolerated; at least one segment must be a
-   listing. A piped `find` is a legitimate producer (rule 13 may still
+   listing. A piped `find` is a legitimate producer (rule 15 may still
    auto-allow it), an action-predicate `find` is an executor, a redirected
    `find` has a downstream reader, and a **mixed** compound (a segment that is
    neither a listing nor a banner) all pass untouched. **Placed before both
@@ -398,14 +437,74 @@ load-bearing where noted.
     this rule (the consumer disqualifies it). Conservative by construction: an
     unrecognized option-with-argument or a glued pattern flag biases toward
     passing, never a false steer of a history search.
-12. **Auto-allow `: > file` truncation** — a leading `:` plus redirect
+12. **Self-matching process-liveness predicate** — a `pgrep`/`pkill -f` whose
+    pattern literal the command's own text repeats is **blocked**. `-f` matches
+    against full argv, and the waiter's own argv — the harness's wrapper included
+    — carries that literal, so `until ! pgrep -f '<script>'; do …; done` has a
+    permanently-true condition and never exits. It reds nothing: the work
+    completes correctly and the only symptom is the foreground cap absorbing an
+    unbounded loop, which reads from outside as a fixed cap-length wait. Fires on
+    the conjunction no allowlist glob expresses: a segment whose **command word**
+    is `pgrep` or `pkill` — read past a leading `until`/`while`/`if`/`!`, which do
+    not change which binary runs, so the loop-headed spelling the rule exists for
+    is reached — carrying `-f` (bare or bundled in a short cluster), whose pattern
+    operand is a literal occurring **elsewhere** in the same command. The
+    corrective names both sanctioned forms: wait on the work's own artifact, or
+    `kill -0` against a **recorded PID** where liveness genuinely is the condition
+    (a producer this session did not start). A PID is an identity; a pattern is a
+    guess about a process table that includes the guesser. The refusal of the
+    bracket-trick repair as the *sanctioned* form is delegation-kit's ruling and
+    its grounds live there (delegation-kit/SPEC.md §The delegation model); this
+    rule exists because a correct form one character from an incorrect one will be
+    got wrong. Conservative by construction, in this ruleset's established
+    directions: an expansion or substitution anywhere in the command declines
+    outright (rule 6 already blocks those shapes); a `pgrep` without `-f` matches
+    process **names** rather than argv and is untouched; an unrecognized option, an
+    option whose argument cannot be walked, or a second bare operand declines; and
+    a pattern occurring nowhere else in the command is a genuine query and passes.
+    Each biases toward passing rather than toward a false block. **Placed with the
+    read-steer rules and before both auto-allow rules**, on rule 8's stated
+    reasoning: `pgrep` is a plausible member of a widened `GUARD_KIT_RO_BINS` — it
+    is, after all, a read-only query — and a consumer who added it would otherwise
+    have rule 15 silently bless a waiter that can never exit.
+13. **Bare foreground `sleep`** — a `sleep` standing in for a wait is
+    **blocked**, and the discriminator is the whole rule: a blanket `sleep` block
+    is wrong and is refused. The sanctioned wait *is* a condition loop, and
+    `until <cond>; do sleep N; done` is expressly legitimate. So the rule fires on
+    exactly one shape — a bare foreground `sleep` in command position, outside
+    every loop wrapper — and never on a `sleep` inside a loop body. *The
+    discriminator is new territory:* no other rule in this ruleset parses shell
+    keywords. This one takes the skeleton view (so a `sleep` merely *named* in a
+    quoted span or a heredoc body is already inert), then walks it for `do … done`
+    spans and treats a `sleep` inside one as **inert** — structurally the carve-out
+    `_guard_is_banner` already performs for `echo`/`printf` segments in the batched-read
+    rules, applied to a keyword span instead of a segment. A `sleep` outside every
+    such span fires. Where the wrapper cannot be resolved — an unbalanced `do`/`done`,
+    or a span the rule cannot attribute — it **declines**, the direction every
+    other conservative clause here takes; a `sleep` that is an *argument* rather
+    than a command word never fires at all. **Blocks** rather than advises, on
+    rule 16's reasoning: no consumer allowlist is presumed to grant a bare
+    `sleep`, so the rule fires on a command that would be decided out of band
+    anyway and converts that decision into a durable steer at no extra cost. *The
+    corrective names the property and both forms* rather than one spelling: a wait
+    must end when its condition goes true, not when a duration expires; a
+    backgrounded command that *exits* on the condition fires one notification the
+    moment the condition holds, while the harness's event-stream form stays armed
+    to its deadline even after its event fires and is therefore the wrong tool for
+    a single completion. Naming one form teaches a spelling; naming the property
+    and sorting both under it teaches the rule — the discriminator is owned by
+    delegation-kit/SPEC.md §The delegation model. **Placed with rule 12, before both
+    auto-allow rules,** for the same reason: `sleep` is not on the default
+    read-only roster, but the placement argument is about what a consumer may add
+    and the whole family of steer rules already sits there.
+14. **Auto-allow `: > file` truncation** — a leading `:` plus redirect
     defeats the permission matcher, so it is always decided out of band. Granted
     silently when the command is *only* `:` followed by redirects and every target is
     gitignored (`git check-ignore`): truncating scratch is safe; a tracked
     file must still take that decision. The `git` subprocess is gated behind the rare
     `:`-redirect match; expansions (rule 6) and brace forms (rule 7) are
     already blocked, so a surviving target is a literal path.
-13. **Auto-allow read-only pipeline** — granted silently when every pipe
+15. **Auto-allow read-only pipeline** — granted silently when every pipe
     segment leads with a roster binary (`GUARD_KIT_RO_BINS`, default the
     grep/head/cat/find/jq family) and every redirect target is `/dev/null`
     or an fd-dup. Declares `sq dq hd`. Conservative by construction:
@@ -433,7 +532,7 @@ load-bearing where noted.
       least one non-banner roster segment must remain, so a banner-only pipeline
       is not granted.
     - **The lead segment may instead be a bare committed allow entry** — an
-      exact `Bash(<cmd>)` with no glob, on rule 14's own reasoning that a
+      exact `Bash(<cmd>)` with no glob, on rule 16's own reasoning that a
       glob-headed family coexists with allowlisted decorators and would admit
       far more than the reviewed command. The shape this repairs is an
       allowlisted script piped into `head`: the lead is statically allowlisted,
@@ -447,7 +546,7 @@ load-bearing where noted.
       exactly as it behaves without it. A grant that depends on a settings read
       must never turn a missing settings file into a grant, and declining is the
       only direction that cannot.
-14. **Decorated allowlisted command** — the leading command exactly matches a
+16. **Decorated allowlisted command** — the leading command exactly matches a
     committed **bare** allow entry (a `Bash(<cmd>)` with no `:*`/`*` glob) but
     the command decorates it — `&&`/`;`/`|` chaining, a trailing redirect, or
     `2>&1` — which leaves a segment nothing grants, so the whole call falls off
@@ -467,17 +566,17 @@ load-bearing where noted.
     allow entry, reusing `guard_allow_match`'s shell-glob semantics. Reads
     `GUARD_KIT_SETTINGS`; **fail-open** — no `jq`, no settings file, or a
     parse error and the rule silently declines and falls through. Placed after
-    the auto-allow rules (12, 13) so a silently granted read-only pipeline never
-    reaches it — which is also **why the allowlisted-lead grant lives in rule 13
+    the auto-allow rules (14, 15) so a silently granted read-only pipeline never
+    reaches it — which is also **why the allowlisted-lead grant lives in rule 15
     and not here**. Grant, not fall-through, is what removes the friction of an
     allowlisted command decorated only by a read-only reduction of its own
     output, and this rule's own text refuses to grant, correctly: granting here
-    would bless segments the allowlist never reviewed. Rule 13 is already the
+    would bless segments the allowlist never reviewed. Rule 15 is already the
     sanctioned place for a grant of exactly that shape and is already ordered
     ahead of this rule, so a granted pipeline never arrives and nothing
     ungranted becomes granted that either half would not have granted alone.
     Declares `sq dq hd`.
-15. **Git history-rewrite advisory** — a `git commit` carrying `--amend`, `-F`,
+17. **Git history-rewrite advisory** — a `git commit` carrying `--amend`, `-F`,
     or `--file`, or a `git reset --soft`, gets a `guard_advise` steer carrying
     the checklist from DOCTRINE.md's *Re-verify volatile state before a git
     history rewrite* rule (verify HEAD before amend/squash; re-stage and verify
@@ -485,20 +584,22 @@ load-bearing where noted.
     this turn). Advisory, not a block: each is a legitimate command, so the rule
     injects the re-verification context and lets the command proceed. The
     DOCTRINE.md rule is cited by **name**, not number — the doctrine's craft
-    rules renumber as it grows, and this ruleset carries its own rule 15, so a
-    doc-qualified number would both rot on a renumber and read ambiguously
+    rules renumber as it grows, and this ruleset renumbers on its own account
+    too — this rule's own number moved when rules 12 and 13 were inserted ahead
+    of it — so a
+    doc-qualified number would rot on either renumber and read ambiguously
     against the local numbering. Placed
-    after the auto-allow rules (12, 13) and the decorated-allowlist rule (14),
+    after the auto-allow rules (14, 15) and the decorated-allowlist rule (16),
     so it fires only on a bare rewrite command none of those claimed; a
-    decorated form meets rule 14's block first and the advisory fires on the
+    decorated form meets rule 16's block first and the advisory fires on the
     re-issued bare command.
-16. **Bare `rm` of a tracked path** — an `rm` statement naming a git-tracked
+18. **Bare `rm` of a tracked path** — an `rm` statement naming a git-tracked
     file (`git ls-files --error-unmatch`) is **blocked** with the steer to
     `git rm -q <path>`, which deletes and stages that one deletion in a single
     motion. The deletion is the point: a bare `rm` leaves it unstaged, so it
     lands only via a later `git add -A` — the form the shared-index discipline
     warns against, since it sweeps a concurrent session's foreign path into the
-    commit. Block, not advise, on rule 14's reasoning: no consumer allowlist is
+    commit. Block, not advise, on rule 16's reasoning: no consumer allowlist is
     presumed to grant `rm`, so the rule fires on a command that would be decided
     out of band anyway and converts that decision into a durable steer. Fires per statement
     (`;`/`&&`/`||`/`|` split), so a decorated form steers on the same premise as
@@ -507,8 +608,15 @@ load-bearing where noted.
     tracked *directory* under `rm -r` does not match `--error-unmatch` — each
     biases toward passing rather than a false steer. An untracked or gitignored
     target never matches, so scratch deletion is untouched.
-17. **Fall-through logging** — anything neither blocked nor auto-allowed is
+19. **Fall-through logging** — anything neither blocked nor auto-allowed is
     appended to the friction log. Always last; never affects the decision.
+
+**Nothing above claims the sleep half was already enforced.** Before rule 13, no
+rule in this ruleset enforced the never-poll rule's `sleep` half and rule 13 is
+the first; whether a mechanism *outside* a consumer's tree blocks a foreground
+`sleep` is an open question, unprobed as to cause, and no clause here rests a
+coverage claim on one. The rule is built as though nothing outside the tree
+enforced it — the only construction that is correct whichever way that resolves.
 
 ### Consumer rules
 
@@ -625,7 +733,7 @@ close-stage audit. A committed pattern subsumes a local entry when the
 local string matches it under shell-glob semantics; the harness `:*` prefix
 idiom (`Bash(printf:*)` ≡ any `printf …`) is normalized to a trailing `*`
 so one glob test covers both forms — the match core is `guard_allow_match`
-in `lib/guard.sh`, shared with rule 14. Read-only — reports candidates, never
+in `lib/guard.sh`, shared with rule 16. Read-only — reports candidates, never
 mutates (the operator prunes). It is the detector, not the policy: a
 non-redundant local entry can still be one-off junk worth pruning by
 judgment.
@@ -795,9 +903,9 @@ repo's layout as defaults):
   consumer's vocabulary, never the kit's (CLAUDE.md §The provenance seam).
 - `GUARD_KIT_RO_SCRIPTS` — array of globs eligible for the
   absolute→relative rewrite (rule 4); default `("check-*.sh")`.
-- `GUARD_KIT_RO_BINS` — read-only pipeline roster (rule 13); default the
+- `GUARD_KIT_RO_BINS` — read-only pipeline roster (rule 15); default the
   grep/head/cat/find/jq family, plus `xargs`, whose membership is qualified by
-  rule 13's discriminator rather than granting on the leads-with test alone.
+  rule 15's discriminator rather than granting on the leads-with test alone.
 - `GUARD_KIT_SCRATCH_DIRS` — gitignored scratch dirs named in the
   rule-3 corrective message; default `(".tmp")`.
 

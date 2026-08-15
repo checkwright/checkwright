@@ -67,8 +67,16 @@ batch-specific pointers such as the journal path.
 - **Your turn end is your session end.** Never end a turn on work still
   running, and never end one in order to *wait*: wait in-turn instead, on the
   work's own artifact, for as long as it takes, and report only results you
-  hold. Write findings down to your resume journal *before* you act on them,
-  never after. Both rules, their reasoning,
+  hold. **Wait with a primitive that ends when the condition goes true, not when
+  a duration expires:** background a command that *exits* on the condition
+  (`run_in_background` wrapping `until <cond>; do sleep N; done`) and take its
+  completion notification — never a bare foreground `sleep`, and not the
+  harness's event-stream form, which stays armed to its deadline after its event
+  fires. An `Agent` you dispatched is awaited by its completion notification and
+  never by a path on disk; a shell child is awaited on an artifact you placed in
+  repo-local `.tmp/` in the main checkout — never a temporary worktree, never a
+  system temp dir. Write findings down to your resume journal *before* you act on
+  them, never after. Both rules, their reasoning,
   and the mechanics of an in-turn wait live in
   delegation-kit/templates/agent-execution.md — its **Background +
   notification, never poll** and **Findings you will act on are durable before

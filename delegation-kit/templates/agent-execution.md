@@ -41,10 +41,41 @@ drift: do not delete it on sight, and when either rule changes here, propagate.
   ending the turn to wait for the completion notification — that is the one act
   that revokes the channel, which is how a *careful* reader reaches this
   failure. Wait **in-turn on a condition** instead: loop on the work's own
-  artifact (evidence file, lock, exit marker) with the harness's waiting
-  primitive. Never-poll governs waiting on an `Agent`'s completion notification,
-  a channel a supervisor has; condition-waiting is the only one a dispatched
-  role has.
+  artifact (evidence file, lock, exit marker). Never-poll governs waiting on an
+  `Agent`'s completion notification, a channel a supervisor has;
+  condition-waiting is the only one a dispatched role has.
+  **Which primitive — the one whose wait ends when the condition goes true, not
+  when a duration expires.** The harness offers two forms with opposite
+  reactivity, and the difference is exactly the wall-clock property this rule
+  exists to buy. **Background a command that *exits* on the condition** — a
+  `run_in_background` shell command wrapping `until <cond>; do sleep N; done` —
+  and it fires one notification the moment the condition holds, then ends: that
+  is the sanctioned form. The harness's **event-stream form**, armed with a
+  command and a deadline, emits one event per occurrence and **stays armed to
+  its deadline even after the event fires**, so used for a single completion it
+  converts a wait that should end in seconds into one that ends at the timeout —
+  the wrong tool for a completion, and named here because a reader told only
+  about the first form reaches for this one the next time the shape looks close.
+  Never a bare foreground `sleep`, which ends on neither.
+  **What you wait *on* splits two ways, and the split is what makes the artifact
+  reachable.** An **`Agent` dispatch** is awaited by its **completion
+  notification** — that record is the harness's, not the session's — so never go
+  looking for it on disk. A **shell child** has no notification channel of its
+  own, so it is awaited on an artifact *the session placed*: put it where the
+  **Resume journal — agent writes, scratch reset sweeps** bullet below sends a
+  journal, repo-local gitignored scratch in the main checkout, on that bullet's
+  stated survivability grounds — widened here from the journal to any artifact a
+  session waits on.
+  **And wait on the artifact, not on process liveness.** `pgrep -f '<pattern>'`
+  matches the waiter's own argv — the harness's wrapper argv matches too — so
+  `until ! pgrep -f '<script>'; do …; done` can never go false and never exits,
+  reddening nothing while it burns the whole foreground cap. Where liveness
+  genuinely *is* the condition — a producer this session did not start — match a
+  **recorded PID** (`kill -0 "$pid"`), never a pattern: a PID is an identity, a
+  pattern is a guess about a process table that includes the guesser. The
+  bracket-trick repair (`pgrep -f '[r]un-smoke.sh'`) is **not** the sanctioned
+  form, and its grounds for being refused are
+  delegation-kit/SPEC.md §The delegation model's.
 - **Serialize on shared files; ≤`DELEGATION_KIT_FAN_WIDTH`-wide otherwise.**
   Agents that edit a shared file (see the roster below) run one at a time —
   dispatch, await notification, verify, dispatch the next. Independent

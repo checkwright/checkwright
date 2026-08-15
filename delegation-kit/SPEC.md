@@ -81,6 +81,59 @@ template names the channel a dispatched role *does* have: an in-turn wait on the
 work's own artifact. This is the case where the backgrounding rule and the
 liveness hazard meet and neither, alone, covered it.
 
+**Which primitive that in-turn wait uses, and the discriminator is a property
+rather than a name.** The template named *the harness's waiting primitive* in the
+singular while the harness offers two forms with opposite reactivity, so a
+session picking one unaided picked by shape. The rule now states the property a
+wait must have — **it ends when its condition goes true, not when a duration
+expires** — and sorts both forms under it: a backgrounded command that *exits* on
+the condition fires one notification at the moment the condition holds and then
+ends, while the event-stream form stays armed to its deadline even after its
+event fires, converting a seconds-long wait into a timeout-long one whenever it
+is used for a single completion. Naming one form teaches a spelling; naming the
+property and sorting both under it teaches the discriminator, which is what
+survives a harness that adds a third form.
+
+**Two waitable things, and only one of them has a path.** An `Agent` dispatch is
+awaited by its completion notification: that record is the harness's, and a
+session that goes looking for it on disk is the attested failure. A shell child
+has no notification channel of its own, so it is awaited on an artifact the
+session *placed* — which is why the artifact needs a stated home, and why that
+home is the resume journal's own scoping widened rather than a second rule. The
+failure had no third case, which is what makes the two-way split complete rather
+than merely convenient.
+
+**The guard interaction that produced it resolves without touching the guard.**
+The attested sequence: a session reached for the correct artifact wait, spelled
+it against the harness's own scratchpad path, and the consumer's bash guard
+refused it and steered to repo-local scratch. The guard was **right** and needed
+no change. What was missing is that the doctrine never said where an awaited
+artifact belongs, so the refusal read as a refusal of artifact-waiting itself and
+pushed the session onto the process-liveness form that then broke. With the split
+above, a session waiting on an `Agent` never reaches for a path at all, and a
+session waiting on a shell child has a path the guard already sanctions.
+
+**Process liveness is not the sanctioned predicate, and the repair a reader will
+propose is refused in writing.** `pgrep -f '<pattern>'` matches the waiter's own
+argv, and the harness's wrapper argv matches too, so
+`until ! pgrep -f '<script>'; do …; done` has a permanently-true condition and
+never exits. It does not depend on how the waiter is spelled and it reds nothing:
+the work completes correctly and the only symptom is the foreground cap absorbing
+an unbounded loop, which reads from outside as a fixed cap-length wait. Three
+repairs exist and only two are sanctioned. **The artifact wait** is the default.
+**A recorded PID** (`kill -0 "$pid"` against a PID captured when the session
+started the child) is sanctioned where liveness genuinely is the condition —
+waiting on a producer the session did not start — because a PID is an identity
+while a pattern is a guess about a process table that includes the guesser. **The
+bracket trick** (`pgrep -f '[r]un-smoke.sh'`) is refused *as the sanctioned
+form*, and refused here rather than passed over, because it is the first thing a
+reader reaches for and it *works*: what disqualifies it is not correctness but
+its failure mode — a spelling that must be remembered, whose omission is
+invisible at the call site and whose cost when omitted is silent and expensive. A
+rule whose correct form differs from its incorrect form by one character is a
+rule that will be got wrong, which is why the enforcement half is a guard rule
+over the shape (guard-kit/SPEC.md §The generic ruleset) rather than more prose.
+
 The template's **Findings you will act on are durable before you act on them**
 rule rests on a near-loss rather than a loss: a close stage dispatched two
 audit sweeps and then hit the session wall. Both had already returned, which
@@ -502,6 +555,22 @@ surface for the failure mode it does remove, and never a substitute for an
 oracle where one is buildable. In the attested instance what caught the
 consequence was the artifact-side oracle below, with the prose already in its
 strengthened form.
+
+**The propagate obligation has fired, and the record names what it cost.** The
+waiting rule changed — the primitive named by its reactivity property, the
+awaited artifact given a home — and the template's *when either rule changes
+here, propagate* header sent that change to both of its restatements in this
+consumer's `.claude/agents/` definitions: one a stage-session type, one a
+read-only sweep type. They did not carry the rule alike. One cited the bullet by
+name and restated its wait mechanics at length; the other carried a single
+turn-end line with no citation, no primitive and no home. **The target is
+symmetric even where the starting text is not**, so propagation into the second
+was a genuine addition sized to that file's own voice rather than a paste of the
+first's paragraph — and neither absorbed the rejected-alternative reasoning,
+which is (b)'s line and stays with this section's owner. Recorded because the
+sanction's cost is exactly this: every rule it licenses acquires N carriers that
+a later change must find, and a restatement that drifted *unevenly* is harder to
+spot than one that drifted at all.
 
 **No gate is owed, and not for budget.** No check can read a session's choice to
 end a turn — the act leaves no tracked artifact. The anti-restatement gates were

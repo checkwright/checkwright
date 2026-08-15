@@ -42,7 +42,21 @@ rule in delegation-kit/templates/agent-execution.md.
 
 Because the return is the contract, do not end your turn with work still in
 flight: a dispatched agent's turn end is its session end, so anything
-backgrounded past it dies unreported.
+backgrounded past it dies unreported. Never end a turn in order to *wait*
+either — that is the one act that revokes the channel you were waiting on.
+
+Wait in-turn instead, with a primitive that ends when the condition goes true
+rather than when a duration expires: background a command that *exits* on the
+condition (`run_in_background` wrapping `until <cond>; do sleep N; done`) and
+take its completion notification. Not a bare foreground `sleep`, which ends on a
+clock, and not the harness's event-stream form, which stays armed to its deadline
+even after its event fires. A sub-`Agent` is awaited by its completion
+notification and never by a path on disk; a shell child is awaited on an artifact
+you placed in repo-local `.tmp/` in the main checkout — never a temporary
+worktree, which is deleted with it, and never a system temp dir. Stating these
+here as imperatives is sanctioned by delegation-kit/SPEC.md §Operative residency;
+the rule, its reasoning and its mechanics are the **Background + notification,
+never poll** bullet in delegation-kit/templates/agent-execution.md.
 
 ## Tier
 

@@ -40,8 +40,8 @@ fallthrough	awk '$1' data.txt
 # cannot expand, and the shell is what guarantees that — so its body is inert
 block	cat <<EOF > .tmp/n.md@NL@value is $(date)@NL@EOF
 fallthrough	cat <<'EOF' > .tmp/n.md@NL@value is $(date)@NL@EOF
-# reaches rule 15's advisory, which is the correct verdict for a commit -F; the
-# point is that rule 6 no longer blocks it before rule 15 is ever consulted
+# reaches rule 17's advisory, which is the correct verdict for a commit -F; the
+# point is that rule 6 no longer blocks it before rule 17 is ever consulted
 advise	git commit -F - <<'MSG'@NL@names a $(cmd) in the body@NL@MSG
 
 # rule 7 — unquoted brace glyph: bare {} placeholder rewritten, expansions blocked.
@@ -99,11 +99,28 @@ block	git grep needle -- src
 fallthrough	git grep foo HEAD
 fallthrough	git grep --cached foo
 
-# rule 12 — `: > file` truncation auto-allowed iff every target is gitignored
+# rule 12 — self-matching process-liveness predicate: a `pgrep -f` pattern the
+#           command's own text repeats can never go false, since `-f` scans the
+#           waiter's own argv. A lone query, a `pgrep` without `-f`, and a pattern
+#           occurring nowhere else are genuine queries and pass.
+block	bash run-smoke.sh & until ! pgrep -f run-smoke.sh; do sleep 5; done
+block	pkill -f run-smoke.sh; bash run-smoke.sh
+fallthrough	pgrep -f run-smoke.sh
+fallthrough	pgrep run-smoke.sh; bash run-smoke.sh
+
+# rule 13 — bare foreground sleep steered to a condition wait. The non-firing
+#           cases are the load-bearing ones: a sleep inside an `until … do … done`
+#           loop *is* the sanctioned form, and a quoted mention is inert.
+block	sleep 30
+block	sleep 180; echo waited
+fallthrough	until grep -q DONE .tmp/smoke.log; do sleep 5; done
+fallthrough	printf 'sleep 5' >> .tmp/note.txt
+
+# rule 14 — `: > file` truncation auto-allowed iff every target is gitignored
 allow	: > scratch.txt
 fallthrough	: > tracked.txt
 
-# rule 13 — read-only pipeline auto-allow; a non-roster segment falls through
+# rule 15 — read-only pipeline auto-allow; a non-roster segment falls through
 allow	grep -rn foo src | head
 fallthrough	grep foo file | awk '{print}'
 # banner tolerance (rules 9 and 10's, third caller): a literal echo/printf
@@ -111,7 +128,7 @@ fallthrough	grep foo file | awk '{print}'
 allow	echo === | grep foo src
 fallthrough	echo a | echo b
 # widened lead: a bare committed allow entry may lead, since it was reviewed —
-# but only where something decorates it, so the undecorated form (rule 14's
+# but only where something decorates it, so the undecorated form (rule 16's
 # 'fallthrough git status' below) is still never intercepted here
 allow	git status | head
 allow	git status | head -20
@@ -128,7 +145,7 @@ fallthrough	grep -rln foo src | xargs sed -i s/a/b/
 block	ls | xargs chmod 777
 block	ls | xargs xargs rm
 
-# rule 14 — decorated allowlisted bare lead with an unmatched segment blocked;
+# rule 16 — decorated allowlisted bare lead with an unmatched segment blocked;
 #           chaining steer, redirect steer, and the untouched non-firing cases
 block	git status && rm -rf tmp
 block	git status 2>&1
@@ -137,7 +154,7 @@ fallthrough	frobnicate && git status
 fallthrough	git status && ls
 fallthrough	git status && printf done
 
-# rule 15 — git history-rewrite advisory: amend / commit -F / soft-reset steered;
+# rule 17 — git history-rewrite advisory: amend / commit -F / soft-reset steered;
 #           a plain commit and a non-soft reset pass
 advise	git commit --amend
 advise	git commit --amend --no-edit
@@ -146,7 +163,7 @@ advise	git reset --soft HEAD~1
 fallthrough	git commit -m done
 fallthrough	git reset --hard HEAD~1
 
-# rule 16 — bare rm of a tracked path steers to 'git rm -q'; untracked,
+# rule 18 — bare rm of a tracked path steers to 'git rm -q'; untracked,
 #           gitignored, and the already-correct git rm form pass
 block	rm tracked.md
 block	rm -f tracked.md
@@ -155,5 +172,5 @@ fallthrough	rm scratch.txt
 fallthrough	rm untracked-nowhere.md
 fallthrough	git rm -q tracked.md
 
-# rule 17 — anything else falls through to the friction log
+# rule 19 — anything else falls through to the friction log
 fallthrough	make build
