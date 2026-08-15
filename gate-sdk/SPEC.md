@@ -1028,6 +1028,47 @@ they record what the floor would have cost when it was rejected. A later session
 must not refresh them against the current battery — a recount is a step toward
 re-deciding, and only the operator reopens a closed ruling.
 
+### The non-gate arm
+
+The binary is a multi-call binary whose *gate* subcommands are dispatched by
+name out of `gates::REGISTRY`. It also carries arms that are **not** gates —
+`--list`, `--reads`, `--knobs`, `--source-stamp`, `--queue-parity` and
+`--declaration-parity` — and the class they form is named here because a
+session arriving with a new non-gate thing to port has no other way to learn
+that one exists or what it costs. Each arm's own `spec:` comment explains that
+arm's placement to whoever is already reading it; none of them can reach the
+session that has not started.
+
+A **non-gate arm** is specified by three properties:
+
+- **It is a top-level `--`-prefixed flag, resolved in `main` before the
+  registry lookup, and it is absent from `--list`.** The placement is
+  load-bearing rather than stylistic: §check-gate-substrate-parity assertion B
+  equates the `.gate` descriptor set with exactly the roster `--list` prints, so
+  an arm inside that roster would read as a subcommand nothing declares and red
+  the gate. Staying outside it is what keeps that equality true in both
+  directions.
+- **It owes no `.gate` descriptor, no `gates.list` registration, and no
+  `good/`+`bad/` fixture pair.** Those three are the *gate* contract and they
+  attach to a thing that returns a verdict a battery reads. An arm that returns
+  a document has no pass and no fail to fixture.
+- **It owes a named reader instead.** A gate's reader is the battery; a non-gate
+  arm has to name the caller that reads its output and the transition where it
+  is read, or it is dead weight. Every member above satisfies this —
+  `--source-stamp` is read by §check-gate-binary-fresh, `--queue-parity` and
+  `--declaration-parity` by their parity harnesses — and stating it is what
+  stops the class becoming a place to park unreachable code.
+
+**An arm receives no configuration, and a member needing some is reached
+through a caller.** The config bridge is built by `gate_command` (§lib/gate.sh)
+for a `.gate`-declared member alone, and `kit_roots` is transported rather than
+re-derived by standing crate invariant, so a bare invocation of an arm resolves
+only what the arm can compute for itself. This does not make the class unusable
+for a member with inputs: the arm stays the only entry point into the crate, and
+a front-end that already sources the shell library — the battery runner among
+them — supplies the bridged environment in front of it. What the class forbids
+is a *second* entry point into the emission path, not a caller.
+
 ### The port-candidate criteria
 
 **These seven are an engineering roster and an ordering signal, never an
@@ -5289,6 +5330,12 @@ steers the fixture pair onto hermetic copies of each surface. Six assertions.
   conservation section dispositions it `reference-only`, the one allowance and
   the reason it is recorded there rather than in the crate (§Meta-gate
   conservation for the binary substrate).
+  **This equality is why a non-gate arm sits outside `--list` rather than inside
+  it**, and the direction is worth stating forward: the binary carries arms that
+  return a document instead of a verdict, and an arm that joined the roster would
+  present here as a subcommand nothing declares. §The non-gate arm owns the class
+  and its three properties, so the next such arm is placed correctly rather than
+  discovering its placement from this assertion going red.
   **The roster half is scoped to what this tree declared, because the unscoped
   equality is unsatisfiable in any consumer that vendors a subset of the kits
   the shared binary carries** — which is every consumer once a second kit ports,
