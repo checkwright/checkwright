@@ -1668,7 +1668,7 @@
 - **stage-stamp-ordering-unenforced** [design-pending] — `check-stage-evidence`
   accepts a stage stamp that lands **after** commits already made under it, so
   the stamp proves invocation but not that it preceded the work it authorizes.
-  recurrence: stage-stamp-ordering-unenforced 2026-08-07
+  recurrence: stage-stamp-ordering-unenforced 2026-08-07 2026-08-16
   **Observed with the battery green throughout.** This iteration's build batch 1
   stamped `.workflow/WORKFLOW-STATE.txt` as its *third* commit, after two commits
   had already landed build-stage edits under that unstamped entry. Nothing caught
