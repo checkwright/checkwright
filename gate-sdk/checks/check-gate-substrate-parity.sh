@@ -51,6 +51,25 @@ crate_source_here() {
     [[ -d "$1" ]] || return 1
     [[ -n "$(git -C "$1" ls-files 2>/dev/null)" ]]
 }
+CRATE="$(gate_native_crate)"
+# spec: gate-sdk/SPEC.md §check-gate-substrate-parity — the publishing test is computed once and
+# read twice, by assertion B's consumer-declared scope clause and assertion F's missing-roster arm
+publishing_tree=0
+crate_source_here "$CRATE" && publishing_tree=1
+
+# spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion B's owner column: a kit
+# directory basename, or CONSUMER_OWNER for a member the consumer's own gates directory declares
+CONSUMER_OWNER='-'
+# spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion B's two-clause scope rule: a
+# kit-owned subcommand is in scope iff this tree vendored that kit, and a consumer-declared one
+# iff this is the tree that declared it, which is the tree carrying the crate's tracked source
+subcommand_in_scope() {
+    if [[ "$1" == "$CONSUMER_OWNER" ]]; then
+        [[ "$publishing_tree" == 1 ]]
+        return
+    fi
+    printf '%s\n' "${KIT_NAMES[@]+"${KIT_NAMES[@]}"}" | grep -qx -- "$1"
+}
 
 # assertion A: each member resolves to exactly one declaration — a dir carrying
 # both <name>.sh and <name>.gate is ambiguous dispatch, never resolved by order
@@ -121,12 +140,12 @@ if [[ -x "$BIN" ]]; then
         printf '%s\n' "${subcommands[@]}" | grep -qx -- "$g" \
             || findings+=("descriptor names no subcommand: $g.gate declares a gate the binary does not carry")
     done
-    # spec: gate-sdk/SPEC.md §check-gate-substrate-parity — the roster half speaks only for the
-    # kits this tree vendored: a subcommand whose owning kit is absent is neither dead code nor
-    # a half-finished port, it is out of scope, and it is counted rather than dropped silently
+    # spec: gate-sdk/SPEC.md §check-gate-substrate-parity — the roster half speaks only for what
+    # this tree declared: a subcommand from an unvendored kit, or consumer-declared elsewhere, is
+    # out of scope rather than stranded, and it is counted rather than dropped silently
     for i in "${!subcommands[@]}"; do
         s="${subcommands[$i]}"
-        if [[ "$owner_state" == scoped ]] && ! printf '%s\n' "${KIT_NAMES[@]+"${KIT_NAMES[@]}"}" | grep -qx -- "${owners[$i]}"; then
+        if [[ "$owner_state" == scoped ]] && ! subcommand_in_scope "${owners[$i]}"; then
             out_of_scope=$((out_of_scope + 1))
             continue
         fi
@@ -185,7 +204,6 @@ fi
 # assertion E: opacity is held by structure — a ported gate's implementation source
 # may not reach the vendoring set, whose members are exactly the kit roots
 # spec: gate-sdk/SPEC.md §Consumer payload
-CRATE="$(gate_native_crate)"
 declare -A DESCRIPTOR_SET=()
 for g in "${DESCRIPTORS[@]+"${DESCRIPTORS[@]}"}"; do DESCRIPTOR_SET["$g"]=1; done
 kit_scanned=0
@@ -229,7 +247,7 @@ if [[ -f "$ROSTER" ]]; then
         [[ "$t" =~ ^[A-Za-z0-9_]+(-[A-Za-z0-9_.]+){2,3}$ ]] \
             || findings+=("malformed target triple: '$t' in $ROSTER is not <arch>-<vendor>-<os>[-<env>]")
     done
-elif [[ "$dispatching" -gt 0 ]] && crate_source_here "$CRATE"; then
+elif [[ "$dispatching" -gt 0 && "$publishing_tree" == 1 ]]; then
     # spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion F rides the corrected
     # predicate *and* the publishing-tree test: declaring platform support is the act of the tree
     # that builds and publishes the artifact, and a consumer receives kit roots but never the crate
@@ -325,7 +343,7 @@ if [[ ${#findings[@]} -gt 0 ]]; then
 fi
 
 if [[ "$roster_read" == 1 ]]; then
-    roster="${#DESCRIPTORS[@]} descriptor(s) in parity with the ${#subcommands[@]}-subcommand roster ($in_scope in scope, $out_of_scope owned by a kit this tree did not vendor, owner column $owner_state), $refonly reference-only"
+    roster="${#DESCRIPTORS[@]} descriptor(s) in parity with the ${#subcommands[@]}-subcommand roster ($in_scope in scope, $out_of_scope out of scope — an unvendored kit, or a consumer declaration from another tree — owner column $owner_state), $refonly reference-only"
 else
     roster="${#DESCRIPTORS[@]} descriptor(s), no binary at $BIN so no subcommand roster to compare"
 fi

@@ -62,9 +62,13 @@
   direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope. Since then it is
   promoted at spec and demoted at build once per cohort, and the terminal move is a **demotion**.
 
-- **consumer-gate-port-disposition** [spec: SPEC-consumer-first-mover.md] — the
-  destination is ruled; what remains is the tranche that ports this repo's own 13 gates
-  into `native/`.
+## Technical Debt
+
+## Deferred
+
+- **consumer-gate-port-disposition** [design-pending] — the destination is ruled and the
+  first-mover design is merged; what remains is the tranche work porting this repo's own 13
+  gates into `native/`.
   **Operator-ruled 2026-08-14: PORT INTO `native/`.** The 13 gates declared under `scripts/`
   become subcommands of the existing multi-call binary. The seam fork this entry opened is
   **closed** — a later session does not re-litigate it, and the two refused alternatives (a
@@ -75,47 +79,42 @@
   are **100% unported** — no `.gate` beside any of them — against **60 unported of 104
   registered**, so they are 22% of what the port has left. Earlier figures (63 of 103, then 62
   of 104) each predate a cohort and are corrected here rather than annotated. They are
-  Checkwright's own rules about Checkwright's own tree: docs mirror,
-  nav and kit parity, install toolchain, installer dependency floor, npm publish spec, release
-  bump and channel parity, trajectory freshness, value rollup, tightened-gates grammar and
-  note parity, kit-ref liveness.
-  **What the ruling accepts, recorded so the tranche does not re-open it.** They sit in the
-  *consumer's own gates directory*, whose defining property gate-sdk/SPEC.md §upgrade-smoke
-  states: a gate living solely there "cannot appear in a vendored tree". Meanwhile
-  `scripts/pack-installer.sh` packs the prebuilt binaries built from the `native/` crate into
-  the payload (gate-sdk/SPEC.md §Consumer payload). So an adopter's binary carries subcommands
-  implementing another project's repo rules, which they can never register. That is the cost
-  the ruling took, against TRAJECTORY.md's objective 4; the tranche's design owns how the
-  unregistrable subcommands are declared, not whether they ship.
-  **Why nobody hit this before, which a later reader will not re-derive.** Checkwright is both
-  the kit publisher and a consumer of its own kits, and that dual role collapses the distinction
-  the question turned on: `native/` is both the crate this repo ports *into* and the crate
-  whose binary ships *out*. A single-role tree would have met the fork on its first consumer gate.
+  Checkwright's own rules about Checkwright's own tree: docs mirror, nav and kit parity, install
+  toolchain, installer dependency floor, npm publish spec, release bump and channel parity,
+  trajectory freshness, value rollup, tightened-gates grammar and note parity, kit-ref liveness.
+  **What the ruling accepts:** an adopter's binary carries subcommands implementing another
+  project's repo rules, which they can never register — the cost taken against TRAJECTORY.md's
+  objective 4. Its two grounds and their consequence now sit where the mechanism is,
+  gate-sdk/SPEC.md §check-gate-substrate-parity's adopter clause, rather than restated here.
+  **Why nobody hit this before:** Checkwright is both kit publisher and consumer of its own
+  kits, and `native/` is both the crate this repo ports *into* and the one whose binary ships
+  *out*; a single-role tree would have met the fork on its first consumer gate.
   **The cheapest single-gate first mover is named: `check-installer-no-deps`** — one gate over
   one small corpus (`installer/package.json`), excluded from the ninth cohort with cause (that
   cohort buys a JSON reader and membership beyond what proves the engine adds risk without
-  payoff), entering here with that reader already paid.
+  payoff), entering with that reader already paid. It was ruled *past* the 2026-08-15 tranche,
+  never rescinded, and stays available to any later cohort.
   **The first tranche is ruled 2026-08-15 at scope: the `lib/declaration.sh` release-note family**
   — `check-release-bump`, `check-tightened-gates-grammar`, `check-tightened-gates-note-parity`,
   3 of the 13; its members and grounds live with every other cohort's on
-  `native-gate-port-remaining-corpus`. **`check-installer-no-deps` was ruled *past* this
-  iteration, never rescinded** — it stays the named single-gate first mover above, available to
-  any later cohort; the ruling was cohort sizing inside this entry's envelope and leaves the
-  2026-08-14 destination untouched. **The first-mover design is `spec`'s, named so it is not
-  re-derived:** how `check-gate-substrate-parity` assertion B's owner column reads a
-  `scripts/<name>.gate` descriptor under a non-kit root (the crate unit test's
-  `<owner>/checks/<name>.gate` shape cannot hold there), and whether a consumer-declared member
-  earns a conservation row.
+  `native-gate-port-remaining-corpus`. That sizing was inside this entry's envelope and leaves
+  the 2026-08-14 destination untouched.
+  **The first-mover design is answered and merged into gate-sdk/SPEC.md, 2026-08-15 at build,
+  and a later tranche member inherits it rather than re-deriving it:** the owner column's
+  declaring-root domain and its `-` sentinel, assertion B's two-clause scope rule with both
+  directions proved by a run, and the owner unit test resolving by root shape
+  (§check-gate-substrate-parity); location as no term of the conservation derivation, re-derived
+  at each tranche's cut (§Meta-gate conservation for the binary substrate); and the recorded
+  verdicts of the three kit-root-scoped readers that do not reach a consumer-declared member.
+  The standing coverage question the third exposes — no roster reader covers any
+  consumer-declared gate — is filed to the gap inbox and is not this entry's.
   **Cost while deferred:** now bounded rather than open — no cohort stalls on an unanswered
   question, and what remains is ordinary port work whose ordering competes with every other
   member, while the largest single shell block keeps standing against objective 6.
   Filed 2026-08-14 at scope on operator direction under scope-gated intake with the seam ruling
   open; ruled and re-scoped 2026-08-14, first tranche ruled 2026-08-15, both at scope off a live
-  `port-blockers.sh --group` run.
-
-## Technical Debt
-
-## Deferred
+  `port-blockers.sh --group` run; design merged and demoted 2026-08-15 at build — a **demotion**
+  rather than a Done move, since the deliverable is 13 members and this tranche delivers 3.
 
 - **born-native-omission-accumulation** [design-pending] — the born-native flip attaches
   criterion 5's omission to every future gate, and nothing measures the pile.

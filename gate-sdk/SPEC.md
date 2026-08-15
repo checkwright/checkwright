@@ -51,7 +51,12 @@ override with `GATE_SDK_GATES_DIR`) holding:
   `msg-patterns.local.list` — its gitignored companion for private terms, which
   must never be tracked (tracking the banned terms would itself be the leak).
 
-Environment overrides, all optional: `GATE_SDK_GATES_DIR` (default `scripts`),
+Environment overrides, all optional: `GATE_SDK_GATES_DIR` (default `scripts`; the
+crate names no gates directory anywhere, the owner sentinel `-` standing in its
+place on `--list` — so a reader looking for where the binary learns this repo's
+layout finds the answer *nowhere* stated rather than merely absent, and the one
+place the crate resolves the directory at all is the owner unit test, through
+this knob's own resolver — §check-gate-substrate-parity),
 `GATE_SDK_TESTS_DIR` (default `<gates-dir>/gate-tests`), `GATE_SDK_HOOKS_DIR`
 (default `<gates-dir>/git-hooks`), `GATE_SDK_WORKFLOW_DIR` (default
 `.workflow`; the directory's two-tier membership rule, header form, and
@@ -809,7 +814,18 @@ path of a registry member** — the derivation `check-gate-substrate-parity`
 performs at runtime, so no count or roster here can rot. (The test is against
 registry members' declaration paths specifically, not against every `*.sh`
 under a resolve dir: `scripts/queue-config.sh` sits in the gates dir and is not
-a gate, and matching it would over-report.) Every derived member takes exactly
+a gate, and matching it would over-report.) **Where a declaration lives is not a
+term of that derivation**, on either side of it: a member the consumer's own
+gates directory declares earns a row on exactly the same terms as a kit-declared
+one, and a consumer-declared member's own declaration path counts as an object
+the couples may cover. Said in a sentence because the table below is entirely kit
+gates and the natural reading of that is a false exemption — an exemption whose
+cost is the silent end of whatever assertions a consumer-declared meta-gate
+makes, the one failure mode this section exists to prevent. A tranche porting
+consumer-declared members re-derives the set at its cut rather than inheriting a
+verdict, because a port *changes* a declaration path — `<gates-dir>/<name>.sh`
+becoming `<gates-dir>/<name>.gate` — which can move other members into or out of
+the derived set. Every derived member takes exactly
 one recorded disposition below, and a member the section does not name is red.
 
 **`check-crate-arms` couples the crate and is still outside that derivation**,
@@ -881,9 +897,19 @@ each one absorbs a single unmatched observed root, so a second undeclared walk s
 reds.
 
 **Where that verification runs, and where it does not.** Those unit tests are
-`cargo test` — and so is the third registry-data test, the one holding each
-member's declared owning kit to the descriptor that kit's `checks/` actually
-carries (§check-gate-substrate-parity, assertion B's owner column) — so they run
+`cargo test` — and so is the third registry-data test,
+`every_registry_member_declares_the_root_that_carries_its_descriptor`, which
+holds each member's declared root to the descriptor that root actually carries,
+over both root shapes (§check-gate-substrate-parity, assertion B's owner column);
+it is named *root* rather than *kit* because a test whose name says one shape
+while it asserts over two is a name that will be read instead of the body. For
+the sentinel it must know the consumer's gates directory, and it asks
+`gate_sdk_gates_dir` for it rather than carrying a copy of that layout: the crate
+holds no default for a knob the kit's shell library resolves, the same rule the
+`check-knob-default-coupling` row above states, and a gate **module** wanting the
+same value crosses the config bridge instead (§lib/gate.sh). Learning a layout
+inside a `cargo test` is sound **here and nowhere else**, and the bound is the
+next sentence rather than taste — these tests run
 in this repo and in CI and **never in a consumer tree**:
 `native/` ships no `checks/` and no `smoke/`, so it is not a kit root and no
 consumer ever receives the crate source — there is nothing there to run them
@@ -4750,16 +4776,54 @@ steers the fixture pair onto hermetic copies of each surface. Six assertions.
   conservation section dispositions it `reference-only`, the one allowance and
   the reason it is recorded there rather than in the crate (§Meta-gate
   conservation for the binary substrate).
-  **The roster half is scoped to the vendored kits, because the unscoped
+  **The roster half is scoped to what this tree declared, because the unscoped
   equality is unsatisfiable in any consumer that vendors a subset of the kits
   the shared binary carries** — which is every consumer once a second kit ports,
   so the gap grows by the size of each cohort rather than staying one kit's
-  problem. The rule: *for each subcommand, if its owning kit is present in
-  `gate_kit_roots`, a descriptor for it must exist*; a subcommand whose owning
-  kit is absent is **out of scope, counted, and declared on the clean line**. The
+  problem. The rule has one clause per value the owner column can take: *for a
+  kit-owned subcommand, a descriptor must exist iff its owning kit is present in
+  `gate_kit_roots`*; *for a **consumer-declared** subcommand — owner `-`, the
+  sentinel meaning the consumer's own gates directory declares it and no kit
+  ships it — a descriptor must exist iff the tree is a **publishing** tree*, the
+  predicate assertion F computes, reused rather than spelled a second time and
+  deliberately **source** rather than directory presence for the reason stated
+  there. A subcommand out of scope under either clause is **counted and declared
+  on the clean line**. The
   equality was always meant to catch a **stranded implementation** — a subcommand
   no descriptor dispatches to, dead code or the residue of a half-finished port —
-  and a subcommand belonging to a kit the consumer never took is neither.
+  and neither a subcommand belonging to a kit the consumer never took nor one
+  declared by a gates directory the consumer does not have is that.
+  **Both directions of the consumer clause carry weight, and neither is the
+  obvious one.** In the publishing tree the member must be **in** scope or the
+  assertion goes dark for every consumer-declared port: the tree carrying the
+  crate source is the tree whose registry decides which subcommands exist, so it
+  is the only tree where a stranded implementation can be created — a module and
+  a registry entry landed while the descriptor is forgotten — and nothing else
+  catches that, since the descriptor→subcommand direction is the other direction
+  and assertion A stays quiet while a half-finished port leaves the member
+  resolving to its surviving `.sh`. Ruling these members permanently out of scope
+  was weighed and refused on exactly that: it would buy simplicity by ending, for
+  every consumer-declared member, the one assertion this half exists for. In an
+  adopter the member must be **out** of scope or the equality is unsatisfiable:
+  §upgrade-smoke states the defining property of the consumer's own gates
+  directory — a gate living solely there cannot appear in a vendored tree — while
+  §Consumer payload has the payload carrying the prebuilt binary, so an adopter
+  holds the subcommand and can never hold a descriptor for it, which is neither
+  dead code nor a half-finished port.
+  **Unioning the gates-directory basename into the vendored-kit name set is
+  refused**, and recorded because it is the first thing a later session reaches
+  for. `GATE_SDK_GATES_DIR` defaults to `scripts` for every consumer (§Layout and
+  configuration), so under that union every adopter is in scope for every
+  consumer-declared member and reds with a finding it cannot discharge —
+  reinstating the unsatisfiable equality this scoping removed, and growing it by
+  the size of each tranche.
+  **Version skew across the sentinel is inherited rather than designed**, and is
+  stated because it is load-bearing. Against a gate predating the sentinel, `-`
+  is simply a value absent from the vendored-kit names, so the existing code
+  counts it out of scope and prints the count — the same disposition this rule
+  states, reached by the old code path. A newer binary in an older vendored tree
+  therefore does not red, and the bounded residual below is not widened by the
+  sentinel.
   Three properties are held deliberately. **The other direction stays
   unrestricted**: a descriptor the resolve dirs carry with no subcommand behind
   it is red whatever kit owns it, because a vendored descriptor is in scope by
@@ -4772,13 +4836,35 @@ steers the fixture pair onto hermetic copies of each surface. Six assertions.
   printed, so an emptied scope is visible rather than silent, in the shape the
   zero-descriptor clean line already uses.
   **The owner is registry data held to executed behavior, not a self-declaration.**
-  `--list` prints two tab-separated columns, `<subcommand>` and the owning kit's
-  directory basename as it appears under `gate_kit_roots`; the descriptor that
+  `--list` prints two tab-separated columns, `<subcommand>` and the **declaring
+  root**: the owning kit's directory basename as it appears under
+  `gate_kit_roots`, or `-` where the consumer's own gates directory declares the
+  member and no kit ships it. The descriptor that
   would otherwise answer this is precisely what a subset vendoring lacks. The
   declaration lives in the crate's dispatch registry beside each member's walk
   roots and knobs — an entry a member cannot compile without — the same shape
   `--reads` and `--knobs` have, and a crate unit test holds it to the tree: for
-  every registered subcommand, `<owner>/checks/<name>.gate` exists.
+  every registered subcommand the declared root carries its descriptor —
+  `<owner>/checks/<name>.gate` for a kit, `<gates-dir>/<name>.gate` for the
+  sentinel.
+  **A sentinel rather than the gates directory's basename, because a basename is
+  not an identity here.** `GATE_SDK_GATES_DIR` defaults to `scripts` for *every*
+  consumer, so the same string would name this repo's declaring root and every
+  adopter's — the column would report a value that cannot distinguish the tree
+  that owns the subcommand from the tree that merely received the binary, which
+  is the exact discrimination the scope rule needs it for. A crate literal
+  spelling one project's gates-directory name would also ship that project's
+  layout to everyone, which §Layout and configuration rules for the target roster
+  and CLAUDE.md §The provenance seam rules generally. The sentinel is
+  layout-independent and needs to be, and nothing on the reading side wants the
+  name: the gate resolves a consumer-declared descriptor through
+  `gate_sdk_gates_dir` and already globs that directory into its descriptor set.
+  **`-` rather than `?`, because the sibling arm has already spent `?` on the
+  other meaning.** `--reads` prints `?` for a root the gate's author *cannot
+  bound*, and its reader counts it as undecidable rather than trusting it as
+  empty (§Meta-gate conservation for the binary substrate). A consumer-declared
+  member's owning kit is not undecidable — it is decided, and there is none. Two
+  readings that far apart must not share a spelling.
   **An introspection arm is therefore a *flag* arm, and this assertion is why.**
   Something that needs to ask the binary a question directly — a cross-substrate
   parity harness reaching a primitive no gate exposes — cannot land as a new
@@ -4819,7 +4905,7 @@ steers the fixture pair onto hermetic copies of each surface. Six assertions.
   once here so the sibling cites rather than re-derives it:** *an assertion over a
   whole-roster fact states its scope in terms of what the tree vendored.* The two
   were weighed and deliberately **not** unified — they derive scope from different
-  inputs, this one from a subcommand's owning kit as the binary reports it, that
+  inputs, this one from a subcommand's declaring root as the binary reports it, that
   one from the vendored kits' `checks/` directories it already reads, so a shared
   rule would be parameterised over both and become a third thing to keep true. With the binary **load-bearing** and
   absent or non-executable the gate exits 2, never 0 — the §Fail-closed
@@ -4890,7 +4976,12 @@ steers the fixture pair onto hermetic copies of each surface. Six assertions.
   configuration sanctions a consumer's shell shadow of a ported gate. And an
   **extensionless** name is deliberately out of reach: a built artifact named
   after its gate is an artifact-placement question this section does not own, and
-  an assertion that reds on it would prejudge one. The honest residual, stated
+  an assertion that reds on it would prejudge one. **The sibling half's corpus is
+  the kit roots, so it does not reach a file dropped beside a
+  *consumer-declared* descriptor — and that is its scope rather than a hole**: the
+  half enforces §Consumer payload's ruling, whose subject is what a consumer
+  *receives*, and a file in this repo's own gates directory vendors nowhere. The
+  honest residual, stated
   rather than discovered: with no descriptors declared the sibling half scans
   nothing and says so in its clean line — an unported tree has no ported gate's
   source to misplace, and the crate half stays live throughout.
@@ -4951,7 +5042,8 @@ cohort's descriptors ship, where the fail-closed arm *and* assertion F's
 missing-roster arm must both stay quiet; and the near miss, **a registered member
 resolving to a descriptor with no binary**, which must still exit 2. The last two
 are the corrected predicate's own boundary, and a too-loose predicate passes the
-`good/` case and reds only there. Four further cases hold the vendor scope, and
+`good/` case and reds only there. Seven further cases hold the two scope clauses,
+and
 they are in the bespoke test rather than in a second consumer-smoke leg because
 that suite vendors, installs and drives a whole scratch tree and buying it twice
 to reach one assertion is the cost this split exists to avoid: **descriptors for
@@ -4959,9 +5051,18 @@ one kit and a binary reporting a second kit's subcommands too**, where the gate
 must run clean; **the near miss**, the same sandbox with the in-scope kit missing
 a descriptor, which must red; **the same subset roster from a one-column binary**,
 which must red as it does without the column, so the fallback is run rather
-than asserted; and **a vendored descriptor naming no subcommand under the scoped
+than asserted; **a vendored descriptor naming no subcommand under the scoped
 path**, because the obvious implementation restricts one loop and accidentally
-restricts both. That test is in the per-kit fixture-runner battery, so the subset
+restricts both; and three for the consumer clause, whose two directions are
+proved by a run rather than by inspection — **a consumer-declared subcommand in
+an adopter**, which must run clean with the member counted out of scope, the
+direction an adopter depends on and the one an over-tight predicate passes by
+accident; **the same roster in a publishing tree with no descriptor**, which must
+red; and **the same tree once the descriptor is placed in the gates directory**,
+which must clear, so the sentinel's declaring root is exercised rather than
+asserted. Each is a manufactured roster in a sandbox rather than a live tree, so
+none of them waits on a real consumer-declared port. That test is in the per-kit
+fixture-runner battery, so the subset
 configuration acquires a commit-time oracle at no measurable cost — it had none
 at commit time or in CI, which is how a standing red in it goes unnoticed across
 iterations.

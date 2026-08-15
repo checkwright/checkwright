@@ -54,10 +54,9 @@ pub type GateFn = fn(&[String]) -> i32;
 // spec: gate-sdk/SPEC.md §lib/gate.sh — the fourth element is the member's declared knob
 // reads, the data `--knobs` prints and the config bridge resolves. Un-omittable by the same
 // construction, so no member can read a knob the bridge was never asked to carry.
-// spec: gate-sdk/SPEC.md §check-gate-substrate-parity — the fifth element is the owning kit's
-// directory basename, `--list`'s second column, by which assertion B scopes its roster half to
-// the kits a consumer vendored. Un-omittable by the same construction, and held to the tree by
-// the unit test below rather than trusted as a self-declaration.
+// spec: gate-sdk/SPEC.md §check-gate-substrate-parity — the fifth element is the declaring
+// root, `--list`'s second column: a kit's directory basename, or `-` where the consumer's own
+// gates directory declares the member. Un-omittable, and held to the tree by the test below.
 pub type GateEntry = (
     &'static str,
     GateFn,
@@ -716,8 +715,8 @@ pub fn knobs(name: &str) -> Option<&'static [&'static str]> {
 }
 
 // spec: gate-sdk/SPEC.md §check-gate-substrate-parity — `--list`'s two columns, the second
-// naming the kit whose `checks/` declares the member. Emitted together because a consumer
-// reading the roster needs the owner to know whether it vendored the member at all.
+// naming the root whose declaration carries the member: a kit's `checks/`, or the consumer
+// sentinel. Emitted together because the reader needs the owner to scope the roster at all.
 pub fn names_with_owners() -> Vec<(&'static str, &'static str)> {
     REGISTRY.iter().map(|(n, _, _, _, o)| (*n, *o)).collect()
 }
@@ -768,14 +767,22 @@ mod tests {
     }
 
     // spec: gate-sdk/SPEC.md §check-gate-substrate-parity — the owner column is registry data
-    // held to executed behavior: a declared owner must be the kit whose `checks/` carries the
-    // descriptor.
+    // held to executed behavior: the declared root must carry the descriptor, over both root
+    // shapes, which is why the name says root rather than kit.
     #[test]
-    fn every_registry_member_declares_the_kit_that_carries_its_descriptor() {
+    fn every_registry_member_declares_the_root_that_carries_its_descriptor() {
         assert!(!REGISTRY.is_empty(), "no member to assert over");
         let repo = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("..");
+        let mut gates_dir: Option<String> = None;
         for (name, _, _, _, owner) in REGISTRY {
-            let declared = repo.join(owner).join("checks").join(format!("{}.gate", name));
+            let declared = if *owner == "-" {
+                let dir = gates_dir
+                    .get_or_insert_with(|| resolve_gates_dir(&repo))
+                    .clone();
+                repo.join(dir).join(format!("{}.gate", name))
+            } else {
+                repo.join(owner).join("checks").join(format!("{}.gate", name))
+            };
             assert!(
                 declared.is_file(),
                 "{} declares owner {}, but {} is not a file",
@@ -784,6 +791,33 @@ mod tests {
                 declared.display()
             );
         }
+    }
+
+    // spec: gate-sdk/SPEC.md §Meta-gate conservation for the binary substrate — the sentinel's
+    // declaring root is a layout, resolved by the one owner of that value so the crate carries
+    // no gates-directory default of its own.
+    fn resolve_gates_dir(repo: &std::path::Path) -> String {
+        let at = repo.display().to_string();
+        let completed = crate::proc::run(
+            "bash",
+            &[
+                "-c",
+                "cd \"$1\" || exit 2; . gate-sdk/lib/gate.sh; gate_sdk_gates_dir",
+                "bash",
+                &at,
+            ],
+        )
+        .expect("cannot run the shell library's gates-directory resolution");
+        let out = completed
+            .stdout()
+            .expect("gate-sdk/lib/gate.sh could not resolve the gates directory");
+        let dir = String::from_utf8_lossy(out).trim().to_string();
+        assert!(
+            !dir.is_empty(),
+            "the shell library resolved no gates directory — a sentinel member's descriptor \
+             would be looked for at the repo root"
+        );
+        dir
     }
 
     // spec: gate-sdk/SPEC.md §check-reads-couples — unit test A: the declared roots are

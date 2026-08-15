@@ -65,7 +65,7 @@ expect() {  # expect <label> <want-rc> <substring> <got-rc> <output>
 # a stranded implementation — the half a descriptor-count guard would blank out.
 printf 'check-alpha\n' > "$SANDBOX/scripts/gates.list"
 out="$(run ./stub-bin)"; rc=$?
-expect no-desc-binary 0 '0 descriptor(s) in parity with the 1-subcommand roster (1 in scope, 0 owned by a kit this tree did not vendor, owner column unavailable), 1 reference-only' "$rc" "$out"
+expect no-desc-binary 0 '0 descriptor(s) in parity with the 1-subcommand roster (1 in scope, 0 out of scope — an unvendored kit, or a consumer declaration from another tree — owner column unavailable), 1 reference-only' "$rc" "$out"
 
 # --- no descriptors, no binary: clean, and it says why the roster went unread ---
 out="$(run ./nonexistent-bin)"; rc=$?
@@ -96,7 +96,7 @@ expect registered-no-binary 2 'registered member(s) dispatch to it' "$rc" "$out"
 # must stay quiet: declaring platform support is the publishing tree's act, and a
 # consumer receives kit roots and an artifact but never the crate.
 out="$(run ./stub-bin-full)"; rc=$?
-expect consumer-with-binary 0 '2 descriptor(s) in parity with the 3-subcommand roster (3 in scope, 0 owned by a kit this tree did not vendor, owner column scoped), 1 reference-only' "$rc" "$out"
+expect consumer-with-binary 0 '2 descriptor(s) in parity with the 3-subcommand roster (3 in scope, 0 out of scope — an unvendored kit, or a consumer declaration from another tree — owner column scoped), 1 reference-only' "$rc" "$out"
 if grep -qF 'no target roster' <<<"$out"; then
     echo "  FAIL [consumer-with-binary-roster]: assertion F red in a tree that builds nothing: $out"
     fails=$((fails + 1))
@@ -153,7 +153,7 @@ run_subset() {  # run_subset <bin>
 }
 
 out="$(run_subset ./stub-bin-subset)"; rc=$?
-expect subset-vendoring 0 '1 descriptor(s) in parity with the 2-subcommand roster (1 in scope, 1 owned by a kit this tree did not vendor, owner column scoped), 0 reference-only' "$rc" "$out"
+expect subset-vendoring 0 '1 descriptor(s) in parity with the 2-subcommand roster (1 in scope, 1 out of scope — an unvendored kit, or a consumer declaration from another tree — owner column scoped), 0 reference-only' "$rc" "$out"
 
 # --- its near miss: the in-scope kit is the one missing a descriptor ---
 # The scoping must narrow what the assertion speaks for and nothing else. A rule that
@@ -166,6 +166,51 @@ expect subset-near-miss 1 "the binary carries 'check-orphan' with no check-orpha
 # which is exactly what this gate did before the column existed.
 out="$(run_subset ./stub-bin-subset-flat)"; rc=$?
 expect subset-fallback-reds 1 "the binary carries 'check-foreign' with no check-foreign.gate descriptor" "$rc" "$out"
+
+# --- the consumer sentinel in an adopter: out of scope, counted, clean ---
+# A subcommand the publisher's own gates directory declares. §upgrade-smoke's defining property
+# of that directory is that a gate living solely there cannot appear in a vendored tree, while
+# the payload ships the prebuilt binary — so an adopter holds the subcommand and can never hold a
+# descriptor for it. Scoping it in would reinstate the unsatisfiable equality the scope rule
+# removed. This is the direction an adopter depends on, and the one an over-tight predicate
+# passes by accident, so it is a run rather than an inspection.
+cat > "$SUB/stub-bin-consumer" <<'EOF'
+#!/usr/bin/env bash
+[[ "${1:-}" == --list ]] && { printf 'check-vendored\tkitroot\ncheck-consumer\t-\n'; exit 0; }
+exit 2
+EOF
+chmod +x "$SUB/stub-bin-consumer"
+out="$(run_subset ./stub-bin-consumer)"; rc=$?
+expect consumer-owner-adopter 0 '1 descriptor(s) in parity with the 2-subcommand roster (1 in scope, 1 out of scope — an unvendored kit, or a consumer declaration from another tree — owner column scoped), 0 reference-only' "$rc" "$out"
+
+# --- the same roster in the publishing tree: in scope, and red with no descriptor ---
+# The tree carrying the crate's tracked source is the tree whose registry decides which
+# subcommands exist, so it is the only one where a stranded implementation can be created — and
+# ruling these members permanently out of scope would end, for the whole consumer-declared
+# corpus, the one assertion assertion B exists for. The sandbox carries a target roster so
+# assertion F stays quiet and the finding under test is the only one.
+PUBC="$SANDBOX/pubc"
+mkdir -p "$PUBC/crate"
+cp -R "$SUB/scripts" "$SUB/kitroot" "$SUB/conservation.md" "$SUB/stub-bin-consumer" "$PUBC/"
+git -C "$PUBC" init -q
+printf 'fn main() {}\n' > "$PUBC/crate/main.src"
+printf 'x86_64-unknown-linux-gnu\n' > "$PUBC/crate/targets.list"
+git -C "$PUBC" add crate/main.src
+
+run_pubc() {
+    ( cd "$PUBC" && env GATE_SDK_KIT_DIRS=kitroot GATE_SDK_NATIVE_BIN=./stub-bin-consumer \
+        GATE_SDK_NATIVE_CRATE=crate GATE_SDK_NATIVE_SRC=impl \
+        "$GATE" scripts conservation.md 2>&1 )
+}
+
+out="$(run_pubc)"; rc=$?
+expect consumer-owner-publisher 1 "the binary carries 'check-consumer' with no check-consumer.gate descriptor" "$rc" "$out"
+
+# --- and what discharges it is a descriptor in the gates directory, not under a kit root ---
+# The declaring root a consumer-declared member resolves through, proved by the finding clearing.
+printf '%s\n' "$DESC" > "$PUBC/scripts/check-consumer.gate"
+out="$(run_pubc)"; rc=$?
+expect consumer-owner-declared 0 '2 descriptor(s) in parity with the 2-subcommand roster (2 in scope, 0 out of scope' "$rc" "$out"
 
 # --- the other direction stays unrestricted under the scoped path ---
 # The obvious implementation restricts one loop and accidentally restricts both. A
@@ -180,5 +225,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "check-gate-substrate-parity.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-gate-substrate-parity.test.sh: clean (descriptor configurations: none with a binary, none without, present-but-none-dispatching with neither binary nor roster, a registered dispatch with no binary, a consumer dispatching to a placed binary with no crate, the publishing counterpart that still reds, a subset vendoring whose binary carries a second kit's subcommand, its near miss where the in-scope kit is the one missing a descriptor, that same subset roster from a one-column binary, which still reds, and a vendored descriptor naming no subcommand under the scoped path — 12 assertions over 10 cases, two of them driving a single-column binary so the owner-column fallback is run rather than asserted)"
+echo "check-gate-substrate-parity.test.sh: clean (descriptor configurations: none with a binary, none without, present-but-none-dispatching with neither binary nor roster, a registered dispatch with no binary, a consumer dispatching to a placed binary with no crate, the publishing counterpart that still reds, a subset vendoring whose binary carries a second kit's subcommand, its near miss where the in-scope kit is the one missing a descriptor, that same subset roster from a one-column binary, which still reds, a consumer-declared subcommand out of scope in an adopter, its counterpart in scope in the publishing tree where it reds with no descriptor and clears with one under the gates directory, and a vendored descriptor naming no subcommand under the scoped path — 15 assertions over 13 cases, two of them driving a single-column binary so the owner-column fallback is run rather than asserted)"
 exit 0
