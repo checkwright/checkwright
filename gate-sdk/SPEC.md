@@ -5456,6 +5456,17 @@ untracked bakes a stamp computed without it; staging the file then moves the tre
 side and not the baked one, and the commit reds on a rebuild that has already
 run. A commit introducing a crate file stages first and builds second.
 
+**A partial-path commit cannot split a port, and it is the same `ls-files` read
+that says so.** `git commit -- <paths>` commits against a *temporary* index of
+`HEAD` plus the named paths, so the input set step 1 derives shrinks to that set:
+a commit naming only some of a cohort's crate files recomputes the tree-side
+stamp without the rest, and no binary built from the whole worktree can match it.
+Porting a cohort is therefore **atomic by construction** — the crate modules, the
+registry edit, the descriptors and the deleted shell gates land in one commit or
+this gate reds. That is a mechanism rather than a convention, so no sequencing
+rule has to carry it and no session has to remember it; what a session does need
+is to read it here instead of re-deriving it from two refused commits.
+
 **The two sides.** The producer is `native/build.rs`, which bakes the stamp in as
 a compile-time constant and is re-run by `cargo:rerun-if-changed=` on exactly the
 two events that can change it: each tracked input's own path, for a content edit;

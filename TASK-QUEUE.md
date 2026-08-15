@@ -2986,7 +2986,11 @@
 
 - **poll-sleep-guard-steer** [design-pending] — polling to wait is the one half of the
   never-poll rule that leaves a tracked artifact, and nothing reads it.
-  recurrence: poll-sleep-guard-steer 2026-08-14
+  recurrence: poll-sleep-guard-steer 2026-08-14 2026-08-15
+  **The 2026-08-15 firing, and its shape is the 2026-08-14 one exactly.** One bare foreground
+  `sleep` standing in for a wait on a long local job, again beside condition loops in the same
+  log that this entry expressly rules legitimate — so the detector it asks for would have
+  separated them on the first pass and did not exist to.
   **The 2026-08-14 firing, and its honest magnitude.** One instance, not sixteen: a build
   session ran `bash installer/consumer-smoke/run-smoke.sh` and then `sleep 180; echo waited`
   in the foreground. Unambiguously the finding — a foreground sleep standing in for a wait on
@@ -4627,10 +4631,10 @@
 - **entry-headroom-unexposed** [design-pending] — the cap is enforced by a gate and exposed by
   nothing, so every session sizing an edit hand-rolls the measurement it then trusts.
   recurrence: entry-headroom-unexposed 2026-08-15
-  **2026-08-15, and the shape is exposure rather than the hand-rolled parse.** That close reached
-  for `--extent` (oracle-first, so defect 3 did not recur) and still had to read the cap literal
-  out of `queue-kit/lib/queue.sh` and subtract by hand, four times over one iteration — defect 1
-  in its milder form, and the last step no tool supplies is exactly the one still missing.
+  **2026-08-15: defects 1 and 2 both recurred, 2 in its documented broken form.** Seven `python3`
+  heredocs across that iteration's scope and build sessions re-implemented the entry walk, several
+  terminating on the next `- **` — the predicate defect 3 below proves wrong at a section
+  boundary. Its close then read the cap literal out of the kit library and subtracted by hand.
   `check-queue-entry-budget` computes each entry's line count in order to enforce
   `QUEUE_KIT_ENTRY_LINE_CAP` (default 50). Headroom is that computation one output away, so what
   is missing is **exposure, not capability** — and the gap is narrower still than that, because
@@ -5800,6 +5804,10 @@
 - **gap-capture-argv-prompt-friction** [design-pending] — the mandated capture tools take their
   prose as an argv string, so every filing whose prose contains shell punctuation costs an
   out-of-band permission decision.
+  recurrence: gap-capture-argv-prompt-friction 2026-08-15
+  **Re-measured 2026-08-15: three prompting calls** (`file-survey.sh` twice, `file-gap.sh` once,
+  `kfric.sh` none), against six the iteration before. Halved, and the halving is not progress —
+  fewer captures were filed, and the per-filing tax is unchanged.
   **Diagnosed rather than allowlisted, per the triage criterion.** `bash
   lifecycle-kit/bin/file-gap.sh *` is **already** in the committed allowlist, alongside
   `file-survey.sh *` and `kfric.sh *` — so this is not missing coverage. The harness matcher
@@ -5821,6 +5829,41 @@
   **Cost while deferred:** a friction tax that scales with how carefully a bullet is written,
   which taxes exactly the good filings.
   Filed 2026-08-14 by close, from the prompt-friction triage.
+
+- **allowlist-path-existence-unchecked** [design-pending] — an allowlist entry naming a script
+  path that does not exist grants a call that can only ENOENT, and nothing detects it, so the
+  grant silently blesses the typo it encodes.
+  **Measured 2026-08-15: seven of this repo's 112 local-overlay `Bash(` entries named
+  nonexistent paths** — five under a `bin/` directory for tools that live under `checks/` or in a
+  different kit. Two sessions this iteration actually called one, `gate-sdk/bin/md-section.sh`,
+  whose real home is `context-kit/bin/md-section.sh` and is already committed-allowlisted; both
+  got ENOENT instead of the prompt that would have named the wrong path.
+  **Why the existing tool cannot see it.** `compare-settings-allow.sh` reports redundancy (a
+  committed glob already grants the entry) and breadth (a declared probe the glob auto-allows).
+  Both compare *globs against globs*; neither resolves a target. A dead entry is redundant with
+  nothing and broad over nothing, so it reports clean — and it reported clean on all seven.
+  **The failure mode is inverted, which is what earns this a check.** A missing grant costs one
+  prompt and teaches the session the right form. A grant for the *wrong* path costs no prompt
+  and teaches nothing: the session reads ENOENT as "the tool is gone" rather than "I named it
+  wrong", and the entry survives to mislead the next one. Friction is the correcting signal
+  here, and a dead grant suppresses precisely the signal that would have corrected it.
+  **Why `[design-pending]`:** the corpus is the open part, and it is a tracked-versus-local
+  question. The committed allowlist is tracked and gateable; the overlay is gitignored and
+  per-machine, so a *gate* over it would red on a state no commit can fix — the shape a
+  pre-commit gate must not have. Candidates: an advisory arm on `compare-settings-allow.sh`,
+  which already reads both files, is already advisory, and would cost no new surface and no
+  gate; a committed-only gate plus that advisory arm; or resolving only entries whose first
+  token is a known interpreter followed by a repo-relative path, which is the subset decidable
+  at all — a grant naming a system binary or a path outside the tree is not this check's
+  business. **The check class is nameable and buildable**, which is why no "no scanner is
+  possible" line appears here: it is *allowlist entry whose repo-relative target does not
+  resolve*, and the first candidate builds it.
+  **Cost while deferred:** paid per stale entry per session and paid silently, and it compounds
+  — an overlay is append-mostly, so dead entries accumulate and the file degrades as a statement
+  of what is actually granted. Seven were found at first look, by a session that was not
+  looking for them.
+  Filed 2026-08-15 by close, from its own prompt-friction triage; the seven were pruned in the
+  same session, which removes the instances and not the hole.
 
 - **bridged-knob-owner-for-consumer-gate** [design-pending] — the config bridge resolves a knob
   by the knob's own name, so a consumer-declared ported gate that needs a consumer-owned knob
