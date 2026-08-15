@@ -5,3 +5,4 @@
 ---
 
 consumer-cohort-completion-and-wait-enforcement scope acc3ae8a 2026-08-15
+consumer-cohort-completion-and-wait-enforcement spec ac542ef8 2026-08-15
