@@ -6006,11 +6006,6 @@
 
 ## Done
 
-- consumer-gate-port-disposition
-- harness-wait-primitive-unnamed
-- waiter-predicate-self-match
-- poll-sleep-guard-steer
-
 ## Lessons Learned
 
 
