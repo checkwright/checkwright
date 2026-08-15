@@ -199,12 +199,19 @@ rewrites the `<!-- value-rollup:begin/end -->` block **in place** in `docs/value
 marker block.
 
 So the port adds one: a marker-block module carrying the read half (extracted from its current
-private home, so there is one implementation rather than two) and a write half preserving
-`inject.sh`'s contract — markers matched exactly, content between them replaced, the file
-otherwise untouched, and a **refusal** when the markers are absent, unbalanced, or out of order,
-never a silent append. The refusal direction is stated because the failure it prevents is the
-expensive one: a generator that appends when it cannot find its markers corrupts a hand-authored
-page and the freshness gate then reports the corruption as staleness.
+private home, so there is one implementation rather than two) and a write half that matches
+`inject.sh`'s contract on a marker hit — markers matched exactly, content between them replaced,
+the file otherwise untouched — and **tightens** it on a miss. `inject.sh` itself appends a fresh
+block when the begin marker is absent (`gate-sdk/lib/inject.sh`'s own `else` branch, `action="appended"`);
+the port does not carry that branch forward, refusing instead on an absent, unbalanced, or
+out-of-order marker pair, never a silent append. The refusal direction is stated because the
+failure it prevents is the expensive one: a generator that appends when it cannot find its markers
+corrupts a hand-authored page and the freshness gate then reports the corruption as staleness.
+**This is a deliberate divergence from the shell original, not a preservation of it** — `inject.sh`
+keeps its append-on-absent behavior for its other, unported callers (the installer's attribute and
+registration blocks among them), so until each remaining caller ports in turn, the same miss reads
+two different ways depending on which implementation reaches it. Recorded here so a later reader
+does not take "preserves the contract" to mean the two stay identical.
 
 `inject.sh` itself is **not** deleted by this unit — other shell callers remain (the lifecycle
 installer's attribute and registration blocks among them) — and this delta explicitly does not
@@ -352,10 +359,23 @@ inspection.
   section records it as an instance of the directive's *the technical problems those criteria name
   are engineering work the port owes, not exclusions it may take*.
 - **gate-sdk/SPEC.md §lib/inject.sh** — §6. The section gains the Rust counterpart, the shared
-  read half, and the explicit statement that the shell library survives for its remaining shell
-  callers.
-- **context-kit/SPEC.md §bin/footprint.sh** — §3. The emitter's implementation substrate changes
-  and its invocation moves; its inputs, its output and its `--emit` contract do not.
+  read half, the explicit statement that the shell library survives for its remaining shell
+  callers, and the statement that the write half's absent-marker handling diverges from (tightens)
+  the shell original's rather than preserving it.
+- **gate-sdk/SPEC.md §enforcement-map and §check-enforcement-fresh** — §3 and §4. Both sections
+  currently describe a shell script: the emitter section documents `bin/enforcement-map.sh --emit`
+  and the comparator section documents `checks/check-enforcement-fresh.sh`'s bare-mode spawn of it.
+  Each gains the ported shape in place — the non-gate `--emit-enforcement-map` arm for the former,
+  the in-process function call for the latter — so neither continues to describe a spawn once this
+  unit lands.
+- **context-kit/SPEC.md §bin/footprint.sh, §check-footprint-fresh and §Layout and configuration**
+  — §3 and §4. The emitter's implementation substrate changes and its invocation moves; its inputs,
+  its output and its `--emit` contract do not. The comparator's section stops describing a spawn
+  (`checks/check-footprint-fresh.sh`'s bare-mode `bash <emitter> --emit`) and states the in-process
+  call instead. The file-tree listing's two `.sh` entries — `bin/footprint.sh` and
+  `checks/check-footprint-fresh.sh` — retire the way `check-settings-pins.gate` and
+  `check-settings-paths.gate` already show two lines above them in the same tree: the emitter's
+  line drops (no `bin/` file survives it) and the comparator's becomes a `.gate` entry.
 - **queue-kit/SPEC.md §check-roadmap-fresh** — §8. The hold's recorded reason is deleted, not
   annotated as answered, and what remains is an ordinary sequence position.
 - **docs/site-architecture.md §Generated projections** — §9. Three regen commands, the live-read

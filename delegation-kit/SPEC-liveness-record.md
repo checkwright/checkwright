@@ -131,15 +131,27 @@ record's grammar impossible to get wrong, and a hand-written one can be malforme
 bounded by the consumer — `check-producer-liveness` exits **2**, fail-closed, on a record it cannot
 parse, so a malformed record reads as *could not be established*, never as *nothing running*.
 
-### 5. The restatements in the two agent definitions take the naming
+### 5. The restatements move in lockstep, and a third carrier outside delegation-kit takes the same clause
 
-**The waiting imperative's two carriers move in lockstep** — mechanical **[mechanical]**.
+**The waiting imperative's carriers move in lockstep** — mechanical **[mechanical]**.
 delegation-kit/SPEC.md §Operative residency's restatement sanction names the *Background +
-notification, never poll* rule explicitly, and its live carriers are exactly
-`.claude/agents/stage-session.md` and `.claude/agents/audit-sweep.md`. Both carry the shell-child
-branch and both take §1's naming and §2's widened clause. The restatement stays an imperative with
-an adjacent citation: it does not absorb §1's rejected alternative or §3's grammar argument, which
-are amendment-tier and stay behind the pointer.
+notification, never poll* rule explicitly, and its live carriers inside delegation-kit's own reach
+are exactly `.claude/agents/stage-session.md` and `.claude/agents/audit-sweep.md`. Both carry the
+shell-child branch and both take §1's naming and §2's widened clause. The restatement stays an
+imperative with an adjacent citation: it does not absorb §1's rejected alternative or §3's grammar
+argument, which are amendment-tier and stay behind the pointer.
+
+**A third carrier sits outside delegation-kit's own restatement roster and states the same narrow
+clause in its corrective help text.** `guard-kit/lib/guard.sh`'s `guard_rule_pgrep_self_match`
+blocks the self-matching `pgrep`/`pkill -f` shape, and its block message names the sanctioned
+repair in the pre-widening phrasing, verbatim — *"where liveness genuinely is the condition,
+waiting on a producer this session did not start — `kill -0 <pid>` against a PID you recorded"* —
+mirrored in prose at guard-kit/SPEC.md §The generic ruleset's rule 12. §2 widens exactly this
+clause, so this message goes stale in the same commit that fixes the two agent definitions, or a
+guard-blocked session reads advice that undersells what it may now do with its own backgrounded
+child. This is distinct from `waiter-loop-condition-predicate-gap`, which holds the rule's *firing
+predicate* (whether loop-condition position also triggers the block) and is untouched here; this is
+the rule's existing *corrective text*, carrying the clause this amendment is the ruling for.
 
 ### 6. What this unit does not claim, carried into the section so a later reader does not close it by inference
 
@@ -185,11 +197,13 @@ No third field is introduced: a start timestamp was already weighed and dropped 
 when this grammar was ruled, and nothing in this amendment gives it a reader.
 
 **The widened liveness clause (§2).** *Producer:* the delegation-kit template, at every load of the
-agent-execution skill, and its restated copies in the two agent definitions at every dispatch of
-those types — which is the propagation half, and why §5 is not optional. *Consumer:* the dispatched
-session choosing how to wait, at the moment it has backgrounded a shell child and holds no result.
-A human or agent reader, never a gate — §6 states that limit rather than leaving it to be inferred
-from the absence of one.
+agent-execution skill, its restated copies in the two agent definitions at every dispatch of those
+types, and its third restated copy in guard-kit's corrective help text (`guard-kit/lib/guard.sh`,
+mirrored at guard-kit/SPEC.md §The generic ruleset rule 12) — which is the propagation half, and
+why §5 is not optional. *Consumer:* the dispatched session choosing how to wait, at the moment it
+has backgrounded a shell child and holds no result; for the third copy, any session the guard has
+just blocked, reading the corrective inline. A human or agent reader, never a gate — §6 states that
+limit rather than leaving it to be inferred from the absence of one.
 
 **Existing integration prose describing the prior flow is updated, not left to drift** — see below.
 The one flow that genuinely changes is the shell-child wait: it stops being *place some artifact
@@ -225,6 +239,10 @@ rather than an omission.
   PID-reuse residual and the refused TTL are unchanged; the section notes that its grammar now has
   a second writer class, so a later change to the record shape has both callers in view.
 - **`.claude/agents/stage-session.md` and `.claude/agents/audit-sweep.md`** — §5.
+- **guard-kit/SPEC.md §The generic ruleset (rule 12) and `guard-kit/lib/guard.sh`** — §5. The
+  self-matching-`pgrep` corrective's parenthetical — *a producer this session did not start* —
+  takes the same widening the two agent definitions take; the loop-condition firing predicate
+  itself (`waiter-loop-condition-predicate-gap`'s subject) is untouched.
 - **TASK-QUEUE.md** — `waiting-rule-carrier-reach` moves to `## Done`, dropping its `[spec:]` tag.
   Its deliverable under the narrowing is the shell-child class alone and this amendment discharges
   it whole rather than incrementing it, so it does not take the demotion branch. Its `recurrence:`
@@ -246,7 +264,8 @@ rather than an omission.
 - [ ] **The three non-assertions survive the merge** — nothing in the landed text claims a gate
       enforces the rule, answers the enforcement-design question, or reopens the reach axis.
 - [ ] **The restatements propagated** — both agent definitions carry the named artifact and the
-      widened clause, and neither absorbs amendment-tier reasoning.
+      widened clause, guard-kit's corrective help text and its SPEC mirror carry the widened
+      clause, and none of the three absorbs amendment-tier reasoning.
 - [ ] **Merged with no information lost** — each addition integrated into its proper canonical-spec
       section (not appended); each merged spec reads as one coherent document a reader who never saw
       the amendment can use alone.
