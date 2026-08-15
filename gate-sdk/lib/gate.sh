@@ -45,6 +45,9 @@ unset _gpx
 [[ -v GATE_SDK_WORKFLOW_DIR ]] || GATE_SDK_WORKFLOW_DIR=".workflow"
 # spec: gate-sdk/SPEC.md §Layout and configuration — and the same resolution for the queue file, on the third occurrence of the same cause: a compiled member valving the queue out of its corpus declares this knob, and an environment-only override no kit library defines is the bridge's third refusal whatever prefix its name carries. Every inline reader keeps its spelling and its value; what changes is that the name now resolves to something declare -p can find.
 [[ -v GATE_SDK_QUEUE_FILE ]] || GATE_SDK_QUEUE_FILE="TASK-QUEUE.md"
+# spec: gate-sdk/SPEC.md §Layout and configuration — the same resolution again, for the two knobs the enforcement-map emitter reads once it is a compiled arm: a value no kit library defines is the bridge's third refusal, and these two were previously defaulted inside the emitter script itself, which is the duplication the bridge exists to remove. Resolved *after* the config seam above, so the config file still cannot name its own directory — what changes is that the resolved value is now something declare -p can find, not where it comes from.
+[[ -v GATE_SDK_GATES_DIR ]] || GATE_SDK_GATES_DIR="scripts"
+[[ -v GATE_SDK_ENFORCE_SCAN_DIR ]] || GATE_SDK_ENFORCE_SCAN_DIR="."
 
 gate_find() {
     local prune=() d

@@ -166,6 +166,20 @@ consumer config, which runs the loop. Nothing about the evidence config is speci
 it is simply not the emitter's job to interpret it. What this costs is one extension to the bridge
 protocol, §3a below, and no new `EVIDENCE_KIT_*` knob at all.
 
+**The port *removes* a knob read rather than adding one, which is worth stating because
+`EVIDENCE_KIT_CONFIG_FILE` looked like the hardest input and turns out not to be an input at all.**
+The shell emitter reads that path to `source` the file; the ported emitter receives
+`EVIDENCE_KIT_SUITES` and the `EVIDENCE_KIT_RUN_*` family across the bridge and never opens it, so
+the knob leaves the emitter's declaration entirely. Both of its behaviours are preserved **by their
+rightful owner** rather than re-implemented: a consumer that has not adopted the registry resolves
+`EVIDENCE_KIT_SUITES` to the empty array `evidence-kit/lib/evidence.sh` defaults it to, so the
+Validate-suites section is absent exactly as before; and a consumer whose knob is *explicitly set to
+a missing file* hits that library's own `exit 2`, which fires inside the bridge's resolution
+subshell and refuses the whole invocation. The adopted-but-broken-refuses / not-adopted-degrades
+distinction the shell emitter spelled out for itself is therefore kept without the emitter spelling
+anything, and **its set-ness could not have crossed the bridge anyway** — a guarded default would
+have collapsed the two modes into the refusing one.
+
 **The three interests the flat-reader mechanism was carrying survive intact, and they are what
 this design is held to:** no subprocess spawned from inside the emitter — the failure §4 retires;
 **fail-closed rather than silent-empty** on a value that does not resolve, naming what did not;
