@@ -5975,6 +5975,44 @@
   Filed 2026-08-15 by close, draining the gap-inbox bullet build filed on the lead's ruling;
   scope-gated intake, so it was filed costed rather than taken in flight.
 
+- **overhead-meter-measures-the-lead** [design-pending] — under a live lead the overhead meter
+  measures the supervising session, never the stage session its own binding names.
+  **Probed at close 2026-08-15, both halves.** `lifecycle-kit/bin/session-id.sh` is
+  delegation-aware: with `CLAUDE_CODE_CHILD_SESSION` set it scans the lead's `subagents/` dir
+  alone and returned this close session's own id. `drift-kit/bin/overhead-meter.sh` resolves
+  "newest transcript" by a bare glob over the project dir with no such branch, and returned the
+  **lead's** id — twice, with a growing byte total, so it was tracking the live supervising
+  transcript rather than a stale one. Two tools, the same phrase, different answers.
+  **What it costs, and why it is not a rounding error.** drift-kit/SPEC.md §The overhead meter
+  names the producer as the consumer's close-stage binding, "invokes the meter on the closing
+  session". Under the lead-orchestrated posture this repo runs, that is exactly the case where
+  the meter cannot reach the closing session, so every close-stage row taken under a live lead is
+  the lead's own governance/task split filed under the lead's key. `kpi-overhead` reads `pct`,
+  `gate` and `total` off those rows, and the lead's shape — dispatch prompts, notifications,
+  little tool work — is not the shape a stage session has. The trend is not corrupt so much as
+  **measuring a different population than it names**, which is the harder failure to notice.
+  **Not a data-repair task.** Each logged row is a truthful measurement of a real session, keyed
+  by its own `session8`, so nothing needs deleting and re-measuring cannot fix it: the meter run
+  again from the same session resolves the same wrong transcript.
+  **DISTINCT from the mis-pick limit lifecycle-kit/SPEC.md §bin/session-id.sh already owns**,
+  and deliberately not folded into it: that limit is about `session-id.sh`'s *fallback* picking a
+  just-finished subagent when the env uuid is absent, and it is documented at
+  `lifecycle-kit/templates/lead.md`. This is the opposite direction — the env uuid is present and
+  correct, one tool consults it and the other does not.
+  **Why `[design-pending]`:** the seam is the open call. drift-kit could grow its own
+  delegation-aware resolution (duplicating a derivation lifecycle-kit already ships and owns), or
+  take a transcript path from its caller so the close binding passes what it already knows, or
+  depend on lifecycle-kit's tool across a kit boundary that no kit dependency currently spans.
+  The third is the cheapest and the least obviously admissible, which is exactly why it wants a
+  ruling rather than a patch. Whether the lead's own overhead is separately *worth* measuring —
+  it may be, and the accidental rows are the only such data that exists — is a second question
+  this entry raises and does not answer.
+  **Cost while deferred:** an account-bearing trend under `.metric/` keeps accumulating rows
+  attributed to the wrong population, and every efficiency claim read off `kpi-overhead` while
+  the lead posture is live is a claim about supervision cost wearing a stage-session label.
+  Filed 2026-08-15 by close, probed while reconciling its own meter output against its own stage
+  stamp; scope-gated intake, so it is filed costed rather than fixed in flight.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
