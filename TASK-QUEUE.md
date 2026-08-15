@@ -3059,6 +3059,22 @@
   **Cost while deferred:** the project's only evidence that prose-alone enforcement fails is
   an anecdote spread across six firings' histories, and each further firing costs an orphaned
   producer plus the lead turn that discovers it.
+  **Its own coupling claim was ENGAGED, and the disposition is DECLINE — recorded 2026-08-15 at
+  scope so the next reader finds a considered call instead of re-deriving the coupling.** The
+  clause is this entry's own, seven lines up: `poll-sleep-guard-steer` "is the same rule from the
+  side that *does* leave a tracked artifact, so a scope taking either should cost both". That
+  scope took `poll-sleep-guard-steer`, so the clause fired on its own terms. It is **not** a
+  recurrence-threshold question — this entry stands at one stamped date and has never met the
+  threshold — and reading it as one is the mistake to avoid on the next pass.
+  **Costed and declined as not-yet-designable, never as unimportant.** The operator ruled a
+  narrowed bundle on 2026-08-15: `poll-sleep-guard-steer`, `waiter-predicate-self-match`,
+  `harness-wait-primitive-unnamed`. Those three are one causal chain — unnamed primitive, then
+  self-matching predicate, then the polled wait — each link mechanically decidable on a surface
+  the guard already reads. What survives here is the enforcement-**design** question the
+  2026-08-06 operator ruling deliberately left unanswered, `[design-pending]` with no design
+  ruled, so it has nothing buildable to contribute to that chain and would have made the unit a
+  design fork rather than a build. The unit set is closed; this records the decline against the
+  coupling and reopens nothing.
   Filed 2026-08-06 by close, recording this iteration's central incident.
 
 - **waiting-rule-carrier-reach** [design-pending] — the residency rule reaches the sessions
