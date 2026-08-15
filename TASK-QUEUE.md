@@ -1606,13 +1606,13 @@
   the delta that leans on the routing.
 
 - **release-note-section-set-derivation** [design-pending] — the release note's
-  fixed-section set is held by `scripts/check-release-bump.sh` as parallel
+  fixed-section set is held by `check-release-bump` as parallel
   hardcoded calls, so a fifth section is added by copying a call rather than by
   extending one roster, and **no gate asserts that the gate's set equals the
   page's**.
   **The disease this is the residue of.** The section *count* was hand-maintained
   as a literal across `gate-sdk/bin/upgrade-smoke.sh`,
-  `scripts/check-tightened-gates-grammar.sh`, `check-release-bump`'s spec
+  `check-tightened-gates-grammar`, `check-release-bump`'s spec
   comment, `gate-sdk/SPEC.md` and several `docs/install.md` sentences, while the
   set itself was separate hardcoded calls with no array and no length. Nothing
   derived the number and nothing reddened when it was wrong — the test "if this

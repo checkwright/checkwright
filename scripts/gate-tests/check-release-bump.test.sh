@@ -1,15 +1,18 @@
 #!/usr/bin/env bash
-# Behavioral test of scripts/check-release-bump.sh — the Behavior-changes leg the
-# one good/bad pair cannot hold. The pair covers presence + the tightened-gates
-# floor; this covers the third fixed section: its fail-closed presence assertion,
-# its minor-bump floor when non-empty, and the clean cases.
+# Behavioral test of check-release-bump — the arms the one good/bad pair cannot
+# hold. The pair covers presence + the tightened-gates floor; this covers the
+# third fixed section (its fail-closed presence assertion, its minor-bump floor
+# when non-empty, and the clean cases), the deferral floor, the In brief
+# predicate, and the version comparator's refusal, which no `bad/` case can pin
+# because a case dir's rejection arm is exit 1 and a refusal is exit 2
+# (gate-sdk/SPEC.md §The declaration cohort).
 #
 # Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-GATE="$ROOT/scripts/check-release-bump.sh"
+GATES_DIR="$ROOT/scripts"
 
 fails=0
 tmp="$(mktemp -d)"
@@ -46,7 +49,7 @@ EOF
 # $1=label $2=posts-dir $3=want-rc $4=want-substring
 check_case() {
     local out rc
-    out="$(cd "$2" && "$GATE" posts 2>&1)"; rc=$?
+    out="$(cd "$2" && gate_run check-release-bump "$GATES_DIR" posts 2>&1)"; rc=$?
     if [[ "$rc" -ne "$3" ]]; then
         echo "  FAIL [$1]: want exit $3, got $rc -- $out"; fails=$((fails + 1)); return
     fi
@@ -102,7 +105,7 @@ check_case "all-none-patch-clean" "$tmp/allnone" 0 "RELEASE-BUMP: clean"
 check_deferral() {
     local out rc
     printf '%s' "$3" > "$2/disposition.txt"
-    out="$(cd "$2" && "$GATE" posts disposition.txt 2>&1)"; rc=$?
+    out="$(cd "$2" && gate_run check-release-bump "$GATES_DIR" posts disposition.txt 2>&1)"; rc=$?
     if [[ "$rc" -ne "$4" ]]; then
         echo "  FAIL [$1]: want exit $4, got $rc -- $out"; fails=$((fails + 1)); return
     fi
@@ -231,9 +234,36 @@ None.
 EOF
 check_case "inbrief-dormant-when-tagged" "$k" 0 "In brief presence dormant"
 
+# --- the version comparator's refusal ----------------------------------------
+# Ordering is defined over <major>.<minor>.<patch> and a token outside it is exit
+# 2 naming the token, its source and the grammar. This is the one arm the good/bad
+# pair structurally cannot hold: a rejection case is exit 1 by contract. Both
+# producers are covered, because a refusal that names the wrong file sends its
+# reader hunting (gate-sdk/SPEC.md §The declaration cohort).
+
+# L — a prerelease token in a note's release: key. sort -V would order it *below*
+# the release it postdates under semver, so ordering it at all is a rule this port
+# has no authority to invent.
+n="$tmp/prerelease/posts"
+write_note "$n" "0.1.0" "None." "None."
+write_note "$n" "0.2.0-rc1" "None." "None."
+check_case "prerelease-token-refused" "$tmp/prerelease" 2 "is outside the grammar this gate orders"
+check_case "prerelease-refusal-names-token" "$tmp/prerelease" 2 "'0.2.0-rc1'"
+check_case "prerelease-refusal-names-source" "$tmp/prerelease" 2 "posts/note-0.2.0-rc1.md"
+check_case "prerelease-refusal-names-grammar" "$tmp/prerelease" 2 "<major>.<minor>.<patch>"
+
+# M — the other producer: a disposition data line. Its refusal names the line, not
+# a note file, because that is where the reader has to go.
+o="$tmp/dispgrammar"
+write_note "$o/posts" "0.1.0" "None." "None."
+write_note "$o/posts" "0.2.0" "None." "None."
+check_deferral "disposition-token-refused" "$o" \
+    'alpha release deferred:v0.2 — a two-field token
+' 2 "alpha release deferred:v0.2"
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-release-bump.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "check-release-bump.test: ok (absent Behavior-changes section fails closed; the non-empty section floors a patch red and passes a minor; all-None patch stays clean; an outstanding deferral floors a patch red and a single-note tree too, discharges on a later release line, passes a minor that clears it, and reds a minor bump the numeric floor still sits above; the In brief presence assertion arms on a note under composition, reds when the section is absent there, and reports itself dormant once the note's version is tagged)"
+echo "check-release-bump.test: ok (absent Behavior-changes section fails closed; the non-empty section floors a patch red and passes a minor; all-None patch stays clean; an outstanding deferral floors a patch red and a single-note tree too, discharges on a later release line, passes a minor that clears it, and reds a minor bump the numeric floor still sits above; the In brief presence assertion arms on a note under composition, reds when the section is absent there, and reports itself dormant once the note's version is tagged; a version token outside the triple refuses at exit 2 naming the token, its source and the grammar, from a note key and from a disposition line alike)"
 exit 0

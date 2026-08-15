@@ -1,0 +1,2 @@
+# graph: couples=docs/posts/*.md,docs/install.md,native/src/gates/tightened_gates_grammar.rs,native/src/declaration.rs dir=one valve=none tier=precommit
+# spec: docs/install.md §The upgrade contract — every release note's Tightened-gates section resolves to an explicit `None` or to a non-empty set of backticked bare gate names; a non-`none` section yielding no tokens is the silently-empty declaration the smoke cannot see

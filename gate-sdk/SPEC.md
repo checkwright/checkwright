@@ -2675,6 +2675,151 @@ vocabulary**, so it can no more carry a project term than `ere.rs` could. What t
 seam still forbids is a *consumer-shaped* dependency — one selected because it
 encodes some tree's terms — and the bar above excludes that class by construction.
 
+### The declaration cohort
+
+**Three members: `check-release-bump`, `check-tightened-gates-grammar` and
+`check-tightened-gates-note-parity`**, and what the cohort buys is the
+release-note declaration family off the shell substrate. Named for what it buys,
+on §The POSIX ERE matcher's precedent rather than for a group key — the group key
+is precisely what did *not* select it. All three are **consumer-declared**, so
+this is also `consumer-gate-port-disposition`'s first tranche, 3 of 13, and the
+first-mover design every later tranche inherits is
+§check-gate-substrate-parity's assertion-B owner clause rather than this
+section's.
+
+**Selection evidence, from a `--group` run at the cut** (2026-08-15): **104
+members scanned, 45 groups formed, 0 undecidable, 44 already ported** — 60
+remaining shell. Group sizes are 1×14, 2×2, 2×2 and 42 singletons, and the
+**largest takeable group is one member**: the 14-member group is operator-ruled
+not a cohort (§The canonical-spec cohort: `fail_closed` derives no corpus), one
+two-member group holds `check-install-disposition`, which the table above keeps
+on shell, and the other holds `check-docs-render-fidelity`, held on criterion 7.
+So the size arm is **exhausted a second consecutive time** — the ninth cohort was
+the first — and this cohort is selected under the documented blocker-retiring
+override, never by member count. The undecidable count is the bound on that
+claim, and it is zero.
+
+**The tool split one derivation into three singletons, and the session rejoined
+them — which is the addition this cohort makes to the recording contract.** The
+members cut as three separate keys: `libs=collect_dispositions,decl_section_bullets,fail_closed,section_bullets globs=*.md`,
+`libs=decl_record_tokens,decl_section_tokens,fail_closed globs=*.md` and
+`libs=decl_section_tokens globs=*.md`. The **adjudicated union key** is
+`libs=collect_dispositions,decl_record_tokens,decl_section_bullets,decl_section_tokens,fail_closed,section_bullets globs=*.md`
+— one 59-line library and one walk. Recording the union is what makes the section
+legible: without it an override cohort whose members the tool reported as three
+singletons reads, to a later selector, as three coincidences. The adjudication is
+the selecting session's by the rule above, read in its mirror image — a group
+whose members' corpora visibly diverge is a finding, and so is a derivation the
+key split.
+
+**Criterion 6 leaves the library dual, and what that owes is a standing oracle
+rather than a port-time proof.** `bin/upgrade-smoke.sh` survives the port as
+`lib/declaration.sh`'s only remaining caller, so neither the duplication-absent
+road nor the deleted-original road is available and the disposition is
+queue-kit's `lib/queue.sh` one, taken by the same mechanism. The arm, the test
+and the corpus that carries every branch are §lib/declaration.sh's.
+
+**The version comparator is defined over a stated grammar, and a token outside it
+is a loud refusal.** The shell form ordered versions with `sort -V` in four
+places; the compiled form orders `<major>.<minor>.<patch>`, each a run of ASCII
+digits, field-wise numeric, with the row form tying on the path's byte order, and
+refuses anything else at exit 2 naming the token, its source and the grammar.
+**The ground is that a faithful port and a correct one are different programs
+here.** Probed: `sort -V` orders `1.0.0` **before** `1.0.0-rc1` and semver orders
+it **after**, so reproducing `sort -V` bakes a prerelease ordering into a gate
+whose whole subject is a semver line, while implementing semver instead is a rule
+change smuggled through a substrate change. Refusing is the only disposition that
+neither invents a rule nor ships a known-wrong one — §The POSIX ERE matcher's
+refusal shape applied to an ordering rather than to a parse. It forecloses
+nothing: the prerelease path stays exactly as open as `scripts/pack-installer.sh`
+already leaves it, and docs/install.md §Versioning now names where the ordering
+ruling is owed. Measured against this tree, all 23 live `release:` keys are bare
+`vX.Y.Z` and the disposition file carries no data line, so the refusal is a guard
+for the future rather than a change to this repo today. The `sort -u` inside the
+disposition collector is **not** version ordering — it is a byte sort with dedupe
+over whole lines and ports as one, named because two sorts four lines apart in
+one function is exactly how a port fuses them.
+
+**A rejection case cannot pin a refusal, so the arm is pinned where refusals
+already are.** §run-gate-tests makes a `bad/` case exit 1 by contract and a
+refusal is exit 2, so no fixture case can hold this arm — the pin is
+`scripts/gate-tests/check-release-bump.test.sh`, alongside that gate's other
+exit-2 cases, and it covers **both** producers, a note's `release:` key and a
+disposition data line, because a refusal naming the wrong file sends its reader
+hunting.
+
+**A cohort port is one commit, and that is a construction rather than a
+preference.** §check-gate-binary-fresh's stamp is computed from `git ls-files`,
+so a partial-path `git commit -- <paths>` — which swaps in a temporary index of
+HEAD plus the named paths — recomputes the crate's manifest without the sources
+the partial commit leaves out, and a binary built from the whole tree can never
+match it. Splitting the modules from the registry, the descriptors or the `.sh`
+deletions therefore reds rather than staging cleanly, which is the gate refusing
+to record a crate tree nothing was built from. A session budgeting a cohort into
+several commits budgets around this.
+
+**Parity was proved while both implementations still existed**, which assertion A
+makes the only possible order: each member's script and its subcommand run over
+every fixture case, over the live tree, and over the edge roots (an absent
+directory, an empty posts dir, a one-note tree), compared on stdout, stderr and
+exit code. Byte-identical on all of them, with **exactly one divergence, and it is
+the designed one** — a prerelease token, where the shell prints a clean line
+carrying a mis-ordered pair and the compiled form refuses.
+
+**Two conflations are preserved rather than repaired, because a port proves
+parity and does not fix rules.** The first is inherited: `check-release-bump`
+silences its historical `git log`'s stderr and returns success regardless, so a
+tree where git cannot answer derives its deferral floor from the live file alone.
+The compiled form reproduces it and the reasoning is recorded rather than left as
+an accident of translation — the branch is unreachable in the live tree, which
+always has a repository, and in the fixture pair, which supplies the file, so
+there is no case that would prove a change correct. The second the port
+**found**, and it is the shell library's: both arms leak already-resolved tokens
+into the refusal output (§lib/declaration.sh). Both are filed as gaps so the debt
+is costed rather than implicit.
+
+**The three declare no knobs, and the `.workflow/` asymmetry that exposes is
+preserved rather than repaired** — because repairing it needs an answer this
+tranche does not have. Both `.workflow/` defaults are hardcoded in the gates while
+`bin/upgrade-smoke.sh`, a reader of the *same* declaration file, resolves the
+directory through `GATE_SDK_WORKFLOW_DIR`. Honouring the knob in the compiled form
+would make it a **declared** knob, which sends `gate_command` to
+`_gate_knob_value`, which sources *the owning kit's* library — and a
+consumer-declared member has no owning kit. That is the config-bridge question
+`consumer-gate-port-disposition` must answer for the first knob-declaring member
+of its tranche; it is **named here and deliberately not answered**, because
+answering it inside a port whose members need no knob would be designing against
+no case. Keeping the literals keeps `gate_command` on its zero-knob path and
+leaves the asymmetry exactly as visible as it is today.
+
+**Assertion C's derivation was re-run at the cut, in both directions: zero
+transitions.** The declaration paths moved from `<gates-dir>/<name>.sh` to
+`<gates-dir>/<name>.gate`; every member reaching these three through a
+`scripts/*.sh` glob also matches other surviving `.sh` declaration paths, so none
+loses sensitivity, and the members carrying a bare `*.gate` token already matched
+dozens of descriptors, so none gains it. A row the derivation stops selecting is
+not removed on that ground alone; only the newly-selected direction can fail, and
+it selected nothing.
+
+**What this cohort paid that the last four did not is the callers, and it is the
+lifecycle-kit cohort's lesson recurring on a consumer's own gates directory.**
+Both bespoke `scripts/gate-tests/*.test.sh` behind these members named their gate
+by **script path**, so the port would have left them invoking a deleted file; both
+now reach it through `gate_run` (§run-gate-tests), which is what makes a
+behavioral test survive a substrate change. A tranche porting consumer-declared
+members enumerates that directory's `*.test.sh` before the cut, exactly as a
+selector reaching a kit that ships `bin/` or `smoke/` does.
+
+**Two exclusions, each with its ground.** `check-installer-no-deps` was ruled past
+this iteration at scope and is **not** rescinded here; it remains the named
+cheapest single-gate first mover for a later cohort, with its `jq` reader already
+paid, and reading its exclusion as a new hold re-litigates cohort sizing that is
+closed. The other ten consumer-declared members are **sequencing, not exclusion**,
+on the standing rule that every held member has port work owed rather than a
+waiver — three held on an unported emitter and one on an undetermined criterion 7,
+whose holds belong to `cohort-held-members-port-prerequisites` and
+`consumer-gate-port-disposition`.
+
 ### What the reverted port established
 
 Not nothing, and worth separating from what it broke:
@@ -3758,31 +3903,68 @@ the artifact it claims to read. So the helper refuses, and the refusal is what
 closes the class permanently: no future markup variant can disarm the assertion,
 only red it.
 
-Callers, all four named: `bin/upgrade-smoke.sh` at its declaration-resolve step
-uses both arms (§upgrade-smoke); this repo's `check-tightened-gates-grammar`
-uses the markdown arm's verdict at each note it walks; `scripts/check-tightened-gates-note-parity.sh`
-also uses both arms, comparing a note's `Tightened gates` section
-(`decl_section_tokens`) against its declaration-file argument's record set
-(`decl_record_tokens`); and `scripts/check-release-bump.sh` uses the markdown
-arm's *container* alone, counting bullets across the note's declaration-bearing
-sections. That last caller is why the container and the token predicate are
+**The library is dual, and one live caller is what makes that true rather than
+asserted.** `bin/upgrade-smoke.sh` at its declaration-resolve step uses both arms
+(§upgrade-smoke) and is the shell form's **only** caller since §The declaration
+cohort: the members that shared it ship as compiled subcommands and reach
+`native/src/declaration.rs` instead. The shell caller set therefore does not
+empty, so criterion 6's delete-the-shell-form outcome is unavailable and the
+duplication takes the machine-held disposition (§The port-candidate criteria,
+criterion 6).
+
+**The standing oracle that discharges it.** A port-time byte-identity proof is
+not machine-held — it proves the two agreed once and expires at the next edit to
+either side, which is exactly the failure that clause names. So the binary
+carries a top-level `--declaration-parity` arm reporting the compiled holder's
+*classification* of one input, one record per line, and
+`gate-tests/declaration-lib-parity.test.sh` — in the fixture-runner battery,
+resolving the binary through `GATE_SDK_NATIVE_BIN` — feeds one canned corpus to
+both holders and compares byte for byte. A flag rather than a subcommand, for the
+reason its siblings are one (§check-gate-substrate-parity). The corpus is the
+**trichotomy** rather than a sample of any tree's notes, so it reaches every arm
+both holders have, including the container that is neither `None` nor
+token-bearing and whose status 1 comes with *empty* stdout.
+`gate-tests/lib-declaration.test.sh` keeps its place unchanged: it is the shell
+arm's own runtime lock-in and fails when only the shell is wrong, which a
+comparison of the two structurally cannot.
+
+**One conflation both holders now carry, recorded rather than repaired.** On the
+refusal path each arm emits the tokens it had already resolved *before* the
+offending lines, because the shell form prints a token as it walks and appends
+the offenders at the end — so a container mixing a readable and an unreadable
+bullet reports the readable one to its caller's finding list as unreadable. The
+verdict is unaffected in both holders and only the diagnostic list is wrong; the
+compiled form reproduces it, because a port proves parity and does not fix the
+rules it ports. Repairing it is a two-holder edit in one unit or the parity test
+reds, which is the oracle above doing its job.
+
+The remaining caller relations, stated in one place: this repo's
+`check-tightened-gates-grammar` uses the markdown arm's verdict at each note it
+walks; `check-tightened-gates-note-parity` uses both arms, comparing a note's
+`Tightened gates` section against its declaration-file argument's record set; and
+`check-release-bump` uses the markdown arm's *container* alone, counting bullets
+across the note's declaration-bearing sections. That last caller is why the container and the token predicate are
 separable rather than one pass: Behavior-changes lead tokens are legitimately
 prose phrases, so the bump derivation needs the bullets without the token
 predicate. Before this helper the container was stated three times and two of
 the statements already disagreed on whether a bullet marker could be indented,
 so the section a bump was derived from and the section an allowed-red set was
 parsed from were not guaranteed to be the same section. A sourced library, not
-a gate, so it owes no `good/`+`bad/` pair; its runtime lock-in is
-`gate-tests/lib-declaration.test.sh`. The record arm is also exercised through
-`scripts/gate-tests/check-tightened-gates-note-parity`'s own `good/`+`bad/`
-pair, whose `tightened-gates.txt` fixture drives `decl_record_tokens` via the
-gate's declaration-file argument. The direct unit test keeps its place — it is
-still the arm's runtime lock-in — standing on its own rather than on an
-absence that is not there.
+a gate, so it owes no `good/`+`bad/` pair. The record arm is exercised a second
+way, through `scripts/gate-tests/check-tightened-gates-note-parity`'s own
+`good/`+`bad/` pair, whose `tightened-gates.txt` fixture drives it via the gate's
+declaration-file argument — which since the port drives the *compiled* holder,
+so that pair proves the shell arm only through the parity comparison above and
+never instead of it.
 
 The helper carries no section name and no gate name of its own — both are the
 caller's arguments, and it takes no configuration. That is where the seam falls:
-the parsing is kit mechanism, the parsed content is the consumer's.
+the parsing is kit mechanism, the parsed content is the consumer's. **The seam
+falls in the same place on the compiled side and is checkable there**:
+`native/src/declaration.rs` takes its section as an argument too, so the four
+published section names live in the three gate modules that pass them — this
+consumer's rule content sitting in this consumer's rules — and a grep of that
+module for any of them returns nothing.
 
 ### lib/test-hermetic.sh
 
@@ -4874,7 +5056,9 @@ steers the fixture pair onto hermetic copies of each surface. Six assertions.
   joins `--list`, `--reads`, `--knobs` and `--source-stamp` at the binary level,
   outside the roster this assertion equates. Recorded because the assertion is
   unchanged by it and the consequence is otherwise rediscovered by reddening it
-  (queue-kit/SPEC.md §lib/queue.sh is the first such arm's consumer).
+  (queue-kit/SPEC.md §lib/queue.sh is the first such arm's consumer;
+  §lib/declaration.sh is the second, and the shape held unchanged at the second
+  use, which is what makes it a pattern rather than one harness's accommodation).
   **A second column rather than a fifth flag, and the reason is version skew.**
   The gate ships in a kit and the binary ships in the payload, and the two version
   independently — `init` places a released binary while a consumer may vendor a

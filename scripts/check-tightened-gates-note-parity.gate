@@ -1,0 +1,2 @@
+# graph: couples=docs/posts/*.md,.workflow/tightened-gates.txt,native/src/gates/tightened_gates_note_parity.rs,native/src/declaration.rs dir=one valve=none tier=precommit
+# spec: docs/install.md §The upgrade contract — while a release note is under composition its Tightened-gates token set equals the declaration surface it was composed from, both directions

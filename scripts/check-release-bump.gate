@@ -1,0 +1,2 @@
+# graph: couples=docs/posts/*.md,docs/install.md,.workflow/release-disposition.txt,native/src/gates/release_bump.rs,native/src/declaration.rs dir=one valve=none tier=precommit
+# spec: docs/install.md §Versioning — the derivable bump floor: a release note declaring tightened gates or renamed knobs, or inheriting an outstanding deferred release's floor, may not ride a patch-only bump over its predecessor

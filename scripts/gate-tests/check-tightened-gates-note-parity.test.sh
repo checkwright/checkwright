@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Behavioral test of scripts/check-tightened-gates-note-parity.sh — the arms the
+# Behavioral test of check-tightened-gates-note-parity — the arms the
 # one good/bad pair cannot hold. The pair proves the equal state and a note
 # violating the set equality in both directions at once; this isolates each
 # direction so neither can pass on the other's finding, exercises the arming
@@ -10,7 +10,7 @@ set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-GATE="$ROOT/scripts/check-tightened-gates-note-parity.sh"
+GATES_DIR="$ROOT/scripts"
 
 fails=0
 tmp="$(mktemp -d)"
@@ -55,7 +55,7 @@ write_surface() {
 # $1=label $2=dir $3=want-rc $4=want-substring
 check_case() {
     local out rc
-    out="$(cd "$2" && "$GATE" posts tightened-gates.txt 2>&1)"; rc=$?
+    out="$(cd "$2" && gate_run check-tightened-gates-note-parity "$GATES_DIR" posts tightened-gates.txt 2>&1)"; rc=$?
     if [[ "$rc" -ne "$3" ]]; then
         echo "  FAIL [$1]: want exit $3, got $rc -- $out"; fails=$((fails + 1)); return
     fi

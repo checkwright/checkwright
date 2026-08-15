@@ -24,6 +24,7 @@ pub mod queue_hygiene;
 pub mod queue_sections;
 pub mod queue_slug_liveness;
 pub mod queue_wrap;
+pub mod release_bump;
 pub mod scratch_citation;
 pub mod settings_paths;
 pub mod settings_pins;
@@ -44,6 +45,8 @@ pub mod todo_task_liveness;
 pub mod task_names;
 pub mod template_registry_parity;
 pub mod test_hermetic;
+pub mod tightened_gates_grammar;
+pub mod tightened_gates_note_parity;
 pub mod tracking_claim;
 
 pub type GateFn = fn(&[String]) -> i32;
@@ -690,6 +693,32 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
         &["CONTEXT_KIT_SETTINGS_FILE", "CONTEXT_KIT_SETTINGS_PINS"],
         "context-kit",
+    ),
+    // spec: gate-sdk/SPEC.md §The declaration cohort — the consumer sentinel's first members: each
+    // walks one directory relocated by the gate's own positional argument, so the honest
+    // declaration is a single `?`, and a subprocess read enters no walk roster in either substrate.
+    // spec: gate-sdk/SPEC.md §The declaration cohort — none declares a knob, which keeps
+    // `gate_command` on its zero-knob path and the config-bridge question unasked.
+    (
+        "check-release-bump",
+        release_bump::run,
+        &["?"],
+        &[],
+        "-",
+    ),
+    (
+        "check-tightened-gates-grammar",
+        tightened_gates_grammar::run,
+        &["?"],
+        &[],
+        "-",
+    ),
+    (
+        "check-tightened-gates-note-parity",
+        tightened_gates_note_parity::run,
+        &["?"],
+        &[],
+        "-",
     ),
 ];
 

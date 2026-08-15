@@ -190,8 +190,8 @@ that has to resolve your platform before any binary can run. It is deliberately
 small enough to exist twice, which is what would make a native Windows path
 possible where the roster above can only offer WSL.
 
-<!-- measured: ported-gate-members=44 -->
-That direction is now underway rather than announced: 44 gates in the battery
+<!-- measured: ported-gate-members=47 -->
+That direction is now underway rather than announced: 47 gates in the battery
 dispatch to the compiled binary today, and the rest is still shell. The
 requirements above are what the shell gates actually invoke, so they stand until
 the gates that invoke them do not. When a requirement drops it drops from that
@@ -617,7 +617,8 @@ The next qualifying note carries them in its declaration-bearing sections and ma
 below that version — so a note's floor is the higher of what its own sections
 derive and what an outstanding deferral carries. `check-release-bump` reads both.
 
-The derivable half is gated: `check-release-bump` (this repo's `scripts/`)
+The derivable half is gated: `check-release-bump` (this repo's `scripts/`, a
+compiled subcommand since gate-sdk/SPEC.md §The declaration cohort)
 orders the release notes by version and reds a patch-only bump whose note
 declares tightened gates, renamed knobs, or behavior changes (and fails closed
 if any fixed section is absent). That presence assertion binds the **newest**
@@ -625,6 +626,17 @@ note only, so adding a fixed section to the roster above costs no historical
 backfill across the published corpus. The major criteria stay judgment —
 a decommission is a semantic fact no section grammar carries — so the gate
 holds only the floor.
+
+**The gate orders `<major>.<minor>.<patch>` and refuses anything else**, naming
+in its refusal the offending token, where that token came from, plus the grammar
+it failed. That is a guard rather than a closure. A prerelease or build-metadata
+suffix stays exactly as admissible as `scripts/pack-installer.sh` already leaves
+it; what is missing is an *ordering* for one, because the candidate rules
+disagree — `sort -V` puts `1.0.0` *before* `1.0.0-rc1` where semver puts it
+after. A gate whose subject is this section's one semver line must not pick
+between them by accident. **That ruling is owed by the session that first cuts
+such a release.** Until then the first note using one reds loudly here instead of
+mis-ordering silently.
 
 ## The upgrade contract
 
@@ -694,7 +706,8 @@ here does not silently falsify a sentence somewhere else.
   than a declaration of nothing: the parse would otherwise compile a note naming
   several gates into an empty allowed-red set, passing vacuously on a green
   battery and failing with a false message on a red one.
-  `check-tightened-gates-grammar` (this repo's `scripts/`) holds that over the
+  `check-tightened-gates-grammar` (this repo's `scripts/`, a compiled subcommand
+  since gate-sdk/SPEC.md §The declaration cohort) holds that over the
   whole corpus, with no version cutoff — `GATE_SDK_UPGRADE_FROM` and
   `GATE_SDK_UPGRADE_TO` make any historical pair a supported run, so any note may
   be the one the smoke resolves. Registry membership is deliberately not
@@ -712,9 +725,13 @@ here does not silently falsify a sentence somewhere else.
   gate that never tightened and sends consumers hunting a reconcile that does not
   exist. It arms on a note whose declared version carries no tag yet and disarms
   once tagged, reporting its dormancy rather than letting a drained surface read
-  as verification. It rides `gate-sdk/lib/declaration.sh`'s parsers, never a
-  private one. That is what stops it passing while the smoke reads a different
-  token set from the same bytes.
+  as verification. It is a compiled subcommand
+  (gate-sdk/SPEC.md §The declaration cohort) and rides that cohort's holder of the
+  shared grammar rather than a private parser — held to
+  `gate-sdk/lib/declaration.sh`, which the smoke
+  still reads, by a standing parity oracle (gate-sdk/SPEC.md §lib/declaration.sh).
+  That is what stops it passing while the smoke reads a different token set from
+  the same bytes.
 
   **A declaration precedes its release.** Because the upgrade smoke's untagged
   arm reads a working tree's tightened-gates declaration surface rather than a
