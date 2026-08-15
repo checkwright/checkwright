@@ -86,27 +86,21 @@ template names the channel a dispatched role *does* have: an in-turn wait on the
 work's own artifact. This is the case where the backgrounding rule and the
 liveness hazard meet and neither, alone, covered it.
 
-**Which primitive that in-turn wait uses, and the discriminator is a property
-rather than a name.** The template named *the harness's waiting primitive* in the
+The template's **Background + notification, never poll** rule now carries a
+*which primitive* clause, and that clause's residency here is a calibration
+history. The template first named the harness's waiting primitive in the
 singular while the harness offers two forms with opposite reactivity, so a
-session picking one unaided picked by shape. The rule now states the property a
-wait must have — **it ends when its condition goes true, not when a duration
-expires** — and sorts both forms under it: a backgrounded command that *exits* on
-the condition fires one notification at the moment the condition holds and then
-ends, while the event-stream form stays armed to its deadline even after its
-event fires, converting a seconds-long wait into a timeout-long one whenever it
-is used for a single completion. Naming one form teaches a spelling; naming the
-property and sorting both under it teaches the discriminator, which is what
-survives a harness that adds a third form.
+session picking one unaided picked by shape. Naming a form teaches a spelling;
+naming the property a wait must have and sorting the forms under it teaches the
+discriminator — a bound that is correctness rather than preference, because it
+is what survives a harness adding a third form.
 
-**Two waitable things, and only one of them has a path.** An `Agent` dispatch is
-awaited by its completion notification: that record is the harness's, and a
-session that goes looking for it on disk is the attested failure. A shell child
-has no notification channel of its own, so it is awaited on an artifact the
-session *placed* — which is why the artifact needs a stated home, and why that
-home is the resume journal's own scoping widened rather than a second rule. The
-failure had no third case, which is what makes the two-way split complete rather
-than merely convenient.
+**Two waitable things, and only one of them has a path.** The template splits
+what a session waits *on* and carries that mechanism itself. What is added here
+is that the split is *complete* rather than merely convenient, because the
+attested failure had no third case — and that the artifact's home is the resume
+journal's own scoping widened rather than a second rule, so the survivability
+grounds are stated once and cited twice.
 
 **The guard interaction that produced it resolves without touching the guard.**
 The attested sequence: a session reached for the correct artifact wait, spelled
@@ -118,24 +112,15 @@ pushed the session onto the process-liveness form that then broke. With the spli
 above, a session waiting on an `Agent` never reaches for a path at all, and a
 session waiting on a shell child has a path the guard already sanctions.
 
-**Process liveness is not the sanctioned predicate, and the repair a reader will
-propose is refused in writing.** `pgrep -f '<pattern>'` matches the waiter's own
-argv, and the harness's wrapper argv matches too, so
-`until ! pgrep -f '<script>'; do …; done` has a permanently-true condition and
-never exits. It does not depend on how the waiter is spelled and it reds nothing:
-the work completes correctly and the only symptom is the foreground cap absorbing
-an unbounded loop, which reads from outside as a fixed cap-length wait. Three
-repairs exist and only two are sanctioned. **The artifact wait** is the default.
-**A recorded PID** (`kill -0 "$pid"` against a PID captured when the session
-started the child) is sanctioned where liveness genuinely is the condition —
-waiting on a producer the session did not start — because a PID is an identity
-while a pattern is a guess about a process table that includes the guesser. **The
-bracket trick** (`pgrep -f '[r]un-smoke.sh'`) is refused *as the sanctioned
-form*, and refused here rather than passed over, because it is the first thing a
-reader reaches for and it *works*: what disqualifies it is not correctness but
-its failure mode — a spelling that must be remembered, whose omission is
-invisible at the call site and whose cost when omitted is silent and expensive. A
-rule whose correct form differs from its incorrect form by one character is a
+**The bracket trick is refused as the sanctioned form, and the grounds are here
+because the template defers them here.** The template carries the mechanism —
+why a process-liveness predicate can never go false, and the two sanctioned
+repairs — and sends here the one question it does not answer: why the third,
+`pgrep -f '[r]un-smoke.sh'`, is refused rather than passed over. It is the first
+thing a reader reaches for and it *works*, so what disqualifies it is not correctness
+but its failure mode: a spelling that must be remembered, whose omission is
+invisible at the call site and whose cost when omitted is silent and expensive.
+A rule whose correct form differs from its incorrect form by one character is a
 rule that will be got wrong, which is why the enforcement half is a guard rule
 over the shape (guard-kit/SPEC.md §The generic ruleset) rather than more prose.
 

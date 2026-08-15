@@ -243,9 +243,10 @@ kit's name: the `SPEC.md` canonical-spec filename, the `SPEC-*.md` amendment
 glob, the `spec:` and `contract:` source directives, the `[spec:]` and
 `[design-pending]` queue tags, the `check-spec-*` gate names, and the internal
 `lib/spec.sh` loader (where "spec" names the discipline). The consumer gate
-`check-kit-ref-liveness` (a check-skeleton copy in `scripts/` — the
-dangling-reference hazard is a kit author's, so it is not templated into
-gate-sdk) holds the brand-token side honest tree-wide: every slash- or
+`check-kit-ref-liveness` (declared by a `.gate` descriptor in `scripts/` and
+dispatched to the binary substrate — the dangling-reference hazard is a kit
+author's, so it is not templated into gate-sdk) holds the brand-token side
+honest tree-wide: every slash- or
 line-anchored `<name>-kit` / `gate-sdk` path segment must name a
 `gate_kit_roots` dir, and every live-prefix kit knob must resolve to a tracked
 kit knob (check-docs-cmd's resolver, reused so the non-uniform knob-prefix map

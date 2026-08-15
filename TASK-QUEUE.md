@@ -1432,10 +1432,12 @@
 - **gate-spawn-hoist-residual** [design-pending] — `gate-battery-spawn-hoists`
   closed most of its worklist and left a named remainder, recorded so the next
   pass starts from measurement rather than from this list.
-  **Unmeasured, same shape:** `check-comment-tier`, `check-trajectory-fresh`,
-  `check-docs-cmd`, and `check-docs-nav-reachable` all carry the in-gate
-  fork/exec-per-item shape the landed hoists removed elsewhere, but were neither
-  measured nor hoisted (the pass was time-boxed after the near-miss below).
+  **Unmeasured, same shape:** `check-comment-tier` and `check-docs-cmd` carry the
+  in-gate fork/exec-per-item shape the landed hoists removed elsewhere, but were
+  neither measured nor hoisted (the pass was time-boxed after the near-miss below).
+  The list named two more, `check-trajectory-fresh` and `check-docs-nav-reachable`;
+  both went native in the eleventh cohort 2026-08-15, which dissolves the shell
+  fork-per-item shape rather than hoisting it, so they leave this remainder.
   **Attempted and reverted:** `check-spec-pointer`'s `heading_present`. A
   bash-extglob port of its strippar/isprefix awk match logic was byte-identical
   to the awk original on small inputs and **pathologically slow** on this tree's
@@ -2985,24 +2987,19 @@
 - **waiting-rule-carrier-reach** [design-pending] — the residency rule reaches the sessions
   whose definitions name it, and both firings this iteration were outside that set.
   recurrence: waiting-rule-carrier-reach 2026-08-11 2026-08-15
-  **Fifth firing — a carrier that named the rule nowhere, and its ground is ANSWERED.** Scope's
-  `audit-sweep` for the port-candidate census ended its turn on a live child fork with no census;
-  its definition then carried no residency clause, making it evidence about **reach** rather than
-  prose-versus-enforcement strength. Re-verified at scope 2026-08-15: that gap is **closed** —
-  `.claude/agents/audit-sweep.md:43-45` carries the clause and both roster files now do. So reach
-  is not the binding constraint here, and widening carriers buys less than the title implies.
-  **Sixth firing — a second carrier class, and the more dangerous one.** The validate session
-  backgrounded its own `run-validate.sh` and ended the turn in order to wait on it. For a
-  dispatched session a turn end is a session end, so the observer died while the shell child
-  survived, orphaned and still writing — and the harness fired a completion notification
-  anyway, because that notification means only "no live `Agent` children" and is silent about
-  a backgrounded shell child. Nothing was lost: the lead read the process table, found the
-  producer live under its lock, barred a second one, and the resumed session waited in-turn
-  and finished inside its ceiling.
-  **What makes the sixth a distinct question rather than more of the fifth.** A shell child
-  is not an agent, so no agent definition governs it however many definitions carry the
-  clause — and the one signal a supervisor would trust to say the work is done is precisely
-  the signal that is wrong here.
+  **Firings five, seven and eight — ANSWERED, compressed here rather than dropped.** Five was a
+  carrier omitting the clause (scope's `audit-sweep`, which ended its turn on a live child fork);
+  re-verified at scope 2026-08-15 that gap is **closed** — `.claude/agents/audit-sweep.md` and
+  both roster files carry it. Seven (2026-08-10 validate, zero live children) and eight
+  (2026-08-11) had the rule provably loaded and broke it anyway, which is the sibling
+  prose-versus-enforcement framing (`waiting-rule-fourth-firing-post-fix`), not reach.
+  **Sixth firing — the shell-child class, and the one this entry now reduces to.** The validate
+  session backgrounded its own `run-validate.sh` and ended the turn to wait on it; the observer
+  died, the shell child survived orphaned and still writing, and the harness fired a completion
+  notification anyway — that notification means only "no live `Agent` children" and is silent
+  about a backgrounded shell child. Nothing was lost (the lead read the process table and barred
+  a second producer). Distinct because a shell child is not an agent, so no agent definition
+  governs it however many carry the clause, and the one signal a supervisor trusts is wrong.
   **Why `[design-pending]`:** the two candidate homes trade off and neither covers both classes.
   Per-type definitions are maintenance a newly added type silently opts out of; a standing clause
   in the dispatch-prompt template reaches every type but only through prose a dispatcher must
@@ -3012,17 +3009,6 @@
   **Cost while deferred:** every dispatch to a type whose definition omits the clause is
   unprotected, and a backgrounded producer under a session with no live lead is lost
   silently — the sixth firing cost nothing only because a lead happened to be watching.
-  **Seventh firing, 2026-08-10 (`native-port-cadence` validate) — and it cuts against this
-  entry's own hypothesis, which is why it is recorded here rather than only cited.** The
-  validate session ended a turn to wait on a monitor notification with **zero live children**,
-  having loaded a carrier that states the rule explicitly (the `stage-session` definition's
-  turn-end-is-session-end clause, plus the standing dispatch policy naming the in-turn wait).
-  So reach was **present** and the rule still failed.
-  **What it evidences, against this entry's interest.** Firings five and six were carriers
-  omitting the clause; this one is not. It is direct evidence for the sibling framing —
-  `waiting-rule-fourth-firing-post-fix`'s prose-versus-enforcement question — that a rule present
-  in loaded context is still not obeyed at the moment of temptation.
-  **Eighth firing, 2026-08-11:** rule loaded, named and restated back — and broken anyway.
   **RE-DEFERRED by operator ruling 2026-08-15**, recorded here because this entry reached the
   recurrence threshold and a threshold entry is dispositioned rather than outranked in silence.
   Ground: the corrected premise above closes its founding reach gap, and nine firings — the last
@@ -3030,6 +3016,21 @@
   one enforcement-shaped answer. That half is the iteration's: `poll-sleep-guard-steer`,
   `waiter-predicate-self-match`, `harness-wait-primitive-unnamed`. What survives here is the
   **shell-child** class alone, which no agent definition governs; re-cost it against those three.
+  **Ninth to eleventh firings, 2026-08-15 — the first evidence gathered AFTER both halves landed,
+  and it argues this entry back up.** Held by the lead as observation rather than as argument, in
+  the same iteration that shipped the doctrine and guard rules 12-13: (9) the attested build-batch
+  instance already recorded beside `waiter-predicate-self-match`; (10) a stage session dispatched
+  **after** the doctrine landed ended its turn to wait rather than waiting in-turn; (11) the same
+  session repeated it, launching a watcher to watch the first watcher, while carrying the
+  imperative in the agent definition it runs under.
+  **Why this is not more of seven and eight.** Those predate the enforcement half. These postdate
+  both halves, so the re-deferral's ground — that the family "resolves to one enforcement-shaped
+  answer" — is now testable, and for the agent-session class it reads as falsified: the
+  enforcement works and the doctrine is sound, and what fails is the rule reaching the session at
+  the moment it needs it. A twelfth, weaker instance from this close's own friction triage: 14
+  `cat >>` heredoc journal appends against a carrier that says the agent `Write`s the journal.
+  **Not promoted here** — promotion is scope's call. The evidence is landed so the next scope
+  weighs it against the re-deferral above rather than re-deriving it from a lead's memory.
   Filed 2026-08-06 by close, draining the gap inbox and the lead's separately held incident.
 
 - **amendment-dod-sibling-dependence** [design-pending] — an amendment's DoD is written as if
@@ -3538,6 +3539,20 @@
   not a judgment miss, and it belongs to the dispatch-policy surface rather than to align's
   checklist. Kept adjacent because both are tier-calibration evidence and the two get read
   together; kept distinct because a fix for either does nothing for the other.
+  **Second reading, `consumer-cohort-completion-and-wait-enforcement` (2026-08-15) — and it does
+  not repeat the first.** Align ran on Sonnet, found **five real defects** and escalated nothing
+  spurious, so the zero-divergence shape above did not recur. What did happen is the other half:
+  **three amendment claims were falsified by probes at build** — delta 8's knob arithmetic, delta
+  6's substantive half (which would have reddened the battery on **every** invocation had it
+  shipped), and a second fail-closed hole.
+  **Both facts, stated honestly, because they point opposite ways.** The revert signal **as
+  defined** — a missed spec defect surfacing as a **build round-trip** — did **not** fire: build
+  absorbed all three in-session and nothing round-tripped. And three spec defects nonetheless
+  reached build, one of them battery-reddening. Whether a defect absorbed in-session should count
+  against the tier is a **tier judgment**, which is the lead's and the operator's; this close
+  records the data and does not re-tier. That question is itself the calibration this entry is
+  about — the revert trigger is defined on the round-trip, and this iteration is the case where
+  the two readings come apart.
   **Cost while deferred:** align keeps returning a clean verdict that build then falsifies, so
   the stage's signal value decays toward zero while its cost does not — and a zero-divergence
   pass is read as evidence the amendments were right.
@@ -5788,10 +5803,13 @@
 - **consumer-gate-roster-unread** [design-pending] — no roster reader covers a consumer-declared
   gate, so one added to or deleted from the consumer gates dir drops out of nothing.
   **Verified at the drain.** `check-readme-roster`'s corpus is `gate_kit_roots`, and it skips any
-  root carrying no `checks/` directory. The consumer gates dir is neither, so the ten
-  `check-*.sh` and three `.gate` members living there are named by no README roster in either
-  direction — the kit-README marker block that makes a kit's own roster falsifiable has no
-  counterpart for them.
+  root carrying no `checks/` directory. The consumer gates dir is neither, so its members are
+  named by no README roster in either direction — the kit-README marker block that makes a kit's
+  own roster falsifiable has no counterpart for them.
+  **Re-verified 2026-08-15**, after the eleventh cohort emptied that dir of shell: it now holds
+  thirteen `.gate` members and no `check-*.sh` at all. The substrate moved, the predicate did
+  not — a `.gate` descriptor is exactly as unrostered as the script it replaced, so the entry's
+  corpus changed shape without changing size-of-gap, and the finding stands unaltered.
   **What does cover them, and why none of it is a roster.** They register in `gates.list`, each
   carries a `# graph:` manifest, and each owes a fixture pair. Every one of those is a
   *mechanism* obligation discharged by a machine-readable artifact; none asserts that a
@@ -5883,6 +5901,79 @@
   `audit-class-corpus-attestation` records. Paid at every close that reads the roster.
   Filed 2026-08-15 by close, on the lead's corpus ruling; scope-gated intake, so it is filed
   costed rather than swept by the session that received the ruling.
+
+- **freshness-emitter-port-cohort** [design-pending] — three generated-projection freshness
+  comparators are native while the emitters they compare against are still shell.
+  `scripts/gen-value-rollup.sh`, `scripts/gen-docs-mirror.sh` and `drift-kit/bin/trajectory.sh`
+  — re-verified 2026-08-15, all three still present as shell. Their comparator gates ported in
+  the eleventh cohort (gate-sdk/SPEC.md §The consumer remainder cohort), and that section states
+  the transferable conclusion in its own words: the cheap cohort in this family is the
+  **emitters**, not the gates, because a ported byte-comparator spawning a shell emitter removes
+  no shell. So the cohort banked consumer-tranche *completion* and, for these three members,
+  honestly zero dual-maintenance win. This entry is the work that banks it.
+  **Why `[design-pending]`:** an emitter is not a gate — it has no `.gate` descriptor, no
+  `good/`+`bad/` fixture pair, and no place in `gates.list`, so the shipped porting procedure
+  does not describe it and the substrate contract has no representation for a ported emitter.
+  Whether these become binary subcommands, stay shell behind a native comparator, or dissolve
+  into the comparator itself is the open call; `check-roadmap-fresh`'s unresolved emitter design
+  (three candidates, none ruled) is the same question one member over and should be ruled with it.
+  **Cost while deferred:** three compiled gates keep bash in the dependency floor against
+  TRAJECTORY.md objectives 1 and 6, and every later reader of the freshness family section has to
+  re-derive that the hold was superseded rather than wrong.
+  Filed 2026-08-15 by close, draining two gap-inbox bullets filed at spec and at build for the
+  same finding; both stated DISTINCT from `consumer-gate-port-disposition`, which the eleventh
+  cohort retired, and the drain confirmed the distinction rather than inheriting it.
+
+- **consumer-guard-rule-verification-lane** [design-pending] — a consumer's own bash-guard rules
+  have no verification lane anywhere in the tree.
+  guard-kit ships the decision table `guard-tests/cases.tsv` and guard-kit/SPEC.md §Testing
+  requires every **generic** rule to carry a firing and a non-firing case. But
+  `bin/run-guard-tests.sh` feeds `guard-kit/templates/bash-guard.sh`, which ships no consumer rule
+  by design (§Consumer rules). Re-verified 2026-08-15: `scripts/bash-guard.sh` carries exactly
+  four project rules — the `--no-verify` block, the harness-scratchpad steer, the `git clean -x`
+  block and the scratch-script steer — and no test file anywhere names any of them.
+  **Why `[design-pending]`:** the seam is the open part, not the tests. A consumer table needs a
+  runner entry point that feeds the *consumer's* guard rather than the template's, and that is
+  either a knob on `run-guard-tests.sh`, a second table the kit reads from a consumer-named path,
+  or a shipped harness the consumer calls with its own guard as the argument — and which one is
+  right depends on whether a consumer table may also assert on generic rules, which is unruled.
+  Provenance seam: the rules themselves are consumer content and must not become kit literals.
+  **Cost while deferred:** every consumer rule is a hand-verified block whose narrowing cannot be
+  measured, and §Testing's own point — that the decision table is the instrument precisely
+  because a blocked command never reaches the friction log — applies to consumer rules with no
+  table behind them. Enforcement-first wants the fix and its check in one unit; for a consumer
+  rule there is currently nowhere to put the check.
+  Filed 2026-08-15 by close, draining a gap-inbox bullet filed at spec.
+
+- **waiter-loop-condition-predicate-gap** [design-pending] — guard rule 12 declines on a
+  standalone loop-condition waiter, which is the shape its founding instance most likely took.
+  **Lead-ruled at build 2026-08-15 and filed with its cost and its conflict already stated; this
+  drain lands it as filed and does not re-open the ruling.** Rule 12 fires only when the
+  `pgrep`/`pkill -f` pattern literal recurs elsewhere in the same command, so a standalone waiter
+  issued as its own tool call falls through the recurrence test, and rule 13 declines on that
+  same command because the sleep sits inside a `do…done` span. **Both new rules miss it** —
+  re-verified by probe at this drain: the standalone `until`-form and the `while`-form both
+  return exit 0 through `scripts/bash-guard.sh`, while the compound launch-and-wait form returns
+  exit 2. Coverage is partial and honest rather than absent.
+  **Founding-instance argument.** The attested instance recorded beside
+  `waiter-predicate-self-match` is build batch A running two such waiters, plausibly the
+  standalone shape — so the enforcement half landed 2026-08-15 may not cover the failure that
+  motivated it.
+  **Proposed predicate:** also fire when the `pgrep`/`pkill -f` segment sits in loop-condition
+  position, between an `until`/`while` head and its `do`. Mechanically decidable off the token
+  walk the bare-sleep rule already performs, so the machinery exists and the cost is one clause
+  plus its firing and non-firing case in the decision table.
+  **Why `[design-pending]` — a conflict a later unit must resolve by ruling rather than ignore.**
+  The merged amendment states as a conservative direction that a `pgrep -f` whose pattern occurs
+  nowhere else in the command is a genuine query and is untouched, and loop-condition firing newly
+  blocks exactly that shape; and rule 12's own block message sanctions `kill -0` against a
+  recorded PID for waiting on a producer this session did not start, a legitimate case the
+  widened predicate would reach.
+  **Cost while deferred:** the founding shape stays unblocked and its failure mode is silent —
+  nothing reds, the work finishes correctly, and the only symptom is the foreground cap absorbing
+  an unbounded wait, which reads from outside as a fixed cap-length wait.
+  Filed 2026-08-15 by close, draining the gap-inbox bullet build filed on the lead's ruling;
+  scope-gated intake, so it was filed costed rather than taken in flight.
 
 ## Icebox
 
