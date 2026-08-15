@@ -4135,6 +4135,40 @@ Resolution, per declared knob:
   **exercised**, in evidence-kit and in lifecycle-kit, rather than a curiosity
   carried forward by cohorts that never met it. Stated here because a later
   kit's port would otherwise discover it at implementation time.
+- **A declared name ending in `*` is a prefix, and the bridge resolves the whole
+  family under it** — one `GATE_SDK_KNOB_<NAME>=<tab-joined>` element per match,
+  sorted, so the emitted environment is deterministic and the generated hook it
+  is baked into is stable. This is what lets a member read a keyed family whose
+  key set is *another knob's value*: `--knobs` publishes a static roster, so
+  without it a member can only name knobs it knows at compile time.
+  `EVIDENCE_KIT_RUN_<suite>` is the live instance — one variable per suite, with
+  the suite set coming from `EVIDENCE_KIT_SUITES`.
+
+  **This is a family of separate variables, not the keyed knob the bullet above
+  holds off the substrate, and the difference is the wire format's.** An
+  associative array cannot cross because `<name>=<elements>` has no key channel;
+  a prefix family needs none, because each member is already its own name and the
+  name carries the key. So the limit above stands exactly as written.
+
+  **Resolution happens at the instant the scalar arm's does** — after the owning
+  kit's `lib/*.sh` has been sourced, in the same subshell, which is the load-bearing
+  detail: it is what puts a consumer config's *loop-declared* variables in scope.
+  `scripts/evidence-config.sh` builds most of its family with a `while` loop over
+  `gate_fixture_suites`, so a reader that parsed the file rather than resolving it
+  would see the statically-assigned names and silently miss the rest.
+
+  **A prefix matching nothing is a refusal naming it**, and that is deliberately
+  *not* the resolved-empty pass an element-less knob gets: an empty array is a
+  value the consumer set, whereas an empty family is a member asking for
+  something absent. The element-shape refusals below apply per match, naming the
+  offending family member rather than the prefix.
+
+  **A prefix is a resolution set, never a roster.** It says *resolve values for
+  these names*; it does not say *these are the members*. The roster comes from
+  the roster knob, and a reader must look each name up rather than enumerate what
+  matched — `EVIDENCE_KIT_RUN_ID` matches `EVIDENCE_KIT_RUN_` and is evidence-kit's
+  run identifier, not a suite. A reader treating the matched set as the roster
+  would publish it as one.
 - **Three refusals, each exit 2 naming the knob** (§Fail-closed contract): an
   element containing a **newline**, which would break the line-per-element argv
   protocol; an element containing a **tab**, which would break the

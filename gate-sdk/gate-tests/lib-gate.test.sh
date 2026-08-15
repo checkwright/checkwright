@@ -151,6 +151,11 @@ PROBE_KIT_SPACED=(alpha "two words")
 PROBE_KIT_SCALAR=solo
 PROBE_KIT_TABBED=($'has\ttab')
 PROBE_KIT_NEWLINED=($'has\nnewline')
+PROBE_KIT_RUN_alpha='run alpha'
+PROBE_KIT_RUN_beta='run beta'
+PROBE_KIT_BADRUN_tabbed=($'has\ttab')
+for _p in one two; do declare "PROBE_KIT_RUN_loop_$_p=made by the loop"; done
+unset _p
 PROBE
 knob_argv() {
     PROBE_KNOB="$1" GATE_SDK_KIT_DIRS="$sandbox/probe-kit" \
@@ -199,6 +204,47 @@ out="$(knob_argv PROBE_KIT_ABSENT)"; rc=$?
 grep -qF -- 'PROBE_KIT_ABSENT' <<<"$out" \
     || { echo "  FAIL: the undeclared-knob refusal did not name the knob: $out"; fails=$((fails + 1)); }
 
+# --- the prefix form: a declared name ending in '*' resolves the whole family ---
+# The load-bearing case is the LOOP-DECLARED member: the family this exists for is
+# built by a consumer config's `while`/`declare`, so a reader that parsed the file
+# instead of resolving it would see the static names and miss these two entirely.
+prefix_env() { knob_argv 'PROBE_KIT_RUN_*' | grep '^GATE_SDK_KNOB_'; }
+got="$(prefix_env)"
+for want in \
+    'GATE_SDK_KNOB_PROBE_KIT_RUN_alpha=run alpha' \
+    'GATE_SDK_KNOB_PROBE_KIT_RUN_beta=run beta' \
+    'GATE_SDK_KNOB_PROBE_KIT_RUN_loop_one=made by the loop' \
+    'GATE_SDK_KNOB_PROBE_KIT_RUN_loop_two=made by the loop'; do
+    grep -qxF -- "$want" <<<"$got" \
+        || { echo "  FAIL: prefix form missed '$want', got: $got"; fails=$((fails + 1)); }
+done
+[[ "$(wc -l <<<"$got")" -eq 4 ]] \
+    || { echo "  FAIL: prefix form emitted $(wc -l <<<"$got") element(s), want 4: $got"; fails=$((fails + 1)); }
+
+# a resolution set is not a roster: the prefix takes only what sits under it, so a
+# sibling family under a different prefix stays out of this member's environment
+grep -q 'PROBE_KIT_BADRUN' <<<"$got" \
+    && { echo "  FAIL: prefix form swept in a sibling family: $got"; fails=$((fails + 1)); }
+
+# deterministic: the emitted environment is sorted, so two runs agree byte for byte
+[[ "$got" == "$(prefix_env)" ]] \
+    || { echo "  FAIL: prefix form is not deterministic across runs"; fails=$((fails + 1)); }
+
+# a prefix matching nothing is a REFUSAL naming it — not the resolved-empty pass a
+# scalar knob's empty value is, because the member asked for a family that is absent
+out="$(knob_argv 'PROBE_KIT_NOSUCH_*')"; rc=$?
+[[ "$rc" -eq 2 ]] \
+    || { echo "  FAIL: a prefix matching nothing exited $rc, want 2"; fails=$((fails + 1)); }
+grep -qF -- 'PROBE_KIT_NOSUCH_*' <<<"$out" \
+    || { echo "  FAIL: the empty-prefix refusal did not name the prefix: $out"; fails=$((fails + 1)); }
+
+# the element-shape refusals apply per match, naming the offending family member
+out="$(knob_argv 'PROBE_KIT_BADRUN_*')"; rc=$?
+[[ "$rc" -eq 2 ]] \
+    || { echo "  FAIL: a tab inside a prefix-matched element exited $rc, want 2"; fails=$((fails + 1)); }
+grep -qF -- 'knob PROBE_KIT_BADRUN_tabbed' <<<"$out" \
+    || { echo "  FAIL: the prefix element refusal did not name the member: $out"; fails=$((fails + 1)); }
+
 # --- the knob-owner lookup drains its producer --------------------------------
 # The candidate roots are read to EOF *before* the match loop, so an early prefix
 # hit never leaves the producer writing into a closed pipe. The oracle is SIGPIPE
@@ -224,5 +270,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "lib-gate.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "lib-gate.test: ok (fail_closed branches; gate_path_pruned; GATE_GREP_EXCLUDES; gate_find prune incl. the worktrees leaf; PRUNE_EXTRA_DIRS append over both branches; registry + resolution; .gate declaration/argv split + dispatch fail-closed; the knob bridge's serialization, scalar/knobless/prefixless arms and its three refusals; the knob-owner lookup draining its producer on an early match under SIGPIPE-ignored)"
+echo "lib-gate.test: ok (fail_closed branches; gate_path_pruned; GATE_GREP_EXCLUDES; gate_find prune incl. the worktrees leaf; PRUNE_EXTRA_DIRS append over both branches; registry + resolution; .gate declaration/argv split + dispatch fail-closed; the knob bridge's serialization, scalar/knobless/prefixless arms and its three refusals; the prefix form over a loop-declared family, its sibling-family exclusion, determinism, empty-prefix refusal and per-match element refusal; the knob-owner lookup draining its producer on an early match under SIGPIPE-ignored)"
 exit 0

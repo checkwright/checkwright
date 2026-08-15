@@ -157,6 +157,49 @@ _gate_knob_value() {
     )
 }
 
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the prefix form of _gate_knob_value: a declared name ending in `*` resolves the whole family defined under it, one `GATE_SDK_KNOB_<NAME>=<tab-joined>` element per match, sorted so the emitted environment is deterministic. Resolution happens at the same instant the scalar arm's does — after the owning kit's lib/*.sh has been sourced, which is what puts a consumer config's loop-declared variables in scope. A prefix matching nothing is a refusal naming it, never a resolved-empty set: the member asked for a family and the family is absent. The element-shape refusals are the scalar arm's, applied per match.
+_gate_knob_prefix_values() {
+    local prefix="$1" gate="$2" kit
+    kit="$(_gate_knob_owning_kit "$prefix")"
+    (
+        shopt -s nullglob
+        export GATE_SDK_RESOLVING_KNOB="$prefix"
+        local _gkp_f
+        for _gkp_f in "$kit"/lib/*.sh; do
+            # shellcheck disable=SC1090  # the owning kit's library, resolved by prefix
+            source "$_gkp_f"
+        done
+        local _gkp_n _gkp_e _gkp_hits=0
+        local -a _gkp_names=()
+        while IFS= read -r _gkp_n; do
+            [[ "$_gkp_n" == "$prefix"* ]] && _gkp_names+=("$_gkp_n")
+        done < <(compgen -v | sort)
+        for _gkp_n in ${_gkp_names[@]+"${_gkp_names[@]}"}; do
+            local -n _gkp_val="$_gkp_n"
+            for _gkp_e in "${_gkp_val[@]+"${_gkp_val[@]}"}"; do
+                case "$_gkp_e" in
+                    *$'\n'*)
+                        printf 'gate_command: knob %s has an element containing a newline: %s — ' "$_gkp_n" "$_gkp_e" >&2
+                        printf 'the argv protocol is one element per line; treating as failure (not clean)\n' >&2
+                        exit 2 ;;
+                    *$'\t'*)
+                        printf 'gate_command: knob %s has an element containing a tab: %s — ' "$_gkp_n" "$_gkp_e" >&2
+                        printf 'tab separates the serialized elements; treating as failure (not clean)\n' >&2
+                        exit 2 ;;
+                esac
+            done
+            ( IFS=$'\t'; printf 'GATE_SDK_KNOB_%s=%s\n' "$_gkp_n" "${_gkp_val[*]+"${_gkp_val[*]}"}" )
+            unset -n _gkp_val
+            _gkp_hits=$(( _gkp_hits + 1 ))
+        done
+        if [[ "$_gkp_hits" -eq 0 ]]; then
+            printf 'gate_command: %s declares knob prefix %s*, but %s/lib defines no variable under it — ' "$gate" "$prefix" "$kit" >&2
+            printf 'a prefix matching nothing is a refusal, not a resolved-empty set; treating as failure (not clean)\n' >&2
+            exit 2
+        fi
+    )
+}
+
 # spec: gate-sdk/SPEC.md §lib/gate.sh — the bridged environment for one binary arm, whether that arm is a `.gate`-dispatched gate or a non-gate arm a front-end invokes (§The non-gate arm): asks the binary what the arm reads, resolves each name through _gate_knob_value, and emits one `GATE_SDK_KNOB_<NAME>=<tab-joined>` element per line. Returns non-zero having named the refusal on stderr — the status is the caller's to propagate, which is why this prints to stdout for a `$(…)` capture rather than writing into a process substitution that would swallow it.
 gate_knob_env() {
     local g="$1" bin knob_names knob_status knob value
@@ -169,6 +212,10 @@ gate_knob_env() {
     fi
     while IFS= read -r knob; do
         [[ -n "$knob" ]] || continue
+        if [[ "$knob" == *'*' ]]; then
+            _gate_knob_prefix_values "${knob%\*}" "$g" || return 2
+            continue
+        fi
         value="$(_gate_knob_value "$knob" "$g")" || return 2
         printf 'GATE_SDK_KNOB_%s=%s\n' "$knob" "$value"
     done <<<"$knob_names"
