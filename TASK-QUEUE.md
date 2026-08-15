@@ -4492,7 +4492,7 @@
   by answering, evict to the icebox, or relocate grounds to a linked entry — the last
   **authorization-gated, not self-served**. So a session facing a full entry and holding a
   *mandatory* one-line write has no self-served move that preserves the record.
-  recurrence: entry-cap-displaces-mandated-writes 2026-08-15
+  recurrence: entry-cap-displaces-mandated-writes 2026-08-15 2026-08-16
   **Four firings on 2026-08-15 against a promotion threshold of 2** — an 11-line cull at scope
   (both entries left at 49/50) and three over two build batches — plus a fifth to seat this line.
   **First recorded instance:** `deferred-release-declaration-accumulation`'s 2026-08-09 deferral,
