@@ -12,10 +12,14 @@
 
 ## New Features
 
-- **native-gate-port-remaining-corpus** [spec: SPEC-decl-cohort.md] [roadmap: now/reliability]
+## Technical Debt
+
+## Deferred
+
+- **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
   — the whole battery onto the binary, and the shell surface down to its residue.
   roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
-  Stays deferred rather than `## Done`: it is the **whole corpus** (60 of 104 unported), and a
+  Stays deferred rather than `## Done`: it is the **whole corpus** (57 of 104 unported), and a
   Done move would assert a finished port and silently drop it from the **public** roadmap
   projection, which reads `[roadmap:]` tags off live entries.
   **Operator-ruled 2026-08-09: complete the port, ASAP.** The ruling, its grounds and its
@@ -33,26 +37,19 @@
   **This answers the toolchain-free objection:** the installer smoke's toolchain-free arm is
   satisfied by the pre-compiled path, not by retaining shell gates. `powershell-installer-surface`
   moves with it — one implementation across platforms shrinks its cover to the bootstrap.
-  **Nine cohorts closed; gate-sdk/SPEC.md §The first cohort, and the rule that selects the next
+  **Ten cohorts closed; gate-sdk/SPEC.md §The first cohort, and the rule that selects the next
   is canonical for every one of them** — members, delivered counts, holds, grounds and each
   cohort's own price live there, so this entry states what remains rather than restating them.
   From the eighth on, members are **selected by running** `port-blockers.sh --group` rather than
-  read off the tree. **44 of 104 ported.**
-  **The tenth cohort is operator-ruled 2026-08-15 at scope: the `lib/declaration.sh` release-note
-  family** — `check-release-bump`, `check-tightened-gates-grammar`,
-  `check-tightened-gates-note-parity`, all three consumer-declared, so it is also
-  `consumer-gate-port-disposition`'s first tranche. The `--group` size arm is exhausted a second
-  time, so it rides the blocker-retiring override; the tool split one shared derivation into
-  three singletons on exact-set key equality and the selecting session adjudicated the union,
-  which §The first cohort reserves to it. Criterion 6 carried forward so `spec` does not
-  re-derive it: `gate-sdk/bin/upgrade-smoke.sh` keeps `lib/declaration.sh` **dual** — the
-  `spec_manifest_files` disposition, never the seventh cohort's delete-the-shell-form outcome.
-  Seam ruled clean: the library parameterises its section name, its token grammar is generic, and
-  the section names are published — grammar crosses into the crate, vocabulary does not.
+  read off the tree; the size arm is now exhausted twice running, so the last two cohorts rode
+  the documented blocker-retiring override rather than a count. **47 of 104 ported.** The tenth
+  is §The declaration cohort, which is also `consumer-gate-port-disposition`'s first tranche and
+  where that cohort's override, its adjudicated union key, its criterion-6 dual disposition and
+  its seam ruling are recorded.
   Every held member is **sequencing with port work owed, never exclusion**, and what each owes
   is on `cohort-held-members-port-prerequisites`, which owns the roster and the kits it spans;
   a kit count copied here would be a second one to drift, and was.
-  **Cost while deferred:** large and known — 60 gates plus the runners and the install-lifecycle
+  **Cost while deferred:** large and known — 57 gates plus the runners and the install-lifecycle
   layer, and every gate landed meanwhile adds shell to the eventual port. Not a single-iteration
   delta; scope owns the decomposition, and the criterion-relaxation question is closed at
   gate-sdk/SPEC.md §The port-candidate criteria — an ordering signal, never an eligibility screen.
@@ -61,10 +58,6 @@
   Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
   direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope. Since then it is
   promoted at spec and demoted at build once per cohort, and the terminal move is a **demotion**.
-
-## Technical Debt
-
-## Deferred
 
 - **consumer-gate-port-disposition** [design-pending] — the destination is ruled and the
   first-mover design is merged; what remains is the tranche work porting this repo's own 13
@@ -75,13 +68,13 @@
   second consumer-owned crate under `GATE_SDK_NATIVE_CRATE`; shell residue justified as a
   class) are not re-priced here. The ruling was taken *without* making the tranche that
   iteration's unit, so the destination is settled and the tranche schedules later.
-  **The class, re-measured 2026-08-15 at scope against the post-ninth-cohort registry:** the 13
-  are **100% unported** — no `.gate` beside any of them — against **60 unported of 104
-  registered**, so they are 22% of what the port has left. Earlier figures (63 of 103, then 62
-  of 104) each predate a cohort and are corrected here rather than annotated. They are
+  **The class, re-measured at each tranche rather than annotated:** after the first tranche
+  landed 2026-08-15 at build, **10 of the 13 are still shell**, against **57 unported of 104
+  registered**, so they are 18% of what the port has left. Every earlier figure predates a
+  cohort and is corrected in place. They are
   Checkwright's own rules about Checkwright's own tree: docs mirror, nav and kit parity, install
-  toolchain, installer dependency floor, npm publish spec, release bump and channel parity,
-  trajectory freshness, value rollup, tightened-gates grammar and note parity, kit-ref liveness.
+  toolchain, installer dependency floor, npm publish spec, release channel parity,
+  trajectory freshness, value rollup, kit-ref liveness.
   **What the ruling accepts:** an adopter's binary carries subcommands implementing another
   project's repo rules, which they can never register — the cost taken against TRAJECTORY.md's
   objective 4. Its two grounds and their consequence now sit where the mechanism is,
@@ -90,15 +83,15 @@
   kits, and `native/` is both the crate this repo ports *into* and the one whose binary ships
   *out*; a single-role tree would have met the fork on its first consumer gate.
   **The cheapest single-gate first mover is named: `check-installer-no-deps`** — one gate over
-  one small corpus (`installer/package.json`), excluded from the ninth cohort with cause (that
-  cohort buys a JSON reader and membership beyond what proves the engine adds risk without
-  payoff), entering with that reader already paid. It was ruled *past* the 2026-08-15 tranche,
-  never rescinded, and stays available to any later cohort.
-  **The first tranche is ruled 2026-08-15 at scope: the `lib/declaration.sh` release-note family**
-  — `check-release-bump`, `check-tightened-gates-grammar`, `check-tightened-gates-note-parity`,
-  3 of the 13; its members and grounds live with every other cohort's on
-  `native-gate-port-remaining-corpus`. That sizing was inside this entry's envelope and leaves
-  the 2026-08-14 destination untouched.
+  one small corpus (`installer/package.json`), excluded from the ninth cohort with cause and
+  entering with that cohort's JSON reader already paid. Ruled *past* the 2026-08-15 tranche,
+  never rescinded, and available to any later cohort.
+  **The first tranche is ruled 2026-08-15 at scope and landed the same day at build: the
+  `lib/declaration.sh` release-note family** — 3 of the 13, its members, grounds and price at
+  gate-sdk/SPEC.md §The declaration cohort. That sizing was inside this entry's envelope and
+  leaves the 2026-08-14 destination untouched. It proved the sentinel dispatches, and that a
+  zero-knob member never reaches the config bridge — so the **dispatch** question the gap inbox
+  carries is still owed by the first member that declares a knob.
   **The first-mover design is answered and merged into gate-sdk/SPEC.md, 2026-08-15 at build,
   and a later tranche member inherits it rather than re-deriving it:** the owner column's
   declaring-root domain and its `-` sentinel, assertion B's two-clause scope rule with both

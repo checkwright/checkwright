@@ -2771,6 +2771,15 @@ exit code. Byte-identical on all of them, with **exactly one divergence, and it 
 the designed one** — a prerelease token, where the shell prints a clean line
 carrying a mis-ordered pair and the compiled form refuses.
 
+**Both subprocess reads go through the crate's one spawn site**, and a unit test
+leaves a gate module unable to construct a child at all (§Fail-closed contract).
+The tag probe's non-zero status is the *no such tag* branch, a verdict rather
+than a failure, so it is read through the exit-code accessor that section added
+for exactly the child that grades its own outcome by its exit code. The historical
+`git log`'s added lines are extracted with a pattern the gate itself owns, so it
+is hand-compiled rather than routed through the engine — §The POSIX ERE matcher's
+boundary, unchanged.
+
 **Two conflations are preserved rather than repaired, because a port proves
 parity and does not fix rules.** The first is inherited: `check-release-bump`
 silences its historical `git log`'s stderr and returns success regardless, so a
@@ -2806,6 +2815,41 @@ dozens of descriptors, so none gains it. A row the derivation stops selecting is
 not removed on that ground alone; only the newly-selected direction can fail, and
 it selected nothing.
 
+**The other readers of the narrowed corpus were enumerated by red condition
+rather than by subject**, because *a narrower corpus can only remove violations*
+is false for three ordinary shapes and this narrowing met all of them
+(canon-kit/SPEC.md's causal-completeness point 5). The **inverse** shapes:
+assertion A reds on a descriptor and a script *coexisting*, so a half-done port
+violates it and the finished one satisfies it; `check-exec-bit`'s `.gate` arm is
+unconditional and reds on a descriptor committed **executable**, the opposite of
+its usual condition. The **reds-on-empty** shape: `check-shellcheck` exits 2 on an
+empty target set, re-checked at build rather than inherited, since the gates
+directory retains many `check-*.sh` and the ground is a count.
+`check-gate-fixture-coverage` reds on a registered member with no pair, and all
+three pairs are retained — deleting a script and orphaning its pair are one action
+apart. `check-reads-couples` reds when observed walk roots are not a subset of
+declared ones, answered here by `--reads` with a single `?`: the walked directory
+is relocated by the gate's own positional argument, so declaring the live default
+would red unit test A the moment a fixture case ran. Two readers are
+**structurally out of reach, measured rather than assumed**: `check-readme-roster`
+and `check-install-disposition` both sweep `gate_kit_roots` only, so neither names
+a consumer-declared member before or after, in either direction. The general fact
+the first exposes — that no roster reader covers a consumer-declared gate at all —
+is a standing coverage question filed to the gap inbox rather than answered inside
+this cohort. `check-settings-paths` reds on a committed permission grant naming a
+`.sh` path that does not resolve, and re-verification at build found none naming
+these: the two grants that could have carry a `*` in the command token and are
+skipped by the predicate. One non-red consequence is recorded so it is not
+mistaken for coverage — those wildcard grants silently stop covering this
+cohort's members, which do not run as scripts. `check-docs-cmd` reddens on
+§lib/declaration.sh's caller roster, where the deleted paths were named, and the
+roster rewrite this cohort already
+owed is what clears it; that is real signal, exactly as the disposition table
+predicts for it. `check-measured-claim` reds because its oracle counts registry
+members resolving to a `.gate`, so the marked literal in docs/install.md moves
+with the port — and the generated pre-commit hook bakes the same value, which is
+why the hook regen is owed with the doc edit rather than after it.
+
 **What this cohort paid that the last four did not is the callers, and it is the
 lifecycle-kit cohort's lesson recurring on a consumer's own gates directory.**
 Both bespoke `scripts/gate-tests/*.test.sh` behind these members named their gate
@@ -2814,6 +2858,21 @@ now reach it through `gate_run` (§run-gate-tests), which is what makes a
 behavioral test survive a substrate change. A tranche porting consumer-declared
 members enumerates that directory's `*.test.sh` before the cut, exactly as a
 selector reaching a kit that ships `bin/` or `smoke/` does.
+
+**Criterion 5, priced by measurement, on a prediction that was structural rather
+than empirical.** All three members are consumer-declared, so they sit in no kit's
+`checks/`, `init` can never seed them, and no adopter has ever had them — a
+residual counts what a consumer *loses*, and this cohort takes nothing from any
+consumer. That is a stronger ground than the ninth cohort's `on-surface`
+argument, and it still does not discharge the criterion: N members each
+individually runnable is not a measurement. Measured with `installer_smoke`'s
+binary-less leg after this cohort's own commit, from a clean checkout reached by
+path: **12 members omitted and declared**, the same figure the ninth cohort
+measured, so growth is **zero** and the cohort lands on that finding. The
+consumer-declared ground is restated here rather than banked, because it is what
+makes the zero predictable rather than lucky. The judgment was fixed in advance,
+and a non-zero would have been a finding about the *measurement* as much as about
+the cohort.
 
 **Two exclusions, each with its ground.** `check-installer-no-deps` was ruled past
 this iteration at scope and is **not** rescinded here; it remains the named
@@ -3899,7 +3958,14 @@ no status 2.
 
 The markdown arm reports the **trichotomy** the grammar defines: an explicit
 `None` body (the resolved empty set), a non-empty token list, or
-unparsed-and-not-`None`. The third arm is the one that earns the helper. A
+unparsed-and-not-`None`. Every arm has a named reader at a named transition, and
+one with none would be removed: *absent* is read by `check-release-bump` at its
+fixed-section presence assertions and by `check-tightened-gates-grammar` at its
+status-2 arm; *explicit `None`* by the grammar gate's `none` counter, which its
+clean line prints, and by note-parity as the resolved empty set it compares;
+*tokens* by all three, as a bullet count in the bump gate and as a token set in
+the other two; *unparsed* by the grammar gate's finding list and by note-parity's
+refusal. The third arm is the one that earns the helper. A
 non-`none` section yielding zero tokens must not become "no allowed reds": on a
 green battery that passes silently over a note naming several gates, and on a red
 one it fails *loudly with a false message*, accusing the note of an omission it
@@ -3961,6 +4027,15 @@ way, through `scripts/gate-tests/check-tightened-gates-note-parity`'s own
 declaration-file argument — which since the port drives the *compiled* holder,
 so that pair proves the shell arm only through the parity comparison above and
 never instead of it.
+
+**The compiled holder's public surface is bounded and is exactly these three
+entry points** — the container arm alone, the markdown arm's verdict, and the
+record arm. There is no writer, no renderer and no section-discovery API, and
+adding one is a design decision with its own reader rather than an omission to
+fill in. Its consumers are four and are named: the three gate modules of §The
+declaration cohort plus the parity arm above. `bin/upgrade-smoke.sh` is
+deliberately not among them, which is the criterion-6 ruling and the reason the
+oracle exists.
 
 The helper carries no section name and no gate name of its own — both are the
 caller's arguments, and it takes no configuration. That is where the seam falls:
