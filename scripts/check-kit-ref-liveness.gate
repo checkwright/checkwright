@@ -1,0 +1,2 @@
+# graph: couples=kit:README.md,native/src/gates/kit_ref_liveness.rs,native/src/fresh.rs dir=one valve=none tier=precommit trigger=*
+# spec: canon-kit/SPEC.md §Layout and configuration — every kit-name reference in a tracked file resolves to a live kit root: a slash/line-anchored <name>-kit or gate-sdk path segment names a gate_kit_roots dir, and a live-prefix kit knob resolves to a tracked kit knob (check-docs-cmd's resolver)

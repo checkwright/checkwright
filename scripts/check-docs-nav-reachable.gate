@@ -1,0 +1,2 @@
+# graph: couples=docs/*.md,docs/*/index.md,docs/*/SPEC.md,docs/*/README.md,docs/doctrine-kit/DOCTRINE.md,docs/posts/*.md,scripts/docs-offnav.list,native/src/gates/docs_nav_reachable.rs,native/src/fresh.rs dir=one valve=none tier=precommit
+# spec: docs/site-architecture.md §Site chrome and the nav contract — every tracked docs page carries a title front-matter block and is reachable from the rendered nav (a nav slot, or a relative-link walk seeded from the nav set), or is listed in the off-nav allowlist

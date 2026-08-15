@@ -2,6 +2,11 @@
 // format: an LCS walk rather than a spawn, returning every hunk uncapped, carrying no
 // consumer vocabulary and no report policy
 
+// spec: gate-sdk/SPEC.md §The diff renderer — the freshness family's stale-report cap, held
+// as the value its shell members each spelled inline. The renderer stays uncapped; the
+// caller applies this.
+pub(crate) const STALE_REPORT_CAP: usize = 20;
+
 pub(crate) fn normal_diff(a: &[&str], b: &[&str]) -> Vec<String> {
     let (n, m) = (a.len(), b.len());
     let mut lcs = vec![vec![0usize; m + 1]; n + 1];

@@ -1,0 +1,2 @@
+# graph: couples=.github/workflows/*.yml,.github/workflows/*.yaml,native/src/gates/npm_publish_spec.rs,native/src/fresh.rs dir=one valve=none tier=precommit
+# spec: RELEASING.md §The publish spec — every `npm publish` positional spec in a workflow is unambiguously a path by its own literal text: a leading `.` or `/`, or an expansion of a proven-absolute root

@@ -1,0 +1,2 @@
+# graph: couples=docs/kits.md,docs/*/index.md,kit:gate-tests/*,native/src/gates/docs_kit_parity.rs,native/src/gates/kit_registration.rs,native/src/fresh.rs dir=one valve=none tier=precommit
+# spec: gate-sdk/SPEC.md §check-kit-registration — docs/kits.md carries a registry row for every kit root (this consumer re-scopes the kit-registration invariant onto the Kit Reference page; wrapper, not mechanism) and every docs/<kit>/index.md carries the nav child block so a landed kit page cannot fall out of the site nav

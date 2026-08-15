@@ -4,6 +4,7 @@
 mod declaration;
 mod diff;
 mod ere;
+mod fresh;
 mod gates;
 mod json;
 mod proc;

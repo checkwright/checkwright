@@ -43,6 +43,8 @@ unset _gpx
 [[ -v GATE_SDK_RUNNER_DOC ]] || GATE_SDK_RUNNER_DOC="README.md"
 # spec: gate-sdk/SPEC.md §The workflow directory — the same resolution for the workflow directory, and for the same reason: the governed-comment corpus takes its tracked tier, so a compiled member reading that corpus declares this knob and the bridge can only carry a value some kit library defines
 [[ -v GATE_SDK_WORKFLOW_DIR ]] || GATE_SDK_WORKFLOW_DIR=".workflow"
+# spec: gate-sdk/SPEC.md §Layout and configuration — and the same resolution for the queue file, on the third occurrence of the same cause: a compiled member valving the queue out of its corpus declares this knob, and an environment-only override no kit library defines is the bridge's third refusal whatever prefix its name carries. Every inline reader keeps its spelling and its value; what changes is that the name now resolves to something declare -p can find.
+[[ -v GATE_SDK_QUEUE_FILE ]] || GATE_SDK_QUEUE_FILE="TASK-QUEUE.md"
 
 gate_find() {
     local prune=() d

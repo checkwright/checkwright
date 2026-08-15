@@ -1,0 +1,2 @@
+# graph: couples=docs/install.md,context-kit/lib/toolfloor.sh,native/src/gates/install_toolchain.rs,native/src/fresh.rs dir=bi valve=none tier=precommit
+# spec: docs/site-architecture.md §Generated projections and their freshness gates — docs/install.md's Requirements toolchain list holds whole-element parity (name, version floor, implementation token, audience) with context-kit/lib/toolfloor.sh's PROBE_SET roster, both directions

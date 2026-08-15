@@ -155,11 +155,21 @@ pub fn find_files(root: &Path, exts: &[&str]) -> Result<Vec<PathBuf>, String> {
 // the extension filter and the filename filter are both applied by their callers above, so
 // one traversal serves both and the recorder still observes every walk at one line.
 fn find_any(root: &Path) -> Result<Vec<PathBuf>, String> {
+    let prune = prune_dirs()?;
+    find_with_prune(root, &|n| prune.iter().any(|d| d == n))
+}
+
+// spec: gate-sdk/SPEC.md §Fail-closed contract — the same traversal with the prune predicate
+// supplied by the caller, because `gate_find`'s bridged set is not every shell form's rule: a
+// member whose original reached for a bare `find` prunes what that `find` pruned.
+pub fn find_with_prune(
+    root: &Path,
+    prune: &dyn Fn(&str) -> bool,
+) -> Result<Vec<PathBuf>, String> {
     // spec: gate-sdk/SPEC.md §check-reads-couples — every walk passes here, so recording at
     // this one line is what makes unit test A's observation complete.
     #[cfg(test)]
     recorder::note(&root.display().to_string());
-    let prune = prune_dirs()?;
     let mut out = Vec::new();
     let mut stack = vec![root.to_path_buf()];
     while let Some(dir) = stack.pop() {
@@ -179,7 +189,7 @@ fn find_any(root: &Path) -> Result<Vec<PathBuf>, String> {
             let meta = fs::symlink_metadata(&p)
                 .map_err(|e| format!("cannot stat {}: {}", p.display(), e))?;
             if meta.is_dir() {
-                if prune.contains(&name) {
+                if prune(&name) {
                     continue;
                 }
                 stack.push(p);

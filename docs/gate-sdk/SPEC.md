@@ -76,7 +76,13 @@ read by `check-graph` assertion E — set it to republish the artifact elsewhere
 e.g. a served docs page), `GATE_SDK_TMP_DIR` (default `.tmp`), `GATE_SDK_VERBOSE`
 (default unset = quiet green; any non-empty value restores the full per-gate
 banner roll on `run-gates.sh` and the generated hooks — see §run-gates),
-`GATE_SDK_QUEUE_FILE` (default `TASK-QUEUE.md`), `GATE_SDK_AGENT_FILE` (default
+`GATE_SDK_QUEUE_FILE` (default `TASK-QUEUE.md`; resolved in `lib/gate.sh` rather
+than inline at its readers, for the third occurrence of the reason the workflow
+directory above and the two `check-kit-registration` document knobs below carry —
+a compiled member valving the queue out of its corpus declares this knob, and a
+knob no kit library defines is the config bridge's third refusal **whatever
+prefix its name carries**, so an environment-only override would fail-close on
+every invocation), `GATE_SDK_AGENT_FILE` (default
 `CLAUDE.md`; the always-loaded agent file a consumer's harness reads — set it to
 `AGENTS.md` under an agent-file harness, and `check-root-tiering`'s built-in
 allowlist accepts that file at root), `GATE_SDK_GRAPH_THEME` (default
@@ -856,7 +862,8 @@ answering a question assertion C never asked.
 | `check-todo-task-liveness`, `check-deprecation-task` | **Retained, corpus extended** to the Rust module and the descriptor, the same shape as `check-comment-tier`: both walk the shared comment surface hunting `TODO(task:)`/deprecation markers, so a marker left in a ported gate's Rust source would otherwise stop being tracked. Both are `.gate`-dispatched since the seventh cohort, on the same terms as the two rows above. |
 | `check-knob-default-coupling` | **Retained unchanged, and deliberately *not* corpus-extended** — the extension the shape of this table invites would be vacuous. Its two default idioms are shell (`${KNOB:-v}`, the guarded assignment) and its knob prefixes derive from `gate_kit_roots` members; `native/` is not a kit root and a Rust `const` matches neither idiom, so pointing it at `*.rs` would scan files whose grammar it cannot parse and add zero assertions while reading as coverage. The duplication it could not reach — the crate's prune-dir default against `lib/gate.sh`'s — **is now absent rather than test-held**: the config bridge (§lib/gate.sh) leaves exactly one place a knob's value is computed, the kit's shell library, and the crate carries no default for a bridged knob to drift from. The crate carries no unit test comparing the two literals, because it carries only one: that assertion is **deleted with the duplication it gated** — enforcement-first ranks removing the duplication above gating it, and a citation left behind would point this table at an absent mechanism, the exact defect its own prose calls out. Its verdict on `lib/gate.sh` is unchanged: the shell default stays exactly where it is, as the sole one. |
 | `check-gate-tamper` | **Retained, extended — and the extension is partly discharged.** The gate-file roster it recognises (`DELEGATION_KIT_GATE_FILES`) carries the `.gate` spelling on the **kit default** as of the first cohort's descriptors, or a consumer on that default would receive a ported gate whose edits escape the isolation rule (delegation-kit/SPEC.md §Layout and configuration). This repo's own config carried both spellings ahead of the port, which is exactly why the kit default had to be checked separately rather than inferred from a green battery here. Its meta-layer path roster (`DELEGATION_KIT_META_PATHS`) is fixed **in this repo's consumer config**: `native/` is declared there (`scripts/delegation-config.sh`), so a commit editing a ported gate's Rust implementation alongside its descriptor is meta-isolated rather than refused. The kit default and any other consumer on it still lack the prefix — `native/` is never auto-unioned by the kit-root scan (`gate_kit_roots`'s predicate requires `checks/` or `smoke/`, which the crate ships neither of), so the fix is consumer config, not a kit-default change. One known limit stands: its exemption reader parses a shell `# exception-list:` array literal and has no Rust-source equivalent. Stated against the live ported set rather than the cohort that first raised it, since the binding condition is a property of the roster and moves with every cohort: the limit is unbound while no ported member carries an exemption list, and it is unbound for a stronger reason than a shell-only holder set — the tree carries **no** exemption-list holder at all, which `check-gate-exemption-tasks` counts on every run. The cohort that ports the first one owes the Rust-source reader. |
-| `check-graph`, `check-kit-enum`, `check-gate-fixture-coverage`, `check-enforcement-fresh`, `check-value-rollup-fresh` | **Survive unchanged** — all five read the declaration path as text (directly, or through `enforcement-map.sh`/`footprint.sh`, which do), which the descriptor still is. |
+| `check-graph`, `check-kit-enum`, `check-gate-fixture-coverage`, `check-enforcement-fresh` | **Survive unchanged** — all four read the declaration path as text (directly, or through `enforcement-map.sh`/`footprint.sh`, which do), which the descriptor still is. |
+| `check-value-rollup-fresh` | **Survives unchanged in mechanism, and is itself `.gate`-dispatched** since §The consumer remainder cohort — so this row now describes a ported member reading ported members' declaration paths. It reads them as text through `footprint.sh`, which the descriptor still is, and that is why the port moves nothing about its rule. What the port *did* move is one term of its coupling, recorded because the re-derivation confirmed it rather than assuming it: its `couples=` names `scripts/*.sh,kit:*.sh`, and after that cohort emptied the consumer's gates directory of check scripts, `scripts/*.sh` covers **no** registry member's declaration path at all. The member stays substrate-sensitive through `kit:*.sh` alone. A narrowing is not a clearance — `scripts/` retains many non-gate `*.sh`, and the coupling still earns its trigger — but a later reader deriving the set must not read the `scripts/*.sh` token as the thing that selects this row. |
 | `check-gate-binary-fresh` | **Retained by construction — and recorded here before the derivation reaches it, deliberately.** It reads declaration paths as a *set*, to decide whether the binary is load-bearing, and never reads a gate's source, so a port is its trigger rather than its blind spot: a ported member is exactly the case that switches it on. Its couples name `kit:checks/*.gate` specifically, so it was **not yet substrate-sensitive** by assertion C's runtime derivation when this row was written, with zero descriptors then on disk, and the row was not yet owed — it was written ahead of the trigger rather than left to be discovered. The first cohort's descriptors have since landed, so the gate is sensitive and the row is owed; the commit that landed them would have reddened on a missing disposition, and that commit's session was the worst possible one to be learning this table exists. That is the foresight paying, and it is the same reasoning as the gate itself: the oracle ahead of the hole (§check-gate-binary-fresh). |
 | `check-gate-substrate-parity` | **Retained by construction** — it is substrate-sensitive by the same derivation it performs, and it reads declaration paths both as text and as a *set*, which is precisely what it exists to see. It stays a shell gate (§check-gate-substrate-parity), so the auditor never depends on the substrate it audits. Its own row is written out rather than left to the section's prose mention: assertion C is satisfied by any occurrence of a member's name in this section, and a gate passing its own assertion by being *discussed* is a coincidence, not a disposition. |
 | `check-install-disposition` | **Retained, and substrate-blind by construction** — it reads both declaration spellings as text, taking the `# install:` header line off a `.gate` descriptor exactly as off a `.sh` implementation, because a ported gate is still a gate a kit ships and its disposition is a property of the gate rather than of its substrate (§The install disposition). A port therefore moves nothing here: the declaration travels with the descriptor, which is the same file the installer's payload already carries. It stays a shell gate for the reason the sibling auditors do — the assertion that a gate declares itself must not depend on the substrate the declaration might name. |
@@ -1386,6 +1393,25 @@ design time; the last three were paid for, and each is named with what it cost.
    derived roster literally will otherwise label such a hold criterion 7 and put
    the design work behind the wrong door.
 
+   **The worked instance.** §The consumer remainder cohort ported three
+   generated-projection freshness members whose emitters are unported shell —
+   `check-trajectory-fresh`, `check-value-rollup-fresh` and
+   `check-docs-mirror-fresh`. All three clear this criterion, exactly as the
+   clause above says, and what actually held them was the family's own sequencing
+   finding, superseded by an operator ruling and accounted for at §The
+   generated-projection freshness family rather than waived here. The instance is
+   worth naming because it is the first time the two doors were open at once and
+   the cohort went through the right one.
+
+   **A second instance, and it is about the tool rather than the rule.** The same
+   cohort's `check-docs-kit-parity` was reported `?` — undecidable — because its
+   command word was an array `gate_command` populates at run time, which no
+   static scan resolves. An undecidable is neither a pass nor a blocker: it is an
+   instruction to trace the runtime program set by hand, which that cohort did,
+   finding `{awk, bash, the binary this cohort ports into}` and clearing the
+   criterion. A session that reads `?` as a hold has let the scanner's limit
+   become the rule's.
+
    **The roster is derived and lives in no document, including this one** —
    `bash gate-sdk/bin/port-blockers.sh` reports it against the tree at the moment
    a session sequences a cohort. That is a correctness requirement, not a
@@ -1804,21 +1830,49 @@ labelled.** Its members byte-compare a tracked projection against a live
 gate's emitter ported?* — the emitters are `context-kit/bin/footprint.sh`,
 `drift-kit/bin/trajectory.sh`, `gate-sdk/bin/enforcement-map.sh`,
 `scripts/gen-value-rollup.sh`, `scripts/gen-docs-mirror.sh`,
-`queue-kit/bin/roadmap.sh`, and **not one of them is ported**, so every member is
-held for any cohort that ports no emitter. What differs per member is what
-clearing the hold *costs*:
+`queue-kit/bin/roadmap.sh`, and **not one of them is ported**. On that key every
+member is held for any cohort that ports no emitter — a **sequencing** finding,
+and §The consumer remainder cohort is where three of them are superseded rather
+than repealed (below). What differs per member is what clearing the hold *costs*:
 
 | Member | Beyond the byte-compare | What it owes past its emitter |
 |---|---|---|
-| `check-footprint-fresh`, `check-trajectory-fresh`, `check-enforcement-fresh` | nothing | nothing — a spawn and a string compare |
-| `check-value-rollup-fresh` | marker-block extraction | nothing — the block grammar is the projection's, not a corpus derivation |
-| `check-docs-mirror-fresh` | an orphan sweep, its own walk over `<root>/docs` | the walk (the crate already carries it) **and** a fail-closed repair: the sweep silences stderr, so an unreadable tree reads as no orphans |
+| `check-footprint-fresh`, `check-trajectory-fresh`, `check-enforcement-fresh` | nothing | nothing — a spawn and a string compare. `check-trajectory-fresh` is **ported** (§The consumer remainder cohort), emitter still shell |
+| `check-value-rollup-fresh` | marker-block extraction | nothing — the block grammar is the projection's, not a corpus derivation. **Ported** (§The consumer remainder cohort), emitter still shell |
+| `check-docs-mirror-fresh` | an orphan sweep, its own walk over `<root>/docs` | the walk (the crate already carries it) **and** a fail-closed repair: the sweep silences stderr, so an unreadable tree reads as no orphans. **Both paid** at §The consumer remainder cohort; emitter still shell |
 | `check-roadmap-fresh` | a second assertion over `TASK-QUEUE.md` through `queue_roadmap_entries` | a **criterion 6** answer — `bin/roadmap.sh` calls that same adapter, which is what makes queue-kit/SPEC.md's *"the emitter and the gate can never disagree"* true; porting the gate alone duplicates it with nothing machine-held |
 
 **Whichever member of this family ports first owes the report cap, and it is
 settled rather than left to that session** — the renderer the crate carries is
 uncapped and the `head -20` above is the caller's, so the cap lands as one crate
-constant with its first reader in that same commit (§The diff renderer).
+constant with its first reader in that same commit (§The diff renderer). **§The
+consumer remainder cohort discharged it**, landing the constant with the two
+readers this family had for it.
+
+**Three members ported ahead of their emitters, and the accounting is written
+here rather than left implied.** `check-trajectory-fresh`,
+`check-value-rollup-fresh` and `check-docs-mirror-fresh` ship as subcommands from
+§The consumer remainder cohort, under the operator's remainder ruling. The two
+sentences above — *not one of them is ported, so every member is held* and *a
+ported byte-comparator spawning a shell emitter buys nothing against dual
+maintenance* — are **true and are not repealed**. What changes is their standing
+for these three: they are a *sequencing* finding, and the standing rule at
+TRAJECTORY.md §PRIORITY DIRECTIVE — the port track's sequence is that no
+port-candidate criterion survives as an eligibility gate, so the technical
+problem a criterion names is work the port owes rather than an exclusion it may
+take. The operator's remainder ruling is the later and more
+specific instruction. **The honest number is therefore zero**: the
+dual-maintenance win for those three is nil until their emitters follow, and what
+the cohort actually banked for them is *consumer-tranche completion* — a gates
+directory with no check script left in it — never a shrunken interpreter surface.
+Written down because the next selector reading three ported members as evidence
+that this family's hold was wrong would be reading the opposite of what happened.
+
+**The emitters are filed, not adopted.** Porting `scripts/gen-value-rollup.sh`,
+`scripts/gen-docs-mirror.sh` and `drift-kit/bin/trajectory.sh` is real and
+identified work, and it sits outside the remainder cohort's ruled scope, so it is
+a costed queue entry under scope-gated intake rather than something pulled in
+mid-cohort.
 
 **The transferable conclusion re-points the ordering rule.** The cheap cohort in
 this family is **the emitters, not the gates**: a ported byte-comparator
@@ -1840,7 +1894,13 @@ positional is `[root]`, both case arg files are `.`, and it executes the live
 the emitter-executing arm and the warning does not apply to it. For the other five
 the warning stands unweakened, and their parity must be bought by a live-tree run
 or a constructed scenario — criterion 2's `# no-fixture:` treatment, reached
-through a bypass arm rather than through an absent pair.
+through a bypass arm rather than through an absent pair. **Two of the five have
+since attested it**: `check-trajectory-fresh` and `check-value-rollup-fresh` were
+ported at §The consumer remainder cohort and their criterion-2 parity was bought
+exactly that way. The attestation sharpens the claim in one place the original
+wording left soft — a live-tree run must be a **stale** one, because a clean
+comparison exercises neither the diff renderer nor the cap, and those are the
+parts a pair steered off the emitter was never going to reach.
 
 **Two orthogonal nine-of-ten splits existed and neither predicted a held member.**
 One is the walk axis — every member reads fixed paths but `check-queue-slug-liveness`,
@@ -2007,6 +2067,24 @@ shares only the fail-closed guard, which derives no corpus. And the tool's colum
 are not the whole screen: the group it ranks second contains a member
 §Meta-gate conservation for the binary substrate holds on shell, which no column
 reports and which a selector applying the run mechanically would have taken.
+
+**The eleventh cohort exhausts the size arm a third consecutive time, and what
+that streak means is a fact about the rule rather than about any cohort.** §The
+consumer remainder cohort takes the whole remainder of this repo's own gates
+directory — ten members — under the documented blocker-retiring override, with
+the `--group` verdict at its cut recorded there. Three consecutive selections
+made without the size arm is the point at which the arm stops being the ordering
+rule's live half here: what actually orders the remaining corpus is which
+*blocker* a cohort retires, and the size arm survives as the tiebreak it was
+always the general form of. Two grounds compound in this instance and are
+separated so neither is read as the other. The first is the override's own — the
+tranche retires `consumer-gate-port-disposition`, an entry several cohorts have
+demoted rather than closed. The second is **amortization**, and it is new: the
+first-mover design for a consumer-declared member (§check-gate-substrate-parity's
+assertion-B owner clause) was paid by the first tranche, so every later member
+inherits it and marginal cost per member sits at its floor. Amortization is not
+a licence to take a large set whose members share nothing — it lowers the price
+of a cohort the override already selected, and does not select one.
 
 ### The canon-kit `spec_manifest_files` cohort
 
@@ -2531,6 +2609,19 @@ hold one early are a lint suppression the crate has never used or a caller inven
 to read it, and both are worse than stating the contract here and landing the value
 at the port that first needs it.
 
+**§The consumer remainder cohort discharged the rule, and the constant is
+`STALE_REPORT_CAP`** in `native/src/diff.rs`. It arrived with the two readers that
+cohort brought — `check-value-rollup-fresh` and `check-trajectory-fresh`, the two
+members carrying the `head -20` literal — so a later family member reads the
+constant rather than the literal, and the value has one owner again. **Applying it
+is the caller's, and the caller is a reporter rather than the renderer**:
+`native/src/fresh.rs` carries the family's shared shape — the emitter spawn, the
+command-substitution read, `diff`'s own line model, and the one site the cap is
+applied at — while `normal_diff` stays uncapped and pure. That separation is this
+section's own rule taken literally: the module that truncates is not the module
+that renders, and putting the cap in the renderer would have been the first
+convenient way to lose it.
+
 **The renderer never spawns, and that is a contract rather than an accident.**
 `diff` is on `GATE_SDK_PROGRAM_FLOOR` (§lib/gate.sh), so criterion 7 clears a
 ported form reaching for `Command::new("diff")` and a session under parity pressure
@@ -2876,15 +2967,174 @@ makes the zero predictable rather than lucky. The judgment was fixed in advance,
 and a non-zero would have been a finding about the *measurement* as much as about
 the cohort.
 
-**Two exclusions, each with its ground.** `check-installer-no-deps` was ruled past
-this iteration at scope and is **not** rescinded here; it remains the named
-cheapest single-gate first mover for a later cohort, with its `jq` reader already
-paid, and reading its exclusion as a new hold re-litigates cohort sizing that is
-closed. The other ten consumer-declared members are **sequencing, not exclusion**,
-on the standing rule that every held member has port work owed rather than a
-waiver — three held on an unported emitter and one on an undetermined criterion 7,
-whose holds belong to `cohort-held-members-port-prerequisites` and
-`consumer-gate-port-disposition`.
+**Two exclusions, each with its ground — and both are now discharged.**
+`check-installer-no-deps` was ruled past this iteration at scope and was **not**
+rescinded there; it remained the named cheapest single-gate first mover for a
+later cohort, with its `jq` reader already paid. The other ten consumer-declared
+members were **sequencing, not exclusion**, on the standing rule that every held
+member has port work owed rather than a waiver — three held on an unported
+emitter and one on an undetermined criterion 7. **§The consumer remainder cohort
+takes all ten**, folding the first mover in with them, so both clauses are spent
+rather than standing.
+
+**The config-bridge question this section named is re-pointed rather than
+answered here, and the re-pointing corrects which member owes it.** The text
+above attributes it to `check-installer-no-deps`; probed at the remainder
+cohort, that gate reads **no** knob at all — its only environment read is the
+`GATE_SDK_ROOT` bootstrap every gate script carries to locate `lib/gate.sh`,
+which has no compiled counterpart because a compiled gate sources nothing. The
+question belongs to **the first consumer-owned knob name**, and no member of the
+thirteen has one. What the remainder cohort did meet is the hazard's *other*
+door, and it is worth separating from the one this section described: the
+bridge's undeclared-knob refusal fires not only on a name that misattributes to
+the wrong kit, but on a name that attributes to the **right** kit whose library
+does not `declare` it. `GATE_SDK_QUEUE_FILE` carried gate-sdk's prefix and was an
+environment-only override every reader spelled inline as
+`${GATE_SDK_QUEUE_FILE:-…}`, so prefix attribution succeeded and `declare -p`
+found nothing. The repair is the one §Layout and configuration already states
+twice — resolve the knob in `lib/gate.sh` rather than inline at its readers —
+applied a third time, and it is why *a knob whose name carries a live kit's
+prefix resolves* is a necessary and not a sufficient condition.
+
+### The consumer remainder cohort
+
+**Ten members: the whole remainder of this repo's own gates directory** —
+`check-docs-kit-parity`, `check-docs-mirror-fresh`, `check-docs-nav-reachable`,
+`check-install-toolchain`, `check-installer-no-deps`, `check-kit-ref-liveness`,
+`check-npm-publish-spec`, `check-release-channel-parity`,
+`check-trajectory-fresh` and `check-value-rollup-fresh`. They ship as descriptors
+dispatching to the binary, the ten shell scripts they replace are deleted, and
+`scripts/` keeps **no** `check-*.sh` at all. This completes
+`consumer-gate-port-disposition` 13 of 13 and retires it.
+
+**Operator-ruled 2026-08-15 at scope: the remainder, all ten**, on the
+destination ruled 2026-08-14 (TRAJECTORY.md §PRIORITY DIRECTIVE — the port
+track's sequence, its consumer clause). The tranche's ground is **not** a member
+count: `--group`'s size arm is exhausted a **third** consecutive time, so the
+live ground is the tenth cohort's documented blocker-retiring override (§The
+first cohort, and the rule that selects the next) plus the fact that the
+first-mover design is already paid, so every member inherits it and marginal cost
+per member sits at its floor.
+
+**Selection evidence is cited rather than re-bought.**
+`.workflow/survey-record.md`'s 2026-08-15 scope block answers *which gates
+compose this cohort*; its witness was re-run at the authoring stage and holds —
+the corpus is unmoved since the recorded revision but for the queue, and
+`bash gate-sdk/bin/port-blockers.sh --group` reports the same verdict the finding
+was written against: **104 members scanned, 0 undecidable, 47 already ported, 57
+still shell**. The undecidable count is the bound on the claim, and it is zero.
+
+**Criterion 7's `?` was scanner blindness, and tracing it is what made the
+tranche ten.** `port-blockers.sh` reported `check-docs-kit-parity ?
+… (command-position $WRAPPED, default unresolvable)`: the command word there was
+an array populated at run time by `gate_command`, which no static scan resolves.
+Traced by hand, the runtime program set was `{awk, bash, the crate's own
+binary}` — the first two on `GATE_SDK_PROGRAM_FLOOR`, and the wrapped member
+`check-kit-registration` already ported, so the third element was the binary this
+cohort ports *into*. Criterion 7 clears. Scope's fallback — *if a manual
+criterion-7 check does not clear it the tranche is 9* — was therefore **executed
+and spent**, not declined, and it is recorded in that shape because a later
+reader meeting the fallback needs to know which.
+
+**The composition is a first: a compiled gate whose rule is another gate's
+verdict.** `check-docs-kit-parity` wraps `check-kit-registration` and must keep
+doing so across the substrate boundary. The shell form reached the wrapped member
+through `gate_command`, captured its combined output and re-framed it by exit
+code — 2 passes the wrapped diagnostic through to stderr unchanged, non-zero
+becomes this gate's own headed failure on stdout, 0 falls through to the nav-block
+sweep. **The compiled form calls the module and does not spawn itself**: both
+members live in one binary, so spawning would put a gate's own process through
+`native/src/proc.rs` for no reason and would make a gate's verdict depend on the
+binary being executable from a path it happens to know. The port therefore owes a
+**capturing entry point** — the existing `run(&[String]) -> i32` retained
+unchanged as the dispatch signature, the body moved behind a form writing into
+caller-supplied sinks — and the wrapper calls that form. Letting the wrapper call
+`run` directly and leaving the wrapped output on stdout was **ruled out**: it
+passes a `good/` fixture and diverges on every failing case, where the shell form
+prints one headed report and the compiled form would print two unheaded ones.
+
+**Two knob declarations are what the members execute, and that is not what their
+scripts spell.** The amendment predicted nine empty knob slots off a probe that
+counted `${KNOB:-default}` reads written in the gate scripts; the executed shape
+is **eight empty and two carrying three each**, because the standing rule is that
+a member declares every knob a shared derivation it calls is computed from.
+`check-kit-ref-liveness` reaches `gate_kit_roots_rel` and `gate_path_pruned`
+beside its own queue-file read, so it declares `GATE_KIT_ROOTS_REL`,
+`GATE_PRUNE_DIRS` and `GATE_SDK_QUEUE_FILE`. `check-docs-kit-parity` reaches the
+wrapped rule **in-process**, so its dispatch must carry what `gate_command` used
+to resolve on the wrapper's behalf: the wrapped member's whole knob set. The
+correction is recorded rather than quietly implemented, because the arithmetic is
+what a later selector would inherit — a wrapper's knob cost is the wrapped rule's,
+and an in-process call is what moves that cost onto the wrapper.
+
+**One knob's resolution had to be repaired before it could be declared**, and it
+is the second door onto §The declaration cohort's hazard rather than a new one —
+that section's own paragraph carries the finding.
+
+**Three members port ahead of their emitters, and the cost is stated rather than
+absorbed** — §The generated-projection freshness family carries the accounting,
+the supersession and the honest zero.
+
+**One member's fail-closed repair came due at the port, and it is this cohort's
+single designed divergence** — `check-docs-mirror-fresh`, at §The
+generated-projection freshness family's table row.
+
+**`check-installer-no-deps` drops `jq` for the crate's existing JSON reader.**
+The gate's whole predicate is *does this package declare any of three dependency
+fields, or any of three install-time lifecycle script keys* — a `has(key)` test
+over one object and one nested object, which `serde_json` (§The settings cohort,
+and the crate's first dependency) expresses directly. The `command -v jq` guard
+and its fail-closed exit go with it: a linked parser cannot be absent from
+`PATH`, so the branch has no compiled counterpart. The gate's own semantics are
+preserved exactly, including the one they turn on — **the field's presence is the
+finding, not its emptiness** — and so is a detail a tidier port would have
+"fixed": the shell indents the *capture* rather than each finding, because
+`printf '  %s\n' "$findings"` takes one argument, so only the first line carries
+the lead.
+
+**Assertion C's derivation was re-run at the cut, in both directions, and this is
+the widest single move it has seen** — ten `<gates-dir>/<name>.sh` paths becoming
+`<gates-dir>/<name>.gate` in one commit. `check-value-rollup-fresh` is itself in
+§Meta-gate conservation's *survive unchanged* row and is itself a member here, so
+its row records that it is now `.gate`-dispatched and that its `scripts/*.sh`
+coupling covers **no** registry member's declaration path any more while
+`kit:*.sh` still does. The other readers were enumerated **by red condition,
+never by subject**: `check-gate-fixture-coverage` reds on a registered member
+with no pair and `check-shellcheck` exits 2 on an empty target set, so neither is
+monotone in the violation set and both were re-checked by **running** them, not
+by inspection. Every fixture pair is retained.
+
+**Every fixture pair is retained and re-pointed, and two members' parity could
+not be bought from a pair at all.** Each member's `gate-tests/<name>/good/` and
+`bad/` case directories are unchanged; the two bespoke
+`scripts/gate-tests/*.test.sh` that named their gate by **script path** now reach
+it through `gate_run` (§run-gate-tests), which is the tenth cohort's recorded
+lesson about a consumer's gates directory. `check-trajectory-fresh` and
+`check-value-rollup-fresh` are two of the five family members whose pairs steer
+off the live emitter through the emit-source positional, so their criterion-2
+parity was bought by a **live-tree run** with both implementations still present
+— and deliberately by a *stale* one, since a clean live run exercises neither the
+diff renderer nor its cap.
+
+**Parity was proved while both implementations still existed**, which assertion A
+makes the only possible order. Every member's script and its subcommand ran over
+every fixture case, over the live tree and over nineteen edge roots, compared on
+stdout, stderr and exit code: **byte-identical, with exactly one divergence, and
+it is the designed one** (the mirror member's unreadable-`docs` refusal). Five
+further constructed scenarios covered the arms no case reaches — both family
+members' stale report against the live emitter, each long enough to prove the
+cap, and the mirror member's missing and orphan arms.
+
+**Criterion 5, priced by measurement on the tenth cohort's structural ground.**
+All ten members are consumer-declared: they sit in no kit's `checks/`, `init` can
+never seed them, and no adopter has ever had them, so the cohort takes nothing
+from any consumer and the prediction was **zero** growth. N members each
+individually runnable is not a measurement, which is why the ground does not
+discharge the criterion; measured with `installer_smoke`'s binary-less leg from a
+clean checkout after this cohort's own commit, the omitted-and-declared count is
+recorded against the ninth and tenth cohorts' 12. The judgment was fixed in
+advance, and a non-zero would have been a finding about the measurement as much
+as about the cohort.
 
 ### What the reverted port established
 
@@ -5111,6 +5361,15 @@ steers the fixture pair onto hermetic copies of each surface. Six assertions.
   every registered subcommand the declared root carries its descriptor —
   `<owner>/checks/<name>.gate` for a kit, `<gates-dir>/<name>.gate` for the
   sentinel.
+  **The owner clause is now exercised over a whole gates directory, and no
+  assertion changed to get there.** The sentinel's first three members arrived
+  with §The declaration cohort; §The consumer remainder cohort took the other
+  ten, so `-` and the publishing-tree scope rule are proved over **thirteen**
+  members — the consumer's entire gates directory — rather than over a sample of
+  it. Recorded because a clause proved on three members and a clause proved on
+  all of them are different amounts of evidence for the same words, and because
+  the crate's owner unit test resolving every declared root to a descriptor on
+  disk is what makes the second number mean anything.
   **A sentinel rather than the gates directory's basename, because a basename is
   not an identity here.** `GATE_SDK_GATES_DIR` defaults to `scripts` for *every*
   consumer, so the same string would name this repo's declaring root and every

@@ -25,12 +25,32 @@ fn read_doc(path: &str) -> Result<String, String> {
         .map_err(|e| format!("cannot read {} ({})", path, e))
 }
 
+// spec: gate-sdk/SPEC.md §The consumer remainder cohort — the dispatch signature, retained
+// unchanged so the registry entry, `--list` and every existing caller are untouched. The rule
+// itself lives behind `run_captured`, whose one reader is `check-docs-kit-parity`'s wrapper.
 pub fn run(args: &[String]) -> i32 {
+    let mut out: Vec<String> = Vec::new();
+    let mut err: Vec<String> = Vec::new();
+    let rc = run_captured(args, &mut out, &mut err);
+    for l in &out {
+        println!("{}", l);
+    }
+    for l in &err {
+        eprintln!("{}", l);
+    }
+    rc
+}
+
+// spec: gate-sdk/SPEC.md §The consumer remainder cohort — the capturing entry point a compiled
+// wrapper needs: `check-docs-kit-parity` re-frames this verdict three ways by exit code, which
+// it cannot do while the report goes to the process's own streams.
+pub fn run_captured(args: &[String], stdout: &mut Vec<String>, stderr: &mut Vec<String>) -> i32 {
     let repo_root = match toplevel() {
         Some(r) => r,
         None => {
-            eprintln!(
+            stderr.push(
                 "check-kit-registration: not a git repository — cannot test tracked kit files"
+                    .to_string(),
             );
             return 2;
         }
@@ -49,7 +69,7 @@ pub fn run(args: &[String]) -> i32 {
             None => match walk::knob_scalar(knob) {
                 Ok(v) => v,
                 Err(e) => {
-                    eprintln!("check-kit-registration: {}", e);
+                    stderr.push(format!("check-kit-registration: {}", e));
                     return 2;
                 }
             },
@@ -62,49 +82,49 @@ pub fn run(args: &[String]) -> i32 {
     let (registry_doc, runner_doc) = (docs[0].clone(), docs[1].clone());
 
     if !Path::new(&registry_doc).is_file() {
-        eprintln!(
+        stderr.push(format!(
             "check-kit-registration: registry doc not found: {}",
             registry_doc
-        );
+        ));
         return 2;
     }
     if !Path::new(&runner_doc).is_file() {
-        eprintln!(
+        stderr.push(format!(
             "check-kit-registration: runner doc not found: {}",
             runner_doc
-        );
+        ));
         return 2;
     }
 
     let kit_roots = match walk::kit_roots_rel() {
         Ok(v) => v,
         Err(e) => {
-            eprintln!("check-kit-registration: {}", e);
+            stderr.push(format!("check-kit-registration: {}", e));
             return 2;
         }
     };
     if kit_roots.is_empty() {
-        eprintln!("check-kit-registration: no kit roots enumerated");
+        stderr.push("check-kit-registration: no kit roots enumerated".to_string());
         return 2;
     }
 
     let registry_text = match read_doc(&registry_doc) {
         Ok(t) => t,
         Err(e) => {
-            eprintln!(
+            stderr.push(format!(
                 "check-kit-registration: {} — the check could not run; treating as failure (not clean)",
                 e
-            );
+            ));
             return 2;
         }
     };
     let runner_text = match read_doc(&runner_doc) {
         Ok(t) => t,
         Err(e) => {
-            eprintln!(
+            stderr.push(format!(
                 "check-kit-registration: {} — the check could not run; treating as failure (not clean)",
                 e
-            );
+            ));
             return 2;
         }
     };
@@ -125,7 +145,7 @@ pub fn run(args: &[String]) -> i32 {
         let completed = match proc::run("git", &["-C", &repo_root, "ls-files", "--", &pathspec]) {
             Ok(c) => c,
             Err(e) => {
-                eprintln!("check-kit-registration: {}", e);
+                stderr.push(format!("check-kit-registration: {}", e));
                 return 2;
             }
         };
@@ -134,10 +154,10 @@ pub fn run(args: &[String]) -> i32 {
             None => {
                 // spec: gate-sdk/SPEC.md §Fail-closed contract — the fail_closed wording the
                 // shell form emitted, for the same condition and the same reason
-                eprintln!(
+                stderr.push(format!(
                     "check-kit-registration: git ls-files exited {} — the check could not run; treating as failure (not clean)",
                     completed.code().unwrap_or(-1)
-                );
+                ));
                 return 2;
             }
         };
@@ -151,36 +171,50 @@ pub fn run(args: &[String]) -> i32 {
 
     if !missing_row.is_empty() || !missing_runner.is_empty() {
         if !missing_row.is_empty() {
-            println!("check-kit-registration: kit root(s) not registered in the registry doc");
-            println!("({} has no '](<kit>/' link row):", registry_doc);
+            stdout.push(
+                "check-kit-registration: kit root(s) not registered in the registry doc".to_string(),
+            );
+            stdout.push(format!("({} has no '](<kit>/' link row):", registry_doc));
             for r in &missing_row {
-                println!("  {}", r);
+                stdout.push(format!("  {}", r));
             }
         }
         if !missing_runner.is_empty() {
             if !missing_row.is_empty() {
-                println!();
+                stdout.push(String::new());
             }
-            println!("check-kit-registration: kit root(s) shipping gate-tests but absent from the");
-            println!(
+            stdout.push(
+                "check-kit-registration: kit root(s) shipping gate-tests but absent from the"
+                    .to_string(),
+            );
+            stdout.push(format!(
                 "fixture-runner battery ({} names no '<kit>/gate-tests' line):",
                 runner_doc
-            );
+            ));
             for r in &missing_runner {
-                println!("  {}", r);
+                stdout.push(format!("  {}", r));
             }
         }
-        println!("  help: add the kit's registry row to {} (a '](<kit>/' link — bare", registry_doc);
-        println!("        dir or a page under it, e.g. '](<kit>/index.md)') and,");
-        println!("        for a kit that ships gate-tests, its 'run-gate-tests.sh <kit>/gate-tests'");
-        println!("        line to {}, so a landed kit cannot fall out of the docs.", runner_doc);
+        stdout.push(format!(
+            "  help: add the kit's registry row to {} (a '](<kit>/' link — bare",
+            registry_doc
+        ));
+        stdout.push("        dir or a page under it, e.g. '](<kit>/index.md)') and,".to_string());
+        stdout.push(
+            "        for a kit that ships gate-tests, its 'run-gate-tests.sh <kit>/gate-tests'"
+                .to_string(),
+        );
+        stdout.push(format!(
+            "        line to {}, so a landed kit cannot fall out of the docs.",
+            runner_doc
+        ));
         return 1;
     }
 
-    println!(
+    stdout.push(format!(
         "KIT-REGISTRATION: clean ({} kit root(s) each carry a registry row; {} shipping gate-tests each name a fixture-runner line)",
         kit_roots.len(),
         runner_owed
-    );
+    ));
     0
 }

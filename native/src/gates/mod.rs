@@ -6,6 +6,16 @@ pub mod assertion_strength;
 pub mod comment_tier;
 pub mod deprecation_task;
 pub mod docs_cmd;
+pub mod docs_kit_parity;
+pub mod docs_mirror_fresh;
+pub mod docs_nav_reachable;
+pub mod install_toolchain;
+pub mod installer_no_deps;
+pub mod kit_ref_liveness;
+pub mod npm_publish_spec;
+pub mod release_channel_parity;
+pub mod trajectory_fresh;
+pub mod value_rollup_fresh;
 pub mod gap_inbox_neutrality;
 pub mod install_claim;
 pub mod kit_registration;
@@ -717,6 +727,90 @@ pub const REGISTRY: &[GateEntry] = &[
         "check-tightened-gates-note-parity",
         tightened_gates_note_parity::run,
         &["?"],
+        &[],
+        "-",
+    ),
+    // spec: gate-sdk/SPEC.md §The consumer remainder cohort — the rest of the consumer's own
+    // gates directory, every member on the `-` sentinel. The two that declare a knob declare
+    // what they execute: a shared derivation's whole knob set.
+    (
+        "check-docs-kit-parity",
+        docs_kit_parity::run,
+        &["?"],
+        &[
+            "GATE_KIT_ROOTS_REL",
+            "GATE_SDK_REGISTRY_DOC",
+            "GATE_SDK_RUNNER_DOC",
+        ],
+        "-",
+    ),
+    // spec: gate-sdk/SPEC.md §check-reads-couples — `?` for each member whose walk root is its
+    // own positional argument with a default, the variable-first-argument shape the shell parser
+    // calls undecidable; an empty set for the members that read named files and list nothing.
+    (
+        "check-docs-mirror-fresh",
+        docs_mirror_fresh::run,
+        &["?"],
+        &[],
+        "-",
+    ),
+    (
+        "check-docs-nav-reachable",
+        docs_nav_reachable::run,
+        &["?"],
+        &[],
+        "-",
+    ),
+    (
+        "check-install-toolchain",
+        install_toolchain::run,
+        &[],
+        &[],
+        "-",
+    ),
+    (
+        "check-installer-no-deps",
+        installer_no_deps::run,
+        &[],
+        &[],
+        "-",
+    ),
+    (
+        "check-kit-ref-liveness",
+        kit_ref_liveness::run,
+        &[],
+        &[
+            "GATE_KIT_ROOTS_REL",
+            "GATE_PRUNE_DIRS",
+            "GATE_SDK_QUEUE_FILE",
+        ],
+        "-",
+    ),
+    (
+        "check-npm-publish-spec",
+        npm_publish_spec::run,
+        &["?"],
+        &[],
+        "-",
+    ),
+    (
+        "check-release-channel-parity",
+        release_channel_parity::run,
+        &[],
+        &[],
+        "-",
+    ),
+    (
+        "check-trajectory-fresh",
+        trajectory_fresh::run,
+        &[],
+        &[],
+        "-",
+    ),
+    (
+        "check-value-rollup-fresh",
+        value_rollup_fresh::run,
+        &[],
         &[],
         "-",
     ),

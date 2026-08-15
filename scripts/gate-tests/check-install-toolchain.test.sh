@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Behavioral test of scripts/check-install-toolchain.sh — the arms the one
+# Behavioral test of check-install-toolchain — the arms the one
 # good/bad pair cannot hold. The pair covers whole-element parity and the
 # floor-divergence rejection; this covers the two name-set directions the
 # widened assertion still owns, the three spellings of an unconstrained member,
@@ -12,7 +12,7 @@ set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-GATE="$ROOT/scripts/check-install-toolchain.sh"
+GATES_DIR="$ROOT/scripts"
 
 fails=0
 tmp="$(mktemp -d)"
@@ -32,7 +32,7 @@ write_case() {
 # $1=label $2=dir $3=want-rc $4=want-substring
 check_case() {
     local out rc
-    out="$(cd "$2" && "$GATE" install.md roster.sh 2>&1)"; rc=$?
+    out="$(cd "$2" && gate_run check-install-toolchain "$GATES_DIR" install.md roster.sh 2>&1)"; rc=$?
     if [[ "$rc" -ne "$3" ]]; then
         echo "  FAIL [$1]: want exit $3, got $rc -- $out"; fails=$((fails + 1)); return
     fi

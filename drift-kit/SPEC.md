@@ -369,7 +369,9 @@ harvested state-file paths (§Layout and configuration).
 
 Consumer wiring (this repo, not kit mechanism): the emission is committed at
 `docs/evidence-data.md`, and the consumer gate
-`scripts/check-trajectory-fresh.sh` (registered in `gates.list`) re-emits and
+`check-trajectory-fresh` (registered in `gates.list`, declared by
+`scripts/check-trajectory-fresh.gate` and dispatching to the compiled binary
+since gate-sdk/SPEC.md §The consumer remainder cohort) re-emits and
 byte-compares — the gen-pre-commit/check-graph freshness pattern — so a
 hand-edited or stale number is red at commit. The gate carries its own
 `# graph:` manifest coupling `docs/evidence-data.md` to the harvested state

@@ -1,0 +1,2 @@
+# graph: couples=installer/package.json,native/src/gates/installer_no_deps.rs,native/src/fresh.rs dir=one valve=none tier=precommit
+# spec: CLAUDE.md §Housekeeping — the installer package declares no resolvable-dependency field and no install-time lifecycle script, the two shapes that would turn a one-shot vendoring installer into a dependency channel or a run-on-install code path

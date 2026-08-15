@@ -1,0 +1,2 @@
+# graph: couples=docs/install.md,.github/workflows/publish.yml,native/src/gates/release_channel_parity.rs,native/src/fresh.rs dir=one valve=none tier=precommit
+# spec: docs/install.md §Versioning — the declared release channel agrees with the publish workflow's prerelease posture (A) and with the project's own version line (B)

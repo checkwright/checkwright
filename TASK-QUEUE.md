@@ -12,62 +12,6 @@
 
 ## New Features
 
-- **consumer-gate-port-disposition** [spec: SPEC-consumer-remainder.md] — the destination is
-  ruled and the first-mover design is merged; what remains is the tranche work porting this
-  repo's own 13 gates into `native/`.
-  **Operator-ruled 2026-08-14: PORT INTO `native/`.** The 13 gates declared under `scripts/`
-  become subcommands of the existing multi-call binary. The seam fork this entry opened is
-  **closed** — a later session does not re-litigate it, and the two refused alternatives (a
-  second consumer-owned crate under `GATE_SDK_NATIVE_CRATE`; shell residue justified as a
-  class) are not re-priced here. The ruling was taken *without* making the tranche that
-  iteration's unit, so the destination is settled and the tranche schedules later.
-  **The class, re-measured at each tranche rather than annotated:** after the first tranche
-  landed 2026-08-15 at build, **10 of the 13 are still shell**, against **57 unported of 104
-  registered**, so they are 18% of what the port has left. Every earlier figure predates a
-  cohort and is corrected in place. They are
-  Checkwright's own rules about Checkwright's own tree: docs mirror, nav and kit parity, install
-  toolchain, installer dependency floor, npm publish spec, release channel parity,
-  trajectory freshness, value rollup, kit-ref liveness.
-  **What the ruling accepts:** an adopter's binary carries subcommands implementing another
-  project's repo rules, which they can never register — the cost taken against TRAJECTORY.md's
-  objective 4. Its two grounds and their consequence now sit where the mechanism is,
-  gate-sdk/SPEC.md §check-gate-substrate-parity's adopter clause, rather than restated here.
-  **Why nobody hit this before:** Checkwright is both kit publisher and consumer of its own
-  kits, and `native/` is both the crate this repo ports *into* and the one whose binary ships
-  *out*; a single-role tree would have met the fork on its first consumer gate.
-  **The first tranche is ruled 2026-08-15 at scope and landed the same day at build: the
-  `lib/declaration.sh` release-note family** — 3 of the 13, its members, grounds and price at
-  gate-sdk/SPEC.md §The declaration cohort; it proved the sentinel dispatches.
-  **The SECOND tranche is ruled 2026-08-15 at scope on the operator's ruling: the REMAINDER — all
-  10, completing this entry 13 of 13 and retiring it.** It is the eleventh cohort. Ground: the
-  selector's size arm is exhausted a third time, so the live ground is the tenth cohort's, and the
-  first-mover design below is already paid — every member inherits it, putting marginal cost per
-  member at its floor. `check-installer-no-deps` folds in as one member, discharging the standing
-  single-gate reservation it held since the ninth cohort, and its `jq` reader is the tranche's one
-  non-floor dependency. Census and price: `.workflow/survey-record.md` while its witness holds.
-  **The first-mover design is answered and merged into gate-sdk/SPEC.md, 2026-08-15 at build, and
-  every later tranche member inherits it rather than re-deriving it:** the owner column and its
-  `-` sentinel plus assertion B's scope rule (§check-gate-substrate-parity), and location as no
-  term of the conservation derivation (§Meta-gate conservation for the binary substrate). The
-  coverage question it exposed is filed to the gap inbox and is not this entry's.
-  **PROMOTED 2026-08-15 at spec; the amendment is `gate-sdk/SPEC-consumer-remainder.md`, and it
-  corrects two of this entry's own predictions against probes rather than inheriting them.**
-  (1) The tranche is **ten, not nine**: `check-docs-kit-parity`'s `c7=?` is a scanner limitation
-  on a command-position array, its runtime program set is `{awk, bash, the crate's own binary}`,
-  and criterion 7 clears — so scope's stated fallback is spent rather than declined. (2) The
-  knob-declaring **dispatch** question is **not** `check-installer-no-deps`', which reads no knob
-  at all; the tranche's one business-logic knob read is `check-kit-ref-liveness`'
-  `GATE_SDK_QUEUE_FILE`, which carries a kit prefix and so resolves on the config bridge's
-  ordinary path. The question the tenth cohort named stays owed by the first **consumer-owned**
-  knob name, which no member of the thirteen has.
-  **Cost while deferred:** now bounded rather than open — no cohort stalls on an unanswered
-  question, and what remains is ordinary port work whose ordering competes with every other
-  member, while the largest single shell block keeps standing against objective 6.
-  Filed 2026-08-14 at scope on operator direction under scope-gated intake with the seam ruling
-  open; ruled and re-scoped 2026-08-14, first tranche ruled 2026-08-15, both at scope off a live
-  `port-blockers.sh --group` run; design merged and demoted 2026-08-15 at build. **This tranche's
-  terminal move is a Done move**, not a demotion: it delivers the last 10 of the 13.
-
 - **harness-wait-primitive-unnamed** [spec: SPEC-waiting.md] — the in-turn waiting rule names
   "the harness's waiting primitive" in the singular, and the harness has two with opposite
   reactivity.
@@ -213,7 +157,7 @@
 - **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
   — the whole battery onto the binary, and the shell surface down to its residue.
   roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
-  Stays deferred rather than `## Done`: it is the **whole corpus** (57 of 104 unported), and a
+  Stays deferred rather than `## Done`: it is the **whole corpus** (47 of 104 unported), and a
   Done move would assert a finished port and silently drop it from the **public** roadmap
   projection, which reads `[roadmap:]` tags off live entries.
   **Operator-ruled 2026-08-09: complete the port, ASAP.** The ruling, its grounds and its
@@ -231,19 +175,19 @@
   **This answers the toolchain-free objection:** the installer smoke's toolchain-free arm is
   satisfied by the pre-compiled path, not by retaining shell gates. `powershell-installer-surface`
   moves with it — one implementation across platforms shrinks its cover to the bootstrap.
-  **Ten cohorts closed; gate-sdk/SPEC.md §The first cohort, and the rule that selects the next
+  **Eleven cohorts closed; gate-sdk/SPEC.md §The first cohort, and the rule that selects the next
   is canonical for every one of them** — members, delivered counts, holds, grounds and each
   cohort's own price live there, so this entry states what remains rather than restating them.
   From the eighth on, members are **selected by running** `port-blockers.sh --group` rather than
-  read off the tree; the size arm is now exhausted twice running, so the last two cohorts rode
-  the documented blocker-retiring override rather than a count. **47 of 104 ported.** The tenth
-  is §The declaration cohort, which is also `consumer-gate-port-disposition`'s first tranche and
-  where that cohort's override, its adjudicated union key, its criterion-6 dual disposition and
-  its seam ruling are recorded.
+  read off the tree; the size arm is now exhausted three times running, so the last three cohorts
+  rode the documented blocker-retiring override rather than a count. **57 of 104 ported.** The
+  eleventh is §The consumer remainder cohort, which closed `consumer-gate-port-disposition` at
+  13 of 13 and emptied this repo's own gates directory of check scripts; what it leaves owed to
+  this entry is the unported emitters behind three ported freshness comparators.
   Every held member is **sequencing with port work owed, never exclusion**, and what each owes
   is on `cohort-held-members-port-prerequisites`, which owns the roster and the kits it spans;
   a kit count copied here would be a second one to drift, and was.
-  **Cost while deferred:** large and known — 57 gates plus the runners and the install-lifecycle
+  **Cost while deferred:** large and known — 47 gates plus the runners and the install-lifecycle
   layer, and every gate landed meanwhile adds shell to the eventual port. Not a single-iteration
   delta; scope owns the decomposition, and the criterion-relaxation question is closed at
   gate-sdk/SPEC.md §The port-candidate criteria — an ordering signal, never an eligibility screen.
@@ -6107,6 +6051,8 @@
 - **scratch-execution-allowlist-bar** [design-pending] — Each close re-derives this standing bar.
 
 ## Done
+
+- consumer-gate-port-disposition
 
 ## Lessons Learned
 

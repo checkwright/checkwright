@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Behavioral test of scripts/check-release-channel-parity.sh — the arms the one
+# Behavioral test of check-release-channel-parity — the arms the one
 # good/bad pair cannot hold on its own. The pair proves the agreeing state and a
 # tree violating both invariants at once (its expect.txt pins invariant B, so
 # deleting B fails the fixture). This isolates each invariant so neither can pass
@@ -12,7 +12,7 @@ set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-GATE="$ROOT/scripts/check-release-channel-parity.sh"
+GATES_DIR="$ROOT/scripts"
 
 fails=0
 tmp="$(mktemp -d)"
@@ -37,9 +37,9 @@ EOF
 check_case() {
     local out rc
     if [[ -n "$3" ]]; then
-        out="$(cd "$2" && "$GATE" install.md publish.yml "$3" 2>&1)"; rc=$?
+        out="$(cd "$2" && gate_run check-release-channel-parity "$GATES_DIR" install.md publish.yml "$3" 2>&1)"; rc=$?
     else
-        out="$(cd "$2" && "$GATE" install.md publish.yml 2>&1)"; rc=$?
+        out="$(cd "$2" && gate_run check-release-channel-parity "$GATES_DIR" install.md publish.yml 2>&1)"; rc=$?
     fi
     if [[ "$rc" -ne "$4" ]]; then
         echo "  FAIL [$1]: want exit $4, got $rc -- $out"; fails=$((fails + 1)); return
