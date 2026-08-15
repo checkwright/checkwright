@@ -3061,12 +3061,12 @@
 - **waiting-rule-carrier-reach** [design-pending] — the residency rule reaches the sessions
   whose definitions name it, and both firings this iteration were outside that set.
   recurrence: waiting-rule-carrier-reach 2026-08-11 2026-08-15
-  **Fifth firing — a carrier that names the rule nowhere.** Scope's `audit-sweep` for the
-  port-candidate census ended its turn on a live child fork with no census, and had to be
-  resumed by message. The four firings `waiting-rule-fourth-firing-post-fix` records all ran
-  through carriers that *do* name the rule; the `audit-sweep` definition carries no residency
-  clause at all, so this is evidence about the rule's **reach** rather than about
-  prose-versus-enforcement strength.
+  **Fifth firing — a carrier that named the rule nowhere, and its ground is ANSWERED.** Scope's
+  `audit-sweep` for the port-candidate census ended its turn on a live child fork with no census;
+  its definition then carried no residency clause, making it evidence about **reach** rather than
+  prose-versus-enforcement strength. Re-verified at scope 2026-08-15: that gap is **closed** —
+  `.claude/agents/audit-sweep.md:43-45` carries the clause and both roster files now do. So reach
+  is not the binding constraint here, and widening carriers buys less than the title implies.
   **Sixth firing — a second carrier class, and the more dangerous one.** The validate session
   backgrounded its own `run-validate.sh` and ended the turn in order to wait on it. For a
   dispatched session a turn end is a session end, so the observer died while the shell child
