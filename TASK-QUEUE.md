@@ -12,6 +12,200 @@
 
 ## New Features
 
+- **consumer-gate-port-disposition** [spec: SPEC-consumer-remainder.md] — the destination is
+  ruled and the first-mover design is merged; what remains is the tranche work porting this
+  repo's own 13 gates into `native/`.
+  **Operator-ruled 2026-08-14: PORT INTO `native/`.** The 13 gates declared under `scripts/`
+  become subcommands of the existing multi-call binary. The seam fork this entry opened is
+  **closed** — a later session does not re-litigate it, and the two refused alternatives (a
+  second consumer-owned crate under `GATE_SDK_NATIVE_CRATE`; shell residue justified as a
+  class) are not re-priced here. The ruling was taken *without* making the tranche that
+  iteration's unit, so the destination is settled and the tranche schedules later.
+  **The class, re-measured at each tranche rather than annotated:** after the first tranche
+  landed 2026-08-15 at build, **10 of the 13 are still shell**, against **57 unported of 104
+  registered**, so they are 18% of what the port has left. Every earlier figure predates a
+  cohort and is corrected in place. They are
+  Checkwright's own rules about Checkwright's own tree: docs mirror, nav and kit parity, install
+  toolchain, installer dependency floor, npm publish spec, release channel parity,
+  trajectory freshness, value rollup, kit-ref liveness.
+  **What the ruling accepts:** an adopter's binary carries subcommands implementing another
+  project's repo rules, which they can never register — the cost taken against TRAJECTORY.md's
+  objective 4. Its two grounds and their consequence now sit where the mechanism is,
+  gate-sdk/SPEC.md §check-gate-substrate-parity's adopter clause, rather than restated here.
+  **Why nobody hit this before:** Checkwright is both kit publisher and consumer of its own
+  kits, and `native/` is both the crate this repo ports *into* and the one whose binary ships
+  *out*; a single-role tree would have met the fork on its first consumer gate.
+  **The first tranche is ruled 2026-08-15 at scope and landed the same day at build: the
+  `lib/declaration.sh` release-note family** — 3 of the 13, its members, grounds and price at
+  gate-sdk/SPEC.md §The declaration cohort; it proved the sentinel dispatches.
+  **The SECOND tranche is ruled 2026-08-15 at scope on the operator's ruling: the REMAINDER — all
+  10, completing this entry 13 of 13 and retiring it.** It is the eleventh cohort. Ground: the
+  selector's size arm is exhausted a third time, so the live ground is the tenth cohort's, and the
+  first-mover design below is already paid — every member inherits it, putting marginal cost per
+  member at its floor. `check-installer-no-deps` folds in as one member, discharging the standing
+  single-gate reservation it held since the ninth cohort, and its `jq` reader is the tranche's one
+  non-floor dependency. Census and price: `.workflow/survey-record.md` while its witness holds.
+  **The first-mover design is answered and merged into gate-sdk/SPEC.md, 2026-08-15 at build, and
+  every later tranche member inherits it rather than re-deriving it:** the owner column and its
+  `-` sentinel plus assertion B's scope rule (§check-gate-substrate-parity), and location as no
+  term of the conservation derivation (§Meta-gate conservation for the binary substrate). The
+  coverage question it exposed is filed to the gap inbox and is not this entry's.
+  **PROMOTED 2026-08-15 at spec; the amendment is `gate-sdk/SPEC-consumer-remainder.md`, and it
+  corrects two of this entry's own predictions against probes rather than inheriting them.**
+  (1) The tranche is **ten, not nine**: `check-docs-kit-parity`'s `c7=?` is a scanner limitation
+  on a command-position array, its runtime program set is `{awk, bash, the crate's own binary}`,
+  and criterion 7 clears — so scope's stated fallback is spent rather than declined. (2) The
+  knob-declaring **dispatch** question is **not** `check-installer-no-deps`', which reads no knob
+  at all; the tranche's one business-logic knob read is `check-kit-ref-liveness`'
+  `GATE_SDK_QUEUE_FILE`, which carries a kit prefix and so resolves on the config bridge's
+  ordinary path. The question the tenth cohort named stays owed by the first **consumer-owned**
+  knob name, which no member of the thirteen has.
+  **Cost while deferred:** now bounded rather than open — no cohort stalls on an unanswered
+  question, and what remains is ordinary port work whose ordering competes with every other
+  member, while the largest single shell block keeps standing against objective 6.
+  Filed 2026-08-14 at scope on operator direction under scope-gated intake with the seam ruling
+  open; ruled and re-scoped 2026-08-14, first tranche ruled 2026-08-15, both at scope off a live
+  `port-blockers.sh --group` run; design merged and demoted 2026-08-15 at build. **This tranche's
+  terminal move is a Done move**, not a demotion: it delivers the last 10 of the 13.
+
+- **harness-wait-primitive-unnamed** [spec: SPEC-waiting.md] — the in-turn waiting rule names
+  "the harness's waiting primitive" in the singular, and the harness has two with opposite
+  reactivity.
+  `delegation-kit/templates/agent-execution.md:43-45` tells a dispatched session to "loop on the
+  work's own artifact (evidence file, lock, exit marker) with the harness's waiting primitive" —
+  **re-verified at this close by reading those lines**; the phrase is singular and names nothing.
+  The two candidates differ by exactly the wall-clock property the rule exists to buy: a
+  backgrounded shell `until` loop fires one notification the moment its condition goes true, while
+  the harness's event-stream form, armed with an unbounded command, stays armed to its deadline
+  even after the event fires.
+  **Second half — an interaction, not a separate defect.** Build batch A's *first* instinct was
+  the correct artifact wait (`until grep -q` on the runner's own output), and the repo's own
+  bash guard rejected it for naming the harness scratchpad path — **re-verified**: the guard
+  blocks the `/tmp/claude-...` prefix and steers to repo-local `.tmp/`. The guard is *correct*;
+  what is missing is that the doctrine never says the artifact belongs in `.tmp/`, so the guard's
+  refusal reads as a refusal of artifact-waiting itself and steered the session onto the
+  process-liveness form that then broke (`waiter-predicate-self-match`).
+  **Deliverable:** name the primitive in the doctrine bullet, and say in the same breath that the
+  awaited artifact goes in repo-local `.tmp/`. Small edit; the reason it is a task and not an
+  in-flight fix is that ruling *which* primitive is the sanctioned one is a delegation-kit
+  contract call, not a wording call.
+  **Distinct from `waiter-predicate-self-match`:** that entry is the broken predicate; this is the
+  doctrine-and-guard interaction that selected the shape it lived in.
+  **Cost while deferred:** every dispatched session re-derives which primitive to use, and the
+  guard keeps steering away from the artifact wait the doctrine's own words prefer.
+  **Promoted 2026-08-15 by operator ruling as the chain's HEAD** — the unnamed primitive is what
+  selects the shape the other two fail in — into
+  `consumer-cohort-completion-and-wait-enforcement`. Its second half re-occurred at that scope,
+  unprompted and in the session's own tool use: the correct artifact wait refused for naming the
+  harness scratchpad, three blocked attempts before recovery, filed to the gap inbox for the
+  drain to judge.
+  **Amendment authored 2026-08-15 at spec: `delegation-kit/SPEC-waiting.md`**, which rules the
+  primitive by its **reactivity property** rather than by name — one completion is awaited by a
+  backgrounded command that exits on its condition, a repeating signal by the event-stream form —
+  and splits the artifact question two ways: an `Agent` dispatch is awaited by its completion
+  notification and never by a path, a shell child by an artifact the session placed in `.tmp/`.
+  That split is what makes the guard's refusal a steer toward a documented destination.
+  Filed 2026-08-14 by close, draining the gap inbox; the bullet came from build batch A, beside
+  the broken predicate it selected.
+
+- **waiter-predicate-self-match** [spec: SPEC-waiting.md] — `until ! pgrep -f '<script>'` can
+  never exit, because `pgrep -f` matches the waiter's own argv.
+  **Re-verified live at this close** with a script name that exists nowhere in the tree:
+  `bash -c 'pgrep -af "cw-probe-nonexistent-script.sh"'` matched **two** processes — the harness's
+  outer `bash -c` wrapper and the inner one — and exited 0. So the condition is permanently true
+  and the loop is unbounded. The claim is established and is *stronger* than filed: the harness's
+  own wrapper argv matches too, so the defect does not depend on how the waiter is spelled.
+  **Attested cost:** this iteration's build batch A ran two such waiters against `run-smoke.sh`;
+  both survived the smoke's terminal line and were still running when `TaskStop` reported success.
+  The observed price was the Bash tool's 600s foreground cap absorbing an infinite loop, which
+  reads from outside as a fixed ten-minute wait. Nothing reds — the work completes correctly and
+  the only symptom is wall-clock, which is why no existing oracle sees it.
+  **Deliverable:** rule the sanctioned form and put it where a waiting session reads it — the
+  bracket trick (`pgrep -f '[r]un-smoke.sh'`), matching a recorded PID rather than a pattern, or
+  waiting on the work's own artifact. A `bash-guard` rule steering off the self-matching shape is
+  the enforcement half and is mechanically decidable (the pattern is a literal in the argv).
+  **Distinct from** `poll-sleep-guard-steer` and `waiting-rule-fourth-firing-post-fix`: this
+  session chose the documented `run_in_background` + `until` pattern *correctly*, and the
+  predicate inside it was the defect.
+  **Cost while deferred:** ten wall-clock minutes per occurrence, silently, on any session that
+  reaches for the obvious spelling — and it is the obvious spelling.
+  [precondition-ok: the "waiting on the work's own artifact" phrase above names one of this
+  entry's own candidate deliverables, not a forward dependency; nothing gates this entry]
+  **Promoted 2026-08-15 by operator ruling as the chain's MIDDLE link** — the broken predicate
+  between the unnamed primitive and the polled wait — into
+  `consumer-cohort-completion-and-wait-enforcement`. Re-probed at that scope: the self-match
+  still holds against a name absent from the tree, now matching the harness's single wrapper
+  where this entry recorded two.
+  **Amendment authored 2026-08-15 at spec: `delegation-kit/SPEC-waiting.md`.** Of the three
+  candidate forms this entry names, it sanctions the **artifact wait** as the default and a
+  **recorded PID** where liveness genuinely is the condition, and **refuses the bracket trick as
+  the sanctioned form** — in writing, because it is the first repair a reader reaches for and it
+  works; what disqualifies it is a failure mode that is silent, expensive and one character away.
+  Filed 2026-08-14 by close, draining the gap inbox; the bullet came from build batch A, which
+  paid the ten minutes.
+
+- **poll-sleep-guard-steer** [spec: SPEC-waiting.md] — polling to wait is the one half of the
+  never-poll rule that leaves a tracked artifact, and nothing reads it.
+  recurrence: poll-sleep-guard-steer 2026-08-14 2026-08-15
+  **The 2026-08-15 firing, and its shape is the 2026-08-14 one exactly.** One bare foreground
+  `sleep` standing in for a wait on a long local job, again beside condition loops in the same
+  log that this entry expressly rules legitimate — so the detector it asks for would have
+  separated them on the first pass and did not exist to.
+  **The 2026-08-14 firing, and its honest magnitude.** One instance, not sixteen: a build
+  session ran `bash installer/consumer-smoke/run-smoke.sh` and then `sleep 180; echo waited`
+  in the foreground. Unambiguously the finding — a foreground sleep standing in for a wait on
+  background work — and unambiguously smaller than the founding instance. It came through the
+  close-stage prompt-friction triage rather than through a gap bullet, and it is stamped anyway
+  because the declaration is the only durable record and is not re-derivable once the log is
+  cleared. The two `until`/`while` condition loops beside it in the same log are **not**
+  instances: this entry expressly rules `until <cond>; do sleep N; done` legitimate, and their
+  defect is the predicate, filed separately as `waiter-predicate-self-match`.
+  **The founding instance (2026-08-05).** `bash guard-kit/bin/scan-prompts.sh` ranked bare
+  `sleep` as that iteration's **top**
+  prompting pattern at 16 calls — a session waiting on background work by sleeping in the
+  foreground, roughly forty minutes of turns spent not-waiting-correctly. It is the same
+  rule `waiting-rule-fourth-firing-post-fix` records, approached from the opposite
+  side: that entry is a session ending its turn to wait, this is a session refusing to.
+  **Why this half is different, and why the difference is the whole entry.** That entry
+  states, correctly, that no gate can read a session's choice to *end a turn* — the act
+  leaves no tracked artifact. A **poll does**: it is a `Bash` call, on the exact surface
+  `scripts/bash-guard.sh` already reads and already steers (`cat`→Read, `sed`→Read, bare
+  allowlisted commands→undecorated). So the enforcement-first half that the turn-end class
+  honestly cannot have is available here, cheaply, and no entry has noticed that.
+  **Why it needed a design ruling before it could be built:** a blanket `sleep` block is wrong.
+  The sanctioned wait *is* a
+  condition loop, and this repo's own sessions run `until <cond>; do sleep N; done`
+  legitimately; a smoke or a probe may need a settle. So the rule has to separate a bare
+  foreground `sleep` from a sleep inside a condition loop, and decide whether the steer
+  names the notification channel, the harness's monitor form, or both — a guard-kit
+  contract question, since the rule is generic mechanism while the named better form is
+  consumer/harness vocabulary that must not become a kit literal (the provenance seam).
+  **Cost while deferred:** the cheapest available detector for a rule that has now fired in
+  four consecutive iterations goes unbuilt, and every polled wait bills a full-price turn
+  for a session doing nothing — paid per occurrence, on the tiered stages where long oracle
+  batteries are the whole work class.
+  [precondition-ok: the "waiting on background work" phrase above describes the defect this
+  entry fixes, not a forward dependency; nothing gates this entry]
+  **PROMOTED into `consumer-cohort-completion-and-wait-enforcement` by operator ruling
+  2026-08-15**, with `waiter-predicate-self-match` and `harness-wait-primitive-unnamed` as one
+  causal chain rather than three tasks; `waiting-rule-carrier-reach` was re-deferred against it,
+  so this is the family's enforcement half taken on its own.
+  **Amendment authored 2026-08-15 at spec: `delegation-kit/SPEC-waiting.md`**, which answers both
+  open questions. The steer names **both** forms sorted by the reactivity property, because
+  naming one teaches a spelling and naming the discriminator teaches the rule. The seam question
+  resolves against CLAUDE.md's own text rather than against precedent: the seam is a *privacy*
+  boundary over private rule content, and a harness tool name is public, shared vocabulary that
+  publishes nothing — so the rule lands in guard-kit's **generic** ruleset, which is also the
+  only lane carrying a decision-table obligation. Its scope sentence widens by one clause to
+  admit the sibling `pgrep` rule, whose subject is shell-substrate rather than harness behavior.
+  **What the amendment deliberately does not settle:** the harness's own assertion that a
+  foreground `sleep` is blocked. Probed in-tree — no sleep rule exists in `scripts/bash-guard.sh`,
+  `guard-kit/lib/`, `guard-kit/checks/` or `.claude/settings.json` — so nothing this repo controls
+  enforces the rule today and the amendment builds as though nothing outside it does either. The
+  disagreement's cause is unprobed and filed to the gap inbox; no delta rules on it.
+  Filed 2026-08-05 by close, from its own prompt-friction triage; scope-gated intake, so it
+  is filed rather than started.
+
 ## Technical Debt
 
 ## Deferred
@@ -58,55 +252,6 @@
   Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
   direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope. Since then it is
   promoted at spec and demoted at build once per cohort, and the terminal move is a **demotion**.
-
-- **consumer-gate-port-disposition** [design-pending] — the destination is ruled and the
-  first-mover design is merged; what remains is the tranche work porting this repo's own 13
-  gates into `native/`.
-  **Operator-ruled 2026-08-14: PORT INTO `native/`.** The 13 gates declared under `scripts/`
-  become subcommands of the existing multi-call binary. The seam fork this entry opened is
-  **closed** — a later session does not re-litigate it, and the two refused alternatives (a
-  second consumer-owned crate under `GATE_SDK_NATIVE_CRATE`; shell residue justified as a
-  class) are not re-priced here. The ruling was taken *without* making the tranche that
-  iteration's unit, so the destination is settled and the tranche schedules later.
-  **The class, re-measured at each tranche rather than annotated:** after the first tranche
-  landed 2026-08-15 at build, **10 of the 13 are still shell**, against **57 unported of 104
-  registered**, so they are 18% of what the port has left. Every earlier figure predates a
-  cohort and is corrected in place. They are
-  Checkwright's own rules about Checkwright's own tree: docs mirror, nav and kit parity, install
-  toolchain, installer dependency floor, npm publish spec, release channel parity,
-  trajectory freshness, value rollup, kit-ref liveness.
-  **What the ruling accepts:** an adopter's binary carries subcommands implementing another
-  project's repo rules, which they can never register — the cost taken against TRAJECTORY.md's
-  objective 4. Its two grounds and their consequence now sit where the mechanism is,
-  gate-sdk/SPEC.md §check-gate-substrate-parity's adopter clause, rather than restated here.
-  **Why nobody hit this before:** Checkwright is both kit publisher and consumer of its own
-  kits, and `native/` is both the crate this repo ports *into* and the one whose binary ships
-  *out*; a single-role tree would have met the fork on its first consumer gate.
-  **The first tranche is ruled 2026-08-15 at scope and landed the same day at build: the
-  `lib/declaration.sh` release-note family** — 3 of the 13, its members, grounds and price at
-  gate-sdk/SPEC.md §The declaration cohort; it proved the sentinel dispatches.
-  **The SECOND tranche is ruled 2026-08-15 at scope on the operator's ruling: the REMAINDER — all
-  10, completing this entry 13 of 13 and retiring it.** It is the eleventh cohort. Ground: the
-  selector's size arm is exhausted a third time, so the live ground is the tenth cohort's, and the
-  first-mover design below is already paid — every member inherits it, putting marginal cost per
-  member at its floor. 8 of the 10 clear every criterion. `check-installer-no-deps` folds in as
-  one member, discharging the standing single-gate reservation it held since the ninth cohort, and
-  it carries the knob-declaring **dispatch** question still owed since the zero-knob first tranche
-  never reached the config bridge. `check-docs-kit-parity` alone is unresolved at `c7=?`; if a
-  manual criterion-7 check does not clear it the tranche is 9, and the stage that finds it says
-  so. Census and price: `.workflow/survey-record.md` while its witness holds.
-  **The first-mover design is answered and merged into gate-sdk/SPEC.md, 2026-08-15 at build, and
-  every later tranche member inherits it rather than re-deriving it:** the owner column and its
-  `-` sentinel plus assertion B's scope rule (§check-gate-substrate-parity), and location as no
-  term of the conservation derivation (§Meta-gate conservation for the binary substrate). The
-  coverage question it exposed is filed to the gap inbox and is not this entry's.
-  **Cost while deferred:** now bounded rather than open — no cohort stalls on an unanswered
-  question, and what remains is ordinary port work whose ordering competes with every other
-  member, while the largest single shell block keeps standing against objective 6.
-  Filed 2026-08-14 at scope on operator direction under scope-gated intake with the seam ruling
-  open; ruled and re-scoped 2026-08-14, first tranche ruled 2026-08-15, both at scope off a live
-  `port-blockers.sh --group` run; design merged and demoted 2026-08-15 at build — a **demotion**
-  rather than a Done move, since the deliverable is 13 members and this tranche delivers 3.
 
 - **born-native-omission-accumulation** [design-pending] — the born-native flip attaches
   criterion 5's omission to every future gate, and nothing measures the pile.
@@ -2983,52 +3128,6 @@
   at the worst moment — mid-cut, with a note committed and a tag pending.
   Filed 2026-08-06 at close, on the lead's ruling, from the cut that hit it.
 
-- **poll-sleep-guard-steer** [design-pending] — polling to wait is the one half of the
-  never-poll rule that leaves a tracked artifact, and nothing reads it.
-  recurrence: poll-sleep-guard-steer 2026-08-14 2026-08-15
-  **The 2026-08-15 firing, and its shape is the 2026-08-14 one exactly.** One bare foreground
-  `sleep` standing in for a wait on a long local job, again beside condition loops in the same
-  log that this entry expressly rules legitimate — so the detector it asks for would have
-  separated them on the first pass and did not exist to.
-  **The 2026-08-14 firing, and its honest magnitude.** One instance, not sixteen: a build
-  session ran `bash installer/consumer-smoke/run-smoke.sh` and then `sleep 180; echo waited`
-  in the foreground. Unambiguously the finding — a foreground sleep standing in for a wait on
-  background work — and unambiguously smaller than the founding instance. It came through the
-  close-stage prompt-friction triage rather than through a gap bullet, and it is stamped anyway
-  because the declaration is the only durable record and is not re-derivable once the log is
-  cleared. The two `until`/`while` condition loops beside it in the same log are **not**
-  instances: this entry expressly rules `until <cond>; do sleep N; done` legitimate, and their
-  defect is the predicate, filed separately as `waiter-predicate-self-match`.
-  **The founding instance (2026-08-05).** `bash guard-kit/bin/scan-prompts.sh` ranked bare
-  `sleep` as that iteration's **top**
-  prompting pattern at 16 calls — a session waiting on background work by sleeping in the
-  foreground, roughly forty minutes of turns spent not-waiting-correctly. It is the same
-  rule `waiting-rule-fourth-firing-post-fix` records, approached from the opposite
-  side: that entry is a session ending its turn to wait, this is a session refusing to.
-  **Why this half is different, and why the difference is the whole entry.** That entry
-  states, correctly, that no gate can read a session's choice to *end a turn* — the act
-  leaves no tracked artifact. A **poll does**: it is a `Bash` call, on the exact surface
-  `scripts/bash-guard.sh` already reads and already steers (`cat`→Read, `sed`→Read, bare
-  allowlisted commands→undecorated). So the enforcement-first half that the turn-end class
-  honestly cannot have is available here, cheaply, and no entry has noticed that.
-  **Why `[design-pending]`:** a blanket `sleep` block is wrong. The sanctioned wait *is* a
-  condition loop, and this repo's own sessions run `until <cond>; do sleep N; done`
-  legitimately; a smoke or a probe may need a settle. So the rule has to separate a bare
-  foreground `sleep` from a sleep inside a condition loop, and decide whether the steer
-  names the notification channel, the harness's monitor form, or both — a guard-kit
-  contract question, since the rule is generic mechanism while the named better form is
-  consumer/harness vocabulary that must not become a kit literal (the provenance seam).
-  **Cost while deferred:** the cheapest available detector for a rule that has now fired in
-  four consecutive iterations goes unbuilt, and every polled wait bills a full-price turn
-  for a session doing nothing — paid per occurrence, on the tiered stages where long oracle
-  batteries are the whole work class.
-  **PROMOTED into `consumer-cohort-completion-and-wait-enforcement` by operator ruling
-  2026-08-15**, with `waiter-predicate-self-match` and `harness-wait-primitive-unnamed` as one
-  causal chain rather than three tasks; `waiting-rule-carrier-reach` was re-deferred against it,
-  so this is the family's enforcement half taken on its own. The amendment is spec's to author.
-  Filed 2026-08-05 by close, from its own prompt-friction triage; scope-gated intake, so it
-  is filed rather than started.
-
 - **waiting-rule-fourth-firing-post-fix** [design-pending] — the residency rule fired again,
   under its own freshly-strengthened prose.
   recurrence: waiting-rule-fourth-firing-post-fix 2026-08-06
@@ -5495,68 +5594,6 @@
   equal to the script's own tree, so the two agree today. The cost is a trap armed for the first
   caller that uses `--root` for what it was built for: packing a tree other than the packer's.
   Filed 2026-08-14 by close, draining the gap inbox; the bullet came from the `--root` build batch.
-
-- **waiter-predicate-self-match** [design-pending] — `until ! pgrep -f '<script>'` can never
-  exit, because `pgrep -f` matches the waiter's own argv.
-  **Re-verified live at this close** with a script name that exists nowhere in the tree:
-  `bash -c 'pgrep -af "cw-probe-nonexistent-script.sh"'` matched **two** processes — the harness's
-  outer `bash -c` wrapper and the inner one — and exited 0. So the condition is permanently true
-  and the loop is unbounded. The claim is established and is *stronger* than filed: the harness's
-  own wrapper argv matches too, so the defect does not depend on how the waiter is spelled.
-  **Attested cost:** this iteration's build batch A ran two such waiters against `run-smoke.sh`;
-  both survived the smoke's terminal line and were still running when `TaskStop` reported success.
-  The observed price was the Bash tool's 600s foreground cap absorbing an infinite loop, which
-  reads from outside as a fixed ten-minute wait. Nothing reds — the work completes correctly and
-  the only symptom is wall-clock, which is why no existing oracle sees it.
-  **Deliverable:** rule the sanctioned form and put it where a waiting session reads it — the
-  bracket trick (`pgrep -f '[r]un-smoke.sh'`), matching a recorded PID rather than a pattern, or
-  waiting on the work's own artifact. A `bash-guard` rule steering off the self-matching shape is
-  the enforcement half and is mechanically decidable (the pattern is a literal in the argv).
-  **Distinct from** `poll-sleep-guard-steer` and `waiting-rule-fourth-firing-post-fix`: this
-  session chose the documented `run_in_background` + `until` pattern *correctly*, and the
-  predicate inside it was the defect.
-  **Cost while deferred:** ten wall-clock minutes per occurrence, silently, on any session that
-  reaches for the obvious spelling — and it is the obvious spelling.
-  **Promoted 2026-08-15 by operator ruling as the chain's MIDDLE link** — the broken predicate
-  between the unnamed primitive and the polled wait — into
-  `consumer-cohort-completion-and-wait-enforcement`. Re-probed at that scope: the self-match
-  still holds against a name absent from the tree, now matching the harness's single wrapper
-  where this entry recorded two. The amendment is spec's to author.
-  Filed 2026-08-14 by close, draining the gap inbox; the bullet came from build batch A, which
-  paid the ten minutes.
-
-- **harness-wait-primitive-unnamed** [design-pending] — the in-turn waiting rule names "the
-  harness's waiting primitive" in the singular, and the harness has two with opposite reactivity.
-  `delegation-kit/templates/agent-execution.md:43-45` tells a dispatched session to "loop on the
-  work's own artifact (evidence file, lock, exit marker) with the harness's waiting primitive" —
-  **re-verified at this close by reading those lines**; the phrase is singular and names nothing.
-  The two candidates differ by exactly the wall-clock property the rule exists to buy: a
-  backgrounded shell `until` loop fires one notification the moment its condition goes true, while
-  `Monitor` armed with an unbounded command stays armed to its `timeout_ms` deadline even after
-  the event fires.
-  **Second half — an interaction, not a separate defect.** Build batch A's *first* instinct was
-  the correct artifact wait (`until grep -q` on the runner's own output), and the repo's own
-  bash guard rejected it for naming the harness scratchpad path — **re-verified**: the guard
-  blocks the `/tmp/claude-...` prefix and steers to repo-local `.tmp/`. The guard is *correct*;
-  what is missing is that the doctrine never says the artifact belongs in `.tmp/`, so the guard's
-  refusal reads as a refusal of artifact-waiting itself and steered the session onto the
-  process-liveness form that then broke (`waiter-predicate-self-match`).
-  **Deliverable:** name the primitive in the doctrine bullet, and say in the same breath that the
-  awaited artifact goes in repo-local `.tmp/`. Small edit; the reason it is a task and not an
-  in-flight fix is that ruling *which* primitive is the sanctioned one is a delegation-kit
-  contract call, not a wording call.
-  **Distinct from `waiter-predicate-self-match`:** that entry is the broken predicate; this is the
-  doctrine-and-guard interaction that selected the shape it lived in.
-  **Cost while deferred:** every dispatched session re-derives which primitive to use, and the
-  guard keeps steering away from the artifact wait the doctrine's own words prefer.
-  **Promoted 2026-08-15 by operator ruling as the chain's HEAD** — the unnamed primitive is what
-  selects the shape the other two fail in — into
-  `consumer-cohort-completion-and-wait-enforcement`. Its second half re-occurred at that scope,
-  unprompted and in the session's own tool use: the correct artifact wait refused for naming the
-  harness scratchpad, three blocked attempts before recovery, filed to the gap inbox for the
-  drain to judge. The amendment is spec's to author.
-  Filed 2026-08-14 by close, draining the gap inbox; the bullet came from build batch A, beside
-  the broken predicate it selected.
 
 - **consumer-smoke-targeted-mode-registrar-scope** [design-pending] — the consumer smoke's
   targeted single-kit form fails on a cross-kit registration dependency that the targeting severs.
