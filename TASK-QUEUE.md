@@ -82,25 +82,24 @@
   **Why nobody hit this before:** Checkwright is both kit publisher and consumer of its own
   kits, and `native/` is both the crate this repo ports *into* and the one whose binary ships
   *out*; a single-role tree would have met the fork on its first consumer gate.
-  **The cheapest single-gate first mover is named: `check-installer-no-deps`** — one gate over
-  one small corpus (`installer/package.json`), excluded from the ninth cohort with cause and
-  entering with that cohort's JSON reader already paid. Ruled *past* the 2026-08-15 tranche,
-  never rescinded, and available to any later cohort.
   **The first tranche is ruled 2026-08-15 at scope and landed the same day at build: the
   `lib/declaration.sh` release-note family** — 3 of the 13, its members, grounds and price at
-  gate-sdk/SPEC.md §The declaration cohort. That sizing was inside this entry's envelope and
-  leaves the 2026-08-14 destination untouched. It proved the sentinel dispatches, and that a
-  zero-knob member never reaches the config bridge — so the **dispatch** question the gap inbox
-  carries is still owed by the first member that declares a knob.
-  **The first-mover design is answered and merged into gate-sdk/SPEC.md, 2026-08-15 at build,
-  and a later tranche member inherits it rather than re-deriving it:** the owner column's
-  declaring-root domain and its `-` sentinel, assertion B's two-clause scope rule with both
-  directions proved by a run, and the owner unit test resolving by root shape
-  (§check-gate-substrate-parity); location as no term of the conservation derivation, re-derived
-  at each tranche's cut (§Meta-gate conservation for the binary substrate); and the recorded
-  verdicts of the three kit-root-scoped readers that do not reach a consumer-declared member.
-  The standing coverage question the third exposes — no roster reader covers any
-  consumer-declared gate — is filed to the gap inbox and is not this entry's.
+  gate-sdk/SPEC.md §The declaration cohort; it proved the sentinel dispatches.
+  **The SECOND tranche is ruled 2026-08-15 at scope on the operator's ruling: the REMAINDER — all
+  10, completing this entry 13 of 13 and retiring it.** It is the eleventh cohort. Ground: the
+  selector's size arm is exhausted a third time, so the live ground is the tenth cohort's, and the
+  first-mover design below is already paid — every member inherits it, putting marginal cost per
+  member at its floor. 8 of the 10 clear every criterion. `check-installer-no-deps` folds in as
+  one member, discharging the standing single-gate reservation it held since the ninth cohort, and
+  it carries the knob-declaring **dispatch** question still owed since the zero-knob first tranche
+  never reached the config bridge. `check-docs-kit-parity` alone is unresolved at `c7=?`; if a
+  manual criterion-7 check does not clear it the tranche is 9, and the stage that finds it says
+  so. Census and price: `.workflow/survey-record.md` while its witness holds.
+  **The first-mover design is answered and merged into gate-sdk/SPEC.md, 2026-08-15 at build, and
+  every later tranche member inherits it rather than re-deriving it:** the owner column and its
+  `-` sentinel plus assertion B's scope rule (§check-gate-substrate-parity), and location as no
+  term of the conservation derivation (§Meta-gate conservation for the binary substrate). The
+  coverage question it exposed is filed to the gap inbox and is not this entry's.
   **Cost while deferred:** now bounded rather than open — no cohort stalls on an unanswered
   question, and what remains is ordinary port work whose ordering competes with every other
   member, while the largest single shell block keeps standing against objective 6.
@@ -3023,6 +3022,10 @@
   four consecutive iterations goes unbuilt, and every polled wait bills a full-price turn
   for a session doing nothing — paid per occurrence, on the tiered stages where long oracle
   batteries are the whole work class.
+  **PROMOTED into `consumer-cohort-completion-and-wait-enforcement` by operator ruling
+  2026-08-15**, with `waiter-predicate-self-match` and `harness-wait-primitive-unnamed` as one
+  causal chain rather than three tasks; `waiting-rule-carrier-reach` was re-deferred against it,
+  so this is the family's enforcement half taken on its own. The amendment is spec's to author.
   Filed 2026-08-05 by close, from its own prompt-friction triage; scope-gated intake, so it
   is filed rather than started.
 
@@ -3079,13 +3082,12 @@
   is not an agent, so no agent definition governs it however many definitions carry the
   clause — and the one signal a supervisor would trust to say the work is done is precisely
   the signal that is wrong here.
-  **Why `[design-pending]`:** the two candidate homes trade off and neither covers both
-  classes. Putting the clause on every dispatched agent type's definition is per-type
-  maintenance a newly added type silently opts out of; putting it on the dispatching side as
-  a standing clause in the dispatch-prompt template reaches every type but only through prose
-  a dispatcher must remember to send. Neither answers the shell-child class, where the honest
-  fix may be a liveness read rather than a rule. Provenance seam: the notification's
-  semantics are harness vocabulary, so a kit may state the obligation and not the mechanism.
+  **Why `[design-pending]`:** the two candidate homes trade off and neither covers both classes.
+  Per-type definitions are maintenance a newly added type silently opts out of; a standing clause
+  in the dispatch-prompt template reaches every type but only through prose a dispatcher must
+  remember to send. Neither answers the shell-child class, where the honest fix may be a liveness
+  read rather than a rule. Provenance seam: notification semantics are harness vocabulary, so a
+  kit states the obligation and not the mechanism.
   **Cost while deferred:** every dispatch to a type whose definition omits the clause is
   unprotected, and a backgrounded producer under a session with no live lead is lost
   silently — the sixth firing cost nothing only because a lead happened to be watching.
@@ -3095,17 +3097,18 @@
   having loaded a carrier that states the rule explicitly (the `stage-session` definition's
   turn-end-is-session-end clause, plus the standing dispatch policy naming the in-turn wait).
   So reach was **present** and the rule still failed.
-  **What it evidences, stated against this entry's interest.** Firings five and six were about
-  carriers omitting the clause; this one is not, so it is not more of the same. It is direct
-  evidence for the sibling framing — `waiting-rule-fourth-firing-post-fix`'s prose-versus-
-  enforcement question — that a rule present in loaded context is still not obeyed at the
-  moment of temptation. Kept here because the two entries decide together and split evidence
-  is how a decider sees half of it.
+  **What it evidences, against this entry's interest.** Firings five and six were carriers
+  omitting the clause; this one is not. It is direct evidence for the sibling framing —
+  `waiting-rule-fourth-firing-post-fix`'s prose-versus-enforcement question — that a rule present
+  in loaded context is still not obeyed at the moment of temptation.
   **Eighth firing, 2026-08-11:** rule loaded, named and restated back — and broken anyway.
-  **The ground this answers:** if reach is not the binding constraint, widening carriers — both
-  candidate homes above — buys less than it appears to, and the two entries likely resolve to
-  one enforcement-shaped answer rather than two prose-shaped ones. Nine firings, the last three
-  with the rule provably in context, is now the argument rather than a hypothesis.
+  **RE-DEFERRED by operator ruling 2026-08-15**, recorded here because this entry reached the
+  recurrence threshold and a threshold entry is dispositioned rather than outranked in silence.
+  Ground: the corrected premise above closes its founding reach gap, and nine firings — the last
+  three with the rule provably in context — make reach the wrong axis, so the family resolves to
+  one enforcement-shaped answer. That half is the iteration's: `poll-sleep-guard-steer`,
+  `waiter-predicate-self-match`, `harness-wait-primitive-unnamed`. What survives here is the
+  **shell-child** class alone, which no agent definition governs; re-cost it against those three.
   Filed 2026-08-06 by close, draining the gap inbox and the lead's separately held incident.
 
 - **amendment-dod-sibling-dependence** [design-pending] — an amendment's DoD is written as if
@@ -5498,6 +5501,11 @@
   predicate inside it was the defect.
   **Cost while deferred:** ten wall-clock minutes per occurrence, silently, on any session that
   reaches for the obvious spelling — and it is the obvious spelling.
+  **Promoted 2026-08-15 by operator ruling as the chain's MIDDLE link** — the broken predicate
+  between the unnamed primitive and the polled wait — into
+  `consumer-cohort-completion-and-wait-enforcement`. Re-probed at that scope: the self-match
+  still holds against a name absent from the tree, now matching the harness's single wrapper
+  where this entry recorded two. The amendment is spec's to author.
   Filed 2026-08-14 by close, draining the gap inbox; the bullet came from build batch A, which
   paid the ten minutes.
 
@@ -5525,6 +5533,12 @@
   doctrine-and-guard interaction that selected the shape it lived in.
   **Cost while deferred:** every dispatched session re-derives which primitive to use, and the
   guard keeps steering away from the artifact wait the doctrine's own words prefer.
+  **Promoted 2026-08-15 by operator ruling as the chain's HEAD** — the unnamed primitive is what
+  selects the shape the other two fail in — into
+  `consumer-cohort-completion-and-wait-enforcement`. Its second half re-occurred at that scope,
+  unprompted and in the session's own tool use: the correct artifact wait refused for naming the
+  harness scratchpad, three blocked attempts before recovery, filed to the gap inbox for the
+  drain to judge. The amendment is spec's to author.
   Filed 2026-08-14 by close, draining the gap inbox; the bullet came from build batch A, beside
   the broken predicate it selected.
 
