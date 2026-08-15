@@ -84,6 +84,18 @@ still-running `run-validate`. Every check passed mid-write, because the producer
 commits its evidence and keeps going, so the terminal commit existing is fully
 compatible with the process still executing.
 
+**When the notification does not arrive, no single read distinguishes a
+finished-but-unreported session from a live one.** Delivery can fail, and the
+rule above then has no fallback — while the artifact reads a lead reaches for
+next are the same ones it just refused. What recovers it is two signals and a
+question: the session's absence from the harness's running-agent roster, a
+`DONE` marker in its journal, and — decisive whenever either is ambiguous —
+asking the session itself, which §A running session is asked, never instructed
+already sanctions as a question rather than a command. The `DONE` check carries
+a sharp edge worth stating rather than rediscovering: it is valid only as the
+journal's **last line**, so any out-of-order append silently invalidates it
+while leaving the marker plainly visible.
+
 **Any prompt-answered signal is a start signal, never a completion one.** The
 same lead read an operator's note about having just answered a stalled permission
 prompt as the stage being finished. It means the opposite: an approval prompt
