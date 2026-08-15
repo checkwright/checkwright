@@ -885,8 +885,9 @@ sources it instead of re-defaulting, which is the single-home form
 value one value rather than two.
 
 **The config bridge is what forces a library rather than a convention.**
-`gate-sdk/lib/gate.sh`'s `_gate_knob_value` sources `<kit>/lib/*.sh` in a subshell
-and **exits 2 on a knob the sourced library does not define**, so a
+gate-sdk's config bridge resolves each declared knob by sourcing one kit's
+library in a subshell, and **exits 2 on a knob that library does not define**
+(gate-sdk/SPEC.md §lib/gate.sh), so a
 `.gate`-dispatched member whose knobs were defaulted inside a check script would
 resolve none of them. That mechanism is indifferent to what any crate links: a
 member receives its knobs this way whatever the binary carries.

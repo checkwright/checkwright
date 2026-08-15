@@ -3898,6 +3898,14 @@
   `.workflow/audit-roster.txt` rows carry `due:` and `last:` and nothing else, so the close that
   performs one records *that* it swept and reports its finding count in prose. "Came back clean"
   is unfalsifiable at the time it is written and un-re-runnable afterwards.
+  recurrence: audit-class-corpus-attestation 2026-08-15
+  **Third instance, and it widens the entry: this one was not a false negative.** The 2026-08-15
+  sweep of `capability-pendency-after-landing` *found* `gate-sdk/SPEC.md`'s "no `.gate` member
+  exists anywhere in the tree" — false since the first cohort, 2026-08-02 — and correctly ruled
+  it outside its own trigger, which is event-scoped to what the iteration landed. So an honest
+  sweep, with its corpus genuinely read, can leave standing drift; a `last:` carrying the corpus
+  command would not have changed that verdict. The scoping is the second axis, and this entry's
+  deliverable has to rule whether a row also stamps what it *declined* and why.
   **Measured harm, and it is not hypothetical — a two-for-two false negative on consecutive
   closes.** `capability-pendency-after-landing`'s trigger fired when `native-cohort-activation`
   cut v0.22.0 (`.workflow/release-disposition.txt`, `git show d64e63c0`), the first tag publishing
@@ -3977,6 +3985,7 @@
   rule categorically excludes.
   queue-kit/SPEC.md §The icebox tier states that a roadmap-tagged entry is not
   icebox-eligible — a hard rule, not a judgment. The worklist does not read the tag.
+  recurrence: icebox-worklist-roadmap-blind 2026-08-15
   **Measured this close: 3 of 3 offered candidates carried a roadmap tag**
   (`plugin-marketplace`, `benchmark-ab-experiment`, `hosted-attestation-service`), so the
   worklist's precision was zero and every row was resolved by re-deriving the same exclusion.
@@ -3996,7 +4005,7 @@
   whether anything else already tells that story.
   **Cost while deferred:** low, recurring, and paid by every close — three entries re-read and
   one rule re-derived per iteration, forever, against a one-predicate fix. Re-measured at the
-  2026-08-13 close: 3 of 3 offered rows were roadmap-tagged again, so precision is still zero.
+  2026-08-13 and 2026-08-15 closes: the same 3 rows both times, so precision has been zero thrice.
   Filed 2026-08-09 by close (`install-profile-seam`) from its own backlog-eviction step;
   a duplicate filing of the same finding (`icebox-candidate-roadmap-filter`, 2026-08-13) was
   merged in here at the 2026-08-13 close, which also filed
