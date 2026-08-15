@@ -5972,6 +5972,44 @@
   Filed 2026-08-15 by close, draining the gap inbox; not fixed inline because the change is
   shipped-output work across two substrates, which scope-gated intake files rather than starts.
 
+- **deferred-pool-identifier-restatement-sweep** [design-pending] — the deferred pool entered
+  `internal-identifier-restatement`'s corpus on 2026-08-15 and has never been swept under it, so
+  the tree's longest-lived prose surface carries an unmeasured restatement debt.
+  **The corpus ruling that created this.** The class's roster line was widened at the 2026-08-15
+  close: the 2026-08-09 exclusion is a **conjunction** — a surface is out when recording is its
+  whole contract *and* it is boundary-truncated — and the deferred pool fails the second half.
+  The survey record stays out on both. The roster line carries the ruling; this entry carries
+  the work it created.
+  **The predicate is narrow, and the narrowness is the whole point.** What is swept for is a
+  restated *call chain, roster or algorithm* — never a named identifier, since
+  de-literalization's own digest is "prose cites names". A private helper named as the
+  **subject** of a pending decision is a citation of instance and is clean. A sweep that reports
+  every underscore-prefixed name it finds has misread its predicate and produced noise, which is
+  the failure mode worth naming in advance because the corpus invites it.
+  **Why the debt is plausibly real rather than theoretical, priced off the iteration that filed
+  it.** Both restatements found at that close had rotted in place — a false call chain in a kit
+  SPEC for six days, and a tree-state claim for roughly seven closes. A deferred entry has no
+  truncation and no boundary, so its rot window is bounded only by how long the entry waits.
+  Two entries filed at that same close name private helpers deliberately and cleanly, which is
+  evidence the corpus is **rich** in the identifiers the predicate must distinguish rather than
+  evidence it is dirty; the sweep's cost is in the judging, not the grepping.
+  **Why `[design-pending]`:** the remedy is open in a way it is not for a SPEC. An entry's job is
+  to carry a pending decision's grounds, so the chain may belong there — compressing it to a
+  pointer can leave the decision unmakeable by the scope that inherits it. The unit must rule
+  what a finding here *becomes*: a rewrite, a pointer, or an accepted carry with its rot window
+  stated. Ruling that ahead of reading the corpus decides against a shape nobody has measured.
+  **DISTINCT from `vendored-library-identifier-reach`, and deliberately not folded into it.**
+  That entry owns *which identifiers count as internal* — the file-level versus kit-level reach
+  question — and the corpus ruling left it un-narrowed on purpose. This owns *sweeping a surface
+  that ruling just added*. Either may land first; neither closes the other.
+  **Cost while deferred:** the class's `last:` stamp names an iteration whose sweep read the
+  pre-widening corpus only, so the roster carries a cadence claim narrower than the class it
+  labels. The roster line states that gap explicitly rather than leaving it inferable — but a
+  stated caveat is not a sweep, and this is the same stamp-implies-coverage shape
+  `audit-class-corpus-attestation` records. Paid at every close that reads the roster.
+  Filed 2026-08-15 by close, on the lead's corpus ruling; scope-gated intake, so it is filed
+  costed rather than swept by the session that received the ruling.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
