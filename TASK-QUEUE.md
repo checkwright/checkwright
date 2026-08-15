@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: declaration-cohort-and-consumer-first-mover
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -19,27 +19,19 @@
 - **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
   — the whole battery onto the binary, and the shell surface down to its residue.
   roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
-  The entry stays deferred rather than moving to `## Done`: it is the **whole corpus**, 60 of
-  104 registered gates remain unported, and a Done move would assert a finished port and
-  silently drop it from the **public** roadmap projection, which reads `[roadmap:]` tags off
-  live entries.
+  Stays deferred rather than `## Done`: it is the **whole corpus** (60 of 104 unported), and a
+  Done move would assert a finished port and silently drop it from the **public** roadmap
+  projection, which reads `[roadmap:]` tags off live entries.
   **Operator-ruled 2026-08-09: complete the port, ASAP.** The ruling, its grounds and its
   supersession of the 2026-08-06 measurement-locus clause are recorded in
   [TRAJECTORY.md](TRAJECTORY.md) §PRIORITY DIRECTIVE — the port track's sequence. This entry is
   the work, and does not restate them. What it inherits unchanged: gate-sdk/SPEC.md §Porting a
   gate to the binary substrate for the porting procedure, §Consumer payload for the payload
   rule.
-  **The scope the ruling fixes.** Everything portable ports — the gates, the runners, and the
-  install-lifecycle scripts alike. Surviving shell is **residue justified case by case**, never
-  a protected category, so "it is orchestration" is not by itself an answer. Adopters install a
-  **pre-compiled binary or build from source, their choice**; both paths ship. *From source*
-  means a developer clones the **public repository** — source never enters the payload, so the
-  disclosure boundary is untouched and assertion E still binds (operator-answered 2026-08-09).
-  **The known irreducible, named so nobody reads it as non-compliance.** Something must run
-  before the binary exists, and fetching-and-executing the first artifact cannot itself be that
-  artifact. So the **bootstrap** — in shell, or absorbed by the transport, since the payload
-  ships as an npm package and a Release tarball and npm can carry per-platform binaries — is the
-  one place shell may be unavoidable. Naming it is not designing it; the design is this unit's.
+  **The scope the ruling fixes, both shipped install paths, and the bootstrap residue are
+  TRAJECTORY.md §PRIORITY DIRECTIVE's** — deleted here 2026-08-15 as a verbatim second copy,
+  against this entry's own no-restatement claim above. Designing the bootstrap is still this
+  unit's work, not that file's.
   **Wall-clock is the weaker argument and is answered:** the battery is under 6%
   of validate, so the win is retiring shell *sources* the payload carries, not faster execution.
   **This answers the toolchain-free objection:** the installer smoke's toolchain-free arm is
@@ -49,10 +41,16 @@
   is canonical for every one of them** — members, delivered counts, holds, grounds and each
   cohort's own price live there, so this entry states what remains rather than restating them.
   From the eighth on, members are **selected by running** `port-blockers.sh --group` rather than
-  read off the tree. The ninth landed 2026-08-14 and is the one whose cost outran its port:
-  it took the crate's **first dependency** rather than building an engine, which moved the
-  toolchain floor 1.56 → 1.71 — and an MSRV move turns out to be a `check-crate-arms` input, so
-  a later floor bump budgets a clippy pass nothing announced. **44 of 104 ported.**
+  read off the tree. **44 of 104 ported.**
+  **The tenth cohort is operator-ruled 2026-08-15 at scope: the `lib/declaration.sh` release-note
+  family** — `check-release-bump`, `check-tightened-gates-grammar`,
+  `check-tightened-gates-note-parity`, all three consumer-declared, so it is also
+  `consumer-gate-port-disposition`'s first tranche. The `--group` size arm is exhausted a second
+  time, so it rides the blocker-retiring override; the tool split one shared derivation into
+  three singletons on exact-set key equality and the selecting session adjudicated the union,
+  which §The first cohort reserves to it. Criterion 6 carried forward so `spec` does not
+  re-derive it: `gate-sdk/bin/upgrade-smoke.sh` keeps `lib/declaration.sh` **dual** — the
+  `spec_manifest_files` disposition, never the seventh cohort's delete-the-shell-form outcome.
   Every held member is **sequencing with port work owed, never exclusion**, and what each owes
   is on `cohort-held-members-port-prerequisites`, which owns the roster and the kits it spans;
   a kit count copied here would be a second one to drift, and was.
@@ -74,11 +72,11 @@
   second consumer-owned crate under `GATE_SDK_NATIVE_CRATE`; shell residue justified as a
   class) are not re-priced here. The ruling was taken *without* making the tranche that
   iteration's unit, so the destination is settled and the tranche schedules later.
-  **The class, re-measured 2026-08-14 at scope against the post-eighth-cohort registry:** the
-  13 are **100% unported** — no `.gate` beside any of them — against **62 unported of 104
-  registered**, so they are 21% of what the port has left. The figures this entry was filed
-  with, 63 of 103, were taken before the eighth cohort landed and are corrected here rather
-  than annotated. They are Checkwright's own rules about Checkwright's own tree: docs mirror,
+  **The class, re-measured 2026-08-15 at scope against the post-ninth-cohort registry:** the 13
+  are **100% unported** — no `.gate` beside any of them — against **60 unported of 104
+  registered**, so they are 22% of what the port has left. Earlier figures (63 of 103, then 62
+  of 104) each predate a cohort and are corrected here rather than annotated. They are
+  Checkwright's own rules about Checkwright's own tree: docs mirror,
   nav and kit parity, install toolchain, installer dependency floor, npm publish spec, release
   bump and channel parity, trajectory freshness, value rollup, tightened-gates grammar and
   note parity, kit-ref liveness.
@@ -90,22 +88,30 @@
   implementing another project's repo rules, which they can never register. That is the cost
   the ruling took, against TRAJECTORY.md's objective 4; the tranche's design owns how the
   unregistrable subcommands are declared, not whether they ship.
-  **Why nobody hit this before, which is the part a later reader will not re-derive.**
-  Checkwright is both the kit publisher and a consumer of its own kits, and that dual role
-  collapses the distinction the question turned on: `native/` is at once the crate this repo
-  ports *into* and the crate whose binary ships *out*. A single-role tree would have met the
-  fork on its first consumer gate.
-  **The cheapest first mover is named: `check-installer-no-deps`.** It was weighed for the
-  ninth cohort's membership and excluded with cause — that cohort buys a JSON reader, and
-  membership beyond what proves the engine adds risk without adding the payoff — so it enters
-  here instead, as one gate over one small corpus (`installer/package.json`) with the jq
-  engine already paid by the time the tranche runs.
-  **Cost while deferred:** now bounded rather than open. No cohort stalls on an unanswered
-  question any more; what remains is 13 gates of ordinary port work whose ordering competes
-  with every other member, and a tranche deferred long enough that the largest single shell
-  block keeps standing against objective 6.
-  Filed 2026-08-14 at scope on operator direction, under scope-gated intake, with the seam
-  ruling left open; ruled and re-scoped 2026-08-14 at scope, premise corrected off a live
+  **Why nobody hit this before, which a later reader will not re-derive.** Checkwright is both
+  the kit publisher and a consumer of its own kits, and that dual role collapses the distinction
+  the question turned on: `native/` is at once the crate this repo ports *into* and the crate
+  whose binary ships *out*. A single-role tree would have met the fork on its first consumer gate.
+  **The cheapest single-gate first mover is named: `check-installer-no-deps`** — one gate over
+  one small corpus (`installer/package.json`), excluded from the ninth cohort with cause (that
+  cohort buys a JSON reader and membership beyond what proves the engine adds risk without
+  payoff), entering here with that reader already paid.
+  **The first tranche is ruled 2026-08-15 at scope: the `lib/declaration.sh` release-note family**
+  — `check-release-bump`, `check-tightened-gates-grammar`, `check-tightened-gates-note-parity`,
+  3 of the 13; its members and grounds live with every other cohort's on
+  `native-gate-port-remaining-corpus`. **`check-installer-no-deps` was ruled *past* this
+  iteration, never rescinded** — it stays the named single-gate first mover above, available to
+  any later cohort; the ruling was cohort sizing inside this entry's envelope and leaves the
+  2026-08-14 destination untouched. **The first-mover design is `spec`'s, named so it is not
+  re-derived:** how `check-gate-substrate-parity` assertion B's owner column reads a
+  `scripts/<name>.gate` descriptor under a non-kit root (the crate unit test's
+  `<owner>/checks/<name>.gate` shape cannot hold there), and whether a consumer-declared member
+  earns a conservation row.
+  **Cost while deferred:** now bounded rather than open — no cohort stalls on an unanswered
+  question, and what remains is ordinary port work whose ordering competes with every other
+  member, while the largest single shell block keeps standing against objective 6.
+  Filed 2026-08-14 at scope on operator direction under scope-gated intake with the seam ruling
+  open; ruled and re-scoped 2026-08-14, first tranche ruled 2026-08-15, both at scope off a live
   `port-blockers.sh --group` run.
 
 - **born-native-omission-accumulation** [design-pending] — the born-native flip attaches

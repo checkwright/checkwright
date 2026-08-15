@@ -4,4 +4,4 @@
 
 ---
 
-— scope ab30a2d8 2026-08-14
+declaration-cohort-and-consumer-first-mover scope ab30a2d8 2026-08-14
