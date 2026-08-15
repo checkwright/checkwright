@@ -52,8 +52,8 @@ hook approximation and the session-context template also expect
    auto-memory-disabling ones. `check-settings-paths` needs no manifest: it
    reads the same settings file and holds every allow-list grant naming a
    literal `.sh` path against the tree. `check-footprint-fresh` byte-gates a committed
-   `docs/footprint.md` against `bin/footprint.sh --emit`; register it when you
-   publish that projection.
+   `docs/footprint.md` against the footprint emitter it calls in-process;
+   register it when you publish that projection.
 
 2. Wire the session-start hook — copy `templates/session-context.sh` into your
    gates dir, edit its `[EDIT ME]` sections (layout judgment, not mechanism),
@@ -81,7 +81,7 @@ bash context-kit/bin/md-section.sh <file> <heading> # print one section by headi
 bash context-kit/bin/pub-index.sh [paths…]          # public API surface (per-language extractors; ships rust, ts)
 bash context-kit/bin/always-loaded.sh               # standing surface vs baseline (one line)
 bash context-kit/bin/always-loaded.sh --update-baseline   # a close-stage act
-bash context-kit/bin/footprint.sh                   # per-kit token footprint (--emit: the committed page)
+bash gate-sdk/bin/run-gates.sh --emit footprint     # per-kit token footprint (the committed page)
 ```
 
 ## Test

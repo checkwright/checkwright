@@ -157,6 +157,23 @@ _gate_knob_value() {
     )
 }
 
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the bridged environment for one binary arm, whether that arm is a `.gate`-dispatched gate or a non-gate arm a front-end invokes (§The non-gate arm): asks the binary what the arm reads, resolves each name through _gate_knob_value, and emits one `GATE_SDK_KNOB_<NAME>=<tab-joined>` element per line. Returns non-zero having named the refusal on stderr — the status is the caller's to propagate, which is why this prints to stdout for a `$(…)` capture rather than writing into a process substitution that would swallow it.
+gate_knob_env() {
+    local g="$1" bin knob_names knob_status knob value
+    bin="$(gate_native_bin)"
+    knob_names="$("$bin" --knobs "$g" 2>&1)"; knob_status=$?
+    if [[ "$knob_status" -ne 0 ]]; then
+        printf 'gate_command: %s --knobs %s exited %s — the config bridge could not ' "$bin" "$g" "$knob_status" >&2
+        printf 'report what %s reads; treating as failure (not clean)\n%s\n' "$g" "$knob_names" >&2
+        return 2
+    fi
+    while IFS= read -r knob; do
+        [[ -n "$knob" ]] || continue
+        value="$(_gate_knob_value "$knob" "$g")" || return 2
+        printf 'GATE_SDK_KNOB_%s=%s\n' "$knob" "$value"
+    done <<<"$knob_names"
+}
+
 # spec: gate-sdk/SPEC.md §lib/gate.sh — resolve a gate name to its *invocation argv*, the execution counterpart of gate_resolve's declaration path: one element `<dir>/<name>.sh` for a shell gate, two elements `<binary> <name>` for a `.gate`-dispatched one — prefixed, when that member declares knobs, by `env` and one `GATE_SDK_KNOB_<NAME>=<tab-joined>` element per knob. Emits one argv element per line, so a caller looking for the dispatch executable takes the first element that is neither `env` nor an assignment. An absent or non-executable binary when a member dispatches to it is a harness error — exit 2, never a skip and never a pass (§Fail-closed contract): a skip would let the battery silently stop running a gate whenever a build is missing. A binary that cannot report its knobs, and each of the three knob-resolution refusals, exit 2 by the same contract.
 gate_command() {
     local g="$1" d bin
@@ -174,19 +191,10 @@ gate_command() {
                 printf 'failure (not clean). Build it: bash gate-sdk/bin/build-native.sh\n' >&2
                 exit 2
             fi
-            local knob_names knob_status knob value
-            knob_names="$("$bin" --knobs "$g" 2>&1)"; knob_status=$?
-            if [[ "$knob_status" -ne 0 ]]; then
-                printf 'gate_command: %s --knobs %s exited %s — the config bridge could not ' "$bin" "$g" "$knob_status" >&2
-                printf 'report what %s reads; treating as failure (not clean)\n%s\n' "$g" "$knob_names" >&2
-                exit 2
-            fi
+            local env_out
+            env_out="$(gate_knob_env "$g")" || exit 2
             local -a env_elems=()
-            while IFS= read -r knob; do
-                [[ -n "$knob" ]] || continue
-                value="$(_gate_knob_value "$knob" "$g")" || exit 2
-                env_elems+=("GATE_SDK_KNOB_$knob=$value")
-            done <<<"$knob_names"
+            [[ -n "$env_out" ]] && mapfile -t env_elems <<<"$env_out"
             if [[ ${#env_elems[@]} -gt 0 ]]; then
                 printf 'env\n'
                 printf '%s\n' "${env_elems[@]}"

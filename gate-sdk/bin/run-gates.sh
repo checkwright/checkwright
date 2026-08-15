@@ -16,6 +16,26 @@ REPO_ROOT="$(git rev-parse --show-toplevel)" || {
 }
 cd "$REPO_ROOT" || exit 2
 
+# spec: gate-sdk/SPEC.md §The non-gate arm — the emitter front-end: a ported emitter receives no
+# configuration, so a caller already sourcing this library resolves its bridged knobs and invokes
+# it. The projection is an operand here and a suffix in the crate, governed separately.
+if [[ "${1:-}" == --emit ]]; then
+    shift
+    EMIT_PROJECTION="${1:-}"
+    [[ -n "$EMIT_PROJECTION" ]] || { echo "run-gates: --emit needs a projection name" >&2; exit 2; }
+    EMIT_ARM="--emit-$EMIT_PROJECTION"
+    EMIT_BIN="$(gate_native_bin)"
+    if [[ ! -x "$EMIT_BIN" ]]; then
+        printf 'run-gates: --emit dispatches to the native binary, but %s is absent or not ' "$EMIT_BIN" >&2
+        printf 'executable — the projection could not be emitted. Build it: bash gate-sdk/bin/build-native.sh\n' >&2
+        exit 2
+    fi
+    EMIT_ENV="$(gate_knob_env "$EMIT_ARM")" || exit 2
+    EMIT_ELEMS=()
+    [[ -n "$EMIT_ENV" ]] && mapfile -t EMIT_ELEMS <<<"$EMIT_ENV"
+    exec env ${EMIT_ELEMS[@]+"${EMIT_ELEMS[@]}"} "$EMIT_BIN" "$EMIT_ARM"
+fi
+
 FOR_PATHS=()
 if [[ "${1:-}" == --for ]]; then
     shift

@@ -1863,17 +1863,20 @@ labelled.** Its members byte-compare a tracked projection against a live
 `bash <emitter> --emit`: `check-footprint-fresh`, `check-trajectory-fresh`,
 `check-enforcement-fresh`, `check-value-rollup-fresh`, `check-docs-mirror-fresh`,
 `check-roadmap-fresh`. On the per-member key the relabel above fixes — *is this
-gate's emitter ported?* — the emitters are `context-kit/bin/footprint.sh`,
+gate's emitter ported?* — the still-shell emitters are
 `drift-kit/bin/trajectory.sh`, `gate-sdk/bin/enforcement-map.sh`,
-`scripts/gen-value-rollup.sh`, `scripts/gen-docs-mirror.sh`,
-`queue-kit/bin/roadmap.sh`, and **not one of them is ported**. On that key every
-member is held for any cohort that ports no emitter — a **sequencing** finding,
+`scripts/gen-value-rollup.sh`, `scripts/gen-docs-mirror.sh` and
+`queue-kit/bin/roadmap.sh`. **The footprint emitter is ported** — a non-gate arm
+of the binary (§The non-gate arm), landed with its comparator so that member's
+compare is an in-process function call rather than a spawn, which is the first
+time this family's `bash` hop has actually been retired for anyone. On that key
+the remaining five are held for any cohort that ports no emitter — a **sequencing** finding,
 and §The consumer remainder cohort is where three of them are superseded rather
 than repealed (below). What differs per member is what clearing the hold *costs*:
 
 | Member | Beyond the byte-compare | What it owes past its emitter |
 |---|---|---|
-| `check-footprint-fresh`, `check-trajectory-fresh`, `check-enforcement-fresh` | nothing | nothing — a spawn and a string compare. `check-trajectory-fresh` is **ported** (§The consumer remainder cohort), emitter still shell |
+| `check-footprint-fresh`, `check-trajectory-fresh`, `check-enforcement-fresh` | nothing | nothing — a spawn and a string compare. `check-footprint-fresh` is **fully discharged**: gate and emitter both ported, compare in-process, no shell left. `check-trajectory-fresh` is **ported** (§The consumer remainder cohort), emitter still shell |
 | `check-value-rollup-fresh` | marker-block extraction | nothing — the block grammar is the projection's, not a corpus derivation. **Ported** (§The consumer remainder cohort), emitter still shell |
 | `check-docs-mirror-fresh` | an orphan sweep, its own walk over `<root>/docs` | the walk (the crate already carries it) **and** a fail-closed repair: the sweep silences stderr, so an unreadable tree reads as no orphans. **Both paid** at §The consumer remainder cohort; emitter still shell |
 | `check-roadmap-fresh` | a second assertion over `TASK-QUEUE.md` through `queue_roadmap_entries` | a **criterion 6** answer — `bin/roadmap.sh` calls that same adapter, which is what makes queue-kit/SPEC.md's *"the emitter and the gate can never disagree"* true; porting the gate alone duplicates it with nothing machine-held |
@@ -1897,12 +1900,20 @@ TRAJECTORY.md §PRIORITY DIRECTIVE — the port track's sequence is that no
 port-candidate criterion survives as an eligibility gate, so the technical
 problem a criterion names is work the port owes rather than an exclusion it may
 take. The operator's remainder ruling is the later and more
-specific instruction. **The honest number is therefore zero**: the
+specific instruction. **The honest number for those three is therefore zero**: the
 dual-maintenance win for those three is nil until their emitters follow, and what
 the cohort actually banked for them is *consumer-tranche completion* — a gates
 directory with no check script left in it — never a shrunken interpreter surface.
 Written down because the next selector reading three ported members as evidence
 that this family's hold was wrong would be reading the opposite of what happened.
+
+**Across the whole family the count is one, and it belongs beside that zero
+rather than appended somewhere else.** `check-footprint-fresh` lands its
+comparator *and* its emitter in one unit, so for that member the spawn is gone,
+the shell is deleted, and the dual-maintenance win is banked rather than owed.
+The three above still owe their emitters. This is a live count of members whose
+win has actually banked, and porting an emitter moves it — the property that
+makes the figure worth stating at all.
 
 **The emitters are filed, not adopted.** Porting `scripts/gen-value-rollup.sh`,
 `scripts/gen-docs-mirror.sh` and `drift-kit/bin/trajectory.sh` is real and

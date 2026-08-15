@@ -3,6 +3,7 @@
 // check-gate-substrate-parity assertion B compares against the descriptors on disk
 mod declaration;
 mod diff;
+mod emit;
 mod ere;
 mod fresh;
 mod gates;
@@ -115,7 +116,8 @@ fn main() {
         Some(a) => a.as_str(),
         None => {
             eprintln!("checkwright-gates: no subcommand given");
-            eprintln!("  usage: checkwright-gates --list | --reads <gate-name> | --knobs <gate-name> | --source-stamp | --queue-parity <queue-file> | --declaration-parity section <file> <section> | --declaration-parity record <file> | <gate-name> [args...]");
+            eprintln!("  usage: checkwright-gates --list | --reads <gate-name> | --knobs <gate-name> | --source-stamp | --queue-parity <queue-file> | --declaration-parity section <file> <section> | --declaration-parity record <file> | --emit-<projection> | <gate-name> [args...]");
+            eprintln!("  projections: {}", emit::projections().join(", "));
             exit(2);
         }
     };
@@ -219,7 +221,10 @@ fn main() {
                 exit(2);
             }
         };
-        match gates::knobs(name) {
+        // spec: gate-sdk/SPEC.md §The non-gate arm — the knob roster is published through this one
+        // arm rather than a second flag, so a front-end asks one question whatever it is about to
+        // invoke: a gate, or an arm whose caller must resolve its reads.
+        match gates::knobs(name).or_else(|| emit::knobs(name)) {
             Some(knobs) => {
                 for k in knobs {
                     println!("{}", k);
@@ -227,6 +232,22 @@ fn main() {
                 exit(0);
             }
             None => no_such_gate(name),
+        }
+    }
+
+    // spec: gate-sdk/SPEC.md §The non-gate arm — the ported emitters, resolved before the registry
+    // lookup and absent from `--list`. A thin wrapper by construction: the emission is a library
+    // function, so the comparator and the rollup join call it in-process rather than through this.
+    if let Some(f) = emit::lookup(first) {
+        match f() {
+            Ok(doc) => {
+                print!("{}", doc);
+                exit(0);
+            }
+            Err(e) => {
+                eprintln!("checkwright-gates: {}: {}", first, e);
+                exit(2);
+            }
         }
     }
 

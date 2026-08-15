@@ -110,8 +110,9 @@ recoverable:
   `# enforce:` marker. `check-enforcement-fresh` byte-compares it (`bash
   gate-sdk/bin/enforcement-map.sh --emit > docs/enforcement.md`). Its sibling
   `docs/footprint.md` is the per-kit token cost (`bash
-  context-kit/bin/footprint.sh --emit > docs/footprint.md`), stale on any change
-  to a tracked kit file's line count — which is why a prose-only SPEC edit reds
+  gate-sdk/bin/run-gates.sh --emit footprint > docs/footprint.md`, the emitter
+  having ported to a non-gate arm the runner resolves config for), stale on any
+  change to a tracked kit file's line count — which is why a prose-only SPEC edit reds
   it. **Tracked is literal, and it sets the ordering:** a file this iteration adds
   has no footprint cost until it is staged, so regenerate the footprint (and the
   rollup that joins it) *after* `git add`, never before — regenerate first and the
@@ -150,7 +151,7 @@ recoverable:
   the on-site SPEC mirror (`bash scripts/gen-docs-mirror.sh --write`),
   `docs/enforcement.md` (`bash gate-sdk/bin/enforcement-map.sh --emit >
   docs/enforcement.md` — the gate joins the class registry),
-  `docs/footprint.md` (`bash context-kit/bin/footprint.sh --emit >
+  `docs/footprint.md` (`bash gate-sdk/bin/run-gates.sh --emit footprint >
   docs/footprint.md` — a new script is new token cost), `docs/value.md`'s rollup
   block (`bash scripts/gen-value-rollup.sh`, derived from the two above),
   `docs/check-graph.html` (`bash gate-sdk/checks/check-graph.sh --emit >

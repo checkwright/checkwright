@@ -9,6 +9,7 @@ pub mod docs_cmd;
 pub mod docs_kit_parity;
 pub mod docs_mirror_fresh;
 pub mod docs_nav_reachable;
+pub mod footprint_fresh;
 pub mod install_toolchain;
 pub mod installer_no_deps;
 pub mod kit_ref_liveness;
@@ -813,6 +814,16 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
         &[],
         "-",
+    ),
+    // spec: gate-sdk/SPEC.md §check-reads-couples — no walk root: the comparator reads one named
+    // projection file, and the emitter it calls in-process declares its own reads through the knob
+    // below rather than through a root the recorder could observe.
+    (
+        "check-footprint-fresh",
+        footprint_fresh::run,
+        &[],
+        &["CONTEXT_KIT_SURFACES"],
+        "context-kit",
     ),
 ];
 

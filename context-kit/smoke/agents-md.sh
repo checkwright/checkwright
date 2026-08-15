@@ -102,7 +102,7 @@ grep -qE "surfaces $agent_lines( |·)" <<<"$al_out" \
     || fail "always-loaded did not measure the AGENTS.md surface (${agent_lines}l): $al_out"
 
 # comment-tier-exempt: proves footprint reads AGENTS.md — a non-zero always-loaded total; against the CLAUDE.md default it would find no surface file and measure zero
-fp_out="$( ( cd "$SCRATCH" && bash context-kit/bin/footprint.sh ) )"
+fp_out="$( ( cd "$SCRATCH" && bash gate-sdk/bin/run-gates.sh --emit footprint ) )"
 fp_total="$(grep -E '^\| \*\*total\*\*' <<<"$fp_out")"
 grep -qE '\*\*total\*\* \| [1-9][0-9]*l' <<<"$fp_total" \
     || fail "footprint measured no AGENTS.md always-loaded surface: $fp_total"

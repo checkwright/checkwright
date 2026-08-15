@@ -442,7 +442,7 @@ the measurement.
 
 ## bin/footprint
 
-`bin/footprint.sh` publishes the kits' measured context footprint — the
+The footprint emitter publishes the kits' measured context footprint — the
 adoption-cost evidence a consumer weighs before vendoring, the concrete form of
 the token-economics positioning. Where the meter reads one consumer's live
 always-loaded total, this reads the tracked kit surfaces and attributes the cost
@@ -476,13 +476,27 @@ honest. The exclusion is also a determinism requirement: the freshness gate
 byte-compares the emission, so every measured surface must be a static tracked
 file — a live hook run, being state-dependent, could never be byte-gated.
 
-**Emission.** Bare invocation prints a human header plus the per-kit table;
-`--emit` prints the committed `docs/footprint.md` page whole (front matter,
-method and exclusion prose, then the table with a totals row) — the `--emit`
-symmetry the sibling emitters (`always-loaded.sh`, drift-kit's `trajectory.sh`)
-share. Advisory by construction: exit is always zero and the script never joins
-`gates.list`; the freshness gate (§check-footprint-fresh) is what blocks a stale
+**Emission, and the substrate it runs on.** The emitter is a **non-gate arm of
+the gate binary**, `--emit-footprint` (gate-sdk/SPEC.md §The non-gate arm), and
+it prints the committed `docs/footprint.md` page whole: front matter, method and
+exclusion prose, then the table with a totals row. It is reached as
+`bash gate-sdk/bin/run-gates.sh --emit footprint`, because an arm receives no
+configuration of its own and that front-end resolves `CONTEXT_KIT_SURFACES`
+across the config bridge before invoking it.
+
+The emission is a **library function** the arm wraps rather than the arm itself,
+which is what lets §check-footprint-fresh call it in-process and the value
+rollup consume its per-kit figures as data rather than re-parsing the rendered
 page.
+
+**The advisory bare mode did not survive the port**, and its loss is the ported
+script's deletion rather than a separate decision: the shell emitter printed a
+human header plus the table on a bare invocation, and the replacement arm's
+contract is exactly what `--emit` printed. The table is still reachable — it is
+in the emitted page — so what went is the header, which had no reader that the
+page does not serve. Advisory by construction is unchanged: the arm never joins
+`gates.list`, and the freshness gate (§check-footprint-fresh) is what blocks a
+stale page.
 
 ## The brevity gate
 
@@ -808,8 +822,8 @@ what is present to check: a local settings file with no `jq`.
 
 ## check-footprint-fresh
 
-`checks/check-footprint-fresh.sh` (hermetic, `precommit`) byte-compares the
-committed `docs/footprint.md` against `footprint.sh --emit`, the
+`checks/check-footprint-fresh.gate` (hermetic, `precommit`) byte-compares the
+committed `docs/footprint.md` against the footprint emitter, the
 `check-docs-mirror-fresh`/`check-trajectory-fresh` posture: a generated,
 freshness-gated projection is Derivation-first's sanctioned copy, so the
 maintainer re-runs the emitter after any change to a measured surface and a
@@ -817,8 +831,16 @@ stale page reddens the battery. Its `# graph:` manifest couples the measured
 surfaces — the configured agent file and each kit's `templates/` tree — so an
 edit to what the page counts re-fires the gate.
 
+**It is a registry member of the gate binary, and its emitter is a function call
+rather than a spawn.** The comparator and the emitter ported in one unit, so
+where the shell form ran `bash <emitter> --emit` in a subprocess, the compiled
+member calls the emitter module's `emit()` **in-process** — which is what
+retires the family's `bash` hop for this member (gate-sdk/SPEC.md §The first
+cohort, and the rule that selects the next). The `CONTEXT_KIT_SURFACES` the
+emitter reads arrives across the config bridge, declared by this member.
+
 Bare, it runs the live emitter; a two-argument form
-(`check-footprint-fresh.sh <projection> <emit>`) compares two pre-baked files,
+(`check-footprint-fresh <projection> <emit>`) compares two pre-baked files,
 the hermetic mode the `good/`+`bad/` fixture pair drives. Fail-closed (exit 2)
 on a missing projection or emit source; the stale byte-compare is the exit-1
 violation. The page's generated numbers ride the `docs/evidence-data.md`
@@ -838,14 +860,13 @@ context-kit/
   lib/pub-lang/rust.sh           # shipped extractor: Rust public items
   lib/pub-lang/ts.sh             # shipped extractor: TypeScript export surface
   bin/always-loaded.sh
-  bin/footprint.sh               # per-kit two-tier footprint; --emit is docs/footprint.md
   bin/env-probe.sh               # derives the marker-bounded local env profile
   bin/run-index-tests.sh         # expected-output runner for the bin tools
   checks/check-brevity.sh
   checks/check-settings-pins.gate  # hermetic, binary-dispatched: pins hold against the settings file
   checks/check-settings-paths.gate # hermetic, binary-dispatched: literal .sh grants resolve in the tree
   checks/check-memory-off.sh     # local-environment: memory dir + local overrides
-  checks/check-footprint-fresh.sh # hermetic: docs/footprint.md byte-fresh vs the emitter
+  checks/check-footprint-fresh.gate # hermetic, binary-dispatched: docs/footprint.md byte-fresh vs the emitter it calls in-process
   gate-tests/check-brevity/{good,bad}/
   gate-tests/check-settings-pins/{good,bad}/
   gate-tests/check-settings-paths/{good,bad}/
@@ -993,7 +1014,7 @@ each a case, the emptiness rule being the part of the grammar a reader is
 likeliest to get wrong.
 The runner registers as its own evidence-kit validate suite
 (`index_tests`, the `demo` precedent): the golden the refactor leans on now
-has an automated validate-stage consumer. `footprint.sh` is advisory the same way, but its
+has an automated validate-stage consumer. The footprint emitter is advisory the same way, but its
 projection is gated rather than runner-tested: `check-footprint-fresh` byte-holds
 `docs/footprint.md` against `--emit`. `check-brevity`, `check-settings-pins`,
 `check-memory-off`, and `check-footprint-fresh` are gates and carry the standard
@@ -1032,8 +1053,8 @@ mechanics (gate-sdk/SPEC.md §Consumer smoke), converts its agent file from
 `CLAUDE.md` to `AGENTS.md`, sets the agent-file knobs in the consumer's config
 seams (`GATE_SDK_AGENT_FILE`, `LIFECYCLE_KIT_AGENT_FILE`, `DOCTRINE_KIT_AGENT_FILE`,
 `CANON_KIT_MANIFEST_FILES`, `CONTEXT_KIT_SURFACES`, `CONTEXT_KIT_BREVITY_FILE`),
-then asserts the battery is green, `always-loaded.sh` and `footprint.sh` measure
-the `AGENTS.md` surface, and `check-root-tiering`'s built-in allowlist accepts
+then asserts the battery is green, `always-loaded.sh` and the footprint emitter
+measure the `AGENTS.md` surface, and `check-root-tiering`'s built-in allowlist accepts
 `AGENTS.md` at root while rejecting a stray second agent file. It is a standalone
 harness — not driven by `run-consumer-smoke.sh`, which asserts the kit defaults
 under zero config — and registers as its own evidence-kit validate suite

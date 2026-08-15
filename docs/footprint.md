@@ -8,8 +8,9 @@ nav_child_order: 2
 
 What vendoring Checkwright costs a consumer's context budget, measured per kit
 and split by when the cost is paid. Every number here is generated from the
-tracked kit surfaces by `context-kit/bin/footprint.sh` and held current by a
-freshness gate, so the page cannot drift from what the kits actually ship.
+tracked kit surfaces by `bash gate-sdk/bin/run-gates.sh --emit footprint` and
+held current by a freshness gate, so the page cannot drift from what the kits
+actually ship.
 
 ## What is measured
 
