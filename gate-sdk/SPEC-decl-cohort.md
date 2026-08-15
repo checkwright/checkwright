@@ -105,6 +105,10 @@ ties on the path's byte order. A token outside that grammar is **exit 2** naming
 the token, the file or disposition line it came from, and the grammar.
 **[design-bearing]**
 
+**Operator-ruled 2026-08-15 at spec: ships as authored — option (a), the
+refusal stands, and the ordering ruling stays deferred to the session that
+first cuts a prerelease.**
+
 **The ground is that a faithful port and a correct one are different programs
 here, which is the fact that forecloses the two obvious dispositions.** Probed
 this session: `sort -V` orders `1.0.0` **before** `1.0.0-rc1`; semver orders it
@@ -203,9 +207,15 @@ corpus** to both holders and compares their classification **byte for byte**.
 **A flag rather than a subcommand, and the reason is structural**:
 §check-gate-substrate-parity assertion B reds a subcommand no descriptor
 dispatches to, and nothing dispatches here — so an introspection arm joins
-`--list`, `--reads`, `--knobs`, `--source-stamp` and `--queue-parity` at the
-binary level. That is the assertion's own recorded consequence, and
-`--queue-parity` is the precedent this arm is built on line for line.
+`--list`, `--reads`, `--knobs` and `--source-stamp` at the binary level, the
+four siblings that paragraph names. That is the assertion's own recorded
+consequence, stated generically rather than by flag spelling — the paragraph
+describes the shape and cites queue-kit/SPEC.md §lib/queue.sh as "the first
+such arm's consumer" without naming `--queue-parity` itself, which is
+gate-sdk/SPEC.md never carrying one project's flag vocabulary past the
+generic pattern. `--queue-parity` (`native/src/main.rs`, real and dispatching
+today) is the actual precedent this arm is built on line for line, even
+though the roster prose it joins names it by shape, not by spelling.
 
 **Why it is owed at all, which is the half a build session skips.** Criterion 6
 admits a duplication only where it is *machine-held*, and criterion 2's port-time
