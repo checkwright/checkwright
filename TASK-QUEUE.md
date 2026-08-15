@@ -12,11 +12,7 @@
 
 ## New Features
 
-## Technical Debt
-
-## Deferred
-
-- **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
+- **native-gate-port-remaining-corpus** [spec: SPEC-decl-cohort.md] [roadmap: now/reliability]
   — the whole battery onto the binary, and the shell surface down to its residue.
   roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
   Stays deferred rather than `## Done`: it is the **whole corpus** (60 of 104 unported), and a
@@ -66,8 +62,9 @@
   direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope. Since then it is
   promoted at spec and demoted at build once per cohort, and the terminal move is a **demotion**.
 
-- **consumer-gate-port-disposition** [design-pending] — the destination is ruled; what remains
-  is the tranche that ports this repo's own 13 gates into `native/`.
+- **consumer-gate-port-disposition** [spec: SPEC-consumer-first-mover.md] — the
+  destination is ruled; what remains is the tranche that ports this repo's own 13 gates
+  into `native/`.
   **Operator-ruled 2026-08-14: PORT INTO `native/`.** The 13 gates declared under `scripts/`
   become subcommands of the existing multi-call binary. The seam fork this entry opened is
   **closed** — a later session does not re-litigate it, and the two refused alternatives (a
@@ -92,7 +89,7 @@
   unregistrable subcommands are declared, not whether they ship.
   **Why nobody hit this before, which a later reader will not re-derive.** Checkwright is both
   the kit publisher and a consumer of its own kits, and that dual role collapses the distinction
-  the question turned on: `native/` is at once the crate this repo ports *into* and the crate
+  the question turned on: `native/` is both the crate this repo ports *into* and the crate
   whose binary ships *out*. A single-role tree would have met the fork on its first consumer gate.
   **The cheapest single-gate first mover is named: `check-installer-no-deps`** — one gate over
   one small corpus (`installer/package.json`), excluded from the ninth cohort with cause (that
@@ -115,6 +112,10 @@
   Filed 2026-08-14 at scope on operator direction under scope-gated intake with the seam ruling
   open; ruled and re-scoped 2026-08-14, first tranche ruled 2026-08-15, both at scope off a live
   `port-blockers.sh --group` run.
+
+## Technical Debt
+
+## Deferred
 
 - **born-native-omission-accumulation** [design-pending] — the born-native flip attaches
   criterion 5's omission to every future gate, and nothing measures the pile.
