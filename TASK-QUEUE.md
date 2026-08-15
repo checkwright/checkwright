@@ -120,6 +120,13 @@
   **Boundary with the port:** the ninth cohort's JSON reader is a *crate* module and does not
   reach bash, so it does not close this. `install-step-relocation` is where the fix lands if
   the answer is to move these steps behind the binary's invoke.
+  **RULED INTO THE `freshness-emitter-substrate` ITERATION by operator ruling 2026-08-15**, over
+  the scope session's own recommendation to leave it deferred; `spec` performs the queue promotion
+  when it authors the amendment. Ground taken: it qualifies unambiguously under the private
+  brief's arm 1, and the preview cohort is the population that certainly lacks `jq`.
+  **Scoped to the cheap refusal floor** this entry already names — a refusal naming the missing
+  program, over the failing-open reads in `installer/lib/init.sh`. The relocation answer is **not
+  this unit's to discharge** and stays where the pointer above already puts it.
   **Cost while deferred:** every jq-less adopter is one wrong install away from the defect
   class the release policy's narrow reading already declines to fire on, and the population
   it would land on grows the moment the preview cohort — non-technical adopters, by the
@@ -2987,11 +2994,9 @@
 - **waiting-rule-carrier-reach** [design-pending] — the residency rule reaches the sessions
   whose definitions name it, and both firings this iteration were outside that set.
   recurrence: waiting-rule-carrier-reach 2026-08-11 2026-08-15
-  **Firings five, seven and eight — ANSWERED, compressed here rather than dropped.** Five was a
-  carrier omitting the clause (scope's `audit-sweep`, which ended its turn on a live child fork);
-  re-verified at scope 2026-08-15 that gap is **closed** — `.claude/agents/audit-sweep.md` and
-  both roster files carry it. Seven (2026-08-10 validate, zero live children) and eight
-  (2026-08-11) had the rule provably loaded and broke it anyway, which is the sibling
+  **Firings five, seven and eight — ANSWERED, compressed rather than dropped.** Five was a carrier
+  omitting the clause (scope's `audit-sweep`); that gap is **closed**, re-verified 2026-08-15.
+  Seven and eight had the rule provably loaded and broke it anyway — the sibling
   prose-versus-enforcement framing (`waiting-rule-fourth-firing-post-fix`), not reach.
   **Sixth firing — the shell-child class, and the one this entry now reduces to.** The validate
   session backgrounded its own `run-validate.sh` and ended the turn to wait on it; the observer
@@ -3009,13 +3014,17 @@
   **Cost while deferred:** every dispatch to a type whose definition omits the clause is
   unprotected, and a backgrounded producer under a session with no live lead is lost
   silently — the sixth firing cost nothing only because a lead happened to be watching.
-  **RE-DEFERRED by operator ruling 2026-08-15**, recorded here because this entry reached the
-  recurrence threshold and a threshold entry is dispositioned rather than outranked in silence.
-  Ground: the corrected premise above closes its founding reach gap, and nine firings — the last
-  three with the rule provably in context — make reach the wrong axis, so the family resolves to
-  one enforcement-shaped answer. That half is the iteration's: `poll-sleep-guard-steer`,
-  `waiter-predicate-self-match`, `harness-wait-primitive-unnamed`. What survives here is the
-  **shell-child** class alone, which no agent definition governs; re-cost it against those three.
+  **RULED INTO THE `freshness-emitter-substrate` ITERATION, NARROWLY, by operator ruling
+  2026-08-15**, on the recurrence threshold this entry reached — a threshold entry is
+  dispositioned rather than outranked in silence. `spec` performs the queue promotion when it
+  authors the amendment. The 2026-08-15 re-deferral this supersedes narrowed the entry and that
+  **narrowing stands unreversed**: its ground was that the corrected premise closes the founding
+  reach gap and the family resolves to one enforcement-shaped answer, shipped as
+  `poll-sleep-guard-steer`, `waiter-predicate-self-match`, `harness-wait-primitive-unnamed`. The
+  reach-axis re-scope was put to the operator as operator-class and **not taken**. So the unit is
+  the **shell-child class alone** — a liveness read on a backgrounded producer, which no agent
+  definition governs and no part of the enforcement half addressed — and evidence recorded here
+  stays inside that class.
   **Ninth to eleventh firings, 2026-08-15 — the first evidence gathered AFTER both halves landed,
   and it argues this entry back up.** Held by the lead as observation rather than as argument, in
   the same iteration that shipped the doctrine and guard rules 12-13: (9) the attested build-batch
@@ -3029,8 +3038,7 @@
   enforcement works and the doctrine is sound, and what fails is the rule reaching the session at
   the moment it needs it. A twelfth, weaker instance from this close's own friction triage: 14
   `cat >>` heredoc journal appends against a carrier that says the agent `Write`s the journal.
-  **Not promoted here** — promotion is scope's call. The evidence is landed so the next scope
-  weighs it against the re-deferral above rather than re-deriving it from a lead's memory.
+  That evidence was landed for the next scope to weigh; it has been weighed — the ruling above.
   Filed 2026-08-06 by close, draining the gap inbox and the lead's separately held incident.
 
 - **amendment-dod-sibling-dependence** [design-pending] — an amendment's DoD is written as if
@@ -5902,24 +5910,41 @@
   Filed 2026-08-15 by close, on the lead's corpus ruling; scope-gated intake, so it is filed
   costed rather than swept by the session that received the ruling.
 
-- **freshness-emitter-port-cohort** [design-pending] — three generated-projection freshness
-  comparators are native while the emitters they compare against are still shell.
-  `scripts/gen-value-rollup.sh`, `scripts/gen-docs-mirror.sh` and `drift-kit/bin/trajectory.sh`
-  — re-verified 2026-08-15, all three still present as shell. Their comparator gates ported in
-  the eleventh cohort (gate-sdk/SPEC.md §The consumer remainder cohort), and that section states
-  the transferable conclusion in its own words: the cheap cohort in this family is the
-  **emitters**, not the gates, because a ported byte-comparator spawning a shell emitter removes
-  no shell. So the cohort banked consumer-tranche *completion* and, for these three members,
-  honestly zero dual-maintenance win. This entry is the work that banks it.
+- **freshness-emitter-port-cohort** [design-pending] — the generated-projection freshness family
+  is six comparator+emitter pairs, and every emitter is still shell.
+  **WIDENED 3 → 6 at scope 2026-08-15, on a census filed to the survey record** (question: which
+  comparators and emitters are still shell; oracle `bash gate-sdk/bin/port-blockers.sh --group`).
+  The three this entry was filed for — `scripts/gen-value-rollup.sh`,
+  `scripts/gen-docs-mirror.sh`, `drift-kit/bin/trajectory.sh` — have native comparators. The
+  census found three more pairs the entry never named: `gate-sdk/bin/enforcement-map.sh` and
+  `context-kit/bin/footprint.sh`, whose comparators `check-enforcement-fresh` and
+  `check-footprint-fresh` are **also still shell** and criteria-clearing, and
+  `queue-kit/bin/roadmap.sh`, whose comparator is the held member. Six emitters, 971 lines.
+  **SCOPED by operator ruling 2026-08-15 to the value-rollup triple**, which is tight rather than
+  merely adjacent: docs/site-architecture.md §Generated projections states `gen-value-rollup.sh`
+  reads the other two emitters **live**, so porting `enforcement-map.sh` (273),
+  `footprint.sh` (129) and `gen-value-rollup.sh` (124) together makes that join in-process — 526
+  lines, plus the two still-shell comparators over them. `gen-docs-mirror.sh`, `trajectory.sh`
+  and `roadmap.sh` stay on this entry for a following cohort.
+  **Selected over the tool's largest advisory group, and the adjudication is recorded because
+  gate-sdk/SPEC.md §The first cohort reserves it to the selecting session:** group 1 is largest at
+  9 but its key is `libs=fail_closed globs=-` with no shared glob walk and visibly divergent
+  member corpora — the null-key residue bucket, not a shared corpus derivation, so the size arm is
+  exhausted a fourth time. This unit rides the documented blocker-retiring override instead.
+  The eleventh cohort (gate-sdk/SPEC.md §The consumer remainder cohort) states the transferable
+  conclusion in its own words: the cheap cohort here is the **emitters**, not the gates, because a
+  ported byte-comparator spawning a shell emitter removes no shell. This entry banks it.
   **Why `[design-pending]`:** an emitter is not a gate — it has no `.gate` descriptor, no
   `good/`+`bad/` fixture pair, and no place in `gates.list`, so the shipped porting procedure
   does not describe it and the substrate contract has no representation for a ported emitter.
   Whether these become binary subcommands, stay shell behind a native comparator, or dissolve
-  into the comparator itself is the open call; `check-roadmap-fresh`'s unresolved emitter design
-  (three candidates, none ruled) is the same question one member over and should be ruled with it.
-  **Cost while deferred:** three compiled gates keep bash in the dependency floor against
-  TRAJECTORY.md objectives 1 and 6, and every later reader of the freshness family section has to
-  re-derive that the hold was superseded rather than wrong.
+  into the comparator itself is the open call — **one ruling this unit owes, answered once and
+  applied six times.** It also discharges `check-roadmap-fresh`'s unresolved emitter design (three
+  candidates, none ruled), which is the same question one member over; that retires a hold on
+  `cohort-held-members-port-prerequisites` and is what earns this unit the blocker-retiring
+  override above.
+  **Cost while deferred:** six shell emitters keep bash in the dependency floor against
+  TRAJECTORY.md objectives 1 and 6, three of them behind already-compiled comparators.
   Filed 2026-08-15 by close, draining two gap-inbox bullets filed at spec and at build for the
   same finding; both stated DISTINCT from `consumer-gate-port-disposition`, which the eleventh
   cohort retired, and the drain confirmed the distinction rather than inheriting it.
