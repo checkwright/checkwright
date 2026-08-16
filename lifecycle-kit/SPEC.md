@@ -1438,11 +1438,9 @@ resolved through gate-sdk's `gate_command` rather than named by script path, so
 the arm names a gate and never a substrate: the resolved argv is prefix-shaped,
 so the two positionals ride it unchanged, and an argv the bridge refused to build
 is exit 2 — the dispatcher's own verdict — never a rename pre-flighted by a check
-that did not run. The built-in `check-stage-entry` pre-flight above keeps its
-script path because that member is held on shell (gate-sdk/SPEC.md §The first
-cohort, and the rule that selects the next), so the two arms of this tool
-resolve differently and the difference is the member's substrate, not a
-convention gap. **Refusals** (exit 2,
+that did not run. The built-in `check-stage-entry` pre-flight above resolves the
+same way, so both arms of this tool name a gate and neither names a substrate.
+**Refusals** (exit 2,
 nothing written): `<name>` empty; `<name>` equal to the unnamed placeholder,
 which only the boundary reset may write — checked ahead of the grammar that would
 also reject it, so the message names the owning writer instead of reporting a

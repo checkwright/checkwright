@@ -6211,6 +6211,32 @@
   Filed 2026-08-17 by close from its own tooling-friction and knowledge-friction triages; each of
   the five paths was probed for existence before the count was asserted.
 
+- **kit-spec-consumer-config-literal** [design-pending] — nothing stops a kit SPEC from spelling
+  out a value that belongs to a consumer's config, so the seam leaks by worked example.
+  The provenance seam (CLAUDE.md) forbids a kit literal carrying consumer content, and
+  de-literalization forbids prose owning a value. Both were crossed by one sentence this
+  iteration: gate-sdk/SPEC.md illustrated the keyed wire by enumerating this repo's live
+  `LIFECYCLE_KIT_PREDECESSOR` pairs, so a *vendoring* consumer read another tree's stage graph
+  asserted as the shape of their own. Fixed in place at this close; the class is what is filed.
+  **Why nothing caught it.** `check-tree-terms` is a banned-pattern leak guard and the leaked
+  string is not a banned term; no other gate reads a kit SPEC against a consumer config at all.
+  Found instead by the close-stage `internal-identifier-restatement` audit, which is rostered
+  un-gateable for a *different* reason (public contract names are legitimate citations) — that
+  reason does not reach this narrower shape, which is why the gap is filed rather than absorbed.
+  **Why it looks buildable, and where the design is owed.** The two tiers are already separate
+  files: a kit's own default lives in `<kit>/lib/*.sh` and a consumer's override in the
+  consumer's config dir, so a kit SPEC quoting a value that appears only in the *override* tier
+  is mechanically decidable. What is owed is the false-positive boundary — a kit SPEC that
+  documents its own default legitimately, and a consumer whose override happens to equal it,
+  are the same two strings — plus whether the subject is any value or only a multi-element
+  roster, the shape actually found here.
+  **Cost while deferred:** one leaked example per authoring session that reaches for a live
+  value to illustrate a wire format, each one shipping a consumer's configuration inside a kit
+  and going stale against it silently.
+  Class: lands as a gate, so canon-kit's litmus makes it a **feature**.
+  Filed 2026-08-17 by close from its own audit-roster review; the instance was fixed at this
+  close and the absent-gate claim probed against `scripts/gates.list` before it was asserted.
+
 
 ## Icebox
 
@@ -6242,8 +6268,6 @@
 - **scratch-execution-allowlist-bar** [design-pending] — Each close re-derives this standing bar.
 
 ## Done
-
-- entry-headroom-unexposed
 
 ## Lessons Learned
 

@@ -4240,9 +4240,9 @@ A keyed knob takes the same line with `<key>=<value>` in place of each element:
 GATE_SDK_KNOB_<NAME>=<key>=<value><TAB><key>=<value>…
 ```
 
-`LIFECYCLE_KIT_PREDECESSOR` as this repo configures it therefore crosses carrying
-`align=scope`, `build=scope`, `close=validate`, `spec=scope` and `validate=build`,
-tab-separated and in exactly that order.
+`LIFECYCLE_KIT_PREDECESSOR` is the live instance: it crosses as one
+`<stage>=<predecessor>` element per declared pair, sorted by key, whichever pairs
+the consumer's own config declares.
 
 one element per line, the existing protocol unchanged. **A member declaring no
 knob emits the two-element argv exactly as before**, so the bridge is inert for

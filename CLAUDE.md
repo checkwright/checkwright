@@ -43,8 +43,7 @@ at close; a release tag earns the second run (`publish`). Every push also costs 
 `pages-build-deployment`, so drip-pushing re-buys one push's information at N
 times the wall-clock. Never hand-dispatch `site-health` — it runs on a schedule.
 
-Beyond the gate battery, the repo runs its own iteration lifecycle — one
-iteration per hardening or roadmap unit. The stage cursor has exactly one
+One iteration per hardening or roadmap unit. The stage cursor has exactly one
 source, the last stamp in `.workflow/WORKFLOW-STATE.txt`, and stage motion never
 writes the queue (`check-stage-evidence` / `check-stage-entry` enforce the stamp
 protocol; `check-lifecycle-registration` holds the block below in lockstep with
@@ -145,10 +144,9 @@ load behind that trigger, so they are not resident here.
   format, port sequencing and the toolchain floor:
   gate-sdk/SPEC.md §Porting a gate to the binary substrate; the shipped
   install behavior: installer/README.md §The gate binary.
-- `CONTRIBUTING.md` + the `.github/` issue/PR templates, `CODE_OF_CONDUCT.md`,
-  `SECURITY.md`, and `RELEASING.md` are governed repo-meta — tracked,
-  core-files-pinned, gated like any doc; the fixture is the unit of
-  contribution, so edit the guide, not GitHub UI settings.
+- The governed repo-meta pinned in `scripts/core-files.list` is tracked and gated
+  like any doc; the fixture is the unit of contribution, so edit the guide, not
+  GitHub UI settings.
 - `ROADMAP.md` is a generated root projection of this queue's curated
   `[roadmap:]` tags — never hand-edit its marker block; it is rostered with its
   trigger and regen command like every other generated projection.
