@@ -2247,6 +2247,57 @@ inherits it and marginal cost per member sits at its floor. Amortization is not
 a licence to take a large set whose members share nothing — it lowers the price
 of a cohort the override already selected, and does not select one.
 
+### The first budget batch
+
+**Composed by budget rather than by group — the arm's first live selection.**
+`--group` reported 37 groups over the remainder with no group takeable: 34
+singletons, two pairs each held on shell for a stated ground, and the one
+7-member group already ruled out. Six members were taken by a criteria audit
+over the three smallest-key groups, on the budget the composing session set.
+Per the property above, the batch is not one unit of work and was never
+merged, recorded or argued as one: each member took its own descriptor, its
+own registry entry, its own parity run and its own deletion, in six
+independent commits. This section records the two findings the batch
+produced and the one verdict its cut owed — never a member roster, which the
+rule above already gives a derivation for.
+
+**A missing shared primitive is invisible to `--group`, and a later selector
+must not read the run's silence as clearance.** `--group`'s key is shell
+libraries and globs; two of the six members hand-rolled the identical
+heading-bounded section walk while sharing no shell library, so nothing in
+the run's own columns names the primitive they were about to duplicate a
+third time. `native/src/section.rs` lands it: enter a section at the first
+heading whose text matches a caller-supplied name at any level 1–6, close at
+the next heading whose level is the same or shallower, yield the bounded line
+range. The seam holds at the argument boundary — the crate ships the walker
+and no section vocabulary, every name arriving as a caller argument.
+
+**Two members sharing that primitive is sequencing, not a rejoined cohort,
+and the axis is stated so a later selector does not merge their proofs.** The
+cohort axis above keys on a shared *corpus derivation*, proved once and
+compared over one corpus shape N times. `check-brevity` and
+`check-doctrine-registration` share a *parsing primitive* instead and walk
+different corpora — `CLAUDE.md` against `CLAUDE.md` plus
+`doctrine-kit/DOCTRINE.md` — so there is no single corpus shape to compare
+over and neither's parity run lends the other proof; each kept its own. The
+sequencing is soft in both directions, which is what kept the batch's
+drop-any-member property true even for the two that share code: dropping
+`check-doctrine-registration` would have left the primitive with one caller,
+still correct, and dropping `check-brevity` would have moved the primitive's
+landing into the surviving member's own unit.
+
+**The substrate-sensitive set was re-derived at the batch's cut, and the cut
+adds no member.** A port moves declaration paths — `<kit>/checks/<name>.sh`
+becoming `<name>.gate` — which can move other members into or out of the
+derived set, so assertion C was run fresh after all six descriptors landed
+rather than inherited from an earlier cohort's table reading. None of the
+six reaches a gate declaration path through its own `couples=`:
+`scripts/git-hooks/*`, `.claude/agents/*.md`, the two named delegation-kit
+files, `CLAUDE.md` plus `doctrine-kit/DOCTRINE.md`, and `.workflow/*,.gitignore`
+each name a corpus outside `<kit>/checks/`, `native/src/gates/*.rs` and
+`native/src/*.rs` alike. §Meta-gate conservation for the binary substrate
+gains no row from this batch.
+
 ### The canon-kit `spec_manifest_files` cohort
 
 **The shared derivation is compiled.** `native/src/spec.rs` carries all three

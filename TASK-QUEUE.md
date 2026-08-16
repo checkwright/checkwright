@@ -12,56 +12,6 @@
 
 ## New Features
 
-- **native-gate-port-remaining-corpus** [spec: SPEC-tail-batch.md] [roadmap: now/reliability]
-  — the whole battery onto the binary, and the shell surface down to its residue.
-  roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
-  Its terminal move is a demotion rather than `## Done`: it is the **whole corpus**, and a
-  Done move would assert a finished port and silently drop it from the **public** roadmap
-  projection, which reads `[roadmap:]` tags off live entries.
-  **Operator-ruled 2026-08-09: complete the port, ASAP.** The ruling, its grounds and its
-  supersession of the 2026-08-06 measurement-locus clause are recorded in
-  [TRAJECTORY.md](TRAJECTORY.md) §PRIORITY DIRECTIVE — the port track's sequence. This entry is
-  the work, and does not restate them. What it inherits unchanged: gate-sdk/SPEC.md §Porting a
-  gate to the binary substrate for the porting procedure, §Consumer payload for the payload
-  rule.
-  **The scope the ruling fixes, both shipped install paths, and the bootstrap residue are
-  TRAJECTORY.md §PRIORITY DIRECTIVE's** — deleted here 2026-08-15 as a verbatim second copy,
-  against this entry's own no-restatement claim above. Designing the bootstrap is still this
-  unit's work, not that file's.
-  **Wall-clock is the weaker argument and is answered:** the battery is under 6%
-  of validate, so the win is retiring shell *sources* the payload carries, not faster execution.
-  **This answers the toolchain-free objection:** the installer smoke's toolchain-free arm is
-  satisfied by the pre-compiled path, not by retaining shell gates. `powershell-installer-surface`
-  moves with it — one implementation across platforms shrinks its cover to the bootstrap.
-  **Eleven cohorts closed; gate-sdk/SPEC.md §The first cohort, and the rule that selects the next
-  is canonical for every one of them** — members, delivered counts, holds, grounds and each
-  cohort's own price live there, so this entry states what remains rather than restating them.
-  From the eighth on, members are **selected by running** `port-blockers.sh --group` rather than
-  read off the tree; the size arm is now exhausted three times running, so the last three cohorts
-  rode the documented blocker-retiring override rather than a count. **65 of 104 ported** — a
-  dated 2026-08-16 oracle read (`bash gate-sdk/bin/port-blockers.sh --group`'s trailer, which
-  `scripts/measured-claims.sh` emits as `ported-gate-members`), never a count this line holds:
-  the prior hand-held figure here drifted two behind the tree. The
-  eleventh is §The consumer remainder cohort, which closed `consumer-gate-port-disposition` at
-  13 of 13 and emptied this repo's own gates directory of check scripts; what it leaves owed to
-  this entry is the unported freshness emitters, whose roster
-  `freshness-emitter-port-cohort` owns — a count copied here drifted once already.
-  Every held member is **sequencing with port work owed, never exclusion**, and what each owes
-  is on `cohort-held-members-port-prerequisites`, which owns the roster and the kits it spans;
-  a kit count copied here would be a second one to drift, and was.
-  **Cost while deferred:** large and known — the unported remainder (43 at the dated read
-  above) plus the runners and the install-lifecycle layer; since the 2026-08-14 born-native
-  default (TRAJECTORY.md §The closed rulings) a gate landed meanwhile no longer adds shell to
-  it. Not a single-iteration
-  delta; scope owns the decomposition, and the criterion-relaxation question is closed at
-  gate-sdk/SPEC.md §The port-candidate criteria — an ordering signal, never an eligibility screen.
-  `gate-battery-parallel-execution` and
-  `gate-battery-result-cache` say the port subsumes them: closure candidates as it lands.
-  Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
-  direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope. Since then it is
-  promoted at spec and demoted at build **once per increment** — a cohort, or a budget batch
-  on `port-tail-cohort-batching-policy`'s arm — and the terminal move is a **demotion**.
-
 - **entry-cap-displaces-mandated-writes** [spec: SPEC-mandated-write.md] — the cap silently
   chooses what a governed mechanism may record, and bites hardest where the record matters
   most. `check-queue-entry-budget` caps a deferred entry at 50 lines and offers three
@@ -117,6 +67,55 @@
 ## Technical Debt
 
 ## Deferred
+
+- **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
+  — the whole battery onto the binary, and the shell surface down to its residue.
+  roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
+  The entry stays deferred rather than moving to `## Done`: it is the **whole corpus**, 39 of
+  104 registered gates remain unported, and a Done move would assert a finished port and
+  silently drop it from the **public** roadmap projection, which reads `[roadmap:]` tags off
+  live entries.
+  **Operator-ruled 2026-08-09: complete the port, ASAP.** The ruling, its grounds and its
+  supersession of the 2026-08-06 measurement-locus clause are recorded in
+  [TRAJECTORY.md](TRAJECTORY.md) §PRIORITY DIRECTIVE — the port track's sequence. This entry is
+  the work, and does not restate them. What it inherits unchanged: gate-sdk/SPEC.md §Porting a
+  gate to the binary substrate for the porting procedure, §Consumer payload for the payload
+  rule.
+  **The scope the ruling fixes, both shipped install paths, and the bootstrap residue are
+  TRAJECTORY.md §PRIORITY DIRECTIVE's** — deleted here 2026-08-15 as a verbatim second copy,
+  against this entry's own no-restatement claim above. Designing the bootstrap is still this
+  unit's work, not that file's.
+  **Wall-clock is the weaker argument and is answered:** the battery is under 6%
+  of validate, so the win is retiring shell *sources* the payload carries, not faster execution.
+  **This answers the toolchain-free objection:** the installer smoke's toolchain-free arm is
+  satisfied by the pre-compiled path, not by retaining shell gates. `powershell-installer-surface`
+  moves with it — one implementation across platforms shrinks its cover to the bootstrap.
+  **Eleven cohorts closed, plus the first budget batch; gate-sdk/SPEC.md §The first cohort, and
+  the rule that selects the next is canonical for every one of them** — members, delivered
+  counts, holds, grounds and each batch or cohort's own price live there, so this entry states
+  what remains rather than restating them. From the eighth on, members are **selected by
+  running** `port-blockers.sh --group`; the size arm is now exhausted three times running, so
+  the ordering rule's live half is which blocker retires, with the budget arm composing a batch
+  when no group is takeable. **65 of 104 ported** — a dated 2026-08-16 oracle read (`bash
+  gate-sdk/bin/port-blockers.sh --group`'s trailer, which `scripts/measured-claims.sh` emits as
+  `ported-gate-members`), never a count this line holds. What both the eleventh cohort and the
+  first budget batch leave owed to this entry is the unported freshness emitters, whose roster
+  `freshness-emitter-port-cohort` owns — a count copied here drifted once already.
+  Every held member is **sequencing with port work owed, never exclusion**, and what each owes
+  is on `cohort-held-members-port-prerequisites`, which owns the roster and the kits it spans;
+  a kit count copied here would be a second one to drift, and was.
+  **Cost while deferred:** large and known — the unported remainder (39 at the dated read
+  above) plus the runners and the install-lifecycle layer; since the 2026-08-14 born-native
+  default (TRAJECTORY.md §The closed rulings) a gate landed meanwhile no longer adds shell to
+  it. Not a single-iteration
+  delta; scope owns the decomposition, and the criterion-relaxation question is closed at
+  gate-sdk/SPEC.md §The port-candidate criteria — an ordering signal, never an eligibility screen.
+  `gate-battery-parallel-execution` and
+  `gate-battery-result-cache` say the port subsumes them: closure candidates as it lands.
+  Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
+  direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope. Since then it is
+  promoted at spec and demoted at build **once per increment** — a cohort, or a budget batch
+  on `port-tail-cohort-batching-policy`'s arm — the terminal move always a **demotion**.
 
 - **freshness-emitter-port-cohort** [design-pending] — the generated-projection freshness family
   is six comparator+emitter pairs; **three are now ported and three remain shell**.
