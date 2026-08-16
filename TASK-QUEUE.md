@@ -114,64 +114,6 @@
   new entry is *in* it, competing with its own parent for the scope attention that ranks both.
   Filed 2026-08-12 by close, from the cap it hit while discharging its own drain contract.
 
-- **port-tail-cohort-batching-policy** [spec: SPEC-budget-arm.md] — port cohorts were
-  composed around a shared derivation, the tail no longer offers one, and nothing states
-  what sizes a cohort instead.
-  **Probed at this boundary, then corrected at the same scope:** `port-blockers.sh --group`
-  partitions the 45-gate remainder into 37 groups — 34 singletons, two pairs, one 7-member group
-  — and **not one of them is a takeable cohort**. gate-sdk/SPEC.md:2371-2379 rules that 7-member
-  key out (operator-ruled 2026-08-14: `fail_closed` derives no corpus, so its members share the
-  *absence* of one), and each pair holds a member the port does not take. Amortization is spent,
-  not thin — a stronger finding than the one this entry was filed on hours earlier.
-  **Why that is an economics defect and not merely a fact about the gates:** iteration overhead is
-  fixed and large. Of the 529 commits since 2026-08-08, 360 are `chore` — the stage-lifecycle
-  ceremony — against 81 `feat`, 27 of which name the port. A one-group cohort buys one ported gate
-  for a whole iteration's ceremony, and 34 singletons at that rate is 34 iterations against a
-  standing ASAP directive (TRAJECTORY.md §PRIORITY DIRECTIVE — the port track's sequence).
-  **What the unit owed — the *placement* — is RULED at spec and authored in
-  `SPEC-budget-arm.md`:** the arm lands in gate-sdk/SPEC.md §The first cohort, and the rule that
-  selects the next, as a third selection arm. The two rejected homes and the ground each lost on
-  are recorded there, TRAJECTORY.md by its own contract (it records operator-closed rulings and
-  never authors one; this is lead-class).
-  **Why it needed design first:** the placement was the question, not the arithmetic, and the
-  widest candidate is the one the provenance seam bears on — a batching rule stated as generic
-  mechanism is kit content, while a rule naming the port's remainder is this repo's rule content.
-  **Cost while deferred:** each scope session re-derives the tail's shape from `--group` and picks
-  a cohort size unaided, so the sizing is decided identically and invisibly every iteration, and
-  the composition test in the scope contract keeps being answered from first principles.
-  **The composition question is RULED, 2026-08-16, lead-class — and the ruling is what this unit
-  now authors rather than re-decides.** The tail gets an **additive second composition axis**: an
-  iteration may take N unrelated single-gate ports sized by iteration budget, each entering as an
-  independent unit proved on its own parity run, **never as one cohort**. Nothing is reversed —
-  the `libs=fail_closed globs=-` group stays not-a-cohort (gate-sdk/SPEC.md:2371-2379,
-  operator-ruled 2026-08-14), the shared-derivation rule stands wherever it still selects, and
-  the budget axis serves the 2026-08-09 ASAP directive rather than re-scoping it. Ruled after the
-  scope session flagged it as possibly operator-class and the lead tested that reading against
-  both records.
-  **Guardrail carried into the record, and it binds the authoring stage:** if the policy cannot
-  be authored *beside* recorded operator-ruled text — if authoring it would narrow or rewrite
-  any — that is operator-class and returns to the lead for relay rather than being authored.
-  **The ground it stands on, corrected in place 2026-08-16 at spec on the lead's ruling.** The
-  size arm is exhausted — `native-gate-port-remaining-corpus` records it, three cohorts running —
-  and that half stands. The second half **overstated**: the blocker-retiring override did not
-  have nothing left to retire, it had a live candidate the criteria audit structurally could not
-  see. A shared **implementation primitive** rather than a shared corpus derivation — the crate
-  carries no heading-bounded section walker, and two ready members hand-roll the same one — which
-  `port-blockers.sh --group` cannot report, its key being shell libraries plus globs and those two
-  members sharing no shell library.
-  **Two bounds ride the correction, and neither reopens anything.** The ruling above is
-  **unchanged**: the budget axis is additive either way, which is what makes this a corrected
-  ground rather than a reversal. And the batch `SPEC-tail-batch.md` composes holds both walker
-  members, so it retires that primitive in passing; whether the override arm is live for a
-  *later* batch stays deliberately unsettled, exactly as that amendment states.
-  Class: **feature**, settled by the placement ruling. It mints an arm the selecting session must
-  honor beside the two gate-sdk/SPEC.md already names, so it is more than a calibration line —
-  and it takes **no knob**, refused with grounds in the amendment: a batch size varies by
-  iteration, not by consumer, and a knob would freeze a default that reads as the answer.
-  Filed 2026-08-16 by the consult; dispositioned out of the gap inbox at the 2026-08-16 scope
-  boundary (lifecycle-kit/SPEC.md §The committed gap inbox, "The boundary refusal"), the counts
-  re-probed rather than carried.
-
 ## Technical Debt
 
 ## Deferred
@@ -6230,6 +6172,8 @@
 - **scratch-execution-allowlist-bar** [design-pending] — Each close re-derives this standing bar.
 
 ## Done
+
+- port-tail-cohort-batching-policy
 
 ## Lessons Learned
 

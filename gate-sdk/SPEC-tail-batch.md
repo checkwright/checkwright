@@ -3,8 +3,9 @@
 The **first budget batch** — six members, taken as six independent units, plus
 the one shared primitive two of them are queued behind.
 
-This is the first application of the budget arm authored beside this file in
-`SPEC-budget-arm.md`, which owns the arm itself; this file owns the batch. The
+This is the first application of the budget arm, which landed in
+gate-sdk/SPEC.md §The first cohort, and the rule that selects the next and owns
+the arm itself; this file owns the batch. The
 arm's precondition holds on a live run: `bash gate-sdk/bin/port-blockers.sh
 --group` reports 37 groups over the 45-member remainder — 34 singletons, two
 pairs and one 7-member group — and **no group is takeable**. The 7-member key
@@ -359,8 +360,9 @@ here in four places:
       `### The first budget batch`; delta 12's verdict lands in the conservation
       section. No member roster is written into this SPEC.
 - [ ] **Amendment deleted** — this file removed on merge; `ls gate-sdk/SPEC-*.md`
-      checked at the iteration horizon, since `SPEC-budget-arm.md` is a sibling
-      in flight for this same component.
+      checked at the iteration horizon. The sibling amendment in flight for this
+      same component has merged, so this file is the last one and the none-remain
+      half is satisfiable at this batch's commit.
 - [ ] **Removals propagated** — grepped every spec, README, doc and permission
       allow-list for each of the six deleted `checks/<gate>.sh` paths; nothing
       dangles. Stderr not silenced on any of those greps.

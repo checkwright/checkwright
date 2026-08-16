@@ -1742,14 +1742,99 @@ advisory and its key is deliberately not fused with `couples=`, so a group whose
 members' corpora visibly diverge is a **finding the selecting session
 adjudicates**, never a cohort the tool cut. A cohort that retires a **blocker** several later cohorts are queued
 behind outranks a larger one that retires none, which is the exception §The POSIX
-ERE matcher works and `check-roadmap-fresh`'s hold worked before it. Shared derivation is the axis because it is what made this cohort
+ERE matcher works and `check-roadmap-fresh`'s hold worked before it. **Where
+neither of those selects, the increment composes by budget** — a third arm, and
+what makes it usable is the precedence rather than the arm alone. The arm: *N
+criteria-clearing members, taken as N independent units*, sized against the
+iteration's own budget. Precedence across the three is total and is read off a
+run rather than off a preference. The size arm selects first; the
+blocker-retiring override outranks it wherever a blocker several members are
+queued behind can be retired; the budget arm is reachable **only** when a `bash
+gate-sdk/bin/port-blockers.sh --group` run reports no takeable group — so its
+precondition is a verdict from the instrument this section already names for the
+size arm, never a session's reading of the tree. Shared derivation is the axis
+**while it selects**, because it is what made this cohort
 cheap: the walk is ported once and proved N times, and the parity comparison is
-over one corpus shape rather than N. Selecting by kit, by profile, or by whatever
+over one corpus shape rather than N; the budget arm is what this section says
+when that axis stops selecting. Selecting by kit, by profile, or by whatever
 is easiest next all re-import work this cohort only paid once. The gates failing
 criterion 4 or 7 are **sequenced last and budgeted for**, because each carries a
 design problem — a self-referential parity oracle, an external program on `PATH`
 — that the port owes an answer to rather than a waiver. Neither is ported and
 patched later; both are designed, then ported.
+
+**"Never as one cohort" is the property that makes a budget batch safe, and it
+reads as bookkeeping only until that is said.** A batch's members carry **no
+joint proof**: each takes its own `.gate` descriptor, its own registry entry, its
+own fixture-pair parity run and its own live-tree and edge-root arms, so no
+shared walk is claimed and no comparison spans two of them. What follows is the
+property worth having — **dropping a member mid-batch invalidates nothing**. A
+member that turns out dearer than it was sized leaves the batch and the rest land
+unchanged, where a cohort losing a member loses the amortization it was composed
+on and is re-planned. A batch is therefore never recorded, argued or merged as
+one unit of work; the plural is the mechanism rather than the wording.
+
+**The batch size is a budget, and the budget is deliberately not a knob.**
+Config-via-env exists for configuration that varies **by consumer**; a batch size
+varies **by iteration**, against that iteration's other work, so it is a judgment
+the composing session makes with the queue in front of it. A knob would freeze a
+default that reads as the answer, and the next session would size against the
+default rather than against its budget — the very defect the arm was minted
+against, reintroduced as configuration and harder to see for being declared.
+What the sizing session weighs instead, stated once so it is not re-derived: the
+per-member cost `--group` already prints beside each member (shell line count and
+the mechanically derivable criterion columns), the iteration's non-port work, and
+the fixed per-iteration ceremony.
+
+**A budget batch records only findings here, never a member roster.** Every
+cohort section below earned its place by having a shared derivation to explain,
+and a budget batch has none, so its default record is **nothing**. The rule: *a
+budget batch adds a section to this SPEC only where it has a finding to record* —
+an adjudication a later selector would otherwise re-make, a primitive it landed,
+a criterion it discharged. Membership and progress are **derived** instead: a
+ported member leaves a `.gate` beside its deleted `.sh`, and the count is
+`scripts/measured-claims.sh`'s `ported-gate-members`, which §check-measured-claim
+already holds to the tree. Without the rule the section count scales with the
+tail — roughly one section per batch across the remaining singletons — and the
+fixed per-iteration ceremony the arm exists to amortize gets paid a second time,
+in prose, on the one surface a porting session must read end to end.
+
+**The arm names no remainder, which is what keeps it kit content.** It is stated
+generically — no gate names, no member roster, no count of any tree's remaining
+corpus — so a consumer who ports gates receives the mechanism and not this
+project's work queue. A kit literal naming one tree's singleton set would publish
+that queue as everyone's mechanism, the same defect the `check-graph` rule-content
+split exists to prevent (§check-graph).
+
+**Two other homes were weighed for this arm and each lost on a stated ground**,
+recorded so the placement is not re-opened. **lifecycle-kit's scope template** owns
+the general economic-composition test, and a port-specific selection arm placed
+there would bind every consumer's iteration including the consumers who port
+nothing, and would make the general iteration contract carry a term only this kit
+can define; the reach it would have been bought for is already bought, because a
+consumer's port entry names this section as canonical for every increment, so a
+scope session composing a port iteration reaches the arm along the path it walks
+anyway. **The consumer's ruling record** (TRAJECTORY.md here) lost by its own
+contract rather than on a preference: it records rulings the operator closed and
+never authors one, and its pointer-first convention registers a ruling at its
+mechanism's canonical home — which is this section. This section already owns the
+two arms the third joins, it is the surface a selecting session already loads,
+its reach is exactly the port and nothing wider, and it is kit content, so the
+arm ships as mechanism to every consumer who ports gates.
+
+**The arm's producer and consumers, and the verdict that it adds no field.**
+Producer: the session composing a port iteration — scope when it ranks the queue,
+and the authoring stage when it writes the batch amendment — triggered by a
+`--group` run whose verdict is *no takeable group*. That trigger is live rather
+than test-only, being the same run the size arm already reads at every cut.
+Consumers: that same session, by reading this section; and the iteration lead at
+batch-cut, which reads a batch amendment's per-delta work-class labels and needs
+the arm to know that a batch's deltas are independent and may be cut apart where a
+cohort's may not. **There is no new field**, and saying so is the point rather
+than an omission: a later reader must not go looking for a machine reader that was
+never intended. The arm is an authoring contract like the two it joins, neither of
+which has a machine reader either, and §check-queue-entry-budget's own
+*the gate cannot hold this* paragraph is the house form for saying so.
 
 **A primitive's *remaining* consumers are derived, never recorded here.** Each
 cohort section below records the members it landed, which answers what was ported
