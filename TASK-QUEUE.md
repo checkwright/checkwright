@@ -168,7 +168,7 @@
   session's born-native ruling, under the gap-disposition rule.
 
 - **recurrence-drain-input-widening** [design-pending] — a recurrence with no bullet is uncounted.
-  recurrence: recurrence-drain-input-widening 2026-08-09
+  recurrence: recurrence-drain-input-widening 2026-08-09 2026-08-17
   **Operator-ruled 2026-08-04, at the close of `ruling-capture-contracts`.** The drain that
   stamps the `recurrence:` declaration takes gap-inbox bullets as its sole input, which the
   amendment made the mechanism's single auditable producer. The open question is whether it
@@ -207,10 +207,11 @@
   lead's relayed figure, and the closing session's own tool use. The last generalizes: close is
   downstream of the drain, so the fix is a second input rather than a wider filer habit —
   `close-generated-finding-route` owns that shape one altitude up.
-  **Attesting 6 (2026-08-12, `native-cohort-canon-kit`): TWO declined, ZERO in channel** — the
-  poll-to-wait pattern surfaced by close's own friction triage, and `icebox-worklist-roadmap-blind`
-  re-deriving the identical 3-of-3 roadmap exclusion its cost field predicts. Both declined on
-  this entry's own rule, so both are uncounted.
+  **Attesting 6 (2026-08-12, `native-cohort-canon-kit`): TWO declined, ZERO in channel** — close's
+  friction-triage poll-to-wait pattern and `icebox-worklist-roadmap-blind` re-deriving its predicted
+  3-of-3 exclusion, both declined on this entry's rule. **7 (2026-08-17) arrived as a bullet and so
+  stamps the date above:** that entry's fifth zero-precision measurement landed as close's prose,
+  and a post-close gap bullet routed it here — the finding is counted only because one was filed.
   **The budget note is now twice-attested:** this entry sits at its cap, so 6 rides a substitution
   over that very note — paid by compressing two grounds already marked answered, never by dropping
   one. `entry-cap-displaces-mandated-writes` owns the class; this is its worked instance.
