@@ -6123,6 +6123,38 @@
   Filed 2026-08-16 by close, from the lesson the porting cohort generalized rather than from a
   fresh finding — the two instances are already fixed.
 
+- **port-tail-cohort-batching-policy** [design-pending] — port cohorts have been composed around
+  a shared derivation, the tail no longer offers one, and nothing states what sizes a cohort
+  instead.
+  **Probed at this boundary, not inherited:** `bash gate-sdk/bin/port-blockers.sh --group`
+  partitions the 45-gate remainder into 37 groups — 34 singletons, two pairs, and one 7-member
+  group. The amortization every prior cohort was composed on (one derivation or one engine, several
+  gates riding it) therefore survives for exactly one group.
+  **Why that is an economics defect and not merely a fact about the gates:** iteration overhead is
+  fixed and large. Of the 529 commits since 2026-08-08, 360 are `chore` — the stage-lifecycle
+  ceremony — against 81 `feat`, 27 of which name the port. A one-group cohort buys one ported gate
+  for a whole iteration's ceremony, and 34 singletons at that rate is 34 iterations against a
+  standing ASAP directive (TRAJECTORY.md §PRIORITY DIRECTIVE — the port track's sequence).
+  **What the unit owes:** a stated cohort-sizing rule for the tail — size by blocker retirement
+  plus an iteration budget, taking several groups per iteration — and a ruling on which surface
+  owns it. The candidates are lifecycle-kit's scope template (iteration composition is already its
+  economic-composition test), gate-sdk/SPEC.md §Porting a gate to the binary substrate (which owns
+  cohort procedure), or this repo's own trajectory record (which owns the port sequence). Each
+  gives the rule a different reach: the first binds every consumer's iteration, the second binds
+  only porting, the third binds only this tree.
+  **Why `[design-pending]`:** the placement is the question, not the arithmetic, and the widest
+  candidate is the one the provenance seam bears on — a batching rule stated as generic mechanism
+  is kit content, while a rule naming the port's remainder is this repo's rule content.
+  **Cost while deferred:** each scope session re-derives the tail's shape from `--group` and picks
+  a cohort size unaided, so the sizing is decided identically and invisibly every iteration, and
+  the composition test in the scope contract keeps being answered from first principles.
+  Class: mints no name if it lands as a calibration line on an existing surface — **debt**; a
+  stated iteration budget with a knob makes it a **feature**, and the placement ruling decides
+  which.
+  Filed 2026-08-16 by the consult; dispositioned out of the gap inbox at the 2026-08-16 scope
+  boundary (lifecycle-kit/SPEC.md §The committed gap inbox, "The boundary refusal"), the counts
+  re-probed rather than carried.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
