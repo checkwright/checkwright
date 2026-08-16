@@ -1,1 +1,25 @@
 # contract: evidence-manifest v1
+freshness-emitter-substrate gates sha256=b06207fb89acbc4cd9ce127dc0bbc333bdd1d1a384ac21626a0bfa76f06617d3 pass=104 fail=0 ignore=0 verdict=clean 2026-08-16
+freshness-emitter-substrate gate_sdk sha256=35c92394bfb0090018ba776356010dae71ef6d887532cfca6abb32620f13d9fc pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
+freshness-emitter-substrate canon_kit sha256=c13b2442a2898fd4c5c30c9175f74b8e6d20ec43199ed0c9c7001203352040ae pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
+freshness-emitter-substrate context_kit sha256=65e7536ec8b920506d9defb5f2fd338be716ee72482acf2e4819ca5b3fcbe891 pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
+freshness-emitter-substrate delegation_kit sha256=d62b93b71c449eeafd8ab0e055be5b31cf98730a0c632aef78114119053c4727 pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
+freshness-emitter-substrate doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
+freshness-emitter-substrate evidence_kit sha256=b9a84e84d67dad5a63ae7ce34aecdc472ffbe13d06d01cc02f04bfca5b5de2ae pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
+freshness-emitter-substrate guard_kit sha256=0d5bfe0b92c08f178b4fee3a0b91ba29b6001f42c0222ff3254e86a5561ad0ec pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
+freshness-emitter-substrate lifecycle_kit sha256=68eaa631e5e5438312c15d4ac93bb1f36ab2533290eb94ae5aeb4af4821ab7e0 pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
+freshness-emitter-substrate queue_kit sha256=bd337719dfff15f492ae94d8e8662663a8917b65edd4b3bfcfdd20f1790ba39b pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
+freshness-emitter-substrate site_kit sha256=07f7139ea31865677de58ea44b43f7c98ae6c40c8f3fe57e8975e8d65794be35 pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
+freshness-emitter-substrate scripts sha256=79527cb41f0b806658b1baf22c0fba3e53b6e043aae75cfd195b90660b2e7fb2 pass=0 fail=1 ignore=0 verdict=new-failures 2026-08-16
+freshness-emitter-substrate guard_tests sha256=1c7a43a12696781ff4405096f181e90ad94cc417b875d94ea9c46bc7d052a7df pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
+freshness-emitter-substrate usage_tests sha256=04968d303b3e4ec54f3f8033f0e7e00d4b33ae90fd7507b48347cab56d0bc26d pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
+freshness-emitter-substrate budget_guard_tests sha256=94bbe0c41f3993e3c748a492d29e2a0d22139825b8c53bbae6a528500a8ce402 pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
+freshness-emitter-substrate dispatch_guard_tests sha256=6018943502411c07fe57162c0dae2ac37af304eccc0d0a9a6e0ec4fd733a1daf pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
+freshness-emitter-substrate trend_tests sha256=acdbfef4eab851fca00ca747245b6ac4a4f804b05989f9cd3acd014bb56ac330 pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
+freshness-emitter-substrate demo sha256=d1fd385277c7bf08c264a66b53c7cc1d98ef024a611f70309f59cab4660fb890 pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
+freshness-emitter-substrate installer_smoke sha256=22926b629159fbb08299d55c02551ea6c68eb63585e94fc725ceb7fe1f304007 pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
+freshness-emitter-substrate consumer_smoke sha256=298ee6d90743cf8a9e12e03d1ebe284a81544d53a3a594f97ede1f70b22ff057 pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
+freshness-emitter-substrate upgrade sha256=463966bed441456d41ba1a2fb4de7bb4006647a6c3e0b9a962079042c86f5f25 pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
+freshness-emitter-substrate agents_md_smoke sha256=56afa22ae50073b4d6fa15b83fbeda654760f4286ce185c7f10b10c6d0d49ec4 pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
+freshness-emitter-substrate index_tests sha256=e14e152466dc5be0296b1e20575bf3d587e1e0a127e7c63ad57671dbcaeaddb8 pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
+freshness-emitter-substrate native_crate sha256=46402c6723c1af6f0b8d038f61c000f3f90ace90e9a47a1a7ac1fddec157c1e5 pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
