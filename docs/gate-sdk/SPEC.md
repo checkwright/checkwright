@@ -2266,11 +2266,15 @@ must not read the run's silence as clearance.** `--group`'s key is shell
 libraries and globs; two of the six members hand-rolled the identical
 heading-bounded section walk while sharing no shell library, so nothing in
 the run's own columns names the primitive they were about to duplicate a
-third time. `native/src/section.rs` lands it: enter a section at the first
-heading whose text matches a caller-supplied name at any level 1–6, close at
-the next heading whose level is the same or shallower, yield the bounded line
-range. The seam holds at the argument boundary — the crate ships the walker
-and no section vocabulary, every name arriving as a caller argument.
+third time. `native/src/section.rs` lands it, and what this section owns of it
+is the **contract**: the primitive yields a bounded line range and nothing
+else, so a caller reads no heading level and no heading text. The matching and
+closing rule that *produces* that range is stated once, as a directive at the
+implementation itself, and is deliberately not restated here — a second copy is
+what rots, and the one drafted here had already drifted from the source it
+described before this section was a day old. The seam holds at the argument
+boundary — the crate ships the walker and no section vocabulary, every name
+arriving as a caller argument.
 
 **Two members sharing that primitive is sequencing, not a rejoined cohort,
 and the axis is stated so a later selector does not merge their proofs.** The

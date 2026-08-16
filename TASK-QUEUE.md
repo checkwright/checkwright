@@ -6172,6 +6172,31 @@
   Filed 2026-08-16 by close, from its own tooling-friction triage; counts read off
   `scan-prompts.sh` at the triage rather than estimated.
 
+- **metric-dir-member-contract-unheld** [design-pending] — `DRIFT_KIT_METRIC_DIR` states a member
+  contract and nothing holds it, so the persistent dir accretes whatever a session leaves there.
+  drift-kit/SPEC.md §Layout and configuration says metric-dir members "are append-only trend logs
+  that survive scratch wipes" — a contract, distinguishing it from `DRIFT_KIT_TMP_DIR` precisely
+  by retention. The distinction is what makes the dir exempt from the scratch wipe, so a
+  non-conforming member there has **no reclaim path at all**: it survives every boundary forever.
+  **Found at this close's runtime-artifact lifecycle check, and it is a live instance rather than
+  a shape.** This clone's `.metric/` carries three Python scripts beside its two trend logs. They
+  are referenced by no tracked surface — a grep across `*.sh`, `*.md` and `*.json` finds each
+  name zero times — and they predate this iteration, so they are prior sessions' analysis scratch
+  written to the one gitignored directory that never gets swept.
+  **Why `[design-pending]` rather than a gate:** the dir is per-clone and gitignored, so a gate
+  reds on one operator's local state and never on anything a commit produced — the
+  low-false-positive contract site-kit/SPEC.md §The monitor boundary rules on for a different
+  subject. The candidate shapes are a shape assertion inside `drift-report.sh` (advisory, where
+  the reader already is), a wipe-non-conforming-members arm on the meter, or ruling the contract
+  advisory and saying so. Which one turns on whether the contract is a privacy rule or a
+  housekeeping rule; the gitignore already carries the privacy half.
+  **Cost while deferred:** unbounded accretion in the one directory with no reclaim path, paid
+  as a dir a later reader cannot tell trend data from leftovers in.
+  Class: mints no governed name unless it lands as a gate, so canon-kit's litmus makes it
+  **debt** in two of the three shapes.
+  Filed 2026-08-16 by close, from step 6's write-path/reclaim-path question; the instance was
+  probed (grep for each name across the tracked tree) before it was called orphaned.
+
 
 ## Icebox
 
@@ -6203,9 +6228,6 @@
 - **scratch-execution-allowlist-bar** [design-pending] — Each close re-derives this standing bar.
 
 ## Done
-
-- port-tail-cohort-batching-policy
-- entry-cap-displaces-mandated-writes
 
 ## Lessons Learned
 
