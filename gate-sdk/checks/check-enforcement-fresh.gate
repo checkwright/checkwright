@@ -1,0 +1,3 @@
+# graph: couples=docs/enforcement.md,scripts/gates.list,scripts/*.sh,kit:*.sh,scripts/kpis.list,.claude/settings.json,.github/workflows/*.yml,native/src/gates/enforcement_fresh.rs,native/src/emit/enforcement_map.rs,native/src/fresh.rs,native/src/diff.rs dir=one valve=none tier=precommit
+# install: on-surface
+# spec: gate-sdk/SPEC.md §check-enforcement-fresh — docs/enforcement.md is the byte-fresh projection of the enforcement-map emitter, which this member calls in-process rather than spawning

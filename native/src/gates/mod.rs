@@ -9,6 +9,7 @@ pub mod docs_cmd;
 pub mod docs_kit_parity;
 pub mod docs_mirror_fresh;
 pub mod docs_nav_reachable;
+pub mod enforcement_fresh;
 pub mod footprint_fresh;
 pub mod install_toolchain;
 pub mod installer_no_deps;
@@ -824,6 +825,25 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
         &["CONTEXT_KIT_SURFACES"],
         "context-kit",
+    ),
+    // spec: gate-sdk/SPEC.md §check-reads-couples — the monitor walk's root is the emitter's own
+    // scan knob, declared below; the comparator itself reads one named projection file.
+    (
+        "check-enforcement-fresh",
+        enforcement_fresh::run,
+        &["?"],
+        &[
+            "GATE_SDK_GATES_DIR",
+            "GATE_SDK_ENFORCE_SCAN_DIR",
+            "GATE_KIT_ROOTS_HERE",
+            "GATE_PRUNE_DIRS",
+            "DRIFT_KIT_KPIS_FILE",
+            "CONTEXT_KIT_SETTINGS_FILE",
+            "CANON_KIT_DOCS_BLOB_REF",
+            "EVIDENCE_KIT_SUITES",
+            "EVIDENCE_KIT_RUN_*",
+        ],
+        "gate-sdk",
     ),
 ];
 

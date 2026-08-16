@@ -5,8 +5,9 @@ source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 cd "$ROOT" || exit 2
-EMIT="gate-sdk/bin/enforcement-map.sh"
-[[ -x "$EMIT" ]] || { echo "enforcement-map.test: emitter not found: $EMIT"; exit 2; }
+# spec: gate-sdk/SPEC.md §The non-gate arm — the emitter is a compiled arm reached through the front-end that resolves its bridged knobs, so this suite drives that entry point rather than a script
+EMIT=(gate-sdk/bin/run-gates.sh --emit enforcement-map)
+[[ -x "${EMIT[0]}" ]] || { echo "enforcement-map.test: front-end not found: ${EMIT[0]}"; exit 2; }
 
 emptydir="$(mktemp -d)"; scandir="$(mktemp -d)"; scratch="$(mktemp -d)"
 trap 'rm -rf "$emptydir" "$scandir" "$scratch"' EXIT
@@ -19,7 +20,7 @@ assert_absent() { grep -qF -- "$2" <<<"$3" && { echo "FAIL [$1]: expected absent
 # routes through EVIDENCE_KIT_CONFIG_FILE, which the hermetic bootstrap pins to
 # an empty file; drop that pin here so the emitter resolves this repo's real
 # evidence-config.sh (the other registries already read their real defaults).
-base="$(env -u EVIDENCE_KIT_CONFIG_FILE bash "$EMIT" --emit)"
+base="$(env -u EVIDENCE_KIT_CONFIG_FILE bash "${EMIT[@]}")"
 for section in "## Blocking gates" "## Advisory KPIs" "## Guards" "## Session warnings" "## Validate suites" "## Monitors"; do
     assert_has baseline "$section" "$base"
 done
@@ -31,7 +32,7 @@ done
 errfile="$scratch/stderr"
 assert_strict() {  # $1=case $2=knob-name $3=knob-value
     local out rc
-    out="$(env "$2=$3" bash "$EMIT" --emit 2>"$errfile")"; rc=$?
+    out="$(env "$2=$3" bash "${EMIT[@]}" 2>"$errfile")"; rc=$?
     [[ "$rc" -eq 2 ]]  || { echo "FAIL [$1]: expected exit 2, got $rc"; fails=$((fails + 1)); }
     [[ -z "$out" ]]    || { echo "FAIL [$1]: expected empty stdout"; fails=$((fails + 1)); }
     grep -qF -- "$2" "$errfile" || { echo "FAIL [$1]: stderr does not name $2"; fails=$((fails + 1)); }
@@ -50,25 +51,25 @@ assert_strict strict-settings-unparseable CONTEXT_KIT_SETTINGS_FILE "$scratch/ba
 # KPI section, so the sections drop independently.
 mkdir -p "$scratch/gates"
 cp "scripts/gates.list" "$scratch/gates/gates.list"
-deg="$(env -u DRIFT_KIT_KPIS_FILE -u EVIDENCE_KIT_CONFIG_FILE GATE_SDK_GATES_DIR="$scratch/gates" bash "$EMIT" --emit)"
+deg="$(env -u DRIFT_KIT_KPIS_FILE -u EVIDENCE_KIT_CONFIG_FILE GATE_SDK_GATES_DIR="$scratch/gates" bash "${EMIT[@]}")"
 assert_absent degrade-both "## Advisory KPIs" "$deg"
 assert_absent degrade-both "## Validate suites" "$deg"
 assert_has    degrade-both "## Blocking gates" "$deg"
 cp "scripts/kpis.list" "$scratch/gates/kpis.list"
-deg2="$(env -u DRIFT_KIT_KPIS_FILE -u EVIDENCE_KIT_CONFIG_FILE GATE_SDK_GATES_DIR="$scratch/gates" bash "$EMIT" --emit)"
+deg2="$(env -u DRIFT_KIT_KPIS_FILE -u EVIDENCE_KIT_CONFIG_FILE GATE_SDK_GATES_DIR="$scratch/gates" bash "${EMIT[@]}")"
 assert_has    degrade-independent "## Advisory KPIs" "$deg2"
 assert_absent degrade-independent "## Validate suites" "$deg2"
 assert_has    degrade-independent "## Blocking gates" "$deg2"
 
-# The settings default (.claude/settings.json) is cwd-relative: run from a cwd
-# without one, the unset knob degrades — both hook sections drop, the gate
-# registry (reached through an absolute GATE_SDK_GATES_DIR) remains.
-nohooks="$(cd "$emptydir" && env -u CONTEXT_KIT_SETTINGS_FILE -u DRIFT_KIT_KPIS_FILE -u EVIDENCE_KIT_CONFIG_FILE GATE_SDK_GATES_DIR="$scratch/gates" bash "$ROOT/$EMIT" --emit)"
-assert_absent no-hooks "## Guards" "$nohooks"
-assert_absent no-hooks "## Session warnings" "$nohooks"
-assert_has    no-hooks "## Blocking gates" "$nohooks"
+# The settings registry's not-adopted arm moved out of this suite and is not a
+# coverage loss: the front-end anchors at the repo root, so "run from a cwd with
+# no .claude/settings.json" is no longer a reachable state to drive it from, and
+# an explicitly-set missing path now refuses in context-kit's library rather than
+# degrading. The two arms are asserted at the reader instead —
+# native/src/emit/enforcement_map.rs, absent_settings_drop_the_hook_sections_and_
+# unparseable_settings_refuse.
 
-nomon="$(GATE_SDK_ENFORCE_SCAN_DIR="$emptydir" bash "$EMIT" --emit)"
+nomon="$(GATE_SDK_ENFORCE_SCAN_DIR="$emptydir" bash "${EMIT[@]}")"
 assert_absent no-monitors "## Monitors" "$nomon"
 assert_has    no-monitors "## Blocking gates" "$nomon"
 
@@ -78,7 +79,7 @@ assert_has    no-monitors "## Blocking gates" "$nomon"
 mkdir -p "$scandir/live" "$scandir/templates"
 printf '# enforce: class=monitor live-surface-alpha\n' > "$scandir/live/probe.yml"
 printf '# enforce: class=monitor template-surface-beta\n' > "$scandir/templates/probe.yml"
-tmpl="$(GATE_SDK_ENFORCE_SCAN_DIR="$scandir" bash "$EMIT" --emit)"
+tmpl="$(GATE_SDK_ENFORCE_SCAN_DIR="$scandir" bash "${EMIT[@]}")"
 assert_has    template-inert "live-surface-alpha" "$tmpl"
 assert_absent template-inert "template-surface-beta" "$tmpl"
 

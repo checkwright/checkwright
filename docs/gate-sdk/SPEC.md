@@ -6503,18 +6503,35 @@ dir, instead of walking the real `gates.list`.
 
 ### enforcement-map
 
-`bin/enforcement-map.sh --emit` writes `docs/enforcement.md`: a kit-first map of
+The emitter is a **non-gate arm of the gate binary**, `--emit-enforcement-map`
+(§The non-gate arm), reached as
+`bash gate-sdk/bin/run-gates.sh --emit enforcement-map` because an arm receives
+no configuration of its own and that front-end resolves its bridged knobs first.
+It writes `docs/enforcement.md`: a kit-first map of
 every check surface — kit, governed surface, enforcement class — derived from
 the class registries so it cannot drift from what actually runs. It is
 check-graph's sibling in shape (an emitter whose output a freshness gate
 byte-compares), advisory by construction: it never joins `gates.list`, and a
 *healthy* run exits 0 whatever registries are absent — while a misconfigured run
-(a set-but-missing registry knob) exits 2, fail-closed. Every knob check runs
-before the first stdout byte in both modes, so a misconfigured
-`--emit > docs/enforcement.md` regen leaves an empty projection and a nonzero
-exit, never a plausible partial page that byte-matches itself on the next
-freshness check. Bare it prints a human header before the page; `--emit` prints
-the page alone, for the committed projection.
+exits 2, fail-closed, leaving an empty projection rather than a plausible partial
+page that would byte-match itself on the next freshness check.
+
+**Where the fail-closed decision now sits has moved, and the move is the
+substance rather than a relocation of wording.** The shell form captured each
+registry knob's *set-ness* before defaulting it, so it could tell an
+explicitly-misconfigured registry from an unadopted one. A bridged knob crosses
+as a value with no set-ness attached, so each registry's owning library now makes
+that call at resolution time — `DRIFT_KIT_KPIS_FILE` resolving empty for
+not-adopted (drift-kit/SPEC.md §lib/drift.sh), `CONTEXT_KIT_SETTINGS_FILE`
+refusing on an explicitly-set missing path (context-kit/SPEC.md §Layout and
+configuration) — and what remains here is the reader's own half: a registry that
+resolves to nothing drops its section, and a roster naming a member the bridge
+did not carry refuses naming it.
+
+The emission is a **library function** the arm wraps rather than the arm itself,
+which is what lets §check-enforcement-fresh call it in-process and the value
+rollup consume the class taxonomy and per-kit counts as data instead of
+re-parsing this page's headings.
 
 Each enforcement class reads one registry, every registry defaulting to this
 repo's layout through the owning kit's knob: **blocking gates** from
@@ -6523,12 +6540,15 @@ from the same name-resolution walk the runner uses (a consumer-dir gate groups
 as the consumer's); **advisory KPIs** from the drift-kit `kpis.list` registry
 (`DRIFT_KIT_KPIS_FILE`); **guards** and **session warnings** from the
 `PreToolUse` / `SessionStart` command hooks in the tracked harness settings file
-(`CONTEXT_KIT_SETTINGS_FILE`, parsed with `jq`) — a guard row's *intercepts* cell
+(`CONTEXT_KIT_SETTINGS_FILE`, parsed with the crate's own JSON reader) — a guard row's *intercepts* cell
 carries the harness matcher verbatim, so its `|` alternation is escaped on the way
 into the table, a case a freshness gate can never report because it compares the
 emitter against the page and both would carry the same broken row; **validate
 suites** from
-evidence-kit's suite config (`EVIDENCE_KIT_CONFIG_FILE`); and **monitors** — the
+evidence-kit's suite registry — the roster from `EVIDENCE_KIT_SUITES` and each
+suite's run command looked up **by name** in the bridged `EVIDENCE_KIT_RUN_`
+family, never enumerated, since a prefix is a resolution set and not a roster
+(§lib/gate.sh); and **monitors** — the
 one class with no parseable registry — from a line-start
 `# enforce: class=monitor <free-text>` marker a non-gate surface declares itself
 with, greped under `GATE_SDK_ENFORCE_SCAN_DIR` (this repo's first carrier is the
@@ -6574,13 +6594,24 @@ docs page** (`<kit>/index.md`, relative to the page under the docs root); the
 
 ### check-enforcement-fresh
 
-Invariant: `docs/enforcement.md` byte-matches `enforcement-map.sh --emit` — the
+Invariant: `docs/enforcement.md` byte-matches the enforcement-map emitter — the
 check-graph / trajectory-freshness byte-compare pattern. Bare, it runs the
 emitter and compares the committed page; given two arguments
 (`projection-file emit-file`) it compares pre-baked files, letting the fixture
 pair exercise it hermetically off the live registries. Fail-closed: a missing
-projection, a missing emitter, or a non-zero emit is a red (exit 2), never a
-false clean. Its `# graph:` manifest couples every class registry — the gate
+projection, a missing emit source, or a failed emit is a red (exit 2), never a
+false clean.
+
+**It is a registry member of the gate binary, and its emitter is a function call
+rather than a spawn.** The comparator and the emitter ported in one unit, so
+where the shell form ran `bash <emitter> --emit` in a subprocess, the compiled
+member calls the emitter module's `emit()` **in-process** — retiring the
+family's `bash` hop for this member as it did for §check-footprint-fresh. Every
+registry knob the emitter reads is declared by this member and arrives across the
+config bridge, including the `EVIDENCE_KIT_RUN_` **prefix family**; because the
+hermetic two-argument mode bypasses the emitter entirely, those knobs are
+resolved but unread in a fixture run, which is why an empty family must resolve
+rather than refuse (§lib/gate.sh). Its `# graph:` manifest couples every class registry — the gate
 sources (so a `tier=` edit re-fires), `kpis.list`, the settings file, and the
 monitor-carrier workflows — beside the artifact itself, so any registry change
 re-runs the freshness compare. The corrective its help text names is the

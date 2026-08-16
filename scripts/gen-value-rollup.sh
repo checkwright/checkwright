@@ -15,7 +15,8 @@ cd "$REPO_ROOT" 2>/dev/null || { echo "gen-value-rollup: cannot enter repo root"
 PAGE="docs/value.md"
 BEGIN="<!-- value-rollup:begin -->"
 END="<!-- value-rollup:end -->"
-ENFORCEMENT_EMITTER="gate-sdk/bin/enforcement-map.sh"
+# spec: gate-sdk/SPEC.md §The non-gate arm — the enforcement-map emitter ported to a non-gate arm, so it is reached through the front-end that resolves its bridged knobs; this hop dies with this script when the rollup's own join ports
+ENFORCEMENT_EMIT=(bash gate-sdk/bin/run-gates.sh --emit enforcement-map)
 # spec: gate-sdk/SPEC.md §The non-gate arm — the footprint emitter ported to a non-gate arm, so it is reached through the front-end that resolves its bridged knobs; this hop dies with this script when the rollup's own join ports
 FOOTPRINT_EMIT=(bash gate-sdk/bin/run-gates.sh --emit footprint)
 
@@ -23,7 +24,7 @@ emit=0
 [[ "${1:-}" == "--emit" ]] && emit=1
 
 # spec: docs/site-architecture.md §Generated projections and their freshness gates — the join reads the two emitters live (never the committed detail pages), so a stale committed page cannot poison the rollup; each page carries its own freshness gate
-enf="$(bash "$ENFORCEMENT_EMITTER" --emit)"; est=$?
+enf="$("${ENFORCEMENT_EMIT[@]}")"; est=$?
 [[ "$est" -eq 0 ]] || { echo "gen-value-rollup: enforcement-map emitter failed (exit $est)" >&2; exit 2; }
 foot="$("${FOOTPRINT_EMIT[@]}")"; fst=$?
 [[ "$fst" -eq 0 ]] || { echo "gen-value-rollup: footprint emitter failed (exit $fst)" >&2; exit 2; }
