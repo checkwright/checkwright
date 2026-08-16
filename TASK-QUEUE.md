@@ -6096,6 +6096,46 @@
   Filed 2026-08-16 by close, from the lesson the porting cohort generalized rather than from a
   fresh finding — the two instances are already fixed.
 
+- **port-remainder-permanent-shell-inflation** [design-pending] — `port-blockers.sh` counts
+  permanently-shell members in its unported remainder, so the port's progress metric can never
+  reach zero.
+  **Re-verified at this drain rather than taken from the bullet, and every claim held.** A
+  2026-08-16 `--group` run reports 39 remaining and prints `check-install-disposition`,
+  `check-gate-substrate-parity` and `check-crate-arms` among them; gate-sdk/SPEC.md
+  §The port-candidate criteria rules the first two **permanent** under class (a) and rules
+  `check-crate-arms` permanent under criteria 4 and 7, explicitly *not* class (a).
+  **What the re-verification changed is the number, and that is itself a finding.** The bullet
+  filed 45 remaining / 42 portable; one iteration of porting later the same oracle says 39, so
+  the portable remainder is 36. Any fix that hands a reader a second number to maintain will rot
+  on the same one-iteration clock — which argues for the reported-split shape over a prose note.
+  **The fix is a fork, and neither arm is free.** (1) *Exclude* the three in the tool: the
+  remainder then means "still owed", but no gate carries a machine-readable permanent-shell
+  marker today — the causes live in prose (§The port-candidate criteria for two, §check-crate-arms
+  for the third), so an exclusion is three hardcoded names in a tool, against de-literalization
+  and unable to see the next one. (2) *Report a split* — "N still shell, M still owed" — which
+  needs the same input to compute M and only relocates the question. (3) A declarable field on
+  the descriptor (`# port: permanent|blocked|candidate`) makes both arms derivable, and is the
+  unit's real design question.
+  **Class (b) is why a marker cannot just mean "shell".** That class is *temporary by
+  construction* — it ends when `platform-support-ci-matrix` widens the target roster — so a
+  marker conflating permanent with temporarily-held would drop members that will port, replacing
+  an over-count with an under-count.
+  **The conservation table is a partial derivation source, not a whole one.** gate-sdk/SPEC.md
+  §Meta-gate conservation for the binary substrate carries rows for two of the three, and states
+  in its own prose that `check-crate-arms` sits outside its derivation entirely. A fix reading
+  that table gets two members for free and still owes a home for the third.
+  **Why `[design-pending]`:** picking among the three arms is a design call about where a
+  permanence verdict is declared, not a patch to the tool's arithmetic.
+  **Cost while deferred:** every "N remaining" claim inherits the inflation, including
+  `native-gate-port-remaining-corpus`' own cost field. That entry is **not** patched here and the
+  decision is deliberate: it delegates the number to the oracle by design ("never a count this
+  line holds"), so correcting its prose would make it disagree with the oracle it cites and would
+  re-introduce the maintained copy it was written to avoid. The defect is in the oracle, and it
+  is paid as a roadmap-facing metric that asymptotes at three instead of zero.
+  Class: changes a reporting tool's output rather than minting a governed name, so canon-kit's
+  litmus makes it **debt**; a feature only if arm (3) mints a descriptor field.
+  Filed 2026-08-16 by close from the gap inbox (bullet dated 2026-08-16, filed at scope).
+
 
 ## Icebox
 
