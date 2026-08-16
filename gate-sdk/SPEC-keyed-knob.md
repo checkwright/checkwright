@@ -173,8 +173,13 @@ second field naming the knob whose value is the `-name` pattern —
 `<root><TAB><knob-name>` — which `check-reads-couples` resolves through the config
 bridge it already sources, passing the resolved value where it currently passes
 `""`. A bare root keeps its present meaning, unfiltered, so every existing
-declaration is unchanged and the 40 members declaring `?` are untouched. The
-registry's third element grows to carry the pair.
+declaration is unchanged and the 39 members declaring `?` are untouched — a live
+count over `native/src/gates/mod.rs`'s 65-entry `REGISTRY` at this rev, corrected
+at align from an off-by-one (`check-evidence-baseline`'s own port, delta 6, adds
+the 40th once it lands: its glob comes from a knob, so its root is undecidable
+statically by the same `queue_slug_liveness.rs:72` precedent delta 6 already
+cites — a distinction this sentence's original count conflated). The registry's
+third element grows to carry the pair.
 
 **A literal pattern in the registry is refused, and this is the load-bearing
 detail.** `check-stage-entry`'s scans are `-name "$LIFECYCLE_KIT_ROSTER_BASENAME"`
