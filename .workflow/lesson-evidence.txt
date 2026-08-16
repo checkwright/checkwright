@@ -2,5 +2,3 @@
 # lesson-disposition v1 — one line per dispositioned Lessons entry, close-triage-written:
 # <iteration> lesson <rule <file> | task <slug> | harvest <tag> | discard <reason>> — <lead-line prefix>
 
-port-tail-batching-and-cap-relief lesson task turn-end-chokepoint-and-wait-primitive — validate ended its turn on a live run-validate producer, the wait rule firing again under the stage-session agent definition itself
-
