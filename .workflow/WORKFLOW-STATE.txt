@@ -9,3 +9,4 @@ port-tail-batching-and-cap-relief spec aee7c370 2026-08-16
 port-tail-batching-and-cap-relief align a24bfbe0 2026-08-16
 port-tail-batching-and-cap-relief build a52a34e5 2026-08-16
 port-tail-batching-and-cap-relief build a95d6d0a 2026-08-16
+port-tail-batching-and-cap-relief validate af8c01fc 2026-08-16
