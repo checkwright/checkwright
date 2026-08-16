@@ -507,7 +507,7 @@ C="$(consumer jq-less)" || fail "could not build a scratch consumer for the jq-l
 # spec: installer/README.md §init — on a tree with no manifest, init's first JSON read is the package's own version stamp, so this is the case that used to surface as "this package carries no version stamp"
 assert_jq_refusal "init (no manifest yet)" "$C" init --profile "$PROFILE_MIN"
 
-RUN_PATH="$PATH"
+# spec: installer/README.md §The consumer smoke — this arm sets no RUN_PATH: its masked calls carry JQ_PATH explicitly and this one ordinary install runs under the ambient PATH, so nothing here reads RUN_PATH and the arms below reach their own assignments untouched. Left as a note rather than a defensive assignment because a dead assignment that looks load-bearing is what the next arm inserted here would copy
 out="$( cd "$C" && "${ENTRY[@]}" init --profile "$PROFILE_MIN" 2>&1 )" \
     || { printf '%s\n' "$out" >&2; fail "the jq-less arm could not make an ordinary install to run its manifest-reading verbs against"; }
 # spec: installer/README.md §init — with a manifest present, the read that comes first is the schema check every one of these verbs shares, so these are the cases that used to surface as "carries a schema this build does not know"
@@ -515,13 +515,17 @@ assert_jq_refusal "init (manifest present)" "$C" init --profile "$PROFILE_MIN"
 assert_jq_refusal "diff" "$C" diff
 assert_jq_refusal "uninstall" "$C" uninstall --dry-run
 
-# spec: installer/README.md §doctor — doctor is the boundary this unit does not cross: its job is to report a toolchain rather than refuse on one, so it keeps its own inline probe and stays green on a machine the other verbs refuse. An arm that let doctor take the preflight would be asserting the opposite of what doctor is for
+# spec: installer/README.md §doctor — doctor is the boundary this unit does not cross, and the boundary is *reaching the diagnosis*, never the exit code. jq is a consumer-audience member of the toolchain floor, so a machine without it is genuinely below contract and doctor saying so is correct rather than a defect. What separates doctor from the verbs above is that it renders its whole report first: the other verbs must refuse before their first read, where doctor keeps its own inline probe and gets as far as naming jq in the toolchain block *and* saying it is why the manifest could not be read. Asserting exit 0 here would have been asserting the opposite of the contract
 out="$( cd "$C" && PATH="$JQ_PATH" "${ENTRY[@]}" doctor 2>&1 )"; rc=$?
-[[ "$rc" -eq 0 ]] \
-    || { printf '%s\n' "$out" >&2; fail "doctor exited $rc with jq absent — doctor reports a toolchain rather than refusing on one, and an adopter diagnosing this exact machine is who needs it to run"; }
-grep -q 'jq' <<<"$out" \
-    || { printf '%s\n' "$out" >&2; fail "doctor ran on a jq-less machine without saying jq is why the manifest could not be read"; }
-say "doctor: still reports on a jq-less machine, and names jq as the reason the manifest is unreadable"
+[[ "$rc" -eq 1 ]] \
+    || { printf '%s\n' "$out" >&2; fail "doctor exited $rc with jq absent, not the 1 that means below contract — jq is a floor member the vendored battery needs, so a jq-less machine is below contract and doctor is the verb that says so"; }
+grep -q '^DOCTOR: below contract' <<<"$out" \
+    || { printf '%s\n' "$out" >&2; fail "doctor exited 1 on a jq-less machine without rendering its below-contract verdict — it refused somewhere ahead of the report instead of reaching it"; }
+grep -qE '^  jq +NOT FOUND' <<<"$out" \
+    || { printf '%s\n' "$out" >&2; fail "doctor's toolchain block does not name jq as missing — the report an adopter reads to find out what to install is silent about the program that stopped every other verb"; }
+grep -q 'jq is absent, so it cannot be read' <<<"$out" \
+    || { printf '%s\n' "$out" >&2; fail "doctor reached its manifest branch without saying jq is why the manifest could not be read — that line is the idiom this whole unit generalized"; }
+say "doctor: reaches its full diagnosis, names jq missing and unreadable-manifest, verdict below contract"
 
 # spec: installer/README.md §The consumer smoke — the upgrade arm packs a second, higher version and drives the same installed tree across it, because everything above installs at one version: what only a cross-version run reaches is the manifest's version comparison falling through in the upgrade direction, the profile re-read from the lock with no flag, and claim() re-applying around a file the adopter has since edited
 printf 'upgrade arm (two cross-version hops, %s profile — the lattice minimum, so the arm is the smallest install that carries the manifest behavior it asserts)\n' "$PROFILE_MIN"

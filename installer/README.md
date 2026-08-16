@@ -45,9 +45,19 @@ read it with `jq`, so every one of them refuses without it, naming the program
 and the remedy (§The manifest). This is a claim about *these verbs*, separate
 from the install page's toolchain block, which names `jq` for the gates in the
 battery being vendored: different programs' users, and a machine can satisfy
-either without the other. `doctor` is the exception by design — it reports a
-toolchain rather than refusing on one, so it runs on a machine with no `jq` and
-tells you that is why the manifest could not be read.
+either without the other, though a machine missing `jq` is below both.
+
+`doctor` is the exception by design, and the exception is that it **reaches its
+diagnosis** rather than that it is content: it reports a toolchain instead of
+refusing before it can report one, so on a machine with no `jq` it renders its
+whole report, names `jq` as missing, and tells you that is also why the manifest
+could not be read. Its verdict is still **below contract**, because `jq` is a
+consumer-audience member of the toolchain floor and the battery being vendored
+needs it too. So the installer always knew about this dependency and `doctor`
+always said so — what was wrong is that `init` runs `doctor` *last*, after the
+JSON reads that need `jq`, so the one verdict that named the program was ordered
+behind the refusals that could not. The precondition above is that ordering
+corrected, not a fact newly discovered.
 
 ## Layout
 
@@ -1084,10 +1094,12 @@ surface as *carries a schema this build does not know*. Each must refuse, **name
 assertion, and asserting the exit status alone would have been worthless: these
 verbs already exited 2 before the precondition existed, so a status-only arm
 would have passed against the very defect being fixed. `doctor` is asserted on
-the other side of the boundary — exit 0, still reporting, naming `jq` as the
-reason the manifest could not be read — because `doctor`'s job is to report a
-toolchain rather than refuse on one, and an adopter diagnosing this exact machine
-is who needs it to run.
+the other side of the boundary, and the boundary is *reaching the diagnosis*
+rather than the exit code: it must render its below-contract verdict, name `jq`
+as missing in the toolchain block, **and** say `jq` is why the manifest could not
+be read. Exit 1 is the correct verdict there, and asserting exit 0 would have
+been asserting the opposite of the contract — `jq` is a floor member, so a
+machine without it is below contract and `doctor` is the verb that says so.
 
 The gap that arm closes was total, and it is why this defect could be filed
 twice: the smoke's preflight requires `jq` and this harness reads every manifest
