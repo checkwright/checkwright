@@ -1605,8 +1605,8 @@
   accepts a stage stamp that lands **after** commits already made under it, so
   the stamp proves invocation but not that it preceded the work it authorizes.
   recurrence: stage-stamp-ordering-unenforced 2026-08-07 2026-08-16
-  **Observed with the battery green throughout.** This iteration's build batch 1
-  stamped `.workflow/WORKFLOW-STATE.txt` as its *third* commit, after two commits
+  **Observed with the battery green throughout.** At the 2026-08-07 firing a build
+  batch stamped `.workflow/WORKFLOW-STATE.txt` as its *third* commit, after two commits
   had already landed build-stage edits under that unstamped entry. Nothing caught
   it — not `check-stage-evidence`, not `check-stage-entry`, not the pre-commit
   hook. Batch 2 stamped first and **the difference was invisible to every gate**,
@@ -2928,7 +2928,7 @@
 
 - **waiting-rule-fourth-firing-post-fix** [design-pending] — the residency rule fired again,
   under its own freshly-strengthened prose.
-  recurrence: waiting-rule-fourth-firing-post-fix 2026-08-06
+  recurrence: waiting-rule-fourth-firing-post-fix 2026-08-06 2026-08-16
   `dispatched-session-waiting-rule-residency` shipped this iteration. Batch 2 (`a046c06`)
   landed its residency half into `.claude/agents/stage-session.md` as a bare imperative —
   never end a turn on work still running, and never end one in order to wait. The **validate**
@@ -5934,6 +5934,101 @@
   the lead posture is live is a claim about supervision cost wearing a stage-session label.
   Filed 2026-08-15 by close, probed while reconciling its own meter output against its own stage
   stamp; scope-gated intake, so it is filed costed rather than fixed in flight.
+
+- **drift-kpis-default-two-homes** [design-pending] — the KPI-file default literal now has two
+  homes and no gate holds them in lockstep.
+  **Re-verified at the drain, and the claim holds exactly.** `drift-kit/lib/drift.sh:11` and
+  `drift-kit/bin/drift-report.sh:36` each carry `${GATE_SDK_GATES_DIR:-scripts}/kpis.list`
+  verbatim; the library home arrived with `80b0b50b`, which did not touch the reader. Against
+  de-literalization and derivation-first, and nothing reds when one moves.
+  **Why `[design-pending]`:** the obvious collapse is not free, and that is the whole entry.
+  `drift.sh` refuses (`exit 2`) on an explicitly-set-but-missing path so the bridge can tell
+  adopted-but-broken from not-adopted; `drift-report.sh:93` degrades in *both* modes behind a
+  file-exists guard. Sourcing the library therefore changes drift-report's user-facing behaviour
+  — arguably a correction toward the documented design, but a behaviour change on a surface the
+  emitter amendment's envelope never covered. The alternatives are a freshness gate over two
+  literals (gating duplication the doctrine says to remove instead) or leaving the reader to
+  carry its own default and saying so.
+  **Cost while deferred:** low and non-rotting while both literals are the same string; the hole
+  opens the moment either default moves, and it opens silently.
+  Debt: collapses a duplicated constant onto its owner, minting nothing.
+  Filed 2026-08-16 by close from the gap inbox; surfaced by the lead reviewing `80b0b50b`, not
+  by a gate.
+
+- **installer-jq-usability-probe** [design-pending] — the installer's `jq` precondition is a
+  **resolution** probe, so a `jq` that resolves but cannot run still meets a misdiagnosis.
+  **Re-verified at the drain by running it, and one citation corrected.** The predicate lives at
+  `installer/lib/common/lock.sh:14` (`lock_require_jq`), not the `installer/lib/lock.sh` the
+  bullet named. With a shim that exits 127 first on `PATH`, `command -v jq` returns true, the
+  preflight never fires, and `jq --version` exits 127 — the failing machine reaches exactly the
+  refusals the jq-floor unit removed for the absent case.
+  **DISTINCT from `installer-jq-silent-degradation`, which this does not re-open.** That unit's
+  subject is the absent case and it is discharged whole — preflight, refusal, `jq`-less smoke arm
+  and README declaration all landed and are asserted. Its slug now resolves only in `## Done`, so
+  the drain rule files this as new work rather than a recurrence stamp.
+  **Why `[design-pending]`:** widening the predicate to an execution probe (`jq --version`)
+  settles a user-facing question the amendment deliberately did not — it costs an extra process
+  on every JSON-reading verb, and it changes what "installed" means for a program the toolchain
+  roster also probes, so the roster and the installer would need to agree on one predicate rather
+  than drift into two.
+  **Cost while deferred:** bounded and narrow — a present-but-broken `jq` is rarer than an absent
+  one, and the `jq`-less arm now covers the common case.
+  Filed 2026-08-16 by close from the gap inbox; surfaced by a probe run while building the unit
+  whose ruled predicate leaves this axis open.
+
+- **fixture-assertion-liveness** [design-pending] — nothing catches a fixture asserting a message
+  no gate emits, or a fixture citing a script already deleted from the tree.
+  **Re-verified at the drain.** `check-gate-fixture-coverage` is the only fixture-subject gate in
+  `scripts/gates.list`, and its invariant is that a pair *exists* — never that the pair's expected
+  strings are still emitted. `run-gates.sh` runs gates, not their fixture pairs, so a gate whose
+  message changed still passes itself while its own `bad/expect.txt` goes stale.
+  **Attested, not hypothetical.** `f8795712` changed `check-value-rollup-fresh`'s stale message
+  and left the fixture asserting the old string; the battery stayed green and the defect surfaced
+  a stage later as the only red in a 24-suite validate manifest (`b7e47707`), repaired by
+  `83f79e7d`. The commit that broke it was the commit that could have caught it.
+  **Why `[design-pending]`:** the oracle is the hard part. A lint cross-referencing each
+  `*/gate-tests/*/bad/expect.txt` literal against its gate's own source works for a shell gate
+  and gets harder for a ported one, where the string lives in a compiled binary and would have to
+  be read back out of it. A liveness check on any script path a fixture's `args`/`projection.txt`
+  names is the cheap half and is worth costing separately.
+  Class: mints a gate name, so canon-kit/SPEC.md's new-names litmus makes it a **feature**.
+  **Cost while deferred:** paid once per iteration that changes a gate's user-facing text, and
+  paid at the worst place — a validate red, one stage after the commit that caused it.
+  Filed 2026-08-16 by close from the gap inbox; filed by the build re-entry that fixed the
+  instance rather than designing the gate in flight.
+
+- **turn-end-chokepoint-and-wait-primitive** [design-pending] — two open mechanism questions the
+  wait rule's fifth firing raised, neither answerable from the ruling that closed its prose half.
+  **This is the design half of `waiting-rule-fourth-firing-post-fix`**, whose surviving question
+  is "given that prose alone does not hold, what does". Filed apart from it only because that
+  entry stands within three lines of the per-entry cap — the displacement
+  `entry-cap-displaces-mandated-writes` predicts, in a new shape: content pushed into a *new
+  entry* rather than into a commit message.
+  **First half — the chokepoint claim is narrower than it reads.** delegation-kit/SPEC.md:390-392
+  rules that enforcement turns on whether an act passes a chokepoint, and that a turn-end does
+  not. The analysis immediately below it is scoped to what a **`PreToolUse` hook** can read, and
+  every guard this repo ships is `PreToolUse`. The harness also fires a `Stop` event at turn end,
+  which no session has probed against this rule. **Unprobed, and stated as unprobed:** whether a
+  `Stop` hook can observe a live `run_in_background` child is exactly the question, and it is not
+  settled by a cheap command — wiring one is a settings change.
+  **What makes it newly cheap: this iteration shipped the artifact such a guard would read.**
+  `waiting-rule-carrier-reach` landed the launch-time liveness record (`pid=<n> run=<key>` in
+  repo-local `.tmp/`), so a turn-end guard needs no payload introspection — it reads the records
+  and runs `kill -0`. The record proved itself on first contact, recovering three orphaned
+  producers this iteration.
+  **Second half, distinct subject — which primitive is reliable here.** The protocol states a
+  hard ordering: `run_in_background` plus an `until`-loop for a single completion, with the
+  event-stream form named the wrong tool. On this machine that ordering **inverted** — four of
+  the lead's own backgrounded waiters were killed before their conditions went true, each with
+  the producer verifiably still alive, while a `Monitor` call emitting one line and exiting
+  succeeded first attempt. A guard built on the wrong primitive inherits the wrong failure.
+  **Why `[design-pending]`:** the first half may be refused outright if `Stop` cannot see what it
+  needs, which would confirm delegation-kit's ruling rather than overturn it; the second half is
+  a measurement whose result could change a stated protocol ordering. Neither is a patch.
+  **Cost while deferred:** each further firing costs an orphaned producer plus the lead turn that
+  discovers it — three such turns this iteration, against four prompt-side statements of the rule.
+  Filed 2026-08-16 by close from the gap inbox, both halves; the drain re-verified the carrier
+  count and the chokepoint scoping against the SPEC rather than taking the bullet's prose.
 
 ## Icebox
 

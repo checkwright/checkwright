@@ -93,3 +93,4 @@
 | json-reader-cohort-and-native-by-default | sc sp a b v c | 4f/3d | 2 · ≤0d | 24s clean | 104 |
 | declaration-cohort-and-consumer-first-mover | sc sp a b v c | 3f/0d | 2 · ≤0d | 24s clean | 104 |
 | consumer-cohort-completion-and-wait-enforcement | sc sp a b v c | 3f/0d | 2 · ≤0d | 24s clean | 104 |
+| freshness-emitter-substrate | sc sp a b v c | 12f/5d | 3 · ≤1d | 32s 1✗ | 104 |
