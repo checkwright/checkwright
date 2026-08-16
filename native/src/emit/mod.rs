@@ -1,6 +1,7 @@
-// spec: gate-sdk/SPEC.md §The non-gate arm — the ported emitters. Each owes no descriptor, no
-// registration and no fixture pair, and owes a named reader instead: the regen command in
-// docs/site-architecture.md §Generated projections, and the comparator calling `emit()`.
+// spec: gate-sdk/SPEC.md §The non-gate arm — the ported arms. Each owes no descriptor, no
+// registration and no fixture pair, and owes a named caller instead: a regen command, a
+// comparator calling `emit()`, a stage step, a gate reaching it in process.
+pub mod close_surfaces;
 pub mod enforcement_map;
 pub mod footprint;
 pub mod value_rollup;
@@ -15,6 +16,19 @@ pub type EmitFn = fn(&[String]) -> Result<String, String>;
 // `--knobs` prints for it.
 pub const EMITTERS: &[(&str, EmitFn, &[&str])] = &[
     ("footprint", footprint::emit, &["CONTEXT_KIT_SURFACES"]),
+    // spec: lifecycle-kit/SPEC.md §The close-surfaces emit arm — the class's first member that is
+    // not a stored projection: the roster's value is that it is recomputed at the moment close
+    // reads it, so there is no comparator and must not be.
+    (
+        "close-surfaces",
+        close_surfaces::emit,
+        &[
+            "GATE_KIT_ROOTS_REL",
+            "LIFECYCLE_KIT_ROSTER_BASENAME",
+            "LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS",
+            "GATE_SDK_WORKFLOW_DIR",
+        ],
+    ),
     (
         "enforcement-map",
         enforcement_map::emit,

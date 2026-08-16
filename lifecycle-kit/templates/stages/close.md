@@ -107,7 +107,8 @@ session.
    gains nothing. A slug that resolves only in the done section is not a
    recurrence — the finding recurred after its fix landed, which is a new defect,
    and it files as one.
-3. **Sweep the inbound triage surfaces** — run `bin/close-surfaces.sh` and
+3. **Sweep the inbound triage surfaces** — run
+   `bash gate-sdk/bin/run-gates.sh --emit close-surfaces` and
    disposition every row (§The close-surface roster). The roster is derived, not
    enumerated here or in the binding below: a `forced=` row has a structural
    forcing function and cannot be skipped silently; an `advisory` row may be

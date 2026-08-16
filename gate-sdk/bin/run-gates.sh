@@ -16,14 +16,14 @@ REPO_ROOT="$(git rev-parse --show-toplevel)" || {
 }
 cd "$REPO_ROOT" || exit 2
 
-# spec: gate-sdk/SPEC.md §The non-gate arm — the emitter front-end: a ported emitter receives no
+# spec: gate-sdk/SPEC.md §The non-gate arm — the emitter front-end: a ported arm receives no
 # configuration, so a caller already sourcing this library resolves its bridged knobs and invokes
-# it. The projection is an operand here and a suffix in the crate, governed separately.
+# it. The arm name is an operand here and a suffix in the crate, governed separately.
 if [[ "${1:-}" == --emit ]]; then
     shift
-    EMIT_PROJECTION="${1:-}"
-    [[ -n "$EMIT_PROJECTION" ]] || { echo "run-gates: --emit needs a projection name" >&2; exit 2; }
-    EMIT_ARM="--emit-$EMIT_PROJECTION"
+    EMIT_ARM_NAME="${1:-}"
+    [[ -n "$EMIT_ARM_NAME" ]] || { echo "run-gates: --emit needs an arm name" >&2; exit 2; }
+    EMIT_ARM="--emit-$EMIT_ARM_NAME"
     shift
     EMIT_ARGS=("$@")
     EMIT_BIN="$(gate_native_bin)"

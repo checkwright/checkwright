@@ -5,6 +5,7 @@ pub mod action_pinning;
 pub mod agent_tier_explicit;
 pub mod assertion_strength;
 pub mod brevity;
+pub mod close_surfaces;
 pub mod comment_tier;
 pub mod doctrine_registration;
 pub mod deprecation_task;
@@ -38,6 +39,7 @@ pub mod payload_claim;
 pub mod prose_enum;
 pub mod queue_entry_budget;
 pub mod queue_hygiene;
+pub mod queue_prose_precondition;
 pub mod queue_sections;
 pub mod queue_slug_liveness;
 pub mod queue_wrap;
@@ -128,6 +130,19 @@ pub const REGISTRY: &[GateEntry] = &[
         queue_hygiene::run,
         &[],
         &["QUEUE_KIT_QUEUE_FILE", "QUEUE_KIT_PROSE_LEADS"],
+        "queue-kit",
+    ),
+    (
+        "check-queue-prose-precondition",
+        queue_prose_precondition::run,
+        &[],
+        &[
+            "QUEUE_KIT_QUEUE_FILE",
+            "QUEUE_KIT_PRECONDITION_REGEX",
+            "QUEUE_KIT_ACTIVE_SECTIONS",
+            "QUEUE_KIT_DEFERRED_SECTION",
+            "QUEUE_KIT_ICEBOX_SECTION",
+        ],
         "queue-kit",
     ),
     // spec: queue-kit/SPEC.md §lib/queue.sh — a member reading a derived section matcher declares
@@ -672,6 +687,20 @@ pub const REGISTRY: &[GateEntry] = &[
             "LIFECYCLE_KIT_AMENDMENT_GLOB",
             "LIFECYCLE_KIT_CONTRACT_TOKENS",
             "GATE_PRUNE_DIRS",
+        ],
+        "lifecycle-kit",
+    ),
+    // spec: gate-sdk/SPEC.md §The twelfth cohort — both walks hang off a base that is this
+    // member's own first argument with a default, so both take the undecidable marker.
+    (
+        "check-close-surfaces",
+        close_surfaces::run,
+        &[("?", ""), ("?", "")],
+        &[
+            "GATE_KIT_ROOTS_REL",
+            "LIFECYCLE_KIT_ROSTER_BASENAME",
+            "LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS",
+            "GATE_SDK_WORKFLOW_DIR",
         ],
         "lifecycle-kit",
     ),

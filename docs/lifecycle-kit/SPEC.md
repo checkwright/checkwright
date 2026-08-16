@@ -1101,7 +1101,8 @@ the same seam — a `forced=` declaration authored outside the manifest set woul
 carry an unresolved citation, and no gate here catches that, because the
 resolver is canon-kit's and lifecycle-kit does not depend on canon-kit.
 
-**The derivation** is `bin/close-surfaces.sh`, never a maintained registry. Two
+**The derivation** is the `close-surfaces` emit arm
+(§The close-surfaces emit arm), never a maintained registry. Two
 sources, unioned: every `close-surface:` declaration across the resolved kit
 roots and the consumer's configured declaration surfaces; and every **gitignored
 member of the workflow directory** — capture-tier by definition (gate-sdk/SPEC.md
@@ -1153,12 +1154,12 @@ descriptor. For a case that differs by a knob rather than by argv, `gate_env
 NAME=VALUE` sets that one case's environment in the caller's subshell;
 `check-stage-evidence`'s session-boundary posture cases are the worked instance.
 
-Every gate-driving runner in this kit, including `check-close-surfaces` — whose
-gate remains shell, unsized by any cohort (gate-sdk/SPEC.md §The first cohort,
-and the rule that selects the next) — resolves through `gate_run` rather than a
-held `checks/<name>.sh` path. `check-stage-entry` is the worked payoff rather
-than an exception: its runner needed no edit when the gate ported, because it
-already named the gate.
+Every gate-driving runner in this kit resolves through `gate_run` rather than a
+held `checks/<name>.sh` path, and the payoff has now been collected **twice**:
+`check-stage-entry`'s runner needed no edit when that gate ported, and
+`check-close-surfaces`' sandbox-repo runner needed none when this one did —
+each already named the gate. Two attestations rather than one exception, which
+is the stronger claim this rule was written to earn.
 
 The rest exercise `bin/` tools, which are advisory tooling with no gate to
 dispatch and so have nothing to say about reach.
@@ -1546,22 +1547,45 @@ line is live the moment `.gitattributes` carries it.
 Advisory tooling, not a gate: no fixture pair is owed; every step is exercised
 end-to-end in `smoke/install.sh`.
 
-### bin/close-surfaces.sh
+### The close-surfaces emit arm
 
 Prints the derived close-surface roster (§The close-surface roster), one row per
 surface, tab-separated `<path>	<mode>	<reclaim>	<owner>`, sorted by path. A
 field with nothing declared is `-`; an owner-less row is a capture surface source
 2 found with no declaration, whose mode reads `(undeclared)`. The mode is echoed
 verbatim — a malformed one is passed through for `check-close-surfaces` to rule
-on, so the derivation never silently repairs what the gate exists to catch.
+on, so the derivation never silently repairs what the gate exists to catch. An
+empty roster prints nothing and succeeds: a resolved-empty derivation is an
+answer, never an error.
+
+A **non-gate arm** (gate-sdk/SPEC.md §The non-gate arm), invoked as
+`bash gate-sdk/bin/run-gates.sh --emit close-surfaces [scan-root]` — the
+front-end that resolves the arm's bridged knobs in front of it. Its two callers
+are `check-close-surfaces`, which reaches the derivation **in process** rather
+than spawning anything, and close's own inbound-triage sweep. Nothing stores the
+roster and nothing must: its whole value is that it is recomputed at the moment
+close reads it, so a capture surface added yesterday appears today.
 
 The declaration surfaces are the resolved kit roots' `LIFECYCLE_KIT_ROSTER_BASENAME`
 files plus every `LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS` match (gate-sdk's kit-root
 resolution, consumer-first with kit shadowing — the order every kit registry
-already uses); duplicates collapse. Follows the affordance contract:
-repo-root `cd`, config-via-env, exit 2 on a non-repo cwd, an unreadable
-declaration surface, or a `git check-ignore` that could not decide. Advisory
-tooling, no fixture pair owed — the gate below is what blocks.
+already uses); duplicates collapse. Follows the affordance contract, with the
+`cd` a compiled arm cannot take becoming a **computed base**: the scan-root
+argument, else the repo toplevel, with every path globbed, ignored and printed
+relative to it. Config-via-env across the bridge; and the three exit-2 causes —
+a non-repo base, an unreadable declaration surface, a `git check-ignore` that
+could not decide — become the arm's error return, which the front-end and the
+in-process caller both surface. Advisory tooling, no fixture pair owed — the
+gate below is what blocks, and §The non-gate arm is the second, now-structural
+ground for the same verdict: an arm returning a document has no pass and no
+fail to fixture.
+
+The sort is by path, with the **whole row** as its tie-break, and that is
+observable rather than incidental: one path may be declared on two surfaces, a
+duplication the derivation deliberately does not collapse (it collapses
+duplicate *surfaces*, not duplicate declarations). A path-only sort would leave
+the tie order at the sorter's discretion and churn the gate's error order for no
+edit.
 
 ### check-close-surfaces
 
@@ -1583,17 +1607,35 @@ depend on canon-kit — the same ownership-cycle argument that rules out the log
 merge. The honest arrangement is a pair of gates independently reading one
 surface, each asserting what it owns.
 
-The gate reads the roster by running the affordance, so a roster it could not
-derive is fail-closed (exit 2), as is an unreadable declaration surface. An
-optional scan-root argument (passed through to the affordance) is the fixture
+The gate reads the roster by **calling the derivation in process**
+(§The close-surfaces emit arm),
+so a roster it could not derive is fail-closed (exit
+2), as is an unreadable declaration surface. The in-process call is the point
+rather than an optimization: it makes "the derivation and the gate can never
+disagree" structural instead of conventional. It also means the descriptor
+acquires a **source coupling** — the gate module and the emit module it reaches
+transitively join `couples=` beside the surfaces already named, or the gate
+stays registered, green, and never triggered on the edit that broke it.
+
+An optional scan-root argument (passed through to the derivation as its base) is
+the fixture
 capability: `git check-ignore` never reports a *tracked* path, and a fixture file
 must be tracked to survive a clone, so a case dir cannot hold a capture-tier
 member. The `good/`+`bad/` pair therefore covers assertion B on a consumer-set
 `LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS`, and the bespoke
 `gate-tests/check-close-surfaces.test.sh` builds sandbox repos with a real
-`.gitignore` for assertions A and C — the `check-exec-bit` precedent. Tier
-`precommit`; the `# graph:` manifest couples the workflow dir and the
-declaration surfaces.
+`.gitignore` for assertions A and C — the `check-exec-bit` precedent. Both move
+with the member across a substrate change rather than being re-authored: the
+pair is keyed by gate *name*, and the scenario runner dispatches by name through
+`gate_run` (§Testing). Tier
+`precommit`; the `# graph:` manifest couples the workflow dir, the
+declaration surfaces and the two crate modules.
+
+The three assertions carry `assertion A:` / `assertion B:` / `assertion C:`
+markers in the implementing member's own source, in whatever comment leader its
+substrate spells. That is not decoration: `check-gate-assertions` set-matches
+the enumeration above against those markers and reds on an **empty** set, so a
+port that drops them leaves the gate looking unasserted.
 
 Calibration and honest limit: the gate asserts the roster is **complete and
 moded**, never that close actually *read* a surface. Reading is a session act

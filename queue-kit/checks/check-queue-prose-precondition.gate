@@ -1,0 +1,3 @@
+# graph: couples=TASK-QUEUE.md,native/src/gates/queue_prose_precondition.rs dir=one valve=none tier=precommit
+# install: zero-config
+# spec: queue-kit/SPEC.md §check-queue-prose-precondition — no active entry states a forward precondition in prose without a blocked-by tag (selection trusts tags, not prose)

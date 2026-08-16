@@ -559,7 +559,7 @@ gate to the binary substrate), so `check-queue-slug-liveness` and
 `bin/queue-edges.sh` keeps calling this one; the same is true of the section
 regexes, every one of which a `bin/` script still reads directly. The split is
 **permanent** — every `bin/` script in the kit still sources this library, and so
-do `check-roadmap-fresh` and `check-queue-prose-precondition`
+does `check-roadmap-fresh`
 (`grep -rl lib/queue.sh queue-kit/bin queue-kit/checks` is the roster) — so the
 shell form cannot be deleted the way a ported primitive's is, and a port-time
 byte-identity proof would expire at the next edit to either side. What holds the

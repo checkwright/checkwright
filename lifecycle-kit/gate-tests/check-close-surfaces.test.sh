@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Behavioral test of checks/check-close-surfaces.sh over real git repos — the
+# Behavioral test of check-close-surfaces over real git repos — the
 # two assertions the good/bad pair cannot reach. A fixture case dir cannot ship
 # a gitignored member: `git check-ignore` never reports a tracked path, and a
 # fixture file must be tracked to survive a clone. So the capture-tier half —

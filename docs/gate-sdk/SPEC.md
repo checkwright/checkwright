@@ -1059,12 +1059,25 @@ A **non-gate arm** is specified by three properties:
   `good/`+`bad/` fixture pair.** Those three are the *gate* contract and they
   attach to a thing that returns a verdict a battery reads. An arm that returns
   a document has no pass and no fail to fixture.
-- **It owes a named reader instead.** A gate's reader is the battery; a non-gate
+- **It owes a named caller instead.** A gate's reader is the battery; a non-gate
   arm has to name the caller that reads its output and the transition where it
   is read, or it is dead weight. Every member above satisfies this —
   `--source-stamp` is read by §check-gate-binary-fresh, `--queue-parity` and
   `--declaration-parity` by their parity harnesses — and stating it is what
   stops the class becoming a place to park unreachable code.
+
+  **A *caller* is the requirement; a stored projection is one shape of it, not
+  the shape.** The emit arms that opened this class were all generators of a
+  committed page, so their callers were a regen command and a freshness
+  comparator, and the rule read as if a member owed a projection on disk. It
+  does not. `--emit-close-surfaces`
+  (lifecycle-kit/SPEC.md §The close-surfaces emit arm)
+  is the worked counter-instance: nothing stores its roster and
+  nothing must — the roster's whole value is that it is recomputed at the moment
+  its reader asks, so a surface added yesterday appears today. It is a member in
+  good standing on two live callers, a gate calling it in-process and a stage
+  step running it through the front-end, which is the whole of what this bullet
+  demands.
 
 **An arm receives no configuration, and a member needing some is reached
 through a caller.** The config bridge is built by `gate_command` (§lib/gate.sh)
@@ -1944,7 +1957,9 @@ with its port work named and owed:
   by applying that ruling unchanged. This is a **retirement of the hold's reason,
   not a reversal of the hold**: the member is still unported, and it is now held
   by nothing but its place in the queue.
-- **`check-queue-prose-precondition` — an ERE engine.** It does not *transport*
+- **`check-queue-prose-precondition` — an ERE engine. RETIRED, its port landing
+  in the twelfth cohort below; the grounds are kept because they are what the
+  engine was sized against.** It does not *transport*
   `QUEUE_KIT_PRECONDITION_REGEX` across the bridge, it **interprets** it, and the
   knob is consumer config carrying an arbitrary POSIX ERE; its `awk` also runs
   `gsub` with alternation, groups and negated classes, so porting it means an ERE
@@ -1956,7 +1971,8 @@ with its port work named and owed:
   configured regex is **foreclosed** by the argument criterion 6 already makes for
   globs: the config surface permits what this consumer happens not to write, and a
   narrow reader would silently mis-scan the first consumer who writes it. The
-  engine has landed, so what this member is held on is its own port.
+  engine had landed, so what this member was held on was its own port — and that
+  is the port the twelfth cohort took.
 
 Neither hold is an eligibility screen, and citing it as one inverts the rule §The
 port-candidate criteria denies in its opening sentence and TRAJECTORY.md restates.
@@ -2122,7 +2138,9 @@ cost is recorded with it: the increment ran larger than it was scoped, by one
 wire-format change scope did not see.
 **`check-close-surfaces` is out rather than held**: it sources
 no `lib/stages.sh` at all, so it is *unsized*, and a later selector owes it a
-sizing rather than inheriting a hold whose ground was never established.
+sizing rather than inheriting a hold whose ground was never established. **The
+twelfth cohort below is that later selector, and the sizing it owed is recorded
+there with its cause.**
 
 **The kit and corpus boundaries coincide again, and the sharing claim is weaker
 than queue-kit's — stated so a later selector does not inherit an overstated
@@ -2716,6 +2734,17 @@ three items and no more:
 
 There is no `replace`, no `replace_all`, and no capture-group accessor; adding
 one is a design decision with its own reader rather than an omission to fill in.
+
+**The promotion trigger for a fourth item, recorded rather than left to be
+re-argued.** `check-queue-prose-precondition` ported with **one** reader for
+substitution, and took it as a twelve-line private loop over `find` inside its
+own module rather than as a public engine API — `find` reports leftmost-longest,
+which *is* awk's `gsub` match rule, so the loop is: find in the remaining tail,
+append prefix and replacement, advance past the match, and on an empty match
+advance one character. A **second** ported member needing substitution is what
+promotes that loop into `ere.rs` as its fourth item, with the differential oracle
+below widened to `awk 'gsub(p,r){…}'`. Until then a private loop with one caller
+is cheaper than a public contract with one caller.
 The engine is **byte-wise**, the C-locale semantics the span arithmetic of its
 callers assumes: `find`'s offsets are handed to byte-indexed slicing, and a
 char-wise engine shifts every one of them on a multi-byte glyph. Interval bounds
@@ -2763,7 +2792,21 @@ move the canon-kit cohort made for the default walk. The arm runs under
 **The boundary the cohort applies: a pattern the kit owns is hand-compiled; a
 pattern a consumer supplies goes through the engine.** The prefix strip and the
 inline-code stripper `check-manifest-temporal` applies are substitutions over kit
-literals and port as direct code, which is why the API owes no `replace`. One
+literals and port as direct code, which is why the API owes no `replace`.
+
+**The boundary is refined, not reversed, by the first member to port *after* the
+engine landed.** "Hand-compiled" is a claim about the **substitution**, which
+stays the port's own cheap work; it was never a claim that the port must also
+hand-write a *matcher* for the pattern being substituted. When
+`check-queue-prose-precondition` ported, hand-compiling
+`(once|when|after)[^.,;]*(landed|shipped|merged|resolved|completed|was [a-z]+ed)`
+would have meant writing an alternation, a negated-class gap and a sub-matcher by
+hand with leftmost-longest arbitration, in a gate module, beside a compiled
+matcher that already answers it — roughly forty lines of exactly the code the
+engine exists to stop anyone writing. So a kit-owned pattern **compiles through
+the engine like any other**, and what the member owns is the substitution loop
+around it: a member ports against the engine that has since landed rather than
+around it. One
 deliberate exception buys the span path a production reader:
 `check-install-claim`'s heading extraction routes through `find` rather than a
 second hand-written scanner, so a precommit-tier gate exercises the span API on
@@ -3392,6 +3435,84 @@ much as about the cohort — which is what makes the third identical reading wor
 recording rather than skipping. The consumer-declared ground is restated here
 rather than banked, because it is what makes the zero predictable rather than
 lucky: a residual counts what a consumer *loses*, and no consumer ever had these.
+
+### The twelfth cohort
+
+**Two members, selected by the size arm's group 1 and sharing no blocker.**
+`check-close-surfaces` and `check-queue-prose-precondition` were `--group`'s
+first group at the cut — both `libs=fail_closed globs=-`, both clearing criteria
+2, 3 and 7, neither tripping criterion 4. The arm selected on *shape*, and what
+each member bought is different, which is why this record has two halves rather
+than one shared derivation: `check-close-surfaces` removes a spawned derivation
+from the gate corpus, and `check-queue-prose-precondition` spends the ERE
+matcher on its last held reader.
+
+**The sizing correction the tool does not print, and the general rule behind
+it.** The pair is not what its two gate files measure.
+`check-close-surfaces.sh`
+*spawned* `bin/close-surfaces.sh`, which carried the whole derivation,
+so the cohort was roughly 222 shell lines, unevenly split, with
+`check-queue-prose-precondition` self-contained over a single-file corpus. The
+transferable half is the **cause**: a member's shell-level dependency set is
+measured on the **gate file**, so a gate whose work is behind a spawn reads as
+*unsized* rather than as large — `check-close-surfaces` sourced only
+`lib/gate.sh` while the tool it spawned sourced `lib/stages.sh`. **A spawned
+tool is invisible to every static sizing signal the selector has,
+`port-blockers.sh --group`'s line counts included.** Stated once here rather
+than rediscovered per member; the class is nearly exhausted, and the one
+remaining unrecorded instance is filed rather than fixed here, since it is
+another member's entry.
+
+**A prediction this record corrects, because the oracle overruled it at build.**
+The port was expected to make `check-reads-couples`' coverage assertion run *for
+real* on this member for the first time — it does not, and the reason is
+structural rather than an omission. Both of the derivation's walks hang off a
+**computed base** (the scan-root argument, else the toplevel), and `--reads`
+declares static strings, so each takes the `?` marker and is skipped-and-counted
+exactly as the shell member's unanalyzable walks were. The near miss is worth
+recording: declaring the roster tier as `.` filtered by
+`LIFECYCLE_KIT_ROSTER_BASENAME` — the filter-knob arm's own shape — *compiles and
+reds*, because that spelling claims every tracked `SPEC.md` in the tree including
+the docs mirror's, which this member never reads. A declaration wider than the
+read is not a safe over-approximation here; it is a false claim the coverage
+assertion then holds the gate to.
+
+**The spawn is what the port removes, and the shape it takes is the
+freshness-emitter's.** The derivation became a **non-gate arm**
+(§The non-gate arm, lifecycle-kit/SPEC.md §The close-surfaces emit arm), the
+gate calls it **in process**, and the shell script is deleted. In taking it the
+emit-arm class acquired its first member that is **not** a stored projection,
+which widened that class's caller clause rather than being smuggled past it. The
+in-process call is the point rather than an optimization: it makes
+"the derivation and the gate can never disagree" structural, the same dividend
+the freshness family banked, and it obliges the descriptor to name both crate
+modules under `couples=` or the gate goes untriggered on the edit that breaks it.
+
+**`gsub` is a caller-side loop, and the engine's surface did not move.**
+`check-queue-prose-precondition` runs two substitutions over patterns baked into
+its own source, and the ERE engine has no substitution arm. The ruling — recorded
+with its promotion trigger at §The POSIX ERE matcher — is a twelve-line private
+loop over the existing `find`, not a fourth public item with one caller, and not
+a bespoke hand-written scanner for the second pattern beside a compiled matcher
+that already answers it. `to_ascii_lowercase` and not `to_lowercase`, because a
+Unicode fold can change a string's byte length and desynchronize the offsets that
+loop slices with.
+
+**Both members landed in one commit, and the rule the landing obeys is about a
+member rather than about a commit.** §check-gate-substrate-parity's assertions A
+and B are non-monotone in both directions, so *every intermediate state of a
+staggered landing is red*: a member's descriptor, module, registry entry and
+shell deletion cross together. Two whole members in one commit splits neither, so
+it satisfies the rule the same way two commits would; what the rule forbids is
+splitting one member across commits.
+
+**The price.** Three crate modules, two descriptors, three shell files deleted,
+one renamed SPEC heading with its citations moved, and the generated-projection
+fan-out §Generated projections rosters. Parity was proved by running both
+substrates over the live tree: the arm is byte-identical to the deleted script's
+roster, and the ported precondition gate is byte-identical to the deleted one
+over `TASK-QUEUE.md` and over a crafted corpus reaching the bracket-bridging,
+past-tense-bridging and multi-byte cases the fixture pair does not.
 
 ### What the reverted port established
 

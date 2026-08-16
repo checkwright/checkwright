@@ -118,8 +118,8 @@ fn main() {
         Some(a) => a.as_str(),
         None => {
             eprintln!("checkwright-gates: no subcommand given");
-            eprintln!("  usage: checkwright-gates --list | --reads <gate-name> | --knobs <gate-name> | --source-stamp | --queue-parity <queue-file> | --declaration-parity section <file> <section> | --declaration-parity record <file> | --emit-<projection> | <gate-name> [args...]");
-            eprintln!("  projections: {}", emit::projections().join(", "));
+            eprintln!("  usage: checkwright-gates --list | --reads <gate-name> | --knobs <gate-name> | --source-stamp | --queue-parity <queue-file> | --declaration-parity section <file> <section> | --declaration-parity record <file> | --emit-<arm> | <gate-name> [args...]");
+            eprintln!("  emit arms: {}", emit::projections().join(", "));
             exit(2);
         }
     };
