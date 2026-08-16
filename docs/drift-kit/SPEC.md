@@ -894,8 +894,19 @@ where not-adopted degrades*:
 idiom every other knob here could have used is wrong for this one, because it
 erases the set-ness the two modes are told apart by, turning a consumer that
 never adopted KPIs into a hard failure. Emptiness carries the not-adopted signal
-instead, which is what lets **no reader carry the default**: a reader that had to
-recognise the default path would be a second home for it.
+instead, which is what lets **a reader reached through the bridge carry no
+default**: a reader that had to recognise the default path would be a second home
+for it.
+
+**The default has a second home today, and the scope of the claim above is
+exactly the bridge.** `bin/drift-report.sh` resolves the same knob inline with
+its own copy of the default and is *not* a bridge reader, so it is untouched by
+this library and nothing holds the two literals in lockstep. The duplication is
+real, bounded, and the ordinary transitional state — collapsing it means
+`drift-report.sh` sourcing this library, which would also give it this library's
+refusal where it currently degrades in both modes, a behaviour change outside the
+amendment that introduced this file. It is filed rather than absorbed
+(`drift-kpis-default-two-homes`), not left for a later reader to rediscover.
 
 ## Layout and configuration
 
