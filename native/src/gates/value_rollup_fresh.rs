@@ -1,5 +1,5 @@
 // spec: docs/site-architecture.md §Generated projections and their freshness gates — the
-// value-rollup block in docs/value.md is the byte-fresh projection of gen-value-rollup.sh --emit
+// value-rollup block in docs/value.md is the byte-fresh projection of the value-rollup join
 use crate::fresh;
 use std::path::Path;
 
@@ -54,7 +54,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
     if block != emitted {
         println!(
-            "check-value-rollup-fresh: the value-rollup block in {} is stale vs gen-value-rollup.sh:",
+            "check-value-rollup-fresh: the value-rollup block in {} is stale vs the value-rollup join:",
             projection
         );
         // spec: gate-sdk/SPEC.md §The consumer remainder cohort — both sides are
@@ -64,7 +64,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         return Ok(1);
     }
     println!(
-        "VALUE-ROLLUP-FRESH: clean (the value-rollup block in {} byte-matches gen-value-rollup.sh)",
+        "VALUE-ROLLUP-FRESH: clean (the value-rollup block in {} byte-matches the value-rollup join)",
         projection
     );
     Ok(0)

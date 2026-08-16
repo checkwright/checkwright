@@ -1,2 +1,2 @@
 # graph: couples=docs/value.md,scripts/gates.list,scripts/*.sh,kit:*.sh,scripts/kpis.list,.claude/settings.json,.github/workflows/*.yml,CLAUDE.md,kit:templates/*.md,lifecycle-kit/templates/stages/*.md,native/src/gates/value_rollup_fresh.rs,native/src/fresh.rs,native/src/diff.rs dir=one valve=none tier=precommit
-# spec: docs/site-architecture.md §Generated projections and their freshness gates — the value-rollup block in docs/value.md is the byte-fresh projection of gen-value-rollup.sh --emit
+# spec: docs/site-architecture.md §Generated projections and their freshness gates — the value-rollup block in docs/value.md is the byte-fresh projection of the value-rollup join, which this member calls in-process rather than spawning
