@@ -12,35 +12,6 @@
 
 ## New Features
 
-- **freshness-emitter-port-cohort** [spec: SPEC-emitter-substrate.md] — the generated-projection
-  freshness family is six comparator+emitter pairs, and every emitter is still shell.
-  **WIDENED 3 → 6 at scope 2026-08-15, on a census filed to the survey record** (question: which
-  comparators and emitters are still shell; oracle `bash gate-sdk/bin/port-blockers.sh --group`).
-  The witness was re-run at spec — corpus clean since the recorded rev, oracle verdict unchanged —
-  so the census was cited rather than re-bought.
-  **SCOPED by operator ruling 2026-08-15 to the value-rollup triple**, which is tight rather than
-  merely adjacent: docs/site-architecture.md §Generated projections states `gen-value-rollup.sh`
-  reads the other two emitters **live**, so porting `enforcement-map.sh` (273),
-  `footprint.sh` (129) and `gen-value-rollup.sh` (124) together makes that join in-process — 526
-  lines, plus the two still-shell comparators over them. `gen-docs-mirror.sh`, `trajectory.sh`
-  and `roadmap.sh` stay on this entry for a following cohort, which is why the terminal move here
-  is the **demotion** branch and not a Done move: the deliverable is a six-member corpus and the
-  amendment delivers three.
-  **Selected over the tool's largest advisory group, and the adjudication is recorded because
-  gate-sdk/SPEC.md §The first cohort reserves it to the selecting session:** group 1 is largest at
-  9 but its key is `libs=fail_closed globs=-` with no shared glob walk and visibly divergent
-  member corpora — the null-key residue bucket, not a shared corpus derivation, so the size arm is
-  exhausted a fourth time. This unit rides the documented blocker-retiring override instead.
-  **The design question is ANSWERED at spec and the answer lives in the amendment**, not here: a
-  ported emitter is a non-gate arm of the binary, the class the substrate already runs six arms
-  under and had never named. That retires `check-roadmap-fresh`'s unruled-emitter-design hold on
-  `cohort-held-members-port-prerequisites`, which is what earns the override above.
-  **Cost while deferred:** six shell emitters keep bash in the dependency floor against
-  TRAJECTORY.md objectives 1 and 6, three of them behind already-compiled comparators.
-  Filed 2026-08-15 by close, draining two gap-inbox bullets filed at spec and at build for the
-  same finding; both stated DISTINCT from `consumer-gate-port-disposition`, which the eleventh
-  cohort retired, and the drain confirmed the distinction rather than inheriting it.
-
 - **waiting-rule-carrier-reach** [spec: SPEC-liveness-record.md] — a backgrounded shell producer
   has no liveness record, and the one signal a supervisor trusts is silent about it.
   recurrence: waiting-rule-carrier-reach 2026-08-11 2026-08-15
@@ -100,6 +71,27 @@
 ## Technical Debt
 
 ## Deferred
+
+- **freshness-emitter-port-cohort** [design-pending] — the generated-projection freshness family
+  is six comparator+emitter pairs; **three are now ported and three remain shell**.
+  **Delivered 2026-08-16**: `footprint.sh` (129), `gate-sdk/bin/enforcement-map.sh` (273) and
+  `scripts/gen-value-rollup.sh` (124) are deleted, each emitter now a non-gate arm of the binary,
+  and `check-footprint-fresh`, `check-enforcement-fresh` and `check-value-rollup-fresh` each call
+  their emitter **in-process** rather than spawning it. Each port was held to a byte-identical
+  parity run against the shell emitter *before* the deletion. Two dividends banked: the join is
+  structural (the rollup receives its siblings' data instead of re-parsing their markdown), and
+  `jq` left the battery's own path with the settings-hook rows.
+  **Remaining, and held by nothing but sequence:** `scripts/gen-docs-mirror.sh` (127),
+  `drift-kit/bin/trajectory.sh` (242) and `queue-kit/bin/roadmap.sh` (76), with their comparators.
+  The design question is **answered and merged** — a ported emitter is a non-gate arm
+  (gate-sdk/SPEC.md §The non-gate arm) — so the following cohort applies the ruling rather than
+  re-deciding it, and `check-roadmap-fresh`'s unruled-emitter-design hold is retired as spent.
+  **Why deferred rather than Done:** the deliverable is a six-member corpus and half of it is
+  unbuilt. A Done move would assert a finished port.
+  **Cost while deferred:** three shell emitters keep bash in the dependency floor against
+  TRAJECTORY.md objectives 1 and 6, all three behind already-compiled comparators.
+  Filed 2026-08-15 by close; scoped to the value-rollup triple by operator ruling 2026-08-15 and
+  demoted at build 2026-08-16 having delivered that triple.
 
 - **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
   — the whole battery onto the binary, and the shell surface down to its residue.
