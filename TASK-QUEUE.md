@@ -151,9 +151,19 @@
   **Guardrail carried into the record, and it binds the authoring stage:** if the policy cannot
   be authored *beside* recorded operator-ruled text — if authoring it would narrow or rewrite
   any — that is operator-class and returns to the lead for relay rather than being authored.
-  **The ground it stands on:** neither selection arm survives — the size arm is exhausted
-  (`native-gate-port-remaining-corpus` records it, three cohorts running), and the
-  blocker-retiring override has nothing left to retire among the ready singletons.
+  **The ground it stands on, corrected in place 2026-08-16 at spec on the lead's ruling.** The
+  size arm is exhausted — `native-gate-port-remaining-corpus` records it, three cohorts running —
+  and that half stands. The second half **overstated**: the blocker-retiring override did not
+  have nothing left to retire, it had a live candidate the criteria audit structurally could not
+  see. A shared **implementation primitive** rather than a shared corpus derivation — the crate
+  carries no heading-bounded section walker, and two ready members hand-roll the same one — which
+  `port-blockers.sh --group` cannot report, its key being shell libraries plus globs and those two
+  members sharing no shell library.
+  **Two bounds ride the correction, and neither reopens anything.** The ruling above is
+  **unchanged**: the budget axis is additive either way, which is what makes this a corrected
+  ground rather than a reversal. And the batch `SPEC-tail-batch.md` composes holds both walker
+  members, so it retires that primitive in passing; whether the override arm is live for a
+  *later* batch stays deliberately unsettled, exactly as that amendment states.
   Class: **feature**, settled by the placement ruling. It mints an arm the selecting session must
   honor beside the two gate-sdk/SPEC.md already names, so it is more than a calibration line —
   and it takes **no knob**, refused with grounds in the amendment: a batch size varies by
