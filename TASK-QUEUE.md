@@ -1611,15 +1611,12 @@
   accepts a stage stamp that lands **after** commits already made under it, so
   the stamp proves invocation but not that it preceded the work it authorizes.
   recurrence: stage-stamp-ordering-unenforced 2026-08-07 2026-08-16
-  **Observed with the battery green throughout.** At the 2026-08-07 firing a build
-  batch stamped `.workflow/WORKFLOW-STATE.txt` as its *third* commit, after two commits
-  had already landed build-stage edits under that unstamped entry. Nothing caught
-  it — not `check-stage-evidence`, not `check-stage-entry`, not the pre-commit
-  hook. Batch 2 stamped first and **the difference was invisible to every gate**,
-  which is the point: the ordering is session discipline with no oracle, while
-  `lifecycle-kit/templates/stages/build.md` states the stamp as the "First step"
-  and says to commit it on its own. The prescription exists; only enforcement is
-  missing.
+  **Observed with the battery green throughout.** At the 2026-08-07 firing a build batch stamped
+  `.workflow/WORKFLOW-STATE.txt` as its *third* commit, after two commits had already landed
+  build-stage edits under that unstamped entry. Batch 2 stamped first and **the difference was
+  invisible to every gate** — which gates, and why, is the cause paragraph's below. The ordering
+  is session discipline with no oracle, while `lifecycle-kit/templates/stages/build.md` states
+  the stamp as the "First step" and says to commit it on its own; only enforcement is missing.
   **The mechanism, run rather than observed (folded in 2026-08-02 from the gap
   inbox; the text above states the symptom, this states the cause).** Both gates
   are path-coupled in the generated pre-commit hook — the couple set is
@@ -1654,6 +1651,9 @@
   Class: mints a gate name if the oracle lands, so canon-kit/SPEC.md's new-names
   litmus makes it a **feature** on that path; debt only if it lands as an
   assertion inside `check-stage-evidence`. The promoting scope call settles it.
+  **Deferred 2026-08-16 at scope on the lead's ruling despite the threshold:** the couple sets
+  re-verified live (both exactly `TASK-QUEUE.md,.workflow/WORKFLOW-STATE.txt`), but the cheap
+  half and the history assertion are one design fork rather than two units.
   Filed 2026-08-01 at close from the gap inbox; build filed it against its own
   batch-1 stamp.
 
@@ -2955,21 +2955,22 @@
   question this entry flagged is settled and no longer part of it.
   **Why `[design-pending]` still.** What survives the ruling is the enforcement question the
   ruling deliberately did not answer: given that prose alone does not hold, what does.
-  `poll-sleep-guard-steer` is the same rule from the side that *does* leave a tracked
-  artifact, so a scope taking either should cost both; `waiting-rule-carrier-reach` is the
-  question of which sessions the prose even reaches, and the two firings stamped above are
-  its evidence rather than this entry's.
+  `waiting-rule-carrier-reach` owns which sessions the prose even reaches, and the two firings
+  stamped above are its evidence rather than this entry's.
   **Cost while deferred:** the project's only evidence that prose-alone enforcement fails is
   an anecdote spread across six firings' histories, and each further firing costs an orphaned
   producer plus the lead turn that discovers it.
   **Its own coupling claim was ENGAGED, and the disposition is DECLINE — recorded 2026-08-15 at
   scope so the next reader finds a considered call instead of re-deriving the coupling.** The
-  clause is this entry's own, seven lines up: `poll-sleep-guard-steer` "is the same rule from the
-  side that *does* leave a tracked artifact, so a scope taking either should cost both". That
-  scope took `poll-sleep-guard-steer`, so the clause fired on its own terms. That decline was
-  **not** a recurrence-threshold call — the entry stood at one stamped date then. It stands at
-  two since 2026-08-16, stamped threshold-reached, so the threshold rule now reaches it and the
-  decline above does not answer that. Corrected at the 2026-08-16 scope; the decline stands.
+  clause was this entry's own: `poll-sleep-guard-steer` "is the same rule from the side that
+  *does* leave a tracked artifact, so a scope taking either should cost both". That scope took
+  it, so the clause fired on its own terms and is retired above as spent. That decline was not a
+  threshold call — the entry stood at one date then; it stands at two since 2026-08-16.
+  **Declined a second time 2026-08-16 at scope on the lead's ruling:** nothing buildable — the
+  surviving question is the enforcement design the 2026-08-06 operator ruling left open, and its
+  design half `turn-end-chokepoint-and-wait-primitive` turns on whether a `Stop` hook can see a
+  live background child, a settings probe rather than a command. **A third threshold recurrence
+  routes to the operator, not to a third decline** — two is where lead discretion ends.
   **Costed and declined as not-yet-designable, never as unimportant.** The operator ruled a
   narrowed bundle on 2026-08-15: `poll-sleep-guard-steer`, `waiter-predicate-self-match`,
   `harness-wait-primitive-unnamed`. Those three are one causal chain — unnamed primitive, then
@@ -3899,6 +3900,17 @@
   **Cost while deferred:** low, recurring, and paid by every close — three entries re-read and
   one rule re-derived per iteration, forever, against a one-predicate fix. Re-measured at the
   2026-08-13, 2026-08-15 and 2026-08-16 closes: precision has been zero four times running.
+  **Deferred 2026-08-16 at scope on the lead's ruling, though the threshold rule reached it, and
+  the ground is substrate rather than merit.** The claim re-verified live at that scope — the
+  worklist offered 4 rows, 3 roadmap-tagged, precision zero a fourth time, and a grep of the
+  tool finds no `roadmap` token in the candidate filter at all. But the fix lands in
+  `queue-kit/bin/queue-index.sh`, a 182-line shell **bin tool**, and the 2026-08-09 priority
+  directive commits to deleting the shell runners as well as the gates
+  (TRAJECTORY.md §PRIORITY DIRECTIVE). A bash predicate patched into it is work the port throws
+  away. What that argues for is bundling: take this defect with the tool's own port to a
+  non-gate arm (gate-sdk/SPEC.md §The non-gate arm, the shape `roadmap.sh` already has queued),
+  not alone. The 2026-08-14 born-native default does **not** reach it — that default governs
+  gates, and this is a bin tool — so the coupling is to the directive, not to that ruling.
   Filed 2026-08-09 by close (`install-profile-seam`) from its own backlog-eviction step;
   a duplicate filing of the same finding (`icebox-candidate-roadmap-filter`, 2026-08-13) was
   merged in here at the 2026-08-13 close, which also filed
@@ -6127,28 +6139,43 @@
 - **port-tail-cohort-batching-policy** [design-pending] — port cohorts have been composed around
   a shared derivation, the tail no longer offers one, and nothing states what sizes a cohort
   instead.
-  **Probed at this boundary, not inherited:** `bash gate-sdk/bin/port-blockers.sh --group`
-  partitions the 45-gate remainder into 37 groups — 34 singletons, two pairs, and one 7-member
-  group. The amortization every prior cohort was composed on (one derivation or one engine, several
-  gates riding it) therefore survives for exactly one group.
+  **Probed at this boundary, then corrected at the same scope:** `port-blockers.sh --group`
+  partitions the 45-gate remainder into 37 groups — 34 singletons, two pairs, one 7-member group
+  — and **not one of them is a takeable cohort**. gate-sdk/SPEC.md:2371-2379 rules that 7-member
+  key out (operator-ruled 2026-08-14: `fail_closed` derives no corpus, so its members share the
+  *absence* of one), and each pair holds a member the port does not take. Amortization is spent,
+  not thin — a stronger finding than the one this entry was filed on hours earlier.
   **Why that is an economics defect and not merely a fact about the gates:** iteration overhead is
   fixed and large. Of the 529 commits since 2026-08-08, 360 are `chore` — the stage-lifecycle
   ceremony — against 81 `feat`, 27 of which name the port. A one-group cohort buys one ported gate
   for a whole iteration's ceremony, and 34 singletons at that rate is 34 iterations against a
   standing ASAP directive (TRAJECTORY.md §PRIORITY DIRECTIVE — the port track's sequence).
-  **What the unit owes:** a stated cohort-sizing rule for the tail — size by blocker retirement
-  plus an iteration budget, taking several groups per iteration — and a ruling on which surface
-  owns it. The candidates are lifecycle-kit's scope template (iteration composition is already its
-  economic-composition test), gate-sdk/SPEC.md §Porting a gate to the binary substrate (which owns
-  cohort procedure), or this repo's own trajectory record (which owns the port sequence). Each
-  gives the rule a different reach: the first binds every consumer's iteration, the second binds
-  only porting, the third binds only this tree.
+  **What the unit owes, now that the sizing half is ruled below:** the *placement*. The candidates
+  are lifecycle-kit's scope template (iteration composition is already its economic-composition
+  test), gate-sdk/SPEC.md §Porting a gate to the binary substrate (which owns cohort procedure),
+  or this repo's own trajectory record (which owns the port sequence) — the first binds every
+  consumer's iteration, the second binds only porting, the third binds only this tree.
   **Why `[design-pending]`:** the placement is the question, not the arithmetic, and the widest
   candidate is the one the provenance seam bears on — a batching rule stated as generic mechanism
   is kit content, while a rule naming the port's remainder is this repo's rule content.
   **Cost while deferred:** each scope session re-derives the tail's shape from `--group` and picks
   a cohort size unaided, so the sizing is decided identically and invisibly every iteration, and
   the composition test in the scope contract keeps being answered from first principles.
+  **The composition question is RULED, 2026-08-16, lead-class — and the ruling is what this unit
+  now authors rather than re-decides.** The tail gets an **additive second composition axis**: an
+  iteration may take N unrelated single-gate ports sized by iteration budget, each entering as an
+  independent unit proved on its own parity run, **never as one cohort**. Nothing is reversed —
+  the `libs=fail_closed globs=-` group stays not-a-cohort (gate-sdk/SPEC.md:2371-2379,
+  operator-ruled 2026-08-14), the shared-derivation rule stands wherever it still selects, and
+  the budget axis serves the 2026-08-09 ASAP directive rather than re-scoping it. Ruled after the
+  scope session flagged it as possibly operator-class and the lead tested that reading against
+  both records.
+  **Guardrail carried into the record, and it binds the authoring stage:** if the policy cannot
+  be authored *beside* recorded operator-ruled text — if authoring it would narrow or rewrite
+  any — that is operator-class and returns to the lead for relay rather than being authored.
+  **The ground it stands on:** neither selection arm survives — the size arm is exhausted
+  (`native-gate-port-remaining-corpus` records it, three cohorts running), and the
+  blocker-retiring override has nothing left to retire among the ready singletons.
   Class: mints no name if it lands as a calibration line on an existing surface — **debt**; a
   stated iteration budget with a knob makes it a **feature**, and the placement ruling decides
   which.
