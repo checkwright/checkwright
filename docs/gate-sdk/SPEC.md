@@ -1074,6 +1074,23 @@ a front-end that already sources the shell library — the battery runner among
 them — supplies the bridged environment in front of it. What the class forbids
 is a *second* entry point into the emission path, not a caller.
 
+**A gate that reaches an arm in-process acquires a source coupling its
+descriptor must carry, and the trigger set does not follow the port on its
+own.** In the shell form a comparator spawned its emitter, and the spawn was
+invisible to the `# graph:` manifest — a coupling nothing could have declared,
+because the manifest names tracked paths and a subprocess is not one. In the
+compiled form the same relationship is a function call across crate modules, and
+it *is* nameable: the callee's module is a tracked source file whose edit changes
+the caller's verdict. So the porting session owes the descriptor every module its
+gate reaches, transitively, including a module shared by both sides of a compare.
+Omitting them leaves the gate registered and green while the projection it holds
+goes stale at commit time, because the generated hook's `staged_matches` trigger
+is derived from `couples=` — the gate simply never runs on the edit that broke
+it, and only a full battery finds it. Stated here rather than in a member's own
+row because it is a property of the port, not of any one gate: every remaining
+member of the freshness family acquires it the moment its emitter lands in the
+crate beside it.
+
 ### The port-candidate criteria
 
 **These seven are an engineering roster and an ordering signal, never an

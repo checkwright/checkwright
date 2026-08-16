@@ -3865,7 +3865,7 @@
   rule categorically excludes.
   queue-kit/SPEC.md §The icebox tier states that a roadmap-tagged entry is not
   icebox-eligible — a hard rule, not a judgment. The worklist does not read the tag.
-  recurrence: icebox-worklist-roadmap-blind 2026-08-15
+  recurrence: icebox-worklist-roadmap-blind 2026-08-15 2026-08-16
   **Measured this close: 3 of 3 offered candidates carried a roadmap tag**
   (`plugin-marketplace`, `benchmark-ab-experiment`, `hosted-attestation-service`), so the
   worklist's precision was zero and every row was resolved by re-deriving the same exclusion.
@@ -3883,9 +3883,15 @@
   print as a stated exclusion. Vanishing is cleaner; printing keeps the reason visible to a close
   that would otherwise wonder where a long-dormant roadmap entry went, and the answer turns on
   whether anything else already tells that story.
+  **The predicate is wider than the tag, established 2026-08-16 and it changes the deliverable.**
+  That close was offered **4** rows, not 3, and the fourth (`rendered-site-link-monitor`) carries
+  no roadmap tag — it is excluded by the tier's *other* categorical clause, a named event waiting
+  to promote it, which the entry states in prose the tool cannot parse. So a roadmap-tag filter
+  alone would have left precision at 1-in-4 rather than fixing it, and the unit must either take
+  both clauses or say why the machine-readable one is worth taking alone.
   **Cost while deferred:** low, recurring, and paid by every close — three entries re-read and
   one rule re-derived per iteration, forever, against a one-predicate fix. Re-measured at the
-  2026-08-13 and 2026-08-15 closes: the same 3 rows both times, so precision has been zero thrice.
+  2026-08-13, 2026-08-15 and 2026-08-16 closes: precision has been zero four times running.
   Filed 2026-08-09 by close (`install-profile-seam`) from its own backlog-eviction step;
   a duplicate filing of the same finding (`icebox-candidate-roadmap-filter`, 2026-08-13) was
   merged in here at the 2026-08-13 close, which also filed
@@ -6080,6 +6086,36 @@
   **Cost while deferred:** every close either stamps the class on evidence it cannot read or
   leaves it unstamped and accruing, and neither is a verdict.
   Filed 2026-08-16 by close, from the audit it could not discharge.
+
+- **in-crate-module-coupling-derivation** [design-pending] — a ported gate's descriptor can omit
+  the crate modules its own verdict depends on, and no gate says so.
+  **Attested this iteration, twice, and neither instance was found by a gate.**
+  `check-value-rollup-fresh`'s module calls `enforcement_map::measure()` and
+  `footprint::measure()` in-process, but its `couples=` named none of the three `emit/` modules;
+  the lead found it by reading, and the fixing session found a **fourth** module the lead had
+  missed (`native/src/marker.rs`, used on both sides of the compare, so a `read_block` change
+  moves the verdict). Its two sibling members had their descriptors updated at port time, so the
+  omission was inconsistent with the pattern the same cohort established.
+  **Why it is silent rather than loud:** the generated pre-commit hook derives its
+  `staged_matches` trigger from `couples=`, so an under-declared descriptor means the gate never
+  runs on the edit that broke its projection. It passes because it did not execute. Only a full
+  battery reaches it, and `run-gates.sh --for <path>` targeting misses it too.
+  **`check-reads-couples` does not reach this**, and the distinction is the design's crux: that
+  gate covers **walk roots** — what a gate reads off the filesystem — and an in-process call to a
+  sibling module changes no walk root at all. This is a *source* coupling, a different axis.
+  **Why `[design-pending]`, though the derivation looks easy:** a `--deps` arm reporting each
+  gate module's transitive in-crate dependencies is the obvious producer and has a precedent in
+  `--reads` (§The non-gate arm), but transitive closure over a shared crate reaches `walk.rs`,
+  `proc.rs` and every common helper, so a literal reading couples every gate to most of the
+  crate and the trigger set stops discriminating. Where to cut — a declared boundary set, or
+  first-party modules only, or the emit/marker layer alone — is the unit's real question.
+  **Cost while deferred:** paid once per remaining member of the freshness family as its emitter
+  lands in the crate beside it, and paid as a stale published projection rather than a red. The
+  interim is prose: gate-sdk/SPEC.md §The non-gate arm now states the obligation.
+  Class: mints a gate name if it lands as one, so canon-kit/SPEC.md's litmus makes it a
+  **feature**; debt only as an assertion folded into an existing meta-gate.
+  Filed 2026-08-16 by close, from the lesson the porting cohort generalized rather than from a
+  fresh finding — the two instances are already fixed.
 
 ## Icebox
 
