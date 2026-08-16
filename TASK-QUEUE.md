@@ -4437,9 +4437,8 @@
   recurrence: entry-cap-displaces-mandated-writes 2026-08-15 2026-08-16
   **Four firings on 2026-08-15 against a promotion threshold of 2** — an 11-line cull at scope
   (both entries left at 49/50) and three over two build batches — plus a fifth to seat this line.
-  **First recorded instance:** `deferred-release-declaration-accumulation`'s 2026-08-09 deferral,
-  whose declarations "could not land here at all" and rode a disposition line instead — **"chosen
-  by the cap rather than by design"**.
+  **First recorded instance:** `deferred-release-declaration-accumulation`'s 2026-08-09 deferral —
+  declarations that "could not land here at all", **"chosen by the cap rather than by design"**.
   **The obligatory-write instance is the sharp one.** The gap-inbox drain
   (lifecycle-kit/SPEC.md §The committed gap inbox) *must* append a `recurrence:` date in the
   commit that truncates the inbox — that commit is the audit artifact, so the write is neither
@@ -4467,15 +4466,16 @@
   right. Exempt the `recurrence:` line from the count (cheapest, and defensible since it is
   machine-written and fixed-width, but it exempts the one line that grows without bound as
   dates accumulate). Make an at-cap entry with a fresh recurrence an automatic *promotion*
-  signal rather than a compression prompt — arguably the honest reading, since thirteen
-  instances is a unit asking to be scheduled, not an entry asking to be trimmed. Or let the
-  drain relocate grounds to a linked entry under a standing authorization, which is the relief
-  the gate names and the one currently unavailable to the session that needs it.
+  signal rather than a compression prompt — the honest reading, since a count this high is a
+  unit asking to be scheduled, not one asking to be trimmed. Or let the drain relocate grounds
+  to a linked entry under a standing authorization, the relief the gate names and withholds.
   **Cost while deferred:** paid every close that drains a recurrence onto a mature entry, and
   paid as a *quiet* loss — the stamp lands, the gate goes green, and the grounds that would
-  have justified promoting the entry are the thing that got cut. Both instances so far were
-  resolved by displacing content into a commit message or a disposition line, i.e. out of the
-  surface a ranking scope actually reads.
+  have justified promoting the entry are the thing that got cut. **A third displacement shape
+  appeared 2026-08-16 and it is the worst of the three:** at ~47/50 lines,
+  `waiting-rule-fourth-firing-post-fix` could not hold its own design half, so close filed it
+  as a *separate entry*. A commit message is at least out of the ranking surface honestly; a
+  new entry is *in* it, competing with its own parent for the scope attention that ranks both.
   Filed 2026-08-12 by close, from the cap it hit while discharging its own drain contract.
 
 - **throughput-and-wait-time-unmeasured** [design-pending] — nothing splits session wall-clock
