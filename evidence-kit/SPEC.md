@@ -373,6 +373,18 @@ no matching file, or a file with no baseline line, reddens). Argument mode
 liveness and coverage branches beyond the one good/bad pair are covered by
 `gate-tests/check-evidence-baseline.test.sh`.
 
+**The gate dispatches to the binary substrate** — `checks/check-evidence-baseline.gate`
+to `native/src/gates/evidence_baseline.rs`, the shell script deleted — and asserts
+nothing new. It was held on the config bridge's want of a key channel, since
+`EVIDENCE_KIT_SCENARIO_GLOBS` is read **by key** (gate-sdk/SPEC.md §lib/gate.sh,
+the keyed arm that retired the hold), and it is this kit's first compiled member.
+**Where the non-empty keyed map is actually exercised is a caveat worth stating
+rather than discovering.** A consumer configuring no scenario glob resolves the
+kit default — an empty map — so its whole battery crosses the *empty* arm and a
+defect in the keyed wire would pass it; the non-empty arm is exercised by the
+coverage case in this gate's own behavioral test, which is therefore the
+load-bearing evidence for it rather than an extra scenario.
+
 ### check-evidence-manifest
 
 Invariant: the evidence manifest is well-formed and, where lifecycle drives the

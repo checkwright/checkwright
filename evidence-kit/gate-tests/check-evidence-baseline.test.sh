@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Behavioral test of checks/check-evidence-baseline.sh — the slug-liveness and
+# Behavioral test of check-evidence-baseline — the slug-liveness and
 # scenario-coverage branches the one good/bad pair (grammar) cannot hold: a Done
 # slug is stale-red, an unknown slug is red, a permanent marker is accepted, and
 # a configured scenario glob asserts manifest↔disk set equality both ways.
@@ -9,7 +9,6 @@ set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # evidence-kit/
-GATE="$DIR/checks/check-evidence-baseline.sh"
 
 fails=0
 tmp="$(mktemp -d)"
@@ -20,7 +19,7 @@ case_run() {
     local name="$1" base="$2" queue="$3" want="$4" expect="$5" out rc
     printf '# fixture\n%b' "$base" >"$tmp/base.txt"
     printf '%b' "$queue" >"$tmp/queue.md"
-    out="$("$GATE" "$tmp/base.txt" "$tmp/queue.md" 2>&1)"; rc=$?
+    out="$(gate_run check-evidence-baseline "$DIR/checks" "$tmp/base.txt" "$tmp/queue.md" 2>&1)"; rc=$?
     if [[ "$rc" -ne "$want" ]]; then
         echo "  FAIL: $name expected exit $want, got $rc: $out"; fails=$((fails + 1)); return
     fi
@@ -55,7 +54,9 @@ _perm_cfg() {
     printf 'EVIDENCE_KIT_PERMANENT_SLUGS=(forever)\n' >"$d/scripts/evidence-config.sh"
     printf '# fixture\nu a ignore forever\n' >"$d/base.txt"
     printf '## New Features\n- **unrelated** — x\n' >"$d/queue.md"
-    ( cd "$d" && env -u EVIDENCE_KIT_CONFIG_FILE GATE_SDK_GATES_DIR=scripts "$GATE" base.txt queue.md 2>&1 )
+    ( cd "$d" && unset EVIDENCE_KIT_CONFIG_FILE \
+        && gate_env GATE_SDK_GATES_DIR=scripts \
+        && gate_run check-evidence-baseline "$DIR/checks" base.txt queue.md 2>&1 )
 }
 if ! out="$(_perm_cfg)" || ! grep -qF "clean" <<<"$out"; then
     echo "  FAIL: permanent-marker not accepted: $out"; fails=$((fails + 1))
@@ -68,7 +69,9 @@ _cov_cfg() {
     printf 'declare -A EVIDENCE_KIT_SCENARIO_GLOBS=([sx]="scen/*.txt")\n' >"$d/scripts/evidence-config.sh"
     : >"$d/scen/a.txt"; : >"$d/scen/b.txt"
     printf '# fixture\nsx a.txt pass\n' >"$d/base.txt"
-    ( cd "$d" && env -u EVIDENCE_KIT_CONFIG_FILE GATE_SDK_GATES_DIR=scripts "$GATE" base.txt 2>&1 )
+    ( cd "$d" && unset EVIDENCE_KIT_CONFIG_FILE \
+        && gate_env GATE_SDK_GATES_DIR=scripts \
+        && gate_run check-evidence-baseline "$DIR/checks" base.txt 2>&1 )
 }
 if out="$(_cov_cfg)"; then
     echo "  FAIL: coverage gap (extra on-disk scenario) did not redden: $out"; fails=$((fails + 1))

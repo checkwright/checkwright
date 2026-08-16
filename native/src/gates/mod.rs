@@ -13,6 +13,7 @@ pub mod docs_kit_parity;
 pub mod docs_mirror_fresh;
 pub mod docs_nav_reachable;
 pub mod enforcement_fresh;
+pub mod evidence_baseline;
 pub mod footprint_fresh;
 pub mod install_toolchain;
 pub mod installer_no_deps;
@@ -631,6 +632,21 @@ pub const REGISTRY: &[GateEntry] = &[
             "LIFECYCLE_KIT_GAP_INBOX_FILE",
         ],
         "lifecycle-kit",
+    ),
+    // spec: gate-sdk/SPEC.md §check-reads-couples — `?` because the walk's root is decided by
+    // the glob knob's values, which the queue-kit cohort's prose-surface member already rules
+    // undecidable statically for the same reason.
+    (
+        "check-evidence-baseline",
+        evidence_baseline::run,
+        &[("?", "")],
+        &[
+            "EVIDENCE_KIT_BASELINE_FILE",
+            "EVIDENCE_KIT_QUEUE_FILE",
+            "EVIDENCE_KIT_SCENARIO_GLOBS",
+            "EVIDENCE_KIT_PERMANENT_SLUGS",
+        ],
+        "evidence-kit",
     ),
     // spec: gate-sdk/SPEC.md §check-reads-couples — the filter-knob arm's first live instance:
     // assertion C's two whole-tree scans are one root selected by two knob values, and a literal

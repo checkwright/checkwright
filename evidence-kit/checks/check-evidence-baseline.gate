@@ -1,0 +1,3 @@
+# graph: couples=.workflow/validate-baseline.txt,TASK-QUEUE.md dir=one valve=none tier=precommit
+# install: zero-config
+# spec: evidence-kit/SPEC.md §check-evidence-baseline — held-constant baseline grammar, blocking-slug liveness, and (when scenario globs are configured) manifest↔disk set equality

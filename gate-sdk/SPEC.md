@@ -1751,7 +1751,11 @@ criteria-clearing members, taken as N independent units*, sized against the
 iteration's own budget. Precedence across the three is total and is read off a
 run rather than off a preference. The size arm selects first; the
 blocker-retiring override outranks it wherever a blocker several members are
-queued behind can be retired; the budget arm is reachable **only** when a `bash
+queued behind can be retired — the keyed-knob increment is its second live
+instance and its smallest, a pair of members in separate kits behind one
+wire-format change, which is the shape the override is *for* rather than a weak
+case of it;
+the budget arm is reachable **only** when a `bash
 gate-sdk/bin/port-blockers.sh --group` run reports no takeable group — so its
 precondition is a verdict from the instrument this section already names for the
 size arm, never a session's reading of the tree. Shared derivation is the axis
