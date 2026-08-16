@@ -3944,7 +3944,7 @@
   both clauses or say why the machine-readable one is worth taking alone.
   **Cost while deferred:** low, recurring, and paid by every close — three entries re-read and
   one rule re-derived per iteration, forever, against a one-predicate fix. Re-measured at the
-  2026-08-13, 2026-08-15 and 2026-08-16 closes: precision has been zero four times running.
+  2026-08-13, 2026-08-15, 2026-08-16 and 2026-08-17 closes: precision has been zero five running.
   **Deferred 2026-08-16 at scope on the lead's ruling, though the threshold rule reached it, and
   the ground is substrate rather than merit.** The claim re-verified live at that scope — the
   worklist offered 4 rows, 3 roadmap-tagged, precision zero a fourth time, and a grep of the
@@ -6177,6 +6177,39 @@
   Class: lands as a gate assertion, so canon-kit's litmus makes it **debt**.
   Filed 2026-08-16 at spec from the amendment's own residue section; drained and promoted
   2026-08-17 by close.
+
+- **kit-bin-entry-point-unrostered** [design-pending] — no surface says which kit owns which
+  `bin/` entry point, so a session guesses the path and buys an out-of-band decision per guess.
+  **Measured at this close's triage, off the log rather than from impression.** Five prompting
+  calls this iteration invoked a kit-bin path that does not exist, across three sessions:
+  `canon-kit/bin/md-section.sh` and `gate-sdk/bin/section.sh` (three calls) for the extractor
+  context-kit actually owns, `lifecycle-kit/bin/drain-stage.sh` for the gating read that
+  `enter-stage.sh --simulate` performs, and a `scripts/checks/` path for a shell gate this
+  iteration's own port had already deleted. The correct `context-kit/bin/md-section.sh` appears
+  three times in the same log, so the *script* is known and its *owning kit* is what gets guessed.
+  **What this entry is NOT.** Not every invented form at the triage. `run-gates.sh <gate-name>`
+  was also tried and is a habit rather than a hole: the positional argument is a gates-dir and
+  the path-scoped selector is owned in prose by gate-sdk/SPEC.md §run-gates. Only the cross-kit
+  ownership fact is genuinely unowned — each kit SPEC documents its own `bin/` members and
+  nothing spans them.
+  **Three candidate closes, disagreeing on tier.**
+  (a) A generated roster projection, freshness-gated like every other — derivation-first, since
+  one listing derives it; costs a projection and its whole staling fan-out for a rarely-read fact.
+  (b) A convention on an always-loaded surface telling a session to list before invoking — free
+  to build and a permanent per-session tax, the shape the brevity machinery exists to reject.
+  (c) A `bash-guard.sh` steer: an invocation naming a kit-bin path that does not exist gets the
+  real owner back, found by basename. Enforcement-first — it fires at the moment of the guess,
+  costs no resident bytes, and the guard is already wired into every session.
+  **Why `[design-pending]`:** (c) dominates on cost but has the guard answering a *discovery*
+  question rather than steering a form, which is a widening of what that instrument is for, and
+  that is the operator's call rather than this entry's.
+  **Cost while deferred:** about one out-of-band decision per guess, five this iteration, paid by
+  whichever session reaches for a kit tool it has not used recently — and the guesses land as
+  silent no-ops where the session falls back to grep instead of noticing.
+  Class: mints no governed name and adds no gate in arms (b) and (c), so canon-kit's litmus makes
+  it **debt**.
+  Filed 2026-08-17 by close from its own tooling-friction and knowledge-friction triages; each of
+  the five paths was probed for existence before the count was asserted.
 
 
 ## Icebox
