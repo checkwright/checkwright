@@ -4496,7 +4496,7 @@
 
 - **entry-headroom-unexposed** [design-pending] — the cap is enforced by a gate and exposed by
   nothing, so every session sizing an edit hand-rolls the measurement it then trusts.
-  recurrence: entry-headroom-unexposed 2026-08-15
+  recurrence: entry-headroom-unexposed 2026-08-15 2026-08-16
   **2026-08-15: defects 1 and 2 both recurred, 2 in its documented broken form.** Seven `python3`
   heredocs across that iteration's scope and build sessions re-implemented the entry walk, several
   terminating on the next `- **` — the predicate defect 3 below proves wrong at a section
@@ -5084,6 +5084,7 @@
 - **scratch-execution-control-is-bash-only** [design-pending] — the scratch-run steer and the
   runner it steers to are both bash-only, so a non-bash scratch script executes with no
   compensating control at all.
+  recurrence: scratch-execution-control-is-bash-only 2026-08-16
   `scripts/bash-guard.sh` blocks a direct scratch run by matching `^bash[[:space:]]+\.tmp/`, and
   `guard-kit/bin/scratch-run.sh` executes its target with a hardcoded `bash`. Neither reaches a
   script run under another interpreter. Probed at the 2026-08-13 close against the guard itself:
@@ -6135,6 +6136,41 @@
   Class: changes a reporting tool's output rather than minting a governed name, so canon-kit's
   litmus makes it **debt**; a feature only if arm (3) mints a descriptor field.
   Filed 2026-08-16 by close from the gap inbox (bullet dated 2026-08-16, filed at scope).
+
+- **session-mechanic-grants-uncommitted** [design-pending] — the committed allowlist grants none
+  of the session mechanics the methodology itself mandates, so every session pays out-of-band
+  decisions for doing what its own templates tell it to do.
+  **Measured at this close's tooling-friction triage, from the log rather than from impression.**
+  `scan-prompts.sh` ranks 122 prompting calls across 41 patterns from 519 fall-throughs, and the
+  single largest pattern is `cat` at 28 — of which **21 are `cat >`/`cat >>`**, the heredoc append
+  into a gitignored `.tmp/` resume journal that delegation-kit/SPEC.md §Resume journal — agent
+  writes, scratch reset sweeps requires of every mutating agent. One mandated mechanic, 21
+  out-of-band decisions, one iteration.
+  **The three dispositions disagree, which is why this is a unit and not a pruning chore.**
+  (a) *Grant* `cat >>` into the scratch dir: cheapest, and the write target is disposable and
+  boundary-wiped — but widening the committed set is the consumer's call, never a session's, and
+  the glob has to be narrow enough that it cannot reach a tracked path.
+  (b) *Steer* to `Write`/`Edit`, the shape `guard_rule_sed_file` already uses for reads: those
+  tools never prompt and keep the harness's file view current — but an append through `Edit`
+  costs an anchor match and through `Write` costs re-emitting the whole journal, so the steer
+  trades a permission decision for tokens on a file that only grows.
+  (c) *Convention* in `templates/agent-execution.md`'s journal bullet: free, and the weakest.
+  **The second half is the overlay-only oracles.** `scan-prompts.sh`'s overlay report shows 22
+  calls across 11 patterns granted by nothing committed — `bash scripts/measured-claims.sh` (the
+  repo's own measured-claim oracle, 5), `cargo test`, `cargo build`. Each is read-only or a build
+  of the tree's own crate, each recurs every port iteration, and each works today only because
+  one clone carries an uncommitted overlay: a fresh clone re-buys every decision.
+  **What this entry is NOT.** It is not the friction itself — the dominant *cause* of prompting
+  this iteration was decoration, already-granted commands chained or piped so the matcher never
+  reaches them, which `bash-guard.sh` already steers and which no grant can fix. That is a habit,
+  stated at the triage and not filed. This entry is only the grants that are genuinely absent.
+  **Why `[design-pending]`:** (a) versus (b) is a real trade with no dominant arm, and (a) needs
+  an operator decision this entry cannot make for them.
+  **Cost while deferred:** roughly one out-of-band decision per journal write, paid by every
+  dispatched session in every iteration, plus a fresh clone with no working oracle grants.
+  Class: mints no governed name and adds no gate, so canon-kit's litmus makes it **debt**.
+  Filed 2026-08-16 by close, from its own tooling-friction triage; counts read off
+  `scan-prompts.sh` at the triage rather than estimated.
 
 
 ## Icebox
