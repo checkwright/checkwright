@@ -46,9 +46,9 @@
   cohort; ruled `keyed-knob-bridge`'s increment 2026-08-16 by the lead under gate-sdk/SPEC.md
   §The first cohort's blocker-retiring override, reachable because no larger cohort is.
   **Promoted 2026-08-16 at spec**; SPEC-keyed-knob.md owns the wire grammar and both ports.
-  Authoring found the hold understated: `--reads` cannot express a walk's name filter either,
-  and a descriptor has no exemption, so `check-stage-entry` owes a **second** channel. The
-  amendment designs it and carries it; whether this increment splits instead is the lead's.
+  Authoring found the hold understated: `--reads` cannot express a walk's filter either, and a
+  descriptor has no exemption, so `check-stage-entry` owes a **second** channel. **This
+  increment carries it — lead-ruled 2026-08-16**, the split refused with grounds in §5b.
   **Cost of the remainder:** `native-gate-port-remaining-corpus` ranks the remaining corpus as
   undifferentiated gate-count, so a held member reads as one more unported gate when its
   prerequisite is a sub-project. A later cohort discovers the sizing at implementation

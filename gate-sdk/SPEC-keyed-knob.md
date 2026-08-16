@@ -7,9 +7,9 @@ hold is one prerequisite shared by two members in two kits
 increment: a bridge arm with no member reading it would be an unread interface.
 
 Authoring found a **second** missing channel of the same class — `--reads` cannot
-express the name filter a ported walk needs, and the descriptor has no exemption
-to fall back on. It is ruled in §5b, where the design has one spec-compatible arm
-and the scope half is the lead's.
+express the filter a ported walk needs, and the descriptor has no exemption to
+fall back on. It is delta 5b, and **this increment carries it**: design and scope
+both closed, the scope half lead-ruled 2026-08-16.
 
 ## What changes
 
@@ -211,24 +211,32 @@ using it to evade the assertion is opting out spelled in code, and it silently
 narrows assertion C to **tracked** amendments, where the shell member sees an
 untracked one too.
 
-**This delta's scope is the lead's to confirm; its design is not open.** What is
-open is whether this increment carries the delta or splits — porting
-`check-evidence-baseline` alone (unaffected: its glob expansion is not a `find` at
-command position, and `queue_slug_liveness.rs:72` is the precedent for declaring
-`?` when the globs come from a knob) and holding `check-stage-entry` on the newly
-named `--reads` prerequisite, designed above so the next increment ports rather
-than discovers.
+**This increment carries the delta — lead-ruled 2026-08-16, its design never
+open.** The alternative was to port `check-evidence-baseline` alone (unaffected:
+its glob expansion is not a `find` at command position, and
+`queue_slug_liveness.rs:72` is the precedent for declaring `?` when the globs come
+from a knob) and hold `check-stage-entry` on the newly named `--reads`
+prerequisite. It is recorded here as **refused**, with the grounds, so a later
+increment meeting the same shape does not re-open it.
 
-The amendment is authored for **carrying it**, on two grounds the split does not
-answer. First, splitting leaves the keyed arm with **no non-empty live instance in
-this tree**: `EVIDENCE_KIT_SCENARIO_GLOBS` is empty here (delta 6), so the only map
-that actually resolves at every pre-commit is `LIFECYCLE_KIT_PREDECESSOR`, and it
-resolves only if `check-stage-entry` is the member reading it. A wire format whose
-in-tree exercise is the empty case is a wire format whose first real consumer finds
-the bugs. Second, the blocker-retiring override outranked the size arm's two-member
-group 1 **on the two-member count**; retiring a blocker for one member is a weaker
-case than the arm it displaced. Against that, the honest cost of carrying it: this
-increment is larger than scope costed, by one wire-format change scope did not see.
+Four grounds, the first two the split cannot answer. First, the increment's
+selection rode the blocker-retiring override **on the two-member count**;
+delivering one member and re-blocking the other undercuts the ground of the very
+selection it rides on. Second, splitting leaves the keyed arm with **no non-empty
+live instance in this tree**: `EVIDENCE_KIT_SCENARIO_GLOBS` is empty here (delta
+6), so the only map that actually resolves at every pre-commit is
+`LIFECYCLE_KIT_PREDECESSOR`, and it resolves only if `check-stage-entry` is the
+member reading it — a wire format whose in-tree exercise is the empty case is one
+whose first real consumer finds the bugs. Third, both gaps are **one defect
+class**, a wire the compiled substrate cannot say what the shell substrate could,
+so they are one increment rather than two stapled together. Fourth, the 2026-08-09
+priority directive: holding a member on a designed-but-unbuilt prerequisite buys an
+iteration of delay and retires no risk.
+
+**The honest cost, carried knowingly rather than absorbed silently:** this
+increment is larger than scope costed, by one wire-format change scope did not
+see. No recorded ruling is reversed — the increment is extended to deliver exactly
+what it was selected to deliver.
 
 ### 6. `check-evidence-baseline` ports to the binary substrate
 
