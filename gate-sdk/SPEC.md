@@ -1822,9 +1822,15 @@ with its port work named and owed:
   the generated-projection freshness gates — while what the hold actually turns on
   is whether the cohort ports the emitter, which that criterion explicitly does not
   adjudicate. A hold is **per-member**, keyed on *is this gate's emitter ported?*
-  The design it owes — shell out to the emitter,
-  reimplement the emission format in Rust against criterion 6, or collapse the
-  emitter itself onto the binary — is the cohort that takes it to answer.
+
+  **The design it owed is answered, so what remains is sequence alone.** The three
+  candidates — shell out to the emitter, reimplement the emission format in Rust
+  beside the surviving script, or collapse the emitter itself onto the binary —
+  are adjudicated: the third is the one that pays, and a ported emitter is a
+  **non-gate arm** with a stated contract (§The non-gate arm). `roadmap.sh` ports
+  by applying that ruling unchanged. This is a **retirement of the hold's reason,
+  not a reversal of the hold**: the member is still unported, and it is now held
+  by nothing but its place in the queue.
 - **`check-queue-prose-precondition` — an ERE engine.** It does not *transport*
   `QUEUE_KIT_PRECONDITION_REGEX` across the bridge, it **interprets** it, and the
   knob is consumer config carrying an arbitrary POSIX ERE; its `awk` also runs
@@ -2806,6 +2812,17 @@ both with named owners. It is **not** retired from the shipped install path at
 all — `installer/lib/` shells to it and degrades silently, which
 `installer-jq-silent-degradation` owns. *"The cohort retires jq"* is false in both
 directions.
+
+**The enforcement-map port later closed one of those two**, and it is recorded
+here rather than beside the port because this is where the claim is stated. That
+emitter read the harness settings hooks through two `jq` programs; ported, it
+reads them through the crate's own JSON dependency. The retirement is a
+**dividend of a port that was argued on other grounds**, not a unit bought to
+chase it — which is the shape §The port-candidate criteria says an
+external-program dependency should take: engineering work the port owes rather
+than an exclusion it may claim. The boundary above is unmoved in the direction
+that matters: the *shipped install path* still shells to `jq`, and
+`installer-jq-silent-degradation` still owns it.
 
 **The provenance seam, ruled here because a settings reader is where it bites.**
 The pin-path layer carries no settings key, no pin path and no permission
@@ -4232,6 +4249,28 @@ the expected "no match"; the caller draws that line at the capture site.
 
 The marker-bounded span mechanics every kit's agent-file injector shares — three
 functions over one notion of a well-formed block.
+
+**A compiled counterpart exists, and it is a divergence rather than a
+translation.** `native/src/marker.rs` carries a read half and a write half for
+the crate's own block consumers: the read half is the single implementation the
+value-rollup comparator and the value-rollup generator both use, extracted from
+the comparator's private copy when the writer landed. The write half matches this
+library on a marker hit — markers matched whole-line, content between them
+replaced, the file otherwise byte-untouched — and **tightens it on a miss**:
+where `inject_marker_block` appends a fresh block when the begin marker is
+absent, the compiled writer **refuses**, and likewise on an unbalanced or
+reversed pair. The refusal direction is deliberate, because the failure it
+prevents is the expensive one: a generator that appends when it cannot find its
+markers corrupts a hand-authored page, and the freshness gate then reports the
+corruption as staleness rather than as damage.
+
+**This library is not retired by that, and the duplication is the ordinary
+transitional state.** Its append-on-absent behaviour is still correct for its own
+callers — the lifecycle installer's attribute and registration blocks among them
+— which are shell and unported. So the same miss reads two ways depending on
+which implementation reaches it, until each remaining caller ports in turn;
+retiring `lib/inject.sh` belongs to whichever unit ports its last one. Recorded
+so a later reader does not take the two halves for copies of each other.
 
 `inject_marker_block <file> <begin> <end>` takes the inner block content on
 stdin. It writes `<begin>` + the piped content + `<end>` into
