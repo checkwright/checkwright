@@ -2093,11 +2093,14 @@ the `lib/stages.sh` derivation, operator-ruled 2026-08-13 and delivered whole.**
 `check-lesson-disposition`, `check-survey-record`, `check-shim-restatement` and
 `check-scratch-citation` ship as descriptors dispatching to the binary; the ten
 shell scripts they replace are deleted. Two members stay shell and their grounds
-differ in kind. **`check-stage-entry` is held**: it reads `LIFECYCLE_KIT_PREDECESSOR`
-by key, and the bridge carries scalars and indexed arrays only, so the hold clears
-when the wire format grows keys — a prerequisite it now shares with
-`check-evidence-baseline`, which is why the queue holds one entry for it rather
-than one per member. **`check-close-surfaces` is out rather than held**: it sources
+differ in kind. **`check-stage-entry` was held, and the hold is retired**: it reads
+`LIFECYCLE_KIT_PREDECESSOR` by key, and the bridge carried scalars and indexed
+arrays only, so the hold turned on the wire format growing keys — a prerequisite it
+shared with `check-evidence-baseline`, which is why the queue held one entry for it
+rather than one per member. The keyed-arm increment paid exactly that (§lib/gate.sh)
+and both members ported together; the grounds are kept because this section is
+canonical for every cohort's holds *and their disposition*.
+**`check-close-surfaces` is out rather than held**: it sources
 no `lib/stages.sh` at all, so it is *unsized*, and a later selector owes it a
 sizing rather than inheriting a hold whose ground was never established.
 
@@ -6677,6 +6680,26 @@ no third reader. The producer is the binary's `--reads` arm, printing the declar
 roots each registry member carries — data held to what the code actually walks by
 two crate-side unit tests (§Meta-gate conservation for the binary substrate).
 
+**A root line may carry one optional field: a tab and the name of the knob whose
+value is that walk's `-name` pattern** (`<root><TAB><knob-name>`). A bare root
+keeps its present meaning, unfiltered, so every existing declaration is unchanged.
+The field's producer is the same `--reads` arm printing the same registry data; its
+**only** consumer is this gate's consumption path, at exactly one transition — the
+per-root coverage assertion — where it resolves the named knob through the config
+bridge it already sources and forwards the resolved value where an unfiltered root
+passes the empty pattern. Resolution failure is **fail-closed**: a named knob the
+owning kit does not define is exit 2 naming it, never an empty filter silently
+widening the demand to the whole root.
+
+**The filter is carried as a knob name and never as a literal pattern, and that is
+the load-bearing detail.** The walks this exists for select by *knob values* — which
+is exactly why the shell analyzer extracts nothing for them, since it discards a
+pattern containing `$`, so the shell member's exemption was the only channel it had
+rather than laziness. Spelling the pattern into the crate's registry to make the
+field static would be a second spelling of a knob's default, which
+de-literalization forbids. Carrying the name keeps the value single-sourced and
+reuses the resolution path the bridge already owns.
+
 **The coverage assertion itself is unchanged; only the source of the roots
 differs** — a shell parse for a `.sh` member, the substrate's own report for a
 `.gate` one. Two calibrations follow from what a binary does *not* report, and both
@@ -6685,11 +6708,11 @@ the prune list exactly as a `gate_find` walk is, because the crate's single
 sanctioned walk resolves its set from the same two knobs, `GATE_SDK_PRUNE_DIRS`
 and `GATE_SDK_PRUNE_EXTRA_DIRS` (§lib/gate.sh) — both, because a substrate
 honoring only one of an additive pair would scan a different tree than the shell
-for any consumer who set the other. And
-no literal `-name` primary is extractable from a binary, so the enumeration is
-unfiltered — the same answer the shell arm already gives a walk whose pattern is a
-variable. A ported gate therefore narrows by declaring a tighter root, never by
-declaring a pattern.
+for any consumer who set the other. And no literal `-name` primary is extractable
+from a binary, so a bare root's enumeration is unfiltered — the same answer the
+shell arm already gives a walk whose pattern is a variable. A ported gate narrows
+by declaring a tighter root, or by naming the **knob** its pattern comes from
+(above); it never declares a pattern.
 
 **The refusal survives, narrowed to the two cases where the gate still cannot
 see.** The binary absent or not executable while a `.gate` member is registered is
@@ -6712,12 +6735,19 @@ that makes "land it then relax" hard to see. Removed with the port, and not
 reinstated by the consumption path above: a port ends this assertion by
 **answering** it, never by opting out of it.
 
-No ported member reports a resolvable walk root, so this arm has no live instance
-and its clean line reports a counted zero — a counted zero taken over a live
-descriptor set rather than an empty tree, which is what it was taken over before
-the first cohort landed.
-`gate-tests/check-reads-couples.test.sh` is what keeps that a counted zero rather
-than an untested branch, and it is what **proves the mechanism without a port**.
+**The arm has a live instance, and it is the filtered form.** `check-stage-entry`
+declares one root twice under two filter-knob names
+(lifecycle-kit/SPEC.md §check-stage-entry), so the coverage assertion runs for
+real rather than reporting a counted zero — which it did through every cohort
+before this one, over a live descriptor set rather than an empty tree. That member
+is also where the no-descriptor-exemption ruling below is paid rather than
+softened: its shell form carried two `# reads-couples-exempt:` markers, and the
+port ends the exemption by **answering** the assertion — the couples widen to
+cover what the walks genuinely read.
+
+`gate-tests/check-reads-couples.test.sh` is what keeps the unexercised branches
+tested rather than merely reachable, and it is what **proves the mechanism without
+a port**.
 It drives the consumption path against a stub binary — a reported root whose
 tracked reads its couples cover, one whose couples stop a level short, and one
 reporting `?` — both surviving refusals, a descriptor still claiming the removed

@@ -161,15 +161,34 @@ for src in "${sources[@]+"${sources[@]}"}"; do
             echo "        must replace." >&2
             exit 2
         fi
-        while IFS= read -r root; do
-            [[ -n "$root" ]] || continue
+        while IFS= read -r line; do
+            [[ -n "$line" ]] || continue
+            # spec: gate-sdk/SPEC.md §check-reads-couples — a root line's optional second field
+            # names the knob whose value is the walk's `-name` pattern, resolved through the
+            # config bridge this gate already sources; a bare root stays unfiltered.
+            root="${line%%$'\t'*}"; fknob=""
+            [[ "$line" == *$'\t'* ]] && fknob="${line#*$'\t'}"
             # spec: gate-sdk/SPEC.md §check-reads-couples — '?' is the substrate's own honesty
             # marker, counted by the same skip counter the shell arm's unresolvable roots use.
             if [[ "$root" == '?' ]]; then
                 skipped=$((skipped + 1)); continue
             fi
+            namepat=""; where="declared read root '$root' (--reads)"
+            if [[ -n "$fknob" ]]; then
+                # spec: gate-sdk/SPEC.md §Fail-closed contract — a named knob the owning kit does
+                # not define is exit 2, never an empty filter silently widening the demand to the
+                # whole root: "cannot resolve" and "no filter" must not share a verdict.
+                kv="$(gate_knob_env_one "$fknob" "$gname")" || {
+                    echo "check-reads-couples: $gname declares read root '$root' filtered by knob" >&2
+                    echo "$fknob, which the config bridge could not resolve — the coverage" >&2
+                    echo "assertion could not run; treating as failure (not clean)." >&2
+                    exit 2
+                }
+                namepat="${kv#*=}"
+                where="declared read root '$root' filtered by $fknob='$namepat' (--reads)"
+            fi
             analyzed=$((analyzed + 1))
-            cover_root "$root" 1 "" "$gname" "declared read root '$root' (--reads)"
+            cover_root "$root" 1 "$namepat" "$gname" "$where"
         done <<<"$reads"
         continue
     fi

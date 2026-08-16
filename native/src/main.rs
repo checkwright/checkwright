@@ -186,9 +186,9 @@ fn main() {
         exit(declaration_parity(&argv[1..]));
     }
 
-    // spec: gate-sdk/SPEC.md §check-reads-couples — one line per walk root and nothing
-    // else: a repo-relative directory, or `?` where the gate cannot bound one statically.
-    // No count line, because the count is derivable from the lines.
+    // spec: gate-sdk/SPEC.md §check-reads-couples — one line per walk root and nothing else: a
+    // repo-relative directory or `?`, optionally followed by a tab and the name of the knob
+    // whose value filters it. No count line, because the count is derivable from the lines.
     if first == "--reads" {
         let name = match argv.get(1) {
             Some(n) => n.as_str(),
@@ -200,8 +200,12 @@ fn main() {
         };
         match gates::roots(name) {
             Some(roots) => {
-                for r in roots {
-                    println!("{}", r);
+                for (r, filter) in roots {
+                    if filter.is_empty() {
+                        println!("{}", r);
+                    } else {
+                        println!("{}\t{}", r, filter);
+                    }
                 }
                 exit(0);
             }

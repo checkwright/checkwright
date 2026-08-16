@@ -201,8 +201,8 @@ if staged_matches 'TASK-QUEUE.md' '.workflow/WORKFLOW-STATE.txt'; then
     run_gate check-stage-evidence env GATE_SDK_KNOB_LIFECYCLE_KIT_QUEUE_FILE=TASK-QUEUE.md GATE_SDK_KNOB_LIFECYCLE_KIT_STATE_FILE=.workflow/WORKFLOW-STATE.txt $'GATE_SDK_KNOB_LIFECYCLE_KIT_STAGES=scope\tspec\talign\tbuild\tvalidate\tclose' GATE_SDK_KNOB_LIFECYCLE_KIT_FIRST_STAGE=scope GATE_SDK_KNOB_LIFECYCLE_KIT_WAIVER_TOKEN=align-waived GATE_SDK_KNOB_LIFECYCLE_KIT_SESSION_BOUNDARY=iteration native/target/release/checkwright-gates check-stage-evidence
 fi
 
-if staged_matches 'TASK-QUEUE.md' '.workflow/WORKFLOW-STATE.txt'; then
-    run_gate check-stage-entry lifecycle-kit/checks/check-stage-entry.sh
+if staged_matches 'TASK-QUEUE.md' '.workflow/WORKFLOW-STATE.txt' 'SPEC.md' '*/SPEC.md' '*/*/SPEC.md' 'SPEC-*.md' '*/SPEC-*.md' '*/*/SPEC-*.md'; then
+    run_gate check-stage-entry env GATE_SDK_KNOB_LIFECYCLE_KIT_QUEUE_FILE=TASK-QUEUE.md GATE_SDK_KNOB_LIFECYCLE_KIT_STATE_FILE=.workflow/WORKFLOW-STATE.txt $'GATE_SDK_KNOB_LIFECYCLE_KIT_STAGES=scope\tspec\talign\tbuild\tvalidate\tclose' $'GATE_SDK_KNOB_LIFECYCLE_KIT_PREDECESSOR=align=scope\tbuild=scope\tclose=validate\tspec=scope\tvalidate=build' GATE_SDK_KNOB_LIFECYCLE_KIT_DRAIN_STAGE=validate $'GATE_SDK_KNOB_LIFECYCLE_KIT_ACTIVE_SECTIONS=New Features\tTechnical Debt' GATE_SDK_KNOB_LIFECYCLE_KIT_AUDIT_STAGE=align GATE_SDK_KNOB_LIFECYCLE_KIT_AUDIT_ENTRY_STAGE=build GATE_SDK_KNOB_LIFECYCLE_KIT_WAIVER_TOKEN=align-waived GATE_SDK_KNOB_LIFECYCLE_KIT_ROSTER_BASENAME=SPEC.md $'GATE_SDK_KNOB_LIFECYCLE_KIT_AMENDMENT_GLOB=SPEC-*.md' $'GATE_SDK_KNOB_LIFECYCLE_KIT_CONTRACT_TOKENS=SPEC.md\tproto/' $'GATE_SDK_KNOB_GATE_PRUNE_DIRS=target\t.git\tnode_modules\t.tmp\tgate-tests\tworktrees' native/target/release/checkwright-gates check-stage-entry
 fi
 
 if staged_matches '.claude/commands/*.md'; then
@@ -356,7 +356,7 @@ if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md'; then
 fi
 
 if staged_matches '*.md' 'scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh'; then
-    run_gate check-measured-claim env $'GATE_SDK_KNOB_CANON_KIT_MEASURED_CLAIMS_CMD=bash scripts/measured-claims.sh' $'GATE_SDK_KNOB_CANON_KIT_MEASURED_SURFACE_GLOBS=CLAUDE.md\tREADME.md\tCONTRIBUTING.md\tCODE_OF_CONDUCT.md\tSECURITY.md\tRELEASING.md\tROADMAP.md\tTRAJECTORY.md\t*/SPEC.md\t*/README.md\treserve/*/README.md\tdoctrine-kit/DOCTRINE.md\tdocs/*.md\tdocs/*/index.md\tdocs/posts/*.md\t.claude/commands/*.md' GATE_SDK_KNOB_CANON_KIT_MEASURED_KEYS=ported-gate-members GATE_SDK_KNOB_CANON_KIT_MEASURED_VALUES=65 native/target/release/checkwright-gates check-measured-claim
+    run_gate check-measured-claim env $'GATE_SDK_KNOB_CANON_KIT_MEASURED_CLAIMS_CMD=bash scripts/measured-claims.sh' $'GATE_SDK_KNOB_CANON_KIT_MEASURED_SURFACE_GLOBS=CLAUDE.md\tREADME.md\tCONTRIBUTING.md\tCODE_OF_CONDUCT.md\tSECURITY.md\tRELEASING.md\tROADMAP.md\tTRAJECTORY.md\t*/SPEC.md\t*/README.md\treserve/*/README.md\tdoctrine-kit/DOCTRINE.md\tdocs/*.md\tdocs/*/index.md\tdocs/posts/*.md\t.claude/commands/*.md' GATE_SDK_KNOB_CANON_KIT_MEASURED_KEYS=ported-gate-members GATE_SDK_KNOB_CANON_KIT_MEASURED_VALUES=66 native/target/release/checkwright-gates check-measured-claim
 fi
 
 if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md' '.gitignore'; then

@@ -193,7 +193,13 @@ else
     pre_queue="$QUEUE"
 fi
 
-if ! preflight="$(bash "$KIT/checks/check-stage-entry.sh" "$pre_queue" "$tmpstate" 2>&1)"; then
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the built-in pre-flight names the gate and never a substrate, the rename pre-flight's own resolution: an argv the bridge refused to build is exit 2, never an entry that proceeds unchecked.
+mapfile -t pre_argv < <(gate_command check-stage-entry "$KIT/checks")
+if [[ ${#pre_argv[@]} -eq 0 ]]; then
+    echo "enter-stage: check-stage-entry could not be dispatched (see above) — the entry could not be pre-flighted; nothing written." >&2
+    exit 2
+fi
+if ! preflight="$("${pre_argv[@]}" "$pre_queue" "$tmpstate" 2>&1)"; then
     if [[ "$sim" == 1 ]]; then
         echo "enter-stage (simulate): check-stage-entry would refuse the entry to '$stage':" >&2
         sim_relay "$preflight" >&2

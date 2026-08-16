@@ -53,6 +53,7 @@ pub mod spec_derivable_section;
 pub mod spec_dod_singleton;
 pub mod spec_fence_balance;
 pub mod spec_pointer;
+pub mod stage_entry;
 pub mod stage_evidence;
 pub mod stage_skill_coverage;
 pub mod survey_record;
@@ -70,8 +71,8 @@ pub mod workflow_tiering;
 pub type GateFn = fn(&[String]) -> i32;
 
 // spec: gate-sdk/SPEC.md §check-reads-couples — the third element is the member's declared
-// walk roots, the data `--reads` prints. A member added without them fails to compile, so
-// the declaration cannot be silently omitted.
+// walk roots, the data `--reads` prints, each paired with the name of the knob whose value
+// filters that root by basename — empty for an unfiltered root, un-omittable by construction.
 // spec: gate-sdk/SPEC.md §lib/gate.sh — the fourth element is the member's declared knob
 // reads, the data `--knobs` prints and the config bridge resolves. Un-omittable by the same
 // construction, so no member can read a knob the bridge was never asked to carry.
@@ -81,7 +82,7 @@ pub type GateFn = fn(&[String]) -> i32;
 pub type GateEntry = (
     &'static str,
     GateFn,
-    &'static [&'static str],
+    &'static [(&'static str, &'static str)],
     &'static [&'static str],
     &'static str,
 );
@@ -93,14 +94,14 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-action-pinning",
         action_pinning::run,
-        &["?"],
+        &[("?", "")],
         &["GATE_PRUNE_DIRS"],
         "gate-sdk",
     ),
     (
         "check-action-gh-repo",
         action_gh_repo::run,
-        &["?"],
+        &[("?", "")],
         &["GATE_PRUNE_DIRS"],
         "gate-sdk",
     ),
@@ -193,7 +194,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-manifest-count",
         manifest_count::run,
-        &["?"],
+        &[("?", "")],
         &[
             "GATE_PRUNE_DIRS",
             "GATE_KIT_ROOTS_HERE",
@@ -213,7 +214,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-prose-enum",
         prose_enum::run,
-        &["?"],
+        &[("?", "")],
         &[
             "GATE_PRUNE_DIRS",
             "GATE_KIT_ROOTS_HERE",
@@ -233,7 +234,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-measured-claim",
         measured_claim::run,
-        &["?"],
+        &[("?", "")],
         &[
             "CANON_KIT_MEASURED_CLAIMS_CMD",
             "CANON_KIT_MEASURED_SURFACE_GLOBS",
@@ -251,7 +252,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-spec-dod-singleton",
         spec_dod_singleton::run,
-        &["?"],
+        &[("?", "")],
         &[
             "GATE_PRUNE_DIRS",
             "GATE_KIT_ROOTS_HERE",
@@ -265,7 +266,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-spec-derivable-section",
         spec_derivable_section::run,
-        &["?"],
+        &[("?", "")],
         &[
             "GATE_PRUNE_DIRS",
             "GATE_KIT_ROOTS_HERE",
@@ -283,7 +284,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-manifest-temporal",
         manifest_temporal::run,
-        &["?"],
+        &[("?", "")],
         &[
             "GATE_PRUNE_DIRS",
             "GATE_KIT_ROOTS_HERE",
@@ -303,7 +304,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-install-claim",
         install_claim::run,
-        &["?"],
+        &[("?", "")],
         &[
             "GATE_PRUNE_DIRS",
             "GATE_KIT_ROOTS_HERE",
@@ -323,7 +324,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-payload-claim",
         payload_claim::run,
-        &["?"],
+        &[("?", "")],
         &[
             "GATE_PRUNE_DIRS",
             "GATE_KIT_ROOTS_HERE",
@@ -345,7 +346,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-docs-cmd",
         docs_cmd::run,
-        &["?"],
+        &[("?", "")],
         &[
             "GATE_PRUNE_DIRS",
             "GATE_KIT_ROOTS_HERE",
@@ -363,7 +364,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-md-refs",
         md_refs::run,
-        &["?"],
+        &[("?", "")],
         &[
             "GATE_PRUNE_DIRS",
             "GATE_KIT_ROOTS_HERE",
@@ -381,7 +382,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-tracking-claim",
         tracking_claim::run,
-        &["?"],
+        &[("?", "")],
         &[
             "GATE_PRUNE_DIRS",
             "GATE_KIT_ROOTS_HERE",
@@ -398,7 +399,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-knob-citation",
         knob_citation::run,
-        &["?"],
+        &[("?", "")],
         &[
             "GATE_PRUNE_DIRS",
             "GATE_KIT_ROOTS_HERE",
@@ -416,7 +417,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-spec-fence-balance",
         spec_fence_balance::run,
-        &["?"],
+        &[("?", "")],
         &[
             "GATE_PRUNE_DIRS",
             "GATE_KIT_ROOTS_HERE",
@@ -436,7 +437,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-comment-tier",
         comment_tier::run,
-        &["?"],
+        &[("?", "")],
         &[
             "GATE_PRUNE_DIRS",
             "GATE_KIT_ROOTS_HERE",
@@ -459,7 +460,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-spec-pointer",
         spec_pointer::run,
-        &["?"],
+        &[("?", "")],
         &[
             "GATE_PRUNE_DIRS",
             "GATE_KIT_ROOTS_HERE",
@@ -479,7 +480,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-todo-task-liveness",
         todo_task_liveness::run,
-        &["?"],
+        &[("?", "")],
         &[
             "GATE_PRUNE_DIRS",
             "GATE_KIT_ROOTS_HERE",
@@ -498,7 +499,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-deprecation-task",
         deprecation_task::run,
-        &["?"],
+        &[("?", "")],
         &[
             "GATE_PRUNE_DIRS",
             "GATE_KIT_ROOTS_HERE",
@@ -519,7 +520,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-queue-slug-liveness",
         queue_slug_liveness::run,
-        &["?"],
+        &[("?", "")],
         &[
             "QUEUE_KIT_QUEUE_FILE",
             "QUEUE_KIT_PROSE_SURFACE_GLOBS",
@@ -559,14 +560,14 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-test-hermetic",
         test_hermetic::run,
-        &["?"],
+        &[("?", "")],
         &["GATE_KIT_ROOTS_HERE"],
         "gate-sdk",
     ),
     (
         "check-assertion-strength",
         assertion_strength::run,
-        &["?"],
+        &[("?", "")],
         &["GATE_KIT_ROOTS_HERE"],
         "gate-sdk",
     ),
@@ -576,7 +577,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-template-registry-parity",
         template_registry_parity::run,
-        &["?"],
+        &[("?", "")],
         &["GATE_KIT_ROOTS_HERE"],
         "gate-sdk",
     ),
@@ -586,14 +587,14 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-stage-skill-coverage",
         stage_skill_coverage::run,
-        &["?"],
+        &[("?", "")],
         &["LIFECYCLE_KIT_SKILLS_DIR", "LIFECYCLE_KIT_STAGES"],
         "lifecycle-kit",
     ),
     (
         "check-skill-binding",
         skill_binding::run,
-        &["?"],
+        &[("?", "")],
         &["LIFECYCLE_KIT_SKILLS_DIR"],
         "lifecycle-kit",
     ),
@@ -628,6 +629,33 @@ pub const REGISTRY: &[GateEntry] = &[
             "LIFECYCLE_KIT_SURVEY_RECORD_FILE",
             "LIFECYCLE_KIT_BOUNDARY_TRUNCATE",
             "LIFECYCLE_KIT_GAP_INBOX_FILE",
+        ],
+        "lifecycle-kit",
+    ),
+    // spec: gate-sdk/SPEC.md §check-reads-couples — the filter-knob arm's first live instance:
+    // assertion C's two whole-tree scans are one root selected by two knob values, and a literal
+    // pattern here would be a second spelling of a knob's own default.
+    (
+        "check-stage-entry",
+        stage_entry::run,
+        &[
+            (".", "LIFECYCLE_KIT_ROSTER_BASENAME"),
+            (".", "LIFECYCLE_KIT_AMENDMENT_GLOB"),
+        ],
+        &[
+            "LIFECYCLE_KIT_QUEUE_FILE",
+            "LIFECYCLE_KIT_STATE_FILE",
+            "LIFECYCLE_KIT_STAGES",
+            "LIFECYCLE_KIT_PREDECESSOR",
+            "LIFECYCLE_KIT_DRAIN_STAGE",
+            "LIFECYCLE_KIT_ACTIVE_SECTIONS",
+            "LIFECYCLE_KIT_AUDIT_STAGE",
+            "LIFECYCLE_KIT_AUDIT_ENTRY_STAGE",
+            "LIFECYCLE_KIT_WAIVER_TOKEN",
+            "LIFECYCLE_KIT_ROSTER_BASENAME",
+            "LIFECYCLE_KIT_AMENDMENT_GLOB",
+            "LIFECYCLE_KIT_CONTRACT_TOKENS",
+            "GATE_PRUNE_DIRS",
         ],
         "lifecycle-kit",
     ),
@@ -668,7 +696,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-shim-restatement",
         shim_restatement::run,
-        &["?", "?"],
+        &[("?", ""), ("?", "")],
         &[
             "GATE_PRUNE_DIRS",
             "GATE_KIT_ROOTS_REL",
@@ -685,7 +713,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-scratch-citation",
         scratch_citation::run,
-        &["?"],
+        &[("?", "")],
         &[
             "LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS",
             "LIFECYCLE_KIT_STATE_FILE",
@@ -720,21 +748,21 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-release-bump",
         release_bump::run,
-        &["?"],
+        &[("?", "")],
         &[],
         "-",
     ),
     (
         "check-tightened-gates-grammar",
         tightened_gates_grammar::run,
-        &["?"],
+        &[("?", "")],
         &[],
         "-",
     ),
     (
         "check-tightened-gates-note-parity",
         tightened_gates_note_parity::run,
-        &["?"],
+        &[("?", "")],
         &[],
         "-",
     ),
@@ -744,7 +772,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-docs-kit-parity",
         docs_kit_parity::run,
-        &["?"],
+        &[("?", "")],
         &[
             "GATE_KIT_ROOTS_REL",
             "GATE_SDK_REGISTRY_DOC",
@@ -758,14 +786,14 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-docs-mirror-fresh",
         docs_mirror_fresh::run,
-        &["?"],
+        &[("?", "")],
         &[],
         "-",
     ),
     (
         "check-docs-nav-reachable",
         docs_nav_reachable::run,
-        &["?"],
+        &[("?", "")],
         &[],
         "-",
     ),
@@ -797,7 +825,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-npm-publish-spec",
         npm_publish_spec::run,
-        &["?"],
+        &[("?", "")],
         &[],
         "-",
     ),
@@ -818,7 +846,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-value-rollup-fresh",
         value_rollup_fresh::run,
-        &["?"],
+        &[("?", "")],
         &[
             "GATE_SDK_GATES_DIR",
             "GATE_SDK_ENFORCE_SCAN_DIR",
@@ -848,7 +876,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-enforcement-fresh",
         enforcement_fresh::run,
-        &["?"],
+        &[("?", "")],
         &[
             "GATE_SDK_GATES_DIR",
             "GATE_SDK_ENFORCE_SCAN_DIR",
@@ -897,14 +925,14 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-hook-exec-bit",
         hook_exec_bit::run,
-        &["?"],
+        &[("?", "")],
         &["GATE_SDK_HOOKS_DIR"],
         "gate-sdk",
     ),
     (
         "check-agent-tier-explicit",
         agent_tier_explicit::run,
-        &["?"],
+        &[("?", "")],
         &["DELEGATION_KIT_AGENT_DIR", "GATE_PRUNE_DIRS"],
         "delegation-kit",
     ),
@@ -921,7 +949,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-workflow-tiering",
         workflow_tiering::run,
-        &["?"],
+        &[("?", "")],
         &["GATE_SDK_WORKFLOW_DIR"],
         "gate-sdk",
     ),
@@ -934,7 +962,7 @@ pub fn lookup(name: &str) -> Option<GateFn> {
         .map(|(_, f, _, _, _)| *f)
 }
 
-pub fn roots(name: &str) -> Option<&'static [&'static str]> {
+pub fn roots(name: &str) -> Option<&'static [(&'static str, &'static str)]> {
     REGISTRY
         .iter()
         .find(|(n, _, _, _, _)| *n == name)
@@ -959,11 +987,14 @@ pub fn names_with_owners() -> Vec<(&'static str, &'static str)> {
 // absorbs one unmatched observed root, so the declaration is held to its arity. Pure, so
 // the concrete-root branch is provable without a member that declares one.
 #[cfg(test)]
-fn declaration_covers(declared: &[&str], observed: &[String]) -> Result<(), String> {
-    let mut wildcards = declared.iter().filter(|d| **d == "?").count();
+fn declaration_covers(
+    declared: &[(&str, &str)],
+    observed: &[String],
+) -> Result<(), String> {
+    let mut wildcards = declared.iter().filter(|(d, _)| *d == "?").count();
     let mut undeclared: Vec<&str> = Vec::new();
     for o in observed {
-        if declared.iter().any(|d| *d != "?" && d == o) {
+        if declared.iter().any(|(d, _)| *d != "?" && d == o) {
             continue;
         }
         if wildcards > 0 {
@@ -988,16 +1019,34 @@ mod tests {
 
     #[test]
     fn a_concrete_root_matches_by_equality_and_a_leftover_is_undeclared() {
-        assert!(declaration_covers(&["corpus"], &["corpus".into()]).is_ok());
-        assert!(declaration_covers(&["corpus"], &["corpus".into(), "other".into()]).is_err());
+        assert!(declaration_covers(&[("corpus", "")], &["corpus".into()]).is_ok());
+        assert!(
+            declaration_covers(&[("corpus", "")], &["corpus".into(), "other".into()]).is_err()
+        );
         assert!(declaration_covers(&[], &["corpus".into()]).is_err());
     }
 
     #[test]
     fn each_question_mark_absorbs_exactly_one_unbounded_root() {
-        assert!(declaration_covers(&["?"], &["anything".into()]).is_ok());
-        assert!(declaration_covers(&["?"], &["a".into(), "b".into()]).is_err());
-        assert!(declaration_covers(&["corpus", "?"], &["corpus".into(), "x".into()]).is_ok());
+        assert!(declaration_covers(&[("?", "")], &["anything".into()]).is_ok());
+        assert!(declaration_covers(&[("?", "")], &["a".into(), "b".into()]).is_err());
+        assert!(
+            declaration_covers(&[("corpus", ""), ("?", "")], &["corpus".into(), "x".into()])
+                .is_ok()
+        );
+    }
+
+    // spec: gate-sdk/SPEC.md §check-reads-couples — the filter-knob half is a declaration about
+    // the root, never a second root: a member declaring one root twice under two filters is
+    // covered by one observation of that root, which is what the ported walk actually does.
+    #[test]
+    fn a_filter_knob_narrows_a_root_without_multiplying_it() {
+        assert!(declaration_covers(
+            &[(".", "KIT_A"), (".", "KIT_B")],
+            &[".".into()]
+        )
+        .is_ok());
+        assert!(declaration_covers(&[(".", "KIT_A")], &["other".into()]).is_err());
     }
 
     // spec: gate-sdk/SPEC.md §check-gate-substrate-parity — the owner column is registry data

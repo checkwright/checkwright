@@ -1153,11 +1153,12 @@ descriptor. For a case that differs by a knob rather than by argv, `gate_env
 NAME=VALUE` sets that one case's environment in the caller's subshell;
 `check-stage-evidence`'s session-boundary posture cases are the worked instance.
 
-Every gate-driving runner in this kit, including `check-close-surfaces` and
-`check-stage-entry` — whose gates themselves remain shell (`check-close-surfaces`
-unsized by any cohort, `check-stage-entry` held on shell — gate-sdk/SPEC.md
-§The first cohort, and the rule that selects the next) — now resolves through
-`gate_run` rather than a held `checks/<name>.sh` path.
+Every gate-driving runner in this kit, including `check-close-surfaces` — whose
+gate remains shell, unsized by any cohort (gate-sdk/SPEC.md §The first cohort,
+and the rule that selects the next) — resolves through `gate_run` rather than a
+held `checks/<name>.sh` path. `check-stage-entry` is the worked payoff rather
+than an exception: its runner needed no edit when the gate ported, because it
+already named the gate.
 
 The rest exercise `bin/` tools, which are advisory tooling with no gate to
 dispatch and so have nothing to say about reach.
@@ -1807,7 +1808,29 @@ approximates "changes ≥2 components' *contracts*" with "touches or names ≥2
 component surfaces" — it can over-demand (the cheap waiver valve absorbs
 that) and can under-detect a purely semantic cross-component impact; it
 converts a silent skip into a stamp, a recorded waiver, or a narrow
-false-negative, strictly better than self-report. The good/bad pair covers
+false-negative, strictly better than self-report.
+
+**The gate dispatches to the binary substrate** — `checks/check-stage-entry.gate`
+to `native/src/gates/stage_entry.rs`, the shell script deleted — and the port
+asserts nothing new: the three assertions, their calibration and assertion C's
+honest limit are exactly as stated above. The port was held on the config
+bridge's want of a key channel, since the predecessor map is read **by key**
+(gate-sdk/SPEC.md §lib/gate.sh, the keyed arm that retired the hold). Two
+consequences are worth stating where a reader of this gate will look for them.
+Its `couples=` **widens** to reach the amendment and roster corpora assertion C
+scans, which is correct coupling rather than a concession: an amendment landing
+anywhere genuinely changes what C sees, and the shell form's
+`# reads-couples-exempt:` markers were excusing that rather than expressing it.
+And its two whole-tree scans are declared to `--reads` as one root under two
+**filter-knob** names, `LIFECYCLE_KIT_ROSTER_BASENAME` and
+`LIFECYCLE_KIT_AMENDMENT_GLOB` — the channel gate-sdk/SPEC.md §check-reads-couples
+grew for it, so the port **answers** that assertion where the shell member was
+exempt from it. **Honest limit on the crate-side declaration:** neither fixture
+case reaches assertion C, so the crate's declared-roots unit test holds over an
+empty observation for this member and the scans' coverage rests on the
+behavioral test below and on the live battery.
+
+The good/bad pair covers
 assertion A; `gate-tests/check-stage-entry.test.sh` covers B and C over nine
 sandbox scenarios (untagged residue red, tagged residue at drain entry green,
 empty-reason tag red, tagged residue at successor entry red; two-dir

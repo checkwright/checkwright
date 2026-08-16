@@ -37,6 +37,37 @@ pub fn knob_array(knob: &str) -> Result<Vec<String>, String> {
     Ok(raw.split('\t').map(String::from).collect())
 }
 
+// spec: gate-sdk/SPEC.md §lib/gate.sh — the bridged read of a *keyed* knob, the map counterpart
+// of knob_array: each element splits on its first `=`, absent is an error where empty is a
+// resolved-empty map, and pairs arrive in the sorted order the wire carries.
+pub fn knob_map(knob: &str) -> Result<Vec<(String, String)>, String> {
+    let var = format!("GATE_SDK_KNOB_{}", knob);
+    let raw = std::env::var(&var).map_err(|_| {
+        format!(
+            "{} is unset — the gate was invoked without the config bridge gate_command \
+             emits, so {} could not be resolved",
+            var, knob
+        )
+    })?;
+    if raw.is_empty() {
+        return Ok(Vec::new());
+    }
+    let mut out: Vec<(String, String)> = Vec::new();
+    for el in raw.split('\t') {
+        match el.split_once('=') {
+            Some((k, v)) => out.push((k.to_string(), v.to_string())),
+            None => {
+                return Err(format!(
+                    "{} carries the element '{}', which has no '=' — a keyed knob's element \
+                     is <key>=<value>, so {} could not be read as a map",
+                    var, el, knob
+                ))
+            }
+        }
+    }
+    Ok(out)
+}
+
 // spec: gate-sdk/SPEC.md §lib/gate.sh — the bridged read of a knob *family*, the prefix form's
 // receiving half: every `GATE_SDK_KNOB_<prefix>…` variable, keyed by the suffix the prefix leaves.
 // Sorted, so a reader's output order does not depend on the environment's.

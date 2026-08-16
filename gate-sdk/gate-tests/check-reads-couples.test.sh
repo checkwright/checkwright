@@ -2,9 +2,9 @@
 # Behavioral test of check-reads-couples' .gate arm — the consumption path and the two
 # refusals that survive it. The one good/bad pair cannot hold this arm: the pair models
 # exit 0 and exit 1 against a shell source, while this arm needs a binary to answer
-# `--reads` and its refusals are exit 2 by the fail-closed contract. With no .gate member
-# registered anywhere in the tree the arm has no live instance, so without this file it
-# would be an untested branch rather than the counted zero the clean line reports.
+# `--reads` and its refusals are exit 2 by the fail-closed contract. A live member
+# exercises the covered path in the battery, but nothing there reaches the refusals, the '?'
+# skip, or a filter knob the owning kit does not define — those would be untested branches.
 #
 # Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
@@ -34,11 +34,22 @@ make_stub() {
     chmod +x "$path"
 }
 
+# A stand-in kit whose library defines the filter knobs the filtered-root cases name, so the
+# resolution path under test is the real bridge rather than a value the case injected.
+PROBEKIT="$tmp/probe-kit"
+mkdir -p "$PROBEKIT/lib"
+cat > "$PROBEKIT/lib/probe.sh" <<'PROBE'
+# shellcheck shell=bash
+PROBE_KIT_TOP_ONLY='top.md'
+PROBE_KIT_DEEP_ONLY='deep.md'
+PROBE
+
 # $1=label $2=want-rc $3=want-substring $4=binary-path  (case dir prepared by the caller)
 run_case() {
     local label="$1" want="$2" substr="$3" bin="$4" out rc
     cases=$((cases + 1))
-    out="$( cd "$tmp/$label" && GATE_SDK_NATIVE_BIN="$bin" "$GATE" sandbox.gate 2>&1 )"; rc=$?
+    out="$( cd "$tmp/$label" && GATE_SDK_NATIVE_BIN="$bin" GATE_SDK_KIT_DIRS="$PROBEKIT" \
+        "$GATE" sandbox.gate 2>&1 )"; rc=$?
     if [[ "$rc" -ne "$want" ]]; then
         echo "  FAIL [$label]: want exit $want, got $rc -- $out"; fails=$((fails + 1)); return
     fi
@@ -81,6 +92,22 @@ make_case claimed_exemption \
     "$MANIFEST
 # reads-couples-exempt: the walks are covered elsewhere" corpus
 run_case claimed_exemption 1 "corpus/sub/deep.md" "$tmp/claimed_exemption/stub-bin"
+
+# D2 — the filter-knob field: the same root and the same couple that stops a level short as B,
+# but the root is declared filtered by a knob whose value selects only the covered file. Green
+# here against B's red is what proves the filter is applied rather than ignored.
+make_case filtered_covered "$MANIFEST" 'corpus	PROBE_KIT_TOP_ONLY'
+run_case filtered_covered 0 '1 resolvable walk(s) covered' "$tmp/filtered_covered/stub-bin"
+
+# D3 — the other direction, so a green above cannot be passing for a dropped root: the filter
+# selects the file the couple misses, and the finding must still name it.
+make_case filtered_uncovered "$MANIFEST" 'corpus	PROBE_KIT_DEEP_ONLY'
+run_case filtered_uncovered 1 "corpus/sub/deep.md" "$tmp/filtered_uncovered/stub-bin"
+
+# D4 — resolution is fail-closed: a filter knob the owning kit does not define is exit 2, never
+# an empty filter silently widening the demand back to the whole root.
+make_case filtered_unresolvable "$MANIFEST" 'corpus	PROBE_KIT_NOSUCH'
+run_case filtered_unresolvable 2 'PROBE_KIT_NOSUCH' "$tmp/filtered_unresolvable/stub-bin"
 
 # E — surviving refusal one: a .gate member registered with no binary to ask. Exit 2, the
 # same fail-closed shape check-gate-substrate-parity assertion B uses for this condition.
