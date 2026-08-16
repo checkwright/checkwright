@@ -12,35 +12,10 @@
 
 ## New Features
 
-## Technical Debt
-
-## Deferred
-
-- **freshness-emitter-port-cohort** [design-pending] — the generated-projection freshness family
-  is six comparator+emitter pairs; **three are now ported and three remain shell**.
-  **Delivered 2026-08-16**: `footprint.sh` (129), `gate-sdk/bin/enforcement-map.sh` (273) and
-  `scripts/gen-value-rollup.sh` (124) are deleted, each emitter now a non-gate arm of the binary,
-  and `check-footprint-fresh`, `check-enforcement-fresh` and `check-value-rollup-fresh` each call
-  their emitter **in-process** rather than spawning it. Each port was held to a byte-identical
-  parity run against the shell emitter *before* the deletion. Two dividends banked: the join is
-  structural (the rollup receives its siblings' data instead of re-parsing their markdown), and
-  `jq` left the battery's own path with the settings-hook rows.
-  **Remaining, and held by nothing but sequence:** `scripts/gen-docs-mirror.sh` (127),
-  `drift-kit/bin/trajectory.sh` (242) and `queue-kit/bin/roadmap.sh` (76), with their comparators.
-  The design question is **answered and merged** — a ported emitter is a non-gate arm
-  (gate-sdk/SPEC.md §The non-gate arm) — so the following cohort applies the ruling rather than
-  re-deciding it, and `check-roadmap-fresh`'s unruled-emitter-design hold is retired as spent.
-  **Why deferred rather than Done:** the deliverable is a six-member corpus and half of it is
-  unbuilt. A Done move would assert a finished port.
-  **Cost while deferred:** three shell emitters keep bash in the dependency floor against
-  TRAJECTORY.md objectives 1 and 6, all three behind already-compiled comparators.
-  Filed 2026-08-15 by close; scoped to the value-rollup triple by operator ruling 2026-08-15 and
-  demoted at build 2026-08-16 having delivered that triple.
-
-- **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
+- **native-gate-port-remaining-corpus** [spec: SPEC-tail-batch.md] [roadmap: now/reliability]
   — the whole battery onto the binary, and the shell surface down to its residue.
   roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
-  Stays deferred rather than `## Done`: it is the **whole corpus**, and a
+  Its terminal move is a demotion rather than `## Done`: it is the **whole corpus**, and a
   Done move would assert a finished port and silently drop it from the **public** roadmap
   projection, which reads `[roadmap:]` tags off live entries.
   **Operator-ruled 2026-08-09: complete the port, ASAP.** The ruling, its grounds and its
@@ -84,7 +59,134 @@
   `gate-battery-result-cache` say the port subsumes them: closure candidates as it lands.
   Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
   direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope. Since then it is
-  promoted at spec and demoted at build once per cohort, and the terminal move is a **demotion**.
+  promoted at spec and demoted at build **once per increment** — a cohort, or a budget batch
+  on `port-tail-cohort-batching-policy`'s arm — and the terminal move is a **demotion**.
+
+- **entry-cap-displaces-mandated-writes** [spec: SPEC-mandated-write.md] — the cap silently
+  chooses what a governed mechanism may record, and bites hardest where the record matters
+  most. `check-queue-entry-budget` caps a deferred entry at 50 lines and offers three
+  reliefs: compress by answering, evict to the icebox, or relocate grounds to a linked
+  entry — the last **authorization-gated, not self-served**. So a session facing a full
+  entry and holding a *mandatory* one-line write has no self-served move that preserves the
+  record.
+  recurrence: entry-cap-displaces-mandated-writes 2026-08-15 2026-08-16
+  **Four firings on 2026-08-15 against a promotion threshold of 2** — an 11-line cull at scope
+  (both entries left at 49/50) and three over two build batches — plus a fifth to seat this line.
+  **First recorded instance:** `deferred-release-declaration-accumulation`'s 2026-08-09 deferral —
+  declarations that "could not land here at all", **"chosen by the cap rather than by design"**.
+  **The obligatory-write instance is the sharp one.** The gap-inbox drain
+  (lifecycle-kit/SPEC.md §The committed gap inbox) *must* append a `recurrence:` date in the
+  commit that truncates the inbox — that commit is the audit artifact, so the write is neither
+  optional nor deferrable. At `465ea869` `spec-measured-count-gate` stood at exactly 50 and
+  `waiting-rule-carrier-reach` at 49; one stamp overran the first and spent the second's headroom.
+  **The ordering is the defect, and a line count will not reconstruct it.** What got compressed
+  was *peer-authored grounds*; what it made room for was a *mechanical, fixed-width stamp*. The
+  cap cannot tell those apart, so under pressure it always spends argued content to seat
+  generated content — precisely backwards. **Three displacements in this one session:** the two
+  recurrence stamps, and an operator-ruled correction to `native-gate-port-remaining-corpus` at
+  headroom **zero** — one of them incurred in order to file this entry.
+  **Widened 2026-08-12 twice more, and the second is the sharper one.** First, the class reaches a
+  **fresh** entry, not only a mature one: a four-line factual correction to a two-hour-old entry
+  (`cardinal-notation-splits-gate-reach`) consumed its whole remaining budget, landing it at
+  exactly 50. Second, **the cap now blocks a cross-reference rather than content** — that entry
+  and `probe-evidence-sufficiency` each stand at exactly 50, so neither can name the other and a
+  finding recorded in one is unreachable from the other. Linkage is what makes a fragmented record
+  navigable, so the cap has stopped merely shortening entries and started disconnecting them.
+  **Owed:** truncation sub-case `cardinal-notation-splits-gate-reach`→`probe-evidence-sufficiency`.
+  **The structural shape:** an entry accrues evidence in proportion to how often it recurs,
+  so the entries nearest the cap are the most-recurring ones — exactly the entries whose next
+  recurrence most needs recording. The cap therefore goes blind first on the highest-signal
+  findings, and the blindness reads as silence rather than as a red.
+  **Deliverable — RULED at spec and authored in `SPEC-mandated-write.md`, which owns the three
+  candidates, the grounds each won or lost on, and the honest limit.** Two ship. Assertion A
+  discounts **one** `recurrence:` line per entry: the objection this entry raised against that
+  candidate — the line grows without bound — is falsified by queue-kit/SPEC.md §The tag algebra,
+  which already width-bounds it and rules reaching that bound the correct complaint. And
+  relocating *grounds* into an entry that already owns their subject becomes self-served for a
+  **mandated write**, while minting a *new* entry stays authorization-gated — which is what
+  answers the third displacement shape below rather than making it routine.
+  **Cost while deferred:** paid every close that drains a recurrence onto a mature entry, and
+  paid as a *quiet* loss — the stamp lands, the gate goes green, and the grounds that would
+  have justified promoting the entry are the thing that got cut. **A third displacement shape
+  appeared 2026-08-16 and it is the worst of the three:** at ~47/50 lines,
+  `waiting-rule-fourth-firing-post-fix` could not hold its own design half, so close filed it
+  as a *separate entry*. A commit message is at least out of the ranking surface honestly; a
+  new entry is *in* it, competing with its own parent for the scope attention that ranks both.
+  Filed 2026-08-12 by close, from the cap it hit while discharging its own drain contract.
+
+- **port-tail-cohort-batching-policy** [spec: SPEC-budget-arm.md] — port cohorts were
+  composed around a shared derivation, the tail no longer offers one, and nothing states
+  what sizes a cohort instead.
+  **Probed at this boundary, then corrected at the same scope:** `port-blockers.sh --group`
+  partitions the 45-gate remainder into 37 groups — 34 singletons, two pairs, one 7-member group
+  — and **not one of them is a takeable cohort**. gate-sdk/SPEC.md:2371-2379 rules that 7-member
+  key out (operator-ruled 2026-08-14: `fail_closed` derives no corpus, so its members share the
+  *absence* of one), and each pair holds a member the port does not take. Amortization is spent,
+  not thin — a stronger finding than the one this entry was filed on hours earlier.
+  **Why that is an economics defect and not merely a fact about the gates:** iteration overhead is
+  fixed and large. Of the 529 commits since 2026-08-08, 360 are `chore` — the stage-lifecycle
+  ceremony — against 81 `feat`, 27 of which name the port. A one-group cohort buys one ported gate
+  for a whole iteration's ceremony, and 34 singletons at that rate is 34 iterations against a
+  standing ASAP directive (TRAJECTORY.md §PRIORITY DIRECTIVE — the port track's sequence).
+  **What the unit owed — the *placement* — is RULED at spec and authored in
+  `SPEC-budget-arm.md`:** the arm lands in gate-sdk/SPEC.md §The first cohort, and the rule that
+  selects the next, as a third selection arm. The two rejected homes and the ground each lost on
+  are recorded there, TRAJECTORY.md by its own contract (it records operator-closed rulings and
+  never authors one; this is lead-class).
+  **Why it needed design first:** the placement was the question, not the arithmetic, and the
+  widest candidate is the one the provenance seam bears on — a batching rule stated as generic
+  mechanism is kit content, while a rule naming the port's remainder is this repo's rule content.
+  **Cost while deferred:** each scope session re-derives the tail's shape from `--group` and picks
+  a cohort size unaided, so the sizing is decided identically and invisibly every iteration, and
+  the composition test in the scope contract keeps being answered from first principles.
+  **The composition question is RULED, 2026-08-16, lead-class — and the ruling is what this unit
+  now authors rather than re-decides.** The tail gets an **additive second composition axis**: an
+  iteration may take N unrelated single-gate ports sized by iteration budget, each entering as an
+  independent unit proved on its own parity run, **never as one cohort**. Nothing is reversed —
+  the `libs=fail_closed globs=-` group stays not-a-cohort (gate-sdk/SPEC.md:2371-2379,
+  operator-ruled 2026-08-14), the shared-derivation rule stands wherever it still selects, and
+  the budget axis serves the 2026-08-09 ASAP directive rather than re-scoping it. Ruled after the
+  scope session flagged it as possibly operator-class and the lead tested that reading against
+  both records.
+  **Guardrail carried into the record, and it binds the authoring stage:** if the policy cannot
+  be authored *beside* recorded operator-ruled text — if authoring it would narrow or rewrite
+  any — that is operator-class and returns to the lead for relay rather than being authored.
+  **The ground it stands on:** neither selection arm survives — the size arm is exhausted
+  (`native-gate-port-remaining-corpus` records it, three cohorts running), and the
+  blocker-retiring override has nothing left to retire among the ready singletons.
+  Class: **feature**, settled by the placement ruling. It mints an arm the selecting session must
+  honor beside the two gate-sdk/SPEC.md already names, so it is more than a calibration line —
+  and it takes **no knob**, refused with grounds in the amendment: a batch size varies by
+  iteration, not by consumer, and a knob would freeze a default that reads as the answer.
+  Filed 2026-08-16 by the consult; dispositioned out of the gap inbox at the 2026-08-16 scope
+  boundary (lifecycle-kit/SPEC.md §The committed gap inbox, "The boundary refusal"), the counts
+  re-probed rather than carried.
+
+## Technical Debt
+
+## Deferred
+
+- **freshness-emitter-port-cohort** [design-pending] — the generated-projection freshness family
+  is six comparator+emitter pairs; **three are now ported and three remain shell**.
+  **Delivered 2026-08-16**: `footprint.sh` (129), `gate-sdk/bin/enforcement-map.sh` (273) and
+  `scripts/gen-value-rollup.sh` (124) are deleted, each emitter now a non-gate arm of the binary,
+  and `check-footprint-fresh`, `check-enforcement-fresh` and `check-value-rollup-fresh` each call
+  their emitter **in-process** rather than spawning it. Each port was held to a byte-identical
+  parity run against the shell emitter *before* the deletion. Two dividends banked: the join is
+  structural (the rollup receives its siblings' data instead of re-parsing their markdown), and
+  `jq` left the battery's own path with the settings-hook rows.
+  **Remaining, and held by nothing but sequence:** `scripts/gen-docs-mirror.sh` (127),
+  `drift-kit/bin/trajectory.sh` (242) and `queue-kit/bin/roadmap.sh` (76), with their comparators.
+  The design question is **answered and merged** — a ported emitter is a non-gate arm
+  (gate-sdk/SPEC.md §The non-gate arm) — so the following cohort applies the ruling rather than
+  re-deciding it, and `check-roadmap-fresh`'s unruled-emitter-design hold is retired as spent.
+  **Why deferred rather than Done:** the deliverable is a six-member corpus and half of it is
+  unbuilt. A Done move would assert a finished port.
+  **Cost while deferred:** three shell emitters keep bash in the dependency floor against
+  TRAJECTORY.md objectives 1 and 6, all three behind already-compiled comparators.
+  Filed 2026-08-15 by close; scoped to the value-rollup triple by operator ruling 2026-08-15 and
+  demoted at build 2026-08-16 having delivered that triple.
+
 
 - **born-native-omission-accumulation** [design-pending] — the born-native flip attaches
   criterion 5's omission to every future gate, and nothing measures the pile.
@@ -4447,55 +4549,6 @@
   the one allowlist class whose whole point is that it does not look dangerous.
   Filed 2026-08-12 by close, from its own overlay triage.
 
-- **entry-cap-displaces-mandated-writes** [design-pending] — the per-entry cap silently chooses
-  what a governed mechanism may record, and bites hardest where the record matters most.
-  `check-queue-entry-budget` caps a deferred entry at 50 lines and offers three reliefs: compress
-  by answering, evict to the icebox, or relocate grounds to a linked entry — the last
-  **authorization-gated, not self-served**. So a session facing a full entry and holding a
-  *mandatory* one-line write has no self-served move that preserves the record.
-  recurrence: entry-cap-displaces-mandated-writes 2026-08-15 2026-08-16
-  **Four firings on 2026-08-15 against a promotion threshold of 2** — an 11-line cull at scope
-  (both entries left at 49/50) and three over two build batches — plus a fifth to seat this line.
-  **First recorded instance:** `deferred-release-declaration-accumulation`'s 2026-08-09 deferral —
-  declarations that "could not land here at all", **"chosen by the cap rather than by design"**.
-  **The obligatory-write instance is the sharp one.** The gap-inbox drain
-  (lifecycle-kit/SPEC.md §The committed gap inbox) *must* append a `recurrence:` date in the
-  commit that truncates the inbox — that commit is the audit artifact, so the write is neither
-  optional nor deferrable. At `465ea869` `spec-measured-count-gate` stood at exactly 50 and
-  `waiting-rule-carrier-reach` at 49; one stamp overran the first and spent the second's headroom.
-  **The ordering is the defect, and a line count will not reconstruct it.** What got compressed
-  was *peer-authored grounds*; what it made room for was a *mechanical, fixed-width stamp*. The
-  cap cannot tell those apart, so under pressure it always spends argued content to seat
-  generated content — precisely backwards. **Three displacements in this one session:** the two
-  recurrence stamps, and an operator-ruled correction to `native-gate-port-remaining-corpus` at
-  headroom **zero** — one of them incurred in order to file this entry.
-  **Widened 2026-08-12 twice more, and the second is the sharper one.** First, the class reaches a
-  **fresh** entry, not only a mature one: a four-line factual correction to a two-hour-old entry
-  (`cardinal-notation-splits-gate-reach`) consumed its whole remaining budget, landing it at
-  exactly 50. Second, **the cap now blocks a cross-reference rather than content** — that entry
-  and `probe-evidence-sufficiency` each stand at exactly 50, so neither can name the other and a
-  finding recorded in one is unreachable from the other. Linkage is what makes a fragmented record
-  navigable, so the cap has stopped merely shortening entries and started disconnecting them.
-  **Owed:** truncation sub-case `cardinal-notation-splits-gate-reach`→`probe-evidence-sufficiency`.
-  **The structural shape:** an entry accrues evidence in proportion to how often it recurs,
-  so the entries nearest the cap are the most-recurring ones — exactly the entries whose next
-  recurrence most needs recording. The cap therefore goes blind first on the highest-signal
-  findings, and the blindness reads as silence rather than as a red.
-  **Deliverable, and why `[design-pending]`:** the candidates trade off and none is obviously
-  right. Exempt the `recurrence:` line from the count (cheapest, and defensible since it is
-  machine-written and fixed-width, but it exempts the one line that grows without bound as
-  dates accumulate). Make an at-cap entry with a fresh recurrence an automatic *promotion*
-  signal rather than a compression prompt — the honest reading, since a count this high is a
-  unit asking to be scheduled, not one asking to be trimmed. Or let the drain relocate grounds
-  to a linked entry under a standing authorization, the relief the gate names and withholds.
-  **Cost while deferred:** paid every close that drains a recurrence onto a mature entry, and
-  paid as a *quiet* loss — the stamp lands, the gate goes green, and the grounds that would
-  have justified promoting the entry are the thing that got cut. **A third displacement shape
-  appeared 2026-08-16 and it is the worst of the three:** at ~47/50 lines,
-  `waiting-rule-fourth-firing-post-fix` could not hold its own design half, so close filed it
-  as a *separate entry*. A commit message is at least out of the ranking surface honestly; a
-  new entry is *in* it, competing with its own parent for the scope attention that ranks both.
-  Filed 2026-08-12 by close, from the cap it hit while discharging its own drain contract.
 
 - **throughput-and-wait-time-unmeasured** [design-pending] — nothing splits session wall-clock
   into waiting-on-model versus local execution, and nothing measures per-model throughput.
@@ -6136,52 +6189,6 @@
   Filed 2026-08-16 by close, from the lesson the porting cohort generalized rather than from a
   fresh finding — the two instances are already fixed.
 
-- **port-tail-cohort-batching-policy** [design-pending] — port cohorts have been composed around
-  a shared derivation, the tail no longer offers one, and nothing states what sizes a cohort
-  instead.
-  **Probed at this boundary, then corrected at the same scope:** `port-blockers.sh --group`
-  partitions the 45-gate remainder into 37 groups — 34 singletons, two pairs, one 7-member group
-  — and **not one of them is a takeable cohort**. gate-sdk/SPEC.md:2371-2379 rules that 7-member
-  key out (operator-ruled 2026-08-14: `fail_closed` derives no corpus, so its members share the
-  *absence* of one), and each pair holds a member the port does not take. Amortization is spent,
-  not thin — a stronger finding than the one this entry was filed on hours earlier.
-  **Why that is an economics defect and not merely a fact about the gates:** iteration overhead is
-  fixed and large. Of the 529 commits since 2026-08-08, 360 are `chore` — the stage-lifecycle
-  ceremony — against 81 `feat`, 27 of which name the port. A one-group cohort buys one ported gate
-  for a whole iteration's ceremony, and 34 singletons at that rate is 34 iterations against a
-  standing ASAP directive (TRAJECTORY.md §PRIORITY DIRECTIVE — the port track's sequence).
-  **What the unit owes, now that the sizing half is ruled below:** the *placement*. The candidates
-  are lifecycle-kit's scope template (iteration composition is already its economic-composition
-  test), gate-sdk/SPEC.md §Porting a gate to the binary substrate (which owns cohort procedure),
-  or this repo's own trajectory record (which owns the port sequence) — the first binds every
-  consumer's iteration, the second binds only porting, the third binds only this tree.
-  **Why `[design-pending]`:** the placement is the question, not the arithmetic, and the widest
-  candidate is the one the provenance seam bears on — a batching rule stated as generic mechanism
-  is kit content, while a rule naming the port's remainder is this repo's rule content.
-  **Cost while deferred:** each scope session re-derives the tail's shape from `--group` and picks
-  a cohort size unaided, so the sizing is decided identically and invisibly every iteration, and
-  the composition test in the scope contract keeps being answered from first principles.
-  **The composition question is RULED, 2026-08-16, lead-class — and the ruling is what this unit
-  now authors rather than re-decides.** The tail gets an **additive second composition axis**: an
-  iteration may take N unrelated single-gate ports sized by iteration budget, each entering as an
-  independent unit proved on its own parity run, **never as one cohort**. Nothing is reversed —
-  the `libs=fail_closed globs=-` group stays not-a-cohort (gate-sdk/SPEC.md:2371-2379,
-  operator-ruled 2026-08-14), the shared-derivation rule stands wherever it still selects, and
-  the budget axis serves the 2026-08-09 ASAP directive rather than re-scoping it. Ruled after the
-  scope session flagged it as possibly operator-class and the lead tested that reading against
-  both records.
-  **Guardrail carried into the record, and it binds the authoring stage:** if the policy cannot
-  be authored *beside* recorded operator-ruled text — if authoring it would narrow or rewrite
-  any — that is operator-class and returns to the lead for relay rather than being authored.
-  **The ground it stands on:** neither selection arm survives — the size arm is exhausted
-  (`native-gate-port-remaining-corpus` records it, three cohorts running), and the
-  blocker-retiring override has nothing left to retire among the ready singletons.
-  Class: mints no name if it lands as a calibration line on an existing surface — **debt**; a
-  stated iteration budget with a knob makes it a **feature**, and the placement ruling decides
-  which.
-  Filed 2026-08-16 by the consult; dispositioned out of the gap inbox at the 2026-08-16 scope
-  boundary (lifecycle-kit/SPEC.md §The committed gap inbox, "The boundary refusal"), the counts
-  re-probed rather than carried.
 
 ## Icebox
 
