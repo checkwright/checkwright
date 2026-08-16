@@ -23,6 +23,13 @@
   **Cost while deferred — bounded:** one stale paragraph, no gate gap.
   Filed 2026-01-02 by scope.
 
+- **zeta-idea** [design-pending] — seven extent lines against a six-line cap,
+  and the sole excess is the machine-written declaration below, which the
+  count discounts one of per entry.
+  recurrence: zeta-idea 2026-01-03 2026-01-09
+  **Cost while deferred:** low — the discount is what keeps this filing legible.
+  Filed 2026-01-03 by scope.
+
 ## Icebox
 
 - **delta-idea** [design-pending] — dormant: cheap to carry, nothing waiting.

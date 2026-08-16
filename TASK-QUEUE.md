@@ -12,58 +12,6 @@
 
 ## New Features
 
-- **entry-cap-displaces-mandated-writes** [spec: SPEC-mandated-write.md] — the cap silently
-  chooses what a governed mechanism may record, and bites hardest where the record matters
-  most. `check-queue-entry-budget` caps a deferred entry at 50 lines and offers three
-  reliefs: compress by answering, evict to the icebox, or relocate grounds to a linked
-  entry — the last **authorization-gated, not self-served**. So a session facing a full
-  entry and holding a *mandatory* one-line write has no self-served move that preserves the
-  record.
-  recurrence: entry-cap-displaces-mandated-writes 2026-08-15 2026-08-16
-  **Four firings on 2026-08-15 against a promotion threshold of 2** — an 11-line cull at scope
-  (both entries left at 49/50) and three over two build batches — plus a fifth to seat this line.
-  **First recorded instance:** `deferred-release-declaration-accumulation`'s 2026-08-09 deferral —
-  declarations that "could not land here at all", **"chosen by the cap rather than by design"**.
-  **The obligatory-write instance is the sharp one.** The gap-inbox drain
-  (lifecycle-kit/SPEC.md §The committed gap inbox) *must* append a `recurrence:` date in the
-  commit that truncates the inbox — that commit is the audit artifact, so the write is neither
-  optional nor deferrable. At `465ea869` `spec-measured-count-gate` stood at exactly 50 and
-  `waiting-rule-carrier-reach` at 49; one stamp overran the first and spent the second's headroom.
-  **The ordering is the defect, and a line count will not reconstruct it.** What got compressed
-  was *peer-authored grounds*; what it made room for was a *mechanical, fixed-width stamp*. The
-  cap cannot tell those apart, so under pressure it always spends argued content to seat
-  generated content — precisely backwards. **Three displacements in this one session:** the two
-  recurrence stamps, and an operator-ruled correction to `native-gate-port-remaining-corpus` at
-  headroom **zero** — one of them incurred in order to file this entry.
-  **Widened 2026-08-12 twice more, and the second is the sharper one.** First, the class reaches a
-  **fresh** entry, not only a mature one: a four-line factual correction to a two-hour-old entry
-  (`cardinal-notation-splits-gate-reach`) consumed its whole remaining budget, landing it at
-  exactly 50. Second, **the cap now blocks a cross-reference rather than content** — that entry
-  and `probe-evidence-sufficiency` each stand at exactly 50, so neither can name the other and a
-  finding recorded in one is unreachable from the other. Linkage is what makes a fragmented record
-  navigable, so the cap has stopped merely shortening entries and started disconnecting them.
-  **Owed:** truncation sub-case `cardinal-notation-splits-gate-reach`→`probe-evidence-sufficiency`.
-  **The structural shape:** an entry accrues evidence in proportion to how often it recurs,
-  so the entries nearest the cap are the most-recurring ones — exactly the entries whose next
-  recurrence most needs recording. The cap therefore goes blind first on the highest-signal
-  findings, and the blindness reads as silence rather than as a red.
-  **Deliverable — RULED at spec and authored in `SPEC-mandated-write.md`, which owns the three
-  candidates, the grounds each won or lost on, and the honest limit.** Two ship. Assertion A
-  discounts **one** `recurrence:` line per entry: the objection this entry raised against that
-  candidate — the line grows without bound — is falsified by queue-kit/SPEC.md §The tag algebra,
-  which already width-bounds it and rules reaching that bound the correct complaint. And
-  relocating *grounds* into an entry that already owns their subject becomes self-served for a
-  **mandated write**, while minting a *new* entry stays authorization-gated — which is what
-  answers the third displacement shape below rather than making it routine.
-  **Cost while deferred:** paid every close that drains a recurrence onto a mature entry, and
-  paid as a *quiet* loss — the stamp lands, the gate goes green, and the grounds that would
-  have justified promoting the entry are the thing that got cut. **A third displacement shape
-  appeared 2026-08-16 and it is the worst of the three:** at ~47/50 lines,
-  `waiting-rule-fourth-firing-post-fix` could not hold its own design half, so close filed it
-  as a *separate entry*. A commit message is at least out of the ranking surface honestly; a
-  new entry is *in* it, competing with its own parent for the scope attention that ranks both.
-  Filed 2026-08-12 by close, from the cap it hit while discharging its own drain contract.
-
 ## Technical Debt
 
 ## Deferred
@@ -4598,7 +4546,7 @@
 
 - **cardinal-notation-splits-gate-reach** [design-pending] — whether a written count is
   enforceable depends on how it is spelled and how large it is, and the queue sits outside the
-  scanning corpus entirely.
+  scanning corpus entirely; the truncated probe below is a `probe-evidence-sufficiency` sub-case.
   **The premise that prompted this is falsified, and that is the finding.** Asked whether spelled
   numerals have a reason, the answer is partly yes: canon-kit/SPEC.md §check-manifest-count
   documents a cardinal grammar — *"digit sequences and the spelled `two`…`twelve`,
@@ -6173,6 +6121,7 @@
 ## Done
 
 - port-tail-cohort-batching-policy
+- entry-cap-displaces-mandated-writes
 
 ## Lessons Learned
 

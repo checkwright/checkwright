@@ -356,9 +356,15 @@ the grounds that folding jobs together gives one tool two output grammars.
 form is byte-unique on the (slug, date) pair and is refused anyway: it grows an
 entry linearly against `check-queue-entry-budget`'s cap, so a *machine* writer
 could push a deferred entry past that cap and red some later, unrelated session's
-commit — and the cap's remedy is authorization-gated (§check-queue-entry-budget: a
-session blocked by it does not self-serve the split). The single-line form costs
-one entry line forever regardless of count. Its own ceiling is
+commit — and the cap's remedy is only half self-served (§check-queue-entry-budget:
+relocating grounds into an entry that already owns their subject is self-served
+for a mandated write, while minting a *new* entry to hold them stays
+authorization-gated). That ground survives the discount §check-queue-entry-budget
+grants this declaration, **because the discount is one line**: the second and
+later lines of a per-recurrence variant are counted like any other, so the variant
+still grows an entry linearly against the cap. The single-line form costs **no**
+counted line at all, which strengthens the case for it rather than weakening it.
+Its own ceiling is
 `check-queue-wrap`'s budget, reached after a handful of dates on a long slug, and
 reaching it is the *correct* complaint: a slug recorded as recurring that many
 times without anyone promoting it is a governance failure, surfaced loudly rather
@@ -894,15 +900,24 @@ queue file at `tier=precommit`.
 
 ### check-queue-entry-budget
 
-Invariant, one statement from two sides: **a deferred entry is a costed filing
+Invariant, one statement from three sides: **a deferred entry is a costed filing
 — bounded above so it is not an inlined amendment, bounded below so it is not a
-flag-and-skip.** Three assertions:
+flag-and-skip, and bounded in what it may displace, so a bound on filing never
+becomes a bound on the record.** The first two sides are about the entry's
+*size*; the third is about what the cap *spends* to stay inside it. Three
+assertions:
 
-- **(A) Size.** No deferred entry exceeds `QUEUE_KIT_ENTRY_LINE_CAP` lines,
-  counted as the lead line through the line before the next bullet at the same
-  or shallower indent — the same extent `bin/queue-index.sh --extent` yields, so
-  the range the gate measures is the range an eviction deletes. A sub-task
-  nests inside its parent's extent and is measured as its own entry too.
+- **(A) Size.** No deferred entry exceeds `QUEUE_KIT_ENTRY_LINE_CAP` **counted**
+  lines. An entry's **extent** is the lead line through the line before the next
+  bullet at the same or shallower indent — the same extent
+  `bin/queue-index.sh --extent` yields, so the range the gate measures is the
+  range an eviction deletes. Its **count** is that extent less **at most one**
+  line matching the `recurrence:` declaration grammar (§The tag algebra). Extent
+  and count differ by that one discounted line and by nothing else, which is what
+  keeps the equality above a statement about the *range* while the cap binds the
+  *count*. A sub-task nests inside its parent's extent and is measured as its own
+  entry too — and claims its own at-most-one discount, so a parent whose extent
+  holds two declarations still discounts one.
 - **(B) Icebox shape.** Every icebox entry is exactly one line; a continuation
   line under an icebox bullet is a violation. Skips clean when
   `QUEUE_KIT_ICEBOX_SECTION` is empty, the empty-knob behavior
@@ -928,25 +943,99 @@ binds top-level entries only — a sub-task is covered by its parent's costing.
 entry's residency is one iteration by the drain rule, so it has no carry to
 cap. The carry problem is the deferred pool's alone.
 
-**Compression is lossless, and the split is authorization-gated.** An entry
-that will not fit is compressed by *answering* grounds, never by dropping or
-summarizing them away; a ground that survives unanswered is relocated into a
-distinct linked entry. The gate cannot hold this: it sees an entry's current
-extent, and judging whether a removed line was answered or discarded is
-semantic. So the rule is a stated authoring contract, and the remedy carries
-its own authorization — a parent session (the iteration lead), or the operator
-in the absence of one, grants permission to split and issues the recipe with
-the ruling. A session blocked by the cap does not self-serve the split, the
-same lineage as a `check-stage-entry` assertion C waiver
-(lifecycle-kit/SPEC.md §check-stage-entry), and the gate's failure text
-therefore cites this section rather than inlining the recipe.
+*Why one `recurrence:` line is discounted, and why exactly one.* The line is
+**fixed-shape and width-bounded** — §The tag algebra rules its ceiling to be
+`check-queue-wrap`'s budget and rules reaching that ceiling the *correct*
+complaint, so the discount cannot let an entry grow without bound. It is exactly
+the **generated-shaped content** that argued content was otherwise spent to seat,
+so making the count blind to it removes that trade rather than arbitrating it.
+And it is **one line, not a grammar-wide exemption**: the declaration's own rule
+is one line per entry with dates appended, so one line is the whole of what that
+form can claim — §The tag algebra refuses the one-line-per-recurrence variant
+partly *because* it grows an entry linearly against this cap, and a grammar-wide
+exemption would retire that refusal's ground as a side effect. The match is the
+declaration's own grammar — the `recurrence:` lead token, a slug, then at least
+one ISO date, the shape drift-kit's `kpi-incident-recurrence` already reads —
+with no entry-boundary or self-slug condition added, since the at-most-one bound
+is what does the scoping. The discount narrows the **count** only and removes
+nothing from the scan, so (B), which counts icebox continuation lines, and (C),
+which asserts a lead-in is *present*, cannot flip; (A) itself reds on
+*exceeding* the cap and is monotone in the count, so a smaller count reds
+strictly less.
+
+**A mandated write is the class the cap has no self-served answer for.** A
+mandated write is a write on a deferred entry that another governed contract
+obliges the writing session to make **in the commit it is already making**, and
+whose obligation is citable to that contract by name. Two instances exist, both
+already in the tree rather than invented here: the gap-inbox drain's
+`recurrence:` date, which must land in the commit that truncates the inbox
+because that commit is the audit artifact (lifecycle-kit/SPEC.md §The committed
+gap inbox); and a ruling recorded onto the entry it rules, under the
+recording-in-the-moment rule below. Its **producers** are the sessions those two
+contracts already bind — the closing stage's drain, and any session recording a
+ruling — both running today with no new trigger, no new field and nothing to
+configure; its **consumers** are that same session reading this section when
+assertion A blocks it, a path the gate's failure text already routes it down, and
+lifecycle-kit's drain contract, which cites the class by name for the write it
+mandates. **What is not a mandated write, because a class that excludes nothing
+is not a class:** the session's own evidence for a claim, a further ground for a
+claim already made, a cross-reference it would like to add, a correction it could
+equally make in a later commit. All of those keep the reliefs they have. The test
+is not *how important is this* — every session believes its write matters — but
+*does a named contract oblige this write in this commit*.
+
+**Compression is lossless; relocation is self-served for a mandated write, and
+the split stays authorization-gated.** An entry that will not fit is compressed
+by *answering* grounds, never by dropping or summarizing them away; a ground that
+survives unanswered is relocated into a distinct linked entry. The gate cannot
+hold this: it sees an entry's current extent, and judging whether a removed line
+was answered or discarded is semantic. So the rule is a stated authoring
+contract — and that third relief is **two acts wearing one name**.
+
+- **Relocating grounds** into an entry that **already exists and already owns the
+  ground's subject** is self-served when, and only when, what the cap blocks is a
+  mandated write. The relocating session cites the mandating contract in the
+  commit that makes the relocation, and names the target with a
+  single-backticked slug in the entry body — already a citation under §The tag
+  algebra and already aggregated by `bin/queue-edges.sh`, so the link needs no
+  declaration of its own. A `relocated:` declaration is refused on the ground
+  §The tag algebra refuses `relates:` on: it would cost a counted line against
+  this very cap, on the entry least able to pay it.
+- **Splitting the unit** — minting a *new* entry to hold what would not fit —
+  carries its own authorization, unchanged: a parent session (the iteration
+  lead), or the operator in the absence of one, grants permission to split and
+  issues the recipe with the ruling. A session blocked by the cap does not
+  self-serve *that*, the same lineage as a `check-stage-entry` assertion C waiver
+  (lifecycle-kit/SPEC.md §check-stage-entry), and the gate's failure text
+  therefore cites this section rather than inlining the recipe.
+
+*Why the line falls between the two acts.* Grounds are not rankable work, so
+moving them into an entry that already owns their subject mints no ranking peer;
+a new entry *is* a new unit, competing for the scope attention that ranks both,
+which is a scope-class judgment and keeps the authorization. That is what stops
+the sharpest displacement shape — an entry too full to hold its own design half,
+so the half is filed as a separate entry competing with its own parent — from
+becoming routine under a blanket relief. And the authorization is safe to drop
+for the narrow act because a mandated write is by construction not
+discretionary: its obligation belongs to another surface and is citable, so a
+reader can check the trigger even though no gate reads it, and the act is
+net-negative on the parent by construction — a relocation that does not reduce
+the parent's extent is not a relocation, which assertion A enforces from the
+other side. **The honest limit, stated because it is real:** where no existing
+entry owns the ground's subject, the self-served relief is unavailable and the
+session is back to compressing by answering, or to asking. That is the correct
+outcome rather than a hole — needing to mint an entry *is* the signal that a
+unit, not a ground, is what would not fit.
 
 *Why the cap is not widened for exceptional content.* Assertion A's bound is
 the amendment-inlining line above, not a length preference, so raising the
 number moves the number without moving the line — and the entries that would
 claim an exception are the likeliest ungoverned amendments. A conditional cap
 collapses back into authorization anyway, or it is the self-issued exemption
-the delegation doctrine already names as the standard failure mode.
+the delegation doctrine already names as the standard failure mode. The
+recurrence discount is **not** that widening and must not be read as one: it
+changes what the count includes, never the number, and it is unconditional —
+no entry claims it by being exceptional.
 
 **A ruling the operator restates from memory is filed in the moment.** The
 compression rule above is an authoring contract, so a break in it is silent, and

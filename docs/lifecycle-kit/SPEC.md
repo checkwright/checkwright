@@ -792,7 +792,12 @@ pays for it is **auditability by inspection** — the drain stamps the declarati
 in the *same commit* that truncates the inbox, so the judgment and the prose it
 was made from sit in one diff and a reader auditing a date reads that commit and
 sees the bullet the judge read. That same-commit rule is therefore **load-bearing
-rather than incidental**: it is the audit artifact. Re-running a matcher is
+rather than incidental**: it is the audit artifact. It is also what makes the
+stamp a **mandated write** in queue-kit's sense — the class
+queue-kit/SPEC.md §check-queue-entry-budget defines, and the section a draining
+session reads for its relief when that gate's per-entry cap blocks the stamp.
+Neither the class nor the relief is restated here; this section is only the
+contract that mandates the write. Re-running a matcher is
 replaced by reading the grounds, which is the correct trade when the thing
 recorded is a judgment.
 

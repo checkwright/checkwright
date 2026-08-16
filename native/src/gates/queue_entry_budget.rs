@@ -1,6 +1,6 @@
 // spec: queue-kit/SPEC.md §check-queue-entry-budget — a deferred entry is a costed filing:
-// bounded above so it is not an inlined amendment, bounded below so it is not a flag-and-skip;
-// an icebox entry is its lead line and nothing else
+// bounded above so it is not an inlined amendment, bounded below so it is not a flag-and-skip,
+// bounded in what it may displace; an icebox entry is its lead line and nothing else
 use crate::queue;
 
 const COST_MARK: &str = "**Cost while deferred";
@@ -12,6 +12,7 @@ struct Open {
     sec: Sec,
     costed: bool,
     nb: usize,
+    recur: bool,
 }
 
 #[derive(PartialEq, Clone, Copy)]
@@ -19,6 +20,24 @@ enum Sec {
     Other,
     Deferred,
     Icebox,
+}
+
+fn is_iso_date(tok: &str) -> bool {
+    let b = tok.as_bytes();
+    b.len() == 10
+        && b[4] == b'-'
+        && b[7] == b'-'
+        && [0, 1, 2, 3, 5, 6, 8, 9]
+            .iter()
+            .all(|&i| b[i].is_ascii_digit())
+}
+
+// spec: queue-kit/SPEC.md §check-queue-entry-budget — the discounted line is the `recurrence:`
+// declaration by its own grammar, lead token then slug then at least one ISO date, with no
+// entry-boundary or self-slug condition added
+fn is_recurrence(line: &str) -> bool {
+    let mut f = line.split_whitespace();
+    f.next() == Some("recurrence:") && f.next().is_some() && f.any(is_iso_date)
 }
 
 fn is_rule(line: &str) -> bool {
@@ -89,13 +108,24 @@ pub fn run(args: &[String]) -> i32 {
                     break;
                 }
                 let o = open.pop().unwrap();
-                let n = bound - o.start;
                 match o.sec {
                     Sec::Deferred => {
+                        // spec: queue-kit/SPEC.md §check-queue-entry-budget — the count is the
+                        // extent less at most one `recurrence:` declaration line per entry
+                        let n = bound - o.start - usize::from(o.recur);
                         if n > cap {
                             size.push(format!(
-                                "{}:{}: {} — {} lines (cap {})",
-                                file, o.start, o.slug, n, cap
+                                "{}:{}: {} — {} lines (cap {}){}",
+                                file,
+                                o.start,
+                                o.slug,
+                                n,
+                                cap,
+                                if o.recur {
+                                    ", after discounting one recurrence: line"
+                                } else {
+                                    ""
+                                }
                             ));
                         }
                         if o.ind == 0 && !o.costed {
@@ -164,6 +194,7 @@ pub fn run(args: &[String]) -> i32 {
                         sec,
                         costed: false,
                         nb: 1,
+                        recur: false,
                     });
                     if costed {
                         for o in open.iter_mut() {
@@ -176,8 +207,10 @@ pub fn run(args: &[String]) -> i32 {
         }
 
         if !open.is_empty() && !line.trim().is_empty() {
+            let recur = is_recurrence(line);
             for o in open.iter_mut() {
                 o.nb += 1;
+                o.recur |= recur;
             }
         }
         if !open.is_empty() && line.contains(COST_MARK) {
@@ -215,9 +248,11 @@ pub fn run(args: &[String]) -> i32 {
         }
         println!("  help: add the cost field, or evict the entry to the icebox as a one-line lead.");
         println!("        Over the cap: compress by ANSWERING grounds, never by dropping them —");
-        println!("        an unanswered ground is relocated to a linked entry, and that split is");
-        println!("        authorization-gated, not self-served (queue-kit/SPEC.md");
-        println!("        section check-queue-entry-budget).");
+        println!("        an unanswered ground is relocated to a linked entry. Relocating it into");
+        println!("        an entry that ALREADY owns its subject is self-served only for a");
+        println!("        mandated write; minting a NEW entry to hold it stays authorization-");
+        println!("        gated (queue-kit/SPEC.md section check-queue-entry-budget, which");
+        println!("        defines the class and owns the recurrence-line discount above).");
         return 1;
     }
 
