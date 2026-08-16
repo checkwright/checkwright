@@ -40,7 +40,7 @@
 - **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
   — the whole battery onto the binary, and the shell surface down to its residue.
   roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
-  Stays deferred rather than `## Done`: it is the **whole corpus** (47 of 104 unported), and a
+  Stays deferred rather than `## Done`: it is the **whole corpus**, and a
   Done move would assert a finished port and silently drop it from the **public** roadmap
   projection, which reads `[roadmap:]` tags off live entries.
   **Operator-ruled 2026-08-09: complete the port, ASAP.** The ruling, its grounds and its
@@ -63,15 +63,21 @@
   cohort's own price live there, so this entry states what remains rather than restating them.
   From the eighth on, members are **selected by running** `port-blockers.sh --group` rather than
   read off the tree; the size arm is now exhausted three times running, so the last three cohorts
-  rode the documented blocker-retiring override rather than a count. **57 of 104 ported.** The
+  rode the documented blocker-retiring override rather than a count. **59 of 104 ported** — a
+  dated 2026-08-16 oracle read (`bash gate-sdk/bin/port-blockers.sh --group`'s trailer, which
+  `scripts/measured-claims.sh` emits as `ported-gate-members`), never a count this line holds:
+  the prior hand-held figure here drifted two behind the tree. The
   eleventh is §The consumer remainder cohort, which closed `consumer-gate-port-disposition` at
   13 of 13 and emptied this repo's own gates directory of check scripts; what it leaves owed to
-  this entry is the unported emitters behind three ported freshness comparators.
+  this entry is the unported freshness emitters, whose roster
+  `freshness-emitter-port-cohort` owns — a count copied here drifted once already.
   Every held member is **sequencing with port work owed, never exclusion**, and what each owes
   is on `cohort-held-members-port-prerequisites`, which owns the roster and the kits it spans;
   a kit count copied here would be a second one to drift, and was.
-  **Cost while deferred:** large and known — 47 gates plus the runners and the install-lifecycle
-  layer, and every gate landed meanwhile adds shell to the eventual port. Not a single-iteration
+  **Cost while deferred:** large and known — the unported remainder (45 at the dated read
+  above) plus the runners and the install-lifecycle layer; since the 2026-08-14 born-native
+  default (TRAJECTORY.md §The closed rulings) a gate landed meanwhile no longer adds shell to
+  it. Not a single-iteration
   delta; scope owns the decomposition, and the criterion-relaxation question is closed at
   gate-sdk/SPEC.md §The port-candidate criteria — an ordering signal, never an eligibility screen.
   `gate-battery-parallel-execution` and
