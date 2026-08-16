@@ -2966,9 +2966,10 @@
   scope so the next reader finds a considered call instead of re-deriving the coupling.** The
   clause is this entry's own, seven lines up: `poll-sleep-guard-steer` "is the same rule from the
   side that *does* leave a tracked artifact, so a scope taking either should cost both". That
-  scope took `poll-sleep-guard-steer`, so the clause fired on its own terms. It is **not** a
-  recurrence-threshold question — this entry stands at one stamped date and has never met the
-  threshold — and reading it as one is the mistake to avoid on the next pass.
+  scope took `poll-sleep-guard-steer`, so the clause fired on its own terms. That decline was
+  **not** a recurrence-threshold call — the entry stood at one stamped date then. It stands at
+  two since 2026-08-16, stamped threshold-reached, so the threshold rule now reaches it and the
+  decline above does not answer that. Corrected at the 2026-08-16 scope; the decline stands.
   **Costed and declined as not-yet-designable, never as unimportant.** The operator ruled a
   narrowed bundle on 2026-08-15: `poll-sleep-guard-steer`, `waiter-predicate-self-match`,
   `harness-wait-primitive-unnamed`. Those three are one causal chain — unnamed primitive, then
