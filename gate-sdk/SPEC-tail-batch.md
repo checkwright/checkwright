@@ -103,6 +103,12 @@ these gates share **no** shell library — each duplicates the walker inline. A
 later selector must not read `--group`'s silence as evidence that no shared
 primitive is owed.
 
+What this batch does **not** settle, stated so the absence is a verdict: whether
+that blind spot leaves the blocker-retiring override live for some *later* batch
+is a selection question this amendment does not answer and this batch does not
+need answered. It composes by budget either way, and it lands the primitive
+either way.
+
 ### 4. `check-hook-exec-bit` ports
 
 A pure scan of `git ls-files -s` over the hooks directory asserting index mode

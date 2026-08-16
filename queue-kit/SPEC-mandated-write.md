@@ -160,6 +160,29 @@ discount is what pays for that cross-reference, and the sub-case is discharged b
 naming it rather than left standing as owed prose after the mechanism that
 answers it lands — **mechanical**.
 
+### 7. The seam verdict, stated because the class could easily have crossed it
+
+Everything here ships as **kit mechanism** and nothing becomes consumer config
+— **design-bearing**, because the natural way to write delta 1 would have
+crossed the seam.
+
+The mandated-write class is generic: it is defined by *a named contract obliges
+this write in this commit*, and it names no contract of this project's beyond
+the two kit-owned instances it cites — lifecycle-kit's gap-inbox drain and this
+section's own recording rule. A consumer's own mandated writes satisfy the
+definition without queue-kit ever hearing about them, which is the test.
+
+**A roster of mandated writes was the obvious shape and is refused.** A kit
+literal enumerating which contracts may mandate a write would ship one
+project's governance vocabulary as everyone's mechanism, and it would be a
+maintained roster besides — the two failures §The tag algebra already refuses a
+relational verb set on. The definition selects; the roster would have listed.
+
+**No knob is added**, and that is a verdict rather than an omission: the
+discount is one line by the declaration's own form, and the relief's trigger is
+a property of the write rather than a consumer preference. Neither has a value
+to configure.
+
 ## Producers and consumers
 
 This amendment introduces **one named class, one change to an existing
