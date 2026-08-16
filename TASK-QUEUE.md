@@ -6148,9 +6148,6 @@
 
 ## Done
 
-- waiting-rule-carrier-reach
-- installer-jq-silent-degradation
-
 ## Lessons Learned
 
 
