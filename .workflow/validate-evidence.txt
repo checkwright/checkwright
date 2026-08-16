@@ -1,1 +1,25 @@
 # contract: evidence-manifest v1
+keyed-knob-bridge gates sha256=3e3b30cfc75a391e9194e793e9381e329f0e3e6abcc0f70d83f922be49196559 pass=104 fail=0 ignore=0 verdict=clean 2026-08-16
+keyed-knob-bridge gate_sdk sha256=35c92394bfb0090018ba776356010dae71ef6d887532cfca6abb32620f13d9fc pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
+keyed-knob-bridge canon_kit sha256=c13b2442a2898fd4c5c30c9175f74b8e6d20ec43199ed0c9c7001203352040ae pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
+keyed-knob-bridge context_kit sha256=65e7536ec8b920506d9defb5f2fd338be716ee72482acf2e4819ca5b3fcbe891 pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
+keyed-knob-bridge delegation_kit sha256=d62b93b71c449eeafd8ab0e055be5b31cf98730a0c632aef78114119053c4727 pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
+keyed-knob-bridge doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
+keyed-knob-bridge evidence_kit sha256=b9a84e84d67dad5a63ae7ce34aecdc472ffbe13d06d01cc02f04bfca5b5de2ae pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
+keyed-knob-bridge guard_kit sha256=0d5bfe0b92c08f178b4fee3a0b91ba29b6001f42c0222ff3254e86a5561ad0ec pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
+keyed-knob-bridge lifecycle_kit sha256=68eaa631e5e5438312c15d4ac93bb1f36ab2533290eb94ae5aeb4af4821ab7e0 pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
+keyed-knob-bridge queue_kit sha256=bd337719dfff15f492ae94d8e8662663a8917b65edd4b3bfcfdd20f1790ba39b pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
+keyed-knob-bridge site_kit sha256=07f7139ea31865677de58ea44b43f7c98ae6c40c8f3fe57e8975e8d65794be35 pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
+keyed-knob-bridge scripts sha256=28b2b32bbd297a46b82dfd6915ad92a325eb579b3f56acc6e30bcd2dbe5af279 pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
+keyed-knob-bridge guard_tests sha256=1c7a43a12696781ff4405096f181e90ad94cc417b875d94ea9c46bc7d052a7df pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
+keyed-knob-bridge usage_tests sha256=04968d303b3e4ec54f3f8033f0e7e00d4b33ae90fd7507b48347cab56d0bc26d pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
+keyed-knob-bridge budget_guard_tests sha256=94bbe0c41f3993e3c748a492d29e2a0d22139825b8c53bbae6a528500a8ce402 pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
+keyed-knob-bridge dispatch_guard_tests sha256=6018943502411c07fe57162c0dae2ac37af304eccc0d0a9a6e0ec4fd733a1daf pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
+keyed-knob-bridge trend_tests sha256=acdbfef4eab851fca00ca747245b6ac4a4f804b05989f9cd3acd014bb56ac330 pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
+keyed-knob-bridge demo sha256=c4f35dcb14a0c7191f96b8b4018f8f16fc411e36750e6ba931e3befd60ac5991 pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
+keyed-knob-bridge installer_smoke sha256=32a1106064e0a9f9da4cc00775c07a6c2d703a35f15bf1593e3370b9fbaf9ccd pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
+keyed-knob-bridge consumer_smoke sha256=7839c4881758a28c88fc455e10ec174cbd6b4c0952efe517c54b7d270ee46d99 pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
+keyed-knob-bridge upgrade sha256=bd50ed22ef10b5a697d2e5f9a7fd3200cef65bc82d95818adbcae5e96662bc70 pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
+keyed-knob-bridge agents_md_smoke sha256=4786e3d567ada68916547500aabee715a5d72054cdbcc5a4d5392df23910ff90 pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
+keyed-knob-bridge index_tests sha256=e14e152466dc5be0296b1e20575bf3d587e1e0a127e7c63ad57671dbcaeaddb8 pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
+keyed-knob-bridge native_crate sha256=5c030b09d504ceb7ff45e85cd67dad5c20c9366748d1463a9f162222a80cc851 pass=1 fail=0 ignore=0 verdict=clean 2026-08-16
