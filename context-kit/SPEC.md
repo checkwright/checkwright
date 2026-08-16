@@ -495,7 +495,7 @@ stale page.
 
 ## The brevity gate
 
-`checks/check-brevity.sh` — a section-agnostic name: the governed section
+`check-brevity` — a section-agnostic name: the governed section
 is a knob, so no section name binds the gate (a consumer's
 `check-convention-brevity` would be its section-specific counterpart). It scans one designated
 always-loaded file for a bulleted section where each `- **name:**` bullet
@@ -857,7 +857,7 @@ context-kit/
   bin/always-loaded.sh
   bin/env-probe.sh               # derives the marker-bounded local env profile
   bin/run-index-tests.sh         # expected-output runner for the bin tools
-  checks/check-brevity.sh
+  checks/check-brevity.gate      # hermetic, binary-dispatched: the budgeted section's over-budget pointer bullets
   checks/check-settings-pins.gate  # hermetic, binary-dispatched: pins hold against the settings file
   checks/check-settings-paths.gate # hermetic, binary-dispatched: literal .sh grants resolve in the tree
   checks/check-memory-off.sh     # local-environment: memory dir + local overrides

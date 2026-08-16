@@ -3,6 +3,7 @@
 pub mod action_gh_repo;
 pub mod action_pinning;
 pub mod assertion_strength;
+pub mod brevity;
 pub mod comment_tier;
 pub mod deprecation_task;
 pub mod docs_cmd;
@@ -855,6 +856,21 @@ pub const REGISTRY: &[GateEntry] = &[
             "EVIDENCE_KIT_RUN_*",
         ],
         "gate-sdk",
+    ),
+    // spec: gate-sdk/SPEC.md §The first cohort, and the rule that selects the next — a budget
+    // batch's members carry no joint proof, so each declares its own reads and nothing shared:
+    // both read named files rather than listing a directory, the empty-walk-root shape.
+    (
+        "check-brevity",
+        brevity::run,
+        &[],
+        &[
+            "CONTEXT_KIT_BREVITY_FILE",
+            "CONTEXT_KIT_BREVITY_BUDGET",
+            "CONTEXT_KIT_BREVITY_SECTION",
+            "CONTEXT_KIT_BREVITY_POINTER_RE",
+        ],
+        "context-kit",
     ),
 ];
 

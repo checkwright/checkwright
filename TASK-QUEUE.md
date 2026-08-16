@@ -38,7 +38,7 @@
   cohort's own price live there, so this entry states what remains rather than restating them.
   From the eighth on, members are **selected by running** `port-blockers.sh --group` rather than
   read off the tree; the size arm is now exhausted three times running, so the last three cohorts
-  rode the documented blocker-retiring override rather than a count. **59 of 104 ported** — a
+  rode the documented blocker-retiring override rather than a count. **60 of 104 ported** — a
   dated 2026-08-16 oracle read (`bash gate-sdk/bin/port-blockers.sh --group`'s trailer, which
   `scripts/measured-claims.sh` emits as `ported-gate-members`), never a count this line holds:
   the prior hand-held figure here drifted two behind the tree. The
@@ -49,7 +49,7 @@
   Every held member is **sequencing with port work owed, never exclusion**, and what each owes
   is on `cohort-held-members-port-prerequisites`, which owns the roster and the kits it spans;
   a kit count copied here would be a second one to drift, and was.
-  **Cost while deferred:** large and known — the unported remainder (45 at the dated read
+  **Cost while deferred:** large and known — the unported remainder (44 at the dated read
   above) plus the runners and the install-lifecycle layer; since the 2026-08-14 born-native
   default (TRAJECTORY.md §The closed rulings) a gate landed meanwhile no longer adds shell to
   it. Not a single-iteration

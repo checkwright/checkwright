@@ -11,6 +11,7 @@ mod json;
 mod marker;
 mod proc;
 mod queue;
+mod section;
 mod spec;
 mod stages;
 mod walk;

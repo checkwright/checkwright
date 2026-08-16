@@ -11,7 +11,6 @@ set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # context-kit/
-GATE="$DIR/checks/check-brevity.sh"
 SANDBOX="$(mktemp -d)"
 trap 'rm -rf "$SANDBOX"' EXIT
 
@@ -50,7 +49,9 @@ EOF
 check_case() {  # $1=label  $2=want-rc  $3=want-substring  $4=file  $5..=env assignments
     local label="$1" want="$2" sub="$3" file="$4"; shift 4
     local out rc
-    out="$(env "$@" "$GATE" "$SANDBOX/$file" 2>&1)"; rc=$?
+    # spec: gate-sdk/SPEC.md §lib/gate.sh — the overrides are exported rather than passed through
+    # `env`, because the config bridge resolves this member's knobs before the argv it builds runs
+    out="$(export "$@"; gate_run check-brevity "$DIR/checks" "$SANDBOX/$file" 2>&1)"; rc=$?
     if [[ "$rc" -ne "$want" ]]; then
         echo "  FAIL [$label]: want exit $want, got $rc -- $out"; fails=$((fails + 1)); return
     fi
