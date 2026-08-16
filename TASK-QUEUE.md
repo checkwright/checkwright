@@ -73,26 +73,27 @@
   the work, and does not restate them. What it inherits unchanged: gate-sdk/SPEC.md §Porting a
   gate to the binary substrate for the porting procedure, §Consumer payload for the payload
   rule.
-  **The scope the ruling fixes, both shipped install paths, and the bootstrap residue are
-  TRAJECTORY.md §PRIORITY DIRECTIVE's** — deleted here 2026-08-15 as a verbatim second copy,
-  against this entry's own no-restatement claim above. Designing the bootstrap is still this
-  unit's work, not that file's.
-  **Wall-clock is the weaker argument and is answered:** the battery is under 6%
-  of validate, so the win is retiring shell *sources* the payload carries, not faster execution.
-  **This answers the toolchain-free objection:** the installer smoke's toolchain-free arm is
-  satisfied by the pre-compiled path, not by retaining shell gates. `powershell-installer-surface`
-  moves with it — one implementation across platforms shrinks its cover to the bootstrap.
+  **The scope, both install paths and the bootstrap residue are TRAJECTORY.md §PRIORITY
+  DIRECTIVE's**, not restated; designing the bootstrap is still this unit's work. **Two objections
+  answered:** wall-clock is the weaker case (battery under 6% of validate — the win is retiring the
+  shell *sources* the payload carries), and the toolchain-free arm rides the pre-compiled path, not
+  retained shell gates; `powershell-installer-surface` shrinks to the bootstrap for the same reason.
   **Eleven cohorts closed, plus the first budget batch; gate-sdk/SPEC.md §The first cohort, and
   the rule that selects the next is canonical for every one of them** — members, delivered
   counts, holds, grounds and each batch or cohort's own price live there, so this entry states
   what remains rather than restating them. From the eighth on, members are **selected by
-  running** `port-blockers.sh --group`; the size arm is now exhausted three times running, so
-  the ordering rule's live half is which blocker retires, with the budget arm composing a batch
-  when no group is takeable. **65 of 104 ported** — a dated 2026-08-16 oracle read (`bash
-  gate-sdk/bin/port-blockers.sh --group`'s trailer, which `scripts/measured-claims.sh` emits as
-  `ported-gate-members`), never a count this line holds. What both the eleventh cohort and the
-  first budget batch leave owed to this entry is the unported freshness emitters, whose roster
-  `freshness-emitter-port-cohort` owns — a count copied here drifted once already.
+  running** `port-blockers.sh --group`; the size arm ran exhausted for three increments and
+  selects again as of the read below, no blocker-retiring override surviving the keyed-knob
+  bridge; the budget arm composes a batch only when no group is takeable. **67 of 104 ported**
+  — a dated 2026-08-17 oracle read (`bash gate-sdk/bin/port-blockers.sh --group`'s trailer, which
+  `scripts/measured-claims.sh` emits as `ported-gate-members`), never a count this line holds.
+  What the eleventh cohort and the first budget batch leave owed here is the unported freshness
+  emitters, whose roster `freshness-emitter-port-cohort` owns — a count copied here drifted once.
+  **Increment ruled 2026-08-17 by the operator: the size arm's group 1 — `check-close-surfaces`
+  + `check-queue-prose-precondition`.** Sized at scope, and that date's survey-record block carries
+  the correction `--group` does not print: the cohort is not its two members' line counts, because
+  `check-close-surfaces` shells out to `lifecycle-kit/bin/close-surfaces.sh` and the port must
+  reimplement that derivation too.
   Every held member is **sequencing with port work owed, never exclusion**, and what each owes
   is on `cohort-held-members-port-prerequisites`, which owns the roster and the kits it spans;
   a kit count copied here would be a second one to drift, and was.
@@ -130,6 +131,40 @@
   Filed 2026-08-15 by close; scoped to the value-rollup triple by operator ruling 2026-08-15 and
   demoted at build 2026-08-16 having delivered that triple.
 
+- **queue-index-non-gate-arm-port** [design-pending] — `queue-kit/bin/queue-index.sh` (182 lines)
+  onto the binary's non-gate arm.
+  **A cohort under `native-gate-port-remaining-corpus`, not a competing claim on its corpus.**
+  That umbrella already covers this by its own words — "the whole battery onto the binary, **and
+  the shell surface down to its residue**" — so nothing here widens the port's scope. What did not
+  exist is a cohort at the granularity a bundling ground can name, which is the whole reason this
+  entry is filed rather than the umbrella cited.
+  **Why it fell through every filed cohort.** Cohort membership so far runs off the *gate* corpus
+  (`port-blockers.sh --group` scans registered members) or off a named family
+  (`freshness-emitter-port-cohort`'s six `check-*-fresh` emitters). `queue-index.sh` is neither: it
+  is a tool, not a gate — its own header says so, and it carries no `# graph:` manifest — and it
+  emits no freshness projection. So it is reachable by no selector the port currently runs, which
+  is a gap in the *selection* machinery as much as in the roster.
+  **The shape is already ruled, so this applies a decision rather than taking one:** a ported
+  non-gate tool becomes a non-gate arm of the binary (gate-sdk/SPEC.md §The non-gate arm), the
+  form `freshness-emitter-port-cohort` records as answered and merged.
+  **Why `[design-pending]` even so — the caller set is the open half, and it is not a gate's.**
+  Its callers are a session-context hook (`context-kit/templates/session-context.sh`,
+  `context-kit/bin/always-loaded.sh`), a sibling shell tool (`queue-kit/bin/queue-counts.sh`) and
+  the close skill. A ported emitter could be called in-process by its already-compiled comparator;
+  this one has no gate consumer at all, so the port must decide what each caller invokes and
+  whether the hook's own shell survives it under TRAJECTORY.md objective 6.
+  **What lands with it, and what does not.** `icebox-worklist-roadmap-blind` re-grounds its
+  deferral on this entry, so its predicate rides this port; its *presentation* half — whether an
+  excluded row vanishes or prints as a stated exclusion — stays that entry's to decide, and this
+  one must not pre-empt it. queue-kit/SPEC.md §check-queue-entry-budget already refused a
+  `--headroom` mode here on the ground that it "grows a shell tool this repo's port track
+  retires", so the SPEC anticipates this unit by name.
+  **Cost while deferred:** one 182-line shell tool stays in the dependency floor against
+  TRAJECTORY.md objectives 1 and 6, on the session-context hook path where every session pays it;
+  and `icebox-worklist-roadmap-blind` stays deferred behind it at a measured zero precision per
+  close.
+  Filed 2026-08-17 at scope on the operator's ruling, dispositioning a carrier gap this scope's
+  own survey found (`.workflow/survey-record.md`, the port-increment block of that date).
 
 - **born-native-omission-accumulation** [design-pending] — the born-native flip attaches
   criterion 5's omission to every future gate, and nothing measures the pile.
@@ -3920,19 +3955,13 @@
   queue-kit/SPEC.md §The icebox tier states that a roadmap-tagged entry is not
   icebox-eligible — a hard rule, not a judgment. The worklist does not read the tag.
   recurrence: icebox-worklist-roadmap-blind 2026-08-15 2026-08-16
-  **Measured this close: 3 of 3 offered candidates carried a roadmap tag**
-  (`plugin-marketplace`, `benchmark-ab-experiment`, `hosted-attestation-service`), so the
-  worklist's precision was zero and every row was resolved by re-deriving the same exclusion.
-  **The tool is honest about being advisory** — its own `spec:` comment says the age filter
-  "only bounds how much close must look at" — so this is not a correctness defect, and that is
-  why it is filed rather than fixed in place. The question the unit owes is whether a
-  *categorical* eligibility rule belongs in the bound at all, given the tier deliberately keeps
-  judgment out of the tool.
-  **Why the advisory defence does not settle it**, merged in from a duplicate filing: that
-  defence is about the **cost-class heuristic**, which is prose-matched and rightly advisory.
-  Roadmap-eligibility is neither prose nor judgment — the tag is on the lead line the tool
-  already parses, and the SPEC states the exclusion in the imperative. Filtering it removes
-  re-derivation without deciding anything.
+  **The advisory defence is raised and settled**, merged in from a duplicate filing. The tool's own
+  `spec:` comment says the age filter "only bounds how much close must look at", so this is not a
+  correctness defect and is filed rather than fixed in place; but that defence covers the
+  **cost-class heuristic**, which is prose-matched and rightly advisory. Roadmap-eligibility is
+  neither prose nor judgment — the tag is on the lead line the tool already parses and the SPEC
+  states the exclusion in the imperative — so filtering it removes re-derivation without deciding
+  anything. What the unit still owes is whether a *categorical* rule belongs in the bound at all.
   **The open half is presentation, not predicate:** whether an excluded row should vanish or
   print as a stated exclusion. Vanishing is cleaner; printing keeps the reason visible to a close
   that would otherwise wonder where a long-dormant roadmap entry went, and the answer turns on
@@ -3945,7 +3974,8 @@
   both clauses or say why the machine-readable one is worth taking alone.
   **Cost while deferred:** low, recurring, and paid by every close — three entries re-read and
   one rule re-derived per iteration, forever, against a one-predicate fix. Re-measured at the
-  2026-08-13, 2026-08-15, 2026-08-16 and 2026-08-17 closes: precision has been zero five running.
+  2026-08-13, 2026-08-15, 2026-08-16 and 2026-08-17 closes and again at the 2026-08-17 scope:
+  precision has been zero six running.
   **Deferred 2026-08-16 at scope on the lead's ruling, though the threshold rule reached it, and
   the ground is substrate rather than merit.** The claim re-verified live at that scope — the
   worklist offered 4 rows, 3 roadmap-tagged, precision zero a fourth time, and a grep of the
@@ -3954,9 +3984,15 @@
   directive commits to deleting the shell runners as well as the gates
   (TRAJECTORY.md §PRIORITY DIRECTIVE). A bash predicate patched into it is work the port throws
   away. What that argues for is bundling: take this defect with the tool's own port to a
-  non-gate arm (gate-sdk/SPEC.md §The non-gate arm, the shape `roadmap.sh` already has queued),
-  not alone. The 2026-08-14 born-native default does **not** reach it — that default governs
-  gates, and this is a bin tool — so the coupling is to the directive, not to that ruling.
+  non-gate arm (gate-sdk/SPEC.md §The non-gate arm), not alone. The 2026-08-14 born-native
+  default does **not** reach it — that default governs gates, and this is a bin tool — so the
+  coupling is to the directive, not to that ruling.
+  **Re-opened 2026-08-17 by the operator, because that bundling ground named no carrier.** It
+  cited `roadmap.sh`'s queued port as precedent for the *shape*, but `roadmap.sh` sits in
+  `freshness-emitter-port-cohort`, whose corpus is the six `check-*-fresh` emitters, and
+  `queue-index.sh` is neither a fresh emitter nor a gate — so it fell outside every filed cohort
+  and this deferral pointed at a carrier that did not exist. `queue-index-non-gate-arm-port` is
+  filed as that carrier; the deferral stands, grounded on it now rather than on a shape.
   Filed 2026-08-09 by close (`install-profile-seam`) from its own backlog-eviction step;
   a duplicate filing of the same finding (`icebox-candidate-roadmap-filter`, 2026-08-13) was
   merged in here at the 2026-08-13 close, which also filed
