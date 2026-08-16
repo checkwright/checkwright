@@ -6003,7 +6003,15 @@
   needs, which would confirm delegation-kit's ruling rather than overturn it; the second half is
   a measurement whose result could change a stated protocol ordering. Neither is a patch.
   **Cost while deferred:** each further firing costs an orphaned producer plus the lead turn that
-  discovers it — three such turns this iteration, against four prompt-side statements of the rule.
+  discovers it — three such turns in the iteration that filed this, against four prompt-side
+  statements of the rule.
+  **It fired again in the very next iteration** (`port-tail-batching-and-cap-relief`, 2026-08-16):
+  the validate session ended its turn on a live `run-validate`, the harness marked the agent
+  complete, and the lead had to resume it from transcript. That firing is the sharpest evidence
+  the entry has, because the rule reached that session through the **stage-session agent
+  definition itself** — not a dispatch prompt — which is the strongest prose carrier the project
+  has and the one `waiting-rule-carrier-reach` shipped. The mechanical half held again: the
+  launch-time liveness record answered `kill -0` and no evidence was lost.
   Filed 2026-08-16 by close from the gap inbox, both halves; the drain re-verified the carrier
   count and the chokepoint scoping against the SPEC rather than taking the bullet's prose.
 

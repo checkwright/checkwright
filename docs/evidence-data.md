@@ -94,3 +94,4 @@
 | declaration-cohort-and-consumer-first-mover | sc sp a b v c | 3f/0d | 2 · ≤0d | 24s clean | 104 |
 | consumer-cohort-completion-and-wait-enforcement | sc sp a b v c | 3f/0d | 2 · ≤0d | 24s clean | 104 |
 | freshness-emitter-substrate | sc sp a b v c | 12f/5d | 3 · ≤1d | 32s 1✗ | 104 |
+| port-tail-batching-and-cap-relief | sc sp a b v c | 10f/0d | 3 · ≤0d | 24s clean | 104 |
