@@ -943,6 +943,21 @@ binds top-level entries only — a sub-task is covered by its parent's costing.
 entry's residency is one iteration by the drain rule, so it has no carry to
 cap. The carry problem is the deferred pool's alone.
 
+**Clean-path headroom.** When all three assertions hold, the clean line is
+followed by one line per Deferred entry — a sub-task included, since it is
+measured as its own entry under (A) — naming that entry's headroom to the cap:
+the same count assertion A already derives, one subtraction away, so exposing
+it costs no new computation and mints no new name. This is exposure, not a new
+capability: the enforcing member already computes each entry's count in order
+to enforce the cap, so a session sizing an edit reads the measurement instead
+of hand-rolling it — a hand-rolled probe carries the risk of a second spelling
+of the cap, a second implementation of the parse, and a mismeasured entry
+boundary that reads as a false cap overrun. The rejected
+alternative was a `--headroom <slug>` mode on `bin/queue-index.sh`: it mints a
+name and grows a shell tool this repo's port track retires, where this
+exposure spends nothing beyond a print at the compiled assertion's existing
+computation.
+
 *Why one `recurrence:` line is discounted, and why exactly one.* The line is
 **fixed-shape and width-bounded** — §The tag algebra rules its ceiling to be
 `check-queue-wrap`'s budget and rules reaching that ceiling the *correct*

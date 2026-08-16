@@ -14,47 +14,6 @@
 
 ## Technical Debt
 
-- **entry-headroom-unexposed** — the cap is enforced by a gate and exposed by nothing, so every
-  session sizing an edit hand-rolls the measurement it then trusts.
-  recurrence: entry-headroom-unexposed 2026-08-15 2026-08-16
-  **Promoted 2026-08-16 at scope on the lead's ruling, with the arm ruled in the same motion.**
-  `check-queue-entry-budget` prints per-entry headroom in its clean output. That arm mints no
-  governed name, so this is **debt**; it lands **native**, the gate already being a `.gate`
-  (`native/src/gates/queue_entry_budget.rs`), and it costs no new surface at all. The rejected
-  arm was a `--headroom <slug>` mode on `queue-kit/bin/queue-index.sh`: it mints a name, and it
-  grows the shell bin tool TRAJECTORY.md §PRIORITY DIRECTIVE commits to deleting.
-  `check-queue-entry-budget` computes each entry's line count in order to enforce
-  `QUEUE_KIT_ENTRY_LINE_CAP`. Headroom is that computation one output away, so what is missing
-  is **exposure, not capability**.
-  **Three defects in the hand-rolled substitute, and the third is attested.**
-  (1) It re-spells a knob default. A scratch probe hardcoding the cap is a second spelling of
-  `QUEUE_KIT_ENTRY_LINE_CAP`, which de-literalization forbids, and any consumer who retunes the
-  knob gets a probe that lies to them — the class `knob-default-accessor-singularity` names,
-  reached by no gate here because scratch is gitignored.
-  (2) It re-implements the parse. The enforcing member is a `.gate` in the binary, so a shell
-  probe is a second implementation of one entry-boundary rule, and it is the copy a session
-  trusts when deciding how much prose to cut.
-  (3) **It was wrong, and nothing went red.** The probe terminated an entry at the next `- **`
-  line. For the *last* entry in `## Deferred` that terminator is the first **Icebox** entry, so
-  it swallowed that heading and its preamble and over-counted by **8**. Measured against
-  `--extent`, an entry standing at 42 lines was reported as sitting at the cap, and **three of
-  five compression rounds on it were therefore unnecessary** — a failure presenting as an
-  ordinary cap overrun rather than as an error.
-  **2026-08-15: defects 1 and 2 both recurred, 2 in its documented broken form.** Seven `python3`
-  heredocs across that iteration's scope and build sessions re-implemented the entry walk,
-  several terminating on the next `- **`; its close then read the cap literal out of the kit
-  library and subtracted by hand.
-  **It is also an oracle-first miss.** `queue-index.sh --extent` shipped before that session and
-  would have given the boundary correctly; the probe was written anyway.
-  **DISTINCT from `entry-cap-displaces-mandated-writes`**, and deliberately not folded into it.
-  That entry owns the *displacement*; this owns the *instrument that decides how much to
-  displace*. Exposing headroom does not reduce displacement by one line, so it cannot close that
-  entry — but the two **compound**: a faulty instrument plus a cap that forces cutting produces
-  prose cut that never needed cutting, which is the worst cell of the matrix and is what
-  happened.
-  Filed 2026-08-12 by close, from the operator's observation of that session's own scratch tool —
-  and demonstrated by that tool inside the same session.
-
 ## Deferred
 
 - **cohort-held-members-port-prerequisites** [design-pending] — gates are held on
@@ -6223,6 +6182,8 @@
 - **scratch-execution-allowlist-bar** [design-pending] — Each close re-derives this standing bar.
 
 ## Done
+
+- entry-headroom-unexposed
 
 ## Lessons Learned
 

@@ -91,6 +91,10 @@ pub fn run(args: &[String]) -> i32 {
     };
 
     let (mut size, mut cost, mut shape) = (Vec::new(), Vec::new(), Vec::new());
+    // spec: queue-kit/SPEC.md §check-queue-entry-budget — headroom is the size
+    // assertion's own count one subtraction away, collected for every closed
+    // Deferred entry regardless of cap outcome and surfaced only on the clean path
+    let mut headroom: Vec<(usize, String, usize)> = Vec::new();
     let mut open: Vec<Open> = Vec::new();
     let mut sec = Sec::Other;
     let mut bound;
@@ -131,6 +135,7 @@ pub fn run(args: &[String]) -> i32 {
                         if o.ind == 0 && !o.costed {
                             cost.push(format!("{}:{}: {}", file, o.start, o.slug));
                         }
+                        headroom.push((o.start, o.slug.clone(), cap.saturating_sub(n)));
                     }
                     Sec::Icebox => {
                         if o.nb > 1 {
@@ -260,5 +265,13 @@ pub fn run(args: &[String]) -> i32 {
         "QUEUE-ENTRY-BUDGET: clean (every {} entry within {} lines and carrying a cost field in {})",
         sec_cfg.deferred, cap, file
     );
+    if !headroom.is_empty() {
+        println!();
+        println!("headroom under the {}-line cap, per entry:", cap);
+        headroom.sort_by_key(|(start, _, _)| *start);
+        for (_, slug, h) in &headroom {
+            println!("  {}: {} lines of headroom", slug, h);
+        }
+    }
     0
 }
