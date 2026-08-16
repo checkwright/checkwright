@@ -5167,6 +5167,13 @@ It is a tool, not a gate: no `# graph:` manifest, no `# install:` header, no
 fixture pair — the same distinction `queue-kit/bin/roadmap.sh` carries. It is
 `100755` in the index like every other `*/bin/*.sh` (§check-exec-bit).
 
+**When to run it relative to `git add` is §check-gate-binary-fresh's rule, not
+this section's.** A build made before a new crate file is staged bakes a stamp
+that the tree side then cannot match; that section owns the ordering and its
+ground. The pointer is here because a session investigating a stamp red reaches
+this script first, and this section is where the script's own `# spec:` line
+lands it.
+
 **Why this is generic kit mechanism and vendors with the rest of gate-sdk.** It
 builds *the configured crate* and carries no repo-specific path, no product
 constant, and no private vocabulary; `native/` reaches it only as
