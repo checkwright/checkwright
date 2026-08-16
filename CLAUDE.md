@@ -146,11 +146,9 @@ load behind that trigger, so they are not resident here.
   gate-sdk/SPEC.md §Porting a gate to the binary substrate; the shipped
   install behavior: installer/README.md §The gate binary.
 - `CONTRIBUTING.md` + the `.github/` issue/PR templates, `CODE_OF_CONDUCT.md`,
-  `SECURITY.md`, and `RELEASING.md` are governed repo-meta (tracked,
-  core-files-pinned, in the spec manifest so their links/commands resolve like
-  any doc); the fixture is the unit of contribution — edit the guide, not GitHub
-  UI settings. The release runbook is the load-triggered tier, resident only at
-  close's release step.
+  `SECURITY.md`, and `RELEASING.md` are governed repo-meta — tracked,
+  core-files-pinned, gated like any doc; the fixture is the unit of
+  contribution, so edit the guide, not GitHub UI settings.
 - `ROADMAP.md` is a generated root projection of this queue's curated
   `[roadmap:]` tags — never hand-edit its marker block; it is rostered with its
   trigger and regen command like every other generated projection.
