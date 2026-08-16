@@ -12,52 +12,6 @@
 
 ## New Features
 
-- **cohort-held-members-port-prerequisites** [spec: SPEC-keyed-knob.md] — gates are held on
-  shell by operator ruling, each owing a named prerequisite nothing else tracks.
-  Ground is **sequencing, not exclusion**: gate-sdk/SPEC.md §The port-candidate criteria opens
-  by denying the seven are an eligibility screen, and criterion 7's worked example
-  (`check-action-run-shell` / `shellcheck`) names such a member the largest piece of port work
-  rather than a permitted exclusion. Every hold **and its grounds** are canonical at
-  gate-sdk/SPEC.md §The first cohort; this entry carries only the work owed, so a ground
-  stated there is cited here and never restated.
-  The count is the roster's, never a fixed number.
-  **`check-roadmap-fresh` owes an emitter design; the label is cohort composition** — relabelled
-  off criterion 7 at build 2026-08-12, ground unchanged. It is canonical, with the whole
-  family's per-member cost derivation, at gate-sdk/SPEC.md §The first cohort. Three candidate
-  designs are stated once by their owner; none is ruled.
-  Worth preserving in the design: the hold keeps `queue_roadmap_entries` on one shell adapter,
-  so queue-kit/SPEC.md's "the emitter and the gate can never disagree" guarantee survives intact
-  and is **not** part of the dual-implementation debt above.
-  **The POSIX ERE engine is PAID** (landed 2026-08-13 at build); the members it unblocks and
-  `check-comment-tier`'s standing screen-out are the canonical roster's, cited not restated.
-  **One of them owes more than its port: `check-tree-terms` — corrected 2026-08-13 at close** on
-  the mechanical confirmation the gap inbox asked for. Its corpus is `git ls-files` over the
-  whole tracked tree, pruned only by `GATE_PRUNE_DIRS` and the pattern-file basenames — a live
-  run scans 518 files and prunes neither `*/checks/` nor `native/src/` — so every declaration
-  path lies inside the corpus it scans as content, criterion 4's own predicate verbatim. It
-  carries a criterion-4 hold on top of its port, so the gate-sdk leak-guard pair is not the
-  clean first-cohort shape it reads as. Independent of assertion C, which does not select it
-  (`couples=scripts/msg-patterns.list`).
-  **The associative-array bridge is ONE prerequisite shared by two members in two kits** — a
-  shape no per-member line expresses. `check-stage-entry` (lifecycle-kit) and
-  `check-evidence-baseline` (evidence-kit) each read a `declare -A` knob **by key**, and the
-  bridge's wire carries elements with no key channel, so a selector reaching either kit finds
-  one prerequisite rather than re-deriving it twice. Held 2026-08-13 at spec with the sixth
-  cohort; ruled `keyed-knob-bridge`'s increment 2026-08-16 by the lead under gate-sdk/SPEC.md
-  §The first cohort's blocker-retiring override, reachable because no larger cohort is.
-  **Promoted 2026-08-16 at spec**; SPEC-keyed-knob.md owns the wire grammar and both ports.
-  Authoring found the hold understated: `--reads` cannot express a walk's filter either, and a
-  descriptor has no exemption, so `check-stage-entry` owes a **second** channel. **This
-  increment carries it — lead-ruled 2026-08-16**, the split refused with grounds in §5b.
-  **Cost of the remainder:** `native-gate-port-remaining-corpus` ranks the remaining corpus as
-  undifferentiated gate-count, so a held member reads as one more unported gate when its
-  prerequisite is a sub-project. A later cohort discovers the sizing at implementation
-  time, which is the failure mode criterion 7 exists to prevent — designed first, then ported,
-  never ported and patched.
-  Filed 2026-08-12 by close; widened at build with the canon-kit trio; engine count and cohort
-  cleanliness corrected 2026-08-12 at scope from an 85-gate census, on operator direction;
-  the engine block collapsed 2026-08-13 at build when the ERE cohort paid it.
-
 ## Technical Debt
 
 - **entry-headroom-unexposed** — the cap is enforced by a gate and exposed by nothing, so every
@@ -103,10 +57,54 @@
 
 ## Deferred
 
+- **cohort-held-members-port-prerequisites** [design-pending] — gates are held on
+  shell by operator ruling, each owing a named prerequisite nothing else tracks.
+  Ground is **sequencing, not exclusion**: gate-sdk/SPEC.md §The port-candidate criteria opens
+  by denying the seven are an eligibility screen, and criterion 7's worked example
+  (`check-action-run-shell` / `shellcheck`) names such a member the largest piece of port work
+  rather than a permitted exclusion. Every hold **and its grounds** are canonical at
+  gate-sdk/SPEC.md §The first cohort; this entry carries only the work owed, so a ground
+  stated there is cited here and never restated.
+  The count is the roster's, never a fixed number.
+  **`check-roadmap-fresh` owes an emitter design; the label is cohort composition** — relabelled
+  off criterion 7 at build 2026-08-12, ground unchanged. It is canonical, with the whole
+  family's per-member cost derivation, at gate-sdk/SPEC.md §The first cohort. Three candidate
+  designs are stated once by their owner; none is ruled.
+  Worth preserving in the design: the hold keeps `queue_roadmap_entries` on one shell adapter,
+  so queue-kit/SPEC.md's "the emitter and the gate can never disagree" guarantee survives intact
+  and is **not** part of the dual-implementation debt above.
+  **The POSIX ERE engine is PAID** (landed 2026-08-13 at build); the members it unblocks and
+  `check-comment-tier`'s standing screen-out are the canonical roster's, cited not restated.
+  **One of them owes more than its port: `check-tree-terms` — corrected 2026-08-13 at close** on
+  the mechanical confirmation the gap inbox asked for. Its corpus is `git ls-files` over the
+  whole tracked tree, pruned only by `GATE_PRUNE_DIRS` and the pattern-file basenames — a live
+  run scans 518 files and prunes neither `*/checks/` nor `native/src/` — so every declaration
+  path lies inside the corpus it scans as content, criterion 4's own predicate verbatim. It
+  carries a criterion-4 hold on top of its port, so the gate-sdk leak-guard pair is not the
+  clean first-cohort shape it reads as. Independent of assertion C, which does not select it
+  (`couples=scripts/msg-patterns.list`).
+  **The associative-array bridge is PAID** (landed 2026-08-16 at build): the keyed wire arm
+  released `check-stage-entry` and `check-evidence-baseline` together, and the port uncovered a
+  second channel of the same class — `--reads` could not express a walk's filter — which the
+  same increment carried rather than splitting. The retired holds, the refused split and its
+  grounds are canonical at gate-sdk/SPEC.md §The first cohort, cited not restated.
+  **Cost while deferred:** `native-gate-port-remaining-corpus` ranks the remaining corpus as
+  undifferentiated gate-count, so a held member reads as one more unported gate when its
+  prerequisite is a sub-project. A later cohort discovers the sizing at implementation
+  time, which is the failure mode criterion 7 exists to prevent — designed first, then ported,
+  never ported and patched.
+  Filed 2026-08-12 by close; widened at build with the canon-kit trio; engine count and cohort
+  cleanliness corrected 2026-08-12 at scope from an 85-gate census, on operator direction;
+  the engine block collapsed 2026-08-13 at build when the ERE cohort paid it; promoted
+  2026-08-16 at spec and **demoted again 2026-08-16 at build** rather than moved to Done — the
+  deliverable is the corpus of held members and the keyed-knob amendment delivered one
+  increment of it (canon-kit/SPEC.md §Merging an amendment, the entry-outlives-the-amendment
+  branch), with `check-roadmap-fresh` and `check-tree-terms` still owing theirs.
+
 - **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
   — the whole battery onto the binary, and the shell surface down to its residue.
   roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
-  The entry stays deferred rather than moving to `## Done`: it is the **whole corpus**, 39 of
+  The entry stays deferred rather than moving to `## Done`: it is the **whole corpus**, 37 of
   104 registered gates remain unported, and a Done move would assert a finished port and
   silently drop it from the **public** roadmap projection, which reads `[roadmap:]` tags off
   live entries.
@@ -139,7 +137,7 @@
   Every held member is **sequencing with port work owed, never exclusion**, and what each owes
   is on `cohort-held-members-port-prerequisites`, which owns the roster and the kits it spans;
   a kit count copied here would be a second one to drift, and was.
-  **Cost while deferred:** large and known — the unported remainder (39 at the dated read
+  **Cost while deferred:** large and known — the unported remainder (37 at the dated read
   above) plus the runners and the install-lifecycle layer; since the 2026-08-14 born-native
   default (TRAJECTORY.md §The closed rulings) a gate landed meanwhile no longer adds shell to
   it. Not a single-iteration
@@ -4214,8 +4212,9 @@
   The close entry preflight (`scripts/lifecycle-config.sh`'s
   `LIFECYCLE_KIT_ENTRY_PREFLIGHT`) refuses until every suite carries a clean
   evidence line. The sanctioned way to make a known red clean is a baseline `fail`
-  row carrying a blocking slug, and `check-evidence-baseline.sh` L68-75 requires
-  that slug to resolve to a **live queue task**. But the stage chartered to file
+  row carrying a blocking slug, and `check-evidence-baseline`'s liveness assertion
+  (evidence-kit/SPEC.md §check-evidence-baseline) requires that slug to resolve to
+  a **live queue task**. But the stage chartered to file
   that task is close — which cannot enter until the preflight the mark would
   clear passes. Validate cannot pre-empt it either: a mid-iteration queue edit is
   exactly what the gap inbox exists to prevent.

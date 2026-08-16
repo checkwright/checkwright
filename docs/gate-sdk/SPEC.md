@@ -2104,6 +2104,22 @@ shared with `check-evidence-baseline`, which is why the queue held one entry for
 rather than one per member. The keyed-arm increment paid exactly that (§lib/gate.sh)
 and both members ported together; the grounds are kept because this section is
 canonical for every cohort's holds *and their disposition*.
+
+**Splitting that increment was refused, and the grounds generalise.** Authoring
+found a second missing channel of the same class (§check-reads-couples' filter
+field) affecting only one of the two members, and the cheap move was to deliver
+the unaffected member and re-block the other. Two of the four grounds are ones a
+split cannot answer: the increment's selection rode the **blocker-retiring
+override on the pair**, so delivering one member undercuts the ground of its own
+selection; and splitting would leave the keyed wire with **no non-empty live
+instance in this tree**, since only the predecessor map actually resolves at
+every pre-commit and only if its reader ported — a wire format whose in-tree
+exercise is the empty case is one whose first real consumer finds the bugs. The
+other two: both gaps are one defect class — *a wire the compiled substrate
+cannot say what the shell substrate could* — and holding a member on a
+designed-but-unbuilt prerequisite buys delay and retires no risk. The honest
+cost is recorded with it: the increment ran larger than it was scoped, by one
+wire-format change scope did not see.
 **`check-close-surfaces` is out rather than held**: it sources
 no `lib/stages.sh` at all, so it is *unsized*, and a later selector owes it a
 sizing rather than inheriting a hold whose ground was never established.
@@ -4370,6 +4386,16 @@ Resolution, per declared knob:
   `check-stage-entry` respectively, and are the arm's live instances: the second
   resolves at every pre-commit run in this repo, the first is empty here and
   exercised non-empty only by its owning fixture.
+
+  **The residue the arm leaves, stated rather than discovered later.** A reader
+  taking a knob as an *array* when its consumer has since redeclared it
+  `declare -A` receives `key=value` strings and cannot tell. The reverse
+  direction *is* caught — the map reader refuses an element with no `=`. Closing
+  the remaining direction means transporting the reader's expected shape back to
+  the producer, which is the maintained declaration the derived-shape rule above
+  declined to mint, and the hazard needs a consumer to change a shipped knob's
+  **grammar**, which is a kit-SPEC-governed contract change rather than a
+  configuration edit.
 - **A declared name ending in `*` is a prefix, and the bridge resolves the whole
   family under it** — one `GATE_SDK_KNOB_<NAME>=<tab-joined>` element per match,
   sorted, so the emitted environment is deterministic and the generated hook it
@@ -6694,6 +6720,17 @@ bridge it already sources and forwards the resolved value where an unfiltered ro
 passes the empty pattern. Resolution failure is **fail-closed**: a named knob the
 owning kit does not define is exit 2 naming it, never an empty filter silently
 widening the demand to the whole root.
+
+**Two alternatives are refused, recorded so a later port does not retry them.**
+Declaring `?` for such a root is refused: `?` marks a root that cannot be
+*bounded statically*, and every member carrying it does so because its root is an
+argument with a default, where these are literal — spelling one `?` would be the
+foreclosed opt-out moved into the registry. Re-implementing the scan over
+`git ls-files` to fall outside the analyzed class is refused for the same reason
+with a behavioral cost on top: enumeration is out of scope *because* it is not a
+walk, so using it to evade the assertion is opting out spelled in code, and it
+silently narrows the scan to **tracked** files where the walk sees an untracked
+one too.
 
 **The filter is carried as a knob name and never as a literal pattern, and that is
 the load-bearing detail.** The walks this exists for select by *knob values* — which
