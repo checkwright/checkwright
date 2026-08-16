@@ -207,4 +207,10 @@ binary's baked source stamp against the crate's tracked source whenever a `.gate
 descriptor makes it load-bearing. Recorded because the derivation-first reflex
 reads "generated artifact" and reaches for this roster; the answer is that the
 roster's admission rule is narrower than that reflex, and the obligation has a
-home.
+home. **The staging-order hazard stated above for the footprint regen binds this
+build too**, for the same reason and with the same remedy — that stamp is
+computed over *tracked* crate source, so a unit adding a crate file builds after
+`git add`, never before; the rule and its mechanism are the owner's
+(gate-sdk/SPEC.md §check-gate-binary-fresh), and it is pointed at from here
+because a session that knows the hazard from this roster will look for its
+sibling here first.

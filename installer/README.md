@@ -488,7 +488,10 @@ with the same remedy, a re-run of `init`.
 
 `doctor` defines no floor of its own. It sources the toolchain roster out of
 its own `payload/` and renders whatever verdict that roster's predicate
-returns, so the contract keeps one owner and this stays a display of it. The
+returns, so the contract keeps one owner and this stays a display of it. Which
+members are consumer-audience — and so which absences set the verdict — is read
+off that roster, never listed here; §Requirements works the one case a reader
+arrives with, `jq`, and says why it is below contract rather than outside it. The
 payload copy is the one it reads, never a copy in the tree it is inspecting:
 at `init` time nothing has been vendored there yet, so a tree copy would not
 exist at the moment the answer is needed.
