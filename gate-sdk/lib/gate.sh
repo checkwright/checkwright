@@ -126,7 +126,8 @@ _gate_knob_owning_kit() {
     gate_sdk_root
 }
 
-# spec: gate-sdk/SPEC.md §lib/gate.sh — resolve one declared knob to its tab-joined value by sourcing the owning kit's lib/*.sh in a subshell, so a kit library's globals cannot leak into the dispatcher or across members. Emits the joined value on stdout; returns non-zero having named the knob on stderr for each of the three refusals (undeclared knob, tab in an element, newline in an element).
+# spec: gate-sdk/SPEC.md §lib/gate.sh — resolve one declared knob to its tab-joined value by sourcing the owning kit's lib/*.sh in a subshell, so a kit library's globals cannot leak into the dispatcher or across members. Emits the joined value on stdout; returns non-zero having named the knob on stderr for each refusal (undeclared knob, tab or newline in an element, `=` in a key of a keyed knob).
+# spec: gate-sdk/SPEC.md §lib/gate.sh — which arm a knob takes is *derived* from its own `declare -p` output rather than declared by the member: the same call that confirms the knob is defined carries the `declare -A` marker, so a keyed knob answers the shape question itself and no roster spelling is maintained beside it.
 _gate_knob_value() {
     local knob="$1" gate="$2" kit
     kit="$(_gate_knob_owning_kit "$knob")"
@@ -141,10 +142,15 @@ _gate_knob_value() {
             # shellcheck disable=SC1090  # the owning kit's library, resolved by prefix
             source "$_gkv_f"
         done
-        if ! declare -p "$knob" >/dev/null 2>&1; then
+        local _gkv_decl
+        if ! _gkv_decl="$(declare -p "$knob" 2>/dev/null)"; then
             printf 'gate_command: %s declares knob %s, but %s/lib defines no such knob — ' "$gate" "$knob" "$kit" >&2
             printf 'the config bridge could not resolve it; treating as failure (not clean)\n' >&2
             exit 2
+        fi
+        if [[ "$_gkv_decl" =~ ^declare[[:space:]]+-[a-zA-Z]*A ]]; then
+            _gate_knob_pairs "$knob"
+            exit $?
         fi
         local -n _gkv_val="$knob"
         local _gkv_e
@@ -163,6 +169,45 @@ _gate_knob_value() {
         local IFS=$'\t'
         printf '%s' "${_gkv_val[*]+"${_gkv_val[*]}"}"
     )
+}
+
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the keyed arm's serialization: one `<key>=<value>` per tab-separated element, sorted by key. The sort is `LC_ALL=C` because the resolved argv is baked verbatim into the tracked pre-commit hook, so the emitted order must not depend on the invoking locale any more than it may depend on bash's hash seed. The split is on the *first* `=`, the rule `env` itself applies one level out, so only the key is constrained and a value carries `=` freely.
+_gate_knob_pairs() {
+    local -n _gkp_map="$1"
+    local knob="$1" _gkp_k _gkp_v
+    local -a _gkp_keys=() _gkp_pairs=()
+    # comment-tier-exempt: the emptiness guard is a count test rather than the `${!map[@]+…}`
+    # alternate-value form the indexed arms use — with a `!` prefix bash reads that as
+    # indirect expansion with a default and hands back the values
+    if [[ ${#_gkp_map[@]} -gt 0 ]]; then
+        for _gkp_k in "${!_gkp_map[@]}"; do
+            _gkp_v="${_gkp_map[$_gkp_k]}"
+            case "$_gkp_k$_gkp_v" in
+                *$'\n'*)
+                    printf 'gate_command: knob %s has key %s whose pair contains a newline — ' "$knob" "$_gkp_k" >&2
+                    printf 'the argv protocol is one element per line; treating as failure (not clean)\n' >&2
+                    return 2 ;;
+                *$'\t'*)
+                    printf 'gate_command: knob %s has key %s whose pair contains a tab — ' "$knob" "$_gkp_k" >&2
+                    printf 'tab separates the serialized elements; treating as failure (not clean)\n' >&2
+                    return 2 ;;
+            esac
+            case "$_gkp_k" in
+                *=*)
+                    printf 'gate_command: knob %s has key %s containing an "=" — ' "$knob" "$_gkp_k" >&2
+                    printf 'the pair splits on its first "=", so such a key is unsplittable; treating as failure (not clean)\n' >&2
+                    return 2 ;;
+            esac
+            _gkp_keys+=("$_gkp_k")
+        done
+    fi
+    if [[ ${#_gkp_keys[@]} -gt 0 ]]; then
+        while IFS= read -r _gkp_k; do
+            _gkp_pairs+=("$_gkp_k=${_gkp_map[$_gkp_k]}")
+        done < <(printf '%s\n' "${_gkp_keys[@]}" | LC_ALL=C sort)
+    fi
+    local IFS=$'\t'
+    printf '%s' "${_gkp_pairs[*]+"${_gkp_pairs[*]}"}"
 }
 
 # spec: gate-sdk/SPEC.md §lib/gate.sh — the prefix form of _gate_knob_value: a declared name ending in `*` resolves the whole family defined under it, one `GATE_SDK_KNOB_<NAME>=<tab-joined>` element per match, sorted so the emitted environment is deterministic. Resolution happens at the same instant the scalar arm's does — after the owning kit's lib/*.sh has been sourced, which is what puts a consumer config's loop-declared variables in scope. A prefix matching nothing is a refusal naming it, never a resolved-empty set: the member asked for a family and the family is absent. The element-shape refusals are the scalar arm's, applied per match.

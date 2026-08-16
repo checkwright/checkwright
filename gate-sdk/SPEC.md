@@ -151,7 +151,9 @@ tracked source §check-gate-binary-fresh hashes into the stamp it compares. Read
 through `gate_native_crate`, its one shell home — §lib/gate.sh). `GATE_SDK_KNOB_<NAME>` joins this roster as the one entry that is **not a
 consumer knob**: it is a *dispatch-time convention*, written by `gate_command`
 into the argv it emits and read by the binary's knob reader (§lib/gate.sh, the
-array-knob config bridge). **No consumer sets it, and saying so is what stops it
+array-knob config bridge, whose three value shapes — a tab-joined element list, a
+scalar as its one-element case, and an associative knob's sorted `<key>=<value>`
+pairs — that one name spans). **No consumer sets it, and saying so is what stops it
 being documented as one** — it has no default, it is not read from the config
 seam, and a value found in a consumer's environment is overwritten by the
 dispatch that emits it. It adds no configuration surface: the bridge carries
@@ -4209,6 +4211,16 @@ GATE_SDK_KNOB_<NAME>=<tab-joined values>
 <name>
 ```
 
+A keyed knob takes the same line with `<key>=<value>` in place of each element:
+
+```
+GATE_SDK_KNOB_<NAME>=<key>=<value><TAB><key>=<value>…
+```
+
+`LIFECYCLE_KIT_PREDECESSOR` as this repo configures it therefore crosses carrying
+`align=scope`, `build=scope`, `close=validate`, `spec=scope` and `validate=build`,
+tab-separated and in exactly that order.
+
 one element per line, the existing protocol unchanged. **A member declaring no
 knob emits the two-element argv exactly as before**, so the bridge is inert for
 a member that reads no config. The declaration is the crate's, not the
@@ -4289,23 +4301,63 @@ Resolution, per declared knob:
 - The resolved array is serialized **tab-joined**. Whitespace is preserved
   inside an element, which is exactly why the whitespace-separated scalar shape
   cannot serve — `CANON_KIT_TEMPORAL_EXEMPT_SECTIONS` contains `Out of scope`. A
-  scalar knob is a one-element array; the two cases share one grammar. **Those
-  two are the whole domain: the bridge carries scalars and indexed arrays and
-  cannot carry an associative array**, because the serialization has no key
-  channel — `<name>=<tab-joined elements>` transports elements only, so keys
-  would have to be smuggled into element text and re-parsed. A `declare -A` knob
-  is therefore not portable across the bridge as it stands, and a gate that reads
-  one is not a port candidate until the wire format grows keys.
-  Three knob-shaped instances exist, and they part company on whether a gate
-  reads them. `QUEUE_KIT_LESSON_SINKS` has no gate reader — only
-  `queue-kit/bin/lesson-sink.sh` reads it — so the queue-kit cohort ported with
-  the limit untouched. `EVIDENCE_KIT_SCENARIO_GLOBS` and
-  `LIFECYCLE_KIT_PREDECESSOR` are each read **by key** by a registered gate,
-  `check-evidence-baseline` and `check-stage-entry` respectively, so the rule
-  above holds those two members off the substrate. The limit is therefore
-  **exercised**, in evidence-kit and in lifecycle-kit, rather than a curiosity
-  carried forward by cohorts that never met it. Stated here because a later
-  kit's port would otherwise discover it at implementation time.
+  scalar knob is a one-element array; the two cases share one grammar.
+- **An associative knob takes a third arm: its key-value pairs, sorted by key,
+  one pair per tab-separated element, each pair spelled `<key>=<value>`.** The
+  **split is on the first `=`**, so a value may carry `=` freely and only the key
+  is constrained — the same rule `env` itself applies one level out, where the
+  outer `env` splits the argv element's first `=` to recover the variable name.
+  The grammar therefore adds no second parsing convention to the protocol; it
+  repeats the one already in it.
+
+  **Which arm a knob takes is derived from `declare -p`, never declared.** The
+  bridge already sources the owning kit's `lib/*.sh` and confirms the knob is
+  defined; the same `declare -p` output carries the `declare -A` marker, so the
+  producer sees the shape without being told it. The asymmetry with the prefix
+  arm below is deliberate, and it is the rule a later arm is measured against: the
+  `*` spelling in a member's declared knob roster exists because there **is** no
+  variable named `EVIDENCE_KIT_RUN_` to inspect, so that spelling carries
+  resolution information nothing else holds. A keyed knob carries none — the
+  variable exists and answers the question itself. A shape marker there would
+  maintain a derivable fact, which derivation-first forbids, and would put the
+  declaration and its subject in two places that can disagree. So `--knobs` output
+  stays a flat list of names and no `.gate` descriptor field is added.
+
+  **Sorting is load-bearing rather than cosmetic.** Bash associative arrays
+  iterate in hash order, so an unsorted emission would make the resolved argv —
+  baked verbatim into the tracked generated pre-commit hook — depend on bash's
+  hash seed and churn that file for no change. The sort is `LC_ALL=C` for the
+  same reason one level further out: byte order is what the compiled reader's own
+  sort produces, and a locale-dependent collation would make the emitted hook
+  depend on the invoking environment.
+
+  **Two alternatives were rejected, recorded so a later arm does not retry them.**
+  *Reusing the prefix-family wire* — decomposing a map into
+  `GATE_SDK_KNOB_<NAME>_<key>=<value>` variables — would reuse the prefix
+  machinery almost entirely, and it fails on the readers: both keyed members
+  iterate the map's **key set**, while the rule below holds that a prefix is a
+  resolution set and never a roster, precisely so a stray variable sharing the
+  stem is not published as a member. A map has no separate roster knob to fall
+  back on, so reusing the family wire would either violate that rule or reintroduce
+  the collision it was written against, and it would restrict keys to
+  identifier-safe characters for no gain. A single variable carrying its own keys
+  has neither problem: the `declare -A` *is* the roster. *An index-aligned sibling
+  knob* (`…=<values>` plus `…__KEYS=<keys>`) has live precedent in the
+  install-transport vocabularies below, but there the two halves are one consumer
+  command's single output, where this would mint a second bridged name per map
+  whose alignment nothing enforces and whose halves can be resolved, baked and
+  read independently.
+
+  The knob-shaped instances part company on whether a gate reads them.
+  `QUEUE_KIT_LESSON_SINKS` has no gate reader — only
+  `queue-kit/bin/lesson-sink.sh` reads it — so the queue-kit cohort ported before
+  this arm existed and is unaffected by it; it becomes portable now, and is named
+  here so a later selector does not re-derive its status.
+  `EVIDENCE_KIT_SCENARIO_GLOBS` and `LIFECYCLE_KIT_PREDECESSOR` are each read
+  **by key** by a registered gate, `check-evidence-baseline` and
+  `check-stage-entry` respectively, and are the arm's live instances: the second
+  resolves at every pre-commit run in this repo, the first is empty here and
+  exercised non-empty only by its owning fixture.
 - **A declared name ending in `*` is a prefix, and the bridge resolves the whole
   family under it** — one `GATE_SDK_KNOB_<NAME>=<tab-joined>` element per match,
   sorted, so the emitted environment is deterministic and the generated hook it
@@ -4316,10 +4368,13 @@ Resolution, per declared knob:
   the suite set coming from `EVIDENCE_KIT_SUITES`.
 
   **This is a family of separate variables, not the keyed knob the bullet above
-  holds off the substrate, and the difference is the wire format's.** An
-  associative array cannot cross because `<name>=<elements>` has no key channel;
-  a prefix family needs none, because each member is already its own name and the
-  name carries the key. So the limit above stands exactly as written.
+  carries, and both shapes now cross — so the live question is which wire each
+  takes and why, never whether one crosses at all.** A prefix family is one
+  variable per member, and the *name* carries the key, which is what lets the key
+  set come from another knob's value; a keyed knob is one variable carrying its
+  own keys, which is what lets its key set be the roster. A member whose roster
+  is external takes the prefix; a member that iterates the map's own key set
+  takes the keyed arm.
 
   **Resolution happens at the instant the scalar arm's does** — after the owning
   kit's `lib/*.sh` has been sourced, in the same subshell, which is the load-bearing
@@ -4351,15 +4406,28 @@ Resolution, per declared knob:
   matched — `EVIDENCE_KIT_RUN_ID` matches `EVIDENCE_KIT_RUN_` and is evidence-kit's
   run identifier, not a suite. A reader treating the matched set as the roster
   would publish it as one.
-- **Three refusals, each exit 2 naming the knob** (§Fail-closed contract): an
+- **Four refusals, each exit 2 naming the knob** (§Fail-closed contract): an
   element containing a **newline**, which would break the line-per-element argv
   protocol; an element containing a **tab**, which would break the
-  serialization; and a knob the owning kit's library **does not define**, since
+  serialization; a **key containing `=`**, which would make its pair
+  unsplittable; and a knob the owning kit's library **does not define**, since
   serializing that as empty would hand the reader an empty set — a fail-open
   dressed as a default, and for a prune set a silently *larger* walk. An
   element-less knob is not that case: a resolved-empty array serializes to the
   empty string and is carried, so *absent* and *empty* part company on the
-  reading side too.
+  reading side too, and an empty map is the same resolved-empty reading.
+  On a keyed knob the newline and tab refusals apply to the **key and the value
+  of every pair**, naming the offending key rather than the knob alone — the
+  shape the prefix arm already uses when it names the offending family member.
+
+  **The keyed arm closes a live fail-open rather than merely adding a case.**
+  Before it, the resolution checked only that a knob was *declared* and then
+  expanded it through a nameref, so an associative knob did not refuse: it
+  silently serialized its **values**, in hash order, losing the keys. The
+  documented limit was therefore prose-only, and nothing stopped a consumer from
+  porting such a gate and receiving a quietly wrong environment. The keyed arm
+  removes the hazard **by construction** — the shape is now taken rather than
+  fallen through — which is why no separate guard is added for it.
 
   **The tab refusal is discharged upstream for a consumer-supplied ERE**, which is
   worth recording rather than re-checking per port. A POSIX ERE legitimately may

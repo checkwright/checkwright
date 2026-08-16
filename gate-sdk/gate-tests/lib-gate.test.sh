@@ -154,6 +154,13 @@ PROBE_KIT_NEWLINED=($'has\nnewline')
 PROBE_KIT_RUN_alpha='run alpha'
 PROBE_KIT_RUN_beta='run beta'
 PROBE_KIT_BADRUN_tabbed=($'has\ttab')
+declare -A PROBE_KIT_MAP=([zeta]=last [align]=scope [mid]="two words" [eq]="a=b")
+declare -A PROBE_KIT_EMPTYMAP=()
+declare -A PROBE_KIT_TABKEY=([$'has\ttab']=v)
+declare -A PROBE_KIT_TABVAL=([k]=$'has\ttab')
+declare -A PROBE_KIT_NLKEY=([$'has\nnewline']=v)
+declare -A PROBE_KIT_NLVAL=([k]=$'has\nnewline')
+declare -A PROBE_KIT_EQKEY=([a=b]=v)
 for _p in one two; do declare "PROBE_KIT_RUN_loop_$_p=made by the loop"; done
 unset _p
 PROBE
@@ -203,6 +210,41 @@ out="$(knob_argv PROBE_KIT_ABSENT)"; rc=$?
     || { echo "  FAIL: a knob no kit library defines exited $rc, want 2"; fails=$((fails + 1)); }
 grep -qF -- 'PROBE_KIT_ABSENT' <<<"$out" \
     || { echo "  FAIL: the undeclared-knob refusal did not name the knob: $out"; fails=$((fails + 1)); }
+
+# --- the keyed form: an associative knob serializes its key-value pairs ----------
+# Which arm a knob takes is derived from its own `declare -p`, so the case declares no
+# shape: the same map that would have silently lost its keys before now crosses whole.
+got="$(knob_argv PROBE_KIT_MAP | sed -n '2p')"
+want="GATE_SDK_KNOB_PROBE_KIT_MAP=align=scope"$'\t'"eq=a=b"$'\t'"mid=two words"$'\t'"zeta=last"
+[[ "$got" == "$want" ]] \
+    || { echo "  FAIL: keyed knob argv was '$got' (want '$want')"; fails=$((fails + 1)); }
+
+# sorted by key, not by bash's hash order — the resolved argv is baked verbatim into the
+# tracked pre-commit hook, so an unsorted emission would churn that file for no change
+[[ "$got" == "$(knob_argv PROBE_KIT_MAP | sed -n '2p')" ]] \
+    || { echo "  FAIL: keyed form is not deterministic across runs"; fails=$((fails + 1)); }
+
+# the split is on the FIRST '=', so a value carries '=' freely and only the key is
+# constrained — the rule `env` itself applies one level out, not a second convention
+grep -qF -- 'eq=a=b' <<<"$got" \
+    || { echo "  FAIL: a value containing '=' did not survive the keyed wire: $got"; fails=$((fails + 1)); }
+
+# an empty map serializes to the empty string and is a resolved-empty map: absent and
+# empty part company here exactly as they do for an indexed array
+got="$(knob_argv PROBE_KIT_EMPTYMAP | sed -n '2p')"
+[[ "$got" == 'GATE_SDK_KNOB_PROBE_KIT_EMPTYMAP=' ]] \
+    || { echo "  FAIL: an empty map serialized to '$got'"; fails=$((fails + 1)); }
+
+# the three element-shape refusals, applied to the key and the value of every pair and
+# naming the offending KEY rather than the knob alone
+for probe in TABKEY:tab TABVAL:tab NLKEY:newline NLVAL:newline EQKEY:'"="'; do
+    knob="PROBE_KIT_${probe%%:*}"; what="${probe##*:}"
+    out="$(knob_argv "$knob")"; rc=$?
+    [[ "$rc" -eq 2 ]] \
+        || { echo "  FAIL: $knob (a $what in a pair) exited $rc, want 2"; fails=$((fails + 1)); }
+    grep -qF -- "knob $knob has key " <<<"$out" \
+        || { echo "  FAIL: the $what refusal on $knob did not name the offending key: $out"; fails=$((fails + 1)); }
+done
 
 # --- the prefix form: a declared name ending in '*' resolves the whole family ---
 # The load-bearing case is the LOOP-DECLARED member: the family this exists for is
@@ -275,5 +317,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "lib-gate.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "lib-gate.test: ok (fail_closed branches; gate_path_pruned; GATE_GREP_EXCLUDES; gate_find prune incl. the worktrees leaf; PRUNE_EXTRA_DIRS append over both branches; registry + resolution; .gate declaration/argv split + dispatch fail-closed; the knob bridge's serialization, scalar/knobless/prefixless arms and its three refusals; the prefix form over a loop-declared family, its sibling-family exclusion, determinism, empty-family resolution leaving the argv inert, and per-match element refusal; the knob-owner lookup draining its producer on an early match under SIGPIPE-ignored)"
+echo "lib-gate.test: ok (fail_closed branches; gate_path_pruned; GATE_GREP_EXCLUDES; gate_find prune incl. the worktrees leaf; PRUNE_EXTRA_DIRS append over both branches; registry + resolution; .gate declaration/argv split + dispatch fail-closed; the knob bridge's serialization, scalar/knobless/prefixless arms and its three refusals; the keyed form's derived shape, sorted pairs, first-'=' split, empty map, and its refusals over both halves of a pair; the prefix form over a loop-declared family, its sibling-family exclusion, determinism, empty-family resolution leaving the argv inert, and per-match element refusal; the knob-owner lookup draining its producer on an early match under SIGPIPE-ignored)"
 exit 0
