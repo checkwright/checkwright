@@ -506,9 +506,10 @@ under the causal-gap rule, never a deferred TODO.
   the clause is not merely deleted; the example is promoted from
   still-shell-illustration to second attestation, which is the stronger claim
   the paragraph was written to earn.
-- **lifecycle-kit/gate-tests/check-close-surfaces.test.sh** — its header comment
-  reads "Behavioral test of checks/check-close-surfaces.sh"; the file itself
-  needs no change (previous bullet), only that one path in the comment.
+- **lifecycle-kit/gate-tests/check-close-surfaces.test.sh** — owned by delta 3.
+  Its header comment reads "Behavioral test of checks/check-close-surfaces.sh";
+  the file itself needs no change (the in-process call is what delta 3 rules),
+  only that one path in the comment.
 - **lifecycle-kit/templates/stages/close.md, step 3** — owned by deltas 1 and 2:
   `run bin/close-surfaces.sh` becomes
   `run bash gate-sdk/bin/run-gates.sh --emit close-surfaces`. Everything about
@@ -517,8 +518,10 @@ under the causal-gap rule, never a deferred TODO.
   the fixture sentence and for any statement of substrate. The invariant, the
   opt-out tag's any-position reach, and the past-tense strip's purpose are
   unchanged.
-- **CLAUDE.md** — only if it names either shell path directly; the port changes
-  no rule it states. Checked at build rather than asserted here.
+- **CLAUDE.md** — owned by deltas 2 and 4, the two shell-path deletions,
+  conditionally: only if it names either path directly, which it does not at
+  this rev (grepped, zero hits) — the port changes no rule it states. Re-checked
+  at build rather than assumed stale from this reading.
 - **docs mirror of every file above** — owned by delta 6, regenerated not
   edited.
 

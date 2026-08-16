@@ -209,7 +209,8 @@ worth naming because the widening changes how often they fire, not whether:
 - **TASK-QUEUE.md `recurrence-drain-input-widening`** — owned by delta 4, for
   the stale "three of the nine commits" figure. The re-measurement supersedes it
   and the census lives in the survey record.
-- **docs mirror of every file above** — regenerated, not edited.
+- **docs mirror of every file above** — owned by deltas 1–4 collectively, the
+  mechanical consequence of every prose edit above; regenerated, not edited.
 
 No wire contract, no knob, no gate and no script is touched by this amendment.
 
