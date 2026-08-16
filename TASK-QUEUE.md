@@ -6151,6 +6151,33 @@
   Filed 2026-08-16 by close, from step 6's write-path/reclaim-path question; the instance was
   probed (grep for each name across the tracked tree) before it was called orphaned.
 
+- **knob-shape-flip-undetected** [design-pending] — a crate reading a knob as an array cannot
+  tell that its consumer has since redeclared it `declare -A`: the values arrive as
+  `key=value` strings and pass.
+  The reverse direction *is* caught — the map reader refuses an element with no `=` — so this
+  is the one open half of the keyed arm, named by gate-sdk/SPEC.md §Porting a gate to the
+  binary substrate as the residue the arm leaves rather than discovered later. That section
+  owns the grounds and is cited here, never restated.
+  **Re-verified at this drain rather than taken on the filing's word.** Both crate readers were
+  read at HEAD: the array reader tab-splits and asserts no shape, the map reader errors naming
+  the offending element. Every associative knob in the tree — `LIFECYCLE_KIT_PREDECESSOR`,
+  `EVIDENCE_KIT_SCENARIO_GLOBS`, `QUEUE_KIT_LESSON_SINKS` — is read by key wherever a crate
+  reads it, so the hazard is a **future** flip with no live instance today. The filing's
+  mechanism claim held; only its silence about liveness needed correcting.
+  **Why `[design-pending]`:** closing it at the wire means transporting the reader's expected
+  shape back to the producer, the maintained declaration the derived-shape rule deliberately
+  declined to mint. So the candidate close is the *auditor* shape instead — assert that no
+  knob a crate reads as an array is declared associative in its owning kit's lib. That is
+  `check-gate-substrate-parity`-shaped work, and whether it lands as a further assertion there
+  or as its own member is the open call this entry cannot make from the wire alone.
+  **Cost while deferred:** silent, and it presents as a gate reading plausible-looking garbage
+  rather than as a refusal — the same failure shape the keyed arm was written to end. Bounded
+  by needing a consumer to change a shipped knob's *grammar*, itself a kit-SPEC-governed
+  contract change rather than a configuration edit.
+  Class: lands as a gate assertion, so canon-kit's litmus makes it **debt**.
+  Filed 2026-08-16 at spec from the amendment's own residue section; drained and promoted
+  2026-08-17 by close.
+
 
 ## Icebox
 
