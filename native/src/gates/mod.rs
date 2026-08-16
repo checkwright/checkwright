@@ -2,6 +2,7 @@
 // subcommand name is the gate name, so no mapping table exists to drift
 pub mod action_gh_repo;
 pub mod action_pinning;
+pub mod agent_tier_explicit;
 pub mod assertion_strength;
 pub mod brevity;
 pub mod comment_tier;
@@ -897,6 +898,13 @@ pub const REGISTRY: &[GateEntry] = &[
         &["?"],
         &["GATE_SDK_HOOKS_DIR"],
         "gate-sdk",
+    ),
+    (
+        "check-agent-tier-explicit",
+        agent_tier_explicit::run,
+        &["?"],
+        &["DELEGATION_KIT_AGENT_DIR", "GATE_PRUNE_DIRS"],
+        "delegation-kit",
     ),
 ];
 

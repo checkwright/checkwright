@@ -1248,7 +1248,7 @@ delegation-kit/
   usage-tests/trend-history.log   # fixture history for the trend runner
   checks/check-gate-tamper.sh
   checks/check-rule-citation.sh
-  checks/check-agent-tier-explicit.sh
+  checks/check-agent-tier-explicit.gate  # hermetic, binary-dispatched: every agent definition declares an explicit model:
   gate-tests/check-gate-tamper/{good,bad}/
   gate-tests/check-rule-citation/{good,bad}/
   gate-tests/check-agent-tier-explicit/{good,bad}/
