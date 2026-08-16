@@ -21,6 +21,7 @@ pub mod release_channel_parity;
 pub mod trajectory_fresh;
 pub mod value_rollup_fresh;
 pub mod gap_inbox_neutrality;
+pub mod hook_exec_bit;
 pub mod install_claim;
 pub mod kit_registration;
 pub mod knob_citation;
@@ -886,6 +887,16 @@ pub const REGISTRY: &[GateEntry] = &[
             "DOCTRINE_KIT_DIGEST_SECTION",
         ],
         "doctrine-kit",
+    ),
+    // spec: gate-sdk/SPEC.md §The first cohort, and the rule that selects the next — the first
+    // budget batch's remaining four members, each its own unit with no joint proof: a `?` for a
+    // positional scan root the shell parser calls undecidable, an empty set for named-file readers.
+    (
+        "check-hook-exec-bit",
+        hook_exec_bit::run,
+        &["?"],
+        &["GATE_SDK_HOOKS_DIR"],
+        "gate-sdk",
     ),
 ];
 

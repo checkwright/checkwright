@@ -49,6 +49,10 @@ unset _gpx
 # spec: gate-sdk/SPEC.md §enforcement-map — a guarded default erases set-ness, and the enforcement map tells its two adoption modes apart *by* set-ness (adopted-but-broken refuses where not-adopted degrades). These two are safe only because neither default can be absent: `scripts` is the gates dir the registry was already read from, and `.` is the cwd, so the refusal arm each knob's preflight guards is unreachable for the defaulted value. **This is not a precedent for a knob whose default may legitimately not exist** — `DRIFT_KIT_KPIS_FILE`'s is such a knob and takes a mode-preserving resolution in its own kit's library instead (drift-kit/SPEC.md §lib/drift.sh).
 [[ -v GATE_SDK_GATES_DIR ]] || GATE_SDK_GATES_DIR="scripts"
 [[ -v GATE_SDK_ENFORCE_SCAN_DIR ]] || GATE_SDK_ENFORCE_SCAN_DIR="."
+# spec: gate-sdk/SPEC.md §check-hook-exec-bit — the same resolution once more, for the hooks
+# directory, off GATE_SDK_GATES_DIR's own resolved default above rather than the not-yet-defined
+# gate_sdk_gates_dir, so the two stay one value by construction rather than by two readers agreeing
+[[ -v GATE_SDK_HOOKS_DIR ]] || GATE_SDK_HOOKS_DIR="$GATE_SDK_GATES_DIR/git-hooks"
 
 gate_find() {
     local prune=() d
