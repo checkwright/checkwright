@@ -127,8 +127,9 @@ refuses an element with no `=`. Closing the remaining direction means transporti
 the reader's expected shape back to the producer, which is the maintained
 declaration §1 just declined to mint, and the hazard needs a consumer to change a
 shipped knob's **grammar**, which is already a kit-SPEC-governed contract change
-rather than a configuration edit. Filed as debt rather than fixed here; the cost
-is stated on that entry.
+rather than a configuration edit. Filed to `.workflow/gap-inbox.md` as
+`knob-shape-flip-undetected` with its cost and a candidate close, for close to
+drain — not left as a flagged-and-skipped gap.
 
 ### 5. `check-stage-entry` ports to the binary substrate
 
@@ -147,7 +148,7 @@ tokens rides `native/src/ere.rs`, whose engine was paid at the ERE cohort. The m
 is the only piece that was missing, which is what made this a one-blocker hold
 rather than a sizing.
 
-### 5b. `--reads` grows a name-filter channel, because the port has no other arm
+### 5b. `--reads` grows a filter-knob channel, because the port has no other arm
 
 Porting `check-stage-entry` uncovers a **second missing channel of the same
 class**, which scope did not cost and which the amendment rules here rather than
@@ -276,7 +277,7 @@ roster and each regen command are docs/site-architecture.md §Generated
 projections'; this amendment names the fan-out rather than restating it.
 **Mechanical.**
 
-### 9. The seam ruling
+### 9. The seam ruling (a ruling, not a delta — it carries no build work)
 
 **Kit mechanism:** the keyed wire grammar, the shape derivation, the three
 refusals, both halves of the transport, and `--reads`' filter field. All generic —
