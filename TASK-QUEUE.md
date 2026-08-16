@@ -38,7 +38,7 @@
   cohort's own price live there, so this entry states what remains rather than restating them.
   From the eighth on, members are **selected by running** `port-blockers.sh --group` rather than
   read off the tree; the size arm is now exhausted three times running, so the last three cohorts
-  rode the documented blocker-retiring override rather than a count. **64 of 104 ported** — a
+  rode the documented blocker-retiring override rather than a count. **65 of 104 ported** — a
   dated 2026-08-16 oracle read (`bash gate-sdk/bin/port-blockers.sh --group`'s trailer, which
   `scripts/measured-claims.sh` emits as `ported-gate-members`), never a count this line holds:
   the prior hand-held figure here drifted two behind the tree. The

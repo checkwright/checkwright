@@ -65,6 +65,7 @@ pub mod test_hermetic;
 pub mod tightened_gates_grammar;
 pub mod tightened_gates_note_parity;
 pub mod tracking_claim;
+pub mod workflow_tiering;
 
 pub type GateFn = fn(&[String]) -> i32;
 
@@ -916,6 +917,13 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
         &[],
         "delegation-kit",
+    ),
+    (
+        "check-workflow-tiering",
+        workflow_tiering::run,
+        &["?"],
+        &["GATE_SDK_WORKFLOW_DIR"],
+        "gate-sdk",
     ),
 ];
 

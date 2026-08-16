@@ -181,6 +181,31 @@ fn find_any(root: &Path) -> Result<Vec<PathBuf>, String> {
     find_with_prune(root, &|n| prune.iter().any(|d| d == n))
 }
 
+// spec: gate-sdk/SPEC.md §The workflow directory — a single-level listing, immediate children
+// only and both entry kinds, for a member that inspects one directory's own membership (tracked
+// vs ignored) rather than walking a tree beneath it
+pub fn list_dir(root: &Path) -> Result<Vec<(String, bool)>, String> {
+    #[cfg(test)]
+    recorder::note(&root.display().to_string());
+    let rd = fs::read_dir(root)
+        .map_err(|e| format!("cannot read directory {}: {}", root.display(), e))?;
+    let mut out: Vec<(String, bool)> = Vec::new();
+    for ent in rd {
+        let ent = ent.map_err(|e| format!("cannot read entry in {}: {}", root.display(), e))?;
+        let name = ent
+            .file_name()
+            .into_string()
+            .map_err(|_| format!("non-UTF-8 entry name under {}", root.display()))?;
+        let is_dir = ent
+            .file_type()
+            .map_err(|e| format!("cannot stat {} in {}: {}", name, root.display(), e))?
+            .is_dir();
+        out.push((name, is_dir));
+    }
+    out.sort();
+    Ok(out)
+}
+
 // spec: gate-sdk/SPEC.md §Fail-closed contract — the same traversal with the prune predicate
 // supplied by the caller, because `gate_find`'s bridged set is not every shell form's rule: a
 // member whose original reached for a bare `find` prunes what that `find` pruned.
