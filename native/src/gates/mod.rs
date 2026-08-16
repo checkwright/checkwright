@@ -5,6 +5,7 @@ pub mod action_pinning;
 pub mod assertion_strength;
 pub mod brevity;
 pub mod comment_tier;
+pub mod doctrine_registration;
 pub mod deprecation_task;
 pub mod docs_cmd;
 pub mod docs_kit_parity;
@@ -871,6 +872,20 @@ pub const REGISTRY: &[GateEntry] = &[
             "CONTEXT_KIT_BREVITY_POINTER_RE",
         ],
         "context-kit",
+    ),
+    // spec: gate-sdk/SPEC.md §The first cohort, and the rule that selects the next — the batch's
+    // second walker-riding member, sequenced behind the first rather than cohorted with it: it
+    // reads named files rather than listing a directory, so the walk-root set is empty.
+    (
+        "check-doctrine-registration",
+        doctrine_registration::run,
+        &[],
+        &[
+            "DOCTRINE_KIT_AGENT_FILE",
+            "DOCTRINE_KIT_DOCTRINE_FILE",
+            "DOCTRINE_KIT_DIGEST_SECTION",
+        ],
+        "doctrine-kit",
     ),
 ];
 

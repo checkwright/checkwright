@@ -294,7 +294,7 @@ a sibling `*.test.sh` drives the extra-line, declared-trim, link-absent,
 craft-untagged, craft-malformed, and four fail-closed cases the one-pair harness
 cannot hold (fixture-pair); and registration in this repo's `gates.list` where
 its own always-loaded file is the scan target (self-lint). Positional form
-`check-doctrine-registration.sh [agent-file [doctrine-file]]` lets the fixtures
+`check-doctrine-registration [agent-file [doctrine-file]]` lets the fixtures
 point at a synthetic agent and doctrine file.
 
 ## stage-rules

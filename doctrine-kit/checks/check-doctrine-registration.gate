@@ -1,0 +1,3 @@
+# graph: couples=CLAUDE.md,doctrine-kit/DOCTRINE.md dir=one valve=none tier=precommit
+# install: zero-config
+# spec: doctrine-kit/SPEC.md §check-doctrine-registration — the always-loaded agent file links the doctrine file and holds its methodology-rule digest in per-rule lockstep with DOCTRINE.md, fail-closed when a scanned file or section is missing

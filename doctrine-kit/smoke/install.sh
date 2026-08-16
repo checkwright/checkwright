@@ -4,6 +4,19 @@
 set -euo pipefail
 : "${SMOKE_KIT_ROOT:?run via run-consumer-smoke.sh}"
 SDK="$SMOKE_KIT_ROOT/../gate-sdk"   # the vendored gate-sdk beside this kit
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the smoke resolves a kit gate through gate_command, the way
+# a consumer's own battery does: this is the one context where a ported member's `.sh` is genuinely
+# absent, and an absent binary is exit 2 — never a skip, never a pass, never an invented fallback.
+# shellcheck source=../../gate-sdk/lib/gate.sh
+source "$SDK/lib/gate.sh"
+
+kit_gate() {   # $1=gate-name  $2.. = gate args — dispatch a vendored doctrine-kit gate by name
+    local g="$1"; shift
+    local -a argv=()
+    mapfile -t argv < <(gate_command "$g" "$SMOKE_KIT_ROOT/checks")
+    [[ ${#argv[@]} -gt 0 ]] || return 2
+    "${argv[@]}" "$@"
+}
 
 # spec: gate-sdk/SPEC.md §Consumer smoke — seed a minimal always-loaded agent file (guarded, so it composes with any kit that already dropped one), then install the reference block into it via the shipped installer
 if [[ ! -f CLAUDE.md ]]; then
@@ -51,7 +64,7 @@ if [[ "$(smoke_block | grep -A1 -F -- "$SMOKE_TRIM" | tail -n1)" != "$SMOKE_NEXT
     echo "doctrine smoke: the carried trim for '$SMOKE_TRIMMED' is not in the trimmed bullet's position (expected '$SMOKE_NEXT' beneath it)" >&2
     exit 1
 fi
-bash "$SMOKE_KIT_ROOT/checks/check-doctrine-registration.sh" >/dev/null \
+kit_gate check-doctrine-registration >/dev/null \
     || { echo "doctrine smoke: check-doctrine-registration is not green across the trim round-trip" >&2; exit 1; }
 
 # spec: doctrine-kit/SPEC.md §install-doctrine — the two reported findings, each carried *and* named. Both ride stderr, so this captures that channel and not stdout
@@ -80,7 +93,7 @@ case "$SMOKE_ERR" in
     *) echo "doctrine smoke: the duplicate trim for '$SMOKE_TRIMMED' was collapsed silently (stderr was: $SMOKE_ERR)" >&2; exit 1 ;;
 esac
 # spec: doctrine-kit/SPEC.md §install-doctrine — carrying an unmatched trim forward is only safe if the gate tolerates one; a gate that red on it would hand the consumer a broken battery instead of a reconciliation
-bash "$SMOKE_KIT_ROOT/checks/check-doctrine-registration.sh" >/dev/null \
+kit_gate check-doctrine-registration >/dev/null \
     || { echo "doctrine smoke: check-doctrine-registration reds on a carried-forward trim naming no live rule — carrying it forward would break the consumer's battery" >&2; exit 1; }
 
 # spec: doctrine-kit/SPEC.md §install-doctrine — the other direction, and the reason the smoke's steady state is an untrimmed consumer: withdrawing the declarations restores the bullet where it was
@@ -114,7 +127,7 @@ if ! smoke_block | grep -q .; then
     echo "doctrine smoke: a reinstall after --remove did not restore the doctrine block" >&2
     exit 1
 fi
-bash "$SMOKE_KIT_ROOT/checks/check-doctrine-registration.sh" >/dev/null \
+kit_gate check-doctrine-registration >/dev/null \
     || { echo "doctrine smoke: check-doctrine-registration is not green after the --remove/reinstall round trip" >&2; exit 1; }
 
 # spec: doctrine-kit/SPEC.md §install-doctrine — the derivation's refusals. The digest is derived from DOCTRINE.md's *Digest:* trailers, so a rule carrying none (or two) leaves its bullet undecidable; the installer must refuse rather than emit a digest silently one rule short, which is the exact defect the derivation replaced. Driven through the positional overrides so the refusal is *run*, not inspected

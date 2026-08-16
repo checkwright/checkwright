@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Behavioral test of checks/check-doctrine-registration.sh — the scenarios the
+# Behavioral test of check-doctrine-registration — the scenarios the
 # one-pair good/bad harness cannot hold. The good/bad fixture pair covers the
 # lockstep-clean case and the digest-missing-a-rule case (assertion B); the
 # harness admits one bad/ dir, so this drives the digest-extra-line case
@@ -13,7 +13,6 @@ set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # doctrine-kit/
-GATE="$DIR/checks/check-doctrine-registration.sh"
 SANDBOX="$(mktemp -d)"
 trap 'rm -rf "$SANDBOX"' EXIT
 
@@ -21,7 +20,7 @@ fails=0
 
 check_case() {  # $1=label  $2=sandbox-dir  $3=want-rc  $4=want-substring
     local out rc
-    out="$(cd "$2" && "$GATE" AGENT.md DOCTRINE.md 2>&1)"; rc=$?
+    out="$(cd "$2" && gate_run check-doctrine-registration "$DIR/checks" AGENT.md DOCTRINE.md 2>&1)"; rc=$?
     if [[ "$rc" -ne "$3" ]]; then
         echo "  FAIL [$1]: want exit $3, got $rc -- $out"; fails=$((fails + 1)); return
     fi
