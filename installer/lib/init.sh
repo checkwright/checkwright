@@ -50,6 +50,9 @@ if (( ! DRY )) && (( DO_COMMIT )) && [[ -n "$(git -C "$ROOT" status --porcelain)
         "init makes one commit, and a dirty tree would fold your work into it — so a reviewer's diff would no longer be the whole of what was vendored. Commit or stash first, or pass --no-commit to stage the vendoring yourself." 1
 fi
 
+# spec: installer/README.md §init — the jq preflight sits here rather than at the top of the file because here is where "before its first JSON read" falls: every precondition above is about the package or the repository and is answerable without jq, and every refusal below is one a jq-less machine would otherwise meet as a misdiagnosis
+lock_require_jq
+
 PKG="$INSTALLER/package.json"
 VERSION="$(jq -r '.version // ""' "$PKG" 2>/dev/null)"
 COMMIT="$(jq -r '.checkwright.commit // ""' "$PKG" 2>/dev/null)"
@@ -339,7 +342,9 @@ files_hash() {   # $1 = repo-relative path -> the hash its files[] entry carries
 manifest() {
     local f
     # spec: installer/README.md §The manifest — the binary is neither vendored nor generated, so it joins as its own key rather than a files[] row: a files[] entry means hashed with git hash-object and rewritten when unmodified, and this one is hashed with SHA-256 against a published value and rewritten on a different rule. Its absence on a run that omitted the artifact is the omission's machine-readable form, which is why the flag is passed only when a target was selected
-    local -a args=(version="$VERSION" commit="$COMMIT" profile="$PROFILE" kits="${KITS[*]}")
+    local -a args=(version="$VERSION" profile="$PROFILE" kits="${KITS[*]}")
+    # spec: installer/README.md §The manifest — commit is passed on the same conditional footing as the artifact key, for the reason lock_emit already states: an identity field is present exactly when the caller supplied it, and an empty commit written as "" would be a placeholder standing in for an omission. Its emptiness was masked by statement order alone until the jq preflight landed ahead of it; with jq's absence ruled out, an empty commit means only that the package carries no commit stamp, and the existing rule settles what to do about it
+    [[ -n "$COMMIT" ]] && args+=(commit="$COMMIT")
     [[ -n "$ARTIFACT_TARGET" ]] && args+=(--artifact "$ARTIFACT_TARGET" "$ARTIFACT_DIGEST")
     for f in "${WRITTEN[@]}"; do
         printf '%s\t%s\n' "$f" "$(files_hash "$f")"

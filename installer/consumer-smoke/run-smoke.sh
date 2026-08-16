@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: installer/README.md §The consumer smoke — builds the host gate binary, packs the package around it, installs it from the resulting tarball with no registry access, and drives init through a scratch consumer once per profile; exit 0 asserts the whole activation path (install → green battery → manifest agrees with the tree → the seeded queue satisfies queue-kit's section contract, or none is seeded where none is owed → idempotent re-run → doctor clean → a planted prose defect caught and cleared → diff clean → uninstall back to the pre-init tree object) plus the four profile-lattice assertions and the value assertion over the loop (some profile below the maximum catches that defect) (every named kit resolves, exactly one minimum and one maximum, the maximum is the payload-derived profile, and gate rosters are monotone across every comparable pair), a binary-less leg installing one profile from an artifact-free payload and asserting disclosure — every lost member declared in the consumer's registry, at a non-zero count — a two-hop cross-version upgrade that also relinquishes a payload path on one hop and re-adds it on the next, a toolchain-free arm driving doctor and a full init with cargo and rustc masked off PATH, a same-version seam arm over the two surfaces init rewrites every run and the protection branch chained onto it, a narrowing arm re-running init at a smaller profile so files[] outlives kits, and an artifact arm driving the selection outcomes a single install cannot show — the undeclared host's omit-and-declare and the two refusals between it and placement; the evidence-kit 'installer_smoke' validate suite each validate stage re-runs.
+# spec: installer/README.md §The consumer smoke — builds the host gate binary, packs the package around it, installs it from the resulting tarball with no registry access, and drives init through a scratch consumer once per profile; exit 0 asserts the whole activation path (install → green battery → manifest agrees with the tree → the seeded queue satisfies queue-kit's section contract, or none is seeded where none is owed → idempotent re-run → doctor clean → a planted prose defect caught and cleared → diff clean → uninstall back to the pre-init tree object) plus the four profile-lattice assertions and the value assertion over the loop (some profile below the maximum catches that defect) (every named kit resolves, exactly one minimum and one maximum, the maximum is the payload-derived profile, and gate rosters are monotone across every comparable pair), a binary-less leg installing one profile from an artifact-free payload and asserting disclosure — every lost member declared in the consumer's registry, at a non-zero count — a two-hop cross-version upgrade that also relinquishes a payload path on one hop and re-adds it on the next, a toolchain-free arm driving doctor and a full init with cargo and rustc masked off PATH, a jq-less arm asserting that init, diff and uninstall each refuse naming jq at exit 2 while doctor still reports, a same-version seam arm over the two surfaces init rewrites every run and the protection branch chained onto it, a narrowing arm re-running init at a smaller profile so files[] outlives kits, and an artifact arm driving the selection outcomes a single install cannot show — the undeclared host's omit-and-declare and the two refusals between it and placement; the evidence-kit 'installer_smoke' validate suite each validate stage re-runs.
 set -uo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -464,6 +464,64 @@ if grep -qE '^  (cargo|rustc) ' <<<"$out"; then
 fi
 say "doctor: clean with no Rust toolchain on PATH, and silent about the members that need one"
 assert_install "$PROFILE_DERIVED" "$C"
+
+# spec: installer/README.md §The consumer smoke — the jq-less arm, and the gap it closes is total: this script's own preflight requires jq, so every arm above runs with it present and nothing in this tree has ever exercised a jq-less install. Masking is per-arm, and per-arm is load-bearing here for a reason the other two masks do not have — this harness reads every manifest assertion with jq itself, so a mask on the harness's own PATH would disarm the assertions rather than the installer. The mask rides the verb's PATH alone. The assertion is the **message**: the exit status was already 2 before the preflight existed, so an arm checking the status alone would have passed against the very defect being fixed
+# spec: installer/README.md §The consumer smoke — the mask is by ABSENCE, not by the failing shim the node and cargo arms use, and the difference is the question each arm asks rather than a style choice. Those arms ask whether the payload ever *reaches* a program, so a shim that fails loudly is exactly right. This arm asks what a machine *without* jq is told, and a shim is a jq that is present: `command -v jq` — the preflight's own predicate — resolves it and the preflight never fires, so a shim-masked arm would drive the verbs straight into the misdiagnosis it exists to catch. The farm is derived from the live PATH rather than from a maintained list of the programs the verbs use, so it cannot drift out of date the way such a list would
+printf 'jq-less arm (%s, jq absent from the verbs'\'' PATH)\n' "$PROFILE_MIN"
+JQFARM="$SCRATCH/jqfarm"
+mkdir -p "$JQFARM"
+IFS=: read -ra jq_path_dirs <<<"$PATH"
+for jq_d in "${jq_path_dirs[@]}"; do
+    [[ -d "$jq_d" ]] || continue
+    for jq_f in "$jq_d"/*; do
+        jq_b="${jq_f##*/}"
+        [[ "$jq_b" == jq ]] && continue
+        [[ -x "$jq_f" && ! -d "$jq_f" ]] || continue
+        [[ -e "$JQFARM/$jq_b" ]] && continue
+        ln -s "$jq_f" "$JQFARM/$jq_b" 2>/dev/null
+    done
+done
+JQ_PATH="$JQFARM"
+# spec: installer/README.md §The consumer smoke — the mask is proved in both directions, for the reason the other two masks are proved in one: a PATH that failed to drop jq would assert nothing while passing, and a farm that failed to populate would make every verb fail for the wrong reason and pass this arm on a refusal that has nothing to do with jq. So jq must be gone and a control program must still resolve
+[[ -z "$( PATH="$JQ_PATH" bash -c 'command -v jq' 2>/dev/null )" ]] \
+    || fail "the mask did not take: jq still resolves under the arm's PATH"
+[[ -n "$( PATH="$JQ_PATH" bash -c 'command -v git' 2>/dev/null )" ]] \
+    || fail "the jq-less farm resolves no git — it did not populate, so every verb below would refuse for a reason that is not jq"
+say "mask: jq resolves to nothing, and the farm still resolves git"
+
+assert_jq_refusal() {   # $1 = a label for the message, $2 = consumer dir, $3.. = the verb and its argv
+    local label="$1" dir="$2"; shift 2
+    local out rc
+    out="$( cd "$dir" && PATH="$JQ_PATH" "${ENTRY[@]}" "$@" 2>&1 )"; rc=$?
+    [[ "$rc" -eq 2 ]] \
+        || { printf '%s\n' "$out" >&2; fail "$label exited $rc on a jq-less machine, not the 2 that means the question could not be answered"; }
+    grep -q 'jq' <<<"$out" \
+        || { printf '%s\n' "$out" >&2; fail "$label refused on a jq-less machine without naming jq — it is blaming the package or the manifest for a program that is not installed"; }
+    grep -q '^  help: ' <<<"$out" \
+        || { printf '%s\n' "$out" >&2; fail "$label named jq but carries no help: line, so the remedy is still nowhere the adopter can read it"; }
+    say "$label: refuses naming jq, with a remedy, exit 2"
+}
+
+ENTRY=("$CW")
+C="$(consumer jq-less)" || fail "could not build a scratch consumer for the jq-less arm"
+# spec: installer/README.md §init — on a tree with no manifest, init's first JSON read is the package's own version stamp, so this is the case that used to surface as "this package carries no version stamp"
+assert_jq_refusal "init (no manifest yet)" "$C" init --profile "$PROFILE_MIN"
+
+RUN_PATH="$PATH"
+out="$( cd "$C" && "${ENTRY[@]}" init --profile "$PROFILE_MIN" 2>&1 )" \
+    || { printf '%s\n' "$out" >&2; fail "the jq-less arm could not make an ordinary install to run its manifest-reading verbs against"; }
+# spec: installer/README.md §init — with a manifest present, the read that comes first is the schema check every one of these verbs shares, so these are the cases that used to surface as "carries a schema this build does not know"
+assert_jq_refusal "init (manifest present)" "$C" init --profile "$PROFILE_MIN"
+assert_jq_refusal "diff" "$C" diff
+assert_jq_refusal "uninstall" "$C" uninstall --dry-run
+
+# spec: installer/README.md §doctor — doctor is the boundary this unit does not cross: its job is to report a toolchain rather than refuse on one, so it keeps its own inline probe and stays green on a machine the other verbs refuse. An arm that let doctor take the preflight would be asserting the opposite of what doctor is for
+out="$( cd "$C" && PATH="$JQ_PATH" "${ENTRY[@]}" doctor 2>&1 )"; rc=$?
+[[ "$rc" -eq 0 ]] \
+    || { printf '%s\n' "$out" >&2; fail "doctor exited $rc with jq absent — doctor reports a toolchain rather than refusing on one, and an adopter diagnosing this exact machine is who needs it to run"; }
+grep -q 'jq' <<<"$out" \
+    || { printf '%s\n' "$out" >&2; fail "doctor ran on a jq-less machine without saying jq is why the manifest could not be read"; }
+say "doctor: still reports on a jq-less machine, and names jq as the reason the manifest is unreadable"
 
 # spec: installer/README.md §The consumer smoke — the upgrade arm packs a second, higher version and drives the same installed tree across it, because everything above installs at one version: what only a cross-version run reaches is the manifest's version comparison falling through in the upgrade direction, the profile re-read from the lock with no flag, and claim() re-applying around a file the adopter has since edited
 printf 'upgrade arm (two cross-version hops, %s profile — the lattice minimum, so the arm is the smallest install that carries the manifest behavior it asserts)\n' "$PROFILE_MIN"

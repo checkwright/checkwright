@@ -39,6 +39,8 @@ ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" \
 LOCK="$(lock_path "$ROOT")"
 [[ -f "$LOCK" ]] || die "no $CHECKWRIGHT_LOCK_FILE at $ROOT" \
     "init is the verb that makes an install, and the manifest it writes is the only record of which files are this installer's to remove. Without one there is nothing here to reverse."
+# spec: installer/README.md §init — the jq preflight before the first JSON read, so the schema refusal below is reached only when the schema is actually the problem
+lock_require_jq
 lock_schema_ok "$LOCK" || die "$CHECKWRIGHT_LOCK_FILE carries a schema this build does not know" \
     "this manifest was written by a different Checkwright release. Upgrade the installer rather than letting it guess at a shape it was not built for."
 

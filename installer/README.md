@@ -39,6 +39,16 @@ delivery-path tool joins the toolchain roster, and the manual vendoring path
 documented on the site needs neither. The toolchain the battery does assert,
 with its version floors, is on the install page.
 
+**The verbs themselves need `jq`.** `init`, `diff` and `uninstall` read JSON —
+this package's own version stamp and the `checkwright.lock` manifest — and they
+read it with `jq`, so every one of them refuses without it, naming the program
+and the remedy (§The manifest). This is a claim about *these verbs*, separate
+from the install page's toolchain block, which names `jq` for the gates in the
+battery being vendored: different programs' users, and a machine can satisfy
+either without the other. `doctor` is the exception by design — it reports a
+toolchain rather than refusing on one, so it runs on a machine with no `jq` and
+tells you that is why the manifest could not be read.
+
 ## Layout
 
 - `bin/checkwright.sh` — the verb dispatcher, and the package's `bin` entry.
@@ -118,12 +128,26 @@ and checked against a published digest before it is written, which is what makes
 zero build step a property of `init` itself rather than of which profile you
 picked (gate-sdk/SPEC.md §Porting a gate to the binary substrate, criterion 5).
 
-Three preconditions, and all three **refuse** rather than warn — a partial
+Four preconditions, and all of them **refuse** rather than warn — a partial
 install is the outcome none of them may produce, so every one is checked before
 a single file is written:
 
 - **You are inside a git work tree.** The vendored source is meant to be
   committed; that is what makes it auditable rather than merely present.
+- **`jq` is installed.** It sits immediately before the first JSON read rather
+  than at the very top of the verb, because that is where *before the first
+  read* falls: the two preconditions either side of it are about the package and
+  the repository and are answerable without `jq`, while every refusal after it
+  is one a `jq`-less machine would otherwise meet as a misdiagnosis. That is the
+  whole of what this precondition buys, and it is worth stating as the
+  deliverable rather than leaving it to be read as a side effect: the refusals
+  below it — *this package carries no version stamp*, and *`checkwright.lock`
+  carries a schema this build does not know* — **keep their exact text and
+  recover their accuracy**. Each is the right message for the condition it
+  names, and each was only ever wrong as the message a `jq`-less machine
+  received, reached by a path that had nothing to do with what it said. After
+  this precondition, meeting one of them means the condition it names is
+  actually true.
 - **The worktree is clean.** `init` makes one commit, and a dirty tree would
   fold your work into it, leaving a reviewer's diff wider than what was
   actually vendored. `--no-commit` is the valve: it writes and stages the
@@ -477,7 +501,12 @@ what stops `DOCTOR: clean` from being read as a claim about the tree's contents.
 A third exit status, `2`, means the question could not be answered rather than
 that the answer was bad: the package carries no payload, or the manifest
 carries a schema key this build does not know. A build refuses an unfamiliar
-manifest rather than guessing at the shape behind it.
+manifest rather than guessing at the shape behind it. **A missing program is that
+same status by derivation rather than by a new code** — a verb refusing because
+`jq` is absent has not judged the tree, the package or the manifest, which is
+what `1` is reserved for; it could not answer. It is also the status the
+misdiagnosing refusals already exited with, so no caller's exit-code handling
+changes and only the message does.
 
 ## update
 
@@ -508,8 +537,12 @@ to it rather than being misreported as an absent manifest.
 most of what you see comes from `init` and says so. The one refusal `update`
 owns is prefixed `checkwright update:`; every other refusal — not a git work
 tree, an unknown schema, a dirty worktree, a stale downgrade, a below-contract
-toolchain — arrives prefixed **`checkwright init:`**, and the success path
-reports `INIT:`, because that is literally which verb produced the line. This is
+toolchain, an absent `jq` — arrives prefixed **`checkwright init:`**, and the
+success path
+reports `INIT:`, because that is literally which verb produced the line. The
+`jq` refusal inherits this without a second rule: it is raised from `lock.sh` but
+surfaces through the calling verb's own `die`, so it carries that verb's prefix,
+its `help:` line and its exit code rather than a separate idiom. This is
 honest rather than untidy: the prefix names the operation that actually ran, and
 renaming it cosmetically would hide exactly the delegation that makes these two
 verbs one. It is written down here so that a `checkwright init:` line answering
@@ -674,7 +707,20 @@ live there, so the two verbs that write a manifest and the verbs that read one
 cannot drift apart. Being the single writer is what makes the shape a contract
 rather than a convention: keys are sorted at every nesting level, and a field is
 present exactly when its writer supplied one, so an omission leaves the key
-**absent** rather than null or blank.
+**absent** rather than null or blank. `commit` is the field that rule most
+recently had to be applied to: a package with no commit stamp leaves it out of
+the manifest rather than writing it empty, on the same conditional footing the
+`artifact` key already sat on. Until the `jq` precondition landed ahead of it, an
+empty `commit` was ambiguous between *no stamp* and *no `jq`* and was masked by
+statement order alone; with `jq`'s absence refused up front the field is
+decidable, and the writer's existing omission rule settles it with no new one.
+
+Reading it needs `jq`, and that is a dependency of the verbs rather than of the
+file: `lock.sh` declares it once, beside the wire format it is a fact about, and
+each JSON-reading verb calls that declaration before its first read. So a machine
+without `jq` is told which program is missing, instead of being told the package
+has no version stamp or the manifest has an unknown schema — refusals that are
+correct for the conditions they name and were never correct for this one.
 
 The wire key is versioned (`checkwright-lock v1`, in `CHECKWRIGHT_LOCK_SCHEMA`)
 and a build that meets a key it does not know refuses rather than guessing at
@@ -1028,6 +1074,45 @@ replaced by a knob for a reason: `INSTALLER_SMOKE_TMP_DIR` stays the smoke's onl
 knob, a knob that suppressed a roster member would be a second, test-only
 audience axis whose production behavior no adopter ever exercises, and a masked
 `PATH` is what a machine with no Rust toolchain actually is.
+
+**The `jq`-less arm** asserts what a machine without `jq` is told. It drives
+`init` on a tree with no manifest — the case that used to surface as *this
+package carries no version stamp* — then makes an ordinary install and drives
+`init`, `diff` and `uninstall` against it with `jq` gone, the cases that used to
+surface as *carries a schema this build does not know*. Each must refuse, **name
+`jq`**, carry a `help:` line and exit 2. Naming the program is the whole
+assertion, and asserting the exit status alone would have been worthless: these
+verbs already exited 2 before the precondition existed, so a status-only arm
+would have passed against the very defect being fixed. `doctor` is asserted on
+the other side of the boundary — exit 0, still reporting, naming `jq` as the
+reason the manifest could not be read — because `doctor`'s job is to report a
+toolchain rather than refuse on one, and an adopter diagnosing this exact machine
+is who needs it to run.
+
+The gap that arm closes was total, and it is why this defect could be filed
+twice: the smoke's preflight requires `jq` and this harness reads every manifest
+assertion above with it, so nothing in this tree had ever exercised a `jq`-less
+install. **Masking is per-arm** here for a reason the other two masks do not
+have — a mask on the harness's own `PATH` would disarm the assertions rather
+than the installer, so the mask rides the verb's `PATH` alone and the preflight
+is unchanged.
+
+**This mask is by absence, and that is a different instrument from the other
+two** — the distinction is which question is being asked, not a matter of taste,
+and it is written down because the failing-shim idiom is what a later reader will
+reach for. The Node-free and toolchain-free arms ask whether the payload ever
+*reaches* a program, so a shim that fails loudly and names itself is exactly the
+right tool. This arm asks what a machine *without* `jq` is told, and a shim is a
+`jq` that is present: `command -v jq` — the precondition's own predicate —
+resolves it, the precondition never fires, and the verbs run straight into the
+misdiagnosis the arm exists to catch. So the arm builds a directory of links to
+every program on `PATH` except `jq` and runs the verbs against that. It is
+derived from the live `PATH` rather than from a maintained list of the programs
+these verbs happen to use, so it cannot fall out of date the way such a list
+would, and the mask is proved in **both** directions: `jq` must resolve to
+nothing, and a control program must still resolve, since a farm that failed to
+populate would fail every verb for a reason that has nothing to do with `jq` and
+pass this arm on the wrong refusal.
 
 **The upgrade arm** drives a cross-version run, because every arm above installs
 at one version and re-runs at that same one. It packs a second tarball a patch

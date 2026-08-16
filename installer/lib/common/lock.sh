@@ -9,6 +9,13 @@ lock_path() {   # $1 = repo root -> the manifest's path within it
     printf '%s/%s' "${1%/}" "$CHECKWRIGHT_LOCK_FILE"
 }
 
+# spec: installer/README.md §Requirements — the single declaration that this installer reads JSON with jq, living beside the wire format it is a fact about so four verbs do not grow four copies of it. Every verb that reads JSON calls this before its first read, never lazily inside an accessor: init reads the package's own version stamp before it touches any accessor here, and a lazy probe would let the first and most misleading refusal through. It refuses through the caller's own die(), so the verb prefix, the help: line and the exit code are the published idiom rather than a second one
+lock_require_jq() {   # -> 0 when jq is on PATH; otherwise refuses through the calling verb's die()
+    command -v jq >/dev/null 2>&1 && return 0
+    die "jq is not installed, and this installer reads its JSON with it" \
+        "install jq and re-run. Until it is on PATH nothing here can read $CHECKWRIGHT_LOCK_FILE or the package's own version stamp, so the tree can be neither checked nor changed."
+}
+
 lock_schema_ok() {   # $1 = manifest path -> 0 iff .schema is the key this build knows
     local got
     got="$(jq -r 'if type == "object" then (.schema // "") else "" end' "$1" 2>/dev/null)" || return 1

@@ -12,35 +12,6 @@
 
 ## New Features
 
-- **installer-jq-silent-degradation** [spec: SPEC-jq-floor.md] — the shipped installer refuses
-  without `jq`, and blames the artifact for a defect a missing program caused.
-  **THE FILED PREMISE WAS FALSIFIED AT SPEC, by probe rather than by reading.** This entry
-  asserted the installer "reads an empty version, an empty commit, and an empty prior-file and
-  artifact-lock set — and proceeds", failing *open*, of the `install-claim-contract` silent-revert
-  class. With `jq` masked off `PATH`: `installer/lib/init.sh:54`'s substitution exits 127,
-  `:56`'s `[[ -n "$VERSION" ]] || die` **fires and exits 2**, and lines 76-78 are never reached;
-  `lock.sh:14`'s `lock_schema_ok` ends with an explicit `|| return 1`, so `:64` dies too. The
-  installer **fails closed with a misdiagnosis** — it never proceeds and never writes.
-  **The corrected defect, and it is still a defect.** Three refusals blame the package and the
-  manifest for a missing program; the remedy appears in no message, no `help:` line, and not in
-  `installer/README.md` §Requirements. `installer/lib/doctor.sh:80` already gets it right, so the
-  idiom is in-tree and the unit generalizes it.
-  **`jq` is not in `GATE_SDK_PROGRAM_FLOOR`** (gate-sdk/lib/gate.sh), the set the payload is
-  entitled to assume present, and this sits on the **install path** — the surface TRAJECTORY.md's
-  objective 1 and the time-to-first-value argument are staked on.
-  **No test anywhere runs `jq`-free:** `installer/consumer-smoke/run-smoke.sh` requires `jq` in
-  its own preflight, so every arm — including both masked arms — runs with it present.
-  **DISTINCT from two live entries.** `guard-advise-jq-dependency` is guard-kit's `guard_advise`
-  losing an *advisory*; `stage-economics-smoke-jq-arm-dormant` is a smoke arm that never runs.
-  **Boundary with the port:** `install-step-relocation` owns moving these steps behind the
-  binary's invoke, and this unit neither discharges nor narrows it.
-  **RULED INTO THE `freshness-emitter-substrate` ITERATION by operator ruling 2026-08-15**, over
-  the scope session's own recommendation to leave it deferred, and **scoped to the cheap refusal
-  floor** — a refusal naming the missing program. That deliverable survives the correction
-  unchanged; what the correction reaches is the severity ground, escalated at spec rather than
-  absorbed.
-  Filed 2026-08-14 at scope, dispositioning a gap-inbox bullet the same session filed.
-
 ## Technical Debt
 
 ## Deferred
@@ -5996,6 +5967,7 @@
 ## Done
 
 - waiting-rule-carrier-reach
+- installer-jq-silent-degradation
 
 ## Lessons Learned
 
