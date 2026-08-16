@@ -73,9 +73,14 @@ batch-specific pointers such as the journal path.
   completion notification — never a bare foreground `sleep`, and not the
   harness's event-stream form, which stays armed to its deadline after its event
   fires. An `Agent` you dispatched is awaited by its completion notification and
-  never by a path on disk; a shell child is awaited on an artifact you placed in
-  repo-local `.tmp/` in the main checkout — never a temporary worktree, never a
-  system temp dir. Write findings down to your resume journal *before* you act on
+  never by a path on disk; a shell child is awaited on the liveness record **you
+  write at its launch** — its PID, one line `pid=<n> run=<key>`, in repo-local
+  `.tmp/` in the main checkout, never a temporary worktree and never a system temp
+  dir — and your wait is a loop on that recorded PID's liveness (`kill -0
+  "$pid"`), never a pattern match, whoever started the producer. Leave the record
+  behind when you go: `check-producer-liveness <record>` reads it unchanged, so
+  whoever arrives next can still tell whether your orphan is writing. Write
+  findings down to your resume journal *before* you act on
   them, never after. Both rules, their reasoning,
   and the mechanics of an in-turn wait live in
   delegation-kit/templates/agent-execution.md — its **Background +

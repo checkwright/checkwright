@@ -12,33 +12,6 @@
 
 ## New Features
 
-- **waiting-rule-carrier-reach** [spec: SPEC-liveness-record.md] — a backgrounded shell producer
-  has no liveness record, and the one signal a supervisor trusts is silent about it.
-  recurrence: waiting-rule-carrier-reach 2026-08-11 2026-08-15
-  **The unit is the shell-child class alone**, by operator ruling 2026-08-15 on the recurrence
-  threshold this entry reached. The 2026-08-15 narrowing **stands unreversed**, and the reach-axis
-  re-scope was put to the operator as operator-class and **not taken**; evidence recorded here
-  stays inside the class.
-  **The founding instance.** A validate session backgrounded its own `run-validate.sh` and ended
-  the turn to wait on it; the observer died, the shell child survived orphaned and still writing,
-  and the harness fired a completion notification anyway — that notification means only "no live
-  `Agent` children" and is silent about a backgrounded shell child. Nothing was lost (the lead
-  read the process table and barred a second producer). Distinct because a shell child is not an
-  agent, so no agent definition governs it however many carry the clause.
-  **Firings five, seven and eight — ANSWERED.** Five was a carrier omitting the clause (scope's
-  `audit-sweep`); that gap is **closed**, re-verified 2026-08-15. Seven and eight had the rule
-  provably loaded and broke it anyway — the sibling prose-versus-enforcement framing
-  (`waiting-rule-fourth-firing-post-fix`), not reach. Firings nine to eleven were landed for the
-  next scope to weigh; they have been weighed, and the ruling above is the outcome.
-  **The design question is ANSWERED at spec and the answer lives in the amendment**, not here: the
-  awaited artifact is a launch-time liveness record the launcher writes, in the grammar
-  `check-producer-liveness` already reads, so the second reader costs nothing. Provenance seam
-  held: notification semantics are harness vocabulary, so the kit states the obligation and not
-  the mechanism.
-  **Cost while deferred:** a backgrounded producer under a session with no live lead is lost
-  silently — the founding instance cost nothing only because a lead happened to be watching.
-  Filed 2026-08-06 by close, draining the gap inbox and the lead's separately held incident.
-
 - **installer-jq-silent-degradation** [spec: SPEC-jq-floor.md] — the shipped installer refuses
   without `jq`, and blames the artifact for a defect a missing program caused.
   **THE FILED PREMISE WAS FALSIFIED AT SPEC, by probe rather than by reading.** This entry
@@ -5942,8 +5915,11 @@
   The merged amendment states as a conservative direction that a `pgrep -f` whose pattern occurs
   nowhere else in the command is a genuine query and is untouched, and loop-condition firing newly
   blocks exactly that shape; and rule 12's own block message sanctions `kill -0` against a
-  recorded PID for waiting on a producer this session did not start, a legitimate case the
-  widened predicate would reach.
+  recorded PID wherever liveness is the condition, a legitimate case the widened predicate would
+  reach. That message's clause was **widened 2026-08-16** by `waiting-rule-carrier-reach` — it now
+  covers a child the session backgrounded itself, which is the shape a self-backgrounding waiter
+  actually has, so the conflict this entry names got broader rather than narrower; the firing
+  predicate itself is untouched and stays this entry's subject.
   **Cost while deferred:** the founding shape stays unblocked and its failure mode is silent —
   nothing reds, the work finishes correctly, and the only symptom is the foreground cap absorbing
   an unbounded wait, which reads from outside as a fixed cap-length wait.
@@ -6018,6 +5994,8 @@
 - **scratch-execution-allowlist-bar** [design-pending] — Each close re-derives this standing bar.
 
 ## Done
+
+- waiting-rule-carrier-reach
 
 ## Lessons Learned
 

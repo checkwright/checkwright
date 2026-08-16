@@ -204,6 +204,15 @@ carried: a start timestamp was considered and removed, because once the stale
 policy is PID-liveness rather than age it has no reader, and a field with no
 reader is removed rather than kept for plausibility.
 
+**The grammar has a second writer class, so a later change to the record shape has
+both callers in view.** Besides this lock's claim, a session that backgrounds a
+shell child writes a launch-time liveness record in this same one-line form, so
+that whoever arrives after the session dies can still ask whether the orphan is
+writing (delegation-kit/SPEC.md §The delegation model owns that rule). What the
+two writers share is the grammar and the predicate below, and nothing else: the
+atomic create-exclusive claim is this lock's alone, since a launcher recording its
+own child's PID has no second claimant to exclude.
+
 **The lock is held if and only if the recorded PID is alive**, which makes a
 leaked lock self-invalidating — the shape this methodology already relies on for
 the session-role marker, whose id match means a stale marker self-invalidates.
@@ -479,6 +488,16 @@ Argument mode `check-producer-liveness.sh [lock-file]` makes it fixture-capable
 and is how the entry hook points it at the lock (§lifecycle-kit integration);
 extra arguments are ignored, so the hook's trailing `<queue> <state>` argv passes
 through harmlessly.
+
+**Its subject is a record, not this lock**, and the argument mode is what makes
+that literal rather than incidental: any file in §The producer-liveness lock's
+`pid=<n> run=<key>` grammar is a legal subject, whoever wrote it. The second
+writer class is the launch-time liveness record a session places when it
+backgrounds a shell child (delegation-kit/SPEC.md §The delegation model); pointed
+at one, this gate answers *is that producer still running* on the same exit
+contract, unchanged. Stated here because a reader deciding what they may point
+this gate at reads this section, and because it is what lets that rule add a
+second reader without adding a gate.
 
 **It belongs on the entry hook and not in a `gates.list` battery**, and the
 reason is structural rather than a matter of taste. Its subject is a transition —

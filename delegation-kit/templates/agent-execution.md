@@ -61,18 +61,28 @@ drift: do not delete it on sight, and when either rule changes here, propagate.
   reachable.** An **`Agent` dispatch** is awaited by its **completion
   notification** — that record is the harness's, not the session's — so never go
   looking for it on disk. A **shell child** has no notification channel of its
-  own, so it is awaited on an artifact *the session placed*: put it where the
-  **Resume journal — agent writes, scratch reset sweeps** bullet below sends a
-  journal, repo-local gitignored scratch in the main checkout, on that bullet's
-  stated survivability grounds — widened here from the journal to any artifact a
-  session waits on.
-  **And wait on the artifact, not on process liveness.** `pgrep -f '<pattern>'`
+  own, so it is awaited on an artifact *the session placed*, and that artifact is
+  named: **record the child's PID at launch**, one line in the form
+  `pid=<n> run=<key>`, written where the **Resume journal — agent writes, scratch
+  reset sweeps** bullet below sends a journal, repo-local gitignored scratch in
+  the main checkout, on that bullet's stated survivability grounds — widened here
+  from the journal to any artifact a session waits on. That record *is* the wait
+  target: loop on its PID's liveness and the loop ends when the PID stops
+  answering. Write it at the launch, not after, and leave it behind — a
+  completion marker answers *is it done* to a live observer, and the case this
+  rule exists for is the one where the observer is gone, where a liveness record
+  still answers *is it still running* to whoever arrives next. Whoever that is
+  reads it with `check-producer-liveness <record>`, unchanged and already wired
+  (evidence-kit/SPEC.md §check-producer-liveness), which is why the record is in
+  that gate's grammar rather than a shape of your own.
+  **And never by pattern-matching the process table.** `pgrep -f '<pattern>'`
   matches the waiter's own argv — the harness's wrapper argv matches too — so
   `until ! pgrep -f '<script>'; do …; done` can never go false and never exits,
-  reddening nothing while it burns the whole foreground cap. Where liveness
-  genuinely *is* the condition — a producer this session did not start — match a
-  **recorded PID** (`kill -0 "$pid"`), never a pattern: a PID is an identity, a
-  pattern is a guess about a process table that includes the guesser. The
+  reddening nothing while it burns the whole foreground cap. Where liveness *is*
+  the condition, match a **recorded PID** (`kill -0 "$pid"`) and never a pattern —
+  one rule, whoever started the producer, your own backgrounded child included: a
+  PID is an identity, a pattern is a guess about a process table that includes the
+  guesser. The
   bracket-trick repair (`pgrep -f '[r]un-smoke.sh'`) is **not** the sanctioned
   form, and its grounds for being refused are
   delegation-kit/SPEC.md §The delegation model's.

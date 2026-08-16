@@ -51,9 +51,14 @@ condition (`run_in_background` wrapping `until <cond>; do sleep N; done`) and
 take its completion notification. Not a bare foreground `sleep`, which ends on a
 clock, and not the harness's event-stream form, which stays armed to its deadline
 even after its event fires. A sub-`Agent` is awaited by its completion
-notification and never by a path on disk; a shell child is awaited on an artifact
-you placed in repo-local `.tmp/` in the main checkout — never a temporary
-worktree, which is deleted with it, and never a system temp dir. Stating these
+notification and never by a path on disk; a shell child is awaited on the liveness
+record you write at its launch — its PID, one line `pid=<n> run=<key>`, in
+repo-local `.tmp/` in the main checkout, never a temporary worktree, which is
+deleted with it, and never a system temp dir. Loop on that recorded PID's liveness
+(`kill -0 "$pid"`) and never on a pattern, whoever started the producer; leave the
+record behind, because `check-producer-liveness <record>` reads it unchanged and
+that is how whoever arrives after you tells a live orphan from a finished one.
+Stating these
 here as imperatives is sanctioned by delegation-kit/SPEC.md §Operative residency;
 the rule, its reasoning and its mechanics are the **Background + notification,
 never poll** bullet in delegation-kit/templates/agent-execution.md.

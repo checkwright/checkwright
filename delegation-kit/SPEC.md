@@ -97,6 +97,89 @@ attested failure had no third case — and that the artifact's home is the resum
 journal's own scoping widened rather than a second rule, so the survivability
 grounds are stated once and cited twice.
 
+**The shell branch names its artifact, and the naming is the substance.** The
+split above left that branch pointing at *an artifact the session placed* without
+saying which, so a session that wanted to comply had nothing to write, and of the
+long-running shell producers a session might background, most publish no record of
+any kind. The artifact is a **launch-time liveness record**: the child's PID,
+captured by the launcher at the moment it backgrounds the child. The obvious
+repair — have the child touch a file when it finishes and wait on that — is
+refused, and the attested failure is exactly why: a completion marker answers *is
+it done* **to a live observer**, and the failure case is the one where the
+observer is gone. A liveness record answers *is it still running* **to whoever
+arrives next**, which is a question a dead session's successor can still ask.
+
+**The record's producer is the launcher, and the alternative is recorded as
+refused rather than merely not chosen.** The alternative is per-producer
+self-claiming — the producer-liveness lock's shape generalized so every
+long-running producer claims its own record — and it fails on three counts. It
+reaches only producers the consumer's own tree owns, where most backgrounded work
+is an ad-hoc command composed at the call site. It puts the record's production in
+the one process whose death is the event being detected, so a producer that dies
+before claiming is invisible in exactly the window that matters. And it bills a
+program for a property that belongs to the *launch* rather than to the program:
+the same script backgrounded is in this class and run in the foreground is not.
+The launcher, by contrast, knows the PID of anything it started, is the party that
+needs to read it back, and is the only one present at the moment the class is
+entered.
+
+**The liveness clause widened rather than acquiring an exception, and its own
+premise is what falsified it.** The clause sanctioned a recorded-PID match *where
+liveness genuinely is the condition — a producer this session did not start*, and
+that exclusion rested on an assumption: a session that started the producer was
+taken to have a better instrument, namely its own artifact. The better instrument
+requires a live reader, and the failure being fixed is the loss of the reader. So
+the subject widens to cover a producer the session started **and backgrounded**,
+and the widening is on the subject alone, never on the predicate — pattern-matched
+liveness stays refused, and the bracket trick stays refused as the sanctioned
+form on the grounds below.
+
+**The record's grammar is evidence-kit's, and that is what makes the second reader
+free.** There are two readers, and they are different parties at different
+transitions: the **launching session**, in-turn, as its wait condition; and
+**whoever arrives next**, which is the case the attested failure is actually
+about, where the launcher is gone and something else must be able to tell that a
+producer is still mutating shared files. Written in the one-line `pid=<n>
+run=<key>` grammar the producer-liveness lock already carries, the record is a
+legal subject for `check-producer-liveness` **unchanged** — that gate already
+takes a record path and already reports exactly *is the producer named here still
+running*, on a ruled exit contract. No new gate, no new tool, no new grammar, and
+a reader already specified, already fixture-covered and already wired. An inverted
+grammar would have bought a second implementation of a decided thing, which is the
+only argument this needs; it is recorded because *a launch record is not a lock,
+so it should have its own shape* is the reading a later session will reach for,
+and the answer is that the two records carry the same field, answer the same
+question, and differ only in who wrote them. How a PID's liveness is *decided*
+stays evidence-kit's — the predicate, the PID-reuse residual and the refused TTL
+are ruled in evidence-kit/SPEC.md §The producer-liveness lock and are not
+seconded here. delegation-kit owns *when a session waits and on what*.
+
+**Both affordances are refused, and the refusal's cost is bounded rather than
+denied.** A tool to write the record and a second one to read it are declined: the
+write is a PID captured at launch and the read is a single liveness match, each a
+shell builtin away and both already spelled in the template, and a script whose
+body is one builtin is the clearest case of the script-interpreter surface this
+methodology shrinks. The generic reading affordance that would genuinely earn its
+place already exists and is `check-producer-liveness`, which the grammar reuse
+reaches without adding anything. What the refusal costs is stated rather than
+hidden: an affordance would make the record's grammar impossible to get wrong, and
+a hand-written one can be malformed. That failure is bounded by the consumer,
+which exits **2** on a record it cannot parse, so a malformed record reads as
+*could not be established* and never as *nothing running*.
+
+**What the naming does not claim.** No gate enforces it, and the reason is
+structural rather than budgetary: the subject is *did a session record a PID
+before backgrounding*, and a session that skips the rule writes nothing, so there
+is no absence a check could have been told to expect. The artifact-side backstop
+stays the one §Operative residency already names — `check-producer-liveness` at a
+stage entry, covering the **concurrent** case, a producer still live when the next
+entry is stamped. Widening what that backstop may be pointed at does not make the
+rule itself checkable. The enforcement-design question — *given that prose alone
+does not hold, what does* — is untouched, and so is the question of which sessions
+the rule reaches. What the naming removes is a different failure: a session that
+**wanted** to comply had no named artifact and was carved out of the only clause
+that fit.
+
 **The guard interaction that produced it resolves without touching the guard.**
 The attested sequence: a session reached for the correct artifact wait, spelled
 it against the harness's own scratchpad path, and the consumer's bash guard
@@ -556,6 +639,22 @@ which is (b)'s line and stays with this section's owner. Recorded because the
 sanction's cost is exactly this: every rule it licenses acquires N carriers that
 a later change must find, and a restatement that drifted *unevenly* is harder to
 spot than one that drifted at all.
+
+**The obligation fired again, and the second firing found a carrier the roster
+did not hold.** The waiting rule changed once more — the shell-child branch named
+its artifact, and the liveness clause widened past *a producer this session did
+not start* — and propagation reached both `.claude/agents/` definitions as before.
+It also reached a **third** carrier sitting outside this section's roster
+entirely: guard-kit's self-matching-`pgrep` rule states the same clause verbatim
+in the corrective help text it prints when it blocks, mirrored in prose in that
+kit's own SPEC. Left alone, a guard-blocked session would read advice that
+undersells what it may now do with its own backgrounded child — a restatement
+whose reader arrives at the worst possible moment, already stopped and looking for
+the sanctioned form. Recorded because of what found it: the clause's own wording,
+grepped across the tree, and not this section's list of known carriers. The
+sanction's cost is N carriers a later change must find, and N is discovered by
+grepping the rule's phrasing rather than by consulting the roster — a roster is a
+record of the carriers someone noticed, never a proof of the set.
 
 **No gate is owed, and not for budget.** No check can read a session's choice to
 end a turn — the act leaves no tracked artifact. The anti-restatement gates were

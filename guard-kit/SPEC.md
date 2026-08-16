@@ -446,7 +446,10 @@ that harness exists would be designing against no case.
     operand is a literal occurring **elsewhere** in the same command. The
     corrective names both sanctioned forms: wait on the work's own artifact, or
     `kill -0` against a **recorded PID** where liveness genuinely is the condition
-    (a producer this session did not start). A PID is an identity; a pattern is a
+    — whoever started that producer, a child the session backgrounded itself
+    included, whose PID it recorded at launch. That clause is owned by
+    delegation-kit/SPEC.md §The delegation model and this text carries it.
+    A PID is an identity; a pattern is a
     guess about a process table that includes the guesser. The refusal of the
     bracket-trick repair as the *sanctioned* form is delegation-kit's ruling and
     its grounds live there (delegation-kit/SPEC.md §The delegation model); this
