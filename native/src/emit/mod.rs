@@ -1,6 +1,7 @@
 // spec: gate-sdk/SPEC.md §The non-gate arm — the ported emitters. Each owes no descriptor, no
 // registration and no fixture pair, and owes a named reader instead: the regen command in
 // docs/site-architecture.md §Generated projections, and the comparator calling `emit()`.
+pub mod enforcement_map;
 pub mod footprint;
 
 pub type EmitFn = fn() -> Result<String, String>;
@@ -8,11 +9,24 @@ pub type EmitFn = fn() -> Result<String, String>;
 // spec: gate-sdk/SPEC.md §The non-gate arm — the projection's own name keys the arm, so no
 // mapping table exists to drift. The third element is the arm's bridged knob reads, the data
 // `--knobs` prints for it.
-pub const EMITTERS: &[(&str, EmitFn, &[&str])] = &[(
-    "footprint",
-    footprint::emit,
-    &["CONTEXT_KIT_SURFACES"],
-)];
+pub const EMITTERS: &[(&str, EmitFn, &[&str])] = &[
+    ("footprint", footprint::emit, &["CONTEXT_KIT_SURFACES"]),
+    (
+        "enforcement-map",
+        enforcement_map::emit,
+        &[
+            "GATE_SDK_GATES_DIR",
+            "GATE_SDK_ENFORCE_SCAN_DIR",
+            "GATE_KIT_ROOTS_HERE",
+            "GATE_PRUNE_DIRS",
+            "DRIFT_KIT_KPIS_FILE",
+            "CONTEXT_KIT_SETTINGS_FILE",
+            "CANON_KIT_DOCS_BLOB_REF",
+            "EVIDENCE_KIT_SUITES",
+            "EVIDENCE_KIT_RUN_*",
+        ],
+    ),
+];
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — resolved before the registry lookup and absent from
 // `--list`, which is what keeps check-gate-substrate-parity assertion B's equality true in both

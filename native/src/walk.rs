@@ -37,6 +37,28 @@ pub fn knob_array(knob: &str) -> Result<Vec<String>, String> {
     Ok(raw.split('\t').map(String::from).collect())
 }
 
+// spec: gate-sdk/SPEC.md §lib/gate.sh — the bridged read of a knob *family*, the prefix form's
+// receiving half: every `GATE_SDK_KNOB_<prefix>…` variable, keyed by the suffix the prefix leaves.
+// Sorted, so a reader's output order does not depend on the environment's.
+pub fn knob_prefix(prefix: &str) -> Vec<(String, String)> {
+    let var_prefix = format!("GATE_SDK_KNOB_{}", prefix);
+    let mut out: Vec<(String, String)> = std::env::vars()
+        .filter_map(|(k, v)| k.strip_prefix(&var_prefix).map(|s| (s.to_string(), v)))
+        .collect();
+    out.sort();
+    out
+}
+
+// spec: gate-sdk/SPEC.md §lib/gate.sh — a prefix is a *resolution set, never a roster*: this
+// answers "what is <name>'s value", and the caller's roster comes from its own roster knob. A
+// reader enumerating `knob_prefix` instead would publish `EVIDENCE_KIT_RUN_ID` as a suite.
+pub fn knob_in_family(family: &[(String, String)], name: &str) -> Option<String> {
+    family
+        .iter()
+        .find(|(k, _)| k == name)
+        .map(|(_, v)| v.clone())
+}
+
 // spec: gate-sdk/SPEC.md §lib/gate.sh — the binary side of `gate_kit_roots`: transported,
 // never re-derived, because the fallback predicate is anchored at the shell library's own
 // location and a binary the installer copies elsewhere cannot recover it
@@ -517,6 +539,27 @@ pub fn fixture_case_dirs(gate: &str) -> Vec<PathBuf> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // spec: gate-sdk/SPEC.md §lib/gate.sh — the prefix form's receiving half: the family is keyed
+    // by the suffix, sorted independently of the environment's order, and a lookup is by name
+    // because a prefix is a resolution set rather than a roster.
+    #[test]
+    fn a_knob_family_is_keyed_by_suffix_and_read_by_name_not_enumerated() {
+        std::env::set_var("GATE_SDK_KNOB_PROBEFAM_beta", "b");
+        std::env::set_var("GATE_SDK_KNOB_PROBEFAM_alpha", "a");
+        std::env::set_var("GATE_SDK_KNOB_PROBEFAM_ID", "not-a-member");
+        let fam = knob_prefix("PROBEFAM_");
+        let keys: Vec<&str> = fam.iter().map(|(k, _)| k.as_str()).collect();
+        assert_eq!(keys, vec!["ID", "alpha", "beta"], "family is sorted by suffix");
+        assert_eq!(knob_in_family(&fam, "alpha").as_deref(), Some("a"));
+        assert_eq!(knob_in_family(&fam, "absent"), None);
+        // spec: gate-sdk/SPEC.md §lib/gate.sh — the decoy resolves and is simply never looked up,
+        // which is what keeps EVIDENCE_KIT_RUN_ID out of the emitted suite roster
+        assert!(knob_in_family(&fam, "ID").is_some());
+        for k in ["beta", "alpha", "ID"] {
+            std::env::remove_var(format!("GATE_SDK_KNOB_PROBEFAM_{}", k));
+        }
+    }
 
     // spec: gate-sdk/SPEC.md §check-reads-couples — unit test B: a walk outside this file
     // would be invisible to the recorder and would unverify test A, so the roster of
