@@ -864,10 +864,39 @@ stage (it moves no cursor, stamps nothing) and so is outside
 `check-stage-skill-coverage`'s stage roster; it is a reporting ritual the close
 skill may invoke, never a gate.
 
+## lib/drift.sh
+
+The kit's sourced knob resolution — values, never tool structure. It exists for
+one reason: `gate-sdk/SPEC.md §lib/gate.sh`'s config bridge resolves a compiled
+member's declared knob by sourcing **the owning kit's** `lib/*.sh`, and the owner
+is derived from the knob's own `DRIFT_KIT_` prefix. So a knob this kit owns can
+only be resolved from here; there is no other place that would work, and a knob
+no library defines is the bridge's third refusal.
+
+**`DRIFT_KIT_KPIS_FILE` resolves to the KPI registry path, and the two adoption
+modes are preserved here rather than at the reader.** They are the same two the
+enforcement map states for every registry it reads — *adopted-but-broken refuses
+where not-adopted degrades*:
+
+- **Explicitly set to a path that does not exist** is adopted-but-broken: exit 2
+  naming the knob. Under the config bridge that refusal fires inside the
+  resolution subshell and refuses the whole invocation, so a consumer who
+  misconfigured the registry gets a failure rather than a quietly shorter page.
+- **Unset, with the default path absent**, is not-adopted: the knob resolves to
+  the **empty string**, which a reader takes as *no registry, drop the section*.
+
+**A guarded default would have collapsed both into the refusing mode** — the
+idiom every other knob here could have used is wrong for this one, because it
+erases the set-ness the two modes are told apart by, turning a consumer that
+never adopted KPIs into a hard failure. Emptiness carries the not-adopted signal
+instead, which is what lets **no reader carry the default**: a reader that had to
+recognise the default path would be a second home for it.
+
 ## Layout and configuration
 
 ```
 drift-kit/
+  lib/drift.sh                   # sourced knob resolution; the config bridge sources it
   bin/drift-report.sh
   bin/trajectory.sh              # the published-evidence extractor
   bin/kfric.sh                   # the knowledge-friction capture affordance
