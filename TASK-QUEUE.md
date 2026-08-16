@@ -6030,6 +6030,57 @@
   Filed 2026-08-16 by close from the gap inbox, both halves; the drain re-verified the carrier
   count and the chokepoint scoping against the SPEC rather than taking the bullet's prose.
 
+- **done-slug-ownership-citation-report** [design-pending] — governed prose says a queue slug
+  "owns" an open question in the present tense, and nothing notices when that slug lands.
+  **Two live instances, both found by hand at this close's audit sweep and both fixed here.**
+  `gate-sdk/SPEC.md` asserted that the shipped install path "degrades silently, which
+  `installer-jq-silent-degradation` owns", and again that the slug "still owns it" — text
+  *added by this same iteration*, weeks-fresh, and falsified by the same iteration's later
+  commits (`bd8ef299`, `97b65bdb`, `047c7426`) that landed the unit and moved the slug to
+  `## Done`. A reader arrives at a settled question dressed as an open one.
+  **DISTINCT from `dead-queue-citation-report`**, and deliberately not folded into it: that
+  entry's corpus is the queue's own bodies and its subject is a slug resolving *nowhere*. This
+  one's corpus is governed SPEC prose and its subject is a slug resolving in `## Done` — live,
+  findable, and closed. Different scan, different reader, different remedy.
+  **Why `[design-pending]`:** the tempting form is a red, and a red is wrong for the same
+  reason it is wrong for its sibling — governed prose legitimately names landed work, and
+  telling a historical citation from a present-tense ownership claim means reading tense. The
+  cheaper true form is that sibling's own conclusion: a **listing**, every governed-prose
+  citation of a Done-resolving slug, reported rather than redded. Where the listing is read is
+  the same open question, and taking either entry should cost both.
+  **This narrows a class the audit roster carries as un-gateable.** `capability-pendency-after-
+  landing` is un-gateable because a scanner cannot infer which tree set discharges a prose
+  claim. The slug sub-case is the exception: the discharging set is the queue's own `## Done`,
+  which is machine-readable, so this is the gateable slice of an ungateable class.
+  Class: mints a name for a report rather than a gate; the promoting scope settles feature-vs-debt.
+  **Cost while deferred:** paid by every reader of a governed SPEC who takes a closed ruling
+  for an open one, and the audit that catches it is a per-close human sweep with no oracle.
+  Filed 2026-08-16 by close, from the two instances its own roster sweep found.
+
+- **survey-engagement-residue-untracked** [design-pending] — the `survey-engagement` audit class
+  cannot be performed a stage later under this repo's lead-orchestrated posture.
+  **Established at this close, by trying to perform it.** The class asks whether a scope survey
+  ran a counter-evidence pass before recommending against an entry, and the roster already
+  states its residue is "the survey's own reasoning". Under the split posture that reasoning is
+  relayed to the lead and lands in the lead's journal under `.tmp/`, which is gitignored and
+  which `bin/enter-stage.sh`'s boundary reset wipes at the **next scope** — so the evidence has
+  a lifetime shorter than the audit's cadence. A read-only sweep of the committed tree for this
+  iteration's two refused unit candidates found no survey-record block, no `queue-edges.sh`
+  invocation and no committed reasoning; only the operator's overriding ground survives, in a
+  commit body since superseded.
+  **What makes it a defect and not just a limit:** the roster's `last:` stamp asserts the class
+  was audited, and a stamp resting on evidence that no longer exists is exactly the shape
+  `capability-pendency-after-landing` exists to catch, one level up.
+  **Why `[design-pending]`:** three shapes trade off and none is obviously right. Widen
+  `bin/file-survey.sh` so a *refusal* is filed like a census, which puts the residue in the
+  committed survey record — but that record is itself boundary-truncated, so it buys one
+  iteration, not an audit trail. Add a scope-stage obligation to record each refusal's engaged
+  ground in the entry it refuses, which is durable but grows at-cap entries. Or retire the class
+  as unauditable under this posture and say so, which is honest and loses the check.
+  **Cost while deferred:** every close either stamps the class on evidence it cannot read or
+  leaves it unstamped and accruing, and neither is a verdict.
+  Filed 2026-08-16 by close, from the audit it could not discharge.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
