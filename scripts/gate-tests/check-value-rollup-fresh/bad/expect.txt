@@ -1,1 +1,1 @@
-is stale vs gen-value-rollup.sh
+is stale vs the value-rollup join
