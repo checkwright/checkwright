@@ -973,7 +973,16 @@ lazily by `context_memory_dir_default()` at its one reader, which also keeps a
 - `CONTEXT_KIT_SETTINGS_FILE` — the tracked harness settings file
   check-settings-pins and check-settings-paths each verify, on a different
   invariant, and whose `.local.json` sibling check-memory-off scans; default
-  `.claude/settings.json`.
+  `.claude/settings.json`. **Explicitly setting it to a path that does not exist
+  is refused (exit 2) by `lib/context.sh` at resolution time**, while leaving it
+  unset and having no file at the default path is not-adopted and degrades at
+  each reader. The refusal lives in the library because that is the last place
+  *set-ness* is visible: once the value crosses gate-sdk's config bridge a
+  compiled reader sees one path string and cannot tell the misconfigured case
+  from the unadopted one. Emptiness is **not** the signal here — the config
+  validation below rejects an empty value as malformed, an invariant older than
+  the bridge — which is why this knob refuses where `DRIFT_KIT_KPIS_FILE`
+  resolves empty (drift-kit/SPEC.md §lib/drift.sh).
 - `CONTEXT_KIT_SETTINGS_PINS` — the pins manifest; default
   `${GATE_SDK_GATES_DIR:-scripts}/settings-pins.conf`.
 - `CONTEXT_KIT_MEMORY_DIRS` — space-separated glob list of harness memory dirs

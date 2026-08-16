@@ -19,7 +19,13 @@ fi
 unset _ck_cfg
 
 # spec: context-kit/SPEC.md §lib/context.sh — every default is repo-relative: a bridged value is baked verbatim into the tracked pre-commit hook, so an absolute path would pin one clone's layout into a committed artifact
-[[ -v CONTEXT_KIT_SETTINGS_FILE ]] || CONTEXT_KIT_SETTINGS_FILE=".claude/settings.json"
+# spec: context-kit/SPEC.md §Layout and configuration — the settings knob tells two adoption modes apart by *set-ness*, and a guarded default erases that the moment the value crosses the config bridge: a compiled reader sees one path string and cannot tell an explicitly-misconfigured file (refuse) from an unadopted one (degrade). The refusal is therefore taken *here*, where set-ness is still visible — an explicitly-set path that does not exist is adopted-but-broken and exits 2 — while an unset knob keeps the plain default, and a reader that cannot open *that* path is in the not-adopted case and degrades. The empty-string signal drift-kit's counterpart uses is unavailable here: the validation below rejects an empty value as a malformed config, and that invariant is older than this bridge.
+[[ -v CONTEXT_KIT_SETTINGS_FILE ]] \
+    && { [[ -f "$CONTEXT_KIT_SETTINGS_FILE" ]] || {
+             echo "context-kit: CONTEXT_KIT_SETTINGS_FILE not found: $CONTEXT_KIT_SETTINGS_FILE" >&2
+             exit 2
+         }; } \
+    || CONTEXT_KIT_SETTINGS_FILE=".claude/settings.json"
 [[ -v CONTEXT_KIT_SETTINGS_PINS ]] || CONTEXT_KIT_SETTINGS_PINS="${GATE_SDK_GATES_DIR:-scripts}/settings-pins.conf"
 
 # spec: context-kit/SPEC.md §check-memory-off — empty means "derive it", not "no dir": the harness names each project's dir from an absolute path this library must not compute on every knob resolution, so the default stays lazy and its owner is the function below
