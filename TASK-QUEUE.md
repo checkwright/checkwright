@@ -12,58 +12,6 @@
 
 ## New Features
 
-- **recurrence-drain-input-widening** [spec: SPEC-recurrence-input.md]
-  — a recurrence with no bullet is uncounted.
-  recurrence: recurrence-drain-input-widening 2026-08-09 2026-08-17
-  **Operator-ruled 2026-08-04, at the close of `ruling-capture-contracts`.** The drain that
-  stamps the `recurrence:` declaration takes gap-inbox bullets as its sole input, which the
-  amendment made the mechanism's single auditable producer. The open question is whether it
-  should also stamp a recurrence the closing stage resolves for itself.
-  **Grounds, from the iteration that built the mechanism:** `amendment-landing-citation-assertions`
-  genuinely re-occurred — a build session found a false citation in an amendment the audit stage
-  had passed as zero-divergence, that entry's own assertion (2) case. It reached close as dispatch
-  prose, so close recorded dated prose and no declaration: faithfully captured, aggregated
-  nowhere, the exact failure the counter exists to end, one channel over.
-  **The ground that held it open is ANSWERED.** The ruling turned on single-producer
-  auditability, which `gap-resolver-mention-overcount` back-tested and found already false —
-  three of the nine commits that ever added a `recurrence:` date stamped one outside the drain.
-  The drain is the only *mechanized* producer, and auditability now rests on same-commit reading.
-  **What remains open** is only whether a direct stamp by a session observing a recurrence out of
-  channel should be sanctioned, forbidden, or mechanized — inherited here by name, and the live
-  half of this entry.
-  **Cost while deferred:** a recurrence observed anywhere but the capture channel misses both
-  `kpi-incident-recurrence` and scope's pre-emption threshold, so the theme keeps outranking
-  it silently — with the counter shipped, that silence now reads as evidence of no recurrence.
-  **Attestings 2-5, each an iteration's close, all declining stamps per this entry's own rule.**
-  2 (2026-08-05, `install-claim-contract`): a validate turn ended with `run-validate.sh` live,
-  reaching close via `bin/kfric.sh`, so neither `validate-producer-liveness-unobservable` nor
-  `dispatched-session-waiting-rule-residency` moved. 3 (2026-08-09, `install-profile-seam`):
-  THREE out of channel, ZERO in it — `spec-measured-count-gate` (lead dispatch prose, five
-  firings in one iteration, as its cost field predicts), `survey-edge-aggregation-residue` (a
-  rostered audit), `dispatch-worktree-reds-the-battery` (a battery red in close's own commit);
-  a bullet-only drain would have reported clean for an iteration carrying three. 4 (2026-08-09,
-  `prose-profile-activation`), first with a non-zero in-channel half: THREE stamped off bullets,
-  THREE declined — `poll-sleep-guard-steer`, `cat-read-steer-guard`,
-  `dispatch-cited-evidence-unverified` — so the sole-input shape *does* work when a filer routes
-  through it. 5 (2026-08-10, `native-port-cadence`), first with the closing session as subject:
-  `exit-echo-decoration-guard-vs-habit` fired three times inside close itself, the guard blocking
-  a decorated `overhead-meter.sh`, `close-surfaces.sh` and `run-gates.sh`.
-  **Answered: the unreachable set is enumerated, not open-ended.** Seven attested channels —
-  dispatch prose, `bin/kfric.sh`, a rostered audit, a battery red, close's friction triage, a
-  lead's relayed figure, and the closing session's own tool use. The last generalizes: close is
-  downstream of the drain, so the fix is a second input rather than a wider filer habit —
-  `close-generated-finding-route` owns that shape one altitude up.
-  **Attesting 6 (2026-08-12, `native-cohort-canon-kit`): TWO declined, ZERO in channel** — close's
-  friction-triage poll-to-wait pattern and `icebox-worklist-roadmap-blind` re-deriving its predicted
-  3-of-3 exclusion, both declined on this entry's rule. **7 (2026-08-17) arrived as a bullet and so
-  stamps the date above:** that entry's fifth zero-precision measurement landed as close's prose,
-  and a post-close gap bullet routed it here — the finding is counted only because one was filed.
-  **The budget note is now twice-attested:** this entry sits at its cap, so 6 rides a substitution
-  over that very note — paid by compressing two grounds already marked answered, never by dropping
-  one. `entry-cap-displaces-mandated-writes` owns the class; this is its worked instance.
-  Filed by the lead on operator direction under the direct-filing exception; the operator ruled
-  file-a-unit over both keep-as-is and next-iteration-priority.
-
 ## Technical Debt
 
 ## Deferred
@@ -1204,6 +1152,11 @@
   **Evidence it is live rather than theoretical:** this iteration. The drain
   landed claiming 24 bullets dispositioned; five more findings arrived after it,
   and close re-drained.
+  **Narrowed 2026-08-17 by `recurrence-drain-input-widening`, which settles the RECURRENCE half
+  and nothing else.** A close-generated finding that *is* a recurrence now has a channel — the
+  session judging it stamps the date directly, that ruling's first ground being this entry's own
+  argument. What stays open is this entry's actual question: a close-generated finding that is
+  **not** a recurrence still has no drainer inside its own iteration.
   **Why `[design-pending]` — three candidates, three different failure modes.** A
   second drain pass late in close, after its own findings have settled, can loop.
   A re-arm refusing close's completion while the inbox is non-empty can deadlock
@@ -3613,10 +3566,14 @@
   **The alternation is the evidence, and it is what makes this the requirement's property rather
   than any session's.** Answerable once, unanswerable three times, on one roster line, with
   nothing changed but the survey — and the entry predicted its own recurrence before two of them.
-  **No `recurrence:` date is stamped, and the decline is deliberate and unchanged:** every one of
-  these came from the rostered close audit rather than the gap-inbox capture channel, and whether
-  such an observation may stamp directly is the open question `recurrence-drain-input-widening`
-  holds. Attested as prose, consistently with the other out-of-channel recurrences.
+  **The ground for declining a `recurrence:` date is SPENT, 2026-08-17**, when
+  `recurrence-drain-input-widening` landed the direct stamp as sanctioned *and obliged*: an
+  observation reaching a session from the rostered close audit rather than the capture channel is
+  now stamped by whoever judges it. These four are **not** back-filled — the obligation attaches
+  to the judging session at the moment of judgment, the landing rule undertook no backfill, and a
+  later session re-grading three earlier sessions' prose is the self-grading hazard that ruling
+  names rather than a repair of it. The next observation of this defect stamps. The backfill
+  question itself is filed to the gap inbox at that landing for close to disposition.
   **Why `[design-pending]`:** the cheap fix — have the survey cite its edge sums — risks
   becoming ceremony, a stage writing down that it did the thing rather than doing it. The
   honest alternatives are a survey artifact the sum lands in, folding the sum into the existing
@@ -6305,6 +6262,8 @@
 - **scratch-execution-allowlist-bar** [design-pending] — Each close re-derives this standing bar.
 
 ## Done
+
+- recurrence-drain-input-widening
 
 ## Lessons Learned
 

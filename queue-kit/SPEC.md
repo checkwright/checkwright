@@ -372,7 +372,8 @@ than absorbed.
 
 Unlike the `relates:` declaration refused above, no corpus needs migrating. The
 line is **session-written under judgment** — the closing stage's gap-inbox drain
-is its only mechanized producer, and each date records that session's ruling that
+is its only mechanized producer, while any session that judges a recurrence is
+obliged to stamp one directly, and each date records that session's ruling that
 the finding re-occurred, read off the filed prose rather than derived from it
 (lifecycle-kit/SPEC.md §The committed gap inbox owns the rule and the standard) —
 and hand-read; an entry with no declaration is simply an entry that has not
@@ -982,16 +983,17 @@ strictly less.
 mandated write is a write on a deferred entry that another governed contract
 obliges the writing session to make **in the commit it is already making**, and
 whose obligation is citable to that contract by name. Two instances exist, both
-already in the tree rather than invented here: the gap-inbox drain's
-`recurrence:` date, which must land in the commit that truncates the inbox
-because that commit is the audit artifact (lifecycle-kit/SPEC.md §The committed
-gap inbox); and a ruling recorded onto the entry it rules, under the
-recording-in-the-moment rule below. Its **producers** are the sessions those two
-contracts already bind — the closing stage's drain, and any session recording a
+already in the tree rather than invented here: a judged `recurrence:` date and
+the grounds it is read from, which must land in the commit the judging session is
+already making because that commit is the audit artifact (lifecycle-kit/SPEC.md
+§The committed gap inbox); and a ruling recorded onto the entry it rules, under
+the recording-in-the-moment rule below. Its **producers** are the sessions those
+two contracts already bind — any session that judges a recurrence, the gap-inbox
+drain being its mechanized instance, and any session recording a
 ruling — both running today with no new trigger, no new field and nothing to
 configure; its **consumers** are that same session reading this section when
 assertion A blocks it, a path the gate's failure text already routes it down, and
-lifecycle-kit's drain contract, which cites the class by name for the write it
+lifecycle-kit's judgment contract, which cites the class by name for the write it
 mandates. **What is not a mandated write, because a class that excludes nothing
 is not a class:** the session's own evidence for a claim, a further ground for a
 claim already made, a cross-reference it would like to add, a correction it could

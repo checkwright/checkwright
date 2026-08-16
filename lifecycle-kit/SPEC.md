@@ -770,10 +770,32 @@ judgment: on a bullet it judges a recurrence it stamps the date onto that entry'
 declaration — creating the line when absent, appending the date when present —
 **in addition to** its ordinary disposition, never instead of it. It is reachable
 at every close with no enabling config, since the drain is already mandatory and
-the boundary refusal already forces it. It is *not* the only producer in fact: a
-session that observes a recurrence outside the capture channel can stamp one
-directly, and whether that path should be sanctioned, forbidden, or mechanized is
-open. Stamping is **idempotent per (slug, date)** — two filings of one slug on
+the boundary refusal already forces it.
+
+The drain is *not* the only producer, and that path is **ruled: sanctioned, and
+obliged.** A session that observes a recurrence outside the capture channel
+stamps one directly, in the commit it is already making. The obligation attaches
+to the **judgment**, not to the channel the observation arrived through — the
+failure the counter exists to end is a recurrence *seen and not recorded*, and a
+merely permitted write is one a session under pressure correctly declines, which
+would answer the question in form and leave it open in substance.
+
+*Not forbidden*, on three independent grounds. It would strand a class by
+construction: this drain runs once, early in close, while close's own later steps
+— audits, lesson disposition, staleness reads, release disposition — necessarily
+generate findings that postdate it, leaving the one stage downstream of every
+drain no legal channel at all. It is already being obeyed at a recorded cost, and
+a rule whose disciplined observance produces a known-wrong count is the wrong
+rule. And it would red roughly a third of its own precedent — the ground on which
+the provenance gate below is refused, a refusal made to keep this route open.
+
+*Not mechanized*, which is foreclosed rather than weighed: **no mechanism
+produces the declaration** is the ruling stated above, and mechanizing this path
+reverses it. Independently, the only available mechanism is the capture-time
+matcher, whose honest limit above runs in the **under-counting** direction, so
+mechanizing on it would dress a known-lossy predicate as a count.
+
+Stamping is **idempotent per (slug, date)** — two filings of one slug on
 one day record one date, the day being the only resolution the bullet's own
 grammar has, and inventing a finer one would claim precision this channel does not
 carry.
@@ -787,21 +809,37 @@ pays for it is **auditability by inspection** — the drain stamps the declarati
 in the *same commit* that truncates the inbox, so the judgment and the prose it
 was made from sit in one diff and a reader auditing a date reads that commit and
 sees the bullet the judge read. That same-commit rule is therefore **load-bearing
-rather than incidental**: it is the audit artifact. It is also what makes the
+rather than incidental**: it is the audit artifact. The **invariant** is the
+judgment and its grounds landing in one commit; truncating the inbox is one way
+of satisfying it and not the thing itself. A direct stamp truncates nothing, so
+it discharges the same obligation the only way it can — **the observation is
+written into the entry, beside the declaration, in the stamping commit** — and a
+reader auditing a direct date finds the grounds there exactly as with a drained
+one. The same-commit rule is also what makes the
 stamp a **mandated write** in queue-kit's sense — the class
-queue-kit/SPEC.md §check-queue-entry-budget defines, and the section a draining
-session reads for its relief when that gate's per-entry cap blocks the stamp.
+queue-kit/SPEC.md §check-queue-entry-budget defines, and the section a stamping
+session reads for its relief when that gate's per-entry cap blocks the stamp;
+that grounds write is the same mandated write as the date it accompanies, its
+grounds half rather than a discretionary addition, so it claims the same relief.
 Neither the class nor the relief is restated here; this section is only the
 contract that mandates the write. Re-running a matcher is
 replaced by reading the grounds, which is the correct trade when the thing
 recorded is a judgment.
+
+**What the sanction adds is judges.** It adds no *new* class of unverifiability —
+re-derivability is conceded above for the drain's own stamps — but the population
+that may stamp widens from one stage to every session, and some of those sessions
+judge their own tool use, which is a session grading itself. No gate can hold
+that and none is proposed; the counterweight is the grounds obligation above,
+which makes a thin judgment visibly thin.
 
 **A provenance gate was drafted here and is refused, recorded so it is not
 re-drafted.** Requiring every commit that adds a `recurrence:` date to co-stage
 the inbox looks like the enforced replacement for re-derivability. It is not: a
 back-test over this project's own history redded roughly one in three of the
 commits that had ever stamped one, and it would foreclose the direct-stamp path
-above by gating exactly the route that open question may want opened. A gate that
+above by gating exactly the route the ruling there opens — which makes this
+refusal retrospectively correct rather than speculative. A gate that
 reds a third of the precedent it was derived from is measuring the rule, not the
 tree.
 

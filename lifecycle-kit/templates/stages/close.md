@@ -91,7 +91,12 @@ session.
    (§bin/enter-stage.sh), so an undrained gap blocks the boundary rather than
    crossing it silently.
    **Judge the recurrence, in addition to the disposition — you are the judge,
-   and nothing upstream ruled.** A slug appearing in a bullet is an *input*, never
+   and nothing upstream ruled.** That framing is the **general** contract rather
+   than this stage's local one — every session that judges a recurrence is obliged
+   to stamp it, and this drain is only its mechanized instance (§The committed gap
+   inbox owns the rule and what a stamp outside a drain owes instead). Your
+   obligation here is undiminished by that reach.
+   A slug appearing in a bullet is an *input*, never
    a verdict; the question is whether the finding **re-occurred** or is merely
    being cited, corrected, or argued against, and the bullet's prose is your
    grounds (the filer was asked at capture to write the claim there). State the
