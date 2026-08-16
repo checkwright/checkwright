@@ -41,6 +41,7 @@ pub mod queue_sections;
 pub mod queue_slug_liveness;
 pub mod queue_wrap;
 pub mod release_bump;
+pub mod rule_citation;
 pub mod scratch_citation;
 pub mod settings_paths;
 pub mod settings_pins;
@@ -904,6 +905,16 @@ pub const REGISTRY: &[GateEntry] = &[
         agent_tier_explicit::run,
         &["?"],
         &["DELEGATION_KIT_AGENT_DIR", "GATE_PRUNE_DIRS"],
+        "delegation-kit",
+    ),
+    // spec: gate-sdk/SPEC.md §The first cohort, and the rule that selects the next — the two
+    // file paths are positional arguments with hardcoded defaults and no env knob, so this
+    // member declares the empty knob list.
+    (
+        "check-rule-citation",
+        rule_citation::run,
+        &[],
+        &[],
         "delegation-kit",
     ),
 ];

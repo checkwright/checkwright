@@ -1242,7 +1242,7 @@ delegation-kit/
   usage-tests/dispatch-guard-cases.tsv  # expected-outcome <TAB> scenario knobs
   usage-tests/trend-history.log   # fixture history for the trend runner
   checks/check-gate-tamper.sh
-  checks/check-rule-citation.sh
+  checks/check-rule-citation.gate  # hermetic, binary-dispatched: every SPEC rule citation resolves to a template lead-in
   checks/check-agent-tier-explicit.gate  # hermetic, binary-dispatched: every agent definition declares an explicit model:
   gate-tests/check-gate-tamper/{good,bad}/
   gate-tests/check-rule-citation/{good,bad}/
