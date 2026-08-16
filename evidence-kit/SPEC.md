@@ -440,7 +440,7 @@ with tracked `gate-tests/` files to have a runner-doc line naming
 `EVIDENCE_KIT_SUITES` through `gate_fixture_suites`, assertion (A) here is a
 superset of that arm for a consumer running both kits. It is kept rather than
 retired on a dependency direction: a gate-sdk gate may not require this kit's
-config — gate-sdk's `bin/enforcement-map.sh` reads the suite roster where a
+config — gate-sdk's enforcement-map emitter reads the suite roster where a
 consumer has one, but an assertion cannot, having no honest verdict when it is
 absent. So B is the arm that survives a gate-sdk-only adoption, which is the
 more common shape. Both sections say so, each naming the other, so the next
@@ -564,9 +564,13 @@ evidence line proves the green result once the suites have run.
   `run-validate.sh` (what to run), by `check-evidence-manifest` (A's green
   block), by `check-battery-roster` (the doc-parity compare), and — behind a
   `declare -p` probe, so evidence-kit stays optional — by gate-sdk's
-  `bin/enforcement-map.sh`. Every one of them reads it by sourcing the config
+  enforcement-map emitter. Every one of them reads it by sourcing the config
   through the loader rather than parsing the file, so a suite a derivation loop
-  adds is visible to all of them with no second parse to keep in step.
+  adds is visible to all of them with no second parse to keep in step. The
+  compiled emitter reads it through that same loader at one remove: gate-sdk's
+  config bridge sources this kit's library to resolve `EVIDENCE_KIT_SUITES` and
+  the `EVIDENCE_KIT_RUN_` family, so the derivation loop still runs in bash and
+  nothing re-parses the file (gate-sdk/SPEC.md §lib/gate.sh).
 - **Producer-liveness lock** — produced by `run-validate.sh` at the claim point,
   which sits on the ordinary path (the validate stage runs it, and it is the only
   writer of the manifest); its enabling config carries a default in the loader, so

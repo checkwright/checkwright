@@ -82,12 +82,15 @@ recoverable:
 - **The value rollup** — `docs/value.md` is hand-framed prose around one
   generated marker block that joins the enforcement-map's per-kit class counts to
   the footprint's per-kit token cost. Regenerate on any change either emitter
-  reports: `bash scripts/gen-value-rollup.sh` (`check-value-rollup-fresh`
-  byte-gates the block, the byte-fresh projection of `gen-value-rollup.sh
-  --emit`). The join reads the two emitters live (never the committed detail
-  pages, so a stale page cannot poison the rollup); the class taxonomy and its
-  hardest-to-softest column order are owned by the enforcement page and derived
-  from its `##` section headings; the cost columns are the footprint's per-kit
+  reports: `bash gate-sdk/bin/run-gates.sh --emit value-rollup --write`
+  (`check-value-rollup-fresh` byte-gates the block, the byte-fresh projection of
+  the same arm without `--write`). The join reads the two emitters live — never
+  the committed detail pages, so a stale page cannot poison the rollup — and
+  reads them as **structured values rather than rendered markdown**, so the class
+  taxonomy and the per-kit figures arrive as data and no heading or table row is
+  re-parsed. The taxonomy and its hardest-to-softest column order are still owned
+  by the enforcement page, now as its section order rather than as text scraped
+  back out of it; the cost columns are the footprint's per-kit
   token figure, and the totals row reuses the footprint's pre-summed token totals
   rather than re-summing; the kit axis follows the footprint roster, then any
   enforcement-only label (a surface under no kit) groups as `(consumer)`. It is a
@@ -108,7 +111,7 @@ recoverable:
   projection, stale on any **class-registry** change rather than on a content
   edit: a gate's `tier=`, a `scripts/kpis.list` entry, the settings hooks, a
   `# enforce:` marker. `check-enforcement-fresh` byte-compares it (`bash
-  gate-sdk/bin/enforcement-map.sh --emit > docs/enforcement.md`). Its sibling
+  gate-sdk/bin/run-gates.sh --emit enforcement-map > docs/enforcement.md`). Its sibling
   `docs/footprint.md` is the per-kit token cost (`bash
   gate-sdk/bin/run-gates.sh --emit footprint > docs/footprint.md`, the emitter
   having ported to a non-gate arm the runner resolves config for), stale on any
@@ -149,11 +152,12 @@ recoverable:
   because a kit may not name a consumer's docs surfaces. Assembled here so the
   next author reads the list instead of discovering it one red gate at a time:
   the on-site SPEC mirror (`bash scripts/gen-docs-mirror.sh --write`),
-  `docs/enforcement.md` (`bash gate-sdk/bin/enforcement-map.sh --emit >
+  `docs/enforcement.md` (`bash gate-sdk/bin/run-gates.sh --emit enforcement-map >
   docs/enforcement.md` — the gate joins the class registry),
   `docs/footprint.md` (`bash gate-sdk/bin/run-gates.sh --emit footprint >
   docs/footprint.md` — a new script is new token cost), `docs/value.md`'s rollup
-  block (`bash scripts/gen-value-rollup.sh`, derived from the two above),
+  block (`bash gate-sdk/bin/run-gates.sh --emit value-rollup --write`, derived
+  from the two above),
   `docs/check-graph.html` (`bash gate-sdk/checks/check-graph.sh --emit >
   docs/check-graph.html`), and — for a hook-tier gate — the generated hooks
   (`bash gate-sdk/bin/gen-pre-commit.sh --write`). The same list applies to

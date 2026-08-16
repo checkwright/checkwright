@@ -544,7 +544,7 @@ pub fn render(m: &EnforcementMap) -> String {
     out
 }
 
-pub fn emit() -> Result<String, String> {
+pub fn emit(_args: &[String]) -> Result<String, String> {
     Ok(render(&measure()?))
 }
 

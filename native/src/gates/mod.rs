@@ -812,8 +812,19 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-value-rollup-fresh",
         value_rollup_fresh::run,
-        &[],
-        &[],
+        &["?"],
+        &[
+            "GATE_SDK_GATES_DIR",
+            "GATE_SDK_ENFORCE_SCAN_DIR",
+            "GATE_KIT_ROOTS_HERE",
+            "GATE_PRUNE_DIRS",
+            "DRIFT_KIT_KPIS_FILE",
+            "CONTEXT_KIT_SETTINGS_FILE",
+            "CANON_KIT_DOCS_BLOB_REF",
+            "EVIDENCE_KIT_SUITES",
+            "EVIDENCE_KIT_RUN_*",
+            "CONTEXT_KIT_SURFACES",
+        ],
         "-",
     ),
     // spec: gate-sdk/SPEC.md §check-reads-couples — no walk root: the comparator reads one named

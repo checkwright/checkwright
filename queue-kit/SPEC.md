@@ -785,8 +785,8 @@ The block ends on a blank line. That blank is load-bearing rather than cosmetic:
 the Pages parser closes a list only on one, so without it the `:end` marker abuts
 the last bullet and renders *inside* that list item. Command substitution strips
 the trailing newline on both sides of the freshness compare, so the byte-compare
-is unaffected — the same arrangement `gen-value-rollup.sh` uses to keep a table
-from swallowing its marker.
+is unaffected — the same arrangement the value-rollup emitter uses to keep a
+table from swallowing its marker.
 
 Honest limit — the lead line is a shared budget, and `[roadmap:]` competes for it
 with every other tag the entry carries. Against `check-queue-wrap`'s floor a

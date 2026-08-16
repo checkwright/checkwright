@@ -199,7 +199,7 @@ host repository's residue.
 
 "#;
 
-pub fn emit() -> Result<String, String> {
+pub fn emit(_args: &[String]) -> Result<String, String> {
     Ok(format!("{}{}", PREAMBLE, table(&measure()?)))
 }
 

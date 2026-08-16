@@ -8,6 +8,7 @@ mod ere;
 mod fresh;
 mod gates;
 mod json;
+mod marker;
 mod proc;
 mod queue;
 mod spec;
@@ -239,7 +240,7 @@ fn main() {
     // lookup and absent from `--list`. A thin wrapper by construction: the emission is a library
     // function, so the comparator and the rollup join call it in-process rather than through this.
     if let Some(f) = emit::lookup(first) {
-        match f() {
+        match f(&argv[1..]) {
             Ok(doc) => {
                 print!("{}", doc);
                 exit(0);

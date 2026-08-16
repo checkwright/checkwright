@@ -31,7 +31,6 @@
       "Bash(bash scripts/check-*.sh *)",
       "Bash(bash scripts/gen-docs-mirror.sh)",
       "Bash(bash scripts/gen-docs-mirror.sh *)",
-      "Bash(bash scripts/gen-value-rollup.sh)",
       "Bash(bash gate-sdk/bin/gen-pre-commit.sh --write)",
       "Bash(bash gate-sdk/bin/install-hooks.sh)",
       "Bash(bash gate-sdk/bin/build-native.sh)",

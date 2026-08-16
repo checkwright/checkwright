@@ -33,7 +33,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         // spec: gate-sdk/SPEC.md §The first cohort, and the rule that selects the next — the
         // emitter is a function call, not a spawn: it ported in the same unit, so there is no
         // shell left to reach and fresh::emit's bash hop is retired for this member.
-        emit::enforcement_map::emit()?
+        emit::enforcement_map::emit(&[])?
     };
 
     // spec: gate-sdk/SPEC.md §The consumer remainder cohort — both sides of the shell form's

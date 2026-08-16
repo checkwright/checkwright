@@ -3,8 +3,12 @@
 // docs/site-architecture.md §Generated projections, and the comparator calling `emit()`.
 pub mod enforcement_map;
 pub mod footprint;
+pub mod value_rollup;
 
-pub type EmitFn = fn() -> Result<String, String>;
+// spec: gate-sdk/SPEC.md §The non-gate arm — the arm's own argv tail, so a projection whose
+// generator has a write-in-place mode takes it as a flag rather than needing a second arm. The
+// returned string is what the arm prints: the document, or the action a write performed.
+pub type EmitFn = fn(&[String]) -> Result<String, String>;
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — the projection's own name keys the arm, so no
 // mapping table exists to drift. The third element is the arm's bridged knob reads, the data
@@ -24,6 +28,24 @@ pub const EMITTERS: &[(&str, EmitFn, &[&str])] = &[
             "CANON_KIT_DOCS_BLOB_REF",
             "EVIDENCE_KIT_SUITES",
             "EVIDENCE_KIT_RUN_*",
+        ],
+    ),
+    // spec: docs/site-architecture.md §Generated projections and their freshness gates — the join
+    // reads both sibling emitters live, so it declares the union of what they read.
+    (
+        "value-rollup",
+        value_rollup::emit,
+        &[
+            "GATE_SDK_GATES_DIR",
+            "GATE_SDK_ENFORCE_SCAN_DIR",
+            "GATE_KIT_ROOTS_HERE",
+            "GATE_PRUNE_DIRS",
+            "DRIFT_KIT_KPIS_FILE",
+            "CONTEXT_KIT_SETTINGS_FILE",
+            "CANON_KIT_DOCS_BLOB_REF",
+            "EVIDENCE_KIT_SUITES",
+            "EVIDENCE_KIT_RUN_*",
+            "CONTEXT_KIT_SURFACES",
         ],
     ),
 ];

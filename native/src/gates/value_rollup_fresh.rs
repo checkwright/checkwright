@@ -4,7 +4,6 @@ use crate::fresh;
 use std::path::Path;
 
 const DEFAULT_PROJECTION: &str = "docs/value.md";
-const GENERATOR: &str = "scripts/gen-value-rollup.sh";
 const BEGIN: &str = "<!-- value-rollup:begin -->";
 const END: &str = "<!-- value-rollup:end -->";
 
@@ -18,26 +17,10 @@ pub fn run(args: &[String]) -> i32 {
     }
 }
 
-// spec: docs/site-architecture.md §Generated projections and their freshness gates — the marker
-// block: whole-line equality on each marker, the lines strictly between them, and the trailing
-// newlines the shell form's `$(awk …)` strips
+// spec: gate-sdk/SPEC.md §lib/inject.sh — the block reader moved to the shared marker module when
+// its writer landed, so one implementation serves the comparator and the generator
 fn marker_block(text: &str) -> String {
-    let mut inb = false;
-    let mut out: Vec<&str> = Vec::new();
-    for line in text.lines() {
-        if line == BEGIN {
-            inb = true;
-            continue;
-        }
-        if line == END {
-            inb = false;
-            continue;
-        }
-        if inb {
-            out.push(line);
-        }
-    }
-    out.join("\n").trim_end_matches('\n').to_string()
+    crate::marker::read_block(text, BEGIN, END)
 }
 
 fn rule(args: &[String]) -> Result<i32, String> {
@@ -62,11 +45,10 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
         fresh::read_captured(emit_src)?
     } else {
-        let gen = fresh::emitter_path(GENERATOR)?;
-        if !fresh::executable(&gen) {
-            return Err(format!("generator not found: {}", gen));
-        }
-        fresh::emit(&gen, &["--emit"], "gen-value-rollup")?
+        // spec: gate-sdk/SPEC.md §The first cohort, and the rule that selects the next — the join
+        // is a function call, not a spawn: it ported in the same unit, so there is no shell left
+        // to reach and fresh::emit's bash hop is retired for this member too.
+        crate::emit::value_rollup::emit(&[])?
     };
     let emitted = emitted.trim_end_matches('\n');
 
@@ -78,7 +60,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         // spec: gate-sdk/SPEC.md §The consumer remainder cohort — both sides are
         // `printf '%s\n'` process substitutions here, so both carry one terminating newline
         fresh::print_capped_diff(&format!("{}\n", emitted), &format!("{}\n", block));
-        println!("  help: regenerate — bash scripts/gen-value-rollup.sh");
+        println!("  help: regenerate — bash gate-sdk/bin/run-gates.sh --emit value-rollup --write");
         return Ok(1);
     }
     println!(

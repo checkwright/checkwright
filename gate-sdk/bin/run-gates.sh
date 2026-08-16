@@ -24,6 +24,8 @@ if [[ "${1:-}" == --emit ]]; then
     EMIT_PROJECTION="${1:-}"
     [[ -n "$EMIT_PROJECTION" ]] || { echo "run-gates: --emit needs a projection name" >&2; exit 2; }
     EMIT_ARM="--emit-$EMIT_PROJECTION"
+    shift
+    EMIT_ARGS=("$@")
     EMIT_BIN="$(gate_native_bin)"
     if [[ ! -x "$EMIT_BIN" ]]; then
         printf 'run-gates: --emit dispatches to the native binary, but %s is absent or not ' "$EMIT_BIN" >&2
@@ -33,7 +35,7 @@ if [[ "${1:-}" == --emit ]]; then
     EMIT_ENV="$(gate_knob_env "$EMIT_ARM")" || exit 2
     EMIT_ELEMS=()
     [[ -n "$EMIT_ENV" ]] && mapfile -t EMIT_ELEMS <<<"$EMIT_ENV"
-    exec env ${EMIT_ELEMS[@]+"${EMIT_ELEMS[@]}"} "$EMIT_BIN" "$EMIT_ARM"
+    exec env ${EMIT_ELEMS[@]+"${EMIT_ELEMS[@]}"} "$EMIT_BIN" "$EMIT_ARM" ${EMIT_ARGS[@]+"${EMIT_ARGS[@]}"}
 fi
 
 FOR_PATHS=()
