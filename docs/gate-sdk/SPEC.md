@@ -4157,11 +4157,22 @@ Resolution, per declared knob:
   `gate_fixture_suites`, so a reader that parsed the file rather than resolving it
   would see the statically-assigned names and silently miss the rest.
 
-  **A prefix matching nothing is a refusal naming it**, and that is deliberately
-  *not* the resolved-empty pass an element-less knob gets: an empty array is a
-  value the consumer set, whereas an empty family is a member asking for
-  something absent. The element-shape refusals below apply per match, naming the
-  offending family member rather than the prefix.
+  **A prefix matching nothing resolves to an empty family and passes**, and the
+  fail-closed obligation it looks like that drops is **relocated, not removed**:
+  it belongs to the **reader**, the only party holding the roster. A reader that
+  looks up a name its roster named and does not find it refuses, naming the
+  member. The bridge cannot make that call, because a prefix carries no
+  expectation of its own — which is the same thing the resolution-set rule below
+  says. The element-shape refusals apply per match, naming the offending family
+  member rather than the prefix.
+
+  **Refusing on an empty match would collapse adopted-but-broken into
+  not-adopted's arm.** A roster naming a member with no entry is *adopted but
+  broken* and refuses; an empty roster is *not adopted*, performs no lookups, and
+  drops its section. `check-enforcement-fresh` is the live case: a consumer that
+  has not adopted evidence-kit has no `EVIDENCE_KIT_RUN_` family at all, and the
+  shell emitter it replaced dropped the Validate-suites section rather than
+  failing.
 
   **A prefix is a resolution set, never a roster.** It says *resolve values for
   these names*; it does not say *these are the members*. The roster comes from

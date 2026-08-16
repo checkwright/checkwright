@@ -480,9 +480,10 @@ pub fn bridge_case_knobs(case: &Path, gate: &str, knobs: &[&str]) {
     let lib = Path::new(env!("CARGO_MANIFEST_DIR"))
         .join("..")
         .join("gate-sdk/lib/gate.sh");
+    // spec: gate-sdk/SPEC.md §lib/gate.sh — resolution goes through the library's own per-name
+    // dispatch, so the prefix form has one implementation rather than one here and one there
     let script = "source \"$1\"; g=\"$2\"; shift 2; \
-                  for k in \"$@\"; do v=\"$(_gate_knob_value \"$k\" \"$g\")\" || exit 2; \
-                  printf '%s=%s\\n' \"$k\" \"$v\"; done";
+                  for k in \"$@\"; do gate_knob_env_one \"$k\" \"$g\" || exit 2; done";
     let out = std::process::Command::new("bash")
         .arg("-c")
         .arg(script)
@@ -507,7 +508,7 @@ pub fn bridge_case_knobs(case: &Path, gate: &str, knobs: &[&str]) {
         let (name, value) = line
             .split_once('=')
             .unwrap_or_else(|| panic!("unparseable knob line from the bridge: {}", line));
-        std::env::set_var(format!("GATE_SDK_KNOB_{}", name), value);
+        std::env::set_var(name, value);
     }
 }
 

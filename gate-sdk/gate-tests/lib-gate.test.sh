@@ -230,13 +230,18 @@ grep -q 'PROBE_KIT_BADRUN' <<<"$got" \
 [[ "$got" == "$(prefix_env)" ]] \
     || { echo "  FAIL: prefix form is not deterministic across runs"; fails=$((fails + 1)); }
 
-# a prefix matching nothing is a REFUSAL naming it — not the resolved-empty pass a
-# scalar knob's empty value is, because the member asked for a family that is absent
+# a prefix matching nothing resolves to an EMPTY FAMILY and passes: the bridge holds no
+# roster, so it has no expectation to fail closed on. Refusing here would collapse
+# not-adopted (empty roster, no lookups, section drops) into adopted-but-broken's arm --
+# the regression that reached a real consumer before this rule was corrected.
 out="$(knob_argv 'PROBE_KIT_NOSUCH_*')"; rc=$?
-[[ "$rc" -eq 2 ]] \
-    || { echo "  FAIL: a prefix matching nothing exited $rc, want 2"; fails=$((fails + 1)); }
-grep -qF -- 'PROBE_KIT_NOSUCH_*' <<<"$out" \
-    || { echo "  FAIL: the empty-prefix refusal did not name the prefix: $out"; fails=$((fails + 1)); }
+[[ "$rc" -eq 0 ]] \
+    || { echo "  FAIL: a prefix matching nothing exited $rc, want 0: $out"; fails=$((fails + 1)); }
+grep -q 'GATE_SDK_KNOB_PROBE_KIT_NOSUCH' <<<"$out" \
+    && { echo "  FAIL: an empty family emitted an element: $out"; fails=$((fails + 1)); }
+# and it stays inert rather than swallowing the argv: the two-element form survives
+[[ "$(paste -sd'|' - <<<"$out")" == "$sandbox/knobbin|check-ported" ]] \
+    || { echo "  FAIL: an empty family disturbed the argv: $out"; fails=$((fails + 1)); }
 
 # the element-shape refusals apply per match, naming the offending family member
 out="$(knob_argv 'PROBE_KIT_BADRUN_*')"; rc=$?
@@ -270,5 +275,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "lib-gate.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "lib-gate.test: ok (fail_closed branches; gate_path_pruned; GATE_GREP_EXCLUDES; gate_find prune incl. the worktrees leaf; PRUNE_EXTRA_DIRS append over both branches; registry + resolution; .gate declaration/argv split + dispatch fail-closed; the knob bridge's serialization, scalar/knobless/prefixless arms and its three refusals; the prefix form over a loop-declared family, its sibling-family exclusion, determinism, empty-prefix refusal and per-match element refusal; the knob-owner lookup draining its producer on an early match under SIGPIPE-ignored)"
+echo "lib-gate.test: ok (fail_closed branches; gate_path_pruned; GATE_GREP_EXCLUDES; gate_find prune incl. the worktrees leaf; PRUNE_EXTRA_DIRS append over both branches; registry + resolution; .gate declaration/argv split + dispatch fail-closed; the knob bridge's serialization, scalar/knobless/prefixless arms and its three refusals; the prefix form over a loop-declared family, its sibling-family exclusion, determinism, empty-family resolution leaving the argv inert, and per-match element refusal; the knob-owner lookup draining its producer on an early match under SIGPIPE-ignored)"
 exit 0

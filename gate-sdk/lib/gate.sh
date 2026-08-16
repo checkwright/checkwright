@@ -196,11 +196,8 @@ _gate_knob_prefix_values() {
             unset -n _gkp_val
             _gkp_hits=$(( _gkp_hits + 1 ))
         done
-        if [[ "$_gkp_hits" -eq 0 ]]; then
-            printf 'gate_command: %s declares knob prefix %s*, but %s/lib defines no variable under it — ' "$gate" "$prefix" "$kit" >&2
-            printf 'a prefix matching nothing is a refusal, not a resolved-empty set; treating as failure (not clean)\n' >&2
-            exit 2
-        fi
+        # spec: gate-sdk/SPEC.md §lib/gate.sh — a prefix matching nothing resolves to an empty family and passes: the bridge holds no roster, so it has no expectation to fail closed on. The reader that named the roster is what refuses on a member it expected and did not get.
+        : "$_gkp_hits"
     )
 }
 
@@ -216,13 +213,19 @@ gate_knob_env() {
     fi
     while IFS= read -r knob; do
         [[ -n "$knob" ]] || continue
-        if [[ "$knob" == *'*' ]]; then
-            _gate_knob_prefix_values "${knob%\*}" "$g" || return 2
-            continue
-        fi
-        value="$(_gate_knob_value "$knob" "$g")" || return 2
-        printf 'GATE_SDK_KNOB_%s=%s\n' "$knob" "$value"
+        gate_knob_env_one "$knob" "$g" || return 2
     done <<<"$knob_names"
+}
+
+# spec: gate-sdk/SPEC.md §lib/gate.sh — one declared name resolved to its bridged element(s): the trailing `*` selects the prefix family, anything else the scalar arm. Split out so the dispatcher and any harness resolving a member's declared knobs share one implementation of which arm a name takes, rather than each re-deriving it from the spelling.
+gate_knob_env_one() {
+    local knob="$1" g="$2" value
+    if [[ "$knob" == *'*' ]]; then
+        _gate_knob_prefix_values "${knob%\*}" "$g" || return 2
+        return 0
+    fi
+    value="$(_gate_knob_value "$knob" "$g")" || return 2
+    printf 'GATE_SDK_KNOB_%s=%s\n' "$knob" "$value"
 }
 
 # spec: gate-sdk/SPEC.md §lib/gate.sh — resolve a gate name to its *invocation argv*, the execution counterpart of gate_resolve's declaration path: one element `<dir>/<name>.sh` for a shell gate, two elements `<binary> <name>` for a `.gate`-dispatched one — prefixed, when that member declares knobs, by `env` and one `GATE_SDK_KNOB_<NAME>=<tab-joined>` element per knob. Emits one argv element per line, so a caller looking for the dispatch executable takes the first element that is neither `env` nor an assignment. An absent or non-executable binary when a member dispatches to it is a harness error — exit 2, never a skip and never a pass (§Fail-closed contract): a skip would let the battery silently stop running a gate whenever a build is missing. A binary that cannot report its knobs, and each of the three knob-resolution refusals, exit 2 by the same contract.

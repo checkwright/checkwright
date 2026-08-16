@@ -205,11 +205,22 @@ an accidental contract:
   instant a static knob's value is read, not some later one. "After the kit lib is sourced" means
   after *that* source completes, which is what puts the consumer config's loop-declared variables
   in scope, since the kit library is what sources the consumer config.
-- **Fail-closed, and distinct from a static knob's empty.** A static knob that resolves to the
-  empty string is a *resolved-empty set* and passes; a **prefix matching no variable at all** is a
-  refusal naming the prefix, because the member asked for a family and the family is absent — the
-  same distinction `walk.rs` already draws between an unset bridged knob and an empty one, applied
-  one level up.
+- **Fail-closed, relocated to the reader rather than removed.** A **prefix matching no variable at
+  all resolves to an empty family** and passes. The fail-closed obligation is not dropped by that —
+  it **moves to the reader**, which is the only party holding the roster: a reader that looks up a
+  name its roster named and does not find it refuses, naming the member. The bridge cannot make
+  that call, because a prefix carries no expectation of its own.
+
+  **This is the adopted-but-broken / not-adopted distinction, one level up**, and refusing on an
+  empty family collapses the two into the refusing arm — the identical failure this amendment
+  already corrected on `EVIDENCE_KIT_CONFIG_FILE`, `DRIFT_KIT_KPIS_FILE` and
+  `CONTEXT_KIT_SETTINGS_FILE`. A roster naming a suite with no `RUN_` entry is *adopted but broken*
+  and refuses; an **empty roster** is *not adopted*, performs no lookups, and drops its section —
+  which is exactly what the shell emitter does, and therefore what byte-identical parity requires.
+
+  **It also makes the three properties consistent with each other.** The third says a prefix is a
+  resolution set and never a roster, so the reader must look names up; a bridge that refused on an
+  empty match would be asserting an expectation the third property denies it has.
 - **A prefix is a resolution set, never a roster.** It says *resolve values for these names*, never
   *these are the members*. The roster comes from the roster knob: `suite_rows` iterates
   `EVIDENCE_KIT_SUITES` and looks each name up. This is load-bearing rather than pedantic —
