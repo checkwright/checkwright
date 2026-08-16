@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Behavioral test of checks/check-stage-entry.sh assertions B and C — the
+# Behavioral test of check-stage-entry assertions B and C — the
 # scenarios the one-pair good/bad harness cannot hold. The good/bad fixture
 # pair (run-gate-tests.sh) covers assertion A (prerequisite-stamp ordering: a
 # close cursor with no validate stamp); the harness admits only one
