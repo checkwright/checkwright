@@ -308,6 +308,15 @@ reaches for.
 - **TASK-QUEUE.md `queue-index-non-gate-arm-port`** — owned by the opening
   correction, for the caller set. **TASK-QUEUE.md
   `icebox-worklist-roadmap-blind`** — owned by delta 6, for its deferral ground.
+  **TASK-QUEUE.md `queue-index-blocked-by-assertions`** — owned by delta 5. That
+  entry's coverage hole (the blocked-by tag's re-echo, the ready/blocked marker)
+  names `queue-kit/gate-tests/queue-index.test.sh` as where two `want()` lines
+  would close it; delta 5 shrinks that file to the front-end/bridge assertions
+  alone and moves rendering coverage into the ported module's own
+  `#[cfg(test)]` tests, so the entry's fix location moves with it — a future
+  session taking the entry adds its two assertions in the crate, not the shell
+  fixture. **Found by this align audit**, not designed here: the entry's own
+  defect is untouched, only where its fix lands.
 - **docs mirror of every file above** — regenerated, not edited.
 
 **Not updated, stated so the omission is read as a decision.**
