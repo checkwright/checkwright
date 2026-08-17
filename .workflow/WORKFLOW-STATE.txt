@@ -5,3 +5,4 @@
 ---
 
 port-selector-permanence-and-batch scope a5e98917 2026-08-17
+port-selector-permanence-and-batch spec a95358b9 2026-08-17
