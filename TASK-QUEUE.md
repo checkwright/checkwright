@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: port-selector-permanence-and-batch
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -1595,11 +1595,12 @@
   Class: mints a gate name if the oracle lands, so canon-kit/SPEC.md's new-names
   litmus makes it a **feature** on that path; debt only if it lands as an
   assertion inside `check-stage-evidence`. The promoting scope call settles it.
-  **Deferred 2026-08-16 at scope on the lead's ruling despite the threshold:** the couple sets
-  re-verified live (both exactly `TASK-QUEUE.md,.workflow/WORKFLOW-STATE.txt`), but the cheap
-  half and the history assertion are one design fork rather than two units.
-  Filed 2026-08-01 at close from the gap inbox; build filed it against its own
-  batch-1 stamp.
+  **Declined twice at scope on the lead's ruling despite the threshold — 2026-08-16, then again
+  2026-08-17 on unchanged grounds.** The couple sets were re-verified live at the first decline
+  (both exactly `TASK-QUEUE.md,.workflow/WORKFLOW-STATE.txt`) and cited rather than re-bought at
+  the second; the cheap half and the history assertion are still one design fork, and the entry
+  sits off every unit's surface in the 2026-08-17 set, so bundling would buy no amortization.
+  Filed 2026-08-01 at close from the gap inbox; build filed it against its own batch-1 stamp.
 
 - **amendment-deletion-content-completeness** [design-pending] — a closed
   amendment can be **deleted with part of its content landing in no canonical
@@ -2914,27 +2915,18 @@
   **Cost while deferred:** the project's only evidence that prose-alone enforcement fails is
   an anecdote spread across six firings' histories, and each further firing costs an orphaned
   producer plus the lead turn that discovers it.
-  **Its own coupling claim was ENGAGED, and the disposition is DECLINE — recorded 2026-08-15 at
-  scope so the next reader finds a considered call instead of re-deriving the coupling.** The
-  clause was this entry's own: `poll-sleep-guard-steer` "is the same rule from the side that
-  *does* leave a tracked artifact, so a scope taking either should cost both". That scope took
-  it, so the clause fired on its own terms and is retired above as spent. That decline was not a
-  threshold call — the entry stood at one date then; it stands at two since 2026-08-16.
-  **Declined a second time 2026-08-16 at scope on the lead's ruling:** nothing buildable — the
-  surviving question is the enforcement design the 2026-08-06 operator ruling left open, and its
-  design half `turn-end-chokepoint-and-wait-primitive` turns on whether a `Stop` hook can see a
-  live background child, a settings probe rather than a command. **A third threshold recurrence
-  routes to the operator, not to a third decline** — two is where lead discretion ends.
-  **Costed and declined as not-yet-designable, never as unimportant.** The operator ruled a
-  narrowed bundle on 2026-08-15: `poll-sleep-guard-steer`, `waiter-predicate-self-match`,
-  `harness-wait-primitive-unnamed`. Those three are one causal chain — unnamed primitive, then
-  self-matching predicate, then the polled wait — each link mechanically decidable on a surface
-  the guard already reads. What survives here is the enforcement-**design** question the
-  2026-08-06 operator ruling deliberately left unanswered, `[design-pending]` with no design
-  ruled, so it has nothing buildable to contribute to that chain and would have made the unit a
-  design fork rather than a build. The unit set is closed; this records the decline against the
-  coupling and reopens nothing.
-  Filed 2026-08-06 by close, recording this iteration's central incident.
+  **PROMOTED 2026-08-17 by operator ruling, on the third threshold recurrence.** The clause that
+  routed it there — **a third threshold recurrence routes to the operator, not to a third
+  decline; two is where lead discretion ends** — fired once and **stays live and unspent**, ruled
+  so at that same relay. The operator took promotion over both alternatives put: deferring behind
+  a stated blocker, and retiring the clause. The two prior declines (2026-08-15 and 2026-08-16,
+  both at scope on a lead's ruling, both on *nothing buildable* rather than on merit) are spent
+  by the promotion and live in history.
+  **What the promoted unit is, stated here so it is not re-scoped at authoring:** the enforcement
+  design the 2026-08-06 operator ruling deliberately left unanswered. Its design half
+  `turn-end-chokepoint-and-wait-primitive` turns on whether a `Stop` hook can see a live
+  background child — a settings probe rather than a command, and the first thing the unit owes.
+  Filed 2026-08-06 by close, recording that iteration's central incident.
 
 - **amendment-dod-sibling-dependence** [design-pending] — an amendment's DoD is written as if
   its unit were the iteration's only one.
@@ -3867,18 +3859,18 @@
   one rule re-derived per iteration, forever, against a one-predicate fix. Re-measured again at
   this close: 4 rows, 0 eligible — three roadmap-tagged, one (`rendered-site-link-monitor`) on the
   named-event clause. Precision has been zero at every measurement taken since 2026-08-13.
-  **Deferred 2026-08-16 at scope on the lead's ruling, though the threshold rule reached it, and
-  the ground was substrate rather than merit:** the fix landed in a 182-line shell **bin tool** the
-  2026-08-09 priority directive commits to deleting (TRAJECTORY.md §PRIORITY DIRECTIVE), so a bash
-  predicate patched into it was work the port throws away. **That ground is now spent: the port
-  landed in `post-close-intake-and-index-port`**, the tool is a compiled non-gate arm
-  (queue-kit/SPEC.md §The queue-index arm), and a predicate written there is not thrown away.
-  **What did NOT ride the port, operator-ruled NARROW 2026-08-17:** the port is
-  behaviour-preserving — no filter added, no row dropped, no exclusion printed — so this entry's
-  predicate did not travel with it and the port decided nothing here. The port **re-grounds** this
-  deferral rather than carrying its predicate. What holds it deferred now is the open half alone:
-  presentation, plus the two-clause predicate above — and a tag-only filter would leave 1 row and
-  still 0 eligible, so a partial predicate would move the measured number not at all.
+  **Declined a third time 2026-08-17 at scope on the lead's ruling, and the two halves are
+  recorded apart because only one of them moved.** The 2026-08-16 ground — the fix would land in a
+  182-line shell **bin tool** the 2026-08-09 priority directive commits to deleting — is **SPENT**:
+  the port landed in `post-close-intake-and-index-port`, the tool is a compiled non-gate arm
+  (queue-kit/SPEC.md §The queue-index arm), and a predicate written there is not thrown away. What
+  the port did **not** carry is this predicate — behaviour-preserving by operator ruling
+  2026-08-17, no filter added and no row dropped — so the port re-grounds this deferral rather
+  than discharging it.
+  **The decline now rests on the entry's own honest limit, which is merit rather than substrate:**
+  the buildable tag-only half would leave 1 row and still 0 eligible, moving the measured number
+  not at all, while the second clause is an undesigned prose-parsing fork. A threshold entry whose
+  blocker has cleared and which is declined anyway is worth saying plainly rather than quietly.
   Filed 2026-08-09 by close (`install-profile-seam`) from its own backlog-eviction step;
   a duplicate filing of the same finding (`icebox-candidate-roadmap-filter`, 2026-08-13) was
   merged in here at the 2026-08-13 close, which also filed
@@ -6043,6 +6035,15 @@
   §Meta-gate conservation for the binary substrate carries rows for two of the three, and states
   in its own prose that `check-crate-arms` sits outside its derivation entirely. A fix reading
   that table gets two members for free and still owes a home for the third.
+  **The consequence is larger than a wrong number — established 2026-08-17 at scope, and it is
+  what puts this in that day's unit set.** The inflation also **mis-selects the cohort**.
+  `--group`'s only non-singleton group at that rev paired `check-readme-roster` with
+  `check-install-disposition`, whose permanence the tool cannot see, so the size arm reads
+  takeable when it is in fact exhausted and the increment belongs to the budget arm. gate-sdk's
+  §The first cohort sanctions the hand adjudication — an advisory group is "a finding the
+  selecting session adjudicates" — but it is re-bought at each of the ~32 cuts still owed, which
+  is exactly what arm (3) makes derivable. The census and its two-command witness are filed at
+  `.workflow/survey-record.md`.
   **Why `[design-pending]`:** picking among the three arms is a design call about where a
   permanence verdict is declared, not a patch to the tool's arithmetic.
   **Cost while deferred:** every "N remaining" claim inherits the inflation, including
