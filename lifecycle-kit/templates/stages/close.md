@@ -87,9 +87,17 @@ session.
    dispositioned *as a claim*: say so, and let the promoted entry carry the
    unverified premise openly (§The committed gap inbox rules why this sits at the
    drain and not at filing time).
-   The next iteration's scope entry refuses a non-empty inbox
-   (§bin/enter-stage.sh), so an undrained gap blocks the boundary rather than
-   crossing it silently.
+   The next iteration's first-stage entry refuses a non-empty inbox **when this
+   stage was skipped** (§bin/enter-stage.sh), so an undrained gap blocks the
+   boundary rather than crossing it silently.
+   **A finding your own later steps generate postdates this drain, and it routes
+   to the inbox like any other.** The audits, the lesson disposition, the
+   staleness read and the release disposition all run after this step, so what
+   they turn up has no drainer left in this iteration. File it (`bin/file-gap.sh`)
+   and let it be carried: the next first-stage entry admits it and takes it as
+   that session's intake (§The committed gap inbox). Do **not** back-date it into
+   a drain that has already run — a second pass over an inbox your own later
+   steps keep refilling is the loop that shape was rejected for.
    **Judge the recurrence, in addition to the disposition — you are the judge,
    and nothing upstream ruled.** That framing is the **general** contract rather
    than this stage's local one — every session that judges a recurrence is obliged

@@ -92,8 +92,8 @@ fi
 #   capture, while the filer can still act: after the iteration's last stage
 #   stamps there is no drainer left in the machine.
 _fg_stage="$(lifecycle_current_stage)"
-if [[ "$_fg_stage" == "${LIFECYCLE_KIT_STAGES[-1]}" ]]; then
-    printf 'file-gap: WARNING — the cursor is at %s, the last stage of the iteration. Disposition this bullet before the iteration ends: once that stage has finished, none is left to drain it, and the next %s entry refuses until an entering session promotes it directly.\n' \
+if lifecycle_closing_stage_reached; then
+    printf 'file-gap: WARNING — the cursor is at %s, the last stage of the iteration. Disposition this bullet before the iteration ends: once that stage has finished, none is left to drain it, and the next %s entry carries it into that session'"'"'s own intake instead.\n' \
         "$_fg_stage" "$LIFECYCLE_KIT_FIRST_STAGE" >&2
 else
     printf 'file-gap: this bullet blocks the next %s entry until close drains it.\n' \

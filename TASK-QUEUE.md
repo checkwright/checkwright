@@ -112,36 +112,6 @@
 
 ## Technical Debt
 
-- **simulate-recovery-unrelayed** — `enter-stage.sh --simulate` reports that an entry would be
-  refused and never how to recover, and the SPEC's simulate roster omits a refusal the code runs.
-  **The mechanism, read rather than inferred.** Every `help:` echo in the script — 210 and 226
-  (preflight), 246 (Lessons), 262-263 (gap inbox), 287 (BOUNDARY_REQUIRE) — sits *after* the
-  `sim == 1` branch's own `exit 1`. Five refusal classes, zero recovery under simulate. The real
-  refusal's text is the actionable half by design: lifecycle-kit/SPEC.md §The committed gap inbox
-  says of the post-close recovery that "what was missing was the message's actionability".
-  **The designed consumer of simulate is the LEAD** — lifecycle-kit/SPEC.md §templates/lead.md
-  directs it to gate an expensive dispatch with `--simulate` rather than hand-derive prior-stage
-  completeness — so the actor the mode was built for is the one who loses the recovery.
-  **Attested, not predicted.** At the 2026-08-17 boundary the lead ran `--simulate scope`, did not
-  see line 263's post-close recovery, and escalated to the entering scope session an unverified
-  negative asking whether a pre-entry queue write is sanctioned — which line 263 answers verbatim.
-  **Second half, same subject.** lifecycle-kit/SPEC.md's `--simulate` roster enumerates what the
-  mode runs and ends at "the iteration-boundary Lessons check — then stops", omitting the
-  gap-inbox refusal the script runs and the boundary-require check one line down. SPEC-vs-code.
-  **Debt rather than a feature:** it converges behaviour on names the specs already carry — the
-  `help:` output, the mode, the refusal set — and mints none.
-  **Distinct from two filed siblings:** `enter-stage-arg-position-silent-drop` is the flag's
-  *position*, `enter-stage-simulate-no-write-fixture` (icebox) the no-write guarantee; neither
-  touches output actionability.
-  **RIDER, operator-ruled 2026-08-17 and bounded here so the build cannot widen it.** This unit's
-  build also runs ONE probe: whether a `Stop` hook can observe a live `run_in_background` child.
-  It is the single unrun fact both halves of `turn-end-chokepoint-and-wait-primitive` turn on, and
-  a settings experiment rather than a command, which is why it rides rather than waits. **Bounded
-  to the probe and its recorded result — it does not license building the enforcement design the
-  probe informs.** Grounds: `waiting-rule-fourth-firing-post-fix` reached a THIRD recurrence date
-  at this boundary, and its own text routes a third to the operator, not to a third decline.
-  Filed 2026-08-17 at scope, from this session's own read of the script that refused it.
-
 ## Deferred
 
 - **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
@@ -6003,14 +5973,14 @@
   rules that enforcement turns on whether an act passes a chokepoint, and that a turn-end does
   not. The analysis immediately below it is scoped to what a **`PreToolUse` hook** can read, and
   every guard this repo ships is `PreToolUse`. The harness also fires a `Stop` event at turn end,
-  which no session has probed against this rule. **Unprobed, and stated as unprobed:** whether a
-  `Stop` hook can observe a live `run_in_background` child is exactly the question, and it is not
-  settled by a cheap command — wiring one is a settings change.
-  **What makes it newly cheap: this iteration shipped the artifact such a guard would read.**
-  `waiting-rule-carrier-reach` landed the launch-time liveness record (`pid=<n> run=<key>` in
-  repo-local `.tmp/`), so a turn-end guard needs no payload introspection — it reads the records
-  and runs `kill -0`. The record proved itself on first contact, recovering three orphaned
-  producers this iteration.
+  which no session had probed against this rule. **PROBED 2026-08-17 — documentary, not wired —
+  as the operator-ruled rider on `simulate-recovery-unrelayed`.** Settled: the `Stop` payload names
+  no background task, PID or shell id, so detection never comes from it; but the hook runs arbitrary
+  shell, so it CAN read the liveness record `waiting-rule-carrier-reach` landed (`pid=<n> run=<key>`
+  in repo-local `.tmp/`) and run `kill -0`, and it CAN refuse the stop, capped at a bounded run of
+  blocks. **Unsettled, and load-bearing:** whether the harness defers `Stop` while a background
+  child is live. **Moved AGAINST this half:** a dispatched session is a *subagent*, so its turn end
+  fires `SubagentStop`, undocumented for blocking — and every attested firing here was dispatched.
   **Second half, distinct subject — which primitive is reliable here.** The protocol states a
   hard ordering: `run_in_background` plus an `until`-loop for a single completion, with the
   event-stream form named the wrong tool. On this machine that ordering **inverted** — four of
@@ -6438,6 +6408,8 @@
 - **scratch-execution-allowlist-bar** [design-pending] — Each close re-derives this standing bar.
 
 ## Done
+
+- simulate-recovery-unrelayed
 
 ## Lessons Learned
 

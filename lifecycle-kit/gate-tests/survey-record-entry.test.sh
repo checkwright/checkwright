@@ -89,9 +89,20 @@ grep -qF '.workflow/survey-record.md' <<<"$out" \
 grep -qF 'which gates meet every port criterion?' <<<"$out" \
     && note boundary-headings "the boundary entry printed headings it had just discarded: $out"
 
-# --- the gap inbox still refuses, so the asymmetry is real and not an accident ---
+# --- the gap inbox still refuses on its close-skipped branch, so the asymmetry is real and not an
+# --- accident: a survey owes nobody a disposition, an undrained gap owes one to a stage that can
+# --- still run. (The post-close branch admits instead, and gap-inbox-route.test.sh owns that.)
 gap="$SANDBOX/gap"
 seed "$gap"
+cat >"$gap/.workflow/WORKFLOW-STATE.txt" <<'EOF'
+# contract: lifecycle-kit/SPEC.md §check-stage-evidence
+
+---
+
+demo-iteration scope aaaaaaaa 2026-06-01
+demo-iteration build bbbbbbbb 2026-06-02
+demo-iteration validate cccccccc 2026-06-03
+EOF
 printf '# contract: lifecycle-kit/SPEC.md §The committed gap inbox\n- 2026-06-05 — an untriaged gap\n' \
     >"$gap/.workflow/gap-inbox.md"
 out="$(run_enter "$gap" scope)"; rc=$?

@@ -373,7 +373,7 @@ write_br_fixture —                                                       # (d)
 printf '# contract\n' > "$brd"
 br_run scope >/dev/null || { echo "smoke(enter-stage): boundary-require should skip a never-named closing iteration" >&2; exit 1; }
 
-# spec: lifecycle-kit/SPEC.md §The committed gap inbox — the iteration-boundary entry refuses while the gap inbox holds bullets (the Lessons-refusal contract); an empty (header-only) inbox passes
+# spec: lifecycle-kit/SPEC.md §The committed gap inbox — the iteration-boundary gap-inbox check: one detector, two dispositions. A close-skipped boundary refuses (the Lessons-refusal contract, nothing written); a post-close one admits and carries the bullets; an empty (header-only) inbox passes either way.
 gp="$es/gap-inbox"; mkdir -p "$gp/.workflow"
 gpq="$gp/TASK-QUEUE.md"; gps="$gp/.workflow/WORKFLOW-STATE.txt"; gpi="$gp/.workflow/gap-inbox.md"
 cat > "$gpq" <<EOF
@@ -388,13 +388,17 @@ cat > "$gpq" <<EOF
 ## Done
 ## Lessons Learned
 EOF
-cat > "$gps" <<EOF
+gp_seed_state() {  # $1 = the last stage the closing iteration reached
+    cat > "$gps" <<EOF
 # contract
 
 ---
 
-gap-iter close aabbccdd $d
+gap-iter scope aabbccdd $d
+gap-iter $1 aabbccdd $d
 EOF
+}
+gp_seed_state build
 cat > "$gp/stages.sh" <<STAGES
 # shellcheck shell=bash
 LIFECYCLE_KIT_GAP_INBOX_FILE=$gpi
@@ -408,12 +412,22 @@ gp_run() {
     LIFECYCLE_KIT_CONFIG_FILE="$gp/stages.sh" \
     bash "$SMOKE_KIT_ROOT/bin/enter-stage.sh" "$@"
 }
-printf '# contract: gap inbox\n- 2026-07-17 — an untriaged gap bullet\n' > "$gpi"   # (a) non-empty inbox → refuse, nothing written
+printf '# contract: gap inbox\n- 2026-07-17 — an untriaged gap bullet\n' > "$gpi"   # (a) close-skipped + non-empty inbox → refuse, nothing written
 cp "$gpq" "$gp/q.before"; cp "$gps" "$gp/s.before"
-if gp_run scope >/dev/null 2>&1; then echo "smoke(enter-stage): should refuse a boundary entry while the gap inbox holds bullets" >&2; exit 1; fi
+if gp_run scope >/dev/null 2>&1; then echo "smoke(enter-stage): should refuse a boundary entry while the gap inbox holds bullets and the closing stage was skipped" >&2; exit 1; fi
 cmp -s "$gp/s.before" "$gps" || { echo "smoke(enter-stage): wrote state on a gap-inbox refusal" >&2; exit 1; }
 cmp -s "$gp/q.before" "$gpq" || { echo "smoke(enter-stage): wrote queue on a gap-inbox refusal" >&2; exit 1; }
-printf '# contract: gap inbox\n' > "$gpi"                                            # (b) header-only inbox → boundary entry proceeds
+gp_sim="$(gp_run --simulate scope 2>&1)" || true
+grep -q 'would be refused' <<<"$gp_sim" || { echo "smoke(enter-stage): --simulate did not relay the close-skipped gap-inbox refusal -- $gp_sim" >&2; exit 1; }
+grep -q 'help:' <<<"$gp_sim" || { echo "smoke(enter-stage): --simulate relayed a refusal without its recovery -- $gp_sim" >&2; exit 1; }
+gp_seed_state close                                                                  # (b) post-close + non-empty inbox → admit, carrying the bullets
+gp_out="$(gp_run scope 2>&1)" || { echo "smoke(enter-stage): a post-close gap inbox should not refuse a boundary entry -- $gp_out" >&2; exit 1; }
+grep -q 'intake' <<<"$gp_out" || { echo "smoke(enter-stage): the post-close admission printed no carried-bullet advisory -- $gp_out" >&2; exit 1; }
+grep -q '2026-07-17' <<<"$gp_out" || { echo "smoke(enter-stage): the post-close advisory did not name the carried bullet -- $gp_out" >&2; exit 1; }
+grep -q '^- 2026-07-17' "$gpi" || { echo "smoke(enter-stage): the admitted entry consumed the carried bullet" >&2; exit 1; }
+grep -q "^## Iteration: —\$" "$gpq" || { echo "smoke(enter-stage): the post-close admission did not reset the header" >&2; exit 1; }
+printf '# contract: gap inbox\n' > "$gpi"                                            # (c) header-only inbox → boundary entry proceeds
+gp_seed_state close
 gp_run scope >/dev/null || { echo "smoke(enter-stage): a header-only gap inbox should not refuse a boundary entry" >&2; exit 1; }
 grep -q "^## Iteration: —\$" "$gpq" || { echo "smoke(enter-stage): gap-inbox pass did not reset the header" >&2; exit 1; }
 

@@ -30,6 +30,21 @@ sim=0
 if [[ "${1:-}" == "--simulate" ]]; then sim=1; shift; fi
 sim_relay() { local l; while IFS= read -r l; do echo "enter-stage (simulate): $l"; done <<<"$1"; }
 
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the recovery relay: a refusal's help line is its actionable half, so it prints under --simulate too. The mode's designed consumer is the lead, which gates an expensive dispatch on it rather than hand-deriving prior-stage completeness; relaying the verdict while withholding the one line that resolves it is what sent a lead to escalate a question this tool already answered.
+relay_help() {
+    local l
+    for l in "$@"; do
+        if [[ "$sim" == 1 ]]; then
+            echo "enter-stage (simulate):   help: $l" >&2
+        else
+            echo "  help: $l" >&2
+        fi
+    done
+}
+
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the two pre-flight arms refuse on the same terms and recover the same way, so the recovery is one string rather than two that must be kept in step
+HELP_PREFLIGHT="resolve the finding above, or (to override deliberately) perform the stamp by hand."
+
 QUEUE="$LIFECYCLE_KIT_QUEUE_FILE"
 STATE="$LIFECYCLE_KIT_STATE_FILE"
 
@@ -203,11 +218,11 @@ if ! preflight="$("${pre_argv[@]}" "$pre_queue" "$tmpstate" 2>&1)"; then
     if [[ "$sim" == 1 ]]; then
         echo "enter-stage (simulate): check-stage-entry would refuse the entry to '$stage':" >&2
         sim_relay "$preflight" >&2
-        exit 1
+    else
+        echo "enter-stage: check-stage-entry refuses the entry to '$stage' — nothing written:" >&2
+        printf '%s\n' "$preflight" >&2
     fi
-    echo "enter-stage: check-stage-entry refuses the entry to '$stage' — nothing written:" >&2
-    printf '%s\n' "$preflight" >&2
-    echo "  help: resolve the finding above, or (to override deliberately) perform the stamp by hand." >&2
+    relay_help "$HELP_PREFLIGHT"
     exit 1
 fi
 
@@ -219,11 +234,11 @@ for pf in ${LIFECYCLE_KIT_ENTRY_PREFLIGHT[@]+"${LIFECYCLE_KIT_ENTRY_PREFLIGHT[@]
         if [[ "$sim" == 1 ]]; then
             echo "enter-stage (simulate): LIFECYCLE_KIT_ENTRY_PREFLIGHT command for '$stage' would refuse the entry:" >&2
             sim_relay "$pf_out" >&2
-            exit 1
+        else
+            echo "enter-stage: LIFECYCLE_KIT_ENTRY_PREFLIGHT command for '$stage' refuses the entry — nothing written:" >&2
+            printf '%s\n' "$pf_out" >&2
         fi
-        echo "enter-stage: LIFECYCLE_KIT_ENTRY_PREFLIGHT command for '$stage' refuses the entry — nothing written:" >&2
-        printf '%s\n' "$pf_out" >&2
-        echo "  help: resolve the finding above, or (to override deliberately) perform the stamp by hand." >&2
+        relay_help "$HELP_PREFLIGHT"
         exit 1
     fi
 done
@@ -239,29 +254,43 @@ if [[ "$first" == 1 ]]; then
         if [[ "$sim" == 1 ]]; then
             echo "enter-stage (simulate): iteration-boundary entry to '$stage' would be refused — ## Lessons Learned is non-empty:" >&2
             sim_relay "$lessons" >&2
-            exit 1
+        else
+            echo "enter-stage: iteration-boundary entry to '$stage' refused — ## Lessons Learned is non-empty; the close stage must disposition every lesson before the next iteration begins (nothing written):" >&2
+            printf '%s\n' "$lessons" >&2
         fi
-        echo "enter-stage: iteration-boundary entry to '$stage' refused — ## Lessons Learned is non-empty; the close stage must disposition every lesson before the next iteration begins (nothing written):" >&2
-        printf '%s\n' "$lessons" >&2
-        echo "  help: run the close ritual's disposition step (rule/task/harvest/discard, stamping $LIFECYCLE_KIT_LESSON_EVIDENCE_FILE), clear the section, then re-run enter-stage $stage." >&2
+        relay_help "run the close ritual's disposition step (rule/task/harvest/discard, stamping $LIFECYCLE_KIT_LESSON_EVIDENCE_FILE), clear the section, then re-run enter-stage $stage."
         exit 1
     fi
 fi
 
-# spec: lifecycle-kit/SPEC.md §The committed gap inbox — the iteration-boundary entry refuses while the gap inbox holds bullets: a mid-iteration gap must be dispositioned by close's drain before the next iteration begins (the same refusal contract as the Lessons check), so no gap outlives its iteration untriaged.
+# spec: lifecycle-kit/SPEC.md §The committed gap inbox — the iteration-boundary gap-inbox check: one detector (any bullet), two dispositions. Close-skipped refuses as it always did, because a skipped stage is recoverable by running it; post-close admits, because no stage of the closing iteration is coming back and a refusal there only pushes the queue write outside the state machine, ahead of any stamp.
 if [[ "$first" == 1 && -f "$LIFECYCLE_KIT_GAP_INBOX_FILE" ]]; then
     gaps="$(awk '/^-[[:space:]]/ { print }' "$LIFECYCLE_KIT_GAP_INBOX_FILE")"
     if [[ -n "$gaps" ]]; then
-        if [[ "$sim" == 1 ]]; then
-            echo "enter-stage (simulate): iteration-boundary entry to '$stage' would be refused — $LIFECYCLE_KIT_GAP_INBOX_FILE holds untriaged gap bullets:" >&2
-            sim_relay "$gaps" >&2
+        gap_n="$(grep -c '' <<<"$gaps")"
+        # spec: lifecycle-kit/SPEC.md §The committed gap inbox — the discriminator, one cursor read shared with bin/file-gap.sh. A never-named closing iteration has no close to have skipped — the guard LIFECYCLE_KIT_BOUNDARY_REQUIRE applies one block down for the same reason — and a boundary with no cursor at all is that case too, which the predicate alone reports as not-reached, so both edges are named here rather than folded into it.
+        if [[ "$cur_iter" == "$UNNAMED" ]] || lifecycle_closing_stage_reached "$STATE" \
+            || [[ -z "$(lifecycle_current_stage "$STATE")" ]]; then
+            if [[ "$sim" == 1 ]]; then
+                echo "enter-stage (simulate): iteration-boundary entry to '$stage' would not refuse for the gap inbox — it would carry $gap_n bullet(s) from $LIFECYCLE_KIT_GAP_INBOX_FILE into '$stage''s own intake:" >&2
+                sim_relay "$gaps" >&2
+            else
+                echo "enter-stage: $LIFECYCLE_KIT_GAP_INBOX_FILE holds $gap_n bullet(s) and no stage of the closing iteration is coming back for them — they do not refuse this entry; they are this iteration's '$stage' intake:" >&2
+                printf '%s\n' "$gaps" >&2
+            fi
+            relay_help "disposition each bullet in this session, after the stamp: promote it to a queue entry, fix it inline, or discard it with cause in the commit message — then truncate $LIFECYCLE_KIT_GAP_INBOX_FILE to its header in the same commit. Deleting a bullet without a disposition is not a drain."
+            relay_help "a promoted entry's provenance sentence carries the bullet's own date and names the iteration whose close generated it — the finding's disposition lands in this iteration's ledger, and saying so is what keeps that legible."
+        else
+            if [[ "$sim" == 1 ]]; then
+                echo "enter-stage (simulate): iteration-boundary entry to '$stage' would be refused — $LIFECYCLE_KIT_GAP_INBOX_FILE holds $gap_n untriaged gap bullet(s) and the cursor never reached '${LIFECYCLE_KIT_STAGES[-1]}', the closing stage of '$cur_iter':" >&2
+                sim_relay "$gaps" >&2
+            else
+                echo "enter-stage: iteration-boundary entry to '$stage' refused — $LIFECYCLE_KIT_GAP_INBOX_FILE holds $gap_n untriaged gap bullet(s) and the cursor never reached '${LIFECYCLE_KIT_STAGES[-1]}', the closing stage of '$cur_iter' (nothing written):" >&2
+                printf '%s\n' "$gaps" >&2
+            fi
+            relay_help "run the closing stage's gap-drain step — disposition each bullet (promote to a deferred [design-pending] entry, fix inline, or discard with cause in the commit message), truncate the inbox to its header, then re-run enter-stage $stage."
             exit 1
         fi
-        echo "enter-stage: iteration-boundary entry to '$stage' refused — $LIFECYCLE_KIT_GAP_INBOX_FILE holds untriaged gap bullets; every gap is dispositioned before the next iteration begins (nothing written):" >&2
-        printf '%s\n' "$gaps" >&2
-        echo "  help: if the closing stage has not run yet, run its gap-drain step — disposition each bullet (promote to a deferred [design-pending] entry, fix inline, or discard with cause in the commit message), then truncate the inbox to its header." >&2
-        echo "  help: if it has already run, these bullets were filed after the drain and no stage is coming back for them: disposition them here, in this entering session — promote each directly to the deferred queue (or fix it), truncate the inbox to its header, commit, and re-run enter-stage $stage. Deleting a bullet without a disposition is not a drain." >&2
-        exit 1
     fi
 fi
 
@@ -281,10 +310,10 @@ if [[ "$first" == 1 && "$cur_iter" != "$UNNAMED" ]]; then
         [[ -z "$req_msg" ]] && continue
         if [[ "$sim" == 1 ]]; then
             echo "enter-stage (simulate): iteration-boundary entry to '$stage' would be refused — $req_msg" >&2
-            exit 1
+        else
+            echo "enter-stage: iteration-boundary entry to '$stage' refused — $req_msg (nothing written)." >&2
         fi
-        echo "enter-stage: iteration-boundary entry to '$stage' refused — $req_msg (nothing written)." >&2
-        echo "  help: the close stage must disposition the iteration at the release boundary, stamping a '<iteration> release <version|none> — <basis>' line into $br before the next iteration begins." >&2
+        relay_help "the close stage must disposition the iteration at the release boundary, stamping a '<iteration> release <version|none> — <basis>' line into $br before the next iteration begins."
         exit 1
     done
 fi

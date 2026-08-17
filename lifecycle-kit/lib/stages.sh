@@ -87,6 +87,11 @@ lifecycle_current_stage() {
     awk '{ print $2 }' <<<"$last"
 }
 
+# spec: lifecycle-kit/SPEC.md §lib/stages.sh — the closing-stage predicate: success when the cursor equals the last configured stage. Hoisted because two tools must agree by construction rather than by lookalike — the filer warned at capture that no stage is left to drain a bullet is warned by the same test that later admits it at the boundary.
+lifecycle_closing_stage_reached() {
+    [[ "$(lifecycle_current_stage "$@")" == "${LIFECYCLE_KIT_STAGES[-1]}" ]]
+}
+
 lifecycle_stage_known() {
     local s
     for s in "${LIFECYCLE_KIT_STAGES[@]}"; do

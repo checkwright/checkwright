@@ -734,25 +734,73 @@ scratch superseded at the boundary, but a gap filed on either side of a
 concurrent merge must survive. The installer emits the line and
 `check-merge-attrs` verifies it (§bin/install-lifecycle.sh, §check-merge-attrs).
 
-**The boundary refusal.** `bin/enter-stage.sh`'s first-stage (iteration-boundary)
-entry refuses while the inbox holds bullets (exit 1, the untriaged bullets
-printed, nothing written — the same refusal contract as the non-empty Lessons
-section), so no gap outlives its iteration untriaged (the gap-disposition rule:
-costed and filed, never flagged-and-skipped).
+**The boundary check: one detector, two dispositions.**
+`bin/enter-stage.sh`'s first-stage (iteration-boundary) entry is unchanged in
+**detection** — it still fires on any `- ` bullet in the inbox — and
+**discriminates** on which of two dispositions it takes, because the drain and
+the filing window do not coincide.
 
-The refusal names **two** recoveries, because the drain and the filing window do
-not coincide. A bullet filed *during* the iteration is drained by the closing
-stage, and the refusal points there. A bullet filed *after* that stage has run
-has no drainer left in the machine — the detection is still right, and what
-would fail is a message describing a stage that is not coming back — so the
-refusal also tells the entering session to disposition the bullets itself:
-promote each directly to the deferred queue (or fix it), truncate the inbox,
-commit, re-run. Deleting a bullet without a disposition is not a drain. No
-second detector is added for the post-close window: the existing refusal already
-detects it, and what was missing was the message's actionability.
+- **Close-skipped** — the closing iteration's cursor never reached the last
+  configured stage. The entry **refuses** (exit 1, the untriaged bullets
+  printed, nothing written — the same refusal contract as the non-empty Lessons
+  section), with the one recovery that applies: run the closing stage's
+  gap-drain step, truncate the inbox, re-enter. A stage was skipped, so the
+  recovery is to run it, and no gap outlives its iteration untriaged (the
+  gap-disposition rule: costed and filed, never flagged-and-skipped).
+- **Post-close** — the cursor sits at the last configured stage, so the closing
+  stage has run and none is coming back. The entry is **admitted**: the bullets
+  print on stderr as an advisory naming them this iteration's first-stage
+  intake, and the stamp proceeds. Deleting a bullet without a disposition is
+  still not a drain.
 
-That refusal is the inbox's
-forcing function, so the inbox declares itself on the close-surface roster
+The discriminator is the cursor read `lifecycle_closing_stage_reached`
+(§lib/stages.sh), the same predicate `bin/file-gap.sh` warns from at capture, so
+a filer told "none is left to drain it" is told so by the very test that later
+admits the bullet rather than by a lookalike. **Two edges take the post-close
+disposition**, both following precedents the script already carries: a closing
+iteration that was never named (the `—` placeholder) has no close to have
+skipped — the guard `LIFECYCLE_KIT_BOUNDARY_REQUIRE` applies one block down for
+the same reason — and an inbox holding bullets with no cursor at all, a fresh
+consumer's first boundary, is that case too.
+
+**No second detector is added for the post-close window**: the existing refusal
+already detects it, and what was missing was the message's actionability. That
+ruling is **kept and re-read** rather than retired — the two-disposition shape
+satisfies it more exactly than the two-recovery message did, since one detector
+still fires and what the discriminator picks is only what to do about it.
+
+**Why admission, and not merely a better-worded refusal.** A refusal that picks
+the right message still leaves the queue write where this project's own history
+puts it: made **before any stamp exists, by a session that has entered no
+stage**, and committed as though by a stage that has not started. Routing a
+post-close finding into the first stage's ordinary intake is satisfiable only
+*inside* that stage — the intake is its — so the entry has to succeed for the
+finding to reach it. What the change buys is that the disposition becomes an
+ordinary in-stage queue write in the stage that writes the queue anyway.
+
+**What the admission costs, and why the loss is smaller than it looks.** The
+invariant "no gap outlives its iteration untriaged" is not weakened, because a
+post-close bullet never had a drainer in the iteration it was filed in — that is
+the defect, and no message could have supplied one. On admission the bullet
+stops being post-close: it becomes an ordinary mid-iteration bullet of the
+**new** iteration, and it therefore acquires the drainer it never had, that
+iteration's mandatory close drain. The first stage is directed to take it
+earlier because it is writing the queue anyway; if it does not, close does. That
+forcing function is the existing one rather than a new one.
+
+**The honest limit, stated because it is real.** The finding's *disposition*
+then lands in the next iteration's ledger, which cannot be repaired: the finding
+postdates its own iteration's close, so no iteration-correct ledger position
+exists for it. What is repaired is legibility — a promoted entry's provenance
+sentence carries the bullet's own date and names the iteration whose close
+generated it, so a reader sees where the finding came from even though its
+disposition sits one iteration later. A record that is late and says so is
+strictly better than one that is late and silent.
+
+That check is the inbox's
+forcing function — branch-conditional as of the two dispositions above, refusing
+on the close-skipped branch and obliging an in-stage disposition on the other —
+so the inbox declares itself on the close-surface roster
 (§The close-surface roster) here, where the forcing function is documented:
 
 close-surface: .workflow/gap-inbox.md forced=lifecycle-kit/SPEC.md §bin/enter-stage.sh
@@ -1241,6 +1289,22 @@ readers deliberately do *not* call this helper — each derives the cursor
 itself from a path it already configures, so no consumer kit gains a
 lifecycle-kit dependency.
 
+`lifecycle_closing_stage_reached [<state-file>]` is the **closing-stage
+predicate** built on that cursor: success when the cursor equals the last member
+of `LIFECYCLE_KIT_STAGES`, failure otherwise — including for both no-cursor
+shapes, since a cursor that does not exist has not reached anything. It is
+hoisted rather than spelled at each site because its **two callers must agree by
+construction**: `bin/file-gap.sh` reads it for the capture-time warning that
+tells a filer which consequence they are buying, and `bin/enter-stage.sh` reads
+it at the iteration-boundary gap-inbox check to choose between refusing and
+admitting (§The committed gap inbox). A filer warned that "none is left to drain
+it" is warned by the very test that later admits the bullet, rather than by a
+lookalike that can drift from it. **No knob is minted and none is possible**: the
+last configured stage is already `LIFECYCLE_KIT_STAGES`'s last member, so the
+predicate is config-derived in every consumer with nothing left to configure. It
+is a predicate over the cursor and must not acquire a third caller silently —
+`lifecycle_current_stage` remains the general reader.
+
 The loader also owns `lifecycle_registration_block`,
 which renders the resident registration block (§bin/install-lifecycle.sh) from the
 live config so `bin/install-lifecycle.sh` and `check-lifecycle-registration`
@@ -1408,10 +1472,15 @@ The boundary entry also
 untriaged entries printed, nothing written — the same refusal contract as the
 built-in pre-flight): an untriaged lesson must not cross into the next
 iteration, so no `[attend]` injection (queue-kit §bin/queue-index.sh) can
-outlive the iteration that filed it. It **likewise refuses while the gap inbox
-(`LIFECYCLE_KIT_GAP_INBOX_FILE`) holds bullets** — the same refusal contract, so
-a mid-iteration gap the close skill did not drain (§The committed gap inbox)
-cannot cross the boundary untriaged; an absent inbox has no bullets and passes.
+outlive the iteration that filed it. Its **gap-inbox check
+(`LIFECYCLE_KIT_GAP_INBOX_FILE`) is one detector with two dispositions**
+(§The committed gap inbox owns the design): it fires on any bullet, then reads
+`lifecycle_closing_stage_reached` to choose. A **close-skipped** boundary
+refuses on the same contract as the Lessons check, so a mid-iteration gap the
+close skill did not drain cannot cross untriaged; a **post-close** one admits
+the entry and prints the bullets as a stderr advisory naming them the entering
+stage's intake, because no stage of the closing iteration is coming back for
+them. An absent inbox has no bullets and passes either way.
 **The survey record, its neighbour in the boundary reset, deliberately does
 not refuse** (§The survey record): it is truncated like any built-in member, and
 a non-empty one is never a blocker, because a survey owes nobody a disposition —
@@ -1459,12 +1528,30 @@ it runs everything a real entry runs up to the write — config load and stage
 validation, header parse, session-id derivation, the idempotence probe (a
 would-be no-op is reported as such and exits 0), the candidate-stamp temp
 state build, `check-stage-entry`, every matching `LIFECYCLE_KIT_ENTRY_PREFLIGHT`
-entry, and the iteration-boundary Lessons check — then stops: no stamp, no
-boundary truncation, the temp files removed. Every output
+entry, and — at an iteration boundary — the Lessons check, the gap-inbox check
+and every `LIFECYCLE_KIT_BOUNDARY_REQUIRE` member, in the order a real entry runs
+them; then it stops: no stamp, no boundary truncation, the temp files removed.
+That roster is stated in full because a roster that stops short of the refusals
+the code runs is read as a guarantee the mode does not give. Every output
 line is prefixed `enter-stage (simulate):` so a transcript can never read as
 a stamp. Exit 0 = the real entry would proceed (or no-op); exit 1 = it would
 refuse, with the refusing check's output relayed line-by-line; exit 2 =
-usage/config error, as a real entry. Not a gate — exercised in `smoke/`
+usage/config error, as a real entry.
+
+**Every refusal's recovery is relayed too, and that is the mode's contract
+rather than a courtesy.** A refusal's `help:` line is its actionable half — the
+real refusal's own design rests on that (§The committed gap inbox) — so each one
+prints under `--simulate` as well, prefixed like every other simulate line. The
+mode's designed consumer is the lead (§templates/lead.md), which gates an
+expensive dispatch on it rather than hand-deriving prior-stage completeness;
+relaying a verdict while withholding the one line that resolves it hands that
+consumer the refusal and keeps the recovery, which is measured rather than
+supposed — a lead reading a simulated boundary refusal escalated a question the
+withheld line answers verbatim. The **gap-inbox check's post-close disposition
+reports the branch it would take**: that the entry would proceed, naming how
+many bullets it would carry into the entering stage's intake, since "would
+refuse" and "would proceed carrying work" are different answers to the question
+the lead is asking. Not a gate — exercised in `smoke/`
 beside the existing enter-stage coverage (would-pass, would-refuse,
 would-no-op, nothing written).
 
