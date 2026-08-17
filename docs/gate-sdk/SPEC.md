@@ -5269,8 +5269,7 @@ green (a red FROM baseline is a broken tag — exit 2, not an upgrade finding),
 then replaces the vendored kit directories wholesale at a **TO** ref and
 regenerates the generated artifacts — the contract's consumer phase-A steps
 (docs/install.md §The upgrade contract). It asserts **determinism** (the scratch
-consumer's `git status` shows changes only under the kit roots and the two
-regenerated artifacts — the pre-commit hook and the graph) and then, over the
+consumer's `git status` shows changes only under the kit roots) and then, over the
 phase-B battery, that the **red set is a subset of TO's tightened-gates
 declaration**. A new N+1 gate
 is *not* in this consumer's `gates.list` (the phase-A sync never re-runs the
@@ -5286,6 +5285,24 @@ A `bin/` tool, not a gate — no `good/`+`bad/` fixture pair is owed;
 the `upgrade` validate suite running it (scripts/evidence-config.sh) is its
 evidence, at ~2× run-consumer-smoke's cost since it runs the battery twice in
 scratch (accepted as validate-stage cost, never pre-commit).
+
+**The determinism assertion is measured between phase A's two steps, and that
+ordering carries the assertion.** Phase A syncs the kit directories, then
+regenerates the generated artifacts; the claim under test belongs to the *sync* —
+that replacing kit directories wholesale loses nothing a consumer owns. Read
+after the regen instead, one `git status` mixes two authors, and the mixture then
+has to be unmixed by an allow-set naming every generated artifact. That set was a
+hand-held roster with no way to learn an emitter had grown an output:
+`gen-pre-commit --write` began writing a second hook, and the roster reddened on
+an artifact the contract's own step had just written — an emitter's ordinary
+evolution reported as an upgrade regression. It also could not tell a sync that
+*clobbered* the agent file from `install-doctrine` writing it, and exempted both.
+Reading before the regen removes the roster rather than deriving it, and narrows
+the claim to exactly its subject. What that gives up is any claim that the regen
+steps write only an expected set — never this suite's claim to make. Each
+emitter's write set is held by that emitter's own freshness gate (`check-graph`
+assertions D and E cover both generated hooks and the graph artifact) and its own
+fixtures; restating it here bought nothing and rotted on the first change.
 
 **Each phase runs against its own ref's gate binary**, and that pairing is what
 makes phase 1's claim true as written. A `.gate` member dispatches to a binary
@@ -5364,17 +5381,17 @@ artifact, so a dispatched member's FROM-vs-TO behavior is covered. The
 vendored-kit-only reach still holds for the installer path.
 
 **The gate binary is placed by the harness, and still sits outside the
-determinism assertion.** That assertion covers changes under the kit roots plus
-the two regenerated artifacts; phase A replaces the vendored directories in tree
+determinism assertion.** That assertion covers changes under the kit roots;
+phase A replaces the vendored directories in tree
 and never runs an installer, so a consumer's *install* path for the artifact is
 outside its reach entirely and an installed binary is neither a determinism
 finding nor a determinism exemption. Widening the assertion to name it would
 claim coverage this tool cannot have. Re-placing the binary at phase A does not
 disturb that, and the reason is mechanical rather than argued: the scratch
 consumer's `.gitignore` carries `gate_native_bin`'s path (§Consumer smoke), so
-the placed artifact never enters the `git status` the assertion reads, and no
-allow-set entry is added. The ruling stands unchanged and is cited here, not
-amended. The install path's own idempotence proof is the installer's smoke
+the placed artifact never enters the `git status` the assertion reads, and
+nothing is exempted on its behalf. The ruling stands unchanged and is cited here,
+not amended. The install path's own idempotence proof is the installer's smoke
 (installer/README.md §The consumer smoke), which does re-run `init`, and the rule
 that satisfies it is the manifest's: an on-disk artifact that still verifies
 against the recorded digest is not rewritten (installer/README.md §The manifest).

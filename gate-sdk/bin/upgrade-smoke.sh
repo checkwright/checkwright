@@ -113,7 +113,7 @@ if [[ "$rc" -ne 0 ]] || ! grep -qE 'All [0-9]+ gates passed' <<<"$out"; then
     exit 2
 fi
 
-# spec: gate-sdk/SPEC.md §upgrade-smoke — phase A: replace the vendored kit directories wholesale at TO and regenerate the generated artifacts (the contract's consumer steps, docs/install.md §The upgrade contract)
+# spec: gate-sdk/SPEC.md §upgrade-smoke — phase A, step 1 of 2: replace the vendored kit directories wholesale at TO (the contract's consumer steps, docs/install.md §The upgrade contract)
 declare -A kitname_seen=()
 for r in "${fromroots[@]}"; do rm -rf "${CONS:?}/$(basename "$r")"; done
 for r in "${toroots[@]}"; do
@@ -129,6 +129,23 @@ if [[ "$(csmoke_gate_descriptors "${toroots[@]}")" -gt 0 ]]; then
         || { echo "upgrade-smoke: FAIL(env) — could not place TO ($TO)'s gate binary in the scratch consumer" >&2; exit 2; }
 fi
 
+# spec: gate-sdk/SPEC.md §upgrade-smoke — determinism is measured on the sync alone, before a regen step has run: the sync's whole claim is that it loses nothing a consumer owns, so its staged set must fall under the kit roots and nowhere else, with no exemption to state
+git -C "$CONS" add -A
+stray=()
+while IFS= read -r p; do
+    [[ -n "$p" ]] || continue
+    top="${p%%/*}"
+    [[ -n "${kitname_seen[$top]:-}" ]] || stray+=("$p")
+done < <(git -C "$CONS" diff --cached --name-only)
+
+if [[ ${#stray[@]} -gt 0 ]]; then
+    echo "upgrade-smoke: FAIL — the phase-A kit sync is non-deterministic: it changed consumer files outside the kit roots:" >&2
+    for p in "${stray[@]}"; do echo "  $p" >&2; done
+    echo "  the wholesale kit-sync must lose nothing a consumer owns (docs/install.md §The upgrade contract)." >&2
+    exit 1
+fi
+
+# spec: gate-sdk/SPEC.md §upgrade-smoke — phase A, step 2 of 2: regenerate the generated artifacts, run after the sync has been judged. Which paths each emitter writes is that emitter's own contract, held by that emitter's own freshness gate, so nothing here names the set
 ( cd "$CONS" && bash gate-sdk/bin/gen-pre-commit.sh --write >/dev/null ) \
     || { echo "upgrade-smoke: phase A gen-pre-commit failed at TO ($TO)" >&2; exit 2; }
 ( cd "$CONS" && bash gate-sdk/checks/check-graph.sh --emit > scripts/CHECK-GRAPH.html ) \
@@ -138,24 +155,7 @@ if [[ -f "$CONS/doctrine-kit/bin/install-doctrine.sh" ]]; then
         || { echo "upgrade-smoke: phase A install-doctrine failed at TO ($TO)" >&2; exit 2; }
 fi
 
-# spec: gate-sdk/SPEC.md §upgrade-smoke — determinism: git status shows changes only under kit roots and the two regenerated artifacts; anything else means phase A edited a consumer file (the wholesale-sync invariant broke)
 git -C "$CONS" add -A
-stray=()
-while IFS= read -r p; do
-    [[ -n "$p" ]] || continue
-    case "$p" in
-        scripts/git-hooks/pre-commit|scripts/CHECK-GRAPH.html|CLAUDE.md) continue ;;
-    esac
-    top="${p%%/*}"
-    [[ -n "${kitname_seen[$top]:-}" ]] || stray+=("$p")
-done < <(git -C "$CONS" diff --cached --name-only)
-
-if [[ ${#stray[@]} -gt 0 ]]; then
-    echo "upgrade-smoke: FAIL — phase A is non-deterministic: it changed consumer files outside the kit roots and the regenerated artifacts:" >&2
-    for p in "${stray[@]}"; do echo "  $p" >&2; done
-    echo "  the wholesale kit-sync must lose nothing a consumer owns (docs/install.md §The upgrade contract)." >&2
-    exit 1
-fi
 git -C "$CONS" -c user.email=smoke@example.invalid -c user.name=smoke \
     commit -q --no-verify --allow-empty -m "phase A: kits at $TO"
 

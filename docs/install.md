@@ -644,8 +644,10 @@ An upgrade runs in two phases.
 
 **Phase A — deterministic.** Replace the vendored kit directories wholesale at
 the target tag. Because consumers never edit kit files, this sync loses
-nothing. Then regenerate the generated artifacts (the pre-commit hook and the
-graph projection).
+nothing. Then regenerate the generated artifacts. *Which* artifacts those are is
+a property of the kits you vendored rather than a list to carry here: each one's
+freshness gate names its own regen command when it reds, so phase B is what tells
+you about any you skipped.
 
 **Phase B — gate-driven.** Run the full battery. The set of gates that go red
 *is* your migration worklist: each red gate names the surface that moved, and
