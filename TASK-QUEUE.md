@@ -2978,7 +2978,8 @@
 
 - **waiting-rule-fourth-firing-post-fix** [design-pending] — the residency rule fired again,
   under its own freshly-strengthened prose.
-  recurrence: waiting-rule-fourth-firing-post-fix 2026-08-06 2026-08-16
+  recurrence: waiting-rule-fourth-firing-post-fix 2026-08-06 2026-08-16 2026-08-17
+  **Eighth and ninth firings, 2026-08-17; grounds on `turn-end-chokepoint-and-wait-primitive`.**
   `dispatched-session-waiting-rule-residency` shipped this iteration. Batch 2 (`a046c06`)
   landed its residency half into `.claude/agents/stage-session.md` as a bare imperative —
   never end a turn on work still running, and never end one in order to wait. The **validate**
@@ -5972,6 +5973,14 @@
   definition itself** — not a dispatch prompt — which is the strongest prose carrier the project
   has and the one `waiting-rule-carrier-reach` shipped. The mechanical half held again: the
   launch-time liveness record answered `kill -0` and no evidence was lost.
+  **It fired TWICE MORE at 2026-08-17 (`native-cohort-close-surfaces`) — the eighth and ninth,
+  and these are the grounds for that date's stamp on `waiting-rule-fourth-firing-post-fix`.**
+  Both were the LEAD's observation, not the acting session's: validate ended its turn on a live
+  `run-validate.sh` still writing the evidence manifest, close on a live `gh run watch`. Each was
+  recoverable only by what the producer happened to be — validate's by the liveness record it had
+  written, close's by the watch being a read-only remote poll that truncates no artifact — so the
+  rule itself held in neither. **Two firings in one iteration, both in producing roles**, which is
+  the first evidence the rate is not one-per-iteration noise.
   Filed 2026-08-16 by close from the gap inbox, both halves; the drain re-verified the carrier
   count and the chokepoint scoping against the SPEC rather than taking the bullet's prose.
 
