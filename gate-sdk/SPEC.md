@@ -3454,9 +3454,11 @@ measured on the **gate file**, so a gate whose work is behind a spawn reads as
 `lib/gate.sh` while the tool it spawned sourced `lib/stages.sh`. **A spawned
 tool is invisible to every static sizing signal the selector has,
 `port-blockers.sh --group`'s line counts included.** Stated once here rather
-than rediscovered per member; the class is nearly exhausted, and the one
-remaining unrecorded instance is filed rather than fixed here, since it is
-another member's entry.
+than rediscovered per member. **The class is now exhausted**: the one remaining
+unrecorded instance was `check-graph`, whose spawned generator is sized in its
+own section (§check-graph) at the 2026-08-17 close that drained the bullet; the
+only other spawning member, `check-roadmap-fresh`, has always carried
+`bin/roadmap.sh` (76) in `freshness-emitter-port-cohort`'s roster.
 
 **A prediction this record corrects, because the oracle overruled it at build.**
 The port was expected to make `check-reads-couples`' coverage assertion run *for
@@ -6737,6 +6739,14 @@ surface fires the gate. The
 statically resolvable slice of that parity is carried by its sibling
 `check-reads-couples` (§check-reads-couples); the undecidable remainder stays
 the author's duty under §The `# graph:` manifest.
+
+Port sizing, recorded because no static signal carries it: this member's work is
+**929 shell lines, not the 632 of `check-graph.sh`**. Assertions D and E spawn
+`bin/gen-pre-commit.sh` (297) and compare its `--emit` and `--emit-commit-msg`
+output byte-for-byte, so the generator is part of the port and `--group`'s line
+counts see none of it — the spawn-invisibility rule stated under §The first
+cohort, whose last unrecorded instance this is. Recorded 2026-08-17 at close,
+draining the bullet spec filed while sizing the twelfth cohort.
 
 Theme seam: the emitted HTML artifact bypasses the consumer's
 site generator, so it renders foreign beside the rest of a docs host unless the
