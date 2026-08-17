@@ -64,7 +64,7 @@ pub const EMITTERS: &[(&str, EmitFn, &[&str])] = &[
         ],
     ),
     // spec: queue-kit/SPEC.md §The queue-index arm — the class's first *query* member as well as a
-    // generator, and the table's most configured one: a hardcoded flag receives no configuration
+    // generator, and configured: a hardcoded flag receives no configuration
     (
         "queue-index",
         queue_index::emit,

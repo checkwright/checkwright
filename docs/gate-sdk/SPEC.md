@@ -1086,7 +1086,7 @@ A **non-gate arm** is specified by three properties:
   `--emit-` spelling reads as a stretch. It is precedented and taken rather than
   renaming the family, which would be a gate-sdk unit of its own. `extent` is
   also the class's worked instance of a mode whose only caller is **a session** —
-  no in-tree invoker exists, and the caller is load-bearing regardless, because
+  nothing in tree invokes it but its own fixture, and the caller is load-bearing because
   §The queue-index arm's refusal to ship a queue-mutating tool rests on it. A
   session reaching a mode through the front-end counts exactly as a stage step
   does.
@@ -1100,6 +1100,13 @@ for a member with inputs: the arm stays the only entry point into the crate, and
 a front-end that already sources the shell library — the battery runner among
 them — supplies the bridged environment in front of it. What the class forbids
 is a *second* entry point into the emission path, not a caller.
+**So the family choice is forced for any tool that needs configuration at all.**
+Only an emitter-table member is bridged: the table's knob list is what `--knobs`
+prints and what the battery runner's `--emit` front-end resolves, while a
+hardcoded top-level flag is reached by neither and receives nothing. A configured
+tool ported as a top-level flag therefore resolves platform defaults and silently
+ignores every consumer override — which is not a calibration between two workable
+shapes but the difference between working and appearing to.
 
 **A gate that reaches an arm in-process acquires a source coupling its
 descriptor must carry, and the trigger set does not follow the port on its
@@ -6679,15 +6686,19 @@ reason. No knob: the lead-line shape is not a consumer's posture but the one
 format the `# until:` contract is written against, and a consumer free to
 redefine it could redefine it back into the fail-open this closes.
 
-**The honest cost, stated with its size: eight independent holders now carry
+**The honest cost, stated with its size: six independent holders now carry
 that predicate and no gate enforces their agreement** — `queue_live_slugs` and
 `queue_roadmap_entries` (queue-kit/lib/queue.sh), `queue_slugs`
 (native/src/spec.rs — canon-kit's holder, which moved substrate with the seventh
 cohort and is deliberately not pointed at the crate's own queue module, since one
-shared function would end the arrangement this count prices), the inline scans in queue-kit's `check-task-names` and
-`check-queue-entry-budget`, the `queue-index` arm (which carries it twice, in the
-`--extent` and `--icebox-candidates` walks), the section-pool builder inside
-drift-kit's `kpi-queue-net-delta`, and this gate. Only the public
+shared function would end the arrangement this count prices), the crate's own
+queue module, the section-pool builder inside
+drift-kit's `kpi-queue-net-delta`, and this gate. **It was eight, and porting is
+what shrank it** — the inline scans in `check-task-names` and
+`check-queue-entry-budget`, and both of the `queue-index` arm's walks, now call
+one shared crate function, and two call sites of one function are one holder by
+this section's own criterion. That is the shared-derivation question below
+answering itself for three members without anyone deciding it. Only the public
 library functions are named; the rest are cited by the surface that owns them,
 because naming another kit's private helper here would couple this
 count to an identifier no gate holds. They are cited at all because a grep for the *function* names
@@ -6696,10 +6707,10 @@ which is how the count was twice under-stated before it was surveyed. The risk
 and the cost do not sit in the same place: a **set builder** with a wrong
 predicate fails silently, in wrong membership, which is this gate's own defect
 class, while a **per-bullet extractor** fails loudly and locally — a missing
-index row, an extent measured wrong. So a format change costs all eight edits
+index row, an extent measured wrong. So a format change costs all six edits
 and endangers only the few that build sets. Accepted on the same ground as the
 section-set residue above: a cross-kit code dependency would cost more than the
-divergence risk. Whether eight hand-coupled parsers earn a shared derivation, a
+divergence risk. Whether the remaining hand-coupled parsers earn a shared derivation, a
 conformance test, or a gate is a real question and a **different unit**; this
 section neither answers it nor forecloses it.
 

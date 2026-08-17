@@ -606,16 +606,14 @@ class forbids.
 **The front-end is not optional dressing.** A caller that invoked the binary
 directly would resolve platform defaults and silently ignore every consumer
 override; the front-end sources the shell library and supplies the bridged
-environment in front of the arm. This is the class's most configured member —
-its bridged reads are `QUEUE_KIT_QUEUE_FILE`, `QUEUE_KIT_ACTIVE_SECTIONS`,
-`QUEUE_KIT_DEFERRED_SECTION`, `QUEUE_KIT_ICEBOX_SECTION`, `QUEUE_KIT_ATTEND_CAP`
-and `QUEUE_KIT_ICEBOX_AGE_DAYS` — which is also why it is a table member rather
-than a hardcoded top-level flag: a hardcoded flag receives no configuration at
-all, and an arm that cannot see the icebox knob silently drops the tally in every
-consumer that configures a tier. The derived regexes the shell library built
-(`QUEUE_ACTIVE_RE` and its siblings) were never a configuration surface, only
-that library's internal spelling of these knobs, so they do not survive and
-nothing is lost with them.
+environment in front of the arm. The arm is configured — its bridged reads are
+declared beside it in the emitter table — which is why it is a table member
+rather than a hardcoded top-level flag: a hardcoded flag receives no
+configuration at all, and an arm that cannot see `QUEUE_KIT_ICEBOX_SECTION`
+silently drops the tally in every consumer that configures a tier. The derived
+regexes the shell library built (`QUEUE_ACTIVE_RE` and its siblings) were never a
+configuration surface, only that library's internal spelling of these knobs, so
+none of them crosses into the arm and nothing is lost by their not crossing.
 
 **The three modes stay three modes on one arm**, selected from the arm's own
 argv tail — the emitter type is defined over an argv slice precisely so a mode
