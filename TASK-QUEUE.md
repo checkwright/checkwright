@@ -1002,36 +1002,6 @@
   Surfaced 2026-07-31, operator-directed across three gap-inbox bullets; drained
   and merged into one unit by close.
 
-- **queue-index-blocked-by-assertions** [design-pending] — coverage hole in the queue-index
-  rendering tests, pre-existing: the blocked-by tag's
-  re-echo and the ready/blocked marker (bullet vs cross) are asserted nowhere,
-  although the sibling drain-exempt echo is. Surfaced while fixing the title
-  rendering this iteration, because that fix restructured the very expression
-  concatenating the blocked-by suffix onto the title — the hole sat directly under
-  the change.
-  Verified by running rather than by reading that nothing regressed: a fixture
-  carrying a blocked entry, one whose lead line is all tag, and one carrying both
-  rendered byte-identically before and after the fix apart from the intended
-  separator change. But the assertion that would have caught a regression does not
-  exist, and the marker derivation is likewise unasserted.
-  **Cost while deferred:** low and non-rotting — two assertions close it — and
-  the residue is only that a future edit to the title-and-tag concatenation can
-  regress the echo silently.
-  **The fix location moved 2026-08-17 with `queue-index-non-gate-arm-port`,** which shrank
-  `queue-kit/gate-tests/queue-index.test.sh` to front-end/bridge assertions and moved rendering
-  coverage into the ported module's own `#[cfg(test)]` tests. A session taking this entry adds its
-  assertions in the crate, not the shell fixture.
-  **Both assertions were then landed incidentally by that same port** — the moved rendering tests
-  pin a blocked entry's whole rendered row, cross marker and re-echoed blocker slug together, which
-  is the marker derivation and the echo at once. The build session that landed them did not
-  disposition this entry: closing a deferred entry is not a build stage's call on a unit outside
-  its own. **Owed:**
-  a close or scope read of whether anything here survives that coverage.
-  Surfaced 2026-07-31 at build; not folded into the fix commit because the unit's
-  commit had already landed under a HEAD moved by a concurrent session, so landing
-  it meant either a second commit on a closed unit or a rewrite of shared history.
-  Drained from the gap inbox by close.
-
 - **context-pressure-signal** [design-pending] — operator request: a
   usage-verdict-style context-pressure signal that **suggests** compaction, so the
   decision stops depending on a lead's guess. The source needs no estimation: the
@@ -1976,8 +1946,8 @@
   and **both behaviors are wanted**. So a conformance mechanism must scope to the
   **line predicate alone**.
   **Second divergence axis, verified at this close and not in the original
-  filing:** `bin/queue-index.sh`'s default index-mode walk matches lead lines with
-  a column-0 `/^-[[:space:]]/` anchor rather than the tolerant
+  filing:** the `queue-index` arm's default index-mode walk matches lead lines
+  with a column-0 `/^-[[:space:]]/` anchor rather than the tolerant
   `^[[:space:]]*-[[:space:]]+` one, so indented sub-task bullets are invisible to
   it. That is *sanctioned* — the gate-sdk section rules the indent level the
   reader's choice and the predicate not — but it means a conformance mechanism
@@ -3886,9 +3856,9 @@
   parse. So a tag-only filter leaves precision at 1-in-4, and the unit takes both clauses or
   states why the machine-readable one is worth taking alone.
   **Cost while deferred:** low, recurring, and paid by every close — three entries re-read and
-  one rule re-derived per iteration, forever, against a one-predicate fix. Re-measured at the
-  2026-08-13, 2026-08-15, 2026-08-16 and both 2026-08-17 closes and at the 2026-08-17 scope:
-  precision has been zero **seven running**.
+  one rule re-derived per iteration, forever, against a one-predicate fix. Re-measured again at
+  this close: 4 rows, 0 eligible — three roadmap-tagged, one (`rendered-site-link-monitor`) on the
+  named-event clause. Precision has been zero at every measurement taken since 2026-08-13.
   **Deferred 2026-08-16 at scope on the lead's ruling, though the threshold rule reached it, and
   the ground was substrate rather than merit:** the fix landed in a 182-line shell **bin tool** the
   2026-08-09 priority directive commits to deleting (TRAJECTORY.md §PRIORITY DIRECTIVE), so a bash
@@ -4031,8 +4001,9 @@
 - **queue-entry-grammar-single-owner** [design-pending] — queue-kit has two entry grammars, and
   they disagree about whether an indented bold-slug bullet is an entry.
   **The disagreement.** `lib/queue.sh`'s `queue_live_slugs` matches an optionally-indented
-  bold-slug bullet and counts it as a live entry, while `bin/queue-index.sh` and
-  `bin/queue-counts.sh` match a column-0 `- ` and treat the same line as body.
+  bold-slug bullet and counts it as a live entry, while the `queue-index` arm
+  (`native/src/emit/queue_index.rs`) and `bin/queue-counts.sh` match a column-0
+  `- ` and treat the same line as body.
   **Latent today, and verified so.** `TASK-QUEUE.md` carries no indented bold-slug bullet, so
   both readers return the same total. A single such bullet would make the index, the counters
   and the slug-uniqueness/liveness gates disagree about what an entry *is*.
@@ -4613,9 +4584,10 @@
   gating it.
   **Deliverable, and why `[design-pending]`:** a slug-addressed `queue-kit/bin/queue-edit.sh` with
   promote/done/defer/icebox verbs reusing queue-kit's own classifier and running the conservation
-  check over its own output before writing — the write-side counterpart to `queue-index.sh`. What
-  is open is which grammar it writes against, since `queue-entry-grammar-single-owner` records
-  that queue-kit carries two and a verb must pick a side.
+  check over its own output before writing — the write-side counterpart to the `queue-index`
+  arm. What is open is which grammar it writes against, since
+  `queue-entry-grammar-single-owner` records that queue-kit carries two and a verb must pick a
+  side.
   **RELATED, NOT DUPLICATE:** `amendment-done-move-assertions` designs a *gate* for the Done-move
   contract a verb would make unreachable; `scope-rename-guard-deadlock` was this same missing-verb
   shape on `.workflow/WORKFLOW-STATE.txt`, and it closed 2026-08-13 with `enter-stage.sh --rename`
@@ -5881,18 +5853,13 @@
   entry stands within three lines of the per-entry cap — the displacement
   `entry-cap-displaces-mandated-writes` predicts, in a new shape: content pushed into a *new
   entry* rather than into a commit message.
-  **First half — the chokepoint claim is narrower than it reads.** delegation-kit/SPEC.md:390-392
-  rules that enforcement turns on whether an act passes a chokepoint, and that a turn-end does
-  not. The analysis immediately below it is scoped to what a **`PreToolUse` hook** can read, and
-  every guard this repo ships is `PreToolUse`. The harness also fires a `Stop` event at turn end,
-  which no session had probed against this rule. **PROBED 2026-08-17 — documentary, not wired —
-  as the operator-ruled rider on `simulate-recovery-unrelayed`.** Settled: the `Stop` payload names
-  no background task, PID or shell id, so detection never comes from it; but the hook runs arbitrary
-  shell, so it CAN read the liveness record `waiting-rule-carrier-reach` landed (`pid=<n> run=<key>`
-  in repo-local `.tmp/`) and run `kill -0`, and it CAN refuse the stop, capped at a bounded run of
-  blocks. **Unsettled, and load-bearing:** whether the harness defers `Stop` while a background
-  child is live. **Moved AGAINST this half:** a dispatched session is a *subagent*, so its turn end
-  fires `SubagentStop`, undocumented for blocking — and every attested firing here was dispatched.
+  **First half — ANSWERED 2026-08-17, and its remainder relocated.** delegation-kit/SPEC.md:390-392
+  rules that enforcement turns on whether an act passes a chokepoint and that a turn-end does not;
+  the analysis under it is scoped to `PreToolUse`, which is every guard this repo ships, so the
+  turn-end hook had never been probed against this rule. It has been now, documentarily, and what
+  survives — a `SubagentStop` hook reading the liveness record, and whether the harness defers the
+  stop while a background child is live — is `subagent-stop-liveness-hook-wiring`'s, filed at this
+  close because wiring it is a settings change no agent message authorizes.
   **Second half, distinct subject — which primitive is reliable here.** The protocol states a
   hard ordering: `run_in_background` plus an `until`-loop for a single completion, with the
   event-stream form named the wrong tool. On this machine that ordering **inverted** — four of
@@ -5903,8 +5870,7 @@
   needs, which would confirm delegation-kit's ruling rather than overturn it; the second half is
   a measurement whose result could change a stated protocol ordering. Neither is a patch.
   **Cost while deferred:** each further firing costs an orphaned producer plus the lead turn that
-  discovers it — three such turns in the iteration that filed this, against four prompt-side
-  statements of the rule.
+  discovers it — and, as the tenth showed, can cost a whole suite's evidence.
   **It fired again in the very next iteration** (`port-tail-batching-and-cap-relief`, 2026-08-16):
   the validate session ended its turn on a live `run-validate`, the harness marked the agent
   complete, and the lead had to resume it from transcript. That firing is the sharpest evidence
@@ -5920,9 +5886,45 @@
   written, close's by the watch being a read-only remote poll that truncates no artifact — so the
   rule itself held in neither. **Two firings in one iteration, both in producing roles**, which is
   the first evidence the rate is not one-per-iteration noise.
-  **Its `Stop` probe is a 2026-08-17 operator-ruled rider on `simulate-recovery-unrelayed`.**
+  **Tenth firing, 2026-08-17 (`post-close-intake-and-index-port` validate) — the first to cost
+  evidence rather than turns.** The session backgrounded `run-validate.sh`, backgrounded a
+  `kill -0` loop on it, and ended its turn saying it would act on the completion notification,
+  which ending the turn is what prevents. It then committed a gap filing mid-run, dirtying the
+  worktree the `installer_smoke` pack step checks: that run reported `verdict=new-failures` on a
+  false ground and had to be discarded and re-run foreground. No date is stamped — 2026-08-17 is
+  already on `waiting-rule-fourth-firing-post-fix` and the stamp is idempotent per (slug, date).
   Filed 2026-08-16 by close from the gap inbox, both halves; the drain re-verified the carrier
   count and the chokepoint scoping against the SPEC rather than taking the bullet's prose.
+
+- **subagent-stop-liveness-hook-wiring** [design-pending] — the wired half of the turn-end hook
+  probe, which no agent session may authorize.
+  The **documentary** half is settled and lives on `turn-end-chokepoint-and-wait-primitive`: the
+  payload names no background task, PID or shell id, so detection never comes from it; but the
+  hook runs arbitrary shell, so it CAN read the `pid=<n> run=<key>` liveness record
+  `waiting-rule-carrier-reach` landed in repo-local `.tmp/` and run `kill -0`, and it CAN refuse
+  the stop, capped at a bounded run of blocks.
+  **The correction that made this its own entry: the hook is `SubagentStop`, not `Stop`.** A
+  dispatched stage session is a *subagent*, so its turn end fires `SubagentStop`; every attested
+  firing of the waiting rule was a dispatched session, so the original framing probed the wrong
+  hook and whatever is documented about blocking `Stop` says nothing about the event that
+  actually fires here. `SubagentStop` being undocumented for blocking is the load-bearing
+  unknown, not a footnote to it.
+  **Why it is filed rather than done: wiring it is a `.claude/settings.json` change, and no agent
+  message authorizes one.** A hook registration is a permission-surface write. The build session
+  that ran the probe declined it on exactly that ground and recorded its result as documentary
+  rather than half-wiring it; that refusal is correct and is written here so the next session
+  reads a settled call instead of re-litigating it. What this entry needs is the operator, not a
+  second probe of the same shape.
+  **Unsettled and load-bearing, unchanged by the correction:** whether the harness defers the
+  stop while a background child is live. If it does not, a blocking hook is the only lever left;
+  if it does, the class dissolves. Neither is decidable without the hook wired.
+  **Why `[design-pending]`:** the block cap is bounded, so a hook that refuses forever is not on
+  the table, and what a *capped* refusal buys against a session that has already decided to stop
+  is the open question — the honest answer may be nothing, which is a result rather than a
+  failure.
+  **Cost while deferred:** the rule's only enforcement candidate stays unmeasured, so each
+  further firing is paid in full and the enforcement question is argued from prose.
+  Filed 2026-08-17 by close on the lead's ruling, draining the bullet the probe left behind.
 
 - **done-slug-ownership-citation-report** [design-pending] — governed prose says a queue slug
   "owns" an open question in the present tense, and nothing notices when that slug lands.
@@ -6324,6 +6326,7 @@
 - close-generated-finding-route
 - queue-index-non-gate-arm-port
 - simulate-recovery-unrelayed
+- queue-index-blocked-by-assertions
 
 ## Lessons Learned
 

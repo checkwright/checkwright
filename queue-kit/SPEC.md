@@ -390,7 +390,7 @@ close-surface: TASK-QUEUE.md#Lessons-Learned forced=lifecycle-kit/SPEC.md §bin/
 
 - `[attend]` — fixed spelling, kit mechanism (the inbound channel): the filing
   session marks a lesson as a live attention point for later sessions *of the
-  same iteration*. `queue-index.sh` emits an attention block of `[attend]`
+  same iteration*. The `queue-index` arm emits an attention block of `[attend]`
   lead lines (§The queue-index arm); the injection dies at the iteration
   boundary because lifecycle-kit's first-stage entry refuses a non-empty
   Lessons section.
@@ -1141,7 +1141,7 @@ scanned surface both widen with the lesson channels: `[blocked-by:]` /
 `[spec:]` / `[design-pending]` / `[drain-exempt:]` / `[roadmap:]` in the task
 sections (active + deferred), plus
 `[attend]` and every `QUEUE_KIT_LESSON_TAGS` name in the `## Lessons Learned`
-section — the section `queue-index.sh` now reads, which retires the old "parsed
+section — the section the `queue-index` arm now reads, which retires the old "parsed
 by no reader" exemption for it. Couples
 the width-only wrap gate to the tag-parsing tools over the same surface: gate
 the coupling, not just each side.
