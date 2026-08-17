@@ -583,7 +583,9 @@ what makes assertion (B)'s foreign-iteration test able to catch a skipped
 truncation.
 
 `LIFECYCLE_KIT_ENTRY_PREFLIGHT` carries **both** of this kit's entry-side gates,
-at three stage keys between them. `bin/enter-stage.sh` runs each matching entry
+at the stage keys the two paragraphs below name — a count here would be a second
+one, and it would be a kit SPEC counting a consumer's config array at that.
+`bin/enter-stage.sh` runs each matching entry
 against the candidate temp state file (the prospective stamp appended) and the
 live queue, appending that `<queue> <state>` argv to whatever the entry names, and
 a non-zero exit refuses the entry with nothing written.

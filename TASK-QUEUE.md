@@ -3795,7 +3795,7 @@
   tier's own eligibility rule categorically excludes.
   queue-kit/SPEC.md §The icebox tier states that a roadmap-tagged entry is not
   icebox-eligible — a hard rule, not a judgment. The worklist does not read the tag.
-  recurrence: icebox-worklist-roadmap-blind 2026-08-15 2026-08-16 2026-08-17
+  recurrence: icebox-worklist-roadmap-blind 2026-08-15 2026-08-16 2026-08-17 2026-08-18
   **The 2026-08-17 date is a direct stamp, and these are its grounds.** Observed at this close's
   own backlog-eviction step with no bullet and no drain — the channel this same iteration's
   `recurrence-drain-input-widening` ruled sanctioned *and obliged*, the obligation attaching to
@@ -6344,10 +6344,10 @@
   verdict, which is why it was filed rather than picked by precedent. The carry is that the
   next cohort cut re-opens the same question at selection time, where a wrong answer buys a
   mis-sized port rather than a wrong one.
-  Flagged unsettled in the spec stage's survey record 2026-08-17 rather than adjudicated there;
-  escalated at align on spec-over-precedent; filed 2026-08-18 by close from the gap inbox,
-  whose cited SPEC line number the drain re-verified — the row moved this iteration, content
-  unchanged.
+  Surfaced 2026-08-17 in the spec stage's survey record, flagged unsettled rather than
+  adjudicated there, and escalated at align on spec-over-precedent.
+  Filed 2026-08-18 by close from the gap inbox, whose cited SPEC line number the drain
+  re-verified — the row moved this iteration, content unchanged.
 
 - **launch-chokepoint-liveness-record-write** [design-pending] — nothing refuses a backgrounding
   call that writes no liveness record, so the session invisible to guard rule 14 is the one
@@ -6455,9 +6455,9 @@
   **Cost while deferred:** low. The De-literalization rule is broken on one line of one tool
   whose only consumer is zero-config, so the carry is the standing invitation to copy the
   pattern, not a live wrong write.
-  Filed at build 2026-08-18 under the unconditional capture rule, and kept at the drain on the
-  operator's ruling that a correct application of doctrine is not dropped to save an inbox
-  bullet; promoted 2026-08-18 by close, both spellings re-verified.
+  Surfaced 2026-08-18 at build under the unconditional capture rule, and kept at the drain on
+  the operator's ruling that a correct application of doctrine is not dropped to save an inbox
+  bullet. Filed 2026-08-18 by close, both spellings re-verified.
 
 - **lead-dispatch-simulate-optionality** [design-pending] — the lead's dispatch contract makes
   `--simulate` optional, so the liveness gate wired into it runs only when the lead chooses to
@@ -6545,7 +6545,6 @@
 - **supervisor-verification-attestation** [design-pending] — The verification duty is unattested.
 - **assertion-strength-exit-header-reach** [design-pending] — Wider header reach may be ceremony.
 - **gate-spec-claim-assertion-parity** [design-pending] — Ruled a human-audit class, not gateable.
-- **upgrade-smoke-phase-a-regen-derivation** [design-pending] — A hand-held regen roster; rot-prone.
 - **scope-amendment-authoring-gate** [design-pending] — Scope can do spec's job and stay green.
 - **evidence-journal-hash-chain** [design-pending] — Tamper-evidence wanted only by a hosted rung.
 - **md-section-near-miss-match** [design-pending] — Empty on a near miss; correct on an exact query.
@@ -6560,6 +6559,7 @@
 
 - port-remainder-permanent-shell-inflation
 - waiting-rule-fourth-firing-post-fix
+- upgrade-smoke-phase-a-regen-derivation
 
 ## Lessons Learned
 
