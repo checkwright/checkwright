@@ -6299,6 +6299,113 @@
   was grepped before the absence was asserted and the history attestation read off the survey
   record rather than inferred.
 
+- **stale-identifier-after-retirement** [design-pending] — governed prose citing a deleted path
+  whose capability moved intact to a new holder: a class the close-stage audit roster does not
+  name.
+  Found as a five-instance out-of-class residue — two in queue-kit/SPEC.md and three in live
+  deferred entries, all naming `bin/queue-index.sh` after the port deleted it. **The instances
+  were fixed; the class was not.**
+  **Why both rostered siblings read past it.** It is neither
+  capability-pendency-after-landing — nothing is claimed outstanding — nor
+  capability-liveness-after-descope — nothing was descoped. Both are tense-and-inference classes
+  over a *claim*; here the capability survived and only its holder changed, so the citation is
+  stale in its **subject** rather than in its claim, and no roster line covers that axis.
+  **What makes it different in kind: it is PARTLY GATEABLE.** A backticked path in governed
+  prose either exists on disk or does not, and deciding that infers no intent — the exact ground
+  both existing classes are rostered un-gateable on. The class does not merely widen the roster;
+  it moves an instance out of the human-audit tier.
+  **Three readings, and the choice is real — each costed here rather than left to the unit.**
+  Widen `prose-filename-citation-liveness`, the decisive neighbour, which owns the same dangling
+  -backtick shape but is bounded to bare `<name>.md` filenames and states its own reason for
+  staying narrow (its `AGENTS.md` false positive); or mint a new audit class; or rule it a
+  `check-docs-cmd` widening — and that third arm is dearer than it looks, because assertion A
+  scans **invocation position only** and calls that its deliberate calibration, so the widening
+  reopens a stated design decision rather than extending a corpus.
+  **Attested cost, not estimated:** commit `19098b08` swept for the qualified
+  `bin/queue-index.sh` spelling and missed every bare-basename one, so a hand sweep has already
+  failed at this once.
+  **Cost while deferred:** every retirement that relocates a capability leaves citations no audit
+  line claims, and the failure is silent — the prose reads correct and names a path that is gone.
+  Class: mints a gate name and a roster line on the mint-a-class arm, so canon-kit's litmus makes
+  it a **feature** there; debt only as a widening of a line already carried.
+  Filed 2026-08-17 into the gap inbox by the `post-close-intake-and-index-port` close, from its
+  capability-pendency audit; promoted 2026-08-17 at scope, the disposition landing one iteration
+  after the finding.
+
+- **queue-lib-dead-derivation** [design-pending] — three derivations in `queue-kit/lib/queue.sh`
+  outlived the shell tool that read them, and their only surviving reader is a gate-test.
+  **Re-verified at this scope rather than carried from the bullet, and the premise holds at
+  HEAD.** `QUEUE_ACTIVE_RE`, `QUEUE_DEFERRED_RE` and `QUEUE_ICEBOX_RE` (lib/queue.sh:71-87) are
+  read by nothing but their own definitions and `queue-kit/gate-tests/queue-lib-parity.test.sh`,
+  the shell tool that read them having been deleted by the queue-index port. Their siblings
+  `QUEUE_TASK_RE` and `QUEUE_SECTION_RE` **do** still have live readers —
+  `bin/queue-counts.sh`, `bin/queue-edges.sh`, and `queue_live_slugs`/`queue_roadmap_entries` in
+  the library itself — so this is a **partial** death and a blanket section deletion is wrong.
+  **queue-kit/SPEC.md already rules the three internal**, which is what makes the deletion look
+  safe: §The queue-index arm says the derived regexes "were never a configuration surface, only
+  that library's internal spelling of these knobs".
+  **What is NOT settled, and it is the whole entry:** whether the parity test's reads are
+  load-bearing coverage of a live contract or the last consumers of a dead one. That is
+  `gate-test-in-tree-invoker-ruling`'s predicate asked about a derivation instead of an arm — one
+  unruled question wearing two hats — and this entry deliberately does not pre-empt it.
+  **Cost while deferred:** three dead derivations and a parity arm carried against the port's own
+  dependency-floor objective, and every reader who wonders re-runs the same grep to learn they
+  are dead.
+  Class: deletes internal names and mints none, so canon-kit's litmus makes it **debt**.
+  Filed 2026-08-17 by the `post-close-intake-and-index-port` close into the gap inbox, found by
+  its internal-identifier-restatement audit; promoted 2026-08-17 at scope with the reader set
+  re-probed at HEAD before the claim was carried forward.
+
+- **gate-test-in-tree-invoker-ruling** [design-pending] — nothing rules whether a gate-test counts
+  as an in-tree invoker, and two live governed claims rest on the answer.
+  gate-sdk/SPEC.md §The non-gate arm calls the queue-index arm's extent mode the class's worked
+  instance of a mode whose only caller is a session. `queue-kit/gate-tests/queue-index.test.sh`
+  invokes it, landed in the very commit that authored the prose, off a survey premise recorded at
+  scope before the test existed. The sentence was corrected at the last close to say nothing in
+  tree invokes it **but its own fixture** — true without deciding the general question, and
+  deliberately so.
+  **The corpus does not answer it.** That section's own named-caller set is a regen command, a
+  comparator calling `emit()`, a stage step, and a gate reaching it in process; it lists no test.
+  **Why the answer reaches past one sentence.** §The queue-index arm's refusal to ship a
+  queue-mutating tool rests on the caller being a session, so a fixture counting as a caller needs
+  that refusal's ground restated too. And `queue-lib-dead-derivation` is this same predicate on a
+  derivation rather than an arm, which is why the two are filed as a pair rather than folded.
+  **Cost while deferred:** two governed claims stand on an unruled predicate, and every session
+  meeting a fixture-only caller re-derives the same undecided question — the close that found it
+  escalated rather than picked, for exactly this reason.
+  Class: rules a reading of prose already shipped and mints no name, so canon-kit's litmus makes
+  it **debt**; a feature only if the ruling lands a new declaration.
+  Filed 2026-08-17 into the gap inbox by the `post-close-intake-and-index-port` close, which
+  escalated rather than picked; promoted 2026-08-17 at scope.
+
+- **single-gate-run-config-bridge** [design-pending] — no way to run one gate with its
+  configuration bridged, so a targeted verdict costs the whole battery or a hand-built
+  environment.
+  **Attested from a prompt-friction log rather than theorised.** `run-gates.sh` takes a
+  gates-**dir**, so `--only`, `--help` and a bare gate name all fall through to the positional
+  and fail with `no registry at <arg>/gates.list` — a message that reads as a missing file rather
+  than a rejected argument. The two available options are both bad: run the whole battery, or
+  invoke the binary subcommand directly and hand-export every `GATE_SDK_KNOB_*` the gate reads,
+  which is re-implementing `gate_command`'s bridge at the call site. The close that found it took
+  the second and spent four prompting calls on one env prefix; the same log shows a reach for a
+  nonexistent `gate-sdk/bin/gate.sh`, the shape a session expects to exist.
+  **`kit-bin-entry-point-unrostered` disclaims this, and the disclaimer is incomplete.** It rules
+  `run-gates.sh <gate-name>` "a habit rather than a hole" because the path-scoped selector is
+  owned in prose. That disposition is not reopened for the **name selector** — but its cited
+  remedy, `--for <path>`, is path-keyed and may select several gates, so it cannot exercise a
+  knob change that edits no file. The unowned half is the **configuration bridge**, and no
+  surface carries it.
+  **Deliberately not pre-designed:** an `--only` flag, a separate `bin` tool, or a documented
+  one-liner is a real fork, and the runner's argument grammar is the constraint that decides it.
+  **Cost while deferred:** paid by every session wanting a targeted verdict, and paid worst by
+  the ones that reason about a gate instead of running it — the oracle-first rule losing to
+  ergonomics.
+  Class: a flag or a bin tool mints a governed name, so canon-kit's litmus makes it a **feature**
+  on those two arms and debt only as a documented one-liner.
+  Filed 2026-08-17 by the `post-close-intake-and-index-port` close into the gap inbox, off its
+  own tooling-friction triage; promoted 2026-08-17 at scope, with `--for`'s path-keyed selection
+  read off `run-gates.sh` before the neighbour's disclaimer was called incomplete.
+
 
 ## Icebox
 
