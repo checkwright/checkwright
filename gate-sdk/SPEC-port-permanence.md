@@ -237,6 +237,32 @@ belongs in the **built-in** roster and not behind a `CANON_KIT_COMMENT_*`
 consumer knob: that roster is *the directive names the kits themselves carry*,
 and this one is a gate-sdk kit mechanism.
 
+### 8a. The seam: mechanism ships, the verdicts do not
+
+**The kit ships the field, the reader and the assertion; it ships **no** roster of
+permanent members and no cause text** — **design-bearing**, because the shape most
+likely to cross the seam here is the convenient one.
+
+A kit literal naming *this* tree's three permanently-shell gates would publish one
+project's work queue as everyone's mechanism, which is the defect §The first
+cohort already guards against for the batch arm — *"it is stated generically — no
+gate names, no member roster, no count of any tree's remaining corpus"* — and
+which the `check-graph` rule-content split exists to prevent. The remainder is
+**derived from declarations in the consumer's own tree** at every read, so a
+consumer with no permanent member reads a field that never fires and a consumer
+with ten declares ten.
+
+**The `<cause>` is consumer content by construction.** It is free text pointing
+at whatever surface that consumer records the ruling on; the kit constrains only
+that it be non-empty. Nothing in gate-sdk parses a cause, matches it against a
+vocabulary, or knows what a section reference looks like — which is what keeps
+this field from becoming the coupling-vocabulary shape the seam forbids.
+
+**And no knob is minted.** The field needs none: both readers already resolve the
+declaration path through `gate_resolve` under `gate_kit_roots`, which is the
+configuration this tool and this gate each resolve today, so the delta adds no
+`<KIT>_<KNOB>` and no default to be unset anywhere.
+
 ### 9. The three permanent members declare
 
 `check-install-disposition` and `check-gate-substrate-parity` cite the exception
