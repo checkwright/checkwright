@@ -24,14 +24,8 @@ one: a kit literal carrying a private vocabulary publishes it.
 
 The gates in [`scripts/gates.list`](scripts/gates.list) run on this tree —
 dogfooding is day-one, not optional. Before committing, run the full battery
-and the touched kit's fixture suite:
-
-```bash
-bash gate-sdk/bin/run-gates.sh   # full battery
-```
-
-The per-kit fixture-runner battery lives in [README.md](README.md) §This repo,
-governed.
+(`bash gate-sdk/bin/run-gates.sh`) and the touched kit's fixture suite, whose
+per-kit runner lives in [README.md](README.md) §This repo, governed.
 
 The git index is shared with any concurrent session: check `git status` for a
 foreign staged path before `git add`, or stage and commit in one motion.
@@ -118,10 +112,8 @@ load behind that trigger, so they are not resident here.
 ## Housekeeping
 
 - `.tmp/` is gitignored, purely disposable scratch (gate timings, resume
-  journals, and the `<key>.run` launch-liveness records a session leaves when it
-  backgrounds a shell child — never on the keep-list, since a record outliving
-  the boundary names a producer from the previous iteration), wiped at the scope
-  boundary by `enter-stage.sh`'s boundary reset —
+  journals, and the `<key>.run` launch-liveness records a backgrounding session
+  leaves), wiped at the scope boundary by `enter-stage.sh`'s boundary reset —
   mechanized, not by hand; the keep-list is in `scripts/lifecycle-config.sh`
   (lifecycle-kit/SPEC.md §bin/enter-stage.sh); `.metric/` is gitignored persistent
   measurement trends — **never committed**,
