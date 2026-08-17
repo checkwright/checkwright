@@ -800,6 +800,20 @@ reverses it. Independently, the only available mechanism is the capture-time
 matcher, whose honest limit above runs in the **under-counting** direction, so
 mechanizing on it would dress a known-lossy predicate as a count.
 
+*Prospective only, operator-ruled 2026-08-17, and this is the ruling's own reach
+rather than a narrowing of it.* No session backfills a date onto a judgment an
+earlier session declined to stamp. The trade below is what forecloses it: this
+rule concedes re-derivability and pays with **auditability by inspection**, so a
+date is legible only because the prose it was judged from sits in the same diff —
+and for a past decline the judging session is gone and no contemporaneous prose
+can be put there. A backfilled date would carry neither property, which is
+precisely the artifact this section refuses to ship. The counter-argument is
+recorded rather than buried: refutation two above rests on the declines having
+produced a known-wrong count, and that count stays wrong. A rule change fixes the
+count forward by removing what produced the error; retro-scoring is a different
+act on a worse evidence base. Stated here so the reach is read rather than
+re-derived.
+
 Stamping is **idempotent per (slug, date)** — two filings of one slug on
 one day record one date, the day being the only resolution the bullet's own
 grammar has, and inventing a finer one would claim precision this channel does not

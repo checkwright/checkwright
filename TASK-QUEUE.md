@@ -6276,6 +6276,33 @@
   the claim was asserted and the compression-vs-eviction split checked against the entry it
   would otherwise have contradicted.
 
+- **crate-toolchain-grant-uncommitted** [design-pending] — the crate's toolchain is a commit-time
+  obligation whose permission grant lives only in an uncommitted local overlay, so the standing
+  grant is unreviewable and absent from a fresh clone.
+  `cargo build`, `cargo test` and `cargo clippy` are auto-allowed by
+  `.claude/settings.local.json` and appear nowhere in the committed `settings.json` (115 entries;
+  a live check finds `git rm`, three `gh run` forms and no `cargo`). Meanwhile CLAUDE.md makes
+  `bash gate-sdk/bin/build-native.sh` a commit-time obligation alongside the battery, and
+  `check-crate-arms` runs the crate's lint and test arms, so a session in a fresh clone meets a
+  mandatory toolchain with nothing granting it and pays an out-of-band decision per call.
+  **Why this is filed rather than fixed, and the ground is authority not effort.** Widening the
+  committed allowlist is the **consumer's** call: guard-kit's triage contract lets a session
+  propose a standing grant and prune the overlay, never widen its own auto-allow set
+  (guard-kit/templates/close-triage.md). Proposed at this close and **deferred by operator
+  ruling**, so the deferral is a decision on the record rather than an unfinished step.
+  **The design question, which is why it is not a one-line settings edit.** The overlay's
+  `cargo` grants are bare-command globs, and the shape to reinforce may be narrower — the
+  obligation is discharged through `build-native.sh` and the battery, not by hand-run `cargo`
+  subcommands, so a grant on the *wrappers* may be the correct form and the direct `cargo`
+  entries the habit to steer away from. Deciding that is the triage criterion's job, per member.
+  **Cost while deferred:** the grant works on this machine and nowhere else, so the friction is
+  invisible exactly where it is measured and lands entirely on a first-time clone — the adoption
+  path `demo/run-demo.sh` and `installer/` exist to keep smooth.
+  Class: mints no governed name and lands no gate, so canon-kit's litmus makes it **debt**.
+  Filed 2026-08-17 by close from its own tooling-friction triage; both allowlist sets were read
+  before the absence was asserted, and the overlay was confirmed carrying zero redundant and
+  zero over-broad entries by `compare-settings-allow.sh` at the same triage.
+
 
 ## Icebox
 
@@ -6307,8 +6334,6 @@
 - **scratch-execution-allowlist-bar** [design-pending] — Each close re-derives this standing bar.
 
 ## Done
-
-- recurrence-drain-input-widening
 
 ## Lessons Learned
 
