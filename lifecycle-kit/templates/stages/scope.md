@@ -28,6 +28,25 @@ later stages append. Honest limit: the stamp proves the skill was *invoked*,
 not that the work was done faithfully — it forces deliberate invocation and an
 audit trail, nothing more.
 
+**Second step — take the carried gap bullets, if the entry reported any.** The
+entry admits a boundary whose gap inbox holds bullets the closing stage could
+not have drained, and prints them as an advisory naming them this session's
+intake (lifecycle-kit/SPEC.md §The committed gap inbox owns why it admits rather
+than refuses). Each carried bullet gets **exactly one** disposition — promoted to
+a queue entry, fixed inline this session, or discarded with cause in the commit
+message — after which this session truncates the inbox to its `# contract:`
+header **in the same commit**. That is the drain's own disposition set, run by
+the stage that can now legally run it; no linked-and-skipped middle state, per
+the gap-disposition rule, and deleting a bullet without a disposition is not a
+drain.
+Two properties are obliged rather than suggested. The disposition happens
+**after the stamp**, in-stage — that is the whole point of admitting the entry,
+since a pre-stamp queue write is attributed to a stage that has not started. And
+a promoted entry's provenance sentence carries the **bullet's own date** and
+names the iteration whose close generated it, because the finding's disposition
+lands in this iteration's ledger while the finding belongs to the last one; a
+record that is late and says so is what that trade buys.
+
 ## Session ritual
 
 *<ritual: your scope ritual: index the governing docs before reading them

@@ -18,6 +18,14 @@ silently drop the lead's role suppression mid-session. The rest is purely
 disposable scratch (CLAUDE.md §Housekeeping — persistent trends live in
 `.metric/`), and a resume journal from a closed iteration is dead by definition.
 
+**carried-gap intake** — this repo's binding for the template's carried-bullet
+step; the disposition rule is the template's and is not restated. The inbox is
+`.workflow/gap-inbox.md`. A promoted bullet becomes a `## Deferred` entry in
+`TASK-QUEUE.md`'s grammar (queue-kit/SPEC.md §The tag algebra), costed like any
+deferred entry, and `check-queue-entry-budget`'s per-entry cap binds it — size
+the promotion against the headroom a clean battery prints, not against the
+bullet's length. A discard's cause rides the commit message that truncates.
+
 **ritual** — read `BRIEF.local.md` (local-only brief) and the tracked ruling
 record this survey ranks against, TRAJECTORY.md §The objectives plus
 TRAJECTORY.md §The closed rulings and its sequence directive; **a recorded

@@ -12,56 +12,6 @@
 
 ## New Features
 
-- **close-generated-finding-route** [spec: SPEC-intake-route.md] — the gap inbox is drained
-  **once, at close**, and close is the stage that generates findings by design —
-  the audit sweeps, the lesson disposition, the staleness read, the release
-  disposition. Anything close generates, or that close's own failure generates,
-  necessarily postdates its drain, so a close-generated finding has no drainer
-  inside its own iteration. This is not a filer's timing error to work around; it
-  is untimeable.
-  `bin/file-gap.sh` already warns that a filing made while the cursor sits at the
-  last configured stage may have no stage left to drain it, but it frames that as
-  the filer's problem. The design implication is stronger: the drain-once shape
-  has its blind spot exactly where the lifecycle is most productive of findings,
-  and the sanctioned fallback — the next scope entry refuses until the entering
-  session promotes the bullets itself — silently pushes one iteration's record
-  across the boundary into the next one's.
-  **Evidence it is live rather than theoretical:** this iteration. The drain
-  landed claiming 24 bullets dispositioned; five more findings arrived after it,
-  and close re-drained.
-  **Narrowed 2026-08-17 by `recurrence-drain-input-widening`, which settles the RECURRENCE half
-  and nothing else.** A close-generated finding that *is* a recurrence now has a channel — the
-  session judging it stamps the date directly, that ruling's first ground being this entry's own
-  argument. What stays open is this entry's actual question: a close-generated finding that is
-  **not** a recurrence still has no drainer inside its own iteration.
-  **Why it needed design — three candidates, three different failure modes.** A
-  second drain pass late in close, after its own findings have settled, can loop.
-  A re-arm refusing close's completion while the inbox is non-empty can deadlock
-  close against its own filings. An explicit rule routing close-generated findings
-  straight to the queue or to Lessons, never through the inbox, loses the inbox's
-  one uniform capture channel and reintroduces the mid-iteration index contention
-  the inbox exists to prevent. Picking among them is the work.
-  **PROMOTED 2026-08-17 by operator ruling into `post-close-intake-and-index-port`; the amendment
-  is spec's. RULED: route (a)** — the refusal distinguishes a post-close bullet from a
-  close-skipped one and routes the first into scope's ordinary intake. The operator's other
-  route, refusing capture at `file-gap.sh` once close has run, is **ruled out with its ground**,
-  recorded so the two-route framing is not re-opened: §The committed gap inbox already refuses
-  capture-time refusal, since refusing capture pushes the finding back into session context.
-  **A FOURTH candidate, relayed and NOT ruled** — spec weighs it against the three above.
-  Post-close-ness is *derivable*: the inbox is committed and the drain truncates it, so "has the
-  inbox been truncated since the close stamp commit?" separates the cases with no marker field,
-  leaving §check-gap-inbox-neutrality's two-field bound intact. Probed, not designed.
-  **Folded in by the lead 2026-08-17: the direct-stamp obligation has no discharge a LEAD can
-  reach.** It is *obliged* and attaches to the judgment, while lifecycle-kit/templates/lead.md
-  forbids the lead every queue write — so its only channel is this inbox, which produces the very
-  refusal this entry fixes. `recurrence-obligation-residency` is the *reach* half; this *authority*.
-  **Cost while deferred:** low and non-rotting in tree terms, but it is paid every
-  iteration that closes productively, and it is paid as a **record** defect — the
-  findings survive, in the wrong iteration's ledger.
-  Surfaced 2026-07-31 by the lead, deliberately **not** filed to the inbox on the
-  ground that filing it there would compound the defect it names; drained by close
-  in the same pass as the inbox.
-
 - **queue-index-non-gate-arm-port** [spec: SPEC-index-arm.md] — `queue-kit/bin/queue-index.sh`
   (182 lines) onto the binary's non-gate arm.
   **A cohort under `native-gate-port-remaining-corpus`, not a competing claim on its corpus.**
@@ -6409,6 +6359,7 @@
 
 ## Done
 
+- close-generated-finding-route
 - simulate-recovery-unrelayed
 
 ## Lessons Learned

@@ -688,6 +688,34 @@ around to stay accurate is miscalibrated, and the next filer does not know to
 phrase around it. What all three trade against is prose, which the channel
 already carries and a judge already reads.
 
+**A fourth shape is refused — deriving post-close-ness from git — recorded so it
+is not re-drafted.** The proposal: rather than reading the cursor, ask "has the
+inbox been truncated since the close stamp's commit?", which separates the cases
+with no marker field. It is refused on evidence, on four independent grounds.
+
+- **It is wrong on the case that matters.** The predicate assumes the drain and
+  the closing stamp are commensurable in commit order. Measured over this
+  project's four most recently closed iterations they are not: the truncation is
+  **never** in the stamp's commit and is **always** a later, separately authored
+  one. So "truncated since the close stamp" is true of every normally-closed
+  iteration, and the single case it does distinguish — a close that stamped and
+  then skipped its drain — it answers *close-skipped*, handing the entering
+  session a recovery naming a stage that is gone. The cursor read is right there,
+  because close did run.
+- **It cannot answer the other case at all.** Where close was genuinely skipped
+  there is no close-stamp commit to anchor on, so the git predicate degenerates
+  into "is there a close stamp?" — which is the cursor read, obtained from a file
+  the tool already holds open.
+- **It would be `bin/enter-stage.sh`'s first `git` invocation.** That tool shells
+  out to git nowhere: every decision it takes is a read of the queue and the
+  state file. Adding history-dependence to the state machine's only writer makes
+  the entry decision non-hermetic, and the branch's fixture would have to
+  construct commit history rather than three files.
+- **Its stated virtue does not discriminate.** "Needs no marker field, so
+  §check-gap-inbox-neutrality's two-field bound stays intact" is equally true of
+  the cursor read, which writes nothing anywhere. The bound is untouched by both,
+  so it selects neither.
+
 **The tool writes no queue file, and that is the load-bearing constraint on the
 whole channel.** This inbox exists precisely because a gap surfaced mid-stage has
 no committed place to land except the queue file a stage session is already
@@ -807,11 +835,16 @@ close-surface: .workflow/gap-inbox.md forced=lifecycle-kit/SPEC.md §bin/enter-s
 
 **Producers and consumers.** Producer: any mid-iteration session (lead or stage)
 via `bin/file-gap.sh` — the knob default makes the channel live everywhere the
-kit is vendored. Consumers: the close skill's drain step (§templates/stages/)
-dispositions every bullet — promoted to a deferred `[design-pending]` entry,
-fixed inline that session, or discarded with cause in the close commit message —
-then truncates the inbox to its header; the boundary refusal reads emptiness at
-the next scope entry as the backstop.
+kit is vendored. Consumers, **two**, one per disposition of the boundary check.
+The close skill's drain step (§templates/stages/) dispositions every bullet —
+promoted to a deferred `[design-pending]` entry, fixed inline that session, or
+discarded with cause in the close commit message — then truncates the inbox to
+its header. The **first stage's intake step** (§templates/stages/) takes the
+bullets the boundary carried, with the same disposition set and the same
+truncate-in-the-same-commit rule, run after its stamp; it is reachable at every
+boundary with no enabling config, and it exists because a post-close bullet has
+no drainer in the iteration that filed it. The boundary check reads emptiness at
+the next first-stage entry as the backstop for both.
 
 **A `recurrence:` date records a session's judgment that a finding re-occurred,
 made by reading the bullet's prose. A slug appearing in a bullet is an input to
@@ -832,6 +865,20 @@ to the **judgment**, not to the channel the observation arrived through — the
 failure the counter exists to end is a recurrence *seen and not recorded*, and a
 merely permitted write is one a session under pressure correctly declines, which
 would answer the question in form and leave it open in substance.
+
+**A lead cannot discharge that obligation as written, and the channel already
+supplies what it can.** §templates/lead.md forbids the lead every queue write, so
+a lead that judges a recurrence has exactly one channel — this inbox — and a
+lead's judgment is made at the boundary, which is precisely where the check above
+stands. The discharge is therefore *stated* rather than invented: **a lead
+discharges the obligation by filing the judgment and its grounds into the
+bullet's prose**, and the stamp is made by the session that may write the queue,
+judging from that prose. That is the shape the drain already has — the bullet's
+prose is the grounds the judge reads — so no new authority and no new producer is
+created. What the two dispositions above supply is the route's far end: a
+boundary-filed lead judgment reaches a judge rather than a refusal.
+This settles the **authority** half only; the **reach** half — stages that may
+write the queue but never load this rule — is untouched here.
 
 *Not forbidden*, on three independent grounds. It would strand a class by
 construction: this drain runs once, early in close, while close's own later steps
@@ -1263,6 +1310,18 @@ is the stronger claim this rule was written to earn.
 
 The rest exercise `bin/` tools, which are advisory tooling with no gate to
 dispatch and so have nothing to say about reach.
+
+`gate-tests/gap-inbox-route.test.sh` is one of those, and it is named because it
+closes a hole rather than adding coverage to a covered path: the
+iteration-boundary gap-inbox check had **no fixture at all**, so both its refusal
+and its recovery text were unpinned while being the thing an entering session
+acts on. It drives `bin/enter-stage.sh` against a sandboxed queue, state file and
+inbox — the harness `gate-tests/boundary-scratch-wipe.test.sh` established — and
+pins the branch both ways: the close-skipped case refuses with the drain recovery
+and writes nothing, the post-close case stamps and carries the bullets with its
+advisory, the never-named and no-cursor edges take the post-close branch, and
+`--simulate` reports each branch with its recovery relayed and writes nothing. No
+fixture *pair* is owed: this is a `bin/` tool, not a gate.
 
 ## Per-component contracts
 
