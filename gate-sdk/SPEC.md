@@ -2732,11 +2732,14 @@ one is a design decision with its own reader rather than an omission to fill in.
 
 **The promotion trigger for a fourth item, recorded rather than left to be
 re-argued.** `check-queue-prose-precondition` ported with **one** reader for
-substitution, and took it as a twelve-line private loop over `find` inside its
-own module rather than as a public engine API — `find` reports leftmost-longest,
-which *is* awk's `gsub` match rule, so the loop is: find in the remaining tail,
-append prefix and replacement, advance past the match, and on an empty match
-advance one character. A **second** ported member needing substitution is what
+substitution, and took it as a private loop over `find` inside its own module
+rather than as a public engine API — `find` reports leftmost-longest, which *is*
+awk's `gsub` match rule, so a caller-side loop reproduces `gsub` with no engine
+surface (`replace_all` in `native/src/gates/queue_prose_precondition.rs`, held by
+the differential oracle below). One rule of that loop is owned here rather than
+there, and its `spec:` line cites back: **an empty match advances one
+character** — stated because its failure is a silent infinite loop rather than a
+wrong answer. A **second** ported member needing substitution is what
 promotes that loop into `ere.rs` as its fourth item, with the differential oracle
 below widened to `awk 'gsub(p,r){…}'`. Until then a private loop with one caller
 is cheaper than a public contract with one caller.

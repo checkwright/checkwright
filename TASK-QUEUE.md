@@ -74,10 +74,11 @@
   gate-sdk/SPEC.md §The first cohort; this entry carries only the work owed, so a ground
   stated there is cited here and never restated.
   The count is the roster's, never a fixed number.
-  **`check-roadmap-fresh` owes an emitter design; the label is cohort composition** — relabelled
-  off criterion 7 at build 2026-08-12, ground unchanged. It is canonical, with the whole
-  family's per-member cost derivation, at gate-sdk/SPEC.md §The first cohort. Three candidate
-  designs are stated once by their owner; none is ruled.
+  **`check-roadmap-fresh` is held on cohort composition alone** — relabelled off criterion 7 at
+  build 2026-08-12, ground unchanged. It is canonical, with the whole family's per-member cost
+  derivation, at gate-sdk/SPEC.md §The first cohort. The emitter design it once owed is
+  **answered and its hold retired as spent** (2026-08-16, `freshness-emitter-port-cohort`); what
+  remains owed is the port, held by sequence.
   Worth preserving in the design: the hold keeps `queue_roadmap_entries` on one shell adapter,
   so queue-kit/SPEC.md's "the emitter and the gate can never disagree" guarantee survives intact
   and is **not** part of the dual-implementation debt above.
@@ -2875,6 +2876,15 @@
 
 - **kfric-empty-log-ambiguity** [design-pending] — an empty knowledge-friction log is read as
   no friction, and it is equally consistent with no capture.
+  recurrence: kfric-empty-log-ambiguity 2026-08-17
+  **The 2026-08-17 date is a direct stamp, and its grounds are first-person.** The log read
+  **empty** at this close across a six-session iteration — and the closing session itself
+  re-derived a fact no doc owns (that `git log -S` misses an eviction leaving the slug behind)
+  and did not run `kfric.sh`, filing `queue-recovery-pickaxe-wrong-oracle` instead. The survey
+  record shows scope re-deriving the *same* fact independently earlier in the same iteration.
+  Two events, one fact, zero stamps: stronger than the founding attestation, which had to infer
+  its unstamped event from the prompt log. Stamped directly, out of channel, under the rule this
+  iteration landed as obliged (lifecycle-kit/SPEC.md §The committed gap inbox).
   `.workflow/knowledge-friction.log` read **empty** at the 2026-08-06 close, across an
   iteration that added a Rust module, a build-time source stamp and a new gate. The same
   iteration's prompt-friction log records a build session reading a *deleted* `.gate`
@@ -3911,7 +3921,14 @@
   rule categorically excludes.
   queue-kit/SPEC.md §The icebox tier states that a roadmap-tagged entry is not
   icebox-eligible — a hard rule, not a judgment. The worklist does not read the tag.
-  recurrence: icebox-worklist-roadmap-blind 2026-08-15 2026-08-16
+  recurrence: icebox-worklist-roadmap-blind 2026-08-15 2026-08-16 2026-08-17
+  **The 2026-08-17 date is a direct stamp, and these are its grounds.** Observed at this close's
+  own backlog-eviction step with no bullet and no drain — the channel this same iteration's
+  `recurrence-drain-input-widening` ruled sanctioned *and obliged*, the obligation attaching to
+  the judgment (lifecycle-kit/SPEC.md §The committed gap inbox). Live at this rev,
+  `--icebox-candidates` offered **4 rows, 0 eligible**: three roadmap-tagged, plus
+  `rendered-site-link-monitor` on the named-event clause. What is stamped is this session's
+  own observation, never a re-grading of sessions that declined — that question is open.
   **The advisory defence is raised and settled**, merged in from a duplicate filing. The tool's own
   `spec:` comment says the age filter "only bounds how much close must look at", so this is not a
   correctness defect and is filed rather than fixed in place; but that defence covers the
@@ -3923,33 +3940,27 @@
   print as a stated exclusion. Vanishing is cleaner; printing keeps the reason visible to a close
   that would otherwise wonder where a long-dormant roadmap entry went, and the answer turns on
   whether anything else already tells that story.
-  **The predicate is wider than the tag, established 2026-08-16 and it changes the deliverable.**
-  That close was offered **4** rows, not 3, and the fourth (`rendered-site-link-monitor`) carries
-  no roadmap tag — it is excluded by the tier's *other* categorical clause, a named event waiting
-  to promote it, which the entry states in prose the tool cannot parse. So a roadmap-tag filter
-  alone would have left precision at 1-in-4 rather than fixing it, and the unit must either take
-  both clauses or say why the machine-readable one is worth taking alone.
+  **The predicate is wider than the tag, established 2026-08-16, and it changes the deliverable.**
+  The fourth row (`rendered-site-link-monitor`) carries no roadmap tag: it is excluded by the
+  tier's *other* categorical clause, a named event waiting, stated in prose the tool cannot
+  parse. So a tag-only filter leaves precision at 1-in-4, and the unit takes both clauses or
+  states why the machine-readable one is worth taking alone.
   **Cost while deferred:** low, recurring, and paid by every close — three entries re-read and
   one rule re-derived per iteration, forever, against a one-predicate fix. Re-measured at the
-  2026-08-13, 2026-08-15, 2026-08-16 and 2026-08-17 closes and again at the 2026-08-17 scope:
-  precision has been zero six running.
+  2026-08-13, 2026-08-15, 2026-08-16 and both 2026-08-17 closes and at the 2026-08-17 scope:
+  precision has been zero **seven running**.
   **Deferred 2026-08-16 at scope on the lead's ruling, though the threshold rule reached it, and
-  the ground is substrate rather than merit.** The claim re-verified live at that scope — the
-  worklist offered 4 rows, 3 roadmap-tagged, precision zero a fourth time, and a grep of the
-  tool finds no `roadmap` token in the candidate filter at all. But the fix lands in
-  `queue-kit/bin/queue-index.sh`, a 182-line shell **bin tool**, and the 2026-08-09 priority
-  directive commits to deleting the shell runners as well as the gates
-  (TRAJECTORY.md §PRIORITY DIRECTIVE). A bash predicate patched into it is work the port throws
-  away. What that argues for is bundling: take this defect with the tool's own port to a
-  non-gate arm (gate-sdk/SPEC.md §The non-gate arm), not alone. The 2026-08-14 born-native
-  default does **not** reach it — that default governs gates, and this is a bin tool — so the
-  coupling is to the directive, not to that ruling.
-  **Re-opened 2026-08-17 by the operator, because that bundling ground named no carrier.** It
-  cited `roadmap.sh`'s queued port as precedent for the *shape*, but `roadmap.sh` sits in
-  `freshness-emitter-port-cohort`, whose corpus is the six `check-*-fresh` emitters, and
-  `queue-index.sh` is neither a fresh emitter nor a gate — so it fell outside every filed cohort
-  and this deferral pointed at a carrier that did not exist. `queue-index-non-gate-arm-port` is
-  filed as that carrier; the deferral stands, grounded on it now rather than on a shape.
+  the ground is substrate rather than merit:** the fix lands in `queue-kit/bin/queue-index.sh`, a
+  182-line shell **bin tool** the 2026-08-09 priority directive commits to deleting
+  (TRAJECTORY.md §PRIORITY DIRECTIVE), so a bash predicate patched into it is work the port
+  throws away — take the defect with the tool's own port to a non-gate arm
+  (gate-sdk/SPEC.md §The non-gate arm), not alone. The 2026-08-14 born-native default does
+  **not** reach it: that default governs gates, and this is a bin tool.
+  **Re-opened 2026-08-17 by the operator, because that bundling ground named no carrier**, and
+  re-grounded rather than lifted: `roadmap.sh` was cited only as precedent for the *shape*, but
+  it sits in `freshness-emitter-port-cohort`'s six-emitter corpus while `queue-index.sh` is
+  neither a fresh emitter nor a gate, so it fell outside every filed cohort.
+  `queue-index-non-gate-arm-port` is filed as that carrier; the deferral stands on it now.
   Filed 2026-08-09 by close (`install-profile-seam`) from its own backlog-eviction step;
   a duplicate filing of the same finding (`icebox-candidate-roadmap-filter`, 2026-08-13) was
   merged in here at the 2026-08-13 close, which also filed
@@ -6230,6 +6241,40 @@
   Class: lands as a gate, so canon-kit's litmus makes it a **feature**.
   Filed 2026-08-17 by close from its own audit-roster review; the instance was fixed at this
   close and the absent-gate claim probed against `scripts/gates.list` before it was asserted.
+
+- **queue-recovery-pickaxe-wrong-oracle** [design-pending] — every surface that tells a reader how
+  to recover an evicted queue body names `git log -S`, which is blind to exactly the eviction it
+  documents.
+  **Measured, not reasoned, at this close.** `-S` fires only when a literal's occurrence *count*
+  changes, and an eviction that leaves the slug behind changes none — a `## Done` move to a bare
+  slug line, an icebox one-liner, or any body that spelled its own slug once. Two probes: this
+  iteration's own Done move (`4bea9ceb`) leaves the count at 5 before and 5 after, so `-S` does
+  not list the evicting commit at all and its newest hit is an unrelated earlier commit; and on a
+  real icebox eviction, `-S'scratch-execution-allowlist-bar'` returns 3 commits where `-G`
+  returns 5. `-G` matches diff content and reaches both.
+  **Four surfaces carry the wrong spelling**, which is why this is one unit rather than a typo:
+  this file's `## Icebox` preamble, `queue-entry-evidence-tier`'s body, queue-kit/SPEC.md §The
+  icebox tier, and `check-queue-entry-budget`'s own help text — that last one is a compiled
+  subcommand now, so the fix costs a crate edit and a rebuild rather than a string swap.
+  **It does not re-open `queue-entry-evidence-tier`'s narrowing, and that is deliberate.** That
+  entry ruled recovery solved and signalling the gap, on a 2026-08-02 measurement of the
+  *compression* case — a shrinking body whose slug count does drop, where `-S` genuinely worked.
+  The case that fails is *eviction*. The narrowing stands; only the oracle spelling is wrong.
+  **Re-derived independently twice inside one iteration**, which is the cost showing rather than
+  an argument for it: scope hit it while counting recurrence-stamping commits (the record notes
+  `-S` undercounted and `-G` surfaced nine more), and this close hit it again re-verifying a gap
+  bullet whose own recovery command was the broken one. Neither derivation had a doc to read.
+  **Not started here, per Enforcement-first:** the fix and the gate that catches it land in one
+  unit, and the gate half looks cheap — a literal-pattern check over the governed doc set for a
+  `-S` prescribed as a body-recovery recipe. What is owed is whether that gate earns its slot
+  against a four-line prose fix, which is the design call this entry holds.
+  **Cost while deferred:** a session sent to recover an evicted body runs the documented command,
+  gets a short list that does not contain the evicting commit, and reads the absence as the
+  content never having existed — a silent wrong answer, not a visible failure.
+  Class: mints a governed name and lands a gate, so canon-kit's litmus makes it a **feature**.
+  Filed 2026-08-17 by close, from re-verifying a gap-inbox bullet; both probes were run before
+  the claim was asserted and the compression-vs-eviction split checked against the entry it
+  would otherwise have contradicted.
 
 
 ## Icebox

@@ -96,3 +96,4 @@
 | freshness-emitter-substrate | sc sp a b v c | 12f/5d | 3 · ≤1d | 32s 1✗ | 104 |
 | port-tail-batching-and-cap-relief | sc sp a b v c | 10f/0d | 3 · ≤0d | 24s clean | 104 |
 | keyed-knob-bridge | sc sp a b v c | 5f/0d | 1 · ≤0d | 24s clean | 104 |
+| native-cohort-close-surfaces | sc sp a b v c | 3f/0d | 2 · ≤0d | 24s clean | 104 |
