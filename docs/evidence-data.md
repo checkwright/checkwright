@@ -98,3 +98,4 @@
 | keyed-knob-bridge | sc sp a b v c | 5f/0d | 1 · ≤0d | 24s clean | 104 |
 | native-cohort-close-surfaces | sc sp a b v c | 3f/0d | 2 · ≤0d | 24s clean | 104 |
 | post-close-intake-and-index-port | sc sp a b v c | 4f/0d | 2 · ≤0d | 24s clean | 104 |
+| port-selector-permanence-and-batch | sc sp a b v c | 4f/1d | 3 · ≤0d | 48s 1✗ | 104 |

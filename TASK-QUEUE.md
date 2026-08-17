@@ -19,8 +19,8 @@
 - **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
   — the whole battery onto the binary, and the shell surface down to its residue.
   roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
-  The entry stays deferred rather than moving to `## Done`: it is the **whole corpus**, 33 of
-  104 registered gates remain unported, and a Done move would assert a finished port and
+  The entry stays deferred rather than moving to `## Done`: it is the **whole corpus**, the
+  oracle below still counts gates owed, and a Done move would assert a finished port and
   silently drop it from the **public** roadmap projection, which reads `[roadmap:]` tags off
   live entries.
   **Operator-ruled 2026-08-09: complete the port, ASAP.** The ruling, its grounds and its
@@ -41,7 +41,7 @@
   running** `port-blockers.sh --group`; the size arm ran exhausted for three increments, then
   selected the twelfth cohort, then read exhausted again at this cut, no blocker-retiring
   override surviving the keyed-knob bridge; the budget arm composes a batch only when no group
-  is takeable. **71 of 104 ported**
+  is takeable. **71 of 104 ported; the rest splits into permanently-shell and owed**
   — a dated 2026-08-17 oracle read (`bash gate-sdk/bin/port-blockers.sh --group`'s trailer, which
   `scripts/measured-claims.sh` emits as `ported-gate-members`), never a count this line holds.
   What the eleventh cohort and the budget batches leave owed here is the unported freshness
@@ -53,13 +53,13 @@
   Every held member is **sequencing with port work owed, never exclusion**, and what each owes
   is on `cohort-held-members-port-prerequisites`, which owns the roster and the kits it spans;
   a kit count copied here would be a second one to drift, and was.
-  **Cost while deferred:** large and known — the unported remainder (33 at the dated read
-  above) plus the runners and the install-lifecycle layer; since the 2026-08-14 born-native
-  default (TRAJECTORY.md §The closed rulings) a gate landed meanwhile no longer adds shell to
-  it. Not a single-iteration
-  delta; scope owns the decomposition, and the criterion-relaxation question is closed at
-  gate-sdk/SPEC.md §The port-candidate criteria — an ordering signal, never an eligibility screen.
-  `gate-battery-parallel-execution` and
+  **Cost while deferred:** large and known — the **owed** remainder (the split's third arm in
+  that same oracle read, never the unported count, which the permanent members inflate) plus
+  the runners and the install-lifecycle layer; since the 2026-08-14 born-native default
+  (TRAJECTORY.md §The closed rulings) a gate landed meanwhile no longer adds shell to it. Not
+  a single-iteration delta; scope owns the decomposition, and the criterion-relaxation
+  question is closed at gate-sdk/SPEC.md §The port-candidate criteria — an ordering signal,
+  never an eligibility screen. `gate-battery-parallel-execution` and
   `gate-battery-result-cache` say the port subsumes them: closure candidates as it lands.
   Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
   direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope. Since then it is
@@ -98,6 +98,11 @@
   second channel of the same class — `--reads` could not express a walk's filter — which the
   same increment carried rather than splitting. The retired holds, the refused split and its
   grounds are canonical at gate-sdk/SPEC.md §The first cohort, cited not restated.
+  **It also owes the hold's declarable spelling.** gate-sdk/SPEC.md §The port-candidate
+  criteria designs `# port-until: <slug>` — a second header field holding a class-(b)/(c) hold
+  to a live entry — and refuses to mint it on the closed-roster rule, its only holders being
+  this roster. Until they declare it, `port-blockers --group` counts every held member as
+  owed, so each cut re-adjudicates the holds by hand: the re-buy `# no-port:` ended for three.
   **Cost while deferred:** `native-gate-port-remaining-corpus` ranks the remaining corpus as
   undifferentiated gate-count, so a held member reads as one more unported gate when its
   prerequisite is a sub-project. A later cohort discovers the sizing at implementation
@@ -6316,6 +6321,210 @@
   Filed 2026-08-17 by the `post-close-intake-and-index-port` close into the gap inbox, off its
   own tooling-friction triage; promoted 2026-08-17 at scope, with `--for`'s path-keyed selection
   read off `run-gates.sh` before the neighbour's disclaimer was called incomplete.
+
+- **spec-embedded-source-criterion-4-membership** [design-pending] — whether a diff-reference
+  corpus counts as "scanned as content" for criterion 4 is unsettled by the two sections that
+  would rule it.
+  gate-sdk/SPEC.md's conservation table rules `check-spec-embedded-source` **"survives
+  unchanged — reverse trigger of the same shape"**, reading its `couples=` extension roster as
+  a language list "not a reference to gate declarations" whose "scanned corpus is the canonical
+  specs and amendments". The implementation disagrees in shape:
+  `canon-kit/checks/check-spec-embedded-source.sh:41` builds its candidate set with `gate_find`
+  over every `*.sh`/`*.rs`/… file in the tree and diffs each file's actual line content against
+  every spec's fenced blocks, so every still-shell gate declaration path is inside that set and
+  its content is **read**, not merely triggered on.
+  **Why [design-pending]:** criterion 4 (gate-sdk/SPEC.md §The port-candidate criteria) binds
+  where "a registry member's declaration path lies inside the corpus the gate scans as
+  content", and distinguishes a reverse-trigger couple, never read as content, from a content
+  couple. A **diff-reference** corpus — opened and content-compared, but not the gate's own
+  assertion target — is neither, and neither section's text as written resolves which it joins.
+  The verdict decides whether this gate carries a criterion-4 hold the way `check-tree-terms`
+  does, so it is a port-sizing call rather than a wording one.
+  **Cost while deferred:** low and bounded — nothing in this iteration's batch rested on the
+  verdict, which is why it was filed rather than picked by precedent. The carry is that the
+  next cohort cut re-opens the same question at selection time, where a wrong answer buys a
+  mis-sized port rather than a wrong one.
+  Flagged unsettled in the spec stage's survey record 2026-08-17 rather than adjudicated there;
+  escalated at align on spec-over-precedent; filed 2026-08-18 by close from the gap inbox,
+  whose cited SPEC line number the drain re-verified — the row moved this iteration, content
+  unchanged.
+
+- **launch-chokepoint-liveness-record-write** [design-pending] — nothing refuses a backgrounding
+  call that writes no liveness record, so the session invisible to guard rule 14 is the one
+  that never recorded.
+  **Filed apart from `turn-end-chokepoint-and-wait-primitive` only on the cap.** That entry
+  holds this unit's other open mechanism question and is the right body for a third obligation,
+  but `check-queue-entry-budget` measures it at **0 lines of headroom** — the same displacement
+  that split it off `waiting-rule-fourth-firing-post-fix`, and split
+  `subagent-stop-liveness-hook-wiring` off it.
+  **The residue is exact.** `guard_rule_git_mutation_under_producer` (guard-kit/lib/guard.sh)
+  reaches only a session that RECORDED: it collects the live run records and returns clean on
+  an empty set. A session that backgrounds a producer without writing its `<key>.run` record is
+  invisible to that rule and to the entry preflight alike.
+  **Candidate:** a guard rule firing on the backgrounding call itself, refusing one that writes
+  no record.
+  **Why [design-pending] — REFUSED on an unestablished fact, not on cost.** Two backgrounding
+  forms, and the guard's reach differs. A shell `&` is in the command text every rule already
+  reads, so that arm is buildable today; the harness's background-this form is a TOOL
+  PARAMETER, and whether it reaches the `PreToolUse` payload's `tool_input` is unprobed here.
+  Building only the `&` arm is worse than not building it — every attested firing used the
+  harness form, so it would block the spelling nobody uses and pass the one that fires.
+  **The probe is one command:** one backgrounded Bash call through a guard that records its
+  payload, then read the recorded `tool_input` for the background field. The general reach is
+  already attested — `scripts/agent-dispatch-guard.sh` reads `.tool_input.subagent_type` and
+  `.tool_input.isolation` by jq path — so this is an empirical question about ONE FIELD, not
+  about the mechanism. It is **not** `subagent-stop-liveness-hook-wiring`'s operator-gated
+  probe: it needs no settings change, the `PreToolUse` Bash matcher being already wired, and a
+  later session must not refuse it as the gated one.
+  **Cost while deferred:** low and stated — rule 14's bound stays "only for a session that
+  recorded", so the launch chokepoint is uncovered while the mutation chokepoint is covered.
+  One rule plus decision-table rows if taken.
+  Filed 2026-08-18 by close from the gap inbox; the drain re-verified the rule's reach against
+  its source and measured the target entry's headroom with the gate rather than by hand — the
+  bullet read one line of room where the oracle reports zero.
+
+- **crate-test-env-knob-race** [design-pending] — crate tests set knobs through process-global
+  `std::env::set_var` while cargo runs them on parallel threads in one process, so a
+  knob-setting test can observe a sibling's value.
+  **PROBED, not asserted** (build, batch B): 5 runs at the default parallelism failed 1 of 5;
+  5 runs with `--test-threads=1` failed 0 of 5. The failing member is
+  `emit::queue_index::tests::the_attend_block_caps_and_reports_its_overflow`.
+  **Cause, from the source:** the tests in `native/src/emit/queue_index.rs` set
+  `GATE_SDK_KNOB_QUEUE_KIT_ATTEND_CAP` and its siblings by `std::env::set_var`, so the overflow
+  test — cap 2, expecting `+1 more` — can observe the cap 3 that
+  `the_default_cap_shows_every_lead_line_with_no_overflow_note` or
+  `an_absent_attend_tag_produces_no_block_at_all` just wrote.
+  **The shape is general to every crate test that sets a `GATE_SDK_KNOB_` variable**, so the
+  deliverable is a class fix rather than one test's: serialize the knob-setting tests behind a
+  mutex, or thread the knob through as a parameter instead of the environment.
+  **Why [design-pending]:** which of the two is a call about the knob seam itself. A mutex
+  keeps the environment path under test and buys serialization; a parameter deletes the race
+  but stops exercising the resolution the gate actually runs.
+  **Cost while deferred:** high for its size, and the reason this is not icebox-eligible.
+  `check-crate-arms` is a commit-time obligation and a member of the CI battery, so roughly one
+  full-battery run in five reds on a tree that is correct — which trains sessions to re-run a
+  red battery rather than read it, the precise habit the Oracle-first rule exists to prevent,
+  and costs a full battery re-run each time.
+  Filed 2026-08-18 by close from the gap inbox; the drain re-verified the `set_var` call sites
+  in the named module rather than taking the bullet's prose.
+
+- **threshold-recurrence-routing-residency** [design-pending] — where the threshold-recurrence
+  routing clause lives, now that its only carrier has left the live tree.
+  **The clause, carried here verbatim so it does not spend by attrition:** *"a third threshold
+  recurrence routes to the operator, not to a third decline; two is where lead discretion
+  ends."*
+  **OPERATOR-RULED 2026-08-17: file for scope to decide a permanent home**, rather than leave it
+  in history or move it to TRAJECTORY.md now. It was exercised once in
+  `port-selector-permanence-and-batch` and ruled LIVE AND UNSPENT at the promotion relay, so
+  its disappearance from the live tree would spend it by attrition — the outcome that ruling
+  refused.
+  **Scope owns the real question**, and this entry does not pre-empt it: whether the clause was
+  entry-specific — its subject IS resolved, the enforcement landed as guard-kit rule 14 — or
+  whether "two is where lead discretion ends" is a general threshold-recurrence routing rule
+  that every recurrence-carrying entry inherits.
+  **Two homes were probed and refused at build**, so they are not fresh options. A live queue
+  entry was blocked because `turn-end-chokepoint-and-wait-primitive` measures 0 lines of
+  headroom. TRAJECTORY.md is refused by CLAUDE.md's own scoping sentence, which admits
+  **closed** operator rulings while this one is explicitly open — choosing it means amending
+  that sentence, a governance edit rather than a move. lifecycle-kit's scope contract was
+  refused as envelope-class: it would widen a ruling about this repo's queue into mechanism
+  binding every consumer.
+  **DISTINCT from `waiting-rule-fourth-firing-post-fix`**, which is Done: that entry owned the
+  residency rule's enforcement and got it; this owns where its escalation-routing clause lives,
+  which the Done move is what puts at risk.
+  **Cost while deferred:** low while this entry exists and unbounded without it — the entry IS
+  the carrier, so deferring the *home* decision costs only that a possibly-general rule reads
+  as one parked entry's prose; not filing at all would have cost the clause to git history.
+  Filed 2026-08-18 by close from the gap inbox on the 2026-08-17 operator ruling; the drain
+  re-verified that no permanent surface carries the clause — the only hits were the inbox this
+  drain truncates and the survey record the next first-stage entry truncates.
+
+- **upgrade-smoke-graph-artifact-literal** [design-pending] — the smoke's regen step writes the
+  graph artifact to a literal path, restating a resolution `check-graph` performs for itself.
+  `gate-sdk/bin/upgrade-smoke.sh` runs `check-graph.sh --emit` redirected to a hard-coded
+  `scripts/CHECK-GRAPH.html`, while `gate-sdk/checks/check-graph.sh` resolves that path from
+  `GATE_SDK_GRAPH_ARTIFACT` falling back to the gates dir. Two spellings of one path, and the
+  smoke's is the copy.
+  **Harmless today, and that is the whole of its size:** the scratch consumer the smoke builds
+  is zero-config by construction, so the default always holds. It would silently mis-write
+  under an exported `GATE_SDK_GRAPH_ARTIFACT` or `GATE_SDK_GATES_DIR`.
+  **Why [design-pending]:** the fix is a seam call rather than a repair. Either duplicate the
+  default expression — cheap, and a second copy of the very thing being de-literalized — or
+  expose the resolution from `check-graph` so a caller can ask where the artifact goes, which
+  mints an arm on a gate for one caller.
+  **Cost while deferred:** low. The De-literalization rule is broken on one line of one tool
+  whose only consumer is zero-config, so the carry is the standing invitation to copy the
+  pattern, not a live wrong write.
+  Filed at build 2026-08-18 under the unconditional capture rule, and kept at the drain on the
+  operator's ruling that a correct application of doctrine is not dropped to save an inbox
+  bullet; promoted 2026-08-18 by close, both spellings re-verified.
+
+- **lead-dispatch-simulate-optionality** [design-pending] — the lead's dispatch contract makes
+  `--simulate` optional, so the liveness gate wired into it runs only when the lead chooses to
+  pay for it.
+  **This entry is what survived a corrected premise, and the correction is the point.** It was
+  filed as "detection costs a lead a hand-run gate it must remember to run", off the FOURTH
+  ATTESTED FIRING of the turn-end residency rule (2026-08-17, the first after this iteration
+  shipped its enforcement): validate ended its turn to wait on a background loop, the harness
+  fired a completion notification reading "finished" while the producer was still writing the
+  evidence manifest, and a lead taking that at face value would have dispatched close over a
+  half-written manifest.
+  **The machine held, and the drain established more than the bullet claimed.**
+  `lifecycle-kit/bin/enter-stage.sh` runs `LIFECYCLE_KIT_ENTRY_PREFLIGHT` under `--simulate`
+  too, and `scripts/lifecycle-config.sh` wires `check-producer-liveness` against the scratch
+  directory at **every** stage — widened this iteration. So the bullet's candidate, that the
+  lead's dispatch path run the liveness gate before dispatching stage N+1, is **already
+  satisfied whenever the lead simulates**, and lifecycle-kit/templates/lead.md already states
+  that qualification in prose.
+  **What actually survives is one word.** That template says the lead "dispatches and trusts
+  `enter-stage.sh`'s fail-closed refusal, **or** gates an expensive dispatch cheaply first with
+  `--simulate`". A lead taking the first branch dispatches over a live producer; the stage
+  session's own entry then refuses, one dispatch later.
+  **Why [design-pending]:** making `--simulate` mandatory is an envelope change to a kit
+  template binding every consumer, and it trades a cheap always-run probe against that rule's
+  own stated reason for the optional branch — the lead must not re-derive what the machinery
+  rules on. Whether an always-run `--simulate` is re-derivation or is exactly the machinery is
+  the call.
+  **Cost while deferred:** low, and now honestly low. The harm is a wasted dispatch caught one
+  stage later, not lost evidence — both chokepoints that covered the fourth firing, guard rule
+  14 and the widened preflight, stay live.
+  Filed 2026-08-18 by close from the gap inbox; the drain probed the `--simulate` preflight
+  path and the consumer wiring, which is what narrowed the entry from the bullet's shape to
+  this one.
+
+- **stage-cursor-rerun-stamp-gap** [design-pending] — a stage re-run that skips its stamp leaves
+  the cursor naming an earlier stage, and nothing reds.
+  **Observed in `port-selector-permanence-and-batch` with the battery green.** The iteration's
+  last stamp before close was a `build` stamp, but the re-validate that followed the repair
+  round-trip committed a full 24-suite evidence manifest without stamping — the state file's
+  history shows validate's earlier stamp and no second one, so the cursor pointed backwards
+  across two commits of validate work.
+  **The two readings of "the previous stage" diverge here.** CLAUDE.md declares the cursor "has
+  exactly one source, the last stamp"; `check-stage-entry`'s assertion A tests that the
+  mandatory predecessor's stamp **exists for this iteration**, never that it is the last one.
+  Close was therefore admitted from a `build` cursor — correctly by the gate, wrongly by the
+  doc.
+  **The tree's own practice is that a re-run stamps** — build stamped three times this
+  iteration, once per batch — so this is a discipline the machine does not hold rather than a
+  convention nobody follows.
+  **The missing check class is nameable and buildable**, which is why this files as a task and
+  not a note: for each commit in the iteration, the last stamp at that commit must name the
+  stage its `chore(<stage>):` subject declares. Both halves already exist —
+  `check-commit-subject` parses the subject and the state file is the cursor — so the
+  deliverable is a comparator over the two, not new substrate.
+  **Why [design-pending]:** the honest fix may be the doc rather than the gate. Either the
+  cursor sentence narrows to "the stamp set", or a re-run owes a stamp; that ruling is what
+  decides whether the comparator above is enforcement or ceremony.
+  **DISTINCT from `stage-stamp-ordering-unenforced`**, and explicitly not judged a recurrence of
+  it: that entry's subject is a stamp landing **after** commits already made under it. Here the
+  stamp precedes its own run correctly, and it is a **later run of the same stage** that leaves
+  no mark at all.
+  **Cost while deferred:** low and quiet. Nothing was lost this iteration — the manifest is
+  correct and validate is green — but the cursor is what a lead and `--simulate` both read, so
+  a wrong cursor buys a wrong dispatch, and the failure is silent by construction.
+  Filed 2026-08-18 by close, generated by this session's own entry read rather than drawn from
+  the gap inbox, and dispositioned in the drain that was already open rather than routed into
+  an inbox this same close is about to truncate.
 
 
 ## Icebox
