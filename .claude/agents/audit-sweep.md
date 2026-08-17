@@ -52,12 +52,16 @@ take its completion notification. Not a bare foreground `sleep`, which ends on a
 clock, and not the harness's event-stream form, which stays armed to its deadline
 even after its event fires. A sub-`Agent` is awaited by its completion
 notification and never by a path on disk; a shell child is awaited on the liveness
-record you write at its launch — its PID, one line `pid=<n> run=<key>`, in
-repo-local `.tmp/` in the main checkout, never a temporary worktree, which is
-deleted with it, and never a system temp dir. Loop on that recorded PID's liveness
-(`kill -0 "$pid"`) and never on a pattern, whoever started the producer; leave the
-record behind, because `check-producer-liveness <record>` reads it unchanged and
-that is how whoever arrives after you tells a live orphan from a finished one.
+record you write at its launch — its PID, one line `pid=<n> run=<key>`, in a file
+named `<key>.run` in repo-local `.tmp/` in the main checkout, never a temporary
+worktree, which is deleted with it, and never a system temp dir. Loop on that
+recorded PID's liveness (`kill -0 "$pid"`) and never on a pattern, whoever started
+the producer; leave the record behind, because `check-producer-liveness <record>`
+reads it unchanged — and the `.run` suffix is what lets
+`check-producer-liveness .tmp` read the whole set — and that is how whoever
+arrives after you tells a live orphan from a finished one. Delete it once its
+producer has exited and not before: while it names a live PID the bash guard
+blocks every `git` command that writes the index, the worktree or a ref.
 Stating these
 here as imperatives is sanctioned by delegation-kit/SPEC.md §Operative residency;
 the rule, its reasoning and its mechanics are the **Background + notification,

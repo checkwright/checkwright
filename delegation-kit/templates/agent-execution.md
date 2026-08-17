@@ -63,18 +63,28 @@ drift: do not delete it on sight, and when either rule changes here, propagate.
   looking for it on disk. A **shell child** has no notification channel of its
   own, so it is awaited on an artifact *the session placed*, and that artifact is
   named: **record the child's PID at launch**, one line in the form
-  `pid=<n> run=<key>`, written where the **Resume journal — agent writes, scratch
-  reset sweeps** bullet below sends a journal, repo-local gitignored scratch in
-  the main checkout, on that bullet's stated survivability grounds — widened here
-  from the journal to any artifact a session waits on. That record *is* the wait
-  target: loop on its PID's liveness and the loop ends when the PID stops
-  answering. Write it at the launch, not after, and leave it behind — a
-  completion marker answers *is it done* to a live observer, and the case this
-  rule exists for is the one where the observer is gone, where a liveness record
-  still answers *is it still running* to whoever arrives next. Whoever that is
-  reads it with `check-producer-liveness <record>`, unchanged and already wired
-  (evidence-kit/SPEC.md §check-producer-liveness), which is why the record is in
-  that gate's grammar rather than a shape of your own.
+  `pid=<n> run=<key>`, in a file named **`<key>.run`** — the same `<key>`, so the
+  name carries no field the line does not — written where the **Resume journal —
+  agent writes, scratch reset sweeps** bullet below sends a journal, repo-local
+  gitignored scratch in the main checkout, on that bullet's stated survivability
+  grounds — widened here from the journal to any artifact a session waits on.
+  That record *is* the wait target: loop on its PID's liveness and the loop ends
+  when the PID stops answering. Write it at the launch, not after, and leave it
+  behind — a completion marker answers *is it done* to a live observer, and the
+  case this rule exists for is the one where the observer is gone, where a
+  liveness record still answers *is it still running* to whoever arrives next.
+  Whoever that is reads it with `check-producer-liveness <record>` — or, because
+  the `.run` suffix makes the set a glob rather than a path someone must be told,
+  `check-producer-liveness <scratch-dir>` over all of them at once — unchanged
+  and already wired (evidence-kit/SPEC.md §check-producer-liveness), which is why
+  the record is in that gate's grammar rather than a shape of your own.
+  **Delete the record when its producer is done, and never before.** While one
+  names a live PID, a guard blocks every `git` command that writes the index, the
+  worktree or a ref (guard-kit/SPEC.md §The generic ruleset, rule 14) — a commit
+  taken under a live producer dirties the tree it is measuring and costs that
+  run's whole verdict. Deleting a record whose producer has exited is not a way
+  around the block: it is a statement of fact that has become false being
+  retracted.
   **And never by pattern-matching the process table.** `pgrep -f '<pattern>'`
   matches the waiter's own argv — the harness's wrapper argv matches too — so
   `until ! pgrep -f '<script>'; do …; done` can never go false and never exits,

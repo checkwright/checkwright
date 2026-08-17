@@ -132,7 +132,7 @@ Primitives a consumer guard composes; each emits the harness's
   the string matches a committed allow pattern, with the harness `:*` prefix
   idiom (`Bash(printf:*)` ≡ any `printf …`) normalized to a trailing `*`. Not a
   hook primitive — a shared helper, one implementation behind
-  compare-settings-allow's redundancy detection and rule 16's silent-grant
+  compare-settings-allow's redundancy detection and rule 17's silent-grant
   guard so the two never drift.
 - `guard_skeleton <cmd> <inert-class>…` — the context-aware normalizer, and the
   only place a rule learns what part of a command is live. It returns the command
@@ -151,7 +151,7 @@ Primitives a consumer guard composes; each emits the harness's
 - `guard_split_compound <skeleton>` — the compound splitter: emits one segment
   per line, splitting on the harness's statement separators (`;`, `&&`, `||`,
   `|`). Also not a hook primitive — the single implementation every consumer
-  that reasons *per segment* shares (rules 8/12/15/16/18, the read-compound
+  that reasons *per segment* shares (rules 8/12/14/16/17/19, the read-compound
   carve-out of rules 9/10, and scan-prompts' `allowed()`), so the harness's
   per-segment matching surface is modelled in exactly one place and cannot drift
   between them. Fed a `guard_skeleton` view, so a separator inside a quoted
@@ -185,7 +185,7 @@ stays live, which is the conservative direction. And the normalizer models **quo
 shell semantics**: a construct that survives its scan and is not one of the three
 classes is treated as live, the fail-toward-matching direction and the one a
 guard should err in. That bound is why the command/process-substitution and
-backtick tests in rules 9, 10, 11, 12, 13, 15 and 18 read the **raw** command
+backtick tests in rules 9, 10, 11, 12, 13, 14, 16 and 19 read the **raw** command
 rather than
 a skeleton and must keep doing so — a `"$(…)"` inside double quotes still
 executes, so a rule that declared `dq` inert for *that* test would hand an
@@ -278,16 +278,29 @@ consumer copies.
 
 ## The generic ruleset
 
-Rules that encode **harness or shell-substrate behavior**, never any project's
-toolchain — shipped as `lib/guard.sh` functions the template guard invokes. Order
-is load-bearing where noted.
+Rules that encode **harness behavior, shell-substrate behavior, or behavior over
+an artifact whose grammar a kit owns**, never any project's toolchain — shipped
+as `lib/guard.sh` functions the template guard invokes. Order is load-bearing
+where noted.
 
-**The shell-substrate half of that clause was added for rule 12, and it admits
-nothing a project owns.** A `-f` pattern match seeing the matcher's own argv is a
-property of the shell substrate every consumer of this kit runs on — neither
-harness behavior nor any project's toolchain — so the narrower sentence left it
-in a gap it had no reason to leave. A project's toolchain stays out on the same
-words as before.
+**The clause has taken two widenings, and each is recorded with the rule that
+forced it, because a rule slipped in unremarked is what would rot it.**
+
+- **The shell-substrate half was added for rule 12, and it admits nothing a
+  project owns.** A `-f` pattern match seeing the matcher's own argv is a
+  property of the shell substrate every consumer of this kit runs on — neither
+  harness behavior nor any project's toolchain — so the narrower sentence left
+  it in a gap it had no reason to leave.
+- **The kit-artifact half was added for rule 14, and it takes the same form and
+  passes the same test.** Rule 14 is neither of the two earlier classes as they
+  were written: what it reads is evidence-kit's `pid=<n> run=<key>` record and
+  the OS's process table. It interprets **no project vocabulary at all** — it
+  reads a PID and asks whether it is alive — so the test rule 12's widening had
+  to pass is the test this one passes: **it admits nothing a project owns**. A
+  kit's own artifact grammar is shipped mechanism, which is exactly what
+  CLAUDE.md §The provenance seam distinguishes from private rule content.
+
+A project's toolchain stays out on the same words as before, under both.
 
 **Naming one harness's forms in a corrective costs portability, not privacy, and
 the cost is recorded rather than pre-paid.** Rule 13's block message names a
@@ -377,7 +390,7 @@ that harness exists would be designing against no case.
    so `-e`/`-f` consume their argument and the first bare operand is the script
    — a *second* bare operand is the file that fires the rule. **Placed before
    both auto-allow rules:** a consumer that widens `GUARD_KIT_RO_BINS` with
-   `sed` would otherwise have rule 15 silently grant an in-place rewrite.
+   `sed` would otherwise have rule 16 silently grant an in-place rewrite.
 9. **Listing-only `find`** — a bare `find` that only lists is blocked with
    the steer to the harness's Glob tool (the same shape as rule 8's `sed`
    read-steer: a better tool exists, and Glob returns paths registered for a
@@ -390,7 +403,7 @@ that harness exists would be designing against no case.
    batch of independent listings, exactly what the Glob steer collapses into one
    call. A literal `echo`/`printf` banner segment between them is the natural
    separator of such a batch and is tolerated; at least one segment must be a
-   listing. A piped `find` is a legitimate producer (rule 15 may still
+   listing. A piped `find` is a legitimate producer (rule 16 may still
    auto-allow it), an action-predicate `find` is an executor, a redirected
    `find` has a downstream reader, and a **mixed** compound (a segment that is
    neither a listing nor a banner) all pass untouched. **Placed before both
@@ -447,8 +460,12 @@ that harness exists would be designing against no case.
     corrective names both sanctioned forms: wait on the work's own artifact, or
     `kill -0` against a **recorded PID** where liveness genuinely is the condition
     — whoever started that producer, a child the session backgrounded itself
-    included, whose PID it recorded at launch. That clause is owned by
-    delegation-kit/SPEC.md §The delegation model and this text carries it.
+    included, whose PID it recorded at launch as a `<key>.run` record under its
+    scratch directory. That clause is owned by
+    delegation-kit/SPEC.md §The delegation model and this text carries it, the
+    record's naming convention included — rule 14 reads that same set, so a
+    corrective that named the PID but not where it lives would send a blocked
+    session to write the one artifact shape neither reader can find.
     A PID is an identity; a pattern is a
     guess about a process table that includes the guesser. The refusal of the
     bracket-trick repair as the *sanctioned* form is delegation-kit's ruling and
@@ -464,7 +481,7 @@ that harness exists would be designing against no case.
     read-steer rules and before both auto-allow rules**, on rule 8's stated
     reasoning: `pgrep` is a plausible member of a widened `GUARD_KIT_RO_BINS` — it
     is, after all, a read-only query — and a consumer who added it would otherwise
-    have rule 15 silently bless a waiter that can never exit.
+    have rule 16 silently bless a waiter that can never exit.
 13. **Bare foreground `sleep`** — a `sleep` standing in for a wait is
     **blocked**, and the discriminator is the whole rule: a blanket `sleep` block
     is wrong and is refused. The sanctioned wait *is* a condition loop, and
@@ -481,7 +498,7 @@ that harness exists would be designing against no case.
     or a span the rule cannot attribute — it **declines**, the direction every
     other conservative clause here takes; a `sleep` that is an *argument* rather
     than a command word never fires at all. **Blocks** rather than advises, on
-    rule 16's reasoning: no consumer allowlist is presumed to grant a bare
+    rule 17's reasoning: no consumer allowlist is presumed to grant a bare
     `sleep`, so the rule fires on a command that would be decided out of band
     anyway and converts that decision into a durable steer at no extra cost. *The
     corrective names the property and both forms* rather than one spelling: a wait
@@ -495,14 +512,65 @@ that harness exists would be designing against no case.
     auto-allow rules,** for the same reason: `sleep` is not on the default
     read-only roster, but the placement argument is about what a consumer may add
     and the whole family of steer rules already sits there.
-14. **Auto-allow `: > file` truncation** — a leading `:` plus redirect
+14. **Tracked-tree mutation under a live producer** — a `git` command that
+    writes the index, the worktree or a ref is **blocked** while a `*.run`
+    record under a `GUARD_KIT_SCRATCH_DIRS` member names a live PID. The record
+    is the launch-time liveness record a session writes when it backgrounds a
+    shell child (delegation-kit/SPEC.md §The delegation model owns that rule;
+    evidence-kit/SPEC.md §The producer-liveness lock owns the `pid=<n>
+    run=<key>` grammar and the PID predicate, and neither is re-decided here).
+    **The act set is bounded and named rather than gestured at**: `add`,
+    `commit`, `rm`, `mv`, `restore`, `checkout`, `switch`, `reset`, `stash`,
+    `merge`, `rebase`, `cherry-pick`, `revert`, `apply`, `am`, `clean`.
+    Read-only git — `status`, `log`, `diff`, `show`, `rev-parse`, `ls-files` —
+    passes, and so does every non-`git` command. **`Write`/`Edit` are
+    deliberately outside the rule**: a mutating session's mandated journal write
+    lands through them and the scratch directory is gitignored, so a rule
+    reaching them would refuse the very mechanic the resume-journal contract
+    requires *while a wait is in progress*.
+    **This is the enforcement half of the waiting rule, and it works by
+    relocation.** The turn-end itself passes no chokepoint and stays unreachable
+    (delegation-kit/SPEC.md §Operative residency); the **harm** it causes
+    arrives as an ordinary tool call at a chokepoint already wired, which is
+    what this rule fires on.
+    **Why the block is right even though it over-reaches, stated rather than
+    softened.** A read-only producer takes no harm from a commit, and the record
+    cannot say which kind it is. This ruleset's established direction is to bias
+    toward passing; that direction is **not** taken here, and the ground is that
+    the biased-toward-passing reading is what has failed every time this rule
+    fired. The corrective is cheap and names both exits: **wait for the producer
+    on its own artifact, or delete the record if the producer is done** — and
+    deleting a record whose producer has exited is not a workaround, it is the
+    statement of fact becoming false and being retracted.
+    **Conservative in this ruleset's other established directions**, which are
+    kept: an expansion or substitution anywhere in the command declines outright
+    (rule 6 already blocks those shapes); a record that does not parse declines
+    rather than blocks, because a guard is not the place a corruption verdict is
+    taken and `check-producer-liveness` already exits 2 on one; git's global
+    options are walked so `git -C <dir> commit` is reached, but an option the
+    walk does not recognize declines rather than guess which token is the
+    subcommand; and an unrecognized `git` subcommand declines. Each biases
+    toward passing rather than toward a false block, which is the calibration
+    the previous paragraph departs from **only** on the read-only producer.
+    **Placed with rules 12 and 13, before every auto-allow rule.** It is the
+    third member of the wait-discipline family and inherits their placement
+    argument (`git` is not on the default `GUARD_KIT_RO_BINS` roster, but a
+    consumer that widened it would otherwise have the read-only-pipeline rule
+    silently grant the mutation). **Two collisions make the placement necessary
+    rather than tidy**, and both are with rules that sit *after* the
+    auto-allows: rule 17 would block a chained `git commit` first and hand back
+    *run it bare* — a corrective that is wrong under a live producer and that
+    the session can follow; and rule 18 **advises** on `git commit --amend`, so
+    a rewrite under a live producer would proceed with a re-verification steer
+    instead of stopping.
+15. **Auto-allow `: > file` truncation** — a leading `:` plus redirect
     defeats the permission matcher, so it is always decided out of band. Granted
     silently when the command is *only* `:` followed by redirects and every target is
     gitignored (`git check-ignore`): truncating scratch is safe; a tracked
     file must still take that decision. The `git` subprocess is gated behind the rare
     `:`-redirect match; expansions (rule 6) and brace forms (rule 7) are
     already blocked, so a surviving target is a literal path.
-15. **Auto-allow read-only pipeline** — granted silently when every pipe
+16. **Auto-allow read-only pipeline** — granted silently when every pipe
     segment leads with a roster binary (`GUARD_KIT_RO_BINS`, default the
     grep/head/cat/find/jq family) and every redirect target is `/dev/null`
     or an fd-dup. Declares `sq dq hd`. Conservative by construction:
@@ -530,7 +598,7 @@ that harness exists would be designing against no case.
       least one non-banner roster segment must remain, so a banner-only pipeline
       is not granted.
     - **The lead segment may instead be a bare committed allow entry** — an
-      exact `Bash(<cmd>)` with no glob, on rule 16's own reasoning that a
+      exact `Bash(<cmd>)` with no glob, on rule 17's own reasoning that a
       glob-headed family coexists with allowlisted decorators and would admit
       far more than the reviewed command. The shape this repairs is an
       allowlisted script piped into `head`: the lead is statically allowlisted,
@@ -544,7 +612,7 @@ that harness exists would be designing against no case.
       exactly as it behaves without it. A grant that depends on a settings read
       must never turn a missing settings file into a grant, and declining is the
       only direction that cannot.
-16. **Decorated allowlisted command** — the leading command exactly matches a
+17. **Decorated allowlisted command** — the leading command exactly matches a
     committed **bare** allow entry (a `Bash(<cmd>)` with no `:*`/`*` glob) but
     the command decorates it — `&&`/`;`/`|` chaining, a trailing redirect, or
     `2>&1` — which leaves a segment nothing grants, so the whole call falls off
@@ -564,17 +632,17 @@ that harness exists would be designing against no case.
     allow entry, reusing `guard_allow_match`'s shell-glob semantics. Reads
     `GUARD_KIT_SETTINGS`; **fail-open** — no `jq`, no settings file, or a
     parse error and the rule silently declines and falls through. Placed after
-    the auto-allow rules (14, 15) so a silently granted read-only pipeline never
-    reaches it — which is also **why the allowlisted-lead grant lives in rule 15
+    the auto-allow rules (15, 16) so a silently granted read-only pipeline never
+    reaches it — which is also **why the allowlisted-lead grant lives in rule 16
     and not here**. Grant, not fall-through, is what removes the friction of an
     allowlisted command decorated only by a read-only reduction of its own
     output, and this rule's own text refuses to grant, correctly: granting here
-    would bless segments the allowlist never reviewed. Rule 15 is already the
+    would bless segments the allowlist never reviewed. Rule 16 is already the
     sanctioned place for a grant of exactly that shape and is already ordered
     ahead of this rule, so a granted pipeline never arrives and nothing
     ungranted becomes granted that either half would not have granted alone.
     Declares `sq dq hd`.
-17. **Git history-rewrite advisory** — a `git commit` carrying `--amend`, `-F`,
+18. **Git history-rewrite advisory** — a `git commit` carrying `--amend`, `-F`,
     or `--file`, or a `git reset --soft`, gets a `guard_advise` steer carrying
     the checklist from DOCTRINE.md's *Re-verify volatile state before a git
     history rewrite* rule (verify HEAD before amend/squash; re-stage and verify
@@ -584,20 +652,20 @@ that harness exists would be designing against no case.
     DOCTRINE.md rule is cited by **name**, not number — the doctrine's craft
     rules renumber as it grows, and this ruleset renumbers on its own account
     too — this rule's own number moved when rules 12 and 13 were inserted ahead
-    of it — so a
+    of it, and again when rule 14 was — so a
     doc-qualified number would rot on either renumber and read ambiguously
     against the local numbering. Placed
-    after the auto-allow rules (14, 15) and the decorated-allowlist rule (16),
+    after the auto-allow rules (15, 16) and the decorated-allowlist rule (17),
     so it fires only on a bare rewrite command none of those claimed; a
-    decorated form meets rule 16's block first and the advisory fires on the
+    decorated form meets rule 17's block first and the advisory fires on the
     re-issued bare command.
-18. **Bare `rm` of a tracked path** — an `rm` statement naming a git-tracked
+19. **Bare `rm` of a tracked path** — an `rm` statement naming a git-tracked
     file (`git ls-files --error-unmatch`) is **blocked** with the steer to
     `git rm -q <path>`, which deletes and stages that one deletion in a single
     motion. The deletion is the point: a bare `rm` leaves it unstaged, so it
     lands only via a later `git add -A` — the form the shared-index discipline
     warns against, since it sweeps a concurrent session's foreign path into the
-    commit. Block, not advise, on rule 16's reasoning: no consumer allowlist is
+    commit. Block, not advise, on rule 17's reasoning: no consumer allowlist is
     presumed to grant `rm`, so the rule fires on a command that would be decided
     out of band anyway and converts that decision into a durable steer. Fires per statement
     (`;`/`&&`/`||`/`|` split), so a decorated form steers on the same premise as
@@ -606,7 +674,7 @@ that harness exists would be designing against no case.
     tracked *directory* under `rm -r` does not match `--error-unmatch` — each
     biases toward passing rather than a false steer. An untracked or gitignored
     target never matches, so scratch deletion is untouched.
-19. **Fall-through logging** — anything neither blocked nor auto-allowed is
+20. **Fall-through logging** — anything neither blocked nor auto-allowed is
     appended to the friction log. Always last; never affects the decision.
 
 **Nothing above claims the sleep half was already enforced.** Before rule 13, no
@@ -731,7 +799,7 @@ close-stage audit. A committed pattern subsumes a local entry when the
 local string matches it under shell-glob semantics; the harness `:*` prefix
 idiom (`Bash(printf:*)` ≡ any `printf …`) is normalized to a trailing `*`
 so one glob test covers both forms — the match core is `guard_allow_match`
-in `lib/guard.sh`, shared with rule 16. Read-only — reports candidates, never
+in `lib/guard.sh`, shared with rule 17. Read-only — reports candidates, never
 mutates (the operator prunes). It is the detector, not the policy: a
 non-redundant local entry can still be one-off junk worth pruning by
 judgment.
@@ -901,9 +969,9 @@ repo's layout as defaults):
   consumer's vocabulary, never the kit's (CLAUDE.md §The provenance seam).
 - `GUARD_KIT_RO_SCRIPTS` — array of globs eligible for the
   absolute→relative rewrite (rule 4); default `("check-*.sh")`.
-- `GUARD_KIT_RO_BINS` — read-only pipeline roster (rule 15); default the
+- `GUARD_KIT_RO_BINS` — read-only pipeline roster (rule 16); default the
   grep/head/cat/find/jq family, plus `xargs`, whose membership is qualified by
-  rule 15's discriminator rather than granting on the leads-with test alone.
+  rule 16's discriminator rather than granting on the leads-with test alone.
 - `GUARD_KIT_SCRATCH_DIRS` — gitignored scratch dirs named in the
   rule-3 corrective message; default `(".tmp")`.
 

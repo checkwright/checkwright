@@ -516,6 +516,34 @@ contract, unchanged. Stated here because a reader deciding what they may point
 this gate at reads this section, and because it is what lets that rule add a
 second reader without adding a gate.
 
+**Set mode: a directory argument quantifies that verdict over a whole record
+set.** Pointed at a directory, the gate reads every `*.run` file in it — the
+naming convention delegation-kit/SPEC.md §The delegation model gives the
+launch-time record, which is what makes the set a glob rather than a path a
+reader must be told. The per-record verdict, the exit contract and the PID
+predicate are the ones above and are **not re-decided**; what the mode adds is
+the quantifier. The **aggregation rule is the mode's only new decision**: exit 2
+wins over red wins over green, so one corrupt record is never averaged away by
+nine clean ones. An empty directory is green, the verdict the absent-lock case
+already takes; a directory whose records all name dead PIDs is green; any live
+PID reds, naming **every** blocking record and run key, so a reader waits on the
+set rather than discovering it one entry at a time. Only `*.run` is read — a
+stray file in the same directory is not a record and its unreadability is not
+corruption, which is the whole point of giving the record a suffix.
+
+**The single-path mode is left exactly as it is.** `EVIDENCE_KIT_LOCK_FILE` has
+one path and one writer, and routing it through a directory would be the
+generalization that breaks the case that already works. The two modes are told
+apart by the argument being a directory, not by a flag: the caller already knows
+which it holds.
+
+**The `.run` suffix is deliberately not `.lock`, and the distinction is
+load-bearing rather than cosmetic.** A lock is claimed and released by one owner
+and its absence means *free* — `EVIDENCE_KIT_LOCK_FILE` is one and keeps its
+name. A launch record is a **statement of fact left behind**, and its absence
+means *nothing was recorded*, never *nothing is running*. Two meanings, two
+suffixes.
+
 **It belongs on the entry hook and not in a `gates.list` battery**, and the
 reason is structural rather than a matter of taste. Its subject is a transition —
 *is a producer in flight right now* — where every battery member's subject is
@@ -533,6 +561,13 @@ leg makes reliable: under `kill -0` alone, an unprivileged run reads init as
 dead and the case would silently invert. Everything the pair cannot hold — a
 live PID the test itself owns, the unparseable-lock exit, and the writer-side
 behavior — is covered by `gate-tests/producer-lock.test.sh`.
+
+**Set mode's verdicts are covered there too rather than in the pair, and the
+reason is the runner's shape.** A fixture dir holds exactly one `good/` and one
+`bad/` case, so a mode with four verdicts and an aggregation rule between them
+cannot be expressed as a pair at all; three of the four also need a
+multi-record directory, and the red case needs a live PID the pair could only
+reach as init. The unit test carries all four plus the suffix bound.
 
 ## lifecycle-kit integration
 
@@ -564,14 +599,33 @@ skill's run-validate wiring, not a replacement for it; for a consumer that
 wires it, assertion (A)'s enforcement point moves one step earlier, from
 commit to entry.
 
-`check-producer-liveness` is wired at `close=` **and** `validate=`
-(`<stage>=…/check-producer-liveness.sh <lock-file>`). `close=` is the case the
-gate was filed for — a lead dispatching close into a still-running producer.
-`validate=` is added because this roster is an exact per-stage match, and a
-second validate batch entering while a first batch's `run-validate` is live is
-the same hazard with a worse outcome: two producers folding the same manifest.
-Which keys a consumer wires is config, not asserted kit behavior — a consumer
-whose producer runs at another stage wires its own.
+`check-producer-liveness` is wired at **every** stage key in set mode, each
+entry pointed at the consumer's scratch **directory**
+(`<stage>=…/check-producer-liveness.sh <scratch-dir>`). `close=` is the case the
+gate was filed for — a lead dispatching close into a still-running producer —
+and `validate=` was the second, a second validate batch entering while a first
+batch's `run-validate` is live. **Both were chosen when the subject was one
+producer with one lock.** The subject is now any recorded producer, and any
+stage can leave one: a stage that ended its turn on a backgrounded `gh run
+watch` leaves a record no lock-pointed entry names, so the aim was one path wide
+where the rule was right. The cost of the full roster is one gate invocation per
+stage entry against a directory that is usually empty. Which keys a consumer
+wires is still config, not asserted kit behavior.
+
+**The lock-pointed entries stay beside the set entries rather than being
+replaced by them**, and the reason is the suffix rule above rather than caution.
+Set mode reads `*.run`; `EVIDENCE_KIT_LOCK_FILE` keeps `.lock`, so the
+directory pass **cannot see run-validate's own lock**. Replacing the two entries
+would have traded the coverage the set mode adds for the coverage the lock
+entries already had, which is not the widening this wiring is. A consumer whose
+producer publishes a lock keeps that lock's entry and adds the directory.
+
+**What this wiring is honest about: it detects, and it detects late.** An orphan
+is found at the *next* entry, so the turns between the firing and that entry are
+already spent, and if the firing is the iteration's last stage no entry follows
+it at all. The preventing half is a `PreToolUse` rule over the harm rather than
+the act (guard-kit/SPEC.md §The generic ruleset, rule 14); this entry is the
+backstop behind it.
 
 The **read-only `--simulate` mode inherits this gate with no extra wiring**, and
 that is the highest-value consumer rather than a bookkeeping detail: it runs

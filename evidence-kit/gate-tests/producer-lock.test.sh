@@ -49,6 +49,47 @@ if [[ "$rc" -ne 2 ]]; then
     echo "  FAIL: an unparseable lock must be exit 2, got rc=$rc: $out"; fails=$((fails + 1))
 fi
 
+# B2 — set mode's four verdicts. The gate's fixture pair holds exactly one good
+#      and one bad case, so the quantifier's aggregation rule cannot live there;
+#      three of these four also need a multi-record directory the pair has no
+#      shape for, and one needs a live PID the pair can only reach as init.
+set_dir="$tmp/set"
+mkdir -p "$set_dir"
+out="$(bash "$GATE" "$set_dir" 2>&1)"; rc=$?
+if [[ "$rc" -ne 0 ]] || [[ "$out" != *"no '*.run' record"* ]]; then
+    echo "  FAIL: an empty directory must be green (rc=$rc): $out"; fails=$((fails + 1))
+fi
+
+printf 'pid=2147483646 run=dead-a\n' >"$set_dir/dead-a.run"
+printf 'pid=2147483645 run=dead-b\n' >"$set_dir/dead-b.run"
+out="$(bash "$GATE" "$set_dir" 2>&1)"; rc=$?
+if [[ "$rc" -ne 0 ]] || [[ "$out" != *"none naming a live pid"* ]]; then
+    echo "  FAIL: a directory of dead records must be green (rc=$rc): $out"; fails=$((fails + 1))
+fi
+
+printf 'pid=%s run=owned-set-run\n' "$live" >"$set_dir/owned-set-run.run"
+out="$(bash "$GATE" "$set_dir" 2>&1)"; rc=$?
+if [[ "$rc" -ne 1 ]] || [[ "$out" != *"run key 'owned-set-run' is still running (pid $live)"* ]]; then
+    echo "  FAIL: one live record among dead ones must red and name it (rc=$rc): $out"; fails=$((fails + 1))
+fi
+
+# The aggregation rule: exit 2 wins over red, so a corrupt record is never
+# averaged away by the clean ones beside it — nor by the live one still red here.
+printf 'garbage\n' >"$set_dir/broken.run"
+out="$(bash "$GATE" "$set_dir" 2>&1)"; rc=$?
+if [[ "$rc" -ne 2 ]] || [[ "$out" != *"broken.run carries no readable"* ]]; then
+    echo "  FAIL: an unparseable record must win over red with exit 2 (rc=$rc): $out"; fails=$((fails + 1))
+fi
+
+# A non-'.run' file in the same directory is not a record and is not read: the
+# suffix is what makes the set derivable, so a stray file must not be corruption.
+rm -f "$set_dir/broken.run"
+printf 'garbage\n' >"$set_dir/notes.txt"
+out="$(bash "$GATE" "$set_dir" 2>&1)"; rc=$?
+if [[ "$rc" -ne 1 ]]; then
+    echo "  FAIL: a non-'.run' file must be invisible to set mode (rc=$rc): $out"; fails=$((fails + 1))
+fi
+
 # C — delta 6's headline: the writer refuses to start against a *live* PID,
 #     names the blocking run key, and attempts no reclaim — the lock it found
 #     is still there, untouched, when it exits.
@@ -105,5 +146,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "producer-lock.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "producer-lock.test: ok (live-PID red, unparseable lock exit 2, writer refusal on a live lock, bounded reclaim of a dead one, conditional release)"
+echo "producer-lock.test: ok (live-PID red, unparseable lock exit 2, set mode's four verdicts and its suffix bound, writer refusal on a live lock, bounded reclaim of a dead one, conditional release)"
 exit 0

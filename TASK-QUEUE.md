@@ -12,53 +12,6 @@
 
 ## New Features
 
-- **waiting-rule-fourth-firing-post-fix** [spec: SPEC-wait-enforcement.md]
-  — the residency rule fired again, under its own freshly-strengthened prose.
-  recurrence: waiting-rule-fourth-firing-post-fix 2026-08-06 2026-08-16 2026-08-17
-  **Eighth and ninth firings, 2026-08-17; grounds on `turn-end-chokepoint-and-wait-primitive`.**
-  `dispatched-session-waiting-rule-residency` shipped this iteration. Batch 2 (`a046c06`)
-  landed its residency half into `.claude/agents/stage-session.md` as a bare imperative —
-  never end a turn on work still running, and never end one in order to wait. The **validate**
-  session of this same iteration was then dispatched under that updated definition and did it
-  anyway: it ended its turn with `run-validate` still executing, orphaning the producer. Four
-  consecutive iterations now; the third firing went through a dispatch prompt that named the
-  rule, the fourth through the strengthened agent definition itself.
-  **Not a recurrence — a new defect.** The slug resolves only in `## Done`, and the firing came
-  *after* its fix landed, which the drain rule files as new work rather than a recurrence stamp.
-  **The mechanical half held, and that is the other side of the finding.** The lead ran
-  `check-producer-liveness` rather than guessing, got a live PID, waited in-turn on the lock,
-  and did not dispatch close into a mutating manifest; the `close=` entry preflight would have
-  refused it regardless. The lock ended up absent rather than stale, so conditional release
-  behaved as specified and no work was lost. Enforcement held exactly where a gate existed and
-  failed exactly where only prose did — an enforcement-first result produced by dogfooding.
-  **The operator ruled the prose half on 2026-08-06** — delegation-kit/SPEC.md §Operative
-  residency now states that the rule requests rather than enforces, so the amendment-scope
-  question this entry flagged is settled and no longer part of it.
-  **What survived that ruling was the enforcement question it deliberately did not answer** —
-  given that prose alone does not hold, what does — and `SPEC-wait-enforcement.md` answers it
-  by relocation: the turn-end passes no chokepoint and stays unreachable, while the harm it
-  causes passes one that is already wired. `waiting-rule-carrier-reach` owns which sessions the
-  prose even reaches, and the two firings stamped above are its evidence rather than this
-  entry's.
-  **Cost while deferred:** the project's only evidence that prose-alone enforcement fails is
-  an anecdote spread across six firings' histories, and each further firing costs an orphaned
-  producer plus the lead turn that discovers it.
-  **PROMOTED 2026-08-17 by operator ruling, on the third threshold recurrence.** The clause that
-  routed it there — **a third threshold recurrence routes to the operator, not to a third
-  decline; two is where lead discretion ends** — fired once and **stays live and unspent**, ruled
-  so at that same relay. The operator took promotion over both alternatives put: deferring behind
-  a stated blocker, and retiring the clause. The two prior declines (2026-08-15 and 2026-08-16,
-  both at scope on a lead's ruling, both on *nothing buildable* rather than on merit) are spent
-  by the promotion and live in history.
-  **What the promoted unit is, stated here so it is not re-scoped at authoring:** the enforcement
-  design the 2026-08-06 operator ruling deliberately left unanswered. **Corrected 2026-08-17,
-  staleness fix at align, not a reversal:** the settings probe is no longer the first thing the
-  unit owes. `turn-end-chokepoint-and-wait-primitive`'s first half is now ANSWERED and its
-  remainder relocated — the `SubagentStop`-wiring settings change lives on the unpromoted,
-  operator-gated `subagent-stop-liveness-hook-wiring`, not on this unit. `SPEC-wait-enforcement.md`
-  is what this promoted unit actually builds, and it touches no settings surface.
-  Filed 2026-08-06 by close, recording that iteration's central incident.
-
 ## Technical Debt
 
 ## Deferred
@@ -6397,6 +6350,7 @@
 ## Done
 
 - port-remainder-permanent-shell-inflation
+- waiting-rule-fourth-firing-post-fix
 
 ## Lessons Learned
 

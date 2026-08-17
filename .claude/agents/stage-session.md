@@ -74,12 +74,17 @@ batch-specific pointers such as the journal path.
   harness's event-stream form, which stays armed to its deadline after its event
   fires. An `Agent` you dispatched is awaited by its completion notification and
   never by a path on disk; a shell child is awaited on the liveness record **you
-  write at its launch** — its PID, one line `pid=<n> run=<key>`, in repo-local
-  `.tmp/` in the main checkout, never a temporary worktree and never a system temp
-  dir — and your wait is a loop on that recorded PID's liveness (`kill -0
-  "$pid"`), never a pattern match, whoever started the producer. Leave the record
-  behind when you go: `check-producer-liveness <record>` reads it unchanged, so
-  whoever arrives next can still tell whether your orphan is writing. Write
+  write at its launch** — its PID, one line `pid=<n> run=<key>`, in a file named
+  `<key>.run` in repo-local `.tmp/` in the main checkout, never a temporary
+  worktree and never a system temp dir — and your wait is a loop on that recorded
+  PID's liveness (`kill -0 "$pid"`), never a pattern match, whoever started the
+  producer. Leave the record behind when you go: `check-producer-liveness
+  <record>` reads it unchanged and `check-producer-liveness .tmp` reads the whole
+  set, so whoever arrives next can still tell whether your orphan is writing.
+  **Delete it once its producer has exited, and not before** — while it names a
+  live PID the bash guard blocks every `git` command that writes the index, the
+  worktree or a ref, which is the rule catching the harm a premature commit under
+  a live producer does, not an obstacle to route around. Write
   findings down to your resume journal *before* you act on
   them, never after. Both rules, their reasoning,
   and the mechanics of an in-turn wait live in

@@ -154,6 +154,29 @@ stays evidence-kit's — the predicate, the PID-reuse residual and the refused T
 are ruled in evidence-kit/SPEC.md §The producer-liveness lock and are not
 seconded here. delegation-kit owns *when a session waits and on what*.
 
+**The record's name is a convention, and what the convention buys is a derivable
+set.** It is written as `<scratch-dir>/<key>.run`, carrying the same `pid=<n>
+run=<key>` line — the filename's `<key>` is that record's own `run=` value, not
+a third field. The grammar is untouched; what was missing is not the record's
+shape but its **discoverability**. Without a convention the record's path is
+known only to the session that wrote it and to whoever it happens to tell, so
+the second reader named above — *whoever arrives next*, where the launcher is
+gone — can read a record only by guessing its name. A suffix makes the set a
+glob, and every reader that must ask *is anything still running here* reads the
+set rather than a path: `check-producer-liveness`'s set mode
+(evidence-kit/SPEC.md §check-producer-liveness), the stage-entry preflight
+behind it, and guard-kit rule 14.
+
+**`.run` rather than `.lock`, and the distinction is load-bearing.** A lock is
+claimed and released by one owner and its absence means *free*;
+`EVIDENCE_KIT_LOCK_FILE` is one and keeps its name. A launch record is a
+**statement of fact left behind** — it answers *is it still running* to whoever
+arrives next, a question a dead session's successor can still ask — and its
+absence means *nothing was recorded*, never *nothing is running*. Two meanings,
+two suffixes; and a consumer's scratch reset carries no `*.run` on its keep-list,
+because a record surviving a work-unit boundary names a producer from the
+previous one, which is precisely the stale statement the sweep exists to remove.
+
 **Both affordances are refused, and the refusal's cost is bounded rather than
 denied.** A tool to write the record and a second one to read it are declined: the
 write is a PID captured at launch and the read is a single liveness match, each a
@@ -174,11 +197,46 @@ is no absence a check could have been told to expect. The artifact-side backstop
 stays the one §Operative residency already names — `check-producer-liveness` at a
 stage entry, covering the **concurrent** case, a producer still live when the next
 entry is stamped. Widening what that backstop may be pointed at does not make the
-rule itself checkable. The enforcement-design question — *given that prose alone
-does not hold, what does* — is untouched, and so is the question of which sessions
-the rule reaches. What the naming removes is a different failure: a session that
-**wanted** to comply had no named artifact and was carved out of the only clause
-that fit.
+rule itself checkable. What the naming removes is a different failure: a session
+that **wanted** to comply had no named artifact and was carved out of the only
+clause that fit.
+
+**The enforcement-design question is now answered, and the answer is a
+relocation rather than a reversal.** *Given that prose alone does not hold, what
+does* stood open here while the ruling above — the write is structurally
+uncheckable — stayed true. It still is. What changed is the subject: the
+**harm** a missed wait causes is not the turn-end but a tracked-tree mutation
+under a live producer, and that arrives as an ordinary tool call at a
+`PreToolUse` chokepoint, which is precisely the class §Operative residency says
+the interception axis admits. It is enforced there, as guard-kit rule 14
+(guard-kit/SPEC.md §The generic ruleset). The chokepoint ruling is confirmed by
+this, not weakened.
+
+**The claim ships with its bound, because a claim without one is the failure
+this rule keeps re-earning.** The enforcement holds only for **a session that
+recorded**. The paragraph above rules that the record's write is structurally
+uncheckable — a session that skips the rule writes nothing, so there is no
+absence a check could have been told to expect — so a session that backgrounds
+without recording is invisible to rule 14 and to the entry preflight alike,
+exactly as it is today. This narrows the failure to that residue rather than
+closing it.
+
+**Enforcing the record's *write* at the launch chokepoint is designed, refused,
+and filed** — recorded here so a later session finds a ruling rather than a
+blank. The candidate is a rule firing on the backgrounding call itself and
+refusing one that writes no record, and the two backgrounding forms differ in a
+guard's reach. A shell `&` is in the command text, which every rule in that
+ruleset already reads, so that arm is buildable today. A harness's
+background-this parameter is **tool input, not command text**, and whether it
+reaches the `PreToolUse` payload is an empirical question about one field rather
+than about the mechanism — a guard that reads non-headline `tool_input` fields
+by `jq` path is already an attested shape. **Building only the `&` arm is
+refused as worse than not building it**: every attested firing used the harness
+form, so a rule covering only the shell spelling would block the form nobody
+uses and pass the one that fires — coverage in appearance, an assertion about
+nothing in fact. The probe it waits on is one backgrounded call through a guard
+that records its payload, and that probe needs **no** permission- or hook-surface
+change, because the `PreToolUse` command matcher is already wired.
 
 **The guard interaction that produced it resolves without touching the guard.**
 The attested sequence: a session reached for the correct artifact wait, spelled
@@ -656,8 +714,20 @@ sanction's cost is N carriers a later change must find, and N is discovered by
 grepping the rule's phrasing rather than by consulting the roster — a roster is a
 record of the carriers someone noticed, never a proof of the set.
 
-**No gate is owed, and not for budget.** No check can read a session's choice to
-end a turn — the act leaves no tracked artifact. The anti-restatement gates were
+**No gate is owed *over the act*, and not for budget — but one is now owed over
+its harm, and it exists.** No check can read a session's choice to end a turn:
+the act leaves no tracked artifact and passes no chokepoint, and that ruling
+stands unamended. What the ruling never licensed was stopping there. The harm
+the turn-end causes does pass a chokepoint — a tracked-tree mutation while a
+recorded producer is still writing arrives as an ordinary tool call — and it is
+blocked there by guard-kit rule 14 (guard-kit/SPEC.md §The generic ruleset,
+whose design §The delegation model owns). So the enforcement question this
+section left open is answered **by relocating the subject from the act to its
+consequence**, and the honest bound travels with the answer: it reaches only a
+session that recorded, since the record's write is itself structurally
+uncheckable.
+
+**The anti-restatement gates were**
 checked against a sanctioned restatement rather than assumed inert, since a
 sanction that required weakening a gate would be the wrong sanction:
 `check-shim-restatement` scans binding shims under the skills directory against a
@@ -667,9 +737,15 @@ agent definition is neither its scanned surface nor its corpus, and
 canonical SPEC surface, which reaches no agent definition either. The sanction
 therefore ships with **no gate exemption** — and the honest converse ships with
 it: nothing in the battery would catch a *non*-compliant restatement, so (a)–(c)
-are review-enforced. The nearest buildable oracle detects a *consequence* rather
-than the act — `check-producer-liveness` reads a producer still running at the
-next stage's entry (evidence-kit/SPEC.md §check-producer-liveness).
+are review-enforced. Both buildable oracles detect a *consequence* rather than
+the act, and they sit at different distances from it: guard-kit rule 14
+**prevents** the consequence at the tool call that would cause it, and
+`check-producer-liveness` **detects** a producer still running at the next
+stage's entry (evidence-kit/SPEC.md §check-producer-liveness). The second
+detects late by construction — the turns between the firing and that entry are
+already spent, and a firing at the last stage of an iteration has no entry after
+it — which is what makes it the backstop behind the first rather than a
+substitute for it.
 
 **A case where an oracle *was* buildable now sits beside this one, and the two
 are not each other's contradiction.** The dispatch-shape rules bind acts
@@ -681,6 +757,13 @@ why neither rule gets a *gate* over the tree, and it is not by itself a reason
 to stop looking for an oracle. Recorded here for the same reason §The
 delegation model records the durability rule beside the read-only-fan-out
 caveat: otherwise the next reader re-litigates one of the two paragraphs.
+
+**That last sentence was cashed rather than left standing.** The search it
+licensed found one: the turn-end is still unreachable, but the mutation it
+enables is a `PreToolUse` call, and rule 14 fires there. Recorded because a
+sentence saying *keep looking* is cheap to write and easy to leave un-acted, and
+the next reader should find the outcome beside the licence rather than have to
+reconstruct whether anyone ever looked.
 
 ## Resume journal — agent writes, scratch reset sweeps
 

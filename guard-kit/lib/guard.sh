@@ -219,12 +219,12 @@ guard_skeleton() {
     printf '%s' "$out"
 }
 
-# spec: guard-kit/SPEC.md §The guard framework — one splitter for every consumer that reasons per compound segment (rules 8/12/15/16/18, the read-compound carve-out, scan-prompts), fed a guard_skeleton view so the harness's per-segment boundary set never drifts
+# spec: guard-kit/SPEC.md §The guard framework — one splitter for every consumer that reasons per compound segment (rules 8/12/14/16/17/19, the read-compound carve-out, scan-prompts), fed a guard_skeleton view so the harness's per-segment boundary set never drifts
 guard_split_compound() {
     sed -E 's/\|\||&&|;|\|/\n/g' <<<"$1"
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — the committed Bash(...) allow inners, one per line; the fail-open read rules 15 and 16 share, so a missing jq or settings file emits nothing and every reader declines
+# spec: guard-kit/SPEC.md §The generic ruleset — the committed Bash(...) allow inners, one per line; the fail-open read rules 16 and 17 share, so a missing jq or settings file emits nothing and every reader declines
 _guard_allow_inners() {
     command -v jq >/dev/null 2>&1 || return 0
     [[ -f "$GUARD_KIT_SETTINGS" ]] || return 0
@@ -238,7 +238,7 @@ _guard_allow_inners() {
     done < <(jq -r '.permissions.allow[]?' "$GUARD_KIT_SETTINGS" 2>/dev/null)
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — a segment with its redirects removed and trimmed: what rules 15 and 16 compare against a committed bare allow entry
+# spec: guard-kit/SPEC.md §The generic ruleset — a segment with its redirects removed and trimmed: what rules 16 and 17 compare against a committed bare allow entry
 _guard_segment_core() {
     local seg
     seg="$(sed -E 's/[[:space:]]*[0-9]*(>>?|<)[[:space:]]*(&?[0-9-]+|[^[:space:]]+)?//g' <<<"$1")"
@@ -247,7 +247,7 @@ _guard_segment_core() {
     printf '%s' "$seg"
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — true when the segment exactly matches a committed *bare* allow entry (no glob): the reviewed-lead half of rule 15's predicate and rule 16's lead test
+# spec: guard-kit/SPEC.md §The generic ruleset — true when the segment exactly matches a committed *bare* allow entry (no glob): the reviewed-lead half of rule 16's predicate and rule 17's lead test
 _guard_is_bare_allow() {
     local core bl
     core="$(_guard_segment_core "$1")"
@@ -406,7 +406,7 @@ _guard_is_cat_read() {
     [[ "$operands" == 1 ]]
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 15's xargs discriminator: xargs runs a command rather than filtering text, so the segment is read-only only when the command it runs is itself on the roster
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 16's xargs discriminator: xargs runs a command rather than filtering text, so the segment is read-only only when the command it runs is itself on the roster
 _guard_is_ro_xargs() {
     local seg="${1#"${1%%[![:space:]]*}"}" tok want_arg=0 cmdtok='' b i n
     local -a toks
@@ -570,7 +570,7 @@ guard_rule_pgrep_self_match() {
         pat="$(_guard_pgrep_pattern "$cmdseg")" || continue
         occurrences="$(grep -oF -- "$pat" <<<"$raw" | wc -l)"
         [[ "$occurrences" -ge 2 ]] || continue
-        guard_block "don't wait on process liveness with 'pgrep -f $pat' — '-f' matches full argv, and this command's own argv (the harness's wrapper included) carries that same literal, so the predicate is permanently true and the loop never exits. Nothing reds: the work finishes and the only symptom is the foreground cap absorbing an unbounded wait. Wait on the work's own artifact instead (an evidence file, a lock, an exit marker the work itself writes), or — where liveness genuinely is the condition — 'kill -0 <pid>' against a PID you recorded, whoever started that producer: a child you backgrounded yourself counts, and its PID is the one you recorded at launch. A pattern is a guess about a process table that includes the guesser; a PID is an identity. If you genuinely need pgrep, run it yourself with !<command>."
+        guard_block "don't wait on process liveness with 'pgrep -f $pat' — '-f' matches full argv, and this command's own argv (the harness's wrapper included) carries that same literal, so the predicate is permanently true and the loop never exits. Nothing reds: the work finishes and the only symptom is the foreground cap absorbing an unbounded wait. Wait on the work's own artifact instead (an evidence file, a lock, an exit marker the work itself writes), or — where liveness genuinely is the condition — 'kill -0 <pid>' against a PID you recorded, whoever started that producer: a child you backgrounded yourself counts, and its PID is the one you recorded at launch, one line 'pid=<n> run=<key>' in a '<key>.run' file under your gitignored scratch dir. A pattern is a guess about a process table that includes the guesser; a PID is an identity. If you genuinely need pgrep, run it yourself with !<command>."
     done < <(guard_split_compound "$raw" | tr '&' '\n')
 }
 
@@ -600,6 +600,74 @@ guard_rule_bare_sleep() {
     done
     [[ "$depth" == 0 && "$bare" == 1 ]] || return 0
     guard_block "don't wait by sleeping in the foreground — a wait must end when its condition goes true, not when a duration expires, and a foreground sleep spends a full-price turn doing nothing. Background a command that *exits* on the condition ('run_in_background' wrapping 'until <cond>; do sleep N; done') and take its completion notification: it fires the moment the condition holds and then ends. A dispatched agent is awaited by its own completion notification and never by a path on disk. The harness's event-stream form stays armed to its deadline even after its event fires, so it is the wrong tool for a single completion. A sleep inside a condition loop is untouched — that is the sanctioned form. If you genuinely need the settle, run it yourself with !<command>."
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 14's record reader: the one-line 'pid=<n> run=<key>' grammar is evidence-kit/SPEC.md §The producer-liveness lock's and is read rather than sourced, because a PreToolUse hook cannot depend on a sibling kit being vendored; a record that does not parse yields nothing, so the rule declines on one
+_guard_live_run_records() {
+    local d rec line pid
+    for d in ${GUARD_KIT_SCRATCH_DIRS[@]+"${GUARD_KIT_SCRATCH_DIRS[@]}"}; do
+        [[ -d "$d" ]] || continue
+        for rec in "$d"/*.run; do
+            [[ -f "$rec" ]] || continue
+            IFS= read -r line <"$rec" || continue
+            [[ "$line" =~ ^pid=([1-9][0-9]*)[[:space:]]run=([^[:space:]]+)$ ]] || continue
+            pid="${BASH_REMATCH[1]}"
+            { kill -0 "$pid" 2>/dev/null || ps -p "$pid" >/dev/null 2>&1; } \
+                && printf "'%s' (pid %s, recorded in %s)\n" "${BASH_REMATCH[2]}" "$pid" "$rec"
+        done
+    done
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 14's subcommand walk: git's global options are consumed so 'git -C dir commit' is reached, and any option this list does not recognize returns non-zero so the segment declines rather than guessing which token is the subcommand
+_guard_git_subcommand() {
+    local seg="$1" tok first=1 expect_arg=0
+    for tok in $seg; do
+        if [[ "$first" == 1 ]]; then
+            [[ "$tok" == git ]] || return 1
+            first=0
+            continue
+        fi
+        if [[ "$expect_arg" == 1 ]]; then expect_arg=0; continue; fi
+        case "$tok" in
+            -C | -c | --git-dir | --work-tree | --namespace | --exec-path | --config-env)
+                expect_arg=1 ;;
+            --git-dir=* | --work-tree=* | --namespace=* | --exec-path=* | --config-env=*) ;;
+            -p | -P | --paginate | --no-pager | --bare | --no-replace-objects | \
+                --literal-pathspecs | --no-literal-pathspecs | --glob-pathspecs | \
+                --noglob-pathspecs | --icase-pathspecs | --no-optional-locks) ;;
+            -*) return 1 ;;
+            *) printf '%s' "$tok"; return 0 ;;
+        esac
+    done
+    return 1
+}
+
+guard_rule_git_mutation_under_producer() {
+    local raw="$1" s seg cmdseg sub
+    case "$raw" in *git*) ;; *) return 0 ;; esac
+    grep -qE '\$\(|<\(|>\(|\$\{|\$[A-Za-z_]' <<<"$raw" && return 0
+    case "$raw" in *'`'*) return 0 ;; esac
+    s="$(guard_skeleton "$raw" sq dq hd)"
+    local -a writes=()
+    while IFS= read -r seg; do
+        cmdseg="$(_guard_command_word "$seg")"
+        sub="$(_guard_git_subcommand "$cmdseg")" || continue
+        case "$sub" in
+            add | commit | rm | mv | restore | checkout | switch | reset | stash | \
+                merge | rebase | cherry-pick | revert | apply | am | clean) ;;
+            *) continue ;;
+        esac
+        writes+=("git $sub")
+    done < <(guard_split_compound "$s")
+    [[ "${#writes[@]}" -gt 0 ]] || return 0
+
+    local -a runs=()
+    mapfile -t runs < <(_guard_live_run_records)
+    [[ "${#runs[@]}" -gt 0 ]] || return 0
+
+    local list
+    list="$(printf '%s; ' "${runs[@]}")"
+    guard_block "don't run '${writes[0]}' while a producer you recorded is still running — ${list%; } names a live pid, and a tracked-tree mutation under a live producer is what the wait rule exists to prevent: the run is still writing, so a commit taken now dirties the worktree underneath it and its verdict has to be discarded and re-run. Two exits, both cheap: wait for that producer on its own artifact (loop on the recorded pid's liveness, 'until ! kill -0 <pid> 2>/dev/null; do sleep 5; done', backgrounded so its completion notifies you), or — if the producer has already exited — delete its .run file, which is not a workaround but the statement of fact becoming false and being retracted. Read-only git ('status', 'log', 'diff', 'show') is untouched. If you genuinely need this mutation now, run it yourself with !<command>."
 }
 
 guard_rule_truncate_scratch() {
@@ -655,7 +723,7 @@ guard_rule_ro_pipeline() {
             [[ "$first" == "$b" ]] && { matched=1; break; }
         done
         if [[ "$matched" == 0 ]]; then
-            # spec: guard-kit/SPEC.md §The generic ruleset — rule 15's widened lead: a bare
+            # spec: guard-kit/SPEC.md §The generic ruleset — rule 16's widened lead: a bare
             # committed allow entry qualifies, but only where something decorates it
             [[ "$i" == 0 && "${#segs[@]}" -gt 1 ]] || return 0
             _guard_is_bare_allow "$seg" || return 0
@@ -758,6 +826,7 @@ guard_generic_rules() {
     guard_rule_git_grep "$cmd"
     guard_rule_pgrep_self_match "$cmd"
     guard_rule_bare_sleep "$cmd"
+    guard_rule_git_mutation_under_producer "$cmd"
     guard_rule_truncate_scratch "$cmd"
     guard_rule_ro_pipeline "$cmd"
     guard_rule_allowlist_chain "$cmd"

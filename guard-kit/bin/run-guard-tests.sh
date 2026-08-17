@@ -18,10 +18,15 @@ SANDBOX="$(mktemp -d)"
 trap 'rm -rf "$SANDBOX"' EXIT
 git -C "$SANDBOX" init -q
 printf 'scratch.txt\n.tmp/\nfriction.log\n' >"$SANDBOX/.gitignore"
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 18 splits on tracked vs not, so the sandbox needs one of each
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 19 splits on tracked vs not, so the sandbox needs one of each
 printf 'tracked\n' >"$SANDBOX/tracked.md"
 printf 'scratch\n' >"$SANDBOX/scratch.txt"
 git -C "$SANDBOX" add tracked.md
+
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 14 reads '*.run' records under GUARD_KIT_SCRATCH_DIRS; the table's sandbox carries a dead-PID record and a non-record file beside it, so every mutating-git row below asserts the rule's decline arm rather than the vacuous absence of any record at all. The live arm needs a PID the test owns and lives in gate-tests/git-mutation-under-producer.test.sh.
+mkdir -p "$SANDBOX/.tmp"
+printf 'pid=2147483646 run=dead-producer\n' >"$SANDBOX/.tmp/dead-producer.run"
+printf 'not a record\n' >"$SANDBOX/.tmp/notes.txt"
 
 mkdir -p "$SANDBOX/.claude"
 printf '%s\n' '{ "permissions": { "allow": ["Bash(git status)", "Bash(ls)", "Bash(printf:*)"] } }' \

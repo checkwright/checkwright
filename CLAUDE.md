@@ -118,7 +118,10 @@ load behind that trigger, so they are not resident here.
 ## Housekeeping
 
 - `.tmp/` is gitignored, purely disposable scratch (gate timings, resume
-  journals), wiped at the scope boundary by `enter-stage.sh`'s boundary reset —
+  journals, and the `<key>.run` launch-liveness records a session leaves when it
+  backgrounds a shell child — never on the keep-list, since a record outliving
+  the boundary names a producer from the previous iteration), wiped at the scope
+  boundary by `enter-stage.sh`'s boundary reset —
   mechanized, not by hand; the keep-list is in `scripts/lifecycle-config.sh`
   (lifecycle-kit/SPEC.md §bin/enter-stage.sh); `.metric/` is gitignored persistent
   measurement trends — **never committed**,

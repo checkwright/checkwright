@@ -5,9 +5,16 @@ LIFECYCLE_KIT_BOUNDARY_TRUNCATE=(.workflow/validate-evidence.txt .workflow/relea
 LIFECYCLE_KIT_BOUNDARY_REQUIRE=(.workflow/release-disposition.txt)
 # spec: context-kit/SPEC.md §The session-context hook — the one scratch member this repo carries across the boundary: the marker the hook reads to suppress the delegation nudge for a lead session, whose lifetime is that live session's, not the iteration's
 LIFECYCLE_KIT_BOUNDARY_PRESERVE=(session-role)
-# spec: evidence-kit/SPEC.md §check-producer-liveness — the liveness gate is wired at the entry and nowhere else: `close=` is the filed case, `validate=` stops a second validate batch entering while a first batch's run-validate is live. It is deliberately absent from gates.list — this repo's `gates` suite is the battery run-validate itself invokes, so a registered liveness gate would red every validate run against its own lock.
+# spec: evidence-kit/SPEC.md §check-producer-liveness — the liveness gate is wired at the entry and nowhere else, now in set mode at *every* stage against the scratch directory: the subject is any recorded producer and any stage can leave one (the ninth firing's `gh run watch` had no lock at all), where the two lock-pointed entries were chosen when the subject was one producer with one lock. The cost is one invocation per entry against a usually-empty directory. It is deliberately absent from gates.list — this repo's `gates` suite is the battery run-validate itself invokes, so a registered liveness gate would red every validate run against its own lock.
+# spec: evidence-kit/SPEC.md §check-producer-liveness — the two lock-pointed entries are *kept beside* the set entries rather than replaced by them, and this is a widening with no narrowing inside it: set mode globs `*.run`, and `EVIDENCE_KIT_LOCK_FILE` deliberately keeps the `.lock` suffix (a lock's absence means free; a launch record's means nothing was recorded), so the directory pass cannot see run-validate's own lock and dropping these two would have traded the ninth firing's coverage for the eighth's.
 LIFECYCLE_KIT_ENTRY_PREFLIGHT=(
     'close=evidence-kit/checks/check-evidence-manifest.sh .workflow/validate-evidence.txt'
+    'scope=evidence-kit/checks/check-producer-liveness.sh .tmp'
+    'spec=evidence-kit/checks/check-producer-liveness.sh .tmp'
+    'align=evidence-kit/checks/check-producer-liveness.sh .tmp'
+    'build=evidence-kit/checks/check-producer-liveness.sh .tmp'
+    'validate=evidence-kit/checks/check-producer-liveness.sh .tmp'
+    'close=evidence-kit/checks/check-producer-liveness.sh .tmp'
     'validate=evidence-kit/checks/check-producer-liveness.sh .tmp/run-validate.lock'
     'close=evidence-kit/checks/check-producer-liveness.sh .tmp/run-validate.lock'
 )
