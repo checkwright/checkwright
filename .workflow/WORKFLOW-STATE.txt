@@ -11,3 +11,4 @@ port-selector-permanence-and-batch build acb0a174 2026-08-17
 port-selector-permanence-and-batch build abfd4807 2026-08-17
 port-selector-permanence-and-batch validate aef3130f 2026-08-17
 port-selector-permanence-and-batch build a29a4fab 2026-08-18
+port-selector-permanence-and-batch close a4a07291 2026-08-18
