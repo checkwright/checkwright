@@ -6,8 +6,8 @@ set -uo pipefail
 REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 cd "$REPO_ROOT" 2>/dev/null || exit 0
 
-# spec: context-kit/SPEC.md §The session-context hook — consumer layout: vendored kit tools + governed queue file, retarget to yours [EDIT ME]
-QUEUE_INDEX="queue-kit/bin/queue-index.sh"
+# spec: context-kit/SPEC.md §The session-context hook — consumer layout: vendored kit tools + governed queue file, retarget to yours [EDIT ME]. The queue index is reached through the battery runner's --emit front-end rather than by tool path: the front-end sources the shell library and supplies the bridged environment, so a consumer's section and cap overrides reach the arm (gate-sdk/SPEC.md §The non-gate arm).
+RUN_GATES="gate-sdk/bin/run-gates.sh"
 CTX_BIN="context-kit/bin"
 DRIFT_REPORT="${CONTEXT_KIT_DRIFT_REPORT:-}"
 STAGE_RULES="${CONTEXT_KIT_STAGE_RULES:-}"
@@ -22,11 +22,11 @@ stage=""
 if [[ -f "$STATE_FILE" ]]; then
     stage="$(awk '/^---[[:space:]]*$/ { f = 1; next } f && NF { l = $2 } END { print l }' "$STATE_FILE" 2>/dev/null)"
 fi
-if [[ -f "$QUEUE_INDEX" ]]; then
+if [[ -f "$RUN_GATES" ]]; then
     if [[ "$stage" == close || "$stage" == scope ]]; then
-        bash "$QUEUE_INDEX" 2>/dev/null || echo "(queue-index unavailable)"
+        bash "$RUN_GATES" --emit queue-index 2>/dev/null || echo "(queue-index unavailable)"
     else
-        bash "$QUEUE_INDEX" --collapse-deferred 2>/dev/null || echo "(queue-index unavailable)"
+        bash "$RUN_GATES" --emit queue-index --collapse-deferred 2>/dev/null || echo "(queue-index unavailable)"
     fi
     echo
 fi

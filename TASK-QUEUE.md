@@ -12,54 +12,6 @@
 
 ## New Features
 
-- **queue-index-non-gate-arm-port** [spec: SPEC-index-arm.md] — `queue-kit/bin/queue-index.sh`
-  (182 lines) onto the binary's non-gate arm.
-  **A cohort under `native-gate-port-remaining-corpus`, not a competing claim on its corpus.**
-  That umbrella already covers this by its own words — "the whole battery onto the binary, **and
-  the shell surface down to its residue**" — so nothing here widens the port's scope. What did not
-  exist is a cohort at the granularity a bundling ground can name, which is the whole reason this
-  entry is filed rather than the umbrella cited.
-  **Why it fell through every filed cohort.** Cohort membership so far runs off the *gate* corpus
-  (`port-blockers.sh --group` scans registered members) or off a named family
-  (`freshness-emitter-port-cohort`'s six `check-*-fresh` emitters). `queue-index.sh` is neither: it
-  is a tool, not a gate — its own header says so, and it carries no `# graph:` manifest — and it
-  emits no freshness projection. So it is reachable by no selector the port currently runs, which
-  is a gap in the *selection* machinery as much as in the roster.
-  **The shape is already ruled, so this applies a decision rather than taking one:** a ported
-  non-gate tool becomes a non-gate arm of the binary (gate-sdk/SPEC.md §The non-gate arm), the
-  form `freshness-emitter-port-cohort` records as answered and merged.
-  **Why it needed design even so — the caller set is the open half, not a gate's.**
-  Its callers are a session-context hook (`context-kit/templates/session-context.sh`,
-  `scripts/session-context.sh`, `context-kit/bin/always-loaded.sh`) and
-  the close skill. A ported emitter could be called in-process by its already-compiled comparator;
-  this one has no gate consumer at all, so the port must decide what each caller invokes and
-  whether the hook's own shell survives it under TRAJECTORY.md objective 6.
-  **What lands with it, and what does not.** `icebox-worklist-roadmap-blind` re-grounds its
-  deferral on this entry, so its predicate rides this port; its *presentation* half — whether an
-  excluded row vanishes or prints as a stated exclusion — stays that entry's to decide, and this
-  one must not pre-empt it.
-  **PROMOTED 2026-08-17 by operator ruling as this iteration's port increment, into
-  `post-close-intake-and-index-port`. The amendment is spec's.** It carries the PRIORITY
-  DIRECTIVE's port cadence and discharges
-  `icebox-worklist-roadmap-blind`'s carrier in one unit — that entry stands at three recurrence
-  dates, the highest live count in the pool, and its predicate rides this port.
-  **ENTRY WARNING for the stage that authors this, so no entry discovers it late:** the caller
-  set spans queue-kit, `native/` and context-kit, so the amendment covers ≥2 component dirs and
-  `check-stage-entry` assertion C will demand the audit-stage stamp (or a user-ruled waiver) at
-  the entry *after* spec. Re-sized 2026-08-17 at scope: 182 lines, zero `# graph:` manifests,
-  callers re-verified at spec as `context-kit/templates/session-context.sh`,
-  `scripts/session-context.sh`, `context-kit/bin/always-loaded.sh` and the close skill;
-  `queue-counts.sh` cites this tool and never calls it — a caller-set correction made at spec.
-  queue-kit/SPEC.md §check-queue-entry-budget already refused a
-  `--headroom` mode here on the ground that it "grows a shell tool this repo's port track
-  retires", so the SPEC anticipates this unit by name.
-  **Cost while deferred:** one 182-line shell tool stays in the dependency floor against
-  TRAJECTORY.md objectives 1 and 6, on the session-context hook path where every session pays it;
-  and `icebox-worklist-roadmap-blind` stays deferred behind it at a measured zero precision per
-  close.
-  Filed 2026-08-17 at scope on the operator's ruling, dispositioning a carrier gap this scope's
-  own survey found (`.workflow/survey-record.md`, the port-increment block of that date).
-
 ## Technical Debt
 
 ## Deferred
@@ -1050,8 +1002,8 @@
   Surfaced 2026-07-31, operator-directed across three gap-inbox bullets; drained
   and merged into one unit by close.
 
-- **queue-index-blocked-by-assertions** [design-pending] — coverage hole in
-  `queue-kit/gate-tests/queue-index.test.sh`, pre-existing: the blocked-by tag's
+- **queue-index-blocked-by-assertions** [design-pending] — coverage hole in the queue-index
+  rendering tests, pre-existing: the blocked-by tag's
   re-echo and the ready/blocked marker (bullet vs cross) are asserted nowhere,
   although the sibling drain-exempt echo is. Surfaced while fixing the title
   rendering this iteration, because that fix restructured the very expression
@@ -1062,9 +1014,19 @@
   rendered byte-identically before and after the fix apart from the intended
   separator change. But the assertion that would have caught a regression does not
   exist, and the marker derivation is likewise unasserted.
-  **Cost while deferred:** low and non-rotting — two `want()` lines close it — and
+  **Cost while deferred:** low and non-rotting — two assertions close it — and
   the residue is only that a future edit to the title-and-tag concatenation can
   regress the echo silently.
+  **The fix location moved 2026-08-17 with `queue-index-non-gate-arm-port`,** which shrank
+  `queue-kit/gate-tests/queue-index.test.sh` to front-end/bridge assertions and moved rendering
+  coverage into the ported module's own `#[cfg(test)]` tests. A session taking this entry adds its
+  assertions in the crate, not the shell fixture.
+  **Both assertions were then landed incidentally by that same port** — the moved rendering tests
+  pin a blocked entry's whole rendered row, cross marker and re-echoed blocker slug together, which
+  is the marker derivation and the echo at once. The build session that landed them did not
+  disposition this entry: closing a deferred entry is not a build stage's call on a unit outside
+  its own. **Owed:**
+  a close or scope read of whether anything here survives that coverage.
   Surfaced 2026-07-31 at build; not folded into the fix commit because the unit's
   commit had already landed under a HEAD moved by a concurrent session, so landing
   it meant either a second commit on a closed unit or a rewrite of shared history.
@@ -3894,9 +3856,9 @@
   bullet itself gives: the record is boundary-truncated, so the finding would be erased at the
   next scope boundary.
 
-- **icebox-worklist-roadmap-blind** [design-pending] — `queue-index.sh --icebox-candidates`
-  filters on age and cost class only, so it offers candidates the icebox tier's own eligibility
-  rule categorically excludes.
+- **icebox-worklist-roadmap-blind** [design-pending] — the `queue-index` arm's
+  `--icebox-candidates` filters on age and cost class only, so it offers candidates the icebox
+  tier's own eligibility rule categorically excludes.
   queue-kit/SPEC.md §The icebox tier states that a roadmap-tagged entry is not
   icebox-eligible — a hard rule, not a judgment. The worklist does not read the tag.
   recurrence: icebox-worklist-roadmap-blind 2026-08-15 2026-08-16 2026-08-17
@@ -3928,17 +3890,17 @@
   2026-08-13, 2026-08-15, 2026-08-16 and both 2026-08-17 closes and at the 2026-08-17 scope:
   precision has been zero **seven running**.
   **Deferred 2026-08-16 at scope on the lead's ruling, though the threshold rule reached it, and
-  the ground is substrate rather than merit:** the fix lands in `queue-kit/bin/queue-index.sh`, a
-  182-line shell **bin tool** the 2026-08-09 priority directive commits to deleting
-  (TRAJECTORY.md §PRIORITY DIRECTIVE), so a bash predicate patched into it is work the port
-  throws away — take the defect with the tool's own port to a non-gate arm
-  (gate-sdk/SPEC.md §The non-gate arm), not alone. The 2026-08-14 born-native default does
-  **not** reach it: that default governs gates, and this is a bin tool.
-  **Re-opened 2026-08-17 by the operator, because that bundling ground named no carrier**, and
-  re-grounded rather than lifted: `roadmap.sh` was cited only as precedent for the *shape*, but
-  it sits in `freshness-emitter-port-cohort`'s six-emitter corpus while `queue-index.sh` is
-  neither a fresh emitter nor a gate, so it fell outside every filed cohort.
-  `queue-index-non-gate-arm-port` is filed as that carrier; the deferral stands on it now.
+  the ground was substrate rather than merit:** the fix landed in a 182-line shell **bin tool** the
+  2026-08-09 priority directive commits to deleting (TRAJECTORY.md §PRIORITY DIRECTIVE), so a bash
+  predicate patched into it was work the port throws away. **That ground is now spent: the port
+  landed in `post-close-intake-and-index-port`**, the tool is a compiled non-gate arm
+  (queue-kit/SPEC.md §The queue-index arm), and a predicate written there is not thrown away.
+  **What did NOT ride the port, operator-ruled NARROW 2026-08-17:** the port is
+  behaviour-preserving — no filter added, no row dropped, no exclusion printed — so this entry's
+  predicate did not travel with it and the port decided nothing here. The port **re-grounds** this
+  deferral rather than carrying its predicate. What holds it deferred now is the open half alone:
+  presentation, plus the two-clause predicate above — and a tag-only filter would leave 1 row and
+  still 0 eligible, so a partial predicate would move the measured number not at all.
   Filed 2026-08-09 by close (`install-profile-seam`) from its own backlog-eviction step;
   a duplicate filing of the same finding (`icebox-candidate-roadmap-filter`, 2026-08-13) was
   merged in here at the 2026-08-13 close, which also filed
@@ -6360,6 +6322,7 @@
 ## Done
 
 - close-generated-finding-route
+- queue-index-non-gate-arm-port
 - simulate-recovery-unrelayed
 
 ## Lessons Learned

@@ -354,7 +354,7 @@ kit. Self-citation is already narration rather than an edge (above), so the fiel
 costs no new rule. That one-grep property is also why **no `bin/queue-index.sh`
 recurrence mode exists** — the obvious home, refused: drift-kit could not call it
 without the cycle its own KPI already records, which would leave lifecycle-kit's
-rule as the only caller, and §bin/queue-index.sh already resists a further mode on
+rule as the only caller, and §The queue-index arm already resists a further mode on
 the grounds that folding jobs together gives one tool two output grammars.
 
 **One line with appended dates, not one line per recurrence.** The per-recurrence
@@ -396,7 +396,7 @@ close-surface: TASK-QUEUE.md#Lessons-Learned forced=lifecycle-kit/SPEC.md §bin/
 - `[attend]` — fixed spelling, kit mechanism (the inbound channel): the filing
   session marks a lesson as a live attention point for later sessions *of the
   same iteration*. `queue-index.sh` emits an attention block of `[attend]`
-  lead lines (§bin/queue-index.sh); the injection dies at the iteration
+  lead lines (§The queue-index arm); the injection dies at the iteration
   boundary because lifecycle-kit's first-stage entry refuses a non-empty
   Lessons section.
 - **Harvest tags** — `QUEUE_KIT_LESSON_TAGS` (array of bare tag names, default
@@ -595,7 +595,45 @@ sink value tracked in `queue-config.sh` would itself be the leak, so it lands
 in the gitignored overlay instead. The overlay is optional — its absence is
 fail-open, not an error.
 
-### bin/queue-index.sh
+### The queue-index arm
+
+A **non-gate arm of the binary** (gate-sdk/SPEC.md §The non-gate arm), reached
+through the battery runner's `--emit` front-end:
+`run-gates.sh --emit queue-index [<flags>] [<queue-file>]`. It registers in the
+emitter table under the derived spelling `--emit-queue-index`, stays outside
+`--list`, and owes no `.gate` descriptor, no `gates.list` registration and no
+`good/`+`bad/` fixture pair. The shell tool it replaces is deleted rather than
+retained as a dispatching shim: a shim keeps the interpreted lines the port
+exists to retire and adds a second entry point into the emission path, which the
+class forbids.
+
+**The front-end is not optional dressing.** A caller that invoked the binary
+directly would resolve platform defaults and silently ignore every consumer
+override; the front-end sources the shell library and supplies the bridged
+environment in front of the arm. This is the class's most configured member —
+its bridged reads are `QUEUE_KIT_QUEUE_FILE`, `QUEUE_KIT_ACTIVE_SECTIONS`,
+`QUEUE_KIT_DEFERRED_SECTION`, `QUEUE_KIT_ICEBOX_SECTION`, `QUEUE_KIT_ATTEND_CAP`
+and `QUEUE_KIT_ICEBOX_AGE_DAYS` — which is also why it is a table member rather
+than a hardcoded top-level flag: a hardcoded flag receives no configuration at
+all, and an arm that cannot see the icebox knob silently drops the tally in every
+consumer that configures a tier. The derived regexes the shell library built
+(`QUEUE_ACTIVE_RE` and its siblings) were never a configuration surface, only
+that library's internal spelling of these knobs, so they do not survive and
+nothing is lost with them.
+
+**The three modes stay three modes on one arm**, selected from the arm's own
+argv tail — the emitter type is defined over an argv slice precisely so a mode
+rides as a flag rather than needing a second arm. The refusal to grow a *fourth*
+mode is unchanged, and so are the three grammars: they are the contract this port
+preserves.
+
+**One observable moved, and it is stated rather than absorbed.** A `--extent`
+slug that resolves to nothing reported `queue-index: slug not found: <slug>` at
+exit 1 and now reports the arm's error at exit **2**, because the emitter type
+returns a `Result` and the dispatcher maps every error arm to 2. Preserving the
+old code would mean widening the class's return contract for one mode's error
+path; no caller reads it — `extent`'s caller is a session reading two integers —
+so the widening is not taken. Every mode's **stdout** grammar is byte-preserved.
 
 Compact surface of the queue for task selection — the iteration header line
 if present, then every top-level active entry as a one-line title plus tags,
@@ -616,7 +654,7 @@ entries under no subsection tallied as `(top)`.
 A configured icebox contributes exactly **one line** to the index —
 `<section>: N entries` — and never an entry listing, on **both** `index`-mode
 renderings (`--collapse-deferred` is a flag within that mode, not a mode of its
-own; the tool's modes are `index`, `extent`, and `icebox-candidates`). The
+own; the arm's modes are `index`, `extent`, and `icebox-candidates`). The
 tally must not reach `extent`, whose contract is two integers and nothing else.
 The reasoning is the surface's: this output is embedded in the always-loaded
 session-context brief, so listing the tier would re-import the very tokens the
@@ -652,10 +690,16 @@ always-loaded through the session-context hook that embeds this output, so the
 cap is its token budget. This is the inbound lesson channel reaching every
 later session of the iteration with zero consumer-hook edits.
 
+The age cutoff keeps its `date -d` derivation rather than moving to an in-crate
+civil-date computation, and the reason is behaviour preservation: `date` resolves
+the operator's local zone where an in-crate computation would resolve UTC, and a
+port that shifts the cutoff by a day is not the behaviour-preserving port this
+was. Its refusal on a `date` without `-d` survives with it.
+
 This is a *task-selection* surface, walking bullet lead lines. Its sibling
 `bin/queue-edges.sh` walks entry **bodies** to aggregate citations — a
 different question over the same file (§bin/queue-edges.sh). They stay two
-tools rather than one tool with a fourth mode, because folding them would give
+tools rather than one with a fourth mode, because folding them would give
 one tool two jobs and two output grammars.
 
 ### bin/queue-counts.sh
@@ -674,13 +718,13 @@ section name, which is what keeps the vocabulary inside this kit when a caller
 outside it renders the numbers.
 
 The counted unit is the **top-level entry bullet** — the same unit
-§bin/queue-index.sh lists, so the index and the counters cannot report different
+§The queue-index arm lists, so the index and the counters cannot report different
 sizes for one queue. Not lines, and not bullets: an indented bullet inside an
 entry body is body.
 
 **Why a second tool rather than a fourth mode on `bin/queue-index.sh`.** That
 tool's modes are fixed at `index`, `extent` and `icebox-candidates`
-(§bin/queue-index.sh), on the stated grounds that folding jobs together gives one
+(§The queue-index arm), on the stated grounds that folding jobs together gives one
 tool two output grammars — the same refusal that keeps `bin/queue-edges.sh`
 separate. A tally keyed by section name is a different job with a different
 grammar, so it lands beside the index rather than inside it. Recorded here

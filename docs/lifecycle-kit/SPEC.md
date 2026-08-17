@@ -1530,7 +1530,7 @@ The boundary entry also
 **refuses outright when `## Lessons Learned` is non-empty** (exit 1, the
 untriaged entries printed, nothing written — the same refusal contract as the
 built-in pre-flight): an untriaged lesson must not cross into the next
-iteration, so no `[attend]` injection (queue-kit §bin/queue-index.sh) can
+iteration, so no `[attend]` injection (queue-kit §The queue-index arm) can
 outlive the iteration that filed it. Its **gap-inbox check
 (`LIFECYCLE_KIT_GAP_INBOX_FILE`) is one detector with two dispositions**
 (§The committed gap inbox owns the design): it fires on any bullet, then reads

@@ -81,7 +81,9 @@ pattern): wired as the harness's session-start hook via
 Every step is guarded and degrades silently — the hook never fails a
 session. Steps, in order:
 
-1. **Queue index** — via queue-kit's `queue-index.sh`, collapsing the
+1. **Queue index** — via queue-kit's `queue-index` arm, reached through the
+   battery runner's `--emit` front-end (queue-kit/SPEC.md §The queue-index arm),
+   collapsing the
    Deferred section to a tally except on the close and scope stages. The stage
    it routes on comes from the cursor — `CONTEXT_KIT_STATE_FILE`'s last data
    line — with an empty cursor (no such file, or one truncated to its preamble
@@ -96,7 +98,7 @@ session. Steps, in order:
    A configured icebox tier rides **both** branches as a one-line tally, so
    this step needs no new stage routing: a dormant entry is already one line,
    so there is no full listing of it to withhold, and the eviction work that
-   reads the tier reads `queue-index.sh --icebox-candidates` rather than this
+   reads the tier reads `--emit queue-index --icebox-candidates` rather than this
    index.
 2. **Dirty-surface pre-run** — for each component with uncommitted
    changes, pre-run the matching surface index (default: `pub-index` over
@@ -413,8 +415,8 @@ nothing unbidden.
 `bin/always-loaded.sh` measures the standing surface: the summed line
 count of the configured surface files (default `CLAUDE.md`) plus the
 steady-state hook body, approximated by the configured hook-body command
-(default: queue-kit's `queue-index.sh --collapse-deferred` when
-resolvable). The approximation is deliberate: the meter must never run the
+(default: queue-kit's `queue-index` arm through the battery runner's `--emit`
+front-end, `--collapse-deferred`, when resolvable). The approximation is deliberate: the meter must never run the
 session-context hook itself — the hook emits this meter's own output line,
 so self-measurement would recurse and inflate.
 
@@ -942,7 +944,7 @@ lazily by `context_memory_dir_default()` at its one reader, which also keeps a
   default `${GATE_SDK_GATES_DIR:-scripts}/pub-lang`.
 - `CONTEXT_KIT_HOOK_CMD` — command whose output line count approximates
   the steady-state hook body; default queue-kit's
-  `queue-index.sh --collapse-deferred` when resolvable, else empty
+  `run-gates.sh --emit queue-index --collapse-deferred` when resolvable, else empty
   (surfaces only).
 - `CONTEXT_KIT_DRIFT_REPORT` — path to the consumer's drift-report script;
   the session-context hook runs it with `--trend` for the brief's drift

@@ -187,11 +187,17 @@ works. Derivation-first is satisfied by deriving on demand otherwise, and a
 committed copy of a high-churn source's derivation buys a per-commit
 regeneration tax for nobody. So a tool whose only consumer is a session with a
 shell stays off this roster and gets no freshness gate:
-`queue-kit/bin/queue-index.sh` and `bin/queue-edges.sh` are the standing
+queue-kit's `queue-index` arm and `bin/queue-edges.sh` are the standing
 instances, the latter with its refusal reasoned in its own contract
 (queue-kit/SPEC.md §bin/queue-edges.sh). Their absence is a ruling, not an
 oversight — the question to ask of a new derived surface is who reads it, not
 whether it could be generated.
+The `queue-index` **ruling is unchanged by its port onto the binary, but its
+ground is restated**: "its only consumer is a session with a shell" stopped being
+true when the consumer became a session reaching a compiled arm through the
+`--emit` front-end. The load-bearing reason was always the other one — **a tool
+with no stored projection has nothing to hold fresh** — and that is what keeps it
+off the roster on either substrate.
 
 **The compiled gate binary is the third standing instance, and it fails the
 admission test in both directions.** It is not committed at all (`native/target/`

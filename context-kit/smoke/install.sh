@@ -49,7 +49,8 @@ if ! grep -q 'Session context' <<<"$hook_out"; then
     echo "context-kit/smoke/install.sh: hook produced no session-context brief" >&2
     exit 1
 fi
-if [[ -f queue-kit/bin/queue-index.sh ]] \
+# spec: context-kit/SPEC.md §The session-context hook — the queue-index assertion is predicated on the front-end resolving, not on a tool file existing: the index is reached through `run-gates.sh --emit queue-index`, so what the hook needs present is the front-end (gate-sdk/SPEC.md §The non-gate arm)
+if bash gate-sdk/bin/run-gates.sh --emit queue-index >/dev/null 2>&1 \
     && { grep -q 'queue-index unavailable' <<<"$hook_out" || ! grep -q 'Iteration:' <<<"$hook_out"; }; then
     echo "context-kit/smoke/install.sh: hook did not emit the queue index" >&2
     printf '%s\n' "$hook_out" >&2

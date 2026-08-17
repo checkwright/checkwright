@@ -1074,6 +1074,18 @@ A **non-gate arm** is specified by three properties:
   step running it through the front-end, which is the whole of what this bullet
   demands.
 
+  **A member may also be a *query* tool rather than a generator**, which is the
+  reading `--emit-close-surfaces` opened and `--emit-queue-index`
+  (queue-kit/SPEC.md §The queue-index arm) completes: that arm's `extent` mode
+  answers two integers about one entry and emits no document at all, so the
+  `--emit-` spelling reads as a stretch. It is precedented and taken rather than
+  renaming the family, which would be a gate-sdk unit of its own. `extent` is
+  also the class's worked instance of a mode whose only caller is **a session** —
+  no in-tree invoker exists, and the caller is load-bearing regardless, because
+  §The queue-index arm's refusal to ship a queue-mutating tool rests on it. A
+  session reaching a mode through the front-end counts exactly as a stage step
+  does.
+
 **An arm receives no configuration, and a member needing some is reached
 through a caller.** The config bridge is built by `gate_command` (§lib/gate.sh)
 for a `.gate`-declared member alone, and `kit_roots` is transported rather than
@@ -6668,7 +6680,7 @@ that predicate and no gate enforces their agreement** — `queue_live_slugs` and
 (native/src/spec.rs — canon-kit's holder, which moved substrate with the seventh
 cohort and is deliberately not pointed at the crate's own queue module, since one
 shared function would end the arrangement this count prices), the inline scans in queue-kit's `check-task-names` and
-`check-queue-entry-budget`, `bin/queue-index.sh` (which carries it twice, in the
+`check-queue-entry-budget`, the `queue-index` arm (which carries it twice, in the
 `--extent` and `--icebox-candidates` walks), the section-pool builder inside
 drift-kit's `kpi-queue-net-delta`, and this gate. Only the public
 library functions are named; the rest are cited by the surface that owns them,

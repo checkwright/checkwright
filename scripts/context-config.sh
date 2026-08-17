@@ -5,6 +5,6 @@
 # shellcheck disable=SC2034  # consumed by check-brevity through the config bridge after sourcing
 CONTEXT_KIT_BREVITY_SECTION="## Conventions established in gate-sdk (keep every kit consistent)"
 
-# comment-tier-exempt: queue-kit lives at queue-kit/bin/ in this monorepo, so name the hook body explicitly rather than lean on the default gates-dir probe
+# comment-tier-exempt: gate-sdk lives at gate-sdk/bin/ in this monorepo, so name the front-end explicitly rather than lean on the default gates-dir probe
 # shellcheck disable=SC2034  # consumed by context-kit/bin/always-loaded.sh after sourcing
-CONTEXT_KIT_HOOK_CMD="bash queue-kit/bin/queue-index.sh --collapse-deferred"
+CONTEXT_KIT_HOOK_CMD="bash gate-sdk/bin/run-gates.sh --emit queue-index --collapse-deferred"

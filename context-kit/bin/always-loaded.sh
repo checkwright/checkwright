@@ -13,11 +13,12 @@ UPDATE=0
 # shellcheck source=../lib/context.sh
 source "$KIT/lib/context.sh"
 
+# spec: context-kit/SPEC.md §The always-loaded meter — the default resolves the battery runner's --emit front-end, consumer-first, keeping the two-candidate shape and the empty-on-unresolvable behaviour: the front-end sources the shell library and bridges the arm's knobs, so a consumer's overrides reach the rendering this meter counts (gate-sdk/SPEC.md §The non-gate arm)
 if [[ -z "${CONTEXT_KIT_HOOK_CMD+x}" ]]; then
     CONTEXT_KIT_HOOK_CMD=""
-    for _qi in "${GATE_SDK_GATES_DIR:-scripts}/queue-index.sh" "$KIT/../queue-kit/bin/queue-index.sh"; do
+    for _qi in "${GATE_SDK_GATES_DIR:-scripts}/run-gates.sh" "$KIT/../gate-sdk/bin/run-gates.sh"; do
         if [[ -f "$_qi" ]]; then
-            CONTEXT_KIT_HOOK_CMD="bash $_qi --collapse-deferred"
+            CONTEXT_KIT_HOOK_CMD="bash $_qi --emit queue-index --collapse-deferred"
             break
         fi
     done

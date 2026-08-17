@@ -4,6 +4,7 @@
 pub mod close_surfaces;
 pub mod enforcement_map;
 pub mod footprint;
+pub mod queue_index;
 pub mod value_rollup;
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — the arm's own argv tail, so a projection whose
@@ -60,6 +61,20 @@ pub const EMITTERS: &[(&str, EmitFn, &[&str])] = &[
             "EVIDENCE_KIT_SUITES",
             "EVIDENCE_KIT_RUN_*",
             "CONTEXT_KIT_SURFACES",
+        ],
+    ),
+    // spec: queue-kit/SPEC.md §The queue-index arm — the class's first *query* member as well as a
+    // generator, and the table's most configured one: a hardcoded flag receives no configuration
+    (
+        "queue-index",
+        queue_index::emit,
+        &[
+            "QUEUE_KIT_QUEUE_FILE",
+            "QUEUE_KIT_ACTIVE_SECTIONS",
+            "QUEUE_KIT_DEFERRED_SECTION",
+            "QUEUE_KIT_ICEBOX_SECTION",
+            "QUEUE_KIT_ATTEND_CAP",
+            "QUEUE_KIT_ICEBOX_AGE_DAYS",
         ],
     ),
 ];

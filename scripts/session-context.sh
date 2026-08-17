@@ -6,7 +6,7 @@ set -uo pipefail
 REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 cd "$REPO_ROOT" 2>/dev/null || exit 0
 
-QUEUE_INDEX="queue-kit/bin/queue-index.sh"       # queue-kit's queue surface
+RUN_GATES="gate-sdk/bin/run-gates.sh"             # the --emit front-end: queue-kit's queue surface, bridged
 CTX_BIN="context-kit/bin"                         # context-kit index tools
 DRIFT_REPORT="${CONTEXT_KIT_DRIFT_REPORT:-drift-kit/bin/drift-report.sh}"  # drift-kit trend line
 STAGE_RULES="${CONTEXT_KIT_STAGE_RULES:-doctrine-kit/bin/stage-rules.sh}"  # doctrine-kit craft-rule router
@@ -20,11 +20,11 @@ stage=""
 if [[ -f "$STATE_FILE" ]]; then
     stage="$(awk '/^---[[:space:]]*$/ { f = 1; next } f && NF { l = $2 } END { print l }' "$STATE_FILE" 2>/dev/null)"
 fi
-if [[ -f "$QUEUE_INDEX" ]]; then
+if [[ -f "$RUN_GATES" ]]; then
     if [[ "$stage" == close || "$stage" == scope ]]; then
-        bash "$QUEUE_INDEX" 2>/dev/null || echo "(queue-index unavailable)"
+        bash "$RUN_GATES" --emit queue-index 2>/dev/null || echo "(queue-index unavailable)"
     else
-        bash "$QUEUE_INDEX" --collapse-deferred 2>/dev/null || echo "(queue-index unavailable)"
+        bash "$RUN_GATES" --emit queue-index --collapse-deferred 2>/dev/null || echo "(queue-index unavailable)"
     fi
     echo
 fi
