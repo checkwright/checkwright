@@ -1,4 +1,5 @@
 restated collection total: rules 1-8
+bad.sh:27: port: the bare word is not a roster entry, so this line is prose and is flagged
 bad.gate:4: this descriptor comment cites no owning section and carries no directive
 bad.rs:3: this crate comment restates the line below it and cites no owning section
 templates/bad-tmpl.sh:2: this templates stub comment paraphrases its own body and carries no directive

@@ -614,9 +614,53 @@ because each would be a name that could drift from the thing it names. The one
 fact is the file's presence; the subcommand is derived from the name that
 already identifies the gate everywhere else. **The field roster is closed**, and
 every field on it has a named reader — `# graph:` by the manifest readers below,
-`# spec:` by canon-kit's `check-spec-pointer`, `# no-fixture:` by
+`# spec:` by canon-kit's `check-spec-pointer`, `# install:` by
+§check-install-disposition (ruled at §The install disposition, *and in a `.gate`
+descriptor on the same terms*), `# no-fixture:` by
 §check-gate-fixture-coverage. The descriptor carries no field that lacks one,
 reserving nothing against a future reader.
+
+**One field is minted on the `<name>.sh` spelling alone, and the descriptor's
+roster is untouched by it.** `# no-port: <cause>` declares that a gate is never
+going to the binary substrate and names the ruling that makes it so — one
+optional header line beside `# graph:`, `# install:` and `# spec:`, read by
+§port-blockers' `--group` arm and by §check-gate-substrate-parity's assertion G.
+**A `.gate` descriptor never carries it.** A descriptor's *existence is the
+dispatch declaration*, so a member that has one is ported and has no port
+question left to declare; a `# no-port:` line there would be a field asserting
+the negation of the file it sits in, and the one way that lands in practice is a
+port forward-copying it with the three lines that *are* copied verbatim — which
+is precisely what assertion G's first clause reds on. The roster above therefore
+gains nothing and reserves nothing.
+
+**The `# reads:`/`# needs:` refusal below does not reach it, and the difference
+is what a reader could verify.** Both were refused because nothing would hold
+them to the implementation: they are claims about **runtime behavior**, which an
+implementation can contradict, so the crate's registry plus a unit test that runs
+the member is a strictly better home. `# no-port:` is a claim about a **design
+ruling**. It has no runtime referent at all — no execution could falsify it — so
+*hold it to the implementation* names nothing that could be done for it in any
+location. What it can be held to is the ruling it cites, which the exception
+criterion already requires to exist in the gate's own SPEC section (§The
+port-candidate criteria), and the pointer's shape is what assertion G holds.
+**There is no value vocabulary**: the field's presence *is* the verdict and
+absence means still owed, so the `<cause>` half is the whole payload — a reader
+who finds the line reaches the argument in one hop.
+
+**The kit ships the field, its two readers and the assertion — never a roster of
+permanent members and never a cause text.** A kit literal naming one project's
+permanently-shell gates would publish that project's work queue as everyone's
+mechanism, the defect §The first cohort, and the rule that selects the next
+already guards against for the batch arm and the `check-graph` rule-content split
+exists to prevent. The remainder is derived from declarations in the **consumer's
+own tree** at every read, so a consumer with no permanent member reads a field
+that never fires and one with ten declares ten. The `<cause>` is consumer content
+by construction: free text pointing at whatever surface that consumer records the
+ruling on, with the kit constraining only that it be non-empty — nothing here
+parses a cause, matches it against a vocabulary, or knows what a section reference
+looks like. **And no knob is minted**: both readers already resolve the
+declaration path through `gate_resolve` under `gate_kit_roots`, so the field adds
+no `<KIT>_<KNOB>` and no default to be unset anywhere.
 
 **Two fields are refused rather than merely absent, and the refusal is the
 design.** A `# reads:` line declaring the gate's walk roots is the obvious cheap
@@ -1711,6 +1755,24 @@ which class and why. A fourth class is an amendment, not a judgment call.
   had to be re-derived by `port-blockers.sh` at some later cohort cut.
   **Temporary by construction** — it expires when the substrate lands.
 
+**A declarable spelling for the held classes is designed and refused, and the
+refusal is recorded so it is not re-bought.** Classes (b) and (c) are temporary,
+so `# no-port:` must not carry them — a marker conflating permanent with
+temporarily-held would drop members that will port, replacing the remainder's
+over-count with an under-count. The honest spelling is a **second** field,
+`# port-until: <slug>`: `blocked` collides with a word `port-blockers.sh` already
+uses for something *derived*, while `until` is this tree's existing word for a
+temporary disposition — §check-gate-exemption-tasks pairs `# until: <live-slug>`
+with `# permanent: <reason>` on exactly this axis, two annotations rather than one
+with two values. That precedent also answers the rot objection: it holds the slug
+to a **live** queue entry, so when the blocker lands and the slug moves to Done
+the gate reds and the declaration must be dropped. It is refused anyway on the
+**closed-roster rule** — the field roster carries no field lacking a named reader
+— because it would ship with **zero holders**: the members that would declare it
+live on `cohort-held-members-port-prerequisites`' roster, and retrofitting them is
+that entry's work. A field minted empty is a reservation however good its design,
+so the value is **filed costed** against the entry that holds the holders.
+
 **The cause is recorded in the gate's own SPEC section**, beside the rule it
 governs, on the same terms every other design ruling for that gate is recorded —
 never in a central roster, which would be a maintained list of the residue that
@@ -1740,6 +1802,19 @@ false. Three enforceable shapes have been weighed:
   retrospective declaration per unported member, sixty against this tree at the
   flip, each deleted again as its member ports. It becomes cheap when the residue
   is small, which is the condition to revisit it under.
+
+  **`# no-port:` is the same shape over a different subject, and it does not
+  discharge this** — stated because a green §check-gate-substrate-parity must not
+  be read as having landed born-native enforcement. This header would enforce the
+  **born-native default** — *may this gate land in shell at all?* — over newly
+  authored gates; that field reports the **port remainder** — *will this gate ever
+  leave shell?* — over existing ones. Different subject, different corpus,
+  different reader, which is also why the field is not simply named
+  `# substrate:`. It is likewise why that field mints **no value vocabulary and no
+  `candidate` default**: a value asserted over every still-shell member reinstates
+  exactly the retrospective sweep costed above, thirty-odd declarations each saying
+  nothing and each deleted at its port, where default-by-absence buys the same
+  derivation for three lines.
 - **A baseline roster of today's shell members that a gate diffs against.** A
   maintained roster, which derivation-first refuses, and it rots at every cohort
   cut.
@@ -5568,7 +5643,8 @@ exact mirror of the `command -v` guard.
 partition over the still-shell members**, groups ordered by size descending, each
 member's row carrying the criterion columns below with its expanded `couples=`
 beside it, then a trailing line counting members scanned, groups formed, members
-undecidable, and members already ported and excluded. Its consumer is a **human**
+undecidable, members already ported and excluded, and members **permanently shell
+and excluded**. Its consumer is a **human**
 session at exactly one transition — cutting the next port cohort under §The first
 cohort, and the rule that selects the next — and its enabling configuration is
 the one the default arm already resolves, `gate_sdk_gates_dir` for the registry
@@ -5624,6 +5700,29 @@ counted in the trailing line. This is a deliberate divergence from the default
 arm, where such a member prints `?` because its external-program requirement
 genuinely cannot be asked; here there is no open question, because the grouping
 exists to order the *remaining* corpus and a ported member is not in it.
+
+**Declared-permanent members leave on exactly those terms, which is what makes
+the remainder mean *still owed*.** A member whose shell declaration carries
+`# no-port:` (§The `# graph:` manifest) leaves the partition and increments its
+own clause in the trailer, because the grouping orders the corpus this arm can
+take and a member that is never going to the binary is not in it. The count a
+reader derives — scanned minus ported minus permanent minus undecidable — is
+therefore *still owed* rather than *still shell*, the number the port track has
+wanted since it started, and it is derived rather than maintained: nothing here
+hardcodes a name, and the tool learns of a new permanent member the day that
+member's declaration says so. **A reported split and a hardcoded exclusion both
+fall out of this one input**, which is why neither was built: an exclusion list
+of three names would be de-literalization's own defect and blind to the fourth,
+and a split needs the same input to compute.
+
+**The default arm is unchanged, and that is a ruling rather than an omission.** A
+permanent member keeps its criterion-7 row there. `check-crate-arms` prints
+`c7=cargo`, and that row **is** part of the evidence for its own permanence (§The
+port-candidate criteria, criteria 4 and 7); excluding it would delete the finding
+that grounds the declaration, leaving a reader with a verdict and no oracle behind
+it. The two arms answer different questions — *what external programs does this
+rule require*, true and useful whatever a member's port future, versus *what
+should the next cohort take*, the only question permanence bears on.
 
 **Cheap criterion columns, so the selection rule is applicable end to end.** That
 rule wants the largest set of **criteria-clearing** gates sharing one corpus
@@ -5905,7 +6004,7 @@ Holds the dispatch seam honest: a gate's implementation may move to a compiled
 subcommand, but not by quietly deleting the declaration other gates read or the
 record of what that move costs. Usage
 `check-gate-substrate-parity.sh [gates-dir] [conservation-doc]`; the two-arg form
-steers the fixture pair onto hermetic copies of each surface. Six assertions.
+steers the fixture pair onto hermetic copies of each surface. Seven assertions.
 
 - **assertion A — declaration uniqueness.** Each `gates.list` member resolves to
   exactly one declaration. A dir carrying both `<name>.sh` and `<name>.gate` is
@@ -6184,6 +6283,36 @@ steers the fixture pair onto hermetic copies of each surface. Six assertions.
   from being either vacuous in this repo (which has a roster, registers both
   ported members, and is checked in full) or hostile to a consumer that has no
   crate.
+- **assertion G — port-declaration placement.** Two clauses over the declaration
+  set assertion A already derives, which resolves every member to exactly one
+  declaration and knows which spelling it got — the entire input, which is why
+  this folds in here rather than shipping as its own gate, on the precedent
+  assertion E states for itself. **A `.gate` descriptor carries no `# no-port:`
+  line**, §The `# graph:` manifest's placement rule, and the one failure the
+  mechanism can actually produce: a port landing a descriptor from a declaration
+  that carried the field, forward-copying it with the `# graph:`/`# install:`/
+  `# spec:` lines that *are* copied verbatim. **A `# no-port:` line on a shell
+  declaration carries a non-empty cause, and a declaration carries at most one** —
+  the shape §check-install-disposition already holds for `# install:`, reached
+  here with *at most* since the field is optional. The subject fits this gate:
+  where a declaration field may live by spelling is the dispatch seam's own
+  partition, the question assertion D answers for the
+  implementation-versus-declaration axis.
+
+  **Presence is deliberately not asserted, and the asymmetry is what makes that
+  safe.** No clause demands that a permanently-shell member declare, because
+  permanence is a ruling in prose and a gate deriving which members hold one would
+  have to parse SPEC argument text. The error direction is what bounds it: an
+  **undeclared** permanent member is counted as owed, which is the status-quo
+  over-count for that one member and nothing worse, while the field can only ever
+  *shrink* the reported remainder — so the mechanism fails toward today's state
+  rather than toward an under-count. Enforcement-first is not waived; it ranks a
+  gate above discipline *where a gate is available*, and the available gate is
+  this shape assertion, which ships.
+
+  The gate is permanently shell under exception class (a), so widening it raises
+  no substrate question, and the assertion adds no member to the conservation
+  table: the corpus is the declaration set it already walks.
 
 It stays a **shell** gate: a gate that audits the port is not a gate the port
 may consume, or assertion B would be checking a roster through the very binary
@@ -6193,7 +6322,9 @@ Its coverage is split across two oracles because the descriptor configurations
 cannot all live in one fixture pair — a pair is one invocation each — and naming
 where each is proved is what keeps the split from reading as a hole. The
 `good/`+`bad/` pair covers **descriptors and a binary** (parity both ways, the
-reference-only allowance, and each refusal). The bespoke
+reference-only allowance, each refusal, and both of assertion G's clauses — a
+descriptor carrying the field, a bare one with no cause, and a declaration
+carrying two). The bespoke
 `gate-tests/check-gate-substrate-parity.test.sh` holds the rest, each case a
 sandbox rather than a live tree: **no descriptors, binary present** — the
 post-revert tree, where the roster half is the only live half; **no descriptors,

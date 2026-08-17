@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # graph: couples=scripts/gates.list,kit:checks/*,gate-sdk/SPEC.md,native/*,.github/workflows/publish.yml dir=one valve=none tier=precommit
 # install: on-surface
+# no-port: gate-sdk/SPEC.md §The port-candidate criteria — exception class (a), permanent: the gate audits the dispatch relation, so a compiled form could check its own roster through the very binary in question
 # spec: gate-sdk/SPEC.md §check-gate-substrate-parity — one declaration per member, descriptor/subcommand parity both ways, a recorded disposition for every substrate-sensitive member, no implementation source inside the vendoring set, and one owner for the target roster the artifact path derives from
 #
 # usage: check-gate-substrate-parity.sh [gates-dir] [conservation-doc]
@@ -78,6 +79,10 @@ declared=0
 # a registered member resolving to one is a dispatch, and only a dispatch makes the binary
 # load-bearing. Derived here because assertion A already resolves every member.
 dispatching=0
+# spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion G's two counters, derived in
+# assertion A's own loop because the declaration set and its spelling are exactly its output
+declpaths_shell=0
+noport_declared=0
 for m in "${MEMBERS[@]}"; do
     for d in "${RESOLVE_DIRS[@]}"; do
         if [[ -f "$d/$m.sh" && -f "$d/$m.gate" ]]; then
@@ -90,6 +95,27 @@ for m in "${MEMBERS[@]}"; do
     fi
     [[ "$src" == *.gate ]] && dispatching=$((dispatching + 1))
     declared=$((declared + 1))
+
+    # assertion G: the port declaration lives on the shell spelling and carries a cause —
+    # a descriptor's existence is already the dispatch declaration, so a `# no-port:` line
+    # there asserts the negation of the file it sits in
+    # spec: gate-sdk/SPEC.md §check-gate-substrate-parity
+    noport="$(grep -cE '^#[[:space:]]*no-port:' "$src")" || noport=0
+    if [[ "$src" == *.gate ]]; then
+        [[ "$noport" -gt 0 ]] \
+            && findings+=("port declaration on a descriptor: $src carries a '# no-port:' line — a descriptor's existence is the dispatch declaration, so the field's domain is the <name>.sh spelling alone")
+    else
+        declpaths_shell=$((declpaths_shell + 1))
+        if [[ "$noport" -gt 1 ]]; then
+            findings+=("more than one port declaration: $src carries $noport '# no-port:' lines — a declaration carries at most one")
+        elif [[ "$noport" -eq 1 ]]; then
+            noport_declared=$((noport_declared + 1))
+            cause="$(grep -E '^#[[:space:]]*no-port:' "$src" | head -n 1)"
+            cause="${cause#*no-port:}"
+            [[ -n "${cause//[[:space:]]/}" ]] \
+                || findings+=("port declaration with no cause: $src carries a bare '# no-port:' line — the cause names the ruling that makes the member permanent, and is the field's whole payload")
+        fi
+    fi
 done
 
 # assertion B: the .gate descriptors on disk and the binary's reported subcommand
@@ -339,6 +365,10 @@ if [[ ${#findings[@]} -gt 0 ]]; then
     echo "        workflow's matrix from it rather than spelling a platform there, and"
     echo "        emit each artifact's digest in exactly one step, where its bytes are"
     echo "        produced. A runner mapping may name a platform; a matrix may not."
+    echo "  help: a '# no-port:' line declares a member the port will never take — it goes on"
+    echo "        the <name>.sh declaration only, at most once, and its cause names the SPEC"
+    echo "        section ruling the member permanent. A ported member has no port question"
+    echo "        left to declare, so drop the line rather than copying it into a descriptor."
     exit 1
 fi
 
@@ -347,5 +377,5 @@ if [[ "$roster_read" == 1 ]]; then
 else
     roster="${#DESCRIPTORS[@]} descriptor(s), no binary at $BIN so no subcommand roster to compare"
 fi
-echo "GATE-SUBSTRATE-PARITY: clean ($declared member(s) with one declaration each, $dispatching of them dispatching to the binary; $roster; $sensitive substrate-sensitive member(s) all dispositioned; $impl_scanned implementation source(s) free of manifest-class annotation; $kit_scanned kit root(s) scanned for an implementation sibling, crate root $CRATE outside every kit root; target roster $roster_state at $ROSTER with $roster_targets well-formed target(s); publish workflow $wf_state at $WORKFLOW, $wf_matrix matrix declaration(s) roster-derived across $wf_jobs job(s) with one producer per digest)"
+echo "GATE-SUBSTRATE-PARITY: clean ($declared member(s) with one declaration each, $dispatching of them dispatching to the binary; $noport_declared of the $declpaths_shell shell declaration(s) declare '# no-port:' with a cause, no descriptor carrying one; $roster; $sensitive substrate-sensitive member(s) all dispositioned; $impl_scanned implementation source(s) free of manifest-class annotation; $kit_scanned kit root(s) scanned for an implementation sibling, crate root $CRATE outside every kit root; target roster $roster_state at $ROSTER with $roster_targets well-formed target(s); publish workflow $wf_state at $WORKFLOW, $wf_matrix matrix declaration(s) roster-derived across $wf_jobs job(s) with one producer per digest)"
 exit 0

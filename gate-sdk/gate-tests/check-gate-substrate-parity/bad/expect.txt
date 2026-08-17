@@ -1,4 +1,7 @@
 ambiguous dispatch
+port declaration with no cause: scripts/check-alpha.sh
+port declaration on a descriptor: scripts/check-orphan.gate
+more than one port declaration: scripts/check-twice.sh
 descriptor names no subcommand
 subcommand nothing declares
 no reference-only disposition

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # graph: couples=kit:checks/check-*.sh,kit:checks/check-*.gate,kit:smoke/install.sh,installer/lib/common/recipe.sh dir=one valve=none tier=precommit
 # install: zero-config
+# no-port: gate-sdk/SPEC.md §The port-candidate criteria — exception class (a), permanent: the gate audits the dispatch relation, so a compiled form could pass itself with a broken binary
 # spec: gate-sdk/SPEC.md §check-install-disposition — every shipped gate declares one install disposition, every zero-config gate is registrable in its kit's smoke, and the installer keeps no second copy of the roster
 #
 # usage: check-install-disposition.sh [root]

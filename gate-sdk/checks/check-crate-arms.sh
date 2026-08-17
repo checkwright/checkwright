@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # graph: couples=native/Cargo.toml,native/build.rs,native/src/*.rs,native/src/gates/*.rs dir=one valve=none tier=precommit
 # install: never
+# no-port: gate-sdk/SPEC.md §check-crate-arms — criteria 4 and 7, not exception class (a): a gate running cargo over the crate cannot live inside the artifact it tests, and its rule invokes cargo
 # spec: gate-sdk/SPEC.md §check-crate-arms — the crate's lint and test arms run at commit time, so a battery that passes cannot coexist with a CI that fails on them
 #
 # usage: check-crate-arms.sh

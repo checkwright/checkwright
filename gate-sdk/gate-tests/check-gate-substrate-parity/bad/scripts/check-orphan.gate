@@ -1,1 +1,2 @@
 # graph: couples=docs/*.md dir=one valve=none tier=precommit
+# no-port: fixture: a descriptor forward-copying the field from the declaration it replaced

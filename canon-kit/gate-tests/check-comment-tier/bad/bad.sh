@@ -23,3 +23,6 @@ quux() { echo w; }
 # spec: some/SPEC.md §wrap — this window pins two comment
 #   gates across the line break, a wrapped total no per-line scan reads.
 corge() { echo v; }
+
+# port: the bare word is not a roster entry, so this line is prose and is flagged
+grault() { echo u; }

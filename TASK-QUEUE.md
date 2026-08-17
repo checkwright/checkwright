@@ -12,56 +12,6 @@
 
 ## New Features
 
-- **port-remainder-permanent-shell-inflation** [spec: SPEC-port-permanence.md]
-  — `port-blockers.sh` counts permanently-shell members in its unported remainder, so the
-  port's progress metric can never reach zero.
-  **Re-verified at this drain rather than taken from the bullet, and every claim held.** A
-  2026-08-16 `--group` run reports 39 remaining and prints `check-install-disposition`,
-  `check-gate-substrate-parity` and `check-crate-arms` among them; gate-sdk/SPEC.md
-  §The port-candidate criteria rules the first two **permanent** under class (a) and rules
-  `check-crate-arms` permanent under criteria 4 and 7, explicitly *not* class (a).
-  **What the re-verification changed is the number, and that is itself a finding.** The bullet
-  filed 45 remaining / 42 portable; one iteration of porting later the same oracle says 39, so
-  the portable remainder is 36. Any fix that hands a reader a second number to maintain will rot
-  on the same one-iteration clock — which argues for the reported-split shape over a prose note.
-  **The fix is a fork, and neither arm is free.** (1) *Exclude* the three in the tool: the
-  remainder then means "still owed", but no gate carries a machine-readable permanent-shell
-  marker today — the causes live in prose (§The port-candidate criteria for two, §check-crate-arms
-  for the third), so an exclusion is three hardcoded names in a tool, against de-literalization
-  and unable to see the next one. (2) *Report a split* — "N still shell, M still owed" — which
-  needs the same input to compute M and only relocates the question. (3) A declarable field on
-  the descriptor (`# port: permanent|blocked|candidate`) makes both arms derivable, and is the
-  unit's real design question.
-  **Class (b) is why a marker cannot just mean "shell".** That class is *temporary by
-  construction* — it ends when `platform-support-ci-matrix` widens the target roster — so a
-  marker conflating permanent with temporarily-held would drop members that will port, replacing
-  an over-count with an under-count.
-  **The conservation table is a partial derivation source, not a whole one.** gate-sdk/SPEC.md
-  §Meta-gate conservation for the binary substrate carries rows for two of the three, and states
-  in its own prose that `check-crate-arms` sits outside its derivation entirely. A fix reading
-  that table gets two members for free and still owes a home for the third.
-  **The consequence is larger than a wrong number — established 2026-08-17 at scope, and it is
-  what puts this in that day's unit set.** The inflation also **mis-selects the cohort**.
-  `--group`'s only non-singleton group at that rev paired `check-readme-roster` with
-  `check-install-disposition`, whose permanence the tool cannot see, so the size arm reads
-  takeable when it is in fact exhausted and the increment belongs to the budget arm. gate-sdk's
-  §The first cohort sanctions the hand adjudication — an advisory group is "a finding the
-  selecting session adjudicates" — but it is re-bought at each of the ~32 cuts still owed, which
-  is exactly what arm (3) makes derivable. The census and its two-command witness are filed at
-  `.workflow/survey-record.md`.
-  **The design it needed** — picking among the three arms is a call about where a permanence
-  verdict is declared, not a patch to the tool's arithmetic — **is answered**: the lead ruled
-  arm (3), and `SPEC-port-permanence.md` settles the spelling, the placement and the reader.
-  **Cost while deferred:** every "N remaining" claim inherits the inflation, including
-  `native-gate-port-remaining-corpus`' own cost field. That entry is **not** patched here and the
-  decision is deliberate: it delegates the number to the oracle by design ("never a count this
-  line holds"), so correcting its prose would make it disagree with the oracle it cites and would
-  re-introduce the maintained copy it was written to avoid. The defect is in the oracle, and it
-  is paid as a roadmap-facing metric that asymptotes at three instead of zero.
-  Class: changes a reporting tool's output rather than minting a governed name, so canon-kit's
-  litmus makes it **debt**; a feature only if arm (3) mints a descriptor field.
-  Filed 2026-08-16 by close from the gap inbox (bullet dated 2026-08-16, filed at scope).
-
 - **waiting-rule-fourth-firing-post-fix** [spec: SPEC-wait-enforcement.md]
   — the residency rule fired again, under its own freshly-strengthened prose.
   recurrence: waiting-rule-fourth-firing-post-fix 2026-08-06 2026-08-16 2026-08-17
@@ -6446,6 +6396,7 @@
 
 ## Done
 
+- port-remainder-permanent-shell-inflation
 
 ## Lessons Learned
 

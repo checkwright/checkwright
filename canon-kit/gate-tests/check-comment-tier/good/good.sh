@@ -25,6 +25,9 @@ bar() { echo bye; }
 # smoke-unregistered: check-example — a machine directive run-consumer-smoke.sh parses off the vendored copy, so it is blessed by name like graph:/contract: rather than needing an exempt tag
 baz() { echo sm; }
 
+# no-port: some/SPEC.md §thing — a declaration's port verdict, blessed by name off the built-in roster; the shell spelling is where the field lives
+qux2() { echo np; }
+
 # spec: some/SPEC.md §bounds — a directive blesses at most three checks per run,
 #   a bound rather than a total; three of the twelve gates below stay partitive,
 #   and the inline-code `six gates` reads as a meta-reference.
