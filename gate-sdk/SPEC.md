@@ -5501,7 +5501,10 @@ pre-commit hook to stdout and `--emit-commit-msg` the commit-msg hook
 and `commit-msg` only when a `tier=commit-msg` gate is registered. Adding a
 gate to either hook is manifest-only — there is no second hand-wiring step to
 drift. The emission is deterministic (no timestamps) so the committed hooks are
-byte-stable.
+byte-stable. **A `tier=commit-msg` member therefore ports with no new emitter
+arm** — both hooks resolve argv through the one `command_rel` → `gate_command`
+path — which the generated hook's own shell spelling reads against; the
+adjudication is at §The second budget batch.
 
 **The hook bakes a ported member's resolved knob values**, because it resolves
 argv through `gate_command` at *generation* time and the bridge's `env` elements

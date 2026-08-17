@@ -1219,6 +1219,15 @@ still applies. A descriptor's own lines are directives by construction. Marker
 matching is on the **token**, independent of the comment leader, so `//` and `#`
 carry the same directives and no language earns a quieter standard.
 
+**The colon side's sharp edge is a naming rule, not a matcher one.** A colon
+directive matches as a substring (the joining rule under Calibration below), so a
+short token nests inside ordinary vocabulary: a directive named `port:` would
+silently bless `support:`, `transport:`, `export:` and `report:`. Roster names on
+that side are chosen not to nest; a bare word is bounded and carries no such
+hazard. Unenforced by construction — the hazard is in a name that does not exist
+yet, and a scanner over a roster of literals would be checking the roster against
+itself.
+
 One shape overrides the window: a full-line comment carrying a **restated
 collection total** — the count grammar of §check-manifest-count, over the same
 `CANON_KIT_COUNT_COLLECTIONS` vocabulary — is flagged even where a directive
