@@ -6756,6 +6756,16 @@ counts see none of it — the spawn-invisibility rule stated under §The first
 cohort, whose last unrecorded instance this is. Recorded 2026-08-17 at close,
 draining the bullet spec filed while sizing the twelfth cohort.
 
+The same spawn is why this member's runtime has grown into the battery's slowest
+few, which is a second argument for its port and an independent one: assertion D
+spawns a fresh `bash` on the generator for `--emit`, and assertion E spawns a
+second for `--emit-commit-msg` whenever a `tier=commit-msg` gate is registered —
+so the cost scales with the manifest set on every run, and a consumer registering
+a commit-msg gate pays it twice. The port makes those calls in-process, the
+dividend the freshness family already banked. Per-gate timings and the pre-port
+comparison stay owned by the consumer's timing baseline and the close-stage
+runtime review that reads it, never by this line.
+
 Theme seam: the emitted HTML artifact bypasses the consumer's
 site generator, so it renders foreign beside the rest of a docs host unless the
 host theme is inlined — and the theme is consumer-specific, so the emitter must

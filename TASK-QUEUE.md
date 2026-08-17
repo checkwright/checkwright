@@ -6303,6 +6303,43 @@
   before the absence was asserted, and the overlay was confirmed carrying zero redundant and
   zero over-broad entries by `compare-settings-allow.sh` at the same triage.
 
+- **recurrence-obligation-residency** [design-pending] — the recurrence stamp became an
+  obligation on **every** session this iteration, and its statement still reaches only the two
+  stages that already loaded it.
+  `recurrence-drain-input-widening` ruled the direct stamp sanctioned *and obliged*, attaching
+  the duty to the judgment rather than to the channel, and ruled prospective-only at this close.
+  So a build, align or validate session that observes a recurrence now owes a stamp. A live grep
+  over the surfaces those sessions actually load — CLAUDE.md, doctrine-kit/DOCTRINE.md,
+  context-kit's session-context templates, every stage template, delegation-kit's templates and
+  the agent definitions — finds the word only in `close.md` and `scope.md`, and scope's is the
+  *reader* half (the pre-emption threshold counting dates), not the duty to stamp one.
+  **The remedy is already specified, which is why the gap is filed rather than argued.** This is
+  delegation-kit/SPEC.md §Operative residency's exact shape and its condition (a) holds: the
+  bound actor fires no trigger that loads lifecycle-kit/SPEC.md §The committed gap inbox, and a
+  trigger that exists but that the actor never fires is, for that actor, no trigger. So a bounded
+  imperative plus an adjacent citation is sanctioned — (b) and (c) bound what may be copied.
+  **Attested from history, not predicted.** This iteration's spec survey counted the stamping
+  commits and found direct stamps already produced by `chore(build)` twice, `chore(align)` once
+  and `chore(scope)` once — the stages the original ruling never contemplated as producers. The
+  writes are being made by sessions that never read the rule, which is the residency gap
+  measured rather than theorised.
+  **Second attestation, first-person, from this close.** The closing session made two direct
+  stamps and reached the obligation only by reading §The committed gap inbox for an unrelated
+  reason; neither its stage skill's dispatch nor any resident surface named the duty.
+  **Why `[design-pending]` — the placement is the open half and it is a real trade.** The
+  candidates differ in kind: one line in CLAUDE.md buys every session at a standing per-session
+  cost on the tier the brevity machinery guards; a clause in each of the four unserved stage
+  templates costs nothing resident but multiplies the restatement by four and drifts four ways;
+  a clause in the dispatch-side agent definition serves only dispatched sessions and misses a
+  standalone run. Widest-true-tier placement decides it and no reading is obviously right.
+  **Cost while deferred:** the obligation is unenforceable and silently unmet for four of six
+  stages — the failure mode is a recurrence *seen and not recorded*, which is the exact failure
+  the counter exists to end, so the ruling's own purpose is what erodes.
+  Class: relocates one imperative and adds no gate, so canon-kit's litmus makes it **debt**.
+  Filed 2026-08-17 by close from its own brevity-and-residency pass; the loaded-surface corpus
+  was grepped before the absence was asserted and the history attestation read off the survey
+  record rather than inferred.
+
 
 ## Icebox
 
