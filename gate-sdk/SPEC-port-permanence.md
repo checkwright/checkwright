@@ -276,6 +276,17 @@ found by reading those sections, and after this unit it is derivable by grepping
 the field. Three at this rev, and the count is a measurement rather than a
 fixture.
 
+**Corrected at align, checked from the tree rather than assumed.** Only
+`check-crate-arms`'s own `###` section states its permanence argument in place
+(§check-crate-arms, criteria 4 and 7). `check-install-disposition`'s and
+`check-gate-substrate-parity`'s own `###` sections carry no permanence statement
+at all — read in full, neither mentions exception class (a). That ruling lives
+in §The port-candidate criteria (the class-(a) definition) and is restated in
+§Meta-gate conservation for the binary substrate's rows for the two of them. The
+three `<cause>` values therefore point at two different kinds of section: two
+cite §The port-candidate criteria's class (a), one cites its own
+§check-crate-arms.
+
 ### 10. `§The `# graph:` manifest`'s field-roster paragraph is corrected while it is open
 
 It enumerates the descriptor's closed roster as `# graph:`, `# spec:` and
@@ -387,10 +398,14 @@ sequence.
   where the class-(b)/(c) causes it would have carried are ruled.
 - **canon-kit/SPEC.md §check-comment-tier** — delta 8's roster entry in the
   machine-directive invariant.
-- **The three members' own SPEC sections** — §check-install-disposition,
-  §check-gate-substrate-parity, §check-crate-arms — each already states the
-  permanence ruling delta 9's cause cites, so none gains an argument; each is
-  read to confirm the citation resolves before the header line is written.
+- **The permanence ruling each `<cause>` cites** — §The port-candidate criteria
+  (exception class (a), the ruling `check-install-disposition`'s and
+  `check-gate-substrate-parity`'s header lines point at) and §check-crate-arms
+  (the ruling its own header line points at, citing criteria 4 and 7 rather than
+  the class) — each read to confirm the citation resolves before its header line
+  is written. **Corrected at align**: the draft's original bullet claimed all
+  three members' own `###` sections carry the argument; only §check-crate-arms's
+  does (delta 9's correction).
 - **`cohort-held-members-port-prerequisites`** — delta 3's filed value, costed
   against the roster that would hold it.
 

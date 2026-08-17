@@ -185,15 +185,19 @@ than hides: *"The shell-substrate half of that clause was added for rule 12, and
 it admits nothing a project owns."* This widening takes the same form. The
 admitted class becomes **behavior over an artifact whose grammar a kit owns** —
 here evidence-kit's `pid=<n> run=<key>` record and the OS's process table. Rule
-17 interprets no project vocabulary at all: it reads a PID and asks whether it is
+14 interprets no project vocabulary at all: it reads a PID and asks whether it is
 alive. A project's toolchain stays out on the same words as before, and the test
 the widening must pass is the one rule 12's passed — **it admits nothing a
 project owns**.
 
-### 6. §Operative residency records the answer, and records what it does not claim
+### 6. §Operative residency records the answer; §The delegation model records what it does not claim
 
-The section states today that no gate is owed and that the enforcement-design
-question is untouched. Both sentences move — **design-bearing**.
+§Operative residency states today that no gate is owed; §The delegation model
+separately states, in its "What the naming does not claim" paragraph, that the
+enforcement-design question is untouched. **Corrected at align: these are two
+sentences in two sections, not one section's pair** — read closely, the
+original header conflated them as if both lived in §Operative residency. Both
+move — **design-bearing**.
 
 What lands: the enforcement question is **answered by relocation**. The act is
 unreachable and stays unreachable; the **harm** passes a chokepoint and is
@@ -242,7 +246,7 @@ not refuse it as the operator-gated one.
 
 ### 8. The rule's carriers are re-swept by its own wording, not by a roster
 
-Rule 17's corrective states the wait clause, so the carrier set grows — and the
+Rule 14's corrective states the wait clause, so the carrier set grows — and the
 sweep is by **grepping the clause's phrasing across the tree**, never by
 consulting §Operative residency's list — **mechanical**.
 
@@ -256,7 +260,7 @@ guard-kit rule 12's block message; the sweep is what decides the actual set.
 `check-producer-liveness`'s pair gains the set-mode verdicts — an empty
 directory, a directory whose records are all dead, one holding a live record, and
 one holding an unparseable record beside a clean one (the aggregation rule of
-delta 2). Rule 17 takes guard-kit's own rule-test coverage in the shape rules 12
+delta 2). Rule 14 takes guard-kit's own rule-test coverage in the shape rules 12
 and 13 carry. Then `bash gate-sdk/bin/build-native.sh` and
 `bash gate-sdk/bin/run-gates.sh`, neither discharging the other —
 **mechanical**.
@@ -338,12 +342,15 @@ with a dead PID is green, so neither ordering strands a session.
 
 - **delegation-kit/SPEC.md §The delegation model** — delta 1's naming convention,
   in the paragraph that already rules the record's grammar and its two readers;
-  and delta 7's refusal, recorded where the write-side's structural
-  uncheckability is already ruled.
-- **delegation-kit/SPEC.md §Operative residency** — delta 6. Its *"No gate is
-  owed, and not for budget"* paragraph and its closing *"the enforcement-design
-  question ... is untouched"* clause both move; the chokepoint ruling above them
-  is confirmed unchanged.
+  delta 7's refusal, recorded where the write-side's structural uncheckability is
+  already ruled; and **delta 6's second half, corrected at align**: the closing
+  *"the enforcement-design question ... is untouched"* clause lives here, in the
+  "What the naming does not claim" paragraph, not in §Operative residency as the
+  draft's §Operative residency bullet originally claimed.
+- **delegation-kit/SPEC.md §Operative residency** — delta 6's *"No gate is
+  owed, and not for budget"* paragraph moves; the chokepoint ruling above it is
+  confirmed unchanged. (Delta 6's second clause is §The delegation model's, not
+  this section's — see that bullet above.)
 - **delegation-kit/templates/agent-execution.md** — the wait rule's own carrier,
   which states the record's placement; delta 1's filename lands there, and delta 8
   is the sweep that finds the rest.

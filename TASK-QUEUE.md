@@ -150,9 +150,12 @@
   both at scope on a lead's ruling, both on *nothing buildable* rather than on merit) are spent
   by the promotion and live in history.
   **What the promoted unit is, stated here so it is not re-scoped at authoring:** the enforcement
-  design the 2026-08-06 operator ruling deliberately left unanswered. Its design half
-  `turn-end-chokepoint-and-wait-primitive` turns on whether a `Stop` hook can see a live
-  background child — a settings probe rather than a command, and the first thing the unit owes.
+  design the 2026-08-06 operator ruling deliberately left unanswered. **Corrected 2026-08-17,
+  staleness fix at align, not a reversal:** the settings probe is no longer the first thing the
+  unit owes. `turn-end-chokepoint-and-wait-primitive`'s first half is now ANSWERED and its
+  remainder relocated — the `SubagentStop`-wiring settings change lives on the unpromoted,
+  operator-gated `subagent-stop-liveness-hook-wiring`, not on this unit. `SPEC-wait-enforcement.md`
+  is what this promoted unit actually builds, and it touches no settings surface.
   Filed 2026-08-06 by close, recording that iteration's central incident.
 
 ## Technical Debt

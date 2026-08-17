@@ -51,19 +51,26 @@ argued as one.
 **Why these two rather than the four the audit cleared.** `check-commit-subject`
 is the cheapest zero-debt member on the whole remainder — no criterion carries a
 cost and no still-shell gate shares a derivation with it. `check-readme-roster`
-is the roster's own **already-named deferred debt**: §The first budget batch
-recorded it *READY with bounded pre-work* and left it as "the cheapest thing to
-leave for the next one", and the next increment was a size-arm cohort instead, so
-taking it now retires a named item rather than accumulating a third same-shape
-deferral. It is also the phantom pair's portable half, so its port dissolves the
-last non-singleton group **structurally** — the same defect
+is the phantom pair's portable half, so its port dissolves the last
+non-singleton group **structurally** — the same defect
 `port-remainder-permanent-shell-inflation` closes from the tool's end in this
-same iteration, closed here from the member's end. `check-root-tiering` (67
-lines, no pre-work) and `check-core-files` (76) were cleared and **not taken**:
-the budget is 2, neither retires a blocker later members are queued behind, and
-`check-core-files` additionally owes a `kit:<glob>` expander the crate does not
-carry, which is the cheapest thing to leave for the next batch on exactly the
-reasoning that left `check-readme-roster` for this one.
+same iteration, closed here from the member's end.
+
+**Corrected at align: the draft's citation to a prior disposition does not
+resolve.** It read "§The first budget batch recorded it *READY with bounded
+pre-work* and left it as 'the cheapest thing to leave for the next one'" —
+grepped and read in full, §The first budget batch (gate-sdk/SPEC.md:2307-2360)
+names six other members and never mentions `check-readme-roster`; neither phrase
+occurs anywhere in the tree. `check-readme-roster`'s actual disposition is this
+iteration's own finding, not a carried one: this SPEC's survey record (spec
+stage, 2026-08-17) is where it was first probed and found to need criterion-4
+fixture pre-work, which delta 5 discharges.
+
+`check-root-tiering` (67 lines, no pre-work) and `check-core-files` (76) were
+cleared and **not taken**: the budget is 2, neither retires a blocker later
+members are queued behind, and `check-core-files` additionally owes a
+`kit:<glob>` expander the crate does not carry — the cheapest thing to leave for
+the next batch, on the same budget ground that left these two for this one.
 
 ### 2. Criterion 3 does not bar a `tier=commit-msg` member, and the emitter already carries it
 
@@ -129,8 +136,12 @@ literals inside the gate module**, not knobs, exactly as the shell holds them:
 they are gate-sdk's own mechanism rather than a consumer's document vocabulary,
 which is the same seam ruling that kept doctrine-kit's section headings as module
 literals in the first budget batch. Its corpus arrives through the bridged
-`GATE_KIT_ROOTS`; criterion 6 is clean, the derivation being `gate_kit_roots`
-plus two globs and a set comparison, with no shared corpus helper to dual-hold.
+`GATE_SDK_KIT_DIRS` (**corrected at align** — the draft named `GATE_KIT_ROOTS`,
+which is not a knob; `GATE_KIT_ROOTS_HERE`/`GATE_KIT_ROOTS_REL` are the derived
+arrays `gate_kit_roots` resolves *from* `GATE_SDK_KIT_DIRS`, per this gate's own
+§check-readme-roster section); criterion 6 is clean, the derivation being
+`gate_kit_roots` plus two globs and a set comparison, with no shared corpus
+helper to dual-hold.
 
 ### 5. `check-readme-roster` fails criterion 4, and the discharge is fixture pre-work
 
@@ -168,6 +179,20 @@ function, its declared walk roots, the knobs it reads, and the kit root that
 carries its descriptor — **mechanical**.
 
 **No knob is renamed, dropped, or given a crate-side default.**
+
+**`check-readme-roster`'s own SPEC section additionally takes the substrate edit
+every other ported gate's section in this file already carries — corrected at
+align, where the draft's "Existing sections updated" bullet claimed neither
+ported section needed one.** §check-readme-roster's positional-form sentence
+today names the `.sh` suffix explicitly
+(`` `check-readme-roster.sh [root]` ``, gate-sdk/SPEC.md:7233-7234); every other
+already-ported gate's section drops that suffix and gains an **"Its
+implementation is a compiled subcommand, on §check-action-pinning's terms"**
+sentence at port (§check-smoke-entry-guard and §check-template-registry-parity
+are two of six precedents in this same file). This member's port takes that same
+edit. `check-commit-subject`'s section names no invocation form today and needs
+no such edit — the "neither section names its substrate" verdict holds for it
+alone.
 
 **Neither descriptor carries a `# no-port:` line**, and the sibling amendment in
 flight for this component is what makes that worth saying: that field's domain is
@@ -207,6 +232,17 @@ Under the arm's record-only-findings rule the section carries delta 2's
 criterion-3 adjudication and delta 5's criterion-4 ordering, and **not** a member
 roster — membership is derivable from the tree and the count from
 `scripts/measured-claims.sh` — **mechanical**.
+
+**Audited at align: a k=2 batch where each recorded delta names its one subject
+reads close to a roster, and is ruled distinct rather than assumed so.** Delta 2
+and delta 5 are technical adjudications — a criterion satisfied in spirit despite
+its literal wording, a criterion failed and discharged by fixture pre-work —
+each argued on its own terms; a roster is a bare enumeration asserting only
+membership, with no argument attached. That a two-member batch's two arguments
+happen to name both members is a property of *this* batch's size, not a
+membership list reintroduced under a different label — and membership stays
+independently derivable from the tree with this section absent entirely, which a
+roster's information could not be.
 
 ### 10. The binary is rebuilt and the full battery run before commit
 
@@ -313,17 +349,33 @@ Two `*.sh` files leave `gate-sdk/checks/`. Causal-completeness point 5 binds, an
   8. No row is added unless the cut's re-derivation moves a member into the set;
   the re-derivation's verdict lands there either way, because *a member the
   section does not name is red*.
-- **gate-sdk/SPEC.md §check-commit-subject and §check-readme-roster** — **neither
-  takes a substrate change, and that is a verdict rather than an omission**:
-  probed, neither section names its substrate, because a gate's SPEC section owns
-  its **rule** and the substrate is the descriptor's business.
+- **gate-sdk/SPEC.md §check-commit-subject** — takes no substrate change, and
+  that is a verdict rather than an omission: probed, the section names no
+  invocation form and no substrate today, because a gate's SPEC section owns its
+  **rule** and the substrate is the descriptor's business.
+- **gate-sdk/SPEC.md §check-readme-roster** — **corrected at align: this section
+  DOES take a substrate edit**, delta 6's added paragraph — the `.sh` suffix
+  drops from its positional-form sentence and it gains the compiled-subcommand
+  sentence every other ported gate's section already carries. The draft's
+  original bullet grouped this section with §check-commit-subject under "neither
+  takes a substrate change"; that held only for the latter.
 - **gate-sdk/README.md's gate roster** — held in both directions by the very
   member this batch ports.
 - **The committed permission allow-list, and any doc fencing a deleted `.sh`
   path** — the two not-monotone readers named above, each owning its delta
   through the member whose script it names.
-- **`native-gate-port-remaining-corpus`** — its dated ported-count read moves
-  with the batch, per the `check-measured-claim` reader above.
+- **`native-gate-port-remaining-corpus`** — two edits, corrected at align to name
+  both (the draft's bullet named only the first). Its dated `69 of 104 ported`
+  oracle read (TASK-QUEUE.md:39-41) moves to 71 of 104 — **by hand, not by
+  `check-measured-claim`**: that line explicitly disclaims durability ("never a
+  count this line holds") and TASK-QUEUE.md carries no `<!-- measured: -->`
+  marker at all (grepped), so no gate catches a stale copy of it; citing
+  `check-measured-claim` as what forces this edit, as the draft did, overclaims
+  what the gate covers (it does hold the real marked claim at
+  `docs/install.md:193-194`, which is a separate edit and does move under that
+  gate). Second, per this SPEC's DoD "Terminal move is a demotion, not a Done
+  move": the entry drops its `[spec:]` tag and returns to `## Deferred` under
+  `[design-pending]`, keeping its `[roadmap:]` tag.
 
 ## Definition of Done
 
