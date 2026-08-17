@@ -3333,6 +3333,14 @@
   passed on without opening it. A pattern that fires inside the dispatch *about* the pattern is
   the argument for a resident line rather than a link: the reviewers who caught the other five
   had all loaded the material, and it still went through. Hence the rule's relay clause.
+  **The firing that shows the reviewing stages are not the backstop, 2026-08-17
+  (`post-close-intake-and-index-port`).** An amendment section built a whole batch on the
+  claim that deleting a 182-line tracked shell file moves the footprint measurement. False —
+  that projection measures context surfaces, not shell line counts — and it rode through
+  **spec, which authored it, and align, whose whole job is verifying the amendment**,
+  unchallenged. Build caught it by running the emitter rather than reading the sentence, and
+  the batch collapsed into verification. Every earlier firing was caught by a later reviewer;
+  this one only by the first stage that *executed*: review does not catch a false ground.
   **Cost while deferred:** the cost is paid where it was measured — a false premise entering
   at scope is corrected at spec or align if it is lucky, and lands in the queue as established
   fact if it is not; the queue's own convention of dating premise corrections into bodies is
@@ -6323,10 +6331,6 @@
 
 ## Done
 
-- close-generated-finding-route
-- queue-index-non-gate-arm-port
-- simulate-recovery-unrelayed
-- queue-index-blocked-by-assertions
 
 ## Lessons Learned
 
