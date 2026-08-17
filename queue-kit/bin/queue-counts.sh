@@ -21,7 +21,7 @@ done
 FILE="${file:-$QUEUE_KIT_QUEUE_FILE}"
 [[ -f "$FILE" ]] || { echo "queue-counts: file not found: $FILE" >&2; exit 2; }
 
-# spec: queue-kit/SPEC.md §bin/queue-counts.sh — the counted unit is the top-level entry bullet, the same one bin/queue-index.sh lists, so two readers cannot disagree about the size of one queue
+# spec: queue-kit/SPEC.md §bin/queue-counts.sh — the counted unit is the top-level entry bullet, the same one the queue-index arm lists, so two readers cannot disagree about the size of one queue
 awk -v sects="$(printf '%s\n' "${QUEUE_TASK_SECTIONS[@]}")" -v sectre="$QUEUE_SECTION_RE" '
     BEGIN { n = split(sects, S, "\n") }
     $0 ~ sectre {

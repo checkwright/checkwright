@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Behavioral test of bin/queue-counts.sh: the emitted section set is the
 # *configured* task sections in configured order — not a fixed four — and the
-# count is the top-level entry, the unit bin/queue-index.sh lists. The
+# count is the top-level entry, the unit the queue-index arm lists. The
 # icebox-unset case is the discriminating one: a hardcoded implementation passes
 # a run against this repo's own config and fails only here. queue-counts is a
 # tool, not a gate, so it has no good/bad pair; this drives it directly.

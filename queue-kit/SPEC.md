@@ -45,7 +45,7 @@ as `##` sections over column-0 bullets:
 
 The **defer date** of an entry is its `Surfaced <date>` mark when present, else
 the date on its `Filed <date>` provenance line. One definition, two readers —
-drift-kit's deferred-age KPI and `bin/queue-index.sh --icebox-candidates`.
+drift-kit's deferred-age KPI and the `queue-index` arm's `--icebox-candidates`.
 Widening, not replacing: `Surfaced` records when the premise was observed and
 is the better premise-rot datum, `Filed` is the honest available fallback, so
 no entry owes a migration. drift-kit re-implements the definition rather than
@@ -346,7 +346,7 @@ rule (lifecycle-kit/SPEC.md §Layout and configuration,
 `LIFECYCLE_KIT_RECURRENCE_THRESHOLD`) and drift-kit's `kpi-incident-recurrence`
 (drift-kit/SPEC.md §Bundled KPIs) — each read it without depending on the other's
 kit. Self-citation is already narration rather than an edge (above), so the field
-costs no new rule. That one-grep property is also why **no `bin/queue-index.sh`
+costs no new rule. That one-grep property is also why **no `queue-index`
 recurrence mode exists** — the obvious home, refused: drift-kit could not call it
 without the cycle its own KPI already records, which would leave lifecycle-kit's
 rule as the only caller, and §The queue-index arm already resists a further mode on
@@ -380,7 +380,7 @@ and hand-read; an entry with no declaration is simply an entry that has not
 recurred.
 
 Two tags ride **Lessons Learned** entries — a lesson is a top-level bullet
-under the fixed-spelling `## Lessons Learned` heading, and `bin/queue-index.sh`
+under the fixed-spelling `## Lessons Learned` heading, and the `queue-index` arm
 plus `check-tag-lead-line` read that section's lead lines too. That section is
 one of close's inbound triage surfaces, and its forcing function is the sibling
 of the gap inbox's — the first-stage entry refuses while it holds entries — so it
@@ -408,8 +408,9 @@ close-surface: TASK-QUEUE.md#Lessons-Learned forced=lifecycle-kit/SPEC.md §bin/
 
 The kit is vendored beside gate-sdk (conventionally at `queue-kit/`); its
 gates are registered in the consumer's `gates.list` by name and resolve
-through gate-sdk's multi-kit path. `bin/queue-index.sh` is a tool, not a gate
-(no `# graph:` manifest).
+through gate-sdk's multi-kit path. The `queue-index` arm is not among them: it
+is a non-gate arm of the binary, registered in no `gates.list` and carrying no
+`.gate` descriptor (§The queue-index arm).
 
 Config follows lifecycle-kit's pattern: copy `templates/queue-config.sh`
 into the gates dir as `queue-config.sh` (or point `QUEUE_KIT_CONFIG_FILE`
@@ -435,7 +436,7 @@ Knobs:
   line cap `check-queue-entry-budget` assertion A holds over the deferred
   section.
 - `QUEUE_KIT_ICEBOX_AGE_DAYS` — positive integer, default `30`; the defer-date
-  age filter for `bin/queue-index.sh --icebox-candidates`, and nothing else.
+  age filter for the `queue-index` arm's `--icebox-candidates`, and nothing else.
 - `QUEUE_KIT_WRAP_BUDGET` — default `100` (`check-queue-wrap` gate floor).
 - `QUEUE_KIT_PROSE_LEADS` — array of column-0 lead tokens exempt from the
   hygiene gate's no-prose axis, default `("Protocol:")`.
@@ -465,7 +466,7 @@ Knobs:
   fail-open default (§bin/lesson-sink.sh). A private sink value belongs in the
   local overlay, not this tracked file.
 - `QUEUE_KIT_ATTEND_CAP` — positive integer, default `3`; the maximum `[attend]`
-  lead lines `bin/queue-index.sh` emits in its attention block before folding
+  lead lines the `queue-index` arm emits in its attention block before folding
   the rest into an overflow note.
 - `QUEUE_KIT_HORIZONS` — ordered array of horizon names for the `[roadmap:]`
   tag's first field, default empty. The order is the projection's emitted
@@ -717,8 +718,8 @@ The counted unit is the **top-level entry bullet** — the same unit
 sizes for one queue. Not lines, and not bullets: an indented bullet inside an
 entry body is body.
 
-**Why a second tool rather than a fourth mode on `bin/queue-index.sh`.** That
-tool's modes are fixed at `index`, `extent` and `icebox-candidates`
+**Why a second tool rather than a fourth mode on the `queue-index` arm.** That
+arm's modes are fixed at `index`, `extent` and `icebox-candidates`
 (§The queue-index arm), on the stated grounds that folding jobs together gives one
 tool two output grammars — the same refusal that keeps `bin/queue-edges.sh`
 separate. A tally keyed by section name is a different job with a different
@@ -737,7 +738,7 @@ statusline template, whose own contract records the degradation
 ### bin/queue-edges.sh
 
 The inbound-citation aggregator: a tool, not a gate (no `# graph:` manifest),
-following `bin/queue-index.sh`. It reads the queue, writes **stdout only**, and
+following the queue-index precedent. It reads the queue, writes **stdout only**, and
 mutates nothing.
 
 ```
@@ -792,7 +793,7 @@ that, a committed copy of derived edges over what is typically a repo's
 highest-churn file would restale on essentially every queue edit, buying a
 per-commit regeneration tax for zero benefit. Derivation-first is satisfied by
 deriving on demand: that rule's "generate and freshness-gate" clause governs a
-copy that is *needed*, and this one is not. `bin/queue-index.sh` writes nothing
+copy that is *needed*, and this one is not. The `queue-index` arm writes nothing
 and is gated by nothing, for the same reason.
 
 **Not a gate, either.** There is nothing to red: an entry with no inbound edges
@@ -806,7 +807,7 @@ it inward would red on good prose.
 ### bin/roadmap.sh
 
 The public-roadmap emitter: a tool, not a gate (no `# graph:` manifest),
-following `bin/queue-index.sh`. `--emit` prints the generated block to stdout;
+following the queue-index precedent. `--emit` prints the generated block to stdout;
 `--write` splices it between the markers in `QUEUE_KIT_ROADMAP_FILE` through
 gate-sdk's `inject_marker_block`, leaving every byte outside them untouched. It
 reads the live task sections only — active, deferred, and a configured icebox,
@@ -955,7 +956,7 @@ assertions:
 - **(A) Size.** No deferred entry exceeds `QUEUE_KIT_ENTRY_LINE_CAP` **counted**
   lines. An entry's **extent** is the lead line through the line before the next
   bullet at the same or shallower indent — the same extent
-  `bin/queue-index.sh --extent` yields, so the range the gate measures is the
+  the `queue-index` arm's `--extent` yields, so the range the gate measures is the
   range an eviction deletes. Its **count** is that extent less **at most one**
   line matching the `recurrence:` declaration grammar (§The tag algebra). Extent
   and count differ by that one discounted line and by nothing else, which is what
@@ -998,8 +999,8 @@ to enforce the cap, so a session sizing an edit reads the measurement instead
 of hand-rolling it — a hand-rolled probe carries the risk of a second spelling
 of the cap, a second implementation of the parse, and a mismeasured entry
 boundary that reads as a false cap overrun. The rejected
-alternative was a `--headroom <slug>` mode on `bin/queue-index.sh`: it mints a
-name and grows a shell tool this repo's port track retires, where this
+alternative was a `--headroom <slug>` mode on the `queue-index` arm: it mints a
+name against that arm's standing no-fourth-mode refusal, where this
 exposure spends nothing beyond a print at the compiled assertion's existing
 computation.
 
