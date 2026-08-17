@@ -14,6 +14,36 @@
 
 ## Technical Debt
 
+- **simulate-recovery-unrelayed** — `enter-stage.sh --simulate` reports that an entry would be
+  refused and never how to recover, and the SPEC's simulate roster omits a refusal the code runs.
+  **The mechanism, read rather than inferred.** Every `help:` echo in the script — 210 and 226
+  (preflight), 246 (Lessons), 262-263 (gap inbox), 287 (BOUNDARY_REQUIRE) — sits *after* the
+  `sim == 1` branch's own `exit 1`. Five refusal classes, zero recovery under simulate. The real
+  refusal's text is the actionable half by design: lifecycle-kit/SPEC.md §The committed gap inbox
+  says of the post-close recovery that "what was missing was the message's actionability".
+  **The designed consumer of simulate is the LEAD** — lifecycle-kit/SPEC.md §templates/lead.md
+  directs it to gate an expensive dispatch with `--simulate` rather than hand-derive prior-stage
+  completeness — so the actor the mode was built for is the one who loses the recovery.
+  **Attested, not predicted.** At the 2026-08-17 boundary the lead ran `--simulate scope`, did not
+  see line 263's post-close recovery, and escalated to the entering scope session an unverified
+  negative asking whether a pre-entry queue write is sanctioned — which line 263 answers verbatim.
+  **Second half, same subject.** lifecycle-kit/SPEC.md's `--simulate` roster enumerates what the
+  mode runs and ends at "the iteration-boundary Lessons check — then stops", omitting the
+  gap-inbox refusal the script runs and the boundary-require check one line down. SPEC-vs-code.
+  **Debt rather than a feature:** it converges behaviour on names the specs already carry — the
+  `help:` output, the mode, the refusal set — and mints none.
+  **Distinct from two filed siblings:** `enter-stage-arg-position-silent-drop` is the flag's
+  *position*, `enter-stage-simulate-no-write-fixture` (icebox) the no-write guarantee; neither
+  touches output actionability.
+  **RIDER, operator-ruled 2026-08-17 and bounded here so the build cannot widen it.** This unit's
+  build also runs ONE probe: whether a `Stop` hook can observe a live `run_in_background` child.
+  It is the single unrun fact both halves of `turn-end-chokepoint-and-wait-primitive` turn on, and
+  a settings experiment rather than a command, which is why it rides rather than waits. **Bounded
+  to the probe and its recorded result — it does not license building the enforcement design the
+  probe informs.** Grounds: `waiting-rule-fourth-firing-post-fix` reached a THIRD recurrence date
+  at this boundary, and its own text routes a third to the operator, not to a third decline.
+  Filed 2026-08-17 at scope, from this session's own read of the script that refused it.
+
 ## Deferred
 
 - **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
@@ -156,7 +186,19 @@
   **What lands with it, and what does not.** `icebox-worklist-roadmap-blind` re-grounds its
   deferral on this entry, so its predicate rides this port; its *presentation* half — whether an
   excluded row vanishes or prints as a stated exclusion — stays that entry's to decide, and this
-  one must not pre-empt it. queue-kit/SPEC.md §check-queue-entry-budget already refused a
+  one must not pre-empt it.
+  **PROMOTED 2026-08-17 by operator ruling as this iteration's port increment, into
+  `post-close-intake-and-index-port`. The amendment is spec's.** It carries the PRIORITY
+  DIRECTIVE's port cadence and discharges
+  `icebox-worklist-roadmap-blind`'s carrier in one unit — that entry stands at three recurrence
+  dates, the highest live count in the pool, and its predicate rides this port.
+  **ENTRY WARNING for the stage that authors this, so no entry discovers it late:** the caller
+  set spans queue-kit, `native/` and context-kit, so the amendment covers ≥2 component dirs and
+  `check-stage-entry` assertion C will demand the audit-stage stamp (or a user-ruled waiver) at
+  the entry *after* spec. Re-sized 2026-08-17 at scope: 182 lines, zero `# graph:` manifests,
+  callers re-verified live as `context-kit/templates/session-context.sh`,
+  `context-kit/bin/always-loaded.sh`, `queue-kit/bin/queue-counts.sh` and the close skill.
+  queue-kit/SPEC.md §check-queue-entry-budget already refused a
   `--headroom` mode here on the ground that it "grows a shell tool this repo's port track
   retires", so the SPEC anticipates this unit by name.
   **Cost while deferred:** one 182-line shell tool stays in the dependency floor against
@@ -1165,6 +1207,20 @@
   straight to the queue or to Lessons, never through the inbox, loses the inbox's
   one uniform capture channel and reintroduces the mid-iteration index contention
   the inbox exists to prevent. Picking among them is the work.
+  **PROMOTED 2026-08-17 by operator ruling into `post-close-intake-and-index-port`; the amendment
+  is spec's. RULED: route (a)** — the refusal distinguishes a post-close bullet from a
+  close-skipped one and routes the first into scope's ordinary intake. The operator's other
+  route, refusing capture at `file-gap.sh` once close has run, is **ruled out with its ground**,
+  recorded so the two-route framing is not re-opened: §The committed gap inbox already refuses
+  capture-time refusal, since refusing capture pushes the finding back into session context.
+  **A FOURTH candidate, relayed and NOT ruled** — spec weighs it against the three above.
+  Post-close-ness is *derivable*: the inbox is committed and the drain truncates it, so "has the
+  inbox been truncated since the close stamp commit?" separates the cases with no marker field,
+  leaving §check-gap-inbox-neutrality's two-field bound intact. Probed, not designed.
+  **Folded in by the lead 2026-08-17: the direct-stamp obligation has no discharge a LEAD can
+  reach.** It is *obliged* and attaches to the judgment, while lifecycle-kit/templates/lead.md
+  forbids the lead every queue write — so its only channel is this inbox, which produces the very
+  refusal this entry fixes. `recurrence-obligation-residency` is the *reach* half; this *authority*.
   **Cost while deferred:** low and non-rotting in tree terms, but it is paid every
   iteration that closes productively, and it is paid as a **record** defect — the
   findings survive, in the wrong iteration's ledger.
@@ -5981,6 +6037,7 @@
   written, close's by the watch being a read-only remote poll that truncates no artifact — so the
   rule itself held in neither. **Two firings in one iteration, both in producing roles**, which is
   the first evidence the rate is not one-per-iteration noise.
+  **Its `Stop` probe is a 2026-08-17 operator-ruled rider on `simulate-recovery-unrelayed`.**
   Filed 2026-08-16 by close from the gap inbox, both halves; the drain re-verified the carrier
   count and the chokepoint scoping against the SPEC rather than taking the bullet's prose.
 
