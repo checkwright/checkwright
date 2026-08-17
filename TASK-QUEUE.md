@@ -12,6 +12,104 @@
 
 ## New Features
 
+- **close-generated-finding-route** [spec: SPEC-intake-route.md] — the gap inbox is drained
+  **once, at close**, and close is the stage that generates findings by design —
+  the audit sweeps, the lesson disposition, the staleness read, the release
+  disposition. Anything close generates, or that close's own failure generates,
+  necessarily postdates its drain, so a close-generated finding has no drainer
+  inside its own iteration. This is not a filer's timing error to work around; it
+  is untimeable.
+  `bin/file-gap.sh` already warns that a filing made while the cursor sits at the
+  last configured stage may have no stage left to drain it, but it frames that as
+  the filer's problem. The design implication is stronger: the drain-once shape
+  has its blind spot exactly where the lifecycle is most productive of findings,
+  and the sanctioned fallback — the next scope entry refuses until the entering
+  session promotes the bullets itself — silently pushes one iteration's record
+  across the boundary into the next one's.
+  **Evidence it is live rather than theoretical:** this iteration. The drain
+  landed claiming 24 bullets dispositioned; five more findings arrived after it,
+  and close re-drained.
+  **Narrowed 2026-08-17 by `recurrence-drain-input-widening`, which settles the RECURRENCE half
+  and nothing else.** A close-generated finding that *is* a recurrence now has a channel — the
+  session judging it stamps the date directly, that ruling's first ground being this entry's own
+  argument. What stays open is this entry's actual question: a close-generated finding that is
+  **not** a recurrence still has no drainer inside its own iteration.
+  **Why it needed design — three candidates, three different failure modes.** A
+  second drain pass late in close, after its own findings have settled, can loop.
+  A re-arm refusing close's completion while the inbox is non-empty can deadlock
+  close against its own filings. An explicit rule routing close-generated findings
+  straight to the queue or to Lessons, never through the inbox, loses the inbox's
+  one uniform capture channel and reintroduces the mid-iteration index contention
+  the inbox exists to prevent. Picking among them is the work.
+  **PROMOTED 2026-08-17 by operator ruling into `post-close-intake-and-index-port`; the amendment
+  is spec's. RULED: route (a)** — the refusal distinguishes a post-close bullet from a
+  close-skipped one and routes the first into scope's ordinary intake. The operator's other
+  route, refusing capture at `file-gap.sh` once close has run, is **ruled out with its ground**,
+  recorded so the two-route framing is not re-opened: §The committed gap inbox already refuses
+  capture-time refusal, since refusing capture pushes the finding back into session context.
+  **A FOURTH candidate, relayed and NOT ruled** — spec weighs it against the three above.
+  Post-close-ness is *derivable*: the inbox is committed and the drain truncates it, so "has the
+  inbox been truncated since the close stamp commit?" separates the cases with no marker field,
+  leaving §check-gap-inbox-neutrality's two-field bound intact. Probed, not designed.
+  **Folded in by the lead 2026-08-17: the direct-stamp obligation has no discharge a LEAD can
+  reach.** It is *obliged* and attaches to the judgment, while lifecycle-kit/templates/lead.md
+  forbids the lead every queue write — so its only channel is this inbox, which produces the very
+  refusal this entry fixes. `recurrence-obligation-residency` is the *reach* half; this *authority*.
+  **Cost while deferred:** low and non-rotting in tree terms, but it is paid every
+  iteration that closes productively, and it is paid as a **record** defect — the
+  findings survive, in the wrong iteration's ledger.
+  Surfaced 2026-07-31 by the lead, deliberately **not** filed to the inbox on the
+  ground that filing it there would compound the defect it names; drained by close
+  in the same pass as the inbox.
+
+- **queue-index-non-gate-arm-port** [spec: SPEC-index-arm.md] — `queue-kit/bin/queue-index.sh`
+  (182 lines) onto the binary's non-gate arm.
+  **A cohort under `native-gate-port-remaining-corpus`, not a competing claim on its corpus.**
+  That umbrella already covers this by its own words — "the whole battery onto the binary, **and
+  the shell surface down to its residue**" — so nothing here widens the port's scope. What did not
+  exist is a cohort at the granularity a bundling ground can name, which is the whole reason this
+  entry is filed rather than the umbrella cited.
+  **Why it fell through every filed cohort.** Cohort membership so far runs off the *gate* corpus
+  (`port-blockers.sh --group` scans registered members) or off a named family
+  (`freshness-emitter-port-cohort`'s six `check-*-fresh` emitters). `queue-index.sh` is neither: it
+  is a tool, not a gate — its own header says so, and it carries no `# graph:` manifest — and it
+  emits no freshness projection. So it is reachable by no selector the port currently runs, which
+  is a gap in the *selection* machinery as much as in the roster.
+  **The shape is already ruled, so this applies a decision rather than taking one:** a ported
+  non-gate tool becomes a non-gate arm of the binary (gate-sdk/SPEC.md §The non-gate arm), the
+  form `freshness-emitter-port-cohort` records as answered and merged.
+  **Why it needed design even so — the caller set is the open half, not a gate's.**
+  Its callers are a session-context hook (`context-kit/templates/session-context.sh`,
+  `scripts/session-context.sh`, `context-kit/bin/always-loaded.sh`) and
+  the close skill. A ported emitter could be called in-process by its already-compiled comparator;
+  this one has no gate consumer at all, so the port must decide what each caller invokes and
+  whether the hook's own shell survives it under TRAJECTORY.md objective 6.
+  **What lands with it, and what does not.** `icebox-worklist-roadmap-blind` re-grounds its
+  deferral on this entry, so its predicate rides this port; its *presentation* half — whether an
+  excluded row vanishes or prints as a stated exclusion — stays that entry's to decide, and this
+  one must not pre-empt it.
+  **PROMOTED 2026-08-17 by operator ruling as this iteration's port increment, into
+  `post-close-intake-and-index-port`. The amendment is spec's.** It carries the PRIORITY
+  DIRECTIVE's port cadence and discharges
+  `icebox-worklist-roadmap-blind`'s carrier in one unit — that entry stands at three recurrence
+  dates, the highest live count in the pool, and its predicate rides this port.
+  **ENTRY WARNING for the stage that authors this, so no entry discovers it late:** the caller
+  set spans queue-kit, `native/` and context-kit, so the amendment covers ≥2 component dirs and
+  `check-stage-entry` assertion C will demand the audit-stage stamp (or a user-ruled waiver) at
+  the entry *after* spec. Re-sized 2026-08-17 at scope: 182 lines, zero `# graph:` manifests,
+  callers re-verified at spec as `context-kit/templates/session-context.sh`,
+  `scripts/session-context.sh`, `context-kit/bin/always-loaded.sh` and the close skill;
+  `queue-counts.sh` cites this tool and never calls it — a caller-set correction made at spec.
+  queue-kit/SPEC.md §check-queue-entry-budget already refused a
+  `--headroom` mode here on the ground that it "grows a shell tool this repo's port track
+  retires", so the SPEC anticipates this unit by name.
+  **Cost while deferred:** one 182-line shell tool stays in the dependency floor against
+  TRAJECTORY.md objectives 1 and 6, on the session-context hook path where every session pays it;
+  and `icebox-worklist-roadmap-blind` stays deferred behind it at a measured zero precision per
+  close.
+  Filed 2026-08-17 at scope on the operator's ruling, dispositioning a carrier gap this scope's
+  own survey found (`.workflow/survey-record.md`, the port-increment block of that date).
+
 ## Technical Debt
 
 - **simulate-recovery-unrelayed** — `enter-stage.sh --simulate` reports that an entry would be
@@ -160,53 +258,6 @@
   TRAJECTORY.md objectives 1 and 6, all three behind already-compiled comparators.
   Filed 2026-08-15 by close; scoped to the value-rollup triple by operator ruling 2026-08-15 and
   demoted at build 2026-08-16 having delivered that triple.
-
-- **queue-index-non-gate-arm-port** [design-pending] — `queue-kit/bin/queue-index.sh` (182 lines)
-  onto the binary's non-gate arm.
-  **A cohort under `native-gate-port-remaining-corpus`, not a competing claim on its corpus.**
-  That umbrella already covers this by its own words — "the whole battery onto the binary, **and
-  the shell surface down to its residue**" — so nothing here widens the port's scope. What did not
-  exist is a cohort at the granularity a bundling ground can name, which is the whole reason this
-  entry is filed rather than the umbrella cited.
-  **Why it fell through every filed cohort.** Cohort membership so far runs off the *gate* corpus
-  (`port-blockers.sh --group` scans registered members) or off a named family
-  (`freshness-emitter-port-cohort`'s six `check-*-fresh` emitters). `queue-index.sh` is neither: it
-  is a tool, not a gate — its own header says so, and it carries no `# graph:` manifest — and it
-  emits no freshness projection. So it is reachable by no selector the port currently runs, which
-  is a gap in the *selection* machinery as much as in the roster.
-  **The shape is already ruled, so this applies a decision rather than taking one:** a ported
-  non-gate tool becomes a non-gate arm of the binary (gate-sdk/SPEC.md §The non-gate arm), the
-  form `freshness-emitter-port-cohort` records as answered and merged.
-  **Why `[design-pending]` even so — the caller set is the open half, and it is not a gate's.**
-  Its callers are a session-context hook (`context-kit/templates/session-context.sh`,
-  `context-kit/bin/always-loaded.sh`), a sibling shell tool (`queue-kit/bin/queue-counts.sh`) and
-  the close skill. A ported emitter could be called in-process by its already-compiled comparator;
-  this one has no gate consumer at all, so the port must decide what each caller invokes and
-  whether the hook's own shell survives it under TRAJECTORY.md objective 6.
-  **What lands with it, and what does not.** `icebox-worklist-roadmap-blind` re-grounds its
-  deferral on this entry, so its predicate rides this port; its *presentation* half — whether an
-  excluded row vanishes or prints as a stated exclusion — stays that entry's to decide, and this
-  one must not pre-empt it.
-  **PROMOTED 2026-08-17 by operator ruling as this iteration's port increment, into
-  `post-close-intake-and-index-port`. The amendment is spec's.** It carries the PRIORITY
-  DIRECTIVE's port cadence and discharges
-  `icebox-worklist-roadmap-blind`'s carrier in one unit — that entry stands at three recurrence
-  dates, the highest live count in the pool, and its predicate rides this port.
-  **ENTRY WARNING for the stage that authors this, so no entry discovers it late:** the caller
-  set spans queue-kit, `native/` and context-kit, so the amendment covers ≥2 component dirs and
-  `check-stage-entry` assertion C will demand the audit-stage stamp (or a user-ruled waiver) at
-  the entry *after* spec. Re-sized 2026-08-17 at scope: 182 lines, zero `# graph:` manifests,
-  callers re-verified live as `context-kit/templates/session-context.sh`,
-  `context-kit/bin/always-loaded.sh`, `queue-kit/bin/queue-counts.sh` and the close skill.
-  queue-kit/SPEC.md §check-queue-entry-budget already refused a
-  `--headroom` mode here on the ground that it "grows a shell tool this repo's port track
-  retires", so the SPEC anticipates this unit by name.
-  **Cost while deferred:** one 182-line shell tool stays in the dependency floor against
-  TRAJECTORY.md objectives 1 and 6, on the session-context hook path where every session pays it;
-  and `icebox-worklist-roadmap-blind` stays deferred behind it at a measured zero precision per
-  close.
-  Filed 2026-08-17 at scope on the operator's ruling, dispositioning a carrier gap this scope's
-  own survey found (`.workflow/survey-record.md`, the port-increment block of that date).
 
 - **born-native-omission-accumulation** [design-pending] — the born-native flip attaches
   criterion 5's omission to every future gate, and nothing measures the pile.
@@ -1177,56 +1228,6 @@
   drifting rosters sits on the surface every session loads, and has now drifted.
   Surfaced 2026-07-31 by close's top-level staleness review, which found the first
   two; filed rather than fixed because the enum-set survey is the work.
-
-- **close-generated-finding-route** [design-pending] — the gap inbox is drained
-  **once, at close**, and close is the stage that generates findings by design —
-  the audit sweeps, the lesson disposition, the staleness read, the release
-  disposition. Anything close generates, or that close's own failure generates,
-  necessarily postdates its drain, so a close-generated finding has no drainer
-  inside its own iteration. This is not a filer's timing error to work around; it
-  is untimeable.
-  `bin/file-gap.sh` already warns that a filing made while the cursor sits at the
-  last configured stage may have no stage left to drain it, but it frames that as
-  the filer's problem. The design implication is stronger: the drain-once shape
-  has its blind spot exactly where the lifecycle is most productive of findings,
-  and the sanctioned fallback — the next scope entry refuses until the entering
-  session promotes the bullets itself — silently pushes one iteration's record
-  across the boundary into the next one's.
-  **Evidence it is live rather than theoretical:** this iteration. The drain
-  landed claiming 24 bullets dispositioned; five more findings arrived after it,
-  and close re-drained.
-  **Narrowed 2026-08-17 by `recurrence-drain-input-widening`, which settles the RECURRENCE half
-  and nothing else.** A close-generated finding that *is* a recurrence now has a channel — the
-  session judging it stamps the date directly, that ruling's first ground being this entry's own
-  argument. What stays open is this entry's actual question: a close-generated finding that is
-  **not** a recurrence still has no drainer inside its own iteration.
-  **Why `[design-pending]` — three candidates, three different failure modes.** A
-  second drain pass late in close, after its own findings have settled, can loop.
-  A re-arm refusing close's completion while the inbox is non-empty can deadlock
-  close against its own filings. An explicit rule routing close-generated findings
-  straight to the queue or to Lessons, never through the inbox, loses the inbox's
-  one uniform capture channel and reintroduces the mid-iteration index contention
-  the inbox exists to prevent. Picking among them is the work.
-  **PROMOTED 2026-08-17 by operator ruling into `post-close-intake-and-index-port`; the amendment
-  is spec's. RULED: route (a)** — the refusal distinguishes a post-close bullet from a
-  close-skipped one and routes the first into scope's ordinary intake. The operator's other
-  route, refusing capture at `file-gap.sh` once close has run, is **ruled out with its ground**,
-  recorded so the two-route framing is not re-opened: §The committed gap inbox already refuses
-  capture-time refusal, since refusing capture pushes the finding back into session context.
-  **A FOURTH candidate, relayed and NOT ruled** — spec weighs it against the three above.
-  Post-close-ness is *derivable*: the inbox is committed and the drain truncates it, so "has the
-  inbox been truncated since the close stamp commit?" separates the cases with no marker field,
-  leaving §check-gap-inbox-neutrality's two-field bound intact. Probed, not designed.
-  **Folded in by the lead 2026-08-17: the direct-stamp obligation has no discharge a LEAD can
-  reach.** It is *obliged* and attaches to the judgment, while lifecycle-kit/templates/lead.md
-  forbids the lead every queue write — so its only channel is this inbox, which produces the very
-  refusal this entry fixes. `recurrence-obligation-residency` is the *reach* half; this *authority*.
-  **Cost while deferred:** low and non-rotting in tree terms, but it is paid every
-  iteration that closes productively, and it is paid as a **record** defect — the
-  findings survive, in the wrong iteration's ledger.
-  Surfaced 2026-07-31 by the lead, deliberately **not** filed to the inbox on the
-  ground that filing it there would compound the defect it names; drained by close
-  in the same pass as the inbox.
 
 - **post-immutability-machine-read-carveout** [design-pending] — the post
   immutability rule and the machine-readable-note rule are stated on two pages
