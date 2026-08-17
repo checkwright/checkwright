@@ -6557,10 +6557,6 @@
 
 ## Done
 
-- port-remainder-permanent-shell-inflation
-- waiting-rule-fourth-firing-post-fix
-- upgrade-smoke-phase-a-regen-derivation
-
 ## Lessons Learned
 
 
