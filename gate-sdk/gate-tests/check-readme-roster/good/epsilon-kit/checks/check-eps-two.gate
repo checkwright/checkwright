@@ -1,0 +1,2 @@
+# graph: couples=epsilon-kit/README.md dir=one valve=none tier=precommit
+# spec: gate-sdk/SPEC.md §check-readme-roster — fixture descriptor; only the basename is read

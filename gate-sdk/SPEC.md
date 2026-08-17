@@ -113,7 +113,11 @@ fail-closed when missing), `GATE_SDK_MSG_PATTERN_FILES_LOCAL` (default
 fresh clone without the operator's private list still commits),
 `GATE_SDK_COMMIT_TYPES` (default
 `feat fix refactor perf docs test build ci chore style`; the shared
-commit-type roster — see §check-commit-subject), `GATE_SDK_EXEC_GLOBS`
+commit-type roster — see §check-commit-subject — resolved onto the knob's own
+name in `lib/gate.sh` rather than inside `gate_commit_types`' expansion, the
+same reason the two document knobs above are: a default the bridge's `declare
+-p` cannot find is its undeclared-knob refusal, so the compiled member would
+fail-close on every invocation), `GATE_SDK_EXEC_GLOBS`
 (default `*/checks/*.sh */kpis/*.sh */bin/*.sh` plus the computed
 `<gates-dir>/check-*.sh` and `<gates-dir>/kpi-*.sh`; the path globs whose
 tracked `*.sh` members `check-exec-bit` holds to index mode `100755` — see
@@ -854,7 +858,7 @@ answering a question assertion C never asked.
 | `check-gate-exemption-tasks` | **Retained, corpus extended** the same way. |
 | `check-comment-tier` | **Retained, corpus extended** to the implementation module and the `.gate` descriptor, whose own lines are directives by construction. Mechanism: the shared primitive `comment_surface` carries `*.gate` **and `*.rs`** arms — widened once, for every caller (see the `check-spec-pointer` row). The implementation arm is the load-bearing one: locality-class directives stay in the implementation by the reader partition (§The `# graph:` manifest), so without it they would go dark exactly where they still apply. **This member is itself `.gate`-dispatched** since the seventh cohort, so it now audits its own declaration — which is why its trigger names `*.gate` and `*.rs` and why its fixture pair, not the live tree, is what proves those arms. |
 | `check-spec-pointer` | **Retained, and its corpus depends on the same widening** — not "unchanged" in mechanism, only in assertion logic. It calls the *same* shared primitive, `comment_surface` in `native/src/spec.rs` since the seventh cohort ported both it and all four of its callers (canon-kit/SPEC.md §lib/spec.sh); absent that one shared fix a ported gate's `# spec:` line would silently stop being checked in both places it can live — the descriptor and the implementation. With the primitive carrying the `.gate` and `*.rs` arms its own probe logic needs no change. |
-| `check-readme-roster` | **Retained, glob widened** to `*.sh` + `*.gate`. Without it a ported gate silently drops out of its kit README's roster in both directions. |
+| `check-readme-roster` | **Retained, glob widened** to `*.sh` + `*.gate`. Without it a ported gate silently drops out of its kit README's roster in both directions. **This member is itself `.gate`-dispatched** since §The second budget batch, so the row now describes a ported member reading ported members' declaration paths — the shape the `check-value-rollup-fresh` row already has, and the port changes nothing about the rule: what it scans is a set of basenames across both spellings, which the descriptor still is. |
 | `check-exec-bit` | **Retained, extended**: a `.gate` descriptor must be **non**-executable. Stated as an assertion so "not executable" cannot read as "not covered". |
 | `check-todo-task-liveness`, `check-deprecation-task` | **Retained, corpus extended** to the Rust module and the descriptor, the same shape as `check-comment-tier`: both walk the shared comment surface hunting `TODO(task:)`/deprecation markers, so a marker left in a ported gate's Rust source would otherwise stop being tracked. Both are `.gate`-dispatched since the seventh cohort, on the same terms as the two rows above. |
 | `check-knob-default-coupling` | **Retained unchanged, and deliberately *not* corpus-extended** — the extension the shape of this table invites would be vacuous. Its two default idioms are shell (`${KNOB:-v}`, the guarded assignment) and its knob prefixes derive from `gate_kit_roots` members; `native/` is not a kit root and a Rust `const` matches neither idiom, so pointing it at `*.rs` would scan files whose grammar it cannot parse and add zero assertions while reading as coverage. The duplication it could not reach — the crate's prune-dir default against `lib/gate.sh`'s — **is now absent rather than test-held**: the config bridge (§lib/gate.sh) leaves exactly one place a knob's value is computed, the kit's shell library, and the crate carries no default for a bridged knob to drift from. The crate carries no unit test comparing the two literals, because it carries only one: that assertion is **deleted with the duplication it gated** — enforcement-first ranks removing the duplication above gating it, and a citation left behind would point this table at an absent mechanism, the exact defect its own prose calls out. Its verdict on `lib/gate.sh` is unchanged: the shell default stays exactly where it is, as the sole one. |
@@ -930,6 +934,15 @@ predicate. It also means the gate's consumption path assumes nothing about where
 the binary came from: the invocation is through `GATE_SDK_NATIVE_BIN`, the knob
 every other binary reader uses, and an installed artifact answers `--reads`
 identically to one `cargo` produced.
+
+**The set was re-derived at §The second budget batch's cut and gains no row.**
+That batch's README-roster member already carried the row above and the port does
+not move it; its commit-message sibling couples `gate-sdk/lib/gate.sh` alone,
+which covers **no** registry member's declaration path, so it earns none — a
+reverse trigger on the roster's config home, the shape the `check-docs-cmd` row
+records. Written down because a port *changes* declaration paths, so the verdict
+is taken by running the derivation at each cut rather than inherited, and it is
+recorded whether or not it moves a member.
 
 Gates whose corpus is kit directories, smoke scripts or hooks
 (`check-kit-registration`, `check-smoke-entry-guard`, `check-hook-exec-bit`,
@@ -1151,6 +1164,17 @@ design time; the last three were paid for, and each is named with what it cost.
 3. **`tier=precommit`** — it lands in the generated hook, so a green
    `check-graph` after the port is end-to-end proof the manifest survived the
    substrate change.
+
+   **The literal value is a proxy for that reason, not a bar, and a
+   `tier=commit-msg` member satisfies it in full.** Such a member lands in the
+   generated **`commit-msg`** hook, which `check-graph` holds against
+   `--emit-commit-msg` on identical terms, so the end-to-end proof this criterion
+   exists for is available on the same terms. What the criterion actually names is
+   *lands in a generated hook `check-graph` holds*; the two came apart at the first
+   `commit-msg` port and the adjudication is recorded at §The second budget batch,
+   which also records that the emitter and the config bridge needed no widening to
+   reach that tier. `tier=align-only` is untouched by this: it emits into no hook,
+   so the reason has nothing to attach to and the criterion still names a real cost.
 4. **Its assertion target is not gate source** — porting a gate that audits gate
    sources makes the parity proof self-referential: the corpus the
    cross-substrate comparison runs over is changed by the very port being
@@ -1167,6 +1191,14 @@ design time; the last three were paid for, and each is named with what it cost.
    implementation branches resting on a live tree that is green because it is
    clean. Widen first, then port — a port answering only the criterion's sentence
    ships the hole the sentence was pointing at.
+
+   **The second worked instance is a README-roster auditor over `checks/`
+   basenames**, whose pair carried only `.sh` kits, leaving the `.gate` arm the
+   shell already implemented correctly exercised by no case at all. The widening
+   that discharged it is the general shape rather than that member's trick: a kit
+   whose `checks/` holds a descriptor, **and** a mixed `.sh`+`.gate` kit, which is
+   what proves the union of two globs rather than either alone (§The second budget
+   batch).
 
    **The live-tree arm is demoted from proof to smoke for such a member, and the
    demotion is recorded here so the next gate-source cohort inherits it.** Earlier
@@ -2358,6 +2390,58 @@ files, `CLAUDE.md` plus `doctrine-kit/DOCTRINE.md`, and `.workflow/*,.gitignore`
 each name a corpus outside `<kit>/checks/`, `native/src/gates/*.rs` and
 `native/src/*.rs` alike. §Meta-gate conservation for the binary substrate
 gains no row from this batch.
+
+### The second budget batch
+
+**Composed by budget again, and the precondition held through an adjudication
+rather than on the run's face.** `--group` reported one non-singleton group over
+the remainder, and it was a **phantom pair**: its other half is a member §The
+port-candidate criteria's exception class (a) rules permanently shell, whose
+permanence the tool could not see. Every group was in fact a singleton, the size
+arm was exhausted, and the increment belonged to the budget arm — the hand
+adjudication §The first cohort, and the rule that selects the next sanctions, *an
+advisory group is a finding the selecting session adjudicates*. The batch is not
+one unit of work and was never merged, recorded or argued as one. Under the arm's
+record-only-findings rule this section carries the two adjudications the cut
+produced and no member roster: membership is derivable from the tree and the
+count from `scripts/measured-claims.sh`.
+
+**Criterion 3 does not bar a `tier=commit-msg` member, and the criterion's
+literal value is a proxy rather than a bar.** It reads `tier=precommit`, and its
+stated reason is that the member *lands in the generated hook, so a green
+`check-graph` after the port is end-to-end proof the manifest survived the
+substrate change*. A `commit-msg` member lands in the generated **`commit-msg`**
+hook, which `check-graph` holds against `--emit-commit-msg` on identical terms,
+so the criterion's purpose is met in full — the batch's first member is where the
+literal value and the purpose come apart. **The dispatch and the config bridge
+were already there, and the assumption ran the other way first:** the generated
+`commit-msg` hook emits `run_gate <name> <declaration>.sh "$msg_file"`, which
+reads as a shell-only path with no `env` bridge and would owe a new emitter arm.
+It does not — that argv is built through the same `command_rel` → `gate_command`
+path the pre-commit emitter uses, and `gate_command` is what emits
+`env <bridged knobs> <binary> <name>` for a `.gate` member. One emitter, one
+resolver, both tiers; the message-file positional lands after the subcommand name
+and reaches the gate module's argv slice unchanged. Recorded because a member the
+criterion's literal text appears to bar, and does not, reads as a rule being bent
+unless the reason is written down.
+
+**Criterion 4 was failed and discharged by fixture pre-work, and the order is the
+whole discharge.** The batch's second member scans every kit's `checks/`
+directory and its own declaration path lies inside it — criterion 4's predicate
+exactly. **Widen first, then port.** The discharge is a fixture corpus carrying
+every arm of the derivation being ported, and the pair did not: probed directly,
+every kit in both trees shipped only `.sh` files under `checks/`, so the `.gate`
+arm the shell already implemented correctly was exercised by no case at all. The
+pre-work is fixture construction with no design in it — a kit whose `checks/`
+holds a descriptor, and a **mixed** `.sh`+`.gate` kit, which is what proves the
+union of the two globs rather than either alone. **The live-tree arm is demoted
+from proof to smoke for such a member**, on the terms this section's criteria
+already set for a gate-source auditor: assertion A forbids a descriptor and a
+script coexisting in one resolve dir, so the comparison necessarily runs on the
+pre-descriptor tree — a corpus the port then changes. Its verdict is recorded as
+**no disagreement found on the pre-descriptor tree**, never as parity proved; the
+edge-root arm keeps its own separate value, and here it earned it, catching a
+path-construction disagreement no relative-root case could reach.
 
 ### The canon-kit `spec_manifest_files` cohort
 
@@ -7231,11 +7315,17 @@ sweep shape. A kit root without a `checks/` dir is skipped-and-counted; a kit
 root with `checks/` but no marker block in its README is red — the kit-landing
 checklist (§Consumer smoke) has a kit that ships checks registering them.
 Config reuses `GATE_SDK_KIT_DIRS`; no new knob. Positional form
-`check-readme-roster.sh [root]` resolves relative kit roots against a fixture
+`check-readme-roster [root]` resolves relative kit roots against a fixture
 tree (the case dir's `gate-sdk-config.sh` names the fixture kits), the sibling
 meta-gates' hermetic-fixture shape; bare, it sweeps against the git toplevel.
 Fail-closed: a non-repo cwd with no root argument, an empty roster, or an
 unreadable README marker scan is exit 2, never a false clean.
+
+**Its implementation is a compiled subcommand**, on §check-action-pinning's
+terms — declaration path `check-readme-roster.gate`, rule out of the gate
+binary, proved parity-identical before the shell gate was deleted (§The second
+budget batch, where the criterion-4 fixture widening that had to precede that
+proof is recorded).
 
 ### check-smoke-entry-guard
 

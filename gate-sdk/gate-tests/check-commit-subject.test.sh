@@ -1,23 +1,28 @@
 #!/usr/bin/env bash
-# Direct unit test of check-commit-subject.sh — the config path (a
-# consumer-widened roster) and the git-generated carve-outs, neither of which a
-# single good/bad fixture pair can exercise: the pair runs one subject each,
-# while the roster is env-selected and the carve-outs are a set.
+# Direct unit test of check-commit-subject — the config path (a consumer-widened
+# roster) and the git-generated carve-outs, neither of which a single good/bad
+# fixture pair can exercise: the pair runs one subject each, while the roster is
+# env-selected and the carve-outs are a set. The gate is named, never its
+# substrate: gate_run resolves whatever the declaration path dispatches to.
 #
 # Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # gate-sdk/
-GATE="$DIR/checks/check-commit-subject.sh"
 
 fails=0
 tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
 
-# Run the gate on a one-line subject; echo the exit code.
-run_subject() {
+# Run the gate on a one-line subject; echo the exit code. The roster override, when
+# one is given, is exported in the same subshell gate_run resolves the bridge in.
+run_subject() {  # $1=subject  $2..=NAME=VALUE
     printf '%s\n' "$1" > "$tmp/msg.txt"
-    "$GATE" "$tmp/msg.txt" >/dev/null 2>&1
+    shift
+    (
+        gate_env "$@" || exit 2
+        gate_run check-commit-subject "$DIR/checks" "$tmp/msg.txt" >/dev/null 2>&1
+    )
     echo $?
 }
 
@@ -25,11 +30,11 @@ run_subject() {
 rc="$(run_subject 'epic: land the milestone')"
 [[ "$rc" -eq 1 ]] || { echo "  FAIL: 'epic:' should fail the default roster, exited $rc"; fails=$((fails + 1)); }
 
-rc="$(GATE_SDK_COMMIT_TYPES='feat fix epic' run_subject 'epic: land the milestone')"
+rc="$(run_subject 'epic: land the milestone' GATE_SDK_COMMIT_TYPES='feat fix epic')"
 [[ "$rc" -eq 0 ]] || { echo "  FAIL: 'epic:' should pass a roster that includes it, exited $rc"; fails=$((fails + 1)); }
 
 # A default-roster type must still fail against a narrowed roster that omits it.
-rc="$(GATE_SDK_COMMIT_TYPES='fix' run_subject 'feat: add a thing')"
+rc="$(run_subject 'feat: add a thing' GATE_SDK_COMMIT_TYPES='fix')"
 [[ "$rc" -eq 1 ]] || { echo "  FAIL: 'feat:' should fail a roster of just 'fix', exited $rc"; fails=$((fails + 1)); }
 
 # --- git-generated carve-outs (all pass regardless of roster) -----------------
@@ -59,10 +64,10 @@ for sub in 'feat add a thing' \
 done
 
 # --- edge behavior mirroring check-commit-msg ---------------------------------
-"$GATE" >/dev/null 2>&1; rc=$?
+(gate_run check-commit-subject "$DIR/checks" >/dev/null 2>&1); rc=$?
 [[ "$rc" -eq 0 ]] || { echo "  FAIL: no-arg run should clean-skip (exit 0), exited $rc"; fails=$((fails + 1)); }
 
-"$GATE" "$tmp/does-not-exist.txt" >/dev/null 2>&1; rc=$?
+(gate_run check-commit-subject "$DIR/checks" "$tmp/does-not-exist.txt" >/dev/null 2>&1); rc=$?
 [[ "$rc" -eq 2 ]] || { echo "  FAIL: missing message file should fail-closed (exit 2), exited $rc"; fails=$((fails + 1)); }
 
 if [[ "$fails" -gt 0 ]]; then

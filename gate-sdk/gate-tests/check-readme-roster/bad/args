@@ -1,4 +1,6 @@
 # Same synthetic-tree steer as good/. alpha-kit's roster omits shipped
 # check-alpha-two and names the unshipped check-alpha-ghost (both parity
-# directions); gamma-kit ships checks/ but its README has no marker block.
+# directions); gamma-kit ships checks/ but its README has no marker block;
+# delta-kit drifts both directions over the ported spelling — a shipped .gate
+# absent from the roster, and a roster name matching neither glob.
 .

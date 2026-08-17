@@ -1,0 +1,3 @@
+# graph: couples=kit:README.md,kit:checks/* dir=bi valve=none tier=precommit
+# install: on-surface
+# spec: gate-sdk/SPEC.md §check-readme-roster — every kit README's gate-roster marker block holds name-set parity with the kit's shipped checks/ basenames, both directions

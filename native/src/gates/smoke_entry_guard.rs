@@ -13,9 +13,19 @@ pub fn scan_root(args: &[String], gate: &str) -> Option<String> {
     if let Some(r) = args.first().filter(|a| !a.is_empty()) {
         return Some(r.clone());
     }
-    let c = proc::run("git", &["rev-parse", "--show-toplevel"]).ok()?;
-    let out = c.stdout()?;
-    let s = String::from_utf8_lossy(out).trim().to_string();
+    // spec: gate-sdk/SPEC.md §Fail-closed contract — every arm that yields no root says so: a
+    // non-zero `git rev-parse` is what a non-repo cwd looks like, and returning it silently
+    // would exit 2 with nothing on stderr for the caller to act on
+    let s = match proc::run("git", &["rev-parse", "--show-toplevel"]) {
+        Ok(c) => c
+            .stdout()
+            .map(|o| String::from_utf8_lossy(o).trim().to_string())
+            .unwrap_or_default(),
+        Err(e) => {
+            eprintln!("{}: {}", gate, e);
+            return None;
+        }
+    };
     if s.is_empty() {
         eprintln!("{}: not a git repository and no root argument", gate);
         return None;

@@ -7,6 +7,7 @@ pub mod assertion_strength;
 pub mod brevity;
 pub mod close_surfaces;
 pub mod comment_tier;
+pub mod commit_subject;
 pub mod doctrine_registration;
 pub mod deprecation_task;
 pub mod docs_cmd;
@@ -43,6 +44,7 @@ pub mod queue_prose_precondition;
 pub mod queue_sections;
 pub mod queue_slug_liveness;
 pub mod queue_wrap;
+pub mod readme_roster;
 pub mod release_bump;
 pub mod rule_citation;
 pub mod scratch_citation;
@@ -996,6 +998,23 @@ pub const REGISTRY: &[GateEntry] = &[
         workflow_tiering::run,
         &[("?", "")],
         &["GATE_SDK_WORKFLOW_DIR"],
+        "gate-sdk",
+    ),
+    // spec: gate-sdk/SPEC.md §The second budget batch — two members with no joint proof, each its
+    // own unit: the first reads one message file and walks nothing, the empty-walk-root shape; the
+    // second lists every kit's `checks/` through one glob anchored at its own positional scan root.
+    (
+        "check-commit-subject",
+        commit_subject::run,
+        &[],
+        &["GATE_SDK_COMMIT_TYPES"],
+        "gate-sdk",
+    ),
+    (
+        "check-readme-roster",
+        readme_roster::run,
+        &[("?", "")],
+        &["GATE_KIT_ROOTS_HERE"],
         "gate-sdk",
     ),
 ];

@@ -524,9 +524,10 @@ gate_msg_pattern_files() {
     return 0
 }
 
-# spec: gate-sdk/SPEC.md §check-commit-subject — the single home of the commit-type roster (check-commit-subject's type alternation; trajectory.sh and kpi-task-split classify over the same tokens). Emits the space-separated roster on one line: GATE_SDK_COMMIT_TYPES when set, else the shipped default.
+# spec: gate-sdk/SPEC.md §check-commit-subject — the single home of the commit-type roster (check-commit-subject's type alternation; trajectory.sh and kpi-task-split classify over the same tokens). The default resolves onto the knob's own name so `declare -p` can find it, the shape §lib/gate.sh's document knobs already take: the compiled member declares GATE_SDK_COMMIT_TYPES, and a value no kit library defines is the config bridge's third refusal. Nothing moves but where the default is written — this stays the one place the roster is computed, and gate_commit_types stays its accessor, emitting the space-separated roster on one line.
+[[ -n "${GATE_SDK_COMMIT_TYPES:-}" ]] || GATE_SDK_COMMIT_TYPES="feat fix refactor perf docs test build ci chore style"
 gate_commit_types() {
-    printf '%s\n' "${GATE_SDK_COMMIT_TYPES:-feat fix refactor perf docs test build ci chore style}"
+    printf '%s\n' "$GATE_SDK_COMMIT_TYPES"
 }
 
 # spec: gate-sdk/SPEC.md §lib/gate.sh — the self-repo blob-link prefix `<identity>/blob/<ref>/`, shared by check-md-refs' resolver and the reference-link producers (the enforcement map) so an emitted link and the pass that validates it derive one identity. Identity comes from `git remote get-url origin`; the git@ and https remote forms normalize to one https identity, so no kit ships a repo name (the provenance seam holds). Empty output ⇒ no origin or an unrecognized remote form, and the caller skips the self-repo pass. The ref is the caller's policy arg, never a literal here.

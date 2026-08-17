@@ -1,1 +1,3 @@
 alpha-kit: shipped check absent from the README roster: check-alpha-two
+delta-kit: shipped check absent from the README roster: check-delta-one
+delta-kit: roster names no shipped check: check-delta-ghost
