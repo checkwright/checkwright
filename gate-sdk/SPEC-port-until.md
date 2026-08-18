@@ -37,7 +37,7 @@ declaration path through `gate_resolve` under `gate_kit_roots`. *mechanical.*
 ruled here rather than absorbed silently.** §The port-candidate criteria drafts the
 field for a *class-(b)/(c)* hold, both of which are born-native exception classes —
 that is, statements about a gate being **authored** in shell. The day-one roster is
-not shaped that way: three holders are criterion-7 blockers (a program the payload
+not shaped that way: four holders are criterion-7 blockers (a program the payload
 does not carry, which is class (c) read over an existing gate), and one is a
 criterion-4 hold, which needs **design** rather than substrate and fits no lettered
 class at all. So the field's domain is **any temporary hold with named work owed and
@@ -173,13 +173,22 @@ port-candidate criteria already rules that *a session that reads `?` as a hold h
 let the scanner's limit become the rule's*; declaring them would write that mistake
 into a machine-read field. *design-bearing.*
 
-**`check-shellcheck` owes a ground sentence before it may declare.** Its blocker is
-identical to `check-action-run-shell`'s and the tool reports it, but §check-shellcheck
-states only that a `.gate` member is outside its corpus — no sentence grounds *this
-gate's own* hold or names its class. §The port-candidate criteria requires the cause
-in the gate's own SPEC section, so build writes it there and the declaration follows;
-a declaration whose ground is inferred from a sibling is the one shape the field must
-not normalise. *design-bearing.*
+**Three of the five holders owe a ground sentence before they may declare, not
+one — audited at align.** `check-shellcheck`'s blocker is identical to
+`check-action-run-shell`'s and the tool reports both, but neither gate's own SPEC
+section grounds its own hold: §check-shellcheck states only that a `.gate` member
+is outside its corpus, and §check-action-run-shell states nothing about its own
+hold at all — both causes live solely in §The port-candidate criteria's
+criterion-7 worked-example prose, which is the central section the own-section
+rule exists to keep causes out of. `check-gate-assertions`'s `paste` dependency is
+grounded the same way — named in that same worked-example prose and nowhere in
+§check-gate-assertions. §The port-candidate criteria requires the cause in **the
+gate's own SPEC section**, so build writes it there for all three before their
+declarations land; a declaration whose ground is inferred from a sibling, or from
+the criteria section's shared prose, is the one shape the field must not
+normalise. `check-docs-render-fidelity` is the one holder that already clears this
+bar: site-kit/SPEC.md records its `SITE_KIT_RENDERER` dependency beside the knob
+itself. *design-bearing.*
 
 **The slug's honest limit: the owner is an umbrella, and the anti-rot is coarse.**
 Only `check-tree-terms` has a specifically owning entry. The other four resolve to
@@ -288,8 +297,9 @@ delta 2 treats the prose sentence as the thing at risk.
   that must not be missed: the documented subtraction stops yielding *still owed*
   the moment a held member is excluded. Owned by delta 2.
 - **gate-sdk/SPEC.md §check-gate-substrate-parity, assertion G** — the two clauses
-  become four, and the presence-is-not-asserted paragraph is re-stated over both
-  fields rather than one. Owned by delta 3.
+  double to four on identical terms, plus the new co-occurrence clause the pair of
+  fields creates, for five; and the presence-is-not-asserted paragraph is re-stated
+  over both fields rather than one. Owned by delta 3.
 - **gate-sdk/SPEC.md §check-gate-exemption-tasks** — the invariant statement, the
   scope sentence (`Scope is in-script exemption arrays only`) which this widening
   contradicts as written, and the clean-line contract, which now reports a third
