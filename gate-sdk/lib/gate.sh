@@ -527,7 +527,7 @@ gate_msg_pattern_files() {
     return 0
 }
 
-# spec: gate-sdk/SPEC.md §check-commit-subject — the single home of the commit-type roster (check-commit-subject's type alternation; trajectory.sh and kpi-task-split classify over the same tokens). The default resolves onto the knob's own name so `declare -p` can find it, the shape §lib/gate.sh's document knobs already take: the compiled member declares GATE_SDK_COMMIT_TYPES, and a value no kit library defines is the config bridge's third refusal. Nothing moves but where the default is written — this stays the one place the roster is computed, and gate_commit_types stays its accessor, emitting the space-separated roster on one line.
+# spec: gate-sdk/SPEC.md §check-commit-subject — the single home of the commit-type roster (check-commit-subject's type alternation; the trajectory arm and kpi-task-split classify over the same tokens). The default resolves onto the knob's own name so `declare -p` can find it, the shape §lib/gate.sh's document knobs already take: the compiled member declares GATE_SDK_COMMIT_TYPES, and a value no kit library defines is the config bridge's third refusal. Nothing moves but where the default is written — this stays the one place the roster is computed, and gate_commit_types stays its accessor, emitting the space-separated roster on one line.
 [[ -n "${GATE_SDK_COMMIT_TYPES:-}" ]] || GATE_SDK_COMMIT_TYPES="feat fix refactor perf docs test build ci chore style"
 gate_commit_types() {
     printf '%s\n' "$GATE_SDK_COMMIT_TYPES"

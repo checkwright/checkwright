@@ -8,8 +8,8 @@ channel's `[attend]` and the consumer-named harvest tags) are the state machine.
 Gates hold the grammar a coding agent selects work by, the binary's
 `queue-index` arm renders the compact selection surface, a `queue-counts.sh`
 tool tallies each task section for a status readout, a `queue-edges.sh`
-tool sums the citations pointing *at* an entry, and a `roadmap.sh`
-tool projects the entries curated with `[roadmap:]` onto a generated public page.
+tool sums the citations pointing *at* an entry, and a `roadmap` emit
+arm projects the entries curated with `[roadmap:]` onto a generated public page.
 
 Why: an agent picks work by *parsing*, not reading — so everything selection
 trusts (section position, slugs, tags) must be grammar a gate can enforce, and

@@ -89,11 +89,11 @@
   what remains rather than restating them. From the eighth on, members are **selected by
   running** `port-blockers.sh --group`; the size arm read exhausted again at this cut, so the
   budget arm composed the batch, as it does only when no group is takeable.
-  **73 of 104 ported; the rest splits into permanently-shell and owed**
+  **74 of 104 ported; the rest splits into permanently-shell and owed**
   — a dated 2026-08-18 oracle read (`bash gate-sdk/bin/port-blockers.sh --group`'s trailer, which
   `scripts/measured-claims.sh` emits as `ported-gate-members`), never a count this line holds.
-  What the eleventh cohort and the budget batches leave owed here is the unported freshness
-  emitters, whose roster `freshness-emitter-port-cohort` owns — a count copied here drifted once.
+  The freshness-emitter roster it named as owed is **discharged**, that family having closed
+  6/6; the count has drifted twice, both times by a batch landing after it was written.
   Each batch's adjudications are canonical at its own gate-sdk/SPEC.md section; the third
   delivered `check-memory-off` and `check-root-tiering`. The 2026-08-18 cut itself is ruled and
   recorded on `freshness-emitter-port-cohort`: the freshness triple as spine, plus that batch.
@@ -930,7 +930,7 @@
   when stated, a token, never a sentence.**
   **Why `[design-pending]`:** it touches `doctrine-kit/DOCTRINE.md` (re-vendored,
   so it owes a release-note bullet) plus one always-loaded `CLAUDE.md` line, and
-  changes `roadmap.sh`'s placeholder and its fixture — a doctrine ruling and a
+  changes the `roadmap` arm's placeholder and its fixture — a doctrine ruling and a
   behavior change in one unit, and the doctrine half must be worded so it does not
   falsify the install-doc carve-out it sits above.
   **Cost while deferred:** low and non-rotting but recurrent — agents keep landing
@@ -6740,6 +6740,36 @@
   Surfaced 2026-08-18. Filed 2026-08-18 by close, as the gap generalization owed by the
   `docs/site-architecture.md` staleness fixed in the same commit.
 
+- **cited-script-path-liveness-inline** [design-pending] — `check-docs-cmd` sees a deleted `.sh`
+  path only inside a fence, so the same path in an inline code span survives a port unflagged.
+  **Measured at this close, seven instances in one iteration.** The emitter-tail port deleted
+  `drift-kit/bin/trajectory.sh` and `queue-kit/bin/roadmap.sh`, and the battery stayed green at
+  104/104 while seven governed surfaces still named them in the present tense: an `Interface:`
+  line in drift-kit/SPEC.md, a queue-kit/README.md intro sentence, a `.gate` descriptor's
+  `# spec:` line, three gate-sdk/SPEC.md paragraphs and a `# spec:` comment in
+  gate-sdk/lib/gate.sh. All seven were inline code spans or bare prose; all seven are fixed in
+  the commit that files this.
+  **The gate is not absent, its corpus is narrower than its name reads.** Its own module states
+  the reach — "every **fenced** invoked repo-relative .sh path and every backticked/fenced
+  kit-prefixed env knob" (`native/src/gates/docs_cmd.rs:1`) — so an inline span is scanned for
+  knobs and not for paths. gate-sdk/SPEC.md already predicts the fenced half working: it will
+  "correctly — not vacuously — red on a doc still fencing a deleted `.sh` path after a port."
+  It does. The unfenced half is the hole.
+  **Why `[design-pending]`, and the design is the valve rather than the scan.** The fence *is*
+  the current exemption: the gate's own help says a hypothetical example goes outside a fence.
+  Widening to inline spans removes that valve and needs a replacement, and the replacement has
+  to admit the case this close met repeatedly — prose that names a deleted path **deliberately**,
+  as history. Two shapes, neither ruled: a per-line exemption tag, or a tense-blind rule paired
+  with a convention that historical mentions cite the commit rather than the path.
+  **Not the same as the audit class that caught these.** `capability-liveness-after-descope` is
+  a human audit on the roster because judging live-vs-historical prose is a session act; this is
+  the mechanical half underneath it — does the cited path exist at all — which is decidable and
+  today only half-scanned. Landing it narrows what that audit must read; it does not retire it.
+  **Cost while deferred:** measured, recurring, and it lands exactly when the tree is most
+  trusted — a green 104/104 battery over prose that names files the same commit deleted.
+  Surfaced 2026-08-18. Filed by close 2026-08-18, discharging the gap generalization owed by
+  the staleness the `capability-liveness-after-descope` audit turned up in this same commit.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
@@ -6769,9 +6799,6 @@
 - **scratch-execution-allowlist-bar** [design-pending] — Each close re-derives this standing bar.
 
 ## Done
-
-- icebox-worklist-roadmap-blind
-- freshness-emitter-port-cohort
 
 ## Lessons Learned
 

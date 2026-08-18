@@ -1581,7 +1581,7 @@ design time; the last three were paid for, and each is named with what it cost.
    the design work behind the wrong door.
 
    **The worked instance.** §The consumer remainder cohort ported three
-   generated-projection freshness members whose emitters are unported shell —
+   generated-projection freshness members whose emitters were unported shell at that cut —
    `check-trajectory-fresh`, `check-value-rollup-fresh` and
    `check-docs-mirror-fresh`. All three clear this criterion, exactly as the
    clause above says, and what actually held them was the family's own sequencing
@@ -4944,6 +4944,15 @@ that needs *the executable* rather than *the command* takes the first element
 that is neither `env` nor a `NAME=VALUE` assignment. §run-gate-tests is the one caller that
 needs it, and it is named there.
 
+**The bridge is process-global, and that binds the crate's own tests.** Its
+values are environment variables, so every `#[test]` in one test binary shares
+one environment: two cases setting the same `GATE_SDK_KNOB_<NAME>` to different
+values race, and the loser asserts against the other's render. A crate test
+needing a knob either picks one no sibling case touches, or drives the gate
+through a fixture tree instead of the bridge. Recorded because the symptom — a
+test green alone and red in the suite — reads as flakiness rather than as this
+contract.
+
 The binary's path is the knob `GATE_SDK_NATIVE_BIN` (§Layout and configuration),
 never a literal. An **absent or non-executable** binary when a registry member
 dispatches to it is a harness error — **exit 2, never a skip and never a pass**.
@@ -8261,7 +8270,7 @@ hook's `$1`, first line) parses as `<type>(<scope>)?!?: <summary>` with
 `<type>` drawn from the shared roster and `<scope>` a `[a-z0-9./-]+` token, or
 matches a git-generated carve-out — `Merge `, `Revert ` and the `fixup! ` /
 `squash! ` autosquash forms. A subject that does not parse is an unread write
-to a governed projection, not a style nit: trajectory.sh's feat/debt column
+to a governed projection, not a style nit: the trajectory arm's feat/debt column
 classifies commit subjects, and the closed-row freeze leans on docs/chore
 filings sitting outside that harvest — both properties held by convention
 until this gate made every subject carry a roster token, turning a mistyped
@@ -8274,8 +8283,8 @@ The roster is `gate_commit_types` (lib/gate.sh), reading `GATE_SDK_COMMIT_TYPES`
 (default `feat fix refactor perf docs test build ci chore style`). The
 one-vocabulary/two-readers tension — this gate and the evidence classifiers
 both key off commit types — is ruled *share the roster, keep the mappings*: the
-roster's single home is lib/gate.sh; drift-kit's kpi-task-split and
-trajectory.sh keep their own class mapping (feat vs fix+refactor), a
+roster's single home is lib/gate.sh; drift-kit's kpi-task-split and the
+trajectory arm keep their own class mapping (feat vs fix+refactor), a
 classification over roster tokens rather than a second roster. Edge behavior
 matches check-commit-msg: a no-argument run (the whole-tree battery) is a clean
 skip — the message is not a tracked surface; a missing message-file

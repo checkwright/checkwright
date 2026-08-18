@@ -366,7 +366,7 @@ counts — their log is gitignored per-iteration scratch, not committed history,
 so the extractor cannot harvest it and that KPI stays a session-local lower
 bound.
 
-Interface: `trajectory.sh --emit` writes the markdown table (one row per closed
+Interface: `bash gate-sdk/bin/run-gates.sh --emit trajectory` writes the markdown table (one row per closed
 iteration, stable columns) to stdout — the shape the committed projection
 pins; bare invocation prepends a human-oriented header. The extractor degrades
 per surface to an `n/a (<reason>)` cell and exits 0 — drift-kit's fail-visible

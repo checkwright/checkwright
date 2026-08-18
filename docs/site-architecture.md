@@ -117,13 +117,12 @@ recoverable:
   `docs/footprint.md` is the per-kit token cost (`bash
   gate-sdk/bin/run-gates.sh --emit footprint > docs/footprint.md`, the emitter
   having ported to a non-gate arm the runner resolves config for). **Its measured
-  set is narrow, and reading it as "any kit file" is the standing mistake:** the
-  always-loaded column is a kit's `<!-- <kit>:begin -->`…`<!-- <kit>:end -->` block
-  inside each `CONTEXT_KIT_SURFACES` file (`CLAUDE.md` here); the load-triggered
-  column is `<kit>/templates/**/*.md`; the row set is the `*/SPEC.md` glob. So
-  it stales on an injected-block edit, a template edit, or a kit joining or leaving
-  the roster — and **not** on a SPEC body edit, a `bin/` or `checks/` script, or a
-  `scripts/` file, none of which it measures at all. It reads the worktree rather
+  set is narrower than "any kit file", and that misreading is the standing mistake
+  here** — context-kit/SPEC.md §bin/footprint owns the set, and what follows from
+  it is this row's business: the trigger is an injected-block edit, a `templates/`
+  markdown edit, or a kit joining or leaving the roster — **not** a SPEC body
+  edit and not any script under `bin/`, `checks/` or `scripts/`, since the set
+  contains none of those. It reads the worktree rather
   than the index, so no staging order binds its regen. Both are `docs/value.md`'s
   inputs, so a red in either implies a rollup regen.
 - **The trajectory projection** — `docs/evidence-data.md` is the published
