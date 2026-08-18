@@ -54,9 +54,8 @@ The state machine, its stamp protocol, and the per-stage contracts:
 The pre-commit hook is **generated** — never hand-edit
 `scripts/git-hooks/pre-commit`; edit a gate's `# graph:` manifest and regenerate.
 Per-clone opt-in: `bash gate-sdk/bin/install-hooks.sh`. Every generated
-projection — that hook, the graph artifact, the enforcement map, the footprint
-and value rollup, the docs mirror — is rostered with its trigger and regen
-command in [docs/site-architecture.md](docs/site-architecture.md) §Generated
+projection, that hook included, is rostered with its trigger and regen command
+in [docs/site-architecture.md](docs/site-architecture.md) §Generated
 projections, which also carries the full fan-out a new gate stales; each
 freshness gate prints its own command on red.
 
