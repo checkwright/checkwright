@@ -41,7 +41,7 @@ queue-kit/SPEC.md §The tag algebra.
     much to read, it does not decide.
   - **Trajectory projection** — after the template's Clear-Done step lands the
     `close` stamp in history, regenerate the projection (`bash
-    drift-kit/bin/trajectory.sh --emit > docs/evidence-data.md`) and commit it
+    gate-sdk/bin/run-gates.sh --emit trajectory > docs/evidence-data.md`) and commit it
     with the Done clear; the gate is blind at the enter-close commit by
     construction, and the widened `trigger=` fires it on this commit
     (drift-kit/SPEC.md §The published-evidence extractor).

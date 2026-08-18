@@ -4,6 +4,8 @@
 # cwd = scratch-consumer root; SMOKE_KIT_ROOT = the vendored drift-kit copy.
 set -euo pipefail
 : "${SMOKE_KIT_ROOT:?run via run-consumer-smoke.sh}"
+# shellcheck source=../../gate-sdk/lib/gate.sh
+source "$SMOKE_KIT_ROOT/../gate-sdk/lib/gate.sh"
 
 mkdir -p scripts
 cp "$SMOKE_KIT_ROOT/templates/drift-config.sh" scripts/drift-config.sh
@@ -98,10 +100,15 @@ printf 'alpha build s2 2025-01-01\n' >> "$trepo/.workflow/WORKFLOW-STATE.txt"; t
 printf 'alpha close s3 2025-01-02\n' >> "$trepo/.workflow/WORKFLOW-STATE.txt"; tcommit "fix: alpha close"
 printf 'beta scope s4 2025-01-03\n'  > "$trepo/.workflow/WORKFLOW-STATE.txt";  tcommit "feat: beta scope"
 
+# spec: gate-sdk/SPEC.md §The non-gate arm — the extractor is a compiled arm reached through the
+# front-end that resolves its bridged knobs. The binary knob is absolutised because the run
+# happens after a cd, where its repo-relative default would resolve to nothing.
+TRAJ_BIN="$PWD/$(gate_native_bin)"
 set +e
-traj="$( cd "$trepo" && bash "$SMOKE_KIT_ROOT/bin/trajectory.sh" --emit )"; jrc=$?
+traj="$( cd "$trepo" && GATE_SDK_NATIVE_BIN="$TRAJ_BIN" \
+    bash "$SMOKE_KIT_ROOT/../gate-sdk/bin/run-gates.sh" --emit trajectory )"; jrc=$?
 set -e
-[[ "$jrc" -eq 0 ]] || fail "trajectory --emit exited $jrc (advisory tool must exit 0)"
+[[ "$jrc" -eq 0 ]] || fail "the trajectory arm exited $jrc (advisory emission must exit 0)"
 grep -q '^| iteration |' <<<"$traj" || fail "trajectory missing table header"
 [[ "$(grep -c '^| alpha ' <<<"$traj")" -ge 1 ]] || fail "trajectory emitted no closed-iteration row (expected alpha)"
 if grep -q '^| beta ' <<<"$traj"; then fail "trajectory emitted the in-flight (unclosed) beta row"; fi

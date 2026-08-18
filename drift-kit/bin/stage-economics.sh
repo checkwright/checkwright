@@ -121,7 +121,7 @@ split_tokens() {               # $1=total $2..=counts (caller's order) -> one in
 }
 
 # spec: drift-kit/SPEC.md §The stage-economics meter — history ∪ live, the same reader
-# bin/trajectory.sh already ships: the boundary truncation of the live file destroys no
+# the trajectory arm already ships: the boundary truncation of the live file destroys no
 # economics, and the live arm keeps a stamped-but-uncommitted stage visible.
 collect_stamps() {
     git log --reverse --format='%H' -p -U0 -- "$DRIFT_KIT_STATE_FILE" 2>/dev/null \

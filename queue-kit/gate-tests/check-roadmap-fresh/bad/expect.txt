@@ -1,1 +1,1 @@
-is stale vs bin/roadmap.sh
+is stale vs the roadmap arm

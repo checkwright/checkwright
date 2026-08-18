@@ -77,7 +77,7 @@ recoverable:
 
 - **The on-site SPEC mirror** (`docs/<kit>/SPEC.md`, `docs/<kit>/README.md`,
   `docs/doctrine-kit/DOCTRINE.md`) — regenerate after editing any kit
-  SPEC/README/DOCTRINE: `bash scripts/gen-docs-mirror.sh --write`
+  SPEC/README/DOCTRINE: `bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write`
   (`check-docs-mirror-fresh` byte-gates it).
 - **The value rollup** — `docs/value.md` is hand-framed prose around one
   generated marker block that joins the enforcement-map's per-kit class counts to
@@ -123,15 +123,15 @@ recoverable:
   very commit the regen was meant to clear. Both are `docs/value.md`'s inputs, so
   a red in either implies a rollup regen.
 - **The trajectory projection** — `docs/evidence-data.md` is the published
-  evidence extractor's output (`bash drift-kit/bin/trajectory.sh --emit >
+  evidence extractor's output (`bash gate-sdk/bin/run-gates.sh --emit trajectory >
   docs/evidence-data.md`, `check-trajectory-fresh` byte-gates it), stale on a
   stage stamp or a release disposition. Its regen rides the close stage's
   Clear-Done commit, because the gate is blind at the enter-close commit by
   construction. **The name collides and the two surfaces are unrelated:**
-  `check-trajectory-fresh` and `trajectory.sh` govern *this* generated page, never
+  `check-trajectory-fresh` and the `trajectory` arm govern *this* generated page, never
   the hand-authored `TRAJECTORY.md` ruling record, which no gate byte-checks.
 - **The roadmap projection** — `ROADMAP.md` is a root projection of the queue's
-  curated `[roadmap:]` tags (`bash queue-kit/bin/roadmap.sh --write`,
+  curated `[roadmap:]` tags (`bash gate-sdk/bin/run-gates.sh --emit roadmap --write`,
   `check-roadmap-fresh` byte-gates its marker block), stale on any `[roadmap:]`
   tag edit. Never hand-edited.
 - **The graph artifact** — `docs/check-graph.html` and the generated `pre-commit`
@@ -151,7 +151,7 @@ recoverable:
   `scripts/gates.list`) and is silent on the projections a new gate stales,
   because a kit may not name a consumer's docs surfaces. Assembled here so the
   next author reads the list instead of discovering it one red gate at a time:
-  the on-site SPEC mirror (`bash scripts/gen-docs-mirror.sh --write`),
+  the on-site SPEC mirror (`bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write`),
   `docs/enforcement.md` (`bash gate-sdk/bin/run-gates.sh --emit enforcement-map >
   docs/enforcement.md` — the gate joins the class registry),
   `docs/footprint.md` (`bash gate-sdk/bin/run-gates.sh --emit footprint >

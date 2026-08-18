@@ -1,9 +1,7 @@
-// spec: gate-sdk/SPEC.md §The diff renderer — the freshness family's shared shape: an emitter
-// reached by spawn, a projection read with command-substitution semantics, and the one site
-// the cap is applied at. The reporter that section keeps out of the renderer.
+// spec: gate-sdk/SPEC.md §The diff renderer — the freshness family's shared shape: a projection
+// read with command-substitution semantics, and the one site the cap is applied at
 use crate::diff;
 use crate::proc;
-use std::os::unix::fs::PermissionsExt;
 use std::path::Path;
 
 // spec: gate-sdk/SPEC.md §Fail-closed contract — `fail_closed`'s wording, reproduced verbatim
@@ -29,13 +27,6 @@ pub fn toplevel() -> Result<String, String> {
         return Err("git resolved no toplevel — the emitter anchor cannot be resolved".to_string());
     }
     Ok(s)
-}
-
-// spec: gate-sdk/SPEC.md §The consumer remainder cohort — bash's `[[ -x "$GEN" ]]`
-pub fn executable(p: &str) -> bool {
-    std::fs::metadata(p)
-        .map(|m| m.is_file() && m.permissions().mode() & 0o111 != 0)
-        .unwrap_or(false)
 }
 
 // spec: gate-sdk/SPEC.md §Fail-closed contract — the shell form's capture of a file, with the
@@ -66,25 +57,6 @@ pub fn print_capped_diff(left: &str, right: &str) {
     {
         println!("{}", line);
     }
-}
-
-// spec: gate-sdk/SPEC.md §The consumer remainder cohort — `emitted="$(bash <emitter>
-// <args>)"`, including the substitution's trailing-newline strip
-pub fn emit(emitter: &str, args: &[&str], label: &str) -> Result<String, String> {
-    let mut argv: Vec<&str> = vec![emitter];
-    argv.extend_from_slice(args);
-    let c = proc::run("bash", &argv)?;
-    match c.stdout() {
-        Some(o) => Ok(String::from_utf8_lossy(o).into_owned()),
-        None => Err(fail_closed(label, c.code())),
-    }
-}
-
-// spec: gate-sdk/SPEC.md §The consumer remainder cohort — the emitter's own path,
-// resolved once so no member spells the anchor rule itself. The `-x` probe stays at the
-// member, because each words its own not-found refusal.
-pub fn emitter_path(rel: &str) -> Result<String, String> {
-    Ok(format!("{}/{}", toplevel()?, rel))
 }
 
 // spec: gate-sdk/SPEC.md §The consumer remainder cohort — bash's `${1:-default}`:

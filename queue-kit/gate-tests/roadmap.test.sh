@@ -1,19 +1,25 @@
 #!/usr/bin/env bash
-# Behavioral test of check-roadmap-fresh assertion B and the bin/roadmap.sh emit
+# Behavioral test of check-roadmap-fresh assertion B and the roadmap arm's emit
 # grammar. The gate's good/bad pair proves assertion A (the byte-compare), which
 # is the one axis a single pair can carry; B's rejection shapes and the emitter's
 # projection rules are driven directly here. Config is isolated via
 # QUEUE_KIT_CONFIG_FILE so the repo's queue-config.sh does not leak in.
+#
+# Both halves are compiled now, so both are driven through their declared entry
+# points: gate_run resolves the gate's descriptor and its config bridge, and the
+# battery runner's --emit front-end resolves the arm's. The sandbox is a git repo
+# because that front-end anchors at the toplevel before it dispatches.
 #
 # Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # queue-kit/
-GATE="$DIR/checks/check-roadmap-fresh.sh"
-EMIT="$DIR/bin/roadmap.sh"
+CHECKS="$DIR/checks"
+FRONTEND="$DIR/../gate-sdk/bin/run-gates.sh"
 SANDBOX="$(mktemp -d)"
 trap 'rm -rf "$SANDBOX"' EXIT
+git -C "$SANDBOX" init -q
 
 cat >"$SANDBOX/config.sh" <<'EOF'
 QUEUE_KIT_HORIZONS=(soon someday)
@@ -42,14 +48,18 @@ queue() {  # $1=the entry lead line, $2=optional body line(s) — writes a minim
 }
 decl='  roadmap-summary: A sentence an author marked for the public page.'
 
+emit() {   # $@ = the arm's own argv tail
+    ( cd "$SANDBOX" && bash "$FRONTEND" --emit roadmap "$@" 2>&1 )
+}
+
 # The projection page is kept fresh throughout, so every verdict below is
 # assertion B's and never assertion A's.
 refresh() {
     printf 'framing\n\n<!-- roadmap:begin -->\n<!-- roadmap:end -->\n' >"$SANDBOX/ROADMAP.md"
-    ( cd "$SANDBOX" && bash "$EMIT" --write >/dev/null )
+    emit --write >/dev/null
 }
 
-run_gate() { ( cd "$SANDBOX" && bash "$GATE" 2>&1 ); }
+run_gate() { ( cd "$SANDBOX" && gate_run check-roadmap-fresh "$CHECKS" 2>&1 ); }
 
 # Every field valid, one declaration -> clean.
 queue '- **ok-thing** [roadmap: soon/alpha] — a valid entry.' "$decl"
@@ -131,7 +141,7 @@ want "both-horizon" "$out" "unknown horizon 'eventually'"
   printf '  roadmap-summary: A deferred rung, said publicly.\n'
   printf '\n## Done\n\n- shipped-thing\n\n## Lessons Learned\n'
 } >"$SANDBOX/TASK-QUEUE.md"
-out="$( cd "$SANDBOX" && bash "$EMIT" --emit )"
+out="$(emit)"
 want   "emit-declared"  "$out" '- **`live-thing`** *(alpha)* — The public sentence, and only this.'
 absent "emit-leadprose" "$out" "LEADPROSE"
 absent "emit-bodyprose" "$out" "BODYPROSE"
@@ -143,21 +153,21 @@ want   "emit-heading"   "$out" "### soon"
 # The whitelist holds even with the gate bypassed: a tagged entry whose
 # declaration is missing contributes no bullet at all rather than a naked one.
 queue '- **unmarked** [roadmap: soon/alpha] — LEADPROSE only, nothing marked.' '  BODYPROSE here too.'
-out="$( cd "$SANDBOX" && bash "$EMIT" --emit )"
+out="$(emit)"
 absent "bypass-slug"      "$out" "unmarked"
 absent "bypass-leadprose" "$out" "LEADPROSE"
 absent "bypass-bodyprose" "$out" "BODYPROSE"
 
 # An empty horizon still gets its heading, carrying the placeholder.
 queue '- **only-soon** [roadmap: soon/alpha] — the only entry.' "$decl"
-out="$( cd "$SANDBOX" && bash "$EMIT" --emit )"
+out="$(emit)"
 want "empty-heading"     "$out" "### someday"
 want "empty-placeholder" "$out" "_Nothing is queued under this horizon._"
 
 # The written block ends on a blank line before the :end marker — without it the
 # Pages parser leaves the list open and renders the marker inside the last <li>.
 printf 'framing\n\n<!-- roadmap:begin -->\n<!-- roadmap:end -->\n' >"$SANDBOX/ROADMAP.md"
-( cd "$SANDBOX" && bash "$EMIT" --write >/dev/null )
+emit --write >/dev/null
 if ! grep -B1 -F -- '<!-- roadmap:end -->' "$SANDBOX/ROADMAP.md" | head -1 | grep -qx ''; then
     echo "  FAIL [write-trailing-blank]: no blank line before the :end marker:"
     printf '    %s\n' "$(cat "$SANDBOX/ROADMAP.md")"
@@ -166,7 +176,7 @@ fi
 
 # --write leaves every byte outside the markers untouched.
 printf 'KEEP-ABOVE\n\n<!-- roadmap:begin -->\nstale\n<!-- roadmap:end -->\n\nKEEP-BELOW\n' >"$SANDBOX/ROADMAP.md"
-( cd "$SANDBOX" && bash "$EMIT" --write >/dev/null )
+emit --write >/dev/null
 page="$(cat "$SANDBOX/ROADMAP.md")"
 want   "write-above" "$page" "KEEP-ABOVE"
 want   "write-below" "$page" "KEEP-BELOW"
@@ -177,7 +187,7 @@ cat >"$SANDBOX/noroadmap.sh" <<'EOF'
 QUEUE_KIT_HORIZONS=(soon someday)
 QUEUE_KIT_TRACKS=(alpha beta)
 EOF
-out="$( cd "$SANDBOX" && QUEUE_KIT_CONFIG_FILE="$SANDBOX/noroadmap.sh" bash "$GATE" 2>&1 )"
+out="$( cd "$SANDBOX" && QUEUE_KIT_CONFIG_FILE="$SANDBOX/noroadmap.sh" gate_run check-roadmap-fresh "$CHECKS" 2>&1 )"
 code "skip-exit" "$?" 0
 want "skip" "$out" "this consumer publishes no roadmap"
 
@@ -185,7 +195,7 @@ want "skip" "$out" "this consumer publishes no roadmap"
 cat >"$SANDBOX/halfconfig.sh" <<'EOF'
 QUEUE_KIT_HORIZONS=(soon someday)
 EOF
-out="$( cd "$SANDBOX" && QUEUE_KIT_CONFIG_FILE="$SANDBOX/halfconfig.sh" bash "$GATE" 2>&1 )"
+out="$( cd "$SANDBOX" && QUEUE_KIT_CONFIG_FILE="$SANDBOX/halfconfig.sh" gate_run check-roadmap-fresh "$CHECKS" 2>&1 )"
 code "half-exit" "$?" 2
 want "half" "$out" "QUEUE_KIT_TRACKS is empty"
 

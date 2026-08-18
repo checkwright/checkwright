@@ -2503,7 +2503,7 @@ and one that genuinely has not been consumed *should* keep firing.
 A consumer deriving that outstanding set reads the disposition file as
 **history ∪ live** — not replacement, not fallback — the same reader
 drift-kit/SPEC.md §The stage-economics meter applies to the stage stamps and
-`drift-kit/bin/trajectory.sh` already ships. The file is typically a `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` member,
+drift-kit's `trajectory` emit arm already ships. The file is typically a `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` member,
 so a carrying line survives only in committed history and a live-only reader sees
 nothing; conversely a history-only reader is blind at exactly the moment that
 matters most for a precommit gate — the pre-commit of the very close commit

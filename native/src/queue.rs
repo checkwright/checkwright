@@ -311,6 +311,127 @@ pub fn parity_report(text: &str, sec: &Sections) -> Vec<String> {
     out
 }
 
+// spec: queue-kit/SPEC.md §lib/queue.sh — the one [roadmap:] + roadmap-summary: parse, shared by
+// the roadmap arm and check-roadmap-fresh so the two never disagree on what an entry claims. The
+// typed record is that section's, TSV line and defensive `-` column included.
+pub struct RoadmapEntry {
+    pub tags: usize,
+    pub field: String,
+    pub slug: String,
+    pub declarations: usize,
+    pub summary: String,
+}
+
+const TAG_OPEN: &str = "[roadmap:";
+const DECLARATION: &str = "roadmap-summary:";
+
+// spec: queue-kit/SPEC.md §lib/queue.sh — awk's non-overlapping `while (match(s, /\[roadmap:/))`
+fn tag_count(line: &str) -> usize {
+    line.matches(TAG_OPEN).count()
+}
+
+// spec: queue-kit/SPEC.md §lib/queue.sh — awk's `/\[roadmap:[^]]*\]/`: the leftmost `[roadmap:`
+// bounded by the first `]` after it. No `]` anywhere to its right means no match at any later
+// occurrence either, so the first one decides.
+fn tag_field(line: &str) -> String {
+    let open = match line.find(TAG_OPEN) {
+        Some(i) => i + TAG_OPEN.len(),
+        None => return String::new(),
+    };
+    let close = match line[open..].find(']') {
+        Some(i) => open + i,
+        None => return String::new(),
+    };
+    line[open..close]
+        .trim_start_matches([' ', '\t'])
+        .trim_end_matches([' ', '\t'])
+        .to_string()
+}
+
+// spec: queue-kit/SPEC.md §The tag algebra — the declaration is body-scoped by design, so it is
+// read off a *continuation* line: awk's `/^[[:space:]]+roadmap-summary:/` demands the indent, and
+// a column-0 spelling is not a declaration.
+fn is_declaration(line: &str) -> bool {
+    let body = line.trim_start_matches([' ', '\t']);
+    body.len() < line.len() && body.starts_with(DECLARATION)
+}
+
+// spec: queue-kit/SPEC.md §lib/queue.sh — awk's `declared()`: the marking stripped, every
+// whitespace run collapsed to one space, and the leading and trailing space that collapse leaves
+// removed. The declaration is a whitelist, so this is the only text that reaches the page.
+fn declared(line: &str) -> String {
+    let t = line.trim_start_matches([' ', '\t']);
+    let t = t.strip_prefix(DECLARATION).unwrap_or(t);
+    let mut out = String::new();
+    let mut ws = false;
+    for c in t.chars() {
+        if c == ' ' || c == '\t' {
+            ws = true;
+            continue;
+        }
+        if ws && !out.is_empty() {
+            out.push(' ');
+        }
+        ws = false;
+        out.push(c);
+    }
+    out
+}
+
+// spec: queue-kit/SPEC.md §lib/queue.sh — one record per live entry carrying a tag or a
+// declaration, in queue order. An entry carrying neither is not a roadmap entry and is dropped
+// here rather than at each caller, which is what keeps the two callers' universe identical.
+pub fn roadmap_entries(text: &str, sec: &Sections) -> Vec<RoadmapEntry> {
+    let mut out: Vec<RoadmapEntry> = Vec::new();
+    let mut cur: Option<RoadmapEntry> = None;
+    let mut inq = false;
+
+    fn flush(cur: &mut Option<RoadmapEntry>, out: &mut Vec<RoadmapEntry>) {
+        if let Some(e) = cur.take() {
+            if !e.slug.is_empty() && (e.tags > 0 || e.declarations > 0) {
+                out.push(e);
+            }
+        }
+    }
+
+    for line in text.lines() {
+        if sec.is_task(line) {
+            flush(&mut cur, &mut out);
+            inq = true;
+            continue;
+        }
+        if is_section_line(line) {
+            flush(&mut cur, &mut out);
+            inq = false;
+            continue;
+        }
+        if !inq {
+            continue;
+        }
+        if bullet_slug(line).is_some() {
+            flush(&mut cur, &mut out);
+            cur = Some(RoadmapEntry {
+                tags: tag_count(line),
+                field: tag_field(line),
+                slug: first_bold_slug(line).unwrap_or_default().to_string(),
+                declarations: 0,
+                summary: String::new(),
+            });
+            continue;
+        }
+        if let Some(e) = cur.as_mut() {
+            if !e.slug.is_empty() && is_declaration(line) {
+                e.declarations += 1;
+                if e.declarations == 1 {
+                    e.summary = declared(line);
+                }
+            }
+        }
+    }
+    flush(&mut cur, &mut out);
+    out
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

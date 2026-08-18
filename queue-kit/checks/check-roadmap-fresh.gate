@@ -1,0 +1,3 @@
+# graph: couples=TASK-QUEUE.md,ROADMAP.md,scripts/queue-config.sh,native/src/gates/roadmap_fresh.rs,native/src/emit/roadmap.rs,native/src/queue.rs,native/src/marker.rs dir=one valve=none tier=precommit trigger=TASK-QUEUE.md,ROADMAP.md,scripts/queue-config.sh,native/src/gates/roadmap_fresh.rs,native/src/emit/roadmap.rs,native/src/queue.rs,native/src/marker.rs
+# spec: queue-kit/SPEC.md §check-roadmap-fresh — every [roadmap:] tag names a configured horizon and track and pairs with exactly one roadmap-summary: declaration, and the projection page's marker block is the byte-fresh emission of the roadmap arm
+# install: on-surface

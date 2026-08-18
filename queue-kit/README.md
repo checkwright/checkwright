@@ -68,8 +68,8 @@ bash queue-kit/bin/queue-counts.sh                      # "<section><TAB><count>
 bash queue-kit/bin/queue-edges.sh                       # every live slug with inbound citations, and the entries citing it
 bash queue-kit/bin/queue-edges.sh --inbound <slug>      # one slug's inbound set, each edge with its citing line verbatim
 bash queue-kit/bin/lesson-sink.sh <tag>                 # route a harvested lesson body to its configured sink
-bash queue-kit/bin/roadmap.sh --emit                    # the public roadmap block, to stdout
-bash queue-kit/bin/roadmap.sh --write                   # splice it into the configured projection page
+bash gate-sdk/bin/run-gates.sh --emit roadmap          # the public roadmap block, to stdout
+bash gate-sdk/bin/run-gates.sh --emit roadmap --write   # splice it into the configured projection page
 ```
 
 The roadmap projection is opt-in: it emits nothing until you set the horizon and

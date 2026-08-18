@@ -2,10 +2,45 @@
 // registration and no fixture pair, and owes a named caller instead: a regen command, a
 // comparator calling `emit()`, a stage step, a gate reaching it in process.
 pub mod close_surfaces;
+pub mod docs_mirror;
 pub mod enforcement_map;
 pub mod footprint;
 pub mod queue_index;
+pub mod roadmap;
+pub mod trajectory;
 pub mod value_rollup;
+
+// spec: gate-sdk/SPEC.md §lib/gate.sh — gate_self_repo_prefix, degrading to nothing on no origin
+// or an unrecognised form. It sits on the family because two arms render self-repo links, and a
+// second copy of the normalisation is a second identity to disagree about.
+pub fn self_repo_prefix(reference: &str) -> String {
+    let origin = match crate::proc::run("git", &["remote", "get-url", "origin"]) {
+        Ok(c) => match c.stdout() {
+            Some(o) => String::from_utf8_lossy(o).trim().to_string(),
+            None => return String::new(),
+        },
+        Err(_) => return String::new(),
+    };
+    if origin.is_empty() {
+        return String::new();
+    }
+    let id = origin
+        .strip_suffix(".git")
+        .unwrap_or(&origin)
+        .trim_end_matches('/')
+        .to_string();
+    let id = if let Some(rest) = id.strip_prefix("git@") {
+        match rest.split_once(':') {
+            Some((host, path)) => format!("https://{}/{}", host, path),
+            None => return String::new(),
+        }
+    } else if id.starts_with("https://") || id.starts_with("http://") {
+        id
+    } else {
+        return String::new();
+    };
+    format!("{}/blob/{}/", id, reference)
+}
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — the arm's own argv tail, so a projection whose
 // generator has a write-in-place mode takes it as a flag rather than needing a second arm. The
@@ -61,6 +96,44 @@ pub const EMITTERS: &[(&str, EmitFn, &[&str])] = &[
             "EVIDENCE_KIT_SUITES",
             "EVIDENCE_KIT_RUN_*",
             "CONTEXT_KIT_SURFACES",
+        ],
+    ),
+    // spec: canon-kit/SPEC.md §The reference-link grammar — the source set is derived from the
+    // tracked tree rather than enumerated, so the only configured value is the blob ref
+    (
+        "docs-mirror",
+        docs_mirror::emit,
+        &["CANON_KIT_DOCS_BLOB_REF"],
+    ),
+    // spec: drift-kit/SPEC.md §The published-evidence extractor — the stage roster and the
+    // evidence-surface pair are this consumer's vocabulary, so they cross the bridge as knobs; a
+    // stage name in the crate would ship one project's lifecycle as everyone's
+    (
+        "trajectory",
+        trajectory::emit,
+        &[
+            "DRIFT_KIT_CONFIG_FILE",
+            "DRIFT_KIT_TRAJECTORY_SURFACES",
+            "DRIFT_KIT_GATES_FILE",
+            "DRIFT_KIT_STAGES",
+            "GATE_SDK_WORKFLOW_DIR",
+        ],
+    ),
+    // spec: queue-kit/SPEC.md §The roadmap arm — the consumer's editorial vocabulary plus the
+    // section trio that scopes the scan. TRACKS rides although the arm only prints it verbatim:
+    // one table entry serves check-roadmap-fresh's caller too, and that one validates it.
+    (
+        "roadmap",
+        roadmap::emit,
+        &[
+            "QUEUE_KIT_QUEUE_FILE",
+            "QUEUE_KIT_ACTIVE_SECTIONS",
+            "QUEUE_KIT_DEFERRED_SECTION",
+            "QUEUE_KIT_ICEBOX_SECTION",
+            "QUEUE_KIT_HORIZONS",
+            "QUEUE_KIT_TRACKS",
+            "QUEUE_KIT_ROADMAP_FILE",
+            "QUEUE_KIT_ROADMAP_MARKER",
         ],
     ),
     // spec: queue-kit/SPEC.md §The queue-index arm — the class's first *query* member as well as a

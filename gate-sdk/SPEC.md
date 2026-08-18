@@ -1173,9 +1173,12 @@ Omitting them leaves the gate registered and green while the projection it holds
 goes stale at commit time, because the generated hook's `staged_matches` trigger
 is derived from `couples=` — the gate simply never runs on the edit that broke
 it, and only a full battery finds it. Stated here rather than in a member's own
-row because it is a property of the port, not of any one gate: every remaining
-member of the freshness family acquires it the moment its emitter lands in the
-crate beside it.
+row because it is a property of the port, not of any one gate. The freshness
+family discharged it in full: every member's emitter now lives in the crate
+beside its comparator, and each descriptor carries the modules the call reaches
+— two of them acquired from behind, `check-docs-mirror-fresh` having *triggered*
+on its generator without coupling it and `check-trajectory-fresh` having named
+its extractor in neither field.
 
 ### The port-candidate criteria
 
@@ -2079,11 +2082,13 @@ cleared the criteria the existing substrate answers, and that premise turned out
 false for two — each ruled held by the operator the same day, `.sh` unmodified,
 with its port work named and owed:
 
-- **`check-roadmap-fresh` — cohort composition.** It invokes `bash` on
-  `queue-kit/bin/roadmap.sh --emit`, one of the `lib/queue.sh` consumers this port
-  does not touch (queue-kit/SPEC.md §lib/queue.sh), so nothing in the cohort ports
-  the emitter it shells out to. **The 2026-08-11 hold stands on that ground and is
-  relabelled, never lifted** (operator-ruled 2026-08-12):
+- **`check-roadmap-fresh` — cohort composition. SPENT 2026-08-18, its port
+  landing with its own emitter in one commit; the record of why the hold stood is
+  kept because it is what the sequence was waited on.** It invoked `bash` on
+  `queue-kit/bin/roadmap.sh --emit`, one of the `lib/queue.sh` consumers the
+  originating port did not touch (queue-kit/SPEC.md §lib/queue.sh), so nothing in
+  that cohort ported the emitter it shelled out to. **The 2026-08-11 hold stood on
+  that ground and was relabelled, never lifted** (operator-ruled 2026-08-12):
   the label read `criterion 7`, and criterion 7 clears here — `bash` is
   on `GATE_SDK_PROGRAM_FLOOR`, which is why `bin/port-blockers.sh` reports none of
   the generated-projection freshness gates — while what the hold actually turns on
@@ -2097,7 +2102,10 @@ with its port work named and owed:
   **non-gate arm** with a stated contract (§The non-gate arm). `roadmap.sh` ports
   by applying that ruling unchanged. This is a **retirement of the hold's reason,
   not a reversal of the hold**: the member is still unported, and it is now held
-  by nothing but its place in the queue.
+  by nothing but its place in the queue. **That place arrived**: the arm and the
+  gate landed together, which is the pairing the hold existed to preserve — the
+  adapter's never-disagree guarantee is satisfied on the other substrate rather
+  than repealed, and porting exactly one of the two is what would have spent it.
 - **`check-queue-prose-precondition` — an ERE engine. RETIRED, its port landing
   in the twelfth cohort below; the grounds are kept because they are what the
   engine was sized against.** It does not *transport*
@@ -2138,24 +2146,25 @@ fixtures reach.
 labelled.** Its members byte-compare a tracked projection against a live
 `bash <emitter> --emit`: `check-footprint-fresh`, `check-trajectory-fresh`,
 `check-enforcement-fresh`, `check-value-rollup-fresh`, `check-docs-mirror-fresh`,
-`check-roadmap-fresh`. On the per-member key the relabel above fixes — *is this
-gate's emitter ported?* — the still-shell emitters are
-`drift-kit/bin/trajectory.sh`, `scripts/gen-docs-mirror.sh` and
-`queue-kit/bin/roadmap.sh`. **Three of the six are ported** — footprint,
-enforcement-map and the value-rollup join, each a non-gate arm of the binary
-(§The non-gate arm) landed with its comparator, so each of those three compares
-against an in-process function call rather than a spawn. That is where this
-family's `bash` hop is actually retired, rather than merely relocated. On that key
-the remaining three are held for any cohort that ports no emitter — a **sequencing** finding,
-and §The consumer remainder cohort is where three of them are superseded rather
-than repealed (below). What differs per member is what clearing the hold *costs*:
+`check-roadmap-fresh`. **The family is closed 6/6.** On the per-member key the
+relabel above fixes — *is this gate's emitter ported?* — no shell emitter is left:
+footprint, enforcement-map and the value-rollup join went first, and
+`scripts/gen-docs-mirror.sh` (127 lines), `drift-kit/bin/trajectory.sh` (242) and
+`queue-kit/bin/roadmap.sh` (76) followed as the `docs-mirror`, `trajectory` and
+`roadmap` arms, taking 445 lines of shell out of the tree. Each is a non-gate arm
+of the binary (§The non-gate arm) landed with its comparator, so **every** member
+now compares against an in-process function call rather than a spawn. That is
+where this family's `bash` hop is actually retired rather than merely relocated,
+and the retirement is now literal: `fresh.rs`'s `emit`, `emitter_path` and its
+`[[ -x ]]` probe lost their last caller with the tail triple and were deleted.
+What differed per member is what clearing the hold *cost*:
 
 | Member | Beyond the byte-compare | What it owes past its emitter |
 |---|---|---|
-| `check-footprint-fresh`, `check-trajectory-fresh`, `check-enforcement-fresh` | nothing | nothing — a spawn and a string compare. `check-footprint-fresh` and `check-enforcement-fresh` are **fully discharged**: gate and emitter both ported, compare in-process, no shell left. `check-trajectory-fresh` is **ported** (§The consumer remainder cohort), emitter still shell |
+| `check-footprint-fresh`, `check-trajectory-fresh`, `check-enforcement-fresh` | nothing | nothing — a spawn and a string compare. All three **fully discharged**: gate and emitter both ported, compare in-process, no shell left. `check-trajectory-fresh`'s emitter came last, and paid one extra: `date -d` over git's own `--date=short` output was a day difference dressed as an epoch subtraction, so it became a civil-date helper |
 | `check-value-rollup-fresh` | marker-block extraction | nothing — the block grammar is the projection's, not a corpus derivation. **Fully discharged**: the join ported with it, and the block reader it owned moved to the shared marker module beside the writer that module gained (§lib/inject.sh) |
-| `check-docs-mirror-fresh` | an orphan sweep, its own walk over `<root>/docs` | the walk (the crate already carries it) **and** a fail-closed repair: the sweep silences stderr, so an unreadable tree reads as no orphans. **Both paid** at §The consumer remainder cohort; emitter still shell |
-| `check-roadmap-fresh` | a second assertion over `TASK-QUEUE.md` through `queue_roadmap_entries` | a **criterion 6** answer — `bin/roadmap.sh` calls that same adapter, which is what makes queue-kit/SPEC.md's *"the emitter and the gate can never disagree"* true; porting the gate alone duplicates it with nothing machine-held |
+| `check-docs-mirror-fresh` | an orphan sweep, its own walk over `<root>/docs` | the walk (the crate already carries it) **and** a fail-closed repair: the sweep silences stderr, so an unreadable tree reads as no orphans. **Both paid** at §The consumer remainder cohort. **Fully discharged**: the emitter followed, paying `realpath -m --relative-to` as crate path arithmetic |
+| `check-roadmap-fresh` | a second assertion over `TASK-QUEUE.md` through the shared roadmap adapter | a **criterion 6** answer — the roadmap arm calls that same adapter, which is what makes queue-kit/SPEC.md's *"the emitter and the gate can never disagree"* true; porting the gate alone would duplicate it with nothing machine-held. **Fully discharged**, the two landing in one commit so the guarantee never lapsed |
 
 **Whichever member of this family ports first owes the report cap, and it is
 settled rather than left to that session** — the renderer the crate carries is
@@ -2176,27 +2185,32 @@ TRAJECTORY.md §PRIORITY DIRECTIVE — the port track's sequence is that no
 port-candidate criterion survives as an eligibility gate, so the technical
 problem a criterion names is work the port owes rather than an exclusion it may
 take. The operator's remainder ruling is the later and more
-specific instruction. **The honest number for those three is therefore zero**: the
-dual-maintenance win for those three is nil until their emitters follow, and what
-the cohort actually banked for them is *consumer-tranche completion* — a gates
-directory with no check script left in it — never a shrunken interpreter surface.
-Written down because the next selector reading three ported members as evidence
-that this family's hold was wrong would be reading the opposite of what happened.
+specific instruction. **The honest number for those three was therefore zero at that cohort**: the
+dual-maintenance win was nil until their emitters followed, and what the cohort
+actually banked for them was *consumer-tranche completion* — a gates directory
+with no check script left in it — never a shrunken interpreter surface. Written
+down because the next selector reading three ported members as evidence that this
+family's hold was wrong would be reading the opposite of what happened. **The
+emitters have since followed and all three are off zero**, which is the shape of
+the correction rather than a repeal of the reasoning: the number moved because the
+work moved, exactly as the figure was defined to.
 
-**Across the whole family the count is one, and it belongs beside that zero
-rather than appended somewhere else.** `check-footprint-fresh` lands its
-comparator *and* its emitter in one unit, so for that member the spawn is gone,
-the shell is deleted, and the dual-maintenance win is banked rather than owed.
-The three above still owe their emitters. This is a live count of members whose
-win has actually banked, and porting an emitter moves it — the property that
-makes the figure worth stating at all.
+**Across the whole family the count is six, and it belongs beside that zero
+rather than appended somewhere else.** `check-footprint-fresh` was the first to
+land its comparator *and* its emitter in one unit; enforcement-map and the
+value-rollup join followed, then the `docs-mirror`, `trajectory` and `roadmap`
+tail. For every member the spawn is gone, the shell is deleted, and the
+dual-maintenance win is banked rather than owed. This is a live count of members
+whose win has actually banked, and porting an emitter moved it — the property
+that made the figure worth stating at all, and the reason it is now the family's
+own size rather than a fraction of it.
 
-**The emitters were filed, not adopted, and the file has since been drawn down.**
-Porting them was real and identified work sitting outside the remainder cohort's
-ruled scope, so it became a costed queue entry under scope-gated intake rather
-than something pulled in mid-cohort. Three of the six have since been drawn from
-that entry as their own unit; `scripts/gen-docs-mirror.sh`,
-`drift-kit/bin/trajectory.sh` and `queue-kit/bin/roadmap.sh` remain on it.
+**The emitters were filed, not adopted, and the file is now drawn down to
+nothing.** Porting them was real and identified work sitting outside the remainder
+cohort's ruled scope, so it became a costed queue entry under scope-gated intake
+rather than something pulled in mid-cohort. Three of the six were drawn from that
+entry as one unit and the remaining three as the next; the entry closed with
+them.
 
 **The transferable conclusion re-points the ordering rule.** The cheap cohort in
 this family is **the emitters, not the gates**: a ported byte-comparator
@@ -2213,15 +2227,19 @@ Recorded as a worked limit on that rule, not as a change to it.
 selector would inherit it.** The vacuity above was generalised as *all six steer
 their pairs off the live emitter through the emit-source positional*; it is
 true of **five**. `check-docs-mirror-fresh` takes no emit-source argument — its single
-positional is `[root]`, both case arg files are `.`, and it executes the live
-`gen-docs-mirror.sh` against the synthetic case tree, so its pair already proves
-the emitter-executing arm and the warning does not apply to it. For the other five
+positional is `[root]`, both case arg files are `.`, and it drives the live
+generator against the synthetic case tree, so its pair already proves the
+emitter-executing arm and the warning does not apply to it. For the other five
 the warning stands unweakened, and their parity must be bought by a live-tree run
 or a constructed scenario — criterion 2's `# no-fixture:` treatment, reached
-through a bypass arm rather than through an absent pair. **Two of the five have
-since attested it**: `check-trajectory-fresh` and `check-value-rollup-fresh` were
-ported at §The consumer remainder cohort and their criterion-2 parity was bought
-exactly that way. The attestation sharpens the claim in one place the original
+through a bypass arm rather than through an absent pair. **All five have
+since attested it**: `check-trajectory-fresh` and `check-value-rollup-fresh` at
+§The consumer remainder cohort, and the tail triple's emitters by a
+transition-scoped byte-compare against the shell form over the live tree, held
+while both implementations existed.  `check-roadmap-fresh`'s pair is the sharpest
+instance of the warning — a ported pair would have gone green over an arm with no
+implementation at all — which is why the parity run and not the pair is cited as
+its emission's proof. The attestation sharpens the claim in one place the original
 wording left soft — a live-tree run must be a **stale** one, because a clean
 comparison exercises neither the diff renderer nor the cap, and those are the
 parts a pair steered off the emitter was never going to reach.
@@ -3770,8 +3788,8 @@ tool is invisible to every static sizing signal the selector has,
 than rediscovered per member. **The class is now exhausted**: the one remaining
 unrecorded instance was `check-graph`, whose spawned generator is sized in its
 own section (§check-graph) at the 2026-08-17 close that drained the bullet; the
-only other spawning member, `check-roadmap-fresh`, has always carried
-`bin/roadmap.sh` (76) in `freshness-emitter-port-cohort`'s roster.
+only other spawning member, `check-roadmap-fresh`, always carried its emitter
+(76 lines) in `freshness-emitter-port-cohort`'s roster and ported with it.
 
 **A prediction this record corrects, because the oracle overruled it at build.**
 The port was expected to make `check-reads-couples`' coverage assertion run *for
@@ -5725,7 +5743,7 @@ silent success or a skip:
   Saying so is what keeps a vendored tool from reading as a broken one.
 
 It is a tool, not a gate: no `# graph:` manifest, no `# install:` header, no
-fixture pair — the same distinction `queue-kit/bin/roadmap.sh` carries. It is
+fixture pair — the same distinction the kits' remaining `bin/` tools carry. It is
 `100755` in the index like every other `*/bin/*.sh` (§check-exec-bit).
 
 **When to run it relative to `git add` is §check-gate-binary-fresh's rule, not
@@ -7048,15 +7066,17 @@ reason. No knob: the lead-line shape is not a consumer's posture but the one
 format the `# until:` contract is written against, and a consumer free to
 redefine it could redefine it back into the fail-open this closes.
 
-**The honest cost, stated with its size: six independent holders now carry
-that predicate and no gate enforces their agreement** — `queue_live_slugs` and
-`queue_roadmap_entries` (queue-kit/lib/queue.sh), `queue_slugs`
+**The honest cost, stated with its size: five independent holders now carry
+that predicate and no gate enforces their agreement** — `queue_live_slugs`
+(queue-kit/lib/queue.sh), `queue_slugs`
 (native/src/spec.rs — canon-kit's holder, which moved substrate with the seventh
 cohort and is deliberately not pointed at the crate's own queue module, since one
 shared function would end the arrangement this count prices), the crate's own
 queue module, the section-pool builder inside
 drift-kit's `kpi-queue-net-delta`, and this gate. **It was eight, and porting is
-what shrank it** — the inline scans in `check-task-names` and
+what shrank it** — the roadmap adapter left the shell library for the crate's own
+queue module when its two consumers ported together, so a holder became a second
+call site of one already counted; the inline scans in `check-task-names` and
 `check-queue-entry-budget`, and both of the `queue-index` arm's walks, now call
 one shared crate function, and two call sites of one function are one holder by
 this section's own criterion. That is the shared-derivation question below

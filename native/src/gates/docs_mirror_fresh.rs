@@ -1,12 +1,21 @@
 // spec: canon-kit/SPEC.md §The reference-link grammar — docs/<kit>/{SPEC,README}.md and
-// docs/doctrine-kit/DOCTRINE.md are the byte-fresh projection of gen-docs-mirror.sh backing
+// docs/doctrine-kit/DOCTRINE.md are the byte-fresh projection of the docs-mirror arm backing
 // on-site reference reading; a stale, missing, or orphaned mirror page reds
 use crate::fresh;
 use crate::walk;
 use std::path::Path;
 
-const GENERATOR: &str = "scripts/gen-docs-mirror.sh";
 const MIRROR_NAMES: &[&str] = &["SPEC.md", "README.md", "DOCTRINE.md"];
+
+// spec: gate-sdk/SPEC.md §The first cohort, and the rule that selects the next — the generator is
+// a function call, not a spawn: it ported in the same unit, so there is no shell left to reach and
+// fresh::emit's bash hop is retired for this member too.
+fn generate(mode: &[&str], root: &str) -> Result<String, String> {
+    let mut args: Vec<String> = mode.iter().map(|s| s.to_string()).collect();
+    args.push("--root".to_string());
+    args.push(root.to_string());
+    crate::emit::docs_mirror::emit(&args)
+}
 
 pub fn run(args: &[String]) -> i32 {
     match rule(args) {
@@ -23,15 +32,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     if !fresh::is_dir(root) {
         return Err(format!("not a directory: {}", root));
     }
-    let gen = fresh::emitter_path(GENERATOR)?;
-    if !fresh::executable(&gen) {
-        return Err(format!("generator not found: {}", gen));
-    }
-
-    // spec: gate-sdk/SPEC.md §Fail-closed contract — the shell form's guard here read the
-    // array builtin's status rather than the child's, so it was dead code; a child that did
-    // not succeed yields no stdout here, so the hole has no spelling.
-    let listed = fresh::emit(&gen, &["--list", "--root", root], "generator")?;
+    let listed = generate(&["--list"], root)?;
 
     let mut bad: Vec<String> = Vec::new();
     let mut expected: Vec<String> = Vec::new();
@@ -48,10 +49,10 @@ fn rule(args: &[String]) -> Result<i32, String> {
             ));
             continue;
         }
-        let emitted = fresh::emit(&gen, &["--emit", src, "--root", root], "emit")?;
+        let emitted = generate(&["--emit", src], root)?;
         let have = fresh::read_captured(&on_disk)?;
         if emitted.trim_end_matches('\n') != have.trim_end_matches('\n') {
-            bad.push(format!("{}: stale vs gen-docs-mirror.sh --emit {}", dest, src));
+            bad.push(format!("{}: stale vs the docs-mirror arm's emission of {}", dest, src));
         }
     }
 
@@ -93,11 +94,11 @@ fn rule(args: &[String]) -> Result<i32, String> {
         for b in &bad {
             println!("  {}", b);
         }
-        println!("  help: regenerate — bash scripts/gen-docs-mirror.sh --write — and stage docs/.");
+        println!("  help: regenerate — bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write — and stage docs/.");
         return Ok(1);
     }
     println!(
-        "DOCS-MIRROR-FRESH: clean ({} mirror page(s) byte-match gen-docs-mirror.sh; no orphans)",
+        "DOCS-MIRROR-FRESH: clean ({} mirror page(s) byte-match the docs-mirror arm; no orphans)",
         n
     );
     Ok(0)

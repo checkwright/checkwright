@@ -1,1 +1,1 @@
-stale vs gen-docs-mirror.sh
+stale vs the docs-mirror arm's emission of

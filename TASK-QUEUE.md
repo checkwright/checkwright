@@ -12,57 +12,11 @@
 
 ## New Features
 
-- **freshness-emitter-port-cohort** [spec: SPEC-emitter-tail.md] — the generated-projection
-  freshness family is six comparator+emitter pairs; **three are now ported and three remain
-  shell**.
-  **Delivered 2026-08-16**: `footprint.sh` (129), `gate-sdk/bin/enforcement-map.sh` (273) and
-  `scripts/gen-value-rollup.sh` (124) are deleted, each emitter now a non-gate arm of the binary,
-  and `check-footprint-fresh`, `check-enforcement-fresh` and `check-value-rollup-fresh` each call
-  their emitter **in-process** rather than spawning it. Each port was held to a byte-identical
-  parity run against the shell emitter *before* the deletion. Two dividends banked: the join is
-  structural (the rollup receives its siblings' data instead of re-parsing their markdown), and
-  `jq` left the battery's own path with the settings-hook rows.
-  **Remaining, and held by nothing but sequence:** `scripts/gen-docs-mirror.sh` (127),
-  `drift-kit/bin/trajectory.sh` (242) and `queue-kit/bin/roadmap.sh` (76), with their comparators.
-  The design question is **answered and merged** — a ported emitter is a non-gate arm
-  (gate-sdk/SPEC.md §The non-gate arm) — so the following cohort applies the ruling rather than
-  re-deciding it, and `check-roadmap-fresh`'s unruled-emitter-design hold is retired as spent.
-  **Taken this iteration — ruled 2026-08-18 at scope on the operator's relayed ruling; the cut is
-  the freshness triple as spine plus a two-member budget batch.** `--group` again read every group
-  a singleton, which is the budget arm's stated precondition (gate-sdk/SPEC.md §Porting a gate to
-  the binary substrate).
-  **The spine's own coupling:** `check-roadmap-fresh` is ported **with** `queue-kit/bin/roadmap.sh`
-  rather than after it. `cohort-held-members-port-prerequisites` states the hold's dividend as
-  keeping `queue_roadmap_entries` on one shell adapter so queue-kit/SPEC.md's "the emitter and the
-  gate can never disagree" guarantee survives; porting the emitter alone is what spends it. The
-  other two comparators need no such pairing — both are already native.
-  **The batch, and it is never one unit of work:** `check-memory-off` (89 shell lines) and
-  `check-root-tiering` (67), each taking its own descriptor, registry entry and parity run, either
-  droppable without touching the other or the spine. **Delivered 2026-08-18 at build**, its
-  findings at gate-sdk/SPEC.md §The third budget batch.
-  **The adjudication that admits `check-memory-off` — corrected at spec 2026-08-18, and recorded
-  so a later selector does not re-make the error.** This cut justified the member on criterion 7,
-  and that premise is wrong: gate-sdk/SPEC.md holds it on **criterion 2** (§The first cohort, §The
-  settings cohort) and states in terms that *its blocker is the oracle, not the dependency*, so
-  retiring jq cannot retire the hold. Spec-over-precedent makes that SPEC ground truth over this
-  entry. What pays for the member is criterion 2's **constructed-scenario discharge**, ruled taken
-  2026-08-18 and designed at `SPEC-third-batch.md`. The jq re-use through `native/src/json.rs`'s
-  `Path::compile`/`eval` is real and **secondary**: the port subtracts jq from the **gate
-  battery's** dependency floor (TRAJECTORY.md objective 1), never from the repo or the shipped
-  install path. A batch finding owes a gate-sdk/SPEC.md section when it lands.
-  **What the port must not bake in.** `roadmap.sh` reads this consumer's roadmap-tag lane
-  vocabulary, already consumer config (`scripts/queue-config.sh`, in the gate's own couple set).
-  The arm carries the knob read; a lane literal in the crate would publish a consumer's
-  vocabulary, the class the provenance seam forbids.
-  **Why deferred rather than Done:** the deliverable is a six-member corpus and half of it is
-  unbuilt. A Done move would assert a finished port.
-  **Cost while deferred:** three shell emitters keep bash in the dependency floor against
-  TRAJECTORY.md objectives 1 and 6, all three behind already-compiled comparators.
-  Filed 2026-08-15 by close; scoped to the value-rollup triple by operator ruling 2026-08-15 and
-  demoted at build 2026-08-16 having delivered that triple; promoted 2026-08-18 at spec for the
-  tail triple, which closes the family 6/6.
+## Technical Debt
 
-- **cohort-held-members-port-prerequisites** [spec: SPEC-roadmap-port.md] — gates are held on
+## Deferred
+
+- **cohort-held-members-port-prerequisites** [design-pending] — gates are held on
   shell by operator ruling, each owing a named prerequisite nothing else tracks.
   Ground is **sequencing, not exclusion**: gate-sdk/SPEC.md §The port-candidate criteria opens
   by denying the seven are an eligibility screen, and criterion 7's worked example
@@ -71,17 +25,15 @@
   gate-sdk/SPEC.md §The first cohort; this entry carries only the work owed, so a ground
   stated there is cited here and never restated.
   The count is the roster's, never a fixed number.
-  **`check-roadmap-fresh` is held on cohort composition alone** — relabelled off criterion 7 at
-  build 2026-08-12, ground unchanged. It is canonical, with the whole family's per-member cost
-  derivation, at gate-sdk/SPEC.md §The first cohort. The emitter design it once owed is
-  **answered and its hold retired as spent** (2026-08-16, `freshness-emitter-port-cohort`), and
-  **the sequence the port was held by arrived 2026-08-18** — it is taken this iteration, ported
-  with its own emitter in one session. The pairing is forced, not convenient: the hold keeps
-  `queue_roadmap_entries` on one shell adapter, so queue-kit/SPEC.md's "the emitter and the gate
-  can never disagree" guarantee survives, and porting the emitter alone is what spends it.
+  **`check-roadmap-fresh`'s hold is SPENT** (2026-08-18 at build): it was held on cohort
+  composition alone, the sequence arrived, and the gate ported **with** its own emitter in one
+  commit. The pairing was forced rather than convenient — the hold kept the roadmap adapter on
+  one substrate so queue-kit/SPEC.md's "the emitter and the gate can never disagree" guarantee
+  survived, and porting either half alone is what would have spent it. Both now sit on one crate
+  function, so the exclusion is satisfied on the other substrate rather than repealed.
   **The POSIX ERE engine is PAID** (landed 2026-08-13 at build); the members it unblocks and
   `check-comment-tier`'s standing screen-out are the canonical roster's, cited not restated.
-  **One of them owes more than its port: `check-tree-terms` — corrected 2026-08-13 at close** on
+  **`check-tree-terms` owes more than its port — corrected 2026-08-13 at close** on
   the mechanical confirmation the gap inbox asked for. Its corpus is `git ls-files` over the
   whole tracked tree, pruned only by `GATE_PRUNE_DIRS` and the pattern-file basenames — a live
   run scans 518 files and prunes neither `*/checks/` nor `native/src/` — so every declaration
@@ -107,18 +59,11 @@
   Filed 2026-08-12 by close; widened at build with the canon-kit trio; engine count and cohort
   cleanliness corrected 2026-08-12 at scope from an 85-gate census, on operator direction;
   the engine block collapsed 2026-08-13 at build when the ERE cohort paid it; promoted
-  2026-08-16 at spec and **demoted again 2026-08-16 at build** rather than moved to Done — the
-  deliverable is the corpus of held members and the keyed-knob amendment delivered one
+  2026-08-16 at spec and demoted at build; re-promoted 2026-08-18 at spec for
+  `check-roadmap-fresh`'s port and **demoted again 2026-08-18 at build** rather than moved to
+  Done — the deliverable is the corpus of held members and this amendment delivered one
   increment of it (canon-kit/SPEC.md §Merging an amendment, the entry-outlives-the-amendment
-  branch), with `check-roadmap-fresh` and `check-tree-terms` still owing theirs; re-promoted
-  2026-08-18 at spec for `check-roadmap-fresh`'s port, leaving `check-tree-terms` and the
-  `# port-until:` spelling as the entry's remaining work.
-
-
-
-## Technical Debt
-
-## Deferred
+  branch), leaving `check-tree-terms` and the `# port-until:` spelling as the work owed.
 
 - **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
   — the whole battery onto the binary, and the shell surface down to its residue.
@@ -537,7 +482,7 @@
   precisely so this promotion is an evidence-gated follow-up rather than a
   default flip on projection alone.
   **Precondition — hard dependency on `trajectory-stage-roster-hardcode`:** until
-  that lands, `drift-kit/bin/trajectory.sh` silently drops every `spec` stamp
+  that lands, the `trajectory` emit arm silently drops every `spec` stamp
   (hardcoded 5-stage roster), so **no `spec`-stage economics data is recorded on
   the trajectory at all** — the re-run this task prescribes has nothing to read.
   This task cannot start before that fix.
@@ -973,7 +918,7 @@
 - **absence-statement-grammar** [design-pending] — operator-directed: prefer
   omission over a sentence that restates absence, and a bare token (`None`, or a
   dash) where a statement of absence *is* required. Live instance:
-  `queue-kit/bin/roadmap.sh`'s empty-horizon placeholder emits a full sentence
+  the `roadmap` arm's empty-horizon placeholder emits a full sentence
   saying nothing is queued, asserted by its own gate test, where an empty section
   says the same thing.
   **The rule must not be blanket, and that is the design.** docs/install.md's
@@ -1567,7 +1512,7 @@
   on an operator-raised doctrine check.
 
 - **md-refs-tree-link-resolution** [design-pending] —
-  `scripts/gen-docs-mirror.sh` emits a `/tree/` form for off-root **directory**
+  the `docs-mirror` arm emits a `/tree/` form for off-root **directory**
   targets, and `check-md-refs`' self-repo pass recognizes only the
   `/blob/<ref>/` prefix — so a `/tree/` link falls through to the external-URL
   skip and is resolved by nothing.
@@ -3025,7 +2970,7 @@
   `lifecycle-kit/templates/lead.md` without pre-applying the rename. The sweeping batch
   re-derived against the tree only because the lead flagged it, finding five sites the roster
   missed — one in `docs/delegation-kit/index.md`, a hand-authored page
-  `scripts/gen-docs-mirror.sh` does not write, so no mirror regen would ever have corrected it.
+  the `docs-mirror` arm does not write, so no mirror regen would ever have corrected it.
   The enumeration also undercounted its own stated four citation sites.
   **Shape:** either a freshness assertion that a roster is re-derived at sweep time, or a stated
   rule that an enumerated roster is a floor and never the answer. The instance went green, which
@@ -6237,7 +6182,7 @@
   read by nothing but their own definitions and `queue-kit/gate-tests/queue-lib-parity.test.sh`,
   the shell tool that read them having been deleted by the queue-index port. Their siblings
   `QUEUE_TASK_RE` and `QUEUE_SECTION_RE` **do** still have live readers —
-  `bin/queue-counts.sh`, `bin/queue-edges.sh`, and `queue_live_slugs`/`queue_roadmap_entries` in
+  `bin/queue-counts.sh`, `bin/queue-edges.sh`, and `queue_live_slugs` in
   the library itself — so this is a **partial** death and a blanket section deletion is wrong.
   **queue-kit/SPEC.md already rules the three internal**, which is what makes the deletion look
   safe: §The queue-index arm says the derived regexes "were never a configuration surface, only
@@ -6669,6 +6614,7 @@
 ## Done
 
 - icebox-worklist-roadmap-blind
+- freshness-emitter-port-cohort
 
 ## Lessons Learned
 

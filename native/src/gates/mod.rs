@@ -47,6 +47,7 @@ pub mod queue_slug_liveness;
 pub mod queue_wrap;
 pub mod readme_roster;
 pub mod release_bump;
+pub mod roadmap_fresh;
 pub mod root_tiering;
 pub mod rule_citation;
 pub mod scratch_citation;
@@ -538,6 +539,25 @@ pub const REGISTRY: &[GateEntry] = &[
     // own first argument with a default, the variable-first-argument shape the shell parser
     // calls undecidable
     (
+        "check-roadmap-fresh",
+        roadmap_fresh::run,
+        &[],
+        // spec: queue-kit/SPEC.md §check-roadmap-fresh — the consumer's lane vocabulary crosses
+        // the bridge; the crate ships the <horizon>/<track> grammar and not one configured value.
+        // The section trio comes with the shared adapter, which scopes its scan to live entries.
+        &[
+            "QUEUE_KIT_QUEUE_FILE",
+            "QUEUE_KIT_ACTIVE_SECTIONS",
+            "QUEUE_KIT_DEFERRED_SECTION",
+            "QUEUE_KIT_ICEBOX_SECTION",
+            "QUEUE_KIT_HORIZONS",
+            "QUEUE_KIT_TRACKS",
+            "QUEUE_KIT_ROADMAP_FILE",
+            "QUEUE_KIT_ROADMAP_MARKER",
+        ],
+        "queue-kit",
+    ),
+    (
         "check-queue-slug-liveness",
         queue_slug_liveness::run,
         &[("?", "")],
@@ -835,8 +855,14 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-docs-mirror-fresh",
         docs_mirror_fresh::run,
-        &[("?", "")],
-        &[],
+        // spec: gate-sdk/SPEC.md §check-reads-couples — **two** unbounded roots off the scan-root
+        // argument: the generator's source-set listing of `<root>`, and the orphan sweep over
+        // `<root>/docs`. The first was invisible while the generator was a subprocess.
+        &[("?", ""), ("?", "")],
+        // spec: gate-sdk/SPEC.md §The non-gate arm — the generator it now calls in-process reads
+        // the blob ref, so the comparator declares what its callee reads: a knob the bridge does
+        // not carry is a knob the emission cannot resolve.
+        &["CANON_KIT_DOCS_BLOB_REF"],
         "-",
     ),
     (
@@ -889,7 +915,15 @@ pub const REGISTRY: &[GateEntry] = &[
         "check-trajectory-fresh",
         trajectory_fresh::run,
         &[],
-        &[],
+        // spec: gate-sdk/SPEC.md §The non-gate arm — the extractor it now calls in-process reads
+        // the stage roster and the evidence surfaces, so the comparator declares them
+        &[
+            "DRIFT_KIT_CONFIG_FILE",
+            "DRIFT_KIT_TRAJECTORY_SURFACES",
+            "DRIFT_KIT_GATES_FILE",
+            "DRIFT_KIT_STAGES",
+            "GATE_SDK_WORKFLOW_DIR",
+        ],
         "-",
     ),
     (

@@ -4,7 +4,6 @@ use crate::fresh;
 use std::path::Path;
 
 const DEFAULT_PROJECTION: &str = "docs/evidence-data.md";
-const EXTRACTOR: &str = "drift-kit/bin/trajectory.sh";
 
 pub fn run(args: &[String]) -> i32 {
     match rule(args) {
@@ -30,14 +29,10 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
         fresh::read_captured(emit_src)?
     } else {
-        // spec: drift-kit/SPEC.md §The published-evidence extractor — the extractor stays a
-        // spawn: this cohort ports the comparator, not the emitter (§The generated-projection
-        // freshness family records what that leaves owed)
-        let traj = fresh::emitter_path(EXTRACTOR)?;
-        if !fresh::executable(&traj) {
-            return Err(format!("extractor not found: {}", traj));
-        }
-        fresh::emit(&traj, &["--emit"], "trajectory")?
+        // spec: gate-sdk/SPEC.md §The first cohort, and the rule that selects the next — the
+        // extractor is a function call, not a spawn: it ported in the same unit, so there is no
+        // shell left to reach and fresh::emit's bash hop is retired for this member too.
+        crate::emit::trajectory::emit(&[])?
     };
 
     // spec: gate-sdk/SPEC.md §The consumer remainder cohort — both sides of the
@@ -52,7 +47,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         let left = format!("{}\n", emitted.trim_end_matches('\n'));
         fresh::print_capped_diff(&left, &projection_raw);
         println!(
-            "  help: regenerate — bash drift-kit/bin/trajectory.sh --emit > docs/evidence-data.md"
+            "  help: regenerate — bash gate-sdk/bin/run-gates.sh --emit trajectory > docs/evidence-data.md"
         );
         return Ok(1);
     }
