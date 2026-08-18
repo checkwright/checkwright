@@ -1,0 +1,3 @@
+# graph: couples=kit:checks/*.sh,kit:kpis/*.sh,kit:bin/*.sh,scripts/check-*.sh,scripts/kpi-*.sh,native/src/gates/exec_bit.rs,native/src/fresh.rs dir=one valve=none tier=precommit
+# install: on-surface
+# spec: gate-sdk/SPEC.md §check-exec-bit — every tracked *.sh matching an exec-glob carries git index mode 100755 and every tracked *.gate descriptor carries 100644, or a by-path-invoked kit script degrades silently to a skipped check / failed plugin in a fresh clone

@@ -163,8 +163,8 @@ if staged_matches 'scripts/git-hooks/*'; then
     run_gate check-hook-exec-bit env GATE_SDK_KNOB_GATE_SDK_HOOKS_DIR=scripts/git-hooks native/target/release/checkwright-gates check-hook-exec-bit
 fi
 
-if staged_matches 'gate-sdk/checks/*.sh' 'canon-kit/checks/*.sh' 'context-kit/checks/*.sh' 'delegation-kit/checks/*.sh' 'doctrine-kit/checks/*.sh' 'drift-kit/checks/*.sh' 'evidence-kit/checks/*.sh' 'guard-kit/checks/*.sh' 'lifecycle-kit/checks/*.sh' 'queue-kit/checks/*.sh' 'site-kit/checks/*.sh' 'gate-sdk/kpis/*.sh' 'canon-kit/kpis/*.sh' 'context-kit/kpis/*.sh' 'delegation-kit/kpis/*.sh' 'doctrine-kit/kpis/*.sh' 'drift-kit/kpis/*.sh' 'evidence-kit/kpis/*.sh' 'guard-kit/kpis/*.sh' 'lifecycle-kit/kpis/*.sh' 'queue-kit/kpis/*.sh' 'site-kit/kpis/*.sh' 'gate-sdk/bin/*.sh' 'canon-kit/bin/*.sh' 'context-kit/bin/*.sh' 'delegation-kit/bin/*.sh' 'doctrine-kit/bin/*.sh' 'drift-kit/bin/*.sh' 'evidence-kit/bin/*.sh' 'guard-kit/bin/*.sh' 'lifecycle-kit/bin/*.sh' 'queue-kit/bin/*.sh' 'site-kit/bin/*.sh' 'scripts/check-*.sh' 'scripts/kpi-*.sh'; then
-    run_gate check-exec-bit gate-sdk/checks/check-exec-bit.sh
+if staged_matches 'gate-sdk/checks/*.sh' 'canon-kit/checks/*.sh' 'context-kit/checks/*.sh' 'delegation-kit/checks/*.sh' 'doctrine-kit/checks/*.sh' 'drift-kit/checks/*.sh' 'evidence-kit/checks/*.sh' 'guard-kit/checks/*.sh' 'lifecycle-kit/checks/*.sh' 'queue-kit/checks/*.sh' 'site-kit/checks/*.sh' 'gate-sdk/kpis/*.sh' 'canon-kit/kpis/*.sh' 'context-kit/kpis/*.sh' 'delegation-kit/kpis/*.sh' 'doctrine-kit/kpis/*.sh' 'drift-kit/kpis/*.sh' 'evidence-kit/kpis/*.sh' 'guard-kit/kpis/*.sh' 'lifecycle-kit/kpis/*.sh' 'queue-kit/kpis/*.sh' 'site-kit/kpis/*.sh' 'gate-sdk/bin/*.sh' 'canon-kit/bin/*.sh' 'context-kit/bin/*.sh' 'delegation-kit/bin/*.sh' 'doctrine-kit/bin/*.sh' 'drift-kit/bin/*.sh' 'evidence-kit/bin/*.sh' 'guard-kit/bin/*.sh' 'lifecycle-kit/bin/*.sh' 'queue-kit/bin/*.sh' 'site-kit/bin/*.sh' 'scripts/check-*.sh' 'scripts/kpi-*.sh' 'native/src/gates/exec_bit.rs' 'native/src/fresh.rs'; then
+    run_gate check-exec-bit env $'GATE_SDK_KNOB_GATE_EXEC_GLOBS=*/checks/*.sh\t*/kpis/*.sh\t*/bin/*.sh\tscripts/check-*.sh\tscripts/kpi-*.sh' $'GATE_SDK_KNOB_GATE_EXEC_PRUNE=gate-tests\tfixtures\ttemplates\tsmoke' native/target/release/checkwright-gates check-exec-bit
 fi
 
 run_gate check-tree-terms gate-sdk/checks/check-tree-terms.sh
@@ -356,7 +356,7 @@ if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md'; then
 fi
 
 if staged_matches '*.md' 'scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh'; then
-    run_gate check-measured-claim env $'GATE_SDK_KNOB_CANON_KIT_MEASURED_CLAIMS_CMD=bash scripts/measured-claims.sh' $'GATE_SDK_KNOB_CANON_KIT_MEASURED_SURFACE_GLOBS=CLAUDE.md\tREADME.md\tCONTRIBUTING.md\tCODE_OF_CONDUCT.md\tSECURITY.md\tRELEASING.md\tROADMAP.md\tTRAJECTORY.md\t*/SPEC.md\t*/README.md\treserve/*/README.md\tdoctrine-kit/DOCTRINE.md\tdocs/*.md\tdocs/*/index.md\tdocs/posts/*.md\t.claude/commands/*.md' GATE_SDK_KNOB_CANON_KIT_MEASURED_KEYS=ported-gate-members GATE_SDK_KNOB_CANON_KIT_MEASURED_VALUES=77 native/target/release/checkwright-gates check-measured-claim
+    run_gate check-measured-claim env $'GATE_SDK_KNOB_CANON_KIT_MEASURED_CLAIMS_CMD=bash scripts/measured-claims.sh' $'GATE_SDK_KNOB_CANON_KIT_MEASURED_SURFACE_GLOBS=CLAUDE.md\tREADME.md\tCONTRIBUTING.md\tCODE_OF_CONDUCT.md\tSECURITY.md\tRELEASING.md\tROADMAP.md\tTRAJECTORY.md\t*/SPEC.md\t*/README.md\treserve/*/README.md\tdoctrine-kit/DOCTRINE.md\tdocs/*.md\tdocs/*/index.md\tdocs/posts/*.md\t.claude/commands/*.md' GATE_SDK_KNOB_CANON_KIT_MEASURED_KEYS=ported-gate-members GATE_SDK_KNOB_CANON_KIT_MEASURED_VALUES=78 native/target/release/checkwright-gates check-measured-claim
 fi
 
 if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md' '.gitignore'; then

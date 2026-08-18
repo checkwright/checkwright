@@ -14,6 +14,7 @@ pub mod docs_cmd;
 pub mod gate_fail_closed;
 pub mod kit_enum;
 pub mod docs_cname_parity;
+pub mod exec_bit;
 pub mod docs_kit_parity;
 pub mod docs_mirror_fresh;
 pub mod docs_nav_reachable;
@@ -1114,6 +1115,13 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_PRUNE_DIRS",
         ],
         "site-kit",
+    ),
+    (
+        "check-exec-bit",
+        exec_bit::run,
+        &[],
+        &["GATE_EXEC_GLOBS", "GATE_EXEC_PRUNE"],
+        "gate-sdk",
     ),
 ];
 

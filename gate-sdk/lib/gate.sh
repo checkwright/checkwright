@@ -56,6 +56,20 @@ unset _gpx
 # spec: gate-sdk/SPEC.md §check-root-tiering — the same resolution for that member's two remaining knobs, on the cause the four above already state: a knob no kit library defines is the bridge's third refusal, so the defaults could not stay inline in a check that dispatches to the binary. The allowlist default rides GATE_SDK_GATES_DIR's own resolved value above rather than the not-yet-defined gate_sdk_gates_dir, so the two stay one value by construction; an absent allowlist is the gate's own built-in-fallback branch, not a refusal, which is why defaulting a path that need not exist is safe here.
 [[ -v GATE_SDK_ROOT_ALLOWLIST ]] || GATE_SDK_ROOT_ALLOWLIST="$GATE_SDK_GATES_DIR/root-allowlist.list"
 [[ -v GATE_SDK_AGENT_FILE ]] || GATE_SDK_AGENT_FILE="CLAUDE.md"
+# spec: gate-sdk/SPEC.md §check-exec-bit — check-exec-bit's two whitespace-scalar overrides, resolved to arrays here so the config bridge can carry them. Distinct names on §lib/gate.sh's own rule: a scalar feeding an array is the one case a resolved global earns a spelling of its own, which is why GATE_PRUNE_DIRS above has one and the scalar-in/scalar-out knobs beside it do not. The glob default rides GATE_SDK_GATES_DIR's resolved value rather than the not-yet-defined gate_sdk_gates_dir, so the two stay one value by construction.
+# shellcheck disable=SC2034  # consumed by the compiled member across the bridge, never within this lib
+if [[ -n "${GATE_SDK_EXEC_GLOBS:-}" ]]; then
+    read -r -a GATE_EXEC_GLOBS <<<"$GATE_SDK_EXEC_GLOBS"
+else
+    GATE_EXEC_GLOBS=('*/checks/*.sh' '*/kpis/*.sh' '*/bin/*.sh'
+        "$GATE_SDK_GATES_DIR/check-*.sh" "$GATE_SDK_GATES_DIR/kpi-*.sh")
+fi
+# shellcheck disable=SC2034  # consumed by the compiled member across the bridge, never within this lib
+if [[ -n "${GATE_SDK_EXEC_PRUNE:-}" ]]; then
+    read -r -a GATE_EXEC_PRUNE <<<"$GATE_SDK_EXEC_PRUNE"
+else
+    GATE_EXEC_PRUNE=(gate-tests fixtures templates smoke)
+fi
 
 gate_find() {
     local prune=() d

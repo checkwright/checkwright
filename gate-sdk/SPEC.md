@@ -8100,6 +8100,7 @@ the backstop for a mode-only change no `ACMR` content filter would surface.
 
 ### check-exec-bit
 
+`checks/check-exec-bit.gate` (`precommit`, binary-dispatched).
 Invariant: every tracked `*.sh` path matching an exec-glob carries git *index*
 mode `100755`, **and every tracked `*.gate` descriptor carries `100644`**. The
 second is stated as an assertion rather than left implicit so that "a descriptor
@@ -8116,7 +8117,12 @@ because it is the mode a clone receives, and a `Write`-tool-authored script
 acquires `100644` there regardless of worktree state; one `git ls-files -s`
 reads it, sidestepping the worktree bit.
 
-The subject class is two knobs (both join §Layout and configuration's roster).
+The subject class is two knobs (both join §Layout and configuration's roster),
+each resolved in `lib/gate.sh` to an array under a distinct name — `GATE_EXEC_GLOBS`
+and `GATE_EXEC_PRUNE` — which is what the bridge carries and what the compiled
+member declares. That spelling is the one §lib/gate.sh's naming rule grants: a
+whitespace scalar feeding an array would otherwise be one name meaning two
+grammars, the cause `GATE_PRUNE_DIRS` already exists for.
 `GATE_SDK_EXEC_GLOBS` is the space-separated glob set (globs match with `*`
 spanning `/`); its default `*/checks/*.sh */kpis/*.sh */bin/*.sh` plus the
 computed `<gates-dir>/check-*.sh` and `<gates-dir>/kpi-*.sh` covers the per-kit
@@ -8136,13 +8142,22 @@ only in an uncommitted worktree file is invisible until staged, and the
 whole-tree `run-gates.sh` battery is the backstop for a mode-only change no
 `ACMR` content filter would surface. A non-repo cwd is fail-closed (exit 2).
 
-Argument mode (fixture capability): `check-exec-bit.sh [ls-files-dump]` lints a
+Argument mode (fixture capability): `check-exec-bit [ls-files-dump]` lints a
 canned `git ls-files -s` dump instead of running `git ls-files -s` from the
 repo root, so a fixture is hermetic against the host repo's index (the
-check-merge-attrs precedent). The `good/`+`bad/` pair runs on the argument
-path; the bespoke `gate-tests/check-exec-bit.test.sh` builds a temp git repo
-and re-stages a KPI at `100644` then `100755`, exercising the live
-`git ls-files` path. Tier `precommit`.
+check-merge-attrs precedent).
+
+**The two classes are reported one at a time, and that is what shapes the
+pair.** A dump violating both prints the script class and exits, so the
+descriptor class cannot appear in the same case. The `bad/` case therefore
+carries the *descriptor* violation — the class no case reached before the port,
+under a rule this batch landed descriptors beneath — and the script class keeps
+its own case in the bespoke `gate-tests/check-exec-bit.test.sh`, which builds a
+temp git repo and re-stages a KPI at `100644` then `100755` on the live
+`git ls-files` path. That test invokes the member through `gate_run` rather than
+by script path, which is what keeps it alive across a port
+(§lib/test-hermetic.sh; §The third budget batch records the class of failure a
+by-path invocation produces).
 
 ### check-root-tiering
 
