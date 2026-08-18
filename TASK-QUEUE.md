@@ -68,59 +68,6 @@
   `budget-batch-and-account-identity-kind` and promoted that day at spec with
   `SPEC-fifth-batch.md`, the fifth cut at its ruled width of seven.
 
-- **gh-account-identity-expectation** [spec: SPEC-gh-account.md] — a third expectation kind for
-  check-identity, `gh-account <login>`, asserting that this clone's active GitHub CLI
-  login is the one the consumer's manifest names. Filed by operator direction 2026-08-18,
-  which is why it enters the queue directly rather than through a scope.
-  THE HAZARD THE EXISTING TWO KINDS MISS: `git config user.email` and a remote's host are
-  per-clone state, so a wrong value is wrong only where it is set. The active GitHub CLI
-  login is machine-global — one project switching it repoints every CLI call in every other
-  clone on the box, the credential helper a push rides included. A consumer project cannot
-  notice its account moved underneath it, and the symptom surfaces as a permission error
-  against the wrong repo rather than as anything naming the account.
-  OBSERVED TWICE — 2026-08-14 and 2026-08-18, both collateral from a sanctioned action rather
-  than a slip: a close session selected the release account exactly as the local release runbook
-  directs, left it active because that runbook states no restore step, and damaged a session
-  working a parallel project on the same box. The recurrence sat in the procedure.
-  RESTORE RULING, operator-directed 2026-08-18, recorded here because a message thread is not a
-  store. A close session that switches to the release account for a push **restores the prior
-  account once the run it watched goes green** — after, never before, since a red needs the
-  write-scoped account to fix and re-push. It knowingly deviates from the local runbook, which
-  mandates the switch and sanctions no restore. Per-session instruction, NOT the durable fix.
-  WHY check-identity AND NOT A NEW GATE: it already owns the invariant class and every
-  contract this kind needs — optional consumer manifest behind `GATE_SDK_IDENTITY_FILE`,
-  fail-closed on an unknown key or wrong field count, a clean CI skip ahead of the manifest
-  reads, and a `--fixture` mode making the pair deterministic. Its scope fence at
-  gate-sdk/SPEC.md §check-identity — assert that a mapping applied, never perform it —
-  covers this kind unchanged, and the login stays consumer config rather than a kit literal,
-  which the provenance seam requires independently.
-  ALL THREE FORKS ARE NOW RULED, and `SPEC-gh-account.md` owns each ruling's mechanism —
-  cited here, never restated. (3) Shell now or paired with the port — **paired**, operator-ruled
-  2026-08-19 in the lead session through the harness's question mechanism, on a set proposed with
-  exactly that composition as its ground: the fifth-cut batch ports check-identity, so the kind
-  lands native and is not built twice. (1) and (2) were spec's and were settled 2026-08-19 at
-  spec. (1) The oracle is a **local read** of the CLI's persisted active account — its status
-  subcommand validates over the network, which at tier=precommit would red an offline commit —
-  behind a path knob, parsing the exact `user` key and deliberately not the `users` map, with an
-  unrecognized shape fail-closed rather than clean. (2) The absence posture is **graded** rather
-  than the binary the fork offered: absent CLI config is clean with the caveat in the clean line
-  (context-kit/SPEC.md §check-memory-off's shape), present-but-unreadable is exit 2, and a present
-  file with no block for the configured host is a violation — a remote is repo-local state a
-  manifest may demand, while the CLI is machine state no repo-local manifest can require.
-  SCOPE FENCE, operator-ruled 2026-08-18, stated so a later scope reads these as excluded rather
-  than as oversights. The restore obligation in the local release runbook is OUT: the mandated
-  switch keeps having no paired restore, so this unit detects a left-switched account at the next
-  commit instead of preventing the switch from persisting, and detection only fires in a project
-  whose manifest carries the line. Pinning this repo's own account is also OUT, so checkwright
-  itself stays undetected and the unit ships mechanism a consumer opts into — the consequence
-  being that the fixture pair is the kind's only exercise in this tree, so no live run covers it.
-  **Cost while deferred:** borne off-tree and by a third party, which is what makes it easy to
-  under-rate here — a failed push or a wrong-account commit in whatever project shares the box,
-  never a red gate in the project that caused it. The restore ruling answers the per-release
-  exposure but is unenforced, so the harm returns the first time a session misses one.
-  Promoted 2026-08-19 at spec with `SPEC-gh-account.md`, riding check-identity's port in the
-  fifth budget batch.
-
 ## Technical Debt
 
 ## Deferred
@@ -7224,6 +7171,8 @@
 - **scratch-execution-allowlist-bar** [design-pending] — Each close re-derives this standing bar.
 
 ## Done
+
+- gh-account-identity-expectation
 
 ## Lessons Learned
 

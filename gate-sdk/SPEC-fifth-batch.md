@@ -40,11 +40,16 @@ is still completed whole and closed by the session that finishes it.
   closing session was weighed and refused: it buys a whole session's context to
   run a checklist the batch already holds.
 - **The split carries a second unit, and its closing set is not this one's.**
-  `gate-sdk/SPEC-gh-account.md`'s merge and deletion and
-  `gh-account-identity-expectation`'s demotion belong to the batch that lands the
-  account kind, which completes that unit whole. It is named here because a
+  The `gh-account` amendment's merge and deletion and
+  `gh-account-identity-expectation`'s terminal move belonged to the batch that
+  landed the account kind, which completed that unit whole — and because the
+  deliverable was the kind rather than an increment of a corpus, that move was a
+  **Done** move rather than the demotion this bullet first assumed
+  (canon-kit/SPEC.md §Merging an amendment). It is named here because a
   roster enumerating only the fifth batch's obligations is exactly how the second
   unit's closing set falls between batches — no batch inherits it by being last.
+  Discharged: the kind landed, the amendment merged into
+  gate-sdk/SPEC.md §check-identity, and the entry moved to Done.
 - **An earlier batch leaves `§The fifth budget batch` unwritten** rather than
   starting it, so the closing session merges into its own text instead of into a
   half-written section by another.
@@ -65,8 +70,16 @@ so no member's parity run lends another proof, and **build may drop any member
 without invalidating the rest**. Dropping one costs the batch one member and
 nothing else. The three exceptions are about *sequence*, never about which
 members are admissible: delta 6's shared-snapshot constraint, delta 5's
-caller re-pointing, and the rider ordering `gate-sdk/SPEC-gh-account.md` delta 6
-owns.
+caller re-pointing, and the `gh-account` rider's ordering — **the kind lands
+after `check-identity`'s port, in its own commit, in the crate only**, and both
+halves of that order are forced. Landing the kind shell-side first builds it
+twice, which is what the operator's paired ruling refuses. Landing it *before*
+the port's cross-substrate parity run is worse: parity is taken while both
+implementations exist, so a kind added to one side first leaves the port with
+nothing to be equal to and this batch's own oracle would be comparing two
+different rules. Recorded here in full because the rider's own amendment merged
+and was deleted with the kind, and this is the surface the ordering is a fact
+about.
 
 **Out of envelope — escalate rather than absorb.** Widening the batch past seven
 or admitting a member outside the ruled set; admitting a member carrying a
@@ -158,10 +171,11 @@ does nothing, which is the state §The non-gate arm calls worse than no flag.
 
 ### 4. `check-identity`'s argument verdict, ruled here because a rider depends on it
 
-`gate-sdk/SPEC-gh-account.md` lands a third expectation kind on this member
+The `gh-account` rider lands a third expectation kind on this member
 immediately behind its port, and that rider's injection point is whatever survives
-here — so the verdict is ruled at spec rather than left to the cut.
-*design-bearing.*
+here — so the verdict is ruled at spec rather than left to the cut. The rider has
+since landed and merged into gate-sdk/SPEC.md §check-identity, which is where its
+own rulings now live. *design-bearing.*
 
 **The `[manifest]` positional is deleted.** It overrides `GATE_SDK_IDENTITY_FILE`
 and nothing else, so a knob already redirects every path it redirects: the
@@ -526,7 +540,8 @@ run proves. That absence is the causal-completeness answer rather than a gap in
 it, and it is stated because a batch of seven ports invites the assumption that
 seven new things were introduced. The **exceptions** are the two knobs delta 4
 mints, whose producers and consumers are named there and whose third sibling
-`gate-sdk/SPEC-gh-account.md` owns.
+`GATE_SDK_GH_HOSTS_FILE` — landed with the account kind and merged into
+gate-sdk/SPEC.md §check-identity — takes the same shape.
 
 What each port *does* move is a **declaration path**, and its readers are named
 and enumerated:

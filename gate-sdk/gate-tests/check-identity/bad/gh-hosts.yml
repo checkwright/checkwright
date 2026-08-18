@@ -1,0 +1,9 @@
+# the machine's active account is not the one the manifest names.
+github.com:
+    users:
+        example-dev:
+            oauth_token: fixture-token
+        example-other:
+            oauth_token: fixture-token
+    git_protocol: ssh
+    user: example-other

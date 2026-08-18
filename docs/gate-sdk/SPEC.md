@@ -97,7 +97,14 @@ lists their prefixes here — see §check-graph), `GATE_SDK_CORE_FILES_FILE` (de
 `GATE_SDK_GIT_REMOTES_FILE` (both default empty; each names a file standing in
 for one thing the clone itself says — `git config user.email`, and the
 `<remote> <url>` set — so an empty value falls through to the live `git` read
-that is the production path — see §check-identity), `GATE_SDK_PRUNE_DIRS` (default
+that is the production path — see §check-identity), `GATE_SDK_GH_HOSTS_FILE`
+(default empty; the GitHub CLI's persisted hosts file, the account kind's
+actual, where empty means *derive it* — the CLI's own config-dir variable
+first, the XDG config home second — and never *no file*, the derivation living
+in the member because it reads `$HOME` — see §check-identity),
+`GATE_SDK_GH_HOST` (default `github.com`; the host whose block that file is read
+for, mirroring the CLI's own host variable rather than taking a third manifest
+field — see §check-identity), `GATE_SDK_PRUNE_DIRS` (default
 `target .git node_modules .tmp gate-tests worktrees`; it **replaces** the default
 set rather than extending it — see §lib/gate.sh for the members' rationale),
 `GATE_SDK_PRUNE_EXTRA_DIRS` (default empty; space-separated directory basenames
@@ -8321,16 +8328,16 @@ property does — which is exactly the failure a core-file pin exists to prevent
 `checks/check-identity.gate` (`precommit`, binary-dispatched).
 
 Invariant: every expectation in the `identity.conf` manifest matches this
-clone's local git identity — a verification backstop for the fresh-clone gap
+clone's identity — a verification backstop for the fresh-clone gap
 where an agent commits or pushes under the wrong identity and fails silently
 (misattribution is unpurgeable without a SHA-breaking history rewrite; the
 wrong-SSH-key symptom is a misleading "Repository not found"). Multi-identity
 setups — a work and a personal account on one machine — make this the common
 case for the integrator audience. **Scope fence:** the identity *mapping* stays
-git's job (`includeIf`, `core.sshCommand`); this gate only asserts the mapping
-actually applied here.
+git's and the GitHub CLI's job (`includeIf`, `core.sshCommand`, the CLI's own
+account switch); this gate only asserts the mapping actually applied here.
 
-Two expectation kinds, both local reads (cheap, no network, no false positives
+Three expectation kinds, all local reads (cheap, no network, no false positives
 from a settled corpus):
 
 - `email <expected>` — matches `git config user.email` exactly.
@@ -8339,6 +8346,15 @@ from a settled corpus):
   as the alias — that *is* the identity selector in multi-identity setups, so a
   scp-like `git@alias:path` compares as `alias`, and a `scheme://[user@]host/…`
   URL as `host`. A configured remote that does not exist in this clone is red.
+- `gh-account <login>` — exactly two fields, matched against the GitHub CLI's
+  **persisted** active account for the configured host by exact string. The
+  hazard it closes is not the one the first two close: `user.email` and a
+  remote's host are per-clone state, so a wrong value is wrong only where it is
+  set, while the CLI's active account is **machine-global** — one project
+  switching it repoints every CLI call in every other clone on the box, the
+  credential helper a push rides included, and the symptom surfaces as a
+  permission error against the wrong repo rather than as anything naming the
+  account. A consumer project cannot notice its account moved underneath it.
 
 The manifest is optional consumer config (the `graph-vocab.sh` pattern): the
 path knob is `GATE_SDK_IDENTITY_FILE` (default `<gates-dir>/identity.conf`),
@@ -8346,7 +8362,13 @@ line-based `key value…` with `#` comments and blanks ignored. An absent, empty
 or comment-only manifest is clean with a note; a mismatch (or a manifest-named
 remote that is absent) is a violation (exit 1); a malformed line — an unknown
 key or wrong field count — is fail-closed (exit 2), never a false clean on an
-uninterpretable manifest. A run under CI (the vendor-neutral `CI` env var)
+uninterpretable manifest. **Every one of those contracts reaches the account
+kind unchanged, and that is the whole argument for putting the kind here rather
+than in a gate of its own**: a wrong-field-count `gh-account` line — a
+three-field spelling carrying a host, say — is fail-closed by the arm that
+already exists, not by a new one, and adding the key *narrows* the unknown-key
+arm's corpus by exactly one token, which can only remove violations from it.
+A run under CI (the vendor-neutral `CI` env var)
 is clean-skipped ahead of the manifest reads: the server-side battery is not a
 committing clone, so there is no local identity to misattribute a commit or
 push with, and the CI runner's unset `user.email` is expected, not a violation.
@@ -8357,7 +8379,9 @@ deterministic wherever it runs. The same scoping covers the
 is-this-a-git-repository precondition, for the same reason.
 Enforcement is dual: the `# graph:` couples the
 manifest at `tier=precommit` (a `git config` change to the mapping is not
-diff-visible, so the whole-tree `run-gates.sh` battery is the real backstop for
+diff-visible — nor is a CLI account switch, whose hosts file is machine-global,
+outside the tree and never stages, so no coupling could name it either — so the
+whole-tree `run-gates.sh` battery is the real backstop for
 the commit-identity half), and `install-hooks.sh` runs the gate once at opt-in
 to cover the push-identity half (no pre-push hook is added — gate-sdk generates
 only the pre-commit hook, and the setup rung plus the precommit tier already
@@ -8373,8 +8397,10 @@ clone itself says. So the two missing knobs are minted rather than the arm
 deleted on a ground that does not hold — `GATE_SDK_GIT_EMAIL_FILE` and
 `GATE_SDK_GIT_REMOTES_FILE`, each naming a file standing in for one actual, each
 empty by default so the gate falls through to the live `git` read, which is the
-production path. The account-kind rider lands the family's third member on the
-same shape. Reaching
+production path. `GATE_SDK_GH_HOSTS_FILE` is the family's third member, on the
+same shape and with the one genuine **live** use among them — a relocated CLI
+config — so the account kind's test path and its production path are the same
+path, which is the property the arm's deletion exists to buy. Reaching
 the gate through knobs is what makes the fixture pair a parity oracle **for the
 live arm** instead of for a fixture-only second code path, which is the payoff
 context-kit/SPEC.md §check-memory-off states for the identical deletion.
@@ -8386,6 +8412,105 @@ the manifest is local config the same operator writes, the gate is a self-check
 rather than a security boundary, and the scope fence above already puts
 *performing* the mapping outside it. Stated so the capability is a ruling rather
 than a side effect.
+
+**The account kind's oracle is a local read of the CLI's persisted config, and
+the obvious oracle is refused with cause.** The CLI's status subcommand is the
+one a later author reaches for and it validates the token over the network; at
+`tier=precommit` that reddens an offline commit and puts a network round-trip in
+the pre-commit path, so it is refused. What the gate reads instead is the CLI's
+own hosts file — the file mapping each host to that host's credentials and to
+the active account — resolved through `GATE_SDK_GH_HOSTS_FILE`, whose default
+derivation honours the CLI's own config-dir variable first and the XDG config
+home second: a consumer that has relocated its CLI config has already said so
+once, and re-asking it through a kit knob would be a second source for one fact.
+**That derivation lives in the member rather than in `lib/gate.sh`**, which is
+the departure from the knob-defaults rule and has a cause: it reads `$HOME`, and
+a `HOME`-less derivation would yield a path under `/` that is absent — which the
+grading below reads as *clean*, the one false clean this kind exists to refuse.
+So the knob's shell default is empty, meaning *derive it* rather than *no file*,
+and a derivation with nothing to stand on is exit 2. Both halves are
+context-kit/SPEC.md §check-memory-off's, which takes the same refusal on the
+same variable.
+
+**The parse, and the key collision that decides it.** Inside the block
+introduced by the configured host, the active account is the value of the key
+spelled exactly `user`, at that block's own key indent. The sibling key `users`
+— the map enumerating the accounts *available* on this machine — shares that
+prefix and the CLI writes it **first**, so a substring or startswith match hits
+the map header before the active-account key and reads a structural key as a
+login; the indent scoping additionally keeps a login literally spelled `user`
+*inside* that map out of reach. Recorded here rather than left to the
+implementation because it is the defect a reasonable implementation walks
+straight into, and a fixture pair cannot fail on a case nobody thought to write.
+
+**The version tolerance, which is what makes binding to a tool's internal config
+format defensible.** The gate binds to `user` and deliberately does **not** read
+the `users` map: the map answers *which accounts exist here*, a different
+question from *which one is active*, so a design reading it would answer the
+wrong question even where it parsed cleanly. A file whose shape yields no `user`
+key for the configured host is **exit 2** — an unrecognized shape is fail-closed,
+never a clean, which is the one posture that keeps a format change from silently
+retiring the assertion.
+
+**The host is a knob, not a manifest field.** `GATE_SDK_GH_HOST` (default
+`github.com`) names the host whose block is read — config-via-env, mirroring the
+CLI's own host variable. The alternative is refused with cause, because it too
+is one a later author will reach for: a three-field `gh-account <host> <login>`
+would let one manifest pin two hosts, and it would move the field count the
+fail-closed arm keys on. A consumer pinning two hosts from one clone is not in
+evidence; a consumer on a single enterprise host is served by the knob.
+
+**The absence posture is graded rather than binary** — three conditions, three
+verdicts:
+
+- the hosts file is **absent** — clean, with the fail-open caveat named *in the
+  clean line*, and the unverified expectation excluded from the count that line
+  reports. A clone with no CLI cannot push through it, so the hazard this kind
+  guards cannot arise there; context-kit/SPEC.md §check-memory-off is the
+  precedent and the shape is taken from it verbatim.
+- the file is **present and cannot be read or parsed** — exit 2. The surface
+  exists and the gate cannot say what it holds; a clean there is a false clean on
+  the one condition the kind exists to catch. **No probe silences stderr**: a
+  suppressed read error would turn an unreadable file into an absent one and
+  collapse this verdict into the one above, which is the exact false negative the
+  grading exists to keep apart.
+- the file is present and carries **no block for the configured host** — a
+  violation, exit 1. The manifest says the account should be one thing and this
+  machine is not logged in to that host at all.
+
+**The distinguishing principle, stated so the third does not read as
+inconsistent with the first.** This gate already reds when a manifest-named
+remote is absent from the clone, and that is not in tension with
+clean-on-absent-CLI: a remote is **repo-local state a manifest may demand**,
+while the CLI is **machine state outside the repo** that no repo-local manifest
+can require to be installed. Absence of the tool is outside the manifest's
+authority; absence of a login *within* a configured tool is inside it.
+
+**The subject is the persisted account, not the effective one**, and that
+wording is load-bearing rather than incidental: a token environment variable
+makes the CLI authenticate as that token's account without touching the hosts
+file, so an assertion worded over "the account the CLI would use right now"
+would be false wherever one is set. The honest limit rides with the ruling and is
+small on purpose: a per-process token override is not detected, and it is also
+not the hazard — the recurrence this kind exists for is a *persistent* switch
+left behind by a sanctioned release action, which damages every other clone on
+the box, while a token in one process's environment persists nothing and reaches
+no sibling. Scoping the assertion to the persisted state narrows it onto the
+thing that actually recurs rather than conceding a gap.
+
+**The seam: the kit ships the kind, never an account.** A login is one
+project's — one *person's* — vocabulary, and a crate constant holding one would
+publish it as everyone's mechanism. The manifest is already optional consumer
+config on the `graph-vocab.sh` pattern, so the kind inherits the discharge: the
+crate carries the key name, the parse and the comparison; the consumer's
+manifest carries the login; the host is a knob with a generic default. This
+repo's own `scripts/identity.conf` deliberately carries **no** `gh-account`
+line, so checkwright stays undetected by its own gate and ships mechanism a
+consumer opts into. What that costs is stated rather than discovered: **no live
+run in this tree ever executes the kind**, so the fixture pair plus
+`check-identity.test.sh` are its whole oracle, and the sibling is where the
+graded postures above live — a one-pair harness can hold the match/mismatch axis
+and nothing else.
 
 ### check-hook-exec-bit
 

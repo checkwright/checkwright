@@ -1,0 +1,11 @@
+# injected GitHub CLI hosts file. The `users` map enumerates the accounts
+# available on this machine and is written first; the active account is the
+# `user` key at the block's own indent, which is what the manifest matches.
+github.com:
+    users:
+        example-dev:
+            oauth_token: fixture-token
+        user:
+            oauth_token: fixture-token
+    git_protocol: ssh
+    user: example-dev

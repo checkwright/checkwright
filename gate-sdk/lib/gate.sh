@@ -75,6 +75,10 @@ unset _gmp
 # spec: gate-sdk/SPEC.md §check-identity — the two actual-source knobs: each names a file standing in for one thing the *clone itself* says, and each is empty by default so the gate falls through to the live git read, which is the production path. Defined rather than left unset so the bridge can find them; the family's third member is the rider's own.
 [[ -v GATE_SDK_GIT_EMAIL_FILE ]] || GATE_SDK_GIT_EMAIL_FILE=""
 [[ -v GATE_SDK_GIT_REMOTES_FILE ]] || GATE_SDK_GIT_REMOTES_FILE=""
+# spec: gate-sdk/SPEC.md §check-identity — the family's third member, the account kind's hosts file. Empty by default and *derived in the member* rather than here, on check-memory-off's cause: this knob's derivation reads $HOME, and a HOME-less derivation would yield a path under `/` that is absent, which this kind's graded absence posture reads as clean — the one false clean it exists to refuse. Empty means "derive it", never "no file".
+[[ -v GATE_SDK_GH_HOSTS_FILE ]] || GATE_SDK_GH_HOSTS_FILE=""
+# spec: gate-sdk/SPEC.md §check-identity — the host whose block the account kind reads, config-via-env on the CLI's own host-variable shape rather than a third manifest field
+[[ -n "${GATE_SDK_GH_HOST:-}" ]] || GATE_SDK_GH_HOST="github.com"
 [[ -n "${GATE_SDK_TESTS_DIR:-}" ]] || GATE_SDK_TESTS_DIR="$GATE_SDK_GATES_DIR/gate-tests"
 [[ -n "${GATE_SDK_NATIVE_BIN:-}" ]] || GATE_SDK_NATIVE_BIN="native/target/release/checkwright-gates"
 # spec: gate-sdk/SPEC.md §lib/gate.sh — the crate root is normalized where it is resolved rather than at each read, so the value the bridge carries is the canonical one gate_native_crate already printed

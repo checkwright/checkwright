@@ -1166,6 +1166,8 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_IDENTITY_FILE",
             "GATE_SDK_GIT_EMAIL_FILE",
             "GATE_SDK_GIT_REMOTES_FILE",
+            "GATE_SDK_GH_HOSTS_FILE",
+            "GATE_SDK_GH_HOST",
         ],
         "gate-sdk",
     ),
