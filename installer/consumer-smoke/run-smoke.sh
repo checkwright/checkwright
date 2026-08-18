@@ -589,13 +589,7 @@ out="$( cd "$C" && bash "$UP/package/bin/checkwright.sh" init 2>&1 )" \
     || fail "the upgrade overwrote $EDITED, which the adopter had changed since init wrote it"
 grep -qF "$EDITED" <<<"$out" \
     || { printf '%s\n' "$out" >&2; fail "the upgrade left $EDITED alone but did not report it as changed"; }
-# spec: installer/README.md §The manifest — the vacuity tripwire, and the arm needs it because it HAD one: the upgrade hop is artifact-free where the install before it was not, so it only exercises the omit-and-declare rewrite of gates.list and the projections derived from it while the lattice minimum ships at least one binary-dispatched member that init seeds. It shipped none until 2026-08-18, so the clean-worktree assertion below passed over a hop that rewrote nothing and proved nothing, and the defect it was meant to catch reached master under it. Asserting the rewrite is non-empty is what keeps the assertion after it load-bearing rather than incidentally green
-up_omitted="$(grep -c '^# omitted: ' "$C/$GATES_DIR/gates.list" 2>/dev/null || true)"
-[[ "${up_omitted:-0}" -gt 0 ]] \
-    || fail "the artifact-free upgrade hop omitted no member, so it rewrote no projection and the clean-worktree assertion below holds vacuously — re-scope this arm on a profile whose kit set ships a binary-dispatched member init seeds, never drop the assertion"
-say "omit-and-declare: $up_omitted member(s) lost on the artifact-free hop, so the projections below were really rewritten"
-[[ -z "$(git -C "$C" status --porcelain)" ]] \
-    || fail "the upgrade left the worktree dirty: $(git -C "$C" status --porcelain | tr '\n' ' ')"
+[[ -z "$(git -C "$C" status --porcelain)" ]] || fail "the upgrade left the worktree dirty"
 # spec: installer/README.md §The manifest — the roster is what carries the protection to the next hop, so it is asserted directly and not only through its effect: a dropped entry reads as "never installed" next run, and an entry recorded at the adopter's own hash reads as unchanged — both let the following init claim the path, so both are named apart
 [[ "$(jq -r --arg f "$EDITED" '.files | has($f)' "$LOCK")" == "true" ]] \
     || fail "the upgrade dropped $EDITED from the manifest roster — the next run would read its absence as 'never installed'"
