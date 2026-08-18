@@ -7,3 +7,4 @@
 wide-budget-batch-and-hold-declaration scope a96b2877 2026-08-18
 wide-budget-batch-and-hold-declaration spec a4184f62 2026-08-18
 wide-budget-batch-and-hold-declaration align ab4869fd 2026-08-18
+wide-budget-batch-and-hold-declaration build aa8833af 2026-08-18
