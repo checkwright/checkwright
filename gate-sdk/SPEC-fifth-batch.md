@@ -12,6 +12,21 @@ widths are ruled per cut and never inherited; this one was put and answered on
 its own evidence, and a later selector reading the two together as a standing
 envelope is reading a precedent that was refused twice over.
 
+**The width was re-examined *after* this amendment was authored, on cost
+evidence that had moved, and held at seven.** The operator's ruling was taken
+against a survey ranking the corpus by declaration size and logic hazards;
+authoring found the cut's real cost sits in **interfaces** instead (delta 3),
+plus a pre-port library unit (delta 10), two caller re-pointings behind no gate
+(delta 5) and one member whose largest work item that ranking cannot see (delta
+9a). The moved evidence was put to the lead and the ruling **held**, on grounds
+recorded here rather than left in a message thread: the member set is ruled and
+promoted unchanged; **drop-any-member survives in the envelope**, so build keeps
+that relief without anything being re-opened, and build is the stage that feels
+the cost and may exercise it; and the added work is concentrated and named rather
+than diffuse, two of its items being one-time. Recorded because a later reader
+who finds the member audit would otherwise reasonably conclude the width was
+never re-examined against it — the ruling is *held*, not merely un-revisited.
+
 ## The envelope
 
 Stated first because it is what a build session needs before it cuts, and
@@ -182,6 +197,20 @@ lifecycle-kit to resolve a *gate name* in `LIFECYCLE_KIT_ENTRY_PREFLIGHT`, is a
 kit contract change and is **out of this envelope**; if build finds the
 consumer-side front-end insufficient, that is an escalation and not a widening.
 *design-bearing.*
+
+**Each of these two lands *with its own member's port commit*, and that is a
+different sequencing from delta 10's — the distinction matters enough to state,
+because collapsing the three into one "pre-port fixes" bucket gets two of them
+wrong.** Delta 10's knob fix is one edit to one shared library that three members
+trip, so it lands **once, in front of the whole batch**, before the first
+descriptor. These two are **per-member**: the `install-hooks` re-point belongs to
+`check-identity`'s commit and the pre-flight re-point to
+`check-evidence-manifest`'s. Neither is a library unit and neither can be batched
+in front, because each is only *reachable* once its own member is being ported —
+and neither may land **after**, which is the half that actually binds. A window
+in which the descriptor exists and the caller has not moved is a window in which
+the identity rung silently passes, or `close` cannot be entered; same-commit is
+what makes that window zero-width. *design-bearing.*
 
 **And the class is wider than these two instances, so the port owes the sweep
 rather than the fix.** Three gate-test harnesses (`*.test.sh` siblings for
