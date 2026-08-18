@@ -1,0 +1,3 @@
+# graph: couples=scripts/gates.list,kit:checks/*.sh,native/src/gates/kit_enum.rs,native/src/fresh.rs dir=one valve=none tier=precommit
+# install: on-surface
+# spec: gate-sdk/SPEC.md §check-kit-enum — a literal hand list of >=2 kit roots sharing a glob must name every kit root with matching tracked files; the fix is the kit:<glob> token, not a longer list

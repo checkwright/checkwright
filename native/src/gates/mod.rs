@@ -12,6 +12,7 @@ pub mod doctrine_registration;
 pub mod deprecation_task;
 pub mod docs_cmd;
 pub mod gate_fail_closed;
+pub mod kit_enum;
 pub mod docs_kit_parity;
 pub mod docs_mirror_fresh;
 pub mod docs_nav_reachable;
@@ -1087,6 +1088,17 @@ pub const REGISTRY: &[GateEntry] = &[
         gate_fail_closed::run,
         &[],
         &["GATE_SDK_GATES_DIR", "GATE_KIT_ROOTS_HERE"],
+        "gate-sdk",
+    ),
+    (
+        "check-kit-enum",
+        kit_enum::run,
+        &[],
+        &[
+            "GATE_SDK_GATES_DIR",
+            "GATE_KIT_ROOTS_HERE",
+            "GATE_KIT_ROOTS_REL",
+        ],
         "gate-sdk",
     ),
 ];

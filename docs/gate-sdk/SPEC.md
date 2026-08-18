@@ -7805,6 +7805,7 @@ hook (the check-graph contract exactly).
 
 ### check-kit-enum
 
+`checks/check-kit-enum.gate` (`precommit`, binary-dispatched).
 Invariant: for every `gates.list` member, a `couples=` set that literally names
 two or more `gate_kit_roots` members under a common glob suffix must name
 *every* kit root having tracked files matching that suffix. `kit:<glob>` deletes
@@ -7817,6 +7818,22 @@ what the gate requires. A lone named root is not a hand list (no completeness
 obligation); the check engages at two. Fail-closed: an unreadable manifest, an
 unresolvable registered gate, or a non-repo cwd is a red, not a skip. A member
 with no `# graph:` line is `check-graph`'s finding, not this gate's.
+
+**The port made one ordering deterministic, and it was never specified** (§The
+fourth budget batch). The shell form accumulated a member's glob groups in an
+associative array and iterated `${!named[@]}`, which is bash's hash order — so a
+member violating on two globs at once listed its findings in an order neither
+stable across bash builds nor stated anywhere. The compiled form keeps
+first-seen order, which is the manifest's own. The verdict is set-valued either
+way; only a multi-group report's line order was ever at stake.
+
+**Criterion 4 binds here through the walk *and* through the trigger**, which is
+what made its fixture pre-work real: the gate resolves every registered member's
+declaration and reads its manifest as text, so its own declaration path is inside
+its corpus. Neither case resolved a member to a `.gate` before the port, and the
+multi-kit hand-list branch — the whole rule — fired on no live group, so the pair
+proved the parse and not the assertion. Both cases now carry a descriptor
+declaring a complete two-root group, and the good case asserts the group count.
 
 ### check-kit-registration
 
