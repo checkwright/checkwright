@@ -6511,6 +6511,47 @@
   are different tiers and both stand. Filed 2026-08-18 by close on the lead's ruling, which
   adopted close's own refusal to take the envelope change alone.
 
+- **agent-worktree-boundary-disposition** [design-pending] — registered agent worktrees
+  outlive the iteration that created them, and nothing surfaces or reaps them.
+  **The finding, operator-directed 2026-08-18.** Four worktrees under the harness's
+  worktree directory survived this iteration's close, registered in `git worktree list`
+  and invisible to every gate. `.tmp/` has a boundary reset (`bin/enter-stage.sh`, with its
+  keep-list in `scripts/lifecycle-config.sh`); worktrees have nothing.
+  **What scope owes:** whether the boundary should surface them, reap them, or neither —
+  and if either, where that mechanism may live.
+  **Why folding it into the `.tmp/` boundary reset was REFUSED at the lead** rather than
+  filed as the obvious fix. Three grounds, and the third is a seam question:
+  (i) *The downside is asymmetric.* `.tmp/` deletion is lossless by construction —
+  gitignored disposable scratch. A worktree carries a branch and can hold commits existing
+  nowhere else, so one wipe is lossless on the first and destructive on the second.
+  (ii) *The survivor set is selected, not random* — the harness auto-cleans a worktree it
+  finds unchanged, so anything still registered survived for some reason. PROBED, and the
+  probe complicates this rather than confirming it: all four carried **no** commits outside
+  master and **clean** working trees when reaped, so either the survival reason had passed
+  or the auto-clean never ran (an agent dying before cleanup is the obvious candidate,
+  unverified). The selecting mechanism is therefore NOT established, and a reaper designed
+  against a guess at it is worse than no reaper.
+  (iii) *The seam.* `.tmp/` is repo scratch owned by lifecycle-kit's boundary reset; the
+  worktree directory is **harness** state. lifecycle-kit ships to consumers who may not use
+  worktree isolation and may not run this harness at all, so a boundary reset naming that
+  directory is a kit literal encoding one vendor's layout — the class the provenance seam
+  forbids, and the same reason graph vocabulary became consumer config.
+  **A concurrency gap any reaper closes first.** This repo assumes a foreign session may
+  share the index. The `.tmp/` answer is the `.run` liveness record plus a liveness gate at
+  every stage entry; a worktree has no analogous signal, so *is anyone still working in
+  this one* is unanswerable today. Inventing that signal is the design work here — the
+  config line is not.
+  **The cheap half, if scope wants one:** the report, not the removal. Surfacing a count at
+  the boundary (registered / carrying unique commits / dirty) is lossless and leaves removal
+  a human call. Removal, if ever taken, wants the established shape — an optional
+  consumer-config knob defaulting to empty, guarded by an emptiness-and-liveness predicate.
+  **Cost while deferred:** low. Worktrees are gitignored, block nothing, and cost only disk.
+  The carry is that each iteration's operator re-runs `git worktree list` by hand and
+  re-derives whether a survivor is safe to remove, as this one did across four of them.
+  **The honest limit:** one iteration's four worktrees is not a measurement, and nothing
+  reds on a stale worktree. Filed 2026-08-18 by the lead under the operator-directed
+  direct-to-queue exception, the four having been removed once verified empty and clean.
+
 
 ## Icebox
 
