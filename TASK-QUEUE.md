@@ -6552,6 +6552,59 @@
   reds on a stale worktree. Filed 2026-08-18 by the lead under the operator-directed
   direct-to-queue exception, the four having been removed once verified empty and clean.
 
+- **guard-steer-names-absent-tool** [design-pending] — a guard refusal steers the session onto
+  a harness tool its own toolset does not carry, so the remedy it names is unreachable.
+  **PROBED at the 2026-08-18 close and re-probed at this scope entry.** `guard-kit/lib/guard.sh`
+  emits two such steers: the bare-`find` refusal says "use the Glob tool" and the `git grep`
+  refusal says "use the Grep tool". A dispatched stage session's toolset is
+  Agent/Artifact/Bash/Edit/Read/Skill/ToolSearch/Write plus the deferred set, and
+  `ToolSearch 'select:Grep,Glob'` matches nothing — neither tool exists to reach. The `cat` and
+  `sed` steers name the Read tool and are correct, which is why the class reads as ordinary
+  friction rather than as a defect.
+  **The bullet undercounted the surface, and the correction is what widens this.** It named
+  `scripts/bash-guard.sh` and the Grep steer alone; the text lives in **guard-kit's generic
+  ruleset** and Glob has the identical shape. So the reach is every vendoring consumer whose
+  agent shape lacks those tools, not this repo's own steer vocabulary.
+  **NOT a permission-coverage defect and NOT an allowlist widening.** Bare `grep` and `find`
+  are already committed grants, so the working form was available all along; only the named
+  remedy is wrong.
+  **DISTINCT from `guard-steer-grant-mismatch`**, which is a steer whose target form the
+  allowlist does not grant. Here the grant exists and the *tool* does not — the same surface's
+  opposite half, worth designing together, neither subsuming the other.
+  **Why `[design-pending]`:** the guard cannot see a caller's toolset, so a conditional message
+  has no input to condition on. The candidate shapes are naming the fallback in the text ("use
+  the Grep tool, or bare `grep`, which is allowlisted") or making the steered-to tool a
+  consumer-config line, and which one holds is a guard-kit steering-message contract question
+  rather than an edit.
+  **Cost while deferred:** small and paid per search — a session follows the steer, finds no
+  tool, spends a ToolSearch, and re-derives the allowlisted bare form.
+  Surfaced 2026-08-18 at the `port-selector-permanence-and-batch` close, in its tooling-friction
+  triage; promoted from the gap inbox at this iteration's scope.
+
+- **deferred-entry-defer-date-unasserted** [design-pending] — a deferred entry whose provenance
+  date is malformed reads as **undated**, and no gate reds on it.
+  **PROBED both ways at the 2026-08-18 close, on entries that close itself wrote.** Two of its
+  seven new deferred entries spelled the date `filed 2026-08-18 by close` (lowercase, mid-line)
+  and `Filed at build 2026-08-18` (a word between the marker and the date). Both were listed by
+  `run-gates.sh --emit queue-index --icebox-candidates` with defer-date `(undated)`; rewriting
+  the two lines to the canonical form dropped both from the worklist on re-measure.
+  **The failure is silent by construction.** Such an entry is well-formed to every other gate —
+  the cost field is present, the budget gate is clean, the battery is green.
+  **Cost while deferred:** an undated entry never ages out of the age filter, so it is a
+  permanent icebox candidate *and* is invisible to drift-kit's deferred-age KPI, both readers of
+  the one definition (queue-kit/SPEC.md §The queue format).
+  **Why the fix looks cheap, and what the design still owes.** Every top-level deferred entry
+  resolves a defer date, and `check-queue-entry-budget` already walks every one of them to
+  enforce the cost field — so this reads as one more assertion on an existing walk, the shape of
+  its own assertion (C): a required field whose absence is invisible. What is open is the
+  **holder set**: that same SPEC section names three re-implementations of the definition
+  (queue-kit's, drift-kit's KPI, gate-sdk's `check-gate-exemption-tasks`), so an assertion on one
+  leaves the others parsing the same malformed line their own way.
+  Class: an assertion inside a shipped gate mints no name and is **debt** on that path; a new
+  gate or knob would make it a feature, and the promoting scope call settles it.
+  Surfaced 2026-08-18 at the `port-selector-permanence-and-batch` close, at its backlog-eviction
+  step; promoted from the gap inbox at this iteration's scope.
+
 
 ## Icebox
 
