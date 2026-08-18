@@ -304,17 +304,8 @@ if [[ -n "$ARTIFACT_TARGET" ]]; then
     fi
 fi
 
-# spec: installer/README.md §The manifest — the roster's exit condition, and it is the whole rule: init owns a path because it wrote the file there, so ownership ends when the file leaves the tree and at no other moment. Dropping an entry would disown a file init created, and an uninstall reading this roster would then leave it behind. A payload that stops shipping a path is not that moment either — the file is still on disk, it may carry the adopter's edits, and disowning it is precisely what lets a later payload re-adding the same path write straight through them. So membership and existence are the only tests: every path this payload still ships has already reached claim(), which records it on the write and on the refusal alike, leaving exactly the paths no copy_in visited this run to reach here
-if [[ -n "$PRIOR_FILES" ]]; then
-    while IFS=$'\t' read -r p h; do
-        [[ -n "$p" ]] || continue
-        printf '%s\n' "${WRITTEN[@]}" | grep -qxF "$p" && continue
-        [[ -f "$ROOT/$p" ]] || continue
-        record "$p" "$h"
-    done <<<"$PRIOR_FILES"
-fi
-
 # spec: installer/README.md §init — the generated projections are produced by the vendored tools themselves, never restated by the installer: the hook generator and the graph emitter are gate-sdk's, so a consumer's artifacts are the ones their own gate-sdk makes
+# spec: installer/README.md §The manifest — this runs BEFORE the carry-forward loop, and the order is the whole of why init's commit matches what it wrote: the carry-forward claims every prior path init has not written *this run*, so a projection regenerated after it would be recorded as carried, excluded from the staged set, and left dirty by the one commit that was supposed to contain it
 GENERATED=("$GATES_DIR/git-hooks/pre-commit" "$GATES_DIR/CHECK-GRAPH.html")
 if (( ! DRY )); then
     ( cd "$ROOT" && bash "$ROOT/gate-sdk/bin/gen-pre-commit.sh" --write ) >/dev/null \
@@ -327,6 +318,16 @@ for g in "${GENERATED[@]}"; do
     (( DRY )) || [[ -f "$ROOT/$g" ]] || continue
     record "$g"
 done
+
+# spec: installer/README.md §The manifest — the roster's exit condition, and it is the whole rule: init owns a path because it wrote the file there, so ownership ends when the file leaves the tree and at no other moment. Dropping an entry would disown a file init created, and an uninstall reading this roster would then leave it behind. A payload that stops shipping a path is not that moment either — the file is still on disk, it may carry the adopter's edits, and disowning it is precisely what lets a later payload re-adding the same path write straight through them. So membership and existence are the only tests: every path this payload still ships has already reached claim(), which records it on the write and on the refusal alike, leaving exactly the paths no copy_in visited this run to reach here
+if [[ -n "$PRIOR_FILES" ]]; then
+    while IFS=$'\t' read -r p h; do
+        [[ -n "$p" ]] || continue
+        printf '%s\n' "${WRITTEN[@]}" | grep -qxF "$p" && continue
+        [[ -f "$ROOT/$p" ]] || continue
+        record "$p" "$h"
+    done <<<"$PRIOR_FILES"
+fi
 
 # spec: installer/README.md §The manifest — what init wrote this run is a subset of the roster it records, because a path left alone for the adopter and a path this payload no longer ships are both carried forward rather than written; the two part company here so every reader downstream takes the one it means, and staging takes the written set: folding an adopter's file into the vendoring commit is what the clean-worktree precondition exists to prevent
 STAGE=()
