@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: freshness-cohort-roadmap-hold-and-batch
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -46,10 +46,10 @@
   `scripts/measured-claims.sh` emits as `ported-gate-members`), never a count this line holds.
   What the eleventh cohort and the budget batches leave owed here is the unported freshness
   emitters, whose roster `freshness-emitter-port-cohort` owns — a count copied here drifted once.
-  **The second budget batch landed 2026-08-17 at build**: `check-commit-subject` and
-  `check-readme-roster`, taken on the budget arm because the run's one non-singleton group was
-  a **phantom pair** whose other half is permanently shell — that adjudication, the criterion-3
-  proxy reading it produced and the criterion-4 fixture ordering are recorded there.
+  The second budget batch's phantom-pair adjudication is canonical at gate-sdk/SPEC.md §The second
+  budget batch, with the criterion-3 and criterion-4 readings it produced.
+  **The 2026-08-18 cut is ruled and recorded on `freshness-emitter-port-cohort`**: the freshness
+  triple as spine, plus a two-member budget batch, `--group` having read every group a singleton.
   Every held member is **sequencing with port work owed, never exclusion**, and what each owes
   is on `cohort-held-members-port-prerequisites`, which owns the roster and the kits it spans;
   a kit count copied here would be a second one to drift, and was.
@@ -63,8 +63,8 @@
   `gate-battery-result-cache` say the port subsumes them: closure candidates as it lands.
   Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
   direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope. Since then it is
-  promoted at spec and demoted at build **once per increment** — a cohort, or a budget batch
-  on `port-tail-cohort-batching-policy`'s arm — the terminal move always a **demotion**.
+  promoted at spec and demoted at build **once per increment** — a cohort, or a budget batch on
+  the arm gate-sdk/SPEC.md §Porting a gate to the binary substrate owns — always a **demotion**.
 
 - **cohort-held-members-port-prerequisites** [design-pending] — gates are held on
   shell by operator ruling, each owing a named prerequisite nothing else tracks.
@@ -78,11 +78,11 @@
   **`check-roadmap-fresh` is held on cohort composition alone** — relabelled off criterion 7 at
   build 2026-08-12, ground unchanged. It is canonical, with the whole family's per-member cost
   derivation, at gate-sdk/SPEC.md §The first cohort. The emitter design it once owed is
-  **answered and its hold retired as spent** (2026-08-16, `freshness-emitter-port-cohort`); what
-  remains owed is the port, held by sequence.
-  Worth preserving in the design: the hold keeps `queue_roadmap_entries` on one shell adapter,
-  so queue-kit/SPEC.md's "the emitter and the gate can never disagree" guarantee survives intact
-  and is **not** part of the dual-implementation debt above.
+  **answered and its hold retired as spent** (2026-08-16, `freshness-emitter-port-cohort`), and
+  **the sequence the port was held by arrived 2026-08-18** — it is taken this iteration, ported
+  with its own emitter in one session. The pairing is forced, not convenient: the hold keeps
+  `queue_roadmap_entries` on one shell adapter, so queue-kit/SPEC.md's "the emitter and the gate
+  can never disagree" guarantee survives, and porting the emitter alone is what spends it.
   **The POSIX ERE engine is PAID** (landed 2026-08-13 at build); the members it unblocks and
   `check-comment-tier`'s standing screen-out are the canonical roster's, cited not restated.
   **One of them owes more than its port: `check-tree-terms` — corrected 2026-08-13 at close** on
@@ -130,6 +130,31 @@
   The design question is **answered and merged** — a ported emitter is a non-gate arm
   (gate-sdk/SPEC.md §The non-gate arm) — so the following cohort applies the ruling rather than
   re-deciding it, and `check-roadmap-fresh`'s unruled-emitter-design hold is retired as spent.
+  **Taken this iteration — ruled 2026-08-18 at scope on the operator's relayed ruling; the cut is
+  the freshness triple as spine plus a two-member budget batch.** `--group` again read every group
+  a singleton, which is the budget arm's stated precondition (gate-sdk/SPEC.md §Porting a gate to
+  the binary substrate).
+  **The spine's own coupling:** `check-roadmap-fresh` is ported **with** `queue-kit/bin/roadmap.sh`
+  rather than after it. `cohort-held-members-port-prerequisites` states the hold's dividend as
+  keeping `queue_roadmap_entries` on one shell adapter so queue-kit/SPEC.md's "the emitter and the
+  gate can never disagree" guarantee survives; porting the emitter alone is what spends it. The
+  other two comparators need no such pairing — both are already native.
+  **The batch, and it is never one unit of work:** `check-memory-off` (89 shell lines) and
+  `check-root-tiering` (67), each taking its own descriptor, registry entry and parity run, either
+  droppable without touching the other or the spine.
+  **The criterion-7 adjudication that admits `check-memory-off`, recorded so a later selector does
+  not re-make it.** Its jq use is a path query over `settings.local.json` against the
+  `<path> = <expected JSON>` grammar of `scripts/settings-pins.conf` — the identical operation the
+  **already-ported** `check-settings-pins` performs on the same grammar through
+  `native/src/json.rs`'s `Path::compile`/`eval`. The design criterion 7 demands before a port is
+  therefore already paid, and the member is a re-use rather than a re-implementation. Dividend:
+  `port-blockers.sh`'s criterion-7 report names it the battery's **only** remaining jq consumer,
+  so the port subtracts jq from the gate battery's dependency floor (TRAJECTORY.md objective 1).
+  A batch finding owes a gate-sdk/SPEC.md section when it lands.
+  **What the port must not bake in.** `roadmap.sh` reads this consumer's roadmap-tag lane
+  vocabulary, already consumer config (`scripts/queue-config.sh`, in the gate's own couple set).
+  The arm carries the knob read; a lane literal in the crate would publish a consumer's
+  vocabulary, the class the provenance seam forbids.
   **Why deferred rather than Done:** the deliverable is a six-member corpus and half of it is
   unbuilt. A Done move would assert a finished port.
   **Cost while deferred:** three shell emitters keep bash in the dependency floor against
@@ -1560,39 +1585,34 @@
 - **stage-stamp-ordering-unenforced** [design-pending] — `check-stage-evidence`
   accepts a stage stamp that lands **after** commits already made under it, so
   the stamp proves invocation but not that it preceded the work it authorizes.
-  recurrence: stage-stamp-ordering-unenforced 2026-08-07 2026-08-16
+  recurrence: stage-stamp-ordering-unenforced 2026-08-07 2026-08-16 2026-08-18
   **Observed with the battery green throughout.** At the 2026-08-07 firing a build batch stamped
   `.workflow/WORKFLOW-STATE.txt` as its *third* commit, after two commits had already landed
   build-stage edits under that unstamped entry. Batch 2 stamped first and **the difference was
-  invisible to every gate** — which gates, and why, is the cause paragraph's below. The ordering
-  is session discipline with no oracle, while `lifecycle-kit/templates/stages/build.md` states
-  the stamp as the "First step" and says to commit it on its own; only enforcement is missing.
-  **The mechanism, run rather than observed (folded in 2026-08-02 from the gap
-  inbox; the text above states the symptom, this states the cause).** Both gates
-  are path-coupled in the generated pre-commit hook — the couple set is
-  `TASK-QUEUE.md` and `.workflow/WORKFLOW-STATE.txt` — so a work commit touching
-  only kit sources never runs them at all. They are not lenient about ordering;
-  they do not execute. The stamp commit is the first commit that runs them, and by
-  then the work they were meant to gate is already in history. On the full-battery
-  path they do run, but `check-stage-entry` reads point-in-time state only:
-  assertion C scans the amendment files and stamp set **as they are on disk**, with
-  no read of history, so a stamp that landed last is byte-identical to one that
-  landed first. The consequence generalizes past ordering — **every entry-time
-  assertion, assertion C's demand for a prior audit-stage stamp included, is
-  satisfiable retroactively**, because the gate cannot distinguish "align ran
-  before this build" from "align's stamp exists now". It also opens a **cheaper
-  candidate than the history assertion below**: widen the two gates' couple set so a
-  stage's own output surfaces re-fire them, turning a never-ran gate into a
-  ran-and-lenient one first.
-  **Candidate shape to weigh at design:** assert that the commit introducing a
-  stage's stamp is not preceded, within the same stage window, by commits
-  touching that stage's own output surfaces — decidable from git history, though
-  the surface set is the hard part. A cheap approximation misfires on a
-  same-stage re-entry, where a second session's stamp legitimately follows the
-  first session's commits; that case is **confirmed real** this iteration, not
-  hypothetical (see `batch-split-stamp-ownership`). A narrower and possibly
-  sufficient form: assert only that the **first** stamp for an iteration+stage
-  pair is not preceded by non-stamp commits since the prior stage's stamp.
+  invisible to every gate**. `lifecycle-kit/templates/stages/build.md` already states the stamp as
+  the "First step" and says to commit it on its own, so only enforcement is missing.
+  **The mechanism, run rather than observed (folded in 2026-08-02 from the gap inbox; the text
+  above states the symptom, this states the cause).** Both gates are path-coupled in the generated
+  pre-commit hook — the couple set is `TASK-QUEUE.md` and `.workflow/WORKFLOW-STATE.txt` — so a
+  work commit touching only kit sources never runs them at all. They are not lenient about
+  ordering; they do not execute. The stamp commit is the first commit that runs them, and by then
+  the work they were meant to gate is already in history. On the full-battery path they do run,
+  but `check-stage-entry` reads point-in-time state only: assertion C scans the amendment files
+  and stamp set **as they are on disk**, with no read of history, so a stamp that landed last is
+  byte-identical to one that landed first. The consequence generalizes past ordering — **every
+  entry-time assertion, assertion C's demand for a prior audit-stage stamp included, is
+  satisfiable retroactively**, because the gate cannot distinguish "align ran before this build"
+  from "align's stamp exists now". It also opens a **cheaper candidate than the history assertion
+  below**: widen the two gates' couple set so a stage's own output surfaces re-fire them, turning
+  a never-ran gate into a ran-and-lenient one first.
+  **Candidate shape to weigh at design:** assert that the commit introducing a stage's stamp is
+  not preceded, within the same stage window, by commits touching that stage's own output
+  surfaces — decidable from git history, though the surface set is the hard part. A cheap
+  approximation misfires on a same-stage re-entry, where a second session's stamp legitimately
+  follows the first session's commits; that case is **confirmed real**, not hypothetical (see
+  `batch-split-stamp-ownership`). A narrower and possibly sufficient form: assert only that the
+  **first** stamp for an iteration+stage pair is not preceded by non-stamp commits since the
+  prior stage's stamp.
   **Why `[design-pending]`:** it narrows how a shipped evidence contract is read,
   and the surface-set question has no cheap answer.
   **Cost while deferred:** the stamp protocol's central claim — that a stamp
@@ -1601,11 +1621,15 @@
   Class: mints a gate name if the oracle lands, so canon-kit/SPEC.md's new-names
   litmus makes it a **feature** on that path; debt only if it lands as an
   assertion inside `check-stage-evidence`. The promoting scope call settles it.
-  **Declined twice at scope on the lead's ruling despite the threshold — 2026-08-16, then again
-  2026-08-17 on unchanged grounds.** The couple sets were re-verified live at the first decline
-  (both exactly `TASK-QUEUE.md,.workflow/WORKFLOW-STATE.txt`) and cited rather than re-bought at
-  the second; the cheap half and the history assertion are still one design fork, and the entry
-  sits off every unit's surface in the 2026-08-17 set, so bundling would buy no amortization.
+  **Declined three times at scope despite the threshold — 2026-08-16, 2026-08-17, and 2026-08-18
+  on the operator's ruling.** Every decline turned on the same two facts: the cheap half and the
+  history assertion are one unresolved design fork, and the entry sits off every promoted unit's
+  surface, so bundling buys no amortization. The couple sets were re-verified live at the first
+  decline (both exactly `TASK-QUEUE.md,.workflow/WORKFLOW-STATE.txt`) and cited since.
+  **What is NOT unchanged — probed at the third decline and recorded so a fourth firing costs its
+  grounds fresh instead of inheriting them:** `check-stage-evidence` and `check-stage-entry` are
+  **both now native** (`native/src/gates/stage_evidence.rs`, `stage_entry.rs`), so the cheap half
+  is today a two-descriptor couple-set edit against a binary that already honours it.
   Filed 2026-08-01 at close from the gap inbox; build filed it against its own batch-1 stamp.
 
 - **amendment-deletion-content-completeness** [design-pending] — a closed

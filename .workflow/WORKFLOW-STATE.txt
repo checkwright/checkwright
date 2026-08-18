@@ -4,4 +4,4 @@
 
 ---
 
-— scope a4ab7abc 2026-08-18
+freshness-cohort-roadmap-hold-and-batch scope a4ab7abc 2026-08-18
