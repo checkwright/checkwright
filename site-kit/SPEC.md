@@ -101,6 +101,7 @@ kit path into a workflow whose whole distribution model is verbatim copy.
 
 ## check-docs-cname-parity
 
+`checks/check-docs-cname-parity.gate` (`precommit`, binary-dispatched).
 Invariant: no tracked file cites a `SITE_KIT_ALIASES` host in a `://` URL,
 where the authoritative host `H` is read from `SITE_KIT_CNAME`. The CNAME file
 must hold exactly one non-blank host line (else exit 2); `H` itself is exempt
@@ -113,8 +114,34 @@ one-line edit to the CNAME file that the gate re-propagates — the host lives i
 one gated place, and drift anywhere else is caught. The scan reads tracked
 content only, so an untracked local file is never a source; a `git ls-files`
 error is fail-closed (exit 2). The positional form
-`check-docs-cname-parity.sh [scan-root] [cname-file] [config-file]` lets a
-fixture point all three at a synthetic tree without touching consumer config.
+`check-docs-cname-parity <scan-root> <cname-file>` lets a fixture point both at
+a synthetic tree without touching consumer config.
+
+**Its default scan root makes the whole tracked tree its content corpus, and
+that is a port cost worth stating where the rule lives.** With `SITE_KIT_SCAN_ROOT`
+unset the walk is every tracked file, so every kit's `checks/*.sh` and `*.gate`
+is inside the corpus this gate reads *as content* — gate-sdk's criterion 4
+verbatim, reached through the walk rather than through the trigger field. The
+`# graph:` couple is the single literal CNAME file, so the derived
+substrate-sensitive set never selects it and gate-sdk's conservation assertion
+structurally cannot see the hold; it is the first worked instance in that
+direction (gate-sdk/SPEC.md §The fourth budget batch). The discharge is the
+general one: the fixture pair carries the arm, because `gate-tests` is pruned
+from every live-tree walk and no port can change what is inside it. The pair's
+good case therefore takes the default arm — no positional, scan root and CNAME
+both off the config bridge, a fixture declaration path inside its own corpus —
+and the bad case keeps the explicit-root arm.
+
+**There is no third positional selecting a config file, and the ground is a
+finding rather than a preference.** Such an argument could only work by exporting
+`SITE_KIT_CONFIG_FILE` and re-sourcing `lib/site.sh` mid-run. A
+`.gate`-dispatched member cannot do that: the config bridge resolves every declared knob *before* the binary starts
+(gate-sdk/SPEC.md §lib/gate.sh), so an argument that selects which config file
+the knobs come from arrives a process too late, and a documented flag that
+silently changes nothing is worse than none. A fixture supplies its own alias set
+the way any consumer does — a `site-config.sh` in the gates dir the loader
+already resolves — which is the shape gate-sdk/SPEC.md §The third budget batch
+settled for the same cause, and it costs the pair nothing.
 
 ## check-docs-render-fidelity
 

@@ -13,6 +13,7 @@ pub mod deprecation_task;
 pub mod docs_cmd;
 pub mod gate_fail_closed;
 pub mod kit_enum;
+pub mod docs_cname_parity;
 pub mod docs_kit_parity;
 pub mod docs_mirror_fresh;
 pub mod docs_nav_reachable;
@@ -1100,6 +1101,19 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_KIT_ROOTS_REL",
         ],
         "gate-sdk",
+    ),
+    (
+        "check-docs-cname-parity",
+        docs_cname_parity::run,
+        &[],
+        &[
+            "SITE_KIT_SCAN_ROOT",
+            "SITE_KIT_CNAME",
+            "SITE_KIT_ALIASES",
+            "SITE_KIT_EXEMPT_PATHS",
+            "GATE_PRUNE_DIRS",
+        ],
+        "site-kit",
     ),
 ];
 

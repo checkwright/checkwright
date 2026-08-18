@@ -1356,6 +1356,20 @@ design time; the last three were paid for, and each is named with what it cost.
    beside its `checks/` would put declaration paths inside that walk, and there
    criterion 4 would bind.
 
+   **The instance in the opposite direction — the couple clears and the walk
+   binds — is `check-docs-cname-parity`, and it matters more than the two above
+   because it produces a *missed* hold rather than an over-selected row.** Its
+   `couples=` is one literal file, so the derived substrate-sensitive set does not
+   select it and assertion C structurally cannot report it; its walk nonetheless
+   reaches every tracked file, because its scan root defaults to the whole tracked
+   tree and the rule greps each file's bytes. Every kit's `checks/*.sh` and
+   `*.gate` is therefore inside the corpus it scans as content, which is this
+   criterion's predicate exactly. The lesson is the one the paragraph above
+   already states from the other side: a conservation row and a criterion-4 hold
+   are independent facts, so the verdict is taken by **reading the walk**, never
+   by reading the trigger field (§The fourth budget batch; site-kit/SPEC.md
+   §check-docs-cname-parity owns what it cost that member).
+
    **The second machine-derived instance is the other over-selection kind**, so
    both now have one. Run at the ERE cohort's cut, assertion C reports
    `check-install-claim` and `check-payload-claim` substrate-sensitive through a
