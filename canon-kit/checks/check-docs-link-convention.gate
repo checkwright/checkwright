@@ -1,0 +1,3 @@
+# graph: couples=docs/*.md,docs/*/index.md,docs/posts/*.md,native/src/gates/docs_link_convention.rs,native/src/fresh.rs dir=one valve=none tier=precommit
+# install: on-surface
+# spec: canon-kit/SPEC.md §check-docs-link-convention — docs pages cite downward: no directory-target relative link (name the file), a kit page's back-link to its own README/SPEC carries a #section anchor, no relative link to a target resolving outside the docs root

@@ -1658,6 +1658,7 @@ as source references.
 
 ### check-docs-link-convention
 
+`checks/check-docs-link-convention.gate` (`precommit`, binary-dispatched).
 Invariant: every relative markdown link on a docs-site page obeys the
 downward-citation *shape* — the resolution of those links is `check-md-refs`'
 charge, and this gate owns shape alone. Absolute reference links (the off-site
@@ -1698,6 +1699,20 @@ pure `#anchor` (no path) satisfies neither rule. Per-site valve: a
 `docs-link-exempt: <reason>` HTML comment on the link line or the one directly
 above suppresses that one finding — for the rare legitimate directory link a
 consumer's layout demands. A missing scan root is fail-closed (exit 2).
+
+**The walk is unpruned, deliberately, and the port carries that rather than the
+kit's shared prune set** (gate-sdk/SPEC.md §The fourth budget batch): the shell
+form reached for a bare `find` rather than `gate_find`, so a docs tree with a
+directory named like a prune entry is still scanned whole. The compiled form
+takes the prune-free traversal for the same reason, and orders its pages by
+bytes where the shell's `| sort` ordered them by the invoking locale's
+collation — a report-order narrowing, never a change to which pages are read.
+Target resolution is likewise lexical where the shell called
+`realpath -m --relative-to=.`: the two agree on a tree with no symlinked docs
+directory, which every case compared at the port confirmed, including an
+absolute scan root and a scan root of `.`. The bespoke
+`gate-tests/check-docs-link-convention.test.sh` holds the off-root rule's edges
+and dispatches through `gate_run`.
 
 ### check-docs-cmd
 

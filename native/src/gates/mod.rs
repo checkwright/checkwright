@@ -18,6 +18,7 @@ pub mod exec_bit;
 pub mod core_files;
 pub mod battery_roster;
 pub mod commit_msg;
+pub mod docs_link_convention;
 pub mod docs_kit_parity;
 pub mod docs_mirror_fresh;
 pub mod docs_nav_reachable;
@@ -1150,6 +1151,13 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
         &["GATE_MSG_PATTERN_FILES", "GATE_MSG_PATTERN_FILES_LOCAL"],
         "gate-sdk",
+    ),
+    (
+        "check-docs-link-convention",
+        docs_link_convention::run,
+        &[("?", "")],
+        &["CANON_KIT_LINK_ROOT"],
+        "canon-kit",
     ),
 ];
 
