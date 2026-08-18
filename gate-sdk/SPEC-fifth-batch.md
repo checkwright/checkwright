@@ -27,6 +27,28 @@ than diffuse, two of its items being one-time. Recorded because a later reader
 who finds the member audit would otherwise reasonably conclude the width was
 never re-examined against it — the ruling is *held*, not merely un-revisited.
 
+**The cut is executed as several build sessions, and the lead ruled who closes
+what — recorded here because an obligation with no owner is the failure the split
+creates.** The batching is an execution economy and never a re-scoping: each unit
+is still completed whole and closed by the session that finishes it.
+
+- **The last batch touching *this* unit takes its closing set**: delta 8's
+  assertion-C re-run *after the last descriptor lands*, delta 7's criterion-5
+  residual against the post-batch registry, delta 1's
+  `gate-sdk/SPEC.md §The fifth budget batch`, this amendment's merge and
+  deletion, and `native-gate-port-remaining-corpus`' demotion. A dedicated
+  closing session was weighed and refused: it buys a whole session's context to
+  run a checklist the batch already holds.
+- **The split carries a second unit, and its closing set is not this one's.**
+  `gate-sdk/SPEC-gh-account.md`'s merge and deletion and
+  `gh-account-identity-expectation`'s demotion belong to the batch that lands the
+  account kind, which completes that unit whole. It is named here because a
+  roster enumerating only the fifth batch's obligations is exactly how the second
+  unit's closing set falls between batches — no batch inherits it by being last.
+- **An earlier batch leaves `§The fifth budget batch` unwritten** rather than
+  starting it, so the closing session merges into its own text instead of into a
+  half-written section by another.
+
 ## The envelope
 
 Stated first because it is what a build session needs before it cuts, and
@@ -288,7 +310,10 @@ not have to be: the pre-descriptor tree is `5bcef863`, the commit that lands the
 delta 10 library fix and nothing else, and a later member's live-tree comparison
 is taken against a worktree of that rev
 (`git worktree add .tmp/pre-descriptor 5bcef863`) rather than against the tree as
-it then stands. That is the same corpus every earlier member was compared over,
+it then stands. **Reap that worktree off `git worktree list`, never off
+`git status`**: `.tmp/` is gitignored so the status stays clean while an
+unreaped worktree still aborts a clean-tree precondition, which bites at the
+commit or the smoke rather than where it was created. That is the same corpus every earlier member was compared over,
 which is exactly the property the constraint asks for. Recorded here because a
 session reading the paragraph below would otherwise conclude the property was
 lost with the first descriptor.
