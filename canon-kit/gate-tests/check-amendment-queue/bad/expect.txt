@@ -1,1 +1,9 @@
+feature-section entries without [spec:]
+[design-pending] tag in an active-queue entry
+[design-pending] tag in active-queue prose
+design-pending-section entries without [design-pending]
+design-pending-section entries already carrying [spec:]
 misfiled in an active non-feature section
+queue references [spec: nested/SPEC-gone.md] but no such file exists at that path
+queue references [spec: SPEC-gone.md] but no amendment file named SPEC-gone.md exists on disk
+amendment on disk with no queue entry: ./SPEC-orphan.md

@@ -5475,6 +5475,9 @@
   `check-spec-embedded-source.sh:42-43` (both readers) and `check-amendment-queue.sh:96,106` (via
   `spec_amendments`), plus the README reader at `spec.sh:223`. None of the three has a `.test.sh`
   scenario runner. The bullet named two of the three; the third is `check-amendment-queue`.
+  **Since that re-verification** the fifth budget batch ported `check-amendment-queue`, so the
+  surviving shell callers are **two**: its prune now runs in the crate, where the eighth cohort's
+  edge-root case already holds it.
   **Deliverable:** a scenario runner for one still-shell caller carrying the `..`-root case, or the
   assertion folded into an existing canon-kit runner. **Note the control discipline the cohort
   paid for:** a *symmetric* break of the normaliser is invisible to this assertion, so the oracle

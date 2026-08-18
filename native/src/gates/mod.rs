@@ -2,6 +2,7 @@
 // subcommand name is the gate name, so no mapping table exists to drift
 pub mod action_gh_repo;
 pub mod action_pinning;
+pub mod amendment_queue;
 pub mod agent_tier_explicit;
 pub mod assertion_strength;
 pub mod brevity;
@@ -521,6 +522,26 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_SCAN_KIT_ROOTS",
             "CANON_KIT_COMMENT_SURFACE",
             "CANON_KIT_QUEUE_FILE",
+            "CANON_KIT_ACTIVE_SECTIONS",
+            "CANON_KIT_DEFERRED_SECTION",
+            "CANON_KIT_ICEBOX_SECTION",
+        ],
+        "canon-kit",
+    ),
+    // spec: canon-kit/SPEC.md §check-amendment-queue — the amendment finder is the walk, and its
+    // scan root is this member's *second* argument with a `.` default, so the root stays the `?`
+    // the cohort declares; the feature set joins the vocabulary because only this member reads it
+    (
+        "check-amendment-queue",
+        amendment_queue::run,
+        &[("?", "")],
+        &[
+            "GATE_PRUNE_DIRS",
+            "GATE_KIT_ROOTS_HERE",
+            "CANON_KIT_SCAN_KIT_ROOTS",
+            "CANON_KIT_AMENDMENT_GLOB",
+            "CANON_KIT_QUEUE_FILE",
+            "CANON_KIT_FEATURE_SECTIONS",
             "CANON_KIT_ACTIVE_SECTIONS",
             "CANON_KIT_DEFERRED_SECTION",
             "CANON_KIT_ICEBOX_SECTION",

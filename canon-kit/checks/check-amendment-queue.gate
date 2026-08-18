@@ -1,0 +1,3 @@
+# graph: couples=TASK-QUEUE.md,SPEC-*.md,*/SPEC-*.md,native/src/gates/amendment_queue.rs,native/src/spec.rs dir=bi valve=none tier=precommit
+# install: zero-config
+# spec: canon-kit/SPEC.md §check-amendment-queue — the Task↔amendment bidirectional rule and spec-readiness

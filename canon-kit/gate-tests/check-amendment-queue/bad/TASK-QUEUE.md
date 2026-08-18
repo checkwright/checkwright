@@ -2,7 +2,11 @@
 
 ## New Features
 
-- **widget-support** — add the widget surface; this entry is not spec-ready.
+- **widget-support** — a feature entry that is not spec-ready.
+- **already-pending** [design-pending] [spec: SPEC-tidy.md] — a design-pending tag inside an active entry.
+  prose carrying a [design-pending] tag inside an active section
+- **dangling-path** [spec: nested/SPEC-gone.md] — a path-shaped ref resolving to no file.
+- **dangling-name** [spec: SPEC-gone.md] — a bare basename with no amendment on disk.
 
 ## Technical Debt
 
@@ -10,6 +14,7 @@
 
 ## Deferred
 
-- **later-thing** — a design-pending idea with no design ruling yet.
+- **later-thing** — a deferred idea carrying no design-pending tag.
+- **ready-in-deferred** [design-pending] [spec: SPEC-tidy.md] — tagged and already spec-ready.
 
 ## Done

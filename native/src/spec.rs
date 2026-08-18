@@ -147,6 +147,30 @@ pub fn canonical_specs(root: &str) -> Result<Vec<PathBuf>, String> {
     prune_kit_roots(root, specs)
 }
 
+// spec: canon-kit/SPEC.md §lib/spec.sh — `spec_amendments`: the amendment-glob find,
+// `templates/`-filtered and kit-root pruned, selecting by a glob on the basename where
+// `canonical_specs` above selects by a literal name
+pub fn amendments(root: &str) -> Result<Vec<PathBuf>, String> {
+    let glob = knob("CANON_KIT_AMENDMENT_GLOB")?;
+    let prune = walk::prune_dirs()?;
+    // spec: canon-kit/SPEC.md §check-amendment-queue — the finder is best-effort by
+    // construction, its shell form ending `2>/dev/null … || true`: an unwalkable scan root
+    // yields no amendments rather than a refusal, and that section owns why
+    let walked = walk::find_with_prune(Path::new(root), &|n| prune.iter().any(|d| d == n))
+        .unwrap_or_default();
+    let hits: Vec<PathBuf> = walked
+        .into_iter()
+    .filter(|p| {
+        p.file_name()
+            .and_then(|n| n.to_str())
+            .map(|n| walk::pattern_match(&glob, n))
+            .unwrap_or(false)
+    })
+    .filter(|p| !under_templates(&p.display().to_string()))
+    .collect();
+    prune_kit_roots(root, hits)
+}
+
 // spec: canon-kit/SPEC.md §lib/spec.sh — the sorted spelling the two spec-corpus members read,
 // where the shell pipes the finder through `sort`. A byte sort, per the kit-roots cohort's
 // ruling that the compiled form implements set semantics rather than a locale's collation.

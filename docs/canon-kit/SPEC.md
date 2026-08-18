@@ -637,6 +637,19 @@ than by a gate. The guard is total over the *promotion* moves it exists to
 catch — design-pending → an active section — and silent on the disposition
 move.
 
+**The amendment finder is best-effort, and the port had to reproduce that
+rather than harden it.** `spec_amendments` ends `2>/dev/null … || true`, so an
+unwalkable scan root yields *no amendments* instead of a refusal. Read against
+gate-sdk/SPEC.md §Fail-closed contract the compiled form would refuse there —
+and that would be a verdict change across the seam, which is exactly what the
+port's parity run holds invariant. It is also not the vacuity that contract
+guards: an empty amendment set cannot hide a violation in either direction,
+because every `[spec:]` ref then dangles and the run reds. Recorded here
+because the natural port instinct is to add the refusal, and the sibling
+`check-todo-task-liveness` — which *does* refuse on a bad scan root — makes the
+instinct look precedented. That member's shell form carried the `-d` guard;
+this one never has.
+
 ### check-spec-dod-singleton
 
 Invariant: no canonical spec carries the configured Definition-of-Done
