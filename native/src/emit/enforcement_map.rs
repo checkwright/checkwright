@@ -1,6 +1,7 @@
 // spec: gate-sdk/SPEC.md §enforcement-map — the kit→surface→class map emitted from the class
 // registries. Two levels: `measure` produces the sections and their per-row kit attribution,
 // `emit` renders them, so the value-rollup join consumes data rather than re-parsing the page.
+use crate::emit::self_repo_prefix;
 use crate::fresh;
 use crate::proc;
 use crate::walk;
@@ -67,37 +68,6 @@ fn tracked(path: &str) -> bool {
     proc::run("git", &["ls-files", "--error-unmatch", "--", path])
         .map(|c| c.stdout().is_some())
         .unwrap_or(false)
-}
-
-// spec: gate-sdk/SPEC.md §lib/gate.sh — gate_self_repo_prefix: the origin remote rewritten to a
-// blob prefix, degrading to nothing when there is no origin or it is not an http(s)/scp form
-fn self_repo_prefix(reference: &str) -> String {
-    let origin = match proc::run("git", &["remote", "get-url", "origin"]) {
-        Ok(c) => match c.stdout() {
-            Some(o) => String::from_utf8_lossy(o).trim().to_string(),
-            None => return String::new(),
-        },
-        Err(_) => return String::new(),
-    };
-    if origin.is_empty() {
-        return String::new();
-    }
-    let id = origin
-        .strip_suffix(".git")
-        .unwrap_or(&origin)
-        .trim_end_matches('/')
-        .to_string();
-    let id = if let Some(rest) = id.strip_prefix("git@") {
-        match rest.split_once(':') {
-            Some((host, path)) => format!("https://{}/{}", host, path),
-            None => return String::new(),
-        }
-    } else if id.starts_with("https://") || id.starts_with("http://") {
-        id
-    } else {
-        return String::new();
-    };
-    format!("{}/blob/{}/", id, reference)
 }
 
 // spec: gate-sdk/SPEC.md §enforcement-map — cite a class's owner section through the

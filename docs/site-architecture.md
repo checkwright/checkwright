@@ -99,14 +99,16 @@ recoverable:
   and `docs/footprint.md` persist as its off-nav drill-downs, link-reachable from
   it.
 - **The KPI-roster fan-out** — a `scripts/kpis.list` edit is the widest single
-  trigger on this page: adding or removing one KPI moves **four** byte-gated
-  surfaces, not the one or two an amendment naturally names — the on-site SPEC
+  trigger on this page: adding or removing one KPI moves **three** byte-gated
+  surfaces, not the one an amendment naturally names — the on-site SPEC
   mirror (the owning kit's SPEC documents the KPI), `docs/enforcement.md` (the
-  KPI joins the class registry), `docs/footprint.md` (the KPI script is a new
-  file with a token cost), and `docs/value.md`'s rollup block (its per-kit
-  Advisory count is derived from the enforcement map). Each of the four gates
+  KPI joins the class registry), and `docs/value.md`'s rollup block (its per-kit
+  Advisory count is derived from the enforcement map). Each of the three gates
   names its own regen command on a red, so recovery is mechanical once the
   fan-out is known — knowing it in advance is the part nothing else states.
+  `docs/footprint.md` is **not** in this fan-out, though the shape of the list
+  invites the guess: the footprint measures no script, so a KPI's bytes never
+  reach it — its actual trigger is the row below.
 - **The enforcement map** — `docs/enforcement.md` is the class registry's
   projection, stale on any **class-registry** change rather than on a content
   edit: a gate's `tier=`, a `scripts/kpis.list` entry, the settings hooks, a
@@ -114,14 +116,16 @@ recoverable:
   gate-sdk/bin/run-gates.sh --emit enforcement-map > docs/enforcement.md`). Its sibling
   `docs/footprint.md` is the per-kit token cost (`bash
   gate-sdk/bin/run-gates.sh --emit footprint > docs/footprint.md`, the emitter
-  having ported to a non-gate arm the runner resolves config for), stale on any
-  change to a tracked kit file's line count — which is why a prose-only SPEC edit reds
-  it. **Tracked is literal, and it sets the ordering:** a file this iteration adds
-  has no footprint cost until it is staged, so regenerate the footprint (and the
-  rollup that joins it) *after* `git add`, never before — regenerate first and the
-  new file is invisible to the emitter, so `check-footprint-fresh` reds at the
-  very commit the regen was meant to clear. Both are `docs/value.md`'s inputs, so
-  a red in either implies a rollup regen.
+  having ported to a non-gate arm the runner resolves config for). **Its measured
+  set is narrow, and reading it as "any kit file" is the standing mistake:** the
+  always-loaded column is a kit's `<!-- <kit>:begin -->`…`<!-- <kit>:end -->` block
+  inside each `CONTEXT_KIT_SURFACES` file (`CLAUDE.md` here); the load-triggered
+  column is `<kit>/templates/**/*.md`; the row set is the `*/SPEC.md` glob. So
+  it stales on an injected-block edit, a template edit, or a kit joining or leaving
+  the roster — and **not** on a SPEC body edit, a `bin/` or `checks/` script, or a
+  `scripts/` file, none of which it measures at all. It reads the worktree rather
+  than the index, so no staging order binds its regen. Both are `docs/value.md`'s
+  inputs, so a red in either implies a rollup regen.
 - **The trajectory projection** — `docs/evidence-data.md` is the published
   evidence extractor's output (`bash gate-sdk/bin/run-gates.sh --emit trajectory >
   docs/evidence-data.md`, `check-trajectory-fresh` byte-gates it), stale on a
@@ -153,16 +157,15 @@ recoverable:
   next author reads the list instead of discovering it one red gate at a time:
   the on-site SPEC mirror (`bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write`),
   `docs/enforcement.md` (`bash gate-sdk/bin/run-gates.sh --emit enforcement-map >
-  docs/enforcement.md` — the gate joins the class registry),
-  `docs/footprint.md` (`bash gate-sdk/bin/run-gates.sh --emit footprint >
-  docs/footprint.md` — a new script is new token cost), `docs/value.md`'s rollup
-  block (`bash gate-sdk/bin/run-gates.sh --emit value-rollup --write`, derived
-  from the two above),
+  docs/enforcement.md` — the gate joins the class registry), `docs/value.md`'s
+  rollup block (`bash gate-sdk/bin/run-gates.sh --emit value-rollup --write`,
+  derived from the map above),
   `docs/check-graph.html` (`bash gate-sdk/checks/check-graph.sh --emit >
   docs/check-graph.html`), and — for a hook-tier gate — the generated hooks
-  (`bash gate-sdk/bin/gen-pre-commit.sh --write`). The same list applies to
-  any edit that changes a kit's line count, which is why a prose-only SPEC edit
-  can red the footprint and rollup gates.
+  (`bash gate-sdk/bin/gen-pre-commit.sh --write`). `docs/footprint.md` is absent
+  for the reason the row above gives: a gate is a script or a crate module and
+  the footprint measures neither. A prose-only SPEC edit reds the on-site mirror
+  alone.
 - **The install-toolchain parity contract** — `docs/install.md`'s Requirements
   section holds the toolchain list to the probe roster:
   `check-install-toolchain` asserts whole-element parity between its
@@ -210,10 +213,10 @@ binary's baked source stamp against the crate's tracked source whenever a `.gate
 descriptor makes it load-bearing. Recorded because the derivation-first reflex
 reads "generated artifact" and reaches for this roster; the answer is that the
 roster's admission rule is narrower than that reflex, and the obligation has a
-home. **The staging-order hazard stated above for the footprint regen binds this
-build too**, for the same reason and with the same remedy — that stamp is
-computed over *tracked* crate source, so a unit adding a crate file builds after
-`git add`, never before; the rule and its mechanism are the owner's
-(gate-sdk/SPEC.md §check-gate-binary-fresh), and it is pointed at from here
-because a session that knows the hazard from this roster will look for its
-sibling here first.
+home. **It carries a staging-order hazard, and it is the only row here that
+does** — the stamp is computed over *tracked* crate source, so a unit adding a
+crate file builds after `git add`, never before, or the binary is stamped
+against a source set the gate does not hash. The rule and its mechanism are the
+owner's (gate-sdk/SPEC.md §check-gate-binary-fresh); it is restated here because
+the reflex is to assume every generated surface shares the hazard, and none of
+the others do — each of them reads the worktree.

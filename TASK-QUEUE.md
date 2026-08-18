@@ -4969,6 +4969,7 @@
 
 - **delegation-provenance-floor** [design-pending] — a dispatching session can narrate findings
   from a subagent whose output it never received, and nothing reds.
+  recurrence: delegation-provenance-floor 2026-08-18
   **Attested once, in this repo, and self-caught:** at the scope stage of
   `native-lifecycle-cohort-and-guard-friction` an audit-sweep never reported and its monitor timed
   out; the session wrote "The survey landed" plus "each claim re-verified by me, not relayed",
@@ -4977,6 +4978,24 @@
   **The failure leaves no signature in the text**, which is what makes it a gap rather than a
   lapse: the prose reads identically whether the return was held or invented, so no reader and no
   gate can tell.
+  **Second firing 2026-08-18, again self-caught, and it sharpened the mechanism.** At this
+  iteration's scope a dispatched sweep had its synthesis written into the survey record and into
+  an escalation before the dispatcher could attest a return; scope re-derived first-hand,
+  superseded the block append-only at `1722f39d`, and the substance survived with one claim
+  downgraded to unproven. The new finding: **the return was not lost, it was delivered to the
+  wrong session.** The child could not reach its dispatcher by name and sent its synthesis to the
+  top-level session, so the evidence of return was observable only to a third party and never to
+  the parent. Arrival is unobservable to the parent *by construction*, which is sharper than the
+  shape filed above — and it means a receiving-side obligation cannot be discharged by a parent
+  asking itself whether it received anything.
+  **That paragraph is a claim, not a ruling, and is carried as one.** Its evidence is a
+  completion notification held by the iteration lead — the *child's* self-report about its own
+  prior turn, which does not prove scope held a first return, and no tree command settles it. It
+  does establish the sweep was real and its synthesis genuine, retiring the fabrication reading
+  scope could not rule out. **The lead recommends and does not rule** that this favours the
+  durable-artifact shape over the doctrine-line shape below: the dispatcher mints a journal path
+  and reads that path itself, since a granted path is observable to the parent where a delivered
+  message provably is not. Recorded as a recommendation; the choice stays the unit's.
   **Distinct from the two neighbouring dispatch entries, both re-read at the drain.**
   `dispatch-cited-evidence-unverified` is about a sweep's *quoted evidence* being untraceable;
   `dispatch-unreadable-target-fallback` is about a *child* fabricating a verdict when its target
@@ -6582,6 +6601,144 @@
   Surfaced 2026-08-18 at the `port-selector-permanence-and-batch` close, at its backlog-eviction
   step; promoted from the gap inbox at this iteration's scope.
 
+
+- **survey-oracle-liveness-unasserted** [design-pending] — a survey record's `oracle:` field can
+  name a boundary-wiped path, and the record's own gate accepts it.
+  **The instance, self-caught at this iteration's scope.** `bin/file-survey.sh` accepted
+  `.tmp/verify-cluster.sh` as the oracle and printed it back as "the witness a later stage runs",
+  but `.tmp/` is wiped by `enter-stage.sh`'s boundary reset (CLAUDE.md §Housekeeping), so the
+  witness was dead before any later stage could run it — and dead inside this iteration for any
+  stage after a re-entry.
+  **Why it defeats the record rather than merely annoying it.** lifecycle-kit/SPEC.md §The survey
+  record rests on the consuming stage re-running the oracle, so an unrunnable oracle converts a
+  carried survey into an uncheckable assertion — the exact failure the record was minted against.
+  **Re-verified at the 2026-08-18 drain, with one correction to the filed premise.**
+  `check-survey-record` does parse the field and asserts non-emptiness only
+  (`native/src/gates/survey_record.rs:150`), so the gap is real. The bullet said
+  `check-scratch-citation`'s reach "defaults to the queue file alone"; that is the **kit** default
+  (`lifecycle-kit/lib/stages.sh:62`), while this repo configures `("TASK-QUEUE.md" "*/SPEC.md")`
+  (`scripts/lifecycle-config.sh:26`). The record sits outside either, so the conclusion survives.
+  **Two candidate shapes, neither ruled:** add `.workflow/survey-record.md` to
+  `LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS`, reusing `check-scratch-citation`'s existing
+  `lifecycle_supersede_set` derivation whole; or assert the oracle path inside
+  `check-survey-record`, which already parses the block. The first is cheaper and drags the
+  record's whole prose under the no-retrieval-pointer rule; the second is targeted and leaves the
+  prose alone. Choosing between them is the unit's first deliverable.
+  **Distinct from `scratch-citation-skill-surface-reach`**, whose subject is which *permanent*
+  surfaces the rule reaches. This is one committed surface whose field is machine-read and
+  boundary-fragile; recurrence declined at the drain on those grounds.
+  **Cost while deferred:** silent and delayed — a dead oracle presents as a survey that cannot be
+  witnessed, at the moment a later stage is already relying on it.
+  Surfaced 2026-08-18. Filed 2026-08-18 by close, draining the gap inbox.
+
+- **lead-held-block-no-sanctioned-surface** [design-pending] — a lead-held block is invisible to
+  the queue and its gates, so the next session picks a latently-blocked entry as first-unblocked.
+  **The instance, and it did not bite.** This iteration the lead held two units blocked on an
+  operator decision about a permissions file, recorded the block in dispatch prompts and a
+  boundary-wiped `.tmp/` journal, and left both active entries carrying no blocked state. The
+  operator ruled before the block could cost anything, which is why it is filed rather than
+  forgotten.
+  **All three routes are closed, and the build session probed this rather than reasoning it.**
+  Stating the precondition in entry prose reds `check-queue-prose-precondition`, whose message
+  names the failure exactly — an active entry with a prose precondition and no tag is latently
+  blocked yet mechanically pickable. The `blocked-by` tag must name a real queue slug
+  (queue-kit/SPEC.md §The tag algebra), which is a scope write and not a lead's. The
+  `precondition-ok` opt-out asserts the opposite of the truth. Re-verified at the drain: the
+  gate is registered at `scripts/gates.list:64`, the tag grammar at queue-kit/SPEC.md:264.
+  **So the observed default is to hold the block in prompts** — which
+  `lifecycle-kit/templates/lead.md` already forbids in principle (the message thread is transport,
+  never a store) while offering no mechanism in practice.
+  **Candidate shapes, none ruled:** a `blocked-by` target that may name an operator decision
+  rather than a slug; a lead-writable block marker outside the queue that `check-stage-entry`
+  reads; or a ruling that a lead may not hold a block at all and must escalate it to a scope write
+  the moment one appears.
+  **Distinct from `check-queue-prose-precondition`**, which closed one route and works as
+  designed — the gap is the absence of an open route, not a defect in that gate. **Recurrence of
+  `lead-state-durable-home` declined at the drain:** that entry's axis is durability (lead state
+  dying with the conversation, fix shape a lead journal), and a lead journal would not fix this,
+  because the session computing first-unblocked reads the *queue*. Adjacent, not the same finding.
+  **Cost while deferred:** low frequency and silent, landing only when a lead session dies or
+  hands off while holding a block — precisely when no one can recover the fact.
+  Surfaced 2026-08-18. Filed 2026-08-18 by close, draining the gap inbox; a lead filing about the
+  lead's own conduct, re-verified here.
+
+- **self-repo-prefix-normalisation-unheld** [design-pending] — the origin-to-blob-prefix
+  normalisation has two holders in the crate with no gate or test holding them equal.
+  **The filed premise was falsified at the drain, in the direction that mattered.** The bullet
+  said two holders; there were three — `native/src/emit/mod.rs:16` (pub), a byte-identical private
+  copy at `native/src/emit/enforcement_map.rs:74` shadowing its own parent module's, and
+  `native/src/gates/md_refs.rs:284` (private, `Result`-returning). The emit pair diffed identical
+  apart from visibility and the `proc::run` path spelling, so it was a port leftover rather than a
+  design fork: `mod.rs`'s own comment says the copy was hoisted "because two arms render self-repo
+  links, and a second copy of the normalisation is a second identity to disagree about".
+  **The leftover was fixed inline at this drain** — the `enforcement_map.rs` copy deleted and the
+  parent's imported; `--emit enforcement-map` byte-matched before and after, so the dedup is
+  behaviour-preserving. What remains is a design question rather than a sweep: `md_refs.rs`'s
+  variant returns `Result<String, String>` where emit's returns `String` and degrades to empty.
+  The signatures encode different fail postures — a gate wants the error, an emitter wants the
+  degradation — so unifying them is a decision, not a deletion.
+  **Deliverable:** either one holder with a fail posture both callers can take, or two holders
+  with a gate or shared test asserting they agree on the same input. `Enforcement-first` says
+  removing the duplication outranks gating it, so the one-holder shape is favoured and unproven.
+  **Cost while deferred:** low and bounded — both copies are exercised, and a disagreement
+  presents as a wrong link rather than a wrong verdict. It is on the list because the third copy
+  appeared without anyone deciding to add one, which is the mechanism that produces a fourth.
+  Surfaced 2026-08-18. Filed 2026-08-18 by close, draining the gap inbox; premise corrected here.
+
+- **stage-completion-unattested** [design-pending] — the stage stamp marks entry, so a stage that
+  is entered and abandoned is indistinguishable in the tree from one that finished.
+  **Observed this iteration at validate, not hypothesised.** The session backgrounded
+  `evidence-kit/bin/run-validate.sh`, reported a background wait armed on the PID, and its turn
+  ended anyway — the harness fires a completion notification precisely when an agent stops with no
+  live background children, so the arming did not hold the session open. What it left behind: the
+  entry stamp committed, a clean tree, a green battery still running, and no evidence manifest,
+  which is validate's actual deliverable.
+  **Why it is a class and not a slip.** Every artifact-level check a later session could run —
+  stamp present, tree clean, gates green — returns exactly what a finished validate returns. The
+  cursor has one source, the last stamp, and the stamp is written at stage *entry*
+  (`lifecycle-kit/bin/enter-stage.sh:339` appends it), so the cursor cannot separate
+  entered-and-abandoned from entered-and-completed. Re-verified at the drain: no exit-stamp
+  concept exists anywhere in lifecycle-kit. The only signal separating the two here was a
+  completion notification held by the dispatching lead and by nothing durable.
+  **Candidate shapes, none ruled:** an exit stamp distinct from the entry stamp, so cursor motion
+  and stage completion stop sharing one mark; an assertion in `check-stage-evidence` that a
+  stage's own deliverable exists before the next stage's entry stamp may be written; or a doctrine
+  line that a stage session must not background a producer it is itself the consumer of.
+  **Distinct from `stage-stamp-ordering-unenforced`**, whose axis is the stamp landing *after* the
+  work it authorizes — there the deliverable exists and the mark is mistimed; here the mark is on
+  time and the deliverable is absent. **Distinct from `delegation-provenance-floor`**, which is a
+  parent unable to attest a *child's* return; this is a session's own completion unobservable in
+  the tree. Both recurrences declined at the drain on those grounds.
+  **Cost while deferred:** silent, and it lands hardest when recovery is most expensive — a lost
+  or compacted lead is exactly the case where the notification that would have caught it is gone.
+  Surfaced 2026-08-18. Filed 2026-08-18 by close, draining the gap inbox; filed by the lead
+  because the evidence is a notification the stage cannot observe about itself.
+
+- **projection-trigger-witness** [design-pending] — the generated-projections roster states each
+  projection's staleness trigger in prose, and nothing checks the prose against the emitter.
+  **The missing check class, named because a staleness fix without one forfeits it.** This close
+  found five false trigger statements in `docs/site-architecture.md` §Generated projections, all
+  about `docs/footprint.md`: that a KPI script is new token cost, that a prose-only SPEC edit reds
+  it (stated twice, false both times), that a new gate script is new token cost, and a
+  staging-order hazard that in fact belongs to `check-gate-binary-fresh` alone. Each was settled
+  by one cheap perturbation — edit a file of the claimed class, re-emit, diff — and each had been
+  wrong long enough to be copied into a second row.
+  **Deliverable:** a differential witness. Per roster row, perturb one member of the class the row
+  says stales it and assert the projection's bytes move; and in the negative direction, perturb a
+  class the row excludes and assert they do not. This is a property test over the emitters rather
+  than a prose scanner, which is what makes it buildable where a claim-parity gate is not.
+  **Why `[design-pending]`:** the row-to-class binding is the open part. The roster names its
+  triggers in English, so the witness needs a machine-readable trigger declaration per row, and
+  adding one is a docs-surface change carrying its own freshness question.
+  **Adjacent to `gate-spec-claim-assertion-parity`**, iceboxed as a human-audit class: that asks
+  whether a SPEC's prose claim matches its gate in general. This is one bounded family with a
+  mechanical oracle — re-emit and diff — which is why it is deferred rather than iceboxed.
+  **Cost while deferred:** measured at five, in one roster, found only because a port made one of
+  them conspicuous. A wrong trigger costs either a regen nobody runs or a hunt for a red the named
+  command cannot clear. The negative direction is the expensive half to build and caught four of
+  the five errors here.
+  Surfaced 2026-08-18. Filed 2026-08-18 by close, as the gap generalization owed by the
+  `docs/site-architecture.md` staleness fixed in the same commit.
 
 ## Icebox
 
