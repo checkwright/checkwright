@@ -16,6 +16,55 @@
 
 ## Deferred
 
+- **gh-account-identity-expectation** [design-pending] — a third expectation kind for
+  check-identity, `gh-account <login>`, asserting that this clone's active GitHub CLI
+  login is the one the consumer's manifest names. Filed by operator direction 2026-08-18,
+  which is why it enters the queue directly rather than through a scope.
+  THE HAZARD THE EXISTING TWO KINDS MISS: `git config user.email` and a remote's host are
+  per-clone state, so a wrong value is wrong only where it is set. The active GitHub CLI
+  login is machine-global — one project switching it repoints every CLI call in every other
+  clone on the box, the credential helper a push rides included. A consumer project cannot
+  notice its account moved underneath it, and the symptom surfaces as a permission error
+  against the wrong repo rather than as anything naming the account.
+  OBSERVED TWICE, both times collateral from a sanctioned action rather than a slip. On
+  2026-08-18 this repo's close session selected the release account before the release push
+  exactly as the local release runbook directs, left it active because that runbook states
+  no restore step, and a session working a parallel project on the same machine was damaged.
+  The runbook records the same sequence on 2026-08-14, ending the same way. The recurrence
+  sits in the procedure, which is what makes this a mechanism gap and not a discipline one.
+  WHY check-identity AND NOT A NEW GATE: it already owns the invariant class and every
+  contract this kind needs — optional consumer manifest behind `GATE_SDK_IDENTITY_FILE`,
+  fail-closed on an unknown key or wrong field count, a clean CI skip ahead of the manifest
+  reads, and a `--fixture` mode making the pair deterministic. Its scope fence at
+  gate-sdk/SPEC.md §check-identity — assert that a mapping applied, never perform it —
+  covers this kind unchanged, and the login stays consumer config rather than a kit literal,
+  which the provenance seam requires independently.
+  THREE FORKS A SCOPE MUST SETTLE, none ruled. (1) The oracle must be a local read: the
+  CLI's status subcommand validates tokens over the network, which is wrong at
+  tier=precommit and would red an offline commit. The local read is the active-user key in
+  the CLI's own hosts file, but that is the tool's internal config format under a home-dir
+  path, so it needs a path knob and a stated version tolerance. (2) The posture when the
+  CLI is absent or its config unreadable — a clean skip with a note, on the ground that a
+  clone with no CLI cannot push through it, versus fail-closed; context-kit/SPEC.md
+  §check-memory-off is the precedent for a stated fail-open on absence, and the SPEC owns
+  the choice either way. (3) Shell now or paired with the port: check-identity is an
+  unported clean singleton (group 1 at the 2026-08-18 cut, c2=pair c3=precommit c7=clean,
+  no blocker), so a kind added to shell first is knowingly built twice.
+  SCOPE FENCE, operator-ruled 2026-08-18, stated so a later scope reads these as excluded
+  rather than as oversights. The restore obligation in the local release runbook is OUT:
+  the mandated switch keeps having no paired restore, so this unit detects a left-switched
+  account at the next commit instead of preventing the switch from persisting, and
+  detection only fires in a project whose manifest carries the line. Pinning this repo's
+  own account is also OUT, so checkwright itself stays undetected and the unit ships
+  mechanism a consumer opts into; the consequence is that the fixture pair is the kind's
+  only exercise in this tree, which is ordinary for a constructed scenario but means no
+  live run covers it here.
+  **Cost while deferred:** borne off-tree and by a third party, which is what makes it easy
+  to under-rate here. Every release push switches a machine-global account with no paired
+  restore, so exposure recurs once per release rather than once per adopter, and lands on
+  whatever unrelated project shares the box — as a failed push or a wrong-account commit,
+  never as a red gate in the project that caused it. Two occurrences in five days, both from
+  a procedure followed correctly.
 - **cohort-held-members-port-prerequisites** [design-pending] — gates are held on
   shell by operator ruling, each owing a named prerequisite nothing else tracks.
   Ground is **sequencing, not exclusion**: gate-sdk/SPEC.md §The port-candidate criteria opens
