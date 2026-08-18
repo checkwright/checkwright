@@ -12,58 +12,6 @@
 
 ## New Features
 
-- **native-gate-port-remaining-corpus** [spec: SPEC-port-batch.md] [roadmap: now/reliability]
-  — the whole battery onto the binary, and the shell surface down to its residue.
-  roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
-  The entry stays deferred rather than moving to `## Done`: it is the **whole corpus**, the
-  oracle below still counts gates owed, and a Done move would assert a finished port and
-  silently drop it from the **public** roadmap projection, which reads `[roadmap:]` tags off
-  live entries.
-  **Operator-ruled 2026-08-09: complete the port, ASAP.** The ruling, its grounds and its
-  supersession of the 2026-08-06 measurement-locus clause are recorded in
-  [TRAJECTORY.md](TRAJECTORY.md) §PRIORITY DIRECTIVE — the port track's sequence. This entry is
-  the work, and does not restate them. What it inherits unchanged: gate-sdk/SPEC.md §Porting a
-  gate to the binary substrate for the porting procedure, §Consumer payload for the payload
-  rule.
-  **The scope, both install paths and the bootstrap residue are TRAJECTORY.md §PRIORITY
-  DIRECTIVE's**, not restated; designing the bootstrap is still this unit's work. **Two objections
-  answered:** wall-clock is the weaker case (the win is retiring the shell *sources* the payload
-  carries), and the toolchain-free arm rides the pre-compiled path, so
-  `powershell-installer-surface` shrinks to the bootstrap for the same reason.
-  **Twelve cohorts closed, plus three budget batches; gate-sdk/SPEC.md §The first cohort, and
-  the rule that selects the next is canonical for every one of them** — members, delivered
-  counts, holds, grounds and each batch or cohort's own price live there, so this entry states
-  what remains rather than restating them. From the eighth on, members are **selected by
-  running** `port-blockers.sh --group`; the size arm read exhausted again at this cut, so the
-  budget arm composed the batch, as it does only when no group is takeable.
-  **74 of 104 ported; the rest splits into permanently-shell and owed**
-  — a dated 2026-08-18 oracle read (`bash gate-sdk/bin/port-blockers.sh --group`'s trailer, which
-  `scripts/measured-claims.sh` emits as `ported-gate-members`), never a count this line holds.
-  The freshness-emitter roster it named as owed is **discharged**, that family having closed
-  6/6; the count has drifted twice, both times by a batch landing after it was written.
-  Each batch's adjudications are canonical at its own gate-sdk/SPEC.md section; the third
-  delivered `check-memory-off` and `check-root-tiering`. The 2026-08-18 cut itself is ruled and
-  recorded on `freshness-emitter-port-cohort`: the freshness triple as spine, plus that batch.
-  Every held member is **sequencing with port work owed, never exclusion**, and what each owes
-  is on `cohort-held-members-port-prerequisites`, which owns the roster and the kits it spans;
-  a kit count copied here would be a second one to drift, and was.
-  `SPEC-port-batch.md` composes the **fourth** budget batch, and the operator's width ruling is
-  6–8 members against the prior cuts' two to three. Its envelope: the members share **no joint
-  proof**, so build may drop any one without invalidating the rest. The size arm is now
-  **permanently** exhausted rather than exhausted at a cut — 27 owed members in 27 singleton
-  groups, and born-native forecloses a new group forming — so composition is by declaration
-  size plus criterion cleanliness, and the amendment states the honest limit: cheapness
-  amortizes nothing, the whole saving being one session's overhead spread over eight members.
-  `gate-battery-parallel-execution` and `gate-battery-result-cache` say the port subsumes them:
-  closure candidates as it lands.
-  Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
-  direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope. Since then it is
-  promoted at spec and demoted at build **once per increment** — a cohort, or a budget batch on
-  the arm gate-sdk/SPEC.md §Porting a gate to the binary substrate owns — always a **demotion**;
-  promoted 2026-08-18 at spec for the third budget batch and demoted again 2026-08-18 at build
-  having delivered it; promoted again 2026-08-18 at spec as the spine of the wide-budget-batch
-  iteration, on the operator's ruling.
-
 ## Technical Debt
 
 ## Deferred
@@ -116,6 +64,56 @@
   branch); re-promoted 2026-08-18 at spec as rider 1 of the wide-budget-batch iteration, on the
   operator's ruling, for the `# port-until:` spelling alone; merged and demoted again
   2026-08-18 at build on the same entry-outlives-the-amendment branch.
+
+- **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
+  — the whole battery onto the binary, and the shell surface down to its residue.
+  roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
+  The entry stays deferred rather than moving to `## Done`: it is the **whole corpus**, the
+  oracle below still counts gates owed, and a Done move would assert a finished port and
+  silently drop it from the **public** roadmap projection, which reads `[roadmap:]` tags off
+  live entries.
+  **Operator-ruled 2026-08-09: complete the port, ASAP.** The ruling, its grounds and its
+  supersession of the 2026-08-06 measurement-locus clause are recorded in
+  [TRAJECTORY.md](TRAJECTORY.md) §PRIORITY DIRECTIVE — the port track's sequence. This entry is
+  the work, and does not restate them. What it inherits unchanged: gate-sdk/SPEC.md §Porting a
+  gate to the binary substrate for the porting procedure, §Consumer payload for the payload
+  rule.
+  **The scope, both install paths and the bootstrap residue are TRAJECTORY.md §PRIORITY
+  DIRECTIVE's**, not restated; designing the bootstrap is still this unit's work. **Two objections
+  answered:** wall-clock is the weaker case (the win is retiring the shell *sources* the payload
+  carries), and the toolchain-free arm rides the pre-compiled path, so
+  `powershell-installer-surface` shrinks to the bootstrap for the same reason.
+  **Twelve cohorts closed, plus four budget batches; gate-sdk/SPEC.md §The first cohort, and
+  the rule that selects the next is canonical for every one of them** — members, delivered
+  counts, holds, grounds and each batch or cohort's own price live there, so this entry states
+  what remains rather than restating them. From the eighth on, members are **selected by
+  running** `port-blockers.sh --group`; the size arm is now **permanently** exhausted rather
+  than exhausted at a cut, so the budget arm composes until a consumer contributes shell gates
+  sharing a derivation — the rule's own section owns why.
+  **The residue is three-way, not two: permanently shell, temporarily held, and takeable** —
+  a dated oracle read (`bash gate-sdk/bin/port-blockers.sh --group`'s trailer, which
+  `scripts/measured-claims.sh` emits as `ported-gate-members`), never a count this line holds,
+  which is what it was restated as and drifted from twice. The held tier stopped being a hand
+  adjudication when `# port-until:` was minted, so a cut reads its takeable set off the run.
+  Every held member is **sequencing with port work owed, never exclusion**, and what each owes
+  is on `cohort-held-members-port-prerequisites`, which owns the roster and the kits it spans.
+  The **fourth** budget batch is delivered at the operator's 6–8 width ruling, taken at eight —
+  five members clearing criterion 4 and three binding it — and its findings, its honest limit
+  and its measured price are canonical at gate-sdk/SPEC.md §The fourth budget batch.
+  **Cost while deferred:** large and known — the **owed** remainder (the trailer's own arm,
+  never the unported count, which the permanent and held members inflate) plus the runners and
+  the install-lifecycle layer; since the 2026-08-14 born-native default
+  (TRAJECTORY.md §The closed rulings) a gate landed meanwhile no longer adds shell to it. Not
+  a single-iteration delta; scope owns the decomposition, and the criterion-relaxation
+  question is closed at gate-sdk/SPEC.md §The port-candidate criteria — an ordering signal,
+  never an eligibility screen. `gate-battery-parallel-execution` and
+  `gate-battery-result-cache` say the port subsumes them: closure candidates as it lands.
+  Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
+  direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope. Since then it is
+  promoted at spec and demoted at build **once per increment** — a cohort, or a budget batch on
+  the arm gate-sdk/SPEC.md §Porting a gate to the binary substrate owns — always a **demotion**;
+  promoted 2026-08-18 at spec as the spine of the wide-budget-batch iteration, on the operator's
+  ruling, and demoted at build having delivered the fourth budget batch at its full ruled width.
 
 - **gh-account-identity-expectation** [design-pending] — a third expectation kind for
   check-identity, `gh-account <login>`, asserting that this clone's active GitHub CLI
@@ -4775,8 +4773,9 @@
 - **docs-corpus-derivation-manifest-divergence** [design-pending] — two gates declare a
   byte-identical `# graph:` couple and walk different corpora, so the manifest asserts a
   sameness the code does not honour.
-  `canon-kit/checks/check-docs-link-convention.sh` derives its corpus with a bare `find` over
-  the docs root — a filesystem walk that sees **untracked** files — while
+  `check-docs-link-convention` derives its corpus with a bare `find` over
+  the docs root — a filesystem walk that sees **untracked** files, a shape its 2026-08-18 port
+  carried across the substrate deliberately rather than tidying — while
   `site-kit/checks/check-docs-render-fidelity.sh` derives its own from `git ls-files`, tracked
   only, plus an underscore-directory exclusion and a `gate_path_pruned` filter the first gate
   has neither of. Both declare

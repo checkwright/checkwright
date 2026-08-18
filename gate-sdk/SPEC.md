@@ -1552,6 +1552,52 @@ design time; the last three were paid for, and each is named with what it cost.
    **seeded** members rather than of its members — the same predicate that made the
    lifecycle cohort's growth zero, read in the direction that grows.
 
+   **The fourth budget batch priced this criterion at a width where a member-count
+   reading would have been badly wrong, and the number it produced corrected the
+   method rather than the batch.** Measured against the post-batch registry from a
+   clean checkout of the batch's own commit, the binary-less leg reports
+   **fourteen** omitted members. The batch ported eight; its growth is **two**,
+   because six are `on-surface` and no `init` seeds them, while its two
+   `zero-config` members are seeded and therefore lost. That is the same
+   disposition predicate the lifecycle cohort's zero and the comment cohort's
+   three already turned on, read a third time.
+
+   **The absolute number diverged from the amendment's prediction, and the
+   divergence is in the baseline rather than in the price.** The prediction was
+   the comment cohort's *ten* plus this batch's two. The pre-batch tree already
+   stood at **twelve**: increments landed between that measurement and this batch
+   and none re-measured. Establishing that took a derivation — the `zero-config`
+   `.gate` members the measured profile's kit set ships — validated by
+   reproducing the leg's fourteen member for member on the post-batch tree, then
+   run again on the pre-batch tree for its twelve.
+
+   **So the residual is a *standing quantity*, not a per-cohort delta, and reading
+   one cohort's recorded number as the next one's baseline is the error this
+   paragraph exists to end.** Every worked instance above records the standing
+   number, which is right; what is not right is subtracting a later standing
+   number from an earlier one and calling the difference a cohort's price. A
+   cohort can honestly predict **its own growth**, from the install disposition of
+   its own members, and that prediction held here exactly. The absolute number is
+   measured on both sides or it is not compared at all.
+
+   **The measurement also cost more than the number.** The leg refused to run at
+   all until a defect it surfaced was repaired (§check-gate-exemption-tasks): the
+   instrument was sound and the *product* was not, which is this criterion's
+   instrument-before-measurement ordering arriving from the direction it does not
+   name. A session that reads a red instrument as a broken instrument would have
+   waived the measurement and shipped the break.
+
+   The **judgment** this batch's amendment owed is ruled **accept and declare**, on
+   the comment cohort's terms and refusing its two rivals for the same reasons: an
+   adopter on an uncovered platform loses each ported member and receives that
+   omission declared in its own `gates.list` rather than as a broken battery;
+   restoring the class shell-side reinstates the duplication the port deletes,
+   which enforcement-first ranks below removal; and a binary-gated declaration is
+   what the omit path already is. The honest limit rides with the ruling — this is
+   a real subtraction for an uncovered host, it lands because the 2026-08-09
+   directive ports the whole corpus, and it shrinks as targets are published
+   rather than being repaired by the batch that caused it.
+
    The **judgment** that cohort's amendment owed is ruled **accept and declare**.
    On an uncovered platform an adopter loses the governed comment surface
    entirely — the comment tier, the pointer resolution and the `TODO(task:)`
@@ -2874,6 +2920,37 @@ membership. §Meta-gate conservation for the binary substrate gains no row.
 direction that would have put a universal crate layer in every descriptor. The
 rule now states its own scope, at §The non-gate arm where it lives; eight
 descriptors were written against the tree's reading before it did.
+
+**The seam was ruled per member rather than assumed, and the band made that
+worth doing.** Every member reads consumer content — a message-pattern file, a
+governed-path manifest, a suite roster, a docs root, a host and a scan root, an
+exec-glob set — and a Rust `const` holding any of those would publish one
+project's configuration as everyone's mechanism. None became a crate literal.
+The discharge is criterion 6's strongest form rather than a concession: each
+value crosses as a **bridged knob**, computed once in the owning kit's shell
+library, so the binary holds no default to drift from. What the batch had to add
+was the *spelling* — six values were defaulted inline where `declare -p` could
+not see them, and a knob the bridge cannot find is its undeclared-knob refusal,
+so each was resolved onto a name in its kit's library: `GATE_SDK_CORE_FILES_FILE`
+and `EVIDENCE_KIT_RUNNER_DOC` under their own names, and `GATE_EXEC_GLOBS`,
+`GATE_EXEC_PRUNE`, `GATE_MSG_PATTERN_FILES` and its `_LOCAL` sibling under
+distinct ones, on §lib/gate.sh's rule that a whitespace scalar feeding an array
+is the one case a resolved global earns a spelling of its own.
+
+**One member's argument could not be ported at all, and that class is now stated
+at the procedure** (§The non-gate arm): an argument selecting *where*
+configuration comes from arrives after the bridge has already resolved it. It is
+deleted rather than reimplemented.
+
+**Delta 6's exclusion of `check-gate-exemption-tasks` was right twice over.** It
+was excluded because a sibling rider widened its invariant in this same
+iteration, and porting a gate in the iteration that changes its contract makes
+the parity oracle chase a moving target. That contract then moved a *second*
+time, when the same iteration scoped both its arms to the authoring tree
+(§check-gate-exemption-tasks) — a repair this batch's own criterion-5 measurement
+surfaced. A member whose contract moves twice in one iteration is the case the
+exclusion exists for, and the batch would have paid for it had the exclusion been
+read as bookkeeping.
 
 ### The canon-kit `spec_manifest_files` cohort
 
