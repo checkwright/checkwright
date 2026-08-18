@@ -12,6 +12,115 @@
 
 ## New Features
 
+- **native-gate-port-remaining-corpus** [spec: SPEC-fifth-batch.md] [roadmap: now/reliability]
+  — the whole battery onto the binary, and the shell surface down to its residue.
+  roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
+  The entry never moves to `## Done`: it is the **whole corpus**, the oracle
+  below still counts gates owed, and a Done move would assert a finished port and silently drop it
+  from the **public** roadmap projection, which reads `[roadmap:]` tags off live entries.
+  **Operator-ruled 2026-08-09: complete the port, ASAP.** The ruling, its grounds and its
+  supersession of the 2026-08-06 measurement-locus clause are recorded in
+  [TRAJECTORY.md](TRAJECTORY.md) §PRIORITY DIRECTIVE — the port track's sequence; this entry is
+  the work. What it inherits unchanged: gate-sdk/SPEC.md §Porting a gate to the binary substrate
+  for the porting procedure, §Consumer payload for the payload rule.
+  **The scope, both install paths and the bootstrap residue are TRAJECTORY.md §PRIORITY
+  DIRECTIVE's**, not restated; designing the bootstrap is still this unit's work. **Two objections
+  answered:** wall-clock is the weaker case (the win is retiring the shell *sources* the payload
+  carries), and the toolchain-free arm rides the pre-compiled path, so
+  `powershell-installer-surface` shrinks to the bootstrap for the same reason.
+  **Twelve cohorts closed, plus four budget batches; gate-sdk/SPEC.md §The first cohort, and
+  the rule that selects the next is canonical for every one of them** — members, delivered
+  counts, holds, grounds and each batch or cohort's own price live there, so this entry states
+  what remains rather than restating them. From the eighth on, members are **selected by
+  running** `port-blockers.sh --group`; the size arm is now **permanently** exhausted rather
+  than exhausted at a cut, so the budget arm composes until a consumer contributes shell gates
+  sharing a derivation — the rule's own section owns why.
+  **The residue is three-way, not two: permanently shell, temporarily held, and takeable** —
+  a dated oracle read (`bash gate-sdk/bin/port-blockers.sh --group`'s trailer, which
+  `scripts/measured-claims.sh` emits as `ported-gate-members`), never a count this line holds,
+  which is what it was restated as and drifted from twice. The held tier stopped being a hand
+  adjudication when `# port-until:` was minted, so a cut reads its takeable set off the run.
+  Every held member is **sequencing with port work owed, never exclusion**, and what each owes
+  is on `cohort-held-members-port-prerequisites`, which owns the roster and the kits it spans.
+  Cut widths are ruled **per cut and never inherited** — the **fourth** took the operator's 6–8 at
+  eight; the **fifth** was ruled fresh at **seven** on 2026-08-19 through the lead session's
+  harness question mechanism, the 6–8 being that cut's own and non-citable as a width precedent.
+  **`check-graph` is ruled out of every budget batch, not merely out of this one**, and the ground
+  survives the amendment that states it: at 632 declaration lines with 27 shared helpers and a
+  self-contained HTML artifact, it is a non-gate emit arm that must be **designed** before it is
+  ported, so bundling it breaks the drop-any-member property the batch mechanism rests on. It
+  wants its own iteration, and a scope decomposing this corpus should size it as one.
+  `check-template-copy-parity` is the first member a later cut should reach for.
+  **Cost while deferred:** large and known — the **owed** remainder (the trailer's own arm,
+  never the unported count, which the permanent and held members inflate) plus the runners and
+  the install-lifecycle layer; since the 2026-08-14 born-native default
+  (TRAJECTORY.md §The closed rulings) a gate landed meanwhile no longer adds shell to it. Not
+  a single-iteration delta; scope owns the decomposition, and the criterion-relaxation
+  question is closed at gate-sdk/SPEC.md §The port-candidate criteria — an ordering signal,
+  never an eligibility screen. `gate-battery-parallel-execution` and
+  `gate-battery-result-cache` say the port subsumes them: closure candidates as it lands.
+  Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
+  direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope. Since then it is
+  promoted at spec and demoted at build **once per increment** — a cohort, or a budget batch on
+  the arm gate-sdk/SPEC.md §Porting a gate to the binary substrate owns — always a **demotion**;
+  promoted 2026-08-18 at spec as the wide-budget-batch iteration's spine and demoted at build
+  having delivered the fourth batch at its ruled width; ruled 2026-08-19 the spine of
+  `budget-batch-and-account-identity-kind` and promoted that day at spec with
+  `SPEC-fifth-batch.md`, the fifth cut at its ruled width of seven.
+
+- **gh-account-identity-expectation** [spec: SPEC-gh-account.md] — a third expectation kind for
+  check-identity, `gh-account <login>`, asserting that this clone's active GitHub CLI
+  login is the one the consumer's manifest names. Filed by operator direction 2026-08-18,
+  which is why it enters the queue directly rather than through a scope.
+  THE HAZARD THE EXISTING TWO KINDS MISS: `git config user.email` and a remote's host are
+  per-clone state, so a wrong value is wrong only where it is set. The active GitHub CLI
+  login is machine-global — one project switching it repoints every CLI call in every other
+  clone on the box, the credential helper a push rides included. A consumer project cannot
+  notice its account moved underneath it, and the symptom surfaces as a permission error
+  against the wrong repo rather than as anything naming the account.
+  OBSERVED TWICE — 2026-08-14 and 2026-08-18, both collateral from a sanctioned action rather
+  than a slip: a close session selected the release account exactly as the local release runbook
+  directs, left it active because that runbook states no restore step, and damaged a session
+  working a parallel project on the same box. The recurrence sat in the procedure.
+  RESTORE RULING, operator-directed 2026-08-18, recorded here because a message thread is not a
+  store. A close session that switches to the release account for a push **restores the prior
+  account once the run it watched goes green** — after, never before, since a red needs the
+  write-scoped account to fix and re-push. It knowingly deviates from the local runbook, which
+  mandates the switch and sanctions no restore. Per-session instruction, NOT the durable fix.
+  WHY check-identity AND NOT A NEW GATE: it already owns the invariant class and every
+  contract this kind needs — optional consumer manifest behind `GATE_SDK_IDENTITY_FILE`,
+  fail-closed on an unknown key or wrong field count, a clean CI skip ahead of the manifest
+  reads, and a `--fixture` mode making the pair deterministic. Its scope fence at
+  gate-sdk/SPEC.md §check-identity — assert that a mapping applied, never perform it —
+  covers this kind unchanged, and the login stays consumer config rather than a kit literal,
+  which the provenance seam requires independently.
+  ALL THREE FORKS ARE NOW RULED, and `SPEC-gh-account.md` owns each ruling's mechanism —
+  cited here, never restated. (3) Shell now or paired with the port — **paired**, operator-ruled
+  2026-08-19 in the lead session through the harness's question mechanism, on a set proposed with
+  exactly that composition as its ground: the fifth-cut batch ports check-identity, so the kind
+  lands native and is not built twice. (1) and (2) were spec's and were settled 2026-08-19 at
+  spec. (1) The oracle is a **local read** of the CLI's persisted active account — its status
+  subcommand validates over the network, which at tier=precommit would red an offline commit —
+  behind a path knob, parsing the exact `user` key and deliberately not the `users` map, with an
+  unrecognized shape fail-closed rather than clean. (2) The absence posture is **graded** rather
+  than the binary the fork offered: absent CLI config is clean with the caveat in the clean line
+  (context-kit/SPEC.md §check-memory-off's shape), present-but-unreadable is exit 2, and a present
+  file with no block for the configured host is a violation — a remote is repo-local state a
+  manifest may demand, while the CLI is machine state no repo-local manifest can require.
+  SCOPE FENCE, operator-ruled 2026-08-18, stated so a later scope reads these as excluded rather
+  than as oversights. The restore obligation in the local release runbook is OUT: the mandated
+  switch keeps having no paired restore, so this unit detects a left-switched account at the next
+  commit instead of preventing the switch from persisting, and detection only fires in a project
+  whose manifest carries the line. Pinning this repo's own account is also OUT, so checkwright
+  itself stays undetected and the unit ships mechanism a consumer opts into — the consequence
+  being that the fixture pair is the kind's only exercise in this tree, so no live run covers it.
+  **Cost while deferred:** borne off-tree and by a third party, which is what makes it easy to
+  under-rate here — a failed push or a wrong-account commit in whatever project shares the box,
+  never a red gate in the project that caused it. The restore ruling answers the per-release
+  exposure but is unenforced, so the harm returns the first time a session misses one.
+  Promoted 2026-08-19 at spec with `SPEC-gh-account.md`, riding check-identity's port in the
+  fifth budget batch.
+
 ## Technical Debt
 
 ## Deferred
@@ -376,105 +485,6 @@
   operator's ruling, for the `# port-until:` spelling alone; merged and demoted again
   2026-08-18 at build on the same entry-outlives-the-amendment branch.
 
-- **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
-  — the whole battery onto the binary, and the shell surface down to its residue.
-  roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
-  The entry stays deferred rather than moving to `## Done`: it is the **whole corpus**, the oracle
-  below still counts gates owed, and a Done move would assert a finished port and silently drop it
-  from the **public** roadmap projection, which reads `[roadmap:]` tags off live entries.
-  **Operator-ruled 2026-08-09: complete the port, ASAP.** The ruling, its grounds and its
-  supersession of the 2026-08-06 measurement-locus clause are recorded in
-  [TRAJECTORY.md](TRAJECTORY.md) §PRIORITY DIRECTIVE — the port track's sequence; this entry is
-  the work. What it inherits unchanged: gate-sdk/SPEC.md §Porting a gate to the binary substrate
-  for the porting procedure, §Consumer payload for the payload rule.
-  **The scope, both install paths and the bootstrap residue are TRAJECTORY.md §PRIORITY
-  DIRECTIVE's**, not restated; designing the bootstrap is still this unit's work. **Two objections
-  answered:** wall-clock is the weaker case (the win is retiring the shell *sources* the payload
-  carries), and the toolchain-free arm rides the pre-compiled path, so
-  `powershell-installer-surface` shrinks to the bootstrap for the same reason.
-  **Twelve cohorts closed, plus four budget batches; gate-sdk/SPEC.md §The first cohort, and
-  the rule that selects the next is canonical for every one of them** — members, delivered
-  counts, holds, grounds and each batch or cohort's own price live there, so this entry states
-  what remains rather than restating them. From the eighth on, members are **selected by
-  running** `port-blockers.sh --group`; the size arm is now **permanently** exhausted rather
-  than exhausted at a cut, so the budget arm composes until a consumer contributes shell gates
-  sharing a derivation — the rule's own section owns why.
-  **The residue is three-way, not two: permanently shell, temporarily held, and takeable** —
-  a dated oracle read (`bash gate-sdk/bin/port-blockers.sh --group`'s trailer, which
-  `scripts/measured-claims.sh` emits as `ported-gate-members`), never a count this line holds,
-  which is what it was restated as and drifted from twice. The held tier stopped being a hand
-  adjudication when `# port-until:` was minted, so a cut reads its takeable set off the run.
-  Every held member is **sequencing with port work owed, never exclusion**, and what each owes
-  is on `cohort-held-members-port-prerequisites`, which owns the roster and the kits it spans.
-  Cut widths are ruled **per cut and never inherited** — the **fourth** took the operator's 6–8 at
-  eight; the **fifth** was ruled fresh at **seven** on 2026-08-19 through the lead session's
-  harness question mechanism, the 6–8 being that cut's own and non-citable as a width precedent.
-  **Cost while deferred:** large and known — the **owed** remainder (the trailer's own arm,
-  never the unported count, which the permanent and held members inflate) plus the runners and
-  the install-lifecycle layer; since the 2026-08-14 born-native default
-  (TRAJECTORY.md §The closed rulings) a gate landed meanwhile no longer adds shell to it. Not
-  a single-iteration delta; scope owns the decomposition, and the criterion-relaxation
-  question is closed at gate-sdk/SPEC.md §The port-candidate criteria — an ordering signal,
-  never an eligibility screen. `gate-battery-parallel-execution` and
-  `gate-battery-result-cache` say the port subsumes them: closure candidates as it lands.
-  Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
-  direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope. Since then it is
-  promoted at spec and demoted at build **once per increment** — a cohort, or a budget batch on
-  the arm gate-sdk/SPEC.md §Porting a gate to the binary substrate owns — always a **demotion**;
-  promoted 2026-08-18 at spec as the wide-budget-batch iteration's spine and demoted at build
-  having delivered the fourth batch at its ruled width; ruled 2026-08-19 the spine of
-  `budget-batch-and-account-identity-kind`, promotion owed to that iteration's spec.
-
-- **gh-account-identity-expectation** [design-pending] — a third expectation kind for
-  check-identity, `gh-account <login>`, asserting that this clone's active GitHub CLI
-  login is the one the consumer's manifest names. Filed by operator direction 2026-08-18,
-  which is why it enters the queue directly rather than through a scope.
-  THE HAZARD THE EXISTING TWO KINDS MISS: `git config user.email` and a remote's host are
-  per-clone state, so a wrong value is wrong only where it is set. The active GitHub CLI
-  login is machine-global — one project switching it repoints every CLI call in every other
-  clone on the box, the credential helper a push rides included. A consumer project cannot
-  notice its account moved underneath it, and the symptom surfaces as a permission error
-  against the wrong repo rather than as anything naming the account.
-  OBSERVED TWICE — 2026-08-14 and 2026-08-18, both collateral from a sanctioned action rather
-  than a slip: a close session selected the release account exactly as the local release runbook
-  directs, left it active because that runbook states no restore step, and damaged a session
-  working a parallel project on the same box. The recurrence sat in the procedure.
-  RESTORE RULING, operator-directed 2026-08-18, recorded here because a message thread is not a
-  store. A close session that switches to the release account for a push **restores the prior
-  account once the run it watched goes green** — after, never before, since a red needs the
-  write-scoped account to fix and re-push. It knowingly deviates from the local runbook, which
-  mandates the switch and sanctions no restore. Per-session instruction, NOT the durable fix.
-  WHY check-identity AND NOT A NEW GATE: it already owns the invariant class and every
-  contract this kind needs — optional consumer manifest behind `GATE_SDK_IDENTITY_FILE`,
-  fail-closed on an unknown key or wrong field count, a clean CI skip ahead of the manifest
-  reads, and a `--fixture` mode making the pair deterministic. Its scope fence at
-  gate-sdk/SPEC.md §check-identity — assert that a mapping applied, never perform it —
-  covers this kind unchanged, and the login stays consumer config rather than a kit literal,
-  which the provenance seam requires independently.
-  THREE FORKS A SCOPE MUST SETTLE, one now ruled. (1) The oracle must be a local read: the
-  CLI's status subcommand validates tokens over the network, which is wrong at
-  tier=precommit and would red an offline commit. The local read is the active-user key in
-  the CLI's own hosts file, but that is the tool's internal config format under a home-dir
-  path, so it needs a path knob and a stated version tolerance. (2) The posture when the
-  CLI is absent or its config unreadable — a clean skip with a note, on the ground that a
-  clone with no CLI cannot push through it, versus fail-closed; context-kit/SPEC.md
-  §check-memory-off is the precedent for a stated fail-open on absence, and the SPEC owns
-  the choice either way. (3) Shell now or paired with the port — **RULED 2026-08-19, paired**:
-  the operator ruled this unit into `budget-batch-and-account-identity-kind`, whose fifth-cut
-  batch ports check-identity, so the kind lands native and is not built twice. Taken in the lead
-  session through the harness's question mechanism, on a set proposed with exactly that
-  composition as its ground. Forks (1) and (2) stay open and are spec's to settle.
-  SCOPE FENCE, operator-ruled 2026-08-18, stated so a later scope reads these as excluded rather
-  than as oversights. The restore obligation in the local release runbook is OUT: the mandated
-  switch keeps having no paired restore, so this unit detects a left-switched account at the next
-  commit instead of preventing the switch from persisting, and detection only fires in a project
-  whose manifest carries the line. Pinning this repo's own account is also OUT, so checkwright
-  itself stays undetected and the unit ships mechanism a consumer opts into — the consequence
-  being that the fixture pair is the kind's only exercise in this tree, so no live run covers it.
-  **Cost while deferred:** borne off-tree and by a third party, which is what makes it easy to
-  under-rate here — a failed push or a wrong-account commit in whatever project shares the box,
-  never a red gate in the project that caused it. The restore ruling answers the per-release
-  exposure but is unenforced, so the harm returns the first time a session misses one.
 - **born-native-omission-accumulation** [design-pending] — the born-native flip attaches
   criterion 5's omission to every future gate, and nothing measures the pile.
   **This is the costed residue of a closed ruling, not a challenge to it.** TRAJECTORY.md
