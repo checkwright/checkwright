@@ -876,6 +876,7 @@ context-kit/
   gate-tests/check-footprint-fresh/{good,bad}/
   gate-tests/check-brevity.test.sh      # the unmatched-section axis the pair cannot hold
   gate-tests/check-memory-off.test.sh   # the local-override axis the pair cannot hold
+  gate-tests/check-settings-pins.test.sh # the refusal axis the pair cannot hold
   index-tests/                   # fixture corpus + expected outputs
   templates/session-context.sh   # consumer copy: marked consumer sections
   templates/settings-sessionstart.json
@@ -1034,7 +1035,7 @@ fixture pair; the footprint pair drives the hermetic two-argument mode
 memory-off gates take a `--fixture <dir>` injection (the check-identity
 precedent): the settings-pins pair reads `<dir>/settings.json` against
 `<dir>/settings-pins.conf`; the memory-off pair scans `<dir>/memory` for
-content. Two direct unit tests hold the axes the pairs fix and so cannot
+content. Three direct unit tests hold the axes the pairs fix and so cannot
 express: `check-brevity.test.sh` holds the unmatched-section resolution (the
 pair fixes `CONTEXT_KIT_BREVITY_SECTION` at the stock default and always
 supplies a file carrying it, so neither case can express a section that
@@ -1042,7 +1043,11 @@ resolves to nothing — an unmatched section is exit 2, a broken machine rather
 than a clean tree). The memory-off local-override axis — an untracked
 `settings.local.json` that re-enables a pinned key past an empty dir — cannot
 be a good/bad pair (the pair fixes the dir axis), so `check-memory-off.test.sh`
-holds it.
+holds it. `check-settings-pins.test.sh` holds the **refusal** axis: the pair
+fixes the holds-vs-mismatch axis (exit 0 vs exit 1) alone, so a pin outside
+the documented path grammar — a jq filter, an iteration, a slice, an array
+literal — needs its own case to prove the refusal is exit 2, loud and naming
+the pin, the knob and the construct, never a silent clean verdict.
 
 `smoke/install.sh` copies the templates into the scratch consumer (config
 into the gates dir, hook wiring into the harness settings), runs the hook

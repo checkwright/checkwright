@@ -50,11 +50,14 @@ honest:
   from; `templates/gates-workflow.yml` — the CI workflow a consumer copies to
   `.github/workflows/gates.yml`.
 
-Enforcement runs in three concentric tiers: the generated `pre-commit` hook is
-the local, bypassable inner tier; the CI workflow is the server-side backstop
-that catches a `--no-verify` or a clone that never opted in; a tamper-proof
-hosted verifier (so CI cannot be edited away in the same change) is out of
-scope here, a deferred rung.
+Enforcement runs in three concentric tiers, each an outer backstop for the one
+inside it: the generated `pre-commit` hook, the local and bypassable inner
+tier; `run-gates.sh`'s pre-push full battery, whole-tree before the work
+leaves the machine; and the CI workflow, the server-side backstop that catches
+a `--no-verify` or a clone that never opted in. Only CI is a guarantee — see
+SPEC.md §Enforcement tiers for the full definition, including the deferred
+hosted-attestation rung beyond these three (so CI cannot be edited away in the
+same change) that is out of scope here.
 
 The design contracts, the manifest grammar, and each component's full contract
 live in [SPEC.md](SPEC.md).

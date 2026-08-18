@@ -11,8 +11,10 @@ state machine. The problem the kit solves: a coding agent selects work by
 parsing, not by reading — so everything selection trusts (position, slugs,
 tags) is grammar a gate can enforce, and everything a human writes freely
 (task prose) is kept out of the parse path. Drift between what the prose says
-and what a parser sees is the failure mode; all but one of the gates exist to
-close one instance of it each.
+and what a parser sees is the failure mode; all but two of the gates exist to
+close one instance of it each. The two exceptions hold a different axis —
+projection freshness (`check-roadmap-fresh`) and the deferred pool's
+per-entry budget (`check-queue-entry-budget`).
 
 The kit carries the queue grammar and its gates only; a consumer's section
 names, wrap budget, and protocol vocabulary are config, with this repo's

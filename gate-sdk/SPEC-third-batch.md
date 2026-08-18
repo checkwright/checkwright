@@ -26,6 +26,19 @@ JSON re-use exposes (delta 5), and the jq boundary (delta 6).
 member was always registered, and only the declaration spelling moves, which is what keeps
 criterion 1 satisfied through the port. **design-bearing**
 
+**One consumer shells to the deleted path directly, and no listed gate would catch it.**
+`context-kit/smoke/agents-md.sh:117` and `:122` invoke
+`bash "$SCRATCH/gate-sdk/checks/check-root-tiering.sh"` by literal path against a *second*,
+unrelated throwaway repo (`$RT`, which carries no `gate-sdk/` tree of its own) — the align audit
+found this by grepping the tree for `check-root-tiering\.sh` and reading every hit, since neither
+`check-docs-cmd` nor `check-md-refs` scans a `smoke/*.sh` script (their corpus is the governed doc
+set). Point 5 below does not name it for the same reason: it is not a gate that reds, it is a smoke
+suite that would fail outright with "No such file or directory" the first time `agents-md.sh` runs
+after this delta lands, and the failure mode is a hard crash rather than a diagnosable message.
+Both call sites must re-point onto `gate_command check-root-tiering` (the dispatch-agnostic pattern
+`gate-sdk/bin/run-gate-tests.sh`'s `run_case` already uses), resolved against the vendored
+`$SCRATCH/gate-sdk` tree rather than `$RT`'s cwd, in the same commit as this delta.
+
 ### 2. `check-memory-off`'s hold is criterion 2, not criterion 7, and the record is corrected
 
 **The premise this member was selected on is wrong, and correcting it is the batch's first
@@ -268,6 +281,10 @@ distinction* — delta 4's scenario case, which is what makes it checkable rathe
 **Point 5 — this change narrows a corpus, so each reader is named by its red condition.** Two
 tracked shell scripts leave the tree.
 
+- `context-kit/smoke/agents-md.sh:117,122` — not a gate and not in this list's pattern: it shells
+  directly to `check-root-tiering.sh` by path, so the deletion breaks it with a hard crash rather
+  than a gate red. Named and its fix specified under delta 1, because no gate here would have
+  surfaced it.
 - `check-settings-paths` — reds on a literal `.sh` command token in `permissions.allow[]` that does
   not resolve. **Not monotone under a deletion.** Probed: no grant names either script, so this
   batch strands none; the six that do strand are delta 9's.
@@ -347,7 +364,8 @@ tracked shell scripts leave the tree.
 - [ ] **Amendment deleted** — this file removed on merge; none remain for the component
       (`ls gate-sdk/SPEC-*.md`).
 - [ ] **Removals propagated** — grepped every spec for the two check-script paths and for
-      `--fixture`; nothing dangles.
+      `--fixture`; nothing dangles. `context-kit/smoke/agents-md.sh`'s two direct shell-outs to
+      `check-root-tiering.sh` (delta 1) re-point onto `gate_command`, not only the spec citations.
 - [ ] **The criterion-2 discharge is real** — the pair and the `.test.sh` re-pointed onto the knobs
       (delta 3), the throwaway-`HOME` scenario run over the full matrix with both implementations
       live (delta 4), and the jq-absent arm recorded as retired rather than as proved equal.
