@@ -67,6 +67,27 @@
   change; a counter with no split criterion behind it would only make the cadence visible.
   **Cost while deferred:** a cadence that is real is invisible to the only session chartered to act
   on it, since scope ranks what the queue carries and the queue carried none of this.
+  **FOUR MORE FIRINGS, 2026-08-19, the first measured against this entry rather than against
+  commit messages — landing five ruled dispositions took three mandated writes onto entries the
+  gate reports at exactly 0 lines of headroom.** `native-gate-port-remaining-corpus`
+  (a fresh operator width ruling), `gh-account-identity-expectation` (an operator answer to one of
+  its three named forks) and `stage-stamp-ordering-unenforced` (a fifth decline plus the record
+  that the routing worked). Each was seated by the documented relief and each spent something:
+  the fourth batch's member arithmetic de-literalized to its SPEC, an answered fork's text
+  replaced by its answer, and — the one real loss — the literal spelling of the narrow couple
+  pair, compressed out of a correction that now says "the narrow pair" and names it nowhere.
+  **The fourth is a sharper kind and is the one to design against:** on
+  `close-entry-baseline-bootstrap-deadlock` the ruling fitted and its **provenance** did not —
+  the entry closed at 1 line of headroom, so it carries what was ruled and not through which
+  channel, which is precisely the citation `relayed-ruling-provenance-unrecorded` is trialling.
+  A cap that displaces a ruling's audit trail while keeping the ruling is worse than one that
+  displaces prose, because the surviving text reads complete.
+  **The signal the design question asked for.** All three are among the queue's longest-lived and
+  most-ruled-on entries, which is evidence for the split reading rather than for a counter: the
+  collision is not random across the pool, it concentrates where rulings accumulate.
+  **Measured with the gate, not by hand**, and read *after* the dispositions were ruled rather
+  than before — `headroom-check-ordering-unruled`'s ordering, honoured here on purpose so that no
+  ruling could be shaped by the room available to record it.
   Surfaced 2026-08-18 while `wide-budget-batch-and-hold-declaration`'s close drained its own
   inbox, and filed back into it; promoted 2026-08-18 by the following iteration's scope.
 
@@ -93,6 +114,20 @@
   alongside the ruling; or operator-class rulings are landed by the operator directly rather than
   relayed; or a provenance field on ruling records naming how the authorization arrived, so an
   unverifiable one is visibly unverifiable rather than indistinguishable.
+  **The first shape was PRACTISED 2026-08-19, one day after filing, and the trial is worth more
+  than the entry's prose.** The lead relaying five rulings stated the authorization channel
+  unprompted — three questions put to the operator in the lead session through the harness's
+  question mechanism, each answered by selecting the option marked recommended, not free text and
+  not the lead's inference — and the recording session carried that citation onto each ruled
+  entry. `native-gate-port-remaining-corpus`, `gh-account-identity-expectation` and
+  `scratch-execution-control-is-bash-only` carry it; it is the citation an auditor now has.
+  **Two limits the trial exposed, both of which the unit's design owes an answer to.** The
+  citation is still the relaying party's own word about a channel the tracked record cannot
+  reach, so it raises the cost of inventing a ruling without making an invented one detectable —
+  the gap is narrowed, not closed. And it **did not fit twice**:
+  `close-entry-baseline-bootstrap-deadlock` and `stage-stamp-ordering-unenforced` took their
+  rulings at 0–1 lines of headroom and carry the ruling without the channel, so the fix collides
+  with the entry cap on first contact (`entry-cap-displaces-mandated-writes` counts it).
   **Cost while deferred:** silent and audit-side. Every relayed ruling already in the queue carries
   the same unverifiable provenance, the tracked record is all a later auditor or a fresh session
   has, and it will not red a gate — it surfaces as a security flag on an honest session, which is
@@ -122,12 +157,51 @@
   fix is to anchor the match to the scratch root's immediate children — but whether
   `LIFECYCLE_KIT_BOUNDARY_PRESERVE` entries are basenames or root-relative paths is a kit contract
   change a consumer inherits, and whether the wipe should *report* its failures instead of
-  suppressing them is a second, separable call.
+  suppressing them is a second, separable call. That inherited contract is what makes this a
+  **unit rather than a one-line patch**, and it is why the 2026-08-19 disposition was to leave it
+  filed rather than widen `budget-batch-and-account-identity-kind` onto it.
+  **The attesting residue was cleared** once this entry held the evidence: reproducing it costs
+  `mkdir -p .tmp/x/y && touch .tmp/x/y/.gitkeep` plus a boundary run, so keeping two vendored kit
+  payload copies alive across every future boundary bought nothing the entry does not state.
   **Cost while deferred:** scratch accumulates across iteration boundaries without bound while the
   one mechanism chartered to reclaim it reports success — the boundary reset's own claim is false
   in exactly the case a consumer is most likely to hit.
   Found 2026-08-18 by this iteration's scope at its own entry, from the surviving directory rather
   than from a reading of the code; filed under scope-gated intake rather than fixed in-session.
+
+- **gap-inbox-commit-ownership** [design-pending] — nothing says who **commits** a gap-inbox
+  bullet, so a filed bullet can reach the next iteration uncommitted and be carried by whichever
+  session happens to stage next.
+  **Re-tiered out of the icebox 2026-08-19 on a falsified premise, ruled by the iteration lead
+  rather than the operator because the entry's own cost field is what decides it.** Icebox
+  membership asserts "no named event is waiting to promote it"; a named event has now occurred.
+  **The firing, probed rather than inferred.** `lifecycle-kit/bin/file-gap.sh` appends the bullet
+  and never commits — no `git` invocation anywhere in it. `git log -- .workflow/gap-inbox.md`
+  shows the `wide-budget-batch-and-hold-declaration` close's first two bullets each landing in
+  their own `chore(gap):` commit while the third was written and left in the working tree, so it
+  reached a **new iteration's** scope session as an uncommitted modification and was carried into
+  history by that session's boundary stamp commit.
+  **The distinction the firing turns on:** committing a bullet is **not** its disposition. The
+  carrying session had to say so explicitly in the stamp commit's message, because the drain
+  contract (lifecycle-kit/SPEC.md §The committed gap inbox) gives a bullet exactly one
+  disposition — promoted, fixed inline, or discarded with cause — and none of them is "committed".
+  A surface named *the committed gap inbox* whose filer never commits is the gap in one phrase.
+  **Why `[design-pending]`:** the shapes differ in who pays. Have `file-gap.sh` commit its own
+  bullet — cheapest, but it makes a capture affordance a committing tool, and it contends on a
+  shared index with whatever stage session is mid-commit. Oblige the filing session to commit in
+  the same turn — no tool change, but it is an instruction, and this iteration is the evidence
+  that instructions of that shape get missed. Or rule the carry legitimate and state that the
+  next stamping session commits it, which is what happened here by accident rather than by
+  contract.
+  **Cost while deferred:** small per instance and silent — a bullet outside git until some later
+  session notices, invisible to `git log` and to any reader who is not looking at a dirty tree,
+  and lost outright if that tree is reset. It is also the one class the inbox's own
+  merge=union answer cannot cover, since union protects a committed surface and this bullet was
+  never on one.
+  Filed 2026-07-25 by close draining its own gap inbox, and born in the icebox rather than demoted
+  to it — `git log -S` over the slug returns that one commit, which is the whole of its history
+  before this move. Fired 2026-08-18 and re-tiered 2026-08-19 by the scope session the
+  uncommitted bullet reached, which is also the session that carried it into history.
 
 - **crate-test-cwd-process-global-race** [design-pending] — the crate's test guard covers the knob
   environment and nothing else, while a second process-global is written by a test and read by
@@ -305,16 +379,14 @@
 - **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
   — the whole battery onto the binary, and the shell surface down to its residue.
   roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
-  The entry stays deferred rather than moving to `## Done`: it is the **whole corpus**, the
-  oracle below still counts gates owed, and a Done move would assert a finished port and
-  silently drop it from the **public** roadmap projection, which reads `[roadmap:]` tags off
-  live entries.
+  The entry stays deferred rather than moving to `## Done`: it is the **whole corpus**, the oracle
+  below still counts gates owed, and a Done move would assert a finished port and silently drop it
+  from the **public** roadmap projection, which reads `[roadmap:]` tags off live entries.
   **Operator-ruled 2026-08-09: complete the port, ASAP.** The ruling, its grounds and its
   supersession of the 2026-08-06 measurement-locus clause are recorded in
-  [TRAJECTORY.md](TRAJECTORY.md) §PRIORITY DIRECTIVE — the port track's sequence. This entry is
-  the work, and does not restate them. What it inherits unchanged: gate-sdk/SPEC.md §Porting a
-  gate to the binary substrate for the porting procedure, §Consumer payload for the payload
-  rule.
+  [TRAJECTORY.md](TRAJECTORY.md) §PRIORITY DIRECTIVE — the port track's sequence; this entry is
+  the work. What it inherits unchanged: gate-sdk/SPEC.md §Porting a gate to the binary substrate
+  for the porting procedure, §Consumer payload for the payload rule.
   **The scope, both install paths and the bootstrap residue are TRAJECTORY.md §PRIORITY
   DIRECTIVE's**, not restated; designing the bootstrap is still this unit's work. **Two objections
   answered:** wall-clock is the weaker case (the win is retiring the shell *sources* the payload
@@ -334,9 +406,9 @@
   adjudication when `# port-until:` was minted, so a cut reads its takeable set off the run.
   Every held member is **sequencing with port work owed, never exclusion**, and what each owes
   is on `cohort-held-members-port-prerequisites`, which owns the roster and the kits it spans.
-  The **fourth** budget batch is delivered at the operator's 6–8 width ruling, taken at eight —
-  five members clearing criterion 4 and three binding it — and its findings, its honest limit
-  and its measured price are canonical at gate-sdk/SPEC.md §The fourth budget batch.
+  Cut widths are ruled **per cut and never inherited** — the **fourth** took the operator's 6–8 at
+  eight; the **fifth** was ruled fresh at **seven** on 2026-08-19 through the lead session's
+  harness question mechanism, the 6–8 being that cut's own and non-citable as a width precedent.
   **Cost while deferred:** large and known — the **owed** remainder (the trailer's own arm,
   never the unported count, which the permanent and held members inflate) plus the runners and
   the install-lifecycle layer; since the 2026-08-14 born-native default
@@ -349,8 +421,9 @@
   direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope. Since then it is
   promoted at spec and demoted at build **once per increment** — a cohort, or a budget batch on
   the arm gate-sdk/SPEC.md §Porting a gate to the binary substrate owns — always a **demotion**;
-  promoted 2026-08-18 at spec as the spine of the wide-budget-batch iteration, on the operator's
-  ruling, and demoted at build having delivered the fourth budget batch at its full ruled width.
+  promoted 2026-08-18 at spec as the wide-budget-batch iteration's spine and demoted at build
+  having delivered the fourth batch at its ruled width; ruled 2026-08-19 the spine of
+  `budget-batch-and-account-identity-kind`, promotion owed to that iteration's spec.
 
 - **gh-account-identity-expectation** [design-pending] — a third expectation kind for
   check-identity, `gh-account <login>`, asserting that this clone's active GitHub CLI
@@ -378,7 +451,7 @@
   gate-sdk/SPEC.md §check-identity — assert that a mapping applied, never perform it —
   covers this kind unchanged, and the login stays consumer config rather than a kit literal,
   which the provenance seam requires independently.
-  THREE FORKS A SCOPE MUST SETTLE, none ruled. (1) The oracle must be a local read: the
+  THREE FORKS A SCOPE MUST SETTLE, one now ruled. (1) The oracle must be a local read: the
   CLI's status subcommand validates tokens over the network, which is wrong at
   tier=precommit and would red an offline commit. The local read is the active-user key in
   the CLI's own hosts file, but that is the tool's internal config format under a home-dir
@@ -386,18 +459,18 @@
   CLI is absent or its config unreadable — a clean skip with a note, on the ground that a
   clone with no CLI cannot push through it, versus fail-closed; context-kit/SPEC.md
   §check-memory-off is the precedent for a stated fail-open on absence, and the SPEC owns
-  the choice either way. (3) Shell now or paired with the port: check-identity is an
-  unported clean singleton (group 1 at the 2026-08-18 cut, c2=pair c3=precommit c7=clean,
-  no blocker), so a kind added to shell first is knowingly built twice.
-  SCOPE FENCE, operator-ruled 2026-08-18, stated so a later scope reads these as excluded
-  rather than as oversights. The restore obligation in the local release runbook is OUT:
-  the mandated switch keeps having no paired restore, so this unit detects a left-switched
-  account at the next commit instead of preventing the switch from persisting, and
-  detection only fires in a project whose manifest carries the line. Pinning this repo's
-  own account is also OUT, so checkwright itself stays undetected and the unit ships
-  mechanism a consumer opts into; the consequence is that the fixture pair is the kind's
-  only exercise in this tree, which is ordinary for a constructed scenario but means no
-  live run covers it here.
+  the choice either way. (3) Shell now or paired with the port — **RULED 2026-08-19, paired**:
+  the operator ruled this unit into `budget-batch-and-account-identity-kind`, whose fifth-cut
+  batch ports check-identity, so the kind lands native and is not built twice. Taken in the lead
+  session through the harness's question mechanism, on a set proposed with exactly that
+  composition as its ground. Forks (1) and (2) stay open and are spec's to settle.
+  SCOPE FENCE, operator-ruled 2026-08-18, stated so a later scope reads these as excluded rather
+  than as oversights. The restore obligation in the local release runbook is OUT: the mandated
+  switch keeps having no paired restore, so this unit detects a left-switched account at the next
+  commit instead of preventing the switch from persisting, and detection only fires in a project
+  whose manifest carries the line. Pinning this repo's own account is also OUT, so checkwright
+  itself stays undetected and the unit ships mechanism a consumer opts into — the consequence
+  being that the fixture pair is the kind's only exercise in this tree, so no live run covers it.
   **Cost while deferred:** borne off-tree and by a third party, which is what makes it easy to
   under-rate here — a failed push or a wrong-account commit in whatever project shares the box,
   never a red gate in the project that caused it. The restore ruling answers the per-release
@@ -1829,20 +1902,20 @@
   Class: mints a gate name if the oracle lands, so canon-kit/SPEC.md's new-names litmus makes it
   a **feature** on that path; debt only if it lands as an assertion inside `check-stage-evidence`.
   The promoting scope call settles it.
-  **Declined FOUR times at scope despite the threshold — 2026-08-16, 2026-08-17, and twice on
-  2026-08-18, the second of those at the next iteration's scope; the last two on the operator's
-  ruling.** One ground survives all four: the cheap half and the history assertion are a single
-  unresolved design fork, and buying the cheap half first may foreclose the reading the assertion
-  needs. No new `recurrence:` date joins the declaration — the finding did not re-fire, and the
-  stamp is idempotent per (slug, date).
-  **Two grounds the earlier declines cited are CORRECTED here, which is a correction and not a
-  reversal.** The couple sets are no longer "both exactly
-  `TASK-QUEUE.md,.workflow/WORKFLOW-STATE.txt`": `check-stage-entry.gate` widened to the SPEC
-  globs at its 2026-08-16 port, so it is already ran-and-lenient for any SPEC-touching commit and
-  only `check-stage-evidence` keeps the narrow pair — the cheap half is ONE descriptor, not two.
-  And "sits off every promoted unit's surface" fails against the set promoted 2026-08-18, whose
-  members edit `.gate` descriptors and native gate modules. Both gates are native
-  (`native/src/gates/stage_evidence.rs`, `stage_entry.rs`).
+  **Declined FIVE times at scope despite the threshold — 2026-08-16, 2026-08-17, twice on
+  2026-08-18, and 2026-08-19, the last three on the operator's ruling, the newest holding the
+  earlier ones.** One ground survives all five: the cheap half and the history assertion are a
+  single unresolved design fork, and buying the cheap half first may foreclose the reading the
+  assertion needs. No `recurrence:` date joins a decline — the finding did not re-fire.
+  **The 2026-08-19 surfacing is recorded because the routing worked rather than the outcome:**
+  scope refused to re-litigate a closed ruling and put the collision in front of the authority
+  anyway — the split `threshold-recurrence-routing-residency` draws, ruled general the same day.
+  **Two grounds the earlier declines cited are CORRECTED, not reversed.** `check-stage-entry.gate`
+  widened to the SPEC globs at its 2026-08-16 port, so it is already ran-and-lenient for any
+  SPEC-touching commit and only `check-stage-evidence` keeps the narrow pair — the cheap half is
+  ONE descriptor, not two. And "sits off every promoted unit's surface" fails against the set
+  promoted 2026-08-18, whose members edit `.gate` descriptors and native gate modules. Both gates
+  are native (`native/src/gates/stage_evidence.rs`, `stage_entry.rs`).
   Filed 2026-08-01 at close from the gap inbox; build filed it against its own batch-1 stamp.
 
 - **amendment-deletion-content-completeness** [design-pending] — a closed
@@ -4273,6 +4346,11 @@
   structural reading above is now the only one left. The same drain found a **second face** the
   candidates above do not cover — a baseline move stales the evidence line computed against the old
   baseline — promoted as `baseline-move-stales-evidence-line`.
+  **Threshold collision reached the authority and was NOT promoted, ruled 2026-08-19** into
+  `budget-batch-and-account-identity-kind`'s set: the operator took the port spine plus the
+  identity rider and left this out. Cause recorded rather than left silent — the collision is
+  **discharged by having reached the authority**, which is all the threshold rule asks of it, and
+  the decline is not a decline of the finding. Its own recurrence count is unchanged at two.
   Filed 2026-08-10 by close, from its own blocked entry; the escape it needed is
   the evidence. Re-attested 2026-08-12 by close, again from its own blocked entry.
 
@@ -5139,6 +5217,15 @@
   script this iteration ran through `guard-kit/bin/scratch-run.sh`, so the runner works and the
   control's reach is the whole defect. A control covering the disciplined half while the
   undisciplined half grows eightfold is measuring habit, not risk.
+  **Threshold collision reached the authority and was DEFERRED WITH CAUSE, operator-ruled
+  2026-08-19** (taken in the lead session through the harness's question mechanism, three options
+  offered, the recommended one selected). The count stands at two, so scope put it in the proposed
+  set regardless of theme, as the rule requires; the ruling is that it does not enter
+  `budget-batch-and-account-identity-kind`. Cause, recorded rather than left silent: guard-kit is
+  an unrelated surface to that iteration's port spine, so the unit amortizes nothing against it,
+  and the measured cost is **discipline-shaped rather than a correctness hole** — the growth is in
+  how sessions choose to run scratch, not in what the tree permits. No new `recurrence:` date
+  joins the declaration: the finding did not re-fire, and a decline is not a firing.
   Filed 2026-08-13 by close, from its own tooling-friction triage; probed at source before filing.
 
 - **ro-bins-write-option-bypass** [design-pending] — `GUARD_KIT_RO_BINS` membership is tested as
@@ -6626,17 +6713,28 @@
   `port-selector-permanence-and-batch` and ruled LIVE AND UNSPENT at the promotion relay, so
   its disappearance from the live tree would spend it by attrition — the outcome that ruling
   refused.
-  **Scope owns the real question**, and this entry does not pre-empt it: whether the clause was
-  entry-specific — its subject IS resolved, the enforcement landed as guard-kit rule 14 — or
-  whether "two is where lead discretion ends" is a general threshold-recurrence routing rule
-  that every recurrence-carrying entry inherits.
-  **Two homes were probed and refused at build**, so they are not fresh options. A live queue
+  **ANSWERED 2026-08-19 at scope: the clause is GENERAL, not entry-specific** — a
+  threshold-recurrence routing rule every recurrence-carrying entry inherits, not prose belonging
+  to the entry whose subject (guard-kit rule 14) is resolved. Ruled by the iteration lead as a
+  routing call rather than a fresh envelope one: the 2026-08-17 operator ruling delegated the home
+  decision to scope, so recording the answer here **discharges** that delegation. Grounds: the
+  clause completes the scope contract's own threshold paragraph, which already puts a
+  threshold collision "in front of the authority this stage already escalates to" and stops short
+  of saying where that authority changes. Exercised again at this very scope, which is the
+  evidence rather than the argument: `stage-stamp-ordering-unenforced` stands at three
+  recurrences and its last two declines were the operator's, not a lead's.
+  **What is NOT decided here, deliberately.** The clause is not landed in lifecycle-kit's scope
+  contract by this stage or this iteration; that stays a feature-shaped unit for a later one, and
+  this entry stays its carrier meanwhile.
+  **Two homes were probed and refused at build**, and the refusals are not rejections of the
+  options — recorded that way so a later reader does not mistake one for the other. A live queue
   entry was blocked because `turn-end-chokepoint-and-wait-primitive` measures 0 lines of
   headroom. TRAJECTORY.md is refused by CLAUDE.md's own scoping sentence, which admits
   **closed** operator rulings while this one is explicitly open — choosing it means amending
   that sentence, a governance edit rather than a move. lifecycle-kit's scope contract was
-  refused as envelope-class: it would widen a ruling about this repo's queue into mechanism
-  binding every consumer.
+  refused as envelope-class: that was a **build session correctly declining an envelope call it
+  had no authority to make**, and with the general/entry-specific question now answered it is the
+  live candidate home rather than a closed one.
   **DISTINCT from `waiting-rule-fourth-firing-post-fix`**, which is Done: that entry owned the
   residency rule's enforcement and got it; this owns where its escalation-routing clause lives,
   which the Done move is what puts at risk.
@@ -7110,7 +7208,6 @@
 - **evidence-journal-hash-chain** [design-pending] — Tamper-evidence wanted only by a hosted rung.
 - **md-section-near-miss-match** [design-pending] — Empty on a near miss; correct on an exact query.
 - **amendment-update-target-coverage** [design-pending] — Align checks it by hand; no gate yet.
-- **gap-inbox-commit-ownership** [design-pending] — Who commits a lead-filed bullet is unspecified.
 - **operator-authored-unit-set** [design-pending] — The contract omits operator-authored unit sets.
 - **tarball-build-attestation** [design-pending] — The checksum proves transfer only; docs agree.
 - **action-run-shell-scan-predicate** [design-pending] — No consumer seam on a correct gate.
