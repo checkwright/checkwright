@@ -1997,7 +1997,16 @@ case of it;
 the budget arm is reachable **only** when a `bash
 gate-sdk/bin/port-blockers.sh --group` run reports no takeable group — so its
 precondition is a verdict from the instrument this section already names for the
-size arm, never a session's reading of the tree. Shared derivation is the axis
+size arm, never a session's reading of the tree.
+**The size arm is now permanently exhausted rather than exhausted at a cut, and
+that is a property of the rule rather than a reading of one remainder.** A
+`--group` run over the owed members partitions them into groups of exactly one,
+so no group has a second member to amortize a walk across — and the born-native
+default forecloses a new one forming, because a gate written native was never in
+the shell partition to join a group. A later selector therefore reads the arm's
+precondition off the run as before and should expect it to keep reporting the
+same verdict; what would reopen the arm is a *consumer* contributing shell gates
+that share a derivation, not this tree. Shared derivation is the axis
 **while it selects**, because it is what made this cohort
 cheap: the walk is ported once and proved N times, and the parity comparison is
 over one corpus shape rather than N; the budget arm is what this section says
@@ -2825,14 +2834,27 @@ kit as a kit root. The derivation's predicate is the *existence* of the `checks/
 or `smoke/` directory, not a `*.sh` glob, and the kit roots that already carry zero
 `.sh` under `checks/` resolve normally.
 
+**Assertion C was re-run fresh after the last descriptor landed, and the cut
+adds no member** — on the rule §The first budget batch established, that a port
+moves a declaration path and can move *other* members into or out of the derived
+substrate-sensitive set, so the reading is never inherited. It was **measured
+rather than argued**, by running the derivation over both trees: the same five
+members are substrate-sensitive before the batch's first descriptor and after its
+last, and each already carries a disposition. The derivation compares each
+member's expanded `couples=` against the *resolved* declaration paths, which are
+absolute, so the set is exactly the members whose couples carry an unanchored
+`*.sh` or `*.gate` glob — a port changes such a member's extension and never its
+membership. §Meta-gate conservation for the binary substrate gains no row.
+
 **The transitive-couples rule has a scope the tree states and the sentence does
-not, and reading it literally would have produced 76 wrong descriptors.** §The
+not, and reading it literally would have produced a wrong descriptor per ported
+member.** §The
 non-gate arm requires a ported member's descriptor to carry every crate module
 its implementation reaches, transitively — which taken at face value includes
 `walk.rs` and `proc.rs`, the bridge and spawn layers every gate module reaches.
 No descriptor in the tree names either, and none should: coupling a universal
-layer into every descriptor spells one fact 76 times and re-runs the whole
-battery from the hook on any edit to it. What the rule reaches is the modules
+layer into every descriptor spells one fact once per ported member and re-runs
+the whole battery from the hook on any edit to it. What the rule reaches is the modules
 whose edit changes *this* member's verdict and nothing else's — its own module
 and the shared rule-carrying modules beside it. The universal layers are held by
 `check-crate-arms` and the binary's own source stamp instead, which is the same
