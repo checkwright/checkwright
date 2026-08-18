@@ -1,0 +1,3 @@
+# graph: couples=scripts/core-files.list,kit:SPEC.md,kit:README.md,native/src/gates/core_files.rs,native/src/fresh.rs dir=one valve=none tier=precommit
+# install: on-surface
+# spec: gate-sdk/SPEC.md §check-core-files — every path in the core-files manifest exists in the worktree and is tracked

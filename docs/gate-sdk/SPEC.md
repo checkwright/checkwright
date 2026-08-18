@@ -7988,6 +7988,7 @@ binary, proved parity-identical before the shell gate was deleted
 
 ### check-core-files
 
+`checks/check-core-files.gate` (`precommit`, binary-dispatched).
 Invariant: every path in the consumer's `core-files.list` manifest exists in
 the worktree **and** is tracked (`git ls-files --error-unmatch`). Red on a
 missing or untracked listed path — one existence-plus-tracked test catches a
@@ -7996,21 +7997,36 @@ plain `rm`, a `git rm`, and a listed-but-never-added path alike, with no
 
 The manifest is optional consumer config (the `graph-vocab.sh` pattern): the
 path knob is `GATE_SDK_CORE_FILES_FILE` (default
-`<gates-dir>/core-files.list`), registry-style — one repo-relative path per
+`<gates-dir>/core-files.list`, resolved onto the knob's own name in `lib/gate.sh`
+so the config bridge's `declare -p` can find it), registry-style — one repo-relative path per
 line **or** a `kit:<path>` token, `#` comments and blanks ignored. An absent
 manifest is clean with a note;
 an empty or comment-only manifest is clean; a present-but-unreadable manifest
 is fail-closed (exit 2). Calibration: the intentional-removal valve is the
 manifest itself — retiring a surface means deleting its line in the same commit
 that removes the file, a diff-visible edit that needs no exemption tag, so the
-gate is re-scoped in the open, never weakened to pass.
+gate is re-scoped in the open, never weakened to pass. The bespoke
+`gate-tests/check-core-files.test.sh` carries the expansion, the wildcard
+refusal and the untracked-but-present branch — none of them expressible in the
+pair, since the fixture runner reads exit 2 as a harness error and runs each
+case with the fixture dir as cwd — and it dispatches through `gate_run`, which
+is what keeps a bespoke test alive across a substrate move
+(§lib/test-hermetic.sh).
 
 A `kit:<path>` line derives one `<kit-root>/<path>` entry per `gate_kit_roots`
-member through `gate_expand_couples_var` — the same expansion, the same root
+member — the same expansion, the same root
 set, and the same spelling `# graph:` `couples=` fields already use (§check-graph
 owns them; nothing about them is re-specified here). What is new is only that
 `check-core-files` is a second reader of it. A manifest with no `kit:` line
-behaves exactly as before, so no consumer's manifest changes meaning.
+carries no derivation at all, so it needs no root set and reads none.
+
+**The compiled form derives it from the bridged root set rather than calling the
+shell expander**, which is criterion 6's discharge-by-construction and not a
+second implementation of the token: `GATE_KIT_ROOTS_REL` is the *resolved* value
+of the one derivation `lib/gate.sh` owns (§lib/gate.sh), so the root set is
+computed in exactly one place and the binary holds no default to drift from. What
+the crate carries is the join and the wildcard refusal — this reader's own rule,
+which the shared expander deliberately does not have.
 
 **One restriction, and it is fail-closed.** The expansion is unconditional: it
 emits `<root>/<path>` per root with no existence test. In a `couples=` field the

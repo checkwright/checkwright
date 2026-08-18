@@ -15,6 +15,7 @@ pub mod gate_fail_closed;
 pub mod kit_enum;
 pub mod docs_cname_parity;
 pub mod exec_bit;
+pub mod core_files;
 pub mod docs_kit_parity;
 pub mod docs_mirror_fresh;
 pub mod docs_nav_reachable;
@@ -1121,6 +1122,13 @@ pub const REGISTRY: &[GateEntry] = &[
         exec_bit::run,
         &[],
         &["GATE_EXEC_GLOBS", "GATE_EXEC_PRUNE"],
+        "gate-sdk",
+    ),
+    (
+        "check-core-files",
+        core_files::run,
+        &[],
+        &["GATE_SDK_CORE_FILES_FILE", "GATE_KIT_ROOTS_REL"],
         "gate-sdk",
     ),
 ];

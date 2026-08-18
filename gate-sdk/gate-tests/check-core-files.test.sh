@@ -4,8 +4,7 @@ set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../lib/test-hermetic.sh"
 
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
-GATE="$ROOT/gate-sdk/checks/check-core-files.sh"
-[[ -x "$GATE" ]] || { echo "check-core-files.test: gate not found: $GATE"; exit 2; }
+CHECKS="$ROOT/gate-sdk/checks"
 
 sb="$(mktemp -d)"
 trap 'rm -rf "$sb"' EXIT
@@ -21,7 +20,7 @@ git -C "$sb" add -A
 git -C "$sb" commit -qm seed
 
 fails=0
-run() { ( cd "$sb" && GATE_SDK_KIT_DIRS="alpha-kit beta-kit" bash "$GATE" "$1" 2>&1 ); }
+run() { ( cd "$sb" && GATE_SDK_KIT_DIRS="alpha-kit beta-kit" gate_run check-core-files "$CHECKS" "$1" 2>&1 ); }
 
 # A kit: line expands to one path per root; every expansion exists, so the gate is clean
 # and its count proves the derivation ran (2 derived + 1 hand line).
@@ -35,13 +34,13 @@ mkdir -p "$sb/gamma-kit"
 printf 'g\n' > "$sb/gamma-kit/other.md"
 git -C "$sb" add -A
 git -C "$sb" commit -qm gamma
-out="$( cd "$sb" && GATE_SDK_KIT_DIRS="alpha-kit beta-kit gamma-kit" bash "$GATE" good.list 2>&1 )"; rc=$?
+out="$( cd "$sb" && GATE_SDK_KIT_DIRS="alpha-kit beta-kit gamma-kit" gate_run check-core-files "$CHECKS" good.list 2>&1 )"; rc=$?
 [[ "$rc" -eq 1 ]] || { echo "FAIL [new-root-reds]: expected exit 1, got $rc: $out"; fails=$((fails + 1)); }
 grep -qF 'missing:   gamma-kit/SPEC.md' <<<"$out" || { echo "FAIL [new-root-names]: $out"; fails=$((fails + 1)); }
 
 # An untracked expansion reds on the tracked half of the invariant, not just existence.
 printf 'u\n' > "$sb/gamma-kit/SPEC.md"
-out="$( cd "$sb" && GATE_SDK_KIT_DIRS="alpha-kit beta-kit gamma-kit" bash "$GATE" good.list 2>&1 )"; rc=$?
+out="$( cd "$sb" && GATE_SDK_KIT_DIRS="alpha-kit beta-kit gamma-kit" gate_run check-core-files "$CHECKS" good.list 2>&1 )"; rc=$?
 [[ "$rc" -eq 1 ]] || { echo "FAIL [untracked-reds]: expected exit 1, got $rc: $out"; fails=$((fails + 1)); }
 grep -qF 'untracked: gamma-kit/SPEC.md' <<<"$out" || { echo "FAIL [untracked-names]: $out"; fails=$((fails + 1)); }
 

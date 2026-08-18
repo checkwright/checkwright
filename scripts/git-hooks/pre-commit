@@ -189,8 +189,8 @@ if staged_matches '.github/workflows/*.yml' '.github/workflows/*.yaml' '.github/
     run_gate check-action-gh-repo env $'GATE_SDK_KNOB_GATE_PRUNE_DIRS=target\t.git\tnode_modules\t.tmp\tgate-tests\tworktrees' native/target/release/checkwright-gates check-action-gh-repo
 fi
 
-if staged_matches 'scripts/core-files.list' 'gate-sdk/SPEC.md' 'canon-kit/SPEC.md' 'context-kit/SPEC.md' 'delegation-kit/SPEC.md' 'doctrine-kit/SPEC.md' 'drift-kit/SPEC.md' 'evidence-kit/SPEC.md' 'guard-kit/SPEC.md' 'lifecycle-kit/SPEC.md' 'queue-kit/SPEC.md' 'site-kit/SPEC.md' 'gate-sdk/README.md' 'canon-kit/README.md' 'context-kit/README.md' 'delegation-kit/README.md' 'doctrine-kit/README.md' 'drift-kit/README.md' 'evidence-kit/README.md' 'guard-kit/README.md' 'lifecycle-kit/README.md' 'queue-kit/README.md' 'site-kit/README.md'; then
-    run_gate check-core-files gate-sdk/checks/check-core-files.sh
+if staged_matches 'scripts/core-files.list' 'gate-sdk/SPEC.md' 'canon-kit/SPEC.md' 'context-kit/SPEC.md' 'delegation-kit/SPEC.md' 'doctrine-kit/SPEC.md' 'drift-kit/SPEC.md' 'evidence-kit/SPEC.md' 'guard-kit/SPEC.md' 'lifecycle-kit/SPEC.md' 'queue-kit/SPEC.md' 'site-kit/SPEC.md' 'gate-sdk/README.md' 'canon-kit/README.md' 'context-kit/README.md' 'delegation-kit/README.md' 'doctrine-kit/README.md' 'drift-kit/README.md' 'evidence-kit/README.md' 'guard-kit/README.md' 'lifecycle-kit/README.md' 'queue-kit/README.md' 'site-kit/README.md' 'native/src/gates/core_files.rs' 'native/src/fresh.rs'; then
+    run_gate check-core-files env GATE_SDK_KNOB_GATE_SDK_CORE_FILES_FILE=scripts/core-files.list $'GATE_SDK_KNOB_GATE_KIT_ROOTS_REL=gate-sdk\tcanon-kit\tcontext-kit\tdelegation-kit\tdoctrine-kit\tdrift-kit\tevidence-kit\tguard-kit\tlifecycle-kit\tqueue-kit\tsite-kit' native/target/release/checkwright-gates check-core-files
 fi
 
 if staged_matches 'scripts/identity.conf'; then
@@ -356,7 +356,7 @@ if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md'; then
 fi
 
 if staged_matches '*.md' 'scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh'; then
-    run_gate check-measured-claim env $'GATE_SDK_KNOB_CANON_KIT_MEASURED_CLAIMS_CMD=bash scripts/measured-claims.sh' $'GATE_SDK_KNOB_CANON_KIT_MEASURED_SURFACE_GLOBS=CLAUDE.md\tREADME.md\tCONTRIBUTING.md\tCODE_OF_CONDUCT.md\tSECURITY.md\tRELEASING.md\tROADMAP.md\tTRAJECTORY.md\t*/SPEC.md\t*/README.md\treserve/*/README.md\tdoctrine-kit/DOCTRINE.md\tdocs/*.md\tdocs/*/index.md\tdocs/posts/*.md\t.claude/commands/*.md' GATE_SDK_KNOB_CANON_KIT_MEASURED_KEYS=ported-gate-members GATE_SDK_KNOB_CANON_KIT_MEASURED_VALUES=78 native/target/release/checkwright-gates check-measured-claim
+    run_gate check-measured-claim env $'GATE_SDK_KNOB_CANON_KIT_MEASURED_CLAIMS_CMD=bash scripts/measured-claims.sh' $'GATE_SDK_KNOB_CANON_KIT_MEASURED_SURFACE_GLOBS=CLAUDE.md\tREADME.md\tCONTRIBUTING.md\tCODE_OF_CONDUCT.md\tSECURITY.md\tRELEASING.md\tROADMAP.md\tTRAJECTORY.md\t*/SPEC.md\t*/README.md\treserve/*/README.md\tdoctrine-kit/DOCTRINE.md\tdocs/*.md\tdocs/*/index.md\tdocs/posts/*.md\t.claude/commands/*.md' GATE_SDK_KNOB_CANON_KIT_MEASURED_KEYS=ported-gate-members GATE_SDK_KNOB_CANON_KIT_MEASURED_VALUES=79 native/target/release/checkwright-gates check-measured-claim
 fi
 
 if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md' '.gitignore'; then
