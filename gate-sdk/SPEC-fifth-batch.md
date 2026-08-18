@@ -592,9 +592,14 @@ were allowed to fail loudly.
   row predates this cut. Owned by delta 8.
 - **gate-sdk/SPEC.md §check-gate-binary-fresh** — its documented positional form
   follows whatever delta 3's test rules for it. Owned by delta 3.
-- **delegation-kit/SPEC.md §Verify after every agent commit** and
-  **delegation-kit/README.md** — `check-gate-tamper`'s declaration path and its
-  documented `--fixture` invocation follow the port. Owned by deltas 3 and 11.
+- **delegation-kit/SPEC.md §Verify after every agent commit**, **§Testing**,
+  and **delegation-kit/README.md** — `check-gate-tamper`'s declaration path and
+  its documented `--fixture` invocation follow the port. `§Testing` is a
+  second, separate section naming the same invocation
+  ("fixture pair driven through `--fixture` by gate-sdk's `run-gate-tests.sh`")
+  that the tree carries and the original roster omitted — found by the align
+  audit grepping the tree for the literal rather than trusting this list.
+  Owned by deltas 3 and 11.
 - **evidence-kit/SPEC.md §check-evidence-manifest** — the pre-flight invocation it
   documents stops naming a declaration path. Owned by delta 5.
 - **canon-kit/SPEC.md §check-amendment-queue** — the member's own section records
