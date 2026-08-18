@@ -14,7 +14,6 @@ set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 SDK="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-GATE="$SDK/checks/check-gate-output.sh"
 
 fails=0
 TMP="$(mktemp -d)"
@@ -29,7 +28,7 @@ cat > "$TMP/consumer/check-vendored-sample.gate" <<'EOF'
 # spec: gate-sdk/SPEC.md §check-gate-output — the out-of-reach branch
 EOF
 
-out="$(cd "$TMP/consumer" && GATE_SDK_KIT_DIRS="$SDK" bash "$GATE" . 2>&1)"; rc=$?
+out="$(cd "$TMP/consumer" && GATE_SDK_KIT_DIRS="$SDK" gate_run check-gate-output "$SDK/checks" . 2>&1)"; rc=$?
 if [[ "$rc" -ne 0 ]]; then
     echo "  FAIL: a member whose crate is absent reddened (exit $rc) — every consumer's battery"
     printf '    %s\n' "$out"
@@ -58,7 +57,7 @@ fi
 cp -R "$TMP/consumer" "$TMP/binonly"
 mkdir -p "$TMP/binonly/native/target/release"
 : > "$TMP/binonly/native/target/release/checkwright-gates"
-out="$(cd "$TMP/binonly" && GATE_SDK_KIT_DIRS="$SDK" bash "$GATE" . 2>&1)"; rc=$?
+out="$(cd "$TMP/binonly" && GATE_SDK_KIT_DIRS="$SDK" gate_run check-gate-output "$SDK/checks" . 2>&1)"; rc=$?
 if [[ "$rc" -ne 0 ]]; then
     echo "  FAIL: a tree holding only the binary reddened (exit $rc) — the crate path is where"
     echo "        the artifact lands, so directory presence is not crate presence"
@@ -76,7 +75,7 @@ fi
 cp -R "$TMP/consumer" "$TMP/upstream"
 mkdir -p "$TMP/upstream/native/src/gates"
 printf '[package]\nname = "checkwright-gates"\n' > "$TMP/upstream/native/Cargo.toml"
-out="$(cd "$TMP/upstream" && GATE_SDK_KIT_DIRS="$SDK" bash "$GATE" . 2>&1)"; rc=$?
+out="$(cd "$TMP/upstream" && GATE_SDK_KIT_DIRS="$SDK" gate_run check-gate-output "$SDK/checks" . 2>&1)"; rc=$?
 if [[ "$rc" -ne 1 ]]; then
     echo "  FAIL: a crate present with no module for a dispatching member did not red (exit $rc)"
     printf '    %s\n' "$out"
@@ -95,7 +94,7 @@ fi
 cp -R "$TMP/consumer" "$TMP/gutted"
 mkdir -p "$TMP/gutted/native"
 printf '[package]\nname = "checkwright-gates"\n' > "$TMP/gutted/native/Cargo.toml"
-out="$(cd "$TMP/gutted" && GATE_SDK_KIT_DIRS="$SDK" bash "$GATE" . 2>&1)"; rc=$?
+out="$(cd "$TMP/gutted" && GATE_SDK_KIT_DIRS="$SDK" gate_run check-gate-output "$SDK/checks" . 2>&1)"; rc=$?
 if [[ "$rc" -ne 1 ]]; then
     echo "  FAIL: a crate whose gates module is absent did not red (exit $rc) — crate presence"
     echo "        must not be inferred from the module set it happens to carry"

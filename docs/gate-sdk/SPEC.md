@@ -6410,6 +6410,17 @@ change tracked on the queue rather than an adjustment available here.
 
 ### check-gate-output
 
+`checks/check-gate-output.gate` (`precommit`, binary-dispatched).
+
+**The optional `[gates-dir]` positional survives the port**, and the verdict is
+recorded because the batch that ported this member deleted an argument on
+another. It is consumed by the *rule* — it names the registry to read and the
+first resolve dir — rather than redirecting config `gate_command` has already
+resolved before the exec, which is the distinguishing test §The non-gate arm
+states. No other knob this member reads is derived from it, so a caller passing
+it gets one resolution rather than a mixed one; `check-kit-enum` ported the same
+shape ahead of it.
+
 Invariant: every `gates.list` member's source contains both a `: clean`
 success emission and a `help:` remedy line (the static half of the output
 contract). Presence is checked, not correctness — whether the clean line
