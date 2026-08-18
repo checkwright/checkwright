@@ -1,1 +1,1 @@
-EXEC-BIT: clean
+EXEC-BIT: clean (4 by-path-invoked script(s) at index mode 100755; 2 .gate descriptor(s) non-executable)

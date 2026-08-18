@@ -1,0 +1,3 @@
+# graph: couples=gate-sdk/lib/gate.sh,canon-kit/lib/gate.sh dir=one valve=none tier=precommit
+# no-fixture: fixture descriptor (scanned as text): a .gate-dispatched member whose couples= hand-lists two kit roots for one glob, complete because no other kit root carries a tracked lib/gate.sh
+# spec: gate-sdk/SPEC.md §check-kit-enum — the manifest is read off whichever spelling resolved, so a descriptor's hand list is grouped exactly as a script's is

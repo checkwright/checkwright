@@ -1,4 +1,7 @@
 # Fixture registry: check-sample hand-lists only two kit roots for the *.sh
 # suffix while other kit roots carry matching tracked files — the drift the
-# kit:*.sh token closes — so check-kit-enum must REJECT.
+# kit:*.sh token closes — so check-kit-enum must REJECT. check-native-sample is
+# a complete .gate-declared group beside it, so the descriptor arm runs on the
+# rejecting case too and the finding named below is check-sample's alone.
 check-sample
+check-native-sample

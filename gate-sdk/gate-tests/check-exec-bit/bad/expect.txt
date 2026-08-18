@@ -1,1 +1,2 @@
-not committed executable
+.gate descriptor(s) committed executable
+alpha-kit/checks/check-descriptor.gate (index mode 100755)

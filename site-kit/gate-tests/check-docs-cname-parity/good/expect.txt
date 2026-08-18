@@ -1,1 +1,1 @@
-DOCS-CNAME-PARITY: clean
+DOCS-CNAME-PARITY: clean (6 tracked file(s) under .; no alias but the docs host 'apex.example' cited in a URL)

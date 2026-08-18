@@ -1,3 +1,6 @@
-# Fixture registry: check-sample couples the kit surface through the kit:*.sh
-# token — no literal per-kit hand list — so check-kit-enum must ACCEPT.
+# Fixture registry (scanned as text, never executed): check-sample couples the
+# kit surface through the kit:*.sh token — no literal per-kit hand list — and
+# check-native-sample is a .gate descriptor whose two-root hand list for one
+# glob is complete. check-kit-enum must ACCEPT.
 check-sample
+check-native-sample

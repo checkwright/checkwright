@@ -1,5 +1,6 @@
-# Point the gate at this fixture's synthetic tree, CNAME, and alias config. It
-# cites the apex host plus alias URLs, but every alias URL sits under an exempt
-# path class (*docs/posts/* immutable posts, */gate-tests/* fixtures). The gate
-# must PASS.
-tree tree/CNAME site-config.sh
+# No positional: the gate takes its DEFAULT whole-tree arm — SITE_KIT_SCAN_ROOT
+# resolves to "." and SITE_KIT_CNAME to docs/CNAME, both through the config
+# bridge, from this case dir. The corpus is therefore every tracked file of this
+# case, declaration paths included, which is the criterion-4 exposure that arm
+# creates and the reason it needs a case at all. The alias URLs sit under the
+# pruned and the exempt path classes, so the gate must PASS.

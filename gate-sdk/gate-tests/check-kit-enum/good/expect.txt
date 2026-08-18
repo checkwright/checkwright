@@ -1,1 +1,1 @@
-KIT-ENUM: clean
+KIT-ENUM: clean (1 multi-kit hand-list group(s) complete; kit:<glob> keeps them so)
