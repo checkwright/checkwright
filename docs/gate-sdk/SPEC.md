@@ -1210,6 +1210,22 @@ design time; the last three were paid for, and each is named with what it cost.
    time, with delta (9)'s standing limit: it proves the two agree then, and
    nothing machine-held keeps them agreeing after, which is why the shell
    original is deleted for a ported member rather than left running beside it.
+
+   **The second worked instance is usefully different, and the contrast is the
+   part to read.** The first is a member with *no* static representation at all.
+   `check-memory-off` **had** a pair — what it lacked was a pair that reached the
+   ported derivation, because its `--fixture <dir>` arm redirected every path a
+   knob already redirected and so drove a second code path the live arm never
+   took. The discharge there is therefore in two halves: the arm is **deleted**
+   and the pair re-pointed onto the knobs, which fixes the half a fixture can
+   fix, and the scenario covers only the residue — the default derivation, whose
+   corpus is the harness memory dir under `HOME`. Stated so a later member does
+   not cite this as licence to replace a feasible pair with a scenario: where a
+   pair *can* reach the derivation, making it do so is the discharge and the
+   scenario is what is left over. Such a scenario may also carry an arm that
+   cannot be compared at all — one **retired** by the port rather than proved
+   equal — and recording it as retired is what keeps the run's verdict from
+   reading as a clean sweep it did not have.
 3. **`tier=precommit`** — it lands in the generated hook, so a green
    `check-graph` after the port is end-to-end proof the manifest survived the
    substrate change.
@@ -1870,7 +1886,11 @@ fixture arm bypasses the derivation being ported has no parity oracle for the
 part that matters, which is criterion 4's self-referential-parity hazard arriving
 through another door. (It also word-splits an override into multiple globs and
 reads four knobs — the weaker ground, recorded second so resting on it does not
-leave the stronger one unwritten.) `check-action-run-shell` is the near miss and
+leave the stronger one unwritten.) **That exclusion is spent**: §The third budget
+batch took the discharge it named — the redundant arm deleted, the pair
+re-pointed onto the knobs, and a constructed scenario over the residue. The
+record of why it stood stays, because what changed is that the discharge arrived,
+not that the ground was wrong. `check-action-run-shell` is the near miss and
 is criterion 7's own case, above.
 
 **The next cohort is the largest set of criteria-clearing gates sharing one
@@ -2522,6 +2542,114 @@ pre-descriptor tree — a corpus the port then changes. Its verdict is recorded 
 **no disagreement found on the pre-descriptor tree**, never as parity proved; the
 edge-root arm keeps its own separate value, and here it earned it, catching a
 path-construction disagreement no relative-root case could reach.
+
+### The third budget batch
+
+**Composed by budget again, and the precondition read clean on its face this
+time.** `bash gate-sdk/bin/port-blockers.sh --group` read every group a singleton
+at the 2026-08-18 cut, which is the budget arm's stated precondition, so the
+increment is a hand-composed batch rather than a cohort. The batch is not one
+unit of work and was not merged, recorded or argued as one: each member took its
+own descriptor, its own registry entry, its own parity run and its own deletion.
+Under the arm's record-only-findings rule this section carries the cut's findings
+and no member roster — membership is derivable from the tree and the count from
+`scripts/measured-claims.sh`.
+
+**A member was admitted on the wrong criterion, and correcting the record is the
+first finding.** The prior cut admitted `check-memory-off` on a criterion-7
+argument: its `jq` use is a path query the already-ported `check-settings-pins`
+performs on the same grammar, so the design criterion 7 demands is paid. That
+argument is true and it answers a criterion this member was never held on — §The
+first cohort, and the rule that selects the next and §The settings cohort, and the
+crate's first dependency both hold it on **criterion 2**, and the latter
+adjudicates the point directly: *its blocker is the oracle, not the dependency*.
+Retiring `jq` could therefore not retire the hold. Recorded because a member
+admitted on the wrong criterion reads, to the next selector, as evidence that the
+criterion was satisfied.
+
+**The second code path criterion 2 named was redundant, and nothing in the record
+had noticed.** The shell form's live arm resolved three paths from three knobs;
+its `--fixture <dir>` arm resolved the same three from a directory. **Every path
+the fixture arm redirected, a knob already redirected**, so the arm bought a
+shorter spelling and paid for it with the divergent code path that was the whole
+of the criterion-2 finding. Deleting the arm is what dissolves the hold rather
+than working around it, and it is flagged as an interface removal rather than
+folded into an implementation note: `--fixture` was a documented flag on a
+governed surface. The pair is **kept** and re-pointed onto the knobs — a port that
+had dropped it along with the arm would have found that out at
+`check-gate-fixture-coverage` — and it stops being vacuous, because it now drives
+the code path the live battery drives.
+
+**The residue took the constructed scenario, and its verdict is recorded here
+because a verdict that outlives its session is a verdict nobody wrote down.** The
+one derivation no in-tree case can reach is the **default** memory dir, which the
+harness names under `HOME` from the repo toplevel. A throwaway `HOME` with that
+layout beneath it, both implementations run over the same state, bytes and exit
+codes compared: **nine cases, byte-identical on stdout, stderr and exit code** —
+memory dir absent, holding only `.gitkeep`, holding a regular file; local settings
+absent, on-pin, off-pin, and explicitly `null`; and a word-split multi-glob
+override in a clean and a polluted state, which is the "weaker ground" the earlier
+record placed second and which no single-dir case reaches. **One arm was not
+compared and is recorded as retired rather than proved equal:** the shell failed
+closed when a local settings file was present and `jq` absent, and the ported
+member reads JSON itself, so that branch has no counterpart to be equal to.
+
+**Re-using the crate's JSON layer exposed two semantic divergences, and both are
+named rather than discovered later.** `native/src/json.rs`'s `Path::compile`
+accepts every construct the pins grammar permits, but re-use is not substitution.
+*(a)* Comparison becomes **structural**: the shell compared `jq -c`'s compact
+output against the manifest's right-hand side by raw string equality, so `1` and
+`1.0` compared unequal; the manifest declares expected JSON rather than an
+expected byte form, and `check-settings-pins` already reads it that way, so
+keeping string equality would have left this member and its sibling disagreeing
+about one grammar.
+*(b)* Null handling is **opposite**, and `settings_pins.rs`'s branch must not be
+re-used verbatim: `check-memory-off` silently skips a null actual, because a null
+means the local file sets no override for that key, while `settings_pins.rs`
+treats a null as a fail-closed absent pin — correct for the tracked file it reads
+and a correctness regression here, since it would red every tree whose local
+settings simply omit a pinned key. The ported member re-uses `Path::compile`,
+`eval` and `values_equal` and supplies its own null disposition; the scenario
+carries a case for it, so the distinction is checkable rather than asserted.
+
+**The jq dividend, and the boundary no reader may take it past.**
+`port-blockers.sh`'s criterion-7 report over the scanned members named
+`check-memory-off` the battery's only remaining `jq` consumer, so the port
+subtracts `jq` from **the gate battery's** dependency floor, against
+TRAJECTORY.md objective 1. It retires `jq` from nothing else: `installer/lib/`
+shells to it on the shipped install path and refuses naming the program where it
+is absent (installer/README.md §Requirements), and guard-kit, the delegation-kit
+templates, drift-kit and `scripts/` carry their own uses. *"The batch retires
+jq"* is false in every direction but the battery's — §The settings cohort's
+honest-claim paragraph is the model this one is written to.
+
+**A member that produced no finding still owes its reckoning, or the batch's
+silence reads as coverage.** `check-root-tiering` ported with none: every
+primitive it needs was already in the crate, and its hermetic pair carries its own
+allowlist, scan root and both positionals, so unlike its batch-mate's it is a
+genuine parity oracle and the port needed no scenario beside it. Its seam holds
+too — the built-in fallback set is generic orientation plus two configured knobs,
+so nothing consumer-shaped crossed into the crate, and the allowlist proper stays
+optional consumer config on the `graph-vocab.sh` pattern.
+
+**One consumer shelled to a deleted path directly, and no listed gate would have
+caught it.** `context-kit/smoke/agents-md.sh` invoked `check-root-tiering.sh` by
+literal path against a *second*, unrelated throwaway repo — found by grepping the
+tree rather than by a red, since neither `check-docs-cmd` nor `check-md-refs`
+scans a `smoke/*.sh` script. The failure mode would have been a hard
+"No such file or directory" crash the first time that smoke ran, not a
+diagnosable message. Both call sites re-point onto `gate_command`, resolved
+against the vendored tree rather than the throwaway repo's cwd. Recorded because
+the general lesson is not about this smoke: **a port's Point-5 reader enumeration
+covers gates, and a direct shell-out from a non-gate script is outside every one
+of them.**
+
+**Assertion C was re-run fresh after both descriptors landed**, on the rule §The
+first budget batch established — a port moves a declaration path, which can move
+*other* members into or out of the derived substrate-sensitive set, so the reading
+is never inherited from an earlier cut. Verdict: §Meta-gate conservation for the
+binary substrate gains no row, neither member's `couples=` reaching a gate
+declaration path.
 
 ### The canon-kit `spec_manifest_files` cohort
 
@@ -3207,6 +3335,9 @@ the harness memory directory under `HOME` and is not in the tree at all, so the
 pair proves nothing about the part being ported. What it owes is criterion 2's
 **constructed-scenario** discharge, and that is the cohort taking it. Its blocker
 is the oracle, not the dependency, so this cohort's reader does not unblock it.
+(§The third budget batch is the cohort that took it, and this clause is why it
+had to: retiring `jq` could not have retired the hold, so the discharge is what
+paid for the member and the reader it inherits from here is the dividend.)
 `check-installer-no-deps` is **excluded with cause**: as the first
 `scripts/`-declared gate to enter `native/` it would drag in the tranche's
 unanswered first-mover questions — whether a consumer-declared member earns a
@@ -3219,7 +3350,8 @@ exclusion does not rest on it.
 
 **The honest claim about `jq`, which is the one this cohort must not overstate.**
 After the cohort, `jq` is retired from the battery **but for those two members**,
-both with named owners. It is **not** retired from the shipped install path at
+both with named owners; after §The third budget batch, but for
+`check-installer-no-deps` alone. It is **not** retired from the shipped install path at
 all — `installer/lib/` shells to it. *"The cohort retires jq"* is false in both
 directions. On a machine without it the verbs **refuse, naming the program**
 (installer/README.md §Requirements); silent degradation on that path was
@@ -7681,6 +7813,7 @@ and re-stages a KPI at `100644` then `100755`, exercising the live
 
 ### check-root-tiering
 
+`checks/check-root-tiering.gate` (hermetic, `precommit`, binary-dispatched).
 Invariant: every tracked top-level entry of the scanned tree (`git ls-files`
 first-segment set; scan root is the optional second argument, default `.`) is
 covered by an allowlist entry — an exact name or a glob (`SPEC-*.md`). The repo

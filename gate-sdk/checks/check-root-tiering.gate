@@ -1,0 +1,3 @@
+# graph: couples=scripts/root-allowlist.list dir=one valve=none tier=precommit
+# install: on-surface
+# spec: gate-sdk/SPEC.md §check-root-tiering — the repo root holds only allowlisted orientation entries; workflow machinery stays under the configured dirs

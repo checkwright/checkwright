@@ -1,0 +1,3 @@
+# graph: couples=scripts/settings-pins.conf dir=one valve=none tier=precommit trigger=*
+# install: on-surface
+# spec: context-kit/SPEC.md §check-memory-off — local-environment scan: the per-project harness memory dir stays empty and no local settings override re-enables a pinned key

@@ -434,6 +434,66 @@ fn expand(base: &Path, comps: &[&str], out: &mut Vec<PathBuf>) -> Result<(), Str
     Ok(())
 }
 
+// spec: context-kit/SPEC.md §check-memory-off — bash pathname expansion of one word, over
+// entries of *any* kind rather than files only, existence-filtered: a metacharacter-free word
+// expands to itself, so one filter covers that branch and the globbed one as `[[ -e ]]` did.
+// spec: gate-sdk/SPEC.md §check-reads-couples — like `glob_files` it resolves corpus roots
+// rather than reading a corpus, so directories opened while expanding are not noted to the
+// recorder; the caller's own walk of each resolved root is what unit test A observes.
+pub fn glob_entries(pattern: &str) -> Vec<String> {
+    if pattern.is_empty() {
+        return Vec::new();
+    }
+    if !has_meta(pattern) {
+        return if Path::new(pattern).exists() {
+            vec![pattern.to_string()]
+        } else {
+            Vec::new()
+        };
+    }
+    let comps: Vec<&str> = pattern.split('/').filter(|c| !c.is_empty()).collect();
+    let anchor = if pattern.starts_with('/') { "/" } else { "" };
+    let mut out: Vec<String> = Vec::new();
+    expand_entries(anchor, &comps, &mut out);
+    out.sort();
+    out
+}
+
+fn glob_join(prefix: &str, name: &str) -> String {
+    match prefix {
+        "" => name.to_string(),
+        "/" => format!("/{}", name),
+        p => format!("{}/{}", p, name),
+    }
+}
+
+fn expand_entries(prefix: &str, comps: &[&str], out: &mut Vec<String>) {
+    let Some((head, rest)) = comps.split_first() else {
+        if !prefix.is_empty() && Path::new(prefix).exists() {
+            out.push(prefix.to_string());
+        }
+        return;
+    };
+    if !has_meta(head) {
+        expand_entries(&glob_join(prefix, head), rest, out);
+        return;
+    }
+    let dir = if prefix.is_empty() { "." } else { prefix };
+    let Ok(rd) = fs::read_dir(dir) else { return };
+    let mut names: Vec<String> = Vec::new();
+    for ent in rd.flatten() {
+        if let Some(n) = ent.file_name().to_str() {
+            names.push(n.to_string());
+        }
+    }
+    names.sort();
+    for n in names {
+        if match_component(head, &n) {
+            expand_entries(&glob_join(prefix, &n), rest, out);
+        }
+    }
+}
+
 // spec: gate-sdk/SPEC.md §Fail-closed contract — bash's `[[ -r "$d" && -x "$d" ]]` on a
 // directory, answered by attempting the open. It enumerates nothing into a corpus, so it is
 // deliberately not noted to the recorder unit test A observes through.

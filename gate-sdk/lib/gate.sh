@@ -53,6 +53,9 @@ unset _gpx
 # directory, off GATE_SDK_GATES_DIR's own resolved default above rather than the not-yet-defined
 # gate_sdk_gates_dir, so the two stay one value by construction rather than by two readers agreeing
 [[ -v GATE_SDK_HOOKS_DIR ]] || GATE_SDK_HOOKS_DIR="$GATE_SDK_GATES_DIR/git-hooks"
+# spec: gate-sdk/SPEC.md §check-root-tiering — the same resolution for that member's two remaining knobs, on the cause the four above already state: a knob no kit library defines is the bridge's third refusal, so the defaults could not stay inline in a check that dispatches to the binary. The allowlist default rides GATE_SDK_GATES_DIR's own resolved value above rather than the not-yet-defined gate_sdk_gates_dir, so the two stay one value by construction; an absent allowlist is the gate's own built-in-fallback branch, not a refusal, which is why defaulting a path that need not exist is safe here.
+[[ -v GATE_SDK_ROOT_ALLOWLIST ]] || GATE_SDK_ROOT_ALLOWLIST="$GATE_SDK_GATES_DIR/root-allowlist.list"
+[[ -v GATE_SDK_AGENT_FILE ]] || GATE_SDK_AGENT_FILE="CLAUDE.md"
 
 gate_find() {
     local prune=() d

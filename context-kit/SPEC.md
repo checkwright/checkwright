@@ -786,10 +786,9 @@ crate's first dependency), which retired the requirement for this member and its
 sibling by taking a JSON reader into the crate rather than by hand-rolling a
 parser to dodge a dependency — the outcome this paragraph predicted when it said
 one parsing story for the settings file is worth more than the criterion. `jq`
-remains required by `check-memory-off` (held on criterion 2) and
-`check-installer-no-deps` (excluded with cause), so it is retired from the battery
-for these two members and not from the battery outright, and not from the shipped
-install path at all.
+remains required by `check-installer-no-deps` alone (excluded with cause) now that
+`check-memory-off` has taken the same reader, so it is retired from the battery
+but for that one member, and not from the shipped install path at all.
 
 **The gate is not the prune.** It reads the settings file and writes nothing,
 but it reds the moment it registers on a tree carrying stranded entries, and the
@@ -798,10 +797,10 @@ landing order is therefore fixed: the operator prunes, then the gate registers.
 
 ## check-memory-off
 
-`checks/check-memory-off.sh` (local-environment class, the check-identity
-precedent) scans the operator's machine, not the tree — its `# graph:`
-manifest couples the pins file it reads and triggers on `*`, because the
-surfaces it guards (the memory dir and the untracked local settings) never
+`checks/check-memory-off.gate` (local-environment class, binary-dispatched, the
+check-identity precedent) scans the operator's machine, not the tree — its
+`# graph:` manifest couples the pins file it reads and triggers on `*`, because
+the surfaces it guards (the memory dir and the untracked local settings) never
 stage. Two red conditions:
 
 - the harness's per-project memory dir holds content — any regular file that
@@ -814,8 +813,33 @@ stage. Two red conditions:
 scan; its default derives the current project's dir from the harness layout
 (§Layout and configuration). CI-neutral: where the surface is absent the gate
 is clean, and the clean line states the fail-open caveat — an absent dir
-proves nothing about another clone. It fails closed only when it cannot read
-what is present to check: a local settings file with no `jq`.
+proves nothing about another clone.
+
+**It has one arm, and the knobs are it.** The `--fixture <dir>` arm the shell
+form carried is deleted: every path it redirected — the scanned dirs, the pins
+manifest, the local settings file derived from `CONTEXT_KIT_SETTINGS_FILE` by
+swapping `.json` for `.local.json` — a knob already redirects, so the arm bought
+a shorter spelling and paid for it with a second code path that never drove the
+derivation being checked. The pair and `check-memory-off.test.sh` reach the gate
+through the three knobs instead, which is what makes them a parity oracle for the
+live arm rather than for a fixture-only one.
+
+**Comparison is structural and a null actual is a skip**, and the two are
+recorded because they part company with `check-settings-pins` over one manifest.
+The pins file declares *expected JSON*, not an expected byte form, so `1` and
+`1.0` are one value here as they already are there; a right-hand side that is not
+JSON cannot be compared structurally at all and is skipped on this member's one
+disposition for a pin it cannot read — that same line of that same manifest is
+what the sibling gate fail-closes on, so the condition is graded, not lost. A
+path evaluating to **null**, by contrast, is this gate's ordinary clean case: the
+local file simply sets no override for that key. `check-settings-pins` reads a
+null as an absent pin and refuses, which is right for the tracked file it reads
+and would be a correctness regression here, reddening every clone whose local
+settings merely omit a pinned key.
+
+Fail-closed (exit 2) when it cannot read what is present to check: a local
+settings file that is unreadable or not valid JSON, a memory dir it cannot walk,
+or a `HOME` it cannot read when the default derivation is the one in play.
 
 ## check-footprint-fresh
 
@@ -862,7 +886,7 @@ context-kit/
   checks/check-brevity.gate      # hermetic, binary-dispatched: the budgeted section's over-budget pointer bullets
   checks/check-settings-pins.gate  # hermetic, binary-dispatched: pins hold against the settings file
   checks/check-settings-paths.gate # hermetic, binary-dispatched: literal .sh grants resolve in the tree
-  checks/check-memory-off.sh     # local-environment: memory dir + local overrides
+  checks/check-memory-off.gate   # local-environment, binary-dispatched: memory dir + local overrides
   checks/check-footprint-fresh.gate # hermetic, binary-dispatched: docs/footprint.md byte-fresh vs the emitter it calls in-process
   gate-tests/check-brevity/{good,bad}/
   gate-tests/check-settings-pins/{good,bad}/
@@ -920,9 +944,15 @@ member receives its knobs this way whatever the binary carries.
 than a style.** A bridged value is baked verbatim into the tracked pre-commit
 hook, so an absolute path would pin one clone's layout into a committed artifact.
 The one knob whose natural value *is* absolute — `CONTEXT_KIT_MEMORY_DIRS`,
-naming a harness directory under `HOME` — defaults to empty and is derived
-lazily by `context_memory_dir_default()` at its one reader, which also keeps a
-`git` subprocess off the path of every unrelated knob resolution.
+naming a harness directory under `HOME` — defaults to **empty**, and the empty
+value means "derive it" rather than "no dir": the derivation belongs to the one
+member that reads the knob (`native/src/gates/memory_off.rs`), which folds `/`
+and `.` to `-` in the repo toplevel exactly as the harness names each project's
+dir. Deriving it lazily at that reader is also what keeps a `git` subprocess off
+the path of every unrelated knob resolution. The shell library once carried the
+derivation as `context_memory_dir_default()`; it left with the shell gate that
+was its only caller, so the layout rule has one implementation rather than two
+agreeing ones.
 
 - `CONTEXT_KIT_SURFACES` — array of always-loaded files; default
   `("CLAUDE.md")`. The measured surface is agent-file-name-agnostic: a consumer
@@ -1027,10 +1057,13 @@ projection is gated rather than runner-tested: `check-footprint-fresh` byte-hold
 `check-memory-off`, and `check-footprint-fresh` are gates and carry the standard
 fixture pair; the footprint pair drives the hermetic two-argument mode
 (`<projection> <emit>`), the `check-trajectory-fresh` precedent. Both
-memory-off gates take a `--fixture <dir>` injection (the check-identity
-precedent): the settings-pins pair reads `<dir>/settings.json` against
-`<dir>/settings-pins.conf`; the memory-off pair scans `<dir>/memory` for
-content. Three direct unit tests hold the axes the pairs fix and so cannot
+memory-off pairs reach their subject differently, and the difference is the
+point: the settings-pins pair takes a `--fixture <dir>` injection (the
+check-identity precedent) reading `<dir>/settings.json` against
+`<dir>/settings-pins.conf`, while the memory-off pair drives
+`CONTEXT_KIT_MEMORY_DIRS` from its own case-dir config, because that member's
+fixture arm was deleted for being a code path its live arm never took.
+Three direct unit tests hold the axes the pairs fix and so cannot
 express: `check-brevity.test.sh` holds the unmatched-section resolution (the
 pair fixes `CONTEXT_KIT_BREVITY_SECTION` at the stock default and always
 supplies a file carrying it, so neither case can express a section that

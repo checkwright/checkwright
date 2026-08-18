@@ -38,7 +38,8 @@
   other two comparators need no such pairing — both are already native.
   **The batch, and it is never one unit of work:** `check-memory-off` (89 shell lines) and
   `check-root-tiering` (67), each taking its own descriptor, registry entry and parity run, either
-  droppable without touching the other or the spine.
+  droppable without touching the other or the spine. **Delivered 2026-08-18 at build**, its
+  findings at gate-sdk/SPEC.md §The third budget batch.
   **The adjudication that admits `check-memory-off` — corrected at spec 2026-08-18, and recorded
   so a later selector does not re-make the error.** This cut justified the member on criterion 7,
   and that premise is wrong: gate-sdk/SPEC.md holds it on **criterion 2** (§The first cohort, §The
@@ -113,7 +114,13 @@
   2026-08-18 at spec for `check-roadmap-fresh`'s port, leaving `check-tree-terms` and the
   `# port-until:` spelling as the entry's remaining work.
 
-- **native-gate-port-remaining-corpus** [spec: SPEC-third-batch.md] [roadmap: now/reliability]
+
+
+## Technical Debt
+
+## Deferred
+
+- **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
   — the whole battery onto the binary, and the shell surface down to its residue.
   roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
   The entry stays deferred rather than moving to `## Done`: it is the **whole corpus**, the
@@ -128,25 +135,23 @@
   rule.
   **The scope, both install paths and the bootstrap residue are TRAJECTORY.md §PRIORITY
   DIRECTIVE's**, not restated; designing the bootstrap is still this unit's work. **Two objections
-  answered:** wall-clock is the weaker case (battery under 6% of validate — the win is retiring the
-  shell *sources* the payload carries), and the toolchain-free arm rides the pre-compiled path, not
-  retained shell gates; `powershell-installer-surface` shrinks to the bootstrap for the same reason.
-  **Twelve cohorts closed, plus two budget batches; gate-sdk/SPEC.md §The first cohort, and
+  answered:** wall-clock is the weaker case (the win is retiring the shell *sources* the payload
+  carries), and the toolchain-free arm rides the pre-compiled path, so
+  `powershell-installer-surface` shrinks to the bootstrap for the same reason.
+  **Twelve cohorts closed, plus three budget batches; gate-sdk/SPEC.md §The first cohort, and
   the rule that selects the next is canonical for every one of them** — members, delivered
   counts, holds, grounds and each batch or cohort's own price live there, so this entry states
   what remains rather than restating them. From the eighth on, members are **selected by
-  running** `port-blockers.sh --group`; the size arm ran exhausted for three increments, then
-  selected the twelfth cohort, then read exhausted again at this cut, no blocker-retiring
-  override surviving the keyed-knob bridge; the budget arm composes a batch only when no group
-  is takeable. **71 of 104 ported; the rest splits into permanently-shell and owed**
-  — a dated 2026-08-17 oracle read (`bash gate-sdk/bin/port-blockers.sh --group`'s trailer, which
+  running** `port-blockers.sh --group`; the size arm read exhausted again at this cut, so the
+  budget arm composed the batch, as it does only when no group is takeable.
+  **73 of 104 ported; the rest splits into permanently-shell and owed**
+  — a dated 2026-08-18 oracle read (`bash gate-sdk/bin/port-blockers.sh --group`'s trailer, which
   `scripts/measured-claims.sh` emits as `ported-gate-members`), never a count this line holds.
   What the eleventh cohort and the budget batches leave owed here is the unported freshness
   emitters, whose roster `freshness-emitter-port-cohort` owns — a count copied here drifted once.
-  The second budget batch's phantom-pair adjudication is canonical at gate-sdk/SPEC.md §The second
-  budget batch, with the criterion-3 and criterion-4 readings it produced.
-  **The 2026-08-18 cut is ruled and recorded on `freshness-emitter-port-cohort`**: the freshness
-  triple as spine, plus a two-member budget batch, `--group` having read every group a singleton.
+  Each batch's adjudications are canonical at its own gate-sdk/SPEC.md section; the third
+  delivered `check-memory-off` and `check-root-tiering`. The 2026-08-18 cut itself is ruled and
+  recorded on `freshness-emitter-port-cohort`: the freshness triple as spine, plus that batch.
   Every held member is **sequencing with port work owed, never exclusion**, and what each owes
   is on `cohort-held-members-port-prerequisites`, which owns the roster and the kits it spans;
   a kit count copied here would be a second one to drift, and was.
@@ -162,13 +167,8 @@
   direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope. Since then it is
   promoted at spec and demoted at build **once per increment** — a cohort, or a budget batch on
   the arm gate-sdk/SPEC.md §Porting a gate to the binary substrate owns — always a **demotion**;
-  promoted 2026-08-18 at spec for the third budget batch.
-
-
-
-## Technical Debt
-
-## Deferred
+  promoted 2026-08-18 at spec for the third budget batch and demoted again 2026-08-18 at build
+  having delivered it.
 
 - **born-native-omission-accumulation** [design-pending] — the born-native flip attaches
   criterion 5's omission to every future gate, and nothing measures the pile.

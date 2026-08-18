@@ -28,7 +28,7 @@ unset _ck_cfg
     || CONTEXT_KIT_SETTINGS_FILE=".claude/settings.json"
 [[ -v CONTEXT_KIT_SETTINGS_PINS ]] || CONTEXT_KIT_SETTINGS_PINS="${GATE_SDK_GATES_DIR:-scripts}/settings-pins.conf"
 
-# spec: context-kit/SPEC.md §check-memory-off — empty means "derive it", not "no dir": the harness names each project's dir from an absolute path this library must not compute on every knob resolution, so the default stays lazy and its owner is the function below
+# spec: context-kit/SPEC.md §check-memory-off — empty means "derive it", not "no dir": the harness names each project's dir from an absolute path this library must not compute on every knob resolution, so the default stays lazy and its owner is the gate that reads it
 [[ -v CONTEXT_KIT_MEMORY_DIRS ]] || CONTEXT_KIT_MEMORY_DIRS=""
 
 [[ -v CONTEXT_KIT_BREVITY_FILE ]] || CONTEXT_KIT_BREVITY_FILE="CLAUDE.md"
@@ -41,14 +41,6 @@ declare -p CONTEXT_KIT_SURFACES >/dev/null 2>&1 || CONTEXT_KIT_SURFACES=("CLAUDE
 [[ -v CONTEXT_KIT_BASELINE_FILE ]] || CONTEXT_KIT_BASELINE_FILE="${GATE_SDK_WORKFLOW_DIR:-.workflow}/always-loaded-baseline.txt"
 
 [[ -v CONTEXT_KIT_ENV_PROFILE_FILE ]] || CONTEXT_KIT_ENV_PROFILE_FILE="ENV.local.md"
-
-# spec: context-kit/SPEC.md §Layout and configuration — the harness names each project's dir by its absolute path with '/' and '.' folded to '-'; a function because the layout moves (the plugin-marketplace ruling) and because the value costs a subprocess no knob resolution should pay
-context_memory_dir_default() {
-    local top
-    top="$(git rev-parse --show-toplevel 2>/dev/null)" || return 0
-    [[ -n "$top" ]] || return 0
-    printf '%s/.claude/projects/%s/memory\n' "$HOME" "$(printf '%s' "$top" | tr '/.' '-')"
-}
 
 _ck_errs=()
 [[ -n "$CONTEXT_KIT_SETTINGS_FILE" ]] || _ck_errs+=("CONTEXT_KIT_SETTINGS_FILE is empty")

@@ -114,12 +114,24 @@ git -C "$RT" init -q
 : > "$RT/README.md"; : > "$RT/AGENTS.md"
 git -C "$RT" add -A
 git -C "$RT" -c user.email=smoke@example.invalid -c user.name=smoke commit -q -m seed
-rt_ok="$( ( cd "$RT" && GATE_SDK_AGENT_FILE="AGENTS.md" bash "$SCRATCH/gate-sdk/checks/check-root-tiering.sh" ) 2>&1 )"; rc=$?
+# spec: gate-sdk/SPEC.md §run-gate-tests — the dispatch is resolved once against the *vendored*
+# tree, whose knobs and binary are the consumer's, then run from the orientation repo: a literal
+# checks/<gate>.sh path would name a substrate the port has moved, and resolving there no config.
+rt_bin="$(gate_native_bin)"
+[[ "$rt_bin" == /* ]] || rt_bin="$SCRATCH/$rt_bin"
+rt_dispatch="$( cd "$SCRATCH" && GATE_SDK_AGENT_FILE="AGENTS.md" GATE_SDK_NATIVE_BIN="$rt_bin" \
+    bash -c 'source gate-sdk/lib/gate.sh; gate_command check-root-tiering gate-sdk/checks' )" \
+    || fail "could not resolve check-root-tiering's dispatch in the vendored tree"
+rt_argv=()
+mapfile -t rt_argv <<<"$rt_dispatch"
+[[ ${#rt_argv[@]} -gt 0 ]] || fail "check-root-tiering resolves to nothing in the vendored tree"
+
+rt_ok="$( ( cd "$RT" && "${rt_argv[@]}" ) 2>&1 )"; rc=$?
 [[ "$rc" -eq 0 ]] || fail "check-root-tiering rejected an orientation-clean AGENTS.md root: $rt_ok"
 
 : > "$RT/CLAUDE.md"
 git -C "$RT" add CLAUDE.md
-rt_stray="$( ( cd "$RT" && GATE_SDK_AGENT_FILE="AGENTS.md" bash "$SCRATCH/gate-sdk/checks/check-root-tiering.sh" ) 2>&1 )"; rc=$?
+rt_stray="$( ( cd "$RT" && "${rt_argv[@]}" ) 2>&1 )"; rc=$?
 [[ "$rc" -ne 0 ]] || fail "check-root-tiering accepted a stray second agent file (CLAUDE.md beside AGENTS.md)"
 grep -qF "CLAUDE.md" <<<"$rt_stray" || fail "check-root-tiering rejected the wrong entry (expected the stray CLAUDE.md): $rt_stray"
 

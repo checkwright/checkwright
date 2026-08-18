@@ -9,7 +9,6 @@ set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # context-kit/
-GATE="$DIR/checks/check-memory-off.sh"
 SANDBOX="$(mktemp -d)"
 trap 'rm -rf "$SANDBOX"' EXIT
 
@@ -19,14 +18,25 @@ mkdir -p "$SANDBOX/memory"   # clean memory dir — isolates the override axis
 cat >"$SANDBOX/settings-pins.conf" <<'EOF'
 .autoMemoryEnabled = false
 EOF
+# spec: context-kit/SPEC.md §check-memory-off — the local file's path is derived from the
+# settings knob, and the knob's own set-ness contract makes an explicitly-set missing path a
+# refusal, so the tracked sibling has to exist for the untracked one to be reachable at all
+printf '{}\n' >"$SANDBOX/settings.json"
 
 check_case() {  # $1=label  $2=want-rc  $3=want-substring  $4=settings.local.json body ("" = absent)
     local label="$1" want="$2" sub="$3" body="$4"
     rm -f "$SANDBOX/settings.local.json"
     [[ -n "$body" ]] && printf '%s\n' "$body" >"$SANDBOX/settings.local.json"
     local out rc
-    # config isolation is test-hermetic's export (the shared existing empty file)
-    out="$("$GATE" --fixture "$SANDBOX" 2>&1)"; rc=$?
+    # spec: context-kit/SPEC.md §check-memory-off — the three knobs are the only redirection the
+    # ported member has, so the case sets them where it used to pass `--fixture <dir>`
+    out="$(
+        gate_env \
+            CONTEXT_KIT_MEMORY_DIRS="$SANDBOX/memory" \
+            CONTEXT_KIT_SETTINGS_FILE="$SANDBOX/settings.json" \
+            CONTEXT_KIT_SETTINGS_PINS="$SANDBOX/settings-pins.conf"
+        gate_run check-memory-off "$DIR/checks" 2>&1
+    )"; rc=$?
     if [[ "$rc" -ne "$want" ]]; then
         echo "  FAIL [$label]: want exit $want, got $rc -- $out"; fails=$((fails + 1)); return
     fi
@@ -46,9 +56,13 @@ check_case "local-file-unrelated-clean" 0 "MEMORY-OFF: clean" '{"spinnerTipsEnab
 # gate cannot see, caught here.
 check_case "local-override-red" 1 "local settings override" '{"autoMemoryEnabled": true}'
 
+# spec: context-kit/SPEC.md §check-memory-off — the null disposition, opposite to
+# check-settings-pins' absent-pin refusal: a pinned key explicitly set to null sets no override
+check_case "local-null-clean" 0 "MEMORY-OFF: clean" '{"autoMemoryEnabled": null}'
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-memory-off.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-memory-off.test.sh: clean (no-local clean, unrelated-local clean, pinned-key override red, 3 cases)"
+echo "check-memory-off.test.sh: clean (no-local clean, unrelated-local clean, pinned-key override red, explicit-null clean, 4 cases)"
 exit 0

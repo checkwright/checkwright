@@ -35,6 +35,7 @@ pub mod manifest_count;
 pub mod manifest_temporal;
 pub mod md_refs;
 pub mod measured_claim;
+pub mod memory_off;
 pub mod merge_attrs;
 pub mod payload_claim;
 pub mod prose_enum;
@@ -46,6 +47,7 @@ pub mod queue_slug_liveness;
 pub mod queue_wrap;
 pub mod readme_roster;
 pub mod release_bump;
+pub mod root_tiering;
 pub mod rule_citation;
 pub mod scratch_citation;
 pub mod settings_paths;
@@ -1015,6 +1017,31 @@ pub const REGISTRY: &[GateEntry] = &[
         readme_roster::run,
         &[("?", "")],
         &["GATE_KIT_ROOTS_HERE"],
+        "gate-sdk",
+    ),
+    // spec: gate-sdk/SPEC.md §The third budget batch — two members with no joint proof, each its
+    // own unit: the first walks each resolved memory dir, one in every case a fixture can build;
+    // the second's tracked set is a subprocess read, which enters no walk roster in either.
+    (
+        "check-memory-off",
+        memory_off::run,
+        &[("?", "")],
+        &[
+            "CONTEXT_KIT_MEMORY_DIRS",
+            "CONTEXT_KIT_SETTINGS_FILE",
+            "CONTEXT_KIT_SETTINGS_PINS",
+        ],
+        "context-kit",
+    ),
+    (
+        "check-root-tiering",
+        root_tiering::run,
+        &[],
+        &[
+            "GATE_SDK_ROOT_ALLOWLIST",
+            "GATE_SDK_QUEUE_FILE",
+            "GATE_SDK_AGENT_FILE",
+        ],
         "gate-sdk",
     ),
 ];
