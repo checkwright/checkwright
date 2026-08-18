@@ -1,5 +1,5 @@
 # contract: evidence-manifest v1
-wide-budget-batch-and-hold-declaration gates sha256=85489006b58b9daacf63078e4ef36bbd2049868fd7917fc3305bee0038300877 pass=104 fail=0 ignore=0 verdict=clean 2026-08-18
+wide-budget-batch-and-hold-declaration gates sha256=9ae2af2c9d0c6c65ee8408671272ac7e282e767413a9690e77f7ab066a0aaef3 pass=104 fail=0 ignore=0 verdict=clean 2026-08-18
 wide-budget-batch-and-hold-declaration gate_sdk sha256=8da1a1c22edda587c650f3fac35a7692760578ce67ea93d4b266831a0923a181 pass=1 fail=0 ignore=0 verdict=clean 2026-08-18
 wide-budget-batch-and-hold-declaration canon_kit sha256=c13b2442a2898fd4c5c30c9175f74b8e6d20ec43199ed0c9c7001203352040ae pass=1 fail=0 ignore=0 verdict=clean 2026-08-18
 wide-budget-batch-and-hold-declaration context_kit sha256=65e7536ec8b920506d9defb5f2fd338be716ee72482acf2e4819ca5b3fcbe891 pass=1 fail=0 ignore=0 verdict=clean 2026-08-18
@@ -16,10 +16,10 @@ wide-budget-batch-and-hold-declaration usage_tests sha256=04968d303b3e4ec54f3f80
 wide-budget-batch-and-hold-declaration budget_guard_tests sha256=94bbe0c41f3993e3c748a492d29e2a0d22139825b8c53bbae6a528500a8ce402 pass=1 fail=0 ignore=0 verdict=clean 2026-08-18
 wide-budget-batch-and-hold-declaration dispatch_guard_tests sha256=6018943502411c07fe57162c0dae2ac37af304eccc0d0a9a6e0ec4fd733a1daf pass=1 fail=0 ignore=0 verdict=clean 2026-08-18
 wide-budget-batch-and-hold-declaration trend_tests sha256=acdbfef4eab851fca00ca747245b6ac4a4f804b05989f9cd3acd014bb56ac330 pass=1 fail=0 ignore=0 verdict=clean 2026-08-18
-wide-budget-batch-and-hold-declaration demo sha256=93a2008f86f671e6f99831ed7fb9f5881c371548b1712c7faed93dfa21520a93 pass=1 fail=0 ignore=0 verdict=clean 2026-08-18
-wide-budget-batch-and-hold-declaration installer_smoke sha256=7df40eb364c27076c7ad305ddcd52d27365e2e652a7133a0d76a06060f227aa5 pass=0 fail=1 ignore=0 verdict=new-failures 2026-08-18
-wide-budget-batch-and-hold-declaration consumer_smoke sha256=a9359f00b0963fdebef1a0e91b9c0f69d441af17d1b4d1c4987f56fcebb899f6 pass=1 fail=0 ignore=0 verdict=clean 2026-08-18
-wide-budget-batch-and-hold-declaration upgrade sha256=42cc942f4fa8aee80af8e2c9d03609fc470a788967e8fff7388e7e91b695f152 pass=1 fail=0 ignore=0 verdict=clean 2026-08-18
-wide-budget-batch-and-hold-declaration agents_md_smoke sha256=19460c24c895a619f860a344079f31003476dc969cbc30d4dee9c929efc20d1e pass=1 fail=0 ignore=0 verdict=clean 2026-08-18
+wide-budget-batch-and-hold-declaration demo sha256=ee81ffb6f225b3f36c903ecd417f750d1b52fc58e7e191b96fe35c2fea068ce1 pass=1 fail=0 ignore=0 verdict=clean 2026-08-18
+wide-budget-batch-and-hold-declaration installer_smoke sha256=7ba72fbc332a68dda01476ff72c68e44896b7e4bc8f23dbb906f06642d7c04f4 pass=0 fail=1 ignore=0 verdict=clean 2026-08-18
+wide-budget-batch-and-hold-declaration consumer_smoke sha256=e043dc90ed0c07810762435613dceb987f7ae6ea524b32187bc160f482167b0b pass=1 fail=0 ignore=0 verdict=clean 2026-08-18
+wide-budget-batch-and-hold-declaration upgrade sha256=61ad3b80323dd40e5c78c87534a5a698c5785474009604bf06136da12d3ff8e8 pass=1 fail=0 ignore=0 verdict=clean 2026-08-18
+wide-budget-batch-and-hold-declaration agents_md_smoke sha256=33dce44e8f35325cf5f55e63bb7ad7b84c9b9fef5ca3d97c97939b7bf9434015 pass=1 fail=0 ignore=0 verdict=clean 2026-08-18
 wide-budget-batch-and-hold-declaration index_tests sha256=e14e152466dc5be0296b1e20575bf3d587e1e0a127e7c63ad57671dbcaeaddb8 pass=1 fail=0 ignore=0 verdict=clean 2026-08-18
-wide-budget-batch-and-hold-declaration native_crate sha256=727f5b1d14d795f43ab1300d4023921fffbe4d3bf758582a640f5fe856e12089 pass=1 fail=0 ignore=0 verdict=clean 2026-08-18
+wide-budget-batch-and-hold-declaration native_crate sha256=09cde80ca66e73daaad61bc0443b01147b72abc7160e610076630b136d5ec04f pass=1 fail=0 ignore=0 verdict=clean 2026-08-18
