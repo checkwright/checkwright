@@ -7,6 +7,17 @@ rides `check-identity`'s port: the operator ruled fork (3) **paired with the
 port** on 2026-08-19 in the lead session through the harness's question
 mechanism, so the kind lands native and is not built twice.
 
+**This unit's closing set belongs to the session that lands the kind, and no
+later batch inherits it.** The cut it rides is executed as several build
+sessions; `gate-sdk/SPEC-fifth-batch.md` carries the split's ownership roster,
+which rules that a unit is closed by the batch that finishes it rather than by
+whichever runs last. Here that is this amendment's merge and deletion plus
+`gh-account-identity-expectation`'s terminal move, the branch canon-kit/SPEC.md
+§Merging an amendment selects. Recorded on this amendment because a session
+reads its own governing surface and never a sibling's: an obligation reachable
+only through a dispatch prompt has no owner, a prompt being transport rather
+than a store.
+
 ## The envelope
 
 Stated first because it is what a build session needs before it writes a line,
