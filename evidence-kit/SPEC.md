@@ -408,6 +408,7 @@ close-entry and stamp-coupling assertions are covered by
 
 ### check-battery-roster
 
+`checks/check-battery-roster.gate` (`precommit`, binary-dispatched).
 Invariant: the configured runner doc's battery-roster block holds name-set
 parity with `EVIDENCE_KIT_SUITES`, both directions. The suite roster is
 machine-owned and the doc block is a hand copy of it — the
@@ -471,14 +472,27 @@ contradiction — the two name different sets (a kit root, a suite) in their
 output.
 
 Config: `EVIDENCE_KIT_RUNNER_DOC` (§Layout and configuration); positional form
-`check-battery-roster.sh [runner-doc]` overrides it against a hermetic fixture
+`check-battery-roster [runner-doc]` overrides it against a hermetic fixture
 tree, the sibling meta-gates' shape. Fail-closed: a configured doc that does not
 exist, a doc carrying no marker block, an empty suite roster, or a non-repo cwd
 with no positional argument is a misconfiguration (exit 2), never a false clean.
 There is no empty-knob valve — a consumer keeping no runner doc opts out by not
 registering the gate in its `gates.list`, gate-sdk's registry opt-out shape. The
 fail-closed branches and the normalization arms beyond the one good/bad pair are
-covered by `gate-tests/check-battery-roster.test.sh`.
+covered by `gate-tests/check-battery-roster.test.sh`, which dispatches through
+`gate_run` rather than by script path — the invocation shape that survives a
+substrate move (gate-sdk/SPEC.md §lib/test-hermetic.sh).
+
+**The suite roster and the run family cross the bridge as two knobs of different
+kinds, and the asymmetry is the contract rather than an accident.**
+`EVIDENCE_KIT_SUITES` is the roster; `EVIDENCE_KIT_RUN_*` is a **prefix family**,
+a resolution set the gate looks names up in and never enumerates. Enumerating it
+would publish `EVIDENCE_KIT_RUN_ID` as a suite — the reason gate-sdk/SPEC.md
+§lib/gate.sh states that a prefix is a resolution set and never a roster, stated
+again here because this gate is the one that would break.
+`EVIDENCE_KIT_RUNNER_DOC` is resolved onto its own name in `lib/evidence.sh` for
+the same reason the loader's other defaults are: a default the bridge's
+`declare -p` cannot find is its undeclared-knob refusal.
 
 ### check-producer-liveness
 

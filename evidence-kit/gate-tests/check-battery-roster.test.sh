@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Behavioral test of checks/check-battery-roster.sh — the branches the one
+# Behavioral test of check-battery-roster — the branches the one
 # good/bad pair cannot hold: the three fail-closed misconfigurations (absent
 # doc, doc with no marker block, empty suite roster), the normalization arm the
 # pair does not reach (leading VAR=value assignments with no `env` token), and
@@ -11,7 +11,6 @@ set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # evidence-kit/
-GATE="$DIR/checks/check-battery-roster.sh"
 
 fails=0
 tmp="$(mktemp -d)"
@@ -23,7 +22,9 @@ case_run() {
     local d="$tmp/$name" out rc; mkdir -p "$d/scripts"
     printf '%b' "$cfg" >"$d/scripts/evidence-config.sh"
     [[ "$doc" == "SKIP" ]] || printf '%b' "$doc" >"$d/runner.md"
-    out="$( cd "$d" && env -u EVIDENCE_KIT_CONFIG_FILE GATE_SDK_GATES_DIR=scripts "$GATE" runner.md 2>&1 )"; rc=$?
+    out="$( cd "$d" && unset EVIDENCE_KIT_CONFIG_FILE \
+        && gate_env GATE_SDK_GATES_DIR=scripts \
+        && gate_run check-battery-roster "$DIR/checks" runner.md 2>&1 )"; rc=$?
     if [[ "$rc" -ne "$want" ]]; then
         echo "  FAIL: $name expected exit $want, got $rc: $out"; fails=$((fails + 1)); return
     fi

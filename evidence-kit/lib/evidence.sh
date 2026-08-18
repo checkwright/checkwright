@@ -41,6 +41,8 @@ declare -p EVIDENCE_KIT_SUITES &>/dev/null || EVIDENCE_KIT_SUITES=()
 [[ -v EVIDENCE_KIT_LOCK_FILE ]]     || EVIDENCE_KIT_LOCK_FILE="$EVIDENCE_KIT_TMP_DIR/run-validate.lock"
 [[ -v EVIDENCE_KIT_RUN_ID ]]        || EVIDENCE_KIT_RUN_ID=""
 [[ -v EVIDENCE_KIT_PRE_HOOK ]]      || EVIDENCE_KIT_PRE_HOOK=""
+# spec: evidence-kit/SPEC.md §check-battery-roster — resolved onto the knob's own name rather than inline in the gate, because a default the config bridge's `declare -p` cannot find is its undeclared-knob refusal and the compiled member declares this one
+[[ -v EVIDENCE_KIT_RUNNER_DOC ]]    || EVIDENCE_KIT_RUNNER_DOC="README.md"
 declare -p EVIDENCE_KIT_SCENARIO_GLOBS &>/dev/null || declare -A EVIDENCE_KIT_SCENARIO_GLOBS=()
 declare -p EVIDENCE_KIT_PERMANENT_SLUGS &>/dev/null || EVIDENCE_KIT_PERMANENT_SLUGS=()
 

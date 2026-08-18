@@ -190,8 +190,8 @@ that has to resolve your platform before any binary can run. It is deliberately
 small enough to exist twice, which is what would make a native Windows path
 possible where the roster above can only offer WSL.
 
-<!-- measured: ported-gate-members=79 -->
-That direction is now underway rather than announced: 79 gates in the battery
+<!-- measured: ported-gate-members=80 -->
+That direction is now underway rather than announced: 80 gates in the battery
 dispatch to the compiled binary today, and the rest is still shell. The
 requirements above are what the shell gates actually invoke, so they stand until
 the gates that invoke them do not. When a requirement drops it drops from that
