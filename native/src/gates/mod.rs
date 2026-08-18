@@ -17,6 +17,7 @@ pub mod docs_cname_parity;
 pub mod exec_bit;
 pub mod core_files;
 pub mod battery_roster;
+pub mod commit_msg;
 pub mod docs_kit_parity;
 pub mod docs_mirror_fresh;
 pub mod docs_nav_reachable;
@@ -1142,6 +1143,13 @@ pub const REGISTRY: &[GateEntry] = &[
             "EVIDENCE_KIT_RUN_*",
         ],
         "evidence-kit",
+    ),
+    (
+        "check-commit-msg",
+        commit_msg::run,
+        &[],
+        &["GATE_MSG_PATTERN_FILES", "GATE_MSG_PATTERN_FILES_LOCAL"],
+        "gate-sdk",
     ),
 ];
 

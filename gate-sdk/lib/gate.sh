@@ -56,6 +56,18 @@ unset _gpx
 # spec: gate-sdk/SPEC.md §check-root-tiering — the same resolution for that member's two remaining knobs, on the cause the four above already state: a knob no kit library defines is the bridge's third refusal, so the defaults could not stay inline in a check that dispatches to the binary. The allowlist default rides GATE_SDK_GATES_DIR's own resolved value above rather than the not-yet-defined gate_sdk_gates_dir, so the two stay one value by construction; an absent allowlist is the gate's own built-in-fallback branch, not a refusal, which is why defaulting a path that need not exist is safe here.
 [[ -v GATE_SDK_ROOT_ALLOWLIST ]] || GATE_SDK_ROOT_ALLOWLIST="$GATE_SDK_GATES_DIR/root-allowlist.list"
 [[ -v GATE_SDK_AGENT_FILE ]] || GATE_SDK_AGENT_FILE="CLAUDE.md"
+# spec: gate-sdk/SPEC.md §check-commit-msg — the banned-pattern file set as arrays, so the config bridge can carry the value gate_msg_pattern_files already resolves. Distinct names on §lib/gate.sh's rule (a whitespace scalar feeding an array), and filled by the unquoted expansion the resolver itself used, so word-splitting and pathname expansion keep the semantics they had.
+# shellcheck disable=SC2034  # read across the dispatch seam by the compiled member and by gate_msg_pattern_files below
+GATE_MSG_PATTERN_FILES=()
+for _gmp in ${GATE_SDK_MSG_PATTERN_FILES:-$GATE_SDK_GATES_DIR/msg-patterns.list}; do
+    GATE_MSG_PATTERN_FILES+=("$_gmp")
+done
+# shellcheck disable=SC2034  # read across the dispatch seam by the compiled member and by gate_msg_pattern_files below
+GATE_MSG_PATTERN_FILES_LOCAL=()
+for _gmp in ${GATE_SDK_MSG_PATTERN_FILES_LOCAL:-$GATE_SDK_GATES_DIR/msg-patterns.local.list}; do
+    GATE_MSG_PATTERN_FILES_LOCAL+=("$_gmp")
+done
+unset _gmp
 # spec: gate-sdk/SPEC.md §check-core-files — the same resolution for that member's manifest path, on the cause the knobs above state: a default the bridge's `declare -p` cannot find is its undeclared-knob refusal. Rides GATE_SDK_GATES_DIR's resolved value; an absent manifest is the gate's own optional-config branch, not a refusal.
 [[ -v GATE_SDK_CORE_FILES_FILE ]] || GATE_SDK_CORE_FILES_FILE="$GATE_SDK_GATES_DIR/core-files.list"
 # spec: gate-sdk/SPEC.md §check-exec-bit — check-exec-bit's two whitespace-scalar overrides, resolved to arrays here so the config bridge can carry them. Distinct names on §lib/gate.sh's own rule: a scalar feeding an array is the one case a resolved global earns a spelling of its own, which is why GATE_PRUNE_DIRS above has one and the scalar-in/scalar-out knobs beside it do not. The glob default rides GATE_SDK_GATES_DIR's resolved value rather than the not-yet-defined gate_sdk_gates_dir, so the two stay one value by construction.
@@ -530,14 +542,13 @@ gate_msg_pattern_files() {
         printf '%s\n' "$@"
         return 0
     fi
-    local f gd
-    gd="$(gate_sdk_gates_dir)"
-    for f in ${GATE_SDK_MSG_PATTERN_FILES:-$gd/msg-patterns.list}; do
+    local f
+    for f in "${GATE_MSG_PATTERN_FILES[@]}"; do
         [[ -f "$f" ]] || { echo "gate_msg_pattern_files: required tracked pattern file missing: $f" >&2; return 2; }
         [[ -r "$f" ]] || { echo "gate_msg_pattern_files: pattern file not readable: $f" >&2; return 2; }
         printf '%s\n' "$f"
     done
-    for f in ${GATE_SDK_MSG_PATTERN_FILES_LOCAL:-$gd/msg-patterns.local.list}; do
+    for f in "${GATE_MSG_PATTERN_FILES_LOCAL[@]}"; do
         [[ -f "$f" && -r "$f" ]] && printf '%s\n' "$f"
     done
     return 0

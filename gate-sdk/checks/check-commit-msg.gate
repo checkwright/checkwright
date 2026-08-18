@@ -1,0 +1,3 @@
+# graph: couples=scripts/msg-patterns.list,native/src/gates/commit_msg.rs,native/src/ere.rs,native/src/fresh.rs dir=one valve=none tier=commit-msg
+# install: zero-config
+# spec: gate-sdk/SPEC.md §check-commit-msg — the commit message matches no banned pattern (the leak guard for the message surface the pre-commit hook never sees)

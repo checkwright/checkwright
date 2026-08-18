@@ -39,7 +39,7 @@ run_gate() {
     fi
 }
 
-run_gate check-commit-msg gate-sdk/checks/check-commit-msg.sh "$msg_file"
+run_gate check-commit-msg env GATE_SDK_KNOB_GATE_MSG_PATTERN_FILES=scripts/msg-patterns.list GATE_SDK_KNOB_GATE_MSG_PATTERN_FILES_LOCAL=scripts/msg-patterns.local.list native/target/release/checkwright-gates check-commit-msg "$msg_file"
 
 run_gate check-commit-subject env $'GATE_SDK_KNOB_GATE_SDK_COMMIT_TYPES=feat fix refactor perf docs test build ci chore style' native/target/release/checkwright-gates check-commit-subject "$msg_file"
 

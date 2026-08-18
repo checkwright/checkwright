@@ -8581,6 +8581,7 @@ all. The residual `gawk` floor is §check-gate-assertions' and
 
 ### check-commit-msg
 
+`checks/check-commit-msg.gate` (`commit-msg`, binary-dispatched).
 Invariant: the prospective commit message (the `commit-msg` hook's `$1`) matches
 no banned pattern. This is the message half of the CLAUDE.md ban on leaked
 local paths / private repo/project/account terms — the surface the `pre-commit`
@@ -8610,6 +8611,30 @@ argument-with-value, or a missing required tracked pattern file, is fail-closed
 not a tree path — the gate is emitted into the commit-msg hook, not the
 pre-commit hook. Subject *shape* is the sibling check-commit-subject's job:
 this gate stays the leak guard, that one the parse guarantee.
+
+**The pattern set crosses the bridge as two arrays, `GATE_MSG_PATTERN_FILES` and
+`GATE_MSG_PATTERN_FILES_LOCAL`**, resolved in `lib/gate.sh` from the two
+consumer scalars by the same unquoted expansion the resolver itself used, so
+word-splitting and pathname expansion keep the semantics they had.
+`gate_msg_pattern_files` reads those arrays rather than re-expanding the scalars,
+which keeps one derivation for both its readers — this gate and
+§check-tree-terms — and gives the distinct spelling §lib/gate.sh's naming rule
+grants a scalar that feeds an array.
+
+**Matching runs through the crate's own POSIX ERE engine** (§The POSIX ERE
+matcher) rather than through `grep -E`, which subtracts nothing: the engine was
+built for this grammar and the shipped pattern shapes are unit-tested against it
+beside the pair.
+
+**One adjudicated disagreement, on a fail-closed path, and the compiled side is
+the better one.** Given a malformed pattern both substrates exit 2 and both emit
+the same `fail_closed` line; what differs is the diagnostic above it. The shell
+fed its pattern set to `grep` through a process substitution, so `grep` named the
+ephemeral `/dev/fd/N` path and a line number inside it — a location the reader
+cannot open. The compiled form names the offending **pattern** and what is wrong
+with it. Recorded rather than smoothed over, on the rule that a disagreement is a
+finding adjudicated against the rule (§The port-candidate criteria): the rule
+here is the §Fail-closed contract, which the two satisfy identically.
 
 ### check-commit-subject
 
