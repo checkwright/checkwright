@@ -16,6 +16,91 @@
 
 ## Deferred
 
+- **crate-test-cwd-process-global-race** [design-pending] — the crate's test guard covers the knob
+  environment and nothing else, while a second process-global is written by a test and read by
+  production paths a sibling test may be running concurrently.
+  **Re-verified at this drain rather than taken from the bullet; all three sub-claims hold.**
+  `native/src/gates/mod.rs:1333`/`:1338` calls `std::env::set_current_dir` per fixture case inside
+  `every_registry_member_declares_the_roots_it_walks`; `std::env::current_dir()` is read in
+  production paths of `walk.rs`, `spec.rs`, `emit/trajectory.rs`, `emit/docs_mirror.rs`,
+  `gates/docs_nav_reachable.rs`, `gates/assertion_strength.rs` and `gates/docs_link_convention.rs`;
+  and `native/src/knobenv.rs:41` declares `ENV_WRITE_APIS = ["set_var", "remove_var"]`, so the
+  machine-side roster names the knob environment alone.
+  **Why it is latent rather than live.** The one cwd-writing test happens to hold
+  `knobenv::lock()` across its whole loop (`mod.rs:1318`), so the existing guard serializes it by
+  accident of where the lock was taken. Nothing states that, and nothing stops the next
+  cwd-changing test from taking no guard — which is the defect, not the current schedule.
+  **Distinct from `crate-test-env-knob-race`, which is Done**: that entry owned the knob
+  environment and its fix (`f2701ff4`) landed the guard this entry says is too narrow. The finding
+  is what the fix did not reach, so it files as a new defect rather than a recurrence.
+  **Deliverable, and why `[design-pending]`:** widening `knobenv` from "the knob environment" to
+  "process-global test state" renames the module's charter and its roster, and whether the roster
+  should enumerate APIs (`set_current_dir` joining the two) or assert over a class is the open
+  choice. A rename that outruns its assertion is the failure mode to avoid.
+  **Cost while deferred:** one more 1-in-N false red on `check-crate-arms`, paid by every port
+  commit — the same tax `crate-test-env-knob-race` was fixed to remove, re-armed on a second axis.
+  Filed 2026-08-18 by close, draining the gap inbox; re-verified by probe, not by prose.
+
+- **baseline-move-stales-evidence-line** [design-pending] — promoting a task and moving a suite's
+  baseline is not enough to close: the evidence line already recorded against the *old* baseline is
+  stale, and nothing says so until the entry gate refuses a second time for a different reason.
+  **The second face of `close-entry-baseline-bootstrap-deadlock`**, which owns the first (close is
+  the only stage that may file the blocking slug, and cannot enter without it). That entry's
+  candidate fixes all address the first face and leave this one standing, which is why it is filed
+  apart rather than folded in.
+  **The mechanism.** A recorded verdict is *relative* to whichever baseline was live when the suite
+  ran, so moving a suite from `pass` to a slug-carrying `fail` invalidates every line computed
+  before the move. `check-evidence-manifest`'s close-entry assertion then still refuses on "no clean
+  evidence line" with the promotion and the baseline row both correctly landed — the refusal a
+  session reads as the first fix having failed.
+  **Attested, not predicted:** hit at this iteration's validate/close boundary. The first refusal
+  was fixed by `f8c34c20` + `f5664bbf`; a `--simulate close` recheck still refused, for a second
+  reason nothing had flagged, forcing a round trip the recipe would have saved.
+  **Re-verified at this drain; both claims hold.** No promote → baseline → fresh-evidence recipe
+  exists anywhere in `evidence-kit/SPEC.md`, and `check-evidence-baseline`'s own help
+  (`native/src/gates/evidence_baseline.rs:224`) names the line grammar, the liveness requirement
+  and the human-commit rule — never the evidence manifest as the other surface a promotion stales.
+  **Deliverable, enforcement-first shaped:** document the three-step recipe wherever the
+  deferred-known-red path is described, *and* widen that help text to name the manifest, so the
+  session that reaches the second refusal is told by the gate rather than by a round trip.
+  **Cost while deferred:** one wasted close-entry round trip per iteration that ends non-clean,
+  landing on top of the operator interrupt the first face already charges for the same boundary.
+  Filed 2026-08-18 by close, draining the gap inbox; the first face stamped as a recurrence there.
+
+- **nested-battery-env-inheritance-invisible** [design-pending] — a suite whose harness re-execs
+  batteries inside nested sandboxes inherits the parent environment wholesale, and a contaminated
+  scoped run still emits a well-formed `verdict=clean` row.
+  **What makes it a real defect rather than a caveat: the contamination is invisible where the
+  reader looks.** The manifest row carries pass/fail counts, a fresh `sha256` and correct grammar,
+  so nothing in it distinguishes a clean run from one whose nested batteries reddened on a
+  dispatch-harness error. The evidence is only in the captured suite log, which the runner hashes
+  and never prints.
+  **Re-verified at this drain: the mechanism holds.** `installer/consumer-smoke/run-smoke.sh`
+  contains zero occurrences of `EVIDENCE_KIT`, and re-execs `bash gate-sdk/bin/run-gates.sh` in the
+  scratch consumer at L169, L296 and L302, so any evidence-kit knob set as an env-var prefix on the
+  parent `run-validate.sh` reaches every nested battery. A relative scratch path resolves against
+  the wrong cwd inside the sandbox and reds `check-evidence-baseline` / `check-evidence-manifest`
+  there — a defect of the harness, not of the suite.
+  **Attested twice at this iteration's validate**, both times caught only by reading the suite log
+  directly rather than trusting the summary line; a full `run-validate.sh` sets no suite-scoping
+  env var and is unaffected, so it was used instead.
+  **The generalisation, and the distinction that must survive a fix.** The supersede-not-truncate
+  manifest mechanics (evidence-kit/SPEC.md §Evidence manifest — a run overwrites only the rows for
+  suites it covered) are sound and reusable on their own. It is specifically the **scoped-run
+  path** that is unsafe, and only for a suite whose own harness re-execs a battery in a nested
+  tree. A fix that throws out the mechanism with the path has overpaid.
+  **Deliverable, two candidates and neither improvised:** sanitize `EVIDENCE_KIT_CONFIG_FILE` and
+  its siblings inside `run-smoke.sh` before it re-execs into a nested sandbox, or drive
+  suite-scoping by something other than an inherited env var. `[design-pending]` because the second
+  changes a knob contract and the first names a roster that must not drift from it.
+  **Distinct from `consumer-smoke-subset-accounting-verdict`**, whose scoped run produces a false
+  *FAIL* a reader can at least see; this one produces a false *clean* a reader cannot.
+  **Cost while deferred:** re-recording one suite's evidence stays unavailable in practice — the
+  only safe spelling is a full battery — and any future scoped run risks a green row with nothing
+  behind it, the one failure the manifest exists to make impossible.
+  Filed 2026-08-18 by close, draining the gap inbox; the harness's env handling probed directly
+  rather than inferred from the bullet.
+
 - **installer-init-noop-regen-conflict** [design-pending] — init regenerates three generated
   projections (`scripts/gates.list`, `scripts/git-hooks/pre-commit`, `scripts/CHECK-GRAPH.html`)
   on every run and only THEN decides the run was a no-op: a second run on the same consumer
@@ -4033,7 +4118,7 @@
 
 - **close-entry-baseline-bootstrap-deadlock** [design-pending] — a validate that
   ends on an accepted red cannot be closed without an operator carve-out.
-  recurrence: close-entry-baseline-bootstrap-deadlock 2026-08-12
+  recurrence: close-entry-baseline-bootstrap-deadlock 2026-08-12 2026-08-18
   Attested end to end at this iteration's close, which is what makes it filable.
   The close entry preflight (`scripts/lifecycle-config.sh`'s
   `LIFECYCLE_KIT_ENTRY_PREFLIGHT`) refuses until every suite carries a clean
@@ -4066,6 +4151,13 @@
   the case for fixing the bootstrap rather than continuing to pay the interrupt.
   The cost is now measured rather than predicted: one full stop and one operator
   round-trip per close that ends non-clean.
+  **Third firing, 2026-08-18 (`wide-budget-batch-and-hold-declaration`), and the grounds for that
+  date.** `installer_smoke` ended validate on the init no-op/regen red, the close entry refused for
+  want of a live blocking slug, and the escape was the identical operator-directed filing
+  (`f8c34c20`). Three consecutive non-clean validates, three operator interrupts, one route: the
+  structural reading above is now the only one left. The same drain found a **second face** the
+  candidates above do not cover — a baseline move stales the evidence line computed against the old
+  baseline — promoted as `baseline-move-stales-evidence-line`.
   Filed 2026-08-10 by close, from its own blocked entry; the escape it needed is
   the evidence. Re-attested 2026-08-12 by close, again from its own blocked entry.
 
@@ -5823,12 +5915,9 @@
   "given that prose alone does not hold, what does". Filed apart only because that entry stands
   within three lines of the cap — `entry-cap-displaces-mandated-writes` in a new shape, content
   pushed into a *new entry* rather than into a commit message.
-  **First half — ANSWERED 2026-08-17, and its remainder relocated.** delegation-kit/SPEC.md:390-392
-  rules that enforcement turns on whether an act passes a chokepoint and that a turn-end does not;
-  the analysis under it is scoped to `PreToolUse`, which is every guard this repo ships, so the
-  turn-end hook had never been probed against this rule. It has been now, documentarily, and what
-  survives — a `SubagentStop` hook reading the liveness record, and whether the harness defers the
-  stop while a background child is live — is `subagent-stop-liveness-hook-wiring`'s.
+  **First half — ANSWERED 2026-08-17** (delegation-kit/SPEC.md:390-392: enforcement turns on an act
+  passing a chokepoint, and a turn-end does not); its remainder is
+  `subagent-stop-liveness-hook-wiring`'s, stated there in full.
   **Second half — which primitive is reliable here.** The protocol states a hard ordering:
   `run_in_background` plus an `until`-loop for a single completion, with the event-stream form
   named the wrong tool. On this machine that ordering **inverted** — four of the lead's own
@@ -5864,6 +5953,10 @@
   the guard-rule and documentary half alone, since the hook half needs an operator-authorized
   `.claude/settings.json` write no agent message can license. Honest limit, recorded because the
   operator saw it and ruled anyway: the port batches are the work whose evidence this defect eats.
+  recurrence: turn-end-chokepoint-and-wait-primitive 2026-08-18
+  **Firings 11-13, 2026-08-18 — grounds for that date.** Three times a backgrounded producer exited
+  cleanly and the turn ended anyway: work finished, uncommitted, no completion notification,
+  recovered only by the operator noticing. The second half, measured on producers that *finished*.
   Filed 2026-08-16 by close from the gap inbox, both halves; the drain re-verified the carrier
   count and the chokepoint scoping against the SPEC rather than taking the bullet's prose.
 

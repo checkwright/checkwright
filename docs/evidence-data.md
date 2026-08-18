@@ -100,3 +100,4 @@
 | post-close-intake-and-index-port | sc sp a b v c | 4f/0d | 2 · ≤0d | 24s clean | 104 |
 | port-selector-permanence-and-batch | sc sp a b v c | 4f/1d | 3 · ≤0d | 48s 1✗ | 104 |
 | freshness-cohort-roadmap-hold-and-batch | sc sp a b v c | 4f/0d | 3 · ≤0d | 24s clean | 104 |
+| wide-budget-batch-and-hold-declaration | sc sp a b v c | 11f/3d | 2 · ≤0d | 31s 2✗ | 104 |
