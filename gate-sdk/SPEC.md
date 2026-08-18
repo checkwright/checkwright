@@ -5037,6 +5037,22 @@ Resolution, per declared knob:
   lookup runs under a stdout capture, so an early hit that abandons the producer
   leaves it writing into a closed pipe; §run-gates gives the consequence, and
   why the environment that shows it is not the one a battery is usually run in.
+- **A knob the bridge can carry is one whose default is `declare -p`-visible
+  *after* the owning kit's library has been sourced, so the library is where a
+  kit knob's default belongs.** This is a property of the bridge rather than of
+  any batch that trips it: the resolver confirms a declared knob by asking
+  `declare -p` for it, so a value defaulted inline at a use site
+  (`"${KNOB:-<default>}"` inside a check) or inside a helper function's body is
+  invisible to it, and the member's very first post-port run takes the
+  undeclared-knob refusal — whose message names the bridge rather than the
+  missing default, which is what makes the failure expensive to read. The
+  discharge is one edit in the library and its cost is per *knob*, so a batch
+  whose members share bridge-blind knobs pays it **once, in front of the batch**,
+  rather than discovering it once per member inside three ports. The seam holds
+  through that resolution rather than being loosened by it: naming a default in a
+  kit library is where a kit default already belongs, and a path or a directory
+  is not consumer vocabulary — the vocabulary the value points *at* stays in the
+  consumer's own files (CLAUDE.md §The provenance seam).
 - **A bridged value may not carry an absolute path.** The resolved argv is baked
   **verbatim** into the generated pre-commit hook, which is tracked, so an
   absolute value commits one machine's checkout path to a public file. That is a

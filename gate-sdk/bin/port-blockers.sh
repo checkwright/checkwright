@@ -59,7 +59,7 @@ while IFS= read -r _pb_root; do CHECK_DIRS+=("${_pb_root%/}/checks"); done < <(g
 unset _pb_root
 
 # spec: gate-sdk/SPEC.md §port-blockers — criterion 2's column reads the fixture dirs check-gate-fixture-coverage resolves, in that order, so the report and the gate can never disagree about whether a member carries a pair
-TESTS_DIRS=("${GATE_SDK_TESTS_DIR:-$GATES_DIR/gate-tests}")
+TESTS_DIRS=("$GATE_SDK_TESTS_DIR")
 while IFS= read -r _pb_root; do TESTS_DIRS+=("${_pb_root%/}/gate-tests"); done < <(gate_kit_roots_rel)
 unset _pb_root
 

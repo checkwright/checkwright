@@ -6,8 +6,7 @@ SDK="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # shellcheck source=../lib/gate.sh
 source "$SDK/lib/gate.sh"
 
-GATES_DIR_DEFAULT="$(gate_sdk_gates_dir)"
-TESTS_DIR="${1:-${GATE_SDK_TESTS_DIR:-$GATES_DIR_DEFAULT/gate-tests}}"
+TESTS_DIR="${1:-$GATE_SDK_TESTS_DIR}"
 if [[ $# -gt 1 ]]; then
     GATE_DIRS=("${@:2}")
 else

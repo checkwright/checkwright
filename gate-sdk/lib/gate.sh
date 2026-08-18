@@ -70,6 +70,13 @@ done
 unset _gmp
 # spec: gate-sdk/SPEC.md §check-core-files — the same resolution for that member's manifest path, on the cause the knobs above state: a default the bridge's `declare -p` cannot find is its undeclared-knob refusal. Rides GATE_SDK_GATES_DIR's resolved value; an absent manifest is the gate's own optional-config branch, not a refusal.
 [[ -v GATE_SDK_CORE_FILES_FILE ]] || GATE_SDK_CORE_FILES_FILE="$GATE_SDK_GATES_DIR/core-files.list"
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the four knobs the fifth batch's members declare, resolved here for the cause the roster above states: a default written inline at a use site or inside a helper's body is invisible to the bridge's `declare -p`, which is its undeclared-knob refusal on the member's first post-port run. Each keeps the `:-` semantics its use site had (an empty value takes the default), and the identity manifest and tests dir ride GATE_SDK_GATES_DIR's resolved value above so the pair stays one value by construction. An absent identity manifest is the gate's own optional-config branch and an absent tests dir the coverage gate's own no-pair branch, not a refusal.
+[[ -n "${GATE_SDK_IDENTITY_FILE:-}" ]] || GATE_SDK_IDENTITY_FILE="$GATE_SDK_GATES_DIR/identity.conf"
+[[ -n "${GATE_SDK_TESTS_DIR:-}" ]] || GATE_SDK_TESTS_DIR="$GATE_SDK_GATES_DIR/gate-tests"
+[[ -n "${GATE_SDK_NATIVE_BIN:-}" ]] || GATE_SDK_NATIVE_BIN="native/target/release/checkwright-gates"
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the crate root is normalized where it is resolved rather than at each read, so the value the bridge carries is the canonical one gate_native_crate already printed
+[[ -n "${GATE_SDK_NATIVE_CRATE:-}" ]] || GATE_SDK_NATIVE_CRATE="native"
+GATE_SDK_NATIVE_CRATE="${GATE_SDK_NATIVE_CRATE%/}"
 # spec: gate-sdk/SPEC.md §check-exec-bit — check-exec-bit's two whitespace-scalar overrides, resolved to arrays here so the config bridge can carry them. Distinct names on §lib/gate.sh's own rule: a scalar feeding an array is the one case a resolved global earns a spelling of its own, which is why GATE_PRUNE_DIRS above has one and the scalar-in/scalar-out knobs beside it do not. The glob default rides GATE_SDK_GATES_DIR's resolved value rather than the not-yet-defined gate_sdk_gates_dir, so the two stay one value by construction.
 # shellcheck disable=SC2034  # consumed by the compiled member across the bridge, never within this lib
 if [[ -n "${GATE_SDK_EXEC_GLOBS:-}" ]]; then
@@ -340,15 +347,14 @@ gate_command() {
     return 1
 }
 
-# spec: gate-sdk/SPEC.md §Layout and configuration — the one home of GATE_SDK_NATIVE_BIN's default, so a knob default gains readers without gaining spellings
+# spec: gate-sdk/SPEC.md §Layout and configuration — the accessor for GATE_SDK_NATIVE_BIN, whose default is resolved at the top of this library so the bridge can find it; a knob default gains readers without gaining spellings
 gate_native_bin() {
-    printf '%s\n' "${GATE_SDK_NATIVE_BIN:-native/target/release/checkwright-gates}"
+    printf '%s\n' "$GATE_SDK_NATIVE_BIN"
 }
 
-# spec: gate-sdk/SPEC.md §Layout and configuration — the one home of GATE_SDK_NATIVE_CRATE's default, trailing slash stripped, so its three shell readers share a spelling rather than each carrying one
+# spec: gate-sdk/SPEC.md §Layout and configuration — the accessor for GATE_SDK_NATIVE_CRATE, resolved and trailing-slash-stripped at the top of this library, so its three shell readers share a spelling rather than each carrying one
 gate_native_crate() {
-    local crate="${GATE_SDK_NATIVE_CRATE:-native}"
-    printf '%s\n' "${crate%/}"
+    printf '%s\n' "$GATE_SDK_NATIVE_CRATE"
 }
 
 # spec: gate-sdk/SPEC.md §check-gate-substrate-parity — the authoring-tree test: this tree carries the crate's *tracked source*, which is what makes it the tree that declared the kits it carries rather than a tree that vendored them. Source, so build output under the crate root cannot read as authorship. One holder for a predicate its readers scope themselves by; its honest limit is that it is tree-shaped, so a consumer authoring its own kit beside vendored ones reads as non-authoring.

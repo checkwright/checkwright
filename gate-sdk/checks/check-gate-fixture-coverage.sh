@@ -4,7 +4,7 @@
 # spec: gate-sdk/SPEC.md §check-gate-fixture-coverage — every gates.list member has a fixture pair or a no-fixture opt-out
 #
 # usage: check-gate-fixture-coverage.sh [gates-dir [tests-dir...]]
-#   default tests dirs: <gates-dir>/gate-tests + each kit's gate-tests/
+#   default tests dirs: GATE_SDK_TESTS_DIR + each kit's gate-tests/
 set -uo pipefail
 
 SDK="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -15,7 +15,7 @@ DIR="${1:-$(gate_sdk_gates_dir)}"
 if [[ $# -gt 1 ]]; then
     TESTS_DIRS=("${@:2}")
 else
-    TESTS_DIRS=("${GATE_SDK_TESTS_DIR:-$DIR/gate-tests}")
+    TESTS_DIRS=("$GATE_SDK_TESTS_DIR")
     while IFS= read -r k; do TESTS_DIRS+=("$k/gate-tests"); done < <(gate_kit_roots)
 fi
 RESOLVE_DIRS=("$DIR")

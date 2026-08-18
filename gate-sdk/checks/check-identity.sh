@@ -4,7 +4,7 @@
 # spec: gate-sdk/SPEC.md §check-identity — every expectation in the identity manifest matches this clone's local git identity
 #
 # usage: check-identity.sh [--fixture <dir>] [manifest]
-#   default manifest: GATE_SDK_IDENTITY_FILE (<gates-dir>/identity.conf);
+#   default manifest: GATE_SDK_IDENTITY_FILE;
 #   --fixture <dir> injects a clone's git identity for deterministic tests
 set -uo pipefail
 
@@ -27,7 +27,7 @@ if [[ "$MODE" == fixture ]]; then
     [[ -d "$FIXTURE_DIR" ]] || { echo "check-identity: fixture dir not found: $FIXTURE_DIR" >&2; exit 2; }
     MANIFEST="${MANIFEST:-$FIXTURE_DIR/identity.conf}"
 else
-    MANIFEST="${MANIFEST:-${GATE_SDK_IDENTITY_FILE:-$(gate_sdk_gates_dir)/identity.conf}}"
+    MANIFEST="${MANIFEST:-$GATE_SDK_IDENTITY_FILE}"
 fi
 
 if [[ ! -e "$MANIFEST" ]]; then
