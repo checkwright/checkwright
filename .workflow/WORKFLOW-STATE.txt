@@ -6,3 +6,4 @@
 
 freshness-cohort-roadmap-hold-and-batch scope a4ab7abc 2026-08-18
 freshness-cohort-roadmap-hold-and-batch spec a3d178dd 2026-08-18
+freshness-cohort-roadmap-hold-and-batch align a4d8c8d8 2026-08-18
