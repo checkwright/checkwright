@@ -673,6 +673,15 @@ is exactly the right ceiling. **A pool younger than the age threshold yields an
 empty worklist**, which is correct and is not a reason to seed a tier by hand
 against the tool: eligibility is the rule, the worklist is the convenience.
 
+**The worklist deliberately does not filter the tier's categorical exclusions —
+a `[roadmap:]` tag or a live promotion trigger — and that is settled, not
+pending.** Operator-ruled 2026-08-18 on five consecutive measurements at zero
+precision: filtering the machine-readable half would have moved the eligible
+count from zero to zero, and the other half is a prose-parsing fork nothing
+justifies. So the closing stage reads a row and applies §The icebox tier's
+eligibility rule to it, which is the division of labour the paragraph above
+already states; a row the rule excludes is a line read, not a defect.
+
 No queue-mutating tool is added — `--extent <slug>` already yields the line
 range an eviction deletes.
 

@@ -3790,56 +3790,6 @@
   bullet itself gives: the record is boundary-truncated, so the finding would be erased at the
   next scope boundary.
 
-- **icebox-worklist-roadmap-blind** [design-pending] — the `queue-index` arm's
-  `--icebox-candidates` filters on age and cost class only, so it offers candidates the icebox
-  tier's own eligibility rule categorically excludes.
-  queue-kit/SPEC.md §The icebox tier states that a roadmap-tagged entry is not
-  icebox-eligible — a hard rule, not a judgment. The worklist does not read the tag.
-  recurrence: icebox-worklist-roadmap-blind 2026-08-15 2026-08-16 2026-08-17 2026-08-18
-  **The 2026-08-17 date is a direct stamp, and these are its grounds.** Observed at this close's
-  own backlog-eviction step with no bullet and no drain — the channel this same iteration's
-  `recurrence-drain-input-widening` ruled sanctioned *and obliged*, the obligation attaching to
-  the judgment (lifecycle-kit/SPEC.md §The committed gap inbox). Live at this rev,
-  `--icebox-candidates` offered **4 rows, 0 eligible**: three roadmap-tagged, plus
-  `rendered-site-link-monitor` on the named-event clause. What is stamped is this session's
-  own observation, never a re-grading of sessions that declined — that question is open.
-  **The advisory defence is raised and settled**, merged in from a duplicate filing. The tool's own
-  `spec:` comment says the age filter "only bounds how much close must look at", so this is not a
-  correctness defect and is filed rather than fixed in place; but that defence covers the
-  **cost-class heuristic**, which is prose-matched and rightly advisory. Roadmap-eligibility is
-  neither prose nor judgment — the tag is on the lead line the tool already parses and the SPEC
-  states the exclusion in the imperative — so filtering it removes re-derivation without deciding
-  anything. What the unit still owes is whether a *categorical* rule belongs in the bound at all.
-  **The open half is presentation, not predicate:** whether an excluded row should vanish or
-  print as a stated exclusion. Vanishing is cleaner; printing keeps the reason visible to a close
-  that would otherwise wonder where a long-dormant roadmap entry went, and the answer turns on
-  whether anything else already tells that story.
-  **The predicate is wider than the tag, established 2026-08-16, and it changes the deliverable.**
-  The fourth row (`rendered-site-link-monitor`) carries no roadmap tag: it is excluded by the
-  tier's *other* categorical clause, a named event waiting, stated in prose the tool cannot
-  parse. So a tag-only filter leaves precision at 1-in-4, and the unit takes both clauses or
-  states why the machine-readable one is worth taking alone.
-  **Cost while deferred:** low, recurring, and paid by every close — three entries re-read and
-  one rule re-derived per iteration, forever, against a one-predicate fix. Re-measured again at
-  this close: 4 rows, 0 eligible — three roadmap-tagged, one (`rendered-site-link-monitor`) on the
-  named-event clause. Precision has been zero at every measurement taken since 2026-08-13.
-  **Declined a third time 2026-08-17 at scope on the lead's ruling, and the two halves are
-  recorded apart because only one of them moved.** The 2026-08-16 ground — the fix would land in a
-  182-line shell **bin tool** the 2026-08-09 priority directive commits to deleting — is **SPENT**:
-  the port landed in `post-close-intake-and-index-port`, the tool is a compiled non-gate arm
-  (queue-kit/SPEC.md §The queue-index arm), and a predicate written there is not thrown away. What
-  the port did **not** carry is this predicate — behaviour-preserving by operator ruling
-  2026-08-17, no filter added and no row dropped — so the port re-grounds this deferral rather
-  than discharging it.
-  **The decline now rests on the entry's own honest limit, which is merit rather than substrate:**
-  the buildable tag-only half would leave 1 row and still 0 eligible, moving the measured number
-  not at all, while the second clause is an undesigned prose-parsing fork. A threshold entry whose
-  blocker has cleared and which is declined anyway is worth saying plainly rather than quietly.
-  Filed 2026-08-09 by close (`install-profile-seam`) from its own backlog-eviction step;
-  a duplicate filing of the same finding (`icebox-candidate-roadmap-filter`, 2026-08-13) was
-  merged in here at the 2026-08-13 close, which also filed
-  `close-eviction-refiles-without-checking` for the re-filing itself.
-
 - **qualified-pointer-section-ownership** [design-pending] — `check-spec-pointer` asserts a
   cited `§Heading` **exists**, never that it is the heading which *owns* the cited claim, so a
   fully-qualified pointer aimed at the wrong section resolves and reds nothing.
@@ -6526,6 +6476,41 @@
   the gap inbox, and dispositioned in the drain that was already open rather than routed into
   an inbox this same close is about to truncate.
 
+- **lead-specifies-constraint-not-mechanism** [design-pending] — whether the lead contract should
+  say that a lead states the constraint and a stage session finds the mechanism.
+  **The claim, which is what a later scope rules on:** a supervision layer that specifies
+  *mechanism* spends its sessions' verification discipline against its own unverified guess. The
+  asymmetry is already recorded at lifecycle-kit/templates/lead.md — the lead writes no state and
+  so has no verification discipline, while a stage session is held to oracle-first, fixture pairs
+  and a validate battery. A lead that hands down a fix converts a verified actor into a typist,
+  which spends the one asymmetry the split posture exists to exploit.
+  **Two worked instances, both in `port-selector-permanence-and-batch`, and both are the lead's
+  own account rather than a session's self-report.** Validate inverted the lead's diagnosis of the
+  `upgrade` red: the lead suspected the batch that had just changed a hook, and the defect was in
+  the check itself, in a hand-held allowlist older than the change. Build then rejected the
+  derived form the lead had gestured at and deleted the roster outright — phase A's determinism
+  reads on the sync alone, before regen, at which point there is no set to enumerate and nothing
+  to derive. In both, the lead's contribution was the constraint and the session's was the
+  mechanism; where the lead crossed into the second it was wrong.
+  **Why [design-pending], and it is the whole reason this is filed rather than landed:**
+  lifecycle-kit/templates/lead.md is a kit template binding every consumer, so a rule added there
+  is an envelope change. Close refused to make it alone and the lead adopted the refusal rather
+  than substituting its own call. What scope owes is whether the claim generalizes past this
+  repo's posture at all, and if so whether it belongs beside the relay-never-assert rule it is
+  the mirror of, or is too soft to sit in a contract.
+  **THE HONESTY BOUNDARY IS PART OF THE ENTRY, not a caveat on it.** Two instances is an
+  **anecdote, not a measurement**, and **nothing reds on a lead over-specifying** — the rule is
+  unenforceable by construction, since a dispatch never enters the tracked tree. Both instances
+  were caught because the sessions were bounded well, not because any mechanism fired. A scope
+  reading this must not take the rule as established.
+  **Cost while deferred:** low and self-limiting. The posture is already the lead contract's
+  implicit shape, so what is missing is the explicit statement, not the practice; the carry is
+  that each lead re-derives it, and one that does not pays a mis-specified dispatch per firing —
+  two this iteration, each recoverable and each recovered.
+  A longer narrative version is staged as operator material in the essay-harvest sink; the two
+  are different tiers and both stand. Filed 2026-08-18 by close on the lead's ruling, which
+  adopted close's own refusal to take the envelope change alone.
+
 
 ## Icebox
 
@@ -6556,6 +6541,8 @@
 - **scratch-execution-allowlist-bar** [design-pending] — Each close re-derives this standing bar.
 
 ## Done
+
+- icebox-worklist-roadmap-blind
 
 ## Lessons Learned
 
