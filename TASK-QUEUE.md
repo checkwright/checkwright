@@ -16,6 +16,119 @@
 
 ## Deferred
 
+- **close-triage-log-reclaim-loss-window** [design-pending] — the close-stage triage of a capture
+  log reads it and later truncates it as two separate acts, and anything appended between the two
+  is lost with no trace.
+  **The window is in the templates, not in one session's sequencing** — re-verified at this drain
+  by reading both: `guard-kit/templates/close-triage.md` step 5 and
+  `drift-kit/templates/close-knowledge.md` step 3 each prescribe a read-and-triage pass and then
+  name `: > .workflow/<log>` as the reclaim, with the whole triage in between.
+  **Measured, not predicted:** at the `wide-budget-batch-and-hold-declaration` close the
+  diagnosing sweep recorded `.workflow/prompt-friction.log` growing 688 -> 694 lines *while it
+  read*, so at least six fall-throughs from a concurrent session were then discarded by the
+  reclaim.
+  **DISTINCT from the gap inbox**, whose lifecycle-kit/SPEC.md §The committed gap inbox answer is
+  merge=union on a **committed** surface: these two logs are gitignored per-clone capture with no
+  merge semantics available to them, so union is not the fix and the shape of one does not
+  transfer. Distinct too from `scan-prompts-truncation-quote-desync`, a per-line 500-character
+  truncation defect in parsing the log rather than a loss of whole lines from it.
+  **Why `[design-pending]`:** three shapes and none ruled — truncate to the byte offset actually
+  read rather than to empty; rotate rather than truncate; or state in both templates that the
+  reclaim is lossy under concurrency and let the KPI carry the caveat, which is the cheapest and
+  buys the least.
+  **Cost while deferred:** a lower bound that is already declared a lower bound gets quietly
+  lower, and the loss is invisible — nothing records that a truncation discarded unread lines, so
+  the class cannot be measured after the fact, only prevented.
+  Surfaced 2026-08-18 at the `wide-budget-batch-and-hold-declaration` close's tooling-friction
+  triage and filed to the gap inbox there; promoted 2026-08-18 by the next iteration's scope,
+  draining that inbox.
+
+- **entry-cap-displaces-mandated-writes** [design-pending] — the mandated-write class collides with
+  `check-queue-entry-budget`'s per-entry cap at a measurable rate, and nothing counts the spend.
+  **The slug was a shape everyone cites and nothing owned.** Probed 2026-08-18 and again at this
+  drain: before this entry the string resolved to exactly ONE occurrence in the tracked tree — an
+  in-body citation inside `turn-end-chokepoint-and-wait-primitive` — and to no live entry, no Done
+  slug and no SPEC section. Filing it under that spelling is what makes the standing citation
+  resolvable.
+  **Five firings measured in one iteration:** three during scope's disposition work, one seating
+  the operator-handed wait/notification recurrence grounds onto
+  `turn-end-chokepoint-and-wait-primitive` at exactly 50 of 50 counted lines, and one seating the
+  operator's account-restore ruling onto `gh-account-identity-expectation` at 49 of 50.
+  **The last two are the argument.** Both were mandated writes with a citable contract —
+  queue-kit/SPEC.md §check-queue-entry-budget names a judged recurrence's grounds and a ruling
+  recorded onto the entry it rules — and both were seated only by compressing an answered ground
+  out of the same entry. The relief worked and is documented; what has no owner is that it is
+  being spent every time.
+  **DISTINCT from `check-queue-entry-budget` itself**, which is the gate and is behaving exactly as
+  specified, and from `headroom-check-ordering-unruled`, whose axis is *when* a session reads its
+  headroom rather than what the cap displaces.
+  **Why `[design-pending]`:** the real question is whether the entries that keep colliding are the
+  ones that should have been **split**, which is a queue-composition ruling rather than a gate
+  change; a counter with no split criterion behind it would only make the cadence visible.
+  **Cost while deferred:** a cadence that is real is invisible to the only session chartered to act
+  on it, since scope ranks what the queue carries and the queue carried none of this.
+  Surfaced 2026-08-18 while `wide-budget-batch-and-hold-declaration`'s close drained its own
+  inbox, and filed back into it; promoted 2026-08-18 by the following iteration's scope.
+
+- **relayed-ruling-provenance-unrecorded** [design-pending] — a relayed operator ruling lands in a
+  tracked governance surface as "operator-directed" with no provenance a later reader can check.
+  **Found by the harness's own security review**, which flagged the 2026-08-18 `gh` account-restore
+  ruling as possible instruction poisoning: the recording session had landed an operator direction
+  authorizing an elevated-credential account switch and a push to master, deviating from the local
+  release runbook, while its own transcript contained no operator message at all.
+  **The authorization was genuine** — the operator selected it through the harness question
+  mechanism in the lead session — so this is not an incident report; the flag was correct to fire
+  on what it could see.
+  **The gap:** under the split-posture lead architecture (lifecycle-kit/templates/lead.md) an
+  operator ruling reaches a stage session as a peer message and is landed in the queue as
+  "operator-directed". Nothing in the tracked record distinguishes a genuinely relayed ruling from
+  one a compromised or confused lead invented, and the reviewing layer cannot see the lead's
+  transcript. The class most often relayed this way is the highest-consequence one — credentials,
+  pushes, releases, runbook deviations.
+  **DISTINCT from `delegation-provenance-floor`**, which is a *parent* relaying a *child's* return
+  that never arrived; this is a *child* recording a *parent's* ruling into a permanent tracked
+  surface, where the artifact outlives every session that could attest it.
+  **Why `[design-pending]`, and it is envelope-class:** three shapes, none ruled — the lead cites
+  the authorization channel and turn in its relay and the recording session records that citation
+  alongside the ruling; or operator-class rulings are landed by the operator directly rather than
+  relayed; or a provenance field on ruling records naming how the authorization arrived, so an
+  unverifiable one is visibly unverifiable rather than indistinguishable.
+  **Cost while deferred:** silent and audit-side. Every relayed ruling already in the queue carries
+  the same unverifiable provenance, the tracked record is all a later auditor or a fresh session
+  has, and it will not red a gate — it surfaces as a security flag on an honest session, which is
+  where it surfaced.
+  Surfaced 2026-08-18 by the harness security review of `wide-budget-batch-and-hold-declaration`'s
+  close and filed to the gap inbox there; promoted 2026-08-18 by the following scope.
+
+- **boundary-wipe-preserve-basename-reach** [design-pending] — the iteration-boundary scratch wipe
+  matches its preserve list by **basename at any depth**, so one nested `.gitkeep` makes a whole
+  scratch tree immortal and the wipe still reports success.
+  `lifecycle-kit/bin/enter-stage.sh`'s boundary block runs
+  `find "$tmpdir" -mindepth 1 -depth ! -name .gitkeep [! -name <preserve>…] -print -delete`.
+  `! -name` is unanchored, so a `.gitkeep` at any depth survives, its parent's delete then fails
+  as non-empty, and every ancestor up to the scratch root survives with it.
+  **Attested at this very boundary, not reasoned:** `.tmp/upgrepro/` survived this session's wipe
+  intact — two full vendored kit payload copies — because
+  `.tmp/upgrepro/{up,base}/package/payload/context-kit/gate-tests/check-memory-off/good/memory/.gitkeep`
+  sits inside it.
+  **The collision is structural rather than freak:** kit payloads ship `.gitkeep` files, and an
+  upgrade-smoke reproduction is a copy of a kit payload, so the shape recurs whenever scratch holds
+  one.
+  **The failure is silent by design.** The same `# spec:` comment above that `find` suppresses its
+  stderr deliberately, and the run reports what it wiped and never what it failed to wipe; `.tmp/`
+  is gitignored, so no gate sees the residue either.
+  **Why `[design-pending]`:** the preserve contract's intent is stated for the scratch dir's own
+  scaffolding (`<tmpdir>/.gitkeep`, "a consumer that tracks its scratch dir's scaffolding"), so the
+  fix is to anchor the match to the scratch root's immediate children — but whether
+  `LIFECYCLE_KIT_BOUNDARY_PRESERVE` entries are basenames or root-relative paths is a kit contract
+  change a consumer inherits, and whether the wipe should *report* its failures instead of
+  suppressing them is a second, separable call.
+  **Cost while deferred:** scratch accumulates across iteration boundaries without bound while the
+  one mechanism chartered to reclaim it reports success — the boundary reset's own claim is false
+  in exactly the case a consumer is most likely to hit.
+  Found 2026-08-18 by this iteration's scope at its own entry, from the surviving directory rather
+  than from a reading of the code; filed under scope-gated intake rather than fixed in-session.
+
 - **crate-test-cwd-process-global-race** [design-pending] — the crate's test guard covers the knob
   environment and nothing else, while a second process-global is written by a test and read by
   production paths a sibling test may be running concurrently.
