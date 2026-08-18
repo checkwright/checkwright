@@ -12,6 +12,113 @@
 
 ## New Features
 
+- **cohort-held-members-port-prerequisites** [spec: SPEC-port-until.md] — gates are held on
+  shell by operator ruling, each owing a named prerequisite nothing else tracks.
+  Ground is **sequencing, not exclusion**: gate-sdk/SPEC.md §The port-candidate criteria opens
+  by denying the seven are an eligibility screen, and criterion 7's worked example
+  (`check-action-run-shell` / `shellcheck`) names such a member the largest piece of port work
+  rather than a permitted exclusion. Every hold **and its grounds** are canonical at
+  gate-sdk/SPEC.md §The first cohort; this entry carries only the work owed, so a ground
+  stated there is cited here and never restated.
+  The count is the roster's, never a fixed number.
+  **`check-roadmap-fresh`'s hold is SPENT** (2026-08-18 at build): it was held on cohort
+  composition alone, the sequence arrived, and the gate ported **with** its own emitter in one
+  commit. The pairing was forced rather than convenient — the hold kept the roadmap adapter on
+  one substrate so queue-kit/SPEC.md's "the emitter and the gate can never disagree" guarantee
+  survived, and porting either half alone is what would have spent it. Both now sit on one crate
+  function, so the exclusion is satisfied on the other substrate rather than repealed.
+  **The POSIX ERE engine is PAID** (landed 2026-08-13 at build); the members it unblocks and
+  `check-comment-tier`'s standing screen-out are the canonical roster's, cited not restated.
+  **`check-tree-terms` owes more than its port — corrected 2026-08-13 at close** on
+  the mechanical confirmation the gap inbox asked for. Its corpus is `git ls-files` over the
+  whole tracked tree, pruned only by `GATE_PRUNE_DIRS` and the pattern-file basenames — a live
+  run scans 518 files and prunes neither `*/checks/` nor `native/src/` — so every declaration
+  path lies inside the corpus it scans as content, criterion 4's own predicate verbatim. It
+  carries a criterion-4 hold on top of its port, so the gate-sdk leak-guard pair is not the
+  clean first-cohort shape it reads as. Independent of assertion C, which does not select it
+  (`couples=scripts/msg-patterns.list`).
+  **The associative-array bridge is PAID** (landed 2026-08-16 at build): the keyed wire arm
+  released `check-stage-entry` and `check-evidence-baseline` together, and the port uncovered a
+  second channel of the same class — `--reads` could not express a walk's filter — which the
+  same increment carried rather than splitting. The retired holds, the refused split and its
+  grounds are canonical at gate-sdk/SPEC.md §The first cohort, cited not restated.
+  **It also owes the hold's declarable spelling.** gate-sdk/SPEC.md §The port-candidate
+  criteria designs `# port-until: <slug>` — a second header field holding a class-(b)/(c) hold
+  to a live entry — and refuses to mint it on the closed-roster rule, its only holders being
+  this roster. Until they declare it, `port-blockers --group` counts every held member as
+  owed, so each cut re-adjudicates the holds by hand: the re-buy `# no-port:` ended for three.
+  `SPEC-port-until.md` takes **the spelling and not the roster**, so `check-tree-terms`' hold
+  stays owed and this entry demotes again at build. Three rulings it lands. The field is a
+  **bare slug, no `<cause>` half** — a temporary hold's ground lives in the queue entry the slug
+  names, where `# no-port:`' permanence has only prose. The arm's documented derivation
+  *scanned minus ported minus permanent minus undecidable = still owed* is **falsified** by a
+  fourth exclusion class, since a held member is still owed, so the trailer prints *still owed*
+  and *takeable at this cut* rather than leaving a reader to subtract. And slug liveness lands
+  in `check-gate-exemption-tasks`, not in assertion G: that gate already holds the live-section
+  span, the lead-line predicate and the queue coupling over this exact declaration set, so the
+  widening costs **zero** new holders of a predicate gate-sdk/SPEC.md already prices at five.
+  Filed 2026-08-12 by close; widened at build with the canon-kit trio; engine count and cohort
+  cleanliness corrected 2026-08-12 at scope from an 85-gate census, on operator direction;
+  the engine block collapsed 2026-08-13 at build when the ERE cohort paid it; promoted
+  2026-08-16 at spec and demoted at build; re-promoted 2026-08-18 at spec for
+  `check-roadmap-fresh`'s port and demoted again 2026-08-18 at build rather than moved to
+  Done — the deliverable is the corpus of held members and that amendment delivered one
+  increment of it (canon-kit/SPEC.md §Merging an amendment, the entry-outlives-the-amendment
+  branch); re-promoted 2026-08-18 at spec as rider 1 of the wide-budget-batch iteration, on the
+  operator's ruling, for the `# port-until:` spelling alone.
+
+- **native-gate-port-remaining-corpus** [spec: SPEC-port-batch.md] [roadmap: now/reliability]
+  — the whole battery onto the binary, and the shell surface down to its residue.
+  roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
+  The entry stays deferred rather than moving to `## Done`: it is the **whole corpus**, the
+  oracle below still counts gates owed, and a Done move would assert a finished port and
+  silently drop it from the **public** roadmap projection, which reads `[roadmap:]` tags off
+  live entries.
+  **Operator-ruled 2026-08-09: complete the port, ASAP.** The ruling, its grounds and its
+  supersession of the 2026-08-06 measurement-locus clause are recorded in
+  [TRAJECTORY.md](TRAJECTORY.md) §PRIORITY DIRECTIVE — the port track's sequence. This entry is
+  the work, and does not restate them. What it inherits unchanged: gate-sdk/SPEC.md §Porting a
+  gate to the binary substrate for the porting procedure, §Consumer payload for the payload
+  rule.
+  **The scope, both install paths and the bootstrap residue are TRAJECTORY.md §PRIORITY
+  DIRECTIVE's**, not restated; designing the bootstrap is still this unit's work. **Two objections
+  answered:** wall-clock is the weaker case (the win is retiring the shell *sources* the payload
+  carries), and the toolchain-free arm rides the pre-compiled path, so
+  `powershell-installer-surface` shrinks to the bootstrap for the same reason.
+  **Twelve cohorts closed, plus three budget batches; gate-sdk/SPEC.md §The first cohort, and
+  the rule that selects the next is canonical for every one of them** — members, delivered
+  counts, holds, grounds and each batch or cohort's own price live there, so this entry states
+  what remains rather than restating them. From the eighth on, members are **selected by
+  running** `port-blockers.sh --group`; the size arm read exhausted again at this cut, so the
+  budget arm composed the batch, as it does only when no group is takeable.
+  **74 of 104 ported; the rest splits into permanently-shell and owed**
+  — a dated 2026-08-18 oracle read (`bash gate-sdk/bin/port-blockers.sh --group`'s trailer, which
+  `scripts/measured-claims.sh` emits as `ported-gate-members`), never a count this line holds.
+  The freshness-emitter roster it named as owed is **discharged**, that family having closed
+  6/6; the count has drifted twice, both times by a batch landing after it was written.
+  Each batch's adjudications are canonical at its own gate-sdk/SPEC.md section; the third
+  delivered `check-memory-off` and `check-root-tiering`. The 2026-08-18 cut itself is ruled and
+  recorded on `freshness-emitter-port-cohort`: the freshness triple as spine, plus that batch.
+  Every held member is **sequencing with port work owed, never exclusion**, and what each owes
+  is on `cohort-held-members-port-prerequisites`, which owns the roster and the kits it spans;
+  a kit count copied here would be a second one to drift, and was.
+  `SPEC-port-batch.md` composes the **fourth** budget batch, and the operator's width ruling is
+  6–8 members against the prior cuts' two to three. Its envelope: the members share **no joint
+  proof**, so build may drop any one without invalidating the rest. The size arm is now
+  **permanently** exhausted rather than exhausted at a cut — 27 owed members in 27 singleton
+  groups, and born-native forecloses a new group forming — so composition is by declaration
+  size plus criterion cleanliness, and the amendment states the honest limit: cheapness
+  amortizes nothing, the whole saving being one session's overhead spread over eight members.
+  `gate-battery-parallel-execution` and `gate-battery-result-cache` say the port subsumes them:
+  closure candidates as it lands.
+  Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
+  direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope. Since then it is
+  promoted at spec and demoted at build **once per increment** — a cohort, or a budget batch on
+  the arm gate-sdk/SPEC.md §Porting a gate to the binary substrate owns — always a **demotion**;
+  promoted 2026-08-18 at spec for the third budget batch and demoted again 2026-08-18 at build
+  having delivered it; promoted again 2026-08-18 at spec as the spine of the wide-budget-batch
+  iteration, on the operator's ruling.
+
 ## Technical Debt
 
 - **crate-test-env-knob-race** — crate tests set knobs through process-global
@@ -96,105 +203,6 @@
   whatever unrelated project shares the box — as a failed push or a wrong-account commit,
   never as a red gate in the project that caused it. Two occurrences in five days, both from
   a procedure followed correctly.
-- **cohort-held-members-port-prerequisites** [design-pending] — gates are held on
-  shell by operator ruling, each owing a named prerequisite nothing else tracks.
-  Ground is **sequencing, not exclusion**: gate-sdk/SPEC.md §The port-candidate criteria opens
-  by denying the seven are an eligibility screen, and criterion 7's worked example
-  (`check-action-run-shell` / `shellcheck`) names such a member the largest piece of port work
-  rather than a permitted exclusion. Every hold **and its grounds** are canonical at
-  gate-sdk/SPEC.md §The first cohort; this entry carries only the work owed, so a ground
-  stated there is cited here and never restated.
-  The count is the roster's, never a fixed number.
-  **`check-roadmap-fresh`'s hold is SPENT** (2026-08-18 at build): it was held on cohort
-  composition alone, the sequence arrived, and the gate ported **with** its own emitter in one
-  commit. The pairing was forced rather than convenient — the hold kept the roadmap adapter on
-  one substrate so queue-kit/SPEC.md's "the emitter and the gate can never disagree" guarantee
-  survived, and porting either half alone is what would have spent it. Both now sit on one crate
-  function, so the exclusion is satisfied on the other substrate rather than repealed.
-  **The POSIX ERE engine is PAID** (landed 2026-08-13 at build); the members it unblocks and
-  `check-comment-tier`'s standing screen-out are the canonical roster's, cited not restated.
-  **`check-tree-terms` owes more than its port — corrected 2026-08-13 at close** on
-  the mechanical confirmation the gap inbox asked for. Its corpus is `git ls-files` over the
-  whole tracked tree, pruned only by `GATE_PRUNE_DIRS` and the pattern-file basenames — a live
-  run scans 518 files and prunes neither `*/checks/` nor `native/src/` — so every declaration
-  path lies inside the corpus it scans as content, criterion 4's own predicate verbatim. It
-  carries a criterion-4 hold on top of its port, so the gate-sdk leak-guard pair is not the
-  clean first-cohort shape it reads as. Independent of assertion C, which does not select it
-  (`couples=scripts/msg-patterns.list`).
-  **The associative-array bridge is PAID** (landed 2026-08-16 at build): the keyed wire arm
-  released `check-stage-entry` and `check-evidence-baseline` together, and the port uncovered a
-  second channel of the same class — `--reads` could not express a walk's filter — which the
-  same increment carried rather than splitting. The retired holds, the refused split and its
-  grounds are canonical at gate-sdk/SPEC.md §The first cohort, cited not restated.
-  **It also owes the hold's declarable spelling.** gate-sdk/SPEC.md §The port-candidate
-  criteria designs `# port-until: <slug>` — a second header field holding a class-(b)/(c) hold
-  to a live entry — and refuses to mint it on the closed-roster rule, its only holders being
-  this roster. Until they declare it, `port-blockers --group` counts every held member as
-  owed, so each cut re-adjudicates the holds by hand: the re-buy `# no-port:` ended for three.
-  **Cost while deferred:** `native-gate-port-remaining-corpus` ranks the remaining corpus as
-  undifferentiated gate-count, so a held member reads as one more unported gate when its
-  prerequisite is a sub-project. A later cohort discovers the sizing at implementation
-  time, which is the failure mode criterion 7 exists to prevent — designed first, then ported,
-  never ported and patched.
-  Filed 2026-08-12 by close; widened at build with the canon-kit trio; engine count and cohort
-  cleanliness corrected 2026-08-12 at scope from an 85-gate census, on operator direction;
-  the engine block collapsed 2026-08-13 at build when the ERE cohort paid it; promoted
-  2026-08-16 at spec and demoted at build; re-promoted 2026-08-18 at spec for
-  `check-roadmap-fresh`'s port and **demoted again 2026-08-18 at build** rather than moved to
-  Done — the deliverable is the corpus of held members and this amendment delivered one
-  increment of it (canon-kit/SPEC.md §Merging an amendment, the entry-outlives-the-amendment
-  branch), leaving `check-tree-terms` and the `# port-until:` spelling as the work owed.
-
-- **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
-  — the whole battery onto the binary, and the shell surface down to its residue.
-  roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
-  The entry stays deferred rather than moving to `## Done`: it is the **whole corpus**, the
-  oracle below still counts gates owed, and a Done move would assert a finished port and
-  silently drop it from the **public** roadmap projection, which reads `[roadmap:]` tags off
-  live entries.
-  **Operator-ruled 2026-08-09: complete the port, ASAP.** The ruling, its grounds and its
-  supersession of the 2026-08-06 measurement-locus clause are recorded in
-  [TRAJECTORY.md](TRAJECTORY.md) §PRIORITY DIRECTIVE — the port track's sequence. This entry is
-  the work, and does not restate them. What it inherits unchanged: gate-sdk/SPEC.md §Porting a
-  gate to the binary substrate for the porting procedure, §Consumer payload for the payload
-  rule.
-  **The scope, both install paths and the bootstrap residue are TRAJECTORY.md §PRIORITY
-  DIRECTIVE's**, not restated; designing the bootstrap is still this unit's work. **Two objections
-  answered:** wall-clock is the weaker case (the win is retiring the shell *sources* the payload
-  carries), and the toolchain-free arm rides the pre-compiled path, so
-  `powershell-installer-surface` shrinks to the bootstrap for the same reason.
-  **Twelve cohorts closed, plus three budget batches; gate-sdk/SPEC.md §The first cohort, and
-  the rule that selects the next is canonical for every one of them** — members, delivered
-  counts, holds, grounds and each batch or cohort's own price live there, so this entry states
-  what remains rather than restating them. From the eighth on, members are **selected by
-  running** `port-blockers.sh --group`; the size arm read exhausted again at this cut, so the
-  budget arm composed the batch, as it does only when no group is takeable.
-  **74 of 104 ported; the rest splits into permanently-shell and owed**
-  — a dated 2026-08-18 oracle read (`bash gate-sdk/bin/port-blockers.sh --group`'s trailer, which
-  `scripts/measured-claims.sh` emits as `ported-gate-members`), never a count this line holds.
-  The freshness-emitter roster it named as owed is **discharged**, that family having closed
-  6/6; the count has drifted twice, both times by a batch landing after it was written.
-  Each batch's adjudications are canonical at its own gate-sdk/SPEC.md section; the third
-  delivered `check-memory-off` and `check-root-tiering`. The 2026-08-18 cut itself is ruled and
-  recorded on `freshness-emitter-port-cohort`: the freshness triple as spine, plus that batch.
-  Every held member is **sequencing with port work owed, never exclusion**, and what each owes
-  is on `cohort-held-members-port-prerequisites`, which owns the roster and the kits it spans;
-  a kit count copied here would be a second one to drift, and was.
-  **Cost while deferred:** large and known — the **owed** remainder (the split's third arm in
-  that same oracle read, never the unported count, which the permanent members inflate) plus
-  the runners and the install-lifecycle layer; since the 2026-08-14 born-native default
-  (TRAJECTORY.md §The closed rulings) a gate landed meanwhile no longer adds shell to it. Not
-  a single-iteration delta; scope owns the decomposition, and the criterion-relaxation
-  question is closed at gate-sdk/SPEC.md §The port-candidate criteria — an ordering signal,
-  never an eligibility screen. `gate-battery-parallel-execution` and
-  `gate-battery-result-cache` say the port subsumes them: closure candidates as it lands.
-  Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
-  direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope. Since then it is
-  promoted at spec and demoted at build **once per increment** — a cohort, or a budget batch on
-  the arm gate-sdk/SPEC.md §Porting a gate to the binary substrate owns — always a **demotion**;
-  promoted 2026-08-18 at spec for the third budget batch and demoted again 2026-08-18 at build
-  having delivered it.
-
 - **born-native-omission-accumulation** [design-pending] — the born-native flip attaches
   criterion 5's omission to every future gate, and nothing measures the pile.
   **This is the costed residue of a closed ruling, not a challenge to it.** TRAJECTORY.md
