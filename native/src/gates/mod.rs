@@ -37,6 +37,7 @@ pub mod trajectory_fresh;
 pub mod value_rollup_fresh;
 pub mod gap_inbox_neutrality;
 pub mod hook_exec_bit;
+pub mod identity;
 pub mod install_claim;
 pub mod kit_registration;
 pub mod knob_citation;
@@ -1156,6 +1157,17 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_PRUNE_DIRS",
         ],
         "site-kit",
+    ),
+    (
+        "check-identity",
+        identity::run,
+        &[],
+        &[
+            "GATE_SDK_IDENTITY_FILE",
+            "GATE_SDK_GIT_EMAIL_FILE",
+            "GATE_SDK_GIT_REMOTES_FILE",
+        ],
+        "gate-sdk",
     ),
     (
         "check-exec-bit",

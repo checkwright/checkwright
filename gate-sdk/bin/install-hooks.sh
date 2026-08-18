@@ -32,12 +32,24 @@ fi
 # spec: gate-sdk/SPEC.md §install-hooks — apply-and-verify rung: run check-identity
 # once at opt-in so a fresh clone learns of a wrong-identity/wrong-remote mapping
 # before its first commit; the gate's exit status surfaces through this script's.
+# spec: gate-sdk/SPEC.md §install-hooks — the rung reaches the gate through gate_command
+# rather than by interpreting the resolved declaration path: a .gate descriptor is a data
+# file of comment lines, and `bash` on it exits 0, so the rung would pass silently
 identity_rc=0
 mapfile -t _check_dirs < <(gate_check_dirs)
-if identity_gate="$(gate_resolve check-identity "${_check_dirs[@]}")"; then
+_identity_argv_out=""
+_identity_resolve_rc=0
+_identity_argv_out="$(gate_command check-identity "${_check_dirs[@]}")" || _identity_resolve_rc=$?
+if [[ "$_identity_resolve_rc" -eq 0 ]]; then
+    mapfile -t _identity_argv <<<"$_identity_argv_out"
     echo ""
     echo "Verifying git identity (check-identity)…"
-    bash "$identity_gate" || identity_rc=$?
+    "${_identity_argv[@]}" || identity_rc=$?
+elif [[ "$_identity_resolve_rc" -ne 1 ]]; then
+    # spec: gate-sdk/SPEC.md §install-hooks — status 1 is "no such member here", which a
+    # consumer without the gate is entitled to; anything else is a dispatch that could not
+    # be built, already named on stderr, and it fails the opt-in rather than skipping it
+    identity_rc="$_identity_resolve_rc"
 fi
 
 echo "Active hooks:"

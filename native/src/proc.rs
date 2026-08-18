@@ -134,7 +134,10 @@ mod tests {
         for f in &files {
             let text = std::fs::read_to_string(f)
                 .unwrap_or_else(|e| panic!("cannot read {}: {}", f.display(), e));
-            if text.contains("Command") {
+            // spec: gate-sdk/SPEC.md §Fail-closed contract — the roster is the *code*
+            // spellings a construction needs, never the bare word: a gate's own remedy text
+            // may name `core.sshCommand`, and a detector that fires on prose gets muted
+            if ["Command::", "process::Command"].iter().any(|sp| text.contains(sp)) {
                 offenders.push(f.display().to_string());
             }
         }

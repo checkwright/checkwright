@@ -88,7 +88,11 @@ prefixes the `check-graph` external-ref assertion sanctions beyond the
 kit-seeded mermaid import — a consumer whose theme chrome links absolute URLs
 lists their prefixes here — see §check-graph), `GATE_SDK_CORE_FILES_FILE` (default
 `<gates-dir>/core-files.list`), `GATE_SDK_IDENTITY_FILE` (default
-`<gates-dir>/identity.conf`), `GATE_SDK_PRUNE_DIRS` (default
+`<gates-dir>/identity.conf`), `GATE_SDK_GIT_EMAIL_FILE` and
+`GATE_SDK_GIT_REMOTES_FILE` (both default empty; each names a file standing in
+for one thing the clone itself says — `git config user.email`, and the
+`<remote> <url>` set — so an empty value falls through to the live `git` read
+that is the production path — see §check-identity), `GATE_SDK_PRUNE_DIRS` (default
 `target .git node_modules .tmp gate-tests worktrees`; it **replaces** the default
 set rather than extending it — see §lib/gate.sh for the members' rationale),
 `GATE_SDK_PRUNE_EXTRA_DIRS` (default empty; space-separated directory basenames
@@ -6060,6 +6064,19 @@ the fresh clone learns of a wrong-identity or wrong-remote mapping before its
 first commit — the moment the push-identity half is cheapest to fix — and the
 gate's exit status surfaces through this script's.
 
+**The rung reaches the gate through `gate_command`, never by interpreting the
+resolved declaration path, and the reason is worth the sentence: a descriptor
+interprets to success.** Running `bash` on a `.gate` file — a data file whose
+whole content is comment lines — exits **0**, so once its member ported, a rung
+spelled that way would not crash but *pass*, retiring the opt-in verification it
+exists to perform with no diagnostic anywhere. A crash would have been the better
+failure, and no gate would have caught either: this is a direct shell-out from a
+non-gate script, outside every reader a port's enumeration covers.
+`gate_command` resolves the invocation argv for either spelling and fails closed
+on an absent binary. Its **status 1** — the member resolves nowhere — stays a
+silent skip, which a consumer without this gate is entitled to; any other refusal
+fails the opt-in rather than skipping it.
+
 ### build-native
 
 The one spelling of the crate build. Invoked as
@@ -8296,6 +8313,8 @@ property does — which is exactly the failure a core-file pin exists to prevent
 
 ### check-identity
 
+`checks/check-identity.gate` (`precommit`, binary-dispatched).
+
 Invariant: every expectation in the `identity.conf` manifest matches this
 clone's local git identity — a verification backstop for the fresh-clone gap
 where an agent commits or pushes under the wrong identity and fails silently
@@ -8322,20 +8341,46 @@ line-based `key value…` with `#` comments and blanks ignored. An absent, empty
 or comment-only manifest is clean with a note; a mismatch (or a manifest-named
 remote that is absent) is a violation (exit 1); a malformed line — an unknown
 key or wrong field count — is fail-closed (exit 2), never a false clean on an
-uninterpretable manifest. A live run under CI (the vendor-neutral `CI` env var)
+uninterpretable manifest. A run under CI (the vendor-neutral `CI` env var)
 is clean-skipped ahead of the manifest reads: the server-side battery is not a
 committing clone, so there is no local identity to misattribute a commit or
-push with, and the CI runner's unset `user.email` is expected, not a violation
-(fixture mode is unaffected — it exercises the comparison deterministically).
+push with, and the CI runner's unset `user.email` is expected, not a violation.
+**The step-aside binds only where an actual is still read from the clone** — with
+both actual-source knobs below configured, the run is a configured read rather
+than a self-check of a committing clone, so it proceeds and the pair stays
+deterministic wherever it runs. The same scoping covers the
+is-this-a-git-repository precondition, for the same reason.
 Enforcement is dual: the `# graph:` couples the
 manifest at `tier=precommit` (a `git config` change to the mapping is not
 diff-visible, so the whole-tree `run-gates.sh` battery is the real backstop for
 the commit-identity half), and `install-hooks.sh` runs the gate once at opt-in
 to cover the push-identity half (no pre-push hook is added — gate-sdk generates
 only the pre-commit hook, and the setup rung plus the precommit tier already
-cover the surface). A `--fixture <dir>` mode injects the clone's actual identity
-(`git-config-email`, `git-remotes`) so the fixture pair is deterministic without
-touching real git config.
+cover the surface). That rung reaches the gate through `gate_command` rather
+than by interpreting the resolved declaration path (§install-hooks).
+
+**The clone's actuals are redirected by knob, and the `[manifest]` positional and
+`--fixture <dir>` arm are retired.** The positional overrode
+`GATE_SDK_IDENTITY_FILE` and nothing else, so a knob already redirected every
+path it redirected. The arm did not clear that ground as written: it redirected
+*three* things and only the manifest had a knob, the other two being what the
+clone itself says. So the two missing knobs are minted rather than the arm
+deleted on a ground that does not hold — `GATE_SDK_GIT_EMAIL_FILE` and
+`GATE_SDK_GIT_REMOTES_FILE`, each naming a file standing in for one actual, each
+empty by default so the gate falls through to the live `git` read, which is the
+production path. The account-kind rider lands the family's third member on the
+same shape. Reaching
+the gate through knobs is what makes the fixture pair a parity oracle **for the
+live arm** instead of for a fixture-only second code path, which is the payoff
+context-kit/SPEC.md §check-memory-off states for the identical deletion.
+
+**The honest limit, since the knobs are new capability and not only test
+plumbing.** A knob redirecting what the clone's identity *is* can be set to make
+the gate agree with a manifest it should disagree with. That is not a weakening:
+the manifest is local config the same operator writes, the gate is a self-check
+rather than a security boundary, and the scope fence above already puts
+*performing* the mapping outside it. Stated so the capability is a ruling rather
+than a side effect.
 
 ### check-hook-exec-bit
 

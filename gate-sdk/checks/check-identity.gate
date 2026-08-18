@@ -1,0 +1,3 @@
+# graph: couples=scripts/identity.conf,native/src/gates/identity.rs,native/src/fresh.rs dir=one valve=none tier=precommit
+# install: on-surface
+# spec: gate-sdk/SPEC.md §check-identity — every expectation in the identity manifest matches this clone's local git identity

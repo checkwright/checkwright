@@ -72,6 +72,9 @@ unset _gmp
 [[ -v GATE_SDK_CORE_FILES_FILE ]] || GATE_SDK_CORE_FILES_FILE="$GATE_SDK_GATES_DIR/core-files.list"
 # spec: gate-sdk/SPEC.md §lib/gate.sh — the four knobs the fifth batch's members declare, resolved here for the cause the roster above states: a default written inline at a use site or inside a helper's body is invisible to the bridge's `declare -p`, which is its undeclared-knob refusal on the member's first post-port run. Each keeps the `:-` semantics its use site had (an empty value takes the default), and the identity manifest and tests dir ride GATE_SDK_GATES_DIR's resolved value above so the pair stays one value by construction. An absent identity manifest is the gate's own optional-config branch and an absent tests dir the coverage gate's own no-pair branch, not a refusal.
 [[ -n "${GATE_SDK_IDENTITY_FILE:-}" ]] || GATE_SDK_IDENTITY_FILE="$GATE_SDK_GATES_DIR/identity.conf"
+# spec: gate-sdk/SPEC.md §check-identity — the two actual-source knobs: each names a file standing in for one thing the *clone itself* says, and each is empty by default so the gate falls through to the live git read, which is the production path. Defined rather than left unset so the bridge can find them; the family's third member is the rider's own.
+[[ -v GATE_SDK_GIT_EMAIL_FILE ]] || GATE_SDK_GIT_EMAIL_FILE=""
+[[ -v GATE_SDK_GIT_REMOTES_FILE ]] || GATE_SDK_GIT_REMOTES_FILE=""
 [[ -n "${GATE_SDK_TESTS_DIR:-}" ]] || GATE_SDK_TESTS_DIR="$GATE_SDK_GATES_DIR/gate-tests"
 [[ -n "${GATE_SDK_NATIVE_BIN:-}" ]] || GATE_SDK_NATIVE_BIN="native/target/release/checkwright-gates"
 # spec: gate-sdk/SPEC.md §lib/gate.sh — the crate root is normalized where it is resolved rather than at each read, so the value the bridge carries is the canonical one gate_native_crate already printed
