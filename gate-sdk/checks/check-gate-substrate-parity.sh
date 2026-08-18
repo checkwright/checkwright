@@ -83,6 +83,7 @@ dispatching=0
 # assertion A's own loop because the declaration set and its spelling are exactly its output
 declpaths_shell=0
 noport_declared=0
+portuntil_declared=0
 for m in "${MEMBERS[@]}"; do
     for d in "${RESOLVE_DIRS[@]}"; do
         if [[ -f "$d/$m.sh" && -f "$d/$m.gate" ]]; then
@@ -101,9 +102,15 @@ for m in "${MEMBERS[@]}"; do
     # there asserts the negation of the file it sits in
     # spec: gate-sdk/SPEC.md §check-gate-substrate-parity
     noport="$(grep -cE '^#[[:space:]]*no-port:' "$src")" || noport=0
+    # spec: gate-sdk/SPEC.md §check-gate-substrate-parity — the held field's clauses are the
+    # permanent field's over a second spelling, plus the one neither owns alone: a declaration
+    # asserting both makes the two exclusion counts in port-blockers' trailer overlap
+    portuntil="$(grep -cE '^#[[:space:]]*port-until:' "$src")" || portuntil=0
     if [[ "$src" == *.gate ]]; then
         [[ "$noport" -gt 0 ]] \
             && findings+=("port declaration on a descriptor: $src carries a '# no-port:' line — a descriptor's existence is the dispatch declaration, so the field's domain is the <name>.sh spelling alone")
+        [[ "$portuntil" -gt 0 ]] \
+            && findings+=("port declaration on a descriptor: $src carries a '# port-until:' line — a descriptor's existence is the dispatch declaration, so a ported member has no port question left to declare")
     else
         declpaths_shell=$((declpaths_shell + 1))
         if [[ "$noport" -gt 1 ]]; then
@@ -115,6 +122,17 @@ for m in "${MEMBERS[@]}"; do
             [[ -n "${cause//[[:space:]]/}" ]] \
                 || findings+=("port declaration with no cause: $src carries a bare '# no-port:' line — the cause names the ruling that makes the member permanent, and is the field's whole payload")
         fi
+        if [[ "$portuntil" -gt 1 ]]; then
+            findings+=("more than one hold declaration: $src carries $portuntil '# port-until:' lines — a declaration carries at most one")
+        elif [[ "$portuntil" -eq 1 ]]; then
+            portuntil_declared=$((portuntil_declared + 1))
+            slug="$(grep -E '^#[[:space:]]*port-until:' "$src" | head -n 1)"
+            slug="${slug#*port-until:}"
+            [[ -n "${slug//[[:space:]]/}" ]] \
+                || findings+=("hold declaration with no slug: $src carries a bare '# port-until:' line — the slug names the live queue entry that owns the blocker, and is the field's whole payload")
+        fi
+        [[ "$noport" -gt 0 && "$portuntil" -gt 0 ]] \
+            && findings+=("contradictory port declarations: $src carries both '# no-port:' and '# port-until:' — permanent and temporarily-held are opposite verdicts about the same member")
     fi
 done
 
@@ -369,6 +387,10 @@ if [[ ${#findings[@]} -gt 0 ]]; then
     echo "        the <name>.sh declaration only, at most once, and its cause names the SPEC"
     echo "        section ruling the member permanent. A ported member has no port question"
     echo "        left to declare, so drop the line rather than copying it into a descriptor."
+    echo "  help: a '# port-until: <slug>' line declares a member the port still owes but cannot"
+    echo "        take yet, and names the live queue entry owning the blocker. Same domain and"
+    echo "        cardinality as '# no-port:', and never both on one declaration — permanent and"
+    echo "        temporarily-held are opposite verdicts about the same member."
     exit 1
 fi
 
@@ -377,5 +399,5 @@ if [[ "$roster_read" == 1 ]]; then
 else
     roster="${#DESCRIPTORS[@]} descriptor(s), no binary at $BIN so no subcommand roster to compare"
 fi
-echo "GATE-SUBSTRATE-PARITY: clean ($declared member(s) with one declaration each, $dispatching of them dispatching to the binary; $noport_declared of the $declpaths_shell shell declaration(s) declare '# no-port:' with a cause, no descriptor carrying one; $roster; $sensitive substrate-sensitive member(s) all dispositioned; $impl_scanned implementation source(s) free of manifest-class annotation; $kit_scanned kit root(s) scanned for an implementation sibling, crate root $CRATE outside every kit root; target roster $roster_state at $ROSTER with $roster_targets well-formed target(s); publish workflow $wf_state at $WORKFLOW, $wf_matrix matrix declaration(s) roster-derived across $wf_jobs job(s) with one producer per digest)"
+echo "GATE-SUBSTRATE-PARITY: clean ($declared member(s) with one declaration each, $dispatching of them dispatching to the binary; $noport_declared of the $declpaths_shell shell declaration(s) declare '# no-port:' with a cause and $portuntil_declared declare '# port-until:' with a slug, neither on any descriptor nor both on one declaration; $roster; $sensitive substrate-sensitive member(s) all dispositioned; $impl_scanned implementation source(s) free of manifest-class annotation; $kit_scanned kit root(s) scanned for an implementation sibling, crate root $CRATE outside every kit root; target roster $roster_state at $ROSTER with $roster_targets well-formed target(s); publish workflow $wf_state at $WORKFLOW, $wf_matrix matrix declaration(s) roster-derived across $wf_jobs job(s) with one producer per digest)"
 exit 0

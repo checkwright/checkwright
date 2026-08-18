@@ -16,6 +16,7 @@ const SHELL_COLON: &[&str] = &[
     "exception-list:",
     "no-fixture:",
     "no-port:",
+    "port-until:",
     "permanent:",
     "smoke-unregistered:",
     "comment-tier-exempt:",

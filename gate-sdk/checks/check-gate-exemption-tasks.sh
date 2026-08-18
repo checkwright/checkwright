@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # graph: couples=scripts/*.sh,kit:*.sh,TASK-QUEUE.md dir=one valve=none tier=precommit
 # install: zero-config
-# spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — every exception-list element carries a live until: task or permanent: reason
+# spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — every temporary-disposition annotation a gate declaration carries names a live task: an exception-list element's until:, or the declaration's own port-until: header field
 #
 # usage: check-gate-exemption-tasks.sh [queue-file [dir...]]
 #   defaults: $GATE_SDK_QUEUE_FILE (TASK-QUEUE.md); gates dir + each kit's checks/
@@ -67,6 +67,7 @@ parse_elements() {
 
 errors=()
 arrays=0
+headers=0
 scan_files=()
 shopt -s nullglob
 for d in "${DIRS[@]}"; do
@@ -94,13 +95,34 @@ if [[ ${#scan_files[@]} -gt 0 ]]; then
             esac
         done < <(parse_elements "$file" "$lineno")
     done < <(grep -nE '^[[:space:]]*# exception-list:' "${scan_files[@]}" /dev/null 2>/dev/null)
+
+    # spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — the header-field arm enters the walk
+    # independently of the '# exception-list:' marker, because a declaration carrying only the
+    # field is skipped by the trigger the array arm opens on
+    while IFS= read -r hdr; do
+        [[ -z "$hdr" ]] && continue
+        file="${hdr%%:*}"; rest="${hdr#*:}"; lineno="${rest%%:*}"; text="${rest#*:}"
+        slug="${text#*port-until:}"
+        slug="${slug#"${slug%%[![:space:]]*}"}"
+        slug="${slug%%[!a-z0-9-]*}"
+        # spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — a bare field is assertion G's shape
+        # clause, not this gate's: there is no slug to resolve, and reporting it here would give
+        # one defect two reds whose wording disagrees about what is wrong
+        [[ -z "$slug" ]] && continue
+        headers=$(( headers + 1 ))
+        if [[ -z "${IS_LIVE[$slug]:-}" ]]; then
+            errors+=("$file:$lineno — # port-until: $slug does not resolve to a live task (moved to Done, or missing from $QUEUE)")
+        fi
+    done < <(grep -nE '^[[:space:]]*#[[:space:]]*port-until:' "${scan_files[@]}" /dev/null 2>/dev/null)
 fi
 
 if [[ ${#errors[@]} -gt 0 ]]; then
     echo "GATE-EXEMPTION-TASKS: ${#errors[@]} violation(s):"
     printf '  %s\n' "${errors[@]}"
-    echo "  help: annotate each exemption element '# until: <live-slug>' or '# permanent: <reason>'"
+    echo "  help: annotate each exemption element '# until: <live-slug>' or '# permanent: <reason>', and
+        point each '# port-until: <slug>' header field at a live queue entry — when the blocker
+        lands and the entry moves to Done, the declaration is dropped rather than left behind"
     exit 1
 fi
-echo "GATE-EXEMPTION-TASKS: clean ($arrays exemption array(s), ${#IS_LIVE[@]} live task slug(s); every element declares until-with-live-task or permanent-with-reason)"
+echo "GATE-EXEMPTION-TASKS: clean ($arrays exemption array(s), $headers '# port-until:' header field(s), ${#IS_LIVE[@]} live task slug(s); every element declares until-with-live-task or permanent-with-reason and every held declaration names a live entry)"
 exit 0

@@ -1,3 +1,4 @@
 # until: retired-task does not resolve to a live task
 exemption element carries neither # until: <slug> nor # permanent: <reason>
 # until: emphasis does not resolve to a live task
+# port-until: retired-task does not resolve to a live task

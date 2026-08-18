@@ -288,6 +288,7 @@ group_unkeyed=""
 group_unkeyed_n=0
 ported_excluded=0
 permanent_excluded=0
+held_excluded=0
 
 record() {
     rows+="$1"$'\t'"$2"$'\t'"$3"$'\n'
@@ -350,6 +351,13 @@ while IFS= read -r member; do
     # this arm can take, while the default arm's criterion-7 row grounds the permanence itself
     if [[ "$MODE" == group ]] && grep -Eq '^#[[:space:]]*no-port:' "$decl"; then
         permanent_excluded=$((permanent_excluded + 1))
+        continue
+    fi
+    # spec: gate-sdk/SPEC.md §port-blockers — a temporarily-held member leaves the partition on the
+    # permanent member's terms but is counted apart from it: it is still owed, so the trailer prints
+    # the two numbers rather than leaving a reader to subtract a fourth class out of the third
+    if [[ "$MODE" == group ]] && grep -Eq '^#[[:space:]]*port-until:' "$decl"; then
+        held_excluded=$((held_excluded + 1))
         continue
     fi
 
@@ -443,8 +451,13 @@ if [[ "$MODE" == group ]]; then
         printf '%s\n' "${group_unkeyed%$'\n'}"
         printf '\n'
     fi
-    printf 'port-blockers --group: %d member(s) scanned, %d group(s) formed, %d undecidable, %d already ported and excluded, %d permanently shell and excluded\n' \
-        "$scanned" "$groups" "$group_unkeyed_n" "$ported_excluded" "$permanent_excluded"
+    # spec: gate-sdk/SPEC.md §port-blockers — a held member is excluded from the partition and still
+    # owed, which falsifies the subtraction a reader would otherwise do, so both numbers are printed
+    still_owed=$((scanned - ported_excluded - permanent_excluded))
+    takeable=$((still_owed - held_excluded))
+    printf 'port-blockers --group: %d member(s) scanned, %d group(s) formed, %d undecidable, %d already ported and excluded, %d permanently shell and excluded, %d temporarily held and excluded; %d still owed, %d takeable at this cut\n' \
+        "$scanned" "$groups" "$group_unkeyed_n" "$ported_excluded" "$permanent_excluded" \
+        "$held_excluded" "$still_owed" "$takeable"
     exit 0
 fi
 

@@ -1186,7 +1186,7 @@ vendored source, `install:` by the installer's recipe module and
 off `smoke/install.sh`, gate-sdk/SPEC.md §The install disposition and
 §Consumer smoke), a reason directive (a spec pointer, usage synopsis, or
 positional justification: `spec:`, `usage:`, `exception-list:`,
-`no-fixture:`, `no-port:`, `assertion`, `permanent:`, `TODO(task:`,
+`no-fixture:`, `no-port:`, `port-until:`, `assertion`, `permanent:`, `TODO(task:`,
 `TODO(spec-ambiguity)`, which blesses a bounded window — its own line plus
 continuation lines up to `CANON_KIT_COMMENT_RUN_CAP` total physical comment
 lines, blank `#` lines counted; a directive mid-run opens a fresh window

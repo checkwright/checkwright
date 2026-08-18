@@ -12,61 +12,6 @@
 
 ## New Features
 
-- **cohort-held-members-port-prerequisites** [spec: SPEC-port-until.md] — gates are held on
-  shell by operator ruling, each owing a named prerequisite nothing else tracks.
-  Ground is **sequencing, not exclusion**: gate-sdk/SPEC.md §The port-candidate criteria opens
-  by denying the seven are an eligibility screen, and criterion 7's worked example
-  (`check-action-run-shell` / `shellcheck`) names such a member the largest piece of port work
-  rather than a permitted exclusion. Every hold **and its grounds** are canonical at
-  gate-sdk/SPEC.md §The first cohort; this entry carries only the work owed, so a ground
-  stated there is cited here and never restated.
-  The count is the roster's, never a fixed number.
-  **`check-roadmap-fresh`'s hold is SPENT** (2026-08-18 at build): it was held on cohort
-  composition alone, the sequence arrived, and the gate ported **with** its own emitter in one
-  commit. The pairing was forced rather than convenient — the hold kept the roadmap adapter on
-  one substrate so queue-kit/SPEC.md's "the emitter and the gate can never disagree" guarantee
-  survived, and porting either half alone is what would have spent it. Both now sit on one crate
-  function, so the exclusion is satisfied on the other substrate rather than repealed.
-  **The POSIX ERE engine is PAID** (landed 2026-08-13 at build); the members it unblocks and
-  `check-comment-tier`'s standing screen-out are the canonical roster's, cited not restated.
-  **`check-tree-terms` owes more than its port — corrected 2026-08-13 at close** on
-  the mechanical confirmation the gap inbox asked for. Its corpus is `git ls-files` over the
-  whole tracked tree, pruned only by `GATE_PRUNE_DIRS` and the pattern-file basenames — a live
-  run scans 518 files and prunes neither `*/checks/` nor `native/src/` — so every declaration
-  path lies inside the corpus it scans as content, criterion 4's own predicate verbatim. It
-  carries a criterion-4 hold on top of its port, so the gate-sdk leak-guard pair is not the
-  clean first-cohort shape it reads as. Independent of assertion C, which does not select it
-  (`couples=scripts/msg-patterns.list`).
-  **The associative-array bridge is PAID** (landed 2026-08-16 at build): the keyed wire arm
-  released `check-stage-entry` and `check-evidence-baseline` together, and the port uncovered a
-  second channel of the same class — `--reads` could not express a walk's filter — which the
-  same increment carried rather than splitting. The retired holds, the refused split and its
-  grounds are canonical at gate-sdk/SPEC.md §The first cohort, cited not restated.
-  **It also owes the hold's declarable spelling.** gate-sdk/SPEC.md §The port-candidate
-  criteria designs `# port-until: <slug>` — a second header field holding a class-(b)/(c) hold
-  to a live entry — and refuses to mint it on the closed-roster rule, its only holders being
-  this roster. Until they declare it, `port-blockers --group` counts every held member as
-  owed, so each cut re-adjudicates the holds by hand: the re-buy `# no-port:` ended for three.
-  `SPEC-port-until.md` takes **the spelling and not the roster**, so `check-tree-terms`' hold
-  stays owed and this entry demotes again at build. Three rulings it lands. The field is a
-  **bare slug, no `<cause>` half** — a temporary hold's ground lives in the queue entry the slug
-  names, where `# no-port:`' permanence has only prose. The arm's documented derivation
-  *scanned minus ported minus permanent minus undecidable = still owed* is **falsified** by a
-  fourth exclusion class, since a held member is still owed, so the trailer prints *still owed*
-  and *takeable at this cut* rather than leaving a reader to subtract. And slug liveness lands
-  in `check-gate-exemption-tasks`, not in assertion G: that gate already holds the live-section
-  span, the lead-line predicate and the queue coupling over this exact declaration set, so the
-  widening costs **zero** new holders of a predicate gate-sdk/SPEC.md already prices at five.
-  Filed 2026-08-12 by close; widened at build with the canon-kit trio; engine count and cohort
-  cleanliness corrected 2026-08-12 at scope from an 85-gate census, on operator direction;
-  the engine block collapsed 2026-08-13 at build when the ERE cohort paid it; promoted
-  2026-08-16 at spec and demoted at build; re-promoted 2026-08-18 at spec for
-  `check-roadmap-fresh`'s port and demoted again 2026-08-18 at build rather than moved to
-  Done — the deliverable is the corpus of held members and that amendment delivered one
-  increment of it (canon-kit/SPEC.md §Merging an amendment, the entry-outlives-the-amendment
-  branch); re-promoted 2026-08-18 at spec as rider 1 of the wide-budget-batch iteration, on the
-  operator's ruling, for the `# port-until:` spelling alone.
-
 - **native-gate-port-remaining-corpus** [spec: SPEC-port-batch.md] [roadmap: now/reliability]
   — the whole battery onto the binary, and the shell surface down to its residue.
   roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
@@ -122,6 +67,55 @@
 ## Technical Debt
 
 ## Deferred
+
+- **cohort-held-members-port-prerequisites** [design-pending] — gates are held on
+  shell by operator ruling, each owing a named prerequisite nothing else tracks.
+  Ground is **sequencing, not exclusion**: gate-sdk/SPEC.md §The port-candidate criteria opens
+  by denying the seven are an eligibility screen, and criterion 7's worked example
+  (`check-action-run-shell` / `shellcheck`) names such a member the largest piece of port work
+  rather than a permitted exclusion. Every hold **and its grounds** are canonical at
+  gate-sdk/SPEC.md §The first cohort; this entry carries only the work owed, so a ground
+  stated there is cited here and never restated; the count is the roster's, never a fixed number.
+  **The spent holds are the SPEC's record, not this entry's** — `check-roadmap-fresh` (held on
+  cohort composition; ported with its own emitter in one commit, 2026-08-18), the POSIX ERE
+  engine (2026-08-13) and the associative-array bridge (2026-08-16, which also carried a second
+  channel of its class rather than splitting). Each hold, what it released and the ground it was
+  retired on are canonical at gate-sdk/SPEC.md §The first cohort, cited here and never restated.
+  **`check-tree-terms` owes more than its port — corrected 2026-08-13 at close** on the
+  mechanical confirmation the gap inbox asked for. Its corpus is `git ls-files` over the whole
+  tracked tree, pruned only by `GATE_PRUNE_DIRS` and the pattern-file basenames, and a live run
+  prunes neither `*/checks/` nor `native/src/` — so every declaration path lies inside the corpus
+  it scans as content, criterion 4's own predicate verbatim. The criterion-4 hold sits on top of
+  its port, so the leak-guard pair is not the clean first-cohort shape it reads as, and it is
+  independent of assertion C, which does not select it (`couples=scripts/msg-patterns.list`).
+  **The hold's declarable spelling is PAID** (landed 2026-08-18 at build): `# port-until: <slug>`
+  is minted on the shell declaration path with its readers, and every day-one holder declares it,
+  so `port-blockers --group` leaves each cut a takeable set rather than a hand re-adjudication. The
+  field, its wider-than-class-(b)/(c) domain, the trailer arithmetic a fourth exclusion class
+  falsified, and the split that put slug liveness in `check-gate-exemption-tasks` rather than in
+  assertion G are canonical at gate-sdk/SPEC.md §The `# graph:` manifest, §port-blockers,
+  §check-gate-substrate-parity and §check-gate-exemption-tasks, cited here and never restated.
+  The increment took **the spelling and not the roster**, which is why `check-tree-terms`' hold
+  above is still owed and this entry demoted rather than closing. One finding the mint forced and
+  the amendment had not: three of the five holders — `check-shellcheck`, `check-action-run-shell`
+  and `check-gate-assertions` — grounded their holds only in criterion 7's shared worked-example
+  prose, so each gate's own SPEC section gained its cause before its declaration could land.
+  **Cost while deferred:** `native-gate-port-remaining-corpus` ranks the remaining corpus as
+  undifferentiated gate-count, so a held member reads as one more unported gate when its
+  prerequisite is a sub-project. A later cohort discovers the sizing at implementation time,
+  which is the failure mode criterion 7 exists to prevent — designed first, then ported, never
+  ported and patched. The `# port-until:` declarations now keep the held members out of
+  `--group`'s takeable set, so what remains uncosted is the criterion-4 hold's own size.
+  Filed 2026-08-12 by close; widened at build with the canon-kit trio; engine count and cohort
+  cleanliness corrected 2026-08-12 at scope from an 85-gate census, on operator direction;
+  the engine block collapsed 2026-08-13 at build when the ERE cohort paid it; promoted
+  2026-08-16 at spec and demoted at build; re-promoted 2026-08-18 at spec for
+  `check-roadmap-fresh`'s port and demoted again 2026-08-18 at build rather than moved to
+  Done — the deliverable is the corpus of held members and that amendment delivered one
+  increment of it (canon-kit/SPEC.md §Merging an amendment, the entry-outlives-the-amendment
+  branch); re-promoted 2026-08-18 at spec as rider 1 of the wide-budget-batch iteration, on the
+  operator's ruling, for the `# port-until:` spelling alone; merged and demoted again
+  2026-08-18 at build on the same entry-outlives-the-amendment branch.
 
 - **gh-account-identity-expectation** [design-pending] — a third expectation kind for
   check-identity, `gh-account <login>`, asserting that this clone's active GitHub CLI

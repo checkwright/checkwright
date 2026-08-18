@@ -1,4 +1,7 @@
 check-alpha
+check-bare
+check-both
+check-heldtwice
 check-dup
 check-orphan
 check-twice
