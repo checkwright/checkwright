@@ -5000,7 +5000,7 @@
 - **scratch-execution-control-is-bash-only** [design-pending] — the scratch-run steer and the
   runner it steers to are both bash-only, so a non-bash scratch script executes with no
   compensating control at all.
-  recurrence: scratch-execution-control-is-bash-only 2026-08-16
+  recurrence: scratch-execution-control-is-bash-only 2026-08-16 2026-08-18
   `scripts/bash-guard.sh` blocks a direct scratch run by matching `^bash[[:space:]]+\.tmp/`, and
   `guard-kit/bin/scratch-run.sh` executes its target with a hardcoded `bash`. Neither reaches a
   script run under another interpreter. Probed at the 2026-08-13 close against the guard itself:
@@ -5019,6 +5019,12 @@
   allowlist bar for scratch execution rather than about which interpreters the control covers.
   **Cost while deferred:** the control reads as complete and is not, which is worse than an
   absent control — a reviewer seeing the rule and the runner has no reason to check its reach.
+  **Third measurement, 2026-08-18 — grounds for that date, and the trend is the argument.** The
+  count went 3 → **25+ distinct `python3 .tmp/*.py` invocations** in one iteration, plus 23 `python3
+  -` stdin heredocs editing tracked files. Meanwhile the *bash* side is clean: every scratch bash
+  script this iteration ran through `guard-kit/bin/scratch-run.sh`, so the runner works and the
+  control's reach is the whole defect. A control covering the disciplined half while the
+  undisciplined half grows eightfold is measuring habit, not risk.
   Filed 2026-08-13 by close, from its own tooling-friction triage; probed at source before filing.
 
 - **ro-bins-write-option-bypass** [design-pending] — `GUARD_KIT_RO_BINS` membership is tested as
@@ -6104,6 +6110,18 @@
   **Cost while deferred:** roughly one out-of-band decision per journal write, paid by every
   dispatched session in every iteration, plus a fresh clone with no working oracle grants.
   Class: mints no governed name and adds no gate, so canon-kit's litmus makes it **debt**.
+  recurrence: session-mechanic-grants-uncommitted 2026-08-18
+  **Second measurement, 2026-08-18 — grounds for that date.** The journal-write count roughly
+  tripled: **~69 of ~92 `cat` occurrences are heredoc writes into `.tmp/`**, against 21 at filing,
+  and `cat` is again the single largest pattern (73 of 248 prompting calls). Six further absent
+  grants were named at the same triage, each a standing mechanic rather than a one-off: `awk`
+  (granted nowhere, and absent from `GUARD_KIT_RO_BINS` so it misses the read-only-pipeline
+  auto-allow too), the `nohup … & echo pid=… > <key>.run` background-launch idiom this project
+  *mandates*, the bare `native/target/release/checkwright` non-gate arm while its `-gates` sibling
+  is granted, `chmod` with a numeric mode where only `chmod +x *` is granted, `bash
+  */checks/check-*.sh` not reaching the `.gate` descriptors gates now ship as, and `git worktree`,
+  granted by the overlay alone. The list is a promotion *proposal*: widening the committed set
+  stays the consumer's call, which is the same wall disposition (a) already hits.
   Filed 2026-08-16 by close, from its own tooling-friction triage; counts read off
   `scan-prompts.sh` at the triage rather than estimated.
 

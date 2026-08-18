@@ -2,3 +2,4 @@
 # One line per iteration at its release boundary, close-written; the line
 # grammar is lifecycle-kit/SPEC.md §templates/stages/'s, not restated here.
 
+wide-budget-batch-and-hold-declaration release deferred:v0.24.0 — no trigger fired: newest tag v0.23.0 is 4 days old against the 7-day floor, no decommission earns a major, no security or supply-chain fix, no operator direction; the four tightened-gate declarations accumulated since that tag derive a minor, so v0.24.0 is what the criteria would have shipped as.
