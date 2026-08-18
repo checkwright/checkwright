@@ -12,6 +12,107 @@
 
 ## New Features
 
+- **freshness-emitter-port-cohort** [spec: SPEC-emitter-tail.md] — the generated-projection
+  freshness family is six comparator+emitter pairs; **three are now ported and three remain
+  shell**.
+  **Delivered 2026-08-16**: `footprint.sh` (129), `gate-sdk/bin/enforcement-map.sh` (273) and
+  `scripts/gen-value-rollup.sh` (124) are deleted, each emitter now a non-gate arm of the binary,
+  and `check-footprint-fresh`, `check-enforcement-fresh` and `check-value-rollup-fresh` each call
+  their emitter **in-process** rather than spawning it. Each port was held to a byte-identical
+  parity run against the shell emitter *before* the deletion. Two dividends banked: the join is
+  structural (the rollup receives its siblings' data instead of re-parsing their markdown), and
+  `jq` left the battery's own path with the settings-hook rows.
+  **Remaining, and held by nothing but sequence:** `scripts/gen-docs-mirror.sh` (127),
+  `drift-kit/bin/trajectory.sh` (242) and `queue-kit/bin/roadmap.sh` (76), with their comparators.
+  The design question is **answered and merged** — a ported emitter is a non-gate arm
+  (gate-sdk/SPEC.md §The non-gate arm) — so the following cohort applies the ruling rather than
+  re-deciding it, and `check-roadmap-fresh`'s unruled-emitter-design hold is retired as spent.
+  **Taken this iteration — ruled 2026-08-18 at scope on the operator's relayed ruling; the cut is
+  the freshness triple as spine plus a two-member budget batch.** `--group` again read every group
+  a singleton, which is the budget arm's stated precondition (gate-sdk/SPEC.md §Porting a gate to
+  the binary substrate).
+  **The spine's own coupling:** `check-roadmap-fresh` is ported **with** `queue-kit/bin/roadmap.sh`
+  rather than after it. `cohort-held-members-port-prerequisites` states the hold's dividend as
+  keeping `queue_roadmap_entries` on one shell adapter so queue-kit/SPEC.md's "the emitter and the
+  gate can never disagree" guarantee survives; porting the emitter alone is what spends it. The
+  other two comparators need no such pairing — both are already native.
+  **The batch, and it is never one unit of work:** `check-memory-off` (89 shell lines) and
+  `check-root-tiering` (67), each taking its own descriptor, registry entry and parity run, either
+  droppable without touching the other or the spine.
+  **The criterion-7 adjudication that admits `check-memory-off`, recorded so a later selector does
+  not re-make it.** Its jq use is a path query over `settings.local.json` against the
+  `<path> = <expected JSON>` grammar of `scripts/settings-pins.conf` — the identical operation the
+  **already-ported** `check-settings-pins` performs on the same grammar through
+  `native/src/json.rs`'s `Path::compile`/`eval`. The design criterion 7 demands before a port is
+  therefore already paid, and the member is a re-use rather than a re-implementation. Dividend:
+  `port-blockers.sh`'s criterion-7 report names it the battery's **only** remaining jq consumer,
+  so the port subtracts jq from the gate battery's dependency floor (TRAJECTORY.md objective 1).
+  A batch finding owes a gate-sdk/SPEC.md section when it lands.
+  **What the port must not bake in.** `roadmap.sh` reads this consumer's roadmap-tag lane
+  vocabulary, already consumer config (`scripts/queue-config.sh`, in the gate's own couple set).
+  The arm carries the knob read; a lane literal in the crate would publish a consumer's
+  vocabulary, the class the provenance seam forbids.
+  **Why deferred rather than Done:** the deliverable is a six-member corpus and half of it is
+  unbuilt. A Done move would assert a finished port.
+  **Cost while deferred:** three shell emitters keep bash in the dependency floor against
+  TRAJECTORY.md objectives 1 and 6, all three behind already-compiled comparators.
+  Filed 2026-08-15 by close; scoped to the value-rollup triple by operator ruling 2026-08-15 and
+  demoted at build 2026-08-16 having delivered that triple; promoted 2026-08-18 at spec for the
+  tail triple, which closes the family 6/6.
+
+- **cohort-held-members-port-prerequisites** [spec: SPEC-roadmap-port.md] — gates are held on
+  shell by operator ruling, each owing a named prerequisite nothing else tracks.
+  Ground is **sequencing, not exclusion**: gate-sdk/SPEC.md §The port-candidate criteria opens
+  by denying the seven are an eligibility screen, and criterion 7's worked example
+  (`check-action-run-shell` / `shellcheck`) names such a member the largest piece of port work
+  rather than a permitted exclusion. Every hold **and its grounds** are canonical at
+  gate-sdk/SPEC.md §The first cohort; this entry carries only the work owed, so a ground
+  stated there is cited here and never restated.
+  The count is the roster's, never a fixed number.
+  **`check-roadmap-fresh` is held on cohort composition alone** — relabelled off criterion 7 at
+  build 2026-08-12, ground unchanged. It is canonical, with the whole family's per-member cost
+  derivation, at gate-sdk/SPEC.md §The first cohort. The emitter design it once owed is
+  **answered and its hold retired as spent** (2026-08-16, `freshness-emitter-port-cohort`), and
+  **the sequence the port was held by arrived 2026-08-18** — it is taken this iteration, ported
+  with its own emitter in one session. The pairing is forced, not convenient: the hold keeps
+  `queue_roadmap_entries` on one shell adapter, so queue-kit/SPEC.md's "the emitter and the gate
+  can never disagree" guarantee survives, and porting the emitter alone is what spends it.
+  **The POSIX ERE engine is PAID** (landed 2026-08-13 at build); the members it unblocks and
+  `check-comment-tier`'s standing screen-out are the canonical roster's, cited not restated.
+  **One of them owes more than its port: `check-tree-terms` — corrected 2026-08-13 at close** on
+  the mechanical confirmation the gap inbox asked for. Its corpus is `git ls-files` over the
+  whole tracked tree, pruned only by `GATE_PRUNE_DIRS` and the pattern-file basenames — a live
+  run scans 518 files and prunes neither `*/checks/` nor `native/src/` — so every declaration
+  path lies inside the corpus it scans as content, criterion 4's own predicate verbatim. It
+  carries a criterion-4 hold on top of its port, so the gate-sdk leak-guard pair is not the
+  clean first-cohort shape it reads as. Independent of assertion C, which does not select it
+  (`couples=scripts/msg-patterns.list`).
+  **The associative-array bridge is PAID** (landed 2026-08-16 at build): the keyed wire arm
+  released `check-stage-entry` and `check-evidence-baseline` together, and the port uncovered a
+  second channel of the same class — `--reads` could not express a walk's filter — which the
+  same increment carried rather than splitting. The retired holds, the refused split and its
+  grounds are canonical at gate-sdk/SPEC.md §The first cohort, cited not restated.
+  **It also owes the hold's declarable spelling.** gate-sdk/SPEC.md §The port-candidate
+  criteria designs `# port-until: <slug>` — a second header field holding a class-(b)/(c) hold
+  to a live entry — and refuses to mint it on the closed-roster rule, its only holders being
+  this roster. Until they declare it, `port-blockers --group` counts every held member as
+  owed, so each cut re-adjudicates the holds by hand: the re-buy `# no-port:` ended for three.
+  **Cost while deferred:** `native-gate-port-remaining-corpus` ranks the remaining corpus as
+  undifferentiated gate-count, so a held member reads as one more unported gate when its
+  prerequisite is a sub-project. A later cohort discovers the sizing at implementation
+  time, which is the failure mode criterion 7 exists to prevent — designed first, then ported,
+  never ported and patched.
+  Filed 2026-08-12 by close; widened at build with the canon-kit trio; engine count and cohort
+  cleanliness corrected 2026-08-12 at scope from an 85-gate census, on operator direction;
+  the engine block collapsed 2026-08-13 at build when the ERE cohort paid it; promoted
+  2026-08-16 at spec and **demoted again 2026-08-16 at build** rather than moved to Done — the
+  deliverable is the corpus of held members and the keyed-knob amendment delivered one
+  increment of it (canon-kit/SPEC.md §Merging an amendment, the entry-outlives-the-amendment
+  branch), with `check-roadmap-fresh` and `check-tree-terms` still owing theirs; re-promoted
+  2026-08-18 at spec for `check-roadmap-fresh`'s port, leaving `check-tree-terms` and the
+  `# port-until:` spelling as the entry's remaining work.
+
+
 ## Technical Debt
 
 ## Deferred
@@ -65,102 +166,6 @@
   direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope. Since then it is
   promoted at spec and demoted at build **once per increment** — a cohort, or a budget batch on
   the arm gate-sdk/SPEC.md §Porting a gate to the binary substrate owns — always a **demotion**.
-
-- **cohort-held-members-port-prerequisites** [design-pending] — gates are held on
-  shell by operator ruling, each owing a named prerequisite nothing else tracks.
-  Ground is **sequencing, not exclusion**: gate-sdk/SPEC.md §The port-candidate criteria opens
-  by denying the seven are an eligibility screen, and criterion 7's worked example
-  (`check-action-run-shell` / `shellcheck`) names such a member the largest piece of port work
-  rather than a permitted exclusion. Every hold **and its grounds** are canonical at
-  gate-sdk/SPEC.md §The first cohort; this entry carries only the work owed, so a ground
-  stated there is cited here and never restated.
-  The count is the roster's, never a fixed number.
-  **`check-roadmap-fresh` is held on cohort composition alone** — relabelled off criterion 7 at
-  build 2026-08-12, ground unchanged. It is canonical, with the whole family's per-member cost
-  derivation, at gate-sdk/SPEC.md §The first cohort. The emitter design it once owed is
-  **answered and its hold retired as spent** (2026-08-16, `freshness-emitter-port-cohort`), and
-  **the sequence the port was held by arrived 2026-08-18** — it is taken this iteration, ported
-  with its own emitter in one session. The pairing is forced, not convenient: the hold keeps
-  `queue_roadmap_entries` on one shell adapter, so queue-kit/SPEC.md's "the emitter and the gate
-  can never disagree" guarantee survives, and porting the emitter alone is what spends it.
-  **The POSIX ERE engine is PAID** (landed 2026-08-13 at build); the members it unblocks and
-  `check-comment-tier`'s standing screen-out are the canonical roster's, cited not restated.
-  **One of them owes more than its port: `check-tree-terms` — corrected 2026-08-13 at close** on
-  the mechanical confirmation the gap inbox asked for. Its corpus is `git ls-files` over the
-  whole tracked tree, pruned only by `GATE_PRUNE_DIRS` and the pattern-file basenames — a live
-  run scans 518 files and prunes neither `*/checks/` nor `native/src/` — so every declaration
-  path lies inside the corpus it scans as content, criterion 4's own predicate verbatim. It
-  carries a criterion-4 hold on top of its port, so the gate-sdk leak-guard pair is not the
-  clean first-cohort shape it reads as. Independent of assertion C, which does not select it
-  (`couples=scripts/msg-patterns.list`).
-  **The associative-array bridge is PAID** (landed 2026-08-16 at build): the keyed wire arm
-  released `check-stage-entry` and `check-evidence-baseline` together, and the port uncovered a
-  second channel of the same class — `--reads` could not express a walk's filter — which the
-  same increment carried rather than splitting. The retired holds, the refused split and its
-  grounds are canonical at gate-sdk/SPEC.md §The first cohort, cited not restated.
-  **It also owes the hold's declarable spelling.** gate-sdk/SPEC.md §The port-candidate
-  criteria designs `# port-until: <slug>` — a second header field holding a class-(b)/(c) hold
-  to a live entry — and refuses to mint it on the closed-roster rule, its only holders being
-  this roster. Until they declare it, `port-blockers --group` counts every held member as
-  owed, so each cut re-adjudicates the holds by hand: the re-buy `# no-port:` ended for three.
-  **Cost while deferred:** `native-gate-port-remaining-corpus` ranks the remaining corpus as
-  undifferentiated gate-count, so a held member reads as one more unported gate when its
-  prerequisite is a sub-project. A later cohort discovers the sizing at implementation
-  time, which is the failure mode criterion 7 exists to prevent — designed first, then ported,
-  never ported and patched.
-  Filed 2026-08-12 by close; widened at build with the canon-kit trio; engine count and cohort
-  cleanliness corrected 2026-08-12 at scope from an 85-gate census, on operator direction;
-  the engine block collapsed 2026-08-13 at build when the ERE cohort paid it; promoted
-  2026-08-16 at spec and **demoted again 2026-08-16 at build** rather than moved to Done — the
-  deliverable is the corpus of held members and the keyed-knob amendment delivered one
-  increment of it (canon-kit/SPEC.md §Merging an amendment, the entry-outlives-the-amendment
-  branch), with `check-roadmap-fresh` and `check-tree-terms` still owing theirs.
-
-- **freshness-emitter-port-cohort** [design-pending] — the generated-projection freshness family
-  is six comparator+emitter pairs; **three are now ported and three remain shell**.
-  **Delivered 2026-08-16**: `footprint.sh` (129), `gate-sdk/bin/enforcement-map.sh` (273) and
-  `scripts/gen-value-rollup.sh` (124) are deleted, each emitter now a non-gate arm of the binary,
-  and `check-footprint-fresh`, `check-enforcement-fresh` and `check-value-rollup-fresh` each call
-  their emitter **in-process** rather than spawning it. Each port was held to a byte-identical
-  parity run against the shell emitter *before* the deletion. Two dividends banked: the join is
-  structural (the rollup receives its siblings' data instead of re-parsing their markdown), and
-  `jq` left the battery's own path with the settings-hook rows.
-  **Remaining, and held by nothing but sequence:** `scripts/gen-docs-mirror.sh` (127),
-  `drift-kit/bin/trajectory.sh` (242) and `queue-kit/bin/roadmap.sh` (76), with their comparators.
-  The design question is **answered and merged** — a ported emitter is a non-gate arm
-  (gate-sdk/SPEC.md §The non-gate arm) — so the following cohort applies the ruling rather than
-  re-deciding it, and `check-roadmap-fresh`'s unruled-emitter-design hold is retired as spent.
-  **Taken this iteration — ruled 2026-08-18 at scope on the operator's relayed ruling; the cut is
-  the freshness triple as spine plus a two-member budget batch.** `--group` again read every group
-  a singleton, which is the budget arm's stated precondition (gate-sdk/SPEC.md §Porting a gate to
-  the binary substrate).
-  **The spine's own coupling:** `check-roadmap-fresh` is ported **with** `queue-kit/bin/roadmap.sh`
-  rather than after it. `cohort-held-members-port-prerequisites` states the hold's dividend as
-  keeping `queue_roadmap_entries` on one shell adapter so queue-kit/SPEC.md's "the emitter and the
-  gate can never disagree" guarantee survives; porting the emitter alone is what spends it. The
-  other two comparators need no such pairing — both are already native.
-  **The batch, and it is never one unit of work:** `check-memory-off` (89 shell lines) and
-  `check-root-tiering` (67), each taking its own descriptor, registry entry and parity run, either
-  droppable without touching the other or the spine.
-  **The criterion-7 adjudication that admits `check-memory-off`, recorded so a later selector does
-  not re-make it.** Its jq use is a path query over `settings.local.json` against the
-  `<path> = <expected JSON>` grammar of `scripts/settings-pins.conf` — the identical operation the
-  **already-ported** `check-settings-pins` performs on the same grammar through
-  `native/src/json.rs`'s `Path::compile`/`eval`. The design criterion 7 demands before a port is
-  therefore already paid, and the member is a re-use rather than a re-implementation. Dividend:
-  `port-blockers.sh`'s criterion-7 report names it the battery's **only** remaining jq consumer,
-  so the port subtracts jq from the gate battery's dependency floor (TRAJECTORY.md objective 1).
-  A batch finding owes a gate-sdk/SPEC.md section when it lands.
-  **What the port must not bake in.** `roadmap.sh` reads this consumer's roadmap-tag lane
-  vocabulary, already consumer config (`scripts/queue-config.sh`, in the gate's own couple set).
-  The arm carries the knob read; a lane literal in the crate would publish a consumer's
-  vocabulary, the class the provenance seam forbids.
-  **Why deferred rather than Done:** the deliverable is a six-member corpus and half of it is
-  unbuilt. A Done move would assert a finished port.
-  **Cost while deferred:** three shell emitters keep bash in the dependency floor against
-  TRAJECTORY.md objectives 1 and 6, all three behind already-compiled comparators.
-  Filed 2026-08-15 by close; scoped to the value-rollup triple by operator ruling 2026-08-15 and
-  demoted at build 2026-08-16 having delivered that triple.
 
 - **born-native-omission-accumulation** [design-pending] — the born-native flip attaches
   criterion 5's omission to every future gate, and nothing measures the pile.
