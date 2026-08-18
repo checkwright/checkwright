@@ -2727,6 +2727,103 @@ is never inherited from an earlier cut. Verdict: §Meta-gate conservation for th
 binary substrate gains no row, neither member's `couples=` reaching a gate
 declaration path.
 
+### The fourth budget batch
+
+**A wide cut — the operator ruled 6–8 members against the prior cuts' two to
+three, and the width is inside the arm's proven envelope rather than a
+relaxation.** §The first budget batch took six and established the
+drop-any-member property at that width. The batch is not one unit of work and
+was not merged, recorded or argued as one: each member took its own descriptor,
+its own registry entry, its own parity run and its own shell deletion, in its own
+commit. Under the arm's record-only-findings rule this section carries the cut's
+findings and no member roster — membership is derivable from the tree and the
+count from `scripts/measured-claims.sh`'s `ported-gate-members`.
+
+**The size arm is permanently exhausted, and that is a change to the rule rather
+than a reading of one cut.** `bash gate-sdk/bin/port-blockers.sh --group`
+partitions the owed members into groups of exactly one, 0 undecidable — no group
+has a second member to amortize a walk across — and since the born-native default
+no new gate can arrive to form one. The budget arm's stated precondition, a
+`--group` run reporting no takeable group, is met by that run.
+
+**What is new is the selection ground.** §The first budget batch chose from the
+three smallest-*key* groups, a shared-derivation proxy this partition does not
+offer.
+This cut composes by **declaration size plus criterion cleanliness**: the cheap
+band is the members at or under ~103 shell lines with a fixture pair, a
+generated-hook tier, no criterion-7 blocker and no design fork. **The honest
+limit rides with it**: cheapness is not a shared derivation, so the batch
+amortizes nothing across its members and per-member cost is unchanged from taking
+them one at a time. The whole economy is **session overhead** — one cut, one
+criteria audit, one assertion-C re-run, one criterion-5 residual measurement, one
+amendment — spread over the width. That is a real saving and it is the only one;
+a later selector must not cite this batch as evidence that width is cheap in
+itself.
+
+**Half the band binds criterion 4, and the ordering is the discharge.** Every
+port moves a declaration path, and assertion A forbids the two spellings
+coexisting in one resolve dir, so a member's shell form vanishes the instant its
+own port lands — while the live corpus of every criterion-4-binding sibling moves
+with it. So **every binding member's live-tree comparison was captured against
+one shared pre-descriptor snapshot, before the first descriptor of the batch
+landed**: one capture for the batch, not one per member interleaved with the
+landings. An incremental order silently compares each later member against a
+corpus its predecessors already changed, and the resulting verdict reads like the
+earlier ones without being the same claim. The fixture-pair runs carry no such
+constraint — `gate-tests` is pruned from every live-tree walk — which is a second
+reason the pair is the proof and the live tree is smoke.
+
+**The capture's verdict, recorded in the register §The port-candidate criteria
+sets for a gate-source auditor: no disagreement found on the pre-descriptor
+tree, never parity proved.** Nineteen comparisons over the three binding
+members — live tree with no argument, both fixture cases each, three edge roots
+reached through `..`, three refusal paths, and two synthetic corpora built to
+reach report arms no committed case can (a multi-offender scan and a
+multi-alias corpus carrying a NUL-bearing file) — agreed on stdout, stderr and
+exit code in every one.
+
+**`check-docs-cname-parity` is the cut's finding, and it is the kind assertion C
+cannot produce.** Its `couples=` is the single literal `docs/CNAME`, so the
+derived substrate-sensitive set does not select it — and its *walk* nonetheless
+reaches every tracked file, because its scan root defaults to the whole tracked
+tree (`SITE_KIT_SCAN_ROOT`, whose value site-kit/SPEC.md owns) and the rule greps
+each file's bytes for URL hosts. Every kit's `checks/*.sh` and
+`*.gate` is inside the corpus it scans as content, which is criterion 4's
+predicate verbatim, reached through the **walk** rather than through the trigger
+field. It is the first worked instance in the direction where the couple clears
+and the walk binds, and it is recorded beside the two of the opposite kind at
+that criterion.
+
+**`check-gate-fail-closed` is *not* excluded, and the reading that would exclude
+it is named so it is not re-made.** §Meta-gate conservation for the binary
+substrate dispositions it *Retired with cause* — but that table's subject is what
+each meta-gate's assertion is worth **about a `.gate`-dispatched member**, never
+whether the meta-gate itself may port. Its corpus is full in every vendoring
+consumer, where shell is not an exception but the only substrate, so the rule
+keeps its whole reason to exist. What is true is that its `check-*.sh` glob is
+**not substrate-adaptive**, so a ported sibling leaves its corpus with no red —
+which that same row already rules correct, a ported member having no shell to
+lint.
+
+**One hazard was probed and is false**, recorded because the mechanical reading
+produces it: porting the last shell gate in a kit does **not** un-recognise that
+kit as a kit root. The derivation's predicate is the *existence* of the `checks/`
+or `smoke/` directory, not a `*.sh` glob, and the kit roots that already carry zero
+`.sh` under `checks/` resolve normally.
+
+**The transitive-couples rule has a scope the tree states and the sentence does
+not, and reading it literally would have produced 76 wrong descriptors.** §The
+non-gate arm requires a ported member's descriptor to carry every crate module
+its implementation reaches, transitively — which taken at face value includes
+`walk.rs` and `proc.rs`, the bridge and spawn layers every gate module reaches.
+No descriptor in the tree names either, and none should: coupling a universal
+layer into every descriptor spells one fact 76 times and re-runs the whole
+battery from the hook on any edit to it. What the rule reaches is the modules
+whose edit changes *this* member's verdict and nothing else's — its own module
+and the shared rule-carrying modules beside it. The universal layers are held by
+`check-crate-arms` and the binary's own source stamp instead, which is the same
+coverage through a mechanism that does not scale by descriptor count.
+
 ### The canon-kit `spec_manifest_files` cohort
 
 **The shared derivation is compiled.** `native/src/spec.rs` carries all three
@@ -6233,6 +6330,7 @@ invisible from any tree that has a real crate, which upstream always does.
 
 ### check-gate-fail-closed
 
+`checks/check-gate-fail-closed.gate` (`precommit`, binary-dispatched).
 Invariant: every `awk`/`jq` command-substitution capture in a `check-*.sh`
 gate handles its subprocess exit status — `fail_closed`, an inline
 `|| { … }` guard, a captured `=$?`, or an explicit `# fail-closed-exempt:`
@@ -6240,6 +6338,15 @@ opt-out. Only `awk`/`jq` captures are checked: `grep`'s exit 1 on no-match is
 expected, here-string captures read data already in memory, and arithmetic
 `$((…))` is never matched. A parser wrapped inside a shell function is not
 visible to this static scan; the opt-out covers residual false positives.
+
+**The port narrowed one thing, and it is a report order rather than a verdict**
+(§The fourth budget batch). The corpus is `<dir>/check-*.sh` expanded per
+resolve dir, and the shell form's expansion ordered the files by the *invoking
+locale's* collation — so the same findings printed in one order under `C` and
+another under `en_US`, measured. The compiled form orders by bytes, which is
+what `C` already gave. Nothing about which files are scanned or what verdict
+they earn depends on it; recorded because a batch that only compares a clean
+line would not have seen it, and this one compared a six-offender report.
 
 A `.gate`-dispatched member is outside this corpus **with cause**: the defect —
 branching on a captured value's emptiness when the subprocess died — is

@@ -1,0 +1,3 @@
+# graph: couples=scripts/*.sh,kit:*.sh,native/src/gates/gate_fail_closed.rs,native/src/fresh.rs dir=one valve=none tier=precommit
+# install: zero-config
+# spec: gate-sdk/SPEC.md §check-gate-fail-closed — every awk/jq capture in the gate family handles subprocess exit status

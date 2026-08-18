@@ -11,6 +11,7 @@ pub mod commit_subject;
 pub mod doctrine_registration;
 pub mod deprecation_task;
 pub mod docs_cmd;
+pub mod gate_fail_closed;
 pub mod docs_kit_parity;
 pub mod docs_mirror_fresh;
 pub mod docs_nav_reachable;
@@ -1076,6 +1077,16 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_QUEUE_FILE",
             "GATE_SDK_AGENT_FILE",
         ],
+        "gate-sdk",
+    ),
+    // spec: gate-sdk/SPEC.md §The fourth budget batch — members with no joint proof, each its own
+    // unit. None declares a walk root: two resolve a corpus by pathname expansion and the third
+    // by `git ls-files`, and §check-reads-couples rules both outside the walk class.
+    (
+        "check-gate-fail-closed",
+        gate_fail_closed::run,
+        &[],
+        &["GATE_SDK_GATES_DIR", "GATE_KIT_ROOTS_HERE"],
         "gate-sdk",
     ),
 ];
