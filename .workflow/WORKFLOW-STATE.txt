@@ -4,11 +4,4 @@
 
 ---
 
-port-selector-permanence-and-batch scope a5e98917 2026-08-17
-port-selector-permanence-and-batch spec a95358b9 2026-08-17
-port-selector-permanence-and-batch align ac2e935d 2026-08-17
-port-selector-permanence-and-batch build acb0a174 2026-08-17
-port-selector-permanence-and-batch build abfd4807 2026-08-17
-port-selector-permanence-and-batch validate aef3130f 2026-08-17
-port-selector-permanence-and-batch build a29a4fab 2026-08-18
-port-selector-permanence-and-batch close a4a07291 2026-08-18
+— scope a4ab7abc 2026-08-18
