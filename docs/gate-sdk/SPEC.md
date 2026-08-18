@@ -7991,8 +7991,8 @@ unresolvable registered gate, or a non-repo cwd is a red, not a skip. A member
 with no `# graph:` line is `check-graph`'s finding, not this gate's.
 
 **The port made one ordering deterministic, and it was never specified** (§The
-fourth budget batch). The shell form accumulated a member's glob groups in an
-associative array and iterated `${!named[@]}`, which is bash's hash order — so a
+fourth budget batch). The shell form reported a member's glob groups in bash's
+associative-array hash order — so a
 member violating on two globs at once listed its findings in an order neither
 stable across bash builds nor stated anywhere. The compiled form keeps
 first-seen order, which is the manifest's own. The verdict is set-valued either

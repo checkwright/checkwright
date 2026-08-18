@@ -30,8 +30,9 @@
   `knobenv::lock()` across its whole loop (`mod.rs:1318`), so the existing guard serializes it by
   accident of where the lock was taken. Nothing states that, and nothing stops the next
   cwd-changing test from taking no guard — which is the defect, not the current schedule.
-  **Distinct from `crate-test-env-knob-race`, which is Done**: that entry owned the knob
-  environment and its fix (`f2701ff4`) landed the guard this entry says is too narrow. The finding
+  **Distinct from `crate-test-env-knob-race`, which landed this iteration**: that entry owned
+  the knob environment, and its fix (`f2701ff4`) landed the guard this entry calls too narrow. The
+  finding
   is what the fix did not reach, so it files as a new defect rather than a recurrence.
   **Deliverable, and why `[design-pending]`:** widening `knobenv` from "the knob environment" to
   "process-global test state" renames the module's charter and its roster, and whether the roster
@@ -6984,9 +6985,6 @@
 - **scratch-execution-allowlist-bar** [design-pending] — Each close re-derives this standing bar.
 
 ## Done
-
-- gate-spawn-hoist-residual
-- crate-test-env-knob-race
 
 ## Lessons Learned
 
