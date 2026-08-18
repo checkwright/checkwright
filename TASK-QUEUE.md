@@ -39,15 +39,16 @@
   **The batch, and it is never one unit of work:** `check-memory-off` (89 shell lines) and
   `check-root-tiering` (67), each taking its own descriptor, registry entry and parity run, either
   droppable without touching the other or the spine.
-  **The criterion-7 adjudication that admits `check-memory-off`, recorded so a later selector does
-  not re-make it.** Its jq use is a path query over `settings.local.json` against the
-  `<path> = <expected JSON>` grammar of `scripts/settings-pins.conf` — the identical operation the
-  **already-ported** `check-settings-pins` performs on the same grammar through
-  `native/src/json.rs`'s `Path::compile`/`eval`. The design criterion 7 demands before a port is
-  therefore already paid, and the member is a re-use rather than a re-implementation. Dividend:
-  `port-blockers.sh`'s criterion-7 report names it the battery's **only** remaining jq consumer,
-  so the port subtracts jq from the gate battery's dependency floor (TRAJECTORY.md objective 1).
-  A batch finding owes a gate-sdk/SPEC.md section when it lands.
+  **The adjudication that admits `check-memory-off` — corrected at spec 2026-08-18, and recorded
+  so a later selector does not re-make the error.** This cut justified the member on criterion 7,
+  and that premise is wrong: gate-sdk/SPEC.md holds it on **criterion 2** (§The first cohort, §The
+  settings cohort) and states in terms that *its blocker is the oracle, not the dependency*, so
+  retiring jq cannot retire the hold. Spec-over-precedent makes that SPEC ground truth over this
+  entry. What pays for the member is criterion 2's **constructed-scenario discharge**, ruled taken
+  2026-08-18 and designed at `SPEC-third-batch.md`. The jq re-use through `native/src/json.rs`'s
+  `Path::compile`/`eval` is real and **secondary**: the port subtracts jq from the **gate
+  battery's** dependency floor (TRAJECTORY.md objective 1), never from the repo or the shipped
+  install path. A batch finding owes a gate-sdk/SPEC.md section when it lands.
   **What the port must not bake in.** `roadmap.sh` reads this consumer's roadmap-tag lane
   vocabulary, already consumer config (`scripts/queue-config.sh`, in the gate's own couple set).
   The arm carries the knob read; a lane literal in the crate would publish a consumer's
@@ -112,12 +113,7 @@
   2026-08-18 at spec for `check-roadmap-fresh`'s port, leaving `check-tree-terms` and the
   `# port-until:` spelling as the entry's remaining work.
 
-
-## Technical Debt
-
-## Deferred
-
-- **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
+- **native-gate-port-remaining-corpus** [spec: SPEC-third-batch.md] [roadmap: now/reliability]
   — the whole battery onto the binary, and the shell surface down to its residue.
   roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
   The entry stays deferred rather than moving to `## Done`: it is the **whole corpus**, the
@@ -165,7 +161,14 @@
   Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
   direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope. Since then it is
   promoted at spec and demoted at build **once per increment** — a cohort, or a budget batch on
-  the arm gate-sdk/SPEC.md §Porting a gate to the binary substrate owns — always a **demotion**.
+  the arm gate-sdk/SPEC.md §Porting a gate to the binary substrate owns — always a **demotion**;
+  promoted 2026-08-18 at spec for the third budget batch.
+
+
+
+## Technical Debt
+
+## Deferred
 
 - **born-native-omission-accumulation** [design-pending] — the born-native flip attaches
   criterion 5's omission to every future gate, and nothing measures the pile.

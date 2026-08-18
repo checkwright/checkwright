@@ -124,13 +124,19 @@ the emitter module paths in `couples=` and drop the now-dead script triggers. **
 Omitting a module leaves the gate registered and green while the projection it holds goes stale at
 commit time; only a full battery finds it.
 
-### 7. Six stranded permission grants are removed in the same commit
+### 7. Six permission grants strand, and the prune is the operator's rather than this unit's
 
 `.claude/settings.json` carries a `Bash(bash <script>)` grant and its `Bash(bash <script> *)` twin
 for each of the three emitters. `check-settings-paths` reds on a literal `.sh` command token that
 does not resolve in the working tree, and context-kit/SPEC.md §check-settings-paths puts the
 `*`-suffixed twin explicitly *in* scope on the ground that its path is as literal and as strandable
-as the bare form's. All six grants go with the scripts. **mechanical**
+as the bare form's. So the deletion strands six grants and reddens that gate. **mechanical**
+
+**No session edits the file.** The settings file is operator-owned configuration, and
+context-kit/SPEC.md §check-settings-pins already fixes the landing order for exactly this class:
+*the operator prunes, then the gate registers*. This delta is therefore a **build-time obligation
+recorded with its owning gate**, not a sweep a batch performs on its own authority — build meets a
+known red and routes the prune to the operator rather than discovering it as a surprise.
 
 This is the amendment's non-monotone narrowing and it is called out under §Producers and consumers
 point 5 rather than assumed away: deleting files **adds** violations here.
@@ -227,7 +233,7 @@ its subject.** Three tracked shell scripts leave the tree, narrowing every shell
 
 - `check-settings-paths` — reds on a literal `.sh` command token in `permissions.allow[]` that does
   **not resolve**. **Not monotone under this narrowing: the deletion adds six violations.** Delta 7
-  removes them in the same commit.
+  records them as a build-time obligation routed to the operator, since no session edits that file.
 - `check-docs-cmd` — assertion A reds on an invoked repo-relative `.sh` path inside a fence or
   inline backticks in the governed doc set that does **not resolve to a tracked file**. **Not
   monotone: the deletion strands every `bash <emitter>` line in the READMEs, the kit SPECs and
