@@ -16,6 +16,44 @@
 
 ## Deferred
 
+- **installer-init-noop-regen-conflict** [design-pending] — init regenerates three generated
+  projections (`scripts/gates.list`, `scripts/git-hooks/pre-commit`, `scripts/CHECK-GRAPH.html`)
+  on every run and only THEN decides the run was a no-op: a second run on the same consumer
+  regenerates them again and takes the idempotent early exit ("nothing to change"), leaving all
+  three dirty with no commit at all -- contradicting installer/README.md's stated "makes one
+  commit" contract. On an artifact-free payload hop over the lattice minimum, init reports
+  'vendored ... and committed them' while leaving those three paths dirty. VACUOUS UNTIL THIS
+  BATCH, not a fresh regression: the lattice minimum (gate-sdk alone) carried zero zero-config
+  `.gate` members before this iteration ported check-commit-msg and check-gate-fail-closed, so
+  the artifact-free hop previously rewrote nothing and the clean-worktree assertion passed for
+  reasons unrelated to correctness. ONE REPAIR WAS ATTEMPTED AND FALSIFIED against the real hop,
+  checkable at `89876f5d` (landed) / `e0bc8a36` (reverted): moving the generated-projection
+  block ahead of the carry-forward loop did not help -- claim() was not refusing these paths,
+  staging order relative to the carry-forward was not the mechanism, and widening the staged set
+  cannot reach cleanliness at all; the fix needs a decision about regeneration and no-op
+  detection, not a reordering. THREE SEMANTICS OPTIONS, DIRECTION RULED OPEN BY THE OPERATOR
+  2026-08-18 -- silence here is the ruling, not an oversight: (a) NO-OP-RUN-STILL-COMMITS -- a
+  run init considers a no-op still commits what it rewrote, so "nothing to change" no longer
+  implies no commit; (b) DON'T-REGENERATE-UNMOVED -- init skips regenerating a projection whose
+  inputs did not move, which needs a freshness comparison it does not do today; (c)
+  ADOPTER-REGENERATED -- the three projections stop being init-owned `files[]` entries, changing
+  the ownership model. THE VACUITY TRIPWIRE IS OWED WITH THE FIX, ruled 2026-08-18: with the fix
+  absent the arm fails either way, so the tripwire alone would only change the failure message
+  while leaving the coverage class open. Its shape is settled -- the out-of-scope-count pattern
+  this iteration used for `gate_authoring_tree` at `check-gate-exemption-tasks`: assert the
+  artifact-free hop omitted a NON-ZERO number of members before asserting the worktree is clean,
+  naming the re-scope remedy rather than offering the assertion as droppable; it was drafted and
+  reverted with the fix above, so do not re-invent it.
+  **Cost while deferred:** adopter-visible and silent -- a dirty worktree after an install that
+  reports it committed, on exactly the uncovered-platform path criterion 5's accept-and-declare
+  ruling sends adopters down; it lands as a confusing local state, not a red gate. It also
+  degrades the instrument: installer_smoke now carries a baselined red, so a genuine NEW
+  regression in that suite arrives against a suite already expected to fail, and the longer this
+  sits the more the baseline row reads as normal -- the deferral's real price is measured in
+  what the suite stops being able to tell us.
+  Filed 2026-08-18 by validate, operator-directed promotion (breaks a close-entry / baseline
+  live-slug deadlock).
+
 - **cohort-held-members-port-prerequisites** [design-pending] — gates are held on
   shell by operator ruling, each owing a named prerequisite nothing else tracks.
   Ground is **sequencing, not exclusion**: gate-sdk/SPEC.md §The port-candidate criteria opens
