@@ -6851,6 +6851,30 @@
   Surfaced 2026-08-18 in the gap inbox by `freshness-cohort-roadmap-hold-and-batch`'s close,
   whose release-disposition step postdates the drain; promoted 2026-08-18 at scope.
 
+- **port-budget-sizing-input-absent** [design-pending] — the budget arm names a per-member cost
+  column `port-blockers --group` does not print, so every batch is sized on an input it lacks.
+  **Probed at this scope, not inferred.** gate-sdk/SPEC.md §The first cohort, and the rule that
+  selects the next tells the sizing session what to weigh: "the per-member cost `--group` already
+  prints beside each member (shell line count and the mechanically derivable criterion columns)".
+  A live run prints `c2=`, `c3=`, `c7=` and an expanded `couples=` and nothing else; the single
+  member-row print is `gate-sdk/bin/port-blockers.sh:418`, whose format string carries those four
+  fields and no count. `git log -S'lines=' -- gate-sdk/bin/port-blockers.sh` returns nothing, so
+  the column was never emitted and the sentence was false on the day it landed.
+  **Why it bites now rather than in general.** The size arm is exhausted — the same run reports 27
+  owed members in 27 singleton groups — so every remaining increment composes by the budget arm,
+  and the budget arm is the only one that asks for a per-member cost. This is not a marginal
+  documentation defect; it is the missing half of the one selector still reachable.
+  **Two shapes, and the choice is not a scope call.** Emit the count — a `lines=` field beside the
+  criterion columns, mechanical and cheap, but a new field on an advisory tool's output that
+  gate-sdk/SPEC.md §port-blockers specifies and a consumer may parse. Or delete the clause and
+  state what the sizing session actually holds, which is the criterion columns plus its own
+  reading of each member's declaration. The first buys a real input; the second stops a governed
+  surface promising one that does not exist.
+  **Cost while deferred:** a sizing session either re-derives the count by hand per candidate or
+  sizes without it and records a budget it never measured — and because the SPEC tells it the
+  number is already on screen, the second is the likelier outcome and the harder one to notice.
+  Filed 2026-08-18 at scope, probed against the tool while composing this iteration's port batch.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
