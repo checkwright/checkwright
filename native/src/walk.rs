@@ -559,7 +559,7 @@ pub mod recorder {
 // gate_command, so they stand in for the bridge by asking its one owner, the kit's shell
 // library, for the resolved value; a literal here would restore the deleted second default
 #[cfg(test)]
-pub fn bridge_declared_knobs() {
+pub fn bridge_declared_knobs(knobs: &crate::knobenv::KnobEnv) {
     use std::sync::Once;
     static ONCE: Once = Once::new();
     ONCE.call_once(|| {
@@ -581,7 +581,7 @@ pub fn bridge_declared_knobs() {
             "the shell library resolved GATE_PRUNE_DIRS to nothing — the tests would walk an \
              unpruned tree and observe roots no production invocation reaches"
         );
-        std::env::set_var("GATE_SDK_KNOB_GATE_PRUNE_DIRS", value);
+        knobs.set("GATE_SDK_KNOB_GATE_PRUNE_DIRS", &value);
     });
 }
 
@@ -589,7 +589,7 @@ pub fn bridge_declared_knobs() {
 // case dir, so this asks the one owner from the cwd the runner uses; resolving at the repo
 // root would make the crate's case runner the second oracle that section was repaired for
 #[cfg(test)]
-pub fn bridge_case_knobs(case: &Path, gate: &str, knobs: &[&str]) {
+pub fn bridge_case_knobs(env: &crate::knobenv::KnobEnv, case: &Path, gate: &str, knobs: &[&str]) {
     if knobs.is_empty() {
         return;
     }
@@ -624,7 +624,7 @@ pub fn bridge_case_knobs(case: &Path, gate: &str, knobs: &[&str]) {
         let (name, value) = line
             .split_once('=')
             .unwrap_or_else(|| panic!("unparseable knob line from the bridge: {}", line));
-        std::env::set_var(name, value);
+        env.set(name, value);
     }
 }
 
@@ -662,9 +662,10 @@ mod tests {
     // because a prefix is a resolution set rather than a roster.
     #[test]
     fn a_knob_family_is_keyed_by_suffix_and_read_by_name_not_enumerated() {
-        std::env::set_var("GATE_SDK_KNOB_PROBEFAM_beta", "b");
-        std::env::set_var("GATE_SDK_KNOB_PROBEFAM_alpha", "a");
-        std::env::set_var("GATE_SDK_KNOB_PROBEFAM_ID", "not-a-member");
+        let knobs = crate::knobenv::lock();
+        knobs.set("GATE_SDK_KNOB_PROBEFAM_beta", "b");
+        knobs.set("GATE_SDK_KNOB_PROBEFAM_alpha", "a");
+        knobs.set("GATE_SDK_KNOB_PROBEFAM_ID", "not-a-member");
         let fam = knob_prefix("PROBEFAM_");
         let keys: Vec<&str> = fam.iter().map(|(k, _)| k.as_str()).collect();
         assert_eq!(keys, vec!["ID", "alpha", "beta"], "family is sorted by suffix");
@@ -674,7 +675,7 @@ mod tests {
         // which is what keeps EVIDENCE_KIT_RUN_ID out of the emitted suite roster
         assert!(knob_in_family(&fam, "ID").is_some());
         for k in ["beta", "alpha", "ID"] {
-            std::env::remove_var(format!("GATE_SDK_KNOB_PROBEFAM_{}", k));
+            knobs.remove(&format!("GATE_SDK_KNOB_PROBEFAM_{}", k));
         }
     }
 
@@ -685,7 +686,7 @@ mod tests {
 
     #[test]
     fn no_module_outside_this_one_walks_the_filesystem() {
-        bridge_declared_knobs();
+        bridge_declared_knobs(&crate::knobenv::lock());
         let src = Path::new(env!("CARGO_MANIFEST_DIR")).join("src");
         let files = find_files(&src, &["rs"]).expect("cannot enumerate the crate's sources");
         assert!(!files.is_empty(), "no crate source found to scan");

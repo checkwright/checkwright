@@ -537,16 +537,17 @@ mod tests {
     // roster naming a member the family does not carry is *adopted but broken* and refuses.
     #[test]
     fn an_empty_roster_drops_the_section_and_a_named_missing_member_refuses() {
+        let knobs = crate::knobenv::lock();
         for k in ["EVIDENCE_KIT_SUITES", "EVIDENCE_KIT_RUN_alpha"] {
-            std::env::remove_var(format!("GATE_SDK_KNOB_{}", k));
+            knobs.remove(&format!("GATE_SDK_KNOB_{}", k));
         }
-        std::env::set_var("GATE_SDK_KNOB_EVIDENCE_KIT_SUITES", "");
+        knobs.set("GATE_SDK_KNOB_EVIDENCE_KIT_SUITES", "");
         assert!(
             suite_section().expect("an empty roster must not refuse").is_none(),
             "an empty roster is the not-adopted case and drops its section"
         );
 
-        std::env::set_var("GATE_SDK_KNOB_EVIDENCE_KIT_SUITES", "alpha");
+        knobs.set("GATE_SDK_KNOB_EVIDENCE_KIT_SUITES", "alpha");
         let err = match suite_section() {
             Err(e) => e,
             Ok(_) => panic!("a named-but-absent member must refuse"),
@@ -557,13 +558,13 @@ mod tests {
             err
         );
 
-        std::env::set_var("GATE_SDK_KNOB_EVIDENCE_KIT_RUN_alpha", "bash guard-kit/bin/x.sh");
+        knobs.set("GATE_SDK_KNOB_EVIDENCE_KIT_RUN_alpha", "bash guard-kit/bin/x.sh");
         let s = suite_section().expect("a whole roster resolves").expect("section present");
         assert_eq!(s.rows.len(), 1);
         assert_eq!(s.rows[0].kit, "guard-kit");
 
         for k in ["EVIDENCE_KIT_SUITES", "EVIDENCE_KIT_RUN_alpha"] {
-            std::env::remove_var(format!("GATE_SDK_KNOB_{}", k));
+            knobs.remove(&format!("GATE_SDK_KNOB_{}", k));
         }
     }
 

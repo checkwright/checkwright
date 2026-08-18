@@ -94,7 +94,7 @@ mod tests {
     // corpus this scans and why the bridge helpers sit outside it
     #[test]
     fn no_gate_module_constructs_a_subprocess_itself() {
-        walk::bridge_declared_knobs();
+        walk::bridge_declared_knobs(&crate::knobenv::lock());
         let gates = Path::new(env!("CARGO_MANIFEST_DIR")).join("src/gates");
         let files = walk::find_files(&gates, &["rs"]).expect("cannot enumerate the gate modules");
         assert!(!files.is_empty(), "no gate module found to scan");

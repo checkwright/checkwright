@@ -4944,14 +4944,37 @@ that needs *the executable* rather than *the command* takes the first element
 that is neither `env` nor a `NAME=VALUE` assignment. §run-gate-tests is the one caller that
 needs it, and it is named there.
 
-**The bridge is process-global, and that binds the crate's own tests.** Its
-values are environment variables, so every `#[test]` in one test binary shares
-one environment: two cases setting the same `GATE_SDK_KNOB_<NAME>` to different
-values race, and the loser asserts against the other's render. A crate test
-needing a knob either picks one no sibling case touches, or drives the gate
-through a fixture tree instead of the bridge. Recorded because the symptom — a
-test green alone and red in the suite — reads as flakiness rather than as this
-contract.
+**The bridge is process-global, and the crate's own tests are serialized against
+it rather than disciplined around it.** Its values are environment variables, so
+every `#[test]` in one test binary shares one environment: two cases setting the
+same `GATE_SDK_KNOB_<NAME>` to different values race, and the loser asserts
+against the other's render. The symptom — a test green alone and red in the suite
+— reads as flakiness rather than as this contract, which is what made it worth
+mechanizing: the defect was probed, failing 1 of 5 suite runs at cargo's default
+parallelism and none of 5 serialized.
+
+The crate carries **one** serialization point, `native/src/knobenv.rs`, and the
+guard it hands back **is** the write API: `knobenv::lock()` returns a `KnobEnv`,
+whose `set` and `remove` are the crate's only spellings of an environment write.
+A case holds that guard across its writes **and** across the assertions that read
+them; holding it across the reads is the load-bearing half, since a lock released
+at the write leaves the render it was taken for unprotected. The two bridge
+helpers (§run-gate-tests) take the guard as an argument rather than acquiring it,
+so a case that already holds it cannot deadlock against them.
+
+**Its machine side is a unit test in that module**, in the roster shape
+§check-reads-couples' unit test B uses: no crate source outside `knobenv.rs`
+names `set_var` or `remove_var`. Without it the guard is advice, and a later case
+calling the std API directly restores the race silently.
+
+**The rejected alternative is recorded because it is the one that looks cheaper.**
+Threading a knob into the code under test as a parameter deletes the race by
+deleting the coverage: environment resolution *is* the production path — a gate
+invoked outside this bridge refuses on the unset knob — so a test passing the
+value in as an argument stops exercising the only resolution the binary ever
+performs. Serialization is therefore the deliverable rather than a caveat on it,
+and its point applies to **every** `GATE_SDK_KNOB_`-writing case in the crate,
+not to whichever one happened to red.
 
 The binary's path is the knob `GATE_SDK_NATIVE_BIN` (§Layout and configuration),
 never a literal. An **absent or non-executable** binary when a registry member

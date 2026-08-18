@@ -583,17 +583,12 @@ mod tests {
 - **l4** — not an attention point
 ";
 
-    // spec: gate-sdk/SPEC.md §lib/gate.sh — the bridge is read out of the process environment,
-    // which cargo's threads share, so two cases setting one knob to different values race and the
-    // loser asserts against the other's render. Every case that writes a knob holds this first.
-    static ENV_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
-
     fn render(collapse: bool, cap: usize) -> String {
-        let _g = ENV_LOCK.lock().unwrap_or_else(|e| e.into_inner());
-        std::env::set_var("GATE_SDK_KNOB_QUEUE_KIT_ACTIVE_SECTIONS", "New Features\tTechnical Debt");
-        std::env::set_var("GATE_SDK_KNOB_QUEUE_KIT_DEFERRED_SECTION", "Deferred");
-        std::env::set_var("GATE_SDK_KNOB_QUEUE_KIT_ICEBOX_SECTION", "");
-        std::env::set_var("GATE_SDK_KNOB_QUEUE_KIT_ATTEND_CAP", cap.to_string());
+        let knobs = crate::knobenv::lock();
+        knobs.set("GATE_SDK_KNOB_QUEUE_KIT_ACTIVE_SECTIONS", "New Features\tTechnical Debt");
+        knobs.set("GATE_SDK_KNOB_QUEUE_KIT_DEFERRED_SECTION", "Deferred");
+        knobs.set("GATE_SDK_KNOB_QUEUE_KIT_ICEBOX_SECTION", "");
+        knobs.set("GATE_SDK_KNOB_QUEUE_KIT_ATTEND_CAP", &cap.to_string());
         index(Q, collapse).expect("index render failed")
     }
 
@@ -658,11 +653,11 @@ mod tests {
     #[test]
     fn an_absent_attend_tag_produces_no_block_at_all() {
         let out = {
-            let _g = ENV_LOCK.lock().unwrap_or_else(|e| e.into_inner());
-            std::env::set_var("GATE_SDK_KNOB_QUEUE_KIT_ACTIVE_SECTIONS", "New Features");
-            std::env::set_var("GATE_SDK_KNOB_QUEUE_KIT_DEFERRED_SECTION", "Deferred");
-            std::env::set_var("GATE_SDK_KNOB_QUEUE_KIT_ICEBOX_SECTION", "");
-            std::env::set_var("GATE_SDK_KNOB_QUEUE_KIT_ATTEND_CAP", "3");
+            let knobs = crate::knobenv::lock();
+            knobs.set("GATE_SDK_KNOB_QUEUE_KIT_ACTIVE_SECTIONS", "New Features");
+            knobs.set("GATE_SDK_KNOB_QUEUE_KIT_DEFERRED_SECTION", "Deferred");
+            knobs.set("GATE_SDK_KNOB_QUEUE_KIT_ICEBOX_SECTION", "");
+            knobs.set("GATE_SDK_KNOB_QUEUE_KIT_ATTEND_CAP", "3");
             index(
                 "## Iteration: demo\n\n## New Features\n\n## Deferred\n\n## Lessons Learned\n\n- **only** — an untagged lesson\n",
                 false,

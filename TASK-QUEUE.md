@@ -121,37 +121,6 @@
 
 ## Technical Debt
 
-- **crate-test-env-knob-race** — crate tests set knobs through process-global
-  `std::env::set_var` while cargo runs them on parallel threads in one process, so a
-  knob-setting test can observe a sibling's value.
-  **PROBED, not asserted** (build, batch B): 5 runs at the default parallelism failed 1 of 5;
-  5 runs with `--test-threads=1` failed 0 of 5. The failing member is
-  `emit::queue_index::tests::the_attend_block_caps_and_reports_its_overflow`.
-  **Cause, from the source:** the tests in `native/src/emit/queue_index.rs` set
-  `GATE_SDK_KNOB_QUEUE_KIT_ATTEND_CAP` and its siblings by `std::env::set_var`, so the overflow
-  test — cap 2, expecting `+1 more` — can observe the cap 3 that
-  `the_default_cap_shows_every_lead_line_with_no_overflow_note` or
-  `an_absent_attend_tag_produces_no_block_at_all` just wrote.
-  **The shape is general to every crate test that sets a `GATE_SDK_KNOB_` variable**, so the
-  deliverable is a class fix rather than one test's: serialize the knob-setting tests behind a
-  mutex, or thread the knob through as a parameter instead of the environment.
-  **RULED at scope 2026-08-18 — the mutex, not the parameter.** The parameter form deletes the
-  race by deleting the coverage: environment resolution IS the production path, probed live this
-  session when a gate invoked outside the config bridge refused with
-  `GATE_SDK_KNOB_QUEUE_KIT_ACTIVE_SECTIONS is unset`. A test threading the knob in as an argument
-  therefore stops exercising the only resolution the binary ever performs. The mutex keeps that
-  path under test and buys serialization, and its cost is the deliverable rather than a caveat on
-  it: the serialization point applies to every `GATE_SDK_KNOB_`-setting test in the crate, not to
-  the one member that happened to red.
-  **Why it earned promotion:** high cost for its size, and the reason it was never icebox-eligible.
-  `check-crate-arms` is a commit-time obligation and a member of the CI battery, so roughly one
-  full-battery run in five reds on a tree that is correct — which trains sessions to re-run a
-  red battery rather than read it, the precise habit the Oracle-first rule exists to prevent.
-  Under the port directive that tax is paid once per commit across every remaining port batch.
-  Filed 2026-08-18 by close from the gap inbox; the drain re-verified the `set_var` call sites
-  in the named module rather than taking the bullet's prose. Promoted 2026-08-18 at scope on the
-  operator's ruling, as RIDER 2 of the wide-budget-batch iteration.
-
 ## Deferred
 
 - **gh-account-identity-expectation** [design-pending] — a third expectation kind for
@@ -6893,6 +6862,7 @@
 ## Done
 
 - gate-spawn-hoist-residual
+- crate-test-env-knob-race
 
 ## Lessons Learned
 

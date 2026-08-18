@@ -8,6 +8,8 @@ mod ere;
 mod fresh;
 mod gates;
 mod json;
+#[cfg(test)]
+mod knobenv;
 mod marker;
 mod proc;
 mod queue;
