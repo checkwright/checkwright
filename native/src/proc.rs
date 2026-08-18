@@ -46,6 +46,38 @@ pub fn run(program: &str, args: &[&str]) -> Result<Completed, String> {
     })
 }
 
+// spec: gate-sdk/SPEC.md §Fail-closed contract — `run` with a body written to the child's stdin,
+// the one shape `run` cannot carry: a shell caller's `printf … | git hash-object --stdin` has no
+// argv spelling, and routing it here keeps the spawn site single
+pub fn run_with_stdin(program: &str, args: &[&str], input: &[u8]) -> Result<Completed, String> {
+    use std::io::Write;
+    use std::process::Stdio;
+    let spawn_err = |e: std::io::Error| {
+        format!(
+            "cannot run {}: {} — the check could not run; treating as failure (not clean)",
+            program, e
+        )
+    };
+    let mut child = Command::new(program)
+        .args(args)
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .map_err(spawn_err)?;
+    let mut pipe = child
+        .stdin
+        .take()
+        .ok_or_else(|| format!("cannot run {}: no stdin pipe — treating as failure (not clean)", program))?;
+    pipe.write_all(input).map_err(spawn_err)?;
+    drop(pipe);
+    let out = child.wait_with_output().map_err(spawn_err)?;
+    Ok(Completed {
+        status: out.status,
+        stdout: out.stdout,
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

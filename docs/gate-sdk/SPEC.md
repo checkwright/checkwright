@@ -5042,6 +5042,19 @@ Resolution, per declared knob:
   lookup runs under a stdout capture, so an early hit that abandons the producer
   leaves it writing into a closed pipe; §run-gates gives the consequence, and
   why the environment that shows it is not the one a battery is usually run in.
+- **A derivation the library memoises is memoised for one *sourcing*, never for
+  the process, and the kit-root anchoring is the worked instance.** The
+  resolution above runs the owning kit's libraries in a **subshell**, which
+  inherits the dispatcher's shell variables — a memo guard among them. So a
+  library that skips its own derivation on a warm memo hands the bridged member
+  the **dispatcher's** value, computed before the consumer config in scope was
+  read, while every knob resolved from scratch in the same pass takes the
+  config's. The two disagree only where a consumer config narrows the derivation's
+  input, which is why it stayed invisible until a fixture pair overrode
+  `GATE_SDK_KIT_DIRS` for a member declaring `GATE_KIT_ROOTS_REL`: the shell form
+  runs as a fresh process and re-derives, the bridged form does not. The guard is
+  therefore cleared where the library resolves it, keeping the memo's saving
+  (one anchor derivation per invocation) without its cross-source reach.
 - **A knob the bridge can carry is one whose default is `declare -p`-visible
   *after* the owning kit's library has been sourced, so the library is where a
   kit knob's default belongs.** This is a property of the bridge rather than of
@@ -6994,9 +7007,34 @@ would land.
 
 ### check-gate-binary-fresh
 
+`checks/check-gate-binary-fresh.gate` (`precommit`, binary-dispatched).
+
 Invariant: **whenever a `.gate` descriptor makes the binary load-bearing, the
 binary was built from the source now in the tree.** Usage
-`check-gate-binary-fresh.sh [gates-dir] [tree-stamp-file]`.
+`<dispatch> [gates-dir] [tree-stamp-file]` — both positionals survive the port,
+each consumed by the rule rather than redirecting config the bridge resolved
+first: the gates dir names the registry and the first resolve dir, and the
+stamp file is the tree side of the comparison itself.
+
+**The tree-side derivation is runtime crate code, which it had never been.** The
+crate carried the stamp as a **build-time-baked constant** plus a test-only
+comparison, so a `gate_native_source_stamp` counterpart had to be written for
+this port — the same three git invocations `native/build.rs` runs, now with a
+runtime caller. The two are one algorithm and a divergence would make the
+freshness verdict meaningless, so the module's own unit test asserts the runtime
+derivation equals the constant the build baked. That test is also where the
+git-based arm is exercised at all: **both** fixture cases pass an explicit stamp
+file, so the derivation the gate exists for has no committed case, and saying so
+here is what keeps a green pair from reading as coverage of it.
+
+**A bespoke case for this member cannot vary the binary through the dispatch.**
+Its subject *is* `GATE_SDK_NATIVE_BIN`, which `gate_command` also resolves the
+dispatch through, so pointing that knob at a missing binary makes the dispatcher
+refuse before the rule runs. `gate-tests/check-gate-binary-fresh.test.sh`
+therefore resolves the argv through `gate_command` — never a declaration path —
+and substitutes the one bridged element the case varies. The fixture pair needs
+no such handling: `run-gate-tests` resolves the dispatch binary once at the
+invoker's root, outside any case's config.
 
 **What makes the binary load-bearing — the predicate both binary meta-gates
 share.** A `.gate` file on disk is a **declaration**. A **registered member

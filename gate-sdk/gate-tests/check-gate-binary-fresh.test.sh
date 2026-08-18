@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Behavioral test of checks/check-gate-binary-fresh.sh over the configurations the
+# Behavioral test of check-gate-binary-fresh over the configurations the
 # good/+bad/ pair cannot hold: the pair is one invocation each and both are
 # "descriptors present, binary readable". These are the load-bearing predicate's
 # own boundary — a descriptor on disk is a declaration, a registered member
@@ -11,7 +11,8 @@ set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # gate-sdk/
-GATE="$DIR/checks/check-gate-binary-fresh.sh"
+# shellcheck source=../lib/gate.sh
+source "$DIR/lib/gate.sh"
 SANDBOX="$(mktemp -d)"
 trap 'rm -rf "$SANDBOX"' EXIT
 
@@ -31,9 +32,30 @@ chmod +x "$SANDBOX/stub-bin"
 DESC='# graph: couples=docs/*.md dir=one valve=none tier=precommit
 # spec: gate-sdk/SPEC.md §check-gate-binary-fresh — fixture descriptor'
 
+# spec: gate-sdk/SPEC.md §check-gate-binary-fresh — this member's subject is the
+# dispatch knob itself, so a case pointing GATE_SDK_NATIVE_BIN at a missing binary
+# cannot reach the rule through an untouched dispatch: gate_command resolves the
+# binary through that same knob and refuses first. The argv is resolved through
+# gate_command (never a declaration path) and the one bridged element the case
+# varies is substituted after, which is also what makes the case substrate-agnostic.
+gate_argv() {  # gate_argv <knob> <value> -> ARGV
+    local knob="$1" val="$2" e
+    local -a resolved=()
+    mapfile -t resolved < <(gate_command check-gate-binary-fresh "$DIR/checks")
+    [[ ${#resolved[@]} -gt 0 ]] || return 2
+    ARGV=()
+    for e in ${resolved[@]+"${resolved[@]}"}; do
+        [[ "$e" == "GATE_SDK_KNOB_$knob="* ]] && e="GATE_SDK_KNOB_$knob=$val"
+        ARGV+=("$e")
+    done
+    export "$knob=$val"
+}
+
 run() {  # run <bin> ; registry + descriptors are already in place
-    ( cd "$SANDBOX" && env GATE_SDK_KIT_DIRS=kitroot GATE_SDK_NATIVE_BIN="$1" \
-        GATE_SDK_NATIVE_CRATE=crate "$GATE" scripts stamp.txt 2>&1 )
+    ( cd "$SANDBOX" \
+        && gate_env GATE_SDK_KIT_DIRS=kitroot GATE_SDK_NATIVE_CRATE=crate \
+        && gate_argv GATE_SDK_NATIVE_BIN "$1" \
+        && "${ARGV[@]}" scripts stamp.txt 2>&1 )
 }
 
 expect() {  # expect <label> <want-rc> <substring> <got-rc> <output>

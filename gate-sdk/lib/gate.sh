@@ -495,6 +495,8 @@ gate_kit_roots_rel() {
     printf '%s\n' "${_gate_kit_roots_rel_cache[@]}"
 }
 
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the memo is scoped to one *sourcing* of this library rather than to the process: _gate_knob_value resolves a knob in a subshell that inherits the dispatcher's shell variables, so a memo carried across the re-source would hand a bridged member the dispatcher's kit-root set instead of the one the consumer config in scope resolves
+unset _gate_kit_roots_rel_cache_set
 # spec: gate-sdk/SPEC.md §lib/gate.sh — the anchored spelling as a bridgeable variable, GATE_KIT_ROOTS' counterpart: a binary-side member needing repo-relative roots (a pathspec, a knob-prefix owner) reads this rather than re-deriving the anchor rule, which an override makes underivable from the absolute set alone
 _gate_kit_roots_rel_ensure_cache
 # shellcheck disable=SC2034  # read across the dispatch seam, never in this shell: the config bridge resolves it by name for a member that declares it

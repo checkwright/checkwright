@@ -12,6 +12,7 @@ pub mod doctrine_registration;
 pub mod deprecation_task;
 pub mod docs_cmd;
 pub mod gate_fail_closed;
+pub mod gate_binary_fresh;
 pub mod gate_fixture_coverage;
 pub mod gate_output;
 pub mod kit_enum;
@@ -1096,6 +1097,18 @@ pub const REGISTRY: &[GateEntry] = &[
         gate_fail_closed::run,
         &[],
         &["GATE_SDK_GATES_DIR", "GATE_KIT_ROOTS_HERE"],
+        "gate-sdk",
+    ),
+    (
+        "check-gate-binary-fresh",
+        gate_binary_fresh::run,
+        &[],
+        &[
+            "GATE_SDK_GATES_DIR",
+            "GATE_SDK_NATIVE_BIN",
+            "GATE_SDK_NATIVE_CRATE",
+            "GATE_KIT_ROOTS_REL",
+        ],
         "gate-sdk",
     ),
     (
