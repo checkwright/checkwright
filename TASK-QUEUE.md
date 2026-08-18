@@ -249,12 +249,15 @@
   clone on the box, the credential helper a push rides included. A consumer project cannot
   notice its account moved underneath it, and the symptom surfaces as a permission error
   against the wrong repo rather than as anything naming the account.
-  OBSERVED TWICE, both times collateral from a sanctioned action rather than a slip. On
-  2026-08-18 this repo's close session selected the release account before the release push
-  exactly as the local release runbook directs, left it active because that runbook states
-  no restore step, and a session working a parallel project on the same machine was damaged.
-  The runbook records the same sequence on 2026-08-14, ending the same way. The recurrence
-  sits in the procedure, which is what makes this a mechanism gap and not a discipline one.
+  OBSERVED TWICE — 2026-08-14 and 2026-08-18, both collateral from a sanctioned action rather
+  than a slip: a close session selected the release account exactly as the local release runbook
+  directs, left it active because that runbook states no restore step, and damaged a session
+  working a parallel project on the same box. The recurrence sat in the procedure.
+  RESTORE RULING, operator-directed 2026-08-18, recorded here because a message thread is not a
+  store. A close session that switches to the release account for a push **restores the prior
+  account once the run it watched goes green** — after, never before, since a red needs the
+  write-scoped account to fix and re-push. It knowingly deviates from the local runbook, which
+  mandates the switch and sanctions no restore. Per-session instruction, NOT the durable fix.
   WHY check-identity AND NOT A NEW GATE: it already owns the invariant class and every
   contract this kind needs — optional consumer manifest behind `GATE_SDK_IDENTITY_FILE`,
   fail-closed on an unknown key or wrong field count, a clean CI skip ahead of the manifest
@@ -282,12 +285,10 @@
   mechanism a consumer opts into; the consequence is that the fixture pair is the kind's
   only exercise in this tree, which is ordinary for a constructed scenario but means no
   live run covers it here.
-  **Cost while deferred:** borne off-tree and by a third party, which is what makes it easy
-  to under-rate here. Every release push switches a machine-global account with no paired
-  restore, so exposure recurs once per release rather than once per adopter, and lands on
-  whatever unrelated project shares the box — as a failed push or a wrong-account commit,
-  never as a red gate in the project that caused it. Two occurrences in five days, both from
-  a procedure followed correctly.
+  **Cost while deferred:** borne off-tree and by a third party, which is what makes it easy to
+  under-rate here — a failed push or a wrong-account commit in whatever project shares the box,
+  never a red gate in the project that caused it. The restore ruling answers the per-release
+  exposure but is unenforced, so the harm returns the first time a session misses one.
 - **born-native-omission-accumulation** [design-pending] — the born-native flip attaches
   criterion 5's omission to every future gate, and nothing measures the pile.
   **This is the costed residue of a closed ruling, not a challenge to it.** TRAJECTORY.md
