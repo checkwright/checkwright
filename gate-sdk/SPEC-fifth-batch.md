@@ -102,6 +102,19 @@ member** because it is an interface removal rather than an implementation detail
 — therefore binds six times in one cut, which is more often than in the four
 prior batches combined. *design-bearing.*
 
+**Build's verdicts, taken per member and recorded as they land.** The first cut
+of four found the ruling binds *less* often than the count of arguments suggests:
+a **gates-dir positional** is consumed by the rule — it names the registry and
+the first resolve dir — and ports unchanged, which `check-kit-enum` and
+`check-root-tiering` had already established in tree; so does
+`check-gate-binary-fresh`'s tree-stamp file, which is the rule's own input. Two
+members delete: `check-identity`'s two arms, ruled below, and
+`check-gate-fixture-coverage`'s positionals — whose ground is narrower than the
+others and is stated at that member's own section, since its gates-dir positional
+was what the *tests-dir* default derived from and delta 10's resolved knob
+supersedes that derivation. A later member's verdict is taken the same way, on
+the test rather than on the count.
+
 **It is not a blanket deletion, and the reading that makes it one is the error to
 avoid.** `check-root-tiering` kept **both** its positionals through its port
 (§The third budget batch), so an argument is not unportable merely by being an
@@ -267,6 +280,18 @@ hold already are: the criterion protects the *parity oracle* from the member's o
 port, the ordering protects every comparison from a *sibling's*. This cut is where
 they come apart, and a session that clears one by clearing the other gets a
 verdict it did not earn. *design-bearing.*
+
+**The shared snapshot is a *rev*, not a moment, and build recorded which one.**
+The cut is executed as several build sessions, so "before the first descriptor of
+the batch lands" is not reachable for a member ported in a later session. It does
+not have to be: the pre-descriptor tree is `5bcef863`, the commit that lands the
+delta 10 library fix and nothing else, and a later member's live-tree comparison
+is taken against a worktree of that rev
+(`git worktree add .tmp/pre-descriptor 5bcef863`) rather than against the tree as
+it then stands. That is the same corpus every earlier member was compared over,
+which is exactly the property the constraint asks for. Recorded here because a
+session reading the paragraph below would otherwise conclude the property was
+lost with the first descriptor.
 
 **The ordering constraint the width creates is the fourth batch's and applies
 unchanged**: assertion A forbids both spellings in one resolve dir, so a member's
