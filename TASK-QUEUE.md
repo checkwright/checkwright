@@ -6819,6 +6819,38 @@
   Surfaced 2026-08-18. Filed by close 2026-08-18, discharging the gap generalization owed by
   the staleness the `capability-liveness-after-descope` audit turned up in this same commit.
 
+- **shipped-bin-removal-deprecation-path** [design-pending] — deleting a kit-shipped `bin/` tool
+  needs no deprecation marker, so that arm of the major-bump criterion is unreachable by design.
+  **The instance, probed rather than assumed.** The `freshness-cohort-roadmap-hold-and-batch`
+  iteration deleted `drift-kit/bin/trajectory.sh` and `queue-kit/bin/roadmap.sh`. Both shipped:
+  `scripts/pack-installer.sh` recursively copies each enumerated kit root into the payload, `bin/`
+  included, so a consumer who scripted a direct invocation now gets file-not-found. And
+  `CANON_KIT_DEPRECATION_MARKERS` defaults empty in `canon-kit/lib/spec.sh`, so no marker ever
+  rode either script and none could.
+  **Why the criterion cannot see it.** docs/install.md §Versioning defines a major as removing a
+  DEPRECATED surface, or a change the two-phase upgrade contract cannot reconcile from the release
+  note alone. Neither half fires. The first presupposes a marker that never existed; the second is
+  satisfied because phase A replaces kit directories wholesale, so the deletion propagates with no
+  consumer action, and the residual breakage is a consumer's OWN script calling the removed path,
+  which no phase-B gate scans. The bump was a correct minor — the defect is that the release-sweep
+  constraint that no marker rides into the next major undispositioned is anchored to a roster that
+  has always been empty in this tree.
+  **The gap is the missing path, not the bump.** Nothing obliges a session deleting a shipped
+  `bin/` tool to mint a deprecation marker for it, so the roster stays empty by construction.
+  **Three candidate shapes, none ruled, and the choice is envelope-class.** A gate asserting that
+  a path deleted under a kit root's `bin/` was marker-covered in a prior release; a widening of
+  the major criterion to name shipped-surface removal directly; or an explicit ruling that a
+  `bin/` tool is not a declared surface and its removal rides a minor forever, which would at
+  least make today's behaviour intentional rather than accidental.
+  **Distinct from `cited-script-path-liveness-inline`**, which shares the instance and not the
+  axis: that entry is about governed prose still naming a deleted path, a staleness question
+  inside this tree; this one is about what an ADOPTER is owed when a shipped path disappears.
+  **Cost while deferred:** silent and consumer-side. It lands on an adopter who automated around
+  a kit tool, and it lands as a broken script rather than a red gate — the failure class the
+  two-phase upgrade contract exists to convert into a worklist.
+  Surfaced 2026-08-18 in the gap inbox by `freshness-cohort-roadmap-hold-and-batch`'s close,
+  whose release-disposition step postdates the drain; promoted 2026-08-18 at scope.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
