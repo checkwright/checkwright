@@ -14,6 +14,37 @@
 
 ## Technical Debt
 
+- **crate-test-env-knob-race** — crate tests set knobs through process-global
+  `std::env::set_var` while cargo runs them on parallel threads in one process, so a
+  knob-setting test can observe a sibling's value.
+  **PROBED, not asserted** (build, batch B): 5 runs at the default parallelism failed 1 of 5;
+  5 runs with `--test-threads=1` failed 0 of 5. The failing member is
+  `emit::queue_index::tests::the_attend_block_caps_and_reports_its_overflow`.
+  **Cause, from the source:** the tests in `native/src/emit/queue_index.rs` set
+  `GATE_SDK_KNOB_QUEUE_KIT_ATTEND_CAP` and its siblings by `std::env::set_var`, so the overflow
+  test — cap 2, expecting `+1 more` — can observe the cap 3 that
+  `the_default_cap_shows_every_lead_line_with_no_overflow_note` or
+  `an_absent_attend_tag_produces_no_block_at_all` just wrote.
+  **The shape is general to every crate test that sets a `GATE_SDK_KNOB_` variable**, so the
+  deliverable is a class fix rather than one test's: serialize the knob-setting tests behind a
+  mutex, or thread the knob through as a parameter instead of the environment.
+  **RULED at scope 2026-08-18 — the mutex, not the parameter.** The parameter form deletes the
+  race by deleting the coverage: environment resolution IS the production path, probed live this
+  session when a gate invoked outside the config bridge refused with
+  `GATE_SDK_KNOB_QUEUE_KIT_ACTIVE_SECTIONS is unset`. A test threading the knob in as an argument
+  therefore stops exercising the only resolution the binary ever performs. The mutex keeps that
+  path under test and buys serialization, and its cost is the deliverable rather than a caveat on
+  it: the serialization point applies to every `GATE_SDK_KNOB_`-setting test in the crate, not to
+  the one member that happened to red.
+  **Why it earned promotion:** high cost for its size, and the reason it was never icebox-eligible.
+  `check-crate-arms` is a commit-time obligation and a member of the CI battery, so roughly one
+  full-battery run in five reds on a tree that is correct — which trains sessions to re-run a
+  red battery rather than read it, the precise habit the Oracle-first rule exists to prevent.
+  Under the port directive that tax is paid once per commit across every remaining port batch.
+  Filed 2026-08-18 by close from the gap inbox; the drain re-verified the `set_var` call sites
+  in the named module rather than taking the bullet's prose. Promoted 2026-08-18 at scope on the
+  operator's ruling, as RIDER 2 of the wide-budget-batch iteration.
+
 ## Deferred
 
 - **gh-account-identity-expectation** [design-pending] — a third expectation kind for
@@ -1402,34 +1433,6 @@
   the oracle lands.
   Filed 2026-08-01 at close from the gap inbox, filed by this iteration's build.
 
-- **gate-spawn-hoist-residual** [design-pending] — `gate-battery-spawn-hoists`
-  closed most of its worklist and left a named remainder, recorded so the next
-  pass starts from measurement rather than from this list.
-  **Unmeasured, same shape:** `check-comment-tier` and `check-docs-cmd` carry the
-  in-gate fork/exec-per-item shape the landed hoists removed elsewhere, but were
-  neither measured nor hoisted (the pass was time-boxed after the near-miss below).
-  The list named two more, `check-trajectory-fresh` and `check-docs-nav-reachable`;
-  both went native in the eleventh cohort 2026-08-15, which dissolves the shell
-  fork-per-item shape rather than hoisting it, so they leave this remainder.
-  **Attempted and reverted:** `check-spec-pointer`'s `heading_present`. A
-  bash-extglob port of its strippar/isprefix awk match logic was byte-identical
-  to the awk original on small inputs and **pathologically slow** on this tree's
-  real prose fragments (several thousand characters) — bash's extglob `%%`
-  suffix match has none of awk's linear-time regex guarantees, turning a 2.7s
-  gate into 25s+. Only the tracked-file-set caching landed (safe: no
-  size-dependent blowup).
-  **Deliverable:** per-target-file batching of the frag queries that keeps the
-  match logic inside **one awk process per unique file** — not a bash port. The
-  reverted attempt is the standing evidence that a bash port is the wrong shape.
-  **Why `[design-pending]`:** the worklist above is already demonstrably stale
-  twice over, so the unit begins by re-measuring against the post-hoist battery
-  (23706ms/90 gates, `check-shellcheck` now the largest line at ~5.9s) and may
-  find the remaining four are not worth the change.
-  **Cost while deferred:** bounded and non-rotting — the gates are correct, just
-  slower than they need to be, and the battery is already 42% faster than it was.
-  Debt: awk-batching inside up to five gates; adds no governed name.
-  Filed 2026-08-01 at close from the gap inbox, by the batch that time-boxed it.
-
 - **template-spec-restatement-reach** [design-pending] — the gap generalization
   behind this close's resume-journal fix: `check-shim-restatement` holds
   **binding shims** (`.claude/commands/*.md`) to an n-gram-disjointness contract
@@ -1595,43 +1598,44 @@
   the "First step" and says to commit it on its own, so only enforcement is missing.
   **The mechanism, run rather than observed (folded in 2026-08-02 from the gap inbox; the text
   above states the symptom, this states the cause).** Both gates are path-coupled in the generated
-  pre-commit hook — the couple set is `TASK-QUEUE.md` and `.workflow/WORKFLOW-STATE.txt` — so a
-  work commit touching only kit sources never runs them at all. They are not lenient about
-  ordering; they do not execute. The stamp commit is the first commit that runs them, and by then
-  the work they were meant to gate is already in history. On the full-battery path they do run,
-  but `check-stage-entry` reads point-in-time state only: assertion C scans the amendment files
-  and stamp set **as they are on disk**, with no read of history, so a stamp that landed last is
-  byte-identical to one that landed first. The consequence generalizes past ordering — **every
-  entry-time assertion, assertion C's demand for a prior audit-stage stamp included, is
-  satisfiable retroactively**, because the gate cannot distinguish "align ran before this build"
-  from "align's stamp exists now". It also opens a **cheaper candidate than the history assertion
-  below**: widen the two gates' couple set so a stage's own output surfaces re-fire them, turning
-  a never-ran gate into a ran-and-lenient one first.
+  pre-commit hook, so a work commit touching only kit sources never runs them at all. They are not
+  lenient about ordering; they do not execute. The stamp commit is the first commit that runs
+  them, and by then the work they were meant to gate is already in history. On the full-battery
+  path they do run, but `check-stage-entry` reads point-in-time state only: assertion C scans the
+  amendment files and stamp set **as they are on disk**, with no read of history, so a stamp that
+  landed last is byte-identical to one that landed first. The consequence generalizes past
+  ordering — **every entry-time assertion, assertion C's demand for a prior audit-stage stamp
+  included, is satisfiable retroactively**. It also opens a **cheaper candidate than the history
+  assertion below**: widen a gate's couple set so a stage's own output surfaces re-fire it,
+  turning a never-ran gate into a ran-and-lenient one first.
   **Candidate shape to weigh at design:** assert that the commit introducing a stage's stamp is
   not preceded, within the same stage window, by commits touching that stage's own output
   surfaces — decidable from git history, though the surface set is the hard part. A cheap
   approximation misfires on a same-stage re-entry, where a second session's stamp legitimately
-  follows the first session's commits; that case is **confirmed real**, not hypothetical (see
-  `batch-split-stamp-ownership`). A narrower and possibly sufficient form: assert only that the
-  **first** stamp for an iteration+stage pair is not preceded by non-stamp commits since the
-  prior stage's stamp.
-  **Why `[design-pending]`:** it narrows how a shipped evidence contract is read,
-  and the surface-set question has no cheap answer.
-  **Cost while deferred:** the stamp protocol's central claim — that a stamp
-  marks a boundary the work happened after — is unattested, and a violation is
-  invisible in a fully green battery.
-  Class: mints a gate name if the oracle lands, so canon-kit/SPEC.md's new-names
-  litmus makes it a **feature** on that path; debt only if it lands as an
-  assertion inside `check-stage-evidence`. The promoting scope call settles it.
-  **Declined three times at scope despite the threshold — 2026-08-16, 2026-08-17, and 2026-08-18
-  on the operator's ruling.** Every decline turned on the same two facts: the cheap half and the
-  history assertion are one unresolved design fork, and the entry sits off every promoted unit's
-  surface, so bundling buys no amortization. The couple sets were re-verified live at the first
-  decline (both exactly `TASK-QUEUE.md,.workflow/WORKFLOW-STATE.txt`) and cited since.
-  **What is NOT unchanged — probed at the third decline and recorded so a fourth firing costs its
-  grounds fresh instead of inheriting them:** `check-stage-evidence` and `check-stage-entry` are
-  **both now native** (`native/src/gates/stage_evidence.rs`, `stage_entry.rs`), so the cheap half
-  is today a two-descriptor couple-set edit against a binary that already honours it.
+  follows the first's — **confirmed real** (`batch-split-stamp-ownership`). Narrower and likely
+  sufficient: hold only an iteration+stage pair's **first** stamp to it, putting a re-entry out
+  of reach by shape rather than by exemption.
+  **Why `[design-pending]`:** it narrows how a shipped evidence contract is read, and the
+  surface-set question has no cheap answer.
+  **Cost while deferred:** the stamp protocol's central claim — that a stamp marks a boundary the
+  work happened after — is unattested, and a violation is invisible in a fully green battery.
+  Class: mints a gate name if the oracle lands, so canon-kit/SPEC.md's new-names litmus makes it
+  a **feature** on that path; debt only if it lands as an assertion inside `check-stage-evidence`.
+  The promoting scope call settles it.
+  **Declined FOUR times at scope despite the threshold — 2026-08-16, 2026-08-17, and twice on
+  2026-08-18, the second of those at the next iteration's scope; the last two on the operator's
+  ruling.** One ground survives all four: the cheap half and the history assertion are a single
+  unresolved design fork, and buying the cheap half first may foreclose the reading the assertion
+  needs. No new `recurrence:` date joins the declaration — the finding did not re-fire, and the
+  stamp is idempotent per (slug, date).
+  **Two grounds the earlier declines cited are CORRECTED here, which is a correction and not a
+  reversal.** The couple sets are no longer "both exactly
+  `TASK-QUEUE.md,.workflow/WORKFLOW-STATE.txt`": `check-stage-entry.gate` widened to the SPEC
+  globs at its 2026-08-16 port, so it is already ran-and-lenient for any SPEC-touching commit and
+  only `check-stage-evidence` keeps the narrow pair — the cheap half is ONE descriptor, not two.
+  And "sits off every promoted unit's surface" fails against the set promoted 2026-08-18, whose
+  members edit `.gate` descriptors and native gate modules. Both gates are native
+  (`native/src/gates/stage_evidence.rs`, `stage_entry.rs`).
   Filed 2026-08-01 at close from the gap inbox; build filed it against its own batch-1 stamp.
 
 - **amendment-deletion-content-completeness** [design-pending] — a closed
@@ -5807,24 +5811,21 @@
 
 - **turn-end-chokepoint-and-wait-primitive** [design-pending] — two open mechanism questions the
   wait rule's fifth firing raised, neither answerable from the ruling that closed its prose half.
-  **This is the design half of `waiting-rule-fourth-firing-post-fix`**, whose surviving question
-  is "given that prose alone does not hold, what does". Filed apart from it only because that
-  entry stands within three lines of the per-entry cap — the displacement
-  `entry-cap-displaces-mandated-writes` predicts, in a new shape: content pushed into a *new
-  entry* rather than into a commit message.
+  **This is the design half of `waiting-rule-fourth-firing-post-fix`**, whose surviving question is
+  "given that prose alone does not hold, what does". Filed apart only because that entry stands
+  within three lines of the cap — `entry-cap-displaces-mandated-writes` in a new shape, content
+  pushed into a *new entry* rather than into a commit message.
   **First half — ANSWERED 2026-08-17, and its remainder relocated.** delegation-kit/SPEC.md:390-392
   rules that enforcement turns on whether an act passes a chokepoint and that a turn-end does not;
   the analysis under it is scoped to `PreToolUse`, which is every guard this repo ships, so the
   turn-end hook had never been probed against this rule. It has been now, documentarily, and what
   survives — a `SubagentStop` hook reading the liveness record, and whether the harness defers the
-  stop while a background child is live — is `subagent-stop-liveness-hook-wiring`'s, filed at this
-  close because wiring it is a settings change no agent message authorizes.
-  **Second half, distinct subject — which primitive is reliable here.** The protocol states a
-  hard ordering: `run_in_background` plus an `until`-loop for a single completion, with the
-  event-stream form named the wrong tool. On this machine that ordering **inverted** — four of
-  the lead's own backgrounded waiters were killed before their conditions went true, each with
-  the producer verifiably still alive, while a `Monitor` call emitting one line and exiting
-  succeeded first attempt. A guard built on the wrong primitive inherits the wrong failure.
+  stop while a background child is live — is `subagent-stop-liveness-hook-wiring`'s.
+  **Second half — which primitive is reliable here.** The protocol states a hard ordering:
+  `run_in_background` plus an `until`-loop for a single completion, with the event-stream form
+  named the wrong tool. On this machine that ordering **inverted** — four of the lead's own
+  backgrounded waiters died before their conditions went true, producers verifiably alive, while
+  a `Monitor` call succeeded first try; a guard on the wrong primitive inherits its failure.
   **Why `[design-pending]`:** the first half may be refused outright if `Stop` cannot see what it
   needs, which would confirm delegation-kit's ruling rather than overturn it; the second half is
   a measurement whose result could change a stated protocol ordering. Neither is a patch.
@@ -5832,19 +5833,17 @@
   discovers it — and, as the tenth showed, can cost a whole suite's evidence.
   **It fired again in the very next iteration** (`port-tail-batching-and-cap-relief`, 2026-08-16):
   the validate session ended its turn on a live `run-validate`, the harness marked the agent
-  complete, and the lead had to resume it from transcript. That firing is the sharpest evidence
-  the entry has, because the rule reached that session through the **stage-session agent
-  definition itself** — not a dispatch prompt — which is the strongest prose carrier the project
-  has and the one `waiting-rule-carrier-reach` shipped. The mechanical half held again: the
-  launch-time liveness record answered `kill -0` and no evidence was lost.
-  **It fired TWICE MORE at 2026-08-17 (`native-cohort-close-surfaces`) — the eighth and ninth,
-  and these are the grounds for that date's stamp on `waiting-rule-fourth-firing-post-fix`.**
-  Both were the LEAD's observation, not the acting session's: validate ended its turn on a live
+  complete, and the lead resumed it from transcript. Sharpest evidence the entry has: the rule
+  reached that session through the **stage-session agent definition itself**, not a dispatch
+  prompt — the strongest prose carrier the project has, and the one `waiting-rule-carrier-reach`
+  shipped. The launch-time liveness record answered `kill -0` and no evidence was lost.
+  **It fired TWICE MORE at 2026-08-17 (`native-cohort-close-surfaces`) — the eighth and ninth, and
+  these are the grounds for that date's stamp on `waiting-rule-fourth-firing-post-fix`.** Both were
+  the LEAD's observation, not the acting session's: validate ended its turn on a live
   `run-validate.sh` still writing the evidence manifest, close on a live `gh run watch`. Each was
   recoverable only by what the producer happened to be — validate's by the liveness record it had
-  written, close's by the watch being a read-only remote poll that truncates no artifact — so the
-  rule itself held in neither. **Two firings in one iteration, both in producing roles**, which is
-  the first evidence the rate is not one-per-iteration noise.
+  written, close's by the watch being a read-only poll that truncates no artifact — so the rule
+  held in neither. **Two firings in one iteration, both producing roles**: the rate is not noise.
   **Tenth firing, 2026-08-17 (`post-close-intake-and-index-port` validate) — the first to cost
   evidence rather than turns.** The session backgrounded `run-validate.sh`, backgrounded a
   `kill -0` loop on it, and ended its turn saying it would act on the completion notification,
@@ -5852,6 +5851,11 @@
   worktree the `installer_smoke` pack step checks: that run reported `verdict=new-failures` on a
   false ground and had to be discarded and re-run foreground. No date is stamped — 2026-08-17 is
   already on `waiting-rule-fourth-firing-post-fix` and the stamp is idempotent per (slug, date).
+  **Surfaced against this iteration's spine and DEFERRED — 2026-08-18, operator-ruled.** Weighed as
+  a competing spine against the port batch and declined; the buildable remainder this iteration was
+  the guard-rule and documentary half alone, since the hook half needs an operator-authorized
+  `.claude/settings.json` write no agent message can license. Honest limit, recorded because the
+  operator saw it and ruled anyway: the port batches are the work whose evidence this defect eats.
   Filed 2026-08-16 by close from the gap inbox, both halves; the drain re-verified the carrier
   count and the chokepoint scoping against the SPEC rather than taking the bullet's prose.
 
@@ -6378,31 +6382,6 @@
   its source and measured the target entry's headroom with the gate rather than by hand — the
   bullet read one line of room where the oracle reports zero.
 
-- **crate-test-env-knob-race** [design-pending] — crate tests set knobs through process-global
-  `std::env::set_var` while cargo runs them on parallel threads in one process, so a
-  knob-setting test can observe a sibling's value.
-  **PROBED, not asserted** (build, batch B): 5 runs at the default parallelism failed 1 of 5;
-  5 runs with `--test-threads=1` failed 0 of 5. The failing member is
-  `emit::queue_index::tests::the_attend_block_caps_and_reports_its_overflow`.
-  **Cause, from the source:** the tests in `native/src/emit/queue_index.rs` set
-  `GATE_SDK_KNOB_QUEUE_KIT_ATTEND_CAP` and its siblings by `std::env::set_var`, so the overflow
-  test — cap 2, expecting `+1 more` — can observe the cap 3 that
-  `the_default_cap_shows_every_lead_line_with_no_overflow_note` or
-  `an_absent_attend_tag_produces_no_block_at_all` just wrote.
-  **The shape is general to every crate test that sets a `GATE_SDK_KNOB_` variable**, so the
-  deliverable is a class fix rather than one test's: serialize the knob-setting tests behind a
-  mutex, or thread the knob through as a parameter instead of the environment.
-  **Why [design-pending]:** which of the two is a call about the knob seam itself. A mutex
-  keeps the environment path under test and buys serialization; a parameter deletes the race
-  but stops exercising the resolution the gate actually runs.
-  **Cost while deferred:** high for its size, and the reason this is not icebox-eligible.
-  `check-crate-arms` is a commit-time obligation and a member of the CI battery, so roughly one
-  full-battery run in five reds on a tree that is correct — which trains sessions to re-run a
-  red battery rather than read it, the precise habit the Oracle-first rule exists to prevent,
-  and costs a full battery re-run each time.
-  Filed 2026-08-18 by close from the gap inbox; the drain re-verified the `set_var` call sites
-  in the named module rather than taking the bullet's prose.
-
 - **threshold-recurrence-routing-residency** [design-pending] — where the threshold-recurrence
   routing clause lives, now that its only carrier has left the live tree.
   **The clause, carried here verbatim so it does not spend by attrition:** *"a third threshold
@@ -6904,6 +6883,8 @@
 - **scratch-execution-allowlist-bar** [design-pending] — Each close re-derives this standing bar.
 
 ## Done
+
+- gate-spawn-hoist-residual
 
 ## Lessons Learned
 
