@@ -12,6 +12,7 @@ pub mod doctrine_registration;
 pub mod deprecation_task;
 pub mod docs_cmd;
 pub mod gate_fail_closed;
+pub mod gate_fixture_coverage;
 pub mod gate_output;
 pub mod kit_enum;
 pub mod docs_cname_parity;
@@ -1095,6 +1096,17 @@ pub const REGISTRY: &[GateEntry] = &[
         gate_fail_closed::run,
         &[],
         &["GATE_SDK_GATES_DIR", "GATE_KIT_ROOTS_HERE"],
+        "gate-sdk",
+    ),
+    (
+        "check-gate-fixture-coverage",
+        gate_fixture_coverage::run,
+        &[],
+        &[
+            "GATE_SDK_GATES_DIR",
+            "GATE_SDK_TESTS_DIR",
+            "GATE_KIT_ROOTS_HERE",
+        ],
         "gate-sdk",
     ),
     (

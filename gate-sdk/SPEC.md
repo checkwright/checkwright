@@ -6511,6 +6511,22 @@ gap.
 
 ### check-gate-fixture-coverage
 
+`checks/check-gate-fixture-coverage.gate` (`precommit`, binary-dispatched).
+
+**Both positionals retire with the port, and the ground is narrower than "an
+argument redirects config".** The gates-dir positional was also what the tests-dir
+default was *derived* from, and that default now resolves onto
+`GATE_SDK_TESTS_DIR` in the kit library so the bridge can carry it
+(§lib/gate.sh). A caller passing the positional would therefore move the registry
+and the resolve dirs while the tests dirs stayed where the knob put them — one
+argument, two resolutions, disagreeing silently. That is the arrive-a-process-too-late
+shape §The non-gate arm deletes rather than reimplements, and it is why this
+member's verdict differs from `check-gate-output`'s, whose positional feeds
+nothing else. The tests-dir positionals go with it, redirecting that knob
+directly. The fixture pair reaches the rule through the default layout instead,
+which is what makes it a parity oracle for the live arm rather than for a
+fixture-only second path.
+
 Invariant: every `gates.list` member either ships a `{good,bad}/` fixture pair
 (searched across the consumer tests dir, then each vendored kit's
 `gate-tests/`) or carries a `# no-fixture: <reason>` header annotation. The authority set is the
