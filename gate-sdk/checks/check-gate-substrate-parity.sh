@@ -45,18 +45,12 @@ fail_closed "$st" check-gate-substrate-parity awk
 
 findings=()
 
-# spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion F's publishing-tree test: the
-# crate's *tracked source* is here, step 1 of §check-gate-binary-fresh's source stamp reused rather
-# than spelled twice — source, so build output under the crate root cannot read as a publisher
-crate_source_here() {
-    [[ -d "$1" ]] || return 1
-    [[ -n "$(git -C "$1" ls-files 2>/dev/null)" ]]
-}
 CRATE="$(gate_native_crate)"
-# spec: gate-sdk/SPEC.md §check-gate-substrate-parity — the publishing test is computed once and
-# read twice, by assertion B's consumer-declared scope clause and assertion F's missing-roster arm
+# spec: gate-sdk/SPEC.md §check-gate-substrate-parity — the publishing test is `gate_authoring_tree`
+# (§lib/gate.sh), computed once and read twice: by assertion B's consumer-declared scope clause and
+# assertion F's missing-roster arm. One holder, shared with §check-gate-exemption-tasks' scope rule
 publishing_tree=0
-crate_source_here "$CRATE" && publishing_tree=1
+gate_authoring_tree && publishing_tree=1
 
 # spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion B's owner column: a kit
 # directory basename, or CONSUMER_OWNER for a member the consumer's own gates directory declares

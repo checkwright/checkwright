@@ -351,6 +351,14 @@ gate_native_crate() {
     printf '%s\n' "${crate%/}"
 }
 
+# spec: gate-sdk/SPEC.md §check-gate-substrate-parity — the authoring-tree test: this tree carries the crate's *tracked source*, which is what makes it the tree that declared the kits it carries rather than a tree that vendored them. Source, so build output under the crate root cannot read as authorship. One holder for a predicate its readers scope themselves by; its honest limit is that it is tree-shaped, so a consumer authoring its own kit beside vendored ones reads as non-authoring.
+gate_authoring_tree() {
+    local crate
+    crate="$(gate_native_crate)"
+    [[ -d "$crate" ]] || return 1
+    [[ -n "$(git -C "$crate" ls-files 2>/dev/null)" ]]
+}
+
 # spec: gate-sdk/SPEC.md §check-gate-output — the implementation module a .gate-dispatched member's rule lives in, derived from the gate name by the crate's own convention (drop the `check-` prefix, `-`→`_`) rather than held in a second registry that could drift from it
 gate_native_module() {
     local g="${1#check-}"

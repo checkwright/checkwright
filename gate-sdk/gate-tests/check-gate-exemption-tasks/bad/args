@@ -1,1 +1,6 @@
-TASK-QUEUE.md gates
+# Same shape as the good case: an adopter reading, its own gates dir plus a
+# vendored kit root. Here the tree's OWN declarations carry stale dispositions
+# and must be REJECTED, while the vendored kit root's two unresolvable slugs stay
+# out of scope — so this case also proves the scope rule is a scope rule and not
+# a blanket skip: the report names the tree's own findings and none of the kit's.
+TASK-QUEUE.md scripts kitroot/checks

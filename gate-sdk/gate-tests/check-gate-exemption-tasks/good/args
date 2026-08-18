@@ -1,1 +1,8 @@
-TASK-QUEUE.md gates
+# The synthetic queue, then this case's own gates dir, then a VENDORED kit root.
+# The case dir carries no crate source, so it reads as an adopter rather than as
+# the tree that authored the kit — the reading a fresh consumer install gets.
+# scripts/ declarations are the tree's own and every disposition there resolves;
+# kitroot/checks/ is the kit author's and its two unresolvable slugs are out of
+# scope rather than violations. The gate must ACCEPT, and its clean line must say
+# the kit-shipped declaration was seen and skipped rather than never reached.
+TASK-QUEUE.md scripts kitroot/checks

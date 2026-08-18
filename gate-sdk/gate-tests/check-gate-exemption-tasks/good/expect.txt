@@ -1,3 +1,5 @@
 GATE-EXEMPTION-TASKS: clean
+1 exemption array(s)
 1 '# port-until:' header field(s)
+1 kit-shipped declaration(s) out of scope
 1 live task slug(s)

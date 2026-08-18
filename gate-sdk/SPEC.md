@@ -1180,6 +1180,21 @@ A **non-gate arm** is specified by three properties:
   session reaching a mode through the front-end counts exactly as a stage step
   does.
 
+**A gate argument that selects where configuration comes from cannot survive a
+port, and the reason is an ordering rather than a limitation.** `gate_command`
+resolves every knob a member declares *before* it execs the binary, so an argument
+whose job is to point the kit library at a different config file arrives a process
+too late: the knobs are already resolved from the tree's own config. Such an
+argument is not ported and not reimplemented — it is **deleted**, because a
+documented flag that silently changes nothing is worse than no flag, and its
+callers are re-pointed at the config path the knob resolution already reads. The
+worked instance is `check-docs-cname-parity`'s third positional
+(site-kit/SPEC.md §check-docs-cname-parity), whose fixture pair moved to a
+gates-dir `site-config.sh` at no cost; §The third budget batch's `--fixture`
+deletion is the same shape reached from a different direction. A porting session
+should check for this shape **before** sizing a member, since it is an interface
+removal on a governed surface rather than an implementation detail.
+
 **An arm receives no configuration, and a member needing some is reached
 through a caller.** The config bridge is built by `gate_command` (§lib/gate.sh)
 for a `.gate`-declared member alone, and `kit_roots` is transported rather than
@@ -1206,6 +1221,20 @@ compiled form the same relationship is a function call across crate modules, and
 it *is* nameable: the callee's module is a tracked source file whose edit changes
 the caller's verdict. So the porting session owes the descriptor every module its
 gate reaches, transitively, including a module shared by both sides of a compare.
+
+**"Transitively" stops at the universal layers, and the tree is what says so.**
+Read at face value the rule reaches `walk.rs` and `proc.rs` — the config-bridge
+and spawn layers every gate module reaches — and no descriptor in the tree names
+either, correctly: coupling a universal layer into every descriptor spells one
+fact once per ported member and re-runs the whole battery from the generated hook
+on any edit to it, which is de-literalization inverted. What the rule reaches is
+the modules whose edit can change **this** member's verdict and nothing else's —
+its own module, and the shared rule-carrying modules beside it (`fresh.rs`,
+`declaration.rs`, an emitter it calls in-process). The universal layers are held
+by §check-crate-arms and by the binary's own source stamp instead, which is the
+same coverage through a mechanism that does not scale by descriptor count. Stated
+here rather than left to each porting session, because the sentence above invites
+the literal reading and the tree silently contradicts it.
 Omitting them leaves the gate registered and green while the projection it holds
 goes stale at commit time, because the generated hook's `staged_matches` trigger
 is derived from `couples=` — the gate simply never runs on the edit that broke
@@ -2841,19 +2870,10 @@ absolute, so the set is exactly the members whose couples carry an unanchored
 `*.sh` or `*.gate` glob — a port changes such a member's extension and never its
 membership. §Meta-gate conservation for the binary substrate gains no row.
 
-**The transitive-couples rule has a scope the tree states and the sentence does
-not, and reading it literally would have produced a wrong descriptor per ported
-member.** §The
-non-gate arm requires a ported member's descriptor to carry every crate module
-its implementation reaches, transitively — which taken at face value includes
-`walk.rs` and `proc.rs`, the bridge and spawn layers every gate module reaches.
-No descriptor in the tree names either, and none should: coupling a universal
-layer into every descriptor spells one fact once per ported member and re-runs
-the whole battery from the hook on any edit to it. What the rule reaches is the modules
-whose edit changes *this* member's verdict and nothing else's — its own module
-and the shared rule-carrying modules beside it. The universal layers are held by
-`check-crate-arms` and the binary's own source stamp instead, which is the same
-coverage through a mechanism that does not scale by descriptor count.
+**The cut found the transitive-couples rule diverging from the tree**, in the
+direction that would have put a universal crate layer in every descriptor. The
+rule now states its own scope, at §The non-gate arm where it lives; eight
+descriptors were written against the tree's reading before it did.
 
 ### The canon-kit `spec_manifest_files` cohort
 
@@ -6483,7 +6503,10 @@ steers the fixture pair onto hermetic copies of each surface. Seven assertions.
   ships it — a descriptor must exist iff the tree is a **publishing** tree*, the
   predicate assertion F computes, reused rather than spelled a second time and
   deliberately **source** rather than directory presence for the reason stated
-  there. A subcommand out of scope under either clause is **counted and declared
+  there. That predicate is `gate_authoring_tree` (§lib/gate.sh), which is where it
+  lives because it acquired a second reader: §check-gate-exemption-tasks scopes
+  both its arms by the same question — whether this tree authored the declaration
+  it is asserting against a queue, or vendored it. A subcommand out of scope under either clause is **counted and declared
   on the clean line**. The
   equality was always meant to catch a **stranded implementation** — a subcommand
   no descriptor dispatches to, dead code or the residue of a half-finished port —
@@ -7336,6 +7359,40 @@ The spelling collision with `# until:` is the precedent being cited rather than 
 accident to rename: the two differ in subject and in prefix and are read by one
 liveness predicate, and a reader who greps `until:` finds both, which is correct.
 
+**Both arms are scoped to the tree that authored the declaration, and the rule
+is a loosening this repo's own iteration paid for.** A temporary disposition
+names a task in *a* queue, and the only party that can make that task land is the
+one that owns the queue. A vendored kit's declaration is the kit author's, shipped
+read-only into a tree whose queue never carried the slug and never will, so
+asserting it there demands of an adopter something only the kit author can
+satisfy — and reds every freshly initialised consumer's battery on gate-sdk's own
+files. **A declaration is in scope iff it is under the consumer's own gates
+directory, or this tree is the one that authored the kits it carries**; the
+authoring test is `gate_authoring_tree` (§lib/gate.sh), the same predicate
+§check-gate-substrate-parity's assertion B already scopes by, shared rather than
+spelled twice. In the authoring tree nothing is out of scope and the assertion is
+exactly what it was.
+
+**The rule is the class, not the instance.** Both annotations take it — the
+`# exception-list:` element's `# until:` as well as the declaration's own
+`# port-until:` — because the exposure is identical by construction and the array
+arm is un-instantiated across the shipped kits only by accident. Scoping the arm
+that happened to fire would leave a scheduled recurrence for whoever next ships an
+exemption array from a kit.
+
+**The skipped set is counted on the clean line**, which is what keeps the
+loosening from becoming a silent stop: a scope rule that quietly widened is
+otherwise indistinguishable from a corpus with nothing to assert. The count is
+non-zero exactly in a tree that vendored a kit shipping such an annotation, and
+zero in the tree that authors them.
+
+**Its honest limit, stated rather than banked: the predicate is tree-shaped where
+the question is kit-shaped.** A consumer that authors its *own* kit beside
+vendored ones reads as non-authoring, so its own kit's dispositions stop being
+asserted — its consumer-gates-dir declarations still are. That is the same limit
+§check-gate-substrate-parity's assertion B already carries for the same predicate,
+and narrowing it means a per-kit authorship marker, which is a different unit.
+
 **The header-field arm enters the walk independently of the `# exception-list:`
 marker.** The array arm opens on that marker, so a declaration carrying only a
 header field would be skipped by it — the arm is a second entry into the same
@@ -7418,8 +7475,9 @@ conformance test, or a gate is a real question and a **different unit**; this
 section neither answers it nor forecloses it.
 
 Clean-line contract: the line reports the exemption-array count, the
-`# port-until:` header-field count **and** the
-derived live-slug count. All three are §run-gates' vacuous-pass tripwire applied to
+`# port-until:` header-field count, the **out-of-scope kit-shipped declaration
+count** and the
+derived live-slug count. All four are §run-gates' vacuous-pass tripwire applied to
 this gate's sets, and they read in opposite directions — an empty array or
 header-field set means that arm ranged over nothing, while an absurdly *large*
 slug set is the

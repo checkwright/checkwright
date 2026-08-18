@@ -68,13 +68,42 @@ parse_elements() {
 errors=()
 arrays=0
 headers=0
+skipped=0
 scan_files=()
+oos_files=()
+
+# spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — the scope rule: a temporary disposition is
+# asserted against the queue of the tree that authored the declaration, so a kit-shipped one is out
+# of scope wherever this tree vendored that kit rather than authoring it
+authoring=0
+gate_authoring_tree && authoring=1
+gates_dir_abs="$(cd "$(gate_sdk_gates_dir)" 2>/dev/null && pwd)" || gates_dir_abs=""
+dir_in_scope() {
+    [[ "$authoring" == 1 ]] && return 0
+    local d
+    d="$(cd "$1" 2>/dev/null && pwd)" || return 1
+    [[ -n "$gates_dir_abs" && "$d" == "$gates_dir_abs" ]]
+}
+
 shopt -s nullglob
 for d in "${DIRS[@]}"; do
     # spec: gate-sdk/SPEC.md §Meta-gate conservation for the binary substrate
-    scan_files+=("$d"/*.sh "$d"/*.gate)
+    if dir_in_scope "$d"; then
+        scan_files+=("$d"/*.sh "$d"/*.gate)
+    else
+        oos_files+=("$d"/*.sh "$d"/*.gate)
+    fi
 done
 shopt -u nullglob
+
+# spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — the skipped set is counted rather than
+# dropped silently: a scope rule that quietly stopped asserting is indistinguishable from a corpus
+# with nothing to assert, which is the vacuity the clean line's other counts already guard
+if [[ ${#oos_files[@]} -gt 0 ]]; then
+    while IFS= read -r _; do
+        skipped=$(( skipped + 1 ))
+    done < <(grep -lE '^[[:space:]]*(# exception-list:|#[[:space:]]*port-until:)' "${oos_files[@]}" 2>/dev/null)
+fi
 
 if [[ ${#scan_files[@]} -gt 0 ]]; then
     while IFS= read -r hdr; do
@@ -124,5 +153,5 @@ if [[ ${#errors[@]} -gt 0 ]]; then
         lands and the entry moves to Done, the declaration is dropped rather than left behind"
     exit 1
 fi
-echo "GATE-EXEMPTION-TASKS: clean ($arrays exemption array(s), $headers '# port-until:' header field(s), ${#IS_LIVE[@]} live task slug(s); every element declares until-with-live-task or permanent-with-reason and every held declaration names a live entry)"
+echo "GATE-EXEMPTION-TASKS: clean ($arrays exemption array(s), $headers '# port-until:' header field(s), $skipped kit-shipped declaration(s) out of scope, ${#IS_LIVE[@]} live task slug(s); every in-scope element declares until-with-live-task or permanent-with-reason and every in-scope held declaration names a live entry)"
 exit 0
