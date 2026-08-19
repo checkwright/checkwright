@@ -1,0 +1,5 @@
+# the second tamper shape, in the same commit as the first: a newly added path exemption that
+# excuses a file staged beside it. `plain-token` is not path-shaped, so assertion B passes it
+# over — the discrimination the one-violation case could not show.
+call-service/src/*.rs
+plain-token

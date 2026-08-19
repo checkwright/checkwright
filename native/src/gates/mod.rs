@@ -16,6 +16,7 @@ pub mod gate_fail_closed;
 pub mod gate_binary_fresh;
 pub mod gate_fixture_coverage;
 pub mod gate_output;
+pub mod gate_tamper;
 pub mod kit_enum;
 pub mod docs_cname_parity;
 pub mod exec_bit;
@@ -734,6 +735,15 @@ pub const REGISTRY: &[GateEntry] = &[
             "EVIDENCE_KIT_SUITES",
         ],
         "evidence-kit",
+    ),
+    // spec: delegation-kit/SPEC.md §Verify after every agent commit — the corpus is the git
+    // index and two named fixture lists, so nothing is walked and the declared root set is empty
+    (
+        "check-gate-tamper",
+        gate_tamper::run,
+        &[],
+        &["DELEGATION_KIT_GATE_FILES", "DELEGATION_KIT_META_PATHS"],
+        "delegation-kit",
     ),
     // spec: gate-sdk/SPEC.md §check-reads-couples — the filter-knob arm's first live instance:
     // assertion C's two whole-tree scans are one root selected by two knob values, and a literal

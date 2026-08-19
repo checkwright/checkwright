@@ -923,6 +923,32 @@ diff review of agent gate edits remains a supervisor duty. `--fixture <dir>`
 injects `staged-files` / `added-exemptions` lists (fixture-pair test
 capability); live mode reads `git diff --cached`.
 
+`checks/check-gate-tamper.gate` (`precommit`, binary-dispatched). `--fixture`
+**survives the port**: it selects the rule's own input corpus, which no knob
+resolves, so it is not the arrives-too-late shape gate-sdk/SPEC.md §The non-gate
+arm deletes — the invocation delegation-kit/README.md documents stays true.
+
+**Criterion 4 binds on this gate as a property of the *consumer's* configured
+globs, not of the gate.** Under the kit-shipped `DELEGATION_KIT_GATE_FILES`
+default the corpus is the consumer's own gates directory, which holds no kit
+declaration, and the criterion clears. Under a config widening the globs to
+every kit's check dir — this repo's — the gate's own declaration falls inside
+them, and staging it makes the gate read its own bytes. Reading the kit default,
+which is the natural first stop, therefore gives the wrong answer for the tree
+the port actually runs against; gate-sdk/SPEC.md §The port-candidate criteria
+carries the instance class.
+
+**Two behaviours changed with the port, and both are rulings rather than
+drift.** The shell held its added-exemption set in a bash associative array,
+whose key order is an unreproducible hash order, so assertion B's report lines
+came out in no defined order once a commit added two matching exemptions; the
+compiled form emits the same **set** byte-sorted, on the kit-roots cohort's
+ruling that a compiled form implements set semantics rather than a shell's
+incidental ordering. And a trailing `--fixture` with no directory after it made
+the shell's `shift 2` fail without advancing, so the argument loop **spun
+forever**; the compiled form reads the missing value as the empty directory name
+and refuses. A hang is not a verdict, so ending it costs no assertion.
+
 ## check-agent-tier-explicit
 
 Every agent definition under `DELEGATION_KIT_AGENT_DIR` declares a `model:`
@@ -1324,10 +1350,11 @@ delegation-kit/
   usage-tests/budget-guard-cases.tsv  # expected-action <TAB> scenario knobs
   usage-tests/dispatch-guard-cases.tsv  # expected-outcome <TAB> scenario knobs
   usage-tests/trend-history.log   # fixture history for the trend runner
-  checks/check-gate-tamper.sh
+  checks/check-gate-tamper.gate  # binary-dispatched; live arm reads the index through git
   checks/check-rule-citation.gate  # hermetic, binary-dispatched: every SPEC rule citation resolves to a template lead-in
   checks/check-agent-tier-explicit.gate  # hermetic, binary-dispatched: every agent definition declares an explicit model:
   gate-tests/check-gate-tamper/{good,bad}/
+  gate-tests/check-gate-tamper.test.sh  # the live arm, over throwaway git repos
   gate-tests/check-rule-citation/{good,bad}/
   gate-tests/check-agent-tier-explicit/{good,bad}/
   templates/agent-execution.md            # full protocol, bound as a skill shim
@@ -1495,7 +1522,21 @@ costs the work in flight.
 `check-gate-tamper` speaks the full gate contract (`GATE-TAMPER: clean
 (…)` / findings + `help:` lines / exit 0-1-2) and ships the standard
 `good/`+`bad/` fixture pair driven through `--fixture` by gate-sdk's
-`run-gate-tests.sh`.
+`run-gate-tests.sh`. The pair reaches both assertions — the bad case carries a
+co-staged non-meta path *and* a newly added path exemption matching one of its
+own staged files, beside a bare token assertion B must pass over.
+
+**The pair cannot reach the live arm, and that is a property of the injection
+rather than of the cases.** `--fixture` supplies both lists directly, so the
+function that derives them — reading each staged gate file's bytes out of the
+object store and diffing its exemption set against `HEAD`'s — runs in no fixture
+case. `gate-tests/check-gate-tamper.test.sh` is where it is exercised: each case
+builds a throwaway git repo, stages a commit shape into a real index, and runs
+the gate inside it. It holds the four verdicts the pair cannot — a HEAD-resident
+exemption is not "added" even when a co-staged file matches it, a newly appended
+one is, an added one matching nothing staged stays silent, and a staged
+*deletion* of a gate file reads as an empty exemption set rather than a failure
+to read.
 
 `check-rule-citation` speaks the same gate contract and ships the standard
 `good/`+`bad/` fixture pair (a citation resolving to a template lead-in vs one

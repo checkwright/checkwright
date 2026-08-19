@@ -1,0 +1,3 @@
+# graph: couples=kit:*.sh,native/src/gates/gate_tamper.rs dir=one valve=none tier=precommit
+# install: zero-config
+# spec: delegation-kit/SPEC.md §Verify after every agent commit — a gate-weakening commit is blocked by shape (A gate edits stay meta-isolated; B a new path-exemption can't excuse a co-staged file)
