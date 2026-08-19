@@ -136,6 +136,10 @@ grep -q '1 group(s) formed, 0 undecidable' <<<"$out" || {
     echo "smoke(port-blockers): --group did not key a fully-scannable member: $out" >&2; exit 1; }
 grep -q 'libs=fail_closed globs=\*.sh' <<<"$out" || {
     echo "smoke(port-blockers): --group key lost a factor: $out" >&2; exit 1; }
+# spec: gate-sdk/SPEC.md §port-blockers — the count is asserted exactly, against the planted declaration's own length rather than a transcribed number, because a lines=[0-9]+ shape match would pass a field counting the wrong file, which is the failure the column's whole value rests on
+pb_decl_lines=$(( $(wc -l < "$pb/check-smoke-tokenizer.sh") ))
+grep -Eq "check-smoke-tokenizer +lines=$pb_decl_lines +c2=" <<<"$out" || {
+    echo "smoke(port-blockers): --group lost lines=$pb_decl_lines on the member row, or moved it out of the fixed-width run: $out" >&2; exit 1; }
 
 if pb_run --nope >/dev/null 2>&1; then
     echo "smoke(port-blockers): an unrecognized argument was not refused" >&2; exit 1

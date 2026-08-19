@@ -3,7 +3,7 @@
 # spec: gate-sdk/SPEC.md §port-blockers — criterion 6's roster on the same tool and the same walk: the --group arm partitions the still-shell members by derived corpus derivation, so one tool is the derived roster for both criteria and neither is a maintained list
 # usage: port-blockers.sh [--group]
 #   default arm: each registered gate's external-program requirements beyond GATE_SDK_PROGRAM_FLOOR, as '<member><TAB><program><TAB><file:line>' rows plus a trailing scanned/undecidable count line — the criterion-7 input a porting session reads when it sequences a cohort; advisory, never parsed, and what it cannot decide prints '?' and is counted.
-#   --group: the corpus-derivation partition over the still-shell members, groups largest first, each member carrying its criterion 2/3/7 columns and its expanded couples= — the criterion-6 input the session cutting the next cohort reads, advisory on the same terms and with an undecidable count of its own.
+#   --group: the corpus-derivation partition over the still-shell members, groups largest first, each member carrying its declaration line count, its criterion 2/3/7 columns and its expanded couples= — the criterion-6 input the session cutting the next cohort reads, advisory on the same terms and with an undecidable count of its own; lines= is a floor on a port's size and never a ranking of it.
 set -uo pipefail
 
 SDK="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -19,11 +19,15 @@ usage: port-blockers.sh [--group]
                  '<member><TAB><program><TAB><file:line>' row each.
   --group        criterion 6: the corpus-derivation partition over the
                  still-shell members, largest group first, each member
-                 carrying its criterion 2/3/7 columns and expanded couples=.
+                 carrying lines= (its declaration's line count), its
+                 criterion 2/3/7 columns and expanded couples=.
   -h, --help     this text.
 
 Both arms are advisory: nothing parses either output, and what cannot be
-decided prints '?' and is counted rather than guessed.
+decided prints '?' and is counted rather than guessed. lines= is one sizing
+input beside the criterion columns, a floor on a port's size and never a
+ranking of it: cost concentrated in interfaces, or behind a spawned tool,
+is invisible to it.
 EOF
 }
 
@@ -407,9 +411,11 @@ while IFS= read -r member; do
             libkey="${libkey%,}"
         fi
         globkey="$(pb_glob_set "$decl")"
+        # spec: gate-sdk/SPEC.md §port-blockers — the line count is read off the same resolved $decl the row's other columns are, so the field cannot disagree with the rest of its own row about which file it describes; it is emitted on the unkeyed row too because a count decides nothing, which is why the ground for withholding the criterion columns there does not reach it
+        decl_lines=$(( $(wc -l < "$decl") ))
         # spec: gate-sdk/SPEC.md §port-blockers — a member empty in both factors is reported, never grouped, and never grouped with another empty-keyed member: sharing an absence of evidence is not sharing a derivation
         if [[ -z "$libkey" && -z "$globkey" ]]; then
-            group_unkeyed+="  ?  $member"$'\t'"$decl"$'\n'
+            group_unkeyed+="  ?  $member"$'\t'"lines=$decl_lines"$'\t'"$decl"$'\n'
             group_unkeyed_n=$((group_unkeyed_n + 1))
         else
             if [[ "$member_undecidable" -eq 1 ]]; then
@@ -423,8 +429,9 @@ while IFS= read -r member; do
             c3="$(gate_manifest_field "$decl" tier)"
             gate_expand_couples_var couples_exp "$(gate_manifest_field "$decl" couples)"
             key="libs=${libkey:--} globs=${globkey:--}"
-            GROUP_ROWS["$key"]+="$(printf '  %-36s c2=%-10s c3=%-9s c7=%s\n      couples=%s' \
-                "$member" "$c2" "${c3:--}" "$c7" "${couples_exp:--}")"$'\n'
+            # spec: gate-sdk/SPEC.md §port-blockers — lines= sits in the fixed-width run ahead of c2=, not appended: c7= is variable-width, so a field after it is the one column that cannot be aligned, and a cost column read down a list is the one that must be
+            GROUP_ROWS["$key"]+="$(printf '  %-36s lines=%-5s c2=%-10s c3=%-9s c7=%s\n      couples=%s' \
+                "$member" "$decl_lines" "$c2" "${c3:--}" "$c7" "${couples_exp:--}")"$'\n'
             GROUP_COUNT["$key"]=$((${GROUP_COUNT["$key"]:-0} + 1))
         fi
     fi

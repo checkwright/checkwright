@@ -2246,9 +2246,22 @@ default that reads as the answer, and the next session would size against the
 default rather than against its budget — the very defect the arm was minted
 against, reintroduced as configuration and harder to see for being declared.
 What the sizing session weighs instead, stated once so it is not re-derived: the
-per-member cost `--group` already prints beside each member (shell line count and
-the mechanically derivable criterion columns), the iteration's non-port work, and
-the fixed per-iteration ceremony.
+per-member inputs `--group` prints beside each member — `lines=`, the
+declaration's own line count, and the mechanically derivable criterion columns —
+plus its own reading of each member's declaration, the iteration's non-port work,
+and the fixed per-iteration ceremony.
+
+**`lines=` is a floor on a port's size and never a ranking of it**, and the
+evidence is two consecutive cuts rather than a caution. §The fifth budget batch
+records that its cost "was in *interfaces*, not in logic" — a ranking of logic
+could not see six command-line arguments — and names
+`check-template-copy-parity` as a member whose cost is concentrated where the
+line count hides it; that member was then the **cheapest by line count** of the
+cut that took it, so the second cut attests what the first found. Cost behind a
+**spawned** tool is invisible to the column on the same terms (the
+spawn-invisibility rule below). So the count is one input beside the criterion
+columns and the session's own reading, never the answer: a session that reads
+the column as an answer stops looking for the cost the column cannot see.
 
 **A budget batch records only findings here, never a member roster.** Every
 cohort section below earned its place by having a shared derivation to explain,
@@ -3410,8 +3423,9 @@ with no Rust counterpart, a hand-rolled surface classifier whose value is in its
 incidental behaviour, a fence tokenizer with a restricted info-string grammar.
 **A cost ranking by declaration size is silent in both directions**, blind to
 interface removals there and to derivation depth here, so a porting session
-prices both itself (§The non-gate arm; `gate-sdk/SPEC-sizing-input.md` states the
-same limit at the column it mints).
+prices both itself (§The non-gate arm; §The first cohort, and the rule that
+selects the next states the same limit at `--group`'s `lines=` column, and this
+batch is the second of the two consecutive cuts it cites).
 
 ### The canon-kit `spec_manifest_files` cohort
 
@@ -6659,8 +6673,8 @@ exact mirror of the `command -v` guard.
 
 **The `--group` arm answers criterion 6.** It emits a **corpus-derivation
 partition over the still-shell members**, groups ordered by size descending, each
-member's row carrying the criterion columns below with its expanded `couples=`
-beside it, then a trailing line counting members scanned, groups formed, members
+member's row carrying `lines=` and the criterion columns below with its expanded
+`couples=` beside it, then a trailing line counting members scanned, groups formed, members
 undecidable, members already ported and excluded, members **permanently shell
 and excluded**, and members **temporarily held and excluded** — closing with the
 two derived totals the four exclusion classes put beyond a reader's own
@@ -6781,6 +6795,32 @@ No field is emitted without a named reader at a named transition, and those thre
 columns were considered and **removed** under that rule, since their only honest
 reader would have had to disregard them.
 
+**`lines=` clears that same rule, and it is stated here so a reader finds the
+admission and the three refusals together.** The field is `wc -l` over the same
+resolved declaration path the row's other columns are read from, so it cannot
+disagree with the rest of its own row about which file it describes, and it sits
+in the **fixed-width run ahead of `c2=`** rather than appended: `c7=` is
+variable-width — `clean`, `?`, or a comma-joined program list — so a field after
+it is the one column that cannot be aligned, and a cost column read down a list
+is the one that must be. What separates it from criteria 4, 5 and 6 is not
+importance but **exactness**: those three would have been guesses, and a reader
+who cannot trust a column must disregard it, where a line count is exact. Its
+reader is the session composing a **budget-arm** cut and its transition is the
+cut itself (§The first cohort, and the rule that selects the next) — the reader
+and transition the row's existing columns already serve, so the field adds a
+column and no reader. **What it is evidence of is bounded there, not here**: the
+count is a floor on a port's size and never a ranking of it, which §The first
+cohort states with the two cuts that attest it.
+
+**The field's nearest reader is a consumer, and saying so is what keeps the rule
+from being bent to fit.** In this tree the takeable tier holds `check-graph`
+alone, ruled out of every budget batch (§The fifth budget batch), so there is no
+in-tree cut to compose until a `# port-until:` hold releases; a vendoring adopter
+with a still-shell battery composes budget cuts on their own corpus, which is
+what makes the column kit mechanism rather than this tree's instrument. A field
+whose reader is real but not imminent is not the same thing as a field whose
+reader would disregard it.
+
 **Undecidable is reported, never guessed**, adopting §check-reads-couples'
 precedent, and the ruling is stated once for the tool rather than per arm. In the
 default arm, a command-position expansion whose default cannot be resolved prints
@@ -6790,9 +6830,20 @@ reported nothing for an unresolvable knob would reproduce the very false negativ
 the derivation exists to close — the dependency that is never spelled in the
 gate's source at all. In `--group`, a still-shell member whose key is empty in
 **both** factors — no kit-library call and no content glob the tool can see —
-prints `?` with its declaration path and is counted; it is never placed in a
+prints `?` with its `lines=` count and its declaration path and is counted; it is
+never placed in a
 group, and empty-keyed members are never grouped **with each other**, because
-sharing an absence of evidence is not sharing a derivation. What the arm emits is
+sharing an absence of evidence is not sharing a derivation. **That the count
+appears on this row is a ruling, not an oversight**: the row carries no criterion
+column because the arm declines to *decide* anything about a member empty in both
+factors, and a line count decides nothing — it is a property of the file, not a
+verdict about it — so the ground for withholding the criterion columns does not
+reach it. An unkeyed member is still owed and still a candidate, and it is
+adjudicated by hand, so leaving it the one row with no cost printed would
+reproduce at a smaller scale the defect the column was minted against. Ruled at
+authoring rather than discovered, because the branch is live code with no
+instance in this tree today and a port or a rewrite would carry the omission
+forward unnoticed. What the arm emits is
 therefore a **decidable partition plus a counted remainder**, never a complete
 partition claimed as one — which is precisely what two failed read-only sweeps
 could not deliver.
