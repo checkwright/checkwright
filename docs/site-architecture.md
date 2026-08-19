@@ -141,7 +141,10 @@ recoverable:
   and `commit-msg` hooks are one set with one trigger, a gate's `# graph:`
   manifest — plus, for the hooks, the resolved knob values a ported member's
   invocation bakes into them (gate-sdk/SPEC.md §gen-pre-commit), so a kit-config
-  edit stales them too: one command emits both hooks
+  edit stales them too — and so does adding a kit `gate-tests/*.test.sh`, whose
+  basename `scripts/enum-sets.sh` derives into the `check-prose-enum` roster the
+  hooks bake verbatim, staling them with no manifest or config touched at all:
+  one command emits both hooks
   (`bash gate-sdk/bin/gen-pre-commit.sh --write`), then the artifact
   (`bash gate-sdk/checks/check-graph.sh --emit > docs/check-graph.html`), which
   `check-graph` asserts fresh together. The hooks are never hand-edited;
