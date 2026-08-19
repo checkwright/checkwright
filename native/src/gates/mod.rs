@@ -44,6 +44,7 @@ pub mod identity;
 pub mod install_claim;
 pub mod kit_registration;
 pub mod knob_citation;
+pub mod knob_default_coupling;
 pub mod lesson_disposition;
 pub mod lifecycle_registration;
 pub mod manifest_count;
@@ -427,6 +428,16 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_MANIFEST_FILES",
             "CANON_KIT_PROSE_SURFACE_GLOBS",
         ],
+        "canon-kit",
+    ),
+    // spec: canon-kit/SPEC.md §check-knob-default-coupling — the kit-root walk is one `?` and
+    // not one per kit: the roster's members and its arity both come from a knob, so no literal
+    // root here could be anything but a second spelling of that knob's resolved value.
+    (
+        "check-knob-default-coupling",
+        knob_default_coupling::run,
+        &[("?", "")],
+        &["GATE_PRUNE_DIRS", "GATE_KIT_ROOTS_REL", "CANON_KIT_SPEC_NAME"],
         "canon-kit",
     ),
     // spec: canon-kit/SPEC.md §check-knob-citation — the second consumer of the kit-root

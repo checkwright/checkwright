@@ -1068,3 +1068,98 @@ pub fn para_wrapped(g: &CountGrammar, para: &Para) -> Option<(usize, String)> {
     }
     Some((para.fnr[start_k - 1], hit))
 }
+
+
+// spec: canon-kit/SPEC.md §lib/spec.sh — the default-statement grammar's one crate-side owner,
+// so both readers of a SPEC's stated default read it identically; the knob-name predicate is the
+// caller's, since each gate derives its own prefix vocabulary
+pub struct DefaultGrammar<'a> {
+    pub is_knobname: &'a dyn Fn(&str) -> bool,
+}
+
+impl DefaultGrammar<'_> {
+    // spec: canon-kit/SPEC.md §lib/spec.sh — `sk_literal_at`: a backticked non-knob string, a
+    // quoted string, or a number. A backticked token that *is* a knob name is a name citation, so
+    // the scan falls through to the quote and number shapes rather than stopping.
+    pub fn literal_at(&self, after: &[u8]) -> String {
+        if let Some((s, e)) = delimited(after, b'`', true) {
+            let content = String::from_utf8_lossy(&after[s..e]).trim().to_string();
+            if !(self.is_knobname)(&content) {
+                return content;
+            }
+        }
+        for q in *b"\"'" {
+            if let Some((s, e)) = delimited(after, q, false) {
+                if e > s {
+                    return String::from_utf8_lossy(&after[s..e]).into_owned();
+                }
+            }
+        }
+        // spec: canon-kit/SPEC.md §lib/spec.sh — the number shape, last of the three
+        let mut i = 0usize;
+        while i < after.len() {
+            if after[i].is_ascii_digit() {
+                let ok_before =
+                    i == 0 || !(after[i - 1].is_ascii_alphanumeric() || after[i - 1] == b'_');
+                let mut j = i;
+                while j < after.len() && after[j].is_ascii_digit() {
+                    j += 1;
+                }
+                let ok_after =
+                    j == after.len() || !(after[j].is_ascii_alphanumeric() || after[j] == b'_');
+                if ok_before && ok_after {
+                    return String::from_utf8_lossy(&after[i..j]).into_owned();
+                }
+                i = j;
+                continue;
+            }
+            i += 1;
+        }
+        String::new()
+    }
+
+    // spec: canon-kit/SPEC.md §lib/spec.sh — `sk_default_literal`: the literal the first
+    // word-bounded "default" binds within a forward window, or the empty string
+    pub fn default_literal(&self, line: &str, win: usize) -> String {
+        let lb = line.to_ascii_lowercase();
+        let low = lb.as_bytes();
+        let b = line.as_bytes();
+        let mut off = 0usize;
+        while off < low.len() {
+            let hit = (off..low.len()).find(|&i| {
+                low[i..].starts_with(b"default")
+                    && (i == 0 || !(low[i - 1].is_ascii_alphanumeric() || low[i - 1] == b'_'))
+            });
+            let ms = match hit {
+                Some(i) => i,
+                None => return String::new(),
+            };
+            let after_start = ms + b"default".len();
+            let after_end = std::cmp::min(after_start + win, b.len());
+            let lit = self.literal_at(&b[after_start..after_end]);
+            if !lit.is_empty() {
+                return lit;
+            }
+            off = ms + 1;
+        }
+        String::new()
+    }
+
+    // spec: canon-kit/SPEC.md §lib/spec.sh — `sk_default_bound`: the word "default" binding a
+    // value literal within a 24-character forward window
+    pub fn default_bound(&self, line: &str) -> bool {
+        !self.default_literal(line, 24).is_empty()
+    }
+}
+
+// spec: canon-kit/SPEC.md §lib/spec.sh — the backticked and quoted shapes `sk_literal_at` reads,
+// leftmost first
+fn delimited(b: &[u8], d: u8, nonempty: bool) -> Option<(usize, usize)> {
+    let open = b.iter().position(|&c| c == d)?;
+    let rest = &b[open + 1..];
+    let close = rest.iter().position(|&c| c == d)?;
+    if nonempty && close == 0 {
+        return None;
+    }
+    Some((open + 1, open + 1 + close))
+}

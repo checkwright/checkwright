@@ -12,7 +12,6 @@ set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # canon-kit/
-GATE="$DIR/checks/check-knob-default-coupling.sh"
 SANDBOX="$(mktemp -d)"
 trap 'rm -rf "$SANDBOX"' EXIT
 
@@ -20,7 +19,8 @@ fails=0
 mkdir -p "$SANDBOX/gate-sdk" "$SANDBOX/widget-kit/lib"
 
 run_gate() {  # echoes gate output; roster is the two sandbox kits
-    ( cd "$SANDBOX" && env GATE_SDK_KIT_DIRS="gate-sdk widget-kit" GATE_SDK_ROOT="$DIR/../gate-sdk" "$GATE" 2>&1 )
+    ( cd "$SANDBOX" && gate_env GATE_SDK_KIT_DIRS="gate-sdk widget-kit" GATE_SDK_ROOT="$DIR/../gate-sdk" \
+        && gate_run check-knob-default-coupling "$DIR/checks" 2>&1 )
 }
 
 check_case() {  # $1=label  $2=want-rc  $3=want-substring

@@ -1,0 +1,3 @@
+# graph: couples=kit:*.sh,kit:SPEC.md dir=one valve=none tier=precommit
+# install: zero-config
+# spec: canon-kit/SPEC.md §check-knob-default-coupling — every literal kit-knob default in kit source agrees across its sites and with the default the owning SPEC states

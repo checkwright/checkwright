@@ -605,6 +605,13 @@ same shapes:
   as a value. `check-knob-citation` reads it to reject a restated value in prose;
   `check-knob-default-coupling` reads it to confirm the SPEC states the source's
   literal (§check-knob-default-coupling).
+  **Both callers are compiled since §The sixth budget batch, so the live holder is
+  `native/src/spec.rs`'s `DefaultGrammar`** — promoted there out of the first
+  gate's private implementation at that port, because the second caller arriving
+  is exactly when a private copy becomes the second owner this bullet exists to
+  prevent. The shell form's caller set emptied with it and it is **not** deleted:
+  the dead-twin disposition (gate-sdk/SPEC.md §The port-candidate criteria,
+  criterion 2) bounds itself to undocumented surface, and this bullet documents it.
 
 ### check-amendment-queue
 
@@ -1167,10 +1174,20 @@ honest limit: agreement is confirmed by the source literal appearing as the
 SPEC's stated default, so a value the SPEC never pins to a literal cannot be
 coupled — only a literal disagreement or a wholly undocumented default reds.
 
+**Ported to the binary substrate at §The sixth budget batch** (gate-sdk/SPEC.md),
+where it took criterion 4 in its sharpest form: its `couples=` field is one level
+deep and so does not cover its own declaration path, while the recursive kit-root
+walk beneath it — which prunes `templates/` and nothing else — reads that path as
+content on every run. Couple clears, walk binds. Its assertion target is the
+grammar of a default, never a gate's dispatch relation, so the criterion is paid
+by the good/bad pair rather than answered by staying shell (§Meta-gate
+conservation for the binary substrate).
+
 Producer: the generated pre-commit hook / `run-gates.sh`, coupled to kit source
 and the kit SPECs; consumer: the committing operator via the output contract —
 file, the knob, the source literal, and the owning SPEC, each read once at the
-scan transition, no persistent state. Fail-closed on the awk status. The good/bad
+scan transition, no persistent state. Fail-closed on an unreadable kit root or an
+unresolved knob. The good/bad
 pair covers self-agreement, the SPEC disagreement, and both idioms;
 `check-knob-default-coupling.test.sh` covers the cross-kit owning SPEC, the
 absent-default red, and the descriptive/array/empty/deferral skips the pair

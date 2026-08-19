@@ -83,7 +83,8 @@ impl spec::ProseSink for Sink {
         // expansion is a name citation, never a value statement of itself; blank the
         // expansions before the token scan
         let tokline = blank_expansions(raw);
-        let bound = self.default_bound(raw);
+        let bound = spec::DefaultGrammar { is_knobname: &|t: &str| self.has_prefix(t) }
+            .default_bound(raw);
         let mut first: Option<(String, String)> = None;
         let b = tokline.as_bytes();
         let mut pos = 0usize;
@@ -157,86 +158,6 @@ fn blank_expansions(line: &str) -> String {
         i += 1;
     }
     String::from_utf8_lossy(&out).into_owned()
-}
-
-impl Sink {
-    // spec: canon-kit/SPEC.md §lib/spec.sh — `sk_default_bound`: the word "default" binding a
-    // value literal within a 24-character forward window
-    fn default_bound(&self, line: &str) -> bool {
-        let lb = line.to_ascii_lowercase();
-        let low = lb.as_bytes();
-        let b = line.as_bytes();
-        let mut off = 0usize;
-        while off < low.len() {
-            let hit = (off..low.len()).find(|&i| {
-                low[i..].starts_with(b"default")
-                    && (i == 0 || !(low[i - 1].is_ascii_alphanumeric() || low[i - 1] == b'_'))
-            });
-            let ms = match hit {
-                Some(i) => i,
-                None => return false,
-            };
-            let after_start = ms + b"default".len();
-            let after_end = std::cmp::min(after_start + 24, b.len());
-            if !self.literal_at(&b[after_start..after_end]).is_empty() {
-                return true;
-            }
-            off = ms + 1;
-        }
-        false
-    }
-
-    // spec: canon-kit/SPEC.md §lib/spec.sh — `sk_literal_at`: a backticked non-knob string, a
-    // quoted string, or a number. A backticked token that *is* a knob name is a name
-    // citation, so the scan falls through to the quote and number shapes rather than stopping.
-    fn literal_at(&self, after: &[u8]) -> String {
-        if let Some((s, e)) = delimited(after, b'`', true) {
-            let content = String::from_utf8_lossy(&after[s..e]).trim().to_string();
-            if !self.has_prefix(&content) {
-                return content;
-            }
-        }
-        for q in *b"\"'" {
-            if let Some((s, e)) = delimited(after, q, false) {
-                if e > s {
-                    return String::from_utf8_lossy(&after[s..e]).into_owned();
-                }
-            }
-        }
-        // spec: canon-kit/SPEC.md §lib/spec.sh — the number shape, last of the three
-        let mut i = 0usize;
-        while i < after.len() {
-            if after[i].is_ascii_digit() {
-                let ok_before =
-                    i == 0 || !(after[i - 1].is_ascii_alphanumeric() || after[i - 1] == b'_');
-                let mut j = i;
-                while j < after.len() && after[j].is_ascii_digit() {
-                    j += 1;
-                }
-                let ok_after =
-                    j == after.len() || !(after[j].is_ascii_alphanumeric() || after[j] == b'_');
-                if ok_before && ok_after {
-                    return String::from_utf8_lossy(&after[i..j]).into_owned();
-                }
-                i = j;
-                continue;
-            }
-            i += 1;
-        }
-        String::new()
-    }
-}
-
-// spec: canon-kit/SPEC.md §lib/spec.sh — the backticked and quoted shapes `sk_literal_at`
-// reads, leftmost first
-fn delimited(b: &[u8], d: u8, nonempty: bool) -> Option<(usize, usize)> {
-    let open = b.iter().position(|&c| c == d)?;
-    let rest = &b[open + 1..];
-    let close = rest.iter().position(|&c| c == d)?;
-    if nonempty && close == 0 {
-        return None;
-    }
-    Some((open + 1, open + 1 + close))
 }
 
 fn rule(args: &[String]) -> Result<i32, String> {

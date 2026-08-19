@@ -958,7 +958,7 @@ answering a question assertion C never asked.
 | `check-readme-roster` | **Retained, glob widened** to `*.sh` + `*.gate`. Without it a ported gate silently drops out of its kit README's roster in both directions. **This member is itself `.gate`-dispatched** since §The second budget batch, so the row now describes a ported member reading ported members' declaration paths — the shape the `check-value-rollup-fresh` row already has, and the port changes nothing about the rule: what it scans is a set of basenames across both spellings, which the descriptor still is. |
 | `check-exec-bit` | **Retained, extended**: a `.gate` descriptor must be **non**-executable. Stated as an assertion so "not executable" cannot read as "not covered". |
 | `check-todo-task-liveness`, `check-deprecation-task` | **Retained, corpus extended** to the Rust module and the descriptor, the same shape as `check-comment-tier`: both walk the shared comment surface hunting `TODO(task:)`/deprecation markers, so a marker left in a ported gate's Rust source would otherwise stop being tracked. Both are `.gate`-dispatched since the seventh cohort, on the same terms as the two rows above. |
-| `check-knob-default-coupling` | **Retained unchanged, and deliberately *not* corpus-extended** — the extension the shape of this table invites would be vacuous. Its two default idioms are shell (`${KNOB:-v}`, the guarded assignment) and its knob prefixes derive from `gate_kit_roots` members; `native/` is not a kit root and a Rust `const` matches neither idiom, so pointing it at `*.rs` would scan files whose grammar it cannot parse and add zero assertions while reading as coverage. The duplication it could not reach — the crate's prune-dir default against `lib/gate.sh`'s — **is now absent rather than test-held**: the config bridge (§lib/gate.sh) leaves exactly one place a knob's value is computed, the kit's shell library, and the crate carries no default for a bridged knob to drift from. The crate carries no unit test comparing the two literals, because it carries only one: that assertion is **deleted with the duplication it gated** — enforcement-first ranks removing the duplication above gating it, and a citation left behind would point this table at an absent mechanism, the exact defect its own prose calls out. Its verdict on `lib/gate.sh` is unchanged: the shell default stays exactly where it is, as the sole one. |
+| `check-knob-default-coupling` | **Retained unchanged, and deliberately *not* corpus-extended** — the extension the shape of this table invites would be vacuous. Its two default idioms are shell (`${KNOB:-v}`, the guarded assignment) and its knob prefixes derive from `gate_kit_roots` members; `native/` is not a kit root and a Rust `const` matches neither idiom, so pointing it at `*.rs` would scan files whose grammar it cannot parse and add zero assertions while reading as coverage. The duplication it could not reach — the crate's prune-dir default against `lib/gate.sh`'s — **is now absent rather than test-held**: the config bridge (§lib/gate.sh) leaves exactly one place a knob's value is computed, the kit's shell library, and the crate carries no default for a bridged knob to drift from. The crate carries no unit test comparing the two literals, because it carries only one: that assertion is **deleted with the duplication it gated** — enforcement-first ranks removing the duplication above gating it, and a citation left behind would point this table at an absent mechanism, the exact defect its own prose calls out. Its verdict on `lib/gate.sh` is unchanged: the shell default stays exactly where it is, as the sole one. **This member is itself `.gate`-dispatched** since §The sixth budget batch, so the row now describes a ported member — and the port moves nothing in it: the two idioms it scans are shell whichever substrate reads them, so the not-corpus-extended verdict above is a property of its rule rather than of its own declaration's spelling. |
 | `check-gate-tamper` | **Retained, extended — and the extension is partly discharged.** The gate-file roster it recognises (`DELEGATION_KIT_GATE_FILES`) carries the `.gate` spelling on the **kit default** as of the first cohort's descriptors, or a consumer on that default would receive a ported gate whose edits escape the isolation rule (delegation-kit/SPEC.md §Layout and configuration). This repo's own config carried both spellings ahead of the port, which is exactly why the kit default had to be checked separately rather than inferred from a green battery here. Its meta-layer path roster (`DELEGATION_KIT_META_PATHS`) is fixed **in this repo's consumer config**: `native/` is declared there (`scripts/delegation-config.sh`), so a commit editing a ported gate's Rust implementation alongside its descriptor is meta-isolated rather than refused. The kit default and any other consumer on it still lack the prefix — `native/` is never auto-unioned by the kit-root scan (`gate_kit_roots`'s predicate requires `checks/` or `smoke/`, which the crate ships neither of), so the fix is consumer config, not a kit-default change. One known limit stands: its exemption reader parses a shell `# exception-list:` array literal and has no Rust-source equivalent. Stated against the live ported set rather than the cohort that first raised it, since the binding condition is a property of the roster and moves with every cohort: the limit is unbound while no ported member carries an exemption list, and it is unbound for a stronger reason than a shell-only holder set — the tree carries **no** exemption-list holder at all, which `check-gate-exemption-tasks` counts on every run. The cohort that ports the first one owes the Rust-source reader. |
 | `check-graph`, `check-kit-enum`, `check-gate-fixture-coverage`, `check-enforcement-fresh` | **Survive unchanged** — all four read the declaration path as text (directly, or through the enforcement-map and footprint emitters, which do), which the descriptor still is. |
 | `check-value-rollup-fresh` | **Survives unchanged in mechanism, and is itself `.gate`-dispatched** since §The consumer remainder cohort — so this row now describes a ported member reading ported members' declaration paths. It reads them as text through the footprint emitter, a non-gate arm this gate calls in-process (§The non-gate arm), and the declaration path is what that emitter reads — which is why the port moves nothing about its rule. What the port *did* move is one term of its coupling, recorded because the re-derivation confirmed it rather than assuming it: its `couples=` names `scripts/*.sh,kit:*.sh`, and after that cohort emptied the consumer's gates directory of check scripts, `scripts/*.sh` covers **no** registry member's declaration path at all. The member stays substrate-sensitive through `kit:*.sh` alone. A narrowing is not a clearance — `scripts/` retains many non-gate `*.sh`, and the coupling still earns its trigger — but a later reader deriving the set must not read the `scripts/*.sh` token as the thing that selects this row. |
@@ -3225,6 +3225,47 @@ into evidence-kit* was **false** and is corrected here rather than carried — t
 kit already dispatched two members to the binary. What was true, and what cost,
 is narrower: the member's own helpers had no Rust counterpart, which is a
 helper-level fact and not a kit-level one.
+
+### The sixth budget batch
+
+**Six members, a width the operator ruled fresh for this cut** on 2026-08-19:
+the whole takeable tier bar `check-graph`, ruled with the raised declaration band
+in hand and against it. Cut widths are ruled per cut and never inherited, and the
+five sections above are each their own ruling rather than a standing envelope. As
+with every batch section, this one records the cut's **findings and no member
+roster** — membership is derivable from the tree and the count from
+`scripts/measured-claims.sh`'s `ported-gate-members`. The fifth cut's
+drop-any-member relief rides in this envelope by the same ruling, available for
+cause and never as a budget lever.
+
+**Taken whole, the cut leaves `check-graph` the one takeable member the oracle
+still counts**, and that member is ruled out of every budget batch rather than
+out of this one (§The fifth budget batch). So the takeable *tier* is exhausted
+by the six, and the budget arm has no further cut to compose until a
+`# port-until:` hold releases. The composition ground was re-read here rather
+than inherited: `port-blockers.sh --group` reported seven groups of exactly one,
+0 undecidable, so the size arm stays permanently exhausted and this is a budget
+cut rather than a cohort.
+
+**The band moved *up*, and the width is the honest consequence.** The fifth cut
+ran 93 to 140 declaration lines; this one runs 127 to 240. Six members here are
+heavier than seven were there, and the reason is the one that exhausted the band
+downward: the floor rose because the cheap members are gone. Width six buys what
+width seven bought last cut and nothing more.
+
+**The cut's cost is in *fresh derivation*, not in interfaces — the exact inverse
+of the fifth, and the pair is the finding.** That batch's defining result was
+that six of seven members carried a command-line argument and the
+deleted-argument ruling bound more often than in the four prior batches combined.
+The same probe here answers the other way: five of six carry an argument, six
+arguments in all, and every one ports unchanged — not one deletion. Where the
+cost actually sits is invisible to a line count in both directions: embedded awk
+with no Rust counterpart, a hand-rolled surface classifier whose value is in its
+incidental behaviour, a fence tokenizer with a restricted info-string grammar.
+**A cost ranking by declaration size is silent in both directions**, blind to
+interface removals there and to derivation depth here, so a porting session
+prices both itself (§The non-gate arm; `gate-sdk/SPEC-sizing-input.md` states the
+same limit at the column it mints).
 
 ### The canon-kit `spec_manifest_files` cohort
 
