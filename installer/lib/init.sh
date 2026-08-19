@@ -307,16 +307,6 @@ if [[ -n "$ARTIFACT_TARGET" ]]; then
     fi
 fi
 
-# spec: installer/README.md §The manifest — the roster's exit condition, and it is the whole rule: init owns a path because it wrote the file there, so ownership ends when the file leaves the tree and at no other moment. Dropping an entry would disown a file init created, and an uninstall reading this roster would then leave it behind. A payload that stops shipping a path is not that moment either — the file is still on disk, it may carry the adopter's edits, and disowning it is precisely what lets a later payload re-adding the same path write straight through them. So membership and existence are the only tests: every path this payload still ships has already reached claim(), which records it on the write and on the refusal alike, leaving exactly the paths no copy_in visited this run to reach here
-if [[ -n "$PRIOR_FILES" ]]; then
-    while IFS=$'\t' read -r p h; do
-        [[ -n "$p" ]] || continue
-        [[ -n "${IS_WRITTEN[$p]:-}" ]] && continue
-        [[ -f "$ROOT/$p" ]] || continue
-        record "$p" "$h"
-    done <<<"$PRIOR_FILES"
-fi
-
 # spec: installer/README.md §init — the generated projections are produced by the vendored tools themselves, never restated by the installer: the hook generator and the graph emitter are gate-sdk's, so a consumer's artifacts are the ones their own gate-sdk makes
 GENERATED=("$GATES_DIR/git-hooks/pre-commit" "$GATES_DIR/CHECK-GRAPH.html")
 if (( ! DRY )); then
@@ -330,6 +320,16 @@ for g in "${GENERATED[@]}"; do
     (( DRY )) || [[ -f "$ROOT/$g" ]] || continue
     record "$g"
 done
+
+# spec: installer/README.md §The manifest — the roster's exit condition, and it is the whole rule: init owns a path because it wrote the file there, so ownership ends when the file leaves the tree and at no other moment. Dropping an entry would disown a file init created, and an uninstall reading this roster would then leave it behind. A payload that stops shipping a path is not that moment either — the file is still on disk, it may carry the adopter's edits, and disowning it is precisely what lets a later payload re-adding the same path write straight through them. So membership and existence are the only tests: every path this payload still ships has already reached claim(), which records it on the write and on the refusal alike, leaving exactly the paths no copy_in visited this run to reach here — and "this run" is why the loop is last rather than merely late: every path init writes must already be recorded when it runs, or the loop carries a path init rewrote seconds earlier at its superseded hash and the staged set loses it. The generated projections above are the ones that reached it from the wrong side
+if [[ -n "$PRIOR_FILES" ]]; then
+    while IFS=$'\t' read -r p h; do
+        [[ -n "$p" ]] || continue
+        [[ -n "${IS_WRITTEN[$p]:-}" ]] && continue
+        [[ -f "$ROOT/$p" ]] || continue
+        record "$p" "$h"
+    done <<<"$PRIOR_FILES"
+fi
 
 # spec: installer/README.md §The manifest — what init wrote this run is a subset of the roster it records, because a path left alone for the adopter and a path this payload no longer ships are both carried forward rather than written; the two part company here so every reader downstream takes the one it means, and staging takes the written set: folding an adopter's file into the vendoring commit is what the clean-worktree precondition exists to prevent
 STAGE=()

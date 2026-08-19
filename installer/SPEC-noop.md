@@ -43,6 +43,31 @@ fault is **order-insensitive**, and the hop's commit touched the lock file alone
 because the staged set was nearly empty. The same idiom appears a second time, in
 the seam-membership probe, where it is harmless only by luck.
 
+**Corrected at build against the running suite: there are two faults, not one,
+and the second *is* the ordering the entry named.** The membership fault above
+is real and is exactly as described. It is not sufficient. The carry-forward
+loop ran **before** the generated projections were recorded, so a prior-manifest
+entry for one of them was not yet in the written set when the loop tested it: the
+loop carried it at its superseded hash, and the later record could not undo that,
+because a carried path is excluded from the staged set. With the membership test
+repaired and nothing else changed, the consumer smoke's upgrade hop still failed
+on a dirty worktree — which is how this was found rather than argued.
+
+So each half explains the other's failure. The reorder alone could not work while
+the membership test was broken: the loop would re-carry the moved-up paths
+anyway, which is why it was landed, falsified and reverted. The membership fix
+alone cannot work either, because the loop still runs ahead of the only write
+path that records after it. **"The fault is order-insensitive" holds of the
+membership fault and not of the defect**, and the sentence above is scoped to the
+former rather than deleted, because the reorder's falsification is a real result
+and its explanation is this.
+
+The invariant the fix restores is the one the loop's own prose already states:
+it selects *the paths no `copy_in` visited **this run***, so it must run after
+every write path rather than merely late among them. This is mechanics inside the
+envelope, not a move toward rival (b): it changes the statement order within one
+run and changes nothing about whether or when `init` regenerates.
+
 **Confirmed against the source, not carried on the reproduction alone.** The
 authoring stage's account was checked at the next stage directly against both
 occurrences in the vendoring verb — the carry-forward loop's short-circuit and
