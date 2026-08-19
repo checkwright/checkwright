@@ -10,3 +10,4 @@ budget-batch-and-account-identity-kind align afd04940 2026-08-19
 budget-batch-and-account-identity-kind build a7e66312 2026-08-19
 budget-batch-and-account-identity-kind build af8e5c8e 2026-08-19
 budget-batch-and-account-identity-kind build abadfd21 2026-08-19
+budget-batch-and-account-identity-kind validate a7eee04d 2026-08-19
