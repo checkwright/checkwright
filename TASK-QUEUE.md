@@ -5145,7 +5145,15 @@
 - **scratch-execution-control-is-bash-only** [design-pending] — the scratch-run steer and the
   runner it steers to are both bash-only, so a non-bash scratch script executes with no
   compensating control at all.
-  recurrence: scratch-execution-control-is-bash-only 2026-08-16 2026-08-18
+  recurrence: scratch-execution-control-is-bash-only 2026-08-16 2026-08-18 2026-08-19
+  **FOURTH MEASUREMENT, 2026-08-19 at close, and the shape has fully migrated.** This iteration's
+  log ranks **50 `python3 - <<EOF` stdin heredocs** editing tracked files and **zero**
+  `python3 .tmp/*.py` runs: the path-shaped payload is gone and stdin is the whole of it. That
+  narrows the design rather than only raising the count — stdin has no `.tmp/` path to match, so
+  even the cheap third option below misses it unless the rule names the interpreter rather than the
+  path. The bash side stayed clean a second time: 16 scratch runs, every one through the runner.
+  The date above joins for THIS measurement; the decline recorded below still stands, and a
+  measurement and a decline are different events that happened to fall on one day.
   `scripts/bash-guard.sh` blocks a direct scratch run by matching `^bash[[:space:]]+\.tmp/`, and
   `guard-kit/bin/scratch-run.sh` executes its target with a hardcoded `bash`. Neither reaches a
   script run under another interpreter. Probed at the 2026-08-13 close against the guard itself:
@@ -6277,7 +6285,11 @@
   **Cost while deferred:** roughly one out-of-band decision per journal write, paid by every
   dispatched session in every iteration, plus a fresh clone with no working oracle grants.
   Class: mints no governed name and adds no gate, so canon-kit's litmus makes it **debt**.
-  recurrence: session-mechanic-grants-uncommitted 2026-08-18
+  recurrence: session-mechanic-grants-uncommitted 2026-08-18 2026-08-19
+  **The `awk` item below is CONTESTED, 2026-08-19: granting it blesses the wrong form.** 19 of this
+  iteration's 22 `awk` calls are the exact `awk 'NR>=X && NR<=Y' <file>` range print and all 22 read
+  a file — the shape `bash-guard.sh` already steers `cat` and `sed` away from. A (b) steer, not an
+  (a) grant, and the masking the criterion warns of; filed as a gap. Journal writes: 21 → 30 of 35.
   **Second measurement, 2026-08-18 — grounds for that date.** The journal-write count roughly
   tripled: **~69 of ~92 `cat` occurrences are heredoc writes into `.tmp/`**, against 21 at filing,
   and `cat` is again the single largest pattern (73 of 248 prompting calls). Six further absent
