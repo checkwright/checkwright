@@ -88,6 +88,7 @@ pub mod tag_lead_line;
 pub mod task_conservation;
 pub mod todo_task_liveness;
 pub mod task_names;
+pub mod template_copy_parity;
 pub mod template_registry_parity;
 pub mod test_hermetic;
 pub mod tightened_gates_grammar;
@@ -432,6 +433,15 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_PROSE_SURFACE_GLOBS",
         ],
         "canon-kit",
+    ),
+    // spec: gate-sdk/SPEC.md §check-reads-couples — an empty read-root set: the pairing is one
+    // pathname expansion over the root plus a named-file probe per pair, and neither descends
+    (
+        "check-template-copy-parity",
+        template_copy_parity::run,
+        &[],
+        &["GATE_SDK_GATES_DIR"],
+        "gate-sdk",
     ),
     // spec: gate-sdk/SPEC.md §check-reads-couples — `?` because the scan root is the member's own
     // first argument with a default; the candidate walk, the canonical-spec find and the

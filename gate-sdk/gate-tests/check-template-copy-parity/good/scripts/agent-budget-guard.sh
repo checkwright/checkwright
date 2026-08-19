@@ -7,8 +7,12 @@ VERDICT_BIN="${DELEGATION_KIT_VERDICT_BIN:-delegation-kit/bin/usage-verdict.sh}"
 [[ -f "$GUARD_KIT_LIB" ]] || exit 0
 source "$GUARD_KIT_LIB"
 
+# copy-divergence: this consumer tees the verdict through guard_trace, which the template does not declare
+# copy-divergence: and reads GUARD_KIT_TRACE_FILE to say where — the pair of markers is what assertion C's valve wants
+GUARD_KIT_TRACE_FILE="${GUARD_KIT_TRACE_FILE:-/dev/null}"
 verdict="$("$VERDICT_BIN")"
 rc=$?
+guard_trace "$verdict" >>"$GUARD_KIT_TRACE_FILE"
 case "$rc" in
     1) guard_block "$verdict" ;;
     *) guard_advise "budget verdict (agent-budget-guard): $verdict" ;;

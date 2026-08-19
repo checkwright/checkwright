@@ -965,7 +965,7 @@ answering a question assertion C never asked.
 | `check-prose-enum` | **Corpus extended to the Rust module — it was never a pure reverse trigger.** This gate was grouped with the reverse triggers above on the ground that none of them reads a gate's *content*; that ground was **false for this one**, and the queue-kit port is what exposed it. Its enum derivation (`scripts/enum-sets.sh`) reads the queue tag vocabulary out of `check-tag-lead-line`'s own class table, deliberately — *"read from the gate rather than re-listed here, so a rename cannot leave the two spellings disagreeing"* — so deleting that gate's script broke the derivation and the gate exited 2 rather than passing vacuously, which is the fail-closed behavior working. The corpus follows the rule to where it now lives, `native/src/gates/tag_lead_line.rs`'s `CLASSES` table, keeping the read-from-the-owner property and its one-table fail-closed anchor. **The gate is itself a ported member since the canon-kit cohort**, so a gate whose input is a gate's content is now gate content — and its own derivation crosses the bridge as *data*, which is what keeps the compiled form from spawning the emitter it reads. |
 | `check-measured-claim` | **Retained, and sensitive through its oracle rather than its corpus — the first born-native member to take a row.** What it scans is the governed-prose surface, so by corpus it is a reverse trigger like the row above. What makes it substrate-sensitive is the consumer oracle behind `CANON_KIT_MEASURED_CLAIMS_CMD`, which its `couples=` reaches through `scripts/*.sh`: this repo's emitter counts how much of the registry resolves to a `.gate` descriptor, so it reads declaration paths **as a set**, the shape `check-gate-binary-fresh` has. A port therefore *moves its value*, which is the mechanism working rather than a blind spot — the number a marked sentence states is about the port, and the sentence reddens when the port advances without it. The design that landed the gate predicted no row here, on the premise that its `couples=` named no declaration path; the emitter coupling the same design requires falsifies that premise, and the row is recorded rather than the coupling dropped, because dropping it would leave the oracle's own source outside the trigger set. **The row and criterion 4 are independent facts, and this is the case that proved it**: the criterion binds on a gate's assertion target, this gate's is the governed-prose surface, so it clears — while the transitive reach through its emitter is precisely what assertion C is shaped to see (§The port-candidate criteria, criterion 4). |
 | `check-spec-embedded-source` | **Survives unchanged — reverse trigger of the same shape.** Its `couples=` extension list (`*.rs`, `*.sh`, `*.toml`, …) is the roster of **languages it recognizes inside fenced blocks**, not a reference to gate declarations; its scanned corpus is the canonical specs and amendments. It already carries `*.rs`, so a ported gate's Rust module is inside its trigger set with no widening. **This member is itself `.gate`-dispatched** since §The sixth budget batch, so the row describes a ported member — and the reverse-trigger reading survives its own port, because the extension list is still a language roster and not a declaration reference. What its port *does* move is its own candidate index, which loses a shell declaration and gains a Rust module at every sibling's port; that is a property of the corpus rather than of this table's question (canon-kit/SPEC.md §check-spec-embedded-source). |
-| `check-template-copy-parity`, `check-template-registry-parity` | **Survive unchanged** — their corpus is kit templates and the template registry, not gate declarations; a gate's substrate does not reach either. |
+| `check-template-copy-parity`, `check-template-registry-parity` | **Survive unchanged** — their corpus is kit templates and the template registry, not gate declarations; a gate's substrate does not reach either. Both are `.gate`-dispatched — the second since §The consumer remainder cohort, the first since §The sixth budget batch — so the row describes ported members, and the reasoning is unaffected for the reason it gives: neither reads a gate declaration at all. |
 
 **What *the auditor never depends on the substrate it audits* scopes to, ruled
 because a mechanical reading of it holds the wrong members.** Two rows above keep
@@ -9459,16 +9459,28 @@ collision across classes cannot mask one:
 - `func:` — function declarations, both `name()` and `function name` spellings.
 - `case:` — each `case`-arm's **exit token**: the first command word of the arm
   body.
-- `lib:` — command-position calls to `_`-bearing identifiers the file does not
-  itself declare (the sourced-lib API).
+- `lib:` — `_`-bearing lowercase identifiers in **command position**: the leading
+  edge of a line, or directly after `;`, `&`, `|`, `)`, `$(`, `&&` or `||`. The
+  intent is the sourced-lib API, and the class is wider than that intent by
+  construction — a locally declared function is matched by its own call sites like
+  any other, and a `case`-arm pattern sitting at a line's leading edge in front of
+  its `)` is matched too. Both are deliberate as of §The sixth budget batch, which
+  **corrected this description against the code** rather than narrowing the code:
+  a narrowing the shell form never made would be a verdict change across the port
+  seam, and the sentence was the half that had drifted from its subject.
 - `knob:` — uppercase `_`-bearing names read via the defaulted-env idiom
   `${NAME:-…}` / `${NAME:=…}`.
 
 The `case:` class reads the arm's **action, never its pattern**, and that is a
-seam requirement rather than a convenience: a consumer's arm patterns are its own
-rule vocabulary, which a kit gate must never read (CLAUDE.md §The provenance
-seam). The gate asserts that a consumer's divergent rule lines are *declared*,
-never what they say. `func:` is inert on every pair in this tree (thin hook
+**privacy boundary** rather than a parsing convenience: a consumer's arm patterns
+are its own rule vocabulary, which a kit gate must never read (CLAUDE.md §The
+provenance seam). The gate asserts that a consumer's divergent rule lines are
+*declared*, never what they say. The discard is what enforces it, so the compiled
+form reproduces it **as a discard** and never as a capture that is later ignored:
+a port that parsed an arm into a pattern and a body and kept the pattern — for a
+diagnostic, a debug rendering or a test fixture — would have put consumer
+vocabulary inside the crate, and no committed case would catch it, because no case
+inspects intermediate state. `func:` is inert on every pair in this tree (thin hook
 scripts source a kit lib and delegate, declaring no functions); the surface's
 whole bite comes from the other three classes, which are non-empty on every file.
 
@@ -9501,6 +9513,29 @@ audit trail.
 prose or logic, so a consumer rewording a message, reordering rules, or adding
 steering text triggers nothing. It fires only when a declared contract element
 appears on one side unexplained.
+
+**Ported to the binary substrate at §The sixth budget batch.** Two behaviours the
+port **reproduces rather than repairs**, on the rule that a refusal the shell form
+never made is a verdict change across the seam. The gate **refuses outright** —
+exit 2, the fail-closed message — on a paired file carrying no
+knob-with-default idiom at all, because the surface derivation's last stage is a
+grep whose empty result propagates under `pipefail`. It fails *closed*, which is
+what makes reproducing it safe-but-wrong rather than dangerous, and the tree is
+green only because the two knob-less files in its corpus are excluded by the
+`*-config.sh` rule before the call. And the `lib:` class matches what the bullet
+above now says it matches. The refusal is filed as its own unit rather than
+repaired here.
+
+**Its root default is a derivation no injected case can reach**, since every
+committed case passes an explicit root — so the discharge is a sibling harness,
+`check-template-copy-parity.test.sh`, which drives the `git rev-parse
+--show-toplevel` branch from a *subdirectory* (a cwd-relative default would find
+no pair and pass vacuously) and drives its refusal with git unable to answer.
+Criterion 4 **clears** on this member: its glob is exactly two levels deep and
+cannot reach a `checks/` segment at all, taken off the walk rather than off an
+earlier section's sentence — a property of a gate against a consumer's config, so
+a consumer whose gates dir held a shell declaration matching a kit template
+basename would flip it.
 
 `dir=bi` — parity is symmetric, either side going stale is the defect, which is
 precisely what B and C split between them. The fixture pair **synthesizes** the
