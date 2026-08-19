@@ -457,10 +457,12 @@ same shapes:
   never disagree on the set — and a done slug for a bare-slug bullet outside
   them; the single grammar `check-todo-task-liveness`
   and `check-deprecation-task` resolve a `task: <slug>` binding through. **The
-  walk is `native/src/spec.rs`'s `queue_slugs` and the section builders are the
-  shell library's**: both members compile, so the shell walk went with its last
-  caller, while `check-amendment-queue` still reads `SPEC_ACTIVE_RE` and its
-  siblings here. That walk's bullet lead-line predicate is written again in the
+  walk is `native/src/spec.rs`'s `queue_slugs`**: both members compile, so the
+  shell walk went with its last caller, and so did the shell library's section
+  builders — the compiled classifier matches a section name against the
+  configured sets directly rather than through a built regex, so those builders
+  are defined here with no reader left in the tree, a residue whose disposition
+  is filed rather than taken at a close. That walk's bullet lead-line predicate is written again in the
   crate rather than pointed at `native/src/queue.rs`'s adapters, which keeps
   canon-kit one of the format's independent holders under the
   re-implement-and-cite-from-both-ends rule

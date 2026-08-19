@@ -33,7 +33,7 @@ struct Sets {
 
 fn classify(line: &str, s: &Sets) -> Option<Sec> {
     let name = trim_end_space(line.strip_prefix("## ")?);
-    // spec: canon-kit/SPEC.md §check-amendment-queue — awk tests feature first, so a section
+    // spec: canon-kit/SPEC.md §check-amendment-queue — feature is tested first, so a section
     // named in both sets classifies as feature; the order is load-bearing, not incidental
     if s.feature.iter().any(|n| n == name) {
         return Some(Sec::Feature);
@@ -284,7 +284,7 @@ mod tests {
     }
 
     // spec: canon-kit/SPEC.md §check-amendment-queue — a section named in both the feature and
-    // the active set is a feature section, because awk tests the feature pattern first
+    // the active set is a feature section, because the feature set is tested first
     #[test]
     fn the_feature_set_wins_over_the_active_set_on_a_shared_name() {
         let s = Sets {

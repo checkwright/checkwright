@@ -3143,9 +3143,9 @@ tree*, never *parity proved*.
 
 **One disagreement was found and adjudicated rather than hidden**, on the rule
 that a disagreement is a finding against the rule and never a defect in whichever
-side moved. `check-gate-tamper`'s shell form held its added-exemption set in a
-bash associative array, so with two matching exemptions the report line order was
-an unreproducible hash order; the compiled form emits the same set byte-sorted.
+side moved. `check-gate-tamper`'s shell form reported the added-exemption set
+in an order that was not reproducible run to run once a commit added two matching
+exemptions; the compiled form emits the same set byte-sorted.
 Ruled as set semantics on the kit-roots cohort's precedent, and recorded at that
 member's own section with the second behaviour change beside it.
 

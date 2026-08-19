@@ -65,7 +65,9 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
 
 6. Wire `check-producer-liveness` on `LIFECYCLE_KIT_ENTRY_PREFLIGHT` rather than
    in `gates.list`, its command naming the lock file
-   (`<stage>=evidence-kit/checks/check-producer-liveness.sh <lock-file>`),
+   through a name-resolving front end rather than a path
+   (`<stage>=<front end> check-producer-liveness <lock-file>`; SPEC.md
+   §check-evidence-manifest owns why a preflight entry names the gate),
    at whichever stage entries must not begin while `run-validate`
    is still running. It asks whether a producer is in flight, not whether the
    tree is consistent, so a battery that `run-validate` itself invokes would red

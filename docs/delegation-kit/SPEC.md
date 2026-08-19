@@ -944,15 +944,13 @@ the port actually runs against; gate-sdk/SPEC.md §The port-candidate criteria
 carries the instance class.
 
 **Two behaviours changed with the port, and both are rulings rather than
-drift.** The shell held its added-exemption set in a bash associative array,
-whose key order is an unreproducible hash order, so assertion B's report lines
-came out in no defined order once a commit added two matching exemptions; the
+drift.** Assertion B's report lines came out of the shell form in no
+reproducible order once a commit added two matching exemptions; the
 compiled form emits the same **set** byte-sorted, on the kit-roots cohort's
 ruling that a compiled form implements set semantics rather than a shell's
-incidental ordering. And a trailing `--fixture` with no directory after it made
-the shell's `shift 2` fail without advancing, so the argument loop **spun
-forever**; the compiled form reads the missing value as the empty directory name
-and refuses. A hang is not a verdict, so ending it costs no assertion.
+incidental ordering. And a trailing `--fixture` with no directory after it
+**hung** the shell form in its argument-parsing loop; the compiled form reads the
+missing value as the empty directory name and refuses. A hang is not a verdict, so ending it costs no assertion.
 
 ## check-agent-tier-explicit
 

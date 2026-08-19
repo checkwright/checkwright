@@ -195,8 +195,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     while i < args.len() {
         if args[i] == "--fixture" {
             // spec: delegation-kit/SPEC.md §Verify after every agent commit — a trailing
-            // `--fixture` names the empty directory and refuses; the shell's `shift 2` could not
-            // advance past it and spun
+            // `--fixture` names the empty directory and refuses rather than hanging
             fixture = Some(args.get(i + 1).cloned().unwrap_or_default());
             i += 2;
             continue;

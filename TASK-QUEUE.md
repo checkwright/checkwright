@@ -2663,7 +2663,7 @@
   canon-kit/SPEC.md §Merging an amendment requires the completed entry to move to `## Done`
   *dropping* its spec-pointer tag; queue-kit/SPEC.md §The queue format makes a Done entry a
   bare slug line. Verified 2026-08-03 against the tree: nothing checks either.
-  **Why it falls through.** `check-amendment-queue`'s awk classifies only the feature,
+  **Why it falls through.** `check-amendment-queue` classifies only the feature,
   active and deferred sections, so `## Done` falls to the unclassified bucket — while its
   every-amendment-has-an-entry assertion collects spec-pointer refs with a whole-file grep,
   so a tag left on a Done entry still *satisfies* that half. queue-kit's
