@@ -309,7 +309,10 @@ fn spec_verdict(pairs: &[(String, String)], blob: &[char], knob: &str, want: &st
         }
         let end = std::cmp::min(blob.len(), hit + k.len() + 400);
         let win = reduce_deferrals(&blob[hit..end].iter().collect::<String>());
-        let low = win.to_lowercase();
+        // spec: canon-kit/SPEC.md §check-knob-default-coupling — ASCII folding, because the
+        // offset the hit yields indexes back into the unfolded window and a Unicode fold can
+        // change a byte length
+        let low = win.to_ascii_lowercase();
         let haskw = low.find("default");
         let mut slit = String::new();
         if let Some(at) = haskw {
