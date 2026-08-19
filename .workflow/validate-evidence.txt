@@ -1,1 +1,25 @@
 # contract: evidence-manifest v1
+budget-batch-and-account-identity-kind gates sha256=a7ae3e766a3ec033688faa67b2a4a7e5c1f5c7e21b1dbe452e5c2585b2a0a52b pass=104 fail=0 ignore=0 verdict=clean 2026-08-19
+budget-batch-and-account-identity-kind gate_sdk sha256=5c5a13d6818cce284319df81ef3ee5488227b01243f640e78b6a88410426abd6 pass=1 fail=0 ignore=0 verdict=clean 2026-08-19
+budget-batch-and-account-identity-kind canon_kit sha256=c13b2442a2898fd4c5c30c9175f74b8e6d20ec43199ed0c9c7001203352040ae pass=1 fail=0 ignore=0 verdict=clean 2026-08-19
+budget-batch-and-account-identity-kind context_kit sha256=65e7536ec8b920506d9defb5f2fd338be716ee72482acf2e4819ca5b3fcbe891 pass=1 fail=0 ignore=0 verdict=clean 2026-08-19
+budget-batch-and-account-identity-kind delegation_kit sha256=6d5af78679d3b30bda016b7d6cdeab840c0fc2bde80bfe4ecaad54b15446f963 pass=1 fail=0 ignore=0 verdict=clean 2026-08-19
+budget-batch-and-account-identity-kind doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-08-19
+budget-batch-and-account-identity-kind evidence_kit sha256=b9a84e84d67dad5a63ae7ce34aecdc472ffbe13d06d01cc02f04bfca5b5de2ae pass=1 fail=0 ignore=0 verdict=clean 2026-08-19
+budget-batch-and-account-identity-kind guard_kit sha256=234e06ba5cdb4ca383be7191965292443198471675d1b3166d8c264175420ae4 pass=1 fail=0 ignore=0 verdict=clean 2026-08-19
+budget-batch-and-account-identity-kind lifecycle_kit sha256=246f07a9d7e12fa9535108c073077518b3cc8bdd64a4014d5c8327c1d8101c95 pass=1 fail=0 ignore=0 verdict=clean 2026-08-19
+budget-batch-and-account-identity-kind queue_kit sha256=bd337719dfff15f492ae94d8e8662663a8917b65edd4b3bfcfdd20f1790ba39b pass=1 fail=0 ignore=0 verdict=clean 2026-08-19
+budget-batch-and-account-identity-kind site_kit sha256=07f7139ea31865677de58ea44b43f7c98ae6c40c8f3fe57e8975e8d65794be35 pass=1 fail=0 ignore=0 verdict=clean 2026-08-19
+budget-batch-and-account-identity-kind scripts sha256=28b2b32bbd297a46b82dfd6915ad92a325eb579b3f56acc6e30bcd2dbe5af279 pass=1 fail=0 ignore=0 verdict=clean 2026-08-19
+budget-batch-and-account-identity-kind guard_tests sha256=ed069fd539523a13d0f0c2c0aa7eb871123dd4fe87e1d9de8b138a8702f89189 pass=1 fail=0 ignore=0 verdict=clean 2026-08-19
+budget-batch-and-account-identity-kind usage_tests sha256=04968d303b3e4ec54f3f8033f0e7e00d4b33ae90fd7507b48347cab56d0bc26d pass=1 fail=0 ignore=0 verdict=clean 2026-08-19
+budget-batch-and-account-identity-kind budget_guard_tests sha256=94bbe0c41f3993e3c748a492d29e2a0d22139825b8c53bbae6a528500a8ce402 pass=1 fail=0 ignore=0 verdict=clean 2026-08-19
+budget-batch-and-account-identity-kind dispatch_guard_tests sha256=6018943502411c07fe57162c0dae2ac37af304eccc0d0a9a6e0ec4fd733a1daf pass=1 fail=0 ignore=0 verdict=clean 2026-08-19
+budget-batch-and-account-identity-kind trend_tests sha256=acdbfef4eab851fca00ca747245b6ac4a4f804b05989f9cd3acd014bb56ac330 pass=1 fail=0 ignore=0 verdict=clean 2026-08-19
+budget-batch-and-account-identity-kind demo sha256=391602faa2b720e099259bdc359b025c165686eb5404c6f52a08c57cb4683372 pass=1 fail=0 ignore=0 verdict=clean 2026-08-19
+budget-batch-and-account-identity-kind installer_smoke sha256=49521121336c05a6005bfad4049f41381353949b13a9da0efab579e4bc6e2fc1 pass=0 fail=1 ignore=0 verdict=clean 2026-08-19
+budget-batch-and-account-identity-kind consumer_smoke sha256=4ba1eae0c63f53d0e4779bc87cb9e92c9d168b8f41fa749d8e3f20607dbe9d83 pass=1 fail=0 ignore=0 verdict=clean 2026-08-19
+budget-batch-and-account-identity-kind upgrade sha256=52a5a85e9e4d6ae5351223491b9c40bb7c1babbb98831b06b228dcab0d967e7a pass=1 fail=0 ignore=0 verdict=clean 2026-08-19
+budget-batch-and-account-identity-kind agents_md_smoke sha256=9640ad5fefd51df6b6c18c2418d01d69de684fc283e07ac842ff8be211352b2f pass=1 fail=0 ignore=0 verdict=clean 2026-08-19
+budget-batch-and-account-identity-kind index_tests sha256=e14e152466dc5be0296b1e20575bf3d587e1e0a127e7c63ad57671dbcaeaddb8 pass=1 fail=0 ignore=0 verdict=clean 2026-08-19
+budget-batch-and-account-identity-kind native_crate sha256=2f47478ef2ea45fe27619a38d2a54c52b01b3132ecb25d3c773fefcfdcb75da6 pass=1 fail=0 ignore=0 verdict=clean 2026-08-19
