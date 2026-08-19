@@ -1211,6 +1211,37 @@ deletion is the same shape reached from a different direction. A porting session
 should check for this shape **before** sizing a member, since it is an interface
 removal on a governed surface rather than an implementation detail.
 
+**The distinguishing test, stated as a test because it is applied far more often
+than the deletion happens.** An argument is unportable when it redirects
+something `gate_command` has **already resolved** from the tree's own config
+before the exec — it arrives a process too late and would silently change
+nothing. An argument the **rule itself** consumes, arriving as argv into the
+subcommand, ports unchanged: the subcommand reads its own argv and may override
+a bridged knob value with it perfectly well. It is not a blanket deletion, and
+the reading that makes it one is the error to avoid — `check-root-tiering` kept
+**both** its positionals through its port (§The third budget batch), so an
+argument is not unportable merely by being an argument.
+
+**The verdict is taken per member against that test, never off a count.** The
+fifth batch's cut carried a command-line argument on six of its seven members
+and read that as six deletions; applied per member the ruling bound **twice**. A
+**gates-dir positional** is consumed by the rule — it names the registry and the
+first resolve dir — and ports unchanged, as `check-kit-enum` and
+`check-root-tiering` had already established; so does `check-gate-binary-fresh`'s
+tree-stamp file, which is the rule's own input, and `check-gate-tamper`'s
+`--fixture <dir>`, which selects the rule's input *corpus* and which no knob
+resolves. A **queue-file or state-file positional** falling back to a knob
+(`check-amendment-queue`, `check-evidence-manifest`) ports unchanged for the same
+reason, the shape `check-todo-task-liveness` already carries in tree. The two
+that deleted are `check-identity`'s two arms (§check-identity) and
+`check-gate-fixture-coverage`'s positionals, whose ground is narrower and stated
+at that member's own section. A relayed count read as a target is how a batch
+talks itself into deletions it never verified.
+
+**Where a deleted argument was documented, the doc is part of the port.** A port
+that deletes an argument and leaves the sentence standing ships a documented flag
+that does nothing, which is the state this section calls worse than no flag.
+
 **An arm receives no configuration, and a member needing some is reached
 through a caller.** The config bridge is built by `gate_command` (§lib/gate.sh)
 for a `.gate`-declared member alone, and `kit_roots` is transported rather than
@@ -1419,6 +1450,34 @@ design time; the last three were paid for, and each is named with what it cost.
    gate reads a declaration path as content — what both scan is the governed
    markdown set. Criterion 4 binds on neither, and both carry the conservation row
    the reverse-trigger case earns.
+
+   **A verdict can flip on which *consumer configuration* is read, which makes
+   this a property of a gate against a config rather than of a gate.**
+   `check-gate-tamper` is the worked instance, and
+   delegation-kit/SPEC.md owns what it cost that member.
+   Under the kit-shipped `DELEGATION_KIT_GATE_FILES`
+   default its corpus is the consumer's own gates directory, which holds no kit
+   declaration, and criterion 4 **clears**. Under a config widening those globs
+   to every kit's check dir — this repo's — the gate's own declaration falls
+   inside them, and staging it makes the gate read its own bytes, so criterion 4
+   **binds**. Reading the kit default is the natural first stop and gives the
+   wrong answer for the tree the port actually runs against. It produces the same
+   failure as the couple-clears-walk-binds instance above, a missed hold, through
+   a third route: not a wrong field and not a wrong walk, but the right walk over
+   somebody else's configuration.
+
+   **And a member can be *self-immune*, clearing the criterion while the
+   ordering constraint still binds.** `check-gate-fixture-coverage` reaches a
+   declaration's bytes only for a member with **no** resolvable fixture pair —
+   and it must carry a pair itself to pass its own rule, so it can never reach
+   its own bytes. The criterion's predicate is *the gate's own declaration path
+   lies inside the corpus it scans as content*, and for this member the answer is
+   no for itself and yes for its siblings. So criterion 4 and the shared-snapshot
+   ordering constraint are **independent facts**, the way a conservation row and a
+   criterion-4 hold already are: the criterion protects the parity oracle from
+   the member's *own* port, the ordering protects every comparison from a
+   *sibling's*. The fifth batch is where they came apart, and a session clearing
+   one by clearing the other has a verdict it did not earn.
 5. **Its vendored form stays runnable.** *Measured, not reasoned.* A `.gate`
    descriptor under a vendoring kit root reaches every consumer; the binary does
    not, because `native/` ships no `checks/` or `smoke/` and that predicate is
@@ -1595,6 +1654,28 @@ design time; the last three were paid for, and each is named with what it cost.
    cohort can honestly predict **its own growth**, from the install disposition of
    its own members, and that prediction held here exactly. The absolute number is
    measured on both sides or it is not compared at all.
+
+   **The fifth budget batch's measurement corrected the growth predicate, and the
+   correction is the same shape as the one above.** Measured the same way — the
+   binary-less leg against the post-batch registry, from a clean checkout of the
+   batch's own commit reached by path — it reports **seventeen** omitted members,
+   against fourteen before the batch. The amendment predicted a growth of *at most
+   five*, the count of the batch's `zero-config` members, and the measured growth
+   is **three**. The bound held and the estimate did not, for a reason worth
+   stating: **the residual is measured over one profile's kit set, not over the
+   registry**, so a member's install disposition is necessary and not sufficient —
+   it must also ship in the measured profile. Two of the batch's five `zero-config`
+   members belong to kits that profile does not carry, so no `init` of it seeds
+   them and none is lost. The reading to carry forward is that a cohort predicting
+   its own growth prices its `zero-config` members **intersected with the measured
+   profile's kits**, and a prediction that skips the intersection is an upper bound
+   rather than an estimate.
+
+   **It was reproduced rather than taken on the leg's word**, on the method the
+   paragraph above established: the `zero-config` `.gate` members under the
+   measured profile's kit roots enumerate to exactly seventeen, member for member.
+   The judgment is the standing one, **accept and declare**, on the terms already
+   ruled above.
 
    **The measurement also cost more than the number.** The leg refused to run at
    all until a defect it surfaced was repaired (§check-gate-exemption-tasks): the
@@ -2967,6 +3048,183 @@ time, when the same iteration scoped both its arms to the authoring tree
 surfaced. A member whose contract moves twice in one iteration is the case the
 exclusion exists for, and the batch would have paid for it had the exclusion been
 read as bookkeeping.
+
+### The fifth budget batch
+
+**Seven members, a width the operator ruled fresh for this cut.** §The fourth
+budget batch's 6–8 is that cut's own ruling and was not citable here: cut widths
+are ruled per cut and never inherited, and a later selector reading the two
+together as a standing envelope is reading a precedent that has now been refused
+twice. Under the arm's record-only-findings rule this section carries the cut's
+findings and no member roster — membership is derivable from the tree and the
+count from `scripts/measured-claims.sh`'s `ported-gate-members`.
+
+**The width was re-examined *after* the amendment was authored, on cost evidence
+that had moved, and held.** The ruling was taken against a survey ranking the
+corpus by declaration size and logic hazards; authoring found the cut's real cost
+sits in interfaces instead, plus a pre-port library unit, two caller re-pointings
+behind no gate, and one member whose largest work item that ranking cannot see.
+The moved evidence was put and the ruling held, on grounds recorded rather than
+left in a message thread: the member set was promoted unchanged; **drop-any-member
+survives in the envelope**, so the executing stage keeps that relief without
+anything being re-opened; and the added work is concentrated and named rather
+than diffuse, two of its items being one-time. Recorded because a later reader
+finding the member audit would otherwise reasonably conclude the width was never
+re-examined against it.
+
+**What is new is that the cut composed off a *filed, witnessed* cost survey
+rather than off a property read at the cut.** §The fourth budget batch composed
+by declaration size plus criterion cleanliness, reading both at its own cut; this
+one took the seven cheapest of the fourteen takeable as ranked by a survey filed
+under lifecycle-kit/SPEC.md §The survey record, whose witness the authoring stage
+re-ran and passed. That makes the selection auditable after the fact and
+re-runnable by a later reader, which a cut-time read is not. **The band is
+exhausted downward, and that is the honest reading of the width**: the fourth cut
+consumed the members at or under ~103 declaration lines and this one's ran 93 to
+140, so the ceiling rose only because the floor did. Width seven bought what
+width eight bought last cut and nothing more — session overhead spread over more
+members, since cheapness is not a shared derivation.
+
+**The cut's cost was in *interfaces*, not in logic, and that is its defining
+finding.** The ranking it composed from is a ranking of logic. What it could not
+see is that six of the seven members carry a command-line argument, two of them
+documented on a governed surface — so the deleted-argument ruling had to be
+adjudicated more often here than in the four prior batches combined. Applied per
+member against the test §The non-gate arm now states, it bound **twice**, and
+that section owns both the test and this cut's verdicts. The finding that
+generalizes is the gap between the two: a cost ranking by size is silent about
+interface removals, so a porting session prices them itself.
+
+**Two live callers named a batch member's declaration path, and no gate would
+have caught either.** This is §The third budget batch's lesson arriving twice in
+one cut — a port's Point-5 reader enumeration covers gates, and a direct
+shell-out from a non-gate script is outside every one of them — and both were
+found by grepping the tree. `install-hooks`' identity rung *passed silently* on a
+descriptor (§install-hooks), and this consumer's close-stage entry pre-flight
+*refused the stage* (evidence-kit/SPEC.md §check-evidence-manifest, which owns
+the consumer-side front-end that discharges it). Each landed **with its own
+member's port commit** — a different sequencing from the pre-port library unit
+below, and collapsing the three into one "pre-port fixes" bucket gets two of them
+wrong. Neither is a library unit and neither is *reachable* until its own member
+is being ported; what binds is that neither may land **after**, because the
+window in which the descriptor exists and the caller has not moved is the window
+the defect lives in. Same-commit makes it zero-width. The class is wider than the
+two instances — three `gate-tests/*.test.sh` harnesses also invoked their subject
+by literal path — so every member's port re-grepped the tree for its own
+declaration path before the deletion landed, the enumeration being a grep and
+never a gate.
+
+**Four knobs the batch needed were bridge-blind, and the fix was a *pre-port
+unit* rather than a per-member cost.** The bridge can carry only a knob whose
+default is visible to `declare -p` after the kit library is sourced; a value
+defaulted inline at its use site, or inside a helper's body, hits the emitter's
+undeclared-knob refusal on the member's first post-port run. Three of the seven
+members would have tripped it and no already-ported member declared any of the
+four, so it landed **once, in front of the batch**, before the first descriptor —
+an ordering constraint of the same standing as the shared snapshot below.
+§The fourth budget batch paid this six times by finding it per member; recording
+it as a precondition is what stopped the fifth paying it three more, and
+§lib/gate.sh now states the precondition at the library's own contract.
+
+**The cut executed as several build sessions, which turned the shared snapshot
+from a moment into a *rev*.** The ordering constraint is §The fourth budget
+batch's and applies unchanged — assertion A forbids both spellings in one resolve
+dir, so a member's shell form vanishes the instant its own port lands while the
+live corpus of every binding sibling moves with it. "Before the first descriptor
+of the batch lands" is simply not reachable for a member ported in a later
+session. It does not have to be: the pre-descriptor tree is a **named commit**,
+the one landing the library unit above and nothing else, and a later member's
+live-tree comparison is taken against a worktree of that rev. **Reap that
+worktree off `git worktree list`, never off `git status`** — a scratch directory
+is gitignored, so the status reads clean while an unreaped worktree still aborts
+a clean-tree precondition, and it surfaces at a commit or a smoke rather than
+where it was made. The verdict stays *no disagreement found on the pre-descriptor
+tree*, never *parity proved*.
+
+**One disagreement was found and adjudicated rather than hidden**, on the rule
+that a disagreement is a finding against the rule and never a defect in whichever
+side moved. `check-gate-tamper`'s shell form held its added-exemption set in a
+bash associative array, so with two matching exemptions the report line order was
+an unreproducible hash order; the compiled form emits the same set byte-sorted.
+Ruled as set semantics on the kit-roots cohort's precedent, and recorded at that
+member's own section with the second behaviour change beside it.
+
+**Fixture-pair pre-work was real on every member and was *most of the port* on
+two.** Every one of the seven pairs was a single good case and a single bad case,
+so any member with more than two branch outcomes was under-exercised by
+construction, before anyone read a line. The finding that generalizes is §The
+fourth budget batch's and holds here too — a clear criterion-4 verdict says the
+parity oracle is not self-referential, never that the pair reaches every arm —
+and this cut sharpens it into a second class: two members were not "widen the
+pair" but **"write the pair"**. One exercised one of the eight violation classes
+its rule carries; the other ran its fixture arm in *both* cases, so the function
+reading gate-file bytes through git had no committed case at all and one
+assertion's violation had none in either direction. That second one is the shape
+to look for — a pair that injects the corpus cannot reach the code that derives
+it, however many cases it has — and the discharge is a `gate-tests/*.test.sh`
+sibling driving the live arm, not another injected case.
+
+**Two takeable members were excluded by name, and both grounds were sizing.**
+`check-template-copy-parity` is clean on criteria 4 and 7 and is the first member
+a later cut should reach for; its cost is concentrated where the line count hides
+it, in reproducing a hand-rolled `case`/`esac` surface classifier faithfully.
+`check-graph` is excluded on a stronger ground and it is a ruling rather than a
+deferral: it emits a self-contained HTML artifact, which makes it a non-gate arm
+that must be **designed before it is ported** (§The non-gate arm). Bundling it
+into a budget batch would violate the never-as-one-cohort property the mechanism
+rests on — a batch whose members must be droppable cannot carry a member whose
+design is a prerequisite for the rest of its own work. It wants its own
+iteration.
+
+**Criterion 5's residual was measured against the post-batch registry and
+corrected the growth predicate rather than the batch** — the amendment's
+at-most-five prediction held as a bound and missed as an estimate, because the
+residual is measured over one profile's kit set and two of the batch's seeded
+members ship in kits that profile does not carry. §The port-candidate criteria,
+criterion 5 owns the number and the corrected predicate.
+
+**Assertion C was re-run fresh after the last descriptor landed, and the cut adds
+no row** — on the rule §The first budget batch established, that a port moves a
+declaration path and can move *other* members into or out of the derived
+substrate-sensitive set, so the reading is never inherited. It was **measured
+rather than argued**, by running the derivation over both trees: the same five
+members are substrate-sensitive before the batch's first descriptor and after its
+last. One row was already written ahead of its own trigger and must not be
+re-derived as new — `check-gate-binary-fresh` is a batch member *and* carries a
+disposition recording that it reads declaration paths as a set, so its port is
+the case that switches it on rather than its blind spot. And this is gate-sdk's
+meta-gate conservation assertion C, **not** lifecycle-kit's `check-stage-entry`
+assertion C: the two share a letter and nothing else, and the second is the one
+this cut's own cross-component amendment tripped at the next stage's entry.
+
+**The seam was ruled per member rather than assumed.** Every member reads
+consumer content — a gates roster and fixture roots, a workflow evidence manifest
+and a queue, a governed queue plus the amendment glob, an identity manifest, a
+meta-path exemption set — and none became a crate literal. The discharge is
+criterion 6's strongest form rather than a concession: each value crosses as a
+bridged knob computed once in the owning kit's shell library, so the binary holds
+no default to drift from. The one place a *kit* literal was admitted is a
+wire-format version string, which is kit mechanism rather than consumer
+vocabulary, and it is held to the shell library by a unit test that executes it
+(evidence-kit/SPEC.md §check-evidence-manifest).
+
+**The cut is where §The fourth budget batch's kit-root probe became
+load-bearing.** That batch probed, rather than argued, that porting the last
+shell gate in a kit does not un-recognise the kit as a kit root — the predicate
+is the *existence* of a `checks/` or `smoke/` directory, not a `*.sh` glob. This
+cut is the case that would have believed the mechanical reading: porting one
+member left delegation-kit with **no** `check-*.sh` at all. The directory and its
+two sibling descriptors remain, so the root does, and `check-kit-enum` — which
+reds on a *set inequality* in both directions and is therefore not clearable by
+inspection — stayed green.
+
+**This batch carried that rule into kits with no ported member of their own kind
+of content**, contributing one member each to canon-kit, evidence-kit and
+delegation-kit. The ranking survey's claim that one of them was the *first port
+into evidence-kit* was **false** and is corrected here rather than carried — that
+kit already dispatched two members to the binary. What was true, and what cost,
+is narrower: the member's own helpers had no Rust counterpart, which is a
+helper-level fact and not a kit-level one.
 
 ### The canon-kit `spec_manifest_files` cohort
 
