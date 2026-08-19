@@ -43,6 +43,14 @@ fault is **order-insensitive**, and the hop's commit touched the lock file alone
 because the staged set was nearly empty. The same idiom appears a second time, in
 the seam-membership probe, where it is harmless only by luck.
 
+**Confirmed against the source, not carried on the reproduction alone.** The
+authoring stage's account was checked at the next stage directly against both
+occurrences in the vendoring verb — the carry-forward loop's short-circuit and
+the seam-membership probe — including the reading that makes the second one
+harmless: its false negative re-records the seam with no hash, so the path stays
+out of the carried set and only the roster count inflates. The claim is therefore
+verified at two independent stages, and a build session need not re-derive it.
+
 **This does not reverse the ruling.** (a) remains implementable and this
 amendment implements it. It does change what the *minimal* correct change is, and
 it opens one question the envelope below sends upward rather than absorbing.
@@ -58,14 +66,17 @@ or to the manifest's ownership model — those are the two refused rivals. No
 change to packing or to the version stamp. The early exit **stays**, and delta 2
 states why it must.
 
-**Out of envelope — escalate rather than absorb.** Reading (a) as *satisfied by
-construction* once the membership test is repaired. That reading is defensible —
-with the projections actually staged, a run that rewrote them can no longer take
-the early exit at all — but it re-scopes a recorded operator ruling against a
-mechanism description this stage has falsified, and re-scoping a ruling is the
-operator's to do. This amendment therefore implements (a) **as ruled** and names
-the fork here so that a build session finding the commit arm unreachable
-escalates rather than quietly dropping it.
+**The fork the authoring stage parked here is closed.** It asked whether (a)
+could be read as *satisfied by construction* once the membership test is
+repaired — defensible, since with the projections actually staged a run that
+rewrote them can no longer take the early exit at all, but a re-scope of a
+recorded ruling and so the operator's to make. **Ruled 2026-08-19: (a) as ruled,
+on top of the real fix.** Belt and braces — the defect is repaired at its cause
+*and* the no-op exit gains the commit arm. The arm is expected to be inert under
+the repair, and that is the point of it: it holds the "makes one commit" contract
+over the staged set failing to cover what `init` rewrote, rather than trusting
+that it never will again. A build session finding it unreachable therefore lands
+it anyway; the fork is not reopened by that finding.
 
 ## What changes
 
@@ -92,6 +103,15 @@ commit them, so moving the commit ahead of the no-op predicate turns the pure
 idempotent path into a false, fatal error. The predicate therefore **stays** the
 guard on whether a commit is attempted, and (a) can only change what happens on
 the branch where the guard says nothing is staged. *design-bearing.*
+
+**The arm carries its own guard, and it is not the index again.** Inside that
+branch the index is by definition empty of changes, so an unconditional commit
+there reproduces the empty-index failure the paragraph above rules out — one
+level in. The arm therefore asks the question the branch has *not* asked: does
+any path `init` wrote this run still differ from `HEAD` in the worktree? That set
+is the staged set, so the question is answerable without widening what `init`
+considers its own, and a negative answer — the expected one under delta 1 — costs
+one `git diff` and leaves the idempotent path exactly as it was. *mechanical.*
 
 **Changing the predicate instead — comparing the worktree rather than the index —
 is the shape that reaches the reported symptom without fixing the cause**, and it
@@ -169,6 +189,14 @@ worktree is the visible half of a manifest that was recording values `init` had
 already superseded. Whether the smoke should also assert `uninstall` from a
 **re-run** consumer is a coverage question this fix does not answer and does not
 foreclose. *design-bearing.*
+
+**The operator refused the widen, 2026-08-19, and the refusal is the ruling here
+rather than a scoping preference.** These two consumers are **out of scope**:
+they are filed to the gap inbox and no work is scoped toward them. Delta 1 may
+well close them as a side effect, since the stale hash and the missing staging
+are one fault — but a side effect is reported, never asserted as coverage, so
+the filed entries stand on their own and the commit says plainly which of the two
+it happened to reach. *mechanical.*
 
 ## Producers and consumers
 
