@@ -4693,6 +4693,7 @@
 
 - **agent-worktree-reclamation-unenforced** [design-pending] — the documented auto-clean for an
   unchanged read-only agent worktree does not fire, and nothing sweeps the residue.
+  recurrence: agent-worktree-reclamation-unenforced 2026-08-19
   Five worktrees from prior sessions were still on disk under `.claude/worktrees/` at four stale
   revisions (`c0d652f5` twice, `465ea869` twice, `32c009ca`), verified by `git worktree list`.
   **DISTINCT from `readonly-dispatch-isolation-unbuyable`**, deliberately: that entry is about
@@ -4717,9 +4718,25 @@
   sweep at dispatch time (earlier, but the guard would own lifecycle it does not today), or a
   central ignore that makes the second copy unreachable to every walker rather than to the
   careful ones. The third fixes the correctness half without touching the disk half.
+  **Fires again 2026-08-19, and it paid two findings the entry did not hold.** One orphan
+  survived — `agent-a00982cef8c0c227d`, LOCKED, at an align stamp two iterations old, with a
+  clean `git status --porcelain` inside it. (i) **Reaping leaves a branch ref.**
+  `git worktree unlock` then `git worktree remove` clears the directory and leaves
+  `worktree-agent-<id>` standing, deleted separately with `git branch -d`, so a reclaim that only
+  removes worktrees still accretes refs. (ii) **The failure is intermittent rather than
+  systematic**, which narrows every candidate below and confirms the hypothesis above rather than
+  merely restating it: the same session dispatched two isolated agents after reaping and BOTH
+  auto-cleaned whole, directory and ref. The harness handles the clean exit; a reclaim need cover
+  only the abnormal one.
+  **A candidate the three above miss:** `.gitignore` asserts the directory is "auto-cleaned",
+  which this instance falsifies. Correcting that claim to best-effort and leaving the residue
+  *declared* is a real option beside owning it, and it is the only one that costs nothing.
   **Cost while deferred:** grows monotonically with every read-only dispatch, and this repo
   pre-authorizes delegation for read-heavy audits, so the accumulation rate is the working rate.
-  Filed 2026-08-12 by close, draining the gap inbox; found at scope, re-verified here.
+  Filed 2026-08-12 by close, draining the gap inbox; found at scope, re-verified here. Widened
+  2026-08-19 at scope, absorbing a gap bullet the `budget-batch-and-account-identity-kind` close
+  filed as new: its "no entry names `.claude/worktrees/` at all" premise was re-verified here and
+  is **false** — this entry and `agent-worktree-boundary-disposition` both name it.
 
 - **dispatch-unreadable-target-fallback** [design-pending] — a dispatched sweep whose target is
   unreadable validates against the **dispatch prompt's paraphrase** and returns PASS.
@@ -5292,7 +5309,11 @@
 
 - **delegation-provenance-floor** [design-pending] — a dispatching session can narrate findings
   from a subagent whose output it never received, and nothing reds.
-  recurrence: delegation-provenance-floor 2026-08-18
+  recurrence: delegation-provenance-floor 2026-08-18 2026-08-19
+  **Third firing 2026-08-19, on two actors in one iteration, so the class is structural.** The
+  fabrication sat in a dispatcher's own REASONING rather than in a quoted child report — a close
+  wrote findings from two sweeps that never returned — so a floor checking relayed output alone
+  misses it. Stamped at this drain, the first session with no stake in either actor to reach it.
   **Attested once, in this repo, and self-caught:** at the scope stage of
   `native-lifecycle-cohort-and-guard-friction` an audit-sweep never reported and its monitor timed
   out; the session wrote "The survey landed" plus "each claim re-verified by me, not relayed",
@@ -7143,6 +7164,7 @@
 
 - **port-budget-sizing-input-absent** [design-pending] — the budget arm names a per-member cost
   column `port-blockers --group` does not print, so every batch is sized on an input it lacks.
+  recurrence: port-budget-sizing-input-absent 2026-08-19
   **Probed at this scope, not inferred.** gate-sdk/SPEC.md §The first cohort, and the rule that
   selects the next tells the sizing session what to weigh: "the per-member cost `--group` already
   prints beside each member (shell line count and the mechanically derivable criterion columns)".
@@ -7163,7 +7185,129 @@
   **Cost while deferred:** a sizing session either re-derives the count by hand per candidate or
   sizes without it and records a budget it never measured — and because the SPEC tells it the
   number is already on screen, the second is the likelier outcome and the harder one to notice.
-  Filed 2026-08-18 at scope, probed against the tool while composing this iteration's port batch.
+  **Re-fired at the next scope, 2026-08-19, and the predicted outcome is the one that happened.**
+  Sizing the remaining takeable set meant reading `wc -l` over six declaration paths by hand,
+  because `--group` prints the criterion columns and no count. The cost is small per candidate
+  and it is paid again at every cut, which is the shape that never becomes urgent.
+  Filed 2026-08-18 at scope, probed against the tool while composing a port batch; re-stamped
+  2026-08-19 at scope from its own re-payment.
+
+- **prose-uniqueness-claim-unchecked** [design-pending] — no check reaches a prose UNIQUENESS
+  claim over a governed roster: a superlative selecting a predicate-defined subset of it.
+  **The instance, found 2026-08-19 at close's staleness read and fixed inline at `efd74265`.**
+  docs/site-architecture.md §Generated projections asserted the gate binary was the sole rostered
+  projection carrying a staging-order hazard. The generated pre-commit hook carries such a hazard
+  by another route: `check-prose-enum`'s enum-set emitter derives its `*-gate-test` members with
+  `git ls-files` (`scripts/enum-sets.sh`), so an untracked new `gate-tests/*.test.sh` sibling
+  passes a whole-tree battery and reds the hook at commit time on `git add`.
+  **Why the nearest gates do not reach it.** `check-manifest-count` refuses a bare cardinal
+  quantifying a governed collection noun; `check-prose-enum` holds an enumeration against a
+  derived set. Both read claims about the *members*. "The only X that Y" is a claim about the
+  **complement** — every member of the roster the predicate does not select — and neither gate
+  has any reading of the complement at all.
+  **Why `[design-pending]`: whether a scanner is buildable is the open question.** The selecting
+  predicate is prose ("carries a staging-order hazard"), so the derivable half may be only the
+  roster the claim quantifies over. If that is right the shape is a **marked-claim** class in
+  `check-measured-claim`'s lineage — the author declares the roster, the check holds the
+  superlative against it — rather than a scan that finds the claims itself.
+  **Cost while deferred:** a uniqueness claim is the shape a reader most reasonably stops reading
+  at, so a false one silently narrows the next session's search; and it goes false by the roster
+  growing, which is the one event nobody re-reads the prose for.
+  Filed 2026-08-19 into the gap inbox by the `budget-batch-and-account-identity-kind` close, whose
+  staleness read hit the instance; promoted at the following scope's drain of that inbox.
+
+- **guard-read-steer-tool-coverage** [design-pending] — the bash-guard's read-steer covers `cat`
+  and `sed` and not `awk`, so a line-range read of a tracked file is decided out of band.
+  **Measured 2026-08-19 at close's prompt-friction triage, off the log rather than impression.**
+  The iteration ranked 22 `awk` calls: 19 of the exact shape `awk 'NR>=X && NR<=Y' <file>`, 13 of
+  those against `TASK-QUEUE.md`; one a range-address read of `.workflow/survey-record.md`; one
+  feeding a pipe. So every one of the 22 read a file rather than transformed a stream — the shape
+  the guard already steers `cat` and `sed` away from, toward `Read`'s `offset`/`limit`.
+  **It CORRECTS a proposal `session-mechanic-grants-uncommitted` carries**, and that entry now
+  holds the contest. That one lists `awk` among the absent grants to put to the operator, which is
+  its disposition (a); on this measurement the right disposition is (b), the steer. Granting it
+  would bless the form the tree is retiring — exactly the masking
+  `guard-kit/templates/close-triage.md`'s criterion warns of. One token, opposite dispositions.
+  **Distinct from both steer-defect neighbours**, re-read here rather than assumed:
+  `guard-steer-grant-mismatch` is a steer whose target form nothing grants;
+  `guard-steer-names-absent-tool` is a steer naming a tool that is not there. This is a read form
+  with **no steer at all**.
+  **Why `[design-pending]`, and why it is not a one-liner.** The `sed` steer is a dedicated
+  segment parser (`guard-kit/lib/guard.sh`, `_guard_sed_segment`) separating the script argument
+  from file operands through `sed`'s own option grammar. `awk`'s grammar differs — `-F`, `-v`,
+  `-f`, and the first non-option word is the program unless `-f` is given — so it needs its own
+  parser plus a `guard-read-path.test.sh` arm. What the unit owns is whether a third per-tool
+  parser is the right shape, or whether the three want one "first-word-is-the-program,
+  rest-are-operands" abstraction.
+  **Cost while deferred:** an out-of-band decision per range read, on the busiest read shape in
+  the tree, while the guard reads as though it covers the class.
+  Filed 2026-08-19 into the gap inbox by the `budget-batch-and-account-identity-kind` close's
+  prompt-friction triage; promoted at the following scope's drain, both neighbours re-read there.
+
+- **deferred-entry-time-deixis-rot** [design-pending] — relative time-deixis rots in the deferred
+  pool and no gate reaches it, because a deferred entry outlives its filing iteration by design.
+  **Measured 2026-08-19 at close's staleness read.** 165 lines of `TASK-QUEUE.md` matched
+  `this iteration|this batch|last iteration|next iteration|this close|this session`, and every one
+  of them silently re-points each time the queue header moves. Re-run at the following scope's
+  drain the same grep returns 152 — the iteration boundary cleared the active sections, not the
+  pool — so the count is a live oracle rather than a number this entry holds.
+  **The live instance that found it, fixed inline; the class is not.** A deferred entry read
+  "VACUOUS UNTIL THIS BATCH ... before this iteration ported `check-commit-msg` and
+  `check-gate-fail-closed`", filed 2026-08-18 by validate about the iteration then closing — and
+  one iteration later it asserted the vacuity ended with a different batch's ports instead. That
+  reading tells the next reader a baselined red is a FRESH regression rather than a known one.
+  165 lines is a unit and not a triage, which is why the class is filed rather than swept.
+  **`check-manifest-temporal` is the nearest gate and reaches neither half.** Its corpus is the
+  `spec_manifest_files` finder — canonical SPECs, `README.md` at any depth, `CLAUDE.md` — which
+  excludes `TASK-QUEUE.md`; its markers are narration markers (*previously*, *formerly*) rather
+  than deixis.
+  **Two candidate shapes, trading against different things.** Widen that gate's corpus and marker
+  set, which collides with the queue being a work record where "this iteration" is meaningful AT
+  FILING TIME. Or rule that a deferred entry names its iteration and hold it with a queue-side
+  scan — narrower, and matching the widening already ruled for
+  `deferred-pool-identifier-restatement-sweep` over the same pool and for the same rot-window
+  reason.
+  **DISTINCT from `installer-init-noop-regen-conflict`**, which owns an installer no-op defect and
+  is only the entry this class was caught inside.
+  **Cost while deferred:** every promotion, drain and audit reading the pool prices a dated claim
+  against the wrong iteration, and the error is invisible — the sentence stays grammatical and
+  stays plausible.
+  Filed 2026-08-19 into the gap inbox by the `budget-batch-and-account-identity-kind` close;
+  promoted at the following scope's drain, the matching grep re-run there before the claim moved.
+
+- **spec-lib-dead-derivation** [design-pending] — three section-builder regexes in
+  `canon-kit/lib/spec.sh` have no reader left in the tree, and nothing rules what they are.
+  **Derived rather than inferred, 2026-08-19 at close's capability-pendency audit.**
+  `SPEC_FEATURE_RE`, `SPEC_ACTIVE_RE` and `SPEC_DEFERRED_RE` are matched by nothing but their own
+  definition lines: a grep for the three names across every `*.sh` in the tree returns those lines
+  and nothing else.
+  **It surfaced from a prose claim that had gone false, and the prose is already corrected.**
+  canon-kit/SPEC.md asserted `check-amendment-queue` "still reads `SPEC_ACTIVE_RE` and its
+  siblings here"; that gate ported to the crate, where the module classifies a section name
+  against `CANON_KIT_ACTIVE_SECTIONS` directly and builds no regex at all. The residue is what is
+  left uncorrected, and it is this entry.
+  **The disposition is genuinely open, which is why this is a unit and not a deletion.**
+  `canon-kit/lib/spec.sh` is a KIT library: a consumer's own shell gate may legitimately source
+  these, so *unread in this tree* is not *unused*. Deleting them is a kit-surface removal with an
+  upgrade-contract cost — a Renamed-knobs `old -> nothing` declaration under docs/install.md's
+  grammar — rather than a cleanup.
+  **Three shapes.** Delete them and declare the removal. Keep them and state in canon-kit/SPEC.md
+  that they are consumer surface with no in-tree reader, which makes the absence a fact rather
+  than a smell. Or hold them until the port's shell residue is dispositioned wholesale, since more
+  of this library loses its last caller as the remaining members port.
+  **The same class as `queue-lib-dead-derivation`, one library over, and deliberately not folded
+  into it.** That entry's regexes retain a gate-test reader and queue-kit/SPEC.md already rules
+  them internal, so its open question is whether a parity arm is live coverage. These have **no**
+  reader of any kind and no ruling behind them, so the question is the opposite one: whether they
+  are surface at all.
+  **DISTINCT from `in-crate-module-coupling-derivation`** (descriptors under-declaring their
+  couples) and from `native-gate-port-remaining-corpus` (what the port still owes, not what it
+  leaves behind unread).
+  **Cost while deferred:** the port keeps generating this residue at the rate it lands members,
+  and every reader who wonders re-runs the same grep to learn the same thing.
+  Filed into the gap inbox 2026-08-19 by the `budget-batch-and-account-identity-kind` close, at
+  its capability-pendency audit; promoted at the following scope's drain, the grep re-run at HEAD
+  there and the three names still matched by their own definition lines alone.
 
 ## Icebox
 
