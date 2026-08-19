@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Behavioral test of checks/check-evidence-manifest.sh — the lifecycle-coupled
+# Behavioral test of check-evidence-manifest — the lifecycle-coupled
 # assertions the one good/bad pair (grammar) cannot hold: (C) a validate stamp
 # demands ≥1 evidence line, disarmed while the cursor is still at validate and
 # re-armed past it; (A) a close-entry cursor demands the full green block over
@@ -14,7 +14,7 @@ set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # evidence-kit/
-GATE="$DIR/checks/check-evidence-manifest.sh"
+CHECKS="$DIR/checks"
 HASH=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
 
 fails=0
@@ -29,7 +29,9 @@ case_run() {
     printf '%s\n' "$hdr" >"$d/queue.md"
     printf '%b' "$state" >"$d/state.txt"
     [[ -n "$suites" ]] && printf 'EVIDENCE_KIT_SUITES=(%s)\n' "$suites" >"$d/scripts/evidence-config.sh"
-    out="$( cd "$d" && env -u EVIDENCE_KIT_CONFIG_FILE GATE_SDK_GATES_DIR=scripts "$GATE" man.txt queue.md state.txt 2>&1 )"; rc=$?
+    out="$( cd "$d" && unset EVIDENCE_KIT_CONFIG_FILE \
+        && gate_env GATE_SDK_GATES_DIR=scripts \
+        && gate_run check-evidence-manifest "$CHECKS" man.txt queue.md state.txt 2>&1 )"; rc=$?
     if [[ "$rc" -ne "$want" ]]; then
         echo "  FAIL: $name expected exit $want, got $rc: $out"; fails=$((fails + 1)); return
     fi
@@ -93,7 +95,7 @@ _no_state() {
     local d="$tmp/nostate"; mkdir -p "$d"
     printf '# contract: evidence-manifest v1\n' >"$d/man.txt"
     printf '## Iteration: it\n' >"$d/queue.md"
-    "$GATE" "$d/man.txt" "$d/queue.md" "$d/absent-state.txt" 2>&1
+    gate_run check-evidence-manifest "$CHECKS" "$d/man.txt" "$d/queue.md" "$d/absent-state.txt" 2>&1
 }
 if ! out="$(_no_state)" || ! grep -qF "close-entry/stamp-coupling disarmed" <<<"$out"; then
     echo "  FAIL: no-lifecycle disarm not reported clean: $out"; fails=$((fails + 1))

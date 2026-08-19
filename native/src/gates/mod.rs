@@ -28,6 +28,7 @@ pub mod docs_mirror_fresh;
 pub mod docs_nav_reachable;
 pub mod enforcement_fresh;
 pub mod evidence_baseline;
+pub mod evidence_manifest;
 pub mod footprint_fresh;
 pub mod install_toolchain;
 pub mod installer_no_deps;
@@ -717,6 +718,20 @@ pub const REGISTRY: &[GateEntry] = &[
             "EVIDENCE_KIT_QUEUE_FILE",
             "EVIDENCE_KIT_SCENARIO_GLOBS",
             "EVIDENCE_KIT_PERMANENT_SLUGS",
+        ],
+        "evidence-kit",
+    ),
+    // spec: evidence-kit/SPEC.md §check-evidence-manifest — three named-file reads and no walk,
+    // so the declared root set is empty and unit test A holds that to executed behavior
+    (
+        "check-evidence-manifest",
+        evidence_manifest::run,
+        &[],
+        &[
+            "EVIDENCE_KIT_MANIFEST_FILE",
+            "EVIDENCE_KIT_QUEUE_FILE",
+            "EVIDENCE_KIT_STATE_FILE",
+            "EVIDENCE_KIT_SUITES",
         ],
         "evidence-kit",
     ),

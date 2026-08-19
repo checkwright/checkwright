@@ -1,5 +1,6 @@
 // spec: evidence-kit/SPEC.md §check-evidence-baseline — baseline grammar, blocking-slug
 // liveness against the queue, and per-suite manifest↔disk set equality
+use crate::evidence::data_lines;
 use crate::walk;
 use std::path::Path;
 
@@ -8,17 +9,6 @@ fn knob_or(args: &[String], at: usize, knob: &str) -> Result<String, String> {
         Some(v) => Ok(v.clone()),
         None => walk::knob_scalar(knob),
     }
-}
-
-// spec: evidence-kit/SPEC.md §lib/evidence.sh — `ek_data_lines`: everything but a comment line
-// and a blank one, the one read every baseline and manifest consumer shares
-fn data_lines(text: &str) -> Vec<&str> {
-    text.lines()
-        .filter(|l| {
-            let t = l.trim_start_matches([' ', '\t']);
-            !t.is_empty() && !t.starts_with('#')
-        })
-        .collect()
 }
 
 // spec: evidence-kit/SPEC.md §check-evidence-baseline — bash `read -r suite scenario status
@@ -270,10 +260,4 @@ mod tests {
         );
     }
 
-    // spec: evidence-kit/SPEC.md §lib/evidence.sh — the comment-and-blank filter, indentation
-    // included, so a header line never reaches the grammar assertion
-    #[test]
-    fn comments_and_blanks_are_not_data_lines() {
-        assert_eq!(data_lines("# h\n\n  \nu a pass\n  # c\n"), vec!["u a pass"]);
-    }
 }

@@ -407,9 +407,40 @@ early-out rather than by an empty stage falling through two live assertions: a
 silent fall-through would read as a green gate in exactly the window where the
 gate has nothing to say, which is the failure mode the cursor migration was
 ordered to avoid.
-Argument mode `$1 $2 $3` (manifest, queue, state) makes it fixture-capable; the
-close-entry and stamp-coupling assertions are covered by
-`gate-tests/check-evidence-manifest.test.sh`.
+`checks/check-evidence-manifest.gate` (`precommit`, binary-dispatched).
+Argument mode `$1 $2 $3` (manifest, queue, state) survives the port — each
+positional reaches the subcommand as argv and overrides the bridged knob there,
+so none of the three is the arrives-too-late shape gate-sdk/SPEC.md §The
+non-gate arm deletes. The good/bad pair drops its `args` and reaches the rule
+through the three path knobs instead, which is the branch the production battery
+takes; the positional arm keeps its coverage in
+`gate-tests/check-evidence-manifest.test.sh`, which also owns the close-entry
+and stamp-coupling assertions.
+
+**A pre-flight caller names this gate, never its declaration path, and the port
+is what made that binding.** `LIFECYCLE_KIT_ENTRY_PREFLIGHT`
+(lifecycle-kit/SPEC.md §bin/enter-stage.sh) is exec'd with **no interpreter
+word**, so a literal `…/check-evidence-manifest.sh` entry rides the exec bit. A
+`.gate` descriptor is a non-executable data file, so the exec fails, the
+non-zero exit refuses the entry, and the `close` stage cannot be entered at all
+— by a caller no gate enumerates, since a Point-5 reader enumeration covers
+gates and an ordinary shell-out is outside every one of them. The discharge is a
+**consumer-side front-end** that resolves a gate *name* through `gate_command`
+(this repo's `scripts/gate-exec.sh`) — deliberately not teaching lifecycle-kit
+to resolve a name in that knob, which would be a kit-contract change. The
+front-end is wired for the consumer's whole pre-flight roster rather than for
+the one member that forced it: an entry still naming a path is the same trap
+armed for the next port, and re-pointing a still-shell member costs nothing
+because `gate_command` resolves it to exactly the path the entry held.
+
+**The data-line helper is `ek_data_lines`' own primitive, and the crate carries
+a same-named one that is a different rule.** `ek_data_lines` filters comment and
+blank lines and nothing else. The crate's `stages::data_lines` — the lifecycle
+state file's reader — takes only the lines *below a `---` separator*, so binding
+to it here compiles, passes a thin fixture, and silently drops every manifest
+line in a file with no separator. The compiled form therefore keeps
+evidence-kit's own reader (`native/src/evidence.rs`), which is the same
+independence from lifecycle-kit the shell library states at §lib/evidence.sh.
 
 ### check-battery-roster
 

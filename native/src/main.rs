@@ -5,6 +5,7 @@ mod declaration;
 mod diff;
 mod emit;
 mod ere;
+mod evidence;
 mod fresh;
 mod gates;
 mod json;
