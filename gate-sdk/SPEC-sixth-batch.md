@@ -34,8 +34,9 @@ members are admissible: delta 12's ordering constraints.
 
 **Out of envelope — escalate rather than absorb.** Widening past six or
 admitting a member outside the ruled set; changing what a `.gate` descriptor may
-carry, or what the registry's knob field may hold (delta 13's fork turns on
-exactly that and is escalated rather than ruled here); ruling the **class**
+carry (delta 13's ruling deliberately stays inside a crate-internal carrier for
+exactly that reason, and a carrier change forcing a **specified** arm's output to
+move escalates); ruling the **class**
 question `spec-embedded-source-criterion-4-membership` owns, which delta 4
 deliberately leaves untouched; and repairing any of the three defects delta 10
 rules **reproduced** — each repair is a verdict change across the seam and is
@@ -364,7 +365,7 @@ stay shell after this cut — but it spends the batch's only such oracle on its
 first member. Recorded as a ruling with its ground rather than as a preference.
 *design-bearing.*
 
-### 13. One design fork is **escalated rather than ruled**, and it is on the critical path
+### 13. One design fork, **ruled at this stage** — take the derived union
 
 A compiled `check-reads-couples` must resolve a knob whose **name is not known
 until run time**: the filter-knob name arrives from another member's declared walk
@@ -374,18 +375,52 @@ member declares, and the registry's knob field is a static list. The instance is
 live rather than hypothetical — a ported member already declares two filter knobs
 whose kit is not gate-sdk. *design-bearing.*
 
-**The corpus points two ways, which is why this is escalated and not decided
-here.** §port-blockers records that a knob resolves through the library's own
-bridge resolver, *the single place a knob default is read anywhere*, which argues
-for reaching that resolver. §Meta-gate conservation's `check-prose-enum` row
-records that a consumer derivation crosses the bridge **as data**, *which is what
-keeps the compiled form from spawning the emitter it reads*, which argues against
-a spawn. A third shape — computing the union of every member's filter knob —
-reaches neither objection but changes what the registry's knob field may hold,
-which §The envelope puts outside this batch. Build does not choose: the ruling
-lands on this amendment before the member is taken, and if it does not, the
-member is **dropped** under the envelope's own relief rather than the batch
-widened. *design-bearing.*
+**Ruled 2026-08-19 by the operator against this iteration's intent oracle: the
+compiled member takes the union of every registry member's declared filter-knob
+names, computed from the registry, resolved by the existing bridge, and consumed
+as data.** The per-kit prefix family is the fallback. **The member is not
+dropped** — the envelope's drop relief stays available and nothing here needs it.
+*design-bearing.*
+
+**The two citations are not opposed, and the paragraph that read them as a fork
+was wrong.** §port-blockers answers *where* a knob default is read: the bridge
+resolver in gate-sdk's own library, which already resolves by sourcing the owning
+kit's library in a subshell — on the **dispatcher** side, before the binary runs.
+§Meta-gate conservation's `check-prose-enum` row answers *what a compiled form
+may do at run time*: not spawn its producer. Both hold at once, and reaching the
+library's resolver was never an alternative to the bridge — it **is** the bridge.
+*design-bearing.*
+
+**Spawning bash from the binary is refused as unnecessary rather than close.** It
+would make bash a *run-time* dependency of that gate, which objective 1 and the
+closed sole-runtime-dependency ruling retire, converting a transitional
+dependency into a permanent one. Criterion 7 clearing on the program floor does
+not license it: no port-candidate criterion survives as an eligibility gate.
+*design-bearing.*
+
+**The union is derived, not maintained, and it is not a governed-contract
+change.** A member's declared read roots with their filter-knob names and its own
+knob list are fields of **one compile-time registry tuple**, so the union is
+derivation-first satisfied rather than violated and a newly declared filter knob
+cannot be forgotten. And the knob roster is an **answered binary arm**, not a
+static field of the `.gate` descriptor, so what the union changes is a
+crate-internal **carrier** — calibration inside the ruled envelope. *design-bearing.*
+
+**The per-kit prefix family resolves, so the fallback is real.** The bridge's
+single-knob emitter carries a prefix arm spelled with a trailing star, and the
+prefix expander strips the star before matching the remainder against each kit's
+derived prefix. A **per-kit** family therefore has an owner; only an all-kit
+wildcard has none. The live instance is `check-stage-entry`, and both its filter
+knobs belong to one kit. *design-bearing.*
+
+**Residue the oracle refused to let ride as settled**, because it read the
+registry, the resolver and the prefix arm but **compiled nothing**. Unverified:
+that a computed union carries against the knob roster's current return type
+without a wider refactor than assumed, and how the union interacts with the
+`--reads` unit tests and with `check-gate-substrate-parity`. If the carrier
+forces a change to a **specified** arm's output rather than to an internal type,
+that touches a governed contract and is escalated rather than absorbed.
+*design-bearing.*
 
 ### 14. The seam, ruled per member — and one member's is a **privacy** boundary rather than a config one
 
@@ -491,9 +526,10 @@ absence is the causal-completeness answer rather than a gap in it, and it is
 stated because a batch of six ports invites the assumption that six new things
 were introduced. **The two exceptions are named at the deltas that own them**: no
 knob is minted here at all (delta 11 records that the bridge precondition is
-already discharged), and the one open interface question — what a compiled member
-declares for a run-time-named knob — is delta 13's, escalated rather than ruled,
-so nothing is asserted about it in either direction.
+already discharged), and the run-time-named-knob question is delta 13's, **ruled
+at this stage** as a derived union computed from the registry and carried across
+the existing bridge as data — a crate-internal carrier, so no declared interface
+moves here either.
 
 What each port *does* move is a **declaration path**, and its readers are named
 and enumerated:
