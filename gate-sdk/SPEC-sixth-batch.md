@@ -220,8 +220,8 @@ batch's own commit; a divergence is a finding, and the absolute number is
 measured on both sides or not compared at all. *design-bearing.*
 
 **The batch also *removes* the ground on which an earlier cohort's residual was
-accepted, and that is this delta's real content.** §The canon-kit
-`spec_manifest_files` cohort rules its residual accept-and-declare **because** the
+accepted, and that is this delta's real content.** §The canonical-spec
+`spec_canonical_specs` cohort rules its residual accept-and-declare **because** the
 canonical-spec corpus still carried a shell auditor there —
 `check-spec-embedded-source`. This batch ports it. What is left over that corpus
 is one gate that no `init` seeds and that sits in no generated hook, so on a
@@ -591,10 +591,11 @@ walks that were allowed to fail loudly.
 - **gate-sdk/SPEC.md §The port-candidate criteria, criterion 5** — the batch's
   measured residual, its exact-rather-than-bounded prediction, and the fact that
   the intersection is a no-op for the first time. Owned by delta 7.
-- **gate-sdk/SPEC.md §The canon-kit `spec_manifest_files` cohort** — the sentence
-  grounding that cohort's accept-and-declare on a surviving shell auditor stops
-  being true when this batch ports it; corrected there, where it lives, with the
-  new judgment cited to the sixth batch's section. Owned by delta 7.
+- **gate-sdk/SPEC.md §The canonical-spec `spec_canonical_specs` cohort** — the
+  sentence grounding that cohort's accept-and-declare on a surviving shell
+  auditor stops being true when this batch ports it; corrected there, where it
+  lives, with the new judgment cited to the sixth batch's section. Owned by
+  delta 7.
 - **gate-sdk/SPEC.md §Meta-gate conservation for the binary substrate** — five
   existing rows gain the ported-member sentence; any row assertion C's fresh run
   yields lands here too, and the five must not be re-derived as new. Owned by
