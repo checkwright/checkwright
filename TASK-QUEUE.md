@@ -1474,8 +1474,8 @@
 - **template-copy-parity-yaml-widening** [design-pending] — a kit `.yml` template
   and this repository's copy of it are mirrored by hand and a missed half is caught
   by nothing. Re-verified at this close: `check-template-copy-parity` globs
-  `*/templates/*.sh` against the gates dir — three pairs in this tree, none of them
-  YAML — and no other gate compares two hand-maintained copies of anything. Every
+  `*/templates/*.sh` against the gates dir — every pair it finds is shell and none
+  is YAML — and no other gate compares two hand-maintained copies of anything. Every
   other parity or freshness gate compares a **generated** projection against its
   source, which is a different problem. The duplication cannot be removed, because
   kit-template-plus-consumer-copy *is* the distribution model, so enforcement-first
@@ -4612,6 +4612,7 @@
   **Cost while deferred:** every count written in the queue is unreachable by any oracle, and in
   the manifest corpus a count's enforceability turns on a spelling choice no author is told
   about. Both failures are silent — the gate runs, reports clean, and never saw the claim.
+  recurrence: cardinal-notation-splits-gate-reach 2026-08-19
   Filed 2026-08-12 by close, from an operator observation; the "no reason exists" premise was
   falsified by probing the count gate's own matcher rather than by grepping for a style rule.
 
@@ -5674,6 +5675,15 @@
   baseline holds; this is the baseline not holding it.
   **Cost while deferred:** the two suites keep their weakest protection while the crate is the
   fastest-moving surface in the tree.
+  **Second instance, one granularity down — 2026-08-19, and it is the entry's own open call.**
+  The suite-level claim above re-verified unchanged (22 rows for 24 suites, the same two absent).
+  What is new: *within* the `gates` suite the run reports 104 scenarios while the baseline names
+  **75**, so 29 registered gates hold no row. Probed at the source rather than assumed
+  (`evidence-kit/lib/evidence.sh:137,156,166`): the diff is directional, so a rowless gate going
+  red is still a new-failure — what a `pass` row alone buys is that the scenario going **absent**
+  reds too. The uncovered 29 can therefore be deregistered, renamed or silently skipped with the
+  battery still green, which is a different loss from the one the suite-level half names.
+  recurrence: validate-baseline-suite-coverage 2026-08-19
   Filed 2026-08-14 by close, draining a gap-inbox bullet the lead filed after the validate
   session declined to act on its own finding unilaterally.
 
@@ -6112,7 +6122,7 @@
   the guard-rule and documentary half alone, since the hook half needs an operator-authorized
   `.claude/settings.json` write no agent message can license. Honest limit, recorded because the
   operator saw it and ruled anyway: the port batches are the work whose evidence this defect eats.
-  recurrence: turn-end-chokepoint-and-wait-primitive 2026-08-18
+  recurrence: turn-end-chokepoint-and-wait-primitive 2026-08-18 2026-08-19
   **Firings 11-13, 2026-08-18 — grounds for that date.** Three times a backgrounded producer exited
   cleanly and the turn ended anyway: work finished, uncommitted, no completion notification,
   recovered only by the operator noticing. The second half, measured on producers that *finished*.
@@ -6667,6 +6677,7 @@
   **Cost while deferred:** low and stated — rule 14's bound stays "only for a session that
   recorded", so the launch chokepoint is uncovered while the mutation chokepoint is covered.
   One rule plus decision-table rows if taken.
+  recurrence: launch-chokepoint-liveness-record-write 2026-08-19
   Filed 2026-08-18 by close from the gap inbox; the drain re-verified the rule's reach against
   its source and measured the target entry's headroom with the gate rather than by hand — the
   bullet read one line of room where the oracle reports zero.
@@ -7247,6 +7258,157 @@
   its capability-pendency audit; promoted at the following scope's drain, the grep re-run at HEAD
   there and the three names still matched by their own definition lines alone.
 
+- **couples-glob-semantics-unowned** [design-pending] — one manifest field, three readers, two
+  incompatible glob semantics, and no surface owns which reader is entitled to which.
+  **Probed at all three sources, not read off the bullet.** `check-gate-substrate-parity`
+  assertion C matches with a bash `[[ p == g ]]`, where `*` crosses `/` — verified by execution:
+  `gate-sdk/*.sh` matches `gate-sdk/checks/check-x.sh`. `check-reads-couples`' own couple matcher
+  requires **equal segment count** and never crosses `/`. `check-graph` assertion B reads the
+  same field a **third** way — exact-token subset membership against `trigger=`, invoking no glob
+  matcher at all — and the generated hook's staged-path test takes the slash-spanning form.
+  **What the drain corrected in the filing's own claim.** The bullet said the divergence is
+  stated nowhere; it is stated in **one** place, the compiled couple matcher's own comment, which
+  names its narrowness as deliberate and cites the slash-spanning matcher it differs from. That
+  narrows the gap without closing it: a comment inside one reader is not a contract any other
+  reader or any descriptor author reads, and the third semantics is undocumented outright.
+  **Why `[design-pending]`:** normalising is not obviously right. `check-reads-couples`' narrow
+  matcher is correct **as specified** and its spec says so, so the call is whether `couples=` has
+  one semantics with stated exceptions, or is a field whose meaning is per-reader and must
+  therefore be declared per reader. Only the second is cheap; only the first is safe.
+  **Cost while deferred:** it already bit once, at the sixth budget batch, which reproduced both
+  forms deliberately rather than normalising them. The crate now carries a component-wise matcher
+  and a slash-spanning one side by side, so a porting session reaching for "the" crate glob
+  matcher flips a verdict on one side and no gate anywhere would say which side.
+  Filed 2026-08-19 by close from the gap inbox; the drain executed all three matchers rather
+  than reading them.
+
+- **prose-tell-threshold-validation** [design-pending] — `check-prose-tells`' numeric thresholds
+  are read unvalidated on both substrates, so a typo turns a calibrated gate into a silent no-op
+  or a wall of noise, confidently and with no diagnostic.
+  **The count in the filing was wrong and the drain corrected it: five, not six.**
+  `canon-kit/lib/spec.sh` defaults `CANON_KIT_PROSE_TELL_EMDASH_MAX`, `_CONTRAST_MAX`,
+  `_RHYTHM_MIN_SENTENCES`, `_RHYTHM_CV_MIN` and `_TRICOLON_MAX` with a bare `[[ -v ]] ||` and
+  validates none of them, while the same file's validator block checks fourteen other knobs for
+  range and shape. `_GLOBS` is the sixth knob the bullet counted and it is an array, not a
+  threshold — a different validation question.
+  **The failure is silent in both directions.** The value is coerced by its leading numeric
+  prefix, so a non-numeric max becomes zero and every paragraph reds, and a non-numeric minimum
+  becomes zero and its assertion can never fire. The compiled form reproduces the coercion
+  **deliberately** — a refusal the shell never made would be a verdict change across the seam.
+  **Why `[design-pending]`:** the repair is one validation in `canon-kit/lib/spec.sh`, which is
+  criterion 6's discharge-by-construction — one computation both substrates read. What is not
+  settled is what a malformed threshold should *do*: refuse the gate at exit 2, matching every
+  other knob in that validator, or fall back to the documented default and report. The first is
+  consistent; the second is kinder to an adopter mid-edit.
+  **Cost while deferred:** a consumer typo produces a confidently wrong verdict, and neither
+  failure mode names its cause.
+  Filed 2026-08-19 by close from the gap inbox, which carried it twice — once from the sixth
+  batch's port survey and once from the port itself; the drain read the validator and counted.
+
+- **template-copy-parity-knobless-refusal** [design-pending] — `check-template-copy-parity`
+  refuses the whole gate at exit 2 on any paired file carrying no knob-with-default idiom.
+  **The behavior, reproduced by execution at the drain rather than read.** When a paired file
+  carries no knob-with-default token at all, the surface derivation reports *could not classify*
+  rather than *no knobs*, and the fail-closed wrapper turns that into exit 2 for the whole gate,
+  with a message naming an internal step rather than the file.
+  **The tree is green by exclusion, not by correctness.** The two knob-less files in the corpus
+  are dropped before the derivation runs — one by the `*-config.sh` rule, one by being unpaired.
+  Vendoring an unpaired knob-less template into the gates dir turns every run into that refusal.
+  **Reproduced rather than repaired at the sixth budget batch**, and the crate module says so in
+  its own spec comment: a refusal the shell form never made is a verdict change across the seam,
+  which the parity run holds invariant. Both substrates now carry it identically, proven by a
+  differential run.
+  **Why `[design-pending]` rather than a two-line fix:** the repair itself needs no ruling — a
+  knob-less file has an **empty** knob class, not an unreadable one. What needs one is the seam:
+  this is the first deliberate defect-reproduction the port has filed for later repair, so the
+  unit has to establish how a repaired verdict lands on both substrates at once without either
+  side briefly disagreeing.
+  **Cost while deferred:** the first consumer to vendor a template with no defaulted-env read
+  gets exit 2 on a file that is fine, and no gate anywhere would have predicted it.
+  Filed 2026-08-19 by close from the gap inbox, which carried it twice — from the port survey and
+  from the port; the drain reproduced the refusal rather than reading for it.
+
+- **installer-uninstall-diff-stale-hash-coverage** [design-pending] — the reverse-to-pre-install
+  property is asserted only where a stale carried hash cannot arise, so the class that produced
+  `installer-init-noop-regen-conflict` would land again on a green suite.
+  **The filing's premise was wrong and the drain corrected it before promoting.** The bullet
+  said both smoke arms run `uninstall` against a fresh install. They do not: the install
+  assertion ends with an idempotent **re-run** of `init`, and the reversal assertion runs on that
+  same consumer immediately after, so `uninstall` already meets a twice-initialised tree — and
+  the seam arm drives init, an edit, a re-run, `diff` and `uninstall` in sequence as well.
+  **What survives the correction, narrowed to what is actually uncovered.** Every reversal runs
+  after a **same-version** re-run, where the payload is byte-identical and the written set cannot
+  change. The upgrade arm is the only place a re-run carries a *different* payload — a relinquish
+  hop and a re-add hop — and it asserts no reversal at all. So the hop that can actually move a
+  recorded hash is the one hop whose reversal nothing asserts.
+  **Why `[design-pending]`:** whether to chain a reversal onto the upgrade arm's second hop or
+  give it its own arm is a smoke-cost judgment, and that arm is already the most expensive in the
+  suite.
+  **Cost while deferred:** the property the whole adoption story rests on is asserted on the
+  paths where it cannot fail and unasserted on the one where it can.
+  Filed 2026-08-19 by close from the gap inbox, discharging the operator's refusal of the widen
+  at `installer-init-noop-regen-conflict`; the drain read the smoke's call order and the bullet's
+  central claim fell.
+
+- **pipeline-membership-idiom-latent** [design-pending] — two shell sites still hold the
+  SIGPIPE-under-pipefail membership idiom that produced `installer-init-noop-regen-conflict`, and
+  nothing stops a third being written.
+  **The idiom.** A quiet `grep` reading an array printed into a pipe under `set -o pipefail`:
+  `grep` exits on its first match while the writer is still writing, the writer takes SIGPIPE,
+  and `pipefail` makes the pipeline's status the signal rather than `grep`'s zero — so a present
+  member reads as **absent**.
+  **Probed, and re-probed at the drain.** A sweep of every shell file in the tree returns exactly
+  two survivors, both re-read line by line at this close:
+  `gate-sdk/checks/check-gate-substrate-parity.sh:178` (the crate's subcommand roster) and
+  `gate-sdk/gate-tests/lib-gate.test.sh:45` (the grep-excludes roster). Both files set
+  `set -uo pipefail`. Onset was measured in the session that fixed the installer: with
+  single-token members the fault begins between 400 and 800 entries, which is the 64K pipe buffer
+  filling. Both rosters are far below that, so **both sites are latent** — the honest reason this
+  is filed rather than fixed.
+  **Why `[design-pending]`:** the mechanical repair is an associative-array membership test, the
+  same one `init` took, and needs no ruling. The open call is whether that is the deliverable at
+  all, or whether enforcement-first makes it a gate over the idiom — the only shape that stops
+  the third site, and the only one that costs a design.
+  **Cost while deferred:** a correctness cliff with no warning track. Nothing degrades gradually;
+  the gate starts reporting a present member as absent on the run where its roster crosses the
+  buffer, and because `check-gate-substrate-parity` is a **parity** gate, that false absence
+  reads as a real parity finding rather than as a fault in the check. The port is what grows the
+  subcommand roster, and the port is the tree's standing direction.
+  Filed 2026-08-19 by close from the gap inbox; the drain re-read both sites at their line
+  numbers rather than taking the sweep's count.
+
+- **stage-journal-contract-unoracled** [design-pending] — a granted resume journal that is never
+  written is indistinguishable from a session that had nothing to say, so the durable narration
+  channel fails silently.
+  **Observed, not hypothesised.** At this iteration's validate the dispatch granted a journal
+  path spelled absolutely into the main checkout, and at stage end the file did not exist — while
+  every other stage this iteration wrote its own, six of six. Re-verified at the drain by listing
+  the scratch dir: the six siblings are there and the granted seventh is not.
+  **The mitigation that failed is the one the protocol itself prescribes.**
+  `delegation-kit/templates/agent-execution.md` already carries the caveat that a background
+  agent's sandbox may block the write and that the agent then falls back silently to its return
+  message. This is the first instance in this tree where the granted path was named absolutely in
+  the main checkout — the caveat's own remedy — and it failed anyway, which is what makes it a
+  finding rather than a repeat.
+  **The cost landed on precisely the case the journal exists for.** That was the one stage of the
+  iteration interrupted mid-work; had the session died rather than merely ending its turn, its
+  baseline-diff reasoning would have been unrecoverable, the return message being the only place
+  it ever existed.
+  **Distinct from the two nearest entries, both re-read at the drain.**
+  `stage-completion-unattested` is the stage's own **deliverable** absent behind a live entry
+  stamp; this is the narration channel, and a stage can lose either without the other.
+  `delegation-provenance-floor` is a parent relaying a child's return that never arrived — but
+  its body already **recommends** the shape this entry would take, a dispatcher minting a path
+  and reading it, so it is cited here as prior art rather than folded into.
+  **Why `[design-pending]`:** the question is whether a stage session's journal becomes a stage
+  **contract** with an oracle — an entry-time or close-time assertion that the granted path
+  exists and terminates — or stays a dispatch-time request. The first mints an obligation every
+  stage pays; the second is what just failed.
+  **Cost while deferred:** every dispatched stage can lose its reasoning silently, and the loss
+  is invisible until someone needs it.
+  Filed 2026-08-19 by close from the gap inbox, filed by the lead because the absence is
+  observable to the dispatcher and not to the session.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
@@ -7276,8 +7438,6 @@
 
 ## Done
 
-- installer-init-noop-regen-conflict
-- port-budget-sizing-input-absent
 
 ## Lessons Learned
 
