@@ -9786,13 +9786,13 @@ appears on one side unexplained.
 port **reproduces rather than repairs**, on the rule that a refusal the shell form
 never made is a verdict change across the seam. The gate **refuses outright** —
 exit 2, the fail-closed message — on a paired file carrying no
-knob-with-default idiom at all, because the surface derivation's last stage is a
-grep whose empty result propagates under `pipefail`. It fails *closed*, which is
+knob-with-default idiom at all, reporting *could not classify* where the honest
+verdict is *no knobs*. It fails *closed*, which is
 what makes reproducing it safe-but-wrong rather than dangerous, and the tree is
 green only because the two knob-less files in its corpus are excluded by the
 `*-config.sh` rule before the call. And the `lib:` class matches what the bullet
-above now says it matches. The refusal is filed as its own unit rather than
-repaired here.
+above now says it matches. The refusal is filed as its own unit —
+`template-copy-parity-knobless-refusal` — rather than repaired here.
 
 **Its root default is a derivation no injected case can reach**, since every
 committed case passes an explicit root — so the discharge is a sibling harness,
