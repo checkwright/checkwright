@@ -45,11 +45,8 @@
 
 - **entry-cap-displaces-mandated-writes** [design-pending] — the mandated-write class collides with
   `check-queue-entry-budget`'s per-entry cap at a measurable rate, and nothing counts the spend.
-  **The slug was a shape everyone cites and nothing owned.** Probed 2026-08-18 and again at this
-  drain: before this entry the string resolved to exactly ONE occurrence in the tracked tree — an
-  in-body citation inside `turn-end-chokepoint-and-wait-primitive` — and to no live entry, no Done
-  slug and no SPEC section. Filing it under that spelling is what makes the standing citation
-  resolvable.
+  **The slug was a shape everyone cited and nothing owned** — filing it under this spelling made
+  the standing citation resolvable.
   **Five firings measured in one iteration:** three during scope's disposition work, one seating
   the operator-handed wait/notification recurrence grounds onto
   `turn-end-chokepoint-and-wait-primitive` at exactly 50 of 50 counted lines, and one seating the
@@ -88,6 +85,11 @@
   **Measured with the gate, not by hand**, and read *after* the dispositions were ruled rather
   than before — `headroom-check-ordering-unruled`'s ordering, honoured here on purpose so that no
   ruling could be shaped by the room available to record it.
+  **The pressure is DEFERRED-only and promotion is the unrecorded relief valve**, filed to the gap
+  inbox 2026-08-19 by spec and merged here at that drain: assertion A binds deferred entries alone
+  ("The active sections are uncapped", queue-kit/SPEC.md §check-queue-entry-budget), so every
+  firing above sits in the deferred half of a promote/demote cycle, and each colliding entry was
+  written onto freely once promoted. Seating this paragraph fired the cap again at 2 lines.
   Surfaced 2026-08-18 while `wide-budget-batch-and-hold-declaration`'s close drained its own
   inbox, and filed back into it; promoted 2026-08-18 by the following iteration's scope.
 
@@ -6205,6 +6207,16 @@
 
 - **in-crate-module-coupling-derivation** [design-pending] — a ported gate's descriptor can omit
   the crate modules its own verdict depends on, and no gate says so.
+  recurrence: in-crate-module-coupling-derivation 2026-08-19
+  **THE CORPUS IS 51 OF 89, measured 2026-08-19 at build and re-derived at this drain**: 51 `.gate`
+  descriptors carry a `couples=` naming no `native/` path and no `*.rs` glob, and every one of the
+  51 has a like-named crate module — so the hook never re-runs them on the edit that moves their
+  verdict. `check-manifest-count` is the worked case: trigger `*SPEC*.md,*README.md,CLAUDE.md`,
+  rule in `native/src/gates/manifest_count.rs`. §The fourth budget batch records eight descriptors
+  written against the tree's older reading; nothing owns the retro-fit and the count has grown with
+  each ported cohort. The retro-fit is mechanical per descriptor — the member's own module plus the
+  shared rule-carrying modules it reaches, stopping at the universal layers — but 51 hand edits
+  will not stay correct, so the gate this entry is designing is what makes it durable.
   **Attested this iteration, twice, and neither instance was found by a gate.**
   `check-value-rollup-fresh`'s module calls `enforcement_map::measure()` and
   `footprint::measure()` in-process, but its `couples=` named none of the three `emit/` modules;
