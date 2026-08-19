@@ -602,6 +602,12 @@ same shapes:
   source (§check-comment-tier). Which finder a gate uses is kit contract, not
   consumer config — a consumer wanting the old blanket exemption shadows the
   gate.
+- **The amendment finder** `spec_amendments`, the amendment-glob counterpart of
+  `spec_canonical_specs` above. Its last shell caller left at §The sixth budget
+  batch (gate-sdk/SPEC.md), and the function stays: the dead-twin disposition
+  (gate-sdk/SPEC.md §The port-candidate criteria, criterion 2) reaches
+  **undocumented** surface only, and this bullet documents it. The live holder is
+  `native/src/spec.rs`.
 - **The default-statement grammar** both knob gates share, so the rule for
   what reads as a stated default has one home. `sk_literal_at` recognizes the
   value literal opening a window (a backticked non-knob string, a quoted string,
@@ -698,6 +704,34 @@ Calibration: blocks shorter than `CANON_KIT_EMBED_MINLINES` are ignored;
 languages in `CANON_KIT_EMBED_ILLUSTRATIVE` are skipped by default; the
 threshold is calibrated against real specs, not synthetic fixtures.
 `precommit` tier.
+
+**The wire-delta exemption is scoped to the configured wire kind, not to
+amendments.** An amendment quoting enough distinct non-trivial lines of a tracked
+file in a fence of any *other* language fires exactly as a canonical spec would,
+which is what keeps the valve a bridge for a wire contract rather than a blanket
+licence for amendment prose. The per-site marker is the general escape, and it is
+a **path-identity** test against the amendment set rather than a name pattern —
+which is what re-arms the exemption the moment the amendment is deleted, instead
+of leaving a spelling that outlives its subject.
+
+**Ported to the binary substrate at §The sixth budget batch** (gate-sdk/SPEC.md).
+Criterion 4's verdict on it was taken **conservatively without ruling the class**:
+its walk opens and content-compares every source file the language roster names,
+its own declaration and every sibling's included, but as a *diff reference* rather
+than as its assertion target, and whether that satisfies the criterion is the open
+ruling `spec-embedded-source-criterion-4-membership` owns. The batch took the
+binding verdict for its own member because that costs a fixture widening and
+cannot be wrong in the harmful direction, while clearing wrongly ships the hole
+the criterion exists to point at; a later reader must not read the disposition as
+that entry's answer. The widening the verdict bought is the one delta the pair was
+missing: its cases derive a real corpus and do reach the finder, but neither valve
+was exercised by any committed case, and both now are.
+
+**One second-order fact the port prices whichever way that class falls**: every
+port removes a shell declaration from this gate's candidate index and adds a Rust
+module to it, so its verdicts move under *every* sibling's port — the narrowing is
+a swap rather than a removal, and a port can therefore create a violation here by
+moving a derivation's text from a file the specs do not quote into one they do.
 
 ### check-manifest-temporal
 

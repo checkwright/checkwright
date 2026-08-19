@@ -1,0 +1,3 @@
+# graph: couples=*SPEC*.md,*.rs,*.toml,*.sql,*.rego,*.ts,*.tsx,*.yaml,*.yml,*.proto,*.sh,Dockerfile dir=one valve=none tier=precommit
+# install: zero-config
+# spec: canon-kit/SPEC.md §check-spec-embedded-source — a canonical spec's fenced block must not verbatim-copy a tracked source file

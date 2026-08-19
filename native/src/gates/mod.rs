@@ -77,6 +77,7 @@ pub mod skill_binding;
 pub mod smoke_entry_guard;
 pub mod spec_derivable_section;
 pub mod spec_dod_singleton;
+pub mod spec_embedded_source;
 pub mod spec_fence_balance;
 pub mod spec_pointer;
 pub mod stage_entry;
@@ -429,6 +430,27 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_SCAN_KIT_ROOTS",
             "CANON_KIT_MANIFEST_FILES",
             "CANON_KIT_PROSE_SURFACE_GLOBS",
+        ],
+        "canon-kit",
+    ),
+    // spec: gate-sdk/SPEC.md §check-reads-couples — `?` because the scan root is the member's own
+    // first argument with a default; the candidate walk, the canonical-spec find and the
+    // amendment find all anchor at that one root
+    (
+        "check-spec-embedded-source",
+        spec_embedded_source::run,
+        &[("?", "")],
+        &[
+            "GATE_PRUNE_DIRS",
+            "GATE_KIT_ROOTS_HERE",
+            "CANON_KIT_SPEC_NAME",
+            "CANON_KIT_AMENDMENT_GLOB",
+            "CANON_KIT_SCAN_KIT_ROOTS",
+            "CANON_KIT_EMBED_LANGS",
+            "CANON_KIT_EMBED_ILLUSTRATIVE",
+            "CANON_KIT_EMBED_THRESHOLD",
+            "CANON_KIT_EMBED_MINLINES",
+            "CANON_KIT_EMBED_WIRE_KIND",
         ],
         "canon-kit",
     ),

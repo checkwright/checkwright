@@ -964,7 +964,7 @@ answering a question assertion C never asked.
 | `check-settings-paths` | **Survives unchanged — reverse trigger, and a port is its subject rather than its blind spot.** Its `couples=` names `kit:checks/*.sh` only so that a check-script edit re-runs it; what it scans is the committed permission allow-list, never a gate script's content. A port is the event it exists for: replacing `checks/<gate>.sh` with a descriptor strands every allow entry naming the old path, so the gate reddens *because* of a port rather than falling silent after one — the shape `check-docs-cmd` has in the row above. Two limits are recorded rather than left to be re-derived. The glob is deliberately not widened to `*.gate`, because a descriptor path is not something a `Bash(…)` grant invokes and the widening would add no assertion. And the trigger is a **partial route by construction**: the generated hook matches staged `ACMR` paths, so a *deleted* `.sh` never fires it; what catches a cohort's stranded grants is the whole-tree battery, which runs with no trigger filter. The trigger still earns its place — it catches the ordinary edit that strands a grant — but it is not what makes the gate's landing order necessary (context-kit/SPEC.md §check-settings-paths). **This member is itself `.gate`-dispatched from the settings cohort**, so the row describes a ported gate: the reverse trigger and both limits above are properties of its rule, not of its substrate, and survived the port unchanged. |
 | `check-prose-enum` | **Corpus extended to the Rust module — it was never a pure reverse trigger.** This gate was grouped with the reverse triggers above on the ground that none of them reads a gate's *content*; that ground was **false for this one**, and the queue-kit port is what exposed it. Its enum derivation (`scripts/enum-sets.sh`) reads the queue tag vocabulary out of `check-tag-lead-line`'s own class table, deliberately — *"read from the gate rather than re-listed here, so a rename cannot leave the two spellings disagreeing"* — so deleting that gate's script broke the derivation and the gate exited 2 rather than passing vacuously, which is the fail-closed behavior working. The corpus follows the rule to where it now lives, `native/src/gates/tag_lead_line.rs`'s `CLASSES` table, keeping the read-from-the-owner property and its one-table fail-closed anchor. **The gate is itself a ported member since the canon-kit cohort**, so a gate whose input is a gate's content is now gate content — and its own derivation crosses the bridge as *data*, which is what keeps the compiled form from spawning the emitter it reads. |
 | `check-measured-claim` | **Retained, and sensitive through its oracle rather than its corpus — the first born-native member to take a row.** What it scans is the governed-prose surface, so by corpus it is a reverse trigger like the row above. What makes it substrate-sensitive is the consumer oracle behind `CANON_KIT_MEASURED_CLAIMS_CMD`, which its `couples=` reaches through `scripts/*.sh`: this repo's emitter counts how much of the registry resolves to a `.gate` descriptor, so it reads declaration paths **as a set**, the shape `check-gate-binary-fresh` has. A port therefore *moves its value*, which is the mechanism working rather than a blind spot — the number a marked sentence states is about the port, and the sentence reddens when the port advances without it. The design that landed the gate predicted no row here, on the premise that its `couples=` named no declaration path; the emitter coupling the same design requires falsifies that premise, and the row is recorded rather than the coupling dropped, because dropping it would leave the oracle's own source outside the trigger set. **The row and criterion 4 are independent facts, and this is the case that proved it**: the criterion binds on a gate's assertion target, this gate's is the governed-prose surface, so it clears — while the transitive reach through its emitter is precisely what assertion C is shaped to see (§The port-candidate criteria, criterion 4). |
-| `check-spec-embedded-source` | **Survives unchanged — reverse trigger of the same shape.** Its `couples=` extension list (`*.rs`, `*.sh`, `*.toml`, …) is the roster of **languages it recognizes inside fenced blocks**, not a reference to gate declarations; its scanned corpus is the canonical specs and amendments. It already carries `*.rs`, so a ported gate's Rust module is inside its trigger set with no widening. |
+| `check-spec-embedded-source` | **Survives unchanged — reverse trigger of the same shape.** Its `couples=` extension list (`*.rs`, `*.sh`, `*.toml`, …) is the roster of **languages it recognizes inside fenced blocks**, not a reference to gate declarations; its scanned corpus is the canonical specs and amendments. It already carries `*.rs`, so a ported gate's Rust module is inside its trigger set with no widening. **This member is itself `.gate`-dispatched** since §The sixth budget batch, so the row describes a ported member — and the reverse-trigger reading survives its own port, because the extension list is still a language roster and not a declaration reference. What its port *does* move is its own candidate index, which loses a shell declaration and gains a Rust module at every sibling's port; that is a property of the corpus rather than of this table's question (canon-kit/SPEC.md §check-spec-embedded-source). |
 | `check-template-copy-parity`, `check-template-registry-parity` | **Survive unchanged** — their corpus is kit templates and the template registry, not gate declarations; a gate's substrate does not reach either. |
 
 **What *the auditor never depends on the substrate it audits* scopes to, ruled
@@ -3511,10 +3511,12 @@ pruned — every piece of which `native/src/spec.rs` already carried inside
 `manifest_files`' default branch since the canon-kit cohort. The port **lifts it
 out** rather than writing a second copy beside it, so the manifest set and the
 canonical-spec set cannot disagree about which specs exist. The shell form stays,
-because `check-surface-duplication` and `check-spec-embedded-source` still call
-it: this is the *unless* clause's live-consumer disposition, the same one
-queue-kit's `lib/queue.sh` takes, and not the emptied-primitive disposition the
-seventh cohort earned.
+because `check-surface-duplication` still calls it: this is the *unless* clause's
+live-consumer disposition, the same one queue-kit's `lib/queue.sh` takes, and not
+the emptied-primitive disposition the seventh cohort earned. **The caller set was
+two when this was written and is one since §The sixth budget batch**, which ported
+the other; the disposition is unchanged because it turns on whether the set is
+empty, and one live caller is not empty.
 
 **The edge-root arm disagreed, and the compiled side read the rule correctly.**
 Parity ran over both fixture pairs, the live tree at four scan-root spellings and
@@ -3562,10 +3564,17 @@ a flake.
 cohort's identical verdict is that no class empties.** On an uncovered platform an
 adopter loses the Definition-of-Done singleton and the derivable-section density
 budget, declared in its own `gates.list` rather than arriving as a broken battery.
-The canonical-spec corpus still carries a **shell** auditor there,
-`check-spec-embedded-source`, so what an uncovered host loses is two structural
-assertions over a corpus that remains guarded — not the whole surface the comment
-cohort's ten took with them. The two rivals are refused with cause and the first
+When this was written the canonical-spec corpus still carried a **shell** auditor
+there, `check-spec-embedded-source`, so what an uncovered host lost was two
+structural assertions over a corpus that remained guarded. **§The sixth budget
+batch ported that auditor, and the sentence is corrected here rather than left
+standing as a false claim** — nothing gates it, so it would have outlived its
+subject silently. What now survives that corpus on a binary-less host is one gate
+no `init` seeds and that sits in no generated hook, so the corpus is **unguarded
+at install**: a class emptied, which is the aggregate cost criterion 5 forbids
+landing unpriced. That batch's own section carries the measurement and re-rules
+the judgment against its own subtraction rather than inheriting this one, because
+the subtraction is larger than any the prior cuts made. The two rivals are refused with cause and the first
 is refused harder here than usual: restoring the class shell-side would reinstate
 a second `spec_canonical_specs` implementation, which is the exact duplication
 this cohort's criterion-6 discharge exists by removing, and enforcement-first

@@ -1,0 +1,13 @@
+syntax = "proto3";
+package widget.v1;
+
+message WidgetHeader {
+  string id = 1;
+  string kind = 2;
+  int32 count = 3;
+  bool enabled = 4;
+  string note = 5;
+  repeated string tags = 6;
+  int64 created_unix = 7;
+  string owner = 8;
+}
