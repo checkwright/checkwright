@@ -298,11 +298,13 @@ to ask twice — the two paths sound like a disclosure change and are not one.
 this repo declares under `scripts/` become subcommands of the existing
 multi-call binary rather than a second consumer-owned crate or a sanctioned
 shell block, so no part of the remaining corpus is now without a destination.
-The ruling's grounds, the cost it accepts — an adopter's binary carries
+The ruling's grounds and the cost it accepts — an adopter's binary carries
 subcommands implementing another project's repo rules, which they can never
-register — and the tranche that discharges it are the queue entry's:
-`consumer-gate-port-disposition`. Recorded here because it binds every remaining
-cohort's ordering and the entry that owns it eventually leaves the queue.
+register — were the queue entry's, and that entry has since been **discharged
+and retired**: gate-sdk/SPEC.md §The consumer remainder cohort records the last
+tranche, after which `scripts/` keeps no gate script at all. Recorded here
+because it binds every remaining cohort's ordering and the entry that owned it
+was always going to leave the queue.
 
 What the sequence names next, after the port: `companion-toolkit-profile`.
 
