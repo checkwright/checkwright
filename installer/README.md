@@ -207,6 +207,18 @@ that rewrote something normally stages it and never reaches that branch at all.
 The arm is there so the promise holds when it does. Under `--no-commit` the arm
 is off, because the commit is yours.
 
+**Two shapes this is deliberately not, and one ordering it must not take.** It is
+not a freshness comparison that skips regenerating a projection whose inputs have
+not moved: `init` does not compare freshness, and the projections are the vendored
+tools' own output rather than something `init` holds an input for. It is not a
+change of owner either — the projections stay `init`'s `files` entries rather than
+becoming yours to regenerate, because the ownership rule in §The manifest is what
+protects your edits to everything else `init` writes. And the commit on that branch
+sits **inside** the exit rather than ahead of it: a commit against an empty index
+exits non-zero and `init` treats a failed commit as a fatal install error, so an arm
+placed before the "nothing to change" test would turn the pure idempotent path into
+a false hard failure.
+
 A payload older than the recorded install is refused as a
 silent downgrade — `--force` covers that refusal too, which is what makes a
 rollback a thing you asked for rather than a thing that happened to you.
@@ -831,6 +843,17 @@ the roster grow without bound from it: the existence test is already the reaper,
 so `files` is bounded by the files `init` created that still exist, which is the
 ownership set itself. What `init` never does is delete, so a path no release
 ships any more stays on disk and stays yours to remove.
+
+**"Nothing visited it on the run" is a claim about the whole run, so the
+carry-forward is the last pass `init` makes before it stages.** Every path `init`
+writes has to be on the written set by the time that pass runs, or it carries a
+path `init` rewrote seconds earlier at a hash the run has already superseded — and
+a carried path is not staged, so the file is left dirty *and* the roster records a
+hash the run itself has replaced. Both halves reach past the worktree: `uninstall`
+and `diff` read that hash to decide whether a path is still `init`'s, so a
+superseded one reads to them as your edit. The generated projections are the ones
+that can reach the pass from the wrong side, which is why `init` produces them
+before it rather than after.
 
 The hash carried forward is the one `init` wrote, not the one this payload would
 have written. Either would protect the file, so protection does not decide it —

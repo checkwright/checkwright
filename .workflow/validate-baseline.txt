@@ -90,7 +90,7 @@ usage_tests usage_tests pass
 budget_guard_tests budget_guard_tests pass
 trend_tests trend_tests pass
 demo demo pass
-installer_smoke installer_smoke fail installer-init-noop-regen-conflict
+installer_smoke installer_smoke pass
 consumer_smoke consumer_smoke pass
 upgrade upgrade pass
 agents_md_smoke agents_md_smoke pass
