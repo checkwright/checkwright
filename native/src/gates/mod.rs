@@ -55,6 +55,7 @@ pub mod memory_off;
 pub mod merge_attrs;
 pub mod payload_claim;
 pub mod prose_enum;
+pub mod prose_tells;
 pub mod queue_entry_budget;
 pub mod queue_hygiene;
 pub mod queue_prose_precondition;
@@ -427,6 +428,25 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_SCAN_KIT_ROOTS",
             "CANON_KIT_MANIFEST_FILES",
             "CANON_KIT_PROSE_SURFACE_GLOBS",
+        ],
+        "canon-kit",
+    ),
+    // spec: canon-kit/SPEC.md §check-prose-tells — `?` because the scan root is the member's own
+    // first argument with a default; the consumer-extended vocabularies cross as the *merged*
+    // arrays their kit library unions before the bridge reads them, never as the extension names
+    (
+        "check-prose-tells",
+        prose_tells::run,
+        &[("?", "")],
+        &[
+            "CANON_KIT_PROSE_TELL_GLOBS",
+            "CANON_KIT_PROSE_TELL_PHRASES",
+            "CANON_KIT_PROSE_TELL_ABBR_ALLOW",
+            "CANON_KIT_PROSE_TELL_EMDASH_MAX",
+            "CANON_KIT_PROSE_TELL_CONTRAST_MAX",
+            "CANON_KIT_PROSE_TELL_RHYTHM_MIN_SENTENCES",
+            "CANON_KIT_PROSE_TELL_RHYTHM_CV_MIN",
+            "CANON_KIT_PROSE_TELL_TRICOLON_MAX",
         ],
         "canon-kit",
     ),

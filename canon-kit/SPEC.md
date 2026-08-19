@@ -2039,6 +2039,23 @@ Exact detection regexes are implementation, owned by the gate source; the
 (`bad/` trips every assertion, `good/` passes all and demonstrates the valve).
 Thresholds are the `CANON_KIT_PROSE_TELL_*` knobs (§Layout and configuration).
 
+**Ported to the binary substrate at §The sixth budget batch** (gate-sdk/SPEC.md).
+Two properties of the port are stated here because neither is visible from the
+assertion list. The corpus is walked **once per file**, not once per surface set:
+assertion D is an in-file assertion, so a shared walk would pool every surface's
+tokens into one buffer and an abbreviation expanded in any file would clear it in
+all of them. And the thresholds are **coerced, not validated** — the port
+reproduces that rather than hardening it, because a refusal the shell form never
+made is a verdict change across the seam. A malformed threshold therefore reads
+as zero on both substrates, which makes the gate fire on everything or never; the
+repair belongs in the library, where one computation would serve both, and is
+filed as its own unit rather than taken here.
+
+Criterion 4 **clears** on this member and the verdict is a property of a
+consumer's config rather than of the gate: its corpus is a pure glob expansion of
+the configured prose-surface set, which reaches no gate declaration path in this
+tree. A consumer whose prose globs named descriptors would flip it.
+
 **Valve** — an HTML comment `<!-- prose-tell-exempt: <reason> -->` on the
 flagged line or directly above it suppresses the tell at that site; it rides the
 shared exempt-window (§lib/spec.sh — the line or the one above), and the reason
