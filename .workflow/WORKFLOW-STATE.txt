@@ -11,3 +11,4 @@ takeable-tier-batch-and-installer-noop build a57bc474 2026-08-19
 takeable-tier-batch-and-installer-noop build a7a00fc1 2026-08-19
 takeable-tier-batch-and-installer-noop build a68c5291 2026-08-19
 takeable-tier-batch-and-installer-noop validate a179b43d 2026-08-19
+takeable-tier-batch-and-installer-noop close afae1a16 2026-08-19
