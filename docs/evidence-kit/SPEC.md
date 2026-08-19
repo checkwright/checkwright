@@ -635,8 +635,11 @@ against the candidate temp state file (the prospective stamp appended) and the
 live queue, appending that `<queue> <state>` argv to whatever the entry names, and
 a non-zero exit refuses the entry with nothing written.
 
-`check-evidence-manifest` is wired at `close=`, its command naming the manifest
-(`close=…/check-evidence-manifest.sh <manifest>`),
+`check-evidence-manifest` is wired at `close=`, its command naming the *gate*
+rather than a path and the manifest after it
+(`close=<name-resolving front end> check-evidence-manifest <manifest>`;
+§check-evidence-manifest owns the front end and the trap a literal
+`…/check-evidence-manifest.sh` entry falls into once the gate is ported),
 so assertion (A)'s close-entry green-block check fires *before* the
 stamp is written — the missing evidence becomes a refusal at the entry (pointing
 at run-validate) instead of a self-referential deadlock at pre-commit, where the
@@ -648,7 +651,9 @@ commit to entry.
 
 `check-producer-liveness` is wired at **every** stage key in set mode, each
 entry pointed at the consumer's scratch **directory**
-(`<stage>=…/check-producer-liveness.sh <scratch-dir>`). `close=` is the case the
+(`<stage>=<front end> check-producer-liveness <scratch-dir>`, the same
+name-resolving form — this member is still shell, so a literal path would work
+today and would break at its port). `close=` is the case the
 gate was filed for — a lead dispatching close into a still-running producer —
 and `validate=` was the second, a second validate batch entering while a first
 batch's `run-validate` is live. **Both were chosen when the subject was one

@@ -297,9 +297,10 @@
   regenerates them again and takes the idempotent early exit ("nothing to change"), leaving all
   three dirty with no commit at all -- contradicting installer/README.md's stated "makes one
   commit" contract. On an artifact-free payload hop over the lattice minimum, init reports
-  'vendored ... and committed them' while leaving those three paths dirty. VACUOUS UNTIL THIS
-  BATCH, not a fresh regression: the lattice minimum (gate-sdk alone) carried zero zero-config
-  `.gate` members before this iteration ported check-commit-msg and check-gate-fail-closed, so
+  'vendored ... and committed them' while leaving those three paths dirty. VACUOUS UNTIL
+  `wide-budget-batch-and-hold-declaration`, not a fresh regression: the lattice minimum (gate-sdk
+  alone) carried zero zero-config `.gate` members until it ported check-commit-msg and
+  check-gate-fail-closed, so
   the artifact-free hop previously rewrote nothing and the clean-worktree assertion passed for
   reasons unrelated to correctness. ONE REPAIR WAS ATTEMPTED AND FALSIFIED against the real hop,
   checkable at `89876f5d` (landed) / `e0bc8a36` (reverted): moving the generated-projection
@@ -315,7 +316,7 @@
   the ownership model. THE VACUITY TRIPWIRE IS OWED WITH THE FIX, ruled 2026-08-18: with the fix
   absent the arm fails either way, so the tripwire alone would only change the failure message
   while leaving the coverage class open. Its shape is settled -- the out-of-scope-count pattern
-  this iteration used for `gate_authoring_tree` at `check-gate-exemption-tasks`: assert the
+  that same iteration used for `gate_authoring_tree` at `check-gate-exemption-tasks`: assert the
   artifact-free hop omitted a NON-ZERO number of members before asserting the worktree is clean,
   naming the re-scope remedy rather than offering the assertion as droppable; it was drafted and
   reverted with the fix above, so do not re-invent it.
