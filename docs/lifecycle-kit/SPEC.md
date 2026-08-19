@@ -1582,7 +1582,12 @@ the compliant one). `LIFECYCLE_KIT_ENTRY_PREFLIGHT` is a generic per-stage hook
 — no consumer surface is named in the kit; a downstream kit whose gate is the
 real precondition for a stage wires itself here (as evidence-kit's manifest gate
 does for close entry), turning a would-be pre-commit deadlock into a loud
-refusal at the entry. **`--simulate <stage>` — the read-only preflight mode:**
+refusal at the entry. **Each entry's `<command>` is split on whitespace and
+exec'd as argv with no interpreter word prepended**, so the configured path rides
+its own exec bit: a consumer wiring a gate here configures the gate's *invocation*
+and not its declaration file, and a configured path that stops being executable —
+a member ported to a binary substrate leaving a data-file descriptor behind — is
+a stage-entry breakage rather than a stale reference. **`--simulate <stage>` — the read-only preflight mode:**
 it runs everything a real entry runs up to the write — config load and stage
 validation, header parse, session-id derivation, the idempotence probe (a
 would-be no-op is reported as such and exits 0), the candidate-stamp temp

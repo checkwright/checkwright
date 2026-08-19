@@ -212,10 +212,18 @@ binary's baked source stamp against the crate's tracked source whenever a `.gate
 descriptor makes it load-bearing. Recorded because the derivation-first reflex
 reads "generated artifact" and reaches for this roster; the answer is that the
 roster's admission rule is narrower than that reflex, and the obligation has a
-home. **It carries a staging-order hazard, and it is the only row here that
-does** — the stamp is computed over *tracked* crate source, so a unit adding a
-crate file builds after `git add`, never before, or the binary is stamped
-against a source set the gate does not hash. The rule and its mechanism are the
-owner's (gate-sdk/SPEC.md §check-gate-binary-fresh); it is restated here because
-the reflex is to assume every generated surface shares the hazard, and none of
-the others do — each of them reads the worktree.
+home. **It carries a staging-order hazard** — the stamp is computed over *tracked*
+crate source, so a unit adding a crate file builds after `git add`, never before,
+or the binary is stamped against a source set the gate does not hash. The rule
+and its mechanism are the owner's (gate-sdk/SPEC.md §check-gate-binary-fresh); it
+is restated here because the reflex is to read the hazard off the artifact's own
+freshness rule, which is not where it lives.
+
+**The generated pre-commit hook carries one too, by a different route, and the
+two are the whole set.** The hook bakes each gate's resolved argv, and
+`check-prose-enum`'s enum-set emitter derives its `*-gate-test` members with `git
+ls-files` — tracked, not the worktree. So a unit adding a `gate-tests/*.test.sh`
+sibling sees a green whole-tree battery while the file is untracked, and the hook
+reds at commit time as a `check-graph` artifact staleness the moment `git add`
+admits it. Same discipline as the row above: stage first, regenerate second.
+Every other row here reads the worktree and is order-free.
