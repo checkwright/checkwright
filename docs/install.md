@@ -271,7 +271,12 @@ covers each kit's config seam and the commit-message patterns — the files you 
 most expected to edit — as well as the vendored kit source. Nor does the
 protection expire: `init` owns a path because it wrote the file there, so the
 path keeps its recorded hash until the file leaves your tree, across later
-upgrades and across a release that stops shipping it. `--dry-run` prints the file
+upgrades and across a release that stops shipping it. Idempotent is a claim about
+the tree, not about the commit: `init` regenerates the projections its vendored
+tools own on every run, so a re-run that reports nothing to change still commits
+anything it rewrote and had not already committed. **One commit** is a promise
+about what a run leaves behind, and the run never leaves its own work uncommitted
+for you to find. `--dry-run` prints the file
 plan and the manifest and writes nothing.
 
 `checkwright.lock` is the install-ownership record — what was installed, from

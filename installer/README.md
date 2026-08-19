@@ -160,9 +160,14 @@ a single file is written:
   actually true.
 - **The worktree is clean.** `init` makes one commit, and a dirty tree would
   fold your work into it, leaving a reviewer's diff wider than what was
-  actually vendored. `--no-commit` is the valve: it writes and stages the
+  actually vendored. It is also what makes a run's own residue attributable:
+  anything dirty at a path `init` recorded, when the run ends, was written by
+  that run and by nothing else — which is what lets a run that changed nothing
+  still commit what it rewrote rather than guess whose the change was.
+  `--no-commit` is the valve: it writes and stages the
   files and leaves the commit to you, so an operator who wants to compose the
-  change themselves has taken that guarantee on deliberately.
+  change themselves has taken that guarantee on deliberately — and because it
+  waives the precondition, it waives that attribution with it.
 - **`doctor` passes.** The contract it holds you to is the consumer-audience
   subset of the roster — the tools the vendored battery runs, never a tool that
   only builds Checkwright (§doctor) — so a machine with no Rust toolchain is
@@ -190,7 +195,19 @@ meets the same protection rather than a clean slate — which is the one window 
 which an unowned path could otherwise be written straight over your edits. A
 re-run that finds
 nothing to change says so and exits clean; an unchanged tree is the success
-case, not an error. A payload older than the recorded install is refused as a
+case, not an error.
+
+**"Nothing to change" does not mean "nothing was committed".** `init` regenerates
+the projections its vendored tools own on every run, so a run it classifies as a
+no-op has still rewritten files — and **one commit** is a promise about what the
+run leaves behind, not about which branch it took to get there. So the no-op exit
+commits anything it rewrote that is not already committed, under the same message
+the ordinary vendoring commit uses, and says so. Expect it to find nothing: a run
+that rewrote something normally stages it and never reaches that branch at all.
+The arm is there so the promise holds when it does. Under `--no-commit` the arm
+is off, because the commit is yours.
+
+A payload older than the recorded install is refused as a
 silent downgrade — `--force` covers that refusal too, which is what makes a
 rollback a thing you asked for rather than a thing that happened to you.
 `--force` means the same thing in all three places it appears — the changed-file
@@ -601,7 +618,12 @@ anything is removed, because a partial removal is the outcome none of them may
 produce: inside a git work tree; a manifest present with a schema this build
 knows, else a refusal naming `init`; and a clean worktree, for `init`'s own
 reason — one commit is made, and a dirty tree would fold your work into it.
-`--no-commit` is the same valve on the same terms.
+`--no-commit` is the same valve on the same terms. The parallel with `init`
+stops one clause short, and the divergence is deliberate rather than an
+oversight to be tidied: `init` regenerates on every run, so it needs an arm that
+commits what a no-op rewrote (§init), while `uninstall` only ever removes — a
+removal it declines to make writes nothing, so there is no residue for such an
+arm to find.
 
 **The removal rule is the ownership contract seen from the other side.** For
 each `files` entry: hash the file, remove it while the hash still matches what
@@ -1170,6 +1192,23 @@ the defect is reproduced end to end rather than argued about. Each version is
 derived from the one packed before it and the arm refuses to run unless the
 derivation is strictly higher, so neither hop can quietly turn into a second test
 of the downgrade refusal.
+
+**The first hop's clean-worktree assertion carries a tripwire**, for the same
+reason the binary-less leg's disclosure count does: the assertion is evidence
+only over a hop that rewrote something. This arm's payload is artifact-free over
+the lattice minimum, and for as long as that kit set dispatched no member to the
+binary, `init` seeded no omission, the hop rewrote nothing beyond the manifest,
+and the assertion passed for a reason unrelated to correctness — which is how a
+defect leaving that very worktree dirty reached the tree under a green
+assertion. So the hop asserts a **non-zero** count of omission-declaring lines in
+the consumer's own registry *before* asserting the worktree is clean, reading the
+registry rather than the run's output because the registry is what a later run
+and a reviewer both read, and treating an absent registry as a count of zero
+rather than as a reason to abort. Its failure names the remedy — **re-scope the
+arm onto a profile whose kit set ships a member `init` seeds and dispatches to
+the binary, never drop the assertion.** Its scope is the first hop; the second
+hop's clean-worktree assertion carries no tripwire, and widening it is a separate
+judgment.
 
 **The seam arm** covers the two surfaces `init` rewrites on every run — a
 `templates/*-config.sh` destination and gate-sdk's `msg-patterns.list` — which no
