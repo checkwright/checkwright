@@ -64,6 +64,7 @@ pub mod queue_sections;
 pub mod queue_slug_liveness;
 pub mod queue_wrap;
 pub mod readme_roster;
+pub mod reads_couples;
 pub mod release_bump;
 pub mod roadmap_fresh;
 pub mod root_tiering;
@@ -433,6 +434,22 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_PROSE_SURFACE_GLOBS",
         ],
         "canon-kit",
+    ),
+    // spec: gate-sdk/SPEC.md §check-reads-couples — an empty read-root set: this member reads
+    // named files and one directory listing per resolve dir, and every corpus it covers comes out
+    // of `git ls-files` rather than a walk. The sentinel is what carries the filter-knob union.
+    (
+        "check-reads-couples",
+        reads_couples::run,
+        &[],
+        &[
+            "GATE_SDK_GATES_DIR",
+            "GATE_KIT_ROOTS_HERE",
+            "GATE_KIT_ROOTS_REL",
+            "GATE_PRUNE_DIRS",
+            EVERY_FILTER_KNOB,
+        ],
+        "gate-sdk",
     ),
     // spec: gate-sdk/SPEC.md §check-reads-couples — an empty read-root set: the pairing is one
     // pathname expansion over the root plus a named-file probe per pair, and neither descends
@@ -1351,7 +1368,45 @@ pub fn roots(name: &str) -> Option<&'static [(&'static str, &'static str)]> {
         .map(|(_, _, r, _, _)| *r)
 }
 
+// spec: gate-sdk/SPEC.md §check-reads-couples — the union sentinel a member declares when the
+// knob names it must resolve are not known until run time; it expands to every filter-knob name
+// the registry carries
+pub const EVERY_FILTER_KNOB: &str = "@every-filter-knob";
+
+// spec: gate-sdk/SPEC.md §check-reads-couples — the expansion is a crate-internal carrier: the
+// arm's own output stays one knob name per line, and no `.gate` descriptor field moves.
+fn expanded_knobs() -> &'static [(&'static str, Vec<&'static str>)] {
+    static EXPANDED: std::sync::OnceLock<Vec<(&'static str, Vec<&'static str>)>> =
+        std::sync::OnceLock::new();
+    EXPANDED.get_or_init(|| {
+        let mut filters: Vec<&'static str> = REGISTRY
+            .iter()
+            .flat_map(|(_, _, roots, _, _)| roots.iter().map(|(_, k)| *k))
+            .filter(|k| !k.is_empty())
+            .collect();
+        filters.sort();
+        filters.dedup();
+        REGISTRY
+            .iter()
+            .filter(|(_, _, _, k, _)| k.contains(&EVERY_FILTER_KNOB))
+            .map(|(n, _, _, k, _)| {
+                let mut out: Vec<&'static str> =
+                    k.iter().copied().filter(|x| *x != EVERY_FILTER_KNOB).collect();
+                for f in &filters {
+                    if !out.contains(f) {
+                        out.push(f);
+                    }
+                }
+                (*n, out)
+            })
+            .collect()
+    })
+}
+
 pub fn knobs(name: &str) -> Option<&'static [&'static str]> {
+    if let Some((_, v)) = expanded_knobs().iter().find(|(n, _)| *n == name) {
+        return Some(v.as_slice());
+    }
     REGISTRY
         .iter()
         .find(|(n, _, _, _, _)| *n == name)
@@ -1495,13 +1550,17 @@ mod tests {
         walk::bridge_declared_knobs(&env);
         let mut cases_run = 0usize;
         let mut roots_observed = 0usize;
-        for (name, f, declared, knobs, _) in REGISTRY {
+        for (name, f, declared, _, _) in REGISTRY {
+            // spec: gate-sdk/SPEC.md §check-reads-couples — resolved through `knobs`, not off the
+            // tuple, so a member declaring the union sentinel is bridged the expansion the
+            // dispatcher would bridge rather than the sentinel itself
+            let member_knobs = knobs(name).unwrap_or(&[]);
             for case in walk::fixture_case_dirs(name) {
                 let args = case_args(&case);
                 // spec: gate-sdk/SPEC.md §run-gate-tests — the member's knobs are bridged from
                 // the case dir before it runs, or a bridged member exits 2 on an unresolved
                 // knob and this test asserts over a run that never reached its rule
-                walk::bridge_case_knobs(&env, &case, name, knobs);
+                walk::bridge_case_knobs(&env, &case, name, member_knobs);
                 let prev = std::env::current_dir().expect("cannot read cwd");
                 // spec: gate-sdk/SPEC.md §check-reads-couples — the case is entered exactly
                 // as run-gate-tests.sh enters it, so an observed root is the same string the
