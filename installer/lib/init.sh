@@ -161,9 +161,12 @@ prior_hash() {   # $1 = repo-relative path -> the hash the manifest recorded for
 
 WRITTEN=()
 declare -A CARRIED=()
+# spec: installer/README.md §The manifest — membership in the written set is held as a key rather than re-derived by piping the list into a quiet grep: that grep exits on its first match while the writer is still writing, the writer takes SIGPIPE, and under the pipefail this file sets the pipeline's status becomes the signal instead of the match. The test then reads as "absent" for a path init wrote seconds earlier, which carries it forward at its prior hash and drops it from the staged set — and because a carried path is appended to the list, every later lookup starts further from the tail. The array is written where paths are recorded so the two cannot part company
+declare -A IS_WRITTEN=()
 # spec: installer/README.md §The manifest — a recorded hash is what init last wrote at that path, so an entry init did not write this run — because it refused the write, or because this payload no longer ships the path — carries its hash forward verbatim instead of letting manifest() hash the tree at emit time: hashing the tree there would file the adopter's own content as init's, and the next run would find cur == want, claim the path and overwrite it silently
 record() {   # $1 = repo-relative path, $2 = the hash to emit for it; omitted, the tree is hashed at emit time
     WRITTEN+=("$1")
+    IS_WRITTEN["$1"]=1
     [[ -n "${2:-}" ]] && CARRIED["$1"]="$2"
     return 0
 }
@@ -300,7 +303,7 @@ if [[ -n "$ARTIFACT_TARGET" ]]; then
             } > "$ROOT/$SEAM.tmp" \
                 && mv "$ROOT/$SEAM.tmp" "$ROOT/$SEAM" || die "could not write $SEAM"
         fi
-        printf '%s\n' "${WRITTEN[@]}" | grep -qxF "$SEAM" || record "$SEAM"
+        [[ -n "${IS_WRITTEN[$SEAM]:-}" ]] || record "$SEAM"
     fi
 fi
 
@@ -308,7 +311,7 @@ fi
 if [[ -n "$PRIOR_FILES" ]]; then
     while IFS=$'\t' read -r p h; do
         [[ -n "$p" ]] || continue
-        printf '%s\n' "${WRITTEN[@]}" | grep -qxF "$p" && continue
+        [[ -n "${IS_WRITTEN[$p]:-}" ]] && continue
         [[ -f "$ROOT/$p" ]] || continue
         record "$p" "$h"
     done <<<"$PRIOR_FILES"
@@ -385,9 +388,22 @@ fi
 
 git -C "$ROOT" add -- "${STAGE[@]}" || die "could not stage the vendored files"
 
-# spec: installer/README.md §init — idempotence is a property of the tree, so a re-run that changed nothing reports and exits clean rather than failing on an empty commit: "nothing to do" is the success case, not an error
+# spec: installer/README.md §init — idempotence is a property of the tree, so a re-run that changed nothing reports and exits clean rather than failing on an empty commit: "nothing to do" is the success case, not an error. The predicate reads the index rather than the worktree and it stays the guard on whether a commit is attempted, because a commit against an empty index exits non-zero and init treats a failed commit as a fatal install failure — an arm placed ahead of this branch would turn the pure idempotent path into a false hard error
 if git -C "$ROOT" diff --cached --quiet; then
-    printf 'INIT: already at the %s profile (v%s) — %d file(s) checked, nothing to change.\n' \
+    # spec: installer/README.md §init — a run init considers a no-op still commits what it rewrote, so this branch asks what the predicate above cannot: whether anything on the roster init just recorded differs from the committed tree. The clean-worktree precondition is what makes the answer attributable — nothing dirty at those paths can be the adopter's — and --no-commit is exempt because it waives that precondition and hands the commit over. The expected answer is "nothing", at the cost of one status call; the arm is here so the one-commit contract survives the staged set failing to cover what init wrote rather than resting on the assumption that it never will, and the inner index check is what keeps that survival from becoming the empty commit the paragraph above rules out
+    if (( DO_COMMIT )) && [[ -n "$(git -C "$ROOT" status --porcelain -- "${WRITTEN[@]}")" ]]; then
+        git -C "$ROOT" add -- "${WRITTEN[@]}" \
+            || die "could not stage the files init rewrote but left out of the vendoring commit"
+        if ! git -C "$ROOT" diff --cached --quiet; then
+            residue="$(git -C "$ROOT" diff --cached --name-only | grep -c .)"
+            git -C "$ROOT" commit -q -m "chore: vendor Checkwright kits ($PROFILE profile, v$VERSION)" \
+                || die "the commit failed — the files are staged; commit them yourself to finish the install" "" 1
+            printf 'INIT: already at the %s profile (v%s) — %d file(s) checked; %d that init had rewritten were uncommitted and are now committed.\n' \
+                "$PROFILE" "$VERSION" "${#WRITTEN[@]}" "$residue"
+            exit 0
+        fi
+    fi
+    printf 'INIT: already at the %s profile (v%s) — %d file(s) checked, nothing to change and nothing it rewrote left uncommitted.\n' \
         "$PROFILE" "$VERSION" "${#WRITTEN[@]}"
     exit 0
 fi
