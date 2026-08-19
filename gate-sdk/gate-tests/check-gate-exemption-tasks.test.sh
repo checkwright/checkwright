@@ -9,7 +9,6 @@ set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../lib/test-hermetic.sh"
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # gate-sdk/
-GATE="$DIR/checks/check-gate-exemption-tasks.sh"
 
 fails=0
 sb="$(mktemp -d)"
@@ -37,7 +36,7 @@ EXEMPT=(
 )
 EOF
 
-run() { ( cd "$sb" && "$GATE" TASK-QUEUE.md scripts kitroot/checks 2>&1 ); }
+run() { ( cd "$sb" && gate_run check-gate-exemption-tasks "$DIR/checks" TASK-QUEUE.md scripts kitroot/checks 2>&1 ); }
 
 # --- adopter reading: no crate source, so the kit-shipped declaration is out of scope ---
 out="$(run)"; rc=$?

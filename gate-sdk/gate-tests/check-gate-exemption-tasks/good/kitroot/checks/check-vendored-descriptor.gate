@@ -1,0 +1,4 @@
+# graph: couples=docs/*.md dir=one valve=none tier=precommit
+# install: zero-config
+# port-until: a-third-slug-only-the-kit-authors-queue-carries
+# spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — a KIT-SHIPPED descriptor, so the out-of-scope set's `*.gate` half is counted rather than asserted; without it the skip count could not tell a descriptor from a script

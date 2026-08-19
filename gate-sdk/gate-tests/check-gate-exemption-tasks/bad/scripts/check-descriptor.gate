@@ -1,0 +1,4 @@
+# graph: couples=docs/*.md dir=one valve=none tier=precommit
+# install: zero-config
+# port-until: retired-task
+# spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — a descriptor-declared member whose held-port slug resolves only to Done; a `*.gate` arm that fell out of the in-scope glob would pass this silently

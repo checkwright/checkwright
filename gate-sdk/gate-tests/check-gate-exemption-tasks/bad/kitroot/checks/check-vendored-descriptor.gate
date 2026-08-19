@@ -1,0 +1,4 @@
+# graph: couples=docs/*.md dir=one valve=none tier=precommit
+# install: zero-config
+# port-until: a-third-slug-only-the-kit-authors-queue-carries
+# spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — a KIT-SHIPPED descriptor carrying an unresolvable slug, which must stay out of scope even in the case where the tree's own descriptors are rejected

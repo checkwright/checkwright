@@ -1,0 +1,3 @@
+# graph: couples=scripts/*.sh,kit:*.sh,TASK-QUEUE.md dir=one valve=none tier=precommit
+# install: zero-config
+# spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — every temporary-disposition annotation a gate declaration carries names a live task: an exception-list element's until:, or the declaration's own port-until: header field

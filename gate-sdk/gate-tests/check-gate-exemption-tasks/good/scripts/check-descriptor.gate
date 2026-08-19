@@ -1,0 +1,4 @@
+# graph: couples=docs/*.md dir=one valve=none tier=precommit
+# install: zero-config
+# port-until: fix-sample-surface
+# spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — a descriptor-declared member of the tree's own gates dir whose held-port field resolves, so the in-scope `*.gate` half of the glob is exercised by a case instead of only by the live tree

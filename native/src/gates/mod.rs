@@ -12,6 +12,7 @@ pub mod commit_subject;
 pub mod doctrine_registration;
 pub mod deprecation_task;
 pub mod docs_cmd;
+pub mod gate_exemption_tasks;
 pub mod gate_fail_closed;
 pub mod gate_binary_fresh;
 pub mod gate_fixture_coverage;
@@ -430,6 +431,21 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_PROSE_SURFACE_GLOBS",
         ],
         "canon-kit",
+    ),
+    // spec: gate-sdk/SPEC.md §check-reads-couples — an empty read-root set: the member resolves
+    // its corpus by one-level pathname expansion over each listed directory and descends into
+    // none, so there is no walk root for the recorder to observe
+    (
+        "check-gate-exemption-tasks",
+        gate_exemption_tasks::run,
+        &[],
+        &[
+            "GATE_SDK_QUEUE_FILE",
+            "GATE_SDK_GATES_DIR",
+            "GATE_KIT_ROOTS_HERE",
+            "GATE_SDK_NATIVE_CRATE",
+        ],
+        "gate-sdk",
     ),
     // spec: canon-kit/SPEC.md §check-prose-tells — `?` because the scan root is the member's own
     // first argument with a default; the consumer-extended vocabularies cross as the *merged*

@@ -952,7 +952,7 @@ answering a question assertion C never asked.
 | `check-gate-fail-closed` | **Retired with cause, and the cause is narrower than it first read.** For a member that reads files, the defect (branching on a captured value's emptiness when the subprocess died) is unrepresentable: there is no subprocess, and a fallible read returns a `Result` that cannot be ignored. A real substrate win, stated as one. **It is representable for a member that spawns one**, and the queue-kit cohort landed the first: `Command::output()` returning `Ok` means the *spawn* succeeded, never that the program did, so reading `stdout` while ignoring `status` reproduces the defect exactly. The disposition is unchanged — this gate's corpus is `check-*.sh` and it could not scan a Rust module either way — and the property is held crate-side rather than by review: the spawn wrapper and its unit tests (§Fail-closed contract) leave a gate module unable to construct a `Command` at all, and unable to reach stdout without the status having been read. Machine-held rather than remembered, which is the same answer the `check-reads-couples` row below gives to the same problem, and what keeps this retirement honest. |
 | `check-reads-couples` | **Retained, with a binary-side equivalent.** Its shell parser finds no walks in a binary gate and would print `clean` — the single worst vacuity available here — so the substrate answers instead of the parser: the binary carries a `--reads <name>` arm printing one line per walk root, a repo-relative path or `?`, and the gate consumes that report into its existing coverage assertion (§check-reads-couples). The declaration is **registry data held to executed behavior**, which is what separates it from the unbound self-declaration this gate exists to refuse: each gate's roots are declared beside its dispatch entry in the crate's registry (an entry added without them fails to compile), the crate's single sanctioned walk implementation records the roots it is invoked with, and two unit tests close the loop — **A**, every member run over its own `gate-tests/<name>/{good,bad}/` cases with recording on, observed roots a subset of declared; **B**, no module outside that walk implementation names a filesystem-walk API, because a direct walk would be invisible to the recorder and unverify A. B's vendored half is held by an **allowlist over the resolved graph**: a spelling roster cannot catch a walker inside a dependency, so every crate in the tracked `Cargo.lock` — transitive included, since a transitive crate walks as visibly as a direct one — is admitted by name with the clause of the dependency bar it cleared (§The settings cohort, and the crate's first dependency), and the assertion reds both on an unadmitted crate and on an allowlist entry absent from the graph. Reading only the `[dependencies]` table would admit an entire subtree unexamined, which is why the lock is tracked rather than gitignored. The precedent is the `check-knob-default-coupling` row below: an executed assertion is the answer where a static gate would be vacuous. The refusal survives only where the gate still cannot see — an absent or non-executable binary, and a non-zero `--reads` — and there is deliberately no descriptor-level opt-out, which the consumption path does not reinstate: a port ends this assertion by answering it (§check-reads-couples). |
 | `check-gate-assertions` | **Retained, corpus extended** to the gate's Rust module; the `# assertion` marker matches on its token, independent of the comment leader. |
-| `check-gate-exemption-tasks` | **Retained, corpus extended** the same way. |
+| `check-gate-exemption-tasks` | **Retained, corpus extended** the same way. **This member is itself `.gate`-dispatched** since §The sixth budget batch, so the row describes a ported member reading ported members' declaration paths — and its own port changed nothing in the rule: what it globs is both declaration spellings, which a descriptor still is. |
 | `check-comment-tier` | **Retained, corpus extended** to the implementation module and the `.gate` descriptor, whose own lines are directives by construction. Mechanism: the shared primitive `comment_surface` carries `*.gate` **and `*.rs`** arms — widened once, for every caller (see the `check-spec-pointer` row). The implementation arm is the load-bearing one: locality-class directives stay in the implementation by the reader partition (§The `# graph:` manifest), so without it they would go dark exactly where they still apply. **This member is itself `.gate`-dispatched** since the seventh cohort, so it now audits its own declaration — which is why its trigger names `*.gate` and `*.rs` and why its fixture pair, not the live tree, is what proves those arms. |
 | `check-spec-pointer` | **Retained, and its corpus depends on the same widening** — not "unchanged" in mechanism, only in assertion logic. It calls the *same* shared primitive, `comment_surface` in `native/src/spec.rs` since the seventh cohort ported both it and all four of its callers (canon-kit/SPEC.md §lib/spec.sh); absent that one shared fix a ported gate's `# spec:` line would silently stop being checked in both places it can live — the descriptor and the implementation. With the primitive carrying the `.gate` and `*.rs` arms its own probe logic needs no change. |
 | `check-readme-roster` | **Retained, glob widened** to `*.sh` + `*.gate`. Without it a ported gate silently drops out of its kit README's roster in both directions. **This member is itself `.gate`-dispatched** since §The second budget batch, so the row now describes a ported member reading ported members' declaration paths — the shape the `check-value-rollup-fresh` row already has, and the port changes nothing about the rule: what it scans is a set of basenames across both spellings, which the descriptor still is. |
@@ -7959,6 +7959,32 @@ which is the reason it landed here rather than in
 builds, at a second entry into the walk it already makes. Whether the remaining hand-coupled parsers earn a shared derivation, a
 conformance test, or a gate is a real question and a **different unit**; this
 section neither answers it nor forecloses it.
+
+**Ported to the binary substrate at §The sixth budget batch.** Three things the
+port had to get right are recorded here rather than left to the module. Its
+`[queue-file [dir…]]` positional pair **ports unchanged**, and the dirs positional
+is independent of the scope anchor: it says *what* to read, while
+`gate_authoring_tree` and the gates directory say *whether* what was read is in
+scope, so overriding one never moves the other. The queue-format literals above
+stay literals in the compiled form too — the crate holds a *different* member's
+section reader that takes knobs, and copying that shape here would silently
+acquire the knob this section refuses. And the port adds a **third in-crate holder
+of the lead-line predicate while leaving the count at five**: the shell original
+left with it, and whether the hand-coupled parsers earn a shared derivation is
+still the different unit named above.
+
+**Criterion 4 binds in every configuration, which is a new row for the register.**
+In an authoring tree this member's own declaration is in the scanned set; in a
+vendored consumer it is in the *out-of-scope* set, which is still read to build
+the skip count. There is no configuration that clears it, so the criterion is paid
+by the pair rather than answered by a corpus that misses the member — and the
+pair's `.gate` half was the hole the port closed: both cases now ship a descriptor
+on each side of the scope rule, because a glob arm no case reaches is an arm the
+live tree cannot exercise either.
+
+Its corpus is resolved by **one-level pathname expansion** over each listed
+directory rather than by a recursive walk, so the compiled member declares an
+empty read-root set and `--reads` reports nothing to cover (§check-reads-couples).
 
 Clean-line contract: the line reports the exemption-array count, the
 `# port-until:` header-field count, the **out-of-scope kit-shipped declaration
