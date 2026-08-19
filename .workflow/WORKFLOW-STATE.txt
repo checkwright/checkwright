@@ -4,11 +4,4 @@
 
 ---
 
-budget-batch-and-account-identity-kind scope a8a5c3b9 2026-08-18
-budget-batch-and-account-identity-kind spec a4e7db42 2026-08-19
-budget-batch-and-account-identity-kind align afd04940 2026-08-19
-budget-batch-and-account-identity-kind build a7e66312 2026-08-19
-budget-batch-and-account-identity-kind build af8e5c8e 2026-08-19
-budget-batch-and-account-identity-kind build abadfd21 2026-08-19
-budget-batch-and-account-identity-kind validate a7eee04d 2026-08-19
-budget-batch-and-account-identity-kind close ae5d00c4 2026-08-19
+— scope a69415f3 2026-08-19

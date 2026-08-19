@@ -2,4 +2,3 @@
 # One line per iteration at its release boundary, close-written; the line
 # grammar is lifecycle-kit/SPEC.md §templates/stages/'s, not restated here.
 
-budget-batch-and-account-identity-kind release deferred:v0.24.0 — no trigger fired: newest tag v0.23.0 is 4d14h old against the 7-day floor; no decommission earns a major (the seven deleted shell implementations are ported members, not deprecated surfaces, and no release-sweep decommission ran); no security or supply-chain fix (the gh-account expectation kind is a new opt-in capability, inert without a gh-account line in identity.conf); no operator direction reached this session. The bump stays the minor the four tightened-gate declarations accumulated since v0.23.0 already earned — this iteration appended none — so the outstanding deferral is carried at its existing version rather than raised.
