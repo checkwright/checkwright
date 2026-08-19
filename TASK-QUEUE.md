@@ -428,7 +428,7 @@
   **The SIXTH cut is ruled at six members — operator, 2026-08-19:** the whole takeable tier bar
   `check-graph`, with the fifth cut's drop-any-member relief carried in its envelope, ruled with
   the raised declaration band in hand and against it. This cut's own width, inheriting nothing;
-  taken whole it exhausts the takeable tier, and the survey record holds the read behind it.
+  taken whole it leaves `check-graph` the one takeable member the oracle still counts.
   Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
   direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope. Since then it is
   promoted at spec and demoted at build once per increment, always a **demotion** on the
