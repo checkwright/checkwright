@@ -1233,6 +1233,23 @@ that deleted are `check-identity`'s two arms (§check-identity) and
 at that member's own section. A relayed count read as a target is how a batch
 talks itself into deletions it never verified.
 
+**§The sixth budget batch applied the same test and it bound zero times, over six
+arguments on five members.** Two shapes cover all six and both port unchanged. A
+**scan-root positional** — a root no knob resolves, which the rule composes with
+the bridged globs it is handed — is the shape three members carry
+(`check-prose-tells`, `check-spec-embedded-source`, `check-template-copy-parity`),
+and it joins the worked instances above as an argument that ports. An
+**input-corpus positional** — one that selects what the rule analyses rather than
+redirecting resolved config — is the other two
+(`check-reads-couples`' gate-source paths, `check-gate-exemption-tasks`' scan
+dirs), the shape `check-gate-tamper`'s `--fixture` already establishes. That
+member's queue-file positional falling back to a knob is the shape named by name
+above. Two of the six are documented on a governed surface and both sentences stay
+true, which is the finding rather than an aside: the doc obligation in the
+paragraph below binds only on a deletion, so a cut with no deletion owes no doc
+edit — and the batch that read six arguments as six deletions is the reason that
+is worth saying twice.
+
 **Where a deleted argument was documented, the doc is part of the port.** A port
 that deletes an argument and leaves the sentence standing ships a documented flag
 that does nothing, which is the state this section calls worse than no flag.
@@ -1461,6 +1478,29 @@ design time; the last three were paid for, and each is named with what it cost.
    a third route: not a wrong field and not a wrong walk, but the right walk over
    somebody else's configuration.
 
+   **A member with *no clearing configuration* is the register's last shape, and
+   §The sixth budget batch produced the first.** `check-gate-exemption-tasks`
+   globs both declaration spellings into an in-scope set and an out-of-scope set,
+   and reads both: in an authoring tree its own declaration is in the scanned set,
+   and in a vendored consumer it is in the out-of-scope set, which is still read to
+   build the skip count. There is no configuration in which the criterion clears,
+   so the two paragraphs above about a verdict flipping on a config have a
+   counterpart — a member whose verdict flips on nothing.
+
+   **That batch also produced a *third* couple-clears-walk-binds instance, and the
+   sharpest**: `check-knob-default-coupling`'s `couples=` field is one level deep
+   and does not cover its own declaration path, while the recursive kit-root walk
+   beneath it — which prunes `templates/` and nothing else — opens that path as
+   content on every run. The gap between the field's depth and the walk's is the
+   whole mechanism, and it is why the verdict is read off the walk. The same batch
+   took one verdict **conservatively without ruling the class it belongs to**: a
+   member whose walk content-compares every source file as a *diff reference*
+   rather than as its assertion target takes the binding verdict, because that
+   costs a fixture widening and cannot be wrong in the harmful direction, while
+   clearing wrongly ships the hole this criterion exists to point at. The class
+   stays `spec-embedded-source-criterion-4-membership`'s, and a later reader must
+   not read the disposition as its answer.
+
    **And a member can be *self-immune*, clearing the criterion while the
    ordering constraint still binds.** `check-gate-fixture-coverage` reaches a
    declaration's bytes only for a member with **no** resolvable fixture pair —
@@ -1581,6 +1621,14 @@ design time; the last three were paid for, and each is named with what it cost.
    row this clause was first written against was earned out in `97683db2` and
    reads `pass` today, so the mechanism is live and its founding instance is
    not.
+
+   **The intersection with the measured profile's kit set became a no-op for the
+   first time at §The sixth budget batch**, whose members live entirely inside the
+   kit set that profile carries — so its prediction is an estimate rather than an
+   upper bound, and the prediction and the measurement coincide at **three**. That
+   batch also measured **both** sides, seventeen before and twenty after, rather
+   than measuring one and reasoning the other, which is what makes the growth a
+   subtraction rather than an inference.
 
    **Its honest limit, narrowed rather than deleted.** The *number* is
    machine-derived and its completeness is machine-asserted, so a cohort can no
@@ -3247,6 +3295,109 @@ ran 93 to 140 declaration lines; this one runs 127 to 240. Six members here are
 heavier than seven were there, and the reason is the one that exhausted the band
 downward: the floor rose because the cheap members are gone. Width six buys what
 width seven bought last cut and nothing more.
+
+**Criterion 4 bound on four of six, and two of the four are new rows for the
+register** (§The port-candidate criteria, criterion 4). `check-gate-exemption-tasks`
+binds in **every** configuration — in an authoring tree its declaration is in the
+scanned set and in a vendored consumer it is in the out-of-scope set the skip count
+still reads — which is the register's first member with no clearing configuration.
+`check-knob-default-coupling` is a **third** couple-clears-walk-binds instance and
+the sharpest yet: its trigger field is one level shallower than the walk beneath
+it, so assertion C's derived set structurally cannot report it while the walk binds.
+`check-spec-embedded-source`'s verdict is taken **conservatively without ruling the
+class** its own entry owns, on the ground that a conservative verdict costs a
+fixture widening and cannot be wrong in the harmful direction. The two that clear
+are properties of a gate against a consumer's config rather than of the gate.
+
+**Criterion 5's price, measured on both sides.** The binary-less leg reports
+**twenty** omitted members against the post-batch registry, where the same leg on
+the pre-descriptor rev reports **seventeen** — a growth of **exactly three**, which
+is the prediction rather than a bound: three of the six are `zero-config`, and this
+is the first cut where intersecting them with the measured profile's kit set is a
+**no-op**, the profile carrying every kit the members live in. Both
+numbers were measured, from a clean checkout of each rev, rather than one measured
+and one reasoned.
+
+**The judgment is *accept and declare*, ruled here against this subtraction rather
+than inherited.** What the batch removes is larger than any prior cut's: §The
+canonical-spec `spec_canonical_specs` cohort accepted its own residual **because**
+the canonical-spec corpus still carried a shell auditor, and this batch ports that
+auditor. On a binary-less host the corpus is now unguarded at install — a class
+emptied, which is exactly the aggregate cost this criterion forbids landing
+unpriced. It lands anyway, on the terms that criterion states: the loss is
+*declared* in the consumer's own registry rather than arriving as a broken battery,
+the 2026-08-09 directive ports the whole corpus, and the subtraction shrinks as
+targets are published rather than being repaired by the cut that caused it. That
+cohort's grounding sentence is corrected where it lives, since nothing gates it and
+it would otherwise stand as a false claim.
+
+**Assertion C was re-run fresh after the last descriptor landed and yields no new
+row.** Five of the six members already carried a disposition in §Meta-gate
+conservation for the binary substrate, each written about *other* members being
+`.gate`-dispatched; after this cut every one of those rows describes a ported
+member and each takes the sentence the table already uses for that transition. The
+sixth, `check-prose-tells`, is named nowhere and needs none: its couples reach no
+registry member's declaration path, so the derivation does not select it.
+
+**The bridge precondition is discharged rather than inherited, and what replaced it
+is subtler.** §The fifth budget batch landed a pre-port library unit because four
+knobs its members needed were bridge-blind. Twenty-eight knob names cross here and
+**not one** is bridge-blind, so this cut owes no library unit — recorded so the next
+selector does not read that precondition as a standing cost. The live trap is now
+declaring the wrong *spelling* of a knob that has a default: four names this batch
+touches are defaulted only inline and are subsumed by a resolved sibling the bridge
+already carries, so declaring any of them by name hits the undeclared-knob refusal
+on the member's first post-port run. The verdict is taken at the library and never
+at the use site, because neither direction of the trap is visible from there.
+
+**Ordering bound *within* the batch, which is new.** One member's corpus contains
+another member's declaration as content, so porting the second moves the first's
+clean-line counts. Every later member's comparison was therefore taken against a
+worktree of a named pre-descriptor rev — assertion A forbids both spellings in one
+resolve dir, so a member's shell form vanishes the instant its own port lands and a
+cut executing across several sessions cannot reach "before the first descriptor".
+The verdict each run supports is *no disagreement found on the pre-descriptor
+tree*, never *parity proved*. `check-reads-couples` was ported **last**, on the
+ground that while its shell form existed it was the batch's only cross-substrate
+oracle: the one second implementation available to audit the five siblings' new
+descriptors.
+
+**Fixture pre-work was most of the port, and the class it adds is that an arm
+reachable only through a `.gate` member has no case anywhere.** In the live tree
+the overwhelming majority of registry members are descriptors, so the arm doing
+most of the work was the arm no case reached — and no fixture anywhere shipped a
+descriptor before this cut. Two members carried that hole and both are closed;
+three valves that no committed case exercised are now exercised; and one member's
+root default is a derivation no injected case can reach, discharged by a sibling
+harness driving the live arm rather than by a third case.
+
+**Three defects the port reproduces rather than repairs**, on the owning spec's own
+rule that a refusal the shell form never made is a verdict change across the seam —
+which is precisely what the parity run holds invariant, and precisely what the
+natural port instinct is to add. Each is filed to the gap inbox as its own unit.
+The exception is a governed sentence that had drifted from the code it describes:
+there the port takes the code and **corrects the sentence**, because that is the one
+case where reproducing leaves nothing false.
+
+**The seam was ruled per member, and one member's is a *privacy* boundary rather
+than a config one.** Every member reads consumer content and none became a crate
+literal; the discharge is criterion 6's strongest form, each value crossing as a
+bridged knob computed once in the owning kit's shell library. Two inlining risks
+were named because each reads like a natural constant: a wire-kind string, and a
+pair of merged consumer-extended vocabularies the library unions **before** the
+bridge reads them, so declaring the extension names beside them would double every
+consumer token while declaring only them would drop the bundled set. The privacy
+one is `check-template-copy-parity`'s pattern discard, which is what keeps a
+consumer's rule vocabulary out of the crate and which no committed case could
+catch a port for losing.
+
+**One design fork was escalated at authoring and ruled at build**: a compiled
+`check-reads-couples` must resolve a knob whose name is not known until run time.
+The ruling is a **derived union** computed off the registry and carried across the
+existing bridge as data, with the per-kit prefix family as the fallback; the two
+citations that read as a fork answer different questions and are not opposed, and
+spawning an interpreter is refused as converting a transitional dependency into a
+permanent one. §check-reads-couples owns the ruling and its grounds.
 
 **The cut's cost is in *fresh derivation*, not in interfaces — the exact inverse
 of the fifth, and the pair is the finding.** That batch's defining result was
@@ -5328,6 +5479,22 @@ Resolution, per declared knob:
   library global, deliberately distinct from the `GATE_SDK_`-prefixed consumer
   overrides that feed it, so it carries no `GATE_SDK_` prefix of its own.
   Derivation-first — no roster of knob→kit pairs is maintained, so none can rot.
+
+  **Some knob names are *un-declarable* by construction, and a port that declares
+  one fails closed on its first run.** A name defaulted only inline, whose value a
+  *resolved sibling* the bridge already carries subsumes, has no top-level
+  assignment for `declare -p` to find, so naming it in a member's declared set hits
+  the emitter's does-not-define refusal. `GATE_SDK_PRUNE_DIRS` and
+  `GATE_SDK_PRUNE_EXTRA_DIRS` are the pair to watch, because prose in this document
+  names them together as the source of the prune set: that sentence describes the
+  **conceptual** pair, and the bridgeable spelling is the resolved
+  `GATE_PRUNE_DIRS` alone. The same shape covers the kit-root override, whose
+  bridgeable spellings are `GATE_KIT_ROOTS_HERE` and `GATE_KIT_ROOTS_REL`. The trap
+  runs the other way too and is worth stating with it: a knob spelled as an inline
+  default at its use site can still be perfectly declarable, because the guarded
+  top-level assignment exists elsewhere in this library. **Neither direction is
+  visible from a use site**, so the verdict is taken at the library
+  (§The sixth budget batch, which surveyed twenty-eight crossing names to find it).
 
   **A distinct spelling is what a grammar change buys, and nothing else, so a
   gate-sdk knob that changes no grammar keeps its own name.** `GATE_SDK_PRUNE_DIRS`
@@ -8205,7 +8372,9 @@ differs** — a shell parse for a `.sh` member, the substrate's own report for a
 err toward demanding more coverage rather than less. A reported root is filtered by
 the prune list exactly as a `gate_find` walk is, because the crate's single
 sanctioned walk resolves its set from the same two knobs, `GATE_SDK_PRUNE_DIRS`
-and `GATE_SDK_PRUNE_EXTRA_DIRS` (§lib/gate.sh) — both, because a substrate
+and `GATE_SDK_PRUNE_EXTRA_DIRS` (§lib/gate.sh — which is where a port learns that
+neither is the spelling a member *declares*: the bridgeable one is the resolved
+`GATE_PRUNE_DIRS`) — both, because a substrate
 honoring only one of an additive pair would scan a different tree than the shell
 for any consumer who set the other. And no literal `-name` primary is extractable
 from a binary, so a bare root's enumeration is unfiltered — the same answer the

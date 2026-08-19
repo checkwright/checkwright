@@ -12,56 +12,6 @@
 
 ## New Features
 
-- **native-gate-port-remaining-corpus** [spec: SPEC-sixth-batch.md] [roadmap: now/reliability]
-  — the whole battery onto the binary, and the shell surface down to its residue.
-  roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
-  The entry demotes at build rather than moving to `## Done`: it is the **whole corpus**, the oracle
-  below still counts gates owed, and a Done move would assert a finished port and silently drop it
-  from the **public** roadmap projection, which reads `[roadmap:]` tags off live entries.
-  **Operator-ruled 2026-08-09: complete the port, ASAP** — the ruling, its grounds and its
-  supersession of the 2026-08-06 measurement-locus clause are [TRAJECTORY.md](TRAJECTORY.md)
-  §PRIORITY DIRECTIVE's, with the scope, both install paths and the bootstrap residue; this entry
-  is the work, and designing the bootstrap is still its. It inherits gate-sdk/SPEC.md §Porting a
-  gate to the binary substrate for the procedure and §Consumer payload for the payload rule.
-  **Two objections answered:** wall-clock is the weaker case (the win is retiring the shell
-  *sources* the payload carries), and the toolchain-free arm rides the pre-compiled path, so
-  `powershell-installer-surface` shrinks to the bootstrap for the same reason.
-  **Twelve cohorts closed, plus five budget batches**, each with its members, delivered counts,
-  holds, grounds and price at gate-sdk/SPEC.md §The first cohort, and the rule that selects the
-  next — so this entry states what remains rather than restating them, cut widths included: they
-  are ruled **per cut and never inherited**, and each cut's own section owns its width and the
-  refusal to read it as a precedent. From the eighth on members are **selected by running**
-  `port-blockers.sh --group`; the size arm is now **permanently** exhausted rather than exhausted
-  at a cut, so the budget arm composes until a consumer contributes shell gates sharing a
-  derivation — the rule's own section owns why.
-  **The residue is three-way, not two: permanently shell, temporarily held, and takeable** —
-  a dated oracle read (`bash gate-sdk/bin/port-blockers.sh --group`'s trailer, which
-  `scripts/measured-claims.sh` emits as `ported-gate-members`), never a count this line holds,
-  which is what it was restated as and drifted from twice. The held tier stopped being a hand
-  adjudication when `# port-until:` was minted, so a cut reads its takeable set off the run.
-  Every held member is **sequencing with port work owed, never exclusion**, and what each owes
-  is on `cohort-held-members-port-prerequisites`, which owns the roster and the kits it spans.
-  **`check-graph` is ruled out of every budget batch, not merely out of this one**, and the
-  ground survives the amendment that stated it — gate-sdk/SPEC.md §The fifth budget batch owns
-  it, and names `check-template-copy-parity` as the first member a later cut should reach for.
-  A scope decomposing this corpus sizes `check-graph` as an iteration of its own.
-  **Cost while deferred:** large and known — the **owed** remainder (the trailer's own arm,
-  never the unported count, which the permanent and held members inflate) plus the runners and
-  the install-lifecycle layer; since the 2026-08-14 born-native default
-  (TRAJECTORY.md §The closed rulings) a gate landed meanwhile no longer adds shell to it. Not
-  a single-iteration delta; scope owns the decomposition, and the criterion-relaxation
-  question is closed at gate-sdk/SPEC.md §The port-candidate criteria — an ordering signal,
-  never an eligibility screen. `gate-battery-parallel-execution` and
-  `gate-battery-result-cache` say the port subsumes them: closure candidates as it lands.
-  **The SIXTH cut is ruled at six members — operator, 2026-08-19:** the whole takeable tier bar
-  `check-graph`, with the fifth cut's drop-any-member relief carried in its envelope, ruled with
-  the raised declaration band in hand and against it. This cut's own width, inheriting nothing;
-  taken whole it leaves `check-graph` the one takeable member the oracle still counts.
-  Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
-  direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope. Since then it is
-  promoted at spec and demoted at build once per increment, always a **demotion** on the
-  entry-outlives-the-amendment branch, each cut's own record staying at its SPEC section.
-
 - **installer-init-noop-regen-conflict** [spec: SPEC-noop.md] — init regenerates three generated
   projections (`scripts/gates.list`, `scripts/git-hooks/pre-commit`, `scripts/CHECK-GRAPH.html`)
   on every run and only THEN decides the run was a no-op: a second run on the same consumer
@@ -148,6 +98,55 @@
 ## Technical Debt
 
 ## Deferred
+
+- **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
+  — the whole battery onto the binary, and the shell surface down to its residue.
+  roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
+  The entry demotes at build rather than moving to `## Done`: it is the **whole corpus**, the oracle
+  below still counts gates owed, and a Done move would assert a finished port and silently drop it
+  from the **public** roadmap projection, which reads `[roadmap:]` tags off live entries.
+  **Operator-ruled 2026-08-09: complete the port, ASAP** — the ruling, its grounds and its
+  supersession of the 2026-08-06 measurement-locus clause are [TRAJECTORY.md](TRAJECTORY.md)
+  §PRIORITY DIRECTIVE's, with the scope, both install paths and the bootstrap residue; this entry
+  is the work, and designing the bootstrap is still its. It inherits gate-sdk/SPEC.md §Porting a
+  gate to the binary substrate for the procedure and §Consumer payload for the payload rule.
+  **Two objections answered:** wall-clock is the weaker case (the win is retiring the shell
+  *sources* the payload carries), and the toolchain-free arm rides the pre-compiled path, so
+  `powershell-installer-surface` shrinks to the bootstrap for the same reason.
+  **Twelve cohorts and six budget batches are closed**, each with its members, delivered counts,
+  holds, grounds and price at gate-sdk/SPEC.md §The first cohort, and the rule that selects the
+  next — so this entry states what remains rather than restating them. Cut widths are ruled **per
+  cut and never inherited**, members are **selected by running** `port-blockers.sh --group`, and
+  the size arm is **permanently** exhausted, so the budget arm is the only composer left.
+  **The residue is three-way, not two: permanently shell, temporarily held, and takeable** —
+  a dated oracle read (`bash gate-sdk/bin/port-blockers.sh --group`'s trailer, which
+  `scripts/measured-claims.sh` emits as `ported-gate-members`), never a count this line holds,
+  which is what it was restated as and drifted from twice. The held tier stopped being a hand
+  adjudication when `# port-until:` was minted, so a cut reads its takeable set off the run.
+  Every held member is **sequencing with port work owed, never exclusion**, and what each owes
+  is on `cohort-held-members-port-prerequisites`, which owns the roster and the kits it spans.
+  **Cost while deferred:** large and known — the **owed** remainder (the trailer's own arm,
+  never the unported count, which the permanent and held members inflate) plus the runners and
+  the install-lifecycle layer; since the 2026-08-14 born-native default
+  (TRAJECTORY.md §The closed rulings) a gate landed meanwhile no longer adds shell to it. Not
+  a single-iteration delta; scope owns the decomposition, and the criterion-relaxation
+  question is closed at gate-sdk/SPEC.md §The port-candidate criteria — an ordering signal,
+  never an eligibility screen. `gate-battery-parallel-execution` and
+  `gate-battery-result-cache` say the port subsumes them: closure candidates as it lands.
+  **The SIXTH cut is delivered at six members** — the whole takeable tier bar `check-graph`, ruled
+  by the operator 2026-08-19 at that width against the raised declaration band, with the fifth
+  cut's drop-any-member relief carried in its envelope and never needed. Its findings, its
+  criterion-5 measurement on both sides and its accept-and-declare judgment are at
+  gate-sdk/SPEC.md §The sixth budget batch, which also answers §The fifth budget batch's pick of
+  `check-template-copy-parity` by delivering it. The takeable **tier** is therefore exhausted, and
+  `check-graph` — the one takeable member the oracle still counts — is ruled out of **every**
+  budget batch rather than that one, so a scope decomposing this corpus sizes it as an iteration
+  of its own. The next increment is that, or a held member's prerequisite.
+  Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
+  direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope. Since then it is
+  promoted at spec and demoted at build once per increment, always a **demotion** on the
+  entry-outlives-the-amendment branch, each cut's own record staying at its SPEC section;
+  demoted again 2026-08-19 at build on the sixth cut's delivery.
 
 - **close-triage-log-reclaim-loss-window** [design-pending] — the close-stage triage of a capture
   log reads it and later truncates it as two separate acts, and anything appended between the two
@@ -4356,11 +4355,11 @@
 - **knob-default-accessor-singularity** [design-pending] — the missing check class
   behind two knob-default re-spellings drained this iteration.
   `check-knob-default-coupling` asserts that every literal site for one knob
-  carries the **same** literal (canon-kit/checks/check-knob-default-coupling.sh
-  L103-113) — an *agreement* assertion. Two identical spellings agree, so they
+  carries the **same** literal (assertion 1 at canon-kit/SPEC.md
+  §check-knob-default-coupling) — an *agreement* assertion. Two identical spellings agree, so they
   pass, and the gate has no *singularity* assertion at all. That is why both
   `.github/workflows/publish.yml:97` (`GATE_SDK_NATIVE_CRATE`) and
-  `gate-sdk/checks/check-reads-couples.sh:144` (`GATE_SDK_NATIVE_BIN`) sat green
+  `check-reads-couples`' binary lookup (`GATE_SDK_NATIVE_BIN`) sat green
   while open-coding a default whose accessor exists and whose `# spec:` comment
   calls itself "the one home" of it. Both are fixed; the class is not.
   **The check is buildable, which is why this is filed rather than argued away.**
@@ -5546,12 +5545,13 @@
   `check-spec-dod-singleton.gate` and `check-spec-derivable-section.gate` (both `.sh` files
   deleted), while `canon-kit/lib/spec.sh:171-201` still routes three surviving shell gates through
   the repaired prune — `check-surface-duplication.sh:34` (via `spec_canonical_specs`),
-  `check-spec-embedded-source.sh:42-43` (both readers) and `check-amendment-queue.sh:96,106` (via
-  `spec_amendments`), plus the README reader at `spec.sh:223`. None of the three has a `.test.sh`
+  `check-spec-embedded-source` (both readers) and `check-amendment-queue` (via
+  `spec_amendments`), plus the README reader in that library. None of the three has a `.test.sh`
   scenario runner. The bullet named two of the three; the third is `check-amendment-queue`.
-  **Since that re-verification** the fifth budget batch ported `check-amendment-queue`, so the
-  surviving shell callers are **two**: its prune now runs in the crate, where the eighth cohort's
-  edge-root case already holds it.
+  **Since that re-verification** the fifth budget batch ported `check-amendment-queue` and the
+  sixth ported `check-spec-embedded-source`, so the surviving shell caller is **one**,
+  `check-surface-duplication`: the other two prunes now run in the crate, where the eighth
+  cohort's edge-root case already holds them.
   **Deliverable:** a scenario runner for one still-shell caller carrying the `..`-root case, or the
   assertion folded into an existing canon-kit runner. **Note the control discipline the cohort
   paid for:** a *symmetric* break of the normaliser is invisible to this assertion, so the oracle
@@ -6697,10 +6697,13 @@
   unchanged — reverse trigger of the same shape"**, reading its `couples=` extension roster as
   a language list "not a reference to gate declarations" whose "scanned corpus is the canonical
   specs and amendments". The implementation disagrees in shape:
-  `canon-kit/checks/check-spec-embedded-source.sh:41` builds its candidate set with `gate_find`
-  over every `*.sh`/`*.rs`/… file in the tree and diffs each file's actual line content against
-  every spec's fenced blocks, so every still-shell gate declaration path is inside that set and
-  its content is **read**, not merely triggered on.
+  the member builds its candidate set by walking every `*.sh`/`*.rs`/… file in the tree and
+  diffs each file's actual line content against every spec's fenced blocks, so every gate
+  declaration path is inside that set and its content is **read**, not merely triggered on.
+  **The sixth budget batch ported the member and did NOT rule this class** — it took the
+  binding verdict for that member alone, on the ground that a conservative verdict costs a
+  fixture widening and cannot be wrong in the harmful direction (gate-sdk/SPEC.md §The sixth
+  budget batch). This entry still owns the class, and that disposition is not its answer.
   **Why [design-pending]:** criterion 4 (gate-sdk/SPEC.md §The port-candidate criteria) binds
   where "a registry member's declaration path lies inside the corpus the gate scans as
   content", and distinguishes a reverse-trigger couple, never read as content, from a content
