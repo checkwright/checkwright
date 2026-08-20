@@ -242,6 +242,34 @@ leaving an objective's scope to be inferred. What the ruling does **not** touch:
 the dependency **bar** the crate applies to a candidate dependency is
 engineering judgment owned by gate-sdk/SPEC.md, and nothing here loosens it.
 
+**The graph gate's consumer config becomes a data-only contract, and the sourced-function seam is
+retired — ruled 2026-08-20 by the operator.** `check-graph` is the last takeable member of the
+port, and the only one whose consumer configuration crosses **executable bash functions** rather
+than values: `graph_surface_layer` from `GATE_SDK_GRAPH_VOCAB`, plus `graph_theme_css`,
+`graph_theme_header` and `graph_theme_footer` from `GATE_SDK_GRAPH_THEME`, each dispatched through
+`declare -F`. A compiled binary cannot be handed a bash function, and the array-knob config bridge
+carries arrays, scalars and keyed lists into argv and nothing else — so the port cannot be built
+without deciding what replaces the hooks. Two alternatives were costed and refused: a **shell shim**
+kept for theme emission alone preserves the seam and adds a shell-only install step the interpreter
+policy above forbids outright, and **shipping the artifact unthemed** is cheapest and regresses a
+shipped capability, which is not a port.
+
+**The cost is a breaking change, and it is stated rather than softened.** It narrows asserted
+behavior for every consumer carrying a `graph-theme.sh`, and it re-cuts the seam
+CLAUDE.md §The provenance seam names as its own worked example — so the replacement is bound to keep
+that doctrine true: the vocabulary and the theme stay the consumer's, and only their *form* moves
+from executable to declarative. Designing that form is the port unit's work. **The ruling is
+discharged when an amendment lands the contract at gate-sdk/SPEC.md §check-graph**, after which
+this record is deleted rather than annotated.
+
+Two questions the ruling deliberately leaves open, recorded here so the authoring stage receives
+them instead of rediscovering them. `couples=` is read three ways across the tree and `check-graph`
+assertion B is the third — **`couples-glob-semantics-unowned`** owns that, and the crate already
+carries two matchers with nothing anywhere to say which side a port should reach for. And
+`check-graph`'s **criterion-4 self-reference disposition is unruled rather than cleared**: the
+member was kept out of every budget batch on the non-gate-arm ground, before the criteria checklist
+was ever run against it.
+
 ## PRIORITY DIRECTIVE — the port track's sequence
 
 **Ruled 2026-08-09 by the operator, and it is the track's top priority: complete

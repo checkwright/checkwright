@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: graph-port-and-config-seam
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -55,10 +55,11 @@
   cut's drop-any-member relief carried in its envelope and never needed. Its findings, its
   criterion-5 measurement on both sides and its accept-and-declare judgment are at
   gate-sdk/SPEC.md §The sixth budget batch, which also answers §The fifth budget batch's pick of
-  `check-template-copy-parity` by delivering it. The takeable **tier** is therefore exhausted, and
-  `check-graph` — the one takeable member the oracle still counts — is ruled out of **every**
-  budget batch rather than that one, so a scope decomposing this corpus sizes it as an iteration
-  of its own. The next increment is that, or a held member's prerequisite.
+  `check-template-copy-parity` by delivering it.
+  **The next increment is RULED, 2026-08-20: `check-graph`, as its own iteration** — the takeable
+  tier is exhausted, it is the one takeable member the oracle still counts, and after it every
+  remaining member is held behind a prerequisite. Its true size is gate-sdk/SPEC.md §check-graph's;
+  its config seam and the two openings that ruling leaves are TRAJECTORY.md §The closed rulings'.
   Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
   direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope. Since then it is
   promoted at spec and demoted at build once per increment, always a **demotion** on the
@@ -1816,20 +1817,19 @@
   Class: mints a gate name if the oracle lands, so canon-kit/SPEC.md's new-names litmus makes it
   a **feature** on that path; debt only if it lands as an assertion inside `check-stage-evidence`.
   The promoting scope call settles it.
-  **Declined SIX times at scope despite the threshold — 2026-08-16, 2026-08-17, and twice each on
-  2026-08-18 and 2026-08-19, the last four on the operator's ruling, the newest holding the
-  earlier ones.** One ground survives all six: the cheap half and the history assertion are a
-  single unresolved design fork, and buying the cheap half first may foreclose the reading the
-  assertion needs. No `recurrence:` date joins a decline — the finding did not re-fire.
-  **The 2026-08-19 surfacing is recorded because the routing worked rather than the outcome:**
-  scope refused to re-litigate a closed ruling and put the collision in front of the authority
-  anyway — the split `threshold-recurrence-routing-residency` draws, ruled general the same day.
-  **Two grounds the earlier declines cited are CORRECTED, not reversed.** `check-stage-entry.gate`
-  widened to the SPEC globs at its 2026-08-16 port, so it is already ran-and-lenient for any
-  SPEC-touching commit and only `check-stage-evidence` keeps the narrow pair — the cheap half is
-  ONE descriptor, not two. And "sits off every promoted unit's surface" fails against the set
-  promoted 2026-08-18, whose members edit `.gate` descriptors and native gate modules. Both gates
-  are native (`native/src/gates/stage_evidence.rs`, `stage_entry.rs`).
+  **TAKEN into `graph-port-and-config-seam`, operator-ruled 2026-08-20 and relayed by the lead**,
+  after six declines (2026-08-16, 2026-08-17, and twice each on 2026-08-18 and 2026-08-19, the last
+  four the operator's own; no `recurrence:` date ever joined one, the finding not having re-fired).
+  The one ground that survived all six is now this unit's first deliverable rather than its
+  blocker: the cheap half and the history assertion are a single unresolved design fork, and buying
+  the cheap half first may foreclose the reading the assertion needs.
+  **The class call this entry left to "the promoting scope call" is NOT settled here**, and the
+  sentence naming scope is stale: this roster splits authoring out, so `spec` both authors and
+  promotes. The fork decides the class, so `spec` settles the two together or neither.
+  **The cheap half is ONE descriptor, not two:** `check-stage-entry.gate` widened to the SPEC globs
+  at its 2026-08-16 port and is already ran-and-lenient for a SPEC-touching commit, so only
+  `check-stage-evidence` keeps the narrow pair. Both gates are native
+  (`native/src/gates/stage_evidence.rs`, `stage_entry.rs`).
   Filed 2026-08-01 at close from the gap inbox; build filed it against its own batch-1 stamp.
 
 - **amendment-deletion-content-completeness** [design-pending] — a closed
@@ -4259,13 +4259,13 @@
   structural reading above is now the only one left. The same drain found a **second face** the
   candidates above do not cover — a baseline move stales the evidence line computed against the old
   baseline — promoted as `baseline-move-stales-evidence-line`.
-  **Threshold collision reached the authority and was NOT promoted, ruled 2026-08-19** into
-  `budget-batch-and-account-identity-kind`'s set, then **held again the same day** into
-  `takeable-tier-batch-and-installer-noop`'s. Cause recorded rather than left silent — the
-  collision is **discharged by having reached the authority**, which is all the threshold rule
-  asks, and neither decline is a decline of the finding. The second was taken on a probed ground
-  the first did not have: the row is **not armed today**, the live baselined `fail` naming a slug
-  that still resolves. Its own recurrence count is unchanged at two.
+  **Held a THIRD time, ruled 2026-08-20 by the iteration lead** into `graph-port-and-config-seam`:
+  the ruled spine is the `check-graph` port and this entry shares no surface with it. Still inside
+  lead discretion — the routing clause ends that at three *recurrences*, and this count is unchanged
+  at two. Prior holds 2026-08-19 into `budget-batch-and-account-identity-kind` and, the same day,
+  into `takeable-tier-batch-and-installer-noop`, the second on a probed ground the first lacked:
+  the row is **not armed today**, the live baselined `fail` naming a slug that still resolves.
+  None of the three declines the finding; each is discharged by having reached the authority.
   Filed 2026-08-10 by close, from its own blocked entry; the escape it needed is
   the evidence. Re-attested 2026-08-12 by close, again from its own blocked entry.
 
@@ -5158,18 +5158,18 @@
   script this iteration ran through `guard-kit/bin/scratch-run.sh`, so the runner works and the
   control's reach is the whole defect. A control covering the disciplined half while the
   undisciplined half grows eightfold is measuring habit, not risk.
-  **Threshold collision reached the authority and was DEFERRED WITH CAUSE, operator-ruled
-  2026-08-19** (taken in the lead session through the harness's question mechanism, three options
-  offered, the recommended one selected), and **held a second time the same day**, at the next
-  iteration's scope, into `takeable-tier-batch-and-installer-noop` — the identical cause, because
-  that iteration's spine is a port spine too. Scope put it in the proposed set regardless of theme
-  both times, as the rule requires; the count stood at two at the first ruling and stands at three
-  now, the third date being a measurement rather than a firing of the decline.
-  Cause, recorded rather than left silent: guard-kit is
-  an unrelated surface to a port spine, so the unit amortizes nothing against it,
-  and the measured cost is **discipline-shaped rather than a correctness hole** — the growth is in
-  how sessions choose to run scratch, not in what the tree permits. No new `recurrence:` date
-  joins the declaration: the finding did not re-fire, and a decline is not a firing.
+  **DECLINED BY THE OPERATOR, ruled 2026-08-20 and relayed by the lead** — the entry stood at three
+  recurrences, so the routing clause `threshold-recurrence-routing-residency` carries put it past
+  lead discretion, and this decline is **the operator's own, not a third lead decline**. The clause
+  is discharged by having reached that authority, which is all it asks. Cause: this iteration's
+  ruled spine is the `check-graph` port, guard-kit shares no surface with it, and the measured cost
+  stays **discipline-shaped rather than a correctness hole** — the growth is in how sessions choose
+  to run scratch, not in what the tree permits.
+  **Two prior declines, neither a lead's third:** deferred with cause 2026-08-19 by the operator
+  through the harness's question mechanism, then held the same day at the next iteration's scope
+  into `takeable-tier-batch-and-installer-noop` on the identical port-spine cause. Scope put it in
+  the proposed set regardless of theme all three times, as the rule requires. No `recurrence:` date
+  joins any decline: the finding did not re-fire, and a decline is not a firing.
   Filed 2026-08-13 by close, from its own tooling-friction triage; probed at source before filing.
 
 - **ro-bins-write-option-bypass** [design-pending] — `GUARD_KIT_RO_BINS` membership is tested as
@@ -5317,10 +5317,10 @@
   **Cost while deferred:** it lands on exactly the dispatches delegation is pre-authorized for,
   and it defeats normal trust rather than merely being wrong — a relayed finding is the signal a
   reader uses to decide a claim has already been checked.
-  **Threshold collision reached the authority and was HELD, ruled 2026-08-19** out of
-  `takeable-tier-batch-and-installer-noop`, the price acknowledged: the entry reached the
-  threshold at that same drain, so this is a first hold rather than a repeat, and the firing rate
-  is now once per iteration on a mechanism a clean run hides by construction.
+  **Held a SECOND time, 2026-08-20, by the iteration lead** into `graph-port-and-config-seam`: the
+  ruled spine is the `check-graph` port, delegation-kit shares no surface with it, and two
+  recurrences stay inside lead discretion. First held 2026-08-19 out of
+  `takeable-tier-batch-and-installer-noop`, at a firing rate of once per iteration since.
   Filed 2026-08-13 by close, draining the gap inbox on operator direction to file, not promote.
 
 - **handoff-premise-reverification-placement** [design-pending] — `Probe-before-assertion` is
@@ -6117,11 +6117,11 @@
   worktree the `installer_smoke` pack step checks: that run reported `verdict=new-failures` on a
   false ground and had to be discarded and re-run foreground. No date is stamped — 2026-08-17 is
   already on `waiting-rule-fourth-firing-post-fix` and the stamp is idempotent per (slug, date).
-  **Surfaced against this iteration's spine and DEFERRED — 2026-08-18, operator-ruled.** Weighed as
-  a competing spine against the port batch and declined; the buildable remainder this iteration was
-  the guard-rule and documentary half alone, since the hook half needs an operator-authorized
-  `.claude/settings.json` write no agent message can license. Honest limit, recorded because the
-  operator saw it and ruled anyway: the port batches are the work whose evidence this defect eats.
+  **HELD AGAIN 2026-08-20, by the iteration lead**, out of `graph-port-and-config-seam` — the ruled
+  spine is the `check-graph` port and this entry shares no surface with it; at two recurrences the
+  hold is still inside lead discretion. First deferred 2026-08-18 by operator ruling, weighed there
+  as a competing spine against the port batch. The honest limit both holds carry, recorded because
+  each authority saw it and ruled anyway: the port work is the work whose evidence this defect eats.
   recurrence: turn-end-chokepoint-and-wait-primitive 2026-08-18 2026-08-19
   **Firings 11-13, 2026-08-18 — grounds for that date.** Three times a backgrounded producer exited
   cleanly and the turn ended anyway: work finished, uncommitted, no completion notification,
@@ -6273,21 +6273,21 @@
   repo's own measured-claim oracle, 5), `cargo test`, `cargo build`. Each is read-only or a build
   of the tree's own crate, each recurs every port iteration, and each works today only because
   one clone carries an uncommitted overlay: a fresh clone re-buys every decision.
-  **What this entry is NOT.** Not the friction itself — the dominant *cause* of prompting at that
-  triage was decoration, already-granted commands chained so the matcher never reaches them, which
-  `bash-guard.sh` already steers and no grant can fix. This entry is only the absent grants.
+  **What this entry is NOT.** Not the friction itself: prompting's dominant *cause* is decoration —
+  granted commands chained past the matcher, which `bash-guard.sh` steers and no grant can fix.
   **Why `[design-pending]`:** (a) versus (b) is a real trade with no dominant arm, and (a) needs
   an operator decision this entry cannot make for them.
   **Cost while deferred:** roughly one out-of-band decision per journal write, paid by every
   dispatched session in every iteration, plus a fresh clone with no working oracle grants.
   Class: mints no governed name and adds no gate, so canon-kit's litmus makes it **debt**.
   recurrence: session-mechanic-grants-uncommitted 2026-08-18 2026-08-19
-  **The `awk` item below is CONTESTED and the contest is now its own entry**, promoted 2026-08-19:
-  `guard-read-steer-tool-coverage` rules it a (b) steer rather than an (a) grant, on its own
-  measurement. Journal writes at that triage: 21 → 30 of 35.
-  **Held out of `takeable-tier-batch-and-installer-noop` at the threshold, ruled 2026-08-19:** no
-  shared surface with that iteration's port spine, and friction rather than correctness. Price:
-  (a) is the consumer's call, so this re-reaches the authority every boundary until it is ruled.
+  **The `awk` item below is CONTESTED**, its contest an entry since 2026-08-19:
+  `guard-read-steer-tool-coverage` rules it a (b) steer, not an (a) grant. Journal writes: 21 → 30.
+  **Held as a BUILD unit only, 2026-08-20, by the iteration lead** into `graph-port-and-config-seam`
+  — the ruled spine is the `check-graph` port. **Not** a decline of disposition (a): the operator
+  ruled 2026-08-20, relayed by the lead, to take the grant batch as rulings this iteration at zero
+  build cost, so (a) is live and the price below is being paid off rather than deferred again.
+  Prior hold 2026-08-19 out of `takeable-tier-batch-and-installer-noop`, same cause.
   **Second measurement, 2026-08-18 — grounds for that date.** The journal-write count roughly
   tripled: **~69 of ~92 `cat` occurrences are heredoc writes into `.tmp/`**, against 21 at filing,
   and `cat` is again the single largest pattern (73 of 248 prompting calls). Six further absent
