@@ -7409,6 +7409,72 @@
   Filed 2026-08-19 by close from the gap inbox, filed by the lead because the absence is
   observable to the dispatcher and not to the session.
 
+- **icebox-candidate-eligibility-unapplied** [design-pending] — the eviction worklist lists rows the
+  icebox eligibility rule already forbids, so every close re-derives the same exclusions by hand.
+  **The split is backwards, and that is the finding rather than a calibration complaint.**
+  queue-kit/SPEC.md §The icebox tier states that a roadmap-tagged entry is not icebox-eligible
+  as a hard rule with structural enforcement behind it — `check-roadmap-fresh` reds a one-line entry
+  that cannot carry a `roadmap-summary:` — while the `queue-index --icebox-candidates` arm filters
+  on age and low-cost-opener alone. The mechanically-decidable half of eligibility is unapplied
+  while the judgment half is applied by hand, which is the wrong split.
+  **Measured at the generating close rather than predicted:** the worklist returned four rows and
+  **three were roadmap-tagged and therefore ineligible by rule** — 75% of the review list was
+  work no close may take. The fourth was ineligible too, on the tier's other stated clause (a live
+  promotion trigger), which is genuinely a judgment and correctly left to the session.
+  **Re-verified at promotion against the current tree, not carried on the bullet's word:** the arm
+  now returns five rows and three are still roadmap-tagged (`plugin-marketplace`,
+  `benchmark-ab-experiment`, `hosted-attestation-service`), so the defect stands and its rate moved
+  with the pool rather than with any fix.
+  **DISTINCT from any calibration question.** queue-kit/SPEC.md deliberately rules the age and
+  cost filters non-load-bearing because miscalibration only lengthens the list; that reasoning
+  does not extend to a rule the SPEC states as binding either way.
+  **Why `[design-pending]`:** two shapes and neither ruled — one predicate in the emitter that
+  drops the row, or a printed ineligibility reason per row if listing-then-explaining is preferred
+  to filtering. The second keeps the worklist a census and costs the close a read; the first makes
+  it a pick list and hides the tier's reasoning from the session that most needs to have read it.
+  Class: neither shape mints a governed name or a gate, so canon-kit's litmus makes it **debt**.
+  **Cost while deferred:** low and recurring — one re-derivation per close — plus the standing risk
+  that a roadmap-tagged row on a worklist reads as a sanctioned candidate to a session that
+  has not read the tier section.
+  Surfaced 2026-08-19 at the `takeable-tier-batch-and-installer-noop` close's icebox eviction review
+  and filed to the gap inbox there; promoted 2026-08-20 by the next iteration's scope.
+
+- **retired-slug-live-pointer-citation** [design-pending] — governed prose can point at a retired
+  queue slug as if it were a live surface, and the gate that owns slug citations permits that by
+  design rather than by omission.
+  **The rule is stated in two halves and only one is enforced.** queue-kit/SPEC.md
+  §check-queue-slug-liveness says prose about landed work must drop the bold-code form **and** cite
+  the owning SPEC instead; the gate's token grammar is the bold-code form alone, so a plain-code
+  slug is legal prose about landed work whether or not the sentence around it still points
+  anywhere real.
+  **One live instance, found 2026-08-19 at the generating close's staleness review and fixed in
+  place.** TRAJECTORY.md's port-sequence directive said a ruling's grounds, its accepted cost and
+  its discharging tranche "are the queue entry's", present tense, for an entry that had completed
+  13 of 13 and retired several iterations earlier — and the same sentence's closing clause
+  anticipated that retirement. That is what makes it the sharp case: the author saw the retirement
+  coming, recorded the ruling in TRAJECTORY.md precisely so it would survive, and still left the
+  pointer aimed at the vanishing surface. Re-pointed at gate-sdk/SPEC.md §The consumer remainder
+  cohort, which is where TRAJECTORY.md reads today.
+  **Probed rather than assumed:** a scan of every plain-code slug-shaped token across the
+  top-level governed docs against the live slug set returned exactly one true positive, so the
+  class is real and rare rather than a wave.
+  **DISTINCT from `stale-identifier-after-retirement`**, which is a deleted *path* whose capability
+  moved intact. This is a retired *slug* cited as a live pointer, and the two differ in what a
+  reader can do about it: a dead path is checkable against disk, while a retired slug resolves to
+  nothing anywhere, the Done section being cleared every iteration.
+  **Why `[design-pending]`:** the mechanical half is a scan for a plain-code slug-shaped token that
+  matches no live slug but does match a slug in the queue's own history — buildable, and it needs a
+  false-positive budget, since gate names share the slug grammar and dominate the token
+  population. Whether that budget is affordable, and whether the second half — does the sentence
+  still point anywhere — is decidable at all, is the ruling this entry owes.
+  Class: mints a gate name if the oracle lands, so canon-kit's new-names litmus makes it a
+  **feature** on that path; debt only if it lands as a further assertion inside
+  `check-queue-slug-liveness`.
+  **Cost while deferred:** low frequency, silent failure, and it lands hardest on the ruling record
+  — the one surface whose whole purpose is outliving the queue entries it was extracted from.
+  Surfaced 2026-08-19 at the same close's staleness review, filed to the gap inbox beside the entry
+  above; promoted 2026-08-20 by the next iteration's scope, which drained that inbox to its header.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
