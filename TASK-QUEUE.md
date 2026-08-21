@@ -65,6 +65,108 @@
   promoted at spec and demoted at build once per increment on the entry-outlives-the-amendment
   branch — seven so far, each cut's own record staying at its SPEC section.
 
+- **graph-port-bash-spawn-residue** [design-pending] — the ported `check-graph` spawns `bash` from
+  the binary, so the crate's shipped gate path carries a non-git program for the first time.
+  **The residue is exact.** `native/src/gates/graph.rs` runs `gate-sdk/bin/gen-pre-commit.sh` for
+  its `--emit` and `--emit-commit-msg` arms (assertions D and E), because the hook generator stayed
+  shell while the gate that reads its output ported. Criterion 7 sanctions the spawn — `bash` is on
+  `GATE_SDK_PROGRAM_FLOOR` — and the operator ratified the cost 2026-08-21, so this is residue and
+  not a rule break. It runs against TRAJECTORY.md §The objectives 1, 2 and 6.
+  **Re-verified at the drain, and the filing claim needed narrowing.** The crate carries four other
+  non-git spawns — `bash` in `main.rs`, `walk.rs` twice and `evidence.rs`, `awk` in `ere.rs` — but
+  every one sits inside a `#[cfg(test)]` module. The honest claim is *first non-git spawn on the
+  shipped gate path*, not *first in the crate*; the bullet's grep was scoped to `native/src/gates`
+  and `native/src/emit` and reached the right answer for a narrower reason than it stated.
+  Corrected here so a later session does not inherit the wider claim and find it false.
+  **The designed-but-unbought answer** is a new SHELL gate owning hook parity alone under
+  born-native exception class (a): a gate asserting that the persisted dispatch matches its
+  generator is auditing the dispatch relation, and a compiled form would compute both sides of that
+  comparison through the very binary under test.
+  **Why `[design-pending]`:** build refused it 2026-08-21 because it mints a gate name, a
+  descriptor, a fixture pair and a SPEC section to relocate an assertion criterion 7 already
+  sanctions in place — and on a host with no `bash` the spawn errors rather than being absent,
+  which is the branch a taker weighs rather than assumes.
+  **Cost while deferred:** low and bounded — the shipped spawn set has one member it did not have,
+  and gate-sdk/SPEC.md §gen-pre-commit carries the cause where a reader meets it.
+  Filed 2026-08-21 twice, by spec and again by build, into the gap inbox; drained and promoted at
+  `graph-port-and-config-seam`'s close, which re-verified the spawn set against the crate.
+
+- **config-bridge-resolution-cost** [design-pending] — the array-knob config bridge is the largest
+  non-cargo cost in the battery and no entry owns it.
+  **Measured at build, re-measured at the drain, and the ratio moved the wrong way.**
+  `gen-pre-commit.sh --emit` takes 6119/6203/6243 ms on this tree against 206/205/218 ms for
+  `--emit-commit-msg`, and `check-graph`'s whole run is 6704 ms — so roughly **92%** of the
+  battery's second-slowest gate is one call resolving argv for every registered member. The filing
+  measurement said 5651 of 7629 ms (74%); the re-run raised it rather than lowering it.
+  **The mechanism.** `gate_command` asks the binary for its `--knobs`, then sources the owning kit's
+  `lib/*.sh` in a fresh subshell to read `declare -p`, so the cost is per member per declared knob.
+  It is paid twice inside every `check-graph` run, again by `install-hooks.sh`, and again by a
+  hook regeneration.
+  **Nothing else owns it.** `gate-battery-parallel-execution` and `gate-battery-result-cache` are
+  about the battery rather than the bridge and neither reaches it, and the port track's own runtime
+  argument was retired against this same measurement (gate-sdk/SPEC.md §check-graph).
+  **Candidate shapes, none costed:** memoise the per-kit library sourcing across knobs within one
+  `gen-pre-commit` run; batch `--knobs` into one binary call; or resolve each kit's declared-knob
+  set once per run rather than once per knob.
+  **Why `[design-pending]`:** the three trade differently against the bridge's fail-closed contract,
+  and choosing needs an answer the bridge's SPEC does not carry today — whether one knob's resolved
+  value may legitimately differ between two members in the same run.
+  **Cost while deferred:** the battery's slowest non-cargo component is a resolution loop nothing
+  measures or holds, so every port that adds a member adds to it invisibly.
+  Surfaced by the member that pays it most and filed 2026-08-21 twice, by spec and by build;
+  promoted at `graph-port-and-config-seam`'s close, which re-timed all three figures.
+
+- **installer-graph-artifact-literal** [design-pending] — `installer/lib/init.sh` spells the graph
+  artifact's path as a literal where a resolver owns it.
+  **The two sites are exact**, re-verified at the drain: `installer/lib/init.sh` line 311 (the
+  `GENERATED` roster) and line 317 (the emit redirect) both write `$GATES_DIR/CHECK-GRAPH.html`,
+  while `gate-sdk/lib/gate.sh` resolves `GATE_SDK_GRAPH_ARTIFACT` for the same file.
+  **DISTINCT from `upgrade-smoke-graph-artifact-literal`**, which the graph port discharged: that
+  entry was scoped to `gate-sdk/bin/upgrade-smoke.sh`, and this is a second site the port's caller
+  sweep surfaced.
+  **It is also weaker, and the weakness is the whole cost question.** `init` writes a freshly
+  initialised consumer whose config seam `init` itself authors, so the default holds by construction
+  on a first run. The live exposure is a **re-run** over a tree whose adopter has since set
+  `GATE_SDK_GRAPH_ARTIFACT`: `init` would write the default path and record it in the manifest while
+  the consumer's own gate looks elsewhere. The `GATE_SDK_GATES_DIR` half is already handled,
+  `$GATES_DIR` being init's own variable.
+  **Why `[design-pending]`:** the fix is not obviously "resolve the knob" — `init` runs before the
+  consumer's gate library is necessarily sourceable, which is why it literalises at all, and whether
+  the installer may reach into a vendored kit's resolver at that point is an installer-layering
+  question this entry does not settle.
+  **Cost while deferred:** low and bounded to the re-run case, but it is exactly the standing
+  invitation the discharged sibling entry named on its way out.
+  Filed 2026-08-21 by build into the gap inbox; promoted at `graph-port-and-config-seam`'s close,
+  which re-verified both line numbers and the resolver against the tree.
+
+- **amendment-reader-roster-undercount** [design-pending] — an amendment's reader/caller roster is a
+  dated measurement presented as a roster, and it undercounted twice in one iteration.
+  **Both misses were the same spec session, one iteration.** `SPEC-graph-port.md` delta 5 scoped ONE
+  caller of a file it deleted where the tree held twelve — nine kit `smoke/install.sh` arms,
+  `context-kit/smoke/agents-md.sh`, `bin/upgrade-smoke.sh` and `installer/lib/init.sh`.
+  `SPEC-stamp-head.md` delta 5 asserted "exactly one parser breaks" and named it, missing FOUR
+  end-anchored `grep` assertions in `lifecycle-kit/smoke/install.sh` plus 7 of 10 cases in
+  `check-stage-evidence.test.sh` that flip to "malformed stamp" and stop reaching what they assert.
+  **One shape, and the spec method structurally cannot see it.** The hit is BUILT BY INTERPOLATION —
+  the date is a shell variable — so a literal-string, field-count or length sweep returns nothing;
+  and the breakage is CONSEQUENTIAL rather than assertional, so "the tests still pass" reads true
+  and is false. Re-verified at the drain against `git diff` on both files: every named site is there
+  and every one was rewritten by the build unit that found them.
+  **This is a method finding about a STAGE, not a defect count.** Delta 5 itself says the build unit
+  re-runs the sweep against the tree rather than trusting the roster, and that sentence is what
+  caught both — carried by an individual amendment rather than by any contract that outlives it.
+  **Candidate deliverables, none ruled:** make the re-sweep obligation a build-stage contract line
+  rather than a sentence an amendment may or may not carry; or an oracle for the interpolated-hit
+  class that greps the assertion IDIOM rather than the literal; or drop the roster from amendments
+  and keep only the sweep instruction, since a roster nobody may trust is context cost with a
+  false-confidence coupon attached.
+  **Why `[design-pending]`:** the three are not variants of one fix — a template edit, a new gate,
+  and a deletion that removes a real aid — and choosing needs the counter-case this iteration did
+  not supply: an amendment whose roster was RIGHT and whose reader was thereby spared the sweep.
+  **Cost while deferred:** a spec session pays for a census the build session must buy again, and
+  the roster's authority runs inversely to its accuracy.
+  Filed 2026-08-21 by build into the gap inbox; promoted at `graph-port-and-config-seam`'s close.
+
 - **close-triage-log-reclaim-loss-window** [design-pending] — the close-stage triage of a capture
   log reads it and later truncates it as two separate acts, and anything appended between the two
   is lost with no trace.
@@ -96,15 +198,19 @@
   `check-queue-entry-budget`'s per-entry cap at a measurable rate, and nothing counts the spend.
   **The slug was a shape everyone cited and nothing owned** — filing it under this spelling made
   the standing citation resolvable.
-  **Five firings measured in one iteration:** three during scope's disposition work, one seating
-  the operator-handed wait/notification recurrence grounds onto
-  `turn-end-chokepoint-and-wait-primitive` at exactly 50 of 50 counted lines, and one seating the
-  operator's account-restore ruling onto `gh-account-identity-expectation` at 49 of 50.
-  **The last two are the argument.** Both were mandated writes with a citable contract —
-  queue-kit/SPEC.md §check-queue-entry-budget names a judged recurrence's grounds and a ruling
-  recorded onto the entry it rules — and both were seated only by compressing an answered ground
-  out of the same entry. The relief worked and is documented; what has no owner is that it is
-  being spent every time.
+  **First five firings, the filing measurement:** three during scope's disposition work, two seating
+  operator-handed writes onto entries at exactly 50/50 and 49/50. **They are the argument:** both
+  were mandated writes with a citable contract (queue-kit/SPEC.md §check-queue-entry-budget names a
+  judged recurrence's grounds and a ruling recorded onto the entry it rules), and both were seated
+  only by compressing an answered ground out of the same entry. The relief works and is documented;
+  what has no owner is that it is being spent every time.
+  recurrence: entry-cap-displaces-mandated-writes 2026-08-20 2026-08-21
+  **Twelve more firings, 2026-08-20/21 — grounds for those dates, and the class NARROWS.** Seven at
+  scope landed authority rulings onto five entries at exactly 0 headroom; two at build compressed by
+  answering spent grounds; three are THIS drain's own recurrence stamps, one of them onto this very
+  entry. The taxed class is the write that cannot be deferred or reworded without falsifying the
+  record of what was decided; one scope firing was relieved only by RELOCATION onto a linked entry
+  that happened to have headroom, which nothing guarantees and no session can arrange.
   **DISTINCT from `check-queue-entry-budget` itself**, which is the gate and is behaving exactly as
   specified, and from `headroom-check-ordering-unruled`, whose axis is *when* a session reads its
   headroom rather than what the cap displaces.
@@ -113,15 +219,12 @@
   change; a counter with no split criterion behind it would only make the cadence visible.
   **Cost while deferred:** a cadence that is real is invisible to the only session chartered to act
   on it, since scope ranks what the queue carries and the queue carried none of this.
-  **FOUR MORE FIRINGS, 2026-08-19, the first measured against this entry rather than against
-  commit messages — landing five ruled dispositions took three mandated writes onto entries the
-  gate reports at exactly 0 lines of headroom.** `native-gate-port-remaining-corpus`
-  (a fresh operator width ruling), `gh-account-identity-expectation` (an operator answer to one of
-  its three named forks) and `stage-stamp-ordering-unenforced` (a fifth decline plus the record
-  that the routing worked). Each was seated by the documented relief and each spent something:
-  the fourth batch's member arithmetic de-literalized to its SPEC, an answered fork's text
-  replaced by its answer, and — the one real loss — the literal spelling of the narrow couple
-  pair, compressed out of a correction that now says "the narrow pair" and names it nowhere.
+  **Four more firings, 2026-08-19, the first measured against this entry rather than commit
+  messages:** landing five ruled dispositions took three mandated writes onto entries the gate
+  reports at exactly 0 headroom — `native-gate-port-remaining-corpus`,
+  `gh-account-identity-expectation`, `stage-stamp-ordering-unenforced`. Each was seated by the
+  documented relief and each spent something; the one real loss was the literal spelling of the
+  narrow couple pair, compressed out of a correction that now says "the narrow pair" and names none.
   **The fourth is a sharper kind and is the one to design against:** on
   `close-entry-baseline-bootstrap-deadlock` the ruling fitted and its **provenance** did not —
   the entry closed at 1 line of headroom, so it carries what was ruled and not through which
@@ -452,9 +555,16 @@
 
 - **install-step-relocation** [design-pending] — move the install's shell steps into the binary.
   `installer/lib/init.sh` runs two consumer-side shell steps after it writes:
-  `gen-pre-commit.sh --write` and `check-graph.sh --emit`. Each is a pure function of
+  `gen-pre-commit.sh --write` and the graph emission. Each is a pure function of
   tracked text, and each is a natural subcommand of a binary the vendoring ruling puts on
   disk before either of them runs.
+  **Half of the premise landed 2026-08-21 and the entry is narrowed rather than closed.** The graph
+  step no longer runs `check-graph.sh --emit` — that file was deleted by the `check-graph` port —
+  and `init` now reaches the emitter through `run-gates.sh --emit graph`, which dispatches to the
+  binary. So the emission logic is already relocated and what remains at that site is the thin shell
+  dispatcher, not a bash text-processing step. `gen-pre-commit.sh --write` is the one genuinely
+  un-relocated step (gate-sdk/SPEC.md §check-graph: the generator's lines stay shell with the cause
+  stated there), so the entry's cost and scope are both smaller than filed.
   **Ordered by the operator's trajectory pivot 2026-08-03**, objective 6 — the
   script-interpreter surface shrinks to the unavoidable. This entry is most of what makes
   it shrink: with these two relocated the bootstrap is resolve-the-platform,
@@ -6080,18 +6190,18 @@
   written, close's by the watch being a read-only poll that truncates no artifact — so the rule
   held in neither. **Two firings in one iteration, both producing roles**: the rate is not noise.
   **Tenth firing, 2026-08-17 (`post-close-intake-and-index-port` validate) — the first to cost
-  evidence rather than turns.** The session backgrounded `run-validate.sh`, backgrounded a
-  `kill -0` loop on it, and ended its turn saying it would act on the completion notification,
-  which ending the turn is what prevents. It then committed a gap filing mid-run, dirtying the
-  worktree the `installer_smoke` pack step checks: that run reported `verdict=new-failures` on a
-  false ground and had to be discarded and re-run foreground. No date is stamped — 2026-08-17 is
-  already on `waiting-rule-fourth-firing-post-fix` and the stamp is idempotent per (slug, date).
-  **HELD AGAIN 2026-08-20, by the iteration lead**, out of `graph-port-and-config-seam` — the ruled
-  spine is the `check-graph` port and this entry shares no surface with it; at two recurrences the
-  hold is still inside lead discretion. First deferred 2026-08-18 by operator ruling, weighed there
-  as a competing spine against the port batch. The honest limit both holds carry, recorded because
-  each authority saw it and ruled anyway: the port work is the work whose evidence this defect eats.
-  recurrence: turn-end-chokepoint-and-wait-primitive 2026-08-18 2026-08-19
+  evidence rather than turns.** The session backgrounded `run-validate.sh` and a `kill -0` loop on
+  it, then ended its turn saying it would act on the completion notification, which ending the turn
+  is what prevents. It then committed mid-run, dirtying the worktree the `installer_smoke` pack step
+  checks: that run reported `verdict=new-failures` on a false ground and was re-run foreground. No
+  date — 2026-08-17 is already on `waiting-rule-fourth-firing-post-fix`, idempotent per (slug,date).
+  **Held out of `graph-port-and-config-seam`** (lead 2026-08-20; operator 2026-08-18, weighed as a
+  competing spine) on the limit both authorities saw and ruled past: the port work is the work whose
+  evidence this defect eats. **Fourteenth firing, 2026-08-21 — grounds for that date, and the held
+  limit coming true inside the held iteration:** its validate session ended a turn *in order to
+  wait* on the battery. Self-disclosed; its liveness record was written and cleaned up, so nothing
+  was lost and the lead resumed the session rather than restarting the stage.
+  recurrence: turn-end-chokepoint-and-wait-primitive 2026-08-18 2026-08-19 2026-08-21
   **Firings 11-13, 2026-08-18 — grounds for that date.** Three times a backgrounded producer exited
   cleanly and the turn ended anyway: work finished, uncommitted, no completion notification,
   recovered only by the operator noticing. The second half, measured on producers that *finished*.
@@ -6240,18 +6350,15 @@
   out-of-band decisions, one iteration.
   **The three dispositions, ruled below:** (a) grant the append into the disposable, boundary-wiped
   scratch dir; (b) steer to `Write`/`Edit`, trading a permission decision for tokens on a file that
-  only grows — an `Edit` append costs an anchor match, a `Write` one re-emits the whole journal;
-  (c) a convention in `templates/agent-execution.md`'s journal bullet, free and the weakest.
+  only grows; (c) a convention in `templates/agent-execution.md`'s journal bullet, the weakest.
   **DISPOSITION (a) RULED — GRANT, operator 2026-08-20 via the lead: the APPEND form only.**
   `cat >> .tmp/…` is granted; the truncating `cat > .tmp/…` is deliberately not, so a mis-typed
   redirect cannot destroy a journal. Condition, not a hope: the glob must be provably unable to
   reach a tracked path. (b) and (c) refused. The ruling reaches (a) alone — the oracles below stay
   unruled — and the settings write is this entry's own build work, not this iteration's.
-  **The second half is the overlay-only oracles.** `scan-prompts.sh`'s overlay report shows 22
-  calls across 11 patterns granted by nothing committed — `bash scripts/measured-claims.sh` (the
-  repo's own measured-claim oracle, 5), `cargo test`, `cargo build`. Each is read-only or a build
-  of the tree's own crate, each recurs every port iteration, and each works today only because
-  one clone carries an uncommitted overlay: a fresh clone re-buys every decision.
+  **The second half is the overlay-only oracles**, granted by nothing committed: `cargo test`,
+  `cargo build`/`clippy`, the release binary itself, `gh auth`. Each is read-only or a build of the
+  tree's own crate; a fresh clone re-buys every decision (22 calls at filing, 12 at 2026-08-21).
   **What this entry is NOT.** Not the friction itself: prompting's dominant *cause* is decoration —
   granted commands chained past the matcher, which `bash-guard.sh` steers and no grant can fix.
   **Why `[design-pending]`:** (a) versus (b) is a real trade with no dominant arm, and (a) needs
@@ -6259,9 +6366,12 @@
   **Cost while deferred:** roughly one out-of-band decision per journal write, paid by every
   dispatched session in every iteration, plus a fresh clone with no working oracle grants.
   Class: mints no governed name and adds no gate, so canon-kit's litmus makes it **debt**.
-  recurrence: session-mechanic-grants-uncommitted 2026-08-18 2026-08-19
+  recurrence: session-mechanic-grants-uncommitted 2026-08-18 2026-08-19 2026-08-21
   **The `awk` item below is CONTESTED**, its contest an entry since 2026-08-19:
-  `guard-read-steer-tool-coverage` rules it a (b) steer, not an (a) grant. Journal writes: 21 → 30.
+  `guard-read-steer-tool-coverage` rules it a (b) steer, not an (a) grant. Journal writes: 21 → 30 →
+  30 at 2026-08-21, the grounds for that date: the tripling stopped and the cost is now a PLATEAU,
+  30 `.tmp/` heredocs of which 22 are journal appends, `awk` again ungranted at 33. A flat rate is
+  the worse finding, not the milder one — it is the steady-state price of an unbuilt ruled grant.
   **Held as a BUILD unit only, 2026-08-20, by the iteration lead** into `graph-port-and-config-seam`
   — the ruled spine is the `check-graph` port. **Not** a decline of disposition (a): the operator
   ruled 2026-08-20, relayed by the lead, to take the grant batch as rulings this iteration at zero
@@ -6596,6 +6706,14 @@
   ergonomics.
   Class: a flag or a bin tool mints a governed name, so canon-kit's litmus makes it a **feature**
   on those two arms and debt only as a documented one-liner.
+  recurrence: single-gate-run-config-bridge 2026-08-21
+  **Grounds for that date, and it is a first-hand firing rather than a log read.** The
+  `graph-port-and-config-seam` close needed one gate's verdict while re-verifying a gap bullet,
+  tried `run-gates.sh check-queue-entry-budget`, and got `no registry at
+  check-queue-entry-budget/gates.list` — the exact fall-through this entry describes. It then paid
+  the entry's own second bad option: invoking the binary directly, which refused fail-closed for an
+  unset bridged knob, and finally re-derived the answer by hand from `queue-kit/lib/queue.sh`. Three
+  attempts to learn one number, which is the ergonomics cost the entry prices.
   Filed 2026-08-17 by the `post-close-intake-and-index-port` close into the gap inbox, off its
   own tooling-friction triage; promoted 2026-08-17 at scope, with `--for`'s path-keyed selection
   read off `run-gates.sh` before the neighbour's disclaimer was called incomplete.
@@ -6660,7 +6778,13 @@
   **Cost while deferred:** low and stated — rule 14's bound stays "only for a session that
   recorded", so the launch chokepoint is uncovered while the mutation chokepoint is covered.
   One rule plus decision-table rows if taken.
-  recurrence: launch-chokepoint-liveness-record-write 2026-08-19
+  recurrence: launch-chokepoint-liveness-record-write 2026-08-19 2026-08-21
+  **Second firing, 2026-08-21 — grounds for that date.** `graph-port-and-config-seam`'s third build
+  batch backgrounded its step-0 battery and wrote no `<key>.run` record. No orphan resulted, so the
+  cost was zero this time — which is the entry's own point: the rule that would have caught it
+  reaches only a session that recorded, and a session that skips the record is invisible to it. The
+  firing is the harness form again, not a shell `&`, so it also re-attests why the `&`-only arm was
+  refused above. Self-disclosed by the session that committed it.
   Filed 2026-08-18 by close from the gap inbox; the drain re-verified the rule's reach against
   its source and measured the target entry's headroom with the gate rather than by hand — the
   bullet read one line of room where the oracle reports zero.
