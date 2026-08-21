@@ -312,8 +312,11 @@ GENERATED=("$GATES_DIR/git-hooks/pre-commit" "$GATES_DIR/CHECK-GRAPH.html")
 if (( ! DRY )); then
     ( cd "$ROOT" && bash "$ROOT/gate-sdk/bin/gen-pre-commit.sh" --write ) >/dev/null \
         || die "gate-sdk's hook generator failed"
-    ( cd "$ROOT" && bash "$ROOT/gate-sdk/checks/check-graph.sh" --emit ) > "$ROOT/$GATES_DIR/CHECK-GRAPH.html" \
-        || die "gate-sdk's graph emitter failed"
+    # spec: installer/README.md §The gate binary — the graph emitter is a binary arm, reached through the front-end that resolves its bridged knobs (gate-sdk/SPEC.md §The non-gate arm). It runs exactly when an artifact was selected, because a payload that omitted the binary has written the graph gate into gates.list as an omission and the consumer therefore has no graph gate for this artifact to be fresh against — and because omission must never fail an install over something the adopter did not choose. The roster loop below already tolerates a generated file that was not produced.
+    if [[ -n "$ARTIFACT_TARGET" ]]; then
+        ( cd "$ROOT" && bash "$ROOT/gate-sdk/bin/run-gates.sh" --emit graph ) > "$ROOT/$GATES_DIR/CHECK-GRAPH.html" \
+            || die "gate-sdk's graph emitter failed"
+    fi
 fi
 [[ -f "$ROOT/$GATES_DIR/git-hooks/commit-msg" ]] && GENERATED+=("$GATES_DIR/git-hooks/commit-msg")
 for g in "${GENERATED[@]}"; do
