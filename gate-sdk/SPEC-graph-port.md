@@ -202,13 +202,17 @@ configuration — there is no consumer config in which the registry is not the
 corpus — so this joins `check-gate-exemption-tasks` as a member whose verdict
 flips on nothing. **Design-bearing.**
 
-Criterion 4's discharge is the fixture corpus, and its condition is that the pair
-carry **every arm of the derivation being ported**. Measured at this stage on
-2026-08-21, the pair carries **one** arm of nine: `good/args` and `bad/args` are
-both `--amend-only`, so only assertion G is fixtured, and every other assertion
-rests on a live tree that is green because it is clean. Widening is therefore the
-port's largest single piece of work, and it happens **first** — a port answering
-only the criterion's sentence ships the hole the sentence was pointing at.
+Criterion 4's discharge is the fixture corpus — the `good/`+`bad/` pair and the
+bespoke drivers beside it, both living under the `gate-tests/` every live-tree
+walk prunes — and its condition is that the corpus carry **every arm of the
+derivation being ported**. Measured at spec on 2026-08-21 it carried **one** arm
+of nine: `good/args` and `bad/args` were both `--amend-only`, so only assertion G
+was fixtured and every other assertion rested on a live tree that is green
+because it is clean. Widening is therefore the port's largest single piece of
+work, and it happens **first** — a port answering only the criterion's sentence
+ships the hole the sentence was pointing at. **Delivered at build 2026-08-21 at
+nine of nine**, by the split below; what remains of this delta is the theme
+migration its last three bullets carry, which cannot land before delta (2).
 
 The widening splits by assertion shape:
 
@@ -265,7 +269,11 @@ The widening splits by assertion shape:
   **precisely so a member's port leaves its behavioral tests untouched** — so as
   written all three stop testing anything the moment the shell file is deleted.
   Re-pointing them onto `gate_run` is part of the port, not a cleanup, and it is
-  the same edit in all three files.
+  the same edit in each. It is a **different** migration from the theme one the
+  next bullets carry, over an overlapping set of files: this one is owed by
+  `-refs`, `-cap` and `-theme`, the theme one by `-refs`, `-theme` and `-tree`.
+  `check-graph-tree.test.sh` already reaches the gate through `gate_run` and owes
+  only the theme half.
 - **`check-graph-theme.test.sh` is re-pointed** from the retired sourced-function
   seam onto the part-file contract, keeping its four existing claims: injected
   content lands, an absent theme falls back with no leakage, both paths are
@@ -284,7 +292,7 @@ The widening splits by assertion shape:
   reachable through the theme and nowhere else, so its two cases inject a
   `graph_theme_header()` and are written against the seam that exists when they
   land. Post-port the injection becomes a `GATE_SDK_GRAPH_THEME_DIR/header.html`
-  part file. The three re-pointings are one migration over three files, and the
+  part file. The theme migration is one edit over those three files, and the
   widening lands **first** by this delta's own sequencing — a driver written
   against a contract the tree does not yet carry is a driver that runs nothing.
 
