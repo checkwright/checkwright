@@ -7533,6 +7533,17 @@
   **Cost while deferred:** low and recurring — one re-derivation per close — plus the standing risk
   that a roadmap-tagged row on a worklist reads as a sanctioned candidate to a session that
   has not read the tier section.
+  recurrence: icebox-candidate-eligibility-unapplied 2026-08-21
+  **Grounds for that date — the rate went to 100%.** `graph-port-and-config-seam`'s close ran the
+  worklist and every one of its five rows was ineligible: the same three by the roadmap-tag rule
+  (`plugin-marketplace`, `benchmark-ab-experiment`, `hosted-attestation-service`) and BOTH of the
+  remaining two on the tier's live-promotion-trigger clause — `rendered-site-link-monitor` waits on
+  the launch crawl and `build-stage-tier-economics` waits on `batch-split-stamp-ownership`, each
+  trigger stated in the entry's own body. So the judgment half returned no work either, and the
+  close paid two full entry reads to establish it. That sharpens the design fork rather than only
+  re-attesting the defect: a worklist that is empty of takeable rows every time it is run is not
+  being miscalibrated, it is deriving the wrong set — which argues for the filtering shape over the
+  explaining one, on evidence the entry did not have when it named the two.
   Surfaced 2026-08-19 at the `takeable-tier-batch-and-installer-noop` close's icebox eviction review
   and filed to the gap inbox there; promoted 2026-08-20 by the next iteration's scope.
 
@@ -7601,8 +7612,6 @@
 
 ## Done
 
-- upgrade-smoke-graph-artifact-literal
-- stage-stamp-ordering-unenforced
 
 ## Lessons Learned
 

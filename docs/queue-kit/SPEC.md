@@ -1224,6 +1224,15 @@ Calibration: lead-class rule — a tag of class C on a continuation line is a
 violation only when the lead line lacks class C (prose that mentions a tag
 the lead already carries is tolerated); tags outside the scanned sections are
 parsed by no reader and ignored. Fenced-code and table lines exempt.
+**Single backticks are not an exemption**, and the consequence is worth stating
+where an author meets it: an entry body *discussing* a tag it does not carry —
+`` `[roadmap:]` `` inside a sentence about the roadmap arm — reds exactly as a
+reflowed tag would, because the class table matches the bracketed token and the
+lead-class rule only tolerates what the lead line already carries. So prose
+about a tag spells its name without the brackets. Widening the exemption to
+inline code is refused: the entry-body citation grammar above already puts
+single backticks to work as a *live* claim (§The tag algebra), so a scan that
+skipped them would have to skip the citation surface too.
 Residual accepted gap: a same-class duplicate sliding off while one stays on
 the lead — negligible severity, not reflow-realistic.
 
