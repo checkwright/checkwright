@@ -38,8 +38,8 @@ override with `GATE_SDK_GATES_DIR`) holding:
   sets any `GATE_SDK_*` layout knob so the override outlives the shell that set
   it (see the loader paragraph below).
 - `graph-vocab.sh` — optional rule content for `check-graph` (see there).
-- `graph-theme.sh` — optional consumer theme for `check-graph`'s emitted
-  artifact (see there).
+- `graph-theme/` — optional consumer theme **directory** for `check-graph`'s
+  emitted artifact, its parts read as data (see there).
 - `core-files.list` — optional manifest for `check-core-files`: the
   repo-relative paths that must stay present and tracked (see there).
 - `identity.conf` — optional manifest for `check-identity`: the git identity
@@ -8364,8 +8364,9 @@ all six globals are defined before the source so an absent file resolves to
 empty arrays that disable their checks exactly as before.
 
 The rule is a **prefix test, not a glob, and that is a deliberate narrowing.**
-The retired `graph_surface_layer()` hook was a bash `case`, whose `*` crosses
-`/`; the crate carries a component-wise matcher and a slash-spanning one side by
+The retired `graph_surface_layer()` hook accepted an arbitrary shell pattern over
+the whole path, unanchored to path segments; the crate carries a component-wise
+matcher and a slash-spanning one side by
 side and nothing says which a port should reach for
 (`couples-glob-semantics-unowned`). A prefix test has no glob semantics to own,
 expresses every rule the live consumer's hook expressed, and closes this
@@ -8466,10 +8467,10 @@ edit, so the failure would be invisible in a green battery — the exact shape
 Determinism: the freshness assertion's in-memory emission and the emit arm a
 consumer redirects into the artifact read the same part files, so the
 byte-compare holds; the artifact stays generated-only, a styling change landing
-in a part file (or the emitter), never a hand-edit. The node set is byte-sorted
-rather than sorted under the invoking locale, which the shell form did — a
-narrowing the port took on purpose, since under a non-C collation the artifact
-was machine-dependent and the byte-compare read that as drift.
+in a part file (or the emitter), never a hand-edit. The node set is byte-sorted,
+which is deterministic across locales — a narrowing the port took on purpose,
+since a locale-dependent ordering makes the artifact machine-dependent and the
+byte-compare reads that as drift.
 Self-containment is unchanged: injected content is inline, and a theme emitting
 a relative asset href must resolve under the artifact dir or the asset-href
 assertion is red — the existing gate already polices the link-the-site-stylesheet
