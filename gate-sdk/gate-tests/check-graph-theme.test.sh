@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Direct unit test of check-graph.sh's theme-injection seam (GATE_SDK_GRAPH_THEME
+# Direct unit test of check-graph's theme-injection seam (GATE_SDK_GRAPH_THEME
 # and the graph_theme_css/header/footer overrides) — the good/bad pair stays the
 # themeless case (--amend-only), so the emit-side theme seam needs its own test:
 # a theme file's injected markers provably land in --emit, an absent theme falls
@@ -11,7 +11,7 @@ set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # gate-sdk/
-GATE="$DIR/checks/check-graph.sh"
+CHECKS="$DIR/checks"
 
 fails=0
 tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
@@ -26,8 +26,12 @@ graph_theme_header() { echo "  <div id=\"$HDR_MARKER\"></div>"; }
 graph_theme_footer() { echo "  <div id=\"$FTR_MARKER\"></div>"; }
 THEME
 
-themed="$(GATE_SDK_GRAPH_THEME="$tmp/theme.sh" "$GATE" --emit)"
-bare="$(GATE_SDK_GRAPH_THEME="$tmp/absent.sh" "$GATE" --emit)"
+emit() {  # emit() <theme-file> -> the --emit output under that theme
+    gate_env GATE_SDK_GRAPH_THEME="$1" && gate_run check-graph "$CHECKS" --emit
+}
+
+themed="$(emit "$tmp/theme.sh")"
+bare="$(emit "$tmp/absent.sh")"
 
 # --- the injected markers provably land in the themed emission -----------------
 for m in "$CSS_MARKER" "$HDR_MARKER" "$FTR_MARKER"; do
@@ -42,10 +46,10 @@ for m in "$CSS_MARKER" "$HDR_MARKER" "$FTR_MARKER"; do
 done
 
 # --- both paths are deterministic (assertion E's byte-compare depends on it) ---
-themed2="$(GATE_SDK_GRAPH_THEME="$tmp/theme.sh" "$GATE" --emit)"
+themed2="$(emit "$tmp/theme.sh")"
 [[ "$themed" == "$themed2" ]] \
     || { echo "  FAIL: themed --emit is not byte-deterministic across runs"; fails=$((fails + 1)); }
-bare2="$(GATE_SDK_GRAPH_THEME="$tmp/absent.sh" "$GATE" --emit)"
+bare2="$(emit "$tmp/absent.sh")"
 [[ "$bare" == "$bare2" ]] \
     || { echo "  FAIL: themeless --emit is not byte-deterministic across runs"; fails=$((fails + 1)); }
 

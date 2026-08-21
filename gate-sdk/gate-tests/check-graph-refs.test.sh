@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Direct unit test of check-graph.sh's external-ref assertion (assertion H) via
+# Direct unit test of check-graph's external-ref assertion (assertion H) via
 # the hermetic --refs-only mode — the good/bad pair stays the themeless
 # --amend-only case, so the emit-side ref allowlist needs its own test: a theme
 # chrome link that matches no allowed prefix reds, the same link allowlisted via
@@ -12,7 +12,7 @@ set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # gate-sdk/
-GATE="$DIR/checks/check-graph.sh"
+CHECKS="$DIR/checks"
 
 fails=0
 tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
@@ -25,8 +25,9 @@ graph_theme_footer() { echo "  <a href=\"$EXT\">third-party</a>"; }
 THEME
 
 run() {  # run() <config> <theme> <knob> -> sets rc/out
-    out="$(GATE_SDK_CONFIG_FILE="$1" GATE_SDK_GRAPH_THEME="$2" \
-           GATE_SDK_GRAPH_EXTERNAL_REFS="$3" "$GATE" --refs-only 2>&1)"
+    out="$(gate_env GATE_SDK_CONFIG_FILE="$1" GATE_SDK_GRAPH_THEME="$2" \
+                    GATE_SDK_GRAPH_EXTERNAL_REFS="$3" \
+           && gate_run check-graph "$CHECKS" --refs-only 2>&1)"
     rc=$?
 }
 

@@ -262,7 +262,8 @@ The widening splits by assertion shape:
   four of delta (6)'s coverage branches and all three cycle-valve branches clear,
   so a branch that stops firing reds rather than passing vacuously.
 - **The three existing drivers reach the gate by script path and must be moved to
-  `gate_run`, found at build.** `check-graph-refs.test.sh`,
+  `gate_run`, found at build and delivered there 2026-08-21.**
+  `check-graph-refs.test.sh`,
   `check-graph-cap.test.sh` and `check-graph-theme.test.sh` each invoke
   `"$GATE"` = `checks/check-graph.sh` directly. gate-sdk/SPEC.md §run-gate-tests
   rules that a bespoke test names a gate and a checks dir, never a script path,

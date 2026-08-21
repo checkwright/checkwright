@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Direct unit test of check-graph.sh's render-cap assertion (assertion I) via the
+# Direct unit test of check-graph's render-cap assertion (assertion I) via the
 # hermetic --cap-only mode — the good/bad pair stays the themeless --amend-only
 # case, so the emit-side cap needs its own test: an emitted graph with more edges
 # than the page's declared maxEdges reds (Mermaid would paint an error graphic
@@ -13,17 +13,18 @@ set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # gate-sdk/
-GATE="$DIR/checks/check-graph.sh"
+CHECKS="$DIR/checks"
 
 fails=0
 
 # the emitted edge count the assertion measures against, from the real registry
-edge_n="$(grep -cE '(<-->|-->)\|"' <<<"$("$GATE" --emit)")"
+edge_n="$(grep -cE '(<-->|-->)\|"' <<<"$(gate_run check-graph "$CHECKS" --emit)")"
 [[ "$edge_n" -gt 1 ]] \
     || { echo "  FAIL: expected the emitted graph to carry edges, counted $edge_n"; fails=$((fails + 1)); }
 
 run() {  # run() <knob> -> sets rc/out
-    out="$(GATE_SDK_GRAPH_MAX_EDGES="$1" "$GATE" --cap-only 2>&1)"; rc=$?
+    out="$(gate_env GATE_SDK_GRAPH_MAX_EDGES="$1" \
+           && gate_run check-graph "$CHECKS" --cap-only 2>&1)"; rc=$?
 }
 
 # --- a cap below the edge count reds, naming the count and the cap -------------
