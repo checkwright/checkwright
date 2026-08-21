@@ -44,7 +44,7 @@ EOF
 cp "$SDK/templates/msg-patterns.list" scripts/msg-patterns.list
 
 bash "$SDK/bin/gen-pre-commit.sh" --write >/dev/null
-bash "$SDK/checks/check-graph.sh" --emit > scripts/CHECK-GRAPH.html
+bash "$SDK/bin/run-gates.sh" --emit graph > scripts/CHECK-GRAPH.html
 
 # spec: gate-sdk/SPEC.md §run-gates — quiet green, loud red: green is one summary line, red prints verbatim, GATE_SDK_VERBOSE restores the banner roll
 q="$PWD/.tmp/quiet-smoke"

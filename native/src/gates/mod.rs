@@ -18,6 +18,7 @@ pub mod gate_binary_fresh;
 pub mod gate_fixture_coverage;
 pub mod gate_output;
 pub mod gate_tamper;
+pub mod graph;
 pub mod kit_enum;
 pub mod docs_cname_parity;
 pub mod exec_bit;
@@ -1235,6 +1236,35 @@ pub const REGISTRY: &[GateEntry] = &[
     // spec: gate-sdk/SPEC.md §The fourth budget batch — members with no joint proof, each its own
     // unit. None declares a walk root: two resolve a corpus by pathname expansion and the third
     // by `git ls-files`, and §check-reads-couples rules both outside the walk class.
+    // spec: gate-sdk/SPEC.md §check-graph — the coupling-graph auditor. `?` as its walk root for
+    // the reason its shell original was classified `?`: assertion G's scan root is the member's own
+    // first argument with a default, the variable-first-argument shape §check-reads-couples calls
+    // undecidable. It declares GATE_SDK_ROOT_HERE because assertion D spawns the hook generator,
+    // which stays shell (§gen-pre-commit), and a compiled member has no BASH_SOURCE to find it by.
+    (
+        "check-graph",
+        graph::run,
+        &[("?", "")],
+        &[
+            "GATE_PRUNE_DIRS",
+            "GATE_SDK_GATES_DIR",
+            "GATE_SDK_HOOKS_DIR",
+            "GATE_SDK_ROOT_HERE",
+            "GATE_KIT_ROOTS_HERE",
+            "GATE_KIT_ROOTS_REL",
+            "GATE_SDK_GRAPH_ARTIFACT",
+            "GATE_SDK_GRAPH_THEME_DIR",
+            "GATE_SDK_GRAPH_MAX_EDGES",
+            "GATE_GRAPH_EXTERNAL_REFS",
+            "GRAPH_VOCAB",
+            "GRAPH_LEADING",
+            "GRAPH_LAGGING",
+            "GRAPH_LAYERS",
+            "GRAPH_LAYER_RULES",
+            "GRAPH_LAYER_DEFAULT",
+        ],
+        "gate-sdk",
+    ),
     (
         "check-gate-fail-closed",
         gate_fail_closed::run,

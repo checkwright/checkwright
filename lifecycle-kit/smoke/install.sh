@@ -76,7 +76,7 @@ bash "$SMOKE_KIT_ROOT/bin/file-survey.sh" \
 bash "$SMOKE_KIT_ROOT/bin/install-lifecycle.sh" >/dev/null
 
 bash "$SDK/bin/gen-pre-commit.sh" --write >/dev/null
-bash "$SDK/checks/check-graph.sh" --emit > scripts/CHECK-GRAPH.html
+bash "$SDK/bin/run-gates.sh" --emit graph > scripts/CHECK-GRAPH.html
 
 # spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — exercise enter-stage end-to-end under .tmp (advisory tool, no fixture pair)
 es="$PWD/.tmp/enter-stage-smoke"

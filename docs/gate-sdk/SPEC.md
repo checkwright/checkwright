@@ -85,10 +85,14 @@ prefix its name carries**, so an environment-only override would fail-close on
 every invocation), `GATE_SDK_AGENT_FILE` (default
 `CLAUDE.md`; the always-loaded agent file a consumer's harness reads — set it to
 `AGENTS.md` under an agent-file harness, and `check-root-tiering`'s built-in
-allowlist accepts that file at root), `GATE_SDK_GRAPH_THEME` (default
-`<gates-dir>/graph-theme.sh`; the optional consumer theme file `check-graph`
-sources to inline host-site tokens/chrome into the emitted artifact — see
-there), `GATE_SDK_GRAPH_EXTERNAL_REFS` (default empty; space-separated URL
+allowlist accepts that file at root), `GATE_SDK_GRAPH_THEME_DIR` (default
+`<gates-dir>/graph-theme/`; the optional consumer theme directory whose part
+files `check-graph`'s emitter inlines verbatim to bring host-site tokens/chrome
+into the emitted artifact — see there; it **replaces** the retired
+`GATE_SDK_GRAPH_THEME` sourced-function seam, which the gate now refuses on
+rather than ignoring), `GATE_SDK_GRAPH_MAX_EDGES` (default `100000`; the render
+cap the emitted page declares and `check-graph` asserts against — see there),
+`GATE_SDK_GRAPH_EXTERNAL_REFS` (default empty; space-separated URL
 prefixes the `check-graph` external-ref assertion sanctions beyond the
 kit-seeded mermaid import — a consumer whose theme chrome links absolute URLs
 lists their prefixes here — see §check-graph), `GATE_SDK_CORE_FILES_FILE` (default
@@ -1827,6 +1831,14 @@ design time; the last three were paid for, and each is named with what it cost.
    first consumer who writes one. Committing to the wider semantics costs
    nothing today and closes a silent-divergence class; a porting unit inherits
    the commitment rather than re-deciding it.
+
+   **The commitment governs a glob matcher and not a predicate that matches no
+   glob**, which is the distinction `check-graph`'s port had to draw: assertion
+   B's `couples ⊆ trigger` test is four branches of exact-token and suffix
+   comparison with one bash-pattern branch inside it, and reading this paragraph
+   as a mandate to substitute a globstar matcher for the whole predicate flips
+   verdicts on the live registry (§check-graph). Stated because this is the first
+   ruling a porting session finds and it is the wrong one for such a reader.
 7. **Its rule invokes no external program the payload does not carry.** *Found
    at first-cohort selection.* The programs the payload is entitled to assume are
    `GATE_SDK_PROGRAM_FLOOR` (§lib/gate.sh); git is on it as the one sanctioned
@@ -5729,6 +5741,15 @@ Resolution, per declared knob:
   of every pair**, naming the offending key rather than the knob alone — the
   shape the prefix arm already uses when it names the offending family member.
 
+  **The newline refusal has a design consequence worth stating as a rule, because
+  it decides the shape of every configurable *document*: values cross the bridge;
+  documents cross as a path.** A stylesheet or an HTML fragment is newline-bearing
+  by construction, so its content cannot ride the bridge at all — what crosses is
+  the **relative** path to a directory or file, and the binary reads the bytes
+  itself. `check-graph`'s theme seam is the worked instance and the counterpart is
+  its vocabulary, whose layer rules are short single-line elements and so cross as
+  values (§check-graph).
+
   **The keyed arm closes a live fail-open rather than merely adding a case.**
   Before it, the resolution checked only that a knob was *declared* and then
   expanded it through a nameref, so an associative knob did not refuse: it
@@ -5745,6 +5766,37 @@ Resolution, per declared knob:
   an extra tab and its line-oriented read forecloses a newline, so no value
   reaching those knobs can violate the bridge. The constraint is that loader's,
   not a new bound this bridge imposes on consumers.
+
+**The graph family's resolved globals.** `GATE_SDK_GRAPH_ARTIFACT`,
+`GATE_SDK_GRAPH_THEME_DIR` and `GATE_SDK_GRAPH_MAX_EDGES` take guarded top-level
+assignments here rather than inline `${KNOB:-…}` defaults at their use sites, on
+the cause the roster above states — a default `declare -p` cannot find is the
+bridge's undeclared-knob refusal — and the first two ride `GATE_SDK_GATES_DIR`'s
+own resolved value so each pair stays one value by construction.
+`GATE_SDK_GRAPH_EXTERNAL_REFS` is a whitespace scalar feeding an array, the one
+case a resolved global earns a spelling of its own, so it resolves to
+`GATE_GRAPH_EXTERNAL_REFS` beside `GATE_PRUNE_DIRS`. Every one of these values
+stays **relative**: the resolved argv is baked verbatim into the tracked
+pre-commit hook, and an absolute value would commit one machine's checkout path
+to a public file.
+
+**`GATE_SDK_ROOT_HERE` is the kit's own root as a bridgeable value**, spelled
+relative to the current directory by `GATE_KIT_ROOTS_HERE`'s rule and for its
+reason. It exists because a compiled member that must reach a file inside its own
+kit has **no `BASH_SOURCE`** to find it by — the one thing a shell gate knew about
+itself for free is the one thing a port must be handed. `check-graph`'s assertion
+D is the worked instance: it spawns `bin/gen-pre-commit.sh`, which stays shell
+(§gen-pre-commit). The kit-root set is not a substitute, because
+`GATE_SDK_KIT_DIRS` may narrow it to a consumer's own tree — which is exactly the
+configuration a sandboxed fixture runs under.
+
+**A consumer config *file* whose content is rule data is sourced here, not in the
+member.** `GATE_SDK_GRAPH_VOCAB` (default `<gates-dir>/graph-vocab.sh`) is read at
+top level, the shape `GATE_SDK_MSG_PATTERN_FILES` already uses, and its six
+globals are defined before the source so the bridge's does-not-define refusal
+cannot fire on any of them and an absent file resolves to empty arrays. The
+member is compiled and receives the resolved values, so the path itself is a knob
+the crate never declares.
 
 The `GATE_SDK_KNOB_` prefix is deliberately **not** the knob's own name: reusing
 `CANON_KIT_MANIFEST_FILES` as an env scalar would collide with the existing
@@ -6303,6 +6355,19 @@ emitter's write set is held by that emitter's own freshness gate (`check-graph`
 assertions D and E cover both generated hooks and the graph artifact) and its own
 fixtures; restating it here bought nothing and rotted on the first change.
 
+**The regen step reads the artifact's path rather than spelling it, and reads it
+in the *consumer's* library.** The graph emitter is a binary arm, so the step
+goes through the emit front-end that resolves its bridged knobs (§The non-gate
+arm), and the destination comes from the scratch consumer's own
+`GATE_SDK_GRAPH_ARTIFACT` — sourced in that tree — never from this tool's, which
+resolved the *host* repo's config when it sourced `lib/gate.sh` at startup. The
+distinction is load-bearing rather than pedantic: a host that republishes its
+artifact (this repo serves `docs/check-graph.html`) would otherwise write the
+scratch consumer's artifact to a path that consumer's own gate never looks at.
+This is what discharges `upgrade-smoke-graph-artifact-literal`, and through
+neither disposition that entry could see: it neither duplicates the default
+expression nor mints an arm on a gate for one caller.
+
 **Each phase runs against its own ref's gate binary**, and that pairing is what
 makes phase 1's claim true as written. A `.gate` member dispatches to a binary
 that does not travel with the kits: `native/` ships no `checks/` or `smoke/`, so
@@ -6509,6 +6574,26 @@ byte-stable. **A `tier=commit-msg` member therefore ports with no new emitter
 arm** — both hooks resolve argv through the one `command_rel` → `gate_command`
 path — which the generated hook's own shell spelling reads against; the
 adjudication is at §The second budget batch.
+
+**This generator does not port, and the cause is structural rather than a sizing
+judgment.** The hook bakes the **resolved** invocation argv verbatim — `env
+GATE_SDK_KNOB_…=… <binary> <name>` — and resolving a knob means sourcing the
+owning kit's `lib/*.sh` in a subshell and reading `declare -p`. §lib/gate.sh
+rules there is exactly **one** place a knob's value is computed, the kit's shell
+library; a crate-side hook emitter would have to be the second, which criterion 6
+refuses. So this is not an unported emitter awaiting a cohort — it is the config
+bridge's own producer, and it stays where the bridge is. `check-graph`'s
+assertion D therefore keeps spawning it, which criterion 7 clears explicitly: a
+rule shelling out to `bash <emitter>` clears that criterion because `bash` is on
+the program floor, however unported the emitter is. The cost is real and is
+recorded rather than absorbed — the ported `check-graph` is the crate's **first**
+gate to spawn a program other than git, which runs against the direction of
+TRAJECTORY.md §The objectives 1, 2 and 6. The alternative — a new shell gate
+owning hook parity alone, under born-native exception class (a) — was costed and
+refused: it mints a gate name, a descriptor, a fixture pair and a SPEC section to
+relocate an assertion criterion 7 already sanctions in place. The residue is
+filed (`graph-port-bash-spawn-residue`) with that split as the
+designed-but-unbought answer. **Ratified by the operator, 2026-08-21.**
 
 **The hook bakes a ported member's resolved knob values**, because it resolves
 argv through `gate_command` at *generation* time and the bridge's `env` elements
@@ -8272,9 +8357,42 @@ Rule content is config, not code: `<gates-dir>/graph-vocab.sh` may declare
 `GRAPH_VOCAB` (the legal surface tokens; empty/absent disables the vocabulary
 check), `GRAPH_LEADING`/`GRAPH_LAGGING` (the assertion-C sets; absent
 disables cycle-valve classification, leaving the no-leading `valve=none` rule),
-and `GRAPH_LAYERS` + `graph_surface_layer()` (the projection's subgraph
-grouping; absent renders one layer). The `--amend-only [dir]` mode runs only
+`GRAPH_LAYERS` (the projection's subgraph grouping; absent renders one layer),
+and the layer lookup as **data rather than a hook**: `GRAPH_LAYER_RULES`, an
+ordered array of `<path-prefix>:<layer-id>` elements split at the **last** `:`
+(a layer id is `[A-Za-z0-9_]+`, so a prefix may itself carry one) with **first
+match wins**, and `GRAPH_LAYER_DEFAULT`, the layer a surface no rule matches
+takes (kit default `surfaces`). The file is sourced by `lib/gate.sh`, not by the
+member: the member is compiled and receives the resolved *values*, so
+`GATE_SDK_GRAPH_VOCAB` is a path the crate never sees and never declares, and
+all six globals are defined before the source so an absent file resolves to
+empty arrays that disable their checks exactly as before.
+
+The rule is a **prefix test, not a glob, and that is a deliberate narrowing.**
+The retired `graph_surface_layer()` hook was a bash `case`, whose `*` crosses
+`/`; the crate carries a component-wise matcher and a slash-spanning one side by
+side and nothing says which a port should reach for
+(`couples-glob-semantics-unowned`). A prefix test has no glob semantics to own,
+expresses every rule the live consumer's hook expressed, and closes this
+surface's exposure rather than adding a fourth reader of an unowned question. The `--amend-only [dir]` mode runs only
 (G) over a given directory, letting the fixture pair exercise it hermetically.
+**Assertion B's coverage predicate, stated because it is the `couples=` field's
+third reader and it invokes no glob matcher at all.** A couple is covered when
+any trigger token satisfies one of four branches: a `*` trigger covers
+everything; an exact string match covers; a **literal** couple — one carrying no
+`*` or `?` — covered by the trigger read as a bash pattern covers; and a
+`*.<ext>` trigger covers a couple ending in that suffix. Neither of the crate's
+two matchers *is* this predicate — the component-wise one requires equal segment
+counts and the slash-spanning one is branch three alone — and substituting
+either flips verdicts on the live registry, so the predicate is carried whole.
+Criterion 6's globstar commitment (§The port-candidate criteria) governs a Rust
+glob matcher over a bridged knob and does not reach a predicate that matches no
+glob; it is stated here because it is the first ruling a porting session finds
+and it is the wrong one for this reader. This closes the **port's** exposure to
+`couples-glob-semantics-unowned` and that entry's undocumented-third-semantics
+half; whether `couples=` has one semantics with stated exceptions or a per-reader
+meaning declared per reader is untouched and stays that entry's deliverable.
+
 Coverage ruling: a full `couples ⊇ find-globs` parity check over arbitrary
 shell is undecidable — neither cheap nor low-FP — so check-graph does not carry
 it, and the couples⊆trigger guarantee already ensures editing a *coupled*
@@ -8283,39 +8401,79 @@ statically resolvable slice of that parity is carried by its sibling
 `check-reads-couples` (§check-reads-couples); the undecidable remainder stays
 the author's duty under §The `# graph:` manifest.
 
-Port sizing, recorded because no static signal carries it: this member's work is
-**929 shell lines, not the 632 of `check-graph.sh`**. Assertions D and E spawn
-`bin/gen-pre-commit.sh` (297) and compare its `--emit` and `--emit-commit-msg`
-output byte-for-byte, so the generator is part of the port and `--group`'s line
-counts see none of it — the spawn-invisibility rule stated under §The first
-cohort, whose last unrecorded instance this is. Recorded 2026-08-17 at close,
-draining the bullet spec filed while sizing the twelfth cohort.
+Port sizing, **corrected at the port**: the 929-line figure recorded 2026-08-17
+counted the generator, and `bin/gen-pre-commit.sh` (297) does **not** port
+(§gen-pre-commit). The ported surface is `check-graph.sh`'s 632 lines; the
+generator's 297 stay shell with the cause stated there, and assertion D keeps
+spawning it for `--emit` and `--emit-commit-msg`. The spawn-invisibility rule the
+old figure illustrated still holds for a generator that *is* in a port's scope —
+what was wrong was the assumption that this one was.
 
-The same spawn is why this member's runtime has grown into the battery's slowest
-few, which is a second argument for its port and an independent one: assertion D
-spawns a fresh `bash` on the generator for `--emit`, and assertion E spawns a
-second for `--emit-commit-msg` whenever a `tier=commit-msg` gate is registered —
-so the cost scales with the manifest set on every run, and a consumer registering
-a commit-msg gate pays it twice. The port makes those calls in-process, the
-dividend the freshness family already banked. Per-gate timings and the pre-port
-comparison stay owned by the consumer's timing baseline and the close-stage
-runtime review that reads it, never by this line.
+**The runtime paragraph is corrected against measurement, and the correction
+removes an argument rather than adjusting it.** This member is among the
+battery's slowest, and the reason is the two spawns that do not port. Measured at
+build on 2026-08-21 against this tree, median of three: the full gate runs
+7629 ms, of which `gen-pre-commit.sh --emit` is 5651 ms and `--emit-commit-msg`
+210 ms — **77% of the member's runtime is the two spawns**, and the 5.7 s is the
+config bridge resolving argv for every registered member. What the port does bank
+is the graph emission and the per-member manifest read, 1454 ms for the emission
+alone. So the earlier claim that *the port makes those calls in-process* was
+false as written: it never could, under the generator's own cause for staying
+shell. The operator ruling of 2026-08-09 is the argument for this member's port
+and it needs no other; a runtime dividend was never one. Per-gate timings stay
+owned by the consumer's timing baseline and the close-stage runtime review that
+reads it, never by this line.
 
 Theme seam: the emitted HTML artifact bypasses the consumer's
 site generator, so it renders foreign beside the rest of a docs host unless the
 host theme is inlined — and the theme is consumer-specific, so the emitter must
-not hardcode it. `GATE_SDK_GRAPH_THEME` (default `<gates-dir>/graph-theme.sh`,
-mirroring `GATE_SDK_GRAPH_VOCAB`) names a consumer file sourced when present at
-every emission. It may define override functions, the `graph_surface_layer`
-pattern: `graph_theme_css` emits the `<style>` element's body (replacing the
-kit's default stylesheet), `graph_theme_header` emits a fragment directly after
-`<body>` (site chrome above the kit header), and `graph_theme_footer` emits a
-fragment directly before `</body>`. An absent file or an undefined function
-falls back to the kit default, so a themeless consumer's output stays
-byte-identical. Determinism: the freshness assertion's in-memory emission and the `--emit` a
-consumer redirects into the artifact resolve the same theme path, so the
+not hardcode it. `GATE_SDK_GRAPH_THEME_DIR` (default `<gates-dir>/graph-theme/`)
+names a directory of at most three optional part files, each inlined **byte
+verbatim** at one injection point:
+
+| part file | injection point | absent |
+|---|---|---|
+| `theme.css` | the `<style>` element's body, replacing the kit default stylesheet | kit default stylesheet |
+| `header.html` | directly after `<body>`, above the kit header | nothing emitted |
+| `footer.html` | directly before `</body>` | nothing emitted |
+
+The roster is closed at three: a part file with no injection point is not
+defined. An absent directory or an absent part falls back exactly as an undefined
+override function did under the retired seam, so a themeless consumer's output
+stays byte-identical. The kit neither adds nor strips a trailing newline — a part
+file's own bytes are what appear.
+
+**Why a directory of files rather than bridged values.** The config bridge
+(§lib/gate.sh) refuses any element containing a newline, exit 2, because the
+newline would break the line-per-element argv protocol; a stylesheet and two HTML
+fragments are newline-bearing by construction, so theme *content* cannot ride the
+bridge at all. Only the **path** crosses, relative, and the binary reads the files
+itself. That is the general rule §lib/gate.sh states: values cross the bridge,
+documents cross as a path.
+
+**This replaced a sourced-function seam and the replacement is breaking, stated
+rather than presented as a clean port.** `GATE_SDK_GRAPH_THEME` and the three
+`graph_theme_css`/`_header`/`_footer` override functions are **retired**: a
+consumer carrying a `graph-theme.sh` had that file read at every emission, and
+after this change it is not. The doctrine CLAUDE.md §The provenance seam names
+this pair as its worked example holds through the cut — the theme stays the
+consumer's, and only its **form** moves from executable to declarative.
+
+**The retired seam fails loudly rather than silently.** The gate refuses, exit 2,
+naming the migration, when `GATE_SDK_GRAPH_THEME` is set in its environment or a
+file exists at `<gates-dir>/graph-theme.sh`. The tripwire is permanent kit weight
+and it is worth it: a themed consumer that silently lost its theme produces a
+regenerated artifact the byte-compare cannot distinguish from a legitimate theme
+edit, so the failure would be invisible in a green battery — the exact shape
+§Fail-closed contract exists to refuse.
+
+Determinism: the freshness assertion's in-memory emission and the emit arm a
+consumer redirects into the artifact read the same part files, so the
 byte-compare holds; the artifact stays generated-only, a styling change landing
-in the theme file (or the emitter), never a hand-edit.
+in a part file (or the emitter), never a hand-edit. The node set is byte-sorted
+rather than sorted under the invoking locale, which the shell form did — a
+narrowing the port took on purpose, since under a non-C collation the artifact
+was machine-dependent and the byte-compare read that as drift.
 Self-containment is unchanged: injected content is inline, and a theme emitting
 a relative asset href must resolve under the artifact dir or the asset-href
 assertion is red — the existing gate already polices the link-the-site-stylesheet
@@ -8338,7 +8496,7 @@ via `--refs-only` (the fixture's `check-graph-refs.test.sh` drives it, as
 neither `href` nor `src` and are out of scope. Dark mode is the theme owner's disposition: the kit default keeps its
 light+dark scheme, and because the emitted mermaid init keys on
 `prefers-color-scheme`, a theme's chrome must honor that query too or it clashes
-with a dark-rendered graph on the same page. This repo's `scripts/graph-theme.sh`
+with a dark-rendered graph on the same page. This repo's `scripts/graph-theme/`
 supplies the docs-host tokens, header, and footer (both schemes), so
 `docs/check-graph.html` reads as the same site.
 
@@ -8360,6 +8518,56 @@ Mermaid's own `500` default, catching a regression that drops the init key
 entirely. The assertion runs whole-tree and hermetically via `--cap-only` (the
 fixture's `check-graph-cap.test.sh` drives it, as `--refs-only` drives assertion
 H).
+
+**Criterion 4 binds on this member, under every configuration.** The gate
+resolves every `gates.list` member's declaration path and reads its bytes for the
+`# graph:` line, so a registry member's declaration path lies inside the corpus
+the gate scans as content — criterion 4's predicate exactly — and there is no
+consumer config in which the registry is not that corpus. It joins
+`check-gate-exemption-tasks` as a member whose verdict flips on nothing. The
+discharge is the fixture corpus, and its condition is that the corpus carry
+**every arm of the derivation being ported**. Measured at spec on 2026-08-21 it
+carried **one arm of nine** — `good/args` and `bad/args` were both
+`--amend-only`, so only assertion G was fixtured and every other assertion rested
+on a live tree that is green because it is clean. The widening therefore landed
+**before** the port, at nine of nine, and it splits by assertion shape:
+
+- The `good/`+`bad/` pair carries assertion **G and only G**. A case runs one
+  argv, so it selects one mode, and only `--amend-only` reaches an assertion
+  without also reaching D and E — which a `good/` case cannot satisfy, since
+  `gen-pre-commit.sh` cds to `git rev-parse --show-toplevel` before resolving the
+  gates dir, and satisfying E would take a committed `CHECK-GRAPH.html` inside
+  `gate-tests/`. Both are the second-copy-of-a-generated-file this corpus
+  refuses. A fourth mode selecting the registry assertions is refused too: it
+  would add consumer-visible surface to buy a corpus a driver already has.
+- Assertions **A through F** take a constructed mini-consumer in
+  `check-graph-tree.test.sh` — a `mktemp`'d git repo carrying a registry, five
+  member declarations in **both spellings**, and a vocabulary file. Its `.gate`
+  member is `tier=align-only`, which keeps it out of both generated hooks and so
+  out of `gate_command`'s reach, letting the sandbox exercise the descriptor
+  branch of assertion A's resolution with no binary present. The baseline case is
+  the parity oracle for the branch set: it greens only if all four coverage
+  branches and all three cycle-valve branches clear, so a branch that stops firing
+  reds rather than passing vacuously.
+- Assertions **H and I** keep their own hermetic drivers
+  <!-- prose-enum-exempt: this member's own driver set, not a subset of the kit's gate-test roster -->
+  (`check-graph-refs.test.sh`, `check-graph-cap.test.sh`), and the **theme seam**
+  keeps `check-graph-theme.test.sh`. Assertion F is reachable only through a
+  theme, because the kit's own emission carries no local `href`/`src` at all.
+- A bespoke driver reaches the gate through `gate_run` and never by script path
+  (§run-gate-tests), which is what let this member's behavioral tests survive its
+  port; what each driver owed at the cut was the **two distinct migrations** the
+  port carried — onto `gate_run`, and off the retired theme seam onto part files.
+
+**The live-tree parity arm is demoted from proof to smoke**, per criterion 4's
+own rule for a member whose assertion target is gate source: assertion A forbids
+a descriptor and a script coexisting in one resolve dir, so the cross-substrate
+comparison necessarily ran on the pre-descriptor tree, which the port then
+changed. Its verdict is recorded as **no disagreement found on the pre-descriptor
+tree**, never as parity proved. What stands in its place is an executed
+byte-identity acceptance: with the descriptor's couples widening held out, the
+ported emitter over the migrated part files reproduced the pre-port shell
+emission byte for byte.
 
 ### check-reads-couples
 

@@ -18,7 +18,7 @@ CHECKS="$DIR/checks"
 fails=0
 
 # the emitted edge count the assertion measures against, from the real registry
-edge_n="$(grep -cE '(<-->|-->)\|"' <<<"$(gate_run check-graph "$CHECKS" --emit)")"
+edge_n="$(grep -cE '(<-->|-->)\|"' <<<"$(bash "$DIR/bin/run-gates.sh" --emit graph)")"
 [[ "$edge_n" -gt 1 ]] \
     || { echo "  FAIL: expected the emitted graph to carry edges, counted $edge_n"; fails=$((fails + 1)); }
 

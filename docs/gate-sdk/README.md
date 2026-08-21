@@ -81,7 +81,7 @@ EOF
 
 mkdir -p .workflow docs
 bash gate-sdk/bin/gen-pre-commit.sh --write                       # generate the hook
-bash gate-sdk/checks/check-graph.sh --emit > scripts/CHECK-GRAPH.html
+bash gate-sdk/bin/run-gates.sh --emit graph > scripts/CHECK-GRAPH.html   # the coupling graph
 bash gate-sdk/bin/run-gates.sh --emit enforcement-map > docs/enforcement.md # the enforcement map (regenerate on any class-registry change)
 bash gate-sdk/bin/install-hooks.sh                                # opt in this clone
 

@@ -148,8 +148,13 @@ fi
 # spec: gate-sdk/SPEC.md §upgrade-smoke — phase A, step 2 of 2: regenerate the generated artifacts, run after the sync has been judged. Which paths each emitter writes is that emitter's own contract, held by that emitter's own freshness gate, so nothing here names the set
 ( cd "$CONS" && bash gate-sdk/bin/gen-pre-commit.sh --write >/dev/null ) \
     || { echo "upgrade-smoke: phase A gen-pre-commit failed at TO ($TO)" >&2; exit 2; }
-( cd "$CONS" && bash gate-sdk/checks/check-graph.sh --emit > scripts/CHECK-GRAPH.html ) \
-    || { echo "upgrade-smoke: phase A check-graph --emit failed at TO ($TO)" >&2; exit 2; }
+# spec: gate-sdk/SPEC.md §upgrade-smoke — the artifact's path is resolved rather than spelled again here: check-graph resolves the same knob for itself, and a second spelling mis-writes under a GATE_SDK_GRAPH_ARTIFACT or GATE_SDK_GATES_DIR the consumer does not share. It is resolved in the consumer's library and not in this tool's own — this tool sources the host repo's gate.sh, so the host's value is this repo's docs path while the scratch consumer is zero-config, and reading the host's would write the artifact where that consumer's own gate will not look. The emitter is a binary arm, so it is reached through the front-end that resolves its bridged knobs (§The non-gate arm), never by a path into the kit.
+CONS_ARTIFACT="$( cd "$CONS" && bash -c 'source gate-sdk/lib/gate.sh; printf "%s" "$GATE_SDK_GRAPH_ARTIFACT"' )" \
+    || { echo "upgrade-smoke: could not resolve the graph artifact path at TO ($TO)" >&2; exit 2; }
+[[ -n "$CONS_ARTIFACT" ]] \
+    || { echo "upgrade-smoke: the consumer's library resolved an empty graph artifact path at TO ($TO)" >&2; exit 2; }
+( cd "$CONS" && bash gate-sdk/bin/run-gates.sh --emit graph > "$CONS_ARTIFACT" ) \
+    || { echo "upgrade-smoke: phase A graph emit failed at TO ($TO)" >&2; exit 2; }
 if [[ -f "$CONS/doctrine-kit/bin/install-doctrine.sh" ]]; then
     ( cd "$CONS" && bash doctrine-kit/bin/install-doctrine.sh >/dev/null ) \
         || { echo "upgrade-smoke: phase A install-doctrine failed at TO ($TO)" >&2; exit 2; }

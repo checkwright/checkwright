@@ -99,6 +99,37 @@ else
     GATE_EXEC_PRUNE=(gate-tests fixtures templates smoke)
 fi
 
+# spec: gate-sdk/SPEC.md §check-graph — check-graph's three scalar graph knobs, resolved here rather than inline at their use sites on the cause the roster above states: a default the bridge's `declare -p` cannot find is its undeclared-knob refusal on the member's first post-port run. Each keeps the `:-` semantics its use site had (an empty value takes the default), and the artifact and the theme directory ride GATE_SDK_GATES_DIR's own resolved value above so the pair stays one value by construction. Every one of them stays relative: the resolved argv is baked verbatim into the tracked pre-commit hook, and an absolute value would commit one machine's checkout path to a public file.
+[[ -n "${GATE_SDK_GRAPH_ARTIFACT:-}" ]]  || GATE_SDK_GRAPH_ARTIFACT="$GATE_SDK_GATES_DIR/CHECK-GRAPH.html"
+# spec: gate-sdk/SPEC.md §check-graph — GATE_SDK_GRAPH_THEME is RETIRED and the gate refuses, exit 2, on finding it set or on a stale <gates-dir>/graph-theme.sh; the theme is now GATE_SDK_GRAPH_THEME_DIR's directory of verbatim part files. Named here rather than deleted so a consumer grepping the kit for the old knob lands on its replacement instead of on nothing.
+[[ -n "${GATE_SDK_GRAPH_THEME_DIR:-}" ]] || GATE_SDK_GRAPH_THEME_DIR="$GATE_SDK_GATES_DIR/graph-theme"
+[[ -n "${GATE_SDK_GRAPH_MAX_EDGES:-}" ]] || GATE_SDK_GRAPH_MAX_EDGES="100000"
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the allowlist is a whitespace-separated scalar feeding an array, which is the one case a resolved global earns a spelling of its own; GATE_PRUNE_DIRS above is the same shape for the same reason.
+# shellcheck disable=SC2034  # consumed by the compiled member across the bridge, never within this lib
+if [[ -n "${GATE_SDK_GRAPH_EXTERNAL_REFS:-}" ]]; then
+    read -r -a GATE_GRAPH_EXTERNAL_REFS <<<"$GATE_SDK_GRAPH_EXTERNAL_REFS"
+else
+    GATE_GRAPH_EXTERNAL_REFS=()
+fi
+# spec: gate-sdk/SPEC.md §check-graph — the consumer's vocabulary file is sourced here rather than in the member, because the member is compiled: it receives the resolved values and never the path, so GATE_SDK_GRAPH_VOCAB is not a knob the crate declares. All six globals are defined first, so an absent vocabulary file resolves to empty arrays that disable their checks exactly as before and the bridge's does-not-define refusal cannot fire on any of them. GRAPH_LAYER_RULES and GRAPH_LAYER_DEFAULT replace the retired graph_surface_layer() hook: an ordered `<path-prefix>:<layer-id>` roster split at the last `:`, first match wins, and the default is the value the retired hook's absent-function branch returned.
+# shellcheck disable=SC2034  # consumed by the compiled member across the bridge, never within this lib
+GRAPH_VOCAB=()
+# shellcheck disable=SC2034  # consumed by the compiled member across the bridge, never within this lib
+GRAPH_LEADING=()
+# shellcheck disable=SC2034  # consumed by the compiled member across the bridge, never within this lib
+GRAPH_LAGGING=()
+# shellcheck disable=SC2034  # consumed by the compiled member across the bridge, never within this lib
+GRAPH_LAYERS=()
+# shellcheck disable=SC2034  # consumed by the compiled member across the bridge, never within this lib
+GRAPH_LAYER_RULES=()
+# shellcheck disable=SC2034  # consumed by the compiled member across the bridge, never within this lib
+GRAPH_LAYER_DEFAULT="surfaces"
+[[ -n "${GATE_SDK_GRAPH_VOCAB:-}" ]] || GATE_SDK_GRAPH_VOCAB="$GATE_SDK_GATES_DIR/graph-vocab.sh"
+if [[ -f "$GATE_SDK_GRAPH_VOCAB" ]]; then
+    # shellcheck disable=SC1090  # consumer-supplied rule content, path is config
+    source "$GATE_SDK_GRAPH_VOCAB"
+fi
+
 gate_find() {
     local prune=() d
     for d in "${GATE_PRUNE_DIRS[@]}"; do prune+=(-name "$d" -o); done
@@ -451,6 +482,15 @@ while IFS= read -r _gkr; do
     fi
 done < <(gate_kit_roots)
 unset _gkr
+
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the kit's own root as a bridgeable variable, spelled relative to the current directory by GATE_KIT_ROOTS_HERE's rule above and for its reason. A compiled member that must reach a file inside its own kit — check-graph's assertion D spawns bin/gen-pre-commit.sh, which stays shell (§gen-pre-commit) — has no BASH_SOURCE to find it by, and the kit-root set is not a substitute: GATE_SDK_KIT_DIRS may narrow that set to a consumer's own tree, which is exactly the configuration a sandboxed fixture runs under.
+GATE_SDK_ROOT_HERE="$(gate_sdk_root)"
+if [[ "$GATE_SDK_ROOT_HERE" == "$PWD"/* ]]; then
+    GATE_SDK_ROOT_HERE="${GATE_SDK_ROOT_HERE#"$PWD"/}"
+elif [[ "$GATE_SDK_ROOT_HERE" == /* ]]; then
+    GATE_SDK_ROOT_HERE="$(realpath --relative-to="$PWD" "$GATE_SDK_ROOT_HERE" 2>/dev/null \
+        || printf '%s' "$GATE_SDK_ROOT_HERE")"
+fi
 
 gate_check_dirs() {
     gate_sdk_gates_dir

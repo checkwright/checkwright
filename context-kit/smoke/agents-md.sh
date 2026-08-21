@@ -80,7 +80,7 @@ battery_env=(
 # manifest set battery_env now carries. Regenerate under the same env the battery runs
 # with, or check-graph reds the AGENTS.md consumer on a hook stale by construction.
 ( cd "$SCRATCH" && env "${battery_env[@]}" bash gate-sdk/bin/gen-pre-commit.sh --write >/dev/null )
-( cd "$SCRATCH" && env "${battery_env[@]}" bash gate-sdk/checks/check-graph.sh --emit > scripts/CHECK-GRAPH.html )
+( cd "$SCRATCH" && env "${battery_env[@]}" bash gate-sdk/bin/run-gates.sh --emit graph > scripts/CHECK-GRAPH.html )
 git -C "$SCRATCH" add -A
 git -C "$SCRATCH" -c user.email=smoke@example.invalid -c user.name=smoke \
     commit -q --no-verify -m "regenerate the hook + graph artifact under the AGENTS.md config"

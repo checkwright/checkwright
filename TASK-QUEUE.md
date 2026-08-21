@@ -12,78 +12,6 @@
 
 ## New Features
 
-- **native-gate-port-remaining-corpus** [spec: SPEC-graph-port.md] [roadmap: now/reliability]
-  — the whole battery onto the binary, and the shell surface down to its residue.
-  roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
-  The entry demotes at build rather than moving to `## Done`: it is the **whole corpus**, the oracle
-  below still counts gates owed, and a Done move would assert a finished port and silently drop it
-  from the **public** roadmap projection, which reads `[roadmap:]` tags off live entries.
-  **Operator-ruled 2026-08-09: complete the port, ASAP** — the ruling, its grounds and its
-  supersession of the 2026-08-06 measurement-locus clause are [TRAJECTORY.md](TRAJECTORY.md)
-  §PRIORITY DIRECTIVE's, with the scope, both install paths and the bootstrap residue; this entry
-  is the work, and designing the bootstrap is still its. It inherits gate-sdk/SPEC.md §Porting a
-  gate to the binary substrate for the procedure and §Consumer payload for the payload rule.
-  **Two objections answered:** wall-clock is the weaker case (the win is retiring the shell
-  *sources* the payload carries), and the toolchain-free arm rides the pre-compiled path, so
-  `powershell-installer-surface` shrinks to the bootstrap for the same reason.
-  **Twelve cohorts and six budget batches are closed**, each with its members, delivered counts,
-  holds, grounds and price at gate-sdk/SPEC.md §The first cohort, and the rule that selects the
-  next — so this entry states what remains rather than restating them. Cut widths are ruled **per
-  cut and never inherited**, members are **selected by running** `port-blockers.sh --group`, and
-  the size arm is **permanently** exhausted, so the budget arm is the only composer left.
-  **The residue is three-way, not two: permanently shell, temporarily held, and takeable** —
-  a dated oracle read (`bash gate-sdk/bin/port-blockers.sh --group`'s trailer, which
-  `scripts/measured-claims.sh` emits as `ported-gate-members`), never a count this line holds,
-  which is what it was restated as and drifted from twice. The held tier stopped being a hand
-  adjudication when `# port-until:` was minted, so a cut reads its takeable set off the run.
-  Every held member is **sequencing with port work owed, never exclusion**, and what each owes
-  is on `cohort-held-members-port-prerequisites`, which owns the roster and the kits it spans.
-  **Cost while deferred:** large and known — the **owed** remainder (the trailer's own arm,
-  never the unported count, which the permanent and held members inflate) plus the runners and
-  the install-lifecycle layer; since the 2026-08-14 born-native default
-  (TRAJECTORY.md §The closed rulings) a gate landed meanwhile no longer adds shell to it. Not
-  a single-iteration delta; scope owns the decomposition, and the criterion-relaxation
-  question is closed at gate-sdk/SPEC.md §The port-candidate criteria — an ordering signal,
-  never an eligibility screen. `gate-battery-parallel-execution` and
-  `gate-battery-result-cache` say the port subsumes them: closure candidates as it lands.
-  **The SIXTH cut is delivered at six members** — the whole takeable tier bar `check-graph`, ruled
-  by the operator 2026-08-19 at that width against the raised declaration band, with the fifth
-  cut's drop-any-member relief carried in its envelope and never needed. Its findings, its
-  criterion-5 measurement on both sides and its accept-and-declare judgment are at
-  gate-sdk/SPEC.md §The sixth budget batch, which also answers §The fifth budget batch's pick of
-  `check-template-copy-parity` by delivering it.
-  **The next increment is RULED, 2026-08-20: `check-graph`, as its own iteration** — the takeable
-  tier is exhausted, it is the one takeable member the oracle still counts, and after it every
-  remaining member is held behind a prerequisite. Its true size is gate-sdk/SPEC.md §check-graph's;
-  its config seam and the two openings that ruling leaves are TRAJECTORY.md §The closed rulings'.
-  Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
-  direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope. Since then it is
-  promoted at spec and demoted at build once per increment, always a **demotion** on the
-  entry-outlives-the-amendment branch, each cut's own record staying at its SPEC section;
-  demoted again 2026-08-19 at build on the sixth cut's delivery.
-
-- **upgrade-smoke-graph-artifact-literal** [spec: SPEC-graph-port.md] — the smoke's regen
-  step writes the graph artifact to a literal path, restating a resolution `check-graph`
-  performs for itself.
-  `gate-sdk/bin/upgrade-smoke.sh` runs `check-graph.sh --emit` redirected to a hard-coded
-  `scripts/CHECK-GRAPH.html`, while `gate-sdk/checks/check-graph.sh` resolves that path from
-  `GATE_SDK_GRAPH_ARTIFACT` falling back to the gates dir. Two spellings of one path, and the
-  smoke's is the copy.
-  **Harmless today, and that is the whole of its size:** the scratch consumer the smoke builds
-  is zero-config by construction, so the default always holds. It would silently mis-write
-  under an exported `GATE_SDK_GRAPH_ARTIFACT` or `GATE_SDK_GATES_DIR`.
-  **Why it was held for design:** the fix is a seam call rather than a repair. Either duplicate
-  the default expression — cheap, and a second copy of the very thing being de-literalized — or
-  expose the resolution from `check-graph` so a caller can ask where the artifact goes, which
-  mints an arm on a gate for one caller. `SPEC-graph-port.md` takes neither: the config bridge
-  requires the resolved default in `lib/gate.sh` anyway, and the smoke reads it.
-  **Cost while deferred:** low. The De-literalization rule is broken on one line of one tool
-  whose only consumer is zero-config, so the carry is the standing invitation to copy the
-  pattern, not a live wrong write.
-  Surfaced 2026-08-18 at build under the unconditional capture rule, and kept at the drain on
-  the operator's ruling that a correct application of doctrine is not dropped to save an inbox
-  bullet. Filed 2026-08-18 by close, both spellings re-verified.
-
 - **stage-stamp-ordering-unenforced** [spec: SPEC-stamp-head.md] — `check-stage-evidence`
   accepts a stage stamp that lands **after** commits already made under it, so
   the stamp proves invocation but not that it preceded the work it authorizes.
@@ -140,6 +68,55 @@
 ## Technical Debt
 
 ## Deferred
+
+- **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
+  — the whole battery onto the binary, and the shell surface down to its residue.
+  roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
+  The entry demotes at build rather than moving to `## Done`: it is the **whole corpus**, the oracle
+  below still counts gates owed, and a Done move would assert a finished port and silently drop it
+  from the **public** roadmap projection, which reads `[roadmap:]` tags off live entries.
+  **Operator-ruled 2026-08-09: complete the port, ASAP** — the ruling, its grounds and its
+  supersession of the 2026-08-06 measurement-locus clause are [TRAJECTORY.md](TRAJECTORY.md)
+  §PRIORITY DIRECTIVE's, with the scope, both install paths and the bootstrap residue; this entry
+  is the work, and designing the bootstrap is still its. It inherits gate-sdk/SPEC.md §Porting a
+  gate to the binary substrate for the procedure and §Consumer payload for the payload rule.
+  **Two objections answered:** wall-clock is the weaker case (the win is retiring the shell
+  *sources* the payload carries), and the toolchain-free arm rides the pre-compiled path, so
+  `powershell-installer-surface` shrinks to the bootstrap for the same reason.
+  **Twelve cohorts and six budget batches are closed**, each with its members, delivered counts,
+  holds, grounds and price at gate-sdk/SPEC.md §The first cohort, and the rule that selects the
+  next — so this entry states what remains rather than restating them. Cut widths are ruled **per
+  cut and never inherited**, members are **selected by running** `port-blockers.sh --group`, and
+  the size arm is **permanently** exhausted, so the budget arm is the only composer left.
+  **The residue is three-way, not two: permanently shell, temporarily held, and takeable** —
+  a dated oracle read (`bash gate-sdk/bin/port-blockers.sh --group`'s trailer, which
+  `scripts/measured-claims.sh` emits as `ported-gate-members`), never a count this line holds,
+  which is what it was restated as and drifted from twice. The held tier stopped being a hand
+  adjudication when `# port-until:` was minted, so a cut reads its takeable set off the run.
+  Every held member is **sequencing with port work owed, never exclusion**, and what each owes
+  is on `cohort-held-members-port-prerequisites`, which owns the roster and the kits it spans.
+  **Cost while deferred:** large and known — the **owed** remainder (the trailer's own arm,
+  never the unported count, which the permanent and held members inflate) plus the runners and
+  the install-lifecycle layer; since the 2026-08-14 born-native default
+  (TRAJECTORY.md §The closed rulings) a gate landed meanwhile no longer adds shell to it. Not
+  a single-iteration delta; scope owns the decomposition, and the criterion-relaxation
+  question is closed at gate-sdk/SPEC.md §The port-candidate criteria — an ordering signal,
+  never an eligibility screen. `gate-battery-parallel-execution` and
+  `gate-battery-result-cache` say the port subsumes them: closure candidates as it lands.
+  **The SEVENTH cut is delivered: `check-graph`, its own iteration, operator-ruled 2026-08-20.**
+  It answers the sixth cut's one exclusion and that ruling's own next-increment question together,
+  and it re-cut the graph config seam to a data-only contract on the way. Its findings, its size
+  and its criterion-4 discharge are gate-sdk/SPEC.md §check-graph's, as the sixth cut's are
+  §The sixth budget batch's.
+  **The composer has nothing left to compose from, which is the state that decides the next cut.**
+  Read at this cut, `--group` reports the **takeable tier empty** and the owed remainder down by
+  one: every member still owed now sits behind a prerequisite, so the budget arm cannot select
+  until `cohort-held-members-port-prerequisites` moves, and that entry is the next unit rather
+  than a wider cut of this one.
+  Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
+  direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope. Since then it is
+  promoted at spec and demoted at build once per increment on the entry-outlives-the-amendment
+  branch — seven so far, each cut's own record staying at its SPEC section.
 
 - **close-triage-log-reclaim-loss-window** [design-pending] — the close-stage triage of a capture
   log reads it and later truncates it as two separate acts, and anything appended between the two
@@ -7548,6 +7525,7 @@
 
 ## Done
 
+- upgrade-smoke-graph-artifact-literal
 
 ## Lessons Learned
 

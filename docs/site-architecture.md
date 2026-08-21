@@ -146,7 +146,7 @@ recoverable:
   hooks bake verbatim, staling them with no manifest or config touched at all:
   one command emits both hooks
   (`bash gate-sdk/bin/gen-pre-commit.sh --write`), then the artifact
-  (`bash gate-sdk/checks/check-graph.sh --emit > docs/check-graph.html`), which
+  (`bash gate-sdk/bin/run-gates.sh --emit graph > docs/check-graph.html`), which
   `check-graph` asserts fresh together. The hooks are never hand-edited;
   that rule is resident in `CLAUDE.md` because a session about to edit it is not
   looking at a red gate.
@@ -162,7 +162,7 @@ recoverable:
   docs/enforcement.md` — the gate joins the class registry), `docs/value.md`'s
   rollup block (`bash gate-sdk/bin/run-gates.sh --emit value-rollup --write`,
   derived from the map above),
-  `docs/check-graph.html` (`bash gate-sdk/checks/check-graph.sh --emit >
+  `docs/check-graph.html` (`bash gate-sdk/bin/run-gates.sh --emit graph >
   docs/check-graph.html`), and — for a hook-tier gate — the generated hooks
   (`bash gate-sdk/bin/gen-pre-commit.sh --write`). `docs/footprint.md` is absent
   for the reason the row above gives: a gate is a script or a crate module and

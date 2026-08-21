@@ -15,8 +15,6 @@
       "Bash(bash gate-sdk/bin/run-gate-tests.sh *)",
       "Bash(bash gate-sdk/bin/run-consumer-smoke.sh)",
       "Bash(bash gate-sdk/bin/run-consumer-smoke.sh *)",
-      "Bash(bash gate-sdk/checks/check-graph.sh)",
-      "Bash(bash gate-sdk/checks/check-graph.sh *)",
       "Bash(bash drift-kit/bin/drift-report.sh)",
       "Bash(bash drift-kit/bin/drift-report.sh *)",
       "Bash(bash drift-kit/bin/kfric.sh *)",

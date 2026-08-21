@@ -75,7 +75,7 @@ VOCAB
 
 regen() {  # regen() -> rewrite both hooks and the graph artifact from the manifests
     ( cd "$repo" && bash "$GEN" --write >/dev/null 2>&1 ) || return 1
-    ( cd "$repo" && gate_run check-graph "$CHECKS" --emit >scripts/CHECK-GRAPH.html 2>/dev/null ) || return 1
+    ( cd "$repo" && bash "$DIR/bin/run-gates.sh" --emit graph >scripts/CHECK-GRAPH.html 2>/dev/null ) || return 1
 }
 
 run() {  # run() -> the full whole-registry gate over the sandbox; sets rc/out
@@ -168,20 +168,19 @@ run; want_red e-artifact-absent "scripts/CHECK-GRAPH.html does not exist"
 # reference is the mermaid CDN import, which this assertion's scan excludes), so
 # the failure path is only reachable through a theme — the shortcut the assertion
 # exists to refuse, a chrome fragment linking an asset beside the site rather than
-# inlining it. This is the seam SPEC-graph-port.md delta (2) retires: at the port
-# the fixture moves to a GATE_SDK_GRAPH_THEME_DIR part file, alongside
-# check-graph-refs.test.sh's own migration.
+# inlining it. The injection is a GATE_SDK_GRAPH_THEME_DIR part file, inlined byte
+# verbatim at the point after <body> the retired graph_theme_header() fed.
 seed
-printf 'graph_theme_header() { echo %s; }\n' "'  <img src=\"chrome-logo.png\" alt=\"\">'" \
-    >"$repo/theme.sh"
-export GATE_SDK_GRAPH_THEME="$repo/theme.sh"
+mkdir -p "$repo/theme"
+printf '  <img src="chrome-logo.png" alt="">\n' >"$repo/theme/header.html"
+export GATE_SDK_GRAPH_THEME_DIR="$repo/theme"
 regen || true; run
 want_red f-asset-href "emitted asset 'chrome-logo.png' does not resolve to a file under scripts/"
 
 : >"$repo/scripts/chrome-logo.png"
 regen || true; run
 want_green f-asset-href-resolves
-unset GATE_SDK_GRAPH_THEME
+unset GATE_SDK_GRAPH_THEME_DIR
 
 if [[ "$fails" -gt 0 ]]; then
     echo "check-graph-tree.test: $fails case(s) failed"

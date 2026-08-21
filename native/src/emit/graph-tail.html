@@ -1,0 +1,36 @@
+    const { svg } = await mermaid.render('graph', graph);
+    const vp = document.getElementById('diagram');
+    vp.innerHTML = svg;
+
+    // Pan/zoom (self-contained; no external lib) — the platform diagram-assets
+    // approach: render the SVG at its natural, readable size in an overflow:auto
+    // box; Ctrl/Cmd+wheel scales the SVG, drag pans via native scroll, and
+    // double-click resets the zoom. Never shrink-to-fit — that makes a dense
+    // graph unreadable.
+    const el = vp.querySelector('svg');
+    el.style.transformOrigin = '0 0';
+    let zoom = 1;
+    const applyZoom = () => { el.style.transform = 'scale(' + zoom + ')'; };
+
+    vp.addEventListener('wheel', (e) => {
+      if (!(e.ctrlKey || e.metaKey)) return;
+      e.preventDefault();
+      zoom = Math.min(6, Math.max(0.4, zoom * (e.deltaY < 0 ? 1.1 : 1 / 1.1)));
+      applyZoom();
+    }, { passive: false });
+
+    let down = false, lx = 0, ly = 0;
+    vp.addEventListener('pointerdown', (e) => {
+      down = true; lx = e.clientX; ly = e.clientY;
+      vp.classList.add('grabbing'); vp.setPointerCapture(e.pointerId);
+    });
+    vp.addEventListener('pointermove', (e) => {
+      if (!down) return;
+      vp.scrollLeft -= e.clientX - lx; vp.scrollTop -= e.clientY - ly;
+      lx = e.clientX; ly = e.clientY;
+    });
+    const end = () => { down = false; vp.classList.remove('grabbing'); };
+    vp.addEventListener('pointerup', end);
+    vp.addEventListener('pointercancel', end);
+    vp.addEventListener('dblclick', () => { zoom = 1; applyZoom(); });
+  </script>

@@ -5,6 +5,7 @@ pub mod close_surfaces;
 pub mod docs_mirror;
 pub mod enforcement_map;
 pub mod footprint;
+pub mod graph;
 pub mod queue_index;
 pub mod roadmap;
 pub mod trajectory;
@@ -134,6 +135,24 @@ pub const EMITTERS: &[(&str, EmitFn, &[&str])] = &[
             "QUEUE_KIT_TRACKS",
             "QUEUE_KIT_ROADMAP_FILE",
             "QUEUE_KIT_ROADMAP_MARKER",
+        ],
+    ),
+    // spec: gate-sdk/SPEC.md §check-graph — the theme crosses as a *path* rather than as content:
+    // the bridge refuses any element carrying a newline and a stylesheet is newline-bearing by
+    // construction. Values cross the bridge; documents cross as a path.
+    (
+        "graph",
+        graph::emit,
+        &[
+            "GATE_SDK_GATES_DIR",
+            "GATE_KIT_ROOTS_HERE",
+            "GATE_KIT_ROOTS_REL",
+            "GATE_SDK_GRAPH_ARTIFACT",
+            "GATE_SDK_GRAPH_THEME_DIR",
+            "GATE_SDK_GRAPH_MAX_EDGES",
+            "GRAPH_LAYERS",
+            "GRAPH_LAYER_RULES",
+            "GRAPH_LAYER_DEFAULT",
         ],
     ),
     // spec: queue-kit/SPEC.md §The queue-index arm — the class's first *query* member as well as a
