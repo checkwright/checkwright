@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — --rename end-to-end through a sandboxed enter-stage: both surfaces rewritten in one motion, the columns-2-4 witness proved rather than assumed, the half-landed hand-rename healed, every refusal writing nothing, the idempotent no-op, and --simulate --rename writing nothing while prefixing every line
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — --rename end-to-end through a sandboxed enter-stage: both surfaces rewritten in one motion, the columns-2-to-last witness proved rather than assumed, the half-landed hand-rename healed, every refusal writing nothing, the idempotent no-op, and --simulate --rename writing nothing while prefixing every line
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
@@ -30,9 +30,9 @@ EOF
 
 ---
 
-$col1 scope aaaaaaaa 2026-06-01
-$col1 build bbbbbbbb 2026-06-02
-$col1 validate cccccccc 2026-06-03
+$col1 scope aaaaaaaa 2026-06-01 none
+$col1 build bbbbbbbb 2026-06-02 none
+$col1 validate cccccccc 2026-06-03 none
 EOF
     cp "$sb/TASK-QUEUE.md" "$sb/queue.before"
     cp "$sb/.workflow/WORKFLOW-STATE.txt" "$sb/state.before"
@@ -43,25 +43,25 @@ run_rename() {  # $1=sandbox subdir, rest = argv after the tool name
     ( cd "$sb" && env GATE_SDK_TMP_DIR="$sb/scratch" bash "$ENTER" "$@" 2>&1 )
 }
 
-fields234() { awk '/^---[[:space:]]*$/ { f = 1; next } f && NF { print $2, $3, $4 }' "$1"; }
+fields_2_to_nf() { awk '/^---[[:space:]]*$/ { f = 1; next } f && NF { s = ""; for (i = 2; i <= NF; i++) s = s (i > 2 ? " " : "") $i; print s }' "$1"; }
 
 unchanged() {  # $1=sandbox subdir  $2=assertion label
     cmp -s "$1/queue.before" "$1/TASK-QUEUE.md" || note "$2" "the queue was written"
     cmp -s "$1/state.before" "$1/.workflow/WORKFLOW-STATE.txt" || note "$2" "the state file was written"
 }
 
-# --- both surfaces rewritten in one motion, columns 2-4 intact ---
+# --- both surfaces rewritten in one motion, columns 2 through NF intact ---
 ok="$SANDBOX/ok"
 seed "$ok" old-name old-name
-pre="$(fields234 "$ok/state.before")"
+pre="$(fields_2_to_nf "$ok/state.before")"
 out="$(run_rename "$ok" --rename new-name)"; rc=$?
 [[ "$rc" -eq 0 ]] || note write "want exit 0, got $rc -- $out"
 grep -q '^## Iteration: new-name$' "$ok/TASK-QUEUE.md" || note write-header "the queue header was not renamed"
 [[ "$(awk '/^---[[:space:]]*$/ { f = 1; next } f && NF && $1 != "new-name" { c++ } END { print c + 0 }' \
     "$ok/.workflow/WORKFLOW-STATE.txt")" == 0 ]] \
     || note write-stamps "a stamp's column 1 was left at the old name"
-[[ "$pre" == "$(fields234 "$ok/.workflow/WORKFLOW-STATE.txt")" ]] \
-    || note witness "columns 2-4 (stage, session id, date) moved under the rename"
+[[ "$pre" == "$(fields_2_to_nf "$ok/.workflow/WORKFLOW-STATE.txt")" ]] \
+    || note witness "columns 2 through NF (stage, session id, date, head) moved under the rename"
 [[ "$(wc -l <"$ok/state.before")" == "$(wc -l <"$ok/.workflow/WORKFLOW-STATE.txt")" ]] \
     || note witness-shape "the rename changed the state file's line count"
 grep -qF 'commit' <<<"$out" || note report "the report does not tell the caller to commit both files: $out"
@@ -109,7 +109,7 @@ grep -qF 'boundary reset' <<<"$out" \
 # --- a pre-flight refusal writes nothing: a stamp naming a stage the machine does not know ---
 pf="$SANDBOX/preflight"
 seed "$pf" old-name old-name
-printf 'old-name notastage eeeeeeee 2026-06-05\n' >>"$pf/.workflow/WORKFLOW-STATE.txt"
+printf 'old-name notastage eeeeeeee 2026-06-05 none\n' >>"$pf/.workflow/WORKFLOW-STATE.txt"
 cp "$pf/.workflow/WORKFLOW-STATE.txt" "$pf/state.before"
 out="$(run_rename "$pf" --rename new-name)"; rc=$?
 [[ "$rc" -eq 1 ]] || note preflight "a check-stage-evidence refusal: want exit 1, got $rc -- $out"
@@ -138,5 +138,5 @@ fi
 unchanged "$simn" simulate-noop-write
 
 [[ "$fails" -eq 0 ]] || { echo "rename-iteration.test: $fails assertion(s) failed"; exit 1; }
-echo "rename-iteration.test: clean (--rename writes both surfaces with columns 2-4 proved unchanged, heals a half-landed rename from either side, no-ops idempotently, refuses empty/non-slug/placeholder/arity and a red pre-flight with nothing written, and simulates read-only under its prefix)"
+echo "rename-iteration.test: clean (--rename writes both surfaces with columns 2 through NF proved unchanged, heals a half-landed rename from either side, no-ops idempotently, refuses empty/non-slug/placeholder/arity and a red pre-flight with nothing written, and simulates read-only under its prefix)"
 exit 0

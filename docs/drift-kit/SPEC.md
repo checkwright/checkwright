@@ -477,9 +477,11 @@ priced cost, never the account the tokens billed to.
 **The join.** Three inputs, joined on the session:
 
 1. **Stamps** — the WORKFLOW-STATE data lines, one per stage-skill invocation,
-   grammar `<iteration> <stage> <session-id> <date>` (owned by
+   grammar `<iteration> <stage> <session-id> <date> <head>` (owned by
    lifecycle-kit/SPEC.md §The state machine; this tool is a read-only consumer of
-   that contract, it changes nothing there). The `<session-id>` field is not a raw
+   that contract, it changes nothing there — its parse names a catch-all past the
+   date, which is why the fifth field arrived here as a restatement to update and
+   not as a reader to fix). The `<session-id>` field is not a raw
    transcript id: it is lifecycle's `session-id.sh` *normalization* of one — a
    leading `agent-` stripped, then the first 8 chars (lifecycle-kit/SPEC.md
    §bin/session-id.sh) — so this repo's stamps carry an 8-char value, `session8`

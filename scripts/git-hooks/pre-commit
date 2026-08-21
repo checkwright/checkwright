@@ -198,7 +198,7 @@ if staged_matches 'scripts/identity.conf' 'native/src/gates/identity.rs' 'native
 fi
 
 if staged_matches 'TASK-QUEUE.md' '.workflow/WORKFLOW-STATE.txt'; then
-    run_gate check-stage-evidence env GATE_SDK_KNOB_LIFECYCLE_KIT_QUEUE_FILE=TASK-QUEUE.md GATE_SDK_KNOB_LIFECYCLE_KIT_STATE_FILE=.workflow/WORKFLOW-STATE.txt $'GATE_SDK_KNOB_LIFECYCLE_KIT_STAGES=scope\tspec\talign\tbuild\tvalidate\tclose' GATE_SDK_KNOB_LIFECYCLE_KIT_FIRST_STAGE=scope GATE_SDK_KNOB_LIFECYCLE_KIT_WAIVER_TOKEN=align-waived GATE_SDK_KNOB_LIFECYCLE_KIT_SESSION_BOUNDARY=iteration native/target/release/checkwright-gates check-stage-evidence
+    run_gate check-stage-evidence env GATE_SDK_KNOB_LIFECYCLE_KIT_QUEUE_FILE=TASK-QUEUE.md GATE_SDK_KNOB_LIFECYCLE_KIT_STATE_FILE=.workflow/WORKFLOW-STATE.txt $'GATE_SDK_KNOB_LIFECYCLE_KIT_STAGES=scope\tspec\talign\tbuild\tvalidate\tclose' GATE_SDK_KNOB_LIFECYCLE_KIT_FIRST_STAGE=scope GATE_SDK_KNOB_LIFECYCLE_KIT_WAIVER_TOKEN=align-waived GATE_SDK_KNOB_LIFECYCLE_KIT_SESSION_BOUNDARY=iteration GATE_SDK_KNOB_LIFECYCLE_KIT_LESSON_EVIDENCE_FILE=.workflow/lesson-evidence.txt GATE_SDK_KNOB_LIFECYCLE_KIT_SURVEY_RECORD_FILE=.workflow/survey-record.md $'GATE_SDK_KNOB_LIFECYCLE_KIT_BOUNDARY_TRUNCATE=.workflow/validate-evidence.txt\t.workflow/release-disposition.txt' GATE_SDK_KNOB_LIFECYCLE_KIT_GAP_INBOX_FILE=.workflow/gap-inbox.md native/target/release/checkwright-gates check-stage-evidence
 fi
 
 if staged_matches 'TASK-QUEUE.md' '.workflow/WORKFLOW-STATE.txt' 'SPEC.md' '*/SPEC.md' '*/*/SPEC.md' 'SPEC-*.md' '*/SPEC-*.md' '*/*/SPEC-*.md'; then

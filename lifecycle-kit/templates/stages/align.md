@@ -4,7 +4,7 @@ battery>* as one gate. Exit condition: no unresolved conflicts or terminology
 drift.
 
 **First step — stamp evidence.** Run lifecycle-kit's `bin/enter-stage.sh
-align`: it appends `<iteration> align <session-id> <date>` to
+align`: it appends `<iteration> align <session-id> <date> <head>` to
 `.workflow/WORKFLOW-STATE.txt` (required by `check-stage-evidence`; the stamp
 proves invocation, not faithful execution), reading `<session-id>` from
 `bin/session-id.sh`
@@ -31,7 +31,7 @@ rule). The arriving stage stamps its own entry as its first step
 Trigger 3 is mechanized at build entry: `check-stage-entry` assertion C blocks
 the build entry when the on-disk amendments carry a cross-component signal and
 no `<iter> align` stamp exists. To skip the audit anyway, the user must
-explicitly rule it unwarranted and a `<iter> align-waived <session> <date>`
+explicitly rule it unwarranted and a `<iter> align-waived <session> <date> <head>`
 line is recorded in `.workflow/WORKFLOW-STATE.txt` — never self-issued by the
 entering build session (lifecycle-kit/SPEC.md §check-stage-entry).
 

@@ -12,59 +12,6 @@
 
 ## New Features
 
-- **stage-stamp-ordering-unenforced** [spec: SPEC-stamp-head.md] — `check-stage-evidence`
-  accepts a stage stamp that lands **after** commits already made under it, so
-  the stamp proves invocation but not that it preceded the work it authorizes.
-  recurrence: stage-stamp-ordering-unenforced 2026-08-07 2026-08-16 2026-08-18
-  **Observed with the battery green throughout.** At the 2026-08-07 firing a build batch stamped
-  `.workflow/WORKFLOW-STATE.txt` as its *third* commit, after two commits had already landed
-  build-stage edits under that unstamped entry. Batch 2 stamped first and **the difference was
-  invisible to every gate**. `lifecycle-kit/templates/stages/build.md` already states the stamp as
-  the "First step" and says to commit it on its own, so only enforcement is missing.
-  **The mechanism, run rather than observed (folded in 2026-08-02 from the gap inbox; the text
-  above states the symptom, this states the cause).** Both gates are path-coupled in the generated
-  pre-commit hook, so a work commit touching only kit sources never runs them at all. They are not
-  lenient about ordering; they do not execute. The stamp commit is the first commit that runs
-  them, and by then the work they were meant to gate is already in history. On the full-battery
-  path they do run, but `check-stage-entry` reads point-in-time state only: assertion C scans the
-  amendment files and stamp set **as they are on disk**, with no read of history, so a stamp that
-  landed last is byte-identical to one that landed first. The consequence generalizes past
-  ordering — **every entry-time assertion, assertion C's demand for a prior audit-stage stamp
-  included, is satisfiable retroactively**. It also opens a **cheaper candidate than the history
-  assertion below**: widen a gate's couple set so a stage's own output surfaces re-fire it,
-  turning a never-ran gate into a ran-and-lenient one first.
-  **Candidate shape to weigh at design:** assert that the commit introducing a stage's stamp is
-  not preceded, within the same stage window, by commits touching that stage's own output
-  surfaces — decidable from git history, though the surface set is the hard part. A cheap
-  approximation misfires on a same-stage re-entry, where a second session's stamp legitimately
-  follows the first's — **confirmed real** (`batch-split-stamp-ownership`). Narrower and likely
-  sufficient: hold only an iteration+stage pair's **first** stamp to it, putting a re-entry out
-  of reach by shape rather than by exemption.
-  **Why it was held for design:** it narrows how a shipped evidence contract is read, and the
-  surface-set question has no cheap answer.
-  **Cost while deferred:** the stamp protocol's central claim — that a stamp marks a boundary the
-  work happened after — is unattested, and a violation is invisible in a fully green battery.
-  Class: **feature**, settled 2026-08-21 at spec — not on the mint-a-gate-name path the two
-  branches below anticipated. The assertions land inside `check-stage-evidence`, which those
-  branches called debt, but they read a **fifth stamp field**, and a file format four kits parse
-  is a contract another component must honor under canon-kit/SPEC.md's new-names litmus.
-  **TAKEN into `graph-port-and-config-seam`, operator-ruled 2026-08-20 and relayed by the lead**,
-  after six declines (2026-08-16, 2026-08-17, and twice each on 2026-08-18 and 2026-08-19, the last
-  four the operator's own; no `recurrence:` date ever joined one, the finding not having re-fired).
-  The one ground that survived all six is now this unit's first deliverable rather than its
-  blocker: the cheap half and the history assertion are a single unresolved design fork, and buying
-  the cheap half first may foreclose the reading the assertion needs.
-  **The fork is settled at spec, and BOTH halves are refused** — the assertion `SPEC-stamp-head.md`
-  buys attaches at the stamp commit, where the gate's existing couples already fire it, so the
-  cheap half buys nothing; and the surface roster the history assertion needs is refused as
-  unmaintainable rather than merely expensive. Neither foreclosed the other.
-  **The cheap half is ONE descriptor, not two:** `check-stage-entry.gate` widened to the SPEC globs
-  at its 2026-08-16 port and is already ran-and-lenient for a SPEC-touching commit, so only
-  `check-stage-evidence` keeps the narrow pair. Both gates are native
-  (`native/src/gates/stage_evidence.rs`, `stage_entry.rs`).
-  Filed 2026-08-01 at close from the gap inbox; build filed it against its own batch-1 stamp.
-
-
 ## Technical Debt
 
 ## Deferred
@@ -7061,7 +7008,12 @@
   line that a stage session must not background a producer it is itself the consumer of.
   **Distinct from `stage-stamp-ordering-unenforced`**, whose axis is the stamp landing *after* the
   work it authorizes — there the deliverable exists and the mark is mistimed; here the mark is on
-  time and the deliverable is absent. **Distinct from `delegation-provenance-floor`**, which is a
+  time and the deliverable is absent. **That sibling LANDED in `graph-port-and-config-seam` and
+  handed its remainder here**: an entry stamp bound to its own commit cannot reach a session that
+  works, commits, then stamps, and with the per-stage surface roster refused there, the exit mark
+  this entry would mint is the only declared boundary left. That case closes as a composition of
+  the two entries, never as more work inside the sibling.
+  **Distinct from `delegation-provenance-floor`**, which is a
   parent unable to attest a *child's* return; this is a session's own completion unobservable in
   the tree. Both recurrences declined at the drain on those grounds.
   **Cost while deferred:** silent, and it lands hardest when recovery is most expensive — a lost
@@ -7526,6 +7478,7 @@
 ## Done
 
 - upgrade-smoke-graph-artifact-literal
+- stage-stamp-ordering-unenforced
 
 ## Lessons Learned
 

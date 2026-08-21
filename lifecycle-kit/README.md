@@ -2,8 +2,9 @@
 
 The iteration stage state machine for coding-agent-assisted delivery: a
 `## Iteration: <name>` header line in the task queue naming the iteration, an
-evidence file of `<iteration> <stage> <session-id> <date>` stamps whose **last
-stamp is the current stage**, stage
+evidence file of `<iteration> <stage> <session-id> <date> <head>` stamps whose
+**last stamp is the current stage** and whose `<head>` binds each stamp to the
+commit it was taken at, stage
 skills (scope/align/build/validate/close by default — stages are config), and
 gates that make skipping a stage, or claiming one without running
 its skill, fail the commit.

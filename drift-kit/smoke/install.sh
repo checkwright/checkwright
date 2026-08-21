@@ -95,10 +95,10 @@ tcommit() {
     git -C "$trepo" add -A
     git -C "$trepo" -c user.email=smoke@example.invalid -c user.name=smoke commit -q -m "$1"
 }
-printf 'alpha scope s1 2025-01-01\n' > "$trepo/.workflow/WORKFLOW-STATE.txt"; tcommit "feat: alpha scope"
-printf 'alpha build s2 2025-01-01\n' >> "$trepo/.workflow/WORKFLOW-STATE.txt"; tcommit "feat: alpha build"
-printf 'alpha close s3 2025-01-02\n' >> "$trepo/.workflow/WORKFLOW-STATE.txt"; tcommit "fix: alpha close"
-printf 'beta scope s4 2025-01-03\n'  > "$trepo/.workflow/WORKFLOW-STATE.txt";  tcommit "feat: beta scope"
+printf 'alpha scope s1 2025-01-01 none\n' > "$trepo/.workflow/WORKFLOW-STATE.txt"; tcommit "feat: alpha scope"
+printf 'alpha build s2 2025-01-01 none\n' >> "$trepo/.workflow/WORKFLOW-STATE.txt"; tcommit "feat: alpha build"
+printf 'alpha close s3 2025-01-02 none\n' >> "$trepo/.workflow/WORKFLOW-STATE.txt"; tcommit "fix: alpha close"
+printf 'beta scope s4 2025-01-03 none\n'  > "$trepo/.workflow/WORKFLOW-STATE.txt";  tcommit "feat: beta scope"
 
 # spec: gate-sdk/SPEC.md §The non-gate arm — the extractor is a compiled arm reached through the
 # front-end that resolves its bridged knobs. The binary knob is absolutised because the run
@@ -275,7 +275,7 @@ cat > "$sedir/agent-sess1234deadbeef.jsonl" <<'EOF'
 {"type":"assistant","message":{"id":"m1","model":"test-model","usage":{"input_tokens":10,"output_tokens":8,"cache_read_input_tokens":100,"cache_creation_input_tokens":20}}}
 {"type":"assistant","message":{"id":"m2","model":"test-model","usage":{"input_tokens":4,"output_tokens":3,"cache_read_input_tokens":50,"cache_creation_input_tokens":10}}}
 EOF
-printf 'smoke build sess1234 2025-01-01\n' > "$work/se-state.txt"
+printf 'smoke build sess1234 2025-01-01 none\n' > "$work/se-state.txt"
 printf 'model\tinput\toutput\tcache_read\tcache_creation\ntest-model\t1\t2\t3\t4\n' > "$work/se-prices.tsv"
 selog="$work/se-log.txt"
 
@@ -347,7 +347,7 @@ if command -v jq >/dev/null 2>&1; then
     dbldir="$work/dbl-sessions"; mkdir -p "$dbldir"
     cp "$sedir/agent-sess1234deadbeef.jsonl" "$dbldir/agent-sess1234deadbeef.jsonl"
     cp "$sedir/agent-sess1234deadbeef.jsonl" "$dbldir/orphan9876.jsonl"
-    printf 'smoke scope sess1234 2025-01-01\nsmoke build sess1234 2025-01-01\n' > "$work/dbl-state.txt"
+    printf 'smoke scope sess1234 2025-01-01 none\nsmoke build sess1234 2025-01-01 none\n' > "$work/dbl-state.txt"
     dbllog="$work/dbl-log.txt"
     set +e
     dblout="$( DRIFT_KIT_STATE_FILE="$work/dbl-state.txt" \
@@ -374,7 +374,7 @@ if command -v jq >/dev/null 2>&1; then
     cat > "$supdir/lead0001dead.jsonl" <<'EOF'
 {"type":"assistant","message":{"id":"L1","model":"test-model","usage":{"input_tokens":2,"output_tokens":3,"cache_read_input_tokens":4,"cache_creation_input_tokens":5}}}
 EOF
-    printf 'supiter build supa1234 2025-01-01\n' > "$work/sup-state.txt"
+    printf 'supiter build supa1234 2025-01-01 none\n' > "$work/sup-state.txt"
     suplog="$work/sup-log.txt"
     sup() {   # $1 = supervision label
         DRIFT_KIT_STATE_FILE="$work/sup-state.txt" \
@@ -401,7 +401,7 @@ EOF
         || fail "DRIFT_KIT_SUPERVISION_LABEL did not name the row (the label is not a literal)"
 
     : > "$suplog"
-    printf 'supiter build supa1234 2025-01-01\nsupiter supervision nolead12 2025-01-01\n' > "$work/sup-state.txt"
+    printf 'supiter build supa1234 2025-01-01 none\nsupiter supervision nolead12 2025-01-01 none\n' > "$work/sup-state.txt"
     set +e
     colout="$(sup supervision)"
     set -e
@@ -437,7 +437,7 @@ EOF
     printf '{"agentType":"fork","isFork":true,"parentAgentId":"fochild2feed","spawnDepth":3}\n' > "$fosub/agent-fogrand3feed.meta.json"
     printf '{"agentType":"stage-session","spawnDepth":1}\n' > "$fosub/agent-fostage4feed.meta.json"
     printf '{"agentType":"Explore","parentAgentId":"fostage4feed","spawnDepth":2}\n' > "$fosub/agent-fochild5feed.meta.json"
-    printf 'foiter build fostage1 2025-01-01\nfoiter build fostage4 2025-01-01\n' > "$work/fo-state.txt"
+    printf 'foiter build fostage1 2025-01-01 none\nfoiter build fostage4 2025-01-01 none\n' > "$work/fo-state.txt"
     folog="$work/fo-log.txt"
     fan() {   # $1 = fan-out suffix
         DRIFT_KIT_STATE_FILE="$work/fo-state.txt" \
@@ -470,13 +470,13 @@ EOF
         || fail "DRIFT_KIT_FANOUT_SUFFIX did not name the row (the suffix is not a literal)"
 
     : > "$folog"
-    printf 'foiter build fostage1 2025-01-01\nfoiter build fostage4 2025-01-01\nfoiter build+fanout nostage1 2025-01-01\n' > "$work/fo-state.txt"
+    printf 'foiter build fostage1 2025-01-01 none\nfoiter build fostage4 2025-01-01 none\nfoiter build+fanout nostage1 2025-01-01 none\n' > "$work/fo-state.txt"
     focol="$(fan '+fanout')"
     grep -q 'colliding with DRIFT_KIT_FANOUT_SUFFIX' <<<"$focol" \
         || fail "a stamp whose stage ends in the suffix did not raise the collision notice"
     [[ "$(grep -c 'build+fanout test-model' "$folog")" -eq 0 ]] \
         || fail "the collision did not suppress the fan-out row"
-    printf 'foiter build fostage1 2025-01-01\nfoiter build fostage4 2025-01-01\n' > "$work/fo-state.txt"
+    printf 'foiter build fostage1 2025-01-01 none\nfoiter build fostage4 2025-01-01 none\n' > "$work/fo-state.txt"
 
     # spec: drift-kit/SPEC.md §Testing — the fan-out fixture's two degradation assertions, neither of
     # which may be dropped for brevity: they are what make the coupling's bound testable, not asserted.

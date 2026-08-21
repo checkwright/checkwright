@@ -106,10 +106,10 @@ if [[ "${1:-}" == "--rename" ]]; then
         { $1 = n; print }
     ' "$STATE" > "$rn_tmpstate"
 
-    # spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the columns-2-4 witness: the writer proves it touched only the field it meant to, which is the content predicate a PreToolUse guard would have to reconstruct a pre-edit file to compute
-    rn_fields() { awk '/^---[[:space:]]*$/ { f = 1; next } f && NF { print $2, $3, $4 }' "$1"; }
+    # spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the columns-2-to-last witness: the writer proves it touched only the field it meant to, which is the content predicate a PreToolUse guard would have to reconstruct a pre-edit file to compute. It reads to $NF rather than to a pinned column because a field riding outside the witness could be dropped or corrupted with neither this tool nor its test noticing
+    rn_fields() { awk '/^---[[:space:]]*$/ { f = 1; next } f && NF { s = ""; for (i = 2; i <= NF; i++) s = s (i > 2 ? " " : "") $i; print s }' "$1"; }
     if [[ "$(rn_fields "$STATE")" != "$(rn_fields "$rn_tmpstate")" ]]; then
-        echo "enter-stage: the rename would alter columns 2-4 (stage, session id, date) of $STATE — refusing, nothing written." >&2
+        echo "enter-stage: the rename would alter columns 2 through NF (stage, session id, date, head) of $STATE — refusing, nothing written." >&2
         exit 2
     fi
 
@@ -133,7 +133,7 @@ if [[ "${1:-}" == "--rename" ]]; then
     if [[ "$sim" == 1 ]]; then
         echo "enter-stage (simulate): --rename '$rn_name' would rewrite both surfaces — no write:"
         sim_relay "$QUEUE: '## Iteration: $rn_cur' -> '## Iteration: $rn_name'"
-        sim_relay "$STATE: column 1 of $rn_moves stamp(s) -> '$rn_name'; columns 2-4 proved unchanged"
+        sim_relay "$STATE: column 1 of $rn_moves stamp(s) -> '$rn_name'; columns 2 through NF proved unchanged"
         exit 0
     fi
 
@@ -141,7 +141,7 @@ if [[ "${1:-}" == "--rename" ]]; then
     mv "$rn_tmpqueue" "$QUEUE"
     mv "$rn_tmpstate" "$STATE"
     trap - EXIT
-    echo "enter-stage: renamed the iteration to '$rn_name' — header in $QUEUE, column 1 of $rn_moves stamp(s) in $STATE; columns 2-4 proved unchanged."
+    echo "enter-stage: renamed the iteration to '$rn_name' — header in $QUEUE, column 1 of $rn_moves stamp(s) in $STATE; columns 2 through NF proved unchanged."
     echo "  next: commit $QUEUE and $STATE together — the rename writes both, and check-stage-evidence requires them to agree."
     exit 0
 fi
@@ -172,11 +172,15 @@ if ! id="$(bash "$KIT/bin/session-id.sh")"; then
     exit 2
 fi
 today="$(date +%F)"
-stamp_line="$stamp_iter $stage $id $today"
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the sole production writer of <head>, read in the state file's own work tree at the instant of the append; 'none' where there is no work tree or no commit to name is a value, never an omission
+head_at="$(git -C "$(dirname "$STATE")" rev-parse --short HEAD 2>/dev/null)"
+[[ -n "$head_at" ]] || head_at="none"
+stamp_line="$stamp_iter $stage $id $today $head_at"
 
 last="$(awk '/^---[[:space:]]*$/ { f = 1; next } f && NF { last = $0 } END { print last }' "$STATE")"
-read -r f_iter f_stage f_id _ <<<"$last"
-if [[ "$f_iter" == "$stamp_iter" && "$f_stage" == "$stage" && "$f_id" == "$id" ]]; then
+read -r f_iter f_stage f_id _f_date f_head _ <<<"$last"
+# spec: lifecycle-kit/SPEC.md §The state machine — the idempotence guard keys on the head too, so a re-entry after HEAD moved appends rather than reporting a no-op: re-running this tool IS the stated remedy for a stale recorded head, and a guard blind to the head would answer that remedy by writing nothing
+if [[ "$f_iter" == "$stamp_iter" && "$f_stage" == "$stage" && "$f_id" == "$id" && "$f_head" == "$head_at" ]]; then
     if [[ "$sim" == 1 ]]; then
         echo "enter-stage (simulate): '$stamp_line' is already the last stamp in $STATE — the real entry would be an idempotent no-op."
         exit 0

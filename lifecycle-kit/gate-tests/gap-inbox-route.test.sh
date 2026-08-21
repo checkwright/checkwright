@@ -42,11 +42,11 @@ run_enter() {  # $1=sandbox subdir, rest=argv
                      bash "$ENTER" "${@:2}" 2>&1 )
 }
 
-CLOSED='demo-iteration scope aaaaaaaa 2026-06-01
-demo-iteration close dddddddd 2026-06-04
+CLOSED='demo-iteration scope aaaaaaaa 2026-06-01 none
+demo-iteration close dddddddd 2026-06-04 none
 '
-SKIPPED='demo-iteration scope aaaaaaaa 2026-06-01
-demo-iteration build bbbbbbbb 2026-06-02
+SKIPPED='demo-iteration scope aaaaaaaa 2026-06-01 none
+demo-iteration build bbbbbbbb 2026-06-02 none
 '
 
 # --- close-skipped: refuse with the drain recovery, write nothing ---
@@ -95,7 +95,7 @@ grep -qF 'would carry 2 bullet(s)' <<<"$out" \
 cmp -s "$sm/s.before" "$sm/.workflow/WORKFLOW-STATE.txt" || note postclose-sim-write "--simulate wrote the state file"
 
 # --- the never-named closing iteration takes the post-close branch ---
-un="$(seed unnamed '—' '— scope aaaaaaaa 2026-06-01
+un="$(seed unnamed '—' '— scope aaaaaaaa 2026-06-01 none
 ')"
 out="$(run_enter "$un" scope)"; rc=$?
 [[ "$rc" -eq 0 ]] || note unnamed-admits "a never-named closing iteration should not refuse, got $rc -- $out"

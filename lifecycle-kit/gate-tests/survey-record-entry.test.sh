@@ -32,10 +32,10 @@ EOF
 
 ---
 
-demo-iteration scope aaaaaaaa 2026-06-01
-demo-iteration build bbbbbbbb 2026-06-02
-demo-iteration validate cccccccc 2026-06-03
-demo-iteration close dddddddd 2026-06-04
+demo-iteration scope aaaaaaaa 2026-06-01 none
+demo-iteration build bbbbbbbb 2026-06-02 none
+demo-iteration validate cccccccc 2026-06-03 none
+demo-iteration close dddddddd 2026-06-04 none
 EOF
     cat >"$sb/.workflow/survey-record.md" <<'EOF'
 # contract: lifecycle-kit/SPEC.md §The survey record — carried surveys.
@@ -99,9 +99,9 @@ cat >"$gap/.workflow/WORKFLOW-STATE.txt" <<'EOF'
 
 ---
 
-demo-iteration scope aaaaaaaa 2026-06-01
-demo-iteration build bbbbbbbb 2026-06-02
-demo-iteration validate cccccccc 2026-06-03
+demo-iteration scope aaaaaaaa 2026-06-01 none
+demo-iteration build bbbbbbbb 2026-06-02 none
+demo-iteration validate cccccccc 2026-06-03 none
 EOF
 printf '# contract: lifecycle-kit/SPEC.md §The committed gap inbox\n- 2026-06-05 — an untriaged gap\n' \
     >"$gap/.workflow/gap-inbox.md"

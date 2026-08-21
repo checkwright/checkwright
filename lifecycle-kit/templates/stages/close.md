@@ -3,7 +3,7 @@ merge. Exit condition: Done and Lessons Learned sections cleared (harvestable
 lessons promoted first).
 
 **First step — stamp evidence.** Run lifecycle-kit's `bin/enter-stage.sh
-close`: it appends `<iteration> close <session-id> <date>` to
+close`: it appends `<iteration> close <session-id> <date> <head>` to
 `.workflow/WORKFLOW-STATE.txt` (required by `check-stage-evidence`; the stamp
 proves invocation, not faithful execution), reading `<session-id>` from
 `bin/session-id.sh`

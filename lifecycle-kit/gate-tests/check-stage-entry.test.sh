@@ -40,9 +40,9 @@ EOF
 cat >"$SANDBOX/.workflow/WORKFLOW-STATE.txt" <<'EOF'
 ---
 
-demo-iteration scope aaaaaaaa 2026-06-01
-demo-iteration build bbbbbbbb 2026-06-02
-demo-iteration validate cccccccc 2026-06-03
+demo-iteration scope aaaaaaaa 2026-06-01 none
+demo-iteration build bbbbbbbb 2026-06-02 none
+demo-iteration validate cccccccc 2026-06-03 none
 EOF
 
 out="$(cd "$SANDBOX" && gate_run check-stage-entry "$DIR/checks" 2>&1)"; rc=$?
@@ -62,9 +62,9 @@ state_through_validate() {  # stamps scope..validate into $1/.workflow — the l
     cat >"$1/.workflow/WORKFLOW-STATE.txt" <<'EOF'
 ---
 
-demo-iteration scope aaaaaaaa 2026-06-01
-demo-iteration build bbbbbbbb 2026-06-02
-demo-iteration validate cccccccc 2026-06-03
+demo-iteration scope aaaaaaaa 2026-06-01 none
+demo-iteration build bbbbbbbb 2026-06-02 none
+demo-iteration validate cccccccc 2026-06-03 none
 EOF
 }
 
@@ -145,10 +145,10 @@ mkdir -p "$b4/.workflow"
 cat >"$b4/.workflow/WORKFLOW-STATE.txt" <<'EOF'
 ---
 
-demo-iteration scope aaaaaaaa 2026-06-01
-demo-iteration build bbbbbbbb 2026-06-02
-demo-iteration validate dddddddd 2026-06-03
-demo-iteration close eeeeeeee 2026-06-04
+demo-iteration scope aaaaaaaa 2026-06-01 none
+demo-iteration build bbbbbbbb 2026-06-02 none
+demo-iteration validate dddddddd 2026-06-03 none
+demo-iteration close eeeeeeee 2026-06-04 none
 EOF
 check_case "B4 tagged-residue-successor-entry" "$b4" 1 "[drain-exempt:] included"
 
@@ -180,8 +180,8 @@ mkdir -p "$c1/.workflow" "$c1/widget-service" "$c1/panel-facade"
 cat >"$c1/.workflow/WORKFLOW-STATE.txt" <<'EOF'
 ---
 
-demo-iteration scope aaaaaaaa 2026-06-01
-demo-iteration build bbbbbbbb 2026-06-02
+demo-iteration scope aaaaaaaa 2026-06-01 none
+demo-iteration build bbbbbbbb 2026-06-02 none
 EOF
 check_case "C1 two-dir-no-align" "$c1" 1 "cross-component amendment signal"
 
@@ -191,9 +191,9 @@ cp -r "$c1" "$c2"
 cat >"$c2/.workflow/WORKFLOW-STATE.txt" <<'EOF'
 ---
 
-demo-iteration scope aaaaaaaa 2026-06-01
-demo-iteration align-waived cccccccc 2026-06-03
-demo-iteration build bbbbbbbb 2026-06-02
+demo-iteration scope aaaaaaaa 2026-06-01 none
+demo-iteration align-waived cccccccc 2026-06-03 none
+demo-iteration build bbbbbbbb 2026-06-02 none
 EOF
 check_case "C2 two-dir-waiver" "$c2" 0 "STAGE-ENTRY: clean"
 
@@ -206,8 +206,8 @@ printf 'delta folds the wire change into panel-facade/SPEC.md\n' >"$c3/widget-se
 cat >"$c3/.workflow/WORKFLOW-STATE.txt" <<'EOF'
 ---
 
-demo-iteration scope aaaaaaaa 2026-06-01
-demo-iteration build bbbbbbbb 2026-06-02
+demo-iteration scope aaaaaaaa 2026-06-01 none
+demo-iteration build bbbbbbbb 2026-06-02 none
 EOF
 check_case "C3 single-amendment-cross-component" "$c3" 1 "cross-component amendment signal"
 
@@ -220,8 +220,8 @@ printf 'delta stays within widget-service/SPEC.md\n' >"$c4/widget-service/SPEC-f
 cat >"$c4/.workflow/WORKFLOW-STATE.txt" <<'EOF'
 ---
 
-demo-iteration scope aaaaaaaa 2026-06-01
-demo-iteration build bbbbbbbb 2026-06-02
+demo-iteration scope aaaaaaaa 2026-06-01 none
+demo-iteration build bbbbbbbb 2026-06-02 none
 EOF
 check_case "C4 single-component" "$c4" 0 "STAGE-ENTRY: clean"
 
@@ -237,8 +237,8 @@ printf 'delta stays within widget-service/SPEC.md\n' >"$c5/widget-service/SPEC-f
 cat >"$c5/.workflow/WORKFLOW-STATE.txt" <<'EOF'
 ---
 
-demo-iteration scope aaaaaaaa 2026-06-01
-demo-iteration build bbbbbbbb 2026-06-02
+demo-iteration scope aaaaaaaa 2026-06-01 none
+demo-iteration build bbbbbbbb 2026-06-02 none
 EOF
 check_case "C5 templates-stub-not-counted" "$c5" 0 "STAGE-ENTRY: clean"
 

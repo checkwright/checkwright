@@ -4,3 +4,4 @@ check-gate-substrate-parity
 check-reads-couples
 check-gate-exemption-tasks
 check-graph
+check-stage-evidence

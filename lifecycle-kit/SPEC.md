@@ -28,11 +28,32 @@ Two governed surfaces, carrying **one axis each**:
   then a `---` separator, then one data line per stage-skill invocation:
 
   ```
-  <iteration> <stage> <session-id> <YYYY-MM-DD>
+  <iteration> <stage> <session-id> <YYYY-MM-DD> <head>
   ```
 
   It carries the *fast* axis too: **the last data line's `<stage>` token is the
   cursor** — the single source for "which stage is this iteration in".
+
+  `<head>` is the abbreviated commit `bin/enter-stage.sh` read at the instant
+  it wrote the stamp, or the literal `none` where it found no git work tree and
+  no commit to name. It is **required**, and `none` is a value rather than an
+  omission: a permanently optional field is a permanent disarm switch for the
+  provenance assertion it exists to serve (§check-stage-evidence), which would
+  be enforcement-first inverted — the fix shipped beside its bypass. The field
+  is **appended** rather than inserted, so every positional reader of fields one
+  to four is unmoved.
+
+  **The five-field grammar is a breaking change to a shipped file format**, and
+  a consumer vendoring it mid-iteration reds until they rewrite their own
+  stamps: for each, `<head>` is the first parent of the commit that introduced
+  that stamp line, recoverable from history, and `none` where it is not — a
+  stamp whose introducing commit cannot be identified takes `none` rather than
+  a guess, because a guessed provenance value is indistinguishable from a real
+  one afterward. That rewrite is a **rewrite and not an introduction**, which is
+  what the migration clause of the newly-introduced test (§check-stage-evidence)
+  exists to say. The honest mitigation is the boundary: the first stage's reset
+  truncates this file, so a consumer upgrading at an iteration boundary pays
+  nothing.
 
 The header once carried a `[stage:]` field as well. It was a second copy of a
 derivable fact — every stage entry already stamps its `<stage>` — bought at one
@@ -136,8 +157,12 @@ see §check-stage-evidence).
 **Same-stage re-entry (N sibling sessions per stage).** Entering the
 currently-stamped stage from a *new* session is legal and appends a fresh
 stamp: `enter-stage.sh`'s idempotence guard keys on the full
-`(iteration, stage, session-id)` triple, so only the *same* session re-entering
-is a no-op, and `check-stage-entry` assertion A keys on the *predecessor* stamp,
+`(iteration, stage, session-id, head)` tuple, so only the *same* session
+re-entering **at the same commit** is a no-op — a re-entry after `HEAD` moved
+appends a fresh stamp carrying the new head, which is what makes re-running the
+tool the stated remedy for a stale recorded head rather than a reported no-op
+that changes nothing (§check-stage-evidence). `check-stage-entry` assertion A
+keys on the *predecessor* stamp,
 which the stage's first entry satisfied for every sibling. So N sessions may
 enter one stage — a multi-session build, or a lead's intra-stage batch split
 (§templates/lead.md) — serialized by the shared index/HEAD like any concurrent
@@ -1438,6 +1463,12 @@ rather than calling it directly.
 The deterministic writer for a stage transition: `enter-stage.sh <stage>`
 appends the invocation stamp, reading `session-id.sh` for
 the id — never an argument, so the no-hand-picking rule rides into the tool.
+It is the **sole production writer of `<head>`** (§The state machine), read as
+`git rev-parse --short HEAD` in the state file's own work tree at the instant of
+the append, and `none` where that yields nothing — so the field is produced by
+the live path every stage template's first step already invokes rather than only
+under test. It takes no enabling knob: the field is unconditional, which is what
+refusing an optional spelling buys.
 `<stage>` must be a configured stage; anything else is a usage error (exit 2).
 Its positionals are membership-validated rather than free text, so it owes no
 leading-`-` refusal (gate-sdk/SPEC.md §The bin/-tool contract) — but it owes the
@@ -1463,6 +1494,13 @@ kit-owned surfaces — `LIFECYCLE_KIT_LESSON_EVIDENCE_FILE` and
 `LIFECYCLE_KIT_SURVEY_RECORD_FILE` (§The survey record) — reset by the same rule
 as **built-in members**: the kit owns those surfaces, so they do not ride the
 consumer knob (git history keeps the retired stamps and the retired surveys).
+
+That written-surface set is also the **source of the stamp-commit purity
+assertion's exemption** (§check-stage-evidence): the boundary reset is the one
+legitimate reason a stamp commit touches anything besides the state file, so the
+assertion reads the members this reset already resolves rather than a roster
+minted to describe it — which is why widening the reset cannot leave the
+assertion behind.
 
 **What counts as the header, for the truncate.** The retained run is the
 member's leading blank and `#` **comment** lines, stopping at the first data
@@ -1628,8 +1666,14 @@ stamp is appended and no stage token is written, so the cursor is untouched and
 "stage motion never writes the queue" is unweakened. The precedent for this tool
 writing the queue header at all is the boundary reset, which already does.
 
-Before writing, the mode asserts its **columns-2-4 witness** — fields 2 through
-4 of every data line (stage, session id, date) identical before and after. This
+Before writing, the mode asserts its **columns-2-to-last witness** — fields 2
+through `NF` of every data line (stage, session id, date, head, and any field a
+later grammar appends) identical before and after. It reads to the end of the
+line rather than to a pinned column because a field riding *outside* the witness
+could be dropped or corrupted by the rename with neither the tool nor its test
+noticing, which is exactly what the four-field spelling did to `<head>` the
+moment that field landed; an explicit column-5 check was refused because it
+re-hardcodes the arity the gap came from. This
 is the content predicate applied by the **writer**, where it is cheap and exact,
 rather than by the `Write`/`Edit` guard: a `PreToolUse` hook sees only *proposed*
 content, so proving "no stage token moved" there means reconstructing the
@@ -1901,9 +1945,11 @@ stage axis off the header, nothing else would have caught it (an empty file
 gives the grammar and staleness passes nothing to reject).
 
 The stamp file is additionally kept provably bounded: every data line
-must be grammatically well-formed — exactly four fields, stage ∈ the
+must be grammatically well-formed — exactly five fields, stage ∈ the
 configured stage set plus the waiver token (a stamp token but never a header
-stage), date `YYYY-MM-DD`; every data line's iteration must be the current
+stage), date `YYYY-MM-DD`, and `<head>` either the literal `none` or a
+lowercase hex abbreviation of 7 to 40 characters (§The state machine owns the
+field); every data line's iteration must be the current
 one, stale lines from a prior iteration are rejected; and the `—`
 unnamed-iteration sentinel may appear only while the header itself is unnamed.
 It also reads the `<session-id>` field (which it once ignored) for one
@@ -1933,7 +1979,91 @@ undetected, so the allowance is stage-scoped, not global. The data section
 begins after the first `---` separator; prose above it is not validated
 line-by-line. Argument mode `$1 $2` (queue, state) with configured defaults
 makes the gate fixture-capable; the sentinel-scoping interplay that exceeds
-one good/bad pair is covered by `gate-tests/check-stage-evidence.test.sh`.
+one good/bad pair is covered by `gate-tests/check-stage-evidence.test.sh`, which
+is also where the two assertions below are exercised — each needs a real git
+history, which no static fixture pair can carry.
+
+**The stamp-provenance assertion.** A stamp proves the stage skill was invoked;
+this assertion is what makes it prove the invocation came **first**. For every
+**newly introduced** stamp, inside a git work tree: **`<head>` must name
+`HEAD`** — the recorded abbreviation, at least seven characters, must be a
+prefix of the full `HEAD` sha, so a consumer's `core.abbrev` never enters the
+contract.
+
+A stamp is **newly introduced** when no data line in `HEAD`'s version of the
+state file carries the same `<session-id> <head>` pair. Identity is that pair
+rather than the whole line because `bin/enter-stage.sh --rename` rewrites
+column 1 of every data line and must not read as re-introducing all of them.
+**The migration clause** applies that same reasoning to the one other bulk
+rewrite this format has: a `HEAD`-version data line carrying only **four**
+fields matches any working-tree line with the same `<session-id>`, so the
+one-time five-field migration (§The state machine) is a rewrite and not an
+introduction. Without it the migration commit — and every consumer's own
+rewrite, which that section names as the recovery — would red against an
+assertion no historical stamp can satisfy. The clause is self-retiring:
+four-field lines cease to exist once migrated, and the boundary reset truncates
+the file within one iteration.
+
+What it catches, without a history walk and without a per-stage surface roster:
+a session that stamps first and commits the stamp *after* its work commits has
+moved `HEAD` between the write and the commit, so the recorded head is stale and
+the gate reds naming both commits. **Same-stage re-entry is in reach by shape
+rather than by exemption** — a second session's stamp records its own `HEAD` and
+is committed on it, and the assertion never compares two stamps to each other.
+
+**Four inertness conditions, all stated, because an unstated one reads as
+coverage.** The assertion does not run when
+
+- **(a)** the state file's directory lies in no git work tree, or in a different
+  one from the configured surfaces — a vendored tree under test, a sandbox;
+- **(b)** the file handed to the gate is not *this* work tree's own configured
+  state file — its repo-root-relative path is not `LIFECYCLE_KIT_STATE_FILE`.
+  "Inside a work tree" alone is not the discriminator the amendment behind this
+  section assumed it was: a `gate-tests/` fixture tree sits inside the repo like
+  everything else, and firing there would assert a recorded head against a repo
+  whose history the fixture's stamps were never taken in. That is also what
+  keeps this gate's argument mode fixture-capable at no cost to the assertion;
+- **(c)** the state file is not tracked in `HEAD`, because there is then no
+  prior version to diff against and "newly introduced" is unanswerable rather
+  than false — a consumer's first state-file commit;
+- **(d)** no stamp is newly introduced, which is every battery run that stamps
+  nothing.
+
+On the live file, `none` on a newly introduced stamp is a **red**, and that is
+what keeps the inertness from being a disarm. The residual is `git rm --cached`
+of the state file, which would restore condition (c): the same class as
+`--no-verify`, and closed by neither.
+
+**The stamp-commit purity assertion.** The provenance assertion alone is
+defeated by a session that writes the stamp and its work into **one** commit:
+`HEAD` has not moved, so the recorded head is current. The complement closes it.
+Where the state file is among the staged paths *and* introduces a stamp, the
+staged path set must contain **only**:
+
+- the state file — for any stage's stamp; and additionally
+- the queue file, `LIFECYCLE_KIT_LESSON_EVIDENCE_FILE`,
+  `LIFECYCLE_KIT_SURVEY_RECORD_FILE`, the members of
+  `LIFECYCLE_KIT_BOUNDARY_TRUNCATE`, and `LIFECYCLE_KIT_GAP_INBOX_FILE` — for
+  the **first stage**'s stamp only, because the iteration-boundary reset
+  legitimately writes all of them in one motion (§bin/enter-stage.sh).
+
+The exemption set is **derived from the configuration the boundary reset already
+reads**, so no roster is minted and none can rot; no knob is added. Widening the
+set can only remove violations and narrowing it can only add them, so a config
+change here is safe to reason about by inspection in both directions. Gating on
+the *staged* set rather than on the working tree is what keeps a sibling
+session's staged file out of this verdict: a stamp nothing is committing is not
+a stamp this commit introduces. It mechanizes a sentence every stage template
+already carries — *commit the stamp on its own* — which is enforcement-first
+applied to prose that had no gate behind it.
+
+**The concurrent-session false fire is real and its remedy is cheap.** Where a
+repo shares its git index between sessions, a sibling committing between a
+stamp's write and its commit moves `HEAD` and reds the stamp. The remedy is to
+re-run `bin/enter-stage.sh`, which appends a fresh stamp at the current `HEAD` —
+a same-stage re-entry, in-contract, and cheaper than any weakening that would
+admit the case the assertion exists to catch. The tool's idempotence guard reads
+the head for exactly this reason (§The state machine).
 
 Honest limit: the stamp proves the stage skill was *invoked*, never that it
 produced its green result — a validate stamp says validate ran, not that the
@@ -1942,13 +2072,39 @@ evidence manifest (a suite verdict per line) and, via the optional
 `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` integration, couples a close entry to
 the full green block.
 
+**The one ordering case neither assertion above reaches**, and it is structural
+rather than a gap in their design: a session that does its work, commits it, and
+only *then* runs `bin/enter-stage.sh`. The stamp legitimately records the
+post-work `HEAD`, the stamp commit is pure, both assertions pass — and the work
+still preceded the mark. The interval between stage X-1's stamp and stage X's
+holds X-1's legitimate work and X's illegitimate pre-stamp work, and nothing in
+the tree separates them. Only a *declared* boundary can, and there are two
+candidates: a per-stage output-surface roster, refused because "a stage's own
+output surfaces" is not derivable from the tree — a build stage's are
+approximately everything — and a configured one false-fires when coarse and
+misses when narrow; or an **exit mark**, which this kit does not have and which
+no reading of an entry stamp can supply. Closing the remaining case is therefore
+a **composition** with a deliverable that mints an exit mark, not more work
+inside these assertions. Recording that is what stops the next reader
+re-deriving the refused roster.
+
+What the assertions do close is the generalization that *every entry-time
+assertion is satisfiable retroactively*, which fails for this one: the recorded
+head is bound to a commit that already existed when the stamp was written, and a
+stamp introduced later is checked against the `HEAD` of its own introduction, so
+re-satisfying it means re-stamping — which is a fresh, honest stamp rather than
+a forged one.
+
 **The uncommitted window, and what closes it.** This gate — and every other one
 that would catch a hand-written stamp — fires at *commit*. The cursor, though, is
 the working tree's last stamp, and every reader reads the working tree. So a
 session that hand-edits the state file and simply never commits moves the stage
 cursor for its entire life and is caught by nothing. Content-based detection
-cannot help: a hand-written stamp is byte-identical to `bin/enter-stage.sh`'s by
-design.
+narrows this and does not close it: the `<head>` field makes a hand-written stamp
+name the `HEAD` it claims to have been taken at, so it is not byte-identical to
+`bin/enter-stage.sh`'s for free — but a hand that reads `git rev-parse --short
+HEAD` writes an identical line, and a stamp that is never committed is never
+checked at all.
 
 `templates/workflow-state-guard.sh` closes the part of that window an agent
 tooling actually passes through. It is a `PreToolUse(Write|Edit)` hook (register
@@ -1980,7 +2136,12 @@ exit, extending the invocation-stamp floor `check-stage-evidence` provides
 for the current stage one hop back (a shared surface, a distinct invariant:
 *stamp grammar + name-axis agreement* there, *prior-stage invoked +
 entered-stage static exit* here). It reads the entered stage from the **cursor**
-— the state file's last stamp — and the iteration from the header. An empty
+— the state file's last stamp — and the iteration from the header, both through
+the shared `lifecycle_current_stage`/`header_iter` derivations, which take
+positional fields one to three. That is why the `<head>` field appended in
+§The state machine moved nothing here, and it is recorded rather than left
+unstated so the next grammar change knows this reader was checked and cleared
+rather than overlooked. An empty
 cursor is unreachable by construction here and stays a hard parse error rather
 than a disarm: `enter-stage.sh` hands the gate a temp state file that always
 carries the candidate stamp, and at commit time the entry commit stages that

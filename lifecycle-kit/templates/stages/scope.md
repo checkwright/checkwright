@@ -12,7 +12,7 @@ amendment-readiness gate green>*.
 *resets* the evidence file: it truncates `.workflow/WORKFLOW-STATE.txt` back
 to its header (dropping the prior iteration's stamps — git history is the
 permanent audit trail; the gates only ever read the current iteration), stamps
-`— scope <session-id> <date>` under the unnamed-iteration sentinel, and sets
+`— scope <session-id> <date> <head>` under the unnamed-iteration sentinel, and sets
 the queue header to `## Iteration: —`. It reads `<session-id>`
 from `bin/session-id.sh` itself (the newest transcript — never hand-picked),
 uses `date +%F`, and refuses (writing nothing) if `check-stage-entry` is red.

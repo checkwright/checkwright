@@ -32,10 +32,10 @@ EOF
 
 ---
 
-demo-iteration scope aaaaaaaa 2026-06-01
-demo-iteration build bbbbbbbb 2026-06-02
-demo-iteration validate cccccccc 2026-06-03
-demo-iteration close dddddddd 2026-06-04
+demo-iteration scope aaaaaaaa 2026-06-01 none
+demo-iteration build bbbbbbbb 2026-06-02 none
+demo-iteration validate cccccccc 2026-06-03 none
+demo-iteration close dddddddd 2026-06-04 none
 EOF
     cat >"$sb/lifecycle-config.sh" <<'EOF'
 # shellcheck shell=bash

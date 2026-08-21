@@ -20,7 +20,7 @@ a skipped `spec` cannot ship a feature without its amendment (the same
 procedural-plus-one-gated-backstop shape as the audit stage's own trigger).
 
 **First step — stamp evidence.** Run lifecycle-kit's `bin/enter-stage.sh spec`:
-it appends `<iteration> spec <session-id> <date>` to
+it appends `<iteration> spec <session-id> <date> <head>` to
 `.workflow/WORKFLOW-STATE.txt` (required by `check-stage-evidence`; the stamp
 proves invocation, not faithful execution), reading `<session-id>` from
 `bin/session-id.sh` (the newest transcript — never hand-picked), using

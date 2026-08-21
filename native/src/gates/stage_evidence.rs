@@ -1,5 +1,7 @@
 // spec: lifecycle-kit/SPEC.md §check-stage-evidence — stamp grammar + name-axis agreement
-// (staleness) between the header and every stamp; cross-stage session-id distinctness
+// (staleness) between the header and every stamp; cross-stage session-id distinctness; the
+// stamp-provenance and stamp-commit-purity assertions over the fifth <head> field
+use crate::proc;
 use crate::stages;
 use crate::walk;
 use std::path::Path;
@@ -19,6 +21,170 @@ fn is_date(s: &str) -> bool {
         && [0, 1, 2, 3, 5, 6, 8, 9]
             .iter()
             .all(|&i| b[i].is_ascii_digit())
+}
+
+// spec: lifecycle-kit/SPEC.md §The state machine — the <head> field's grammar: the `none`
+// sentinel, or a lowercase hex abbreviation long enough for the prefix comparison the
+// provenance assertion makes (git's own floor is seven)
+fn is_head(s: &str) -> bool {
+    s == "none"
+        || ((7..=40).contains(&s.len())
+            && s.bytes().all(|c| c.is_ascii_digit() || (b'a'..=b'f').contains(&c)))
+}
+
+// spec: lifecycle-kit/SPEC.md §check-stage-evidence — the repo-root-relative spelling the
+// purity assertion compares in, the frame `git diff --cached --name-only` prints
+fn norm(p: &str) -> String {
+    let mut out: Vec<&str> = Vec::new();
+    for seg in p.split('/') {
+        match seg {
+            "" | "." => {}
+            ".." => {
+                out.pop();
+            }
+            s => out.push(s),
+        }
+    }
+    out.join("/")
+}
+
+fn git_line(args: &[&str]) -> Option<String> {
+    let c = proc::run("git", args).ok()?;
+    let b = c.stdout()?;
+    Some(String::from_utf8_lossy(b).trim().to_string())
+}
+
+fn git_blob(args: &[&str]) -> Option<String> {
+    let c = proc::run("git", args).ok()?;
+    let b = c.stdout()?;
+    Some(String::from_utf8_lossy(b).into_owned())
+}
+
+// spec: lifecycle-kit/SPEC.md §check-stage-evidence — the stamp-provenance and
+// stamp-commit-purity assertions. `Ok(empty)` is clean AND every inertness condition;
+// `Err` is a spawn failure the caller reports as exit 2 rather than as a clean run.
+fn provenance(
+    state: &str,
+    stext: &str,
+    first_stage: &str,
+    queue: &str,
+) -> Result<Vec<String>, String> {
+    let inert = Ok(Vec::new());
+    let dir = match Path::new(state).parent() {
+        Some(d) if !d.as_os_str().is_empty() => d.to_string_lossy().into_owned(),
+        _ => ".".to_string(),
+    };
+    // spec: lifecycle-kit/SPEC.md §check-stage-evidence — inertness (a): no work tree holding
+    // the state file, or a different one from the work tree the configured surfaces resolve
+    // against — a vendored tree under test, a sandbox fixture
+    let (Some(root_s), Some(root_c)) = (
+        git_line(&["-C", &dir, "rev-parse", "--show-toplevel"]),
+        git_line(&["rev-parse", "--show-toplevel"]),
+    ) else {
+        return inert;
+    };
+    if root_s != root_c {
+        return inert;
+    }
+    let (Some(prefix), Some(full_head)) = (
+        git_line(&["rev-parse", "--show-prefix"]),
+        git_line(&["rev-parse", "HEAD"]),
+    ) else {
+        return inert;
+    };
+    // spec: lifecycle-kit/SPEC.md §check-stage-evidence — an absolute knob value is rebased
+    // onto the repo root rather than compared in a frame nothing else uses
+    let rel = |p: &str| match p.strip_prefix(&format!("{}/", root_c)) {
+        Some(inside) => norm(inside),
+        None => norm(&format!("{}/{}", prefix, p)),
+    };
+    let rel_state = rel(state);
+    // spec: lifecycle-kit/SPEC.md §check-stage-evidence — inertness (b): the file handed to
+    // the gate is not this work tree's own configured state file. The knob is deliberately NOT
+    // put through `rel` — the question is asked from the repo root, where a case dir differs
+    // comment-tier-exempt: `rel` vs bare `norm` on the two sides is invisible in the call
+    if rel_state != norm(&walk::knob_scalar("LIFECYCLE_KIT_STATE_FILE")?) {
+        return inert;
+    }
+    // spec: lifecycle-kit/SPEC.md §check-stage-evidence — inertness (c): the state file is not
+    // tracked in HEAD, so there is no prior version to diff against and "newly introduced" is
+    // unanswerable rather than false
+    let Some(blob) = git_blob(&["show", &format!("HEAD:{}", rel_state)]) else {
+        return inert;
+    };
+
+    // spec: lifecycle-kit/SPEC.md §check-stage-evidence — identity is the `<session-id> <head>`
+    // pair (--rename's column-1 rewrite must not re-introduce every line); the migration clause
+    // is the second arm, a HEAD-version line still carrying four fields
+    let mut pairs: Vec<(String, String)> = Vec::new();
+    let mut migrating: Vec<String> = Vec::new();
+    for l in stages::data_lines(&blob) {
+        let f: Vec<&str> = l.split_whitespace().collect();
+        match (f.get(2), f.get(4), f.len()) {
+            (Some(sid), Some(h), _) => pairs.push((sid.to_string(), h.to_string())),
+            (Some(sid), None, 4) => migrating.push(sid.to_string()),
+            _ => {}
+        }
+    }
+
+    let mut new_stamps: Vec<(String, String, String)> = Vec::new();
+    for line in stages::data_lines(stext) {
+        let f: Vec<&str> = line.split_whitespace().collect();
+        let (Some(&stg), Some(&sid), Some(&h)) = (f.get(1), f.get(2), f.get(4)) else {
+            continue;
+        };
+        if pairs.iter().any(|(s, p)| s == sid && p == h) || migrating.iter().any(|s| s == sid) {
+            continue;
+        }
+        new_stamps.push((stg.to_string(), h.to_string(), line.to_string()));
+    }
+    // spec: lifecycle-kit/SPEC.md §check-stage-evidence — inertness (d): no newly introduced
+    // stamp, which is every battery run that stamps nothing
+    if new_stamps.is_empty() {
+        return inert;
+    }
+
+    let mut out: Vec<String> = Vec::new();
+    for (_, h, line) in &new_stamps {
+        if h == "none" {
+            out.push(format!("stamp records head 'none' inside a git work tree — the sentinel is for a tree with no commit to name, never a stamp taken in one: {}", line));
+        } else if !full_head.starts_with(h.as_str()) {
+            out.push(format!("stamp records head '{}' but HEAD is now '{}' — HEAD moved between the stamp's write and its commit, so commits landed under a mark that had not been made yet: {}", h, &full_head[..h.len().min(full_head.len())], line));
+        }
+    }
+
+    // spec: lifecycle-kit/SPEC.md §check-stage-evidence — the purity assertion is gated on the
+    // state file being STAGED: a stamp nothing is committing is not a stamp this commit
+    // introduces
+    let staged_raw = proc::run("git", &["diff", "--cached", "--name-only"])?;
+    let Some(bytes) = staged_raw.stdout() else {
+        return Err("git diff --cached failed — the staged path set could not be read; treating as failure (not clean)".to_string());
+    };
+    let staged: Vec<String> = String::from_utf8_lossy(bytes)
+        .lines()
+        .filter(|l| !l.trim().is_empty())
+        .map(|l| l.to_string())
+        .collect();
+    if !staged.iter().any(|p| p == &rel_state) {
+        return Ok(out);
+    }
+
+    let mut permitted: Vec<String> = vec![rel_state.clone()];
+    // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the exemption is derived from the
+    // members the iteration-boundary reset already resolves, and applies to the first stage's
+    // stamp alone
+    if new_stamps.iter().any(|(stg, _, _)| stg == first_stage) {
+        permitted.push(rel(queue));
+        for p in stages::supersede_set()?.iter().chain(stages::union_set()?.iter()) {
+            permitted.push(rel(p));
+        }
+    }
+    for p in &staged {
+        if !permitted.contains(p) {
+            out.push(format!("the commit introducing a stamp also stages '{}' — a stamp commit carries the evidence file alone (the first stage's boundary reset additionally carries {}), so the mark cannot be back-dated into a work commit: {}", p, permitted.join(" "), state));
+        }
+    }
+    Ok(out)
 }
 
 pub fn run(args: &[String]) -> i32 {
@@ -71,7 +237,7 @@ pub fn run(args: &[String]) -> i32 {
     // carrying no stamp is this gate's no-cursor fallback and reds rather than going vacuous
     if !Path::new(&state).is_file() {
         println!("STAGE-EVIDENCE: {} is missing", state);
-        println!("  help: create it — prose header, a '---' separator, then one '<iter> <stage> <session-id> <YYYY-MM-DD>' stamp per stage-skill invocation");
+        println!("  help: create it — prose header, a '---' separator, then one '<iter> <stage> <session-id> <YYYY-MM-DD> <head>' stamp per stage-skill invocation");
         return 1;
     }
     let stext = match std::fs::read(&state) {
@@ -87,7 +253,7 @@ pub fn run(args: &[String]) -> i32 {
             "STAGE-EVIDENCE: {} carries no stamp — there is no current stage to attest",
             state
         );
-        println!("  help: run the stage skill (it stamps as its first step), or append the '<iter> <stage> <session-id> <YYYY-MM-DD>' stamp below the '---' separator");
+        println!("  help: run the stage skill (it stamps as its first step), or append the '<iter> <stage> <session-id> <YYYY-MM-DD> <head>' stamp below the '---' separator");
         return 1;
     }
 
@@ -112,10 +278,21 @@ pub fn run(args: &[String]) -> i32 {
             f.get(2).copied().unwrap_or(""),
         );
         let f4 = f.get(3).copied().unwrap_or("");
-        if f4.is_empty() || f.len() > 4 {
+        let f5 = f.get(4).copied().unwrap_or("");
+        // spec: lifecycle-kit/SPEC.md §check-stage-evidence — exactly five fields: the <head>
+        // field is required and `none` is a value, because a permanently optional field is a
+        // permanent disarm switch for the provenance assertion below
+        if f.len() != 5 {
             errors.push(format!(
-                "malformed stamp (want '<iter> <stage> <session-id> <YYYY-MM-DD>'): {}",
+                "malformed stamp (want '<iter> <stage> <session-id> <YYYY-MM-DD> <head>'): {}",
                 line
+            ));
+            continue;
+        }
+        if !is_head(f5) {
+            errors.push(format!(
+                "bad head '{}' (want 'none' or a 7-40 character lowercase hex abbreviation): {}",
+                f5, line
             ));
             continue;
         }
@@ -160,9 +337,26 @@ pub fn run(args: &[String]) -> i32 {
         for e in &errors {
             println!("  {}", e);
         }
-        println!("  help: run /$stage in this session (it stamps {} as its first step), or append the '<iter> <stage> <session> <date>' stamp", state);
+        println!("  help: run /$stage in this session (it stamps {} as its first step), or append the '<iter> <stage> <session> <date> <head>' stamp", state);
         return 1;
     }
+
+    match provenance(&state, &stext, &first_stage, &queue) {
+        Err(e) => {
+            eprintln!("check-stage-evidence: {}", e);
+            return 2;
+        }
+        Ok(v) if !v.is_empty() => {
+            println!("STAGE-EVIDENCE: {} stamp-provenance issue(s) in {}:", v.len(), state);
+            for e in &v {
+                println!("  {}", e);
+            }
+            println!("  help: re-run the stage skill's first step (bash lifecycle-kit/bin/enter-stage.sh <stage>) — it appends a fresh stamp at the current HEAD, which is a same-stage re-entry and in contract; then commit that stamp on its own (lifecycle-kit/SPEC.md §check-stage-evidence)");
+            return 1;
+        }
+        Ok(_) => {}
+    }
+
     if boundary == "stage" {
         println!("STAGE-EVIDENCE: clean ('{}' / '{}' stamped; all stamps well-formed, current, and stage-distinct in session id)", iter, stage);
     } else {

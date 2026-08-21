@@ -19,12 +19,12 @@ consistency gate>* and refuse to stamp if it is red — fix the drift first (or 
 prior stage is scope, whose exit the entry already re-fires — **except** when
 `check-stage-entry` assertion C fires: a cross-component amendment signal with
 no align stamp blocks the entry until the iteration carries either an align
-stamp or an explicit `<iter> align-waived <session> <date>` waiver line,
+stamp or an explicit `<iter> align-waived <session> <date> <head>` waiver line,
 written **only on the user's explicit ruling** — never self-issued by this
 entering session.
 
 **First step — stamp evidence.** Run lifecycle-kit's
-`bin/enter-stage.sh build`: it appends `<iteration> build <session-id> <date>`
+`bin/enter-stage.sh build`: it appends `<iteration> build <session-id> <date> <head>`
 to `.workflow/WORKFLOW-STATE.txt` (required by `check-stage-evidence`; the
 stamp proves invocation, not faithful execution), reading `<session-id>` from
 `bin/session-id.sh`
@@ -43,7 +43,7 @@ a session reset at a task boundary; reach for mid-task summarization only as
 a fallback before a commit, never as the routine per-task reset.
 
 **Every session still stamps** — re-run `bin/enter-stage.sh build` each
-session: it appends a fresh `<iter> build <session-id> <date>` line with this
+session: it appends a fresh `<iter> build <session-id> <date> <head>` line with this
 session's id, so WORKFLOW-STATE keeps the per-session audit trail
 (`check-stage-evidence` tolerates multiple `build` stamps). A sibling stamp
 naming `build` leaves the cursor where it already is, so there is no

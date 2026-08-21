@@ -60,7 +60,7 @@ cat > .workflow/WORKFLOW-STATE.txt <<EOF
 
 ---
 
-— scope smoke001 $(date +%F)
+— scope smoke001 $(date +%F) $(git rev-parse --short HEAD)
 EOF
 
 # spec: lifecycle-kit/SPEC.md §check-survey-record — file a real block off the seed commit so the
@@ -98,7 +98,7 @@ cat > "$es/.workflow/WORKFLOW-STATE.txt" <<'EOF'
 
 ---
 
-prev-iter close ffffffff 2020-01-01
+prev-iter close ffffffff 2020-01-01 none
 EOF
 
 es_run() {
@@ -113,15 +113,15 @@ esq="$es/TASK-QUEUE.md"; ess="$es/.workflow/WORKFLOW-STATE.txt"; d="$(date +%F)"
 
 es_run scope >/dev/null
 grep -q "^## Iteration: —\$" "$esq" || { echo "smoke(enter-stage): scope header wrong" >&2; exit 1; }
-grep -q "^— scope aabbccdd $d\$" "$ess" || { echo "smoke(enter-stage): scope stamp missing" >&2; exit 1; }
+grep -Eq "^— scope aabbccdd $d ([0-9a-f]{7,40}|none)\$" "$ess" || { echo "smoke(enter-stage): scope stamp missing or carries no head field" >&2; exit 1; }
 if grep -q 'prev-iter' "$ess"; then echo "smoke(enter-stage): state not truncated on reset" >&2; exit 1; fi
 
 # spec: lifecycle-kit/SPEC.md §The stamp protocol — a non-boundary entry writes the evidence file ONLY: the cursor advances by the appended stamp and the queue is byte-identical afterwards
 cp "$esq" "$es/q.before"
 es_run align >/dev/null
 cmp -s "$es/q.before" "$esq" || { echo "smoke(enter-stage): a non-boundary entry wrote the queue" >&2; exit 1; }
-grep -q "^— align aabbccdd $d\$" "$ess" || { echo "smoke(enter-stage): align stamp missing" >&2; exit 1; }
-grep -q "^— scope aabbccdd $d\$" "$ess" || { echo "smoke(enter-stage): scope stamp lost on append" >&2; exit 1; }
+grep -Eq "^— align aabbccdd $d ([0-9a-f]{7,40}|none)\$" "$ess" || { echo "smoke(enter-stage): align stamp missing or carries no head field" >&2; exit 1; }
+grep -Eq "^— scope aabbccdd $d ([0-9a-f]{7,40}|none)\$" "$ess" || { echo "smoke(enter-stage): scope stamp lost on append" >&2; exit 1; }
 [[ "$(awk '/^---[[:space:]]*$/{f=1;next} f && NF {l=$2} END{print l}' "$ess")" == align ]] \
     || { echo "smoke(enter-stage): cursor did not advance to align" >&2; exit 1; }
 
@@ -153,7 +153,7 @@ cat > "$ess" <<EOF
 
 ---
 
-pf-iter build aabbccdd $d
+pf-iter build aabbccdd $d none
 EOF
 cat > "$es/preflight-stub.sh" <<'STUB'
 #!/usr/bin/env bash
@@ -184,7 +184,7 @@ touch "$es/preflight-ok"
 es_pf_run validate >/dev/null || { echo "smoke(enter-stage): green preflight should let the entry through" >&2; exit 1; }
 [[ "$(awk '/^---[[:space:]]*$/{f=1;next} f && NF {l=$2} END{print l}' "$ess")" == validate ]] \
     || { echo "smoke(enter-stage): green preflight did not advance the cursor to validate" >&2; exit 1; }
-grep -q "^pf-iter validate aabbccdd $d\$" "$ess" || { echo "smoke(enter-stage): green preflight did not stamp" >&2; exit 1; }
+grep -Eq "^pf-iter validate aabbccdd $d ([0-9a-f]{7,40}|none)\$" "$ess" || { echo "smoke(enter-stage): green preflight did not stamp" >&2; exit 1; }
 
 # spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — --simulate: would-no-op, would-pass, would-refuse; read-only and prefix-marked in all three
 cp "$esq" "$es/q.before"; cp "$ess" "$es/s.before"
@@ -334,7 +334,7 @@ EOF
 
 ---
 
-$1 close aabbccdd $d
+$1 close aabbccdd $d none
 EOF
 }
 cat > "$br/stages.sh" <<STAGES
@@ -394,8 +394,8 @@ gp_seed_state() {  # $1 = the last stage the closing iteration reached
 
 ---
 
-gap-iter scope aabbccdd $d
-gap-iter $1 aabbccdd $d
+gap-iter scope aabbccdd $d none
+gap-iter $1 aabbccdd $d none
 EOF
 }
 gp_seed_state build

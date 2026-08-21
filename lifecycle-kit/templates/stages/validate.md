@@ -5,7 +5,7 @@ unsatisfiable while any suite is tracked-red on a deferred blocker; each
 held-constant red line carries the live task slug that blocks it>*.
 
 **First step — stamp evidence.** Run lifecycle-kit's `bin/enter-stage.sh
-validate`: it appends `<iteration> validate <session-id> <date>` to
+validate`: it appends `<iteration> validate <session-id> <date> <head>` to
 `.workflow/WORKFLOW-STATE.txt` (required by `check-stage-evidence`; the stamp
 proves invocation, not faithful execution), reading `<session-id>` from
 `bin/session-id.sh`

@@ -93,7 +93,7 @@ recipe_seed() {   # $1 = kit name, $2 = kit payload dir, $3 = consumer root; pri
             mkdir -p "$root/.workflow" || return 1
             [[ -f "$root/.workflow/WORKFLOW-STATE.txt" ]] && return 0
             printf '%s\n' "# contract: lifecycle-kit/SPEC.md §check-stage-evidence" \
-                "# One data line per stage-skill invocation: <iteration> <stage> <session-id> <date>." \
+                "# One data line per stage-skill invocation: <iteration> <stage> <session-id> <date> <head>." \
                 "" "---" "" > "$root/.workflow/WORKFLOW-STATE.txt" || return 1
             printf '%s\n' ".workflow/WORKFLOW-STATE.txt" ;;
         doctrine-kit)

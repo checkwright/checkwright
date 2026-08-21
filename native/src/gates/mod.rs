@@ -887,6 +887,8 @@ pub const REGISTRY: &[GateEntry] = &[
         "check-stage-evidence",
         stage_evidence::run,
         &[],
+        // spec: lifecycle-kit/SPEC.md §check-stage-evidence — the four boundary knobs ride
+        // because the purity assertion's exemption set is derived from them
         &[
             "LIFECYCLE_KIT_QUEUE_FILE",
             "LIFECYCLE_KIT_STATE_FILE",
@@ -894,6 +896,10 @@ pub const REGISTRY: &[GateEntry] = &[
             "LIFECYCLE_KIT_FIRST_STAGE",
             "LIFECYCLE_KIT_WAIVER_TOKEN",
             "LIFECYCLE_KIT_SESSION_BOUNDARY",
+            "LIFECYCLE_KIT_LESSON_EVIDENCE_FILE",
+            "LIFECYCLE_KIT_SURVEY_RECORD_FILE",
+            "LIFECYCLE_KIT_BOUNDARY_TRUNCATE",
+            "LIFECYCLE_KIT_GAP_INBOX_FILE",
         ],
         "lifecycle-kit",
     ),

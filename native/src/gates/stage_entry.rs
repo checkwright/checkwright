@@ -251,7 +251,7 @@ pub fn run(args: &[String]) -> i32 {
             "STAGE-ENTRY: could not parse the entered stage — no stamp line in {}",
             k.state
         );
-        println!("  help: the entered stage is the last '<iter> <stage> <session-id> <YYYY-MM-DD>' stamp; run the stage skill (it stamps as its first step)");
+        println!("  help: the entered stage is the last '<iter> <stage> <session-id> <YYYY-MM-DD> <head>' stamp; run the stage skill (it stamps as its first step)");
         return 1;
     }
     if !stages::stage_known(&k.stage_set, &stage) {
@@ -361,7 +361,7 @@ pub fn run(args: &[String]) -> i32 {
             println!("  {}", e);
         }
         if c_fired {
-            println!("  help: a cross-component {} entry must run /{} (stamps '{} {} <session> <date>'), or — on an explicit user ruling, never self-issued by the entering session — record a deliberate waiver line '{} {} <session> <date>' in {}", k.audit_entry_stage, k.audit_stage, iter, k.audit_stage, iter, k.waiver, k.state);
+            println!("  help: a cross-component {} entry must run /{} (stamps '{} {} <session> <date> <head>'), or — on an explicit user ruling, never self-issued by the entering session — record a deliberate waiver line '{} {} <session> <date> <head>' in {}", k.audit_entry_stage, k.audit_stage, iter, k.audit_stage, iter, k.waiver, k.state);
         } else {
             println!("  help: a stage entry re-verifies the prior stage's static exit — invoke the predecessor skill (it stamps {}) and drain the active queue before entering {}", k.state, k.drain);
         }
