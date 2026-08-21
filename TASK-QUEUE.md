@@ -12,11 +12,7 @@
 
 ## New Features
 
-## Technical Debt
-
-## Deferred
-
-- **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
+- **native-gate-port-remaining-corpus** [spec: SPEC-graph-port.md] [roadmap: now/reliability]
   — the whole battery onto the binary, and the shell surface down to its residue.
   roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
   The entry demotes at build rather than moving to `## Done`: it is the **whole corpus**, the oracle
@@ -65,6 +61,85 @@
   promoted at spec and demoted at build once per increment, always a **demotion** on the
   entry-outlives-the-amendment branch, each cut's own record staying at its SPEC section;
   demoted again 2026-08-19 at build on the sixth cut's delivery.
+
+- **upgrade-smoke-graph-artifact-literal** [spec: SPEC-graph-port.md] — the smoke's regen
+  step writes the graph artifact to a literal path, restating a resolution `check-graph`
+  performs for itself.
+  `gate-sdk/bin/upgrade-smoke.sh` runs `check-graph.sh --emit` redirected to a hard-coded
+  `scripts/CHECK-GRAPH.html`, while `gate-sdk/checks/check-graph.sh` resolves that path from
+  `GATE_SDK_GRAPH_ARTIFACT` falling back to the gates dir. Two spellings of one path, and the
+  smoke's is the copy.
+  **Harmless today, and that is the whole of its size:** the scratch consumer the smoke builds
+  is zero-config by construction, so the default always holds. It would silently mis-write
+  under an exported `GATE_SDK_GRAPH_ARTIFACT` or `GATE_SDK_GATES_DIR`.
+  **Why it was held for design:** the fix is a seam call rather than a repair. Either duplicate
+  the default expression — cheap, and a second copy of the very thing being de-literalized — or
+  expose the resolution from `check-graph` so a caller can ask where the artifact goes, which
+  mints an arm on a gate for one caller. `SPEC-graph-port.md` takes neither: the config bridge
+  requires the resolved default in `lib/gate.sh` anyway, and the smoke reads it.
+  **Cost while deferred:** low. The De-literalization rule is broken on one line of one tool
+  whose only consumer is zero-config, so the carry is the standing invitation to copy the
+  pattern, not a live wrong write.
+  Surfaced 2026-08-18 at build under the unconditional capture rule, and kept at the drain on
+  the operator's ruling that a correct application of doctrine is not dropped to save an inbox
+  bullet. Filed 2026-08-18 by close, both spellings re-verified.
+
+- **stage-stamp-ordering-unenforced** [spec: SPEC-stamp-head.md] — `check-stage-evidence`
+  accepts a stage stamp that lands **after** commits already made under it, so
+  the stamp proves invocation but not that it preceded the work it authorizes.
+  recurrence: stage-stamp-ordering-unenforced 2026-08-07 2026-08-16 2026-08-18
+  **Observed with the battery green throughout.** At the 2026-08-07 firing a build batch stamped
+  `.workflow/WORKFLOW-STATE.txt` as its *third* commit, after two commits had already landed
+  build-stage edits under that unstamped entry. Batch 2 stamped first and **the difference was
+  invisible to every gate**. `lifecycle-kit/templates/stages/build.md` already states the stamp as
+  the "First step" and says to commit it on its own, so only enforcement is missing.
+  **The mechanism, run rather than observed (folded in 2026-08-02 from the gap inbox; the text
+  above states the symptom, this states the cause).** Both gates are path-coupled in the generated
+  pre-commit hook, so a work commit touching only kit sources never runs them at all. They are not
+  lenient about ordering; they do not execute. The stamp commit is the first commit that runs
+  them, and by then the work they were meant to gate is already in history. On the full-battery
+  path they do run, but `check-stage-entry` reads point-in-time state only: assertion C scans the
+  amendment files and stamp set **as they are on disk**, with no read of history, so a stamp that
+  landed last is byte-identical to one that landed first. The consequence generalizes past
+  ordering — **every entry-time assertion, assertion C's demand for a prior audit-stage stamp
+  included, is satisfiable retroactively**. It also opens a **cheaper candidate than the history
+  assertion below**: widen a gate's couple set so a stage's own output surfaces re-fire it,
+  turning a never-ran gate into a ran-and-lenient one first.
+  **Candidate shape to weigh at design:** assert that the commit introducing a stage's stamp is
+  not preceded, within the same stage window, by commits touching that stage's own output
+  surfaces — decidable from git history, though the surface set is the hard part. A cheap
+  approximation misfires on a same-stage re-entry, where a second session's stamp legitimately
+  follows the first's — **confirmed real** (`batch-split-stamp-ownership`). Narrower and likely
+  sufficient: hold only an iteration+stage pair's **first** stamp to it, putting a re-entry out
+  of reach by shape rather than by exemption.
+  **Why it was held for design:** it narrows how a shipped evidence contract is read, and the
+  surface-set question has no cheap answer.
+  **Cost while deferred:** the stamp protocol's central claim — that a stamp marks a boundary the
+  work happened after — is unattested, and a violation is invisible in a fully green battery.
+  Class: **feature**, settled 2026-08-21 at spec — not on the mint-a-gate-name path the two
+  branches below anticipated. The assertions land inside `check-stage-evidence`, which those
+  branches called debt, but they read a **fifth stamp field**, and a file format four kits parse
+  is a contract another component must honor under canon-kit/SPEC.md's new-names litmus.
+  **TAKEN into `graph-port-and-config-seam`, operator-ruled 2026-08-20 and relayed by the lead**,
+  after six declines (2026-08-16, 2026-08-17, and twice each on 2026-08-18 and 2026-08-19, the last
+  four the operator's own; no `recurrence:` date ever joined one, the finding not having re-fired).
+  The one ground that survived all six is now this unit's first deliverable rather than its
+  blocker: the cheap half and the history assertion are a single unresolved design fork, and buying
+  the cheap half first may foreclose the reading the assertion needs.
+  **The fork is settled at spec, and BOTH halves are refused** — the assertion `SPEC-stamp-head.md`
+  buys attaches at the stamp commit, where the gate's existing couples already fire it, so the
+  cheap half buys nothing; and the surface roster the history assertion needs is refused as
+  unmaintainable rather than merely expensive. Neither foreclosed the other.
+  **The cheap half is ONE descriptor, not two:** `check-stage-entry.gate` widened to the SPEC globs
+  at its 2026-08-16 port and is already ran-and-lenient for a SPEC-touching commit, so only
+  `check-stage-evidence` keeps the narrow pair. Both gates are native
+  (`native/src/gates/stage_evidence.rs`, `stage_entry.rs`).
+  Filed 2026-08-01 at close from the gap inbox; build filed it against its own batch-1 stamp.
+
+
+## Technical Debt
+
+## Deferred
 
 - **close-triage-log-reclaim-loss-window** [design-pending] — the close-stage triage of a capture
   log reads it and later truncates it as two separate acts, and anything appended between the two
@@ -1781,56 +1856,6 @@
   Filed 2026-08-01 at close from the gap inbox, filed by this iteration's build,
   recorded in `docs-root-link-grammar`'s Producers-and-consumers section rather
   than flagged-and-skipped.
-
-- **stage-stamp-ordering-unenforced** [design-pending] — `check-stage-evidence`
-  accepts a stage stamp that lands **after** commits already made under it, so
-  the stamp proves invocation but not that it preceded the work it authorizes.
-  recurrence: stage-stamp-ordering-unenforced 2026-08-07 2026-08-16 2026-08-18
-  **Observed with the battery green throughout.** At the 2026-08-07 firing a build batch stamped
-  `.workflow/WORKFLOW-STATE.txt` as its *third* commit, after two commits had already landed
-  build-stage edits under that unstamped entry. Batch 2 stamped first and **the difference was
-  invisible to every gate**. `lifecycle-kit/templates/stages/build.md` already states the stamp as
-  the "First step" and says to commit it on its own, so only enforcement is missing.
-  **The mechanism, run rather than observed (folded in 2026-08-02 from the gap inbox; the text
-  above states the symptom, this states the cause).** Both gates are path-coupled in the generated
-  pre-commit hook, so a work commit touching only kit sources never runs them at all. They are not
-  lenient about ordering; they do not execute. The stamp commit is the first commit that runs
-  them, and by then the work they were meant to gate is already in history. On the full-battery
-  path they do run, but `check-stage-entry` reads point-in-time state only: assertion C scans the
-  amendment files and stamp set **as they are on disk**, with no read of history, so a stamp that
-  landed last is byte-identical to one that landed first. The consequence generalizes past
-  ordering — **every entry-time assertion, assertion C's demand for a prior audit-stage stamp
-  included, is satisfiable retroactively**. It also opens a **cheaper candidate than the history
-  assertion below**: widen a gate's couple set so a stage's own output surfaces re-fire it,
-  turning a never-ran gate into a ran-and-lenient one first.
-  **Candidate shape to weigh at design:** assert that the commit introducing a stage's stamp is
-  not preceded, within the same stage window, by commits touching that stage's own output
-  surfaces — decidable from git history, though the surface set is the hard part. A cheap
-  approximation misfires on a same-stage re-entry, where a second session's stamp legitimately
-  follows the first's — **confirmed real** (`batch-split-stamp-ownership`). Narrower and likely
-  sufficient: hold only an iteration+stage pair's **first** stamp to it, putting a re-entry out
-  of reach by shape rather than by exemption.
-  **Why `[design-pending]`:** it narrows how a shipped evidence contract is read, and the
-  surface-set question has no cheap answer.
-  **Cost while deferred:** the stamp protocol's central claim — that a stamp marks a boundary the
-  work happened after — is unattested, and a violation is invisible in a fully green battery.
-  Class: mints a gate name if the oracle lands, so canon-kit/SPEC.md's new-names litmus makes it
-  a **feature** on that path; debt only if it lands as an assertion inside `check-stage-evidence`.
-  The promoting scope call settles it.
-  **TAKEN into `graph-port-and-config-seam`, operator-ruled 2026-08-20 and relayed by the lead**,
-  after six declines (2026-08-16, 2026-08-17, and twice each on 2026-08-18 and 2026-08-19, the last
-  four the operator's own; no `recurrence:` date ever joined one, the finding not having re-fired).
-  The one ground that survived all six is now this unit's first deliverable rather than its
-  blocker: the cheap half and the history assertion are a single unresolved design fork, and buying
-  the cheap half first may foreclose the reading the assertion needs.
-  **The class call this entry left to "the promoting scope call" is NOT settled here**, and the
-  sentence naming scope is stale: this roster splits authoring out, so `spec` both authors and
-  promotes. The fork decides the class, so `spec` settles the two together or neither.
-  **The cheap half is ONE descriptor, not two:** `check-stage-entry.gate` widened to the SPEC globs
-  at its 2026-08-16 port and is already ran-and-lenient for a SPEC-touching commit, so only
-  `check-stage-evidence` keeps the narrow pair. Both gates are native
-  (`native/src/gates/stage_evidence.rs`, `stage_entry.rs`).
-  Filed 2026-08-01 at close from the gap inbox; build filed it against its own batch-1 stamp.
 
 - **amendment-deletion-content-completeness** [design-pending] — a closed
   amendment can be **deleted with part of its content landing in no canonical
@@ -6758,26 +6783,6 @@
   re-verified that no permanent surface carries the clause — the only hits were the inbox this
   drain truncates and the survey record the next first-stage entry truncates.
 
-- **upgrade-smoke-graph-artifact-literal** [design-pending] — the smoke's regen step writes the
-  graph artifact to a literal path, restating a resolution `check-graph` performs for itself.
-  `gate-sdk/bin/upgrade-smoke.sh` runs `check-graph.sh --emit` redirected to a hard-coded
-  `scripts/CHECK-GRAPH.html`, while `gate-sdk/checks/check-graph.sh` resolves that path from
-  `GATE_SDK_GRAPH_ARTIFACT` falling back to the gates dir. Two spellings of one path, and the
-  smoke's is the copy.
-  **Harmless today, and that is the whole of its size:** the scratch consumer the smoke builds
-  is zero-config by construction, so the default always holds. It would silently mis-write
-  under an exported `GATE_SDK_GRAPH_ARTIFACT` or `GATE_SDK_GATES_DIR`.
-  **Why [design-pending]:** the fix is a seam call rather than a repair. Either duplicate the
-  default expression — cheap, and a second copy of the very thing being de-literalized — or
-  expose the resolution from `check-graph` so a caller can ask where the artifact goes, which
-  mints an arm on a gate for one caller.
-  **Cost while deferred:** low. The De-literalization rule is broken on one line of one tool
-  whose only consumer is zero-config, so the carry is the standing invitation to copy the
-  pattern, not a live wrong write.
-  Surfaced 2026-08-18 at build under the unconditional capture rule, and kept at the drain on
-  the operator's ruling that a correct application of doctrine is not dropped to save an inbox
-  bullet. Filed 2026-08-18 by close, both spellings re-verified.
-
 - **lead-dispatch-simulate-optionality** [design-pending] — the lead's dispatch contract makes
   `--simulate` optional, so the liveness gate wired into it runs only when the lead chooses to
   pay for it.
@@ -7313,6 +7318,11 @@
   forms deliberately rather than normalising them. The crate now carries a component-wise matcher
   and a slash-spanning one side by side, so a porting session reaching for "the" crate glob
   matcher flips a verdict on one side and no gate anywhere would say which side.
+  **Half discharged 2026-08-21 at spec:** `SPEC-graph-port.md` states check-graph assertion B's
+  four coverage branches in gate-sdk/SPEC.md and forbids the port reaching for either crate
+  matcher, so the third semantics stops being undocumented and the port's own exposure closes.
+  What remains is this entry's real question: one semantics with stated exceptions, or a
+  per-reader meaning declared per reader.
   Filed 2026-08-19 by close from the gap inbox; the drain executed all three matchers rather
   than reading them.
 
