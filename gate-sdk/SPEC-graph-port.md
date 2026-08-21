@@ -183,7 +183,13 @@ because this iteration already carries a breaking seam change and a second unit.
 The residue it leaves is real and is filed rather than absorbed: the ported
 `check-graph` becomes the crate's **first** gate to spawn a program other than
 git, which runs against the direction of TRAJECTORY.md §The objectives 1, 2 and
-6. The filed entry carries the split as the designed-but-unbought answer.
+6. The filed entry carries the split as the designed-but-unbought answer
+(`graph-port-bash-spawn-residue`).
+
+**Ratified by the operator, 2026-08-21.** This refusal was ruled at this stage;
+the operator has since ratified the cost and the refused alternative on the
+same grounds, which stands as a stronger record than the stage's own ruling
+alone.
 
 ### (8) The fixture corpus widens *before* the port — criterion 4's discharge
 
@@ -218,16 +224,32 @@ The widening splits by assertion shape:
 - **Emission and freshness assertions — D, E, F, H, I — take constructed
   scenarios.** A committed expected hook or artifact inside `gate-tests/` is a
   second copy of a generated file that rots, so these generate and compare inside
-  a throwaway tree instead. F, H and I already have hermetic drivers
-  (`check-graph-refs.test.sh`, `check-graph-cap.test.sh`); assertion D needs one
-  because `gen-pre-commit.sh` anchors itself at `git rev-parse --show-toplevel`
-  and so cannot be driven from a non-repository case dir at all; assertion E
-  needs one for the artifact byte-compare.
+  a throwaway tree instead. **Corrected against the fixture tree, 2026-08-21 at
+  align: only H and I already have hermetic drivers**
+  (`check-graph-refs.test.sh`, `check-graph-cap.test.sh` respectively) —
+  neither exercises assertion F (`check-graph.sh:600-605`, every emitted local
+  `href`/`src` resolves under the artifact dir), which has none today. Assertion
+  F needs its own driver for the same reason H's does: the kit's own default
+  emission is self-contained by construction, so the failure path (a theme
+  injecting a relative href to a file that is not there) and its clearing
+  counterpart are untested until a theme supplies one — the natural extension is
+  a case in `check-graph-refs.test.sh` or a sibling test alongside it. Assertion D
+  needs a driver because `gen-pre-commit.sh` anchors itself at
+  `git rev-parse --show-toplevel` and so cannot be driven from a non-repository
+  case dir at all; assertion E needs one for the artifact byte-compare.
 - **`check-graph-theme.test.sh` is re-pointed** from the retired sourced-function
   seam onto the part-file contract, keeping its four existing claims: injected
   content lands, an absent theme falls back with no leakage, both paths are
   byte-deterministic, and the kit body survives theming. It gains a fifth: the
   retired-seam tripwire of delta (2) refuses.
+- **`check-graph-refs.test.sh` is not theme-neutral and needs the same
+  re-pointing, found at this stage.** It injects its un-allowlisted chrome link
+  through `graph_theme_footer()` sourced via `GATE_SDK_GRAPH_THEME` (lines
+  23–28) — the same retired seam, not merely a similar one — so under the port
+  it would hit delta (2)'s tripwire (exit 2, naming the migration) on every one
+  of its three cases instead of exercising assertion H at all. Its fixture must
+  move to a `GATE_SDK_GRAPH_THEME_DIR/footer.html` part file carrying the same
+  link, alongside the theme test's migration rather than as separate work.
 
 **The live-tree parity arm is demoted from proof to smoke**, per criterion 4's
 own rule for a member whose assertion target is gate source: assertion A forbids
@@ -321,9 +343,17 @@ file at `<gates-dir>/graph-theme.sh`. *Consumer:* the battery, as an exit-2
 harness error. *Red condition:* it reds on **finding** either — monotone.
 
 **Existing prose describing the prior flow.** The four `declare -F` dispatch
-sites are the whole of the retired mechanism and they live in one file; no other
-file in the tree uses the pattern, re-verified at this stage. The prose
-describing it is inventoried in the next section.
+sites (`check-graph.sh:37,78,82,87`) are the whole of the retired mechanism and
+they live in one file; no other file in the tree sources a consumer file to
+dispatch one of *these* override functions. The bare `declare -F <name>` idiom
+itself is not unique to this mechanism and is not retired: it is this tree's
+named convention for probing an optional shell hook
+(`gate-sdk/SPEC.md §The port-candidate criteria`), and two other sites use it
+for unrelated hooks — `gate-sdk/bin/port-blockers.sh:375` and
+`delegation-kit/lib/delegation.sh:49` (`gate_kit_roots_rel`) — re-verified at
+this stage, narrowed from an unbounded "no other file uses the pattern" that a
+literal-string grep for `declare -F` disproves. The prose describing the
+retired mechanism is inventoried in the next section.
 
 ## Existing sections updated
 
