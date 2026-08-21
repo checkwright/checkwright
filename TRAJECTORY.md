@@ -242,6 +242,21 @@ leaving an objective's scope to be inferred. What the ruling does **not** touch:
 the dependency **bar** the crate applies to a candidate dependency is
 engineering judgment owned by gate-sdk/SPEC.md, and nothing here loosens it.
 
+**The allowlist narrows on security grounds only — ruled 2026-08-20 by the operator.** Breadth is
+kept wherever it is safe, because an allow match short-circuits the permission classifier outright,
+so a broad rule actively *saves* model calls rather than merely avoiding a prompt — which is the
+opposite of the premise the 2026-08-13 breadth ruling was taken on. Narrowing is warranted only
+where a destructive form sits inside a blanket grant: `reset --hard`, `clean`, `push --force`, and
+a bare `checkout --`. The disposition pair a narrowing chooses between — narrow the glob, or record
+that the breadth is intended — is owned by guard-kit/SPEC.md §compare-settings-allow and is not
+restated here.
+
+This is recorded rather than left where it was decided, and that is the whole point of the entry:
+the 2026-08-13 ruling **selected** this question's disposition and never **stated** the direction,
+so for a week the answer lived in no governed surface at all — only a drained gap bullet and a
+commit message, which spec-over-precedent says is not ground truth. The ruling is discharged when
+the re-derived grant set lands; the entry carrying that work is **`guard-grant-review`**.
+
 **The graph gate's consumer config becomes a data-only contract, and the sourced-function seam is
 retired — ruled 2026-08-20 by the operator.** `check-graph` is the last takeable member of the
 port, and the only one whose consumer configuration crosses **executable bash functions** rather

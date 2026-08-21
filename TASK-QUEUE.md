@@ -1892,6 +1892,13 @@
   the committed `settings.json` as well as the local overlay, which is a
   policy question about the consumer's own file. Whether this is a new gate or
   an assertion inside `check-settings-pins` also settles its class.
+  **The committed-vs-overlay fork above is NOT discharged by the 2026-08-20 declaration ruling**,
+  checked at that ruling's relay rather than assumed. That ruling puts a *declaration* in the
+  committed file only; this fork asks how far a *scan* reaches, and a scanner that skips the
+  overlay misses the instance class that motivated it. What does transfer is the principle — the
+  committed file is the surface of record for ruled intent, the overlay is per-clone and unruled —
+  which argues the scan must reach the committed file without settling whether it also keeps the
+  overlay. The boundary question below is untouched either way.
   **Cost while deferred:** low per instance and detectable at close, but the
   detector is a session's attention — the reason this was filed as a criterion
   question rather than a removal request is precisely that removing instances
@@ -4971,22 +4978,22 @@
   settings file with no git allow entries there, and both settings files were written minutes
   after the bullet was filed. Nothing re-reports today, so this is filed on the general gap —
   a stated disposition no mechanism can express — and not on the instance.
-  **The operator question this asks and does not answer.** The 2026-08-13 ruling that those
-  globs are intended stands; nothing here reverses, demotes or re-scopes it, which is
-  operator-class (TRAJECTORY.md §How to read a ruling recorded here). Two corrections are
-  recorded for the operator's re-judgment, both read off the vendor permission-modes page
-  rather than inferred from it. First, the ruling's stated premise — fewer blocking prompts is
-  the point — does not survive that page: auto mode removes routine prompts via a classifier,
-  becomes the default for new Pro, Max and Team sessions on 2026-08-14, and must live in the
-  user settings file, since v2.1.142 and later ignore `auto` from a repository's own settings.
-  Second, the correction runs the *other* way from the one first drafted: the dropped-on-entry
-  set enumerates blanket `Bash(*)`, wildcarded interpreters, package-manager run commands and
-  `Agent` rules, a verb-scoped `Bash(git *)` is in none of them, and an allow match
-  short-circuits the classifier outright — so a surviving broad rule *saves* model calls rather
-  than buying nothing. The page settles that enumeration and not the boundary: its narrow-rule
-  example is the literal `Bash(npm test)`, leaving a wildcarded verb rule between the two
-  examples and unruled. The case for narrowing is therefore **security alone** — keeping
-  `reset --hard`, `clean`, `push --force` and bare `checkout --` out of blanket approval.
+  **The two premise corrections that fed the operator's re-judgment**, kept because the 2026-08-20
+  direction rests on them, and both read off the vendor permission-modes page rather than inferred.
+  The 2026-08-13 ruling's stated premise — fewer blocking prompts is the point — does not survive
+  that page: auto mode removes routine prompts via a classifier and must live in the *user*
+  settings file, since v2.1.142 and later ignore `auto` from a repository's own settings. And the
+  correction runs the *other* way from the one first drafted: an allow match short-circuits the
+  classifier outright, so a surviving broad rule *saves* model calls rather than buying nothing.
+  The case for narrowing is therefore **security alone**, the ground 2026-08-20 was ruled on.
+  **RULED — BUILD IT, operator 2026-08-20 via the lead: the knob ships, glob-plus-reason.** A bare
+  list re-loses the reason it exists to keep. Consumer config beside `GUARD_KIT_BREADTH_PROBES`,
+  default empty, never a kit literal — the provenance seam in full, every string naming a command
+  being the consumer's vocabulary. **The shape fork is ruled with it: the COMMITTED file only.** A
+  declaration is a durable ruling about intended breadth, so it belongs in the tracked surface
+  spec-over-precedent can find; overlay globs stay per-clone and keep re-reporting, which is honest
+  rather than a gap, since they were never ruled. Bought for the next cycle rather than to silence
+  a live finding — nothing re-reports today, and the record should not imply otherwise.
   **Why `[design-pending]`:** the ruling decides whether the knob is built at all — reaffirm
   the breadth and the declaration is a stated disposition's missing half, narrow it and there
   is nothing to declare. Two shape questions ride behind it: whether a declaration reaches the
@@ -5001,26 +5008,39 @@
   Filed 2026-08-13 by close from its own gap-inbox drain; the instance-vs-gap split and both
   premise corrections are the drain's.
 
-- **guard-grant-review** [design-pending] [blocked-by: settings-allow-intended-breadth-declaration]
-  — which allowlist grants are worth keeping, once it is the **match** that buys the
-  short-circuit rather than the prompt-avoidance the guard's messages claim.
+- **guard-grant-review** [design-pending] — which allowlist grants are worth keeping, once it is
+  the **match** that buys the short-circuit rather than the prompt-avoidance the guard's messages
+  claim.
   Split from `bash-guard-auto-mode-rationale` 2026-08-13 at scope, on the operator ruling
   that scoped that entry to its first two parts. This is its third: re-derive the grant set,
   given that an allow match resolves immediately and skips the classifier entirely, so a
   surviving broad rule *saves* model calls rather than buying nothing.
-  **Why blocked rather than merely deferred:** it changes what the repo grants, which is the
-  operator-intent surface `settings-allow-intended-breadth-declaration` turns on. The
-  2026-08-13 ruling selected that entry's *disposition* — a direction is given now rather
-  than deferred — but **did not state the direction**, and supplying one is operator-class
-  (TRAJECTORY.md §How to read a ruling recorded here). So this entry stays unstarted.
-  **Where the direction lands when it arrives — stated so it is not re-derived, and without
-  pre-empting what it says:** TRAJECTORY.md §The closed rulings is the governed home, that
-  file being the project's ruling record, pointing at guard-kit/SPEC.md
-  §compare-settings-allow, which owns the narrow-or-declare disposition pair a direction
-  chooses between. This matters because the 2026-08-13 breadth ruling currently lives in
-  **no** governed surface — only a drained gap bullet and a commit message, which
-  spec-over-precedent says is not ground truth. Naming the home is what stops the next
-  ruling landing the same way.
+  **THE DIRECTION IS SUPPLIED — operator-ruled 2026-08-20, relayed by the lead: narrow on
+  SECURITY grounds only.** Keep breadth wherever it is safe, because an allow match short-circuits
+  the classifier and a broad rule actively saves model calls; narrow only where a destructive form
+  sits inside a blanket grant — `reset --hard`, `clean`, `push --force`, bare `checkout --`. This
+  is what the 2026-08-13 ruling selected and never stated, and the gap between selecting a
+  disposition and stating it is what left this entry unstarted for a week.
+  **Landed in its governed home rather than here:** TRAJECTORY.md §The closed rulings, pointing at
+  guard-kit/SPEC.md §compare-settings-allow, which owns the narrow-or-declare pair the direction
+  chooses between. That placement is the part that stops this recurring — the 2026-08-13 breadth
+  ruling lived in **no** governed surface at all, only a drained gap bullet and a commit message,
+  which spec-over-precedent says is not ground truth.
+  **UNBLOCKED 2026-08-20**, the blocked-by tag naming
+  `settings-allow-intended-breadth-declaration`
+  cleared on the lead's ruling that the blocker is discharged by that entry being *ruled*. What the
+  discharge does and does not buy, recorded so a starting session is not surprised: the direction
+  is executable now, since narrowing a destructive form needs no declaration surface. What still
+  waits on that entry's **build** is a durable home for the *keep-the-breadth* half — until the
+  knob ships, a kept glob re-reports at every close, which its own ruling calls honest rather than
+  a gap.
+  **RELOCATED here 2026-08-20 rather than lost**, out of the declaration entry named above when
+  landing its ruling compressed this against the entry cap: the vendor permission-modes
+  page **settles the enumeration and not the boundary**. Its dropped-on-entry set is blanket
+  `Bash(*)`, wildcarded interpreters, package-manager run commands and `Agent` rules — a
+  verb-scoped `Bash(git *)` is in none of them — while its narrow-rule example is the literal
+  `Bash(npm test)`. A wildcarded verb rule sits between the two examples and is unruled, which is
+  the exact judgment this entry's re-derivation has to make and the page will not make for it.
   **Cost while deferred:** the guard keeps steering against a grant set nobody has
   re-derived under the mechanism that actually applies, so the allowlist may be
   simultaneously wider than security wants and narrower than the short-circuit rewards.
@@ -6148,6 +6168,16 @@
   rather than half-wiring it; that refusal is correct and is written here so the next session
   reads a settled call instead of re-litigating it. What this entry needs is the operator, not a
   second probe of the same shape.
+  **AUTHORIZED — operator 2026-08-20, relayed by the lead: the LOGGING-ONLY variant first.** A hook
+  that records what it *would* have blocked and blocks nothing, which answers the load-bearing
+  unknown at zero risk of wedging a session. **A blocking hook is a second authorization and is not
+  implied by this one.** The reasoning was taken with the ruling: the unknown is whether the
+  harness already defers the stop while a background child is live, and if it does the class
+  dissolves and no hook is needed at all.
+  **Two things this entry is entitled to return, recorded so neither reads as a failure.** That a
+  capped refusal buys **nothing** is a *result*. And the event is `SubagentStop`, never `Stop`; its
+  being undocumented for blocking is the unknown itself rather than a footnote to it.
+  No settings write rode this session — the authorization is what was bought.
   **Unsettled and load-bearing, unchanged by the correction:** whether the harness defers the
   stop while a background child is live. If it does not, a blocking hook is the only lever left;
   if it does, the class dissolves. Neither is decidable without the hook wired.
@@ -6259,15 +6289,15 @@
   into a gitignored `.tmp/` resume journal that delegation-kit/SPEC.md §Resume journal — agent
   writes, scratch reset sweeps requires of every mutating agent. One mandated mechanic, 21
   out-of-band decisions, one iteration.
-  **The three dispositions disagree, which is why this is a unit and not a pruning chore.**
-  (a) *Grant* `cat >>` into the scratch dir: cheapest, and the write target is disposable and
-  boundary-wiped — but widening the committed set is the consumer's call, never a session's, and
-  the glob has to be narrow enough that it cannot reach a tracked path.
-  (b) *Steer* to `Write`/`Edit`, the shape `guard_rule_sed_file` already uses for reads: those
-  tools never prompt and keep the harness's file view current — but an append through `Edit`
-  costs an anchor match and through `Write` costs re-emitting the whole journal, so the steer
-  trades a permission decision for tokens on a file that only grows.
-  (c) *Convention* in `templates/agent-execution.md`'s journal bullet: free, and the weakest.
+  **The three dispositions, ruled below:** (a) grant the append into the disposable, boundary-wiped
+  scratch dir; (b) steer to `Write`/`Edit`, trading a permission decision for tokens on a file that
+  only grows — an `Edit` append costs an anchor match, a `Write` one re-emits the whole journal;
+  (c) a convention in `templates/agent-execution.md`'s journal bullet, free and the weakest.
+  **DISPOSITION (a) RULED — GRANT, operator 2026-08-20 via the lead: the APPEND form only.**
+  `cat >> .tmp/…` is granted; the truncating `cat > .tmp/…` is deliberately not, so a mis-typed
+  redirect cannot destroy a journal. Condition, not a hope: the glob must be provably unable to
+  reach a tracked path. (b) and (c) refused. The ruling reaches (a) alone — the oracles below stay
+  unruled — and the settings write is this entry's own build work, not this iteration's.
   **The second half is the overlay-only oracles.** `scan-prompts.sh`'s overlay report shows 22
   calls across 11 patterns granted by nothing committed — `bash scripts/measured-claims.sh` (the
   repo's own measured-claim oracle, 5), `cargo test`, `cargo build`. Each is read-only or a build
@@ -6446,28 +6476,32 @@
   the claim was asserted and the compression-vs-eviction split checked against the entry it
   would otherwise have contradicted.
 
-- **crate-toolchain-grant-uncommitted** [design-pending] — the crate's toolchain is a commit-time
-  obligation whose permission grant lives only in an uncommitted local overlay, so the standing
-  grant is unreviewable and absent from a fresh clone.
-  `cargo build`, `cargo test` and `cargo clippy` are auto-allowed by
-  `.claude/settings.local.json` and appear nowhere in the committed `settings.json` (115 entries;
-  a live check finds `git rm`, three `gh run` forms and no `cargo`). Meanwhile CLAUDE.md makes
-  `bash gate-sdk/bin/build-native.sh` a commit-time obligation alongside the battery, and
-  `check-crate-arms` runs the crate's lint and test arms, so a session in a fresh clone meets a
-  mandatory toolchain with nothing granting it and pays an out-of-band decision per call.
-  **Why this is filed rather than fixed, and the ground is authority not effort.** Widening the
-  committed allowlist is the **consumer's** call: guard-kit's triage contract lets a session
-  propose a standing grant and prune the overlay, never widen its own auto-allow set
-  (guard-kit/templates/close-triage.md). Proposed at this close and **deferred by operator
-  ruling**, so the deferral is a decision on the record rather than an unfinished step.
-  **The design question, which is why it is not a one-line settings edit.** The overlay's
-  `cargo` grants are bare-command globs, and the shape to reinforce may be narrower — the
-  obligation is discharged through `build-native.sh` and the battery, not by hand-run `cargo`
-  subcommands, so a grant on the *wrappers* may be the correct form and the direct `cargo`
-  entries the habit to steer away from. Deciding that is the triage criterion's job, per member.
-  **Cost while deferred:** the grant works on this machine and nowhere else, so the friction is
-  invisible exactly where it is measured and lands entirely on a first-time clone — the adoption
-  path `demo/run-demo.sh` and `installer/` exist to keep smooth.
+- **crate-toolchain-grant-uncommitted** [design-pending] — one clone's overlay grants a hand-run
+  `cargo` path the sanctioned path never uses, so what is uncommitted is a widening nobody needs.
+  **The premise as filed was backwards, corrected 2026-08-20 against a fresh probe.** It read "a
+  session in a fresh clone meets a mandatory toolchain with nothing granting it". It does not: both
+  sanctioned paths are granted in the committed `settings.json` — `run-gates.sh` at lines 11-13 and
+  `build-native.sh` at 32-33. `check-crate-arms` *does* shell out to `cargo` directly
+  (`gate-sdk/checks/check-crate-arms.sh:40,47`), and that settles the question **toward** the
+  correction rather than against it, because the allowlist matches the top-level `Bash` call and
+  not its subprocesses. Verified behaviourally rather than reasoned: that gate is registered at
+  `scripts/gates.list:14`, so every `bash gate-sdk/bin/run-gates.sh` run this session executed it,
+  and not one prompted for `cargo`.
+  **What is true instead:** the committed file carries **107** `Bash(` entries and no `cargo` in
+  any form — the 115 first filed was a dated count — while `.claude/settings.local.json`
+  auto-allows `cargo build`, `cargo test` and `cargo clippy`, grants that reach only the
+  unsanctioned hand-run path, the obligation being discharged through the two wrappers.
+  **RULED — PRUNE THE OVERLAY AND GRANT NOTHING NEW; operator 2026-08-20, relayed by the lead.**
+  A pruning, not a widening, and the deliverable shrinks to match.
+  **The design question is ANSWERED by that ruling**, and it is why this was never a one-line
+  settings edit: the wrapper grant is the correct form, it already exists committed, and the direct
+  `cargo` entries are the habit to steer away from. Pruning is inside a session's own authority —
+  guard-kit's triage contract (guard-kit/templates/close-triage.md) lets a session prune the
+  overlay and forbids only widening its own auto-allow set.
+  **Cost while deferred:** small, and no longer clone-shaped — the corrected premise removes the
+  fresh-clone harm outright, both sanctioned paths being committed-granted. What remains is that
+  one clone's overlay silently permits a hand-run path the project does not sanction: a standing
+  grant nobody reviews, rather than friction anyone feels.
   Class: mints no governed name and lands no gate, so canon-kit's litmus makes it **debt**.
   Filed 2026-08-17 by close from its own tooling-friction triage; both allowlist sets were read
   before the absence was asserted, and the overlay was confirmed carrying zero redundant and
