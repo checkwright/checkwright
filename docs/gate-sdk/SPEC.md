@@ -8455,9 +8455,10 @@ documents cross as a path.
 rather than presented as a clean port.** `GATE_SDK_GRAPH_THEME` and the three
 `graph_theme_css`/`_header`/`_footer` override functions are **retired**: a
 consumer carrying a `graph-theme.sh` had that file read at every emission, and
-after this change it is not. The doctrine CLAUDE.md §The provenance seam names
-this pair as its worked example holds through the cut — the theme stays the
-consumer's, and only its **form** moves from executable to declarative.
+after this change it is not. What the operator ruling of 2026-08-20 bound the
+replacement to is that the doctrine holds through the cut: CLAUDE.md §The
+provenance seam names this pair as its worked example, and the theme stays the
+consumer's — only its **form** moves from executable to declarative.
 
 **The retired seam fails loudly rather than silently.** The gate refuses, exit 2,
 naming the migration, when `GATE_SDK_GRAPH_THEME` is set in its environment or a
