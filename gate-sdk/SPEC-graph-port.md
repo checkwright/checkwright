@@ -212,31 +212,60 @@ only the criterion's sentence ships the hole the sentence was pointing at.
 
 The widening splits by assertion shape:
 
-- **Static assertions — A, B, C, G — widen the `good/`+`bad/` pair.** The harness
-  resolves and runs each case with cwd set to the case dir
-  (gate-sdk/SPEC.md §run-gate-tests), and `GATE_SDK_GATES_DIR` defaults relative,
-  so a case dir *is* a mini-consumer root: `scripts/gates.list`, member
-  declarations, `scripts/graph-vocab.sh`. The pair must carry **both declaration
-  spellings** — a `.sh` member and a `.gate` member — which is the arm a
-  gate-source auditor's pair classically leaves resting on the live tree, and it
-  must reach all four of delta (6)'s coverage branches and all three cycle-valve
-  branches.
-- **Emission and freshness assertions — D, E, F, H, I — take constructed
-  scenarios.** A committed expected hook or artifact inside `gate-tests/` is a
-  second copy of a generated file that rots, so these generate and compare inside
-  a throwaway tree instead. **Corrected against the fixture tree, 2026-08-21 at
-  align: only H and I already have hermetic drivers**
+- **The `good/`+`bad/` pair carries assertion G, and only G.** The pair runs one
+  argv per case, so it selects exactly one of the gate's modes, and only
+  `--amend-only` reaches an assertion without also reaching the two the pair
+  cannot satisfy. **Corrected at build, 2026-08-21, against a run rather than a
+  reading**: a case dir *is* a mini-consumer root as this delta said, and A, B and
+  C do run clean in one — but a `good/` case must exit 0 and the full path always
+  reaches D and E, which red there on two counts a fixture may not answer.
+  `gen-pre-commit.sh` cds to `git rev-parse --show-toplevel` **before** resolving
+  the gates dir, so `--emit` invoked from a case dir emits *this repo's* hook;
+  satisfying D would take a committed byte-copy of the real generated hook inside
+  `gate-tests/`, and satisfying E a committed `CHECK-GRAPH.html` beside it —
+  both the second-copy-of-a-generated-file this delta already refuses below. The
+  alternative, a fourth mode selecting the registry assertions, is refused: it
+  adds consumer-visible surface and a fourth arm to delta (1)'s port, to buy a
+  corpus a driver already has. So G's widening is the pair's whole job — every
+  branch of `validate_amend_manifest` and of the extractor that feeds it.
+- **Every other assertion — A, B, C, D, E, F, H, I — takes a constructed
+  scenario in a `gate-tests/*.test.sh` driver.** A committed expected hook or
+  artifact inside `gate-tests/` is a second copy of a generated file that rots, so
+  these generate and compare inside a throwaway tree instead. That tree is
+  criterion 4's discharge on the same ground the pair is: it is written by a file
+  under `gate-tests/`, which every live-tree walk prunes, so no port can add or
+  remove a file in the corpus the comparison runs over. **Corrected against the
+  fixture tree, 2026-08-21 at align: only H and I already have hermetic drivers**
   (`check-graph-refs.test.sh`, `check-graph-cap.test.sh` respectively) —
   neither exercises assertion F (`check-graph.sh:600-605`, every emitted local
   `href`/`src` resolves under the artifact dir), which has none today. Assertion
   F needs its own driver for the same reason H's does: the kit's own default
-  emission is self-contained by construction, so the failure path (a theme
-  injecting a relative href to a file that is not there) and its clearing
-  counterpart are untested until a theme supplies one — the natural extension is
-  a case in `check-graph-refs.test.sh` or a sibling test alongside it. Assertion D
-  needs a driver because `gen-pre-commit.sh` anchors itself at
+  emission is self-contained by construction — it emits no local `href`/`src` at
+  all — so the failure path (a theme injecting a relative href to a file that is
+  not there) and its clearing counterpart are untested until a theme supplies one.
+  Assertion D needs a driver because `gen-pre-commit.sh` anchors itself at
   `git rev-parse --show-toplevel` and so cannot be driven from a non-repository
   case dir at all; assertion E needs one for the artifact byte-compare.
+- **The driver is `check-graph-tree.test.sh`, delivered at build 2026-08-21**,
+  and it is one tree rather than one per assertion because A through F share a
+  single mini-consumer: a `mktemp`'d git repo carrying `scripts/gates.list`, five
+  member declarations in **both spellings**, and `scripts/graph-vocab.sh`. The
+  `.gate` member is `tier=align-only`, which keeps it out of both generated hooks
+  and so out of `gate_command`'s reach — that is what lets the sandbox exercise
+  the descriptor branch of assertion A's resolution with **no binary present**,
+  rather than making a shell-substrate fixture depend on a built crate. The
+  baseline case is the parity oracle for the branch set: it greens only if all
+  four of delta (6)'s coverage branches and all three cycle-valve branches clear,
+  so a branch that stops firing reds rather than passing vacuously.
+- **The three existing drivers reach the gate by script path and must be moved to
+  `gate_run`, found at build.** `check-graph-refs.test.sh`,
+  `check-graph-cap.test.sh` and `check-graph-theme.test.sh` each invoke
+  `"$GATE"` = `checks/check-graph.sh` directly. gate-sdk/SPEC.md §run-gate-tests
+  rules that a bespoke test names a gate and a checks dir, never a script path,
+  **precisely so a member's port leaves its behavioral tests untouched** — so as
+  written all three stop testing anything the moment the shell file is deleted.
+  Re-pointing them onto `gate_run` is part of the port, not a cleanup, and it is
+  the same edit in all three files.
 - **`check-graph-theme.test.sh` is re-pointed** from the retired sourced-function
   seam onto the part-file contract, keeping its four existing claims: injected
   content lands, an absent theme falls back with no leakage, both paths are
@@ -250,6 +279,14 @@ The widening splits by assertion shape:
   of its three cases instead of exercising assertion H at all. Its fixture must
   move to a `GATE_SDK_GRAPH_THEME_DIR/footer.html` part file carrying the same
   link, alongside the theme test's migration rather than as separate work.
+- **`check-graph-tree.test.sh` joins that migration, for assertion F only.**
+  Because the kit emits no local `href`/`src` of its own, F's failure path is
+  reachable through the theme and nowhere else, so its two cases inject a
+  `graph_theme_header()` and are written against the seam that exists when they
+  land. Post-port the injection becomes a `GATE_SDK_GRAPH_THEME_DIR/header.html`
+  part file. The three re-pointings are one migration over three files, and the
+  widening lands **first** by this delta's own sequencing — a driver written
+  against a contract the tree does not yet carry is a driver that runs nothing.
 
 **The live-tree parity arm is demoted from proof to smoke**, per criterion 4's
 own rule for a member whose assertion target is gate source: assertion A forbids

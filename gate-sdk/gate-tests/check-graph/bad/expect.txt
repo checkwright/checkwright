@@ -1,1 +1,13 @@
+missing required key 'couples='
+missing required key 'dir='
+missing required key 'valve='
+missing required key 'tier='
+unknown manifest key/token 'bogus=1'
 dir= must be bi|one (got 'mono')
+valve= must be none|PROPOSED (got 'no-fixture')
+tier= must be precommit|align-only|commit-msg (got 'postcommit')
+mode= must be staged|whole-tree (got 'partial')
+gen= must be manual (got 'auto')
+couples= is empty
+couples token 'docs/[a].md' is not a syntactically valid glob/path
+trigger token 'docs/(x).md' is not a syntactically valid glob/path
