@@ -75,7 +75,7 @@ if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*
     run_gate check-gate-exemption-tasks env GATE_SDK_KNOB_GATE_SDK_QUEUE_FILE=TASK-QUEUE.md GATE_SDK_KNOB_GATE_SDK_GATES_DIR=scripts $'GATE_SDK_KNOB_GATE_KIT_ROOTS_HERE=gate-sdk\tcanon-kit\tcontext-kit\tdelegation-kit\tdoctrine-kit\tdrift-kit\tevidence-kit\tguard-kit\tlifecycle-kit\tqueue-kit\tsite-kit' GATE_SDK_KNOB_GATE_SDK_NATIVE_CRATE=native native/target/release/checkwright-gates check-gate-exemption-tasks
 fi
 
-if staged_matches 'scripts/gates.list' 'gate-sdk/checks/*' 'canon-kit/checks/*' 'context-kit/checks/*' 'delegation-kit/checks/*' 'doctrine-kit/checks/*' 'drift-kit/checks/*' 'evidence-kit/checks/*' 'guard-kit/checks/*' 'lifecycle-kit/checks/*' 'queue-kit/checks/*' 'site-kit/checks/*' 'gate-sdk/SPEC.md' 'native/*' '.github/workflows/publish.yml'; then
+if staged_matches 'scripts/gates.list' 'gate-sdk/checks/*' 'canon-kit/checks/*' 'context-kit/checks/*' 'delegation-kit/checks/*' 'doctrine-kit/checks/*' 'drift-kit/checks/*' 'evidence-kit/checks/*' 'guard-kit/checks/*' 'lifecycle-kit/checks/*' 'queue-kit/checks/*' 'site-kit/checks/*' 'gate-sdk/SPEC.md' 'gate-sdk/SPEC.md' 'canon-kit/SPEC.md' 'context-kit/SPEC.md' 'delegation-kit/SPEC.md' 'doctrine-kit/SPEC.md' 'drift-kit/SPEC.md' 'evidence-kit/SPEC.md' 'guard-kit/SPEC.md' 'lifecycle-kit/SPEC.md' 'queue-kit/SPEC.md' 'site-kit/SPEC.md' 'native/*' '.github/workflows/publish.yml'; then
     run_gate check-gate-substrate-parity gate-sdk/checks/check-gate-substrate-parity.sh
 fi
 

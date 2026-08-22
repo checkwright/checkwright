@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=scripts/msg-patterns.list dir=one valve=none tier=precommit trigger=*
 # install: zero-config
-# port-until: cohort-held-members-port-prerequisites
 # spec: gate-sdk/SPEC.md §check-tree-terms — no tracked file matches the banned-pattern set (the tracked-files half of the leak guard; the pattern files and their templates are self-exempt)
 #
 # usage: check-tree-terms.sh [scan-root] [pattern-file...]

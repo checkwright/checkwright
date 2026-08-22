@@ -5,3 +5,5 @@ check-heldtwice
 check-dup
 check-orphan
 check-twice
+check-nospec
+check-ungrounded

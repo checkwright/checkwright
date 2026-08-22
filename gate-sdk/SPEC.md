@@ -660,13 +660,19 @@ is precisely what assertion G's first clauses red on. The roster above therefore
 gains nothing and reserves nothing.
 
 **The held field's payload is a bare slug and nothing else**, which is the one
-place the two fields' grammars part. `# no-port:` carries free text because
-permanence is a *ruling* whose only home is prose; a temporary hold's home is a
-**queue entry**, which already carries the ground, the cost and the disposition,
-so a `<cause>` half here would be a second place the same ground lives and the one
-that rots when the entry is re-scoped. Both fields cost their reader exactly one
-hop. The refusal is recorded so a later author does not re-propose the half as an
-ergonomic.
+place the two fields' grammars part. A temporary hold has **two facts in two
+homes**: the **ground** lives in the gate's own SPEC section, beside the rule it
+governs, and the **disposition and the cost** live in the owning queue entry
+(§The port-candidate criteria, which owns that split). `# no-port:` carries free
+text because permanence is a *ruling* whose only home is prose and the field *is*
+the pointer to it; `# port-until:` carries a slug because the slug reaches the
+fact a *reader of the queue* needs, and the ground is already one hop away
+through the declaration's own `# spec:` pointer. A `<cause>` half here would
+therefore be a second place the same ground lives — the gate's section being the
+first — and the one that rots when the entry is re-scoped. Both fields cost their
+reader exactly one hop. The refusal is recorded so a later author does not
+re-propose the half as an ergonomic, and the other hop has an oracle rather than
+discipline behind it: §check-gate-substrate-parity's assertion H.
 
 **The slug's anti-rot is coarse, and the limit is stated rather than left to be
 discovered.** Where several held members point at one umbrella entry — an entry
@@ -681,11 +687,10 @@ before then is costed filings against work nobody has scoped.
 **Its domain is any temporary hold with named work owed and a live owning entry**,
 which is wider than the two born-native exception classes §The port-candidate
 criteria drafted it for. Those classes are statements about a gate being
-*authored* in shell; the day-one roster is not shaped that way, its members being
-criterion-7 blockers read over existing gates and one criterion-4 hold that needs
-**design** rather than substrate and fits no lettered class at all. Narrowing the
-field to the letters would leave the criteria section's own worked example unable
-to declare, which is the reading that fails on its own example.
+*authored* in shell; the holders are not shaped that way, being criterion-7
+blockers read over gates already authored and fitting no lettered class at all.
+Narrowing the field to the letters would leave the criteria section's own worked
+example unable to declare, which is the reading that fails on its own example.
 
 **The `# reads:`/`# needs:` refusal below does not reach it, and the difference
 is what a reader could verify.** Both were refused because nothing would hold
@@ -1392,6 +1397,23 @@ design time; the last three were paid for, and each is named with what it cost.
    clean. Widen first, then port — a port answering only the criterion's sentence
    ships the hole the sentence was pointing at.
 
+   **A criterion-4 bind therefore prices a port; it never holds one.** The
+   sentence above already says a failing member still ports and already names the
+   discharge, and *widen first, then port* is an **instruction**, not a blocker:
+   a member whose only unmet criterion is 4 is **takeable**, carrying the widening
+   in its price. Saying so is not a new ruling but the consequence the criterion
+   never stated, and it is stated because the omission produced a real declaration
+   — a correctly identified criterion-4 bind spelled as a hold, on a field whose
+   meaning is *not takeable now*. The evidence is five members rather than the
+   argument: `check-docs-cname-parity`, `check-gate-exemption-tasks`,
+   `check-knob-default-coupling`, `check-spec-embedded-source` and
+   `check-gate-tamper` each bind this criterion and each **ported**, discharging
+   it by widening the fixture pair. So a member binding it declares no
+   `# port-until:` on that ground (§The `# graph:` manifest owns the field), and
+   the shared-snapshot **ordering** constraint the paragraphs below rule is
+   narrowed by none of this: a cohort still sequences a criterion-4 member
+   deliberately, it just does not declare it held.
+
    **The second worked instance is a README-roster auditor over `checks/`
    basenames**, whose pair carried only `.sh` kits, leaving the `.gate` arm the
    shell already implemented correctly exercised by no case at all. The widening
@@ -1430,7 +1452,7 @@ design time; the last three were paid for, and each is named with what it cost.
    edit re-runs the gate, is never read as content at all; and a **content couple
    wider than the walk**, whose glob covers declaration paths the gate's own
    population predicate never reaches, is content-shaped and still not over gate
-   source. A conservation row and a criterion-4 hold are therefore independent
+   source. A conservation row and a criterion-4 bind are therefore independent
    facts about a member, which is what they always were.
 
    **The worked instance is live and machine-derived, which is why this predicate
@@ -1460,7 +1482,7 @@ design time; the last three were paid for, and each is named with what it cost.
    tree and the rule greps each file's bytes. Every kit's `checks/*.sh` and
    `*.gate` is therefore inside the corpus it scans as content, which is this
    criterion's predicate exactly. The lesson is the one the paragraph above
-   already states from the other side: a conservation row and a criterion-4 hold
+   already states from the other side: a conservation row and a criterion-4 bind
    are independent facts, so the verdict is taken by **reading the walk**, never
    by reading the trigger field (§The fourth budget batch; site-kit/SPEC.md
    §check-docs-cname-parity owns what it cost that member).
@@ -1521,7 +1543,7 @@ design time; the last three were paid for, and each is named with what it cost.
    lies inside the corpus it scans as content*, and for this member the answer is
    no for itself and yes for its siblings. So criterion 4 and the shared-snapshot
    ordering constraint are **independent facts**, the way a conservation row and a
-   criterion-4 hold already are: the criterion protects the parity oracle from
+   criterion-4 bind already are: the criterion protects the parity oracle from
    the member's *own* port, the ordering protects every comparison from a
    *sibling's*. The fifth batch is where they came apart, and a session clearing
    one by clearing the other has a verdict it did not earn.
@@ -1852,6 +1874,42 @@ design time; the last three were paid for, and each is named with what it cost.
    A *blocker* here is therefore work the port owes, in the sense the roster's
    opening paragraph fixes for all seven; it never reads on whether a gate ports.
 
+   **A blocker here holds a member only where the program is the rule's own
+   semantic content**, and the test between the two classes is *whether removing
+   the program changes the gate's verdict*. The criterion has been silent on this
+   since the declarable spelling landed, which is the narrower question that
+   spelling made answerable — *is this member takeable at this cut?* — and the
+   silence is what let an incidental dependency be spelled as a hold.
+
+   - **The program is the rule.** `shellcheck` decides what §check-shellcheck and
+     §check-action-run-shell assert; `cargo` decides what §check-crate-arms
+     asserts; the renderer decides what site-kit/SPEC.md
+     §check-docs-render-fidelity asserts. Designing the dependency away means
+     re-deciding the rule, which is a sub-project with its own design, and the
+     member is genuinely **not takeable now**. This is the class `# port-until:`
+     was minted for.
+   - **The program is incidental spelling.** A text utility the rule uses to
+     assemble, split or order a string the port re-expresses in the target
+     language — `paste -sd, -` is `.join(",")`, and the verdict is identical
+     either side of the substitution. The blocker is **priced by the cut, never a
+     hold**: one line of the port's own work, exactly like a criterion-4 widening.
+
+   **The tool cannot make this call and is not asked to.** §port-blockers reports
+   *which program a rule invokes*; the class is a judgment about what the rule
+   asserts, which no tokenizer sees. Declaring it is therefore presence-shaped on
+   the terms §check-gate-substrate-parity's assertion G already fixed for both
+   fields — presence is the verdict, absence means takeable, and an **undeclared**
+   member is over-counted as takeable rather than lost. The failure direction is
+   unchanged by the test: a misclassified class-(i) member reads takeable, is
+   selected, and the cut discovers the blocker at composition time, which is where
+   the report already puts it.
+
+   **Two refusals, recorded so they are not re-proposed as ergonomics.** *The
+   program is not on the floor* is not the test — that is the **report's** test,
+   and reading it as the hold's is what puts ungrounded declarations on a tree.
+   And *the port is more work than an ordinary member* is not the test either:
+   every criterion prices work, and pricing is not holding.
+
    **What it adjudicates is exactly one thing: whether the payload carries the
    program a rule invokes.** Whether the *target* of a sanctioned spawn is itself
    ported is a **cohort-composition** question and criterion 7 does not reach it —
@@ -1917,7 +1975,11 @@ design time; the last three were paid for, and each is named with what it cost.
    member the roster reported clean and now reports blocked reads like drift
    unless the reason is written down — and because it is the standing evidence
    that a *derived* roster still has to be re-derived by a **repaired**
-   derivation, never trusted because it is derived.
+   derivation, never trusted because it is derived. **Its class is (ii)**: the
+   invocation is `paste -sd, -`, a comma join of a sorted label set, so the
+   compiled rule spells it directly and the verdict does not move. The member is
+   therefore **takeable and priced**, not held (§check-gate-assertions records
+   what its port costs).
 
    **`check-crate-arms` is a different case under the same criterion, and it is
    named so no later cohort reads it as owed work.** Its rule is an invocation of
@@ -2086,11 +2148,11 @@ exactly the missing input; the field landed **with** its declarations in one uni
 which is the only landing the rule admits.
 
 **The spelling's domain is wider than these two classes, and that widening is
-§The `# graph:` manifest's to state**: the day-one holders are mostly criterion-7
-blockers read over gates already authored, plus one criterion-4 hold that fits no
-lettered class, so the field's subject is *any temporary hold with named work owed
-and a live owning entry* rather than the born-native exception letters. Recorded
-here because this is the section that drafted it for the letters.
+§The `# graph:` manifest's to state**: the holders are criterion-7 blockers read
+over gates already authored, fitting no lettered class, so the field's subject is
+*any temporary hold with named work owed and a live owning entry* rather than the
+born-native exception letters. Recorded here because this is the section that
+drafted it for the letters.
 
 **The cause is recorded in the gate's own SPEC section**, beside the rule it
 governs, on the same terms every other design ruling for that gate is recorded —
@@ -2104,12 +2166,17 @@ entry that `bash gate-sdk/bin/port-blockers.sh` can derive but not attribute; an
 the session landing the missing substrate or the missing target, for which a
 class-(b) or class-(c) cause *is* the list of gates that become portable with it.
 **A held member's cause now has a machine-read companion and the two must agree**:
-`# port-until:` names the owning entry, that entry carries the disposition, and
-the gate's own section carries the ground. A member may not declare the field
+`# port-until:` names the owning entry, that entry carries the disposition and
+the cost, and the gate's own section carries the ground — the single statement of
+that split, §The `# graph:` manifest citing it rather than ruling a second one.
+A member may not declare the field
 until its own section states its cause — a declaration whose ground is inferred
 from a sibling gate, or from this section's shared worked-example prose, is the
 one shape the field must not normalise, since the field's whole value is that a
-reader reaches the ground from the declaration in one hop.
+reader reaches the ground from the declaration in one hop. That rule is
+**machine-held** rather than discipline: §check-gate-substrate-parity's assertion
+H opens the section the declaration's own `# spec:` field names and reds when it
+does not state the hold.
 
 **What the classes deliberately exclude**, because an exception criterion is
 defined by its refusals: *the rule is easier to write in shell*, *the author is
@@ -2236,7 +2303,20 @@ default forecloses a new one forming, because a gate written native was never in
 the shell partition to join a group. A later selector therefore reads the arm's
 precondition off the run as before and should expect it to keep reporting the
 same verdict; what would reopen the arm is a *consumer* contributing shell gates
-that share a derivation, not this tree. Shared derivation is the axis
+that share a derivation, not this tree.
+**The takeable tier is non-empty again, and this is an oracle read rather than a
+number this section holds.** Run on 2026-08-22 after two holds were retired —
+one criterion-4 bind that was never a hold ground and one criterion-7 blocker of
+the incidental-spelling class (§The port-candidate criteria owns both rulings) —
+`bash gate-sdk/bin/port-blockers.sh --group` trailed *106 member(s) scanned, 2
+group(s) formed, 0 undecidable, 98 already ported and excluded, 3 permanently
+shell and excluded, 3 temporarily held and excluded; 5 still owed, 2 takeable at
+this cut*. That supersedes the reading §The sixth budget batch recorded at its own
+cut, where the tier was exhausted and the budget arm had nothing to compose from;
+the two groups are still of exactly one, so the size arm's verdict is unmoved and
+the budget arm is the one that reopened. A later session re-reads the trailer
+rather than this paragraph — a dated read is evidence that the arm's precondition
+can change, never the tier's current value. Shared derivation is the axis
 **while it selects**, because it is what made this cohort
 cheap: the walk is ported once and proved N times, and the parity comparison is
 over one corpus shape rather than N; the budget arm is what this section says
@@ -7245,15 +7325,22 @@ its marker and the contract. A first paragraph that embeds the literal pattern
 in example prose self-matches — the failure is loud (a false positive forcing
 a reword), never a silent miss, so it is accepted. Requires GNU awk.
 
-**It is held on shell, and the cause is recorded here rather than inferred.** The
-rule also invokes `paste`, which is not on `GATE_SDK_PROGRAM_FLOOR` (§lib/gate.sh),
-so criterion 7 blocks it (§The port-candidate criteria) — owed port work, a
-dependency to be designed away or replaced, never a permitted exclusion. That
-criterion's worked-example prose records *how* the requirement surfaced, the scan
-having abandoned this declaration before reaching the call for the roster's whole
-life; what belongs here is the requirement itself, because a member may not
-declare `# port-until:` on a ground that lives only in a shared central passage.
-The declaration names the entry that owns the blocker.
+**Its port price is `paste`, and the hold it carried is retired.** The rule
+invokes `paste`, which is not on `GATE_SDK_PROGRAM_FLOOR` (§lib/gate.sh), so
+criterion 7 names it — owed port work, a dependency to be designed away or
+replaced, never a permitted exclusion. *How* the requirement surfaced is worth
+keeping and is recorded in that criterion's worked-example prose: the scan
+abandoned this declaration before reaching the call, so the roster reported the
+member clean for its whole life. What changes is the **verdict** on it. The
+invocation is `paste -sd, -`, a comma join over a sorted label set, which is
+class (ii) under criterion 7's hold-worthiness test — the compiled rule spells the
+join directly and the gate's verdict is identical either side of the substitution.
+The member is therefore **takeable and priced**, not held, and its
+`# port-until:` declaration is retired. The **GNU-awk** requirement above rides
+the same reasoning and is named so a later reader does not restore a hold on it:
+`match()`'s third argument is a convenience the port re-expresses in its own
+capture API, not a decision about what this gate asserts. The criterion citation
+stays because the port still owes the work the criterion names.
 
 ### check-gate-substrate-parity
 
@@ -7261,7 +7348,11 @@ Holds the dispatch seam honest: a gate's implementation may move to a compiled
 subcommand, but not by quietly deleting the declaration other gates read or the
 record of what that move costs. Usage
 `check-gate-substrate-parity.sh [gates-dir] [conservation-doc]`; the two-arg form
-steers the fixture pair onto hermetic copies of each surface. Seven assertions.
+steers the fixture pair onto hermetic copies of each surface. Eight assertions:
+(A) declaration uniqueness; (B) subcommand parity; (C) disposition coverage;
+(D) one writable home for the manifest; (E) no implementation source inside the
+vendoring set; (F) one owner for the target roster; (G) port-declaration
+placement; and (H) a held declaration's ground reachable in one hop.
 
 - **assertion A — declaration uniqueness.** Each `gates.list` member resolves to
   exactly one declaration. A dir carrying both `<name>.sh` and `<name>.gate` is
@@ -7589,6 +7680,79 @@ steers the fixture pair onto hermetic copies of each surface. Seven assertions.
   The gate is permanently shell under exception class (a), so widening it raises
   no substrate question, and the assertion adds no member to the conservation
   table: the corpus is the declaration set it already walks.
+- **assertion H — a held declaration's ground is reachable in one hop.** For every
+  declaration carrying `# port-until:`, the SPEC section its own `# spec:` header
+  field points at names the field. §The port-candidate criteria rules that a held
+  member's ground lives in its own section and §The `# graph:` manifest rests the
+  slug-only payload on it; until this assertion that rule was discipline, and two
+  of the five declarations live when it landed failed it.
+
+  **Resolution is the declaration's own pointer, not a derivation.** Every
+  declaration carries a `# spec: <path> §<section>` header field, and
+  canon-kit/SPEC.md §check-spec-pointer already holds that pointer to a tracked
+  file and an existing heading — so this assertion resolves *nothing*: it opens
+  the section that field names and reads it. That is the literal shape of the
+  property, a reader reaching the ground from the declaration in one hop, and it
+  costs no second heading-matching implementation. It also handles the two heading
+  levels in play without a special case (`### <gate>` here, `## <gate>` in
+  site-kit/SPEC.md), because the pointer names the heading **text** and the
+  extraction runs to the next heading at the same or shallower level.
+
+  **Red conditions, enumerated.** A declaration carrying `# port-until:` and **no
+  `# spec:` field naming a section** — either the field is absent, or it carries a
+  path with no `§<heading>` fragment — is red naming the declaration: the ground is
+  unreachable from it, whatever else is true. This is not `check-spec-pointer`'s
+  job, which holds a *present* pointer's resolution and asserts no pointer's
+  presence. A declaration whose named section body contains no `port-until` token
+  is red naming the section: the hop lands somewhere that does not discuss the
+  hold, which is also where a heading the file lacks arrives, its body being
+  empty. And an **unreadable target file** at the resolved path is fail-closed on
+  §Fail-closed contract's ordinary terms — a gate that cannot read its corpus is
+  not clean.
+
+  **Not asserted, deliberately:** that a member *without* the field has no hold.
+  That is assertion G's presence question, refused there for reasons this does not
+  disturb, and the error direction of not asserting it is the status-quo
+  over-count.
+
+  **The corpus and the coupling.** The subject set is the declarations assertion A
+  already resolves; the second corpus is the SPEC files their pointers name. The
+  manifest's `couples=` therefore gains `kit:SPEC.md`, so an edit to any vendored
+  kit's SPEC re-runs the gate — the correct coupling, since deleting a paragraph
+  is exactly how this assertion goes from green to red, and without it the most
+  likely red would arrive a tier late. The existing `gate-sdk/SPEC.md` literal is
+  **kept rather than folded into the new token**: it is assertion C's
+  conservation-doc coupling, and a consumer whose `GATE_SDK_KIT_DIRS` does not
+  name gate-sdk would otherwise lose it silently. Two couples for two assertions,
+  stated so the redundancy does not read as an oversight. The widening's direction
+  is *wider*, so the monotonicity argument below does not bind on it; what it costs
+  is one section read per held declaration, bounded by the held tier.
+
+  **Why it folds in here rather than shipping as its own gate.** Assertion C is
+  the precedent and it is exact: C asserts that a *SPEC document records a
+  disposition* for every substrate-sensitive member — the same prose-placement
+  claim over the same declaration set, in the same gate, read from the same
+  two-positional usage. The refusal recorded at §check-gate-exemption-tasks, that
+  slug liveness would give this gate a **queue-file** coupling it deliberately has
+  none of, does not reach a SPEC coupling it already has. And the gate is
+  permanently shell under exception class (a), so this widening raises no
+  substrate question and adds no conservation row either.
+
+  **Its honest limit, stated rather than discovered.** The assertion holds
+  *reachability*, not truth: a section could name the field and say nothing
+  useful, and no gate can rule whether a ground is a good one. §When a gate earns
+  its place bars a trivially-true proxy, and what clears this one is a measurement
+  rather than an argument — two of the five live declarations failed it at the cut
+  that landed it, so it is a real drift axis over a real corpus and not a
+  heading-presence check. What stays human is the irreducibly semantic judgment
+  alone. The count of held declarations whose ground was verified is on the clean
+  line for that reason: a zero there in a tree that declares holds is the
+  vacuous-pass tell, and its reader is the session choosing the next cohort cut.
+
+  **It must not acquire a non-zero floor**, stated because the vacuity instinct
+  would add one: a tree with no held member has nothing to ground, and a floor
+  would red every consumer that never declared a hold. The anti-vacuity signal is
+  the emitted count, not a refusal.
 
 It stays a **shell** gate: a gate that audits the port is not a gate the port
 may consume, or assertion B would be checking a roster through the very binary
@@ -7600,7 +7764,12 @@ where each is proved is what keeps the split from reading as a hole. The
 `good/`+`bad/` pair covers **descriptors and a binary** (parity both ways, the
 reference-only allowance, each refusal, and every one of assertion G's clauses —
 a descriptor carrying either field, a bare one with no payload, a declaration
-carrying two of one field, and a declaration carrying one of each). The bespoke
+carrying two of one field, and a declaration carrying one of each). It covers
+**assertion H** in the same invocations: a held declaration whose pointed-at
+section names the field clears, one whose section does not reds, and one with no
+`# spec:` header field at all reds. The SPEC surface lives inside the case tree
+and each pointer is case-relative, so the pair proves the resolution rather than
+the live tree's accident of already being green. The bespoke
 `gate-tests/check-gate-substrate-parity.test.sh` holds the rest, each case a
 sandbox rather than a live tree: **no descriptors, binary present** — the
 post-revert tree, where the roster half is the only live half; **no descriptors,
@@ -9909,6 +10078,23 @@ list is caught by keeping it gitignored, not by this gate. A non-repo cwd, or a
 missing required tracked pattern file, is fail-closed (exit 2). When the pattern
 set is empty the tree is unchecked (clean) — the fail-closed obligation is on a
 missing file, not an empty one.
+
+**Criterion 4 binds, and the price is a fixture widening before the port.** Its
+corpus is `git ls-files` over the whole tracked tree, pruned only by the shared
+prune dirs and the `msg-patterns` basenames, so **every** registry member's
+declaration path lies inside the corpus it scans as content — criterion 4's
+predicate verbatim, and reached through the **walk** rather than the trigger
+field, which is `couples=scripts/msg-patterns.list` and selects no declaration at
+all (§The port-candidate criteria, whose couple-clears-walk-binds register this
+joins). What the bind buys the port is named there too: a fixture pair carrying
+every arm of the derivation, widened first and ported second.
+
+**The verdict is priced, not held**, and the `# port-until:` declaration this
+member carried is retired. Criterion 4 orders a port and prices it; it has never
+made a member un-takeable, five members having bound it and ported by widening
+their pairs, so a field whose meaning is *not takeable now* was the wrong
+instrument for a fixture widening. The sizing fact above is real and stays; what
+it stopped doing is standing as a hold.
 
 ### check-template-copy-parity
 

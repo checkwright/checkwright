@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# graph: couples=scripts/gates.list,kit:checks/*,gate-sdk/SPEC.md,native/*,.github/workflows/publish.yml dir=one valve=none tier=precommit
+# graph: couples=scripts/gates.list,kit:checks/*,gate-sdk/SPEC.md,kit:SPEC.md,native/*,.github/workflows/publish.yml dir=one valve=none tier=precommit
 # install: on-surface
 # no-port: gate-sdk/SPEC.md §The port-candidate criteria — exception class (a), permanent: the gate audits the dispatch relation, so a compiled form could check its own roster through the very binary in question
 # spec: gate-sdk/SPEC.md §check-gate-substrate-parity — one declaration per member, descriptor/subcommand parity both ways, a recorded disposition for every substrate-sensitive member, no implementation source inside the vendoring set, and one owner for the target roster the artifact path derives from
@@ -45,6 +45,21 @@ fail_closed "$st" check-gate-substrate-parity awk
 
 findings=()
 
+# spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion H opens the section the
+# declaration's own pointer names, so the depth is the matched heading's own and the body runs
+# to the next heading at that depth or shallower: the two live heading levels need no special case
+spec_section_body() {
+    awk -v want="$2" '
+        function level(s) { match(s, /^#+/); return RLENGTH }
+        /^#+[[:space:]]/ {
+            if (inb && level($0) <= lvl) inb = 0
+            t = $0; sub(/^#+[[:space:]]*/, "", t); sub(/[[:space:]]+$/, "", t)
+            if (!inb && t == want) { inb = 1; lvl = level($0); next }
+        }
+        inb { print }
+    ' "$1"
+}
+
 CRATE="$(gate_native_crate)"
 # spec: gate-sdk/SPEC.md §check-gate-substrate-parity — the publishing test is `gate_authoring_tree`
 # (§lib/gate.sh), computed once and read twice: by assertion B's consumer-declared scope clause and
@@ -78,6 +93,10 @@ dispatching=0
 declpaths_shell=0
 noport_declared=0
 portuntil_declared=0
+# spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion H's one new datum: the count of
+# held declarations whose ground was verified, read by the session choosing the next cohort cut,
+# for which a zero in a tree that declares holds is the vacuous-pass tell
+portuntil_grounded=0
 for m in "${MEMBERS[@]}"; do
     for d in "${RESOLVE_DIRS[@]}"; do
         if [[ -f "$d/$m.sh" && -f "$d/$m.gate" ]]; then
@@ -124,6 +143,35 @@ for m in "${MEMBERS[@]}"; do
             slug="${slug#*port-until:}"
             [[ -n "${slug//[[:space:]]/}" ]] \
                 || findings+=("hold declaration with no slug: $src carries a bare '# port-until:' line — the slug names the live queue entry that owns the blocker, and is the field's whole payload")
+
+            # assertion H: a held declaration's ground is reachable in one hop — the section
+            # the declaration's own `# spec:` field names states the hold, so a reader arriving
+            # at the declaration reaches the ground without resolving anything else
+            # spec: gate-sdk/SPEC.md §check-gate-substrate-parity
+            specfield="$(grep -E '^#[[:space:]]*spec:' "$src" | head -n 1)"
+            target="${specfield#*spec:}"
+            target="${target%% — *}"
+            target="${target#"${target%%[![:space:]]*}"}"
+            target="${target%"${target##*[![:space:]]}"}"
+            if [[ -z "$specfield" || "$target" != *§* ]]; then
+                findings+=("hold ground unreachable: $src carries '# port-until:' but no '# spec:' header field naming a section — a held member's ground lives in its own SPEC section, one hop from the declaration")
+            else
+                specpath="${target%%§*}"
+                spechead="${target#*§}"
+                specpath="${specpath%"${specpath##*[![:space:]]}"}"
+                spechead="${spechead#"${spechead%%[![:space:]]*}"}"
+                if [[ ! -r "$specpath" ]]; then
+                    echo "check-gate-substrate-parity: $src points its '# spec:' field at $specpath, which is unreadable — assertion H could not read its corpus; treating as failure (not clean)" >&2
+                    exit 2
+                fi
+                body="$(spec_section_body "$specpath" "$spechead")"; st=$?
+                fail_closed "$st" check-gate-substrate-parity "awk section($specpath)"
+                if grep -q 'port-until' <<<"$body"; then
+                    portuntil_grounded=$((portuntil_grounded + 1))
+                else
+                    findings+=("hold ground not in the pointed-at section: $src declares '# port-until:' and points at $specpath §$spechead, whose body never names the field — the section a reader reaches from the declaration is where the hold's ground lives")
+                fi
+            fi
         fi
         [[ "$noport" -gt 0 && "$portuntil" -gt 0 ]] \
             && findings+=("contradictory port declarations: $src carries both '# no-port:' and '# port-until:' — permanent and temporarily-held are opposite verdicts about the same member")
@@ -385,6 +433,11 @@ if [[ ${#findings[@]} -gt 0 ]]; then
     echo "        take yet, and names the live queue entry owning the blocker. Same domain and"
     echo "        cardinality as '# no-port:', and never both on one declaration — permanent and"
     echo "        temporarily-held are opposite verdicts about the same member."
+    echo "  help: a held member's ground lives in its own SPEC section, one hop from the"
+    echo "        declaration — give the declaration a '# spec: <path> §<section>' field and"
+    echo "        state the hold in that section, naming 'port-until'. A ground reachable"
+    echo "        only through a queue entry or a shared worked-example passage is the one"
+    echo "        placement the field must not normalise."
     exit 1
 fi
 
@@ -393,5 +446,5 @@ if [[ "$roster_read" == 1 ]]; then
 else
     roster="${#DESCRIPTORS[@]} descriptor(s), no binary at $BIN so no subcommand roster to compare"
 fi
-echo "GATE-SUBSTRATE-PARITY: clean ($declared member(s) with one declaration each, $dispatching of them dispatching to the binary; $noport_declared of the $declpaths_shell shell declaration(s) declare '# no-port:' with a cause and $portuntil_declared declare '# port-until:' with a slug, neither on any descriptor nor both on one declaration; $roster; $sensitive substrate-sensitive member(s) all dispositioned; $impl_scanned implementation source(s) free of manifest-class annotation; $kit_scanned kit root(s) scanned for an implementation sibling, crate root $CRATE outside every kit root; target roster $roster_state at $ROSTER with $roster_targets well-formed target(s); publish workflow $wf_state at $WORKFLOW, $wf_matrix matrix declaration(s) roster-derived across $wf_jobs job(s) with one producer per digest)"
+echo "GATE-SUBSTRATE-PARITY: clean ($declared member(s) with one declaration each, $dispatching of them dispatching to the binary; $noport_declared of the $declpaths_shell shell declaration(s) declare '# no-port:' with a cause and $portuntil_declared declare '# port-until:' with a slug, neither on any descriptor nor both on one declaration; $portuntil_grounded of those held declaration(s) reach their ground in one hop, the section their own '# spec:' field names stating the hold; $roster; $sensitive substrate-sensitive member(s) all dispositioned; $impl_scanned implementation source(s) free of manifest-class annotation; $kit_scanned kit root(s) scanned for an implementation sibling, crate root $CRATE outside every kit root; target roster $roster_state at $ROSTER with $roster_targets well-formed target(s); publish workflow $wf_state at $WORKFLOW, $wf_matrix matrix declaration(s) roster-derived across $wf_jobs job(s) with one producer per digest)"
 exit 0

@@ -17,3 +17,5 @@ malformed target triple: 'notatriple'
 matrix declaration not roster-derived: publish.yml
 digest recomputed: job 'build'
 digest computed by a consumer: job 'release'
+hold ground unreachable: scripts/check-nospec.sh
+hold ground not in the pointed-at section: scripts/check-ungrounded.sh
