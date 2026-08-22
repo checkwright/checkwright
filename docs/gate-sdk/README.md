@@ -20,7 +20,10 @@ honest:
   parser must never read as "clean"), the fixture-tree prune adapters, and the
   registry/resolution helpers.
 - `bin/run-gates.sh` — the aggregate battery: every gate in your `gates.list`,
-  one shot, per-gate timings.
+  one shot, per-gate timings. Two selectors narrow it without losing the config
+  bridge or the output contract: `--only <name>...` runs the gates you name (in
+  registry order; an unregistered name is a refusal), and `--for <path>...` runs
+  the gates coupling to the paths you name, exactly as the generated hook would.
 - `bin/run-gate-tests.sh` — the golden-fixture runner: every gate proves it
   accepts a `good/` case and rejects a `bad/` case with the right error text.
 - `bin/run-consumer-smoke.sh` — the end-to-end check no fixture makes: builds a
@@ -86,6 +89,8 @@ bash gate-sdk/bin/run-gates.sh --emit enforcement-map > docs/enforcement.md # th
 bash gate-sdk/bin/install-hooks.sh                                # opt in this clone
 
 bash gate-sdk/bin/run-gates.sh                                    # the full battery
+bash gate-sdk/bin/run-gates.sh --only check-graph                 # one gate's verdict
+bash gate-sdk/bin/run-gates.sh --for scripts/gates.list           # the gates coupling to a path
 bash gate-sdk/bin/run-gate-tests.sh gate-sdk/gate-tests gate-sdk/checks  # the kit's own tests
 ```
 

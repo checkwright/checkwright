@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# spec: gate-sdk/SPEC.md §run-gates — aggregate gate runner; --for scopes it to gates coupling to given paths
+# spec: gate-sdk/SPEC.md §run-gates — aggregate gate runner; --for scopes it to gates coupling to given paths, --only to gates named on argv
 #
-# usage: run-gates.sh [gates-dir]              run every registered gate
-#        run-gates.sh --for <path>...          run only gates coupling to those paths
+# usage: run-gates.sh [gates-dir] | --only <name>... | --for <path>... | --emit <arm> [args...] | -h | --help
+#        every arm, its refusals and the knobs print from the tool itself: run-gates.sh --help
 #   timings → $GATE_SDK_TMP_DIR/gate-timings.txt (default .tmp/); a measurement, never committed
 set -uo pipefail
 
@@ -16,39 +16,116 @@ REPO_ROOT="$(git rev-parse --show-toplevel)" || {
 }
 cd "$REPO_ROOT" || exit 2
 
-# spec: gate-sdk/SPEC.md §The non-gate arm — the emitter front-end: a ported arm receives no
-# configuration, so a caller already sourcing this library resolves its bridged knobs and invokes
-# it. The arm name is an operand here and a suffix in the crate, governed separately.
-if [[ "${1:-}" == --emit ]]; then
-    shift
-    EMIT_ARM_NAME="${1:-}"
-    [[ -n "$EMIT_ARM_NAME" ]] || { echo "run-gates: --emit needs an arm name" >&2; exit 2; }
-    EMIT_ARM="--emit-$EMIT_ARM_NAME"
-    shift
-    EMIT_ARGS=("$@")
-    EMIT_BIN="$(gate_native_bin)"
-    if [[ ! -x "$EMIT_BIN" ]]; then
-        printf 'run-gates: --emit dispatches to the native binary, but %s is absent or not ' "$EMIT_BIN" >&2
-        printf 'executable — the projection could not be emitted. Build it: bash gate-sdk/bin/build-native.sh\n' >&2
-        exit 2
-    fi
-    EMIT_ENV="$(gate_knob_env "$EMIT_ARM")" || exit 2
-    EMIT_ELEMS=()
-    [[ -n "$EMIT_ENV" ]] && mapfile -t EMIT_ELEMS <<<"$EMIT_ENV"
-    exec env ${EMIT_ELEMS[@]+"${EMIT_ELEMS[@]}"} "$EMIT_BIN" "$EMIT_ARM" ${EMIT_ARGS[@]+"${EMIT_ARGS[@]}"}
-fi
+# spec: gate-sdk/SPEC.md §run-gates — the one usage text, the stdout body of a help request and
+# the stderr body of an unrecognized-option refusal, per §The bin/-tool contract
+usage() {
+    cat <<'EOF'
+usage: run-gates.sh [gates-dir]                run every registered gate
+       run-gates.sh --only <name> [<name>...]  run only the named registered gates
+       run-gates.sh --for <path> [<path>...]   run only gates coupling to those paths
+       run-gates.sh --emit <arm> [args...]     dispatch a ported non-gate emitter arm
+       run-gates.sh -h | --help                this text, on stdout, exit 0
+
+  --only  runs the named members in registry order whatever order they were
+          typed; duplicates collapse, and an unregistered name is a refusal.
+          The [gates-dir] positional is unavailable in this form — point
+          GATE_SDK_GATES_DIR at another registry instead.
+  --for   selects by coupling: every gate whose effective trigger matches one
+          of the given repo-relative paths, exactly as the generated hook
+          would. A path no gate couples to is a note, not a failure.
+  --emit  dispatches the named non-gate arm of the native binary, handing it
+          every remaining argument.
+  --      ends option processing, so a gates-dir spelled with a leading dash
+          is still reachable.
+
+GATE_SDK_VERBOSE (any non-empty value) restores the per-gate banner roll the
+quiet-green output contract suppresses; per-gate timings land in
+$GATE_SDK_TMP_DIR/gate-timings.txt (default .tmp/).
+EOF
+}
+
+unrecognized_option() {
+    printf 'run-gates: unrecognized option: %s\n' "$1" >&2
+    usage >&2
+    exit 2
+}
 
 FOR_PATHS=()
-if [[ "${1:-}" == --for ]]; then
-    shift
-    FOR_PATHS=("$@")
-    [[ ${#FOR_PATHS[@]} -gt 0 ]] || { echo "run-gates: --for needs at least one path" >&2; exit 2; }
-    set --
-fi
+ONLY_NAMES=()
+# spec: gate-sdk/SPEC.md §run-gates — the argument grammar: every arm is decided off the first
+# argument alone, so the option arms are exclusive and a leading '-' that names none of them is a
+# refusal rather than a gates-dir
+case "${1-}" in
+    -h | --help)
+        usage
+        exit 0
+        ;;
+    # spec: gate-sdk/SPEC.md §The non-gate arm — the emitter front-end: a ported arm receives no
+    # configuration, so a caller already sourcing this library resolves its bridged knobs and invokes
+    # it. The arm name is an operand here and a suffix in the crate, governed separately.
+    --emit)
+        shift
+        EMIT_ARM_NAME="${1:-}"
+        [[ -n "$EMIT_ARM_NAME" ]] || { echo "run-gates: --emit needs an arm name" >&2; exit 2; }
+        EMIT_ARM="--emit-$EMIT_ARM_NAME"
+        shift
+        EMIT_ARGS=("$@")
+        EMIT_BIN="$(gate_native_bin)"
+        if [[ ! -x "$EMIT_BIN" ]]; then
+            printf 'run-gates: --emit dispatches to the native binary, but %s is absent or not ' "$EMIT_BIN" >&2
+            printf 'executable — the projection could not be emitted. Build it: bash gate-sdk/bin/build-native.sh\n' >&2
+            exit 2
+        fi
+        EMIT_ENV="$(gate_knob_env "$EMIT_ARM")" || exit 2
+        EMIT_ELEMS=()
+        [[ -n "$EMIT_ENV" ]] && mapfile -t EMIT_ELEMS <<<"$EMIT_ENV"
+        exec env ${EMIT_ELEMS[@]+"${EMIT_ELEMS[@]}"} "$EMIT_BIN" "$EMIT_ARM" ${EMIT_ARGS[@]+"${EMIT_ARGS[@]}"}
+        ;;
+    --for)
+        shift
+        FOR_PATHS=("$@")
+        [[ ${#FOR_PATHS[@]} -gt 0 ]] || { echo "run-gates: --for needs at least one path" >&2; exit 2; }
+        set --
+        ;;
+    # spec: gate-sdk/SPEC.md §run-gates — a name beginning with '-' is an unrecognized option
+    # wherever it stands in the list, so `--only --for` refuses at the name instead of taking it
+    # for a gate and reporting it unregistered
+    --only)
+        shift
+        ONLY_NAMES=("$@")
+        [[ ${#ONLY_NAMES[@]} -gt 0 ]] || { echo "run-gates: --only needs at least one gate name" >&2; exit 2; }
+        for only_name in "${ONLY_NAMES[@]}"; do
+            case "$only_name" in -*) unrecognized_option "$only_name" ;; esac
+        done
+        set --
+        ;;
+    --)
+        shift
+        ;;
+    -*)
+        unrecognized_option "$1"
+        ;;
+esac
 
-GATES_DIR="${1:-$(gate_sdk_gates_dir)}"
+GATES_DIR_ARG="${1-}"
+GATES_DIR="${GATES_DIR_ARG:-$(gate_sdk_gates_dir)}"
 LIST="$GATES_DIR/gates.list"
-[[ -f "$LIST" ]] || { echo "run-gates: no registry at $LIST" >&2; exit 2; }
+# spec: gate-sdk/SPEC.md §run-gates — the --only steer: a positional that is really a member of the
+# default registry earns the remedy beside the refusal, never a run it did not ask for
+if [[ ! -f "$LIST" ]]; then
+    echo "run-gates: no registry at $LIST" >&2
+    DEFAULT_LIST="$(gate_sdk_gates_dir)/gates.list"
+    if [[ -n "$GATES_DIR_ARG" && -f "$DEFAULT_LIST" ]]; then
+        mapfile -t DEFAULT_MEMBERS < <(gates_list_members "$DEFAULT_LIST")
+        for m in ${DEFAULT_MEMBERS[@]+"${DEFAULT_MEMBERS[@]}"}; do
+            [[ "$m" == "$GATES_DIR_ARG" ]] || continue
+            printf "run-gates: '%s' is a gate registered in %s, not a gates dir — run it with: run-gates.sh --only %s\n" \
+                "$GATES_DIR_ARG" "$DEFAULT_LIST" "$GATES_DIR_ARG" >&2
+            break
+        done
+    fi
+    exit 2
+fi
 
 mapfile -t MEMBERS < <(gates_list_members "$LIST")
 [[ ${#MEMBERS[@]} -gt 0 ]] || { echo "run-gates: $LIST names no gates" >&2; exit 2; }
@@ -56,7 +133,7 @@ mapfile -t MEMBERS < <(gates_list_members "$LIST")
 RESOLVE_DIRS=("$GATES_DIR")
 while IFS= read -r k; do RESOLVE_DIRS+=("$k/checks"); done < <(gate_kit_roots)
 
-# spec: gate-sdk/SPEC.md §run-gates — --for selection: hook-identical match per member; RUN_LIST + RUN_ARGSTR (index-aligned, newline-joined staged-mode args) carry the result
+# spec: gate-sdk/SPEC.md §run-gates — where both selectors land their result: RUN_LIST + RUN_ARGSTR (index-aligned; newline-joined staged-mode args under --for, empty for every member under --only, which names gates and has no paths to hand one)
 RUN_LIST=()
 RUN_ARGSTR=()
 
@@ -114,8 +191,33 @@ select_for() {
     done
 }
 
+# spec: gate-sdk/SPEC.md §run-gates — --only selection: set-shaped and registry-ordered, so two
+# names give one transcript whichever way they were typed; an unregistered name is a refusal
+# because a name is a claim about the registry, never a fact about the tree
+select_only() {
+    local n c found
+    for n in "${ONLY_NAMES[@]}"; do
+        found=0
+        for c in "${MEMBERS[@]}"; do [[ "$c" == "$n" ]] && { found=1; break; }; done
+        (( found )) || {
+            echo "run-gates: --only: '$n' is not registered in $LIST" >&2
+            exit 2
+        }
+    done
+    for c in "${MEMBERS[@]}"; do
+        for n in "${ONLY_NAMES[@]}"; do
+            [[ "$c" == "$n" ]] || continue
+            RUN_LIST+=("$c"); RUN_ARGSTR+=("")
+            break
+        done
+    done
+}
+
 RUN_MEMBERS=("${MEMBERS[@]}")
-if [[ ${#FOR_PATHS[@]} -gt 0 ]]; then
+if [[ ${#ONLY_NAMES[@]} -gt 0 ]]; then
+    select_only
+    RUN_MEMBERS=("${RUN_LIST[@]}")
+elif [[ ${#FOR_PATHS[@]} -gt 0 ]]; then
     select_for
     RUN_MEMBERS=("${RUN_LIST[@]}")
     if [[ ${#RUN_MEMBERS[@]} -eq 0 ]]; then

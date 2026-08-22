@@ -29,12 +29,16 @@ override with `GATE_SDK_GATES_DIR`) holding:
   every sibling directory holding a `checks/` **or** a `smoke/` (a vendored
   Checkwright kit — a gateless kit is discovered by its `smoke/` alone);
   override with `GATE_SDK_KIT_DIRS` (space-separated kit roots).
-  A **targeted run** needs no mechanism beyond these two knobs composed: point the
-  positional at a scratch directory holding a one-line `gates.list`, and set
-  `GATE_SDK_VERBOSE` to restore the per-gate banner the runner suppresses on a
-  pass. One gate's verdict and its clean-path output are then reachable with the
-  `GATE_SDK_KNOB_*` bridge `gate_command` emits still intact, rather than
-  hand-exported at the call site.
+  A **targeted run** is `run-gates.sh --only <name>...` (§run-gates), and it is a
+  spelling rather than a mechanism because these two knobs already compose into
+  one: point the positional at a scratch directory holding a one-line
+  `gates.list`, and set `GATE_SDK_VERBOSE` to restore the per-gate banner the
+  runner suppresses on a pass. One gate's verdict and its clean-path output are
+  then reachable with the `GATE_SDK_KNOB_*` bridge `gate_command` emits still
+  intact, rather than hand-exported at the call site. That composition stays the
+  answer for a caller assembling a registry that is **not** a subset of the
+  default one — a gate the consumer has not registered, or one shadowed for the
+  run; `--only` is the ergonomic form for everything inside it.
 - the consumer's own `check-*.sh` gates (copy-edits of
   `templates/check-skeleton.sh`).
 - `gate-tests/` — the consumer's fixture tree (see §run-gate-tests).
@@ -6195,6 +6199,19 @@ any CI wrapper without an argv contract change. Gates themselves are untouched �
 each still prints its single clean line per the output contract (§Output
 contract); the runner captures it.
 
+**That convention governs configuration, not selection, and the bound is ruled
+here** rather than left for a later reader to re-litigate against the sentence
+above. `GATE_SDK_VERBOSE` is *how* the battery reports — a value every caller of
+the battery should carry uniformly — and env is right for it. *Which* members run
+is the one thing that must not be ambient: a selector spelled as a `GATE_SDK_*`
+knob would be inherited by the generated hook, by `run-consumer-smoke.sh` and by
+any CI wrapper that ran under it, silently narrowing a battery to one member
+while the summary line still reported a pass — precisely the
+green-with-nothing-behind-it the declared-omission accounting above exists to
+make impossible. A selector spelled in argv dies with the process that typed it.
+So the runner draws the line where the two selectors below sit: reporting is env,
+selection is argv.
+
 **The dispatch capture holds the two streams apart.** `gate_command`'s stdout
 *is* the invocation argv, one element per line; its stderr is diagnostic text.
 Merging them makes any stderr a successful call emits the **first argv element**,
@@ -6246,6 +6263,65 @@ couples to <path>` note and exits 0 — an ungoverned path is a fact, not a
 failure; the selector is a `bin/` tool, never a registered gate, but its own
 plumbing stays fail-closed (an unreadable registry or unresolvable member exits
 non-zero).
+
+`run-gates.sh --only <name> [<name>...]` is the **name-keyed** selector — the
+ergonomic form of the targeted run that §Layout and configuration's `gates.list`
+bullet composes out of two knobs, and thin precisely because that composition
+already proves selection needs no new mechanism. It resolves the registry as a
+bare run, then runs the named members. `--only` is recognized as the first
+argument on the same terms as `--emit` and `--for`, consuming every remaining
+argument as a gate name, so the `[gates-dir]` positional is unavailable in this
+form: a caller selecting within another registry composes it through
+`GATE_SDK_GATES_DIR`, the knob that positional shadows anyway. An empty name
+list is a refusal — `run-gates: --only needs at least one gate name`, exit 2,
+matching `--for`'s message shape.
+
+Selection is **set-shaped and registry-ordered**: the named set is intersected
+with the registry and run in registry order rather than argv order, so two names
+give the same transcript whichever way they were typed and the run reads as a
+narrower bare run; duplicates collapse silently, because the argument is a set.
+**An unregistered name is a refusal, exit 2, naming both the name and the
+registry path.** That is the one place `--only` deliberately diverges from
+`--for`, and the divergence is the point: an ungoverned path is a fact about the
+tree, so the path-keyed selector notes it and exits 0, whereas a *name* is a
+claim about the registry and a wrong one is a typo or a stale memory — exiting 0
+there would print `All 0 gates passed.`, the vacuous green the summary line
+exists to make impossible. A `mode=staged` member receives **no** positional
+arguments under `--only`, which is the bare-run behavior rather than the hook's:
+`--for` hands such a member its matching paths because it *has* paths, and
+`--only` names gates and has none, so the member runs over its full corpus.
+Everything downstream is untouched, which is the whole value of siting this on
+the runner rather than in a second tool — the `GATE_SDK_KNOB_*` config bridge,
+the consumer-first resolve-dir order, the dispatch capture, the per-gate timing,
+`GATE_SDK_VERBOSE`, the declared-omission line and the output contract all behave
+exactly as in a bare run. The summary line's `N` is the **selected** count, as it
+already is under `--for`; the roster-collapse tripwire that count serves is a
+property of a bare run, and neither selector claims it.
+
+**The runner honours §The bin/-tool contract**, which binds because its
+positional is free text — a path — and an arity check is not a shape check. `-h`
+or `--help` as the first argument prints the usage on **stdout** at exit 0; a
+first argument beginning with `-` that is none of `--emit`, `--for`, `--only`,
+`-h`, `--help` or `--` is a refusal, usage on **stderr** at exit 2, naming the
+unrecognized option; and `--` ends option processing, so a gates-dir legitimately
+spelled with a leading dash stays reachable. A name beginning with `-` is an
+unrecognized option wherever it stands, so `--only --for` refuses at the name
+rather than taking it for a gate and calling it unregistered. This is convergence
+on a contract the family already carries, not a new design: before it,
+`run-gates.sh --help` fell through to the positional and died with `no registry
+at --help/gates.list` — a message about a missing file in answer to a rejected
+argument, which is why a wrong guess cost three steps instead of one.
+
+**A gates-dir that is really a gate name steers to `--only`.** When the
+positional holds no `gates.list` and names a member of the **default** registry
+— resolvable through `gate_sdk_gates_dir` precisely because the failing argument
+was never a registry path — the refusal gains a line naming the gate and the
+flag that runs it. It is an addition to a refusal and never a fallback: the
+positional keeps one meaning, and a caller who typed a name gets a remedy rather
+than a run it did not ask for, which is the shape a gate's own `help:` line
+takes applied to a `bin/` tool's argument error. Where the default registry is
+itself unresolvable the plain message stands unchanged, so the steer adds no
+failure path of its own.
 
 ### run-gate-tests
 

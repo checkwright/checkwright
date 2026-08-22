@@ -12,62 +12,6 @@
 
 ## New Features
 
-- **single-gate-run-config-bridge** [spec: SPEC-gate-select.md] — no way to run one gate
-  with its configuration bridged, so a targeted verdict costs the whole battery or a
-  hand-built environment.
-  **Attested from a prompt-friction log rather than theorised.** `run-gates.sh` takes a
-  gates-**dir**, so `--only`, `--help` and a bare gate name all fall through to the positional
-  and fail with `no registry at <arg>/gates.list` — a message that reads as a missing file rather
-  than a rejected argument. The two available options are both bad: run the whole battery, or
-  invoke the binary subcommand directly and hand-export every `GATE_SDK_KNOB_*` the gate reads,
-  which is re-implementing `gate_command`'s bridge at the call site. The close that found it took
-  the second and spent four prompting calls on one env prefix; the same log shows a reach for a
-  nonexistent `gate-sdk/bin/gate.sh`, the shape a session expects to exist.
-  **`kit-bin-entry-point-unrostered` disclaims this, and the disclaimer is incomplete.** It rules
-  `run-gates.sh <gate-name>` "a habit rather than a hole" because the path-scoped selector is
-  owned in prose. That disposition is not reopened for the **name selector** — but its cited
-  remedy, `--for <path>`, is path-keyed and may select several gates, so it cannot exercise a
-  knob change that edits no file. The unowned half WAS the **configuration bridge**; the third
-  firing below gives that route a home and leaves ergonomics as the live question.
-  **Deliberately not pre-designed:** an `--only` flag, a separate `bin` tool, or a documented
-  one-liner is a real fork, and the runner's argument grammar is the constraint that decides it.
-  **Cost while deferred:** paid by every session wanting a targeted verdict, and paid worst by
-  the ones that reason about a gate instead of running it — the oracle-first rule losing to
-  ergonomics.
-  Class: a flag or a bin tool mints a governed name, so canon-kit's litmus makes it a **feature**
-  on those two arms and debt only as a documented one-liner.
-  recurrence: single-gate-run-config-bridge 2026-08-21 2026-08-22
-  **Grounds for that date, and it is a first-hand firing rather than a log read.** The
-  `graph-port-and-config-seam` close needed one gate's verdict while re-verifying a gap bullet,
-  tried `run-gates.sh check-queue-entry-budget`, and got `no registry at
-  check-queue-entry-budget/gates.list` — the exact fall-through this entry describes. It then paid
-  the entry's own second bad option: invoking the binary directly, which refused fail-closed for an
-  unset bridged knob, and finally re-derived the answer by hand from `queue-kit/lib/queue.sh`. Three
-  attempts to learn one number, which is the ergonomics cost the entry prices.
-  **Grounds for 2026-08-22, and it is the SAME THREE STEPS in the same order** — this iteration's
-  scope wanted the entry-cap headroom before sizing a promotion, ran
-  `run-gates.sh check-queue-entry-budget` (fell through to `no registry at
-  check-queue-entry-budget/gates.list`), invoked the binary directly (fail-closed on an unset
-  `GATE_SDK_KNOB_QUEUE_KIT_ACTIVE_SECTIONS`), and read the cap off `queue-kit/lib/queue.sh:38` by
-  hand. Second first-hand firing, a different stage from the first: the cost is not close-shaped.
-  **Third firing 2026-08-22 at close, and it NARROWS the entry rather than confirming it.** Same
-  two failed steps again, then a third the entry never priced: a scratch dir holding a one-line
-  `gates.list` plus `GATE_SDK_VERBOSE` selects one gate AND keeps `gate_command`'s bridge intact.
-  So "the two available options are both bad" was incomplete — a third composes documented knobs
-  and hand-exports nothing. That route now has a home (gate-sdk/SPEC.md §Layout and
-  configuration), so the unowned-fact half is DISCHARGED and what survives is ergonomics: the
-  session still authors a scratch file to ask one question. No date — 2026-08-22 already stamped.
-  **Held 2026-08-22 on surface disjointness, then TAKEN — operator-ruled the same day as the sole
-  rider of the port-hold-grounds iteration. Feature-class on two arms, so `/spec` promotes it.**
-  **The fork is RULED 2026-08-22 at spec: the `--only` flag.** The separate `bin` tool is refused
-  (it re-implements the runner's resolution, dispatch, timing and output contract) and the
-  documented one-liner stays the fallback that makes the flag thin. Grounds, the argv-versus-env
-  ruling and the bin/-tool-contract debt that rides the unit are the amendment's, never restated
-  here.
-  Filed 2026-08-17 by the `post-close-intake-and-index-port` close into the gap inbox, off its
-  own tooling-friction triage; promoted 2026-08-17 at scope, with `--for`'s path-keyed selection
-  read off `run-gates.sh` before the neighbour's disclaimer was called incomplete.
-
 ## Technical Debt
 
 ## Deferred
@@ -7745,6 +7689,8 @@
 - **scratch-execution-allowlist-bar** [design-pending] — Each close re-derives this standing bar.
 
 ## Done
+
+- single-gate-run-config-bridge
 
 ## Lessons Learned
 

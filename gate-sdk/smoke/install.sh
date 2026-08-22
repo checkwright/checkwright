@@ -77,7 +77,30 @@ if out="$(qg_run)"; then echo "smoke(quiet): red battery exited green" >&2; exit
 grep -q '===== check-smoke-fail =====' <<<"$out" || { echo "smoke(quiet): red run lost the failing banner" >&2; exit 1; }
 grep -q 'SMOKE-FAIL: 1 stub finding' <<<"$out" || { echo "smoke(quiet): red output not verbatim" >&2; exit 1; }
 if grep -q 'SMOKE-PASS: clean' <<<"$out"; then echo "smoke(quiet): red run printed the passing gate's output" >&2; exit 1; fi
+
+# spec: gate-sdk/SPEC.md §run-gates — --only selects by name off argv and refuses an unregistered
+# one; the registry still holds the failing stub, so a leg that goes green proves the selection
+# narrowed rather than that the battery happened to pass
+only_run() { env -u GATE_SDK_VERBOSE GATE_SDK_GATES_DIR="$q" GATE_SDK_TMP_DIR="$q/tmp" bash "$SDK/bin/run-gates.sh" "$@"; }
+
+out="$(only_run --only check-smoke-pass)" || { echo "smoke(--only): selecting the passing member of a red registry went red" >&2; exit 1; }
+grep -q 'All 1 gates passed' <<<"$out" || { echo "smoke(--only): summary N is not the selected count" >&2; exit 1; }
+if grep -q 'SMOKE-FAIL: 1 stub finding' <<<"$out"; then echo "smoke(--only): ran a member that was not selected" >&2; exit 1; fi
+
+if out="$(only_run --only check-smoke-absent 2>&1)"; then echo "smoke(--only): an unregistered name did not refuse" >&2; exit 1; fi
+grep -q "check-smoke-absent" <<<"$out" || { echo "smoke(--only): refusal did not name the name" >&2; exit 1; }
+grep -q "$q/gates.list" <<<"$out" || { echo "smoke(--only): refusal did not name the registry" >&2; exit 1; }
 rm -rf "$q"
+
+# spec: gate-sdk/SPEC.md §The bin/-tool contract — behavioural coverage of a bin/ tool's help and
+# refusal, on the precedent that rule names: no gate reads it, so these two legs are what keeps
+# `--help` from falling back through to the gates-dir positional
+out="$(bash "$SDK/bin/run-gates.sh" --help 2>/dev/null)" || { echo "smoke(--help): a help request did not exit 0" >&2; exit 1; }
+grep -q '^usage: run-gates.sh' <<<"$out" || { echo "smoke(--help): usage did not reach stdout" >&2; exit 1; }
+
+if err="$(bash "$SDK/bin/run-gates.sh" --smoke-nope 2>&1 >/dev/null)"; then echo "smoke(refusal): an unrecognized option was not refused" >&2; exit 1; fi
+grep -q 'unrecognized option: --smoke-nope' <<<"$err" || { echo "smoke(refusal): refusal did not name the option" >&2; exit 1; }
+grep -q '^usage: run-gates.sh' <<<"$err" || { echo "smoke(refusal): usage did not reach stderr" >&2; exit 1; }
 
 # spec: gate-sdk/SPEC.md §gen-pre-commit — the emitted hook's capture wrapper: green is one summary line, a red gate's output reprints verbatim
 cat > scripts/smoke-hook-probe.sh <<'EOF'
