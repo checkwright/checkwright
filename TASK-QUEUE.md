@@ -67,63 +67,6 @@
   disproves deferral, no accumulation of `live=no` lines proves it, so the build's first act
   after wiring is one deliberate firing rather than a wait.
 
-- **launch-chokepoint-liveness-record-write** [spec: SPEC-launch-chokepoint.md]
-  [precondition-ok: the one-command probe ran at spec 2026-08-22 and settled it — the
-  harness background form does reach the PreToolUse payload, so both arms are buildable
-  and nothing forward is waited on]
-  — nothing refuses a backgrounding call that writes no liveness record, so the session
-  invisible to guard rule 14 is the one that never recorded.
-  **Filed apart from `turn-end-chokepoint-and-wait-primitive` only on the cap.** That entry
-  holds this unit's other open mechanism question and is the right body for a third obligation,
-  but `check-queue-entry-budget` measures it at **0 lines of headroom** — the same displacement
-  that split it off `waiting-rule-fourth-firing-post-fix`, and split
-  `subagent-stop-liveness-hook-wiring` off it.
-  **The residue is exact.** `guard_rule_git_mutation_under_producer` (guard-kit/lib/guard.sh)
-  reaches only a session that RECORDED: it collects the live run records and returns clean on
-  an empty set. A session that backgrounds a producer without writing its `<key>.run` record is
-  invisible to that rule and to the entry preflight alike.
-  **Candidate:** a guard rule firing on the backgrounding call itself, refusing one that writes
-  no record.
-  **Why it needed design — REFUSED on an unestablished fact, not on cost.** Two backgrounding
-  forms, and the guard's reach differs. A shell `&` is in the command text every rule already
-  reads, so that arm is buildable today; the harness's background-this form is a TOOL
-  PARAMETER, and whether it reaches the `PreToolUse` payload's `tool_input` is unprobed here.
-  Building only the `&` arm is worse than not building it — every attested firing used the
-  harness form, so it would block the spelling nobody uses and pass the one that fires.
-  **The probe is one command:** one backgrounded Bash call through a guard that records its
-  payload, then read the recorded `tool_input` for the background field. The general reach is
-  already attested — `scripts/agent-dispatch-guard.sh` reads `.tool_input.subagent_type` and
-  `.tool_input.isolation` by jq path — so this is an empirical question about ONE FIELD, not
-  about the mechanism. It is **not** `subagent-stop-liveness-hook-wiring`'s operator-gated
-  probe: it needs no settings change, the `PreToolUse` Bash matcher being already wired, and a
-  later session must not refuse it as the gated one.
-  **Cost while deferred:** low and stated — rule 14's bound stays "only for a session that
-  recorded", so the launch chokepoint is uncovered while the mutation chokepoint is covered.
-  One rule plus decision-table rows if taken.
-  recurrence: launch-chokepoint-liveness-record-write 2026-08-19 2026-08-21
-  **Second firing, 2026-08-21 — grounds for that date.** `graph-port-and-config-seam`'s third build
-  batch backgrounded its step-0 battery and wrote no `<key>.run` record. No orphan resulted, so the
-  cost was zero this time — which is the entry's own point: the rule that would have caught it
-  reaches only a session that recorded, and a session that skips the record is invisible to it. The
-  firing is the harness form again, not a shell `&`, so it also re-attests why the `&`-only arm was
-  refused above. Self-disclosed by the session that committed it.
-  **In `ruled-grant-surface-and-launch-chokepoint`'s ruled set as the RIDER, operator 2026-08-22
-  via the lead**, on the shared `.claude/settings.json` + guard-kit surface the spine's four
-  rulings write. Feature-class — a guard rule plus decision-table rows — so `spec` authors and
-  promotes it. Its one-command probe is unchanged and is **not** the operator-gated one: it needs
-  no settings change, so a later session must not refuse it as the hook entry's.
-  Filed 2026-08-18 by close from the gap inbox; the drain re-verified the rule's reach against
-  its source and measured the target entry's headroom with the gate rather than by hand — the
-  bullet read one line of room where the oracle reports zero.
-  **PROMOTED 2026-08-22 at spec as `SPEC-launch-chokepoint.md`, with the probe RUN and the
-  refusal DISCHARGED.** `.tool_input.run_in_background` is a JSON boolean on a backgrounded
-  Bash call and absent on a foreground one, so both arms ship in one rule and the
-  `&`-only-is-worse objection is spent. Two calibrations the amendment takes and states: the
-  posture is **advise**, not block — the guard cannot tell a producer from a trivial child and
-  both attested firings cost zero — and the harness arm cannot be expressed in
-  `guard-tests/cases.tsv`'s decision+command grammar, so it takes a third table on the
-  escalation-table precedent rather than shipping untested.
-
 ## Technical Debt
 
 - **guard-grant-review** — which allowlist grants are worth keeping, once it is
@@ -7637,6 +7580,7 @@
 ## Done
 
 - settings-allow-intended-breadth-declaration
+- launch-chokepoint-liveness-record-write
 
 ## Lessons Learned
 

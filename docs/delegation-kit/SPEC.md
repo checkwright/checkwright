@@ -222,26 +222,28 @@ this rule keeps re-earning.** The enforcement holds only for **a session that
 recorded**. The paragraph above rules that the record's write is structurally
 uncheckable — a session that skips the rule writes nothing, so there is no
 absence a check could have been told to expect — so a session that backgrounds
-without recording is invisible to rule 14 and to the entry preflight alike,
-exactly as it is today. This narrows the failure to that residue rather than
-closing it.
+without recording is invisible to rule 14 and to the entry preflight alike. It is
+now **advised at the launch**, and still not refused. This narrows the failure to
+that residue rather than closing it.
 
-**Enforcing the record's *write* at the launch chokepoint is designed, refused,
-and filed** — recorded here so a later session finds a ruling rather than a
-blank. The candidate is a rule firing on the backgrounding call itself and
-refusing one that writes no record, and the two backgrounding forms differ in a
-guard's reach. A shell `&` is in the command text, which every rule in that
-ruleset already reads, so that arm is buildable today. A harness's
-background-this parameter is **tool input, not command text**, and whether it
-reaches the `PreToolUse` payload is an empirical question about one field rather
-than about the mechanism — a guard that reads non-headline `tool_input` fields
-by `jq` path is already an attested shape. **Building only the `&` arm is
-refused as worse than not building it**: every attested firing used the harness
-form, so a rule covering only the shell spelling would block the form nobody
-uses and pass the one that fires — coverage in appearance, an assertion about
-nothing in fact. The probe it waits on is one backgrounded call through a guard
-that records its payload, and that probe needs **no** permission- or hook-surface
-change, because the `PreToolUse` command matcher is already wired.
+**The record's *write* is now reached at the launch chokepoint, and the refusal
+that stood here is discharged.** The candidate was a rule firing on the
+backgrounding call itself, held back on one empirical unknown: a shell `&` is in
+the command text every rule already reads, but a harness's background-this
+parameter is **tool input, not command text**, and whether it reaches the
+`PreToolUse` payload was a question about one field. It does:
+`.tool_input.run_in_background` is a JSON boolean `true` on a backgrounded Bash
+call and absent on a foreground one (guard-kit/SPEC.md §The guard framework
+records the payload's shape, so no session re-buys the probe). Both forms are
+therefore reachable and **guard-kit rule 15 builds both arms in one rule**. The
+judgment that held it back is kept rather than retired, because it is what made
+the two-arm rule the right build rather than a bigger one: **building only the
+`&` arm would have been worse than not building it** — every attested firing used
+the harness form, so a rule covering only the shell spelling would have blocked
+the form nobody uses and passed the one that fires, coverage in appearance and an
+assertion about nothing in fact. What ships is an **advisory**, not a block, on
+grounds guard-kit/SPEC.md §The generic ruleset states with the rule, and its
+re-opening condition is named there.
 
 **The guard interaction that produced it resolves without touching the guard.**
 The attested sequence: a session reached for the correct artifact wait, spelled
