@@ -59,7 +59,15 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    on a PAUSE verdict and advising otherwise (SPEC §The delegation model).
    Unwired, it is inert.
 
-5. Optional — retune: copy `templates/delegation-config.sh` into your gates dir
+5. Optional — wire the turn-end liveness probe: copy
+   `templates/subagent-stop-liveness.sh` into your gates dir and register it
+   under `SubagentStop` in `.claude/settings.json` (that event takes no matcher).
+   It logs one line per subagent turn end saying whether any launch record named
+   a live producer, emits no hook JSON and always exits 0 — a probe, not an
+   enforcement mechanism (SPEC §The turn-end liveness probe (template)). Unwired,
+   it is inert; wiring it is a permission-surface change, so it is yours to make.
+
+6. Optional — retune: copy `templates/delegation-config.sh` into your gates dir
    and override the budget thresholds, the gate-file globs, or the meta-layer
    prefixes. Defaults are this repo's single-operator layout.
 

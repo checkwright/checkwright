@@ -456,6 +456,16 @@ either, so the distinguishing axis is not durability but interception:
 > question is whether the act passes a **chokepoint** — not whether it reaches
 > the tree. A dispatch does. A turn-end does not.
 
+**That second sentence is a claim about the harness, and it is now under test
+rather than settled.** A `SubagentStop` hook *is* a chokepoint at the turn-end,
+so it is the one candidate that could falsify the axis — and whether the harness
+already defers a subagent's stop while a background child is live decides whether
+the class this rule exists for survives at all. The logging-only probe that
+measures it is registered and specified at §The turn-end liveness probe
+(template). Nothing above is reversed by it: the relocation to guard-kit rule 14
+stands and that rule is unchanged. What changed is that the claim has an
+instrument, so neither reading may be asserted ahead of what the log returns.
+
 **The chokepoint — what a `PreToolUse` hook can actually read.** The payload
 carries `session_id`, `prompt_id`, `transcript_path`, `cwd`, `permission_mode`,
 `hook_event_name`, `tool_name`, `tool_input`, and `tool_use_id`; and, **only
@@ -723,8 +733,11 @@ record of the carriers someone noticed, never a proof of the set.
 
 **No gate is owed *over the act*, and not for budget — but one is now owed over
 its harm, and it exists.** No check can read a session's choice to end a turn:
-the act leaves no tracked artifact and passes no chokepoint, and that ruling
-stands unamended. What the ruling never licensed was stopping there. The harm
+the act leaves no tracked artifact, and no `PreToolUse` chokepoint sees it. The
+harness's own turn-end event is the one place that could, which is why it is
+being measured rather than assumed (§The turn-end liveness probe (template));
+until that log returns, the relocation below is the enforcement, not a
+placeholder for one. What the ruling never licensed was stopping there. The harm
 the turn-end causes does pass a chokepoint — a tracked-tree mutation while a
 recorded producer is still writing arrives as an ordinary tool call — and it is
 blocked there by guard-kit rule 14 (guard-kit/SPEC.md §The generic ruleset,
@@ -758,19 +771,164 @@ substitute for it.
 are not each other's contradiction.** The dispatch-shape rules bind acts
 that leave no tracked artifact either, yet they are gated. The axis that
 separates them is **interception, not durability**: a dispatch passes a
-chokepoint the harness fires a hook on, and a turn-end passes none (§The
-delegation model, which owns the generalization). So "no tracked artifact" is
+chokepoint the harness fires a hook on, and a turn-end passes none the
+dispatch-shape rules could have used (§The delegation model, which owns the
+generalization, and §The turn-end liveness probe (template), where the harness's
+own turn-end event is under measurement). So "no tracked artifact" is
 why neither rule gets a *gate* over the tree, and it is not by itself a reason
 to stop looking for an oracle. Recorded here for the same reason §The
 delegation model records the durability rule beside the read-only-fan-out
 caveat: otherwise the next reader re-litigates one of the two paragraphs.
 
 **That last sentence was cashed rather than left standing.** The search it
-licensed found one: the turn-end is still unreachable, but the mutation it
-enables is a `PreToolUse` call, and rule 14 fires there. Recorded because a
+licensed found one: the turn-end is unreachable from the tool-call axis, but the
+mutation it enables is a `PreToolUse` call, and rule 14 fires there. It then
+found a second candidate on a different axis — the harness's own `SubagentStop`
+event — which the probe above measures rather than assumes. Recorded because a
 sentence saying *keep looking* is cheap to write and easy to leave un-acted, and
 the next reader should find the outcome beside the licence rather than have to
 reconstruct whether anyone ever looked.
+
+## The turn-end liveness probe (template)
+
+`templates/subagent-stop-liveness.sh` is an opt-in `SubagentStop` hook, inert
+until a consumer registers it, that answers one question the section above
+leaves open: **does the harness already defer a subagent's stop while a
+background child is live?** If it does, the whole class §The delegation model's
+waiting rule exists for dissolves; if it does not, the axis holds at the turn-end
+too and a blocking hook is the only lever left. It is a **probe with a durable
+artifact, not an enforcement mechanism** — its deliverable is an answer, and *a
+capped refusal buys nothing* is one of the answers it is entitled to return.
+
+**The event is `SubagentStop`, never `Stop`.** A dispatched session is a
+subagent, so its turn end fires `SubagentStop`, and every attested firing of the
+waiting rule was a dispatched session. `Stop` is deliberately not registered:
+the main-session turn end has no attested firing, so registering it would widen
+the subject past what the evidence carries.
+
+**Logging-only, and the variant boundary is part of the contract.** The hook
+reads its payload from stdin, asks the liveness reader whether any launch record
+under `${GATE_SDK_TMP_DIR:-.tmp}` names a live producer, appends one line to
+`DELEGATION_KIT_STOP_LOG`, and **exits 0 unconditionally, emitting no hook JSON
+at all**. A hook that blocks is a **separate authorization** and nothing here
+implies one.
+
+**Emitting nothing is the design, and it is what makes this variant buildable.**
+guard-kit's framework hardcodes `hookEventName:"PreToolUse"` in each of its three
+emitters, so a hook that had to *speak* at `SubagentStop` would need a primitive
+guard-kit does not have and whose event scope its SPEC never states. Speaking
+nothing needs no emitter, so this template **does not source guard-kit's lib** —
+which also keeps delegation-kit from acquiring a dependency on guard-kit being
+vendored. The two payload fields it does read cost a `cat` and a `jq -r`; the
+blocking variant's emitter cost is stacked on its own authorization rather than
+paid here.
+
+**It never wedges a turn.** Every failure path — an unreadable payload, an absent
+`jq`, an absent or hung liveness reader, an unwritable log — exits 0, recording
+the failure in the line where the line can be written and silently where it
+cannot. The reader is invoked under `timeout` where one is available, because a
+reader that hung would refuse the turn end by accident and that is the blocking
+variant arrived at sideways.
+
+**The liveness reading reuses `check-producer-liveness` and copies no grammar.**
+§The delegation model rules that the reading affordance which would genuinely
+earn its place already exists and is that gate; a hook re-implementing the
+`pid=<n> run=<key>` parse and the PID predicate would be a third copy of a
+grammar evidence-kit owns. So the hook invokes the reader in **set mode** over
+the scratch dir — which already quantifies the per-record verdict and already
+resolves *exit 2 wins over red wins over green* (evidence-kit/SPEC.md
+§check-producer-liveness) — and maps its exit class onto `verdict` and `live`.
+Nothing about how a PID's liveness is decided is seconded here.
+
+**The prerequisite is stated, not assumed.** A consumer that wires this hook with
+no reader resolvable at `DELEGATION_KIT_LIVENESS_CMD` — evidence-kit unvendored,
+or the knob deliberately emptied — gets `verdict=unavailable` on every line and a
+probe that answers nothing. That is honest degradation and it is preferable to a
+silent third parse that would work everywhere and drift from its owner.
+
+**One line per firing**, appended, space-delimited `key=value` after a leading
+timestamp:
+
+```
+<UTC ISO-8601>  event=<hook_event_name|->  session=<session_id|->  live=<yes|no>  verdict=<green|red|corrupt|unavailable>  records=<n>  keys=<comma-separated top-level payload keys>
+```
+
+Every field has a reader at a named transition, and no field is carried that this
+list does not name one for:
+
+- **timestamp** — read by the close-stage reader to order firings and to tell a
+  fresh line from a stale one.
+- **`event`** — the payload's own `hook_event_name`. Read at the **first** firing,
+  to confirm the event fires at all for a dispatched session and that it is
+  spelled `SubagentStop`. The entry's whole correction turned on the event's
+  identity, which is what earns it a field.
+- **`session`** — the payload's `session_id`, `-` otherwise. Read when correlating
+  a firing with the stage stamp naming the same session id, which is how a firing
+  is attributed to a stage session rather than to an anonymous subagent.
+- **`live`** — `yes` exactly when the reader reported a live producer. **The
+  decisive field**; the honest limit below is what bounds how it may be read.
+- **`verdict`**, **`records`** — the reader's exit class and the number of `*.run`
+  records under the scratch dir. Read together: `records=0` makes a `live=no`
+  uninformative, while `records=2 live=no` says records existed and their
+  producers had exited. `verdict=corrupt` carries `live=no` because the field is
+  two-valued — the pair is the reading, never `live` alone.
+- **`keys`** — the payload's top-level key set, nothing more. Read **once**, at
+  the first firing, to settle what a `SubagentStop` payload carries without
+  asserting anything about it in advance. Values are deliberately not logged: the
+  payload is already known to name no background task, PID or shell id, so the key
+  set is the whole of what remains unknown, and logging values would put
+  transcript paths and prompt ids into a file for no reader.
+
+**`records` is counted by the hook's own `*.run` glob, not parsed back out of the
+reader**, and the reason is the reader's output contract rather than convenience:
+`check-producer-liveness` publishes a count only on its green line, printing one
+finding per blocking record on red and no total. Same directory, same glob, same
+number — and the field stays meaningful when the reader is unavailable, which is
+the case the prerequisite above makes reachable. For the same reason the reader's
+first output line is **not** carried verbatim: over `verdict`, `records` and
+`live` it adds only the blocking record paths, and a free-text field would break
+the space-delimited parse the grammar above is for.
+
+**The log is capture-tier** — gitignored, advisory, drained by a named reclaim
+path (gate-sdk/SPEC.md §The workflow directory), which is what keeps
+`check-workflow-tiering` green on a member that is neither tracked nor ignored,
+and it declares itself on the close-surface roster (lifecycle-kit/SPEC.md §The
+close-surface roster) naming its own clear as the reclaim path:
+
+close-surface: .workflow/subagent-stop-liveness.log advisory reclaim=: > .workflow/subagent-stop-liveness.log
+
+`advisory` rather than `forced`, on the reasoning guard-kit's friction log takes:
+nothing refuses a close that skips it, and a visible skip is the honest mode for a
+probe.
+
+**No gate observes the wiring, and that is recorded rather than assumed.**
+`check-settings-pins` asserts only the pinned paths in the consumer's pins file
+(none under `hooks`), `check-settings-paths`'s subject is `permissions.allow[]`
+alone and never `hooks[].hooks[].command`, and `check-memory-off` scans the memory
+surface. So the registration reds nothing — and neither would a registration
+naming a script that does not exist. A session decides this wiring by reading this
+section, never by predicting a verdict.
+
+### The probe is asymmetric, and no reading may treat it otherwise
+
+**A `live=yes` line proves the harness does not defer the stop.** One firing with
+a live producer settles the unknown in that direction and the class stands.
+
+**No accumulation of `live=no` lines proves that it does.** `live=no` is equally
+consistent with *the harness deferred the stop*, *the session waited correctly*,
+and *the session recorded nothing* — the last being the residue guard-kit rule 15
+advises against and does not close. Passive accumulation therefore cannot return
+the finding that would dissolve the class, and anyone waiting for it waits forever
+and then reports the wrong thing.
+
+**So the reading is bought by a deliberate firing, never by a wait.** A dispatched
+session backgrounds a producer that runs long, writes its `<key>.run` record, and
+then ends its turn. Both outcomes are results: the hook fires immediately with
+`live=yes`, so the harness does not defer and §Operative residency's axis holds at
+the turn-end too; or the hook does not fire until the child exits, so the harness
+does defer, the class dissolves, and this template's remaining value is the
+evidence for retiring it. The log is what makes that firing, and every later
+accidental one, legible.
 
 ## Resume journal — agent writes, scratch reset sweeps
 
@@ -1368,6 +1526,7 @@ delegation-kit/
   templates/agent-dispatch-guard.sh       # PreToolUse(Agent) dispatch-shape guard (D1/D2/D3)
   templates/statusline-usage.sh           # push usage.txt producer (statusline hook) + status bar incl. the queue counter group
   templates/usage-poller.sh               # poll usage.txt producer (timer-driven, fail-soft)
+  templates/subagent-stop-liveness.sh     # SubagentStop turn-end liveness probe (logging-only)
   templates/delegation-config.sh          # knob overrides (arrays live here)
   smoke/install.sh
   smoke/violation.sh
@@ -1465,6 +1624,19 @@ layout as defaults):
   filter: a
   prefix the consumer declared cannot be lost, and without `gate.sh` the config
   is used exactly as written.
+- `DELEGATION_KIT_STOP_LOG` — the turn-end probe's log (§The turn-end liveness
+  probe (template)); default
+  `${GATE_SDK_WORKFLOW_DIR:-.workflow}/subagent-stop-liveness.log`, the same
+  deferral guard-kit's two logs already take. No scratch-dir knob sits beside it:
+  the launch record's home is `${GATE_SDK_TMP_DIR:-.tmp}`, the cross-kit deferral
+  every kit reaching that directory already resolves it through, and a second
+  name for it would be the duplication rather than the config.
+- `DELEGATION_KIT_LIVENESS_CMD` — the liveness reader the probe invokes in set
+  mode; default `evidence-kit/checks/check-producer-liveness.sh`. A knob rather
+  than a literal because a consumer's evidence-kit may sit elsewhere, and because
+  it is read through the **unset** form, so an explicitly empty value is the
+  supported way to run the probe with no reader at all — the honest-degradation
+  case the section states.
 - `DELEGATION_KIT_READONLY_TYPES` — agent-type names the consumer dispatches for
   read-only work; D2's only trigger (§The delegation model). Default empty, in
   which case D2 is inert by construction. Every entry is the consumer's own
@@ -1497,6 +1669,17 @@ is the whole opt-in: unwired, the guard is inert. This repo registers it, and
 its consumer session brief (`scripts/session-context.sh`) additionally prints
 the verdict line at SessionStart for planning-time visibility — a consumer-side
 edit; the context-kit template stays uncoupled from delegation-kit.
+
+`subagent-stop-liveness.sh` is a third hook, and the only one on a non-`PreToolUse`
+event. It registers under `SubagentStop` in the consumer's `.claude/settings.json`
+— an event that takes **no matcher**, so the entry carries a `hooks` array alone
+and is not tool-scoped, the shape a `SessionStart` entry already has. Copy the
+template into the gates dir and wire `bash scripts/subagent-stop-liveness.sh`; it
+sources no kit lib at all (§The turn-end liveness probe (template) owns why) and
+resolves its reader through `DELEGATION_KIT_LIVENESS_CMD`. Registration is again
+the whole opt-in, and here the opt-in is also the consent: the wiring is a
+permission-surface write, so it is the consumer's own act and never an agent
+session's.
 
 `agent-dispatch-guard.sh` is a second hook on that same matcher, registered the
 same way and **independently**: the harness fires every hook a matcher carries
