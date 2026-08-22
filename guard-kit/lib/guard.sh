@@ -245,12 +245,12 @@ guard_skeleton() {
     printf '%s' "$out"
 }
 
-# spec: guard-kit/SPEC.md §The guard framework — one splitter for every consumer that reasons per compound segment (rules 8/12/14/16/17/19, the read-compound carve-out, scan-prompts), fed a guard_skeleton view so the harness's per-segment boundary set never drifts
+# spec: guard-kit/SPEC.md §The guard framework — one splitter for every consumer that reasons per compound segment (rules 8/12/14/15/17/18/20, the read-compound carve-out, scan-prompts), fed a guard_skeleton view so the harness's per-segment boundary set never drifts
 guard_split_compound() {
     sed -E 's/\|\||&&|;|\|/\n/g' <<<"$1"
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — the committed Bash(...) allow inners, one per line; the fail-open read rules 16 and 17 share, so a missing jq or settings file emits nothing and every reader declines
+# spec: guard-kit/SPEC.md §The generic ruleset — the committed Bash(...) allow inners, one per line; the fail-open read rules 17 and 18 share, so a missing jq or settings file emits nothing and every reader declines
 _guard_allow_inners() {
     command -v jq >/dev/null 2>&1 || return 0
     [[ -f "$GUARD_KIT_SETTINGS" ]] || return 0
@@ -264,7 +264,7 @@ _guard_allow_inners() {
     done < <(jq -r '.permissions.allow[]?' "$GUARD_KIT_SETTINGS" 2>/dev/null)
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — a segment with its redirects removed and trimmed: what rules 16 and 17 compare against a committed bare allow entry
+# spec: guard-kit/SPEC.md §The generic ruleset — a segment with its redirects removed and trimmed: what rules 17 and 18 compare against a committed bare allow entry
 _guard_segment_core() {
     local seg
     seg="$(sed -E 's/[[:space:]]*[0-9]*(>>?|<)[[:space:]]*(&?[0-9-]+|[^[:space:]]+)?//g' <<<"$1")"
@@ -273,7 +273,7 @@ _guard_segment_core() {
     printf '%s' "$seg"
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — true when the segment exactly matches a committed *bare* allow entry (no glob): the reviewed-lead half of rule 16's predicate and rule 17's lead test
+# spec: guard-kit/SPEC.md §The generic ruleset — true when the segment exactly matches a committed *bare* allow entry (no glob): the reviewed-lead half of rule 17's predicate and rule 18's lead test
 _guard_is_bare_allow() {
     local core bl
     core="$(_guard_segment_core "$1")"
@@ -432,7 +432,7 @@ _guard_is_cat_read() {
     [[ "$operands" == 1 ]]
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 16's xargs discriminator: xargs runs a command rather than filtering text, so the segment is read-only only when the command it runs is itself on the roster
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 17's xargs discriminator: xargs runs a command rather than filtering text, so the segment is read-only only when the command it runs is itself on the roster
 _guard_is_ro_xargs() {
     local seg="${1#"${1%%[![:space:]]*}"}" tok want_arg=0 cmdtok='' b i n
     local -a toks
@@ -600,31 +600,46 @@ guard_rule_pgrep_self_match() {
     done < <(guard_split_compound "$raw" | tr '&' '\n')
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 13's loop-wrapper span: 'until <cond>; do sleep N; done' is the sanctioned wait, so only a sleep outside every do…done span fires, and an unresolvable span declines
-guard_rule_bare_sleep() {
-    local raw="$1" s tok depth=0 cmdpos=1 bare=0
-    grep -qE '\$\(|<\(|>\(|\$\{|\$[A-Za-z_]' <<<"$raw" && return 0
-    case "$raw" in *'`'*) return 0 ;; esac
-    s="$(guard_skeleton "$raw" sq dq hd)"
-    s="$(tr '\n' ';' <<<"$s" | sed -E 's/(\|\||&&|;|\||&|\(|\)|\{|\})/ \1 /g')"
+# spec: guard-kit/SPEC.md §The generic ruleset — the ruleset's one shell-keyword walk, shared by rules 13 and 15: emits '<depth> <cmdpos> <token>' per skeleton token and returns non-zero on an unbalanced do/done so both callers decline rather than guess
+_guard_loop_span() {
+    local s tok depth=0 cmdpos=1
+    s="$(tr '\n' ';' <<<"$1" | sed -E 's/(\|\||&&|;|\||&|\(|\)|\{|\})/ \1 /g')"
     local -a toks
     read -ra toks <<<"$s"
     for tok in "${toks[@]}"; do
         case "$tok" in
-            ';' | '|' | '||' | '&&' | '&' | '(' | ')' | '{' | '}') cmdpos=1 ;;
-            '!' | until | while | if | then | else | elif | for) cmdpos=1 ;;
-            do) depth=$((depth + 1)); cmdpos=1 ;;
+            ';' | '|' | '||' | '&&' | '&' | '(' | ')' | '{' | '}' | \
+                '!' | until | while | if | then | else | elif | for)
+                printf '%s %s %s\n' "$depth" "$cmdpos" "$tok"
+                cmdpos=1 ;;
+            do)
+                depth=$((depth + 1))
+                printf '%s %s %s\n' "$depth" "$cmdpos" "$tok"
+                cmdpos=1 ;;
             done)
                 depth=$((depth - 1))
-                [[ "$depth" -lt 0 ]] && return 0
+                [[ "$depth" -lt 0 ]] && return 1
+                printf '%s %s %s\n' "$depth" "$cmdpos" "$tok"
                 cmdpos=1 ;;
-            sleep)
-                [[ "$cmdpos" == 1 && "$depth" == 0 ]] && bare=1
+            *)
+                printf '%s %s %s\n' "$depth" "$cmdpos" "$tok"
                 cmdpos=0 ;;
-            *) cmdpos=0 ;;
         esac
     done
-    [[ "$depth" == 0 && "$bare" == 1 ]] || return 0
+    [[ "$depth" -eq 0 ]]
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 13's loop-wrapper span: 'until <cond>; do sleep N; done' is the sanctioned wait, so only a sleep outside every do…done span fires, and an unresolvable span declines
+guard_rule_bare_sleep() {
+    local raw="$1" s span depth cmdpos tok bare=0
+    grep -qE '\$\(|<\(|>\(|\$\{|\$[A-Za-z_]' <<<"$raw" && return 0
+    case "$raw" in *'`'*) return 0 ;; esac
+    s="$(guard_skeleton "$raw" sq dq hd)"
+    span="$(_guard_loop_span "$s")" || return 0
+    while read -r depth cmdpos tok; do
+        [[ "$tok" == sleep && "$cmdpos" == 1 && "$depth" == 0 ]] && bare=1
+    done <<<"$span"
+    [[ "$bare" == 1 ]] || return 0
     guard_block "don't wait by sleeping in the foreground — a wait must end when its condition goes true, not when a duration expires, and a foreground sleep spends a full-price turn doing nothing. Background a command that *exits* on the condition ('run_in_background' wrapping 'until <cond>; do sleep N; done') and take its completion notification: it fires the moment the condition holds and then ends. A dispatched agent is awaited by its own completion notification and never by a path on disk. The harness's event-stream form stays armed to its deadline even after its event fires, so it is the wrong tool for a single completion. A sleep inside a condition loop is untouched — that is the sanctioned form. If you genuinely need the settle, run it yourself with !<command>."
 }
 
@@ -696,6 +711,76 @@ guard_rule_git_mutation_under_producer() {
     guard_block "don't run '${writes[0]}' while a producer you recorded is still running — ${list%; } names a live pid, and a tracked-tree mutation under a live producer is what the wait rule exists to prevent: the run is still writing, so a commit taken now dirties the worktree underneath it and its verdict has to be discarded and re-run. Two exits, both cheap: wait for that producer on its own artifact (loop on the recorded pid's liveness, 'until ! kill -0 <pid> 2>/dev/null; do sleep 5; done', backgrounded so its completion notifies you), or — if the producer has already exited — delete its .run file, which is not a workaround but the statement of fact becoming false and being retracted. Read-only git ('status', 'log', 'diff', 'show') is untouched. If you genuinely need this mutation now, run it yourself with !<command>."
 }
 
+# spec: guard-kit/SPEC.md §The generic ruleset — every redirect target in a skeleton, one per line: the corpus rules 15 and 17 both read
+_guard_redirect_targets() {
+    grep -oE '[0-9]*>>?[[:space:]]*[^[:space:]|;&]+' <<<"$1" \
+        | sed -E 's/^[0-9]*>>?[[:space:]]*//'
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — the read-only-segment test rules 15 and 17 share, xargs discriminator included because xargs runs a command rather than filtering text
+_guard_is_ro_segment() {
+    local seg="${1#"${1%%[![:space:]]*}"}" first b
+    first="${seg%%[[:space:]]*}"
+    [[ -n "$first" ]] || return 1
+    [[ "$first" == xargs ]] && { _guard_is_ro_xargs "$seg" || return 1; }
+    for b in "${GUARD_KIT_RO_BINS[@]}"; do
+        [[ "$first" == "$b" ]] && return 0
+    done
+    return 1
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 15's shell arm: a statement-ending bare '&' in the skeleton, never the '&&' operator and never a redirect's fd-dup
+_guard_shell_backgrounds() {
+    grep -qE '(^|[^&>])&([[:space:]]|;|$)' <<<"$1"
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 15's record-writing test: at PreToolUse the child has not started and no record can exist yet, so the only observable is whether the launch is going to write one
+_guard_writes_run_record() {
+    local d tgt
+    while read -r tgt; do
+        case "$tgt" in *.run) ;; *) continue ;; esac
+        for d in ${GUARD_KIT_SCRATCH_DIRS[@]+"${GUARD_KIT_SCRATCH_DIRS[@]}"}; do
+            case "$tgt" in "$d"/*) return 0 ;; esac
+        done
+    done < <(_guard_redirect_targets "$1")
+    return 1
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 15's exemption 3: a child that writes nothing has nothing for a later commit to corrupt, so it owes no record
+_guard_is_ro_background() {
+    local s="$1" tgt seg reads=0
+    while read -r tgt; do
+        case "$tgt" in
+            /dev/null | '&'[0-9]*) ;;
+            *) return 1 ;;
+        esac
+    done < <(_guard_redirect_targets "$s")
+    while IFS= read -r seg; do
+        seg="${seg#"${seg%%[![:space:]]*}"}"
+        [[ -z "$seg" ]] && continue
+        _guard_is_banner "$seg" && continue
+        _guard_is_ro_segment "$seg" || return 1
+        reads=$((reads + 1))
+    done < <(guard_split_compound "$s")
+    [[ "$reads" -ge 1 ]]
+}
+
+guard_rule_background_no_record() {
+    local raw="$1" s span depth cmdpos tok
+    grep -qE '\$\(|<\(|>\(|\$\{|\$[A-Za-z_]' <<<"$raw" && return 0
+    case "$raw" in *'`'*) return 0 ;; esac
+    s="$(guard_skeleton "$raw" sq dq hd)"
+    [[ "$(guard_input_field '.tool_input.run_in_background')" == "true" ]] \
+        || _guard_shell_backgrounds "$s" || return 0
+    _guard_writes_run_record "$s" && return 0
+    span="$(_guard_loop_span "$s")" || return 0
+    while read -r depth cmdpos tok; do
+        [[ "$depth" -ge 1 ]] && return 0
+    done <<<"$span"
+    _guard_is_ro_background "$s" && return 0
+    guard_advise "this call backgrounds a child and writes no liveness record — write one at the launch, in the same command: a single line 'pid=<n> run=<key>' in a '<key>.run' file under your gitignored scratch dir (e.g. ${GUARD_KIT_SCRATCH_DIRS[0]}/<key>.run), naming the PID you just backgrounded. The record buys two things nothing else does: it is what gives the tracked-tree-mutation rule its reach, so a commit taken while this child is still writing is refused rather than silently taken; and it is what lets the next arrival tell whether the producer is still writing instead of guessing at a process table. Delete it once the producer has exited, and not before — a record naming a dead pid blocks nothing, and one deleted early buys the harm back. A backgrounded wait loop and a backgrounded read-only pipeline own no work a commit could corrupt and owe no record."
+}
+
 guard_rule_truncate_scratch() {
     local cmd
     cmd="$(guard_skeleton "$1" sq dq hd)"
@@ -728,28 +813,22 @@ guard_rule_ro_pipeline() {
             /dev/null | '&'[0-9]*) ;;
             *) return 0 ;;
         esac
-    done < <(grep -oE '[0-9]*>>?[[:space:]]*[^[:space:]|;&]+' <<<"$s" \
-        | sed -E 's/^[0-9]*>>?[[:space:]]*//')
+    done < <(_guard_redirect_targets "$s")
     if grep -qE '(^|[[:space:]])find([[:space:]]|$)' <<<"$s" \
         && grep -qE '\-(exec|execdir|ok|delete)\b' <<<"$s"; then
         return 0
     fi
     local -a segs
     mapfile -t segs < <(guard_split_compound "$s")
-    local seg first b i matched reads=0
+    local seg i reads=0
     for ((i = 0; i < ${#segs[@]}; i++)); do
         seg="${segs[i]}"
         seg="${seg#"${seg%%[![:space:]]*}"}"
         [[ -z "$seg" ]] && continue
         _guard_is_banner "$seg" && continue
-        first="${seg%%[[:space:]]*}"
-        [[ "$first" == xargs ]] && { _guard_is_ro_xargs "$seg" || return 0; }
-        matched=0
-        for b in "${GUARD_KIT_RO_BINS[@]}"; do
-            [[ "$first" == "$b" ]] && { matched=1; break; }
-        done
-        if [[ "$matched" == 0 ]]; then
-            # spec: guard-kit/SPEC.md §The generic ruleset — rule 16's widened lead: a bare
+        [[ "${seg%%[[:space:]]*}" == xargs ]] && { _guard_is_ro_xargs "$seg" || return 0; }
+        if ! _guard_is_ro_segment "$seg"; then
+            # spec: guard-kit/SPEC.md §The generic ruleset — rule 17's widened lead: a bare
             # committed allow entry qualifies, but only where something decorates it
             [[ "$i" == 0 && "${#segs[@]}" -gt 1 ]] || return 0
             _guard_is_bare_allow "$seg" || return 0
@@ -853,6 +932,7 @@ guard_generic_rules() {
     guard_rule_pgrep_self_match "$cmd"
     guard_rule_bare_sleep "$cmd"
     guard_rule_git_mutation_under_producer "$cmd"
+    guard_rule_background_no_record "$cmd"
     guard_rule_truncate_scratch "$cmd"
     guard_rule_ro_pipeline "$cmd"
     guard_rule_allowlist_chain "$cmd"

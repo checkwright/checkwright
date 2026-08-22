@@ -1,0 +1,14 @@
+# spec: guard-kit/SPEC.md §Testing — rule 15's harness arm: the backgrounding flag is tool
+# input, not command text, so it cannot be written in cases.tsv's decision/command grammar.
+# Columns: <expected-decision> <TAB> <run_in_background> <TAB> <command>.
+#
+# rule 15 — a backgrounded launch that records no producer is advised. The
+#           non-firing cases are the load-bearing ones: an inline record
+#           discharges the obligation, a wait loop is a waiter rather than a
+#           producer, a read-only pipeline owns nothing a commit could corrupt,
+#           and a foreground call never reaches the rule at all.
+advise	true	bash worker.sh
+fallthrough	true	bash worker.sh > .tmp/worker.log 2>&1 & printf 'pid=1 run=worker\n' > .tmp/worker.run
+fallthrough	true	until grep -q DONE .tmp/worker.log; do sleep 5; done
+allow	true	grep -rn foo src | head
+fallthrough	false	bash worker.sh
