@@ -570,10 +570,11 @@ that harness exists would be designing against no case.
     relocation.** The turn-end passes no `PreToolUse` chokepoint, so it is
     unreachable from this ruleset (delegation-kit/SPEC.md §Operative residency);
     the **harm** it causes arrives as an ordinary tool call at a chokepoint
-    already wired, which is what this rule fires on. Whether the harness's own
-    turn-end event reaches it on a different axis is being measured, not assumed
-    (delegation-kit/SPEC.md §The turn-end liveness probe (template)) — and this
-    rule is unchanged either way.
+    already wired, which is what this rule fires on. The harness's own turn-end
+    event does reach it on a different axis, measured rather than assumed
+    (delegation-kit/SPEC.md §The turn-end liveness probe (template)), and
+    observing there is not refusing there — so this rule stays the enforcement
+    and is unchanged.
     **Why the block is right even though it over-reaches, stated rather than
     softened.** A read-only producer takes no harm from a commit, and the record
     cannot say which kind it is. This ruleset's established direction is to bias
