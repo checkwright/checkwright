@@ -8,3 +8,4 @@ substrate-claim-and-update-target-coverage scope a84368aa 2026-08-22 473c73d9
 substrate-claim-and-update-target-coverage spec a7a1db60 2026-08-22 03f37ce7
 substrate-claim-and-update-target-coverage align aa9c2c63 2026-08-22 59b2f81a
 substrate-claim-and-update-target-coverage build a3768fe0 2026-08-22 914e54de
+substrate-claim-and-update-target-coverage validate a8ce0039 2026-08-22 3c831e96
