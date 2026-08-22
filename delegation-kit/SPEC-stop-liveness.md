@@ -209,6 +209,24 @@ instrument that makes it and every later accidental firing legible.
 because the entry is entitled to return it and because the logging-only variant
 may make that the answer without a single block being written.
 
+## The seam
+
+**Kit mechanism:** the template, the log grammar, the two knobs, and the SPEC
+section. Each is generic — a hook that asks a liveness question and writes a line
+— and none names a project, a command vocabulary, or a term list.
+
+**Consumer config:** both knob values, and the wiring itself. The log path and the
+liveness reader's path are `DELEGATION_KIT_*` knobs with this repo's layout as
+their defaults, per the config-via-env convention; the `.claude/settings.json`
+registration is the consumer's own act, which is precisely why it needed the
+operator and not an agent session.
+
+**Private rule content: none, and there is none to keep out.** The hook reads a
+PID and a run key. It logs no command, no prompt, no transcript path and no
+payload values beyond a session id and an event name — delta (4) refuses the
+values deliberately — so nothing consumer-specific can reach a kit file or a
+committed log line by construction.
+
 ## Producers and consumers
 
 **The log line.**
