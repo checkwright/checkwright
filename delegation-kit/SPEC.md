@@ -451,15 +451,16 @@ either, so the distinguishing axis is not durability but interception:
 > question is whether the act passes a **chokepoint** — not whether it reaches
 > the tree. A dispatch does. A turn-end does not.
 
-**That second sentence is a claim about the harness, and it is now under test
-rather than settled.** A `SubagentStop` hook *is* a chokepoint at the turn-end,
-so it is the one candidate that could falsify the axis — and whether the harness
-already defers a subagent's stop while a background child is live decides whether
-the class this rule exists for survives at all. The logging-only probe that
-measures it is registered and specified at §The turn-end liveness probe
-(template). Nothing above is reversed by it: the relocation to guard-kit rule 14
-stands and that rule is unchanged. What changed is that the claim has an
-instrument, so neither reading may be asserted ahead of what the log returns.
+**That second sentence was a claim about the harness, and it has now been
+measured.** A `SubagentStop` hook *is* a chokepoint at the turn-end, so it is the
+one candidate that could falsify the axis — and the decisive question was whether
+the harness already defers a subagent's stop while a background child is live,
+since a harness that deferred would dissolve the class this rule exists for. The
+logging-only probe at §The turn-end liveness probe (template) put a live producer
+under a deliberate turn-end and read `live=yes`: **the stop is not deferred**. So
+the sentence stands as written for the `PreToolUse` axis it was said on, the
+relocation to guard-kit rule 14 stands, and the turn-end's own event is reachable
+but buys enforcement only through a blocking hook nobody has authorized.
 
 **The chokepoint — what a `PreToolUse` hook can actually read.** The payload
 carries `session_id`, `prompt_id`, `transcript_path`, `cwd`, `permission_mode`,
@@ -729,10 +730,11 @@ record of the carriers someone noticed, never a proof of the set.
 **No gate is owed *over the act*, and not for budget — but one is now owed over
 its harm, and it exists.** No check can read a session's choice to end a turn:
 the act leaves no tracked artifact, and no `PreToolUse` chokepoint sees it. The
-harness's own turn-end event is the one place that could, which is why it is
-being measured rather than assumed (§The turn-end liveness probe (template));
-until that log returns, the relocation below is the enforcement, not a
-placeholder for one. What the ruling never licensed was stopping there. The harm
+harness's own turn-end event does see it — measured, not assumed (§The turn-end
+liveness probe (template)) — and seeing is not refusing: reading the act there
+would take a blocking hook, which is a separate authorization and is not held. So
+the relocation below is the enforcement, and it is that on the merits rather than
+for want of an alternative. What the ruling never licensed was stopping there. The harm
 the turn-end causes does pass a chokepoint — a tracked-tree mutation while a
 recorded producer is still writing arrives as an ordinary tool call — and it is
 blocked there by guard-kit rule 14 (guard-kit/SPEC.md §The generic ruleset,
@@ -768,8 +770,8 @@ that leave no tracked artifact either, yet they are gated. The axis that
 separates them is **interception, not durability**: a dispatch passes a
 chokepoint the harness fires a hook on, and a turn-end passes none the
 dispatch-shape rules could have used (§The delegation model, which owns the
-generalization, and §The turn-end liveness probe (template), where the harness's
-own turn-end event is under measurement). So "no tracked artifact" is
+generalization, and §The turn-end liveness probe (template), which measured the
+harness's own turn-end event and found it reachable). So "no tracked artifact" is
 why neither rule gets a *gate* over the tree, and it is not by itself a reason
 to stop looking for an oracle. Recorded here for the same reason §The
 delegation model records the durability rule beside the read-only-fan-out
@@ -779,7 +781,9 @@ caveat: otherwise the next reader re-litigates one of the two paragraphs.
 licensed found one: the turn-end is unreachable from the tool-call axis, but the
 mutation it enables is a `PreToolUse` call, and rule 14 fires there. It then
 found a second candidate on a different axis — the harness's own `SubagentStop`
-event — which the probe above measures rather than assumes. Recorded because a
+event, which the probe above measured and found live. It is an oracle that
+*observes* rather than one that refuses, and turning it into the second kind is a
+separate authorization. Recorded because a
 sentence saying *keep looking* is cheap to write and easy to leave un-acted, and
 the next reader should find the outcome beside the licence rather than have to
 reconstruct whether anyone ever looked.
@@ -857,9 +861,14 @@ list does not name one for:
   to confirm the event fires at all for a dispatched session and that it is
   spelled `SubagentStop`. The entry's whole correction turned on the event's
   identity, which is what earns it a field.
-- **`session`** — the payload's `session_id`, `-` otherwise. Read when correlating
-  a firing with the stage stamp naming the same session id, which is how a firing
-  is attributed to a stage session rather than to an anonymous subagent.
+- **`session`** — the payload's `session_id`, `-` otherwise. Read to separate the
+  firings of one top-level session from another's in a shared log. **It is not the
+  subagent's own id**, and the first firings settled that against the field's
+  original reader: a dispatched agent and its dispatcher log the *same*
+  `session_id`, and neither matches the identifier a stage stamp carries, so
+  attributing a firing to a stage session is not a reading this field supports.
+  The payload's `agent_id` is the discriminator that would, and logging it is a
+  grammar change this variant did not take.
 - **`live`** — `yes` exactly when the reader reported a live producer. **The
   decisive field**; the honest limit below is what bounds how it may be read.
 - **`verdict`**, **`records`** — the reader's exit class and the number of `*.run`
@@ -924,6 +933,26 @@ the turn-end too; or the hook does not fire until the child exits, so the harnes
 does defer, the class dissolves, and this template's remaining value is the
 evidence for retiring it. The log is what makes that firing, and every later
 accidental one, legible.
+
+**The firing was bought, and it returned the first branch.** A dispatched agent
+backgrounded a producer with a recorded PID and ended its turn without waiting;
+the log took `live=yes verdict=red records=1` four seconds later, and again at
+that agent's own stop, while the producer went on writing for another two and a
+half minutes. **The harness does not defer the stop**, so the class the waiting
+rule exists for does not dissolve, the relocation to guard-kit rule 14 stands, and
+a blocking hook is the only lever left — which is a second authorization this
+result does not grant.
+
+**The same firings settled a second thing nothing could have settled before
+wiring: `SubagentStop` is not the session-end event.** It fired seventeen times
+inside one dispatched session that had ended no turn at all, spaced by assistant
+steps rather than by the clock — a stretch spanning three long tool calls and no
+assistant step produced no firing at all. A blocking variant would therefore
+refuse at *every* intermediate step of a session rather than once at its return,
+which is what a bounded run of blocks would actually be spent on. Recorded here
+because it is a cost the blocking variant's authorization should be weighed
+against, and because it is exactly the class of fact a logging-only probe exists
+to buy.
 
 ## Resume journal — agent writes, scratch reset sweeps
 

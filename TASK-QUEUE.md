@@ -12,61 +12,6 @@
 
 ## New Features
 
-- **subagent-stop-liveness-hook-wiring** [spec: SPEC-stop-liveness.md]
-  — the wired half of the turn-end hook probe, which no agent session may authorize.
-  The **documentary** half is settled and lives on `turn-end-chokepoint-and-wait-primitive`: the
-  payload names no background task, PID or shell id, so detection never comes from it; but the
-  hook runs arbitrary shell, so it CAN read the `pid=<n> run=<key>` liveness record
-  `waiting-rule-carrier-reach` landed in repo-local `.tmp/` and run `kill -0`, and it CAN refuse
-  the stop, capped at a bounded run of blocks.
-  **The correction that made this its own entry: the hook is `SubagentStop`, not `Stop`.** A
-  dispatched stage session is a *subagent*, so its turn end fires `SubagentStop`; every attested
-  firing of the waiting rule was a dispatched session, so the original framing probed the wrong
-  hook and whatever is documented about blocking `Stop` says nothing about the event that
-  actually fires here. `SubagentStop` being undocumented for blocking is the load-bearing
-  unknown, not a footnote to it.
-  **Why it is filed rather than done: wiring it is a `.claude/settings.json` change, and no agent
-  message authorizes one.** A hook registration is a permission-surface write. The build session
-  that ran the probe declined it on exactly that ground and recorded its result as documentary
-  rather than half-wiring it; that refusal is correct and is written here so the next session
-  reads a settled call instead of re-litigating it. What this entry needs is the operator, not a
-  second probe of the same shape.
-  **AUTHORIZED — operator 2026-08-20, relayed by the lead: the LOGGING-ONLY variant first.** A hook
-  that records what it *would* have blocked and blocks nothing, which answers the load-bearing
-  unknown at zero risk of wedging a session. **A blocking hook is a second authorization and is not
-  implied by this one.** The reasoning was taken with the ruling: the unknown is whether the
-  harness already defers the stop while a background child is live, and if it does the class
-  dissolves and no hook is needed at all.
-  **Two things this entry is entitled to return, recorded so neither reads as a failure.** That a
-  capped refusal buys **nothing** is a *result*. And the event is `SubagentStop`, never `Stop`; its
-  being undocumented for blocking is the unknown itself rather than a footnote to it.
-  No settings write rode this session — the authorization is what was bought.
-  **Unsettled and load-bearing, unchanged by the correction:** whether the harness defers the
-  stop while a background child is live. If it does not, a blocking hook is the only lever left;
-  if it does, the class dissolves. Neither is decidable without the hook wired.
-  **Why it needed design:** the block cap is bounded, so a hook that refuses forever is not on
-  the table, and what a *capped* refusal buys against a session that has already decided to stop
-  is the open question — the honest answer may be nothing, which is a result rather than a
-  failure.
-  **Cost while deferred:** the rule's only enforcement candidate stays unmeasured, so each
-  further firing is paid in full and the enforcement question is argued from prose.
-  **In `ruled-grant-surface-and-launch-chokepoint`'s ruled set, operator 2026-08-22 via the lead.**
-  Feature-class — the logging-only hook mints a script name and a `.claude/settings.json`
-  registration — so `spec` authors the amendment and promotes this entry with it. The 2026-08-20
-  authorization is what it carries in; **a blocking hook is still a second authorization** and this
-  ruling does not imply one, exactly as the 2026-08-20 ruling said.
-  **The amendment will span ≥2 component dirs** — the hook script, `.claude/settings.json` under
-  context-kit's settings gates, and delegation-kit's rule — so `check-stage-entry` assertion C
-  will demand the audit stamp (or a ruled waiver) at the stage after `spec`. Stated here by scope
-  so the entry does not discover it; noted at scope 2026-08-22 rather than left to the gate.
-  Filed 2026-08-17 by close on the lead's ruling, draining the bullet the probe left behind.
-  **PROMOTED 2026-08-22 at spec as `SPEC-stop-liveness.md`.** Logging-only, emitting no hook
-  JSON at all — which is what makes it buildable without the `SubagentStop` emitter guard-kit
-  does not have, and the reason the blocking variant costs a primitive on top of its second
-  authorization. The probe is **asymmetric** and the amendment says so: one `live=yes` line
-  disproves deferral, no accumulation of `live=no` lines proves it, so the build's first act
-  after wiring is one deliberate firing rather than a wait.
-
 ## Technical Debt
 
 - **guard-grant-review** — which allowlist grants are worth keeping, once it is
@@ -6259,20 +6204,21 @@
 - **turn-end-chokepoint-and-wait-primitive** [design-pending] — two open mechanism questions the
   wait rule's fifth firing raised, neither answerable from the ruling that closed its prose half.
   **This is the design half of `waiting-rule-fourth-firing-post-fix`**, whose surviving question is
-  "given that prose alone does not hold, what does". Filed apart only because that entry stands
-  within three lines of the cap — `entry-cap-displaces-mandated-writes` in a new shape, content
-  pushed into a *new entry* rather than into a commit message.
-  **First half — ANSWERED 2026-08-17** (delegation-kit/SPEC.md:390-392: enforcement turns on an act
-  passing a chokepoint, and a turn-end does not); its remainder is
-  `subagent-stop-liveness-hook-wiring`'s, stated there in full.
+  "given that prose alone does not hold, what does". Filed apart only because that entry sits at
+  the cap — `entry-cap-displaces-mandated-writes` in a new shape, content pushed into a new entry.
+  **First half — ANSWERED 2026-08-17** (enforcement turns on an act passing a chokepoint; a
+  turn-end passes no `PreToolUse` one), and its remainder — `subagent-stop-liveness-hook-wiring`'s
+  probe — **RETURNED 2026-08-22 off the wired logging-only hook: the harness does NOT defer the
+  stop, so the class does not dissolve and rule 14 stands.** Second finding, unbuyable without
+  wiring: `SubagentStop` fires per assistant step, not at the session end, so a blocking variant
+  refuses at every step — and stays a SECOND authorization nobody holds. Both recorded at
+  delegation-kit/SPEC.md §The turn-end liveness probe (template).
   **Second half — which primitive is reliable here.** The protocol states a hard ordering:
   `run_in_background` plus an `until`-loop for a single completion, with the event-stream form
   named the wrong tool. On this machine that ordering **inverted** — four of the lead's own
   backgrounded waiters died before their conditions went true, producers verifiably alive, while
   a `Monitor` call succeeded first try; a guard on the wrong primitive inherits its failure.
-  **Why `[design-pending]`:** the first half may be refused outright if `Stop` cannot see what it
-  needs, which would confirm delegation-kit's ruling rather than overturn it; the second half is
-  a measurement whose result could change a stated protocol ordering. Neither is a patch.
+  **Why `[design-pending]`:** the surviving half measures a stated protocol ordering — not a patch.
   **Cost while deferred:** each further firing costs an orphaned producer plus the lead turn that
   discovers it — and, as the tenth showed, can cost a whole suite's evidence.
   **It fired again in the very next iteration** (`port-tail-batching-and-cap-relief`, 2026-08-16):
@@ -6295,11 +6241,10 @@
   checks: that run reported `verdict=new-failures` on a false ground and was re-run foreground. No
   date — 2026-08-17 is already on `waiting-rule-fourth-firing-post-fix`, idempotent per (slug,date).
   **Held out of `graph-port-and-config-seam`** (lead 2026-08-20; operator 2026-08-18, weighed as a
-  competing spine) on the limit both authorities saw and ruled past: the port work is the work whose
-  evidence this defect eats. **Fourteenth firing, 2026-08-21 — grounds for that date, and the held
-  limit coming true inside the held iteration:** its validate session ended a turn *in order to
-  wait* on the battery. Self-disclosed; its liveness record was written and cleaned up, so nothing
-  was lost and the lead resumed the session rather than restarting the stage.
+  competing spine) on the limit both ruled past: the port work is the work whose evidence this
+  defect eats. **Fourteenth firing, 2026-08-21 — grounds for that date, and the held limit coming
+  true inside the held iteration:** its validate session ended a turn *in order to wait* on the
+  battery. Self-disclosed; the liveness record it wrote meant nothing was lost.
   recurrence: turn-end-chokepoint-and-wait-primitive 2026-08-18 2026-08-19 2026-08-21
   **Firings 11-13, 2026-08-18 — grounds for that date.** Three times a backgrounded producer exited
   cleanly and the turn ended anyway: work finished, uncommitted, no completion notification,
@@ -7581,6 +7526,7 @@
 
 - settings-allow-intended-breadth-declaration
 - launch-chokepoint-liveness-record-write
+- subagent-stop-liveness-hook-wiring
 
 ## Lessons Learned
 
