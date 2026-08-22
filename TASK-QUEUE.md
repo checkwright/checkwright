@@ -14,105 +14,6 @@
 
 ## Technical Debt
 
-- **guard-grant-review** — which allowlist grants are worth keeping, once it is
-  the **match** that buys the short-circuit rather than the prompt-avoidance the guard's messages
-  claim.
-  Split from `bash-guard-auto-mode-rationale` 2026-08-13 at scope, on the operator ruling
-  that scoped that entry to its first two parts. This is its third: re-derive the grant set,
-  given that an allow match resolves immediately and skips the classifier entirely, so a
-  surviving broad rule *saves* model calls rather than buying nothing.
-  **THE DIRECTION IS SUPPLIED — operator-ruled 2026-08-20, relayed by the lead: narrow on
-  SECURITY grounds only.** Keep breadth wherever it is safe, because an allow match short-circuits
-  the classifier and a broad rule actively saves model calls; narrow only where a destructive form
-  sits inside a blanket grant — `reset --hard`, `clean`, `push --force`, bare `checkout --`. This
-  is what the 2026-08-13 ruling selected and never stated, and the gap between selecting a
-  disposition and stating it is what left this entry unstarted for a week.
-  **Landed in its governed home rather than here:** TRAJECTORY.md §The closed rulings, pointing at
-  guard-kit/SPEC.md §compare-settings-allow, which owns the narrow-or-declare pair the direction
-  chooses between. That placement is the part that stops this recurring — the 2026-08-13 breadth
-  ruling lived in **no** governed surface at all, only a drained gap bullet and a commit message,
-  which spec-over-precedent says is not ground truth.
-  **UNBLOCKED 2026-08-20**, the blocked-by tag naming
-  `settings-allow-intended-breadth-declaration`
-  cleared on the lead's ruling that the blocker is discharged by that entry being *ruled*. What the
-  discharge does and does not buy, recorded so a starting session is not surprised: the direction
-  is executable now, since narrowing a destructive form needs no declaration surface. What still
-  waits on that entry's **build** is a durable home for the *keep-the-breadth* half — until the
-  knob ships, a kept glob re-reports at every close, which its own ruling calls honest rather than
-  a gap.
-  **RELOCATED here 2026-08-20 rather than lost**, out of the declaration entry named above when
-  landing its ruling compressed this against the entry cap: the vendor permission-modes
-  page **settles the enumeration and not the boundary**. Its dropped-on-entry set is blanket
-  `Bash(*)`, wildcarded interpreters, package-manager run commands and `Agent` rules — a
-  verb-scoped `Bash(git *)` is in none of them — while its narrow-rule example is the literal
-  `Bash(npm test)`. A wildcarded verb rule sits between the two examples and is unruled, which is
-  the exact judgment this entry's re-derivation has to make and the page will not make for it.
-  **Cost while deferred:** the guard keeps steering against a grant set nobody has
-  re-derived under the mechanism that actually applies, so the allowlist may be
-  simultaneously wider than security wants and narrower than the short-circuit rewards.
-  Non-rotting: nothing in the tree degrades while it sits.
-  **PROMOTED 2026-08-22 at scope, on the operator's ruling relayed by the lead.** Debt-class:
-  it re-derives an existing grant set and
-  mints no governed name, so no amendment is owed. One SEQUENCING fact the taker needs, implied
-  above and stated here so it is not re-derived — the *narrow* half is executable alone, while
-  the *keep-the-breadth* half has no durable home until
-  `settings-allow-intended-breadth-declaration`'s knob ships, so that feature lands first or a
-  kept glob re-reports at this iteration's own close.
-
-- **session-mechanic-grants-uncommitted** — the committed allowlist grants none
-  of the session mechanics the methodology itself mandates, so every session pays out-of-band
-  decisions for doing what its own templates tell it to do.
-  **Measured at the filing close's tooling-friction triage, off the log rather than impression.**
-  `scan-prompts.sh` ranks 122 prompting calls across 41 patterns from 519 fall-throughs, and the
-  single largest pattern is `cat` at 28 — of which **21 are `cat >`/`cat >>`**, the heredoc append
-  into a gitignored `.tmp/` resume journal that delegation-kit/SPEC.md §Resume journal — agent
-  writes, scratch reset sweeps requires of every mutating agent. One mandated mechanic, 21
-  out-of-band decisions, one iteration.
-  **The three dispositions, ruled below:** (a) grant the append into the disposable, boundary-wiped
-  scratch dir; (b) steer to `Write`/`Edit`, trading a permission decision for tokens on a file that
-  only grows; (c) a convention in `templates/agent-execution.md`'s journal bullet, the weakest.
-  **DISPOSITION (a) RULED — GRANT, operator 2026-08-20 via the lead: the APPEND form only.**
-  `cat >> .tmp/…` is granted; the truncating `cat > .tmp/…` is deliberately not, so a mis-typed
-  redirect cannot destroy a journal. Condition, not a hope: the glob must be provably unable to
-  reach a tracked path. (b) and (c) refused. The ruling reaches (a) alone — the oracles below stay
-  unruled — and the settings write is this entry's own build work, not this iteration's.
-  **The second half is the overlay-only oracles**, granted by nothing committed: `cargo test`,
-  `cargo build`/`clippy`, the release binary itself, `gh auth`. Each is read-only or a build of the
-  tree's own crate; a fresh clone re-buys every decision (22 calls at filing, 12 at 2026-08-21).
-  **What this entry is NOT.** Not the friction itself: prompting's dominant *cause* is decoration —
-  granted commands chained past the matcher, which `bash-guard.sh` steers and no grant can fix.
-  **Cost while deferred:** roughly one out-of-band decision per journal write, paid by every
-  dispatched session in every iteration, plus a fresh clone with no working oracle grants.
-  Class: mints no governed name and adds no gate, so canon-kit's litmus makes it **debt**.
-  recurrence: session-mechanic-grants-uncommitted 2026-08-18 2026-08-19 2026-08-21
-  **The `awk` item below is CONTESTED**, its contest an entry since 2026-08-19:
-  `guard-read-steer-tool-coverage` rules it a (b) steer, not an (a) grant. Journal writes: 21 → 30 →
-  30 at 2026-08-21, the grounds for that date: the tripling stopped and the cost is now a PLATEAU,
-  30 `.tmp/` heredocs of which 22 are journal appends, `awk` again ungranted at 33. A flat rate is
-  the worse finding, not the milder one — it is the steady-state price of an unbuilt ruled grant.
-  **Held as a BUILD unit only, 2026-08-20, by the iteration lead** into `graph-port-and-config-seam`
-  — the ruled spine is the `check-graph` port. **Not** a decline of disposition (a): the operator
-  ruled 2026-08-20, relayed by the lead, to take the grant batch as rulings this iteration at zero
-  build cost, so (a) is live and the price below is being paid off rather than deferred again.
-  Prior hold 2026-08-19 out of `takeable-tier-batch-and-installer-noop`, same cause.
-  **Second measurement, 2026-08-18 — grounds for that date.** The journal-write count roughly
-  tripled: **~69 of ~92 `cat` occurrences are heredoc writes into `.tmp/`**, against 21 at filing,
-  and `cat` is again the single largest pattern (73 of 248 prompting calls). Six further absent
-  grants were named at the same triage, each a standing mechanic rather than a one-off: `awk`
-  (granted nowhere, and absent from `GUARD_KIT_RO_BINS` so it misses the read-only-pipeline
-  auto-allow too), the `nohup … & echo pid=… > <key>.run` background-launch idiom this project
-  *mandates*, the bare `native/target/release/checkwright` non-gate arm while its `-gates` sibling
-  is granted, `chmod` with a numeric mode where only `chmod +x *` is granted, `bash
-  */checks/check-*.sh` not reaching the `.gate` descriptors gates now ship as, and `git worktree`,
-  granted by the overlay alone. The list is a promotion *proposal*: widening the committed set
-  stays the consumer's call, which is the same wall disposition (a) already hits.
-  Filed 2026-08-16 by close from its own tooling-friction triage; counts read off `scan-prompts.sh`.
-  **PROMOTED 2026-08-22 at scope into `ruled-grant-surface-and-launch-chokepoint`, on the
-  operator's ruling relayed by the lead** — disposition (a)'s ruled grant is this iteration's
-  build, so the price above stops being paid rather than being measured a fourth time. Debt-class
-  by this entry's own litmus line. The `awk` item stays CONTESTED by
-  `guard-read-steer-tool-coverage` and is not settled by this promotion.
-
 ## Deferred
 
 - **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
@@ -163,6 +64,129 @@
   direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope. Since then it is
   promoted at spec and demoted at build once per increment on the entry-outlives-the-amendment
   branch — seven so far, each cut's own record staying at its SPEC section.
+
+- **guard-grant-review** [design-pending] — the committed grant set's security narrowing, prepared
+  and unlandable: the review is COMPLETE and only an operator-class edit remains.
+  **The review is done and must not be re-bought.** All 105 `Bash(` entries of
+  `.claude/settings.json` were walked 2026-08-22 at build, by a read-only worktree sweep plus a
+  local-overlay probe against `guard_allow_match`.
+  **The operator's own named four find NOTHING to narrow.** `git reset --hard`, `git clean`,
+  `git push --force` and a bare `git checkout --` are auto-allowed by neither file today — the
+  committed set grants no `git reset` at all, the overlay's `Bash(git reset)` and
+  `Bash(git reset -q)` are exact, `git push origin master` is exact, and `scripts/bash-guard.sh`
+  additionally blocks `git clean -x/-X` outright. The grant set already honours the 2026-08-20
+  ruling (TRAJECTORY.md §The closed rulings) for every form that ruling names.
+  **The two real findings are a different class and are filed separately** as
+  `grant-argument-bounding-mechanism`; the code-execution question is
+  `grant-path-traversal-exposure`. Neither is to be re-derived here.
+  **The matcher semantics are SETTLED, from the vendor doc rather than by inference:** a Bash
+  rule's `*` "matches any sequence of characters including spaces", so it spans `/` and `..` and
+  no allow glob can bound an argument. guard-kit's `guard_allow_match` is a faithful model of it.
+  **The keep-half LANDED 2026-08-22 and is not outstanding:** five breadth probes for the
+  remote-destruction class the six original probes never witnessed, plus the first
+  `GUARD_KIT_BREADTH_DECLARED` inhabitant (`Bash(git worktree *)`, ruled KEEP with its reason).
+  **Deliverable:** the four `gh` narrowing candidates the report now prints — `gh api *`,
+  `gh repo *`, `gh release *`, `gh secret *`, each auto-allowing an irrecoverable remote deletion —
+  disposed at close's triage step 4 by the operator, who owns the untracked overlay and the ops
+  workflow those globs serve. A session cannot narrow them without guessing what ops work needs.
+  **Why [design-pending]:** nothing about the SECURITY question is open. What is open is the
+  ops-workflow shape of each `gh` narrowing, which only the operator holds.
+  **Cost while deferred:** four irrecoverable remote-destruction forms stay auto-allowed on the
+  operator's clone, `gh release delete` among them, which destroys one of this project's two
+  shipping transports. The report names all four at every close, so the cost is visible rather
+  than silent, and non-rotting: nothing in the tree degrades while it sits.
+  Promoted 2026-08-22 at scope; re-deferred the same day at build under the operator ruling that a
+  permission-settings edit is operator-class and scope never promotes one. The review half is spent
+  and recorded above so this entry never buys it twice.
+
+- **session-mechanic-grants-uncommitted** [design-pending] — the mandated resume-journal append is
+  granted by nothing committed, and the spelling ruled to grant it does not work.
+  **FEATURE-CLASS as of 2026-08-22, re-classed from debt at build.** The ruled design mints a
+  governed name — a new numbered guard rule and its SPEC section — so canon-kit's litmus makes this
+  a feature and an **amendment is owed** before any build. This entry's former "mints no governed
+  name" litmus line is superseded and must not be re-applied.
+  **THE PREVIOUSLY-RULED SPELLING IS INERT. This is the finding, and it must not be bought twice.**
+  `Bash(cat >> .tmp/*)` cannot grant a journal append at all. The vendor permissions doc is
+  explicit: "Claude Code checks the target of an output redirection, such as `>`, `>>`, or `2>`, as
+  a file write. The check covers your `Edit` allow and deny rules ... A rule such as
+  `Bash(git commit *)` allows the command, not the target." A `Bash(...)` rule grants the COMMAND,
+  never the redirect TARGET, so disposition (a) as previously written would have shipped a no-op
+  and then measured no improvement.
+  **The ruled design, operator 2026-08-22 via the lead:** a PreToolUse guard rule running
+  `git check-ignore` on every redirect target and auto-allowing only when all of them are ignored,
+  with `guard_rule_truncate_scratch` (guard-kit/lib/guard.sh:784) as the shipped precedent — it
+  already does exactly this for the `: >` truncation form.
+  **Why the hook and not an `Edit` rule.** `Edit(/.tmp/**)` would grant the target, and is anchored
+  so it provably cannot reach a tracked path — but a redirect-target check is a FILE-WRITE check
+  and cannot tell `>>` from `>`, so it grants the truncating form too. The append-only split ruled
+  2026-08-20, so that a mis-typed redirect cannot destroy a journal, is inexpressible in ANY
+  settings rule. Only the hook honours what was actually ruled, and the operator ruled 2026-08-22
+  that the split is worth its cost.
+  **The second half is unchanged and still unruled:** the overlay-only oracles (`cargo test`,
+  `cargo build`/`clippy`, the release binary, `gh auth`), each read-only or a build of this tree's
+  own crate, which a fresh clone re-buys entirely.
+  **The `awk` item stays CONTESTED** by `guard-read-steer-tool-coverage`, which rules it a (b)
+  steer rather than an (a) grant; nothing here settles it.
+  recurrence: session-mechanic-grants-uncommitted 2026-08-18 2026-08-19 2026-08-21
+  **Cost while deferred:** measured, and flat — 30 `.tmp/` heredocs of which 22 are journal appends
+  at 2026-08-21, one out-of-band decision each, paid by every dispatched session in every
+  iteration. A plateau is the worse reading rather than the milder one: it is the steady-state
+  price of an unbuilt ruled grant.
+  Filed 2026-08-16 by close; promoted 2026-08-22 at scope; re-deferred the same day at build, its
+  design ruled and its class corrected rather than the work merely postponed.
+
+- **grant-argument-bounding-mechanism** [design-pending] — two committed grants reach a destructive
+  form and no allow-glob narrowing can stop either.
+  **Both findings are verified rather than surmised**, at build 2026-08-22 by a read-only worktree
+  sweep over all 105 committed `Bash(` entries.
+  **(1) The `.tmp/` rm family escapes the scratch dir.** `Bash(rm .tmp/*)`, `Bash(rm -f .tmp/*)`
+  and `Bash(rm -rf .tmp/*)` each match `rm -rf .tmp/../.git`, and reach any irreplaceable untracked
+  local file — `BRIEF.local.md`, `OPS.local.md`, `ENV.local.md`. `guard_rule_rm_tracked` fires only
+  on a TRACKED target, so nothing in the guard covers this.
+  **(2) `Bash(git rm -q *)` reaches `git rm -q -f <modified file>`**, destroying uncommitted work
+  irrecoverably; the sweep demonstrated it in a scratch repo rather than reasoning about it. No
+  guard rule covers that either — `guard_rule_rm_tracked` matches a bare `rm` only.
+  **That grant is LOAD-BEARING, which is what makes this hard.** `guard_rule_rm_tracked` STEERS
+  every tracked-file deletion INTO `git rm -q`, so narrowing the grant taxes a mechanic the guard
+  itself mandates. It is not a grant anyone may simply delete.
+  **Why no allow-glob fixes it.** A Bash rule's `*` "matches any sequence of characters including
+  spaces" (vendor permissions doc), so it spans `/` and `..` and cannot bound an argument. That
+  same doc warns outright that "Bash permission patterns that try to constrain command arguments
+  are fragile", and offers exactly two remedies: deny rules, or a PreToolUse hook.
+  **Candidate shapes, none costed:** a committed `deny` list, which outranks allow but inherits the
+  fragility the doc names; extend the guard's rules, the vendor's own remedy and the one this repo
+  already owns the hook for; or accept and declare, recording the reach rather than removing it.
+  **Why [design-pending]:** the three trade differently against a boundary this repo has never
+  used — `.claude/settings.json` carries no `deny` list at all today — and the first is an
+  operator-class edit besides, so the mechanism choice decides who may even land it.
+  **Cost while deferred:** two live paths to irrecoverable data loss, one of them reachable by a
+  single mistyped path inside a grant every session uses for routine scratch cleanup.
+  Filed 2026-08-22 by build, split out of `guard-grant-review` on the lead's ruling that choosing
+  the mechanism is design work and scope-gated intake makes it a costed Deferred entry by default.
+
+- **grant-path-traversal-exposure** [design-pending] — the committed script-runner globs match a
+  traversing path, and whether that is in the narrowing ruling's scope is unsettled.
+  **The exposure, stated plainly:** `Bash(bash */checks/check-*.sh)` matches
+  `bash ../../evil/checks/check-x.sh`, because a Bash rule's `*` spans `/`. Its siblings carry the
+  same shape — `bash */bin/run-*-tests.sh`, `bash */gate-tests/*.test.sh`, `bash */smoke/install.sh`
+  and the `drift-kit/kpis/*.sh` pair. Verified at build 2026-08-22.
+  **Ruled OUT of scope for the 2026-08-20 narrowing, by the lead 2026-08-22**, on the reading that
+  that ruling is scoped to data-loss forms and that declining to widen a recorded ruling is the
+  conservative move. Recorded here so the exposure is not lost along with the decision.
+  **Why it is genuinely weaker than a data-loss finding:** reaching a destructive script needs a
+  second precondition the allowlist cannot evidence — a hostile script must already exist at a
+  matching path. `scripts/bash-guard.sh` also blocks `bash .tmp/…` outright, closing the one path a
+  session may write to freely, and routes it through `scratch-run.sh`, which resolves the real path
+  and refuses anything outside the scratch dir.
+  **Why [design-pending]:** whether "destructive form" covers a code-execution class at all is a
+  question about the 2026-08-20 ruling's own scope, and only the operator may widen it. The
+  engineering question — whether these globs can be re-spelled without breaking the battery they
+  exist to run — is untouched and unbought.
+  **Cost while deferred:** low and precondition-bound, but it spans the whole script-runner
+  surface rather than one grant, so a later change making a matching path writable would arm the
+  whole family at once, and would do it without a signal anyone reads.
+  Filed 2026-08-22 by build on the lead's ruling; surfaced by the same sweep that produced
+  `grant-argument-bounding-mechanism`, which is the data-loss half of the one audit.
 
 - **graph-port-bash-spawn-residue** [design-pending] — the ported `check-graph` spawns `bash` from
   the binary, so the crate's shipped gate path carries a non-git program for the first time.
