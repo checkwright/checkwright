@@ -216,6 +216,23 @@ reachable in a shipped guard rather than only in the tests. Without it the rule
 still runs and still covers the shell `&` arm; delta (1)'s fallback is what makes
 that true.
 
+## The seam
+
+**Everything here is kit mechanism, and no rule content crosses.** The rule
+recognizes a *shape* — a backgrounding call, a redirect to a `.run` path, a loop
+wrapper — and names no command, no binary and no project vocabulary. Every
+vocabulary it consults is already consumer config: `GUARD_KIT_SCRATCH_DIRS` names
+where records live, `GUARD_KIT_RO_BINS` names what counts as read-only, and this
+amendment adds to neither. The one string the kit ships is the advisory's own
+corrective text, which describes the record contract rather than any consumer's
+commands.
+
+**No knob is minted, and that is a seam decision rather than an economy.** A
+producer roster — *which backgrounded commands are worth a record* — is exactly
+the consumer's vocabulary the seam keeps out of a kit, so the rule is built to
+need none: it recognizes shapes and advises, and a consumer who wants a narrower
+population narrows the two knobs that already exist.
+
 ## Producers and consumers
 
 **`GUARD_INPUT`, the cached payload.**
