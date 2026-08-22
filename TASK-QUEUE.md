@@ -5859,9 +5859,9 @@
   and past a battery that stayed green. **Format examples are the shape that survives**, and
   that is the pattern any scanner here would have to key on.
   **The converse of an existing entry, and the distinction is load-bearing.**
-  `amendment-update-target-coverage` (icebox) owns a roster *entry* naming no owning delta — a
-  listed target with no claim. This owns a *target with no entry*, which no scan over the
-  amendment alone can see, because the evidence is in the tree rather than in the document.
+  `amendment-update-target-coverage` owned a roster *entry* naming no owning delta — a listed
+  target with no claim, now closed by `check-amendment-update-target`. This owns a *target with no
+  entry*, which no scan over the amendment alone can see: the evidence is in the tree, not the doc.
   **Why `[design-pending]`:** the general form is not gateable — deciding which surfaces an
   amendment *should* have listed is the semantics of the change. The narrow slice that might
   be is a **literal-substitution** amendment: one declaring an old literal and its replacement
@@ -7578,6 +7578,35 @@
   Surfaced 2026-08-19 at the same close's staleness review, filed to the gap inbox beside the entry
   above; promoted 2026-08-20 by the next iteration's scope, which drained that inbox to its header.
 
+- **queue-status-parenthetical-liveness** [design-pending] — a queue cross-citation's section-status
+  parenthetical goes stale when the cited entry moves section, and nothing reads it.
+  **The instance, found 2026-08-22 by two independent close audits.** The
+  internal-identifier-restatement and capability-pendency sweeps reached
+  `amendment-roster-omission-detection` by different heuristics and returned the same line —
+  `amendment-update-target-coverage` tagged `(icebox)`, written while that entry was iceboxed and
+  left behind when this iteration promoted, built and closed it. Fixed in place by dropping the
+  status and naming the landed gate, which is what queue-kit/SPEC.md §check-queue-slug-liveness
+  already prescribes for prose about landed work. Both sweeps proposed keeping a status tag; that
+  would have been stale again within the hour, since the same close cleared the Done section.
+  **Why this slice IS gateable where its neighbour is not.** `retired-slug-live-pointer-citation`
+  needs a false-positive budget because gate names share the slug grammar and dominate the token
+  population. This one needs none: the trigger is a closed vocabulary of section names in
+  parentheses immediately after a backticked token, in the queue's own file, and the queue's own
+  sections are the oracle. Resolution is single-file and total, with no cross-corpus reach.
+  **DISTINCT from `retired-slug-live-pointer-citation`** above, whose subject is a slug cited as a
+  live pointer after retirement. Here the slug is cited correctly as an instance and only the
+  status beside it is false — the reader is told the work is unbuilt while the gate it names runs.
+  **Why `[design-pending]`:** the open question is the vocabulary's edges rather than the scan. A
+  second live citation — `enter-stage-simulate-no-write-fixture` tagged `(icebox)`, verified
+  accurate at this same drain — uses the bare section name; whether a richer spelling should be
+  admitted, rejected or normalized, and what a status tag on a NON-slug token means, decides
+  whether this is one more assertion on `check-queue-slug-liveness` or a member of its own.
+  **Cost while deferred:** low frequency and silent, but it INVERTS the reader's conclusion rather
+  than blurring it — a stale `(icebox)` says the work is not done, which is the opposite of true —
+  and the population is small enough that hand sweeps keep finding it one instance at a time.
+  Filed 2026-08-22 by close, discharging its staleness review's gap-generalization obligation: the
+  fix landed inline and the scanner that would have caught it did not, so it is filed not forfeited.
+
 - **settings-hook-command-path-gate** [design-pending] — a hook registration in
   `.claude/settings.json` whose `command` names a renamed or deleted script reds nowhere and
   fails silently at run time.
@@ -7712,9 +7741,6 @@
 - **scratch-execution-allowlist-bar** [design-pending] — Each close re-derives this standing bar.
 
 ## Done
-
-- substrate-claim-staleness
-- amendment-update-target-coverage
 
 ## Lessons Learned
 
