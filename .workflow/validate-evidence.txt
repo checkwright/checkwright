@@ -1,5 +1,5 @@
 # contract: evidence-manifest v1
-ruled-grant-surface-and-launch-chokepoint gates sha256=ad15e72dfb58bfd4f021476b1f243b6a297a82ae81af381069c61e0775399e65 pass=104 fail=0 ignore=0 verdict=clean 2026-08-22
+ruled-grant-surface-and-launch-chokepoint gates sha256=fa195c8adf9d0efce14ff8e9789d03800b9f70e59a8a5392ad37e787093415b0 pass=104 fail=0 ignore=0 verdict=clean 2026-08-22
 ruled-grant-surface-and-launch-chokepoint gate_sdk sha256=3aa562bcbb8a7ce2876372a6c43820da188950f243ad9faf02a90b0e37b665af pass=1 fail=0 ignore=0 verdict=clean 2026-08-22
 ruled-grant-surface-and-launch-chokepoint canon_kit sha256=c13b2442a2898fd4c5c30c9175f74b8e6d20ec43199ed0c9c7001203352040ae pass=1 fail=0 ignore=0 verdict=clean 2026-08-22
 ruled-grant-surface-and-launch-chokepoint context_kit sha256=65e7536ec8b920506d9defb5f2fd338be716ee72482acf2e4819ca5b3fcbe891 pass=1 fail=0 ignore=0 verdict=clean 2026-08-22
@@ -16,10 +16,10 @@ ruled-grant-surface-and-launch-chokepoint usage_tests sha256=04968d303b3e4ec54f3
 ruled-grant-surface-and-launch-chokepoint budget_guard_tests sha256=94bbe0c41f3993e3c748a492d29e2a0d22139825b8c53bbae6a528500a8ce402 pass=1 fail=0 ignore=0 verdict=clean 2026-08-22
 ruled-grant-surface-and-launch-chokepoint dispatch_guard_tests sha256=6018943502411c07fe57162c0dae2ac37af304eccc0d0a9a6e0ec4fd733a1daf pass=1 fail=0 ignore=0 verdict=clean 2026-08-22
 ruled-grant-surface-and-launch-chokepoint trend_tests sha256=acdbfef4eab851fca00ca747245b6ac4a4f804b05989f9cd3acd014bb56ac330 pass=1 fail=0 ignore=0 verdict=clean 2026-08-22
-ruled-grant-surface-and-launch-chokepoint demo sha256=8b81fc7dd551d5b95906d72b5228910e8f39ecb4b78dbe5a94c35d5363beb803 pass=1 fail=0 ignore=0 verdict=clean 2026-08-22
-ruled-grant-surface-and-launch-chokepoint installer_smoke sha256=b221b75beddb8004a5eff434ee2154cfe222696f75daa9a6f0729e777f71b4f7 pass=1 fail=0 ignore=0 verdict=clean 2026-08-22
-ruled-grant-surface-and-launch-chokepoint consumer_smoke sha256=5d43b1c37530ad9f4bcb64ea54dc299796751caf7471b2b291a4aa859c63859c pass=1 fail=0 ignore=0 verdict=clean 2026-08-22
-ruled-grant-surface-and-launch-chokepoint upgrade sha256=a204fab03bd589dfe44f20aeb684c061d3a54d0babe17c3b8d37ab1157905a17 pass=0 fail=1 ignore=0 verdict=new-failures 2026-08-22
-ruled-grant-surface-and-launch-chokepoint agents_md_smoke sha256=6ce5877c3c58f64a95efbd1a59891a7995e920b7005cc8985f207c4a014701e2 pass=1 fail=0 ignore=0 verdict=clean 2026-08-22
+ruled-grant-surface-and-launch-chokepoint demo sha256=9f3349ff7f931522fb2b388d61184efefc157ad7af7d7ccd5e4f6ee9426bfaa5 pass=1 fail=0 ignore=0 verdict=clean 2026-08-22
+ruled-grant-surface-and-launch-chokepoint installer_smoke sha256=69d5bb7833587a232dbf1a19b6f248c9b5b245d28060768e6716e35efb34ef38 pass=1 fail=0 ignore=0 verdict=clean 2026-08-22
+ruled-grant-surface-and-launch-chokepoint consumer_smoke sha256=47de69487b34a802b5c20f79e38caa4363dd28d77fb807f482403e842eb20010 pass=1 fail=0 ignore=0 verdict=clean 2026-08-22
+ruled-grant-surface-and-launch-chokepoint upgrade sha256=0b92fc84b525e27187c1e01c7a5d1ed41a16f5f33dd067066bcd715c41207eab pass=1 fail=0 ignore=0 verdict=clean 2026-08-22
+ruled-grant-surface-and-launch-chokepoint agents_md_smoke sha256=2adfcadb8c77e9c95b67663cf84cba3513665f25fab66717de49f2d5a09e13ce pass=1 fail=0 ignore=0 verdict=clean 2026-08-22
 ruled-grant-surface-and-launch-chokepoint index_tests sha256=e14e152466dc5be0296b1e20575bf3d587e1e0a127e7c63ad57671dbcaeaddb8 pass=1 fail=0 ignore=0 verdict=clean 2026-08-22
-ruled-grant-surface-and-launch-chokepoint native_crate sha256=ec846fa2900503de676660f753d7ca10067aaa35e5f1bf8521354ecf746f18a0 pass=1 fail=0 ignore=0 verdict=clean 2026-08-22
+ruled-grant-surface-and-launch-chokepoint native_crate sha256=7f62688bbe30a6b8076ef9f68777de4161682c5f4189ef52e3c6041dc5983362 pass=1 fail=0 ignore=0 verdict=clean 2026-08-22
