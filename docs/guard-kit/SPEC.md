@@ -111,7 +111,17 @@ run the core command bare.
 Primitives a consumer guard composes; each emits the harness's
 `PreToolUse` hook protocol:
 
-- `guard_read_command` — parse the hook JSON on stdin, emit the command;
+- `guard_read_input` — read stdin **once** into the global `GUARD_INPUT`,
+  returning non-zero when stdin yielded nothing. Called **directly**, never in a
+  command substitution, and before the first field accessor. It exists because
+  the payload was otherwise unreadable past its first field: `guard_read_command`
+  is invoked as `cmd="$(guard_read_command)"`, so any cache it set died with the
+  substitution's subshell and stdin was already consumed — a rule needing a
+  second field could not get one.
+- `guard_input_field <jq-path>` — the value at `<jq-path>` in `GUARD_INPUT`, or
+  nothing when `GUARD_INPUT` is unset or empty or the path is absent. The
+  accessor a rule reaching past the headline fields uses.
+- `guard_read_command` — parse the hook JSON, emit the command;
   **fail-open** on any parse problem (exit 0) so a guard can never wedge
   the agent.
 - `guard_read_path` — the same accessor for `.tool_input.file_path`, the field a
@@ -207,15 +217,32 @@ expansion, substitution or backtick (rule 6 blocks those shapes anyway), and a
 pattern operand carrying a stray quote — the evidence that the compound split
 landed *inside* a quoted span — declines rather than guesses at the operand.
 
-**The payload carries the live permission mode, and no accessor above reads it.**
-`PreToolUse` delivers `permission_mode` alongside the fields
-`guard_read_command` and `guard_read_path` pick off, so a rule whose rationale is
-mode-*conditional* — "no allowlist entry can suppress this prompt" is false under
-an auto-approving mode and true under the others — currently asserts a mode
-rather than reading one. Recorded here because it is a fact about this framework's
-own inputs: without it, each session re-establishes it from the vendor hook
-reference. Whether a guard *should* read the mode is a consumer decision and is
-not settled here.
+**`GUARD_INPUT` first, stdin otherwise, and the fallback is the whole point of
+the shape.** `guard_read_command` and `guard_read_path` parse `GUARD_INPUT` when
+it is set and non-empty and read stdin exactly as they always did otherwise, so
+every consumer copy that never opted in keeps working byte-identically without an
+edit — it never sets `GUARD_INPUT`, so both readers take the stdin path. A guard
+that wants a second field opts in by adding one line, `guard_read_input || exit 0`
+ahead of the first accessor, which is what the shipped template carries. Making
+`guard_read_input` mandatory was refused: it would break every consumer copy on
+upgrade for a field only one rule needs.
+
+**What a `PreToolUse` payload actually carries, recorded so no session re-buys
+the probe.** Top-level keys: `agent_id`, `agent_type`, `cwd`, `effort`,
+`hook_event_name`, `permission_mode`, `prompt_id`, `session_id`, `tool_input`,
+`tool_name`, `tool_use_id`, `transcript_path`. On a Bash call `tool_input` carries
+`command`, `description`, and `run_in_background` — a JSON boolean `true` on a
+backgrounded call, and **absent** on a foreground one. It is a fact about this
+framework's own inputs, so without it each session re-establishes it from the
+vendor hook reference.
+
+**The live permission mode is in that payload and no rule reads it.**
+`permission_mode` sits alongside the fields the accessors pick off, so a rule
+whose rationale is mode-*conditional* — "no allowlist entry can suppress this
+prompt" is false under an auto-approving mode and true under the others —
+asserts a mode rather than reading one. Whether a guard *should* read the mode is
+a consumer decision and is not settled here; the same holds for `agent_id`,
+`agent_type` and `effort`, each of which belongs to a question of its own.
 
 Fail-open is the default posture. The one sanctioned fail-closed shape is a
 deny-guard whose hook *matcher* already proves the tool identity (see
@@ -260,7 +287,11 @@ guard-kit gains no dependency on a kit it does not otherwise know about
 
 A consumer's project-specific block/steer/allow rules live in its copy of
 `templates/bash-guard.sh`, composed from the `lib/guard.sh` primitives above and
-placed **before** the generic ruleset — the template marks the position. Order
+placed **before** the generic ruleset — the template marks the position. The
+template's head reads the payload once (`guard_read_input || exit 0`) before the
+first field accessor, which is what makes a rule reading a tool-input field
+beyond the command reachable in a shipped guard rather than only in the tests; a
+copy without that line still runs every rule, on the fallback above. Order
 is the whole reason the seam sits here: a project rule that fires must fire
 ahead of the generic rule it refines, or the generic verdict wins and the
 project rule is dead code.
