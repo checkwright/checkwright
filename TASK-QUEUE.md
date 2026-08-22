@@ -12,11 +12,7 @@
 
 ## New Features
 
-## Technical Debt
-
-## Deferred
-
-- **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
+- **native-gate-port-remaining-corpus** [spec: SPEC-eighth-cut.md] [roadmap: now/reliability]
   — the whole battery onto the binary, and the shell surface down to its residue.
   roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
   The entry demotes at build rather than moving to `## Done`: it is the **whole corpus**, the oracle
@@ -66,6 +62,206 @@
   promoted at spec and demoted at build once per increment on the entry-outlives-the-amendment
   branch — seven so far, each cut's own record staying at its SPEC section.
 
+- **session-mechanic-grants-uncommitted** [spec: SPEC-journal-append.md] — the mandated
+  resume-journal append is granted by nothing committed, and the spelling ruled to grant
+  it does not work.
+  **FEATURE-CLASS as of 2026-08-22, re-classed from debt at build.** The ruled design mints a
+  governed name — a new numbered guard rule and its SPEC section — so canon-kit's litmus makes this
+  a feature and an **amendment is owed** before any build. This entry's former "mints no governed
+  name" litmus line is superseded and must not be re-applied.
+  **THE PREVIOUSLY-RULED SPELLING IS INERT. This is the finding, and it must not be bought twice.**
+  `Bash(cat >> .tmp/*)` cannot grant a journal append at all. The vendor permissions doc is
+  explicit: "Claude Code checks the target of an output redirection, such as `>`, `>>`, or `2>`, as
+  a file write. The check covers your `Edit` allow and deny rules ... A rule such as
+  `Bash(git commit *)` allows the command, not the target." A `Bash(...)` rule grants the COMMAND,
+  never the redirect TARGET, so disposition (a) as previously written would have shipped a no-op
+  and then measured no improvement.
+  **The ruled design, operator 2026-08-22 via the lead:** a PreToolUse guard rule running
+  `git check-ignore` on every redirect target and auto-allowing only when all of them are ignored,
+  with `guard_rule_truncate_scratch` (guard-kit/lib/guard.sh:784) as the shipped precedent — it
+  already does exactly this for the `: >` truncation form.
+  **Why the hook and not an `Edit` rule.** `Edit(/.tmp/**)` would grant the target, and is anchored
+  so it provably cannot reach a tracked path — but a redirect-target check is a FILE-WRITE check
+  and cannot tell `>>` from `>`, so it grants the truncating form too. The append-only split ruled
+  2026-08-20, so that a mis-typed redirect cannot destroy a journal, is inexpressible in ANY
+  settings rule. Only the hook honours what was actually ruled, and the operator ruled 2026-08-22
+  that the split is worth its cost.
+  **The second half is SPLIT OUT, 2026-08-23, and that split is what discharged the hold below.**
+  The overlay-only oracles are now `overlay-only-oracle-grants-uncommitted`; this entry's
+  deliverable is the redirect-target rule alone. The split is authorized by the lead and is the
+  first worked instance of the criterion `SPEC-entry-split.md` mints — two deliverables, two
+  dispositions, one slug — so the entry it unblocked is the entry that proves the test.
+  **The `awk` item stays CONTESTED** by `guard-read-steer-tool-coverage`, which rules it a (b)
+  steer rather than an (a) grant; nothing here settles it.
+  recurrence: session-mechanic-grants-uncommitted 2026-08-18 2026-08-19 2026-08-21 2026-08-22
+  **Grounds for 2026-08-22 — a THIRD member of the class, and it corroborates the ruled hook
+  without widening what that hook must do.** The mandated in-turn wait is a `kill -0 "$pid"` loop
+  on a launch-liveness record (delegation-kit/templates/agent-execution.md); this iteration's
+  friction log carries 19 such calls across two sessions, every one out-of-band. None is grantable
+  by a settings rule for a structural reason: the mandated form IS a loop condition, so it is
+  decorated by construction and a `Bash(...)` glob matches bare commands. That is a second shape,
+  after the redirect target above, where a settings rule provably cannot express a mechanic the
+  methodology mandates — so the hook is not the better route, it is the only one.
+  **Cost while deferred:** measured, and flat — 30 `.tmp/` heredocs of which 22 are journal appends
+  at 2026-08-21, one out-of-band decision each, paid by every dispatched session in every
+  iteration. A plateau is the worse reading rather than the milder one: it is the steady-state
+  price of an unbuilt ruled grant.
+  **The 2026-08-22 hold is DISCHARGED, not overridden.** It was held twice that day, the second
+  operator-ruled, on one stated ground: its design was ruled and its second half was not, so
+  promoting it would carry an unruled half into a build. The split above removes that half rather
+  than the ground, which is why the promotion is a discharge and not a reversal.
+  **The wait-loop grant is NOT in this promotion, ruled at spec 2026-08-23.** The third member of
+  the class stays unbuilt until `turn-end-chokepoint-and-wait-primitive`'s measurement half returns:
+  a grant shaped to the currently-sanctioned loop form would bake the ordering that unit is testing.
+  **It IS landable, recorded so the neighbouring ruling is not misread onto it:** the ruled design
+  is guard-kit code, so the 2026-08-22 operator ruling that a permission-settings edit is
+  operator-class (TRAJECTORY.md §The closed rulings) does not reach it. That is the whole reason
+  the hook was chosen over an `Edit` rule, and a reader meeting both entries could infer otherwise.
+  Filed 2026-08-16 by close; promoted 2026-08-22 at scope; re-deferred the same day at build, its
+  design ruled and its class corrected rather than the work merely postponed.
+
+- **entry-cap-displaces-mandated-writes** [spec: SPEC-entry-split.md] — the mandated-write
+  class collides with `check-queue-entry-budget`'s per-entry cap at a measurable rate, and
+  nothing counts the spend.
+  **First five firings, the filing measurement:** three during scope's disposition work, two seating
+  operator-handed writes at 50/50 and 49/50 — both mandated writes with a citable contract
+  (queue-kit/SPEC.md §check-queue-entry-budget), both seated only by compressing an answered ground
+  out of the same entry. The relief works and is documented; the spend has no owner.
+  recurrence: entry-cap-displaces-mandated-writes 2026-08-20 2026-08-21 2026-08-22 2026-08-23
+  **Nine firings 2026-08-22 and a tenth 2026-08-23 — grounds for both dates, and the SPLIT reading
+  gets its counter-evidence twice.** Six landed one operator ruling, one relieved by PROMOTION, the
+  "unrecorded relief valve". Three more reddened scope's own mandated writes at 51/53/51 against 50,
+  the first set MEASURED by the gate. The tenth reddened CLOSE's watch-condition record at 51. Every
+  collider was the most recently RULED-ON entry, not the longest-lived.
+  **Twelve more firings, 2026-08-20/21 — grounds for those dates, and the class NARROWS.** Seven at
+  scope landed authority rulings onto five entries at 0 headroom; two at build compressed by
+  answering spent grounds; three were that drain's own recurrence stamps. The taxed class is the
+  write that cannot be deferred or reworded without falsifying the record of what was decided; one
+  firing was relieved only by RELOCATION onto a linked entry that happened to have headroom.
+  **DISTINCT from `check-queue-entry-budget` itself**, which is the gate and is behaving exactly as
+  specified, and from `headroom-check-ordering-unruled`, whose axis is *when* a session reads its
+  headroom rather than what the cap displaces.
+  **The design question is ANSWERED, 2026-08-23 at spec, and the answer is the deliverable.** The
+  real question was whether the colliding entries are the ones that should have been **split** — a
+  queue-composition ruling, never a gate change. `SPEC-entry-split.md` rules it on
+  dispositionability: an entry carrying two deliverables that can take different dispositions is a
+  split candidate, one accumulating further grounds for a single deliverable is not. Size, age and
+  ruling-count are each refused there against this entry's own measurements. No counter is minted,
+  on the ground this entry states: the clean-path headroom line already exposes the quantity.
+  **HELD at the 2026-08-22 promotion, lead-ruled:** the real deliverable is that composition ruling
+  and the documented relief still works. **The hold IS an instance** — seating four hold grounds at
+  0 headroom fired this class on its own class, and the entry it blocked hardest is the one whose
+  hold is not on merit. Same date as the stamp above, so no new date is owed.
+  **Cost while deferred:** a cadence that is real is invisible to the only session chartered to act
+  on it, since scope ranks what the queue carries and the queue carried none of this.
+  **Four more firings, 2026-08-19, the first measured against this entry rather than commit
+  messages:** landing five ruled dispositions took three mandated writes onto entries the gate
+  reports at exactly 0 headroom. Each was seated by the documented relief and each spent something.
+  **The fourth is a sharper kind and is the one to design against:** on
+  `close-entry-baseline-bootstrap-deadlock` the ruling fitted and its **provenance** did not — the
+  entry closed at 1 line of headroom, carrying what was ruled and not through which channel, which
+  `relayed-ruling-provenance-unrecorded` is trialling. A cap that displaces a ruling's audit trail
+  while keeping the ruling is worse than one displacing prose: the surviving text reads complete.
+  **The signal the design question asked for.** All three are among the queue's longest-lived and
+  most-ruled-on entries, which is evidence for the split reading rather than for a counter: the
+  collision is not random across the pool, it concentrates where rulings accumulate.
+  **Measured with the gate, not by hand**, and read *after* the dispositions were ruled rather
+  than before — `headroom-check-ordering-unruled`'s ordering, honoured here on purpose so that no
+  ruling could be shaped by the room available to record it.
+  **The pressure is DEFERRED-only and promotion is the unrecorded relief valve**, filed to the gap
+  inbox 2026-08-19 by spec and merged here at that drain: assertion A binds deferred entries alone
+  ("The active sections are uncapped", queue-kit/SPEC.md §check-queue-entry-budget), so every
+  firing above sits in the deferred half of a promote/demote cycle, and each colliding entry was
+  written onto freely once promoted. Seating this paragraph fired the cap again at 2 lines.
+  Surfaced 2026-08-18 while `wide-budget-batch-and-hold-declaration`'s close drained its own
+  inbox, and filed back into it; promoted 2026-08-18 by the following iteration's scope.
+
+- **turn-end-chokepoint-and-wait-primitive** [spec: SPEC-wait-primitive.md] — two open
+  mechanism questions the wait rule's fifth firing raised, neither answerable from the
+  ruling that closed its prose half.
+  **The design half of `waiting-rule-fourth-firing-post-fix`** (now Done), split off at that entry's
+  cap; its surviving question is "given that prose alone does not hold, what does".
+  **First half — CLOSED 2026-08-22:** both answers — a turn-end passes no `PreToolUse`, and
+  `SubagentStop` fires per assistant step, so a blocking variant needs a SECOND authorization —
+  live in delegation-kit/SPEC.md §The turn-end liveness probe. Rule 14 stands; the class holds.
+  **Fifteenth firing, 2026-08-22 — grounds for that date:** this iteration's validate session ended
+  its turn to wait on `run-validate`, twice; the hook wired that same iteration logged FIFTEEN
+  `live=yes verdict=red` firings over 309 events — six in validate's session, nine in the lead's.
+  **RULED by the lead 2026-08-22 — the blocking variant is not sought this iteration:** a second
+  authorization is a scope-stage ask, and `subagent-stop-payload-background-tasks-read` may collapse
+  what such a hook should read. Sequence: settle that entry first, then route the ask.
+  **Second half — which primitive is reliable here.** The protocol states a hard ordering:
+  `run_in_background` plus an `until`-loop for a single completion, with the event-stream form
+  named the wrong tool. On this machine that ordering **inverted** — four of the lead's own
+  backgrounded waiters died before their conditions went true, producers verifiably alive, while
+  a `Monitor` call succeeded first try; a guard on the wrong primitive inherits its failure.
+  **The MEASUREMENT half is promoted and the blocking variant is NOT**, lead-ruled 2026-08-23:
+  `SPEC-wait-primitive.md` takes the surviving half — which primitive is reliable here — and
+  restates the blocking variant's sequencing behind `subagent-stop-payload-background-tasks-read`
+  rather than reaching it. One thing narrowed at authoring by probe rather than measurement: the
+  vendor reference confines the stays-armed property to an **unbounded** command and independently
+  recommends the sanctioned form for a single completion, so the ordering is corroborated and what
+  is under measurement is why four sanctioned-form waiters died with their producers alive.
+  **HELD TWICE on 2026-08-22 — on surface disjointness, then OPERATOR-RULED**, the operator taking
+  the port's hold grounds as the spine with this hold stated as the argument against it. Neither is
+  on merit: the queue's highest recurrence (4 dates, 15 firings), surviving half a measurement plus
+  a doctrine line. The prior "leading candidate for next spine" naming did not survive and is gone.
+  **Cost while deferred:** each further firing costs an orphaned producer plus the lead turn that
+  discovers it — and, as the tenth showed, can cost a whole suite's evidence.
+  **Firings 6-9, 2026-08-16/17 — spent grounds, kept only for what they establish.** Four across
+  three iterations, every one a producing role ending its turn on a live producer and recovered by
+  whatever the producer happened to be. They established the rate is not noise; both their readings
+  are superseded below, and neither carried a date of its own.
+  **It fired again at 2026-08-22 validate, and the CARRIER argument is now ANSWERED.** The session
+  ended its turn on a live `run-validate.sh` with its OWN journal recording this lesson from the
+  tenth firing and stating the intent not to repeat it. Earlier firings argued the rule's carrier
+  was too weak — the agent definition, then the dispatch prompt. A session that wrote the rule down
+  itself and still ended the turn retires that: carriage is not the defect. No new date, 2026-08-22
+  being stamped already. **The DETECTOR exists and is deliberately inert, which is where the design
+  should go** — the `SubagentStop` probe logged `verdict=red live=yes` SIXTEEN times in one
+  37-minute window this iteration and is logging-only, so what is missing is a forcing function.
+  **Tenth firing, 2026-08-17 (`post-close-intake-and-index-port` validate) — the first to cost
+  evidence rather than turns.** It ended its turn on a live `run-validate.sh` to await a completion
+  notification that ending the turn prevents, then committed mid-run and dirtied the worktree
+  `installer_smoke` checks: `verdict=new-failures` on a false ground. No date — already stamped.
+  **Fourteenth firing, 2026-08-21 — grounds for that date:** validate ended a turn *in order to
+  wait* on the battery, inside the very iteration this defect was held out of for the port spine
+  (lead 2026-08-20; operator 2026-08-18) — the held limit came true. Record written, nothing lost.
+  recurrence: turn-end-chokepoint-and-wait-primitive 2026-08-18 2026-08-19 2026-08-21 2026-08-22
+  **Firings 11-13, 2026-08-18 — grounds for that date.** Three times a backgrounded producer exited
+  cleanly and the turn ended anyway: work finished, uncommitted, no completion notification,
+  recovered only by the operator noticing. The second half, measured on producers that *finished*.
+  Filed 2026-08-16 by close from the gap inbox, both halves; the drain re-verified the carrier
+  count and the chokepoint scoping against the SPEC rather than taking the bullet's prose.
+
+## Technical Debt
+
+## Deferred
+
+- **overlay-only-oracle-grants-uncommitted** [design-pending] — four oracles this tree runs
+  constantly are granted only by an untracked overlay, so a fresh clone re-buys every one.
+  **SPLIT from `session-mechanic-grants-uncommitted` on 2026-08-23 at spec, lead-authorized**,
+  as the first application of the split criterion `SPEC-entry-split.md` mints: that entry
+  carried a ruled design and this unruled half, two deliverables taking two dispositions on
+  one slug. Its ruled half promoted the same day; this one did not, which is the test.
+  **The set, unchanged from the parent and not to be re-derived:** `cargo test`,
+  `cargo build` / `clippy`, the release binary, and `gh auth` — each read-only or a build of
+  this tree's own crate, none of them reaching the network or a foreign repo.
+  **Why `[design-pending]`:** what is open is not whether the four are safe but **which
+  surface should carry them**. A committed `.claude/settings.json` grant is the obvious
+  answer and is **operator-class** under the 2026-08-22 ruling (TRAJECTORY.md §The closed
+  rulings), so no stage session can land it; a guard-kit rule is landable but would encode a
+  Rust toolchain's command shapes into a kit whose ruleset admits **no project's toolchain**
+  by its own stated clause. That tension is the design question, and neither horn is costed.
+  **Distinct from the parent**, whose subject is a redirect target no settings rule can
+  express, and from `guard-grant-review`, whose subject is narrowing grants that already
+  exist rather than minting ones that do not.
+  **Cost while deferred:** every fresh clone and every dispatched session on one pays an
+  out-of-band decision per oracle, and the cost is invisible on the operator's own machine
+  because the overlay hides it there — which is the reading that makes it worth filing
+  rather than absorbing.
+  Filed 2026-08-23 at spec by the split above; never promoted, never held on merit.
+
 - **guard-grant-review** [design-pending] — the committed grant set's security narrowing, prepared
   and unlandable: the review is COMPLETE and only an operator-class edit remains.
   **The review is done and must not be re-bought.** All 105 `Bash(` entries of
@@ -99,57 +295,6 @@
   Promoted 2026-08-22 at scope; re-deferred the same day at build under the operator ruling that a
   permission-settings edit is operator-class and scope never promotes one. The review half is spent
   and recorded above so this entry never buys it twice.
-
-- **session-mechanic-grants-uncommitted** [design-pending] — the mandated resume-journal append is
-  granted by nothing committed, and the spelling ruled to grant it does not work.
-  **FEATURE-CLASS as of 2026-08-22, re-classed from debt at build.** The ruled design mints a
-  governed name — a new numbered guard rule and its SPEC section — so canon-kit's litmus makes this
-  a feature and an **amendment is owed** before any build. This entry's former "mints no governed
-  name" litmus line is superseded and must not be re-applied.
-  **THE PREVIOUSLY-RULED SPELLING IS INERT. This is the finding, and it must not be bought twice.**
-  `Bash(cat >> .tmp/*)` cannot grant a journal append at all. The vendor permissions doc is
-  explicit: "Claude Code checks the target of an output redirection, such as `>`, `>>`, or `2>`, as
-  a file write. The check covers your `Edit` allow and deny rules ... A rule such as
-  `Bash(git commit *)` allows the command, not the target." A `Bash(...)` rule grants the COMMAND,
-  never the redirect TARGET, so disposition (a) as previously written would have shipped a no-op
-  and then measured no improvement.
-  **The ruled design, operator 2026-08-22 via the lead:** a PreToolUse guard rule running
-  `git check-ignore` on every redirect target and auto-allowing only when all of them are ignored,
-  with `guard_rule_truncate_scratch` (guard-kit/lib/guard.sh:784) as the shipped precedent — it
-  already does exactly this for the `: >` truncation form.
-  **Why the hook and not an `Edit` rule.** `Edit(/.tmp/**)` would grant the target, and is anchored
-  so it provably cannot reach a tracked path — but a redirect-target check is a FILE-WRITE check
-  and cannot tell `>>` from `>`, so it grants the truncating form too. The append-only split ruled
-  2026-08-20, so that a mis-typed redirect cannot destroy a journal, is inexpressible in ANY
-  settings rule. Only the hook honours what was actually ruled, and the operator ruled 2026-08-22
-  that the split is worth its cost.
-  **The second half is unchanged and still unruled:** the overlay-only oracles (`cargo test`,
-  `cargo build`/`clippy`, the release binary, `gh auth`), each read-only or a build of this tree's
-  own crate, which a fresh clone re-buys entirely.
-  **The `awk` item stays CONTESTED** by `guard-read-steer-tool-coverage`, which rules it a (b)
-  steer rather than an (a) grant; nothing here settles it.
-  recurrence: session-mechanic-grants-uncommitted 2026-08-18 2026-08-19 2026-08-21 2026-08-22
-  **Grounds for 2026-08-22 — a THIRD member of the class, and it corroborates the ruled hook
-  without widening what that hook must do.** The mandated in-turn wait is a `kill -0 "$pid"` loop
-  on a launch-liveness record (delegation-kit/templates/agent-execution.md); this iteration's
-  friction log carries 19 such calls across two sessions, every one out-of-band. None is grantable
-  by a settings rule for a structural reason: the mandated form IS a loop condition, so it is
-  decorated by construction and a `Bash(...)` glob matches bare commands. That is a second shape,
-  after the redirect target above, where a settings rule provably cannot express a mechanic the
-  methodology mandates — so the hook is not the better route, it is the only one.
-  **Cost while deferred:** measured, and flat — 30 `.tmp/` heredocs of which 22 are journal appends
-  at 2026-08-21, one out-of-band decision each, paid by every dispatched session in every
-  iteration. A plateau is the worse reading rather than the milder one: it is the steady-state
-  price of an unbuilt ruled grant.
-  **HELD TWICE on 2026-08-22, the second operator-ruled, on the ground stated rather than by
-  omission:** its design is ruled and the second half above is not, so promoting it now carries an
-  unruled half into a build. The threshold is met; the hold is a judgement, not an oversight.
-  **It IS landable, recorded so the neighbouring ruling is not misread onto it:** the ruled design
-  is guard-kit code, so the 2026-08-22 operator ruling that a permission-settings edit is
-  operator-class (TRAJECTORY.md §The closed rulings) does not reach it. That is the whole reason
-  the hook was chosen over an `Edit` rule, and a reader meeting both entries could infer otherwise.
-  Filed 2026-08-16 by close; promoted 2026-08-22 at scope; re-deferred the same day at build, its
-  design ruled and its class corrected rather than the work merely postponed.
 
 - **grant-argument-bounding-mechanism** [design-pending] — two committed grants reach a destructive
   form and no allow-glob narrowing can stop either.
@@ -332,57 +477,6 @@
   Surfaced 2026-08-18 at the `wide-budget-batch-and-hold-declaration` close's tooling-friction
   triage and filed to the gap inbox there; promoted 2026-08-18 by the next iteration's scope,
   draining that inbox.
-
-- **entry-cap-displaces-mandated-writes** [design-pending] — the mandated-write class collides with
-  `check-queue-entry-budget`'s per-entry cap at a measurable rate, and nothing counts the spend.
-  **First five firings, the filing measurement:** three during scope's disposition work, two seating
-  operator-handed writes at 50/50 and 49/50 — both mandated writes with a citable contract
-  (queue-kit/SPEC.md §check-queue-entry-budget), both seated only by compressing an answered ground
-  out of the same entry. The relief works and is documented; the spend has no owner.
-  recurrence: entry-cap-displaces-mandated-writes 2026-08-20 2026-08-21 2026-08-22 2026-08-23
-  **Nine firings 2026-08-22 and a tenth 2026-08-23 — grounds for both dates, and the SPLIT reading
-  gets its counter-evidence twice.** Six landed one operator ruling, one relieved by PROMOTION, the
-  "unrecorded relief valve". Three more reddened scope's own mandated writes at 51/53/51 against 50,
-  the first set MEASURED by the gate. The tenth reddened CLOSE's watch-condition record at 51. Every
-  collider was the most recently RULED-ON entry, not the longest-lived.
-  **Twelve more firings, 2026-08-20/21 — grounds for those dates, and the class NARROWS.** Seven at
-  scope landed authority rulings onto five entries at 0 headroom; two at build compressed by
-  answering spent grounds; three were that drain's own recurrence stamps. The taxed class is the
-  write that cannot be deferred or reworded without falsifying the record of what was decided; one
-  firing was relieved only by RELOCATION onto a linked entry that happened to have headroom.
-  **DISTINCT from `check-queue-entry-budget` itself**, which is the gate and is behaving exactly as
-  specified, and from `headroom-check-ordering-unruled`, whose axis is *when* a session reads its
-  headroom rather than what the cap displaces.
-  **Why `[design-pending]`:** the real question is whether the entries that keep colliding are the
-  ones that should have been **split**, which is a queue-composition ruling rather than a gate
-  change; a counter with no split criterion behind it would only make the cadence visible.
-  **HELD at the 2026-08-22 promotion, lead-ruled:** the real deliverable is that composition ruling
-  and the documented relief still works. **The hold IS an instance** — seating four hold grounds at
-  0 headroom fired this class on its own class, and the entry it blocked hardest is the one whose
-  hold is not on merit. Same date as the stamp above, so no new date is owed.
-  **Cost while deferred:** a cadence that is real is invisible to the only session chartered to act
-  on it, since scope ranks what the queue carries and the queue carried none of this.
-  **Four more firings, 2026-08-19, the first measured against this entry rather than commit
-  messages:** landing five ruled dispositions took three mandated writes onto entries the gate
-  reports at exactly 0 headroom. Each was seated by the documented relief and each spent something.
-  **The fourth is a sharper kind and is the one to design against:** on
-  `close-entry-baseline-bootstrap-deadlock` the ruling fitted and its **provenance** did not — the
-  entry closed at 1 line of headroom, carrying what was ruled and not through which channel, which
-  `relayed-ruling-provenance-unrecorded` is trialling. A cap that displaces a ruling's audit trail
-  while keeping the ruling is worse than one displacing prose: the surviving text reads complete.
-  **The signal the design question asked for.** All three are among the queue's longest-lived and
-  most-ruled-on entries, which is evidence for the split reading rather than for a counter: the
-  collision is not random across the pool, it concentrates where rulings accumulate.
-  **Measured with the gate, not by hand**, and read *after* the dispositions were ruled rather
-  than before — `headroom-check-ordering-unruled`'s ordering, honoured here on purpose so that no
-  ruling could be shaped by the room available to record it.
-  **The pressure is DEFERRED-only and promotion is the unrecorded relief valve**, filed to the gap
-  inbox 2026-08-19 by spec and merged here at that drain: assertion A binds deferred entries alone
-  ("The active sections are uncapped", queue-kit/SPEC.md §check-queue-entry-budget), so every
-  firing above sits in the deferred half of a promote/demote cycle, and each colliding entry was
-  written onto freely once promoted. Seating this paragraph fired the cap again at 2 lines.
-  Surfaced 2026-08-18 while `wide-budget-batch-and-hold-declaration`'s close drained its own
-  inbox, and filed back into it; promoted 2026-08-18 by the following iteration's scope.
 
 - **relayed-ruling-provenance-unrecorded** [design-pending] — a relayed operator ruling lands in a
   tracked governance surface as "operator-directed" with no provenance a later reader can check.
@@ -5282,27 +5376,24 @@
   allowlist bar for scratch execution rather than about which interpreters the control covers.
   **Cost while deferred:** the control reads as complete and is not, which is worse than an
   absent control — a reviewer seeing the rule and the runner has no reason to check its reach.
-  **Third measurement, 2026-08-18 — grounds for that date, and the trend is the argument.** The
-  count went 3 → **25+ distinct `python3 .tmp/*.py` invocations** in one iteration, plus 23 `python3
-  -` stdin heredocs editing tracked files. Meanwhile the *bash* side is clean: every scratch bash
-  script this iteration ran through `guard-kit/bin/scratch-run.sh`, so the runner works and the
-  control's reach is the whole defect. A control covering the disciplined half while the
-  undisciplined half grows eightfold is measuring habit, not risk.
-  **DECLINED BY THE OPERATOR, ruled 2026-08-20 and relayed by the lead** — the entry stood at three
-  recurrences, so the routing clause `threshold-recurrence-routing-residency` carries put it past
-  lead discretion, and this decline is **the operator's own, not a third lead decline**. The clause
-  is discharged by having reached that authority, which is all it asks. Cause: this iteration's
-  ruled spine is the `check-graph` port, guard-kit shares no surface with it, and the measured cost
-  stays **discipline-shaped rather than a correctness hole** — the growth is in how sessions choose
-  to run scratch, not in what the tree permits.
-  **Two prior declines, neither a lead's third:** deferred with cause 2026-08-19 by the operator
-  through the harness's question mechanism, then held the same day at the next iteration's scope
-  into `takeable-tier-batch-and-installer-noop` on the identical port-spine cause. Scope put it in
-  the proposed set regardless of theme all three times, as the rule requires. No `recurrence:` date
-  joins any decline: the finding did not re-fire, and a decline is not a firing.
-  **RE-DECLINED, operator 2026-08-22 via the lead — the fourth, and it re-affirms rather than
-  re-decides:** out of `ruled-grant-surface-and-launch-chokepoint`'s set, on the same grounds.
-  **HELD at the 2026-08-22 promotion, lead-ruled:** that standing operator decline is unchanged.
+  **Third measurement, 2026-08-18 — spent, and kept for the one thing it alone establishes.** Its
+  counts are superseded above and its *trend is the argument* reading is reversed by the fifth; what
+  survives is that the **bash side was clean** — every scratch bash script ran through the runner —
+  so the runner works and the control's reach is the whole defect.
+  **DEFERRED ON THE MERITS 2026-08-23 at spec, and the grounds are REVERSED rather than repeated.**
+  The four declines below all rested on a theme-shaped cause: the iteration's ruled spine shared no
+  surface with guard-kit. This one does not need it. The fifth measurement broke the trend for the
+  first time, which is the first evidence *for* the operator's discipline-shaped reading rather than
+  merely consistent with it — so the entry is deferred on what it measures, not on what it is near.
+  The reach defect is unchanged and non-rotting, which is what makes deferring it honest.
+  **Four prior declines, all OPERATOR-class and all on the one theme-shaped cause the paragraph
+  above supersedes:** 2026-08-19 through the harness's question mechanism, held the same day at
+  scope into `takeable-tier-batch-and-installer-noop`, ruled again 2026-08-20 via the lead — the
+  entry then stood at three recurrences, so `threshold-recurrence-routing-residency`'s routing
+  clause put it past lead discretion and reaching that authority is what discharged it — and
+  re-affirmed 2026-08-22 out of `ruled-grant-surface-and-launch-chokepoint`'s set. Scope proposed it
+  regardless of theme every time, as the rule requires. **No `recurrence:` date joins a decline:**
+  the finding did not re-fire, and a decline is not a firing.
   Filed 2026-08-13 by close, from its own tooling-friction triage; probed at source before filing.
 
 - **ro-bins-write-option-bypass** [design-pending] — `GUARD_KIT_RO_BINS` membership is tested as
@@ -6275,57 +6366,6 @@
   Surfaced 2026-08-21 draining the knowledge-friction log at `graph-port-and-config-seam`'s close;
   promoted 2026-08-22 at scope from the carried gap inbox, which re-verified both args files and
   the discharge record against the tree.
-
-- **turn-end-chokepoint-and-wait-primitive** [design-pending] — two open mechanism questions the
-  wait rule's fifth firing raised, neither answerable from the ruling that closed its prose half.
-  **The design half of `waiting-rule-fourth-firing-post-fix`** (now Done), split off at that entry's
-  cap; its surviving question is "given that prose alone does not hold, what does".
-  **First half — CLOSED 2026-08-22:** both answers — a turn-end passes no `PreToolUse`, and
-  `SubagentStop` fires per assistant step, so a blocking variant needs a SECOND authorization —
-  live in delegation-kit/SPEC.md §The turn-end liveness probe. Rule 14 stands; the class holds.
-  **Fifteenth firing, 2026-08-22 — grounds for that date:** this iteration's validate session ended
-  its turn to wait on `run-validate`, twice; the hook wired that same iteration logged FIFTEEN
-  `live=yes verdict=red` firings over 309 events — six in validate's session, nine in the lead's.
-  **RULED by the lead 2026-08-22 — the blocking variant is not sought this iteration:** a second
-  authorization is a scope-stage ask, and `subagent-stop-payload-background-tasks-read` may collapse
-  what such a hook should read. Sequence: settle that entry first, then route the ask.
-  **Second half — which primitive is reliable here.** The protocol states a hard ordering:
-  `run_in_background` plus an `until`-loop for a single completion, with the event-stream form
-  named the wrong tool. On this machine that ordering **inverted** — four of the lead's own
-  backgrounded waiters died before their conditions went true, producers verifiably alive, while
-  a `Monitor` call succeeded first try; a guard on the wrong primitive inherits its failure.
-  **Why `[design-pending]`:** the surviving half measures a stated protocol ordering — not a patch.
-  **HELD TWICE on 2026-08-22 — on surface disjointness, then OPERATOR-RULED**, the operator taking
-  the port's hold grounds as the spine with this hold stated as the argument against it. Neither is
-  on merit: the queue's highest recurrence (4 dates, 15 firings), surviving half a measurement plus
-  a doctrine line. The prior "leading candidate for next spine" naming did not survive and is gone.
-  **Cost while deferred:** each further firing costs an orphaned producer plus the lead turn that
-  discovers it — and, as the tenth showed, can cost a whole suite's evidence.
-  **Firings 6-9, 2026-08-16/17 — spent grounds, kept only for what they establish.** Four across
-  three iterations, every one a producing role ending its turn on a live producer and recovered by
-  whatever the producer happened to be. They established the rate is not noise; both their readings
-  are superseded below, and neither carried a date of its own.
-  **It fired again at 2026-08-22 validate, and the CARRIER argument is now ANSWERED.** The session
-  ended its turn on a live `run-validate.sh` with its OWN journal recording this lesson from the
-  tenth firing and stating the intent not to repeat it. Earlier firings argued the rule's carrier
-  was too weak — the agent definition, then the dispatch prompt. A session that wrote the rule down
-  itself and still ended the turn retires that: carriage is not the defect. No new date, 2026-08-22
-  being stamped already. **The DETECTOR exists and is deliberately inert, which is where the design
-  should go** — the `SubagentStop` probe logged `verdict=red live=yes` SIXTEEN times in one
-  37-minute window this iteration and is logging-only, so what is missing is a forcing function.
-  **Tenth firing, 2026-08-17 (`post-close-intake-and-index-port` validate) — the first to cost
-  evidence rather than turns.** It ended its turn on a live `run-validate.sh` to await a completion
-  notification that ending the turn prevents, then committed mid-run and dirtied the worktree
-  `installer_smoke` checks: `verdict=new-failures` on a false ground. No date — already stamped.
-  **Fourteenth firing, 2026-08-21 — grounds for that date:** validate ended a turn *in order to
-  wait* on the battery, inside the very iteration this defect was held out of for the port spine
-  (lead 2026-08-20; operator 2026-08-18) — the held limit came true. Record written, nothing lost.
-  recurrence: turn-end-chokepoint-and-wait-primitive 2026-08-18 2026-08-19 2026-08-21 2026-08-22
-  **Firings 11-13, 2026-08-18 — grounds for that date.** Three times a backgrounded producer exited
-  cleanly and the turn ended anyway: work finished, uncommitted, no completion notification,
-  recovered only by the operator noticing. The second half, measured on producers that *finished*.
-  Filed 2026-08-16 by close from the gap inbox, both halves; the drain re-verified the carrier
-  count and the chokepoint scoping against the SPEC rather than taking the bullet's prose.
 
 - **done-slug-ownership-citation-report** [design-pending] — governed prose says a queue slug
   "owns" an open question in the present tense, and nothing notices when that slug lands.
