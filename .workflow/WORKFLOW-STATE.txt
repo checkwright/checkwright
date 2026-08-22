@@ -4,12 +4,4 @@
 
 ---
 
-ruled-grant-surface-and-launch-chokepoint scope a1383029 2026-08-22 adc34529
-ruled-grant-surface-and-launch-chokepoint spec a3868a66 2026-08-22 52559491
-ruled-grant-surface-and-launch-chokepoint align a844336d 2026-08-22 eda90a12
-ruled-grant-surface-and-launch-chokepoint build a0b16026 2026-08-22 9058404d
-ruled-grant-surface-and-launch-chokepoint build a8ca9aff 2026-08-22 c6532c40
-ruled-grant-surface-and-launch-chokepoint build a77c810e 2026-08-22 4e651b75
-ruled-grant-surface-and-launch-chokepoint validate a6582d95 2026-08-22 d4fbd36a
-ruled-grant-surface-and-launch-chokepoint build a89d9afa 2026-08-22 f42a347d
-ruled-grant-surface-and-launch-chokepoint close a580af0f 2026-08-22 987fceeb
+— scope a84368aa 2026-08-22 473c73d9
