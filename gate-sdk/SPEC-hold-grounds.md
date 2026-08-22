@@ -57,10 +57,10 @@ entry:
 - §The `# graph:` manifest, ruling the field's payload a bare slug: *"a
   temporary hold's home is a **queue entry**, which already carries the ground,
   the cost and the disposition"*.
-- §The first cohort, and the rule that selects the next: *"`# port-until:` names
-  the owning entry, **that entry carries the disposition, and the gate's own
-  section carries the ground**. A member may not declare the field until its own
-  section states its cause"*.
+- §The port-candidate criteria, criterion 7's worked-example passage: *"`#
+  port-until:` names the owning entry, **that entry carries the disposition, and
+  the gate's own section carries the ground**. A member may not declare the field
+  until its own section states its cause"*.
 
 A session reading the first files the ground in the entry and is done; a session
 reading the second reds on that. Both are live prose in one document. Delta 1
@@ -106,6 +106,12 @@ budget arm cannot select until `cohort-held-members-port-prerequisites`
 moves"*. Two members return to the takeable tier and the budget arm can compose
 a cut again.
 
+**Operator-ratified 2026-08-22, relayed through the lead.** The envelope this
+section states — retire both holds, port neither member this iteration — is an
+operator ruling on the disposition this amendment reasoned to, not a scoping
+choice this amendment made unilaterally. Grounds are the section above and are
+not restated.
+
 ### The provenance seam, and the config surface
 
 **Kit mechanism:** the `# port-until:` field, its readers, assertion H's rule,
@@ -137,9 +143,9 @@ Config-via-env is satisfied by having nothing to configure.
 ### (1) One home for a held member's ground
 
 §The `# graph:` manifest stops claiming the queue entry carries a held member's
-ground, and §The first cohort's split — **entry carries the disposition and the
-cost, the gate's own SPEC section carries the ground** — becomes the single
-statement of it. **{design-bearing}**
+ground, and §The port-candidate criteria's split — **entry carries the
+disposition and the cost, the gate's own SPEC section carries the ground** —
+becomes the single statement of it. **{design-bearing}**
 
 The refusal that paragraph exists for is **unchanged and re-grounded**: the
 field's payload stays a bare slug, and a `<cause>` half is still refused. What
@@ -444,12 +450,13 @@ three.
   paragraph loses its claim that the queue entry carries the ground, and states
   the entry/section split; the `<cause>`-half refusal is re-grounded, not
   removed (delta 1).
-- gate-sdk/SPEC.md §The first cohort, and the rule that selects the next — its
-  ground/disposition split becomes the single statement rather than one of two,
-  and it records the post-amendment takeable-tier reading (deltas 1 and 7).
+- gate-sdk/SPEC.md §The first cohort, and the rule that selects the next — it
+  records the post-amendment takeable-tier reading (delta 7).
 - gate-sdk/SPEC.md §The port-candidate criteria, criterion 4 — gains the
   never-a-hold statement and the five ported members that evidence it (delta 2).
-- gate-sdk/SPEC.md §The port-candidate criteria, criterion 7 — gains the
+- gate-sdk/SPEC.md §The port-candidate criteria, criterion 7 — its
+  worked-example passage's ground/disposition split becomes the single
+  statement rather than one of two (delta 1); the criterion gains the
   hold-worthiness test, its two classes, the two recorded refusals, and the
   restatement that the tool reports invocations rather than classes; its
   `check-gate-assertions` worked-example paragraph keeps *how* the requirement
