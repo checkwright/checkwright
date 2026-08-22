@@ -79,7 +79,18 @@ three are advisory `bin/` tools; none joins `gates.list`.
 pattern): wired as the harness's session-start hook via
 `templates/settings-sessionstart.json`, it assembles the session brief.
 Every step is guarded and degrades silently — the hook never fails a
-session. Steps, in order:
+session.
+
+**A `hooks[]` edit arms immediately, and this is the kit set's record of it** —
+true of every hook registration in the settings file, not just this template's:
+the running session and its already-dispatched subagents pick it up with no
+restart and no re-dispatch. Measured rather than assumed, by watching a newly
+registered hook's log fill inside the same session that wrote the registration.
+It bounds what a session-start hook can be relied on for: arming is not the
+same event as the session brief, so a hook wired mid-session runs without ever
+having assembled one.
+
+Steps, in order:
 
 1. **Queue index** — via queue-kit's `queue-index` arm, reached through the
    battery runner's `--emit` front-end (queue-kit/SPEC.md §The queue-index arm),
