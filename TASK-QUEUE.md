@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: hold-ground-oracle-and-takeable-holds
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -141,9 +141,13 @@
   at 2026-08-21, one out-of-band decision each, paid by every dispatched session in every
   iteration. A plateau is the worse reading rather than the milder one: it is the steady-state
   price of an unbuilt ruled grant.
-  **HELD at the 2026-08-22 promotion, lead-ruled, on the ground stated rather than by omission:**
-  its design is ruled and the second half above is not, so promoting it now carries an unruled
-  half into a build. The recurrence threshold is met; the hold is a judgement, not an oversight.
+  **HELD TWICE on 2026-08-22, the second operator-ruled, on the ground stated rather than by
+  omission:** its design is ruled and the second half above is not, so promoting it now carries an
+  unruled half into a build. The threshold is met; the hold is a judgement, not an oversight.
+  **It IS landable, recorded so the neighbouring ruling is not misread onto it:** the ruled design
+  is guard-kit code, so the 2026-08-22 operator ruling that a permission-settings edit is
+  operator-class (TRAJECTORY.md §The closed rulings) does not reach it. That is the whole reason
+  the hook was chosen over an `Edit` rule, and a reader meeting both entries could infer otherwise.
   Filed 2026-08-16 by close; promoted 2026-08-22 at scope; re-deferred the same day at build, its
   design ruled and its class corrected rather than the work merely postponed.
 
@@ -586,18 +590,19 @@
   rather than a permitted exclusion. Every hold **and its grounds** are canonical at
   gate-sdk/SPEC.md §The first cohort; this entry carries only the work owed, so a ground
   stated there is cited here and never restated; the count is the roster's, never a fixed number.
-  **The spent holds are the SPEC's record, not this entry's** — `check-roadmap-fresh` (held on
-  cohort composition; ported with its own emitter in one commit, 2026-08-18), the POSIX ERE
-  engine (2026-08-13) and the associative-array bridge (2026-08-16, which also carried a second
-  channel of its class rather than splitting). Each hold, what it released and the ground it was
-  retired on are canonical at gate-sdk/SPEC.md §The first cohort, cited here and never restated.
-  **`check-tree-terms` owes more than its port — corrected 2026-08-13 at close** on the
-  mechanical confirmation the gap inbox asked for. Its corpus is `git ls-files` over the whole
-  tracked tree, pruned only by `GATE_PRUNE_DIRS` and the pattern-file basenames, and a live run
-  prunes neither `*/checks/` nor `native/src/` — so every declaration path lies inside the corpus
-  it scans as content, criterion 4's own predicate verbatim. The criterion-4 hold sits on top of
-  its port, so the leak-guard pair is not the clean first-cohort shape it reads as, and it is
-  independent of assertion C, which does not select it (`couples=scripts/msg-patterns.list`).
+  **The spent holds are the SPEC's record, not this entry's** — `check-roadmap-fresh`, the POSIX
+  ERE engine and the associative-array bridge, each canonical at gate-sdk/SPEC.md §The first cohort.
+  **`check-tree-terms` owes more than its port — corrected 2026-08-13 at close.** Its corpus is
+  `git ls-files` over the whole tracked tree, pruned only by `GATE_PRUNE_DIRS` and the pattern-file
+  basenames, so every declaration path lies inside the corpus it scans as content — criterion 4's
+  own predicate verbatim. The criterion-4 hold sits on top of its port, and is independent of
+  assertion C, which does not select it (`couples=scripts/msg-patterns.list`).
+  **A FOURTH holder never gained its cause — the 2026-08-22 scope survey, verified first-hand.**
+  `gate-sdk/SPEC.md §check-tree-terms` states no ground for its `# port-until:` at all, the one
+  shape §The port-candidate criteria forbids; the ground exists in THIS entry, the wrong home, and
+  `check-gate-exemption-tasks` asserts only that the slug resolves. `port-blockers.sh` plain lists
+  that member among the blocked not at all — git and grep are on the floor, and
+  `check-gate-assertions`' blocker is `paste -sd, -`, a join. Two dispositions; `/spec` rules both.
   **The hold's declarable spelling is PAID** (landed 2026-08-18 at build): `# port-until: <slug>`
   is minted on the shell declaration path with its readers, and every day-one holder declares it,
   so `port-blockers --group` leaves each cut a takeable set rather than a hand re-adjudication. The
@@ -4464,9 +4469,9 @@
   into `takeable-tier-batch-and-installer-noop`, the second on a probed ground the first lacked:
   the row is **not armed today**, the live baselined `fail` naming a slug that still resolves.
   None of the three declines the finding; each is discharged by having reached the authority.
-  **HELD a FOURTH time at the 2026-08-22 promotion, lead-ruled:** three firings, three operator
-  interrupts, three prior holds — and it still shares no surface with that iteration's prose-gate
-  spine. The recurrence count is unchanged at two, so the routing clause is still not reached.
+  **HELD a FOURTH and a FIFTH time on 2026-08-22, the second operator-ruled:** three firings, three
+  operator interrupts, and it shares no surface with either that day's prose-gate spine or the next
+  iteration's port hold grounds. Count unchanged at two, so the routing clause is still not reached.
   Filed 2026-08-10 by close, from its own blocked entry; the escape it needed is
   the evidence. Re-attested 2026-08-12 by close, again from its own blocked entry.
 
@@ -4858,7 +4863,11 @@
 
 - **agent-worktree-reclamation-unenforced** [design-pending] — the documented auto-clean for an
   unchanged read-only agent worktree does not fire, and nothing sweeps the residue.
-  recurrence: agent-worktree-reclamation-unenforced 2026-08-19
+  recurrence: agent-worktree-reclamation-unenforced 2026-08-19 2026-08-22
+  **Grounds for 2026-08-22, found at the iteration boundary by the scope session that stamped it.**
+  `git worktree list` reported `agent-af31cb92f3c50b68e`, LOCKED, at `5aac0757` — the *previous*
+  iteration's scope boundary stamp — with clean porcelain inside: the unchanged read-only case the
+  auto-clean documents, surviving a whole iteration. **HELD:** no surface with the ruled spine.
   Five worktrees from prior sessions were still on disk under `.claude/worktrees/` at four stale
   revisions (`c0d652f5` twice, `465ea869` twice, `32c009ca`), verified by `git worktree list`.
   **DISTINCT from `readonly-dispatch-isolation-unbuyable`**, deliberately: that entry is about
@@ -5445,9 +5454,9 @@
   ruled spine is the `check-graph` port, delegation-kit shares no surface with it, and two
   recurrences stay inside lead discretion. First held 2026-08-19 out of
   `takeable-tier-batch-and-installer-noop`, at a firing rate of once per iteration since.
-  **HELD a THIRD time at the 2026-08-22 promotion, lead-ruled:** the body itself concedes a gate
-  over tree state is very likely unbuildable, so the deliverable is a CHOICE between two non-gate
-  shapes rather than a gate — which is not spine-shaped for a prose-gate iteration.
+  **HELD a THIRD and a FOURTH time on 2026-08-22, the second operator-ruled:** the body itself
+  concedes a gate over tree state is very likely unbuildable, so the deliverable is a CHOICE between
+  two non-gate shapes — not spine-shaped for a prose-gate nor for a port-hold-grounds iteration.
   Filed 2026-08-13 by close, draining the gap inbox on operator direction to file, not promote.
 
 - **handoff-premise-reverification-placement** [design-pending] — `Probe-before-assertion` is
@@ -6288,10 +6297,10 @@
   backgrounded waiters died before their conditions went true, producers verifiably alive, while
   a `Monitor` call succeeded first try; a guard on the wrong primitive inherits its failure.
   **Why `[design-pending]`:** the surviving half measures a stated protocol ordering — not a patch.
-  **HELD at the 2026-08-22 promotion, lead-ruled on SURFACE DISJOINTNESS alone and explicitly NOT
-  on merit** — this entry carries the queue's highest recurrence (4 dates, 15 firings), and its
-  surviving half is a measurement plus a doctrine line rather than a build. Named by the lead the
-  LEADING CANDIDATE for the next iteration's spine.
+  **HELD TWICE on 2026-08-22 — on surface disjointness, then OPERATOR-RULED**, the operator taking
+  the port's hold grounds as the spine with this hold stated as the argument against it. Neither is
+  on merit: the queue's highest recurrence (4 dates, 15 firings), surviving half a measurement plus
+  a doctrine line. The prior "leading candidate for next spine" naming did not survive and is gone.
   **Cost while deferred:** each further firing costs an orphaned producer plus the lead turn that
   discovers it — and, as the tenth showed, can cost a whole suite's evidence.
   **It fired again in the very next iteration** (`port-tail-batching-and-cap-relief`, 2026-08-16):
@@ -6748,8 +6757,8 @@
   and hand-exports nothing. That route now has a home (gate-sdk/SPEC.md §Layout and
   configuration), so the unowned-fact half is DISCHARGED and what survives is ergonomics: the
   session still authors a scratch file to ask one question. No date — 2026-08-22 already stamped.
-  **HELD at the 2026-08-22 promotion, lead-ruled on SURFACE DISJOINTNESS from that iteration's
-  prose-gate spine and NOT on merit** — named there a leading candidate for the next spine.
+  **Held 2026-08-22 on surface disjointness, then TAKEN — operator-ruled the same day as the sole
+  rider of the port-hold-grounds iteration. Feature-class on two arms, so `/spec` promotes it.**
   Filed 2026-08-17 by the `post-close-intake-and-index-port` close into the gap inbox, off its
   own tooling-friction triage; promoted 2026-08-17 at scope, with `--for`'s path-keyed selection
   read off `run-gates.sh` before the neighbour's disclaimer was called incomplete.

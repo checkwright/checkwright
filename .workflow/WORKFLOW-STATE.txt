@@ -4,4 +4,4 @@
 
 ---
 
-— scope a07a2f29 2026-08-22 39733d17
+hold-ground-oracle-and-takeable-holds scope a07a2f29 2026-08-22 39733d17
