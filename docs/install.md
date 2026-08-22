@@ -63,8 +63,8 @@ per kit, so the adoption decision weighs a number rather than a guess.
 Checkwright is **Unix-first**, and specifically **GNU-first**: the engine is
 portable to any Unix that presents a GNU userland on `PATH`, which Linux
 distributions do out of the box. Windows runs it through WSL (Windows Subsystem
-for Linux), not natively — the gate battery and the git hooks are Bash scripts
-and no native-Windows shell path exists.
+for Linux), not natively — the battery's entry points and both generated git
+hooks run under bash and no native-Windows shell path exists.
 
 macOS runs it too, but as an adopter action rather than something the stock
 system delivers. Stock macOS ships bash 3.2 over a BSD userland whose `sort`,
@@ -80,8 +80,9 @@ your `PATH`, and the note says what breaks without it:
 
 <!-- toolchain:begin -->
 
-- `bash` (≥ 4.3) — every gate and both generated git hooks are Bash scripts;
-  nothing in the battery runs without it. The floor is the highest construct the
+- `bash` (≥ 4.3) — the shell library every gate loads through and both generated
+  git hooks are written in bash; nothing in the
+  battery runs without it. The floor is the highest construct the
   battery runs: a nameref (`local -n`) in the gate library every check sources.
   Associative arrays, `mapfile`, and the lowercasing case expansion are more
   widespread but only reach 4.0.
@@ -89,8 +90,9 @@ your `PATH`, and the note says what breaks without it:
   model is git-native end to end.
 - `jq` — the settings and evidence gates, and guard-kit's JSON tooling, parse
   their inputs with it.
-- `awk` (GNU) — the gate family's line scanning and field extraction are written
-  in awk; most checks cannot run without it. GNU awk specifically: the 3-argument
+- `awk` (GNU) — the gates still on the shell substrate and the generated hooks
+  do their line scanning and field extraction with it, so it stays on the floor
+  until that residue is gone. GNU awk specifically: the 3-argument
   `match()` in `check-gate-assertions` is a gawk extension.
 - `sort` (coreutils) — the battery's file plumbing assumes GNU coreutils, and
   `sort` is the member standing for that family. The binding construct is

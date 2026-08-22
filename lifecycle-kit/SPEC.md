@@ -1909,7 +1909,7 @@ exit 1). The stale-block report prints **every** hunk: the format and the
 uncapped contract are the crate renderer's, whose home is
 gate-sdk/SPEC.md §The diff renderer since it stopped being this gate's private
 mechanism, and this gate is its one live consumer. Resolution fails closed: a missing agent file, a begin marker without
-its end, or an errored awk capture is exit 2 — a half-written or unreadable
+its end, or an errored marker capture is exit 2 — a half-written or unreadable
 target must not pass as clean. The gate satisfies the four gate-sdk contracts
 (gate-sdk/SPEC.md §The gate model): the single `LIFECYCLE-REGISTRATION: clean`
 line and a `help:` remedy on each finding path (output); exit 2 on an
@@ -2604,7 +2604,7 @@ slot's content:
   you own the ritual prose, an upgrade's re-vendor does not reach it, and the
   shim gates do not cover it. It is kept deliberately — the blessed escape hatch
   that keeps legitimate structural divergence (different stages, a reshaped
-  machine) visible and contained, and the harness-agnostic floor the bare-bash
+  machine) visible and contained, and the harness-agnostic floor the
   upgrade smoke assumes; removing it would drive forks into edits of the
   vendored template, which break Phase-A upgrade determinism with no gate to
   catch them.

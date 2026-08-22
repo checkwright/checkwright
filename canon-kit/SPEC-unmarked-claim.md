@@ -6,7 +6,7 @@ Pairs with `TASK-QUEUE.md` entry **substrate-claim-staleness**.
 
 It is two things joined by one mechanism: a **new canon-kit gate**
 (`check-unmarked-claim`) that makes a declared class of prose claim carry an
-oracle, and the **thirteen-site prose repair** across eleven files that the gate
+oracle, and the **sixteen-site prose repair** across twelve files that the gate
 then holds. The repair is not a separate unit riding along — it is the gate's
 `bad/` corpus in the live tree, and landing either half alone leaves the other
 without its reason.
@@ -27,7 +27,7 @@ The queue entry filed the unit `[design-pending]` on a real fork: **(i)** widen
 the shipped `measured:` marker discipline onto the rewritten sentences — debt,
 minting no name, reaching only a claim that carries a number; or **(ii)** a new
 canon-kit sibling over a forbidden-literal roster — feature, reaching a
-re-authored claim but structurally missing three of the census's thirteen sites.
+re-authored claim but structurally missing three of the census's sites.
 The entry judged them complementary rather than exclusive and left the call here.
 
 **Ruled: they are one mechanism, not two units.** Arm (ii)'s roster is the
@@ -49,7 +49,7 @@ better than either arm alone, and each is checkable:
   oracle's value moves, every marked sentence reds, and the sentences that must
   change are enumerated by the gate rather than remembered.
 
-Arm (i) survives inside arm (ii) rather than being dropped: four of the thirteen
+Arm (i) survives inside arm (ii) rather than being dropped: four of the
 rewritten sites keep a substrate claim *and* carry a marker, which is arm (i)
 executed. What is refused is arm (i) **alone**, on the entry's own ground — it
 reaches only a claim carrying a number, and the definitional sites carry none.
@@ -158,10 +158,11 @@ the kit's prose never spells a member.
 same surface `check-measured-claim` scans, and for that section's stated reason
 (the manifest set omits binding shims by silent omission and the prose surface
 excludes them on a copy-shape ownership this rule is not covered by). Verified
-against the corpus rather than assumed: **all eleven census files already fall
+against the corpus rather than assumed: **all twelve touched files already fall
 inside this repo's setting of that knob** (`README.md`, `CONTRIBUTING.md`,
 `SECURITY.md` directly; `docs/index.md`, `docs/install.md`, `docs/methodology.md`,
-`docs/positioning.md` via `docs/*.md`; `gate-sdk/SPEC.md`, `lifecycle-kit/SPEC.md`
+`docs/positioning.md` via `docs/*.md`; `gate-sdk/SPEC.md`, `lifecycle-kit/SPEC.md`,
+`context-kit/SPEC.md`
 via `*/SPEC.md`; `gate-sdk/README.md`, `installer/README.md` via `*/README.md`).
 A second surface knob would therefore be a knob with no consumer, and
 §check-knob-citation would be the only thing that ever read it. The cost of
@@ -227,7 +228,7 @@ residue reaches zero the emitter returns `native`, every sentence marked
 `gate-substrates=native+shell` reds, and the gate enumerates the sentences to
 rewrite instead of a later reader finding them.
 
-### (5) The thirteen-site repair across eleven files
+### (5) The sixteen-site repair across twelve files
 
 Every row is a judgment about which half of a sentence is load-bearing, and none
 of it is a search-and-replace. **{design-bearing}**
@@ -237,12 +238,17 @@ witness are `.workflow/survey-record.md`'s 2026-08-22 block and are cited rather
 than restated; what follows is the **disposition** each site takes, which the
 census did not rule.
 
-The measurement every rewrite is sized on, re-run at this stage and unmoved:
-`bash gate-sdk/bin/port-blockers.sh --group` reports **104 scanned, 96 ported, 3
-permanently shell, 5 held, 0 takeable**. That is 96 and **eight**, of which only
-**three** are permanent — not 98 and six. A rewrite sized on six ships a second
-false number, which is why the count appears here once and every marked sentence
-takes it from the oracle rather than from this line.
+The measurement every rewrite is sized on, re-read at the moment of the edit
+rather than carried: `bash gate-sdk/bin/port-blockers.sh --group` reports **106
+scanned, 98 ported, 3 permanently shell, 5 held, 0 takeable**. The census sized
+this repair on 104 and 96; the oracle has since moved, because deltas 1 and 6 of
+this amendment and its in-flight sibling each landed a member native. That
+movement is the unit's own thesis executed on itself — the oracle is right and
+the line above it is a dated hypothesis. That is 98 ported and **eight** unported,
+of which only **three** are permanent. No marked sentence takes its value from
+this line: the four that carry a marker carry the extent key `gate-substrates`,
+which spells the substrate *set* and so does not go stale against a moving count
+at all.
 
 | # | site | disposition |
 |---|---|---|
@@ -250,24 +256,41 @@ takes it from the oracle rather than from this line.
 | 2 | `docs/index.md:62-63` | rewrite out of the class. The stated *cause* is also wrong: harness independence follows from no gate reading a harness surface, never from the implementation language. No marker. |
 | 3 | `docs/methodology.md:45-47` | keep the substrate claim, corrected, **marked** `gate-substrates`. This page's job is to say what the enforcing layer is. |
 | 4 | `docs/positioning.md:48-51` | tier one keeps its substrate sentence, corrected, **marked** `gate-substrates`. The tiering claim itself is untouched. |
-| 5 | `docs/install.md:83` | rewrite the **note half only**. The bullet's backticked head and parenthetical are held to `context-kit/lib/toolfloor.sh`'s `PROBE_SET` by `check-install-toolchain`; the prose after the em-dash is free, so no toolfloor change is owed. |
-| 6 | `docs/install.md:92` | as row 5 — note half only; `awk` stays on the floor because the shell residue and the generated hooks still invoke it. |
-| 7 | `gate-sdk/SPEC.md:5` | **the kit's definition of its central noun.** A gate is defined substrate-free; the definition must not need a marker, because a definition that carries a measurement is a definition with an expiry date. |
-| 8 | `gate-sdk/README.md:10` | the same definition, and it must land **word-for-word compatible** with row 7. **No gate holds this pairing in this tree**, verified at the read site rather than assumed: `check-surface-duplication` needs a `GLOSSARY.md` this repo does not carry and is unregistered in `scripts/gates.list` for exactly that reason (`canon-kit/README.md`'s roster already notes it — "needs a glossary (exits 2 without one)"), and its invariant is a different shape besides — one bold-lead-in definition of a *glossary* term outside the glossary, not two non-glossary surfaces agreeing with each other. The pairing is caught only by DoD review at merge (**Merged with no information lost**), never mechanically. |
-| 9 | `gate-sdk/SPEC.md:210` | rewrite: the library-sourcing parenthetical is true of a shell gate and false of a `.gate` member. Narrowed, not deleted. |
-| 10 | `lifecycle-kit/SPEC.md:1912` | rewrite: the fail-closed clause names the failure, not the tool that had it. The gate is ported (`native/src/gates/lifecycle_registration.rs`), so the tool named is not the one that runs. |
-| 11 | `SECURITY.md:42,44` | one finding, two lines. Rewrite so the threat statement covers a binary as well as a script, **marked** `gate-substrates`. The compiled-implementation trust story is **already correct** at `SECURITY.md:49-57` (digest-verified, citing gate-sdk/SPEC.md §Consumer payload) and is not touched — the threat model needs no widening, only the substrate wording. |
-| 12 | `installer/README.md:26-27` | the installer *is* bash and that stays true. What drops is the claim about the rest of the tree; the reviewability argument survives on the installer's own terms. |
-| 13 | `CONTRIBUTING.md:57-58` | **the inverse claim.** Qualified and **marked** `gate-substrates`. The build obligation it states is unchanged and correct; only its unqualified premise is false. |
+| 5 | `docs/install.md:66` | **not in the census; found by the gate against the live tree.** The Windows rationale is true of the entry points and the hooks and false of the battery as a whole, so it narrows to what actually forces WSL. No marker. |
+| 6 | `docs/install.md:83` | rewrite the **note half only**. The bullet's backticked head and parenthetical are held to `context-kit/lib/toolfloor.sh`'s `PROBE_SET` by `check-install-toolchain`; the prose after the em-dash is free, so no toolfloor change is owed. |
+| 7 | `docs/install.md:92` | as row 6 — note half only; `awk` stays on the floor because the shell residue and the generated hooks still invoke it. |
+| 8 | `gate-sdk/SPEC.md:5` | **the kit's definition of its central noun.** A gate is defined substrate-free; the definition must not need a marker, because a definition that carries a measurement is a definition with an expiry date. |
+| 9 | `gate-sdk/README.md:10` | the same definition, and it must land **word-for-word compatible** with row 8. **No gate holds this pairing in this tree**, verified at the read site rather than assumed: `check-surface-duplication` needs a `GLOSSARY.md` this repo does not carry and is unregistered in `scripts/gates.list` for exactly that reason (`canon-kit/README.md`'s roster already notes it — "needs a glossary (exits 2 without one)"), and its invariant is a different shape besides — one bold-lead-in definition of a *glossary* term outside the glossary, not two non-glossary surfaces agreeing with each other. The pairing is caught only by DoD review at merge (**Merged with no information lost**), never mechanically. |
+| 10 | `gate-sdk/SPEC.md:210` | rewrite: the library-sourcing parenthetical is true of a shell gate and false of a `.gate` member. Narrowed, not deleted. |
+| 11 | `lifecycle-kit/SPEC.md:1912` | rewrite: the fail-closed clause names the failure, not the tool that had it. The gate is ported (`native/src/gates/lifecycle_registration.rs`), so the tool named is not the one that runs. **The one site the class does not reach** — repaired by hand, per the honest limit below. |
+| 12 | `lifecycle-kit/SPEC.md:2607` | **not in the census; found by the gate.** True as written — the upgrade smoke *is* bash — but its substrate is gate-sdk/SPEC.md §upgrade-smoke's to state, and this sentence's load-bearing half is *harness-agnostic*, not the substrate. The epithet drops; nothing is rewritten into falsehood. No marker. |
+| 13 | `context-kit/SPEC.md:69` | **not in the census, and the twelfth file.** Also true as written of `pub-index.sh`. What is false is the parenthetical's *equation* of that substrate with Tier one, which row 4 falsifies the moment it lands. The tool's own altitude is kept and restated out of the class; the Tier-one citation survives as a citation. No marker. |
+| 14 | `SECURITY.md:42,44` | one finding, two lines. Rewrite so the threat statement covers a binary as well as a script, **marked** `gate-substrates`. The compiled-implementation trust story is **already correct** at `SECURITY.md:49-57` (digest-verified, citing gate-sdk/SPEC.md §Consumer payload) and is not touched — the threat model needs no widening, only the substrate wording. |
+| 15 | `installer/README.md:26-27` | the installer *is* bash and that stays true. What drops is the claim about the rest of the tree; the reviewability argument survives on the installer's own terms. |
+| 16 | `CONTRIBUTING.md:57-58` | **the inverse claim.** Qualified and **marked** `gate-substrates`. The build obligation it states is unchanged and correct; only its unqualified premise is false. |
 
-**`docs/install.md:193-198` survives untouched and is the model.** It already
-states 96 correctly under a live `measured:` marker bound to `ported-gate-members`
-— the one site the census found right, and the shape rows 3, 4, 11 and 13 adopt.
+**Sites are not reports, and the difference is worth stating once.** The gate
+reports **fourteen** findings over this table's sixteen rows, and the two gaps
+are structural rather than coverage. Rows 6 and 7 are one bullet block with no
+blank line between them, so §check-unmarked-claim's paragraph unit reports both
+at `docs/install.md:83` and both halves must be repaired to clear the single
+report. Row 11 is reported by nothing at all — it is the class's one measured
+miss, below. Rows 5, 12 and 13 are the inverse case: three sites the census never
+reached, surfaced by running the gate against the live tree, which is the ordinary
+outcome of shipping a scanner over a corpus a human enumerated by hand. Each was
+given the same read-site judgment as every census row rather than repaired to
+clear a report; rows 12 and 13 record the two that were true as written.
 
-**Three of the eleven are kit surfaces whose `docs/` mirror is generated** —
-`gate-sdk/SPEC.md`, `gate-sdk/README.md` and `lifecycle-kit/SPEC.md`, mirrored at
-`docs/gate-sdk/` and `docs/lifecycle-kit/`. Regenerate; never hand-edit the
-mirror. **`installer/README.md` is the fourth kit-shaped surface and is
+**`docs/install.md:195-200` survives untouched and is the model.** It already
+states 98 correctly under a live `measured:` marker bound to `ported-gate-members`
+— the one site the census found right, and the shape rows 3, 4, 14 and 16 adopt.
+
+**Four of the twelve are kit surfaces whose `docs/` mirror is generated** —
+`gate-sdk/SPEC.md`, `gate-sdk/README.md`, `lifecycle-kit/SPEC.md` and
+`context-kit/SPEC.md`, mirrored at
+`docs/gate-sdk/`, `docs/lifecycle-kit/` and `docs/context-kit/`. Regenerate; never
+hand-edit the
+mirror. **`installer/README.md` is the fifth kit-shaped surface and is
 deliberately not one of them**: `installer/` is not a kit, so there is no
 `docs/installer/` and its edit is a plain file edit — checked at this stage
 rather than assumed from its shape, because assuming the mirror exists would
@@ -293,20 +316,28 @@ gate stales, the generated pre-commit hook included. The four gate-sdk contracts
 (output, fail-closed, fixture-pair, self-lint) are gate-sdk/SPEC.md §The gate
 model's and are satisfied, not restated.
 
-## The honest limit — one site of thirteen, and it is a roster property
+## The honest limit — one site of sixteen, and it is a roster property
 
-**First, the count, because two true numbers are in circulation and a build
-session will meet both.** The census reports "twelve findings across eleven
-files" while its own sub-counts read `FALSE (9)` and `OVERSTATED (4)`, which sum
-to thirteen. Both are right and they count different things: **thirteen sites,
-twelve findings, eleven files.** The reconciling item is the gate-sdk definitional
-pair — `gate-sdk/SPEC.md:5` and `gate-sdk/README.md:10` are **one** finding (a
-single canonical definition) living in **two** files, so the headline counts it
-once and the `FALSE (9)` sub-count counts it twice. Delta 5's table is keyed on
-**sites**, which is why it has thirteen rows; the envelope the operator ruled is
-the same set either way, and nothing here widens or narrows it.
+**First, the count, because several true numbers are in circulation and a build
+session will meet all of them.** The census reported "twelve findings across
+eleven files" while its own sub-counts read `FALSE (9)` and `OVERSTATED (4)`,
+which sum to thirteen; the shipped gate, run against the live tree, reports
+fourteen. All three are right and they count different things: **sixteen sites,
+fourteen gate findings, twelve files**, against a census that had reached
+thirteen sites in eleven files by hand. Two reconciling items, and neither is a
+discrepancy: the gate-sdk definitional pair — `gate-sdk/SPEC.md:5` and
+`gate-sdk/README.md:10` are **one** canonical definition living in **two** files,
+so the census headline counts it once and the `FALSE (9)` sub-count counts it
+twice, while the gate (which knows only files and paragraphs) reports it twice —
+and the paragraph unit, which folds rows 6 and 7 into one report. Delta 5's table
+is keyed on **sites**, which is why it has sixteen rows. **The class the operator
+ruled on 2026-08-22 is the same class either way.** "All eleven files" recorded
+how far the census had reached that day, not a boundary; the three sites the gate
+adds are members of the ruled class that the hand enumeration had not yet
+reached, and declining one because a table written before the gate existed omits
+it would reproduce the very error the operator's correction removed.
 
-Against the roster delta 3 declares, **twelve of the thirteen sites fall inside
+Against the roster delta 3 declares, **fifteen of the sixteen sites fall inside
 the class and one does not**: `lifecycle-kit/SPEC.md:1912`'s bare `awk` token,
 excluded on the measured noise ground in delta 3. The census's own reading of the
 originally-proposed roster was **three** structurally missed — a bare token, a
@@ -361,7 +392,7 @@ battery run — no new enabling config, and the key is live the moment the emitt
 ships. Consumers: `check-measured-claim` arm A (compares the marker's value to
 the emitted value) and arm B (the key is now in the roster, so a marker naming it
 no longer fails closed). Read at the single scan transition, per marker; no
-persistent state. **The four sites that will carry it** are rows 3, 4, 11 and 13
+persistent state. **The four sites that will carry it** are rows 3, 4, 14 and 16
 of delta 5 — named here because a key with no marker naming it is a field with no
 reader, and would be removed.
 
@@ -380,7 +411,7 @@ by name, gains a fourth.
 
 **No corpus is narrowed by this amendment**, so point 5 of the
 causal-completeness check (each reader's red condition under a narrowing) does
-not bind. Stated rather than skipped: delta 5 edits eleven files and adds none
+not bind. Stated rather than skipped: delta 5 edits twelve files and adds none
 to and removes none from any gate's scanned set, and delta 2 adds a reader to an
 existing surface knob without changing the glob array. The one place a set
 *grows* is the measured-claims roster (delta 4), and a key added to a roster can
@@ -439,14 +470,16 @@ Each names the delta that owns it.
   the new gate adds no contract to the model and no gate-sdk knob. Its
   `# graph:` manifest and its descriptor format are consumed by existing
   machinery unchanged (delta 6).
-- **The eleven prose surfaces** — `README.md`, `docs/index.md`,
+- **The twelve prose surfaces** — `README.md`, `docs/index.md`,
   `docs/methodology.md`, `docs/positioning.md`, `docs/install.md`,
   `gate-sdk/SPEC.md`, `gate-sdk/README.md`, `lifecycle-kit/SPEC.md`,
+  `context-kit/SPEC.md`,
   `SECURITY.md`, `installer/README.md`, `CONTRIBUTING.md`, each per its row in
   delta 5's table (delta 5). `gate-sdk/SPEC.md` appears both here and above
   because it is edited by two different deltas at two different sections.
 - **The `docs/` kit mirror** — `docs/gate-sdk/SPEC.md`, `docs/gate-sdk/README.md`,
-  `docs/lifecycle-kit/SPEC.md`, `docs/canon-kit/SPEC.md` and
+  `docs/lifecycle-kit/SPEC.md`, `docs/context-kit/SPEC.md`,
+  `docs/canon-kit/SPEC.md` and
   `docs/canon-kit/README.md` are generated projections that go stale the moment
   their source is edited. The regen commands and their freshness gates are
   rostered at docs/site-architecture.md §Generated projections; the merge runs
@@ -465,7 +498,7 @@ Each names the delta that owns it.
   from `bash gate-sdk/bin/port-blockers.sh --group` at the moment of the edit. If
   the number has moved since this amendment was written, the amendment is wrong
   and the oracle is right — that asymmetry is the entire point of the unit.
-- **Row 7 and row 8 land together or not at all.** Two surfaces carry one
+- **Row 8 and row 9 land together or not at all.** Two surfaces carry one
   canonical definition; splitting them across batches ships a tree where the
   kit's SPEC and its README define the same noun differently, and **no gate
   would find it in this repo** — `check-surface-duplication` is unregistered
@@ -479,7 +512,7 @@ Each names the delta that owns it.
   holds. A build session wanting the quotes reads that block.
 - **No gap is filed by this amendment.** The one adjacent question surfaced
   while authoring — whether the definitional sites should carry a marker at all —
-  is *ruled* in delta 5 rows 7 and 8 rather than deferred, so nothing is owed to
+  is *ruled* in delta 5 rows 8 and 9 rather than deferred, so nothing is owed to
   the gap inbox from here.
 
 ## Definition of Done

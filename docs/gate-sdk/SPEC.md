@@ -7,7 +7,7 @@ generated: true
 
 Machine-gated consistency for the surfaces conventional linters ignore:
 markdown specs, glossaries, task queues, config projections, diagrams — any
-text whose drift is mechanically decidable. A **gate** is a small shell script
+text whose drift is mechanically decidable. A **gate** is a small program
 that checks one invariant across one or more governed surfaces and blocks the
 commit (or the merge) when they disagree.
 
@@ -212,8 +212,9 @@ Paths are
 repo-root-relative; every entry point `cd`s to `git rev-parse --show-toplevel`
 before resolving them.
 
-`lib/gate.sh` auto-sources the consumer config seam on load, so every gate (all
-source the library) sees the same knob resolution: `GATE_SDK_CONFIG_FILE` when
+`lib/gate.sh` auto-sources the consumer config seam on load, so every gate sees
+the same knob resolution, whether it sources the library itself or is dispatched
+through it as a `.gate` member: `GATE_SDK_CONFIG_FILE` when
 set — and a set-but-missing path exits 2 rather than silently running on
 defaults (an operator typo must not pass as clean) — else
 `<gates-dir>/gate-sdk-config.sh`, sourced only when the file exists — a

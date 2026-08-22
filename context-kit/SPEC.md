@@ -66,7 +66,7 @@ three are advisory `bin/` tools; none joins `gates.list`.
   it — a second adopter's tree carries a TypeScript surface its Rust-only copy
   could not index — not before: an unrequested plugin framework would have
   been scaffolding, and AST/tree-sitter parsing is above the tool's grep-grade
-  portability altitude (bare bash + coreutils, Tier one).
+  portability altitude (shell over coreutils, Tier one).
 
 ## The session-context hook (template)
 

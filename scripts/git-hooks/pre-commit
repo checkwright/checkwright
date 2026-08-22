@@ -364,7 +364,7 @@ if staged_matches '*.md' 'scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'contex
 fi
 
 if staged_matches '*.md' 'scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh'; then
-    run_gate check-unmarked-claim env GATE_SDK_KNOB_CANON_KIT_CLAIM_CLASSES_CMD= $'GATE_SDK_KNOB_CANON_KIT_MEASURED_SURFACE_GLOBS=CLAUDE.md\tREADME.md\tCONTRIBUTING.md\tCODE_OF_CONDUCT.md\tSECURITY.md\tRELEASING.md\tROADMAP.md\tTRAJECTORY.md\t*/SPEC.md\t*/README.md\treserve/*/README.md\tdoctrine-kit/DOCTRINE.md\tdocs/*.md\tdocs/*/index.md\tdocs/posts/*.md\t.claude/commands/*.md' GATE_SDK_KNOB_CANON_KIT_CLAIM_CLASS_IDS= GATE_SDK_KNOB_CANON_KIT_CLAIM_CLASS_PATTERNS= native/target/release/checkwright-gates check-unmarked-claim
+    run_gate check-unmarked-claim env $'GATE_SDK_KNOB_CANON_KIT_CLAIM_CLASSES_CMD=bash scripts/claim-classes.sh' $'GATE_SDK_KNOB_CANON_KIT_MEASURED_SURFACE_GLOBS=CLAUDE.md\tREADME.md\tCONTRIBUTING.md\tCODE_OF_CONDUCT.md\tSECURITY.md\tRELEASING.md\tROADMAP.md\tTRAJECTORY.md\t*/SPEC.md\t*/README.md\treserve/*/README.md\tdoctrine-kit/DOCTRINE.md\tdocs/*.md\tdocs/*/index.md\tdocs/posts/*.md\t.claude/commands/*.md' GATE_SDK_KNOB_CANON_KIT_CLAIM_CLASS_IDS=gate-substrates $'GATE_SDK_KNOB_CANON_KIT_CLAIM_CLASS_PATTERNS=bare[ -]bash|are bash scripts|is a small shell script|written in awk|all source the library|vendored kit is bash|the one language the rest of the tree is written in|dispatch(es)? to a compiled subcommand' native/target/release/checkwright-gates check-unmarked-claim
 fi
 
 if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md' '.gitignore'; then

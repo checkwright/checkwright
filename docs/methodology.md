@@ -42,8 +42,10 @@ positive is treated as a defect in the gate, not a cost of doing business.
 
 ## The enforcement core carries no harness dependency
 
-The part that does the blocking (the gate battery) is bare bash over a
-coreutils toolchain. No gate reads a harness surface, so the enforcement core
+<!-- measured: gate-substrates=native+shell -->
+The part that does the blocking (the gate battery) is a prebuilt binary beside a
+shell residue, over a coreutils toolchain. No gate reads a harness surface, so
+the enforcement core
 runs under any coding-agent harness, under any CI, or under no harness at all:
 there is no harness dependency in the layer that must be trustworthy. The
 shaping layer (the always-loaded convention the agent reads each session)

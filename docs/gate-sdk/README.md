@@ -12,7 +12,7 @@ agents do the writing: a stateless agent session cannot be trusted to
 *remember* conventions, so the conventions are enforced by machine-run gates
 that block the commit instead.
 
-A **gate** is a small shell script checking one invariant across one or more
+A **gate** is a small program checking one invariant across one or more
 governed surfaces. The kit ships the machinery that keeps a gate family
 honest:
 

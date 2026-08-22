@@ -24,9 +24,9 @@ vendored keeps working — it needs nothing from a package registry again.
 ## Implementation
 
 Bash. npm is the delivery vehicle, never the implementation: the `bin` entry is
-a bash script, so a reader reviewing what they are about to run reads the one
-language the rest of the tree is written in, and the linter that governs every
-other script in the repository governs these too.
+a bash script, so a reader reviewing what they are about to run reads source
+rather than a build product, and the linter that governs every other script in
+the repository governs these too.
 
 ## Requirements
 

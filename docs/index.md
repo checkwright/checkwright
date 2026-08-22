@@ -59,8 +59,9 @@ for scaling agent [orchestration](orchestration.md) past the point where a human
 reads every hop: coordination is only worth parallelizing once each coordinated
 result is checkable.
 
-The enforcement core carries no harness dependency. The gate battery is bare
-bash, so it runs under any coding-agent harness, any CI, or none. Only the
+The enforcement core carries no harness dependency. No gate reads a harness
+surface, so the battery runs under any coding-agent harness, any CI, or none.
+Only the
 always-loaded convention adapts, riding whichever agent file your harness reads
 by configuration rather than a port, per the
 [tiered compatibility claim](positioning.md#the-tiered-compatibility-claim).

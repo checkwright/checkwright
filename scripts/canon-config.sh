@@ -74,6 +74,10 @@ CANON_KIT_MEASURED_CLAIMS_CMD="bash scripts/measured-claims.sh"
 # shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing
 CANON_KIT_MEASURED_SURFACE_GLOBS=("${CANON_KIT_MANIFEST_FILES[@]}" ".claude/commands/*.md")
 
+# comment-tier-exempt: this repo's claim-class roster — the classes are consumer config for the same provenance-seam reason the transport, payload and measured vocabularies above are, and more sharply: the roster spells this project's own positioning vocabulary, so a kit literal carrying it would publish it and canon-kit/SPEC.md would match its own class while describing it; the scanned surface is CANON_KIT_MEASURED_SURFACE_GLOBS above rather than a second knob, since every site the class reaches already falls inside it
+# shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing
+CANON_KIT_CLAIM_CLASSES_CMD="bash scripts/claim-classes.sh"
+
 # comment-tier-exempt: the enum-set emitter derives the queue-tag set from queue-kit's own tag parser plus this repo's lesson tags, so a prose enumeration of the tag vocabulary that drops a member is caught rather than trusted
 # shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing
 CANON_KIT_ENUM_SETS_CMD="bash scripts/enum-sets.sh"

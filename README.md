@@ -6,7 +6,7 @@
 **Verification for coding-agent delivery.** Checkwright is the verification
 layer under agent orchestration: spec drift, skipped stages, and unsupported
 *done* claims become failing checks before a merge, instead of review findings
-after one. It ships as installable kits — bare-bash gates plus an
+after one. It ships as installable kits — harness-independent gates plus an
 evidence-stamped iteration lifecycle designed for stateless agent sessions.
 
 **For the maintainer of a repository coding agents write most of**, who has to

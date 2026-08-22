@@ -430,8 +430,9 @@ unset, and the loader exits 2 on a malformed config. Knobs:
   a spelling of what one project claims about itself, so it is consumer config for
   the same provenance-seam reason the vocabularies above are, and for one more:
   this kit's own SPEC is governed prose, so a kit literal here would match its own
-  class while describing it. The gate reads `CANON_KIT_MEASURED_SURFACE_GLOBS`
-  above for its corpus and adds no surface knob. `CANON_KIT_CLAIM_CLASS_IDS` / `CANON_KIT_CLAIM_CLASS_PATTERNS` —
+  class while describing it. This repo sets `bash scripts/claim-classes.sh`. The
+  gate reads `CANON_KIT_MEASURED_SURFACE_GLOBS` above for its corpus and adds no
+  surface knob. `CANON_KIT_CLAIM_CLASS_IDS` / `CANON_KIT_CLAIM_CLASS_PATTERNS` —
   that command's parsed output in the same bridged, index-aligned shape as the
   transport and payload pairs above, default empty arrays.
 - `CANON_KIT_COMMENT_MACHINE` / `CANON_KIT_COMMENT_REASON` — arrays, default
