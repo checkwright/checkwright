@@ -5149,7 +5149,12 @@ enforcing it.
   `SMOKE_KIT_ROOT` = the vendored copy of the installing kit. The executable
   form of that kit's README install steps: register its gates in
   `scripts/gates.list`, establish the minimal governed surface its gates need
-  to be green, and regenerate the hook + graph artifacts. *Which* gates it
+  to be green, and regenerate the hook + graph artifacts. **Copying the kit's own
+  templates in is not part of that contract**: a smoke script installs a template
+  only where a registered gate reads one — site-kit's `templates/site-health.yml`
+  is the shipped instance — so a kit whose templates no gate reads copies none,
+  and whether a given kit copies is read off its script rather than assumed.
+  *Which* gates it
   registers is not the author's discretion — *The registration accounting*
   below rules on every omission, and the installer's own narrower subset is
   derived from the same per-gate declarations (§The install disposition) rather

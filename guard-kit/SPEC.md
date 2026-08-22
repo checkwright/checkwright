@@ -1186,6 +1186,19 @@ make a command expressible in one tab-separated cell: `@ROOT@` becomes the git
 sandbox root, and `@NL@` becomes a newline — without the second a heredoc case
 cannot be written at all, and the heredoc class would ship untested.
 
+**Any ad-hoc invocation of a consumer's guard script must set `GUARD_KIT_LOG` to
+a scratch path**, because the logger's default is the *live* friction log and a
+throwaway probe otherwise files its synthetic commands as real friction. The
+kit's own runners all set it — the decision table into its sandbox, the
+`scan-prompts` fixture into its own — so the convention is invisible until a
+hand-written latency or behaviour probe drives `bash-guard.sh` in a loop and
+poisons the next close's ranking with its payload. Measured rather than
+hypothetical: one such probe contributed 30 of 237 ranked prompting calls at a
+single close, ranking second. **No scanner is proposed:** the polluting caller is
+a one-off script in the gitignored scratch dir, so there is no committed corpus
+to scan and the convention is carried by this sentence and by
+`bin/scratch-run.sh`'s echo-at-execution.
+
 **The decision table is the instrument for any change to what the guard
 refuses, and its red condition is not monotone.** A change that *narrows*
 refusal cannot be cleared by inspection, because the table fails on a verdict
