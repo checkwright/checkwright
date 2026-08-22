@@ -6157,6 +6157,42 @@
   Filed 2026-08-16 by close from the gap inbox; filed by the build re-entry that fixed the
   instance rather than designing the gate in flight.
 
+- **fixture-assertion-coverage-unmeasured** [design-pending] — no surface records which of a
+  gate's assertions its fixture pair actually reaches, and no gate derives it.
+  **gate-sdk/SPEC.md §The port-candidate criteria states the discharge condition well** — criterion
+  4's pair must carry every arm of the derivation being ported — but the condition is asserted per
+  port and verified by nobody, so a port can satisfy the sentence and ship the hole it points at.
+  **The cost is attested rather than theorised.** `check-graph` shipped for months with a
+  `good/`+`bad/` pair whose two `args` files were both `--amend-only`: exactly ONE of its nine
+  assertions was fixtured, and A/B/C/D/E/F/H/I rested on a live tree that was green because it was
+  clean. A human reading the two args files at spec 2026-08-21 found it, no oracle did, and the
+  widening to nine-of-nine was that iteration's build work (gate-sdk/SPEC.md §check-graph). Every
+  other multi-arm member is in the same unmeasured position and nobody knows which.
+  **Re-verified at promotion, and it NARROWS the candidate set.** Both `args` files still read
+  `--amend-only` today: the nine-of-nine discharge was bought with **bespoke drivers**
+  (`check-graph-tree.test.sh` for A-F, `check-graph-refs`/`-cap` for H and I), not by widening the
+  pair — because a case runs one argv, and only `--amend-only` reaches an assertion without also
+  reaching D and E. So an oracle phrased as *the pair's `expect.txt` must cover every assertion* is
+  falsified by the very member that motivated it; the unit of coverage is the member's whole driver
+  set, which is what makes the derivation hard.
+  **Candidate shapes, none costed:** an assertion-id roster per gate that the driver set must
+  cover; a coverage arm on `check-gate-fixture-coverage` comparing exercised paths against the
+  module's assertion set; or a stated per-member coverage line in each gate's SPEC section —
+  derivation-first's weakest arm, since it is maintained rather than derived.
+  **DISTINCT from three siblings.** `unregistered-gate-fixture-coverage` asks whether a member has
+  a pair at all; `gate-file-coverage-closure` asks whether a gate is inside `check-gate-tamper`'s
+  glob; `fixture-assertion-liveness` asks whether a pair's expected strings are still emitted.
+  This asks which of a member's assertions any driver reaches.
+  **Why `[design-pending]`:** the three shapes differ in kind — a maintained roster, a new gate
+  arm, and a SPEC convention — and choosing needs the assertion-identity question answered first,
+  a Rust `// assertion X` comment being no machine-readable id today.
+  Class: the first two shapes mint a governed name, so canon-kit's litmus makes it a **feature**.
+  **Cost while deferred:** criterion 4's discharge is asserted per port and verified by nobody, so
+  every remaining port re-buys a hand audit or ships without one.
+  Surfaced 2026-08-21 draining the knowledge-friction log at `graph-port-and-config-seam`'s close;
+  promoted 2026-08-22 at scope from the carried gap inbox, which re-verified both args files and
+  the discharge record against the tree.
+
 - **turn-end-chokepoint-and-wait-primitive** [design-pending] — two open mechanism questions the
   wait rule's fifth firing raised, neither answerable from the ruling that closed its prose half.
   **This is the design half of `waiting-rule-fourth-firing-post-fix`**, whose surviving question is
