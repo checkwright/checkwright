@@ -208,7 +208,9 @@ exception is forced rather than chosen.** Its predicate is *the pattern literal
 placeholder — the quoted operand is the normal spelling — so a skeleton view
 would blind the rule to the only thing it tests. It pays for the exception in the
 same conservative direction every other clause takes: it declines outright on any
-expansion, substitution or backtick (rule 6 blocks those shapes anyway), and a
+expansion, substitution or backtick (rule 6 blocks the expansion and substitution
+shapes; the backtick decline is this rule's own arm, per the raw-command reading
+above), and a
 pattern operand carrying a stray quote — the evidence that the compound split
 landed *inside* a quoted span — declines rather than guesses at the operand.
 
@@ -780,7 +782,8 @@ that harness exists would be designing against no case.
     out of band anyway and converts that decision into a durable steer. Fires per statement
     (`;`/`&&`/`||`/`|` split), so a decorated form steers on the same premise as
     the bare one. Conservative by construction: expansions and backticks decline
-    outright (rule 6 already blocks them), option words are skipped, and a
+    outright (rule 6 already blocks the expansions; the backtick arm is this
+    rule's own), option words are skipped, and a
     tracked *directory* under `rm -r` does not match `--error-unmatch` — each
     biases toward passing rather than a false steer. An untracked or gitignored
     target never matches, so scratch deletion is untouched.

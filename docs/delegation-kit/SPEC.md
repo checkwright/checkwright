@@ -883,10 +883,15 @@ list does not name one for:
   two-valued — the pair is the reading, never `live` alone.
 - **`keys`** — the payload's top-level key set, nothing more. Read **once**, at
   the first firing, to settle what a `SubagentStop` payload carries without
-  asserting anything about it in advance. Values are deliberately not logged: the
-  payload is already known to name no background task, PID or shell id, so the key
-  set is the whole of what remains unknown, and logging values would put
-  transcript paths and prompt ids into a file for no reader.
+  asserting anything about it in advance. **It returned against the advance
+  claim**, which is the whole reason the field logs the set rather than assuming
+  it: the payload carries a top-level `background_tasks`, so the pre-wiring premise
+  that it names no background task was wrong, and only the key read caught it.
+  Values stay unlogged on the ground that survives that correction — logging them
+  would put transcript paths and prompt ids into a file for no reader — so what
+  `background_tasks` actually carries is **unsettled**, and reading it is a change
+  to this privacy ruling rather than a free follow-up. The question is filed as
+  `subagent-stop-payload-background-tasks-read`.
 
 **`records` is counted by the hook's own `*.run` glob, not parsed back out of the
 reader**, and the reason is the reader's output contract rather than convenience:

@@ -104,3 +104,4 @@
 | budget-batch-and-account-identity-kind | sc sp a b v c | 2f/1d | 2 · ≤0d | 24s 1✗ | 104 |
 | takeable-tier-batch-and-installer-noop | sc sp a b v c | 8f/3d | 3 · ≤0d | 24s clean | 104 |
 | graph-port-and-config-seam | sc sp a b v c | 2f/1d | 2 · ≤0d | 24s clean | 104 |
+| ruled-grant-surface-and-launch-chokepoint | sc sp a b v c | 7f/1d | 3 · ≤0d | 31s 1✗ | 104 |
