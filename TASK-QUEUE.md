@@ -55,10 +55,10 @@
   and it re-cut the graph config seam to a data-only contract on the way. Its findings, its size
   and its criterion-4 discharge are gate-sdk/SPEC.md §check-graph's, as the sixth cut's are
   §The sixth budget batch's.
-  **The composer has nothing left to compose from, which is the state that decides the next cut.**
-  Read at this cut, `--group` reports the **takeable tier empty** and the owed remainder down by
-  one: every member still owed now sits behind a prerequisite, so the budget arm cannot select
-  until `cohort-held-members-port-prerequisites` moves — the next port unit, not a wider cut here.
+  **The composer has an input again, which is the state that decides the next cut.**
+  `cohort-held-members-port-prerequisites` moved at the 2026-08-23 close, retiring two ungrounded
+  holds, and the takeable tier is non-empty again. What the next cut composes from is the trailer
+  read at that cut — this paragraph says only that the arm is unblocked, never by how much.
   **The PRIORITY DIRECTIVE yields on that measurement for the 2026-08-22 iteration alone —
   operator-ruled, relayed through the lead — and is NOT reversed, demoted or re-scoped.**
   Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
@@ -340,11 +340,11 @@
   (queue-kit/SPEC.md §check-queue-entry-budget), both seated only by compressing an answered ground
   out of the same entry. The relief works and is documented; the spend has no owner.
   recurrence: entry-cap-displaces-mandated-writes 2026-08-20 2026-08-21 2026-08-22
-  **Six more firings, 2026-08-22 — grounds for that date, and the SPLIT reading gets its
-  counter-evidence.** Landing one operator ruling took six mandated writes, three seated at 1 or 0
-  headroom; the one at 0 was relieved by PROMOTION, this entry's own "unrecorded relief valve",
-  exercised deliberately for the first time. The colliders were the most recently RULED-ON rather
-  than the longest-lived — evidence AGAINST splitting, since a ruling lands wherever it rules.
+  **Nine more firings, 2026-08-22 — grounds for that date, and the SPLIT reading gets its
+  counter-evidence twice.** Six landed one operator ruling, three at 1 or 0 headroom, the one at 0
+  relieved by PROMOTION — the "unrecorded relief valve", exercised deliberately. Three more reddened
+  scope's own mandated writes at 51/53/51 against 50, the first set MEASURED by the gate rather than
+  by hand. Both sets' colliders were the most recently RULED-ON, not the longest-lived.
   **Twelve more firings, 2026-08-20/21 — grounds for those dates, and the class NARROWS.** Seven at
   scope landed authority rulings onto five entries at 0 headroom; two at build compressed by
   answering spent grounds; three were that drain's own recurrence stamps. The taxed class is the
@@ -7258,6 +7258,37 @@
   stays plausible.
   Filed 2026-08-19 into the gap inbox by the `budget-batch-and-account-identity-kind` close;
   promoted at the following scope's drain, the matching grep re-run there before the claim moved.
+
+- **iteration-scoping-clause-date-ambiguity** [design-pending] — a clause scoping a ruling to one
+  iteration by DATE cannot name it, because this tree opens several iterations a day.
+  **The instance, measured rather than argued.** `native-gate-port-remaining-corpus` carries "the
+  PRIORITY DIRECTIVE yields ... for the 2026-08-22 iteration alone". Two iterations scoped on
+  2026-08-22 — `substrate-claim-and-update-target-coverage` and
+  `hold-ground-oracle-and-takeable-holds` — probed at this drain against the stamp HISTORY, since
+  `.workflow/WORKFLOW-STATE.txt` is boundary-truncated and only `git show` reaches the earlier one.
+  It cost the 2026-08-22 scope one escalation question and will cost the next reader one.
+  **The same defect hits the `HELD at the <date> promotion` form**, two live instances, both dated
+  2026-08-22 and neither able to say which of that day's two promotions it records.
+  **Deliverable: a clause scoping a ruling to one iteration names the ITERATION, not its date.**
+  The iteration name is unique by construction — it is the queue header and the state file's first
+  field — where the date is not.
+  **Do NOT re-scope the yield ruling itself — operator-class.** Rewriting that clause to name an
+  iteration would DECIDE which one it meant, which is substance and not spelling, and is why this
+  drain promoted rather than fixed.
+  **DISTINCT from `deferred-entry-time-deixis-rot`** (relative deixis — "this iteration" — silently
+  re-pointing as the header moves) **and from `deferred-entry-defer-date-unasserted`** (a
+  provenance date malformed or absent). Both are a date stale or missing; this is a date that is
+  present, correct and still ambiguous. The adjacency worth composing against: deixis-rot's own
+  second candidate shape is "rule that a deferred entry names its iteration", the same REMEDY for a
+  different defect, so a scope promoting either should price them together.
+  **Why `[design-pending]`:** whether this is gateable is open. A scanner for `the <date> iteration`
+  and `at the <date> promotion` is cheap, but which clause forms fall in the class is a ruling the
+  strings do not carry, and the corpus is the same pool deixis-rot names.
+  **Cost while deferred:** every one-iteration scoping clause written from here on is ambiguous the
+  day a second iteration opens, and the ambiguity is invisible — the sentence stays grammatical, the
+  date stays correct, and the reader who misresolves it has no tell.
+  Filed 2026-08-22 into the gap inbox by scope; promoted at this iteration's close drain, the
+  two-scope-stamps claim re-verified against git history before the promotion.
 
 - **spec-lib-dead-derivation** [design-pending] — three section-builder regexes in
   `canon-kit/lib/spec.sh` have no reader left in the tree, and nothing rules what they are.
