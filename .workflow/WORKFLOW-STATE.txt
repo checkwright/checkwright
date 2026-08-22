@@ -9,3 +9,4 @@ hold-ground-oracle-and-takeable-holds spec a1e45164 2026-08-22 fc9da9b4
 hold-ground-oracle-and-takeable-holds align a035980a 2026-08-22 ea5a6445
 hold-ground-oracle-and-takeable-holds build a4f1b40e 2026-08-22 c45b77ed
 hold-ground-oracle-and-takeable-holds build a25dcefa 2026-08-23 0d2fbec2
+hold-ground-oracle-and-takeable-holds validate a8f948af 2026-08-23 24f4273c
