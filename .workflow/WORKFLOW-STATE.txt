@@ -5,3 +5,4 @@
 ---
 
 hold-ground-oracle-and-takeable-holds scope a07a2f29 2026-08-22 39733d17
+hold-ground-oracle-and-takeable-holds spec a1e45164 2026-08-22 fc9da9b4
