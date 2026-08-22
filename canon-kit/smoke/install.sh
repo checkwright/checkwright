@@ -30,6 +30,7 @@ check-spec-fence-balance
 check-spec-pointer
 check-todo-task-liveness
 check-tracking-claim
+check-unmarked-claim
 EOF
 
 # smoke-unregistered: check-surface-duplication — the glossary topology it reads (CANON_KIT_GLOSSARY_FILE, default GLOSSARY.md) is optional and this tree ships none, so its exit 2 is uncorroborated only because the invoking repo lacks the same optional surface, not because the gate is broken
