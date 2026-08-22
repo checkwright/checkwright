@@ -3,6 +3,7 @@
 pub mod action_gh_repo;
 pub mod action_pinning;
 pub mod amendment_queue;
+pub mod amendment_update_target;
 pub mod agent_tier_explicit;
 pub mod assertion_strength;
 pub mod brevity;
@@ -661,6 +662,22 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_ACTIVE_SECTIONS",
             "CANON_KIT_DEFERRED_SECTION",
             "CANON_KIT_ICEBOX_SECTION",
+        ],
+        "canon-kit",
+    ),
+    // spec: canon-kit/SPEC.md §check-amendment-update-target — the amendment finder is the walk
+    // and the scan root is this member's own first argument with a `.` default, so the root stays
+    // the `?` the cohort declares; the knob set is `spec::amendments`' and nothing else, because
+    // the two heading names are kit constants rather than config
+    (
+        "check-amendment-update-target",
+        amendment_update_target::run,
+        &[("?", "")],
+        &[
+            "GATE_PRUNE_DIRS",
+            "GATE_KIT_ROOTS_HERE",
+            "CANON_KIT_SCAN_KIT_ROOTS",
+            "CANON_KIT_AMENDMENT_GLOB",
         ],
         "canon-kit",
     ),

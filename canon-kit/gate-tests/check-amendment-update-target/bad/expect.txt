@@ -1,0 +1,8 @@
+delta headings outside the '### (<N>) <title>' form
+SPEC-thing.md:5: ### A1. the bold-token grammar {design-bearing}
+delta numbers that are not 1..n unique and ascending
+SPEC-thing.md:13: delta (3) stands where (2) is owed
+update targets citing no delta
+SPEC-thing.md:19: - **surface/one.md**
+citations naming a delta the amendment does not define
+SPEC-thing.md:22: cites delta 7, which no '### (7)' heading defines

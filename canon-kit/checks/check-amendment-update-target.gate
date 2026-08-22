@@ -1,0 +1,3 @@
+# graph: couples=SPEC-*.md,*/SPEC-*.md,native/src/gates/amendment_update_target.rs,native/src/spec.rs dir=one valve=none tier=precommit
+# install: zero-config
+# spec: canon-kit/SPEC.md §check-amendment-update-target — every entry under an amendment's `## Existing sections updated` cites at least one delta and every cited delta is defined under `## What changes` in the same amendment, so an update target no delta claims stops at the gate rather than reaching build as an orphan a batch adopts on its own authority

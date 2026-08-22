@@ -8,6 +8,7 @@ SDK="$SMOKE_KIT_ROOT/../gate-sdk"   # the vendored gate-sdk beside this kit
 cat >> scripts/gates.list <<'EOF'
 # canon-kit (check-surface-duplication omitted — needs a glossary)
 check-amendment-queue
+check-amendment-update-target
 check-spec-dod-singleton
 check-spec-derivable-section
 check-spec-embedded-source

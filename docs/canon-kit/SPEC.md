@@ -84,6 +84,38 @@ design *ruling* is design work — it goes to the deferred section
 `[design-pending]` until scope rules on it. Enforced by
 `check-amendment-queue`.
 
+**The delta-ID grammar.** An amendment's `## What changes` is a sequence of
+**deltas**, and both a delta and a citation to one have a pinned form. Pinned
+because the next section requires each update target to name the delta that
+owns it, and a name no surface specifies is unmechanizable: a gate cannot match
+a grammar the template never states.
+
+A **delta** is a `###` heading under `## What changes` of the form
+`### (<N>) <title>`, where `<N>` is a positive decimal integer written without a
+leading zero and `<title>` is non-empty. Delta numbers begin at one and are
+**sequential and unique** within the amendment — a gap or a repeat means a delta
+was split or dropped without its citations moving, which is the drift this
+grammar exists to make visible.
+
+A **citation** is the token `delta <N>` or `deltas <N>` (case-insensitive),
+optionally continuing into further integers separated by commas and/or the word
+`and`; a trailing possessive (`delta 3's`) is the same citation. The literal
+`all deltas` cites **every** delta the amendment defines — the form a
+whole-amendment update target already uses in practice (a generated mirror is
+stale the moment any delta lands), admitted rather than forced into an
+enumeration that would itself drift as deltas are added.
+
+A heading rather than a bold lead-in token, because a heading gives a delta an
+anchor a reader can link to and a scanner can find in one pass, and it survives
+reordering under a diff more legibly than a token buried in a paragraph. The
+**work-class tag** an amendment may carry (`{mechanical}` / `{design-bearing}`)
+is deliberately **outside** this grammar: its owner is the roster's
+authoring-stage template and its reader is the iteration lead at batch-cut, so
+carrying it inside the delta token would tie two independent conventions to one
+string and stop either changing without the other. Stated as a non-target so a
+later reader does not read the silence as an omission. Enforced by
+`check-amendment-update-target`.
+
 An amendment file is **outside the governed manifest**: `CANON_KIT_MANIFEST_FILES`
 globs `*/SPEC.md`, which `SPEC-<name>.md` does not match, so the prose and knob
 gates never scan one. Their obligations attach at the merge rather than at the
@@ -460,7 +492,8 @@ each degrading to "no icebox" rather than to a wrong section when left unset. Va
 Each gate below owns its own section — the assertion, its fixture pair, and the
 reason for any bespoke unit test beside it. The bespoke unit tests are named
 together here, because a roster spread across per-gate sections is one no reader
-and no oracle sees whole: `check-comment-tier.test.sh`,
+and no oracle sees whole: `check-amendment-update-target.test.sh`,
+`check-comment-tier.test.sh`,
 `check-deprecation-task.test.sh`, `check-docs-link-convention.test.sh`,
 `check-knob-citation.test.sh`, `check-knob-default-coupling.test.sh`,
 `check-manifest-count.test.sh`, `check-md-refs.test.sh`,
@@ -644,6 +677,17 @@ same shapes:
   (gate-sdk/SPEC.md §The port-candidate criteria, criterion 2) reaches
   **undocumented** surface only, and this bullet documents it. The live holder is
   `native/src/spec.rs`.
+  Its consumers are `check-amendment-queue` and
+  `check-amendment-update-target`, and they **differ in fail-closed posture on
+  purpose** — so the crate holds two spellings of one walk, `amendments` and
+  `amendments_strict`, rather than one that reads as drift. The best-effort form
+  swallows an unwalkable scan root and yields no amendments, which the queue gate
+  can afford because an empty amendment set cannot hide a violation there (every
+  `[spec:]` ref then dangles and the run reds). The update-target gate has no
+  second surface to contradict an empty set, so for it an empty set hides every
+  violation silently and the walk refuses instead. Each section states its own
+  half; the difference is a reasoned divergence, never an inconsistency to
+  reconcile.
 - **The default-statement grammar** both knob gates share, so the rule for
   what reads as a stated default has one home. `sk_literal_at` recognizes the
   value literal opening a window (a backticked non-knob string, a quoted string,
@@ -686,7 +730,11 @@ carrying the tag reds nowhere, and queue-kit's lead-line gate misses it too
 grammar is a bare slug line, so the tag is dropped by that grammar rather
 than by a gate. The guard is total over the *promotion* moves it exists to
 catch — design-pending → an active section — and silent on the disposition
-move.
+move. This is a limit on *this* gate's axis only: the amendment artifact is
+held on a second axis by `check-amendment-update-target`
+(§check-amendment-update-target), whose corpus is the same amendment set and
+whose subject is what the file says about itself rather than how it pairs with
+the queue.
 
 **The amendment finder is best-effort, and the port had to reproduce that
 rather than harden it.** `spec_amendments` ends `2>/dev/null … || true`, so an
@@ -700,6 +748,101 @@ because the natural port instinct is to add the refusal, and the sibling
 `check-todo-task-liveness` — which *does* refuse on a bad scan root — makes the
 instinct look precedented. That member's shell form carried the `-d` guard;
 this one never has.
+
+### check-amendment-update-target
+
+Invariant: in every amendment on disk, each entry under
+`## Existing sections updated` cites at least one delta, and every cited delta is
+defined under `## What changes` in the same amendment. The grammar it reads —
+what a delta is, what a citation looks like — is contract, stated at
+§The amendment lifecycle and shown to the author in
+`templates/SPEC-amendment.md`.
+
+The failure it closes is attested: an update target no delta claims **reaches
+build as an orphan a batch adopts on its own authority**, which is the
+template's own words for it. That is not hypothetical — one iteration dropped a
+tightened-gates declaration across all three of its build batches, and a fourth
+batch repaired it at validate.
+
+**Three arms and a valve.**
+
+- **A — the grammar.** Red (exit 1) when a `###` heading under `## What changes`
+  does not match `### (<N>) <title>`, or when the delta numbers, read in
+  document order, are not `1..n` unique and ascending. This is the arm that makes
+  B and C possible at all. Only the **first** ordering breach in a file is
+  reported: inserting one delta shifts every number after it, so reporting each
+  would bury the single edit that caused them.
+- **B — the uncited target.** Red when a top-level `-` bullet under
+  `## Existing sections updated` carries no citation. The bullet's entry is the
+  bullet line plus its indented continuation, so a citation that wrapped across a
+  newline is still one subject — the same wrap-straddling boundary
+  §check-unmarked-claim crosses, for the same reason.
+- **C — the dangling citation.** Red when a citation names an `<N>` no
+  `### (<N>)` heading defines, `all deltas` in an amendment that defines none
+  included. Without C, arms A and B both pass on an amendment whose targets cite
+  deltas that were renumbered out from under them.
+- **Valve** — `<!-- update-target-exempt: <reason> -->` on the bullet's first
+  line or the one above, riding the shared exempt-window (§lib/spec.sh — the line
+  or the one above), and the reason is mandatory (the `comment-tier-exempt:`
+  convention). An exempt bullet leaves the target count as well as the finding.
+
+A fenced block is skipped whole, on the ground §The amendment lifecycle already
+gives the fence its exemption for: an amendment may embed a wire-contract delta
+until merge, and a heading or a bullet inside one is grammar being shown rather
+than a delta being defined.
+
+**Fail-closed (exit 2):** a scan root that is not a directory; an amendment
+carrying `## Existing sections updated` but no `## What changes`, where no entry
+*can* be owned and no arm could say which to blame; a file the finder returns and
+the reader cannot read; and **an unwalkable scan root**, where
+§check-amendment-queue's best-effort finder returns empty instead. That last
+divergence is deliberate and is the one to read carefully: the queue gate can
+afford an empty amendment set because its other direction contradicts it, while
+here an empty set hides every violation silently. The two spellings of the walk
+live at §lib/spec.sh, which owns the asymmetry.
+
+**No new knob, and the reason is not laziness.** The corpus is `spec_amendments`
+(§lib/spec.sh) — the same finder §check-amendment-queue uses, already applying
+the `templates/` exclusion that keeps a shipped `SPEC-amendment.md` skeleton from
+being read as a live amendment, so the skeleton's illustrative headings cannot
+red the gate that governs its copies. The two heading names are **kit constants,
+not config**: they are canon-kit's own template's headings, and a consumer
+editing them has edited canon-kit's artifact rather than configured it. The
+contrast with §check-spec-dod-singleton's configurable Definition-of-Done heading
+is real, and the line is where the surface is authored — that heading appears in
+**consumer-authored canonical specs**, these appear in **copies of a kit-shipped
+skeleton**. A knob is available later behind an attested consumer rename; adding
+one now would be a knob whose only reader is §check-knob-citation.
+
+**Deliberately not asserted: roster completeness.** The gate cannot check that
+the update-target roster names every surface the change obliges a write to —
+that is a claim about the world, not about the file, and no scanner reaches it.
+It asserts the decidable half (every listed target is owned) and the align stage
+keeps the other half, whose duty is unchanged: arm B catches a target that was
+*listed and unowned*, never one that was never listed at all. Two stronger arms
+were weighed and refused. Requiring **every delta to be cited by some target** is
+false — a delta adding a wholly new section legitimately touches no existing one.
+Requiring **every path or `§` reference in a delta body to appear in the roster**
+would be high-false-positive, because a delta body names many surfaces for
+context, and a gate that cries wolf trains its readers to bypass it (gate-sdk/SPEC.md
+§When a gate earns its place).
+
+**Criterion 4** (gate-sdk/SPEC.md §The port-candidate criteria) **clears**: the
+corpus is `spec_amendments`, which reaches no gate declaration path. **Born
+native**, no shell form authored — a crate-carrying tree births a gate native by
+default and none of the three exception classes applies. Its `good/`+`bad/` pair
+is its oracle: the `bad/` case carries a malformed heading, a non-sequential
+delta number, an uncited target and a dangling citation together, so each arm has
+an executable statement, while the `good/` case exercises the wrapped citation,
+the list and possessive forms, `all deltas`, the fenced decoy and the valve.
+`check-amendment-update-target.test.sh` holds the fail-closed exits and the
+empty-corpus clean, which a one-pair harness cannot spell.
+
+Producer of nothing but a verdict; its consumer is the committing session through
+the output contract, on the generated pre-commit hook, `run-gates.sh` and CI, and
+`run-gate-tests.sh` through the fixture pair. Its input is `spec_amendments`'
+output — an existing producer with an existing enabling path, so nothing new must
+be configured for the gate to see a live corpus. `precommit` tier.
 
 ### check-spec-dod-singleton
 

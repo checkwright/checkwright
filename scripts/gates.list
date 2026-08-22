@@ -65,6 +65,7 @@ check-queue-prose-precondition
 check-queue-slug-liveness
 check-roadmap-fresh
 check-amendment-queue
+check-amendment-update-target
 check-spec-dod-singleton
 check-spec-derivable-section
 check-spec-embedded-source

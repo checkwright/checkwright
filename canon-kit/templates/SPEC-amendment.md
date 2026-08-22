@@ -18,7 +18,13 @@
 ## What changes
 
 <!-- The delta: new invariants, states, interfaces, error behavior. Each will
-     land in its proper canonical-spec section at merge — write it so it can. -->
+     land in its proper canonical-spec section at merge — write it so it can.
+
+     Each delta is a heading of the form `### (<N>) <title>` — <N> a positive
+     integer, no leading zero, numbering from 1, sequential and unique within
+     this file. A gap or a repeat means a delta was split or dropped without its
+     citations moving. Renumber a delta and you move its citations with it.
+     Checked by check-amendment-update-target. -->
 
 ## Producers and consumers
 
@@ -38,7 +44,16 @@
 <!-- Any canonical-spec section describing the prior flow that this change
      touches — updated here, in the amendment, not left to drift. Each entry
      names the delta that owns it; an update target no delta claims reaches
-     build as an orphan a batch adopts on its own authority. -->
+     build as an orphan a batch adopts on its own authority.
+
+     A citation is `delta <N>` or `deltas <N>` (case-insensitive), continuing
+     into further integers through commas and/or the word `and` — `(deltas 2, 3)`,
+     `(deltas 1 and 4)`; `delta 3's` is the same citation. `all deltas` cites
+     every delta this file defines, for a target (a generated mirror, say) that
+     goes stale the moment any of them lands. For a target deliberately owned by
+     no delta, tag `<!-- update-target-exempt: <reason> -->` on the bullet's first
+     line or the one above — the reason is mandatory. Checked by
+     check-amendment-update-target. -->
 
 <!-- The one sanctioned copy exemption: an amendment may embed a wire-contract
      delta (e.g. a fenced proto block) until merge, because it is the design

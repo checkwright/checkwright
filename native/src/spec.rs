@@ -151,13 +151,27 @@ pub fn canonical_specs(root: &str) -> Result<Vec<PathBuf>, String> {
 // `templates/`-filtered and kit-root pruned, selecting by a glob on the basename where
 // `canonical_specs` above selects by a literal name
 pub fn amendments(root: &str) -> Result<Vec<PathBuf>, String> {
+    amendments_walk(root, false)
+}
+
+// spec: canon-kit/SPEC.md §lib/spec.sh — the same walk with the swallow removed, for the
+// consumer whose empty set would hide every violation instead of contradicting itself
+pub fn amendments_strict(root: &str) -> Result<Vec<PathBuf>, String> {
+    amendments_walk(root, true)
+}
+
+fn amendments_walk(root: &str, strict: bool) -> Result<Vec<PathBuf>, String> {
     let glob = knob("CANON_KIT_AMENDMENT_GLOB")?;
     let prune = walk::prune_dirs()?;
     // spec: canon-kit/SPEC.md §check-amendment-queue — the finder is best-effort by
     // construction, its shell form ending `2>/dev/null … || true`: an unwalkable scan root
     // yields no amendments rather than a refusal, and that section owns why
-    let walked = walk::find_with_prune(Path::new(root), &|n| prune.iter().any(|d| d == n))
-        .unwrap_or_default();
+    let walked = walk::find_with_prune(Path::new(root), &|n| prune.iter().any(|d| d == n));
+    let walked = match walked {
+        Ok(w) => w,
+        Err(e) if strict => return Err(e),
+        Err(_) => Vec::new(),
+    };
     let hits: Vec<PathBuf> = walked
         .into_iter()
     .filter(|p| {

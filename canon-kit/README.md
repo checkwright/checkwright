@@ -26,6 +26,7 @@ reads the tag syntax [queue-kit](../queue-kit/) defines.
    <!-- gate-roster:begin -->
    ```
    check-amendment-queue        # needs a task queue
+   check-amendment-update-target # every update target cites a delta the amendment defines
    check-spec-dod-singleton     # needs canonical specs
    check-spec-derivable-section # needs canonical specs
    check-spec-embedded-source   # needs canonical specs + tracked source
