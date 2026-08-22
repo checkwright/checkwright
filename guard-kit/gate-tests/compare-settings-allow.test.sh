@@ -33,6 +33,20 @@ printf '%s\n' '{ "permissions": { "allow": ["Bash(git fetch --dry-run)"] } }' > 
 printf '%s\n' 'GUARD_KIT_BREADTH_PROBES=("Bash(git reset --hard)")' > "$sb/probes.sh"
 printf '%s\n' '# no probes declared' > "$sb/empty.sh"
 
+# The declaration is keyed on the exact local allow-rule string; 'off-by-one.sh'
+# differs from the overlay entry by one character and must not silence it.
+two_probes='GUARD_KIT_BREADTH_PROBES=("Bash(git reset --hard)" "Bash(gh repo delete)")'
+{
+    printf '%s\n' "$two_probes"
+    printf '%s\n' 'declare -A GUARD_KIT_BREADTH_DECLARED=(["Bash(git *)"]="sandbox repo, every git write is disposable")'
+} > "$sb/declared.sh"
+{
+    printf '%s\n' "$two_probes"
+    printf '%s\n' 'declare -A GUARD_KIT_BREADTH_DECLARED=(["Bash(git*)"]="one character off the overlay entry")'
+} > "$sb/off-by-one.sh"
+
+printf '%s\n' '{ "permissions": { "allow": ["Bash(git *)", "Bash(gh *)"] } }' > "$sb/mixed.json"
+
 # Firing probe: the blanket glob auto-allows the destructive probe, reported with its witness.
 firing="$(run "$sb/broad.json" "$sb/probes.sh")"
 assert_has firing-section  'settings allowlist breadth' "$firing"
@@ -59,6 +73,37 @@ c_empty="$(run "$sb/broad.json" "$sb/empty.sh" --count)"
 c_absent="$(run "$sb/does-not-exist.json" "$sb/probes.sh" --count)"
 [[ "$c_absent" == "0 0" ]] || { echo "FAIL [count-absent]: expected '0 0', got '$c_absent'"; fails=$((fails + 1)); }
 
+# Empty declaration map (every case above): the declared subsection is absent too.
+assert_absent empty-declared-silent 'advisory — declared intended' "$firing"
+
+# An over-broad set that is entirely declared: the declared section prints with its
+# reason, and no narrowing section and no false clean line appear.
+all_declared="$(run "$sb/broad.json" "$sb/declared.sh")"
+assert_has    all-declared-section  'advisory — declared intended' "$all_declared"
+assert_has    all-declared-reason   'sandbox repo, every git write is disposable' "$all_declared"
+assert_absent all-declared-narrow   'advisory — narrowing candidates' "$all_declared"
+assert_absent all-declared-clean    'no over-broad local entries' "$all_declared"
+
+# A mixed set: the declared entry leaves the narrowing set, the undeclared one stays.
+mixed="$(run "$sb/mixed.json" "$sb/declared.sh")"
+assert_has mixed-narrowing 'advisory — narrowing candidates' "$mixed"
+assert_has mixed-undeclared 'Bash(gh *)  ⊇  Bash(gh repo delete)' "$mixed"
+assert_has mixed-declared  'Bash(git *)  ⊇  Bash(git reset --hard)  — sandbox repo' "$mixed"
+# The narrowing lane prints the pair bare; only the declared lane appends the reason,
+# so an exact whole-line match on the bare pair is the partition assertion.
+grep -qxF -- '  Bash(git *)  ⊇  Bash(git reset --hard)' <<<"$mixed" \
+    && { echo "FAIL [mixed-partition]: the declared glob is still in the narrowing set"; fails=$((fails + 1)); }
+
+# --count: the breadth number counts narrowing candidates, so the declared entry is excluded.
+c_mixed="$(run "$sb/mixed.json" "$sb/declared.sh" --count)"
+[[ "$c_mixed" == "0 1" ]] || { echo "FAIL [count-declared]: expected '0 1', got '$c_mixed'"; fails=$((fails + 1)); }
+
+# Exactness: a declaration one character off the overlay entry silences nothing.
+off="$(run "$sb/broad.json" "$sb/off-by-one.sh")"
+assert_has    off-by-one-narrowing 'advisory — narrowing candidates' "$off"
+assert_has    off-by-one-entry     'Bash(git *)  ⊇  Bash(git reset --hard)' "$off"
+assert_absent off-by-one-declared  'advisory — declared intended' "$off"
+
 [[ "$fails" -eq 0 ]] || { echo "compare-settings-allow.test: $fails assertion(s) failed"; exit 1; }
-echo "compare-settings-allow.test: clean (a firing probe names its witnessing glob, a non-firing probe reports clean, an empty probe set omits the section)"
+echo "compare-settings-allow.test: clean (a firing probe names its witnessing glob, a non-firing probe reports clean, an empty probe set omits the section, a declared breadth moves out of the narrowing set and out of --count, and an exactness miss silences nothing)"
 exit 0

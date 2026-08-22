@@ -12,59 +12,6 @@
 
 ## New Features
 
-- **settings-allow-intended-breadth-declaration** [spec: SPEC-breadth-declaration.md]
-  — `compare-settings-allow` offers the operator two dispositions and ships a mechanism for one.
-  guard-kit/SPEC.md §compare-settings-allow states the pair — narrow the glob, **or record
-  that the breadth is intended** — but only narrowing is expressible, so a glob ruled intended
-  re-reports at every close and the ruling survives only in a session's memory or a commit
-  message, the surface spec-over-precedent says is not ground truth.
-  **Deliverable:** an intended-breadth declaration knob beside `GUARD_KIT_BREADTH_PROBES`
-  (guard-kit/SPEC.md §Layout and configuration), default empty, so a declared glob prints as
-  declared rather than as a finding. Consumer config, never a kit literal — every string
-  naming a command is the consumer's vocabulary (CLAUDE.md §The provenance seam), the seam
-  that already makes the probe set config. Cost: one knob, one branch in
-  `bin/compare-settings-allow.sh`, one bespoke unit-test case; the tool is advisory rather
-  than a gate, so no fixture pair is owed.
-  **The motivating instance is gone; the gap is not.** The filing bullet described a standing
-  finding over two broad globs. Four probes at the drain say otherwise as of 2026-08-13: the
-  local overlay carries neither `Bash(git *)` nor `Bash(git checkout *)`, the breadth section
-  prints no over-broad entries, `permissions.defaultMode` is already `auto` in the *user*
-  settings file with no git allow entries there, and both settings files were written minutes
-  after the bullet was filed. Nothing re-reports today, so this is filed on the general gap —
-  a stated disposition no mechanism can express — and not on the instance.
-  **The two premise corrections that fed the operator's re-judgment**, kept because the 2026-08-20
-  direction rests on them, and both read off the vendor permission-modes page rather than inferred.
-  The 2026-08-13 ruling's stated premise — fewer blocking prompts is the point — does not survive
-  that page: auto mode removes routine prompts via a classifier and must live in the *user*
-  settings file, since v2.1.142 and later ignore `auto` from a repository's own settings. And the
-  correction runs the *other* way from the one first drafted: an allow match short-circuits the
-  classifier outright, so a surviving broad rule *saves* model calls rather than buying nothing.
-  The case for narrowing is therefore **security alone**, the ground 2026-08-20 was ruled on.
-  **RULED — BUILD IT, operator 2026-08-20 via the lead: the knob ships, glob-plus-reason.** A bare
-  list re-loses the reason it exists to keep. Consumer config beside `GUARD_KIT_BREADTH_PROBES`,
-  default empty, never a kit literal — the provenance seam in full, every string naming a command
-  being the consumer's vocabulary. **The shape fork is ruled with it: the COMMITTED file only.** A
-  declaration is a durable ruling about intended breadth, so it belongs in the tracked surface
-  spec-over-precedent can find; overlay globs stay per-clone and keep re-reporting, which is honest
-  rather than a gap, since they were never ruled. Bought for the next cycle rather than to silence
-  a live finding — nothing re-reports today, and the record should not imply otherwise.
-  **Why it needed design first: the amendment was unwritten, not the design.** Both shape
-  questions this entry carried are ANSWERED above — the committed file only, and
-  glob-plus-reason — so what remains is authoring, which is why `spec` promotes it rather
-  than scope.
-  **Cost while deferred:** zero in reports, non-zero in attention. With the instance gone
-  nothing re-prints, so the carry is that the next intended-broad glob reproduces the whole
-  cycle — close finding, escalation, operator ruling, nowhere to put it — the cycle this
-  filing just paid for once.
-  Filed 2026-08-13 by close from its own gap-inbox drain; the instance-vs-gap split and both
-  premise corrections are the drain's. **In `ruled-grant-surface-and-launch-chokepoint`'s ruled
-  set, operator 2026-08-22 via the lead**; feature-class, so `spec` authors and promotes it.
-  **PROMOTED 2026-08-22 at spec as `SPEC-breadth-declaration.md`.** The amendment settles the
-  ruling's reading rather than re-deciding it: *the committed file only* fixes where a
-  declaration **lives** (the tracked config), not which file's globs are scanned — the corpus
-  stays the local overlay, on guard-kit/SPEC.md §compare-settings-allow's own sentence naming
-  the local glob as the report's subject. The wider reading is refused there in writing.
-
 - **subagent-stop-liveness-hook-wiring** [spec: SPEC-stop-liveness.md]
   — the wired half of the turn-end hook probe, which no agent session may authorize.
   The **documentary** half is settled and lives on `turn-end-chokepoint-and-wait-primitive`: the
@@ -7689,6 +7636,7 @@
 
 ## Done
 
+- settings-allow-intended-breadth-declaration
 
 ## Lessons Learned
 

@@ -55,9 +55,10 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
 
 Configuration follows the established kit pattern — override any knob in
 `guard-config.sh` (log paths, settings paths, `GUARD_KIT_RO_SCRIPTS`,
-`GUARD_KIT_RO_BINS`, `GUARD_KIT_SCRATCH_DIRS`, `GUARD_KIT_BREADTH_PROBES`);
-defaults are this repo's layout, and the probe set defaults to empty because
-its contents are your project's vocabulary, not the kit's.
+`GUARD_KIT_RO_BINS`, `GUARD_KIT_SCRATCH_DIRS`, `GUARD_KIT_BREADTH_PROBES`,
+`GUARD_KIT_BREADTH_DECLARED`); defaults are this repo's layout, and the probe set
+and the declaration map both default to empty because their contents are your
+project's vocabulary, not the kit's.
 
 ## Use
 

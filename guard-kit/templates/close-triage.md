@@ -27,11 +27,18 @@ of lifecycle-kit's `tooling-friction triage` placeholder (close skill, step 2).
    each has its own disposition.
    - **Redundant**: remove every listed `settings.local.json` entry (a committed
      glob already grants it).
-   - **Too broad**: for every entry the breadth report names, either narrow the
-     glob or record that its breadth is intended. The probe printed beside it is
-     the witness — the command that glob auto-allows. An empty breadth report is
+   - **Too broad**: for every entry the report lists as a *narrowing candidate*,
+     either narrow the glob or record that its breadth is intended — as a
+     `GUARD_KIT_BREADTH_DECLARED` entry (glob plus reason) in the committed
+     `guard-config.sh`, which moves it into the report's *declared intended*
+     section and stops it re-reporting. A per-clone note does not: the ruling is
+     durable only where it is tracked. The probe printed beside an entry is the
+     witness — the command that glob auto-allows. An empty breadth report is
      not a proof of narrowness: probes are witnesses, and no completeness is
      claimed (the section is absent entirely when no probes are declared).
+     Read the declared section too — it is the record of what was ruled, and a
+     declaration whose glob is gone from the overlay is spent and should be
+     dropped.
 
    - **Not content-pinned**: an entry naming a *script path* rather than a fixed
      command grants whatever that file says at run time, so its meaning changes
