@@ -65,6 +65,92 @@
   promoted at spec and demoted at build once per increment on the entry-outlives-the-amendment
   branch — seven so far, each cut's own record staying at its SPEC section.
 
+- **substrate-claim-staleness** [design-pending] — governed prose asserts the enforcement core's
+  implementation substrate, and an incremental port falsifies it with nothing watching.
+  **OPERATOR-RULED 2026-08-22: fix it as a scoped unit, not out of band and not left to ordinary
+  priority.** Relayed by the lead through the gap inbox; scope promotes it.
+  **THREE sites, each re-verified first-hand here rather than relayed:** `README.md:9`
+  ("bare-bash gates" — hyphenated, which is exactly why one hand grep proved a FALSE negative
+  about that whole file), `docs/positioning.md:48` and `docs/methodology.md:45` (both "the gate
+  battery is bare bash over a coreutils toolchain").
+  **The measurement that falsifies them**, `bash gate-sdk/bin/port-blockers.sh --group` at
+  2026-08-22: 104 scanned, **96 already ported, 3 permanently shell, 5 temporarily held** — 96 and
+  EIGHT, of which only three are permanent. NOT 98 and six; a rewrite sized on six would ship a
+  second false number inside the docs it is fixing.
+  **The shipped docs set already contradicts itself**, which is what makes this measured rather
+  than a judgement call: `docs/install.md:193-198` says 96 gates dispatch to the compiled binary
+  today and the rest is still shell, under a live `measured:` marker binding it to the
+  `ported-gate-members` oracle key — the half that is measurably right.
+  **The load-bearing half SURVIVES and must survive the rewrite:** no gate reads a harness
+  surface, so the battery runs under any harness, any CI, or none. Only the substrate sentence is
+  false, and retiering a public compatibility claim is a positioning act — which is why close
+  escalated instead of rewriting.
+  **A FOURTH surface, found here and named in no bullet:** `docs/install.md`'s
+  `toolchain:begin` bullet NOTES (l.83-99) over-claim the same way — "every gate and both
+  generated git hooks are Bash scripts", "the gate family's line scanning and field extraction are
+  written in awk". `check-install-toolchain` holds the bullet ELEMENTS to
+  `context-kit/lib/toolfloor.sh`; the note PROSE is ungated. The requirements still stand (runner,
+  hooks and bootstrap are bash); the stated reasons do not.
+  **Why `[design-pending]`: the shape is a real fork.** (i) Widen the SHIPPED `measured:` marker
+  discipline onto the rewritten sentences — debt, mints no name, but reaches only a claim carrying
+  a number, and canon-kit/SPEC.md §check-measured-claim says in its own words that the claims
+  costing most carry none. (ii) A new canon-kit sibling scanning a forbidden-literal roster, red
+  while the tree ships a live binary — feature, amendment owed, and the only arm that would have
+  caught the hand-grep false negative above. Complementary, not exclusive.
+  **The seam is ruled, and it is the family's own rather than a new call:** the scan machinery is
+  kit mechanism; the literal roster ("bare bash", "bare-bash", "pure bash", "shell-only battery",
+  "coreutils toolchain") is consumer config behind a `CANON_KIT_*_CMD` knob resolved the
+  `scripts/measured-claims.sh` way, since a kit literal spelling this project's positioning
+  vocabulary would publish it (canon-kit/SPEC.md §check-measured-claim states the identical
+  ground for its own oracle).
+  **Cost while deferred:** the front door states a false fact about the product's own core, and it
+  rots FURTHER at every port cut — the number moves each increment while the prose does not.
+  Class: **feature** on arm (ii) — a gate name, a descriptor, a `scripts/gates.list` row and a
+  config knob; debt only on arm (i).
+  Surfaced 2026-08-22 by the `ruled-grant-surface-and-launch-chokepoint` close's gap filing,
+  corrected twice the same day (a lead filing, then that lead's own retraction of two of its three
+  points); promoted 2026-08-22 at scope with every fact re-run against the tree, not carried.
+
+- **amendment-update-target-coverage** [design-pending] — an entry under an amendment's
+  `## Existing sections updated` heading can name no owning delta, and nothing catches it.
+  **PROMOTED OUT OF THE ICEBOX 2026-08-22 at scope**, on the trigger its own icebox line invited:
+  a dormant entry's subject fired inside the iteration that iceboxed it. The evicted body is
+  restored here rather than re-derived (`git log -p -S'amendment-update-target-coverage' --
+  TASK-QUEUE.md`, `366e1bd4`), and the icebox one-liner's "Align checks it by hand; no gate yet"
+  is what that line was recording.
+  **The firing, established rather than asserted.** `ruled-grant-surface-and-launch-chokepoint`
+  missed a tightened-gates declaration across ALL THREE build batches. Batch A reasoned past it on
+  the ground that guard-kit registers no gates and an advisory hook rule is not a battery member —
+  true of the RULE and irrelevant to the TEMPLATE PAIRS `check-template-copy-parity` governs. The
+  omission surfaced only at validate; a fourth batch repaired it. That is this entry's subject
+  exactly: whether an amendment's update-target roster names every surface the change obliges a
+  write to.
+  **The align-tier reading was weighed at that close and the numbers REFUSE it:** align on Sonnet
+  drew cr=8549862 against an 18-iteration range of 4.9M-15.3M and a mean near 8.9M — mid-range and
+  flat. The defect was a CONSEQUENCE of the change rather than a claim inside the amendment, and
+  align's corpus is the amendment.
+  **No `recurrence:` date rides this, and the reason is mechanical rather than a judgement that it
+  did not recur:** an icebox entry is exactly one line under `check-queue-entry-budget` assertion
+  B, so a `recurrence:` line beneath it would have redded the gate. The count is therefore
+  understated by construction, which is an argument for promotion and not against it.
+  **Deliverable — a canon-kit gate asserting every entry under that heading cites a delta the same
+  amendment defines.** The authoring-side rule is `canon-kit/templates/SPEC-amendment.md`'s and
+  align carries the manual verification; this entry is the assertion those two stand in for.
+  **Why `[design-pending]`:** the delta-letter grammar is convention, not contract. `**A1.`
+  through `**D1.` is how amendments have happened to number their deltas; no surface pins it, and
+  a gate cannot match a grammar the template never specifies. The design call is whether canon-kit
+  FIXES that numbering (redding a non-conforming amendment) or weakens the assertion to "cites
+  some bold token defined above" — a proxy thin enough to fail gate-sdk/SPEC.md §When a gate earns
+  its place.
+  **Cost while deferred, and it moved.** The filing called it bounded: an edit adopted by judgment
+  rather than dropped, with the align duty naming it. This iteration falsified the mild half — the
+  edit was DROPPED, by three batches in a row, and reached validate. The align duty is a hand
+  check and a hand check missed it.
+  Class: **feature**, correcting the filing's own "adds no governed name" line — a gate name, a
+  descriptor and a `scripts/gates.list` row are governed names under canon-kit's litmus.
+  Filed 2026-07-25 by close from the `supply-chain-trust-baseline` lesson triage; iceboxed since;
+  promoted here 2026-08-22 at scope from the gap inbox of the iteration that fired it.
+
 - **guard-grant-review** [design-pending] — the committed grant set's security narrowing, prepared
   and unlandable: the review is COMPLETE and only an operator-class edit remains.
   **The review is done and must not be re-bought.** All 105 `Bash(` entries of
@@ -6686,7 +6772,7 @@
   ergonomics.
   Class: a flag or a bin tool mints a governed name, so canon-kit's litmus makes it a **feature**
   on those two arms and debt only as a documented one-liner.
-  recurrence: single-gate-run-config-bridge 2026-08-21
+  recurrence: single-gate-run-config-bridge 2026-08-21 2026-08-22
   **Grounds for that date, and it is a first-hand firing rather than a log read.** The
   `graph-port-and-config-seam` close needed one gate's verdict while re-verifying a gap bullet,
   tried `run-gates.sh check-queue-entry-budget`, and got `no registry at
@@ -6694,6 +6780,12 @@
   the entry's own second bad option: invoking the binary directly, which refused fail-closed for an
   unset bridged knob, and finally re-derived the answer by hand from `queue-kit/lib/queue.sh`. Three
   attempts to learn one number, which is the ergonomics cost the entry prices.
+  **Grounds for 2026-08-22, and it is the SAME THREE STEPS in the same order** — this iteration's
+  scope wanted the entry-cap headroom before sizing a promotion, ran
+  `run-gates.sh check-queue-entry-budget` (fell through to `no registry at
+  check-queue-entry-budget/gates.list`), invoked the binary directly (fail-closed on an unset
+  `GATE_SDK_KNOB_QUEUE_KIT_ACTIVE_SECTIONS`), and read the cap off `queue-kit/lib/queue.sh:38` by
+  hand. Second first-hand firing, a different stage from the first: the cost is not close-shaped.
   Filed 2026-08-17 by the `post-close-intake-and-index-port` close into the gap inbox, off its
   own tooling-friction triage; promoted 2026-08-17 at scope, with `--for`'s path-keyed selection
   read off `run-gates.sh` before the neighbour's disclaimer was called incomplete.
@@ -7650,7 +7742,6 @@
 - **scope-amendment-authoring-gate** [design-pending] — Scope can do spec's job and stay green.
 - **evidence-journal-hash-chain** [design-pending] — Tamper-evidence wanted only by a hosted rung.
 - **md-section-near-miss-match** [design-pending] — Empty on a near miss; correct on an exact query.
-- **amendment-update-target-coverage** [design-pending] — Align checks it by hand; no gate yet.
 - **operator-authored-unit-set** [design-pending] — The contract omits operator-authored unit sets.
 - **tarball-build-attestation** [design-pending] — The checksum proves transfer only; docs agree.
 - **action-run-shell-scan-predicate** [design-pending] — No consumer seam on a correct gate.
