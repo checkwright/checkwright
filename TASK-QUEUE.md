@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: ruled-grant-surface-and-launch-chokepoint
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -13,6 +13,105 @@
 ## New Features
 
 ## Technical Debt
+
+- **guard-grant-review** — which allowlist grants are worth keeping, once it is
+  the **match** that buys the short-circuit rather than the prompt-avoidance the guard's messages
+  claim.
+  Split from `bash-guard-auto-mode-rationale` 2026-08-13 at scope, on the operator ruling
+  that scoped that entry to its first two parts. This is its third: re-derive the grant set,
+  given that an allow match resolves immediately and skips the classifier entirely, so a
+  surviving broad rule *saves* model calls rather than buying nothing.
+  **THE DIRECTION IS SUPPLIED — operator-ruled 2026-08-20, relayed by the lead: narrow on
+  SECURITY grounds only.** Keep breadth wherever it is safe, because an allow match short-circuits
+  the classifier and a broad rule actively saves model calls; narrow only where a destructive form
+  sits inside a blanket grant — `reset --hard`, `clean`, `push --force`, bare `checkout --`. This
+  is what the 2026-08-13 ruling selected and never stated, and the gap between selecting a
+  disposition and stating it is what left this entry unstarted for a week.
+  **Landed in its governed home rather than here:** TRAJECTORY.md §The closed rulings, pointing at
+  guard-kit/SPEC.md §compare-settings-allow, which owns the narrow-or-declare pair the direction
+  chooses between. That placement is the part that stops this recurring — the 2026-08-13 breadth
+  ruling lived in **no** governed surface at all, only a drained gap bullet and a commit message,
+  which spec-over-precedent says is not ground truth.
+  **UNBLOCKED 2026-08-20**, the blocked-by tag naming
+  `settings-allow-intended-breadth-declaration`
+  cleared on the lead's ruling that the blocker is discharged by that entry being *ruled*. What the
+  discharge does and does not buy, recorded so a starting session is not surprised: the direction
+  is executable now, since narrowing a destructive form needs no declaration surface. What still
+  waits on that entry's **build** is a durable home for the *keep-the-breadth* half — until the
+  knob ships, a kept glob re-reports at every close, which its own ruling calls honest rather than
+  a gap.
+  **RELOCATED here 2026-08-20 rather than lost**, out of the declaration entry named above when
+  landing its ruling compressed this against the entry cap: the vendor permission-modes
+  page **settles the enumeration and not the boundary**. Its dropped-on-entry set is blanket
+  `Bash(*)`, wildcarded interpreters, package-manager run commands and `Agent` rules — a
+  verb-scoped `Bash(git *)` is in none of them — while its narrow-rule example is the literal
+  `Bash(npm test)`. A wildcarded verb rule sits between the two examples and is unruled, which is
+  the exact judgment this entry's re-derivation has to make and the page will not make for it.
+  **Cost while deferred:** the guard keeps steering against a grant set nobody has
+  re-derived under the mechanism that actually applies, so the allowlist may be
+  simultaneously wider than security wants and narrower than the short-circuit rewards.
+  Non-rotting: nothing in the tree degrades while it sits.
+  **PROMOTED 2026-08-22 at scope, on the operator's ruling relayed by the lead.** Debt-class:
+  it re-derives an existing grant set and
+  mints no governed name, so no amendment is owed. One SEQUENCING fact the taker needs, implied
+  above and stated here so it is not re-derived — the *narrow* half is executable alone, while
+  the *keep-the-breadth* half has no durable home until
+  `settings-allow-intended-breadth-declaration`'s knob ships, so that feature lands first or a
+  kept glob re-reports at this iteration's own close.
+
+- **session-mechanic-grants-uncommitted** — the committed allowlist grants none
+  of the session mechanics the methodology itself mandates, so every session pays out-of-band
+  decisions for doing what its own templates tell it to do.
+  **Measured at the filing close's tooling-friction triage, off the log rather than impression.**
+  `scan-prompts.sh` ranks 122 prompting calls across 41 patterns from 519 fall-throughs, and the
+  single largest pattern is `cat` at 28 — of which **21 are `cat >`/`cat >>`**, the heredoc append
+  into a gitignored `.tmp/` resume journal that delegation-kit/SPEC.md §Resume journal — agent
+  writes, scratch reset sweeps requires of every mutating agent. One mandated mechanic, 21
+  out-of-band decisions, one iteration.
+  **The three dispositions, ruled below:** (a) grant the append into the disposable, boundary-wiped
+  scratch dir; (b) steer to `Write`/`Edit`, trading a permission decision for tokens on a file that
+  only grows; (c) a convention in `templates/agent-execution.md`'s journal bullet, the weakest.
+  **DISPOSITION (a) RULED — GRANT, operator 2026-08-20 via the lead: the APPEND form only.**
+  `cat >> .tmp/…` is granted; the truncating `cat > .tmp/…` is deliberately not, so a mis-typed
+  redirect cannot destroy a journal. Condition, not a hope: the glob must be provably unable to
+  reach a tracked path. (b) and (c) refused. The ruling reaches (a) alone — the oracles below stay
+  unruled — and the settings write is this entry's own build work, not this iteration's.
+  **The second half is the overlay-only oracles**, granted by nothing committed: `cargo test`,
+  `cargo build`/`clippy`, the release binary itself, `gh auth`. Each is read-only or a build of the
+  tree's own crate; a fresh clone re-buys every decision (22 calls at filing, 12 at 2026-08-21).
+  **What this entry is NOT.** Not the friction itself: prompting's dominant *cause* is decoration —
+  granted commands chained past the matcher, which `bash-guard.sh` steers and no grant can fix.
+  **Cost while deferred:** roughly one out-of-band decision per journal write, paid by every
+  dispatched session in every iteration, plus a fresh clone with no working oracle grants.
+  Class: mints no governed name and adds no gate, so canon-kit's litmus makes it **debt**.
+  recurrence: session-mechanic-grants-uncommitted 2026-08-18 2026-08-19 2026-08-21
+  **The `awk` item below is CONTESTED**, its contest an entry since 2026-08-19:
+  `guard-read-steer-tool-coverage` rules it a (b) steer, not an (a) grant. Journal writes: 21 → 30 →
+  30 at 2026-08-21, the grounds for that date: the tripling stopped and the cost is now a PLATEAU,
+  30 `.tmp/` heredocs of which 22 are journal appends, `awk` again ungranted at 33. A flat rate is
+  the worse finding, not the milder one — it is the steady-state price of an unbuilt ruled grant.
+  **Held as a BUILD unit only, 2026-08-20, by the iteration lead** into `graph-port-and-config-seam`
+  — the ruled spine is the `check-graph` port. **Not** a decline of disposition (a): the operator
+  ruled 2026-08-20, relayed by the lead, to take the grant batch as rulings this iteration at zero
+  build cost, so (a) is live and the price below is being paid off rather than deferred again.
+  Prior hold 2026-08-19 out of `takeable-tier-batch-and-installer-noop`, same cause.
+  **Second measurement, 2026-08-18 — grounds for that date.** The journal-write count roughly
+  tripled: **~69 of ~92 `cat` occurrences are heredoc writes into `.tmp/`**, against 21 at filing,
+  and `cat` is again the single largest pattern (73 of 248 prompting calls). Six further absent
+  grants were named at the same triage, each a standing mechanic rather than a one-off: `awk`
+  (granted nowhere, and absent from `GUARD_KIT_RO_BINS` so it misses the read-only-pipeline
+  auto-allow too), the `nohup … & echo pid=… > <key>.run` background-launch idiom this project
+  *mandates*, the bare `native/target/release/checkwright` non-gate arm while its `-gates` sibling
+  is granted, `chmod` with a numeric mode where only `chmod +x *` is granted, `bash
+  */checks/check-*.sh` not reaching the `.gate` descriptors gates now ship as, and `git worktree`,
+  granted by the overlay alone. The list is a promotion *proposal*: widening the committed set
+  stays the consumer's call, which is the same wall disposition (a) already hits.
+  Filed 2026-08-16 by close from its own tooling-friction triage; counts read off `scan-prompts.sh`.
+  **PROMOTED 2026-08-22 at scope into `ruled-grant-surface-and-launch-chokepoint`, on the
+  operator's ruling relayed by the lead** — disposition (a)'s ruled grant is this iteration's
+  build, so the price above stops being paid rather than being measured a fourth time. Debt-class
+  by this entry's own litmus line. The `awk` item stays CONTESTED by
+  `guard-read-steer-tool-coverage` and is not settled by this promotion.
 
 ## Deferred
 
@@ -196,15 +295,18 @@
 
 - **entry-cap-displaces-mandated-writes** [design-pending] — the mandated-write class collides with
   `check-queue-entry-budget`'s per-entry cap at a measurable rate, and nothing counts the spend.
-  **The slug was a shape everyone cited and nothing owned** — filing it under this spelling made
-  the standing citation resolvable.
   **First five firings, the filing measurement:** three during scope's disposition work, two seating
   operator-handed writes onto entries at exactly 50/50 and 49/50. **They are the argument:** both
   were mandated writes with a citable contract (queue-kit/SPEC.md §check-queue-entry-budget names a
   judged recurrence's grounds and a ruling recorded onto the entry it rules), and both were seated
   only by compressing an answered ground out of the same entry. The relief works and is documented;
   what has no owner is that it is being spent every time.
-  recurrence: entry-cap-displaces-mandated-writes 2026-08-20 2026-08-21
+  recurrence: entry-cap-displaces-mandated-writes 2026-08-20 2026-08-21 2026-08-22
+  **Six more firings, 2026-08-22 — grounds for that date, and the SPLIT reading gets its
+  counter-evidence.** Landing one operator ruling took six mandated writes, three seated at 1 or 0
+  headroom; the one at 0 was relieved by PROMOTION, this entry's own "unrecorded relief valve",
+  exercised deliberately for the first time. The colliders were the most recently RULED-ON rather
+  than the longest-lived — evidence AGAINST splitting, since a ruling lands wherever it rules.
   **Twelve more firings, 2026-08-20/21 — grounds for those dates, and the class NARROWS.** Seven at
   scope landed authority rulings onto five entries at exactly 0 headroom; two at build compressed by
   answering spent grounds; three are THIS drain's own recurrence stamps, one of them onto this very
@@ -221,10 +323,7 @@
   on it, since scope ranks what the queue carries and the queue carried none of this.
   **Four more firings, 2026-08-19, the first measured against this entry rather than commit
   messages:** landing five ruled dispositions took three mandated writes onto entries the gate
-  reports at exactly 0 headroom — `native-gate-port-remaining-corpus`,
-  `gh-account-identity-expectation`, `stage-stamp-ordering-unenforced`. Each was seated by the
-  documented relief and each spent something; the one real loss was the literal spelling of the
-  narrow couple pair, compressed out of a correction that now says "the narrow pair" and names none.
+  reports at exactly 0 headroom. Each was seated by the documented relief and each spent something.
   **The fourth is a sharper kind and is the one to design against:** on
   `close-entry-baseline-bootstrap-deadlock` the ruling fitted and its **provenance** did not —
   the entry closed at 1 line of headroom, so it carries what was ruled and not through which
@@ -5053,57 +5152,16 @@
   spec-over-precedent can find; overlay globs stay per-clone and keep re-reporting, which is honest
   rather than a gap, since they were never ruled. Bought for the next cycle rather than to silence
   a live finding — nothing re-reports today, and the record should not imply otherwise.
-  **Why `[design-pending]`:** the ruling decides whether the knob is built at all — reaffirm
-  the breadth and the declaration is a stated disposition's missing half, narrow it and there
-  is nothing to declare. Two shape questions ride behind it: whether a declaration reaches the
-  committed settings file as well as the local overlay, a policy question about the consumer's
-  own file and the same fork `path-pinned-allow-entry-oracle` is stuck on; and whether it is a
-  bare glob list or a glob-plus-reason pair, since a bare list re-loses at the next close the
-  reason it exists to keep.
+  **Why `[design-pending]`: the amendment is unwritten, not the design.** Both shape questions
+  this entry carried are ANSWERED above — the committed file only, and glob-plus-reason — so what
+  remains is authoring, which is why `spec` promotes it rather than scope.
   **Cost while deferred:** zero in reports, non-zero in attention. With the instance gone
   nothing re-prints, so the carry is that the next intended-broad glob reproduces the whole
   cycle — close finding, escalation, operator ruling, nowhere to put it — the cycle this
   filing just paid for once.
   Filed 2026-08-13 by close from its own gap-inbox drain; the instance-vs-gap split and both
-  premise corrections are the drain's.
-
-- **guard-grant-review** [design-pending] — which allowlist grants are worth keeping, once it is
-  the **match** that buys the short-circuit rather than the prompt-avoidance the guard's messages
-  claim.
-  Split from `bash-guard-auto-mode-rationale` 2026-08-13 at scope, on the operator ruling
-  that scoped that entry to its first two parts. This is its third: re-derive the grant set,
-  given that an allow match resolves immediately and skips the classifier entirely, so a
-  surviving broad rule *saves* model calls rather than buying nothing.
-  **THE DIRECTION IS SUPPLIED — operator-ruled 2026-08-20, relayed by the lead: narrow on
-  SECURITY grounds only.** Keep breadth wherever it is safe, because an allow match short-circuits
-  the classifier and a broad rule actively saves model calls; narrow only where a destructive form
-  sits inside a blanket grant — `reset --hard`, `clean`, `push --force`, bare `checkout --`. This
-  is what the 2026-08-13 ruling selected and never stated, and the gap between selecting a
-  disposition and stating it is what left this entry unstarted for a week.
-  **Landed in its governed home rather than here:** TRAJECTORY.md §The closed rulings, pointing at
-  guard-kit/SPEC.md §compare-settings-allow, which owns the narrow-or-declare pair the direction
-  chooses between. That placement is the part that stops this recurring — the 2026-08-13 breadth
-  ruling lived in **no** governed surface at all, only a drained gap bullet and a commit message,
-  which spec-over-precedent says is not ground truth.
-  **UNBLOCKED 2026-08-20**, the blocked-by tag naming
-  `settings-allow-intended-breadth-declaration`
-  cleared on the lead's ruling that the blocker is discharged by that entry being *ruled*. What the
-  discharge does and does not buy, recorded so a starting session is not surprised: the direction
-  is executable now, since narrowing a destructive form needs no declaration surface. What still
-  waits on that entry's **build** is a durable home for the *keep-the-breadth* half — until the
-  knob ships, a kept glob re-reports at every close, which its own ruling calls honest rather than
-  a gap.
-  **RELOCATED here 2026-08-20 rather than lost**, out of the declaration entry named above when
-  landing its ruling compressed this against the entry cap: the vendor permission-modes
-  page **settles the enumeration and not the boundary**. Its dropped-on-entry set is blanket
-  `Bash(*)`, wildcarded interpreters, package-manager run commands and `Agent` rules — a
-  verb-scoped `Bash(git *)` is in none of them — while its narrow-rule example is the literal
-  `Bash(npm test)`. A wildcarded verb rule sits between the two examples and is unruled, which is
-  the exact judgment this entry's re-derivation has to make and the page will not make for it.
-  **Cost while deferred:** the guard keeps steering against a grant set nobody has
-  re-derived under the mechanism that actually applies, so the allowlist may be
-  simultaneously wider than security wants and narrower than the short-circuit rewards.
-  Non-rotting: nothing in the tree degrades while it sits.
+  premise corrections are the drain's. **In `ruled-grant-surface-and-launch-chokepoint`'s ruled
+  set, operator 2026-08-22 via the lead**; feature-class, so `spec` authors and promotes it.
 
 - **docs-corpus-derivation-manifest-divergence** [design-pending] — two gates declare a
   byte-identical `# graph:` couple and walk different corpora, so the manifest asserts a
@@ -5217,11 +5275,6 @@
   `guard-kit/bin/scratch-run.sh` executes its target with a hardcoded `bash`. Neither reaches a
   script run under another interpreter. Probed at the 2026-08-13 close against the guard itself:
   a `python3 .tmp/<script>.py` payload exits **0** — no block, no steer, no advice.
-  **Measured, not hypothetical:** this iteration's own friction log ranks three distinct
-  `python3 .tmp/*.py` invocations, all mechanical queue edits. Each was decided out of band and
-  none went through the echo-at-execution that guard-kit/SPEC.md §scratch-run names as the
-  compensating control for exactly this class of run. The control was designed for the shape and
-  missed every instance of it.
   **Why `[design-pending]`:** the two halves want different answers. Widening the guard's match to
   a set of interpreters is a roster that rots; widening the runner needs it to either dispatch on
   extension or take the interpreter as an argument, and the second re-opens what the runner is
@@ -5249,6 +5302,8 @@
   into `takeable-tier-batch-and-installer-noop` on the identical port-spine cause. Scope put it in
   the proposed set regardless of theme all three times, as the rule requires. No `recurrence:` date
   joins any decline: the finding did not re-fire, and a decline is not a firing.
+  **RE-DECLINED, operator 2026-08-22 via the lead — the fourth, and it re-affirms rather than
+  re-decides:** out of `ruled-grant-surface-and-launch-chokepoint`'s set, on the same grounds.
   Filed 2026-08-13 by close, from its own tooling-friction triage; probed at source before filing.
 
 - **ro-bins-write-option-bypass** [design-pending] — `GUARD_KIT_RO_BINS` membership is tested as
@@ -6282,6 +6337,15 @@
   failure.
   **Cost while deferred:** the rule's only enforcement candidate stays unmeasured, so each
   further firing is paid in full and the enforcement question is argued from prose.
+  **In `ruled-grant-surface-and-launch-chokepoint`'s ruled set, operator 2026-08-22 via the lead.**
+  Feature-class — the logging-only hook mints a script name and a `.claude/settings.json`
+  registration — so `spec` authors the amendment and promotes this entry with it. The 2026-08-20
+  authorization is what it carries in; **a blocking hook is still a second authorization** and this
+  ruling does not imply one, exactly as the 2026-08-20 ruling said.
+  **The amendment will span ≥2 component dirs** — the hook script, `.claude/settings.json` under
+  context-kit's settings gates, and delegation-kit's rule — so `check-stage-entry` assertion C
+  will demand the audit stamp (or a ruled waiver) at the stage after `spec`. Stated here by scope
+  so the entry does not discover it; noted at scope 2026-08-22 rather than left to the gate.
   Filed 2026-08-17 by close on the lead's ruling, draining the bullet the probe left behind.
 
 - **done-slug-ownership-citation-report** [design-pending] — governed prose says a queue slug
@@ -6374,57 +6438,6 @@
   **feature**; debt only as an assertion folded into an existing meta-gate.
   Filed 2026-08-16 by close, from the lesson the porting cohort generalized rather than from a
   fresh finding — the two instances are already fixed.
-
-- **session-mechanic-grants-uncommitted** [design-pending] — the committed allowlist grants none
-  of the session mechanics the methodology itself mandates, so every session pays out-of-band
-  decisions for doing what its own templates tell it to do.
-  **Measured at the filing close's tooling-friction triage, off the log rather than impression.**
-  `scan-prompts.sh` ranks 122 prompting calls across 41 patterns from 519 fall-throughs, and the
-  single largest pattern is `cat` at 28 — of which **21 are `cat >`/`cat >>`**, the heredoc append
-  into a gitignored `.tmp/` resume journal that delegation-kit/SPEC.md §Resume journal — agent
-  writes, scratch reset sweeps requires of every mutating agent. One mandated mechanic, 21
-  out-of-band decisions, one iteration.
-  **The three dispositions, ruled below:** (a) grant the append into the disposable, boundary-wiped
-  scratch dir; (b) steer to `Write`/`Edit`, trading a permission decision for tokens on a file that
-  only grows; (c) a convention in `templates/agent-execution.md`'s journal bullet, the weakest.
-  **DISPOSITION (a) RULED — GRANT, operator 2026-08-20 via the lead: the APPEND form only.**
-  `cat >> .tmp/…` is granted; the truncating `cat > .tmp/…` is deliberately not, so a mis-typed
-  redirect cannot destroy a journal. Condition, not a hope: the glob must be provably unable to
-  reach a tracked path. (b) and (c) refused. The ruling reaches (a) alone — the oracles below stay
-  unruled — and the settings write is this entry's own build work, not this iteration's.
-  **The second half is the overlay-only oracles**, granted by nothing committed: `cargo test`,
-  `cargo build`/`clippy`, the release binary itself, `gh auth`. Each is read-only or a build of the
-  tree's own crate; a fresh clone re-buys every decision (22 calls at filing, 12 at 2026-08-21).
-  **What this entry is NOT.** Not the friction itself: prompting's dominant *cause* is decoration —
-  granted commands chained past the matcher, which `bash-guard.sh` steers and no grant can fix.
-  **Why `[design-pending]`:** (a) versus (b) is a real trade with no dominant arm, and (a) needs
-  an operator decision this entry cannot make for them.
-  **Cost while deferred:** roughly one out-of-band decision per journal write, paid by every
-  dispatched session in every iteration, plus a fresh clone with no working oracle grants.
-  Class: mints no governed name and adds no gate, so canon-kit's litmus makes it **debt**.
-  recurrence: session-mechanic-grants-uncommitted 2026-08-18 2026-08-19 2026-08-21
-  **The `awk` item below is CONTESTED**, its contest an entry since 2026-08-19:
-  `guard-read-steer-tool-coverage` rules it a (b) steer, not an (a) grant. Journal writes: 21 → 30 →
-  30 at 2026-08-21, the grounds for that date: the tripling stopped and the cost is now a PLATEAU,
-  30 `.tmp/` heredocs of which 22 are journal appends, `awk` again ungranted at 33. A flat rate is
-  the worse finding, not the milder one — it is the steady-state price of an unbuilt ruled grant.
-  **Held as a BUILD unit only, 2026-08-20, by the iteration lead** into `graph-port-and-config-seam`
-  — the ruled spine is the `check-graph` port. **Not** a decline of disposition (a): the operator
-  ruled 2026-08-20, relayed by the lead, to take the grant batch as rulings this iteration at zero
-  build cost, so (a) is live and the price below is being paid off rather than deferred again.
-  Prior hold 2026-08-19 out of `takeable-tier-batch-and-installer-noop`, same cause.
-  **Second measurement, 2026-08-18 — grounds for that date.** The journal-write count roughly
-  tripled: **~69 of ~92 `cat` occurrences are heredoc writes into `.tmp/`**, against 21 at filing,
-  and `cat` is again the single largest pattern (73 of 248 prompting calls). Six further absent
-  grants were named at the same triage, each a standing mechanic rather than a one-off: `awk`
-  (granted nowhere, and absent from `GUARD_KIT_RO_BINS` so it misses the read-only-pipeline
-  auto-allow too), the `nohup … & echo pid=… > <key>.run` background-launch idiom this project
-  *mandates*, the bare `native/target/release/checkwright` non-gate arm while its `-gates` sibling
-  is granted, `chmod` with a numeric mode where only `chmod +x *` is granted, `bash
-  */checks/check-*.sh` not reaching the `.gate` descriptors gates now ship as, and `git worktree`,
-  granted by the overlay alone. The list is a promotion *proposal*: widening the committed set
-  stays the consumer's call, which is the same wall disposition (a) already hits.
-  Filed 2026-08-16 by close from its own tooling-friction triage; counts read off `scan-prompts.sh`.
 
 - **metric-dir-member-contract-unheld** [design-pending] — `DRIFT_KIT_METRIC_DIR` states a member
   contract and nothing holds it, so the persistent dir accretes whatever a session leaves there.
@@ -6821,6 +6834,11 @@
   reaches only a session that recorded, and a session that skips the record is invisible to it. The
   firing is the harness form again, not a shell `&`, so it also re-attests why the `&`-only arm was
   refused above. Self-disclosed by the session that committed it.
+  **In `ruled-grant-surface-and-launch-chokepoint`'s ruled set as the RIDER, operator 2026-08-22
+  via the lead**, on the shared `.claude/settings.json` + guard-kit surface the spine's four
+  rulings write. Feature-class — a guard rule plus decision-table rows — so `spec` authors and
+  promotes it. Its one-command probe is unchanged and is **not** the operator-gated one: it needs
+  no settings change, so a later session must not refuse it as the hook entry's.
   Filed 2026-08-18 by close from the gap inbox; the drain re-verified the rule's reach against
   its source and measured the target entry's headroom with the gate rather than by hand — the
   bullet read one line of room where the oracle reports zero.
