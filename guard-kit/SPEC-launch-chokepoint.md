@@ -286,13 +286,26 @@ Each names the delta that owns it.
   (delta 4); rule 13's entry gains the note that its keyword walk is now shared
   (delta 5). Rule 14's own section gains the pointer that its stated bound — *only
   for a session that recorded* — is now narrowed at the launch chokepoint, and is
-  **not** claimed closed (delta 3's honest limit).
+  **not** claimed closed (delta 3's honest limit). **One of the renumbering's
+  targets is authored by this amendment itself, not inherited from the tree**:
+  delta 2's exemption 3 names "rule 16's own test" for the read-only-pipeline
+  auto-allow — true of *today's* numbering, the convention every delta above uses
+  — and that citation moves to 17 at merge exactly like every pre-existing one;
+  the merge must not skip it on the reasoning that it is new prose rather than an
+  old cross-reference (delta 4).
 - **guard-kit/SPEC.md §The guard framework (`lib/guard.sh`)** — the primitive
   roster gains `guard_read_input` and `guard_input_field`, and the sentence
   describing `guard_read_command`/`guard_read_path` gains the
   `GUARD_INPUT`-first-then-stdin resolution and the reason it is ordered that way
   (delta 1). This is the section a consumer reads to write a guard, so the
-  opt-in line belongs in its description of a guard's shape (delta 7).
+  opt-in line belongs in its description of a guard's shape (delta 7). It also
+  carries a rule-17 citation (the `guard_allow_match` primitive's description,
+  "rule 17's silent-grant guard" in today's numbering) that renumbers to 18 with
+  the rest (delta 4).
+- **guard-kit/SPEC.md §compare-settings-allow** — cites the shared match core
+  "in `lib/guard.sh`, shared with rule 17" in today's numbering; that citation
+  moves to rule 18 at merge, though nothing in the section's own behavior changes
+  (delta 4).
 - **guard-kit/SPEC.md §Consumer rules** — the template's shape is described here;
   it gains the `guard_read_input` line (delta 7).
 - **guard-kit/SPEC.md §Testing** — the third decision table, its columns, its
@@ -302,7 +315,17 @@ Each names the delta that owns it.
   rather than restated (delta 6).
 - **guard-kit/SPEC.md §Layout and configuration** — the layout block gains
   `guard-tests/background-cases.tsv` (delta 6). **No knob is added**, and that is
-  recorded so the merge does not look for one.
+  recorded so the merge does not look for one. The section also carries two
+  existing rule-16 citations (the `GUARD_KIT_RO_BINS` entry) that renumber to 17
+  with the rest (delta 4).
+- **guard-kit/lib/guard.sh** — the implementation surface itself: `guard_read_input`,
+  `guard_input_field` and the redefined `guard_read_command`/`guard_read_path`
+  land here (delta 1); `_guard_loop_span` is extracted from rule 13's inline
+  keyword walk and called by both rule 13 and the new rule (delta 5); the new
+  rule's own function joins `guard_generic_rules`' call order at position 15
+  (delta 4). The file carries its own `# spec:` comment lines naming a rule by
+  number (today's rule 16 and 17, both cited more than once) that renumber with
+  the rest, same obligation as the SPEC's in-doc citations (delta 4).
 - **guard-kit/templates/bash-guard.sh** and **scripts/bash-guard.sh** — the
   opt-in line (delta 7). The repo copy carries `copy-divergence:` comments for
   every place it differs from the template; this line is **not** a divergence and
