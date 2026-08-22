@@ -12,3 +12,4 @@ ruled-grant-surface-and-launch-chokepoint build a8ca9aff 2026-08-22 c6532c40
 ruled-grant-surface-and-launch-chokepoint build a77c810e 2026-08-22 4e651b75
 ruled-grant-surface-and-launch-chokepoint validate a6582d95 2026-08-22 d4fbd36a
 ruled-grant-surface-and-launch-chokepoint build a89d9afa 2026-08-22 f42a347d
+ruled-grant-surface-and-launch-chokepoint close a580af0f 2026-08-22 987fceeb
