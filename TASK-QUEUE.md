@@ -12,6 +12,118 @@
 
 ## New Features
 
+- **cohort-held-members-port-prerequisites** [spec: SPEC-hold-grounds.md] — gates are held
+  on shell by operator ruling, each owing a named prerequisite nothing else tracks.
+  Ground is **sequencing, not exclusion**: gate-sdk/SPEC.md §The port-candidate criteria opens
+  by denying the seven are an eligibility screen, and criterion 7's worked example
+  (`check-action-run-shell` / `shellcheck`) names such a member the largest piece of port work
+  rather than a permitted exclusion. Every hold **and its grounds** are canonical at
+  gate-sdk/SPEC.md §The first cohort; this entry carries only the work owed, so a ground
+  stated there is cited here and never restated; the count is the roster's, never a fixed number.
+  **The spent holds are the SPEC's record, not this entry's** — `check-roadmap-fresh`, the POSIX
+  ERE engine and the associative-array bridge, each canonical at gate-sdk/SPEC.md §The first cohort.
+  **`check-tree-terms`' criterion-4 fact is real and is this entry's last tenant — it relocates
+  to gate-sdk/SPEC.md §check-tree-terms with the amendment.** Its corpus is `git ls-files` over
+  the whole tracked tree, pruned only by `GATE_PRUNE_DIRS` and the pattern-file basenames, so every
+  declaration path lies inside the corpus it scans as content — criterion 4's own predicate
+  verbatim, reached through the walk and not the trigger field, which is
+  `couples=scripts/msg-patterns.list` and selects it nowhere. What it prices is a fixture widening
+  before the port; what it is **not**, per the ruling above, is a hold.
+  **BOTH dispositions ruled 2026-08-22 at spec: retire both holds.** Grounds, evidence and the
+  refused alternative are the amendment's, cited here and never restated. In summary: criterion 4
+  prices a port and has never held one, five members having bound it and ported; a criterion-7
+  blocker holds only where the program IS the rule's semantic content, which `paste -sd, -` is
+  not. So `check-tree-terms` and `check-gate-assertions` return to the takeable tier, the held
+  tier becomes exactly the three shellcheck/renderer members, an eighth parity assertion makes the
+  ground-in-its-own-section rule machine-read, and the two SPEC passages that disagreed about
+  where a ground lives are reconciled. **Neither member PORTS here** — the port is
+  `native-gate-port-remaining-corpus`'s deliverable and that entry is unpromoted this iteration;
+  what this unit delivers is the unblock that entry names.
+  **The hold's declarable spelling is PAID** (landed 2026-08-18 at build): `# port-until: <slug>`
+  is minted on the shell declaration path with its readers, and every day-one holder declares it,
+  so `port-blockers --group` leaves each cut a takeable set rather than a hand re-adjudication. The
+  field, its wider-than-class-(b)/(c) domain, the trailer arithmetic a fourth exclusion class
+  falsified, and the split that put slug liveness in `check-gate-exemption-tasks` rather than in
+  assertion G are canonical at gate-sdk/SPEC.md §The `# graph:` manifest, §port-blockers,
+  §check-gate-substrate-parity and §check-gate-exemption-tasks, cited here and never restated.
+  The increment took **the spelling and not the roster**, which is why `check-tree-terms`' hold
+  above is still owed and this entry demoted rather than closing. One finding the mint forced and
+  the amendment had not: three of the five holders — `check-shellcheck`, `check-action-run-shell`
+  and `check-gate-assertions` — grounded their holds only in criterion 7's shared worked-example
+  prose, so each gate's own SPEC section gained its cause before its declaration could land.
+  **Cost while deferred:** `native-gate-port-remaining-corpus` ranks the remaining corpus as
+  undifferentiated gate-count, so a held member reads as one more unported gate when its
+  prerequisite is a sub-project. A later cohort discovers the sizing at implementation time,
+  which is the failure mode criterion 7 exists to prevent — designed first, then ported, never
+  ported and patched. The `# port-until:` declarations now keep the held members out of
+  `--group`'s takeable set, so what remains uncosted is the criterion-4 hold's own size.
+  Filed 2026-08-12 by close; widened at build with the canon-kit trio; engine count and cohort
+  cleanliness corrected 2026-08-12 at scope from an 85-gate census, on operator direction;
+  the engine block collapsed 2026-08-13 at build when the ERE cohort paid it; promoted
+  2026-08-16 at spec and demoted at build; re-promoted 2026-08-18 at spec for
+  `check-roadmap-fresh`'s port and demoted again 2026-08-18 at build rather than moved to
+  Done — the deliverable is the corpus of held members and that amendment delivered one
+  increment of it (canon-kit/SPEC.md §Merging an amendment, the entry-outlives-the-amendment
+  branch); re-promoted 2026-08-18 at spec as rider 1 of the wide-budget-batch iteration, on the
+  operator's ruling, for the `# port-until:` spelling alone; merged and demoted again
+  2026-08-18 at build on the same entry-outlives-the-amendment branch.
+
+- **single-gate-run-config-bridge** [spec: SPEC-gate-select.md] — no way to run one gate
+  with its configuration bridged, so a targeted verdict costs the whole battery or a
+  hand-built environment.
+  **Attested from a prompt-friction log rather than theorised.** `run-gates.sh` takes a
+  gates-**dir**, so `--only`, `--help` and a bare gate name all fall through to the positional
+  and fail with `no registry at <arg>/gates.list` — a message that reads as a missing file rather
+  than a rejected argument. The two available options are both bad: run the whole battery, or
+  invoke the binary subcommand directly and hand-export every `GATE_SDK_KNOB_*` the gate reads,
+  which is re-implementing `gate_command`'s bridge at the call site. The close that found it took
+  the second and spent four prompting calls on one env prefix; the same log shows a reach for a
+  nonexistent `gate-sdk/bin/gate.sh`, the shape a session expects to exist.
+  **`kit-bin-entry-point-unrostered` disclaims this, and the disclaimer is incomplete.** It rules
+  `run-gates.sh <gate-name>` "a habit rather than a hole" because the path-scoped selector is
+  owned in prose. That disposition is not reopened for the **name selector** — but its cited
+  remedy, `--for <path>`, is path-keyed and may select several gates, so it cannot exercise a
+  knob change that edits no file. The unowned half WAS the **configuration bridge**; the third
+  firing below gives that route a home and leaves ergonomics as the live question.
+  **Deliberately not pre-designed:** an `--only` flag, a separate `bin` tool, or a documented
+  one-liner is a real fork, and the runner's argument grammar is the constraint that decides it.
+  **Cost while deferred:** paid by every session wanting a targeted verdict, and paid worst by
+  the ones that reason about a gate instead of running it — the oracle-first rule losing to
+  ergonomics.
+  Class: a flag or a bin tool mints a governed name, so canon-kit's litmus makes it a **feature**
+  on those two arms and debt only as a documented one-liner.
+  recurrence: single-gate-run-config-bridge 2026-08-21 2026-08-22
+  **Grounds for that date, and it is a first-hand firing rather than a log read.** The
+  `graph-port-and-config-seam` close needed one gate's verdict while re-verifying a gap bullet,
+  tried `run-gates.sh check-queue-entry-budget`, and got `no registry at
+  check-queue-entry-budget/gates.list` — the exact fall-through this entry describes. It then paid
+  the entry's own second bad option: invoking the binary directly, which refused fail-closed for an
+  unset bridged knob, and finally re-derived the answer by hand from `queue-kit/lib/queue.sh`. Three
+  attempts to learn one number, which is the ergonomics cost the entry prices.
+  **Grounds for 2026-08-22, and it is the SAME THREE STEPS in the same order** — this iteration's
+  scope wanted the entry-cap headroom before sizing a promotion, ran
+  `run-gates.sh check-queue-entry-budget` (fell through to `no registry at
+  check-queue-entry-budget/gates.list`), invoked the binary directly (fail-closed on an unset
+  `GATE_SDK_KNOB_QUEUE_KIT_ACTIVE_SECTIONS`), and read the cap off `queue-kit/lib/queue.sh:38` by
+  hand. Second first-hand firing, a different stage from the first: the cost is not close-shaped.
+  **Third firing 2026-08-22 at close, and it NARROWS the entry rather than confirming it.** Same
+  two failed steps again, then a third the entry never priced: a scratch dir holding a one-line
+  `gates.list` plus `GATE_SDK_VERBOSE` selects one gate AND keeps `gate_command`'s bridge intact.
+  So "the two available options are both bad" was incomplete — a third composes documented knobs
+  and hand-exports nothing. That route now has a home (gate-sdk/SPEC.md §Layout and
+  configuration), so the unowned-fact half is DISCHARGED and what survives is ergonomics: the
+  session still authors a scratch file to ask one question. No date — 2026-08-22 already stamped.
+  **Held 2026-08-22 on surface disjointness, then TAKEN — operator-ruled the same day as the sole
+  rider of the port-hold-grounds iteration. Feature-class on two arms, so `/spec` promotes it.**
+  **The fork is RULED 2026-08-22 at spec: the `--only` flag.** The separate `bin` tool is refused
+  (it re-implements the runner's resolution, dispatch, timing and output contract) and the
+  documented one-liner stays the fallback that makes the flag thin. Grounds, the argv-versus-env
+  ruling and the bin/-tool-contract debt that rides the unit are the amendment's, never restated
+  here.
+  Filed 2026-08-17 by the `post-close-intake-and-index-port` close into the gap inbox, off its
+  own tooling-friction triage; promoted 2026-08-17 at scope, with `--for`'s path-keyed selection
+  read off `run-gates.sh` before the neighbour's disclaimer was called incomplete.
+
 ## Technical Debt
 
 ## Deferred
@@ -581,56 +693,6 @@
   behind it, the one failure the manifest exists to make impossible.
   Filed 2026-08-18 by close, draining the gap inbox; the harness's env handling probed directly
   rather than inferred from the bullet.
-
-- **cohort-held-members-port-prerequisites** [design-pending] — gates are held on
-  shell by operator ruling, each owing a named prerequisite nothing else tracks.
-  Ground is **sequencing, not exclusion**: gate-sdk/SPEC.md §The port-candidate criteria opens
-  by denying the seven are an eligibility screen, and criterion 7's worked example
-  (`check-action-run-shell` / `shellcheck`) names such a member the largest piece of port work
-  rather than a permitted exclusion. Every hold **and its grounds** are canonical at
-  gate-sdk/SPEC.md §The first cohort; this entry carries only the work owed, so a ground
-  stated there is cited here and never restated; the count is the roster's, never a fixed number.
-  **The spent holds are the SPEC's record, not this entry's** — `check-roadmap-fresh`, the POSIX
-  ERE engine and the associative-array bridge, each canonical at gate-sdk/SPEC.md §The first cohort.
-  **`check-tree-terms` owes more than its port — corrected 2026-08-13 at close.** Its corpus is
-  `git ls-files` over the whole tracked tree, pruned only by `GATE_PRUNE_DIRS` and the pattern-file
-  basenames, so every declaration path lies inside the corpus it scans as content — criterion 4's
-  own predicate verbatim. The criterion-4 hold sits on top of its port, and is independent of
-  assertion C, which does not select it (`couples=scripts/msg-patterns.list`).
-  **A FOURTH holder never gained its cause — the 2026-08-22 scope survey, verified first-hand.**
-  `gate-sdk/SPEC.md §check-tree-terms` states no ground for its `# port-until:` at all, the one
-  shape §The port-candidate criteria forbids; the ground exists in THIS entry, the wrong home, and
-  `check-gate-exemption-tasks` asserts only that the slug resolves. `port-blockers.sh` plain lists
-  that member among the blocked not at all — git and grep are on the floor, and
-  `check-gate-assertions`' blocker is `paste -sd, -`, a join. Two dispositions; `/spec` rules both.
-  **The hold's declarable spelling is PAID** (landed 2026-08-18 at build): `# port-until: <slug>`
-  is minted on the shell declaration path with its readers, and every day-one holder declares it,
-  so `port-blockers --group` leaves each cut a takeable set rather than a hand re-adjudication. The
-  field, its wider-than-class-(b)/(c) domain, the trailer arithmetic a fourth exclusion class
-  falsified, and the split that put slug liveness in `check-gate-exemption-tasks` rather than in
-  assertion G are canonical at gate-sdk/SPEC.md §The `# graph:` manifest, §port-blockers,
-  §check-gate-substrate-parity and §check-gate-exemption-tasks, cited here and never restated.
-  The increment took **the spelling and not the roster**, which is why `check-tree-terms`' hold
-  above is still owed and this entry demoted rather than closing. One finding the mint forced and
-  the amendment had not: three of the five holders — `check-shellcheck`, `check-action-run-shell`
-  and `check-gate-assertions` — grounded their holds only in criterion 7's shared worked-example
-  prose, so each gate's own SPEC section gained its cause before its declaration could land.
-  **Cost while deferred:** `native-gate-port-remaining-corpus` ranks the remaining corpus as
-  undifferentiated gate-count, so a held member reads as one more unported gate when its
-  prerequisite is a sub-project. A later cohort discovers the sizing at implementation time,
-  which is the failure mode criterion 7 exists to prevent — designed first, then ported, never
-  ported and patched. The `# port-until:` declarations now keep the held members out of
-  `--group`'s takeable set, so what remains uncosted is the criterion-4 hold's own size.
-  Filed 2026-08-12 by close; widened at build with the canon-kit trio; engine count and cohort
-  cleanliness corrected 2026-08-12 at scope from an 85-gate census, on operator direction;
-  the engine block collapsed 2026-08-13 at build when the ERE cohort paid it; promoted
-  2026-08-16 at spec and demoted at build; re-promoted 2026-08-18 at spec for
-  `check-roadmap-fresh`'s port and demoted again 2026-08-18 at build rather than moved to
-  Done — the deliverable is the corpus of held members and that amendment delivered one
-  increment of it (canon-kit/SPEC.md §Merging an amendment, the entry-outlives-the-amendment
-  branch); re-promoted 2026-08-18 at spec as rider 1 of the wide-budget-batch iteration, on the
-  operator's ruling, for the `# port-until:` spelling alone; merged and demoted again
-  2026-08-18 at build on the same entry-outlives-the-amendment branch.
 
 - **born-native-omission-accumulation** [design-pending] — the born-native flip attaches
   criterion 5's omission to every future gate, and nothing measures the pile.
@@ -6711,57 +6773,6 @@
   it **debt**; a feature only if the ruling lands a new declaration.
   Filed 2026-08-17 into the gap inbox by the `post-close-intake-and-index-port` close, which
   escalated rather than picked; promoted 2026-08-17 at scope.
-
-- **single-gate-run-config-bridge** [design-pending] — no way to run one gate with its
-  configuration bridged, so a targeted verdict costs the whole battery or a hand-built
-  environment.
-  **Attested from a prompt-friction log rather than theorised.** `run-gates.sh` takes a
-  gates-**dir**, so `--only`, `--help` and a bare gate name all fall through to the positional
-  and fail with `no registry at <arg>/gates.list` — a message that reads as a missing file rather
-  than a rejected argument. The two available options are both bad: run the whole battery, or
-  invoke the binary subcommand directly and hand-export every `GATE_SDK_KNOB_*` the gate reads,
-  which is re-implementing `gate_command`'s bridge at the call site. The close that found it took
-  the second and spent four prompting calls on one env prefix; the same log shows a reach for a
-  nonexistent `gate-sdk/bin/gate.sh`, the shape a session expects to exist.
-  **`kit-bin-entry-point-unrostered` disclaims this, and the disclaimer is incomplete.** It rules
-  `run-gates.sh <gate-name>` "a habit rather than a hole" because the path-scoped selector is
-  owned in prose. That disposition is not reopened for the **name selector** — but its cited
-  remedy, `--for <path>`, is path-keyed and may select several gates, so it cannot exercise a
-  knob change that edits no file. The unowned half WAS the **configuration bridge**; the third
-  firing below gives that route a home and leaves ergonomics as the live question.
-  **Deliberately not pre-designed:** an `--only` flag, a separate `bin` tool, or a documented
-  one-liner is a real fork, and the runner's argument grammar is the constraint that decides it.
-  **Cost while deferred:** paid by every session wanting a targeted verdict, and paid worst by
-  the ones that reason about a gate instead of running it — the oracle-first rule losing to
-  ergonomics.
-  Class: a flag or a bin tool mints a governed name, so canon-kit's litmus makes it a **feature**
-  on those two arms and debt only as a documented one-liner.
-  recurrence: single-gate-run-config-bridge 2026-08-21 2026-08-22
-  **Grounds for that date, and it is a first-hand firing rather than a log read.** The
-  `graph-port-and-config-seam` close needed one gate's verdict while re-verifying a gap bullet,
-  tried `run-gates.sh check-queue-entry-budget`, and got `no registry at
-  check-queue-entry-budget/gates.list` — the exact fall-through this entry describes. It then paid
-  the entry's own second bad option: invoking the binary directly, which refused fail-closed for an
-  unset bridged knob, and finally re-derived the answer by hand from `queue-kit/lib/queue.sh`. Three
-  attempts to learn one number, which is the ergonomics cost the entry prices.
-  **Grounds for 2026-08-22, and it is the SAME THREE STEPS in the same order** — this iteration's
-  scope wanted the entry-cap headroom before sizing a promotion, ran
-  `run-gates.sh check-queue-entry-budget` (fell through to `no registry at
-  check-queue-entry-budget/gates.list`), invoked the binary directly (fail-closed on an unset
-  `GATE_SDK_KNOB_QUEUE_KIT_ACTIVE_SECTIONS`), and read the cap off `queue-kit/lib/queue.sh:38` by
-  hand. Second first-hand firing, a different stage from the first: the cost is not close-shaped.
-  **Third firing 2026-08-22 at close, and it NARROWS the entry rather than confirming it.** Same
-  two failed steps again, then a third the entry never priced: a scratch dir holding a one-line
-  `gates.list` plus `GATE_SDK_VERBOSE` selects one gate AND keeps `gate_command`'s bridge intact.
-  So "the two available options are both bad" was incomplete — a third composes documented knobs
-  and hand-exports nothing. That route now has a home (gate-sdk/SPEC.md §Layout and
-  configuration), so the unowned-fact half is DISCHARGED and what survives is ergonomics: the
-  session still authors a scratch file to ask one question. No date — 2026-08-22 already stamped.
-  **Held 2026-08-22 on surface disjointness, then TAKEN — operator-ruled the same day as the sole
-  rider of the port-hold-grounds iteration. Feature-class on two arms, so `/spec` promotes it.**
-  Filed 2026-08-17 by the `post-close-intake-and-index-port` close into the gap inbox, off its
-  own tooling-friction triage; promoted 2026-08-17 at scope, with `--for`'s path-keyed selection
-  read off `run-gates.sh` before the neighbour's disclaimer was called incomplete.
 
 - **spec-embedded-source-criterion-4-membership** [design-pending] — whether a diff-reference
   corpus counts as "scanned as content" for criterion 4 is unsettled by the two sections that
