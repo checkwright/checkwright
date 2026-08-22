@@ -253,7 +253,7 @@ takes it from the oracle rather than from this line.
 | 5 | `docs/install.md:83` | rewrite the **note half only**. The bullet's backticked head and parenthetical are held to `context-kit/lib/toolfloor.sh`'s `PROBE_SET` by `check-install-toolchain`; the prose after the em-dash is free, so no toolfloor change is owed. |
 | 6 | `docs/install.md:92` | as row 5 — note half only; `awk` stays on the floor because the shell residue and the generated hooks still invoke it. |
 | 7 | `gate-sdk/SPEC.md:5` | **the kit's definition of its central noun.** A gate is defined substrate-free; the definition must not need a marker, because a definition that carries a measurement is a definition with an expiry date. |
-| 8 | `gate-sdk/README.md:10` | the same definition, and it must land **word-for-word compatible** with row 7 — `check-surface-duplication` governs a canonical definition having one home. |
+| 8 | `gate-sdk/README.md:10` | the same definition, and it must land **word-for-word compatible** with row 7. **No gate holds this pairing in this tree**, verified at the read site rather than assumed: `check-surface-duplication` needs a `GLOSSARY.md` this repo does not carry and is unregistered in `scripts/gates.list` for exactly that reason (`canon-kit/README.md`'s roster already notes it — "needs a glossary (exits 2 without one)"), and its invariant is a different shape besides — one bold-lead-in definition of a *glossary* term outside the glossary, not two non-glossary surfaces agreeing with each other. The pairing is caught only by DoD review at merge (**Merged with no information lost**), never mechanically. |
 | 9 | `gate-sdk/SPEC.md:210` | rewrite: the library-sourcing parenthetical is true of a shell gate and false of a `.gate` member. Narrowed, not deleted. |
 | 10 | `lifecycle-kit/SPEC.md:1912` | rewrite: the fail-closed clause names the failure, not the tool that had it. The gate is ported (`native/src/gates/lifecycle_registration.rs`), so the tool named is not the one that runs. |
 | 11 | `SECURITY.md:42,44` | one finding, two lines. Rewrite so the threat statement covers a binary as well as a script, **marked** `gate-substrates`. The compiled-implementation trust story is **already correct** at `SECURITY.md:49-57` (digest-verified, citing gate-sdk/SPEC.md §Consumer payload) and is not touched — the threat model needs no widening, only the substrate wording. |
@@ -467,8 +467,12 @@ Each names the delta that owns it.
   and the oracle is right — that asymmetry is the entire point of the unit.
 - **Row 7 and row 8 land together or not at all.** Two surfaces carry one
   canonical definition; splitting them across batches ships a tree where the
-  kit's SPEC and its README define the same noun differently, and
-  `check-surface-duplication` is the gate that would find it.
+  kit's SPEC and its README define the same noun differently, and **no gate
+  would find it in this repo** — `check-surface-duplication` is unregistered
+  here (it needs a `GLOSSARY.md` this repo does not carry), the align audit
+  verified this at the read site (`scripts/gates.list`, `canon-kit/README.md`'s
+  roster note), so the pairing is caught only by DoD review at merge, never
+  mechanically.
 - **The census is not re-bought.** `.workflow/survey-record.md`'s 2026-08-22
   block is the roster of record; its witness (a clean corpus diff since the
   recorded rev plus an unchanged oracle verdict) was re-run at this stage and
