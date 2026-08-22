@@ -257,6 +257,26 @@ so for a week the answer lived in no governed surface at all — only a drained 
 commit message, which spec-over-precedent says is not ground truth. The ruling is discharged when
 the re-derived grant set lands; the entry carrying that work is **`guard-grant-review`**.
 
+**A permission-settings edit is operator-class work, and scope never promotes one — ruled
+2026-08-22 by the operator.** An edit to `.claude/settings.json` is not build work and is not
+queue work: it is applied by the operator, out of band, or it is not applied. A stage session may
+*prepare* one — derive the diff, state its security grounds, record both on the entry — and there
+its remit ends.
+
+**The grounds are that the work is not executable where the lifecycle dispatches it**, which is
+stronger than a preference about who should do it. Two independent mechanisms refuse the edit: the
+auto-mode classifier denies it, and a dispatched stage session's own definition forbids changing
+permission settings on any agent's say-so. So an operator ruling that resolves to "edit the
+allowlist" cannot be discharged by the session sent to discharge it — it is promoted, scoped,
+dispatched, and then stalls at build having spent the whole pipeline to reach a wall. This was
+found at build 2026-08-22, when the narrowing half of `guard-grant-review` hit exactly that wall.
+
+**The rejected alternative is recorded because it is the tempting one.** The build session offered
+to hand its prepared diff to the supervising session to apply. That was refused: a supervising
+session performing an edit its child was denied is permission laundering, and it converts the
+operator's permission boundary into a formality. A session that meets the refusal and stops has
+behaved correctly, and re-deferring the unlandable half is the outcome, not a failure.
+
 ## PRIORITY DIRECTIVE — the port track's sequence
 
 **Ruled 2026-08-09 by the operator, and it is the track's top priority: complete
