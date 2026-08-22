@@ -4494,8 +4494,10 @@
   it been missed.
   **The near-miss that makes this sharper than it looks.** `guard-kit/SPEC.md`
   carries ~15 `rule N` citations that are *not* DOCTRINE citations — they name
-  guard-kit's own bash-guard ruleset, which renumbers on its own schedule
-  (that SPEC says so at its own §rule 15). So the corpus a naive scanner would
+  guard-kit's own bash-guard ruleset, which renumbers on its own schedule (that
+  SPEC says so in its git history-rewrite advisory rule — named, not numbered,
+  since the number moved again at close 2026-08-22, which is the point).
+  So the corpus a naive scanner would
   flag is dominated by correct citations of a different ruleset, and telling the
   two apart is the actual work.
   **Deliverable, and why `[design-pending]`:** either a gate that resolves a
@@ -7655,10 +7657,6 @@
 - **scratch-execution-allowlist-bar** [design-pending] — Each close re-derives this standing bar.
 
 ## Done
-
-- settings-allow-intended-breadth-declaration
-- launch-chokepoint-liveness-record-write
-- subagent-stop-liveness-hook-wiring
 
 ## Lessons Learned
 
