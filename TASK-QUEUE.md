@@ -324,11 +324,9 @@
 - **entry-cap-displaces-mandated-writes** [design-pending] — the mandated-write class collides with
   `check-queue-entry-budget`'s per-entry cap at a measurable rate, and nothing counts the spend.
   **First five firings, the filing measurement:** three during scope's disposition work, two seating
-  operator-handed writes onto entries at exactly 50/50 and 49/50. **They are the argument:** both
-  were mandated writes with a citable contract (queue-kit/SPEC.md §check-queue-entry-budget names a
-  judged recurrence's grounds and a ruling recorded onto the entry it rules), and both were seated
-  only by compressing an answered ground out of the same entry. The relief works and is documented;
-  what has no owner is that it is being spent every time.
+  operator-handed writes at 50/50 and 49/50 — both mandated writes with a citable contract
+  (queue-kit/SPEC.md §check-queue-entry-budget), both seated only by compressing an answered ground
+  out of the same entry. The relief works and is documented; the spend has no owner.
   recurrence: entry-cap-displaces-mandated-writes 2026-08-20 2026-08-21 2026-08-22
   **Six more firings, 2026-08-22 — grounds for that date, and the SPLIT reading gets its
   counter-evidence.** Landing one operator ruling took six mandated writes, three seated at 1 or 0
@@ -336,28 +334,30 @@
   exercised deliberately for the first time. The colliders were the most recently RULED-ON rather
   than the longest-lived — evidence AGAINST splitting, since a ruling lands wherever it rules.
   **Twelve more firings, 2026-08-20/21 — grounds for those dates, and the class NARROWS.** Seven at
-  scope landed authority rulings onto five entries at exactly 0 headroom; two at build compressed by
-  answering spent grounds; three are THIS drain's own recurrence stamps, one of them onto this very
-  entry. The taxed class is the write that cannot be deferred or reworded without falsifying the
-  record of what was decided; one scope firing was relieved only by RELOCATION onto a linked entry
-  that happened to have headroom, which nothing guarantees and no session can arrange.
+  scope landed authority rulings onto five entries at 0 headroom; two at build compressed by
+  answering spent grounds; three were that drain's own recurrence stamps. The taxed class is the
+  write that cannot be deferred or reworded without falsifying the record of what was decided; one
+  firing was relieved only by RELOCATION onto a linked entry that happened to have headroom.
   **DISTINCT from `check-queue-entry-budget` itself**, which is the gate and is behaving exactly as
   specified, and from `headroom-check-ordering-unruled`, whose axis is *when* a session reads its
   headroom rather than what the cap displaces.
   **Why `[design-pending]`:** the real question is whether the entries that keep colliding are the
   ones that should have been **split**, which is a queue-composition ruling rather than a gate
   change; a counter with no split criterion behind it would only make the cadence visible.
+  **HELD at the 2026-08-22 promotion, lead-ruled:** the real deliverable is that composition ruling
+  and the documented relief still works. **The hold IS an instance** — seating four hold grounds at
+  0 headroom fired this class on its own class, and the entry it blocked hardest is the one whose
+  hold is not on merit. Same date as the stamp above, so no new date is owed.
   **Cost while deferred:** a cadence that is real is invisible to the only session chartered to act
   on it, since scope ranks what the queue carries and the queue carried none of this.
   **Four more firings, 2026-08-19, the first measured against this entry rather than commit
   messages:** landing five ruled dispositions took three mandated writes onto entries the gate
   reports at exactly 0 headroom. Each was seated by the documented relief and each spent something.
   **The fourth is a sharper kind and is the one to design against:** on
-  `close-entry-baseline-bootstrap-deadlock` the ruling fitted and its **provenance** did not —
-  the entry closed at 1 line of headroom, so it carries what was ruled and not through which
-  channel, which is precisely the citation `relayed-ruling-provenance-unrecorded` is trialling.
-  A cap that displaces a ruling's audit trail while keeping the ruling is worse than one that
-  displaces prose, because the surviving text reads complete.
+  `close-entry-baseline-bootstrap-deadlock` the ruling fitted and its **provenance** did not — the
+  entry closed at 1 line of headroom, carrying what was ruled and not through which channel, which
+  `relayed-ruling-provenance-unrecorded` is trialling. A cap that displaces a ruling's audit trail
+  while keeping the ruling is worse than one displacing prose: the surviving text reads complete.
   **The signal the design question asked for.** All three are among the queue's longest-lived and
   most-ruled-on entries, which is evidence for the split reading rather than for a counter: the
   collision is not random across the pool, it concentrates where rulings accumulate.
@@ -4436,15 +4436,12 @@
   **Cost while deferred:** paid only when validate ends non-clean, but paid as a
   full stop that costs an operator round-trip at the boundary, in the exact
   situation where the tree is already known to be imperfect.
-  **Second attested firing, 2026-08-12 — and the repeat is the argument.** The
-  `native-cohort-canon-kit` close hit the identical wall on `installer_smoke`, and
-  escaped by the identical route: an operator-directed filing relayed by the lead.
-  Two consecutive closes have now needed an **operator interrupt to get past their
-  own entry gate**, on unrelated suites and unrelated defects. One occurrence reads
-  as an unlucky iteration; two by the same route reads as **structural**, which is
-  the case for fixing the bootstrap rather than continuing to pay the interrupt.
-  The cost is now measured rather than predicted: one full stop and one operator
-  round-trip per close that ends non-clean.
+  **Second firing, 2026-08-12 — the repeat is the argument.** The `native-cohort-canon-kit` close
+  hit the identical wall on `installer_smoke` and escaped by the identical route: an
+  operator-directed filing relayed by the lead. Two consecutive closes have now needed an
+  **operator interrupt to get past their own entry gate**, on unrelated suites and unrelated
+  defects. One occurrence is an unlucky iteration; two by the same route is **structural**. Cost
+  measured rather than predicted: one full stop and one operator round-trip per non-clean close.
   **Third firing, 2026-08-18 (`wide-budget-batch-and-hold-declaration`), and the grounds for that
   date.** `installer_smoke` ended validate on the init no-op/regen red, the close entry refused for
   want of a live blocking slug, and the escape was the identical operator-directed filing
@@ -4459,6 +4456,9 @@
   into `takeable-tier-batch-and-installer-noop`, the second on a probed ground the first lacked:
   the row is **not armed today**, the live baselined `fail` naming a slug that still resolves.
   None of the three declines the finding; each is discharged by having reached the authority.
+  **HELD a FOURTH time at the 2026-08-22 promotion, lead-ruled:** three firings, three operator
+  interrupts, three prior holds — and it still shares no surface with that iteration's prose-gate
+  spine. The recurrence count is unchanged at two, so the routing clause is still not reached.
   Filed 2026-08-10 by close, from its own blocked entry; the escape it needed is
   the evidence. Re-attested 2026-08-12 by close, again from its own blocked entry.
 
@@ -5407,15 +5407,12 @@
   lapse: the prose reads identically whether the return was held or invented, so no reader and no
   gate can tell.
   **Second firing 2026-08-18, again self-caught, and it sharpened the mechanism.** At that
-  iteration's scope a dispatched sweep had its synthesis written into the survey record and into
-  an escalation before the dispatcher could attest a return; scope re-derived first-hand,
-  superseded the block append-only at `1722f39d`, and the substance survived with one claim
-  downgraded to unproven. The new finding: **the return was not lost, it was delivered to the
-  wrong session.** The child could not reach its dispatcher by name and sent its synthesis to the
-  top-level session, so the evidence of return was observable only to a third party and never to
-  the parent. Arrival is unobservable to the parent *by construction*, which is sharper than the
-  shape filed above — and it means a receiving-side obligation cannot be discharged by a parent
-  asking itself whether it received anything.
+  iteration's scope a dispatched sweep had its synthesis written into the survey record and an
+  escalation before the dispatcher could attest a return; scope re-derived first-hand, superseded
+  the block append-only at `1722f39d`, one claim downgraded to unproven. The new finding: **the
+  return was not lost, it was delivered to the wrong session** — the child could not reach its
+  dispatcher by name and sent its synthesis to the top-level session. Arrival is unobservable to
+  the parent *by construction*, so a receiving-side duty cannot be discharged by self-inquiry.
   **That paragraph is a claim, not a ruling.** Its evidence is a completion notification held by
   the lead — the *child's* self-report about its own prior turn — which does not prove scope held
   a first return, though it does retire the fabrication reading. **The lead recommends and does
@@ -5440,6 +5437,9 @@
   ruled spine is the `check-graph` port, delegation-kit shares no surface with it, and two
   recurrences stay inside lead discretion. First held 2026-08-19 out of
   `takeable-tier-batch-and-installer-noop`, at a firing rate of once per iteration since.
+  **HELD a THIRD time at the 2026-08-22 promotion, lead-ruled:** the body itself concedes a gate
+  over tree state is very likely unbuildable, so the deliverable is a CHOICE between two non-gate
+  shapes rather than a gate — which is not spine-shaped for a prose-gate iteration.
   Filed 2026-08-13 by close, draining the gap inbox on operator direction to file, not promote.
 
 - **handoff-premise-reverification-placement** [design-pending] — `Probe-before-assertion` is
@@ -5570,6 +5570,34 @@
   session running the targeted form after touching a `smoke/install.sh` will read the same red as
   its own.
   Filed 2026-08-14 by close, draining the gap inbox (filed there mid-iteration).
+
+- **install-disposition-smoke-accounting-split** [design-pending] — the precommit gate checks smoke
+  registration for `zero-config` gates only, so an `on-surface` gate's missing registration is
+  caught one stage late, at validate.
+  `check-install-disposition` skips every non-`zero-config` disposition outright
+  (`gate-sdk/checks/check-install-disposition.sh:56` — `[[ "$value" == zero-config ]] || continue`),
+  and its clean line counts only the zero-config half. The full accounting — every shipped gate
+  either registered in its kit's `smoke/install.sh` or carrying a `# smoke-unregistered:` line with
+  a reason — lives in `gate-sdk/bin/run-consumer-smoke.sh`, which this repo runs as the evidence-kit
+  `consumer_smoke` validate suite and never at precommit.
+  **The instance, measured 2026-08-22.** Batch A landed `check-unmarked-claim` (`install:
+  on-surface`) without registering it in `canon-kit/smoke/install.sh`. The precommit battery passed
+  at 105 and then at 106 across four commits and three independent lead verifications; validate's
+  `consumer_smoke` caught it, fixed in one line at `93cda68d`. The same iteration's batch-B gate was
+  `zero-config` and WAS registered, so the seam is the disposition split rather than a careless
+  batch.
+  **Why `[design-pending]`:** the fix shape needs a ruling, not a build. Either widen
+  `check-install-disposition` to run the full accounting for every disposition, or move the
+  accounting out of `consumer_smoke` into a precommit member — the second buys the coverage but may
+  re-buy smoke cost at every commit, which is the trade nothing here settles.
+  **Distinct from `consumer-smoke-targeted-mode-registrar-scope`**, whose axis is the targeted
+  single-kit mode severing a cross-kit registrar. This one is about which TIER holds the accounting
+  at all, and it fires on the untargeted run that neighbour reports clean.
+  **Cost while deferred:** one stage of latency on a mechanical zero-judgement condition a precommit
+  gate could hold, plus a validate red that presents as a build defect — the batch session reads a
+  registration omission as its own gate misbehaving.
+  Filed 2026-08-22 by close, draining the gap inbox; the lead filed the bullet at validate and this
+  drain re-verified the skip at its source rather than off the gate's `spec:` line.
 
 - **spec-prune-normalisation-shell-oracle** [design-pending] — the shell twin of the
   `_spec_prune_kit_roots` normalisation repair is covered by no standing oracle.
@@ -6237,11 +6265,9 @@
   wait rule's fifth firing raised, neither answerable from the ruling that closed its prose half.
   **The design half of `waiting-rule-fourth-firing-post-fix`** (now Done), split off at that entry's
   cap; its surviving question is "given that prose alone does not hold, what does".
-  **First half — CLOSED 2026-08-22:** the chokepoint answer (2026-08-17, a turn-end passes no
-  `PreToolUse` one) and the probe's return (the harness does NOT defer the stop; `SubagentStop`
-  fires per assistant step, so a blocking variant refuses at every step and still needs a SECOND
-  authorization) — delegation-kit/SPEC.md §The turn-end liveness probe (template) holds both, so
-  the class does not dissolve and rule 14 stands.
+  **First half — CLOSED 2026-08-22:** both answers — a turn-end passes no `PreToolUse`, and
+  `SubagentStop` fires per assistant step, so a blocking variant needs a SECOND authorization —
+  live in delegation-kit/SPEC.md §The turn-end liveness probe. Rule 14 stands; the class holds.
   **Fifteenth firing, 2026-08-22 — grounds for that date:** this iteration's validate session ended
   its turn to wait on `run-validate`, twice; the hook wired that same iteration logged five
   `live=yes verdict=red records=1` firings across the two launches, catching its own supervisor.
@@ -6254,14 +6280,17 @@
   backgrounded waiters died before their conditions went true, producers verifiably alive, while
   a `Monitor` call succeeded first try; a guard on the wrong primitive inherits its failure.
   **Why `[design-pending]`:** the surviving half measures a stated protocol ordering — not a patch.
+  **HELD at the 2026-08-22 promotion, lead-ruled on SURFACE DISJOINTNESS alone and explicitly NOT
+  on merit** — this entry carries the queue's highest recurrence (4 dates, 15 firings), and its
+  surviving half is a measurement plus a doctrine line rather than a build. Named by the lead the
+  LEADING CANDIDATE for the next iteration's spine.
   **Cost while deferred:** each further firing costs an orphaned producer plus the lead turn that
   discovers it — and, as the tenth showed, can cost a whole suite's evidence.
   **It fired again in the very next iteration** (`port-tail-batching-and-cap-relief`, 2026-08-16):
-  the validate session ended its turn on a live `run-validate`, the harness marked the agent
-  complete, and the lead resumed it from transcript. Sharpest evidence the entry has: the rule
-  reached that session through the **stage-session agent definition itself**, not a dispatch
-  prompt — the strongest prose carrier the project has, and the one `waiting-rule-carrier-reach`
-  shipped. The launch-time liveness record answered `kill -0` and no evidence was lost.
+  validate ended its turn on a live `run-validate`, the harness marked the agent complete, and the
+  lead resumed it from transcript. Sharpest evidence the entry has: the rule reached that session
+  through the **stage-session agent definition itself**, not a dispatch prompt — the strongest
+  prose carrier the project has, the one `waiting-rule-carrier-reach` shipped. Nothing was lost.
   **It fired TWICE MORE at 2026-08-17 (`native-cohort-close-surfaces`) — the eighth and ninth, and
   these are the grounds for that date's stamp on `waiting-rule-fourth-firing-post-fix`.** Both were
   the LEAD's observation, not the acting session's: validate ended its turn on a live
@@ -6270,10 +6299,9 @@
   written, close's by the watch being a read-only poll that truncates no artifact — so the rule
   held in neither. **Two firings in one iteration, both producing roles**: the rate is not noise.
   **Tenth firing, 2026-08-17 (`post-close-intake-and-index-port` validate) — the first to cost
-  evidence rather than turns.** It ended its turn on a live `run-validate.sh` saying it would act on
-  the completion notification, which ending the turn is what prevents, then committed mid-run and
-  dirtied the worktree `installer_smoke` checks: that run reported `verdict=new-failures` on a false
-  ground. No date — 2026-08-17 already stamped there, idempotent per (slug,date).
+  evidence rather than turns.** It ended its turn on a live `run-validate.sh` to await a completion
+  notification that ending the turn prevents, then committed mid-run and dirtied the worktree
+  `installer_smoke` checks: `verdict=new-failures` on a false ground. No date — already stamped.
   **Fourteenth firing, 2026-08-21 — grounds for that date:** validate ended a turn *in order to
   wait* on the battery, inside the very iteration this defect was held out of for the port spine
   (lead 2026-08-20; operator 2026-08-18) — the held limit came true. Record written, nothing lost.

@@ -105,3 +105,4 @@
 | takeable-tier-batch-and-installer-noop | sc sp a b v c | 8f/3d | 3 · ≤0d | 24s clean | 104 |
 | graph-port-and-config-seam | sc sp a b v c | 2f/1d | 2 · ≤0d | 24s clean | 104 |
 | ruled-grant-surface-and-launch-chokepoint | sc sp a b v c | 7f/1d | 3 · ≤0d | 31s 1✗ | 104 |
+| substrate-claim-and-update-target-coverage | sc sp a b v c | 4f/1d | 2 · ≤0d | 24s clean | 106 |
