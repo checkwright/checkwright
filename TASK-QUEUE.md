@@ -69,40 +69,44 @@
   implementation substrate, and an incremental port falsifies it with nothing watching.
   **OPERATOR-RULED 2026-08-22: fix it as a scoped unit, not out of band and not left to ordinary
   priority.** Relayed by the lead through the gap inbox; scope promotes it.
-  **THREE sites, each re-verified first-hand here rather than relayed:** `README.md:9`
-  ("bare-bash gates" — hyphenated, which is exactly why one hand grep proved a FALSE negative
-  about that whole file), `docs/positioning.md:48` and `docs/methodology.md:45` (both "the gate
-  battery is bare bash over a coreutils toolchain").
+  **The class is TWELVE findings across ELEVEN files, not the three sites the bullets named** —
+  censused here, every hit re-verified first-hand; verdicts, quotes and witness are
+  `.workflow/survey-record.md`'s 2026-08-22 block, cited and never restated. The files:
+  `README.md`, `docs/index.md`, `docs/methodology.md`, `docs/positioning.md`, `docs/install.md`,
+  `gate-sdk/SPEC.md`, `gate-sdk/README.md`, `lifecycle-kit/SPEC.md`, `SECURITY.md`,
+  `installer/README.md`, `CONTRIBUTING.md` — four of them kit surfaces whose `docs/` mirror is
+  generated and regenerated, never hand-edited. Two are **gate-sdk's own definition of its central
+  noun**, and one overstates in the OPPOSITE direction (`CONTRIBUTING.md` asserts compilation
+  unqualified against eight shell members), which is why "rewrite the bare-bash sentence" under-
+  scopes the unit twice over.
   **The measurement that falsifies them**, `bash gate-sdk/bin/port-blockers.sh --group` at
-  2026-08-22: 104 scanned, **96 already ported, 3 permanently shell, 5 temporarily held** — 96 and
-  EIGHT, of which only three are permanent. NOT 98 and six; a rewrite sized on six would ship a
-  second false number inside the docs it is fixing.
-  **The shipped docs set already contradicts itself**, which is what makes this measured rather
-  than a judgement call: `docs/install.md:193-198` says 96 gates dispatch to the compiled binary
-  today and the rest is still shell, under a live `measured:` marker binding it to the
-  `ported-gate-members` oracle key — the half that is measurably right.
+  2026-08-22: 104 scanned, **96 ported, 3 permanently shell, 5 held** — 96 and EIGHT, of which only
+  three are permanent. NOT 98 and six; a rewrite sized on six ships a second false number.
+  **This is measured rather than a judgement call** because the docs set contradicts itself:
+  `docs/install.md:193-198` states the 96 correctly under a live `measured:` marker bound to the
+  `ported-gate-members` oracle key — the one site that is right, and the model for the rest.
   **The load-bearing half SURVIVES and must survive the rewrite:** no gate reads a harness
   surface, so the battery runs under any harness, any CI, or none. Only the substrate sentence is
   false, and retiering a public compatibility claim is a positioning act — which is why close
   escalated instead of rewriting.
-  **A FOURTH surface, found here and named in no bullet:** `docs/install.md`'s
-  `toolchain:begin` bullet NOTES (l.83-99) over-claim the same way — "every gate and both
-  generated git hooks are Bash scripts", "the gate family's line scanning and field extraction are
-  written in awk". `check-install-toolchain` holds the bullet ELEMENTS to
-  `context-kit/lib/toolfloor.sh`; the note PROSE is ungated. The requirements still stand (runner,
-  hooks and bootstrap are bash); the stated reasons do not.
+  **TWO design constraints the census bought and no bullet names.** (1) The claims are
+  LINE-WRAPPED: a single-line grep resolved eight of eleven files and FAILED on three, the same
+  failure class as the lead's retracted hyphen miss — so a line-keyed scanner is blind by
+  construction and the predicate must normalize whitespace across lines. (2) Against the proposed
+  roster nine of twelve are caught and three are structurally missed: a bare `awk` token, a
+  paraphrase, and the inverse claim no stale-shell roster can ever fire on. `every gate` is too
+  noisy to roster — dozens of non-substrate uses.
   **Why `[design-pending]`: the shape is a real fork.** (i) Widen the SHIPPED `measured:` marker
   discipline onto the rewritten sentences — debt, mints no name, but reaches only a claim carrying
-  a number, and canon-kit/SPEC.md §check-measured-claim says in its own words that the claims
-  costing most carry none. (ii) A new canon-kit sibling scanning a forbidden-literal roster, red
-  while the tree ships a live binary — feature, amendment owed, and the only arm that would have
-  caught the hand-grep false negative above. Complementary, not exclusive.
+  a number, and canon-kit/SPEC.md §check-measured-claim says the claims costing most carry none.
+  (ii) A new canon-kit sibling over a forbidden-literal roster, red while the tree ships a live
+  binary — feature, amendment owed, and the only arm reaching a re-authored claim. Its measured
+  3-of-12 miss is the honest bound on it, not a case against it. Complementary, not exclusive.
   **The seam is ruled, and it is the family's own rather than a new call:** the scan machinery is
-  kit mechanism; the literal roster ("bare bash", "bare-bash", "pure bash", "shell-only battery",
-  "coreutils toolchain") is consumer config behind a `CANON_KIT_*_CMD` knob resolved the
-  `scripts/measured-claims.sh` way, since a kit literal spelling this project's positioning
-  vocabulary would publish it (canon-kit/SPEC.md §check-measured-claim states the identical
-  ground for its own oracle).
+  kit mechanism; the literal roster is consumer config behind a `CANON_KIT_*_CMD` knob resolved
+  the `scripts/measured-claims.sh` way, since a kit literal spelling this project's positioning
+  vocabulary would publish it — canon-kit/SPEC.md §check-measured-claim states the identical
+  ground for its own oracle.
   **Cost while deferred:** the front door states a false fact about the product's own core, and it
   rots FURTHER at every port cut — the number moves each increment while the prose does not.
   Class: **feature** on arm (ii) — a gate name, a descriptor, a `scripts/gates.list` row and a
