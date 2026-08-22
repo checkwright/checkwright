@@ -12,6 +12,171 @@
 
 ## New Features
 
+- **settings-allow-intended-breadth-declaration** [spec: SPEC-breadth-declaration.md]
+  — `compare-settings-allow` offers the operator two dispositions and ships a mechanism for one.
+  guard-kit/SPEC.md §compare-settings-allow states the pair — narrow the glob, **or record
+  that the breadth is intended** — but only narrowing is expressible, so a glob ruled intended
+  re-reports at every close and the ruling survives only in a session's memory or a commit
+  message, the surface spec-over-precedent says is not ground truth.
+  **Deliverable:** an intended-breadth declaration knob beside `GUARD_KIT_BREADTH_PROBES`
+  (guard-kit/SPEC.md §Layout and configuration), default empty, so a declared glob prints as
+  declared rather than as a finding. Consumer config, never a kit literal — every string
+  naming a command is the consumer's vocabulary (CLAUDE.md §The provenance seam), the seam
+  that already makes the probe set config. Cost: one knob, one branch in
+  `bin/compare-settings-allow.sh`, one bespoke unit-test case; the tool is advisory rather
+  than a gate, so no fixture pair is owed.
+  **The motivating instance is gone; the gap is not.** The filing bullet described a standing
+  finding over two broad globs. Four probes at the drain say otherwise as of 2026-08-13: the
+  local overlay carries neither `Bash(git *)` nor `Bash(git checkout *)`, the breadth section
+  prints no over-broad entries, `permissions.defaultMode` is already `auto` in the *user*
+  settings file with no git allow entries there, and both settings files were written minutes
+  after the bullet was filed. Nothing re-reports today, so this is filed on the general gap —
+  a stated disposition no mechanism can express — and not on the instance.
+  **The two premise corrections that fed the operator's re-judgment**, kept because the 2026-08-20
+  direction rests on them, and both read off the vendor permission-modes page rather than inferred.
+  The 2026-08-13 ruling's stated premise — fewer blocking prompts is the point — does not survive
+  that page: auto mode removes routine prompts via a classifier and must live in the *user*
+  settings file, since v2.1.142 and later ignore `auto` from a repository's own settings. And the
+  correction runs the *other* way from the one first drafted: an allow match short-circuits the
+  classifier outright, so a surviving broad rule *saves* model calls rather than buying nothing.
+  The case for narrowing is therefore **security alone**, the ground 2026-08-20 was ruled on.
+  **RULED — BUILD IT, operator 2026-08-20 via the lead: the knob ships, glob-plus-reason.** A bare
+  list re-loses the reason it exists to keep. Consumer config beside `GUARD_KIT_BREADTH_PROBES`,
+  default empty, never a kit literal — the provenance seam in full, every string naming a command
+  being the consumer's vocabulary. **The shape fork is ruled with it: the COMMITTED file only.** A
+  declaration is a durable ruling about intended breadth, so it belongs in the tracked surface
+  spec-over-precedent can find; overlay globs stay per-clone and keep re-reporting, which is honest
+  rather than a gap, since they were never ruled. Bought for the next cycle rather than to silence
+  a live finding — nothing re-reports today, and the record should not imply otherwise.
+  **Why it needed design first: the amendment was unwritten, not the design.** Both shape
+  questions this entry carried are ANSWERED above — the committed file only, and
+  glob-plus-reason — so what remains is authoring, which is why `spec` promotes it rather
+  than scope.
+  **Cost while deferred:** zero in reports, non-zero in attention. With the instance gone
+  nothing re-prints, so the carry is that the next intended-broad glob reproduces the whole
+  cycle — close finding, escalation, operator ruling, nowhere to put it — the cycle this
+  filing just paid for once.
+  Filed 2026-08-13 by close from its own gap-inbox drain; the instance-vs-gap split and both
+  premise corrections are the drain's. **In `ruled-grant-surface-and-launch-chokepoint`'s ruled
+  set, operator 2026-08-22 via the lead**; feature-class, so `spec` authors and promotes it.
+  **PROMOTED 2026-08-22 at spec as `SPEC-breadth-declaration.md`.** The amendment settles the
+  ruling's reading rather than re-deciding it: *the committed file only* fixes where a
+  declaration **lives** (the tracked config), not which file's globs are scanned — the corpus
+  stays the local overlay, on guard-kit/SPEC.md §compare-settings-allow's own sentence naming
+  the local glob as the report's subject. The wider reading is refused there in writing.
+
+- **subagent-stop-liveness-hook-wiring** [spec: SPEC-stop-liveness.md]
+  — the wired half of the turn-end hook probe, which no agent session may authorize.
+  The **documentary** half is settled and lives on `turn-end-chokepoint-and-wait-primitive`: the
+  payload names no background task, PID or shell id, so detection never comes from it; but the
+  hook runs arbitrary shell, so it CAN read the `pid=<n> run=<key>` liveness record
+  `waiting-rule-carrier-reach` landed in repo-local `.tmp/` and run `kill -0`, and it CAN refuse
+  the stop, capped at a bounded run of blocks.
+  **The correction that made this its own entry: the hook is `SubagentStop`, not `Stop`.** A
+  dispatched stage session is a *subagent*, so its turn end fires `SubagentStop`; every attested
+  firing of the waiting rule was a dispatched session, so the original framing probed the wrong
+  hook and whatever is documented about blocking `Stop` says nothing about the event that
+  actually fires here. `SubagentStop` being undocumented for blocking is the load-bearing
+  unknown, not a footnote to it.
+  **Why it is filed rather than done: wiring it is a `.claude/settings.json` change, and no agent
+  message authorizes one.** A hook registration is a permission-surface write. The build session
+  that ran the probe declined it on exactly that ground and recorded its result as documentary
+  rather than half-wiring it; that refusal is correct and is written here so the next session
+  reads a settled call instead of re-litigating it. What this entry needs is the operator, not a
+  second probe of the same shape.
+  **AUTHORIZED — operator 2026-08-20, relayed by the lead: the LOGGING-ONLY variant first.** A hook
+  that records what it *would* have blocked and blocks nothing, which answers the load-bearing
+  unknown at zero risk of wedging a session. **A blocking hook is a second authorization and is not
+  implied by this one.** The reasoning was taken with the ruling: the unknown is whether the
+  harness already defers the stop while a background child is live, and if it does the class
+  dissolves and no hook is needed at all.
+  **Two things this entry is entitled to return, recorded so neither reads as a failure.** That a
+  capped refusal buys **nothing** is a *result*. And the event is `SubagentStop`, never `Stop`; its
+  being undocumented for blocking is the unknown itself rather than a footnote to it.
+  No settings write rode this session — the authorization is what was bought.
+  **Unsettled and load-bearing, unchanged by the correction:** whether the harness defers the
+  stop while a background child is live. If it does not, a blocking hook is the only lever left;
+  if it does, the class dissolves. Neither is decidable without the hook wired.
+  **Why it needed design:** the block cap is bounded, so a hook that refuses forever is not on
+  the table, and what a *capped* refusal buys against a session that has already decided to stop
+  is the open question — the honest answer may be nothing, which is a result rather than a
+  failure.
+  **Cost while deferred:** the rule's only enforcement candidate stays unmeasured, so each
+  further firing is paid in full and the enforcement question is argued from prose.
+  **In `ruled-grant-surface-and-launch-chokepoint`'s ruled set, operator 2026-08-22 via the lead.**
+  Feature-class — the logging-only hook mints a script name and a `.claude/settings.json`
+  registration — so `spec` authors the amendment and promotes this entry with it. The 2026-08-20
+  authorization is what it carries in; **a blocking hook is still a second authorization** and this
+  ruling does not imply one, exactly as the 2026-08-20 ruling said.
+  **The amendment will span ≥2 component dirs** — the hook script, `.claude/settings.json` under
+  context-kit's settings gates, and delegation-kit's rule — so `check-stage-entry` assertion C
+  will demand the audit stamp (or a ruled waiver) at the stage after `spec`. Stated here by scope
+  so the entry does not discover it; noted at scope 2026-08-22 rather than left to the gate.
+  Filed 2026-08-17 by close on the lead's ruling, draining the bullet the probe left behind.
+  **PROMOTED 2026-08-22 at spec as `SPEC-stop-liveness.md`.** Logging-only, emitting no hook
+  JSON at all — which is what makes it buildable without the `SubagentStop` emitter guard-kit
+  does not have, and the reason the blocking variant costs a primitive on top of its second
+  authorization. The probe is **asymmetric** and the amendment says so: one `live=yes` line
+  disproves deferral, no accumulation of `live=no` lines proves it, so the build's first act
+  after wiring is one deliberate firing rather than a wait.
+
+- **launch-chokepoint-liveness-record-write** [spec: SPEC-launch-chokepoint.md]
+  [precondition-ok: the one-command probe ran at spec 2026-08-22 and settled it — the
+  harness background form does reach the PreToolUse payload, so both arms are buildable
+  and nothing forward is waited on]
+  — nothing refuses a backgrounding call that writes no liveness record, so the session
+  invisible to guard rule 14 is the one that never recorded.
+  **Filed apart from `turn-end-chokepoint-and-wait-primitive` only on the cap.** That entry
+  holds this unit's other open mechanism question and is the right body for a third obligation,
+  but `check-queue-entry-budget` measures it at **0 lines of headroom** — the same displacement
+  that split it off `waiting-rule-fourth-firing-post-fix`, and split
+  `subagent-stop-liveness-hook-wiring` off it.
+  **The residue is exact.** `guard_rule_git_mutation_under_producer` (guard-kit/lib/guard.sh)
+  reaches only a session that RECORDED: it collects the live run records and returns clean on
+  an empty set. A session that backgrounds a producer without writing its `<key>.run` record is
+  invisible to that rule and to the entry preflight alike.
+  **Candidate:** a guard rule firing on the backgrounding call itself, refusing one that writes
+  no record.
+  **Why it needed design — REFUSED on an unestablished fact, not on cost.** Two backgrounding
+  forms, and the guard's reach differs. A shell `&` is in the command text every rule already
+  reads, so that arm is buildable today; the harness's background-this form is a TOOL
+  PARAMETER, and whether it reaches the `PreToolUse` payload's `tool_input` is unprobed here.
+  Building only the `&` arm is worse than not building it — every attested firing used the
+  harness form, so it would block the spelling nobody uses and pass the one that fires.
+  **The probe is one command:** one backgrounded Bash call through a guard that records its
+  payload, then read the recorded `tool_input` for the background field. The general reach is
+  already attested — `scripts/agent-dispatch-guard.sh` reads `.tool_input.subagent_type` and
+  `.tool_input.isolation` by jq path — so this is an empirical question about ONE FIELD, not
+  about the mechanism. It is **not** `subagent-stop-liveness-hook-wiring`'s operator-gated
+  probe: it needs no settings change, the `PreToolUse` Bash matcher being already wired, and a
+  later session must not refuse it as the gated one.
+  **Cost while deferred:** low and stated — rule 14's bound stays "only for a session that
+  recorded", so the launch chokepoint is uncovered while the mutation chokepoint is covered.
+  One rule plus decision-table rows if taken.
+  recurrence: launch-chokepoint-liveness-record-write 2026-08-19 2026-08-21
+  **Second firing, 2026-08-21 — grounds for that date.** `graph-port-and-config-seam`'s third build
+  batch backgrounded its step-0 battery and wrote no `<key>.run` record. No orphan resulted, so the
+  cost was zero this time — which is the entry's own point: the rule that would have caught it
+  reaches only a session that recorded, and a session that skips the record is invisible to it. The
+  firing is the harness form again, not a shell `&`, so it also re-attests why the `&`-only arm was
+  refused above. Self-disclosed by the session that committed it.
+  **In `ruled-grant-surface-and-launch-chokepoint`'s ruled set as the RIDER, operator 2026-08-22
+  via the lead**, on the shared `.claude/settings.json` + guard-kit surface the spine's four
+  rulings write. Feature-class — a guard rule plus decision-table rows — so `spec` authors and
+  promotes it. Its one-command probe is unchanged and is **not** the operator-gated one: it needs
+  no settings change, so a later session must not refuse it as the hook entry's.
+  Filed 2026-08-18 by close from the gap inbox; the drain re-verified the rule's reach against
+  its source and measured the target entry's headroom with the gate rather than by hand — the
+  bullet read one line of room where the oracle reports zero.
+  **PROMOTED 2026-08-22 at spec as `SPEC-launch-chokepoint.md`, with the probe RUN and the
+  refusal DISCHARGED.** `.tool_input.run_in_background` is a JSON boolean on a backgrounded
+  Bash call and absent on a foreground one, so both arms ship in one rule and the
+  `&`-only-is-worse objection is spent. Two calibrations the amendment takes and states: the
+  posture is **advise**, not block — the guard cannot tell a producer from a trivial child and
+  both attested firings cost zero — and the harness arm cannot be expressed in
+  `guard-tests/cases.tsv`'s decision+command grammar, so it takes a third table on the
+  escalation-table precedent rather than shipping untested.
+
 ## Technical Debt
 
 - **guard-grant-review** — which allowlist grants are worth keeping, once it is
@@ -5116,53 +5281,6 @@
   Filed 2026-08-13 by close, raised by the delegated identifier sweep, which declined to rule it;
   third population added 2026-08-14 by close from the same rostered sweep, which declined again.
 
-- **settings-allow-intended-breadth-declaration** [design-pending] — `compare-settings-allow`
-  offers the operator two dispositions and ships a mechanism for one.
-  guard-kit/SPEC.md §compare-settings-allow states the pair — narrow the glob, **or record
-  that the breadth is intended** — but only narrowing is expressible, so a glob ruled intended
-  re-reports at every close and the ruling survives only in a session's memory or a commit
-  message, the surface spec-over-precedent says is not ground truth.
-  **Deliverable:** an intended-breadth declaration knob beside `GUARD_KIT_BREADTH_PROBES`
-  (guard-kit/SPEC.md §Layout and configuration), default empty, so a declared glob prints as
-  declared rather than as a finding. Consumer config, never a kit literal — every string
-  naming a command is the consumer's vocabulary (CLAUDE.md §The provenance seam), the seam
-  that already makes the probe set config. Cost: one knob, one branch in
-  `bin/compare-settings-allow.sh`, one bespoke unit-test case; the tool is advisory rather
-  than a gate, so no fixture pair is owed.
-  **The motivating instance is gone; the gap is not.** The filing bullet described a standing
-  finding over two broad globs. Four probes at the drain say otherwise as of 2026-08-13: the
-  local overlay carries neither `Bash(git *)` nor `Bash(git checkout *)`, the breadth section
-  prints no over-broad entries, `permissions.defaultMode` is already `auto` in the *user*
-  settings file with no git allow entries there, and both settings files were written minutes
-  after the bullet was filed. Nothing re-reports today, so this is filed on the general gap —
-  a stated disposition no mechanism can express — and not on the instance.
-  **The two premise corrections that fed the operator's re-judgment**, kept because the 2026-08-20
-  direction rests on them, and both read off the vendor permission-modes page rather than inferred.
-  The 2026-08-13 ruling's stated premise — fewer blocking prompts is the point — does not survive
-  that page: auto mode removes routine prompts via a classifier and must live in the *user*
-  settings file, since v2.1.142 and later ignore `auto` from a repository's own settings. And the
-  correction runs the *other* way from the one first drafted: an allow match short-circuits the
-  classifier outright, so a surviving broad rule *saves* model calls rather than buying nothing.
-  The case for narrowing is therefore **security alone**, the ground 2026-08-20 was ruled on.
-  **RULED — BUILD IT, operator 2026-08-20 via the lead: the knob ships, glob-plus-reason.** A bare
-  list re-loses the reason it exists to keep. Consumer config beside `GUARD_KIT_BREADTH_PROBES`,
-  default empty, never a kit literal — the provenance seam in full, every string naming a command
-  being the consumer's vocabulary. **The shape fork is ruled with it: the COMMITTED file only.** A
-  declaration is a durable ruling about intended breadth, so it belongs in the tracked surface
-  spec-over-precedent can find; overlay globs stay per-clone and keep re-reporting, which is honest
-  rather than a gap, since they were never ruled. Bought for the next cycle rather than to silence
-  a live finding — nothing re-reports today, and the record should not imply otherwise.
-  **Why `[design-pending]`: the amendment is unwritten, not the design.** Both shape questions
-  this entry carried are ANSWERED above — the committed file only, and glob-plus-reason — so what
-  remains is authoring, which is why `spec` promotes it rather than scope.
-  **Cost while deferred:** zero in reports, non-zero in attention. With the instance gone
-  nothing re-prints, so the carry is that the next intended-broad glob reproduces the whole
-  cycle — close finding, escalation, operator ruling, nowhere to put it — the cycle this
-  filing just paid for once.
-  Filed 2026-08-13 by close from its own gap-inbox drain; the instance-vs-gap split and both
-  premise corrections are the drain's. **In `ruled-grant-surface-and-launch-chokepoint`'s ruled
-  set, operator 2026-08-22 via the lead**; feature-class, so `spec` authors and promotes it.
-
 - **docs-corpus-derivation-manifest-divergence** [design-pending] — two gates declare a
   byte-identical `# graph:` couple and walk different corpora, so the manifest asserts a
   sameness the code does not honour.
@@ -6299,55 +6417,6 @@
   Filed 2026-08-16 by close from the gap inbox, both halves; the drain re-verified the carrier
   count and the chokepoint scoping against the SPEC rather than taking the bullet's prose.
 
-- **subagent-stop-liveness-hook-wiring** [design-pending] — the wired half of the turn-end hook
-  probe, which no agent session may authorize.
-  The **documentary** half is settled and lives on `turn-end-chokepoint-and-wait-primitive`: the
-  payload names no background task, PID or shell id, so detection never comes from it; but the
-  hook runs arbitrary shell, so it CAN read the `pid=<n> run=<key>` liveness record
-  `waiting-rule-carrier-reach` landed in repo-local `.tmp/` and run `kill -0`, and it CAN refuse
-  the stop, capped at a bounded run of blocks.
-  **The correction that made this its own entry: the hook is `SubagentStop`, not `Stop`.** A
-  dispatched stage session is a *subagent*, so its turn end fires `SubagentStop`; every attested
-  firing of the waiting rule was a dispatched session, so the original framing probed the wrong
-  hook and whatever is documented about blocking `Stop` says nothing about the event that
-  actually fires here. `SubagentStop` being undocumented for blocking is the load-bearing
-  unknown, not a footnote to it.
-  **Why it is filed rather than done: wiring it is a `.claude/settings.json` change, and no agent
-  message authorizes one.** A hook registration is a permission-surface write. The build session
-  that ran the probe declined it on exactly that ground and recorded its result as documentary
-  rather than half-wiring it; that refusal is correct and is written here so the next session
-  reads a settled call instead of re-litigating it. What this entry needs is the operator, not a
-  second probe of the same shape.
-  **AUTHORIZED — operator 2026-08-20, relayed by the lead: the LOGGING-ONLY variant first.** A hook
-  that records what it *would* have blocked and blocks nothing, which answers the load-bearing
-  unknown at zero risk of wedging a session. **A blocking hook is a second authorization and is not
-  implied by this one.** The reasoning was taken with the ruling: the unknown is whether the
-  harness already defers the stop while a background child is live, and if it does the class
-  dissolves and no hook is needed at all.
-  **Two things this entry is entitled to return, recorded so neither reads as a failure.** That a
-  capped refusal buys **nothing** is a *result*. And the event is `SubagentStop`, never `Stop`; its
-  being undocumented for blocking is the unknown itself rather than a footnote to it.
-  No settings write rode this session — the authorization is what was bought.
-  **Unsettled and load-bearing, unchanged by the correction:** whether the harness defers the
-  stop while a background child is live. If it does not, a blocking hook is the only lever left;
-  if it does, the class dissolves. Neither is decidable without the hook wired.
-  **Why `[design-pending]`:** the block cap is bounded, so a hook that refuses forever is not on
-  the table, and what a *capped* refusal buys against a session that has already decided to stop
-  is the open question — the honest answer may be nothing, which is a result rather than a
-  failure.
-  **Cost while deferred:** the rule's only enforcement candidate stays unmeasured, so each
-  further firing is paid in full and the enforcement question is argued from prose.
-  **In `ruled-grant-surface-and-launch-chokepoint`'s ruled set, operator 2026-08-22 via the lead.**
-  Feature-class — the logging-only hook mints a script name and a `.claude/settings.json`
-  registration — so `spec` authors the amendment and promotes this entry with it. The 2026-08-20
-  authorization is what it carries in; **a blocking hook is still a second authorization** and this
-  ruling does not imply one, exactly as the 2026-08-20 ruling said.
-  **The amendment will span ≥2 component dirs** — the hook script, `.claude/settings.json` under
-  context-kit's settings gates, and delegation-kit's rule — so `check-stage-entry` assertion C
-  will demand the audit stamp (or a ruled waiver) at the stage after `spec`. Stated here by scope
-  so the entry does not discover it; noted at scope 2026-08-22 rather than left to the gate.
-  Filed 2026-08-17 by close on the lead's ruling, draining the bullet the probe left behind.
-
 - **done-slug-ownership-citation-report** [design-pending] — governed prose says a queue slug
   "owns" an open question in the present tense, and nothing notices when that slug lands.
   **Two live instances, both found by hand at this close's audit sweep and both fixed here.**
@@ -6796,52 +6865,6 @@
   adjudicated there, and escalated at align on spec-over-precedent.
   Filed 2026-08-18 by close from the gap inbox, whose cited SPEC line number the drain
   re-verified — the row moved this iteration, content unchanged.
-
-- **launch-chokepoint-liveness-record-write** [design-pending] — nothing refuses a backgrounding
-  call that writes no liveness record, so the session invisible to guard rule 14 is the one
-  that never recorded.
-  **Filed apart from `turn-end-chokepoint-and-wait-primitive` only on the cap.** That entry
-  holds this unit's other open mechanism question and is the right body for a third obligation,
-  but `check-queue-entry-budget` measures it at **0 lines of headroom** — the same displacement
-  that split it off `waiting-rule-fourth-firing-post-fix`, and split
-  `subagent-stop-liveness-hook-wiring` off it.
-  **The residue is exact.** `guard_rule_git_mutation_under_producer` (guard-kit/lib/guard.sh)
-  reaches only a session that RECORDED: it collects the live run records and returns clean on
-  an empty set. A session that backgrounds a producer without writing its `<key>.run` record is
-  invisible to that rule and to the entry preflight alike.
-  **Candidate:** a guard rule firing on the backgrounding call itself, refusing one that writes
-  no record.
-  **Why [design-pending] — REFUSED on an unestablished fact, not on cost.** Two backgrounding
-  forms, and the guard's reach differs. A shell `&` is in the command text every rule already
-  reads, so that arm is buildable today; the harness's background-this form is a TOOL
-  PARAMETER, and whether it reaches the `PreToolUse` payload's `tool_input` is unprobed here.
-  Building only the `&` arm is worse than not building it — every attested firing used the
-  harness form, so it would block the spelling nobody uses and pass the one that fires.
-  **The probe is one command:** one backgrounded Bash call through a guard that records its
-  payload, then read the recorded `tool_input` for the background field. The general reach is
-  already attested — `scripts/agent-dispatch-guard.sh` reads `.tool_input.subagent_type` and
-  `.tool_input.isolation` by jq path — so this is an empirical question about ONE FIELD, not
-  about the mechanism. It is **not** `subagent-stop-liveness-hook-wiring`'s operator-gated
-  probe: it needs no settings change, the `PreToolUse` Bash matcher being already wired, and a
-  later session must not refuse it as the gated one.
-  **Cost while deferred:** low and stated — rule 14's bound stays "only for a session that
-  recorded", so the launch chokepoint is uncovered while the mutation chokepoint is covered.
-  One rule plus decision-table rows if taken.
-  recurrence: launch-chokepoint-liveness-record-write 2026-08-19 2026-08-21
-  **Second firing, 2026-08-21 — grounds for that date.** `graph-port-and-config-seam`'s third build
-  batch backgrounded its step-0 battery and wrote no `<key>.run` record. No orphan resulted, so the
-  cost was zero this time — which is the entry's own point: the rule that would have caught it
-  reaches only a session that recorded, and a session that skips the record is invisible to it. The
-  firing is the harness form again, not a shell `&`, so it also re-attests why the `&`-only arm was
-  refused above. Self-disclosed by the session that committed it.
-  **In `ruled-grant-surface-and-launch-chokepoint`'s ruled set as the RIDER, operator 2026-08-22
-  via the lead**, on the shared `.claude/settings.json` + guard-kit surface the spine's four
-  rulings write. Feature-class — a guard rule plus decision-table rows — so `spec` authors and
-  promotes it. Its one-command probe is unchanged and is **not** the operator-gated one: it needs
-  no settings change, so a later session must not refuse it as the hook entry's.
-  Filed 2026-08-18 by close from the gap inbox; the drain re-verified the rule's reach against
-  its source and measured the target entry's headroom with the gate rather than by hand — the
-  bullet read one line of room where the oracle reports zero.
 
 - **threshold-recurrence-routing-residency** [design-pending] — where the threshold-recurrence
   routing clause lives, now that its only carrier has left the live tree.
