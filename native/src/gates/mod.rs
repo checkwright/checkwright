@@ -96,6 +96,7 @@ pub mod test_hermetic;
 pub mod tightened_gates_grammar;
 pub mod tightened_gates_note_parity;
 pub mod tracking_claim;
+pub mod unmarked_claim;
 pub mod workflow_tiering;
 
 pub type GateFn = fn(&[String]) -> i32;
@@ -361,6 +362,22 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_INSTALL_SECTION_RE",
             "CANON_KIT_INSTALL_TRANSPORT_IDS",
             "CANON_KIT_INSTALL_TRANSPORT_PATTERNS",
+        ],
+        "canon-kit",
+    ),
+    // spec: canon-kit/SPEC.md §check-unmarked-claim — born native beside its family, and it
+    // derives its corpus from check-measured-claim's glob surface rather than from
+    // `spec::manifest_files`: the knob set is that surface plus the class command and the two
+    // bridged arrays the roster crosses as
+    (
+        "check-unmarked-claim",
+        unmarked_claim::run,
+        &[("?", "")],
+        &[
+            "CANON_KIT_CLAIM_CLASSES_CMD",
+            "CANON_KIT_MEASURED_SURFACE_GLOBS",
+            "CANON_KIT_CLAIM_CLASS_IDS",
+            "CANON_KIT_CLAIM_CLASS_PATTERNS",
         ],
         "canon-kit",
     ),

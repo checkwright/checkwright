@@ -103,6 +103,8 @@ declare -p CANON_KIT_PAYLOAD_CLAIM_EXCLUDE &>/dev/null || CANON_KIT_PAYLOAD_CLAI
 [[ -v CANON_KIT_MEASURED_CLAIMS_CMD ]] || CANON_KIT_MEASURED_CLAIMS_CMD=""
 declare -p CANON_KIT_MEASURED_SURFACE_GLOBS &>/dev/null || CANON_KIT_MEASURED_SURFACE_GLOBS=()
 
+[[ -v CANON_KIT_CLAIM_CLASSES_CMD ]] || CANON_KIT_CLAIM_CLASSES_CMD=""
+
 declare -p CANON_KIT_COMMENT_MACHINE &>/dev/null || CANON_KIT_COMMENT_MACHINE=()
 declare -p CANON_KIT_COMMENT_REASON  &>/dev/null || CANON_KIT_COMMENT_REASON=()
 declare -p CANON_KIT_COMMENT_SURFACE &>/dev/null || CANON_KIT_COMMENT_SURFACE=()
@@ -541,4 +543,18 @@ if [[ "${GATE_SDK_RESOLVING_KNOB:-}" == CANON_KIT_PAYLOAD_CLAIM_IDS \
         CANON_KIT_PAYLOAD_CLAIM_PATTERNS+=("$_sk_r")
     done <<<"$_sk_pc"
     unset _sk_pc _sk_c _sk_r
+fi
+
+declare -p CANON_KIT_CLAIM_CLASS_IDS &>/dev/null      || CANON_KIT_CLAIM_CLASS_IDS=()
+declare -p CANON_KIT_CLAIM_CLASS_PATTERNS &>/dev/null || CANON_KIT_CLAIM_CLASS_PATTERNS=()
+if [[ "${GATE_SDK_RESOLVING_KNOB:-}" == CANON_KIT_CLAIM_CLASS_IDS \
+   || "${GATE_SDK_RESOLVING_KNOB:-}" == CANON_KIT_CLAIM_CLASS_PATTERNS ]] \
+   && [[ -n "$CANON_KIT_CLAIM_CLASSES_CMD" ]]; then
+    _sk_cc="$(spec_claim_vocabulary "$CANON_KIT_CLAIM_CLASSES_CMD" CANON_KIT_CLAIM_CLASSES_CMD)" || exit 2
+    while IFS=$'\t' read -r _sk_ci _sk_cp; do
+        [[ -n "$_sk_ci" ]] || continue
+        CANON_KIT_CLAIM_CLASS_IDS+=("$_sk_ci")
+        CANON_KIT_CLAIM_CLASS_PATTERNS+=("$_sk_cp")
+    done <<<"$_sk_cc"
+    unset _sk_cc _sk_ci _sk_cp
 fi

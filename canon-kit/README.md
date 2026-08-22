@@ -38,6 +38,7 @@ reads the tag syntax [queue-kit](../queue-kit/) defines.
    check-knob-default-coupling  # source knob defaults agree with the owning SPEC
    check-manifest-count         # no bare cardinal over a governed collection
    check-measured-claim         # needs a measured-claim oracle (marked claims re-measured)
+   check-unmarked-claim         # needs a claim-class roster (a declared class carries a marker)
    check-manifest-temporal      # no temporal narration in manifest prose
    check-tracking-claim         # a path's tracking status in prose agrees with git
    check-prose-enum             # partial enumeration of a governed set

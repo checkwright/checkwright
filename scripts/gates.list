@@ -86,6 +86,7 @@ check-npm-publish-spec
 check-manifest-temporal
 check-manifest-count
 check-measured-claim
+check-unmarked-claim
 check-tracking-claim
 check-prose-enum
 check-prose-tells

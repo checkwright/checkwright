@@ -1069,6 +1069,52 @@ pub fn para_wrapped(g: &CountGrammar, para: &Para) -> Option<(usize, String)> {
     Some((para.fnr[start_k - 1], hit))
 }
 
+// spec: canon-kit/SPEC.md §check-unmarked-claim — the wrap-straddling boundary the count
+// adapter crosses, served to a pattern matcher: one whitespace-normalized subject that still
+// knows which physical line every byte came from
+pub struct FlatPara {
+    pub text: String,
+    line_of: Vec<usize>,
+}
+
+impl FlatPara {
+    pub fn line_at(&self, byte: usize) -> usize {
+        self.line_of
+            .get(byte)
+            .or_else(|| self.line_of.last())
+            .copied()
+            .unwrap_or(1)
+    }
+}
+
+// spec: canon-kit/SPEC.md §check-unmarked-claim — a run of whitespace, the newline at a wrap
+// included, collapses to one space, and that space carries the line of the content following
+// it
+pub fn flatten_para(para: &Para) -> FlatPara {
+    let mut text = String::new();
+    let mut line_of: Vec<usize> = Vec::new();
+    let mut pending = false;
+    for (k, l) in para.line.iter().enumerate() {
+        let fnr = para.fnr[k];
+        for ch in l.chars() {
+            if ch.is_whitespace() {
+                pending = !text.is_empty();
+                continue;
+            }
+            if pending {
+                text.push(' ');
+                line_of.push(fnr);
+                pending = false;
+            }
+            text.push(ch);
+            while line_of.len() < text.len() {
+                line_of.push(fnr);
+            }
+        }
+        pending = pending || !text.is_empty();
+    }
+    FlatPara { text, line_of }
+}
 
 // spec: canon-kit/SPEC.md §lib/spec.sh — the default-statement grammar's one crate-side owner,
 // so both readers of a SPEC's stated default read it identically; the knob-name predicate is the

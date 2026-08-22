@@ -204,7 +204,13 @@ own instance); the kit's rules are the topology itself:
   turns a transcribed number into a generated, freshness-gated copy and is the
   second remedy this bullet offers beside citing the owner. Prefer citing the
   owner where the number need not be stated; mark it where a reader is served by
-  reading it. A **user-facing** claim takes the same treatment when a reader
+  reading it. **What makes marking happen at all is a third mechanism**, because
+  the two above both wait for an author to act: `check-unmarked-claim` lets a
+  consumer declare a *class* of claim that may not go unoracled, so the sentences
+  most worth binding are pressured into a marker rather than left to authorial
+  memory — and the class reaches a claim carrying no number, which is where this
+  bullet's own rules stop.
+  A **user-facing** claim takes the same treatment when a reader
   acts on it: `check-install-claim` gives the primary-install-path claim one
   declared owner and holds every governed install section to it, so the topology
   reaches beyond the internal facts the rules above are stated over.
@@ -376,7 +382,21 @@ unset, and the loader exits 2 on a malformed config. Knobs:
   so no key ships as a kit literal (the provenance seam). This repo sets
   `bash scripts/measured-claims.sh` and the `CANON_KIT_MANIFEST_FILES` globs plus
   `.claude/commands/*.md` — the shims the manifest set omits and the prose surface
-  excludes on a copy-shape ownership this rule is not covered by.
+  excludes on a copy-shape ownership this rule is not covered by. The surface knob
+  has a **second reader**, `check-unmarked-claim`, which shares it rather than
+  forking a knob of its own: the pair composes over one corpus
+  (§check-unmarked-claim), and the recorded cost is that a consumer cannot scan
+  claim classes over a different surface than its measured claims.
+- `CANON_KIT_CLAIM_CLASSES_CMD` — a consumer command emitting the claim classes
+  `check-unmarked-claim` holds, one `<class-id>`⇥`<ERE>` line per class, default
+  empty ⇒ clean skip (no declared class, so no sentence falls in one). A class is
+  a spelling of what one project claims about itself, so it is consumer config for
+  the same provenance-seam reason the vocabularies above are, and for one more:
+  this kit's own SPEC is governed prose, so a kit literal here would match its own
+  class while describing it. The gate reads `CANON_KIT_MEASURED_SURFACE_GLOBS`
+  above for its corpus and adds no surface knob. `CANON_KIT_CLAIM_CLASS_IDS` / `CANON_KIT_CLAIM_CLASS_PATTERNS` —
+  that command's parsed output in the same bridged, index-aligned shape as the
+  transport and payload pairs above, default empty arrays.
 - `CANON_KIT_COMMENT_MACHINE` / `CANON_KIT_COMMENT_REASON` — arrays, default
   empty: extra directive prefixes appended to the built-in kit-mechanism
   roster (a consumer's product vocabulary). `CANON_KIT_COMMENT_SURFACE` —
@@ -440,7 +460,8 @@ and no oracle sees whole: `check-comment-tier.test.sh`,
 `check-knob-citation.test.sh`, `check-knob-default-coupling.test.sh`,
 `check-manifest-count.test.sh`, `check-md-refs.test.sh`,
 `check-measured-claim.test.sh`, `check-prose-enum.test.sh`,
-`check-spec-dod-singleton.test.sh` and `check-tracking-claim.test.sh`.
+`check-spec-dod-singleton.test.sh`, `check-tracking-claim.test.sh` and
+`check-unmarked-claim.test.sh`.
 
 ### lib/spec.sh
 
@@ -547,9 +568,10 @@ same shapes:
   element, so a `<name>`⇥`<member>` line cannot cross as a single string. The
   resolution is gated on `GATE_SDK_RESOLVING_KNOB` (gate-sdk/SPEC.md
   §lib/gate.sh), because it costs a subprocess and this library is sourced once
-  per declared knob per gate. Three vocabularies ride that shape, one pair each:
-  the enum sets, `CANON_KIT_INSTALL_TRANSPORT_IDS` / `..._PATTERNS`, and
-  `CANON_KIT_PAYLOAD_CLAIM_IDS` / `..._PATTERNS` (§Layout and configuration). The
+  per declared knob per gate. Four vocabularies ride that shape, one pair each:
+  the enum sets, `CANON_KIT_INSTALL_TRANSPORT_IDS` / `..._PATTERNS`,
+  `CANON_KIT_PAYLOAD_CLAIM_IDS` / `..._PATTERNS`, and
+  `CANON_KIT_CLAIM_CLASS_IDS` / `..._PATTERNS` (§Layout and configuration). The
   emitting **command** knob is bridged beside each pair, because it is what tells
   *none configured* from *configured, and it declared nothing* — the two clean
   skips a claim gate reports apart. The tab a POSIX ERE may legitimately carry
@@ -558,7 +580,14 @@ same shapes:
 - **The count adapter** the restated-total gates share, so a consumer's
   `CANON_KIT_COUNT_COLLECTIONS` vocabulary enters once and every such gate
   matches the same total shapes — including a total whose cardinal and noun
-  straddle a prose wrap, reported at the cardinal's physical line. The boundary
+  straddle a prose wrap, reported at the cardinal's physical line. **That
+  wrap-straddling normalization now has a second reader**: `check-unmarked-claim`
+  matches a class ERE against the same normalized paragraph and maps the match's
+  span back to the physical line it starts on (`FlatPara`,
+  `native/src/spec.rs`), so both cross a prose wrap by one rule rather than by a
+  copy each. What the count adapter owns is the *total* grammar; what the flatten
+  adapter owns is the *subject* a pattern is matched against, and separating them
+  is why a second reader cost a call rather than a fork. The boundary
   rule and the mechanical exemptions live in one shared fragment, so no sibling
   drifts from another in what it counts as a total (§check-manifest-count). That
   boundary guards a prose **noun** against gluing to a following word ("gate"
@@ -573,7 +602,10 @@ same shapes:
   `spec_claim_vocabulary <command> <label>` — one loader for every
   `<id>`⇥`<ERE>` vocabulary a claim gate reads, taking the command as an
   argument rather than from one named knob so a second claim axis costs a caller
-  and not a second copy. It carries the
+  and not a second copy. **That argument is attested rather than anticipated:**
+  `check-unmarked-claim` is the fourth caller and it arrived as a caller and
+  nothing else — no fork of the loader, no second copy of the shape checks. It
+  carries the
   same fail-closed contract its enum-set sibling does — a command error, an
   unparsable line, an id that is not slug-shaped, or a repeated id is exit 2 —
   and the `<label>` it is given names the failing vocabulary in every message,
@@ -583,10 +615,14 @@ same shapes:
   callers are `spec_install_transports`, over
   `CANON_KIT_INSTALL_TRANSPORTS_CMD` (§check-install-claim);
   `check-payload-claim` directly, over `CANON_KIT_PAYLOAD_CLAIMS_CMD`
-  (§check-payload-claim); and `spec_measured_claims`, over
+  (§check-payload-claim); `spec_measured_claims`, over
   `CANON_KIT_MEASURED_CLAIMS_CMD` (§check-measured-claim) — whose second field is
   a measured value rather than an ERE, which the loader neither interprets nor
-  needs to, since every check it makes is on the line's shape.
+  needs to, since every check it makes is on the line's shape; and
+  `check-unmarked-claim` directly, over `CANON_KIT_CLAIM_CLASSES_CMD`
+  (§check-unmarked-claim). The two-field shape is what makes that last caller
+  coverage-only: a class cannot carry a required key beside its ERE without a
+  third field this loader refuses, and the refusal is kept rather than relaxed.
 - **The comment-surface adapters:** the comment gates read *different* surfaces,
   which is the one thing the primitive's parameter decides.
   `check-spec-pointer` scans the template-pruned surface — a template's `spec:`
@@ -925,11 +961,22 @@ the emitter recomputes: a corpus size, a sorted membership list, a digest over
 the swept set. This is the axis no scanner reaches and it costs nothing extra —
 the same arms, with a set-valued rather than integer-valued oracle. Because the
 config bridge refuses an element containing a tab and tab is this protocol's own
-field separator, a set-valued oracle joins its members with something else.
+field separator, a set-valued oracle joins its members with something else. This
+repo's first such inhabitant is `gate-substrates`, the live substrate set the
+enforcement core runs on, its members joined with `+`; it is the shape that makes
+a **definitional or qualitative** sentence self-correcting, since such a sentence
+carries no cardinal for arm C to check and would otherwise be marked with nothing
+an emitter could recompute.
 
 **The known limit, stated rather than hidden: a claim nobody marks is uncaught
-here.** What narrows it is §check-manifest-count's discharge, which makes marking
-pressured rather than voluntary wherever the ban already bites.
+here.** It is narrowed from both sides, along different axes.
+§check-manifest-count's discharge makes marking pressured rather than voluntary
+wherever the ban already bites — a narrowing by **shape**, reaching whatever
+carries a bare cardinal over a governed collection. §check-unmarked-claim narrows
+by **subject**, reaching a claim a consumer has declared must not go unoracled
+whether or not it carries a number. Neither closes the limit; between them the
+uncaught remainder is a claim that is both unnumbered and undeclared, which is a
+smaller set than either alone leaves.
 
 The scanned surface is its own glob knob, `CANON_KIT_MEASURED_SURFACE_GLOBS`,
 **not** the manifest set. The motivating class ranges over SPEC sections and
@@ -980,6 +1027,129 @@ in a crate-carrying tree are born native by default, with shell an exception
 under one of three stated classes (gate-sdk/SPEC.md §The port-candidate
 criteria). The refusal above is unaffected in its own terms: what settles the
 second gate is the ruling, never this section.
+
+### check-unmarked-claim
+
+Invariant: on the scanned prose surface, a paragraph matching a
+consumer-declared **claim-class** pattern carries a `measured:` marker. The class
+this closes is the axis §check-measured-claim names as its own known limit: the
+marker is voluntary, so the claims that most need an oracle are exactly the ones
+an author never thought to mark. This gate makes marking **pressured inside a
+declared class**, the same narrowing §check-manifest-count already performs for
+the bare-cardinal shape — there by *shape*, here by *subject*.
+
+**It declares a class; it does not ban a phrase, and the difference is the whole
+design.** A ban is discharged forever the moment the banned phrase is deleted, and
+it can only ever face one direction. A class assertion fires again on the next
+author who states the same thing in new words, and it covers a claim that
+overstates in *either* direction, because what puts a sentence in the class is
+what it asserts rather than which words it reaches for. The two properties are
+one property: the class is written over the claim, never over a canonical
+phrasing.
+
+**Two arms and a valve.**
+
+- **A — an unmarked claim.** Red (exit 1) when a paragraph matches a declared
+  class ERE and no `measured:` marker binds it. The finding names the class id,
+  the file, and the physical line where the match starts, and its `help:` line
+  states the three remedies below. A paragraph yields at most one finding, at the
+  first class in roster order that matches it.
+- **B — the vocabulary fails to load.** Exit 2 on a command error, an unparsable
+  line, a non-slug id, or a repeated id — inherited unchanged from
+  `spec_claim_vocabulary` (§lib/spec.sh), which already names the failing
+  vocabulary by its `<label>` in every message — and on a declared ERE that does
+  not compile, which is the same unreadable-roster failure one step later.
+- **Valve** — `<!-- unmarked-claim-exempt: <reason> -->` on the flagged line or
+  directly above it, riding the shared exempt-window (§lib/spec.sh — the line or
+  the one above), and the reason is mandatory (the `comment-tier-exempt:`
+  convention — a deliberate keep carries its cause in-line, a reasonless valve is
+  red).
+
+**The three remedies, and the gate is indifferent between them.** Rewrite the
+sentence out of the class (the doctrine's preference — a claim not made cannot go
+stale); attach a `measured:` marker binding it to an oracle; or land a reasoned
+valve. Naming all three on the finding is what keeps the gate from reading as a
+ban, which it deliberately is not.
+
+**Matching is whitespace-normalized across lines, and this is load-bearing rather
+than a nicety.** A claim spans a prose wrap as readily as it fits on one line, so
+a line-keyed predicate is blind by construction on whatever fraction of its corpus
+happens to wrap — a fraction no author controls and no reviewer can see. The ERE
+is matched against the paragraph with every run of whitespace, the newline at a
+wrap included, collapsed to one space; the finding is reported at the physical
+line the match starts on. This is not a new mechanism: it is the boundary
+§check-manifest-count already crosses for a total whose cardinal and noun straddle
+a wrap, reported at the cardinal's physical line, and the shared adapter
+(§lib/spec.sh) is where that normalization already lives. The subject is
+**ASCII-lowercased** before matching and a class pattern is authored in lower
+case, so a sentence's opening capital is not a way past the class.
+
+**A paragraph is the unit, and it is §check-measured-claim's paragraph**, so the
+both gates agree on what a marker binds: the block ending at a blank line, a fence,
+or the end of file, with the marker line riding inside the block it heads — which
+is what makes carrying a marker a property of the paragraph rather than of a line.
+Fenced blocks are skipped for the reason that section gives: a fence is grammar
+being shown, not a claim being made.
+
+**Coverage-only, and the reason is a constraint rather than a preference.** The
+gate asserts that a matched claim carries *a* marker; it does not assert *which*
+key. `spec_claim_vocabulary` is a two-field loader that **rejects a line carrying
+an extra tab**, so a class cannot declare a required key beside its ERE without a
+third field the loader refuses. Adding one would fork the loader every claim gate
+shares — the cost §lib/spec.sh explicitly took the shared-loader shape to avoid.
+The key is checked by `check-measured-claim` on the very next arm (its arm B fails
+closed on a key nobody emits, its arm A on a value the oracle now contradicts),
+so the composition covers it and neither gate duplicates the other.
+
+The scanned surface is `CANON_KIT_MEASURED_SURFACE_GLOBS` — **shared with
+`check-measured-claim`, not forked**, because they compose: a claim this
+one pressures into a marker is a claim that one then re-measures, and holding them
+over one corpus is what makes that handoff total. The cost of sharing is stated
+rather than hidden: a consumer wanting claim classes over a *different* surface
+than its measured claims cannot express that, and the split is available later
+behind an attested need.
+
+**The roster is consumer config and the seam here is sharper than its siblings'.**
+Every class id and every pattern arrives through `CANON_KIT_CLAIM_CLASSES_CMD`
+(§Layout and configuration); the scan, the normalization, the marker lookup and
+the verdict are kit mechanism. Beyond the provenance seam every claim gate
+observes, this one has a reason of its own: **this SPEC is itself governed prose**,
+so a kit that enumerated a consumer's claim phrasings would match its own class
+while describing it and need a valve to say what it does. Holding the roster in
+consumer config means the kit's prose never spells a member. An unset command
+means no class is declared and the gate reports clean — the inactive-by-default
+posture its `*_CMD` siblings take, and the correct posture rather than a gap: only
+a consumer's own vocabulary can turn this gate on.
+
+**The honest limit, and it is a property of what a roster can hold.** A claim
+stated in a **single implementation-tool token** with no predicate around it is out
+of reach: rostering the bare token would fire on every passing mention of the tool,
+and a gate that cries wolf is a gate its readers learn to bypass — the failure §When
+a gate earns its place (gate-sdk/SPEC.md) names as a defect in the gate rather than
+in the corpus. The general move for a noisy member is to roster **the predicate the
+noisy subject attaches to** rather than the subject, which recovers the site with
+none of the noise; a bare token offers no predicate to move to, and that is the
+residue. Two further bounds are deliberate: the gate cannot tell a **true** class
+member from a false one — it asserts the claim is *bound* to an oracle and
+`check-measured-claim` then asserts the oracle agrees — and neither reaches a
+sentence whose prose is true today and whose stated *reason* is wrong, which stays
+a human judgment.
+
+**Criterion 4** (gate-sdk/SPEC.md §The port-candidate criteria) **clears**: the
+corpus is a pure glob expansion of the configured surface set, reaching no gate
+declaration path in this tree — the same verdict and the same reasoning as
+§check-prose-tells, and flippable by the same consumer config. **Born native**, with
+no shell form authored: a crate-carrying tree births a gate native by default and
+none of the three exception classes applies here (gate-sdk/SPEC.md §The
+port-candidate criteria). Its `good/`+`bad/` pair is its oracle — the `bad/` case
+carries a claim wrapped across a newline, so the line-keyed blindness above is
+executable rather than asserted — with `check-unmarked-claim.test.sh` holding the
+fail-closed vocabulary arms and the two distinct clean skips a pair cannot spell.
+
+Producer of nothing but a verdict; its consumer is the committing session through
+the output contract, on the generated pre-commit hook, `run-gates.sh` and CI. Each
+paragraph is read at the single scan transition, no persistent state. `precommit`
+tier.
 
 ### check-prose-enum
 

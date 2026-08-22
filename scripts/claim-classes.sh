@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# spec: canon-kit/SPEC.md §check-unmarked-claim — this repo's claim-class roster: one <class-id><TAB><ERE> line per class of prose claim that must carry an oracle rather than an author's memory. The scan machinery is kit mechanism; every spelling below is consumer config, because a kit literal enumerating this project's positioning vocabulary would publish it.
+set -uo pipefail
+
+# comment-tier-exempt: the roster is checkwright-specific by construction and its boundary is the gate's false-positive contract — gate-substrates recognizes a claim about what the enforcement core is implemented in, in BOTH directions, because one oracle settles both and a sentence overstating either way is the same defect. The subject `every gate` is deliberately absent: the census measured dozens of non-substrate uses, so the noisy subject is excluded and the predicate it attaches to (`all source the library`) is rostered instead. `dispatches` is rostered and `dispatching` is not: a participle introduces a restrictive clause naming a subset, where the finite verb asserts of the whole. A bare implementation-tool token (`awk` alone) is excluded with no predicate to roster in its place, which is this roster's one measured coverage cost.
+printf '%s\t%s\n' \
+    gate-substrates 'bare[ -]bash|are bash scripts|is a small shell script|written in awk|all source the library|vendored kit is bash|the one language the rest of the tree is written in|dispatch(es)? to a compiled subcommand'
