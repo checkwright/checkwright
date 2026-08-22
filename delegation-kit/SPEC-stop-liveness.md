@@ -1,12 +1,13 @@
 # SPEC amendment: the turn-end liveness probe
 
-Closes `subagent-stop-liveness-hook-wiring`. delegation-kit/SPEC.md §Operative
-residency rules that a turn-end passes **no chokepoint** — *"A dispatch does. A
-turn-end does not"* — and the enforcement of the waiting rule was relocated to
-guard-kit rule 14 on exactly that ground. A `SubagentStop` hook is a chokepoint
-at the turn-end, so it is the one candidate that would falsify the axis, and the
-entry's load-bearing unknown is whether the harness already **defers** the stop
-while a background child is live: if it does, the whole class dissolves.
+Closes `subagent-stop-liveness-hook-wiring`. delegation-kit/SPEC.md §The
+delegation model rules that a turn-end passes **no chokepoint** — *"A dispatch
+does. A turn-end does not"* — and the enforcement of the waiting rule was
+relocated to guard-kit rule 14 on exactly that ground. A `SubagentStop` hook is
+a chokepoint at the turn-end, so it is the one candidate that would falsify the
+axis, and the entry's load-bearing unknown is whether the harness already
+**defers** the stop while a background child is live: if it does, the whole
+class dissolves.
 
 The operator authorized the **logging-only** variant on 2026-08-20 — a hook that
 records what it would have blocked and blocks nothing. **A blocking hook is a
@@ -90,8 +91,10 @@ and drift from its owner.
   is the supported way to run the hook with no reader at all.
 
 **No scratch-dir knob is minted.** The record's home is `${GATE_SDK_TMP_DIR:-.tmp}`,
-the cross-kit deferral three kits already take for exactly this directory. A
-`DELEGATION_KIT_RUN_DIR` would be a fourth name for one path.
+the cross-kit deferral guard-kit, evidence-kit, context-kit, drift-kit and
+lifecycle-kit already take for exactly this directory, alongside gate-sdk's own
+use. A `DELEGATION_KIT_RUN_DIR` would mint a second name for a path five other
+kits already reach through the same deferral.
 
 ### (4) The log line, and every field has a reader
 
@@ -140,8 +143,10 @@ its own say-so, and it is here on the 2026-08-20 authorization.
   divergence is expected.
 - `.claude/settings.json` gains a `SubagentStop` key registering
   `bash scripts/subagent-stop-liveness.sh`. `SubagentStop` takes **no matcher**,
-  so the entry carries a `hooks` array alone — unlike every `PreToolUse` entry in
-  the file, and unlike them it is not tool-scoped.
+  so the entry carries a `hooks` array alone and is not tool-scoped — unlike
+  every `PreToolUse` entry in the file, and precedented already by the
+  `SessionStart` entry, the file's one other matcher-less, non-tool-scoped
+  registration.
 - `.gitignore` gains the log path, beside the two guard-kit logs it sits with.
 
 **No settings gate observes any of this**, and it is recorded rather than assumed:
@@ -261,7 +266,7 @@ dropped, and it is dropped because the variant is logging-only.
 rather than an oversight — no gate in the tree reads `hooks[]`.
 
 **Existing integration prose describing the prior flow** is inventoried below.
-The load-bearing one is §Operative residency's chokepoint sentence, which is a
+The load-bearing one is §The delegation model's chokepoint sentence, which is a
 *claim about the world* this probe is built to test; it is updated to say so
 rather than left reading as settled.
 
@@ -275,13 +280,16 @@ is untouched, because this hook adds no guard rule and changes no guard decision
 Each names the delta that owns it.
 
 - **delegation-kit/SPEC.md §The turn-end liveness probe (template)** — new; owns
-  deltas 1–4, 6 and the honest limit (delta 7).
-- **delegation-kit/SPEC.md §Operative residency** — the chokepoint sentence *"A
+  deltas 1–4 and 6. Delta 7 is the act of creating this section, which then
+  houses the honest limit above as its own content.
+- **delegation-kit/SPEC.md §The delegation model** — the chokepoint sentence *"A
   dispatch does. A turn-end does not"* and the paragraph relocating enforcement to
-  rule 14 are the prior-flow prose. They are **not** reversed — the relocation
-  stands and rule 14 is unchanged — but the claim gains its live test: a
-  `SubagentStop` hook is a turn-end chokepoint, the probe is registered, and what
-  the axis rests on is now measurable rather than argued (deltas 1, 7).
+  rule 14 are the prior-flow prose (both sit here, not in the later §Operative
+  residency, which the surrounding paragraph only cites in passing). They are
+  **not** reversed — the relocation stands and rule 14 is unchanged — but the
+  claim gains its live test: a `SubagentStop` hook is a turn-end chokepoint, the
+  probe is registered, and what the axis rests on is now measurable rather than
+  argued (deltas 1, 7).
   The wording must not overclaim in either direction before the probe returns.
 - **delegation-kit/SPEC.md §Layout and configuration** — the knob roster gains
   `DELEGATION_KIT_STOP_LOG` and `DELEGATION_KIT_LIVENESS_CMD` with their defaults
