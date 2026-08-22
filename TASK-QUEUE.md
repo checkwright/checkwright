@@ -339,12 +339,12 @@
   operator-handed writes at 50/50 and 49/50 — both mandated writes with a citable contract
   (queue-kit/SPEC.md §check-queue-entry-budget), both seated only by compressing an answered ground
   out of the same entry. The relief works and is documented; the spend has no owner.
-  recurrence: entry-cap-displaces-mandated-writes 2026-08-20 2026-08-21 2026-08-22
-  **Nine more firings, 2026-08-22 — grounds for that date, and the SPLIT reading gets its
-  counter-evidence twice.** Six landed one operator ruling, three at 1 or 0 headroom, the one at 0
-  relieved by PROMOTION — the "unrecorded relief valve", exercised deliberately. Three more reddened
-  scope's own mandated writes at 51/53/51 against 50, the first set MEASURED by the gate rather than
-  by hand. Both sets' colliders were the most recently RULED-ON, not the longest-lived.
+  recurrence: entry-cap-displaces-mandated-writes 2026-08-20 2026-08-21 2026-08-22 2026-08-23
+  **Nine firings 2026-08-22 and a tenth 2026-08-23 — grounds for both dates, and the SPLIT reading
+  gets its counter-evidence twice.** Six landed one operator ruling, one relieved by PROMOTION, the
+  "unrecorded relief valve". Three more reddened scope's own mandated writes at 51/53/51 against 50,
+  the first set MEASURED by the gate. The tenth reddened CLOSE's watch-condition record at 51. Every
+  collider was the most recently RULED-ON entry, not the longest-lived.
   **Twelve more firings, 2026-08-20/21 — grounds for those dates, and the class NARROWS.** Seven at
   scope landed authority rulings onto five entries at 0 headroom; two at build compressed by
   answering spent grounds; three were that drain's own recurrence stamps. The taxed class is the
@@ -2207,6 +2207,12 @@
   that way: the always-loaded set and the skill body do not shrink between
   iterations. So the peak reads as work-side, and "roughly doubled" in the lead
   line above is a trend claim the series no longer supports without qualification.
+  **Second non-monotonic fall, checked 2026-08-23 on the `cr` column, and the
+  watch's QUALITY half was tested for the first time.** The draw fell again from
+  a high iteration to below the era's median, corroborating work-side. Align on
+  the cheaper tier also confirmed an amendment whose delta premise was false, but
+  build delivered the stated end state in-session — so the ruling's revert signal,
+  a missed spec defect surfacing as a build ROUND-TRIP, did not fire. Logged only.
   Surfaced 2026-08-01 by the `/economics` run at close as the competing
   hypothesis behind an align tier question; the tier half was ruled the same
   session and this entry re-scoped to the half that is still open.
@@ -5251,7 +5257,10 @@
 - **scratch-execution-control-is-bash-only** [design-pending] — the scratch-run steer and the
   runner it steers to are both bash-only, so a non-bash scratch script executes with no
   compensating control at all.
-  recurrence: scratch-execution-control-is-bash-only 2026-08-16 2026-08-18 2026-08-19
+  recurrence: scratch-execution-control-is-bash-only 2026-08-16 2026-08-18 2026-08-19 2026-08-23
+  **FIFTH MEASUREMENT, 2026-08-23 — the trend REVERSED for the first time.** Nine `python3 -` stdin
+  heredocs, seven of them editing tracked files, against 50 last time: an ~86% fall. That is
+  evidence FOR the operator's discipline-shaped cause; the control's reach defect is unchanged.
   **FOURTH MEASUREMENT, 2026-08-19 at close, and the shape has fully migrated.** This iteration's
   log ranks **50 `python3 - <<EOF` stdin heredocs** editing tracked files and **zero**
   `python3 .tmp/*.py` runs: the path-shaped payload is gone and stdin is the whole of it. That
@@ -6292,18 +6301,18 @@
   a doctrine line. The prior "leading candidate for next spine" naming did not survive and is gone.
   **Cost while deferred:** each further firing costs an orphaned producer plus the lead turn that
   discovers it — and, as the tenth showed, can cost a whole suite's evidence.
-  **It fired again in the very next iteration** (`port-tail-batching-and-cap-relief`, 2026-08-16):
-  validate ended its turn on a live `run-validate`, the harness marked the agent complete, and the
-  lead resumed it from transcript. Sharpest evidence the entry has: the rule reached that session
-  through the **stage-session agent definition itself**, not a dispatch prompt — the strongest
-  prose carrier the project has, the one `waiting-rule-carrier-reach` shipped. Nothing was lost.
-  **It fired TWICE MORE at 2026-08-17 (`native-cohort-close-surfaces`) — the eighth and ninth, and
-  these are the grounds for that date's stamp on `waiting-rule-fourth-firing-post-fix`.** Both were
-  the LEAD's observation, not the acting session's: validate ended its turn on a live
-  `run-validate.sh` still writing the evidence manifest, close on a live `gh run watch`. Each was
-  recoverable only by what the producer happened to be — validate's by the liveness record it had
-  written, close's by the watch being a read-only poll that truncates no artifact — so the rule
-  held in neither. **Two firings in one iteration, both producing roles**: the rate is not noise.
+  **Firings 6-9, 2026-08-16/17 — spent grounds, kept only for what they establish.** Four across
+  three iterations, every one a producing role ending its turn on a live producer and recovered by
+  whatever the producer happened to be. They established the rate is not noise; both their readings
+  are superseded below, and neither carried a date of its own.
+  **It fired again at 2026-08-22 validate, and the CARRIER argument is now ANSWERED.** The session
+  ended its turn on a live `run-validate.sh` with its OWN journal recording this lesson from the
+  tenth firing and stating the intent not to repeat it. Earlier firings argued the rule's carrier
+  was too weak — the agent definition, then the dispatch prompt. A session that wrote the rule down
+  itself and still ended the turn retires that: carriage is not the defect. No new date, 2026-08-22
+  being stamped already. **The DETECTOR exists and is deliberately inert, which is where the design
+  should go** — the `SubagentStop` probe logged `verdict=red live=yes` SIXTEEN times in one
+  37-minute window this iteration and is logging-only, so what is missing is a forcing function.
   **Tenth firing, 2026-08-17 (`post-close-intake-and-index-port` validate) — the first to cost
   evidence rather than turns.** It ended its turn on a live `run-validate.sh` to await a completion
   notification that ending the turn prevents, then committed mid-run and dirtied the worktree
@@ -7202,6 +7211,14 @@
 
 - **guard-read-steer-tool-coverage** [design-pending] — the bash-guard's read-steer covers `cat`
   and `sed` and not `awk`, so a line-range read of a tracked file is decided out of band.
+  recurrence: guard-read-steer-tool-coverage 2026-08-23
+  **FIRST RECURRENCE, 2026-08-23, and the DOMINANT SHAPE FLIPPED — which redirects the design.**
+  22 `awk` programs in this iteration's log: **8** the line-range `NR>=X && NR<=Y` form, **12** a
+  section-pattern form (`/^## <title>/,/^## /`), 2 genuine stream transforms. The measurement below
+  had 19 of 22 line-range. So the majority now wants a DIFFERENT target — `context-kit/bin/`'s
+  section extractor, already committed-allowlisted and reached for once against those 12 — and a
+  steer built to that measurement would send the majority to `Read`'s offset/limit, the wrong tool.
+  What the unit owns therefore grows by one: the parser must also decide WHICH steer to emit.
   **Measured 2026-08-19 at close's prompt-friction triage, off the log rather than impression.**
   The iteration ranked 22 `awk` calls: 19 of the exact shape `awk 'NR>=X && NR<=Y' <file>`, 13 of
   those against `TASK-QUEUE.md`; one a range-address read of `.workflow/survey-record.md`; one
@@ -7720,8 +7737,6 @@
 - **scratch-execution-allowlist-bar** [design-pending] — Each close re-derives this standing bar.
 
 ## Done
-
-- single-gate-run-config-bridge
 
 ## Lessons Learned
 
