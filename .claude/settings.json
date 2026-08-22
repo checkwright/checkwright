@@ -11,6 +11,7 @@
       "Bash(bash gate-sdk/bin/run-gates.sh)",
       "Bash(bash gate-sdk/bin/run-gates.sh *)",
       "Bash(env GATE_SDK_VERBOSE=1 bash gate-sdk/bin/run-gates.sh)",
+      "Bash(env GATE_SDK_VERBOSE=1 bash gate-sdk/bin/run-gates.sh *)",
       "Bash(bash scripts/parse-gates-log.sh *)",
       "Bash(bash gate-sdk/bin/run-gate-tests.sh *)",
       "Bash(bash gate-sdk/bin/run-consumer-smoke.sh)",
