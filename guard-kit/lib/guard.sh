@@ -31,9 +31,30 @@ declare -p GUARD_KIT_RO_BINS >/dev/null 2>&1 || GUARD_KIT_RO_BINS=(
     grep egrep fgrep rg head tail cat wc sort uniq cut tr nl rev tac paste comm column diff jq find ls xargs
 )
 
+# spec: guard-kit/SPEC.md §The guard framework — the payload cache: called directly (never in a substitution, which would kill the global with its subshell) so a rule needing a second field can have one
+guard_read_input() {
+    GUARD_INPUT="$(cat 2>/dev/null)" || return 1
+    [[ -n "$GUARD_INPUT" ]] || return 1
+    return 0
+}
+
+# spec: guard-kit/SPEC.md §The guard framework — one field of the cached payload by jq path; an unset or empty GUARD_INPUT and an absent path alike print nothing, which is what keeps a guard that never opted in working unchanged
+guard_input_field() {
+    local v
+    [[ -n "${GUARD_INPUT:-}" ]] || return 0
+    v="$(printf '%s' "$GUARD_INPUT" | jq -r "$1" 2>/dev/null)" || return 0
+    [[ "$v" == "null" ]] && return 0
+    printf '%s' "$v"
+}
+
+# spec: guard-kit/SPEC.md §The guard framework — GUARD_INPUT first, stdin otherwise: the fallback is what keeps every consumer copy that never opted in byte-identical
 guard_read_command() {
     local input cmd
-    input="$(cat 2>/dev/null)" || return 1
+    if [[ -n "${GUARD_INPUT:-}" ]]; then
+        input="$GUARD_INPUT"
+    else
+        input="$(cat 2>/dev/null)" || return 1
+    fi
     cmd="$(printf '%s' "$input" | jq -r '.tool_input.command // empty' 2>/dev/null)" || return 1
     [[ -z "$cmd" ]] && return 1
     printf '%s' "$cmd"
@@ -42,7 +63,11 @@ guard_read_command() {
 # spec: guard-kit/SPEC.md §The guard framework — the path counterpart of guard_read_command; a call carrying no file_path returns non-zero so a matcher covering it falls through instead of blocking
 guard_read_path() {
     local input path
-    input="$(cat 2>/dev/null)" || return 1
+    if [[ -n "${GUARD_INPUT:-}" ]]; then
+        input="$GUARD_INPUT"
+    else
+        input="$(cat 2>/dev/null)" || return 1
+    fi
     path="$(printf '%s' "$input" | jq -r '.tool_input.file_path // empty' 2>/dev/null)" || return 1
     [[ -z "$path" ]] && return 1
     printf '%s' "$path"
