@@ -5285,8 +5285,9 @@
 
 - **ro-bins-write-option-bypass** [design-pending] — `GUARD_KIT_RO_BINS` membership is tested as
   "the segment leads with this binary", but leading with a roster binary does not make the
-  invocation read-only, and the read-only-pipeline rule's safety argument assumes it does (rule 15
-  since the wait-chain unit inserted two rules ahead of it; rule 13 when this entry was filed).
+  invocation read-only, and the read-only-pipeline rule's safety argument assumes it does. The rule
+  is named rather than numbered here: guard-kit renumbers on insertion, and this citation had gone
+  stale twice over before close 2026-08-22 corrected it.
   **Probed through the live hook at close, not reasoned:** `grep foo a.md | sort -o out.txt` and
   `sort -o tracked.md tracked.md | head` are both auto-allowed today, and each overwrites a named
   file. That rule's redirect check inspects `>`/`>>` targets only, so a write expressed as a
@@ -6227,16 +6228,19 @@
 
 - **turn-end-chokepoint-and-wait-primitive** [design-pending] — two open mechanism questions the
   wait rule's fifth firing raised, neither answerable from the ruling that closed its prose half.
-  **This is the design half of `waiting-rule-fourth-firing-post-fix`**, whose surviving question is
-  "given that prose alone does not hold, what does". Filed apart only because that entry sits at
-  the cap — `entry-cap-displaces-mandated-writes` in a new shape, content pushed into a new entry.
-  **First half — ANSWERED 2026-08-17** (enforcement turns on an act passing a chokepoint; a
-  turn-end passes no `PreToolUse` one), and its remainder — `subagent-stop-liveness-hook-wiring`'s
-  probe — **RETURNED 2026-08-22 off the wired logging-only hook: the harness does NOT defer the
-  stop, so the class does not dissolve and rule 14 stands.** Second finding, unbuyable without
-  wiring: `SubagentStop` fires per assistant step, not at the session end, so a blocking variant
-  refuses at every step — and stays a SECOND authorization nobody holds. Both recorded at
-  delegation-kit/SPEC.md §The turn-end liveness probe (template).
+  **The design half of `waiting-rule-fourth-firing-post-fix`** (now Done), split off at that entry's
+  cap; its surviving question is "given that prose alone does not hold, what does".
+  **First half — CLOSED 2026-08-22:** the chokepoint answer (2026-08-17, a turn-end passes no
+  `PreToolUse` one) and the probe's return (the harness does NOT defer the stop; `SubagentStop`
+  fires per assistant step, so a blocking variant refuses at every step and still needs a SECOND
+  authorization) — delegation-kit/SPEC.md §The turn-end liveness probe (template) holds both, so
+  the class does not dissolve and rule 14 stands.
+  **Fifteenth firing, 2026-08-22 — grounds for that date:** this iteration's validate session ended
+  its turn to wait on `run-validate`, twice; the hook wired that same iteration logged five
+  `live=yes verdict=red records=1` firings across the two launches, catching its own supervisor.
+  **RULED by the lead 2026-08-22 — the blocking variant is not sought this iteration:** a second
+  authorization is a scope-stage ask, and `subagent-stop-payload-background-tasks-read` may collapse
+  what such a hook should read. Sequence: settle that entry first, then route the ask.
   **Second half — which primitive is reliable here.** The protocol states a hard ordering:
   `run_in_background` plus an `until`-loop for a single completion, with the event-stream form
   named the wrong tool. On this machine that ordering **inverted** — four of the lead's own
@@ -6259,17 +6263,14 @@
   written, close's by the watch being a read-only poll that truncates no artifact — so the rule
   held in neither. **Two firings in one iteration, both producing roles**: the rate is not noise.
   **Tenth firing, 2026-08-17 (`post-close-intake-and-index-port` validate) — the first to cost
-  evidence rather than turns.** The session backgrounded `run-validate.sh` and a `kill -0` loop on
-  it, then ended its turn saying it would act on the completion notification, which ending the turn
-  is what prevents. It then committed mid-run, dirtying the worktree the `installer_smoke` pack step
-  checks: that run reported `verdict=new-failures` on a false ground and was re-run foreground. No
-  date — 2026-08-17 is already on `waiting-rule-fourth-firing-post-fix`, idempotent per (slug,date).
-  **Held out of `graph-port-and-config-seam`** (lead 2026-08-20; operator 2026-08-18, weighed as a
-  competing spine) on the limit both ruled past: the port work is the work whose evidence this
-  defect eats. **Fourteenth firing, 2026-08-21 — grounds for that date, and the held limit coming
-  true inside the held iteration:** its validate session ended a turn *in order to wait* on the
-  battery. Self-disclosed; the liveness record it wrote meant nothing was lost.
-  recurrence: turn-end-chokepoint-and-wait-primitive 2026-08-18 2026-08-19 2026-08-21
+  evidence rather than turns.** It ended its turn on a live `run-validate.sh` saying it would act on
+  the completion notification, which ending the turn is what prevents, then committed mid-run and
+  dirtied the worktree `installer_smoke` checks: that run reported `verdict=new-failures` on a false
+  ground. No date — 2026-08-17 already stamped there, idempotent per (slug,date).
+  **Fourteenth firing, 2026-08-21 — grounds for that date:** validate ended a turn *in order to
+  wait* on the battery, inside the very iteration this defect was held out of for the port spine
+  (lead 2026-08-20; operator 2026-08-18) — the held limit came true. Record written, nothing lost.
+  recurrence: turn-end-chokepoint-and-wait-primitive 2026-08-18 2026-08-19 2026-08-21 2026-08-22
   **Firings 11-13, 2026-08-18 — grounds for that date.** Three times a backgrounded producer exited
   cleanly and the turn ended anyway: work finished, uncommitted, no completion notification,
   recovered only by the operator noticing. The second half, measured on producers that *finished*.
@@ -7518,6 +7519,113 @@
   — the one surface whose whole purpose is outliving the queue entries it was extracted from.
   Surfaced 2026-08-19 at the same close's staleness review, filed to the gap inbox beside the entry
   above; promoted 2026-08-20 by the next iteration's scope, which drained that inbox to its header.
+
+- **settings-hook-command-path-gate** [design-pending] — a hook registration in
+  `.claude/settings.json` whose `command` names a renamed or deleted script reds nowhere and
+  fails silently at run time.
+  **Probed at the drain, not reasoned:** `check-settings-paths` resolves command tokens for
+  `permissions.allow[]` only (`native/src/gates/settings_paths.rs`, whose `allow_entries` reads
+  `/permissions/allow`); the sole other reader of `/hooks` in the tree is the **emitter**
+  `native/src/emit/enforcement_map.rs`, which renders `PreToolUse` and `SessionStart` command
+  paths into the enforcement map **without resolving them against the tree** — a deleted script
+  still renders a row — and does not read `/hooks/SubagentStop` at all, so this iteration's new
+  registration is invisible to the projection as well as to every gate.
+  **Two halves, and the second is the cheaper one.** Path resolution is the walk
+  `check-settings-paths` already owns, so widening its subject from one JSON pointer to two is a
+  small port-side change; extending the enforcement map's hook-event roster is a docs-projection
+  ruling about what belongs on that page, not a gate.
+  **Why `[design-pending]`:** whether the widened subject stays inside `check-settings-paths` or
+  mints a second gate name is canon-kit's new-names litmus, and the projection half is a scope
+  call on the enforcement page that nobody has taken.
+  **Cost while deferred:** a broken hook is invisible until the behaviour it guards silently stops
+  happening — the failure mode with no red anywhere and no user-visible symptom.
+  Filed 2026-08-22 at spec while surveying context-kit's settings gates; drained at that
+  iteration's close, which re-verified the claim and found the enforcement-map reader it missed.
+
+- **breadth-declaration-stale-listing** [design-pending] — a `GUARD_KIT_BREADTH_DECLARED` entry can
+  outlive its subject with nothing noticing: the knob records a ruling about one glob and never
+  verifies that glob is still in the local allowlist, still over-broad, or still real.
+  **Probed at the drain:** the declaration lookup sits *inside* the local-allow-by-breadth-probe
+  loop (`guard-kit/bin/compare-settings-allow.sh`), so a declaration keyed on an entry that has
+  left the overlay is never looked up — it is not reported stale, it is not reported at all.
+  **A stale-declaration *red* was already weighed and refused** inside the amendment that shipped
+  the knob, because it would print every declaration naming a committed glob as stale. The cheap
+  true form is a **listing** rather than a red — the conclusion
+  `done-slug-ownership-citation-report` reached for its own class; the remedy shape is borrowed,
+  the finding is not.
+  **DISTINCT from `breadth-declaration-committed-glob-home`**, the same loop's other face: that
+  entry asks where a *committed* glob's keep-ruling lives at all, this one asks what happens to a
+  *local* declaration once its subject leaves. Settling that entry bounds this one's corpus.
+  **Why `[design-pending]`:** whether the listing rides `compare-settings-allow`'s existing
+  advisory output or earns its own arm is unsettled, and so is whether a listing nobody reads
+  beats nothing at all.
+  **Cost while deferred:** a spent ruling reads as live and silences nothing visibly.
+  Filed 2026-08-22 at spec; drained at that iteration's close, which re-verified the loop scoping.
+
+- **breadth-declaration-committed-glob-home** [design-pending] — a keep-the-breadth ruling about a
+  **committed** allow glob has nowhere durable to live: `GUARD_KIT_BREADTH_DECLARED` cannot hold
+  it, because `compare-settings-allow`'s breadth loop iterates the **local overlay** only, so a
+  declaration keyed on a committed glob is a key nothing ever reads — the shape guard-kit/SPEC.md
+  itself refuses when it says a field with no named reader is removed rather than shipped.
+  **The concrete casualty:** `Bash(git rm -q *)` is a committed glob whose breadth build
+  2026-08-22 ruled KEEP on real grounds — `guard_rule_rm_tracked` steers every tracked-file
+  deletion into it, so narrowing it would tax a mandated mechanic — and that ruling evaporated.
+  **NOT a re-filing of `settings-allow-intended-breadth-declaration`**, which shipped the knob and
+  is closed: the knob does exactly what its own spec says. The gap is that `guard-grant-review`'s
+  corpus (the committed set) and the knob's corpus (the overlay) were never the same corpus, which
+  nothing noticed until a committed-glob keep-ruling needed a home.
+  **Three dispositions, none ruled:** state in guard-kit/SPEC.md that the knob is
+  local-overlay-scoped by design and give committed-glob keep-rulings a different home; widen the
+  breadth question to the committed set, which the iteration lead has ruled a closed reading and
+  would have to re-open; or accept that a committed glob's breadth is ruled by the fact that it is
+  committed and reviewed, and record nothing.
+  **Why `[design-pending]`:** the three differ in what they assert about the committed set's
+  reviewability, which is a security-posture call and not a mechanism choice.
+  **Cost while deferred:** a security review of the committed set produces keep-rulings that
+  evaporate — the exact failure mode `guard-grant-review` was re-filed to stop.
+  Filed 2026-08-22 by build; drained at that iteration's close, which re-verified the loop.
+
+- **guard-rule-number-not-citable-outside-kit** [design-pending] — a guard-kit rule number is a
+  stable-looking identifier that is not stable: rules renumber on every insertion, and the
+  renumbering sweep's roster covers SPEC prose, lib comments, the test tables and the runner —
+  **cross-corpus prose has never been in it**.
+  **Measured, not assumed:** `ro-bins-write-option-bypass` cited the read-only-pipeline rule as
+  "rule 15 ... rule 13 when this entry was filed" while it was in fact 17 — stale twice over, and
+  already stale before the renumbering that moved rules 15-20 to 16-21. That one citation was
+  corrected in place at close 2026-08-22 by naming the rule instead of numbering it; the durable
+  rule is this entry's.
+  **Two dispositions and neither is free:** sweep cross-corpus prose on every renumber, a corpus
+  nobody has costed; or state in guard-kit/SPEC.md that a rule number is not a citable identifier
+  outside the kit and have every cross-corpus reference name the rule — the way rule 19 already
+  cites DOCTRINE.md by name rather than number, for exactly this reason.
+  **Why `[design-pending]`:** the second is a one-paragraph boundary note plus a sweep of unknown
+  size, and whether a bare "rule N" outside the kit is gateable at all needs a false-positive
+  budget nobody has measured.
+  **Cost while deferred:** a reader follows the number to the wrong rule and reasons from it.
+  Filed 2026-08-22 at align's cross-audit; drained at that iteration's close, which found the
+  bullet had named the wrong slug and located the real entry before dispositioning.
+
+- **subagent-stop-payload-background-tasks-read** [design-pending] — the `SubagentStop` payload
+  carries a top-level `background_tasks` key and nothing knows what is in it.
+  **Verified against the wired hook's own log, not inferred:** every firing records
+  `keys=...,background_tasks,session_crons`. That falsifies a claim
+  `subagent-stop-liveness-hook-wiring` recorded as SETTLED and carried into its amendment — "the
+  payload names no background task, PID or shell id, so detection never comes from it" — which
+  close 2026-08-22 corrected at delegation-kit/SPEC.md §The turn-end liveness probe (template),
+  keeping the no-values privacy ruling on the ground that survives the correction.
+  **Why it matters beyond the correction.** The harness independently states it tracks an agent's
+  live background children. If that key names them, the blocking variant's whole design changes:
+  the hook could read the harness's own view instead of the `*.run` record set, and guard-kit's
+  unrecorded-launch residue would become reachable. `turn-end-chokepoint-and-wait-primitive` is
+  sequenced behind this entry for that reason — the lead ruled 2026-08-22 that asking for the
+  blocking variant's authorization first would buy a design decided before its inputs.
+  **Why `[design-pending]`:** settling it costs one deliberate **value** read, and the probe logs
+  keys and never values by a recorded privacy ruling (delegation-kit/SPEC.md §The turn-end
+  liveness probe (template), delta 4). Changing that ruling is the design question, not the read.
+  **Cost while deferred:** the entry it gates is the project's most-fired standing defect, and its
+  next design step cannot honestly be taken without this answer.
+  Filed 2026-08-22 by build; drained at that iteration's close, which verified the key set
+  directly against the committed hook's log.
 
 ## Icebox
 
