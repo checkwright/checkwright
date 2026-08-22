@@ -106,6 +106,32 @@ budget arm cannot select until `cohort-held-members-port-prerequisites`
 moves"*. Two members return to the takeable tier and the budget arm can compose
 a cut again.
 
+### The provenance seam, and the config surface
+
+**Kit mechanism:** the `# port-until:` field, its readers, assertion H's rule,
+and the two criteria paragraphs. All of it is a claim about *the shape of a
+declaration and where its argument lives*, true for any consumer, naming no
+gate and no ground.
+
+**Consumer content, and it stays in the consumer's tree:** which members are
+held, what blocks each one, and the slug each names. Assertion H derives its
+subject set from declarations in the tree it runs against and reads the section
+each declaration's own pointer names, so a consumer with no held member sees an
+assertion that never fires and one with ten sees ten. The kit ships **no roster
+of held members, no cause text and no slug** — §The `# graph:` manifest's
+standing rule, unchanged and now enforced from a second direction.
+
+**The one place the seam is easy to cross here and is not:** assertion H must
+not carry a vocabulary of acceptable grounds. It matches the *field's own name*
+in the pointed-at section, which is kit-minted, and rules nothing about what the
+paragraph says. A criterion list or a blocker vocabulary in the assertion would
+publish this project's port track as everyone's mechanism.
+
+**No new knob.** Delta 4 adds one token to an existing `# graph:` manifest and
+no `GATE_SDK_*` value; every surface it reads is already reachable through
+`GATE_SDK_GATES_DIR`, `GATE_SDK_KIT_DIRS` and the declaration's own pointer.
+Config-via-env is satisfied by having nothing to configure.
+
 ## What changes
 
 ### (1) One home for a held member's ground

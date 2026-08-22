@@ -87,6 +87,23 @@ carries — and it lands in this unit because enforcement-first ranks landing th
 fix with the feature above filing it beside one. Without it, `--only` ships
 into a tool where the *next* wrong guess is still unrecoverable.
 
+### The provenance seam, and the config surface
+
+**Kit mechanism:** the flag, its grammar, its refusals, and the help behavior
+§The bin/-tool contract already requires. Every one of them is a statement about
+argument handling, true for any consumer's registry.
+
+**Consumer content, untouched:** the gate names themselves. `--only` takes them
+from argv and validates membership against *the consumer's own registry* — it
+carries no name list, no default selection and no notion of which gates matter.
+A kit literal naming this project's gates is exactly what the seam forbids, and
+the flag is the shape that cannot hold one.
+
+**No new knob**, which is the argv-versus-env ruling above read from the other
+side: the selection is per-invocation and belongs in argv, and the registry
+location it selects within is already `GATE_SDK_GATES_DIR`'s. Delta 1 adds one
+argument arm and no `GATE_SDK_*` value, so config-via-env has nothing to take.
+
 ## What changes
 
 ### (1) `run-gates.sh --only <name> [<name>...]` — the name-keyed selector
