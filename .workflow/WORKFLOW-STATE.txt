@@ -4,4 +4,4 @@
 
 ---
 
-— scope a27e0ee9 2026-08-23 e49f3270
+leak-guard-and-assertion-meta-gate-port scope a27e0ee9 2026-08-23 e49f3270
