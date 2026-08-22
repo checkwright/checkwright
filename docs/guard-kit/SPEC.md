@@ -830,6 +830,65 @@ a report worded as coverage would be the false-confidence proxy gate-sdk/SPEC.md
 is omitted entirely rather than printed clean, so a consumer that declared no
 vocabulary cannot read silence as coverage.
 
+**The second disposition has a mechanism, and where the ruling lives is what makes
+it durable.** `GUARD_KIT_BREADTH_DECLARED` (§Layout and configuration) maps a
+permission-rule string to the reason that breadth was ruled intended — a pair,
+never a bare list, since a bare list re-loses the reason it exists to keep. It
+lives in the **committed** config the consumer tracks, so the ruling survives in a
+reviewable surface rather than in a session's memory or a commit message, which
+spec-over-precedent says is not ground truth. That fixes where a declaration
+*lives*; it does not widen what the breadth question *reads*, which stays the
+local overlay named above. An over-broad local glob keeps re-reporting until a
+**committed** declaration rules it, and a per-clone declaration cannot silence
+one.
+
+**The declaration match is exact-string, never glob.** An entry is declared when
+the exact local allow-rule string is a key of the map — a key test and nothing
+else. Routing it through `guard_allow_match` is refused: the kit's one matcher
+would let a single declaration silence globs the operator's ruling never named,
+which is a declaration widening itself, and a durable ruling about intended
+breadth is a ruling about **one** glob. The consequence is stated rather than left
+to be discovered — narrowing a declared glob, or re-spelling it, drops its
+declaration and the entry re-reports. That is correct, since the ruling was taken
+on the old string, and it is what keeps a declaration from outliving the glob it
+ruled.
+
+**A declared glob is not dropped from the report.** The over-broad set partitions
+in two and both halves print:
+
+- **narrowing candidates** — over-broad and undeclared, printed with the
+  two-disposition help text above.
+- **declared intended** — over-broad and declared, printed as
+  `<glob>  ⊇  <probe>  — <reason>` under its own heading, with help text naming
+  the committed config as where the ruling lives.
+
+Dropping a declared glob would make the knob a silencer whose contents nobody ever
+reads, and a field with no named reader is removed rather than shipped
+(canon-kit/SPEC.md §The causal-completeness check, point 4). An over-broad set
+that is **entirely** declared therefore prints the declared section and **no**
+narrowing section: *no over-broad local entries* would be false there. With no
+over-broad entries at all the report is unchanged, and with the map empty — the
+default, and the shipped state for a consumer who declares nothing — the partition
+is trivial, the declared subsection is omitted, and every byte of output matches
+the tool as it behaved before the declaration shipped. The asymmetry with
+`GUARD_KIT_BREADTH_PROBES` is deliberate: an empty probe set omits the whole
+breadth section because silence there could be misread as coverage, while an empty
+declaration set omits only the declared subsection, where no coverage claim is
+available to misread and an absent section says exactly that nothing was declared.
+
+**The honest limit: a declaration can outlive its subject and nothing notices.**
+The knob records a ruling; it does not verify that the glob it names is still in
+`GUARD_KIT_SETTINGS_LOCAL`, still over-broad, or still real. A stale declaration
+is silent. A stale-declaration report was weighed and refused, because it would
+print every declaration naming a **committed** glob as stale — and a committed
+glob was never in this report to begin with, so a declaration naming one is a
+durable record that the report itself does not read. That is exactly the shape a
+re-derivation of the committed allowlist produces when it rules a glob safe and
+keeps it broad, and it is stated rather than covered; the gap is filed rather than
+flagged-and-skipped. Nothing here makes a gate of the tool either: the placement
+ruling below is unchanged and unweakened by a knob that records exactly the
+operator intent that ruling turns on.
+
 This is the criterion's home rather than a gate, and the placement is ruled
 rather than defaulted: the subject is a gitignored per-machine file CI cannot
 see, and the verdict is operator-intent-dependent (a blanket grant is fine in a
@@ -850,7 +909,11 @@ owns the committed settings file as a gate subject. This kit holds the three
 by parsing technique does not outrank placement by governed surface.
 
 `--count` emits both bare counts on one line, redundancy first and breadth
-second.
+second, and the breadth number counts the **narrowing candidates** rather than
+every over-broad entry: the count's one purpose is *how much is outstanding*, and
+a declared entry is not outstanding. A third number for the declared count is
+refused — no reader needs it, and the two-number line is a shape a consumer may
+already parse.
 
 ## wakeup-guard (template)
 
@@ -898,8 +961,10 @@ lifecycle-kit's close template. The step: run `scan-prompts`, resolve each
 recurring pattern by the triage criterion; review and delete the wakeup
 log if present; run `compare-settings-allow` and take its **two**
 dispositions — prune the listed redundant local entries, and for each entry the
-breadth report names, either narrow the glob or record that its breadth is
-intended — then by judgment prune the remaining one-off exact-string local
+breadth report names as a narrowing candidate, either narrow the glob or record
+that its breadth is intended as a `GUARD_KIT_BREADTH_DECLARED` entry in the
+committed config, which is what moves it into the report's declared section and
+stops it re-reporting — then by judgment prune the remaining one-off exact-string local
 entries and promote recurring safe patterns to the committed settings as
 globs; clear the friction log. Two judgments the reports cannot make sit in
 that last step. An entry naming a **script path** rather than a fixed command is
@@ -972,6 +1037,21 @@ repo's layout as defaults):
   both sides, so a consumer can probe non-`Bash` rules with the same mechanism.
   The kit ships **no** default probes: every string naming a command is the
   consumer's vocabulary, never the kit's (CLAUDE.md §The provenance seam).
+- `GUARD_KIT_BREADTH_DECLARED` — associative array recording the breadths ruled
+  intended (§compare-settings-allow): the key is a permission-rule string, the
+  value the reason that breadth was ruled intended; default empty, in which case
+  the declared subsection is absent and the tool behaves exactly as it did before
+  the declaration shipped. **Associative rather than a delimited indexed array,
+  and the choice is not cosmetic:** a permission rule may contain any character a
+  command may, so every single-character separator an indexed array would need
+  (`|`, `::`, a tab) is a character a legitimate rule can carry, and the knob
+  would ship a grammar that cannot express part of its own subject. An
+  associative key holds the rule verbatim, and a key is unique by construction, so
+  the *which reason wins* question the delimited shape would raise cannot arise.
+  Report order never depends on the map's iteration order: the tool walks the
+  settings file's own allow list and looks each entry up, so the map is never
+  iterated and the unordered iteration never reaches output. The kit ships **no**
+  default declarations, on the same seam reasoning as the probes above.
 - `GUARD_KIT_RO_SCRIPTS` — array of globs eligible for the
   absolute→relative rewrite (rule 4); default `("check-*.sh")`.
 - `GUARD_KIT_RO_BINS` — read-only pipeline roster (rule 16); default the
@@ -1030,7 +1110,14 @@ makes that file conditional on exactly this).
 same reason, at `gate-tests/compare-settings-allow.test.sh`: a firing probe
 (a blanket local glob reported with its witness), a non-firing one (a narrow
 entry reporting clean), and the empty-knob silence that proves the section is
-omitted rather than printed clean. It drives the tool through
+omitted rather than printed clean — which, with `GUARD_KIT_BREADTH_DECLARED`
+empty, also proves the declared subsection absent. The declaration's own cases sit
+beside them: a declared over-broad entry printing in the declared section with its
+reason and **not** in the narrowing set; an all-declared over-broad set printing
+the declared section, no narrowing section and no false clean line; `--count`'s
+breadth number excluding the declared entry; and an exactness case — a declaration
+differing from the local entry by one character leaves that entry in the narrowing
+set, which is the assertion that the lookup never became a glob match. It drives the tool through
 `GUARD_KIT_CONFIG_FILE` pointed at a sandbox config, so the consumer's own probe
 array cannot leak into the fixture.
 

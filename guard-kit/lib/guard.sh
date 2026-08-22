@@ -24,6 +24,7 @@ unset _frik_cfg
 : "${GUARD_KIT_SETTINGS:=.claude/settings.json}"
 : "${GUARD_KIT_SETTINGS_LOCAL:=.claude/settings.local.json}"
 declare -p GUARD_KIT_BREADTH_PROBES >/dev/null 2>&1 || GUARD_KIT_BREADTH_PROBES=()
+declare -p GUARD_KIT_BREADTH_DECLARED >/dev/null 2>&1 || declare -A GUARD_KIT_BREADTH_DECLARED=()
 declare -p GUARD_KIT_RO_SCRIPTS >/dev/null 2>&1 || GUARD_KIT_RO_SCRIPTS=("check-*.sh")
 declare -p GUARD_KIT_SCRATCH_DIRS >/dev/null 2>&1 || GUARD_KIT_SCRATCH_DIRS=(".tmp")
 declare -p GUARD_KIT_RO_BINS >/dev/null 2>&1 || GUARD_KIT_RO_BINS=(

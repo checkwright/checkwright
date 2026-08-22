@@ -41,14 +41,19 @@ done
 
 # spec: guard-kit/SPEC.md §compare-settings-allow — the breadth question: guard_allow_match with the
 # arguments swapped, asking whether a local glob would auto-allow a probe rather than whether a
-# committed glob already grants a local entry
+# committed glob already grants a local entry, then partitions on an exact-string declaration lookup
 too_broad=()
+declared=()
 for entry in "${LOCAL_ALLOW[@]}"; do
     [[ -z "$entry" ]] && continue
     for probe in "${GUARD_KIT_BREADTH_PROBES[@]}"; do
         [[ -z "$probe" ]] && continue
         if guard_allow_match "$probe" "$entry"; then
-            too_broad+=("$entry  ⊇  $probe")
+            if [[ -n "${GUARD_KIT_BREADTH_DECLARED[$entry]+set}" ]]; then
+                declared+=("$entry  ⊇  $probe  — ${GUARD_KIT_BREADTH_DECLARED[$entry]}")
+            else
+                too_broad+=("$entry  ⊇  $probe")
+            fi
             break
         fi
     done
@@ -75,17 +80,36 @@ fi
 [[ ${#GUARD_KIT_BREADTH_PROBES[@]} -eq 0 ]] && exit 0
 
 echo
-echo "=== settings allowlist breadth (advisory — narrowing candidates) ==="
-if [[ ${#too_broad[@]} -eq 0 ]]; then
-    echo "no over-broad local entries (no configured probe is auto-allowed by a $LOCAL glob)"
-    exit 0
+# spec: guard-kit/SPEC.md §compare-settings-allow — an over-broad set that is entirely declared
+# prints the declared section and no narrowing section: the clean line would be false there
+if [[ ${#too_broad[@]} -gt 0 || ${#declared[@]} -eq 0 ]]; then
+    echo "=== settings allowlist breadth (advisory — narrowing candidates) ==="
+    if [[ ${#too_broad[@]} -eq 0 ]]; then
+        echo "no over-broad local entries (no configured probe is auto-allowed by a $LOCAL glob)"
+        exit 0
+    fi
+    echo "${#too_broad[@]} local allow entr(ies) auto-allow a configured probe — candidates to narrow in $LOCAL:"
+    echo
+    printf '  %s\n' "${too_broad[@]}"
+    echo
+    echo "help: narrow each listed glob on the left, or record that the breadth is"
+    echo "      intended — the probe on the right witnesses what it auto-allows."
+    echo "      Probes are witnesses, not a roster: no completeness is claimed, so an"
+    echo "      empty report is not a proof that every local glob is narrow enough."
 fi
 
-echo "${#too_broad[@]} local allow entr(ies) auto-allow a configured probe — candidates to narrow in $LOCAL:"
+# spec: guard-kit/SPEC.md §compare-settings-allow — a declared glob is not dropped from the report:
+# it moves out of the narrowing set and prints with its reason, so the ruling has a reader
+[[ ${#declared[@]} -eq 0 ]] && exit 0
+
+[[ ${#too_broad[@]} -gt 0 ]] && echo
+echo "=== settings allowlist breadth (advisory — declared intended) ==="
+echo "${#declared[@]} over-broad local allow entr(ies) whose breadth was ruled intended:"
 echo
-printf '  %s\n' "${too_broad[@]}"
+printf '  %s\n' "${declared[@]}"
 echo
-echo "help: narrow each listed glob on the left, or record that the breadth is"
-echo "      intended — the probe on the right witnesses what it auto-allows."
-echo "      Probes are witnesses, not a roster: no completeness is claimed, so an"
-echo "      empty report is not a proof that every local glob is narrow enough."
+echo "help: no narrowing is owed — each glob on the left auto-allows the probe beside"
+echo "      it, and that breadth was ruled intended. The ruling lives with the probes"
+echo "      in the committed guard-kit config, as a GUARD_KIT_BREADTH_DECLARED entry."
+echo "      A declaration is keyed on the exact glob string it ruled, so re-spelling"
+echo "      or narrowing that glob returns the entry to the narrowing candidates."
