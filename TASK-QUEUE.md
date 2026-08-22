@@ -128,7 +128,15 @@
   own crate, which a fresh clone re-buys entirely.
   **The `awk` item stays CONTESTED** by `guard-read-steer-tool-coverage`, which rules it a (b)
   steer rather than an (a) grant; nothing here settles it.
-  recurrence: session-mechanic-grants-uncommitted 2026-08-18 2026-08-19 2026-08-21
+  recurrence: session-mechanic-grants-uncommitted 2026-08-18 2026-08-19 2026-08-21 2026-08-22
+  **Grounds for 2026-08-22 — a THIRD member of the class, and it corroborates the ruled hook
+  without widening what that hook must do.** The mandated in-turn wait is a `kill -0 "$pid"` loop
+  on a launch-liveness record (delegation-kit/templates/agent-execution.md); this iteration's
+  friction log carries 19 such calls across two sessions, every one out-of-band. None is grantable
+  by a settings rule for a structural reason: the mandated form IS a loop condition, so it is
+  decorated by construction and a `Bash(...)` glob matches bare commands. That is a second shape,
+  after the redirect target above, where a settings rule provably cannot express a mechanic the
+  methodology mandates — so the hook is not the better route, it is the only one.
   **Cost while deferred:** measured, and flat — 30 `.tmp/` heredocs of which 22 are journal appends
   at 2026-08-21, one out-of-band decision each, paid by every dispatched session in every
   iteration. A plateau is the worse reading rather than the milder one: it is the steady-state
@@ -6269,8 +6277,8 @@
   `SubagentStop` fires per assistant step, so a blocking variant needs a SECOND authorization —
   live in delegation-kit/SPEC.md §The turn-end liveness probe. Rule 14 stands; the class holds.
   **Fifteenth firing, 2026-08-22 — grounds for that date:** this iteration's validate session ended
-  its turn to wait on `run-validate`, twice; the hook wired that same iteration logged five
-  `live=yes verdict=red records=1` firings across the two launches, catching its own supervisor.
+  its turn to wait on `run-validate`, twice; the hook wired that same iteration logged FIFTEEN
+  `live=yes verdict=red` firings over 309 events — six in validate's session, nine in the lead's.
   **RULED by the lead 2026-08-22 — the blocking variant is not sought this iteration:** a second
   authorization is a scope-stage ask, and `subagent-stop-payload-background-tasks-read` may collapse
   what such a hook should read. Sequence: settle that entry first, then route the ask.
@@ -6710,8 +6718,8 @@
   `run-gates.sh <gate-name>` "a habit rather than a hole" because the path-scoped selector is
   owned in prose. That disposition is not reopened for the **name selector** — but its cited
   remedy, `--for <path>`, is path-keyed and may select several gates, so it cannot exercise a
-  knob change that edits no file. The unowned half is the **configuration bridge**, and no
-  surface carries it.
+  knob change that edits no file. The unowned half WAS the **configuration bridge**; the third
+  firing below gives that route a home and leaves ergonomics as the live question.
   **Deliberately not pre-designed:** an `--only` flag, a separate `bin` tool, or a documented
   one-liner is a real fork, and the runner's argument grammar is the constraint that decides it.
   **Cost while deferred:** paid by every session wanting a targeted verdict, and paid worst by
@@ -6733,6 +6741,13 @@
   check-queue-entry-budget/gates.list`), invoked the binary directly (fail-closed on an unset
   `GATE_SDK_KNOB_QUEUE_KIT_ACTIVE_SECTIONS`), and read the cap off `queue-kit/lib/queue.sh:38` by
   hand. Second first-hand firing, a different stage from the first: the cost is not close-shaped.
+  **Third firing 2026-08-22 at close, and it NARROWS the entry rather than confirming it.** Same
+  two failed steps again, then a third the entry never priced: a scratch dir holding a one-line
+  `gates.list` plus `GATE_SDK_VERBOSE` selects one gate AND keeps `gate_command`'s bridge intact.
+  So "the two available options are both bad" was incomplete — a third composes documented knobs
+  and hand-exports nothing. That route now has a home (gate-sdk/SPEC.md §Layout and
+  configuration), so the unowned-fact half is DISCHARGED and what survives is ergonomics: the
+  session still authors a scratch file to ask one question. No date — 2026-08-22 already stamped.
   **HELD at the 2026-08-22 promotion, lead-ruled on SURFACE DISJOINTNESS from that iteration's
   prose-gate spine and NOT on merit** — named there a leading candidate for the next spine.
   Filed 2026-08-17 by the `post-close-intake-and-index-port` close into the gap inbox, off its

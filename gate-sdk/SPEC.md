@@ -29,6 +29,12 @@ override with `GATE_SDK_GATES_DIR`) holding:
   every sibling directory holding a `checks/` **or** a `smoke/` (a vendored
   Checkwright kit — a gateless kit is discovered by its `smoke/` alone);
   override with `GATE_SDK_KIT_DIRS` (space-separated kit roots).
+  A **targeted run** needs no mechanism beyond these two knobs composed: point the
+  positional at a scratch directory holding a one-line `gates.list`, and set
+  `GATE_SDK_VERBOSE` to restore the per-gate banner the runner suppresses on a
+  pass. One gate's verdict and its clean-path output are then reachable with the
+  `GATE_SDK_KNOB_*` bridge `gate_command` emits still intact, rather than
+  hand-exported at the call site.
 - the consumer's own `check-*.sh` gates (copy-edits of
   `templates/check-skeleton.sh`).
 - `gate-tests/` — the consumer's fixture tree (see §run-gate-tests).

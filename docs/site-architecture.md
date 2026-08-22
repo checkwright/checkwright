@@ -167,7 +167,10 @@ recoverable:
   (`bash gate-sdk/bin/gen-pre-commit.sh --write`). `docs/footprint.md` is absent
   for the reason the row above gives: a gate is a script or a crate module and
   the footprint measures neither. A prose-only SPEC edit reds the on-site mirror
-  alone.
+  alone. **Two of these regenerations are staging-ordered** — the generated hooks
+  and the gate binary both derive through `git ls-files`, so a unit adding a file
+  stages first and regenerates second; the two hazards and their routes are the
+  closing paragraphs of this page, and a new-gate unit adds files by definition.
 - **The install-toolchain parity contract** — `docs/install.md`'s Requirements
   section holds the toolchain list to the probe roster:
   `check-install-toolchain` asserts whole-element parity between its
