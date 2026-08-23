@@ -6,3 +6,4 @@
 
 shell-gate-tail-port-and-completion-oracle scope a7bae29a 2026-08-23 260fe91a
 shell-gate-tail-port-and-completion-oracle spec ab751086 2026-08-23 31416722
+shell-gate-tail-port-and-completion-oracle align a7fffd4d 2026-08-23 1eeb5e68
