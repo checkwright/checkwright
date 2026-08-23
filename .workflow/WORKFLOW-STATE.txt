@@ -11,3 +11,4 @@ shell-gate-tail-port-and-completion-oracle build a29074ea 2026-08-23 7924e128
 shell-gate-tail-port-and-completion-oracle build ae7935cb 2026-08-23 abc73011
 shell-gate-tail-port-and-completion-oracle build a1383f37 2026-08-23 2c6ca187
 shell-gate-tail-port-and-completion-oracle build aa91e36d 2026-08-23 e76efd29
+shell-gate-tail-port-and-completion-oracle build ae816403 2026-08-23 59d86a61
