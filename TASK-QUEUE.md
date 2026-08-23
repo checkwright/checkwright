@@ -49,6 +49,38 @@
   `shell-gate-tail-port-and-completion-oracle`'s scope, on the lead's ruling and after that scope's
   premise re-verification found the designed answer void.
 
+- **subagent-stop-payload-background-tasks-read** — the `SubagentStop` payload carries a top-level
+  `background_tasks` key and nothing knows what is in it; take the one deliberate value read.
+  **Verified against the wired hook's own log, not inferred:** every firing records
+  `keys=...,background_tasks,session_crons`. That falsifies a claim
+  `subagent-stop-liveness-hook-wiring` recorded as SETTLED and carried into its amendment — "the
+  payload names no background task, PID or shell id, so detection never comes from it" — which
+  close 2026-08-22 corrected at delegation-kit/SPEC.md §The turn-end liveness probe (template),
+  keeping the no-values privacy ruling on the ground that survives the correction.
+  **Why it matters beyond the correction.** The harness independently states it tracks an agent's
+  live background children. If that key names them, the blocking variant's whole design changes:
+  the hook could read the harness's own view instead of the `*.run` record set, and guard-kit's
+  unrecorded-launch residue would become reachable. `turn-end-chokepoint-and-wait-primitive` is
+  sequenced behind this entry for that reason — the lead ruled 2026-08-22 that asking for the
+  blocking variant's authorization first would buy a design decided before its inputs.
+  **ADMITTED BY THE OPERATOR 2026-08-23 as this iteration's off-surface rider, AND THE ADMISSION IS
+  NARROWER THAN IT LOOKS.** What was authorized is the **unit entering**: the deliberate value read,
+  and the fact that the no-values privacy ruling is now in play. What was NOT authorized is that
+  ruling. It stays OPERATOR-CLASS and UNMADE, and it returns as an escalation from whichever stage
+  holds the read's result in hand. A session reading this entry as having settled it has read the
+  admission for the decision; do not pre-empt it.
+  **So the deliverable splits, and the split is the shape of the unit.** Takeable here: the read
+  itself, against the probe's own recorded ruling that it logs keys and never values
+  (delegation-kit/SPEC.md §The turn-end liveness probe (template), delta 4). Not takeable here:
+  changing that ruling, which is what a value read touches and what the escalation carries.
+  **The pair commitment is EARLY, not void.** This entry and
+  `turn-end-chokepoint-and-wait-primitive` still promote together; the admission pays the condition
+  down inside this iteration rather than deferring it, so only the timing moved.
+  Filed 2026-08-22 by build; drained at that iteration's close, which verified the key set directly
+  against the committed hook's log; promoted to Technical Debt 2026-08-23 at
+  `shell-gate-tail-port-and-completion-oracle`'s scope, on the operator's admission relayed by the
+  lead.
+
 ## Deferred
 
 - **turn-end-chokepoint-and-wait-primitive** [design-pending] — the blocking-hook variant,
@@ -87,18 +119,17 @@
   that undercount is legible. Honest limit on the judgment itself: the probe reads a shared `.tmp`
   and cannot attribute, so the firing is established and the culprit is not — which is the
   detector's limit and is itself an argument for the blocking variant this entry still owes.
-  **SEQUENCED 2026-08-22 BY THE LEAD, AND PROMOTION NOW COMMITTED AT THE NEXT BOUNDARY — lead
-  ruling 2026-08-23, landed here because the acting session is a boundary away and the entry is the
-  store, never the thread.** The 2026-08-22 ruling: a second authorization is a scope-stage ask, and
-  `subagent-stop-payload-background-tasks-read` may collapse what such a hook should read, so that
-  entry settles first and the ask routes after. Scope then put the unstampable fifth firing's
-  ceiling to the lead at `shell-gate-tail-port-and-completion-oracle`'s open, which ruled this entry
-  and that blocker promoted **as a pair at the next iteration boundary** and refused promotion into
-  that one as contravening the sequence above. Refused with it: widening `QUEUE_KIT_WRAP_BUDGET`.
-  Held back to the OPERATOR rather than ruled: the blocker's other half, a decision on the recorded
-  no-values privacy ruling — so a scope finding that half answered may take the pair earlier, and
-  one that does not still owes this promotion. A boundary that reads this and does neither is the
-  failure the unstampable fifth date can no longer signal.
+  **SEQUENCED 2026-08-22 BY THE LEAD; PROMOTION COMMITTED AT THE NEXT BOUNDARY, AND THAT BOUNDARY
+  IS NOW NEARER THAN IT WAS.** The 2026-08-22 ruling: a second authorization is a scope-stage ask
+  and `subagent-stop-payload-background-tasks-read` may collapse what such a hook should read, so
+  that entry settles first. Scope put the unstampable fifth firing's ceiling to the lead at
+  `shell-gate-tail-port-and-completion-oracle`'s open, which committed the pair to the next boundary
+  and refused promotion into this one; widening `QUEUE_KIT_WRAP_BUDGET` was refused with it. **The
+  operator then ADMITTED the blocker into this iteration**, so the commitment is EARLY rather than
+  void — the condition it waited on is being paid down now and only the timing moved. What the
+  admission did NOT do is make the no-values privacy ruling that read touches; that stays
+  operator-class, and the pair still promotes together. A boundary that reads this and promotes
+  neither is the failure the unstampable fifth date can no longer signal.
   Filed 2026-08-16 by close from the gap inbox; demoted 2026-08-23 at build, the measurement half
   delivered and the blocking variant still sequenced.
 
@@ -4547,22 +4578,22 @@
   allowlist bar for scratch execution rather than about which interpreters the control covers.
   **Cost while deferred:** the control reads as complete and is not, which is worse than an
   absent control — a reviewer seeing the rule and the runner has no reason to check its reach.
-  **Third measurement, 2026-08-18 — spent, and kept for the one thing it alone establishes:** the
-  **bash side was clean**, every scratch bash script ran through the runner, so the runner works and
-  the control's reach is the whole defect. Its counts and its trend reading are superseded above.
-  **DEFERRED ON THE MERITS 2026-08-23 at spec, AND THAT DEFERRAL'S STATED GROUND IS FALSIFIED.**
-  It rested on the fifth measurement breaking the trend — "the first evidence *for* the operator's
-  discipline-shaped reading rather than merely consistent with it" — which the sixth reverses. What
-  still holds is the weaker half: the reach defect is unchanged and non-rotting, which is what makes
-  deferring it honest. A later scope weighs it on that, never on a trend the series does not show.
-  **Four prior declines, all OPERATOR-class and all on the one theme-shaped cause the paragraph
-  above supersedes:** 2026-08-19 through the harness's question mechanism, held the same day at
-  scope into `takeable-tier-batch-and-installer-noop`, ruled again 2026-08-20 via the lead — the
-  entry then stood at three recurrences, so `threshold-recurrence-routing-residency`'s routing
-  clause put it past lead discretion and reaching that authority is what discharged it — and
-  re-affirmed 2026-08-22 out of `ruled-grant-surface-and-launch-chokepoint`'s set. Scope proposed it
-  regardless of theme every time, as the rule requires. **No `recurrence:` date joins a decline:**
-  the finding did not re-fire, and a decline is not a firing.
+  **Third measurement, 2026-08-18 — spent; its one surviving datum is that the bash side was clean
+  then too, so the runner has worked from the first reading and the reach is the whole defect.**
+  **PROMOTION COMMITTED AT THE NEXT BOUNDARY — OPERATOR RULING 2026-08-23, REVERSING THEIR OWN
+  FOUR PRIOR DECLINES.** The 2026-08-23 deferral-on-the-merits rested on the fifth measurement
+  breaking the trend — "the first evidence *for* the operator's discipline-shaped reading rather
+  than merely consistent with it" — and the sixth measurement above falsifies that exact ground.
+  The operator saw the reversal and ruled the entry promoted at the next iteration boundary. It
+  was NOT admitted into `shell-gate-tail-port-and-completion-oracle`, whose set was already fixed.
+  **The deliverable fork stays OPEN and stays this entry's** — the three options below are
+  untouched, and neither the operator nor the lead picked among them.
+  **The four declines, all OPERATOR-class, all on the theme-shaped cause this ruling spends:**
+  2026-08-19 through the harness's question mechanism and again at that day's scope; 2026-08-20
+  via the lead, the third recurrence having put it past lead discretion, and reaching that
+  authority is what discharged it; re-affirmed 2026-08-22. Scope proposed it regardless of theme
+  every time, as the rule requires. **No `recurrence:` date joins a decline** — a decline is not
+  a firing, and none of these four is one.
   Filed 2026-08-13 by close, from its own tooling-friction triage; probed at source before filing.
 
 - **ro-bins-write-option-bypass** [design-pending] — `GUARD_KIT_RO_BINS` membership is tested as
@@ -6850,33 +6881,6 @@
   Filed 2026-08-22 at align's cross-audit; drained at that iteration's close, which found the
   bullet had named the wrong slug and located the real entry before dispositioning.
 
-- **subagent-stop-payload-background-tasks-read** [design-pending] — the `SubagentStop` payload
-  carries a top-level `background_tasks` key and nothing knows what is in it.
-  **Verified against the wired hook's own log, not inferred:** every firing records
-  `keys=...,background_tasks,session_crons`. That falsifies a claim
-  `subagent-stop-liveness-hook-wiring` recorded as SETTLED and carried into its amendment — "the
-  payload names no background task, PID or shell id, so detection never comes from it" — which
-  close 2026-08-22 corrected at delegation-kit/SPEC.md §The turn-end liveness probe (template),
-  keeping the no-values privacy ruling on the ground that survives the correction.
-  **Why it matters beyond the correction.** The harness independently states it tracks an agent's
-  live background children. If that key names them, the blocking variant's whole design changes:
-  the hook could read the harness's own view instead of the `*.run` record set, and guard-kit's
-  unrecorded-launch residue would become reachable. `turn-end-chokepoint-and-wait-primitive` is
-  sequenced behind this entry for that reason — the lead ruled 2026-08-22 that asking for the
-  blocking variant's authorization first would buy a design decided before its inputs.
-  **Why `[design-pending]`:** settling it costs one deliberate **value** read, and the probe logs
-  keys and never values by a recorded privacy ruling (delegation-kit/SPEC.md §The turn-end
-  liveness probe (template), delta 4). Changing that ruling is the design question, not the read.
-  **Cost while deferred:** the entry it gates is the project's most-fired standing defect, and its
-  next design step cannot honestly be taken without this answer.
-  **PROMOTED AS A PAIR AT THE NEXT BOUNDARY — lead ruling 2026-08-23**, with
-  `turn-end-chokepoint-and-wait-primitive`, whose entry carries the ruling's grounds and the
-  ceiling that forced it. The half the lead did **not** rule and put to the operator is this
-  entry's own: changing the recorded no-values privacy ruling, which the value read needs. A scope
-  finding that half answered may take the pair earlier; one that does not still owes the promotion.
-  Filed 2026-08-22 by build; drained at that iteration's close, which verified the key set
-  directly against the committed hook's log.
-
 - **criterion-4-two-spellings-disagree** [design-pending] — one port criterion is stated in two
   spellings that give opposite verdicts on the same member.
   **Both sentences sit inside gate-sdk/SPEC.md §The port-candidate criteria, criterion 4.** One
@@ -7162,6 +7166,17 @@
 - **validate-tier-premise-mechanical-only** [design-pending] — the ruling-config assigns `validate`
   the cheaper model on the premise that its batches are uniformly mechanical oracle-running, and one
   iteration falsified that premise.
+  **RULED BY THE OPERATOR 2026-08-23 — (b): KEEP THE TIER, ADD AN ESCALATE-ON-DISCOVERY CLAUSE.**
+  `validate` stays on the cheaper model, and a validate that discovers it must **fix** what it found
+  gets a named, cheap transition to the judgment tier rather than an improvisation. That CLOSES this
+  entry's design fork: what remains is delivery, not design. **Deliberately NOT promoted into
+  `shell-gate-tail-port-and-completion-oracle`** — the operator set that unit set and this is not in
+  it, so the entry is a unit with a settled shape awaiting a later scope's attention.
+  **The `[design-pending]` tag STAYS, and this line exists so a later session does not strip it on
+  the strength of the paragraph above.** It is a section-membership invariant (canon-kit/SPEC.md
+  §The amendment lifecycle — every entry in the set carries it), so it marks the section rather than
+  an open design question and comes off at PROMOTION. Probed rather than argued at the 2026-08-23
+  drain: removing it reds `check-amendment-queue`.
   **OPERATOR-CLASS, and this entry is a CARRIER rather than a proposal.** The tier is a recorded
   ruling carried in the lead binding, so reversing, demoting or re-scoping it is the operator's;
   the scope that promoted this escalated it and ruled nothing. What follows is the observation.
@@ -7175,22 +7190,26 @@
   PREMISE is what needs re-judging.** A validate that only runs oracles is mechanical; a validate
   that has to FIX what it finds is not, and nothing in the current framing distinguishes the two or
   says what a session should do on discovering it is in the second kind.
-  **The surface this bears on, NAMED rather than corrected here.** `build-stage-tier-economics`
-  carries "the already-adopted validate→Sonnet downgrade **demonstrably works** ... with no observed
-  quality cost" as the affirmative precedent its A/B tests for. That sentence now has an observed
-  counter-instance; correcting it belongs to whatever ruling this entry receives, so the promoting
-  scope left it standing rather than editing a ground under a live design direction.
+  **The surface this bears on, NAMED and STILL not corrected — now under the ruling rather than
+  under restraint.** `build-stage-tier-economics` carries "the already-adopted validate→Sonnet
+  downgrade **demonstrably works** ... with no observed quality cost" as the affirmative precedent
+  its A/B tests for. That sentence has an operator-acknowledged counter-instance and the tier
+  survived it anyway. The operator ruled on the TIER, not on that entry's prose, so the correction
+  rides whenever that entry is worked and no session edits it on the strength of this one.
   **DISTINCT from `build-stage-tier-economics`**, which is the BUILD stage's tier and its per-batch
   split; this is validate's, and the two share only the meter that priced them.
-  **Candidate shapes, all unranked and all the operator's:** re-tier validate; keep the tier and add
-  a stated escalate-on-discovery clause so the second kind of validate is a named, cheap transition
-  rather than an improvisation; or record the premise's honest limit and leave the tier alone.
-  **Cost while deferred:** low per iteration and paid at the worst moment — a validate meeting a
-  real defect on the cheaper tier either escalates for a re-dispatch, costing a lead turn and a
-  restart, or does not, which is the case nobody sees.
+  **The three shapes that were open, and which was taken:** re-tier validate — refused; keep the
+  tier and add the escalate-on-discovery clause — **TAKEN**; record the premise's honest limit and
+  leave the tier alone — refused. Kept rather than deleted because a later session weighing a
+  re-tier meets what was already weighed against it.
+  **Cost while deferred, now that the shape is settled:** the exposure is unchanged and the carry is
+  narrower — a validate meeting a real defect on the cheaper tier still either escalates for a
+  re-dispatch, costing a lead turn and a restart, or does not, which is the case nobody sees. What
+  is no longer carried is the design question; what is carried is an unbuilt clause.
   Filed 2026-08-23 to the gap inbox at `battery-runner-port`'s close, offered by the lead and
   deliberately not ruled there; promoted 2026-08-23 at the next iteration's scope drain, which
-  escalated the ruling to the lead rather than taking it.
+  escalated the ruling and did not take it; ruled by the operator the same day and recorded here by
+  that same scope, which authored no part of the ruling it records.
 
 - **relayed-rule-role-scope-unchecked** [design-pending] — a rule relayed through a dispatch can be
   scoped to the RELAYER's role and bind nobody it is relayed to, and nothing in the relay path
