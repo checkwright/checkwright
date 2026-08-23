@@ -7815,9 +7815,5 @@
 
 ## Done
 
-- installed-gate-binary-leak-remap
-- session-mechanic-grants-uncommitted
-- entry-cap-displaces-mandated-writes
-
 ## Lessons Learned
 
