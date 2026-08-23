@@ -12,39 +12,6 @@
 
 ## New Features
 
-- **battery-runner-port** [spec: SPEC-battery-runner.md] — the battery's dispatch moves
-  into the binary: a `--run` arm replaces `run-gates.sh`'s loop and `gate_command`'s
-  per-knob bridge.
-  **Operator-ruled 2026-08-23 as the port tail's first unit**, because it is the only unit that
-  moves wall-clock and because every remaining shell member dispatches through the seam it
-  removes. **Re-measured at spec, on this tree, warm**: `TOTAL 24990`ms over 106 members, of
-  which resolving `gate_command` for all 106 and executing none is **5019ms** — and the 90
-  members individually under 200ms sum to 4841ms, so the bridge is essentially the whole cost of
-  the battery's fastest 90 gates. `gen-pre-commit.sh --emit` is 6637ms, the whole of
-  `check-graph`; the binary answers `--knobs` and `--list` in 1ms each.
-  **What the arm owns:** the registry walk in registry order; knob resolution held in-process
-  for the run — resolved once by the front-end, never per member — with every refusal the bridge
-  states kept (gate-sdk/SPEC.md §lib/gate.sh, which owns the roster and its count); the
-  `--only` / `--for` selectors and the `--emit <arm>` dispatch; per-gate timings and the
-  dispatch-stderr seam (§run-gates); worker threads with per-gate scratch isolation and
-  deterministic output ordering, which is the concurrency contract
-  `gate-battery-parallel-execution` filed and this unit discharges; and the hook generator's
-  argv projection, so `gen-pre-commit.sh --emit` stops sourcing every kit library per knob —
-  which is `config-bridge-resolution-cost`'s whole cost. `gate-battery-result-cache` is a
-  closure candidate once the couples-keyed cache is an in-process map rather than shell
-  bookkeeping; its invalidation question is inherited, not answered here.
-  **The design question is RULED at spec, in the amendment:** the generated pre-commit hook
-  **keeps its baked per-gate argv** and the two-line `run --hook` shim is refused — decisively
-  because a platform with no published artifact would lose its whole hook, where today the shell
-  members survive in it (criterion 5's own branch). So `install-step-relocation` is unblocked and
-  unchanged rather than resolved, and `graph-port-bash-spawn-residue`'s spawn is made cheaper
-  rather than spent: §gen-pre-commit's non-port ruling is held, not reopened.
-  **Cost while deferred:** high and paid per session — every commit pays the bridge, every
-  validate pays the serial battery, and every further port adds a member that dispatches through
-  the seam this unit removes.
-  Filed 2026-08-23 at the consult by operator direction, under the direct-filing exception;
-  promoted 2026-08-23 at spec with `SPEC-battery-runner.md`.
-
 ## Technical Debt
 
 ## Deferred
@@ -1280,8 +1247,15 @@
   failure class the battery exists to prevent. `check-reads-couples` is the
   existing oracle for that gap and would become load-bearing rather than
   advisory, so its own coverage is a precondition, not a detail.
-  **Relation to `native-gate-binary-port`:** the port makes this ordinary
-  engineering instead of shell bookkeeping; a port-first ruling closes it.
+  **`battery-runner-port` landed 2026-08-23 and delivers the precondition, not
+  the closure.** The couples-keyed bookkeeping this entry's key would read is
+  now an in-process map (the crate's registry/couples machinery) rather than
+  shell bookkeeping, which is ordinary engineering exactly as expected — but the
+  unit built no cache, so this entry's own invalidation question stands exactly
+  where it was: whether a gate whose real inputs exceed its declared `couples=`
+  would be skipped while stale, and whether `docs-renderer-batch-contract`'s
+  2026-08-01 content-hash refusal generalizes from one renderer to the battery.
+  Both stay this entry's first work (gate-sdk/SPEC.md §lib/gate.sh).
   **Cost while deferred:** repeated full-battery runs inside one session are the
   dominant waste — a stage that validates after each commit re-runs every gate
   over a tree it just proved. Nothing is incorrect while deferred.
@@ -7682,6 +7656,7 @@
 ## Done
 
 - cohort-held-members-port-prerequisites
+- battery-runner-port
 
 ## Lessons Learned
 
