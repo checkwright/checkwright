@@ -2005,8 +2005,8 @@ design time; the last three were paid for, and each is named with what it cost.
    family and its walk and reads no knob, and the fact that stops it is one none
    of the six criteria sees.
 
-   **`check-gate-assertions` requires `paste`, and how it surfaced is the part
-   worth keeping.** The program is not on the floor, so this is owed port work of
+   **`check-gate-assertions` required `paste`, and how it surfaced is the part
+   worth keeping.** The program is not on the floor, so that was owed port work of
    exactly the shape the worked example above describes — a dependency designed
    away, embedded or replaced. It was **invisible for the roster's whole life**:
    the scan abandoned that declaration before reaching the call and reported the
@@ -2396,6 +2396,29 @@ gate-sdk/bin/port-blockers.sh` where the only programs any rule still names are
 because probing showed `check-gate-assertions` was its only live holder
 (§check-gate-assertions records the probe and what is deliberately *not* changed
 on the published requirement).
+
+**Criterion 5's price for that batch, and the one place its instrument could not
+be run.** Both members are `# install: zero-config` and both live in `gate-sdk`,
+which the measured profile carries, so the predicted growth is **two** with the
+profile intersection a no-op. On the pre side the instrument ran as the criterion
+demands — `installer_smoke`'s binary-less leg, from a clean checkout of the
+pre-batch rev reached by path — and reports **twenty-two** omitted members. **The
+post-side leg run is blocked**, by a defect this batch *uncovered* rather than
+caused: the smoke fails at its first profile because the compiled gate binary
+carries its dependencies' build paths and `init` commits it into the consumer's
+tree, which §check-tree-terms' newly honest binary arm reds on
+(`installed-gate-binary-trips-the-leak-guard`). So the post number is taken from
+the **derivation this criterion already sanctions as the leg's reproduction** —
+the `zero-config` `.gate` members under the measured profile's kit roots — which
+reproduces the leg's twenty-two **member for member** at the pre rev and yields
+**twenty-four** at the post one, the predicted growth exactly. It is recorded as
+*derived on an instrument validated against the leg at the pre rev*, never as the
+leg's own post reading, and the leg's post run is **owed** once that defect is
+ruled. The **judgment** is the standing one, **accept and declare**, refusing its
+two rivals for the reasons already ruled: an adopter on an uncovered platform
+receives each omission declared in its own `gates.list` rather than as a broken
+battery, restoring the class shell-side reinstates the duplication the port
+deletes, and a binary-gated declaration is what the omit path already is.
 
 **"Never as one cohort" is the property that makes a budget batch safe, and it
 reads as bookkeeping only until that is said.** A batch's members carry **no
@@ -10446,7 +10469,13 @@ inherited.**
   the shell form captured stdout only, so a leak inside a tracked binary reported
   `TREE-TERMS: clean` and exited 0. Dead on this tree, which tracks no binaries;
   live in a consumer's, which is exactly why it is ruled here rather than
-  discovered there.
+  discovered there. **It is live on this tree after all**, which the ruling did not
+  expect and the measurement found: `installer_smoke`'s artifact legs commit the
+  gate binary into a scratch consumer's tree at `scripts/checkwright-gates`, and
+  that binary carries its dependencies' build paths, so a consumer's own first
+  battery reds on it. The arm is behaving correctly and what it exposes is
+  somebody else's defect, filed as `installed-gate-binary-trips-the-leak-guard`
+  rather than answered by narrowing this arm.
 - **The three fail-closed arms are discharged where they are held.** The
   pattern-file resolution, the `git ls-files` call and the content match each
   fail-close through one shared helper, held by §check-gate-fail-closed across
