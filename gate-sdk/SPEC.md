@@ -2411,10 +2411,11 @@ is now self-auditing, which its own section owns. Two facts about the remainder
 are worth carrying, both measured at the build cut rather than predicted here:
 `paste` left the battery's program set **entirely**, on a re-run of `bash
 gate-sdk/bin/port-blockers.sh` where the only programs any rule still names are
-`shellcheck`, `cargo` and the renderer; and the residual `gawk` floor emptied,
-because probing showed `check-gate-assertions` was its only live holder
-(§check-gate-assertions records the probe and what is deliberately *not* changed
-on the published requirement).
+`shellcheck`, `cargo` and the renderer; and the residual `gawk` floor lost
+`check-gate-assertions`, the holder the probe covered, while
+§check-docs-render-fidelity still holds it (§check-gate-assertions records the
+probe, its scope, and what is deliberately *not* changed on the published
+requirement).
 
 **Criterion 5's price for that batch, measured on both sides — and the detour it
 took getting there is the part worth keeping.** Both members are
@@ -7748,16 +7749,22 @@ pair already reports, and the third's single-character label is read out of that
 span directly. Neither was ever a hold, and this member
 declared no `# port-until:` on either ground.
 
-**The gawk floor's residue is empty after this port, and that is measured rather
-than inherited.** gate-sdk/SPEC.md carried the residual `gawk` floor as this
+**The gawk floor loses this holder, and the probe that measured it was scoped to
+two members — which is the honest limit, stated because the first reading of it
+was not.** gate-sdk/SPEC.md carried the residual `gawk` floor as this
 member's **and** §check-action-run-shell's. Probed at the cut with a `gawk
 --posix` shim on `PATH`, which refuses every gawk extension: this member's rule
 died on it — *match: third argument is a gawk extension*, exit 2 — and
 `check-action-run-shell` ran **clean**, holding no gawk extension at all. Its own
 declaration's `Requires GNU awk (3-arg match)` header was stale — the file carries
-two-argument `match()` only — and was deleted at that iteration's close. So the
-floor had **one** live holder, this one, and
-the port retires it. What is *not* changed here is the published requirement:
+two-argument `match()` only — and was deleted at that iteration's close. The probe
+covered exactly the two members this file named, so what it establishes is that
+**those two** stop holding the floor — not that the floor is empty. It is not:
+`site-kit/checks/check-docs-render-fidelity.sh` is registered in
+`scripts/gates.list`, is still shell, and runs GNU-awk-only `BEGINFILE`,
+`ENDFILE` and `ARGIND` in live program text, so it is the floor's remaining live
+holder and `shell-gate-tail-port` is what retires it
+(site-kit/SPEC.md §check-docs-render-fidelity). What is *not* changed here is the published requirement:
 `awk (GNU)` is an element of `context-kit/lib/toolfloor.sh`'s probe roster held to
 docs/install.md §Requirements by `check-install-toolchain`, and narrowing a
 user-facing requirement is not this port's to rule. The narrowing is filed
@@ -10400,13 +10407,15 @@ proved byte-identical to the deleted shell gate. One consequence is worth naming
 because the deleted file was where it was recorded: the shell implementation
 required GNU awk's 3-argument `match()`, and the compiled one requires no awk at
 all. The residual `gawk` floor was §check-gate-assertions' and, on its own
-declaration's word, §check-action-run-shell's — never this gate's. **Both halves
-of that residue are now gone, and the second was measured rather than inherited**:
+declaration's word, §check-action-run-shell's — never this gate's. **Both of
+those halves are now gone, and the second was measured rather than inherited**:
 the eighth budget batch ported §check-gate-assertions, and probing
 §check-action-run-shell under a `gawk --posix` shim ran it **clean**, so its
 `Requires GNU awk (3-arg match)` header was stale — deleted at that iteration's
 close — and it holds no gawk extension at
-all. What is *not* changed on that finding is the published requirement:
+all. That empties the residue **this file named**, not the floor:
+§check-docs-render-fidelity holds it still, and §check-gate-assertions records
+the probe's scope. What is *not* changed on that finding is the published requirement:
 `awk (GNU)` is an element of `context-kit/lib/toolfloor.sh`'s probe roster held to
 docs/install.md §Requirements by `check-install-toolchain`, and narrowing a
 user-facing requirement is filed rather than taken in passing

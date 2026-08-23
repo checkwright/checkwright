@@ -157,6 +157,66 @@
   kit libraries ship shell, and every one of them is a PowerShell twin owed under objective 6.
   Filed 2026-08-23 at the consult on operator direction, the direct-filing exception applying.
 
+- **port-oracle-corpus-narrower-than-the-directive** [design-pending] — the port's owed-count
+  oracle scans `gates.list` members, so the completion claim is measured over a corpus the
+  PRIORITY DIRECTIVE does not bound.
+  **Measured at this intake, 2026-08-23, rather than carried on the bullet's word.**
+  `bash gate-sdk/bin/port-blockers.sh --group` scans **106** members and reads *6 still owed,
+  6 takeable*; the tree holds **13990** non-test shell lines. What the scan never sees:
+  `canon-kit/checks/check-surface-duplication.sh` and
+  `evidence-kit/checks/check-producer-liveness.sh` — kit-shipped gates this tree never
+  registers, so `gates.list` does not carry them — and every non-gate script, `run-gates.sh`
+  and `gen-pre-commit.sh` and `installer/lib/*.sh` and each kit's `bin/` and `lib/`.
+  **TRAJECTORY.md §The closed rulings states a completion predicate this oracle cannot
+  evaluate**: every remaining non-test `.sh` outside the battery and the bootstrap "either
+  carries a stated `no-port` cause or is deleted". Nothing counts that set, and nothing can
+  hold a cause against a script that has none — `# no-port:` is a gate-descriptor header and
+  the non-gate corpus owns no descriptor to carry one.
+  **Why `[design-pending]`:** two shapes, neither costed. Widen `port-blockers.sh` to a
+  whole-tree scan with a per-file disposition, which mints a declaration surface for scripts
+  that own no `.gate`; or keep it a gate oracle and give the non-gate corpus a second roster.
+  The first keeps one owed-count and one place to read completion; the second keeps the gate
+  oracle's assertions honest about the corpus they actually scan.
+  **DISTINCT from the three entries that own the work rather than the count.**
+  `battery-runner-port` owns `run-gates.sh`, the `gate_command` bridge and `gen-pre-commit.sh`'s
+  argv projection; `shell-gate-tail-port` owns the six owed gates and the two unregistered ones;
+  `install-step-relocation` owns `installer/lib/init.sh`'s remaining step. What no entry owns is
+  the kit `bin/`+`lib/` remainder and the **measurement** — so all three can land and still
+  leave no oracle able to say the port is done.
+  **Cost while deferred:** the directive's completion claim reads off a 106-member gate census
+  while the corpus it names is the tree, so completion is decidable only by hand and every
+  session that reads *0 takeable* reads it as a finished port.
+  Filed 2026-08-23 to the gap inbox by the consult that followed
+  `leak-guard-and-assertion-meta-gate-port`'s close; promoted 2026-08-23 at this iteration's
+  scope intake, with the bullet's "no entry names the runner port" clause re-verified and found
+  **spent** — that same consult filed `battery-runner-port`.
+
+- **validate-suite-wall-clock-unowned** [design-pending] — the validate run is about seventeen
+  minutes and no entry owns the sixteen of them that are not the gate battery.
+  **Measured 2026-08-23 from `.tmp/validate-*.log` mtimes:** five serial smoke suites carry
+  about 80% of the run — `installer_smoke` 5.6m, `consumer_smoke` 4.0m, `upgrade` 1.9m, `demo`
+  1.8m, `agents_md_smoke` 1.4m — against a 52s gate battery.
+  **`run-validate.sh` is serial by construction and says so**: its spine declares "run each
+  suite foreground" (evidence-kit/SPEC.md §bin/run-validate.sh) and the loop parses and diffs
+  each suite before the next starts. Nothing instruments per-suite cost either — the figures
+  above came from file mtimes, which is the tell.
+  **Why `[design-pending]`:** the spine's ordering is load-bearing in one direction and not the
+  other. The manifest fold is explicitly after the last suite, so evidence accumulation
+  parallelizes trivially; the pre-hook and any suite that writes the tree do not. Which suites
+  are genuinely independent is unmeasured, and a wrong answer corrupts evidence rather than
+  merely running slow.
+  **DISTINCT from the two battery entries, and from the arm already discharged.**
+  `gate-battery-parallel-execution` and `gate-battery-result-cache` own the 52s battery and are
+  parked as port-subsumed; `battery-runner-port` discharges the first and does not reach the
+  suite roster at all. `check-crate-arms`'s source-stamp cache is **landed** — the gate carries
+  its `.green` stamp today — and ruled at gate-sdk/SPEC.md §check-crate-arms, so the cargo half
+  of the original finding is discharged and this entry is the suites alone.
+  **Cost while deferred:** about sixteen minutes per validate, paid serially, on a stage every
+  iteration runs at least once.
+  Filed 2026-08-23 to the gap inbox by the post-close consult of
+  `leak-guard-and-assertion-meta-gate-port`, and promoted at the next scope intake the same day,
+  with the crate-arms half re-verified as landed and dropped from the entry.
+
 - **overlay-only-oracle-grants-uncommitted** [design-pending] — four oracles this tree runs
   constantly are granted only by an untracked overlay, so a fresh clone re-buys every one.
   **SPLIT from `session-mechanic-grants-uncommitted` on 2026-08-23 at spec, lead-authorized**,
@@ -7200,6 +7260,36 @@
   Surfaced 2026-08-19 at the `takeable-tier-batch-and-installer-noop` close's icebox eviction review
   and filed to the gap inbox there; promoted 2026-08-20 by the next iteration's scope.
 
+- **deferred-cost-class-opener-vocabulary** [design-pending] — the icebox cost filter reads the
+  first word of a free-prose field, so it is undecidable for most of the pool.
+  **Censused at this intake, 2026-08-23**, and recorded with its oracle at
+  `.workflow/survey-record.md`: 238 `Cost while deferred:` fields, of which about 40 open with a
+  token the `--icebox-candidates` arm recognizes — `low` 35, `zero` 5 — and the rest open with
+  prose: `the` 44, `every` 35, `a` 32, `paid` 12, `one` 8, `an` 8, `each` 6, `silent` 5,
+  `small` 4, `compounding` 4. queue-kit/SPEC.md names the recognized set (`low`, `zero`,
+  `bounded`, `cosmetic`); roughly four fifths of the pool answers none of them.
+  **The filter under-selects silently rather than mis-selecting**, which is why no gate ever
+  reddened on it: an entry whose cost is genuinely low but whose field opens "the" is invisible
+  to the eviction worklist forever, and nothing distinguishes that from a costly entry. So the
+  2026-08-23 ruling lowering the age floor to seven days bought less than it looks — the age
+  axis widened while the cost axis stayed shut over most of the rows.
+  **Enforcement-first shape, unruled:** a controlled opener vocabulary gated over the
+  `## Deferred` section, plus a one-time reclassification sweep of the existing fields. Class:
+  the vocabulary is a governed name and the gate is a new contract, so canon-kit's litmus makes
+  this a **feature** and an amendment is owed at promotion.
+  **Why `[design-pending]`:** whether the class rides the field's head or a separate tag is
+  open and the two trade differently. A head token keeps one line and makes every existing
+  field a migration; a `cost-class:` tag leaves the prose untouched and spends a line on each
+  entry against `check-queue-entry-budget`'s 50-line cap.
+  **DISTINCT from `icebox-candidate-eligibility-unapplied`**, the same arm's other half: that
+  entry is the *eligibility* rules the arm fails to apply — roadmap tags, live promotion
+  triggers — and its fix filters rows the arm already produced. This is the *cost* predicate
+  producing too few rows to filter. One surface, so they bundle well; neither subsumes the other.
+  **Cost while deferred:** the eviction worklist derives from about a sixth of the pool, so the
+  8:1 intake-to-exit ratio the 2026-08-23 ruling acted on has no lever reaching the rest.
+  Filed 2026-08-23 by the consult held after `leak-guard-and-assertion-meta-gate-port` closed,
+  and promoted out of the gap inbox at the following scope intake on the same date.
+
 - **retired-slug-live-pointer-citation** [design-pending] — governed prose can point at a retired
   queue slug as if it were a live surface, and the gate that owns slug citations permits that by
   design rather than by omission.
@@ -7421,15 +7511,21 @@
   Filed 2026-08-23 by the lead; drained at that iteration's close, which dated rule 15 against
   the filing and read `guard_advise` to establish that it never blocks.
 
-- **interpreter-floor-gawk-residue-empty** [design-pending] — the published GNU-awk requirement
-  outlives the last gate that held it.
-  **Measured, not reasoned.** Probed at the eighth port cut with a `gawk --posix` shim on PATH,
-  which refuses every gawk extension: `check-action-run-shell.sh` ran clean at exit 0, holding no
-  gawk extension at all; `check-gate-assertions.sh` died loudly ("match: third argument is a gawk
-  extension", exit 2) and was the floor's only live holder. That member ported at this cut, so
-  the shell residue is empty. gate-sdk/SPEC.md §check-gate-assertions and the interpreter-floor
-  claim at §check-action-gh-repo now record the measurement, and the stale header on
-  `check-action-run-shell.sh` was corrected at this close.
+- **interpreter-floor-gawk-residue-empty** [design-pending] [blocked-by: shell-gate-tail-port] —
+  the published GNU-awk requirement's *stated ground* is dead while the floor itself still stands.
+  **Measured, not reasoned — and the measurement was scoped narrower than the conclusion drawn
+  from it, corrected 2026-08-23 at scope.** Probed at the eighth port cut with a `gawk --posix`
+  shim on PATH, which refuses every gawk extension: `check-action-run-shell.sh` ran clean at
+  exit 0, holding no gawk extension at all; `check-gate-assertions.sh` died loudly ("match: third
+  argument is a gawk extension", exit 2). That member ported at this cut. **The probe covered
+  those two members only**, so "the shell residue is empty" overreached its own corpus: it is
+  not — `site-kit/checks/check-docs-render-fidelity.sh` is registered in `scripts/gates.list`,
+  is still shell, and runs GNU-awk-only `BEGINFILE`/`ENDFILE`/`ARGIND` in live program text.
+  So the floor keeps one live holder and `shell-gate-tail-port` is what retires it. This entry's
+  slug now outruns its subject and a rename is owed with the unblock.
+  gate-sdk/SPEC.md §check-gate-assertions, §check-action-gh-repo and §The first cohort record
+  the probe with its scope, corrected at the same session; the stale header on
+  `check-action-run-shell.sh` was corrected at the generating close.
   **What the cut did NOT change, and this entry owns.** `awk::GNU` is still an element of
   `context-kit/lib/toolfloor.sh`'s probe roster, held to docs/install.md §Requirements by
   `check-install-toolchain` in both directions — and that section still justifies the requirement
@@ -7439,11 +7535,11 @@
   deliverable is a decision — narrow `awk (GNU)` to `awk`, or drop awk from the floor entirely —
   taken only after re-probing every remaining shell gate and both generated hooks under
   `--posix`. The docs/install.md edge is operator-class; the re-probe is not.
-  **Cost while deferred:** an adopter is told to install gawk for a requirement no gate holds,
-  which is the dependency floor TRAJECTORY.md objective 1 exists to collapse, over-stated by
-  exactly one tool — and the reason given for it is now demonstrably retired.
+  **Cost while deferred:** low until the unblock — an adopter is told to install gawk on a
+  ground that no longer holds, for a floor one gate still genuinely needs, so the published
+  requirement is right by accident and its justification is wrong on its face.
   Filed 2026-08-23 by build; drained at that iteration's close, which re-read the probe roster
-  and found docs/install.md's stated ground retired by the same cut that emptied the residue.
+  and found docs/install.md's stated ground retired by the cut that ported its named holder.
 
 - **guard-rule-number-intra-kit-citations-ungated** [design-pending] — guard-kit cites its own
   rule numbers everywhere and nothing holds a single citation to the ruleset.
