@@ -7161,7 +7161,5 @@
 
 ## Done
 
-- gate-battery-parallel-execution
-
 ## Lessons Learned
 
