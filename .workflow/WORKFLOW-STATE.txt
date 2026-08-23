@@ -4,9 +4,4 @@
 
 ---
 
-battery-runner-port scope aa4300d0 2026-08-23 c7425b1e
-battery-runner-port spec a68583f2 2026-08-23 2e29eadc
-battery-runner-port align a2f5118e 2026-08-23 8f44dcfb
-battery-runner-port build a3c06182 2026-08-23 97fdd548
-battery-runner-port validate a9fb1acc 2026-08-23 0ef32761
-battery-runner-port close a93867e1 2026-08-23 b585794c
+— scope a7bae29a 2026-08-23 260fe91a
