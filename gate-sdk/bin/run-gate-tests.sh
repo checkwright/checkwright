@@ -28,6 +28,14 @@ if [[ "$_rgt_bin" != /* && -e "$_rgt_bin" ]]; then
 fi
 unset _rgt_bin
 
+# spec: gate-sdk/SPEC.md §run-gate-tests — the scratch dir is absolutized here for the mirror of
+# that reason: the case dir a member's cwd lands in is *tracked*, so the repo-relative
+# GATE_SDK_TMP_DIR default would deposit runtime state in the corpus the member is the oracle for
+if [[ "$GATE_SDK_TMP_DIR" != /* ]]; then
+    GATE_SDK_TMP_DIR="$PWD/$GATE_SDK_TMP_DIR"
+fi
+export GATE_SDK_TMP_DIR
+
 [[ -d "$TESTS_DIR" ]] || { echo "run-gate-tests: no fixture tree at $TESTS_DIR" >&2; exit 2; }
 
 pairs=0

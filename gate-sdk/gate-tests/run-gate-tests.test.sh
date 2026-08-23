@@ -139,6 +139,45 @@ out="$(run_tree "$(mk_no_help_line)")"; rc=$?
 assert_rc  no-help "$rc" 1
 assert_has no-help "no 'help:' remedy line" "$out"
 
+# Write-side hermeticity (§run-gate-tests): the `cd` into the case dir puts a
+# member's cwd inside a *tracked* corpus, so a member writing runtime scratch
+# under GATE_SDK_TMP_DIR's repo-relative default would deposit it there — ignored,
+# surviving the run, and riding a verbatim vendor of the kit tree. The runner
+# absolutizes the knob at the invoker's root, so the write lands in scratch and
+# the corpus is untouched. Asserted both ways: a one-sided "corpus is clean" row
+# passes just as well when the write never happened at all.
+mk_writer() {
+    local dir="$scratch/writer/stub-writer"
+    mkdir -p "$dir/good" "$dir/bad"
+    printf 'STUB-WRITER: clean (stub)\n' > "$dir/good/expect.txt"
+    printf 'alpha fired\n' > "$dir/bad/expect.txt"
+    echo "$scratch/writer"
+}
+# The stub writes under the knob's own inline spelling — the one check-crate-arms
+# uses — and the inner run is handed no GATE_SDK_TMP_DIR at all, so the default is
+# what the runner has to absolutize. Its cwd is the scratch root, which is
+# therefore where a pinned write lands and where an unpinned one does not.
+{ printf '#!/usr/bin/env bash\n'
+  printf 'D="${GATE_SDK_TMP_DIR:-.tmp}"\n'
+  printf 'mkdir -p "$D" && : >"$D/stub-writer.marker"\n'
+  printf 'if [[ "$PWD" == */bad ]]; then echo "alpha fired"; echo "  help: stub remedy"; exit 1; fi\n'
+  printf 'echo "STUB-WRITER: clean (stub)"\n'
+} > "$scratch/checks/stub-writer.sh"
+chmod +x "$scratch/checks/stub-writer.sh"
+t="$(mk_writer)"
+out="$( cd "$scratch" && env -u GATE_SDK_TMP_DIR bash "$RUN" "$t" "$scratch/checks" 2>&1 )"; rc=$?
+assert_rc  writer "$rc" 0
+[[ -f "$scratch/.tmp/stub-writer.marker" ]] || {
+    echo "FAIL [writer]: the scratch write did not land at the invoker's root — the corpus assertion below would pass on a write that never happened"
+    fails=$((fails + 1))
+}
+for case_dir in "$t"/stub-writer/*/; do
+    [[ -e "$case_dir/.tmp" ]] && {
+        echo "FAIL [writer]: $(basename "$case_dir")/ acquired a .tmp — the runner let a member write into the tracked corpus"
+        fails=$((fails + 1))
+    }
+done
+
 [[ "$fails" -eq 0 ]] || { echo "run-gate-tests.test: $fails assertion(s) failed"; exit 1; }
-echo "run-gate-tests.test: clean (expect.txt is a per-line conjunction, order-independent, blanks inert, all missing lines named; the output contract is asserted at runtime on both cases)"
+echo "run-gate-tests.test: clean (expect.txt is a per-line conjunction, order-independent, blanks inert, all missing lines named; the output contract is asserted at runtime on both cases; scratch writes land outside the case dir)"
 exit 0

@@ -6833,6 +6833,23 @@ instead of revealing one absent pin per run. Exit 2 from a gate marks the
 fixture malformed (harness error, distinct from logic failure). Fixture-pair hermeticity is the `cd` into the case
 dir: a gate resolving its `<KIT>_CONFIG_FILE` under the cwd finds only the case's
 own files (and a fixture may ship its own cwd-relative config deliberately).
+
+That `cd` buys the **read** side and costs the **write** side, so the runner pays
+the write side back: `GATE_SDK_TMP_DIR` is absolutized at the invoker's root
+before the first case runs, for the mirror of the reason the dispatch executable
+is. A member's runtime scratch — `check-crate-arms`'s source-stamp cache is the
+live instance — resolves that knob's deliberately repo-relative default against
+whatever cwd it has, and under the `cd` that cwd is a **tracked** fixture corpus:
+the gate deposits state inside the very directory it is the oracle for, where it
+is `.gitignore`d, survives the run, and rides `cp -R` into anything that vendors
+the kit tree verbatim. The fix belongs here and not in the member, because the
+member's cwd-relative spelling is what §Layout and configuration ratifies for
+every inline reader; what is anomalous is a cwd pointed at tracked content, and
+the runner is the only thing that points it there. Pinning the knob per fixture
+instead would be one hand-remembered copy per scratch-writing gate, audited by
+nothing. The pin is one-directional: an already-absolute value passes through and
+a case config naming its own scratch still wins, config being sourced ahead of
+the environment (§lib/gate.sh).
 `<tests-dir>/*.test.sh` unit tests run after the pairs; each must exit 0 — and
 each runs with the **invoker's** cwd (repo root in this repo's battery), so
 absent a pin a gate it drives silently inherits this repo's consumer config. The
