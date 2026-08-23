@@ -43,3 +43,9 @@
 - oracle: find . -name '*.sh' outside .git/ and native/target/, minus tests/smoke/fixtures paths, piped to wc -l; then bash gate-sdk/bin/port-blockers.sh --group trailer
 - rev: 87b6436f0330bf192b4311d2b3c68e2af36487c1
 - finding: 13990 non-test shell lines in the tree. The oracle scans 106 gates.list members and reads '6 still owed, 6 takeable'. It counts NEITHER the two kit-shipped unregistered shell gates (canon-kit/checks/check-surface-duplication.sh, evidence-kit/checks/check-producer-liveness.sh, both present, neither in gates.list) NOR any non-gate shell. So the owed count is a gate-corpus count, not the PRIORITY DIRECTIVE's corpus.
+
+## 2026-08-23 validate — Which bespoke gate-tests/*.test.sh sandbox by cwd-relative .tmp/.workflow, and which of those pin the path knobs themselves rather than relying on the ambient default staying relative?
+- corpus: every */gate-tests/*.test.sh in the tree
+- oracle: grep -ln 'mkdir -p .*\.workflow\|mkdir -p .*\.tmp\|/\.tmp\|/\.workflow' */gate-tests/*.test.sh  vs  grep -l 'GATE_SDK_TMP_DIR=\|GATE_SDK_WORKFLOW_DIR=' */gate-tests/*.test.sh — the set difference is the exposed cohort
+- rev: 5849144ddcef50bef28ec14df4db3f400bcf4e91
+- finding: 16 bespoke tests build cwd-relative .tmp/.workflow sandboxes; 11 pin GATE_SDK_TMP_DIR or GATE_SDK_WORKFLOW_DIR explicitly, so pinning is already the majority idiom. The 7 that do not — canon-kit/check-comment-tier, evidence-kit/producer-lock, and lifecycle-kit's check-stage-entry, check-merge-attrs, check-survey-record, check-stage-evidence, check-close-surfaces — are isolated only by the ambient value of those knobs happening to be relative. lib/test-hermetic.sh pins <KIT>_CONFIG_FILE and nothing else, so it does not cover this. Probed, not inferred: with GATE_SDK_TMP_DIR absolute and a live lock at that path, producer-lock.test.sh reds on 4 assertions; with GATE_SDK_WORKFLOW_DIR absolute it reads a foreign manifest and reds on 4.
