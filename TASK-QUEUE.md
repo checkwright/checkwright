@@ -12,37 +12,6 @@
 
 ## New Features
 
-- **shell-gate-tail-port** [spec: SPEC-shell-gate-tail.md] — the six registered shell gates
-  and the two kit-shipped ones this tree never registers port as wrappers; no gate stays shell.
-  **Operator-ruled 2026-08-23** (TRAJECTORY.md §The closed rulings): exception class (a) and
-  the criterion-7 "sub-project" hold are retired with their refutations recorded at
-  gate-sdk/SPEC.md §The port-candidate criteria and §Meta-gate conservation for the binary
-  substrate; the `# no-port:` and `# port-until:` headers are deleted, and the oracle reads
-  *6 still owed, 6 takeable at this cut*.
-  **The members and what each port is:** `check-gate-substrate-parity` and
-  `check-install-disposition`, text walks that already read the binary's `--list`;
-  `check-crate-arms`, a wrapper spawning cargo, `install: never`, carrying the source-stamp cache
-  its SPEC section rules; `check-shellcheck` and `check-action-run-shell`, wrappers spawning
-  shellcheck and refusing at exit 2 when absent, the first DEREGISTERING here with the last
-  `.sh` and not retiring, since it is zero-config and an adopter's battery is shell;
-  `check-docs-render-fidelity`, a wrapper spawning the renderer, whose GNU-awk batch stream is
-  the last live holder of the `awk (GNU)` requirement docs/install.md states, so the port
-  retires that floor (site-kit/SPEC.md §check-docs-render-fidelity); and the two unregistered
-  members `check-surface-duplication` (canon-kit, `install: on-surface`) and
-  `check-producer-liveness` (evidence-kit, `install: never`), which `port-blockers.sh` never
-  counts because it scans `gates.list` members — the kit-shipped corpus is the port's, whether
-  or not this tree registers it. Every member keeps criterion 7's refusal shape and declares its
-  program under `--reads`; cut widths are the cut's, and the ordering inside the unit is
-  substrate-parity first, so the auditor of the dispatch relation is native before the rest move.
-  **The design question is RULED** at `SPEC-shell-gate-tail.md` delta 1: a descriptor field is
-  closed-refused, so the binary answers `--needs` off a registry tuple held to executed behavior.
-  That arm also un-blinds a default arm reading 102 of 106 members undecidable, and the tail is
-  five wrappers not four — `check-producer-liveness` needs `ps` through `ek_pid_alive`.
-  **Cost while deferred:** the PRIORITY DIRECTIVE's claim stays unmade while six gates and two
-  kit libraries ship shell, and every one of them is a PowerShell twin owed under objective 6.
-  Filed 2026-08-23 at the consult on operator direction, the direct-filing exception applying;
-  promoted 2026-08-23 at spec with its amendment, which corrects four premises against the tree.
-
 - **port-oracle-corpus-narrower-than-the-directive** [spec: SPEC-port-oracle.md] — the port's
   owed-count oracle scans `gates.list` members, so the completion claim is measured over a
   corpus the PRIORITY DIRECTIVE does not bound.
@@ -6902,7 +6871,7 @@
   Filed 2026-08-23 by the lead; drained at that iteration's close, which dated rule 15 against
   the filing and read `guard_advise` to establish that it never blocks.
 
-- **interpreter-floor-gawk-residue-empty** [design-pending] [blocked-by: shell-gate-tail-port] —
+- **interpreter-floor-gawk-residue-empty** [design-pending] —
   the published GNU-awk requirement's *stated ground* is dead while the floor itself still stands.
   **Measured, not reasoned — and the measurement was scoped narrower than the conclusion drawn
   from it, corrected 2026-08-23 at scope.** Probed at the eighth port cut with a `gawk --posix`
@@ -7058,7 +7027,7 @@
   Filed 2026-08-23 by build; drained at that iteration's close, which re-read both the knob
   default and the dispatch path in place.
 
-- **binary-less-dispatch-loop-retirement** [design-pending] [blocked-by: shell-gate-tail-port] —
+- **binary-less-dispatch-loop-retirement** [design-pending] —
   `run-gates.sh`'s binary-less dispatch loop and `installer/consumer-smoke`'s binary-less
   green-battery assertion both retire at zero contract cost once no `.sh` member is left, and
   nothing today schedules that retirement.
@@ -7276,6 +7245,7 @@
 
 ## Done
 
+- shell-gate-tail-port
 - subagent-stop-payload-background-tasks-read
 
 ## Lessons Learned

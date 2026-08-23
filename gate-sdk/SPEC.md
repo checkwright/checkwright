@@ -2121,16 +2121,38 @@ design time; the last three were paid for, and each is named with what it cost.
    profile's artifact-free install seeds an empty registry. The leg's own
    re-scoping clause asks for the profile the binary-gated class empties, and
    every one of them does.
-   **The judgment is deliberately absent here, and its absence is the record.**
-   Every prior entry above closes with *accept and declare* on the ground that the
-   adopter *"receives the omission declared in their own `gates.list` rather than
-   as a broken battery"*; that ground is measured false at this cut, so the
-   standing judgment cannot simply be inherited, and choosing among the successors
-   — what the smoke asserts about an all-omitted install, whether an empty registry
-   may be green, whether a member is held back — changes shipped semantics or a
-   closed ruling rather than calibrating one. It is escalated rather than taken,
-   and until it is ruled the price stands measured and unpaid, which is the state
-   the held `fail` row above exists to make visible.
+   **The judgment is *accept and declare* with the price recorded UNPAID —
+   lead-ruled at build, 2026-08-24, and the ruler is named because the label is
+   what tells a later session who may revisit it.** It was the lead's to rule
+   rather than the operator's precisely because it is **derived from this
+   criterion rather than invented at the cut**. Every prior
+   entry above closes with *accept and declare* on the ground that the adopter
+   *"receives the omission declared in their own `gates.list` rather than as a
+   broken battery"*, and that ground is measured false here — so the standing
+   judgment is not inherited on its usual ground but reached on the rules this
+   criterion already states: a cohort emptying a value class **lands anyway**, and
+   what it may not do is land **unpriced**. The measurement supplies the price;
+   this criterion supplies the disposition. **The mechanism is the held `fail` row** named in
+   this criterion's own paragraph above, and it is the **validate stage's to
+   write** — a row encoding a judgment is not a build-stage surface, and the
+   governed record is here rather than in the file. The consequence a later
+   session must not misread: validate meets a **failing `installer_smoke` against
+   a `pass` baseline**, and that is the held row working rather than a red to
+   repair. Repairing it would reverse this ruling **by mechanism** rather than by
+   argument, which is exactly what a held row exists to prevent.
+   **Three successors were refused, each with its ground, so none is
+   re-proposed.** Making an empty registry read green is refused outright: the
+   `names no gates` refusal exists to stop a vacuous pass, and turning a
+   fail-closed into a fail-open on the one tree with no other signal is the worst
+   trade available — being the smallest diff is not a mitigation. Holding a member
+   back on shell reverses the 2026-08-23 operator ruling, and a price higher than
+   predicted is an argument about **cost**, never grounds to reopen a closed
+   ruling. Publishing more targets is real and is outside this criterion. What
+   **is** carried forward is the fourth: re-scoping what the binary-less leg
+   asserts about an all-omitted install, so the assertion becomes *the registry
+   declares its omissions and, where nothing survives, says so*. That changes what
+   an adopter is told they receive, which is why it is a scoped unit of its own
+   and not a cut-time edit.
 
    **The measurement also cost more than the number.** The leg refused to run at
    all until a defect it surfaced was repaired (§check-gate-exemption-tasks): the
@@ -8419,6 +8441,20 @@ Neither empty state has a fixture representation — a committed case cannot be 
 tree whose gates directory resolves to nothing — so both are held by a crate unit
 test that drives the member over two constructed dirs, one carrying a descriptor
 and one carrying neither spelling.
+
+**Who ruled this, and why the answer is recorded rather than left to the commit
+log.** It was **lead-ruled at build, 2026-08-24**. The stage session that hit the
+refusal escalated it correctly — the disposition is a third gate's user-facing
+semantics, which no amendment settled — and the lead ruled it under the lead's own
+authority rather than relaying it to the operator. The commit that landed it
+records it as *operator-ruled*; that message is wrong and is not rewritten, and
+**this passage is the correct record**, on the standing rule that the owner doc is
+ground truth while history answers only what happened. The label is load-bearing
+rather than decorative: *operator-ruled* marks what a later session may not
+reverse alone (TRAJECTORY.md, on how to read a ruling recorded there), so
+inflating a lead ruling to an operator one freezes a decision that should stay
+re-rulable at the lead — and it does so silently, which is why the attribution
+lives beside the ruling instead of only in the amendment that carried it here.
 
 ### check-gate-fixture-coverage
 
