@@ -79,8 +79,8 @@
   (TRAJECTORY.md §The closed rulings) a gate landed meanwhile no longer adds shell to it. Not
   a single-iteration delta; scope owns the decomposition, and the criterion-relaxation
   question is closed at gate-sdk/SPEC.md §The port-candidate criteria — an ordering signal,
-  never an eligibility screen. `gate-battery-parallel-execution` and
-  `gate-battery-result-cache` say the port subsumes them: closure candidates as it lands.
+  never an eligibility screen. Both battery entries said the port subsumes them;
+  `gate-battery-parallel-execution` closed on that, leaving `gate-battery-result-cache`.
   **The SEVENTH and EIGHTH cuts are delivered** — `check-graph` (its own iteration, operator-ruled
   2026-08-20), then `check-gate-assertions` and `check-tree-terms` as two batches of one member
   each. The eighth **emptied the takeable tier** the 2026-08-23 close had just reopened, so every
@@ -174,9 +174,9 @@
   are genuinely independent is unmeasured, and a wrong answer corrupts evidence rather than
   merely running slow.
   **DISTINCT from the two battery entries, and from the arm already discharged.**
-  `gate-battery-parallel-execution` and `gate-battery-result-cache` own the 52s battery and are
-  parked as port-subsumed; `battery-runner-port` discharges the first and does not reach the
-  suite roster at all. `check-crate-arms`'s source-stamp cache is **landed** — the gate carries
+  The two battery entries own the battery's own cost and never reached the suite roster;
+  `battery-runner-port` discharged `gate-battery-parallel-execution`, now Done, while
+  the other stays parked. `check-crate-arms`'s source-stamp cache is **landed** — the gate carries
   its `.green` stamp today — and ruled at gate-sdk/SPEC.md §check-crate-arms, so the cargo half
   of the original finding is discharged and this entry is the suites alone.
   **Cost while deferred:** about sixteen minutes per validate, paid serially, on a stage every
@@ -288,30 +288,39 @@
   Filed 2026-08-21 twice, by spec and again by build, into the gap inbox; drained and promoted at
   `graph-port-and-config-seam`'s close, which re-verified the spawn set against the crate.
 
-- **config-bridge-resolution-cost** [design-pending] — the array-knob config bridge is the largest
-  non-cargo cost in the battery and no entry owns it.
-  **Measured at build, re-measured at the drain, and the ratio moved the wrong way.**
-  `gen-pre-commit.sh --emit` takes 6119/6203/6243 ms on this tree against 206/205/218 ms for
-  `--emit-commit-msg`, and `check-graph`'s whole run is 6704 ms — so roughly **92%** of the
-  battery's second-slowest gate is one call resolving argv for every registered member. The filing
-  measurement said 5651 of 7629 ms (74%); the re-run raised it rather than lowering it.
-  **The mechanism.** `gate_command` asks the binary for its `--knobs`, then sources the owning kit's
-  `lib/*.sh` in a fresh subshell to read `declare -p`, so the cost is per member per declared knob.
-  It is paid twice inside every `check-graph` run, again by `install-hooks.sh`, and again by a
-  hook regeneration.
-  **Nothing else owns it.** `gate-battery-parallel-execution` and `gate-battery-result-cache` are
-  about the battery rather than the bridge and neither reaches it, and the port track's own runtime
-  argument was retired against this same measurement (gate-sdk/SPEC.md §check-graph).
-  **Candidate shapes, none costed:** memoise the per-kit library sourcing across knobs within one
-  `gen-pre-commit` run; batch `--knobs` into one binary call; or resolve each kit's declared-knob
-  set once per run rather than once per knob.
-  **Why `[design-pending]`:** the three trade differently against the bridge's fail-closed contract,
-  and choosing needs an answer the bridge's SPEC does not carry today — whether one knob's resolved
-  value may legitimately differ between two members in the same run.
-  **Cost while deferred:** the battery's slowest non-cargo component is a resolution loop nothing
-  measures or holds, so every port that adds a member adds to it invisibly.
-  Surfaced by the member that pays it most and filed 2026-08-21 twice, by spec and by build;
-  promoted at `graph-port-and-config-seam`'s close, which re-timed all three figures.
+- **config-bridge-resolution-cost** [design-pending] — the array-knob config bridge still costs
+  about 640 ms on every invocation that resolves it, and no entry owns the residue.
+  **RE-SCOPED 2026-08-23 at `battery-runner-port`'s close, on a lead ruling: correcting a false
+  claim in an entry is not a descope.** Three of this entry's four load-bearing statements moved
+  under `df42c13b`, and the retired ones are deleted rather than annotated.
+  **Its blocking design question is ANSWERED, by an executed fact rather than a preference.** It
+  asked whether one knob's resolved value may legitimately differ between two members in the same
+  run. It may not: resolution is **member-independent**, verified by reading the resolver rather
+  than the SPEC — `gate-sdk/lib/gate.sh`'s `_gate_knob_emit` takes the gate name as a parameter and
+  uses it at exactly one site, a refusal message, so no resolver reads the requesting member.
+  Batch 1 then built on that property. The tag nevertheless STAYS: canon-kit/SPEC.md §The amendment
+  lifecycle makes `[design-pending]` a section-membership invariant ("every entry in the set carries
+  the tag"), so it comes off at promotion and not on a closed question — probed, not assumed,
+  since removing it reds `check-amendment-queue` outright.
+  **Its third candidate shape is BUILT** — "resolve each kit's declared-knob set once per run
+  rather than once per knob" is what `gate_knob_env_set` and `_gate_knob_kit_emit` now do, one
+  subshell per owning kit. The other two shapes are untaken and stay open.
+  **What actually remains, measured at this close, best-of-three warm.** A single-gate run of a
+  gate that does almost no work (`check-core-files`) costs **640 ms**, essentially all of it one
+  bridge resolution — that is the floor every bridged invocation pays. `gen-pre-commit.sh --emit`
+  is **4104 ms**, down from the 6119/6203/6243 ms this entry used to carry. The old
+  92%-of-`check-graph` framing is retired with those figures and must not be revived.
+  **Why it does not close.** 4104 ms is still the largest non-cargo single cost in the tree, and
+  the 640 ms floor is paid by every hook regeneration, every `install-hooks.sh`, and every
+  single-gate run a session makes while iterating. What the batch removed was the per-knob
+  multiplier, not the per-kit subshell.
+  **Nothing else owns the residue.** `graph-port-bash-spawn-residue` owns the surviving `bash`
+  spawn itself and was ruled 2026-08-23 not to fall to this port — only its price did.
+  **Cost while deferred:** every bridged invocation pays 640 ms it cannot avoid, and the cost
+  scales with the number of owning kits rather than with the number of members, so a new kit
+  raises the floor for everyone while a new member no longer does.
+  Filed 2026-08-21 twice, by spec and by build; promoted at `graph-port-and-config-seam`'s close;
+  re-scoped here after the batch landed, with every retired figure deleted.
 
 - **installer-graph-artifact-literal** [design-pending] — `installer/lib/init.sh` spells the graph
   artifact's path as a literal where a resolver owns it.
@@ -1180,35 +1189,6 @@
   now documents but does not enforce.
   Filed 2026-07-26 by close (`activation-path`), generalizing the
   knowledge-friction captures that surfaced the replace-vs-extend semantics.
-
-- **gate-battery-parallel-execution** [design-pending] — `run-gates.sh` runs the battery
-  serially: no `xargs`, no `&`, no `wait`. Measured after the spawn-hoist unit
-  landed: 23718ms/90 gates, of which `check-shellcheck` alone is 5921ms. Spread
-  across cores the remaining gates sum to well under that, so **`check-shellcheck`
-  becomes the critical path** and the battery floors at roughly its cost —
-  splitting its corpus across workers is what breaks the bound, not the scheduler.
-  **Premise dated 2026-08-02 at scope, twice over.** `gates.list` now registers 94,
-  and no timing artifact survives in the tree — `.metric/` holds economics and usage
-  only — so the figures above are re-measured before they are built on, not trusted
-  as transcribed. The critical-path *shape* is unaffected by the count.
-  **The deliverable is the concurrency contract, not the scheduler.** Per-gate
-  scratch isolation (`.tmp/` is one shared dir today); the timings file as a
-  contended writer; deterministic output ordering under interleaved completion,
-  so a red reads the same way twice; and an ordering constraint between gates
-  that regenerate projections (`check-graph`, `check-enforcement-fresh`, the
-  rollups) and gates that read them.
-  **Adjacent lever, same measurement:** several gates each walk the whole tracked
-  file tree independently. One shared walk feeding many readers is a structural
-  win per-gate hoisting cannot reach, and is what one binary does natively.
-  **Relation to `native-gate-binary-port`:** the port subsumes this — a native
-  binary gets worker threads nearly free — so a port-first ruling closes this
-  entry rather than duplicating it. Filed anyway because it pays if the port
-  slips, and the isolation contract is owed either way.
-  **Cost while deferred:** every validate and every close pays the serial battery,
-  and each new gate lengthens it — the cost grows with the roster and is paid by
-  every session, not once. Nothing is incorrect while deferred.
-  Debt: no governed name. Filed 2026-08-01 by the lead at operator direction,
-  from the battery profile measured during `delegation-reach-and-gate-cost`.
 
 - **gate-battery-result-cache** [design-pending] — re-run the battery over an unchanged tree and
   every gate redoes its work. This iteration ran it well past half a dozen times,
@@ -7180,6 +7160,8 @@
 - **amendment-roster-omission-detection** [design-pending] — Only a grep catches a short roster.
 
 ## Done
+
+- gate-battery-parallel-execution
 
 ## Lessons Learned
 

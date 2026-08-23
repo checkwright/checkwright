@@ -6590,6 +6590,33 @@ properties bind:
   projection another member read would be a **defect against this contract**,
   not a scheduling input.
 
+**What the pool did NOT need, priced so a later session does not re-reach for
+it.** The standing counter-proposal to a pool is **one shared tree walk feeding
+many readers** — several members each listing and reading the tracked corpus
+independently, hoisted into a single walk the way a single binary makes easy.
+Measured on this tree rather than argued: the tracked corpus is 1634 files and
+8.2 MB, **one whole-tree listing costs 1 ms and listing plus reading every byte
+costs 6 ms**. Five members do a no-pathspec whole-tree walk (`check-md-refs`,
+`check-spec-pointer`, `check-reads-couples`, `check-gate-exemption-tasks`,
+`check-gate-binary-fresh`); the rest of the `ls-files` call sites are either
+scoped to a scan root or are `--error-unmatch` existence tests, which are
+membership queries and not walks at all. So the whole shareable quantity is
+about **30 ms of CPU across the battery, overlapped**, against a 7408 ms run.
+**The two readings that make it moot rather than merely small.** *One*: for the
+members that walk, the walk is not the cost. Behind a single bridge resolution
+(~640 ms, §lib/gate.sh, and the floor every single-gate invocation pays)
+`check-tree-terms` spends ~494 ms and `check-prose-enum` ~351 ms on their own
+per-file matching, of which the shared 6 ms read is a little over one percent —
+and that matching is exactly what a shared walk cannot share, since each member
+wants a different predicate over the same bytes. The other three sit at or below
+the bridge floor's noise. *Two*: the battery's wall clock is floored by a single
+member. `check-shellcheck` is ~6417 ms of a 7408 ms run, so the headroom for
+every non-shellcheck optimization combined is about one second, and a shared
+walk is a low single-digit percentage of even that. This confirms the
+critical-path prediction made when the pool was still unbuilt — splitting
+`check-shellcheck`'s own corpus is what would break the bound, not the
+scheduler and not the walk.
+
 **What the pool actually exposed was a different class, and it is recorded here
 because the contract above would not have caught it.** A member that abandons an
 **in-process pipe producer** — `printf '%s\n' "${set[@]}" | grep -q …`, the
