@@ -7181,8 +7181,5 @@
 
 ## Done
 
-- cohort-held-members-port-prerequisites
-- battery-runner-port
-
 ## Lessons Learned
 

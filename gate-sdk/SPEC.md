@@ -6437,6 +6437,18 @@ the shell dispatcher it replaced was the 24990 ms above. The serial figure is th
 bridge saving alone and the gap to it is the pool's; both are bounded below by
 the longest single member, which is what the timings file's slowest rows name.
 
+**What the completion predicate covers, and the one bash process it does not —
+ruled 2026-08-23 by the operator.** TRAJECTORY.md §The closed rulings states that
+*port complete* means "the battery runs from the hook to the binary with no bash
+in between", naming this unit. That predicate governs the **hook-to-binary path**
+only. The retained knob resolver is one bash process per battery run — the
+config bridge's own producer, which §lib/gate.sh rules is the single place a
+knob's value is computed — and this unit owns its **cost**, not its existence.
+The cost is what fell: one subshell per owning kit rather than one per declared
+knob. Recorded here because the predicate and the surviving process would
+otherwise read as a contradiction to anyone checking the claim against the tree,
+and the resolution is a scope reading rather than an unmet condition.
+
 **A member dispatches as a child process, and the threads are the concurrency.**
 A compiled member is a function in the same binary, so calling it in-process is
 available and looks free. It is refused on three grounds, and the measurement
@@ -7193,6 +7205,20 @@ byte-identical, which is the oracle that the batching moved no value. What did
 **not** change is the ruling above or its consequence: `check-graph` keeps
 spawning `bash bin/gen-pre-commit.sh` for assertions D and E, so
 `graph-port-bash-spawn-residue`'s subject survives and only its price falls.
+
+**Two options were weighed against that cheaper generator and DECLINED FOR NOW
+rather than refuted — ruled 2026-08-23 by the operator, and the distinction is
+the whole reason this paragraph exists.** The first is the **emit-arm path**:
+moving `--emit` into the binary, which the batched bridge makes arithmetically
+more attractive than it was when the ratification above was taken. The second is
+any **reversal of that 2026-08-21 ratification** itself. Neither was argued down
+on the merits here; both were held because this unit's envelope was the battery's
+dispatch. A declined option and a refuted one are not the same record, and the
+refusals stated elsewhere in this section — criterion 6's single-producer rule,
+the four grounds against the hook shim — are refutations that stand. These two
+are open questions with a *timing* answer, so a later session may reopen either
+on its merits and must not read this section's silence as either a fresh idea or
+a settled no.
 
 **The hook's shape is ruled rather than open.** The `--run` arm makes a
 two-line `exec <binary> --run --hook` shim look available; it is **refused**, and
