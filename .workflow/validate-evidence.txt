@@ -1,1 +1,25 @@
 # contract: evidence-manifest v1
+battery-runner-port gates sha256=bbb0d69bd6e558bfd71c2dd055feb68b71b1a2351e668a5a19f492497d86e83b pass=106 fail=0 ignore=0 verdict=clean 2026-08-23
+battery-runner-port gate_sdk sha256=18f97d208af9a317d22c58c12390a5c319f2cc0e9aa17cba778edc64cc5344fd pass=1 fail=0 ignore=0 verdict=clean 2026-08-23
+battery-runner-port canon_kit sha256=9d3cf3ab0a1425a5996fd26152019ba03a3e0f5fa5ad31aa0e4a19901b8acb5a pass=1 fail=0 ignore=0 verdict=clean 2026-08-23
+battery-runner-port context_kit sha256=65e7536ec8b920506d9defb5f2fd338be716ee72482acf2e4819ca5b3fcbe891 pass=1 fail=0 ignore=0 verdict=clean 2026-08-23
+battery-runner-port delegation_kit sha256=ccc527d5f87226b0de67d84cc9e56417838a2295033aaf6dd1e16d699926131d pass=1 fail=0 ignore=0 verdict=clean 2026-08-23
+battery-runner-port doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-08-23
+battery-runner-port evidence_kit sha256=b9a84e84d67dad5a63ae7ce34aecdc472ffbe13d06d01cc02f04bfca5b5de2ae pass=1 fail=0 ignore=0 verdict=clean 2026-08-23
+battery-runner-port guard_kit sha256=234e06ba5cdb4ca383be7191965292443198471675d1b3166d8c264175420ae4 pass=1 fail=0 ignore=0 verdict=clean 2026-08-23
+battery-runner-port lifecycle_kit sha256=246f07a9d7e12fa9535108c073077518b3cc8bdd64a4014d5c8327c1d8101c95 pass=1 fail=0 ignore=0 verdict=clean 2026-08-23
+battery-runner-port queue_kit sha256=bd337719dfff15f492ae94d8e8662663a8917b65edd4b3bfcfdd20f1790ba39b pass=1 fail=0 ignore=0 verdict=clean 2026-08-23
+battery-runner-port site_kit sha256=07f7139ea31865677de58ea44b43f7c98ae6c40c8f3fe57e8975e8d65794be35 pass=1 fail=0 ignore=0 verdict=clean 2026-08-23
+battery-runner-port scripts sha256=28b2b32bbd297a46b82dfd6915ad92a325eb579b3f56acc6e30bcd2dbe5af279 pass=1 fail=0 ignore=0 verdict=clean 2026-08-23
+battery-runner-port guard_tests sha256=8b85026db6389b32629537a903f3e8933e33c4e7a327ff83f284cbdaf1a86e84 pass=1 fail=0 ignore=0 verdict=clean 2026-08-23
+battery-runner-port usage_tests sha256=04968d303b3e4ec54f3f8033f0e7e00d4b33ae90fd7507b48347cab56d0bc26d pass=1 fail=0 ignore=0 verdict=clean 2026-08-23
+battery-runner-port budget_guard_tests sha256=94bbe0c41f3993e3c748a492d29e2a0d22139825b8c53bbae6a528500a8ce402 pass=1 fail=0 ignore=0 verdict=clean 2026-08-23
+battery-runner-port dispatch_guard_tests sha256=6018943502411c07fe57162c0dae2ac37af304eccc0d0a9a6e0ec4fd733a1daf pass=1 fail=0 ignore=0 verdict=clean 2026-08-23
+battery-runner-port trend_tests sha256=acdbfef4eab851fca00ca747245b6ac4a4f804b05989f9cd3acd014bb56ac330 pass=1 fail=0 ignore=0 verdict=clean 2026-08-23
+battery-runner-port demo sha256=8f765bc915fb5990ce8af38fcf65d46864b91555d1eb0d14f0a176cd09eeb9b2 pass=1 fail=0 ignore=0 verdict=clean 2026-08-23
+battery-runner-port installer_smoke sha256=f9ffa64d664e493aa21117ae0f4a356ed3204a2eb577b9182cdf12b563065909 pass=1 fail=0 ignore=0 verdict=clean 2026-08-23
+battery-runner-port consumer_smoke sha256=db48107f88280b33574db5578815c38944a78d1cabe905aae2dfb45ff6059993 pass=1 fail=0 ignore=0 verdict=clean 2026-08-23
+battery-runner-port upgrade sha256=bfea62cdf322c255412d93fa2cd8da2c7cca3e88f5271f3fb602e9194ea5673b pass=1 fail=0 ignore=0 verdict=clean 2026-08-23
+battery-runner-port agents_md_smoke sha256=1a704bfa724b275a3df37a1a160e41f3f58e579fa857c57624bb91986e6d902b pass=1 fail=0 ignore=0 verdict=clean 2026-08-23
+battery-runner-port index_tests sha256=e14e152466dc5be0296b1e20575bf3d587e1e0a127e7c63ad57671dbcaeaddb8 pass=1 fail=0 ignore=0 verdict=clean 2026-08-23
+battery-runner-port native_crate sha256=e7d89f9c204cda0cbe29eb1fe0aab7c4e7e2956bf4b9a1a34ce3dd35da4cf69b pass=1 fail=0 ignore=0 verdict=clean 2026-08-23
