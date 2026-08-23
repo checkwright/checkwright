@@ -2397,28 +2397,31 @@ because probing showed `check-gate-assertions` was its only live holder
 (§check-gate-assertions records the probe and what is deliberately *not* changed
 on the published requirement).
 
-**Criterion 5's price for that batch, and the one place its instrument could not
-be run.** Both members are `# install: zero-config` and both live in `gate-sdk`,
-which the measured profile carries, so the predicted growth is **two** with the
-profile intersection a no-op. On the pre side the instrument ran as the criterion
-demands — `installer_smoke`'s binary-less leg, from a clean checkout of the
-pre-batch rev reached by path — and reports **twenty-two** omitted members. **The
-post-side leg run is blocked**, by a defect this batch *uncovered* rather than
-caused: the smoke fails at its first profile because the compiled gate binary
-carries its dependencies' build paths and `init` commits it into the consumer's
-tree, which §check-tree-terms' newly honest binary arm reds on
-(`installed-gate-binary-trips-the-leak-guard`). So the post number is taken from
-the **derivation this criterion already sanctions as the leg's reproduction** —
-the `zero-config` `.gate` members under the measured profile's kit roots — which
-reproduces the leg's twenty-two **member for member** at the pre rev and yields
-**twenty-four** at the post one, the predicted growth exactly. It is recorded as
-*derived on an instrument validated against the leg at the pre rev*, never as the
-leg's own post reading, and the leg's post run is **owed** once that defect is
-ruled. The **judgment** is the standing one, **accept and declare**, refusing its
-two rivals for the reasons already ruled: an adopter on an uncovered platform
-receives each omission declared in its own `gates.list` rather than as a broken
-battery, restoring the class shell-side reinstates the duplication the port
-deletes, and a binary-gated declaration is what the omit path already is.
+**Criterion 5's price for that batch, measured on both sides — and the detour it
+took getting there is the part worth keeping.** Both members are
+`# install: zero-config` and both live in `gate-sdk`, which the measured profile
+carries, so the predicted growth is **two** with the profile intersection a no-op.
+`installer_smoke`'s binary-less leg, run from a clean checkout of each rev reached
+by path, reports **twenty-two** omitted members before the batch and
+**twenty-four** after — the prediction exactly, and both sides measured rather
+than one measured and one reasoned. The **judgment** is the standing one, **accept
+and declare**, refusing its two rivals for the reasons already ruled: an adopter on
+an uncovered platform receives each omission declared in its own `gates.list`
+rather than as a broken battery, restoring the class shell-side reinstates the
+duplication the port deletes, and a binary-gated declaration is what the omit path
+already is.
+
+**The post-side reading was blocked first, and what blocked it was worth more than
+the number.** The smoke failed at its first profile: the compiled gate binary
+carried its dependencies' build paths and `init` commits that binary into the
+consumer's tree, so §check-tree-terms' newly honest binary arm reddened a
+consumer's own first battery. That is the leak guard working on its first live
+encounter, and the measurement is what found it — a cohort's criterion-5 price is
+paid on a real install, which is precisely why this criterion refuses a reasoned
+number. The defect was fixed at its source rather than exempted (§build-native),
+after which the leg ran and returned the twenty-four above. The lesson for a later
+cut: an instrument that will not run is a finding about the product, not a licence
+to reason the number out.
 
 **"Never as one cohort" is the property that makes a budget batch safe, and it
 reads as bookkeeping only until that is said.** A batch's members carry **no
