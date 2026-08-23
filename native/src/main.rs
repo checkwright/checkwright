@@ -123,7 +123,7 @@ fn main() {
         Some(a) => a.as_str(),
         None => {
             eprintln!("checkwright-gates: no subcommand given");
-            eprintln!("  usage: checkwright-gates --list | --reads <gate-name> | --knobs <gate-name> | --source-stamp | --queue-parity <queue-file> | --declaration-parity section <file> <section> | --declaration-parity record <file> | --run [--gates-dir <dir>] [--only <name>... | --for <path>...] | --emit-<arm> | <gate-name> [args...]");
+            eprintln!("  usage: checkwright-gates --list | --reads <gate-name> | --needs <gate-name> | --knobs <gate-name> | --source-stamp | --queue-parity <queue-file> | --declaration-parity section <file> <section> | --declaration-parity record <file> | --run [--gates-dir <dir>] [--only <name>... | --for <path>...] | --emit-<arm> | <gate-name> [args...]");
             eprintln!("  bridged arms: {}", emit::arms().join(", "));
             exit(2);
         }
@@ -210,6 +210,33 @@ fn main() {
                         println!("{}", r);
                     } else {
                         println!("{}\t{}", r, filter);
+                    }
+                }
+                exit(0);
+            }
+            None => no_such_gate(name),
+        }
+    }
+
+    // spec: gate-sdk/SPEC.md §The `# graph:` manifest — one line per requirement and nothing
+    // else: a program name, or `?` and a tab and the knob whose resolved value's command word is
+    // the requirement, or `?` alone. No count line, because the count is derivable from the lines.
+    if first == "--needs" {
+        let name = match argv.get(1) {
+            Some(n) => n.as_str(),
+            None => {
+                eprintln!("checkwright-gates: --needs needs a gate name — the requirement set could not be reported; treating as failure (not clean)");
+                eprintln!("  usage: checkwright-gates --needs <gate-name>");
+                exit(2);
+            }
+        };
+        match gates::needs(name) {
+            Some(reqs) => {
+                for (program, knob) in reqs {
+                    if knob.is_empty() {
+                        println!("{}", program);
+                    } else {
+                        println!("{}\t{}", program, knob);
                     }
                 }
                 exit(0);

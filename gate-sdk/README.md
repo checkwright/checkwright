@@ -35,7 +35,9 @@ honest:
   exit code. Every reader of that command cites this script rather than copying it.
 - `bin/port-blockers.sh` — the port-sequencing report, in two exclusive arms.
   The default arm gives, per registered gate, the external programs its rule
-  requires beyond `GATE_SDK_PROGRAM_FLOOR`; `--group` partitions the still-shell
+  requires beyond `GATE_SDK_PROGRAM_FLOOR` — tokenized out of a shell rule, or
+  read off the binary's `--needs` for a member that has ported; `--group`
+  partitions the still-shell
   members by derived corpus derivation, largest group first, with the
   mechanically derivable port criteria beside each member. Both derive from the
   tree rather than from a list anywhere, and both count what they could not

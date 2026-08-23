@@ -465,6 +465,18 @@ a cwd and an env nothing in production reads. Widening `proc.rs` is how a member
 that needs more of the child's result gets it; building its own `Command` is what
 the test refuses.
 
+**That routing test is also what makes `--needs` trustworthy, which is why the
+spawn recorder lives here rather than beside the registry.** `proc.rs` carries a
+`#[cfg(test)]` recorder on the shape `walk.rs`'s read recorder has: `run` and
+`run_with_stdin` note the program they are about to spawn, and §The `# graph:`
+manifest's unit test A reads the note back after running a member over its fixture
+cases. It is **test-scoped deliberately** — a production recorder would be state
+with no reader — and it is unreachable from a gate module, which is what keeps it
+from becoming a runtime surface. Because the routing test already proves no gate
+module builds its own `Command`, hooking the two wrapper functions observes every
+spawn a member can make; a recorder placed anywhere else would observe only the
+spawns that happened to pass through it.
+
 ### Fixture-pair discipline
 
 When a gate is written or edited, it ships with — or updates — its
@@ -773,15 +785,58 @@ surface.
 here.** The contract is *a declaration path's substrate answers what it reads* —
 shell answers by parse, the binary answers by `--reads`. It generalizes to
 requirements the same way: **shell answers by parse, the binary answers by
-`--needs`** — a fifth top-level flag beside `--list` / `--reads` / `--knobs` /
-`--source-stamp`, backed by a fifth registry-tuple element and held to behavior by
-a crate unit test in the shape of the `--reads` one. **`--needs` is sequenced, not
-shipped**, and the reason is a decision rather than an omission: no ported member
-requires an external program today, so the arm would land with no named reader,
-which the amendment contract removes rather than reserves. The first port of a
-member carrying an external requirement builds it. Until then `port-blockers.sh`
-reports every `.gate` member as undecidable rather than clean, so the hole is
-counted rather than silent. Whether a later authoring
+`--needs`** — a top-level flag beside `--list` / `--reads` / `--knobs` /
+`--source-stamp`, backed by its own registry-tuple element and held to behavior by
+a crate unit test in the shape of the `--reads` one. **The arm is built**, on the
+condition this section set for it: it was sequenced rather than shipped while no
+ported member required an external program, because it would have landed with no
+named reader, and the first port of a member carrying one builds it. No ordinal is
+stated for either the flag or the element, deliberately: both rosters churn with
+every port, and a count in prose over a churning roster is a second source for
+something `main.rs` and `GateEntry` already hold.
+
+**Its report grammar is one line per requirement and nothing else** — no count
+line and no header, on §check-reads-couples' ground that a transcribed total is a
+second source for something derivable from the lines. Three line kinds, each with
+a named reader at a named transition:
+
+- **`<program>`** — a program the member spawns. Read by §port-blockers' default
+  arm at its per-member row, filtered against `GATE_SDK_PROGRAM_FLOOR` exactly as
+  a shell member's scanned command word is, so an on-floor program is suppressed
+  on both substrates by one rule.
+- **`?<TAB><knob-name>`** — the requirement is the **command word of that knob's
+  resolved value**. Read by the same arm at the bridge resolution that precedes
+  the floor filter, the path it already uses for a shell member's command-position
+  expansion, so the two substrates cannot disagree about a knob's value. This is
+  the load-bearing kind rather than an ergonomic: no literal roster is true for
+  every consumer (§The port-candidate criteria, criterion 7), so spelling the
+  program into the registry would be a second copy of the knob's default and
+  *wrong* for any consumer who repointed it — silently, since nothing would
+  compare the two.
+- **`?`** — a requirement the registry cannot bound at all. Read by the trailer's
+  undecidable counter, the reader a shell member's unresolvable expansion has.
+
+**The `?` in the knob form is deliberate reuse and not an inconsistency with
+`--reads`, which spells its optional field the other way round.** There a root is
+an answer and the tab field refines it; here `?` says *the registry cannot name
+this literal* — what `?` already means on both arms — and the tab field says
+*where the answer is instead*. A reader who takes the tab field away is left with
+the honest `?` the arm would otherwise print. Stated because the two grammars are
+read side by side and the asymmetry would otherwise look like drift; it is also
+why one covering rule holds both arms to behavior rather than two.
+
+**Unit test A holds the declaration to executed behavior**: every registry member
+runs over its own `gate-tests/<name>/{good,bad}/` cases with the spawn recorder
+armed, and the observed program set must be a **subset** of the declared one. The
+direction is stated so a later reader does not tighten it to equality: a wrapper
+whose program is reached only on a branch no fixture case takes would fail an
+equality test for being correctly declared, and the failure that matters is an
+**undeclared** spawn — over-count rather than lose, the direction criterion 7
+already fixes for an undeclared hold. Test **B** — no `Command` construction
+outside the crate's one sanctioned spawn wrapper — is what makes A trustworthy,
+and it is already enforced by `proc.rs`'s own unit tests rather than added here.
+A member whose registry entry omits the element fails to compile, on `--reads`'
+terms. Whether a later authoring
 SDK relocates that contract to a substrate-neutral surface stays
 `gate-authoring-sdk-surface`'s question, narrowed by this and deliberately not
 answered: one substrate's answer is added without adding a shape that would have to
@@ -2136,14 +2191,30 @@ design time; the last three were paid for, and each is named with what it cost.
    wrapper like the three above, and it is `install: never`, so no adopter
    receives it under either substrate (§check-crate-arms).
 
-   **The report's honest bound is its undecidable count, and that count grows with
-   the port.** A member declaring through a `.gate` descriptor has no shell rule to
-   parse and no `--needs` answer yet (§The `.gate` descriptor), so it is counted
-   undecidable rather than reported clean — the §check-reads-couples precedent, a
-   root the tool cannot bound declares `?` rather than guessing. The count is the
-   share of the corpus the report cannot speak for, and every port moves a member
-   into it until the binary answers `--needs`. That is the pressure the sequencing
-   below rests on, and it is why the arm is scheduled rather than left open.
+   **The report's honest bound is its undecidable count, and the port made it grow
+   until `--needs` shipped — after which it fell for the first time.** A member
+   declaring through a `.gate` descriptor has no shell rule to parse, so while the
+   binary could not answer it was counted undecidable rather than reported clean —
+   the §check-reads-couples precedent, a root the tool cannot bound declares `?`
+   rather than guessing. Every port moved a member into that count, until it
+   reached **102 of 106 members scanned**: the roster was blind over more than 96%
+   of the corpus it walks, which is what the arm was sequenced against and what
+   building it repaired. With `--needs` consumed at the default arm's per-member
+   row the same cut reports **1**, and the one remaining is
+   `check-gate-substrate-parity`'s own unresolvable `$BIN` — a still-shell member,
+   not a blind one. The count is the share of the corpus the report cannot speak
+   for, and it is now a bound on the report rather than an artifact of the port.
+
+   **Repairing the arm's consumer is what made the knob line kind readable at
+   all**, and it is recorded because the roster's numbers move with it:
+   `port-blockers.sh`'s `knob_program` called `_gate_knob_value`, a function
+   defined nowhere in the tree, so every knob-derived requirement had always
+   reported `default unresolvable` on **both** substrates — the two agreed only by
+   both failing. It resolves through `gate_knob_env_one`, the per-name face of the
+   bridge the dispatcher itself uses. With it live, `check-docs-render-fidelity`'s
+   requirement is **measured** as `ruby` rather than predicted from
+   `SITE_KIT_RENDERER`'s default, which is the class-(i) worked example reading off
+   a run for the first time.
 
 **New gates are born native by default; shell is the exception and it needs a
 stated cause** — operator-ruled 2026-08-14 and re-affirmed the same day on
@@ -7480,9 +7551,11 @@ seeing the repair rather than a regression.
 
 **The default arm answers criterion 7.** For every `gates.list` member it
 resolves the declaration path and reports the external programs the rule requires
-beyond `GATE_SDK_PROGRAM_FLOOR`, one `<member><TAB><program><TAB><file:line>` row
+beyond `GATE_SDK_PROGRAM_FLOOR`, one `<member><TAB><program><TAB><evidence>` row
 each, then a trailing line counting members scanned and members carrying a
-requirement it could not decide.
+requirement it could not decide. The evidence column names where the answer came
+from: a `<file>:<line>` for a shell rule the arm tokenized, the declaration path
+and `(--needs)` for a compiled member that answered for itself.
 
 **Three derivation inputs, in descending confidence.** The `command -v <prog>`
 guard, already this tree's convention for announcing exactly this dependency — a
@@ -7495,6 +7568,25 @@ command-position expansion**: a `"${KNOB[@]}"` or `"$KNOB"` at the head of a
 command resolves through `lib/gate.sh`'s own bridge resolver, the single place a
 knob default is read anywhere, so this report cannot disagree with the value a
 dispatched binary is handed.
+
+**Those three read a shell rule; a compiled member is read from its substrate
+instead, and the row is the same shape.** A `.gate` member has no rule text to
+tokenize, so this arm asks the binary `--needs <member>` and maps the three line
+kinds §The `# graph:` manifest specifies onto the rows it already emits: a program
+name takes the **same floor filter** a scanned command word takes, so an on-floor
+program is suppressed on both substrates by one rule; a `?<TAB><knob>` takes the
+**same bridge resolution** a command-position expansion takes, which is what keeps
+one knob from having two resolved values in one report; and a bare `?` reaches the
+**same undecidable counter** an unresolvable expansion reaches. No fourth row
+shape is minted, because there is no fourth reader. **The `--group` arm does not
+consume `--needs`** and is unchanged: it excludes ported members from the
+partition entirely, so it has no row to fill.
+
+**A binary that cannot answer is reported undecidable, never as an empty
+requirement set.** An older binary predating the arm refuses it, and folding that
+refusal into "declares nothing" would report the member clean because the question
+failed — the captured-emptiness false green of §Fail-closed contract in report
+form. The arm therefore reads the answer's exit status before its lines.
 
 Two **negative** inputs keep the positive ones honest, and both are derived from
 the tree rather than listed. Keyword and builtin status is asked of the

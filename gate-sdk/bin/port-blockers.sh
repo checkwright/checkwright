@@ -2,7 +2,7 @@
 # spec: gate-sdk/SPEC.md §The port-candidate criteria — criterion 7's roster, derived from the tree at each invocation rather than stated anywhere; a literal roster cannot be correct for every consumer because a renderer/command knob is consumer config
 # spec: gate-sdk/SPEC.md §port-blockers — criterion 6's roster on the same tool and the same walk: the --group arm partitions the still-shell members by derived corpus derivation, so one tool is the derived roster for both criteria and neither is a maintained list
 # usage: port-blockers.sh [--group]
-#   default arm: each registered gate's external-program requirements beyond GATE_SDK_PROGRAM_FLOOR, as '<member><TAB><program><TAB><file:line>' rows plus a trailing scanned/undecidable count line — the criterion-7 input a porting session reads when it sequences a cohort; advisory, never parsed, and what it cannot decide prints '?' and is counted.
+#   default arm: each registered gate's external-program requirements beyond GATE_SDK_PROGRAM_FLOOR, as '<member><TAB><program><TAB><evidence>' rows plus a trailing scanned/undecidable count line — the criterion-7 input a porting session reads when it sequences a cohort; a shell rule is tokenized and the evidence is '<file>:<line>', a ported member answers for itself through the binary's --needs and the evidence is its declaration path; advisory, never parsed, and what it cannot decide prints '?' and is counted.
 #   --group: the corpus-derivation partition over the still-shell members, groups largest first, each member carrying its declaration line count, its criterion 2/3/7 columns and its expanded couples= — the criterion-6 input the session cutting the next cohort reads, advisory on the same terms and with an undecidable count of its own; lines= is a floor on a port's size and never a ranking of it.
 set -uo pipefail
 
@@ -16,7 +16,8 @@ usage: port-blockers.sh [--group]
 
   (no argument)  criterion 7: every registered gate's external-program
                  requirements beyond GATE_SDK_PROGRAM_FLOOR, one
-                 '<member><TAB><program><TAB><file:line>' row each.
+                 '<member><TAB><program><TAB><evidence>' row each — a shell
+                 rule tokenized in place, a ported member read off --needs.
   --group        criterion 6: the corpus-derivation partition over the
                  still-shell members, largest group first, each member
                  carrying lines= (its declaration's line count), its
@@ -320,12 +321,46 @@ pb_criterion2() {
     printf 'none\n'
 }
 
+# spec: gate-sdk/SPEC.md §The `# graph:` manifest — the default arm's `.gate` row, read off the binary's `--needs` rather than left undecidable: a program name filters against GATE_SDK_PROGRAM_FLOOR exactly as a shell member's scanned command word does, a `?` with a knob resolves through the same bridge resolver a command-position expansion does, and a bare `?` reaches the undecidable counter a shell member's unresolvable expansion already reaches
+# spec: gate-sdk/SPEC.md §Fail-closed contract — a binary that cannot answer is reported undecidable and never as an empty requirement set: a member silently reported clean because the arm refused is the captured-emptiness false green in report form
+pb_needs_rows() {
+    local member="$1" decl="$2" bin out st prog knob
+    bin="$(gate_native_bin)"
+    out="$("$bin" --needs "$member" 2>/dev/null)"; st=$?
+    if [[ "$st" -ne 0 ]]; then
+        record "$member" "?" "$decl (binary substrate; --needs unavailable)"
+        return 0
+    fi
+    while IFS=$'\t' read -r prog knob; do
+        [[ -n "$prog" ]] || continue
+        if [[ "$prog" == "?" ]]; then
+            if [[ -z "$knob" ]]; then
+                record "$member" "?" "$decl (--needs: unbounded in the registry)"
+                continue
+            fi
+            prog="$(knob_program "$knob")" || {
+                record "$member" "?" "$decl (--needs \$$knob, default unresolvable)"
+                continue
+            }
+            [[ -n "${FLOOR[$prog]+x}" ]] && continue
+            record "$member" "$prog" "$decl (--needs \$$knob)"
+            continue
+        fi
+        [[ -n "${FLOOR[$prog]+x}" ]] && continue
+        record "$member" "$prog" "$decl (--needs)"
+    done <<<"$out"
+    return 0
+}
+
 # spec: gate-sdk/SPEC.md §The port-candidate criteria — a knob's value is resolved through lib/gate.sh's own bridge resolver, the one place a knob default is read, so this report can never disagree with what a dispatched binary is handed
+# spec: gate-sdk/SPEC.md §port-blockers — the requirement is the resolved value's *command word*: the first element, because a knob carrying an array is bridged tab-joined, then that element's first word, because a renderer knob's value is an invocation rather than a bare program name
 knob_program() {
-    local knob="$1" val
+    local knob="$1" line val
     [[ "$knob" == *[a-z]* ]] && return 1
-    val="$(_gate_knob_value "$knob" port-blockers 2>/dev/null)" || return 1
+    line="$(gate_knob_env_one "$knob" port-blockers 2>/dev/null)" || return 1
+    val="${line#GATE_SDK_KNOB_"$knob"=}"
     val="${val%%$'\t'*}"
+    val="${val%% *}"
     [[ -n "$val" ]] || return 1
     printf '%s\n' "$val"
 }
@@ -339,15 +374,15 @@ while IFS= read -r member; do
         echo "port-blockers: $member is registered but resolves to no declaration path" >&2
         exit 2
     }
-    # spec: gate-sdk/SPEC.md §The `# graph:` manifest — a .gate member's rule is a binary subcommand this tool cannot parse and no --needs flag answers yet, so it is counted undecidable rather than reported clean
-    # spec: gate-sdk/SPEC.md §port-blockers — a ported member leaves the partition entirely rather than printing '?': the grouping exists to order the *remaining* corpus, so there is no open question to report, which is the deliberate divergence from the default arm's undecidable treatment
+    # spec: gate-sdk/SPEC.md §The `# graph:` manifest — a .gate member's rule is a binary subcommand this tool cannot parse, so its requirements are read off the substrate's own `--needs` answer rather than guessed from the declaration path
+    # spec: gate-sdk/SPEC.md §port-blockers — a ported member leaves the partition entirely rather than printing '?': the grouping exists to order the *remaining* corpus, so there is no open question to report, which is the deliberate divergence from the default arm's treatment; --group does not consume --needs because it has no row to fill
     if [[ "$decl" == *.gate ]]; then
         if [[ "$MODE" == group ]]; then
             ported_excluded=$((ported_excluded + 1))
             continue
         fi
-        record "$member" "?" "$decl (binary substrate; no --needs)"
-        undecidable=$((undecidable + 1))
+        pb_needs_rows "$member" "$decl"
+        [[ "$member_undecidable" -eq 1 ]] && undecidable=$((undecidable + 1))
         continue
     fi
     # spec: gate-sdk/SPEC.md §port-blockers — a declared-permanent member leaves the partition on

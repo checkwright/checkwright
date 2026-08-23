@@ -113,12 +113,16 @@ pub type GateFn = fn(&[String]) -> i32;
 // spec: gate-sdk/SPEC.md §check-gate-substrate-parity — the fifth element is the declaring
 // root, `--list`'s second column: a kit's directory basename, or `-` where the consumer's own
 // gates directory declares the member. Un-omittable, and held to the tree by the test below.
+// spec: gate-sdk/SPEC.md §The `# graph:` manifest — the sixth element is the member's external
+// program requirements, the data `--needs` prints, in the third element's own two-field shape.
+// Un-omittable by that construction, and held to executed behavior by unit test A below.
 pub type GateEntry = (
     &'static str,
     GateFn,
     &'static [(&'static str, &'static str)],
     &'static [&'static str],
     &'static str,
+    &'static [(&'static str, &'static str)],
 );
 
 pub const REGISTRY: &[GateEntry] = &[
@@ -131,6 +135,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[("?", "")],
         &["GATE_PRUNE_DIRS"],
         "gate-sdk",
+        &[],
     ),
     (
         "check-action-gh-repo",
@@ -138,6 +143,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[("?", "")],
         &["GATE_PRUNE_DIRS"],
         "gate-sdk",
+        &[],
     ),
     // spec: gate-sdk/SPEC.md §check-reads-couples — the queue-kit cohort reads named files
     // rather than walking a tree, so each member declares an empty walk-root set: there is no
@@ -148,6 +154,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
         &["QUEUE_KIT_QUEUE_FILE", "QUEUE_KIT_REQUIRED_SECTIONS"],
         "queue-kit",
+        &[],
     ),
     (
         "check-queue-wrap",
@@ -155,6 +162,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
         &["QUEUE_KIT_QUEUE_FILE", "QUEUE_KIT_WRAP_BUDGET"],
         "queue-kit",
+        &[],
     ),
     (
         "check-queue-hygiene",
@@ -162,6 +170,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
         &["QUEUE_KIT_QUEUE_FILE", "QUEUE_KIT_PROSE_LEADS"],
         "queue-kit",
+        &[],
     ),
     (
         "check-queue-prose-precondition",
@@ -175,6 +184,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "QUEUE_KIT_ICEBOX_SECTION",
         ],
         "queue-kit",
+        &[],
     ),
     // spec: queue-kit/SPEC.md §lib/queue.sh — a member reading a derived section matcher declares
     // every knob that matcher is computed from, since the Rust side derives them from the
@@ -191,6 +201,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "QUEUE_KIT_ICEBOX_SECTION",
         ],
         "queue-kit",
+        &[],
     ),
     (
         "check-task-names",
@@ -204,6 +215,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "QUEUE_KIT_DONE_SECTION",
         ],
         "queue-kit",
+        &[],
     ),
     (
         "check-queue-entry-budget",
@@ -217,6 +229,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "QUEUE_KIT_ICEBOX_SECTION",
         ],
         "queue-kit",
+        &[],
     ),
     // spec: queue-kit/SPEC.md §check-task-conservation — the HEAD side comes out of the git object store
     // rather than off the filesystem, so this member walks nothing and declares the same empty
@@ -233,6 +246,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "QUEUE_KIT_DONE_SECTION",
         ],
         "queue-kit",
+        &[("git", "")],
     ),
     // spec: canon-kit/SPEC.md §lib/spec.sh — the canon-kit cohort's members all derive their
     // corpus from `spec::manifest_files`, so each declares that derivation's whole knob set
@@ -254,6 +268,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_COUNT_ALLOWED_PHRASES",
         ],
         "canon-kit",
+        &[("git", "")],
     ),
     // spec: canon-kit/SPEC.md §check-prose-enum — the vocabulary is a bridged *value*, two
     // index-aligned arrays because the wire format's own separator is the tab; the command
@@ -274,6 +289,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_ENUM_SET_MEMBERS",
         ],
         "canon-kit",
+        &[("git", "")],
     ),
     // spec: canon-kit/SPEC.md §check-measured-claim — born native, so it derives its corpus
     // from its own glob surface rather than from `spec::manifest_files`: the knob set is its
@@ -289,6 +305,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_MEASURED_VALUES",
         ],
         "canon-kit",
+        &[("git", "")],
     ),
     // spec: gate-sdk/SPEC.md §The canonical-spec `spec_canonical_specs` cohort — two members
     // sharing one corpus derivation, so each declares that derivation's knob set beside its
@@ -309,6 +326,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_DOD_MODE",
         ],
         "canon-kit",
+        &[("git", "")],
     ),
     (
         "check-spec-derivable-section",
@@ -324,6 +342,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_DERIVABLE_POINTER_REGEX",
         ],
         "canon-kit",
+        &[("git", "")],
     ),
     // spec: gate-sdk/SPEC.md §The POSIX ERE matcher — the ERE cohort: the marker vocabulary
     // is a consumer ERE array, so this member declares it beside the shared corpus
@@ -344,6 +363,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_TEMPORAL_EXEMPT_PATHS",
         ],
         "canon-kit",
+        &[("git", "")],
     ),
     // spec: canon-kit/SPEC.md §lib/spec.sh — the emitter-backed vocabularies ride as bridged
     // id/pattern pairs, and the command knob rides too: it is what tells "none configured"
@@ -367,6 +387,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_INSTALL_TRANSPORT_PATTERNS",
         ],
         "canon-kit",
+        &[("git", "")],
     ),
     // spec: canon-kit/SPEC.md §check-unmarked-claim — born native beside its family, and it
     // derives its corpus from check-measured-claim's glob surface rather than from
@@ -383,6 +404,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_CLAIM_CLASS_PATTERNS",
         ],
         "canon-kit",
+        &[("git", "")],
     ),
     (
         "check-payload-claim",
@@ -402,6 +424,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_PAYLOAD_CLAIM_PATTERNS",
         ],
         "canon-kit",
+        &[("git", "")],
     ),
     // spec: gate-sdk/SPEC.md §Meta-gate conservation for the binary substrate — a
     // substrate-sensitive member by reverse trigger only: its `couples=` reaches gate
@@ -421,6 +444,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_MDREF_EXCLUDE",
         ],
         "canon-kit",
+        &[("git", "")],
     ),
     // spec: gate-sdk/SPEC.md §check-reads-couples — `?` for the reason spelled out at
     // check-spec-fence-balance below: the walk root does not bound the read set
@@ -439,6 +463,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_DOCS_BLOB_REF",
         ],
         "canon-kit",
+        &[("git", "")],
     ),
     // spec: gate-sdk/SPEC.md §Fail-closed contract — a git-spawning member, reaching its
     // child through `proc::run` alone
@@ -455,6 +480,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_PROSE_SURFACE_GLOBS",
         ],
         "canon-kit",
+        &[("git", "")],
     ),
     // spec: gate-sdk/SPEC.md §check-reads-couples — an empty read-root set: this member reads
     // named files and one directory listing per resolve dir, and every corpus it covers comes out
@@ -471,6 +497,7 @@ pub const REGISTRY: &[GateEntry] = &[
             EVERY_FILTER_KNOB,
         ],
         "gate-sdk",
+        &[("git", "")],
     ),
     // spec: gate-sdk/SPEC.md §check-reads-couples — an empty read-root set: the pairing is one
     // pathname expansion over the root plus a named-file probe per pair, and neither descends
@@ -480,6 +507,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
         &["GATE_SDK_GATES_DIR"],
         "gate-sdk",
+        &[("git", "")],
     ),
     // spec: gate-sdk/SPEC.md §check-reads-couples — `?` because the scan root is the member's own
     // first argument with a default; the candidate walk, the canonical-spec find and the
@@ -501,6 +529,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_EMBED_WIRE_KIND",
         ],
         "canon-kit",
+        &[("git", "")],
     ),
     // spec: gate-sdk/SPEC.md §check-reads-couples — an empty read-root set: the member resolves
     // its corpus by one-level pathname expansion over each listed directory and descends into
@@ -516,6 +545,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_NATIVE_CRATE",
         ],
         "gate-sdk",
+        &[("git", "")],
     ),
     // spec: canon-kit/SPEC.md §check-prose-tells — `?` because the scan root is the member's own
     // first argument with a default; the consumer-extended vocabularies cross as the *merged*
@@ -535,6 +565,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_PROSE_TELL_TRICOLON_MAX",
         ],
         "canon-kit",
+        &[("git", "")],
     ),
     // spec: canon-kit/SPEC.md §check-knob-default-coupling — the kit-root walk is one `?` and
     // not one per kit: the roster's members and its arity both come from a knob, so no literal
@@ -545,6 +576,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[("?", "")],
         &["GATE_PRUNE_DIRS", "GATE_KIT_ROOTS_REL", "CANON_KIT_SPEC_NAME"],
         "canon-kit",
+        &[("git", "")],
     ),
     // spec: canon-kit/SPEC.md §check-knob-citation — the second consumer of the kit-root
     // mechanism inside this cohort: it calls it directly for its prefix roster, not only
@@ -563,6 +595,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_PROSE_SURFACE_GLOBS",
         ],
         "canon-kit",
+        &[("git", "")],
     ),
     // spec: gate-sdk/SPEC.md §check-reads-couples — `?` rather than the literal `.` the walk
     // starts from: a concrete root asserts the member's `couples=` covers every tracked file
@@ -581,6 +614,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_QUEUE_FILE",
         ],
         "canon-kit",
+        &[("git", "")],
     ),
     // spec: canon-kit/SPEC.md §lib/spec.sh — the `spec_comment_surface` cohort: four members on
     // one corpus derivation, so each declares that derivation's whole knob set beside its own,
@@ -607,6 +641,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_COUNT_ALLOWED_PHRASES",
         ],
         "canon-kit",
+        &[("git", "")],
     ),
     // spec: canon-kit/SPEC.md §check-spec-pointer — the second corpus this member derives is the
     // manifest set, so both derivations' knob sets ride together
@@ -626,6 +661,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_COMMENT_WHITELIST",
         ],
         "canon-kit",
+        &[("git", "")],
     ),
     // spec: canon-kit/SPEC.md §lib/spec.sh — the queue-resolution pass both liveness members
     // read is a second shared derivation, so each declares the section vocabulary it is
@@ -646,6 +682,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_ICEBOX_SECTION",
         ],
         "canon-kit",
+        &[("git", "")],
     ),
     // spec: canon-kit/SPEC.md §check-amendment-queue — the amendment finder is the walk, and its
     // scan root is this member's *second* argument with a `.` default, so the root stays the `?`
@@ -666,6 +703,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_ICEBOX_SECTION",
         ],
         "canon-kit",
+        &[("git", "")],
     ),
     // spec: canon-kit/SPEC.md §check-amendment-update-target — the amendment finder is the walk
     // and the scan root is this member's own first argument with a `.` default, so the root stays
@@ -682,6 +720,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_AMENDMENT_GLOB",
         ],
         "canon-kit",
+        &[("git", "")],
     ),
     // spec: gate-sdk/SPEC.md §The POSIX ERE matcher — the marker vocabulary is a consumer array
     // joined into an alternation and interpreted, so this member compiles it through the engine
@@ -702,6 +741,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_ICEBOX_SECTION",
         ],
         "canon-kit",
+        &[("git", "")],
     ),
     // spec: gate-sdk/SPEC.md §check-reads-couples — `?` because the scan root is the member's
     // own first argument with a default, the variable-first-argument shape the shell parser
@@ -724,6 +764,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "QUEUE_KIT_ROADMAP_MARKER",
         ],
         "queue-kit",
+        &[("date", ""), ("git", "")],
     ),
     (
         "check-queue-slug-liveness",
@@ -737,6 +778,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "QUEUE_KIT_ICEBOX_SECTION",
         ],
         "queue-kit",
+        &[],
     ),
     // spec: gate-sdk/SPEC.md §The kit-roots `gate_kit_roots` cohort — five members sharing one
     // corpus derivation, `GATE_KIT_ROOTS_HERE`/`_REL`, so each declares the bridged spelling its
@@ -754,6 +796,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_RUNNER_DOC",
         ],
         "gate-sdk",
+        &[("git", "")],
     ),
     (
         "check-smoke-entry-guard",
@@ -761,6 +804,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
         &["GATE_KIT_ROOTS_HERE"],
         "gate-sdk",
+        &[("git", "")],
     ),
     // spec: gate-sdk/SPEC.md §check-reads-couples — `?` because the listed directory set is the
     // member's own positional arguments with a kit-root-derived default: neither the count nor
@@ -771,6 +815,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[("?", "")],
         &["GATE_KIT_ROOTS_HERE"],
         "gate-sdk",
+        &[],
     ),
     (
         "check-assertion-strength",
@@ -778,6 +823,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[("?", "")],
         &["GATE_KIT_ROOTS_HERE"],
         "gate-sdk",
+        &[],
     ),
     // spec: gate-sdk/SPEC.md §check-reads-couples — one `?` and not one per kit: the whole
     // `templates/*.list` listing goes through a single walk anchored at the scan root, which is
@@ -788,6 +834,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[("?", "")],
         &["GATE_KIT_ROOTS_HERE"],
         "gate-sdk",
+        &[("git", "")],
     ),
     // spec: gate-sdk/SPEC.md §The first cohort, and the rule that selects the next — the
     // lifecycle-kit cohort shares a config surface rather than a corpus walk, so each member
@@ -798,6 +845,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[("?", "")],
         &["LIFECYCLE_KIT_SKILLS_DIR", "LIFECYCLE_KIT_STAGES"],
         "lifecycle-kit",
+        &[],
     ),
     (
         "check-skill-binding",
@@ -805,6 +853,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[("?", "")],
         &["LIFECYCLE_KIT_SKILLS_DIR"],
         "lifecycle-kit",
+        &[],
     ),
     // spec: gate-sdk/SPEC.md §check-reads-couples — an empty walk-root set for the members
     // that read named files rather than listing a directory: there is no root for the
@@ -819,6 +868,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "LIFECYCLE_KIT_QUEUE_FILE",
         ],
         "lifecycle-kit",
+        &[],
     ),
     (
         "check-gap-inbox-neutrality",
@@ -826,6 +876,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
         &["LIFECYCLE_KIT_GAP_INBOX_FILE"],
         "lifecycle-kit",
+        &[],
     ),
     (
         "check-merge-attrs",
@@ -839,6 +890,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "LIFECYCLE_KIT_GAP_INBOX_FILE",
         ],
         "lifecycle-kit",
+        &[],
     ),
     // spec: gate-sdk/SPEC.md §check-reads-couples — `?` because the walk's root is decided by
     // the glob knob's values, which the queue-kit cohort's prose-surface member already rules
@@ -854,6 +906,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "EVIDENCE_KIT_PERMANENT_SLUGS",
         ],
         "evidence-kit",
+        &[("bash", "")],
     ),
     // spec: evidence-kit/SPEC.md §check-evidence-manifest — three named-file reads and no walk,
     // so the declared root set is empty and unit test A holds that to executed behavior
@@ -868,6 +921,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "EVIDENCE_KIT_SUITES",
         ],
         "evidence-kit",
+        &[("bash", "")],
     ),
     // spec: delegation-kit/SPEC.md §Verify after every agent commit — the corpus is the git
     // index and two named fixture lists, so nothing is walked and the declared root set is empty
@@ -877,6 +931,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
         &["DELEGATION_KIT_GATE_FILES", "DELEGATION_KIT_META_PATHS"],
         "delegation-kit",
+        &[("git", "")],
     ),
     // spec: gate-sdk/SPEC.md §check-reads-couples — the filter-knob arm's first live instance:
     // assertion C's two whole-tree scans are one root selected by two knob values, and a literal
@@ -904,6 +959,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_PRUNE_DIRS",
         ],
         "lifecycle-kit",
+        &[],
     ),
     // spec: gate-sdk/SPEC.md §The twelfth cohort — both walks hang off a base that is this
     // member's own first argument with a default, so both take the undecidable marker.
@@ -918,6 +974,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_WORKFLOW_DIR",
         ],
         "lifecycle-kit",
+        &[("date", ""), ("git", "")],
     ),
     (
         "check-stage-evidence",
@@ -938,6 +995,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "LIFECYCLE_KIT_GAP_INBOX_FILE",
         ],
         "lifecycle-kit",
+        &[("git", "")],
     ),
     (
         "check-lesson-disposition",
@@ -948,6 +1006,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "LIFECYCLE_KIT_LESSON_EVIDENCE_FILE",
         ],
         "lifecycle-kit",
+        &[("git", "")],
     ),
     (
         "check-survey-record",
@@ -955,6 +1014,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
         &["LIFECYCLE_KIT_SURVEY_RECORD_FILE"],
         "lifecycle-kit",
+        &[("git", "")],
     ),
     // spec: gate-sdk/SPEC.md §check-reads-couples — two `?` and not one: the skills-dir listing
     // and the per-kit templates walk are separate call sites with separately unbounded roots,
@@ -972,6 +1032,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "LIFECYCLE_KIT_AGENT_FILE",
         ],
         "lifecycle-kit",
+        &[],
     ),
     // spec: lifecycle-kit/SPEC.md §check-scratch-citation — the surface globs expand from the
     // invoking directory through one `**`-capable listing, so one unbounded root; the four
@@ -988,6 +1049,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "LIFECYCLE_KIT_BOUNDARY_TRUNCATE",
         ],
         "lifecycle-kit",
+        &[("git", "")],
     ),
     // spec: gate-sdk/SPEC.md §The settings cohort, and the crate's first dependency — both
     // members read named files rather than walking, so each declares an empty walk-root set,
@@ -998,6 +1060,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
         &["CONTEXT_KIT_SETTINGS_FILE"],
         "context-kit",
+        &[],
     ),
     (
         "check-settings-pins",
@@ -1005,6 +1068,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
         &["CONTEXT_KIT_SETTINGS_FILE", "CONTEXT_KIT_SETTINGS_PINS"],
         "context-kit",
+        &[],
     ),
     // spec: gate-sdk/SPEC.md §The declaration cohort — the consumer sentinel's first members: each
     // walks one directory relocated by the gate's own positional argument, so the honest
@@ -1017,6 +1081,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[("?", "")],
         &[],
         "-",
+        &[("git", "")],
     ),
     (
         "check-tightened-gates-grammar",
@@ -1024,6 +1089,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[("?", "")],
         &[],
         "-",
+        &[],
     ),
     (
         "check-tightened-gates-note-parity",
@@ -1031,6 +1097,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[("?", "")],
         &[],
         "-",
+        &[("git", "")],
     ),
     // spec: gate-sdk/SPEC.md §The consumer remainder cohort — the rest of the consumer's own
     // gates directory, every member on the `-` sentinel. The two that declare a knob declare
@@ -1045,6 +1112,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_RUNNER_DOC",
         ],
         "-",
+        &[("git", "")],
     ),
     // spec: gate-sdk/SPEC.md §check-reads-couples — `?` for each member whose walk root is its
     // own positional argument with a default, the variable-first-argument shape the shell parser
@@ -1061,6 +1129,7 @@ pub const REGISTRY: &[GateEntry] = &[
         // not carry is a knob the emission cannot resolve.
         &["CANON_KIT_DOCS_BLOB_REF"],
         "-",
+        &[("date", ""), ("git", "")],
     ),
     (
         "check-docs-nav-reachable",
@@ -1068,6 +1137,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[("?", "")],
         &[],
         "-",
+        &[("git", "")],
     ),
     (
         "check-install-toolchain",
@@ -1075,6 +1145,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
         &[],
         "-",
+        &[("git", "")],
     ),
     (
         "check-installer-no-deps",
@@ -1082,6 +1153,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
         &[],
         "-",
+        &[("git", "")],
     ),
     (
         "check-kit-ref-liveness",
@@ -1093,6 +1165,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_QUEUE_FILE",
         ],
         "-",
+        &[("git", "")],
     ),
     (
         "check-npm-publish-spec",
@@ -1100,6 +1173,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[("?", "")],
         &[],
         "-",
+        &[("git", "")],
     ),
     (
         "check-release-channel-parity",
@@ -1107,6 +1181,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
         &[],
         "-",
+        &[("git", "")],
     ),
     (
         "check-trajectory-fresh",
@@ -1122,6 +1197,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_WORKFLOW_DIR",
         ],
         "-",
+        &[("date", ""), ("git", "")],
     ),
     (
         "check-value-rollup-fresh",
@@ -1140,6 +1216,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "CONTEXT_KIT_SURFACES",
         ],
         "-",
+        &[("date", ""), ("git", "")],
     ),
     // spec: gate-sdk/SPEC.md §check-reads-couples — no walk root: the comparator reads one named
     // projection file, and the emitter it calls in-process declares its own reads through the knob
@@ -1150,6 +1227,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
         &["CONTEXT_KIT_SURFACES"],
         "context-kit",
+        &[("date", ""), ("git", "")],
     ),
     // spec: gate-sdk/SPEC.md §check-reads-couples — the monitor walk's root is the emitter's own
     // scan knob, declared below; the comparator itself reads one named projection file.
@@ -1169,6 +1247,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "EVIDENCE_KIT_RUN_*",
         ],
         "gate-sdk",
+        &[("date", ""), ("git", "")],
     ),
     // spec: gate-sdk/SPEC.md §The first cohort, and the rule that selects the next — a budget
     // batch's members carry no joint proof, so each declares its own reads and nothing shared:
@@ -1184,6 +1263,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "CONTEXT_KIT_BREVITY_POINTER_RE",
         ],
         "context-kit",
+        &[("git", "")],
     ),
     // spec: gate-sdk/SPEC.md §The first cohort, and the rule that selects the next — the batch's
     // second walker-riding member, sequenced behind the first rather than cohorted with it: it
@@ -1198,6 +1278,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "DOCTRINE_KIT_DIGEST_SECTION",
         ],
         "doctrine-kit",
+        &[],
     ),
     // spec: gate-sdk/SPEC.md §The first cohort, and the rule that selects the next — the first
     // budget batch's remaining four members, each its own unit with no joint proof: a `?` for a
@@ -1208,6 +1289,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[("?", "")],
         &["GATE_SDK_HOOKS_DIR"],
         "gate-sdk",
+        &[("git", "")],
     ),
     (
         "check-agent-tier-explicit",
@@ -1215,6 +1297,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[("?", "")],
         &["DELEGATION_KIT_AGENT_DIR", "GATE_PRUNE_DIRS"],
         "delegation-kit",
+        &[],
     ),
     // spec: gate-sdk/SPEC.md §The first cohort, and the rule that selects the next — the two
     // file paths are positional arguments with hardcoded defaults and no env knob, so this
@@ -1225,6 +1308,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
         &[],
         "delegation-kit",
+        &[],
     ),
     (
         "check-workflow-tiering",
@@ -1232,6 +1316,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[("?", "")],
         &["GATE_SDK_WORKFLOW_DIR"],
         "gate-sdk",
+        &[("git", "")],
     ),
     // spec: gate-sdk/SPEC.md §The second budget batch — two members with no joint proof, each its
     // own unit: the first reads one message file and walks nothing, the empty-walk-root shape; the
@@ -1242,6 +1327,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
         &["GATE_SDK_COMMIT_TYPES"],
         "gate-sdk",
+        &[],
     ),
     (
         "check-readme-roster",
@@ -1249,6 +1335,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[("?", "")],
         &["GATE_KIT_ROOTS_HERE"],
         "gate-sdk",
+        &[],
     ),
     // spec: gate-sdk/SPEC.md §The third budget batch — two members with no joint proof, each its
     // own unit: the first walks each resolved memory dir, one in every case a fixture can build;
@@ -1263,6 +1350,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "CONTEXT_KIT_SETTINGS_PINS",
         ],
         "context-kit",
+        &[("git", "")],
     ),
     (
         "check-root-tiering",
@@ -1274,6 +1362,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_AGENT_FILE",
         ],
         "gate-sdk",
+        &[("git", "")],
     ),
     // spec: gate-sdk/SPEC.md §The fourth budget batch — members with no joint proof, each its own
     // unit. None declares a walk root: two resolve a corpus by pathname expansion and the third
@@ -1306,6 +1395,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GRAPH_LAYER_DEFAULT",
         ],
         "gate-sdk",
+        &[("bash", ""), ("date", ""), ("git", "")],
     ),
     (
         "check-gate-fail-closed",
@@ -1313,6 +1403,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
         &["GATE_SDK_GATES_DIR", "GATE_KIT_ROOTS_HERE"],
         "gate-sdk",
+        &[("git", "")],
     ),
     (
         "check-gate-binary-fresh",
@@ -1325,6 +1416,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_KIT_ROOTS_REL",
         ],
         "gate-sdk",
+        &[("git", ""), ("?", "GATE_SDK_NATIVE_BIN")],
     ),
     // spec: gate-sdk/SPEC.md §check-gate-assertions — no walk root: the corpus is the kit SPEC
     // set at fixed paths, and each heading resolves through the registry rather than through a
@@ -1339,6 +1431,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_NATIVE_CRATE",
         ],
         "gate-sdk",
+        &[("git", "")],
     ),
     (
         "check-gate-fixture-coverage",
@@ -1350,6 +1443,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_KIT_ROOTS_HERE",
         ],
         "gate-sdk",
+        &[("git", "")],
     ),
     (
         "check-gate-output",
@@ -1361,6 +1455,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_NATIVE_CRATE",
         ],
         "gate-sdk",
+        &[("git", "")],
     ),
     (
         "check-kit-enum",
@@ -1372,6 +1467,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_KIT_ROOTS_REL",
         ],
         "gate-sdk",
+        &[("git", "")],
     ),
     (
         "check-docs-cname-parity",
@@ -1385,6 +1481,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_PRUNE_DIRS",
         ],
         "site-kit",
+        &[("git", "")],
     ),
     (
         "check-identity",
@@ -1398,6 +1495,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_GH_HOST",
         ],
         "gate-sdk",
+        &[("git", "")],
     ),
     (
         "check-exec-bit",
@@ -1405,6 +1503,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
         &["GATE_EXEC_GLOBS", "GATE_EXEC_PRUNE"],
         "gate-sdk",
+        &[("git", "")],
     ),
     (
         "check-core-files",
@@ -1412,6 +1511,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
         &["GATE_SDK_CORE_FILES_FILE", "GATE_KIT_ROOTS_REL"],
         "gate-sdk",
+        &[("git", "")],
     ),
     (
         "check-battery-roster",
@@ -1423,6 +1523,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "EVIDENCE_KIT_RUN_*",
         ],
         "evidence-kit",
+        &[("git", "")],
     ),
     (
         "check-commit-msg",
@@ -1430,6 +1531,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
         &["GATE_MSG_PATTERN_FILES", "GATE_MSG_PATTERN_FILES_LOCAL"],
         "gate-sdk",
+        &[("git", "")],
     ),
     (
         "check-docs-link-convention",
@@ -1437,6 +1539,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[("?", "")],
         &["CANON_KIT_LINK_ROOT"],
         "canon-kit",
+        &[("git", "")],
     ),
     // spec: gate-sdk/SPEC.md §check-tree-terms — no walk root: the corpus is `git ls-files`,
     // which §check-reads-couples rules outside the walk class. The two pattern-file knobs are
@@ -1451,21 +1554,22 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_PRUNE_DIRS",
         ],
         "gate-sdk",
+        &[("git", "")],
     ),
 ];
 
 pub fn lookup(name: &str) -> Option<GateFn> {
     REGISTRY
         .iter()
-        .find(|(n, _, _, _, _)| *n == name)
-        .map(|(_, f, _, _, _)| *f)
+        .find(|(n, _, _, _, _, _)| *n == name)
+        .map(|(_, f, _, _, _, _)| *f)
 }
 
 pub fn roots(name: &str) -> Option<&'static [(&'static str, &'static str)]> {
     REGISTRY
         .iter()
-        .find(|(n, _, _, _, _)| *n == name)
-        .map(|(_, _, r, _, _)| *r)
+        .find(|(n, _, _, _, _, _)| *n == name)
+        .map(|(_, _, r, _, _, _)| *r)
 }
 
 // spec: gate-sdk/SPEC.md §check-reads-couples — the union sentinel a member declares when the
@@ -1481,15 +1585,15 @@ fn expanded_knobs() -> &'static [(&'static str, Vec<&'static str>)] {
     EXPANDED.get_or_init(|| {
         let mut filters: Vec<&'static str> = REGISTRY
             .iter()
-            .flat_map(|(_, _, roots, _, _)| roots.iter().map(|(_, k)| *k))
+            .flat_map(|(_, _, roots, _, _, _)| roots.iter().map(|(_, k)| *k))
             .filter(|k| !k.is_empty())
             .collect();
         filters.sort();
         filters.dedup();
         REGISTRY
             .iter()
-            .filter(|(_, _, _, k, _)| k.contains(&EVERY_FILTER_KNOB))
-            .map(|(n, _, _, k, _)| {
+            .filter(|(_, _, _, k, _, _)| k.contains(&EVERY_FILTER_KNOB))
+            .map(|(n, _, _, k, _, _)| {
                 let mut out: Vec<&'static str> =
                     k.iter().copied().filter(|x| *x != EVERY_FILTER_KNOB).collect();
                 for f in &filters {
@@ -1509,22 +1613,36 @@ pub fn knobs(name: &str) -> Option<&'static [&'static str]> {
     }
     REGISTRY
         .iter()
-        .find(|(n, _, _, _, _)| *n == name)
-        .map(|(_, _, _, k, _)| *k)
+        .find(|(n, _, _, _, _, _)| *n == name)
+        .map(|(_, _, _, k, _, _)| *k)
+}
+
+// spec: gate-sdk/SPEC.md §The `# graph:` manifest — the requirement set `--needs` prints. A
+// lookup by name rather than a roster, because the reader asks about one member at a time,
+// exactly as `--reads` and `--knobs` are asked.
+pub fn needs(name: &str) -> Option<&'static [(&'static str, &'static str)]> {
+    REGISTRY
+        .iter()
+        .find(|(n, _, _, _, _, _)| *n == name)
+        .map(|(_, _, _, _, _, r)| *r)
 }
 
 // spec: gate-sdk/SPEC.md §check-gate-substrate-parity — `--list`'s two columns, the second
 // naming the root whose declaration carries the member: a kit's `checks/`, or the consumer
 // sentinel. Emitted together because the reader needs the owner to scope the roster at all.
 pub fn names_with_owners() -> Vec<(&'static str, &'static str)> {
-    REGISTRY.iter().map(|(n, _, _, _, o)| (*n, *o)).collect()
+    REGISTRY.iter().map(|(n, _, _, _, o, _)| (*n, *o)).collect()
 }
 
 // spec: gate-sdk/SPEC.md §Meta-gate conservation for the binary substrate — each `?`
 // absorbs one unmatched observed root, so the declaration is held to its arity. Pure, so
 // the concrete-root branch is provable without a member that declares one.
+// spec: gate-sdk/SPEC.md §The `# graph:` manifest — `--needs`' declaration is covered by this
+// same function and not a second one: both arms declare in one two-field shape where `?` means
+// *the registry cannot name this literal*, so one covering rule holds both to behavior.
 #[cfg(test)]
 fn declaration_covers(
+    verb: &str,
     declared: &[(&str, &str)],
     observed: &[String],
 ) -> Result<(), String> {
@@ -1544,8 +1662,8 @@ fn declaration_covers(
         return Ok(());
     }
     Err(format!(
-        "walked {:?} but declares {:?}",
-        undeclared, declared
+        "{} {:?} but declares {:?}",
+        verb, undeclared, declared
     ))
 }
 
@@ -1556,19 +1674,19 @@ mod tests {
 
     #[test]
     fn a_concrete_root_matches_by_equality_and_a_leftover_is_undeclared() {
-        assert!(declaration_covers(&[("corpus", "")], &["corpus".into()]).is_ok());
+        assert!(declaration_covers("walked", &[("corpus", "")], &["corpus".into()]).is_ok());
         assert!(
-            declaration_covers(&[("corpus", "")], &["corpus".into(), "other".into()]).is_err()
+            declaration_covers("walked", &[("corpus", "")], &["corpus".into(), "other".into()]).is_err()
         );
-        assert!(declaration_covers(&[], &["corpus".into()]).is_err());
+        assert!(declaration_covers("walked", &[], &["corpus".into()]).is_err());
     }
 
     #[test]
     fn each_question_mark_absorbs_exactly_one_unbounded_root() {
-        assert!(declaration_covers(&[("?", "")], &["anything".into()]).is_ok());
-        assert!(declaration_covers(&[("?", "")], &["a".into(), "b".into()]).is_err());
+        assert!(declaration_covers("walked", &[("?", "")], &["anything".into()]).is_ok());
+        assert!(declaration_covers("walked", &[("?", "")], &["a".into(), "b".into()]).is_err());
         assert!(
-            declaration_covers(&[("corpus", ""), ("?", "")], &["corpus".into(), "x".into()])
+            declaration_covers("walked", &[("corpus", ""), ("?", "")], &["corpus".into(), "x".into()])
                 .is_ok()
         );
     }
@@ -1579,11 +1697,12 @@ mod tests {
     #[test]
     fn a_filter_knob_narrows_a_root_without_multiplying_it() {
         assert!(declaration_covers(
+            "walked",
             &[(".", "KIT_A"), (".", "KIT_B")],
             &[".".into()]
         )
         .is_ok());
-        assert!(declaration_covers(&[(".", "KIT_A")], &["other".into()]).is_err());
+        assert!(declaration_covers("walked", &[(".", "KIT_A")], &["other".into()]).is_err());
     }
 
     // spec: gate-sdk/SPEC.md §check-gate-substrate-parity — the owner column is registry data
@@ -1594,7 +1713,7 @@ mod tests {
         assert!(!REGISTRY.is_empty(), "no member to assert over");
         let repo = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("..");
         let mut gates_dir: Option<String> = None;
-        for (name, _, _, _, owner) in REGISTRY {
+        for (name, _, _, _, owner, _) in REGISTRY {
             let declared = if *owner == "-" {
                 let dir = gates_dir
                     .get_or_insert_with(|| resolve_gates_dir(&repo))
@@ -1650,7 +1769,7 @@ mod tests {
         walk::bridge_declared_knobs(&env);
         let mut cases_run = 0usize;
         let mut roots_observed = 0usize;
-        for (name, f, declared, _, _) in REGISTRY {
+        for (name, f, declared, _, _, _) in REGISTRY {
             // spec: gate-sdk/SPEC.md §check-reads-couples — resolved through `knobs`, not off the
             // tuple, so a member declaring the union sentinel is bridged the expansion the
             // dispatcher would bridge rather than the sentinel itself
@@ -1678,7 +1797,7 @@ mod tests {
                     name,
                     case.display()
                 );
-                if let Err(e) = declaration_covers(declared, &observed) {
+                if let Err(e) = declaration_covers("walked", declared, &observed) {
                     panic!("{} on {}: {}", name, case.display(), e);
                 }
                 cases_run += 1;
@@ -1689,6 +1808,52 @@ mod tests {
         assert!(
             roots_observed > 0,
             "no member walked anything — the subset assertion above held over nothing"
+        );
+    }
+
+    // spec: gate-sdk/SPEC.md §The `# graph:` manifest — unit test A for `--needs`: each member
+    // runs over its own fixture cases with the spawn recorder on, and observed must be a subset
+    // of declared. That section owns why the direction is a subset and not an equality.
+    // comment-tier-exempt: every offender is collected before the panic rather than the first,
+    // which is a property of this test's loop and of nothing the SPEC describes
+    #[test]
+    fn every_registry_member_declares_the_programs_it_spawns() {
+        assert!(!REGISTRY.is_empty(), "no member to assert over");
+        let env = crate::knobenv::lock();
+        walk::bridge_declared_knobs(&env);
+        let mut cases_run = 0usize;
+        let mut offenders: Vec<String> = Vec::new();
+        for (name, f, _, _, _, declared) in REGISTRY {
+            let member_knobs = knobs(name).unwrap_or(&[]);
+            for case in walk::fixture_case_dirs(name) {
+                let args = case_args(&case);
+                walk::bridge_case_knobs(&env, &case, name, member_knobs);
+                let prev = std::env::current_dir().expect("cannot read cwd");
+                std::env::set_current_dir(&case)
+                    .unwrap_or_else(|e| panic!("cannot enter {}: {}", case.display(), e));
+                crate::proc::recorder::start();
+                let rc = (*f)(&args);
+                let observed = crate::proc::recorder::stop();
+                std::env::set_current_dir(&prev).expect("cannot restore cwd");
+                assert_ne!(
+                    rc, 2,
+                    "{} errored on {} — an observation taken from a run that never spawned \
+                     would pass this test by being empty",
+                    name,
+                    case.display()
+                );
+                if let Err(e) = declaration_covers("spawned", declared, &observed) {
+                    offenders.push(format!("{} on {}: {}", name, case.display(), e));
+                }
+                cases_run += 1;
+            }
+        }
+        assert!(cases_run > 0, "no fixture case found for any registry member");
+        assert!(
+            offenders.is_empty(),
+            "member(s) spawned a program their registry entry does not declare, so `--needs` \
+             would under-report what a consumer's machine has to carry:\n  {}",
+            offenders.join("\n  ")
         );
     }
 

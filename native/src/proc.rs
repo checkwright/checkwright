@@ -34,6 +34,8 @@ impl Completed {
 // else, so folding it into a benign branch is something a caller has to write down rather
 // than inherit from one `Result` that meant two things at once
 pub fn run(program: &str, args: &[&str]) -> Result<Completed, String> {
+    #[cfg(test)]
+    recorder::note(program);
     let out = Command::new(program).args(args).output().map_err(|e| {
         format!(
             "cannot run {}: {} — the check could not run; treating as failure (not clean)",
@@ -50,6 +52,8 @@ pub fn run(program: &str, args: &[&str]) -> Result<Completed, String> {
 // the one shape `run` cannot carry: a shell caller's `printf … | git hash-object --stdin` has no
 // argv spelling, and routing it here keeps the spawn site single
 pub fn run_with_stdin(program: &str, args: &[&str], input: &[u8]) -> Result<Completed, String> {
+    #[cfg(test)]
+    recorder::note(program);
     use std::io::Write;
     use std::process::Stdio;
     let spawn_err = |e: std::io::Error| {
@@ -76,6 +80,36 @@ pub fn run_with_stdin(program: &str, args: &[&str], input: &[u8]) -> Result<Comp
         status: out.status,
         stdout: out.stdout,
     })
+}
+
+// spec: gate-sdk/SPEC.md §Fail-closed contract — the spawn recorder unit test A observes
+// through, on the shape walk.rs's read recorder already has. Test-scoped deliberately: a
+// production recorder would be state with no reader, and it is unreachable from a gate module.
+#[cfg(test)]
+pub mod recorder {
+    use std::cell::RefCell;
+
+    thread_local! {
+        static OBSERVED: RefCell<Option<Vec<String>>> = const { RefCell::new(None) };
+    }
+
+    pub fn start() {
+        OBSERVED.with(|o| *o.borrow_mut() = Some(Vec::new()));
+    }
+
+    pub fn stop() -> Vec<String> {
+        OBSERVED.with(|o| o.borrow_mut().take()).unwrap_or_default()
+    }
+
+    pub fn note(program: &str) {
+        OBSERVED.with(|o| {
+            if let Some(v) = o.borrow_mut().as_mut() {
+                if !v.iter().any(|e| e == program) {
+                    v.push(program.to_string());
+                }
+            }
+        });
+    }
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — one battery member's child: its own argv, its declared knob
