@@ -1949,6 +1949,21 @@ design time; the last three were paid for, and each is named with what it cost.
    once at port time satisfies criterion 2 and never this one — it expires at the
    next edit to either side, which is precisely the failure the clause names.
 
+   **`gate_staged_matches` is the second worked instance of that road, and it
+   arrived from the opposite direction — a port *creating* the twin rather than
+   inheriting one.** §run-gates rules `--for` "identical to the generated hook's
+   staged-path matching", and the hook's copy is `bin/gen-pre-commit.sh`'s
+   verbatim awk splice of that function's body. Moving `--for` into the `--run`
+   arm made the matcher two implementations with live consumers on both sides,
+   which is the *unless* clause exactly. The discharge is the same standing
+   comparison: one canned corpus of glob/path pairs fed to `gate_staged_matches`
+   and to the crate matcher, verdicts compared byte for byte, run in the owning
+   kit's fixture lane. **A second pair rides the same lane for the same reason** —
+   the front-end's binary-less dispatch loop against the arm (§run-gates), one
+   hermetic registry, both transcripts required byte-identical. Read together with
+   `lib/queue.sh` above, the pair says the road is available to a duplication a
+   port *creates*, not only to one it finds.
+
    **A dead twin is deleted, not held**, and the same enforcement-first ordering
    decides it: where a shell helper has no caller and its compiled counterpart is
    live and tested, a standing parity obligation gates a duplication that removal
@@ -7118,6 +7133,39 @@ relocate an assertion criterion 7 already sanctions in place. The residue is
 filed (`graph-port-bash-spawn-residue`) with that split as the
 designed-but-unbought answer. **Ratified by the operator, 2026-08-21.**
 
+**The battery's port made this generator cheaper and left its spawn standing,
+and both halves are stated so neither is rediscovered as news.** `command_rel`
+calls `gate_command` for every `tier=precommit` member, so the emitter is the
+loudest reader of the config bridge's cost; the per-kit batch (§lib/gate.sh)
+took `--emit` from 6637 ms to 4204 ms on this tree with the emitted hook
+byte-identical, which is the oracle that the batching moved no value. What did
+**not** change is the ruling above or its consequence: `check-graph` keeps
+spawning `bash bin/gen-pre-commit.sh` for assertions D and E, so
+`graph-port-bash-spawn-residue`'s subject survives and only its price falls.
+
+**The hook's shape is ruled rather than open.** The `--run` arm makes a
+two-line `exec <binary> --run --hook` shim look available; it is **refused**, and
+the first of four reasons is decisive. *One*: a platform with no published
+artifact would lose its whole hook — criterion 5's install model omits the
+members it has no verified binary for and leaves the shell ones, and a hook whose
+whole body is an exec of that binary has nothing to exec, so the branch criterion
+5 exists to keep alive would die at the hook. *Two*: it moves resolution onto
+every commit, where the baked hook pays zero. *Three*: it retires assertion D's
+subject — the hook would stop being a projection of the manifests, so nothing
+would hold a manifest edit to the hook. *Four*: it kills the `gen=manual`
+round-trip, a shipped extensibility point with no replacement in the shim. So
+the baked per-gate argv list is **retained**, and `install-step-relocation`'s
+`--write` step stays un-relocated: the hook's shape does not change, which
+unblocks that entry rather than resolving it.
+
+**This is not read against TRAJECTORY.md's own two-line-shim sentence; the two
+are the same ruling at two corpus states.** That paragraph states what *port
+complete* means, tied to `shell-gate-tail-port`, whose completion is exactly the
+`.sh` residue this refusal turns on going to zero. Once no member dispatches to
+`.sh`, criterion 5's stranded-platform branch has no shell block left to lose and
+the shim stops costing what it costs here. The refusal above is the correct
+reading **now**, not a narrower ruling standing against a wider one already made.
+
 **The hook bakes a ported member's resolved knob values**, because it resolves
 argv through `gate_command` at *generation* time and the bridge's `env` elements
 are part of that argv (§lib/gate.sh). So a kit-config edit stales the hook. That
@@ -9273,18 +9321,23 @@ what was wrong was the assumption that this one was.
 
 **The runtime paragraph is corrected against measurement, and the correction
 removes an argument rather than adjusting it.** This member is among the
-battery's slowest, and the reason is the two spawns that do not port. Measured at
-build on 2026-08-21 against this tree, median of three: the full gate runs
-7629 ms, of which `gen-pre-commit.sh --emit` is 5651 ms and `--emit-commit-msg`
-210 ms — **77% of the member's runtime is the two spawns**, and the 5.7 s is the
-config bridge resolving argv for every registered member. What the port does bank
-is the graph emission and the per-member manifest read, 1454 ms for the emission
-alone. So the earlier claim that *the port makes those calls in-process* was
-false as written: it never could, under the generator's own cause for staying
-shell. The operator ruling of 2026-08-09 is the argument for this member's port
-and it needs no other; a runtime dividend was never one. Per-gate timings stay
-owned by the consumer's timing baseline and the close-stage runtime review that
-reads it, never by this line.
+battery's slowest, and the reason is the two spawns that do not port. Re-measured
+against this tree after the config bridge began batching by owning kit
+(§lib/gate.sh), median of three: the member runs 4546 ms, of which
+`gen-pre-commit.sh --emit` is 4153 ms and `--emit-commit-msg` 219 ms — so the two
+spawns are still very nearly the whole of it, and the `--emit` figure is still
+the config bridge resolving argv for every registered member, now once per owning
+kit rather than once per declared knob. The batching is where the fall came from:
+the same three numbers read 7629 / 5651 / 210 before it. **The shape of the
+finding is unchanged and that is the point** — the spawns dominate whatever their
+price, so a cheaper bridge moves the figure and not the argument. What the port
+banks is the graph emission and the per-member manifest read, in process. The
+earlier claim that *the port makes those calls in-process* was false as written:
+it never could, under the generator's own cause for staying shell. The operator
+ruling of 2026-08-09 is the argument for this member's port and it needs no
+other; a runtime dividend was never one. Per-gate timings stay owned by the
+consumer's timing baseline and the close-stage runtime review that reads it,
+never by this line.
 
 Theme seam: the emitted HTML artifact bypasses the consumer's
 site generator, so it renders foreign beside the rest of a docs host unless the
