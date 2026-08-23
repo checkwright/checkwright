@@ -1827,10 +1827,10 @@
   resolution and the `DONE`-as-last-line clause into **both** in parallel because
   no oracle held them to one owner. Close deduplicated them by hand; nothing
   stops the next lifetime edit doing the same thing again.
-  **The mechanism already exists.** `lifecycle-kit/checks/check-shim-restatement.sh`
-  is the whole implementation — normalize, emit every N-word window, intersect
-  against a corpus index. The unit is a second (surface, corpus) pairing of that
-  same machine, not new code.
+  **The mechanism already exists.** `check-shim-restatement`'s implementation module
+  (`native/src/gates/shim_restatement.rs`) is the whole of it — normalize, emit every
+  N-word window, intersect against a corpus index. The unit is a second (surface,
+  corpus) pairing of that same machine, not new code.
   **Why `[design-pending]`, and the honest objection.** The shim contract is
   *bind consumer residue, cite kit-owned procedure* — a shim legitimately
   restates nothing. A SPEC legitimately restates its template's **contract
@@ -7129,11 +7129,15 @@
   those against `TASK-QUEUE.md`; one a range-address read of `.workflow/survey-record.md`; one
   feeding a pipe. So every one of the 22 read a file rather than transformed a stream — the shape
   the guard already steers `cat` and `sed` away from, toward `Read`'s `offset`/`limit`.
-  **It CORRECTS a proposal `session-mechanic-grants-uncommitted` carries**, and that entry now
-  holds the contest. That one lists `awk` among the absent grants to put to the operator, which is
-  its disposition (a); on this measurement the right disposition is (b), the steer. Granting it
-  would bless the form the tree is retiring — exactly the masking
-  `guard-kit/templates/close-triage.md`'s criterion warns of. One token, opposite dispositions.
+  **It CORRECTED a proposal `session-mechanic-grants-uncommitted` carried**, and that entry has
+  since moved to Done, so the contest has no live holder and this entry is its only survivor. That
+  one listed `awk` among the absent grants to put to the operator, its disposition (a); on this
+  measurement the right disposition is (b), the steer. Granting it would bless the form the tree is
+  retiring — the masking `guard-kit/templates/close-triage.md`'s criterion warns of.
+  **A third disposition, added 2026-08-23 at close:** (c) rule the steer spelling-shaped by design
+  and say so in the rule's own honest-limit paragraph, so a later triage stops re-deriving this.
+  It is the cheapest of the three and the only one that costs no parser; it is also the only one
+  that leaves the out-of-band decisions standing, which is what the choice trades.
   **Distinct from both steer-defect neighbours**, re-read here rather than assumed:
   `guard-steer-grant-mismatch` is a steer whose target form nothing grants;
   `guard-steer-names-absent-tool` is a steer naming a tool that is not there. This is a read form
