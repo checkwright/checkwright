@@ -17,6 +17,7 @@ pub mod gate_assertions;
 pub mod gate_exemption_tasks;
 pub mod gate_fail_closed;
 pub mod gate_binary_fresh;
+pub mod gate_substrate_parity;
 pub mod gate_fixture_coverage;
 pub mod gate_output;
 pub mod gate_tamper;
@@ -1402,6 +1403,26 @@ pub const REGISTRY: &[GateEntry] = &[
         gate_fail_closed::run,
         &[],
         &["GATE_SDK_GATES_DIR", "GATE_KIT_ROOTS_HERE"],
+        "gate-sdk",
+        &[("git", "")],
+    ),
+    // spec: gate-sdk/SPEC.md §check-gate-substrate-parity — two unbounded roots: the
+    // implementation tree assertion D sweeps, and the kit-root sweep assertion E runs once per
+    // vendored root, whose count is a knob's value rather than a literal this entry could name.
+    (
+        "check-gate-substrate-parity",
+        gate_substrate_parity::run,
+        &[("?", ""), ("?", "")],
+        &[
+            "GATE_SDK_GATES_DIR",
+            "GATE_SDK_ROOT_HERE",
+            "GATE_KIT_ROOTS_REL",
+            "GATE_SDK_NATIVE_CRATE",
+            "GATE_SDK_NATIVE_SRC",
+            "GATE_SDK_NATIVE_TARGETS_FILE",
+            "GATE_SDK_NATIVE_PUBLISH_WORKFLOW",
+            "GATE_PRUNE_DIRS",
+        ],
         "gate-sdk",
         &[("git", "")],
     ),

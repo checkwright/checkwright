@@ -1,6 +1,9 @@
 GATE-SUBSTRATE-PARITY: clean
-1 of the 2 shell declaration(s) declare '# no-port:' with a cause and 1 declare '# port-until:' with a slug, neither on any descriptor nor both on one declaration; 1 of those held declaration(s) reach their ground in one hop, the section their own '# spec:' field names stating the hold
-1 descriptor(s) in parity with the 2-subcommand roster (2 in scope, 0 out of scope — an unvendored kit, or a consumer declaration from another tree — owner column unavailable), 1 reference-only
+3 member(s) with one declaration each, 1 of them dispatching to the binary
+1 of the 2 shell declaration(s) declare '# no-port:' with a cause and 1 declare '# port-until:' with a slug, neither on any descriptor nor both on one declaration
+1 of those held declaration(s) reach their ground in one hop, the section their own '# spec:' field names stating the hold
+1 descriptor(s) in parity with the
+out of scope — an unvendored kit, or a consumer declaration from another tree), 0 reference-only
 1 substrate-sensitive member(s) all dispositioned
 1 implementation source(s) free of manifest-class annotation
 1 kit root(s) scanned for an implementation sibling, crate root crate outside every kit root

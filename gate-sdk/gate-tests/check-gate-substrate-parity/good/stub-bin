@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-[[ "${1:-}" == --list ]] && { echo check-ported; echo check-reference; exit 0; }
-exit 2

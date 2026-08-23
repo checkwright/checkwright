@@ -86,6 +86,10 @@ unset _gmp
 # spec: gate-sdk/SPEC.md §lib/gate.sh — the crate root is normalized where it is resolved rather than at each read, so the value the bridge carries is the canonical one gate_native_crate already printed
 [[ -n "${GATE_SDK_NATIVE_CRATE:-}" ]] || GATE_SDK_NATIVE_CRATE="native"
 GATE_SDK_NATIVE_CRATE="${GATE_SDK_NATIVE_CRATE%/}"
+# spec: gate-sdk/SPEC.md §Layout and configuration — the three crate-adjacent knobs resolved here rather than at their read sites, because the config bridge reads a declared knob through `declare -p` and an inline `${KNOB:-default}` is invisible to it. GATE_SDK_NATIVE_TARGETS_FILE keeps riding GATE_SDK_NATIVE_CRATE's already-normalized value, so the crate's location keeps one owner.
+[[ -n "${GATE_SDK_NATIVE_SRC:-}" ]] || GATE_SDK_NATIVE_SRC="$GATE_SDK_NATIVE_CRATE/src"
+[[ -n "${GATE_SDK_NATIVE_TARGETS_FILE:-}" ]] || GATE_SDK_NATIVE_TARGETS_FILE="$GATE_SDK_NATIVE_CRATE/targets.list"
+[[ -n "${GATE_SDK_NATIVE_PUBLISH_WORKFLOW:-}" ]] || GATE_SDK_NATIVE_PUBLISH_WORKFLOW=".github/workflows/publish.yml"
 # spec: gate-sdk/SPEC.md §check-exec-bit — check-exec-bit's two whitespace-scalar overrides, resolved to arrays here so the config bridge can carry them. Distinct names on §lib/gate.sh's own rule: a scalar feeding an array is the one case a resolved global earns a spelling of its own, which is why GATE_PRUNE_DIRS above has one and the scalar-in/scalar-out knobs beside it do not. The glob default rides GATE_SDK_GATES_DIR's resolved value rather than the not-yet-defined gate_sdk_gates_dir, so the two stay one value by construction.
 # shellcheck disable=SC2034  # consumed by the compiled member across the bridge, never within this lib
 if [[ -n "${GATE_SDK_EXEC_GLOBS:-}" ]]; then
@@ -456,9 +460,7 @@ gate_native_module() {
 
 # spec: gate-sdk/SPEC.md §Layout and configuration — GATE_SDK_NATIVE_TARGETS_FILE, defaulted off GATE_SDK_NATIVE_CRATE so the crate's location keeps one owner
 gate_native_targets_file() {
-    local crate
-    crate="$(gate_native_crate)"
-    printf '%s\n' "${GATE_SDK_NATIVE_TARGETS_FILE:-$crate/targets.list}"
+    printf '%s\n' "$GATE_SDK_NATIVE_TARGETS_FILE"
 }
 
 # spec: gate-sdk/SPEC.md §check-gate-binary-fresh — the tree side of the source stamp: the same three git invocations native/build.rs bakes into the binary, so the comparison stays one algorithm rather than two implementations of one. Returns 1 emitting nothing when git cannot answer, so a caller fails closed rather than comparing against an empty string.

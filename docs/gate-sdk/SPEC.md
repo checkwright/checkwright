@@ -183,7 +183,8 @@ config seam exists so a value can be relocated without the default moving.
 Deriving the default from `GATE_SDK_GATES_DIR` instead was weighed and refused:
 it would silently relocate the binary for every existing reader, and make this
 repo's own layout the exception to a convention whose stated rule is that this
-repo's layout *is* the default. And `GATE_SDK_NATIVE_SRC` (default `native/src`;
+repo's layout *is* the default. And `GATE_SDK_NATIVE_SRC` (default **derived**
+from `GATE_SDK_NATIVE_CRATE` as `<crate>/src`, so this repo's `native/src`;
 the implementation tree §check-gate-substrate-parity assertion D holds free of
 manifest-class annotation — a **path, not a language**, so the knob assumes
 nothing about what implements a ported gate). And `GATE_SDK_NATIVE_CRATE`
@@ -1056,7 +1057,7 @@ answering a question assertion C never asked.
 | `check-graph`, `check-kit-enum`, `check-gate-fixture-coverage`, `check-enforcement-fresh` | **Survive unchanged** — all four read the declaration path as text (directly, or through the enforcement-map and footprint emitters, which do), which the descriptor still is. |
 | `check-value-rollup-fresh` | **Survives unchanged in mechanism, and is itself `.gate`-dispatched** since §The consumer remainder cohort — so this row now describes a ported member reading ported members' declaration paths. It reads them as text through the footprint emitter, a non-gate arm this gate calls in-process (§The non-gate arm), and the declaration path is what that emitter reads — which is why the port moves nothing about its rule. What the port *did* move is one term of its coupling, recorded because the re-derivation confirmed it rather than assuming it: its `couples=` names `scripts/*.sh,kit:*.sh`, and after that cohort emptied the consumer's gates directory of check scripts, `scripts/*.sh` covers **no** registry member's declaration path at all. The member stays substrate-sensitive through `kit:*.sh` alone. A narrowing is not a clearance — `scripts/` retains many non-gate `*.sh`, and the coupling still earns its trigger — but a later reader deriving the set must not read the `scripts/*.sh` token as the thing that selects this row. |
 | `check-gate-binary-fresh` | **Retained by construction — and recorded here before the derivation reaches it, deliberately.** It reads declaration paths as a *set*, to decide whether the binary is load-bearing, and never reads a gate's source, so a port is its trigger rather than its blind spot: a ported member is exactly the case that switches it on. Its couples name `kit:checks/*.gate` specifically, so it was **not yet substrate-sensitive** by assertion C's runtime derivation when this row was written, with zero descriptors then on disk, and the row was not yet owed — it was written ahead of the trigger rather than left to be discovered. The first cohort's descriptors have since landed, so the gate is sensitive and the row is owed; the commit that landed them would have reddened on a missing disposition, and that commit's session was the worst possible one to be learning this table exists. That is the foresight paying, and it is the same reasoning as the gate itself: the oracle ahead of the hole (§check-gate-binary-fresh). |
-| `check-gate-substrate-parity` | **Retained by construction** — it is substrate-sensitive by the same derivation it performs, and it reads declaration paths both as text and as a *set*, which is precisely what it exists to see. It **ports** under the 2026-08-23 ruling (the paragraph below the table), owed to `shell-gate-tail-port`: the shell form already reads one side of its comparison through `--list`, so the auditor's independence from the binary was never more than the absent-binary case, which the fail-closed contract owns. Its own row is written out rather than left to the section's prose mention: assertion C is satisfied by any occurrence of a member's name in this section, and a gate passing its own assertion by being *discussed* is a coincidence, not a disposition. |
+| `check-gate-substrate-parity` | **Retained by construction, and `.gate`-dispatched since `shell-gate-tail-port`** — it is substrate-sensitive by the same derivation it performs, and it reads declaration paths both as text and as a *set*, which is precisely what it exists to see, so this row now describes the auditor of the dispatch relation auditing itself. It ported under the 2026-08-23 ruling that retired born-native exception class (a): the shell form already read one side of its comparison through `--list`, so the auditor's independence from the binary was never more than the absent-binary case, which the fail-closed contract owns — and compiled, that case has no reachable input, the binary being the process the assertion runs in. The port moves nothing in the rule: the descriptor set is still globbed off the resolve dirs and the roster is still the binary's, reached in process rather than through a spawn (§check-gate-substrate-parity). Its own row is written out rather than left to the section's prose mention: assertion C is satisfied by any occurrence of a member's name in this section, and a gate passing its own assertion by being *discussed* is a coincidence, not a disposition. |
 | `check-install-disposition` | **Retained, and substrate-blind by construction** — it reads both declaration spellings as text, taking the `# install:` header line off a `.gate` descriptor exactly as off a `.sh` implementation, because a ported gate is still a gate a kit ships and its disposition is a property of the gate rather than of its substrate (§The install disposition). A port therefore moves nothing here: the declaration travels with the descriptor, which is the same file the installer's payload already carries. It **ports** with its sibling auditor under the 2026-08-23 ruling, owed to `shell-gate-tail-port`: the assertion that a gate declares itself is a text walk over both declaration spellings, and a binary that is absent cannot pass it silently — the battery exits 2 rather than skipping (§Fail-closed contract). |
 | `check-docs-cmd`, `check-install-claim`, `check-payload-claim`, `check-queue-slug-liveness` | **Survive unchanged — reverse triggers.** Each names `scripts/*.sh`/`kit:*.sh` in `couples=` only so that a script change re-runs it; the corpus each actually scans is the governed-doc set, and none reads a gate script's *content* as its assertion target. `check-docs-cmd` is worth naming: it will correctly — not vacuously — red on a doc still fencing a deleted `.sh` path after a port. That is real signal. Every member of this row is a ported one — `check-queue-slug-liveness` since the queue-kit cohort, `check-docs-cmd` since the canon-kit one, and the remaining pair since the ERE cohort — so the row describes `.gate`-declared gates throughout; the reasoning is unaffected, because what they scan is the governed-doc set rather than any gate's content. |
 | `check-settings-paths` | **Survives unchanged — reverse trigger, and a port is its subject rather than its blind spot.** Its `couples=` names `kit:checks/*.sh` only so that a check-script edit re-runs it; what it scans is the committed permission allow-list, never a gate script's content. A port is the event it exists for: replacing `checks/<gate>.sh` with a descriptor strands every allow entry naming the old path, so the gate reddens *because* of a port rather than falling silent after one — the shape `check-docs-cmd` has in the row above. Two limits are recorded rather than left to be re-derived. The glob is deliberately not widened to `*.gate`, because a descriptor path is not something a `Bash(…)` grant invokes and the widening would add no assertion. And the trigger is a **partial route by construction**: the generated hook matches staged `ACMR` paths, so a *deleted* `.sh` never fires it; what catches a cohort's stranded grants is the whole-tree battery, which runs with no trigger filter. The trigger still earns its place — it catches the ordinary edit that strands a grant — but it is not what makes the gate's landing order necessary (context-kit/SPEC.md §check-settings-paths). **This member is itself `.gate`-dispatched from the settings cohort**, so the row describes a ported gate: the reverse trigger and both limits above are properties of its rule, not of its substrate, and survived the port unchanged. |
@@ -2200,10 +2201,16 @@ design time; the last three were paid for, and each is named with what it cost.
    reached **102 of 106 members scanned**: the roster was blind over more than 96%
    of the corpus it walks, which is what the arm was sequenced against and what
    building it repaired. With `--needs` consumed at the default arm's per-member
-   row the same cut reports **1**, and the one remaining is
-   `check-gate-substrate-parity`'s own unresolvable `$BIN` — a still-shell member,
-   not a blind one. The count is the share of the corpus the report cannot speak
-   for, and it is now a bound on the report rather than an artifact of the port.
+   row the same cut reported **1**, the one remaining being
+   `check-gate-substrate-parity`'s own unresolvable `$BIN`; **that member's port
+   drove it to 0**, by deleting the spawn rather than by answering it. The count is
+   the share of the corpus the report cannot speak for, and it is now a bound on
+   the report rather than an artifact of the port. A zero here is not a claim that
+   nothing is missed: the report reads a member's own declaration text, so a spawn
+   reached through a shared library — `gate_authoring_tree`'s `git`, `ek_pid_alive`'s
+   `ps` — is invisible to it whatever the count says, which is
+   `port-oracle-corpus-narrower-than-the-directive`'s finding and not this
+   criterion's.
 
    **Repairing the arm's consumer is what made the knob line kind readable at
    all**, and it is recorded because the roster's numbers move with it:
@@ -8067,8 +8074,11 @@ the cut: `kit:*.sh` expands to `<kit-root>/*.sh` and no kit root holds a
 top-level `.sh`, and `scripts/*.sh` matches nothing, because every gate in this
 consumer's gates dir is now a descriptor. So before the correction the only
 declaration path the field reached was `native/src/gates/*.rs`, while the
-**walk** read `gate-sdk/checks/check-gate-substrate-parity.sh` on every run — a
-shell gate whose edit re-fired nothing. `kit:checks/*.sh` closes that missed
+**walk** read `check-gate-substrate-parity`'s shell declaration on every run — a
+shell gate whose edit re-fired nothing. That member has since ported, so the
+missed trigger the correction closed is now reached through the `.gate` glob
+instead; the finding is recorded at the corpus it was measured against, not
+re-taken against today's. `kit:checks/*.sh` closes that missed
 content trigger; `kit:checks/*.gate` is a **reverse trigger**, because creating
 or deleting a descriptor changes which file the gate resolves and greps even
 though the descriptor's own bytes are never read. The two globs that expand to
@@ -8268,10 +8278,15 @@ user-facing requirement is not this port's to rule. The narrowing is filed
 
 ### check-gate-substrate-parity
 
+`checks/check-gate-substrate-parity.gate` (`precommit`, binary-dispatched).
+
 Holds the dispatch seam honest: a gate's implementation may move to a compiled
 subcommand, but not by quietly deleting the declaration other gates read or the
 record of what that move costs. Usage
-`check-gate-substrate-parity.sh [gates-dir] [conservation-doc]`; the two-arg form
+`<dispatch> [gates-dir] [conservation-doc]` — both positionals survive the port,
+each consumed by the rule rather than redirecting config the bridge resolved
+first: the gates dir names the registry and the first resolve dir, and the
+conservation doc is the rule's own second corpus. The two-arg form
 steers the fixture pair onto hermetic copies of each surface. Eight assertions:
 (A) declaration uniqueness; (B) subcommand parity; (C) disposition coverage;
 (D) one writable home for the manifest; (E) no implementation source inside the
@@ -8286,8 +8301,8 @@ placement; and (H) a held declaration's ground reachable in one hop.
   would hide the state a port passes through.
 - **assertion B — subcommand parity, both directions, over the kits this tree
   vendored.** The set of `.gate`
-  descriptors across the resolve dirs equals the binary's reported subcommand
-  roster (`--list`). A descriptor naming no subcommand is a gate that cannot
+  descriptors across the resolve dirs equals the subcommand roster the binary
+  carries. A descriptor naming no subcommand is a gate that cannot
   run; a subcommand with no descriptor is a gate nothing declares — unless the
   conservation section dispositions it `reference-only`, the one allowance and
   the reason it is recorded there rather than in the crate (§Meta-gate
@@ -8411,24 +8426,24 @@ placement; and (H) a held declaration's ground reachable in one hop.
   (queue-kit/SPEC.md §lib/queue.sh is the first such arm's consumer;
   §lib/declaration.sh is the second, and the shape held unchanged at the second
   use, which is what makes it a pattern rather than one harness's accommodation).
-  **A second column rather than a fifth flag, and the reason is version skew.**
-  The gate ships in a kit and the binary ships in the payload, and the two version
-  independently — `init` places a released binary while a consumer may vendor a
-  newer kit, and the upgrade smoke drives exactly that across two hops. A fifth
-  top-level flag an older binary does not recognise answers non-zero, which
-  §Fail-closed contract makes exit 2: every such consumer's battery would die on a
-  flag rather than on a finding. A column degrades instead: an older binary prints
-  one, the gate reads no owner, and the assertion **falls back to the unrestricted
-  equality**, declaring on its clean line that the restriction was unavailable.
-  That is a return to the pre-column behavior, never a false green — proved by a
-  run, since the bespoke test drives the identical subset roster through a
-  one-column binary and it still reds. One row without the column drops the whole
-  roster to the fallback rather than scoping part of it, because a partly-scoped
-  roster would speak for kits it could not place. The **stated residual**: a real
-  adopter on a subset vendoring with a pre-column binary still reds until the
-  binary is upgraded. It does not reach the consumer smoke, which builds the
-  binary from the crate on every run, and it is bounded by a version rather than
-  open-ended.
+  **A second column rather than a fifth flag — and the skew that ruling was taken
+  against is what this member's own port ended.** The column was chosen because
+  the gate shipped in a kit and the binary in the payload, versioning
+  independently: a fifth top-level flag an older binary does not recognise answers
+  non-zero, which §Fail-closed contract makes exit 2, so every such consumer's
+  battery would have died on a flag rather than on a finding, while a column
+  degrades — an older binary prints one, the gate reads no owner, and the
+  assertion falls back to the unrestricted equality. That degradation path, and
+  the residual that rode with it (an adopter on a subset vendoring with a
+  pre-column binary reddening until the binary is upgraded), are **retired by the
+  port rather than reversed**: a compiled auditor reads the registry it is
+  dispatched out of, so a binary that cannot print the owner column is a binary
+  that does not carry this subcommand and cannot run the assertion at all. The
+  column stays for `--list`'s other readers and the choice stays correct for the
+  reason it was made; what is gone is a fallback nothing can reach. Recorded
+  rather than deleted, because the *shape* of the argument — degrade a whole-roster
+  read rather than refuse it — is the one a later arm serving a shell reader will
+  need again.
   **Building the binary per vendoring is refused, and the refusal is recorded
   because the option reads attractive and costs a session to re-cost.** Criterion
   5's install model is closed (§The port-candidate criteria): the payload carries a
@@ -8443,25 +8458,22 @@ placement; and (H) a held declaration's ground reachable in one hop.
   were weighed and deliberately **not** unified — they derive scope from different
   inputs, this one from a subcommand's declaring root as the binary reports it, that
   one from the vendored kits' `checks/` directories it already reads, so a shared
-  rule would be parameterised over both and become a third thing to keep true. With the binary **load-bearing** and
-  absent or non-executable the gate exits 2, never 0 — the §Fail-closed
-  contract, since "cannot verify" and "verified equal" must not share an exit
-  code. Load-bearing is the predicate §check-gate-binary-fresh states: a
-  registered member resolving to a `.gate`, never a descriptor's mere presence
-  on disk. **What that arm deliberately does not weaken** is the roster half.
-  **The two halves are gated separately, and that is the correction the
-  reverted port paid for**: the roster half runs whenever the binary is
-  *readable*, descriptor count and registry both irrelevant. Collapsing the two
-  onto one predicate is the obvious simplification and it re-opens the exact
-  hole the revert closed — the roster half is what catches a stranded
-  implementation, and it must not go dark because nothing happens to dispatch. Under the original single guard —
-  the whole assertion behind `descriptors > 0` — a tree with zero descriptors
-  skipped both directions, which is precisely the state an unported tree is in
-  and the one a stranded implementation hides in. The remaining gap is stated
-  rather than closed: with no descriptors *and* no built binary there is nothing
-  to read, so the assertion counts zero and says so in its clean line. Demanding
-  a build artifact from every reader would re-import, into the auditor, the
-  build-time coupling the revert removed. **The roster is over subcommands
+  rule would be parameterised over both and become a third thing to keep true.
+  **The absent-binary refusal is answered out of existence rather than retired,
+  and the two-halves correction survives it in the half that still binds.** Before
+  the port the gate spawned a binary it might not find, so a load-bearing one that
+  was absent or non-executable had to be exit 2 — "cannot verify" and "verified
+  equal" must not share an exit code — while the *roster* half ran whenever the
+  binary was merely readable, descriptor count and registry both irrelevant.
+  Compiled, there is no binary to be absent: the auditor is a subcommand of it, so
+  that refusal has no reachable input, exactly as §check-reads-couples' did at its
+  own port. What the correction was protecting is unchanged and is the half to keep
+  reading forward: **the roster half must not be gated on descriptor count.** Under
+  the original single guard — the whole assertion behind `descriptors > 0` — a tree
+  with zero descriptors skipped both directions, which is precisely the state an
+  unported tree is in and the one a stranded implementation hides in. That guard
+  is still refused, and the zero-descriptor configuration is still carried in the
+  bespoke test as its own case. **The roster is over subcommands
   alone**: the binary's top-level flags (`--list`, `--reads`, `--source-stamp`,
   `--knobs`) are outside it by construction, handled in the top-level dispatch
   and never entering the gate registry. Stated because the assertion's behavior
@@ -8601,6 +8613,17 @@ placement; and (H) a held declaration's ground reachable in one hop.
   Landing it here instead would give this gate a queue-file coupling it
   deliberately has none of, it being the auditor of the dispatch seam.
 
+  **Its corpus narrows to empty in this tree, and the verdict there is
+  green-with-a-counted-zero.** Both fields live on the `<name>.sh` spelling, so
+  once no registered member declares in that spelling the clause set has nothing to
+  range over. That is a **corpus narrowing**, one of the three non-monotone shapes
+  §The causal-completeness check point 5 names, and the red condition is stated so
+  it stays on the right side of it: *a `<name>.sh` declaration whose field is
+  malformed or whose `# spec:` section does not state the hold* — never *no
+  declaration found*. The counted zero is on the clean line for the same reason
+  assertion H's grounded count is, and the empty case is carried explicitly in the
+  bespoke test rather than left to arrive with the last port.
+
   The gate was shell under the since-retired exception class (a) when this
   assertion landed, so widening it raised no substrate question, and the
   assertion adds no member to the conservation table: the corpus is the
@@ -8679,56 +8702,68 @@ placement; and (H) a held declaration's ground reachable in one hop.
   would red every consumer that never declared a hold. The anti-vacuity signal is
   the emitted count, not a refusal.
 
-It stays a **shell** gate: a gate that audits the port is not a gate the port
-may consume, or assertion B would be checking a roster through the very binary
-whose roster is in question.
+**It ported, and the argument it had stood on is the one the operator retired.**
+The reading it held was *a gate that audits the port is not a gate the port may
+consume, or assertion B would be checking a roster through the very binary whose
+roster is in question* — born-native exception class (a), retired 2026-08-23 with
+its refutation recorded at §Meta-gate conservation for the binary substrate: the
+shell auditor already trusted `--list`, so the spawn never bought independence in
+the first place; an absent binary was exit 2 under the §Fail-closed contract; and
+a **stale** binary — the only state where an in-process and a spawned answer could
+differ — is §check-gate-binary-fresh's red and never this member's. The compiled
+form therefore **reaches the registry in process and the spawn is deleted**, the
+shape §check-reads-couples took at its own port, so this member's `c7` row is gone
+rather than answered. What it does spawn is `git`, once, for assertion F's
+publishing test, and it declares that (§The `# graph:` manifest, `--needs`);
+`port-blockers` never saw it because the call sits in `gate_authoring_tree` rather
+than in the gate's own text, which is the shared-library blind spot
+`port-oracle-corpus-narrower-than-the-directive` owns.
 
-Its coverage is split across two oracles because the descriptor configurations
-cannot all live in one fixture pair — a pair is one invocation each — and naming
-where each is proved is what keeps the split from reading as a hole. The
-`good/`+`bad/` pair covers **descriptors and a binary** (parity both ways, the
-reference-only allowance, each refusal, and every one of assertion G's clauses —
-a descriptor carrying either field, a bare one with no payload, a declaration
-carrying two of one field, and a declaration carrying one of each). It covers
-**assertion H** in the same invocations: a held declaration whose pointed-at
-section names the field clears, one whose section does not reds, and one with no
-`# spec:` header field at all reds. The SPEC surface lives inside the case tree
-and each pointer is case-relative, so the pair proves the resolution rather than
-the live tree's accident of already being green. The bespoke
-`gate-tests/check-gate-substrate-parity.test.sh` holds the rest, each case a
-sandbox rather than a live tree: **no descriptors, binary present** — the
-post-revert tree, where the roster half is the only live half; **no descriptors,
-no binary** — a vendored tree, where the gate must run clean rather than
-fail-close, the configuration the reverted port made unreachable; **descriptors
-present, none dispatching, and no roster** — every vendored tree once the first
-cohort's descriptors ship, where the fail-closed arm *and* assertion F's
-missing-roster arm must both stay quiet; and the near miss, **a registered member
-resolving to a descriptor with no binary**, which must still exit 2. The last two
-are the corrected predicate's own boundary, and a too-loose predicate passes the
-`good/` case and reds only there. Seven further cases hold the two scope clauses,
-and
-they are in the bespoke test rather than in a second consumer-smoke leg because
-that suite vendors, installs and drives a whole scratch tree and buying it twice
-to reach one assertion is the cost this split exists to avoid: **descriptors for
-one kit and a binary reporting a second kit's subcommands too**, where the gate
-must run clean; **the near miss**, the same sandbox with the in-scope kit missing
-a descriptor, which must red; **the same subset roster from a one-column binary**,
-which must red as it does without the column, so the fallback is run rather
-than asserted; **a vendored descriptor naming no subcommand under the scoped
-path**, because the obvious implementation restricts one loop and accidentally
-restricts both; and three for the consumer clause, whose two directions are
-proved by a run rather than by inspection — **a consumer-declared subcommand in
-an adopter**, which must run clean with the member counted out of scope, the
-direction an adopter depends on and the one an over-tight predicate passes by
-accident; **the same roster in a publishing tree with no descriptor**, which must
-red; and **the same tree once the descriptor is placed in the gates directory**,
-which must clear, so the sentinel's declaring root is exercised rather than
-asserted. Each is a manufactured roster in a sandbox rather than a live tree, so
-none of them waits on a real consumer-declared port. That test is in the per-kit
-fixture-runner battery, so the subset
-configuration acquires a commit-time oracle at no measurable cost — it had none
-at commit time or in CI, which is how a standing red in it goes unnoticed across
-iterations.
+Its coverage is split across three oracles because the configurations cannot all
+live in one fixture pair — a pair is one invocation each — and naming where each
+is proved is what keeps the split from reading as a hole. The
+`good/`+`bad/` pair covers **the declaration set**: assertion A's ambiguous
+dispatch, the descriptor→subcommand direction, and every one of assertion G's
+clauses — a descriptor carrying either field, a bare one with no payload, a
+declaration carrying two of one field, and a declaration carrying one of each. It
+covers **assertion H** in the same invocations: a held declaration whose
+pointed-at section names the field clears, one whose section does not reds, and
+one with no `# spec:` header field at all reds. The SPEC surface lives inside the
+case tree and each pointer is case-relative, so the pair proves the resolution
+rather than the live tree's accident of already being green. It also covers
+assertions C, D, E and F end to end, each over the case's own hermetic surfaces.
+
+The bespoke `gate-tests/check-gate-substrate-parity.test.sh` holds the
+declaration configurations one pair cannot reach, each a sandbox rather than a
+live tree: **no descriptors at all** — the post-revert tree, where the roster half
+is the only live half and a descriptor-count guard would blank it out;
+**descriptors present, none dispatching, and no roster** — every vendored tree
+once a cohort's descriptors ship, where assertion F's missing-roster arm must stay
+quiet; **a consumer dispatching to a placed binary with no crate**, which is also
+assertion G's **empty shell-declaration corpus** reported as a counted zero rather
+than as a red for finding none; and **the publishing counterpart**, where the same
+absent roster reds because declaring platform support is the act of the tree that
+builds the artifact. The last two are that predicate's own boundary, and a
+too-loose one passes the `good/` case and reds only there.
+
+**Assertion B's roster matrix lives in the crate's own unit tests, and the port is
+what moved it there.** A roster is not name-addressable, so where
+§check-reads-couples' cases could name a real registry member and let the
+substrate answer, this member's could not: the configurations that matter are
+*whole rosters* — a subset vendoring, its near miss where the in-scope kit is the
+one missing a descriptor, the consumer sentinel out of scope in an adopter and in
+scope in the publishing tree, the descriptor→subcommand direction staying
+unrestricted under the scoped path, and the reference-only allowance. Every one of
+them was a stub binary printing a manufactured `--list`; with the spawn deleted a
+stub tests a provider the gate does not have. So the comparison is a
+**pure function** over the descriptor set, the roster, the vendored kit names, the
+publishing flag and the conservation section, and those six configurations are
+driven against it directly. Nothing weakens in timing: the crate's tests run at
+commit through §check-crate-arms exactly as the bespoke test runs through the
+fixture-runner battery, and a roster held as a value is *more* legible than one
+held as a process. Recorded rather than left to be rediscovered, because a reader
+finding the old stub-binary cases gone and no adjudication would read a coverage
+loss where there is a relocation.
 
 **Why those configurations are held in fixtures rather than assigned to live
 trees.** A coverage claim naming a tree is only as durable as that tree's
