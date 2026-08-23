@@ -13,3 +13,4 @@ leak-guard-and-assertion-meta-gate-port build a7c29c58 2026-08-23 92fa1027
 leak-guard-and-assertion-meta-gate-port build a74ec922 2026-08-23 ac64a345
 leak-guard-and-assertion-meta-gate-port build a4ee0093 2026-08-23 6d74062d
 leak-guard-and-assertion-meta-gate-port validate a262ee80 2026-08-23 30435e7d
+leak-guard-and-assertion-meta-gate-port close a98227e8 2026-08-23 7e0ddfab
