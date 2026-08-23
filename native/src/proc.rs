@@ -78,6 +78,74 @@ pub fn run_with_stdin(program: &str, args: &[&str], input: &[u8]) -> Result<Comp
     })
 }
 
+// spec: gate-sdk/SPEC.md §run-gates — one battery member's child: its own argv, its declared knob
+// environment and nothing else's, a private `TMPDIR`, and stdout+stderr merged into one capture
+// file. `code` is the member's verdict, so output is carried whatever the child's outcome.
+pub struct Dispatched {
+    pub code: i32,
+    pub output: Vec<u8>,
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — a child killed by a signal reports `128 + n`, the spelling
+// bash's own `$?` gave the shell dispatcher this replaced, so the `FAIL: <name> (exit N)` tail
+// keeps one grammar for `scripts/parse-gates-log.sh` and no fourth tail shape is minted
+fn exit_code(status: &std::process::ExitStatus) -> i32 {
+    if let Some(c) = status.code() {
+        return c;
+    }
+    #[cfg(unix)]
+    {
+        use std::os::unix::process::ExitStatusExt;
+        if let Some(sig) = status.signal() {
+            return 128 + sig;
+        }
+    }
+    2
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — the merge is two handles on **one** file description
+// (`try_clone` is `dup`), so the two streams share an offset and interleave exactly as the shell
+// dispatcher's `2>&1` did; reading them as two pipes would reorder a gate's own report.
+// spec: gate-sdk/SPEC.md §run-gates — stdin is `/dev/null`: under a worker pool an inherited
+// terminal is a shared resource two concurrent members could both read from.
+pub fn dispatch(
+    argv: &[String],
+    env: &[(String, String)],
+    drop_env: &[String],
+    tmpdir: &std::path::Path,
+    capture: &std::path::Path,
+) -> Result<Dispatched, String> {
+    let program = argv
+        .first()
+        .ok_or_else(|| "dispatch: empty argv — treating as failure (not clean)".to_string())?;
+    let io_err = |what: &str, e: std::io::Error| {
+        format!(
+            "cannot {} for {}: {} — the check could not run; treating as failure (not clean)",
+            what, program, e
+        )
+    };
+    let out = std::fs::File::create(capture).map_err(|e| io_err("create the capture file", e))?;
+    let err = out.try_clone().map_err(|e| io_err("share the capture file", e))?;
+    let mut cmd = Command::new(program);
+    cmd.args(&argv[1..])
+        .stdin(std::process::Stdio::null())
+        .stdout(std::process::Stdio::from(out))
+        .stderr(std::process::Stdio::from(err))
+        .env("TMPDIR", tmpdir);
+    for name in drop_env {
+        cmd.env_remove(name);
+    }
+    for (k, v) in env {
+        cmd.env(k, v);
+    }
+    let status = cmd.status().map_err(|e| io_err("spawn", e))?;
+    let output = std::fs::read(capture).map_err(|e| io_err("read the capture file", e))?;
+    Ok(Dispatched {
+        code: exit_code(&status),
+        output,
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

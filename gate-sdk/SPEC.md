@@ -78,7 +78,15 @@ bridge's third refusal, so a compiled member declaring it would fail-close on
 every invocation), `GATE_SDK_GRAPH_ARTIFACT` (default
 `<gates-dir>/CHECK-GRAPH.html`; the emitted coupling-graph artifact's path,
 read by `check-graph` assertion E — set it to republish the artifact elsewhere,
-e.g. a served docs page), `GATE_SDK_TMP_DIR` (default `.tmp`), `GATE_SDK_VERBOSE`
+e.g. a served docs page), `GATE_SDK_TMP_DIR` (default `.tmp`; resolved in
+`lib/gate.sh` rather than only inline at its readers, for the reason the workflow
+directory above carries — the battery runner is a compiled arm and declares it,
+and a knob no kit library defines is the config bridge's does-not-define
+refusal), `GATE_SDK_JOBS`
+(default unset = `available_parallelism()`; the battery's worker count, `1`
+restoring a serial run — env rather than argv because worker count is execution
+configuration and changes no member's membership, see §run-gates),
+`GATE_SDK_VERBOSE`
 (default unset = quiet green; any non-empty value restores the full per-gate
 banner roll on `run-gates.sh` and the generated hooks — see §run-gates),
 `GATE_SDK_QUEUE_FILE` (default `TASK-QUEUE.md`; resolved in `lib/gate.sh` rather
@@ -1295,12 +1303,40 @@ a front-end that already sources the shell library — the battery runner among
 them — supplies the bridged environment in front of it. What the class forbids
 is a *second* entry point into the emission path, not a caller.
 **So the family choice is forced for any tool that needs configuration at all.**
-Only an emitter-table member is bridged: the table's knob list is what `--knobs`
-prints and what the battery runner's `--emit` front-end resolves, while a
+Only a **bridged-arm table** member is bridged: the table's knob list is what
+`--knobs` prints and what a front-end resolves, while a
 hardcoded top-level flag is reached by neither and receives nothing. A configured
 tool ported as a top-level flag therefore resolves platform defaults and silently
 ignores every consumer override — which is not a calibration between two workable
 shapes but the difference between working and appearing to.
+
+**That is why the table is named for *bridged*, not for *emit*.** What its members
+share is not that each renders a document — `--emit-queue-index extent` answers
+two integers and emits none — but that each publishes a knob roster a front-end
+resolves. The table is therefore keyed by the **arm's own flag spelling**, and
+`--emit-` is demoted from a family name to a per-arm spelling: nothing about the
+existing arms changes, and a non-emitting member can join without a third stretch
+of the word *emit*. The rename is the one this section declined to take for
+`extent` on the ground that it was "a gate-sdk unit of its own"; it is taken here
+by the unit that needed it, as a generalization of the property already stated
+rather than as a new class.
+
+**`--run` is the class's first bridged member that returns a verdict rather than
+a document** (§run-gates). It satisfies the three properties: it is
+`--`-prefixed, resolved before the registry lookup and absent from `--list`; it
+owes no descriptor, registration or fixture pair, because it returns no verdict a
+*battery* reads; and it names its caller, `bin/run-gates.sh`. It is a table member
+rather than a hardcoded flag for exactly the reason above — it reads the gates
+dir, the kit roots and the scratch dir, so a flag would be the second shape.
+
+**Its declared knob roster is derived, never maintained.** `--knobs --run` answers
+the **union** of every registry member's declared knobs, every sibling arm's, and
+the runner's own, computed from the crate's registry and this table. A maintained
+union would rot against a churning roster the moment a member's knob set changed,
+which derivation-first forbids; the union is exactly the data `gates::knobs` and
+the table already hold. The dispatcher then hands each child only its own
+member's slice of that union, which is what keeps the declared-knob discipline
+executed rather than assumed (§run-gates).
 
 **A gate that reaches an arm in-process acquires a source coupling its
 descriptor must carry, and the trigger set does not follow the port on its
@@ -6059,6 +6095,13 @@ that needs *the executable* rather than *the command* takes the first element
 that is neither `env` nor a `NAME=VALUE` assignment. §run-gate-tests is the one caller that
 needs it, and it is named there.
 
+**The sanction is a property of the caller, so it binds only where the caller is
+bash.** The battery's own dispatch path is not one: the `--run` arm sets each
+child's environment directly, because the condition this paragraph rests on —
+*the dispatcher is already bash* — is false there (§run-gates). The prefix holds
+everywhere the producer is a bash one, the generated hook's baked argv above all,
+and stays a live contract for `gate_command`'s surviving callers.
+
 **The bridge is process-global, and the crate's own tests are serialized against
 it rather than disciplined around it.** Its values are environment variables, so
 every `#[test]` in one test binary shares one environment: two cases setting the
@@ -6325,6 +6368,66 @@ Aggregate runner: executes every `gates.list` member in one shot, timing each
 uncommitted by design: a measurement, not state). A member that resolves
 nowhere is a failure, not a skip. Exit 0 only when every member passed.
 
+**The runner is two halves, and which half owns what is the first thing to know
+here.** The **arm** is `--run`, a bridged non-gate arm of the binary (§The
+non-gate arm): it owns the registry walk, both selectors, the dispatch, the
+worker pool, the timings, the omission accounting and the output contract.
+`bin/run-gates.sh` is the **front-end**: it resolves the repo root, sources
+`lib/gate.sh`, parses argv, resolves the arm's bridged environment in **one**
+`gate_knob_env` call, and `exec`s the binary — the shape `--emit` already had,
+which is the precedent the runner's own arm is built on. Everything the argument
+grammar below specifies is the front-end's; everything the output contract
+specifies is the arm's.
+
+**The split exists to delete a per-member bash bridge, and the arithmetic is why
+it was worth a port.** The front-end resolves the declared-knob union once for
+the whole run where the loop it replaced resolved one member's knobs at a time —
+measured on this tree, `gate_command` over all 106 members and executing none of
+them cost 5019 ms before the batched bridge (§lib/gate.sh) and 2714 ms after,
+against a whole warm battery of `TOTAL 24990` ms; the arm pays it once.
+
+**A member dispatches as a child process, and the threads are the concurrency.**
+A compiled member is a function in the same binary, so calling it in-process is
+available and looks free. It is refused on three grounds, and the measurement
+prices what the refusal forgoes at well under one percent of the saving:
+
+- **It would silently retire the declared-knob discipline.** A gate reads its
+  knobs from the process environment. One shared environment carrying the union
+  means a member reading a knob it never declared would *succeed* — and
+  `--knobs` exists precisely to hold "the crate declares only the knobs its own
+  code reads" to executed behavior. That is the bridge's does-not-define refusal
+  failing in the other direction, with nothing to catch it. So the arm strips
+  every inherited `GATE_SDK_KNOB_*` from a child and re-adds only the ones that
+  member's registry entry declares, prefix families included.
+- **It would lose fault isolation.** A member that panics or aborts must red
+  *that member*; in one process it takes the battery with it.
+- **It would fork the runner in two.** Members resolving to `.sh` survive, and
+  consumer shadowing of a ported member with a shell script is a permanent
+  contract (§lib/gate.sh), so a dispatch path that only reaches compiled members
+  needs the exec path anyway and buys a second implementation rather than
+  replacing one.
+
+**`env` leaves the battery's dispatch path.** The arm sets each child's
+environment directly rather than prefixing an `env` argv element; §lib/gate.sh's
+sanction for `env` is that "the dispatcher is already bash", and this dispatcher
+is not. The prefix stays in the generated hook's baked argv, which is still
+emitted by a bash producer (§gen-pre-commit).
+
+**A child's two streams merge into one capture file rather than two pipes**, and
+the merge is two handles on one file description, so they share an offset and
+interleave exactly as the shell dispatcher's `2>&1` did. Reading them as two
+pipes would reorder a member's own report against its own diagnostics. **Its
+stdin is `/dev/null`**: under a worker pool an inherited terminal is a shared
+resource two concurrent members could both read from, which is the same class of
+interference the per-gate scratch isolation below exists against.
+
+**A child killed by a signal reports `exit 128+n`.** That is the spelling bash's
+`$?` gave the shell dispatcher this replaced, so the tail grammar
+`scripts/parse-gates-log.sh` reads keeps one shape and the port mints no fourth
+tail. The tails are `(exit N)`, `(dispatch harness error, exit 2)` and
+`(unresolved)` — cited rather than counted, because a later dispatch shape may
+add one.
+
 The output contract is **quiet green, loud red**. A passing gate prints
 nothing: its captured output is discarded and the run ends with the summary
 line alone, whose executed-gate count (`All N gates passed.`) is the
@@ -6366,15 +6469,69 @@ make impossible. A selector spelled in argv dies with the process that typed it.
 So the runner draws the line where the two selectors below sit: reporting is env,
 selection is argv.
 
-**The dispatch capture holds the two streams apart.** `gate_command`'s stdout
-*is* the invocation argv, one element per line; its stderr is diagnostic text.
-Merging them makes any stderr a successful call emits the **first argv element**,
-which the runner then execs — a 127 naming the diagnostic instead of running the
-gate, and a `cstatus` of 0 throughout, so nothing upstream reads as an error. So
-stdout is captured into the argv value and stderr into
-`<tmp-dir>/gate-dispatch-stderr.txt`, which is read only as the body of the
-exit-2 (dispatch harness error) report — the reuse the merge existed to serve,
-and the reason the fix is a split rather than a deletion of the capture.
+**`GATE_SDK_JOBS` sits on the reporting side of that line, and the placement is
+argued rather than assumed.** It is the worker count: unset resolves to
+`std::thread::available_parallelism()`, and `1` restores a serial run, which is
+what makes a suspected interference reproducible without a rebuild. It is env
+against the sentence above because worker count changes no member's
+*membership* — it is execution configuration, the same class as
+`GATE_SDK_VERBOSE`, and an ambient one narrows nothing. It is deliberately **not
+bridged**: it is gate-sdk's own execution config, read once from the environment
+the front-end already exports, before the first member is dispatched.
+
+**The concurrency contract.** Members run on a worker pool built from
+`std::thread` and `std::sync` alone — **no new crate dependency**, because
+objective 4 makes footprint a cost paid per target on every adopter's machine
+and a scheduler crate is a cost the standard library already covers. Four
+properties bind:
+
+- **Deterministic output ordering.** Each member's captured output is buffered
+  and flushed in **registry order**, never completion order, so a red reads the
+  same way twice and a transcript diffs against itself. The summary's failed-set
+  is likewise registry-ordered.
+- **The timings file is not a contended writer.** Per-member elapsed times are
+  collected in memory and written once after the join, in registry order,
+  `TOTAL` last — the grammar `drift-kit/kpis/kpi-gate-runtime.sh` and
+  `drift-kit/bin/drift-report.sh` read, unchanged. `TOTAL` is the **sum** of
+  per-member times, as it always was, and therefore stops approximating
+  wall-clock: under a pool the two part company, and per-member times themselves
+  rise with CPU contention while the run gets shorter. Stated because those two
+  readers would otherwise read a rising `TOTAL` as a regression.
+- **Per-gate scratch isolation, split by what the directory is for.** Each child
+  gets a private `TMPDIR` under the run's own scratch, which is where a member's
+  *anonymous* temporaries land. `GATE_SDK_TMP_DIR` stays **shared and is not
+  isolated**, because it is the home of a declared, content-keyed cache whose
+  whole value is surviving the run — `check-crate-arms` writes its
+  `crate-arms-<hash>.green` there and reads it on the next battery, and a
+  per-member scratch would silently retire it. The rule that states, and which a
+  later member is measured against: **an anonymous temporary is private; a
+  declared cache is shared and its filename must carry its key.** The run's
+  scratch is removed on the way out, so a battery leaves the tmp dir's file set
+  exactly as it found it.
+- **The projection-ordering constraint is discharged by an invariant, not by the
+  scheduler.** A full run over this tree leaves `git status --porcelain`
+  byte-identical and the tmp dir with no new entry: no registered member
+  regenerates anything another reads, because the freshness family compares
+  against an in-memory render rather than writing one. That is the invariant a
+  member must not break and the scheduler assumes — a member that wrote a
+  projection another member read would be a **defect against this contract**,
+  not a scheduling input.
+
+**The dispatch capture holds the two streams apart, and it is `gate_command`'s
+contract rather than the battery's.** `gate_command`'s stdout *is* the invocation
+argv, one element per line; its stderr is diagnostic text. Merging them makes any
+stderr a successful call emits the **first argv element**, which the caller then
+execs — a 127 naming the diagnostic instead of running the gate, and a status of
+0 throughout, so nothing upstream reads as an error. So a caller captures stdout
+into the argv value and stderr apart from it.
+
+**The battery is not one of those callers, and keeps no capture file of its
+own.** The `--run` arm builds argv **as data** and never parses a stream into
+it, so the failure class is structurally absent there, and the runner's own
+dispatch-stderr file is retired with the branch that read it. The rule stays here because `gate_command`'s surviving callers — the hook
+generator, the fixture runner, the hook installer, the consumer smoke, the
+hermetic-test library, the stage-entry step and the exec shim among them — still
+parse its stdout as argv and must still hold the two streams apart.
 
 The failure this closes was neither theoretical nor a race: a helper that
 abandoned a pipe producer mid-write emitted a broken-pipe diagnostic on **every**
@@ -6383,9 +6540,9 @@ supervisor, so the write returns `EPIPE` and bash reports it — while a shell a
 the default disposition loses the producer silently and shows nothing at all. An
 environment-determined defect a green local battery cannot see is exactly what
 this capture must be structural against, rather than left to each producer's
-discipline: the runner execs whatever stdout carries, so *no* producer may be
+discipline: a caller execs whatever stdout carries, so *no* producer may be
 trusted to keep stderr clean. Reproducing it locally means restoring the
-runner's signal environment (`trap '' PIPE`), which is what makes the
+signal environment (`trap '' PIPE`), which is what makes the
 `lib-gate.test.sh` arm deterministic instead of environmental.
 
 `run-gates.sh --for <path> [<path>...]` is the path-scoped selector, the
@@ -6446,11 +6603,22 @@ arguments under `--only`, which is the bare-run behavior rather than the hook's:
 `--only` names gates and has none, so the member runs over its full corpus.
 Everything downstream is untouched, which is the whole value of siting this on
 the runner rather than in a second tool — the `GATE_SDK_KNOB_*` config bridge,
-the consumer-first resolve-dir order, the dispatch capture, the per-gate timing,
+the consumer-first resolve-dir order, the worker pool, the per-gate timing,
 `GATE_SDK_VERBOSE`, the declared-omission line and the output contract all behave
 exactly as in a bare run. The summary line's `N` is the **selected** count, as it
 already is under `--for`; the roster-collapse tripwire that count serves is a
 property of a bare run, and neither selector claims it.
+
+**Where each refusal lives is a consequence of the split, and the shapes are
+preserved whichever half prints them.** The **front-end** owns every refusal
+decidable from argv alone: the two empty-list refusals, the unrecognized-option
+refusal, and a leading-dash name inside `--only`. The **arm** owns every refusal
+that has to read the registry — `no registry at <list>`, the `--only` steer
+beside it, `<list> names no gates`, an unregistered `--only` name, and a member
+`--for` cannot resolve. Each keeps the `run-gates:` prefix it always had, because
+the message shape is this tool's documented surface and the arm is what the
+front-end exec'd; a caller cannot tell which process printed it, and none should
+have to.
 
 **The runner honours §The bin/-tool contract**, which binds because its
 positional is free text — a path — and an arity check is not a shape check. `-h`
@@ -6468,8 +6636,9 @@ argument, which is why a wrong guess cost three steps instead of one.
 
 **A gates-dir that is really a gate name steers to `--only`.** When the
 positional holds no `gates.list` and names a member of the **default** registry
-— resolvable through `gate_sdk_gates_dir` precisely because the failing argument
-was never a registry path — the refusal gains a line naming the gate and the
+— resolvable through the bridged `GATE_SDK_GATES_DIR` precisely because the failing argument
+was never a registry path, which is why the positional crosses to the arm as an
+explicit argument rather than as an override of that knob — the refusal gains a line naming the gate and the
 flag that runs it. It is an addition to a refusal and never a fallback: the
 positional keeps one meaning, and a caller who typed a name gets a remedy rather
 than a run it did not ask for, which is the shape a gate's own `help:` line

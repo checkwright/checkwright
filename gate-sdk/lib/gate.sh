@@ -43,6 +43,8 @@ unset _gpx
 [[ -v GATE_SDK_RUNNER_DOC ]] || GATE_SDK_RUNNER_DOC="README.md"
 # spec: gate-sdk/SPEC.md §The workflow directory — the same resolution for the workflow directory, and for the same reason: the governed-comment corpus takes its tracked tier, so a compiled member reading that corpus declares this knob and the bridge can only carry a value some kit library defines
 [[ -v GATE_SDK_WORKFLOW_DIR ]] || GATE_SDK_WORKFLOW_DIR=".workflow"
+# spec: gate-sdk/SPEC.md §Layout and configuration — the same resolution for the scratch directory, on the cause the roster above states: the battery runner is a compiled arm and declares this knob, so a value written only as an inline `${…:-.tmp}` default at a use site is invisible to the bridge's `declare -p`. Every inline reader keeps its spelling and its value.
+[[ -v GATE_SDK_TMP_DIR ]] || GATE_SDK_TMP_DIR=".tmp"
 # spec: gate-sdk/SPEC.md §Layout and configuration — and the same resolution for the queue file, on the third occurrence of the same cause: a compiled member valving the queue out of its corpus declares this knob, and an environment-only override no kit library defines is the bridge's third refusal whatever prefix its name carries. Every inline reader keeps its spelling and its value; what changes is that the name now resolves to something declare -p can find.
 [[ -v GATE_SDK_QUEUE_FILE ]] || GATE_SDK_QUEUE_FILE="TASK-QUEUE.md"
 # spec: gate-sdk/SPEC.md §Layout and configuration — the same resolution again, for the two knobs the enforcement-map emitter reads once it is a compiled arm: a value no kit library defines is the bridge's third refusal, and these two were previously defaulted inside the emitter script itself, which is the duplication the bridge exists to remove. Resolved *after* the config seam above, so the config file still cannot name its own directory — what changes is that the resolved value is now something declare -p can find, not where it comes from.
@@ -388,6 +390,11 @@ gate_knob_env_set() {
         [[ -v by_idx["$i"] ]] || continue
         printf '%s' "${by_idx[$i]}"
     done
+}
+
+# spec: gate-sdk/SPEC.md §lib/gate.sh — one declared name resolved to its bridged element(s): the arity-one face of gate_knob_env_set, for a harness resolving a single knob rather than a member's whole declared set. Which arm a name takes stays derived from its spelling in one place rather than re-derived per caller.
+gate_knob_env_one() {
+    gate_knob_env_set "$2" "$1"
 }
 
 # spec: gate-sdk/SPEC.md §lib/gate.sh — resolve a gate name to its *invocation argv*, the execution counterpart of gate_resolve's declaration path: one element `<dir>/<name>.sh` for a shell gate, two elements `<binary> <name>` for a `.gate`-dispatched one — prefixed, when that member declares knobs, by `env` and one `GATE_SDK_KNOB_<NAME>=<tab-joined>` element per knob. Emits one argv element per line, so a caller looking for the dispatch executable takes the first element that is neither `env` nor an assignment. An absent or non-executable binary when a member dispatches to it is a harness error — exit 2, never a skip and never a pass (§Fail-closed contract): a skip would let the battery silently stop running a gate whenever a build is missing. A binary that cannot report its knobs, and each of the three knob-resolution refusals, exit 2 by the same contract.

@@ -161,7 +161,12 @@ The generic set — each coupled to a kit-governed surface, each degrading to
 - **kpi-gate-runtime** — full-battery runtime from the runner's timings
   file (`<tmp-dir>/gate-timings.txt`): total, the slowest gates by runtime, and
   the file's reading age — a *measurement*, not live state, so the age
-  caveat rides the value.
+  caveat rides the value. Its `TOTAL` is the **sum** of the per-member times and
+  under the runner's worker pool it does not approximate wall-clock
+  (gate-sdk/SPEC.md §run-gates): a run that got shorter can show a larger
+  `TOTAL`, because contention lengthens each member while the battery finishes
+  sooner. Read it as dispatch cost, and the slowest-gate rows as the critical
+  path a pool cannot shorten.
 - **kpi-overhead** — governance and gate-output share over the overhead
   meter's log (§The overhead meter): the governance share (`pct` averaged
   across the recent window of sessions, carrying the session-count and

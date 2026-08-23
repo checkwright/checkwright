@@ -45,7 +45,15 @@ Knobs, this repo's surface names as defaults:
   `scripts/parse-gates-log.sh` maps the verbose `run-gates` log to one scenario
   per registered gate, so an existing gate turning red diffs as a new failure
   even while a sibling gate is legitimately held red; the whole-battery
-  `exit-code` scenario could not tell those apart.
+  `exit-code` scenario could not tell those apart. **What that parser reads is the
+  two-space-indented `PASS:` / `FAIL:` tail line and its gate name, and nothing
+  else**, and the
+  grammar is unchanged by the battery's move onto a compiled arm and a worker
+  pool: the tails keep their spellings, a signalled child renders in the
+  `(exit 128+n)` shape rather than as a fourth one, and the lines are flushed in registry
+  order rather than completion order, so one run's scenario record diffs against
+  another's (gate-sdk/SPEC.md §run-gates). Stated rather than left derivable,
+  because it is the surface a reader would otherwise re-derive off the runner.
 - `EVIDENCE_KIT_SCENARIO_GLOBS` — optional per-suite globs; configuring one
   arms the manifest↔disk set-equality assertion for that suite.
 - `EVIDENCE_KIT_BASELINE_FILE` (default `.workflow/validate-baseline.txt`),

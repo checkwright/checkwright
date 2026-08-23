@@ -48,17 +48,28 @@ pub fn self_repo_prefix(reference: &str) -> String {
 // returned string is what the arm prints: the document, or the action a write performed.
 pub type EmitFn = fn(&[String]) -> Result<String, String>;
 
-// spec: gate-sdk/SPEC.md §The non-gate arm — the projection's own name keys the arm, so no
-// mapping table exists to drift. The third element is the arm's bridged knob reads, the data
-// `--knobs` prints for it.
-pub const EMITTERS: &[(&str, EmitFn, &[&str])] = &[
-    ("footprint", footprint::emit, &["CONTEXT_KIT_SURFACES"]),
+// spec: gate-sdk/SPEC.md §The non-gate arm — a bridged arm either renders a document or returns an
+// exit code; the class the table keys is *bridged*, not *emitting*, so both shapes sit in it.
+pub enum Arm {
+    Emit(EmitFn),
+    Run(fn(&[String]) -> i32),
+}
+
+// spec: gate-sdk/SPEC.md §The non-gate arm — the **bridged-arm table**, keyed by the arm's own flag
+// spelling: `--knobs` publishes each member's roster and a front-end resolves it, which is the
+// property the members share. `--emit-` is one arm family's spelling, not the table's name.
+pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
+    (
+        "--emit-footprint",
+        Arm::Emit(footprint::emit),
+        &["CONTEXT_KIT_SURFACES"],
+    ),
     // spec: lifecycle-kit/SPEC.md §The close-surfaces emit arm — the class's first member that is
     // not a stored projection: the roster's value is that it is recomputed at the moment close
     // reads it, so there is no comparator and must not be.
     (
-        "close-surfaces",
-        close_surfaces::emit,
+        "--emit-close-surfaces",
+        Arm::Emit(close_surfaces::emit),
         &[
             "GATE_KIT_ROOTS_REL",
             "LIFECYCLE_KIT_ROSTER_BASENAME",
@@ -67,8 +78,8 @@ pub const EMITTERS: &[(&str, EmitFn, &[&str])] = &[
         ],
     ),
     (
-        "enforcement-map",
-        enforcement_map::emit,
+        "--emit-enforcement-map",
+        Arm::Emit(enforcement_map::emit),
         &[
             "GATE_SDK_GATES_DIR",
             "GATE_SDK_ENFORCE_SCAN_DIR",
@@ -84,8 +95,8 @@ pub const EMITTERS: &[(&str, EmitFn, &[&str])] = &[
     // spec: docs/site-architecture.md §Generated projections and their freshness gates — the join
     // reads both sibling emitters live, so it declares the union of what they read.
     (
-        "value-rollup",
-        value_rollup::emit,
+        "--emit-value-rollup",
+        Arm::Emit(value_rollup::emit),
         &[
             "GATE_SDK_GATES_DIR",
             "GATE_SDK_ENFORCE_SCAN_DIR",
@@ -102,16 +113,16 @@ pub const EMITTERS: &[(&str, EmitFn, &[&str])] = &[
     // spec: canon-kit/SPEC.md §The reference-link grammar — the source set is derived from the
     // tracked tree rather than enumerated, so the only configured value is the blob ref
     (
-        "docs-mirror",
-        docs_mirror::emit,
+        "--emit-docs-mirror",
+        Arm::Emit(docs_mirror::emit),
         &["CANON_KIT_DOCS_BLOB_REF"],
     ),
     // spec: drift-kit/SPEC.md §The published-evidence extractor — the stage roster and the
     // evidence-surface pair are this consumer's vocabulary, so they cross the bridge as knobs; a
     // stage name in the crate would ship one project's lifecycle as everyone's
     (
-        "trajectory",
-        trajectory::emit,
+        "--emit-trajectory",
+        Arm::Emit(trajectory::emit),
         &[
             "DRIFT_KIT_CONFIG_FILE",
             "DRIFT_KIT_TRAJECTORY_SURFACES",
@@ -124,8 +135,8 @@ pub const EMITTERS: &[(&str, EmitFn, &[&str])] = &[
     // section trio that scopes the scan. TRACKS rides although the arm only prints it verbatim:
     // one table entry serves check-roadmap-fresh's caller too, and that one validates it.
     (
-        "roadmap",
-        roadmap::emit,
+        "--emit-roadmap",
+        Arm::Emit(roadmap::emit),
         &[
             "QUEUE_KIT_QUEUE_FILE",
             "QUEUE_KIT_ACTIVE_SECTIONS",
@@ -141,8 +152,8 @@ pub const EMITTERS: &[(&str, EmitFn, &[&str])] = &[
     // the bridge refuses any element carrying a newline and a stylesheet is newline-bearing by
     // construction. Values cross the bridge; documents cross as a path.
     (
-        "graph",
-        graph::emit,
+        "--emit-graph",
+        Arm::Emit(graph::emit),
         &[
             "GATE_SDK_GATES_DIR",
             "GATE_KIT_ROOTS_HERE",
@@ -158,8 +169,8 @@ pub const EMITTERS: &[(&str, EmitFn, &[&str])] = &[
     // spec: queue-kit/SPEC.md §The queue-index arm — the class's first *query* member as well as a
     // generator, and configured: a hardcoded flag receives no configuration
     (
-        "queue-index",
-        queue_index::emit,
+        "--emit-queue-index",
+        Arm::Emit(queue_index::emit),
         &[
             "QUEUE_KIT_QUEUE_FILE",
             "QUEUE_KIT_ACTIVE_SECTIONS",
@@ -169,44 +180,79 @@ pub const EMITTERS: &[(&str, EmitFn, &[&str])] = &[
             "QUEUE_KIT_ICEBOX_AGE_DAYS",
         ],
     ),
+    // spec: gate-sdk/SPEC.md §run-gates — the battery runner: the class's first bridged member
+    // that returns a verdict rather than a document, and the reason the table is keyed by flag.
+    (
+        "--run",
+        Arm::Run(crate::runner::run),
+        crate::runner::KNOBS,
+    ),
 ];
 
-// spec: gate-sdk/SPEC.md §The non-gate arm — resolved before the registry lookup and absent from
-// `--list`, which is what keeps check-gate-substrate-parity assertion B's equality true in both
-// directions.
-pub fn arm_name(projection: &str) -> String {
-    format!("--emit-{}", projection)
-}
-
-pub fn lookup(arm: &str) -> Option<EmitFn> {
-    EMITTERS
+pub fn lookup(arm: &str) -> Option<&'static Arm> {
+    BRIDGED_ARMS
         .iter()
-        .find(|(p, _, _)| arm_name(p) == arm)
-        .map(|(_, f, _)| *f)
+        .find(|(a, _, _)| *a == arm)
+        .map(|(_, f, _)| f)
 }
 
-pub fn knobs(arm: &str) -> Option<&'static [&'static str]> {
-    EMITTERS
-        .iter()
-        .find(|(p, _, _)| arm_name(p) == arm)
-        .map(|(_, _, k)| *k)
+// spec: gate-sdk/SPEC.md §The non-gate arm — a dispatching arm's declared reads are the **union** of
+// its own with every registry member's and every sibling arm's, derived from the registry and this
+// table rather than maintained beside them, which is the data both already hold.
+pub fn knobs(arm: &str) -> Option<Vec<&'static str>> {
+    let (_, f, own) = BRIDGED_ARMS.iter().find(|(a, _, _)| *a == arm)?;
+    match f {
+        Arm::Emit(_) => Some(own.to_vec()),
+        Arm::Run(_) => Some(dispatch_union(own)),
+    }
 }
 
-pub fn projections() -> Vec<&'static str> {
-    EMITTERS.iter().map(|(p, _, _)| *p).collect()
+fn dispatch_union(own: &'static [&'static str]) -> Vec<&'static str> {
+    let mut all: Vec<&'static str> = own.to_vec();
+    for (name, _, _, _, _) in crate::gates::REGISTRY {
+        if let Some(k) = crate::gates::knobs(name) {
+            all.extend_from_slice(k);
+        }
+    }
+    for (a, _, k) in BRIDGED_ARMS {
+        if *a != "--run" {
+            all.extend_from_slice(k);
+        }
+    }
+    all.sort_unstable();
+    all.dedup();
+    all
+}
+
+pub fn arms() -> Vec<&'static str> {
+    BRIDGED_ARMS.iter().map(|(a, _, _)| *a).collect()
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    // spec: gate-sdk/SPEC.md §The non-gate arm — the arm spelling is derived from the projection
-    // name, so a typo cannot resolve to a different member and no mapping table exists to drift
+    // spec: gate-sdk/SPEC.md §The non-gate arm — the table is keyed by the arm's own flag, so a
+    // near-miss spelling resolves to nothing rather than to a different member
     #[test]
-    fn an_arm_resolves_only_under_its_derived_spelling() {
+    fn an_arm_resolves_only_under_its_own_flag() {
         assert!(lookup("--emit-footprint").is_some());
         assert!(lookup("footprint").is_none());
         assert!(lookup("--emit-footprints").is_none());
-        assert_eq!(knobs("--emit-footprint"), Some(&["CONTEXT_KIT_SURFACES"][..]));
+        assert_eq!(knobs("--emit-footprint"), Some(vec!["CONTEXT_KIT_SURFACES"]));
+    }
+
+    // spec: gate-sdk/SPEC.md §The non-gate arm — the dispatching arm's roster is derived, so it
+    // carries a knob no arm declares the moment a registry member declares it
+    #[test]
+    fn the_dispatching_arms_roster_is_the_union_it_will_have_to_carry() {
+        let u = knobs("--run").expect("--run is not in the bridged-arm table");
+        assert!(u.contains(&"GATE_SDK_TMP_DIR"), "the arm's own knob is missing");
+        assert!(u.contains(&"GATE_PRUNE_DIRS"), "a registry member's knob is missing");
+        assert!(u.contains(&"CONTEXT_KIT_SURFACES"), "a sibling arm's knob is missing");
+        let mut sorted = u.clone();
+        sorted.sort_unstable();
+        sorted.dedup();
+        assert_eq!(u, sorted, "the union is not deterministic");
     }
 }
