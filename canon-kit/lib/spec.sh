@@ -483,16 +483,28 @@ if [[ ${#_sk_errs[@]} -gt 0 ]]; then
 fi
 unset _sk_errs
 
+# spec: gate-sdk/SPEC.md §lib/gate.sh — GATE_SDK_RESOLVING_KNOB is the *set* of names the bridge is
+# resolving in this batch, one per line, so a gated block tests membership rather than equality: one
+# subshell now carries a whole kit's slice, and an equality test would compute for no batch at all
+_spec_resolving() {
+    local _sk_want
+    for _sk_want in "$@"; do
+        case $'\n'"${GATE_SDK_RESOLVING_KNOB:-}"$'\n' in
+            *$'\n'"$_sk_want"$'\n'*) return 0 ;;
+        esac
+    done
+    return 1
+}
+
 # spec: canon-kit/SPEC.md §lib/spec.sh — the emitter-backed vocabularies as bridgeable
 # variables, so a compiled member receives the consumer command's *output* and never spawns
 # an interpreter to read consumer config
 # spec: gate-sdk/SPEC.md §lib/gate.sh — index-aligned arrays because the wire format's own
 # separator is the tab, and gated on GATE_SDK_RESOLVING_KNOB because resolution runs a
-# subprocess and this library is sourced once per declared knob per gate
+# subprocess and this library is sourced once per owning kit per batch
 declare -p CANON_KIT_ENUM_SET_NAMES &>/dev/null   || CANON_KIT_ENUM_SET_NAMES=()
 declare -p CANON_KIT_ENUM_SET_MEMBERS &>/dev/null || CANON_KIT_ENUM_SET_MEMBERS=()
-if [[ "${GATE_SDK_RESOLVING_KNOB:-}" == CANON_KIT_ENUM_SET_NAMES \
-   || "${GATE_SDK_RESOLVING_KNOB:-}" == CANON_KIT_ENUM_SET_MEMBERS ]] \
+if _spec_resolving CANON_KIT_ENUM_SET_NAMES CANON_KIT_ENUM_SET_MEMBERS \
    && [[ -n "$CANON_KIT_ENUM_SETS_CMD" ]]; then
     _sk_sets="$(spec_enum_sets)" || exit 2
     while IFS=$'\t' read -r _sk_n _sk_m; do
@@ -505,8 +517,7 @@ fi
 
 declare -p CANON_KIT_MEASURED_KEYS &>/dev/null   || CANON_KIT_MEASURED_KEYS=()
 declare -p CANON_KIT_MEASURED_VALUES &>/dev/null || CANON_KIT_MEASURED_VALUES=()
-if [[ "${GATE_SDK_RESOLVING_KNOB:-}" == CANON_KIT_MEASURED_KEYS \
-   || "${GATE_SDK_RESOLVING_KNOB:-}" == CANON_KIT_MEASURED_VALUES ]] \
+if _spec_resolving CANON_KIT_MEASURED_KEYS CANON_KIT_MEASURED_VALUES \
    && [[ -n "$CANON_KIT_MEASURED_CLAIMS_CMD" ]]; then
     _sk_meas="$(spec_measured_claims)" || exit 2
     while IFS=$'\t' read -r _sk_k _sk_v; do
@@ -519,8 +530,7 @@ fi
 
 declare -p CANON_KIT_INSTALL_TRANSPORT_IDS &>/dev/null      || CANON_KIT_INSTALL_TRANSPORT_IDS=()
 declare -p CANON_KIT_INSTALL_TRANSPORT_PATTERNS &>/dev/null || CANON_KIT_INSTALL_TRANSPORT_PATTERNS=()
-if [[ "${GATE_SDK_RESOLVING_KNOB:-}" == CANON_KIT_INSTALL_TRANSPORT_IDS \
-   || "${GATE_SDK_RESOLVING_KNOB:-}" == CANON_KIT_INSTALL_TRANSPORT_PATTERNS ]] \
+if _spec_resolving CANON_KIT_INSTALL_TRANSPORT_IDS CANON_KIT_INSTALL_TRANSPORT_PATTERNS \
    && [[ -n "$CANON_KIT_INSTALL_TRANSPORTS_CMD" ]]; then
     _sk_tr="$(spec_install_transports)" || exit 2
     while IFS=$'\t' read -r _sk_i _sk_p; do
@@ -533,8 +543,7 @@ fi
 
 declare -p CANON_KIT_PAYLOAD_CLAIM_IDS &>/dev/null      || CANON_KIT_PAYLOAD_CLAIM_IDS=()
 declare -p CANON_KIT_PAYLOAD_CLAIM_PATTERNS &>/dev/null || CANON_KIT_PAYLOAD_CLAIM_PATTERNS=()
-if [[ "${GATE_SDK_RESOLVING_KNOB:-}" == CANON_KIT_PAYLOAD_CLAIM_IDS \
-   || "${GATE_SDK_RESOLVING_KNOB:-}" == CANON_KIT_PAYLOAD_CLAIM_PATTERNS ]] \
+if _spec_resolving CANON_KIT_PAYLOAD_CLAIM_IDS CANON_KIT_PAYLOAD_CLAIM_PATTERNS \
    && [[ -n "$CANON_KIT_PAYLOAD_CLAIMS_CMD" ]]; then
     _sk_pc="$(spec_claim_vocabulary "$CANON_KIT_PAYLOAD_CLAIMS_CMD" CANON_KIT_PAYLOAD_CLAIMS_CMD)" || exit 2
     while IFS=$'\t' read -r _sk_c _sk_r; do
@@ -547,8 +556,7 @@ fi
 
 declare -p CANON_KIT_CLAIM_CLASS_IDS &>/dev/null      || CANON_KIT_CLAIM_CLASS_IDS=()
 declare -p CANON_KIT_CLAIM_CLASS_PATTERNS &>/dev/null || CANON_KIT_CLAIM_CLASS_PATTERNS=()
-if [[ "${GATE_SDK_RESOLVING_KNOB:-}" == CANON_KIT_CLAIM_CLASS_IDS \
-   || "${GATE_SDK_RESOLVING_KNOB:-}" == CANON_KIT_CLAIM_CLASS_PATTERNS ]] \
+if _spec_resolving CANON_KIT_CLAIM_CLASS_IDS CANON_KIT_CLAIM_CLASS_PATTERNS \
    && [[ -n "$CANON_KIT_CLAIM_CLASSES_CMD" ]]; then
     _sk_cc="$(spec_claim_vocabulary "$CANON_KIT_CLAIM_CLASSES_CMD" CANON_KIT_CLAIM_CLASSES_CMD)" || exit 2
     while IFS=$'\t' read -r _sk_ci _sk_cp; do

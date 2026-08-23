@@ -5814,12 +5814,18 @@ Resolution, per declared knob:
   pathspec or a knob-prefix owner needs — and the two are separate knobs because
   the anchor relating them is not recoverable from either alone once an override
   is in play.
-- **`GATE_SDK_RESOLVING_KNOB` names the knob under resolution**, exported into
-  the subshell before the kit's libraries are sourced. A knob whose value is a
-  consumer *command's output* costs a subprocess to compute, and a library is
-  sourced once per declared knob per gate, so a library that resolved every such
-  knob on every source would multiply that cost by the declared-knob count. A
-  library with no expensive knob ignores it and is unaffected. The install
+- **`GATE_SDK_RESOLVING_KNOB` is the *set* of names under resolution**, one per
+  line, exported into the subshell before the kit's libraries are sourced, and a
+  reader tests **membership** rather than equality. A knob whose value is a
+  consumer *command's output* costs a subprocess to compute, and a library
+  resolving every such knob on every source would pay that cost per source. A
+  library with no expensive knob ignores it and is unaffected. The set spelling
+  is what the per-kit batch below requires: one subshell now carries a whole
+  kit's slice, so an equality test would match no batch of more than one name and
+  the gated block would compute for nothing. A block whose names are absent from
+  the set still does not compute, which is the property the gating buys, and the
+  saving is that it computes once per *run* rather than once per requesting
+  member. The install
   transport and payload disclosure vocabularies cross this way as index-aligned
   id/pattern pairs (canon-kit/SPEC.md §lib/spec.sh), so a compiled member receives
   the consumer command's *output* and spawns no interpreter of its own. Their
@@ -5829,6 +5835,31 @@ Resolution, per declared knob:
   library's globals cannot leak into the dispatcher or across members. The value
   is read after every library has been sourced, so a kit whose knob is resolved
   by one library and consumed by another is carried correctly.
+- **Resolution is batched by owning kit: one subshell per kit per call, not one
+  per declared knob.** The declared set is partitioned by
+  `_gate_knob_owning_kit`, each kit's slice is resolved inside a single subshell
+  that sources that kit's `lib/*.sh` once, and the elements are re-emitted in the
+  **requested** order, so the argv a caller receives — and therefore the tracked
+  hook it is baked into — is unchanged by the batching.
+
+  **The batch rests on a property, not on an assumption, and the property is
+  stated here because a reader would otherwise have to re-derive it.** A knob's
+  resolved value is a function of the knob name and the tree's config **alone**:
+  no resolver reads the requesting member, whose name reaches the resolution only
+  as text in the does-not-define refusal's message. That is what makes a per-run
+  resolution value-identical to a per-member one, and it is what a later arm
+  wanting a member-sensitive knob would have to break first.
+
+  **A refusal anywhere in a slice fails the whole call**, exactly as a per-knob
+  refusal did: the bridge is fail-closed, and a partially resolved environment is
+  the fail-open dressed as a default that the does-not-define refusal exists
+  against.
+
+  What the batch buys is the bridge's whole cost, which was one subshell per
+  *(member × declared knob)*, each sourcing the owning kit's entire library.
+  `--emit`-ing the generated hook resolves the argv for every `tier=precommit`
+  member, so it is the loudest reader of that cost and the one the change is
+  measured on (§gen-pre-commit).
 - The resolved array is serialized **tab-joined**. Whitespace is preserved
   inside an element, which is exactly why the whitespace-separated scalar shape
   cannot serve — `CANON_KIT_TEMPORAL_EXEMPT_SECTIONS` contains `Out of scope`. A

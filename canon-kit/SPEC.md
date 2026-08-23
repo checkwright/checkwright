@@ -602,7 +602,13 @@ same shapes:
   element, so a `<name>`⇥`<member>` line cannot cross as a single string. The
   resolution is gated on `GATE_SDK_RESOLVING_KNOB` (gate-sdk/SPEC.md
   §lib/gate.sh), because it costs a subprocess and this library is sourced once
-  per declared knob per gate. Four vocabularies ride that shape, one pair each:
+  per owning kit per bridge call. That knob is a **set** of the names under
+  resolution, so each gated block tests **membership** through
+  `_spec_resolving` rather than equality: under the per-kit batch one subshell
+  carries a whole slice, and an equality test would match no batch of more than
+  one name — every one of these blocks would silently stop computing and every
+  vocabulary would cross the bridge empty.
+  Four vocabularies ride that shape, one pair each:
   the enum sets, `CANON_KIT_INSTALL_TRANSPORT_IDS` / `..._PATTERNS`,
   `CANON_KIT_PAYLOAD_CLAIM_IDS` / `..._PATTERNS`, and
   `CANON_KIT_CLAIM_CLASS_IDS` / `..._PATTERNS` (§Layout and configuration). The
