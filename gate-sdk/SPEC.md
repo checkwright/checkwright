@@ -6830,21 +6830,31 @@ dir: a gate resolving its `<KIT>_CONFIG_FILE` under the cwd finds only the case'
 own files (and a fixture may ship its own cwd-relative config deliberately).
 
 That `cd` buys the **read** side and costs the **write** side, so the runner pays
-the write side back: `GATE_SDK_TMP_DIR` is absolutized at the invoker's root
-before the first case runs, for the mirror of the reason the dispatch executable
-is. A member's runtime scratch — `check-crate-arms`'s source-stamp cache is the
-live instance — resolves that knob's deliberately repo-relative default against
-whatever cwd it has, and under the `cd` that cwd is a **tracked** fixture corpus:
-the gate deposits state inside the very directory it is the oracle for, where it
-is `.gitignore`d, survives the run, and rides `cp -R` into anything that vendors
-the kit tree verbatim. The fix belongs here and not in the member, because the
-member's cwd-relative spelling is what §Layout and configuration ratifies for
-every inline reader; what is anomalous is a cwd pointed at tracked content, and
-the runner is the only thing that points it there. Pinning the knob per fixture
-instead would be one hand-remembered copy per scratch-writing gate, audited by
-nothing. The pin is one-directional: an already-absolute value passes through and
-a case config naming its own scratch still wins, config being sourced ahead of
-the environment (§lib/gate.sh).
+the write side back: `GATE_SDK_TMP_DIR` is absolutized at the invoker's root and
+handed to the **case invocation**, for the mirror of the reason the dispatch
+executable is. A member's runtime scratch — `check-crate-arms`'s source-stamp
+cache is the live instance — resolves that knob's deliberately repo-relative
+default against whatever cwd it has, and under the `cd` that cwd is a **tracked**
+fixture corpus: the gate deposits state inside the very directory it is the
+oracle for, where it is `.gitignore`d, survives the run, and rides `cp -R` into
+anything that vendors the kit tree verbatim. The fix belongs here and not in the
+member, because the member's cwd-relative spelling is what §Layout and
+configuration ratifies for every inline reader; what is anomalous is a cwd
+pointed at tracked content, and the case invocation is the only place this
+runner points one there. Pinning the knob per fixture instead would be one
+hand-remembered copy per scratch-writing gate, audited by nothing.
+
+The pin's **scope is the pair loop, never the runner's own process**, and that
+boundary is load-bearing rather than tidy. A bespoke `*.test.sh` runs at the
+invoker's cwd (above) and builds its own sandbox trees off exactly this knob's
+relative default; a process-wide export replaces every one of those sandboxes
+with the invoker's live scratch, which is how
+`evidence-kit/gate-tests/producer-lock.test.sh` — whose scratch trees each own a
+`.tmp/run-validate.lock` — comes to contend with a real `run-validate` producer
+running in the same tree. Trading a write into the corpus for a write into live
+state is not a fix. Within the pair loop the pin stays one-directional: an
+already-absolute value passes through, and a case config naming its own scratch
+still wins, config being sourced ahead of the environment (§lib/gate.sh).
 `<tests-dir>/*.test.sh` unit tests run after the pairs; each must exit 0 — and
 each runs with the **invoker's** cwd (repo root in this repo's battery), so
 absent a pin a gate it drives silently inherits this repo's consumer config. The

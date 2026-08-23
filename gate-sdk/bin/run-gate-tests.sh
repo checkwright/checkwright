@@ -28,13 +28,11 @@ if [[ "$_rgt_bin" != /* && -e "$_rgt_bin" ]]; then
 fi
 unset _rgt_bin
 
-# spec: gate-sdk/SPEC.md §run-gate-tests — the scratch dir is absolutized here for the mirror of
-# that reason: the case dir a member's cwd lands in is *tracked*, so the repo-relative
+# spec: gate-sdk/SPEC.md §run-gate-tests — the scratch dir absolutized for the mirror of that
+# reason: the case dir a member's cwd lands in is *tracked*, so the repo-relative
 # GATE_SDK_TMP_DIR default would deposit runtime state in the corpus the member is the oracle for
-if [[ "$GATE_SDK_TMP_DIR" != /* ]]; then
-    GATE_SDK_TMP_DIR="$PWD/$GATE_SDK_TMP_DIR"
-fi
-export GATE_SDK_TMP_DIR
+CASE_TMP_DIR="$GATE_SDK_TMP_DIR"
+[[ "$CASE_TMP_DIR" == /* ]] || CASE_TMP_DIR="$PWD/$CASE_TMP_DIR"
 
 [[ -d "$TESTS_DIR" ]] || { echo "run-gate-tests: no fixture tree at $TESTS_DIR" >&2; exit 2; }
 
@@ -80,7 +78,10 @@ run_case() {
     fi
 
     local out rc
-    out="$( cd "$casedir" && "${argv[@]}" "${args[@]+"${args[@]}"}" 2>&1 )"
+    # spec: gate-sdk/SPEC.md §run-gate-tests — the scratch pin rides the case invocation alone,
+    # because the `cd` that makes the default dangerous is this line's; a bespoke *.test.sh below
+    # runs at the invoker's cwd, sandboxes its own trees, and needs the default to stay relative
+    out="$( cd "$casedir" && GATE_SDK_TMP_DIR="$CASE_TMP_DIR" "${argv[@]}" "${args[@]+"${args[@]}"}" 2>&1 )"
     rc=$?
 
     if [[ "$rc" -eq 2 ]]; then
