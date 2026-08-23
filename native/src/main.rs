@@ -116,6 +116,49 @@ fn declaration_parity(args: &[String]) -> i32 {
     }
 }
 
+// spec: evidence-kit/SPEC.md §lib/evidence.sh — the arm reports *classification* and never an
+// internal representation, `--queue-parity`'s own rule: the two holders share no data shape, so a
+// comparison of derived literals would fail on a difference that is not a disagreement
+fn evidence_lib_parity(args: &[String]) -> i32 {
+    let usage = "  usage: checkwright-gates --evidence-lib-parity lock <file>... | --evidence-lib-parity pid <pid>...";
+    match args.first().map(String::as_str) {
+        Some("lock") => {
+            for f in &args[1..] {
+                match evidence::lock_read(std::path::Path::new(f)) {
+                    evidence::LockRead::Absent => println!("lock\t{}\tabsent", f),
+                    evidence::LockRead::Corrupt => println!("lock\t{}\tcorrupt", f),
+                    evidence::LockRead::Held { pid, run_key } => {
+                        println!("lock\t{}\theld\t{}\t{}", f, pid, run_key)
+                    }
+                }
+            }
+            0
+        }
+        Some("pid") => {
+            for p in &args[1..] {
+                match evidence::pid_alive(p) {
+                    Ok(true) => println!("pid\t{}\talive", p),
+                    Ok(false) => println!("pid\t{}\tdead", p),
+                    Err(evidence::PidProbe::PsAbsent) => {
+                        eprintln!("checkwright-gates: ps not found on PATH — the pid probe could not answer; treating as failure (not clean)");
+                        return 2;
+                    }
+                    Err(evidence::PidProbe::Spawn(e)) => {
+                        eprintln!("checkwright-gates: {}", e);
+                        return 2;
+                    }
+                }
+            }
+            0
+        }
+        _ => {
+            eprintln!("checkwright-gates: --evidence-lib-parity needs a mode — the classification could not be reported; treating as failure (not clean)");
+            eprintln!("{}", usage);
+            2
+        }
+    }
+}
+
 fn main() {
     let argv: Vec<String> = std::env::args().skip(1).collect();
 
@@ -123,7 +166,7 @@ fn main() {
         Some(a) => a.as_str(),
         None => {
             eprintln!("checkwright-gates: no subcommand given");
-            eprintln!("  usage: checkwright-gates --list | --reads <gate-name> | --needs <gate-name> | --knobs <gate-name> | --source-stamp | --queue-parity <queue-file> | --declaration-parity section <file> <section> | --declaration-parity record <file> | --run [--gates-dir <dir>] [--only <name>... | --for <path>...] | --emit-<arm> | <gate-name> [args...]");
+            eprintln!("  usage: checkwright-gates --list | --reads <gate-name> | --needs <gate-name> | --knobs <gate-name> | --source-stamp | --queue-parity <queue-file> | --declaration-parity section <file> <section> | --declaration-parity record <file> | --evidence-lib-parity lock <file>... | --evidence-lib-parity pid <pid>... | --run [--gates-dir <dir>] [--only <name>... | --for <path>...] | --emit-<arm> | <gate-name> [args...]");
             eprintln!("  bridged arms: {}", emit::arms().join(", "));
             exit(2);
         }
@@ -189,6 +232,13 @@ fn main() {
     // dispatches to, and no gate dispatches here.
     if first == "--declaration-parity" {
         exit(declaration_parity(&argv[1..]));
+    }
+
+    // spec: evidence-kit/SPEC.md §lib/evidence.sh — the standing oracle criterion 6's *unless*
+    // clause owes: this module's classification of one canned corpus, for the harness holding it
+    // against `ek_lock_read` and `ek_pid_alive`. A top-level flag, like the arms around it.
+    if first == "--evidence-lib-parity" {
+        exit(evidence_lib_parity(&argv[1..]));
     }
 
     // spec: gate-sdk/SPEC.md §check-reads-couples — one line per walk root and nothing else: a

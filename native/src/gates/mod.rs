@@ -63,6 +63,7 @@ pub mod measured_claim;
 pub mod memory_off;
 pub mod merge_attrs;
 pub mod payload_claim;
+pub mod producer_liveness;
 pub mod prose_enum;
 pub mod prose_tells;
 pub mod queue_entry_budget;
@@ -93,6 +94,7 @@ pub mod spec_pointer;
 pub mod stage_entry;
 pub mod stage_evidence;
 pub mod stage_skill_coverage;
+pub mod surface_duplication;
 pub mod survey_record;
 pub mod tag_lead_line;
 pub mod task_conservation;
@@ -1656,6 +1658,35 @@ pub const REGISTRY: &[GateEntry] = &[
         ],
         "gate-sdk",
         &[("git", "")],
+    ),
+    // spec: canon-kit/SPEC.md §check-surface-duplication — one `?` for the positional scan root the
+    // canonical-spec walk starts from; the requirement set is empty because no program the shell
+    // form spawned survives the port at all, which that section states and measures.
+    (
+        "check-surface-duplication",
+        surface_duplication::run,
+        &[("?", "")],
+        &[
+            "CANON_KIT_GLOSSARY_FILE",
+            "CANON_KIT_DUP_SURFACES",
+            "CANON_KIT_SPEC_NAME",
+            "CANON_KIT_SCAN_KIT_ROOTS",
+            "GATE_KIT_ROOTS_HERE",
+            "GATE_PRUNE_DIRS",
+        ],
+        "canon-kit",
+        &[],
+    ),
+    // spec: evidence-kit/SPEC.md §check-producer-liveness — no walk root: both modes read named
+    // files, set mode's `*.run` glob resolving a corpus rather than reading one. `bash` carries the
+    // `kill -0` builtin and is on the floor; `ps` is the fallback leg's, and the one the report counts.
+    (
+        "check-producer-liveness",
+        producer_liveness::run,
+        &[],
+        &["EVIDENCE_KIT_LOCK_FILE"],
+        "evidence-kit",
+        &[("bash", ""), ("ps", "")],
     ),
 ];
 

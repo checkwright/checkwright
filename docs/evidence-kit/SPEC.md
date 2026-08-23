@@ -128,6 +128,22 @@ fall-through, and `ek_diff`'s absent-from-baseline triple. The triple's `ignore`
 edge carries a test of its own — the narrow side is the half a later session
 widens by accident, so it is pinned by an assertion rather than by prose alone.
 
+**Two of these adapters are held twice and gated as such.** `ek_pid_alive` and
+`ek_lock_read` have compiled twins in `native/src/evidence.rs` since
+§check-producer-liveness ported, and `bin/run-validate.sh` keeps calling both —
+so the caller set does not empty and criterion 6's *unless* clause admits the
+duplication rather than the deletion disposition (gate-sdk/SPEC.md §The
+port-candidate criteria). What holds them equal is
+`gate-tests/evidence-lib-parity.test.sh`, which drives one canned corpus through
+each holder and compares *classification*, never a derived literal: the shell
+side answers in exit codes and one stdout line, the crate in an enum, and a
+comparison of representations would fail on a difference that is not a
+disagreement. The binary's side is reached through the non-gate
+`--evidence-lib-parity` arm, a top-level flag outside `--list`'s roster for the
+reason the arms beside it are. No committed expected file — a maintained golden
+would be a third copy to drift, and the failure this exists to catch is one side
+edited without the other.
+
 ### Baseline manifest
 
 Held-constant, edited by human commit only. It is a tracked checked projection
@@ -554,7 +570,8 @@ the grammar, the stamp coupling — and liveness is a different class. A separat
 gate also earns its own fixture pair instead of widening an existing gate's
 charter.
 
-Argument mode `check-producer-liveness.sh [lock-file]` makes it fixture-capable
+Argument mode `check-producer-liveness [lock-file]` — named as a gate, since the
+declaring substrate is not part of the grammar — makes it fixture-capable
 and is how the entry hook points it at the lock (§lifecycle-kit integration);
 extra arguments are ignored, so the hook's trailing `<queue> <state>` argv passes
 through harmlessly.
@@ -622,6 +639,72 @@ cannot be expressed as a pair at all; three of the four also need a
 multi-record directory, and the red case needs a live PID the pair could only
 reach as init. The unit test carries all four plus the suffix bound.
 
+**`.gate`-dispatched since `shell-gate-tail-port`**, declared at
+`evidence-kit/checks/check-producer-liveness.gate` with its rule in
+`native/src/gates/producer_liveness.rs` and the two library readers it shares
+with `bin/run-validate.sh` in `native/src/evidence.rs`. Like
+§check-surface-duplication it ports on the directive's scope rather than the
+oracle's — `port-blockers.sh` walks `gates.list` and this member is in none — so
+the port moves no number, and the fixture pair plus this kit's smoke is what
+stands in for the dispatch proof criteria 1 and 3 would have bought.
+
+**Its wiring needed no change, and that was verified rather than assumed.** The
+gate is dispatched from `LIFECYCLE_KIT_ENTRY_PREFLIGHT` at six stage keys, and
+this repo names it through the gate-resolving front end rather than by a literal
+`.sh` path — the form §lifecycle-kit integration says would have broken at the
+port. That clause stops being a warning and becomes a discharged one.
+
+**It is the tail's fifth wrapper, and the requirement lives in the library rather
+than in the gate's own text.** `ek_pid_alive` tries the `kill -0` builtin and
+falls back to `ps -p`, and `ps` is not on `GATE_SDK_PROGRAM_FLOOR`. Neither the
+gate's declaration text nor a registry walk could have reported that, which is
+why the compiled form declares it explicitly: `ps` for the fallback leg, and
+`bash` — on the floor, so uncounted — because the builtin has no `std` spelling
+and this crate carries no `libc`, so the compiled form reaches the *same* builtin
+through `bash -c` rather than minting a second off-floor dependency on
+`/bin/kill`. `ek_lock_read` spawns nothing.
+
+**The absent-`ps` refusal is a deliberate divergence from the shell form, not
+parity with it, and asserting that is the point.** `ek_pid_alive` discards
+`ps`'s 127 into its boolean and reports *not alive*, so the shell form prints a
+clean line — the *clean because the program was missing* vacuity
+gate-sdk/SPEC.md §Fail-closed contract exists to close. The port refuses at exit
+2 instead, on the fallback leg only, because a `kill -0` that answers never
+reaches the program. **Its cost is real and bounded**: on a machine with no `ps`
+a lock naming a *dead* PID now refuses where it printed clean, because `kill -0`
+fails with `ESRCH` and the disambiguator is gone. That is honest — without `ps`
+neither substrate can tell `ESRCH` from `EPERM` — and `ps` is POSIX-mandated and
+present on busybox, macOS and every Linux. The divergence was **measured, not
+argued**: with `ps` scrubbed off `PATH` the shell form reads the pair's own
+`bad/` case, PID 1, as *dead* and exits 0, which is the fixture pair's own
+inversion arriving through the missing program instead of through `kill -0`.
+
+**Criterion 4 binds and the live-tree arm was not demoted.** The pre-port rule
+was restored at `evidence-kit/checks/zz-parity-probe.sh` — inside the resolve
+dir, outside the `check-*` glob — and both forms were driven from the same cwd
+with the same argv. Twenty-five comparisons: **twenty-two byte-identical**
+including exit codes, over both fixture cases, the absent/corrupt/live/dead/
+no-trailing-newline/empty/zero-pid single-path arms, the extra-argument
+passthrough, the knob default, set mode's empty, all-dead, one-live, corrupt and
+stray-file arms, and this tree's own `.tmp`; and **three differing, all of them
+the divergence above** — the two dead-PID arms and the all-dead set arm under a
+scrubbed `PATH`. The arm carries no bound: this member's corpus is lock records,
+so the restored `.sh` probe sits outside the corpus it probes.
+
+**Criterion 6's *unless* clause binds on two helpers, not one.** The port creates
+a dual implementation of `ek_pid_alive` **and** of `ek_lock_read`, both with live
+shell consumers after it: `bin/run-validate.sh` calls the reader twice and the
+predicate once. The caller set does not empty, so the deletion disposition is
+unavailable and what discharges the criterion is a **standing cross-substrate
+comparison** in this kit's fixture lane —
+`gate-tests/evidence-lib-parity.test.sh`, one canned corpus of lock records and
+PID strings fed to both holders, classifications compared byte for byte, with the
+corpus's own branch coverage asserted so an agreement over nothing cannot pass
+for a hold. A parity proof taken once at port time satisfies criterion 2 and
+never this one; it expires at the next edit to either side. The lane's
+discriminating case is **PID 1**, which `kill -0` alone reads as dead: if that
+row ever reads `dead`, the `ps` fallback has been dropped on one side.
+
 ## lifecycle-kit integration
 
 Integration is two generic knobs on lifecycle-kit's side of the seam, each
@@ -660,8 +743,9 @@ commit to entry.
 `check-producer-liveness` is wired at **every** stage key in set mode, each
 entry pointed at the consumer's scratch **directory**
 (`<stage>=<front end> check-producer-liveness <scratch-dir>`, the same
-name-resolving form — this member is still shell, so a literal path would work
-today and would break at its port). `close=` is the case the
+name-resolving form — which is what let the member port with no change here at
+all: a literal path would have worked right up to the port and broken at it).
+`close=` is the case the
 gate was filed for — a lead dispatching close into a still-running producer —
 and `validate=` was the second, a second validate batch entering while a first
 batch's `run-validate` is live. **Both were chosen when the subject was one

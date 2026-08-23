@@ -581,17 +581,24 @@ same shapes:
   **Which primitive is on which substrate.** `spec_manifest_files` has a Rust
   implementation (`native/src/spec.rs`) carrying all three branches — explicit
   globs, the default walk, and the prose-surface fold — plus the kit-root path
-  prune, because its family is partly compiled; the shell form stays, since
-  members outside that family still call it. That module carries the claim-gate
+  prune, because its family is partly compiled; the shell form stays, on a ground
+  that has moved. That module carries the claim-gate
   primitives too: the declaration grammar, the declaration roster, the
   governed-doc set behind its two exclude valves, and the bridged vocabulary
   loader. The shell kept a copy of the last two per member; the compiled form has
   one, ported once and proved by each member that calls it. `comment_surface` and
   `queue_slugs` are **compiled only**, and so are all four of their callers
-  (gate-sdk/SPEC.md §The first cohort, and the rule that selects the next): where
-  the manifest finder is dual because members outside its family still call it,
-  these two emptied their caller sets in one cohort and their shell forms were
-  removed in the same commit.
+  (gate-sdk/SPEC.md §The first cohort, and the rule that selects the next): they
+  emptied their caller sets in one cohort and their shell forms were removed in
+  the same commit. **The manifest finder's caller set is empty too, and its shell
+  form stays** — `check-surface-duplication` was the last member outside the
+  family to call it and ported with `shell-gate-tail-port`, so what keeps the
+  shell form is the *dead twin* disposition's **undocumented-surface** bound
+  rather than a live caller: these are helpers this section names, and that
+  disposition reaches only helpers no section does
+  (gate-sdk/SPEC.md §The port-candidate criteria, criterion 6).
+  Read the two together and the rule is legible: an emptied caller set removes an
+  **unnamed** helper and leaves a documented one standing.
   The two implementations of the manifest finder are held together by the config
   bridge rather than by a copied default: every knob either reads crosses it as
   a resolved value, so there is exactly one place each is computed
@@ -1566,6 +1573,55 @@ canonical spec) is never flagged — a component's definition lives in its
 own spec, so there is nothing to restate; gate-test fixtures are excluded;
 exits 2 when the glossary file is absent (register the gate only where the
 topology exists). `align-only` tier.
+
+**`.gate`-dispatched since `shell-gate-tail-port`**, declared at
+`canon-kit/checks/check-surface-duplication.gate` with its rule in
+`native/src/gates/surface_duplication.rs`. It is one of the two members that
+port on the directive's scope rather than the oracle's: this tree registers it
+in no `gates.list`, so `port-blockers.sh` never counted it and the port moves no
+number (gate-sdk/SPEC.md §The port-candidate criteria, criterion 7). Criteria 1
+and 3 therefore both fail on their own terms rather than by a proxy, and what
+replaces the dispatch proof they would have bought is **the fixture pair plus
+canon-kit's own smoke** — named as the only oracle available, not offered as an
+equivalent one.
+
+**It is not a wrapper, and that is a measured verdict rather than a reading of
+its text.** The shell form spawned `awk` twice, `sort`, `grep`, `basename`,
+`dirname` and — through `spec_canonical_specs` — `find` and `cat`, every one of
+them on `GATE_SDK_PROGRAM_FLOOR`. None survives the port: the two awk programs
+are in-process scans and the canonical-spec walk is `spec::canonical_specs`,
+already compiled for the `spec_manifest_files` cohort. The compiled form spawns
+**nothing**, so its declared requirement set is empty rather than floor-filtered
+to empty.
+
+**Two awk semantics are reproduced rather than tidied, and both are narrower
+than a reader expects.** The comment stripper is `<!--[^>]*-->`, so a comment
+carrying a `>` is *not* a comment to this rule and the lead-in behind it is not
+seen — widening it to a shortest-span match would silence a valve tag the shell
+form still reads. The valve reads the **last** keyword occurrence on its line and
+stops at the first `-->` with the whitespace behind it, so a line naming the tag
+twice tags the term it ends with. Both are pure functions of a page's bytes and
+both are held by crate unit tests, which is where the negative half of every arm
+lives: a fixture pair asserts a finding's presence and never its absence.
+
+**Criterion 4 binds and the live-tree arm was not demoted.** The pre-port rule
+was restored at `canon-kit/checks/zz-parity-probe.sh` — inside the resolve dir,
+outside the `check-*` glob, so no member resolves to it — and both forms were
+driven from the same cwd with the same argv over the post-descriptor corpus.
+Eight comparisons, all byte-identical including exit codes: this tree's own root
+(where the member refuses, because no glossary exists here), both fixture cases,
+a constructed corpus exercising the table's alternates, its parenthesised and
+backticked cells, both valve arms, the wrong-tag arm, the component exemption,
+the block-opening rule and both comment shapes, plus the absent-root, the
+absent-glossary and the no-configured-surface refusals. **The arm carries no
+bound**: this member's corpus is markdown, so the restored `.sh` probe sits
+outside the corpus it probes.
+
+**One narrowing is asserted rather than normalised away.** The shell form drove
+every surface through `awk` and refused on its non-zero exit; the compiled form
+has no child, so an unreadable surface refuses on the read that replaced it —
+same exit 2, its own text, and no reproduction of gawk's own diagnostic, which
+was never reproducible on either substrate.
 
 ### check-comment-tier
 

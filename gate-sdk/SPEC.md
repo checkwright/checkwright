@@ -538,6 +538,33 @@ would have reported rather than routing absence to a second message. Both shapes
 obey the one rule the class does have: the refusal fires where the shell form
 fired it, and says what the shell form said.
 
+**The fifth wrapper found the third shape: a shell form that fired no refusal at
+all, and porting it means diverging deliberately rather than reproducing it.**
+`check-producer-liveness` reaches `ps` through `ek_pid_alive`, which discards the
+program's 127 into a boolean and reports *not alive* — so with `ps` gone the shell
+form prints a clean line, which is precisely the *clean because the program was
+missing* vacuity this section exists to close. There is no shell refusal to match,
+so the class rule *fire where the shell form fired it* has nothing to say and the
+**exit-2 rule decides instead**: the port refuses, on the fallback leg only,
+because a `kill -0` that answers never reaches the program. A member reading this
+should take the ordering rule as **the constraint when a shell refusal exists**,
+not as a licence to inherit a false green where one does not. The divergence is
+asserted at the member (evidence-kit/SPEC.md §check-producer-liveness) with its
+cost stated, never normalised away, and the parity run reports it as a differing
+arm rather than hiding it.
+
+**A wrapper's program can be a shell builtin, and the route to it is `bash` on the
+floor rather than a second off-floor dependency.** `ek_pid_alive`'s first leg is
+bash's own `kill -0`, which `std` has no spelling for and this crate carries no
+`libc` to reach. Three routes exist and only one keeps the requirement set honest:
+dropping the leg and probing with `ps` alone makes the program required on every
+call rather than on the fallback; spawning `/bin/kill` mints a second off-floor
+requirement and moves the refusal to the first leg; `proc::run("bash", &["-c",
+…])` reaches the *same builtin the shell form used*, and `bash` is on
+`GATE_SDK_PROGRAM_FLOOR`, so the report still counts one program. The declared set
+carries both, because unit test A is *observed ⊆ declared* and floor membership is
+what the report filters on, not what the registry records.
+
 **Neither half has a fixture representation, so each wrapper's parity run carries
 a constructed scenario**: both implementations over the same cases with the
 program present, and again with PATH scrubbed of it, comparing bytes and exit
@@ -2143,6 +2170,23 @@ design time; the last three were paid for, and each is named with what it cost.
    `lib/queue.sh` above, the pair says the road is available to a duplication a
    port *creates*, not only to one it finds.
 
+   **`ek_pid_alive` and `ek_lock_read` are the third instance, and they carry the
+   correction a reader most needs: the *unless* clause binds on a helper **set**,
+   not on the one helper an amendment happened to name.** Porting
+   `check-producer-liveness` was scoped against the pid predicate alone, because
+   that is the helper whose surviving shell caller is visible at a glance
+   (`bin/run-validate.sh` asks it whether a lock's holder is alive). Reading the
+   caller set rather than the amendment found the *reader* dual too — the same
+   script calls `ek_lock_read` twice — so the discharge covers both. The lane is
+   `evidence-kit/gate-tests/evidence-lib-parity.test.sh` and it takes the same
+   shape as the two above: one canned corpus, classification compared byte for
+   byte, no committed golden. What it adds to the pair is **a coverage assertion
+   on its own corpus** — each branch the comparison is bought for is grepped out
+   of the shell side, so an agreement over a corpus that classifies nothing cannot
+   pass for a hold. The lesson to carry forward is procedural: before taking this
+   road, enumerate the shell callers of every helper the ported member touches,
+   because the disposition turns on whether *that* set empties.
+
    **A dead twin is deleted, not held**, and the same enforcement-first ordering
    decides it: where a shell helper has no caller and its compiled counterpart is
    live and tested, a standing parity obligation gates a duplication that removal
@@ -2399,6 +2443,26 @@ design time; the last three were paid for, and each is named with what it cost.
    predicate is stated in, both measured rather than asserted. The honest bound
    two paragraphs up is unchanged by that zero and is the reason it is not a
    completion claim on its own.
+
+   **The fifth wrapper is the one the report could never have found, and it lands
+   after the count reaches zero.** `check-producer-liveness` is one of the two
+   unregistered kit-shipped members, so `port-blockers.sh` — whose walk is
+   `gates.list` — never counted it and no number moves when it ports. It is a
+   wrapper anyway: `ek_pid_alive` falls back to `ps -p`, off the floor and reached
+   through a **shared library** rather than through the member's own declaration
+   text, which is the sharper of the two reasons the oracle is blind to it because
+   it is true of registered members too. Two facts it settles beyond itself, both
+   §Fail-closed contract's to state for the class. First, the ordering register
+   gains an entry that is not an ordering at all: the shell form fires **no**
+   refusal, so *fire where the shell form fired it* is the constraint when a shell
+   refusal exists and never a licence to inherit a false green where one does not.
+   Second, a wrapper's program can be a **shell builtin**, and the honest route to
+   it is `bash -c` — on the program floor — rather than a second off-floor
+   dependency on `/bin/kill` or a narrowing to the fallback program alone. Its
+   sibling `check-surface-duplication` is the counter-case in the same batch and
+   worth stating beside it: measured the same way, every program its shell form
+   spawned was on the floor and **none survives the port**, so it is not a wrapper
+   and its declared requirement set is empty rather than filtered to empty.
 
 **New gates are born native by default; shell is the exception and it needs a
 stated cause** — operator-ruled 2026-08-14 and re-affirmed the same day on
@@ -4239,12 +4303,20 @@ pruned — every piece of which `native/src/spec.rs` already carried inside
 `manifest_files`' default branch since the canon-kit cohort. The port **lifts it
 out** rather than writing a second copy beside it, so the manifest set and the
 canonical-spec set cannot disagree about which specs exist. The shell form stays,
-because `check-surface-duplication` still calls it: this is the *unless* clause's
-live-consumer disposition, the same one queue-kit's `lib/queue.sh` takes, and not
-the emptied-primitive disposition the seventh cohort earned. **The caller set was
-two when this was written and is one since §The sixth budget batch**, which ported
-the other; the disposition is unchanged because it turns on whether the set is
-empty, and one live caller is not empty.
+and **the reason it stays has moved twice while the verdict has not**. It was
+originally the *unless* clause's live-consumer disposition, the same one
+queue-kit's `lib/queue.sh` takes: the caller set was two when this was written,
+one after §The sixth budget batch ported one of them, and **zero since
+`shell-gate-tail-port` ported `check-surface-duplication`** — `spec_manifest_files`
+now has no caller outside `canon-kit/lib/spec.sh` itself, and neither does
+`spec_canonical_specs` beyond that library's own default branch. An empty caller
+set is the *dead twin* case, whose disposition is deletion rather than a standing
+parity obligation — but that disposition carries an explicit bound, **undocumented
+surface**, and these two are documented helpers named by canon-kit/SPEC.md
+§lib/spec.sh as the manifest set the narration gate family shares. So the ground
+is the bound rather than a live caller, which is the distinction a later reader
+must not collapse: a documented shell helper survives its last caller, and the
+deletion disposition reaches only the helpers no section names.
 
 **The edge-root arm disagreed, and the compiled side read the rule correctly.**
 Parity ran over both fixture pairs, the live tree at four scan-root spellings and
@@ -8250,6 +8322,36 @@ branching on a captured value's emptiness when the subprocess died — is
 unrepresentable once a fallible call returns a `Result` that cannot be ignored
 (§Meta-gate conservation for the binary substrate). A real substrate win, not a
 gap.
+
+**The empty corpus is two different states, and this member tells them apart
+rather than collapsing them.** The paragraph above blessed the corpus *shrinking*
+as each member ported; what it did not anticipate is the corpus reaching **zero**,
+which `shell-gate-tail-port` did. At zero the old refusal fired precisely because
+the port had **succeeded** — a heuristic mistaking its objective being met for its
+own failure, which is the class TRAJECTORY.md's port ruling calls engineering work
+the port owes rather than an eligibility gate to be honoured. So an empty shell
+corpus beside a **non-empty descriptor set** is *green with a counted zero*, the
+verdict §check-gate-substrate-parity assertion G already takes for the same shape.
+The invariant is vacuously true there: with no `check-*.sh` there is no `awk`/`jq`
+capture that could go unchecked.
+
+**The misconfiguration signal survives, because it is still meaningful in the
+other state.** No declaration of **either** spelling under the resolved dirs is
+not a finished port — it is a tree that resolved no gates directory at all — and
+that stays exit 2 with a message naming both spellings. The discriminator is the
+`check-*.gate` count over **the same resolved dirs** the shell glob reads, which
+is what makes it faithful rather than merely convenient: before any member ported,
+those dirs held `.sh` gates, so the old refusal fired only when the dir set itself
+resolved to nothing. It still fires exactly there and nowhere else. No knob, no
+second corpus, no new dependency. The counted zero also names the descriptor
+count, so a reader can tell *the port finished* from *nothing was scanned* without
+running anything else — a bare zero would have made the two indistinguishable in
+the log, which is what "counted" is doing the work of here.
+
+Neither empty state has a fixture representation — a committed case cannot be a
+tree whose gates directory resolves to nothing — so both are held by a crate unit
+test that drives the member over two constructed dirs, one carrying a descriptor
+and one carrying neither spelling.
 
 ### check-gate-fixture-coverage
 

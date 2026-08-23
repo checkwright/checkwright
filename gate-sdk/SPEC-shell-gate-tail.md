@@ -585,6 +585,71 @@ through the front end `scripts/gate-exec.sh` rather than by a literal
 break at its port". The port therefore changes nothing at the entry hook, and the
 kit SPEC's parenthetical stops being a warning and becomes a discharged one.
 
+**Corrected at build, 2026-08-24 — the shell form fires no refusal on an absent
+`ps`, so the port's refusal is a deliberate divergence and not parity.** Read off
+`ek_pid_alive`'s text: `ps -p "$pid" >/dev/null 2>&1` is the function's *return
+value*, so an absent program exits 127, the function returns 1, and the caller
+reads **"not alive"** and prints a clean line. "Matching the shell" is true of the
+*path restriction* — only the fallback leg reaches the program — and false of the
+refusal, which the shell has none of. The conclusion survives on the ground delta
+2 states beside it rather than on parity: *cannot verify* and *verified clean* must
+not share an exit code, and a member printing clean because the program was
+missing is the vacuity the whole contract exists to close. Measured rather than
+argued — with `ps` scrubbed off `PATH` the shell form reads the fixture pair's own
+`bad/` case, PID 1, as **dead** and exits 0. Two things a later reader is owed and
+this paragraph carries: the port's cost (on a `ps`-less machine a lock naming a
+dead PID now refuses where it printed clean, because `kill -0` fails with `ESRCH`
+and the disambiguator is gone), and the fact that this is the first member of the
+class where *fire where the shell form fired it* has no shell refusal to fire
+against. Recorded at evidence-kit/SPEC.md §check-producer-liveness and, for the
+class, at gate-sdk/SPEC.md §Fail-closed contract.
+
+**Corrected at build, 2026-08-24 — criterion 6's *unless* clause binds on two
+helpers, not one.** This delta names `ek_pid_alive` as the dual implementation the
+port creates. Enumerating the caller set rather than inheriting the name finds
+`ek_lock_read` dual on identical grounds: `evidence-kit/bin/run-validate.sh` calls
+it at `:32` and `:48`, beside the `:52` predicate call this delta already cites.
+The standing comparison therefore covers **both** readers. The lesson is
+procedural and generalises past this member: before taking the machine-held road,
+enumerate the shell callers of every helper the ported member touches, because the
+disposition turns on whether *that* set empties.
+
+**Corrected at build, 2026-08-24 — the compiled form declares two programs, not
+one.** This delta says the port "declares `ps` in `--needs`". It declares `ps`
+**and `bash`**, because the first leg is bash's `kill -0` *builtin*, which `std`
+has no spelling for and this crate carries no `libc` to reach. Of the three routes
+to it, only `proc::run("bash", &["-c", …])` keeps the requirement honest:
+`ps -p` alone would make the program required on every call rather than on the
+fallback, and `/bin/kill` would mint a second **off-floor** requirement. `bash` is
+on `GATE_SDK_PROGRAM_FLOOR`, so the report still counts one program — the same
+shape delta 4 recorded for `gate_authoring_tree`'s `git` and delta 7 for
+`check-crate-arms`'.
+
+**Operator-ruled at build, 2026-08-24 — this delta empties the *last* `check-*.sh`
+in the tree, and `check-gate-fail-closed` refused on the empty corpus it produced.**
+That member is `precommit` tier, so the unit could not land at all until it was
+dispositioned, and the disposition is a third gate's user-facing semantics this
+amendment settles nothing about — escalated rather than taken. **Ruled: green with
+a counted zero, with the misconfiguration refusal preserved wherever it is still
+meaningful.** The decisive ground is that the SPEC had already blessed the corpus
+*shrinking* and only ever anticipated it shrinking, so at zero the refusal fired
+because the port had succeeded — a heuristic mistaking its objective being met for
+failure. The discriminator chosen at the code, and stated at gate-sdk/SPEC.md
+§check-gate-fail-closed rather than here: no shell gate beside a **non-empty
+descriptor set** is a finished port and is green; no declaration of **either**
+spelling under the same resolved dirs is a tree that resolved no gates directory,
+and stays exit 2. Delta 10's remainder accounting inherits a member whose clean
+line now carries a descriptor count.
+
+**One thing this delta does not say and a later reader will meet: the port empties
+`spec_canonical_specs`' last live shell caller.** `check-surface-duplication.sh`
+was it, so after this commit `canon-kit/lib/spec.sh`'s spec-corpus helpers have no
+caller outside that library. gate-sdk/SPEC.md §The canonical-spec cohort rested its
+criterion-6 discharge on that caller being live; the verdict survives on the *dead
+twin* disposition's **undocumented-surface bound** instead, since both helpers are
+documented by canon-kit/SPEC.md §lib/spec.sh. Repaired there rather than left to
+delta 10, because it is staleness this delta creates and no gate catches it.
+
 ### (10) Descriptors, registration, conservation rows and the remainder accounting
 
 Eight descriptors, eight registry entries, the derived substrate-sensitive set

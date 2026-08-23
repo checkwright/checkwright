@@ -191,12 +191,30 @@ pub fn run(args: &[String]) -> i32 {
             d.trim_end_matches('/')
         )));
     }
+
+    // spec: gate-sdk/SPEC.md §check-gate-fail-closed — the empty corpus is two different states and
+    // the descriptor count over the same resolved dirs is what tells them apart; that section owns
+    // why globbing both spellings keeps the refusal's original trigger rather than approximating it.
     if gates.is_empty() {
-        eprintln!(
-            "check-gate-fail-closed: no check-*.sh gates found under: {}",
-            dirs.join(" ")
+        let ported: usize = dirs
+            .iter()
+            .map(|d| walk::glob_entries(&format!("{}/check-*.gate", d.trim_end_matches('/'))).len())
+            .sum();
+        if ported == 0 {
+            eprintln!(
+                "check-gate-fail-closed: no check-*.sh and no check-*.gate found under: {}",
+                dirs.join(" ")
+            );
+            eprintln!("  A tree carrying no gate declaration of either spelling has not finished a");
+            eprintln!("  port — it resolved no gates directory. A gate that cannot run is not clean.");
+            eprintln!("  help: check GATE_SDK_GATES_DIR and the kit roots it derives the rest from.");
+            return 2;
+        }
+        println!(
+            "GATE-FAIL-CLOSED: clean (0 shell gate(s) to scan, {} .gate-dispatched member(s) — the defect has no representation left in this corpus)",
+            ported
         );
-        return 2;
+        return 0;
     }
 
     let mut findings: Vec<String> = Vec::new();
@@ -291,6 +309,35 @@ mod tests {
             scan_file("g.sh", cleared, &mut h);
             assert!(h.is_empty(), "{} -> {:?}", cleared, h);
         }
+    }
+
+    // spec: gate-sdk/SPEC.md §check-gate-fail-closed — the empty corpus is two states, and the
+    // discriminator is exercised directly because no fixture pair can carry either: a committed
+    // case cannot be a tree whose gates directory resolves to nothing
+    #[test]
+    fn an_empty_corpus_is_a_finished_port_or_a_misconfiguration_and_never_both() {
+        let base = std::env::temp_dir().join(format!("checkwright-gfc.{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&base);
+        let ported = base.join("ported");
+        let empty = base.join("empty");
+        std::fs::create_dir_all(&ported).expect("cannot make the scratch dir");
+        std::fs::create_dir_all(&empty).expect("cannot make the scratch dir");
+        std::fs::write(ported.join("check-alpha.gate"), "# graph: couples=x\n")
+            .expect("cannot write the descriptor");
+
+        assert_eq!(
+            run(&[ported.display().to_string()]),
+            0,
+            "a dir carrying descriptors and no shell gate reds, so a finished port reads as a \
+             failure and the port's own success is what breaks the battery"
+        );
+        assert_eq!(
+            run(&[empty.display().to_string()]),
+            2,
+            "a dir carrying no declaration of either spelling passed, so the misconfiguration \
+             the refusal exists for is no longer caught anywhere"
+        );
+        let _ = std::fs::remove_dir_all(&base);
     }
 
     // spec: gate-sdk/SPEC.md §check-gate-fail-closed — the exemption marker is consumed by the

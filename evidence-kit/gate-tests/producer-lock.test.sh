@@ -4,12 +4,16 @@
 # below needs a process the test itself owns (a live PID) or a run of the
 # writer (refusal, bounded reclaim, conditional release).
 #
+# spec: evidence-kit/SPEC.md §check-producer-liveness — the reader is reached through `gate_run`
+# and named as a *gate*, never as a script path: the member is `.gate`-dispatched since
+# shell-gate-tail-port, and a path would have pinned the substrate this test is indifferent to.
+#
 # Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # evidence-kit/
-GATE="$DIR/checks/check-producer-liveness.sh"
+CHECKS="$DIR/checks"
 RV="$DIR/bin/run-validate.sh"
 
 fails=0
@@ -36,7 +40,7 @@ _rv() { ( cd "$1" && EVIDENCE_KIT_CONFIG_FILE=scripts/evidence-config.sh bash "$
 #     only reach for PID 1, so the live-PID verdict is pinned here against a
 #     process whose liveness this test controls end to end.
 printf 'pid=%s run=owned-run\n' "$live" >"$tmp/a.lock"
-out="$(bash "$GATE" "$tmp/a.lock" 2>&1)"; rc=$?
+out="$(gate_run check-producer-liveness "$CHECKS" "$tmp/a.lock" 2>&1)"; rc=$?
 if [[ "$rc" -ne 1 ]] || [[ "$out" != *"still running (pid $live)"* ]]; then
     echo "  FAIL: the reader did not red on a live PID the test owns (rc=$rc): $out"; fails=$((fails + 1))
 fi
@@ -44,7 +48,7 @@ fi
 # B — a lock that does not parse is exit 2, never a free reading. The claim
 #     publishes the record whole, so an unparseable lock is corruption.
 printf 'garbage\n' >"$tmp/b.lock"
-out="$(bash "$GATE" "$tmp/b.lock" 2>&1)"; rc=$?
+out="$(gate_run check-producer-liveness "$CHECKS" "$tmp/b.lock" 2>&1)"; rc=$?
 if [[ "$rc" -ne 2 ]]; then
     echo "  FAIL: an unparseable lock must be exit 2, got rc=$rc: $out"; fails=$((fails + 1))
 fi
@@ -55,20 +59,20 @@ fi
 #      shape for, and one needs a live PID the pair can only reach as init.
 set_dir="$tmp/set"
 mkdir -p "$set_dir"
-out="$(bash "$GATE" "$set_dir" 2>&1)"; rc=$?
+out="$(gate_run check-producer-liveness "$CHECKS" "$set_dir" 2>&1)"; rc=$?
 if [[ "$rc" -ne 0 ]] || [[ "$out" != *"no '*.run' record"* ]]; then
     echo "  FAIL: an empty directory must be green (rc=$rc): $out"; fails=$((fails + 1))
 fi
 
 printf 'pid=2147483646 run=dead-a\n' >"$set_dir/dead-a.run"
 printf 'pid=2147483645 run=dead-b\n' >"$set_dir/dead-b.run"
-out="$(bash "$GATE" "$set_dir" 2>&1)"; rc=$?
+out="$(gate_run check-producer-liveness "$CHECKS" "$set_dir" 2>&1)"; rc=$?
 if [[ "$rc" -ne 0 ]] || [[ "$out" != *"none naming a live pid"* ]]; then
     echo "  FAIL: a directory of dead records must be green (rc=$rc): $out"; fails=$((fails + 1))
 fi
 
 printf 'pid=%s run=owned-set-run\n' "$live" >"$set_dir/owned-set-run.run"
-out="$(bash "$GATE" "$set_dir" 2>&1)"; rc=$?
+out="$(gate_run check-producer-liveness "$CHECKS" "$set_dir" 2>&1)"; rc=$?
 if [[ "$rc" -ne 1 ]] || [[ "$out" != *"run key 'owned-set-run' is still running (pid $live)"* ]]; then
     echo "  FAIL: one live record among dead ones must red and name it (rc=$rc): $out"; fails=$((fails + 1))
 fi
@@ -76,7 +80,7 @@ fi
 # The aggregation rule: exit 2 wins over red, so a corrupt record is never
 # averaged away by the clean ones beside it — nor by the live one still red here.
 printf 'garbage\n' >"$set_dir/broken.run"
-out="$(bash "$GATE" "$set_dir" 2>&1)"; rc=$?
+out="$(gate_run check-producer-liveness "$CHECKS" "$set_dir" 2>&1)"; rc=$?
 if [[ "$rc" -ne 2 ]] || [[ "$out" != *"broken.run carries no readable"* ]]; then
     echo "  FAIL: an unparseable record must win over red with exit 2 (rc=$rc): $out"; fails=$((fails + 1))
 fi
@@ -85,7 +89,7 @@ fi
 # suffix is what makes the set derivable, so a stray file must not be corruption.
 rm -f "$set_dir/broken.run"
 printf 'garbage\n' >"$set_dir/notes.txt"
-out="$(bash "$GATE" "$set_dir" 2>&1)"; rc=$?
+out="$(gate_run check-producer-liveness "$CHECKS" "$set_dir" 2>&1)"; rc=$?
 if [[ "$rc" -ne 1 ]]; then
     echo "  FAIL: a non-'.run' file must be invisible to set mode (rc=$rc): $out"; fails=$((fails + 1))
 fi
