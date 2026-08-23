@@ -94,12 +94,18 @@ external requirement builds it." Four of this unit's members carry one, so the
 condition fires here and the amendment builds the arm rather than re-opening the
 refusal.
 
-**Not "the fifth flag".** That section's ordinal is stale — `main.rs` already
+**Not "the fifth flag" — and not "a fifth registry-tuple element" either, the
+same staleness twice in one paragraph.** That section's ordinals are both
+stale, verified against the tree rather than the sentence. `main.rs` already
 resolves `--source-stamp`, `--list`, `--queue-parity`, `--declaration-parity`,
-`--reads` and `--knobs` before the registry lookup, beside the bridged arms. The
-merge drops the count rather than incrementing it, per de-literalization: a
-number in prose over a churning roster is a second source for something the
-source already holds.
+`--reads` and `--knobs` before the registry lookup, beside the bridged arms —
+six top-level arms, not four. And `GateEntry` (`native/src/gates/mod.rs:116-122`)
+is already a five-element tuple — name, `GateFn`, reads, knobs, declaring root,
+the last two added after the manifest section's prose was written and never
+back-read against it — so `--needs`'s element is the tuple's **sixth**, not its
+fifth. The merge drops both counts rather than incrementing either, per
+de-literalization: a number in prose over a churning roster is a second source
+for something the source already holds.
 
 **The report grammar: one line per requirement, and nothing else** — no count
 line and no header, on §check-reads-couples' stated ground that a transcribed
@@ -285,14 +291,20 @@ this delta is exactly a corpus narrowing.
 a crate module that spawns `shellcheck` and refuses at exit 2 when it is absent.
 **Design-bearing**, because the ruling it lands is a refusal rather than a port.
 
-**The retirement claim is corrected.** `shell-gate-tail-port`'s entry says this
-member retires "with the last `.sh`", and §Meta-gate conservation's table row
-says "Retired with cause — no shell exists to lint". Those are two different
-subjects and only one of them is true. The **table row** is a per-member
-disposition: for a `.gate`-dispatched member there is no shell file to lint, so
-the meta-gate makes no assertion about it. The **gate** is `zero-config` and ships
-to every adopter, and an adopter *cannot author a compiled gate* — `native/` ships
-no `checks/` and no `smoke/`, so `gate_kit_roots` never selects it and `init`
+**The retirement claim is corrected, and its live holder is §check-shellcheck's
+own text rather than the queue.** `TASK-QUEUE.md`'s entry already reads
+correctly — "DEREGISTERING here with the last `.sh` and not retiring" — so it is
+not this claim's source; that reading was verified against the tree rather than
+assumed. The claim that needs correcting sits in the canonical section this
+delta edits: §check-shellcheck itself currently says the port leaves "the
+gate's horizon" unchanged, "so it retires with the last `.sh` rather than
+outliving it" — and §Meta-gate conservation's table row says "Retired with
+cause — no shell exists to lint". Those are two different subjects and only one
+of them is true. The **table row** is a per-member disposition: for a
+`.gate`-dispatched member there is no shell file to lint, so the meta-gate
+makes no assertion about it. The **gate** is `zero-config` and ships to every
+adopter, and an adopter *cannot author a compiled gate* — `native/` ships no
+`checks/` and no `smoke/`, so `gate_kit_roots` never selects it and `init`
 never vendors it (§The port-candidate criteria, the default's domain). A
 vendoring consumer's gate family is shell by construction, which is the corpus
 this gate exists for.
@@ -301,7 +313,7 @@ this gate exists for.
 recorded as separate facts. When this tree's last `.sh` leaves, the member's
 corpus here is empty and `scripts/gates.list` drops it; the kit keeps shipping it,
 seeded by `init`, doing exactly the job it does today on a tree that has shell.
-Deleting the gate on the entry's phrasing would remove an adopter's self-lint
+Deleting the gate on that stale phrasing would remove an adopter's self-lint
 floor to tidy a tree it does not describe.
 
 **Its own corpus narrows as this unit runs**, which puts it under point 5 with
@@ -606,8 +618,9 @@ side alone would red it, which is precisely why the narrowing is
 ## Existing sections updated
 
 - **gate-sdk/SPEC.md §The `# graph:` manifest** — the `# needs:` refusal stands
-  and gains its discharge: the sequenced interface is built, the "fifth top-level
-  flag" ordinal is dropped rather than incremented, and the paragraph stops
+  and gains its discharge: the sequenced interface is built, both the "fifth
+  top-level flag" and the "fifth registry-tuple element" ordinals are dropped
+  rather than incremented or corrected to "sixth", and the paragraph stops
   saying `--needs` is unshipped (delta 1).
 - **gate-sdk/SPEC.md §The port-candidate criteria, criterion 7** — the class-(i)
   ruling gains its executed form; `check-crate-arms`' requirement is corrected to

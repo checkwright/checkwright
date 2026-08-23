@@ -162,13 +162,20 @@ that declared. The reader of a script's declaration is `--tree` alone. The
 liveness half is delta 3's.
 
 **The one existing surface a header on a plain script crosses is
-`check-comment-tier`.** Its corpus is governed source and it demands every
-full-line comment be a recognised directive or be deleted, which is exactly right
-here: a `# no-port:` line whose class that gate did not know would red, and a
-blanket exemption would be the "blessing a restatement" defect. So the field
-joins its recognised directive classes, and its **mandatory non-empty payload**
-is what makes it a directive rather than a restatement — the same test
-`# comment-tier-exempt: <reason>` already passes.
+`check-comment-tier`, and the crossing is already clean — verified against the
+tree rather than assumed.** Both `no-port:` and `port-until:` are already in
+`SHELL_COLON`, the built-in directive roster
+(`native/src/gates/comment_tier.rs:18-19`; canon-kit/SPEC.md §check-comment-tier
+already lists both), and the gate's corpus — `comment_surface`'s walk of every
+tracked `.sh`/`.gate`/`.rs` file — is already the whole tree rather than the
+gate declaration paths this amendment widens the two fields *from*: a live run
+scans 403 governed sources, not a gate-scoped subset. So a `# no-port:` line on
+a plain script reds nothing today, and its **mandatory non-empty payload** is
+already what distinguishes it from a restatement — the same test
+`# comment-tier-exempt: <reason>` already passes. Nothing here is new work; it
+is a precondition this delta depends on and states rather than assumes,
+because the field's semantic domain and the directive roster's syntactic
+corpus happened to already agree without anyone widening them together.
 
 ### (3) A held script's slug is held live, by the reader that already holds a gate's
 
@@ -307,13 +314,14 @@ what makes the key non-vacuous the moment it exists; and arm A for any prose tha
 binds it. A key with no reader would be a reservation, which is why it is minted
 in this amendment and not ahead of it.
 
-**Red conditions named, because delta 2 widens a corpus and delta 3 widens a
-walk — and one of them narrows something.** `check-comment-tier`'s red condition
-is *a full-line comment on a governed source that is not a recognised directive*
-— **not** monotone in the obvious direction, because delta 2 adds comment lines
-rather than removing them, so every new declaration is a potential new violation
-until the class is recognised. That is why the class registration is inside
-delta 2 rather than deferred. `check-gate-exemption-tasks`' red condition is *a
+**Red conditions named, because delta 3 widens a walk — and one of them narrows
+something.** `check-comment-tier`'s red condition is *a full-line comment on a
+governed source that is not a recognised directive*, and delta 2 does not
+touch it: both classes are already registered and its corpus already spans the
+whole tree (verified above), so a new `# no-port:`/`# port-until:` declaration
+on a plain script is never a potential violation — there is no class for delta
+2 to register, and none was ever at risk of arriving unrecognised.
+`check-gate-exemption-tasks`' red condition is *a
 declared slug that does not resolve to a live queue entry*, which is monotone in
 the declaration set — widening the walk can only add findings, never remove one,
 so no existing verdict can flip green-to-red by inspection failure. And the arm
@@ -345,9 +353,12 @@ because "a wider tool cannot change a narrower arm" is the same false comfort
   pair to carry (deltas 1, 2).
 - **gate-sdk/README.md** — the `port-blockers` description enumerates the arms and
   gains `--tree` (delta 1).
-- **canon-kit/SPEC.md §check-comment-tier** — `# no-port:` and `# port-until:`
-  join the recognised directive classes, on the mandatory-payload test
-  `# comment-tier-exempt:` already passes (delta 2).
+<!-- update-target-exempt: a no-change confirmation delta 2 depends on, owned by no delta -->
+- **canon-kit/SPEC.md §check-comment-tier** — deliberately **not** widened: `#
+  no-port:` and `# port-until:` are already in `SHELL_COLON` and its corpus
+  already spans the tracked `.sh`/`.gate`/`.rs` tree, listed so the build
+  confirms the precondition delta 2 depends on rather than re-registering
+  what is already true.
 - **canon-kit/SPEC.md §check-measured-claim** — nothing in the gate changes; the
   section gains the statement that a key's *meaning* is consumer-owned and that
   redefining an existing key's oracle is invisible to all three arms, which is the
