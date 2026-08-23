@@ -7809,7 +7809,5 @@
 
 ## Done
 
-- guard-grant-review
-
 ## Lessons Learned
 
