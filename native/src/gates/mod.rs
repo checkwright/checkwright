@@ -97,6 +97,7 @@ pub mod test_hermetic;
 pub mod tightened_gates_grammar;
 pub mod tightened_gates_note_parity;
 pub mod tracking_claim;
+pub mod tree_terms;
 pub mod unmarked_claim;
 pub mod workflow_tiering;
 
@@ -1421,6 +1422,20 @@ pub const REGISTRY: &[GateEntry] = &[
         &[("?", "")],
         &["CANON_KIT_LINK_ROOT"],
         "canon-kit",
+    ),
+    // spec: gate-sdk/SPEC.md §check-tree-terms — no walk root: the corpus is `git ls-files`,
+    // which §check-reads-couples rules outside the walk class. The two pattern-file knobs are
+    // check-commit-msg's, declared here too because both halves read one resolved source.
+    (
+        "check-tree-terms",
+        tree_terms::run,
+        &[],
+        &[
+            "GATE_MSG_PATTERN_FILES",
+            "GATE_MSG_PATTERN_FILES_LOCAL",
+            "GATE_PRUNE_DIRS",
+        ],
+        "gate-sdk",
     ),
 ];
 

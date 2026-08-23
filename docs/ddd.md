@@ -56,16 +56,22 @@ naming the retired words as extended-regex lines:
 
 ```
 # cargo-terms.list — retired synonyms for the "cargo" aggregate.
-# One grep -E pattern per line; '#' and blank lines are ignored.
-\bparcel\b
-\bshipment\b
+# One extended regular expression per line; '#' and blank lines are ignored.
+(^|[^A-Za-z])parcel([^A-Za-z]|$)
+(^|[^A-Za-z])shipment([^A-Za-z]|$)
 ```
 
-and points the tree scan at it — the pattern-file argument stands in for the
-standing `GATE_SDK_MSG_PATTERN_FILES` configuration:
+Those long-hand word boundaries are deliberate. The gate matches through a
+portable extended regular expression engine, which refuses the GNU `\b` escape by
+name, so a list written with GNU extensions fails closed instead of quietly
+matching nothing (`gate-sdk/SPEC.md §check-tree-terms`).
+
+Point the tree scan at it — the pattern-file argument stands in for the standing
+`GATE_SDK_MSG_PATTERN_FILES` configuration:
 
 ```bash
-bash gate-sdk/checks/check-tree-terms.sh . cargo-terms.list
+GATE_SDK_MSG_PATTERN_FILES=cargo-terms.list \
+    bash gate-sdk/bin/run-gates.sh --only check-tree-terms
 ```
 
 From then on a session that writes `parcel` where the model says `cargo` is

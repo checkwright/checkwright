@@ -3,9 +3,9 @@
 # reach. A case dir is not its own repository — `git ls-files` inside one returns
 # the outer repo's index scoped to that subdir — so the non-repository arm is
 # structurally unreachable from a case, and both cases pass a positional
-# pattern-file, which short-circuits the whole env-knob resolution path. The
-# fourth arm pins what a pair cannot: each expect.txt line is an independent
-# substring assertion, so record *order* is assertable only here.
+# pattern-file, which short-circuits the whole env-knob resolution path. The last
+# arm pins what a pair cannot: each expect.txt line is an independent substring
+# assertion, so record *order* is assertable only here.
 #
 # Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
@@ -51,6 +51,22 @@ out="$( cd "$SANDBOX/repo" \
     && gate_run check-tree-terms "$CHECKS" . 2>&1 )"; rc=$?
 expect empty-pattern-set 0 '0 banned pattern(s) configured; tree unchecked' "$rc" "$out"
 
+# --- a banned shape inside a tracked binary: a path-only record, and still red.
+# Dead on this tree (no tracked binaries) and live in a consumer's, which is why
+# it is asserted here rather than discovered there; the fixture pair stays at the
+# three-way split its own measurement fixed. The banned shape is composed, not
+# spelled: this file's directory is pruned, but the composition is the same rule
+# the module itself carries and reads better held in one place.
+printf 'PNG\x00\x01 clone into /%s/bob/x and more\x00bytes\n' home > "$SANDBOX/repo/blob.bin"
+printf '/(home|Users)/[A-Za-z0-9._-]+\n' > "$SANDBOX/repo/banned.list"
+git -C "$SANDBOX/repo" add blob.bin
+out="$( cd "$SANDBOX/repo" && gate_run check-tree-terms "$CHECKS" . banned.list 2>&1 )"; rc=$?
+expect binary-record 1 'blob.bin' "$rc" "$out"
+if grep -qE '^blob\.bin:[0-9]+:' <<<"$out"; then
+    echo "  FAIL [binary-record]: a binary match must not carry :lineno:line -- $out"
+    fails=$((fails + 1))
+fi
+
 # --- multi-record order over the tracked bad/ case: path order, then line order,
 # one record per matching *line* however many patterns hit it, and no dedup of
 # two identical lines. Read off the pair so the corpus has one home.
@@ -74,5 +90,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "check-tree-terms.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-tree-terms.test.sh: clean (the arms a case dir cannot reach: a non-repository cwd, the env-knob resolution path through a missing required pattern file, an empty pattern set leaving the tree unchecked, and the bad pair's record order — 4 assertions over 4 cases)"
+echo "check-tree-terms.test.sh: clean (the arms a case dir cannot reach: a non-repository cwd, the env-knob resolution path through a missing required pattern file, an empty pattern set leaving the tree unchecked, a banned shape inside a tracked binary yielding a path-only record, and the bad pair's record order — 6 assertions over 5 cases)"
 exit 0

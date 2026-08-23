@@ -7,14 +7,16 @@ use std::path::Path;
 
 // spec: gate-sdk/SPEC.md §check-commit-msg — `grep -hEv '^[[:space:]]*(#|$)'`: a pattern line is
 // one that is neither all-whitespace nor whitespace-then-`#`
-fn is_pattern(line: &str) -> bool {
+// spec: gate-sdk/SPEC.md §check-tree-terms — `pub(super)` so the tracked-files half reads this
+// resolution rather than a second copy of it
+pub(super) fn is_pattern(line: &str) -> bool {
     let rest = line.trim_start_matches([' ', '\t']);
     !rest.is_empty() && !rest.starts_with('#')
 }
 
 // spec: gate-sdk/SPEC.md §check-commit-msg — `gate_msg_pattern_files` with no positional: every
 // required file must exist and be readable, and each local one joins where it does
-fn resolve_files() -> Result<Vec<String>, String> {
+pub(super) fn resolve_files() -> Result<Vec<String>, String> {
     let required = walk::knob_array("GATE_MSG_PATTERN_FILES")?;
     let local = walk::knob_array("GATE_MSG_PATTERN_FILES_LOCAL")?;
     let mut out: Vec<String> = Vec::new();

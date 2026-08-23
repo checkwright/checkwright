@@ -1544,6 +1544,17 @@ design time; the last three were paid for, and each is named with what it cost.
    stays `spec-embedded-source-criterion-4-membership`'s, and a later reader must
    not read the disposition as its answer.
 
+   **`check-tree-terms` is the register's fourth instance and its *widest*.**
+   Its `couples=` is one literal pattern file, so the derived substrate-sensitive
+   set does not select it; its walk is `git ls-files` over the **whole tracked
+   tree**, pruned only by the shared prune dirs and the `msg-patterns` basenames,
+   so every registry member's declaration path *and* every implementation module
+   sits inside the corpus it greps as content. What makes it the widest is that no
+   narrowing is available: `check-docs-cname-parity`'s scan root is a knob a
+   consumer can point elsewhere, while this member's corpus is the tracked set
+   itself. The bind is therefore read off the walk — the field would clear it —
+   and §check-tree-terms owns what it cost that member.
+
    **And a member can be *self-immune*, clearing the criterion while the
    ordering constraint still binds.** `check-gate-fixture-coverage` reaches a
    declaration's bytes only for a member with **no** resolvable fixture pair —
@@ -10145,6 +10156,7 @@ the gate is emitted into the commit-msg hook.
 
 ### check-tree-terms
 
+`checks/check-tree-terms.gate` (`precommit`, binary-dispatched).
 Invariant: no tracked file matches the same banned-pattern set — the
 tracked-files half of the leak ban, sharing one pattern source with
 check-commit-msg (`gate_msg_pattern_files`) so the two halves cannot drift
@@ -10160,22 +10172,122 @@ missing required tracked pattern file, is fail-closed (exit 2). When the pattern
 set is empty the tree is unchecked (clean) — the fail-closed obligation is on a
 missing file, not an empty one.
 
-**Criterion 4 binds, and the price is a fixture widening before the port.** Its
-corpus is `git ls-files` over the whole tracked tree, pruned only by the shared
-prune dirs and the `msg-patterns` basenames, so **every** registry member's
-declaration path lies inside the corpus it scans as content — criterion 4's
-predicate verbatim, and reached through the **walk** rather than the trigger
+**The port owes no bridge work on the pattern-file half, and the two halves read
+one resolution rather than two copies of it.** `GATE_MSG_PATTERN_FILES` and
+`GATE_MSG_PATTERN_FILES_LOCAL` already crossed the config bridge for
+check-commit-msg, and this member declares the same two knobs and reads the same
+resolved arrays — through the same two helpers, which the sibling module exports
+rather than this one re-deriving. `gate_msg_pattern_files` is one function in the
+shell precisely so the two halves of the leak ban cannot drift apart, and a
+second compiled copy of that resolution would reinstate the drift the shared
+helper exists to prevent. **No pattern is baked into the crate**: the roster is
+consumer config on the §check-graph pattern, and a kit literal carrying a
+consumer's vocabulary publishes it (CLAUDE.md §The provenance seam).
+
+**The filter/exec split survives the port.** A fork-free per-path filter runs
+first — prune dirs, the `msg-patterns` prefix, the regular-file test — and the
+content match then runs **once** over every surviving path, patterns compiled a
+single time. A port matching per file would be the regression the split exists to
+prevent, and it is stated here because a compiled substrate makes the wrong shape
+cost nothing visible.
+
+**Three behaviors the shell form held by accident of `grep` are ruled, not
+inherited.**
+
+- **A GNU escape in a consumer's pattern file is refused, loudly.** The crate's
+  POSIX ERE engine (§The POSIX ERE matcher) refuses `\b`, `\s`, `\w` and the rest
+  of the GNU set **by name** at compile, which this member turns into exit 2 — a
+  pattern the engine cannot honour must never read as a tree with nothing in it.
+  The divergence is not this member's to invent: it already existed on the same
+  pattern set through the ported check-commit-msg. What changes is that it is
+  stated, so a consumer meeting the exit-2 has its cause. The POSIX ERE spelling
+  of a word boundary is `(^|[^A-Za-z])term([^A-Za-z]|$)`, and docs/ddd.md's
+  worked adoption example is written in it for that reason.
+- **A banned shape inside a tracked binary yields a path-only record, and reds.**
+  The compiled form detects the NUL byte, matches on the decoded text and emits
+  the path **alone** — no `:lineno:line` suffix — rather than dumping lossily
+  decoded bytes: a binary's bytes can carry no newline for a megabyte and can
+  carry control characters, either of which corrupts the `path:lineno:line`
+  grammar the red output rests on, and the record's purpose — naming a line to
+  edit — does not exist for a binary anyway. **This is a hole closed, not a
+  format choice**, and the measurement is why it is recorded rather than assumed:
+  GNU grep from 3.5 writes `grep: <path>: binary file matches` to **stderr**, and
+  the shell form captured stdout only, so a leak inside a tracked binary reported
+  `TREE-TERMS: clean` and exited 0. Dead on this tree, which tracks no binaries;
+  live in a consumer's, which is exactly why it is ruled here rather than
+  discovered there.
+- **The three fail-closed arms are discharged where they are held.** The
+  pattern-file resolution, the `git ls-files` call and the content match each
+  fail-close through one shared helper, held by §check-gate-fail-closed across
+  the whole registry. They are recorded as proved **there** rather than banked as
+  this member's own coverage, on §Fixture-pair discipline's terms.
+
+**The authoring rule this member's own module carries, and it runs both ways.**
+`native/src/gates/tree_terms.rs` is a tracked file **inside the corpus this gate
+scans as content**, so a banned shape spelled literally in its source or its unit
+tests reds the gate against itself; the module **composes** such a shape at
+runtime instead. `native/src/gates/commit_msg.rs` already does this and names
+this gate as the reason. The constraint runs the **opposite** way for everything
+under `gate-tests/`, which is pruned and may spell banned shapes freely — and
+does, because that is what makes the pair's skip cases prove a skip rather than
+an absence. Getting the two directions backwards is the plausible error, which is
+why both are stated. The module's own test inputs come from the **fixture**
+pattern files, never from the consumer's tracked list: compiling a live pattern
+into the crate would be a consumer-config literal no gate catches, since the
+leaked string is not itself a banned term and this very gate cannot see it.
+
+**Criterion 4 binds, and the price is paid: the pair was widened before the
+port.** Its corpus is `git ls-files` over the whole tracked tree, pruned only by
+the shared prune dirs and the `msg-patterns` basenames, so **every** registry
+member's declaration path lies inside the corpus it scans as content — criterion
+4's predicate verbatim, and reached through the **walk** rather than the trigger
 field, which is `couples=scripts/msg-patterns.list` and selects no declaration at
 all (§The port-candidate criteria, whose couple-clears-walk-binds register this
-joins). What the bind buys the port is named there too: a fixture pair carrying
-every arm of the derivation, widened first and ported second.
+member joins). The pair stood at two of twelve control arms and was widened first
+in three directions: `good/` gained a pruned-directory file, a `msg-patterns.list`
+and a `msg-patterns.local.list` — the second proving the self-exemption is a
+prefix glob and not an exact-name match — and a dangling symlink whose own blob
+content is a banned shape, each carrying a banned shape so its skip is proved by
+**greenness** rather than by absence; `good/patterns.list` gained a blank line and
+the live shapes the fixture omitted, including the only anchored one, whose ERE
+anchoring a port can silently drop; and `bad/` gained a second leaking file and
+one carrying two leaks on a line plus two on identical separate lines, which pins
+the record grammar, one record per matching *line* however many patterns hit it,
+and no dedup.
 
-**The verdict is priced, not held**, and the `# port-until:` declaration this
-member carried is retired. Criterion 4 orders a port and prices it; it has never
-made a member un-takeable, five members having bound it and ported by widening
-their pairs, so a field whose meaning is *not takeable now* was the wrong
-instrument for a fixture widening. The sizing fact above is real and stays; what
-it stopped doing is standing as a hold.
+**Two facts about the fixture corpus fixed that shape, and a bespoke
+`check-tree-terms.test.sh` carries the residue.** A case dir is **not** its own
+repository: `git ls-files` inside one returns the **outer** repo's index scoped to
+that subdir, printed relative to cwd. So the non-repository arm is structurally
+unreachable from a case dir and takes the unit-test arm; the `gate-tests` prune
+never fires on a case's emitted paths, which is why the pair works at all and why
+it is inert under the port; and a widening file that is written but not `git
+add`ed is **invisible to the gate**, so an untracked case silently under-covers.
+The test file takes what remains: the non-repository fail-close, the
+missing-required-pattern-file fail-close and with it the entire env-knob
+resolution path — which both cases short-circuit by passing a positional — the
+empty-pattern-set *tree unchecked* clean, the binary path-only record, and the
+record **order** a pair cannot assert, each `expect.txt` line being an independent
+substring test.
+
+**The parity run's verdict, recorded as the register §The port-candidate criteria
+sets for a member binding criterion 4.** Assertion A forbids a descriptor and a
+script coexisting in one resolve dir, so the cross-substrate comparison ran on
+the **pre-descriptor** tree. Five comparisons — both fixture cases, the live tree
+with no argument, a live subdirectory scan root, and the knob-resolved pattern
+path — agreed on stdout, stderr and exit code in every one. **Parity is proved
+over the pair**, the only corpus inert under the port; the three live-tree arms
+are **no disagreement found on the pre-descriptor tree**, never parity proved.
+The two ruled behaviors above are deliberate divergences and sit outside that
+claim: the GNU-escape refusal and the binary path-only record are each a place
+the compiled side is the better one, and each was probed on both substrates
+rather than reasoned about.
+
+**The verdict is priced, not held**, and this member declares no `# port-until:`
+on that ground. Criterion 4 orders a port and prices it; it has never made a
+member un-takeable, five members having bound it and ported by widening their
+pairs, so a field whose meaning is *not takeable now* is the wrong instrument for
+a fixture widening.
 
 ### check-template-copy-parity
 

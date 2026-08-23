@@ -3,3 +3,4 @@ check-template-copy-parity
 check-unmarked-claim
 check-amendment-update-target
 check-gate-substrate-parity
+check-tree-terms
