@@ -1274,6 +1274,14 @@ make a command expressible in one tab-separated cell: `@ROOT@` becomes the git
 sandbox root, and `@NL@` becomes a newline — without the second a heredoc case
 cannot be written at all, and the heredoc class would ship untested.
 
+**The runner drives each case from inside the sandbox**, which decides how a
+target is spelled and is stated because getting it wrong reads as a rule defect
+rather than as a spelling one: a path is written **relative** unless the case is
+*about* an absolute one, since rule 5 blocks any command carrying the repo-root
+prefix and an `@ROOT@`-absolute target therefore never reaches the rule under
+test. `@ROOT@` is for the cases whose subject is the absolute form — rules 2, 4
+and 5 — and for a foreign-repo contrast.
+
 **Any ad-hoc invocation of a consumer's guard script must set `GUARD_KIT_LOG` to
 a scratch path**, because the logger's default is the *live* friction log and a
 throwaway probe otherwise files its synthetic commands as real friction. The
