@@ -5489,6 +5489,21 @@
   same receiving-side shape `handoff-premise-reverification-placement` argues for.
   **Cost while deferred:** one duplicated entry per recurring sweep per close, each of which then
   has to be found and merged by a later close reading 5000 lines of queue.
+  recurrence: close-eviction-refiles-without-checking 2026-08-23
+  **FIRST RECURRENCE, 2026-08-23, self-demonstrating TWICE in one close and generalizing the
+  entry past its own step.** `leak-guard-and-assertion-meta-gate-port`'s close filed two gap
+  bullets that each re-derived a live entry, and withdrew both once an audit sweep surfaced the
+  owners. One came from the eviction step, re-filing `icebox-candidate-eligibility-unapplied`
+  with the same roadmap-tag measurement for the FOURTH time across four closes. The other came
+  from the PROMPT-FRICTION triage, re-deriving `guard-read-steer-tool-coverage`'s awk question
+  from the log — which is the paragraph above confirmed rather than merely restated: the shape
+  is any close-stage sweep whose input recurs, and the eviction step is only its most reliable
+  instance. It also settles which candidate fix is reachable. A similarity oracle is not needed
+  to catch either: both owners were found by a plain slug-and-subject grep of the queue, so the
+  cheap direction is not merely cheaper but sufficient — the missing step is a *lookup before
+  filing*, and neither sweep performed one. The contaminated measurement that came with the awk
+  bullet is a second cost the entry had not priced: a re-derived finding also re-measures, and
+  a worse measurement can overwrite a better one if the duplicate is promoted rather than caught.
   Filed 2026-08-13 by close, from its own backlog-eviction step.
 
 - **pack-installer-payload-kit-set-anchor** [design-pending] — the packer enumerates kit
@@ -7433,7 +7448,7 @@
   **Cost while deferred:** low and recurring — one re-derivation per close — plus the standing risk
   that a roadmap-tagged row on a worklist reads as a sanctioned candidate to a session that
   has not read the tier section.
-  recurrence: icebox-candidate-eligibility-unapplied 2026-08-21
+  recurrence: icebox-candidate-eligibility-unapplied 2026-08-21 2026-08-23
   **Grounds for that date — the rate went to 100%.** `graph-port-and-config-seam`'s close ran the
   worklist and every one of its five rows was ineligible: the same three by the roadmap-tag rule
   (`plugin-marketplace`, `benchmark-ab-experiment`, `hosted-attestation-service`) and BOTH of the
@@ -7444,6 +7459,13 @@
   re-attesting the defect: a worklist that is empty of takeable rows every time it is run is not
   being miscalibrated, it is deriving the wrong set — which argues for the filtering shape over the
   explaining one, on evidence the entry did not have when it named the two.
+  **Grounds for 2026-08-23 — reproduced identically, which is itself the datum.**
+  `leak-guard-and-assertion-meta-gate-port`'s close ran the worklist and got the SAME five rows
+  with the SAME verdict: the same three roadmap-tagged, and the same two on the
+  live-promotion-trigger clause. Two consecutive closes returning a byte-identical worklist and
+  a 100% ineligible verdict settles the fork the 2026-08-21 grounds sharpened — an explaining
+  worklist would have to print the same explanation twice for nothing, so the filtering shape
+  is the one the evidence now names.
   Surfaced 2026-08-19 at the `takeable-tier-batch-and-installer-noop` close's icebox eviction review
   and filed to the gap inbox there; promoted 2026-08-20 by the next iteration's scope.
 
