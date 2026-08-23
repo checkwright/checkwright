@@ -254,8 +254,12 @@ restated here.
 This is recorded rather than left where it was decided, and that is the whole point of the entry:
 the 2026-08-13 ruling **selected** this question's disposition and never **stated** the direction,
 so for a week the answer lived in no governed surface at all — only a drained gap bullet and a
-commit message, which spec-over-precedent says is not ground truth. The ruling is discharged when
-the re-derived grant set lands; the entry carrying that work is **`guard-grant-review`**.
+commit message, which spec-over-precedent says is not ground truth. **The discharge condition fired
+2026-08-23**: `guard-grant-review` completed when the operator ruled its four `gh` candidates
+intended breadth, and the direction now lives in `scripts/guard-config.sh`'s
+`GUARD_KIT_BREADTH_DECLARED`, one declaration per glob with its grounds. The criterion above stays
+live — it is what a future narrowing question is decided against — and only its pending clause is
+spent.
 
 **A permission-settings edit is operator-class work, and scope never promotes one — ruled
 2026-08-22 by the operator.** An edit to `.claude/settings.json` is not build work and is not

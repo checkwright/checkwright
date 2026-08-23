@@ -119,40 +119,6 @@
   rather than absorbing.
   Filed 2026-08-23 at spec by the split above; never promoted, never held on merit.
 
-- **guard-grant-review** [design-pending] — the committed grant set's security narrowing, prepared
-  and unlandable: the review is COMPLETE and only an operator-class edit remains.
-  **The review is done and must not be re-bought.** All 105 `Bash(` entries of
-  `.claude/settings.json` were walked 2026-08-22 at build, by a read-only worktree sweep plus a
-  local-overlay probe against `guard_allow_match`.
-  **The operator's own named four find NOTHING to narrow.** `git reset --hard`, `git clean`,
-  `git push --force` and a bare `git checkout --` are auto-allowed by neither file today — the
-  committed set grants no `git reset` at all, the overlay's `Bash(git reset)` and
-  `Bash(git reset -q)` are exact, `git push origin master` is exact, and `scripts/bash-guard.sh`
-  additionally blocks `git clean -x/-X` outright. The grant set already honours the 2026-08-20
-  ruling (TRAJECTORY.md §The closed rulings) for every form that ruling names.
-  **The two real findings are a different class and are filed separately** as
-  `grant-argument-bounding-mechanism`; the code-execution question is
-  `grant-path-traversal-exposure`. Neither is to be re-derived here.
-  **The matcher semantics are SETTLED, from the vendor doc rather than by inference:** a Bash
-  rule's `*` "matches any sequence of characters including spaces", so it spans `/` and `..` and
-  no allow glob can bound an argument. guard-kit's `guard_allow_match` is a faithful model of it.
-  **The keep-half LANDED 2026-08-22 and is not outstanding:** five breadth probes for the
-  remote-destruction class the six original probes never witnessed, plus the first
-  `GUARD_KIT_BREADTH_DECLARED` inhabitant (`Bash(git worktree *)`, ruled KEEP with its reason).
-  **Deliverable:** the four `gh` narrowing candidates the report now prints — `gh api *`,
-  `gh repo *`, `gh release *`, `gh secret *`, each auto-allowing an irrecoverable remote deletion —
-  disposed at close's triage step 4 by the operator, who owns the untracked overlay and the ops
-  workflow those globs serve. A session cannot narrow them without guessing what ops work needs.
-  **Why [design-pending]:** nothing about the SECURITY question is open. What is open is the
-  ops-workflow shape of each `gh` narrowing, which only the operator holds.
-  **Cost while deferred:** four irrecoverable remote-destruction forms stay auto-allowed on the
-  operator's clone, `gh release delete` among them, which destroys one of this project's two
-  shipping transports. The report names all four at every close, so the cost is visible rather
-  than silent, and non-rotting: nothing in the tree degrades while it sits.
-  Promoted 2026-08-22 at scope; re-deferred the same day at build under the operator ruling that a
-  permission-settings edit is operator-class and scope never promotes one. The review half is spent
-  and recorded above so this entry never buys it twice.
-
 - **grant-argument-bounding-mechanism** [design-pending] — two committed grants reach a destructive
   form and no allow-glob narrowing can stop either.
   **Both findings are verified rather than surmised**, at build 2026-08-22 by a read-only worktree
@@ -7842,6 +7808,8 @@
 - **scratch-execution-allowlist-bar** [design-pending] — Each close re-derives this standing bar.
 
 ## Done
+
+- guard-grant-review
 
 ## Lessons Learned
 
