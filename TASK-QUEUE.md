@@ -12,6 +12,39 @@
 
 ## New Features
 
+- **battery-runner-port** [spec: SPEC-battery-runner.md] — the battery's dispatch moves
+  into the binary: a `--run` arm replaces `run-gates.sh`'s loop and `gate_command`'s
+  per-knob bridge.
+  **Operator-ruled 2026-08-23 as the port tail's first unit**, because it is the only unit that
+  moves wall-clock and because every remaining shell member dispatches through the seam it
+  removes. **Re-measured at spec, on this tree, warm**: `TOTAL 24990`ms over 106 members, of
+  which resolving `gate_command` for all 106 and executing none is **5019ms** — and the 90
+  members individually under 200ms sum to 4841ms, so the bridge is essentially the whole cost of
+  the battery's fastest 90 gates. `gen-pre-commit.sh --emit` is 6637ms, the whole of
+  `check-graph`; the binary answers `--knobs` and `--list` in 1ms each.
+  **What the arm owns:** the registry walk in registry order; knob resolution held in-process
+  for the run — resolved once by the front-end, never per member — with every refusal the bridge
+  states kept (gate-sdk/SPEC.md §lib/gate.sh, which owns the roster and its count); the
+  `--only` / `--for` selectors and the `--emit <arm>` dispatch; per-gate timings and the
+  dispatch-stderr seam (§run-gates); worker threads with per-gate scratch isolation and
+  deterministic output ordering, which is the concurrency contract
+  `gate-battery-parallel-execution` filed and this unit discharges; and the hook generator's
+  argv projection, so `gen-pre-commit.sh --emit` stops sourcing every kit library per knob —
+  which is `config-bridge-resolution-cost`'s whole cost. `gate-battery-result-cache` is a
+  closure candidate once the couples-keyed cache is an in-process map rather than shell
+  bookkeeping; its invalidation question is inherited, not answered here.
+  **The design question is RULED at spec, in the amendment:** the generated pre-commit hook
+  **keeps its baked per-gate argv** and the two-line `run --hook` shim is refused — decisively
+  because a platform with no published artifact would lose its whole hook, where today the shell
+  members survive in it (criterion 5's own branch). So `install-step-relocation` is unblocked and
+  unchanged rather than resolved, and `graph-port-bash-spawn-residue`'s spawn is made cheaper
+  rather than spent: §gen-pre-commit's non-port ruling is held, not reopened.
+  **Cost while deferred:** high and paid per session — every commit pays the bridge, every
+  validate pays the serial battery, and every further port adds a member that dispatches through
+  the seam this unit removes.
+  Filed 2026-08-23 at the consult by operator direction, under the direct-filing exception;
+  promoted 2026-08-23 at spec with `SPEC-battery-runner.md`.
+
 ## Technical Debt
 
 ## Deferred
@@ -96,38 +129,6 @@
   branch — eight so far, each cut's own record staying at its SPEC section.
   **Tail ruled 2026-08-23** (TRAJECTORY.md §PRIORITY DIRECTIVE): no member is permanently shell;
   the sequence is `battery-runner-port`, `shell-gate-tail-port`, then the bootstrap pair.
-
-- **battery-runner-port** [design-pending] — the battery runs from the hook to the binary with
-  no bash in between: a `run` arm of the multi-call binary replaces `run-gates.sh`'s dispatch
-  loop and `gate_command`'s per-knob bridge.
-  **Operator-ruled 2026-08-23 as the port tail's first unit**, because it is the only unit that
-  moves wall-clock and because every remaining shell member dispatches through the seam it
-  removes. Measured at the consult that ruled it: the battery is 52.4s, of which `check-crate-arms`
-  is 27.2s and `check-graph` 7.0s; the other 100 ported gates cost 15–115ms each through
-  `gate_command` — the binary's `--knobs` call plus one subshell sourcing the owning kit's
-  `lib/*.sh` per declared knob — against 1–6ms when the binary is invoked directly, so the port
-  of one hundred gates moved the battery's wall-clock by nothing, as TRAJECTORY.md §PRIORITY
-  DIRECTIVE predicted and `native-gate-port-remaining-corpus` records.
-  **What the arm owns:** the registry walk in registry order; knob resolution in-process from
-  the consumer's config (the bridge's three refusals kept, gate-sdk/SPEC.md §lib/gate.sh); the
-  `--only` / `--for` selectors and the `--emit <arm>` dispatch; per-gate timings and the
-  dispatch-stderr seam (§run-gates); worker threads with per-gate scratch isolation and
-  deterministic output ordering, which is the concurrency contract
-  `gate-battery-parallel-execution` filed and this unit discharges; and the hook generator's
-  argv projection, so `gen-pre-commit.sh --emit` stops sourcing every kit library per knob —
-  which is `config-bridge-resolution-cost`'s whole cost and `graph-port-bash-spawn-residue`'s
-  spawn. `gate-battery-result-cache` is a closure candidate once the couples-keyed cache is an
-  in-process map rather than shell bookkeeping; its invalidation question is inherited, not
-  answered here.
-  **Why `[design-pending]`:** the generated pre-commit hook bakes `gate_command`'s resolved argv
-  today (gate-sdk/SPEC.md §gen-pre-commit), so the hook's shape after the runner port — a
-  two-line shim invoking `run --hook` with the staged-path filter, versus a baked per-gate argv
-  list — is the design question, and it binds `install-step-relocation`. The shell
-  `run-gates.sh` survives as that shim's target only until the bootstrap pair lands.
-  **Cost while deferred:** high and paid per session — every commit pays the bridge, every
-  validate pays the serial battery, and every further port adds a member that dispatches through
-  the seam this unit removes.
-  Filed 2026-08-23 at the consult by operator direction, under the direct-filing exception.
 
 - **shell-gate-tail-port** [design-pending] — the six registered shell gates, and the two
   kit-shipped shell gates this tree never registers, port as wrappers; no gate stays shell.
