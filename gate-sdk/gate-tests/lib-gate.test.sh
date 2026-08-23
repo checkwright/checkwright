@@ -41,9 +41,13 @@ for p in 'src/main.rs' 'a/targets/b' 'some-service/proto/x.proto'; do
 done
 
 # --- GATE_GREP_EXCLUDES: one --exclude-dir per pruned dir --------------------
+# spec: gate-sdk/SPEC.md §run-gates — membership without a pipe: a short-circuiting consumer
+# abandons its in-process producer mid-write, and under `set -o pipefail` the producer's SIGPIPE
+# becomes the pipeline's status and flips this verdict
 for d in target gate-tests node_modules; do
-    printf '%s\n' "${GATE_GREP_EXCLUDES[@]}" | grep -qxF -- "--exclude-dir=$d" \
-        || { echo "  FAIL: GATE_GREP_EXCLUDES missing $d"; fails=$((fails + 1)); }
+    found=0
+    for x in "${GATE_GREP_EXCLUDES[@]}"; do [[ "$x" == "--exclude-dir=$d" ]] && { found=1; break; }; done
+    (( found )) || { echo "  FAIL: GATE_GREP_EXCLUDES missing $d"; fails=$((fails + 1)); }
 done
 
 # --- gate_find: prunes the set, returns everything else ----------------------
