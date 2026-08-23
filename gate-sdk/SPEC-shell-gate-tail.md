@@ -746,6 +746,32 @@ over their own shell gates — the one loss in this set that lands on the corpus
 delta 5 keeps the gate alive for. It shrinks as targets are published, not by
 repair here.
 
+**Measured at the cut, 2026-08-24 — the growth prediction holds and the
+JUDGMENT's premise is false.** Both sides were measured from clean checkouts
+reached by path. The prediction is exact: **two**, and the two are
+`check-install-disposition` and `check-shellcheck`. What this delta did not
+anticipate is what those two *were*. The `prose` profile's seeded roster is
+**26 members on both sides**, and before this unit exactly two of the
+twenty-six were still `.sh` — these two. So the residual goes from 24 of 26 to
+**26 of 26**, the binary-less install seeds an **empty registry**, and the leg
+does not report a number: it **fails**, on the runner's documented
+`names no gates` refusal at exit 2. The accept-and-declare ruling above rests on
+the clause *"receives the omission declared in their own `gates.list` rather than
+as a broken battery"*, and measured, a broken battery is exactly what is
+received. The honest limit this delta states — losing `check-shellcheck`'s
+self-lint floor — understates it by the whole roster.
+**Nor is it a property of the measured profile**: this unit leaves no `.sh` gate
+declaration anywhere, so every profile's artifact-free install empties, and the
+leg's own re-scoping clause has no profile left to be re-scoped onto.
+**Escalated rather than ruled**, because the successors to the falsified judgment
+each change shipped semantics or touch a closed ruling: what the smoke asserts
+about an all-omitted install; whether an empty registry may read green, against a
+refusal the runner has precisely to prevent a vacuous pass; or holding a member
+shell, which reverses the 2026-08-23 operator ruling that no gate stays shell and
+is therefore not this session's even to propose as a decision. The measurement is
+recorded at gate-sdk/SPEC.md §The port-candidate criteria, criterion 5 with its
+judgment marked absent, so the price is on the record while the ruling is not yet.
+
 ## Producers and consumers
 
 **`--needs <name>` (new interface, delta 1).**
