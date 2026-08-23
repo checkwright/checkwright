@@ -8104,6 +8104,17 @@ arm, where such a member prints `?` because its external-program requirement
 genuinely cannot be asked; here there is no open question, because the grouping
 exists to order the *remaining* corpus and a ported member is not in it.
 
+**An exclusion counter reading zero over an empty corpus is not evidence, and
+that is worth stating where the counters are.** Once every registered member has
+ported, `--group` has no still-shell member to exclude, so *permanently shell* and
+*temporarily held* both read zero **by construction** rather than because nothing
+declares. The reading is correct and its evidential value is gone: a session
+wanting to know whether anything in the tree declares a disposition asks `--tree`,
+whose corpus is not empty. The general shape is worth more than the instance — a
+counter over an empty corpus reports the emptiness, never the predicate — and it is
+the same confusion between *nothing found* and *nothing looked at* that
+§check-gate-substrate-parity's assertion G states its empty-corpus verdict against.
+
 **Declared-permanent members leave on exactly those terms, which is what makes
 the remainder mean *still owed*.** A member whose shell declaration carries
 `# no-port:` (§The `# graph:` manifest) leaves the partition and increments its
@@ -9316,9 +9327,13 @@ placement; and (H) a held declaration's ground reachable in one hop.
   deliberately has none of, it being the auditor of the dispatch seam.
 
   **Its corpus narrows to empty in this tree, and the verdict there is
-  green-with-a-counted-zero.** Both fields live on the `<name>.sh` spelling, so
-  once no registered member declares in that spelling the clause set has nothing to
-  range over. That is a **corpus narrowing**, one of the three non-monotone shapes
+  green-with-a-counted-zero.** Within **this assertion's** corpus — the declaration
+  set assertion A derives — both fields reach only the `<name>.sh` spelling, so once
+  no registered member declares in that spelling the clause set has nothing to range
+  over. That is a statement about G's corpus and **not** about the fields' domain,
+  which §The `# graph:` manifest widened to any tracked script: a plain script
+  carrying either field is read by `--tree` and, for a slug, by
+  §check-gate-exemption-tasks, and is invisible here by design. That is a **corpus narrowing**, one of the three non-monotone shapes
   §The causal-completeness check point 5 names, and the red condition is stated so
   it stays on the right side of it: *a `<name>.sh` declaration whose field is
   malformed or whose `# spec:` section does not state the hold* — never *no
