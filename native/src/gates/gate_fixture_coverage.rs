@@ -1,32 +1,9 @@
 // spec: gate-sdk/SPEC.md §check-gate-fixture-coverage — every gates.list member has a fixture
 // pair or a no-fixture opt-out
 use crate::fresh;
+use crate::registry;
 use crate::walk;
 use std::path::Path;
-
-// spec: gate-sdk/SPEC.md §lib/gate.sh — `gates_list_members`: every line that is neither blank
-// nor a comment, in file order
-fn members(text: &str) -> Vec<String> {
-    fresh::file_lines(text)
-        .iter()
-        .filter(|l| !l.trim_start().starts_with('#') && !l.trim().is_empty())
-        .map(|l| (*l).to_string())
-        .collect()
-}
-
-// spec: gate-sdk/SPEC.md §lib/gate.sh — `gate_resolve`: dirs consumer-first, `.sh` before `.gate`
-// within a dir
-fn resolve(name: &str, dirs: &[String]) -> Option<String> {
-    for d in dirs {
-        for ext in ["sh", "gate"] {
-            let p = format!("{}/{}.{}", d, name, ext);
-            if Path::new(&p).is_file() {
-                return Some(p);
-            }
-        }
-    }
-    None
-}
 
 fn fixture_dir_for(member: &str, tests_dirs: &[String]) -> Option<String> {
     for t in tests_dirs {
@@ -77,7 +54,7 @@ pub fn run(_args: &[String]) -> i32 {
             return 2;
         }
     };
-    let members = members(&listing);
+    let members = registry::members(&listing);
     if members.is_empty() {
         eprintln!("check-gate-fixture-coverage: no members parsed from {}", list);
         return 2;
@@ -100,7 +77,7 @@ pub fn run(_args: &[String]) -> i32 {
             }
             continue;
         }
-        let Some(src) = resolve(m, &resolve_dirs) else {
+        let Some(src) = registry::resolve(m, &resolve_dirs) else {
             neither.push(format!(
                 "{} (no fixture pair, and source resolves in none of: {})",
                 m,

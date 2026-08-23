@@ -14,6 +14,7 @@ mod knobenv;
 mod marker;
 mod proc;
 mod queue;
+mod registry;
 mod section;
 mod spec;
 mod stages;

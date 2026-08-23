@@ -3,34 +3,11 @@
 // the tree
 use crate::fresh;
 use crate::proc;
+use crate::registry;
 use crate::walk;
 use std::path::Path;
 
 const REBUILD: &str = "bash gate-sdk/bin/build-native.sh";
-
-// spec: gate-sdk/SPEC.md §lib/gate.sh — `gates_list_members`: every line that is neither blank
-// nor a comment, in file order
-fn members(text: &str) -> Vec<String> {
-    fresh::file_lines(text)
-        .iter()
-        .filter(|l| !l.trim_start().starts_with('#') && !l.trim().is_empty())
-        .map(|l| (*l).to_string())
-        .collect()
-}
-
-// spec: gate-sdk/SPEC.md §lib/gate.sh — `gate_resolve`: dirs consumer-first, `.sh` before `.gate`
-// within a dir
-fn resolve(name: &str, dirs: &[String]) -> Option<String> {
-    for d in dirs {
-        for ext in ["sh", "gate"] {
-            let p = format!("{}/{}.{}", d, name, ext);
-            if Path::new(&p).is_file() {
-                return Some(p);
-            }
-        }
-    }
-    None
-}
 
 // spec: gate-sdk/SPEC.md §check-gate-binary-fresh — the tree side of the source stamp: the same
 // three git invocations native/build.rs bakes into the binary. `None` where git cannot answer,
@@ -154,9 +131,9 @@ pub fn run(args: &[String]) -> i32 {
     let listing = std::fs::read(&list)
         .map(|b| String::from_utf8_lossy(&b).into_owned())
         .unwrap_or_default();
-    let dispatching: Vec<String> = members(&listing)
+    let dispatching: Vec<String> = registry::members(&listing)
         .into_iter()
-        .filter(|m| resolve(m, &resolve_dirs).map(|s| s.ends_with(".gate")) == Some(true))
+        .filter(|m| registry::resolve(m, &resolve_dirs).map(|s| s.ends_with(".gate")) == Some(true))
         .collect();
 
     // spec: gate-sdk/SPEC.md §check-gate-binary-fresh — nothing dispatching is a clean report, not

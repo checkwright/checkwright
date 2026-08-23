@@ -1,9 +1,9 @@
 // spec: gate-sdk/SPEC.md §check-graph — the coupling-graph projection: one node per `couples=`
 // surface, one edge per registry member, grouped into the consumer's declared layers.
 // `native/src/gates/graph.rs` reaches it in process rather than spawning it.
+use crate::registry;
 use crate::walk;
 use std::collections::BTreeMap;
-use std::path::Path;
 
 // spec: gate-sdk/SPEC.md §check-graph — the kit's default stylesheet, emitted when the consumer's
 // theme directory supplies no `theme.css`. Byte-verbatim what the retired `graph_theme_css_default`
@@ -129,10 +129,7 @@ pub struct Config {
 impl Config {
     pub fn from_bridge() -> Result<Config, String> {
         let gates_dir = walk::knob_scalar("GATE_SDK_GATES_DIR")?;
-        let mut resolve_dirs = vec![gates_dir.clone()];
-        for k in walk::kit_roots()? {
-            resolve_dirs.push(format!("{}/checks", k.trim_end_matches('/')));
-        }
+        let resolve_dirs = registry::resolve_dirs(&gates_dir, &walk::kit_roots()?);
         Ok(Config {
             gates_dir,
             artifact: walk::knob_scalar("GATE_SDK_GRAPH_ARTIFACT")?,
@@ -147,76 +144,8 @@ impl Config {
     }
 
     pub fn list_path(&self) -> String {
-        format!("{}/gates.list", self.gates_dir)
+        registry::list_path(&self.gates_dir)
     }
-}
-
-// spec: gate-sdk/SPEC.md §lib/gate.sh — gate_resolve's declaration path: dirs consumer-first, and
-// `.sh` beats `.gate` within a dir
-pub fn resolve(name: &str, dirs: &[String]) -> Option<String> {
-    for d in dirs {
-        for ext in ["sh", "gate"] {
-            let p = format!("{}/{}.{}", d, name, ext);
-            if Path::new(&p).is_file() {
-                return Some(p);
-            }
-        }
-    }
-    None
-}
-
-// spec: gate-sdk/SPEC.md §lib/gate.sh — gates_list_members: every line that is neither blank nor a
-// `#` comment, in file order
-pub fn members(text: &str) -> Vec<String> {
-    text.lines()
-        .filter(|l| {
-            let t = l.trim_start();
-            !t.is_empty() && !t.starts_with('#')
-        })
-        .map(|l| l.to_string())
-        .collect()
-}
-
-// spec: gate-sdk/SPEC.md §check-graph — gate_expand_couples_var: each `kit:<glob>` token becomes
-// `<kit-root>/<glob>` for every repo-relative kit root, in root order; a non-kit token passes
-// through verbatim
-pub fn expand_couples(field: &str, kit_roots_rel: &[String]) -> String {
-    let mut out: Vec<String> = Vec::new();
-    for tok in field.split(',') {
-        match tok.strip_prefix("kit:") {
-            Some(glob) => {
-                for r in kit_roots_rel {
-                    out.push(format!("{}/{}", r.trim_end_matches('/'), glob));
-                }
-            }
-            None => out.push(tok.to_string()),
-        }
-    }
-    out.join(",")
-}
-
-// spec: gate-sdk/SPEC.md §The `# graph:` manifest — the first `# graph: ` line's whitespace-split
-// `<key>=<value>` tokens; an unknown token is the caller's to report, so this keeps them all
-pub fn manifest_line(text: &str) -> Option<&str> {
-    text.lines().find(|l| l.starts_with("# graph: "))
-}
-
-pub fn manifest_fields(man: &str) -> Vec<(String, String)> {
-    man.trim_start_matches("# graph: ")
-        .split_whitespace()
-        .map(|kv| match kv.split_once('=') {
-            Some((k, v)) => (k.to_string(), v.to_string()),
-            None => (kv.to_string(), String::new()),
-        })
-        .collect()
-}
-
-fn field(fields: &[(String, String)], key: &str) -> String {
-    fields
-        .iter()
-        .find(|(k, _)| k == key)
-        .map(|(_, v)| v.clone())
-        .unwrap_or_default()
 }
 
 // spec: gate-sdk/SPEC.md §check-graph — the registry members the projection draws, deduplicated and
@@ -226,13 +155,13 @@ pub fn projected_members(cfg: &Config) -> Result<Vec<Member>, String> {
     let list = cfg.list_path();
     let text = std::fs::read_to_string(&list)
         .map_err(|e| format!("cannot read the registry at {}: {}", list, e))?;
-    let mut names: Vec<String> = members(&text);
+    let mut names: Vec<String> = registry::members(&text);
     names.sort();
     names.dedup();
 
     let mut out: Vec<Member> = Vec::new();
     for name in names {
-        let src = match resolve(&name, &cfg.resolve_dirs) {
+        let src = match registry::resolve(&name, &cfg.resolve_dirs) {
             Some(s) => s,
             None => continue,
         };
@@ -240,16 +169,16 @@ pub fn projected_members(cfg: &Config) -> Result<Vec<Member>, String> {
             Ok(b) => b,
             Err(_) => continue,
         };
-        let man = match manifest_line(&body) {
+        let man = match registry::manifest_line(&body) {
             Some(m) => m,
             None => continue,
         };
-        let f = manifest_fields(man);
+        let f = registry::manifest_fields(man);
         out.push(Member {
             name,
-            couples: expand_couples(&field(&f, "couples"), &cfg.kit_roots_rel),
-            dir: field(&f, "dir"),
-            valve: field(&f, "valve"),
+            couples: registry::expand_couples(&registry::field(&f, "couples"), &cfg.kit_roots_rel),
+            dir: registry::field(&f, "dir"),
+            valve: registry::field(&f, "valve"),
         });
     }
     Ok(out)
@@ -431,15 +360,5 @@ mod tests {
         assert_eq!(surface_layer("gate-sdk/lib/gate.sh", &cfg), "k_gate_sdk");
         assert_eq!(surface_layer("odd:name/x", &cfg), "k_odd");
         assert_eq!(surface_layer("README.md", &cfg), "k_shared");
-    }
-
-    // spec: gate-sdk/SPEC.md §check-graph — a `kit:` token expands per kit root, a plain one passes
-    #[test]
-    fn kit_tokens_expand_and_plain_tokens_pass_through() {
-        let roots = vec!["gate-sdk".to_string(), "queue-kit/".to_string()];
-        assert_eq!(
-            expand_couples("scripts/gates.list,kit:*.sh", &roots),
-            "scripts/gates.list,gate-sdk/*.sh,queue-kit/*.sh"
-        );
     }
 }

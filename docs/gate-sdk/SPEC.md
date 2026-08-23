@@ -1318,9 +1318,10 @@ the caller's verdict. So the porting session owes the descriptor every module it
 gate reaches, transitively, including a module shared by both sides of a compare.
 
 **"Transitively" stops at the universal layers, and the tree is what says so.**
-Read at face value the rule reaches `walk.rs` and `proc.rs` — the config-bridge
-and spawn layers every gate module reaches — and no descriptor in the tree names
-either, correctly: coupling a universal layer into every descriptor spells one
+Read at face value the rule reaches `walk.rs`, `proc.rs` and `registry.rs` — the
+config-bridge, spawn and registry layers every gate module reaches — and no
+descriptor in the tree names any of them,
+correctly: coupling a universal layer into every descriptor spells one
 fact once per ported member and re-runs the whole battery from the generated hook
 on any edit to it, which is de-literalization inverted. What the rule reaches is
 the modules whose edit can change **this** member's verdict and nothing else's —
@@ -1330,6 +1331,16 @@ by §check-crate-arms and by the binary's own source stamp instead, which is the
 same coverage through a mechanism that does not scale by descriptor count. Stated
 here rather than left to each porting session, because the sentence above invites
 the literal reading and the tree silently contradicts it.
+
+**`registry.rs` is the third such layer and it arrived by collapse rather than by
+design.** It owns the `gates.list` member grammar, `gate_resolve`'s declaration
+path (dirs consumer-first, `.sh` beating `.gate` within a dir), the `# graph:`
+field read and the `couples=`/`trigger=` kit expansion — one implementation for
+the readers that each carried a private copy of it: `check-gate-binary-fresh`,
+`check-kit-enum`, `check-gate-fixture-coverage`, `check-core-files`, the graph
+projection and the enforcement map. A registry walk is what the `--run` arm
+needed and what those five had already duplicated, so the module is the
+de-literalization that port made unavoidable rather than a layer invented for it.
 Omitting them leaves the gate registered and green while the projection it holds
 goes stale at commit time, because the generated hook's `staged_matches` trigger
 is derived from `couples=` — the gate simply never runs on the edit that broke

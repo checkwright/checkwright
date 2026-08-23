@@ -2,32 +2,9 @@
 // must name every kit root with matching tracked files; the fix is the kit:<glob> token
 use crate::fresh;
 use crate::proc;
+use crate::registry;
 use crate::walk;
 use std::path::Path;
-
-// spec: gate-sdk/SPEC.md §lib/gate.sh — `gates_list_members`: every line that is neither blank
-// nor a comment, in file order
-fn members(text: &str) -> Vec<String> {
-    fresh::file_lines(text)
-        .iter()
-        .filter(|l| !l.trim_start().starts_with('#') && !l.trim().is_empty())
-        .map(|l| (*l).to_string())
-        .collect()
-}
-
-// spec: gate-sdk/SPEC.md §lib/gate.sh — `gate_resolve`: dirs consumer-first, `.sh` before `.gate`
-// within a dir, so the manifest is read off whichever spelling declares the member
-fn resolve(name: &str, dirs: &[String]) -> Option<String> {
-    for d in dirs {
-        for ext in ["sh", "gate"] {
-            let p = format!("{}/{}.{}", d, name, ext);
-            if Path::new(&p).is_file() {
-                return Some(p);
-            }
-        }
-    }
-    None
-}
 
 // spec: gate-sdk/SPEC.md §The `# graph:` manifest — the first `# graph: ` line's `couples=`
 // field, split on the shell's own unquoted word split
@@ -96,7 +73,7 @@ pub fn run(args: &[String]) -> i32 {
             return 2;
         }
     };
-    let members = members(&listing);
+    let members = registry::members(&listing);
     if members.is_empty() {
         eprintln!("check-kit-enum: no members parsed from {}", list);
         return 2;
@@ -105,7 +82,7 @@ pub fn run(args: &[String]) -> i32 {
     let mut violations: Vec<String> = Vec::new();
     let mut groups_checked = 0usize;
     for m in &members {
-        let Some(src) = resolve(m, &resolve_dirs) else {
+        let Some(src) = registry::resolve(m, &resolve_dirs) else {
             eprintln!(
                 "check-kit-enum: {} in {} resolves in none of: {}",
                 m,
@@ -204,7 +181,7 @@ mod tests {
     #[test]
     fn the_registry_reader_drops_comments_and_blanks_and_keeps_order() {
         assert_eq!(
-            members("# head\n\ncheck-b\n  \ncheck-a\n"),
+            registry::members("# head\n\ncheck-b\n  \ncheck-a\n"),
             vec!["check-b".to_string(), "check-a".to_string()]
         );
     }

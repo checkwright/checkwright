@@ -2,6 +2,7 @@
 // worktree and is tracked, a `kit:` line deriving one path per kit root
 use crate::fresh;
 use crate::proc;
+use crate::registry;
 use crate::walk;
 use std::path::Path;
 
@@ -49,11 +50,7 @@ pub fn run(args: &[String]) -> i32 {
             return 2;
         }
     };
-    // spec: gate-sdk/SPEC.md §lib/gate.sh — `gates_list_members`: neither blank nor a comment
-    let lines: Vec<&str> = fresh::file_lines(&text)
-        .into_iter()
-        .filter(|l| !l.trim_start().starts_with('#') && !l.trim().is_empty())
-        .collect();
+    let lines: Vec<String> = registry::members(&text);
     if lines.is_empty() {
         println!("CORE-FILES: clean (manifest {} lists no paths)", manifest);
         return 0;
@@ -72,7 +69,8 @@ pub fn run(args: &[String]) -> i32 {
     } else {
         Vec::new()
     };
-    let paths = match expand(&lines, &roots) {
+    let line_refs: Vec<&str> = lines.iter().map(String::as_str).collect();
+    let paths = match expand(&line_refs, &roots) {
         Ok(p) => p,
         Err(line) => {
             eprintln!(

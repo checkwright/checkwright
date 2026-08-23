@@ -3,6 +3,7 @@
 // faithful projections of those manifests.
 use crate::emit::graph as proj;
 use crate::proc;
+use crate::registry;
 use crate::walk;
 use std::path::Path;
 
@@ -446,7 +447,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     if !Path::new(&list).is_file() {
         return Err(format!("no registry at {}", list));
     }
-    let checks = proj::members(&read_stripped(&list)?);
+    let checks = registry::members(&read_stripped(&list)?);
     if checks.is_empty() {
         return Err(format!("no members parsed from {}", list));
     }
@@ -468,7 +469,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let mut has_msg_gate = false;
 
     for c in &checks {
-        let script = match proj::resolve(c, &cfg.resolve_dirs) {
+        let script = match registry::resolve(c, &cfg.resolve_dirs) {
             Some(s) => s,
             None => {
                 errors.push(format!(
@@ -480,7 +481,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
             }
         };
         let body = read_stripped(&script)?;
-        let man = match proj::manifest_line(&body) {
+        let man = match registry::manifest_line(&body) {
             Some(m) => m.to_string(),
             None => {
                 errors.push(format!(
@@ -508,9 +509,9 @@ fn rule(args: &[String]) -> Result<i32, String> {
                 )),
             }
         }
-        couples = proj::expand_couples(&couples, &cfg.kit_roots_rel);
+        couples = registry::expand_couples(&couples, &cfg.kit_roots_rel);
         if !trigger.is_empty() {
-            trigger = proj::expand_couples(&trigger, &cfg.kit_roots_rel);
+            trigger = registry::expand_couples(&trigger, &cfg.kit_roots_rel);
         }
         if dir != "bi" && dir != "one" {
             errors.push(format!(

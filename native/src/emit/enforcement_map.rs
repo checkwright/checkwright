@@ -4,6 +4,7 @@
 use crate::emit::self_repo_prefix;
 use crate::fresh;
 use crate::proc;
+use crate::registry;
 use crate::walk;
 use serde_json::Value;
 use std::path::Path;
@@ -80,32 +81,10 @@ fn owner_ref(prefix: &str, path: &str, anchor: &str, title: &str) -> String {
     format!("`{}` §{}", path, title)
 }
 
-fn members(text: &str) -> Vec<String> {
-    fresh::file_lines(text)
-        .iter()
-        .filter(|l| !l.trim_start().starts_with('#') && !l.trim().is_empty())
-        .map(|l| l.to_string())
-        .collect()
-}
-
 fn read_file(path: &str) -> Result<String, String> {
     std::fs::read(path)
         .map(|b| String::from_utf8_lossy(&b).into_owned())
         .map_err(|e| format!("cannot read {}: {}", path, e))
-}
-
-// spec: gate-sdk/SPEC.md §lib/gate.sh — gate_resolve's declaration path: dirs consumer-first, and
-// `.sh` beats `.gate` within a dir
-fn resolve(name: &str, dirs: &[String]) -> Option<String> {
-    for d in dirs {
-        for ext in ["sh", "gate"] {
-            let p = format!("{}/{}.{}", d, name, ext);
-            if Path::new(&p).is_file() {
-                return Some(p);
-            }
-        }
-    }
-    None
 }
 
 // spec: gate-sdk/SPEC.md §enforcement-map — the tier is read from the declaration's `# graph:`
@@ -153,8 +132,8 @@ fn gate_section(gates_dir: &str) -> Result<Option<Section>, String> {
     let dirs = check_dirs(gates_dir)?;
     let (mut pre, mut msg, mut align): (Vec<Row>, Vec<Row>, Vec<Row>) =
         (Vec::new(), Vec::new(), Vec::new());
-    for name in members(&read_file(&list)?) {
-        let src = match resolve(&name, &dirs) {
+    for name in registry::members(&read_file(&list)?) {
+        let src = match registry::resolve(&name, &dirs) {
             Some(s) => s,
             None => continue,
         };
@@ -191,7 +170,7 @@ fn kpi_section(gates_dir: &str) -> Result<Option<Section>, String> {
     }
     let roots = walk::kit_roots()?;
     let mut rows: Vec<Row> = Vec::new();
-    for name in members(&read_file(&file)?) {
+    for name in registry::members(&read_file(&file)?) {
         let direct = format!("{}/{}.sh", gates_dir, name);
         let mut src = if Path::new(&direct).is_file() {
             direct.clone()
