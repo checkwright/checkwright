@@ -6395,6 +6395,21 @@ which is the precedent the runner's own arm is built on. Everything the argument
 grammar below specifies is the front-end's; everything the output contract
 specifies is the arm's.
 
+**The front-end keeps a shell dispatch loop for one branch, and the branch is
+criterion 5's.** A host the payload carries no verified artifact for is an
+*omit-and-declare* install (installer/README.md §The gate binary): its
+`gates.list` records the lost members as comments and keeps its shell ones, and
+its battery has to stay green — an asserted contract, exercised by the
+installer's binary-less leg. So where `GATE_SDK_NATIVE_BIN` names nothing
+executable the front-end dispatches the registry itself, and where it names a
+binary — every covered platform — the arm does. This is the one duplication the
+port carries, it is admitted on criterion 6's *unless* clause, and it is held by
+an **executed comparison** rather than by care: the two dispatchers' transcripts
+over one hermetic registry are required byte-identical, banners, tails, omission
+line and summary alike (§run-gate-tests). `--emit` has no such fallback and
+refuses when the binary is absent, because an emitter has no shell half left to
+run.
+
 **The split exists to delete a per-member bash bridge, and the arithmetic is why
 it was worth a port.** The front-end resolves the declared-knob union once for
 the whole run where the loop it replaced resolved one member's knobs at a time —
