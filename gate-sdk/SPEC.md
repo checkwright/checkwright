@@ -6430,7 +6430,12 @@ it was worth a port.** The front-end resolves the declared-knob union once for
 the whole run where the loop it replaced resolved one member's knobs at a time —
 measured on this tree, `gate_command` over all 106 members and executing none of
 them cost 5019 ms before the batched bridge (§lib/gate.sh) and 2714 ms after,
-against a whole warm battery of `TOTAL 24990` ms; the arm pays it once.
+against a whole warm battery of `TOTAL 24990` ms; the arm pays it once. **The
+outcome, measured warm on a 14-core host, median of three:** the battery is
+7756 ms at the default worker count and 18325 ms under `GATE_SDK_JOBS=1`, where
+the shell dispatcher it replaced was the 24990 ms above. The serial figure is the
+bridge saving alone and the gap to it is the pool's; both are bounded below by
+the longest single member, which is what the timings file's slowest rows name.
 
 **A member dispatches as a child process, and the threads are the concurrency.**
 A compiled member is a function in the same binary, so calling it in-process is
