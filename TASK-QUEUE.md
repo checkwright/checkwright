@@ -44,6 +44,17 @@
   **Cost while deferred:** each further firing costs an orphaned producer plus the lead turn that
   discovers it — and, as the tenth showed, can cost a whole suite's evidence.
   recurrence: turn-end-chokepoint-and-wait-primitive 2026-08-18 2026-08-19 2026-08-21 2026-08-22
+  **FIFTH FIRING JUDGED 2026-08-23 AND UNSTAMPABLE — the wrap ceiling was reached, and
+  queue-kit/SPEC.md §The tag algebra rules that the CORRECT complaint rather than a valve to
+  widen.** `battery-runner-port`'s close read 458 `SubagentStop` events, 8 of them
+  `verdict=red live=yes` with `records=1..2`, in two clusters — a firing by the same evidentiary
+  standard that closed the chokepoint half. A fifth date makes the declaration 107 columns against
+  `check-queue-wrap`'s 100, so the stamp was attempted and reverted; the SPEC names **promotion**,
+  never a wider `QUEUE_KIT_WRAP_BUDGET`, as what a reached ceiling resolves to. Until this entry is
+  promoted `kpi-incident-recurrence` undercounts it by one, and this paragraph is the only place
+  that undercount is legible. Honest limit on the judgment itself: the probe reads a shared `.tmp`
+  and cannot attribute, so the firing is established and the culprit is not — which is the
+  detector's limit and is itself an argument for the blocking variant this entry still owes.
   Filed 2026-08-16 by close from the gap inbox; demoted 2026-08-23 at build, the measurement half
   delivered and the blocking variant still sequenced.
 
@@ -4484,17 +4495,19 @@
   **NOT a split candidate, ruled 2026-08-23 at build** against the criterion queue-kit/SPEC.md
   section check-queue-entry-budget now states: it accumulates measurements for ONE deliverable, so
   ruling it leaves nothing unruled — the fifth measurement reversing the third is compression.
-  **FIFTH MEASUREMENT, 2026-08-23 — the trend REVERSED for the first time.** Nine `python3 -` stdin
-  heredocs, seven of them editing tracked files, against 50 last time: an ~86% fall. That is
-  evidence FOR the operator's discipline-shaped cause; the control's reach defect is unchanged.
-  **FOURTH MEASUREMENT, 2026-08-19 at close, and the shape has fully migrated.** This iteration's
-  log ranks **50 `python3 - <<EOF` stdin heredocs** editing tracked files and **zero**
-  `python3 .tmp/*.py` runs: the path-shaped payload is gone and stdin is the whole of it. That
-  narrows the design rather than only raising the count — stdin has no `.tmp/` path to match, so
-  even the cheap third option below misses it unless the rule names the interpreter rather than the
-  path. The bash side stayed clean a second time: 16 scratch runs, every one through the runner.
-  The date above joins for THIS measurement; the decline recorded below still stands, and a
-  measurement and a decline are different events that happened to fall on one day.
+  **SIXTH MEASUREMENT, 2026-08-23 at close — the fifth's reading is REVERSED and its fall was a
+  dip.** 64 `python3 - <<EOF` stdin heredocs, top-ranked of 49 patterns, most editing tracked files
+  by name. The fifth measurement, taken the same day, read nine against 50 and called the ~86% fall
+  evidence FOR the operator's discipline-shaped cause; 64 is above the 50 it fell from, so the
+  series does not support that reading. Four `python3 .tmp/<name>.py` runs appear in the same log,
+  so the fourth measurement's "the path-shaped payload is gone" no longer holds either — both
+  payload shapes are live at once, which the design fork below treated as sequential. Nothing here
+  touches that fork, and the control's reach defect is unchanged.
+  **FOURTH MEASUREMENT, 2026-08-19 at close.** 50 `python3 - <<EOF` stdin heredocs editing tracked
+  files and zero `python3 .tmp/*.py` runs. What survives it is the design narrowing rather than the
+  count: stdin has no `.tmp/` path to match, so even the cheap third option below misses it unless
+  the rule names the interpreter rather than the path. The bash side stayed clean a second time: 16
+  scratch runs, every one through the runner.
   `scripts/bash-guard.sh` blocks a direct scratch run by matching `^bash[[:space:]]+\.tmp/`, and
   `guard-kit/bin/scratch-run.sh` executes its target with a hardcoded `bash`. Neither reaches a
   script run under another interpreter. Probed at the 2026-08-13 close against the guard itself:
@@ -4508,16 +4521,14 @@
   allowlist bar for scratch execution rather than about which interpreters the control covers.
   **Cost while deferred:** the control reads as complete and is not, which is worse than an
   absent control — a reviewer seeing the rule and the runner has no reason to check its reach.
-  **Third measurement, 2026-08-18 — spent, and kept for the one thing it alone establishes.** Its
-  counts are superseded above and its *trend is the argument* reading is reversed by the fifth; what
-  survives is that the **bash side was clean** — every scratch bash script ran through the runner —
-  so the runner works and the control's reach is the whole defect.
-  **DEFERRED ON THE MERITS 2026-08-23 at spec, and the grounds are REVERSED rather than repeated.**
-  The four declines below all rested on a theme-shaped cause: the iteration's ruled spine shared no
-  surface with guard-kit. This one does not need it. The fifth measurement broke the trend for the
-  first time, which is the first evidence *for* the operator's discipline-shaped reading rather than
-  merely consistent with it — so the entry is deferred on what it measures, not on what it is near.
-  The reach defect is unchanged and non-rotting, which is what makes deferring it honest.
+  **Third measurement, 2026-08-18 — spent, and kept for the one thing it alone establishes:** the
+  **bash side was clean**, every scratch bash script ran through the runner, so the runner works and
+  the control's reach is the whole defect. Its counts and its trend reading are superseded above.
+  **DEFERRED ON THE MERITS 2026-08-23 at spec, AND THAT DEFERRAL'S STATED GROUND IS FALSIFIED.**
+  It rested on the fifth measurement breaking the trend — "the first evidence *for* the operator's
+  discipline-shaped reading rather than merely consistent with it" — which the sixth reverses. What
+  still holds is the weaker half: the reach defect is unchanged and non-rotting, which is what makes
+  deferring it honest. A later scope weighs it on that, never on a trend the series does not show.
   **Four prior declines, all OPERATOR-class and all on the one theme-shaped cause the paragraph
   above supersedes:** 2026-08-19 through the harness's question mechanism, held the same day at
   scope into `takeable-tier-batch-and-installer-noop`, ruled again 2026-08-20 via the lead — the
@@ -4771,6 +4782,16 @@
   filing*, and neither sweep performed one. The contaminated measurement that came with the awk
   bullet is a second cost the entry had not priced: a re-derived finding also re-measures, and
   a worse measurement can overwrite a better one if the duplicate is promoted rather than caught.
+  **THIRD INSTANCE, 2026-08-23, and the SHARPENING is the datum rather than the count.**
+  `battery-runner-port`'s close read the audit-roster row `close-surface-actually-read` — which
+  already carried the prior close's finding that reading a capture surface is not the same act as
+  checking the queue for the owner — then filed five bullets that DID grep for an owner and one
+  that did not. The one that skipped it arrived off the **eviction worklist** rather than a capture
+  log. So the rule is neither unwritten nor unread: it was applied per-bullet by habit instead of
+  as a step, and the bullet arriving through the surface the row does not name is the one that
+  missed. The generalizable form is narrower and sharper than that row's wording — **the
+  owner-check is owed by every filing, not only by one read from a capture log** — and it is a
+  *lookup step*, which is exactly the cheap candidate fix above rather than a new one.
   Filed 2026-08-13 by close, from its own backlog-eviction step.
 
 - **consumer-smoke-targeted-mode-registrar-scope** [design-pending] — the consumer smoke's
@@ -5935,6 +5956,8 @@
   than substituting its own call. What scope owes is whether the claim generalizes past this
   repo's posture at all, and if so whether it belongs beside the relay-never-assert rule it is
   the mirror of, or is too soft to sit in a contract.
+  `relayed-rule-role-scope-unchecked` proposes a second clause for the same template on the same
+  envelope-change reasoning, so a scope ruling either should rule both.
   **THE HONESTY BOUNDARY IS PART OF THE ENTRY, not a caveat on it.** Two instances is an
   **anecdote, not a measurement**, and **nothing reds on a lead over-specifying** — the rule is
   unenforceable by construction, since a dispatch never enters the tracked tree. Both instances
@@ -6282,6 +6305,16 @@
   section extractor, already committed-allowlisted and reached for once against those 12 — and a
   steer built to that measurement would send the majority to `Read`'s offset/limit, the wrong tool.
   What the unit owns therefore grows by one: the parser must also decide WHICH steer to emit.
+  **THIRD MEASUREMENT, 2026-08-23 at `battery-runner-port`'s close — the dominant shape flipped
+  BACK, so the mix is ITERATION-SHAPED rather than trending.** Of the 25 file-reading `awk` calls
+  in that log, **23** are the line-range form and 2 the section-pattern one, with about 5 further
+  genuine stream transforms beside them — so `Read`'s offset/limit is the majority's right target
+  again and the section extractor is the minority answer. Read the three together — 19-of-22
+  line-range on 2026-08-19, 8-of-20 earlier on 2026-08-23, 23-of-25 now: a queue-and-survey-heavy
+  iteration reads sections and a SPEC-and-source-heavy one reads line ranges. That argues for the
+  which-steer clause above more strongly than any single reading argues for one target, and it
+  proposes no new deliverable. **No `recurrence:` date joins:** the finding did not re-fire, a
+  measurement the entry carries was superseded.
   **Measured 2026-08-19 at close's prompt-friction triage, off the log rather than impression.**
   The iteration ranked 22 `awk` calls: 19 of the exact shape `awk 'NR>=X && NR<=Y' <file>`, 13 of
   those against `TASK-QUEUE.md`; one a range-address read of `.workflow/survey-record.md`; one
@@ -6583,10 +6616,6 @@
   **three were roadmap-tagged and therefore ineligible by rule** — 75% of the review list was
   work no close may take. The fourth was ineligible too, on the tier's other stated clause (a live
   promotion trigger), which is genuinely a judgment and correctly left to the session.
-  **Re-verified at promotion against the current tree, not carried on the bullet's word:** the arm
-  now returns five rows and three are still roadmap-tagged (`plugin-marketplace`,
-  `benchmark-ab-experiment`, `hosted-attestation-service`), so the defect stands and its rate moved
-  with the pool rather than with any fix.
   **DISTINCT from any calibration question.** queue-kit/SPEC.md deliberately rules the age and
   cost filters non-load-bearing because miscalibration only lengthens the list; that reasoning
   does not extend to a rule the SPEC states as binding either way.
@@ -6599,23 +6628,19 @@
   that a roadmap-tagged row on a worklist reads as a sanctioned candidate to a session that
   has not read the tier section.
   recurrence: icebox-candidate-eligibility-unapplied 2026-08-21 2026-08-23
-  **Grounds for that date — the rate went to 100%.** `graph-port-and-config-seam`'s close ran the
-  worklist and every one of its five rows was ineligible: the same three by the roadmap-tag rule
-  (`plugin-marketplace`, `benchmark-ab-experiment`, `hosted-attestation-service`) and BOTH of the
-  remaining two on the tier's live-promotion-trigger clause — `rendered-site-link-monitor` waits on
-  the launch crawl and `build-stage-tier-economics` waits on `batch-split-stamp-ownership`, each
-  trigger stated in the entry's own body. So the judgment half returned no work either, and the
-  close paid two full entry reads to establish it. That sharpens the design fork rather than only
-  re-attesting the defect: a worklist that is empty of takeable rows every time it is run is not
-  being miscalibrated, it is deriving the wrong set — which argues for the filtering shape over the
-  explaining one, on evidence the entry did not have when it named the two.
-  **Grounds for 2026-08-23 — reproduced identically, which is itself the datum.**
-  `leak-guard-and-assertion-meta-gate-port`'s close ran the worklist and got the SAME five rows
-  with the SAME verdict: the same three roadmap-tagged, and the same two on the
-  live-promotion-trigger clause. Two consecutive closes returning a byte-identical worklist and
-  a 100% ineligible verdict settles the fork the 2026-08-21 grounds sharpened — an explaining
-  worklist would have to print the same explanation twice for nothing, so the filtering shape
-  is the one the evidence now names.
+  **Grounds for both dates, and a THIRD measurement that COLLAPSES the rate.** 2026-08-21
+  (`graph-port-and-config-seam`) and 2026-08-23 (`leak-guard-and-assertion-meta-gate-port`) each
+  ran the worklist and got a byte-identical five rows, 100% ineligible: the same three by the
+  roadmap-tag rule (`plugin-marketplace`, `benchmark-ab-experiment`, `hosted-attestation-service`)
+  and the same two on the live-promotion-trigger clause. `battery-runner-port`'s close then ran it
+  after `5244a33a` lowered the age floor and got **27 rows with the same three ineligible — 11%**.
+  The absolute count of mechanical exclusions is FIXED at three, bounded by the roadmap-tagged
+  population and not by the pool, so widening the pool DILUTES the defect instead of growing it.
+  **That reverses which half of the split now costs the close most, and a ruling session weighs the
+  two shapes against it:** at 27 rows the hand-derivation actually paid for was the JUDGMENT clause
+  — five of the eight kept rows were held by a live-slug citation, each needing an extent
+  extraction and a slug-liveness check — while the filtering shape the two 100% readings argued for
+  drops three rows out of 27 and buys much less than it did out of five.
   Surfaced 2026-08-19 at the `takeable-tier-batch-and-installer-noop` close's icebox eviction review
   and filed to the gap inbox there; promoted 2026-08-20 by the next iteration's scope.
 
@@ -7102,6 +7127,74 @@
   fact.
   Filed 2026-08-23 by validate; the close drain re-ran the survey oracle and got 16/11/7 with the
   same seven names.
+
+- **validate-tier-premise-mechanical-only** [design-pending] — the ruling-config assigns `validate`
+  the cheaper model on the premise that its batches are uniformly mechanical oracle-running, and one
+  iteration falsified that premise.
+  **OPERATOR-CLASS, and this entry is a CARRIER rather than a proposal.** The tier is a recorded
+  ruling carried in the lead binding, so reversing, demoting or re-scoping it is the operator's;
+  the scope that promoted this escalated it and ruled nothing. What follows is the observation.
+  **The instance, from `battery-runner-port` 2026-08-23.** Validate's spine went red on an
+  INHERITED defect — a gate depositing runtime state inside the tracked fixture corpus it is the
+  oracle for — and closing it took a diagnosis, a fix, a self-caught overreach (the first cut
+  exported the pin process-wide and broke `producer-lock.test.sh`'s sandbox, narrowed at `8f2000f0`)
+  and three spine runs. The lead re-dispatched the stage on the more capable tier for exactly that
+  reason, so the corrective already happened; what is unrecorded is why.
+  **The distinction worth keeping, and it is the whole content: the TIER may well be right and the
+  PREMISE is what needs re-judging.** A validate that only runs oracles is mechanical; a validate
+  that has to FIX what it finds is not, and nothing in the current framing distinguishes the two or
+  says what a session should do on discovering it is in the second kind.
+  **The surface this bears on, NAMED rather than corrected here.** `build-stage-tier-economics`
+  carries "the already-adopted validate→Sonnet downgrade **demonstrably works** ... with no observed
+  quality cost" as the affirmative precedent its A/B tests for. That sentence now has an observed
+  counter-instance; correcting it belongs to whatever ruling this entry receives, so the promoting
+  scope left it standing rather than editing a ground under a live design direction.
+  **DISTINCT from `build-stage-tier-economics`**, which is the BUILD stage's tier and its per-batch
+  split; this is validate's, and the two share only the meter that priced them.
+  **Candidate shapes, all unranked and all the operator's:** re-tier validate; keep the tier and add
+  a stated escalate-on-discovery clause so the second kind of validate is a named, cheap transition
+  rather than an improvisation; or record the premise's honest limit and leave the tier alone.
+  **Cost while deferred:** low per iteration and paid at the worst moment — a validate meeting a
+  real defect on the cheaper tier either escalates for a re-dispatch, costing a lead turn and a
+  restart, or does not, which is the case nobody sees.
+  Filed 2026-08-23 to the gap inbox at `battery-runner-port`'s close, offered by the lead and
+  deliberately not ruled there; promoted 2026-08-23 at the next iteration's scope drain, which
+  escalated the ruling to the lead rather than taking it.
+
+- **relayed-rule-role-scope-unchecked** [design-pending] — a rule relayed through a dispatch can be
+  scoped to the RELAYER's role and bind nobody it is relayed to, and nothing in the relay path
+  checks that.
+  **Two attested instances, both from `battery-runner-port` and both the lead's own self-report.**
+  (1) A dispatch instructed a stage to write `recurrence:` stamps in a shape queue-kit/SPEC.md
+  forbids that stage to write. (2) A dispatch told validate not to re-run `run-validate.sh` — a
+  LEAD-SIDE verification rule, the lead's job being to check the evidence rather than regenerate it
+  and the stage's being the opposite.
+  **The second cost something measurable rather than merely being wrong:** it produced a spliced
+  evidence manifest the lead then had to reject, and the correct manifest needed a second full
+  spine run. The failure mode is that a role-scoped rule relayed as a general one makes the
+  receiving session do the wrong thing CONFIDENTLY — a rule arriving through the dispatch channel
+  reads as authoritative by construction.
+  **The generalization, in the lead's own words:** before relaying a rule, check whose role it
+  binds.
+  **Why `[design-pending]`:** the home is nameable — lifecycle-kit/templates/lead.md, whose relay
+  duties the rule would qualify — but it is a kit template binding every consumer, so the wording is
+  an envelope change. The harder half is whether anything can CHECK it: a dispatch prompt is prose
+  and the roles are defined across three surfaces (lead.md, the stage templates, each kit's SPEC),
+  so a scanner would have to resolve a relayed sentence to a role, which is not obviously decidable.
+  The cheaper shape is a stated relay discipline naming the surfaces a lead consults before
+  relaying, which costs a template line and buys no detection.
+  **DISTINCT from two neighbours, both re-read at the promotion.**
+  `lead-specifies-constraint-not-mechanism` is a lead handing down a MECHANISM where a constraint
+  was its remit; this is a lead handing down a RULE that was never its to hand down.
+  `relayed-ruling-provenance-unrecorded` is a relayed ruling's authorization channel being
+  untraceable, not whom the rule binds. The first shares this entry's home and its envelope-change
+  reasoning, so a scope ruling either should rule both.
+  **Cost while deferred:** low frequency, high per occurrence, and invisible from the receiving end
+  — a stage that follows a mis-scoped relayed rule produces work that looks compliant and is wrong,
+  and only the relayer can tell.
+  Filed 2026-08-23 to the gap inbox at `battery-runner-port`'s close, on the lead's self-report and
+  deliberately not written into the template there; promoted 2026-08-23 at the next iteration's
+  scope drain.
 
 ## Icebox
 
