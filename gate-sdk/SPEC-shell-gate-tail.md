@@ -665,6 +665,31 @@ twin* disposition's **undocumented-surface bound** instead, since both helpers a
 documented by canon-kit/SPEC.md §lib/spec.sh. Repaired there rather than left to
 delta 10, because it is staleness this delta creates and no gate catches it.
 
+**Repaired at the cut — this delta also killed delegation-kit's turn-end liveness
+probe, and the unit does not ship a dead probe.**
+`DELEGATION_KIT_LIVENESS_CMD` defaulted to the declaration path this delta
+deletes, so the readability test it sits behind failed on every firing and the
+probe logged `verdict=unavailable` while answering nothing. **Measured, not
+inferred**: the probe's own log carries 508 answered firings (471 green, 37 red)
+and then an unbroken run of `unavailable` beginning at this delta's commit. That
+is the mechanism the wait-primitive discipline rests on, and the detector behind a
+standing defect with five recorded firings, so it is the unit's breakage to repair
+rather than a bullet to leave behind. It was first filed as a knob-contract and
+provenance-seam question on the premise that *every* repair turns the knob's value
+from a path into a name-resolving command. **That premise is false, and the tree
+had already ruled the case one caller over**: evidence-kit/SPEC.md
+§check-evidence-manifest met the identical break when this same port turned a
+pre-flight entry's named path into a descriptor, and discharged it with a
+**consumer-side front end**, refusing to teach the kit's knob to resolve a name as
+"a kit-contract change". Applied here the knob keeps its contract exactly: the
+template drops its now-fake default, and this repo names its own two-line reader
+reaching the gate by name through the front end its whole pre-flight roster
+already uses. The wider filing stays open on what it still carries; the capability
+does not wait on it. The oracle that would have caught it lands with the fix, in
+the consumer that configures the reader — delegation-kit's own probe test drives a
+**stub** reader by design, so it can hold every verdict arm and can never see
+whether the configured one resolves.
+
 ### (10) Descriptors, registration, conservation rows and the remainder accounting
 
 Eight descriptors, eight registry entries, the derived substrate-sensitive set

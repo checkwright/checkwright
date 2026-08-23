@@ -882,9 +882,29 @@ Nothing about how a PID's liveness is decided is seconded here.
 
 **The prerequisite is stated, not assumed.** A consumer that wires this hook with
 no reader resolvable at `DELEGATION_KIT_LIVENESS_CMD` — evidence-kit unvendored,
-or the knob deliberately emptied — gets `verdict=unavailable` on every line and a
-probe that answers nothing. That is honest degradation and it is preferable to a
-silent third parse that would work everywhere and drift from its owner.
+or the knob left unset — gets `verdict=unavailable` on every line and a probe that
+answers nothing. That is honest degradation and it is preferable to a silent third
+parse that would work everywhere and drift from its owner.
+
+**The template ships no default reader, and what it stopped shipping is why.** It
+defaulted to `evidence-kit/checks/check-producer-liveness.sh` while that gate was
+shell-declared. `shell-gate-tail-port` made the gate a descriptor dispatched to
+the binary, so that path exists in **no** tree — the readability test the reader
+sits behind fails everywhere, and the probe logged `unavailable` on every firing
+in a tree whose battery was green over it. A default naming a path nothing resolves
+is a fake default: it reads as a shipped capability and is none, which is worse
+than declaring the prerequisite. So the knob now has no default and the reader is
+the consumer's to name. **The alternative was to teach this knob to resolve a gate
+*name*, and it is refused on a recorded precedent rather than on taste**:
+evidence-kit/SPEC.md §check-evidence-manifest met the identical break one caller
+over, when the same port turned a pre-flight entry's named path into a descriptor,
+and discharged it with a **consumer-side front end** resolving the name —
+"deliberately not teaching lifecycle-kit to resolve a name in that knob, which
+would be a kit-contract change". The same reasoning binds here, and it is the
+reason this repair changes no contract: the value is still a path this probe runs
+with the scratch dir as its only argument. This repo's own reader is
+`scripts/producer-liveness-reader.sh`, two lines that reach the gate by name
+through the front end its whole pre-flight roster already uses.
 
 **One line per firing**, appended, space-delimited `key=value` after a leading
 timestamp:
@@ -957,6 +977,19 @@ alone and never `hooks[].hooks[].command`, and `check-memory-off` scans the memo
 surface. So the registration reds nothing — and neither would a registration
 naming a script that does not exist. A session decides this wiring by reading this
 section, never by predicting a verdict.
+
+**One half of that is now observed, and the half that is not is the same half.**
+The *registration* is still unwatched, for the reasons above. What is watched is
+the **configured reader**: a consumer test fires the consumer's own hook copy with
+the knob unset, over a scratch run dir it constructs, and asserts the logged
+verdict is `green` on an empty dir and `red` with a record naming a PID that is
+always alive. `unavailable` fails it by name. This kit's own
+`gate-tests/subagent-stop-liveness.test.sh` cannot make that assertion and should
+not try — it drives a **stub** reader per exit class, which is what lets it hold
+every verdict arm hermetically, and a stub is by construction not the configured
+one. The gap between those two is exactly where the dead default lived for a whole
+iteration under a green battery, so the oracle belongs to the consumer that
+configures the reader, beside the copy that names it.
 
 ### What `background_tasks` carries
 
@@ -1869,11 +1902,14 @@ layout as defaults):
   be a name nothing reads, and the close stage reaches the file through the
   roster's literal rather than through a knob.
 - `DELEGATION_KIT_LIVENESS_CMD` — the liveness reader the probe invokes in set
-  mode; default `evidence-kit/checks/check-producer-liveness.sh`. A knob rather
-  than a literal because a consumer's evidence-kit may sit elsewhere, and because
-  it is read through the **unset** form, so an explicitly empty value is the
-  supported way to run the probe with no reader at all — the honest-degradation
-  case the section states.
+  mode, a path run with the scratch dir as its only argument; **no default**.
+  A knob rather than a literal because a consumer's evidence-kit may sit
+  elsewhere, and defaultless because the gate behind it is reached by *name*
+  rather than by path and only a consumer knows its front end (§The turn-end
+  liveness probe (template) owns why the knob is not taught to resolve a name).
+  Unset and empty are therefore the same value here, and both are the supported
+  way to run the probe with no reader at all — the honest-degradation case the
+  section states.
 - `DELEGATION_KIT_READONLY_TYPES` — agent-type names the consumer dispatches for
   read-only work; D2's only trigger (§The delegation model). Default empty, in
   which case D2 is inert by construction. Every entry is the consumer's own

@@ -3,8 +3,8 @@
 set -uo pipefail
 
 LOG="${DELEGATION_KIT_STOP_LOG:-${GATE_SDK_WORKFLOW_DIR:-.workflow}/subagent-stop-liveness.log}"
-# spec: delegation-kit/SPEC.md §The turn-end liveness probe (template) — the unset-form default, so an explicitly empty knob is the supported way to run with no reader at all
-LIVENESS_CMD="${DELEGATION_KIT_LIVENESS_CMD-evidence-kit/checks/check-producer-liveness.sh}"
+# spec: delegation-kit/SPEC.md §The turn-end liveness probe (template) — this consumer's own reader, the adapter that reaches check-producer-liveness by name; the template ships no default because only a consumer knows its front end
+LIVENESS_CMD="${DELEGATION_KIT_LIVENESS_CMD-scripts/producer-liveness-reader.sh}"
 RUN_DIR="${GATE_SDK_TMP_DIR:-.tmp}"
 
 # spec: delegation-kit/SPEC.md §The turn-end liveness probe (template) — every value is one whitespace-free token, so a payload string can never split the space-delimited line
