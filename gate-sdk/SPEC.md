@@ -74,7 +74,7 @@ extension rule are §The workflow directory — resolved in `lib/gate.sh` rather
 than inline at its readers, for the same reason the two `check-kit-registration`
 document knobs below are: the governed-comment corpus takes this directory's
 tracked tier, and a knob the owning kit's library does not define is the config
-bridge's third refusal, so a compiled member declaring it would fail-close on
+bridge's undeclared-knob refusal, so a compiled member declaring it would fail-close on
 every invocation), `GATE_SDK_GRAPH_ARTIFACT` (default
 `<gates-dir>/CHECK-GRAPH.html`; the emitted coupling-graph artifact's path,
 read by `check-graph` assertion E — set it to republish the artifact elsewhere,
@@ -93,7 +93,7 @@ banner roll on `run-gates.sh` and the generated hooks — see §run-gates),
 than inline at its readers, for the third occurrence of the reason the workflow
 directory above and the two `check-kit-registration` document knobs below carry —
 a compiled member valving the queue out of its corpus declares this knob, and a
-knob no kit library defines is the config bridge's third refusal **whatever
+knob no kit library defines is the config bridge's undeclared-knob refusal **whatever
 prefix its name carries**, so an environment-only override would fail-close on
 every invocation), `GATE_SDK_AGENT_FILE` (default
 `CLAUDE.md`; the always-loaded agent file a consumer's harness reads — set it to

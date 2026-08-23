@@ -879,7 +879,7 @@ one reason: `gate-sdk/SPEC.md §lib/gate.sh`'s config bridge resolves a compiled
 member's declared knob by sourcing **the owning kit's** `lib/*.sh`, and the owner
 is derived from the knob's own `DRIFT_KIT_` prefix. So a knob this kit owns can
 only be resolved from here; there is no other place that would work, and a knob
-no library defines is the bridge's third refusal.
+no library defines is the bridge's undeclared-knob refusal (gate-sdk/SPEC.md §lib/gate.sh).
 
 **The trajectory arm's four knobs live here for exactly that reason, and their
 move is what the port paid.** `DRIFT_KIT_CONFIG_FILE`,
@@ -887,7 +887,7 @@ move is what the port paid.** `DRIFT_KIT_CONFIG_FILE`,
 were resolved inside `bin/trajectory.sh` while the extractor was a shell tool
 that could source its own config. A compiled arm cannot: it reads the bridge, the
 bridge sources this library and nothing else, so a default left in the tool would
-have made every one of them the bridge's third refusal. **Sourcing the consumer
+have made every one of them the bridge's undeclared-knob refusal. **Sourcing the consumer
 config is part of that**, and it happens here first — a knob a consumer config
 sets would otherwise resolve to the platform default and silently ignore the
 override, which is the failure mode that looks like success
