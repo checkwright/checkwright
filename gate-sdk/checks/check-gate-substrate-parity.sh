@@ -42,6 +42,16 @@ section="$(awk -v s="$SECTION" '
 fail_closed "$st" check-gate-substrate-parity awk
 [[ -n "$section" ]] || { echo "check-gate-substrate-parity: no '$SECTION' section in $DOC" >&2; exit 2; }
 
+# spec: gate-sdk/SPEC.md §run-gates — membership without a pipe: a short-circuiting consumer abandons its in-process producer mid-write, and under `set -o pipefail` that SIGPIPE becomes the pipeline's status and flips this gate's verdict
+in_set() {
+    local want="$1" x
+    shift
+    for x in "$@"; do
+        [[ "$x" == "$want" ]] && return 0
+    done
+    return 1
+}
+
 findings=()
 
 # spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion H opens the section the
@@ -77,7 +87,7 @@ subcommand_in_scope() {
         [[ "$publishing_tree" == 1 ]]
         return
     fi
-    printf '%s\n' "${KIT_NAMES[@]+"${KIT_NAMES[@]}"}" | grep -qx -- "$1"
+    in_set "$1" ${KIT_NAMES[@]+"${KIT_NAMES[@]}"}
 }
 
 # assertion A: each member resolves to exactly one declaration — a dir carrying
@@ -222,7 +232,7 @@ if [[ -x "$BIN" ]]; then
         if [[ "$row" == *$'\t'* ]]; then owners+=("${row#*$'\t'}"); else owners+=(""); owner_state=unavailable; fi
     done
     for g in "${DESCRIPTORS[@]+"${DESCRIPTORS[@]}"}"; do
-        printf '%s\n' "${subcommands[@]}" | grep -qx -- "$g" \
+        in_set "$g" ${subcommands[@]+"${subcommands[@]}"} \
             || findings+=("descriptor names no subcommand: $g.gate declares a gate the binary does not carry")
     done
     # spec: gate-sdk/SPEC.md §check-gate-substrate-parity — the roster half speaks only for what
@@ -235,8 +245,8 @@ if [[ -x "$BIN" ]]; then
             continue
         fi
         in_scope=$((in_scope + 1))
-        printf '%s\n' "${DESCRIPTORS[@]+"${DESCRIPTORS[@]}"}" | grep -qx -- "$s" && continue
-        if grep -F -- "\`$s\`" <<<"$section" | grep -qi -- 'reference-only'; then
+        in_set "$s" ${DESCRIPTORS[@]+"${DESCRIPTORS[@]}"} && continue
+        if grep -F -- "\`$s\`" <<<"$section" | grep -i -- 'reference-only' >/dev/null; then
             refonly=$((refonly + 1))
             continue
         fi

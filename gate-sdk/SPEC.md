@@ -6568,6 +6568,22 @@ properties bind:
   projection another member read would be a **defect against this contract**,
   not a scheduling input.
 
+**What the pool actually exposed was a different class, and it is recorded here
+because the contract above would not have caught it.** A member that abandons an
+**in-process pipe producer** — `printf '%s\n' "${set[@]}" | grep -q …`, the
+membership idiom — takes the producer's `SIGPIPE` as the pipeline's status under
+`set -o pipefail`, and the verdict flips. Serially the producer's single write
+almost always completes before the consumer short-circuits; under contention it
+does not, and `check-gate-substrate-parity` reported a descriptor the binary
+plainly carried, at roughly one run in three with the crate rebuilding beside it.
+This is the **same class** the dispatch capture above exists against, reached
+through an array rather than through argv, and the fix is the same shape:
+membership is a `for` loop, never a pipeline. **The rule a member is measured
+against: a short-circuiting consumer may not be fed by a producer inside the same
+gate.** The find is worth more than the fix — a pool does not create such a
+defect, it converts a silent one into a visible one, which is what a battery
+should do.
+
 **The dispatch capture holds the two streams apart, and it is `gate_command`'s
 contract rather than the battery's.** `gate_command`'s stdout *is* the invocation
 argv, one element per line; its stderr is diagnostic text. Merging them makes any

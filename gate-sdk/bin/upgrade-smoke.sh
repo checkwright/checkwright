@@ -223,7 +223,10 @@ fi
 
 undeclared=()
 for g in "${red[@]+"${red[@]}"}"; do
-    printf '%s\n' "${allowed[@]+"${allowed[@]}"}" | grep -qxF "$g" || undeclared+=("$g")
+    # spec: gate-sdk/SPEC.md §run-gates — membership without a pipe: an abandoned in-process producer's SIGPIPE becomes the pipeline's status under `set -o pipefail`, which would flip this verdict
+    _allowed=0
+    for _a in ${allowed[@]+"${allowed[@]}"}; do [[ "$_a" == "$g" ]] && { _allowed=1; break; }; done
+    (( _allowed )) || undeclared+=("$g")
 done
 if [[ ${#undeclared[@]} -gt 0 ]]; then
     echo "upgrade-smoke: FAIL — gate(s) went red that TO's tightened-gates declaration does not name:" >&2

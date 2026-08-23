@@ -440,7 +440,10 @@ pub fn run(args: &[String]) -> i32 {
         return 2;
     }
 
-    let kit_roots = match walk::kit_roots() {
+    // spec: gate-sdk/SPEC.md §lib/gate.sh — the bridged roots cross spelled relative to the invoking
+    // directory and are re-absolutised here, which is how the reader recovers exactly the paths the
+    // shell library computed — and what keeps the two dispatchers' unresolved-member report equal
+    let kit_roots = match walk::kit_roots_abs() {
         Ok(v) => v,
         Err(e) => {
             eprintln!("{}: {}", TOOL, e);
@@ -659,6 +662,104 @@ mod tests {
             names,
             vec!["GATE_SDK_KNOB_A", "GATE_SDK_KNOB_P_ONE", "GATE_SDK_KNOB_P_TWO"]
         );
+    }
+
+    // spec: gate-sdk/SPEC.md §The port-candidate criteria — the criterion-6 discharge for the
+    // `staged_matches` twin the port created: one canned corpus of glob/path pairs put to
+    // `gate_staged_matches` and to this matcher, verdicts compared byte for byte.
+    #[test]
+    fn the_staged_matcher_agrees_with_the_shell_library_on_a_canned_corpus() {
+        let globs: &[&[&str]] = &[
+            &["docs/*.md"],
+            &["docs/*"],
+            &["*.md"],
+            &["*"],
+            &["kit/**/x.rs"],
+            &["a?c/*.txt"],
+            &["[ab]lpha/*"],
+            &["[!ab]lpha/*"],
+            &["docs/index.md"],
+            &["scripts/*.sh", "kit/*.sh"],
+            &["docs/*.md", "nothing/at/all"],
+        ];
+        let paths = [
+            "docs/index.md",
+            "docs/a/b.md",
+            "docs",
+            "docsx/index.md",
+            "README.md",
+            "kit/deep/x.rs",
+            "kit/x.rs",
+            "abc/one.txt",
+            "ac/one.txt",
+            "alpha/one",
+            "blpha/one",
+            "clpha/one",
+            "scripts/run.sh",
+            "kit/run.sh",
+            "",
+        ];
+
+        let mut corpus = String::new();
+        let mut mine: Vec<bool> = Vec::new();
+        for g in globs {
+            for p in paths {
+                corpus.push('P');
+                corpus.push_str(p);
+                for one in *g {
+                    corpus.push('\t');
+                    corpus.push_str(one);
+                }
+                corpus.push('\n');
+                mine.push(staged_matches(p, g));
+            }
+        }
+
+        let lib = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("..")
+            .join("gate-sdk/lib/gate.sh");
+        // spec: gate-sdk/SPEC.md §The port-candidate criteria — each record carries a `P` sentinel
+        // ahead of the path, because `read` will not hand back an empty leading field and the empty
+        // path is a corpus row the two matchers must be compared on like any other
+        let script = concat!(
+            "source \"$1\"; ",
+            "while IFS=$'\\t' read -ra f; do ",
+            "  p=\"${f[0]#P}\"; staged_all=(\"$p\"); ",
+            "  if gate_staged_matches \"${f[@]:1}\"; then echo 1; else echo 0; fi; ",
+            "done"
+        );
+        let out = crate::proc::run_with_stdin(
+            "bash",
+            &["-c", script, "bash", &lib.display().to_string()],
+            corpus.as_bytes(),
+        )
+        .expect("cannot run the shell matcher");
+        let body = out
+            .stdout()
+            .expect("the shell matcher exited non-zero over the canned corpus");
+        let theirs: Vec<bool> = String::from_utf8_lossy(body)
+            .lines()
+            .map(|l| l.trim() == "1")
+            .collect();
+
+        assert_eq!(
+            theirs.len(),
+            mine.len(),
+            "the shell matcher answered {} of {} corpus rows",
+            theirs.len(),
+            mine.len()
+        );
+        let mut i = 0;
+        for g in globs {
+            for p in paths {
+                assert_eq!(
+                    mine[i], theirs[i],
+                    "the two staged matchers disagree on path {:?} against globs {:?}:                      the crate says {} and gate_staged_matches says {}",
+                    p, g, mine[i], theirs[i]
+                );
+                i += 1;
+            }
+        }
     }
 
     // spec: gate-sdk/SPEC.md §run-gates — a `mode=staged` member matches by pathspec, the exact
