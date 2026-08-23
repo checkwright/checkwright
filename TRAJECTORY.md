@@ -281,6 +281,38 @@ session performing an edit its child was denied is permission laundering, and it
 operator's permission boundary into a formality. A session that meets the refusal and stops has
 behaved correctly, and re-deferring the unlandable half is the outcome, not a failure.
 
+**No gate is permanently shell, and a spawned program is a dependency, never a port
+exclusion — ruled 2026-08-23 by the operator.** The "permanently shell" class (gate-sdk/SPEC.md
+§The port-candidate criteria, exception class (a)) and the "held behind a sub-project" reading of
+criterion 7 are both retired, with their refutations recorded where each stood: the shell auditor
+already trusts the binary's `--list`, absence and staleness of the binary are the fail-closed
+contract's and `check-gate-binary-fresh`'s to catch, and a wrapper that spawns cargo, shellcheck or
+a renderer moves the dependency floor not at all. Every remaining shell gate ports; the port oracle
+reads six owed and six takeable, and the unit is `shell-gate-tail-port`. **What "port complete"
+means is ruled with it**: the battery runs from the hook to the binary with no bash in between
+(`battery-runner-port`), the install bootstrap is the three-step shim written twice
+(`install-step-relocation`, `powershell-installer-surface`), and every remaining non-test `.sh`
+outside those two either carries a stated `no-port` cause or is deleted. The adopter-facing
+residue is the bootstrap alone: the generated pre-commit hook shim needs no PowerShell twin, because
+git runs hooks through the `sh` Git for Windows ships, so a two-line shim invoking the binary is one
+implementation on every platform. Contributor-side tooling and the test harness ship to no adopter
+and port opportunistically, never as a gate on the claim.
+
+**The deferred pool's exits are close's to take — ruled 2026-08-23 by the operator, on a measured
+8:1 intake-to-exit ratio.** Three things change, each owned where its mechanism lives: the icebox
+age floor drops to seven days (`scripts/queue-config.sh`); a finding whose cost opens in the low
+class and names no live trigger may be filed **directly** as a one-line icebox entry, and a trigger
+that is launch-gated counts as dormant rather than live (queue-kit/SPEC.md §The icebox tier); and
+close's existing wontfix disposition — the bare `## Done` line — is the ordinary exit for an entry
+a landed unit or a closed ruling has mooted, taken by close under those two criteria rather than
+escalated. The icebox compresses and the wontfix line retires; neither needs a new section. What
+stays operator-class is reversing a `[roadmap:]`-tagged entry, which no drain may retire.
+
+**`check-crate-arms` stays whole and caches — ruled 2026-08-23.** The alternative, clippy at
+commit and tests at validate, was refused: CI runs the battery and the fixture suites, not
+validate, so the narrowing would have moved the test arm out of CI's reach. The source-stamp
+cache is owned at gate-sdk/SPEC.md §check-crate-arms.
+
 ## PRIORITY DIRECTIVE — the port track's sequence
 
 **Ruled 2026-08-09 by the operator, and it is the track's top priority: complete
@@ -345,7 +377,11 @@ tranche, after which `scripts/` keeps no gate script at all. Recorded here
 because it binds every remaining cohort's ordering and the entry that owned it
 was always going to leave the queue.
 
-What the sequence names next, after the port: `companion-toolkit-profile`.
+**The port's tail, in order — ruled 2026-08-23:** `battery-runner-port` first, because it is the
+only unit that moves wall-clock and it removes the bash seam every other shell member dispatches
+through; then `shell-gate-tail-port`, the gates the port oracle reads as owed plus the kit-shipped shell gates this
+tree never registers; then the bootstrap pair. What the sequence names after the port:
+`companion-toolkit-profile`.
 
 `instruction-surface-bash-focus` unblocks on a threshold rather than a date,
 per its own queue entry. Surge-channel launch stays gated behind the private

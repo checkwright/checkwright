@@ -188,14 +188,27 @@ entry, the same exemption the deferred section already carries.
 
 **Eligibility**, judged at the closing stage: the entry's cost field opens in
 the low class; it carries no `[roadmap:]` tag; and it has **no live promotion
-trigger** — an entry whose promotion waits on a named expected event (a launch,
-a first external adopter, a sibling unit landing) stays deferred, because it
-has a trigger, just not a date.
+trigger**. **What counts as live was narrowed 2026-08-23 by operator ruling**,
+on a measured pool where the prior reading let almost nothing qualify: a live
+trigger is a **live, unbuilt queue slug** the entry names, a dated `recurrence:`
+line, or a `[roadmap:]` tag. A trigger that is itself gated on launch — a first
+external adopter, a preview cohort, an install count — is **dormant**: the entry
+waits in the icebox until the event occurs and returns on it, which is the round
+trip the tier already conserves. The cost field's opening token is the class word the
+`--icebox-candidates` arm reads (`low`, `zero`, `bounded`, `cosmetic`), so a
+cost field that opens in prose has declared no class and is read as not-low;
+authoring the class word first is the contract, and the gate that holds it is
+owed — filed 2026-08-23 into the gap inbox, drained by the next close.
 
-**Nothing files directly into the icebox.** The only producer is the eviction
-step: a newly filed finding has never been triaged and so cannot be pre-judged
-dormant. That keeps the tier from becoming a dumping ground and keeps the
-net-delta KPI honest.
+**Direct filing into the icebox is permitted on one condition — ruled
+2026-08-23, reversing the prior rule.** The prior rule held that nothing files
+directly into the icebox because a newly filed finding has never been triaged.
+What changed is who triages: the closing stage's drain *is* the triage, and a
+drained bullet whose cost opens in the low class and names no live trigger may
+land as a one-line icebox entry without first being written as a deferred body
+that the next close compresses. The net-delta KPI stays honest because the arm
+counts the tier on the way in. A mid-iteration filing still goes through the
+gap inbox; what this permits is the drain landing it one tier lower.
 
 **Position is a contract, not a preference.** The read order is pickable →
 parked → dormant → history, and a cross-kit reader depends on the tier sitting

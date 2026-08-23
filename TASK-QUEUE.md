@@ -94,6 +94,68 @@
   direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope. Since then it is
   promoted at spec and demoted at build once per increment on the entry-outlives-the-amendment
   branch — eight so far, each cut's own record staying at its SPEC section.
+  **Tail ruled 2026-08-23** (TRAJECTORY.md §PRIORITY DIRECTIVE): no member is permanently shell;
+  the sequence is `battery-runner-port`, `shell-gate-tail-port`, then the bootstrap pair.
+
+- **battery-runner-port** [design-pending] — the battery runs from the hook to the binary with
+  no bash in between: a `run` arm of the multi-call binary replaces `run-gates.sh`'s dispatch
+  loop and `gate_command`'s per-knob bridge.
+  **Operator-ruled 2026-08-23 as the port tail's first unit**, because it is the only unit that
+  moves wall-clock and because every remaining shell member dispatches through the seam it
+  removes. Measured at the consult that ruled it: the battery is 52.4s, of which `check-crate-arms`
+  is 27.2s and `check-graph` 7.0s; the other 100 ported gates cost 15–115ms each through
+  `gate_command` — the binary's `--knobs` call plus one subshell sourcing the owning kit's
+  `lib/*.sh` per declared knob — against 1–6ms when the binary is invoked directly, so the port
+  of one hundred gates moved the battery's wall-clock by nothing, as TRAJECTORY.md §PRIORITY
+  DIRECTIVE predicted and `native-gate-port-remaining-corpus` records.
+  **What the arm owns:** the registry walk in registry order; knob resolution in-process from
+  the consumer's config (the bridge's three refusals kept, gate-sdk/SPEC.md §lib/gate.sh); the
+  `--only` / `--for` selectors and the `--emit <arm>` dispatch; per-gate timings and the
+  dispatch-stderr seam (§run-gates); worker threads with per-gate scratch isolation and
+  deterministic output ordering, which is the concurrency contract
+  `gate-battery-parallel-execution` filed and this unit discharges; and the hook generator's
+  argv projection, so `gen-pre-commit.sh --emit` stops sourcing every kit library per knob —
+  which is `config-bridge-resolution-cost`'s whole cost and `graph-port-bash-spawn-residue`'s
+  spawn. `gate-battery-result-cache` is a closure candidate once the couples-keyed cache is an
+  in-process map rather than shell bookkeeping; its invalidation question is inherited, not
+  answered here.
+  **Why `[design-pending]`:** the generated pre-commit hook bakes `gate_command`'s resolved argv
+  today (gate-sdk/SPEC.md §gen-pre-commit), so the hook's shape after the runner port — a
+  two-line shim invoking `run --hook` with the staged-path filter, versus a baked per-gate argv
+  list — is the design question, and it binds `install-step-relocation`. The shell
+  `run-gates.sh` survives as that shim's target only until the bootstrap pair lands.
+  **Cost while deferred:** high and paid per session — every commit pays the bridge, every
+  validate pays the serial battery, and every further port adds a member that dispatches through
+  the seam this unit removes.
+  Filed 2026-08-23 at the consult by operator direction, under the direct-filing exception.
+
+- **shell-gate-tail-port** [design-pending] — the six registered shell gates, and the two
+  kit-shipped shell gates this tree never registers, port as wrappers; no gate stays shell.
+  **Operator-ruled 2026-08-23** (TRAJECTORY.md §The closed rulings): exception class (a) and
+  the criterion-7 "sub-project" hold are retired with their refutations recorded at
+  gate-sdk/SPEC.md §The port-candidate criteria and §Meta-gate conservation for the binary
+  substrate; the `# no-port:` and `# port-until:` headers are deleted, and the oracle reads
+  *6 still owed, 6 takeable at this cut*.
+  **The members and what each port is:** `check-gate-substrate-parity` and
+  `check-install-disposition`, text walks that already read the binary's `--list`;
+  `check-crate-arms`, a wrapper spawning cargo, `install: never`, carrying the source-stamp cache
+  its SPEC section rules; `check-shellcheck` and `check-action-run-shell`, wrappers spawning
+  shellcheck and refusing at exit 2 when absent, the first retiring with the last `.sh`;
+  `check-docs-render-fidelity`, a wrapper spawning the renderer, whose GNU-awk batch stream is
+  the last live holder of the `awk (GNU)` requirement docs/install.md states, so the port
+  retires that floor (site-kit/SPEC.md §check-docs-render-fidelity); and the two unregistered
+  members `check-surface-duplication` (canon-kit, `install: on-surface`) and
+  `check-producer-liveness` (evidence-kit, `install: never`), which `port-blockers.sh` never
+  counts because it scans `gates.list` members — the kit-shipped corpus is the port's, whether
+  or not this tree registers it. Every member keeps criterion 7's refusal shape and declares its
+  program under `--reads`; cut widths are the cut's, and the ordering inside the unit is
+  substrate-parity first, so the auditor of the dispatch relation is native before the rest move.
+  **Why `[design-pending]`:** the wrappers' dependency declaration — how a compiled member
+  states the external program it spawns so §port-blockers and the payload's omission logic read
+  it without a shell rule to tokenize — is the one mechanism the ruling did not supply.
+  **Cost while deferred:** the PRIORITY DIRECTIVE's claim stays unmade while six gates and two
+  kit libraries ship shell, and every one of them is a PowerShell twin owed under objective 6.
+  Filed 2026-08-23 at the consult on operator direction, the direct-filing exception applying.
 
 - **overlay-only-oracle-grants-uncommitted** [design-pending] — four oracles this tree runs
   constantly are granted only by an untracked overlay, so a fresh clone re-buys every one.
@@ -379,45 +441,6 @@
   in exactly the case a consumer is most likely to hit.
   Found 2026-08-18 by this iteration's scope at its own entry, from the surviving directory rather
   than from a reading of the code; filed under scope-gated intake rather than fixed in-session.
-
-- **cohort-held-members-port-prerequisites** [design-pending] — gates are held on
-  shell by operator ruling, each owing a named prerequisite nothing else tracks.
-  Ground is **sequencing, not exclusion**: gate-sdk/SPEC.md §The port-candidate criteria opens
-  by denying the seven are an eligibility screen, and criterion 7's worked example
-  (`check-action-run-shell` / `shellcheck`) names such a member the largest piece of port work
-  rather than a permitted exclusion. Every hold **and its ground** is canonical in the held
-  member's own SPEC section — the split §The port-candidate criteria rules and
-  §check-gate-substrate-parity's assertion H holds — so a ground stated there is cited here and
-  never restated; the count is the roster's, never a fixed number. The spent holds are that
-  SPEC's record too: `check-roadmap-fresh`, the POSIX ERE engine and the associative-array
-  bridge, each canonical at gate-sdk/SPEC.md §The first cohort.
-  **The declarable spelling is PAID** (2026-08-18): `# port-until: <slug>`, its readers and the
-  slug-liveness split are canonical at gate-sdk/SPEC.md §The `# graph:` manifest, §port-blockers,
-  §check-gate-substrate-parity and §check-gate-exemption-tasks.
-  **Both 2026-08-22 dispositions are PAID and the roster is down to three.**
-  `check-tree-terms` and `check-gate-assertions` are retired from the held tier and their
-  declarations deleted; the criterion-4 sizing fact relocated to gate-sdk/SPEC.md §check-tree-terms
-  and the `paste` price to §check-gate-assertions, so this entry holds neither. The rulings —
-  criterion 4 prices a port and never holds one, and a criterion-7 blocker holds only where the
-  program is the rule's semantic content — are canonical at gate-sdk/SPEC.md §The port-candidate
-  criteria.
-  **What is left is exactly three members, each owing a sub-project**: `check-shellcheck` and
-  `check-action-run-shell` behind a shellcheck-free lint, and site-kit's
-  `check-docs-render-fidelity` behind a renderer-free render. Each blocking program decides its
-  gate's verdict, so none is designed away by port work — which is why this entry stays live
-  rather than closing, and it must: all three declarations name this slug and
-  `check-gate-exemption-tasks` reds on a slug that is Done-only.
-  **Cost while deferred:** `native-gate-port-remaining-corpus` ranks the remaining corpus as
-  undifferentiated gate-count, so a held member reads as one more unported gate when its
-  prerequisite is a sub-project, and a later cohort discovers the sizing at implementation time —
-  the failure mode criterion 7 exists to prevent. The 2026-08-22 increment removed the two members
-  that were never really held; what it leaves is three sub-projects nobody has scoped.
-  Filed 2026-08-12 by close; widened at build with the canon-kit trio; census correction
-  2026-08-12 at scope on operator direction; engine block collapsed 2026-08-13 at build when the
-  ERE cohort paid it. Promoted and demoted at build three times on canon-kit/SPEC.md §Merging an
-  amendment's entry-outlives-the-amendment branch — 2026-08-16, 2026-08-18 for the spelling, and
-  2026-08-22 with SPEC-hold-grounds.md, which retired the two ungrounded holds and left the three
-  real ones grounded and machine-held.
 
 - **gap-inbox-commit-ownership** [design-pending] — nothing says who **commits** a gap-inbox
   bullet, so a filed bullet can reach the next iteration uncommitted and be carried by whichever
@@ -1089,43 +1112,6 @@
   unless a platform label becomes a gated surface.
   Filed 2026-07-26 by scope, operator ruling at the `activation-path` unit-set
   escalation, split from `platform-support-contract`.
-
-- **gate-tamper-consumer-gate-coverage** [design-pending] — this repo's gates
-  are outside `check-gate-tamper` entirely, and the override that did it looks
-  like an oversight rather than a decision. `delegation-kit/lib/delegation.sh`
-  defaults `DELEGATION_KIT_GATE_FILES` to `<gates-dir>/check-*.sh` plus the
-  runner and library under that dir, and the declaration is
-  `declare -p … || <default>` — a consumer array **replaces** it rather than
-  extending it. `scripts/delegation-config.sh` declares
-  `("*/checks/*.sh" "gate-sdk/lib/gate.sh" "gate-sdk/bin/run-gate-tests.sh")`,
-  which reaches every kit-shipped gate and drops `scripts/check-*.sh`, the very
-  case the default existed for. The globs were almost certainly meant to be
-  additive: the comment above them explains the `*/checks/*.sh` reach and says
-  nothing about giving anything up.
-  **The coverage half has landed — re-verified 2026-07-31 at build against
-  `scripts/delegation-config.sh`.** The array now carries `scripts/check-*.sh`
-  beside the other three globs, with the replace-not-extend hazard written into
-  the comment above it, and delegation-kit/SPEC.md was corrected at the same
-  close. What this entry still owes is the *mechanism*, not the value.
-  **Deliverable, as it now stands:** a fixture arm proving that a `scripts/` gate
-  edit co-staged with product code is blocked, which no existing arm covers; and
-  the same replace-not-extend audit on `DELEGATION_KIT_META_PATHS`, which
-  re-declares every default it overrides and so is correct by hand rather than by
-  mechanism. The open design question is whether a consumer array should extend
-  rather than replace — a kit-wide declaration-semantics ruling, not a config
-  edit.
-  **Why deferred rather than fixed in the batch that found it:** widening
-  coverage may red-line commit shapes this repo's own history relies on — a
-  consumer gate landing beside the product change it gates is exactly the shape
-  the assertion rejects — so the fix needs a survey of recent gate-touching
-  commits before it lands. Scope-gated intake.
-  **Cost while deferred:** low, and lower than this entry claimed before the
-  correction above — the coverage hole is closed, so what remains is that the
-  correct value is held by hand: nothing pins the glob, no fixture arm would red
-  if it were dropped again, and `META_PATHS` carries the same unpinned shape.
-  Filed 2026-07-26 by build, on the lead's ruling during the
-  `platform-support-contract` floor batch, from a probe of `check-gate-tamper`'s
-  resolved runtime config.
 
 - **lint-scope-hook-trigger** [design-pending] — `GATE_SDK_LINT_EXTRA_DIRS` widens
   what `check-shellcheck` scans but cannot widen when the generated hook fires
@@ -1853,30 +1839,6 @@
   Filed 2026-08-01 by close's prompt-friction triage; tier corrected 2026-08-13 by close from the
   gap-inbox drain, after the operator ruled the entry out of that iteration's unit set.
 
-- **upgrade-contract-rename-routing-unstated** [design-pending] —
-  `docs/install.md` §The upgrade contract never states that a **gate-name**
-  rename or a **file/directory-convention** rename routes to the note's
-  "Behavior changes" section. The section's bullet-lead definition structurally
-  admits both, and the mapping paragraph covers a *consumer's* residue classes
-  rather than this project's own renames, so the routing is inferred and no
-  release note to date instantiates it.
-  **What leans on it.** lifecycle-kit's knob-rename compat clause
-  (`knob-rename-compat-threshold`, Delta 3) rests on that routing to establish
-  that its knob-scoping leaves no rename class without a home — the check that
-  licenses filing no gap for the widening question. That delta was softened at
-  align to state the inference *as* an inference; this entry is what would make
-  the reasoning stand on something stated.
-  **Why `[design-pending]`:** stating it changes what the upgrade contract
-  asserts to consumers — note-grammar semantics rather than wording, so a scope
-  call rather than a close fix.
-  **Cost while deferred:** low and non-rotting — the routing is admissible today
-  so no note is wrong; the residue is a downstream clause leaning on an inference.
-  Class: **feature** if it states a new routing obligation, debt if it only makes
-  an admitted one explicit — canon-kit/SPEC.md's new-names litmus decides at
-  promotion.
-  Filed 2026-08-01 at close from the gap inbox; align filed it after softening
-  the delta that leans on the routing.
-
 - **release-note-section-set-derivation** [design-pending] — the release note's
   fixed-section set is held by `check-release-bump` as parallel
   hardcoded calls, so a fifth section is added by copying a call rather than by
@@ -1914,30 +1876,6 @@
   Filed 2026-08-01 at close from the gap inbox, filed by this iteration's build
   on an operator-raised doctrine check.
 
-- **md-refs-tree-link-resolution** [design-pending] —
-  the `docs-mirror` arm emits a `/tree/` form for off-root **directory**
-  targets, and `check-md-refs`' self-repo pass recognizes only the
-  `/blob/<ref>/` prefix — so a `/tree/` link falls through to the external-URL
-  skip and is resolved by nothing.
-  **Not a live defect:** the generator's output is correct by construction, so no
-  `/tree/` link is wrong today. A coverage hole rather than a violation, and out
-  of `docs-root-link-grammar`'s boundary because that rule fires on **relative**
-  links while a `/tree/` link is absolute and already converted.
-  **Why `[design-pending]`:** the likely fix is one more prefix arm in the
-  self-repo pass, whose identity derivation and pinned ref
-  (`CANON_KIT_DOCS_BLOB_REF`) already exist — but confirm first whether a
-  `/tree/` target should resolve to a *directory* in-tree, since that is the one
-  case `check-docs-link-convention`'s directory-target rule deliberately routes
-  elsewhere. Two gates disagreeing about directory targets is the design
-  question; the missing arm is not.
-  **Cost while deferred:** low and non-rotting while the generator is the only
-  producer; the hole opens the moment a `/tree/` link is hand-written.
-  Debt: converges a resolver on a link form its own generator already emits,
-  minting nothing.
-  Filed 2026-08-01 at close from the gap inbox, filed by this iteration's build,
-  recorded in `docs-root-link-grammar`'s Producers-and-consumers section rather
-  than flagged-and-skipped.
-
 - **amendment-deletion-content-completeness** [design-pending] — a closed
   amendment can be **deleted with part of its content landing in no canonical
   spec**, and the merge rule has no completeness oracle at deletion time.
@@ -1959,24 +1897,6 @@
   rationale, and the loss is invisible until someone re-derives it, which is
   exactly what happened here and cost this iteration a spec cycle.
   Filed 2026-08-01 at close from the gap inbox.
-
-- **advisory-lane-draft-state-unswept** [design-pending] — the Advisories lane
-  probes `state=triage`, which is correctly the **undispositioned** set:
-  accepting a report moves it to `draft`, so `triage` is exactly what nobody has
-  ruled on yet. But a "fix under embargo" disposition is **ongoing rather than
-  terminal-in-practice** — the advisory sits in `draft` until publication, and
-  no lane looks at `draft`, so an embargoed fix that stalls is invisible to
-  every later boundary sweep. The lane closes the intake hole and leaves a
-  follow-through hole one state downstream.
-  **Options at design:** add a second probe for `state=draft` with a
-  re-raise-only disposition, or rule that the thread's notifications are
-  sufficient and record that ruling.
-  **Cost while deferred:** low and bounded — GitHub keeps notifying maintainers
-  and the thread is the work record (the same honest limit the lane's own
-  preamble states), so this is **unswept rather than unwatched**; the residue is
-  that nothing systematically re-raises a stalled embargo.
-  Surfaced 2026-08-01 at build while deriving the state literal from GitHub's
-  documented enum (lead ruling R3); filed at close from the gap inbox.
 
 - **path-pinned-allow-entry-oracle** [design-pending] — the **gap generalization
   owed** by close's ruling that a standing allow entry naming a *script path* is
@@ -2734,36 +2654,6 @@
   Filed 2026-08-03 at close from the gap inbox, merging the validate-filed instances into
   the base class and re-verifying both against the tree; found by build batch 1 and
   validate, corrected and widened at close.
-
-- **amendment-done-move-assertions** [design-pending] — a task can be marked done with its
-  amendment left undeleted on disk, and the battery stays green.
-  The amendment-merge Done-move contract is stated twice and gated nowhere, and the hole is
-  exactly the one `check-amendment-queue`'s bidirectional rule exists to close.
-  canon-kit/SPEC.md §Merging an amendment requires the completed entry to move to `## Done`
-  *dropping* its spec-pointer tag; queue-kit/SPEC.md §The queue format makes a Done entry a
-  bare slug line. Verified 2026-08-03 against the tree: nothing checks either.
-  **Why it falls through.** `check-amendment-queue` classifies only the feature,
-  active and deferred sections, so `## Done` falls to the unclassified bucket — while its
-  every-amendment-has-an-entry assertion collects spec-pointer refs with a whole-file grep,
-  so a tag left on a Done entry still *satisfies* that half. queue-kit's
-  `check-queue-sections`, `check-tag-lead-line`, `check-task-conservation` and
-  `check-queue-hygiene` all assert other things. Net effect: the silent-amendment-survival
-  failure the bidirectional rule was built against.
-  **Defect class:** a state-machine transition whose completion contract is prose-only on
-  the terminal side.
-  **Deliverable, gateable at zero FP inside an existing gate:** a done-section arm in
-  `check-amendment-queue` — a configured done-section name beside the active-sections knob,
-  then (i) no spec-pointer tag on a done entry and (ii) done entries are bare slug lines. The
-  `couples=` already reach `TASK-QUEUE.md` and the amendment glob, so no new gate and no new
-  trigger set; extending beats adding.
-  **Why `[design-pending]`:** the done-section name is a second consumer knob for a section
-  canon-kit does not otherwise know about, and whether canon-kit should learn queue-kit's
-  section vocabulary at all — rather than queue-kit asserting the Done shape and canon-kit
-  asserting only the tag — is the layering call.
-  **Cost while deferred:** zero while every merge is hand-checked; the failure mode is
-  silent, so its first instance is also its discovery.
-  Filed 2026-08-03 at close from the gap inbox; found by build batch 3 while establishing
-  which dispositions of a partially-landed amendment the oracles actually permit.
 
 - **partitive-exemption-line-scope** [design-pending] — `check-manifest-count` is stricter
   than its own spec, and the gap is one line break wide.
@@ -3537,24 +3427,6 @@
   was unfiled is false; its measurement and its third design candidate are folded in above and
   the duplicate slug is dropped.
 
-- **guard-advise-jq-dependency** [design-pending] — the advisory primitive goes silent in
-  exactly the degradation it exists to report.
-  `guard-kit/lib/guard.sh`'s `guard_advise` pipes into `jq` with no fallback, so with `jq` off
-  PATH it writes an empty stdout and the advisory is lost, leaving only a command-not-found on
-  stderr. Measured, not inferred. Every consumer routing a degraded arm to `guard_advise`
-  therefore says nothing at the moment it most needs to.
-  **The workaround is already local.** This repo's dispatch guard hand-writes its envelope to
-  avoid the dependency, and the constraint is stated in guard-kit's SPEC, so no consumer here
-  is silent today. What is unanswered is whether the *primitive* should carry an escaper-free
-  fallback so no consumer has to know this.
-  **Why `[design-pending]`:** the call is whether a degraded advisory beats a lost one, and
-  whether a hand-rolled escaper in the lib is a cure worth its own risk.
-  **Cost while deferred:** small and bounded here, since the one consumer that mattered worked
-  around it; the cost lands on a downstream consumer that reads the primitive as safe and
-  inherits the silence without the local knowledge that avoids it.
-  Filed 2026-08-07 by close, draining the gap inbox; found at build while wiring the
-  dispatch guard's degraded arm.
-
 - **rejected-compound-commit-relabel** [design-pending] — a rejected stage-and-commit leaves
   the index staged and the bare retry mislabels the work.
   A hook rejection of a compound stage-and-commit invocation unstages nothing, so the natural
@@ -3647,27 +3519,6 @@
   Filed 2026-08-07 by close, as the iteration's candidate lesson; the observation came from
   the lead, the evidence and the framing from this drain. Form ruled and the rule landed
   2026-08-10 by close on operator direction; scope narrowed here to the mechanizability half.
-
-- **survey-record-extension-tier-hybrid** [design-pending] — the record is machine-parsed like
-  a `.txt` and read like an `.md`, and the convention does not resolve the hybrid.
-  gate-sdk/SPEC.md §The workflow directory splits the directory by extension: `.txt` is a
-  record file whose grammar a gate parses field-wise, `.md` is a prose surface machine-read
-  only for emptiness or a bullet count. `.workflow/survey-record.md` does both.
-  `check-survey-record` parses every block field-wise — exact key order, no stray line,
-  non-empty `corpus` and `oracle`, and a `rev` that must be a 40-hex sha naming a real commit —
-  which is materially deeper than the `.md` tier's stated bound and is almost word-for-word the
-  `.txt` tier's test. Its content is nonetheless genuinely prose: a natural-language question
-  meant to be searched, closing on a free-form `finding` a later session judges before citing.
-  **Not a mis-typing so much as a tier the split does not have.** The tracking axis is fine and
-  the `# contract:` header is correct; what is unresolved is where a record-plus-judgment file
-  belongs when the convention offers only record or prose.
-  **Why `[design-pending]`:** the honest options are renaming the surface, widening the `.md`
-  tier's machine-read bound to admit a validating gate, or naming a third tier — and the last
-  one costs every consumer that has internalised the two.
-  **Cost while deferred:** low and non-rotting; it is paid by the next author adding a workflow
-  member, who reads the convention, finds the shipped counter-example, and re-derives which
-  half to follow.
-  Filed 2026-08-07 by close, from the workflow-surface-extension audit its roster made due.
 
 - **consumer-smoke-accounting-spelling-unpinned** [design-pending] — the accounting reads both
   gate spellings, and nothing holds it there.
@@ -4171,27 +4022,6 @@
   the directive count filed here was 1774, wrong by roughly a factor of two on the day it was
   written. Read the numbers off the oracle, never off this line.**
   Filed 2026-08-09 by close (`install-profile-seam`), from its own miswritten citation.
-
-- **install-lifecycle-reversibility** [design-pending] — `install-lifecycle.sh` writes three
-  things and removes none, so lifecycle governance cannot be armed at install.
-  **The declined branch of `init-lifecycle-agent-block-seeding`, recorded with its cost.**
-  `SPEC-agent-block.md` ruled that exclusion **correct on the merits** — seeding follows the
-  gate, not the kit — so nothing here reverses it. This is the prerequisite a *later* iteration
-  would have to buy first, and it is a unit rather than a clause.
-  **The reversibility gap, concretely.** `install-lifecycle.sh` performs three writes: the
-  marker-bounded lifecycle-kit agent block; a `.gitattributes` block it **mints when absent**;
-  and a per-clone `git config merge.iteration-scoped.driver`. It ships
-  no `--remove` mode where `install-doctrine.sh` has one, and `installer/lib/uninstall.sh`
-  hardcodes both the doctrine-kit membership test and the doctrine remover's payload path.
-  **Why the consumer smoke would not catch the residue.** The smoke asserts the consumer's tree
-  object equals the one it had before `init` ran — and the git-config write lives *outside*
-  that tree object, so its residue is silent by construction rather than by oversight.
-  **Deliverable:** a `--remove` mode, a second uninstall branch, a disposition for a minted
-  `.gitattributes` block, and an answer for the per-clone config.
-  **Cost while deferred:** nothing rots — the ruling stands on its own and the manual step is
-  documented in `lifecycle-kit/README.md`. The cost is optionality alone: any future iteration
-  wanting lifecycle governance armed at install pays this first, and discovers it then.
-  Filed 2026-08-09 by close, draining the bullet the build stage filed beside its ruling.
 
 - **docs-link-red-remedy-first** [design-pending] — `check-docs-link-convention` reds on the
   most ordinary thing a docs subpage author writes, and leads with the diagnosis.
@@ -5473,31 +5303,6 @@
   a worse measurement can overwrite a better one if the duplicate is promoted rather than caught.
   Filed 2026-08-13 by close, from its own backlog-eviction step.
 
-- **pack-installer-payload-kit-set-anchor** [design-pending] — the packer enumerates kit
-  *names* from its own tree and copies kit *contents* from the tree `--root` names.
-  `gate_kit_roots_rel` anchors on `gate_sdk_root` — the gate-sdk library's own location via
-  `BASH_SOURCE` — so the emitted relative roots are the packer's own tree's kit set. The pack
-  loop then `cd`s to the resolved `--root` and copies each of those relative names from *there*,
-  with a `[[ -d "$kit" ]] || continue` that silently drops any kit the named tree lacks. A kit the
-  named tree has but the packer's tree does not is never enumerated at all. Either direction
-  yields a narrower-or-wrong payload behind an ordinary green PACK line.
-  **Re-verified at this close**, not relayed: `gate-sdk/lib/gate.sh:252-264` (`gate_sdk_root`
-  anchor), `:315-332` (the rel cache, filled at *source* time — before `pack-installer.sh:55`
-  `cd`s), and `scripts/pack-installer.sh:107-112` (the copy loop and its skip guard). The claim
-  holds as filed and is slightly wider than filed: the drop is bidirectional, not only a
-  narrowing.
-  **DISTINCT from `pack-installer-root-provenance`** (closed at this iteration, in `## Done`):
-  that entry was the packer's *git/cwd* root resolution and `--root` closed it. This is the
-  kit-root *enumeration*, a different resolution path in the same script, which `--root` does not
-  reach. Filing it against the closed entry would re-open finished work.
-  **Options, neither ruled — the choice is envelope-shaped:** refuse a `--root` that is not the
-  packer's own work tree (making the flag the assertion its amendment says it enables), or
-  re-anchor the enumeration on the resolved root so names and contents come from one tree.
-  **Cost while deferred:** nil from any shipped caller — all five real call sites pass a root
-  equal to the script's own tree, so the two agree today. The cost is a trap armed for the first
-  caller that uses `--root` for what it was built for: packing a tree other than the packer's.
-  Filed 2026-08-14 by close, draining the gap inbox; the bullet came from the `--root` build batch.
-
 - **consumer-smoke-targeted-mode-registrar-scope** [design-pending] — the consumer smoke's
   targeted single-kit form fails on a cross-kit registration dependency that the targeting severs.
   **Re-verified live at this close**, at HEAD, on a clean tree: `bash
@@ -6115,47 +5920,6 @@
   the lead posture is live is a claim about supervision cost wearing a stage-session label.
   Filed 2026-08-15 by close, probed while reconciling its own meter output against its own stage
   stamp; scope-gated intake, so it is filed costed rather than fixed in flight.
-
-- **drift-kpis-default-two-homes** [design-pending] — the KPI-file default literal now has two
-  homes and no gate holds them in lockstep.
-  **Re-verified at the drain, and the claim holds exactly.** `drift-kit/lib/drift.sh:11` and
-  `drift-kit/bin/drift-report.sh:36` each carry `${GATE_SDK_GATES_DIR:-scripts}/kpis.list`
-  verbatim; the library home arrived with `80b0b50b`, which did not touch the reader. Against
-  de-literalization and derivation-first, and nothing reds when one moves.
-  **Why `[design-pending]`:** the obvious collapse is not free, and that is the whole entry.
-  `drift.sh` refuses (`exit 2`) on an explicitly-set-but-missing path so the bridge can tell
-  adopted-but-broken from not-adopted; `drift-report.sh:93` degrades in *both* modes behind a
-  file-exists guard. Sourcing the library therefore changes drift-report's user-facing behaviour
-  — arguably a correction toward the documented design, but a behaviour change on a surface the
-  emitter amendment's envelope never covered. The alternatives are a freshness gate over two
-  literals (gating duplication the doctrine says to remove instead) or leaving the reader to
-  carry its own default and saying so.
-  **Cost while deferred:** low and non-rotting while both literals are the same string; the hole
-  opens the moment either default moves, and it opens silently.
-  Debt: collapses a duplicated constant onto its owner, minting nothing.
-  Filed 2026-08-16 by close from the gap inbox; surfaced by the lead reviewing `80b0b50b`, not
-  by a gate.
-
-- **installer-jq-usability-probe** [design-pending] — the installer's `jq` precondition is a
-  **resolution** probe, so a `jq` that resolves but cannot run still meets a misdiagnosis.
-  **Re-verified at the drain by running it, and one citation corrected.** The predicate lives at
-  `installer/lib/common/lock.sh:14` (`lock_require_jq`), not the `installer/lib/lock.sh` the
-  bullet named. With a shim that exits 127 first on `PATH`, `command -v jq` returns true, the
-  preflight never fires, and `jq --version` exits 127 — the failing machine reaches exactly the
-  refusals the jq-floor unit removed for the absent case.
-  **DISTINCT from `installer-jq-silent-degradation`, which this does not re-open.** That unit's
-  subject is the absent case and it is discharged whole — preflight, refusal, `jq`-less smoke arm
-  and README declaration all landed and are asserted. Its slug now resolves only in `## Done`, so
-  the drain rule files this as new work rather than a recurrence stamp.
-  **Why `[design-pending]`:** widening the predicate to an execution probe (`jq --version`)
-  settles a user-facing question the amendment deliberately did not — it costs an extra process
-  on every JSON-reading verb, and it changes what "installed" means for a program the toolchain
-  roster also probes, so the roster and the installer would need to agree on one predicate rather
-  than drift into two.
-  **Cost while deferred:** bounded and narrow — a present-but-broken `jq` is rarer than an absent
-  one, and the `jq`-less arm now covers the common case.
-  Filed 2026-08-16 by close from the gap inbox; surfaced by a probe run while building the unit
-  whose ruled predicate leaves this axis open.
 
 - **fixture-assertion-liveness** [design-pending] — nothing catches a fixture asserting a message
   no gate emits, or a fixture citing a script already deleted from the tree.
@@ -7806,8 +7570,21 @@
 - **tarball-build-attestation** [design-pending] — The checksum proves transfer only; docs agree.
 - **action-run-shell-scan-predicate** [design-pending] — No consumer seam on a correct gate.
 - **scratch-execution-allowlist-bar** [design-pending] — Each close re-derives this standing bar.
+- **gate-tamper-consumer-gate-coverage** [design-pending] — A glob and a roster audit remain.
+- **upgrade-contract-rename-routing-unstated** [design-pending] — One clause leans on it.
+- **md-refs-tree-link-resolution** [design-pending] — Unreachable while one generator produces.
+- **advisory-lane-draft-state-unswept** [design-pending] — GitHub's notifications are the sweep.
+- **amendment-done-move-assertions** [design-pending] — Zero cost while merges are hand-checked.
+- **guard-advise-jq-dependency** [design-pending] — Needs jq; the one consumer works around it.
+- **survey-record-extension-tier-hybrid** [design-pending] — Paid only by a future workflow author.
+- **install-lifecycle-reversibility** [design-pending] — A declined branch; only optionality owed.
+- **pack-installer-payload-kit-set-anchor** [design-pending] — Latent --root trap, no caller.
+- **drift-kpis-default-two-homes** [design-pending] — Two literals, one string, never diverged.
+- **installer-jq-usability-probe** [design-pending] — Broken-but-present jq is unobserved.
 
 ## Done
+
+- cohort-held-members-port-prerequisites
 
 ## Lessons Learned
 

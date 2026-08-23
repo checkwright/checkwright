@@ -237,17 +237,19 @@ consumer registers this gate; it stays outside env-probe's probe-set floor, and
 published docs site simply omits the gate by the registry-not-array convention
 and never installs the dependency.
 
-**This member is held on shell, and the hop from its declaration lands here.** The
-program the rule requires is the **first element of `SITE_KIT_RENDERER`**, so
-gate-sdk's criterion 7 blocks the port, and the blocker is class (i) under that
-criterion's hold-worthiness test: the renderer *is* the contract this gate renders
-through, so removing it changes the verdict and designing it away means
-re-deciding the rule. The declaration therefore carries `# port-until:` naming the
-queue entry that owns the blocker (gate-sdk/SPEC.md §The `# graph:` manifest). The
-dependency itself, and the fact that a consumer who repoints the knob moves it, are
-owned at §Layout and configuration under that knob and are not restated here — the
-knob's value is what the blocker is a property of, so that bullet is its right home
-and this paragraph is the pointer a reader arriving from the declaration needs.
+**This member is takeable, and its port is a wrapper.** The program the rule
+requires is the **first element of `SITE_KIT_RENDERER`**, so gate-sdk's criterion
+7 reports it, and the renderer *is* the contract this gate renders through — which
+under the 2026-08-23 ruling (gate-sdk/SPEC.md §The port-candidate criteria,
+criterion 7) means the compiled form spawns it and refuses at exit 2 when it is
+absent, the dependency moving not at all. The port is owed to
+`shell-gate-tail-port` and no hold is declared. The dependency itself, and the
+fact that a consumer who repoints the knob moves it, are owned at §Layout and
+configuration under that knob and are not restated here. One port obligation is
+recorded because the shell form hides it: the batch stream below is written in
+GNU awk (`BEGINFILE`/`ENDFILE`/`ARGIND`), which is the last live holder of the
+`awk (GNU)` requirement docs/install.md states, so the port retires that floor
+and the requirements page moves with it.
 
 **The batch stream, and why the count is the fail-closed.** One renderer process
 per page is the gate's whole cost — the interpreter restarts, not the rendering —

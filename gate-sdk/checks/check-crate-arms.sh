@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=native/Cargo.toml,native/build.rs,native/src/*.rs,native/src/gates/*.rs dir=one valve=none tier=precommit
 # install: never
-# no-port: gate-sdk/SPEC.md §check-crate-arms — criteria 4 and 7, not exception class (a): a gate running cargo over the crate cannot live inside the artifact it tests, and its rule invokes cargo
 # spec: gate-sdk/SPEC.md §check-crate-arms — the crate's lint and test arms run at commit time, so a battery that passes cannot coexist with a CI that fails on them
 #
 # usage: check-crate-arms.sh
@@ -33,6 +32,20 @@ command -v cargo >/dev/null 2>&1 || {
     exit 2
 }
 
+# spec: gate-sdk/SPEC.md §check-crate-arms — the source-stamp cache: both arms re-run only when the
+# crate's tracked-source stamp or the toolchain differs from the last green run recorded under
+# GATE_SDK_TMP_DIR; an untracked file under the crate, or a crate outside git, never hits the cache
+CACHE="${GATE_SDK_TMP_DIR:-.tmp}/crate-arms-$(printf '%s' "$CRATE" | git hash-object --stdin 2>/dev/null || echo crate).green"
+key=""
+if stamp="$(gate_native_source_stamp 2>/dev/null)" \
+    && [[ -z "$(git -C "$CRATE" ls-files --others --exclude-standard -- . 2>/dev/null)" ]]; then
+    key="$stamp $(rustc --version 2>/dev/null) $(cargo --version 2>/dev/null)"
+    if [[ -n "$stamp" && -f "$CACHE" && "$(cat "$CACHE")" == "$key" ]]; then
+        echo "CRATE-ARMS: clean (cached — source stamp ${stamp:0:12} and toolchain unchanged since the last green run recorded at $CACHE; cargo clippy --all-targets at -D warnings and cargo test, both --release over $CRATE)"
+        exit 0
+    fi
+fi
+
 fail=0
 
 # spec: gate-sdk/SPEC.md §check-crate-arms — both arms run even when the first fails, so one
@@ -58,5 +71,8 @@ if [[ "$fail" -ne 0 ]]; then
     exit 1
 fi
 
+if [[ -n "$key" ]] && mkdir -p "$(dirname "$CACHE")" 2>/dev/null; then
+    printf '%s' "$key" >"$CACHE" 2>/dev/null || true
+fi
 echo "CRATE-ARMS: clean (cargo clippy --all-targets at -D warnings and cargo test, both --release over $CRATE, build scratch $TARGET_DIR)"
 exit 0

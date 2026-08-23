@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=scripts/*.sh,kit:*.sh dir=one valve=none tier=precommit
 # install: zero-config
-# port-until: cohort-held-members-port-prerequisites
 # spec: gate-sdk/SPEC.md §check-shellcheck — ShellCheck lint of the gate family at -S warning (the self-lint contract)
 #
 # usage: check-shellcheck.sh [dir...]

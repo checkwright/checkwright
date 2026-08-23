@@ -993,8 +993,8 @@ answering a question assertion C never asked.
 | `check-graph`, `check-kit-enum`, `check-gate-fixture-coverage`, `check-enforcement-fresh` | **Survive unchanged** — all four read the declaration path as text (directly, or through the enforcement-map and footprint emitters, which do), which the descriptor still is. |
 | `check-value-rollup-fresh` | **Survives unchanged in mechanism, and is itself `.gate`-dispatched** since §The consumer remainder cohort — so this row now describes a ported member reading ported members' declaration paths. It reads them as text through the footprint emitter, a non-gate arm this gate calls in-process (§The non-gate arm), and the declaration path is what that emitter reads — which is why the port moves nothing about its rule. What the port *did* move is one term of its coupling, recorded because the re-derivation confirmed it rather than assuming it: its `couples=` names `scripts/*.sh,kit:*.sh`, and after that cohort emptied the consumer's gates directory of check scripts, `scripts/*.sh` covers **no** registry member's declaration path at all. The member stays substrate-sensitive through `kit:*.sh` alone. A narrowing is not a clearance — `scripts/` retains many non-gate `*.sh`, and the coupling still earns its trigger — but a later reader deriving the set must not read the `scripts/*.sh` token as the thing that selects this row. |
 | `check-gate-binary-fresh` | **Retained by construction — and recorded here before the derivation reaches it, deliberately.** It reads declaration paths as a *set*, to decide whether the binary is load-bearing, and never reads a gate's source, so a port is its trigger rather than its blind spot: a ported member is exactly the case that switches it on. Its couples name `kit:checks/*.gate` specifically, so it was **not yet substrate-sensitive** by assertion C's runtime derivation when this row was written, with zero descriptors then on disk, and the row was not yet owed — it was written ahead of the trigger rather than left to be discovered. The first cohort's descriptors have since landed, so the gate is sensitive and the row is owed; the commit that landed them would have reddened on a missing disposition, and that commit's session was the worst possible one to be learning this table exists. That is the foresight paying, and it is the same reasoning as the gate itself: the oracle ahead of the hole (§check-gate-binary-fresh). |
-| `check-gate-substrate-parity` | **Retained by construction** — it is substrate-sensitive by the same derivation it performs, and it reads declaration paths both as text and as a *set*, which is precisely what it exists to see. It stays a shell gate (§check-gate-substrate-parity), so the auditor never depends on the substrate it audits. Its own row is written out rather than left to the section's prose mention: assertion C is satisfied by any occurrence of a member's name in this section, and a gate passing its own assertion by being *discussed* is a coincidence, not a disposition. |
-| `check-install-disposition` | **Retained, and substrate-blind by construction** — it reads both declaration spellings as text, taking the `# install:` header line off a `.gate` descriptor exactly as off a `.sh` implementation, because a ported gate is still a gate a kit ships and its disposition is a property of the gate rather than of its substrate (§The install disposition). A port therefore moves nothing here: the declaration travels with the descriptor, which is the same file the installer's payload already carries. It stays a shell gate for the reason the sibling auditors do — the assertion that a gate declares itself must not depend on the substrate the declaration might name. |
+| `check-gate-substrate-parity` | **Retained by construction** — it is substrate-sensitive by the same derivation it performs, and it reads declaration paths both as text and as a *set*, which is precisely what it exists to see. It **ports** under the 2026-08-23 ruling (the paragraph below the table), owed to `shell-gate-tail-port`: the shell form already reads one side of its comparison through `--list`, so the auditor's independence from the binary was never more than the absent-binary case, which the fail-closed contract owns. Its own row is written out rather than left to the section's prose mention: assertion C is satisfied by any occurrence of a member's name in this section, and a gate passing its own assertion by being *discussed* is a coincidence, not a disposition. |
+| `check-install-disposition` | **Retained, and substrate-blind by construction** — it reads both declaration spellings as text, taking the `# install:` header line off a `.gate` descriptor exactly as off a `.sh` implementation, because a ported gate is still a gate a kit ships and its disposition is a property of the gate rather than of its substrate (§The install disposition). A port therefore moves nothing here: the declaration travels with the descriptor, which is the same file the installer's payload already carries. It **ports** with its sibling auditor under the 2026-08-23 ruling, owed to `shell-gate-tail-port`: the assertion that a gate declares itself is a text walk over both declaration spellings, and a binary that is absent cannot pass it silently — the battery exits 2 rather than skipping (§Fail-closed contract). |
 | `check-docs-cmd`, `check-install-claim`, `check-payload-claim`, `check-queue-slug-liveness` | **Survive unchanged — reverse triggers.** Each names `scripts/*.sh`/`kit:*.sh` in `couples=` only so that a script change re-runs it; the corpus each actually scans is the governed-doc set, and none reads a gate script's *content* as its assertion target. `check-docs-cmd` is worth naming: it will correctly — not vacuously — red on a doc still fencing a deleted `.sh` path after a port. That is real signal. Every member of this row is a ported one — `check-queue-slug-liveness` since the queue-kit cohort, `check-docs-cmd` since the canon-kit one, and the remaining pair since the ERE cohort — so the row describes `.gate`-declared gates throughout; the reasoning is unaffected, because what they scan is the governed-doc set rather than any gate's content. |
 | `check-settings-paths` | **Survives unchanged — reverse trigger, and a port is its subject rather than its blind spot.** Its `couples=` names `kit:checks/*.sh` only so that a check-script edit re-runs it; what it scans is the committed permission allow-list, never a gate script's content. A port is the event it exists for: replacing `checks/<gate>.sh` with a descriptor strands every allow entry naming the old path, so the gate reddens *because* of a port rather than falling silent after one — the shape `check-docs-cmd` has in the row above. Two limits are recorded rather than left to be re-derived. The glob is deliberately not widened to `*.gate`, because a descriptor path is not something a `Bash(…)` grant invokes and the widening would add no assertion. And the trigger is a **partial route by construction**: the generated hook matches staged `ACMR` paths, so a *deleted* `.sh` never fires it; what catches a cohort's stranded grants is the whole-tree battery, which runs with no trigger filter. The trigger still earns its place — it catches the ordinary edit that strands a grant — but it is not what makes the gate's landing order necessary (context-kit/SPEC.md §check-settings-paths). **This member is itself `.gate`-dispatched from the settings cohort**, so the row describes a ported gate: the reverse trigger and both limits above are properties of its rule, not of its substrate, and survived the port unchanged. |
 | `check-prose-enum` | **Corpus extended to the Rust module — it was never a pure reverse trigger.** This gate was grouped with the reverse triggers above on the ground that none of them reads a gate's *content*; that ground was **false for this one**, and the queue-kit port is what exposed it. Its enum derivation (`scripts/enum-sets.sh`) reads the queue tag vocabulary out of `check-tag-lead-line`'s own class table, deliberately — *"read from the gate rather than re-listed here, so a rename cannot leave the two spellings disagreeing"* — so deleting that gate's script broke the derivation and the gate exited 2 rather than passing vacuously, which is the fail-closed behavior working. The corpus follows the rule to where it now lives, `native/src/gates/tag_lead_line.rs`'s `CLASSES` table, keeping the read-from-the-owner property and its one-table fail-closed anchor. **The gate is itself a ported member since the canon-kit cohort**, so a gate whose input is a gate's content is now gate content — and its own derivation crosses the bridge as *data*, which is what keeps the compiled form from spawning the emitter it reads. |
@@ -1003,28 +1003,28 @@ answering a question assertion C never asked.
 | `check-spec-embedded-source` | **Survives unchanged — reverse trigger of the same shape.** Its `couples=` extension list (`*.rs`, `*.sh`, `*.toml`, …) is the roster of **languages it recognizes inside fenced blocks**, not a reference to gate declarations; its scanned corpus is the canonical specs and amendments. It already carries `*.rs`, so a ported gate's Rust module is inside its trigger set with no widening. **This member is itself `.gate`-dispatched** since §The sixth budget batch, so the row describes a ported member — and the reverse-trigger reading survives its own port, because the extension list is still a language roster and not a declaration reference. What its port *does* move is its own candidate index, which loses a shell declaration and gains a Rust module at every sibling's port; that is a property of the corpus rather than of this table's question (canon-kit/SPEC.md §check-spec-embedded-source). |
 | `check-template-copy-parity`, `check-template-registry-parity` | **Survive unchanged** — their corpus is kit templates and the template registry, not gate declarations; a gate's substrate does not reach either. Both are `.gate`-dispatched — the second since §The consumer remainder cohort, the first since §The sixth budget batch — so the row describes ported members, and the reasoning is unaffected for the reason it gives: neither reads a gate declaration at all. |
 
-**What *the auditor never depends on the substrate it audits* scopes to, ruled
-because a mechanical reading of it holds the wrong members.** Two rows above keep
-a gate on shell for that reason — `check-gate-substrate-parity` and
-`check-install-disposition` — and a selector applying the sentence to every gate
-that reads gate source would have held the whole `spec_comment_surface` family
-too, where the operator ruling did not. The distinction is exact rather than a
-judgment call. Those two adjudicate the **declaration and dispatch relation**:
-whether a gate declares itself, whether a descriptor and a subcommand agree. A
-compiled form of either could pass *itself* with a broken binary, and that is a
-**false green** — the one failure mode this table exists to prevent. A gate
-adjudicating **comment content** on governed sources has a different failure mode
-on a tree with no working binary: it is omitted from the registry and declared
-there (§The install disposition, §check-gate-binary-fresh), so what a consumer
-loses is *declared coverage*, never a silent pass. The rule is therefore: a gate
-whose assertion is about the dispatch mechanism stays shell; a gate that merely
-*reads* declaration paths as content may port, and pays criterion 4's price for
-the parity oracle instead. The residual that distinction leaves is real and is
-answered rather than absorbed — after such a port a corpus-walk regression
-silences those gates over the crate's own sources with no shell auditor left to
-see it, and the answer is the widened `bad/` fixture cases, which red on exactly
-that edit and which a consumer receives and can run without the crate
-(§Fixture-pair discipline).
+**No gate stays shell because it audits the dispatch relation — ruled 2026-08-23
+by the operator, retiring the rule this paragraph used to state.** Two rows above
+were held on shell under it — `check-gate-substrate-parity` and
+`check-install-disposition` — on the ground that a compiled auditor of the
+declaration and dispatch relation could pass *itself* with a broken binary, a
+**false green**. The ground does not survive inspection, and the refusal is
+recorded with it so it is not re-proposed. The shell parity gate already takes
+`--list` from the binary as one side of its comparison, so its independence was
+never from the binary's *answers*, only from its *presence*; and presence is
+owned elsewhere — an absent or non-executable binary is exit 2 under §Fail-closed
+contract, never a skip, and a stale one is §check-gate-binary-fresh's red. What a
+compiled auditor adds to that is nothing the shell form did not already trust.
+The rule is therefore: **every gate ports**, an auditor of the dispatch relation
+included; a gate that reads declaration paths as content pays criterion 4's price
+for the parity oracle (§The port-candidate criteria). The residual the old
+distinction named is unchanged and answered the same way — after such a port a
+corpus-walk regression silences those gates over the crate's own sources with no
+shell auditor left to see it, and the answer is the widened `bad/` fixture cases,
+which red on exactly that edit and which a consumer receives and can run without
+the crate (§Fixture-pair discipline). What survives of the old rule is its
+*scoping* lesson: a selector applying "audits gate source" mechanically would have
+held the whole `spec_comment_surface` family, where the ruling never did.
 
 **The declared read set's honest limit, stated rather than discovered.** Unit test
 A's coverage is the fixture corpus. That is bounded by a contract rather than by
@@ -1939,10 +1939,19 @@ design time; the last three were paid for, and each is named with what it cost.
    - **The program is the rule.** `shellcheck` decides what §check-shellcheck and
      §check-action-run-shell assert; `cargo` decides what §check-crate-arms
      asserts; the renderer decides what site-kit/SPEC.md
-     §check-docs-render-fidelity asserts. Designing the dependency away means
-     re-deciding the rule, which is a sub-project with its own design, and the
-     member is genuinely **not takeable now**. This is the class `# port-until:`
-     was minted for.
+     §check-docs-render-fidelity asserts. **Ruled 2026-08-23 by the operator:
+     such a member ports as a wrapper that spawns the program, and the program
+     stays a declared dependency** — refusing at exit 2 when absent, exactly as
+     the shell form does today. Designing the dependency away was the
+     "sub-project" that held these four for eleven days; it was never the port's
+     work, because the dependency is the rule's content and the port moves the
+     *wrapper*, not the rule. The class is therefore takeable and priced, and
+     `# port-until:` has no holder on this ground; what it was minted for is a
+     member whose substrate the crate genuinely lacks (exception class (c)
+     below). The dependency floor those programs sit outside is not widened by
+     the port: a consumer without the program gets the refusal it gets today,
+     and the adopter-facing residue the ruling leaves is the bootstrap alone
+     (TRAJECTORY.md §The closed rulings).
    - **The program is incidental spelling.** A text utility the rule uses to
      assemble, split or order a string the port re-expresses in the target
      language — `paste -sd, -` is `.join(",")`, and the verdict is identical
@@ -2010,15 +2019,16 @@ design time; the last three were paid for, and each is named with what it cost.
    could not detect, which is why none is shipped.
 
    `check-action-run-shell` is named as the **worked example** rather than as the
-   roster. It clears all six criteria above and still cannot port as written: it
-   requires `shellcheck` on `PATH`, refusing when it is absent and invoking it per
-   extracted block, so a compiled form would move a toolchain requirement from this
-   repo's contributors onto every adopter — the dependency floor TRAJECTORY.md
-   objective 1 exists to collapse, against an adopter objective 5 admits who will
-   not install a toolchain. Recorded rather than left as a silent skip, because
-   every mechanical screen puts that gate *in*: it shares the cohort's corpus
-   family and its walk and reads no knob, and the fact that stops it is one none
-   of the six criteria sees.
+   roster. It clears all six criteria above and requires `shellcheck` on `PATH`,
+   refusing when it is absent and invoking it per extracted block. It was held on
+   the reading that a compiled form would move a toolchain requirement from this
+   repo's contributors onto every adopter; that reading was **wrong**, and the
+   2026-08-23 ruling above retires it: the shell form already imposes the
+   requirement on every consumer that registers the gate, and a compiled wrapper
+   imposes exactly the same one — the substrate of the wrapper does not move the
+   floor. Recorded rather than deleted because every mechanical screen puts that
+   gate *in*, and the eleven-day hold is the evidence that a dependency can be
+   mistaken for a port blocker by a session reading the report literally.
 
    **`check-gate-assertions` required `paste`, and how it surfaced is the part
    worth keeping.** The program is not on the floor, so that was owed port work of
@@ -2037,15 +2047,16 @@ design time; the last three were paid for, and each is named with what it cost.
    it, so the example now reads in the past tense while the *classes* it draws
    outlive the member (§check-gate-assertions records what its port cost).
 
-   **`check-crate-arms` is a different case under the same criterion, and it is
-   named so no later cohort reads it as owed work.** Its rule is an invocation of
-   `cargo`, so criterion 7 blocks it — but unlike the worked example above, the
-   dependency cannot be designed away, because criterion 4 forbids the port
-   independently: a gate that runs `cargo test` over the crate cannot live inside
-   the crate it tests, or the artifact under test would be the artifact asserting.
-   It is a member the port **does not take**, which is a verdict this roster can
-   record without contradicting its opening claim that a blocker is never an
-   eligibility screen (§check-crate-arms).
+   **`check-crate-arms` was ruled a different case under the same criterion, and
+   the ruling is retired with the class above.** Its rule is an invocation of
+   `cargo`, and it was held permanently on the reading that a gate running
+   `cargo test` over the crate cannot live inside the crate it tests. The reading
+   conflates the *artifact* with the *source*: `cargo test` and `cargo clippy`
+   compile and run the crate's **source** afresh in a target directory the binary
+   never reads back, so a stale or broken installed binary spawning them asserts
+   nothing about itself — the verdict is cargo's over the tree. It ports as a
+   wrapper like the three above, and it is `install: never`, so no adopter
+   receives it under either substrate (§check-crate-arms).
 
    **The report's honest bound is its undecidable count, and that count grows with
    the port.** A member declaring through a `.gate` descriptor has no shell rule to
@@ -2141,30 +2152,24 @@ deferred to a port. A born-native gate shipping without them ships *less*
 coverage than the shell gate it replaced, which is the one outcome the flip must
 not produce.
 
-**The exception criterion: three closed classes, each with a stated cause.**
-Shell is taken only under one of these, and the gate's own SPEC section states
-which class and why. A fourth class is an amendment, not a judgment call.
+**The exception criterion: two live classes, each with a stated cause, and one
+retired.** Shell is taken only under one of these, and the gate's own SPEC
+section states which class and why. A further class is an amendment, not a
+judgment call.
 
-- **(a) The gate audits the dispatch relation.** A gate whose assertion is about
-  whether a gate declares itself, or whether a descriptor and a subcommand agree,
-  stays shell — a compiled form could pass *itself* with a broken binary, which is
-  a false green. This class is **not new**: §Meta-gate conservation for the binary
-  substrate already rules it — *a gate whose assertion is about the dispatch
-  mechanism stays shell; a gate that merely reads declaration paths as content may
-  port* — and `check-gate-substrate-parity` and `check-install-disposition` are
-  its live members, each held on exactly that ground in its own row there. The
-  criterion adopts that ruling rather than inventing a parallel one.
-  **Permanent**; the cause is the class.
-
-  `check-crate-arms` is **not** a member of this class, named because the
-  mechanical reading puts it here. That same section states it sits *outside* the
-  conservation table's derivation entirely — its `couples=` covers no registry
-  member's declaration path — and its permanent-shell ground is instead criteria 4
-  and 7: a gate running `cargo test` over the crate cannot live inside the
-  artifact it tests, and its rule invokes `cargo` (criterion 7's worked-example
-  passage above records it as *a different case*). Two permanently-shell causes,
-  not one; folding the second into class (a) is what would blur the class's own
-  ground.
+- **(a) — RETIRED 2026-08-23 by operator ruling; no gate is permanently shell.**
+  The class held that a gate auditing the dispatch relation — whether a gate
+  declares itself, whether a descriptor and a subcommand agree — stays shell
+  because a compiled form could pass *itself* with a broken binary. The grounds
+  for retiring it are owned at §Meta-gate conservation for the binary substrate,
+  the paragraph below its table: the shell auditor already reads the binary's
+  `--list`, an absent binary is exit 2 under the fail-closed contract, and a
+  stale one is §check-gate-binary-fresh's red — so the false green the class
+  feared has an owner that is not the auditor's substrate. `check-crate-arms`,
+  which was held beside this class on criteria 4 and 7, is retired with it
+  (criterion 7's passage above). **No `# no-port:` holder remains**, and the
+  field keeps its meaning for a cause a later amendment may state; the six
+  members these rulings held are owed to `shell-gate-tail-port`.
 - **(b) The gate's subject is a platform the target roster does not cover.**
   Criterion 5 omits a `.gate` member on exactly the platforms `native/targets.list`
   carries no artifact for. A gate whose findings arise *on* those platforms would
@@ -2375,7 +2380,11 @@ its build cut trails *106 member(s) scanned, 0 group(s) formed, 0 undecidable,
 100 already ported and excluded, 3 permanently shell and excluded, 3 temporarily
 held and excluded; 3 still owed, 0 takeable at this cut* — the owed count down by
 two and the takeable tier empty, so every unported member again sits behind
-`cohort-held-members-port-prerequisites`. Neither reading is this paragraph's to
+`cohort-held-members-port-prerequisites`. **The 2026-08-23 ruling then emptied
+both excluded tiers at once** — no `# no-port:` and no `# port-until:` holder
+remains — and the same command trails *0 permanently shell and excluded, 0
+temporarily held and excluded; 6 still owed, 6 takeable at this cut*, the six
+owed to `shell-gate-tail-port`. Neither reading is this paragraph's to
 hold: a later session re-reads the trailer, because a dated read is evidence that
 the arm's precondition **can change**, never the tier's current value. Through
 both readings the groups were of exactly one, so the size arm's verdict is
@@ -3028,9 +3037,9 @@ gains no row from this batch.
 
 **Composed by budget again, and the precondition held through an adjudication
 rather than on the run's face.** `--group` reported one non-singleton group over
-the remainder, and it was a **phantom pair**: its other half is a member §The
-port-candidate criteria's exception class (a) rules permanently shell, whose
-permanence the tool could not see. Every group was in fact a singleton, the size
+the remainder, and it was a **phantom pair**: its other half was a member §The
+port-candidate criteria's exception class (a) then ruled permanently shell (a
+class since retired), whose permanence the tool could not see. Every group was in fact a singleton, the size
 arm was exhausted, and the increment belonged to the budget arm — the hand
 adjudication §The first cohort, and the rule that selects the next sanctions, *an
 advisory group is a finding the selecting session adjudicates*. The batch is not
@@ -7358,16 +7367,14 @@ A `.gate`-dispatched member is outside this corpus **with cause** — there is n
 shell to lint, and `cargo clippy` at deny-warnings is the substrate equivalent
 (§Meta-gate conservation for the binary substrate, which owns the reasoning).
 
-**This gate is itself held on shell, and the cause is its own rather than its
-sibling's.** Its rule *is* an invocation of `shellcheck`, a program the payload
-does not carry, so criterion 7 blocks it (§The port-candidate criteria) — owed
-port work of the shape that criterion describes, a dependency to be designed away,
-embedded or replaced, never a permitted exclusion. The blocker is identical to
-§check-action-run-shell's and the tool reports both, which is exactly why it is
-stated here: a cause a reader has to infer from a sibling gate, or from the
-criteria section's shared worked-example prose, is not grounded in the section
-that governs this rule. The declaration is `# port-until:` on this gate's own
-`.sh`, naming the entry that owns the blocker.
+**This gate is takeable, and its port is a wrapper.** Its rule *is* an invocation
+of `shellcheck`, a program the payload does not carry, so criterion 7 reports it
+(§The port-candidate criteria) — and under the 2026-08-23 ruling recorded there
+the program stays a declared dependency the compiled form spawns, refusing at
+exit 2 when absent exactly as this shell form does. The port is owed to
+`shell-gate-tail-port`; no hold is declared. What the port does not change is the
+gate's horizon: its corpus is the tree's shell, so it retires with the last
+`.sh` rather than outliving it.
 
 That derivation is also the answer to "does anything lint my workflows?", and on
 its own the answer is no: `.github/workflows/*.yml` sits under no kit root and
@@ -8096,9 +8103,10 @@ placement; and (H) a held declaration's ground reachable in one hop.
   Landing it here instead would give this gate a queue-file coupling it
   deliberately has none of, it being the auditor of the dispatch seam.
 
-  The gate is permanently shell under exception class (a), so widening it raises
-  no substrate question, and the assertion adds no member to the conservation
-  table: the corpus is the declaration set it already walks.
+  The gate was shell under the since-retired exception class (a) when this
+  assertion landed, so widening it raised no substrate question, and the
+  assertion adds no member to the conservation table: the corpus is the
+  declaration set it already walks.
 - **assertion H — a held declaration's ground is reachable in one hop.** For every
   declaration carrying `# port-until:`, the SPEC section its own `# spec:` header
   field points at names the field. §The port-candidate criteria rules that a held
@@ -8153,9 +8161,9 @@ placement; and (H) a held declaration's ground reachable in one hop.
   claim over the same declaration set, in the same gate, read from the same
   two-positional usage. The refusal recorded at §check-gate-exemption-tasks, that
   slug liveness would give this gate a **queue-file** coupling it deliberately has
-  none of, does not reach a SPEC coupling it already has. And the gate is
-  permanently shell under exception class (a), so this widening raises no
-  substrate question and adds no conservation row either.
+  none of, does not reach a SPEC coupling it already has. And the gate was shell
+  under the since-retired exception class (a) when this widening landed, so it
+  raised no substrate question and adds no conservation row either.
 
   **Its honest limit, stated rather than discovered.** The assertion holds
   *reachability*, not truth: a section could name the field and say nothing
@@ -8552,12 +8560,13 @@ accounting derives the exemption every run rather than accepting a written one.
 finding or a failing unit test is introduced and repaired inside the single commit
 that perturbs it. The honest counter-pressure is wall clock, since `--all-targets`
 compiles the test targets and clippy keeps a cache separate from the
-`cargo build --release` `bin/build-native.sh` warms; on a warm tree the added
-battery time is well inside the battery's existing dominant member, which is what
-settles it. Should that stop holding, the ruled fallback is `align-only` rather
-than a reopened design round: an arm that runs in the full battery and in CI still
-closes the attested defect, which was a *push* on a green battery, and only the
-pre-commit convenience is lost.
+`cargo build --release` `bin/build-native.sh` warms — and the claim this paragraph
+first made, that the added time sat inside the battery's dominant member, **stopped
+holding**: measured 2026-08-23 the gate was 27.2s of a 52.4s battery, the
+dominant member by a factor of four. The ruled answer is the source-stamp cache
+the next paragraph states, not `align-only` and not a narrowed arm set: a cached
+green is the same two arms' verdict over the same source and toolchain, so the
+commit-time claim keeps its full content at the cost of one hash.
 
 **The fixture pair and the build products it must not leave behind.** The pair is
 two minimal crates, `good/` clean and `bad/` carrying one clippy finding and one
@@ -8569,14 +8578,21 @@ would put build products under a fixture directory, so each case redirects
 `GATE_SDK_CARGO_TARGET_DIR` out of the tree; the `Cargo.lock` cargo writes beside
 the manifest is gitignored on the same terms as the real crate's.
 
-**The gate stays shell, permanently, and that is a verdict rather than unported
-work.** TRAJECTORY.md §PRIORITY DIRECTIVE — the port track's sequence — makes
-surviving shell residue justified case by case, and this member has two
-independent justifications. Criterion 7 in
-its plainest form: the rule *is* an invocation of `cargo`, a program the payload
-does not carry. And criterion 4 at its purest: a gate that runs `cargo test` over
-the crate cannot live **inside** the crate it tests, because the artifact under
-test would be the artifact asserting.
+**The gate ports — ruled 2026-08-23, reversing the permanent-shell verdict this
+paragraph used to carry.** The two justifications it stood on are recorded with
+their refutation at §The port-candidate criteria, criterion 7: the rule *is* an
+invocation of `cargo`, which a compiled wrapper spawns exactly as the shell does;
+and "a gate running `cargo test` over the crate cannot live inside the crate it
+tests" conflated the installed artifact with the source cargo compiles afresh.
+It is `install: never`, so no adopter receives it under either substrate, and it
+is owed to `shell-gate-tail-port` with the other five. **Its commit-time cost is
+bounded by a source-stamp cache** rather than by narrowing its arms: the two
+arms re-run only when the crate's source stamp (§lib/gate.sh,
+`gate_native_source_stamp`) or the toolchain differs from the last green run
+recorded under `.tmp/`, and a crate with untracked files never hits the cache.
+CI and a fresh clone carry no record, so they run both arms in full — which is
+what keeps the battery's claim that a passing commit cannot coexist with a
+failing CI true at the site it is made.
 
 ### check-install-disposition
 
@@ -10173,18 +10189,14 @@ manufactures false positives, so the step's effective shell comes from its
 | `sh` / `dash` / `ksh` | the matching ShellCheck dialect — linting a POSIX body as bash hides the portability findings that dialect exists to surface |
 | anything else (`pwsh`, `python`, a custom `{0}` template) | the block is **skipped and counted** — the body is not shell, so there is no shell to lint |
 
-**It is held on shell, and the cause is stated here rather than in the criteria
-section's shared prose.** The rule invokes `shellcheck`, a program the payload
-does not carry, so criterion 7 blocks it (§The port-candidate criteria) — owed
-port work of that criterion's own shape, a dependency to be designed away,
-embedded or replaced, never a permitted exclusion. §The port-candidate criteria
-names this gate as criterion 7's *worked example*; what it demonstrates there is
-the criterion, and what belongs here is this gate's own hold, because a member may
-not declare `# port-until:` on a ground a reader has to reach a central section to
-find. A compiled form would move a toolchain requirement from this repo's
-contributors onto every adopter, which is the dependency floor TRAJECTORY.md
-objective 1 exists to collapse; the declaration names the entry that owns the
-blocker.
+**It is takeable, and its port is a wrapper.** The rule invokes `shellcheck`, a
+program the payload does not carry, so criterion 7 reports it (§The port-candidate
+criteria), and under the 2026-08-23 ruling recorded there the compiled form spawns
+the same program and refuses at exit 2 when it is absent — the requirement this
+shell form already places on every consumer registering the gate, moved by the
+port not at all. §The port-candidate criteria names this gate as criterion 7's
+*worked example* and records the retired hold beside it; the port is owed to
+`shell-gate-tail-port`, and no hold is declared.
 
 **Severity is `-S warning`**, the gate family's level, so one threshold governs
 all ShellCheck lint in the tree. A future author lowering it inherits false
