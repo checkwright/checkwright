@@ -141,7 +141,15 @@
   PRIORITY DIRECTIVE does not bound.
   **Measured at this intake, 2026-08-23, rather than carried on the bullet's word.**
   `bash gate-sdk/bin/port-blockers.sh --group` scans **106** members and reads *6 still owed,
-  6 takeable*; the tree holds **13990** non-test shell lines. What the scan never sees:
+  6 takeable*.
+  **Re-verified 2026-08-23 at the next scope, and the shell-line half of that reading DID NOT
+  REPRODUCE — which is this entry's own thesis landing on this entry.** The oracle half reproduced
+  exactly: 106 scanned, 6 owed, 6 takeable, 0 held. The "13990 non-test shell lines" did not, and
+  the entry states no oracle for it: `git ls-files '*.sh'` minus `*.test.sh` gives **17949**, and
+  minus `gate-tests/` fixtures too gives **16923**. Both are larger than the figure carried, in a
+  window where the battery port should have *reduced* shell — so the number is unreproducible
+  rather than merely stale, and no session can tell which corpus it named. The figures above
+  replace it and carry their command. What the scan never sees:
   `canon-kit/checks/check-surface-duplication.sh` and
   `evidence-kit/checks/check-producer-liveness.sh` — kit-shipped gates this tree never
   registers, so `gates.list` does not carry them — and every non-gate script, `run-gates.sh`
@@ -286,10 +294,14 @@
   shipped gate path*, not *first in the crate*; the bullet's grep was scoped to `native/src/gates`
   and `native/src/emit` and reached the right answer for a narrower reason than it stated.
   Corrected here so a later session does not inherit the wider claim and find it false.
-  **The designed-but-unbought answer** is a new SHELL gate owning hook parity alone under
-  born-native exception class (a): a gate asserting that the persisted dispatch matches its
-  generator is auditing the dispatch relation, and a compiled form would compute both sides of that
-  comparison through the very binary under test.
+  **The designed-but-unbought answer is VOID as designed, corrected 2026-08-23 at scope's premise
+  re-verification.** It was a new SHELL gate owning hook parity alone under born-native exception
+  class (a) — the audit-the-dispatch-relation argument, a compiled form having to compute both
+  sides of the comparison through the very binary under test. The operator retired class (a) on
+  2026-08-23 (TRAJECTORY.md §The closed rulings; gate-sdk/SPEC.md §The port-candidate criteria now
+  reads "(a) — RETIRED"), and the refutation recorded there is this argument's: the shell auditor
+  already trusts the binary's `--list`. So no shell gate is available to own it and the fork below
+  narrows to the two branches that do not mint one. What is NOT decided here is what replaces it.
   **Why `[design-pending]`:** build refused it 2026-08-21 because it mints a gate name, a
   descriptor, a fixture pair and a SPEC section to relocate an assertion criterion 7 already
   sanctions in place — and on a host with no `bash` the spawn errors rather than being absent,
