@@ -7128,32 +7128,39 @@
   at `installer-init-noop-regen-conflict`; the drain read the smoke's call order and the bullet's
   central claim fell.
 
-- **pipeline-membership-idiom-latent** [design-pending] — two shell sites still hold the
-  SIGPIPE-under-pipefail membership idiom that produced `installer-init-noop-regen-conflict`, and
-  nothing stops a third being written.
+- **pipeline-membership-idiom-latent** [design-pending] — the SIGPIPE-under-pipefail membership
+  idiom that produced `installer-init-noop-regen-conflict` has no gate, so nothing stops the next
+  site being written.
+  recurrence: pipeline-membership-idiom-latent 2026-08-23
   **The idiom.** A quiet `grep` reading an array printed into a pipe under `set -o pipefail`:
   `grep` exits on its first match while the writer is still writing, the writer takes SIGPIPE,
   and `pipefail` makes the pipeline's status the signal rather than `grep`'s zero — so a present
   member reads as **absent**.
-  **Probed, and re-probed at the drain.** A sweep of every shell file in the tree returns exactly
-  two survivors, both re-read line by line at this close:
-  `gate-sdk/checks/check-gate-substrate-parity.sh:178` (the crate's subcommand roster) and
-  `gate-sdk/gate-tests/lib-gate.test.sh:45` (the grep-excludes roster). Both files set
-  `set -uo pipefail`. Onset was measured in the session that fixed the installer: with
-  single-token members the fault begins between 400 and 800 entries, which is the 64K pipe buffer
-  filling. Both rosters are far below that, so **both sites are latent** — the honest reason this
-  is filed rather than fixed.
-  **Why `[design-pending]`:** the mechanical repair is an associative-array membership test, the
-  same one `init` took, and needs no ruling. The open call is whether that is the deliverable at
-  all, or whether enforcement-first makes it a gate over the idiom — the only shape that stops
-  the third site, and the only one that costs a design.
-  **Cost while deferred:** a correctness cliff with no warning track. Nothing degrades gradually;
-  the gate starts reporting a present member as absent on the run where its roster crosses the
-  buffer, and because `check-gate-substrate-parity` is a **parity** gate, that false absence
-  reads as a real parity finding rather than as a fault in the check. The port is what grows the
-  subcommand roster, and the port is the tree's standing direction.
-  Filed 2026-08-19 by close from the gap inbox; the drain re-read both sites at their line
-  numbers rather than taking the sweep's count.
+  **The 2026-08-23 recurrence, and what it falsified.** This entry's 2026-08-19 drain recorded a
+  sweep of every shell file returning "exactly two survivors", both latent. `battery-runner-port`
+  found and fixed **five** sites — `gate-sdk/checks/check-gate-substrate-parity.sh` (3),
+  `gate-sdk/bin/upgrade-smoke.sh` (1), `gate-sdk/gate-tests/lib-gate.test.sh` (1) — so the sweep
+  undercounted by three, and one of them was not latent at all: it produced a 1-in-3 red at that
+  iteration's build once the worker pool raised the load. The rule is now stated at
+  gate-sdk/SPEC.md §run-gates. Re-probed at this drain: a tree sweep for the
+  `printf … | grep -q` shape returns nothing, so **zero sites remain and still no gate exists**.
+  **What remains is now the whole deliverable.** The 2026-08-19 filing left one open call —
+  whether the mechanical repair was the deliverable, or whether enforcement-first made it a gate
+  over the idiom. `battery-runner-port` took the repair and could not take the gate inside its
+  envelope, which settles the call by elimination: the gate is what is owed, and it is the only
+  shape that stops a seventh site.
+  **Why `[design-pending]`:** born-native per CLAUDE.md — a Rust module matching a
+  producer-into-consumer pipe over an array/set membership idiom under `set -o pipefail`, a
+  `.gate` descriptor, a `good/`+`bad/` fixture pair, and `gates.list` registration. The design is
+  the predicate: separating this idiom from a deliberate early-exit pipe without flooding.
+  **Cost while deferred:** a correctness cliff with no warning track, now demonstrated rather than
+  reasoned. Nothing degrades gradually; a check reports a present member as absent on the run
+  where its roster crosses the 64K pipe buffer (onset measured between 400 and 800 single-token
+  members), and in a **parity** gate that false absence reads as a real parity finding rather than
+  as a fault in the check. The port is what grows the subcommand roster, and the port is the
+  tree's standing direction.
+  Filed 2026-08-19 by close from the gap inbox; recurrence judged and stamped at
+  `battery-runner-port`'s close, whose drain re-ran the sweep and found the corpus empty.
 
 - **stage-journal-contract-unoracled** [design-pending] — a granted resume journal that is never
   written is indistinguishable from a session that had nothing to say, so the durable narration
@@ -7615,6 +7622,109 @@
   surface a consumer trusts to enumerate what it vendored.
   Filed 2026-08-23 by build; drained at that iteration's close, which confirmed no gate reads
   the block.
+
+- **crate-arms-relink-under-worker-pool** [design-pending] — `check-crate-arms` rebuilds the
+  dispatch artifact its sibling members exec, so one battery member mutates another's interpreter
+  mid-run.
+  **The mechanism, re-probed at the drain rather than taken on the bullet's word.**
+  `gate-sdk/checks/check-crate-arms.sh:16` resolves its target dir from
+  `GATE_SDK_CARGO_TARGET_DIR` falling back to the crate's own `target`, and runs cargo
+  clippy/test into it; gate-sdk/SPEC.md §Layout and configuration rules that default deliberately,
+  so the arms reuse `build-native.sh`'s warm cache. `gate-sdk/lib/gate.sh:85` dispatches every
+  ported member through `native/target/release/checkwright-gates` — the artifact cargo relinks in
+  that same dir. Under the battery's worker pool that is a member rewriting an artifact its
+  siblings exec, the concurrency contract's own defect class (gate-sdk/SPEC.md §run-gates).
+  **Why the window is narrow.** Cargo removes then hard-links a fully written file, so an exec
+  landing in the window gets ENOENT rather than a torn binary, and no flake has been observed from
+  it. The 1-in-3 red found at `battery-runner-port`'s build was the abandoned-pipe-producer class
+  — a **different** defect, fixed in place, and this entry is not a re-filing of it.
+  **Why `[design-pending]`, and lead-ruled 2026-08-23 to stay filed rather than fixed.** The
+  candidate fix is a build cache of the gate's own under the pruned target dir
+  (`native/target/arms`), costing a second ~550MB cargo cache and one cold build, and it
+  **narrows the recorded shared-warm-cache ruling** in gate-sdk/SPEC.md §Layout and configuration.
+  It was built, tried at that build, and did not fix the flake it was reached for. So the
+  deliverable is a ruling on the warm-cache trade before it is a patch.
+  **Cost while deferred:** low, and paid only during crate development, as a possible spurious
+  dispatch-harness error on one member of a battery run that also builds the crate.
+  Filed 2026-08-23 by build; drained at that iteration's close, which re-read both the knob
+  default and the dispatch path in place.
+
+- **binary-less-dispatch-loop-retirement** [design-pending] [blocked-by: shell-gate-tail-port] —
+  `run-gates.sh`'s binary-less dispatch loop and `installer/consumer-smoke`'s binary-less
+  green-battery assertion both retire at zero contract cost once no `.sh` member is left, and
+  nothing today schedules that retirement.
+  **Distinct from its blocker, verified at the drain.** `shell-gate-tail-port`'s body was re-read
+  in place: it names the six registered shell gates, the two unregistered kit-shipped ones, the
+  wrapper shape each port takes and the dependency-declaration design question — and says nothing
+  about this cleanup. So the retirement is the follow-up its landing *enables*, not a re-filing of
+  the port itself.
+  **Why it is sequenced and not open.** The loop stays by a 2026-08-23 ruling because criterion
+  5's stranded-platform branch still needs it while any `.sh`-dispatched member exists. At zero
+  `.sh` members a binary-less consumer has no gates at all, so the branch the loop serves has
+  nothing left to serve, and the smoke assertion it backs asserts an empty battery.
+  **Cost while deferred:** low — roughly 180 duplicated dispatch lines in `run-gates.sh`, held
+  honest by an executed byte-comparison against the `--run` arm
+  (`gate-sdk/gate-tests/run-arm-contract.test.sh`), so it is gated duplication rather than drift.
+  Filed 2026-08-23 by build; drained at that iteration's close, which re-read the blocker's body
+  to confirm the two deliverables are distinct.
+
+- **pack-installer-vendors-untracked-scratch** [design-pending] — `scripts/pack-installer.sh`
+  vendors kit roots with a verbatim `cp -R`, so any git-ignored artifact sitting under a kit's
+  tracked tree rides into the installer payload and breaks `checkwright init` on the consumer.
+  **The failure it produces.** `init` stages every vendored file with a plain `git add`, which
+  refuses when the consumer's own `.gitignore` also ignores that path ("paths are ignored by one
+  of your .gitignore files"), so init dies with "could not stage the vendored files".
+  **The class, not the instance — both re-probed at the drain.** `scripts/pack-installer.sh:110`
+  still vendors each kit with a bare `cp -R` and the script holds no `git ls-files` filter
+  anywhere, so the class is live. The one *observed* instance is gone: `check-crate-arms`'s
+  source-stamp cache used to land under `gate-sdk/gate-tests/check-crate-arms/good/.tmp/`, and
+  `run-gate-tests.sh` now absolutizes `GATE_SDK_TMP_DIR` for the fixture-pair case invocation
+  (`0c29e19f`, narrowed by `8f2000f0`), so a find over `gate-sdk/gate-tests` for `.tmp` or
+  `*.green` returns nothing and the full spine ran 24 of 24 suites clean at `8f2000f0` with no
+  manual removal. **The original filing's cost line — that every from-scratch validate needs a
+  manual `rm` plus a clean-tree `installer_smoke` re-run — was retracted the same day and is not
+  live.**
+  **Why `[design-pending]`:** the candidate fix is one filter at the vendoring step, vendoring
+  git-tracked paths only, but it needs a decision about consumers vendoring from a non-git
+  payload — packaging semantics rather than a patch.
+  **Cost while deferred:** low today and paid only on recurrence — a future gate or tool that
+  writes ignored scratch under a kit root reintroduces the identical `installer_smoke` red, now
+  with the diagnosis written down twice.
+  Filed 2026-08-23 by validate and re-dispositioned by validate the same day; the close drain read
+  both bullets as one disposition and re-ran the vendoring and stray-artifact probes.
+
+- **bespoke-test-path-knob-pinning** [design-pending] — a bespoke gate-test's cwd sandbox is
+  isolated only while `GATE_SDK_TMP_DIR` and `GATE_SDK_WORKFLOW_DIR` happen to hold relative
+  values in the invoker's environment, which is an ambient default rather than anything the test
+  owns.
+  **Surveyed, and the survey re-run at the drain.** 16 bespoke `*/gate-tests/*.test.sh` build
+  cwd-relative `.tmp`/`.workflow` sandboxes; 11 pin one of those knobs explicitly, so pinning is
+  already the majority idiom. The 7 that do not: `canon-kit/check-comment-tier`,
+  `evidence-kit/producer-lock`, and lifecycle-kit's `check-stage-entry`, `check-merge-attrs`,
+  `check-survey-record`, `check-stage-evidence`, `check-close-surfaces`.
+  **Probed, not inferred (2026-08-23 validate).** With `GATE_SDK_TMP_DIR` pointed at an absolute
+  dir holding a live-pid `run-validate.lock`, `producer-lock.test.sh` reds on 4 assertions because
+  its inner run-validate reads the real lock; with `GATE_SDK_WORKFLOW_DIR` absolute it reds on 4
+  more, reading a foreign `validate-evidence.txt`. That is the same failure `0c29e19f`'s
+  process-wide export produced and `8f2000f0` narrowed away — an export was one way to supply an
+  ambient absolute value, not the only one. `producer-lock` is the sharpest case: the evidence_kit
+  suite runs inside the spine *while a real run-validate producer is live by construction*.
+  **Why `[design-pending]`:** two fix shapes, and choosing is the deliverable. Have each exposed
+  test pin its own path knobs (~7 one-line edits, no new mechanism, conforming to the majority
+  idiom); or widen `gate-sdk/lib/test-hermetic.sh` to neutralize the path knobs the way it already
+  neutralizes `<KIT>_CONFIG_FILE` — one place, and precedented, since that file already pins
+  `GATE_SDK_NATIVE_BIN` absolute for the *same* reason (a relative default resolving to nothing
+  from a sandbox cwd) — but it changes a bootstrap every bespoke test sources and needs each
+  pinning test re-checked for an override it currently gets from the ambient value.
+  Distinct from `hermetic-bin-roster-config`, which is credential pinning in smoke scripts under
+  `check-test-hermetic` assertion B: a different knob class on a different surface.
+  **Cost while deferred:** low and conditional — nothing is red today and the spine is green with
+  the case-scoped pin; the exposure is that any future harness or operator exporting an absolute
+  `GATE_SDK_TMP_DIR` or `GATE_SDK_WORKFLOW_DIR` silently converts a test sandbox into live-state
+  access, which reads as a mystery red in an unrelated kit's suite rather than a configuration
+  fact.
+  Filed 2026-08-23 by validate; the close drain re-ran the survey oracle and got 16/11/7 with the
+  same seven names.
 
 ## Icebox
 
