@@ -7,3 +7,4 @@
 leak-guard-and-assertion-meta-gate-port scope a27e0ee9 2026-08-23 e49f3270
 leak-guard-and-assertion-meta-gate-port spec a5f99393 2026-08-23 c53a7928
 leak-guard-and-assertion-meta-gate-port align a7af54aa 2026-08-23 e5d020f4
+leak-guard-and-assertion-meta-gate-port build aaf6a928 2026-08-23 7cbfb4ea
