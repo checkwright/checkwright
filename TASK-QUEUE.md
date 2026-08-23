@@ -12,6 +12,79 @@
 
 ## New Features
 
+- **shell-gate-tail-port** [spec: SPEC-shell-gate-tail.md] — the six registered shell gates
+  and the two kit-shipped ones this tree never registers port as wrappers; no gate stays shell.
+  **Operator-ruled 2026-08-23** (TRAJECTORY.md §The closed rulings): exception class (a) and
+  the criterion-7 "sub-project" hold are retired with their refutations recorded at
+  gate-sdk/SPEC.md §The port-candidate criteria and §Meta-gate conservation for the binary
+  substrate; the `# no-port:` and `# port-until:` headers are deleted, and the oracle reads
+  *6 still owed, 6 takeable at this cut*.
+  **The members and what each port is:** `check-gate-substrate-parity` and
+  `check-install-disposition`, text walks that already read the binary's `--list`;
+  `check-crate-arms`, a wrapper spawning cargo, `install: never`, carrying the source-stamp cache
+  its SPEC section rules; `check-shellcheck` and `check-action-run-shell`, wrappers spawning
+  shellcheck and refusing at exit 2 when absent, the first retiring with the last `.sh`;
+  `check-docs-render-fidelity`, a wrapper spawning the renderer, whose GNU-awk batch stream is
+  the last live holder of the `awk (GNU)` requirement docs/install.md states, so the port
+  retires that floor (site-kit/SPEC.md §check-docs-render-fidelity); and the two unregistered
+  members `check-surface-duplication` (canon-kit, `install: on-surface`) and
+  `check-producer-liveness` (evidence-kit, `install: never`), which `port-blockers.sh` never
+  counts because it scans `gates.list` members — the kit-shipped corpus is the port's, whether
+  or not this tree registers it. Every member keeps criterion 7's refusal shape and declares its
+  program under `--reads`; cut widths are the cut's, and the ordering inside the unit is
+  substrate-parity first, so the auditor of the dispatch relation is native before the rest move.
+  **The design question is RULED** at `SPEC-shell-gate-tail.md` delta 1: a descriptor field is
+  closed-refused, so the binary answers `--needs` off a registry tuple held to executed behavior.
+  That arm also un-blinds a default arm reading 102 of 106 members undecidable, and the tail is
+  five wrappers not four — `check-producer-liveness` needs `ps` through `ek_pid_alive`.
+  **Cost while deferred:** the PRIORITY DIRECTIVE's claim stays unmade while six gates and two
+  kit libraries ship shell, and every one of them is a PowerShell twin owed under objective 6.
+  Filed 2026-08-23 at the consult on operator direction, the direct-filing exception applying;
+  promoted 2026-08-23 at spec with its amendment, which corrects four premises against the tree.
+
+- **port-oracle-corpus-narrower-than-the-directive** [spec: SPEC-port-oracle.md] — the port's
+  owed-count oracle scans `gates.list` members, so the completion claim is measured over a
+  corpus the PRIORITY DIRECTIVE does not bound.
+  **Measured at this intake, 2026-08-23, rather than carried on the bullet's word.**
+  `bash gate-sdk/bin/port-blockers.sh --group` scans **106** members and reads *6 still owed,
+  6 takeable*.
+  **Re-verified 2026-08-23 at the next scope, and the shell-line half of that reading DID NOT
+  REPRODUCE — which is this entry's own thesis landing on this entry.** The oracle half reproduced
+  exactly: 106 scanned, 6 owed, 6 takeable, 0 held. The "13990 non-test shell lines" did not, and
+  the entry states no oracle for it: `git ls-files '*.sh'` minus `*.test.sh` gives **17949**, and
+  minus `gate-tests/` fixtures too gives **16923**. Both are larger than the figure carried, in a
+  window where the battery port should have *reduced* shell — so the number is unreproducible
+  rather than merely stale, and no session can tell which corpus it named. The figures above
+  replace it and carry their command. What the scan never sees:
+  `canon-kit/checks/check-surface-duplication.sh` and
+  `evidence-kit/checks/check-producer-liveness.sh` — kit-shipped gates this tree never
+  registers, so `gates.list` does not carry them — and every non-gate script, `run-gates.sh`
+  and `gen-pre-commit.sh` and `installer/lib/*.sh` and each kit's `bin/` and `lib/`.
+  **TRAJECTORY.md §The closed rulings states a completion predicate this oracle cannot
+  evaluate**: every remaining non-test `.sh` outside the battery and the bootstrap "either
+  carries a stated `no-port` cause or is deleted". Nothing counts that set, and nothing can
+  hold a cause against a script that has none — `# no-port:` is a gate-descriptor header and
+  the non-gate corpus owns no descriptor to carry one.
+  **RULED at `SPEC-port-oracle.md`:** both shapes are refused as stated and a third `--tree`
+  arm takes what each was reaching for — one tool, one place to read completion, the two
+  registry arms unchanged. `# no-port:`/`# port-until:` widen to any tracked script, so no
+  exclusion knob is minted and the arm's owed count reaching zero IS the directive's predicate.
+  Measured at spec: 152 files, 15594 non-test non-gate shell lines no entry owns.
+  **DISTINCT from the three entries that own the work rather than the count.**
+  `battery-runner-port` owns `run-gates.sh`, the `gate_command` bridge and `gen-pre-commit.sh`'s
+  argv projection; `shell-gate-tail-port` owns the six owed gates and the two unregistered ones;
+  `install-step-relocation` owns `installer/lib/init.sh`'s remaining step. What no entry owns is
+  the kit `bin/`+`lib/` remainder and the **measurement** — so all three can land and still
+  leave no oracle able to say the port is done.
+  **Cost while deferred:** the directive's completion claim reads off a 106-member gate census
+  while the corpus it names is the tree, so completion is decidable only by hand and every
+  session that reads *0 takeable* reads it as a finished port.
+  Filed 2026-08-23 to the gap inbox by the consult that followed
+  `leak-guard-and-assertion-meta-gate-port`'s close; promoted 2026-08-23 at this iteration's
+  scope intake, with the bullet's "no entry names the runner port" clause re-verified and found
+  **spent** — that same consult filed `battery-runner-port`; promoted 2026-08-23 at spec, its
+  two carried line figures re-run and confirmed byte-exact.
+
 ## Technical Debt
 
 - **graph-port-bash-spawn-residue** — the ported `check-graph` spawns `bash` from the binary, so the
@@ -182,76 +255,6 @@
   branch — eight so far, each cut's own record staying at its SPEC section.
   **Tail ruled 2026-08-23** (TRAJECTORY.md §PRIORITY DIRECTIVE): no member is permanently shell;
   the sequence is `battery-runner-port`, `shell-gate-tail-port`, then the bootstrap pair.
-
-- **shell-gate-tail-port** [design-pending] — the six registered shell gates, and the two
-  kit-shipped shell gates this tree never registers, port as wrappers; no gate stays shell.
-  **Operator-ruled 2026-08-23** (TRAJECTORY.md §The closed rulings): exception class (a) and
-  the criterion-7 "sub-project" hold are retired with their refutations recorded at
-  gate-sdk/SPEC.md §The port-candidate criteria and §Meta-gate conservation for the binary
-  substrate; the `# no-port:` and `# port-until:` headers are deleted, and the oracle reads
-  *6 still owed, 6 takeable at this cut*.
-  **The members and what each port is:** `check-gate-substrate-parity` and
-  `check-install-disposition`, text walks that already read the binary's `--list`;
-  `check-crate-arms`, a wrapper spawning cargo, `install: never`, carrying the source-stamp cache
-  its SPEC section rules; `check-shellcheck` and `check-action-run-shell`, wrappers spawning
-  shellcheck and refusing at exit 2 when absent, the first retiring with the last `.sh`;
-  `check-docs-render-fidelity`, a wrapper spawning the renderer, whose GNU-awk batch stream is
-  the last live holder of the `awk (GNU)` requirement docs/install.md states, so the port
-  retires that floor (site-kit/SPEC.md §check-docs-render-fidelity); and the two unregistered
-  members `check-surface-duplication` (canon-kit, `install: on-surface`) and
-  `check-producer-liveness` (evidence-kit, `install: never`), which `port-blockers.sh` never
-  counts because it scans `gates.list` members — the kit-shipped corpus is the port's, whether
-  or not this tree registers it. Every member keeps criterion 7's refusal shape and declares its
-  program under `--reads`; cut widths are the cut's, and the ordering inside the unit is
-  substrate-parity first, so the auditor of the dispatch relation is native before the rest move.
-  **Why `[design-pending]`:** the wrappers' dependency declaration — how a compiled member
-  states the external program it spawns so §port-blockers and the payload's omission logic read
-  it without a shell rule to tokenize — is the one mechanism the ruling did not supply.
-  **Cost while deferred:** the PRIORITY DIRECTIVE's claim stays unmade while six gates and two
-  kit libraries ship shell, and every one of them is a PowerShell twin owed under objective 6.
-  Filed 2026-08-23 at the consult on operator direction, the direct-filing exception applying.
-
-- **port-oracle-corpus-narrower-than-the-directive** [design-pending] — the port's owed-count
-  oracle scans `gates.list` members, so the completion claim is measured over a corpus the
-  PRIORITY DIRECTIVE does not bound.
-  **Measured at this intake, 2026-08-23, rather than carried on the bullet's word.**
-  `bash gate-sdk/bin/port-blockers.sh --group` scans **106** members and reads *6 still owed,
-  6 takeable*.
-  **Re-verified 2026-08-23 at the next scope, and the shell-line half of that reading DID NOT
-  REPRODUCE — which is this entry's own thesis landing on this entry.** The oracle half reproduced
-  exactly: 106 scanned, 6 owed, 6 takeable, 0 held. The "13990 non-test shell lines" did not, and
-  the entry states no oracle for it: `git ls-files '*.sh'` minus `*.test.sh` gives **17949**, and
-  minus `gate-tests/` fixtures too gives **16923**. Both are larger than the figure carried, in a
-  window where the battery port should have *reduced* shell — so the number is unreproducible
-  rather than merely stale, and no session can tell which corpus it named. The figures above
-  replace it and carry their command. What the scan never sees:
-  `canon-kit/checks/check-surface-duplication.sh` and
-  `evidence-kit/checks/check-producer-liveness.sh` — kit-shipped gates this tree never
-  registers, so `gates.list` does not carry them — and every non-gate script, `run-gates.sh`
-  and `gen-pre-commit.sh` and `installer/lib/*.sh` and each kit's `bin/` and `lib/`.
-  **TRAJECTORY.md §The closed rulings states a completion predicate this oracle cannot
-  evaluate**: every remaining non-test `.sh` outside the battery and the bootstrap "either
-  carries a stated `no-port` cause or is deleted". Nothing counts that set, and nothing can
-  hold a cause against a script that has none — `# no-port:` is a gate-descriptor header and
-  the non-gate corpus owns no descriptor to carry one.
-  **Why `[design-pending]`:** two shapes, neither costed. Widen `port-blockers.sh` to a
-  whole-tree scan with a per-file disposition, which mints a declaration surface for scripts
-  that own no `.gate`; or keep it a gate oracle and give the non-gate corpus a second roster.
-  The first keeps one owed-count and one place to read completion; the second keeps the gate
-  oracle's assertions honest about the corpus they actually scan.
-  **DISTINCT from the three entries that own the work rather than the count.**
-  `battery-runner-port` owns `run-gates.sh`, the `gate_command` bridge and `gen-pre-commit.sh`'s
-  argv projection; `shell-gate-tail-port` owns the six owed gates and the two unregistered ones;
-  `install-step-relocation` owns `installer/lib/init.sh`'s remaining step. What no entry owns is
-  the kit `bin/`+`lib/` remainder and the **measurement** — so all three can land and still
-  leave no oracle able to say the port is done.
-  **Cost while deferred:** the directive's completion claim reads off a 106-member gate census
-  while the corpus it names is the tree, so completion is decidable only by hand and every
-  session that reads *0 takeable* reads it as a finished port.
-  Filed 2026-08-23 to the gap inbox by the consult that followed
-  `leak-guard-and-assertion-meta-gate-port`'s close; promoted 2026-08-23 at this iteration's
-  scope intake, with the bullet's "no entry names the runner port" clause re-verified and found
-  **spent** — that same consult filed `battery-runner-port`.
 
 - **validate-suite-wall-clock-unowned** [design-pending] — the validate run is about seventeen
   minutes and no entry owns the sixteen of them that are not the gate battery.
