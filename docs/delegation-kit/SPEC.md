@@ -732,6 +732,42 @@ sanction's cost is N carriers a later change must find, and N is discovered by
 grepping the rule's phrasing rather than by consulting the roster — a roster is a
 record of the carriers someone noticed, never a proof of the set.
 
+**The rule's own attested counter-examples are now explained, and the explanation
+indicted the wording rather than the primitive.** Four of one session's
+backgrounded waiters had died before their conditions went true with their
+producers verifiably alive, against an event-stream call that succeeded first try
+— a standing case that the mandated primitive was the wrong one on this machine.
+It was measured rather than argued (§bin/wait-probe): every trial on a
+*completion-marker* predicate outlived its condition, on both harness forms and on
+a detached shell child, at producer durations up to and including the longest
+swept — so no form carries a wall-clock ceiling in that range. Every early exit
+instead shared one property, and it was not the form: the loop tested the
+producer's **liveness**, and it reproduced on the harness-uninvolved control in
+milliseconds, which exonerates the harness and the primitive together.
+
+**The cause is that the rule's two clauses compose into an inverted loop.** The
+protocol mandates wrapping `until <cond>; do sleep N; done` *and* looping on the
+recorded PID's liveness. `until` ends when its condition becomes **true** and
+`kill -0` is true while the producer is **alive**, so the literal composition of
+the two clauses exits at once, cleanly, with the producer running — which is
+exactly the reported signature, down to the clean exit status. The wait's
+condition must be its **continuation** condition: `until` takes a *done* predicate
+and `while` takes a *still-running* one, and liveness is a still-running
+predicate. So the ordering the template states stands **unchanged** and what
+changed is the spelling every carrier shipped, propagated to all four. That the
+correction is free at the guard was probed rather than assumed: rules 13 and 15
+walk `do … done` spans without reading the loop keyword, so the `while` form is
+exempt exactly as the `until` form is (guard-kit/SPEC.md §The generic ruleset).
+
+**Recorded here because of what the near-miss was.** A rule whose attested
+counter-examples stay unexplained is a rule its readers discount, and the
+discounting was already under way — the counter-examples had been read as evidence
+*against the primitive*, which would have inverted a correct ordering and left the
+actual defect, one keyword, shipped in all four carriers. The fifth firing's own
+lesson generalizes past this rule: an operative restatement propagates a rule's
+**wording**, so a defect in the wording is propagated with it, and N carriers make
+N copies of the bug rather than N chances to catch it.
+
 **No gate is owed *over the act*, and not for budget — but one is now owed over
 its harm, and it exists.** No check can read a session's choice to end a turn:
 the act leaves no tracked artifact, and no `PreToolUse` chokepoint sees it. The
@@ -1532,6 +1568,106 @@ decreases.
    rotating operator reads one weekly trajectory per account rather than an
    interleaved stream.
 
+## bin/wait-probe
+
+`bin/wait-probe.sh` is the instrument behind §Operative residency's wait-primitive
+measurement: it stands a **known-duration producer** up and exercises candidate
+wait forms against it, recording one line per trial. Hand-invoked, no trigger,
+wired into **no** tier — it launches processes and sleeps for its declared
+durations, so a gate tier would put a multi-second sleep on every commit for a
+measurement bought once. Its precedent for existing at all is `demo/run-demo.sh`
+and `gate-sdk/bin/port-blockers.sh`, runnable artifacts a session invokes by hand.
+It writes nothing tracked: producers, markers and launch records go to
+`GATE_SDK_TMP_DIR`, trials to the capture-tier evidence file below, and it mints
+no knob of its own for either (§Layout and configuration owns why).
+
+Exit **0** on a completed subcommand, **2** on misuse; `-h`/`--help` prints the
+subcommand roster on stdout and exits 0, the `bin/`-tool contract
+(gate-sdk/SPEC.md §The bin/-tool contract).
+
+**One trial** is: launch a producer that sleeps a declared duration and then writes
+a completion marker; record its PID at launch in a `<key>.run` file exactly as
+`templates/agent-execution.md` mandates — the rule applies to the instrument that
+measures it, so the probe's own producers are visible to `check-producer-liveness`
+and to guard rule 14 like any other; arm the wait form under test; and record
+whether the waiter exited **before** the marker appeared. That before/after
+relation is the whole measurement: a waiter that outlives its condition is
+working, and one that exits early is the observed failure.
+
+**The producer's duration is swept, not fixed**, because a single duration cannot
+distinguish the candidate causes. The probe reads no harness internals and asserts
+no ceiling; it varies the input and reports where the behavior changes.
+
+**Two axes, and the second is what the instrument earns its keep on.** The *form*
+axis varies how the wait is armed. The *predicate* axis varies what the loop tests
+— a completion marker, or the producer's liveness. A form-only instrument can
+report that a form failed and can never report **why**, and the attested failures
+turned out to sit on the predicate axis, which a form-only sweep would have
+recorded as unexplained. Both axes are swept in the same run on identical
+producers, so no cell's result rests on a comparison with a differently-shaped
+trial, and every form arms the **same** wait body.
+
+**The per-trial line.** Every field has a named reader and the field set is closed
+at these:
+
+- **`form`** — which wait form the trial armed. Read at the comparison; the only
+  field that distinguishes the candidates.
+- **`predicate`** — what the loop tested. Read at the classification, and it is
+  what separates a failing *form* from a failing *condition*.
+- **`producer_ms`** — the producer's declared duration. Read at the sweep analysis:
+  a ceiling shows as a threshold in this field.
+- **`waiter_exit`** — the waiter's exit status. Read at the classification, to
+  separate a signal status from a clean zero with the marker absent.
+- **`marker_at_ms`**, **`waiter_at_ms`** — elapsed wall-clock at the marker's
+  appearance and at the waiter's exit. Read **together and only together**: their
+  *order* is the measurement and neither alone says anything.
+- **`producer_alive_at_exit`** — whether the recorded PID still answered `kill -0`
+  when the waiter exited, establishing the *producer verifiably alive* condition —
+  on the recorded PID and never a process-table pattern, which is the protocol's
+  own rule.
+- **`class`** — the cause, from the closed list below.
+
+The producer's own PID is **not** logged: the `<key>.run` record already holds it
+for the lifetime the wait needs, and a second copy in an advisory log would be a
+PID with no reader once the trial ends.
+
+**The candidate causes are enumerated before the run, not after it**, so a run
+returns a cause rather than an anecdote:
+
+- **(i) `reaped`** — the harness or the session boundary killed the backgrounded
+  shell. Tell: a signal exit status with the producer still alive.
+- **(ii) `ceiling`** — a wall-clock deadline the form carries. Tell: early exits
+  cluster above one duration and short trials never fail.
+- **(iii) `predicate`** — the condition went true, or could not go false, for a
+  reason unrelated to the producer. Tell: a clean **zero** exit with the marker
+  absent, reproducing on a form the harness never touched.
+- **(iv) `unexplained`** — recorded as such and reported as such. A closed list
+  that cannot say *I do not know* would force a wrong attribution, which is the
+  failure the enumeration exists to avoid.
+
+**The honest limit, and it is a division of labour rather than a defect.** Cause
+(ii)'s tell is a **threshold across the sweep**, so no single line can carry it:
+`record` classifies from the tells a trial can see on its own and the `report` arm
+is the only reader that sees the sweep whole and can name (ii). A reader taking a
+line's `class` for the run's verdict has read the wrong surface. The second limit
+is scope: the probe arms the forms a shell can arm and the *session* arms the
+harness's own, calling `record` for each — the tool cannot invoke a harness tool
+parameter, so a run that measures the harness forms is a session's run and `sweep`
+is the harness-uninvolved reproducer a second machine executes.
+
+**The trials land in `.workflow/wait-primitive-evidence.txt`** — capture-tier,
+gitignored, advisory (gate-sdk/SPEC.md §The workflow directory), declared on the
+close-surface roster (lifecycle-kit/SPEC.md §The close-surface roster) naming its
+own clear as the reclaim path:
+
+close-surface: .workflow/wait-primitive-evidence.txt advisory reclaim=: > .workflow/wait-primitive-evidence.txt
+
+`advisory` rather than `forced`, on the reasoning §The turn-end liveness probe's
+log already takes: nothing refuses a close that skips it, and a visible skip is
+the honest mode for a probe. The **finding** — the branch the trials select and
+its grounds — lands in this SPEC, never in the log; the log is evidence, and
+evidence is not the record.
+
 ## Layout and configuration
 
 ```
@@ -1542,6 +1678,7 @@ delegation-kit/
   bin/run-budget-guard-tests.sh   # budget-guard decision-table runner
   bin/run-dispatch-guard-tests.sh # dispatch-guard decision-table runner (D1/D2/D3)
   bin/run-trend-tests.sh          # trend-reporter assertion runner
+  bin/wait-probe.sh               # wait-primitive probe: hand-invoked, no trigger, wired into no tier
   lib/delegation.sh               # shared helpers for the usage tools and the kit's gates
   usage-tests/cases.tsv           # expected-verdict <TAB> scenario knobs
   usage-tests/budget-guard-cases.tsv  # expected-action <TAB> scenario knobs
@@ -1664,7 +1801,16 @@ layout as defaults):
   deferral guard-kit's two logs already take. No scratch-dir knob sits beside it:
   the launch record's home is `${GATE_SDK_TMP_DIR:-.tmp}`, the cross-kit deferral
   every kit reaching that directory already resolves it through, and a second
-  name for it would be the duplication rather than the config.
+  name for it would be the duplication rather than the config. **The rule has
+  since governed a second artifact and held**: `bin/wait-probe` (§bin/wait-probe)
+  writes producers, markers and `<key>.run` records into that same directory and
+  mints no knob of its own for it either. It mints none for its evidence log
+  either, and there the reasoning is the narrower one this bullet's own knob does
+  not meet: a knob needs a reader, and `DELEGATION_KIT_STOP_LOG` has one — a
+  *second process*, the consumer-side hook, which must be told where to write.
+  The probe both writes and reads its own log in one tool, so a knob there would
+  be a name nothing reads, and the close stage reaches the file through the
+  roster's literal rather than through a knob.
 - `DELEGATION_KIT_LIVENESS_CMD` — the liveness reader the probe invokes in set
   mode; default `evidence-kit/checks/check-producer-liveness.sh`. A knob rather
   than a literal because a consumer's evidence-kit may sit elsewhere, and because

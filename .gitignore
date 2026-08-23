@@ -39,3 +39,5 @@ scripts/queue-config.local.sh
 # outbound lesson-harvest sink ([essay] tag) — operator material feeding the
 # launch-comms essay, reclaimed into it then cleared (never tracked)
 .workflow/essay-harvest.md
+# delegation-kit wait-primitive probe trials (advisory close surface, cleared at triage)
+.workflow/wait-primitive-evidence.txt

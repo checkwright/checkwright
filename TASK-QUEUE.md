@@ -12,67 +12,40 @@
 
 ## New Features
 
-- **turn-end-chokepoint-and-wait-primitive** [spec: SPEC-wait-primitive.md] — two open
-  mechanism questions the wait rule's fifth firing raised, neither answerable from the
-  ruling that closed its prose half.
-  **The design half of `waiting-rule-fourth-firing-post-fix`** (now Done), split off at that entry's
-  cap; its surviving question is "given that prose alone does not hold, what does".
-  **First half — CLOSED 2026-08-22:** both answers — a turn-end passes no `PreToolUse`, and
-  `SubagentStop` fires per assistant step, so a blocking variant needs a SECOND authorization —
-  live in delegation-kit/SPEC.md §The turn-end liveness probe. Rule 14 stands; the class holds.
-  **Fifteenth firing, 2026-08-22 — grounds for that date:** this iteration's validate session ended
-  its turn to wait on `run-validate`, twice; the hook wired that same iteration logged FIFTEEN
-  `live=yes verdict=red` firings over 309 events — six in validate's session, nine in the lead's.
-  **RULED by the lead 2026-08-22 — the blocking variant is not sought this iteration:** a second
-  authorization is a scope-stage ask, and `subagent-stop-payload-background-tasks-read` may collapse
-  what such a hook should read. Sequence: settle that entry first, then route the ask.
-  **Second half — which primitive is reliable here.** The protocol states a hard ordering:
-  `run_in_background` plus an `until`-loop for a single completion, with the event-stream form
-  named the wrong tool. On this machine that ordering **inverted** — four of the lead's own
-  backgrounded waiters died before their conditions went true, producers verifiably alive, while
-  a `Monitor` call succeeded first try; a guard on the wrong primitive inherits its failure.
-  **The MEASUREMENT half is promoted and the blocking variant is NOT**, lead-ruled 2026-08-23:
-  `SPEC-wait-primitive.md` takes the surviving half — which primitive is reliable here — and
-  restates the blocking variant's sequencing behind `subagent-stop-payload-background-tasks-read`
-  rather than reaching it. One thing narrowed at authoring by probe rather than measurement: the
-  vendor reference confines the stays-armed property to an **unbounded** command and independently
-  recommends the sanctioned form for a single completion, so the ordering is corroborated and what
-  is under measurement is why four sanctioned-form waiters died with their producers alive.
-  **HELD TWICE on 2026-08-22 — on surface disjointness, then OPERATOR-RULED**, the operator taking
-  the port's hold grounds as the spine with this hold stated as the argument against it. Neither is
-  on merit: the queue's highest recurrence (4 dates, 15 firings), surviving half a measurement plus
-  a doctrine line. The prior "leading candidate for next spine" naming did not survive and is gone.
-  **Cost while deferred:** each further firing costs an orphaned producer plus the lead turn that
-  discovers it — and, as the tenth showed, can cost a whole suite's evidence.
-  **Firings 6-9, 2026-08-16/17 — spent grounds, kept only for what they establish.** Four across
-  three iterations, every one a producing role ending its turn on a live producer and recovered by
-  whatever the producer happened to be. They established the rate is not noise; both their readings
-  are superseded below, and neither carried a date of its own.
-  **It fired again at 2026-08-22 validate, and the CARRIER argument is now ANSWERED.** The session
-  ended its turn on a live `run-validate.sh` with its OWN journal recording this lesson from the
-  tenth firing and stating the intent not to repeat it. Earlier firings argued the rule's carrier
-  was too weak — the agent definition, then the dispatch prompt. A session that wrote the rule down
-  itself and still ended the turn retires that: carriage is not the defect. No new date, 2026-08-22
-  being stamped already. **The DETECTOR exists and is deliberately inert, which is where the design
-  should go** — the `SubagentStop` probe logged `verdict=red live=yes` SIXTEEN times in one
-  37-minute window this iteration and is logging-only, so what is missing is a forcing function.
-  **Tenth firing, 2026-08-17 (`post-close-intake-and-index-port` validate) — the first to cost
-  evidence rather than turns.** It ended its turn on a live `run-validate.sh` to await a completion
-  notification that ending the turn prevents, then committed mid-run and dirtied the worktree
-  `installer_smoke` checks: `verdict=new-failures` on a false ground. No date — already stamped.
-  **Fourteenth firing, 2026-08-21 — grounds for that date:** validate ended a turn *in order to
-  wait* on the battery, inside the very iteration this defect was held out of for the port spine
-  (lead 2026-08-20; operator 2026-08-18) — the held limit came true. Record written, nothing lost.
-  recurrence: turn-end-chokepoint-and-wait-primitive 2026-08-18 2026-08-19 2026-08-21 2026-08-22
-  **Firings 11-13, 2026-08-18 — grounds for that date.** Three times a backgrounded producer exited
-  cleanly and the turn ended anyway: work finished, uncommitted, no completion notification,
-  recovered only by the operator noticing. The second half, measured on producers that *finished*.
-  Filed 2026-08-16 by close from the gap inbox, both halves; the drain re-verified the carrier
-  count and the chokepoint scoping against the SPEC rather than taking the bullet's prose.
-
 ## Technical Debt
 
 ## Deferred
+
+- **turn-end-chokepoint-and-wait-primitive** [design-pending] — the blocking-hook variant,
+  the last open half of the wait rule's fifth firing; its other two halves are closed.
+  **Chokepoint half — CLOSED 2026-08-22**, into delegation-kit/SPEC.md §The turn-end liveness
+  probe: a turn-end passes no `PreToolUse`, and `SubagentStop` fires per assistant step, so a
+  blocking variant needs a SECOND authorization. Rule 14 stands; the class holds.
+  **Measurement half — CLOSED 2026-08-23**, into delegation-kit/SPEC.md §bin/wait-probe (the
+  instrument) and §Operative residency (the finding). The stated ordering **stands unchanged**:
+  every completion-marker wait ran clean across four forms and four durations to 200s, on both
+  harness forms and on a harness-uninvolved control, so no form carries a ceiling in that range.
+  Every early exit was **predicate**-shaped, never form-shaped — the protocol's two clauses
+  compose literally into `until kill -0 "$pid"`, true while the producer is alive and therefore
+  exiting at once. The four attested deaths were that inversion, not the primitive; the polarity
+  fix propagated to all four carriers. What the measurement retired is the reading that the
+  ordering had inverted on this machine.
+  **What remains, and it is the whole of this entry now: the blocking `SubagentStop` variant.**
+  The detector exists and is deliberately inert — the probe logged `verdict=red live=yes` sixteen
+  times in one 37-minute window — so what is missing is a forcing function, and turning an
+  observer into a refuser is the separate authorization above, which is not held.
+  **RULED by the lead 2026-08-22 — not sought that iteration:** a second authorization is a
+  scope-stage ask, and `subagent-stop-payload-background-tasks-read` may collapse what such a hook
+  should read. Sequence: settle that entry first, then route the ask.
+  **The CARRIER argument is answered and stays answered.** Earlier firings argued the rule's
+  carrier was too weak — the agent definition, then the dispatch prompt. A session that wrote the
+  rule down itself and still ended the turn retires that: carriage is not the defect, which is why
+  what remains is an enforcement ask rather than more prose.
+  **Cost while deferred:** each further firing costs an orphaned producer plus the lead turn that
+  discovers it — and, as the tenth showed, can cost a whole suite's evidence.
+  recurrence: turn-end-chokepoint-and-wait-primitive 2026-08-18 2026-08-19 2026-08-21 2026-08-22
+  Filed 2026-08-16 by close from the gap inbox; demoted 2026-08-23 at build, the measurement half
+  delivered and the blocking variant still sequenced.
 
 - **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
   — the whole battery onto the binary, and the shell surface down to its residue.

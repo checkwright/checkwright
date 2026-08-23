@@ -549,8 +549,13 @@ that harness exists would be designing against no case.
     must end when its condition goes true, not when a duration expires; a
     backgrounded command that *exits* on the condition fires one notification the
     moment the condition holds, while the harness's event-stream form stays armed
-    to its deadline even after its event fires and is therefore the wrong tool for
-    a single completion. Naming one form teaches a spelling; naming the property
+    to its deadline after its event fires when the command it was armed with is
+    unbounded, which makes it the second choice for a single completion. *It also
+    names the loop's polarity*, because that is the next mistake and it is the one
+    with an attested cost: `until` takes a done predicate, `while` takes a
+    still-running one such as a PID's liveness, and inverting them yields a loop
+    that exits at once with the producer still running
+    (delegation-kit/SPEC.md §bin/wait-probe measured it). Naming one form teaches a spelling; naming the property
     and sorting both under it teaches the rule — the discriminator is owned by
     delegation-kit/SPEC.md §The delegation model. **Placed with rule 12, before both
     auto-allow rules,** for the same reason: `sleep` is not on the default
@@ -763,7 +768,16 @@ that harness exists would be designing against no case.
     form *is* a loop condition, so it is decorated by construction — but a grant
     minted around the currently-sanctioned loop form would be shaped to a
     primitive that measurement may correct, and a guard on the wrong primitive
-    inherits its failure. Measure first, then grant.
+    inherits its failure. Measure first, then grant. **The measurement has since
+    returned and the precondition is discharged**, so what remains is the grant
+    itself rather than the question it waited on: the backgrounded condition loop
+    stands unchanged as the sanctioned form and the correction landed on the
+    loop's *polarity*, so a grant is now shaped to `while kill -0 "$pid" …` as
+    well as `until <cond> …` (delegation-kit/SPEC.md §bin/wait-probe holds the
+    trials; §Operative residency holds the finding). Recorded here rather than
+    left as a closed refusal because the two read differently: this one is now
+    unblocked work, and rule 6 decides the mandated spelling out of band on every
+    call until it is minted.
 18. **Auto-allow read-only pipeline** — granted silently when every pipe
     segment leads with a roster binary (`GUARD_KIT_RO_BINS`, default the
     grep/head/cat/find/jq family) and every redirect target is `/dev/null`

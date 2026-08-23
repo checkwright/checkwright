@@ -45,18 +45,34 @@ drift: do not delete it on sight, and when either rule changes here, propagate.
   `Agent`'s completion notification, a channel a supervisor has;
   condition-waiting is the only one a dispatched role has.
   **Which primitive — the one whose wait ends when the condition goes true, not
-  when a duration expires.** The harness offers two forms with opposite
+  when a duration expires.** The harness offers two forms with different
   reactivity, and the difference is exactly the wall-clock property this rule
   exists to buy. **Background a command that *exits* on the condition** — a
   `run_in_background` shell command wrapping `until <cond>; do sleep N; done` —
   and it fires one notification the moment the condition holds, then ends: that
-  is the sanctioned form. The harness's **event-stream form**, armed with a
-  command and a deadline, emits one event per occurrence and **stays armed to
-  its deadline even after the event fires**, so used for a single completion it
-  converts a wait that should end in seconds into one that ends at the timeout —
-  the wrong tool for a completion, and named here because a reader told only
+  is the sanctioned form, and it holds that place on measurement rather than on
+  preference (delegation-kit/SPEC.md §bin/wait-probe). The harness's
+  **event-stream form**, armed with a command and a deadline, emits one event per
+  occurrence and stays armed to its deadline after the event fires **when the
+  command it was armed with is unbounded** — a `tail -f`, a `while true` — so
+  pointed at a single completion by way of such a command it converts a wait that
+  should end in seconds into one that ends at the timeout. Armed with a command
+  that *exits*, that watch ends too: it is the second choice for a single
+  completion, not a broken one, and it is named here because a reader told only
   about the first form reaches for this one the next time the shape looks close.
   Never a bare foreground `sleep`, which ends on neither.
+  **Get the loop's polarity right — the two rules in this bullet compose into a
+  trap, and it is the one that has actually fired.** `until` ends when its
+  condition becomes **true**, so `until` takes a *done* predicate:
+  `until [ -f <marker> ]; do sleep N; done`. Liveness is a *still-running*
+  predicate, so it takes `while`: `while kill -0 "$pid" 2>/dev/null; do sleep N;
+  done`. Composing "wrap `until <cond>`" with "loop on the recorded PID's
+  liveness" literally gives `until kill -0 "$pid"`, whose condition is true while
+  the producer is **alive** — so it exits at once. **The tell** is a waiter that
+  exited **zero**, in milliseconds, with its producer still running and its
+  condition never met. Four attested instances read as evidence against this
+  primitive until they were measured and found to be this instead; neither keyword
+  costs anything at the guard, which reads the loop's span and not its keyword.
   **What you wait *on* splits two ways, and the split is what makes the artifact
   reachable.** An **`Agent` dispatch** is awaited by its **completion
   notification** — that record is the harness's, not the session's — so never go
@@ -68,8 +84,9 @@ drift: do not delete it on sight, and when either rule changes here, propagate.
   agent writes, scratch reset sweeps** bullet below sends a journal, repo-local
   gitignored scratch in the main checkout, on that bullet's stated survivability
   grounds — widened here from the journal to any artifact a session waits on.
-  That record *is* the wait target: loop on its PID's liveness and the loop ends
-  when the PID stops answering. Write it at the launch, not after, and leave it
+  That record *is* the wait target: loop on its PID's liveness —
+  `while kill -0 "$pid" 2>/dev/null; do sleep N; done`, on the polarity rule above
+  — and the loop ends when the PID stops answering. Write it at the launch, not after, and leave it
   behind — a completion marker answers *is it done* to a live observer, and the
   case this rule exists for is the one where the observer is gone, where a
   liveness record still answers *is it still running* to whoever arrives next.
@@ -89,7 +106,7 @@ drift: do not delete it on sight, and when either rule changes here, propagate.
   matches the waiter's own argv — the harness's wrapper argv matches too — so
   `until ! pgrep -f '<script>'; do …; done` can never go false and never exits,
   reddening nothing while it burns the whole foreground cap. Where liveness *is*
-  the condition, match a **recorded PID** (`kill -0 "$pid"`) and never a pattern —
+  the condition, match a **recorded PID** (`while kill -0 "$pid" 2>/dev/null`) and never a pattern —
   one rule, whoever started the producer, your own backgrounded child included: a
   PID is an identity, a pattern is a guess about a process table that includes the
   guesser. The

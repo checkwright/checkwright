@@ -82,6 +82,8 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
 bash delegation-kit/bin/usage-verdict.sh            # budget verdict: exit 0 OK/RESET-OK, 1 PAUSE, 2 STALE
 bash delegation-kit/bin/usage-verdict.sh <snapshot> # verdict for an explicit usage.txt (test injection)
 bash delegation-kit/bin/usage-trend.sh              # footprint trend over the sample log (needs DELEGATION_KIT_USAGE_HISTORY)
+bash delegation-kit/bin/wait-probe.sh sweep         # wait-primitive probe: the harness-uninvolved reproducer (sleeps for its declared sweep)
+bash delegation-kit/bin/wait-probe.sh report        # classify the recorded trials and print the verdict
 ```
 
 With `DELEGATION_KIT_USAGE_HISTORY` set, `usage-verdict` logs one sample per

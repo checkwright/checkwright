@@ -70,14 +70,20 @@ batch-specific pointers such as the journal path.
   hold. **Wait with a primitive that ends when the condition goes true, not when
   a duration expires:** background a command that *exits* on the condition
   (`run_in_background` wrapping `until <cond>; do sleep N; done`) and take its
-  completion notification — never a bare foreground `sleep`, and not the
-  harness's event-stream form, which stays armed to its deadline after its event
-  fires. An `Agent` you dispatched is awaited by its completion notification and
+  completion notification — never a bare foreground `sleep`, and in preference to
+  the harness's event-stream form, which stays armed to its deadline after its
+  event fires when the command it was armed with is unbounded. **Get the loop's
+  polarity right:** `until` takes a *done* predicate (`until [ -f <marker> ]`)
+  and liveness is a *still-running* one, so it takes `while` —
+  `while kill -0 "$pid" 2>/dev/null; do sleep N; done`. Writing
+  `until kill -0 "$pid"` inverts it and the loop exits at once, clean, with the
+  producer still running; that is the attested failure, not a fault of the
+  primitive. An `Agent` you dispatched is awaited by its completion notification and
   never by a path on disk; a shell child is awaited on the liveness record **you
   write at its launch** — its PID, one line `pid=<n> run=<key>`, in a file named
   `<key>.run` in repo-local `.tmp/` in the main checkout, never a temporary
   worktree and never a system temp dir — and your wait is a loop on that recorded
-  PID's liveness (`kill -0 "$pid"`), never a pattern match, whoever started the
+  PID's liveness, never a pattern match, whoever started the
   producer. Leave the record behind when you go: `check-producer-liveness
   <record>` reads it unchanged and `check-producer-liveness .tmp` reads the whole
   set, so whoever arrives next can still tell whether your orphan is writing.

@@ -49,13 +49,19 @@ Wait in-turn instead, with a primitive that ends when the condition goes true
 rather than when a duration expires: background a command that *exits* on the
 condition (`run_in_background` wrapping `until <cond>; do sleep N; done`) and
 take its completion notification. Not a bare foreground `sleep`, which ends on a
-clock, and not the harness's event-stream form, which stays armed to its deadline
-even after its event fires. A sub-`Agent` is awaited by its completion
+clock, and in preference to the harness's event-stream form, which stays armed to
+its deadline after its event fires when the command it was armed with is
+unbounded. **Get the loop's polarity right:** `until` takes a *done* predicate
+(`until [ -f <marker> ]`) and liveness is a *still-running* one, so it takes
+`while` — `while kill -0 "$pid" 2>/dev/null; do sleep N; done`. Writing
+`until kill -0 "$pid"` inverts it and the loop exits at once, clean, with the
+producer still running; that is the attested failure, not a fault of the
+primitive. A sub-`Agent` is awaited by its completion
 notification and never by a path on disk; a shell child is awaited on the liveness
 record you write at its launch — its PID, one line `pid=<n> run=<key>`, in a file
 named `<key>.run` in repo-local `.tmp/` in the main checkout, never a temporary
 worktree, which is deleted with it, and never a system temp dir. Loop on that
-recorded PID's liveness (`kill -0 "$pid"`) and never on a pattern, whoever started
+recorded PID's liveness and never on a pattern, whoever started
 the producer; leave the record behind, because `check-producer-liveness <record>`
 reads it unchanged — and the `.run` suffix is what lets
 `check-producer-liveness .tmp` read the whole set — and that is how whoever
