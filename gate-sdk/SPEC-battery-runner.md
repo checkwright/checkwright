@@ -253,6 +253,17 @@ cost falls with delta 3 and its subject survives. `install-step-relocation`'s
 entry named: the answer is that the hook's shape does not change, so that entry
 is unblocked and unchanged rather than resolved.
 
+**This does not reverse TRAJECTORY.md §The closed rulings' own two-line-shim
+reading — it is scoped ahead of this unit's corpus, not against it.** That
+paragraph states what *port complete* means, tied to `shell-gate-tail-port`,
+whose completion is exactly the six-of-106 `.sh` residue this refusal turns
+on going to zero: once no member dispatches to `.sh`, criterion 5's stranded-
+platform branch has no shell block left to lose, and the shim TRAJECTORY
+describes stops costing what it costs here. This unit's refusal is therefore
+the correct reading *now*, not a narrower ruling standing against a wider one
+already made — the two are the same ruling read at two different corpus
+states.
+
 **And the `staged_matches` dual implementation is priced here, not elsewhere.**
 §run-gates rules `--for` "identical to the generated hook's staged-path
 matching", and the hook's copy is `bin/gen-pre-commit.sh`'s verbatim awk splice
@@ -325,7 +336,7 @@ name.
 ### (7) One crate-side registry module, and the copies collapse onto it
 
 The `--run` arm needs the registry walk, declaration resolution and the manifest
-fields the descriptor grammar carries; four gate modules already carry a private
+fields the descriptor grammar carries; five gate modules already carry a private
 copy of `gates_list_members`' grammar. **Design-bearing.**
 
 A `native/src/registry.rs` owns: the `gates.list` member grammar (neither blank
@@ -358,10 +369,14 @@ cases.
   and under the default, with the two transcripts required byte-identical modulo
   the timings file. Without it, ordering determinism is advice.
 - **`gate-sdk/gate-tests/run-*.test.sh` widens** to hold the front-end's
-  refusals and the arm's output contract: the exact green phrase, the four
-  `FAIL:` tail shapes, the omission line staying off the summary line, the
-  `--only` unregistered-name refusal at exit 2, the `--for` uncoupled-path note
-  at exit 0, and the help/unrecognized-option split across stdout and stderr.
+  refusals and the arm's output contract: the exact green phrase, each
+  `FAIL:` tail shape (`(exit N)`, `(dispatch harness error, exit 2)`,
+  `(unresolved)` — cited rather than counted, on delta 10's own ground, since
+  today's tree carries three and a child-process dispatch may add a signal
+  shape this amendment does not name), the omission line staying off the
+  summary line, the `--only` unregistered-name refusal at exit 2, the `--for`
+  uncoupled-path note at exit 0, and the help/unrecognized-option split across
+  stdout and stderr.
 
 ### (9) `gate-battery-result-cache` stays open
 
@@ -375,16 +390,19 @@ untouched: whether a gate whose real inputs exceed its declared `couples=` would
 be skipped while stale, and whether `docs-renderer-batch-contract`'s 2026-08-01
 content-hash refusal generalizes. Both stay that entry's first work.
 
-### (10) The stale refusal count is corrected at both spellings
+### (10) The stale refusal count is corrected at its one remaining spelling
 
 **Mechanical.**
 
 `gate-sdk/lib/gate.sh`'s `gate_command` `spec:` line says "each of the three
-knob-resolution refusals", and the `battery-runner-port` queue entry says "the
-bridge's three refusals kept". §lib/gate.sh has said **four** since the keyed
-arm landed. Both are de-literalized to cite the section rather than carry a
-count, which is the de-literalization rule applied to the thing that already
-drifted.
+knob-resolution refusals". §lib/gate.sh has said **four** since the keyed arm
+landed. It is de-literalized to cite the section rather than carry a count,
+which is the de-literalization rule applied to the thing that already drifted.
+**The queue entry carried the same stale count once** ("the bridge's three
+refusals kept") but its own promotion edit already de-literalized it to "every
+refusal the bridge states kept … which owns the roster and its count" — verified
+on this tree at align, so build's remaining work here is the one code comment,
+not two spellings.
 
 ## Producers and consumers
 
@@ -392,7 +410,7 @@ drifted.
 selected battery run — the enabling configuration is the bridged environment
 that same script resolves, which is emitted on every invocation and not only
 under test. *Consumers:* the CI workflow `.github/workflows/gates.yml` and the
-shipped `templates/gates-workflow.yml` (exit code); `bin/upgrade-smoke.sh`,
+shipped `gate-sdk/templates/gates-workflow.yml` (exit code); `bin/upgrade-smoke.sh`,
 `bin/run-consumer-smoke.sh`, `installer/consumer-smoke/run-smoke.sh`,
 `demo/run-demo.sh`, `context-kit/smoke/agents-md.sh` and
 `gate-sdk/smoke/install.sh` (the green phrase, by grep);
@@ -460,7 +478,7 @@ awk splice, which delta 5's oracle now holds together).
 - **gate-sdk/SPEC.md §check-graph** — the measured 77%-is-the-two-spawns figure
   is superseded by the batched bridge and re-measured at build; assertion D's
   subject is unchanged, which is the ruling delta 5 takes (deltas 3, 5).
-- **gate-sdk/SPEC.md §Porting a gate to the binary substrate, criterion 6** —
+- **gate-sdk/SPEC.md §The port-candidate criteria, criterion 6** —
   the `staged_matches` dual implementation joins `lib/queue.sh` as a worked
   instance of the *unless* clause discharged by a standing comparison rather
   than a deletion (deltas 5, 8).
@@ -472,7 +490,7 @@ awk splice, which delta 5's oracle now holds together).
   states what the scenario parser reads — the tail-line grammar is unchanged and
   the section says so explicitly, because it is the surface a reader would
   otherwise have to re-derive (delta 6).
-- **drift-kit/SPEC.md §The KPI set**, on the gate-runtime KPI — `TOTAL` is the
+- **drift-kit/SPEC.md §Bundled KPIs**, on the `kpi-gate-runtime` entry — `TOTAL` is the
   sum of per-member times and under a pool no longer approximates wall-clock
   (delta 6).
 <!-- update-target-exempt: a no-change confirmation, owned by no delta by construction -->
