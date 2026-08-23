@@ -519,6 +519,16 @@ remove a file in one. A corpus carrying every arm that the port cannot move is
 exactly what criterion 4 says a self-referential port must design and does not
 say how to build (§The port-candidate criteria, criterion 4).
 
+**A case dir is not its own git repository, and that decides what a git-walking
+arm can see inside one.** A `git ls-files` run with cwd inside a case returns
+the *outer* repo's index scoped to that subdirectory, printed relative to cwd.
+Three consequences, none of them optional to design around: the `gate-tests`
+prune never fires inside a case, because the scoping already stripped the prefix
+it matches on; a **non-repository** arm is unreachable from any case dir and
+cannot be exercised there at all; and a file a case plants to widen an arm is
+invisible to the gate until it is `git add`ed, so an unstaged plant leaves the
+widened arm running over nothing while the case still passes.
+
 Two properties make the widening worth its cost rather than ceremony. Its
 **planted violations are standing guards**: a `bad/` case whose only violation
 lives in an arm reds forever if an edit later drops that arm from the walk — for

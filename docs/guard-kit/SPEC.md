@@ -526,8 +526,11 @@ that harness exists would be designing against no case.
     have rule 18 silently bless a waiter that can never exit.
 13. **Bare foreground `sleep`** — a `sleep` standing in for a wait is
     **blocked**, and the discriminator is the whole rule: a blanket `sleep` block
-    is wrong and is refused. The sanctioned wait *is* a condition loop, and
-    `until <cond>; do sleep N; done` is expressly legitimate. So the rule fires on
+    is wrong and is refused. The sanctioned wait *is* a condition loop, and such
+    a loop is expressly legitimate **in either spelling** —
+    `until <cond>; do sleep N; done` and `while <cond>; do sleep N; done` alike,
+    because the span walk below reads `do … done` and never the loop keyword, so
+    correcting a wait loop's polarity is free at the guard. So the rule fires on
     exactly one shape — a bare foreground `sleep` in command position, outside
     every loop wrapper — and never on a `sleep` inside a loop body. *The
     discriminator is new territory:* this ruleset carries exactly one shell-keyword
