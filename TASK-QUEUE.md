@@ -12,64 +12,6 @@
 
 ## New Features
 
-- **session-mechanic-grants-uncommitted** [spec: SPEC-journal-append.md] — the mandated
-  resume-journal append is granted by nothing committed, and the spelling ruled to grant
-  it does not work.
-  **FEATURE-CLASS as of 2026-08-22, re-classed from debt at build.** The ruled design mints a
-  governed name — a new numbered guard rule and its SPEC section — so canon-kit's litmus makes this
-  a feature and an **amendment is owed** before any build. This entry's former "mints no governed
-  name" litmus line is superseded and must not be re-applied.
-  **THE PREVIOUSLY-RULED SPELLING IS INERT. This is the finding, and it must not be bought twice.**
-  `Bash(cat >> .tmp/*)` cannot grant a journal append at all. The vendor permissions doc is
-  explicit: "Claude Code checks the target of an output redirection, such as `>`, `>>`, or `2>`, as
-  a file write. The check covers your `Edit` allow and deny rules ... A rule such as
-  `Bash(git commit *)` allows the command, not the target." A `Bash(...)` rule grants the COMMAND,
-  never the redirect TARGET, so disposition (a) as previously written would have shipped a no-op
-  and then measured no improvement.
-  **The ruled design, operator 2026-08-22 via the lead:** a PreToolUse guard rule running
-  `git check-ignore` on every redirect target and auto-allowing only when all of them are ignored,
-  with `guard_rule_truncate_scratch` (guard-kit/lib/guard.sh:784) as the shipped precedent — it
-  already does exactly this for the `: >` truncation form.
-  **Why the hook and not an `Edit` rule.** `Edit(/.tmp/**)` would grant the target, and is anchored
-  so it provably cannot reach a tracked path — but a redirect-target check is a FILE-WRITE check
-  and cannot tell `>>` from `>`, so it grants the truncating form too. The append-only split ruled
-  2026-08-20, so that a mis-typed redirect cannot destroy a journal, is inexpressible in ANY
-  settings rule. Only the hook honours what was actually ruled, and the operator ruled 2026-08-22
-  that the split is worth its cost.
-  **The second half is SPLIT OUT, 2026-08-23, and that split is what discharged the hold below.**
-  The overlay-only oracles are now `overlay-only-oracle-grants-uncommitted`; this entry's
-  deliverable is the redirect-target rule alone. The split is authorized by the lead and is the
-  first worked instance of the criterion `SPEC-entry-split.md` mints — two deliverables, two
-  dispositions, one slug — so the entry it unblocked is the entry that proves the test.
-  **The `awk` item stays CONTESTED** by `guard-read-steer-tool-coverage`, which rules it a (b)
-  steer rather than an (a) grant; nothing here settles it.
-  recurrence: session-mechanic-grants-uncommitted 2026-08-18 2026-08-19 2026-08-21 2026-08-22
-  **Grounds for 2026-08-22 — a THIRD member of the class, and it corroborates the ruled hook
-  without widening what that hook must do.** The mandated in-turn wait is a `kill -0 "$pid"` loop
-  on a launch-liveness record (delegation-kit/templates/agent-execution.md); this iteration's
-  friction log carries 19 such calls across two sessions, every one out-of-band. None is grantable
-  by a settings rule for a structural reason: the mandated form IS a loop condition, so it is
-  decorated by construction and a `Bash(...)` glob matches bare commands. That is a second shape,
-  after the redirect target above, where a settings rule provably cannot express a mechanic the
-  methodology mandates — so the hook is not the better route, it is the only one.
-  **Cost while deferred:** measured, and flat — 30 `.tmp/` heredocs of which 22 are journal appends
-  at 2026-08-21, one out-of-band decision each, paid by every dispatched session in every
-  iteration. A plateau is the worse reading rather than the milder one: it is the steady-state
-  price of an unbuilt ruled grant.
-  **The 2026-08-22 hold is DISCHARGED, not overridden.** It was held twice that day, the second
-  operator-ruled, on one stated ground: its design was ruled and its second half was not, so
-  promoting it would carry an unruled half into a build. The split above removes that half rather
-  than the ground, which is why the promotion is a discharge and not a reversal.
-  **The wait-loop grant is NOT in this promotion, ruled at spec 2026-08-23.** The third member of
-  the class stays unbuilt until `turn-end-chokepoint-and-wait-primitive`'s measurement half returns:
-  a grant shaped to the currently-sanctioned loop form would bake the ordering that unit is testing.
-  **It IS landable, recorded so the neighbouring ruling is not misread onto it:** the ruled design
-  is guard-kit code, so the 2026-08-22 operator ruling that a permission-settings edit is
-  operator-class (TRAJECTORY.md §The closed rulings) does not reach it. That is the whole reason
-  the hook was chosen over an `Edit` rule, and a reader meeting both entries could infer otherwise.
-  Filed 2026-08-16 by close; promoted 2026-08-22 at scope; re-deferred the same day at build, its
-  design ruled and its class corrected rather than the work merely postponed.
-
 - **entry-cap-displaces-mandated-writes** [spec: SPEC-entry-split.md] — the mandated-write
   class collides with `check-queue-entry-budget`'s per-entry cap at a measurable rate, and
   nothing counts the spend.
@@ -7717,7 +7659,7 @@
   rule is this entry's.
   **Two dispositions and neither is free:** sweep cross-corpus prose on every renumber, a corpus
   nobody has costed; or state in guard-kit/SPEC.md that a rule number is not a citable identifier
-  outside the kit and have every cross-corpus reference name the rule — the way rule 19 already
+  outside the kit and have every cross-corpus reference name the rule — the way rule 20 already
   cites DOCTRINE.md by name rather than number, for exactly this reason.
   **Why `[design-pending]`:** the second is a one-paragraph boundary note plus a sweep of unknown
   size, and whether a bare "rule N" outside the kit is gateable at all needs a false-positive
@@ -7777,6 +7719,7 @@
 ## Done
 
 - installed-gate-binary-leak-remap
+- session-mechanic-grants-uncommitted
 
 ## Lessons Learned
 

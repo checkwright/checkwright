@@ -30,6 +30,7 @@ declare -p GUARD_KIT_SCRATCH_DIRS >/dev/null 2>&1 || GUARD_KIT_SCRATCH_DIRS=(".t
 declare -p GUARD_KIT_RO_BINS >/dev/null 2>&1 || GUARD_KIT_RO_BINS=(
     grep egrep fgrep rg head tail cat wc sort uniq cut tr nl rev tac paste comm column diff jq find ls xargs
 )
+declare -p GUARD_KIT_APPEND_BINS >/dev/null 2>&1 || GUARD_KIT_APPEND_BINS=(cat printf echo)
 
 # spec: guard-kit/SPEC.md §The guard framework — the payload cache: called directly (never in a substitution, which would kill the global with its subshell) so a rule needing a second field can have one
 guard_read_input() {
@@ -245,12 +246,12 @@ guard_skeleton() {
     printf '%s' "$out"
 }
 
-# spec: guard-kit/SPEC.md §The guard framework — one splitter for every consumer that reasons per compound segment (rules 8/12/14/15/17/18/20, the read-compound carve-out, scan-prompts), fed a guard_skeleton view so the harness's per-segment boundary set never drifts
+# spec: guard-kit/SPEC.md §The guard framework — one splitter for every consumer that reasons per compound segment (rules 8/12/14/15/17/18/19/21, the read-compound carve-out, scan-prompts), fed a guard_skeleton view so the harness's per-segment boundary set never drifts
 guard_split_compound() {
     sed -E 's/\|\||&&|;|\|/\n/g' <<<"$1"
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — the committed Bash(...) allow inners, one per line; the fail-open read rules 17 and 18 share, so a missing jq or settings file emits nothing and every reader declines
+# spec: guard-kit/SPEC.md §The generic ruleset — the committed Bash(...) allow inners, one per line; the fail-open read rules 18 and 19 share, so a missing jq or settings file emits nothing and every reader declines
 _guard_allow_inners() {
     command -v jq >/dev/null 2>&1 || return 0
     [[ -f "$GUARD_KIT_SETTINGS" ]] || return 0
@@ -264,7 +265,7 @@ _guard_allow_inners() {
     done < <(jq -r '.permissions.allow[]?' "$GUARD_KIT_SETTINGS" 2>/dev/null)
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — a segment with its redirects removed and trimmed: what rules 17 and 18 compare against a committed bare allow entry
+# spec: guard-kit/SPEC.md §The generic ruleset — a segment with its redirects removed and trimmed: what rules 18 and 19 compare against a committed bare allow entry
 _guard_segment_core() {
     local seg
     seg="$(sed -E 's/[[:space:]]*[0-9]*(>>?|<)[[:space:]]*(&?[0-9-]+|[^[:space:]]+)?//g' <<<"$1")"
@@ -273,7 +274,7 @@ _guard_segment_core() {
     printf '%s' "$seg"
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — true when the segment exactly matches a committed *bare* allow entry (no glob): the reviewed-lead half of rule 17's predicate and rule 18's lead test
+# spec: guard-kit/SPEC.md §The generic ruleset — true when the segment exactly matches a committed *bare* allow entry (no glob): the reviewed-lead half of rule 18's predicate and rule 19's lead test
 _guard_is_bare_allow() {
     local core bl
     core="$(_guard_segment_core "$1")"
@@ -432,7 +433,7 @@ _guard_is_cat_read() {
     [[ "$operands" == 1 ]]
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 17's xargs discriminator: xargs runs a command rather than filtering text, so the segment is read-only only when the command it runs is itself on the roster
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 18's xargs discriminator: xargs runs a command rather than filtering text, so the segment is read-only only when the command it runs is itself on the roster
 _guard_is_ro_xargs() {
     local seg="${1#"${1%%[![:space:]]*}"}" tok want_arg=0 cmdtok='' b i n
     local -a toks
@@ -711,13 +712,13 @@ guard_rule_git_mutation_under_producer() {
     guard_block "don't run '${writes[0]}' while a producer you recorded is still running — ${list%; } names a live pid, and a tracked-tree mutation under a live producer is what the wait rule exists to prevent: the run is still writing, so a commit taken now dirties the worktree underneath it and its verdict has to be discarded and re-run. Two exits, both cheap: wait for that producer on its own artifact (loop on the recorded pid's liveness, 'until ! kill -0 <pid> 2>/dev/null; do sleep 5; done', backgrounded so its completion notifies you), or — if the producer has already exited — delete its .run file, which is not a workaround but the statement of fact becoming false and being retracted. Read-only git ('status', 'log', 'diff', 'show') is untouched. If you genuinely need this mutation now, run it yourself with !<command>."
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — every redirect target in a skeleton, one per line: the corpus rules 15 and 17 both read
+# spec: guard-kit/SPEC.md §The generic ruleset — every redirect target in a skeleton, one per line: the corpus rules 15 and 18 both read
 _guard_redirect_targets() {
     grep -oE '[0-9]*>>?[[:space:]]*[^[:space:]|;&]+' <<<"$1" \
         | sed -E 's/^[0-9]*>>?[[:space:]]*//'
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — the read-only-segment test rules 15 and 17 share, xargs discriminator included because xargs runs a command rather than filtering text
+# spec: guard-kit/SPEC.md §The generic ruleset — the read-only-segment test rules 15 and 18 share, xargs discriminator included because xargs runs a command rather than filtering text
 _guard_is_ro_segment() {
     local seg="${1#"${1%%[![:space:]]*}"}" first b
     first="${seg%%[[:space:]]*}"
@@ -797,6 +798,77 @@ guard_rule_truncate_scratch() {
     fi
 }
 
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 17's redirect scan, operator and target together and fd-dups included: _guard_redirect_targets' target class excludes '&', so it drops an fd-dup target entirely and a rule that must exempt one cannot see it there
+_guard_redirect_pairs() {
+    grep -oE '[0-9]*>>?[[:space:]]*(&[0-9-]+|[^[:space:]|;&<>]+)' <<<"$1"
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 17's single-statement test: guard_skeleton leaves a heredoc's body placeholder and terminator on lines of their own and guard_split_compound emits per line, so one statement is one segment plus exactly the residue that segment's own openers produce, never one segment
+_guard_only_heredoc_residue() {
+    local -a segs=() terms=()
+    local t seg i=1
+    mapfile -t segs < <(guard_split_compound "$1")
+    [[ "${#segs[@]}" -ge 1 ]] || return 1
+    while IFS= read -r t; do
+        t="${t#*<<}"
+        t="${t#-}"
+        t="${t#"${t%%[![:space:]]*}"}"
+        t="${t#[\"\']}"
+        t="${t%[\"\']}"
+        terms+=("$t")
+    done < <(grep -oE '<<-?[[:space:]]*("[^"]*"|'\''[^'\'']*'\''|[A-Za-z_][A-Za-z0-9_]*)' <<<"${segs[0]}")
+    for t in ${terms[@]+"${terms[@]}"}; do
+        seg="${segs[i]:-}"
+        seg="${seg#"${seg%%[![:space:]]*}"}"
+        if [[ "$seg" == HD ]]; then
+            ((i++))
+            seg="${segs[i]:-}"
+            seg="${seg#"${seg%%[![:space:]]*}"}"
+        fi
+        [[ "$seg" == "$t" ]] || return 1
+        ((i++))
+    done
+    [[ "$i" -eq "${#segs[@]}" ]]
+}
+
+guard_rule_append_scratch() {
+    local raw="$1" s
+    # spec: guard-kit/SPEC.md §The guard framework — the raw-command carve-out every auto-allow rule takes; rule 6 blocks three of the four substitution spellings and exits 2 first, but not the output-process-substitution one, and a grant may not rest on a coverage claim that is only mostly true
+    grep -qE '\$\(|<\(|>\(' <<<"$raw" && return 0
+    case "$raw" in *'`'*) return 0 ;; esac
+    s="$(guard_skeleton "$raw" sq dq hd)"
+    _guard_shell_backgrounds "$s" && return 0
+    _guard_only_heredoc_residue "$s" || return 0
+
+    local lead b on_roster=0
+    lead="${s%%$'\n'*}"
+    lead="${lead#"${lead%%[![:space:]]*}"}"
+    lead="${lead%%[[:space:]]*}"
+    for b in "${GUARD_KIT_APPEND_BINS[@]}"; do
+        [[ "$lead" == "$b" ]] && { on_roster=1; break; }
+    done
+    [[ "$on_roster" == 1 ]] || return 0
+
+    local pair op tgt
+    local -a targets=()
+    while IFS= read -r pair; do
+        [[ -z "$pair" ]] && continue
+        pair="${pair#"${pair%%[!0-9]*}"}"
+        if [[ "$pair" == '>>'* ]]; then op='>>'; tgt="${pair#>>}"; else op='>'; tgt="${pair#>}"; fi
+        tgt="${tgt#"${tgt%%[![:space:]]*}"}"
+        case "$tgt" in /dev/null | '&'[0-9-]*) continue ;; esac
+        case "$tgt" in *[\"\']*) return 0 ;; esac
+        [[ "$op" == '>>' ]] || return 0
+        targets+=("$tgt")
+    done < <(_guard_redirect_pairs "$s")
+    [[ "${#targets[@]}" -ge 1 ]] || return 0
+
+    for tgt in "${targets[@]}"; do
+        git check-ignore --quiet -- "$tgt" || return 0
+    done
+    guard_allow "append to gitignored scratch (${GUARD_NAME:-guard} auto-allow)"
+}
+
 guard_rule_ro_pipeline() {
     local raw="$1"
     # spec: guard-kit/SPEC.md §The guard framework — the raw-command carve-out these two tests take
@@ -828,7 +900,7 @@ guard_rule_ro_pipeline() {
         _guard_is_banner "$seg" && continue
         [[ "${seg%%[[:space:]]*}" == xargs ]] && { _guard_is_ro_xargs "$seg" || return 0; }
         if ! _guard_is_ro_segment "$seg"; then
-            # spec: guard-kit/SPEC.md §The generic ruleset — rule 17's widened lead: a bare
+            # spec: guard-kit/SPEC.md §The generic ruleset — rule 18's widened lead: a bare
             # committed allow entry qualifies, but only where something decorates it
             [[ "$i" == 0 && "${#segs[@]}" -gt 1 ]] || return 0
             _guard_is_bare_allow "$seg" || return 0
@@ -934,6 +1006,7 @@ guard_generic_rules() {
     guard_rule_git_mutation_under_producer "$cmd"
     guard_rule_background_no_record "$cmd"
     guard_rule_truncate_scratch "$cmd"
+    guard_rule_append_scratch "$cmd"
     guard_rule_ro_pipeline "$cmd"
     guard_rule_allowlist_chain "$cmd"
     guard_rule_git_rewrite "$cmd"
