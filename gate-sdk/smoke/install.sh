@@ -169,3 +169,81 @@ if pb_run --nope >/dev/null 2>&1; then
 fi
 pb_run --help >/dev/null || { echo "smoke(port-blockers): --help did not exit 0" >&2; exit 1; }
 rm -rf "$pb"
+
+# spec: gate-sdk/SPEC.md §port-blockers — the tree arm's corpus rules and its three dispositions,
+# exercised behaviourally on the bin/-tool contract's terms; asserted as *deltas* against a
+# baseline run rather than as absolute counts, because the surrounding consumer tree's own shell
+# corpus is not this assertion's subject and pinning it would break on every unrelated addition
+# spec: gate-sdk/SPEC.md §port-blockers — the four counts are lifted by matching the trailer's whole
+# grammar, so a trailer that changed shape fails here rather than silently yielding a wrong field
+pbt_counts() {
+    tail -1 | sed -nE 's/^port-blockers --tree: ([0-9]+) file\(s\) scanned, ([0-9]+) declared no-port, ([0-9]+) temporarily held, ([0-9]+) owed$/\1 \2 \3 \4/p'
+}
+pbt_before="$(bash "$SDK/bin/port-blockers.sh" --tree | pbt_counts)"
+[[ -n "$pbt_before" ]] || { echo "smoke(port-blockers): --tree trailer did not match its specified grammar" >&2; exit 1; }
+read -r pbt_n0 pbt_p0 pbt_h0 pbt_o0 <<<"$pbt_before"
+mkdir -p pbtree/gate-tests
+cat > pbtree/plain.sh <<'EOF'
+#!/usr/bin/env bash
+echo plain
+EOF
+cat > pbtree/permanent.sh <<'EOF'
+#!/usr/bin/env bash
+# no-port: the adoption bootstrap runs before any binary exists
+echo permanent
+EOF
+cat > pbtree/held.sh <<'EOF'
+#!/usr/bin/env bash
+# port-until: check-smoke-blocker
+echo held
+EOF
+# spec: gate-sdk/SPEC.md §The `# graph:` manifest — the three ill-formed declarations, each of
+# which must leave its file owed: a bare hold naming no work, a cause with no payload, and both
+# fields at once contradicting the pair's mutual exclusion
+cat > pbtree/bare.sh <<'EOF'
+#!/usr/bin/env bash
+# port-until:
+echo bare
+EOF
+cat > pbtree/empty-cause.sh <<'EOF'
+#!/usr/bin/env bash
+# no-port:
+echo empty
+EOF
+cat > pbtree/both.sh <<'EOF'
+#!/usr/bin/env bash
+# no-port: a permanent cause
+# port-until: check-smoke-blocker
+echo both
+EOF
+cp pbtree/permanent.sh pbtree/excluded.test.sh
+cp pbtree/permanent.sh pbtree/gate-tests/fixture.sh
+git add pbtree
+pbt="$(bash "$SDK/bin/port-blockers.sh" --tree)"
+read -r pbt_n1 pbt_p1 pbt_h1 pbt_o1 <<<"$(pbt_counts <<<"$pbt")"
+
+for row in "pbtree/plain.sh	owed" "pbtree/permanent.sh	no-port" \
+    "pbtree/held.sh	port-until:check-smoke-blocker" "pbtree/bare.sh	owed" \
+    "pbtree/empty-cause.sh	owed" "pbtree/both.sh	owed"; do
+    grep -q "^$row	lines=" <<<"$pbt" || {
+        echo "smoke(port-blockers): --tree missed the row '$row': $pbt" >&2; exit 1; }
+done
+for excluded in pbtree/excluded.test.sh pbtree/gate-tests/fixture.sh; do
+    if grep -q "^$excluded	" <<<"$pbt"; then
+        echo "smoke(port-blockers): --tree scanned $excluded, which its corpus rules exclude" >&2; exit 1
+    fi
+done
+# spec: gate-sdk/SPEC.md §port-blockers — the counts are asserted as exact deltas, so a trailer that
+# merely moved would not pass: six files enter the corpus, one declares no-port, one is held, four
+# are owed, and the two excluded files must move nothing at all
+[[ $((pbt_n1 - pbt_n0)) -eq 6 && $((pbt_p1 - pbt_p0)) -eq 1 &&
+    $((pbt_h1 - pbt_h0)) -eq 1 && $((pbt_o1 - pbt_o0)) -eq 4 ]] || {
+    echo "smoke(port-blockers): --tree trailer deltas wrong — scanned +$((pbt_n1 - pbt_n0)) (want 6), no-port +$((pbt_p1 - pbt_p0)) (want 1), held +$((pbt_h1 - pbt_h0)) (want 1), owed +$((pbt_o1 - pbt_o0)) (want 4)" >&2
+    exit 1
+}
+# spec: gate-sdk/SPEC.md §port-blockers — lines= is asserted against the planted file's own length
+# rather than a shape match, on the ground the --group arm's own count assertion above records
+pbt_held_lines=$(($(wc -l < pbtree/held.sh)))
+grep -q "^pbtree/held.sh	port-until:check-smoke-blocker	lines=$pbt_held_lines$" <<<"$pbt" || {
+    echo "smoke(port-blockers): --tree row lost lines=$pbt_held_lines: $pbt" >&2; exit 1; }
+git rm -rqf pbtree

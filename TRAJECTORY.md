@@ -287,9 +287,9 @@ exclusion — ruled 2026-08-23 by the operator.** The "permanently shell" class 
 criterion 7 are both retired, with their refutations recorded where each stood: the shell auditor
 already trusts the binary's `--list`, absence and staleness of the binary are the fail-closed
 contract's and `check-gate-binary-fresh`'s to catch, and a wrapper that spawns cargo, shellcheck or
-a renderer moves the dependency floor not at all. Every remaining shell gate ports; the port oracle
-reads six owed and six takeable, and the unit is `shell-gate-tail-port`. **What "port complete"
-means is ruled with it**: the battery runs from the hook to the binary with no bash in between
+a renderer moves the dependency floor not at all. Every remaining shell gate ports; `shell-gate-tail-port`
+took the tail, and the registry oracle now reads none owed over the battery it walks.
+**What "port complete" means is ruled with it**: the battery runs from the hook to the binary with no bash in between
 (`battery-runner-port`), the install bootstrap is the three-step shim written twice
 (`install-step-relocation`, `powershell-installer-surface`), and every remaining non-test `.sh`
 outside those two either carries a stated `no-port` cause or is deleted. The adopter-facing
@@ -297,6 +297,14 @@ residue is the bootstrap alone: the generated pre-commit hook shim needs no Powe
 git runs hooks through the `sh` Git for Windows ships, so a two-line shim invoking the binary is one
 implementation on every platform. Contributor-side tooling and the test harness ship to no adopter
 and port opportunistically, never as a gate on the claim.
+
+**That predicate has an oracle, and it is not the one that measures the battery.**
+`bash gate-sdk/bin/port-blockers.sh --tree` reports the port disposition of every tracked non-test
+`.sh`, and its trailer's owed count reaching zero *is* the sentence above: at zero, every remaining
+script either carries a stated cause or is gone. The registry arms beside it walk `gates.list` and
+answer for the gate battery alone — so a session reading zero owed **there** is reading a finished
+battery and not a finished port, which is the misreading this predicate invited for as long as it
+had no evaluator of its own. Mechanism and bounds: gate-sdk/SPEC.md §port-blockers.
 
 **The deferred pool's exits are close's to take — ruled 2026-08-23 by the operator, on a measured
 8:1 intake-to-exit ratio.** Three things change, each owned where its mechanism lives: the icebox
@@ -379,7 +387,7 @@ was always going to leave the queue.
 
 **The port's tail, in order — ruled 2026-08-23:** `battery-runner-port` first, because it is the
 only unit that moves wall-clock and it removes the bash seam every other shell member dispatches
-through; then `shell-gate-tail-port`, the gates the port oracle reads as owed plus the kit-shipped shell gates this
+through; then `shell-gate-tail-port`, the gates the registry oracle read as owed plus the kit-shipped shell gates this
 tree never registers; then the bootstrap pair. What the sequence names after the port:
 `companion-toolkit-profile`.
 

@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # spec: gate-sdk/SPEC.md §The port-candidate criteria — criterion 7's roster, derived from the tree at each invocation rather than stated anywhere; a literal roster cannot be correct for every consumer because a renderer/command knob is consumer config
 # spec: gate-sdk/SPEC.md §port-blockers — criterion 6's roster on the same tool and the same walk: the --group arm partitions the still-shell members by derived corpus derivation, so one tool is the derived roster for both criteria and neither is a maintained list
-# usage: port-blockers.sh [--group]
-#   default arm: each registered gate's external-program requirements beyond GATE_SDK_PROGRAM_FLOOR, as '<member><TAB><program><TAB><evidence>' rows plus a trailing scanned/undecidable count line — the criterion-7 input a porting session reads when it sequences a cohort; a shell rule is tokenized and the evidence is '<file>:<line>', a ported member answers for itself through the binary's --needs and the evidence is its declaration path; advisory, never parsed, and what it cannot decide prints '?' and is counted.
-#   --group: the corpus-derivation partition over the still-shell members, groups largest first, each member carrying its declaration line count, its criterion 2/3/7 columns and its expanded couples= — the criterion-6 input the session cutting the next cohort reads, advisory on the same terms and with an undecidable count of its own; lines= is a floor on a port's size and never a ranking of it.
+# usage: port-blockers.sh [--group | --tree]
+#   Three exclusive arms over two corpora: the default arm answers criterion 7 and --group answers criterion 6, both over the gate registry and so both speaking for the battery alone; --tree answers the PRIORITY DIRECTIVE's completion predicate over the tracked shell tree, and its trailer's owed count reaching zero IS that predicate.
+#   Each arm's rows, trailer, corpus rules and readers are `--help` below and gate-sdk/SPEC.md §port-blockers; the two registry arms are advisory and parsed by nothing, while --tree's trailer is read by a consumer's measured-claim emitter and its grammar is therefore an interface.
 set -uo pipefail
 
 SDK="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -12,7 +12,7 @@ source "$SDK/lib/gate.sh"
 
 pb_usage() {
     cat <<'EOF'
-usage: port-blockers.sh [--group]
+usage: port-blockers.sh [--group | --tree]
 
   (no argument)  criterion 7: every registered gate's external-program
                  requirements beyond GATE_SDK_PROGRAM_FLOOR, one
@@ -22,13 +22,27 @@ usage: port-blockers.sh [--group]
                  still-shell members, largest group first, each member
                  carrying lines= (its declaration's line count), its
                  criterion 2/3/7 columns and expanded couples=.
+  --tree         the port disposition of every tracked non-test shell file,
+                 one '<path><TAB><disposition><TAB>lines=<n>' row each —
+                 'owed', 'no-port' or 'port-until:<slug>'. The trailer's
+                 owed count is the completion predicate: at zero, every
+                 remaining non-test .sh carries a stated cause or is gone.
   -h, --help     this text.
 
-Both arms are advisory: nothing parses either output, and what cannot be
-decided prints '?' and is counted rather than guessed. lines= is one sizing
-input beside the criterion columns, a floor on a port's size and never a
-ranking of it: cost concentrated in interfaces, or behind a spawned tool,
-is invisible to it.
+The first two arms walk the gate registry and answer for the battery; --tree
+walks the tracked shell tree and answers for the project. A registry arm
+reading zero owed means the battery is ported and says nothing about the tree.
+
+The two registry arms are advisory: nothing parses either, and what cannot be
+decided prints '?' and is counted rather than guessed. --tree has no such
+class -- an undeclared file is 'owed', which over-counts it as work rather
+than losing it -- and its trailer alone is read by a machine, a consumer's
+measured-claim emitter, so that one line's grammar is an interface. The rows
+are not: they are read beside a diff, like the other arms' rows.
+
+lines= is one sizing input beside the criterion columns, a floor on a port's
+size and never a ranking of it: cost concentrated in interfaces, or behind a
+spawned tool, is invisible to it.
 EOF
 }
 
@@ -37,6 +51,7 @@ MODE=default
 case "${1-}" in
     "") ;;
     --group) MODE=group ;;
+    --tree) MODE=tree ;;
     -h | --help)
         pb_usage
         exit 0
@@ -49,6 +64,63 @@ esac
 if [[ $# -gt 1 ]]; then
     pb_usage >&2
     exit 2
+fi
+
+# spec: gate-sdk/SPEC.md §port-blockers — the tree arm's corpus is tracked '*.sh' minus the '*.test.sh' suffix the directive's own word non-test names, minus the resolved prune-dir set, which is what removes gate-tests/ fixture content without naming it; enumeration rather than a walk is correct because the subject is *tracked* files, an untracked script being no part of what the project ships and unable to carry a reviewable declaration
+# spec: gate-sdk/SPEC.md §The `# graph:` manifest — a disposition is read only from a well-formed declaration: exactly one of the pair, payload present; anything else leaves the file owed, the same over-count direction absence already takes, because a file that has not made a reviewable declaration has not made one
+# spec: gate-sdk/SPEC.md §The `# graph:` manifest — and read only from the file's own header block, the leading run of shebang, comment and blank lines: over this corpus a line-anywhere scan cannot tell a declaration from a heredoc literal in a script that writes shell, and the field is a *header* field on every corpus
+pb_header_block() {
+    awk 'NR == 1 && /^#!/ { print; next }
+         /^[[:space:]]*#/ { print; next }
+         /^[[:space:]]*$/ { print; next }
+         { exit }' "$1"
+}
+
+pb_tree() {
+    local f disp slug payload np pu lines header
+    local scanned=0 noport=0 held=0 owed=0
+    git rev-parse --git-dir >/dev/null 2>&1 || {
+        echo "port-blockers --tree: not a git repository — this arm's corpus is the tracked shell tree" >&2
+        exit 2
+    }
+    while IFS= read -r f; do
+        [[ -n "$f" ]] || continue
+        [[ "$f" == *.test.sh ]] && continue
+        gate_path_pruned "$f" && continue
+        scanned=$((scanned + 1))
+        disp=owed
+        lines=0
+        if [[ -r "$f" ]]; then
+            lines=$(($(wc -l < "$f")))
+            header="$(pb_header_block "$f")"
+            np="$(grep -Em1 '^#[[:space:]]*no-port:' <<<"$header" || true)"
+            pu="$(grep -Em1 '^#[[:space:]]*port-until:' <<<"$header" || true)"
+            if [[ -n "$np" && -z "$pu" ]]; then
+                payload="${np#*no-port:}"
+                [[ -n "${payload//[[:space:]]/}" ]] && disp=no-port
+            elif [[ -n "$pu" && -z "$np" ]]; then
+                payload="${pu#*port-until:}"
+                payload="${payload#"${payload%%[![:space:]]*}"}"
+                slug="${payload%%[^a-z0-9-]*}"
+                [[ -n "$slug" ]] && disp="port-until:$slug"
+            fi
+        fi
+        case "$disp" in
+            no-port) noport=$((noport + 1)) ;;
+            port-until:*) held=$((held + 1)) ;;
+            *) owed=$((owed + 1)) ;;
+        esac
+        printf '%s\t%s\tlines=%s\n' "$f" "$disp" "$lines"
+    done < <(git ls-files -- '*.sh')
+    # spec: gate-sdk/SPEC.md §port-blockers — held is separated from no-port because a temporary hold is not a permanent disposition, and there is no fourth count because there is no fourth disposition: absence of a declaration is owed, which over-counts an undeclared file as work rather than losing it
+    printf 'port-blockers --tree: %d file(s) scanned, %d declared no-port, %d temporarily held, %d owed\n' \
+        "$scanned" "$noport" "$held" "$owed"
+}
+
+# spec: gate-sdk/SPEC.md §port-blockers — the tree arm dispatches ahead of the registry resolution the other two share, so a tree with no gates.list still answers for its own shell: requiring a registry to count files the registry does not contain is the corpus confusion this arm exists to end
+if [[ "$MODE" == tree ]]; then
+    pb_tree
+    exit 0
 fi
 
 GATES_DIR="$(gate_sdk_gates_dir)"

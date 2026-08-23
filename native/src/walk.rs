@@ -29,6 +29,25 @@ pub fn path_pruned(p: &str, prune: &[String]) -> bool {
     })
 }
 
+// spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — the compiled face of the `--tree` corpus
+// rule: tracked `*.sh`, minus the `*.test.sh` suffix, minus `path_pruned` above. A tree with no
+// tracked set yields none, on `authoring_tree`'s own degrade; an unresolved knob still fails closed
+pub fn tracked_shell_tree() -> Result<Vec<String>, String> {
+    let prune = prune_dirs()?;
+    let bytes = match crate::proc::run("git", &["ls-files", "--", "*.sh"]) {
+        Ok(c) => match c.stdout() {
+            Some(b) => b.to_vec(),
+            None => return Ok(Vec::new()),
+        },
+        Err(_) => return Ok(Vec::new()),
+    };
+    Ok(String::from_utf8_lossy(&bytes)
+        .lines()
+        .filter(|l| !l.is_empty() && !l.ends_with(".test.sh") && !path_pruned(l, &prune))
+        .map(String::from)
+        .collect())
+}
+
 // spec: gate-sdk/SPEC.md §lib/gate.sh — the bridged read of one tab-joined array knob,
 // the shape `prune_dirs` above has; an absent variable is an error because the crate holds
 // no default for a bridged knob, and an empty one is a resolved-empty set.

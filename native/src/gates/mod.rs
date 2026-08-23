@@ -563,6 +563,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_GATES_DIR",
             "GATE_KIT_ROOTS_HERE",
             "GATE_SDK_NATIVE_CRATE",
+            "GATE_PRUNE_DIRS",
         ],
         "gate-sdk",
         &[("git", "")],

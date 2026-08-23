@@ -1086,6 +1086,28 @@ literal enumerating what a project measures would publish that project's
 vocabulary. An unset knob means the gate has no oracle and reports clean — the
 inactive-by-default posture its `*_CMD` siblings take.
 
+**A key's *meaning* is consumer-owned too, and that is the one failure none of the
+three arms can catch.** Redefining an existing key's oracle to answer a wider or
+narrower question leaves every arm satisfied while the referent moves: arm A
+compares the marker to the emitter and arm C compares the marker to the prose, and
+both stay green because neither knows what the key is *about*. The public sentence
+above the marker then asserts something nobody wrote and no gate can see. So a
+measurement whose question differs from an existing key's takes **its own key**,
+however close the two numbers happen to be at the moment — the closeness is what
+makes the substitution tempting and the drift invisible. What holds a key's meaning
+honest is review at the diff, which is the same answer §check-comment-tier gives
+for a free-text cause and for the same reason: nothing here parses meaning.
+
+**A key joins the roster before a marker names it, and a key no marker names is the
+ordinary state rather than a reservation.** Arm B runs marker-to-roster — it fires
+on a *marker* whose key nobody emits — and there is deliberately no converse
+assertion, because an emitter is a consumer's own program and a kit is in no
+position to rule which of its facts a document must cite. The ordering matters when
+a key is minted: the emitter gains the line first, and prose binds it whenever a
+sentence is written that needs it. Reading it the other way — treating arm B as
+something that exercises every emitted key — would be a false comfort, since a key
+no marker names is touched by no arm at all.
+
 **Three arms.**
 
 - **A — the oracle disagrees.** Red when the emitter's current value for `<key>`
@@ -1572,9 +1594,10 @@ topology exists). `align-only` tier.
 **`.gate`-dispatched since `shell-gate-tail-port`**, declared at
 `canon-kit/checks/check-surface-duplication.gate` with its rule in
 `native/src/gates/surface_duplication.rs`. It is one of the two members that
-port on the directive's scope rather than the oracle's: this tree registers it
-in no `gates.list`, so `port-blockers.sh` never counted it and the port moves no
-number (gate-sdk/SPEC.md §The port-candidate criteria, criterion 7). Criteria 1
+ported on the directive's scope rather than the registry oracle's: this tree
+registers it in no `gates.list`, so `port-blockers.sh`'s two registry arms never
+counted it and the port moved no number of theirs
+(gate-sdk/SPEC.md §The port-candidate criteria, criterion 7). Criteria 1
 and 3 therefore both fail on their own terms rather than by a proxy, and what
 replaces the dispatch proof they would have bought is **the fixture pair plus
 canon-kit's own smoke** — named as the only oracle available, not offered as an

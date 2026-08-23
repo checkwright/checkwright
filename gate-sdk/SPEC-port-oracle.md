@@ -88,6 +88,43 @@ Enumeration rather than a walk is correct here and is the one place it is: the
 subject is *tracked* files, because an untracked script is not part of what the
 project ships and cannot carry a reviewable declaration.
 
+**CORRECTION at build (2026-08-24) — three things this corpus rule leaves unstated,
+each forced by running it.**
+
+1. **A disposition is read from the file's header block, not from anywhere in the
+   file.** This corpus contains scripts that *write* shell, and a line-anywhere scan
+   reads a heredoc literal as a declaration — caught on the first live run of the
+   widened reader, against `gate-sdk/smoke/`. Confining the read to the leading run
+   of shebang, comment and blank lines is the field's own name (`# no-port:` and
+   `# port-until:` are *header* fields) rather than a new restriction. Applied to the
+   tree corpus only; the declaration corpus keeps its whole-file scan, so delta 3's
+   widening stays monotone.
+2. **An ill-formed declaration is `owed`.** This delta rules the default-by-absence
+   and stops there. Three shapes are not absence and are not declarations either: an
+   empty `# no-port:` cause, a `# port-until:` naming no slug, and a file carrying
+   **both** in defiance of the mutual exclusion delta 2 preserves. All three read
+   `owed`, on this delta's own over-count-as-work direction.
+3. **A tree that is no git repository is a refusal, not an empty corpus.** An empty
+   *corpus* is the goal state — the port finished — so it must stay green; an
+   unanswerable enumeration must not wear that costume, which is §Fail-closed
+   contract's captured-emptiness rule in this arm's terms.
+
+**And one thing this delta does not consider: the arm is inside its own corpus.**
+`bin/port-blockers.sh` is tracked, non-test and outside the prune set, so it prints
+itself, and so does any emitter that reads it. The consequence is not cosmetic —
+the completion predicate **cannot reach zero while the instrument is still shell**,
+and this amendment supplies a disposition for the bootstrap and the battery runner
+but none for the tool that measures them. Recorded at §port-blockers rather than
+ruled here: a `bin/` tool takes no descriptor, so its route is the binary's non-gate
+arm, and choosing when is a queue question.
+
+**The measurement re-run at the merge, and it reconciles exactly.** The 152 files /
+15,594 lines above was byte-correct at spec. At the merge the arm reads **153 files
+/ 15,647 lines**, and the difference is fully accounted: `scripts/producer-liveness-reader.sh`
+is new (+1 file, +6 lines), `bin/port-blockers.sh` gained this delta's own 35 lines,
+and `lib/gate.sh` gained the sibling unit's 12 lines of knob resolution. The eight
+shell gates the sibling deleted were already outside the 152.
+
 **One row per file, and the columns are the ones a plain script can answer.**
 `<path><TAB><disposition><TAB>lines=<n>`, where `<disposition>` is `owed`,
 `no-port`, or `port-until:<slug>`. `lines=` is `wc -l` over the same path the row
@@ -115,6 +152,19 @@ declaration is `owed`, which is the field's established default-by-absence
 (§The `# graph:` manifest) and is what keeps an undeclared file **over**-counted
 as work rather than lost.
 
+**CORRECTION at build (2026-08-24) — this paragraph contradicts delta 4 and the
+merge resolves it by splitting rows from trailer.** *Nothing parses it* cannot hold
+alongside §Producers and consumers naming `scripts/measured-claims.sh` as a
+consumer "at the emitter's own run", and the contradiction propagates to four
+surfaces that say *nothing parses either*. Resolved as: the **rows** of every arm
+are read beside a diff and parsed by nothing, and the two registry arms are unparsed
+entire; `--tree`'s **trailer** is machine-read by a consumer's measured-claim
+emitter, so that one line's grammar is an interface with a reader who breaks when it
+moves. Reading the count off the arm rather than re-deriving it in the emitter is
+derivation-first — the alternative is a second definition of a corpus only one of
+them owns. Merged that way at §port-blockers, in the tool's own usage text, and in
+gate-sdk/README.md.
+
 **Its consumer is a human session and nothing parses it**, exactly like the two
 arms beside it: the reader is a session asking whether the port is done, and the
 transition is that question. No freshness gate accompanies it, on §port-blockers'
@@ -133,6 +183,17 @@ gate is permanently shell invalidated every cause that existed, and
 `--group`'s trailer reads `0 permanently shell and excluded, 0 temporarily held
 and excluded` in corroboration. So the widening lands on an empty set and cannot
 break a holder.
+
+**CORRECTION at build (2026-08-24) — the claim holds and its corroborating oracle
+has stopped corroborating.** Re-measured at the merge: every `# no-port:` /
+`# port-until:` line in the tree sits under a `gate-tests/` path, which the prune
+set removes, so the live corpus carries **zero** and the widening does land on an
+empty set. But `--group`'s two zeros are now **vacuous**: the sibling unit ported
+every registered shell gate, so the arm has no shell member to exclude and those
+counters read zero by construction rather than because nothing declares. The
+conclusion is unchanged; the evidence offered for it is spent, and a later reader
+citing that trailer as corroboration would be citing an arm that cannot answer the
+question.
 
 **The domain rule is already stated wider than the fields' current corpus.**
 §The `# graph:` manifest rules `# port-until:`'s domain as "any temporary hold
@@ -169,7 +230,16 @@ tree rather than assumed.** Both `no-port:` and `port-until:` are already in
 already lists both), and the gate's corpus — `comment_surface`'s walk of every
 tracked `.sh`/`.gate`/`.rs` file — is already the whole tree rather than the
 gate declaration paths this amendment widens the two fields *from*: a live run
-scans 403 governed sources, not a gate-scoped subset. So a `# no-port:` line on
+scans 403 governed sources, not a gate-scoped subset.
+<!-- comment-tier-exempt: a precision correction to this delta's own premise, kept beside the sentence it corrects -->
+**CORRECTION at build (2026-08-24):** the corpus is a **filesystem walk under the
+prune set** (`walk::find_files`), not an enumeration of tracked files, so *tracked*
+is the wrong word for it. The conclusion is unaffected in both directions — the walk
+is wider than the tracked set where an untracked source exists, and covers the whole
+governed tree either way — but the precondition this delta says it *depends on*
+should name the mechanism it actually rests on. Verified at the merge that both
+spellings remain in the built-in directive roster and that a header on a plain
+script reds nothing. So a `# no-port:` line on
 a plain script reds nothing today, and its **mandatory non-empty payload** is
 already what distinguishes it from a restatement — the same test
 `# comment-tier-exempt: <reason>` already passes. Nothing here is new work; it
@@ -198,6 +268,34 @@ changes is which files it collects slugs from. The precedent it is built on —
 axis — is that gate's own, so the widening inherits the anti-rot argument rather
 than restating it.
 
+**CORRECTION at build (2026-08-24) — "a wider walk" is underdetermined in three
+ways the merge had to settle, and one of them was a shipped protection at risk.**
+
+1. **A union, never a replacement.** A `.gate` descriptor is no `*.sh`, so handing
+   the gate this arm's corpus *instead of* its declaration set would have silently
+   dropped every descriptor-borne field. The walk is both, de-duplicated — which is
+   also what makes the widening monotone, as this amendment's own red-conditions
+   paragraph claims.
+2. **The scope rule had to widen with the walk or be lost.** The gate scopes both
+   arms to the authoring tree, so a vendoring adopter is never held to a kit
+   author's slug. That predicate is written over *dirs*; applied to a tracked script
+   it has no reading. Settled by lifting it verbatim from a directory to a file —
+   this tree authored the kits, or the file sits under the consumer's own gates
+   directory — so it decides nothing the declaration arm had not already decided.
+   Ignoring it would have narrowed an adopter protection while claiming to widen an
+   assertion. Its bound is recorded in the gate's own section.
+3. **The header-block restriction** (see delta 1's correction) applies here too, and
+   for the same measured reason.
+
+**One prediction about this delta was refuted by running it rather than reasoning
+about it**, and it is recorded because the opposite conclusion is the natural one: a
+`git ls-files`-derived corpus was expected to give the member a **read root**, which
+`check-reads-couples` would then demand `couples=` cover. It does not — asking the
+index is a spawn, not a filesystem walk, so the recorder observes no root and the
+gate is green with the read-root set still empty. What the widening *does* cost the
+registry entry is one declared knob, the prune set, without which the member meets
+the bridge's undeclared-knob refusal on every invocation.
+
 **A `# no-port:` cause gets no such reader, and the asymmetry is deliberate.** A
 cause is free text pointing at whatever surface records the ruling; nothing here
 parses a cause, matches it against a vocabulary or knows what a section reference
@@ -213,6 +311,14 @@ buy an assertion the free-text field was chosen not to need.
 `scripts/measured-claims.sh` gains one key for the `--tree` arm's owed count, and
 the existing key keeps its meaning exactly. **Design-bearing**, and it is the
 delta that prevents a public sentence from silently changing what it asserts.
+
+**CORRECTION at build (2026-08-24) — the key's value is stale in this delta, and
+the marker's line number is not.** It reads **106**, not 100, and the public
+sentence reads "106 gates in the battery dispatch to the compiled binary today":
+`shell-gate-tail-port` moved it 100 -> 106 across the eight sessions between this
+amendment's authoring and its merge. The marker is still at `docs/install.md:195`.
+The delta's ruling — do not widen this key — is untouched, and the sentence's own
+"in the battery" scoping is what makes it survive the widening beside it.
 
 **`ported-gate-members` answers a narrower question than the directive's and must
 keep answering it.** Its oracle is `gates_list_members` over `scripts/gates.list`;
@@ -249,6 +355,21 @@ limits of the derivation rather than left to be re-found. **Design-bearing.**
 member is absent from `gates.list`, and the spawn sits in **a shared library**
 (`ek_pid_alive`, `evidence-kit/lib/evidence.sh:117-122`) rather than in the gate's
 own declaration text, which the command-position scan does not follow across.
+
+**CORRECTION at build (2026-08-24) — the worked example is discharged and neither
+limit is.** The sibling unit ported this member in its own delta 9 after this
+amendment was written. It is now `.gate`-dispatched and its `--needs` declares
+`ps` outright (verified by run), so the default arm would read its requirement
+correctly if it were registered; it stays unregistered, so no registry arm reports
+it. The **instance** that attested both limits at once is therefore resolved while
+**both limits stand**: the corpus limit is what delta 1's arm closes for the
+disposition question, and the scan limit is untouched — the tokenizer still does
+not follow a call into a kit library, and the next member to reach a program that
+way will be reported clean by a report that cannot see it. `ek_pid_alive` survives
+in the shell library as a dual helper, so the cited line reference still resolves;
+what changed is that this member no longer reaches `ps` through it. Recorded
+positively at §port-blockers so the limit does not read as resting on an example
+that has stopped being one.
 
 **The second blind spot is the one that generalises**, and it is the reason this
 delta exists rather than being a footnote on the first. Unregistered members are a
@@ -313,6 +434,34 @@ emitter.
 what makes the key non-vacuous the moment it exists; and arm A for any prose that
 binds it. A key with no reader would be a reservation, which is why it is minted
 in this amendment and not ahead of it.
+
+**CORRECTION at build (2026-08-24) — the stated consumer does not exist, and the
+conclusion survives on the emitter's own contract instead.** Arm B runs
+**marker-to-roster**: `native/src/gates/measured_claim.rs:73-80` iterates markers
+and fails closed on a *marker* naming a key nobody emits. There is no converse
+assertion anywhere, so an emitted key that no marker names is touched by none of
+the three arms — the opposite of "non-vacuous the moment it exists". Followed
+literally, this delta's own *minted with its reader or not at all* rule would have
+forbidden the key it mints.
+
+What settles it is the owner surface rather than a judgment at the merge
+(spec-over-precedent): `scripts/measured-claims.sh`'s own header contract, restated
+at canon-kit/SPEC.md §check-measured-claim, rules that **a key joins the roster
+before a marker names it**. Key-before-marker is the specified ordering, so a key
+with no marker yet is the ordinary state and not a reservation. The key is minted;
+the closed-roster analogy to the descriptor fields is the part that does not hold,
+because a descriptor field's reader is kit mechanism while a measured key's is a
+consumer's own prose, which a kit is in no position to require.
+
+**What the literal reading would have cost, since it was one edit away.** Binding a
+marker now to discharge "with its reader" would have pinned the tree-owed count into
+governed prose, and — because the config bridge bakes the emitter's resolved values
+into the generated pre-commit hook — made **every tracked non-test shell file added
+anywhere in the tree** stale a byte-gated artifact and red a marker until a session
+moved the sentence. Measured rather than argued: over the last two hundred commits,
+thirteen moved that corpus and ten of those already owed a hook regeneration, so the
+key alone costs three commits in two hundred, where the marker would have added a
+prose edit to all thirteen.
 
 **Red conditions named, because delta 3 widens a walk — and one of them narrows
 something.** `check-comment-tier`'s red condition is *a full-line comment on a

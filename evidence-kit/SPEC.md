@@ -638,9 +638,10 @@ reach as init. The unit test carries all four plus the suffix bound.
 `evidence-kit/checks/check-producer-liveness.gate` with its rule in
 `native/src/gates/producer_liveness.rs` and the two library readers it shares
 with `bin/run-validate.sh` in `native/src/evidence.rs`. Like
-§check-surface-duplication it ports on the directive's scope rather than the
-oracle's — `port-blockers.sh` walks `gates.list` and this member is in none — so
-the port moves no number, and the fixture pair plus this kit's smoke is what
+§check-surface-duplication it ported on the directive's scope rather than the
+registry oracle's — `port-blockers.sh`'s two registry arms walk `gates.list` and
+this member is in none — so the port moved no number of theirs, and the fixture
+pair plus this kit's smoke is what
 stands in for the dispatch proof criteria 1 and 3 would have bought.
 
 **Its wiring needed no change, and that was verified rather than assumed.** The

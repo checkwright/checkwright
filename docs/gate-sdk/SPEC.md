@@ -804,15 +804,54 @@ descriptor on the same terms*), `# no-fixture:` by
 §check-gate-fixture-coverage. The descriptor carries no field that lacks one,
 reserving nothing against a future reader.
 
-**Two fields are minted on the `<name>.sh` spelling alone, and the descriptor's
-roster is untouched by either.** `# no-port: <cause>` declares that a gate is
-never going to the binary substrate and names the ruling that makes it so;
-`# port-until: <slug>` declares that a gate is **still owed to the port and not
-takeable now**, and names the live queue entry that owns the blocker. Each is one
-optional header line beside `# graph:`, `# install:` and `# spec:`. `# no-port:`
-is read by §port-blockers' `--group` arm and by §check-gate-substrate-parity's
-assertion G; `# port-until:` is read by those two and, for its slug's liveness,
-by §check-gate-exemption-tasks.
+**Two fields are minted on shell, and the descriptor's roster is untouched by
+either.** `# no-port: <cause>` declares that a script is never going to the binary
+substrate and names the ruling that makes it so; `# port-until: <slug>` declares
+that one is **still owed to the port and not takeable now**, and names the live
+queue entry that owns the blocker. Each is one optional **header** line — in a
+gate declaration, beside `# graph:`, `# install:` and `# spec:`.
+
+**Their domain is any tracked script, not a gate declaration path, and that is the
+same widening this section already applied on the other axis.** `# port-until:`'s
+domain is ruled below as *any temporary hold with named work owed and a live owning
+entry*, refusing to narrow to the born-native exception letters because the narrow
+reading would leave the criteria section's own worked example unable to declare.
+This is that sentence applied to the **corpus** rather than to the cause class, and
+`# no-port:` widens with it — because a permanent shell disposition is exactly what
+an install bootstrap has, and exactly what TRAJECTORY.md's completion predicate
+asks a script to state. The enabling path is nothing but the file being tracked:
+there is no registration step, which is the whole reason the field can reach a
+corpus that owns no descriptor.
+
+**Three things are explicitly unchanged, so the widening adds no second grammar.**
+The payloads: `# no-port:` carries free text because permanence is a ruling whose
+home is prose, `# port-until:` a bare slug, each for the reasons below. The
+**mutual exclusion**: at most one of the pair on a file. And the closed-roster
+rule: a `.gate` descriptor still carries **neither**.
+
+**Its readers.** `# no-port:` is read by §port-blockers' `--group` arm over the
+registry and its `--tree` arm over the tracked shell tree, and by
+§check-gate-substrate-parity's assertion G. `# port-until:` is read by those three
+and, for its slug's liveness, by §check-gate-exemption-tasks. Both are read by
+§check-comment-tier, which is what keeps the line from reading as a restatement,
+and which needed no widening: both spellings were already in its built-in directive
+roster and its corpus was already the whole governed tree rather than the
+declaration paths the fields widen *from*. **Assertions G and H do not widen with
+the fields**, and stating that is the easily-missed half: their subject is the
+*gate registry*, and a plain script has no registry membership and no `# spec:`
+pointer for H to open, so widening their walk would red every script that declared.
+The reader of a plain script's declaration is `--tree` and, for a slug,
+§check-gate-exemption-tasks.
+
+**What the widening does not gain is a knob**, and the reason it does not is worth
+stating precisely, because the argument that held for the declaration path does not
+reach the new corpus. Every reader over *declarations* resolves them through
+`gate_resolve` under `gate_kit_roots`; `--tree`'s reader does not, resolving through
+`git ls-files` and the prune-dir set instead. The conclusion survives on a different
+ground: both are values `lib/gate.sh` already resolves for every pruned walk in the
+tree, so the widened corpus rides configuration that predates it. **No exclusion
+knob is minted either**, which §port-blockers rules and which is what makes the
+owed count reaching zero *be* the completion predicate rather than approximate it.
 **A `.gate` descriptor never carries either.** A descriptor's *existence is the
 dispatch declaration*, so a member that has one is ported and has no port
 question left to declare; such a line there would be a field asserting
@@ -884,9 +923,22 @@ construction: a `<cause>` is free text pointing at whatever surface that consume
 records the ruling on, a `<slug>` names an entry in that consumer's own queue, and
 the kit constrains only that each be non-empty — nothing here parses a cause,
 matches it against a vocabulary, or knows what a section reference looks like.
-**And no knob is minted for either**: every reader already resolves the
-declaration path through `gate_resolve` under `gate_kit_roots`, so the fields add
-no `<KIT>_<KNOB>` and no default to be unset anywhere.
+No knob is minted for either, on the two grounds stated above — the declaration
+readers resolve through `gate_resolve` under `gate_kit_roots` and the tree reader
+through values `lib/gate.sh` already resolves — so the fields add no `<KIT>_<KNOB>`
+and no default to be unset anywhere.
+
+**On a plain script only the held field earns a liveness reader, and the asymmetry
+is deliberate.** A stale `# port-until:`, whose blocker landed and whose slug moved
+to Done, **under-counts** the owed set and hides real work — the direction no shape
+assertion covers — so the slug is held to a live queue entry wherever it sits. A
+`# no-port:` cause gets no such reader: it is free text pointing at whatever surface
+records the ruling, and what holds it honest is review at the diff. For a *gate* the
+second holder is assertion H, which opens the section the declaration's own `# spec:`
+names — an assertion a plain script cannot satisfy, having no such pointer. **The gap
+is named here rather than closed**, because the cheap closure would demand a
+`# spec:` pointer on every declaring script, minting a second obligation to buy an
+assertion the free-text field was chosen not to need.
 
 **Two fields are refused rather than merely absent, and the refusal is the
 design.** A `# reads:` line declaring the gate's walk roots is the obvious cheap
@@ -1626,6 +1678,17 @@ engineering problem the port owes** for the gates that fail it, and it **orders
 the work** — a gate clearing all seven is cheap to port today, a gate failing one
 carries exactly the cost the criterion describes. The first four were stated at
 design time; the last three were paid for, and each is named with what it cost.
+
+**All seven bear on *gates*, and the directive's completion predicate bears on the
+*tree* — a distinction worth stating because the criteria are the natural thing to
+reach for and most of them have nothing to say.** A criterion asks after a
+registration, a fixture pair, a tier, a `couples=` — properties a gate has because
+it is a gate. A plain tracked script has none of them, so applying a criterion to
+one yields not a hard question but an unanswerable one, which is why §port-blockers'
+`--tree` arm emits no criterion column over that corpus. The predicate asks a
+different and much smaller question of each file: is there a stated disposition. The
+two rosters are read at different transitions by different sessions, and the arm
+that answers each is the one whose corpus matches its question.
 
 1. **Registered** in `gates.list` — an unregistered gate proves no dispatch.
 2. **Carries a fixture pair** — parity between substrates is proved by running
@@ -2507,8 +2570,8 @@ design time; the last three were paid for, and each is named with what it cost.
    it: the resolved row cites `SITE_KIT_RENDERER_BATCH`, the knob the zero-config
    gate actually spawns, not the per-document one the prediction named.
 
-   **The last registered member ported, and the count the whole port is measured
-   by reached zero.** `check-docs-render-fidelity` is the fourth criterion-7
+   **The last registered member ported, and the count the *battery* is measured by
+   reached zero.** `check-docs-render-fidelity` is the fourth criterion-7
    wrapper and the first whose requirement is **knob-derived**, so it is the only
    member that exercises the report's third line kind end to end — a `?<TAB><knob>`
    pair resolved through the same bridge the dispatcher uses, rather than a program
@@ -2525,15 +2588,21 @@ design time; the last three were paid for, and each is named with what it cost.
    ordering is still per-member and still read off the shell text.
 
    With it in, `--group` reports **0 still owed, 0 takeable, 106 already ported**
-   and the default arm 0 undecidable — the two numbers the port's completion
-   predicate is stated in, both measured rather than asserted. The honest bound
-   two paragraphs up is unchanged by that zero and is the reason it is not a
-   completion claim on its own.
+   and the default arm 0 undecidable — both measured rather than asserted, and both
+   statements about the **gate battery** alone. The honest bound two paragraphs up
+   is unchanged by that zero, and it is not the only reason the zero is no
+   completion claim: the completion predicate TRAJECTORY.md rules is bounded by the
+   *tree*, and the arm that evaluates it is §port-blockers' `--tree`. A registry arm
+   reading zero owed says the battery is ported and says nothing about the tree —
+   the confusion this section's own oracle used to make unavoidable, and the reason
+   the two corpora are now named wherever either number is.
 
    **The fifth wrapper is the one the report could never have found, and it lands
    after the count reaches zero.** `check-producer-liveness` is one of the two
-   unregistered kit-shipped members, so `port-blockers.sh` — whose walk is
-   `gates.list` — never counted it and no number moves when it ports. It is a
+   unregistered kit-shipped members, so the arms that walk `gates.list` never
+   counted it and no number of theirs moved when it ported — `--tree` reaches its
+   *file*, on the terms §port-blockers records for that limit, and never its
+   requirement. It is a
    wrapper anyway: `ek_pid_alive` falls back to `ps -p`, off the floor and reached
    through a **shared library** rather than through the member's own declaration
    text, which is the sharper of the two reasons the oracle is blind to it because
@@ -7895,18 +7964,35 @@ new build path that both bypasses this script **and** publishes without an `init
 
 ### port-blockers
 
-The derived roster for **two** criteria on one walk, at each invocation. Run
+The derived roster for the port's remaining work, at each invocation. Run
 `bash gate-sdk/bin/port-blockers.sh` from the repo root: the default arm answers
-criterion 7, and `--group` answers criterion 6 — both over the same registry,
-through the same `gates_list_members` / `gate_resolve` path. **Why either roster
-is derived rather than written down** is §The port-candidate criteria's,
-criteria 7 and 6; this section owns how. The arms are **exclusive**: `--group`
-replaces the criterion-7 report rather than appending to it, and **adding** the
-second arm changed no byte of the default arm's output — proved by run against a
-clean checkout at the time. That is a fact about that change and **not** a
-standing guarantee that the arm's output never moves: the truncation repair below
-moved it deliberately, and a session diffing two runs across that commit is
-seeing the repair rather than a regression.
+criterion 7 and `--group` answers criterion 6 — both over the same registry,
+through the same `gates_list_members` / `gate_resolve` path — while `--tree`
+answers over the **tracked shell tree** instead. **Why any of the three rosters
+is derived rather than written down** is §The port-candidate criteria's, criteria
+7 and 6; this section owns how. The arms are **exclusive**: each replaces the
+others' report rather than appending to it.
+
+**Two corpora, and confusing them is the failure this tool is now shaped
+against.** The registry arms speak for the **battery** — what `gates.list`
+names — and can speak for nothing else. `--tree` speaks for the **project**, the
+corpus TRAJECTORY.md §The closed rulings actually bounds when it rules that every
+remaining non-test `.sh` either carries a stated cause or is deleted. The two
+questions have different answers at the same moment, and a registry arm reading
+*zero owed* means the battery is ported and says nothing whatever about the tree.
+A session reading completion off the registry arms is reading the wrong number,
+which is a mistake the tool used to make unavoidable and now does not.
+
+**Adding an arm has twice left the arms beside it byte-unchanged, and each time
+that was run rather than claimed.** `--group`'s addition changed no byte of the
+default arm's output, and `--tree`'s addition changed no byte of **either**
+registry arm's — both proved by capturing every arm across the commit, same cwd
+and same argv, and diffing exit codes included. Each is a fact about that change
+and **not** a standing guarantee that an arm's output never moves: the truncation
+repair below moved the default arm's deliberately, and a session diffing two runs
+across that commit is seeing the repair rather than a regression. What `--tree`'s
+addition *did* move is the usage text, which is the new arm being documented and
+not an arm's output changing.
 
 **The default arm answers criterion 7.** For every `gates.list` member it
 resolves the declaration path and reports the external programs the rule requires
@@ -8105,8 +8191,13 @@ whose reader is real but not imminent is not the same thing as a field whose
 reader would disregard it.
 
 **Undecidable is reported, never guessed**, adopting §check-reads-couples'
-precedent, and the ruling is stated once for the tool rather than per arm. In the
-default arm, a command-position expansion whose default cannot be resolved prints
+precedent, and the ruling is stated once for the **registry arms** rather than
+per arm. `--tree` is outside it and that is a property of its question rather than
+an exemption: its columns are a path, a disposition and a line count, every one of
+which a plain file always answers, so there is nothing it could fail to decide. An
+undeclared file is `owed`, which over-counts it as work rather than losing it, and
+that is the same fail-safe direction the `?` serves on the arms that need one. In
+the default arm, a command-position expansion whose default cannot be resolved prints
 `?`, and so does a member declaring through a `.gate` descriptor, whose rule is a
 binary subcommand with no `--needs` to ask (§The `# graph:` manifest). A tool that
 reported nothing for an unresolvable knob would reproduce the very false negative
@@ -8130,6 +8221,124 @@ forward unnoticed. What the arm emits is
 therefore a **decidable partition plus a counted remainder**, never a complete
 partition claimed as one — which is precisely what two failed read-only sweeps
 could not deliver.
+
+**The `--tree` arm answers the directive's completion predicate, and it is the
+only arm whose corpus is the tree.** It reports the port disposition of every
+tracked non-test shell file as `<path><TAB><disposition><TAB>lines=<n>`, where
+`<disposition>` is `owed`, `no-port` or `port-until:<slug>`, closing with a
+trailer counting files scanned, files declared `no-port`, files temporarily held
+and files **owed**. Owed reaching **zero** is TRAJECTORY.md's sentence made
+decidable: every remaining non-test `.sh` then either carries a stated cause or is
+gone. It dispatches **ahead of** the registry resolution the other two arms share,
+so a tree carrying no `gates.list` still answers for its own shell — requiring a
+registry in order to count files the registry does not contain is the corpus
+confusion the arm exists to end.
+
+**The corpus is derived and its exclusions are rules, not lists.** It is
+`git ls-files` over tracked `*.sh`, minus the `*.test.sh` suffix — which the
+directive itself names by writing *non-test* — minus the shared prune-dir set
+`GATE_SDK_PRUNE_DIRS` and `GATE_SDK_PRUNE_EXTRA_DIRS` resolve, which is what
+removes `gate-tests/` fixture content without naming it. Both are honoured, on
+§check-reads-couples' ground that a substrate honouring one of an additive pair
+scans a different tree than the shell for any consumer who set the other.
+**Enumeration rather than a walk is correct here and this is the one place it
+is**: the subject is *tracked* files, because an untracked script is no part of
+what the project ships and cannot carry a reviewable declaration. The arm
+introduces **no knob** — the prune set is the one `lib/gate.sh` already resolves
+for every pruned walk in the tree — and a tree that is not a repository is a
+**refusal**, not a silently empty corpus.
+
+**No exclusion knob is minted for the battery runner and the bootstrap, and that
+is the sharper half of the design.** The obvious spelling for *outside the battery
+and the bootstrap* is a pair of path knobs, and it is refused: a knob defaulted to
+one project's battery and bootstrap paths is a kit literal carrying that project's
+layout — the defect §The install disposition already names — and it would need
+editing every time a file moved. The directive's own predicate supplies the
+mechanism instead. The bootstrap is permanently shell by a closed ruling, so it
+**declares**; the battery runner is simply **owed** until its port lands. That
+substitution is what makes the owed count reaching zero *be* the completion
+predicate rather than approximate it.
+
+**One row per file, and the columns are the ones a plain script can answer.**
+`lines=` is `wc -l` over the same path the row is read from, on the same terms the
+`--group` arm's own count is read and for the same reader. **No criterion column
+is emitted**, and the ground is the one that removed criteria 4, 5 and 6 from
+`--group`: a plain script carries no fixture pair, no tier and no `couples=`, so
+`c2=`, `c3=`, `c7=` and the couples cross-check are all unanswerable for it, and a
+column whose only honest reader would have to disregard it is not emitted. A
+registered gate's row carries its disposition on the same terms as any other file;
+**the arm does not partition gates from scripts, because the directive does not.**
+
+**A disposition is read only from a well-formed declaration, and everything else
+is `owed`.** Exactly one of the pair, with its payload present: a `# no-port:`
+whose cause is empty, a `# port-until:` naming no slug, and a file carrying
+**both** are each read as `owed`. Those are not separate rules but one — a file
+that has not made a reviewable declaration has not made one — and it is the same
+over-count direction absence already takes. There is no fourth count because there
+is no fourth disposition, and *held* is separated from *no-port* for the reason
+`--group` separates *still owed* from *takeable*: a temporary hold is not a
+permanent disposition, and folding the two silently falsifies the subtraction a
+reader would do.
+
+**And read only from the file's own header block — the leading run of shebang,
+comment and blank lines.** This corpus contains scripts that *write* shell —
+smoke scripts, installers, template authors — and a line-anywhere scan cannot tell
+a declaration from a heredoc literal. The restriction is the field's own name
+rather than a new rule: `# no-port:` and `# port-until:` are **header** fields, and
+confining the read to the header removes the false-positive class by construction.
+**Found by running the widened readers over this tree rather than by reasoning**:
+the first live run reported a hold against a heredoc literal in `gate-sdk/smoke/`,
+and the shell arm masked the same exposure behind the contradiction rule above,
+which is why the rule is stated for the corpus and not for one reader.
+
+**The arm reads a corpus it is inside, and that is a property rather than a
+problem.** `bin/port-blockers.sh` and this repo's measured-claims emitter are both
+tracked non-test shell outside the prune set, so both appear in the arm's own
+output as ordinary rows. Nothing about the derivation is self-referential — the
+arm reads headers, not behaviour — but a reader finding the tool in its own report
+should find that recorded rather than wonder.
+
+**Its consumer is a human session and nothing parses it**, exactly like the two
+arms beside it: the reader is a session asking whether the port is done, and the
+transition is that question. The one machine consumer is a **value**, not the
+format — a consumer's measured-claim emitter may read the trailer's owed count, as
+this repo's does, which is why the trailer's grammar is specified above and the
+rows' is not load-bearing. **No freshness gate accompanies it**, on the same
+enforcement-first ground the other arms take: a gate would compare the derivation
+against a stored expectation, which is the maintained roster returning by the back
+door and wrong for every consumer whose tree differs.
+
+**Two standing blind spots, recorded here as limits of the derivation rather than
+left to be re-found.** Both were found by execution during the shell tail's port,
+not reasoned.
+
+- **Unregistered members.** A gate a kit ships but the consumer never registers is
+  absent from `gates.list`, so neither registry arm can speak for it at all. This
+  is a **corpus** limit and `--tree` closes it for the disposition question — an
+  unregistered gate's declaration is a tracked file like any other. It does **not**
+  close it for the *requirement* question: `--tree` reports no criterion column, so
+  an unregistered member's external-program requirement is still reported by
+  nothing.
+- **Library-mediated requirements**, and this is the one that generalises. The
+  command-position scan reads a member's own declaration text and does not follow a
+  call into a kit library, so a requirement reached through a shared helper is
+  invisible **even for a registered, in-corpus member** — the default arm can
+  report `clean` for a gate that genuinely requires an off-floor program. That is a
+  false negative of exactly the shape the repaired tokenizer above already records,
+  and it is a limit of the *scan* rather than of the corpus, so no arm's walk
+  closes it. Following a call into a kit library and resolving its command
+  positions is a scanner widening with its own cost and its own false-positive
+  surface; it is recorded here and filed as work rather than taken.
+
+**The worked example the second blind spot was found on has since been
+resolved, and saying so is what keeps the limit honest.**
+`check-producer-liveness` reached `ps` only through `ek_pid_alive` in
+evidence-kit's library, and was both unregistered and library-mediated — one
+member attesting both limits at once. It is now a `.gate` member whose `--needs`
+declares `ps` outright, so the default arm would read its requirement correctly if
+it were registered. **The instance is discharged and neither limit is**: the scan
+still does not follow a library call, and the next member to reach a program that
+way will be reported clean by a report that cannot see it.
 
 **The tool's own longest-standing `?` was adjudicated by a port rather than by the
 tool.** `check-reads-couples` printed `c7=?` because the program at its
@@ -8183,7 +8392,7 @@ scan never reached carry command-position expansions it cannot resolve, and each
 is now reported `?` rather than passed over. A lower count under a blind scan was
 never the better number.
 
-**Arguments, now that the tool has a mode.** It takes no positional arguments and
+**Arguments, now that the tool has modes.** It takes no positional arguments and
 gains none, so §The `bin/`-tool contract's free-text rule does not bind it. Two of
 that contract's three behaviors are adopted anyway: `-h` / `--help` prints usage
 on **stdout** at exit **0**, and an unrecognized argument is a **refusal** — usage
@@ -8195,16 +8404,59 @@ favor of. The ground is the cost that section already measures — a session tha
 ran a stage writer with `--help`, got `'--help' is not a lifecycle stage` in place
 of usage, and went three guards deep working around a contract the usage text
 would have told it did not exist. A tool with one undiscoverable mode is that cost
-waiting to be paid; a tool with none was not.
+waiting to be paid; a tool with none was not, and a tool with two has it twice
+over — which is why the usage text carries every arm and the `# usage:` header,
+bounded to `CANON_KIT_COMMENT_RUN_CAP` physical comment lines, points at it rather
+than trying to hold the detail itself.
 
-It is a tool, not a gate: **neither arm** carries a `# graph:` manifest or a
-fixture pair, and nothing machine-parses either output — both reports are read by
-the session choosing a cohort, which is the transition where the answers are
-needed. **No freshness gate accompanies it, and that is enforcement-first rather
+It is a tool, not a gate: **no arm** carries a `# graph:` manifest or a fixture
+pair, and the behavioural coverage §The `bin/`-tool contract mandates in place of a
+pair covers all three in `smoke/` — the `--tree` case planting a corpus with each
+disposition, each ill-formed declaration, and one file of each excluded class, and
+asserting the trailer's counts as exact **deltas** rather than absolutes, because
+the surrounding tree's own shell corpus is not that assertion's subject.
+
+**One line of one arm's output is machine-read, and the distinction is the whole
+of it.** The rows of every arm are read beside a diff by the session asking the
+arm's question, and nothing parses them. `--tree`'s **trailer** is different: a
+consumer's measured-claim emitter may read its owed count, as this repo's does, so
+that one line's grammar is an interface with a reader who breaks when it moves,
+and it is specified above for that reason. Reading the count off the arm rather
+than re-deriving it is derivation-first — an emitter with its own copy of the
+corpus rule would be a second definition of a corpus only one of them owns.
+
+**No freshness gate accompanies the tool, and that is enforcement-first rather
 than an omission**: a gate would have to compare the derivation against a stored
 expectation, which is the maintained roster re-entering by the back door, wrong
 for every consumer whose configuration differs. Removing the duplication outranks
-gating it, and criteria 6 and 7 state no roster for a freshness gate to hold.
+gating it, and no criterion states a roster for a freshness gate to hold.
+
+**What that leaves uncovered, stated because it is not obvious and no gate says
+it.** Where a consumer's measured-claim emitter reads the `--tree` trailer, the
+emitter's resolved values are baked into the generated pre-commit hook, so the
+whole tracked shell tree becomes an input to a byte-gated artifact. `check-graph`
+holds that artifact fresh, but its `couples=` is a trigger over paths, and no
+kit-shipped trigger can cover a corpus a *consumer's* emitter defines — which is
+the seam rather than a gap to close: a kit descriptor naming one project's
+directories would publish that project's layout as kit mechanism. In this tree the
+uncovered set is the twelve files under `installer/` and `demo/`, and the
+full-battery-before-every-commit rule is what covers them, since it runs
+`check-graph` unconditionally where the hook's own trigger does not. **The
+regeneration cost was measured rather than argued**: over two hundred commits,
+thirteen moved the corpus file set and ten of those already owed a hook
+regeneration for an unrelated reason, so the marginal cost is three commits in two
+hundred.
+
+**The tool is inside the corpus it measures, and so is any emitter that reads
+it.** `gate-sdk/bin/port-blockers.sh` is tracked, non-test, outside the prune set: it prints
+itself as a row. The consequence is not cosmetic — **the completion predicate
+cannot reach zero while the instrument is still shell**, and unlike the battery
+runner and the install bootstrap, which the predicate disposes of by being owed and
+by declaring, the instrument has no stated disposition. A `bin/` tool takes no
+`.gate` descriptor, so its only port route is a non-gate arm of the binary (§The
+non-gate arm); until then its own row reads `owed` or carries a cause it writes
+about itself. Worth stating rather than discovering: the measurement is not a
+fixed point, and the arm's last act on being ported is to delete its own row.
 
 ### check-shellcheck
 
@@ -9837,8 +10089,9 @@ siblings do.
 
 ### check-gate-exemption-tasks
 
-Invariant: **every temporary-disposition annotation a gate declaration carries
-names a live task.** Two annotations are in scope. Every element of an
+Invariant: **every temporary-disposition annotation in scope names a live task** —
+on a gate declaration, and on any tracked script for the held-port field. Two
+annotations are in scope. Every element of an
 `# exception-list:`-tagged array in a
 `check-*.sh` gate carries exactly one of two disposition annotations —
 `# until: <slug>` (temporary; must resolve to a live task in the queue file's
@@ -9853,16 +10106,77 @@ Done-only or missing is a violation. Inline per-site
 directives (`# fail-closed-exempt:`, `# no-fixture:`) stay out — they are
 local and self-evident via their adjacent comment.
 
+**The held-port field's corpus is the tracked shell tree beside the declaration
+set, and it widened with the field itself** (§The `# graph:` manifest). Without
+this the field's widening would ship its own worst failure direction: an
+**undeclared** hold is counted owed, the status quo a reader's own audit catches,
+while a **stale** declaration whose blocker landed under-counts the owed set and
+hides real work — the direction no shape assertion covers, which is why a slug is
+held to a live queue entry rather than to a shape. It is the same assertion over a
+wider walk and not a new one; what changed is which files it collects slugs from.
+
+**A union, never a replacement, and that is not a nicety.** A `.gate` descriptor
+is no `*.sh`, so a corpus that replaced the declaration set with the tracked shell
+tree would silently drop every descriptor-borne field. The walk is therefore the
+declaration set plus the tree corpus §port-blockers derives, de-duplicated against
+**both** halves of the declaration walk — the in-scope set and the out-of-scope
+set — which also makes the widening **monotone**: it can add findings and never
+remove one, so no existing verdict can flip by inspection failure. De-duplicating
+against the in-scope half alone double-counts a kit-shipped declaration on the
+skipped tally, which is what the fixture pair's out-of-scope count caught.
+
+**Where there is no tracked set the tree half is empty and the declaration half
+still asserts**, which is the opposite disposition from §port-blockers' `--tree`
+arm and is deliberate. That arm's *whole* subject is the tracked tree, so a
+non-repository leaves it nothing to answer and it refuses; here the tree corpus is
+an **addition** to a corpus the gate can still read, so degrading to none returns
+exactly the pre-widening assertion — monotone again, and the same direction
+`gate_authoring_tree` already degrades in when git cannot answer it. An unresolved
+prune knob is a different thing and still fails closed: that is misconfiguration
+rather than an absent corpus. Caught by a bespoke test that stands its sandbox up
+outside any repository, which is the one arm no fixture pair reaches.
+
+**The scope rule is the declaration corpus's own predicate lifted from a directory
+to a file**, so an adopter is never held to a kit author's slug: a tracked script is
+in scope iff this tree authored the kits it carries, or the script sits under the
+consumer's own gates directory. That is the same `gate_authoring_tree` test the
+paragraphs below already turn on, and it is stated as a lift rather than a new rule
+because it decides nothing the declaration arm had not already decided. **Its
+bound, stated rather than banked:** in a *vendoring* tree a consumer's own scripts
+outside its gates directory are not asserted. Under-assertion is the safe direction
+here, it is exactly what the declaration arm already does, and closing it means the
+per-kit authorship marker the limit paragraph below already prices as a different
+unit.
+
+**A disposition is read from the file's header block alone over the tree corpus,
+and the declaration corpus keeps its whole-file scan.** This corpus contains
+scripts that *write* shell — smoke scripts, installers, template authors — and a
+line-anywhere scan cannot tell a declaration from a heredoc literal. The
+restriction is the field's own name rather than a new rule, `# port-until:` being a
+**header** field; confining the tree read to the leading run of shebang, comment
+and blank lines removes the false-positive class by construction. Leaving the
+declaration corpus alone is what keeps the widening monotone: narrowing a scan that
+already shipped would retire findings, which a widening may not do. **Found by
+running the widened gate over this tree rather than by reasoning** — its first live
+run reported a hold against a heredoc literal in `gate-sdk/smoke/` — and recorded
+because the asymmetry between the two corpora is deliberate and reads like an
+oversight.
+
 **The widening was taken over a closer shape-fit rival, and on cost.** A
 top-of-file header field is a different syntactic subject from a per-element
 trailing comment, and on shape alone §check-gate-substrate-parity's assertion G —
 which already reads header fields on this exact declaration set — is the closer
 home. It loses because the two annotations make **one claim about one queue**:
 this gate holds the live-section span, the bullet-lead-line predicate and the
-queue-file coupling **today**, and its corpus is already the declaration set the
-field lives in, so the invariant generalizes with **no** new holder of a predicate
-the cost paragraph below prices at five. The rival would have made that a sixth,
-and would have added a queue-file coupling to a gate that deliberately has none.
+queue-file coupling **today**, so the invariant generalizes with **no** new holder
+of a predicate the cost paragraph below prices at five. The rival would have made
+that a sixth, and would have added a queue-file coupling to a gate that
+deliberately has none. **The corpus half of that argument has since expired and the
+ruling survives without it**: the two corpora coincided when the arm landed here,
+and the field's widening to any tracked script parted them, so this gate now walks
+a corpus assertion G does not. The five-versus-six accounting is untouched, and it
+was always the load-bearing half — a second holder of one claim about one queue is
+the cost, whatever the corpora do.
 The spelling collision with `# until:` is the precedent being cited rather than an
 accident to rename: the two differ in subject and in prefix and are read by one
 liveness predicate, and a reader who greps `until:` finds both, which is correct.
@@ -9903,8 +10217,10 @@ and narrowing it means a per-kit authorship marker, which is a different unit.
 
 **The header-field arm enters the walk independently of the `# exception-list:`
 marker.** The array arm opens on that marker, so a declaration carrying only a
-header field would be skipped by it — the arm is a second entry into the same
-`gate_check_dirs` walk rather than a widened regex. A **bare** field with no slug
+header field would be skipped by it — the arm is a second entry into the walk
+rather than a widened regex, and since the field widened it is a second entry into
+a **wider** walk: the `gate_check_dirs` declaration set plus the tracked shell
+tree. A **bare** field with no slug
 is assertion G's shape clause and is passed over here: there is no slug to
 resolve, and reporting it in both places would give one defect two reds whose
 wording disagrees about what is wrong.
@@ -10004,9 +10320,16 @@ pair's `.gate` half was the hole the port closed: both cases now ship a descript
 on each side of the scope rule, because a glob arm no case reaches is an arm the
 live tree cannot exercise either.
 
-Its corpus is resolved by **one-level pathname expansion** over each listed
-directory rather than by a recursive walk, so the compiled member declares an
-empty read-root set and `--reads` reports nothing to cover (§check-reads-couples).
+Its declaration corpus is resolved by **one-level pathname expansion** over each
+listed directory, and its tree corpus by **enumeration of tracked files**, so the
+compiled member still declares an empty read-root set and `--reads` still reports
+nothing to cover (§check-reads-couples). Neither half is a recursive walk, which is
+what the read-root set is a set of: a `git ls-files` spawn asks the index rather
+than descending a directory, so the recorder observes no root — **verified by
+running that gate rather than reasoned**, since the opposite prediction is the
+natural one. What the tree corpus does add is one bridged knob, the prune-dir set
+`--tree`'s corpus rule reads, which the member declares like any other: a knob read
+without being declared is the bridge's undeclared-knob refusal on every invocation.
 
 Clean-line contract: the line reports the exemption-array count, the
 `# port-until:` header-field count, the **out-of-scope kit-shipped declaration

@@ -278,6 +278,22 @@ fn header_hits(text: &str, opener: &str) -> Vec<(usize, String)> {
     out
 }
 
+// spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — the file's own header block, the leading
+// run of shebang, comment and blank lines: over the tree corpus a line-anywhere scan cannot tell
+// a declaration from a heredoc literal, and the declaration corpus keeps its whole-file scan
+fn header_block(text: &str) -> String {
+    let mut out = String::new();
+    for (idx, line) in text.lines().enumerate() {
+        let t = lstrip(line);
+        if !(t.is_empty() || t.starts_with('#') || (idx == 0 && line.starts_with("#!"))) {
+            break;
+        }
+        out.push_str(line);
+        out.push('\n');
+    }
+    out
+}
+
 fn canon(p: &Path) -> Option<String> {
     std::fs::canonicalize(p)
         .ok()
@@ -359,6 +375,31 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
     }
 
+    // spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — the header-field arm's corpus is the
+    // tracked shell tree beside the declaration set and never instead of it, with the scope rule
+    // lifted from a directory to a file so a vendoring adopter is held to no kit author's slug
+    let tree_scoped: Vec<String> = walk::tracked_shell_tree()?;
+    // spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — the union de-duplicates against BOTH
+    // halves of the declaration walk, in scope and out: a declaration already counted as skipped
+    // would otherwise be counted a second time through the tree corpus that also reaches it
+    let seen: Vec<String> = scan_files.iter().chain(oos_files.iter()).cloned().collect();
+    let mut tree_texts: Vec<(String, String)> = Vec::new();
+    for f in &tree_scoped {
+        if seen.contains(f) {
+            continue;
+        }
+        let in_scope = authoring || Path::new(f).starts_with(&gates_dir);
+        let text = match std::fs::read(Path::new(f)) {
+            Ok(b) => header_block(&String::from_utf8_lossy(&b)),
+            Err(_) => continue,
+        };
+        if in_scope {
+            tree_texts.push((f.clone(), text));
+        } else if !header_hits(&text, "port-until:").is_empty() {
+            skipped += 1;
+        }
+    }
+
     for (f, text) in &texts {
         for (lineno, _) in header_hits(text, "exception-list:") {
             arrays += 1;
@@ -389,7 +430,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — the header-field arm enters the walk
     // independently of the '# exception-list:' marker, because a declaration carrying only the
     // field is skipped by the trigger the array arm opens on
-    for (f, text) in &texts {
+    for (f, text) in texts.iter().chain(tree_texts.iter()) {
         for (lineno, line) in header_hits(text, "port-until:") {
             let tail = match line.split_once("port-until:") {
                 Some((_, t)) => t,
