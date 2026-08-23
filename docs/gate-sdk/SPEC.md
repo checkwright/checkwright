@@ -6597,13 +6597,16 @@ execs — a 127 naming the diagnostic instead of running the gate, and a status 
 0 throughout, so nothing upstream reads as an error. So a caller captures stdout
 into the argv value and stderr apart from it.
 
-**The battery is not one of those callers, and keeps no capture file of its
-own.** The `--run` arm builds argv **as data** and never parses a stream into
-it, so the failure class is structurally absent there, and the runner's own
-dispatch-stderr file is retired with the branch that read it. The rule stays here because `gate_command`'s surviving callers — the hook
-generator, the fixture runner, the hook installer, the consumer smoke, the
-hermetic-test library, the stage-entry step and the exec shim among them — still
-parse its stdout as argv and must still hold the two streams apart.
+**The arm is not one of those callers, and keeps no capture file under the tmp
+dir.** It builds argv **as data** and never parses a stream into it, so the
+failure class is structurally absent there, and the runner's shared
+dispatch-stderr file is retired with the branch that read it. The front-end's
+binary-less loop still *is* a caller and still splits the two streams, into a
+scratch file of its own that nothing outside that loop reads. The rule stays here
+for every surviving caller — that loop, the hook generator, the fixture runner,
+the hook installer, the consumer smoke, the hermetic-test library, the
+stage-entry step and the exec shim among them — each of which parses
+`gate_command`'s stdout as argv and must hold the two streams apart.
 
 The failure this closes was neither theoretical nor a race: a helper that
 abandoned a pipe producer mid-write emitted a broken-pipe diagnostic on **every**
