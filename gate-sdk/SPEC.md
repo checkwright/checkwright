@@ -966,7 +966,7 @@ answering a question assertion C never asked.
 | `check-gate-output` | **Ported and strengthened for the fixtured corpus; source-grep retained for the one member outside it, over the corpus that member's rule now lives in.** The source-grep for `: clean`/`help:` was always a proxy for behavior; for the fixtured members the assertion now runs in `run-gate-tests.sh` (§run-gate-tests) against the case's real output, on **shell gates too**. The remaining member, `check-task-conservation` (`# no-fixture:` per queue-kit/SPEC.md §check-task-conservation — a HEAD-vs-worktree diff has no static-fixture representation), has no case for a runtime assertion to reach, so the source-grep stays its only oracle. Retiring the static half outright would zero out that member's output-contract coverage — the exact vacuity this table exists to close. **That member has since ported**, which is why this row is not "unchanged": its declaration path is now a descriptor, which by the closed field roster cannot hold the strings, so corpus *and* emitter alternation follow the rule to the implementation module, and a tree carrying no crate declares the member out of reach rather than reddening (§check-gate-output owns the resolution and its two branches). |
 | `check-gate-fail-closed` | **Retired with cause, and the cause is narrower than it first read.** For a member that reads files, the defect (branching on a captured value's emptiness when the subprocess died) is unrepresentable: there is no subprocess, and a fallible read returns a `Result` that cannot be ignored. A real substrate win, stated as one. **It is representable for a member that spawns one**, and the queue-kit cohort landed the first: `Command::output()` returning `Ok` means the *spawn* succeeded, never that the program did, so reading `stdout` while ignoring `status` reproduces the defect exactly. The disposition is unchanged — this gate's corpus is `check-*.sh` and it could not scan a Rust module either way — and the property is held crate-side rather than by review: the spawn wrapper and its unit tests (§Fail-closed contract) leave a gate module unable to construct a `Command` at all, and unable to reach stdout without the status having been read. Machine-held rather than remembered, which is the same answer the `check-reads-couples` row below gives to the same problem, and what keeps this retirement honest. |
 | `check-reads-couples` | **Retained, with a binary-side equivalent.** Its shell parser finds no walks in a binary gate and would print `clean` — the single worst vacuity available here — so the substrate answers instead of the parser: the binary carries a `--reads <name>` arm printing one line per walk root, a repo-relative path or `?`, and the gate consumes that report into its existing coverage assertion (§check-reads-couples). The declaration is **registry data held to executed behavior**, which is what separates it from the unbound self-declaration this gate exists to refuse: each gate's roots are declared beside its dispatch entry in the crate's registry (an entry added without them fails to compile), the crate's single sanctioned walk implementation records the roots it is invoked with, and two unit tests close the loop — **A**, every member run over its own `gate-tests/<name>/{good,bad}/` cases with recording on, observed roots a subset of declared; **B**, no module outside that walk implementation names a filesystem-walk API, because a direct walk would be invisible to the recorder and unverify A. B's vendored half is held by an **allowlist over the resolved graph**: a spelling roster cannot catch a walker inside a dependency, so every crate in the tracked `Cargo.lock` — transitive included, since a transitive crate walks as visibly as a direct one — is admitted by name with the clause of the dependency bar it cleared (§The settings cohort, and the crate's first dependency), and the assertion reds both on an unadmitted crate and on an allowlist entry absent from the graph. Reading only the `[dependencies]` table would admit an entire subtree unexamined, which is why the lock is tracked rather than gitignored. The precedent is the `check-knob-default-coupling` row below: an executed assertion is the answer where a static gate would be vacuous. The refusal survives only where the gate still cannot see — a name the substrate does not carry, and an unresolvable filter knob — and there is deliberately no descriptor-level opt-out, which the consumption path does not reinstate: a port ends this assertion by answering it (§check-reads-couples). **This member is itself `.gate`-dispatched** since §The sixth budget batch, which is that closing clause discharging on the auditor: the compiled form reaches the read set in process rather than spawning the arm, so the absent-binary refusal is answered out of existence rather than retired, and the row now describes a ported member auditing ported members. What `--reads` verifies is unchanged and is worth restating because the natural reading is wrong: a member's declared roots are **registry data**, not a derivation from its Rust source, and the declaration-to-code link is held by unit test A. Both members ported in that batch with a non-empty root set carry `?` alone, and the auditor's own root set is empty and stays empty, so no self-assertion is lost. |
-| `check-gate-assertions` | **Retained, corpus extended** to the gate's Rust module; the `# assertion` marker matches on its token, independent of the comment leader. |
+| `check-gate-assertions` | **Retained, corpus extended** to the gate's Rust module; the `# assertion` marker matches on its token, independent of the comment leader. **This member is itself `.gate`-dispatched** since the eighth budget batch (§The first cohort, and the rule that selects the next), and its port moved more than its own spelling: the section it audits gained an enumerated contract of its own, so the gate now reads **its own implementation module** and the contingent immunity that kept its own heading out of discovery is ended deliberately (§check-gate-assertions). Its fixture pair, not the live tree, is what proves those arms — the `check-comment-tier` sentence, inherited for the same reason. |
 | `check-gate-exemption-tasks` | **Retained, corpus extended** the same way. **This member is itself `.gate`-dispatched** since §The sixth budget batch, so the row describes a ported member reading ported members' declaration paths — and its own port changed nothing in the rule: what it globs is both declaration spellings, which a descriptor still is. |
 | `check-comment-tier` | **Retained, corpus extended** to the implementation module and the `.gate` descriptor, whose own lines are directives by construction. Mechanism: the shared primitive `comment_surface` carries `*.gate` **and `*.rs`** arms — widened once, for every caller (see the `check-spec-pointer` row). The implementation arm is the load-bearing one: locality-class directives stay in the implementation by the reader partition (§The `# graph:` manifest), so without it they would go dark exactly where they still apply. **This member is itself `.gate`-dispatched** since the seventh cohort, so it now audits its own declaration — which is why its trigger names `*.gate` and `*.rs` and why its fixture pair, not the live tree, is what proves those arms. |
 | `check-spec-pointer` | **Retained, and its corpus depends on the same widening** — not "unchanged" in mechanism, only in assertion logic. It calls the *same* shared primitive, `comment_surface` in `native/src/spec.rs` since the seventh cohort ported both it and all four of its callers (canon-kit/SPEC.md §lib/spec.sh); absent that one shared fix a ported gate's `# spec:` line would silently stop being checked in both places it can live — the descriptor and the implementation. With the primitive carrying the `.gate` and `*.rs` arms its own probe logic needs no change. |
@@ -1523,7 +1523,32 @@ design time; the last three were paid for, and each is named with what it cost.
    and in a vendored consumer it is in the out-of-scope set, which is still read to
    build the skip count. There is no configuration in which the criterion clears,
    so the two paragraphs above about a verdict flipping on a config have a
-   counterpart — a member whose verdict flips on nothing.
+   counterpart — a member whose verdict flips on nothing. `check-graph` joined it
+   at the seventh cut and `check-gate-assertions` at the eighth, so the row has
+   three members.
+
+   **`check-gate-assertions` also gives the register a shape it did not have: an
+   immunity that is *contingent* rather than structural, and the difference is
+   what makes it worth naming.** The criterion has two spellings in this section
+   and they gave **opposite** verdicts on that member. Under *a registry member's
+   declaration path lies inside the corpus the gate scans as content* it bound
+   before its port in every configuration, the gate resolving every enumerated
+   contract's heading to a declaration or an implementation module and reading its
+   bytes. Under *the gate's **own** declaration path* it cleared — but only
+   because its own SPEC section happened to carry no enumerated contract, so
+   discovery filtered its own heading out. That is one sentence of prose away from
+   ending, and the port is the likeliest author of that sentence, since every
+   ported sibling's section opens with an enumerated contract. Contrast
+   `check-gate-fixture-coverage` below, whose immunity is a **theorem** its own
+   rule enforces. An immunity guarded only by a prohibition **the gate itself
+   would have to enforce** is circular, so the eighth cut took the binding verdict
+   and ended the contingency deliberately by making the member self-auditing
+   (§check-gate-assertions). **The two spellings are not reconciled here**, and
+   that is deliberate: settling which one the criterion means is a change to this
+   section's own rule with reach across every member, so it is filed
+   (`criterion-4-two-spellings-disagree`) rather than taken inside a port. What
+   the eighth cut settled is the member, on the conservative verdict this
+   criterion already prescribes when a reading is uncertain.
 
    **That batch also produced a *third* couple-clears-walk-binds instance, and the
    sharpest**: `check-knob-default-coupling`'s `couples=` field is one level deep
@@ -1991,10 +2016,11 @@ design time; the last three were paid for, and each is named with what it cost.
    unless the reason is written down — and because it is the standing evidence
    that a *derived* roster still has to be re-derived by a **repaired**
    derivation, never trusted because it is derived. **Its class is (ii)**: the
-   invocation is `paste -sd, -`, a comma join of a sorted label set, so the
-   compiled rule spells it directly and the verdict does not move. The member is
-   therefore **takeable and priced**, not held (§check-gate-assertions records
-   what its port costs).
+   invocation was `paste -sd, -`, a comma join of a sorted label set, so the
+   compiled rule spells it directly and the verdict does not move. The member was
+   therefore **takeable and priced**, not held — and the eighth budget batch took
+   it, so the example now reads in the past tense while the *classes* it draws
+   outlive the member (§check-gate-assertions records what its port cost).
 
    **`check-crate-arms` is a different case under the same criterion, and it is
    named so no later cohort reads it as owed work.** Its rule is an invocation of
@@ -2319,19 +2345,26 @@ the shell partition to join a group. A later selector therefore reads the arm's
 precondition off the run as before and should expect it to keep reporting the
 same verdict; what would reopen the arm is a *consumer* contributing shell gates
 that share a derivation, not this tree.
-**The takeable tier is non-empty again, and this is an oracle read rather than a
-number this section holds.** Run on 2026-08-22 after two holds were retired —
-one criterion-4 bind that was never a hold ground and one criterion-7 blocker of
-the incidental-spelling class (§The port-candidate criteria owns both rulings) —
+**The takeable tier reopened at the eighth cut and the eighth cut emptied it
+again, and both readings are oracle reads rather than numbers this section
+holds.** Run on 2026-08-22 after two holds were retired — one criterion-4 bind
+that was never a hold ground and one criterion-7 blocker of the
+incidental-spelling class (§The port-candidate criteria owns both rulings) —
 `bash gate-sdk/bin/port-blockers.sh --group` trailed *106 member(s) scanned, 2
 group(s) formed, 0 undecidable, 98 already ported and excluded, 3 permanently
 shell and excluded, 3 temporarily held and excluded; 5 still owed, 2 takeable at
-this cut*. That supersedes the reading §The sixth budget batch recorded at its own
-cut, where the tier was exhausted and the budget arm had nothing to compose from;
-the two groups are still of exactly one, so the size arm's verdict is unmoved and
-the budget arm is the one that reopened. A later session re-reads the trailer
-rather than this paragraph — a dated read is evidence that the arm's precondition
-can change, never the tier's current value. Shared derivation is the axis
+this cut*. That superseded the reading §The sixth budget batch recorded at its
+own cut, where the tier was exhausted and the budget arm had nothing to compose
+from. **The eighth budget batch then took both**, and the same command re-run at
+its build cut trails *106 member(s) scanned, 0 group(s) formed, 0 undecidable,
+100 already ported and excluded, 3 permanently shell and excluded, 3 temporarily
+held and excluded; 3 still owed, 0 takeable at this cut* — the owed count down by
+two and the takeable tier empty, so every unported member again sits behind
+`cohort-held-members-port-prerequisites`. Neither reading is this paragraph's to
+hold: a later session re-reads the trailer, because a dated read is evidence that
+the arm's precondition **can change**, never the tier's current value. Through
+both readings the groups were of exactly one, so the size arm's verdict is
+unmoved and the budget arm is the only composer left. Shared derivation is the axis
 **while it selects**, because it is what made this cohort
 cheap: the walk is ported once and proved N times, and the parity comparison is
 over one corpus shape rather than N; the budget arm is what this section says
@@ -2341,6 +2374,28 @@ criterion 4 or 7 are **sequenced last and budgeted for**, because each carries a
 design problem — a self-referential parity oracle, an external program on `PATH`
 — that the port owes an answer to rather than a waiver. Neither is ported and
 patched later; both are designed, then ported.
+
+**The eighth budget batch is `check-gate-assertions` and `check-tree-terms`, and
+it is two batches of one member in every sense that matters.** The oracle read
+above is what selected them: the size arm is permanently exhausted, so the budget
+arm composed, and the takeable tier at that read *was* exactly these two. Neither
+was held — both had their `# port-until:` declarations retired on 2026-08-22 with
+their prices relocated to their own sections: §check-gate-assertions priced
+`paste -sd, -` as criterion 7 class (ii) and named the GNU-awk three-argument
+`match()` a capture-API re-expression, and §check-tree-terms priced its
+criterion-4 bind as a fixture widening before the port. Each carried its own
+descriptor, its own registry entry, its own widening and its own parity run, and
+no comparison spanned both — the property the paragraph below states in general.
+**Both bound criterion 4** and each paid it the same way, by widening its pair
+first; `check-gate-assertions` also ended a *contingent* immunity deliberately and
+is now self-auditing, which its own section owns. Two facts about the remainder
+are worth carrying, both measured at the build cut rather than predicted here:
+`paste` left the battery's program set **entirely**, on a re-run of `bash
+gate-sdk/bin/port-blockers.sh` where the only programs any rule still names are
+`shellcheck`, `cargo` and the renderer; and the residual `gawk` floor emptied,
+because probing showed `check-gate-assertions` was its only live holder
+(§check-gate-assertions records the probe and what is deliberately *not* changed
+on the published requirement).
 
 **"Never as one cohort" is the property that makes a budget batch safe, and it
 reads as bookkeeping only until that is said.** A batch's members carry **no
@@ -7375,13 +7430,16 @@ reason text.
 
 ### check-gate-assertions
 
+`checks/check-gate-assertions.gate` (`align-only`, binary-dispatched).
 Invariant: every `### <gate>` subsection in the family SPEC whose contract
-enumerates its assertions (a count-word followed by an enumeration noun and a
-labeled span) is coupled to a matching `# assertion <label>:` marker set in
-the gate's code — the marker label set equals the contract's label span, and
-its size equals the count-word. This catches the prose-vs-code drift an
-internal count⟺span check cannot: a contract can be internally consistent
-while the code grew a sixth assertion.
+enumerates its assertions is coupled to a matching `# assertion <label>:` marker
+set in the gate's code, on four assertions: (A) the count-word equals the size of
+the label span it introduces; (B) the heading resolves to gate code through the
+registry; (C) a resolved file carrying no marker at all is the retrofit
+obligation; (D) the marker label set equals the contract's label span, reported
+through its `missing` and `extra` sub-branches. This catches the prose-vs-code
+drift an internal count⟺span check cannot: a contract can be internally
+consistent while the code grew a sixth assertion.
 
 Discovery is first-paragraph-scoped, requires the enumeration noun
 (`assertion(s)`|`axes`|`axis`|`checks`) adjacent to the count-word
@@ -7391,11 +7449,39 @@ follow-on sentences, hierarchical axis/sub-rule contracts, and count-words
 with non-enumeration nouns. With no spec argument the gate scans
 `<gates-dir>/SPEC.md` when present plus each vendored kit's own `SPEC.md`;
 each matched heading resolves to its gate source through the registry path.
+The three fail-closed exits and the **exit-3 internal skip sentinel** port
+unchanged, the sentinel being no failure path at all: a `.gate`-declared member
+with no crate manifest present is counted onto the clean line as *declared out of
+reach*, and that segment is part of the output contract.
+
+**Its manifest, stated because every ported sibling's section states one and
+because one field of it was wrong.** `dir=bi valve=none tier=align-only`, and no
+`trigger=`: the member emits into **no** generated hook, which is why criterion 3
+names a real cost for it — the fixture pair, `run-gates.sh` and the align stage
+are its only executed callers. `couples=` carries
+`kit:SPEC.md,scripts/*.sh,kit:*.sh,native/src/gates/*.rs` **plus
+`kit:checks/*.sh` and `kit:checks/*.gate`**, the two the port added. Probed at
+the cut: `kit:*.sh` expands to `<kit-root>/*.sh` and no kit root holds a
+top-level `.sh`, and `scripts/*.sh` matches nothing, because every gate in this
+consumer's gates dir is now a descriptor. So before the correction the only
+declaration path the field reached was `native/src/gates/*.rs`, while the
+**walk** read `gate-sdk/checks/check-gate-substrate-parity.sh` on every run — a
+shell gate whose edit re-fired nothing. `kit:checks/*.sh` closes that missed
+content trigger; `kit:checks/*.gate` is a **reverse trigger**, because creating
+or deleting a descriptor changes which file the gate resolves and greps even
+though the descriptor's own bytes are never read. The two globs that expand to
+nothing stay: they are dead against *this* tree's layout, not against a
+consumer's. No conservation row is added by any of it — the field already carried
+`native/src/gates/*.rs`, so the member was already substrate-sensitive and
+already carries its row.
 
 **A `.gate`-declared member's markers live with its rule, in the implementation
 module** — the follow-the-rule-to-the-module resolution §check-gate-output owns,
 arriving here with the kit-roots cohort, because a descriptor's field roster is
-closed and cannot carry them. The marker grammar accepts either comment leader
+closed and cannot carry them. That resolution is **one implementation shared with
+§check-gate-output**, not a second copy: both reach a declaration through the
+same registry path, and two copies of it could disagree about which file a member
+resolves to. The marker grammar accepts either comment leader
 (`#` or `//`): the leader is the substrate's and the marker is a code marker
 either way. **A tree with no crate skips those members and counts them**, in the
 clean line, exactly as §check-gate-output declares them out of reach — a vendored
@@ -7406,28 +7492,169 @@ the **manifest**, never the directory, for the reason §check-gate-output states
 The skip's executed oracle is `installer_smoke`, which runs the battery on a
 freshly vendored consumer and is what found the red this branch answers.
 
+**Four port hazards are pinned here, each a place the natural port diverges
+silently rather than loudly.**
+
+- **The lowercasing must be ASCII and byte-length preserving.** The rule matches
+  on a lowercased copy of the paragraph and then slices the **original-case**
+  paragraph using that copy's offsets, which is sound only because the
+  lowercasing does not change the string's length. The target language's Unicode
+  lowercase is **not** length-preserving — `İ` lowercases to two code points —
+  so the compiled form lowercases ASCII-only. This is the sharpest
+  silent-divergence hazard in the member: nothing reds, the slice simply lands in
+  the wrong place past the first non-ASCII character. The offsets themselves are
+  **bytes**, which is the C-locale reading of the shell form's character indices;
+  an offset landing inside a multi-byte character is stepped back to the boundary
+  below it, so a multi-byte paragraph faults on nothing.
+- **The slice keeps one boundary character.** The count-word pattern consumes one
+  boundary character on each side, and the slice deliberately starts one position
+  **early** so the trailing one survives. A port slicing from the match end
+  diverges on any paragraph whose enumeration noun is followed immediately by a
+  parenthesis: the `(` is the boundary character the pattern ate, and losing it
+  drops the span's first label and can silently demote the contract below the
+  two-label arity filter.
+- **The sort is byte order, and that is a stated narrowing.** The shell form's
+  `sort -u` and `comm` ran under the **ambient locale** with no `LC_ALL=C` pin;
+  the compiled form sorts by byte, which is C-locale order. The two can differ
+  only on a mixed-case label span under a UTF-8 locale, and no live span is
+  anything but `A`-`H` or `1`-`3`. Recorded as a deliberate narrowing of a latent
+  divergence rather than left as an accident of substrate.
+- **The two marker grammars differ on purpose.** The extraction pattern accepts a
+  multi-character label while the contract-span pattern accepts exactly one, so a
+  multi-character marker can only ever surface as an *extra marker* finding. The
+  port reproduces both widths rather than unifying them, because unifying them
+  would turn a reported drift into an unreported one.
+
+**Criterion 4 binds, and the contingent immunity it used to clear under is ended
+deliberately. This is the finding the eighth cut was named for.** The criterion
+has **two spellings in one section and they give opposite verdicts on this
+member**, which is a fact about the criterion and not a reading error. Under *a
+registry member's declaration path lies inside the corpus the gate scans as
+content*, it **binds today, before the port, in every configuration**: eight of
+the nine live enumerated contracts already resolved their markers out of
+`native/src/gates/*.rs` and the ninth out of a shell gate, so the gate reads
+registry members' declaration and implementation paths as content on every run,
+and there is no consumer config in which the SPEC corpus stops naming gates.
+Under *the gate's **own** declaration path*, it **cleared** — because the section
+carried no count-word-plus-labelled-span, so the gate's own heading was filtered
+out of discovery and its own bytes were never read.
+
+**That second verdict was a contingent immunity, not a structural one, and the
+contrast with the register's structural case is the point.**
+`check-gate-fixture-coverage`'s immunity is a theorem: it reaches a declaration's
+bytes only for a member with no fixture pair, and it must carry a pair to pass
+its own rule. This member's immunity was **one sentence of prose away from
+ending** — and the port was the likeliest author of that sentence, since every
+ported sibling's section opens with an enumerated contract and the descriptor's
+`# spec:` one-liner conventionally states one too. An immunity whose only guard
+is a prohibition **this gate itself would have to enforce** is circular, and a
+standing prohibition would also leave the member permanently anomalous against
+every ported sibling. So the ruling is in two parts:
+
+- **The bind is taken** under the registry-member predicate, which was already
+  true and is therefore not a choice: the member joins `check-graph` and
+  `check-gate-exemption-tasks` in the **no-clearing-configuration** row. This is
+  also the direction §The port-candidate criteria itself takes when a verdict is
+  uncertain — the conservative verdict costs a fixture widening and cannot be
+  wrong in the harmful direction, while clearing wrongly ships the hole the
+  criterion exists to point at.
+- **The contingency is ended by making the member self-auditing.** This section
+  gains its **own** enumerated contract over the four arms above and
+  `gate_assertions.rs` carries the matching markers, so the gate reads its own
+  module and the immunity stops being a prose accident. The precedent is
+  §check-comment-tier, which audits its own declaration and whose **fixture pair,
+  not the live tree, is what proves those arms** — the same sentence this member
+  now inherits. The contract and the markers are two copies of one fact **held by
+  the gate itself**, which is the intended coupling rather than a duplication
+  defect: the set-equality arm reads every label at the comparison and the
+  count arm reads the span's size, so no label can exist without a reader by
+  construction. The module carries the matching authoring rule: it is the
+  resolution target of its own contract, so a marker shape in its unit tests is
+  **composed** and never spelled — a literal one would join the module's marker
+  set and red the gate against itself, which is exactly what
+  `native/src/gates/tree_terms.rs` does for the banned-shape set.
+
+**The ordering this forced is stated, because it was not free.**
+§check-gate-substrate-parity assertion A forbids a script and a descriptor
+coexisting in one resolve dir, so the cross-substrate comparison necessarily ran
+on the **pre-descriptor** tree. Therefore the pair widened **first**; parity was
+proved over the **pair**, the only corpus inert under the port; and the enumerated
+contract plus the module markers landed **with** the port, since neither can exist
+before the module does. The **shared-snapshot ordering constraint binds
+independently** and is discharged by none of that: this member's live corpus moves
+whenever **any** of the enumerated contracts' members ports, so criterion 4
+protects the oracle from the member's own port and the ordering protects every
+comparison from a sibling's — independent facts, as §The port-candidate criteria
+already records for `check-gate-fixture-coverage`.
+
+**The pair widened first, and the instrument was ruled rather than left to the
+build.** Measured at spec the pair stood at roughly **two of eight arms**: one
+finding arm of four and one resolution arm of four. One structural cause
+explained most of the darkness — both cases pass a second positional, which
+short-circuits resolution to the *scripts-dir plus `.sh`* branch, so the registry
+walk, the descriptor-to-module redirection and the no-crate skip were reached by
+no case at all, and the **`//` marker leader**, which is the leader every live
+descriptor-declared member actually uses, was covered by nothing. The `args` file
+carries positionals only and cannot set a knob, so opening those arms took one of
+two instruments and the choice is ruled here: a bespoke
+`check-gate-assertions.test.sh` standing up a throwaway mini-consumer, on
+§check-graph's own tree-test precedent, preferred to a per-case config file
+because it reaches the no-crate arm — which needs a tree with **no crate
+manifest**, a state a case dir inside this repository cannot have. The pair took
+the rest: `good/` gained a `//`-led contract in both its plain and its indented
+spelling, and three headings discovery must **exclude** — a non-enumeration noun,
+a first parenthetical that is not a single-char label, and a span of fewer than
+two distinct labels — none of which resolves to any gate file, so each filter is
+proved by **greenness** rather than by absence. `bad/` gained the three finding
+arms and the sub-branch it lacked: an extra-marker set, a count-word disagreeing
+with its own span, an enumerated contract resolving to nothing, and a resolved
+file carrying no marker at all. Every expectation was derived by running the
+case: `run-gate-tests` reds on an `expect.txt` substring **not found**, a
+zero-count red no inspection can clear.
+
+**The parity run's verdict, recorded with the limit the register sets for a
+member binding criterion 4.** Eight comparisons — both fixture cases, the live
+tree with no argument, three live single-spec and scripts-dir variants, the
+missing-spec fail-close and a subdirectory cwd — agreed on stdout, stderr and
+exit code in every one. **Parity is proved over the pair**, the only corpus inert
+under the port; the six live-tree arms are **no disagreement found on the
+pre-descriptor tree**, never parity proved.
+
 Honest residual: the marker catches editing one
 side without the other, but not adding an assertion while forgetting *both*
 its marker and the contract. A first paragraph that embeds the literal pattern
 in example prose self-matches — the failure is loud (a false positive forcing
-a reword), never a silent miss, so it is accepted. Requires GNU awk.
+a reword), never a silent miss, so it is accepted.
 
-**Its port price is `paste`, and the hold it carried is retired.** The rule
-invokes `paste`, which is not on `GATE_SDK_PROGRAM_FLOOR` (§lib/gate.sh), so
-criterion 7 names it — owed port work, a dependency to be designed away or
-replaced, never a permitted exclusion. *How* the requirement surfaced is worth
-keeping and is recorded in that criterion's worked-example prose: the scan
-abandoned this declaration before reaching the call, so the roster reported the
-member clean for its whole life. What changes is the **verdict** on it. The
-invocation is `paste -sd, -`, a comma join over a sorted label set, which is
-class (ii) under criterion 7's hold-worthiness test — the compiled rule spells the
-join directly and the gate's verdict is identical either side of the substitution.
-The member is therefore **takeable and priced**, not held, and its
-`# port-until:` declaration is retired. The **GNU-awk** requirement above rides
-the same reasoning and is named so a later reader does not restore a hold on it:
-`match()`'s third argument is a convenience the port re-expresses in its own
-capture API, not a decision about what this gate asserts. The criterion citation
-stays because the port still owes the work the criterion names.
+**Its port price was `paste`, and the price is paid.** The shell rule invoked
+`paste`, which is not on `GATE_SDK_PROGRAM_FLOOR` (§lib/gate.sh), so criterion 7
+named it — owed port work, a dependency to be designed away or replaced, never a
+permitted exclusion. *How* the requirement surfaced is worth keeping and is
+recorded in that criterion's worked-example prose: the scan abandoned this
+declaration before reaching the call, so the roster reported the member clean for
+its whole life. The invocation was `paste -sd, -` at four sites, a comma join
+over a sorted label set, which is class (ii) under criterion 7's hold-worthiness
+test — the compiled rule spells the join directly and the verdict is identical
+either side of the substitution. The **GNU-awk** requirement rode the same
+reasoning: `match()`'s third argument was a convenience the port re-expressed in
+the crate's own matcher, and the re-expression cost no new API, because all three
+of its sites wanted the *whole* match span that §The POSIX ERE matcher's
+`RSTART`/`RLENGTH` pair already reports. Neither was ever a hold, and this member
+declared no `# port-until:` on either ground.
+
+**The gawk floor's residue is empty after this port, and that is measured rather
+than inherited.** gate-sdk/SPEC.md carried the residual `gawk` floor as this
+member's **and** §check-action-run-shell's. Probed at the cut with a `gawk
+--posix` shim on `PATH`, which refuses every gawk extension: this member's rule
+died on it — *match: third argument is a gawk extension*, exit 2 — and
+`check-action-run-shell` ran **clean**, holding no gawk extension at all. Its own
+declaration's `Requires GNU awk (3-arg match)` header is stale: the file carries
+two-argument `match()` only. So the floor had **one** live holder, this one, and
+the port retires it. What is *not* changed here is the published requirement:
+`awk (GNU)` is an element of `context-kit/lib/toolfloor.sh`'s probe roster held to
+docs/install.md §Requirements by `check-install-toolchain`, and narrowing a
+user-facing requirement is not this port's to rule. The narrowing is filed
+(`interpreter-floor-gawk-residue-empty`) rather than taken.
 
 ### check-gate-substrate-parity
 
@@ -10060,8 +10287,17 @@ and for the same reason the two form one cohort: the declaration path is
 proved byte-identical to the deleted shell gate. One consequence is worth naming
 because the deleted file was where it was recorded: the shell implementation
 required GNU awk's 3-argument `match()`, and the compiled one requires no awk at
-all. The residual `gawk` floor is §check-gate-assertions' and
-§check-action-run-shell's, not this gate's (docs/install.md §Requirements).
+all. The residual `gawk` floor was §check-gate-assertions' and, on its own
+declaration's word, §check-action-run-shell's — never this gate's. **Both halves
+of that residue are now gone, and the second was measured rather than inherited**:
+the eighth budget batch ported §check-gate-assertions, and probing
+§check-action-run-shell under a `gawk --posix` shim ran it **clean**, so its
+`Requires GNU awk (3-arg match)` header is stale and it holds no gawk extension at
+all. What is *not* changed on that finding is the published requirement:
+`awk (GNU)` is an element of `context-kit/lib/toolfloor.sh`'s probe roster held to
+docs/install.md §Requirements by `check-install-toolchain`, and narrowing a
+user-facing requirement is filed rather than taken in passing
+(§check-gate-assertions).
 
 ### check-commit-msg
 

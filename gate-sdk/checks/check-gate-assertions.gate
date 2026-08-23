@@ -1,0 +1,3 @@
+# graph: couples=kit:SPEC.md,scripts/*.sh,kit:*.sh,native/src/gates/*.rs,kit:checks/*.sh,kit:checks/*.gate dir=bi valve=none tier=align-only
+# install: zero-config
+# spec: gate-sdk/SPEC.md §check-gate-assertions — couple each §<gate> enumerated-assertion span+count to the gate code's `# assertion` markers

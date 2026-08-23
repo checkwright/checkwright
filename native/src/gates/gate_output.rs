@@ -16,8 +16,9 @@ fn members(text: &str) -> Vec<String> {
 }
 
 // spec: gate-sdk/SPEC.md §lib/gate.sh — `gate_resolve`: dirs consumer-first, `.sh` before `.gate`
-// within a dir
-fn resolve(name: &str, dirs: &[String]) -> Option<String> {
+// within a dir. Shared with `check-gate-assertions`, which reaches the same declaration through
+// the same registry path, rather than copied into a second implementation that could drift.
+pub(super) fn resolve_declaration(name: &str, dirs: &[String]) -> Option<String> {
     for d in dirs {
         for ext in ["sh", "gate"] {
             let p = format!("{}/{}.{}", d, name, ext);
@@ -32,7 +33,7 @@ fn resolve(name: &str, dirs: &[String]) -> Option<String> {
 // spec: gate-sdk/SPEC.md §lib/gate.sh — `gate_native_module`: the implementation module a
 // .gate-dispatched member's rule lives in, derived from the gate name by the crate's own
 // convention rather than held in a second registry that could drift from it
-fn native_module(crate_dir: &str, gate: &str) -> String {
+pub(super) fn native_module(crate_dir: &str, gate: &str) -> String {
     let stem = gate.strip_prefix("check-").unwrap_or(gate).replace('-', "_");
     format!("{}/src/gates/{}.rs", crate_dir, stem)
 }
@@ -123,7 +124,7 @@ pub fn run(args: &[String]) -> i32 {
     let mut runtime = 0usize;
     for m in &members {
         total += 1;
-        let Some(src) = resolve(m, &resolve_dirs) else {
+        let Some(src) = resolve_declaration(m, &resolve_dirs) else {
             missing.push(format!(
                 "{} (source resolves in none of: {})",
                 m,

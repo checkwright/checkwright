@@ -13,6 +13,7 @@ pub mod commit_subject;
 pub mod doctrine_registration;
 pub mod deprecation_task;
 pub mod docs_cmd;
+pub mod gate_assertions;
 pub mod gate_exemption_tasks;
 pub mod gate_fail_closed;
 pub mod gate_binary_fresh;
@@ -1322,6 +1323,20 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_NATIVE_BIN",
             "GATE_SDK_NATIVE_CRATE",
             "GATE_KIT_ROOTS_REL",
+        ],
+        "gate-sdk",
+    ),
+    // spec: gate-sdk/SPEC.md §check-gate-assertions — no walk root: the corpus is the kit SPEC
+    // set at fixed paths, and each heading resolves through the registry rather than through a
+    // tree walk. The three knobs are §check-gate-output's, because the resolution is the same one.
+    (
+        "check-gate-assertions",
+        gate_assertions::run,
+        &[],
+        &[
+            "GATE_SDK_GATES_DIR",
+            "GATE_KIT_ROOTS_HERE",
+            "GATE_SDK_NATIVE_CRATE",
         ],
         "gate-sdk",
     ),
