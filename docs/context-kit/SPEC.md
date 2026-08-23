@@ -309,9 +309,9 @@ The constrained members and what forces each:
   consumer below it cannot run the battery at all. Recorded here because the
   earlier `4.0` was a fail-open: `env-probe` reported `ok` on a 4.2 box the
   battery would fail with an obscure syntax error.
-- `awk::GNU` — no version floor, one implementation constraint: the 3-arg
-  `match()` in `check-gate-assertions`, whose dependency gate-sdk/SPEC.md
-  §check-gate-assertions already owns.
+- `awk::GNU` — no version floor, one implementation constraint, whose last live
+  holder the eighth port cut retired; narrowing the element is filed as
+  `interpreter-floor-gawk-residue-empty` (gate-sdk/SPEC.md §check-gate-assertions).
 - `sort::coreutils` — no version floor, one implementation constraint, and one
   member standing for a whole package family: GNU coreutils is forced by
   `realpath --relative-to` and its `-m` form (gate-sdk's shared gate library and

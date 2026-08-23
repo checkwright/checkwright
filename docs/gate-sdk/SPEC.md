@@ -7751,8 +7751,9 @@ member's **and** §check-action-run-shell's. Probed at the cut with a `gawk
 --posix` shim on `PATH`, which refuses every gawk extension: this member's rule
 died on it — *match: third argument is a gawk extension*, exit 2 — and
 `check-action-run-shell` ran **clean**, holding no gawk extension at all. Its own
-declaration's `Requires GNU awk (3-arg match)` header is stale: the file carries
-two-argument `match()` only. So the floor had **one** live holder, this one, and
+declaration's `Requires GNU awk (3-arg match)` header was stale — the file carries
+two-argument `match()` only — and was deleted at that iteration's close. So the
+floor had **one** live holder, this one, and
 the port retires it. What is *not* changed here is the published requirement:
 `awk (GNU)` is an element of `context-kit/lib/toolfloor.sh`'s probe roster held to
 docs/install.md §Requirements by `check-install-toolchain`, and narrowing a
@@ -10395,7 +10396,8 @@ declaration's word, §check-action-run-shell's — never this gate's. **Both hal
 of that residue are now gone, and the second was measured rather than inherited**:
 the eighth budget batch ported §check-gate-assertions, and probing
 §check-action-run-shell under a `gawk --posix` shim ran it **clean**, so its
-`Requires GNU awk (3-arg match)` header is stale and it holds no gawk extension at
+`Requires GNU awk (3-arg match)` header was stale — deleted at that iteration's
+close — and it holds no gawk extension at
 all. What is *not* changed on that finding is the published requirement:
 `awk (GNU)` is an element of `context-kit/lib/toolfloor.sh`'s probe roster held to
 docs/install.md §Requirements by `check-install-toolchain`, and narrowing a
