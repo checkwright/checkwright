@@ -5,7 +5,7 @@
 # spec: gate-sdk/SPEC.md §check-action-run-shell — every GitHub Actions `run:` literal block scalar in an Actions-shaped YAML file is ShellCheck-clean at -S warning under the dialect the step actually runs
 #
 # usage: check-action-run-shell.sh [scan-root]
-#   scan-root: the walked tree (default '.'). Requires GNU awk (3-arg match).
+#   scan-root: the walked tree (default '.').
 set -uo pipefail
 
 SDK="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

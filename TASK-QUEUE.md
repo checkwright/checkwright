@@ -3796,6 +3796,11 @@
   records the data and does not re-tier. That question is itself the calibration this entry is
   about — the revert trigger is defined on the round-trip, and this iteration is the case where
   the two readings come apart.
+  **Third reading, `leak-guard-and-assertion-meta-gate-port` (2026-08-23): the second reading
+  again, at five for five.** Every build batch found its amendment's stated *tree behaviour*
+  wrong while its *ruling* was right — batch 4 carried three in one amendment, one of which
+  would have refused the exact command its own rule exists to grant, each settled by one probe.
+  recurrence: align-checklist-fanout-calibration 2026-08-23
   **Cost while deferred:** align keeps returning a clean verdict that build then falsifies, so
   the stage's signal value decays toward zero while its cost does not — and a zero-divergence
   pass is read as evidence the amendments were right.
@@ -7609,6 +7614,178 @@
   next design step cannot honestly be taken without this answer.
   Filed 2026-08-22 by build; drained at that iteration's close, which verified the key set
   directly against the committed hook's log.
+
+- **criterion-4-two-spellings-disagree** [design-pending] — one port criterion is stated in two
+  spellings that give opposite verdicts on the same member.
+  **Both sentences sit inside gate-sdk/SPEC.md §The port-candidate criteria, criterion 4.** One
+  binds where "a registry member's declaration path lies inside the corpus the gate scans as
+  content"; the other where the corpus reaches "the gate's own declaration path". Under the
+  first, `check-gate-assertions` bound today, pre-port, in every configuration — eight of its
+  nine live enumerated contracts already resolved their markers out of `native/src/gates/*.rs`.
+  Under the second it cleared, because §check-gate-assertions carries no
+  count-word-plus-labelled-span and so its own heading is filtered out.
+  **The eighth cut settled the member and deliberately did not settle the criterion** — it took
+  the conservative binding verdict and ended the member's contingent immunity by making it
+  self-auditing; widening the spine past the ruled unit set was refused, and §The port-candidate
+  criteria records the non-reconciliation in its own prose, citing this slug.
+  **Why `[design-pending]`:** picking a spelling changes that section's own rule with reach
+  across every registry member, so the deliverable is the reconciliation plus a re-read of every
+  member's criterion-4 verdict under the chosen spelling — the re-read is the unsized half.
+  **Cost while deferred:** the divergence outlives the cut, and the next gate-source auditor
+  meets a criterion that answers its own question two ways.
+  Filed 2026-08-23 by the lead on spec's finding; drained at that iteration's close, which
+  re-read both spellings in place and confirmed the SPEC still cites this slug as the filing.
+
+- **backgrounded-shell-child-run-record-unenforced** [design-pending] — the launch-time liveness
+  record is advised and never required.
+  **The drain corrected this finding's premise.** It was filed claiming "prompts request, guards
+  enforce, and here only the prompt exists". guard-kit generic rule 15
+  (`guard_rule_background_no_record`) had landed the day before, on 2026-08-22, and does fire on
+  the write side — but what it calls is `guard_advise`, additional context at exit 0, never
+  `guard_block`. The gap is an advisory that is not a floor, not an absent rule.
+  **Attested this iteration:** the align stage session backgrounded two full gate-battery runs
+  and wrote no `.run` record for either, self-reporting the omission afterward. No harm resulted
+  — it awaited each completion notification before any git-writing command — but the omission was
+  invisible to every other actor: the lead, reading the scratch dir for liveness at that moment,
+  could not distinguish a finished producer from one that never registered. Generic rule 14's
+  block on index/worktree/ref-writing git commands is a no-op against a producer that never
+  announced itself.
+  **Why `[design-pending]`:** promoting the advisory to a block needs a detection shape a guard
+  can hold — it cannot read whether a command *will* write the record without inspecting its
+  text, the same text-shaped limit `wait-loop-exemption-blind-behind-a-script-name` records on
+  the exemption side. A session-end check over the scratch dir is the other candidate and has no
+  false-positive budget yet.
+  **DISTINCT from `session-mechanic-grants-uncommitted`**, whose subject is an out-of-band
+  permission decision on the journal-append write path — a grant question, not this enforcement
+  one; it is cited as the adjacent surface only and is not re-filed here.
+  **Cost while deferred:** rule 14's reach stays opt-in on the launching session's diligence, so
+  a commit can be taken beside a live producer that never announced itself.
+  Filed 2026-08-23 by the lead; drained at that iteration's close, which dated rule 15 against
+  the filing and read `guard_advise` to establish that it never blocks.
+
+- **interpreter-floor-gawk-residue-empty** [design-pending] — the published GNU-awk requirement
+  outlives the last gate that held it.
+  **Measured, not reasoned.** Probed at the eighth port cut with a `gawk --posix` shim on PATH,
+  which refuses every gawk extension: `check-action-run-shell.sh` ran clean at exit 0, holding no
+  gawk extension at all; `check-gate-assertions.sh` died loudly ("match: third argument is a gawk
+  extension", exit 2) and was the floor's only live holder. That member ported at this cut, so
+  the shell residue is empty. gate-sdk/SPEC.md §check-gate-assertions and the interpreter-floor
+  claim at §check-action-gh-repo now record the measurement, and the stale header on
+  `check-action-run-shell.sh` was corrected at this close.
+  **What the cut did NOT change, and this entry owns.** `awk::GNU` is still an element of
+  `context-kit/lib/toolfloor.sh`'s probe roster, held to docs/install.md §Requirements by
+  `check-install-toolchain` in both directions — and that section still justifies the requirement
+  by "the 3-argument `match()` in `check-gate-assertions`", which the port retired. The stated
+  ground is dead while the requirement stands.
+  **Why `[design-pending]`:** narrowing a user-facing requirement is an envelope change, so the
+  deliverable is a decision — narrow `awk (GNU)` to `awk`, or drop awk from the floor entirely —
+  taken only after re-probing every remaining shell gate and both generated hooks under
+  `--posix`. The docs/install.md edge is operator-class; the re-probe is not.
+  **Cost while deferred:** an adopter is told to install gawk for a requirement no gate holds,
+  which is the dependency floor TRAJECTORY.md objective 1 exists to collapse, over-stated by
+  exactly one tool — and the reason given for it is now demonstrably retired.
+  Filed 2026-08-23 by build; drained at that iteration's close, which re-read the probe roster
+  and found docs/install.md's stated ground retired by the same cut that emptied the residue.
+
+- **guard-rule-number-intra-kit-citations-ungated** [design-pending] — guard-kit cites its own
+  rule numbers everywhere and nothing holds a single citation to the ruleset.
+  **Measured at the rule-17 insertion, 2026-08-23**, which shifted rules 17-21 to 18-22: the
+  kit's own surfaces carry 111 `rule N` citations — SPEC.md 63, `lib/guard.sh`'s `spec:` comments
+  17, `guard-tests/cases.tsv` 28, `bin/run-guard-tests.sh` 3 — and no gate matches any of them.
+  The amendment authoring the change enumerated six sites; the sweep found roughly five times
+  that, and the merge was correct only because the sweep was run instead of the enumeration
+  trusted.
+  **Worse, one number-bearing roster was already stale and no renumber caused it:** SPEC.md's
+  raw-vs-skeleton paragraph named two rules that carry no raw-command test and omitted three that
+  do, drifting silently from the function bodies until it was re-derived against them at build.
+  **Why `[design-pending]`:** the corpus is bounded and the numbering is derivable from the
+  numbered list, so a gate could assert that every intra-kit `rule N` resolves to an existing
+  item and that the derivable rosters — which rules take the raw command, which read a skeleton —
+  match the bodies. Which claims are derivable and which are prose is the open question.
+  **DISTINCT from `guard-rule-number-not-citable-outside-kit`**, whose dispositions are about
+  cross-corpus prose *outside* the kit and which therefore leaves intra-kit numbers citable and
+  ungated by construction; and from `guard-ruleset-registration-lockstep`, whose subject is the
+  roster/function/dispatch-order triple agreeing, not what cites a rule by number.
+  **Cost while deferred:** every insertion into the ruleset re-buys a hand sweep whose
+  completeness nothing checks, and a stale roster reads as authoritative to the next author —
+  which is exactly how the raw-vs-skeleton one survived.
+  Filed 2026-08-23 by build; drained at that iteration's close, which re-counted the citations
+  and confirmed no gate matches them.
+
+- **wait-loop-grant-lost-its-carrier** [design-pending] — the mandated in-turn wait's grant is
+  owned by no queue entry, and became unowned by a completion rather than by a ruling.
+  **`session-mechanic-grants-uncommitted` carried it** as the third member of its class — 19
+  measured out-of-band calls across two sessions in this iteration alone, every one a
+  `kill -0 "$pid"` loop condition that a `Bash(...)` glob provably cannot match, because the
+  mandated form *is* a loop condition and so is decorated by construction. That entry's promotion
+  deliberately excluded the wait-loop grant, sequencing it behind the wait-primitive measurement
+  on the stated ground that a grant minted around the currently-sanctioned form would be shaped
+  to a primitive the measurement might correct. The exclusion was right and is not questioned.
+  **What the sequencing did not account for** is that the entry itself completed at this build
+  and moved to Done, so the grant lost its carrier. The refusal survives at guard-kit/SPEC.md
+  §The generic ruleset rule 17 — but a SPEC paragraph is not a work item.
+  **The precondition is discharged.** The measurement returned at that same build: the ordering
+  stands and the polarity was the bug, so rule 17 now records that a grant is shaped to
+  `while kill -0 "$pid" …` as well as `until <cond> …`. Nothing here needs re-deriving.
+  **Why `[design-pending]` rather than ready-to-build:** the deliverable is guard-kit code and is
+  landable by a stage session — rule 17's own landing demonstrated that end to end — but the
+  grant's shape (a rule 6 narrowing, a new generic rule, or a raw-command exemption) is unruled.
+  **DISTINCT from `turn-end-chokepoint-and-wait-primitive`**, the measurement half, whose
+  completion is this entry's precondition rather than this work; and from
+  `overlay-only-oracle-grants-uncommitted`, the parent's other split half, whose subject is four
+  Rust/gh toolchain oracles and not the wait form.
+  **Cost while deferred:** rule 6 decides the mandated `kill -0 "$pid"` loop out of band on
+  *every* call — roughly nineteen decisions per iteration for a mechanic the methodology
+  mandates — and the price is now invisible to scope because no entry carries it.
+  Filed 2026-08-23 by build and ruled by the lead to stay a filed gap for this drain; drained at
+  that iteration's close, which confirmed rule 17 carries the discharged precondition.
+
+- **wait-loop-exemption-blind-behind-a-script-name** [design-pending] — guard rule 15's wait-loop
+  exemption is command-text-shaped, so a wait loop inside a script draws the advisory anyway.
+  **Measured 2026-08-23 at build:** eight backgrounded arms of
+  `delegation-kit/bin/wait-probe.sh`'s waiter — whose body *is* `until <cond>; do sleep 1; done`
+  — each drew the recording advisory, whose own closing sentence says a backgrounded wait loop
+  "owns no work a commit could corrupt and owes no record".
+  **Why:** the exemption is detected by the `do … done` span walk
+  `guard_rule_background_no_record` performs over the skeletonized command text; at `PreToolUse`
+  the script body is not readable, so the span walk cannot see it. That is the honest limit of a
+  text-shaped predicate rather than a bug — but the population is not marginal: a reusable wait
+  helper is exactly the shape a methodology that mandates in-turn waiting will grow, and every
+  invocation of one pays an advisory saying the opposite of what the rule means.
+  **Why `[design-pending]`:** the two candidate dispositions are uncosted and point opposite ways
+  — widen the exemption to a leading roster member whose name the consumer declares, which rule
+  15 explicitly refuses as consumer vocabulary; or accept the limit and say so in the rule's own
+  honest-limit paragraph so the next reader does not re-derive it.
+  **DISTINCT from `backgrounded-shell-child-run-record-unenforced`**: that entry is the false
+  negative — the advisory is not a floor — and this one the false positive, where the exemption
+  cannot see through a script name. One text-shaped predicate, two opposite failures, two fixes.
+  **Cost while deferred:** the advisory's credibility decays — a session that meets it wrongly
+  once learns to read past it, which is the erosion that makes an unenforced rule cheap.
+  Filed 2026-08-23 by build; drained at that iteration's close, which read the span walk to
+  confirm the limit is structural rather than a detection bug.
+
+- **kit-spec-layout-tree-hand-maintained** [design-pending] — every kit SPEC's Layout tree block
+  is a hand-maintained roster of the kit's own filesystem, and no gate asserts it matches.
+  **Found 2026-08-23 at build** by a contract sweep before adding
+  `delegation-kit/bin/wait-probe.sh`: every `bin/`, `lib/`, `checks/`, `gate-tests/`,
+  `templates/` and `smoke/` member is listed by hand with an inline annotation, and a member
+  added without editing the block reds nothing. The population is the whole kit set, not
+  delegation-kit alone.
+  **This is a derivation-first defect by the doctrine's own words** — a roster is derivable, so
+  it is derived and freshness-gated, never maintained. What makes it worth an entry rather than
+  absorbing is the direction of the silent failure: an omitted member leaves the SPEC
+  *understating* what the kit ships, which is exactly the surface a vendoring consumer reads to
+  know what it got.
+  **Why `[design-pending]`:** the obvious shape is a marker-block projection emitted from the
+  filesystem with a byte-gate, as ROADMAP.md and the docs mirror already take — but the
+  annotations are hand-authored prose per line, so the emitter has to preserve them across a
+  regeneration. That is the design question and the reason this is not mechanical.
+  **DISTINCT from `check-readme-roster`**, whose subject is the README's gate roster and which
+  reaches no `bin/` or `templates/` member.
+  **Cost while deferred:** every kit-member addition re-buys a hand edit nothing checks, on the
+  surface a consumer trusts to enumerate what it vendored.
+  Filed 2026-08-23 by build; drained at that iteration's close, which confirmed no gate reads
+  the block.
 
 ## Icebox
 

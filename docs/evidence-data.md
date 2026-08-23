@@ -107,3 +107,4 @@
 | ruled-grant-surface-and-launch-chokepoint | sc sp a b v c | 7f/1d | 3 · ≤0d | 31s 1✗ | 104 |
 | substrate-claim-and-update-target-coverage | sc sp a b v c | 4f/1d | 2 · ≤0d | 24s clean | 106 |
 | hold-ground-oracle-and-takeable-holds | sc sp a b v c | 3f/0d | 2 · ≤1d | 24s clean | 106 |
+| leak-guard-and-assertion-meta-gate-port | sc sp a b v c | 6f/1d | 4 · ≤0d | 24s clean | 106 |
