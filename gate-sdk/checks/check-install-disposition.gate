@@ -1,0 +1,3 @@
+# graph: couples=kit:checks/check-*.sh,kit:checks/check-*.gate,kit:smoke/install.sh,installer/lib/common/recipe.sh dir=one valve=none tier=precommit
+# install: zero-config
+# spec: gate-sdk/SPEC.md §check-install-disposition — every shipped gate declares one install disposition, every zero-config gate is registrable in its kit's smoke, and the installer keeps no second copy of the roster

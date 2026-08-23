@@ -47,6 +47,7 @@ pub mod gap_inbox_neutrality;
 pub mod hook_exec_bit;
 pub mod identity;
 pub mod install_claim;
+pub mod install_disposition;
 pub mod kit_registration;
 pub mod knob_citation;
 pub mod knob_default_coupling;
@@ -1475,6 +1476,17 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_KIT_ROOTS_HERE",
             "GATE_SDK_NATIVE_CRATE",
         ],
+        "gate-sdk",
+        &[("git", "")],
+    ),
+    // spec: gate-sdk/SPEC.md §check-install-disposition — one `?` for the one root per kit root,
+    // a set the registry cannot name concretely; `git` for the toplevel the positional root falls
+    // back to, which the fixture cases pass their own root instead of reaching.
+    (
+        "check-install-disposition",
+        install_disposition::run,
+        &[("?", "")],
+        &["GATE_KIT_ROOTS_HERE"],
         "gate-sdk",
         &[("git", "")],
     ),

@@ -1,0 +1,3 @@
+# graph: couples=scripts/zeta.list dir=one valve=none tier=precommit
+# install: zero-config
+# spec: alpha-kit/SPEC.md §check-zeta — a descriptor-declared member reaching an adopter at install, whose name the kit's smoke roster never carries: the second declaration spelling is read as content, and its extension is stripped before the roster lookup

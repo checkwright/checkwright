@@ -1,1 +1,2 @@
 check-delta.sh: 0 '# install:' line(s) where a gate declares exactly one
+check-zeta.gate: declares zero-config but alpha-kit/smoke/install.sh does not register it

@@ -1,1 +1,2 @@
 INSTALL-DISPOSITION: clean
+recipe de-literalization checked: no

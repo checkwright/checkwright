@@ -235,6 +235,28 @@ pre-descriptor tree — a corpus this port then changes. The verdict is recorded
 **no disagreement found on the pre-descriptor tree**, never as *parity proved*,
 on the demotion §The port-candidate criteria records for exactly this shape.
 
+**Corrected at build, 2026-08-23 — the demotion above did not have to be taken,
+and the executed verdict is the undemoted one.** Assertion A binds a *resolving*
+name. Restoring the pre-port rule inside the resolve dir under a name outside the
+`check-*` glob — so no registry member resolves to it — puts both implementations
+over the **post**-descriptor corpus, the one the port actually produces. That is
+what ran: byte-identical stdout, stderr and exit code across the live tree, both
+fixture cases, and the two fail-closed arms no committed fixture can carry
+(absent root; no positional root outside a checkout). The correction is recorded
+in §The port-candidate criteria, criterion 4 with its bound — a port that also
+moves a *sibling* member's corpus keeps the demotion — so a later delta reads the
+true premise rather than re-deriving it.
+
+**Also corrected: "no external program" is true of the *floor* and not of the
+member.** `check-install-disposition.sh:17` runs `git rev-parse --show-toplevel`
+when no positional root is given; `git` is on `GATE_SDK_PROGRAM_FLOOR`, which is
+why `c7` reads `clean`. The compiled form keeps that spawn through
+`fresh::toplevel()` and **declares `git`** in its registry tuple, which delta 1's
+unit test A forces. Unlike delta 4's `gate_authoring_tree` case this one is
+visible in the member's own text, so it is not a third instance of the
+shared-library blind spot; the blind spot was checked here and is empty
+(`gate_kit_roots` and `fail_closed` spawn nothing).
+
 ### (4) `check-gate-substrate-parity` ports, and ends its own `c7=?`
 
 The auditor of the dispatch relation — `lines=459`, the largest member in the

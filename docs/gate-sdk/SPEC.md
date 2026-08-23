@@ -1058,7 +1058,7 @@ answering a question assertion C never asked.
 | `check-value-rollup-fresh` | **Survives unchanged in mechanism, and is itself `.gate`-dispatched** since §The consumer remainder cohort — so this row now describes a ported member reading ported members' declaration paths. It reads them as text through the footprint emitter, a non-gate arm this gate calls in-process (§The non-gate arm), and the declaration path is what that emitter reads — which is why the port moves nothing about its rule. What the port *did* move is one term of its coupling, recorded because the re-derivation confirmed it rather than assuming it: its `couples=` names `scripts/*.sh,kit:*.sh`, and after that cohort emptied the consumer's gates directory of check scripts, `scripts/*.sh` covers **no** registry member's declaration path at all. The member stays substrate-sensitive through `kit:*.sh` alone. A narrowing is not a clearance — `scripts/` retains many non-gate `*.sh`, and the coupling still earns its trigger — but a later reader deriving the set must not read the `scripts/*.sh` token as the thing that selects this row. |
 | `check-gate-binary-fresh` | **Retained by construction — and recorded here before the derivation reaches it, deliberately.** It reads declaration paths as a *set*, to decide whether the binary is load-bearing, and never reads a gate's source, so a port is its trigger rather than its blind spot: a ported member is exactly the case that switches it on. Its couples name `kit:checks/*.gate` specifically, so it was **not yet substrate-sensitive** by assertion C's runtime derivation when this row was written, with zero descriptors then on disk, and the row was not yet owed — it was written ahead of the trigger rather than left to be discovered. The first cohort's descriptors have since landed, so the gate is sensitive and the row is owed; the commit that landed them would have reddened on a missing disposition, and that commit's session was the worst possible one to be learning this table exists. That is the foresight paying, and it is the same reasoning as the gate itself: the oracle ahead of the hole (§check-gate-binary-fresh). |
 | `check-gate-substrate-parity` | **Retained by construction, and `.gate`-dispatched since `shell-gate-tail-port`** — it is substrate-sensitive by the same derivation it performs, and it reads declaration paths both as text and as a *set*, which is precisely what it exists to see, so this row now describes the auditor of the dispatch relation auditing itself. It ported under the 2026-08-23 ruling that retired born-native exception class (a): the shell form already read one side of its comparison through `--list`, so the auditor's independence from the binary was never more than the absent-binary case, which the fail-closed contract owns — and compiled, that case has no reachable input, the binary being the process the assertion runs in. The port moves nothing in the rule: the descriptor set is still globbed off the resolve dirs and the roster is still the binary's, reached in process rather than through a spawn (§check-gate-substrate-parity). Its own row is written out rather than left to the section's prose mention: assertion C is satisfied by any occurrence of a member's name in this section, and a gate passing its own assertion by being *discussed* is a coincidence, not a disposition. |
-| `check-install-disposition` | **Retained, and substrate-blind by construction** — it reads both declaration spellings as text, taking the `# install:` header line off a `.gate` descriptor exactly as off a `.sh` implementation, because a ported gate is still a gate a kit ships and its disposition is a property of the gate rather than of its substrate (§The install disposition). A port therefore moves nothing here: the declaration travels with the descriptor, which is the same file the installer's payload already carries. It **ports** with its sibling auditor under the 2026-08-23 ruling, owed to `shell-gate-tail-port`: the assertion that a gate declares itself is a text walk over both declaration spellings, and a binary that is absent cannot pass it silently — the battery exits 2 rather than skipping (§Fail-closed contract). |
+| `check-install-disposition` | **Retained, and substrate-blind by construction** — it reads both declaration spellings as text, taking the `# install:` header line off a `.gate` descriptor exactly as off a `.sh` implementation, because a ported gate is still a gate a kit ships and its disposition is a property of the gate rather than of its substrate (§The install disposition). A port therefore moves nothing here: the declaration travels with the descriptor, which is the same file the installer's payload already carries. It is **`.gate`-dispatched since `shell-gate-tail-port`**, ported with its sibling auditor under the 2026-08-23 ruling: the assertion that a gate declares itself is a text walk over both declaration spellings, and a binary that is absent cannot pass it silently — the battery exits 2 rather than skipping (§Fail-closed contract). What its own port moved is one number rather than any part of its rule — its clean line counts one fewer `.sh` and one more `.gate`, which is the substrate-blindness above measured rather than asserted. |
 | `check-docs-cmd`, `check-install-claim`, `check-payload-claim`, `check-queue-slug-liveness` | **Survive unchanged — reverse triggers.** Each names `scripts/*.sh`/`kit:*.sh` in `couples=` only so that a script change re-runs it; the corpus each actually scans is the governed-doc set, and none reads a gate script's *content* as its assertion target. `check-docs-cmd` is worth naming: it will correctly — not vacuously — red on a doc still fencing a deleted `.sh` path after a port. That is real signal. Every member of this row is a ported one — `check-queue-slug-liveness` since the queue-kit cohort, `check-docs-cmd` since the canon-kit one, and the remaining pair since the ERE cohort — so the row describes `.gate`-declared gates throughout; the reasoning is unaffected, because what they scan is the governed-doc set rather than any gate's content. |
 | `check-settings-paths` | **Survives unchanged — reverse trigger, and a port is its subject rather than its blind spot.** Its `couples=` names `kit:checks/*.sh` only so that a check-script edit re-runs it; what it scans is the committed permission allow-list, never a gate script's content. A port is the event it exists for: replacing `checks/<gate>.sh` with a descriptor strands every allow entry naming the old path, so the gate reddens *because* of a port rather than falling silent after one — the shape `check-docs-cmd` has in the row above. Two limits are recorded rather than left to be re-derived. The glob is deliberately not widened to `*.gate`, because a descriptor path is not something a `Bash(…)` grant invokes and the widening would add no assertion. And the trigger is a **partial route by construction**: the generated hook matches staged `ACMR` paths, so a *deleted* `.sh` never fires it; what catches a cohort's stranded grants is the whole-tree battery, which runs with no trigger filter. The trigger still earns its place — it catches the ordinary edit that strands a grant — but it is not what makes the gate's landing order necessary (context-kit/SPEC.md §check-settings-paths). **This member is itself `.gate`-dispatched from the settings cohort**, so the row describes a ported gate: the reverse trigger and both limits above are properties of its rule, not of its substrate, and survived the port unchanged. |
 | `check-prose-enum` | **Corpus extended to the Rust module — it was never a pure reverse trigger.** This gate was grouped with the reverse triggers above on the ground that none of them reads a gate's *content*; that ground was **false for this one**, and the queue-kit port is what exposed it. Its enum derivation (`scripts/enum-sets.sh`) reads the queue tag vocabulary out of `check-tag-lead-line`'s own class table, deliberately — *"read from the gate rather than re-listed here, so a rename cannot leave the two spellings disagreeing"* — so deleting that gate's script broke the derivation and the gate exited 2 rather than passing vacuously, which is the fail-closed behavior working. The corpus follows the rule to where it now lives, `native/src/gates/tag_lead_line.rs`'s `CLASSES` table, keeping the read-from-the-owner property and its one-table fail-closed anchor. **The gate is itself a ported member since the canon-kit cohort**, so a gate whose input is a gate's content is now gate content — and its own derivation crosses the bridge as *data*, which is what keeps the compiled form from spawning the emitter it reads. |
@@ -1569,7 +1569,15 @@ design time; the last three were paid for, and each is named with what it cost.
    on the pre-descriptor tree — a corpus the port then changes, with no second
    implementation left to notice a disagreement. The arm is retained, because it is
    cheap and it finds real disagreements; its verdict is recorded as **no
-   disagreement found on the pre-descriptor tree**, never as *parity proved*. The
+   disagreement found on the pre-descriptor tree**, never as *parity proved*.
+   **The demotion is escapable, and `shell-gate-tail-port` is where it was
+   escaped**: assertion A binds a *resolving* name, so restoring the pre-port rule
+   under a name no registry member resolves to lets both implementations run over
+   the **post**-descriptor corpus — the corpus the port actually produces — and a
+   member taking that route records *parity proved* on the live tree rather than
+   the demoted verdict (§check-install-disposition). Where the port also moves a
+   *sibling* member's corpus the demotion still stands, because there the two
+   implementations read two different trees. The
    edge-root arm keeps its own separate value and the comment cohort is the worked
    case: it disagreed, and the compiled side was the correct one — a `..` scan root
    made the shell's kit-root prune compare an unnormalised file path against a
@@ -9155,6 +9163,43 @@ disposition.
 Fail-closed on a non-repo cwd with no root argument, an unreadable gate header,
 an empty kit roster, or kit roots that enumerate no gate at all. Configuration
 reuses `GATE_SDK_KIT_DIRS`; the gate adds no knob of its own. `precommit` tier.
+
+**Its implementation is a compiled subcommand** since `shell-gate-tail-port` —
+declaration path `check-install-disposition.gate`, rule out of the gate binary,
+the shell original deleted. All four fail-closed arms above survive the port; what
+the port narrows is what the positional root is *for*. The kit roots arrive over
+the config bridge already spelled against the invoking directory (§lib/gate.sh),
+so the compiled form anchors them there, and the root argument — with the git
+toplevel it falls back to, which is this member's one declared external program —
+anchors the installer recipe alone. Every invocation in this tree runs at the
+directory the roots were spelled against, so the two anchors coincide; a caller
+passing a root that is not its cwd reads the recipe there and the kit roots where
+it stands.
+
+**Criterion 4 binds, and the fixture pair is what discharges it** (§The
+port-candidate criteria, criterion 4): every registry member's declaration path
+lies inside the corpus this gate scans as content — its own included, and in both
+spellings. The pair carries the four arms of that derivation: a `.sh`-declared
+member, a `.gate`-declared one, a **mixed** kit holding both, and assertion C's
+absent-recipe skip. The skip is carried by `good/`, which ships no installer at
+all — the vendored-consumer shape — while `bad/` carries the literal-roster
+finding beside a `§`-prefixed citation that registers nothing. The `.gate` arm is
+a **finding** rather than a silent count on purpose: a descriptor the sweep counts
+but never reports would leave the second glob asserted by nothing, which is the
+`.gate`-arm-exercised-by-no-case defect the README-roster widening already named.
+What a pair cannot assert is an absence, so the `§`-stripping and the
+`# install:`-with-no-value reading are held by crate unit tests beside the rule.
+
+**The live-tree arm did not have to be demoted here, and the technique is why.**
+Criterion 4 records that arm as smoke for a gate-source member, because
+§check-gate-substrate-parity assertion A forbids a descriptor and a script
+coexisting in one resolve dir, so the comparison runs on a pre-descriptor rev. The
+restriction is on a **resolving** name: restoring the pre-port rule under a name
+no registry member resolves to puts both implementations over the *post*-descriptor
+corpus, which is what ran here — both forms read the same live corpus, this
+member's own descriptor included, and agreed byte for byte on stdout, stderr and
+exit code over the live tree, both fixture cases, and both fail-closed arms no
+committed fixture can reach.
 
 ### check-test-hermetic
 
