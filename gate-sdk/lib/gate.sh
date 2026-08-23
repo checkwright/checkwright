@@ -90,6 +90,8 @@ GATE_SDK_NATIVE_CRATE="${GATE_SDK_NATIVE_CRATE%/}"
 [[ -n "${GATE_SDK_NATIVE_SRC:-}" ]] || GATE_SDK_NATIVE_SRC="$GATE_SDK_NATIVE_CRATE/src"
 [[ -n "${GATE_SDK_NATIVE_TARGETS_FILE:-}" ]] || GATE_SDK_NATIVE_TARGETS_FILE="$GATE_SDK_NATIVE_CRATE/targets.list"
 [[ -n "${GATE_SDK_NATIVE_PUBLISH_WORKFLOW:-}" ]] || GATE_SDK_NATIVE_PUBLISH_WORKFLOW=".github/workflows/publish.yml"
+# spec: gate-sdk/SPEC.md §Layout and configuration — the fourth crate-adjacent knob, resolved here for the cause the three above state and riding the same already-normalized GATE_SDK_NATIVE_CRATE, which is the derivation §Layout already described. A case dir setting it is sourced by the config seam above these lines, so a fixture's redirection out of the tree still wins.
+[[ -n "${GATE_SDK_CARGO_TARGET_DIR:-}" ]] || GATE_SDK_CARGO_TARGET_DIR="$GATE_SDK_NATIVE_CRATE/target"
 # spec: gate-sdk/SPEC.md §check-exec-bit — check-exec-bit's two whitespace-scalar overrides, resolved to arrays here so the config bridge can carry them. Distinct names on §lib/gate.sh's own rule: a scalar feeding an array is the one case a resolved global earns a spelling of its own, which is why GATE_PRUNE_DIRS above has one and the scalar-in/scalar-out knobs beside it do not. The glob default rides GATE_SDK_GATES_DIR's resolved value rather than the not-yet-defined gate_sdk_gates_dir, so the two stay one value by construction.
 # shellcheck disable=SC2034  # consumed by the compiled member across the bridge, never within this lib
 if [[ -n "${GATE_SDK_EXEC_GLOBS:-}" ]]; then

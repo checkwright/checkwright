@@ -27,6 +27,7 @@ pub mod kit_enum;
 pub mod docs_cname_parity;
 pub mod exec_bit;
 pub mod core_files;
+pub mod crate_arms;
 pub mod battery_roster;
 pub mod commit_msg;
 pub mod docs_link_convention;
@@ -1453,6 +1454,24 @@ pub const REGISTRY: &[GateEntry] = &[
         ],
         "gate-sdk",
         &[("git", ""), ("?", "GATE_SDK_NATIVE_BIN")],
+    ),
+    // spec: gate-sdk/SPEC.md §check-crate-arms — no walk root: the corpus is a crate cargo is
+    // handed by manifest path, and the tracked-source stamp it caches on comes from git rather
+    // than from a walk this crate performs.
+    // spec: gate-sdk/SPEC.md §check-crate-arms — three declared programs where criterion 7's
+    // report counts two, because `git` reaches this member through the shared source-stamp
+    // helper and sits on the program floor.
+    (
+        "check-crate-arms",
+        crate_arms::run,
+        &[],
+        &[
+            "GATE_SDK_NATIVE_CRATE",
+            "GATE_SDK_CARGO_TARGET_DIR",
+            "GATE_SDK_TMP_DIR",
+        ],
+        "gate-sdk",
+        &[("cargo", ""), ("git", ""), ("rustc", "")],
     ),
     // spec: gate-sdk/SPEC.md §check-gate-assertions — no walk root: the corpus is the kit SPEC
     // set at fixed paths, and each heading resolves through the registry rather than through a

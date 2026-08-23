@@ -421,6 +421,36 @@ which is the cost that ruling was taken to avoid.
 construction, so a compiled form written the obvious way reports clippy's failure
 and never runs the tests.
 
+**CORRECTION (build, 2026-08-23) — the refusal this delta predicts for an absent
+`rustc` does not exist, and the declaration stands on the other ground stated
+above.** *"A wrapper declaring one would refuse on a machine carrying cargo
+without rustc"* is false against the tree: `rustc` is reached at exactly one site,
+inside the cache-key composition
+`key="$stamp $(rustc --version 2>/dev/null) $(cargo --version 2>/dev/null)"`. That
+program's stderr is discarded and the substitution's emptiness is never tested, so
+an absent `rustc` yields a key with an empty middle field — a cache *miss* against
+any key written while it was present, never a refusal. A faithful port must not
+mint one, and the compiled form does not. What actually forces both declarations
+is the sentence after it: test A asserts *observed ⊆ declared*, and `rustc` is
+observed. Ported on that ground.
+
+**CORRECTION (build, 2026-08-23) — three programs are declared, not two.** `c7`
+counts the **off-floor** pair, which is what `port-blockers.sh` reports; the member
+also spawns `git`, twice in its own text and three more times through
+`gate_native_source_stamp`, the shared-library reach the report cannot see. `git`
+is on `GATE_SDK_PROGRAM_FLOOR`, so declaring it costs no criterion-7 residual — but
+test A observes it, so `--needs` carries it. The same shape delta 4's `git`
+correction records.
+
+**CORRECTION (build, 2026-08-23) — the port needed one knob repair the delta does
+not name.** `GATE_SDK_CARGO_TARGET_DIR` was defaulted inline at the member's read
+site, where the config bridge's `declare -p` cannot see it, and no config in this
+tree sets it — so the bridge's undeclared-knob refusal would have fired here rather
+than only in a consumer. Resolved in `gate-sdk/lib/gate.sh` off the already-normalized
+`GATE_SDK_NATIVE_CRATE`, which is the derivation §Layout and configuration had
+already described. The fourth instance of the pattern in this unit, after deltas 4
+and 5.
+
 ### (8) `check-docs-render-fidelity` ports, and the GNU-awk floor loses its last holder
 
 `lines=241`, `install: on-surface`, requirement knob-derived. It becomes a

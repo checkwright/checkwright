@@ -100,6 +100,13 @@ impl Merged {
     pub fn code(&self) -> Option<i32> {
         self.status.code()
     }
+
+    // spec: gate-sdk/SPEC.md §Fail-closed contract — the same code for a wrapper that *prints* it
+    // rather than branching on it, and that section owns why the two accessors are distinct rather
+    // than one.
+    pub fn reported_code(&self) -> i32 {
+        exit_code(&self.status)
+    }
 }
 
 // spec: gate-sdk/SPEC.md §Fail-closed contract — `run`'s merged-capture face: two handles on one

@@ -1,0 +1,3 @@
+# graph: couples=native/Cargo.toml,native/build.rs,native/src/*.rs,native/src/gates/*.rs dir=one valve=none tier=precommit
+# install: never
+# spec: gate-sdk/SPEC.md §check-crate-arms — the crate's lint and test arms run at commit time, so a battery that passes cannot coexist with a CI that fails on them

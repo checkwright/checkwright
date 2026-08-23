@@ -217,7 +217,12 @@ project commits to is that project's own support commitment — a kit literal
 spelling one project's would ship it as everyone's (CLAUDE.md §The provenance
 seam). And `GATE_SDK_CARGO_TARGET_DIR` (default **derived** from
 `GATE_SDK_NATIVE_CRATE` as `<crate>/target`, cargo's own placement, so the
-warm cache `bin/build-native.sh` fills is the one §check-crate-arms reuses).
+warm cache `bin/build-native.sh` fills is the one §check-crate-arms reuses;
+that derivation is performed **in `lib/gate.sh`** beside the three crate-adjacent
+knobs above, which is where its reader's port had to move it — a default written
+inline at the use site is invisible to the config bridge's `declare -p` and is
+its undeclared-knob refusal, and this sentence had described the derivation for
+longer than the code carried it).
 Its only non-default reader is that gate's fixture pair, which redirects it out
 of the tree so a fixture run leaves no build products beside a fixture manifest;
 defaulting it to scratch instead is refused, because it would cold-build the real
@@ -496,12 +501,20 @@ in `proc.rs` so a cohort of wrappers buys them once:
   by more than success and failure has to be read that way, and ShellCheck is the
   worked case — 1 is *findings I lint into a report*, ≥2 is *a fragment I could
   not lint at all*, and folding the two into `succeeded()` would print an error as
-  though it were a finding list.
+  though it were a finding list. Its sibling `reported_code()` answers the same
+  question for a wrapper that **prints** the code instead of branching on it:
+  bash's `$?` spells a signalled child `128 + n`, so a member whose report reads
+  `failed (exit N)` keeps the number the shell form printed rather than collapsing
+  a killed child to a sentinel. Two accessors rather than one because the grading
+  caller needs the *"not gradeable"* `None` that the printing caller cannot use.
 
 **Neither half has a fixture representation, so each wrapper's parity run carries
 a constructed scenario**: both implementations over the same cases with the
 program present, and again with PATH scrubbed of it, comparing bytes and exit
-codes. A committed case cannot remove a program from PATH — this is the
+codes. **A wrapper declaring more than one program owes the scenario per program
+and for the set** — `check-crate-arms` runs it three ways, `cargo` absent, `rustc`
+absent, and both absent, because only the per-program arms show that one program's
+absence refuses while the other's does not. A committed case cannot remove a program from PATH — this is the
 `# no-fixture:` discharge shape applied to a member that *has* a pair, which
 §The port-candidate criteria criterion 2's second worked instance licenses. The
 scrub removes exactly the one name and keeps the rest of PATH: emptying it
@@ -1081,7 +1094,12 @@ omission. The test is whether a member's expanded `couples=` covers a registry
 member's **declaration path**; `native/src/gates/*.rs` is where a ported gate's
 rule is *implemented*, never where one is declared, so the derivation does not
 select it and no disposition row is owed. A later reader adding one would be
-answering a question assertion C never asked.
+answering a question assertion C never asked. **It is itself `.gate`-dispatched
+since `shell-gate-tail-port`, and its own port does not move it into the
+derivation** — re-taken at that port rather than assumed, because a port changes a
+declaration path and that is exactly what can move a member across this line. What
+its couples name did not change and is still implementation, so the verdict above
+holds for the same reason it always did.
 
 | Meta-gate | Disposition for a `.gate`-dispatched member |
 |---|---|
@@ -1648,10 +1666,14 @@ design time; the last three were paid for, and each is named with what it cost.
    **The worked instance is live and machine-derived, which is why this predicate
    is stated here rather than reasoned out per port.** Running assertion C's
    derivation over the live registry reports `check-template-registry-parity`
-   substrate-sensitive: its `kit:*/*.sh` expands to `gate-sdk/*/*.sh`, which
-   covers every `.sh` still declaring a gate under `gate-sdk/checks/` — a
-   shrinking set named by its shape rather than by a member, because a port
-   empties it one file at a time. It is the second kind of
+   substrate-sensitive: a `kit:` token expands **once per kit root**
+   (`gate_expand_couples_var`), so `kit:*/*.sh` is `<root>/*/*.sh` for every
+   root, and it covers every `.sh` still declaring a registry member under
+   **any** kit's `checks/` — a shrinking set named by its shape rather than by a
+   member or a root, because a port empties it one file at a time and empties
+   whole roots on the way. `gate-sdk/checks/` is the root that emptied first, at
+   `shell-gate-tail-port`'s `check-crate-arms` port, and the derivation kept
+   selecting this member through the roots that had not. It is the second kind of
    over-selection above — the gate does read `*.sh` names as content, but only
    under a `<kit>/<name>/` directory that a sibling `<kit>/templates/<name>.list`
    registers, and no kit ships a template registering `checks/`. Against this
@@ -2153,7 +2175,17 @@ design time; the last three were paid for, and each is named with what it cost.
      refusal text and a point in the order. It also settles a second ordering the
      first wrapper could not: a member whose scan root is a positional argument
      checks that root **before** probing the program, so an absent root reports the
-     root and not the linter.
+     root and not the linter. **The third, `check-crate-arms`, is the first with
+     more than one program, and it is what shows the class rule is about the
+     *program*, not about the member**: `cargo` gets a refusal arm and `rustc` gets
+     none, because the shell form refuses on one and reads the other for a cache key
+     it never tests for emptiness. A wrapper's declared set and its refusal set are
+     therefore two different sets — the declared set is what unit test A observes,
+     the refusal set is what the shell form actually refused on — and the parity run
+     that separates them is the constructed scenario run **per program and for the
+     set** (§Fail-closed contract). Its third ordering: the corpus-presence branch
+     precedes the program probe, so a tree with no crate is clean with no cargo
+     installed.
    - **The program is incidental spelling.** A text utility the rule uses to
      assemble, split or order a string the port re-expresses in the target
      language — `paste -sd, -` is `.join(",")`, and the verdict is identical
@@ -3970,8 +4002,10 @@ of its rule — the first cohort's economy at five members instead of two.
 **The fifth member ports under criterion 4's own predicate, and the ground is
 the second over-selection path rather than the first.** Assertion C's runtime
 derivation reports `check-template-registry-parity` substrate-sensitive: its
-`couples=` carries `kit:*/*.sh`, which expands to `gate-sdk/*/*.sh` and covers
-the `.sh` gate declarations still under `gate-sdk/checks/`. It is **not** a
+`couples=` carries `kit:*/*.sh`, which expands to `<root>/*/*.sh` once per kit
+root and covers the `.sh` gate declarations still under any kit's `checks/`
+— `gate-sdk/checks/` among them until `shell-gate-tail-port` emptied it of that
+spelling. It is **not** a
 reverse-trigger couple —
 the gate really does read `*.sh` names as content, through
 `git ls-files -- '*.sh'`. It is a **content couple wider than the walk**: the
@@ -9016,7 +9050,10 @@ untouched by the correction: two implementations of one hash is the risk, whoeve
 wrote either.
 
 **The source stamp.** git's content identity for the crate's tracked source set,
-computed by three invocations that are identical on both sides:
+computed by three invocations that are identical on both sides — and, since
+§check-crate-arms ported onto the same value to key its cache, by **one** runtime
+helper rather than one per reader (`fresh::source_stamp`), so a second reader could
+not become a second algorithm:
 
 1. `git -C <crate> ls-files` — the input set is **derived, never maintained**.
    Neither side carries a roster of which files matter, so neither can carry a
@@ -9237,14 +9274,14 @@ would put build products under a fixture directory, so each case redirects
 `GATE_SDK_CARGO_TARGET_DIR` out of the tree; the `Cargo.lock` cargo writes beside
 the manifest is gitignored on the same terms as the real crate's.
 
-**The gate ports — ruled 2026-08-23, reversing the permanent-shell verdict this
+**The gate ported — ruled 2026-08-23, reversing the permanent-shell verdict this
 paragraph used to carry.** The two justifications it stood on are recorded with
 their refutation at §The port-candidate criteria, criterion 7: the rule *is* an
 invocation of `cargo`, which a compiled wrapper spawns exactly as the shell does;
 and "a gate running `cargo test` over the crate cannot live inside the crate it
 tests" conflated the installed artifact with the source cargo compiles afresh.
-It is `install: never`, so no adopter receives it under either substrate, and it
-is owed to `shell-gate-tail-port` with the other five. **Its commit-time cost is
+It is `install: never`, so no adopter receives it under either substrate.
+**Its commit-time cost is
 bounded by a source-stamp cache** rather than by narrowing its arms: the two
 arms re-run only when the crate's source stamp (§lib/gate.sh,
 `gate_native_source_stamp`) or the toolchain differs from the last green run
@@ -9252,6 +9289,71 @@ recorded under `.tmp/`, and a crate with untracked files never hits the cache.
 CI and a fresh clone carry no record, so they run both arms in full — which is
 what keeps the battery's claim that a passing commit cannot coexist with a
 failing CI true at the site it is made.
+
+**It is `.gate`-dispatched since `shell-gate-tail-port`**, declared at
+`gate-sdk/checks/check-crate-arms.gate` with its rule in
+`native/src/gates/crate_arms.rs` — the port that emptied `gate-sdk/checks/` of
+its last `.sh`. It consumes the wrapper contract rather than extending it
+(§Fail-closed contract): `proc::on_path` for the presence probe and
+`proc::run_merged` for each arm's `2>&1` capture, because for these two the
+**failing** run is the one whose report has to print. The one face it adds is
+`Merged::reported_code()`, for a wrapper that *prints* an exit code rather than
+branching on it.
+
+**It declares three programs where criterion 7's report counts two.** `cargo` and
+`rustc` are the off-floor pair; `git` is the third, observed through
+`gate_native_source_stamp`'s compiled counterpart and on `GATE_SDK_PROGRAM_FLOOR`,
+so it earns no criterion-7 residual and the report never had cause to name it.
+All three are declared because unit test A asserts *observed ⊆ declared* and an
+undeclared program is exactly what that direction is for.
+
+**`rustc` is read for the cache key and nothing else, so its absence is not a
+refusal** — stated because the natural reading of "declares two programs" is that
+each gets a refusal arm, and building one here would be a behaviour change wearing
+parity's clothes. The shell form composes
+`"$stamp $(rustc --version 2>/dev/null) $(cargo --version 2>/dev/null)"`, discards
+that program's stderr and never tests the substitution's emptiness: an absent
+`rustc` contributes an empty field, which is a cache **miss** against any key
+written while it was present, so the arms re-run and cargo reports whatever a
+toolchain missing its compiler reports. The compiled form does the same. Only
+`cargo` has a refusal arm, and it fires **after** the crate-presence branch — a
+tree with no crate is clean whether or not cargo is installed, which is the
+per-member probe point §Fail-closed contract says to read off the shell form's own
+ordering rather than inherit from a sibling wrapper.
+
+**Both arms still run when the first fails**, which the port had to be written for
+rather than inherited: the natural compiled shape short-circuits on the first
+non-zero status and would report a clippy finding while never running the tests,
+silently halving the report the gate exists to give in one piece. The second
+spawn is unconditional on the first's verdict, and that is the whole of the rule.
+
+**The source stamp is one implementation, now shared.** §check-gate-binary-fresh
+holds its tree-side stamp to being one algorithm rather than two, which is what
+makes its verdict mean anything; this member caches on the same value, so the
+runtime helper lives in `native/src/fresh.rs` and both members call it rather than
+each carrying a copy. The shell spelling is unaffected and still has its own live
+reader — the cross-substrate comparison in `main.rs` that holds the two
+substrates' derivations equal.
+
+**Criterion 4 binds, and the live-tree arm was not demoted.** The pre-port rule was
+restored under a non-resolving name inside the resolve dir, so both forms read the
+**post**-descriptor corpus, and the arm carries **no** bound of the kind
+§check-shellcheck records: this member's corpus is the crate cargo is handed by
+manifest path, so the restored `.sh` sits outside the corpus it probes.
+Fifteen comparisons covering both sides of the cache, the untracked and
+no-tracked-source paths that skip it, and the constructed PATH-scrubbed scenario
+run three ways — `cargo` absent, `rustc` absent, and both absent — each against a
+crate-present and a crate-absent tree, so the probe-point ordering is proved on the
+arm where the two branches disagree. Fourteen are byte-identical including exit
+codes. **The fifteenth is recorded rather than rounded off**: on the `bad/` case the
+two runs differ in one number, the process id inside the panic line *cargo* prints
+for the failing test. That is the child's own non-determinism reaching a report this
+gate forwards verbatim, and it is a property of the report rather than of either
+substrate — run twice, **the shell form disagrees with itself in the same place and
+one more**, cargo's `Finished … in 0.02s` timing line. Naming it keeps the parity
+claim's meaning: what is proved identical is everything this member decides, and a
+relayed report is not one of those things. It is also why the pair's `bad/`
+expectations match substrings rather than pinning the report.
 
 ### check-install-disposition
 

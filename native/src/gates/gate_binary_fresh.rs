@@ -9,50 +9,6 @@ use std::path::Path;
 
 const REBUILD: &str = "bash gate-sdk/bin/build-native.sh";
 
-// spec: gate-sdk/SPEC.md §check-gate-binary-fresh — the tree side of the source stamp: the same
-// three git invocations native/build.rs bakes into the binary. `None` where git cannot answer,
-// so a caller fails closed rather than comparing against an empty string.
-fn source_stamp(crate_dir: &str) -> Option<String> {
-    let listing = proc::run("git", &["-C", crate_dir, "ls-files"])
-        .ok()?
-        .stdout()
-        .map(|o| String::from_utf8_lossy(o).into_owned())?;
-    let paths: Vec<&str> = listing.lines().filter(|l| !l.is_empty()).collect();
-    if paths.is_empty() {
-        return None;
-    }
-    let mut args: Vec<&str> = vec!["-C", crate_dir, "hash-object", "--"];
-    args.extend(paths.iter().copied());
-    let hashed = proc::run("git", &args)
-        .ok()?
-        .stdout()
-        .map(|o| String::from_utf8_lossy(o).into_owned())?;
-    let hashes: Vec<&str> = hashed.lines().filter(|l| !l.is_empty()).collect();
-    if hashes.len() != paths.len() {
-        return None;
-    }
-    let mut manifest = String::new();
-    for (h, p) in hashes.iter().zip(paths.iter()) {
-        manifest.push_str(h);
-        manifest.push(' ');
-        manifest.push_str(p);
-        manifest.push('\n');
-    }
-    let stamp = proc::run_with_stdin(
-        "git",
-        &["-C", crate_dir, "hash-object", "--stdin"],
-        manifest.as_bytes(),
-    )
-    .ok()?
-    .stdout()
-    .map(|o| String::from_utf8_lossy(o).into_owned())?;
-    let stamp = stamp.lines().next().unwrap_or("").to_string();
-    if stamp.is_empty() {
-        return None;
-    }
-    Some(stamp)
-}
-
 fn is_executable(p: &str) -> bool {
     use std::os::unix::fs::PermissionsExt;
     std::fs::metadata(p)
@@ -200,7 +156,7 @@ pub fn run(args: &[String]) -> i32 {
             stamp_file.clone(),
         )
     } else {
-        match source_stamp(&crate_dir) {
+        match fresh::source_stamp(&crate_dir) {
             Some(t) => (t, crate_dir.clone()),
             None => {
                 eprintln!("check-gate-binary-fresh: git could not hash the tracked source under {} — the check could not run; treating as failure (not clean)", crate_dir);
@@ -255,7 +211,7 @@ mod tests {
     #[test]
     fn the_tree_side_stamp_is_the_one_the_build_baked() {
         let crate_dir = env!("CARGO_MANIFEST_DIR");
-        let stamp = source_stamp(crate_dir).expect("git could not hash the crate's tracked source");
+        let stamp = fresh::source_stamp(crate_dir).expect("git could not hash the crate's tracked source");
         assert_eq!(
             stamp.len(),
             40,
@@ -274,6 +230,6 @@ mod tests {
     // "cannot verify", never a stamp compared against the empty string
     #[test]
     fn a_crate_root_git_cannot_hash_yields_no_stamp() {
-        assert_eq!(source_stamp("/nonexistent-crate-root-checkwright"), None);
+        assert_eq!(fresh::source_stamp("/nonexistent-crate-root-checkwright"), None);
     }
 }

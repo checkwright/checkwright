@@ -29,6 +29,50 @@ pub fn toplevel() -> Result<String, String> {
     Ok(s)
 }
 
+// spec: gate-sdk/SPEC.md §check-gate-binary-fresh — the tree side of the source stamp, in the
+// one runtime helper both its readers call. `None` where git cannot answer, so a caller fails
+// closed rather than comparing against an empty string.
+pub fn source_stamp(crate_dir: &str) -> Option<String> {
+    let listing = proc::run("git", &["-C", crate_dir, "ls-files"])
+        .ok()?
+        .stdout()
+        .map(|o| String::from_utf8_lossy(o).into_owned())?;
+    let paths: Vec<&str> = listing.lines().filter(|l| !l.is_empty()).collect();
+    if paths.is_empty() {
+        return None;
+    }
+    let mut args: Vec<&str> = vec!["-C", crate_dir, "hash-object", "--"];
+    args.extend(paths.iter().copied());
+    let hashed = proc::run("git", &args)
+        .ok()?
+        .stdout()
+        .map(|o| String::from_utf8_lossy(o).into_owned())?;
+    let hashes: Vec<&str> = hashed.lines().filter(|l| !l.is_empty()).collect();
+    if hashes.len() != paths.len() {
+        return None;
+    }
+    let mut manifest = String::new();
+    for (h, p) in hashes.iter().zip(paths.iter()) {
+        manifest.push_str(h);
+        manifest.push(' ');
+        manifest.push_str(p);
+        manifest.push('\n');
+    }
+    let stamp = proc::run_with_stdin(
+        "git",
+        &["-C", crate_dir, "hash-object", "--stdin"],
+        manifest.as_bytes(),
+    )
+    .ok()?
+    .stdout()
+    .map(|o| String::from_utf8_lossy(o).into_owned())?;
+    let stamp = stamp.lines().next().unwrap_or("").to_string();
+    if stamp.is_empty() {
+        return None;
+    }
+    Some(stamp)
+}
+
 // spec: gate-sdk/SPEC.md §Fail-closed contract — the shell form's capture of a file, with the
 // read failure the crate cannot drop: a substitution compares an unreadable file as the empty
 // string, and a `Result` makes that reading unrepresentable.
