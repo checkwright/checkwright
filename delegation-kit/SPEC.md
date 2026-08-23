@@ -1620,7 +1620,8 @@ at these:
   when the waiter exited, establishing the *producer verifiably alive* condition —
   on the recorded PID and never a process-table pattern, which is the protocol's
   own rule.
-- **`class`** — the cause, from the closed list below.
+- **`class`** — `ok` on a clean trial; otherwise the cause, from the closed list
+  below.
 
 The producer's own PID is **not** logged: the `<key>.run` record already holds it
 for the lifetime the wait needs, and a second copy in an advisory log would be a

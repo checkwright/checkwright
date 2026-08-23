@@ -124,9 +124,9 @@ fn inner(args: &[String]) -> Result<i32, String> {
         }
     };
 
-    // spec: gate-sdk/SPEC.md §check-tree-terms — the filter/exec split: the per-path filter costs
-    // no process, and the content match runs once over every surviving path rather than once per
-    // file. A port matching per file is the regression the split exists to prevent.
+    // spec: gate-sdk/SPEC.md §check-tree-terms — the cheap-filter-then-match split: the per-path
+    // filter costs no process, and the pattern set is compiled once for the whole walk rather than
+    // per file. A port recompiling per file is the regression the split exists to prevent.
     let mut paths: Vec<&str> = Vec::new();
     for path in listing.lines() {
         if path.is_empty() || path_pruned(path, &prune) || self_exempt(path) {

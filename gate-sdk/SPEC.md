@@ -1574,7 +1574,7 @@ design time; the last three were paid for, and each is named with what it cost.
    stays `spec-embedded-source-criterion-4-membership`'s, and a later reader must
    not read the disposition as its answer.
 
-   **`check-tree-terms` is the register's fourth instance and its *widest*.**
+   **`check-tree-terms` joins the register as its *widest* instance.**
    Its `couples=` is one literal pattern file, so the derived substrate-sensitive
    set does not select it; its walk is `git ls-files` over the **whole tracked
    tree**, pruned only by the shared prune dirs and the `msg-patterns` basenames,
@@ -7547,7 +7547,7 @@ follow-on sentences, hierarchical axis/sub-rule contracts, and count-words
 with non-enumeration nouns. With no spec argument the gate scans
 `<gates-dir>/SPEC.md` when present plus each vendored kit's own `SPEC.md`;
 each matched heading resolves to its gate source through the registry path.
-The three fail-closed exits and the **exit-3 internal skip sentinel** port
+The three fail-closed exits and the internal skip sentinel port
 unchanged, the sentinel being no failure path at all: a `.gate`-declared member
 with no crate manifest present is counted onto the clean line as *declared out of
 reach*, and that segment is part of the output contract.
@@ -7612,8 +7612,8 @@ silently rather than loudly.**
   drops the span's first label and can silently demote the contract below the
   two-label arity filter.
 - **The sort is byte order, and that is a stated narrowing.** The shell form's
-  `sort -u` and `comm` ran under the **ambient locale** with no `LC_ALL=C` pin;
-  the compiled form sorts by byte, which is C-locale order. The two can differ
+  ordering was **locale-dependent and unpinned**; the compiled form sorts by
+  byte, which is C-locale order. The two can differ
   only on a mixed-case label span under a UTF-8 locale, and no live span is
   anything but `A`-`H` or `1`-`3`. Recorded as a deliberate narrowing of a latent
   divergence rather than left as an accident of substrate.
@@ -7735,9 +7735,10 @@ over a sorted label set, which is class (ii) under criterion 7's hold-worthiness
 test — the compiled rule spells the join directly and the verdict is identical
 either side of the substitution. The **GNU-awk** requirement rode the same
 reasoning: `match()`'s third argument was a convenience the port re-expressed in
-the crate's own matcher, and the re-expression cost no new API, because all three
-of its sites wanted the *whole* match span that §The POSIX ERE matcher's
-`RSTART`/`RLENGTH` pair already reports. Neither was ever a hold, and this member
+the crate's own matcher, and the re-expression cost no new API — two of its sites
+wanted the *whole* match span that §The POSIX ERE matcher's `RSTART`/`RLENGTH`
+pair already reports, and the third's single-character label is read out of that
+span directly. Neither was ever a hold, and this member
 declared no `# port-until:` on either ground.
 
 **The gawk floor's residue is empty after this port, and that is measured rather
@@ -10515,10 +10516,10 @@ helper exists to prevent. **No pattern is baked into the crate**: the roster is
 consumer config on the §check-graph pattern, and a kit literal carrying a
 consumer's vocabulary publishes it (CLAUDE.md §The provenance seam).
 
-**The filter/exec split survives the port.** A fork-free per-path filter runs
-first — prune dirs, the `msg-patterns` prefix, the regular-file test — and the
-content match then runs **once** over every surviving path, patterns compiled a
-single time. A port matching per file would be the regression the split exists to
+**The cheap-filter-then-match split survives the port.** A fork-free per-path
+filter runs first — prune dirs, the `msg-patterns` prefix, the regular-file test
+— and the pattern set is compiled **once for the whole walk** rather than per
+file. A port recompiling per file would be the regression the split exists to
 prevent, and it is stated here because a compiled substrate makes the wrong shape
 cost nothing visible.
 
@@ -10555,11 +10556,13 @@ inherited.**
   this same banned set (§build-native), so what ships carries no such path. The
   arm stands unnarrowed, which is the outcome worth recording — this guard's
   first live encounter removes a leak rather than earning an exemption.
-- **The three fail-closed arms are discharged where they are held.** The
-  pattern-file resolution, the `git ls-files` call and the content match each
-  fail-close through one shared helper, held by §check-gate-fail-closed across
-  the whole registry. They are recorded as proved **there** rather than banked as
-  this member's own coverage, on §Fixture-pair discipline's terms.
+- **Its fail-closed arms are discharged where they are held**, by
+  §check-gate-fail-closed across the whole registry rather than banked as this
+  member's own coverage, on §Fixture-pair discipline's terms. **What is not an
+  arm, stated because it is a narrowing against the shell form:** an unreadable
+  tracked file is *skipped* by the content match rather than failing it closed,
+  so a path the walk selects and the read cannot open leaves the scan silently
+  short. The shell form failed closed there.
 
 **The authoring rule this member's own module carries, and it runs both ways.**
 `native/src/gates/tree_terms.rs` is a tracked file **inside the corpus this gate

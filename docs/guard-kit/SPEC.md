@@ -704,8 +704,11 @@ that harness exists would be designing against no case.
     delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps
     obliges is a redirect, and the harness checks a redirect
     **target** as a file write, so no `Bash(…)` allow entry can grant it: such a
-    rule grants the command and never the target. Granted silently when **all
-    four** hold, falling through untouched otherwise:
+    rule grants the command and never the target. Granted silently when **every
+    clause below** holds, falling through untouched otherwise:
+    - **(0) Not a backgrounded launch.** A statement-ending `&` refuses before
+      any other clause is read: a backgrounded append is rule 15's subject, and
+      granting it here would bless a launch the liveness-record rule is about.
     - **(a) Append-only.** Every redirect operator is `>>` (an fd prefix
       allowed: `2>>`); a single truncating `>` **anywhere** refuses. This clause
       carries the append-only split — a mistyped redirect must not be able to

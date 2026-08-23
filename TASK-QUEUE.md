@@ -371,7 +371,8 @@
   the gap is narrowed, not closed. And it **did not fit twice**:
   `close-entry-baseline-bootstrap-deadlock` and `stage-stamp-ordering-unenforced` took their
   rulings at 0–1 lines of headroom and carry the ruling without the channel, so the fix collides
-  with the entry cap on first contact (`entry-cap-displaces-mandated-writes` counts it).
+  with the entry cap on first contact — the displacement class queue-kit/SPEC.md
+  §check-queue-entry-budget's split criterion now decides.
   **Cost while deferred:** silent and audit-side. Every relayed ruling already in the queue carries
   the same unverifiable provenance, the tracked record is all a later auditor or a fresh session
   has, and it will not red a gate — it surfaces as a security flag on an honest session, which is
@@ -1880,7 +1881,7 @@
   **Tier: feature, owing an amendment — corrected 2026-08-13 at close.** The entry long carried
   "Debt: … adds no governed name to a shipped surface"; that self-declaration is false against
   the tree. guard-kit's generic ruleset is a numbered SPEC roster backed by named
-  `guard_rule_*` functions in `lib/guard.sh` (sixteen defined), so a new rule adds a name to a
+  `guard_rule_*` functions in `lib/guard.sh`, so a new rule adds a name to a
   governed surface, a contract consumers honour, and a closed transparent-prefix roster.
   Only the tier label is corrected here; the entry's substantive claims were not re-examined.
   Filed 2026-08-01 by close's prompt-friction triage; tier corrected 2026-08-13 by close from the
@@ -7681,9 +7682,10 @@
   text, the same text-shaped limit `wait-loop-exemption-blind-behind-a-script-name` records on
   the exemption side. A session-end check over the scratch dir is the other candidate and has no
   false-positive budget yet.
-  **DISTINCT from `session-mechanic-grants-uncommitted`**, whose subject is an out-of-band
+  **DISTINCT from `session-mechanic-grants-uncommitted`**, whose subject was an out-of-band
   permission decision on the journal-append write path — a grant question, not this enforcement
-  one; it is cited as the adjacent surface only and is not re-filed here.
+  one. That entry closed this iteration and its subject shipped as guard-kit/SPEC.md §The generic
+  ruleset rule 17, which is the adjacent surface; nothing of it is re-filed here.
   **Cost while deferred:** rule 14's reach stays opt-in on the launching session's diligence, so
   a commit can be taken beside a live producer that never announced itself.
   Filed 2026-08-23 by the lead; drained at that iteration's close, which dated rule 15 against
