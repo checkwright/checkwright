@@ -924,10 +924,9 @@ list does not name one for:
   it: the payload carries a top-level `background_tasks`, so the pre-wiring premise
   that it names no background task was wrong, and only the key read caught it.
   Values stay unlogged on the ground that survives that correction — logging them
-  would put transcript paths and prompt ids into a file for no reader — so what
-  `background_tasks` actually carries is **unsettled**, and reading it is a change
-  to this privacy ruling rather than a free follow-up. The question is filed as
-  `subagent-stop-payload-background-tasks-read`.
+  would put transcript paths and prompt ids into a file for no reader. What
+  `background_tasks` carries was then settled **off this field**, by a one-off
+  read that widened nothing here: §What `background_tasks` carries.
 
 **`records` is counted by the hook's own `*.run` glob, not parsed back out of the
 reader**, and the reason is the reader's output contract rather than convenience:
@@ -958,6 +957,48 @@ alone and never `hooks[].hooks[].command`, and `check-memory-off` scans the memo
 surface. So the registration reds nothing — and neither would a registration
 naming a script that does not exist. A session decides this wiring by reading this
 section, never by predicting a verdict.
+
+### What `background_tasks` carries
+
+The `keys` field settled that the payload has this top-level key and left what is
+in it open. A deliberate one-off read then took it, **out of band and without
+touching this template**: the consumer's hook copy dumped each firing's raw
+payload to gitignored scratch across five firings and was restored byte-for-byte,
+so the grammar above still logs keys and never values. **Whether the probe should
+log any of this is not settled by having read it** — that is a change to the
+privacy ruling, and it is not made here.
+
+**It is a live-children enumeration, and it is populated.** An array of objects in
+two shapes, both carrying `id`, `type`, `status` and `description`: a `type` of
+`subagent` adds `agent_type`, a `type` of `shell` adds `command`. It spans the
+emitting agent's own tree rather than its direct children only — the emitting
+session, its backgrounded shell task and its dispatched grandchild all appeared
+with `status` `running`, the count rising as the grandchild started. Alongside it
+the payload carries `transcript_path`, `cwd`, `prompt_id`, `permission_mode`,
+`agent_id`, `agent_type`, `stop_hook_active`, `agent_transcript_path`,
+`last_assistant_message` and `session_crons`, beside the three fields the grammar
+above reads.
+
+**It enumerates what the harness launched, not what is running — and that is the
+decisive finding.** A producer detached from a foreground tool call, live
+throughout and carrying a `*.run` record the reader was concurrently reporting
+red, appeared in no firing. That is precisely the residue §The probe is
+asymmetric names as one of `live=no`'s three readings and guard-kit rule 15
+advises against without closing. So a blocking variant **cannot substitute** the
+harness's view for the `*.run` record set: the two disagree exactly on the class
+the waiting rule exists for. Supplementing is the most it could do.
+
+**No entry carries a pid.** Those six field names are the whole schema, and a
+`shell` entry's `id` is the harness's own opaque task id. Joining this view to a
+record's `pid=<n>` therefore means parsing the `command` string — the value the
+ruling withholds — even over the children the view does see.
+
+**The privacy ground came back confirmed and wider, not weakened.** The value is
+not benign: `command` is a verbatim shell command line and `description` is
+free-text prose. Logging it would put command lines and task prose into a
+capture-tier file, which is more exposure than the transcript paths and prompt ids
+the ruling was originally written against, and it would do so in whatever tree
+vendors this kit.
 
 ### The probe is asymmetric, and no reading may treat it otherwise
 

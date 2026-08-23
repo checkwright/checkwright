@@ -147,6 +147,17 @@
   itself, against the probe's own recorded ruling that it logs keys and never values
   (delegation-kit/SPEC.md §The turn-end liveness probe (template), delta 4). Not takeable here:
   changing that ruling, which is what a value read touches and what the escalation carries.
+  **THE READ IS TAKEN, 2026-08-23 at build, and it lands in delegation-kit/SPEC.md §What
+  `background_tasks` carries** — schema, not captured values; the instrument was a one-off scratch
+  dump from the consumer hook copy, restored byte-for-byte, so the probe's grammar and its no-values
+  ruling are untouched. **The decisive result is a NEGATIVE and it moves the successor's design:**
+  the key enumerates what the harness launched, not what is running — a detached producer, live and
+  carrying a red `*.run` record, appeared in none of five firings — so the blocking variant cannot
+  substitute the harness's view for the record set, and the unrecorded-launch residue does NOT
+  become reachable through it. The privacy ground came back wider, not weaker: a `shell` entry
+  carries a verbatim `command` line. **The entry does NOT move to Done on this commit.** Its second
+  half — whether the ruling changes — is operator-class and still unmade; it is escalated with the
+  result in hand and the Done move waits on that answer, so nothing here may be read as settling it.
   **The pair commitment is EARLY, not void.** This entry and
   `turn-end-chokepoint-and-wait-primitive` still promote together; the admission pays the condition
   down inside this iteration rather than deferring it, so only the timing moved.
