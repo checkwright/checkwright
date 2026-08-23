@@ -197,9 +197,11 @@ Each names the delta that owns it.
   (delta 3).
 - **lifecycle-kit/templates/lead.md** — the lead is delta (2)'s named authorizing
   consumer, and this is the surface that tells it what it is being asked. It gains
-  one sentence: a split ask arrives with the blocked session's statement of which
-  side of the criterion its entry falls on, and the lead rules against the test
-  rather than re-deriving one (delta 2).
+  one sentence, and the sentence **cites** the criterion at its owner rather than
+  restating it — content-tiering, one content tier per surface: a split ask
+  arrives with the blocked session's statement of which side of `queue-kit/SPEC.md`
+  §check-queue-entry-budget's split test its entry falls on, and the lead rules
+  against that test rather than re-deriving one (delta 2).
 - **TASK-QUEUE.md** — `session-mechanic-grants-uncommitted` loses its
   overlay-only-oracle half to a new deferred entry, both entries carrying the
   bidirectional citation delta (3) mints (deltas 3, 4).

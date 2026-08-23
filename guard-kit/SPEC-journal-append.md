@@ -100,7 +100,7 @@ carve-out, the emitter contract, and **one limit**: the grant is exactly as safe
 as the roster's stdout-only property, which the rule asserts of the roster and
 cannot verify of a member. **Design-bearing.**
 
-That is the same honest bound rule 18 already carries for `GUARD_KIT_RO_BINS`
+That is the same honest bound rule 17 already carries for `GUARD_KIT_RO_BINS`
 (*roster membership does not by itself prove an invocation read-only —
 `sort -o` writes a file*), reached from the writing side rather than the reading
 side, and it is stated rather than left for a later reader to discover.

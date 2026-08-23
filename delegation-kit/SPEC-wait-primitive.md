@@ -37,10 +37,14 @@ delegation-kit gains `bin/wait-probe.sh`, a bin-tool-contract-conforming probe
 that stands a known-duration producer up and exercises each candidate wait form
 against it, recording one line per trial. **Design-bearing.**
 
-It writes nothing in-tree: its scratch root is `DELEGATION_KIT_PROBE_TMP_DIR`,
-defaulting under `GATE_SDK_TMP_DIR` (`.tmp/`), following `demo/run-demo.sh` and
-`scripts/pack-installer.sh`, whose single-knob out-of-tree scratch is the shape
-this repo already uses for a runnable artifact.
+It writes nothing tracked: its scratch root is `DELEGATION_KIT_PROBE_TMP_DIR`,
+defaulting under `GATE_SDK_TMP_DIR` (`.tmp/`) — in-tree but gitignored, not the
+system temp dir `demo/run-demo.sh` and `scripts/pack-installer.sh` default their
+own single knobs to, because the trial's own `<key>.run` liveness record must
+live in repo-local, gitignored scratch and never a system temp dir, on
+`templates/agent-execution.md`'s own mandate (below). Those two tools are
+precedent for a runnable artifact taking one dedicated scratch knob at all, not
+for where that knob points.
 
 One trial is: launch a producer that sleeps a **declared** duration and then
 writes a completion marker; record its PID at launch in a `<key>.run` file
@@ -102,7 +106,11 @@ pressure. **Design-bearing.**
   form is corrected to the vendor's conditional one — the stays-armed property
   attaching to an unbounded command rather than to the form. This branch is
   stated with the others rather than argued down, and it is the branch the
-  fifteenth firing's evidence points at.
+  entry's own second-half measurement points at — four backgrounded waiters
+  dead with their producers verifiably alive against one event-stream call that
+  succeeded first try. (Not the fifteenth firing: that count is the first
+  half's chokepoint-frequency evidence, a different question from which
+  primitive is reliable.)
 - **The result is machine-specific.** Recorded as such and the ordering stands,
   with the probe retained as the reproducer a second machine runs. This is a real
   branch: `ENV.local.md` is this repo's own acknowledgement that machine-shaped
@@ -187,8 +195,10 @@ from becoming untracked-and-unignored residue.
 *Red condition:* none of its own. Two existing readers do have one and both are
 named because a new file under `.workflow/` is exactly what they police:
 `check-workflow-tiering` reds on a member that is **neither tracked nor ignored**
-— so the file must be gitignored, which the delta's roster line and the existing
-`.gitignore` capture-tier pattern together satisfy — and lifecycle-kit's
+— so the file must be gitignored, which the delta's roster line and a new
+`.gitignore` line under the capture-tier block together satisfy (no existing
+pattern is a blanket match; every `.workflow/` capture-tier member is listed by
+its own explicit line) — and lifecycle-kit's
 close-surface reader reds on a declared surface whose reclaim path does not
 resolve. Neither is monotone in a violation set and neither is cleared by
 inspection; both are cleared by running them.
@@ -197,7 +207,8 @@ inspection; both are cleared by running them.
 carriers in this tree, surveyed across the whole component set rather than a
 hand-picked subset and with stderr unsilenced on every probe: the template's
 *Which primitive* paragraph, §Operative residency's bare-imperative copy, guard
-rule 13's block message, and this repo's own always-loaded agent definition. The
+rule 13's block message, and this repo's two always-loaded agent definitions
+(`.claude/agents/stage-session.md`, `.claude/agents/audit-sweep.md`). The
 template itself rules that the residency copy is **sanctioned rather than drift**
 and that a change here **propagates**, so delta (3)'s branches move all four or
 none. They are inventoried below.
@@ -233,10 +244,12 @@ Each names the delta that owns it.
   checked and re-run rather than assumed (delta 4).
 - **.gitignore** — the evidence file joins the capture tier, which is what keeps
   `check-workflow-tiering` green (delta 4).
-- **CLAUDE.md §Agent execution** and this repo's agent definition — re-read at
-  merge against delta (3)'s selected branch; the resident line is a pointer today,
-  so an edit is expected only on the branch that changes the rule rather than its
-  evidence (delta 3).
+- **CLAUDE.md §Agent execution** and this repo's two always-loaded agent
+  definitions, `.claude/agents/stage-session.md` and
+  `.claude/agents/audit-sweep.md` — re-read at merge against delta (3)'s selected
+  branch; CLAUDE.md's resident line is a pointer today, so an edit is expected
+  only on the branch that changes the rule rather than its evidence, and both
+  agent files move together since neither is the other's synonym (delta 3).
 - **TASK-QUEUE.md** — `turn-end-chokepoint-and-wait-primitive` demotes or moves at
   the terminal step according to which half remains: the blocking variant stays
   sequenced, so the measurement's completion does not empty the entry
