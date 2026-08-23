@@ -93,6 +93,13 @@ impl Merged {
     pub fn output(&self) -> &[u8] {
         &self.output
     }
+
+    // spec: gate-sdk/SPEC.md §Fail-closed contract — the exit code for a wrapper whose program
+    // grades itself by it: ShellCheck says 1 for findings and ≥2 for an error it could not lint
+    // past, and folding both into `succeeded()` makes an unlintable fragment read as findings
+    pub fn code(&self) -> Option<i32> {
+        self.status.code()
+    }
 }
 
 // spec: gate-sdk/SPEC.md §Fail-closed contract — `run`'s merged-capture face: two handles on one

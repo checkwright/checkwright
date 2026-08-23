@@ -478,7 +478,11 @@ in `proc.rs` so a cohort of wrappers buys them once:
   **where the shell form fired it**. That ordering is load-bearing rather than
   cosmetic: `check-shellcheck` probes the linter before it globs its targets, so a
   tree with nothing to lint and no linter reports the *linter*, and catching the
-  spawn failure instead would report the empty corpus. A refusal message is a
+  spawn failure instead would report the empty corpus. The probe's place in the
+  order is per-member and not a class rule: `check-action-run-shell` validates its
+  positional scan root *first*, so an absent root reports the root even with no
+  linter installed. What the class fixes is that the point is the shell form's,
+  whatever it was. A refusal message is a
   documented surface — a session debugging its PATH reads the message, not the
   exit code. `run`'s `Err` arm stays the backstop for a program that vanishes
   between the probe and the spawn.
@@ -492,6 +496,12 @@ in `proc.rs` so a cohort of wrappers buys them once:
   description (`try_clone` is `dup`), the technique `dispatch` already uses, so
   the two streams interleave exactly as bash's `2>&1` did; reading them as two
   pipes and concatenating would reorder a linter's findings against its errors.
+  `Merged` also exposes the child's **exit code**, on `Completed::code()`'s own
+  ground and added when the second wrapper needed it: a program that grades itself
+  by more than success and failure has to be read that way, and ShellCheck is the
+  worked case — 1 is *findings I lint into a report*, ≥2 is *a fragment I could
+  not lint at all*, and folding the two into `succeeded()` would print an error as
+  though it were a finding list.
 
 **Neither half has a fixture representation, so each wrapper's parity run carries
 a constructed scenario**: both implementations over the same cases with the
@@ -2141,6 +2151,14 @@ design time; the last three were paid for, and each is named with what it cost.
      **message parity at the shell form's own point in the order**, and the two
      mechanisms that buy it — a PATH presence probe and a merged-stream capture —
      live in §Fail-closed contract for the whole class rather than in one member.
+     **The second wrapper, `check-action-run-shell`, consumed that contract rather
+     than extending it**, which is the evidence the class-level placement was
+     right: it added no mechanism beyond the merged capture's exit code, needed
+     because ShellCheck grades itself by one, and its own contribution was a
+     refusal text and a point in the order. It also settles a second ordering the
+     first wrapper could not: a member whose scan root is a positional argument
+     checks that root **before** probing the program, so an absent root reports the
+     root and not the linter.
    - **The program is incidental spelling.** A text utility the rule uses to
      assemble, split or order a string the port re-expresses in the target
      language — `paste -sd, -` is `.join(",")`, and the verdict is identical
@@ -2212,12 +2230,15 @@ design time; the last three were paid for, and each is named with what it cost.
    refusing when it is absent and invoking it per extracted block. It was held on
    the reading that a compiled form would move a toolchain requirement from this
    repo's contributors onto every adopter; that reading was **wrong**, and the
-   2026-08-23 ruling above retires it: the shell form already imposes the
-   requirement on every consumer that registers the gate, and a compiled wrapper
-   imposes exactly the same one — the substrate of the wrapper does not move the
-   floor. Recorded rather than deleted because every mechanical screen puts that
-   gate *in*, and the eleven-day hold is the evidence that a dependency can be
-   mistaken for a port blocker by a session reading the report literally.
+   2026-08-23 ruling above retires it: the shell form already imposed the
+   requirement on every consumer that registered the gate, and the compiled
+   wrapper `shell-gate-tail-port` landed imposes exactly the same one — the
+   substrate of the wrapper does not move the floor. The example now reads in the
+   past tense, and the class it draws outlives the member
+   (§check-action-run-shell records what its port cost). Recorded rather than
+   deleted because every mechanical screen puts that gate *in*, and the eleven-day
+   hold is the evidence that a dependency can be mistaken for a port blocker by a
+   session reading the report literally.
 
    **`check-gate-assertions` required `paste`, and how it surfaced is the part
    worth keeping.** The program is not on the floor, so that was owed port work of
@@ -10808,9 +10829,9 @@ argument decisive, since no consumer gate and no site-kit-local gate covers both
 Named `action-`, not `check-workflow-*`, for §check-action-pinning's reason: this
 tree already spends "workflow" on §The workflow directory.
 
-**Scan set — derived, then narrowed to the subject.** Stage one is a `gate_find`
-walk for `*.yml` / `*.yaml` from the scan root (the optional positional argument,
-default `.`), pruned by the shared set, so `gate-tests/` is out and the `bad/`
+**Scan set — derived, then narrowed to the subject.** Stage one is a pruned walk
+for `*.yml` / `*.yaml` from the scan root (the optional positional argument,
+default `.`), taking the shared prune set, so `gate-tests/` is out and the `bad/`
 fixture cannot red the whole-tree run. Stage two is the **Actions-shape
 predicate**: a walked file enters the subject only if it carries a top-level
 `jobs:` key (a workflow) or a top-level `runs:` key (a composite action).
@@ -10874,14 +10895,51 @@ manufactures false positives, so the step's effective shell comes from its
 | `sh` / `dash` / `ksh` | the matching ShellCheck dialect — linting a POSIX body as bash hides the portability findings that dialect exists to surface |
 | anything else (`pwsh`, `python`, a custom `{0}` template) | the block is **skipped and counted** — the body is not shell, so there is no shell to lint |
 
-**It is takeable, and its port is a wrapper.** The rule invokes `shellcheck`, a
-program the payload does not carry, so criterion 7 reports it (§The port-candidate
-criteria), and under the 2026-08-23 ruling recorded there the compiled form spawns
-the same program and refuses at exit 2 when it is absent — the requirement this
-shell form already places on every consumer registering the gate, moved by the
-port not at all. §The port-candidate criteria names this gate as criterion 7's
-*worked example* and records the retired hold beside it; the port is owed to
-`shell-gate-tail-port`, and no hold is declared.
+**Its implementation is a compiled subcommand, and it is criterion 7's second
+landed wrapper.** The declaration path is `check-action-run-shell.gate` and the
+rule runs out of the gate binary. The rule invokes `shellcheck`, a program the
+payload does not carry, so criterion 7 reports it (§The port-candidate criteria),
+and under the 2026-08-23 ruling recorded there the compiled form spawns the same
+program and refuses at exit 2 when it is absent — the requirement this shell form
+already placed on every consumer registering the gate, moved by the port not at
+all. The wrapper mechanisms are §Fail-closed contract's, established for the
+class at §check-shellcheck's port and consumed here rather than rebuilt: the
+presence probe firing where the shell form's `command -v` fired it, and the
+merged capture whose exit code this member reads to tell a finding (1) from a
+fragment ShellCheck could not lint at all (≥2).
+
+**The extractor is the port's content, and its two standing rulings moved with
+it.** The *stays inline* rule and the *skipped and counted, never linted as
+shell* dialect rule are locality-class directives binding to a line of
+implementation, so both follow the code into the crate module (§The `# graph:`
+manifest, the annotation partition) rather than into the descriptor.
+§check-action-gh-repo's finding that it is not the second consumer the inline
+rule waits for is what keeps that rule true across the substrate change.
+
+**Criterion 4 binds, and the live-tree arm is undemoted.** The pre-port rule was
+restored under a non-resolving name inside the resolve dir (§The port-candidate
+criteria, criterion 4) and both forms were driven from the same cwd with the same
+argv over thirteen arms — the live tree, both fixture cases, a YAML-free tree, a
+refusal case, an out-of-subject case and an absent scan root, each with the
+linter present and again with PATH scrubbed of it. All thirteen matched byte for
+byte including exit codes. Unlike §check-shellcheck's arm the probe file carries
+no bound: this member's corpus is `*.yml`/`*.yaml`, so a restored `.sh` sits
+outside the corpus it probes and the comparison is over the committed tree.
+
+**Two arms retired on port, both unreachable by construction.** The `fail_closed`
+wrapper around the awk extraction is gone with awk itself — the compiled
+extractor is a function that returns its refusal rather than a child whose exit
+status has to be graded. The `fail_closed` wrapper around the walk is replaced by
+the walker's own error text, the shape §check-action-pinning's port already took;
+what the two shared was a message naming a *shell helper* and its exit status,
+and no shell helper remains to name. The refusals themselves survive: an
+unreadable corpus is still exit 2.
+
+**One deliberate difference, asserted rather than normalised away**, in the shape
+§The first cohort's sort-order note set: the shell walked its corpus in `find(1)`
+order, a filesystem artifact, and the compiled walk sorts. A multi-file finding
+list therefore comes out in a different — and now deterministic — order. The
+counts on the clean line are order-independent, so nothing else moves.
 
 **Severity is `-S warning`**, the gate family's level, so one threshold governs
 all ShellCheck lint in the tree. A future author lowering it inherits false

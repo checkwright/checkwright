@@ -2,6 +2,7 @@
 // subcommand name is the gate name, so no mapping table exists to drift
 pub mod action_gh_repo;
 pub mod action_pinning;
+pub mod action_run_shell;
 pub mod amendment_queue;
 pub mod amendment_update_target;
 pub mod agent_tier_explicit;
@@ -139,6 +140,18 @@ pub const REGISTRY: &[GateEntry] = &[
         &["GATE_PRUNE_DIRS"],
         "gate-sdk",
         &[],
+    ),
+    // spec: gate-sdk/SPEC.md §check-action-run-shell — the same `?` scan root as its cohort
+    // sibling above, and `shellcheck` as the declared dependency criterion 7's wrapper ruling
+    // keeps: the program is the rule, so it stays off the payload and on the floor of what the
+    // member refuses without.
+    (
+        "check-action-run-shell",
+        action_run_shell::run,
+        &[("?", "")],
+        &["GATE_PRUNE_DIRS"],
+        "gate-sdk",
+        &[("shellcheck", "")],
     ),
     (
         "check-action-gh-repo",

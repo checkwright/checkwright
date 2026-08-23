@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Behavioral test of gate-sdk/checks/check-action-run-shell.sh — the fidelity
-# limit's refused class, which the one good/bad pair cannot hold: the pair models
-# exit 0 and exit 1, and every refusal here is exit 2 by the fail-closed contract.
+# Behavioral test of check-action-run-shell — the fidelity limit's refused class,
+# which the one good/bad pair cannot hold: the pair models exit 0 and exit 1, and
+# every refusal here is exit 2 by the fail-closed contract.
 # Each case asserts the exit status AND the construct named in the message, so the
 # boundary is proved by the oracle rather than described in prose.
 #
@@ -9,8 +9,7 @@
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../lib/test-hermetic.sh"
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-GATE="$ROOT/gate-sdk/checks/check-action-run-shell.sh"
+CHECKS="$(cd "$(dirname "${BASH_SOURCE[0]}")/../checks" && pwd)"
 
 fails=0
 tmp="$(mktemp -d)"
@@ -25,7 +24,7 @@ check_case() {
         printf 'name: %s\n\njobs:\n  j:\n    runs-on: ubuntu-latest\n    steps:\n' "$label"
         printf '%s\n' "$tail"
     } > "$dir/tree/wf.yml"
-    out="$( cd "$dir" && "$GATE" tree 2>&1 )"; rc=$?
+    out="$( cd "$dir" && gate_run check-action-run-shell "$CHECKS" tree 2>&1 )"; rc=$?
     if [[ "$rc" -ne "$want" ]]; then
         echo "  FAIL [$label]: want exit $want, got $rc -- $out"; fails=$((fails + 1)); return
     fi
@@ -88,7 +87,7 @@ check_case chomp_plus '      - run: |+
 mkdir -p "$tmp/outside/tree"
 printf 'version: 2\n\nworkflows:\n  b:\n    steps:\n      - run: >\n          echo folded\n' \
     > "$tmp/outside/tree/foreign.yml"
-out="$( cd "$tmp/outside" && "$GATE" tree 2>&1 )"; rc=$?
+out="$( cd "$tmp/outside" && gate_run check-action-run-shell "$CHECKS" tree 2>&1 )"; rc=$?
 if [[ "$rc" -ne 0 ]]; then
     echo "  FAIL [refusal-is-subject-bound]: want exit 0, got $rc -- $out"; fails=$((fails + 1))
 elif ! grep -qF -- "1 file(s) skipped by the Actions-shape predicate" <<<"$out"; then
