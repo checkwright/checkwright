@@ -123,49 +123,6 @@
   `shell-gate-tail-port-and-completion-oracle`'s scope, on the lead's ruling and after that scope's
   premise re-verification found the designed answer void.
 
-- **subagent-stop-payload-background-tasks-read** — the `SubagentStop` payload carries a top-level
-  `background_tasks` key and nothing knows what is in it; take the one deliberate value read.
-  **Verified against the wired hook's own log, not inferred:** every firing records
-  `keys=...,background_tasks,session_crons`. That falsifies a claim
-  `subagent-stop-liveness-hook-wiring` recorded as SETTLED and carried into its amendment — "the
-  payload names no background task, PID or shell id, so detection never comes from it" — which
-  close 2026-08-22 corrected at delegation-kit/SPEC.md §The turn-end liveness probe (template),
-  keeping the no-values privacy ruling on the ground that survives the correction.
-  **Why it matters beyond the correction.** The harness independently states it tracks an agent's
-  live background children. If that key names them, the blocking variant's whole design changes:
-  the hook could read the harness's own view instead of the `*.run` record set, and guard-kit's
-  unrecorded-launch residue would become reachable. `turn-end-chokepoint-and-wait-primitive` is
-  sequenced behind this entry for that reason — the lead ruled 2026-08-22 that asking for the
-  blocking variant's authorization first would buy a design decided before its inputs.
-  **ADMITTED BY THE OPERATOR 2026-08-23 as this iteration's off-surface rider, AND THE ADMISSION IS
-  NARROWER THAN IT LOOKS.** What was authorized is the **unit entering**: the deliberate value read,
-  and the fact that the no-values privacy ruling is now in play. What was NOT authorized is that
-  ruling. It stays OPERATOR-CLASS and UNMADE, and it returns as an escalation from whichever stage
-  holds the read's result in hand. A session reading this entry as having settled it has read the
-  admission for the decision; do not pre-empt it.
-  **So the deliverable splits, and the split is the shape of the unit.** Takeable here: the read
-  itself, against the probe's own recorded ruling that it logs keys and never values
-  (delegation-kit/SPEC.md §The turn-end liveness probe (template), delta 4). Not takeable here:
-  changing that ruling, which is what a value read touches and what the escalation carries.
-  **THE READ IS TAKEN, 2026-08-23 at build, and it lands in delegation-kit/SPEC.md §What
-  `background_tasks` carries** — schema, not captured values; the instrument was a one-off scratch
-  dump from the consumer hook copy, restored byte-for-byte, so the probe's grammar and its no-values
-  ruling are untouched. **The decisive result is a NEGATIVE and it moves the successor's design:**
-  the key enumerates what the harness launched, not what is running — a detached producer, live and
-  carrying a red `*.run` record, appeared in none of five firings — so the blocking variant cannot
-  substitute the harness's view for the record set, and the unrecorded-launch residue does NOT
-  become reachable through it. The privacy ground came back wider, not weaker: a `shell` entry
-  carries a verbatim `command` line. **The entry does NOT move to Done on this commit.** Its second
-  half — whether the ruling changes — is operator-class and still unmade; it is escalated with the
-  result in hand and the Done move waits on that answer, so nothing here may be read as settling it.
-  **The pair commitment is EARLY, not void.** This entry and
-  `turn-end-chokepoint-and-wait-primitive` still promote together; the admission pays the condition
-  down inside this iteration rather than deferring it, so only the timing moved.
-  Filed 2026-08-22 by build; drained at that iteration's close, which verified the key set directly
-  against the committed hook's log; promoted to Technical Debt 2026-08-23 at
-  `shell-gate-tail-port-and-completion-oracle`'s scope, on the operator's admission relayed by the
-  lead.
-
 ## Deferred
 
 - **turn-end-chokepoint-and-wait-primitive** [design-pending] — the blocking-hook variant,
@@ -7318,6 +7275,8 @@
 - **amendment-roster-omission-detection** [design-pending] — Only a grep catches a short roster.
 
 ## Done
+
+- subagent-stop-payload-background-tasks-read
 
 ## Lessons Learned
 

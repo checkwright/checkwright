@@ -959,9 +959,24 @@ The `keys` field settled that the payload has this top-level key and left what i
 in it open. A deliberate one-off read then took it, **out of band and without
 touching this template**: the consumer's hook copy dumped each firing's raw
 payload to gitignored scratch across five firings and was restored byte-for-byte,
-so the grammar above still logs keys and never values. **Whether the probe should
-log any of this is not settled by having read it** — that is a change to the
-privacy ruling, and it is not made here.
+so the grammar above still logs keys and never values.
+
+**The ruling the read was bought to inform: the probe keeps logging key names
+only.** No field is added and the grammar takes no delta. Ruled 2026-08-23 by the
+iteration lead under an explicit operator delegation — the question was relayed
+to the operator as operator-class and the operator returned it to the lead
+("your call"), so the authorization is delegated rather than exercised, and the
+ruling is neither the operator's own nor one the lead took unilaterally. The
+channel is cited here because a later reader cannot otherwise tell those three
+apart. **What decided it is the read's own result, and the direction is the
+unusual part: the read STRENGTHENED the ruling rather than merely failing to
+overturn it.** The only named reader a value log would ever have had was the
+harness-view substitution below, and the read falsified that reader outright. A
+ruling with nothing on the other side of it has stopped being a restriction.
+A derived non-value — a count, a type tally — was weighed and refused on the same
+ground: it serves no reader either, and a grammar delta plus a template and a
+consumer edit are not spent on a field nothing reads.
+Should a reader appear, it reopens as a new question and not as this one.
 
 **It is a live-children enumeration, and it is populated.** An array of objects in
 two shapes, both carrying `id`, `type`, `status` and `description`: a `type` of
