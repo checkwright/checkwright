@@ -78,6 +78,7 @@ pub mod scratch_citation;
 pub mod settings_paths;
 pub mod settings_pins;
 pub mod settings_pins_parity;
+pub mod shellcheck;
 pub mod shim_restatement;
 pub mod skill_binding;
 pub mod smoke_entry_guard;
@@ -1478,6 +1479,23 @@ pub const REGISTRY: &[GateEntry] = &[
         ],
         "gate-sdk",
         &[("git", "")],
+    ),
+    // spec: gate-sdk/SPEC.md §check-shellcheck — one `?` for the derived directory set: the gates
+    // dir, four directories per kit root and the extra-dirs knob's own words, a set the registry
+    // cannot name concretely. `shellcheck` is the declared dependency criterion 7's wrapper ruling
+    // keeps: the program is the rule, so it stays off the payload and on the floor of what the
+    // member refuses without.
+    (
+        "check-shellcheck",
+        shellcheck::run,
+        &[("?", "")],
+        &[
+            "GATE_SDK_GATES_DIR",
+            "GATE_KIT_ROOTS_HERE",
+            "GATE_LINT_EXTRA_DIRS",
+        ],
+        "gate-sdk",
+        &[("shellcheck", "")],
     ),
     // spec: gate-sdk/SPEC.md §check-install-disposition — one `?` for the one root per kit root,
     // a set the registry cannot name concretely; `git` for the toplevel the positional root falls

@@ -1,0 +1,3 @@
+# graph: couples=scripts/*.sh,kit:*.sh dir=one valve=none tier=precommit
+# install: zero-config
+# spec: gate-sdk/SPEC.md §check-shellcheck — ShellCheck lint of the gate family at -S warning (the self-lint contract)

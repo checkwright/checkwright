@@ -461,12 +461,51 @@ a cwd and an env nothing in production reads. Widening `proc.rs` is how a member
 that needs more of the child's result gets it; building its own `Command` is what
 the test refuses.
 
+**The wrapper contract: a member whose rule *is* an external program refuses with
+its own message, at the shell form's own point in the order.** Criterion 7's
+program-is-the-rule class ports as a wrapper (§The port-candidate criteria), and
+`run`'s `Err` arm alone does not discharge it. Two things it does not carry, both
+in `proc.rs` so a cohort of wrappers buys them once:
+
+- **`on_path(program)`** — bash's `command -v <prog>` reduced to *is there an
+  executable of this name on PATH*. It exists so the refusal is the member's own
+  documented text rather than a generic spawn-failure string, and so it fires
+  **where the shell form fired it**. That ordering is load-bearing rather than
+  cosmetic: `check-shellcheck` probes the linter before it globs its targets, so a
+  tree with nothing to lint and no linter reports the *linter*, and catching the
+  spawn failure instead would report the empty corpus. A refusal message is a
+  documented surface — a session debugging its PATH reads the message, not the
+  exit code. `run`'s `Err` arm stays the backstop for a program that vanishes
+  between the probe and the spawn.
+- **`run_merged` and `Merged`** — the `2>&1` capture a wrapper's shell form takes.
+  `Completed` withholds stdout unless the status succeeded, which is right for a
+  reader and wrong for a wrapper: for a linter the **non-zero** run is the one
+  whose report must be printed. `Merged` therefore reads its report whatever the
+  status, and the false green is closed on the other side instead — `succeeded()`
+  reads the status, so a clean line is unreachable from an empty capture and
+  emptiness is never the branch. The merge is two handles on **one** file
+  description (`try_clone` is `dup`), the technique `dispatch` already uses, so
+  the two streams interleave exactly as bash's `2>&1` did; reading them as two
+  pipes and concatenating would reorder a linter's findings against its errors.
+
+**Neither half has a fixture representation, so each wrapper's parity run carries
+a constructed scenario**: both implementations over the same cases with the
+program present, and again with PATH scrubbed of it, comparing bytes and exit
+codes. A committed case cannot remove a program from PATH — this is the
+`# no-fixture:` discharge shape applied to a member that *has* a pair, which
+§The port-candidate criteria criterion 2's second worked instance licenses. The
+scrub removes exactly the one name and keeps the rest of PATH: emptying it
+entirely tests a different absence, since the shell form's own library resolves
+kit roots through `realpath`.
+
 **That routing test is also what makes `--needs` trustworthy, which is why the
 spawn recorder lives here rather than beside the registry.** `proc.rs` carries a
-`#[cfg(test)]` recorder on the shape `walk.rs`'s read recorder has: `run` and
-`run_with_stdin` note the program they are about to spawn, and §The `# graph:`
-manifest's unit test A reads the note back after running a member over its fixture
-cases. It is **test-scoped deliberately** — a production recorder would be state
+`#[cfg(test)]` recorder on the shape `walk.rs`'s read recorder has: **every**
+spawning entry point — `run`, `run_with_stdin`, `run_merged` — notes the program
+it is about to spawn, and §The `# graph:` manifest's unit test A reads the note
+back after running a member over its fixture cases. A face added to `proc.rs`
+that skipped the note would un-verify A silently, which is why the recorder is
+part of what widening `proc.rs` costs. It is **test-scoped deliberately** — a production recorder would be state
 with no reader — and it is unreachable from a gate module, which is what keeps it
 from becoming a runtime surface. Because the routing test already proves no gate
 module builds its own `Command`, hooking the two wrapper functions observes every
@@ -1036,7 +1075,7 @@ answering a question assertion C never asked.
 
 | Meta-gate | Disposition for a `.gate`-dispatched member |
 |---|---|
-| `check-shellcheck` | **Retired with cause** — no shell exists to lint. `cargo clippy` at deny-warnings is the substrate equivalent and runs in CI, not as a gate. |
+| `check-shellcheck` | **Retired with cause, and the cause is per-member rather than about this gate.** For a `.gate`-dispatched member there is no shell file to lint, so this meta-gate makes no assertion about it; `cargo clippy` at deny-warnings is the substrate equivalent and runs in CI, not as a gate. Read as a statement about the *gate* the row would be false, and the distinction is worth the sentence: the gate is `zero-config`, an adopter cannot author a compiled gate, and a vendoring consumer's gate family is shell by construction — so what ends when a tree's last `.sh` leaves is that tree's registration, never the shipped gate (§check-shellcheck). **This member is itself `.gate`-dispatched since `shell-gate-tail-port`**, ported as criterion 7's wrapper: its rule is an invocation of `shellcheck`, which stays a declared dependency the compiled form spawns and refuses at exit 2 without. Its own port moves nothing in the rule and one thing in its corpus — one fewer `.sh` to lint — which is this row's disposition measured rather than asserted. |
 | `check-gate-output` | **Ported and strengthened for the fixtured corpus; source-grep retained for the one member outside it, over the corpus that member's rule now lives in.** The source-grep for `: clean`/`help:` was always a proxy for behavior; for the fixtured members the assertion now runs in `run-gate-tests.sh` (§run-gate-tests) against the case's real output, on **shell gates too**. The remaining member, `check-task-conservation` (`# no-fixture:` per queue-kit/SPEC.md §check-task-conservation — a HEAD-vs-worktree diff has no static-fixture representation), has no case for a runtime assertion to reach, so the source-grep stays its only oracle. Retiring the static half outright would zero out that member's output-contract coverage — the exact vacuity this table exists to close. **That member has since ported**, which is why this row is not "unchanged": its declaration path is now a descriptor, which by the closed field roster cannot hold the strings, so corpus *and* emitter alternation follow the rule to the implementation module, and a tree carrying no crate declares the member out of reach rather than reddening (§check-gate-output owns the resolution and its two branches). |
 | `check-gate-fail-closed` | **Retired with cause, and the cause is narrower than it first read.** For a member that reads files, the defect (branching on a captured value's emptiness when the subprocess died) is unrepresentable: there is no subprocess, and a fallible read returns a `Result` that cannot be ignored. A real substrate win, stated as one. **It is representable for a member that spawns one**, and the queue-kit cohort landed the first: `Command::output()` returning `Ok` means the *spawn* succeeded, never that the program did, so reading `stdout` while ignoring `status` reproduces the defect exactly. The disposition is unchanged — this gate's corpus is `check-*.sh` and it could not scan a Rust module either way — and the property is held crate-side rather than by review: the spawn wrapper and its unit tests (§Fail-closed contract) leave a gate module unable to construct a `Command` at all, and unable to reach stdout without the status having been read. Machine-held rather than remembered, which is the same answer the `check-reads-couples` row below gives to the same problem, and what keeps this retirement honest. |
 | `check-reads-couples` | **Retained, with a binary-side equivalent.** Its shell parser finds no walks in a binary gate and would print `clean` — the single worst vacuity available here — so the substrate answers instead of the parser: the binary carries a `--reads <name>` arm printing one line per walk root, a repo-relative path or `?`, and the gate consumes that report into its existing coverage assertion (§check-reads-couples). The declaration is **registry data held to executed behavior**, which is what separates it from the unbound self-declaration this gate exists to refuse: each gate's roots are declared beside its dispatch entry in the crate's registry (an entry added without them fails to compile), the crate's single sanctioned walk implementation records the roots it is invoked with, and two unit tests close the loop — **A**, every member run over its own `gate-tests/<name>/{good,bad}/` cases with recording on, observed roots a subset of declared; **B**, no module outside that walk implementation names a filesystem-walk API, because a direct walk would be invisible to the recorder and unverify A. B's vendored half is held by an **allowlist over the resolved graph**: a spelling roster cannot catch a walker inside a dependency, so every crate in the tracked `Cargo.lock` — transitive included, since a transitive crate walks as visibly as a direct one — is admitted by name with the clause of the dependency bar it cleared (§The settings cohort, and the crate's first dependency), and the assertion reds both on an unadmitted crate and on an allowlist entry absent from the graph. Reading only the `[dependencies]` table would admit an entire subtree unexamined, which is why the lock is tracked rather than gitignored. The precedent is the `check-knob-default-coupling` row below: an executed assertion is the answer where a static gate would be vacuous. The refusal survives only where the gate still cannot see — a name the substrate does not carry, and an unresolvable filter knob — and there is deliberately no descriptor-level opt-out, which the consumption path does not reinstate: a port ends this assertion by answering it (§check-reads-couples). **This member is itself `.gate`-dispatched** since §The sixth budget batch, which is that closing clause discharging on the auditor: the compiled form reaches the read set in process rather than spawning the arm, so the absent-binary refusal is answered out of existence rather than retired, and the row now describes a ported member auditing ported members. What `--reads` verifies is unchanged and is worth restating because the natural reading is wrong: a member's declared roots are **registry data**, not a derivation from its Rust source, and the declaration-to-code link is held by unit test A. Both members ported in that batch with a non-empty root set carry `?` alone, and the auditor's own root set is empty and stays empty, so no self-assertion is lost. |
@@ -1600,7 +1639,9 @@ design time; the last three were paid for, and each is named with what it cost.
    is stated here rather than reasoned out per port.** Running assertion C's
    derivation over the live registry reports `check-template-registry-parity`
    substrate-sensitive: its `kit:*/*.sh` expands to `gate-sdk/*/*.sh`, which
-   covers `gate-sdk/checks/check-shellcheck.sh`. It is the second kind of
+   covers every `.sh` still declaring a gate under `gate-sdk/checks/` — a
+   shrinking set named by its shape rather than by a member, because a port
+   empties it one file at a time. It is the second kind of
    over-selection above — the gate does read `*.sh` names as content, but only
    under a `<kit>/<name>/` directory that a sibling `<kit>/templates/<name>.list`
    registers, and no kit ships a template registering `checks/`. Against this
@@ -2088,7 +2129,13 @@ design time; the last three were paid for, and each is named with what it cost.
      below). The dependency floor those programs sit outside is not widened by
      the port: a consumer without the program gets the refusal it gets today,
      and the adopter-facing residue the ruling leaves is the bootstrap alone
-     (TRAJECTORY.md §The closed rulings).
+     (TRAJECTORY.md §The closed rulings). **The first wrapper landed with
+     `check-shellcheck` in `shell-gate-tail-port`**, and what it establishes for
+     the class is more than its own port: refusing at exit 2 is not by itself the
+     ruling's discharge, because the exit code is the cheap half. The wrapper owes
+     **message parity at the shell form's own point in the order**, and the two
+     mechanisms that buy it — a PATH presence probe and a merged-stream capture —
+     live in §Fail-closed contract for the whole class rather than in one member.
    - **The program is incidental spelling.** A text utility the rule uses to
      assemble, split or order a string the port re-expresses in the target
      language — `paste -sd, -` is `.join(",")`, and the verdict is identical
@@ -3903,7 +3950,8 @@ of its rule — the first cohort's economy at five members instead of two.
 the second over-selection path rather than the first.** Assertion C's runtime
 derivation reports `check-template-registry-parity` substrate-sensitive: its
 `couples=` carries `kit:*/*.sh`, which expands to `gate-sdk/*/*.sh` and covers
-`gate-sdk/checks/check-shellcheck.sh`. It is **not** a reverse-trigger couple —
+the `.sh` gate declarations still under `gate-sdk/checks/`. It is **not** a
+reverse-trigger couple —
 the gate really does read `*.sh` names as content, through
 `git ls-files -- '*.sh'`. It is a **content couple wider than the walk**: the
 names it reads are only those under a `<kit>/<name>/` directory that a sibling
@@ -7859,24 +7907,69 @@ gating it, and criteria 6 and 7 state no roster for a freshness gate to hold.
 
 ### check-shellcheck
 
+`checks/check-shellcheck.gate` (`precommit`, binary-dispatched).
+
 Invariant: every `*.sh` directly under the consumer gates dir, each
 vendored kit's `lib/`, `bin/`, `checks/`, and `templates/`, and each directory
 named in `GATE_SDK_LINT_EXTRA_DIRS` passes ShellCheck at `-S warning` (the
 self-lint contract). A missing `shellcheck` binary is exit 2 — a gate that
-cannot run is not clean.
+cannot run is not clean — and so is an **empty target set**, because a
+derivation that selected nothing has verified nothing. The two are ordered: the
+linter is probed before the targets are globbed, so a tree with neither reports
+the missing linter.
 
 A `.gate`-dispatched member is outside this corpus **with cause** — there is no
 shell to lint, and `cargo clippy` at deny-warnings is the substrate equivalent
 (§Meta-gate conservation for the binary substrate, which owns the reasoning).
 
-**This gate is takeable, and its port is a wrapper.** Its rule *is* an invocation
-of `shellcheck`, a program the payload does not carry, so criterion 7 reports it
-(§The port-candidate criteria) — and under the 2026-08-23 ruling recorded there
-the program stays a declared dependency the compiled form spawns, refusing at
-exit 2 when absent exactly as this shell form does. The port is owed to
-`shell-gate-tail-port`; no hold is declared. What the port does not change is the
-gate's horizon: its corpus is the tree's shell, so it retires with the last
-`.sh` rather than outliving it.
+**Its rule *is* an invocation of `shellcheck`, so it ported as the wrapper
+§The port-candidate criteria's criterion 7 prescribes for a program-is-the-rule
+member** (and the 2026-08-23 ruling recorded there). The compiled form spawns the
+program, the program stays a **declared dependency** the payload does not carry,
+and an absent one is exit 2 carrying *this member's own* refusal text rather than
+the generic spawn-failure string — §Fail-closed contract owns both mechanisms and
+why message parity rather than the exit code alone is what a wrapper owes. The
+dependency floor is not widened by the port: a consumer without ShellCheck gets
+exactly the refusal it got from the shell form, at the same point in the same
+order. Parity was **run rather than argued** — both implementations over the same
+corpus, same cwd, same argv, with the program present and again with PATH
+scrubbed of it, byte-identical on stdout, stderr and exit code across the live
+tree, both fixture cases and an empty target set.
+
+**Criterion 4 binds, and the live-tree arm was taken undemoted — with a bound
+this member has and its sibling did not.** Its corpus is every `*.sh` under a
+resolve dir, so it reads gate source as content. The pre-port rule was restored
+under a non-resolving name inside the resolve dir, which puts both
+implementations over the **post**-descriptor corpus (§The port-candidate
+criteria, criterion 4). The bound: unlike a member whose corpus is a `check-*`
+glob, this one's corpus is *all* `.sh`, so the probe file is **inside the corpus
+it is probing**. Both implementations were driven over the identical tree at the
+identical moment and both counted the probe, so the comparison is still over the
+post-descriptor corpus rather than the pre-descriptor one; what it does not claim
+is that the corpus is byte-identical to the committed one, which differs by the
+probe alone. Recorded because the next wrapper meets the same shape.
+
+**What ends at the port is this tree's registration, not the kit's gate**, and
+the two are recorded as separate facts because collapsing them deletes an
+adopter's self-lint floor. The gate is `zero-config` and ships to every adopter,
+and an adopter **cannot author a compiled gate** — `native/` ships no `checks/`
+and no `smoke/`, so `gate_kit_roots` never selects it and `init` never vendors it
+(§The port-candidate criteria, the default's domain). A vendoring consumer's gate
+family is shell by construction, which is the corpus this gate exists for. When
+*this tree's* last `.sh` leaves, its corpus here is empty and `scripts/gates.list`
+drops it; the kit keeps shipping it, doing exactly the job it does today on a tree
+that has shell. That is deregistration, not retirement, and it is not this port:
+the tree still carries a shell library, kit `bin/` scripts and a consumer gates
+directory, none of which this unit moves.
+
+**Its own corpus narrows as this unit runs, and the narrowing is safe for a
+stated reason rather than an assumed one.** The red condition is *a `.sh` under a
+resolve dir that fails ShellCheck at `-S warning`*, which is monotone in the
+violation set, so shrinking the corpus can only remove findings. Stated because
+"a narrower corpus can only remove violations" is the first argument a narrowing
+delta reaches for and it is false in general — the reds-on-empty arm stated with
+the invariant above is this member's own counter-case, and it is why an emptied
+target set is exit 2 rather than a clean line.
 
 That derivation is also the answer to "does anything lint my workflows?", and on
 its own the answer is no: `.github/workflows/*.yml` sits under no kit root and
@@ -7886,7 +7979,16 @@ and linting each at this gate's severity.
 
 The knob **appends to** that derived set and never replaces it, so a consumer
 that sets nothing keeps the shipped coverage exactly and a consumer that sets it
-can only widen. It exists because the kit-root predicate (§lib/gate.sh) is what
+can only widen. It is a **whitespace-separated scalar feeding an array**, so it is
+resolved in `lib/gate.sh` onto a name of its own, `GATE_LINT_EXTRA_DIRS` — the
+shape `GATE_PRUNE_DIRS` and `GATE_EXEC_GLOBS` already have, for the reason
+§lib/gate.sh states: a default written at a use site is invisible to the config
+bridge's `declare -p`, and a consumer that never sets this knob would meet the
+bridge's undeclared-knob refusal on the member's first post-port run. The
+resolution splits on whitespace and does **not** pathname-expand, which the
+inline `for d in $KNOB` it replaces did; that narrowing is shared by every knob
+already on this pattern and is deliberate, a directory set being named rather
+than globbed. It exists because the kit-root predicate (§lib/gate.sh) is what
 puts a directory in scope, so a shipped script under no kit root — a consumer's
 own tooling, a runnable walkthrough, an installer — is lintable but not linted
 until its directory is named. Positional arguments remain a full scope override

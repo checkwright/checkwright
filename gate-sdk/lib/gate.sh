@@ -105,6 +105,14 @@ else
     GATE_EXEC_PRUNE=(gate-tests fixtures templates smoke)
 fi
 
+# spec: gate-sdk/SPEC.md §check-shellcheck — the lint-extra-dirs knob is a whitespace-separated scalar feeding an array, which is the one case a resolved global earns a spelling of its own; GATE_PRUNE_DIRS and GATE_EXEC_GLOBS above are the same shape for the same reason. Resolved here rather than at the use site because the config bridge reads a declared knob through `declare -p`, and a consumer that never sets it would be the bridge's undeclared-knob refusal on the member's first post-port run. Empty is the shipped default, so a consumer setting nothing keeps exactly the derived coverage.
+# shellcheck disable=SC2034  # consumed by the compiled member across the bridge, never within this lib
+if [[ -n "${GATE_SDK_LINT_EXTRA_DIRS:-}" ]]; then
+    read -r -a GATE_LINT_EXTRA_DIRS <<<"$GATE_SDK_LINT_EXTRA_DIRS"
+else
+    GATE_LINT_EXTRA_DIRS=()
+fi
+
 # spec: gate-sdk/SPEC.md §check-graph — check-graph's three scalar graph knobs, resolved here rather than inline at their use sites on the cause the roster above states: a default the bridge's `declare -p` cannot find is its undeclared-knob refusal on the member's first post-port run. Each keeps the `:-` semantics its use site had (an empty value takes the default), and the artifact and the theme directory ride GATE_SDK_GATES_DIR's own resolved value above so the pair stays one value by construction. Every one of them stays relative: the resolved argv is baked verbatim into the tracked pre-commit hook, and an absolute value would commit one machine's checkout path to a public file.
 [[ -n "${GATE_SDK_GRAPH_ARTIFACT:-}" ]]  || GATE_SDK_GRAPH_ARTIFACT="$GATE_SDK_GATES_DIR/CHECK-GRAPH.html"
 # spec: gate-sdk/SPEC.md §check-graph — GATE_SDK_GRAPH_THEME is RETIRED and the gate refuses, exit 2, on finding it set or on a stale <gates-dir>/graph-theme.sh; the theme is now GATE_SDK_GRAPH_THEME_DIR's directory of verbatim part files. Named here rather than deleted so a consumer grepping the kit for the old knob lands on its replacement instead of on nothing.

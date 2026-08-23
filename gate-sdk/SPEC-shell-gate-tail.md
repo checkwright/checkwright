@@ -197,6 +197,20 @@ remedy; the wrapper's generic string names the program and not what to do about
 it. A refusal message is a documented surface, and a session debugging its PATH
 reads the message rather than the exit code.
 
+**Corrected at build, 2026-08-23 — "what is not built is message parity" names
+one of three gaps, and the other two are mechanism rather than text.** Landing the
+first wrapper (delta 5) found `proc::run` unable to serve a wrapper at all, for
+the very property this paragraph praises: `Completed::stdout()` withholds output
+unless the status succeeded, and for a linter the **non-zero** run is the one
+whose report must be printed. And `run` captures the two streams separately where
+every wrapper's shell form takes a `2>&1` merge. Two faces were added to
+`proc.rs` — a PATH presence probe and a merged-stream capture — and the presence
+probe carries the third gap: the refusal must fire **where the shell form fired
+it**, before the target derivation, or a tree with nothing to lint and no linter
+reports the empty corpus instead of the missing program. All three are recorded in
+§Fail-closed contract as the wrapper contract for the class, so deltas 6 and 7
+inherit them rather than re-deriving them.
+
 **The refusal is §Fail-closed contract's exit 2 and not a red.** *Cannot verify*
 and *verified clean* must not share an exit code, and an absent linter is the
 first case: a member that printed `clean` because shellcheck was missing is the
@@ -337,6 +351,15 @@ corpus here is empty and `scripts/gates.list` drops it; the kit keeps shipping i
 seeded by `init`, doing exactly the job it does today on a tree that has shell.
 Deleting the gate on that stale phrasing would remove an adopter's self-lint
 floor to tidy a tree it does not describe.
+
+**Also corrected at build, 2026-08-23 — the knob is a scalar feeding an array and
+had no bridgeable name.** `GATE_SDK_LINT_EXTRA_DIRS` is set only in a consumer's
+config file, so `declare -p` finds it in *this* tree and would meet the bridge's
+undeclared-knob refusal in any consumer that never sets it — F11's shape a third
+time. It is resolved in `gate-sdk/lib/gate.sh` onto `GATE_LINT_EXTRA_DIRS`, the
+distinct-array-name rule the library already applies to `GATE_PRUNE_DIRS` and
+`GATE_EXEC_GLOBS`, and the resolution word-splits without pathname-expanding —
+recorded in §check-shellcheck rather than left as a silent narrowing.
 
 **Its own corpus narrows as this unit runs**, which puts it under point 5 with
 delta 4: the gate's red condition is *a `.sh` under a resolve dir that fails

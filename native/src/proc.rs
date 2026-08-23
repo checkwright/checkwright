@@ -48,6 +48,92 @@ pub fn run(program: &str, args: &[&str]) -> Result<Completed, String> {
     })
 }
 
+// spec: gate-sdk/SPEC.md §Fail-closed contract — the wrapper contract's presence probe, bash's
+// `command -v <prog>`: it exists so a wrapper's refusal is its own message at the shell form's
+// own point in the order, with `run`'s `Err` arm left as the backstop
+pub fn on_path(program: &str) -> bool {
+    if program.contains('/') {
+        return is_executable(std::path::Path::new(program));
+    }
+    let Ok(path) = std::env::var("PATH") else {
+        return false;
+    };
+    path.split(':').any(|dir| {
+        let base = if dir.is_empty() { "." } else { dir };
+        is_executable(&std::path::Path::new(base).join(program))
+    })
+}
+
+#[cfg(unix)]
+fn is_executable(p: &std::path::Path) -> bool {
+    use std::os::unix::fs::PermissionsExt;
+    std::fs::metadata(p)
+        .map(|m| m.is_file() && m.permissions().mode() & 0o111 != 0)
+        .unwrap_or(false)
+}
+
+#[cfg(not(unix))]
+fn is_executable(p: &std::path::Path) -> bool {
+    p.is_file()
+}
+
+// spec: gate-sdk/SPEC.md §Fail-closed contract — a child whose two streams were merged, the
+// `2>&1` capture a wrapper's shell form takes; the false green is closed on the `succeeded()`
+// side rather than by withholding the report
+pub struct Merged {
+    status: std::process::ExitStatus,
+    output: Vec<u8>,
+}
+
+impl Merged {
+    pub fn succeeded(&self) -> bool {
+        self.status.success()
+    }
+
+    pub fn output(&self) -> &[u8] {
+        &self.output
+    }
+}
+
+// spec: gate-sdk/SPEC.md §Fail-closed contract — `run`'s merged-capture face: two handles on one
+// file description (`try_clone` is `dup`), `dispatch`'s own technique, so the streams interleave
+// as bash's `2>&1` did rather than concatenating in the wrong order
+pub fn run_merged(program: &str, args: &[&str]) -> Result<Merged, String> {
+    #[cfg(test)]
+    recorder::note(program);
+    let spawn_err = |e: std::io::Error| {
+        format!(
+            "cannot run {}: {} — the check could not run; treating as failure (not clean)",
+            program, e
+        )
+    };
+    let capture = std::env::temp_dir().join(format!(
+        "checkwright-merged.{}.{}",
+        std::process::id(),
+        MERGE_SEQ.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
+    ));
+    let out = std::fs::File::create(&capture).map_err(spawn_err)?;
+    let err = out.try_clone().map_err(spawn_err)?;
+    let status = Command::new(program)
+        .args(args)
+        .stdin(std::process::Stdio::null())
+        .stdout(std::process::Stdio::from(out))
+        .stderr(std::process::Stdio::from(err))
+        .status();
+    let status = match status {
+        Ok(s) => s,
+        Err(e) => {
+            let _ = std::fs::remove_file(&capture);
+            return Err(spawn_err(e));
+        }
+    };
+    let output = std::fs::read(&capture).map_err(spawn_err)?;
+    let _ = std::fs::remove_file(&capture);
+    Ok(Merged { status, output })
+}
+
+static MERGE_SEQ: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
+
 // spec: gate-sdk/SPEC.md §Fail-closed contract — `run` with a body written to the child's stdin,
 // the one shape `run` cannot carry: a shell caller's `printf … | git hash-object --stdin` has no
 // argv spelling, and routing it here keeps the spawn site single
