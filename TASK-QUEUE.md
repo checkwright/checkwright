@@ -14,6 +14,41 @@
 
 ## Technical Debt
 
+- **graph-port-bash-spawn-residue** — the ported `check-graph` spawns `bash` from the binary, so the
+  crate's shipped gate path carries a non-git program; decide what owns that now the shell-gate
+  answer is void.
+  **The residue is exact.** `native/src/gates/graph.rs` runs `gate-sdk/bin/gen-pre-commit.sh` for
+  its `--emit` and `--emit-commit-msg` arms (assertions D and E), because the hook generator stayed
+  shell while the gate that reads its output ported. Criterion 7 sanctions the spawn — `bash` is on
+  `GATE_SDK_PROGRAM_FLOOR` — and the operator ratified the cost 2026-08-21, so this is residue and
+  not a rule break. It runs against TRAJECTORY.md §The objectives 1, 2 and 6.
+  **The claim is narrower than its filing said, verified against the crate.** Four other non-git
+  spawns exist — `bash` in `main.rs`, `walk.rs` twice and `evidence.rs`, `awk` in `ere.rs` — and
+  every one sits inside a `#[cfg(test)]` module. The honest claim is *first non-git spawn on the
+  shipped gate path*, never *first in the crate*.
+  **The designed answer is VOID, and that is what makes this debt rather than a feature.** It was a
+  new SHELL gate owning hook parity alone under born-native exception class (a) — the
+  audit-the-dispatch-relation argument, a compiled form having to compute both sides of the
+  comparison through the very binary under test. The operator retired class (a) on 2026-08-23
+  (TRAJECTORY.md §The closed rulings; gate-sdk/SPEC.md §The port-candidate criteria now reads
+  "(a) — RETIRED") and the refutation recorded there is this argument's own: the shell auditor
+  already trusts the binary's `--list`. Build's 2026-08-21 refusal — that the answer mints a gate
+  name, a descriptor, a fixture pair and a SPEC section to relocate an assertion criterion 7 already
+  sanctions in place — now has nothing left to refuse, and what survives mints no governed name.
+  **What this unit decides:** whether the spawn is declared under the spawned-program declaration
+  `shell-gate-tail-port` mints for every wrapper in this same unit set, or is retired outright by
+  porting the generator. The first is the convergent answer and is bounded by an amendment the
+  authoring stage writes; the second is gate-sdk/SPEC.md §gen-pre-commit's standing hold, named here
+  so a taker weighs it rather than meets it. On a host with no `bash` the spawn errors rather than
+  being absent, which is the branch a taker weighs rather than assumes.
+  **NOT merged with `config-bridge-resolution-cost` — lead-held boundary, 2026-08-23.** The ruling
+  that `battery-runner-port` does not own this spawn, only its cost falling, stands unchanged and is
+  not what this promotion admits.
+  Filed 2026-08-21 twice, by spec and again by build, into the gap inbox; drained and deferred at
+  `graph-port-and-config-seam`'s close; promoted to Technical Debt 2026-08-23 at
+  `shell-gate-tail-port-and-completion-oracle`'s scope, on the lead's ruling and after that scope's
+  premise re-verification found the designed answer void.
+
 ## Deferred
 
 - **turn-end-chokepoint-and-wait-primitive** [design-pending] — the blocking-hook variant,
@@ -34,9 +69,6 @@
   The detector exists and is deliberately inert — the probe logged `verdict=red live=yes` sixteen
   times in one 37-minute window — so what is missing is a forcing function, and turning an
   observer into a refuser is the separate authorization above, which is not held.
-  **RULED by the lead 2026-08-22 — not sought that iteration:** a second authorization is a
-  scope-stage ask, and `subagent-stop-payload-background-tasks-read` may collapse what such a hook
-  should read. Sequence: settle that entry first, then route the ask.
   **The CARRIER argument is answered and stays answered.** Earlier firings argued the rule's
   carrier was too weak — the agent definition, then the dispatch prompt. A session that wrote the
   rule down itself and still ended the turn retires that: carriage is not the defect, which is why
@@ -55,6 +87,18 @@
   that undercount is legible. Honest limit on the judgment itself: the probe reads a shared `.tmp`
   and cannot attribute, so the firing is established and the culprit is not — which is the
   detector's limit and is itself an argument for the blocking variant this entry still owes.
+  **SEQUENCED 2026-08-22 BY THE LEAD, AND PROMOTION NOW COMMITTED AT THE NEXT BOUNDARY — lead
+  ruling 2026-08-23, landed here because the acting session is a boundary away and the entry is the
+  store, never the thread.** The 2026-08-22 ruling: a second authorization is a scope-stage ask, and
+  `subagent-stop-payload-background-tasks-read` may collapse what such a hook should read, so that
+  entry settles first and the ask routes after. Scope then put the unstampable fifth firing's
+  ceiling to the lead at `shell-gate-tail-port-and-completion-oracle`'s open, which ruled this entry
+  and that blocker promoted **as a pair at the next iteration boundary** and refused promotion into
+  that one as contravening the sequence above. Refused with it: widening `QUEUE_KIT_WRAP_BUDGET`.
+  Held back to the OPERATOR rather than ruled: the blocker's other half, a decision on the recorded
+  no-values privacy ruling — so a scope finding that half answered may take the pair earlier, and
+  one that does not still owes this promotion. A boundary that reads this and does neither is the
+  failure the unstampable fifth date can no longer signal.
   Filed 2026-08-16 by close from the gap inbox; demoted 2026-08-23 at build, the measurement half
   delivered and the blocking variant still sequenced.
 
@@ -280,36 +324,6 @@
   whole family at once, and would do it without a signal anyone reads.
   Filed 2026-08-22 by build on the lead's ruling; surfaced by the same sweep that produced
   `grant-argument-bounding-mechanism`, which is the data-loss half of the one audit.
-
-- **graph-port-bash-spawn-residue** [design-pending] — the ported `check-graph` spawns `bash` from
-  the binary, so the crate's shipped gate path carries a non-git program for the first time.
-  **The residue is exact.** `native/src/gates/graph.rs` runs `gate-sdk/bin/gen-pre-commit.sh` for
-  its `--emit` and `--emit-commit-msg` arms (assertions D and E), because the hook generator stayed
-  shell while the gate that reads its output ported. Criterion 7 sanctions the spawn — `bash` is on
-  `GATE_SDK_PROGRAM_FLOOR` — and the operator ratified the cost 2026-08-21, so this is residue and
-  not a rule break. It runs against TRAJECTORY.md §The objectives 1, 2 and 6.
-  **Re-verified at the drain, and the filing claim needed narrowing.** The crate carries four other
-  non-git spawns — `bash` in `main.rs`, `walk.rs` twice and `evidence.rs`, `awk` in `ere.rs` — but
-  every one sits inside a `#[cfg(test)]` module. The honest claim is *first non-git spawn on the
-  shipped gate path*, not *first in the crate*; the bullet's grep was scoped to `native/src/gates`
-  and `native/src/emit` and reached the right answer for a narrower reason than it stated.
-  Corrected here so a later session does not inherit the wider claim and find it false.
-  **The designed-but-unbought answer is VOID as designed, corrected 2026-08-23 at scope's premise
-  re-verification.** It was a new SHELL gate owning hook parity alone under born-native exception
-  class (a) — the audit-the-dispatch-relation argument, a compiled form having to compute both
-  sides of the comparison through the very binary under test. The operator retired class (a) on
-  2026-08-23 (TRAJECTORY.md §The closed rulings; gate-sdk/SPEC.md §The port-candidate criteria now
-  reads "(a) — RETIRED"), and the refutation recorded there is this argument's: the shell auditor
-  already trusts the binary's `--list`. So no shell gate is available to own it and the fork below
-  narrows to the two branches that do not mint one. What is NOT decided here is what replaces it.
-  **Why `[design-pending]`:** build refused it 2026-08-21 because it mints a gate name, a
-  descriptor, a fixture pair and a SPEC section to relocate an assertion criterion 7 already
-  sanctions in place — and on a host with no `bash` the spawn errors rather than being absent,
-  which is the branch a taker weighs rather than assumes.
-  **Cost while deferred:** low and bounded — the shipped spawn set has one member it did not have,
-  and gate-sdk/SPEC.md §gen-pre-commit carries the cause where a reader meets it.
-  Filed 2026-08-21 twice, by spec and again by build, into the gap inbox; drained and promoted at
-  `graph-port-and-config-seam`'s close, which re-verified the spawn set against the crate.
 
 - **config-bridge-resolution-cost** [design-pending] — the array-knob config bridge still costs
   about 640 ms on every invocation that resolves it, and no entry owns the residue.
@@ -6855,6 +6869,11 @@
   liveness probe (template), delta 4). Changing that ruling is the design question, not the read.
   **Cost while deferred:** the entry it gates is the project's most-fired standing defect, and its
   next design step cannot honestly be taken without this answer.
+  **PROMOTED AS A PAIR AT THE NEXT BOUNDARY — lead ruling 2026-08-23**, with
+  `turn-end-chokepoint-and-wait-primitive`, whose entry carries the ruling's grounds and the
+  ceiling that forced it. The half the lead did **not** rule and put to the operator is this
+  entry's own: changing the recorded no-values privacy ruling, which the value read needs. A scope
+  finding that half answered may take the pair earlier; one that does not still owes the promotion.
   Filed 2026-08-22 by build; drained at that iteration's close, which verified the key set
   directly against the committed hook's log.
 
