@@ -625,7 +625,7 @@ on `GATE_SDK_PROGRAM_FLOOR`, so the report still counts one program — the same
 shape delta 4 recorded for `gate_authoring_tree`'s `git` and delta 7 for
 `check-crate-arms`'.
 
-**Operator-ruled at build, 2026-08-24 — this delta empties the *last* `check-*.sh`
+**Lead-ruled at build, 2026-08-24 — this delta empties the *last* `check-*.sh`
 in the tree, and `check-gate-fail-closed` refused on the empty corpus it produced.**
 That member is `precommit` tier, so the unit could not land at all until it was
 dispositioned, and the disposition is a third gate's user-facing semantics this
@@ -640,6 +640,21 @@ descriptor set** is a finished port and is green; no declaration of **either**
 spelling under the same resolved dirs is a tree that resolved no gates directory,
 and stays exit 2. Delta 10's remainder accounting inherits a member whose clean
 line now carries a descriptor count.
+
+**Provenance corrected at the cut — the ruling above is the lead's, and was first
+recorded as the operator's.** The operator was not consulted on it. The delta-9
+session escalated correctly, and the lead ruled it under the lead's own authority
+rather than relaying it onward. Commit `0f9cc492`'s message carries the same
+misattribution and is immutable; it is not rewritten, and **this passage is the
+correct record** — the owner doc is ground truth and a commit message answers only
+what happened, never what is correct. The label is load-bearing rather than
+decorative: *operator-ruled* marks what a later session may not reverse alone
+(TRAJECTORY.md, how to read a ruling recorded there), so inflating a lead ruling
+to an operator one freezes a decision that should stay re-rulable at the lead, and
+it does so silently. The tree already carries an open entry about this failure
+class, `relayed-ruling-provenance-unrecorded`; this instance is filed to the gap
+inbox against it rather than written into it, since a mid-iteration queue edit
+contends on a stage session's surface.
 
 **One thing this delta does not say and a later reader will meet: the port empties
 `spec_canonical_specs`' last live shell caller.** `check-surface-duplication.sh`
