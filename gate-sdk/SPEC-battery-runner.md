@@ -31,6 +31,26 @@ not spent** (delta 5). And one bash process per run survives by construction,
 because criterion 6 puts a knob's value in exactly one place and that place is
 the owning kit's shell library (delta 3's opening paragraph).
 
+**That last residue is the completion predicate's reach, and it is
+operator-confirmed 2026-08-23 rather than read here.** TRAJECTORY.md §The closed
+rulings states the port's completion as *the battery runs from the hook to the
+binary with no bash in between*. The confirmed reading: the predicate governs the
+**hook-to-binary path**, which carries no bash today and keeps none under delta
+5's ruling; the surviving knob resolver is one bash process per battery run, and
+this unit owns its **cost**, not its existence. No TRAJECTORY ruling moves.
+
+**Two widening readings were put to the operator and declined**, named here so a
+later session finds them decided rather than undiscovered. The first is the
+**emit-arm path**: a `--emit-` member is bridged, so a crate-side hook emitter
+could *receive* the resolved knob union through the bridge rather than compute
+it — which is a plausible answer to §gen-pre-commit's structural premise and is
+**declined for now**, not refuted. The second is a reversal of that section's
+2026-08-21 ratification outright. Both are declined, so neither is live work and
+neither is this unit's; a session that rediscovers the first should read this
+paragraph as its disposition. `install-step-relocation` inherits the same
+answer — the hook's shape does not change, so that entry is unblocked and
+unchanged rather than resolved.
+
 ## What changes
 
 ### (1) `--run`: the battery runner is a bridged arm of the binary
