@@ -1061,6 +1061,14 @@ name against that arm's standing no-fourth-mode refusal, where this
 exposure spends nothing beyond a print at the compiled assertion's existing
 computation.
 
+**No collision counter is minted either, and this line is where that decision is
+recorded** rather than left as the absence of one. A count of how often the cap
+displaced a mandated write would be a second measurement of a quantity this
+headroom line already prints, maintained by hand, against a criterion (the split
+test below) that reads an entry's *composition* rather than its collision
+history. What a firing count would have been evidence for, the split criterion
+decides directly.
+
 *Why one `recurrence:` line is discounted, and why exactly one.* The line is
 **fixed-shape and width-bounded** — §The tag algebra rules its ceiling to be
 `check-queue-wrap`'s budget and rules reaching that ceiling the *correct*
@@ -1127,6 +1135,76 @@ contract — and that third relief is **two acts wearing one name**.
   self-serve *that*, the same lineage as a `check-stage-entry` assertion C waiver
   (lifecycle-kit/SPEC.md §check-stage-entry), and the gate's failure text
   therefore cites this section rather than inlining the recipe.
+
+  **An entry is a split candidate when it carries two or more deliverables that
+  can take different dispositions** — where *different dispositions* means one
+  could be promoted, deferred, declined or closed while the other stays open. The
+  test is executed by reading the entry's deliverable statements and asking
+  whether ruling one leaves the other unruled. If it does, the entry is two units
+  wearing one slug, and its grounds are two ground-sets sharing one cap.
+
+  **The counter-class is what makes it a class**, and it is stated with the
+  criterion rather than left to inference: an entry accumulating **further
+  grounds for one deliverable** — recurrence evidence, a repeated measurement, an
+  answered objection, a corroborating firing — is **not** a split candidate
+  however hard it collides. Those are one unit's history, and splitting them
+  mints exactly the ranking peer competing with its own parent that the
+  two-acts paragraph below names as the sharpest displacement shape. Compression
+  by answering is the correct relief there and stays the default.
+
+  *Why dispositionability, and not size, age or ruling-count.* **Size** is the cap
+  itself, so it would make the criterion circular. **Age** is refuted by the
+  measurements a colliding pool actually produces — the collider is the most
+  recently ruled-on entry rather than the longest-lived, which is the opposite of
+  what a first reading of a collision log suggests. **Ruling-count** is the near
+  miss and the one worth stating, because collisions genuinely do concentrate
+  where rulings accumulate; it is refused because it is a **symptom shared by
+  both classes**. An entry accumulating rulings on one deliverable collides
+  exactly as hard as one accumulating rulings on two, so a criterion that cannot
+  separate them licenses the split that mints a competing peer. Dispositionability
+  separates them and is decidable by inspection, which is what an authoring
+  contract needs.
+
+  **The criterion is read at the collision, and it is an input to the
+  authorization rather than a licence.** The blocked session states which side of
+  the test its entry falls on when it asks; the authorizing session rules with
+  that statement in front of it. What changes is the **shape of the ask**, never
+  who answers it. Without a test the authorizing session has only the blocked
+  session's summary of its own entry, so the answer is a judgment call re-derived
+  per firing — which is the mechanism behind the pattern a collision log shows:
+  relief was always available, so the question was always answered by the
+  cheapest relief rather than by composition. **A denied split is not a dead
+  end**, stated so the criterion does not read as gating relief: an entry that
+  fails the test still has compression by answering and the self-served
+  relocation, which are the reliefs it should have been using, and an entry that
+  passes and is denied anyway gets the denial's ground recorded on it as any
+  other ruling would be.
+
+  **An authorized split records itself through the citation grammar already
+  here** — the parent names the child and the child names the parent, each with
+  the single-backticked slug §The tag algebra already rules a citation. A
+  `split-of:` declaration is refused on exactly the ground `relocated:` is
+  refused on above, so the two refusals read as one rule: it would cost a counted
+  line against this very cap, on the two entries least able to pay it — the
+  parent that just overflowed and the child carrying what would not fit. The
+  backticked slug costs no line of its own, because it rides prose the split is
+  writing anyway. **Bidirectional rather than child-to-parent alone**, because
+  the failure a one-way citation leaves is the one this whole class is about: a
+  reader meeting the **parent** sees an entry whose deliverable set silently
+  shrank, with no surviving statement of what left or why, and re-derives the
+  missing half as a gap — the same information loss the compression rule forbids,
+  arriving through a split instead of through a deletion.
+
+  **The pair is an aggregated edge only while both slugs are live**, on §The tag
+  algebra's resolution rule, and the bound is stated because the parent is the
+  end that reaches it first: a `## Done` entry is a bare slug, so it leaves the
+  live set and takes the parent's citation with the rest of its prose, and the
+  edge silently stops being an edge. That is the correct outcome rather than a
+  loss — the parent-side citation exists to stop a *live* parent reading as an
+  entry whose deliverable set shrank, and a completed parent has no open
+  deliverable set to misread. What it means is that the split's durable record is
+  the **child's** citation, and the parent's is owed for exactly as long as the
+  parent is open.
 
 *Why the line falls between the two acts.* Grounds are not rankable work, so
 moving them into an entry that already owns their subject mints no ranking peer;

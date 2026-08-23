@@ -12,62 +12,6 @@
 
 ## New Features
 
-- **entry-cap-displaces-mandated-writes** [spec: SPEC-entry-split.md] — the mandated-write
-  class collides with `check-queue-entry-budget`'s per-entry cap at a measurable rate, and
-  nothing counts the spend.
-  **First five firings, the filing measurement:** three during scope's disposition work, two seating
-  operator-handed writes at 50/50 and 49/50 — both mandated writes with a citable contract
-  (queue-kit/SPEC.md §check-queue-entry-budget), both seated only by compressing an answered ground
-  out of the same entry. The relief works and is documented; the spend has no owner.
-  recurrence: entry-cap-displaces-mandated-writes 2026-08-20 2026-08-21 2026-08-22 2026-08-23
-  **Nine firings 2026-08-22 and a tenth 2026-08-23 — grounds for both dates, and the SPLIT reading
-  gets its counter-evidence twice.** Six landed one operator ruling, one relieved by PROMOTION, the
-  "unrecorded relief valve". Three more reddened scope's own mandated writes at 51/53/51 against 50,
-  the first set MEASURED by the gate. The tenth reddened CLOSE's watch-condition record at 51. Every
-  collider was the most recently RULED-ON entry, not the longest-lived.
-  **Twelve more firings, 2026-08-20/21 — grounds for those dates, and the class NARROWS.** Seven at
-  scope landed authority rulings onto five entries at 0 headroom; two at build compressed by
-  answering spent grounds; three were that drain's own recurrence stamps. The taxed class is the
-  write that cannot be deferred or reworded without falsifying the record of what was decided; one
-  firing was relieved only by RELOCATION onto a linked entry that happened to have headroom.
-  **DISTINCT from `check-queue-entry-budget` itself**, which is the gate and is behaving exactly as
-  specified, and from `headroom-check-ordering-unruled`, whose axis is *when* a session reads its
-  headroom rather than what the cap displaces.
-  **The design question is ANSWERED, 2026-08-23 at spec, and the answer is the deliverable.** The
-  real question was whether the colliding entries are the ones that should have been **split** — a
-  queue-composition ruling, never a gate change. `SPEC-entry-split.md` rules it on
-  dispositionability: an entry carrying two deliverables that can take different dispositions is a
-  split candidate, one accumulating further grounds for a single deliverable is not. Size, age and
-  ruling-count are each refused there against this entry's own measurements. No counter is minted,
-  on the ground this entry states: the clean-path headroom line already exposes the quantity.
-  **HELD at the 2026-08-22 promotion, lead-ruled:** the real deliverable is that composition ruling
-  and the documented relief still works. **The hold IS an instance** — seating four hold grounds at
-  0 headroom fired this class on its own class, and the entry it blocked hardest is the one whose
-  hold is not on merit. Same date as the stamp above, so no new date is owed.
-  **Cost while deferred:** a cadence that is real is invisible to the only session chartered to act
-  on it, since scope ranks what the queue carries and the queue carried none of this.
-  **Four more firings, 2026-08-19, the first measured against this entry rather than commit
-  messages:** landing five ruled dispositions took three mandated writes onto entries the gate
-  reports at exactly 0 headroom. Each was seated by the documented relief and each spent something.
-  **The fourth is a sharper kind and is the one to design against:** on
-  `close-entry-baseline-bootstrap-deadlock` the ruling fitted and its **provenance** did not — the
-  entry closed at 1 line of headroom, carrying what was ruled and not through which channel, which
-  `relayed-ruling-provenance-unrecorded` is trialling. A cap that displaces a ruling's audit trail
-  while keeping the ruling is worse than one displacing prose: the surviving text reads complete.
-  **The signal the design question asked for.** All three are among the queue's longest-lived and
-  most-ruled-on entries, which is evidence for the split reading rather than for a counter: the
-  collision is not random across the pool, it concentrates where rulings accumulate.
-  **Measured with the gate, not by hand**, and read *after* the dispositions were ruled rather
-  than before — `headroom-check-ordering-unruled`'s ordering, honoured here on purpose so that no
-  ruling could be shaped by the room available to record it.
-  **The pressure is DEFERRED-only and promotion is the unrecorded relief valve**, filed to the gap
-  inbox 2026-08-19 by spec and merged here at that drain: assertion A binds deferred entries alone
-  ("The active sections are uncapped", queue-kit/SPEC.md §check-queue-entry-budget), so every
-  firing above sits in the deferred half of a promote/demote cycle, and each colliding entry was
-  written onto freely once promoted. Seating this paragraph fired the cap again at 2 lines.
-  Surfaced 2026-08-18 while `wide-budget-batch-and-hold-declaration`'s close drained its own
-  inbox, and filed back into it; promoted 2026-08-18 by the following iteration's scope.
-
 - **turn-end-chokepoint-and-wait-primitive** [spec: SPEC-wait-primitive.md] — two open
   mechanism questions the wait rule's fifth firing raised, neither answerable from the
   ruling that closed its prose half.
@@ -5292,6 +5236,9 @@
   runner it steers to are both bash-only, so a non-bash scratch script executes with no
   compensating control at all.
   recurrence: scratch-execution-control-is-bash-only 2026-08-16 2026-08-18 2026-08-19 2026-08-23
+  **NOT a split candidate, ruled 2026-08-23 at build** against the criterion queue-kit/SPEC.md
+  section check-queue-entry-budget now states: it accumulates measurements for ONE deliverable, so
+  ruling it leaves nothing unruled — the fifth measurement reversing the third is compression.
   **FIFTH MEASUREMENT, 2026-08-23 — the trend REVERSED for the first time.** Nine `python3 -` stdin
   heredocs, seven of them editing tracked files, against 50 last time: an ~86% fall. That is
   evidence FOR the operator's discipline-shaped cause; the control's reach defect is unchanged.
@@ -7720,6 +7667,7 @@
 
 - installed-gate-binary-leak-remap
 - session-mechanic-grants-uncommitted
+- entry-cap-displaces-mandated-writes
 
 ## Lessons Learned
 

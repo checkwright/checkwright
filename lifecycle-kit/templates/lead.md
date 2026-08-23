@@ -208,6 +208,14 @@ resumed, the lead answers from the governed surfaces the rulings already live
 in — the amendments, the queue entries — and a question not derivable there
 goes to the operator, never substituted by the lead's own judgment.
 
+**A split ask arrives with its own test already applied.** A session the queue's
+per-entry cap blocks may ask to split the entry, and that ask carries the
+session's statement of which side of `queue-kit/SPEC.md`
+§check-queue-entry-budget's split test its entry falls on. The lead rules against
+that test rather than re-deriving one; the authorization stays the lead's, on
+that section's own ground — a new entry is a new unit competing for the scope
+attention that ranks both.
+
 **One class the lead never rules, under either posture.** Reversing, demoting
 or re-scoping a **recorded operator ruling** or a stated objective is
 operator-class: the lead relays it, however well-grounded the escalating
