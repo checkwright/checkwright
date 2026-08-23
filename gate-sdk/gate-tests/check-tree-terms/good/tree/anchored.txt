@@ -1,0 +1,4 @@
+Near misses for the anchored trailer shape, which is the one an ERE port can
+silently get wrong by dropping the leading anchor:
+  Session-Id: 3f2504e0-4f89-41d3-9a0c-0305e82c3301
+a-bare-uuid 3f2504e0-4f89-41d3-9a0c-0305e82c3301 with no trailer key

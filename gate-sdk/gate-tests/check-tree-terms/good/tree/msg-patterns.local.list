@@ -1,0 +1,3 @@
+# The self-exemption is a prefix glob, not an exact-name match: this basename
+# begins msg-patterns and is exempt too, though it is nobody's exact name.
+# It carries /home/bob/projects for the same constructional reason.

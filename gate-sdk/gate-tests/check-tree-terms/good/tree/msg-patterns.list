@@ -1,0 +1,2 @@
+# A pattern list contains, by construction, what it bans: /home/bob/projects.
+# Its basename is self-exempt, so the gate never reads it as content.

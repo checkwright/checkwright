@@ -1,0 +1,2 @@
+A second leaking file, so the red output is a multi-file record set rather than
+a single line: the promo URL claude.com/claude-code is banned here too.

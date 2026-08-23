@@ -1,1 +1,1 @@
-TREE-TERMS: clean
+TREE-TERMS: clean (2 tracked file(s) scanned under tree; none match the 4 banned pattern(s))

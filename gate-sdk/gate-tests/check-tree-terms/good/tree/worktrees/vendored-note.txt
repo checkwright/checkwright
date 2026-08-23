@@ -1,0 +1,3 @@
+A file under a pruned directory. It carries /home/bob/projects, a shape the
+pattern set bans, and the gate must still report clean: the prune is a path
+filter, so a leak here is out of the scanned corpus rather than tolerated in it.
