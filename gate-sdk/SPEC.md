@@ -507,6 +507,36 @@ in `proc.rs` so a cohort of wrappers buys them once:
   `failed (exit N)` keeps the number the shell form printed rather than collapsing
   a killed child to a sentinel. Two accessors rather than one because the grading
   caller needs the *"not gradeable"* `None` that the printing caller cannot use.
+- **`run_streamed` and `Streamed`** — a wrapper whose program is a **filter**: a
+  body written to its stdin, its stdout read back, its stderr left alone. Three
+  things distinguish it from the two faces above and each is forced.
+  `run_with_stdin` pipes both directions and writes its whole input before reading
+  a byte, so a child that fills the stdout pipe stops draining stdin and both
+  sides block — which a shell caller never meets, because its process substitution
+  *is* a concurrent reader. Two capture files are deadlock-free without one, and
+  the input size that makes this real is measured rather than feared:
+  `check-docs-render-fidelity` streams its whole docs corpus, two orders of
+  magnitude past a pipe buffer. stderr stays **unmerged**, unlike `Merged`'s: a
+  filter's output is a framed stream its caller parses, and folding diagnostics
+  into it would corrupt the framing rather than annotate it. And a spawn failure
+  is folded into the child's own `code()` as bash's **127**, or **126** where the
+  file is present and will not execute — because for this shape the code is a
+  number the member *prints inside its own refusal*, so an `Err` arm would produce
+  a different message on a different branch and lose exactly the message parity
+  `on_path` exists to keep. `stdout()` is ungated for `Merged`'s reason, and the
+  false green is closed the same way: the caller reads `code()`, or grades the
+  stream by a framing count an empty capture cannot satisfy.
+
+**A wrapper's refusal is not always an `on_path` refusal, and the class has both
+shapes.** `on_path` serves a member that *tests for* its program;
+`check-docs-render-fidelity` **probes its oracle by running it** — two documents
+in, two documents back — because for a renderer, present-on-PATH is not the
+property the gate needs, and a parser build that loads but cannot parse would pass
+a presence test. There the absence surfaces as the probe's own exit status inside
+the member's own sentence, which is why `run_streamed` synthesizes the status bash
+would have reported rather than routing absence to a second message. Both shapes
+obey the one rule the class does have: the refusal fires where the shell form
+fired it, and says what the shell form said.
 
 **Neither half has a fixture representation, so each wrapper's parity run carries
 a constructed scenario**: both implementations over the same cases with the
@@ -524,7 +554,7 @@ kit roots through `realpath`.
 **That routing test is also what makes `--needs` trustworthy, which is why the
 spawn recorder lives here rather than beside the registry.** `proc.rs` carries a
 `#[cfg(test)]` recorder on the shape `walk.rs`'s read recorder has: **every**
-spawning entry point — `run`, `run_with_stdin`, `run_merged` — notes the program
+spawning entry point — `run`, `run_with_stdin`, `run_merged`, `run_streamed` — notes the program
 it is about to spawn, and §The `# graph:` manifest's unit test A reads the note
 back after running a member over its fixture cases. A face added to `proc.rs`
 that skipped the note would un-verify A silently, which is why the recorder is
@@ -661,7 +691,10 @@ sourcing gate at the `source` line, the fail-closed direction.
   (parenthesize a multi-term expression — `gate_find` appends `-print`, and an
   unparenthesized `-o` chain binds it to the last term only); a `grep -r` walk
   → splice `"${GATE_GREP_EXCLUDES[@]}"`; a paths-then-filter walk →
-  `gate_path_pruned "$f"`.
+  `gate_path_pruned "$f"`. Compiled, that last adapter is `walk::path_pruned`,
+  which sits beside `walk::prune_dirs` rather than once per consuming member: the
+  predicate and the set it applies are one rule, so a per-member copy is a second
+  implementation of it and the fifth consumer is what made that plain.
 - **Couple per surface, not per file.** When one artifact holds N
   representations of the same model, each needs its own coupling edge or an
   explicit ungated marker; "this file is heavily gated" silently reads as "all
@@ -1663,17 +1696,26 @@ design time; the last three were paid for, and each is named with what it cost.
    source. A conservation row and a criterion-4 bind are therefore independent
    facts about a member, which is what they always were.
 
-   **The worked instance is live and machine-derived, which is why this predicate
-   is stated here rather than reasoned out per port.** Running assertion C's
-   derivation over the live registry reports `check-template-registry-parity`
-   substrate-sensitive: a `kit:` token expands **once per kit root**
-   (`gate_expand_couples_var`), so `kit:*/*.sh` is `<root>/*/*.sh` for every
-   root, and it covers every `.sh` still declaring a registry member under
-   **any** kit's `checks/` — a shrinking set named by its shape rather than by a
-   member or a root, because a port empties it one file at a time and empties
-   whole roots on the way. `gate-sdk/checks/` is the root that emptied first, at
-   `shell-gate-tail-port`'s `check-crate-arms` port, and the derivation kept
-   selecting this member through the roots that had not. It is the second kind of
+   **The worked instance was machine-derived for as long as a `.sh` declared a
+   gate anywhere, which is why this predicate is stated here rather than reasoned
+   out per port.** Assertion C's derivation reported
+   `check-template-registry-parity` substrate-sensitive: a `kit:` token expands
+   **once per kit root** (`gate_expand_couples_var`), so `kit:*/*.sh` is
+   `<root>/*/*.sh` for every root, and it covered every `.sh` still declaring a
+   registry member under **any** kit's `checks/` — a shrinking set named by its
+   shape rather than by a member or a root, because a port empties it one file at
+   a time and empties whole roots on the way. `gate-sdk/checks/` is the root that
+   emptied first, at `shell-gate-tail-port`'s `check-crate-arms` port, and the
+   derivation kept selecting this member through the roots that had not. **That
+   set is now empty**: `shell-gate-tail-port`'s last registered member,
+   `check-docs-render-fidelity`, emptied `site-kit/checks/` and with it the last
+   `.sh` gate declaration in the tree, so a `*.sh` glob covers no declaration path
+   and the derivation selects this member nowhere. Its row at §Meta-gate
+   conservation stands as a **recorded** disposition rather than a re-derived one,
+   which assertion C admits because it asserts derived ⊆ dispositioned and never
+   the converse. The verdict below is the one taken while the derivation still
+   selected it, and it is kept because the *predicate* it teaches is what this
+   criterion needs and does not expire with its instance. It is the second kind of
    over-selection above — the gate does read `*.sh` names as content, but only
    under a `<kit>/<name>/` directory that a sibling `<kit>/templates/<name>.list`
    registers, and no kit ships a template registering `checks/`. Against this
@@ -2244,10 +2286,17 @@ design time; the last three were paid for, and each is named with what it cost.
    `bash gate-sdk/bin/port-blockers.sh` reports it against the tree at the moment
    a session sequences a cohort. That is a correctness requirement, not a
    preference for freshness. A gate's requirement need not be spelled in its
-   source at all: `check-docs-render-fidelity`'s is the first element of
-   `SITE_KIT_RENDERER`'s default (site-kit/SPEC.md §lib/site.sh), and because that
-   knob is consumer config, a consumer who repoints it changes which external
-   program that gate requires. **No literal roster is true for every consumer**,
+   source at all: `check-docs-render-fidelity`'s is the first element of whichever
+   renderer knob that run resolves to a command — the batch one where it is
+   non-empty, `SITE_KIT_RENDERER` otherwise (site-kit/SPEC.md §lib/site.sh) — and
+   because both are consumer config, a consumer who repoints either changes which
+   external program that gate requires. Stated as *the* renderer knob because it
+   is one of two: a consumer who pins only `SITE_KIT_RENDERER_BATCH` requires that
+   command and never the per-document one the gate does not invoke, which is why
+   the compiled member declares **both** knobs and why the earlier spelling of
+   this sentence — naming `SITE_KIT_RENDERER` alone — was true of the zero-config
+   program only by the coincidence that both defaults begin `ruby`. **No literal
+   roster is true for every consumer**,
    so a freshness-gated copy here would be gated against *this* repo's
    configuration while reading as a general claim — a defect a stale-roster gate
    could not detect, which is why none is shipped.
@@ -2324,7 +2373,32 @@ design time; the last three were paid for, and each is named with what it cost.
    bridge the dispatcher itself uses. With it live, `check-docs-render-fidelity`'s
    requirement is **measured** as `ruby` rather than predicted from
    `SITE_KIT_RENDERER`'s default, which is the class-(i) worked example reading off
-   a run for the first time.
+   a run for the first time. The run corrected the prediction as well as replacing
+   it: the resolved row cites `SITE_KIT_RENDERER_BATCH`, the knob the zero-config
+   gate actually spawns, not the per-document one the prediction named.
+
+   **The last registered member ported, and the count the whole port is measured
+   by reached zero.** `check-docs-render-fidelity` is the fourth criterion-7
+   wrapper and the first whose requirement is **knob-derived**, so it is the only
+   member that exercises the report's third line kind end to end — a `?<TAB><knob>`
+   pair resolved through the same bridge the dispatcher uses, rather than a program
+   spelled in the rule. Two facts it settles beyond itself. First, a wrapper's
+   refusal is not always an `on_path` refusal: this member's shell form *probes its
+   oracle by running it*, so an absent program surfaces as the probe's own exit
+   status inside the member's own message, and the compiled form reproduces bash's
+   127 (or 126) for a pipeline element it could not start rather than substituting
+   a presence test that would print different text. Second, the ordering register
+   gains its fourth entry, and the first whose probe sits behind more than one
+   corpus test: the git-repository test, then the scan-root test, then the
+   program. Both are
+   §Fail-closed contract's to state for the class; what belongs here is that the
+   ordering is still per-member and still read off the shell text.
+
+   With it in, `--group` reports **0 still owed, 0 takeable, 106 already ported**
+   and the default arm 0 undecidable — the two numbers the port's completion
+   predicate is stated in, both measured rather than asserted. The honest bound
+   two paragraphs up is unchanged by that zero and is the reason it is not a
+   completion claim on its own.
 
 **New gates are born native by default; shell is the exception and it needs a
 stated cause** — operator-ruled 2026-08-14 and re-affirmed the same day on
@@ -2677,9 +2751,12 @@ are worth carrying, both measured at the build cut rather than predicted here:
 gate-sdk/bin/port-blockers.sh` where the only programs any rule still names are
 `shellcheck`, `cargo` and the renderer; and the residual `gawk` floor lost
 `check-gate-assertions`, the holder the probe covered, while
-§check-docs-render-fidelity still holds it (§check-gate-assertions records the
+§check-docs-render-fidelity still held it (§check-gate-assertions records the
 probe, its scope, and what is deliberately *not* changed on the published
-requirement).
+requirement). That last holder left with `shell-gate-tail-port`'s port of it, so
+the residue is now **empty by measurement** — which is the precondition
+`interpreter-floor-gawk-residue-empty` was filed to wait for, and still not the
+narrowing itself.
 
 **Criterion 5's price for that batch, measured on both sides — and the detour it
 took getting there is the part worth keeping.** Both members are
@@ -4001,11 +4078,14 @@ of its rule — the first cohort's economy at five members instead of two.
 
 **The fifth member ports under criterion 4's own predicate, and the ground is
 the second over-selection path rather than the first.** Assertion C's runtime
-derivation reports `check-template-registry-parity` substrate-sensitive: its
+derivation reported `check-template-registry-parity` substrate-sensitive: its
 `couples=` carries `kit:*/*.sh`, which expands to `<root>/*/*.sh` once per kit
-root and covers the `.sh` gate declarations still under any kit's `checks/`
+root and covered the `.sh` gate declarations then under any kit's `checks/`
 — `gate-sdk/checks/` among them until `shell-gate-tail-port` emptied it of that
-spelling. It is **not** a
+spelling, and `site-kit/checks/` last, which emptied the set outright and with it
+the ground on which the derivation selected this member (criterion 4's worked
+instance owns what that costs the paragraph there). The port verdict below stands
+on its own reasoning and is unaffected. It is **not** a
 reverse-trigger couple —
 the gate really does read `*.sh` names as content, through
 `git ls-files -- '*.sh'`. It is a **content couple wider than the walk**: the
@@ -8425,11 +8505,11 @@ died on it — *match: third argument is a gawk extension*, exit 2 — and
 declaration's `Requires GNU awk (3-arg match)` header was stale — the file carries
 two-argument `match()` only — and was deleted at that iteration's close. The probe
 covered exactly the two members this file named, so what it establishes is that
-**those two** stop holding the floor — not that the floor is empty. It is not:
-`site-kit/checks/check-docs-render-fidelity.sh` is registered in
-`scripts/gates.list`, is still shell, and runs GNU-awk-only `BEGINFILE`,
-`ENDFILE` and `ARGIND` in live program text, so it is the floor's remaining live
-holder and `shell-gate-tail-port` is what retires it
+**those two** stop holding the floor — not that the floor was empty. It was not:
+`check-docs-render-fidelity` was registered in `scripts/gates.list`, was still
+shell, and ran GNU-awk-only `BEGINFILE`, `ENDFILE` and `ARGIND` in live program
+text, so it was the floor's remaining live holder — and `shell-gate-tail-port`
+retired it, the last registered member of that unit, leaving the residue empty
 (site-kit/SPEC.md §check-docs-render-fidelity). What is *not* changed here is the published requirement:
 `awk (GNU)` is an element of `context-kit/lib/toolfloor.sh`'s probe roster held to
 docs/install.md §Requirements by `check-install-toolchain`, and narrowing a
@@ -11251,9 +11331,10 @@ the eighth budget batch ported §check-gate-assertions, and probing
 §check-action-run-shell under a `gawk --posix` shim ran it **clean**, so its
 `Requires GNU awk (3-arg match)` header was stale — deleted at that iteration's
 close — and it holds no gawk extension at
-all. That empties the residue **this file named**, not the floor:
-§check-docs-render-fidelity holds it still, and §check-gate-assertions records
-the probe's scope. What is *not* changed on that finding is the published requirement:
+all. That emptied the residue **this file named**, not the floor:
+§check-docs-render-fidelity held it after them, and §check-gate-assertions records
+the probe's scope. Its port under `shell-gate-tail-port` emptied the floor's live
+set outright. What is *not* changed on that finding is the published requirement:
 `awk (GNU)` is an element of `context-kit/lib/toolfloor.sh`'s probe roster held to
 docs/install.md §Requirements by `check-install-toolchain`, and narrowing a
 user-facing requirement is filed rather than taken in passing

@@ -222,7 +222,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         if path.is_empty() {
             continue;
         }
-        if path_pruned(path, &prune) {
+        if walk::path_pruned(path, &prune) {
             continue;
         }
         if path.starts_with("docs/posts/") || path == "docs/evidence-data.md" {
@@ -297,16 +297,6 @@ fn rule(args: &[String]) -> Result<i32, String> {
         scanned, scanroot
     );
     Ok(0)
-}
-
-// spec: gate-sdk/SPEC.md §lib/gate.sh — `gate_path_pruned`: the prune-dir set matched as a
-// leading, `./`-led or interior path component
-fn path_pruned(p: &str, prune: &[String]) -> bool {
-    prune.iter().any(|d| {
-        p.starts_with(&format!("{}/", d))
-            || p.starts_with(&format!("./{}/", d))
-            || p.contains(&format!("/{}/", d))
-    })
 }
 
 // spec: canon-kit/SPEC.md §Layout and configuration — an exact occurrence, or either side of a

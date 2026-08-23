@@ -54,10 +54,9 @@ left linked-but-unqueued: the queue is the only place work waits.
 
 ## Pull requests
 
-<!-- measured: gate-substrates=native+shell -->
-- **Build the gate binary before you commit.** Most gates in this tree dispatch
-  to a compiled subcommand and the rest are still shell, so
-  `bash gate-sdk/bin/build-native.sh`
+<!-- measured: gate-substrates=native -->
+- **Build the gate binary before you commit.** Every gate in this tree dispatches
+  to a compiled subcommand, so `bash gate-sdk/bin/build-native.sh`
   is its own step and **`cargo test` does not discharge it** — the test harness is
   a different artifact from the binary the battery runs, so a full green test run
   leaves `check-gate-binary-fresh` red on a stale build

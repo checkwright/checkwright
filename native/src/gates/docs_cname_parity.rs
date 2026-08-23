@@ -6,16 +6,6 @@ use crate::proc;
 use crate::walk;
 use std::path::Path;
 
-// spec: gate-sdk/SPEC.md §lib/gate.sh — `gate_path_pruned`: the prune-dir set matched as a
-// leading, `./`-led or interior path component
-fn path_pruned(p: &str, prune: &[String]) -> bool {
-    prune.iter().any(|d| {
-        p.starts_with(&format!("{}/", d))
-            || p.starts_with(&format!("./{}/", d))
-            || p.contains(&format!("/{}/", d))
-    })
-}
-
 // spec: site-kit/SPEC.md §check-docs-cname-parity — `grep -I`: a file carrying a NUL byte is
 // binary and is skipped rather than scanned, so an artifact cannot report a host it never spells
 fn binary(bytes: &[u8]) -> bool {
@@ -121,7 +111,7 @@ fn inner(args: &[String]) -> Result<i32, String> {
 
     let mut files: Vec<String> = Vec::new();
     for path in listing.lines() {
-        if path.is_empty() || path_pruned(path, &prune) {
+        if path.is_empty() || walk::path_pruned(path, &prune) {
             continue;
         }
         if exempt.iter().any(|g| walk::pattern_match(g, path)) {
@@ -206,14 +196,4 @@ mod tests {
         assert!(!binary(b"https://apex.example/\n"));
     }
 
-    // spec: gate-sdk/SPEC.md §lib/gate.sh — the prune predicate is a path *component* test, so a
-    // basename that merely starts with a prune name is not pruned
-    #[test]
-    fn the_prune_predicate_matches_components_and_not_prefixes() {
-        let p = vec!["gate-tests".to_string(), ".git".to_string()];
-        assert!(path_pruned("kit/gate-tests/x/good/a.md", &p));
-        assert!(path_pruned("gate-tests/a.md", &p));
-        assert!(path_pruned("./gate-tests/a.md", &p));
-        assert!(!path_pruned("kit/gate-tests-notes/a.md", &p));
-    }
 }

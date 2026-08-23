@@ -19,6 +19,16 @@ pub fn prune_dirs() -> Result<Vec<String>, String> {
     Ok(raw.split('\t').map(String::from).collect())
 }
 
+// spec: gate-sdk/SPEC.md §lib/gate.sh — `gate_path_pruned`: the prune-dir set matched as a
+// leading, `./`-led or interior path component, beside the `prune_dirs` whose value it reads
+pub fn path_pruned(p: &str, prune: &[String]) -> bool {
+    prune.iter().any(|d| {
+        p.starts_with(&format!("{}/", d))
+            || p.starts_with(&format!("./{}/", d))
+            || p.contains(&format!("/{}/", d))
+    })
+}
+
 // spec: gate-sdk/SPEC.md §lib/gate.sh — the bridged read of one tab-joined array knob,
 // the shape `prune_dirs` above has; an absent variable is an error because the crate holds
 // no default for a bridged knob, and an empty one is a resolved-empty set.
@@ -656,6 +666,24 @@ pub fn fixture_case_dirs(gate: &str) -> Vec<PathBuf> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // spec: gate-sdk/SPEC.md §lib/gate.sh — the prune predicate is a path *component* test, so a
+    // basename that merely starts with a prune name is not pruned. One test, because there is now
+    // one predicate: it sat beside each consuming member while each carried its own copy.
+    #[test]
+    fn the_prune_predicate_matches_components_and_not_prefixes() {
+        let p = vec![
+            "gate-tests".to_string(),
+            "worktrees".to_string(),
+            ".git".to_string(),
+        ];
+        assert!(path_pruned("kit/gate-tests/x/good/a.md", &p));
+        assert!(path_pruned("gate-tests/a.md", &p));
+        assert!(path_pruned("./worktrees/a.md", &p));
+        assert!(path_pruned("worktrees/a.md", &p));
+        assert!(!path_pruned("kit/gate-tests-notes/a.md", &p));
+        assert!(!path_pruned("a/b.md", &p));
+    }
 
     // spec: gate-sdk/SPEC.md §lib/gate.sh — the prefix form's receiving half: the family is keyed
     // by the suffix, sorted independently of the environment's order, and a lookup is by name

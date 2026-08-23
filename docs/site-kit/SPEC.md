@@ -242,19 +242,87 @@ consumer registers this gate; it stays outside env-probe's probe-set floor, and
 published docs site simply omits the gate by the registry-not-array convention
 and never installs the dependency.
 
-**This member is takeable, and its port is a wrapper.** The program the rule
-requires is the **first element of `SITE_KIT_RENDERER`**, so gate-sdk's criterion
-7 reports it, and the renderer *is* the contract this gate renders through — which
-under the 2026-08-23 ruling (gate-sdk/SPEC.md §The port-candidate criteria,
-criterion 7) means the compiled form spawns it and refuses at exit 2 when it is
-absent, the dependency moving not at all. The port is owed to
-`shell-gate-tail-port` and no hold is declared. The dependency itself, and the
-fact that a consumer who repoints the knob moves it, are owned at §Layout and
-configuration under that knob and are not restated here. One port obligation is
-recorded because the shell form hides it: the batch stream below is written in
-GNU awk (`BEGINFILE`/`ENDFILE`/`ARGIND`), which is the last live holder of the
-`awk (GNU)` requirement docs/install.md states, so the port retires that floor
-and the requirements page moves with it.
+**`checks/check-docs-render-fidelity.gate` (`precommit`, binary-dispatched).**
+Ported under `shell-gate-tail-port` as the last of its registered members, into
+`native/src/gates/docs_render_fidelity.rs`. It is a criterion-7 **wrapper**: the
+program the rule requires is the first element of whichever renderer knob the run
+resolves to a command, so the compiled form spawns it and refuses at exit 2 when
+it cannot run, the dependency moving not at all (gate-sdk/SPEC.md §The
+port-candidate criteria, criterion 7). The dependency itself, and the fact that a
+consumer who repoints a knob moves it, are owned at §Layout and configuration
+under those knobs and are not restated here.
+
+**Its requirement is knob-derived, and it is *two* knobs rather than one.**
+`--needs` declares `git` plus `?<TAB>SITE_KIT_RENDERER_BATCH` and
+`?<TAB>SITE_KIT_RENDERER`, and `port-blockers.sh` resolves the pair through the
+same bridge the dispatcher uses. Naming only `SITE_KIT_RENDERER` — as this section
+did before the port — is wrong for a reason no zero-config run exposes: with the
+batch knob non-empty the gate never invokes the per-document one, so a consumer
+who pins only the batch renderer requires *that* command. The two defaults both
+begin `ruby`, which is why the narrower claim read true here and would have
+under-declared anywhere else. `git` is declared for its two spawns (`rev-parse
+--git-dir`, `ls-files`) and is on the program floor, so it costs no criterion-7
+residual; `mktemp` and `awk` do not survive the port at all, the scratch tree and
+the three scans having moved in process.
+
+**The GNU-awk floor's last live holder left with it.** The three scans below were
+written in GNU awk (`BEGINFILE`/`ENDFILE`/`ARGIND`), and this was the only
+remaining registered shell member holding those extensions, which
+`interpreter-floor-gawk-residue-empty` established by measurement. The port
+retires the holder; it does **not** narrow docs/install.md §Requirements, whose
+edge is operator-class and whose decision that entry owns. Recorded here so that
+entry's taker reads a discharged precondition rather than re-deriving it.
+
+**The second positional is retired on port, and its function is not.**
+`[docs-dir] [config-file]` read argv[2] by exporting `SITE_KIT_CONFIG_FILE` before
+sourcing `lib/site.sh`. A compiled member cannot: a config file is bash, the
+bridge transports resolved values and interprets nothing (gate-sdk/SPEC.md §The
+port-candidate criteria, criterion 6), and the member receives knob values rather
+than a path. The positional is therefore unreachable by construction, which is
+what makes this a retirement-on-port rather than a narrowing. What it did survives
+under the variable it always set: the bridge resolves a kit's knobs by sourcing
+that kit's `lib/*.sh` in a subshell that inherits the caller's environment, so a
+harness pointing the renderer knobs at a synthetic setup exports
+`SITE_KIT_CONFIG_FILE` and the resolution follows — which is the shape every
+ported member's bespoke tests already use. The **first** positional is unchanged
+and still defaults to `SITE_KIT_DOCS_DIR`.
+
+**`NUL`-stripping becomes deliberate, and it has to.** The framing's
+unforgeability rests on the gate's own reader having already dropped any `NUL` in
+the source before framing happens — a side effect, in the shell form, of bash not
+being able to hold one in a variable. A compiled reader *can* hold one, so it
+drops them at the same point on purpose. The property is load-bearing rather than
+incidental now, which is the one place this port turns an accident of the
+substrate into a stated rule.
+
+**Criterion 4 binds, and the live-tree arm was not demoted.** The member's own
+declaration path moves at this port, so the comparison could have been made only
+against the pre-descriptor tree. It was not: the pre-port rule was restored under
+a name no member resolves to (gate-sdk/SPEC.md §The port-candidate criteria,
+criterion 4), which put both implementations over the **post**-descriptor corpus.
+The arm carries **no bound** — unlike §check-shellcheck's, whose corpus is every
+`.sh` and so contains its own probe file; this member's corpus is `docs/**.md`,
+so the probe sat outside it and both forms read the committed tree byte for byte.
+Twenty-four comparisons over the same cwd, argv and config, all **byte-identical
+including exit codes**: both render paths over the live tree, the fixture pair and
+a front-matter/nested/`_layouts` corpus; the empty corpus; an absent docs dir; the
+batch count mismatch and both probe failures; and each of those again with the
+renderer removed from `PATH` (gate-sdk/SPEC.md §Fail-closed contract owns the
+scrub technique). Two arms were **probed rather than accepted**: a "no repository"
+case first built under `.tmp/` sat inside this checkout, so it proved an empty
+gitignored corpus instead, and re-running it from outside any repository is what
+established the ordering fact below.
+
+**The refusal order, read off the shell text rather than assumed.** Each check
+below precedes any finding and wins over the ones after it: **not a git
+repository**, then **docs dir not found**, then the renderer probe, then the
+corpus enumeration. So an
+absent docs dir reports the docs dir even with no renderer installed, and a tree
+outside a repository reports that even with both. This member's probe is also not
+the presence test the first wrapper established — it probes the oracle *by running
+it*, because for a renderer, on-`PATH` is not the property the gate needs, and an
+absent program therefore surfaces as the probe's own exit status inside the
+member's own sentence.
 
 **The batch stream, and why the count is the fail-closed.** One renderer process
 per page is the gate's whole cost — the interpreter restarts, not the rendering —
@@ -369,9 +437,25 @@ document count and an unresolvable batch command each exit 2. The count case use
 a stub that always emits two documents, so it passes the two-document probe and is
 caught only by the corpus count — a stub the probe already rejected would never
 reach the assertion under test.
-The positional form `check-docs-render-fidelity.sh [docs-dir] [config-file]`
-lets a fixture point the docs dir and renderer knobs at a synthetic tree without
-touching consumer config. `precommit` tier, coupling the docs tree.
+All four are invoked through `gate_run`, so each names a gate and never a
+substrate, and each supplies its renderer configuration as `SITE_KIT_CONFIG_FILE`
+rather than as the retired second positional. The positional form
+`check-docs-render-fidelity [docs-dir]` lets a fixture point the docs dir at a
+synthetic tree without touching consumer config. `precommit` tier, coupling the
+docs tree.
+
+**The port adds a third oracle, and the split is the one the pair cannot carry.**
+The good/bad pair and the four bespoke tests both need a real tracked tree, so
+they stay where they are; what moved into **crate unit tests** is every assertion
+that is a pure function of a page's bytes — the foreign-content exemption in both
+directions, a backtick inside and outside a code span, the element counts, the
+fence-aware heading and table scans including the seventh-`#` bound, front-matter
+stripping, `NUL` framing as a terminator rather than a separator, and the
+Jekyll-internal segment test. Those are commit-time oracles through
+`check-crate-arms` exactly as the bespoke tests are through the fixture runner,
+and they are the arms a golden pair can only assert the *presence* of a line for
+(gate-sdk/SPEC.md §The port-candidate criteria, criterion 2). The pair contract is
+intact: both cases still exist and still exercise the batch path end to end.
 
 Parser-version fidelity (a second honest limit). The oracle is faithful to the
 *parser* GitHub Pages uses (kramdown with GFM input), not necessarily to the

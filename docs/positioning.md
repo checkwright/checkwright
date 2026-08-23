@@ -45,9 +45,9 @@ the coordinating layer and claims no security or trust-layer ground.
 Compatibility here is tiered, not blanket — the honest split matters more than a
 broad claim that would not survive contact:
 
-<!-- measured: gate-substrates=native+shell -->
-- **Tier one — runs anywhere.** The gate battery is a prebuilt binary beside a
-  shell residue, over a coreutils
+<!-- measured: gate-substrates=native -->
+- **Tier one — runs anywhere.** The gate battery is a prebuilt binary, with bash
+  left in the library and tooling around it, over a coreutils
   toolchain. No gate reads a harness surface, so the battery runs under any
   harness, under any CI, or under no harness at all. This is the layer that
   does the enforcing, and it has no harness dependency to compromise.

@@ -166,13 +166,6 @@ fn path_matches_glob(path: &str, glob: &str) -> bool {
     ps.iter().zip(gs.iter()).all(|(p, g)| walk::pattern_match(g, p))
 }
 
-fn path_pruned(p: &str, prune: &[String]) -> bool {
-    prune.iter().any(|d| {
-        p.starts_with(&format!("{}/", d))
-            || p.starts_with(&format!("./{}/", d))
-            || p.contains(&format!("/{}/", d))
-    })
-}
 
 struct Ctx {
     prune: Vec<String>,
@@ -210,7 +203,7 @@ impl Ctx {
             if f.is_empty() {
                 continue;
             }
-            if prune && path_pruned(f, &self.prune) {
+            if prune && walk::path_pruned(f, &self.prune) {
                 continue;
             }
             if !namepat.is_empty() {

@@ -9,12 +9,15 @@
 # same table with a trailing blank line renders and clears. The gate enumerates
 # tracked pages via git ls-files, so the fixture is a throwaway git repo.
 #
+# The gate is invoked through gate_run, so this test names a gate and never a
+# substrate (gate-sdk/SPEC.md §run-gate-tests).
+#
 # Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # site-kit/
-GATE="$DIR/checks/check-docs-render-fidelity.sh"
+CHECKS="$DIR/checks"
 
 fails=0
 tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
@@ -64,7 +67,7 @@ MD
 
 # --- the bad page: the table collapses, red on the table assertion only --------
 git -C "$tmp" add docs/leak.md
-out="$( cd "$tmp" && "$GATE" docs 2>&1 )"; rc=$?
+out="$( cd "$tmp" && gate_run check-docs-render-fidelity "$CHECKS" docs 2>&1 )"; rc=$?
 [[ "$rc" -eq 1 ]] \
     || { echo "  FAIL: collapsed table expected exit 1, got $rc: $out"; fails=$((fails + 1)); }
 grep -qF -- "fall short of" <<<"$out" \
@@ -78,7 +81,7 @@ grep -qF -- "rendered heading(s) exceed" <<<"$out" \
 git -C "$tmp" rm -q --cached docs/leak.md
 rm -f "$tmp/docs/leak.md"
 git -C "$tmp" add docs/ok.md
-out="$( cd "$tmp" && "$GATE" docs 2>&1 )"; rc=$?
+out="$( cd "$tmp" && gate_run check-docs-render-fidelity "$CHECKS" docs 2>&1 )"; rc=$?
 [[ "$rc" -eq 0 ]] \
     || { echo "  FAIL: well-formed table expected exit 0, got $rc: $out"; fails=$((fails + 1)); }
 

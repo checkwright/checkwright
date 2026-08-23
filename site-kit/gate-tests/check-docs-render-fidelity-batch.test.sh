@@ -22,12 +22,17 @@
 # The gate enumerates tracked pages via git ls-files, so the fixture is a
 # throwaway git repo.
 #
+# A case's renderer configuration crosses as SITE_KIT_CONFIG_FILE rather than as
+# the gate's second positional: the compiled member receives resolved knob values
+# and never a config path, so the bridge is the one thing that reads a config file
+# (gate-sdk/SPEC.md §lib/gate.sh). gate_run resolves it from this cwd.
+#
 # Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # site-kit/
-GATE="$DIR/checks/check-docs-render-fidelity.sh"
+CHECKS="$DIR/checks"
 
 fails=0
 tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
@@ -103,8 +108,9 @@ printf '%s\n' '# shellcheck shell=bash' \
 # --- 3/4. both paths, same verdicts -------------------------------------------
 git -C "$tmp" add docs/leak.md
 for mode in batch per-document; do
-    cfg=(); [[ "$mode" == per-document ]] && cfg=("$tmp/batch-off.sh")
-    out="$( cd "$tmp" && "$GATE" docs "${cfg[@]+"${cfg[@]}"}" 2>&1 )"; rc=$?
+    cfg=""; [[ "$mode" == per-document ]] && cfg="$tmp/batch-off.sh"
+    out="$( cd "$tmp" && gate_env SITE_KIT_CONFIG_FILE="${cfg:-$SITE_KIT_CONFIG_FILE}" \
+        && gate_run check-docs-render-fidelity "$CHECKS" docs 2>&1 )"; rc=$?
     [[ "$rc" -eq 1 ]] \
         || { echo "  FAIL: $mode path: severed span expected exit 1, got $rc: $out"; fails=$((fails + 1)); }
     grep -qF -- "leaked into rendered text" <<<"$out" \
@@ -114,8 +120,9 @@ done
 git -C "$tmp" rm -q --cached docs/leak.md
 git -C "$tmp" add docs/ok.md
 for mode in batch per-document; do
-    cfg=(); [[ "$mode" == per-document ]] && cfg=("$tmp/batch-off.sh")
-    out="$( cd "$tmp" && "$GATE" docs "${cfg[@]+"${cfg[@]}"}" 2>&1 )"; rc=$?
+    cfg=""; [[ "$mode" == per-document ]] && cfg="$tmp/batch-off.sh"
+    out="$( cd "$tmp" && gate_env SITE_KIT_CONFIG_FILE="${cfg:-$SITE_KIT_CONFIG_FILE}" \
+        && gate_run check-docs-render-fidelity "$CHECKS" docs 2>&1 )"; rc=$?
     [[ "$rc" -eq 0 ]] \
         || { echo "  FAIL: $mode path: faithful page expected exit 0, got $rc: $out"; fails=$((fails + 1)); }
 done
@@ -130,7 +137,8 @@ printf '%s\n' '# shellcheck shell=bash' \
     'SITE_KIT_RENDERER_BATCH=(bash -c '\''printf "<p>a</p>\000<p>b</p>\000"'\'')' > "$tmp/miscount.sh"
 
 git -C "$tmp" add docs/p1.md docs/p2.md docs/p3.md
-out="$( cd "$tmp" && "$GATE" docs "$tmp/miscount.sh" 2>&1 )"; rc=$?
+out="$( cd "$tmp" && gate_env SITE_KIT_CONFIG_FILE="$tmp/miscount.sh" \
+    && gate_run check-docs-render-fidelity "$CHECKS" docs 2>&1 )"; rc=$?
 [[ "$rc" -eq 2 ]] \
     || { echo "  FAIL: batch count mismatch expected exit 2 (fail-closed), got $rc: $out"; fails=$((fails + 1)); }
 grep -qF -- "document(s) for" <<<"$out" \
@@ -142,7 +150,8 @@ printf '%s\n' '# shellcheck shell=bash' \
     '# shellcheck disable=SC2034  # sourced by the gate under test' \
     'SITE_KIT_RENDERER_BATCH=(site-kit-no-such-batch-renderer)' > "$tmp/unresolvable.sh"
 
-out="$( cd "$tmp" && "$GATE" docs "$tmp/unresolvable.sh" 2>&1 )"; rc=$?
+out="$( cd "$tmp" && gate_env SITE_KIT_CONFIG_FILE="$tmp/unresolvable.sh" \
+    && gate_run check-docs-render-fidelity "$CHECKS" docs 2>&1 )"; rc=$?
 [[ "$rc" -eq 2 ]] \
     || { echo "  FAIL: unresolvable batch renderer expected exit 2, got $rc: $out"; fails=$((fails + 1)); }
 grep -qF -- "failed its probe" <<<"$out" \

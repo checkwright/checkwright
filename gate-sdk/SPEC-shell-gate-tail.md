@@ -483,6 +483,39 @@ holder and **states that it does**; it does **not** narrow `docs/install.md`
 The unblocking fact is recorded here so that entry's taker reads a discharged
 precondition rather than re-deriving it.
 
+**Correction taken at the build (1) — the requirement's stated ground is false,
+and the conclusion survives on the ground stated beside it.** This delta says the
+requirement "is the first element of `SITE_KIT_RENDERER`'s default", quoting
+§The port-candidate criteria criterion 7, which says the same. Against the tree
+`port-blockers.sh` resolves it off **`SITE_KIT_RENDERER_BATCH`** at `:32`: with
+the batch knob non-empty the gate takes the batch branch and never invokes the
+per-document renderer, and `lib/site.sh` fills the batch knob at zero config. The
+claim is accidentally true of the *program* only because both defaults begin
+`ruby`; it is flatly false for a consumer who pins only the batch knob, whose gate
+then requires that command and never `SITE_KIT_RENDERER`'s. The conclusion this
+delta draws is unchanged and already rests on the right ground — it declares
+**both** knobs, which is what a two-knob requirement needs. Corrected in
+site-kit/SPEC.md §check-docs-render-fidelity and in criterion 7.
+
+**Correction taken at the build (2) — the fifth no-bridgeable-name candidate is
+not one.** `SITE_KIT_RENDERER_BATCH` was flagged as the next F11-shaped knob
+repair after four consecutive hits. It is not: `site-kit/lib/site.sh` defines both
+renderer knobs *and* `SITE_KIT_DOCS_DIR` under their own names, so the bridge's
+`declare -p` finds each, and the batch knob's empty-array branch crosses as a
+resolved-empty value the wire format already distinguishes from an absent one. No
+knob repair is owed by this delta. Recorded because a fourth consecutive hit reads
+as a rule, and the fifth check is what keeps it a measurement.
+
+**Correction taken at the build (3) — the port needs one `proc.rs` face this
+amendment does not anticipate, and the cause is measured.** The batch path streams
+the whole docs corpus through the renderer. `proc::run_with_stdin` pipes both
+directions and writes its whole input before reading, so the child fills the
+stdout pipe, stops draining stdin, and both sides block — 73 pages and 2.1 MB
+against a 64 KiB buffer. The shell form never meets it because a process
+substitution is a concurrent reader, which §check-docs-render-fidelity already
+states in terms. The face is file-backed on both ends with stderr left unmerged,
+and it lands in §Fail-closed contract for the class rather than in this member.
+
 ### (9) The two unregistered kit-shipped members port, and their price is named
 
 `canon-kit/checks/check-surface-duplication.sh` and

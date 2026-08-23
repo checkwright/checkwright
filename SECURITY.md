@@ -39,11 +39,11 @@ than a migration.
 Checkwright is vendored, not installed. Understanding what that does and does
 not protect matters more than any of the above.
 
-<!-- measured: gate-substrates=native+shell -->
+<!-- measured: gate-substrates=native -->
 **A vendored kit is code you run with your own privileges.** You copy the kit
 directories into your repository and commit them, and from then on your git
-hooks and your CI execute it as you — the shell that ships in the tree and the
-prebuilt binary the ported gates dispatch to. Nothing is fetched at gate time and
+hooks and your CI execute it as you: the prebuilt binary every gate dispatches
+to, plus the shell library and tooling that ship beside it. Nothing is fetched at gate time and
 no dependency channel exists, so the code that runs is the code sitting in your
 tree. That also means adopting a kit is granting it whatever your hooks and CI
 already hold.

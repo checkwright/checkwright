@@ -33,6 +33,7 @@ pub mod commit_msg;
 pub mod docs_link_convention;
 pub mod docs_kit_parity;
 pub mod docs_mirror_fresh;
+pub mod docs_render_fidelity;
 pub mod docs_nav_reachable;
 pub mod enforcement_fresh;
 pub mod evidence_baseline;
@@ -1565,6 +1566,23 @@ pub const REGISTRY: &[GateEntry] = &[
         ],
         "site-kit",
         &[("git", "")],
+    ),
+    (
+        "check-docs-render-fidelity",
+        docs_render_fidelity::run,
+        &[],
+        &[
+            "SITE_KIT_DOCS_DIR",
+            "SITE_KIT_RENDERER",
+            "SITE_KIT_RENDERER_BATCH",
+            "GATE_PRUNE_DIRS",
+        ],
+        "site-kit",
+        &[
+            ("git", ""),
+            ("?", "SITE_KIT_RENDERER_BATCH"),
+            ("?", "SITE_KIT_RENDERER"),
+        ],
     ),
     (
         "check-identity",

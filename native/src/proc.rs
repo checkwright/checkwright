@@ -182,6 +182,111 @@ pub fn run_with_stdin(program: &str, args: &[&str], input: &[u8]) -> Result<Comp
     })
 }
 
+// spec: gate-sdk/SPEC.md §Fail-closed contract — a child fed a body on stdin whose stdout is
+// captured apart from its stderr; `code` is the pipeline element's own `$?`
+pub struct Streamed {
+    code: i32,
+    stdout: Vec<u8>,
+}
+
+impl Streamed {
+    pub fn code(&self) -> i32 {
+        self.code
+    }
+
+    // spec: gate-sdk/SPEC.md §Fail-closed contract — read whatever the child wrote, `Merged`'s
+    // rule and not `Completed`'s: a filter's caller grades the *stream* it framed, so withholding
+    // it on a non-zero status would hide the truncation the framing check exists to catch
+    pub fn stdout(&self) -> &[u8] {
+        &self.stdout
+    }
+}
+
+// spec: gate-sdk/SPEC.md §Fail-closed contract — `run_with_stdin`'s file-backed counterpart: two
+// capture files, so a body too large for a pipe cannot deadlock, and an unmerged stderr
+pub fn run_streamed(
+    program: &str,
+    args: &[&str],
+    input: &[u8],
+    stderr: Stderr,
+) -> Result<Streamed, String> {
+    #[cfg(test)]
+    recorder::note(program);
+    let io_err = |e: std::io::Error| {
+        format!(
+            "cannot run {}: {} — the check could not run; treating as failure (not clean)",
+            program, e
+        )
+    };
+    let seq = MERGE_SEQ.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+    let dir = std::env::temp_dir();
+    let inp = dir.join(format!("checkwright-in.{}.{}", std::process::id(), seq));
+    let outp = dir.join(format!("checkwright-out.{}.{}", std::process::id(), seq));
+    let cleanup = || {
+        let _ = std::fs::remove_file(&inp);
+        let _ = std::fs::remove_file(&outp);
+    };
+    std::fs::write(&inp, input).map_err(io_err)?;
+    let feed = match std::fs::File::open(&inp) {
+        Ok(f) => f,
+        Err(e) => {
+            cleanup();
+            return Err(io_err(e));
+        }
+    };
+    let sink = match std::fs::File::create(&outp) {
+        Ok(f) => f,
+        Err(e) => {
+            cleanup();
+            return Err(io_err(e));
+        }
+    };
+    let mut cmd = Command::new(program);
+    cmd.args(args)
+        .stdin(std::process::Stdio::from(feed))
+        .stdout(std::process::Stdio::from(sink));
+    if matches!(stderr, Stderr::Discard) {
+        cmd.stderr(std::process::Stdio::null());
+    }
+    let status = match cmd.status() {
+        Ok(s) => s,
+        // spec: gate-sdk/SPEC.md §Fail-closed contract — bash's own verdict on a pipeline element
+        // it could not start, which the member prints inside its own refusal
+        Err(e) => {
+            cleanup();
+            let code = if e.kind() == std::io::ErrorKind::PermissionDenied {
+                126
+            } else {
+                127
+            };
+            return Ok(Streamed {
+                code,
+                stdout: Vec::new(),
+            });
+        }
+    };
+    let stdout = match std::fs::read(&outp) {
+        Ok(b) => b,
+        Err(e) => {
+            cleanup();
+            return Err(io_err(e));
+        }
+    };
+    cleanup();
+    Ok(Streamed {
+        code: exit_code(&status),
+        stdout,
+    })
+}
+
+// spec: gate-sdk/SPEC.md §Fail-closed contract — a filter's stderr policy, named rather than
+// passed as a bare flag: a probe run discards it the way the shell form's `2>/dev/null` does, and
+// a scanning run leaves it alone
+pub enum Stderr {
+    Inherit,
+    Discard,
+}
+
 // spec: gate-sdk/SPEC.md §Fail-closed contract — the spawn recorder unit test A observes
 // through, on the shape walk.rs's read recorder already has. Test-scoped deliberately: a
 // production recorder would be state with no reader, and it is unreachable from a gate module.
