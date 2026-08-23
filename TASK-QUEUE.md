@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: battery-runner-port
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -4270,16 +4270,16 @@
   structural reading above is now the only one left. The same drain found a **second face** the
   candidates above do not cover — a baseline move stales the evidence line computed against the old
   baseline — promoted as `baseline-move-stales-evidence-line`.
-  **Held a THIRD time, ruled 2026-08-20 by the iteration lead** into `graph-port-and-config-seam`:
-  the ruled spine is the `check-graph` port and this entry shares no surface with it. Still inside
-  lead discretion — the routing clause ends that at three *recurrences*, and this count is unchanged
-  at two. Prior holds 2026-08-19 into `budget-batch-and-account-identity-kind` and, the same day,
-  into `takeable-tier-batch-and-installer-noop`, the second on a probed ground the first lacked:
-  the row is **not armed today**, the live baselined `fail` naming a slug that still resolves.
-  None of the three declines the finding; each is discharged by having reached the authority.
-  **HELD a FOURTH and a FIFTH time on 2026-08-22, the second operator-ruled:** three firings, three
-  operator interrupts, and it shares no surface with either that day's prose-gate spine or the next
-  iteration's port hold grounds. Count unchanged at two, so the routing clause is still not reached.
+  **Six holds, none of them a decline of the finding, every one on surface grounds.** 2026-08-19
+  into `budget-batch-and-account-identity-kind` and, the same day, into
+  `takeable-tier-batch-and-installer-noop`, the second on a probed ground the first lacked: the row
+  is **not armed today**, the live baselined `fail` naming a slug that still resolves. THIRD
+  2026-08-20 by the lead into `graph-port-and-config-seam`; FOURTH and FIFTH 2026-08-22, the second
+  operator-ruled, against neither that day's prose-gate spine nor the next iteration's port hold.
+  **SIXTH, OPERATOR-RULED 2026-08-23** into `battery-runner-port`: scope proposed it at threshold as
+  the pre-emption rule requires, the lead declined to rule a fork whose three candidates trade real
+  properties, and the operator re-deferred. Count unchanged at two — **no date joins a decline, the
+  finding not having re-fired** — so each hold is discharged by having reached the authority.
   Filed 2026-08-10 by close, from its own blocked entry; the escape it needed is
   the evidence. Re-attested 2026-08-12 by close, again from its own blocked entry.
 
