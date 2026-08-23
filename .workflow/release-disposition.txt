@@ -2,3 +2,4 @@
 # One line per iteration at its release boundary, close-written; the line
 # grammar is lifecycle-kit/SPEC.md §templates/stages/'s, not restated here.
 
+leak-guard-and-assertion-meta-gate-port release v0.25.0 — supply-chain trigger overrode a 5.2-day cadence miss: the published v0.24.0 gate binary carries the builder's home path into every adopter's tracked tree (measured by strings over the downloaded asset), and init places it without building; operator-ruled, and the bump derives minor off the note, meeting the prior close's deferred:v0.25.0 floor.
