@@ -60,8 +60,9 @@ projections, which also carries the full fan-out a new gate stales; each
 freshness gate prints its own command on red.
 
 New gates here are **born native** — a Rust module plus a `.gate` descriptor;
-shell needs a cause from the three closed exception classes, stated in the gate's
-own SPEC section (gate-sdk/SPEC.md §The port-candidate criteria). Either
+shell needs a cause from the two live exception classes, stated in the gate's
+own SPEC section (gate-sdk/SPEC.md §The port-candidate criteria) — no gate is
+permanently shell (TRAJECTORY.md §The closed rulings, 2026-08-23). Either
 substrate ships with a `good/`+`bad/` fixture pair; the four contracts (output,
 fail-closed, fixture-pair, self-lint) are specified in
 [gate-sdk/SPEC.md](gate-sdk/SPEC.md) and enforced by the meta-gates — a red gate
