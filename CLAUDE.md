@@ -154,16 +154,14 @@ load behind that trigger, so they are not resident here.
   load-triggered [docs/site-architecture.md](docs/site-architecture.md).
 - `demo/run-demo.sh` is the runnable adoption walkthrough (vendor → clean pass →
   violation blocked → fix → green), the evidence-kit `demo` validate suite on the
-  gate-sdk consumer-smoke mechanics (`DEMO_TMP_DIR` its only knob, writing nothing
-  in-tree), so a bit-rotted walkthrough is a red validate.
+  gate-sdk consumer-smoke mechanics, so a bit-rotted walkthrough is a red validate.
 - `installer/` is the published activation surface (bash inside, shipped over
   two transports from one payload — the Release tarball and the npm package),
   repo-root-governed, no owning kit; its layout is
   installer/README.md. Not a kit either, and must not become one — by the same
   predicate stated under `native/` above. Its payload is never
   committed: `scripts/pack-installer.sh` assembles it out of tree from this
-  repo's kit roots and stamps the version from the tag
-  (`INSTALLER_PACK_TMP_DIR` its scratch knob, writing nothing in-tree).
+  repo's kit roots and stamps the version from the tag, writing nothing in-tree.
 - **Knowledge-friction capture (any session):** re-deriving a fact no doc owns
   (off an implementation, a gate's source, a commit, or a prior/sibling
   deliverable)? stamp it in the moment with
