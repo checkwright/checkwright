@@ -1,1 +1,5 @@
-missing marker(s): B
+scripts/SPEC.md §check-foo: marker set [A] != contract span [A,B]; missing marker(s): B
+scripts/SPEC.md §check-extra: marker set [A,B,C] != contract span [A,B]; extra marker(s): C
+scripts/SPEC.md §check-count: count-word says 3 but the (X) span enumerates 2 label(s) [1,2] — the contract is internally inconsistent
+scripts/SPEC.md §check-nowhere: enumerated contract but no gate code resolves for 'check-nowhere' (heading must name the script)
+scripts/SPEC.md §check-zero: contract enumerates [A,B] but scripts/check-zero.sh carries zero `# assertion` markers (retrofit obligation)

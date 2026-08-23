@@ -1,1 +1,1 @@
-GATE-ASSERTIONS: clean (2 of 2 enumerated contract(s) coupled)
+GATE-ASSERTIONS: clean (3 of 3 enumerated contract(s) coupled)
