@@ -6938,7 +6938,47 @@ set cwd and get that tree's crate, and it is why the contract says "from the rep
 root" rather than leaving the working directory unstated.
 
 cargo's exit code passes through unmodified and both streams pass through
-untouched, so a caller capturing build output keeps working.
+untouched, so a caller capturing build output keeps working. A **successful**
+cargo build can still exit 2 here, on the artifact verification below — the one
+place this script substitutes its own verdict for cargo's, and it does so only to
+refuse shipping a binary it has already built.
+
+**The released artifact carries no builder path, and the remap is this script's
+because this script is where every shipped build passes.** rustc records a panic
+location per crate it compiles; for a *dependency* that location is absolute
+under the cargo home, so an unremapped binary carries the builder's home
+directory into every consumer that installs it. Measured on this tree at the
+eighth cut: exactly two such paths, both under `$CARGO_HOME/registry/src/`, from
+resolved dependencies rather than from the crate's own sources — cargo already
+spells the local crate's paths relative, which was **probed rather than assumed**,
+including under an absolute `--manifest-path`, where it stays relative. The build
+therefore exports `RUSTFLAGS` carrying `--remap-path-prefix` for two prefixes,
+`CARGO_HOME` (defaulted to `$HOME/.cargo`) and `HOME`: the first is the measured
+leak, the second covers the same leak with a cargo home this tree cannot predict
+and any future path under the builder's home. A prefix that is empty or `/`
+contributes **no** flag, because remapping `/` would rewrite every absolute path
+in the binary. The flags are **appended** to a caller's `RUSTFLAGS` rather than
+replacing them.
+
+**`--remap-path-prefix` rather than cargo's `trim-paths`, and the reason is the
+dependency floor.** `trim-paths` stabilised in 1.81 and this crate pins
+`rust-version = "1.71"`; taking it would raise the toolchain floor, which runs
+against the objective that exists to collapse that floor rather than raise it
+(TRAJECTORY.md). The cost accepted in exchange is that the setting lives in a
+build path rather than in the manifest, which is what the verification below
+exists to answer.
+
+**The artifact is verified rather than the flag trusted.** After a successful
+build, the emitted binary is matched against the consumer's own resolved
+banned-pattern set — `gate_msg_pattern_files`, the same roster §check-tree-terms
+and §check-commit-msg read, so the artifact is held to the tree's leak ban rather
+than to a second vocabulary this tool would carry. A hit is exit 2 naming the
+artifact and the matched text. This is the difference between a flag that is
+*set* and a property that *holds*: a build path losing the flags, or a prefix
+outside `CARGO_HOME` and `HOME` reaching the binary, is caught here rather than
+in an adopter's first battery. The artifact path is derived from the crate dir
+plus any `--target <triple>`, and an absent artifact after a successful build is
+itself exit 2 rather than a silently skipped verification.
 
 Fail-closed (§Fail-closed contract), each **exit 2 with cause** rather than a
 silent success or a skip:
@@ -6951,6 +6991,14 @@ silent success or a skip:
   binary per declared target and never the crate source (§Consumer payload), so a
   consumer tree that reaches this script has found a misuse, not a missing build.
   Saying so is what keeps a vendored tool from reading as a broken one.
+- The banned-pattern set not resolving — a required tracked pattern file missing
+  or unreadable. The resolver's status is read from the command substitution and
+  **not** from `mapfile`, whose own status reports the array assignment and says
+  nothing about the producer; reading it there would turn a fail-closed resolver
+  into a skipped verification.
+- The built artifact matching a banned pattern, or being absent after a
+  successful build. Both are stated as assertions so "not shipped" cannot read as
+  "not checked".
 
 It is a tool, not a gate: no `# graph:` manifest, no `# install:` header, no
 fixture pair — the same distinction the kits' remaining `bin/` tools carry. It is
@@ -6968,16 +7016,30 @@ builds *the configured crate* and carries no repo-specific path, no product
 constant, and no private vocabulary; `native/` reaches it only as
 `GATE_SDK_NATIVE_CRATE`'s existing default.
 
-**The residual, stated rather than gated.** Every reader of the build command
-cites this script, which removes the duplication outright rather than gating it —
-the stronger half of enforcement-first, and why no gate accompanies it. Nothing
-stops a future session from writing a fresh longhand
-`cargo build --release --manifest-path …` into a new file: no existing gate's
-corpus or predicate reaches that, and inventing one would mean a banned-literal
-gate whose pattern list is one repo's own build command. The recurrence is not
-yet attested — the duplication removed here accumulated because there was no
-owner to cite, and this section is that owner. A recurrence is a costed filing,
-not a silent regrowth.
+**The residual, stated rather than gated, and one half of it is now attested.**
+Nothing stops a future session from writing a fresh longhand `cargo build
+--release --manifest-path …` into a new file: no existing gate's corpus or
+predicate reaches that, and inventing one would mean a banned-literal gate whose
+pattern list is one repo's own build command. **The recurrence is attested**, and
+naming it is what keeps this paragraph honest — §upgrade-smoke carries a second
+spelling, `cargo build --release` inside a checked-out ref's crate directory. It
+is deliberately left there and it is **not** a leak path: it builds a *historical
+ref's* crate, which this script's current text could not govern anyway, and the
+artifact is placed into a scratch consumer that **gitignores** it (§Consumer
+smoke), so it never reaches a tracked tree for the leak ban to read.
+
+**That asymmetry is the whole sufficiency argument and is worth stating once.**
+gate-sdk's scratch-consumer builder ignores the placed binary; the installer's
+`init` **tracks and commits** it. Only the tracked half is a leak path, and every
+build reaching it — the publish workflow's per-target build, CI's, and the
+consumer smoke's host build — goes through *this* script. So the property is held
+in two places that do not depend on each other: this script refuses to leave a
+leaking artifact behind, and `installer_smoke` runs a real `init` and a real
+consumer battery over the result, where §check-tree-terms reads the committed
+binary. A future second builder whose artifact reaches a tracked tree is caught by
+the second; one whose artifact does not is not a leak. What remains uncovered is a
+new build path that both bypasses this script **and** publishes without an `init`
+— a costed filing if it is ever built, not a silent regrowth.
 
 ### port-blockers
 
@@ -10474,13 +10536,15 @@ inherited.**
   the shell form captured stdout only, so a leak inside a tracked binary reported
   `TREE-TERMS: clean` and exited 0. Dead on this tree, which tracks no binaries;
   live in a consumer's, which is exactly why it is ruled here rather than
-  discovered there. **It is live on this tree after all**, which the ruling did not
-  expect and the measurement found: `installer_smoke`'s artifact legs commit the
-  gate binary into a scratch consumer's tree at `scripts/checkwright-gates`, and
-  that binary carries its dependencies' build paths, so a consumer's own first
-  battery reds on it. The arm is behaving correctly and what it exposes is
-  somebody else's defect, filed as `installed-gate-binary-trips-the-leak-guard`
-  rather than answered by narrowing this arm.
+  discovered there. **It is live on this tree**, which the ruling did not expect
+  and the measurement found: `installer_smoke`'s artifact legs commit the gate
+  binary into a scratch consumer's tree at `scripts/checkwright-gates`, so this
+  arm reads a real consumer's real artifact on every run of that suite. What it
+  caught there is **fixed at its source rather than exempted here**: the build
+  remaps the builder's paths out of the artifact and verifies the result against
+  this same banned set (§build-native), so what ships carries no such path. The
+  arm stands unnarrowed, which is the outcome worth recording — this guard's
+  first live encounter removes a leak rather than earning an exemption.
 - **The three fail-closed arms are discharged where they are held.** The
   pattern-file resolution, the `git ls-files` call and the content match each
   fail-close through one shared helper, held by §check-gate-fail-closed across
