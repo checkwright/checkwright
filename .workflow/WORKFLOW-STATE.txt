@@ -6,3 +6,4 @@
 
 battery-runner-port scope aa4300d0 2026-08-23 c7425b1e
 battery-runner-port spec a68583f2 2026-08-23 2e29eadc
+battery-runner-port align a2f5118e 2026-08-23 8f44dcfb
