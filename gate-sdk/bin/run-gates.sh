@@ -66,7 +66,7 @@ exec_arm() {
         printf 'executable — it could not run. Build it: bash gate-sdk/bin/build-native.sh\n' >&2
         exit 2
     fi
-    env_out="$(gate_knob_env "$arm")" || exit 2
+    env_out="$(gate_knob_env "$arm" "$@")" || exit 2
     [[ -n "$env_out" ]] && mapfile -t elems <<<"$env_out"
     exec env ${elems[@]+"${elems[@]}"} "$bin" "$arm" "$@"
 }
@@ -116,8 +116,8 @@ case "${1-}" in
         ;;
 esac
 
-# spec: gate-sdk/SPEC.md §run-gates — the [gates-dir] positional crosses as an explicit argument rather than as an override of the bridged knob, so the arm still holds the configured value the `--only` steer resolves its default registry through
+# spec: gate-sdk/SPEC.md §run-gates — the *effective* gates dir crosses as an explicit argument on every run rather than as an override of the bridged knob: the arm scopes its own declared-knob union by the registry there, and it keeps the configured value beside it so the `--only` steer can tell a positional from the default
 GATES_DIR_ARG="${1-}"
-[[ -n "$GATES_DIR_ARG" ]] && RUN_ARGS=(--gates-dir "$GATES_DIR_ARG" ${RUN_ARGS[@]+"${RUN_ARGS[@]}"})
+RUN_ARGS=(--gates-dir "${GATES_DIR_ARG:-$(gate_sdk_gates_dir)}" ${RUN_ARGS[@]+"${RUN_ARGS[@]}"})
 
 exec_arm --run ${RUN_ARGS[@]+"${RUN_ARGS[@]}"}

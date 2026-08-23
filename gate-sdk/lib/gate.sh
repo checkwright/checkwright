@@ -339,11 +339,12 @@ _gate_knob_kit_emit() {
     )
 }
 
-# spec: gate-sdk/SPEC.md §lib/gate.sh — the bridged environment for one binary arm, whether that arm is a `.gate`-dispatched gate or a non-gate arm a front-end invokes (§The non-gate arm): asks the binary what the arm reads, resolves the whole declared set through gate_knob_env_set, and emits one `GATE_SDK_KNOB_<NAME>=<tab-joined>` element per line. Returns non-zero having named the refusal on stderr — the status is the caller's to propagate, which is why this prints to stdout for a `$(…)` capture rather than writing into a process substitution that would swallow it.
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the bridged environment for one binary arm, whether that arm is a `.gate`-dispatched gate or a non-gate arm a front-end invokes (§The non-gate arm): asks the binary what the arm reads — handing it the arm's own argv, since a dispatching arm's declared set is scoped by it — resolves the whole declared set through gate_knob_env_set, and emits one `GATE_SDK_KNOB_<NAME>=<tab-joined>` element per line. Returns non-zero having named the refusal on stderr — the status is the caller's to propagate, which is why this prints to stdout for a `$(…)` capture rather than writing into a process substitution that would swallow it.
 gate_knob_env() {
     local g="$1" bin knob_names knob_status knob
+    shift
     bin="$(gate_native_bin)"
-    knob_names="$("$bin" --knobs "$g" 2>&1)"; knob_status=$?
+    knob_names="$("$bin" --knobs "$g" "$@" 2>&1)"; knob_status=$?
     if [[ "$knob_status" -ne 0 ]]; then
         printf 'gate_command: %s --knobs %s exited %s — the config bridge could not ' "$bin" "$g" "$knob_status" >&2
         printf 'report what %s reads; treating as failure (not clean)\n%s\n' "$g" "$knob_names" >&2

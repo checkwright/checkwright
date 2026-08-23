@@ -199,23 +199,21 @@ pub fn lookup(arm: &str) -> Option<&'static Arm> {
 // spec: gate-sdk/SPEC.md §The non-gate arm — a dispatching arm's declared reads are the **union** of
 // its own with every registry member's and every sibling arm's, derived from the registry and this
 // table rather than maintained beside them, which is the data both already hold.
-pub fn knobs(arm: &str) -> Option<Vec<&'static str>> {
+pub fn knobs(arm: &str, rest: &[String]) -> Option<Vec<&'static str>> {
     let (_, f, own) = BRIDGED_ARMS.iter().find(|(a, _, _)| *a == arm)?;
     match f {
         Arm::Emit(_) => Some(own.to_vec()),
-        Arm::Run(_) => Some(dispatch_union(own)),
+        Arm::Run(_) => Some(dispatch_union(own, rest)),
     }
 }
 
-fn dispatch_union(own: &'static [&'static str]) -> Vec<&'static str> {
+// spec: gate-sdk/SPEC.md §The non-gate arm — the union is scoped to the members **this tree
+// registers**, which is why the caller's own argv reaches it: the crate carries every ported
+// member whatever the consumer vendored.
+fn dispatch_union(own: &'static [&'static str], rest: &[String]) -> Vec<&'static str> {
     let mut all: Vec<&'static str> = own.to_vec();
-    for (name, _, _, _, _) in crate::gates::REGISTRY {
-        if let Some(k) = crate::gates::knobs(name) {
-            all.extend_from_slice(k);
-        }
-    }
-    for (a, _, k) in BRIDGED_ARMS {
-        if *a != "--run" {
+    for name in crate::runner::registered_members(rest) {
+        if let Some(k) = crate::gates::knobs(&name) {
             all.extend_from_slice(k);
         }
     }
@@ -239,20 +237,36 @@ mod tests {
         assert!(lookup("--emit-footprint").is_some());
         assert!(lookup("footprint").is_none());
         assert!(lookup("--emit-footprints").is_none());
-        assert_eq!(knobs("--emit-footprint"), Some(vec!["CONTEXT_KIT_SURFACES"]));
+        assert_eq!(
+            knobs("--emit-footprint", &[]),
+            Some(vec!["CONTEXT_KIT_SURFACES"])
+        );
     }
 
-    // spec: gate-sdk/SPEC.md §The non-gate arm — the dispatching arm's roster is derived, so it
-    // carries a knob no arm declares the moment a registry member declares it
+    // spec: gate-sdk/SPEC.md §The non-gate arm — the dispatching arm's roster is derived and
+    // registry-scoped: it carries its own knobs always, and a member's knobs only where that
+    // member is registered in the tree the caller named
     #[test]
-    fn the_dispatching_arms_roster_is_the_union_it_will_have_to_carry() {
-        let u = knobs("--run").expect("--run is not in the bridged-arm table");
-        assert!(u.contains(&"GATE_SDK_TMP_DIR"), "the arm's own knob is missing");
-        assert!(u.contains(&"GATE_PRUNE_DIRS"), "a registry member's knob is missing");
-        assert!(u.contains(&"CONTEXT_KIT_SURFACES"), "a sibling arm's knob is missing");
-        let mut sorted = u.clone();
+    fn the_dispatching_arms_roster_is_scoped_to_what_the_tree_registers() {
+        let bare = knobs("--run", &[]).expect("--run is not in the bridged-arm table");
+        assert!(bare.contains(&"GATE_SDK_TMP_DIR"), "the arm's own knob is missing");
+        assert!(
+            !bare.contains(&"CANON_KIT_SPEC_NAME"),
+            "an unregistered member's knob rode an unscoped union"
+        );
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("..");
+        let here = vec![
+            "--gates-dir".to_string(),
+            root.join("scripts").display().to_string(),
+        ];
+        let scoped = knobs("--run", &here).expect("--run is not in the bridged-arm table");
+        assert!(
+            scoped.contains(&"CANON_KIT_SPEC_NAME"),
+            "a registered member's knob is missing from the scoped union"
+        );
+        let mut sorted = scoped.clone();
         sorted.sort_unstable();
         sorted.dedup();
-        assert_eq!(u, sorted, "the union is not deterministic");
+        assert_eq!(scoped, sorted, "the union is not deterministic");
     }
 }

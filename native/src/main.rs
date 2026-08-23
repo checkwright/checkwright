@@ -235,7 +235,10 @@ fn main() {
         // spec: gate-sdk/SPEC.md §The non-gate arm — the knob roster is published through this one
         // arm rather than a second flag, so a front-end asks one question whatever it is about to
         // invoke: a gate, or an arm whose caller must resolve its reads.
-        match gates::knobs(name).map(<[&str]>::to_vec).or_else(|| emit::knobs(name)) {
+        match gates::knobs(name)
+            .map(<[&str]>::to_vec)
+            .or_else(|| emit::knobs(name, &argv[2..]))
+        {
             Some(knobs) => {
                 for k in knobs {
                     println!("{}", k);

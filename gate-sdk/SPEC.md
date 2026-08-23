@@ -1330,13 +1330,29 @@ rather than a hardcoded flag for exactly the reason above — it reads the gates
 dir, the kit roots and the scratch dir, so a flag would be the second shape.
 
 **Its declared knob roster is derived, never maintained.** `--knobs --run` answers
-the **union** of every registry member's declared knobs, every sibling arm's, and
-the runner's own, computed from the crate's registry and this table. A maintained
+the **union** of the runner's own knobs with those of every member the *tree*
+registers, computed from `gates.list` and the crate's registry. A maintained
 union would rot against a churning roster the moment a member's knob set changed,
 which derivation-first forbids; the union is exactly the data `gates::knobs` and
-the table already hold. The dispatcher then hands each child only its own
+the registry already hold. The dispatcher then hands each child only its own
 member's slice of that union, which is what keeps the declared-knob discipline
 executed rather than assumed (§run-gates).
+
+**The scope is the tree's registry rather than the crate's, and that is a
+correctness requirement rather than an economy.** The binary carries every ported
+member whatever profile a consumer installed, so a union taken over
+`gates::REGISTRY` asks the bridge to resolve a knob whose owning kit is not
+vendored — the does-not-define refusal, fail-closed, on the adopter's very first
+battery. The starter profile is the worked instance: one kit vendored, a
+`gates.list` naming only its members, and a crate-wide union demanding
+`CANON_KIT_ACTIVE_SECTIONS` from a tree with no canon-kit. The arm's own argv
+therefore reaches `--knobs`, because the registry it will walk is the only thing
+that scopes the answer correctly, and `gate_knob_env` forwards it for that
+reason. **A sibling arm's knobs are not in the union either**, for the same
+property read forward: the runner never invokes a sibling arm, so declaring its
+knobs would violate the very rule `--knobs` exists to hold. A gate that reaches
+an emitter in-process declares that emitter's knobs on its own registry entry,
+which is the transitive-coupling rule below already covering the case.
 
 **A gate that reaches an arm in-process acquires a source coupling its
 descriptor must carry, and the trigger set does not follow the port on its
@@ -6499,7 +6515,12 @@ properties bind:
   readers would otherwise read a rising `TOTAL` as a regression.
 - **Per-gate scratch isolation, split by what the directory is for.** Each child
   gets a private `TMPDIR` under the run's own scratch, which is where a member's
-  *anonymous* temporaries land. `GATE_SDK_TMP_DIR` stays **shared and is not
+  *anonymous* temporaries land. That scratch sits under the **system** temp dir,
+  where an anonymous temporary already went, and it is **absolute**: a child's
+  working directory is its own, and a relative `TMPDIR` silently resolves
+  somewhere else inside one — the defect the crate's own `awk` cross-check caught
+  when it ran under a child whose cwd was the crate root.
+  `GATE_SDK_TMP_DIR` stays **shared and is not
   isolated**, because it is the home of a declared, content-keyed cache whose
   whole value is surviving the run — `check-crate-arms` writes its
   `crate-arms-<hash>.green` there and reads it on the next battery, and a

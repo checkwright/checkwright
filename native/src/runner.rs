@@ -79,6 +79,20 @@ fn parse(args: &[String]) -> Result<Args, String> {
     Ok(out)
 }
 
+// spec: gate-sdk/SPEC.md §The non-gate arm — the member set the declared-knob union is scoped to:
+// the `gates.list` the caller named. An unreadable or unnamed registry yields nothing, so the run
+// itself is what produces the `no registry at` refusal.
+pub fn registered_members(args: &[String]) -> Vec<String> {
+    let Ok(a) = parse(args) else { return Vec::new() };
+    let Some(dir) = a.gates_dir else {
+        return Vec::new();
+    };
+    match std::fs::read_to_string(registry::list_path(&dir)) {
+        Ok(t) => registry::members(&t),
+        Err(_) => Vec::new(),
+    }
+}
+
 // spec: gate-sdk/SPEC.md §run-gates — worker count: `GATE_SDK_JOBS` where the environment carries a
 // usable one, else the machine's parallelism, else serial. Read once, before the first dispatch.
 fn jobs() -> usize {
@@ -407,13 +421,16 @@ pub fn run(args: &[String]) -> i32 {
         }
     };
     let gates_dir = parsed.gates_dir.clone().unwrap_or_else(|| configured_dir.clone());
+    let explicit = gates_dir != configured_dir;
     let list = registry::list_path(&gates_dir);
 
     let list_text = match std::fs::read_to_string(&list) {
         Ok(t) => t,
         Err(_) => {
             eprintln!("{}: no registry at {}", TOOL, list);
-            steer(&parsed.gates_dir, &configured_dir);
+            if explicit {
+                steer(&gates_dir, &configured_dir);
+            }
             return 2;
         }
     };
@@ -471,9 +488,10 @@ pub fn run(args: &[String]) -> i32 {
             return 2;
         }
     };
-    // spec: gate-sdk/SPEC.md §run-gates — the run's own scratch, removed on the way out, so a
-    // battery leaves the tmp dir's file set exactly as it found it
-    let scratch = PathBuf::from(&tmp_dir).join(format!("run.{}", std::process::id()));
+    // spec: gate-sdk/SPEC.md §run-gates — the run's own scratch: under the *system* temp dir, which
+    // is where an anonymous temporary already went, and absolute because a child's cwd is its own
+    // and a relative `TMPDIR` would resolve somewhere else in it. Removed on the way out.
+    let scratch = std::env::temp_dir().join(format!("checkwright-run.{}", std::process::id()));
     let _ = std::fs::remove_dir_all(&scratch);
     if let Err(e) = std::fs::create_dir_all(&scratch) {
         eprintln!(
@@ -567,8 +585,7 @@ fn trim_trailing_newlines(b: &[u8]) -> &[u8] {
 
 // spec: gate-sdk/SPEC.md §run-gates — the `--only` steer: a positional that is really a member of
 // the *default* registry earns the remedy beside the refusal, never a run it did not ask for
-fn steer(positional: &Option<String>, configured_dir: &str) {
-    let Some(arg) = positional else { return };
+fn steer(arg: &str, configured_dir: &str) {
     let default_list = registry::list_path(configured_dir);
     let Ok(text) = std::fs::read_to_string(&default_list) else {
         return;
