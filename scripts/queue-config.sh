@@ -1,5 +1,5 @@
 # shellcheck shell=bash
-# spec: queue-kit/SPEC.md §Layout and configuration — this repo's queue-kit consumer config: the one outbound lesson-harvest tag ([essay], routed by .claude/commands/close.md) and the living-page prose surfaces that make queue-membership claims; every other knob keeps the platform default
+# spec: queue-kit/SPEC.md §Layout and configuration — this repo's queue-kit consumer config: the one outbound lesson-harvest tag ([essay], routed by .claude/commands/close.md) and the living-page prose surfaces that make queue-membership claims; the icebox age floor, lowered from the kit's 30 days because this queue's inflow runs about a week per eviction review; every other knob keeps the platform default
 # shellcheck disable=SC2034  # consumed by queue-kit/lib/queue.sh after sourcing
 QUEUE_KIT_LESSON_TAGS=(essay)
 # shellcheck disable=SC2034  # consumed by queue-kit/lib/queue.sh after sourcing
@@ -14,3 +14,5 @@ QUEUE_KIT_TRACKS=(adoption reliability ecosystem commercial)
 QUEUE_KIT_ROADMAP_FILE=ROADMAP.md
 # shellcheck disable=SC2034  # consumed by queue-kit/lib/queue.sh after sourcing
 QUEUE_KIT_ICEBOX_SECTION=Icebox
+# shellcheck disable=SC2034  # consumed by queue-kit/lib/queue.sh after sourcing
+QUEUE_KIT_ICEBOX_AGE_DAYS=7
