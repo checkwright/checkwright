@@ -23,7 +23,8 @@
   `check-install-disposition`, text walks that already read the binary's `--list`;
   `check-crate-arms`, a wrapper spawning cargo, `install: never`, carrying the source-stamp cache
   its SPEC section rules; `check-shellcheck` and `check-action-run-shell`, wrappers spawning
-  shellcheck and refusing at exit 2 when absent, the first retiring with the last `.sh`;
+  shellcheck and refusing at exit 2 when absent, the first DEREGISTERING here with the last
+  `.sh` and not retiring, since it is zero-config and an adopter's battery is shell;
   `check-docs-render-fidelity`, a wrapper spawning the renderer, whose GNU-awk batch stream is
   the last live holder of the `awk (GNU)` requirement docs/install.md states, so the port
   retires that floor (site-kit/SPEC.md §check-docs-render-fidelity); and the two unregistered
