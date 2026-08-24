@@ -14,46 +14,6 @@
 
 ## Technical Debt
 
-- **icebox-candidate-eligibility-unapplied** — the eviction worklist lists rows the icebox
-  eligibility rule already forbids, so every close re-derives the same exclusions by hand.
-  **The split is backwards, and that is the finding rather than a calibration complaint.**
-  queue-kit/SPEC.md §The icebox tier states that a roadmap-tagged entry is not icebox-eligible
-  as a hard rule with structural enforcement behind it — `check-roadmap-fresh` reds a one-line
-  entry that cannot carry a `roadmap-summary:` — while the `queue-index --icebox-candidates` arm
-  filters on age and low-cost-opener alone. The mechanically-decidable half of eligibility is
-  unapplied while the judgment half is applied by hand, which is the wrong split.
-  **DISTINCT from any calibration question.** queue-kit/SPEC.md deliberately rules the age and
-  cost filters non-load-bearing because miscalibration only lengthens the list; that reasoning
-  does not extend to a rule the SPEC states as binding either way.
-  **The fork the build stage rules:** one predicate in the emitter that drops the row, or a
-  printed ineligibility reason per row if listing-then-explaining is preferred to filtering. The
-  second keeps the worklist a census and costs the close a read; the first makes it a pick list
-  and hides the tier's reasoning from the session that most needs to have read it. Class:
-  neither shape mints a governed name or a gate, so the litmus makes it debt.
-  **Measured across four closes rather than predicted, and the last reading is the one that
-  settles it.** Two closes each ran the worklist and got a byte-identical five rows, 100%
-  ineligible — three by the roadmap-tag rule and two on the live-promotion-trigger clause. A
-  third ran it after the age floor dropped and got 27 rows with the same three ineligible, an
-  11% rate that was the hold's ground. The fourth measured 8 rows, all 8 ineligible, and scope
-  re-ran the emitter at the next boundary and got the same 8. The five non-roadmap rows are each
-  held by a **live unbuilt queue slug**, which the 2026-08-23 operator narrowing makes a live
-  promotion trigger — and a slug-liveness test is exactly what the queue adapter already
-  implements for `check-task-names` and `check-roadmap-fresh`. So **both** halves of the
-  eligibility rule are mechanically decidable, the judgment residue the 11% reading rested on is
-  not judgment at all, and the worklist's false-positive rate is 100% against a predicate the
-  emitter could have computed. Re-derive these figures rather than citing them.
-  **TAKEN 2026-08-24, operator-ruled at scope's threshold proposal on three recurrence dates**,
-  one hold after the lead came closest to taking it. The rate-collapse ground that hold stood on
-  is answered above; the surface cost was stated to the operator rather than elided — this lands
-  on the queue emitter and not on this iteration's turn-end files — and the ruling took it
-  anyway, against TRAJECTORY.md §The closed rulings' 2026-08-23 operator action on the pool's
-  measured 8:1 intake-to-exit ratio. The bundling with `deferred-cost-class-opener-vocabulary`
-  on one surface stands, and is now an argument for reading that entry beside this one rather
-  than against taking it.
-  Surfaced 2026-08-19 at the `takeable-tier-batch-and-installer-noop` close's icebox eviction
-  review and filed to the gap inbox there; promoted to the deferred pool 2026-08-20 by the next
-  iteration's scope, and to this iteration 2026-08-24 on the recurrence rule.
-
 ## Deferred
 
 - **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
@@ -6396,10 +6356,10 @@
   open and the two trade differently. A head token keeps one line and makes every existing
   field a migration; a `cost-class:` tag leaves the prose untouched and spends a line on each
   entry against `check-queue-entry-budget`'s 50-line cap.
-  **DISTINCT from `icebox-candidate-eligibility-unapplied`**, the same arm's other half: that
-  entry is the *eligibility* rules the arm fails to apply — roadmap tags, live promotion
-  triggers — and its fix filters rows the arm already produced. This is the *cost* predicate
-  producing too few rows to filter. One surface, so they bundle well; neither subsumes the other.
+  **DISTINCT from the eligibility half of the same arm, which landed 2026-08-25**: the arm now
+  applies the categorical rules — roadmap tags, live promotion triggers — marking each row and
+  printing its cause rather than dropping it (queue-kit/SPEC.md §The queue-index arm). This is
+  the *cost* predicate producing too few rows to mark; one surface, and neither subsumes the other.
   **Cost while deferred:** the eviction worklist derives from about a sixth of the pool, so the
   8:1 intake-to-exit ratio the 2026-08-23 ruling acted on has no lever reaching the rest.
   Filed 2026-08-23 by the consult held after `leak-guard-and-assertion-meta-gate-port` closed,
@@ -7703,6 +7663,8 @@
 - **amendment-roster-omission-detection** [design-pending] — Only a grep catches a short roster.
 
 ## Done
+
+- icebox-candidate-eligibility-unapplied
 
 - no-port-cause-class-generalization
 

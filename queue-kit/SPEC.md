@@ -686,6 +686,17 @@ class, carrying the entry's line count and that opener. An entry with no defer
 date is listed as `(undated)` and an uncosted one as `(uncosted)` rather than
 filtered out — an absent input appears rather than vanishing.
 
+Each row is led by the `•`/`✗` mark the index rendering already uses: `•` for an
+entry §The icebox tier's eligibility rule admits, `✗` for one it excludes. An
+excluded row prints its **cause** in place of the cost opener, because the opener
+is inclusion evidence and decides nothing once a categorical exclusion has
+settled the row. The cause names the trigger class — the `[roadmap:]` tag, a
+dated `recurrence:` declaration, or the first live slug named in file order,
+which stands for the class rather than enumerating it. A slug counts as *named*
+only where it stands as a whole token, the neighbouring bytes falling outside the
+slug alphabet: a substring hit inside a longer slug is a different entry, and
+holding a row against it would invent a trigger nobody wrote.
+
 Both filters are deliberately **non-load-bearing**: this is a worklist filter
 in a projection tool, not a threshold in a gate, so miscalibration costs a
 longer or shorter review list and never a wrong disposition. That is what
@@ -697,14 +708,30 @@ is exactly the right ceiling. **A pool younger than the age threshold yields an
 empty worklist**, which is correct and is not a reason to seed a tier by hand
 against the tool: eligibility is the rule, the worklist is the convenience.
 
-**The worklist deliberately does not filter the tier's categorical exclusions —
-a `[roadmap:]` tag or a live promotion trigger — and that is settled, not
-pending.** Operator-ruled 2026-08-18 on five consecutive measurements at zero
-precision: filtering the machine-readable half would have moved the eligible
-count from zero to zero, and the other half is a prose-parsing fork nothing
-justifies. So the closing stage reads a row and applies §The icebox tier's
-eligibility rule to it, which is the division of labour the paragraph above
-already states; a row the rule excludes is a line read, not a defect.
+**The worklist applies the tier's categorical exclusions, reopening a ruling that
+held them off.** Operator-ruled 2026-08-18 that it deliberately would not, on
+five consecutive measurements at zero precision: filtering the machine-readable
+half would have moved the eligible count from zero to zero, and the other half
+read as a prose-parsing fork nothing justified. **Reopened and taken by operator
+ruling 2026-08-24**, on measurement rather than on preference. Both halves of the
+ground fell: all three triggers are mechanically decidable — the `[roadmap:]` tag
+is a lead-line tag, the dated `recurrence:` declaration is one indented body line
+with a fixed lead token (§The queue format), and a named live slug is the
+slug-liveness test the shared adapter already answers for §check-task-names — and
+zero precision is what makes the exclusions worth *reporting*, since a worklist
+whose rows are all re-adjudicated by hand pays that read at every close.
+
+**It prints them rather than filtering, which is this arm's own rule and not a
+new one.** `(undated)` and `(uncosted)` above already list an entry that fails an
+input test instead of dropping it, and a categorical failure is the same case
+under the same sentence. Two further grounds hold in the same direction: dropping
+the row would turn an advisory projection into a silent disposition, which is
+what the non-load-bearing ruling above exists to prevent; and it would deny the
+closing stage a row §The icebox tier requires it to have recovered *before*
+ruling on the entry. So the division of labour is unchanged — the arm reports,
+the closing stage rules, and a row the rule excludes is still a line read rather
+than a defect. What changed is that the line now carries its reason instead of
+leaving every close to re-derive one.
 
 No queue-mutating tool is added — `--extent <slug>` already yields the line
 range an eviction deletes.

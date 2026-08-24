@@ -10,7 +10,8 @@ const OPENER_CAP: usize = 48;
 const USAGE: &str = "\
 usage: --emit queue-index [--collapse-deferred] [--extent <slug>] [--icebox-candidates] [queue-file]
   default: header + active (• ready / ✗ blocked) + deferred titles + icebox tally;
-  --collapse-deferred: per-### tally; --extent <slug>: \"<start> <end>\"; --icebox-candidates: eviction worklist
+  --collapse-deferred: per-### tally; --extent <slug>: \"<start> <end>\";
+  --icebox-candidates: eviction worklist (• eligible / ✗ excluded, cause in place of the cost)
 ";
 
 enum Mode {
@@ -437,11 +438,7 @@ fn opener(line: &str) -> String {
     if t.is_empty() {
         return "(unstated)".to_string();
     }
-    if t.chars().count() > OPENER_CAP {
-        let head: String = t.chars().take(OPENER_CAP - 1).collect();
-        return format!("{}…", head);
-    }
-    t.to_string()
+    cap_chars(t)
 }
 
 // spec: queue-kit/SPEC.md §The queue-index arm — the low cost class is matched on the opener as
@@ -472,35 +469,111 @@ fn find_dated(line: &str, label: &str) -> Option<String> {
     None
 }
 
+fn is_slug_byte(c: u8) -> bool {
+    c.is_ascii_lowercase() || c.is_ascii_digit() || c == b'-'
+}
+
+// spec: queue-kit/SPEC.md §The queue-index arm — a slug is *named* only where it stands as a
+// whole token, the neighbouring bytes falling outside the slug alphabet.
+fn names_slug(hay: &str, slug: &str) -> bool {
+    let b = hay.as_bytes();
+    let mut from = 0usize;
+    while let Some(rel) = hay[from..].find(slug) {
+        let at = from + rel;
+        let before_ok = at == 0 || !is_slug_byte(b[at - 1]);
+        let end = at + slug.len();
+        let after_ok = end >= b.len() || !is_slug_byte(b[end]);
+        if before_ok && after_ok {
+            return true;
+        }
+        from = at + 1;
+    }
+    false
+}
+
+fn has_date(line: &str) -> bool {
+    let b = line.as_bytes();
+    (0..b.len().saturating_sub(9)).any(|i| {
+        (0..10).all(|k| match k {
+            4 | 7 => b[i + k] == b'-',
+            _ => b[i + k].is_ascii_digit(),
+        })
+    })
+}
+
+// spec: queue-kit/SPEC.md §The icebox tier — the categorical half of the eligibility rule; §The
+// queue-index arm owns the 2026-08-24 reopening that moved it here.
+fn ineligibility(e: &Pending, live: &[String]) -> Option<String> {
+    if e.lead.contains("[roadmap:") {
+        return Some("[roadmap] tag — not icebox-eligible".to_string());
+    }
+    for line in e.body.lines() {
+        let t = line.trim_start();
+        if t.starts_with("recurrence:") && has_date(t) {
+            return Some("[recurrence] dated re-filing — live trigger".to_string());
+        }
+    }
+    for s in live {
+        if *s == e.slug {
+            continue;
+        }
+        if names_slug(&e.body, s) {
+            return Some(format!("[trigger] names live slug {}", s));
+        }
+    }
+    None
+}
+
 struct Pending {
     slug: String,
     start: usize,
     surfaced: String,
     filed: String,
     cost: String,
+    lead: String,
+    body: String,
 }
 
-fn flush(p: &mut Option<Pending>, at: usize, cutoff: &str, out: &mut String) {
+fn flush(p: &mut Option<Pending>, at: usize, cutoff: &str, live: &[String], out: &mut String) {
     let Some(e) = p.take() else { return };
     let d = if !e.surfaced.is_empty() { e.surfaced.as_str() } else { e.filed.as_str() };
     let dated_in = d.is_empty() || d < cutoff;
     let costed_in = e.cost.is_empty() || low_class(&e.cost);
     if dated_in && costed_in {
         let shown_date = if d.is_empty() { "(undated)" } else { d };
-        let shown_cost = if e.cost.is_empty() { "(uncosted)" } else { e.cost.as_str() };
+        // spec: queue-kit/SPEC.md §The queue-index arm — an ineligible row keeps its line and
+        // trades its cost opener for the reason: the opener is inclusion evidence, and it decides
+        // nothing once a categorical exclusion has already settled the row.
+        let (mark, tail) = match ineligibility(&e, live) {
+            Some(r) => ('✗', cap_chars(&r)),
+            None => {
+                let c = if e.cost.is_empty() { "(uncosted)" } else { e.cost.as_str() };
+                ('•', c.to_string())
+            }
+        };
         out.push_str(&format!(
-            "{:<46} {:>4}l  {:<11} {}\n",
+            "{} {:<46} {:>4}l  {:<11} {}\n",
+            mark,
             e.slug,
             at - e.start,
             shown_date,
-            shown_cost
+            tail
         ));
     }
+}
+
+fn cap_chars(t: &str) -> String {
+    if t.chars().count() > OPENER_CAP {
+        let head: String = t.chars().take(OPENER_CAP - 1).collect();
+        return format!("{}…", head);
+    }
+    t.to_string()
 }
 
 fn candidates(text: &str) -> Result<String, String> {
     let sec_cfg = Sections::active_and_deferred()?;
     let cutoff = age_cutoff()?;
+    let live = queue::live_slugs(text, &sec_cfg);
     let mut out = String::new();
     let mut in_deferred = false;
     let mut pending: Option<Pending> = None;
@@ -509,7 +582,7 @@ fn candidates(text: &str) -> Result<String, String> {
     for (i, line) in text.lines().enumerate() {
         n = i + 1;
         if queue::is_section_line(line) {
-            flush(&mut pending, n, &cutoff, &mut out);
+            flush(&mut pending, n, &cutoff, &live, &mut out);
             in_deferred = sec_cfg.is_deferred(line);
             continue;
         }
@@ -517,17 +590,21 @@ fn candidates(text: &str) -> Result<String, String> {
             continue;
         }
         if let Some(slug) = queue::bullet_slug(line) {
-            flush(&mut pending, n, &cutoff, &mut out);
+            flush(&mut pending, n, &cutoff, &live, &mut out);
             pending = Some(Pending {
                 slug: slug.to_string(),
                 start: n,
                 surfaced: String::new(),
                 filed: String::new(),
                 cost: String::new(),
+                lead: line.to_string(),
+                body: String::new(),
             });
             continue;
         }
         let Some(e) = pending.as_mut() else { continue };
+        e.body.push_str(line);
+        e.body.push('\n');
         if e.surfaced.is_empty() {
             if let Some(d) = find_dated(line, "Surfaced ") {
                 e.surfaced = d;
@@ -542,7 +619,7 @@ fn candidates(text: &str) -> Result<String, String> {
             e.cost = opener(line);
         }
     }
-    flush(&mut pending, n + 1, &cutoff, &mut out);
+    flush(&mut pending, n + 1, &cutoff, &live, &mut out);
     Ok(out)
 }
 
@@ -678,6 +755,91 @@ mod tests {
         let r = extent(Q, "def-alltag").expect("extent failed");
         assert_eq!(r, "18 19\n", "{}", r);
         assert!(extent(Q, "no-such-slug").is_err());
+    }
+
+    // spec: queue-kit/SPEC.md §The icebox tier — a slug is named only as a whole token, so a
+    // longer slug that merely contains a shorter one holds no row against it.
+    #[test]
+    fn a_slug_is_named_only_where_it_stands_as_a_whole_token() {
+        assert!(names_slug("held by `some-slug` today", "some-slug"));
+        assert!(names_slug("[blocked-by: some-slug]", "some-slug"));
+        assert!(!names_slug("names some-slug-extended instead", "some-slug"));
+        assert!(!names_slug("names a-some-slug instead", "some-slug"));
+        assert!(names_slug("some-slug", "some-slug"));
+    }
+
+    fn pend(lead: &str, body: &str) -> Pending {
+        Pending {
+            slug: "subject".to_string(),
+            start: 1,
+            surfaced: String::new(),
+            filed: String::new(),
+            cost: "low".to_string(),
+            lead: lead.to_string(),
+            body: body.to_string(),
+        }
+    }
+
+    // spec: queue-kit/SPEC.md §The icebox tier — all three categorical triggers, plus the two
+    // near-misses the grammar creates: the self-naming `recurrence:` mandates, and an undated
+    // `recurrence:` line, neither of which is a live trigger.
+    #[test]
+    fn every_categorical_trigger_is_decided_and_self_naming_is_not_one() {
+        let live = vec!["other".to_string(), "subject".to_string()];
+        let r = ineligibility(&pend("- **subject** [roadmap: now/x] — t.", ""), &live);
+        assert!(r.unwrap().starts_with("[roadmap]"));
+        let r = ineligibility(&pend("- **subject** — t.", "  recurrence: subject 2026-08-01\n"), &live);
+        assert!(r.unwrap().starts_with("[recurrence]"));
+        let r = ineligibility(&pend("- **subject** — t.", "  waits on `other` landing.\n"), &live);
+        assert_eq!(r.unwrap(), "[trigger] names live slug other");
+        let r = ineligibility(&pend("- **subject** — t.", "  subject is the whole of it.\n"), &live);
+        assert!(r.is_none(), "self-naming is narration, not a trigger: {:?}", r);
+        let r = ineligibility(&pend("- **subject** — t.", "  recurrence: subject soon\n"), &live);
+        assert!(r.is_none(), "an undated recurrence line is no re-filing: {:?}", r);
+    }
+
+    // spec: queue-kit/SPEC.md §The queue-index arm — the census is preserved: an excluded row
+    // keeps its line and trades the cost opener for the cause.
+    #[test]
+    fn an_excluded_row_is_marked_and_carries_its_cause_instead_of_the_cost() {
+        let q = "\
+## Iteration: demo
+
+## New Features
+
+- **live-one** [design-pending] — an unbuilt active entry.
+
+## Deferred
+
+- **keeper** [design-pending] — nothing holds it.
+  **Cost while deferred:** low and quiet.
+  Filed 2020-01-01 by close.
+- **tagged** [design-pending] [roadmap: now/x] — published.
+  **Cost while deferred:** low and quiet.
+  Filed 2020-01-01 by close.
+- **held** [design-pending] — waits.
+  **Cost while deferred:** low and quiet.
+  Filed 2020-01-01 by close, and it waits on `live-one`.
+
+## Lessons Learned
+";
+        let out = {
+            let knobs = crate::knobenv::lock();
+            knobs.set("GATE_SDK_KNOB_QUEUE_KIT_ACTIVE_SECTIONS", "New Features");
+            knobs.set("GATE_SDK_KNOB_QUEUE_KIT_DEFERRED_SECTION", "Deferred");
+            knobs.set("GATE_SDK_KNOB_QUEUE_KIT_ICEBOX_SECTION", "");
+            knobs.set("GATE_SDK_KNOB_QUEUE_KIT_ICEBOX_AGE_DAYS", "7");
+            candidates(q).expect("candidates failed")
+        };
+        let lines: Vec<&str> = out.lines().collect();
+        assert_eq!(lines.len(), 3, "every row is still listed: {}", out);
+        assert!(lines[0].starts_with("• keeper"), "{}", out);
+        assert!(lines[0].contains("low and quiet."), "{}", out);
+        assert!(lines[1].starts_with("✗ tagged"), "{}", out);
+        assert!(lines[1].contains("[roadmap]"), "{}", out);
+        assert!(!lines[1].contains("low and quiet."), "{}", out);
+        assert!(lines[2].starts_with("✗ held"), "{}", out);
+        assert!(lines[2].ends_with("[trigger] names live slug live-one"), "{}", out);
     }
 
     #[test]
