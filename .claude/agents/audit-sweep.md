@@ -60,7 +60,8 @@ primitive. A sub-`Agent` is awaited by its completion
 notification and never by a path on disk; a shell child is awaited on the liveness
 record you write at its launch — its PID, one line `pid=<n> run=<key>`, in a file
 named `<key>.run` in repo-local `.tmp/` in the main checkout, never a temporary
-worktree, which is deleted with it, and never a system temp dir. Loop on that
+worktree, which takes the record with it when it goes, and never a system temp
+dir. Loop on that
 recorded PID's liveness and never on a pattern, whoever started
 the producer; leave the record behind, because `check-producer-liveness <record>`
 reads it unchanged — and the `.run` suffix is what lets

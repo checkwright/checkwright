@@ -81,13 +81,16 @@ is every governed markdown surface twice.
 The match is on the **leaf basename**, the same rule and the same reasoning
 gate-sdk/SPEC.md §lib/gate.sh fixed for its own set: pruning a parent path also
 passes but loses coverage silently, because the governed markdown under it is
-reached by explicit globs no prune touches. `.tmp` and `gate-tests` sit in
-gate-sdk's set and are **deliberately absent from this one** — this set's subject
+reached by explicit globs no prune touches. gate-sdk's set additionally covers a
+scratch dir and a fixture-corpus dir, and both are **deliberately absent from
+this one** — this set's subject
 is the second copy of the repository, and adding either is a corpus narrowing
 with its own readers (the index-tests goldens; a session that legitimately wants
 a fixture corpus indexed). Whether the two sets should converge is an open
-question, filed rather than taken. They are **not one fact spelled twice**: this
-one omits two members and carries two (`dist`, `build`) that gate-sdk's does not,
+question, filed rather than taken. They are **not one fact spelled twice**: one
+carries leaves gate-sdk's does not and omits two that it has,
+gate-sdk/SPEC.md §lib/gate.sh owning that set's membership and this knob's
+default owning this one,
 and a hard read of `GATE_PRUNE_DIRS` would make an advisory `bin/` tool fail in a
 tree that vendored context-kit without gate-sdk, so a consumer assigns this knob
 in its own config rather than deriving it from a gate library.

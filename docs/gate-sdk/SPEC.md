@@ -1625,15 +1625,15 @@ constraint is recorded where the route is rather than left to be discovered.
 
 **Most of what that port needs is already in the crate**, which is the other half
 of why the route is recordable now. `registry.rs` owns the registry walk both
-registry arms run on; `walk.rs` owns the prune resolution **and the `--tree` corpus
-enumeration itself** — `tracked_shell_tree()` is already the compiled face of that
-corpus rule, tracked `*.sh` minus the `*.test.sh` suffix minus the pruned paths, and
-it is no stub built ahead of demand, §check-gate-exemption-tasks' tree arm having
-called it since that arm landed. What the port owes beyond them is narrower than a
-first read suggests: the header-block read — today a helper private to that gate's
-module, doing the identical shebang/comment/blank-line read this arm needs, so the
-choice is promoting it to a shared home or duplicating four lines rather than
-writing it fresh — and the three arms' trailers, which exist nowhere yet.
+registry arms run on; the prune resolution and the `--tree` corpus rule's own
+compiled face are shared crate mechanism too, and the latter is no stub built
+ahead of demand — §check-gate-exemption-tasks' tree arm has called it since that
+arm landed. What the port owes beyond them is narrower than a first read
+suggests: the header-block read, which exists today only inside the gate module
+that needed it first, so the choice is promoting it to a shared home or
+duplicating it rather than writing it fresh — and the three arms' trailers, which
+exist nowhere yet. Re-derive the helper's size and its home from the crate rather
+than from this paragraph; both are the port's to move.
 
 **That is why the table is named for *bridged*, not for *emit*.** What its members
 share is not that each renders a document — `--emit-queue-index extent` answers
@@ -7829,10 +7829,11 @@ in one sentence — criterion 6's single-producer rule, and the 2026-08-21
 ratification — so §port-blockers' `--tree` arm reports it `no-port` rather than
 `owed`. Until it landed, the ruling existed and the instrument that measures the
 completion predicate could not see it, which is the exact misread the disposition
-column was built to prevent arriving through an empty declaration set. This is the
-**first tracked file in this tree** to take the *declares* branch of the
-substitution that arm's corpus rule turns on, so landing it is what turned that
-substitution from a worked example into a live one.
+column was built to prevent arriving through an empty declaration set. This file
+sits **squarely in the declaring class** of the substitution that arm's corpus
+rule turns on — a sibling declared on a provenance ground in the same commit — so
+landing the pair is what turned that substitution from a worked example into a
+live one.
 
 **The residue's disposition, ruled at build 2026-08-24, on which the debt entry
 that carried it closes.** The spawn is **declared, and the declaration is what

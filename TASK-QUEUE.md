@@ -87,10 +87,10 @@
   **Two constraints the porting unit inherits rather than discovers**, both recorded at §The
   non-gate arm. (i) `measured-claims.sh` reads the `--tree` trailer by spawning `bash` today and
   must move to the arm IN THE SAME COMMIT, or the consumer's claim oracle exits 2. (ii) Most of the
-  substrate exists: `registry.rs` owns the registry walk, `walk.rs` owns the prune resolution AND
-  the `--tree` corpus enumeration (`tracked_shell_tree()`, already called by
-  `check-gate-exemption-tasks`), and the header-block read is a private helper in that gate's
-  module — so the port owes a promote-or-duplicate choice plus the three arms' trailers.
+  substrate exists — the registry walk, the prune resolution and the `--tree` corpus rule's
+  compiled face are already shared crate mechanism, so what the port owes is the header-block read
+  and the three arms' trailers. What exists, what is owed, and the promote-or-duplicate choice are
+  enumerated at §The non-gate arm and are deliberately not re-listed here.
   **The reflexivity is priced and is not a problem:** the arm's shell implementation and the arm's
   own row leave the tree in the same commit, so the measurement is not a fixed point and its last
   act is to remove itself from its own corpus. The arm reads headers, not behaviour, so there is no
