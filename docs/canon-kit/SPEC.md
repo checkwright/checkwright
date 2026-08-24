@@ -1091,6 +1091,19 @@ literal enumerating what a project measures would publish that project's
 vocabulary. An unset knob means the gate has no oracle and reports clean — the
 inactive-by-default posture its `*_CMD` siblings take.
 
+**Adding a key costs more than the emitter, and the extra cost is invisible from
+here: the key and value rosters are bridged knobs, so a consumer generating a
+hook bakes them into it.** Where this member is dispatched through gate-sdk's
+config bridge, the resolved `<KIT>_MEASURED_KEYS` and `_VALUES` sit literally in
+the generated pre-commit hook's invocation, which a freshness gate holds byte for
+byte. The consequence is the one to weigh before minting a key: **every input of
+that key's oracle becomes an input of a byte-gated artifact**, so a high-churn
+key stales the hook on every commit that moves it, whether or not the commit
+touches anything the hook is about. A low-churn key costs nothing extra. This is
+an instance of the general resolved-knob-baking property rather than a second
+mechanism, and it is named here because the emitter is authored on this surface
+while the property lives on gate-sdk's.
+
 **A key's *meaning* is consumer-owned too, and that is the one failure none of the
 three arms can catch.** Redefining an existing key's oracle to answer a wider or
 narrower question leaves every arm satisfied while the referent moves: arm A

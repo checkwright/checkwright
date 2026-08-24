@@ -6349,6 +6349,18 @@ Resolution, per declared knob:
   lookup runs under a stdout capture, so an early hit that abandons the producer
   leaves it writing into a closed pipe; §run-gates gives the consequence, and
   why the environment that shows it is not the one a battery is usually run in.
+- **That subshell inherits the caller's environment, so a bridged member's knob
+  resolution can be aimed at a config the caller chooses — which is the
+  affirmative form of the property below rather than a second one.** The
+  resolution sources the owning kit's `lib/*.sh` inside a subshell of the
+  dispatcher, and a kit library resolves its `<KIT>_CONFIG_FILE` from that
+  environment, so a harness (a bespoke scenario runner, a fixture driver) that
+  exports `<KIT>_CONFIG_FILE` before calling `gate_command` points a **compiled**
+  member's knobs at a synthetic config. The answer a port needs is therefore
+  yes: a ported member still takes a config file, through the knob rather than
+  through a positional. §lib/test-hermetic.sh uses exactly this to pin every kit
+  at one empty file; that is the pin-to-empty case, and the general affordance
+  is stated here so it is not re-derived off the bridge's implementation.
 - **A derivation the library memoises is memoised for one *sourcing*, never for
   the process, and the kit-root anchoring is the worked instance.** The
   resolution above runs the owning kit's libraries in a **subshell**, which
@@ -7854,6 +7866,26 @@ bakes a knob-derived value — the resolved `GATE_SDK_NATIVE_BIN` path sits
 literally in each ported member's `run_gate` line — and the hook's currency is
 held by regeneration plus `check-graph`'s byte-freshness assertion. The bridge
 widens the set of knobs that stale the hook; it does not invent the property.
+
+**Regeneration follows staging, never merely the build — and the reason is that
+a derived roster reads `git ls-files` rather than the worktree.** A generator
+whose input set comes from the tracked list cannot see a file that exists and is
+untracked, so a unit adding one gets a green whole-tree run while the file is
+invisible and a red at commit time once `git add` makes it visible and the baked
+artifact is a generation behind. The ordering is therefore stage first,
+regenerate second, and it applies to every generated artifact whose derivation
+walks the tracked list, not to any one of them.
+
+**Two hazards of this section compose, and the product is a red that belongs to
+the probing session rather than to the tree.** Driving a ported member's
+resolved argv by hand needs `GATE_SDK_NATIVE_BIN` pinned absolute, because the
+default is repo-relative (§lib/gate.sh); the same pin is what `--emit` bakes
+into each `run_gate` line. So a session that pins the knob to hand-drive one
+member and then regenerates emits a hook carrying a machine-specific path, and
+`check-graph` reds on it — correctly, since §Layout and configuration defaults
+the knob relative precisely to keep the tracked hook machine-independent. Each
+half is stated above; the composition is stated here because the resulting red
+reads as a tree defect and is a harness artefact.
 
 **No trigger widening is owed for it, and that is verified rather than assumed.**
 `check-graph`'s `couples=` already carries `scripts/*.sh` and `kit:*.sh`, and

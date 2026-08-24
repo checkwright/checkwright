@@ -4430,19 +4430,19 @@
   **NOT a split candidate, ruled 2026-08-23 at build** against the criterion queue-kit/SPEC.md
   section check-queue-entry-budget now states: it accumulates measurements for ONE deliverable, so
   ruling it leaves nothing unruled — the fifth measurement reversing the third is compression.
+  **SEVENTH MEASUREMENT, 2026-08-24 at close: 81 stdin heredocs against the sixth's 64 and the
+  fifth's 9, so the reversal is CONFIRMED rather than a spike. UNSTAMPABLE — the declaration is 96
+  columns and a fifth date makes it 107, the second entry to hit that ceiling at this same close.**
   **SIXTH MEASUREMENT, 2026-08-23 at close — the fifth's reading is REVERSED and its fall was a
   dip.** 64 `python3 - <<EOF` stdin heredocs, top-ranked of 49 patterns, most editing tracked files
-  by name. The fifth measurement, taken the same day, read nine against 50 and called the ~86% fall
-  evidence FOR the operator's discipline-shaped cause; 64 is above the 50 it fell from, so the
-  series does not support that reading. Four `python3 .tmp/<name>.py` runs appear in the same log,
-  so the fourth measurement's "the path-shaped payload is gone" no longer holds either — both
-  payload shapes are live at once, which the design fork below treated as sequential. Nothing here
-  touches that fork, and the control's reach defect is unchanged.
-  **FOURTH MEASUREMENT, 2026-08-19 at close.** 50 `python3 - <<EOF` stdin heredocs editing tracked
-  files and zero `python3 .tmp/*.py` runs. What survives it is the design narrowing rather than the
-  count: stdin has no `.tmp/` path to match, so even the cheap third option below misses it unless
-  the rule names the interpreter rather than the path. The bash side stayed clean a second time: 16
-  scratch runs, every one through the runner.
+  by name, against the fifth's nine and the 50 it fell from — so the series does not support the
+  fifth's reading of that fall as evidence FOR the operator's discipline-shaped cause. Four
+  `python3 .tmp/<name>.py` runs in the same log also retire the fourth's "the path-shaped payload
+  is gone": both shapes are live at once, which the design fork below treated as sequential.
+  **FOURTH MEASUREMENT, 2026-08-19 at close.** 50 stdin heredocs, zero `python3 .tmp/*.py` runs,
+  and the bash side clean a second time. What survives it is the design narrowing: stdin has no
+  `.tmp/` path to match, so even the cheap third option below misses it unless the rule names the
+  interpreter rather than the path.
   `scripts/bash-guard.sh` blocks a direct scratch run by matching `^bash[[:space:]]+\.tmp/`, and
   `guard-kit/bin/scratch-run.sh` executes its target with a hardcoded `bash`. Neither reaches a
   script run under another interpreter. Probed at the 2026-08-13 close against the guard itself:
@@ -6257,12 +6257,11 @@
   and `sed` and not `awk`, so a line-range read of a tracked file is decided out of band.
   recurrence: guard-read-steer-tool-coverage 2026-08-23
   **FIRST RECURRENCE, 2026-08-23, and the DOMINANT SHAPE FLIPPED — which redirects the design.**
-  22 `awk` programs in this iteration's log: **8** the line-range `NR>=X && NR<=Y` form, **12** a
-  section-pattern form (`/^## <title>/,/^## /`), 2 genuine stream transforms. The measurement below
-  had 19 of 22 line-range. So the majority now wants a DIFFERENT target — `context-kit/bin/`'s
-  section extractor, already committed-allowlisted and reached for once against those 12 — and a
-  steer built to that measurement would send the majority to `Read`'s offset/limit, the wrong tool.
-  What the unit owns therefore grows by one: the parser must also decide WHICH steer to emit.
+  22 `awk` programs in that log: **8** line-range, **12** section-pattern (`/^## <title>/,/^## /`),
+  2 genuine stream transforms, against 19-of-22 line-range below. So the majority then wanted a
+  DIFFERENT target — `context-kit/bin/`'s section extractor, already committed-allowlisted — and a
+  steer built to the earlier measurement would have sent it to `Read`'s offset/limit, the wrong
+  tool. What the unit owns grows by one: the parser must also decide WHICH steer to emit.
   **THIRD MEASUREMENT, 2026-08-23 at `battery-runner-port`'s close — the dominant shape flipped
   BACK, so the mix is ITERATION-SHAPED rather than trending.** Of the 25 file-reading `awk` calls
   in that log, **23** are the line-range form and 2 the section-pattern one, with about 5 further
@@ -6273,11 +6272,13 @@
   which-steer clause above more strongly than any single reading argues for one target, and it
   proposes no new deliverable. **No `recurrence:` date joins:** the finding did not re-fire, a
   measurement the entry carries was superseded.
-  **Measured 2026-08-19 at close's prompt-friction triage, off the log rather than impression.**
-  The iteration ranked 22 `awk` calls: 19 of the exact shape `awk 'NR>=X && NR<=Y' <file>`, 13 of
-  those against `TASK-QUEUE.md`; one a range-address read of `.workflow/survey-record.md`; one
-  feeding a pipe. So every one of the 22 read a file rather than transformed a stream — the shape
-  the guard already steers `cat` and `sed` away from, toward `Read`'s `offset`/`limit`.
+  **FOURTH MEASUREMENT 2026-08-24, and it CONFIRMS the iteration-shaped reading rather than
+  superseding it: 72 line-range `NR>=` against 22 section-pattern, in a SPEC-and-source-heavy
+  iteration exactly as the hypothesis predicts. No `recurrence:` date joins, on this entry's own
+  third-measurement precedent — a further measurement of a carried quantity is not a firing.**
+  **Measured 2026-08-19 off the log:** 22 `awk` calls, 19 the exact `awk 'NR>=X && NR<=Y' <file>`
+  shape, and every one of the 22 read a FILE rather than transformed a stream — which is the whole
+  premise, and it is the shape the guard already steers `cat` and `sed` away from.
   **It CORRECTED a proposal `session-mechanic-grants-uncommitted` carried**, and that entry has
   since moved to Done, so the contest has no live holder and this entry is its only survivor. That
   one listed `awk` among the absent grants to put to the operator, its disposition (a); on this
@@ -6918,11 +6919,21 @@
   completion is this entry's precondition rather than this work; and from
   `overlay-only-oracle-grants-uncommitted`, the parent's other split half, whose subject is four
   Rust/gh toolchain oracles and not the wait form.
+  recurrence: wait-loop-grant-lost-its-carrier 2026-08-24
+  **FIRST RECURRENCE, 2026-08-24, and the PRICE IS THREE TIMES WHAT THIS ENTRY CARRIED.** Measured
+  at close's prompt-friction triage off the log rather than impression: **60** `while kill -0 <pid>`
+  occurrences across this iteration, ranked as the log's third-heaviest prompting pattern, against
+  the nineteen the cost line below was written on. Eight `until` calls beside them. The mechanic did
+  not change and the rule did not change; the iteration simply backgrounded more producers, which is
+  what a methodology mandating in-turn waits produces as it is followed more closely. So the carry
+  is not a fixed nineteen-per-iteration tax — **it scales with compliance**, which is the worst
+  shape a friction cost can have and is the reading a later scope should price against.
   **Cost while deferred:** rule 6 decides the mandated `kill -0 "$pid"` loop out of band on
-  *every* call — roughly nineteen decisions per iteration for a mechanic the methodology
+  *every* call — sixty decisions in this iteration alone, for a mechanic the methodology
   mandates — and the price is now invisible to scope because no entry carries it.
   Filed 2026-08-23 by build and ruled by the lead to stay a filed gap for this drain; drained at
-  that iteration's close, which confirmed rule 17 carries the discharged precondition.
+  that iteration's close, which confirmed rule 17 carries the discharged precondition; re-measured
+  at `shell-gate-tail-port-and-completion-oracle`'s close.
 
 - **wait-loop-exemption-blind-behind-a-script-name** [design-pending] — guard rule 15's wait-loop
   exemption is command-text-shaped, so a wait loop inside a script draws the advisory anyway.
@@ -7263,6 +7274,11 @@
   `scripts/producer-liveness-reader.sh`, reaching the gate by name through `scripts/gate-exec.sh`.
   Proved by negative control at `scripts/gate-tests/subagent-stop-reader.test.sh`, which fails
   with exactly `verdict=unavailable` against the dead default.
+  **The capture log priced the loss and then verified the repair, read at close.**
+  `.workflow/subagent-stop-liveness.log` carries **77** `verdict=unavailable` firings, every one
+  inside a single 46-minute window between the port that deleted the path and the repair, and
+  **zero** after it. So the degradation was real, bounded, silent except for that field, and is
+  closed — which is what makes the surviving question a convention question rather than a defect.
   **The precedent this stands on, which is what makes the question general.** evidence-kit met the
   identical break one caller over when the same port turned a pre-flight entry's named path into a
   descriptor, and discharged it with a CONSUMER-SIDE front end resolving the gate name, explicitly
