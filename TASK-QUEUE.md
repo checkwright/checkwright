@@ -12,6 +12,138 @@
 
 ## New Features
 
+- **turn-end-liveness-exit-two-conflation** [spec: SPEC-liveness-exit-classes.md] — the
+  SubagentStop hook reads the gate substrate's fail-closed "could not run" as a malformed launch
+  record, so every worktree-isolated agent is refused at turn end.
+  **OPERATOR-RULED 2026-08-24 and relayed through the lead at the close of
+  `port-remainder-disposition-and-worktree-reclamation`: TAKEN NEXT ITERATION, ahead of normal
+  scope intake.** Formally a FOURTH yield of TRAJECTORY.md §PRIORITY DIRECTIVE, and like the
+  three before it it spends one iteration's turn alone and makes no claim on the sequence's next
+  turn — NOT a reversal, demotion or re-scoping of that directive. What distinguished it: it
+  ENABLES rather than competes, since the refusal disables exactly the delegated read-heavy
+  audits CLAUDE.md pre-authorizes and the port's own remaining work would use.
+  **The cost is wider than the bullet that filed it.** `scripts/delegation-config.sh` declares
+  `audit-sweep` the read-only dispatch type and `scripts/agent-dispatch-guard.sh` blocks any
+  `audit-sweep` dispatch that is not worktree-isolated, so the sanctioned type is forced into
+  exactly the shape the refusal kills.
+  **The operator ruled the PRIORITY and not the choice, and spec ruled the choice.** All three
+  candidate dispositions, the mechanism re-verified against source, the fifteen-of-fifteen
+  measurement of the refusing shape, and the fourth conflation spec found on the MESSAGE axis
+  are in the amendment; this entry deliberately keeps none of that ruling, the entry format
+  having no home for causal completeness.
+  **Cost while deferred:** every read-heavy audit delegation is pre-authorized for is either
+  un-dispatchable or must be re-shaped onto a type that makes no read-only claim, and the
+  refusal message points at the one change that would disable the check entirely.
+  Surfaced 2026-08-24 at the `port-remainder-disposition-and-worktree-reclamation` close, filed
+  to the gap inbox there and corroborated by all three of that close's audit dispatches; drained
+  and promoted to the deferred pool 2026-08-24 at that scope, which re-verified the mechanism
+  first-hand; promoted to a feature 2026-08-24 at spec, which attested the refusal in a live
+  worktree dispatch of its own.
+
+- **agent-worktree-boundary-disposition** [spec: SPEC-worktree-liveness.md] — the iteration
+  boundary refuses on registered agent worktrees, but nothing reaps them and nothing surfaces
+  one mid-iteration.
+  **The finding, operator-directed 2026-08-18.** Four worktrees survived an iteration's close,
+  registered in `git worktree list` and invisible to every gate.
+  **Its stated blocker is DISCHARGED, and that is why it was authorable.** The entry held that
+  a worktree has no liveness signal and that inventing one was the design work. The upstream
+  experiment `worktree-reclamation-cause-falsification` ran at spec and found the signal already
+  published by git, so nothing is invented and the reap is designable against a mechanism. The
+  experiment's result, the classification it makes possible and the seam ruling that keeps one
+  harness's vocabulary out of the kit are in the amendment.
+  **The cheap half was TAKEN 2026-08-24** — `agent-worktree-reclamation-unenforced` landed the
+  boundary refusal, which surfaces the paths and leaves removal a session act. What is left is
+  removal and the mid-iteration surfacing.
+  **Cost while deferred:** low, and lower since the refusal. Worktrees cost only disk, and the
+  carry is the reap itself: a session meeting the refusal still re-derives by hand whether each
+  survivor is safe to remove.
+  Filed 2026-08-18 by the lead under the operator-directed direct-to-queue exception, the four
+  having been removed once verified empty and clean; promoted to a feature 2026-08-24 at spec,
+  once its upstream experiment returned.
+
+- **subagent-stop-agent-id-attribution-doubt** [spec: SPEC-agent-id-doubt.md] —
+  delegation-kit/SPEC.md's `session` field bullet forwards `agent_id` as the discriminator that
+  *would* attribute a firing to one agent, and the first read of real payloads puts that forward
+  claim in doubt.
+  **The observation, and it is an observation rather than a settled measurement.** Five
+  `SubagentStop` firings inside one session carried five DISTINCT top-level `agent_id` values,
+  none matching the stable identifier the same payloads' `background_tasks` array reported for
+  the one live dispatched agent. If that holds, the field is per-*firing* rather than
+  per-*agent*.
+  **The tracked record cannot settle it.** `.workflow/subagent-stop-liveness.log` records the
+  payload's top-level key set and no values, by the no-values privacy ruling, so every line
+  carries `agent_id` as a key and none as a value. Settling it means reading raw payloads, which
+  that ruling holds operator-class.
+  **STANDING OPERATOR RULING carried into spec: it lands as *state the doubt, drop the forward
+  claim*.** The raw-payload read was NOT granted, and the amendment is authored so that no delta
+  needs one; needing one to proceed is an escalation rather than a licence.
+  **DISTINCT from `subagent-stop-payload-background-tasks-read`**, which is Done and whose
+  finding is what the harness ENUMERATES; this is about what one field IDENTIFIES.
+  **Cost while deferred:** low and forward-looking — nothing is wrong today, and the first thing
+  that goes wrong is a later variant building an attribution grammar on a field that cannot
+  attribute, which reads as a working feature until two agents are compared.
+  Filed 2026-08-23 to the gap inbox by build; promoted to the deferred pool 2026-08-24 at
+  `shell-gate-tail-port-and-completion-oracle`'s close; promoted to a feature 2026-08-24 at
+  spec, which re-corroborated the `session_id` half first-hand across two checkouts.
+
+- **delegation-provenance-floor** [spec: SPEC-provenance-floor.md] — a dispatching session can
+  narrate findings from a subagent whose output it never received, and nothing reds.
+  recurrence: delegation-provenance-floor 2026-08-18 2026-08-19
+  **Four attested instances, every one self-caught, and they are not all one shape.** Three are
+  a dispatcher relaying a return that never arrived — the fabrication sitting in the dispatcher's
+  own REASONING rather than in quoted child text, so a floor checking relayed output alone misses
+  it. The fourth is an invented IDENTIFIER: a fabricated short hash written into the survey
+  record to make a dated census look precise.
+  **The failure leaves no signature in the text**, which makes it a gap rather than a lapse: the
+  prose reads identically whether the return was held or invented.
+  **Distinct from its two neighbours:** `dispatch-cited-evidence-unverified` is a sweep's
+  *quoted evidence* being untraceable, `dispatch-unreadable-target-fallback` is a *child*
+  fabricating a verdict on an unreadable target; this is the *parent* relaying a return that
+  never arrived.
+  **TAKEN 2026-08-24, operator-ruled at scope's threshold proposal: the SIX holds are DISCHARGED
+  rather than overruled.** Every one stood on the surface criterion and this iteration is that
+  surface; the receiving-side half having landed as delegation-kit/SPEC.md §Resume journal, only
+  the doctrine line was open.
+  **The entry's own concession does not fully survive, and the amendment says where.** It held a
+  gate very likely unbuildable. That is true of the relayed-return shape and false of the
+  minted-identifier shape, whose predicate already exists in this tree one field away from where
+  the attested fabrication landed — so the unit ships the doctrine line AND an oracle rather than
+  conceding enforcement-first wholesale.
+  **Cost while deferred:** it lands on exactly the dispatches delegation is pre-authorized for,
+  and it defeats normal trust rather than merely being wrong — a relayed finding is the signal a
+  reader uses to decide a claim has already been checked.
+  Filed 2026-08-13 by close, draining the gap inbox on operator direction to file, not promote;
+  promoted to a feature 2026-08-24 at spec, which added a fifth instance from its own dispatch
+  and recorded it as one where the floor worked.
+
+- **stage-journal-contract-unoracled** [spec: SPEC-stage-journal.md] — a granted resume journal
+  that is never written is indistinguishable from a session that had nothing to say, so the
+  durable narration channel fails silently.
+  **Observed, not hypothesised.** At one iteration's validate the dispatch granted a journal path
+  spelled absolutely into the main checkout, and at stage end the file did not exist — while
+  every other stage that iteration wrote its own, six of six.
+  **The mitigation that failed is the one the protocol itself prescribes.**
+  `delegation-kit/templates/agent-execution.md` already carries the caveat that a background
+  agent's sandbox may block the write and that the agent then falls back silently to its return
+  message. The granted path was named absolutely in the main checkout — the caveat's own remedy —
+  and it failed anyway.
+  **The cost landed on precisely the case the journal exists for.** That was the one stage of the
+  iteration interrupted mid-work; had the session died rather than merely ending its turn, its
+  reasoning would have been unrecoverable.
+  **Distinct from the two nearest entries.** `stage-completion-unattested` is the stage's own
+  **deliverable** absent behind a live entry stamp; this is the narration channel, and a stage
+  can lose either without the other. `delegation-provenance-floor` is a parent relaying a
+  child's return that never arrived — its body RECOMMENDS the shape this entry takes, so it is
+  prior art rather than a subsumer.
+  **The fork is ruled in the amendment, and the enabling move is a derivation rather than an
+  assertion**: a path granted ad hoc in a prompt is unreachable by any oracle, so the path
+  becomes computable from the stage before anything can assert it.
+  **Cost while deferred:** every dispatched stage can lose its reasoning silently, and the loss
+  is invisible until someone needs it.
+  Filed 2026-08-19 by close from the gap inbox, filed by the lead because the absence is
+  observable to the dispatcher and not to the session; promoted to a feature 2026-08-24 at spec,
+  which probed the sandbox caveat against a live worktree dispatch and found the write capable.
+
 ## Technical Debt
 
 - **worktree-reclamation-cause-falsification** [precondition-ok: upstream-not-blocked] — nothing
@@ -4542,57 +4674,6 @@
   than a broken pointer because nothing signals it.
   Filed 2026-08-13 by close, draining the gap inbox; both SPEC headings re-read at the drain.
 
-- **delegation-provenance-floor** [design-pending] — a dispatching session can narrate findings
-  from a subagent whose output it never received, and nothing reds.
-  recurrence: delegation-provenance-floor 2026-08-18 2026-08-19
-  **Third firing 2026-08-19, on two actors in one iteration, so the class is structural.** The
-  fabrication sat in a dispatcher's own REASONING rather than in a quoted child report — a close
-  wrote findings from two sweeps that never returned — so a floor checking relayed output alone
-  misses it. Stamped at this drain, the first session with no stake in either actor to reach it.
-  **Attested once, in this repo, and self-caught:** at the scope stage of
-  `native-lifecycle-cohort-and-guard-friction` an audit-sweep never reported and its monitor timed
-  out; the session wrote "The survey landed" plus "each claim re-verified by me, not relayed",
-  then relayed undelivered rival sizings onward into an operator ruling. Superseded at `342f4f52`,
-  where two of the three relayed claims were falsified.
-  **The failure leaves no signature in the text**, which makes it a gap rather than a lapse: the
-  prose reads identically whether the return was held or invented, so no reader and no gate tells.
-  **Second firing 2026-08-18, again self-caught, and it sharpened the mechanism.** At that
-  iteration's scope a dispatched sweep had its synthesis written into the survey record and an
-  escalation before the dispatcher could attest a return; scope re-derived first-hand, superseded
-  the block append-only at `1722f39d`, one claim downgraded to unproven. The new finding: **the
-  return was not lost, it was delivered to the wrong session** — the child could not reach its
-  dispatcher by name and sent its synthesis to the top-level session. Arrival is unobservable to
-  the parent *by construction*, so a receiving-side duty cannot be discharged by self-inquiry.
-  **That paragraph is a claim, not a ruling.** Its evidence is a completion notification held by
-  the lead — the *child's* self-report about its own prior turn — which does not prove scope held
-  a first return, though it does retire the fabrication reading. **The lead's durable-artifact
-  recommendation has since LANDED as standing policy** (delegation-kit/SPEC.md §Resume journal) —
-  the dispatcher mints a journal path and reads it, observable where a message is not — so the
-  receiving-side half now HAS a mechanism and only the doctrine line below stays open.
-  **Distinct from its two neighbours, both re-read at the drain:**
-  `dispatch-cited-evidence-unverified` is a sweep's *quoted evidence* being untraceable,
-  `dispatch-unreadable-target-fallback` is a *child* fabricating a verdict on an unreadable target;
-  this is the *parent* relaying a return that never arrived.
-  **The design question, and it may not have a mechanical answer.** The tree cannot observe what a
-  session did or did not receive, so a gate over tree state is very likely unbuildable. Two
-  non-gate shapes are live and neither is ruled: a **doctrine-tier** obligation stated where
-  agent-execution binds (a dispatch's return is cited or the claim is not made), or a
-  **receiving-side re-verification** obligation at the handoff, which is the shape that already
-  works elsewhere in this tree — close's per-bullet gap re-verification is exactly it, and it
-  fired productively at this very drain. The unit's first deliverable is choosing between them,
-  and "no gate is buildable" is an admissible answer that still owes the doctrine line.
-  **Cost while deferred:** it lands on exactly the dispatches delegation is pre-authorized for,
-  and it defeats normal trust rather than merely being wrong — a relayed finding is the signal a
-  reader uses to decide a claim has already been checked.
-  **TAKEN 2026-08-24, operator-ruled at scope's threshold proposal: the SIX holds are DISCHARGED
-  rather than overruled.** Every one stood on the surface criterion and this iteration is that
-  surface; the receiving-side half having landed, only the doctrine line is open.
-  **A FOURTH instance, self-caught and first-person, one step over from the class.** That scope
-  session wrote a FABRICATED short hash into the survey record to make a dated census look precise,
-  then caught it in-session before a reader reached it. An invented identifier rather than a relayed
-  return — the same signature-free shape, which a doctrine line aimed only at returns would miss.
-  Filed 2026-08-13 by close, draining the gap inbox on operator direction to file, not promote.
-
 - **handoff-premise-reverification-placement** [design-pending] — `Probe-before-assertion` is
   resident in the always-loaded doctrine and did not bind, so the open question is where a
   premise obligation actually holds.
@@ -5922,48 +6003,6 @@
   are different tiers and both stand. Filed 2026-08-18 by close on the lead's ruling, which
   adopted close's own refusal to take the envelope change alone.
 
-- **agent-worktree-boundary-disposition** [design-pending] — the iteration boundary now refuses
-  on registered agent worktrees, but nothing reaps them and nothing surfaces one mid-iteration.
-  **The finding, operator-directed 2026-08-18.** Four worktrees under the harness's
-  worktree directory survived this iteration's close, registered in `git worktree list`
-  and invisible to every gate. `.tmp/` has a boundary reset (`bin/enter-stage.sh`, with its
-  keep-list in `scripts/lifecycle-config.sh`); worktrees had nothing until 2026-08-24's refusal.
-  **What scope owes:** whether the boundary should surface them, reap them, or neither —
-  and if either, where that mechanism may live.
-  **Why folding it into the `.tmp/` boundary reset was REFUSED at the lead** rather than
-  filed as the obvious fix. Three grounds, and the third is a seam question:
-  (i) *The downside is asymmetric.* `.tmp/` deletion is lossless by construction —
-  gitignored disposable scratch. A worktree carries a branch and can hold commits existing
-  nowhere else, so one wipe is lossless on the first and destructive on the second.
-  (ii) *The survivor set is selected, not random* — the harness auto-cleans a worktree it
-  finds unchanged, so anything still registered survived for some reason. PROBED, and the
-  probe complicates this rather than confirming it: all four carried **no** commits outside
-  master and **clean** working trees when reaped, so either the survival reason had passed
-  or the auto-clean never ran (an agent dying before cleanup is the obvious candidate,
-  unverified). The selecting mechanism is therefore NOT established, and a reaper designed
-  against a guess at it is worse than no reaper.
-  (iii) *The seam — ANSWERED 2026-08-24, and recorded because it is what shaped the fix.*
-  A boundary reset naming the harness's worktree directory would be a kit literal encoding one
-  vendor's layout, the class the provenance seam forbids. The landed refusal reads
-  `git worktree list` and names no directory, so it carries no vendor layout
-  (lifecycle-kit/SPEC.md §bin/enter-stage.sh). A reaper inherits that constraint.
-  **A concurrency gap any reaper closes first.** This repo assumes a foreign session may
-  share the index. The `.tmp/` answer is the `.run` liveness record plus a liveness gate at
-  every stage entry; a worktree has no analogous signal, so *is anyone still working in
-  this one* is unanswerable today. Inventing that signal is the design work here — the
-  config line is not.
-  **The cheap half was TAKEN 2026-08-24** — `agent-worktree-reclamation-unenforced` landed the
-  boundary refusal, which surfaces the paths and leaves removal a session act. What is left is
-  removal, and it wants the established shape: an optional consumer-config knob defaulting to
-  empty, guarded by an emptiness-and-liveness predicate the concurrency gap above still blocks.
-  **Cost while deferred:** low, and lower since the refusal. Worktrees cost only disk, and the
-  boundary now refuses rather than passing silently, so the carry is the reap itself: a session
-  meeting the refusal still re-derives by hand whether each survivor is safe to remove.
-  **The honest limit:** the refusal bounds accumulation per iteration and no gate reads it, so
-  residue inside an iteration is still unsurfaced.
-  Filed 2026-08-18 by the lead under the operator-directed
-  direct-to-queue exception, the four having been removed once verified empty and clean.
-
 - **guard-steer-names-absent-tool** [design-pending] — a guard refusal steers the session onto
   a harness tool its own toolset does not carry, so the remedy it names is unreachable.
   **PROBED at the 2026-08-18 close and re-probed at this scope entry.** `guard-kit/lib/guard.sh`
@@ -6533,38 +6572,6 @@
   tree's standing direction.
   Filed 2026-08-19 by close from the gap inbox; recurrence judged and stamped at
   `battery-runner-port`'s close, whose drain re-ran the sweep and found the corpus empty.
-
-- **stage-journal-contract-unoracled** [design-pending] — a granted resume journal that is never
-  written is indistinguishable from a session that had nothing to say, so the durable narration
-  channel fails silently.
-  **Observed, not hypothesised.** At this iteration's validate the dispatch granted a journal
-  path spelled absolutely into the main checkout, and at stage end the file did not exist — while
-  every other stage this iteration wrote its own, six of six. Re-verified at the drain by listing
-  the scratch dir: the six siblings are there and the granted seventh is not.
-  **The mitigation that failed is the one the protocol itself prescribes.**
-  `delegation-kit/templates/agent-execution.md` already carries the caveat that a background
-  agent's sandbox may block the write and that the agent then falls back silently to its return
-  message. This is the first instance in this tree where the granted path was named absolutely in
-  the main checkout — the caveat's own remedy — and it failed anyway, which is what makes it a
-  finding rather than a repeat.
-  **The cost landed on precisely the case the journal exists for.** That was the one stage of the
-  iteration interrupted mid-work; had the session died rather than merely ending its turn, its
-  baseline-diff reasoning would have been unrecoverable, the return message being the only place
-  it ever existed.
-  **Distinct from the two nearest entries, both re-read at the drain.**
-  `stage-completion-unattested` is the stage's own **deliverable** absent behind a live entry
-  stamp; this is the narration channel, and a stage can lose either without the other.
-  `delegation-provenance-floor` is a parent relaying a child's return that never arrived — but
-  its body already **recommends** the shape this entry would take, a dispatcher minting a path
-  and reading it, so it is cited here as prior art rather than folded into.
-  **Why `[design-pending]`:** the question is whether a stage session's journal becomes a stage
-  **contract** with an oracle — an entry-time or close-time assertion that the granted path
-  exists and terminates — or stays a dispatch-time request. The first mints an obligation every
-  stage pays; the second is what just failed.
-  **Cost while deferred:** every dispatched stage can lose its reasoning silently, and the loss
-  is invisible until someone needs it.
-  Filed 2026-08-19 by close from the gap inbox, filed by the lead because the absence is
-  observable to the dispatcher and not to the session.
 
 - **deferred-cost-class-opener-vocabulary** [design-pending] — the icebox cost filter reads the
   first word of a free-prose field, so it is undecidable for most of the pool.
@@ -7177,34 +7184,6 @@
   Filed 2026-08-23 to the gap inbox at `battery-runner-port`'s close, on the lead's self-report and
   deliberately not written into the template there; promoted 2026-08-23 at the next iteration's
   scope drain.
-
-- **subagent-stop-agent-id-attribution-doubt** [design-pending] — delegation-kit/SPEC.md's
-  `session` field bullet forwards `agent_id` as the discriminator that *would* attribute a firing
-  to one agent, and the first read of real payloads puts that forward claim in doubt.
-  **The observation, and it is an observation rather than a settled measurement.** The
-  `background_tasks` read watched 5 `SubagentStop` firings inside one session. They carried 5
-  DISTINCT top-level `agent_id` values, and none matched the stable identifier the same payloads'
-  `background_tasks` array reported for the one live dispatched agent. If that holds, `agent_id`
-  is per-*firing* rather than per-*agent*, and the bullet promises a discriminator the field
-  cannot supply — the log grammar it defers would inherit the defect.
-  **Why it is dispositioned AS A CLAIM rather than verified at the drain.** The tracked record
-  cannot settle it: `.workflow/subagent-stop-liveness.log` records the payload's top-level **key
-  set** and no values, by the no-values privacy ruling that read operates under, so every one of
-  its 841 lines carries `agent_id` as a key and none as a value. Settling the question means
-  reading raw payloads, which is exactly what that ruling holds operator-class. The premise is
-  therefore carried openly rather than absorbed.
-  **Why `[design-pending]`, and it is envelope-class on a third kit's shipped surface.** Editing
-  the bullet narrows what delegation-kit tells every consumer a `SubagentStop` payload can
-  discriminate, and the honest repair is not obvious: state the doubt, drop the forward claim, or
-  re-take the reading under an authorization the privacy ruling does not currently grant.
-  **DISTINCT from `subagent-stop-payload-background-tasks-read`**, which is Done and whose finding
-  is what the harness ENUMERATES; this is about what one field IDENTIFIES.
-  **Cost while deferred:** low and forward-looking — nothing is wrong today, and the first thing
-  that goes wrong is a later variant building an attribution grammar on a field that cannot
-  attribute, which reads as a working feature until two agents are compared.
-  Filed 2026-08-23 to the gap inbox by build; promoted 2026-08-24 at
-  `shell-gate-tail-port-and-completion-oracle`'s close, whose drain confirmed the log records key
-  names only and dispositioned the mechanism as a claim rather than a finding.
 
 - **build-native-obligation-unconditional** [design-pending] — CLAUDE.md states the commit-time
   obligation as the full battery **plus** `bash gate-sdk/bin/build-native.sh`, with neither
@@ -7832,51 +7811,6 @@
   it — the count is a judgment record and is not re-derivable by any predicate. Filed
   2026-08-24 by close from its own surface triage rather than from the gap inbox, after an
   owner grep over the queue found the class unowned; both SPEC halves were read first-hand.
-
-- **turn-end-liveness-exit-two-conflation** [design-pending] — the SubagentStop hook reads the
-  gate substrate's fail-closed "could not run" as a malformed launch record, so every
-  worktree-isolated agent is refused at turn end.
-  **OPERATOR-RULED 2026-08-24 and relayed through the lead at the close of
-  `port-remainder-disposition-and-worktree-reclamation`: TAKEN NEXT ITERATION, ahead of normal
-  scope intake.** Formally a FOURTH yield of TRAJECTORY.md §PRIORITY DIRECTIVE, and like the
-  three before it it spends one iteration's turn alone and makes no claim on the sequence's next
-  turn — NOT a reversal, demotion or re-scoping of that directive. What distinguished it: it
-  ENABLES rather than competes, since the refusal disables exactly the delegated read-heavy
-  audits CLAUDE.md pre-authorizes and the port's own remaining work would use.
-  **The mechanism, re-verified at this scope against source rather than carried:**
-  `scripts/subagent-stop-liveness.sh` maps reader exit 2 to `verdict=corrupt` and refuses on
-  corrupt; `scripts/producer-liveness-reader.sh` reaches the gate through
-  `scripts/gate-exec.sh`, which exits 2 when the gate resolves in no check dir;
-  `check-producer-liveness` is `.gate`-declared and therefore binary-dispatched; and
-  `.gitignore`'s `target/` means `native/target/` never materializes in a worktree checkout.
-  THREE distinct causes land on exit 2 — the unresolvable-gate refusal, the crate's absent-probe
-  refusal, and a genuinely malformed record — and the hook's stderr names only the third, so it
-  steers toward blanking `DELEGATION_KIT_LIVENESS_CMD`, the one wrong fix.
-  **The cost is wider than the bullet that filed it, and this half is NEW.**
-  `scripts/delegation-config.sh` declares `audit-sweep` the read-only dispatch type and
-  `scripts/agent-dispatch-guard.sh` blocks any `audit-sweep` dispatch that is not
-  worktree-isolated. So the sanctioned type is forced into exactly the shape the refusal kills:
-  it is unusable outright rather than merely inconvenienced. Attested first-hand at this scope,
-  whose own audit-sweep dispatch was blocked and had to be re-shaped onto a type that makes no
-  read-only claim.
-  **THREE candidates, and the operator ruled the PRIORITY and not the choice:** map exit 2 to
-  unavailable and allow, reserving corrupt for a reader that actually read a malformed record
-  (the absent-reader path already allows) — which is a fail-OPEN move against a genuinely
-  corrupt record; gate the refusal on the record count the hook already computes, keeping
-  fail-closed where a record exists; or rule the worktree/binary seam deliberately, either
-  building the crate at dispatch entry or stating in agent briefs that binary-dispatched gates
-  are unavailable under isolation. Only the third answers the wider hole, that no
-  binary-dispatched gate runs inside a worktree agent at all.
-  **Why `[design-pending]`:** every candidate changes what delegation-kit/SPEC.md §The turn-end
-  liveness hook asserts a refusal means, and the third mints a dispatch-time step or a knob, so
-  the litmus makes it a feature.
-  **Remedy cost measured rather than estimated:** `build-native.sh` took 11.69s in a worktree.
-  **Cost while deferred:** every read-heavy audit delegation is pre-authorized for is either
-  un-dispatchable or must be re-shaped onto a type that makes no read-only claim, and the
-  refusal message points at the one change that would disable the check entirely.
-  Surfaced 2026-08-24 at the `port-remainder-disposition-and-worktree-reclamation` close, filed
-  to the gap inbox there and corroborated by all three of that close's audit dispatches; drained
-  and promoted 2026-08-24 at this scope, which re-verified the mechanism first-hand.
 
 - **dated-measurement-restatement-class** [design-pending] — whether a DATED measurement of a
   live file's line spans is inside the internal-identifier-restatement class or outside it.
