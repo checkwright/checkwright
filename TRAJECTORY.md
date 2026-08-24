@@ -152,12 +152,13 @@ objective 3 wants withheld.
 because the binary cannot select itself — that bootstrap is the irreducible
 interpreter surface. Objective 6 binds its *shape* rather than its existence:
 its whole job is resolve the platform, place the matching binary, invoke it,
-which is small enough to be written twice. Everything conditional lives on the
-far side of that invoke. Two standing obligations follow, and they bind every
-unit that touches the install path: **add no new shell-only install step**, and
-assume no POSIX shell. Designing the Windows half is
-`powershell-installer-surface`'s work; moving the remaining shell steps behind
-the invoke is `install-step-relocation`'s.
+which is small enough to be written twice. Everything conditional belongs on
+the far side of that invoke, and today most of it is not there yet — the
+measurement is recorded with the tail sequence below. Two standing obligations
+follow, and they bind every unit that touches the install path: **add no new
+shell-only install step**, and assume no POSIX shell. Designing the Windows
+half and moving the remaining conditional steps behind the invoke are both
+`powershell-installer-surface`'s — one entry owns the whole bootstrap.
 
 **Opacity is taken on deliberately, and it carries an obligation.** A consumer
 who cannot read the gate has only the publisher's word for what it does, so the
@@ -291,8 +292,8 @@ a renderer moves the dependency floor not at all. Every remaining shell gate por
 took the tail, and the registry oracle now reads none owed over the battery it walks.
 **What "port complete" means is ruled with it**: the battery runs from the hook to the binary with no bash in between
 (`battery-runner-port`), the install bootstrap is the three-step shim written twice
-(`install-step-relocation`, `powershell-installer-surface`), and every remaining non-test `.sh`
-outside those two either carries a stated `no-port` cause or is deleted. The adopter-facing
+(`powershell-installer-surface`, which absorbed the relocation half 2026-08-24), and every
+remaining non-test `.sh` outside it either carries a stated `no-port` cause or is deleted. The adopter-facing
 residue is the bootstrap alone: the generated pre-commit hook shim needs no PowerShell twin, because
 git runs hooks through the `sh` Git for Windows ships, so a two-line shim invoking the binary is one
 implementation on every platform. Contributor-side tooling and the test harness ship to no adopter
@@ -385,11 +386,26 @@ tranche, after which `scripts/` keeps no gate script at all. Recorded here
 because it binds every remaining cohort's ordering and the entry that owned it
 was always going to leave the queue.
 
-**The port's tail, in order — ruled 2026-08-23:** `battery-runner-port` first, because it is the
-only unit that moves wall-clock and it removes the bash seam every other shell member dispatches
-through; then `shell-gate-tail-port`, the gates the registry oracle read as owed plus the kit-shipped shell gates this
-tree never registers; then the bootstrap pair. What the sequence names after the port:
+**The port's tail, in order — ruled 2026-08-23 and re-recorded 2026-08-24:** `battery-runner-port`
+first, because it is the only unit that moves wall-clock and it removes the bash seam every other
+shell member dispatches through; then `shell-gate-tail-port`, the gates the registry oracle read as
+owed plus the kit-shipped shell gates this tree never registers. **Both landed.** Then the
+bootstrap, which is now **one** member rather than a pair. What the sequence names after the port:
 `companion-toolkit-profile`.
+
+**The pair became a single member, ruled 2026-08-24 by the operator on a scope re-verification, and
+what it corrects is a premise rather than a direction.** `install-step-relocation` is **retired as
+mooted**: the graph half of its deliverable already dispatches to the binary through
+`run-gates.sh --emit graph`, and its other half, `gen-pre-commit.sh --write`, is refused relocation
+by the closed operator-ratified ruling at gate-sdk/SPEC.md §gen-pre-commit — so nothing remained for
+it to move. `powershell-installer-surface` absorbs the relocation and is **re-scoped to its honest
+size**. The measurement that forced this: the "resolve the platform, place the binary, invoke it"
+shape describes roughly eighty lines of `installer/lib/init.sh`, while the roughly three hundred and
+fifty lines beside it — kit-source vendoring, manifest and lock I/O, registry and queue seeding, the
+commit flow — are conditional install logic no ruling had put behind the invoke. Read that as the
+directive's scope being stated correctly and its *size* having been understated; the direction, the
+ordering and the completion predicate are untouched, and this is a retirement of a spent premise
+rather than a reversal of anything ruled.
 
 `instruction-surface-bash-focus` unblocks on a threshold rather than a date,
 per its own queue entry. Surge-channel launch stays gated behind the private

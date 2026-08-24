@@ -7863,9 +7863,12 @@ every commit, where the baked hook pays zero. *Three*: it retires assertion D's
 subject — the hook would stop being a projection of the manifests, so nothing
 would hold a manifest edit to the hook. *Four*: it kills the `gen=manual`
 round-trip, a shipped extensibility point with no replacement in the shim. So
-the baked per-gate argv list is **retained**, and `install-step-relocation`'s
-`--write` step stays un-relocated: the hook's shape does not change, which
-unblocks that entry rather than resolving it.
+the baked per-gate argv list is **retained**, and the install path's `--write`
+step stays un-relocated: the hook's shape does not change. §gen-pre-commit's
+closed refusal is what settles that, and the bootstrap's remaining work —
+relocation included — is `powershell-installer-surface`'s, which
+TRAJECTORY.md §PRIORITY DIRECTIVE — the port track's sequence names as the
+tail's one remaining member.
 
 **This is not read against TRAJECTORY.md's own two-line-shim sentence; the two
 are the same ruling at two corpus states.** That paragraph states what *port

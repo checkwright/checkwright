@@ -28,8 +28,9 @@
   is the work, and designing the bootstrap is still its. It inherits gate-sdk/SPEC.md §Porting a
   gate to the binary substrate for the procedure and §Consumer payload for the payload rule.
   **Two objections answered:** wall-clock is the weaker case (the win is retiring the shell
-  *sources* the payload carries), and the toolchain-free arm rides the pre-compiled path, so
-  `powershell-installer-surface` shrinks to the bootstrap for the same reason.
+  *sources* the payload carries), and the toolchain-free arm rides the pre-compiled path. Its old
+  third clause — `powershell-installer-surface` shrinking to the bootstrap — is DELETED as measured
+  false 2026-08-24; that entry's re-scope records the ~350 uncovered `init.sh` lines.
   **Every closed cohort and cut — members, counts, holds, grounds, price — is recorded at
   gate-sdk/SPEC.md §The first cohort, and the rule that selects the next, so this entry states
   what remains.** Cut widths are ruled **per cut and never inherited**, members are **selected by
@@ -49,21 +50,21 @@
   criterion-relaxation question is closed at gate-sdk/SPEC.md §The port-candidate criteria — an
   ordering signal, never an eligibility screen. Both battery entries said the port subsumes
   them; `gate-battery-parallel-execution` closed on that, leaving `gate-battery-result-cache`.
-  **TEN cuts are delivered**, each one's members, findings, discharges and price staying at its
-  own §check-<gate> section as this entry has always said; the last two are the tail's first two
-  members below, and between them they emptied the takeable tier `--group` now reads as zero.
-  **The PRIORITY DIRECTIVE has yielded TWICE, each for one named iteration alone and each
-  operator-ruled through the lead — 2026-08-22, and 2026-08-24 to the two entries whose promotion
-  was already committed to that boundary. NEITHER is a reversal, demotion or re-scoping**: the
-  directive and the 2026-08-23 tail ordering stand exactly as ruled, a yield spending one
+  **TEN cuts are delivered**, each one's members, findings and price staying at its own
+  §check-<gate> section; the last two are the tail's first two, which emptied the takeable tier.
+  **The PRIORITY DIRECTIVE has yielded THREE times, each for one named iteration alone and each
+  operator-ruled through the lead — 2026-08-22; 2026-08-24 to the two entries already committed to
+  that boundary; and 2026-08-24 to this entry's own remainder decomposition. NONE is a reversal,
+  demotion or re-scoping**: the directive and its tail ordering stand as ruled, a yield spending one
   iteration's turn and never the sequence's claim on the next.
   Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
   direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope. Since then it is
   promoted at spec and demoted at build once per increment on the entry-outlives-the-amendment
   branch, each cut's record staying at its SPEC section.
-  **Tail ruled 2026-08-23** (TRAJECTORY.md §PRIORITY DIRECTIVE): no member is permanently shell;
-  the sequence is `battery-runner-port`, `shell-gate-tail-port`, then the bootstrap pair — the
-  first two LANDED, the pair deferred one boundary by the yield above with its position untouched.
+  **Tail ruled 2026-08-23, re-recorded 2026-08-24** (TRAJECTORY.md §PRIORITY DIRECTIVE): no member
+  is permanently shell; the sequence is `battery-runner-port`, `shell-gate-tail-port`, then the
+  bootstrap — the first two LANDED, and the bootstrap is now ONE member,
+  `powershell-installer-surface`, `install-step-relocation` having retired as mooted.
 
 - **validate-suite-wall-clock-unowned** [design-pending] — the validate run is about seventeen
   minutes and no entry owns the sixteen of them that are not the gate battery.
@@ -522,7 +523,8 @@
   Filed 2026-08-14 at scope, dispositioning the criterion-5 consequence of the same
   session's born-native ruling, under the gap-disposition rule.
 
-- **powershell-installer-surface** [design-pending] — a native Windows install path.
+- **powershell-installer-surface** [design-pending] — a native Windows install path, and the
+  relocation that has to precede it.
   The installer is bash end to end, so native Windows is unreachable:
   `native-gate-binary-port` states the limit in its own words — "`init` hands to bash, so
   Windows stays blocked" — and `platform-support-ci-matrix` covers Windows only as a
@@ -532,46 +534,34 @@
   major OS including Windows and whose objective 6 is a script-interpreter surface that is
   minimal and dual-implementable — bash for Linux and macOS, PowerShell for Windows. The
   objective set is recorded in TRAJECTORY.md.
-  **What the vendoring ruling already fixes the shape to, so this designs less than it
-  looks like:** the bootstrap's whole job becomes resolve the platform, place the matching
-  prebuilt binary, invoke it. Everything conditional lives on the far side of that invoke,
-  and `install-step-relocation` is what moves it there. So this is a port of a three-step
-  bootstrap, not of the installer as it stands — and its size depends on that relocation
-  landing first.
-  **Why it is design-pending:** two live shapes with different maintenance costs — two
-  hand-kept bootstraps held in parity by a smoke leg, versus one bootstrap generated from a
-  single declaration. Neither is obviously right at three steps, and the choice binds every
-  later step that cannot move into the binary.
-  **Cost while deferred:** the pivot's OS-reach objective stays unmet on the one platform
-  it names that no current path reaches, and every install-path change is authored
-  bash-first, which is the habit that made this entry necessary.
-  Filed 2026-08-03 by spec, on the operator's trajectory pivot.
-
-- **install-step-relocation** [design-pending] — move the install's shell steps into the binary.
-  `installer/lib/init.sh` runs two consumer-side shell steps after it writes:
-  `gen-pre-commit.sh --write` and the graph emission. Each is a pure function of
-  tracked text, and each is a natural subcommand of a binary the vendoring ruling puts on
-  disk before either of them runs.
-  **Half of the premise landed 2026-08-21 and the entry is narrowed rather than closed.** The graph
-  step no longer runs `check-graph.sh --emit` — that file was deleted by the `check-graph` port —
-  and `init` now reaches the emitter through `run-gates.sh --emit graph`, which dispatches to the
-  binary. So the emission logic is already relocated and what remains at that site is the thin shell
-  dispatcher, not a bash text-processing step. `gen-pre-commit.sh --write` is the one genuinely
-  un-relocated step (gate-sdk/SPEC.md §check-graph: the generator's lines stay shell with the cause
-  stated there), so the entry's cost and scope are both smaller than filed.
-  **Ordered by the operator's trajectory pivot 2026-08-03**, objective 6 — the
-  script-interpreter surface shrinks to the unavoidable. This entry is most of what makes
-  it shrink: with these two relocated the bootstrap is resolve-the-platform,
-  place-the-binary, invoke, which is small enough to be written twice.
-  `powershell-installer-surface` is the entry that pays if this one does not land first.
-  **Why it is design-pending:** both steps are **generated projections** with freshness
-  gates and regen commands rostered in docs/site-architecture.md, so relocating them moves
-  a generator without moving its gate — and whether that gate then invokes a shell command
-  or a subcommand is a contract question `gate-authoring-sdk-surface` touches.
-  **Cost while deferred:** the bootstrap keeps two steps that cannot be written in
-  PowerShell without duplicating real logic, so the Windows path stays expensive for as
-  long as this stands.
-  Filed 2026-08-03 by spec; the pivot's objective 6 is what surfaced it.
+  **RE-SCOPED 2026-08-24 by the operator, and the correction is a size rather than a
+  direction.** This entry used to say the vendoring ruling had already fixed the shape to
+  resolve-the-platform, place-the-binary, invoke — a three-step bootstrap whose relocation half
+  `install-step-relocation` owned and whose size depended on that landing first. Both halves of
+  that sentence were false at HEAD. `install-step-relocation` is **retired as mooted** (`## Done`,
+  2026-08-24): its graph step already dispatches to the binary and its `gen-pre-commit.sh --write`
+  step is refused relocation by the closed operator-ratified ruling at gate-sdk/SPEC.md
+  §gen-pre-commit. **So the relocation is this entry's now, and it is most of the work.**
+  **Measured at the scope that re-verified it, not estimated.** The three-step shape describes
+  `installer/lib/init.sh:102-147` and `:277-308` — roughly eighty lines, the platform resolve plus
+  the digest-verified placement `installer/README.md` §The gate binary already calls irreducible.
+  The remaining ~350 lines of that file — kit-source vendoring, manifest and lock I/O,
+  `gates.list` and queue seeding, the commit flow — are conditional install logic that no ruling
+  puts behind the invoke, and `doctor.sh` (164), `uninstall.sh` (214), `diff.sh` (66) and
+  `update.sh` (34) sit beside it unaccounted for. Sizing this against the three-step phrasing
+  understates it by roughly fourfold.
+  **Why it is design-pending, and the fork is now two questions rather than one.** First, what
+  moves behind the invoke and what genuinely cannot — the second is the one that binds, because a
+  step that cannot move is a step PowerShell must re-implement. Second, the original fork,
+  unchanged: two hand-kept bootstraps held in parity by a smoke leg, versus one bootstrap
+  generated from a single declaration. The second question is only answerable once the first
+  fixes how many steps there are.
+  **Cost while deferred:** the pivot's OS-reach objective stays unmet on the one platform it
+  names that no current path reaches, and every install-path change is authored bash-first,
+  which is the habit that made this entry necessary.
+  Filed 2026-08-03 by spec, on the operator's trajectory pivot; re-scoped 2026-08-24 at scope,
+  on the operator's ruling, after a first-hand read of the install path rather than an inherited
+  premise.
 
 - **instruction-surface-bash-focus** [design-pending] — the always-loaded surfaces assume bash.
   `CLAUDE.md` and the instruction surfaces beside it are written around a shell battery:
@@ -2515,6 +2505,13 @@
   drift-kit's capture loop or the KPI that reads it. No date joins the hold; a decline is not a
   firing. The log read **empty** again at this boundary, which is the expected reading at an
   iteration's open and therefore no firing either.
+  **HELD AGAIN 2026-08-24 at the next scope, on the same criterion, and the hold now carries a
+  pairing the earlier one could not.** `kfric-obligation-residency` was promoted at that scope and
+  is this entry's writer-side twin — that entry is the capture obligation never reaching the
+  writer, this is how an empty log may be read once it has. Both resolve alongside
+  `recurrence-obligation-residency` under delegation-kit/SPEC.md §Operative residency's placement
+  rule, so a unit taking the capture loop should take all three; taking this one alone answers the
+  reader's question while leaving the writer unserved. No date joins.
   Filed 2026-08-06 at close, from its own knowledge-friction sweep.
 
 - **reclaim-precondition-outside-the-tree** [design-pending] — a declared `reclaim=` can be
@@ -3562,7 +3559,10 @@
   structural reading above is now the only one left. The same drain found a **second face** the
   candidates above do not cover — a baseline move stales the evidence line computed against the old
   baseline — promoted as `baseline-move-stales-evidence-line`.
-  **SEVEN holds, none a decline of the finding, every one on surface grounds.** 2026-08-19 into
+  **EIGHT holds, none a decline of the finding, every one on surface grounds.** The EIGHTH is
+  2026-08-24, lead-ruled at the next scope's threshold proposal, on the ground the SIXTH already
+  settled: the operator re-deferred this fork rather than ruling it, and nothing since has
+  narrowed the three candidates. Count unchanged; no date joins. 2026-08-19 into
   `budget-batch-and-account-identity-kind` and, the same day, into
   `takeable-tier-batch-and-installer-noop`, the second on a probed ground the first lacked: the row
   is **not armed today**, the live baselined `fail` naming a slug that still resolves. THIRD
@@ -3936,23 +3936,15 @@
 - **agent-worktree-reclamation-unenforced** [design-pending] — the documented auto-clean for an
   unchanged read-only agent worktree does not fire, and nothing sweeps the residue.
   recurrence: agent-worktree-reclamation-unenforced 2026-08-19 2026-08-22 2026-08-24
-  **FOUR firings, and what they jointly SETTLE rather than re-attest.** Every one is the identical
-  shape — a LOCKED worktree at a stale stamp with an EMPTY `git status --porcelain` inside, on a
-  read-only sweep that returned normally — so the documented precondition is met and the reclaim
-  does not fire: probed four times, no longer open. Each was reaped by hand, the workaround this
-  entry exists to replace rather than a discharge of it.
-  **Two properties settle with it.** (i) **Reaping leaves a branch ref** — `worktree remove` clears
-  the directory and leaves `worktree-agent-<id>` standing, needing a separate `git branch -d`;
-  confirmed on all four, so a reclaim that only removes worktrees still accretes refs.
-  (ii) **The failure is intermittent, not systematic** — later read-only dispatches auto-cleaned
-  whole, directory and ref, twice. The harness handles the clean exit; a reclaim covers the other.
-  **The FOURTH (2026-08-24) is the first found IN-SESSION by the DISPATCHING session** rather than
-  at a boundary by a later one, and that MOVES one deliverable's cost: the close-stage reclaim is
-  costed below as "cheap, late, and misses long-running sessions", and here it would NOT have
-  missed — the residue was visible to the dispatching session's own runtime-artifact check while
-  that session was still live. It does not falsify the hypothesis below, the parent being alive at
-  the observation. **No `recurrence:` date joins** — the line already carries 2026-08-24 from the
-  third firing and the declaration is idempotent per (slug, date).
+  **FOUR firings, all the identical shape, and the accumulation has DISCHARGED its purpose** — the
+  entry is taken below, so what follows is the findings rather than the case for taking it. Every
+  firing was a LOCKED worktree at a stale stamp with an EMPTY `git status --porcelain` inside, on a
+  read-only sweep that returned normally, each reaped by hand.
+  **Two properties settle with them.** (i) **Reaping leaves a branch ref** — `worktree remove`
+  clears the directory and leaves `worktree-agent-<id>` standing, so a reclaim that only removes
+  worktrees still accretes refs. (ii) **The failure is intermittent** — later read-only dispatches
+  auto-cleaned whole, twice. The FOURTH was found IN-SESSION by the DISPATCHING session, which
+  MOVES a deliverable's cost: the close-stage reclaim costed below as late would NOT have missed it.
   **The hypothesis a fixing session should falsify first**, unchanged and now four-times
   consistent: reclamation is tied to the *dispatching* session's lifetime rather than the child's,
   so a session that ends abnormally — or ends while a child's directory is still held — strands
@@ -3973,11 +3965,17 @@
   **A candidate the three above miss:** `.gitignore` asserts the directory is "auto-cleaned",
   which every firing falsifies. Correcting that claim to best-effort and leaving the residue
   *declared* is a real option beside owning it, and it is the only one that costs nothing.
-  **HELD 2026-08-24 by the lead**, on the surface criterion, in the same session that stamped the
-  third firing: the promoted turn-end/scratch-execution control set touches the `SubagentStop` hook
-  and the scratch-run guard, and reclamation of a dispatched child's worktree is neither. The hold
-  is recorded as a hold and the firing as a firing — the date above joins the declaration because
-  the finding re-fired, which is exactly what no decline ever does.
+  **HELD once, 2026-08-24 by the lead**, on the surface criterion, in the session that stamped the
+  third firing; superseded the same day by the operator taking it. Each hold was recorded as a hold
+  and each firing as a firing, which is why the declaration above carries three dates and not four:
+  the fourth firing shares the third's date, and the declaration is idempotent per (slug, date).
+  **TAKEN 2026-08-24 by the operator through the lead, at the threshold proposal, and it is the
+  only one of the five threshold members taken.** Grounds: four firings against a two-date
+  threshold, the fourth found in-session, and a cost that grows at the working rate. It shares no
+  surface with the port-remainder pair this iteration also takes, so it is **its own batch**, which
+  the lead sequences. Scope does not promote it either: four live shapes remain and one of them —
+  the guard-side sweep — mints guard lifecycle the guard does not own today, so the class is
+  settled by the ruling and the ruling belongs to the authoring stage.
   **Cost while deferred:** grows monotonically with every read-only dispatch, and this repo
   pre-authorizes delegation for read-heavy audits, so the accumulation rate is the working rate.
   Filed 2026-08-12 by close, draining the gap inbox; found at scope, re-verified here. Widened
@@ -4485,13 +4483,13 @@
   **Cost while deferred:** it lands on exactly the dispatches delegation is pre-authorized for,
   and it defeats normal trust rather than merely being wrong — a relayed finding is the signal a
   reader uses to decide a claim has already been checked.
-  **FIVE holds, none a decline, every one on the surface criterion.** 2026-08-19 out of
-  `takeable-tier-batch-and-installer-noop`; 2026-08-20 by the lead into `graph-port-and-config-seam`
-  (delegation-kit shares no surface with the `check-graph` port); 2026-08-22 twice, the second
-  operator-ruled, against neither that day's prose-gate spine nor the port-hold grounds — the body
-  concedes a gate over tree state is very likely unbuildable, so the deliverable is a CHOICE
-  between two non-gate shapes; and 2026-08-24 by the lead, no surface shared with the promoted
-  turn-end/scratch-execution set. No date joins a hold, and the rate stays once per iteration.
+  **SIX holds, none a decline, every one on the surface criterion**, and the enumeration is spent
+  now that they agree: 2026-08-19, 2026-08-20, 2026-08-22 twice (the second operator-ruled),
+  2026-08-24, and 2026-08-24 again at the next scope's threshold proposal. The operator-ruled one
+  carries the standing ground — the body concedes a gate over tree state is very likely unbuildable,
+  so the deliverable is a CHOICE between two non-gate shapes rather than a build. The sixth adds
+  that the receiving-side half now HAS a mechanism (delegation-kit/SPEC.md §Resume journal), leaving
+  the doctrine line alone. No date joins a hold, and the rate stays once per iteration.
   Filed 2026-08-13 by close, draining the gap inbox on operator direction to file, not promote.
 
 - **handoff-premise-reverification-placement** [design-pending] — `Probe-before-assertion` is
@@ -7313,6 +7311,15 @@
   ruling already exists and is not being read; these two have no ruling at all.
   **Cost while deferred:** low and legible — the completion predicate reads two short of zero
   forever, and a reader who does not know why reads it as unfinished work.
+  **IN THIS ITERATION'S UNIT SET, operator-ruled 2026-08-24 through the lead**, as the spine of the
+  remainder decomposition `native-gate-port-remaining-corpus` has always said scope owns. Scope does
+  **not** promote it: the new-names litmus classes it a **feature**, because one of its three
+  branches ports `port-blockers.sh` and `measured-claims.sh` to non-gate arms and so mints two
+  governed subcommand names (gate-sdk/SPEC.md §The non-gate arm). The authoring stage writes the
+  amendment and promotes the entry with it, per the bidirectional rule.
+  **Ruled ONE design with `gen-pre-commit-tree-declaration-absent` rather than two**, and that
+  pairing is why neither is ruled here: both change what `--tree`'s owed column means, and fixing
+  half of that ahead of the amendment would scatter one design across two stages.
   Filed 2026-08-24 to the gap inbox by build, and promoted 2026-08-24 at
   `shell-gate-tail-port-and-completion-oracle`'s close, whose drain re-ran `--tree` and found both
   files in the owed column.
@@ -7343,6 +7350,15 @@
   count as `tree-shell-owed`, so a declaration makes it one lower and adds a no-port row.
   **Cost while deferred:** low and legible — one row of the completion predicate reads as unruled
   work when the ruling exists, which is a misreading the arm was built to prevent.
+  **IN THIS ITERATION'S UNIT SET, operator-ruled 2026-08-24 through the lead**, paired with
+  `port-oracle-instrument-self-disposition` as one design over `--tree`'s owed column.
+  **Class: debt** — none of the three options mints a governed name or lands a gate; `# no-port:`
+  and `# port-until:` are declared tags already. Scope still does not promote it, and the reason is
+  the pairing rather than the class: canon-kit rules a debt task needing a design *ruling* stays
+  design-pending until that ruling lands, and ruling this fork ahead of its twin's amendment would
+  decide half a design in the wrong stage. The authoring stage rules both and promotes both.
+  **What re-verification at this scope confirmed:** `--tree` still reads 153 owed, 0 declared
+  no-port, with this file among them, so the row the entry describes is unchanged at HEAD.
   Filed 2026-08-24 to the gap inbox by build, then promoted 2026-08-24 at
   `shell-gate-tail-port-and-completion-oracle`'s close, whose drain re-ran `--tree` and found the
   row unchanged.
@@ -7773,6 +7789,7 @@
 
 ## Done
 
+- install-step-relocation
 
 ## Lessons Learned
 
