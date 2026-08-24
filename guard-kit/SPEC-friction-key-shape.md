@@ -85,9 +85,19 @@ Decomposed at authoring across the whole live ranking: `awk` 13 of 13 reads,
 `grep` 6 of 6 reads, `python3 -` 3 of 3 inline heredoc execution and already
 two-token, `git` already subcommand-keyed so its reads and writes already occupy
 separate rows, `sed`/`echo`/`printf` absent — `sed` because
-`guard_rule_sed_file` blocks its read and in-place forms upstream of the log, the
-other two because they are `GUARD_KIT_APPEND_BINS` and auto-allow for `>>` under
-a declared scratch dir.
+`guard_rule_sed_file` blocks its read and in-place forms upstream of the log.
+
+`echo`/`printf`'s absence is only *partly* structural, and the amendment states
+the boundary rather than overclaiming it. `guard_rule_append_scratch` matches
+only the `>>` arm (`lib/guard.sh:861`, `[[ "$op" == '>>' ]] || return 0`) and,
+on a match, calls `guard_allow` — which `exit 0`s the hook directly
+(`lib/guard.sh:87-91`) — so an append line never reaches
+`guard_log_fallthrough` and can *never* appear in the log under any key,
+`>>`-suffixed or not: that half is a structural guarantee. A **create**
+redirect (`echo foo > .tmp/x`) matches no auto-allow rule, falls through to
+`guard_log_fallthrough` like any other command, and would log and key as
+`echo >` the day one is run; today's absence of that shape (and of a bare,
+redirect-free `echo`/`printf` line) is measured, not guaranteed by any rule.
 
 Recorded because the honest reading of that table is that the axis is **general
 and currently single-instance**, and a later reader deciding whether to extend or

@@ -263,11 +263,17 @@ One word, because a section titled *probe* owning a mechanism that refuses is
 the stale-name defect this tree files entries about, and because a one-word
 change keeps every pointer's diff trivially reviewable. `check-spec-pointer` is
 the oracle: a missed pointer reds. The in-tree pointer set at authoring is
-delegation-kit/SPEC.md (four self-references plus the heading),
-delegation-kit/README.md, guard-kit/SPEC.md's rule 14, TRAJECTORY.md's ruling,
-`delegation-kit/smoke/install.sh`, and the four `# spec:` lines across the
-template and its consumer copy — enumerated as a starting point for the sweep,
-never as a substitute for running the oracle.
+delegation-kit/SPEC.md (four `§`-prefixed self-references plus the heading, at
+§The delegation model, §Operative residency, §bin/wait-probe and §Layout and
+configuration — the last section also carries a *plain-text* mirror,
+"SubagentStop turn-end liveness probe (logging-only)" on the file-tree comment,
+which `check-spec-pointer` does not read because it carries no `§`; it is named
+here rather than left for the oracle alone to find), delegation-kit/README.md,
+guard-kit/SPEC.md's rule 14, TRAJECTORY.md's ruling,
+`delegation-kit/smoke/install.sh`, `scripts/producer-liveness-reader.sh`, and
+the four `# spec:` lines per file (eight total) across the template and its
+consumer copy — enumerated as a starting point for the sweep, never as a
+substitute for running the oracle.
 
 ### (8) Behavioral coverage, on both sides of the copy seam
 
@@ -364,10 +370,20 @@ its own words, so none may be left to drift.
   authorization this result does not grant" and weigh the per-step firing as a
   cost that authorization should be measured against. Both are now spent
   (deltas 1 and 6).
-- delegation-kit/SPEC.md §Operative residency — the paragraph ruling that the
-  turn-end "buys enforcement only through a blocking hook nobody has authorized",
-  and the paragraph recording the search that found an oracle which "*observes*
-  rather than one that refuses" (deltas 1 and 6).
+- delegation-kit/SPEC.md §The delegation model, the un-headed passage "Why an
+  oracle is owed here and not for the turn-ending rule" (it precedes §One
+  template, a resident pointer and §Operative residency, both subsections of
+  the same `##` section) — the paragraph ruling that the turn-end "buys
+  enforcement only through a blocking hook nobody has authorized" (deltas 1 and
+  6).
+- delegation-kit/SPEC.md §Operative residency — the paragraph recording the
+  search that found an oracle which "*observes* rather than one that refuses"
+  (deltas 1 and 6).
+- delegation-kit/SPEC.md §Layout and configuration — the file-tree listing's
+  inline comment on `templates/subagent-stop-liveness.sh`,
+  `# SubagentStop turn-end liveness probe (logging-only)`, which is exactly the
+  boundary this amendment retires and is not covered by the whole-section entry
+  above since it is a different section (deltas 1 and 7).
 - delegation-kit/SPEC.md §What `background_tasks` carries — its closing finding
   that a blocking variant "cannot substitute" the harness view for the record
   set now describes a shipped mechanism rather than a hypothetical one
@@ -385,11 +401,15 @@ its own words, so none may be left to drift.
   spent ruling. Retiring a spent ruling is not reversing one (deltas 1 and 7).
 - delegation-kit/smoke/install.sh — its crafted-payload assertion requires the
   probe to "exit 0 … whatever the reader's verdict", which is now false for two
-  verdicts; the smoke's own scratch dir is empty, so the assertion narrows to the
-  arm it actually exercises rather than being deleted (deltas 1 and 7).
+  verdicts; the smoke sets `DELEGATION_KIT_LIVENESS_CMD=""`, so its firing holds
+  no reading at all (`verdict=unavailable`) regardless of the scratch dir's
+  contents — it is not empty, it carries one `.run` record the probe's own
+  `records=1` assertion already reads — and the assertion narrows to the
+  allowing arm it actually exercises rather than being deleted (deltas 1 and 7).
 - `templates/subagent-stop-liveness.sh` and `scripts/subagent-stop-liveness.sh`
-  — the four `# spec:` header and inline comments, each of which currently states
-  the logging-only contract or the not-the-blocking-variant reasoning as its
+  — four `# spec:` header and inline comments per file, eight lines total across
+  the template and its consumer copy, each of which currently states the
+  logging-only contract or the not-the-blocking-variant reasoning as its
   directive (deltas 1, 2, 4 and 7).
 - `gate-tests/subagent-stop-liveness.test.sh` and
   `scripts/gate-tests/subagent-stop-reader.test.sh` (delta 8).
