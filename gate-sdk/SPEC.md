@@ -10645,12 +10645,18 @@ on a live tree that is green because it is clean. The widening therefore landed
 **before** the port, at nine of nine, and it splits by assertion shape:
 
 - The `good/`+`bad/` pair carries assertion **G and only G**. A case runs one
-  argv, so it selects one mode, and only `--amend-only` reaches an assertion
-  without also reaching D and E — which a `good/` case cannot satisfy, since
+  argv, so it selects one mode, and the whole-tree default reaches D and E —
+  which a `good/` case cannot satisfy, since
   `gen-pre-commit.sh` cds to `git rev-parse --show-toplevel` before resolving the
   gates dir, and satisfying E would take a committed `CHECK-GRAPH.html` inside
   `gate-tests/`. Both are the second-copy-of-a-generated-file this corpus
-  refuses. A fourth mode selecting the registry assertions is refused too: it
+  refuses. **`--amend-only` is not the *only* mode that escapes D and E, and this
+  clause once said it was.** `--refs-only` reaches H alone and `--cap-only`
+  reaches I alone, both returning before the whole-tree path — the same two modes
+  named as hermetic drivers three bullets down. What makes `--amend-only` the
+  pair's mode is that its corpus is fixturable in-place, where H and I read an
+  emitted artifact their own drivers construct. A fourth mode selecting the
+  registry assertions is refused too: it
   would add consumer-visible surface to buy a corpus a driver already has.
 - Assertions **A through F** take a constructed mini-consumer in
   `check-graph-tree.test.sh` — a `mktemp`'d git repo carrying a registry, five
