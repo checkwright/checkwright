@@ -29,40 +29,41 @@
   `until kill -0 "$pid"`, true while the producer lives and so exiting at once. The four attested
   deaths were that inversion, not the primitive; the polarity fix propagated to all four carriers.
   **What remains, and it is the whole of this entry now: the blocking `SubagentStop` variant.**
-  The detector exists and is deliberately inert — the probe logged `verdict=red live=yes` sixteen
-  times in one 37-minute window — so what is missing is a forcing function, and turning an
-  observer into a refuser is the separate authorization above, which is not held.
-  **The CARRIER argument is answered and stays answered.** Earlier firings argued the carrier was
-  too weak — the agent definition, then the dispatch prompt. A session that wrote the rule down
-  itself and still ended the turn retires that: carriage is not the defect.
+  The detector exists and WORKS — it logged `verdict=red live=yes` sixteen times in one 37-minute
+  window, and 68 clean `verdict=green live=no records=0` lines at this boundary, so it is live
+  rather than merely present. What was missing was a forcing function.
+  **THE FORCING FUNCTION IS NOW AUTHORIZED — OPERATOR RULING 2026-08-24, UNCONDITIONAL**, recorded
+  at TRAJECTORY.md §The closed rulings, which owns it because delegation-kit/SPEC.md §The turn-end
+  liveness probe states a blocking hook is a separate authorization and leaves it to no surface it
+  owns. **The capped variant was offered and REFUSED** — refuse only on `verdict=red live=yes`
+  carrying at least one record, advisory otherwise — so a narrowing condition in the hook as built
+  is a design decision inside this unit's own amendment envelope, argued on its own grounds and
+  never inherited from the ruling. Scope also probed the hook ALREADY registered in the committed
+  settings, so the build is a script change and not a permission edit under the 2026-08-22 wall;
+  that is a cost finding and explicitly not a ground the authorization rests on.
+  **The CARRIER argument is answered and stays answered:** a session that wrote the rule down
+  itself and still ended the turn retires it, so carriage was never the defect.
   **Cost while deferred:** each further firing costs an orphaned producer plus the lead turn that
   discovers it — and, as the tenth showed, can cost a whole suite's evidence.
   recurrence: turn-end-chokepoint-and-wait-primitive 2026-08-18 2026-08-19 2026-08-21 2026-08-22
-  **FIFTH FIRING JUDGED 2026-08-23 AND UNSTAMPABLE — the wrap ceiling was reached, and
-  queue-kit/SPEC.md §The tag algebra rules that the CORRECT complaint rather than a valve to
-  widen.** `battery-runner-port`'s close read 458 `SubagentStop` events, 8 of them
-  `verdict=red live=yes` with `records=1..2`, in two clusters. A fifth date makes the declaration
-  107 columns against `check-queue-wrap`'s 100, so the stamp was attempted and reverted; the SPEC
-  names **promotion**, never a wider `QUEUE_KIT_WRAP_BUDGET`, as what a reached ceiling resolves
-  to. **SIXTH FIRING JUDGED 2026-08-24, ALSO UNSTAMPABLE:** this iteration's validate ended its
-  turn on a backgrounded `run-validate.sh`, the producer survived as an orphan, and the lead
-  recovered it by reading the recorded PID. Self-reported and **attributed**, it answers the
-  fifth's honest limit — that probe reads a shared `.tmp` and cannot name a culprit — rather than
-  resting on it. `kpi-incident-recurrence` now undercounts this entry by TWO, this paragraph is
-  the only place that is legible, and the ceiling has blocked a stamp at two consecutive closes.
-  **SEQUENCED 2026-08-22 BY THE LEAD; THE CONDITION IS NOW PAID AND PROMOTION IS DUE AT THE NEXT
-  BOUNDARY.** The ruling: a second authorization is a scope-stage ask and
-  `subagent-stop-payload-background-tasks-read` may COLLAPSE what such a hook should read, so that
-  entry settled first; scope put the fifth firing's ceiling to the lead at this iteration's open,
-  which committed the pair to the next boundary and refused both promotion into it and a wider
-  `QUEUE_KIT_WRAP_BUDGET`. **That blocker is now Done and PAID OUT AS NOTHING COLLAPSED**
+  **TWO FIRINGS JUDGED AND UNSTAMPABLE, and the window that blocked them is now another entry's.**
+  The FIFTH, 2026-08-23: `battery-runner-port`'s close read 458 `SubagentStop` events, 8 of them
+  `verdict=red live=yes` with `records=1..2`, in two clusters. The SIXTH, 2026-08-24: that
+  iteration's validate ended its turn on a backgrounded `run-validate.sh`, the producer survived as
+  an orphan, and the lead recovered it by reading the recorded PID — self-reported and
+  **attributed**, which answers the fifth's honest limit (the probe reads a shared `.tmp` and
+  cannot name a culprit) rather than resting on it. Neither could be stamped: a fifth date makes
+  the declaration 107 columns against `check-queue-wrap`'s 100, and queue-kit/SPEC.md §The tag
+  algebra rules that ceiling resolves to PROMOTION, never a wider `QUEUE_KIT_WRAP_BUDGET`. The true
+  count is SIX where the declaration reads four, and the latency that made both unstampable is
+  owned from 2026-08-24 by `promotion-commitment-stamp-latency`.
+  **The 2026-08-22 sequencing is DISCHARGED — the condition was paid and this boundary took it.**
+  `subagent-stop-payload-background-tasks-read` settled first and PAID OUT AS NOTHING COLLAPSED
   (delegation-kit/SPEC.md §What `background_tasks` carries): the harness enumerates what it
-  LAUNCHED, not what is RUNNING, so a detached producer live under a red `*.run` record appeared
-  in none of five firings. The blocking variant therefore still needs the `*.run` record set, the
-  harness view can only supplement it, guard-kit's unrecorded-launch residue stays unreachable
-  through it, and the ask is UNCHANGED rather than collapsed — the sequencing was right to buy
-  this first. The no-values privacy ruling stays operator-class and the pair still promotes
-  together; a boundary that promotes neither is the failure the unstampable dates cannot signal.
+  LAUNCHED, not what is RUNNING, so a detached producer live under a red `*.run` record appeared in
+  none of five firings. What survives for the build — the blocking variant still needs the `*.run`
+  record set, the harness view can only supplement it, and guard-kit's unrecorded-launch residue
+  stays unreachable through it. The no-values privacy ruling stays operator-class.
   Filed 2026-08-16 by close from the gap inbox; demoted 2026-08-23 at build, the measurement half
   delivered and the blocking variant still sequenced.
 
@@ -85,36 +86,35 @@
   what remains.** Cut widths are ruled **per cut and never inherited**, members are **selected by
   running** `port-blockers.sh --group`, and the size arm is **permanently** exhausted, so the
   budget arm is the only composer left.
-  **The residue is three-way, not two: permanently shell, temporarily held, and takeable** — a
-  dated oracle read (`bash gate-sdk/bin/port-blockers.sh --group`), never a count this line holds,
-  and never `measured-claims.sh`'s `ported-gate-members`, which that emitter derives by walking the
-  registry; only `tree-shell-owed` reads a trailer, `--tree`'s. The held tier stopped being a hand
-  adjudication when `# port-until:` was minted, so a cut reads its takeable set off the run.
-  Every held member is **sequencing with port work owed, never exclusion**, and what each owes
-  is on `cohort-held-members-port-prerequisites`, which owns the roster and the kits it spans.
+  **The residue's three-way shape is SPENT, and both oracles were re-run at this boundary rather
+  than cited.** The 2026-08-23 ruling retired the permanently-shell class outright; `--group` now
+  reads 106 scanned, **0 owed and 0 takeable** (none permanent, none held — the battery is
+  finished) and `--tree` reads 153 scanned, 0 `no-port`, 0 held, **153 owed**. Only `--tree`'s
+  count is the completion predicate: `--group`'s clean zero is a finished battery and not a
+  finished port, and `measured-claims.sh`'s `ported-gate-members` answers neither, walking a
+  registry.
   **Cost while deferred:** large and known — the **owed** remainder (the trailer's own arm,
-  never the unported count, which the permanent and held members inflate) plus the runners and
-  the install-lifecycle layer; since the 2026-08-14 born-native default
-  (TRAJECTORY.md §The closed rulings) a gate landed meanwhile no longer adds shell to it. Not
-  a single-iteration delta; scope owns the decomposition, and the criterion-relaxation
-  question is closed at gate-sdk/SPEC.md §The port-candidate criteria — an ordering signal,
-  never an eligibility screen. Both battery entries said the port subsumes them;
-  `gate-battery-parallel-execution` closed on that, leaving `gate-battery-result-cache`.
-  **The SEVENTH and EIGHTH cuts are delivered** — `check-graph` (its own iteration, operator-ruled
-  2026-08-20), then `check-gate-assertions` and `check-tree-terms` as two batches of one member
-  each. The eighth **emptied the takeable tier** the 2026-08-23 close had just reopened, so every
-  unported member again sits behind `cohort-held-members-port-prerequisites`; both its members
-  bound criterion 4 and paid it by widening their pairs before porting, and
-  `check-gate-assertions` also ended a *contingent* immunity deliberately and now audits its own
-  module. Each cut's findings and discharges stay at its own §check-<gate> section.
-  **The PRIORITY DIRECTIVE yields on that measurement for the 2026-08-22 iteration alone —
-  operator-ruled, relayed through the lead — and is NOT reversed, demoted or re-scoped.**
+  never the unported count) plus the runners and the install-lifecycle layer; since the
+  2026-08-14 born-native default (TRAJECTORY.md §The closed rulings) a gate landed meanwhile no
+  longer adds shell to it. Not a single-iteration delta; scope owns the decomposition, and the
+  criterion-relaxation question is closed at gate-sdk/SPEC.md §The port-candidate criteria — an
+  ordering signal, never an eligibility screen. Both battery entries said the port subsumes
+  them; `gate-battery-parallel-execution` closed on that, leaving `gate-battery-result-cache`.
+  **TEN cuts are delivered**, each one's members, findings, discharges and price staying at its
+  own §check-<gate> section as this entry has always said; the last two are the tail's first two
+  members below, and between them they emptied the takeable tier `--group` now reads as zero.
+  **The PRIORITY DIRECTIVE has yielded TWICE, each for one named iteration alone and each
+  operator-ruled through the lead — 2026-08-22, and 2026-08-24 to the two entries whose promotion
+  was already committed to that boundary. NEITHER is a reversal, demotion or re-scoping**: the
+  directive and the 2026-08-23 tail ordering stand exactly as ruled, a yield spending one
+  iteration's turn and never the sequence's claim on the next.
   Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
   direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope. Since then it is
   promoted at spec and demoted at build once per increment on the entry-outlives-the-amendment
-  branch — eight so far, each cut's own record staying at its SPEC section.
+  branch, each cut's record staying at its SPEC section.
   **Tail ruled 2026-08-23** (TRAJECTORY.md §PRIORITY DIRECTIVE): no member is permanently shell;
-  the sequence is `battery-runner-port`, `shell-gate-tail-port`, then the bootstrap pair.
+  the sequence is `battery-runner-port`, `shell-gate-tail-port`, then the bootstrap pair — the
+  first two LANDED, the pair deferred one boundary by the yield above with its position untouched.
 
 - **validate-suite-wall-clock-unowned** [design-pending] — the validate run is about seventeen
   minutes and no entry owns the sixteen of them that are not the gate battery.
@@ -2596,6 +2596,11 @@
   Which is right turns on whether the KPI is meant to be trusted at zero, a contract call.
   **Cost while deferred:** the one KPI measuring the tier contract's completeness reads best
   exactly when nobody is capturing, and no other signal contradicts it.
+  **HELD 2026-08-24 by the lead**, proposed at threshold as the rule requires and held on the
+  surface criterion: nothing in the promoted turn-end/scratch-execution control set touches
+  drift-kit's capture loop or the KPI that reads it. No date joins the hold; a decline is not a
+  firing. The log read **empty** again at this boundary, which is the expected reading at an
+  iteration's open and therefore no firing either.
   Filed 2026-08-06 at close, from its own knowledge-friction sweep.
 
 - **reclaim-precondition-outside-the-tree** [design-pending] — a declared `reclaim=` can be
@@ -3634,29 +3639,26 @@
   **Cost while deferred:** paid only when validate ends non-clean, but paid as a
   full stop that costs an operator round-trip at the boundary, in the exact
   situation where the tree is already known to be imperfect.
-  **Second firing, 2026-08-12 — the repeat is the argument.** The `native-cohort-canon-kit` close
-  hit the identical wall on `installer_smoke` and escaped by the identical route: an
-  operator-directed filing relayed by the lead. Two consecutive closes have now needed an
-  **operator interrupt to get past their own entry gate**, on unrelated suites and unrelated
-  defects. One occurrence is an unlucky iteration; two by the same route is **structural**. Cost
+  **Second and third firings — 2026-08-12 (`native-cohort-canon-kit`) and 2026-08-18
+  (`wide-budget-batch-and-hold-declaration`, at `f8c34c20`) — and the repeat is the argument.**
+  Both hit the identical wall on `installer_smoke`, the second on the init no-op/regen red, and
+  both escaped by the identical route: an operator-directed filing relayed by the lead. Cost
   measured rather than predicted: one full stop and one operator round-trip per non-clean close.
-  **Third firing, 2026-08-18 (`wide-budget-batch-and-hold-declaration`), and the grounds for that
-  date.** `installer_smoke` ended validate on the init no-op/regen red, the close entry refused for
-  want of a live blocking slug, and the escape was the identical operator-directed filing
-  (`f8c34c20`). Three consecutive non-clean validates, three operator interrupts, one route: the
+  Three consecutive non-clean validates, three operator interrupts, one route: the
   structural reading above is now the only one left. The same drain found a **second face** the
   candidates above do not cover — a baseline move stales the evidence line computed against the old
   baseline — promoted as `baseline-move-stales-evidence-line`.
-  **Six holds, none of them a decline of the finding, every one on surface grounds.** 2026-08-19
-  into `budget-batch-and-account-identity-kind` and, the same day, into
+  **SEVEN holds, none a decline of the finding, every one on surface grounds.** 2026-08-19 into
+  `budget-batch-and-account-identity-kind` and, the same day, into
   `takeable-tier-batch-and-installer-noop`, the second on a probed ground the first lacked: the row
   is **not armed today**, the live baselined `fail` naming a slug that still resolves. THIRD
   2026-08-20 by the lead into `graph-port-and-config-seam`; FOURTH and FIFTH 2026-08-22, the second
   operator-ruled, against neither that day's prose-gate spine nor the next iteration's port hold.
   **SIXTH, OPERATOR-RULED 2026-08-23** into `battery-runner-port`: scope proposed it at threshold as
   the pre-emption rule requires, the lead declined to rule a fork whose three candidates trade real
-  properties, and the operator re-deferred. Count unchanged at two — **no date joins a decline, the
-  finding not having re-fired** — so each hold is discharged by having reached the authority.
+  properties, and the operator re-deferred. **SEVENTH, lead-ruled 2026-08-24**, on the surface
+  criterion alone. Count unchanged at two — **no date joins a decline, the finding not having
+  re-fired** — so each hold is discharged by having reached the authority.
   Filed 2026-08-10 by close, from its own blocked entry; the escape it needed is
   the evidence. Re-attested 2026-08-12 by close, again from its own blocked entry.
 
@@ -4055,6 +4057,11 @@
   **A candidate the three above miss:** `.gitignore` asserts the directory is "auto-cleaned",
   which every firing falsifies. Correcting that claim to best-effort and leaving the residue
   *declared* is a real option beside owning it, and it is the only one that costs nothing.
+  **HELD 2026-08-24 by the lead**, on the surface criterion, in the same session that stamped the
+  third firing: the promoted turn-end/scratch-execution control set touches the `SubagentStop` hook
+  and the scratch-run guard, and reclamation of a dispatched child's worktree is neither. The hold
+  is recorded as a hold and the firing as a firing — the date above joins the declaration because
+  the finding re-fired, which is exactly what no decline ever does.
   **Cost while deferred:** grows monotonically with every read-only dispatch, and this repo
   pre-authorizes delegation for read-heavy audits, so the accumulation rate is the working rate.
   Filed 2026-08-12 by close, draining the gap inbox; found at scope, re-verified here. Widened
@@ -4424,19 +4431,16 @@
   **NOT a split candidate, ruled 2026-08-23 at build** against the criterion queue-kit/SPEC.md
   section check-queue-entry-budget now states: it accumulates measurements for ONE deliverable, so
   ruling it leaves nothing unruled — the fifth measurement reversing the third is compression.
-  **SEVENTH MEASUREMENT, 2026-08-24 at close: 81 stdin heredocs against the sixth's 64 and the
-  fifth's 9, so the reversal is CONFIRMED rather than a spike. UNSTAMPABLE — the declaration is 96
-  columns and a fifth date makes it 107, the second entry to hit that ceiling at this same close.**
-  **SIXTH MEASUREMENT, 2026-08-23 at close — the fifth's reading is REVERSED and its fall was a
-  dip.** 64 `python3 - <<EOF` stdin heredocs, top-ranked of 49 patterns, most editing tracked files
-  by name, against the fifth's nine and the 50 it fell from — so the series does not support the
-  fifth's reading of that fall as evidence FOR the operator's discipline-shaped cause. Four
-  `python3 .tmp/<name>.py` runs in the same log also retire the fourth's "the path-shaped payload
-  is gone": both shapes are live at once, which the design fork below treated as sequential.
-  **FOURTH MEASUREMENT, 2026-08-19 at close.** 50 stdin heredocs, zero `python3 .tmp/*.py` runs,
-  and the bash side clean a second time. What survives it is the design narrowing: stdin has no
-  `.tmp/` path to match, so even the cheap third option below misses it unless the rule names the
-  interpreter rather than the path.
+  **THE MEASUREMENT SERIES IS SETTLED at seven readings, and what it settles is the design fork's
+  premise rather than the defect.** Stdin heredocs ran 50 (fourth, 2026-08-19), 9 (fifth), 64
+  (sixth, 2026-08-23, top-ranked of 49 patterns and most editing tracked files by name), 81
+  (seventh, 2026-08-24) — so the fifth's fall was a DIP, and its reading of that fall as evidence
+  FOR the operator's discipline-shaped cause is falsified rather than merely unsupported. The
+  sixth's four `python3 .tmp/<name>.py` runs also retire the fourth's "the path-shaped payload is
+  gone": both shapes are live AT ONCE, which the fork below treated as sequential. The narrowing
+  that survives all seven — stdin carries no `.tmp/` path to match, so even the cheap third option
+  misses it unless the rule names the INTERPRETER rather than the path. The bash side was clean at
+  every reading, so the runner has worked from the first and the REACH is the whole defect.
   `scripts/bash-guard.sh` blocks a direct scratch run by matching `^bash[[:space:]]+\.tmp/`, and
   `guard-kit/bin/scratch-run.sh` executes its target with a hardcoded `bash`. Neither reaches a
   script run under another interpreter. Probed at the 2026-08-13 close against the guard itself:
@@ -4450,22 +4454,21 @@
   allowlist bar for scratch execution rather than about which interpreters the control covers.
   **Cost while deferred:** the control reads as complete and is not, which is worse than an
   absent control — a reviewer seeing the rule and the runner has no reason to check its reach.
-  **Third measurement, 2026-08-18 — spent; its one surviving datum is that the bash side was clean
-  then too, so the runner has worked from the first reading and the reach is the whole defect.**
   **PROMOTION COMMITTED AT THE NEXT BOUNDARY — OPERATOR RULING 2026-08-23, REVERSING THEIR OWN
   FOUR PRIOR DECLINES.** The 2026-08-23 deferral-on-the-merits rested on the fifth measurement
   breaking the trend — "the first evidence *for* the operator's discipline-shaped reading rather
   than merely consistent with it" — and the sixth measurement above falsifies that exact ground.
-  The operator saw the reversal and ruled the entry promoted at the next iteration boundary. It
-  was NOT admitted into `shell-gate-tail-port-and-completion-oracle`, whose set was already fixed.
+  The operator saw the reversal and ruled the entry promoted at the next iteration boundary. That
+  boundary is 2026-08-24 and it ADMITTED the entry: the operator yielded the port sequence for that
+  iteration alone to pay this commitment and its paired one, a yield recorded at
+  `native-gate-port-remaining-corpus` and reversing nothing. The unstampable seventh measurement is
+  the case `promotion-commitment-stamp-latency` now owns.
   **The deliverable fork stays OPEN and stays this entry's** — the three options below are
   untouched, and neither the operator nor the lead picked among them.
-  **The four declines, all OPERATOR-class, all on the theme-shaped cause this ruling spends:**
-  2026-08-19 through the harness's question mechanism and again at that day's scope; 2026-08-20
-  via the lead, the third recurrence having put it past lead discretion, and reaching that
-  authority is what discharged it; re-affirmed 2026-08-22. Scope proposed it regardless of theme
-  every time, as the rule requires. **No `recurrence:` date joins a decline** — a decline is not
-  a firing, and none of these four is one.
+  **The four declines are SPENT, the ruling above having reversed them** — 2026-08-19 twice,
+  2026-08-20 via the lead once the third recurrence put it past lead discretion, re-affirmed
+  2026-08-22; all OPERATOR-class, and **no `recurrence:` date joins a decline**, a decline not
+  being a firing.
   Filed 2026-08-13 by close, from its own tooling-friction triage; probed at source before filing.
 
 - **ro-bins-write-option-bypass** [design-pending] — `GUARD_KIT_RO_BINS` membership is tested as
@@ -4581,9 +4584,8 @@
   out; the session wrote "The survey landed" plus "each claim re-verified by me, not relayed",
   then relayed undelivered rival sizings onward into an operator ruling. Superseded at `342f4f52`,
   where two of the three relayed claims were falsified.
-  **The failure leaves no signature in the text**, which is what makes it a gap rather than a
-  lapse: the prose reads identically whether the return was held or invented, so no reader and no
-  gate can tell.
+  **The failure leaves no signature in the text**, which makes it a gap rather than a lapse: the
+  prose reads identically whether the return was held or invented, so no reader and no gate tells.
   **Second firing 2026-08-18, again self-caught, and it sharpened the mechanism.** At that
   iteration's scope a dispatched sweep had its synthesis written into the survey record and an
   escalation before the dispatcher could attest a return; scope re-derived first-hand, superseded
@@ -4593,13 +4595,14 @@
   the parent *by construction*, so a receiving-side duty cannot be discharged by self-inquiry.
   **That paragraph is a claim, not a ruling.** Its evidence is a completion notification held by
   the lead — the *child's* self-report about its own prior turn — which does not prove scope held
-  a first return, though it does retire the fabrication reading. **The lead recommends and does
-  not rule** the durable-artifact shape over the doctrine line below: the dispatcher mints a
-  journal path and reads it, a path being observable to the parent where a message is not.
-  **Distinct from the two neighbouring dispatch entries, both re-read at the drain.**
-  `dispatch-cited-evidence-unverified` is about a sweep's *quoted evidence* being untraceable;
-  `dispatch-unreadable-target-fallback` is about a *child* fabricating a verdict when its target
-  is unreadable. This is the *parent* relaying a return that never arrived.
+  a first return, though it does retire the fabrication reading. **The lead's durable-artifact
+  recommendation has since LANDED as standing policy** (delegation-kit/SPEC.md §Resume journal) —
+  the dispatcher mints a journal path and reads it, observable where a message is not — so the
+  receiving-side half now HAS a mechanism and only the doctrine line below stays open.
+  **Distinct from its two neighbours, both re-read at the drain:**
+  `dispatch-cited-evidence-unverified` is a sweep's *quoted evidence* being untraceable,
+  `dispatch-unreadable-target-fallback` is a *child* fabricating a verdict on an unreadable target;
+  this is the *parent* relaying a return that never arrived.
   **The design question, and it may not have a mechanical answer.** The tree cannot observe what a
   session did or did not receive, so a gate over tree state is very likely unbuildable. Two
   non-gate shapes are live and neither is ruled: a **doctrine-tier** obligation stated where
@@ -4611,13 +4614,13 @@
   **Cost while deferred:** it lands on exactly the dispatches delegation is pre-authorized for,
   and it defeats normal trust rather than merely being wrong — a relayed finding is the signal a
   reader uses to decide a claim has already been checked.
-  **Held a SECOND time, 2026-08-20, by the iteration lead** into `graph-port-and-config-seam`: the
-  ruled spine is the `check-graph` port, delegation-kit shares no surface with it, and two
-  recurrences stay inside lead discretion. First held 2026-08-19 out of
-  `takeable-tier-batch-and-installer-noop`, at a firing rate of once per iteration since.
-  **HELD a THIRD and a FOURTH time on 2026-08-22, the second operator-ruled:** the body itself
-  concedes a gate over tree state is very likely unbuildable, so the deliverable is a CHOICE between
-  two non-gate shapes — not spine-shaped for a prose-gate nor for a port-hold-grounds iteration.
+  **FIVE holds, none a decline, every one on the surface criterion.** 2026-08-19 out of
+  `takeable-tier-batch-and-installer-noop`; 2026-08-20 by the lead into `graph-port-and-config-seam`
+  (delegation-kit shares no surface with the `check-graph` port); 2026-08-22 twice, the second
+  operator-ruled, against neither that day's prose-gate spine nor the port-hold grounds — the body
+  concedes a gate over tree state is very likely unbuildable, so the deliverable is a CHOICE
+  between two non-gate shapes; and 2026-08-24 by the lead, no surface shared with the promoted
+  turn-end/scratch-execution set. No date joins a hold, and the rate stays once per iteration.
   Filed 2026-08-13 by close, draining the gap inbox on operator direction to file, not promote.
 
 - **handoff-premise-reverification-placement** [design-pending] — `Probe-before-assertion` is
@@ -6595,6 +6598,15 @@
   — five of the eight kept rows were held by a live-slug citation, each needing an extent
   extraction and a slug-liveness check — while the filtering shape the two 100% readings argued for
   drops three rows out of 27 and buys much less than it did out of five.
+  **HELD 2026-08-24 by the lead, and this is the threshold member that came closest to being
+  taken.** Scope proposed it at threshold and flagged it as the one candidate needing no spec
+  amendment — it is classed **debt**, so scope could have promoted it the same session, and
+  TRAJECTORY.md §The closed rulings records the operator acting 2026-08-23 on the deferred pool's
+  measured 8:1 intake-to-exit ratio. Held anyway on two grounds the lead ruled from the governed
+  surfaces: the third measurement above **collapses the rate** it would be taken to fix, from 100%
+  to 11%, and the entry bundles with `deferred-cost-class-opener-vocabulary` on one surface, so
+  taking it alone takes the weaker half of a pair. No date joins the hold; a decline is not a
+  firing.
   Surfaced 2026-08-19 at the `takeable-tier-batch-and-installer-noop` close's icebox eviction review
   and filed to the gap inbox there; promoted 2026-08-20 by the next iteration's scope.
 

@@ -321,6 +321,24 @@ commit and tests at validate, was refused: CI runs the battery and the fixture s
 validate, so the narrowing would have moved the test arm out of CI's reach. The source-stamp
 cache is owned at gate-sdk/SPEC.md §check-crate-arms.
 
+**An enforcing turn-end `SubagentStop` hook is authorized — ruled 2026-08-24 by the operator,
+unconditionally.** delegation-kit/SPEC.md §The turn-end liveness probe ships the probe
+logging-only and states that a hook which blocks is a **separate authorization** nothing there
+implies. This is that authorization. It is recorded here because the SPEC deliberately left it to
+no surface it owns, and because an authorization held only in a dispatch thread is held nowhere.
+**The capped variant was offered and refused, which binds the build.** Refusing only on a
+`verdict=red live=yes` reading carrying at least one record, and staying advisory otherwise, was
+put as an explicit option and **not taken**. So a narrowing condition in the hook as built is a
+design decision inside its own amendment's envelope, argued on its own grounds — never an
+inheritance from this ruling, and never a safety margin added because the unconditional form felt
+large. This ruling names its own discharge event: it is spent when the enforcing hook ships.
+**What the ruling does not rest on, recorded because the finding is the tempting ground.** A scope
+probe established that the hook is already registered, so turning the observer into a refuser is a
+script change rather than a permission edit and does not meet the 2026-08-22 permission-class wall.
+That is a true finding about cost and it is not why the authorization was given: what needed
+authorizing is the **class** — an observer turned refuser at a turn end — and it would have needed
+it just the same had the registration been absent.
+
 ## PRIORITY DIRECTIVE — the port track's sequence
 
 **Ruled 2026-08-09 by the operator, and it is the track's top priority: complete
