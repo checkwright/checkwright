@@ -280,8 +280,9 @@
   the 640 ms floor is paid by every hook regeneration, every `install-hooks.sh`, and every
   single-gate run a session makes while iterating. What the batch removed was the per-knob
   multiplier, not the per-kit subshell.
-  **Nothing else owns the residue.** `graph-port-bash-spawn-residue` owns the surviving `bash`
-  spawn itself and was ruled 2026-08-23 not to fall to this port — only its price did.
+  **Nothing else owns the residue.** The surviving `bash` spawn is owned by gate-sdk/SPEC.md
+  §gen-pre-commit, where its disposition is recorded, and was ruled 2026-08-23 not to fall to this
+  port — only its price did.
   **Cost while deferred:** every bridged invocation pays 640 ms it cannot avoid, and the cost
   scales with the number of owning kits rather than with the number of members, so a new kit
   raises the floor for everyone while a new member no longer does.

@@ -7718,14 +7718,53 @@ bridge's own producer, and it stays where the bridge is. `check-graph`'s
 assertion D therefore keeps spawning it, which criterion 7 clears explicitly: a
 rule shelling out to `bash <emitter>` clears that criterion because `bash` is on
 the program floor, however unported the emitter is. The cost is real and is
-recorded rather than absorbed — the ported `check-graph` is the crate's **first**
-gate to spawn a program other than git, which runs against the direction of
-TRAJECTORY.md §The objectives 1, 2 and 6. The alternative — a new shell gate
-owning hook parity alone, under born-native exception class (a) — was costed and
-refused: it mints a gate name, a descriptor, a fixture pair and a SPEC section to
-relocate an assertion criterion 7 already sanctions in place. The residue is
-filed (`graph-port-bash-spawn-residue`) with that split as the
-designed-but-unbought answer. **Ratified by the operator, 2026-08-21.**
+recorded rather than absorbed: the spawn crosses back from the compiled substrate
+into the shell one, which runs against the direction of TRAJECTORY.md §The
+objectives 1, 2 and 6. It was the **first** spawn of a program other than git on
+the crate's shipped gate path — never the first in the crate, whose test-only
+spawn sites predate it — and it is one of several there now, but it stays the only
+one of its shape: criterion 7's class-(i) wrappers spawn a program because that
+program *is* the rule they assert, and this member spawns `bash` because a surface
+it reads structurally stays shell. **Ratified by the operator, 2026-08-21.**
+
+**The residue's disposition, ruled at build 2026-08-24, on which the debt entry
+that carried it closes.** The spawn is **declared, and the declaration is what
+owns it**: this member's registry entry names `bash` in the requirement element
+`--needs` prints, so the criterion-7 roster answers for it on the compiled
+substrate exactly as the tokenizer answered for the shell form, and one floor
+filter clears it on both. Nothing new is minted and nothing else owns it. The
+answer the residue was filed with — a new shell gate owning hook parity alone,
+under born-native exception class (a), costed and refused here for minting a gate
+name, a descriptor, a fixture pair and a SPEC section to relocate an assertion
+criterion 7 already sanctions in place — is **void** rather than merely unbought,
+because the operator retired class (a) on 2026-08-23 (§The port-candidate
+criteria) and the refutation recorded there is that argument's own. The two live
+alternatives are the two paragraphs below and the closure reopens neither.
+
+**What the declaration does not cover, stated because it is the residue's own
+edge.** `--needs` names *a program the member spawns* (§The `# graph:` manifest),
+so it names `bash` and nothing the generator itself reaches for — the emitter's
+own `git`, `realpath` and `awk` sit one remove further out than the
+library-mediated requirements §port-blockers records as its second blind spot.
+Criterion 7 is cleared either way, since all four are on the floor and its own
+clause rules that a spawn target's unportedness does not reach it; what the bound
+costs is that a change to the generator's requirement set surfaces in no
+declaration, and review at the diff is what stands in for one. The declared set
+is `bash` alone, measured rather than assumed: assertion D's two generator arms
+are the member's only spawns under every mode, the three narrow modes returning
+before the generator is reached at all.
+
+**The absent-`bash` branch was run rather than assumed, and it owes no wrapper
+refusal.** With that one name scrubbed off `PATH` the member exits **2** carrying
+`cannot run bash: … the check could not run; treating as failure (not clean)`,
+which is §Fail-closed contract's standing backstop doing exactly its job. A
+`proc::on_path` probe on top of it is **not** owed, and the ground is that the
+class rule such a probe satisfies has no content on this member: `on_path` exists
+so a wrapper refuses with its own message *at the shell form's own point in the
+order*, and this member's shell form was itself a bash script, which on a host
+with no `bash` did not run at all. There is no shell refusal to be at parity with,
+so building one would be inventing the thing it was supposed to match. Recorded
+so it is not re-proposed as the obvious ergonomic.
 
 **The battery's port made this generator cheaper and left its spawn standing,
 and both halves are stated so neither is rediscovered as news.** `command_rel`
@@ -7734,8 +7773,13 @@ loudest reader of the config bridge's cost; the per-kit batch (§lib/gate.sh)
 took `--emit` from 6637 ms to 4204 ms on this tree with the emitted hook
 byte-identical, which is the oracle that the batching moved no value. What did
 **not** change is the ruling above or its consequence: `check-graph` keeps
-spawning `bash bin/gen-pre-commit.sh` for assertions D and E, so
-`graph-port-bash-spawn-residue`'s subject survives and only its price falls.
+spawning `bash bin/gen-pre-commit.sh` for assertion D's two arms, the pre-commit
+surface and the commit-msg one, so the residue's subject survives and only its
+price falls — the boundary a lead ruling of 2026-08-23 holds, keeping the spawn
+outside `config-bridge-resolution-cost`'s scope. **Assertion E is not one of the
+two arms**: it compares the coupling-graph artifact against an emission this
+member computes in process, which is true of the compiled form and was true of
+the shell form it replaced, so the generator sits in neither one's path.
 
 **Two options were weighed against that cheaper generator and DECLINED FOR NOW
 rather than refuted — ruled 2026-08-23 by the operator, and the distinction is

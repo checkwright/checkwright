@@ -1393,6 +1393,9 @@ pub const REGISTRY: &[GateEntry] = &[
     // first argument with a default, the variable-first-argument shape §check-reads-couples calls
     // undecidable. It declares GATE_SDK_ROOT_HERE because assertion D spawns the hook generator,
     // which stays shell (§gen-pre-commit), and a compiled member has no BASH_SOURCE to find it by.
+    // spec: gate-sdk/SPEC.md §gen-pre-commit — `bash` is the whole declared requirement: assertion
+    // D's two generator arms are this member's only spawns, measured, and the generator's own
+    // programs ride the floor behind them rather than joining this element.
     (
         "check-graph",
         graph::run,
@@ -1416,7 +1419,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "GRAPH_LAYER_DEFAULT",
         ],
         "gate-sdk",
-        &[("bash", ""), ("date", ""), ("git", "")],
+        &[("bash", "")],
     ),
     (
         "check-gate-fail-closed",
