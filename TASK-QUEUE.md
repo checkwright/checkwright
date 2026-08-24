@@ -7339,6 +7339,20 @@
 
 - **dispatch-claim-evidentiary-tier-unmarked** [design-pending] — a dispatch prompt can upgrade an
   inference into a finding, and the receiving session cannot see the evidence base to discount it.
+  recurrence: dispatch-claim-evidentiary-tier-unmarked 2026-08-24
+  **THIRD INSTANCE, in a SUB-SHAPE the two below do not reach and the highest-stakes one yet: a
+  relayed one-shot AUTHORIZATION, carrying no spent/unspent state.** At the
+  `port-remainder-disposition-and-worktree-reclamation` close a dispatch relayed an operator
+  authorization for an outward-facing write against a named public artifact, declaring it "LIVE and
+  UNSPENT" and its target defective. Both halves were false at HEAD: the target had been repaired
+  and the authorization spent hours earlier, by the relaying side, and the tracked issue's own
+  comment thread records the fix with a probe. The write was NOT made. What differs from the two
+  instances below is that the claim was never an inference — it was a fact that had gone stale
+  between the act and the relay, so evidentiary-tier marking would not have caught it; a grant needs
+  a consumed state, not a tier. What is the SAME, for the third time, is that the receiving session
+  caught it by declining to trust the prompt, and nothing else could have. The stakes differ in kind
+  too: the two below cost a session's work, and this one would have been an unrecoverable write to a
+  public surface.
   **Two attested instances, both self-reported by the lead and both caught by the RECEIVING stage
   rather than by the lead.** (1) At build, a dispatch said "assume deltas 10 and 11 carry a false
   premise", converting a verification instruction into a quota. The session came within ONE EDIT
