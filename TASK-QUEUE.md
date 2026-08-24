@@ -176,10 +176,13 @@
   **The valve's cause, stated because a terse tag is not an audit trail.**
   `check-queue-prose-precondition` reds this entry on its sequencing paragraph, reading "upstream
   of" and "blocked on" as a forward precondition this entry waits behind. The direction is
-  inverted: this entry is the BLOCKER, holds no precondition of its own, and is pickable first by
+  inverted: this entry is the BLOCKER, holds no precondition of its own, and was pickable first by
   construction — which is what the paragraph says. Declaring a blocker tag would assert a blocker
-  that does not exist, and rephrasing past-tense would falsify an unrun experiment, so the valve
-  is the only one of the gate's four remedies that is true here.
+  that does not exist, so the valve is the only one of the gate's four remedies that is true here.
+  The rationale's fourth clause — that rephrasing past-tense would falsify an unrun experiment —
+  is SPENT and retired rather than kept: the experiment has run, the paragraph is past-tense now,
+  and the gate still reds on the surviving direction inversion, which is what keeps the valve
+  earned. Retiring a spent ground is not reversing the ruling that took it.
   **RUN 2026-08-24 AT SPEC, AND THE HYPOTHESIS IS FALSIFIED. The deliverable is discharged; do
   not re-buy it.** The hypothesis was that reclamation is tied to the DISPATCHING session's
   lifetime, so a parent ending abnormally strands the child's worktree. A worktree-isolated agent
