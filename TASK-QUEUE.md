@@ -7823,21 +7823,5 @@
 
 ## Done
 
-- icebox-candidate-eligibility-unapplied
-
-- no-port-cause-class-generalization
-
-- stage-journal-contract-unoracled
-
-- agent-worktree-boundary-disposition
-
-- worktree-reclamation-cause-falsification
-
-- delegation-provenance-floor
-
-- subagent-stop-agent-id-attribution-doubt
-
-- turn-end-liveness-exit-two-conflation
-
 ## Lessons Learned
 
