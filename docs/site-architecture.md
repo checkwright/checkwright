@@ -143,7 +143,11 @@ recoverable:
   invocation bakes into them (gate-sdk/SPEC.md §gen-pre-commit), so a kit-config
   edit stales them too — and so does adding a kit `gate-tests/*.test.sh`, whose
   basename `scripts/enum-sets.sh` derives into the `check-prose-enum` roster the
-  hooks bake verbatim, staling them with no manifest or config touched at all:
+  hooks bake verbatim, staling them with no manifest or config touched at all —
+  and so does any tree edit that *moves* a measured claim, since the baked
+  invocation carries `check-measured-claim`'s resolved values, so a script header
+  gaining a `# no-port:` cause moves the `tree-shell-owed` key and stales the
+  hooks from a file no manifest names either:
   one command emits both hooks
   (`bash gate-sdk/bin/gen-pre-commit.sh --write`), then the artifact
   (`bash gate-sdk/bin/run-gates.sh --emit graph > docs/check-graph.html`), which

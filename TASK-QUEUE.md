@@ -5571,37 +5571,6 @@
   Filed 2026-08-17 into the gap inbox by the `post-close-intake-and-index-port` close, which
   escalated rather than picked; promoted 2026-08-17 at scope.
 
-- **spec-embedded-source-criterion-4-membership** [design-pending] — whether a diff-reference
-  corpus counts as "scanned as content" for criterion 4 is unsettled by the two sections that
-  would rule it.
-  gate-sdk/SPEC.md's conservation table rules `check-spec-embedded-source` **"survives
-  unchanged — reverse trigger of the same shape"**, reading its `couples=` extension roster as
-  a language list "not a reference to gate declarations" whose "scanned corpus is the canonical
-  specs and amendments". The implementation disagrees in shape:
-  the member builds its candidate set by walking every `*.sh`/`*.rs`/… file in the tree and
-  diffs each file's actual line content against every spec's fenced blocks, so every gate
-  declaration path is inside that set and its content is **read**, not merely triggered on.
-  **The sixth budget batch ported the member and did NOT rule this class** — it took the
-  binding verdict for that member alone, on the ground that a conservative verdict costs a
-  fixture widening and cannot be wrong in the harmful direction (gate-sdk/SPEC.md §The sixth
-  budget batch). This entry still owns the class, and that disposition is not its answer.
-  **Why [design-pending]:** criterion 4 (gate-sdk/SPEC.md §The port-candidate criteria) binds
-  where "a registry member's declaration path lies inside the corpus the gate scans as
-  content", and distinguishes a reverse-trigger couple, never read as content, from a content
-  couple. A **diff-reference** corpus — opened and content-compared, but not the gate's own
-  assertion target — is neither, and neither section's text as written resolves which it joins.
-  The verdict decides whether this gate **binds** criterion 4 the way `check-tree-terms` does —
-  a fixture widening priced into the port, never a hold, per that section's 2026-08-22 ruling —
-  so it is a port-sizing call rather than a wording one.
-  **Cost while deferred:** low and bounded — nothing in this iteration's batch rested on the
-  verdict, which is why it was filed rather than picked by precedent. The carry is that the
-  next cohort cut re-opens the same question at selection time, where a wrong answer buys a
-  mis-sized port rather than a wrong one.
-  Surfaced 2026-08-17 in the spec stage's survey record, flagged unsettled rather than
-  adjudicated there, and escalated at align on spec-over-precedent.
-  Filed 2026-08-18 by close from the gap inbox, whose cited SPEC line number the drain
-  re-verified — the row moved this iteration, content unchanged.
-
 - **threshold-recurrence-routing-residency** [design-pending] — where the threshold-recurrence
   routing clause lives, now that its only carrier has left the live tree.
   **The clause, carried here verbatim so it does not spend by attrition:** *"a third threshold
@@ -7850,6 +7819,7 @@
 - **doctrine-rule-number-citation-liveness** [design-pending] — A renumber stales citations.
 - **false-ground-citation-propagation** [design-pending] — Nothing re-reads a ground once cited.
 - **amendment-roster-omission-detection** [design-pending] — Only a grep catches a short roster.
+- **spec-embedded-source-criterion-4-membership** [design-pending] — Its port sizing stays unruled.
 
 ## Done
 
