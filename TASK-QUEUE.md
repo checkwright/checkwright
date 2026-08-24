@@ -7067,6 +7067,19 @@
 - **bridged-knob-case-tmp-dir-override-inert** [design-pending] — `run-gate-tests.sh`'s
   `CASE_TMP_DIR` absolutization protects a SHELL-dispatched gate only, so a bridged/native gate
   writes its scratch into the tracked fixture corpus it is the oracle for.
+  recurrence: bridged-knob-case-tmp-dir-override-inert 2026-08-25
+  **FIRST RECURRENCE, 2026-08-25 at close, and it re-fired in the ATTESTED shape rather than a
+  variant.** A battery run regenerated the scratch, and the next `installer_smoke` run died at
+  `checkwright init`'s `git add` on the ignored path — masking the ruled binary-less scenario
+  exactly as the cost line predicts. The masking cost a diagnosis a second time: only deleting the
+  regeneration and re-running showed the four profiles clean and the failure landing where the
+  baseline says it does. TWO READINGS THE RECURRENCE ADDS. First, the regeneration is not
+  occasional — the producing gate runs in the battery, so ANY session that runs the battery before
+  the installer suite meets the mask, which makes the masked reading the default ordering rather
+  than the unlucky one. Second, the 2026-08-24 attribution ruling was VINDICATED by this firing
+  rather than merely upheld: because the baseline row still names the standing cause, deleting the
+  transient one exposed the real red immediately instead of leaving a re-attributed row that would
+  have read as satisfied.
   **The mechanism, measured.** `gate-sdk/bin/run-gate-tests.sh` resolves a bridged gate's knobs
   through `gate_command`'s `mapfile` at line 50 — BEFORE the `GATE_SDK_TMP_DIR="$CASE_TMP_DIR"`
   override at line 84 ever applies. A native gate reads `GATE_SDK_KNOB_GATE_SDK_TMP_DIR`, which
