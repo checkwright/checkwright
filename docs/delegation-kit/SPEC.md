@@ -531,7 +531,14 @@ consequences carry the guard below: the fork ban has an exact trigger
 (`tool_input.subagent_type`), the read-only claim has an exact trigger
 (`tool_input.isolation`), and depth has an exact, *documented* discriminator —
 `agent_id` is present iff the dispatching session is itself a subagent, so its
-presence means the call about to be made creates a grandchild.
+presence means the call about to be made creates a grandchild. **That is a
+discriminator on the field's *presence*, never on its value**, and the
+distinction is worth one clause because §The turn-end liveness hook (template)
+records a live doubt about the value: an observation of five firings in one
+session saw five distinct `agent_id` values. Nothing in that doubt touches this
+trigger — presence is still presence whether the value is per-agent or per-firing
+— so the two readings are compatible rather than in tension, and neither is the
+other's drift.
 
 **Honest limit on that roster.** It is sourced from the harness's own published
 hook contract, fetched rather than recalled, and from nothing in this tree —
@@ -1127,8 +1134,31 @@ list does not name one for:
   original reader: a dispatched agent and its dispatcher log the *same*
   `session_id`, and neither matches the identifier a stage stamp carries, so
   attributing a firing to a stage session is not a reading this field supports.
-  The payload's `agent_id` is the discriminator that would, and logging it is a
-  grammar change this hook has not taken.
+  **Measured, and re-corroborated first-hand rather than carried forward**: a
+  worktree-isolated child's own log and its dispatcher's log carried the
+  identical `session=` token, read out of two different files in two different
+  checkouts. Re-derive by reading both logs, not by citing this.
+  **What *would* attribute a firing is not established, and the claim this bullet
+  used to make is withdrawn.** It named the payload's `agent_id` as the
+  discriminator that would, with a grammar delta as the only thing in the way.
+  That is a forward promise the evidence does not carry. **Observed, not
+  measured**: one read of five firings in a single session saw five **distinct**
+  top-level `agent_id` values, none of them matching the stable identifier the
+  same payloads' `background_tasks` array reported for the one live dispatched
+  agent. If that holds, the field is per-*firing* rather than per-*agent*, and
+  would attribute nothing. The observation is carried at that tier — a single
+  unreplicated read — and neither promoted nor dismissed.
+  **Why the doubt cannot be settled from this tree**, which is a consequence of a
+  ruling rather than of effort: the tracked record is
+  `.workflow/subagent-stop-liveness.log`, and by the no-values ruling (§What
+  `background_tasks` carries) it records the payload's top-level **key set and no
+  values** — so every line of it carries `agent_id` as a key and not one as a
+  value. Settling the question means reading raw payloads, which that ruling
+  holds operator-class. So nothing here says attribution is one grammar delta
+  away: what is established is that `session_id` does not attribute, and what is
+  open is whether anything in the payload does. A consumer proposing to log
+  `agent_id` for attribution is proposing to settle that question, not to
+  consume a settled answer.
 - **`live`** — `yes` exactly when the reader reported a live producer. It stays
   two-valued and stays paired with `verdict`; the honest limit below is what
   bounds how it may be read.
@@ -1196,10 +1226,17 @@ stays last, so the space-delimited parse never has to step over it.
 
 **No field is carried that this list does not name a reader for**, and the two the
 authorization might have invited and that are **not** carried are recorded so the
-omission does not read as an oversight: no session-attribution field (the payload
-carries no attributing value — see `session` above and the shared-scratch-dir
-paragraph below) and no refusal counter (the bound on repeated refusals is the
-producer's own life, not a count).
+omission does not read as an oversight: no session-attribution field (no payload
+value is **established** to attribute — `session_id` is established not to, and
+`agent_id`'s ability to is in doubt and unsettleable here; see `session` above
+and the shared-scratch-dir paragraph below) and no refusal counter (the bound on
+repeated refusals is the producer's own life, not a count). The
+session-attribution omission rests on those two facts and not on a negative over
+the whole payload: asserting that nothing in it attributes would be a claim
+nothing here has checked, and one that would be quietly falsified — on a surface
+nobody re-reads — if `agent_id` turned out to be per-agent after all. The
+omission's *conclusion* is unchanged either way, because the two reasons for not
+wanting such a field are the ones just given rather than the payload's contents.
 
 **`records` is counted by the hook's own `*.run` glob, not parsed back out of the
 reader**, and the reason is the reader's output contract rather than convenience:
@@ -1423,7 +1460,12 @@ with `status` `running`, the count rising as the grandchild started. Alongside i
 the payload carries `transcript_path`, `cwd`, `prompt_id`, `permission_mode`,
 `agent_id`, `agent_type`, `stop_hook_active`, `agent_transcript_path`,
 `last_assistant_message` and `session_crons`, beside the three fields the grammar
-above reads.
+above reads. **`agent_id` appears in that list as a key and nothing more.** The
+same five firings that enumerated these keys carried five *distinct* top-level
+`agent_id` values, none matching the stable `id` this array reported for the one
+live dispatched agent — so listing it here asserts nothing about its being able
+to tell one agent from another. §The turn-end liveness hook (template)'s
+`session` bullet owns that doubt and the reason this tree cannot settle it.
 
 **It enumerates what the harness launched, not what is running — and that is the
 decisive finding.** A producer detached from a foreground tool call, live

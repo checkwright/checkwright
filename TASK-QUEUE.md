@@ -45,31 +45,6 @@
   having been removed once verified empty and clean; promoted to a feature 2026-08-24 at spec,
   once its upstream experiment returned.
 
-- **subagent-stop-agent-id-attribution-doubt** [spec: SPEC-agent-id-doubt.md] —
-  delegation-kit/SPEC.md's `session` field bullet forwards `agent_id` as the discriminator that
-  *would* attribute a firing to one agent, and the first read of real payloads puts that forward
-  claim in doubt.
-  **The observation, and it is an observation rather than a settled measurement.** Five
-  `SubagentStop` firings inside one session carried five DISTINCT top-level `agent_id` values,
-  none matching the stable identifier the same payloads' `background_tasks` array reported for
-  the one live dispatched agent. If that holds, the field is per-*firing* rather than
-  per-*agent*.
-  **The tracked record cannot settle it.** `.workflow/subagent-stop-liveness.log` records the
-  payload's top-level key set and no values, by the no-values privacy ruling, so every line
-  carries `agent_id` as a key and none as a value. Settling it means reading raw payloads, which
-  that ruling holds operator-class.
-  **STANDING OPERATOR RULING carried into spec: it lands as *state the doubt, drop the forward
-  claim*.** The raw-payload read was NOT granted, and the amendment is authored so that no delta
-  needs one; needing one to proceed is an escalation rather than a licence.
-  **DISTINCT from `subagent-stop-payload-background-tasks-read`**, which is Done and whose
-  finding is what the harness ENUMERATES; this is about what one field IDENTIFIES.
-  **Cost while deferred:** low and forward-looking — nothing is wrong today, and the first thing
-  that goes wrong is a later variant building an attribution grammar on a field that cannot
-  attribute, which reads as a working feature until two agents are compared.
-  Filed 2026-08-23 to the gap inbox by build; promoted to the deferred pool 2026-08-24 at
-  `shell-gate-tail-port-and-completion-oracle`'s close; promoted to a feature 2026-08-24 at
-  spec, which re-corroborated the `session_id` half first-hand across two checkouts.
-
 - **delegation-provenance-floor** [spec: SPEC-provenance-floor.md] — a dispatching session can
   narrate findings from a subagent whose output it never received, and nothing reds.
   recurrence: delegation-provenance-floor 2026-08-18 2026-08-19
@@ -7916,6 +7891,8 @@
 - **amendment-roster-omission-detection** [design-pending] — Only a grep catches a short roster.
 
 ## Done
+
+- subagent-stop-agent-id-attribution-doubt
 
 - turn-end-liveness-exit-two-conflation
 
