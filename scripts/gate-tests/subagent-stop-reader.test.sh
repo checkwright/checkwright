@@ -23,8 +23,9 @@ PAYLOAD='{"session_id":"s-1","hook_event_name":"SubagentStop"}'
 # line. The knob is deliberately NOT set: the default in the consumer copy is the subject.
 fire() {
     local name="$1" rundir="$2" want_rc="$3" log rc
+    shift 3
     log="$tmp/$name.log"
-    printf '%s' "$PAYLOAD" | DELEGATION_KIT_STOP_LOG="$log" GATE_SDK_TMP_DIR="$rundir" \
+    printf '%s' "$PAYLOAD" | env "$@" DELEGATION_KIT_STOP_LOG="$log" GATE_SDK_TMP_DIR="$rundir" \
         bash "$HOOK" >/dev/null 2>"$tmp/$name.err"
     rc=$?
     [[ "$rc" -eq "$want_rc" ]] || { echo "  FAIL: $name exited $rc, want $want_rc"; fails=$((fails + 1)); }
@@ -58,9 +59,19 @@ line="$(fire live "$live" 2)"
 want live "$line" "verdict=red" "live=yes" "records=1" "decision=refuse"
 want live-message "$(cat "$tmp/live.err")" "turn-end refused" "delete the record once the producer has exited"
 
+# C — the reader is configured, readable and resolvable, but the binary its gate dispatches to is
+#     absent: the shape a worktree-isolated dispatch takes, whose fresh checkout carries no build
+#     output. Over an EMPTY run dir the reading is `unresolved` and it refuses. It must NOT be
+#     `unavailable` — that would misreport a wired reader as a tree that never configured one,
+#     and it is the arm the stub lane cannot reach because a stub is not the configured reader.
+absent="$tmp/absent"; mkdir -p "$absent"
+line="$(fire no-binary "$absent" 2 GATE_SDK_NATIVE_BIN=/nonexistent)"
+want no-binary "$line" "verdict=unresolved" "live=no" "records=0" "decision=refuse"
+want no-binary-message "$(cat "$tmp/no-binary.err")" "turn-end refused" "produced no reading at all"
+
 if [[ "$fails" -gt 0 ]]; then
     echo "subagent-stop-reader.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "subagent-stop-reader.test: ok (the configured reader resolves and answers, and its verdict reaches the exit: clean scratch dir green and allowed, live producer red and refused with a reason)"
+echo "subagent-stop-reader.test: ok (the configured reader resolves and answers, and its verdict reaches the exit: clean scratch dir green and allowed, live producer red and refused with a reason, absent dispatch binary unresolved and refused rather than reported unavailable)"
 exit 0

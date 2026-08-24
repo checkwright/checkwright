@@ -466,6 +466,25 @@ a cwd and an env nothing in production reads. Widening `proc.rs` is how a member
 that needs more of the child's result gets it; building its own `Command` is what
 the test refuses.
 
+**The same contract binds the *dispatcher*, and there the refusal is raised
+inside `gate_command` — which is a trap for its callers.** A `.gate` member whose
+binary is absent or not executable is a harness error, so `gate_command`
+(§lib/gate.sh) writes its own naming stderr and **`exit`s 2 from inside itself**
+rather than returning. A caller that invokes it through a **process
+substitution** — `mapfile -t argv < <(gate_command …)` — never observes that
+status: the `exit` kills only the subshell, `mapfile` binds an empty array, and
+the caller reads an empty argv whose *only modelled cause* is `gate_command`'s
+`return 1` for a member that resolves in no check dir. The true diagnosis is then
+overwritten by a false one, and a session is told the gate does not exist when it
+exists and could not be built. **So a caller captures `gate_command`'s status —
+a command substitution, never a process substitution** — and branches on it:
+status 1 is the resolves-in-no-check-dir refusal it may name itself, and any
+other non-zero status is a failure `gate_command` has already named on stderr and
+is propagated without a second, contradicting sentence. Both in-tree dispatchers
+take that shape (`gate-sdk/bin/run-gates.sh`, and this repo's front end
+`scripts/gate-exec.sh`, whose obligation evidence-kit/SPEC.md
+§check-evidence-manifest owns).
+
 **The wrapper contract: a member whose rule *is* an external program refuses with
 its own message, at the shell form's own point in the order.** Criterion 7's
 program-is-the-rule class ports as a wrapper (§The port-candidate criteria), and
@@ -6304,6 +6323,19 @@ same answer:
   worth naming where the argv is: a caller that resolves and executes from
   different directories must pin `GATE_SDK_NATIVE_BIN` absolute, because the
   default is repo-relative (§Layout and configuration).
+  **It emits two distinguishable failure signals, and they are told apart only by
+  its status.** `return 1` means the member resolves in **no** check dir — the
+  caller's own diagnosis to name. Any other non-zero status is a **harness
+  error** — an absent or non-executable binary for a `.gate`-dispatched member,
+  or a config-bridge knob refusal — raised as an `exit` from inside
+  `gate_command` after it has already written a naming reason to stderr. The two
+  are indistinguishable on stdout: both leave the caller with an **empty argv**.
+  So **a caller must capture the status, which means a command substitution and
+  never a process substitution**: an `exit` inside `< <(…)` kills only the
+  subshell and reaches the caller as emptiness alone, and a caller that models
+  emptiness as "resolves in no check dir" then re-diagnoses a build problem as a
+  missing gate. §Fail-closed contract states the trap and the required branch for
+  the class.
 
 **The array-knob config bridge.** A consumer's kit knobs are bash arrays
 resolved by a shell library that is sourced *in-process by each shell gate*,

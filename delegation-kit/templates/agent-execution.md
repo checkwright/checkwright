@@ -161,7 +161,7 @@ drift: do not delete it on sight, and when either rule changes here, propagate.
   index**, the **Serialize on shared files** rule above — and for any agent
   *claimed* read-only, as **write confinement**. Grounds for this rule and the
   next: delegation-kit/SPEC.md §The delegation model.
-- **Isolation charges three harness costs, and paying them is the parent's job.**
+- **Isolation charges four harness costs, and paying them is the parent's job.**
   **(1) The worktree's base is configuration, and the default is not HEAD.**
   `worktree.baseRef` selects it: `fresh` (the default) branches from
   `origin/<default-branch>`, `head` from the dispatcher's local HEAD. Set it
@@ -188,6 +188,24 @@ drift: do not delete it on sight, and when either rule changes here, propagate.
   help. **A sweep whose corpus includes an untracked surface is not delegable to
   an isolated agent**: read that surface yourself, or pass its content in the
   prompt.
+  **(4) A gate dispatched to a compiled binary does not resolve inside an
+  isolated worktree, and the lawful response is to report it, never to build
+  one.** Build output is gitignored and in no commit, so by (3) a fresh worktree
+  checkout has none and the binary such a gate dispatches to is absent; the front
+  end then fails closed (gate-sdk/SPEC.md §Fail-closed contract). Inside isolation
+  **an unavailable gate verdict is therefore the expected reading, not a defect to
+  repair**: do not read it as a verdict, and **do not build the binary** — a build
+  is a mutation, and it is exactly the mutation isolation was bought to prevent
+  for an agent dispatched read-only. Name the gate that could not run, say why,
+  and return; the parent's checkout has the binary and can run it. Attested rather
+  than inferred: a fresh worktree checkout carries no build output, and its
+  turn-end liveness hook refuses there on a binary-absent reading
+  (delegation-kit/SPEC.md §The turn-end liveness hook (template)) — and an
+  isolated agent met with that refusal **reported building the binary to escape
+  it**, a claim carried at the tier it arrived on rather than verified. The
+  behaviour is the point either way: a refusal whose message names no reachable
+  remedy invites a read-only agent to invent a mutating one, so the limit is
+  stated here with its lawful response attached.
 - **One commit per unit, sized to finish within budget.** Each unit gets its own
   commit (+ a `[blocked-by: prior]` tag where ordered). A unit that investigates
   long before its first commit is the only thing an interrupt can destroy —

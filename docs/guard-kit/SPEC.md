@@ -627,6 +627,15 @@ that harness exists would be designing against no case.
     the other side at
     delegation-kit/SPEC.md §The turn-end liveness hook (template), so neither
     surface reads as the other's drift.
+    **The hook has since named a `records=0` sub-case this rule has no analogue
+    for, and neither side's decision moves.** Reading a whole set through one
+    exit code lets the hook meet an exit 2 raised over **no record at all** — a
+    reader that could not run rather than a record that does not parse — which it
+    names `unresolved` and still refuses. A per-record read cannot reach that
+    case: with no record there is no call for this rule to be about. So the
+    divergence above is unchanged in substance and gains one clause — the hook's
+    exit-2 arm now carries two names, and this rule's decline still answers only
+    the one of them a record exists for.
     **Placed with rules 12 and 13, before every auto-allow rule.** It is the
     third member of the wait-discipline family and inherits their placement
     argument (`git` is not on the default `GUARD_KIT_RO_BINS` roster, but a

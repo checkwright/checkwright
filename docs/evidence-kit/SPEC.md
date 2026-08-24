@@ -469,6 +469,23 @@ the one member that forced it: an entry still naming a path is the same trap
 armed for the next port, and re-pointing a still-shell member costs nothing
 because `gate_command` resolves it to exactly the path the entry held.
 
+**Owning the front end means owning what it does with a resolution failure it
+did not cause.** `gate_command` has two failure signals and they are told apart
+only by its **status** (gate-sdk/SPEC.md §lib/gate.sh): `return 1` for a member
+resolving in no check dir, and an `exit` 2 — already named on stderr — for a
+harness error such as a `.gate` member whose binary is absent. Both hand the
+caller an empty argv, so a front end that calls through a **process
+substitution** sees only emptiness and reports *resolves in none of* over a gate
+that resolved perfectly well and merely could not be built. The obligation is
+therefore on the front end and not on the pre-flight entry that reaches it: call
+`gate_command` through a **command substitution**, keep its status, name the
+resolves-in-no-check-dir case itself, and on any other non-zero status propagate
+the refusal **without adding a second sentence** — the reason is already on
+stderr, and the second sentence is the one the reader acts on. A front end that
+adds it turns a *build the binary* problem into a *this gate does not exist*
+problem for every caller of the roster at once, which is why this is stated where
+the front end is owned rather than left to each consumer to rediscover.
+
 **The data-line helper is `ek_data_lines`' own primitive, and the crate carries
 a same-named one that is a different rule.** `ek_data_lines` filters comment and
 blank lines and nothing else. The crate's `stages::data_lines` — the lifecycle
@@ -609,7 +626,16 @@ wins over red wins over green, so one corrupt record is never averaged away by
 nine clean ones. An empty directory is green, the verdict the absent-lock case
 already takes; a directory whose records all name dead PIDs is green; any live
 PID reds, naming **every** blocking record and run key, so a reader waits on the
-set rather than discovering it one entry at a time. Only `*.run` is read — a
+set rather than discovering it one entry at a time.
+**One consequence of that aggregation is stated here because a caller rests on
+it: this mode cannot exit 2 over an empty record set.** Corruption is derived
+**per record**, so an empty glob offers no per-record verdict to aggregate and
+the empty directory takes green unconditionally. A caller that observes exit 2
+alongside a zero record count is therefore reading something that is provably
+**not** record corruption — the gate failed to run at all, before it read a
+record — and a caller may branch on that without re-deriving it here
+(delegation-kit/SPEC.md §The turn-end liveness hook (template) is the one that
+does). Only `*.run` is read — a
 stray file in the same directory is not a record and its unreadability is not
 corruption, which is the whole point of giving the record a suffix.
 

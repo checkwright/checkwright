@@ -12,34 +12,6 @@
 
 ## New Features
 
-- **turn-end-liveness-exit-two-conflation** [spec: SPEC-liveness-exit-classes.md] — the
-  SubagentStop hook reads the gate substrate's fail-closed "could not run" as a malformed launch
-  record, so every worktree-isolated agent is refused at turn end.
-  **OPERATOR-RULED 2026-08-24 and relayed through the lead at the close of
-  `port-remainder-disposition-and-worktree-reclamation`: TAKEN NEXT ITERATION, ahead of normal
-  scope intake.** Formally a FOURTH yield of TRAJECTORY.md §PRIORITY DIRECTIVE, and like the
-  three before it it spends one iteration's turn alone and makes no claim on the sequence's next
-  turn — NOT a reversal, demotion or re-scoping of that directive. What distinguished it: it
-  ENABLES rather than competes, since the refusal disables exactly the delegated read-heavy
-  audits CLAUDE.md pre-authorizes and the port's own remaining work would use.
-  **The cost is wider than the bullet that filed it.** `scripts/delegation-config.sh` declares
-  `audit-sweep` the read-only dispatch type and `scripts/agent-dispatch-guard.sh` blocks any
-  `audit-sweep` dispatch that is not worktree-isolated, so the sanctioned type is forced into
-  exactly the shape the refusal kills.
-  **The operator ruled the PRIORITY and not the choice, and spec ruled the choice.** All three
-  candidate dispositions, the mechanism re-verified against source, the fifteen-of-fifteen
-  measurement of the refusing shape, and the fourth conflation spec found on the MESSAGE axis
-  are in the amendment; this entry deliberately keeps none of that ruling, the entry format
-  having no home for causal completeness.
-  **Cost while deferred:** every read-heavy audit delegation is pre-authorized for is either
-  un-dispatchable or must be re-shaped onto a type that makes no read-only claim, and the
-  refusal message points at the one change that would disable the check entirely.
-  Surfaced 2026-08-24 at the `port-remainder-disposition-and-worktree-reclamation` close, filed
-  to the gap inbox there and corroborated by all three of that close's audit dispatches; drained
-  and promoted to the deferred pool 2026-08-24 at that scope, which re-verified the mechanism
-  first-hand; promoted to a feature 2026-08-24 at spec, which attested the refusal in a live
-  worktree dispatch of its own.
-
 - **agent-worktree-boundary-disposition** [spec: SPEC-worktree-liveness.md] — the iteration
   boundary refuses on registered agent worktrees, but nothing reaps them and nothing surfaces
   one mid-iteration.
@@ -7944,6 +7916,8 @@
 - **amendment-roster-omission-detection** [design-pending] — Only a grep catches a short roster.
 
 ## Done
+
+- turn-end-liveness-exit-two-conflation
 
 ## Lessons Learned
 

@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 # Behavioral test of templates/subagent-stop-liveness.sh — the SubagentStop hook.
-# The properties nothing else can assert: the exit code per verdict arm (2 on red and corrupt,
-# 0 on green, unavailable and error), the decision= column that goes with it, a non-empty
-# stderr on each refusing arm because that stderr IS the blocking reason, and stdout empty on
-# every path (a byte on stdout would be hook JSON, which is a decision this hook never emits).
-# The reader is driven by stub scripts, one per exit class, so every verdict arm is reached
-# without a real producer.
+# The properties nothing else can assert: the exit code per verdict arm (2 on red, corrupt and
+# unresolved, 0 on green, unavailable and error), the decision= column that goes with it, a
+# non-empty stderr on each refusing arm because that stderr IS the blocking reason, and stdout
+# empty on every path (a byte on stdout would be hook JSON, which is a decision this hook never
+# emits). The reader is driven by stub scripts, one per exit class, so every verdict arm is
+# reached without a real producer. Reader exit 2 is driven TWICE — over a non-empty record set
+# and over an empty one — because that one exit carries two verdicts, and the messages are
+# asserted apart so a two-way branch cannot regrow behind a three-way spec.
 #
 # Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
@@ -75,6 +77,30 @@ done
 want red-message "$(cat "$tmp/reader-red.err")" "turn-end refused" "wait for the producer on its own artifact" "delete the record once the producer has exited" "$runs"
 want corrupt-message "$(cat "$tmp/reader-corrupt.err")" "does not parse" "which record is malformed"
 
+# F2 — the SAME reader exit over an EMPTY record set is a different reading: there is no record
+#     for it to be about, so it is `unresolved` rather than `corrupt`. It still refuses — the
+#     count names the diagnosis and decides nothing — and its message must not reuse the corrupt
+#     arm's "does not parse" wording over a case that holds no record to parse.
+emptyruns="$tmp/emptyruns"; mkdir -p "$emptyruns"
+log="$tmp/unresolved.log"
+fire reader-unresolved "$log" "$(stub reader-unresolved 2)" "$emptyruns" "$PAYLOAD" 2
+want reader-unresolved "$(cat "$log")" "verdict=unresolved" "live=no" "records=0" "decision=refuse"
+want unresolved-message "$(cat "$tmp/reader-unresolved.err")" "turn-end refused" "produced no reading at all" "the reader's own reason"
+if grep -qF -- "does not parse" "$tmp/reader-unresolved.err"; then
+    echo "  FAIL: the unresolved arm reused the corrupt arm's 'does not parse' wording over a case holding no record"
+    fails=$((fails + 1))
+fi
+
+# F3 — the record glob is taken AFTER the reader has run, and this is the assertion that holds
+#     the order: a stub that writes a record and then exits 2 must read as `corrupt` over
+#     records=1. Move the glob back above the reader and this case flips to unresolved/records=0,
+#     which is the in-flight record being missed rather than counted.
+raceruns="$tmp/raceruns"; mkdir -p "$raceruns"
+printf '#!/usr/bin/env bash\nprintf "pid=1 run=r\\n" >"%s/r.run"\nexit 2\n' "$raceruns" >"$tmp/reader-race"
+log="$tmp/race.log"
+fire reader-race "$log" "$tmp/reader-race" "$raceruns" "$PAYLOAD" 2
+want reader-race "$(cat "$log")" "verdict=corrupt" "records=1" "decision=refuse"
+
 # G — a reader that cannot be run at all (an unresolvable path) is the vendoring prerequisite
 #     failing: the hook holds no reading, so it degrades to `unavailable` and allows rather
 #     than refusing every turn end in a tree that never configured enforcement.
@@ -111,5 +137,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "subagent-stop-liveness.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "subagent-stop-liveness.test: ok (exit 2 on red/corrupt with a reason on stderr, 0 on green/unavailable/error with none; decision= matches the exit; stdout silent on every path; whitespace in a payload cannot split the line; one firing, one line)"
+echo "subagent-stop-liveness.test: ok (exit 2 on red/corrupt/unresolved with a reason on stderr, 0 on green/unavailable/error with none; reader exit 2 splits by record count into corrupt and unresolved with distinct wording; the glob is taken after the reader; decision= matches the exit; stdout silent on every path; whitespace in a payload cannot split the line; one firing, one line)"
 exit 0

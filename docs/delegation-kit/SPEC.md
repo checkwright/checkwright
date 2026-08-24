@@ -427,7 +427,7 @@ work is finished. The guard's contract, its assertions and its source are
 therefore unchanged by this ruling.
 
 **`worktree.baseRef` is vendor configuration, and choosing it is the consumer's
-job.** The template's **Isolation charges three harness costs, and paying them
+job.** The template's **Isolation charges four harness costs, and paying them
 is the parent's job** rule names the knob and both of its values rather than a
 choice, because a vendoring consumer inherits the template and never a settings
 file. A consumer that dispatches isolated agents therefore sets the knob
@@ -919,11 +919,11 @@ the main-session turn end has no attested firing, so registering it would widen
 the subject past what the evidence carries. Enforcement inherits that boundary
 unchanged — the main session's turn end is still unreached.
 
-**The contract: exit 2 on `red` or `corrupt`, exit 0 on every other path, and no
-hook JSON on either.** The hook reads its payload from stdin, asks the liveness
-reader whether any launch record under `${GATE_SDK_TMP_DIR:-.tmp}` names a live
-producer, appends one line to `DELEGATION_KIT_STOP_LOG`, and then either exits 0
-or exits 2 with its refusal written to **stderr**.
+**The contract: exit 2 on `red`, `corrupt` or `unresolved`, exit 0 on every other
+path, and no hook JSON on either.** The hook reads its payload from stdin, asks
+the liveness reader whether any launch record under `${GATE_SDK_TMP_DIR:-.tmp}`
+names a live producer, appends one line to `DELEGATION_KIT_STOP_LOG`, and then
+either exits 0 or exits 2 with its refusal written to **stderr**.
 
 **The refusal needs no emitter, and that is a repair to this section rather than
 a new claim.** This section used to argue that a hook which had to *speak* at
@@ -951,13 +951,17 @@ future harness revision reshaping the event is drift no gate here can
 self-detect, and only re-reading the contract catches it. Recorded so the next
 reader does not mistake a fetched fact for a measured one.
 
-**The predicate is the reader's exit class, and it refuses on two of five arms.**
+**The predicate is the reader's exit class, and it refuses on three of six arms.**
+Reader **exit 2 is read through two names**, chosen by the hook's own `*.run`
+count: `corrupt` over a non-empty record set, `unresolved` over an empty one.
+The count picks the **name**, never the decision — both refuse.
 
 | reading | the hook holds | decision |
 | --- | --- | --- |
 | `green` | no live producer | log, exit 0 — there is nothing to refuse |
 | `red` | a live producer under a launch record | log, **exit 2** — the whole subject |
-| `corrupt` | a record that does not parse | log, **exit 2** — see below |
+| `corrupt` | reader exit 2 over a non-empty record set: a record that does not parse | log, **exit 2** — see below |
+| `unresolved` | reader exit 2 over an **empty** record set: a reader that could not run at all | log, **exit 2** — see below |
 | `unavailable` | no reading at all (no reader named or resolvable) | log, exit 0 |
 | `error` | a configured reader that ran and did not answer | log, exit 0 |
 
@@ -983,17 +987,63 @@ the next commit reds on it. The false-refusal window is one malformed record's
 lifetime; the bypass window, had the arm been dropped, is however long a session
 cares to leave one in place.
 
+**`unresolved` is the same refusal under a different diagnosis, and the ground is
+a proof from the reader's own contract rather than a judgment about appetite.**
+`check-producer-liveness` in set mode derives corruption **per record** and
+aggregates *exit 2 wins over red wins over green* (evidence-kit/SPEC.md
+§check-producer-liveness). Over an empty glob there is no per-record verdict to
+aggregate, so the gate **cannot** return corrupt on an empty set. A reading of
+exit 2 at `records=0` is therefore provably *not* record corruption; it is the
+reader failing for a reason that has nothing to do with any record. The shape
+that produces it in practice is a **worktree-isolated dispatch**: a fresh
+`git worktree add` checkout carries no build output, so the binary a `.gate`
+member dispatches to is absent and the reader fails closed before it reads a
+record. The hook already computes `records` by its own glob over the same
+directory, so the discriminator costs no new field, no new knob and no second
+reader.
+
+**The count labels the diagnosis and decides nothing, and that is a ruling rather
+than a first draft.** The split was first drafted with `unresolved` **allowing**,
+on the sound ground just given that the case cannot be record corruption. Checked
+against the shipped hook, that would have flipped a `records=0` reading from
+`refuse` to `allow` — a real, mechanical edge of the "unconditionally" the
+authorization above records. **Ruled 2026-08-24 by the operator: keep the split
+for its diagnostic value and map `unresolved` to `decision=refuse`, so no edge of
+the secured refusal set narrows.** That is not a reversal of the 2026-08-24
+authorization; it is that authorization holding intact against a delta that would
+have narrowed it. The technical ground was not found wrong — the unconditional
+refusal was simply worth more than the one provably-empty reading it costs. The
+finding is recorded here and not only the disposition, because a later reader who
+re-derives the *cannot be corruption* proof will reach the drafted conclusion
+again and needs to find the ruling rather than the argument alone.
+
+**The cost that ruling keeps is stated rather than left to be discovered.** A
+worktree-isolated dispatch is still refused at turn end on a binary-absent
+reading, because `unresolved` refuses. That is a known and costed consequence of
+the ruling, not an oversight for a later session to loosen.
+
 **`records=0` is not a clause, and the resemblance to the refused option is
-disclosed.** The refused capped variant read "`verdict=red live=yes` carrying at
-least one record". The record count is not a condition here and is not imported
-as one: `check-producer-liveness` cannot return red over an empty set, so `red`
-already implies at least one record by the reader's own contract. That half of
-the refused option was vacuous, and nothing here adopts or needs it.
+disclosed at both places it arises.** The refused capped variant read
+"`verdict=red live=yes` carrying at least one record". The record count is not a
+condition here and is not imported as one: `check-producer-liveness` cannot return
+red over an empty set, so `red` already implies at least one record by the
+reader's own contract. That half of the refused option was vacuous, and nothing
+here adopts or needs it. The `corrupt`/`unresolved` split is the **second**
+coincidence, and it is disclosed on the same terms: there the count is not
+vacuous — exit 2 genuinely occurs at zero records — but it still decides no
+refusal, only which of two refusing names the reading gets. Record count decides
+no refusal anywhere in this hook, on either arm.
 
 **`unavailable` and `error` allow on the degradation posture, not on leniency.**
 Both mean the hook obtained no reading — the knob names no reader, or a configured
 reader failed. Refusing there would refuse every turn end in a tree that has not
-configured a reader, in a kit that ships this hook opt-in and inert. It is
+configured a reader, in a kit that ships this hook opt-in and inert. **This is
+where `unresolved` parts from them and the boundary is the reader's own contract,
+not a preference:** `unavailable` is a reader that never ran and `error` is one
+whose answer this hook does not map, while `unresolved` is a configured, readable
+reader that **ran and returned its own fail-closed verdict**. Taking that verdict
+is not refusing on an absent reading; second-guessing it would be the fail-open
+the reader's exit 2 exists against. It is
 guard-kit/SPEC.md §The guard framework's fail-open-but-loud posture for a
 deny-guard whose rule turns on an external reader, the same posture §The
 delegation model's dispatch guard already takes, and the `verdict=error` value in
@@ -1059,7 +1109,7 @@ through the front end its whole pre-flight roster already uses.
 timestamp:
 
 ```
-<UTC ISO-8601>  event=<hook_event_name|->  session=<session_id|->  live=<yes|no>  verdict=<green|red|corrupt|error|unavailable>  records=<n>  decision=<refuse|allow>  keys=<comma-separated top-level payload keys>
+<UTC ISO-8601>  event=<hook_event_name|->  session=<session_id|->  live=<yes|no>  verdict=<green|red|corrupt|unresolved|error|unavailable>  records=<n>  decision=<refuse|allow>  keys=<comma-separated top-level payload keys>
 ```
 
 Every field has a reader at a named transition, and no field is carried that this
@@ -1086,13 +1136,26 @@ list does not name one for:
   records under the scratch dir. Read together: `records=0` makes a `live=no`
   uninformative, while `records=2 live=no` says records existed and their
   producers had exited. `verdict=corrupt` carries `live=no` because the field is
-  two-valued — the pair is the reading, never `live` alone.
+  two-valued — the pair is the reading, never `live` alone. The pair is also what
+  **names** the exit-2 arm: the same reader exit reads `corrupt` at `records>0`
+  and `unresolved` at `records=0`, so a log line's `records` column is the only
+  place a later reader can see which of the two it was, and the two want
+  different fixes.
 - **`verdict=error`** — a **configured** reader that ran and did not answer: an
   unmapped exit code, or the `timeout` bound firing. Its named reader is the
   close-stage triage below, at the same transition, distinguishing *this tree
   never configured enforcement* (`unavailable`) from *this tree's enforcement is
-  broken* (`error`). Only the second is actionable, and before enforcement both
-  meant "no reading" and the distinction cost more than it bought.
+  broken* (`error`). Before enforcement both meant "no reading" and the
+  distinction cost more than it bought.
+- **`verdict=unresolved`** — the **third** state that triage tells apart, and the
+  second actionable one: a configured, readable reader that ran, exited 2, and
+  held no record to be about. It is what earns a third name rather than a fold
+  onto `unavailable`, because the fix is a different one — the reader could not
+  run at all, where `error` is a reader that ran and answered off-contract and
+  `unavailable` is a tree that never wired one. Its named reader is the same
+  close-stage triage at the same transition. Unlike the other two it also
+  **refuses**, so the triage reads it for a second question the others never
+  raise: whether a refusal was diagnostic rather than about a real producer.
 - **`decision`** — `refuse` exactly when the hook exits 2, `allow` otherwise, on
   every firing including the allowing ones. Its named reader is the **close-stage
   triage** at the close-surface drain, where the log is read and cleared, and it
@@ -1104,6 +1167,19 @@ list does not name one for:
   which is the defect §The probe is asymmetric spent a whole iteration recording
   about `live=no`. It cannot be derived from `live`: a `corrupt` refusal carries
   `live=no decision=refuse`.
+  **The honest limit on that countability, and it is a break in this contract
+  rather than a caveat on it: the named reader cannot see a worktree-isolated
+  agent's firings at all.** `DELEGATION_KIT_STOP_LOG` defaults under
+  `${GATE_SDK_WORKFLOW_DIR:-.workflow}`, resolved against the *writing session's*
+  cwd. An isolated agent's cwd is its own worktree, so its lines land in that
+  worktree's `.workflow/` and are destroyed with the worktree at reclamation —
+  and that is precisely the class `unresolved` names, so the field's claim that a
+  refusal is countable is true of **main-checkout firings only**. Not repaired
+  here, and the reason is a seam rather than appetite: pointing the knob at an
+  absolute main-checkout path would bake a machine path into a consumer surface,
+  and deriving the main checkout from inside a worktree is possible
+  vendor-neutrally (`git rev-parse --git-common-dir`) but is a mechanism no unit
+  has scoped. It is filed rather than flagged and skipped.
 - **`keys`** — the payload's top-level key set, nothing more. Read **once**, at
   the first firing, to settle what a `SubagentStop` payload carries without
   asserting anything about it in advance. **It returned against the advance
@@ -1135,16 +1211,42 @@ first output line is **not** carried verbatim: over `verdict`, `records` and
 `live` it adds only the blocking record paths, and a free-text field would break
 the space-delimited parse the grammar above is for.
 
-**The refusal message names the finding and both lawful exits**, as guard-kit
-requires of every block message. It states that a launch record under the scratch
-dir names a live producer (or, on the corrupt arm, that a record does not parse
-so no reading says whether one is live), that the turn may not end on it, and the
-two ways forward — the two rule 14 already names: **wait for the producer on its
-own artifact, in a loop that ends when the condition goes true, or delete the
-record once the producer has exited**. It names the reader command with the run
-directory so the session can see the record set for itself, and on the corrupt
-arm that is how it finds which record is malformed. It carries no session
-identity, because the hook has none to carry.
+**The glob is taken *after* the reader has run, and the order is load-bearing
+now that the count names an arm.** A record created between the two would, in the
+other order, produce `records=0` beside a reading that legitimately saw that
+record — the one window in which the discriminator could name a genuine corruption
+`unresolved`. Globbing after does not close the window (nothing but a lock could)
+but it inverts which way an in-flight record errs: a record appearing during the
+reader's run is *counted*, so the reading is named `corrupt` and the message
+points at a record that exists. The residual window is one malformed record's
+lifetime against a battery member that reds on the next commit, which is the bound
+the corrupt arm is already priced at above.
+
+**The refusal message names the finding and the lawful exits**, as guard-kit
+requires of every block message, and its branch is **three-way — one arm per
+refusing verdict, never two**. On `red` it states that a launch record under the
+scratch dir names a live producer; on `corrupt`, that a record does not parse so
+no reading says whether one is live; on `unresolved`, that the reader produced no
+reading at all and held no record to have been about. Each arm names the turn may
+not end on it, and each carries its own way forward. `red` and `corrupt` share
+the two rule 14 already names — **wait for the producer on its own artifact, in a
+loop that ends when the condition goes true, or delete the record once the
+producer has exited** — and `unresolved` takes neither, because there is no
+producer to wait for and no record to delete: what it names instead is the
+**reader** as the thing to fix, plus the isolated-dispatch limit
+(`templates/agent-execution.md`) and the lawful response to it, reporting the
+gate unavailable and returning. Every arm names the reader command with the run
+directory: on `red` to see the record set, on `corrupt` to find which record is
+malformed, on `unresolved` to read the reader's own reason for failing. It
+carries no session identity, because the hook has none to carry.
+
+**Folding `unresolved` onto the `corrupt` arm is the specific mistake this branch
+exists against.** A two-way branch would print "a launch record does not parse"
+over a case that holds **no record to parse** — a false diagnosis pointing at a
+remedy (find the malformed record) that cannot be carried out. That is the same
+message-axis conflation `scripts/gate-exec.sh` was repaired for one caller down
+(gate-sdk/SPEC.md §lib/gate.sh), and a refusal whose message names no reachable
+remedy is exactly what invites a read-only agent to invent a mutating one.
 
 **There is no knob, and unwiring the hook is the valve.** §The delegation model
 rules exactly this for the dispatch guard's D1 unconditional block: "the valve is
@@ -1268,16 +1370,24 @@ enforcement lands exactly on that seam. This kit's own
 `gate-tests/subagent-stop-liveness.test.sh` drives a **stub** reader per exit
 class — which is what lets it hold every verdict arm hermetically, and a stub is
 by construction not the configured one — and asserts the exit code per arm (2 on
-`red` and `corrupt`, 0 on `green`, `unavailable` and `error`), the `decision`
-column that goes with it, and a non-empty stderr on each refusing arm, because
-that stderr *is* the blocking reason. The consumer's own
+`red`, `corrupt` and `unresolved`, 0 on `green`, `unavailable` and `error`), the
+`decision` column that goes with it, and a non-empty stderr on each refusing arm,
+because that stderr *is* the blocking reason. Because `corrupt` and `unresolved`
+are **one reader exit read through two record counts**, the stub lane drives that
+exit twice — once over a run dir holding a record and once over an empty one —
+and asserts the message wording apart as well as the verdict, so a two-way branch
+regrown behind a three-way spec reds. The consumer's own
 `scripts/gate-tests/subagent-stop-reader.test.sh` fires this repo's hook copy
 against its own configured reader over a scratch run dir it constructs, asserting
-`green` and an allowed exit on an empty dir and `red`, `decision=refuse` and exit
-2 with a reason on a record naming a PID that is always alive; `unavailable` fails
-it by name. The gap between those two lanes is exactly where the dead default
-lived for a whole iteration under a green battery, so both lanes move together or
-the seam re-opens.
+`green` and an allowed exit on an empty dir, `red`, `decision=refuse` and exit 2
+with a reason on a record naming a PID that is always alive, and
+`unresolved decision=refuse` when the reader is real and resolvable but the
+binary it dispatches to is absent over an empty run dir — the isolated-dispatch
+shape, and the one arm that must **not** come back `unavailable`, which would
+misreport a wired reader as one that was never configured. `unavailable` fails
+that lane by name. The gap between those two lanes is exactly where the dead
+default lived for a whole iteration under a green battery, so both lanes move
+together or the seam re-opens.
 
 ### What `background_tasks` carries
 
