@@ -6,3 +6,4 @@
 
 turn-end-liveness-seam-and-worktree-cause scope a8ba5d47 2026-08-24 4c0d3bb4
 turn-end-liveness-seam-and-worktree-cause spec ac21eb02 2026-08-24 f2719a9e
+turn-end-liveness-seam-and-worktree-cause align ae70d518 2026-08-24 8850c5a6
