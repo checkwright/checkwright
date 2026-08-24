@@ -1007,7 +1007,16 @@ direction is stated so a later reader does not tighten it to equality: a wrapper
 whose program is reached only on a branch no fixture case takes would fail an
 equality test for being correctly declared, and the failure that matters is an
 **undeclared** spawn — over-count rather than lose, the direction criterion 7
-already fixes for an undeclared hold. Test **B** — no `Command` construction
+already fixes for an undeclared hold. **The reach of that guarantee is bounded by
+the fixture corpus, and the bound is stated rather than left to be discovered.** A
+case runs one argv, so it selects one mode; a member none of whose cases selects a
+mode that reaches a spawn is observed spawning **nothing**, and the subset
+assertion is vacuous over it — the undeclared spawn A exists to catch is caught
+only where a case reaches the branch that makes it. `check-graph` is the live
+instance (§gen-pre-commit), and it is the shape to look for: a member whose
+fixture pair is deliberately narrowed to one hermetic assertion. What holds such a
+member is whatever behavioural driver reaches the branch, which is a different
+oracle and not this one. Test **B** — no `Command` construction
 outside the crate's one sanctioned spawn wrapper — is what makes A trustworthy,
 and it is already enforced by `proc.rs`'s own unit tests rather than added here.
 A member whose registry entry omits the element fails to compile, on `--reads`'
@@ -7725,7 +7734,11 @@ the crate's shipped gate path — never the first in the crate, whose test-only
 spawn sites predate it — and it is one of several there now, but it stays the only
 one of its shape: criterion 7's class-(i) wrappers spawn a program because that
 program *is* the rule they assert, and this member spawns `bash` because a surface
-it reads structurally stays shell. **Ratified by the operator, 2026-08-21.**
+it reads structurally stays shell. The contrast is drawn from outside the
+criterion's two classes rather than inside them, and that matters — the class test
+is reached **only where the criterion raises a blocker**, which an on-floor program
+never does, so asking whether removing `bash` moves this gate's verdict (it does)
+sorts nothing. **Ratified by the operator, 2026-08-21.**
 
 **The residue's disposition, ruled at build 2026-08-24, on which the debt entry
 that carried it closes.** The spawn is **declared, and the declaration is what
@@ -7738,8 +7751,10 @@ under born-native exception class (a), costed and refused here for minting a gat
 name, a descriptor, a fixture pair and a SPEC section to relocate an assertion
 criterion 7 already sanctions in place — is **void** rather than merely unbought,
 because the operator retired class (a) on 2026-08-23 (§The port-candidate
-criteria) and the refutation recorded there is that argument's own. The two live
-alternatives are the two paragraphs below and the closure reopens neither.
+criteria) and the refutation recorded there is that argument's own. What stays
+live is the pair this section records as declined-for-now rather than refuted —
+moving `--emit` into the binary, and reopening the 2026-08-21 ratification — and
+this closure reopens neither.
 
 **What the declaration does not cover, stated because it is the residue's own
 edge.** `--needs` names *a program the member spawns* (§The `# graph:` manifest),
@@ -7750,9 +7765,22 @@ Criterion 7 is cleared either way, since all four are on the floor and its own
 clause rules that a spawn target's unportedness does not reach it; what the bound
 costs is that a change to the generator's requirement set surfaces in no
 declaration, and review at the diff is what stands in for one. The declared set
-is `bash` alone, measured rather than assumed: assertion D's two generator arms
-are the member's only spawns under every mode, the three narrow modes returning
-before the generator is reached at all.
+is `bash` alone, measured rather than assumed: assertion D's two generator arms —
+the second reached only where a `tier=commit-msg` member is registered — are the
+member's only spawns, the three narrow modes returning before the generator is
+resolved at all.
+
+**And the measurement is what the declaration rests on, because the executed
+oracle does not reach this member.** Unit test A observes a member over its own
+fixture cases, both of which pass `--amend-only` here, so the observed set is
+empty and the subset assertion is vacuous — the bound §The `# graph:` manifest
+states for the class, with this member as its instance. What holds the spawn is
+`check-graph-tree.test.sh`, which drives assertion D's both arms against a
+constructed mini-consumer through the real generator; that is a behavioural
+oracle and not the declaration's. So a spawn added to this member's rule reds
+nothing on the declaration side, and the narrowing above was taken from a spawn
+census over the gate's own resolved argv plus a read of every path reachable from
+its entry point, never from a green test.
 
 **The absent-`bash` branch was run rather than assumed, and it owes no wrapper
 refusal.** With that one name scrubbed off `PATH` the member exits **2** carrying

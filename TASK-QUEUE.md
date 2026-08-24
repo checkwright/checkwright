@@ -14,41 +14,6 @@
 
 ## Technical Debt
 
-- **graph-port-bash-spawn-residue** — the ported `check-graph` spawns `bash` from the binary, so the
-  crate's shipped gate path carries a non-git program; decide what owns that now the shell-gate
-  answer is void.
-  **The residue is exact.** `native/src/gates/graph.rs` runs `gate-sdk/bin/gen-pre-commit.sh` for
-  its `--emit` and `--emit-commit-msg` arms (assertions D and E), because the hook generator stayed
-  shell while the gate that reads its output ported. Criterion 7 sanctions the spawn — `bash` is on
-  `GATE_SDK_PROGRAM_FLOOR` — and the operator ratified the cost 2026-08-21, so this is residue and
-  not a rule break. It runs against TRAJECTORY.md §The objectives 1, 2 and 6.
-  **The claim is narrower than its filing said, verified against the crate.** Four other non-git
-  spawns exist — `bash` in `main.rs`, `walk.rs` twice and `evidence.rs`, `awk` in `ere.rs` — and
-  every one sits inside a `#[cfg(test)]` module. The honest claim is *first non-git spawn on the
-  shipped gate path*, never *first in the crate*.
-  **The designed answer is VOID, and that is what makes this debt rather than a feature.** It was a
-  new SHELL gate owning hook parity alone under born-native exception class (a) — the
-  audit-the-dispatch-relation argument, a compiled form having to compute both sides of the
-  comparison through the very binary under test. The operator retired class (a) on 2026-08-23
-  (TRAJECTORY.md §The closed rulings; gate-sdk/SPEC.md §The port-candidate criteria now reads
-  "(a) — RETIRED") and the refutation recorded there is this argument's own: the shell auditor
-  already trusts the binary's `--list`. Build's 2026-08-21 refusal — that the answer mints a gate
-  name, a descriptor, a fixture pair and a SPEC section to relocate an assertion criterion 7 already
-  sanctions in place — now has nothing left to refuse, and what survives mints no governed name.
-  **What this unit decides:** whether the spawn is declared under the spawned-program declaration
-  `shell-gate-tail-port` mints for every wrapper in this same unit set, or is retired outright by
-  porting the generator. The first is the convergent answer and is bounded by an amendment the
-  authoring stage writes; the second is gate-sdk/SPEC.md §gen-pre-commit's standing hold, named here
-  so a taker weighs it rather than meets it. On a host with no `bash` the spawn errors rather than
-  being absent, which is the branch a taker weighs rather than assumes.
-  **NOT merged with `config-bridge-resolution-cost` — lead-held boundary, 2026-08-23.** The ruling
-  that `battery-runner-port` does not own this spawn, only its cost falling, stands unchanged and is
-  not what this promotion admits.
-  Filed 2026-08-21 twice, by spec and again by build, into the gap inbox; drained and deferred at
-  `graph-port-and-config-seam`'s close; promoted to Technical Debt 2026-08-23 at
-  `shell-gate-tail-port-and-completion-oracle`'s scope, on the lead's ruling and after that scope's
-  premise re-verification found the designed answer void.
-
 ## Deferred
 
 - **turn-end-chokepoint-and-wait-primitive** [design-pending] — the blocking-hook variant,
@@ -7203,6 +7168,7 @@
 
 ## Done
 
+- graph-port-bash-spawn-residue
 - port-oracle-corpus-narrower-than-the-directive
 - shell-gate-tail-port
 - subagent-stop-payload-background-tasks-read
