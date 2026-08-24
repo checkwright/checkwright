@@ -7569,10 +7569,5 @@
 
 ## Done
 
-- graph-port-bash-spawn-residue
-- port-oracle-corpus-narrower-than-the-directive
-- shell-gate-tail-port
-- subagent-stop-payload-background-tasks-read
-
 ## Lessons Learned
 

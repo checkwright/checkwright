@@ -62,10 +62,9 @@ freshness gate prints its own command on red.
 New gates here are **born native** — a Rust module plus a `.gate` descriptor;
 shell needs a cause from the two live exception classes, stated in the gate's
 own SPEC section (gate-sdk/SPEC.md §The port-candidate criteria) — no gate is
-permanently shell (TRAJECTORY.md §The closed rulings, 2026-08-23). The port's
-remainder has **two** oracles and they answer different questions: `port-blockers.sh`'s
-registry arms speak for the battery, `--tree` for the project, and only the
-latter's owed count is the directive's completion predicate. Either
+permanently shell (TRAJECTORY.md §The closed rulings, 2026-08-23). `port-blockers.sh`
+has **two** oracles: its registry arms answer for the battery, `--tree` for the
+project, and only `--tree`'s owed count is the completion predicate. Either
 substrate ships with a `good/`+`bad/` fixture pair; the four contracts (output,
 fail-closed, fixture-pair, self-lint) are specified in
 [gate-sdk/SPEC.md](gate-sdk/SPEC.md) and enforced by the meta-gates — a red gate
@@ -153,9 +152,9 @@ load behind that trigger, so they are not resident here.
   ruling is closed, so escalate rather than reverse one, and retiring a spent
   ruling is not reversing it.
 - `docs/` is the public GitHub-Pages site (served from `docs/` on master via its
-  `CNAME`), repo-root-governed, no owning kit. Its chrome, page-authoring rules,
-  generated projections + regen commands, and docs gate roster live in the
-  load-triggered [docs/site-architecture.md](docs/site-architecture.md).
+  `CNAME`), repo-root-governed, no owning kit; its chrome, page-authoring rules,
+  generated projections and docs gate roster live in the load-triggered
+  [docs/site-architecture.md](docs/site-architecture.md).
 - `demo/run-demo.sh` is the runnable adoption walkthrough (vendor → clean pass →
   violation blocked → fix → green), the evidence-kit `demo` validate suite on the
   gate-sdk consumer-smoke mechanics, so a bit-rotted walkthrough is a red validate.
