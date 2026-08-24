@@ -105,9 +105,18 @@
   iteration alone to pay this commitment and its paired one, a yield recorded at
   `native-gate-port-remaining-corpus` and reversing nothing. The unstampable seventh measurement is
   the case `promotion-commitment-stamp-latency` now owns.
-  **The seventh measurement's narrowing is adopted in half, and the disclosure is the amendment's**
-  — the rule names the interpreter, and the stdin-heredoc shape is ruled out of subject on body
-  visibility: a `-c` or heredoc body IS the command string the prompt shows and the guard reads.
+  **The seventh measurement is adopted in FULL — the stdin shapes are IN subject.** Ruled by the
+  lead 2026-08-24 inside the envelope, correcting spec's first cut: body visibility is the right
+  discriminator, but "names a path operand under a scratch dir" was a PROXY for it and leaks.
+  The predicate is now body-not-present-in-the-command-string, scoped to a scratch source, so a
+  stdin redirect, a pipe and a command substitution all fire while `-c`, a heredoc and a
+  herestring do not. The measurement's diagnosis was the only wrong half: a stdin *redirect* does
+  carry the `.tmp/` path; only a *heredoc* carries none, because it carries the body instead.
+  **Probed, not reasoned:** 15 crafted payloads through the live hook at spec. Seven shapes leak
+  today, including ``python3 -c "`cat .tmp/x.py`"`` — `guard_rule_expansion` has no backtick
+  alternative, so it blocks the `$(…)` spelling and passes the archaic one, which is why the
+  substitution shape stays in subject rather than being ruled covered. `python3 tools/gen.py`
+  falls through and must keep doing so, which is what holds the scratch scope in place.
   **The four declines are SPENT, the ruling above having reversed them** — 2026-08-19 twice,
   2026-08-20 via the lead once the third recurrence put it past lead discretion, re-affirmed
   2026-08-22; all OPERATOR-class, and **no `recurrence:` date joins a decline**, a decline not

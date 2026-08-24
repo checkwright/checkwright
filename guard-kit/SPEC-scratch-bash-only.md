@@ -51,13 +51,14 @@ across the whole series) while the control's silent hole applies to every one.
 
 The consumer-only arm in `scripts/bash-guard.sh` matching `^bash[[:space:]]+\.tmp/`
 is **generalized into guard-kit's numbered ruleset** and deleted from the
-consumer copy. The new rule fires on a command whose leading binary is a script
-interpreter and whose operand names a path under a `GUARD_KIT_SCRATCH_DIRS`
-member, with two decisions. {design-bearing}
+consumer copy. The new rule fires on a command that invokes a script interpreter
+**on a body it takes from outside the command string**, where that body's source
+is a path under a `GUARD_KIT_SCRATCH_DIRS` member — delta 3 owns the predicate —
+with two decisions. {design-bearing}
 
 | arm | trigger | decision |
 | --- | --- | --- |
-| a | interpreter is `bash` or `sh` | block, naming `bin/scratch-run.sh` — today's steer, unchanged in effect |
+| a | interpreter is `bash` or `sh` | block, naming `bin/scratch-run.sh` — today's steer, widened from operand position to any body source |
 | b | interpreter is a `GUARD_KIT_SCRIPT_INTERPRETERS` member | block, naming the bash-only rule and the same runner |
 
 **Why generic rather than a wider consumer rule.** The rule's content is
@@ -83,32 +84,90 @@ in `guard_generic_rules` — is un-gated, which is the separate open entry
 `guard-ruleset-registration-lockstep`; this amendment satisfies the
 correspondence by hand and does not gate it.
 
-### (3) The subject is the **path** form, and the inline forms are ruled out with grounds
+### (3) The predicate is **where the body comes from**, not where the path sits
 
-The rule keys on the interpreter, as the entry's seventh measurement demanded,
-and requires an operand under a scratch directory. A body carried **in the
-command string** — `python3 -c '…'`, `python3 <<'PY' … PY`, `python3 - <<'PY'`
-— does not fire. {design-bearing}
+The rule fires when a script interpreter takes its program body from **outside
+the command string** and that body's source is under a scratch directory. A body
+carried **in** the command string — `python3 -c 'print(1)'`, `python3 <<'PY' …
+PY`, `python3 <<< 'print(1)'`, `printf 'print(1)' | python3` — does not fire.
+{design-bearing}
 
 **The discriminator is body visibility, and it is the same one that bought the
 runner its grant.** §scratch-run's whole argument is that a scratch path is
 "rewritable by any session", so the body the operator approved is not the body
 that runs; the runner's echo-at-execution is what restores the correspondence. A
-`-c` or heredoc body **is** the command string — the permission prompt shows it,
-the guard's own matcher reads it, and the friction log records it. There is
-nothing for a compensating control to compensate for, so a rule firing there
-would refuse a reviewable act in the name of reviewability.
+`-c`, heredoc or herestring body **is** the command string: the permission prompt
+shows the raw command to the approver, and the friction log records it verbatim.
+There is nothing for a compensating control to compensate for, so a rule firing
+there would refuse a reviewable act in the name of reviewability.
 
-**This narrows the entry's stated reach, and the narrowing is disclosed rather
-than smuggled.** The entry's seventh measurement concluded that "stdin carries no
-`.tmp/` path to match, so even the cheap third option misses it unless the rule
-names the INTERPRETER rather than the path". The interpreter-naming half is
-adopted in full. The implication that the stdin shape is therefore in the
-subject is not, on the ground above — and on a second one the measurement series
-does not separate out: the bulk of the counted stdin heredocs are `cat > <file>`
-writes, which execute nothing at all and belong to the write-form question
-`prompt-ranking-command-word-shape-blind` carries. A rule refusing those would be
-refusing file authorship under a scratch-execution heading.
+**What the argument may *not* claim, recorded because the obvious phrasing is
+wrong.** The guard's own matcher does **not** read those bodies.
+`scripts/bash-guard.sh` calls `guard_skeleton "$cmd" sq dq hd`, and those mode
+letters (`guard-kit/lib/guard.sh:112-123`) strip single-quoted spans,
+double-quoted spans **and heredoc bodies** before any rule sees the command. So
+the visibility that carries this ruling is the **approver's**, not the guard's —
+the raw string reaches the permission prompt and the log, and the skeleton the
+rules match on has the body cut out of it. Stated because a rule keyed on what
+the matcher can read would be keyed on the opposite of the truth.
+
+**Body source, not operand position — the proxy is dropped.** "Names a path
+operand under a scratch dir" is a *proxy* for "body invisible", and it leaks in
+one direction: a path operand always implies an invisible body, but an invisible
+body does not need a path operand. Every shape below the first executes an
+invisible scratch body with no operand of the interpreter, and each is squarely
+inside the entry's stated subject — a non-bash scratch script executing with no
+compensating control:
+
+| shape | body source | live verdict at authoring |
+| --- | --- | --- |
+| `python3 .tmp/x.py` | operand | falls through — the entry's originally probed defect |
+| `python3 - < .tmp/x.py` | stdin redirect | falls through |
+| `python3 < .tmp/x.py` | stdin redirect, no `-` | falls through |
+| `python3 /dev/stdin < .tmp/x.py` | stdin redirect via a device path | falls through |
+| `cat .tmp/x.py \| python3` | pipe producer's operand | falls through |
+| `python3 -c "$(cat .tmp/x.py)"` | command substitution | blocks, but see below |
+| ``python3 -c "`cat .tmp/x.py`"`` | command substitution, archaic spelling | **falls through** |
+
+Every row was **probed through the live consumer hook** with a crafted
+`PreToolUse` payload at authoring, not read off the source. So the trigger is:
+the body's source is a path under a `GUARD_KIT_SCRATCH_DIRS` member, wherever in
+the command that path appears — operand, redirect source, pipe producer's
+operand, or substitution operand.
+
+**The substitution shape stays in subject, and the probe is why.** It was worth
+asking whether rule 6 (expansion) already covers it, since double-covering would
+be waste. It does not cover it: rule 6's match is
+`\$\{|\$\(|<\(|\$[A-Za-z_]` (`lib/guard.sh:349`) and carries **no backtick
+alternative**, so the `$(…)` spelling blocks and the backtick spelling of the
+identical command falls through. A guard that blocks one spelling of a shape and
+passes the other teaches the spelling rather than the rule. Once the predicate is
+body-source-based the shape is covered in both spellings at no extra cost, with
+rule 6 merely pre-empting one of them by dispatch order — that is ordering, not
+duplication. Rule 6's own under-coverage is far wider than this unit and is filed
+to the gap inbox as its own candidate.
+
+**The scratch-directory scope survives the re-key, and one probe row is why.**
+`python3 tools/gen.py` falls through today and must keep falling through: it is a
+legitimate tracked tool, and its body is reviewable in the repo rather than
+rewritable by any session. Dropping the scope along with the proxy would fire on
+it. The scope is not the proxy — the proxy was operand *position*, and position
+is what this delta stops caring about.
+
+**Two honest limits, neither closed here.** A body drawn from outside the scratch
+dir (`python3 - < /elsewhere/x.py`) is out of scope by the paragraph above, and a
+body with no path at all (`curl … | python3`) is a wider hazard that has nothing
+to do with scratch execution. Both fall through, and a later reader should find
+that recorded rather than infer the rule is complete.
+
+**What this settles about the entry's seventh measurement.** It concluded that
+"stdin carries no `.tmp/` path to match, so even the cheap third option misses it
+unless the rule names the INTERPRETER rather than the path". Both halves are
+adopted: the rule names the interpreter, and the stdin shapes are in subject.
+What the measurement's phrasing got wrong is only the diagnosis — a stdin
+*redirect* does carry the `.tmp/` path; it is a **heredoc** that carries no path,
+and a heredoc carries its body instead, which is why it is the one stdin shape
+that stays out.
 
 ### (4) The interpreter roster is a knob, and the runner uses a shebang instead
 
@@ -144,13 +203,29 @@ policy at the line that implements it rather than inferring a default.
 `guard-tests/cases.tsv` gains a firing and a non-firing case per arm — the kit's
 standing rule that every generic rule owes both. {mechanical}
 
-The cases the arms are worth: `bash .tmp/x.sh` blocks (arm a) while
-`bash tools/x.sh` falls through; `python3 .tmp/x.py` blocks (arm b) while
-`python3 -c 'print(1)'` and `python3 - <<'PY'` fall through (delta 3's boundary,
-which is the arm most likely to regress silently); and a roster member invoked on
-a non-scratch path falls through. `bin/run-guard-tests.sh` drives
-`templates/bash-guard.sh`, and the rule is generic, so the table reaches it
-without a consumer-side lane.
+**The case set is delta 3's probe table, promoted from evidence into fixtures.**
+Every row was already run against the live hook at authoring, so the table states
+what each case must assert rather than guessing at a shape:
+
+- **Blocks, arm a:** `bash .tmp/x.sh` (today's steer) and `bash - < .tmp/x.sh`
+  (the widening delta 3 buys arm a as well as arm b).
+- **Blocks, arm b, one per body source:** `python3 .tmp/x.py` (operand),
+  `python3 - < .tmp/x.py` and `python3 < .tmp/x.py` (stdin redirect, with and
+  without the `-`), `cat .tmp/x.py | python3` (pipe), and the backtick
+  substitution — the row rule 6 does **not** reach, which makes it the one case
+  whose absence would leave a silently teachable spelling.
+- **Falls through, body in the command string:** `python3 -c 'print(1)'`,
+  `python3 - <<'PY'`, `python3 <<< 'print(1)'`, `printf 'print(1)' | python3`.
+  This is the boundary most likely to regress silently, so it carries the most
+  cases.
+- **Falls through, outside the scratch scope:** `python3 tools/gen.py`, the row
+  that keeps the re-key from reaching legitimate tracked tooling.
+
+The `$(…)` substitution spelling is deliberately **not** a case for this rule:
+rule 6 blocks it first, so a case here would pin another rule's verdict and would
+go green for the wrong reason the day rule 6 changed. `bin/run-guard-tests.sh`
+drives `templates/bash-guard.sh`, and the rule is generic, so the table reaches
+it without a consumer-side lane.
 
 `gate-tests/scratch-run.test.sh` gains the shebang refusal: a `.tmp` target whose
 first line names a non-bash interpreter exits 2 and is not executed. {mechanical}
@@ -270,10 +345,12 @@ value any reader wants.
       retired; nothing dangles. Specifically: no surface still describes the
       scratch steer as a consumer-only rule, and no rule number cited anywhere
       still points at the pre-renumber roster.
-- [ ] **Probe, not assert** — the closing check is the one the entry itself was
-      filed on: a `python3 .tmp/<script>.py` payload run against the live hook
-      must now block where it exited 0 at the 2026-08-13 close, and
-      `python3 -c` must still fall through.
+- [ ] **Probe, not assert** — delta 3's table is re-run against the **live hook**
+      with crafted payloads, not against the fixture lane alone. Every row marked
+      *falls through* there must block, the backtick substitution included;
+      `python3 -c`, the heredoc, the herestring and `python3 tools/gen.py` must
+      still fall through. The table is the closing check because it is how the
+      predicate was chosen.
 - [ ] **Gaps filed** — cross-component gaps discovered during the work filed as
       debt tasks (a build-time causal gap is resolved that session, not
       deferred).
