@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # spec: gate-sdk/SPEC.md §gen-pre-commit — emit <hooks-dir>/pre-commit from the per-gate graph: manifests; check-graph asserts the committed hook equals --emit
+# no-port: gate-sdk/SPEC.md §gen-pre-commit — the hook bakes resolved argv, resolving a knob means sourcing the owning kit's lib/*.sh, and §lib/gate.sh rules exactly one place a knob's value is computed, so a crate-side emitter would be the second producer criterion 6 refuses; structural rather than a sizing judgment, and ratified by the operator 2026-08-21.
 set -euo pipefail
 
 SDK="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

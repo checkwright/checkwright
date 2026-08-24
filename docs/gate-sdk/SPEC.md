@@ -875,6 +875,19 @@ reader exactly one hop. The refusal is recorded so a later author does not
 re-propose the half as an ergonomic, and the other hop has an oracle rather than
 discipline behind it: §check-gate-substrate-parity's assertion H.
 
+**A cause names the ruling it rests on, and that obligation is what the
+permanence reading costs.** §port-blockers rules that `# no-port:` declares the
+disposition **in force under the ruling that stands**, never an oracle about
+future rulings — which leaves the field weaker than its name suggests to a first
+reader and grows the cause's job to match. A cause that names its ruling lets a
+later reader find out whether that ruling still stands; a cause that names none
+leaves them nothing to check, and the field's own free-text payload is the only
+place that pointer can live. The kit still constrains nothing but non-emptiness —
+a cause is consumer content and nothing here parses one — so this is an authoring
+rule the declaring unit holds itself to rather than an assertion, which is the
+same disposition the free-text half already took when it declined the `# spec:`
+pointer a machine could open.
+
 **The slug's anti-rot is coarse, and the limit is stated rather than left to be
 discovered.** Where several held members point at one umbrella entry — an entry
 whose own text claims exactly that class of hold — every declaration reds at once
@@ -1587,6 +1600,40 @@ hardcoded top-level flag is reached by neither and receives nothing. A configure
 tool ported as a top-level flag therefore resolves platform defaults and silently
 ignores every consumer override — which is not a calibration between two workable
 shapes but the difference between working and appearing to.
+
+**`bin/port-blockers.sh` is a ruled future member of that table, and recording the
+route is not taking the port.** The tool reads the gates dir, the kit roots, the
+prune set `GATE_PRUNE_DIRS` / `GATE_SDK_PRUNE_EXTRA_DIRS` resolves and
+`GATE_SDK_PROGRAM_FLOOR`, so the forced-family test above settles its family with
+nothing left to calibrate — a top-level flag would resolve platform defaults and
+ignore every one of those overrides. The route follows from a rule already on the
+books, which is why it is recordable ahead of the unit that takes it; until that
+unit lands, the tool declares `# port-until:` against the live entry that owes the
+port (§port-blockers).
+
+**And the flag spelling is refused until then.** This section rules that a member
+owes a named caller; the closed-roster rule that a key or a field is minted *with*
+its reader or not at all applies to a flag spelling identically, and a spelling
+written into a SPEC ahead of its implementation is a reservation. The porting unit
+mints it. **That unit's caller is already known, and it is named here as a
+constraint rather than as an interface:** a consumer's measured-claim emitter reads
+the `--tree` trailer today by spawning `bash` (§port-blockers) and will read the arm
+instead, so the port that deletes the shell tool **must** land the emitter's
+call-site change in the same commit or the consumer's claim oracle exits 2. The
+failure lands at an adopter's battery rather than in the crate, which is why the
+constraint is recorded where the route is rather than left to be discovered.
+
+**Most of what that port needs is already in the crate**, which is the other half
+of why the route is recordable now. `registry.rs` owns the registry walk both
+registry arms run on; `walk.rs` owns the prune resolution **and the `--tree` corpus
+enumeration itself** — `tracked_shell_tree()` is already the compiled face of that
+corpus rule, tracked `*.sh` minus the `*.test.sh` suffix minus the pruned paths, and
+it is no stub built ahead of demand, §check-gate-exemption-tasks' tree arm having
+called it since that arm landed. What the port owes beyond them is narrower than a
+first read suggests: the header-block read — today a helper private to that gate's
+module, doing the identical shebang/comment/blank-line read this arm needs, so the
+choice is promoting it to a shared home or duplicating four lines rather than
+writing it fresh — and the three arms' trailers, which exist nowhere yet.
 
 **That is why the table is named for *bridged*, not for *emit*.** What its members
 share is not that each renders a document — `--emit-queue-index extent` answers
@@ -2729,9 +2776,15 @@ judgment call.
   stale one is §check-gate-binary-fresh's red — so the false green the class
   feared has an owner that is not the auditor's substrate. `check-crate-arms`,
   which was held beside this class on criteria 4 and 7, is retired with it
-  (criterion 7's passage above). **No `# no-port:` holder remains**, and the
-  field keeps its meaning for a cause a later amendment may state; the six
-  members these rulings held are owed to `shell-gate-tail-port`.
+  (criterion 7's passage above). **No `# no-port:` holder remains among the
+  registry's members**, and the six members these rulings held are owed to
+  `shell-gate-tail-port`. The field's live holders sit outside that registry: it
+  reaches any tracked script (§The `# graph:` manifest), and two of this tree's
+  plain scripts declare on it — the hook generator on criterion 6's
+  single-producer rule (§gen-pre-commit) and a consumer's measured-claim emitter
+  on a provenance ground (§port-blockers).
+  Scoping the sentence to the registry is what keeps it true of a corpus that has
+  since parted from the field's own.
 - **(b) The gate's subject is a platform the target roster does not cover.**
   Criterion 5 omits a `.gate` member on exactly the platforms `native/targets.list`
   carries no artifact for. A gate whose findings arise *on* those platforms would
@@ -2944,7 +2997,8 @@ held and excluded; 3 still owed, 0 takeable at this cut* — the owed count down
 two and the takeable tier empty, so every unported member again sits behind
 `cohort-held-members-port-prerequisites`. **The 2026-08-23 ruling then emptied
 both excluded tiers at once** — no `# no-port:` and no `# port-until:` holder
-remains — and the same command trailed *0 permanently shell and excluded, 0
+remains **in the registry this arm walks**, the tree corpus `--tree` walks being a
+different set that now carries three — and the same command trailed *0 permanently shell and excluded, 0
 temporarily held and excluded; 6 still owed, 6 takeable at this cut*, the six
 owed to `shell-gate-tail-port`. **That unit then took all six, and the arm's
 trailer reaches the floor**: re-run at its closing cut, the same command trails
@@ -7769,6 +7823,17 @@ is reached **only where the criterion raises a blocker**, which an on-floor prog
 never does, so asking whether removing `bash` moves this gate's verdict (it does)
 sorts nothing. **Ratified by the operator, 2026-08-21.**
 
+**And the ruling is now declared where the arm that counts it can read it.** This
+generator's header carries a `# no-port:` line whose cause is the paragraph above
+in one sentence — criterion 6's single-producer rule, and the 2026-08-21
+ratification — so §port-blockers' `--tree` arm reports it `no-port` rather than
+`owed`. Until it landed, the ruling existed and the instrument that measures the
+completion predicate could not see it, which is the exact misread the disposition
+column was built to prevent arriving through an empty declaration set. This is the
+**first tracked file in this tree** to take the *declares* branch of the
+substitution that arm's corpus rule turns on, so landing it is what turned that
+substitution from a worked example into a live one.
+
 **The residue's disposition, ruled at build 2026-08-24, on which the debt entry
 that carried it closes.** The spawn is **declared, and the declaration is what
 owns it**: this member's registry entry names `bash` in the requirement element
@@ -7851,6 +7916,17 @@ the four grounds against the hook shim — are refutations that stand. These two
 are open questions with a *timing* answer, so a later session may reopen either
 on its merits and must not read this section's silence as either a fresh idea or
 a settled no.
+
+**The `# no-port:` declaration above closes neither of them, and the two records
+do not collide.** The objection is the obvious one — the field's name says
+permanent and these two options are open on their merits — and it is answered at
+§port-blockers rather than here, because it generalises past this member: a cause
+declares the disposition **in force under the ruling that stands**, and if an open
+reopening path defeated a declaration the field would be undeclarable on any file
+whatsoever, every closed ruling in this tree being reopenable by the operator. So
+the header line is a reading of this section, not a fourth ruling in it. The day
+either option is taken, the unit that takes it edits that line along with
+everything else it moves.
 
 **The hook's shape is ruled rather than open.** The `--run` arm makes a
 two-line `exec <binary> --run --hook` shim look available; it is **refused**, and
@@ -8394,6 +8470,18 @@ mechanism instead. The bootstrap is permanently shell by a closed ruling, so it
 substitution is what makes the owed count reaching zero *be* the completion
 predicate rather than approximate it.
 
+**That substitution now has a live instance rather than only a worked example**,
+and until this tree's first three declarations landed it had none — the column
+counted correctly and **discriminated nothing**, a file refused by a ratified
+structural ruling, a file held behind named work and a file nobody had ever looked
+at all reading the same row. §gen-pre-commit's generator is the first tracked file
+in this tree to sit squarely in the declaring class; `bin/port-blockers.sh` is the
+first to sit in the held one; and a consumer's measured-claim emitter is the first
+refused on a provenance ground rather than a structural one. Recorded because a
+reader who finds three declarations and no history reasonably assumes the field had
+always been exercised, and the interval in which it was not is what the empty-set
+misread above is evidence from.
+
 **One row per file, and the columns are the ones a plain script can answer.**
 `lines=` is `wc -l` over the same path the row is read from, on the same terms the
 `--group` arm's own count is read and for the same reader. **No criterion column
@@ -8415,6 +8503,33 @@ is no fourth disposition, and *held* is separated from *no-port* for the reason
 permanent disposition, and folding the two silently falsifies the subtraction a
 reader would do.
 
+**A `# no-port:` cause asserts the disposition in force under the ruling that
+stands, never an oracle about future rulings.** The objection this answers is real
+and will arrive again in the same shape at every declaration: §gen-pre-commit
+records two options — moving `--emit` into the binary, and reopening its
+2026-08-21 ratification — as *declined for now rather than refuted*, so a field
+whose name says permanent reads as overstating a question open on its merits. It
+does not, and the reason generalises past that member. Every closed ruling in this
+tree is reopenable by the operator; that is what an escalate-rather-than-reverse
+rule is *for*. If an open reopening path defeated a `# no-port:`, the field would be
+undeclarable on **any** file whatsoever, and a field with no satisfiable declaration
+is a field that does not exist. The day a ruling is reopened and goes the other way,
+the declaration is edited by the unit that reopened it, exactly as every other
+consequence of a reversed ruling is. What the reading costs is stated at §The
+`# graph:` manifest rather than absorbed: the field is weaker than its name suggests
+to a first reader, so a cause names the ruling it rests on.
+
+**And `owed` is not widened to absorb that objection instead.** The rival reading —
+`owed` is correct for any file with an open port option, so the column means *no
+ruling has been taken here **and** no ruling could be reopened* — is unreachable for
+every file in the corpus, so it would retire the completion predicate rather than
+report it. The column means *no reviewable disposition has been declared here*, and
+nothing else. The remaining route, minting a queue entry for an operator-declined
+option so a `# port-until:` can name it, is refused on its own ground: it puts that
+option into the pickable set, which is a scope act taken by the wrong stage. Both
+refusals are recorded because each is the natural next proposal from a reader who
+has just met the paragraph above.
+
 **And read only from the file's own header block — the leading run of shebang,
 comment and blank lines.** This corpus contains scripts that *write* shell —
 smoke scripts, installers, template authors — and a line-anywhere scan cannot tell
@@ -8429,9 +8544,22 @@ which is why the rule is stated for the corpus and not for one reader.
 **The arm reads a corpus it is inside, and that is a property rather than a
 problem.** `bin/port-blockers.sh` and this repo's measured-claims emitter are both
 tracked non-test shell outside the prune set, so both appear in the arm's own
-output as ordinary rows. Nothing about the derivation is self-referential — the
-arm reads headers, not behaviour — but a reader finding the tool in its own report
-should find that recorded rather than wonder.
+output. Nothing about the derivation is self-referential — the arm reads headers,
+not behaviour, and a header the tool reads about itself is the same kind of fact as
+a header it reads about any other file — but a reader finding the tool in its own
+report should find that recorded rather than wonder.
+
+**The two rows are not the same row, which is the half a reader is likeliest to
+assume away.** They were ruled together and they parted. The tool is **held**,
+declaring `# port-until:` against the live entry that owes its port, because it is
+kit mechanism: it sits in a kit root, rides the installer payload with that root,
+and every adopter runs it, so *everything portable ports* reaches it with nothing to
+excuse it. The emitter is **refused**, declaring `# no-port:`, because it is not kit
+mechanism at all — it is the *value* of `CANON_KIT_MEASURED_CLAIMS_CMD`, it sits in
+a consumer directory the payload assembler never packs, and it carries that
+project's own claim vocabulary, so porting it would put one project's vocabulary
+into every adopter's binary. Held versus refused is therefore a reading of what
+each file **is**, not a judgment about how far along each one's port is.
 
 **Its consumer is a human session and nothing parses it**, exactly like the two
 arms beside it: the reader is a session asking whether the port is done, and the
@@ -8587,11 +8715,23 @@ it.** `gate-sdk/bin/port-blockers.sh` is tracked, non-test, outside the prune se
 itself as a row. The consequence is not cosmetic — **the completion predicate
 cannot reach zero while the instrument is still shell**, and unlike the battery
 runner and the install bootstrap, which the predicate disposes of by being owed and
-by declaring, the instrument has no stated disposition. A `bin/` tool takes no
-`.gate` descriptor, so its only port route is a non-gate arm of the binary (§The
-non-gate arm); until then its own row reads `owed` or carries a cause it writes
-about itself. Worth stating rather than discovering: the measurement is not a
-fixed point, and the arm's last act on being ported is to delete its own row.
+by declaring, the instrument had to have a disposition ruled **about itself**. It
+now has one. A `bin/` tool takes no `.gate` descriptor, so its only port route is a
+non-gate arm of the binary, and the family is forced rather than chosen: this tool
+needs the gates dir, the kit roots, the prune set and the program floor, so it is a
+**bridged-arm table member** or it is a tool that silently ignores every consumer
+override (§The non-gate arm, which owns the route and the refusal to mint the arm's
+flag spelling ahead of its caller). Until that port lands, the tool's own row reads
+`port-until:` against the live entry that owes it, so it counts as **named work
+rather than unexamined work** — which is the whole of what the declaration buys,
+since a held file is owed either way.
+
+**The reflexivity is real and it is not a problem.** When the port lands, the arm's
+shell implementation and the arm's own row leave the tree in the same commit: the
+measurement is not a fixed point and its last act is to remove itself from its own
+corpus. That is a property of a header read, not of a self-referential derivation —
+the arm's verdict about itself is computed the same way its verdict about any other
+file is, so there is no fixed point to converge on and nothing to iterate.
 
 ### check-shellcheck
 

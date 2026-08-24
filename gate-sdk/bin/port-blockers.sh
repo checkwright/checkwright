@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # spec: gate-sdk/SPEC.md §The port-candidate criteria — criterion 7's roster, derived from the tree at each invocation rather than stated anywhere; a literal roster cannot be correct for every consumer because a renderer/command knob is consumer config
 # spec: gate-sdk/SPEC.md §port-blockers — criterion 6's roster on the same tool and the same walk: the --group arm partitions the still-shell members by derived corpus derivation, so one tool is the derived roster for both criteria and neither is a maintained list
+# port-until: port-oracle-instrument-self-disposition
 # usage: port-blockers.sh [--group | --tree]
 #   Three exclusive arms over two corpora: the default arm answers criterion 7 and --group answers criterion 6, both over the gate registry and so both speaking for the battery alone; --tree answers the PRIORITY DIRECTIVE's completion predicate over the tracked shell tree, and its trailer's owed count reaching zero IS that predicate.
 #   Each arm's rows, trailer, corpus rules and readers are `--help` below and gate-sdk/SPEC.md §port-blockers; the two registry arms are advisory and parsed by nothing, while --tree's trailer is read by a consumer's measured-claim emitter and its grammar is therefore an interface.

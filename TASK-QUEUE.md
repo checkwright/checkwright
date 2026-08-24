@@ -12,56 +12,6 @@
 
 ## New Features
 
-- **port-oracle-instrument-self-disposition** [spec: SPEC-owed-column.md] — the
-  tool that measures the completion predicate has no disposition under the predicate it measures,
-  so the predicate cannot reach zero while its own instrument is still shell.
-  **Measured.** `gate-sdk/bin/port-blockers.sh` is tracked, non-test and outside the prune set, so
-  the `--tree` arm prints the tool ITSELF as owed — and so does `scripts/measured-claims.sh`, the
-  emitter that reads its trailer. The arm reports 153 owed, 0 declared no-port, with both files in
-  that column.
-  **Why it is a gap and not a curiosity.** The PRIORITY DIRECTIVE disposes of the battery runner
-  by leaving it owed and of the install bootstrap by letting it declare, and says nothing about
-  the tool that measures them. Recorded at gate-sdk/SPEC.md §port-blockers as a property rather
-  than ruled, because a `bin/` tool takes no `.gate` descriptor so its only port route is the
-  binary's non-gate arm, and when that lands is a queue question rather than a spec one.
-  **Deliverable — decide** whether `port-blockers.sh` and `measured-claims.sh` port to non-gate
-  arms as part of the tail, or declare a no-port cause about themselves, or are simply the last
-  two rows the predicate carries. **Price the reflexivity:** porting the arm removes the arm's
-  shell implementation and its own row in the same commit, so the measurement is not a fixed point
-  and its last act is to delete itself.
-  **DISTINCT from `native-gate-port-remaining-corpus`**, whose deliverable is a disposition on the
-  remaining corpus and its demotion rule; this asks what disposition the measuring instrument
-  itself takes under a predicate it is inside, which that entry can be ruled either way without
-  answering. **DISTINCT from `gen-pre-commit-tree-declaration-absent`**, which is a file whose
-  ruling already exists and is not being read; these two have no ruling at all.
-  **Cost while deferred:** low and legible — the completion predicate reads two short of zero
-  forever, and a reader who does not know why reads it as unfinished work.
-  **IN THIS ITERATION'S UNIT SET, operator-ruled 2026-08-24 through the lead**, as the spine of the
-  remainder decomposition `native-gate-port-remaining-corpus` has always said scope owns. Scope does
-  **not** promote it: the new-names litmus classes it a **feature**, because one of its three
-  branches ports `port-blockers.sh` and `measured-claims.sh` to non-gate arms and so mints two
-  governed subcommand names (gate-sdk/SPEC.md §The non-gate arm). The authoring stage writes the
-  amendment and promotes the entry with it, per the bidirectional rule.
-  **Ruled ONE design with `gen-pre-commit-tree-declaration-absent` rather than two**, and that
-  pairing is why neither is ruled here: both change what `--tree`'s owed column means, and fixing
-  half of that ahead of the amendment would scatter one design across two stages.
-  Filed 2026-08-24 to the gap inbox by build, and promoted 2026-08-24 at
-  `shell-gate-tail-port-and-completion-oracle`'s close, whose drain re-ran `--tree` and found both
-  files in the owed column.
-  **RULED AND PROMOTED 2026-08-24 at spec**, in `SPEC-owed-column.md`, which rules all three
-  dispositions as one design and parts the two instrument files. `gate-sdk/bin/port-blockers.sh` is
-  kit mechanism the payload ships, so it PORTS — as a bridged-arm table member, the family
-  gate-sdk/SPEC.md §The non-gate arm already forces for a tool that needs configuration at all —
-  and it declares `# port-until:` against THIS slug until that port lands.
-  `scripts/measured-claims.sh` is the value of `CANON_KIT_MEASURED_CLAIMS_CMD`, sits in a directory
-  `scripts/pack-installer.sh` never packs, and carries this repo's claim vocabulary, so it declares
-  `# no-port:`: porting it would put that vocabulary in every adopter's binary, which the
-  provenance seam refuses.
-  **The entry stays live and DEMOTES rather than moving to Done** at build — its deliverable is the
-  port, the amendment delivers the disposition increment, and a Done move would strand the
-  `# port-until:` declaration at a dead slug. The arm's flag spelling is deliberately NOT minted
-  yet: a spelling written ahead of its caller is the reservation the closed-roster rule refuses.
-
 - **agent-worktree-reclamation-unenforced** [spec: SPEC-worktree-residue.md] — the
   documented auto-clean for an unchanged read-only agent worktree does not fire, and nothing
   sweeps the residue.
@@ -131,53 +81,6 @@
 
 ## Technical Debt
 
-- **gen-pre-commit-tree-declaration-absent** — `gate-sdk/bin/gen-pre-commit.sh` has a closed
-  non-port ruling and no declaration, so the `--tree` arm counts it as unruled work.
-  **The arm's own rule is explicit** (gate-sdk/SPEC.md §port-blockers, the `--tree` section): "the
-  bootstrap is permanently shell by a closed ruling, so it DECLARES; the battery runner is simply
-  OWED until its port lands" — and that substitution is what makes owed-reaching-zero BE the
-  completion predicate rather than approximate it. `gen-pre-commit.sh` is the first tracked script
-  in this tree to sit squarely in the first class: gate-sdk/SPEC.md §gen-pre-commit rules that it
-  does not port and the cause is structural, criterion 6's single-producer rule refusing a second
-  place where a knob's value is computed. Yet the arm reports it `owed lines=297` among 153 owed,
-  0 declared no-port — the same column an unexamined script gets. Measured at this cut.
-  **The decision is not mechanical, which is why it is filed rather than taken.** `# no-port:`
-  asserts PERMANENT, and the same SPEC section records that moving `--emit` into the binary was
-  DECLINED FOR NOW by the operator on 2026-08-23 rather than refuted, so a permanent declaration
-  would overstate a ruling that is open on its merits. `# port-until: <slug>` needs a live queue
-  entry and there is none, and minting one for an operator-declined option would put that option
-  into the pickable set.
-  **Deliverable — rule which of three:** (a) declare `# no-port:` citing criterion 6, accepting
-  that the emit-arm option is about a DIFFERENT decomposition of the file rather than about this
-  one's portability; (b) mint the queue entry the emit-arm path would need and declare
-  `# port-until:` against it, which is a scope act; or (c) accept `owed` as correct on the ground
-  that a file with any open port option is owed, and state that reading at the `--tree` section so
-  the bootstrap/runner substitution is not read as covering this case.
-  **It moves a measured value either way:** `scripts/measured-claims.sh` emits the trailer's owed
-  count as `tree-shell-owed`, so a declaration makes it one lower and adds a no-port row.
-  **Cost while deferred:** low and legible — one row of the completion predicate reads as unruled
-  work when the ruling exists, which is a misreading the arm was built to prevent.
-  **IN THIS ITERATION'S UNIT SET, operator-ruled 2026-08-24 through the lead**, paired with
-  `port-oracle-instrument-self-disposition` as one design over `--tree`'s owed column.
-  **Class: debt** — none of the three options mints a governed name or lands a gate; `# no-port:`
-  and `# port-until:` are declared tags already. Scope did not promote it, and the reason was the
-  pairing rather than the class: canon-kit rules a debt task needing a design *ruling* design work
-  while that ruling is outstanding, and ruling this fork ahead of its twin's amendment would have
-  decided half a design in the wrong stage. The authoring stage has now ruled both and promoted
-  both.
-  **What re-verification at this scope confirmed:** `--tree` still reads 153 owed, 0 declared
-  no-port, with this file among them, so the row the entry describes is unchanged at HEAD.
-  Filed 2026-08-24 to the gap inbox by build, then promoted 2026-08-24 at
-  `shell-gate-tail-port-and-completion-oracle`'s close, whose drain re-ran `--tree` and found the
-  row unchanged.
-  **RULED (a) 2026-08-24 at spec**, in `SPEC-owed-column.md`, alongside its twin as one design over
-  `--tree`'s owed column: the file declares `# no-port:` citing criterion 6's single-producer rule
-  and the operator ratification of 2026-08-21. The permanence objection is answered rather than
-  conceded — a `# no-port:` cause asserts the disposition in force under the ruling that STANDS,
-  never an oracle about future rulings, else the field is undeclarable on any file at all, every
-  closed ruling being reopenable. Options (b) and (c) are refused with grounds in the amendment.
-  **Class confirmed debt** — the ruling mints no name; `# no-port:` is an already-declared field.
-
 ## Deferred
 
 - **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
@@ -203,10 +106,10 @@
   **The residue's three-way shape is SPENT, and both oracles were re-run at this boundary rather
   than cited.** The 2026-08-23 ruling retired the permanently-shell class outright; `--group` now
   reads 106 scanned, **0 owed and 0 takeable** (none permanent, none held — the battery is
-  finished) and `--tree` reads 153 scanned, 0 `no-port`, 0 held, **153 owed**. Only `--tree`'s
-  count is the completion predicate: `--group`'s clean zero is a finished battery and not a
-  finished port, and `measured-claims.sh`'s `ported-gate-members` answers neither, walking a
-  registry.
+  finished) and `--tree` read 153/0/0/**153 owed**, superseded 2026-08-24 when
+  `port-oracle-instrument-self-disposition` landed the first three declarations: it now reads
+  153/2/1/**150**. Re-run it, never cite. Only `--tree` is the predicate; `--group`'s zero is a
+  finished battery not a finished port; `ported-gate-members`, a registry walk, answers neither.
   **Cost while deferred:** large and known — the **owed** remainder (the trailer's own arm,
   never the unported count) plus the runners and the install-lifecycle layer; since the
   2026-08-14 born-native default (TRAJECTORY.md §The closed rulings) a gate landed meanwhile no
@@ -229,6 +132,44 @@
   is permanently shell; the sequence is `battery-runner-port`, `shell-gate-tail-port`, then the
   bootstrap — the first two LANDED, and the bootstrap is now ONE member,
   `powershell-installer-surface`, `install-step-relocation` having retired as mooted.
+
+- **port-oracle-instrument-self-disposition** [design-pending] — the tool that measures
+  the completion predicate is still shell; its disposition is ruled and declared, and its PORT
+  is what remains.
+  **The disposition increment LANDED 2026-08-24** in the port-remainder iteration, merged into
+  gate-sdk/SPEC.md §port-blockers, §The non-gate arm, §gen-pre-commit and §The
+  `# graph:` manifest. `gate-sdk/bin/port-blockers.sh` declares `# port-until:` against THIS slug;
+  `scripts/measured-claims.sh` — the value of `CANON_KIT_MEASURED_CLAIMS_CMD`, in a directory
+  `pack-installer.sh` never packs — declares `# no-port:` on the provenance seam instead, which is
+  where the two instrument files parted. `--tree` moved 153/0/0/153 to 153/2/1/150 with the hook
+  regenerated behind it. The entry DEMOTED rather than moving to Done because a Done move would
+  strand that declaration at a dead slug and red `check-gate-exemption-tasks`.
+  **Deliverable — the port itself:** `port-blockers.sh` becomes a **bridged-arm table member** of
+  the non-gate arm class, the family gate-sdk/SPEC.md §The non-gate arm already forces for a tool
+  reading the gates dir, the kit roots, the prune set and the program floor. Route ruled, port
+  unbought.
+  **Why [design-pending]:** the arm's flag spelling is deliberately UNMINTED — a spelling written
+  ahead of its caller is the reservation the closed-roster rule refuses — so the porting unit mints
+  it WITH its reader, which is an amendment's act rather than a mechanical one.
+  **Two constraints the porting unit inherits rather than discovers**, both recorded at §The
+  non-gate arm. (i) `measured-claims.sh` reads the `--tree` trailer by spawning `bash` today and
+  must move to the arm IN THE SAME COMMIT, or the consumer's claim oracle exits 2. (ii) Most of the
+  substrate exists: `registry.rs` owns the registry walk, `walk.rs` owns the prune resolution AND
+  the `--tree` corpus enumeration (`tracked_shell_tree()`, already called by
+  `check-gate-exemption-tasks`), and the header-block read is a private helper in that gate's
+  module — so the port owes a promote-or-duplicate choice plus the three arms' trailers.
+  **The reflexivity is priced and is not a problem:** the arm's shell implementation and the arm's
+  own row leave the tree in the same commit, so the measurement is not a fixed point and its last
+  act is to remove itself from its own corpus. The arm reads headers, not behaviour, so there is no
+  fixed point to converge on.
+  **DISTINCT from `native-gate-port-remaining-corpus`**, whose deliverable is the remaining corpus
+  and its demotion rule; this is one named file with a route already ruled.
+  **Cost while deferred:** low and legible — the tool stays shell, so the port is not complete
+  however the owed column reads, and `--tree`'s held tier carries exactly this one row. The
+  declaration already bought the legibility half: the row reads as named work, not unexamined work.
+  Filed 2026-08-24 by build to the gap inbox, promoted at
+  `shell-gate-tail-port-and-completion-oracle`'s close, ruled at spec in `SPEC-owed-column.md`,
+  and demoted 2026-08-24 by build once the disposition increment had landed.
 
 - **validate-suite-wall-clock-unowned** [design-pending] — the validate run is about seventeen
   minutes and no entry owns the sixteen of them that are not the gate battery.
@@ -7829,6 +7770,7 @@
 ## Done
 
 - install-step-relocation
+- gen-pre-commit-tree-declaration-absent
 
 ## Lessons Learned
 

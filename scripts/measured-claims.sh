@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # spec: canon-kit/SPEC.md §check-measured-claim — this repo's measured-claim oracle: one <key><TAB><value> line per fact a governed sentence is allowed to state, recomputed off the tree so the sentence that cites it cannot go stale silently. A value is a cardinal or an extent, since the sentences that most need an oracle carry no number. A key joins here before a marker names it; a marker naming a key absent from this roster fails the gate closed.
+# no-port: CLAUDE.md §The provenance seam (never cross it), ruled for these keys in this knob's own comment at scripts/canon-config.sh — this file is not kit mechanism but the VALUE of CANON_KIT_MEASURED_CLAIMS_CMD, scripts/ rides no installer payload (pack-installer.sh assembles from the kit roots alone), and its keys are this repo's claim vocabulary, so porting it into native/ would ship that vocabulary in every adopter's binary.
 set -uo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
