@@ -2422,10 +2422,11 @@ that answers each is the one whose corpus matches its question.
      root and not the linter. **The third, `check-crate-arms`, is the first with
      more than one program, and it is what shows the class rule is about the
      *program*, not about the member**: `cargo` gets a refusal arm and `rustc` gets
-     none, because the shell form refuses on one and reads the other for a cache key
-     it never tests for emptiness. A wrapper's declared set and its refusal set are
+     none, because the member refuses without one and merely degrades without the
+     other, whose absence contributes an empty field to a cache key nothing tests.
+     A wrapper's declared set and its refusal set are
      therefore two different sets — the declared set is what unit test A observes,
-     the refusal set is what the shell form actually refused on — and the parity run
+     the refusal set is what the member actually refuses on — and the parity run
      that separates them is the constructed scenario run **per program and for the
      set** (§Fail-closed contract). Its third ordering: the corpus-presence branch
      precedes the program probe, so a tree with no crate is clean with no cargo
@@ -2555,8 +2556,8 @@ that answers each is the one whose corpus matches its question.
    reached **102 of 106 members scanned**: the roster was blind over more than 96%
    of the corpus it walks, which is what the arm was sequenced against and what
    building it repaired. With `--needs` consumed at the default arm's per-member
-   row the same cut reported **1**, the one remaining being
-   `check-gate-substrate-parity`'s own unresolvable `$BIN`; **that member's port
+   row the same cut reported **1**, the one member whose
+   command-position expansion the tokenizer could not resolve; **that member's port
    drove it to 0**, by deleting the spawn rather than by answering it. The count is
    the share of the corpus the report cannot speak for, and it is now a bound on
    the report rather than an artifact of the port. A zero here is not a claim that
@@ -8653,8 +8654,8 @@ shape `GATE_PRUNE_DIRS` and `GATE_EXEC_GLOBS` already have, for the reason
 §lib/gate.sh states: a default written at a use site is invisible to the config
 bridge's `declare -p`, and a consumer that never sets this knob would meet the
 bridge's undeclared-knob refusal on the member's first post-port run. The
-resolution splits on whitespace and does **not** pathname-expand, which the
-inline `for d in $KNOB` it replaces did; that narrowing is shared by every knob
+resolution splits on whitespace and does **not** pathname-expand, unlike the
+inline shell form it replaces; that narrowing is shared by every knob
 already on this pattern and is deliberate, a directory set being named rather
 than globbed. It exists because the kit-root predicate (§lib/gate.sh) is what
 puts a directory in scope, so a shipped script under no kit root — a consumer's
@@ -9971,15 +9972,14 @@ undeclared program is exactly what that direction is for.
 **`rustc` is read for the cache key and nothing else, so its absence is not a
 refusal** — stated because the natural reading of "declares two programs" is that
 each gets a refusal arm, and building one here would be a behaviour change wearing
-parity's clothes. The shell form composes
-`"$stamp $(rustc --version 2>/dev/null) $(cargo --version 2>/dev/null)"`, discards
-that program's stderr and never tests the substitution's emptiness: an absent
-`rustc` contributes an empty field, which is a cache **miss** against any key
-written while it was present, so the arms re-run and cargo reports whatever a
-toolchain missing its compiler reports. The compiled form does the same. Only
+parity's clothes. The key is composed from each program's version output with its
+stderr discarded and its emptiness untested, so an absent `rustc` contributes an
+empty field, which is a cache **miss** against any key
+written while it was present: the arms re-run and cargo reports whatever a
+toolchain missing its compiler reports. Only
 `cargo` has a refusal arm, and it fires **after** the crate-presence branch — a
 tree with no crate is clean whether or not cargo is installed, which is the
-per-member probe point §Fail-closed contract says to read off the shell form's own
+per-member probe point §Fail-closed contract says to read off the member's own
 ordering rather than inherit from a sibling wrapper.
 
 **Both arms still run when the first fails**, which the port had to be written for
@@ -11761,14 +11761,12 @@ byte including exit codes. Unlike §check-shellcheck's arm the probe file carrie
 no bound: this member's corpus is `*.yml`/`*.yaml`, so a restored `.sh` sits
 outside the corpus it probes and the comparison is over the committed tree.
 
-**Two arms retired on port, both unreachable by construction.** The `fail_closed`
-wrapper around the awk extraction is gone with awk itself — the compiled
-extractor is a function that returns its refusal rather than a child whose exit
-status has to be graded. The `fail_closed` wrapper around the walk is replaced by
-the walker's own error text, the shape §check-action-pinning's port already took;
-what the two shared was a message naming a *shell helper* and its exit status,
-and no shell helper remains to name. The refusals themselves survive: an
-unreadable corpus is still exit 2.
+**Two refusal-messaging arms are retired by the port, both unreachable by
+construction.** Each existed only to grade a child process and name it in a
+message with its exit status. The compiled extractor returns its own refusal and
+the walker carries its own error text, the shape §check-action-pinning's port
+already took, and there is no child left to name. The refusals themselves
+survive: an unreadable corpus is still exit 2.
 
 **One deliberate difference, asserted rather than normalised away**, in the shape
 §The first cohort's sort-order note set: the shell walked its corpus in `find(1)`

@@ -1617,13 +1617,12 @@ canon-kit's own smoke** — named as the only oracle available, not offered as a
 equivalent one.
 
 **It is not a wrapper, and that is a measured verdict rather than a reading of
-its text.** The shell form spawned `awk` twice, `sort`, `grep`, `basename`,
-`dirname` and — through `spec_canonical_specs` — `find` and `cat`, every one of
-them on `GATE_SDK_PROGRAM_FLOOR`. None survives the port: the two awk programs
-are in-process scans and the canonical-spec walk is `spec::canonical_specs`,
-already compiled for the `spec_manifest_files` cohort. The compiled form spawns
-**nothing**, so its declared requirement set is empty rather than floor-filtered
-to empty.
+its text.** Every program the pre-port form reached for was on
+`GATE_SDK_PROGRAM_FLOOR`, so none of them was ever a requirement to declare, and
+none survives the port either: the text scans run in process and the
+canonical-spec walk is `spec::canonical_specs`, already compiled for the
+`spec_manifest_files` cohort. The compiled form spawns **nothing**, so its
+declared requirement set is empty rather than floor-filtered to empty.
 
 **Two awk semantics are reproduced rather than tidied, and both are narrower
 than a reader expects.** The comment stripper is `<!--[^>]*-->`, so a comment
@@ -1648,11 +1647,10 @@ absent-glossary and the no-configured-surface refusals. **The arm carries no
 bound**: this member's corpus is markdown, so the restored `.sh` probe sits
 outside the corpus it probes.
 
-**One narrowing is asserted rather than normalised away.** The shell form drove
-every surface through `awk` and refused on its non-zero exit; the compiled form
-has no child, so an unreadable surface refuses on the read that replaced it —
-same exit 2, its own text, and no reproduction of gawk's own diagnostic, which
-was never reproducible on either substrate.
+**One narrowing is asserted rather than normalised away.** An unreadable surface
+still refuses at exit 2, and the *text* of that refusal is the gate's own rather
+than a child's, because the compiled form has no child to quote. No third-party
+diagnostic is reproduced, and none was reproducible on either substrate.
 
 ### check-comment-tier
 
