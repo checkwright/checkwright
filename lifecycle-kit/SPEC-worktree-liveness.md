@@ -116,6 +116,18 @@ hand for four paths. A path reported clean **and** commitless is the case where
 removal is lossless by construction, which is what a session needs told rather
 than re-derived.
 
+**This retires a generic disclaimer rather than adding beside it.** The refusal
+today already carries a second help line — that the harness's auto-clean of a
+read-only child's worktree is best-effort, so residue is "expected rather than
+evidence the child wrote," and that a session should run `git status --porcelain`
+inside the worktree by hand to tell a stray write from an unfired reclamation.
+That line exists to answer exactly the question the dirty/unreachable-commits
+report above now answers mechanically, for every class, at the moment of
+refusal. Keeping both would leave two lines telling a session two ways to learn
+the same fact — the residue this delta exists to remove, applied to its own
+refusal text — so the generic line is retired and the per-class report is its
+replacement, not its neighbour.
+
 ### (3) An orphaned worktree is surfaced mid-iteration, advisory, closing the entry's honest limit
 
 The worktree read runs at **every** stage entry rather than at the iteration
@@ -198,12 +210,14 @@ transitions that produced none, delta 4 sets a knob. Each affected reader's
 **red condition** is enumerated anyway, because the point-5 rule is about the
 argument being made rather than about the author's confidence in it:
 
-- `lifecycle-kit/gate-tests/enter-stage.test.sh` — reds when an entry's exit
-  code, written state or emitted text differs from the asserted one. **Not
-  monotone** (it asserts exact text on the refusal path), and it is the one
-  reader this amendment must move: the boundary-refusal case's expected text
-  changes under delta 2, and new cases are owed for each class and for the
-  empty-knob default.
+- `lifecycle-kit/gate-tests/boundary-worktree-refusal.test.sh` — the sandboxed
+  end-to-end fixture over this exact refusal, named here rather than as
+  `enter-stage.test.sh` because no file of that name exists in the tree; this is
+  the one reader this amendment must move. Reds when an entry's exit code,
+  written state or emitted text differs from the asserted one. **Not monotone**
+  (it asserts exact text on the refusal path): the boundary-refusal case's
+  expected text changes under delta 2, and new cases are owed for each class and
+  for the empty-knob default.
 - `check-stage-entry` — reds on its three assertions (predecessor stamp,
   drain-entry queue-empty, audit trigger). **Monotone and cleared by
   inspection**: no delta touches a stamp, a queue section or an amendment
@@ -270,8 +284,9 @@ argument being made rather than about the author's confidence in it:
 - [ ] **Gaps filed** — cross-component gaps discovered during the work filed as
       debt tasks (a build-time causal gap is resolved that session, not
       deferred).
-- [ ] **Fixture pair moved with the text** — `enter-stage.test.sh` carries a
-      case per class plus the empty-knob default, per the narrowing analysis.
+- [ ] **Fixture pair moved with the text** —
+      `boundary-worktree-refusal.test.sh` carries a case per class plus the
+      empty-knob default, per the narrowing analysis.
 - [ ] **Re-derived, not cited** — the lock-reason format and the start-time
       equality re-probed against a live dispatch at build, not carried from this
       file.

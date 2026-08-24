@@ -194,12 +194,17 @@ delta 3, a dispatching supervisor at delta 4.
 Delta 4 narrows an asserted claim's scope and delta 2 adds a refusal, so each
 reader's **red condition** is enumerated rather than its subject:
 
-- `lifecycle-kit/gate-tests/enter-stage.test.sh` — reds when an entry's exit
-  code, written state or emitted text differs from the asserted one. **Not
-  monotone** (exact exits and exact text), and it is the reader this amendment
-  must move: every existing case entering a non-first stage now runs with
-  `REQUIRE=0` by default and is unaffected, but new cases are owed for
-  `REQUIRE=1` with the journal present, absent, and present-but-empty.
+- `enter-stage.sh`'s sandboxed end-to-end fixture family
+  (`lifecycle-kit/gate-tests/boundary-*.test.sh` — no file named
+  `enter-stage.test.sh` exists; the tree's convention is one topic-named file per
+  behaviour, e.g. `boundary-scratch-wipe.test.sh`,
+  `boundary-worktree-refusal.test.sh`) — reds when an entry's exit code, written
+  state or emitted text differs from the asserted one. **Not monotone** (exact
+  exits and exact text). This delta's assertion is new rather than a move: every
+  existing case entering a non-first stage runs with `REQUIRE=0` by default and
+  is unaffected, and a new topic file (naming the predecessor-journal assertion,
+  matching the family's convention) is owed with cases for `REQUIRE=1` against
+  the journal present, absent, and present-but-empty.
 - `check-stage-evidence` — reds on stamp grammar or name-axis disagreement.
   **Monotone and cleared by inspection**: a refused entry writes no stamp, so
   the file this gate reads is untouched on the refusing path and unchanged on
