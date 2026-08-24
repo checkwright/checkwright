@@ -65,6 +65,38 @@ sole="$(GUARD_KIT_SETTINGS="$sb/.claude/settings.json" \
 assert_has  sole-clean 'clean' "$sole"
 assert_has  sole-worklist 'npm test' "$sole"
 
+# The write-shape axis, on a log of its own so the three-way-split fixture above
+# keeps its own count. A row is asserted anchored at end-of-line: 'cat >' is a
+# prefix of 'cat >>', so an unanchored match would pass on the wrong row.
+assert_row() { grep -qE -- "  $2\$" <<<"$3" || { echo "FAIL [$1]: expected row: $2"; fails=$((fails + 1)); }; }
+
+shapeLOG="$sb/shape.log"
+{
+    echo 'cat > .tmp/a.md <<EOF'        # create redirect: keys as 'cat >'
+    echo 'cat >> .tmp/b.md <<EOF'       # append redirect: keys as 'cat >>'
+    echo 'make build 2>&1'              # fd-dup is not a redirect to a file: no suffix
+    echo 'mkdir -p .tmp && cat > .tmp/c.md'  # the ONLY redirect is in a later segment
+} > "$shapeLOG"
+shape="$(GUARD_KIT_SETTINGS="$sb/.claude/settings.json" \
+         GUARD_KIT_SETTINGS_LOCAL="$sb/.claude/settings.local.json" \
+         bash "$SCAN" "$shapeLOG")"
+assert_row shape-create 'cat >'  "$shape"
+assert_row shape-append 'cat >>' "$shape"
+assert_row shape-fd-dup 'make'   "$shape"
+# Delta 2's guard against mis-attribution: the word and the suffix come from the
+# same segment, so a compound whose write lives downstream keys as 'mkdir', never
+# 'mkdir >' — a write attributed to a command that performs none.
+assert_row     shape-first-segment 'mkdir' "$shape"
+assert_absent  shape-no-misattribution 'mkdir >' "$shape"
+
+# --count over the same log: four keys across four calls. The occurrence total is
+# what the axis never moves — splitting a key raises the numerator alone, which is
+# the definitional step the KPI row records.
+shape_count="$(GUARD_KIT_SETTINGS="$sb/.claude/settings.json" \
+               GUARD_KIT_SETTINGS_LOCAL="$sb/.claude/settings.local.json" \
+               GUARD_KIT_LOG="$shapeLOG" bash "$SCAN" --count)"
+[[ "$shape_count" == "4/4" ]] || { echo "FAIL [shape-count]: expected 4/4, got '$shape_count'"; fails=$((fails + 1)); }
+
 [[ "$fails" -eq 0 ]] || { echo "scan-prompts.test: $fails assertion(s) failed"; exit 1; }
-echo "scan-prompts.test: clean (overlay-only grants stay off the headline and in the promote-or-prune section; a split-and-refused compound counts as a true prompt)"
+echo "scan-prompts.test: clean (overlay-only grants stay off the headline and in the promote-or-prune section; a split-and-refused compound counts as a true prompt; the write-shape suffix splits create from append, skips an fd-dup, and never attributes a downstream write to the leading word)"
 exit 0

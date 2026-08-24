@@ -1116,7 +1116,8 @@ The friction log's fall-throughs split three ways:
   harness built-in. Silently granted, reinforced; off every list.
 - **Prompting** — some segment nothing grants. The headline `<n> prompting
   call(s)`, grouped and ranked by pattern (leading binary, plus subcommand for
-  the common multi-command binaries), triaged at close by the criterion above.
+  the common multi-command binaries, plus the **write-shape suffix** below),
+  triaged at close by the criterion above.
 - **Overlay-covered** — granted, but at least one segment relies on the
   uncommitted `GUARD_KIT_SETTINGS_LOCAL` overlay. It *did not prompt*, so it is
   excluded from the headline (the count is a true prompt count, not an upper
@@ -1124,11 +1125,91 @@ The friction log's fall-throughs split three ways:
   see — so it is ranked in a **separate, visibly-advisory section** below the
   headline, never mixed into it.
 
+**The write-shape suffix, and why a bare command word was reporting the wrong
+thing.** The key appends the segment's **write-redirect operator** when it
+carries one, so `cat > <file> <<'EOF'` ranks as `cat >` and `cat >> <file>
+<<'EOF'` ranks as `cat >>`, while a redirect-free segment keys exactly as it did
+before. The operator is normalized to two values, `>` and `>>`: which descriptor
+is redirected is dropped (`2> f` keys the same as `> f`), because the axis the
+row has to carry is *this segment writes a file*, and create-versus-append is the
+finest distinction any reader of the ranking has wanted. A descriptor-dup
+(`2>&1`) is not a redirect to a file and does not qualify. The resulting shape is
+one the ranking already had — `git status` and `python3 -` are two-token keys
+today — so the suffix introduces no new output shape, only a new source for the
+second token. A write redirect standing where a subcommand would is re-homed into
+the suffix rather than doubled into both tokens; a **read** redirect is not this
+axis's subject and keys where it always did.
+
+**The word and the suffix come from the same segment, and without that the
+change would be worse than the defect.** Both are read off the **first segment**
+of the logged line, split with `guard_split_compound` from a `guard_skeleton`
+view. The word alone would be unchanged by this — the first token of the whole
+line is the first token of its first segment — but pulling a redirect from
+*anywhere* in the line would key `mkdir -p .tmp && cat > x` as `mkdir >` and
+attribute a write to a command that performs none. Reading both from one segment
+makes the key internally consistent by construction. *Which* segment should be
+keyed when the friction-bearing one is not the first is a separate axis — which
+segment, not which shape — and is not settled here.
+
+**No parser is minted for the redirect**, and the composition is stated because
+the obvious spelling is the wrong one. The detection reuses
+`_guard_redirect_pairs`, the operator-and-target scan rule 17 already performs,
+and excludes an fd-dup by rule 17's own target test. It deliberately does **not**
+reach for `_guard_redirect_targets` to do that exclusion: that helper drops an
+fd-dup target only as an accident of its target class, which is the very reason
+`_guard_redirect_pairs` exists, so resting the fd-dup rule on it would rest it on
+an accident. These are `_`-prefixed internal helpers rather than the documented
+`guard_*` surface, called from a `bin/` tool inside the same kit — a kit-internal
+call that widens no consumer contract.
+
+**What the top row actually is, recorded because the entry that bought this
+change predicted otherwise.** A read-shaped `cat <file>` cannot appear in the log
+at all: rule 10 blocks it and `guard_block` exits 2 before `guard_log_fallthrough`
+runs. Measured on the live log at the landing: of 43 `cat`-led lines, 33 were
+`cat >>`, 5 `cat >`, and the 5 remaining bare rows were **all** pipe-reads
+(`cat <file> | <consumer>`, one of them fd-dup-decorated) — composition, which is
+exactly what rule 10 deliberately does not block. So the row was never an
+answered steer and an unowned write sharing a key: it was the unowned write
+alone, wearing the word that names the answered steer. That is also the change's
+checkable post-condition — after it, a bare `cat` row is a **real finding**
+(a pipe-read or a multi-file read), not noise.
+
+**`cat` is the only word this bites today, and the measurement that bounds it is
+recorded with it.** Decomposed across the same live ranking: `awk` and `grep`
+were reads throughout, `python3 -` was inline heredoc execution and already
+two-token, `git` is already subcommand-keyed so its reads and writes already
+occupied separate rows, and `sed` was absent because rule 8 blocks its read and
+in-place forms upstream of the log. `echo`/`printf`'s near-absence is only
+*partly* structural, and the boundary is stated rather than overclaimed: rule 17
+matches the `>>` arm only and, on a match, `guard_allow` exits the hook directly,
+so an **append** through a roster emitter can never reach the log under any key —
+a structural guarantee. A **create** redirect (`echo foo > .tmp/x`) matches no
+auto-allow rule, falls through like any other command, and keys as `echo >` the
+day one is run. The honest reading is that the axis is **general and currently
+near-single-instance**, and a later reader deciding whether to extend or retire
+it needs to know the bite was measured rather than assumed.
+
 `--count` emits the compact `<patterns>/<occurrences>` prompting token for a
 drift-KPI consumer (overlay-covered excluded, so the KPI reads true); an
 explicit file argument overrides the log path (test capability). Its behavior
-— the three-way split, the per-segment matching, the true count — is pinned by
-`gate-tests/scan-prompts.test.sh`.
+— the three-way split, the per-segment matching, the true count, and the
+write-shape suffix's create/append/fd-dup/first-segment cases — is pinned by
+`gate-tests/scan-prompts.test.sh`. What that test pins is the split, the count
+semantics and those four cases; the key's granularity beyond them is not a
+contract, which is why an additive suffix leaves its substring assertions true.
+
+**The KPI's numerator steps at the landing commit, for a definitional reason.**
+Splitting one key into two raises `<patterns>` while leaving `<occurrences>`
+unchanged, so `drift-kit/kpis/kpi-prompt-friction.sh` reads a discontinuity that
+is not behavioral. The `^[0-9]+/[0-9]+$` contract it asserts is unbroken, so
+nothing reds — which is exactly what makes the step silent and worth stating. The
+pre-change reading, so a later trend read can attribute the step rather than
+re-derive it: **38 patterns across 173 prompting calls**, which the same log read
+as **44 patterns across the same 173 calls** immediately after. The KPI is **not**
+changed to compensate: a key change that makes the metric finer is the metric
+getting better, and rebasing it to hide the step would trade a legible one-time
+discontinuity for a permanent lie about granularity. drift-kit reads *trend, not
+level* and carries no annotation affordance, so this sentence is the annotation.
 
 ## compare-settings-allow
 

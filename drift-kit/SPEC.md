@@ -152,7 +152,13 @@ The generic set — each coupled to a kit-governed surface, each degrading to
   inside the session. With no baseline (a standalone run, a fresh clone) both
   rows degrade to `n/a (no iteration baseline)`.
 - **kpi-prompt-friction** — distinct/total prompting calls via guard-kit's
-  `scan-prompts.sh --count`; `n/a` when guard-kit or its log is absent.
+  `scan-prompts.sh --count`; `n/a` when guard-kit or its log is absent. Its
+  numerator is a **key count**, so a change to how that tool keys a row steps
+  this trend without any behavior moving, and the `^[0-9]+/[0-9]+$` contract
+  stays satisfied throughout — nothing reds, which is what makes such a step
+  silent. A trend reader meeting one looks for the definitional cause before the
+  behavioral one; guard-kit/SPEC.md §scan-prompts owns the key and records each
+  step with its pre-change reading.
 - **kpi-always-loaded** — the standing per-session surface: level and
   since-baseline delta via context-kit's `always-loaded.sh` meter.
 - **kpi-settings-local** — entry count of the untracked local permission

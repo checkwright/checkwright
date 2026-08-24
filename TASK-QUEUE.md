@@ -12,41 +12,6 @@
 
 ## New Features
 
-- **prompt-ranking-command-word-shape-blind** [spec: SPEC-friction-key-shape.md] — the friction
-  ranking prints a bare command word, so an answered read steer and an unowned write form share
-  one row.
-  **Re-measured at this intake on the live log, not carried from the filing:**
-  `.workflow/prompt-friction.log` holds 14 `cat` occurrences of which **13 are heredoc writes**
-  (8 `cat >>`, 5 `cat >`) and effectively none is a `cat <file>` read. The filing close measured
-  the same shape at scale — 133 calls, 80 `cat >>` plus 37 `cat >` against roughly 16 reads. Two
-  independent corpora, one shape.
-  **Why the row misleads rather than merely being coarse.** The read half is answered:
-  `scripts/bash-guard.sh` steers `cat <file>` to the Read tool and that steer fires correctly —
-  it fired on this very session's first read. So the ranking's top row shows the *solved* half and
-  hides the unsolved one inside it, and three consecutive closes have triaged the pattern under the
-  read-steer heading for exactly that reason.
-  **The write half has no steer, no grant and no owner.** The mandated alternatives —
-  `guard-kit/bin/scratch-run.sh` for execution, `git commit -F` for a message — govern what happens
-  to a file **after** it exists and say nothing about creating one, so a session authoring a scratch
-  script or a commit message pays an out-of-band decision every time.
-  **The two-deliverable fork is RULED, spec 2026-08-24: this unit is the INSTRUMENT.** The write
-  form's own disposition is filed to the gap inbox as its own candidate, because two of its three
-  shapes are unreachable from a stage session — a grant is a settings edit and so operator-class,
-  a stated habit is no mechanism — and the third, a steer, is a wide behavioral change unrelated
-  to the instrument being wrong. **And the premise is CORRECTED**: the read half cannot be in the
-  row at all, since `guard_rule_cat_file` blocks it before `guard_log_fallthrough` runs. Measured
-  at spec on the live 157-line log: of 19 `cat`-led lines, 14 are `cat >>`, 5 are `cat >`, none is
-  a read. The row is the unowned write ALONE, wearing the word that names the answered steer.
-  **DISTINCT from `guard-read-steer-tool-coverage`** and not a re-file of it: that entry is awk
-  having no read-steer where cat and sed have one, all three on the READ side. **DISTINCT from
-  `scan-prompts-blocking-half-blind`**, whose axis is which verdicts the scan sees, and from the
-  iceboxed `scan-prompts-truncation-quote-desync`, a per-line truncation defect.
-  **Cost while deferred:** the tree's one friction instrument reports its heaviest row wrong, so
-  every triage reading it spends judgment re-deriving the decomposition and can still land on the
-  answered half — three closes did.
-  Filed 2026-08-24 to the gap inbox by `shell-gate-tail-port-and-completion-oracle`'s close;
-  promoted 2026-08-24 at this iteration's scope intake, re-measured on a fresh corpus above.
-
 ## Technical Debt
 
 ## Deferred
@@ -7582,6 +7547,7 @@
 
 - turn-end-chokepoint-and-wait-primitive
 - scratch-execution-control-is-bash-only
+- prompt-ranking-command-word-shape-blind
 
 ## Lessons Learned
 

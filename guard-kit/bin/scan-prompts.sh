@@ -81,17 +81,40 @@ allowed() {
     return 0
 }
 
+# spec: guard-kit/SPEC.md §scan-prompts — the key's write-shape suffix: the segment's own write-redirect operator normalized to > or >>, the descriptor dropped and an fd-dup excluded on rule 17's own test, since an fd-dup is not a redirect to a file
+redirect_op_of() {
+    local pair op tgt
+    while IFS= read -r pair; do
+        [[ -z "$pair" ]] && continue
+        pair="${pair#"${pair%%[!0-9]*}"}"
+        if [[ "$pair" == '>>'* ]]; then op='>>'; tgt="${pair#>>}"; else op='>'; tgt="${pair#>}"; fi
+        tgt="${tgt#"${tgt%%[![:space:]]*}"}"
+        case "$tgt" in '&'* | '') continue ;; esac
+        printf '%s' "$op"
+        return 0
+    done < <(_guard_redirect_pairs "$1")
+    return 0
+}
+
+# spec: guard-kit/SPEC.md §scan-prompts — the ranking key: leading binary, plus subcommand for the common multi-command binaries, plus the write-shape suffix; word and suffix both come from the FIRST segment, so a key can never attribute a write to a command that performs none
 pattern_of() {
-    local c t1 t2 rest
-    c="$(strip_prefix "$1")"
+    local c t1 t2 rest key op skel
+    skel="$(guard_skeleton "$1" sq dq hd)"
+    c="$(strip_prefix "$(guard_split_compound "$skel" | head -1)")"
+    c="${c#"${c%%[![:space:]]*}"}"
     t1="${c%%[[:space:]]*}"
     rest="${c#"$t1"}"; rest="${rest#"${rest%%[![:space:]]*}"}"
     t2="${rest%%[[:space:]]*}"
+    # spec: guard-kit/SPEC.md §scan-prompts — a write redirect in subcommand position is re-homed into the suffix below, never doubled into both tokens; a read redirect is not the suffix's subject and is left exactly where it keys today
+    case "$t2" in '>'* | '&>'* | [0-9]'>'*) t2='' ;; esac
     case "$t1" in
         git | gh | cargo | docker | npm | bun | yarn | pnpm | bash | sh | kubectl | python | python3)
-            if [[ -n "$t2" ]]; then printf '%s %s' "$t1" "$t2"; else printf '%s' "$t1"; fi ;;
-        *) printf '%s' "$t1" ;;
+            if [[ -n "$t2" ]]; then key="$t1 $t2"; else key="$t1"; fi ;;
+        *) key="$t1" ;;
     esac
+    op="$(redirect_op_of "$c")"
+    [[ -n "$op" ]] && key="$key $op"
+    printf '%s' "$key"
 }
 
 declare -A counts local_counts
