@@ -74,9 +74,27 @@ the would-be refusal rather than taking it.
   is not asserted. It has no stamp, so the cursor cannot name it, and inventing a
   second roster to reach it would be a surface this unit did not scope.
 
-**Default `0`, and this repo sets `1`.** An unconfigured consumer sees no change,
-which is what keeps the delta additive for every vendoring tree while making the
-contract live in the tree that filed the defect.
+**Default `0`.** An unconfigured consumer sees no change, which is what keeps the
+delta additive for every vendoring tree.
+
+**RULED 2026-08-24 by the iteration lead, and recorded here because the acting
+session is build and build is not imminent: this repo's knob stays `0` for this
+iteration, and the switch is thrown at the NEXT SCOPE ENTRY.** Build lands the
+kit mechanism and leaves `scripts/lifecycle-config.sh` unset; it does not set
+`1`. The ruling is lead-class rather than operator-class because it is
+sequencing, and it is written to this surface rather than left in a message
+because a message thread is transport and never a store — build reads the ruling
+here and needs to ask no one.
+
+The ground, and it is the reason the obvious "make it live where it was filed"
+is wrong: `REQUIRE=1` asserts against the **predecessor** stage, so throwing the
+switch mid-iteration lands it underneath validate and close — both dispatched
+before the rule existed — and puts the first enforced entry *inside* a stage
+rather than at a boundary. At a boundary a refusal costs a stage re-entry; inside
+an iteration, against a session that has already ended and cannot be asked to fix
+anything, it costs a wedge. Delta 3's escape exists precisely so that wedge is
+recoverable, and a rule whose first live firing needs its own escape has been
+scheduled badly rather than designed badly.
 
 ### (3) The refusal's escape is the honest record, and the honest limit is stated with it
 

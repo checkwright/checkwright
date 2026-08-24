@@ -49,6 +49,18 @@ also already establishes the count clause is **vacuous for `red`** (red implies 
 record by the reader's contract); it is not vacuous for exit 2, and that
 asymmetry is the whole content of this delta.
 
+**TRIPWIRE, set by the iteration lead 2026-08-24 and written here because the
+session it binds is the one reading this file.** *Adjacent to a refused option*
+is exactly the shape that reads as derivable when it is not. The claim above is
+that the narrowing removes **no** refusal the operator's ruling secured. If the
+audit stage — or any later session — finds that the record-count precondition
+narrows the refusal set at **even one edge**, that is reversing a recorded
+operator ruling, and it **escalates to the lead for relay**. It is not resolved
+by whoever finds it, however good the grounds and however obvious the repair:
+the strength of the finding is not a reason to skip the escalation, it is the
+reason the escalation exists. Stated as a live condition on this delta, not as
+doubt about the reading.
+
 **Why a new verdict value rather than folding onto `unavailable`.** The three
 non-answering states now take different actions, and a name that merged two of
 them would cost the close-stage triage the distinction it was given `error` for

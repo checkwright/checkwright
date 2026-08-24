@@ -45,12 +45,24 @@
   one mid-iteration.
   **The finding, operator-directed 2026-08-18.** Four worktrees survived an iteration's close,
   registered in `git worktree list` and invisible to every gate.
-  **Its stated blocker is DISCHARGED, and that is why it was authorable.** The entry held that
-  a worktree has no liveness signal and that inventing one was the design work. The upstream
-  experiment `worktree-reclamation-cause-falsification` ran at spec and found the signal already
-  published by git, so nothing is invented and the reap is designable against a mechanism. The
-  experiment's result, the classification it makes possible and the seam ruling that keeps one
-  harness's vocabulary out of the kit are in the amendment.
+  **Its stated blocker is DISCHARGED, and the discharge is written out here so no later reader
+  re-buys the experiment.** The entry held that a worktree has no liveness signal, that *is
+  anyone still working in this one* was unanswerable, and that inventing the signal was the
+  design work. All three are false. `git worktree list --porcelain` already prints a `locked`
+  line per worktree whose reason names the holding process's **pid** and its **start time** — a
+  liveness record STRICTLY RICHER than the `pid=<n> run=<key>` grammar evidence-kit already
+  reads, which carries no start-time reuse guard at all. The start field was checked equal to
+  that process's own stat entry rather than assumed decorative. So nothing is invented, the
+  predicate is one this project already owns, and the reap is designable against a mechanism.
+  **The hypothesis being false is the smaller half of the result; what replaced it is the
+  point.** Reclamation is not tied to the dispatching session's lifetime — it fired at the
+  child's own normal return with the parent alive — and the survivor class the 2026-08-18 probe
+  could not account for now has a cause: a LOCKED worktree is refused by `git worktree prune`
+  and by `git worktree remove` without `--force`, so a harness dying before its cleanup step
+  strands one that is clean, commitless AND unreclaimable. Ground (ii)'s "the survivor set is
+  selected, not random" was right and the selector is the LOCK, not dirtiness.
+  The classification this makes possible, and the seam ruling that keeps one harness's lock
+  vocabulary out of the kit as consumer config, are in the amendment.
   **The cheap half was TAKEN 2026-08-24** — `agent-worktree-reclamation-unenforced` landed the
   boundary refusal, which surfaces the paths and leaves removal a session act. What is left is
   removal and the mid-iteration surfacing.
@@ -89,11 +101,24 @@
 - **delegation-provenance-floor** [spec: SPEC-provenance-floor.md] — a dispatching session can
   narrate findings from a subagent whose output it never received, and nothing reds.
   recurrence: delegation-provenance-floor 2026-08-18 2026-08-19
-  **Four attested instances, every one self-caught, and they are not all one shape.** Three are
+  **FIVE attested instances, every one self-caught, and they are not all one shape.** Three are
   a dispatcher relaying a return that never arrived — the fabrication sitting in the dispatcher's
   own REASONING rather than in quoted child text, so a floor checking relayed output alone misses
   it. The fourth is an invented IDENTIFIER: a fabricated short hash written into the survey
   record to make a dated census look precise.
+  **The FIFTH, 2026-08-24 at this iteration's spec, and it is the first instance where the floor
+  HELD.** A worktree-isolated sweep returned a message claiming an audit roster "from my earlier
+  turns". That roster was not in the return the dispatcher received — the return carried one
+  paragraph about an environment defect and nothing else. It was not narrated, not relayed
+  onward, and not used: every update target in all five of this iteration's amendments was
+  derived first-hand instead. The same return also carried a claim the dispatcher could not
+  verify — that the child had built the native binary to escape a refusal loop — and it is
+  carried at that tier wherever it appears rather than promoted to a finding; what WAS verified
+  is that the main checkout's binary mtime was unchanged and `git status` stayed clean.
+  **Two attested instances from two CONSECUTIVE stage sessions of one iteration is the strongest
+  evidence this unit will have**, and the pair is what makes the class structural rather than
+  anecdotal: scope's was a mint, spec's was a relay, and the discipline that caught the second is
+  exactly the doctrine line this unit is about to write down.
   **The failure leaves no signature in the text**, which makes it a gap rather than a lapse: the
   prose reads identically whether the return was held or invented.
   **Distinct from its two neighbours:** `dispatch-cited-evidence-unverified` is a sweep's
@@ -113,8 +138,7 @@
   and it defeats normal trust rather than merely being wrong — a relayed finding is the signal a
   reader uses to decide a claim has already been checked.
   Filed 2026-08-13 by close, draining the gap inbox on operator direction to file, not promote;
-  promoted to a feature 2026-08-24 at spec, which added a fifth instance from its own dispatch
-  and recorded it as one where the floor worked.
+  promoted to a feature 2026-08-24 at spec, which added the fifth instance from its own dispatch.
 
 - **stage-journal-contract-unoracled** [spec: SPEC-stage-journal.md] — a granted resume journal
   that is never written is indistinguishable from a session that had nothing to say, so the
@@ -156,30 +180,46 @@
   construction — which is what the paragraph says. Declaring a blocker tag would assert a blocker
   that does not exist, and rephrasing past-tense would falsify an unrun experiment, so the valve
   is the only one of the gate's four remedies that is true here.
-  **The hypothesis, unrun.** Reclamation may be tied to the DISPATCHING session's lifetime
-  rather than the child's, so a parent that ends abnormally strands the child's worktree. Cheap
-  to falsify: dispatch an isolated read-only agent, end the parent abnormally, read what stays
-  registered.
-  **SEQUENCED FIRST inside this iteration, and the ordering is the reason it was taken.** It is
-  UPSTREAM of `agent-worktree-boundary-disposition`, whose second refusal ground is this same
-  hypothesis written as an unverified candidate, and it is upstream of the seam question inside
+  **RUN 2026-08-24 AT SPEC, AND THE HYPOTHESIS IS FALSIFIED. The deliverable is discharged; do
+  not re-buy it.** The hypothesis was that reclamation is tied to the DISPATCHING session's
+  lifetime, so a parent ending abnormally strands the child's worktree. A worktree-isolated agent
+  was dispatched and `git worktree list --porcelain` polled throughout: the worktree, its branch
+  ref and its `.git/worktrees/<name>` admin dir were ALL removed at the child's own normal
+  return, with the dispatching session alive and mid-turn. Reclamation is child-completion-tied,
+  not parent-lifetime-tied.
+  **THE CAUSE, which is what the entry was actually filed to buy.** While a child runs, the
+  worktree is held by a git LOCK whose reason string names the holding process's **pid** and its
+  **start time** — verified equal to that process's own stat entry, so it is a real PID-reuse
+  guard rather than decoration, and strictly richer than the `pid=<n> run=<key>` grammar
+  evidence-kit already reads. Reclamation is the harness releasing that lock and removing the
+  worktree at the child's return. A locked worktree is refused by `git worktree prune` and by
+  `git worktree remove` without `--force`, so a harness dying before its cleanup step strands one
+  that is clean, commitless AND unreclaimable — which is exactly the four survivors the
+  2026-08-18 probe measured and could not explain.
+  **SEQUENCED FIRST inside this iteration, and the ordering is the reason it was taken.** It was
+  UPSTREAM of `agent-worktree-boundary-disposition`, whose second refusal ground was this same
+  hypothesis written as an unverified candidate, and upstream of the seam question inside
   `turn-end-liveness-exit-two-conflation`'s third disposition. Both read its answer, so the
-  experiment runs before either amendment is authored rather than at build — a spec session
-  authoring against an unrun hypothesis would be designing against the guess this entry exists
-  to retire.
+  experiment ran before either amendment was authored rather than at build — a spec session
+  authoring against an unrun hypothesis would have been designing against the guess this entry
+  existed to retire. Both amendments are authored against the result above.
   **DISTINCT from `agent-worktree-reclamation-unenforced`, which a prior iteration completed.**
   That unit bought the residue's DECLARATION, its UNREACHABILITY to the two index walkers, and
   a per-iteration BOUND at the boundary refusal — every delta hypothesis-independent by
   construction, which is why it landed without the cause and why this is not a re-filing of it.
   This buys the cause: none of those deltas needed it and none of them establishes it.
-  **What the answer buys:** it separates a dispatch-protocol fix from a sweep. If reclamation
-  is parent-lifetime-tied the fix is in how a dispatch ends; if it is not, the fix is a reaper
-  — different owners, different seams, and nothing today says which.
+  **What the answer bought, and it is NEITHER of the two the question offered.** The fork was a
+  dispatch-protocol fix if reclamation were parent-lifetime-tied, a sweep if not. It is not
+  parent-lifetime-tied, so the fix is a reaper — and the reaper is now designable against a
+  published mechanism rather than against a guess, which is a strictly better answer than the
+  sweep the fork's second horn imagined.
   **Class:** it runs an experiment and mints no name and no gate, so the litmus makes it debt;
   what it produces is the input two sibling amendments are blocked on.
   Filed 2026-08-24 to the gap inbox by spec with an explicit distinct declaration; drained
   2026-08-24 at close, which verified the completed sibling in `## Done` and found the upstream
-  relation the filing did not name; promoted 2026-08-24 at the next scope on an operator ruling.
+  relation the filing did not name; promoted 2026-08-24 at the next scope on an operator ruling;
+  its experiment run and its finding recorded above 2026-08-24 at spec, which is where the
+  sequencing put it. The terminal move belongs to a later stage, not to the session that ran it.
 
 - **no-port-cause-class-generalization** — one file's `# no-port:` cause is true of a whole
   `scripts/` class, and declaring the class moves the completion predicate by roughly a sixth.
