@@ -1,1 +1,25 @@
 # contract: evidence-manifest v1
+shell-gate-tail-port-and-completion-oracle gates sha256=b5cce6576c55b69e2dcbc8a054449375802f106fa1a4a01d0ebda352bd55e39a pass=106 fail=0 ignore=0 verdict=clean 2026-08-24
+shell-gate-tail-port-and-completion-oracle gate_sdk sha256=18f97d208af9a317d22c58c12390a5c319f2cc0e9aa17cba778edc64cc5344fd pass=1 fail=0 ignore=0 verdict=clean 2026-08-24
+shell-gate-tail-port-and-completion-oracle canon_kit sha256=9d3cf3ab0a1425a5996fd26152019ba03a3e0f5fa5ad31aa0e4a19901b8acb5a pass=1 fail=0 ignore=0 verdict=clean 2026-08-24
+shell-gate-tail-port-and-completion-oracle context_kit sha256=65e7536ec8b920506d9defb5f2fd338be716ee72482acf2e4819ca5b3fcbe891 pass=1 fail=0 ignore=0 verdict=clean 2026-08-24
+shell-gate-tail-port-and-completion-oracle delegation_kit sha256=ccc527d5f87226b0de67d84cc9e56417838a2295033aaf6dd1e16d699926131d pass=1 fail=0 ignore=0 verdict=clean 2026-08-24
+shell-gate-tail-port-and-completion-oracle doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-08-24
+shell-gate-tail-port-and-completion-oracle evidence_kit sha256=a65e3e3b8e54c0d98a440fe3a2748c31b51d8850b5c0be10d8fcf5316febd55f pass=1 fail=0 ignore=0 verdict=clean 2026-08-24
+shell-gate-tail-port-and-completion-oracle guard_kit sha256=234e06ba5cdb4ca383be7191965292443198471675d1b3166d8c264175420ae4 pass=1 fail=0 ignore=0 verdict=clean 2026-08-24
+shell-gate-tail-port-and-completion-oracle lifecycle_kit sha256=246f07a9d7e12fa9535108c073077518b3cc8bdd64a4014d5c8327c1d8101c95 pass=1 fail=0 ignore=0 verdict=clean 2026-08-24
+shell-gate-tail-port-and-completion-oracle queue_kit sha256=bd337719dfff15f492ae94d8e8662663a8917b65edd4b3bfcfdd20f1790ba39b pass=1 fail=0 ignore=0 verdict=clean 2026-08-24
+shell-gate-tail-port-and-completion-oracle site_kit sha256=07f7139ea31865677de58ea44b43f7c98ae6c40c8f3fe57e8975e8d65794be35 pass=1 fail=0 ignore=0 verdict=clean 2026-08-24
+shell-gate-tail-port-and-completion-oracle scripts sha256=f302eab3cefcc19e12fac91459be10fb1b4c8f02dd63cef5ad040f4deb8dc259 pass=1 fail=0 ignore=0 verdict=clean 2026-08-24
+shell-gate-tail-port-and-completion-oracle guard_tests sha256=8b85026db6389b32629537a903f3e8933e33c4e7a327ff83f284cbdaf1a86e84 pass=1 fail=0 ignore=0 verdict=clean 2026-08-24
+shell-gate-tail-port-and-completion-oracle usage_tests sha256=04968d303b3e4ec54f3f8033f0e7e00d4b33ae90fd7507b48347cab56d0bc26d pass=1 fail=0 ignore=0 verdict=clean 2026-08-24
+shell-gate-tail-port-and-completion-oracle budget_guard_tests sha256=94bbe0c41f3993e3c748a492d29e2a0d22139825b8c53bbae6a528500a8ce402 pass=1 fail=0 ignore=0 verdict=clean 2026-08-24
+shell-gate-tail-port-and-completion-oracle dispatch_guard_tests sha256=6018943502411c07fe57162c0dae2ac37af304eccc0d0a9a6e0ec4fd733a1daf pass=1 fail=0 ignore=0 verdict=clean 2026-08-24
+shell-gate-tail-port-and-completion-oracle trend_tests sha256=acdbfef4eab851fca00ca747245b6ac4a4f804b05989f9cd3acd014bb56ac330 pass=1 fail=0 ignore=0 verdict=clean 2026-08-24
+shell-gate-tail-port-and-completion-oracle demo sha256=c8abd91d732e587549e5f0b65f9b3139b52a25136dc8b7089fc5edf375b1c498 pass=1 fail=0 ignore=0 verdict=clean 2026-08-24
+shell-gate-tail-port-and-completion-oracle installer_smoke sha256=243c1c29572bc5bcf9a35bb16d6440f2cb4727c811d4b9979961effa7b635683 pass=0 fail=1 ignore=0 verdict=clean 2026-08-24
+shell-gate-tail-port-and-completion-oracle consumer_smoke sha256=883c03c0184c7a7a9444b249695b21f920525f545a94c1b442614289c214aeed pass=1 fail=0 ignore=0 verdict=clean 2026-08-24
+shell-gate-tail-port-and-completion-oracle upgrade sha256=b23fbac9fb5ffcb80d828a9d6ec559bdd83f9c20c971c10c62b70656e51590ca pass=1 fail=0 ignore=0 verdict=clean 2026-08-24
+shell-gate-tail-port-and-completion-oracle agents_md_smoke sha256=ecb1fcd2ae7d5c4f0e8fafc1a1769abdc0eccb98af3d2103485983d5b9ea7ba3 pass=1 fail=0 ignore=0 verdict=clean 2026-08-24
+shell-gate-tail-port-and-completion-oracle index_tests sha256=e14e152466dc5be0296b1e20575bf3d587e1e0a127e7c63ad57671dbcaeaddb8 pass=1 fail=0 ignore=0 verdict=clean 2026-08-24
+shell-gate-tail-port-and-completion-oracle native_crate sha256=3b7fb612627bde071f09465b45e68bda6e88ffd3782338bf9abf0c3bb1217e78 pass=1 fail=0 ignore=0 verdict=clean 2026-08-24
