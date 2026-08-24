@@ -158,6 +158,18 @@ to a live queue task (the queue-file knob) or a configured permanent marker.
 Tooling never writes it — a promotion (a held-constant red recovering to pass)
 is a human commit, which is what keeps the baseline honest.
 
+**Which task a slug names, when more than one could.** The slug names the
+**standing** unpaid price the row was written to hold visible, never the topmost
+cause of the latest run. A transient condition that also fails the scenario — a
+polluted corpus, a half-applied fix, a dirty worktree — is diagnosed in its own
+entry and leaves this row alone. Two reasons, and the second is mechanical: a
+slug that changes identity whenever someone cleans the tree is not held-constant;
+and re-attributing to the transient makes every clean-tree run read as an
+unpromoted recovery and the next dirty one as a new failure, since
+§bin/diff-baseline.sh splits on the row's status and cannot see which of two
+stacked causes produced it. The masking condition is real and worth writing down
+— it is just worth writing down where its own fix is tracked.
+
 A scenario absent from the baseline fails closed: the diff treats its failure
 as a new failure, so a missing `pass` row loses no enforcement — its cost is
 classification (a regression reads as a new scenario), not a silent green.

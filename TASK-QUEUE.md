@@ -7383,9 +7383,17 @@
   which `pack-installer.sh` then vendors, breaking `checkwright init` at `git add` and reddening
   `installer_smoke` for the WRONG reason — which is what masked a ruled scenario at this
   iteration's validate and cost a diagnosis.
+  **The baseline row is NOT re-attributed to this entry, ruled 2026-08-24 and recorded so the
+  next validate does not re-litigate it.** `.workflow/validate-baseline.txt`'s `installer_smoke`
+  row keeps `binary-less-dispatch-loop-retirement`: that slug is the standing unpaid price the row
+  exists to hold visible, and this one is a transient masking cause stacked on top of it — exactly
+  the split evidence-kit/SPEC.md §Baseline manifest now rules generally, which is where the ruling
+  was landed rather than left as this instance's precedent. This entry's cost line above is where
+  the masking diagnosis belongs, and it stays here.
   Filed 2026-08-24 to the gap inbox by validate, with an explicit distinct declaration; promoted
   2026-08-24 at `shell-gate-tail-port-and-completion-oracle`'s close, which deleted the
-  regenerated instance in the same commit.
+  regenerated instance in the same commit; the attribution question its recurrence put to
+  `execution-control-reach-and-turn-end-blocking`'s close was ruled there.
 
 - **dispatch-claim-evidentiary-tier-unmarked** [design-pending] — a dispatch prompt can upgrade an
   inference into a finding, and the receiving session cannot see the evidence base to discount it.
