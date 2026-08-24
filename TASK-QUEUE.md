@@ -7584,6 +7584,14 @@
 
 - **kfric-obligation-residency** [design-pending] — the knowledge-friction capture obligation is
   declared for "any session" and reaches no surface a kit-template session actually loads.
+  recurrence: kfric-obligation-residency 2026-08-24
+  **FIRST RECURRENCE, and it is the attested shape repeating in a SECOND iteration with a second
+  lead.** At `port-remainder-disposition-and-worktree-reclamation` the lead re-derived off
+  implementation source that `run-gate-tests.sh`'s case-scoped scratch override exports the PLAIN
+  knob name while the crate's bridged reader resolves only the `GATE_SDK_KNOB_`-prefixed one — a
+  fact no doc owned — and carried it to close in a DISPATCH PROMPT rather than stamping it. Probed
+  at that close, not inferred: `.workflow/knowledge-friction.log` was 0 bytes. Same session shape,
+  same carrier, same silent zero, one iteration later.
   CLAUDE.md §Housekeeping binds capture to **any session** with "deferred capture is no capture",
   and that sentence is the obligation's only statement in this tree. A live grep over the kits'
   own templates — `lifecycle-kit/templates/`, `delegation-kit/templates/`,
@@ -7764,6 +7772,41 @@
   agree, and a later author who adds a leaf to one and not the other with nothing in the tree
   to catch it. Filed 2026-08-24 to the gap inbox by spec; drained and promoted 2026-08-24 at
   close, which re-read both definitions and corrected the shared-leaf count.
+
+- **recurrence-threshold-counts-dates-not-incidences** [design-pending] — the pre-emption threshold
+  reads a date count as an incidence count, so two incidences in one day count as one and the
+  rule fires late.
+  **The two halves, both read at this close rather than cited.** lifecycle-kit/SPEC.md's knob
+  roster says the threshold is read against the DATE COUNT of an entry's `recurrence:`
+  declaration, and glosses it as "two recorded re-filings is a third incidence of the same
+  finding" — an incidence claim resting on a date count. The same file rules stamping
+  **idempotent per (slug, date)**, and rules it deliberately, on the ground that the day is the
+  only resolution the bullet's grammar has and that a finer one would claim precision the
+  channel does not carry.
+  **NOT A REVERSAL of that ruling, and deliberately not a proposal to date more finely.** The
+  ruling governs what the CAPTURE channel may claim. This entry is about what a DOWNSTREAM
+  READER may infer from what the channel recorded — which that ruling does not address and
+  which no surface states.
+  **The residual is measurable rather than theoretical, and this repo is its worst case.**
+  Iterations here routinely close several to a calendar day — three on 2026-08-24 alone — so
+  two independent incidences in two separate iterations collapse to one date. An entry at
+  genuine incidence three can read as date count two or one, and the scope stage's pre-emption
+  rule, which admits a threshold entry regardless of the standing directive's theme, simply
+  does not fire.
+  **Attested at this close rather than hypothesised.** Three entries were dispositioned against
+  this exact edge here: one stamp taken, and two declined partly because the entry already
+  carried, or would have had to carry, the same calendar day as its own filing.
+  **Why `[design-pending]`:** the candidates differ in kind and none is obviously right. Read
+  the count against an ITERATION named beside each date, which the grammar does not carry
+  today; or state the limit on the threshold — a date count is a LOWER BOUND on incidences —
+  and leave the number alone, which costs one line and buys no detection; or leave it and
+  record that same-day collapse is accepted. The first mints grammar, the second is a hedge,
+  the third is a ruling.
+  **Cost while deferred:** the one rule that promotes work on evidence rather than theme
+  under-reads its evidence, silently and in the direction of doing nothing, and no gate can see
+  it — the count is a judgment record and is not re-derivable by any predicate. Filed
+  2026-08-24 by close from its own surface triage rather than from the gap inbox, after an
+  owner grep over the queue found the class unowned; both SPEC halves were read first-hand.
 
 ## Icebox
 
