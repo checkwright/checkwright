@@ -615,6 +615,23 @@ contract, unchanged. Stated here because a reader deciding what they may point
 this gate at reads this section, and because it is what lets that rule add a
 second reader without adding a gate.
 
+**`ek_pid_alive` now has a named caller outside the `.run` path entirely, and it
+is recorded here rather than only where it is used.**
+`lifecycle-kit/bin/enter-stage.sh` classifies a linked git worktree as live or
+orphaned by extracting the holding process's pid from the worktree's git **lock
+reason** and calling this predicate on it (lifecycle-kit/SPEC.md
+§bin/enter-stage.sh). The record it reads is git's, not this kit's grammar — so
+the *gate* does not reach it — but the **predicate** is deliberately shared, so
+how liveness is decided has one holder and a second lifecycle surface cannot
+drift from this one. The caller sources `lib/evidence.sh` only when its
+lock-reason pattern is configured, so this kit does not become a hard dependency
+of that one. Two consequences of the ruling above ride along unchanged and are
+worth the caller knowing: the `kill -0`-then-`ps -p` pair means a holder running
+under another uid reads **alive** rather than free, and the accepted PID-reuse
+residual means a recycled pid reads **live** — in the worktree caller that
+refuses and says wait, which is the same fail-closed direction, reached by the
+same mechanism.
+
 **Set mode: a directory argument quantifies that verdict over a whole record
 set.** Pointed at a directory, the gate reads every `*.run` file in it — the
 naming convention delegation-kit/SPEC.md §The delegation model gives the

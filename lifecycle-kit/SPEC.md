@@ -520,6 +520,15 @@ the clause's reader is a human or agent rather than a gate.
   isolated agent has an empty `git worktree list` and the check is vacuous rather
   than absent; a consumer with a standing long-lived worktree turns it off here
   rather than teaching the kit its paths.
+- `LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE` — a POSIX ERE with exactly one capture
+  group, matched against a linked worktree's git lock reason, the group being
+  the holder's pid (§bin/enter-stage.sh); **default empty**. Empty because a
+  lock reason is one harness's vocabulary and a kit literal spelling it would
+  publish it, the same seam the residue-directory omission takes; empty also
+  means *no classification is configured*, so an unconfigured consumer sees
+  exactly the unclassified refusal it sees today. Setting it buys a dependency
+  on evidence-kit's liveness predicate; a pattern that will not compile, or one
+  declaring no capture group, is a fail-closed config refusal (§lib/stages.sh).
 - `LIFECYCLE_KIT_ENTRY_PREFLIGHT` — per-stage `<stage>=<command>` entries run
   alongside the built-in pre-flight (§bin/enter-stage.sh); default empty.
 - `LIFECYCLE_KIT_SHIM_NGRAM` — the shared-n-gram width `check-shim-restatement`
@@ -1425,7 +1434,16 @@ prints the derived union-merge set (the gap inbox — §The committed gap inbox)
 and `lifecycle_merge_attrs_block` renders the supersede set as
 `<path> merge=iteration-scoped` lines and the union set as `<path> merge=union`
 lines, so `bin/install-lifecycle.sh` (writer) and `check-merge-attrs` (asserter)
-read one set (§Multi-operator semantics). `lifecycle_supersede_set` has a **third
+read one set (§Multi-operator semantics). The validator roster is fail-closed on **shape, not merely on presence**, and
+`LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE` states the rule the others follow: a
+non-empty pattern must compile as a POSIX ERE and must declare a capture group,
+each refused with its own message. Compilation is read off bash's own `[[ =~ ]]`
+status — 2 for a pattern it could not compile, 0 and 1 both meaning it compiled
+— rather than off a second regex engine that could disagree with the one the
+consumer will actually run against. The refusal exists because the failure it
+replaces is silent: an uncompilable pattern matches nothing and a group-less one
+captures nothing, and either would classify every worktree unclassified while
+looking configured. `lifecycle_supersede_set` has a **third
 reader**, `check-scratch-citation`, which forbids a permanent surface pointing a
 retriever at any of its members — so a consumer adding a
 `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` member gets citation enforcement over it with no
@@ -1627,21 +1645,129 @@ and no knob names a residue directory, because a kit default spelling one
 harness's layout would publish it. It is read off `git worktree list` and
 **never off `git status`**: a gitignored worktree leaves the status clean while
 it still stands, so a status-derived check reports success on exactly the state
-it exists to catch. The reap stays a session act — this kit does not remove a
-directory whose liveness it cannot establish, and what was missing at every
-attested firing was not a reap but anything that *told* a session there was
-residue. `--simulate` relays the would-be refusal the way it does for lessons,
-and a tree that is not a git checkout at all skips the check rather than failing
-on it. Two bounds are stated rather than banked. The ceiling is **per
-iteration**, not per dispatch: residue still accumulates within an iteration, and
-this is a bound rather than a sweep. And the check **cannot see a dangling branch
-ref** whose worktree is already gone — `git worktree list` does not report one,
-and the branch-name pattern that would is one harness's vocabulary — so the
+it exists to catch. `--simulate` relays the would-be refusal the way it does for
+lessons, and a tree that is not a git checkout at all skips the check rather than
+failing on it.
+
+**Each linked worktree carries a liveness class, and the signal is git's own
+rather than one this kit invents.** A worktree held by a live process is
+`locked`, and `git worktree list --porcelain` prints that lock's **reason** —
+which, for at least one harness, is a liveness record naming the holder's **pid**
+and its process **start time**; the same string sits on disk at
+`.git/worktrees/<name>/locked`. Measured rather than assumed, and re-measured at
+each stage that rested on it: the start field equals that process's own
+`/proc/<pid>/stat` field 22, so the reason carries a PID-reuse guard rather than
+decoration — a record strictly richer than the `pid=<n> run=<key>` grammar
+evidence-kit reads for backgrounded shell producers
+(evidence-kit/SPEC.md §check-producer-liveness). The reap that had no designable
+mechanism now has one, and nothing about the signal is minted here.
+
+**The reason's format is consumer vocabulary, taking the same disposition the
+residue directory takes one paragraph up.**
+`LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE` is a POSIX ERE with exactly one capture
+group, matched against a lock reason, the group being the holder's pid; the
+kit's default is **empty**, so an unconfigured consumer classifies nothing and
+sees exactly the behaviour above. The kit ships the mechanism — read the
+porcelain, apply the pattern, probe the pid — and the consumer ships the
+pattern, the same split `check-graph` takes over its vocabulary
+(CLAUDE.md §The provenance seam).
+
+| observation | class |
+| --- | --- |
+| locked, reason matches, captured pid alive | **live** |
+| locked, reason matches, captured pid dead | **orphaned** |
+| locked, reason does not match the pattern | **unclassified** |
+| not locked at all | **orphaned** |
+
+With the pattern unset every linked worktree is **unclassified**, an unlocked one
+included: an empty pattern reads as *no classification is configured* rather than
+as a pattern matching everything, which is what keeps the default additive.
+
+**Liveness is `ek_pid_alive` and never a second predicate** — the probe the
+`.run` path already uses, so how liveness is decided stays settled in one place
+(evidence-kit/SPEC.md §check-producer-liveness). The dependency is **bought by
+the knob**: `bin/enter-stage.sh` sources evidence-kit's library only when the
+pattern is non-empty, so a consumer that configures none owes no second vendored
+kit, and the hard `gate-sdk` dependency stated below gains no sibling for
+everyone. A pattern set with that library unreachable is exit 2 — the same
+fail-closed direction §lib/stages.sh takes on a malformed pattern, and never a
+silent everything-unclassified.
+
+**One capture group and not two.** The start-time field is matched and
+deliberately not captured. Parity is the first ground — the `.run` record grammar
+carries no start-time guard either, so capturing one here would make the worktree
+path stricter than the record path for no stated reason — and the error direction
+is the decisive one: a stranded worktree whose pid has been reused classifies
+**live**, and a live classification refuses and says *wait*, never authorising a
+removal. Dropping the guard errs toward refusing, which is the direction a
+fail-closed boundary wants. That safety is a function of what **reads** the
+class, so the strengthening is filed rather than banked — the moment anything
+reaps on the classification instead of printing it, the argument inverts.
+
+**The refusal set does not narrow; the class changes the remedy.** Both classes
+still refuse — a live worktree because an in-flight dispatch must not straddle
+the boundary, an orphaned one because residue must be cleared before it is
+crossed — and the refusal prints one line per path carrying its class:
+
+- **live** — the holding pid is named and the guidance is *wait, then re-enter*.
+  A force-removal is actively wrong here and is not offered.
+- **orphaned** — the holder is gone, so the lock states a fact that has become
+  false. This is the class force-removal exists for and it is named only here.
+  Git requires **`--force` twice** to remove a *locked* worktree; once suffices
+  only for an unlocked dirty one, and the single-force spelling this guidance
+  used to carry was wrong for exactly the class it was aimed at.
+- **unclassified** — today's reap guidance verbatim, which is also the whole
+  behaviour an unconfigured consumer sees.
+
+**The reap stays a session act, on a ground the experiment did not discharge.**
+The earlier ground — that this kit does not remove a directory whose liveness it
+cannot establish — is **retired**, liveness now being establishable. What stands
+in its place is untouched by that discharge: a worktree can hold commits existing
+nowhere else, so a wipe is destructive rather than merely wasteful. Liveness
+answers *is anyone working here*; it does not answer *would removing this lose
+anything*. What was missing at every attested firing was in any case not a reap
+but anything that *told* a session there was residue.
+
+**The loss question is answered mechanically rather than left to the session.**
+For every non-live path the refusal reports two facts read at the moment of
+refusal — whether the worktree's tree is dirty, and how many commits its `HEAD`
+carries that are unreachable from the main checkout's `HEAD` — and says so
+plainly when a path is clean **and** commitless, the case where removal is
+lossless by construction. Two git reads, no vendor vocabulary, and exactly the
+two facts a session used to re-derive by hand per path. This **replaces** a
+generic help line rather than sitting beside it: the retired line said harness
+residue is expected rather than evidence the child wrote, and that a hand-run
+`git status --porcelain` inside the worktree tells a stray write from an unfired
+reclamation — the same question, answered by hand, over the same paths. Keeping
+both would leave two lines teaching two ways to learn one fact, which is the
+residue this classification exists to remove, applied to its own refusal text.
+
+**Away from the boundary the same scan runs as an advisory.** Every non-boundary
+stage entry reads the worktrees and reports **orphaned paths only**, with the
+same loss report and the same reap guidance, as a stderr advisory that never
+refuses and never suppresses the stamp. It is safe only because the class
+exists: an unclassified mid-iteration report would name every in-flight
+dispatch, which mid-iteration is the **normal** state whenever a supervisor has
+work out, so it would either cry wolf at every entry or push a session to refuse
+legitimate work. A live worktree is reported nowhere here, there being nothing
+for the entering session to do about it, and with the pattern unset nothing is
+classifiable and no advisory is emitted at all.
+
+Two bounds are stated rather than banked, and the advisory moved one of them. The
+ceiling was **per iteration**, not per dispatch, with residue accumulating
+unseen inside an iteration; that blind spot is closed — residue is now surfaced
+at every stage entry — but **surfacing is not sweeping**, so accumulation within
+an iteration is visible rather than prevented and the reap remains a session act.
+The second bound is unchanged and still open: the check **cannot see a dangling
+branch ref** whose worktree is already gone — `git worktree list` does not report
+one, and the branch-name pattern that would is one harness's vocabulary — so the
 refusal's guidance names the branch half explicitly and the reaping session
-removes the ref with the directory. No gate reads it: `check-stage-entry`'s three
+removes the ref with the directory. No gate reads any of this:
+`check-stage-entry`'s three
 assertions are unchanged and the boundary-precondition family has deliberately
 never had a gate sibling (§check-stage-entry states the predecessor-map omission
-for the same class of reason). The grounds for refusing the earlier, sweep-shaped
+for the same class of reason), and a gate over tree state cannot see a worktree
+at all. The grounds for refusing the earlier, sweep-shaped
 alternative — a reap in the dispatch guard — are delegation-kit's
 (delegation-kit/SPEC.md §The delegation model).
 
@@ -1787,7 +1913,7 @@ re-runs its entry step safely. It reads the `lib/stages.sh` knobs
 `LIFECYCLE_KIT_FIRST_STAGE`, `LIFECYCLE_KIT_BOUNDARY_TRUNCATE`,
 `LIFECYCLE_KIT_BOUNDARY_PRESERVE`,
 `LIFECYCLE_KIT_BOUNDARY_REQUIRE`, `LIFECYCLE_KIT_LESSON_EVIDENCE_FILE`,
-`LIFECYCLE_KIT_SURVEY_RECORD_FILE`, and
+`LIFECYCLE_KIT_SURVEY_RECORD_FILE`, `LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE`, and
 `LIFECYCLE_KIT_ENTRY_PREFLIGHT`).
 
 **This tool depends on `gate-sdk/lib/gate.sh`, and the dependency is stated

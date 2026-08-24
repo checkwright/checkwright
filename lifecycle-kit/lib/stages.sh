@@ -69,6 +69,9 @@ declare -p LIFECYCLE_KIT_BOUNDARY_PRESERVE &>/dev/null || LIFECYCLE_KIT_BOUNDARY
 
 [[ -v LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK ]] || LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK=1
 
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the lock-reason pattern is consumer vocabulary, so the kit default is empty and an unconfigured consumer classifies nothing; a kit literal spelling one harness's lock reason would publish it, the same seam the residue-directory omission one knob up already takes
+[[ -v LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE ]] || LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE=''
+
 declare -p LIFECYCLE_KIT_ENTRY_PREFLIGHT &>/dev/null || LIFECYCLE_KIT_ENTRY_PREFLIGHT=()
 
 lifecycle_header() {
@@ -190,9 +193,19 @@ for _lc_pf in ${LIFECYCLE_KIT_ENTRY_PREFLIGHT[@]+"${LIFECYCLE_KIT_ENTRY_PREFLIGH
 done
 [[ "$LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK" == "0" || "$LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK" == "1" ]] \
     || _lc_errs+=("LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK must be 0|1 (got '$LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK')")
+# spec: lifecycle-kit/SPEC.md §lib/stages.sh — a malformed lock-reason pattern is a fail-closed config refusal, never a silent everything-unclassified: bash returns 2 from [[ =~ ]] on a pattern it cannot compile (0 and 1 both meaning it compiled), and a pattern that declares no group would classify every match as pid-less
+if [[ -n "$LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE" ]]; then
+    ( [[ "" =~ $LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE ]] ) 2>/dev/null
+    _lc_re_rc=$?
+    if [[ "$_lc_re_rc" -gt 1 ]]; then
+        _lc_errs+=("LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE '$LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE' is not a valid POSIX ERE")
+    elif [[ "$(sed -E 's/\\./X/g' <<<"$LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE")" != *'('* ]]; then
+        _lc_errs+=("LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE '$LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE' declares no capture group — the group is the holder's pid")
+    fi
+fi
 if [[ ${#_lc_errs[@]} -gt 0 ]]; then
     printf 'lifecycle-kit: malformed stage-machine config — the gates cannot run:\n' >&2
     printf '  %s\n' "${_lc_errs[@]}" >&2
     exit 2
 fi
-unset _lc_errs _lc_k _lc_pf _lc_succ
+unset _lc_errs _lc_k _lc_pf _lc_succ _lc_re_rc

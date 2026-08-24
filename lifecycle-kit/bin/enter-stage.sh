@@ -10,6 +10,17 @@ SDK="${GATE_SDK_ROOT:-$KIT/../gate-sdk}"
 # shellcheck source=../../gate-sdk/lib/gate.sh
 source "$SDK/lib/gate.sh"
 
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the worktree liveness predicate is evidence-kit's ek_pid_alive, sourced only when the lock-reason pattern is configured: an unconfigured consumer classifies nothing and owes no second kit, so the knob buys the dependency rather than vendoring lifecycle-kit doing so. A configured pattern with the library unreachable is exit 2 rather than an everything-unclassified boundary, the same fail-closed direction lib/stages.sh takes on a malformed pattern.
+if [[ -n "$LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE" ]]; then
+    EK="${EVIDENCE_KIT_ROOT:-$KIT/../evidence-kit}"
+    if [[ ! -r "$EK/lib/evidence.sh" ]]; then
+        echo "enter-stage: LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE is set but evidence-kit's liveness predicate is unreachable at $EK/lib/evidence.sh — nothing written." >&2
+        exit 2
+    fi
+    # shellcheck source=../../evidence-kit/lib/evidence.sh
+    source "$EK/lib/evidence.sh"
+fi
+
 # spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the unnamed-iteration placeholder, resolved once: the boundary reset's header rewrite and bootstrap stamp, the boundary-require skip, and --rename's refusal to write it all read this rather than repeating the glyph
 UNNAMED="—"
 
@@ -47,6 +58,53 @@ HELP_PREFLIGHT="resolve the finding above, or (to override deliberately) perform
 
 QUEUE="$LIFECYCLE_KIT_QUEUE_FILE"
 STATE="$LIFECYCLE_KIT_STATE_FILE"
+
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the linked-worktree scan: one porcelain parse classified live/orphaned/unclassified, shared by the boundary refusal and the mid-iteration advisory so the two cannot disagree about what a path is. Prints '<class>\t<pid>\t<path>\t<head>' per linked worktree; the main checkout is skipped.
+worktree_scan() {
+    git rev-parse --git-dir &>/dev/null || return 0
+    local path head lockflag reason pid class
+    while IFS=$'\t' read -r path head lockflag reason; do
+        [[ -n "$path" ]] || continue
+        pid=""
+        if [[ -z "$LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE" ]]; then
+            class=unclassified
+        elif [[ "$lockflag" == 0 ]]; then
+            class=orphaned
+        elif [[ "$reason" =~ $LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE ]]; then
+            pid="${BASH_REMATCH[1]}"
+            if ek_pid_alive "$pid"; then class=live; else class=orphaned; fi
+        else
+            class=unclassified
+        fi
+        printf '%s\t%s\t%s\t%s\n' "$class" "${pid:--}" "$path" "$head"
+    done < <(git worktree list --porcelain 2>/dev/null | awk '
+        function flush() {
+            if (path != "" && n++) printf "%s\t%s\t%s\t%s\n", path, head, locked, reason
+            path = ""; head = ""; locked = 0; reason = ""
+        }
+        /^worktree /              { flush(); path = substr($0, 10); next }
+        /^HEAD /                  { head = substr($0, 6); next }
+        /^locked([[:space:]]|$)/  { locked = 1; reason = (length($0) > 7 ? substr($0, 8) : ""); next }
+        END { flush() }
+    ')
+}
+
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the loss report: the two facts that decide whether removing a residue worktree loses anything, read mechanically at the moment of refusal rather than left for the session to re-derive per path with a hand-run 'git status'. Two git reads, no vendor vocabulary.
+worktree_loss() {
+    local p="$1" h="$2" dirty commits
+    if [[ ! -d "$p" ]]; then
+        echo "directory already gone — prunable residue"
+        return 0
+    fi
+    if [[ -n "$(git -C "$p" status --porcelain 2>/dev/null)" ]]; then dirty="dirty"; else dirty="clean"; fi
+    commits="$(git rev-list --count "$h" '^HEAD' 2>/dev/null)"
+    [[ "$commits" =~ ^[0-9]+$ ]] || commits="?"
+    if [[ "$dirty" == "clean" && "$commits" == "0" ]]; then
+        echo "clean, no commit unreachable from HEAD — removal is lossless"
+    else
+        echo "$dirty, $commits commit(s) unreachable from HEAD"
+    fi
+}
 
 # spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — --rename: the two-surface iteration rename in one motion, no stamp appended and no stage token written, so the cursor is untouched and this is not stage motion
 if [[ "${1:-}" == "--rename" ]]; then
@@ -298,23 +356,63 @@ if [[ "$first" == 1 && -f "$LIFECYCLE_KIT_GAP_INBOX_FILE" ]]; then
     fi
 fi
 
-# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the iteration-boundary linked-worktree refusal, the same contract as the two above: at an iteration boundary no linked worktree should be live, an in-flight dispatch being something that must not straddle a boundary and everything else being residue. Read off 'git worktree list' and never off 'git status' — an ignored worktree leaves the status clean while it still stands, so a status-derived check reports success on exactly the state it exists to catch. The predicate is a property of the boundary rather than a path, so no knob names a residue directory: a kit default spelling one harness's layout would publish it.
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the iteration-boundary linked-worktree refusal, the same contract as the two above: at an iteration boundary no linked worktree should be live, an in-flight dispatch being something that must not straddle a boundary and everything else being residue. Read off 'git worktree list' and never off 'git status' — an ignored worktree leaves the status clean while it still stands, so a status-derived check reports success on exactly the state it exists to catch. Both classes refuse: a live one because an in-flight dispatch must not straddle the boundary, an orphaned one because residue must be cleared before it is crossed; what the class changes is the remedy named, since '--force' is wrong advice for a holder that is still working.
 if [[ "$first" == 1 && "$LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK" == "1" ]] \
     && git rev-parse --git-dir &>/dev/null; then
-    linked="$(git worktree list --porcelain 2>/dev/null \
-        | awk '/^worktree / { if (n++) print substr($0, 10) }')"
-    if [[ -n "$linked" ]]; then
-        wt_n="$(grep -c '' <<<"$linked")"
+    mapfile -t wt_rows < <(worktree_scan)
+    if [[ ${#wt_rows[@]} -gt 0 ]]; then
+        wt_lines=()
+        wt_live=0
+        wt_orphaned=0
+        wt_unclassified=0
+        for wt_row in "${wt_rows[@]}"; do
+            IFS=$'\t' read -r wt_class wt_pid wt_path wt_head <<<"$wt_row"
+            case "$wt_class" in
+                live)
+                    wt_live=$((wt_live + 1))
+                    wt_lines+=("live         $wt_path — held by pid $wt_pid")
+                    ;;
+                orphaned)
+                    wt_orphaned=$((wt_orphaned + 1))
+                    wt_lines+=("orphaned     $wt_path — $(worktree_loss "$wt_path" "$wt_head")")
+                    ;;
+                *)
+                    wt_unclassified=$((wt_unclassified + 1))
+                    wt_lines+=("unclassified $wt_path — $(worktree_loss "$wt_path" "$wt_head")")
+                    ;;
+            esac
+        done
         if [[ "$sim" == 1 ]]; then
-            echo "enter-stage (simulate): iteration-boundary entry to '$stage' would be refused — $wt_n linked worktree(s) still stand:" >&2
-            sim_relay "$linked" >&2
+            echo "enter-stage (simulate): iteration-boundary entry to '$stage' would be refused — ${#wt_rows[@]} linked worktree(s) still stand:" >&2
+            sim_relay "$(printf '%s\n' "${wt_lines[@]}")" >&2
         else
-            echo "enter-stage: iteration-boundary entry to '$stage' refused — $wt_n linked worktree(s) still stand (nothing written):" >&2
-            printf '%s\n' "$linked" >&2
+            echo "enter-stage: iteration-boundary entry to '$stage' refused — ${#wt_rows[@]} linked worktree(s) still stand (nothing written):" >&2
+            printf '%s\n' "${wt_lines[@]}" >&2
         fi
-        relay_help "reap each path with 'git worktree remove <path>' (or --force where the child left it locked) and delete the branch ref it leaves behind — 'worktree remove' clears the directory only, so a reap that stops there accretes refs this check cannot see. Then re-run enter-stage $stage."
-        relay_help "the harness's auto-clean of a read-only child's worktree is best-effort, so residue here is expected rather than evidence the child wrote; one 'git status --porcelain' inside a worktree tells a stray write from an unfired reclamation (delegation-kit/SPEC.md §The delegation model)."
+        [[ "$wt_live" -gt 0 ]] && relay_help "a live worktree's holder is still working: wait for the named pid to return, then re-run enter-stage $stage. Do not remove it and do not force it — the reap advice below is for the other classes."
+        [[ "$wt_orphaned" -gt 0 ]] && relay_help "an orphaned worktree's holder is gone, so its lock states a fact that has become false: reap it with 'git worktree remove --force --force <path>' — git requires --force TWICE to remove a LOCKED worktree, once being enough only for an unlocked dirty one — and delete the branch ref it leaves behind, since 'worktree remove' clears the directory only and a reap that stops there accretes refs this check cannot see."
+        [[ "$wt_unclassified" -gt 0 ]] && relay_help "reap each path with 'git worktree remove <path>' (or --force where the child left it locked) and delete the branch ref it leaves behind — 'worktree remove' clears the directory only, so a reap that stops there accretes refs this check cannot see. Then re-run enter-stage $stage."
         exit 1
+    fi
+fi
+
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the mid-iteration worktree advisory: the same scan away from the boundary, orphaned paths only and never a refusal. It closes the boundary refusal's stated within-iteration blind spot, and it is safe only because the class exists — an unclassified report here would name every in-flight dispatch, which mid-iteration is the normal state.
+if [[ "$first" == 0 && "$LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK" == "1" ]] \
+    && git rev-parse --git-dir &>/dev/null; then
+    adv_lines=()
+    while IFS=$'\t' read -r wt_class wt_pid wt_path wt_head; do
+        [[ "$wt_class" == "orphaned" ]] || continue
+        adv_lines+=("orphaned     $wt_path — $(worktree_loss "$wt_path" "$wt_head")")
+    done < <(worktree_scan)
+    if [[ ${#adv_lines[@]} -gt 0 ]]; then
+        if [[ "$sim" == 1 ]]; then
+            echo "enter-stage (simulate): ${#adv_lines[@]} orphaned worktree(s) stand — advisory, this entry would not refuse:" >&2
+            sim_relay "$(printf '%s\n' "${adv_lines[@]}")" >&2
+        else
+            echo "enter-stage: ${#adv_lines[@]} orphaned worktree(s) stand — advisory, this entry is not refused:" >&2
+            printf '%s\n' "${adv_lines[@]}" >&2
+        fi
+        relay_help "the holder of each is gone: reap with 'git worktree remove --force --force <path>' and delete the branch ref it leaves behind. Left standing they refuse the next iteration boundary."
     fi
 fi
 

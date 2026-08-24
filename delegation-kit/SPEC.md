@@ -383,7 +383,9 @@ reader who finds a surviving worktree and infers a stray write hunts a change
 that is not there, and stops hunting the third time. What replaces it is a weaker
 true statement and no new mechanism: a surviving worktree means *either* the
 child wrote *or* the reclamation did not fire, and telling the two apart is one
-`git status --porcelain` inside it. Isolation's case is untouched and never
+`git status --porcelain` inside it — a read the reaping boundary now performs
+and reports per path, so the disjunction is resolved where it is met rather than
+by hand (lifecycle-kit/SPEC.md §bin/enter-stage.sh). Isolation's case is untouched and never
 needed the detector — the template's **A read-only claim is made by isolation,
 not by sentence** rule rests on write confinement, which is a property of the
 mechanism rather than an observation about its cleanup. Gitignoring the worktree
@@ -412,14 +414,37 @@ become a lifecycle owner whose failures are invisible at the only place anyone
 looks, which is the verdict. *And the timing is wrong in the one direction that
 cannot be recovered*: a dispatch-time sweep runs while sibling dispatches are in
 flight, so its predicate would have to establish that a worktree belongs to no
-live child — which the attested residue makes impossible from the outside, being
-locked, stale-stamped and clean, exactly the signature a live child's worktree
-carries too. Lock is not a liveness signal here, and a sweep that guesses wrong
-destroys a running sibling's checkout. The iteration-boundary refusal has the
+live child, and a sweep that guesses wrong destroys a running sibling's checkout.
+The iteration-boundary refusal has the
 opposite property on both counts: it takes no destructive action at all, and it
 runs at the one moment whose whole definition is that the previous iteration's
 work is finished. The guard's contract, its assertions and its source are
 therefore unchanged by this ruling.
+
+**The second ground rested on a premise an experiment has since falsified, and
+the correction is recorded rather than left to be re-derived.** That ground read
+"lock is not a liveness signal here": the attested residue was locked,
+stale-stamped and clean, taken to be indistinguishable from a live child's
+worktree. It is distinguishable. The lock **reason** names the holding process's
+pid and its start time, so *does this worktree belong to a live child* is
+answerable from outside the child — the classification lifecycle-kit's boundary
+check now performs. The same experiment supplied the residue's **cause**, which
+nothing had established: a locked worktree is refused by `git worktree prune` and
+by an unforced `git worktree remove`, so a harness dying before its cleanup step
+strands one that is clean, commitless **and** unreclaimable — the exact signature
+the attested survivors carried and which the auto-clean-is-best-effort reading
+above described without explaining. Reclamation is tied to the **child's own
+return**, not to the dispatching session's lifetime.
+
+**The ruling stands, and stands on the ground that survived.** *A verdict surface
+may not own lifecycle* is untouched by any of this, and it alone refuses the
+dispatch-time sweep. What the falsified premise changes is what is now
+**designable elsewhere**: a reaper at a boundary can be built against a published
+mechanism rather than against a guess, which is why the classification landed
+there and not here. The predicate also degrades to the old blind state wherever
+the consumer configures no lock-reason pattern, so a guard-side sweep would be
+resting on optional consumer config to avoid destroying a sibling's checkout —
+an argument against moving it here even now that the signal exists.
 
 **`worktree.baseRef` is vendor configuration, and choosing it is the consumer's
 job.** The template's **Isolation charges four harness costs, and paying them

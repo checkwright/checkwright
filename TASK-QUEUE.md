@@ -12,39 +12,6 @@
 
 ## New Features
 
-- **agent-worktree-boundary-disposition** [spec: SPEC-worktree-liveness.md] — the iteration
-  boundary refuses on registered agent worktrees, but nothing reaps them and nothing surfaces
-  one mid-iteration.
-  **The finding, operator-directed 2026-08-18.** Four worktrees survived an iteration's close,
-  registered in `git worktree list` and invisible to every gate.
-  **Its stated blocker is DISCHARGED, and the discharge is written out here so no later reader
-  re-buys the experiment.** The entry held that a worktree has no liveness signal, that *is
-  anyone still working in this one* was unanswerable, and that inventing the signal was the
-  design work. All three are false. `git worktree list --porcelain` already prints a `locked`
-  line per worktree whose reason names the holding process's **pid** and its **start time** — a
-  liveness record STRICTLY RICHER than the `pid=<n> run=<key>` grammar evidence-kit already
-  reads, which carries no start-time reuse guard at all. The start field was checked equal to
-  that process's own stat entry rather than assumed decorative. So nothing is invented, the
-  predicate is one this project already owns, and the reap is designable against a mechanism.
-  **The hypothesis being false is the smaller half of the result; what replaced it is the
-  point.** Reclamation is not tied to the dispatching session's lifetime — it fired at the
-  child's own normal return with the parent alive — and the survivor class the 2026-08-18 probe
-  could not account for now has a cause: a LOCKED worktree is refused by `git worktree prune`
-  and by `git worktree remove` without `--force`, so a harness dying before its cleanup step
-  strands one that is clean, commitless AND unreclaimable. Ground (ii)'s "the survivor set is
-  selected, not random" was right and the selector is the LOCK, not dirtiness.
-  The classification this makes possible, and the seam ruling that keeps one harness's lock
-  vocabulary out of the kit as consumer config, are in the amendment.
-  **The cheap half was TAKEN 2026-08-24** — `agent-worktree-reclamation-unenforced` landed the
-  boundary refusal, which surfaces the paths and leaves removal a session act. What is left is
-  removal and the mid-iteration surfacing.
-  **Cost while deferred:** low, and lower since the refusal. Worktrees cost only disk, and the
-  carry is the reap itself: a session meeting the refusal still re-derives by hand whether each
-  survivor is safe to remove.
-  Filed 2026-08-18 by the lead under the operator-directed direct-to-queue exception, the four
-  having been removed once verified empty and clean; promoted to a feature 2026-08-24 at spec,
-  once its upstream experiment returned.
-
 - **stage-journal-contract-unoracled** [spec: SPEC-stage-journal.md] — a granted resume journal
   that is never written is indistinguishable from a session that had nothing to say, so the
   durable narration channel fails silently.
@@ -7795,6 +7762,8 @@
 - **amendment-roster-omission-detection** [design-pending] — Only a grep catches a short roster.
 
 ## Done
+
+- agent-worktree-boundary-disposition
 
 - worktree-reclamation-cause-falsification
 
