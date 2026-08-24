@@ -4019,25 +4019,29 @@
 
 - **agent-worktree-reclamation-unenforced** [design-pending] — the documented auto-clean for an
   unchanged read-only agent worktree does not fire, and nothing sweeps the residue.
-  recurrence: agent-worktree-reclamation-unenforced 2026-08-19 2026-08-22
-  **Grounds for 2026-08-22, found at the iteration boundary by the scope session that stamped it.**
-  `git worktree list` reported `agent-af31cb92f3c50b68e`, LOCKED, at `5aac0757` — the *previous*
-  iteration's scope boundary stamp — with clean porcelain inside: the unchanged read-only case the
-  auto-clean documents, surviving a whole iteration. **HELD:** no surface with the ruled spine.
-  Five worktrees from prior sessions were still on disk under `.claude/worktrees/` at four stale
-  revisions (`c0d652f5` twice, `465ea869` twice, `32c009ca`), verified by `git worktree list`.
+  recurrence: agent-worktree-reclamation-unenforced 2026-08-19 2026-08-22 2026-08-24
+  **Three firings, and what they jointly SETTLE rather than re-attest.** Each was found at a
+  boundary by the session that stamped it, each a LOCKED worktree at a stale stamp with an EMPTY
+  `git status --porcelain` inside — `agent-a00982cef8c0c227d` (2026-08-19, at an align stamp two
+  iterations old), `agent-af31cb92f3c50b68e` at `5aac0757` beside five survivors at four stale
+  revisions (2026-08-22, HELD for want of a surface with that iteration's ruled spine), and
+  `agent-a657c09f453097842` at `5a4e83d4` (2026-08-24). So the documented precondition is met and
+  the reclaim does not fire: probed three times, no longer open. Each residue was reaped by hand,
+  which is the workaround this entry exists to replace and not a discharge of it.
+  **Two properties are settled with it.** (i) **Reaping leaves a branch ref** — `worktree unlock`
+  then `worktree remove` clears the directory and leaves `worktree-agent-<id>` standing, deleted
+  separately with `git branch -d`; confirmed again on the 2026-08-24 instance, so a reclaim that
+  only removes worktrees still accretes refs. (ii) **The failure is intermittent, not systematic**
+  — sessions that dispatched read-only sweeps after reaping had BOTH auto-clean whole, directory
+  and ref, at two separate firings. The harness handles the clean exit; a reclaim need cover only
+  the abnormal one.
+  **The hypothesis a fixing session should falsify first**, unchanged and now three-times
+  consistent: reclamation is tied to the *dispatching* session's lifetime rather than the child's,
+  so a session that ends abnormally — or ends while a child's directory is still held — strands
+  it. It is cheap to test: dispatch, kill the parent, look.
   **DISTINCT from `readonly-dispatch-isolation-unbuyable`**, deliberately: that entry is about
   which revision a child *starts* from, this is about worktrees never being *reclaimed* after the
   child ends. Neither implies the other and fixing either leaves the other standing.
-  **The auto-clean's documented precondition is met and it still did not fire — probed, not
-  assumed.** Two of the five survivors report a clean `git status --porcelain`, so they are
-  exactly the unchanged case the reclaim is documented to cover. The discriminator arrived in the
-  same session: this close dispatched two read-only sweeps and **both** worktrees auto-cleaned on
-  completion. So the mechanism works on a fresh dispatch and left five behind anyway, which points
-  at reclamation being tied to the *dispatching session's* lifetime rather than the child's — a
-  session that ends abnormally, or ends while a child's directory is still held, strands it. That
-  is the hypothesis a fixing session should falsify first, and it is cheap: dispatch, kill the
-  parent, look.
   **Cost:** each is a full checkout of the tree, so the disk cost is linear in dispatch count with
   no ceiling. The sharper cost is correctness — a stale worktree is a second live copy of every
   governed file, which a later `grep -r`, a gate walk, or an audit sweep can reach and read as the
@@ -4048,18 +4052,8 @@
   sweep at dispatch time (earlier, but the guard would own lifecycle it does not today), or a
   central ignore that makes the second copy unreachable to every walker rather than to the
   careful ones. The third fixes the correctness half without touching the disk half.
-  **Fires again 2026-08-19, and it paid two findings the entry did not hold.** One orphan
-  survived — `agent-a00982cef8c0c227d`, LOCKED, at an align stamp two iterations old, with a
-  clean `git status --porcelain` inside it. (i) **Reaping leaves a branch ref.**
-  `git worktree unlock` then `git worktree remove` clears the directory and leaves
-  `worktree-agent-<id>` standing, deleted separately with `git branch -d`, so a reclaim that only
-  removes worktrees still accretes refs. (ii) **The failure is intermittent rather than
-  systematic**, which narrows every candidate below and confirms the hypothesis above rather than
-  merely restating it: the same session dispatched two isolated agents after reaping and BOTH
-  auto-cleaned whole, directory and ref. The harness handles the clean exit; a reclaim need cover
-  only the abnormal one.
   **A candidate the three above miss:** `.gitignore` asserts the directory is "auto-cleaned",
-  which this instance falsifies. Correcting that claim to best-effort and leaving the residue
+  which every firing falsifies. Correcting that claim to best-effort and leaving the residue
   *declared* is a real option beside owning it, and it is the only one that costs nothing.
   **Cost while deferred:** grows monotonically with every read-only dispatch, and this repo
   pre-authorizes delegation for read-heavy audits, so the accumulation rate is the working rate.
@@ -7510,6 +7504,100 @@
   Filed 2026-08-24 to the gap inbox by build and again by the lead; promoted 2026-08-24 at
   `shell-gate-tail-port-and-completion-oracle`'s close, which judged the merge question the second
   filing put to it.
+
+- **single-gate-front-end-form-unruled** [design-pending] — the tree mandates one front end for a
+  single-gate run and grants a different one, and which form it reinforces is unruled.
+  **Re-verified at this intake rather than carried:** the committed `.claude/settings.json` holds
+  **106** `Bash(` entries and **zero** naming `scripts/gate-exec.sh` in any form, while
+  `bash gate-sdk/bin/run-gates.sh *` is granted at lines 11-14 and covers `--only <gate>`. So a
+  granted alternative genuinely exists and this is a choice between forms, not an absent grant.
+  **The mandate's scope is NARROWER than the filing bullet claimed, corrected here.**
+  evidence-kit/SPEC.md §check-evidence-manifest binds the **pre-flight caller** —
+  `LIFECYCLE_KIT_ENTRY_PREFLIGHT` execs with no interpreter word, so a `.gate` descriptor cannot
+  ride the exec bit and the discharge is a consumer-side front end resolving a gate *name* through
+  `gate_command`. It does not rule that every evidence entry reaches a gate through that front end.
+  The tension survives the correction: the roster the front end serves is the consumer's whole
+  pre-flight set, so a session obeying it hand-runs an ungranted path.
+  **Why `[design-pending]`:** the two dispositions bless opposite futures. Proposing the committed
+  grant reinforces a front end the port may retire — `scripts/gate-exec.sh` is 22 lines and reads
+  `owed` on `port-blockers.sh --tree` — and the grant itself is **operator-class** under
+  TRAJECTORY.md §The closed rulings (2026-08-22), so no stage session may land it. Steering onto
+  `run-gates.sh --only` is landable in guard-kit today and makes the SPEC's own discharge the
+  unreinforced path. Neither horn is costed, and the port disposition of the front end decides it.
+  **DISTINCT from `guard-steer-grant-mismatch`**, a steer whose target nothing grants: no guard
+  rule steers to `gate-exec.sh` at all, the mandate living in a kit SPEC. **DISTINCT from
+  `overlay-only-oracle-grants-uncommitted`**, whose four oracles are granted in an untracked
+  overlay rather than nowhere, and whose question is which surface carries a grant all parties
+  agree is wanted. **DISTINCT from `crate-toolchain-grant-uncommitted`**, ruled toward pruning.
+  **Cost while deferred:** an out-of-band decision per single-gate run for any session that obeys
+  the SPEC, invisible on a clone whose overlay has absorbed it, and a standing risk that a session
+  reads the ungranted form as unsanctioned and stops using the discharge the SPEC designed.
+  Filed 2026-08-24 to the gap inbox by `shell-gate-tail-port-and-completion-oracle`'s close, from
+  its prompt-friction triage; promoted 2026-08-24 at this iteration's scope intake, its premise
+  re-verified and one claim corrected above.
+
+- **prompt-ranking-command-word-shape-blind** [design-pending] — the friction ranking prints a bare
+  command word, so an answered read steer and an unowned write form share one row.
+  **Re-measured at this intake on the live log, not carried from the filing:**
+  `.workflow/prompt-friction.log` holds 14 `cat` occurrences of which **13 are heredoc writes**
+  (8 `cat >>`, 5 `cat >`) and effectively none is a `cat <file>` read. The filing close measured
+  the same shape at scale — 133 calls, 80 `cat >>` plus 37 `cat >` against roughly 16 reads. Two
+  independent corpora, one shape.
+  **Why the row misleads rather than merely being coarse.** The read half is answered:
+  `scripts/bash-guard.sh` steers `cat <file>` to the Read tool and that steer fires correctly —
+  it fired on this very session's first read. So the ranking's top row shows the *solved* half and
+  hides the unsolved one inside it, and three consecutive closes have triaged the pattern under the
+  read-steer heading for exactly that reason.
+  **The write half has no steer, no grant and no owner.** The mandated alternatives —
+  `guard-kit/bin/scratch-run.sh` for execution, `git commit -F` for a message — govern what happens
+  to a file **after** it exists and say nothing about creating one, so a session authoring a scratch
+  script or a commit message pays an out-of-band decision every time.
+  **Why `[design-pending]`:** two different deliverables and neither is ruled. Decomposing a command
+  word by shape inside `guard-kit/bin/scan-prompts.sh` retires the misreading mechanically and buys
+  every future triage a correct row — but it mints an output contract the gate-tests pin. Giving the
+  write form its own disposition (a grant, a steer to the Write tool, or a stated habit) fixes the
+  instance and leaves the instrument blind to the next conflated word.
+  **DISTINCT from `guard-read-steer-tool-coverage`** and not a re-file of it: that entry is awk
+  having no read-steer where cat and sed have one, all three on the READ side. **DISTINCT from
+  `scan-prompts-blocking-half-blind`**, whose axis is which verdicts the scan sees, and from the
+  iceboxed `scan-prompts-truncation-quote-desync`, a per-line truncation defect.
+  **Cost while deferred:** the tree's one friction instrument reports its heaviest row wrong, so
+  every triage reading it spends judgment re-deriving the decomposition and can still land on the
+  answered half — three closes did.
+  Filed 2026-08-24 to the gap inbox by `shell-gate-tail-port-and-completion-oracle`'s close;
+  promoted 2026-08-24 at this iteration's scope intake, re-measured on a fresh corpus above.
+
+- **promotion-commitment-stamp-latency** [design-pending] — between a promotion commitment and the
+  boundary that pays it, an at-ceiling entry accrues firings only prose can hold.
+  **The case, and the ceiling's stated remedy does not cover it.** queue-kit/SPEC.md §The tag
+  algebra rules that a `recurrence:` declaration reaching `check-queue-wrap`'s 100 columns resolves
+  to **promotion** and never to a wider `QUEUE_KIT_WRAP_BUDGET`. At
+  `shell-gate-tail-port-and-completion-oracle`'s close two entries hit that ceiling at once —
+  `turn-end-chokepoint-and-wait-primitive` and `scratch-execution-control-is-bash-only`, each 96
+  columns, each 107 with one more date — and **both were already promotion-committed**. The
+  prescribed remedy had been applied and the undercount persisted, because promotion is a future
+  act and the stamp is owed now.
+  **The window is now measured rather than predicted, which the filing bullet could not do.**
+  Both commitments were paid at this boundary: turn-end committed 2026-08-22 and paid 2026-08-24
+  across two unstampable judged firings; scratch-execution committed 2026-08-23 and paid 2026-08-24
+  across one. So the observed latency is two days and three firings, and `kpi-incident-recurrence`
+  undercounted by three for its duration. The window is short and the loss inside it is total.
+  **Why `[design-pending]`:** three candidates trading different properties. Stamping into the
+  promoted entry at promotion time from a carried record keeps the count honest and needs a carrier
+  the boundary can read. A KPI-side annotation for a declared-at-ceiling entry costs nothing and
+  detects nothing. Accepting the latency and saying so at the tag algebra costs one line and stops
+  a later close re-deriving this — which is the outcome this entry may correctly reach.
+  **The prose fallback is itself capped**, which is what makes doing nothing expensive:
+  `scratch-execution-control-is-bash-only` sat at **0 lines of headroom** under
+  `check-queue-entry-budget` and had to compress to record its own seventh measurement.
+  **DISTINCT from `recurrence-obligation-residency`** (where the stamp obligation lives across
+  stages), from `threshold-recurrence-routing-residency` (routing an entry that reaches the
+  promotion threshold), and from `queue-entry-grammar-single-owner`. It adds no recurrence date to
+  any of them and re-files none.
+  **Cost while deferred:** paid only when an at-ceiling entry is promotion-committed, and paid then
+  as a silent KPI undercount on exactly the entries the project has already judged most recurrent.
+  Filed 2026-08-24 to the gap inbox by that same close, from its recurrence-stamp attempt;
+  promoted 2026-08-24 at this iteration's scope intake, with the window measured above.
 
 ## Icebox
 
