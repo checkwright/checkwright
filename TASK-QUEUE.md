@@ -45,48 +45,6 @@
   having been removed once verified empty and clean; promoted to a feature 2026-08-24 at spec,
   once its upstream experiment returned.
 
-- **delegation-provenance-floor** [spec: SPEC-provenance-floor.md] — a dispatching session can
-  narrate findings from a subagent whose output it never received, and nothing reds.
-  recurrence: delegation-provenance-floor 2026-08-18 2026-08-19
-  **FIVE attested instances, every one self-caught, and they are not all one shape.** Three are
-  a dispatcher relaying a return that never arrived — the fabrication sitting in the dispatcher's
-  own REASONING rather than in quoted child text, so a floor checking relayed output alone misses
-  it. The fourth is an invented IDENTIFIER: a fabricated short hash written into the survey
-  record to make a dated census look precise.
-  **The FIFTH, 2026-08-24 at this iteration's spec, and it is the first instance where the floor
-  HELD.** A worktree-isolated sweep returned a message claiming an audit roster "from my earlier
-  turns". That roster was not in the return the dispatcher received — the return carried one
-  paragraph about an environment defect and nothing else. It was not narrated, not relayed
-  onward, and not used: every update target in all five of this iteration's amendments was
-  derived first-hand instead. The same return also carried a claim the dispatcher could not
-  verify — that the child had built the native binary to escape a refusal loop — and it is
-  carried at that tier wherever it appears rather than promoted to a finding; what WAS verified
-  is that the main checkout's binary mtime was unchanged and `git status` stayed clean.
-  **Two attested instances from two CONSECUTIVE stage sessions of one iteration is the strongest
-  evidence this unit will have**, and the pair is what makes the class structural rather than
-  anecdotal: scope's was a mint, spec's was a relay, and the discipline that caught the second is
-  exactly the doctrine line this unit is about to write down.
-  **The failure leaves no signature in the text**, which makes it a gap rather than a lapse: the
-  prose reads identically whether the return was held or invented.
-  **Distinct from its two neighbours:** `dispatch-cited-evidence-unverified` is a sweep's
-  *quoted evidence* being untraceable, `dispatch-unreadable-target-fallback` is a *child*
-  fabricating a verdict on an unreadable target; this is the *parent* relaying a return that
-  never arrived.
-  **TAKEN 2026-08-24, operator-ruled at scope's threshold proposal: the SIX holds are DISCHARGED
-  rather than overruled.** Every one stood on the surface criterion and this iteration is that
-  surface; the receiving-side half having landed as delegation-kit/SPEC.md §Resume journal, only
-  the doctrine line was open.
-  **The entry's own concession does not fully survive, and the amendment says where.** It held a
-  gate very likely unbuildable. That is true of the relayed-return shape and false of the
-  minted-identifier shape, whose predicate already exists in this tree one field away from where
-  the attested fabrication landed — so the unit ships the doctrine line AND an oracle rather than
-  conceding enforcement-first wholesale.
-  **Cost while deferred:** it lands on exactly the dispatches delegation is pre-authorized for,
-  and it defeats normal trust rather than merely being wrong — a relayed finding is the signal a
-  reader uses to decide a claim has already been checked.
-  Filed 2026-08-13 by close, draining the gap inbox on operator direction to file, not promote;
-  promoted to a feature 2026-08-24 at spec, which added the fifth instance from its own dispatch.
-
 - **stage-journal-contract-unoracled** [spec: SPEC-stage-journal.md] — a granted resume journal
   that is never written is indistinguishable from a session that had nothing to say, so the
   durable narration channel fails silently.
@@ -7891,6 +7849,8 @@
 - **amendment-roster-omission-detection** [design-pending] — Only a grep catches a short roster.
 
 ## Done
+
+- delegation-provenance-floor
 
 - subagent-stop-agent-id-attribution-doubt
 

@@ -15,6 +15,27 @@ fn is_full_sha(s: &str) -> bool {
     s.len() == 40 && s.bytes().all(|b| b.is_ascii_hexdigit() && !b.is_ascii_uppercase())
 }
 
+// spec: lifecycle-kit/SPEC.md §check-survey-record — a git-object-shaped token in a field value:
+// a whole word-bounded run of lowercase hex, 7 to 40 long, carrying at least one a-f so a bare
+// number (a count, a compact date) is not mistaken for a citation
+fn hex_tokens(s: &str) -> Vec<String> {
+    s.split(|c: char| !(c.is_ascii_alphanumeric() || c == '_'))
+        .filter(|run| {
+            (7..=40).contains(&run.len())
+                && run.bytes().all(|b| b.is_ascii_hexdigit() && !b.is_ascii_uppercase())
+                && run.bytes().any(|b| b.is_ascii_lowercase())
+        })
+        .map(str::to_string)
+        .collect()
+}
+
+// spec: lifecycle-kit/SPEC.md §check-survey-record — the block valve, reason mandatory: a
+// hex-shaped token that names no object on purpose is exempted by an audit trail, never silently
+fn exempt_reason(line: &str) -> Option<&str> {
+    let inner = line.trim().strip_prefix("<!--")?.strip_suffix("-->")?;
+    Some(inner.trim().strip_prefix("survey-token-exempt:")?.trim())
+}
+
 // spec: lifecycle-kit/SPEC.md §check-survey-record — the key line, `- <key>: <value>` with a
 // lowercase key; a line inside a block that is not one is a stray
 fn key_line(line: &str) -> Option<(String, String)> {
@@ -42,10 +63,19 @@ fn key_line(line: &str) -> Option<(String, String)> {
 struct Block {
     heading_line: usize,
     keys: Vec<(String, String, usize)>,
+    tokens: Vec<(usize, String)>,
+    exempt: bool,
 }
 
-fn finish(blk: &mut Option<Block>, findings: &mut Vec<(usize, String)>) {
+fn finish(
+    blk: &mut Option<Block>,
+    findings: &mut Vec<(usize, String)>,
+    tokens_out: &mut Vec<(usize, String)>,
+) {
     let Some(b) = blk.take() else { return };
+    if !b.exempt {
+        tokens_out.extend(b.tokens.iter().cloned());
+    }
     let k = b.keys.len();
     for (i, want) in WANT.iter().enumerate() {
         if i >= k {
@@ -119,21 +149,32 @@ pub fn run(args: &[String]) -> i32 {
 
     let mut raw: Vec<(usize, String)> = Vec::new();
     let mut revs: Vec<(usize, String)> = Vec::new();
+    let mut tokens: Vec<(usize, String)> = Vec::new();
     let mut blocks = 0usize;
     let mut blk: Option<Block> = None;
     for (idx, line) in text.lines().enumerate() {
         let fnr = idx + 1;
         if line.starts_with("##") && line[2..].starts_with(is_space) {
-            finish(&mut blk, &mut raw);
+            finish(&mut blk, &mut raw, &mut tokens);
             blk = Some(Block {
                 heading_line: fnr,
                 keys: Vec::new(),
+                tokens: Vec::new(),
+                exempt: false,
             });
             blocks += 1;
             continue;
         }
         let Some(b) = blk.as_mut() else { continue };
         if line.chars().all(is_space) {
+            continue;
+        }
+        if let Some(reason) = exempt_reason(line) {
+            if reason.is_empty() {
+                raw.push((fnr, "survey-token-exempt valve carries no reason — the reason is mandatory, and a valve without one does not exempt".to_string()));
+            } else {
+                b.exempt = true;
+            }
             continue;
         }
         let Some((key, val)) = key_line(line) else {
@@ -156,9 +197,15 @@ pub fn run(args: &[String]) -> i32 {
             } else {
                 raw.push((fnr, format!("rev is not a full 40-hex sha: '{}'", val)));
             }
+            continue;
         }
+        // spec: lifecycle-kit/SPEC.md §check-survey-record — the widened corpus is the other three
+        // fields; rev has its own stricter arm above and reporting it twice would say one thing in
+        // two voices
+        b.tokens
+            .extend(hex_tokens(&val).into_iter().map(|t| (fnr, t)));
     }
-    finish(&mut blk, &mut raw);
+    finish(&mut blk, &mut raw, &mut tokens);
 
     let mut findings: Vec<String> = raw
         .into_iter()
@@ -169,6 +216,7 @@ pub fn run(args: &[String]) -> i32 {
     // wrong-rev case the 40-hex shape cannot: a sha the tree does not carry makes
     // 'git diff <rev>..HEAD' fail rather than witness anything
     let mut probed = 0usize;
+    let mut tokens_probed = 0usize;
     if probe_rev {
         for (line, rev) in &revs {
             let spec = format!("{}^{{commit}}", rev);
@@ -184,6 +232,21 @@ pub fn run(args: &[String]) -> i32 {
                 ));
             }
         }
+        // spec: lifecycle-kit/SPEC.md §check-survey-record — the same probe over a wider corpus:
+        // any object type resolves, because a sha naming a blob or a tree is a real citation
+        for (line, tok) in &tokens {
+            let ok = proc::run("git", &["cat-file", "-e", tok])
+                .map(|c| c.stdout().is_some())
+                .unwrap_or(false);
+            if ok {
+                tokens_probed += 1;
+            } else {
+                findings.push(format!(
+                    "{}:{}: git-object-shaped token names no object in this repository: {}",
+                    record, line, tok
+                ));
+            }
+        }
     }
 
     if !findings.is_empty() {
@@ -195,14 +258,14 @@ pub fn run(args: &[String]) -> i32 {
         for f in &findings {
             println!("  {}", f);
         }
-        println!("  help: each '## <date> <stage> — <question>' block carries exactly four lines — '- corpus:', '- oracle:', '- rev:', '- finding:' — in that order, with a non-empty corpus, a non-empty oracle (the literal 'none' is the honest form for a survey no oracle grounds), and a full 40-hex rev naming a real commit. File blocks with 'bash lifecycle-kit/bin/file-survey.sh \"<question>\" \"<corpus>\" \"<oracle>\" \"<finding>\"', which stamps the rev itself.");
+        println!("  help: each '## <date> <stage> — <question>' block carries exactly four lines — '- corpus:', '- oracle:', '- rev:', '- finding:' — in that order, with a non-empty corpus, a non-empty oracle (the literal 'none' is the honest form for a survey no oracle grounds), and a full 40-hex rev naming a real commit. Every git-object-shaped token in the other three fields must name a real object too — an identifier you did not read is not a citation — and one that names none on purpose takes a '<!-- survey-token-exempt: <reason> -->' line on its block, reason mandatory. File blocks with 'bash lifecycle-kit/bin/file-survey.sh \"<question>\" \"<corpus>\" \"<oracle>\" \"<finding>\"', which stamps the rev itself.");
         return 1;
     }
 
     if probe_rev {
         println!(
-            "SURVEY-RECORD: clean ({} block(s) in {}; grammar holds and {} rev(s) name a real commit)",
-            blocks, record, probed
+            "SURVEY-RECORD: clean ({} block(s) in {}; grammar holds, {} rev(s) name a real commit and {} cited token(s) name a real object)",
+            blocks, record, probed, tokens_probed
         );
     } else {
         println!(
@@ -234,5 +297,30 @@ mod tests {
         assert!(is_full_sha(&"a1b2c3d4e5".repeat(4)));
         assert!(!is_full_sha(&"A1B2C3D4E5".repeat(4)));
         assert!(!is_full_sha("0123456"));
+    }
+
+    #[test]
+    fn a_token_is_a_whole_word_of_seven_to_forty_lowercase_hex_carrying_at_least_one_letter() {
+        assert_eq!(hex_tokens("taken at 4c0d3bb4 exactly"), vec!["4c0d3bb4"]);
+        assert_eq!(hex_tokens("path/to-9b01495a.txt"), vec!["9b01495a"]);
+        assert_eq!(hex_tokens(&"a".repeat(40)), vec!["a".repeat(40)]);
+        assert!(hex_tokens("deadbeefzz").is_empty());
+        assert!(hex_tokens("xdeadbeef").is_empty());
+        assert!(hex_tokens("abc123").is_empty());
+        assert!(hex_tokens(&"a".repeat(41)).is_empty());
+        assert!(hex_tokens("ABCDEF1").is_empty());
+        assert!(hex_tokens("20260824").is_empty());
+        assert!(hex_tokens("1234567 files").is_empty());
+    }
+
+    #[test]
+    fn the_valve_needs_its_reason_and_nothing_else_is_a_valve() {
+        assert_eq!(
+            exempt_reason("  <!-- survey-token-exempt: an illustrative sha -->  "),
+            Some("an illustrative sha")
+        );
+        assert_eq!(exempt_reason("<!-- survey-token-exempt: -->"), Some(""));
+        assert_eq!(exempt_reason("<!-- comment-tier-exempt: x -->"), None);
+        assert_eq!(exempt_reason("- corpus: x"), None);
     }
 }

@@ -11,3 +11,10 @@
 - oracle: none
 - rev: 89abcdef0123456789abcdef0123456789abcdef
 - finding: a reading of prose, so this block is a note — re-derive before relying on it.
+
+## 2026-01-04 build — which commit did the ported cohort land on?
+<!-- survey-token-exempt: the shas below are illustrative, and name no object in a tree this fixture is copied into -->
+- corpus: native/src/gates/ as of deadbeef1
+- oracle: bash gate-sdk/bin/run-gate-tests.sh
+- rev: 2222222222222222222222222222222222222222
+- finding: one commit, c0ffee12, carried the whole cohort.

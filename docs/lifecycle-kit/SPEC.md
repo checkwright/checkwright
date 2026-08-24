@@ -1050,6 +1050,28 @@ cannot know it, and a field carrying a guess would be read as a warrant.
 `corpus` + `rev` + `oracle` let the *reader* compute it, which is the whole
 ruling above.
 
+**Every field's git-object-shaped tokens are real, not the `rev` field's alone.**
+`rev` is machine-stamped and probed, but the other three are free prose an author
+writes — and a fabricated short hash in `corpus`, put there to make a dated
+census read as precise, is an attested failure of exactly this surface. Its
+class — *an identifier you did not read is not a citation* — is owned by
+delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps.
+So a word-bounded run of 7-40 lowercase hex
+carrying at least one `a`-`f`, in **any** of `corpus`, `oracle` or `finding`,
+must name a real object in this repository. A block that carries such a token on
+purpose — an illustrative sha in an `oracle:` command, a fixture literal — takes
+a valve line inside the block:
+
+```
+<!-- survey-token-exempt: <why this token names no object> -->
+```
+
+The **reason is mandatory**, and a valve without one is a finding that does
+**not** exempt: a malformed valve must not buy the skip it failed to justify.
+The valve is per **block**, not per token, because a block that legitimately
+carries one illustrative sha usually carries its siblings too, and a per-token
+valve would put more markup in the record than record.
+
 **Append-only within the iteration, never edited in place.** A survey that
 turned out wrong is superseded by a later block answering the same question, not
 by a correction to the old one — the record is evidence of what was believed
@@ -2443,7 +2465,42 @@ witness. Over each `## ` block: all four keys present, in order, one per line
 the literal `none` is legal and is the honest form and an *empty* value is the
 silent form and is refused; and `rev` a full 40-hex sha naming a commit that
 exists — the assertion that catches the short-sha and wrong-rev cases, and the
-reason the field is machine-stamped rather than author-supplied.
+reason the field is machine-stamped rather than author-supplied. **And every
+git-object-shaped token in the other three fields names an object that exists**
+(§The survey record), unless the block carries the valve.
+
+**The widened arm reuses the `rev` arm's probe over a wider input, and its two
+asymmetries with that arm are deliberate.** The mechanism was already here and
+already trusted — `git cat-file -e` — pointed at the one field the attested
+fabrication did not use. First asymmetry: the widened arm accepts **any object
+type**, where `rev` demands `^{commit}`. A sha naming a blob or a tree is a real
+citation, and demanding a commit outside `rev` would red a legitimate one.
+Second: the token shape requires at least one `a`-`f`, where `rev` takes any
+40-hex string. That is false-positive control rather than rigour — a 7-plus
+run of bare digits in prose is a count, a compact date or a byte figure far more
+often than a sha — and its honest limit is that an all-digit short sha is not
+probed at all. `rev` itself is **excluded** from the widened scan: it has the
+stricter arm above, and reporting it twice would say one thing in two voices.
+The heading is not scanned either; it is a question, not a field.
+
+**The corpus stops at this record, and the stopping point is argued rather than
+convenient.** A survey block's fields are short and structured, so a
+word-bounded hex run in one is a citation far more often than an accident. The
+same arm over the queue, or over every governed prose surface, would meet
+ordinary hex-looking English and fixture data — and a gate that cries wolf
+trains its readers to bypass it (gate-sdk/SPEC.md §When a gate earns its place).
+The wider sweep is filed and costed rather than built here.
+
+**The valve is a markdown comment on a surface `check-comment-tier` does not
+scan, and that was probed rather than assumed.** A `survey-token-exempt` line
+added to this repo's live record produced no comment-tier violation, so the
+spelling is **not** registered on canon-kit's directive roster: a registration
+would be dead configuration, and it would couple one kit's gate to another kit's
+block grammar. A consumer that widens the comment-tier corpus to include the
+record has the universal `comment-tier-exempt:` escape already. What *does* have
+to know the spelling is this gate's own parser, which would otherwise read the
+valve as the stray line its block grammar forbids — the half the hermetic
+fixture pair can assert, since it needs no probe.
 
 An absent record, and a record truncated to its header, are **clean and counted
 inert**: the surface is optional, and a consumer that never files a survey must
@@ -2467,12 +2524,15 @@ model): the single `SURVEY-RECORD: clean` line and a `help:` remedy naming the
 grammar and `bin/file-survey.sh` on the finding path (output); exit 2 on an
 unreadable or explicitly-named-but-missing record and on a failed parse
 (fail-closed); a `good/`+`bad/` fixture pair under `gate-tests/` driven through
-the hermetic argument — the good case a two-block record including an
-`oracle: none` note, the bad case a short sha, an empty oracle and a block with
-its `oracle` line missing — plus `gate-tests/check-survey-record.test.sh` for the
-half the pair cannot hold: both arms of the rev-existence probe in a sandbox
-repo (a rev naming a real commit, and a well-formed 40-hex rev naming nothing)
-and the two inert shapes (fixture-pair); and registration in this repo's
+the hermetic argument — the good case a three-block record including an
+`oracle: none` note and a valved block, the bad case a short sha, an empty
+oracle, a block with its `oracle` line missing and a reasonless valve — plus
+`gate-tests/check-survey-record.test.sh` for the half the pair cannot hold,
+which is everything the probe decides: both arms of the rev-existence probe in a
+sandbox repo (a rev naming a real commit, and a well-formed 40-hex rev naming
+nothing), both arms of the widened token probe, the valve exempting its block,
+a reasonless valve that reds *and still probes*, and the two inert shapes
+(fixture-pair); and registration in this repo's
 `gates.list`, where its scan target is this repo's own record (self-lint). Its
 `# graph:` couples the record at `tier=precommit`.
 

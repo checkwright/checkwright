@@ -721,6 +721,15 @@ fails (a) and stays a pointer. Without that clause this reads as "duplicate when
 it feels important", which is the failure content-tiering exists to prevent and
 would cost more than the gap it closes.
 
+**A worked case the clause decided, recorded because it decided *against*
+residency.** The provenance floor (§Resume journal) binds a session that **has
+dispatched**, and such a session loads `templates/agent-execution.md` through its
+own trigger — so condition (a) fails and the rule stays template-tier rather than
+joining an always-loaded manifest. A resident copy would be a second source paid
+for by every session that never dispatches at all. It is recorded here precisely
+because the rule reads as important enough to promote, and reading as important
+is the licence (a) withholds.
+
 **This is load-trigger residency's own logic, not an exception to it.** That
 doctrine earns a rule a place in an always-loaded file only when no stage, skill,
 or tool-call trigger exists to load it, and the decisive question is *exists for
@@ -1617,6 +1626,52 @@ carving out a second surface per role is what keeps the reclaim story unchanged:
 every discharge path still lands in the same scratch directory the consumer's
 own work-unit boundary already sweeps, so no new lifetime, keep-list entry, or
 inbound-triage surface is created by the widening.
+
+**The provenance floor sits here because this section already owns the
+receiving side.** A dispatching session can narrate a finding from a subagent
+whose output it never received, and nothing reds — **five attested instances,
+every one self-caught**, four of them failures in two distinct shapes and the
+fifth a save. The operative text is the template's **A return you did not
+receive is not a finding, and an identifier you did not read is not a citation**
+bullet; what belongs here is the argument for why one of its two halves gets a
+rule instead of a gate.
+
+**No gate reaches the relayed-return half, and that is a proof rather than an
+appetite.** The tree cannot observe what a session did or did not **receive**. A
+return lives in the parent's context and leaves no artifact, so tree state is
+byte-identical whether the return was held or invented — the prose reads the
+same either way, which is what makes this a gap rather than a lapse. Arrival is
+also unobservable to the parent *by construction* in at least one attested mode:
+a child that could not reach its dispatcher by name delivered its synthesis to
+the top-level session instead, so not even the parent's own self-inquiry
+discharges it. A gate would therefore have to assert a fact about a
+conversation, and no scanner over a repository reaches one. Recorded so the next
+session weighing an oracle for this half reads the argument rather than
+re-deriving it. **The minted-identifier half is a different matter and is not
+conceded**: it leaves a token behind, so it is gated one record at a time at
+lifecycle-kit/SPEC.md §check-survey-record.
+
+**What stands in for the missing oracle is a mitigation, and it is this
+section's own mechanism.** The resume journal makes a child's output land on
+**disk** rather than only in a message, so a parent's claim becomes checkable
+against an artifact wherever the child wrote one. That is a reduction of the
+class's reach and not a closure of it, because the journal is the *child's*
+write and the sandbox caveat above says that write can fail silently. Stated as
+a bound, never banked as a fix.
+
+**Attested first-person, and this instance is recorded because it is one where
+the floor HELD.** An isolated agent dispatched from the authoring session
+returned a message citing an audit roster "from my earlier turns". That roster
+was not in the return the dispatcher received — the return carried one paragraph
+about an environment defect and nothing else. It was not narrated, not relayed
+onward and not used; every update target in that iteration's amendments was
+derived first-hand instead. The same return also carried a claim the dispatcher
+could not verify, that the child had built the native binary to escape a refusal
+loop, and it is carried at that tier wherever it appears rather than promoted to
+a finding — what *was* verified is that the main checkout's binary mtime was
+unchanged and `git status` stayed clean. Two instances from two **consecutive**
+stage sessions of one iteration, a mint and a relay, is what makes the class
+structural rather than anecdotal.
 
 ## Verify after every agent commit
 

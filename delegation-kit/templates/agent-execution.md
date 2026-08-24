@@ -353,6 +353,31 @@ drift: do not delete it on sight, and when either rule changes here, propagate.
   never mentioned. Quotation with attribution is precisely the signal a reader uses
   to decide a claim has already been checked, so an unverified one defeats normal
   trust rather than merely being wrong.
+- **A return you did not receive is not a finding, and an identifier you did not
+  read is not a citation.** Two shapes, because the attested instances are not
+  all one. **The relayed return:** a claim whose warrant is a dispatched agent's
+  output is made only where that output was **received**. A monitor that timed
+  out, a child that never reported, a notification never consumed — each leaves
+  you holding no return, and a claim made anyway is fabrication however well you
+  reasoned your way to it. All three attested instances of this shape sat in the
+  dispatcher's own *reasoning* rather than in quoted child text, which is why a
+  floor checking relayed quotations would have caught none of them. **The minted
+  identifier:** a commit sha, a `file:line`, a count, a path — written to make a
+  record read as precise, never actually read. The fourth attested instance is
+  this, a fabricated short hash put into a survey record's corpus field.
+  **The discharge is deliberately cheap: no new artifact and no running
+  narration.** Where the return arrived, cite **where it is held** — the journal
+  path you granted and read, or the commit you verified. Where it did not, either
+  do not make the claim, or mark it **unheld in the same sentence**. Marking is
+  admissible on purpose: what this closes is a claim that *looks* sourced, and a
+  claim saying it is not sourced does not commit it.
+  **Its boundary against the three bullets above, so the set does not read as
+  four spellings of one rule:** each of those presupposes a return that arrived.
+  *A child's citation is a pointer to verify* governs a citation that arrived and
+  may be wrong; *Findings you will act on are durable before you act on them*
+  governs a finding that arrived and must outlive the session; *Verify after
+  every agent commit* governs work that landed. This one governs the case where
+  **nothing arrived at all**, which none of them reaches.
 - **Budget-check before *each* dispatch in a fan-out**, not once at the start.
   `bash delegation-kit/bin/usage-verdict.sh` (verdict exit 0/1/2 from `usage.txt` —
   it folds in the reading-age and window-validity checks so a dead-window pct
