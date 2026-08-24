@@ -8,3 +8,4 @@ port-remainder-disposition-and-worktree-reclamation scope af3128a8 2026-08-24 6d
 port-remainder-disposition-and-worktree-reclamation spec a6fe25b7 2026-08-24 41750bee
 port-remainder-disposition-and-worktree-reclamation align a07e642f 2026-08-24 63ae827a
 port-remainder-disposition-and-worktree-reclamation build a43eccc5 2026-08-24 ed3faf3d
+port-remainder-disposition-and-worktree-reclamation validate a164aca5 2026-08-24 1e3c2573
