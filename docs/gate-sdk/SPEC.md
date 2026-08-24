@@ -7310,6 +7310,22 @@ assertion the moment a gate ported. The ordering is binding: a ported gate's
 pair passes against the subcommand **before** the script it replaces is
 deleted, never after.
 
+**The two argument positions fail in opposite directions, and the second one's
+symptom does not name its cause.** `$1` is the tests dir and is fail-closed — an
+absent tree exits 2 saying so. `${@:2}` is the gate-declaration dir set and
+**replaces** the resolved default rather than extending it, with a `[[ -d ]]`
+filter that drops a non-existent member silently. Pass a checks dir that is not
+there and the set is empty, so every gate in the tree reports
+`HARNESS: <gate> resolves in none of:` with an empty list after the colon — one
+pair of lines per gate, no line naming the argument. The reading is that the
+runner's search path was emptied, never that a fixture is malformed.
+It bites a consumer whose gates are all `.gate`-declared beside their scripts'
+former home: this repo's own consumer remainder keeps no `checks/` dir at all, so
+its roster line (README.md §This repo, governed) passes the tests dir alone, and
+supplying a plausible-looking `scripts/checks` produces the empty-list symptom
+across the whole tree. Filed for a fail-closed second position as
+`fixture-runner-checks-dir-fails-open`.
+
 **Every subdirectory of a tests dir is read as a case pair.** The runner globs
 `<tests-dir>/*/` and demands `good/` and `bad/` under each, so a directory that
 is not a gate's fixture pair is not ignored — it reds as a missing case dir. A

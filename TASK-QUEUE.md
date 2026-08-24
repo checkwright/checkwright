@@ -4702,9 +4702,18 @@
   fixture pair, plus a ruling on the past-tense form — a sentence deliberately recording a
   *retired* row (both repaired sentences are now exactly that) must not red, so the predicate needs
   a tense or a citation convention to key on. That convention is the design question.
+  **A SECOND live instance was authored 2026-08-24, at this close's eviction review, and it is
+  recorded because it moved this entry out of eviction range.** Ruling the `installer_smoke` row's
+  attribution put a claim about that file's slug column into two governed surfaces at once —
+  `bridged-knob-case-tmp-dir-override-inert`'s body and evidence-kit/SPEC.md §Baseline manifest —
+  so the coupled prose is no longer one repaired sentence but a live pair, and the class now has a
+  reader that a future re-attribution would silently falsify. **No `recurrence:` date joins:** the
+  entry names an unbuilt gate rather than a defect, so authoring a new instance of the class it
+  would catch is the class recurring, not the finding re-firing.
   **Cost while deferred:** low and slow, but it recurs on exactly the readers who most need the
   file — a cohort pricing criterion 5 reads the prose first.
-  Filed 2026-08-14 by close, from its own gap-inbox drain and staleness review.
+  Filed 2026-08-14 by close, from its own gap-inbox drain and staleness review; kept in Deferred at
+  the 2026-08-24 eviction review on the trigger above and on the live slug it names.
 
 - **tracked-to-untracked-pointer-scope** [design-pending] — a tracked doc pointing at an
   untracked one can scope the pointer to the wrong reader, and nothing holds the scope
@@ -7559,6 +7568,69 @@
   radius above; drained 2026-08-24 at this iteration's close, which re-probed both spellings at HEAD
   and confirmed the rule-22 interaction in the SPEC.
 
+- **fixture-runner-checks-dir-fails-open** [design-pending] — `run-gate-tests.sh` refuses a missing
+  tests dir by name and drops a missing checks dir in silence, so the wrong second argument reports
+  as a corpus-wide fixture defect.
+  **Probed at this close, not inferred.** `bash gate-sdk/bin/run-gate-tests.sh scripts/gate-tests
+  scripts/checks` emits `GATE-TESTS: 13 harness/fixture error(s) (malformed fixtures — could not
+  test)` and two `HARNESS: <gate> resolves in none of:` lines per gate, each with an EMPTY list
+  after the colon. Nothing in that output names the argument, and "malformed fixtures" points the
+  reader at the corpus, which is intact.
+  **The mechanism is a one-line asymmetry.** `$1` is guarded by
+  `[[ -d "$TESTS_DIR" ]] || { …; exit 2; }`. `${@:2}` REPLACES the `gate_check_dirs` default and is
+  filtered by `[[ -d "$d" ]] && resolved+=(…)`, so a non-existent member is dropped rather than
+  refused and an all-missing set resolves to empty. The filter is right for the DEFAULT set, where
+  an absent kit dir is normal; it is wrong for an EXPLICIT one, where the caller named it.
+  **Why `[design-pending]` and not a two-line patch.** The two sets need different strictness from
+  one code path, and which distinction to key on is the design: explicit-vs-default argv provenance,
+  or a `--strict` opt-in, or refusing only when the resolved set is empty. The third is cheapest and
+  the weakest — it still passes a run where three of four named dirs are typos. The runner is also
+  the oracle every kit's fixture suite rides, so a strictness change is felt by every consumer
+  invocation at once, including the vendored ones.
+  **This repo is the case that surfaces it**, because its consumer remainder keeps no `checks/`
+  directory since the port — so the roster's consumer line takes the tests dir alone while every
+  kit line takes two, and the natural generalization from a kit line is the failing form.
+  **Cost while deferred:** one session's diagnosis per occurrence, paid by whoever generalizes the
+  two-argument form; low frequency, and self-limiting once the SPEC paragraph above is found, which
+  is exactly what makes it a documented hazard rather than a fixed one.
+  Filed 2026-08-24 at this iteration's close, from the knowledge-friction triage that gave the fact
+  its home in gate-sdk/SPEC.md §run-gate-tests; filed rather than fixed under the scope-gated intake
+  rule, the harness being validate-critical and this close post-validate.
+
+- **inline-body-interpreter-grant-absent** [design-pending] — `python3` with a body carried IN the
+  command string is the tree's standard scratch-computation form, is safe by the tree's own stated
+  argument, and is granted by nothing.
+  **Measured at this close's prompt-friction triage.** 45 `python3`-led fall-throughs on the live
+  438-line log, the largest binary-level class after the write class. The inline shapes are the bulk
+  — `python3 -` 30, `python3 -c` 5, `python3 <<<` 1, `python3 /dev/stdin` 1 — and the remainder is
+  `python3 .tmp/x.py` 3, `python3 <` 2, `python3 tools/gen.py` 2.
+  **Granted NOWHERE, checked both surfaces rather than assumed:** no `Bash(python3*)` entry in the
+  committed `.claude/settings.json` and none in the local overlay. The one that used to exist,
+  `Bash(python3 .tmp/*)`, was removed at a 2026-08-12 close as a glob over writable scratch and is
+  recorded in `settings-content-pin-report-absent`; nothing replaced it for the inline shapes.
+  **Disposition (a), and the tree already argued the safety case.** guard-kit/SPEC.md §The generic
+  ruleset rules that rule 22 deliberately does not fire on a body carried in the command string,
+  because "the permission prompt shows it to the approver verbatim and the friction log records it.
+  There is nothing for a compensating control to compensate for." A grant over exactly that shape
+  reinforces the form the ruleset already blesses — the opposite of the masking risk the triage
+  criterion warns of, which is why (a) is right here and (b) is not.
+  **Why it sits in the queue rather than being taken:** a committed grant is a settings edit and
+  therefore **operator-class** under TRAJECTORY.md §The closed rulings (2026-08-22). This entry is
+  the proposal's durable form; no stage session may land it.
+  **The design question surviving the operator decision** is the glob's shape. `Bash(python3 -*)`
+  reaches `python3 -c` and `python3 -` and stops at a bare file operand, which is the split that
+  matches the safety argument — but a Bash allow-glob's `*` spans `/` and `..`
+  (`grant-argument-bounding-mechanism`), so it cannot be relied on to bound anything, and the
+  scratch-operand shapes rule 22 now blocks must stay blocked by the guard rather than by the glob.
+  **DISTINCT from `overlay-only-oracle-grants-uncommitted`**, whose four oracles are granted in the
+  overlay and whose question is which surface carries them; this shape is granted on no surface at
+  all. DISTINCT from `file-authoring-act-ungoverned`, which governs bringing a file into being where
+  this governs executing a visible body. It re-files neither and adds neither a recurrence date.
+  **Cost while deferred:** roughly forty out-of-band decisions per iteration, paid by whichever
+  session is computing over the tree, and invisible to every gate — the friction log is advisory.
+  Filed 2026-08-24 at this iteration's close, from its prompt-friction triage, both grant surfaces
+  read rather than inferred.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
@@ -7617,10 +7689,6 @@
 
 ## Done
 
-- turn-end-chokepoint-and-wait-primitive
-- scratch-execution-control-is-bash-only
-- prompt-ranking-command-word-shape-blind
-- scratch-run-steer-rule
 
 ## Lessons Learned
 
