@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
-# Behavioral test of templates/subagent-stop-liveness.sh — the SubagentStop probe.
-# The two properties nothing else can assert: the exit is 0 on every path including the
-# failure ones, and stdout stays empty (a byte on stdout would be hook JSON, which is the
-# blocking variant by accident). The reader is driven by stub scripts, one per exit class,
-# so every verdict arm is reached without a real producer.
+# Behavioral test of templates/subagent-stop-liveness.sh — the SubagentStop hook.
+# The properties nothing else can assert: the exit code per verdict arm (2 on red and corrupt,
+# 0 on green, unavailable and error), the decision= column that goes with it, a non-empty
+# stderr on each refusing arm because that stderr IS the blocking reason, and stdout empty on
+# every path (a byte on stdout would be hook JSON, which is a decision this hook never emits).
+# The reader is driven by stub scripts, one per exit class, so every verdict arm is reached
+# without a real producer.
 #
 # Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
@@ -23,14 +25,21 @@ stub() {  # $1=name $2=exit-code
     printf '%s\n' "$tmp/$1"
 }
 
-# fire <name> <log> <reader> <run-dir> <payload> — runs the probe, asserting exit 0 and silent stdout
+# fire <name> <log> <reader> <run-dir> <payload> <want-rc> — runs the hook, asserting the exit
+# code, silent stdout, and stderr non-empty exactly when the exit refuses.
 fire() {
-    local name="$1" log="$2" reader="$3" rundir="$4" payload="$5" out rc
+    local name="$1" log="$2" reader="$3" rundir="$4" payload="$5" want_rc="$6" out rc
     out="$( printf '%s' "$payload" | DELEGATION_KIT_STOP_LOG="$log" \
-        DELEGATION_KIT_LIVENESS_CMD="$reader" GATE_SDK_TMP_DIR="$rundir" bash "$HOOK" 2>/dev/null )"
+        DELEGATION_KIT_LIVENESS_CMD="$reader" GATE_SDK_TMP_DIR="$rundir" \
+        bash "$HOOK" 2>"$tmp/$name.err" )"
     rc=$?
-    [[ "$rc" -eq 0 ]] || { echo "  FAIL: $name exited $rc, not 0"; fails=$((fails + 1)); }
-    [[ -z "$out" ]] || { echo "  FAIL: $name wrote '$out' to stdout; the probe emits no hook JSON"; fails=$((fails + 1)); }
+    [[ "$rc" -eq "$want_rc" ]] || { echo "  FAIL: $name exited $rc, want $want_rc"; fails=$((fails + 1)); }
+    [[ -z "$out" ]] || { echo "  FAIL: $name wrote '$out' to stdout; the hook emits no hook JSON"; fails=$((fails + 1)); }
+    if [[ "$want_rc" -eq 2 ]]; then
+        [[ -s "$tmp/$name.err" ]] || { echo "  FAIL: $name refused with empty stderr; the stderr is the blocking reason"; fails=$((fails + 1)); }
+    else
+        [[ ! -s "$tmp/$name.err" ]] || { echo "  FAIL: $name allowed but wrote stderr: $(cat "$tmp/$name.err")"; fails=$((fails + 1)); }
+    fi
 }
 
 want() {  # $1=name $2=line $3.. = substrings the line must carry
@@ -43,51 +52,58 @@ want() {  # $1=name $2=line $3.. = substrings the line must carry
 
 runs="$tmp/runs"; mkdir -p "$runs"
 
-# A — no reader at all (the knob emptied): the probe still logs, and says so rather than
-#     reporting a clean tree it never asked about.
+# A — no reader at all (the knob emptied): the hook holds no reading, so it logs, says so rather
+#     than reporting a clean tree it never asked about, and allows.
 log="$tmp/a.log"
-fire no-reader "$log" "" "$runs" "$PAYLOAD"
-want no-reader "$(cat "$log")" "event=SubagentStop" "session=s-1" "live=no" "verdict=unavailable" "records=0" "keys=session_id,transcript_path,hook_event_name,stop_hook_active"
+fire no-reader "$log" "" "$runs" "$PAYLOAD" 0
+want no-reader "$(cat "$log")" "event=SubagentStop" "session=s-1" "live=no" "verdict=unavailable" "records=0" "decision=allow" "keys=session_id,transcript_path,hook_event_name,stop_hook_active"
 
-# B/C/D — one firing per reader exit class, each with one record on disk so `records` is
-#     non-zero and a `live=no` is informative rather than vacuous.
+# B/C/D/E — one firing per reader exit class, each with one record on disk so `records` is
+#     non-zero and a `live=no` is informative rather than vacuous. The exit code is the
+#     predicate: red and corrupt refuse, green and an unmapped code allow. `corrupt` carries
+#     `live=no decision=refuse`, which is why decision cannot be derived from live.
 printf 'pid=1 run=k\n' >"$runs/k.run"
-for case_spec in "green 0 live=no" "red 1 live=yes" "corrupt 2 live=no"; do
-    read -r verdict code liveness <<<"$case_spec"
+for case_spec in "green 0 live=no allow 0" "red 1 live=yes refuse 2" "corrupt 2 live=no refuse 2" "error 77 live=no allow 0"; do
+    read -r verdict code liveness decision rc <<<"$case_spec"
     log="$tmp/$verdict.log"
-    fire "reader-$verdict" "$log" "$(stub "reader-$verdict" "$code")" "$runs" "$PAYLOAD"
-    want "reader-$verdict" "$(cat "$log")" "verdict=$verdict" "$liveness" "records=1"
+    fire "reader-$verdict" "$log" "$(stub "reader-$verdict" "$code")" "$runs" "$PAYLOAD" "$rc"
+    want "reader-$verdict" "$(cat "$log")" "verdict=$verdict" "$liveness" "records=1" "decision=$decision"
 done
 
-# E — a reader that cannot be run at all (an unresolvable path) is the vendoring prerequisite
-#     failing, and it degrades to `unavailable` rather than to a wedged turn.
-log="$tmp/e.log"
-fire absent-reader "$log" "$tmp/nowhere/check.sh" "$runs" "$PAYLOAD"
-want absent-reader "$(cat "$log")" "verdict=unavailable" "live=no"
+# F — the refusal message names the finding and both lawful exits, as every block message must,
+#     and it names the reader command so the session can see the record set for itself.
+want red-message "$(cat "$tmp/reader-red.err")" "turn-end refused" "wait for the producer on its own artifact" "delete the record once the producer has exited" "$runs"
+want corrupt-message "$(cat "$tmp/reader-corrupt.err")" "does not parse" "which record is malformed"
 
-# F — an unwritable log: the line cannot be recorded anywhere, so it is dropped silently and
-#     the turn still ends. This is the path where "record the failure where it can be" has
-#     nowhere left to record it.
-printf 'not a directory\n' >"$tmp/blocker"
-fire unwritable-log "$tmp/blocker/probe.log" "" "$runs" "$PAYLOAD"
-
-# G — a payload whose values carry whitespace must not split the space-delimited line: the
-#     field count is the assertion, because a split is invisible in a substring match.
+# G — a reader that cannot be run at all (an unresolvable path) is the vendoring prerequisite
+#     failing: the hook holds no reading, so it degrades to `unavailable` and allows rather
+#     than refusing every turn end in a tree that never configured enforcement.
 log="$tmp/g.log"
-fire spacey-payload "$log" "" "$runs" '{"session_id":"a b\tc","hook_event_name":"Subagent Stop"}'
-nf="$(awk '{print NF}' "$log")"
-[[ "$nf" == "7" ]] || { echo "  FAIL: spacey-payload produced $nf fields, want 7: $(cat "$log")"; fails=$((fails + 1)); }
+fire absent-reader "$log" "$tmp/nowhere/check.sh" "$runs" "$PAYLOAD" 0
+want absent-reader "$(cat "$log")" "verdict=unavailable" "live=no" "decision=allow"
 
-# H — an empty payload (no stdin at all): the payload-derived fields degrade to '-' and the
-#     liveness half of the line is still bought.
-log="$tmp/h.log"
-fire empty-payload "$log" "$(stub reader-h 1)" "$runs" ""
-want empty-payload "$(cat "$log")" "event=-" "session=-" "keys=-" "live=yes"
+# H — an unwritable log: the line cannot be recorded anywhere, so it is dropped silently. The
+#     reading still decides, so this firing allows on `unavailable` rather than on the log.
+printf 'not a directory\n' >"$tmp/blocker"
+fire unwritable-log "$tmp/blocker/probe.log" "" "$runs" "$PAYLOAD" 0
 
-# I — one firing appends exactly one line, so the log is a firing count as well as a record.
+# I — a payload whose values carry whitespace must not split the space-delimited line: the
+#     field count is the assertion, because a split is invisible in a substring match.
 log="$tmp/i.log"
-fire append-1 "$log" "" "$runs" "$PAYLOAD"
-fire append-2 "$log" "" "$runs" "$PAYLOAD"
+fire spacey-payload "$log" "" "$runs" '{"session_id":"a b\tc","hook_event_name":"Subagent Stop"}' 0
+nf="$(awk '{print NF}' "$log")"
+[[ "$nf" == "8" ]] || { echo "  FAIL: spacey-payload produced $nf fields, want 8: $(cat "$log")"; fails=$((fails + 1)); }
+
+# J — an empty payload (no stdin at all): the payload-derived fields degrade to '-' and the
+#     refusal is exact, because the decision reads the liveness reader and no payload field.
+log="$tmp/j.log"
+fire empty-payload "$log" "$(stub reader-j 1)" "$runs" "" 2
+want empty-payload "$(cat "$log")" "event=-" "session=-" "keys=-" "live=yes" "decision=refuse"
+
+# K — one firing appends exactly one line, so the log is a firing count as well as a record.
+log="$tmp/k.log"
+fire append-1 "$log" "" "$runs" "$PAYLOAD" 0
+fire append-2 "$log" "" "$runs" "$PAYLOAD" 0
 lines="$(grep -c . "$log")"
 [[ "$lines" == "2" ]] || { echo "  FAIL: two firings wrote $lines line(s), want 2"; fails=$((fails + 1)); }
 
@@ -95,5 +111,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "subagent-stop-liveness.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "subagent-stop-liveness.test: ok (exit 0 and silent stdout on every path; verdict green/red/corrupt/unavailable mapped; whitespace in a payload cannot split the line; one firing, one line)"
+echo "subagent-stop-liveness.test: ok (exit 2 on red/corrupt with a reason on stderr, 0 on green/unavailable/error with none; decision= matches the exit; stdout silent on every path; whitespace in a payload cannot split the line; one firing, one line)"
 exit 0

@@ -12,60 +12,6 @@
 
 ## New Features
 
-- **turn-end-chokepoint-and-wait-primitive** [spec: SPEC-turn-end-refusal.md] — the blocking-hook
-  variant, the last open half of the wait rule's fifth firing; its other two halves are closed.
-  **Chokepoint half — CLOSED 2026-08-22**, into delegation-kit/SPEC.md §The turn-end liveness
-  probe: a turn-end passes no `PreToolUse`, and `SubagentStop` fires per assistant step, so a
-  blocking variant needs a SECOND authorization. Rule 14 stands; the class holds.
-  **Measurement half — CLOSED 2026-08-23**, into delegation-kit/SPEC.md §bin/wait-probe and
-  §Operative residency. The stated ordering **stands unchanged**: every completion-marker wait ran
-  clean across four forms and four durations to 200s, on both harness forms and a
-  harness-uninvolved control, so no form carries a ceiling in that range. Every early exit was
-  **predicate**-shaped, never form-shaped — the two clauses compose literally into
-  `until kill -0 "$pid"`, true while the producer lives and so exiting at once. The four attested
-  deaths were that inversion, not the primitive; the polarity fix propagated to all four carriers.
-  **What remains, and it is the whole of this entry now: the blocking `SubagentStop` variant.**
-  The detector exists and WORKS — it logged `verdict=red live=yes` sixteen times in one 37-minute
-  window, and 68 clean `verdict=green live=no records=0` lines at this boundary, so it is live
-  rather than merely present. What was missing was a forcing function.
-  **THE FORCING FUNCTION IS NOW AUTHORIZED — OPERATOR RULING 2026-08-24, UNCONDITIONAL**, recorded
-  at TRAJECTORY.md §The closed rulings, which owns it because delegation-kit/SPEC.md §The turn-end
-  liveness probe states a blocking hook is a separate authorization and leaves it to no surface it
-  owns. **The capped variant was offered and REFUSED** — refuse only on `verdict=red live=yes`
-  carrying at least one record, advisory otherwise — so a narrowing condition in the hook as built
-  is a design decision inside this unit's own amendment envelope, argued on its own grounds and
-  never inherited from the ruling. Scope also probed the hook ALREADY registered in the committed
-  settings, so the build is a script change and not a permission edit under the 2026-08-22 wall;
-  that is a cost finding and explicitly not a ground the authorization rests on. **The narrowing
-  is argued and the obligation is discharged** — spec 2026-08-24 refuses on `red` OR `corrupt`,
-  the second arm on a bypass ground of its own, and discloses where a boundary resembles the
-  refused option.
-  **The CARRIER argument is answered and stays answered:** a session that wrote the rule down
-  itself and still ended the turn retires it, so carriage was never the defect.
-  **Cost while deferred:** each further firing costs an orphaned producer plus the lead turn that
-  discovers it — and, as the tenth showed, can cost a whole suite's evidence.
-  recurrence: turn-end-chokepoint-and-wait-primitive 2026-08-18 2026-08-19 2026-08-21 2026-08-22
-  **TWO FIRINGS JUDGED AND UNSTAMPABLE, and the window that blocked them is now another entry's.**
-  The FIFTH, 2026-08-23: `battery-runner-port`'s close read 458 `SubagentStop` events, 8 of them
-  `verdict=red live=yes` with `records=1..2`, in two clusters. The SIXTH, 2026-08-24: that
-  iteration's validate ended its turn on a backgrounded `run-validate.sh`, the producer survived as
-  an orphan, and the lead recovered it by reading the recorded PID — self-reported and
-  **attributed**, which answers the fifth's honest limit (the probe reads a shared `.tmp` and
-  cannot name a culprit) rather than resting on it. Neither could be stamped: a fifth date makes
-  the declaration 107 columns against `check-queue-wrap`'s 100, and queue-kit/SPEC.md §The tag
-  algebra rules that ceiling resolves to PROMOTION, never a wider `QUEUE_KIT_WRAP_BUDGET`. The true
-  count is SIX where the declaration reads four, and the latency that made both unstampable is
-  owned from 2026-08-24 by `promotion-commitment-stamp-latency`.
-  **The 2026-08-22 sequencing is DISCHARGED — the condition was paid and this boundary took it.**
-  `subagent-stop-payload-background-tasks-read` settled first and PAID OUT AS NOTHING COLLAPSED
-  (delegation-kit/SPEC.md §What `background_tasks` carries): the harness enumerates what it
-  LAUNCHED, not what is RUNNING, so a detached producer live under a red `*.run` record appeared in
-  none of five firings. What survives for the build — the blocking variant still needs the `*.run`
-  record set, the harness view can only supplement it, and guard-kit's unrecorded-launch residue
-  stays unreachable through it. The no-values privacy ruling stays operator-class.
-  Filed 2026-08-16 by close from the gap inbox; demoted 2026-08-23 at build, the measurement half
-  delivered and the blocking variant still sequenced.
-
 - **scratch-execution-control-is-bash-only** [spec: SPEC-scratch-bash-only.md] — the scratch-run
   steer and the runner it steers to are both bash-only, so a non-bash scratch script executes
   with no compensating control at all.
@@ -7685,6 +7631,8 @@
 - **amendment-roster-omission-detection** [design-pending] — Only a grep catches a short roster.
 
 ## Done
+
+- turn-end-chokepoint-and-wait-primitive
 
 ## Lessons Learned
 

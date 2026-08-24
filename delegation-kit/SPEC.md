@@ -456,11 +456,20 @@ measured.** A `SubagentStop` hook *is* a chokepoint at the turn-end, so it is th
 one candidate that could falsify the axis — and the decisive question was whether
 the harness already defers a subagent's stop while a background child is live,
 since a harness that deferred would dissolve the class this rule exists for. The
-logging-only probe at §The turn-end liveness probe (template) put a live producer
+probe at §The turn-end liveness hook (template) put a live producer
 under a deliberate turn-end and read `live=yes`: **the stop is not deferred**. So
 the sentence stands as written for the `PreToolUse` axis it was said on, the
-relocation to guard-kit rule 14 stands, and the turn-end's own event is reachable
-but buys enforcement only through a blocking hook nobody has authorized.
+relocation to guard-kit rule 14 stands, and the turn-end's own event is reachable.
+
+**The second sentence of that block holds only on the axis it was said on, and
+the qualification is stated rather than left to be read past.** *A turn-end does
+not* pass a chokepoint on the **tool-call** axis, which is the axis the block is
+about. On the harness's own event axis it does, and the hook there **refuses**,
+by exit 2, on an operator authorization since spent (§The turn-end liveness hook
+(template) owns the mechanism and the authorization's content). So the turn-end
+rule carries enforcement on both axes — rule 14 over the harm, this hook over the
+act — and neither is the other's substitute, since rule 14 reaches acts this
+hook's event never sees and this hook reaches a session that mutates nothing.
 
 **The chokepoint — what a `PreToolUse` hook can actually read.** The payload
 carries `session_id`, `prompt_id`, `transcript_path`, `cwd`, `permission_mode`,
@@ -767,10 +776,11 @@ N copies of the bug rather than N chances to catch it.
 its harm, and it exists.** No check can read a session's choice to end a turn:
 the act leaves no tracked artifact, and no `PreToolUse` chokepoint sees it. The
 harness's own turn-end event does see it — measured, not assumed (§The turn-end
-liveness probe (template)) — and seeing is not refusing: reading the act there
-would take a blocking hook, which is a separate authorization and is not held. So
-the relocation below is the enforcement, and it is that on the merits rather than
-for want of an alternative. What the ruling never licensed was stopping there. The harm
+liveness hook (template)) — and that hook **refuses** there as well as seeing, on
+an authorization since given and spent. So the relocation below is not the only
+enforcement, and it is not the enforcement for want of an alternative: it is that
+on the merits, because the harm it blocks reaches a chokepoint the turn-end event
+never sees. What the ruling never licensed was stopping there. The harm
 the turn-end causes does pass a chokepoint — a tracked-tree mutation while a
 recorded producer is still writing arrives as an ordinary tool call — and it is
 blocked there by guard-kit rule 14 (guard-kit/SPEC.md §The generic ruleset,
@@ -806,7 +816,7 @@ that leave no tracked artifact either, yet they are gated. The axis that
 separates them is **interception, not durability**: a dispatch passes a
 chokepoint the harness fires a hook on, and a turn-end passes none the
 dispatch-shape rules could have used (§The delegation model, which owns the
-generalization, and §The turn-end liveness probe (template), which measured the
+generalization, and §The turn-end liveness hook (template), which measured the
 harness's own turn-end event and found it reachable). So "no tracked artifact" is
 why neither rule gets a *gate* over the tree, and it is not by itself a reason
 to stop looking for an oracle. Recorded here for the same reason §The
@@ -817,53 +827,143 @@ caveat: otherwise the next reader re-litigates one of the two paragraphs.
 licensed found one: the turn-end is unreachable from the tool-call axis, but the
 mutation it enables is a `PreToolUse` call, and rule 14 fires there. It then
 found a second candidate on a different axis — the harness's own `SubagentStop`
-event, which the probe above measured and found live. It is an oracle that
-*observes* rather than one that refuses, and turning it into the second kind is a
-separate authorization. Recorded because a
+event, which the hook above measured and found live. It began as an oracle that
+*observed* rather than refused; turning it into the second kind took a separate
+authorization, that authorization was given, and it now refuses. Recorded because a
 sentence saying *keep looking* is cheap to write and easy to leave un-acted, and
 the next reader should find the outcome beside the licence rather than have to
 reconstruct whether anyone ever looked.
 
-## The turn-end liveness probe (template)
+## The turn-end liveness hook (template)
 
 `templates/subagent-stop-liveness.sh` is an opt-in `SubagentStop` hook, inert
-until a consumer registers it, that answers one question the section above
-leaves open: **does the harness already defer a subagent's stop while a
-background child is live?** If it does, the whole class §The delegation model's
-waiting rule exists for dissolves; if it does not, the axis holds at the turn-end
-too and a blocking hook is the only lever left. It is a **probe with a durable
-artifact, not an enforcement mechanism** — its deliverable is an answer, and *a
-capped refusal buys nothing* is one of the answers it is entitled to return.
+until a consumer registers it, that **refuses a dispatched session's turn end
+while the launch records under the scratch dir say a producer is live**. It
+shipped as a probe first, and the probe's own result is what made it this: the
+question it was built to answer — **does the harness already defer a subagent's
+stop while a background child is live?** — came back *no* (§The probe is
+asymmetric), so the axis §The delegation model's waiting rule exists for holds at
+the turn-end too and a blocking hook was the only lever left.
+
+**The authorization is recorded here because it is spent.** Turning the observer
+into a refuser was ruled by the operator on 2026-08-24, **unconditionally**, and
+the ruling named its own discharge event — spent when the enforcing hook ships —
+so it is retired from TRAJECTORY.md §The closed rulings and its content lives
+here. Two things it settled bind any later change. First, a **capped** variant
+was offered as an explicit option and **refused**: refuse only on a
+`verdict=red live=yes` reading carrying at least one record, stay advisory
+otherwise. So every narrowing below is argued on its own stated grounds, never
+inherited as a safety margin, and where a boundary here coincides with the
+refused option's the coincidence is disclosed rather than left to be read back
+in through the resemblance. Second, what needed authorizing was the **class** —
+an observer turned refuser at a turn end. A scope probe established that this
+repo had the hook registered already, so the change was a script edit rather than
+a permission-surface write under TRAJECTORY.md's 2026-08-22 wall; that is a true
+finding about **cost** and it is not what the authorization rests on, which is
+why it would have been given just the same had the registration been absent.
 
 **The event is `SubagentStop`, never `Stop`.** A dispatched session is a
 subagent, so its turn end fires `SubagentStop`, and every attested firing of the
 waiting rule was a dispatched session. `Stop` is deliberately not registered:
 the main-session turn end has no attested firing, so registering it would widen
-the subject past what the evidence carries.
+the subject past what the evidence carries. Enforcement inherits that boundary
+unchanged — the main session's turn end is still unreached.
 
-**Logging-only, and the variant boundary is part of the contract.** The hook
-reads its payload from stdin, asks the liveness reader whether any launch record
-under `${GATE_SDK_TMP_DIR:-.tmp}` names a live producer, appends one line to
-`DELEGATION_KIT_STOP_LOG`, and **exits 0 unconditionally, emitting no hook JSON
-at all**. A hook that blocks is a **separate authorization** and nothing here
-implies one.
+**The contract: exit 2 on `red` or `corrupt`, exit 0 on every other path, and no
+hook JSON on either.** The hook reads its payload from stdin, asks the liveness
+reader whether any launch record under `${GATE_SDK_TMP_DIR:-.tmp}` names a live
+producer, appends one line to `DELEGATION_KIT_STOP_LOG`, and then either exits 0
+or exits 2 with its refusal written to **stderr**.
 
-**Emitting nothing is the design, and it is what makes this variant buildable.**
-guard-kit's framework hardcodes `hookEventName:"PreToolUse"` in each of its three
-emitters, so a hook that had to *speak* at `SubagentStop` would need a primitive
-guard-kit does not have and whose event scope its SPEC never states. Speaking
-nothing needs no emitter, so this template **does not source guard-kit's lib** —
-which also keeps delegation-kit from acquiring a dependency on guard-kit being
-vendored. The two payload fields it does read cost a `cat` and a `jq -r`; the
-blocking variant's emitter cost is stacked on its own authorization rather than
-paid here.
+**The refusal needs no emitter, and that is a repair to this section rather than
+a new claim.** This section used to argue that a hook which had to *speak* at
+`SubagentStop` would need a primitive guard-kit does not have — all three of
+guard-kit's emitters hardcode `hookEventName:"PreToolUse"` — and concluded that
+the blocking variant's emitter cost was stacked on its own authorization. The
+harness's published hook contract, fetched rather than recalled, settles it the
+other way for the exit-code route: `SubagentStop` is listed as an event a hook
+**can** block, exit 2 is the blocking route, and the hook's **stderr is shown to
+Claude and is itself the blocking reason when the hook emits no JSON decision**.
+So the refusal speaks through stderr, mints no guard-kit primitive, and leaves
+this template's standing property intact — it **does not source guard-kit's lib**,
+which is what keeps delegation-kit from acquiring a dependency on guard-kit being
+vendored. The two payload fields it reads still cost a `cat` and a `jq -r`.
 
-**It never wedges a turn.** Every failure path — an unreadable payload, an absent
-`jq`, an absent or hung liveness reader, an unwritable log — exits 0, recording
-the failure in the line where the line can be written and silently where it
-cannot. The reader is invoked under `timeout` where one is available, because a
-reader that hung would refuse the turn end by accident and that is the blocking
-variant arrived at sideways.
+**There is no advisory tier at this event, so the choice was deliver or do not.**
+At exit 0 a hook's stderr goes to the debug log only and Claude never sees it. A
+"log it more loudly" alternative therefore does not exist to be weighed: exit 2
+is the only delivery, which is why the refusal is not offered in a softer form.
+
+**Honest limit on both of those, inherited deliberately.** That contract is the
+harness's published one and nothing in this tree. It sits on the same footing
+§The delegation model already declares for the `PreToolUse` payload roster: a
+future harness revision reshaping the event is drift no gate here can
+self-detect, and only re-reading the contract catches it. Recorded so the next
+reader does not mistake a fetched fact for a measured one.
+
+**The predicate is the reader's exit class, and it refuses on two of five arms.**
+
+| reading | the hook holds | decision |
+| --- | --- | --- |
+| `green` | no live producer | log, exit 0 — there is nothing to refuse |
+| `red` | a live producer under a launch record | log, **exit 2** — the whole subject |
+| `corrupt` | a record that does not parse | log, **exit 2** — see below |
+| `unavailable` | no reading at all (no reader named or resolvable) | log, exit 0 |
+| `error` | a configured reader that ran and did not answer | log, exit 0 |
+
+**`corrupt` refuses, and it diverges from guard-kit rule 14 on purpose.** Rule 14
+— tracked-tree mutation under a live producer — rules that a record which does not
+parse **declines** rather than blocks, because a guard is not the place a
+corruption verdict is taken and `check-producer-liveness` already exits 2 on one.
+That reasoning does not transfer, and the reason is structural rather than a
+matter of appetite. Rule 14 reads the records **one at a time**, so a malformed
+record declines *for itself* while a sibling record naming a live PID still
+blocks. This hook reads the whole set through **one exit code**, and the reader's
+own resolution is *exit 2 wins over red wins over green* (evidence-kit/SPEC.md
+§check-producer-liveness). Allowing on `corrupt` would therefore mean that **one
+malformed record anywhere under the scratch dir suppresses every refusal in the
+tree** — a bypass rule 14 does not have and cannot have, minted by copying rule
+14's disposition into a reader that lost the per-record view. The divergence is
+recorded from both sides, here and at guard-kit/SPEC.md §The generic ruleset rule
+14, so neither surface reads as the other's drift.
+
+**The corrupt arm is cheap to be wrong about and expensive to skip.** A corrupt
+record cannot be carried far: `check-producer-liveness` is a battery member, so
+the next commit reds on it. The false-refusal window is one malformed record's
+lifetime; the bypass window, had the arm been dropped, is however long a session
+cares to leave one in place.
+
+**`records=0` is not a clause, and the resemblance to the refused option is
+disclosed.** The refused capped variant read "`verdict=red live=yes` carrying at
+least one record". The record count is not a condition here and is not imported
+as one: `check-producer-liveness` cannot return red over an empty set, so `red`
+already implies at least one record by the reader's own contract. That half of
+the refused option was vacuous, and nothing here adopts or needs it.
+
+**`unavailable` and `error` allow on the degradation posture, not on leniency.**
+Both mean the hook obtained no reading — the knob names no reader, or a configured
+reader failed. Refusing there would refuse every turn end in a tree that has not
+configured a reader, in a kit that ships this hook opt-in and inert. It is
+guard-kit/SPEC.md §The guard framework's fail-open-but-loud posture for a
+deny-guard whose rule turns on an external reader, the same posture §The
+delegation model's dispatch guard already takes, and the `verdict=error` value in
+the grammar below is what supplies the "loud".
+
+**`jq`-absence does not disable enforcement, and this is the one place this hook
+is strictly better off than its `PreToolUse` siblings.** The decision reads the
+liveness reader over the run directory and reads **no payload field at all**; the
+payload feeds only the log's `event`, `session` and `keys` columns. So an absent
+`jq` degrades the log line and leaves the refusal exact, and the
+advisory-envelope problem the dispatch guard had to solve by hand does not arise
+here.
+
+**The bounded call stays, and its meaning inverts.** The reader is invoked under
+`timeout` where one is available. While this hook only logged, the bound was
+there because a reader that hung would have refused the turn end by accident —
+the blocking variant arrived at sideways. Now that the hook *is* the blocking
+variant, the bound is what keeps a hung **reader** from being read as a live
+**producer**: a timeout is an unmapped exit code, so it is `error` and it allows,
+and a refusal is only ever the reader's own verdict.
 
 **The liveness reading reuses `check-producer-liveness` and copies no grammar.**
 §The delegation model rules that the reading affordance which would genuinely
@@ -872,31 +972,35 @@ earn its place already exists and is that gate; a hook re-implementing the
 grammar evidence-kit owns. So the hook invokes the reader in **set mode** over
 the scratch dir — which already quantifies the per-record verdict and already
 resolves *exit 2 wins over red wins over green* (evidence-kit/SPEC.md
-§check-producer-liveness) — and maps its exit class onto `verdict` and `live`.
-Nothing about how a PID's liveness is decided is seconded here.
+§check-producer-liveness) — and maps its exit class onto `verdict`, `live` and
+now the exit code. Nothing about how a PID's liveness is decided is seconded
+here.
 
 **The prerequisite is stated, not assumed.** A consumer that wires this hook with
 no reader resolvable at `DELEGATION_KIT_LIVENESS_CMD` — evidence-kit unvendored,
-or the knob left unset — gets `verdict=unavailable` on every line and a probe that
-answers nothing. That is honest degradation and it is preferable to a silent third
-parse that would work everywhere and drift from its owner.
+or the knob left unset — gets `verdict=unavailable decision=allow` on every line:
+a hook that answers nothing and refuses nothing. That is honest degradation and it
+is preferable to a silent third parse that would work everywhere and drift from
+its owner.
 
-**The template ships no default reader, and what it stopped shipping is why.** It
-defaulted to `evidence-kit/checks/check-producer-liveness.sh` while that gate was
+**The template ships no default reader, and enforcement makes that ruling
+stronger rather than negotiable.** It defaulted to
+`evidence-kit/checks/check-producer-liveness.sh` while that gate was
 shell-declared. `shell-gate-tail-port` made the gate a descriptor dispatched to
 the binary, so that path exists in **no** tree — the readability test the reader
-sits behind fails everywhere, and the probe logged `unavailable` on every firing
-in a tree whose battery was green over it. A default naming a path nothing resolves
-is a fake default: it reads as a shipped capability and is none, which is worse
-than declaring the prerequisite. So the knob now has no default and the reader is
-the consumer's to name. **The alternative was to teach this knob to resolve a gate
-*name*, and it is refused on a recorded precedent rather than on taste**:
+sits behind fails everywhere, and the hook logged `unavailable` on every firing
+in a tree whose battery was green over it. A default naming a path nothing
+resolves is a fake default: it reads as a shipped capability and is none, which is
+worse than declaring the prerequisite. So the knob has no default and the reader
+is the consumer's to name; a kit-side default would now decide whether a tree
+*refuses*. **The alternative was to teach this knob to resolve a gate *name*, and
+it is refused on a recorded precedent rather than on taste**:
 evidence-kit/SPEC.md §check-evidence-manifest met the identical break one caller
 over, when the same port turned a pre-flight entry's named path into a descriptor,
 and discharged it with a **consumer-side front end** resolving the name —
 "deliberately not teaching lifecycle-kit to resolve a name in that knob, which
 would be a kit-contract change". The same reasoning binds here, and it is the
-reason this repair changes no contract: the value is still a path this probe runs
+reason this repair changes no contract: the value is still a path this hook runs
 with the scratch dir as its only argument. This repo's own reader is
 `scripts/producer-liveness-reader.sh`, two lines that reach the gate by name
 through the front end its whole pre-flight roster already uses.
@@ -905,7 +1009,7 @@ through the front end its whole pre-flight roster already uses.
 timestamp:
 
 ```
-<UTC ISO-8601>  event=<hook_event_name|->  session=<session_id|->  live=<yes|no>  verdict=<green|red|corrupt|unavailable>  records=<n>  keys=<comma-separated top-level payload keys>
+<UTC ISO-8601>  event=<hook_event_name|->  session=<session_id|->  live=<yes|no>  verdict=<green|red|corrupt|error|unavailable>  records=<n>  decision=<refuse|allow>  keys=<comma-separated top-level payload keys>
 ```
 
 Every field has a reader at a named transition, and no field is carried that this
@@ -924,14 +1028,32 @@ list does not name one for:
   `session_id`, and neither matches the identifier a stage stamp carries, so
   attributing a firing to a stage session is not a reading this field supports.
   The payload's `agent_id` is the discriminator that would, and logging it is a
-  grammar change this variant did not take.
-- **`live`** — `yes` exactly when the reader reported a live producer. **The
-  decisive field**; the honest limit below is what bounds how it may be read.
+  grammar change this hook has not taken.
+- **`live`** — `yes` exactly when the reader reported a live producer. It stays
+  two-valued and stays paired with `verdict`; the honest limit below is what
+  bounds how it may be read.
 - **`verdict`**, **`records`** — the reader's exit class and the number of `*.run`
   records under the scratch dir. Read together: `records=0` makes a `live=no`
   uninformative, while `records=2 live=no` says records existed and their
   producers had exited. `verdict=corrupt` carries `live=no` because the field is
   two-valued — the pair is the reading, never `live` alone.
+- **`verdict=error`** — a **configured** reader that ran and did not answer: an
+  unmapped exit code, or the `timeout` bound firing. Its named reader is the
+  close-stage triage below, at the same transition, distinguishing *this tree
+  never configured enforcement* (`unavailable`) from *this tree's enforcement is
+  broken* (`error`). Only the second is actionable, and before enforcement both
+  meant "no reading" and the distinction cost more than it bought.
+- **`decision`** — `refuse` exactly when the hook exits 2, `allow` otherwise, on
+  every firing including the allowing ones. Its named reader is the **close-stage
+  triage** at the close-surface drain, where the log is read and cleared, and it
+  is read for a question no other field answers: whether a firing was **acted
+  on**. `verdict` alone cannot answer it across the landing commit, because the
+  same `verdict=red` line means *observed* before enforcement and *refused* after
+  it, in one append-only file that spans both. `decision` is also what makes a
+  refusal countable, so the forcing function's own effectiveness is measurable —
+  which is the defect §The probe is asymmetric spent a whole iteration recording
+  about `live=no`. It cannot be derived from `live`: a `corrupt` refusal carries
+  `live=no decision=refuse`.
 - **`keys`** — the payload's top-level key set, nothing more. Read **once**, at
   the first firing, to settle what a `SubagentStop` payload carries without
   asserting anything about it in advance. **It returned against the advance
@@ -943,6 +1065,16 @@ list does not name one for:
   `background_tasks` carries was then settled **off this field**, by a one-off
   read that widened nothing here: §What `background_tasks` carries.
 
+`decision` sits before `keys` deliberately: `keys` is the one free-ish field and
+stays last, so the space-delimited parse never has to step over it.
+
+**No field is carried that this list does not name a reader for**, and the two the
+authorization might have invited and that are **not** carried are recorded so the
+omission does not read as an oversight: no session-attribution field (the payload
+carries no attributing value — see `session` above and the shared-scratch-dir
+paragraph below) and no refusal counter (the bound on repeated refusals is the
+producer's own life, not a count).
+
 **`records` is counted by the hook's own `*.run` glob, not parsed back out of the
 reader**, and the reason is the reader's output contract rather than convenience:
 `check-producer-liveness` publishes a count only on its green line, printing one
@@ -952,6 +1084,110 @@ the case the prerequisite above makes reachable. For the same reason the reader'
 first output line is **not** carried verbatim: over `verdict`, `records` and
 `live` it adds only the blocking record paths, and a free-text field would break
 the space-delimited parse the grammar above is for.
+
+**The refusal message names the finding and both lawful exits**, as guard-kit
+requires of every block message. It states that a launch record under the scratch
+dir names a live producer (or, on the corrupt arm, that a record does not parse
+so no reading says whether one is live), that the turn may not end on it, and the
+two ways forward — the two rule 14 already names: **wait for the producer on its
+own artifact, in a loop that ends when the condition goes true, or delete the
+record once the producer has exited**. It names the reader command with the run
+directory so the session can see the record set for itself, and on the corrupt
+arm that is how it finds which record is malformed. It carries no session
+identity, because the hook has none to carry.
+
+**There is no knob, and unwiring the hook is the valve.** §The delegation model
+rules exactly this for the dispatch guard's D1 unconditional block: "the valve is
+**unwiring the hook**, never a knob: a per-dispatch override is exactly the honour
+system these rules exist to end, and a knob would restore it under a better name."
+The same reasoning binds here and for the same reason, so this hook adds no knob.
+
+**The ordinary escape is not the operator's, and that matters under the permission
+wall.** Unwiring means editing the consumer's settings, which is operator-class
+work no stage session may do (TRAJECTORY.md §The closed rulings, 2026-08-22). If
+unwiring were the *only* escape, this hook would be a mechanism whose every
+recovery path needed the operator. It is not: the record set is the session's own
+artifact, `check-producer-liveness` names the blocking record, and deleting a
+record whose producer has exited is — in rule 14's own words — "not a workaround,
+it is the statement of fact becoming false and being retracted". The
+operator-class valve is the last resort, not the first.
+
+**Loop protection reads the producer, never `stop_hook_active`.** The live payload
+carries a `stop_hook_active` key — this tree's own `keys` reading found it — and
+the published hook contract does not mention the field at all. Keying the refusal
+off it would couple this hook to an **uncontracted** harness artifact, which is
+the precise ground §The delegation model gives for refusing the transcript-meta
+depth route while a contracted boolean was available. Here the contracted
+alternative is better than a boolean: the refusal's own trigger is a real-world
+condition that ends when the producer ends, so the loop is bounded by the thing
+the rule is about. A producer that never ends is bounded by the message's second
+exit.
+
+**The shared scratch dir is the subject, stated rather than discovered.** The
+reading is over `${GATE_SDK_TMP_DIR:-.tmp}`, which concurrent sessions in one
+checkout share, so a record written by one session can refuse another's turn end.
+That is the mechanism's subject and not a defect filed against it. **The project
+already binds every session to that shared set**: guard-kit rule 14 blocks
+index-writing `git` in **any** session while any `*.run` record under a scratch
+dir names a live PID — it is not narrowed to the record's writer and never was.
+Extending the same binding from "you may not commit under a live producer" to
+"you may not end your turn under one" widens the *act set*, not the subject. A
+design that narrowed the turn-end rule to the writer would leave rule 14 and this
+hook disagreeing about whose producers bind whom, on one record set, with no
+surface owning the difference.
+
+**Attribution was weighed and is not available.** The payload's `session_id` is
+shared by a dispatched agent and its dispatcher, and the `pid=<n> run=<key>`
+grammar carries no writer identity. Adding one is a grammar change across
+evidence-kit and guard-kit for a narrowing the paragraph above argues against
+wanting.
+
+**The residue is unchanged and is not closed here.** Two firings this hook cannot
+reach: an **unrecorded** launch (guard-kit rule 15's advisory residue), and the
+harness's own `background_tasks` view, which §What `background_tasks` carries
+established enumerates what was *launched* rather than what is *running* and so
+cannot substitute for the record set.
+
+**A refusal fires at intermediate steps too, and that cost is accepted rather
+than narrowed.** `SubagentStop` is not the session-end event: it fired seventeen
+times inside one dispatched session that had ended no turn at all, spaced by
+assistant steps (§The probe is asymmetric). There is no contracted discriminator
+for a real turn end in the payload, and both uncontracted candidates are refused
+on the precedent the loop-protection paragraph cites. What is left is a judgment
+about the cost and it comes out in favour: at an intermediate step the refusal
+reaches the agent with the obligation it is about to breach *before* it breaches
+it, which is earlier and cheaper than at the end, and it is the only channel that
+reaches the agent at all. The frequency is bounded by the producer's own life,
+and a session that is correctly waiting in-turn is making few assistant steps by
+construction.
+
+**What exit 2 does at a firing that is not a stop was observed, not assumed.**
+The harness contract says exit 2 "prevents the subagent from stopping"; it does
+not say what that means at a firing where the subagent was not stopping, and both
+readings — the reason is injected and the session continues, or nothing happens
+and the line is still logged — were survivable, so the design branches on
+neither. The build bought the firing rather than reasoning about it: a dispatched
+session backgrounded a bounded producer, wrote its `<key>.run` record, and read
+its own log against its own transcript. **The second reading holds.** Two firings
+took `live=yes verdict=red records=1 decision=refuse` and exited 2, and *nothing
+was delivered*: no blocking reason reached the session, no tool call was
+interrupted or re-run, and the session continued normally. Both lines were still
+logged. When the producer exited the next firing read `verdict=green
+decision=allow`, so the refusal window closed with the producer's life — the
+bound the loop-protection paragraph above relies on, observed rather than
+assumed.
+
+**One half of the cost argument above is measured down by that, and is corrected
+rather than restated.** The claim that a refusal at an intermediate step reaches
+the agent with the obligation *before* it breaches it does **not** hold in this
+harness revision: at an intermediate firing the reach is nil. The judgment still
+comes out the same way, because the cost it was weighed against is nil for the
+same reason — an intermediate firing costs the session nothing at all, and what
+survives is a logged `decision=refuse` line that the close-stage triage can
+count. **The honest limit is that this measured the non-stop firing only.**
+Delivery at a real turn end under a red reading rests on the published contract
+and on nothing measured here, and it sits under the same limit as the rest of
+that contract: only re-reading it, or buying that firing, catches a revision.
 
 **The log is capture-tier** — gitignored, advisory, drained by a named reclaim
 path (gate-sdk/SPEC.md §The workflow directory), which is what keeps
@@ -963,7 +1199,7 @@ close-surface: .workflow/subagent-stop-liveness.log advisory reclaim=: > .workfl
 
 `advisory` rather than `forced`, on the reasoning guard-kit's friction log takes:
 nothing refuses a close that skips it, and a visible skip is the honest mode for a
-probe.
+log whose enforcement lives in the exit code rather than in the file.
 
 **No gate observes the wiring, and that is recorded rather than assumed.**
 `check-settings-pins` asserts only the pinned paths in the consumer's pins file
@@ -971,20 +1207,27 @@ probe.
 alone and never `hooks[].hooks[].command`, and `check-memory-off` scans the memory
 surface. So the registration reds nothing — and neither would a registration
 naming a script that does not exist. A session decides this wiring by reading this
-section, never by predicting a verdict.
+section, never by predicting a verdict. Under enforcement the consequence sharpens:
+an unwired hook is a tree where the turn-end rule has no enforcement at all, and
+nothing in the battery says so.
 
 **One half of that is now observed, and the half that is not is the same half.**
 The *registration* is still unwatched, for the reasons above. What is watched is
-the **configured reader**: a consumer test fires the consumer's own hook copy with
-the knob unset, over a scratch run dir it constructs, and asserts the logged
-verdict is `green` on an empty dir and `red` with a record naming a PID that is
-always alive. `unavailable` fails it by name. This kit's own
-`gate-tests/subagent-stop-liveness.test.sh` cannot make that assertion and should
-not try — it drives a **stub** reader per exit class, which is what lets it hold
-every verdict arm hermetically, and a stub is by construction not the configured
-one. The gap between those two is exactly where the dead default lived for a whole
-iteration under a green battery, so the oracle belongs to the consumer that
-configures the reader, beside the copy that names it.
+the **configured reader**, and both sides of the copy seam are covered because
+enforcement lands exactly on that seam. This kit's own
+`gate-tests/subagent-stop-liveness.test.sh` drives a **stub** reader per exit
+class — which is what lets it hold every verdict arm hermetically, and a stub is
+by construction not the configured one — and asserts the exit code per arm (2 on
+`red` and `corrupt`, 0 on `green`, `unavailable` and `error`), the `decision`
+column that goes with it, and a non-empty stderr on each refusing arm, because
+that stderr *is* the blocking reason. The consumer's own
+`scripts/gate-tests/subagent-stop-reader.test.sh` fires this repo's hook copy
+against its own configured reader over a scratch run dir it constructs, asserting
+`green` and an allowed exit on an empty dir and `red`, `decision=refuse` and exit
+2 with a reason on a record naming a PID that is always alive; `unavailable` fails
+it by name. The gap between those two lanes is exactly where the dead default
+lived for a whole iteration under a green battery, so both lanes move together or
+the seam re-opens.
 
 ### What `background_tasks` carries
 
@@ -1027,9 +1270,11 @@ decisive finding.** A producer detached from a foreground tool call, live
 throughout and carrying a `*.run` record the reader was concurrently reporting
 red, appeared in no firing. That is precisely the residue §The probe is
 asymmetric names as one of `live=no`'s three readings and guard-kit rule 15
-advises against without closing. So a blocking variant **cannot substitute** the
+advises against without closing. So the blocking hook **cannot substitute** the
 harness's view for the `*.run` record set: the two disagree exactly on the class
-the waiting rule exists for. Supplementing is the most it could do.
+the waiting rule exists for. Supplementing is the most it could do — and now that
+the hook refuses on the record set alone (§The turn-end liveness hook (template)),
+this is a constraint on a shipped mechanism rather than on a hypothetical one.
 
 **No entry carries a pid.** Those six field names are the whole schema, and a
 `shell` entry's `id` is the harness's own opaque task id. Joining this view to a
@@ -1070,19 +1315,23 @@ the log took `live=yes verdict=red records=1` four seconds later, and again at
 that agent's own stop, while the producer went on writing for another two and a
 half minutes. **The harness does not defer the stop**, so the class the waiting
 rule exists for does not dissolve, the relocation to guard-kit rule 14 stands, and
-a blocking hook is the only lever left — which is a second authorization this
-result does not grant.
+a blocking hook was the only lever left. That was a second authorization this
+result did not grant; it was asked for and given, and the hook blocks (§The
+turn-end liveness hook (template)). This subsection is kept as the evidence the
+authorization was argued from, not as a standing limit on it.
 
 **The same firings settled a second thing nothing could have settled before
 wiring: `SubagentStop` is not the session-end event.** It fired seventeen times
 inside one dispatched session that had ended no turn at all, spaced by assistant
 steps rather than by the clock — a stretch spanning three long tool calls and no
-assistant step produced no firing at all. A blocking variant would therefore
-refuse at *every* intermediate step of a session rather than once at its return,
-which is what a bounded run of blocks would actually be spent on. Recorded here
-because it is a cost the blocking variant's authorization should be weighed
-against, and because it is exactly the class of fact a logging-only probe exists
-to buy.
+assistant step produced no firing at all. The blocking variant therefore fires at
+*every* intermediate step of a session rather than once at its return, which is
+what a bounded run of blocks is actually spent on. Recorded here because it was a
+cost the authorization was weighed against, and because it is exactly the class of
+fact a probe exists to buy. **The cost came in smaller than the estimate, and the
+measurement is at §The turn-end liveness hook (template)**: an intermediate firing
+that exits 2 delivers nothing to the session, so the per-step frequency costs the
+session nothing and buys a countable `decision=refuse` line.
 
 ## Resume journal — agent writes, scratch reset sweeps
 
@@ -1747,7 +1996,7 @@ own clear as the reclaim path:
 
 close-surface: .workflow/wait-primitive-evidence.txt advisory reclaim=: > .workflow/wait-primitive-evidence.txt
 
-`advisory` rather than `forced`, on the reasoning §The turn-end liveness probe's
+`advisory` rather than `forced`, on the reasoning §The turn-end liveness hook's
 log already takes: nothing refuses a close that skips it, and a visible skip is
 the honest mode for a probe. The **finding** — the branch the trials select and
 its grounds — lands in this SPEC, never in the log; the log is evidence, and
@@ -1782,7 +2031,7 @@ delegation-kit/
   templates/agent-dispatch-guard.sh       # PreToolUse(Agent) dispatch-shape guard (D1/D2/D3)
   templates/statusline-usage.sh           # push usage.txt producer (statusline hook) + status bar incl. the queue counter group
   templates/usage-poller.sh               # poll usage.txt producer (timer-driven, fail-soft)
-  templates/subagent-stop-liveness.sh     # SubagentStop turn-end liveness probe (logging-only)
+  templates/subagent-stop-liveness.sh     # SubagentStop turn-end liveness hook: logs, and refuses by exit 2 on a red or corrupt reading
   templates/delegation-config.sh          # knob overrides (arrays live here)
   smoke/install.sh
   smoke/violation.sh
@@ -1901,10 +2150,11 @@ layout as defaults):
   A knob rather than a literal because a consumer's evidence-kit may sit
   elsewhere, and defaultless because the gate behind it is reached by *name*
   rather than by path and only a consumer knows its front end (§The turn-end
-  liveness probe (template) owns why the knob is not taught to resolve a name).
+  liveness hook (template) owns why the knob is not taught to resolve a name).
   Unset and empty are therefore the same value here, and both are the supported
-  way to run the probe with no reader at all — the honest-degradation case the
-  section states.
+  way to run the hook with no reader at all — the honest-degradation case the
+  section states, in which every firing logs `verdict=unavailable decision=allow`
+  and refuses nothing.
 - `DELEGATION_KIT_READONLY_TYPES` — agent-type names the consumer dispatches for
   read-only work; D2's only trigger (§The delegation model). Default empty, in
   which case D2 is inert by construction. Every entry is the consumer's own
@@ -1943,7 +2193,7 @@ event. It registers under `SubagentStop` in the consumer's `.claude/settings.jso
 — an event that takes **no matcher**, so the entry carries a `hooks` array alone
 and is not tool-scoped, the shape a `SessionStart` entry already has. Copy the
 template into the gates dir and wire `bash scripts/subagent-stop-liveness.sh`; it
-sources no kit lib at all (§The turn-end liveness probe (template) owns why) and
+sources no kit lib at all (§The turn-end liveness hook (template) owns why) and
 resolves its reader through `DELEGATION_KIT_LIVENESS_CMD`. Registration is again
 the whole opt-in, and here the opt-in is also the consent: the wiring is a
 permission-surface write, so it is the consumer's own act and never an agent

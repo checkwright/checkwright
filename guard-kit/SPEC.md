@@ -575,15 +575,17 @@ that harness exists would be designing against no case.
     lands through them and the scratch directory is gitignored, so a rule
     reaching them would refuse the very mechanic the resume-journal contract
     requires *while a wait is in progress*.
-    **This is the enforcement half of the waiting rule, and it works by
-    relocation.** The turn-end passes no `PreToolUse` chokepoint, so it is
-    unreachable from this ruleset (delegation-kit/SPEC.md §Operative residency);
+    **This is the `PreToolUse` half of the waiting rule's enforcement, and it
+    works by relocation.** The turn-end passes no `PreToolUse` chokepoint, so it
+    is unreachable from this ruleset (delegation-kit/SPEC.md §Operative residency);
     the **harm** it causes arrives as an ordinary tool call at a chokepoint
     already wired, which is what this rule fires on. The harness's own turn-end
-    event does reach it on a different axis, measured rather than assumed
-    (delegation-kit/SPEC.md §The turn-end liveness probe (template)), and
-    observing there is not refusing there — so this rule stays the enforcement
-    and is unchanged.
+    event reaches the act itself on a different axis, measured rather than
+    assumed, and the hook there **refuses** as well as observes
+    (delegation-kit/SPEC.md §The turn-end liveness hook (template)). This rule's own
+    behavior is untouched by that and it stays the enforcement on its own axis: it
+    reaches mutations the turn-end event never sees, and that hook reaches a
+    session that mutates nothing.
     **Why the block is right even though it over-reaches, stated rather than
     softened.** A read-only producer takes no harm from a commit, and the record
     cannot say which kind it is. This ruleset's established direction is to bias
@@ -603,6 +605,18 @@ that harness exists would be designing against no case.
     subcommand; and an unrecognized `git` subcommand declines. Each biases
     toward passing rather than toward a false block, which is the calibration
     the previous paragraph departs from **only** on the read-only producer.
+    **The corrupt disposition diverges from the turn-end hook's, deliberately,
+    and is recorded from both sides.** This rule declines on a record that does
+    not parse; the `SubagentStop` hook **refuses** on one. The ground is
+    structural rather than a difference of appetite: this rule reads the records
+    **one at a time**, so a malformed record declines for itself while a sibling
+    naming a live PID still blocks, whereas the hook reads the whole set through
+    a single exit code. Allowing there would let one malformed record anywhere
+    under a scratch dir suppress every turn-end refusal in the tree — a bypass
+    this rule does not have and cannot have. The same divergence is stated from
+    the other side at
+    delegation-kit/SPEC.md §The turn-end liveness hook (template), so neither
+    surface reads as the other's drift.
     **Placed with rules 12 and 13, before every auto-allow rule.** It is the
     third member of the wait-discipline family and inherits their placement
     argument (`git` is not on the default `GUARD_KIT_RO_BINS` roster, but a

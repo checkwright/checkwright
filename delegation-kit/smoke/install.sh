@@ -59,7 +59,7 @@ cmp -s "$pp/usage.before" "$pp/usage.txt" || {
     echo "delegation-kit/smoke: poller fetch failure touched the snapshot" >&2; exit 1; }
 rm -rf "$pp"
 
-# spec: delegation-kit/SPEC.md §The turn-end liveness probe (template) — the probe is exercised in place with a crafted payload: it must exit 0 and append exactly one grammar-conformant line, whatever the reader's verdict
+# spec: delegation-kit/SPEC.md §The turn-end liveness hook (template) — the hook is exercised in place with a crafted payload on its allowing arm: the knob is emptied, so the firing holds no reading (verdict=unavailable) whatever the run dir carries, and it must exit 0 and append exactly one grammar-conformant line
 sp="$PWD/.tmp/stop-probe-smoke"
 rm -rf "$sp"; mkdir -p "$sp"
 printf 'pid=1 run=smoke\n' > "$sp/smoke.run"
@@ -68,14 +68,14 @@ printf '{"session_id":"smoke","hook_event_name":"SubagentStop"}' | \
     DELEGATION_KIT_LIVENESS_CMD="" \
     GATE_SDK_TMP_DIR="$sp" \
     bash "$SMOKE_KIT_ROOT/templates/subagent-stop-liveness.sh" || {
-    echo "delegation-kit/smoke: the SubagentStop probe did not exit 0" >&2; exit 1; }
+    echo "delegation-kit/smoke: the SubagentStop hook did not exit 0 on its unavailable arm" >&2; exit 1; }
 probe_line="$(cat "$sp/probe.log")"
 case "$probe_line" in
-    *"event=SubagentStop"*"session=smoke"*"live=no"*"verdict=unavailable"*"records=1"*"keys="*) ;;
-    *) echo "delegation-kit/smoke: probe line off grammar: $probe_line" >&2; exit 1 ;;
+    *"event=SubagentStop"*"session=smoke"*"live=no"*"verdict=unavailable"*"records=1"*"decision=allow"*"keys="*) ;;
+    *) echo "delegation-kit/smoke: hook line off grammar: $probe_line" >&2; exit 1 ;;
 esac
 if [[ "$(grep -c . "$sp/probe.log")" -ne 1 ]]; then
-    echo "delegation-kit/smoke: the probe wrote more than one line for one firing" >&2; exit 1
+    echo "delegation-kit/smoke: the hook wrote more than one line for one firing" >&2; exit 1
 fi
 rm -rf "$sp"
 
