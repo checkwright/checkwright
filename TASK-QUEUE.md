@@ -14,37 +14,6 @@
 
 ## Technical Debt
 
-- **no-port-cause-class-generalization** — one file's `# no-port:` cause is true of a whole
-  `scripts/` class, and declaring the class moves the completion predicate by roughly a sixth.
-  **The cause, and the two halves it is made of.** `scripts/measured-claims.sh` declares
-  `# no-port:` on CLAUDE.md §The provenance seam, and the declaration is a conjunction: (a)
-  `scripts/` rides no installer payload, `pack-installer.sh` assembling from the kit roots
-  alone; (b) the file's keys are this repo's private claim vocabulary, so porting it ships that
-  vocabulary in every adopter's binary.
-  **OPERATOR-RULED 2026-08-24, relayed through the lead at the close of
-  `port-remainder-disposition-and-worktree-reclamation`: the cause generalises on half (b)
-  ALONE.** Declare the config-and-vocabulary files, which hold the private claim vocabulary;
-  leave the mechanism files owed, since they hold none. The operator's ground: the cause's real
-  basis is the provenance seam, and TRAJECTORY.md's 2026-08-14 ruling already ACCEPTED the
-  payload cost for mechanism, so declaring on half (a) alone would contradict a trade that
-  ruling took. NOT a reversal, demotion or re-scoping of it: its stated subject is gates under
-  `scripts/`, and it records that `scripts/` now keeps no gate script at all, so every owed row
-  this touches falls outside that subject.
-  **Re-measured at scope rather than carried:** half (a) holds for every owed row under
-  `scripts/`; half (b) splits them fifteen vocabulary rows against ten mechanism rows. Re-derive
-  that split by reading each header rather than citing it — the class is real and NOT uniform,
-  so one undifferentiated sweep over-declares.
-  **What is NOT ruled and stays with this iteration:** whether the declarations land as one
-  sweep or per owning entry, and the cause text each row carries. Class: it declares an existing
-  marker on existing files and mints no name and no gate, so the litmus makes it debt.
-  **What the delay costs:** the predicate keeps about a sixth of its rows ruled-in-principle and
-  unruled-in-fact, so `--tree`'s owed count overstates the remaining work and every cut composed
-  off it is mis-sized by that margin.
-  Filed 2026-08-24 to the gap inbox by spec and held there deliberately rather than asked
-  mid-iteration, since ruling the class would have moved the owed column underneath the
-  amendment then landing; drained 2026-08-24 at close, which re-measured both halves and
-  escalated the ruling; promoted 2026-08-24 at the next scope once the operator ruled it.
-
 - **icebox-candidate-eligibility-unapplied** — the eviction worklist lists rows the icebox
   eligibility rule already forbids, so every close re-derives the same exclusions by hand.
   **The split is backwards, and that is the finding rather than a calibration complaint.**
@@ -110,10 +79,10 @@
   **The residue's three-way shape is SPENT, and both oracles were re-run at this boundary rather
   than cited.** The 2026-08-23 ruling retired the permanently-shell class outright; `--group` now
   reads 106 scanned, **0 owed and 0 takeable** (none permanent, none held — the battery is
-  finished) and `--tree` read 153/0/0/**153 owed**, superseded 2026-08-24 when
-  `port-oracle-instrument-self-disposition` landed the first three declarations: it now reads
-  153/2/1/**150**. Re-run it, never cite. Only `--tree` is the predicate; `--group`'s zero is a
-  finished battery not a finished port; `ported-gate-members`, a registry walk, answers neither.
+  finished) and `--tree` read 153/0/0/**153 owed**, then 153/2/1/150 on 2026-08-24 and now
+  153/12/1/**140** once the `scripts/` config-and-vocabulary class declared 2026-08-25. Re-run
+  it, never cite. Only `--tree` is the predicate; `--group`'s zero is a finished battery not a
+  finished port; `ported-gate-members`, a registry walk, answers neither.
   **Cost while deferred:** large and known — the **owed** remainder (the trailer's own arm,
   never the unported count) plus the runners and the install-lifecycle layer; since the
   2026-08-14 born-native default (TRAJECTORY.md §The closed rulings) a gate landed meanwhile no
@@ -7734,6 +7703,8 @@
 - **amendment-roster-omission-detection** [design-pending] — Only a grep catches a short roster.
 
 ## Done
+
+- no-port-cause-class-generalization
 
 - stage-journal-contract-unoracled
 

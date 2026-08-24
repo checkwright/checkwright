@@ -1,5 +1,6 @@
 # shellcheck shell=bash
 # spec: queue-kit/SPEC.md §Layout and configuration — this repo's queue-kit consumer config: the one outbound lesson-harvest tag ([essay], routed by .claude/commands/close.md) and the living-page prose surfaces that make queue-membership claims; the icebox age floor, lowered from the kit's 30 days because this queue's inflow runs about a week per eviction review; every other knob keeps the platform default
+# no-port: CLAUDE.md §The provenance seam (never cross it) — operator-ruled 2026-08-24 for this repo's scripts/ config-and-vocabulary class, on the vocabulary half of scripts/measured-claims.sh's cause alone (scripts/ riding no installer payload is the half the ruling deliberately does NOT declare on). QUEUE_KIT_HORIZONS and QUEUE_KIT_TRACKS are this repo's editorial roadmap vocabulary, ruled consumer-side in the comment below, so porting this file would publish one project's editorial posture in every adopter's binary.
 # shellcheck disable=SC2034  # consumed by queue-kit/lib/queue.sh after sourcing
 QUEUE_KIT_LESSON_TAGS=(essay)
 # shellcheck disable=SC2034  # consumed by queue-kit/lib/queue.sh after sourcing

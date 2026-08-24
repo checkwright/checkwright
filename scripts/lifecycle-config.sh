@@ -1,5 +1,6 @@
 # shellcheck shell=bash
 # spec: lifecycle-kit/SPEC.md §Layout and configuration — this repo's lifecycle-kit consumer config: the boundary-truncate and entry-preflight knobs wire evidence-kit's manifest across the seam, the boundary-require knob makes close's release disposition a boundary precondition, the session-boundary posture is set below; every other knob keeps the platform default
+# no-port: CLAUDE.md §The provenance seam (never cross it) — operator-ruled 2026-08-24 for this repo's scripts/ config-and-vocabulary class, on the vocabulary half of scripts/measured-claims.sh's cause alone (scripts/ riding no installer payload is the half the ruling deliberately does NOT declare on). LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE is this harness's own lock vocabulary, ruled consumer-side against an empty kit default in its comment below, so porting this file would spell one harness's layout in every adopter's binary.
 # shellcheck disable=SC2034  # consumed by lifecycle-kit/lib/stages.sh after sourcing
 LIFECYCLE_KIT_BOUNDARY_TRUNCATE=(.workflow/validate-evidence.txt .workflow/release-disposition.txt)
 LIFECYCLE_KIT_BOUNDARY_REQUIRE=(.workflow/release-disposition.txt)

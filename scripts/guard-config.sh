@@ -1,5 +1,6 @@
 # shellcheck shell=bash
 # spec: guard-kit/SPEC.md §Layout and configuration — this repo overrides one guard-kit knob; templates/guard-config.sh lists them and lib/guard.sh holds the defaults
+# no-port: CLAUDE.md §The provenance seam (never cross it) — operator-ruled 2026-08-24 for this repo's scripts/ config-and-vocabulary class, on the vocabulary half of scripts/measured-claims.sh's cause alone (scripts/ riding no installer payload is the half the ruling deliberately does NOT declare on). GUARD_KIT_BREADTH_DECLARED's values are this project's own operator rulings verbatim — its ops surface, its shipping transports, its release procedure — glossary bodies the seam bars a kit from carrying, so porting them would publish one project's ruling record in every adopter's binary.
 
 # spec: guard-kit/SPEC.md §compare-settings-allow — witnesses that a local-overlay glob is too broad; probes, not a roster, so no completeness is claimed
 # shellcheck disable=SC2034  # consumed by guard-kit/lib/guard.sh after sourcing

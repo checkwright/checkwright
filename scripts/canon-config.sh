@@ -1,5 +1,6 @@
 # shellcheck shell=bash
 # spec: canon-kit/SPEC.md §Layout and configuration — this repo's canon-kit consumer config
+# no-port: CLAUDE.md §The provenance seam (never cross it) — operator-ruled 2026-08-24 for this repo's scripts/ config-and-vocabulary class, on the vocabulary half of scripts/measured-claims.sh's cause alone (scripts/ riding no installer payload is the half the ruling deliberately does NOT declare on). This file holds rule content the seam bars a kit from carrying: CANON_KIT_TEMPORAL_MARKERS_EXTRA is this project's ruling-record idiom and CANON_KIT_PROSE_TELL_ABBR_ALLOW_EXTRA its jargon term list, so porting it into native/ would compile one project's vocabulary into every adopter's binary.
 
 # spec: canon-kit/SPEC.md §Layout and configuration — the design-pending section set is deferred plus icebox; this repo runs the icebox tier, so its canon-kit counterpart of QUEUE_KIT_ICEBOX_SECTION is set here
 # shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing
