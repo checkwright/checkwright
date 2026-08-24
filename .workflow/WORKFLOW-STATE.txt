@@ -10,3 +10,4 @@ turn-end-liveness-seam-and-worktree-cause align ae70d518 2026-08-24 8850c5a6
 turn-end-liveness-seam-and-worktree-cause build a1025c9f 2026-08-24 278140fd
 turn-end-liveness-seam-and-worktree-cause build aad872cc 2026-08-24 033474db
 turn-end-liveness-seam-and-worktree-cause build ac72244a 2026-08-25 e07f5e80
+turn-end-liveness-seam-and-worktree-cause validate a8979998 2026-08-25 adaad8cd
