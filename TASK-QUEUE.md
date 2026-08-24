@@ -7764,6 +7764,54 @@
   Filed 2026-08-25 by build; drained and promoted 2026-08-25 at close, which re-ran the sweep and
   corrected its reported reach.
 
+- **readme-roster-enum-coverage** [design-pending] — a kit README enumerating a
+  **derivable** set is outside every parity gate, so it drifts silently while the
+  battery stays green.
+  recurrence: readme-roster-enum-coverage 2026-08-25
+  `check-readme-roster` holds one roster per README — the
+  `checks/` basenames — and nothing else; `check-prose-enum` holds only the sets
+  `scripts/enum-sets.sh` declares, which is the queue tag vocabulary plus four
+  derived roster families over the kit tree, none of them a behavioural enum.
+  **Three instances now, every one found by close's step-5 staleness read rather
+  than by an oracle.** (1) drift-kit/README.md omitted a bundled lead KPI shipped
+  that iteration and registered in `scripts/kpis.list` — a registry that is
+  exactly an enum-set source. (2) queue-kit/README.md's `## Use` block omitted a
+  `queue-index` invocation the SPEC states outright, while the README is the only
+  invocation surface a reader gets. (3) THE THIRD, 2026-08-25: delegation-kit's
+  README said the turn-end liveness hook refuses on `red` or `corrupt` while the
+  iteration's own landing widened the refusal guard to a third verdict, verified
+  against the consumer script's own disjunction rather than off the diff. All
+  three were corrected by hand at the close that found them, which is the
+  Enforcement-first shape the doctrine bars — the fix landing without the gate.
+  **The third instance MOVES this entry back out of the icebox, and it also
+  falsifies half its own cost claim.** "Low and non-rotting" was written when both
+  instances were omissions from a roster that never became false; this one is a
+  README stating a live refusal contract that the tree had already widened, in an
+  ADOPTER-FACING install step, in a file the widening diff never opened. So the
+  class does not merely cost a close's attention — between closes it ships a
+  false contract to a consumer wiring the hook, which is a different and higher
+  cost than an incomplete list.
+  **It also sharpens the shape.** The first two instances were rosters derived
+  from a registry FILE. This one is a set that exists only as a `[[ ]]`
+  disjunction inside a shell guard, so no registry read reaches it and an
+  extractor would have to be written against that one script. That is either the
+  case that makes the enum-set survey worth buying, or the case that bounds it.
+  **Why `[design-pending]`:** an enum set is cheap to declare and expensive to
+  land, because declaring one obliges **every** prose enumeration of that set,
+  tree-wide, to be complete. The unit owes a survey of what each candidate set
+  would red before it is declared, plus a ruling on whether a behavioural set
+  living in a conditional is an enum set at all or wants a different parity
+  shape. The count half of this class is `spec-measured-count-gate`'s, not this
+  entry's: a bare cardinal qualifying a roster is a different scanner from a
+  membership check.
+  **Cost while deferred:** paid once per close by the staleness read, which is
+  the only detector — and, as the third instance shows, paid by a consumer in
+  between when the drifted roster is a contract rather than a list.
+  Surfaced 2026-07-31 by close's top-level staleness review, which found the
+  first two instances; filed rather than fixed because the enum-set survey is the
+  work. Evicted to the icebox on a low, non-rotting cost; returned to Deferred
+  2026-08-25 on a judged recurrence, the tag algebra's own icebox exit.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
@@ -7805,7 +7853,6 @@
 - **absence-statement-grammar** [design-pending] — When to state absence, and how, is unruled.
 - **contributor-writeback-disposition** [design-pending] — Write-back is dormant pre-launch.
 - **context-pressure-signal** [design-pending] — Compaction timing has no per-session signal.
-- **readme-roster-enum-coverage** [design-pending] — Prose rosters drift outside every parity gate.
 - **post-immutability-machine-read-carveout** [design-pending] — Immutable prose, live machine read.
 - **path-pinned-allow-entry-oracle** [design-pending] — No scanner reds a path-naming grant.
 - **price-table-roster-coverage-oracle** [design-pending] — An unpriced model id reds nothing.

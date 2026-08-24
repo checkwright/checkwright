@@ -64,7 +64,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    under `SubagentStop` in `.claude/settings.json` (that event takes no matcher).
    It logs one line per subagent turn end saying whether any launch record named
    a live producer, and **refuses the turn end** — exit 2, its stderr the
-   blocking reason — when that reading is `red` or `corrupt`; it emits no hook
+   blocking reason — when that reading is `red`, `corrupt` or `unresolved`; it emits no hook
    JSON on either path (SPEC §The turn-end liveness hook (template)). There is
    no knob: unwiring is the valve. Unwired, it is inert; wiring it is a
    permission-surface change, so it is yours to make.
