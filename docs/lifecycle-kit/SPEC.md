@@ -81,6 +81,48 @@ The default motion is the linear stage walk; the gate-legal shapes for leaving
 it — abandon, split, reopen — are specified in §Deviation transitions, not
 improvised.
 
+**A stage owes a resume journal, and the obligation is the stage's rather than
+the dispatch's.** delegation-kit owns the journal *contract* — what a session
+writes into it, when, and who may delete it (delegation-kit/SPEC.md §Resume
+journal — agent writes, scratch reset sweeps). What lives here is the **path**,
+because only the stage machine knows the stage: `LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN`
+carries a `<stage>` placeholder, and expanding it is the one derivation a
+dispatching supervisor, a stage session and a stage entry all read. Nothing about
+the contract is restated here and nothing about the path is stated there — the
+owner-and-pointer split, held across the seam rather than inside one surface.
+
+**The derivation is the enabling move, and it is why this was unoracled before.**
+A path invented per dispatch leaves no record on disk of what was granted, so no
+gate and no entry can name the file a stage owes; two dispatchers can also
+disagree about where one stage's journal lives. The supervisor still spells the
+path out in the prompt — an agent cannot read a knob it has no reason to look for
+— but that grant is now a **restatement of a derivation** rather than its only
+source, which is what makes it checkable.
+
+**One journal per stage, appended by every session of that stage.** A stage that
+runs several sessions — the implementation stage runs one per task by contract —
+does not get several journals: the path is a function of the stage, so each
+session appends to the file its predecessors wrote, under a heading naming
+itself. Two consequences are stated because each looks like a defect until it is
+read. The `DONE`-as-last-line rule survives unchanged and reads *better* at this
+granularity: an earlier session's marker sitting mid-file is not a lie about that
+session, and the file's last line still answers *did the session that wrote last
+finish*. And the entry assertion below is satisfied by **any** session of the
+predecessor stage having written, which is the correct question — the successor
+needs the predecessor's reasoning, not one particular session's.
+
+**Measured against this repo's own journals rather than asserted.** The default
+`<scratch dir>/<stage>-journal.md` is the shape sessions here converged on
+unaided, which is the argument for deriving it rather than inventing one — but
+the convergence is not total, and the exception is the case the rule above
+exists for: on an iteration whose implementation stage was split into batches,
+the two batch sessions each wrote a discriminated name of their own. The
+derivation overrides that: the discriminator belongs in a heading inside the
+stage's journal, never in its filename, or the successor's assertion has no file
+to name. **The honest limit**: two sessions of one stage running *concurrently*
+append to one file with no coordination beyond append atomicity, which is
+untested here and filed rather than claimed safe.
+
 ### The stamp protocol
 
 The **arriving** stage's skill *stamps* the evidence file as its first step —
@@ -536,6 +578,17 @@ the clause's reader is a human or agent rather than a gate.
   declaring no capture group, is a fail-closed config refusal (§lib/stages.sh).
 - `LIFECYCLE_KIT_ENTRY_PREFLIGHT` — per-stage `<stage>=<command>` entries run
   alongside the built-in pre-flight (§bin/enter-stage.sh); default empty.
+- `LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN` — the resume journal's path as a function
+  of the stage, carrying a `<stage>` placeholder (§The state machine); the
+  default is the scratch dir's own knob followed by `/<stage>-journal.md`, so the
+  scratch dir's literal is deferred to rather than restated here. A pattern
+  carrying no placeholder is a fail-closed config refusal (§lib/stages.sh).
+- `LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE` — `0` or `1`; default `0`. At `1` a stage
+  entry refuses when the cursor's stage left no journal at that derived path
+  (§bin/enter-stage.sh). Defaulted **off** because the assertion reads the
+  *predecessor*: switching it on mid-iteration asserts against sessions
+  dispatched before the rule existed, so a consumer throws it at an iteration
+  boundary, where a refusal costs a re-entry rather than a wedge.
 - `LIFECYCLE_KIT_SHIM_NGRAM` — the shared-n-gram width `check-shim-restatement`
   trips at (positive integer; §check-shim-restatement); default `9`.
 - `LIFECYCLE_KIT_SHIM_DEDUP_CORPUS` — that gate's corpus file list; default
@@ -1439,7 +1492,15 @@ prints the derived union-merge set (the gap inbox — §The committed gap inbox)
 and `lifecycle_merge_attrs_block` renders the supersede set as
 `<path> merge=iteration-scoped` lines and the union set as `<path> merge=union`
 lines, so `bin/install-lifecycle.sh` (writer) and `check-merge-attrs` (asserter)
-read one set (§Multi-operator semantics). The validator roster is fail-closed on **shape, not merely on presence**, and
+read one set (§Multi-operator semantics). `lifecycle_stage_journal <stage>` is the **journal-path derivation**:
+`LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN` with `<stage>` expanded, hoisted here for
+the same reason the cursor is — three readers must name one file or the
+assertion checks a path nobody was asked to write. Its readers are
+`bin/enter-stage.sh` at the entry assertion, a dispatching supervisor deriving
+the path it grants, and the dispatched stage session deriving where to write
+(§The state machine).
+
+The validator roster is fail-closed on **shape, not merely on presence**, and
 `LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE` states the rule the others follow: a
 non-empty pattern must compile as a POSIX ERE and must declare a capture group,
 each refused with its own message. Compilation is read off bash's own `[[ =~ ]]`
@@ -1448,7 +1509,13 @@ status — 2 for a pattern it could not compile, 0 and 1 both meaning it compile
 consumer will actually run against. The refusal exists because the failure it
 replaces is silent: an uncompilable pattern matches nothing and a group-less one
 captures nothing, and either would classify every worktree unclassified while
-looking configured. `lifecycle_supersede_set` has a **third
+looking configured. `LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN` takes the same
+treatment for the same reason: a pattern with no `<stage>` placeholder names one
+file for every stage, so the entry assertion would read some other session's
+journal and **pass** on it — a wrong answer, not a missing one, which is why it
+is refused rather than tolerated. `LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE` takes the
+`0|1` arm shape `LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK` already has.
+`lifecycle_supersede_set` has a **third
 reader**, `check-scratch-citation`, which forbids a permanent surface pointing a
 retriever at any of its members — so a consumer adding a
 `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` member gets citation enforcement over it with no
@@ -1811,13 +1878,59 @@ exec'd as argv with no interpreter word prepended**, so the configured path ride
 its own exec bit: a consumer wiring a gate here configures the gate's *invocation*
 and not its declaration file, and a configured path that stops being executable —
 a member ported to a binary substrate leaving a data-file descriptor behind — is
-a stage-entry breakage rather than a stale reference. **`--simulate <stage>` — the read-only preflight mode:**
+a stage-entry breakage rather than a stale reference.
+
+**The predecessor-journal assertion runs in that same pre-flight**, gated by
+`LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE` and defaulting off. At `1`, an entry
+refuses when the stage the cursor names left no journal at its derived path
+(§The state machine) — **exit 1, the expected path printed, nothing written**,
+the boundary-precondition family's contract, and `--simulate` relays the
+would-be refusal rather than taking it. Its inputs are both already read here:
+the cursor, and the pattern expanded against it. Three narrowings, each a
+consequence of an existing ruling rather than a carve-out:
+
+- **Existence and non-emptiness, never the `DONE` marker.** delegation-kit rules
+  the marker redundant wherever the supervisor consumed the agent's return, its
+  signal being reserved for a cold read. A stage entry is not a cold read — the
+  entering session exists *because* the previous stage returned — so asserting
+  the marker would mint an obligation its owning section already retires at
+  exactly this transition. Absent and empty are told apart in the message,
+  because they are different mistakes.
+- **The in-iteration predecessor only.** The boundary reset wipes the scratch dir
+  at the first stage's entry and `LIFECYCLE_KIT_BOUNDARY_PRESERVE` deliberately
+  does not keep journals, so the first stage of an iteration has no predecessor
+  journal by construction and is never asserted against.
+- **Stages only.** A supervising session's own journal is not a stage journal: it
+  has no stamp, so the cursor cannot name it, and a second roster to reach it is
+  a surface this assertion did not buy.
+
+**The refusal is evadable, and saying so is the point rather than a caveat on
+it.** Its help text names one way forward — write the missing journal yourself,
+stating that the predecessor left none — and an oracle over an artifact the
+asserted-against session can itself create is bypassable by definition. What the
+mechanism buys is not that a journal exists; it is that its **absence becomes
+deliberate and written** instead of silent and unnoticed, which is the defect
+exactly: the finding this closes was not that a session refused to journal, it
+was that nobody knew one had not. A session that writes "the predecessor left
+none" has produced the recovery record the channel exists for, at the one moment
+someone is looking. The escape is also what keeps the refusal off the deadlock
+class: a refusal with no reachable exit would wedge the lifecycle behind a
+session that has already ended and cannot be asked to fix anything.
+
+**Default `0`, and the switch is thrown at a boundary rather than mid-iteration.**
+`REQUIRE=1` asserts against the *predecessor*, so enabling it inside a running
+iteration lands it underneath stages already dispatched before the rule existed,
+and puts the first enforced firing inside an iteration rather than at its
+boundary — where a refusal costs one stage re-entry instead of a wedge. A rule
+whose first live firing needs its own escape has been scheduled badly rather than
+designed badly. **`--simulate <stage>` — the read-only preflight mode:**
 it runs everything a real entry runs up to the write — config load and stage
 validation, header parse, session-id derivation, the idempotence probe (a
 would-be no-op is reported as such and exits 0), the candidate-stamp temp
 state build, `check-stage-entry`, every matching `LIFECYCLE_KIT_ENTRY_PREFLIGHT`
-entry, and — at an iteration boundary — the Lessons check, the gap-inbox check
-and every `LIFECYCLE_KIT_BOUNDARY_REQUIRE` member, in the order a real entry runs
+entry, the predecessor-journal assertion, and — at an iteration boundary — the
+Lessons check, the gap-inbox check, the linked-worktree check and every
+`LIFECYCLE_KIT_BOUNDARY_REQUIRE` member, in the order a real entry runs
 them; then it stops: no stamp, no boundary truncation, the temp files removed.
 That roster is stated in full because a roster that stops short of the refusals
 the code runs is read as a guarantee the mode does not give. Every output
@@ -1918,7 +2031,8 @@ re-runs its entry step safely. It reads the `lib/stages.sh` knobs
 `LIFECYCLE_KIT_FIRST_STAGE`, `LIFECYCLE_KIT_BOUNDARY_TRUNCATE`,
 `LIFECYCLE_KIT_BOUNDARY_PRESERVE`,
 `LIFECYCLE_KIT_BOUNDARY_REQUIRE`, `LIFECYCLE_KIT_LESSON_EVIDENCE_FILE`,
-`LIFECYCLE_KIT_SURVEY_RECORD_FILE`, `LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE`, and
+`LIFECYCLE_KIT_SURVEY_RECORD_FILE`, `LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE`,
+`LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN`, `LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE`, and
 `LIFECYCLE_KIT_ENTRY_PREFLIGHT`).
 
 **This tool depends on `gate-sdk/lib/gate.sh`, and the dependency is stated

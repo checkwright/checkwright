@@ -1582,6 +1582,16 @@ sweeps** bullet, which is the surface an agent loads. This section owns what
 that bullet cannot carry: the lifetime rule's reasoning, the attestation it was
 priced against, and the two readings the marker carries.
 
+**The grant clause stands and its status changed: it is now a restatement, not a
+source.** Where the consumer runs a stage machine, the journal's path is a
+**derivation from the stage** that the machine owns and can compute
+(lifecycle-kit/SPEC.md §The state machine); the supervisor still spells it out
+absolutely in the prompt, because an agent cannot read a knob it has no reason
+to look for. What that buys is that the grant becomes **checkable against the
+derivation** instead of being the only record of what was granted — the gap that
+left this whole channel unoracled. This kit owns the journal contract and states
+no path convention; that kit owns the path and states no contract.
+
 **Lifetime — why retention rather than an eager deletion chore.** Cleanup is
 the consumer's own scratch reset at its next work-unit boundary, a mechanism
 the consumer already owns (here, `enter-stage.sh`'s boundary wipe of `.tmp/` at
@@ -1618,19 +1628,39 @@ Only in a **cold read** — a journal found with no return ever consumed, the
 agent's session having died before returning (a background sandbox died, a
 crash, a timeout) — is the marker the sole signal, and there the original
 reading holds: no `DONE` = interrupted, resume from it. A live journal is told
-from a spent one by per-session journal naming, the consumer's own work
-cursor, and `git log`, which together say more than presence ever did, and the
-boundary sweep bounds the ambiguity to the current work unit. The
+from a spent one by the consumer's own work
+cursor and by `git log`, which together say more than presence ever did, and the
+boundary sweep bounds the ambiguity to the current work unit. **Per-session
+journal naming discriminates only where the path is the dispatcher's to choose**
+— under a stage machine the journal is named for the stage, so several
+sessions of one stage share the file and append to it. Nothing is lost at the
+granularity a reader actually asks about: the marker rule already says `DONE`
+counts only as the **last** line, so a shared file answers *did the session that
+wrote last finish*, which is the question, and an earlier session's mid-file
+marker is not a claim the later content contradicts. The
 inline-findings rule above is that cold arm's insurance — with no surviving
 return, a pointer-only journal would make a would-be `DONE` lie about
 recoverability.
 
-**Caveat — the sandbox may block the journal write.** Background agents
-have been observed unable to `Write` to the granted path, silently falling
-back to returning findings in the final message — which defeats the journal
-exactly when it matters (a long, interruptible run). The template's
-read-only-fan-out carve-out and its grant-the-path-explicitly clause both
-follow from this observation. That contract has two ends. The caveat's
+**Caveat — a journal write has been observed to fail, and the cause is
+unexplained.** A background agent was once unable to `Write` to the granted
+path, silently falling back to returning findings in the final message — which
+defeats the journal exactly when it matters (a long, interruptible run). The
+template's read-only-fan-out carve-out and its grant-the-path-explicitly clause
+both follow from this observation.
+
+**Narrowed from a property of isolation to a single unexplained observation,
+because the isolation reading was probed and did not hold.** A
+worktree-isolated agent dispatched with an absolute path in the **main
+checkout** wrote it successfully, from inside its own worktree — so isolation
+does not block the write, and the caveat's own prescribed remedy works under the
+strongest isolation this tree dispatches. That matters rather than being trivia:
+it is what makes an entry-time assertion on a journal's existence *fair*, since
+a missing journal is a session that did **not** write rather than one that
+**could not**. The caveat is narrowed and not deleted — one observation of
+capability does not falsify an observation of failure, and the failure that
+prompted this text remains unexplained, so the remedy stands and only the
+generalisation goes. That contract has two ends. The caveat's
 evidence is about **the child's** write failing silently, and its true
 content is *do not make recoverability depend on a backgrounded child's
 write* — which is why it is kept rather than overturned by the template's

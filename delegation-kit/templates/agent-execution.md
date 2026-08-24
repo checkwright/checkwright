@@ -221,7 +221,11 @@ drift: do not delete it on sight, and when either rule changes here, propagate.
   wipes it); name the path **absolute into the main checkout** in the dispatch
   prompt so a worktree-isolated agent writes to the surviving tree, not its doomed
   one. Repo-dir-local scratch is reboot-survivable, cheap to clean, and predictable
-  across coding agents. The agent updates it as it goes; on success it appends a
+  across coding agents. **Where the consumer runs a stage machine the path is
+  derived, not invented** — it is a function of the stage, so the grant in the
+  prompt restates a name both ends can compute rather than minting one, and
+  several sessions of one stage **append to that one file** instead of each
+  naming its own (lifecycle-kit/SPEC.md §The state machine). The agent updates it as it goes; on success it appends a
   `DONE` marker. Each finding is
   written into the journal *inline as it is confirmed* — never "see final
   output": the agent's return message dies with the session, so a pointer-only
@@ -239,13 +243,15 @@ drift: do not delete it on sight, and when either rule changes here, propagate.
   post-commit verification, which *is* the completion attest, so the missing
   marker is redundant, not a signal of interruption. Since every journal now
   outlives its session, presence alone signals nothing — tell a live journal
-  from a spent one by its per-session name, the work cursor, and `git log`
+  from a spent one by the work cursor and `git log`
   (delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset
-  sweeps). **Caveat — a background agent's sandbox may block
-  the journal write.** `run_in_background` agents have been observed unable to
-  `Write` to the granted path and silently falling back to returning findings in
-  their final message — which makes the journal mechanic non-functional exactly
-  when it matters (a long, interruptible run). So: for a **read-only fan-out**
+  sweeps). **Caveat — a journal write has been observed to fail, cause
+  unexplained.** A `run_in_background` agent was once unable to
+  `Write` to the granted path and silently fell back to returning findings in
+  its final message — which makes the journal mechanic non-functional exactly
+  when it matters (a long, interruptible run). Read it as one unexplained
+  observation, not as a property of isolation: a worktree-isolated agent granted
+  an absolute path in the main checkout **wrote it successfully**. So: for a **read-only fan-out**
   (audit, survey), the return value *is* the contract — don't rely on a journal.
   Reserve the **journal** for agents that **mutate files**, and for those grant
   the journal path explicitly before dispatch rather than assuming the write

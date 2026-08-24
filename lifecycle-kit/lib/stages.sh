@@ -55,6 +55,16 @@ declare -p LIFECYCLE_KIT_SHIM_DEDUP_CORPUS &>/dev/null || LIFECYCLE_KIT_SHIM_DED
 
 [[ -v LIFECYCLE_KIT_RECURRENCE_THRESHOLD ]] || LIFECYCLE_KIT_RECURRENCE_THRESHOLD=2
 
+# spec: lifecycle-kit/SPEC.md §The state machine — the stage journal's path is derived from the stage, never invented per dispatch; the default defers to the scratch dir's own knob rather than restating its literal
+[[ -v LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN ]] \
+    || LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN="${GATE_SDK_TMP_DIR:-.tmp}/<stage>-journal.md"
+[[ -v LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE ]] || LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE=0
+
+# spec: lifecycle-kit/SPEC.md §The state machine — the one expansion every reader shares: a dispatcher granting the path, a stage session writing it, and the entry asserting its predecessor's must name one file or the assertion reads a file nobody wrote
+lifecycle_stage_journal() {
+    printf '%s\n' "${LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN//<stage>/$1}"
+}
+
 declare -p LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS &>/dev/null || LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS=("*/SPEC.md")
 
 # spec: lifecycle-kit/SPEC.md §The survey record — the surfaces held to the no-retrieval-pointer rule; the queue file alone by default because it is the one permanent surface this kit owns and where both attested firings landed, so the default is non-vacuous in every consumer and over-reaches in none
@@ -193,6 +203,11 @@ for _lc_pf in ${LIFECYCLE_KIT_ENTRY_PREFLIGHT[@]+"${LIFECYCLE_KIT_ENTRY_PREFLIGH
 done
 [[ "$LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK" == "0" || "$LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK" == "1" ]] \
     || _lc_errs+=("LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK must be 0|1 (got '$LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK')")
+# spec: lifecycle-kit/SPEC.md §lib/stages.sh — a stage-journal pattern with no <stage> placeholder would name one file for every stage, so the entry assertion would read the wrong session's journal and pass on it; fail-closed rather than silently mis-asserting
+[[ "$LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN" == *'<stage>'* ]] \
+    || _lc_errs+=("LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN '$LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN' carries no '<stage>' placeholder")
+[[ "$LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE" == "0" || "$LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE" == "1" ]] \
+    || _lc_errs+=("LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE must be 0|1 (got '$LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE')")
 # spec: lifecycle-kit/SPEC.md §lib/stages.sh — a malformed lock-reason pattern is a fail-closed config refusal, never a silent everything-unclassified: bash returns 2 from [[ =~ ]] on a pattern it cannot compile (0 and 1 both meaning it compiled), and a pattern that declares no group would classify every match as pid-less
 if [[ -n "$LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE" ]]; then
     ( [[ "" =~ $LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE ]] ) 2>/dev/null

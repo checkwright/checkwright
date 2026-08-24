@@ -305,6 +305,29 @@ for pf in ${LIFECYCLE_KIT_ENTRY_PREFLIGHT[@]+"${LIFECYCLE_KIT_ENTRY_PREFLIGHT[@]
     fi
 done
 
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the predecessor-journal assertion, the same refusal contract as the boundary-precondition family: exit 1, the expected path printed, nothing written. Non-boundary only, because the first stage of an iteration has no predecessor journal by construction — this very entry's scratch wipe is the journal's named reclaim path. The predecessor is the cursor, the last stamp's stage, so a second session of one stage asserts the first session's journal at the same derived path.
+if [[ "$first" == 0 && "$LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE" == "1" ]]; then
+    pred_stage="$(lifecycle_current_stage "$STATE")"
+    if [[ -n "$pred_stage" ]]; then
+        pred_journal="$(lifecycle_stage_journal "$pred_stage")"
+        pred_why=""
+        if [[ ! -f "$pred_journal" ]]; then
+            pred_why="does not exist"
+        elif [[ ! -s "$pred_journal" ]]; then
+            pred_why="is empty"
+        fi
+        if [[ -n "$pred_why" ]]; then
+            if [[ "$sim" == 1 ]]; then
+                echo "enter-stage (simulate): entry to '$stage' would be refused — the predecessor stage '$pred_stage' left no resume journal: $pred_journal $pred_why." >&2
+            else
+                echo "enter-stage: entry to '$stage' refused — the predecessor stage '$pred_stage' left no resume journal: $pred_journal $pred_why (nothing written)." >&2
+            fi
+            relay_help "write $pred_journal yourself, stating plainly that '$pred_stage' left none, then re-run enter-stage $stage. The assertion is evadable by design and this is the escape: what it buys is that the absence becomes deliberate and written instead of silent and unnoticed, at the one moment someone is looking."
+            exit 1
+        fi
+    fi
+fi
+
 # spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the iteration-boundary entry refuses on a non-empty ## Lessons Learned: an untriaged lesson must not cross into the next iteration (no [attend] injection may outlive its iteration), the same refusal contract as the check-stage-entry precondition
 if [[ "$first" == 1 ]]; then
     lessons="$(awk '

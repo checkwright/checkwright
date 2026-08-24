@@ -12,34 +12,6 @@
 
 ## New Features
 
-- **stage-journal-contract-unoracled** [spec: SPEC-stage-journal.md] — a granted resume journal
-  that is never written is indistinguishable from a session that had nothing to say, so the
-  durable narration channel fails silently.
-  **Observed, not hypothesised.** At one iteration's validate the dispatch granted a journal path
-  spelled absolutely into the main checkout, and at stage end the file did not exist — while
-  every other stage that iteration wrote its own, six of six.
-  **The mitigation that failed is the one the protocol itself prescribes.**
-  `delegation-kit/templates/agent-execution.md` already carries the caveat that a background
-  agent's sandbox may block the write and that the agent then falls back silently to its return
-  message. The granted path was named absolutely in the main checkout — the caveat's own remedy —
-  and it failed anyway.
-  **The cost landed on precisely the case the journal exists for.** That was the one stage of the
-  iteration interrupted mid-work; had the session died rather than merely ending its turn, its
-  reasoning would have been unrecoverable.
-  **Distinct from the two nearest entries.** `stage-completion-unattested` is the stage's own
-  **deliverable** absent behind a live entry stamp; this is the narration channel, and a stage
-  can lose either without the other. `delegation-provenance-floor` is a parent relaying a
-  child's return that never arrived — its body RECOMMENDS the shape this entry takes, so it is
-  prior art rather than a subsumer.
-  **The fork is ruled in the amendment, and the enabling move is a derivation rather than an
-  assertion**: a path granted ad hoc in a prompt is unreachable by any oracle, so the path
-  becomes computable from the stage before anything can assert it.
-  **Cost while deferred:** every dispatched stage can lose its reasoning silently, and the loss
-  is invisible until someone needs it.
-  Filed 2026-08-19 by close from the gap inbox, filed by the lead because the absence is
-  observable to the dispatcher and not to the session; promoted to a feature 2026-08-24 at spec,
-  which probed the sandbox caveat against a live worktree dispatch and found the write capable.
-
 ## Technical Debt
 
 - **no-port-cause-class-generalization** — one file's `# no-port:` cause is true of a whole
@@ -7762,6 +7734,8 @@
 - **amendment-roster-omission-detection** [design-pending] — Only a grep catches a short roster.
 
 ## Done
+
+- stage-journal-contract-unoracled
 
 - agent-worktree-boundary-disposition
 
