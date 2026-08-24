@@ -7715,9 +7715,19 @@
   The tension is narrower than a conflict and wider than nothing: one ruling took the payload
   cost for mechanism, this cause refuses it for vocabulary, and no surface says which axis
   governs.
-  **Deliverable:** rule whether the cause generalises; if so, whether it generalises on half
-  (a), on half (b), or on their conjunction; and whether declarations land as a sweep or per
-  owning entry.
+  **OPERATOR-RULED 2026-08-24, relayed through the lead at the close of
+  `port-remainder-disposition-and-worktree-reclamation`: the cause generalises on half (b)
+  ALONE.** Declare the config-and-vocabulary files, which hold the private claim vocabulary;
+  leave the mechanism files owed, since they hold none. The operator's ground: the cause's real
+  basis is the provenance seam, and TRAJECTORY.md's 2026-08-14 ruling already ACCEPTED the
+  payload cost for mechanism, so declaring on half (a) alone would contradict a trade that
+  ruling took. NOT a reversal, demotion or re-scoping of it: its stated subject is gates under
+  `scripts/`, and it records that `scripts/` now keeps no gate script at all.
+  **Re-measured at this scope rather than carried:** the split is fifteen vocabulary rows
+  against ten mechanism rows; re-derive it from each header rather than citing that.
+  **What is NOT ruled and stays with the taking iteration:** whether the declarations land as
+  one sweep or per owning entry, and the cause text each row carries. Class: it declares an
+  existing marker on existing files and mints no name and no gate, so the litmus makes it debt.
   **Cost while deferred:** the predicate keeps about a sixth of its rows ruled-in-principle and
   unruled-in-fact, so `--tree`'s owed count overstates the remaining work and every cut
   composed off it is mis-sized by that margin. Filed 2026-08-24 to the gap inbox by spec and
@@ -7840,6 +7850,83 @@
   it — the count is a judgment record and is not re-derivable by any predicate. Filed
   2026-08-24 by close from its own surface triage rather than from the gap inbox, after an
   owner grep over the queue found the class unowned; both SPEC halves were read first-hand.
+
+- **turn-end-liveness-exit-two-conflation** [design-pending] — the SubagentStop hook reads the
+  gate substrate's fail-closed "could not run" as a malformed launch record, so every
+  worktree-isolated agent is refused at turn end.
+  **OPERATOR-RULED 2026-08-24 and relayed through the lead at the close of
+  `port-remainder-disposition-and-worktree-reclamation`: TAKEN NEXT ITERATION, ahead of normal
+  scope intake.** Formally a FOURTH yield of TRAJECTORY.md §PRIORITY DIRECTIVE, and like the
+  three before it it spends one iteration's turn alone and makes no claim on the sequence's next
+  turn — NOT a reversal, demotion or re-scoping of that directive. What distinguished it: it
+  ENABLES rather than competes, since the refusal disables exactly the delegated read-heavy
+  audits CLAUDE.md pre-authorizes and the port's own remaining work would use.
+  **The mechanism, re-verified at this scope against source rather than carried:**
+  `scripts/subagent-stop-liveness.sh` maps reader exit 2 to `verdict=corrupt` and refuses on
+  corrupt; `scripts/producer-liveness-reader.sh` reaches the gate through
+  `scripts/gate-exec.sh`, which exits 2 when the gate resolves in no check dir;
+  `check-producer-liveness` is `.gate`-declared and therefore binary-dispatched; and
+  `.gitignore`'s `target/` means `native/target/` never materializes in a worktree checkout.
+  THREE distinct causes land on exit 2 — the unresolvable-gate refusal, the crate's absent-probe
+  refusal, and a genuinely malformed record — and the hook's stderr names only the third, so it
+  steers toward blanking `DELEGATION_KIT_LIVENESS_CMD`, the one wrong fix.
+  **The cost is wider than the bullet that filed it, and this half is NEW.**
+  `scripts/delegation-config.sh` declares `audit-sweep` the read-only dispatch type and
+  `scripts/agent-dispatch-guard.sh` blocks any `audit-sweep` dispatch that is not
+  worktree-isolated. So the sanctioned type is forced into exactly the shape the refusal kills:
+  it is unusable outright rather than merely inconvenienced. Attested first-hand at this scope,
+  whose own audit-sweep dispatch was blocked and had to be re-shaped onto a type that makes no
+  read-only claim.
+  **THREE candidates, and the operator ruled the PRIORITY and not the choice:** map exit 2 to
+  unavailable and allow, reserving corrupt for a reader that actually read a malformed record
+  (the absent-reader path already allows) — which is a fail-OPEN move against a genuinely
+  corrupt record; gate the refusal on the record count the hook already computes, keeping
+  fail-closed where a record exists; or rule the worktree/binary seam deliberately, either
+  building the crate at dispatch entry or stating in agent briefs that binary-dispatched gates
+  are unavailable under isolation. Only the third answers the wider hole, that no
+  binary-dispatched gate runs inside a worktree agent at all.
+  **Why `[design-pending]`:** every candidate changes what delegation-kit/SPEC.md §The turn-end
+  liveness hook asserts a refusal means, and the third mints a dispatch-time step or a knob, so
+  the litmus makes it a feature.
+  **Remedy cost measured rather than estimated:** `build-native.sh` took 11.69s in a worktree.
+  **Cost while deferred:** every read-heavy audit delegation is pre-authorized for is either
+  un-dispatchable or must be re-shaped onto a type that makes no read-only claim, and the
+  refusal message points at the one change that would disable the check entirely.
+  Surfaced 2026-08-24 at the `port-remainder-disposition-and-worktree-reclamation` close, filed
+  to the gap inbox there and corroborated by all three of that close's audit dispatches; drained
+  and promoted 2026-08-24 at this scope, which re-verified the mechanism first-hand.
+
+- **dated-measurement-restatement-class** [design-pending] — whether a DATED measurement of a
+  live file's line spans is inside the internal-identifier-restatement class or outside it.
+  **The instance that forced the question, named as an instance rather than re-filed:**
+  `powershell-installer-surface` restates two live internal line RANGES of
+  `installer/lib/init.sh` plus per-file line counts for four sibling scripts. The fifteenth
+  `internal-identifier-restatement` sweep judged it LOW-MEDIUM and filed the call rather than
+  taking it. That entry stays live and unchanged either way, and its subject — the uncovered
+  install surface — is untouched by this one.
+  **What makes it borderline rather than clear.** Every figure was verified EXACT at HEAD, and
+  the paragraph is dated and headed "Measured ... not estimated", the form prior sweeps of the
+  class have consistently cleared. Against that: a line RANGE is the most rot-prone form the
+  class takes, it sits in the deferred pool — the longest rot window in the tree, and the corpus
+  the class was widened to cover 2026-08-15 — and the install path is live code any installer
+  edit moves.
+  **Why it generalises past one entry:** the ruling reaches every "measured at <date>" paragraph
+  in the pool, which is why the sweep escalated rather than editing one entry. The audit
+  roster's own reading of the shape is the ground to rule against — a ruled-but-unbought port is
+  its ideal host, because such a paragraph's whole job is to price a port against a source the
+  author has read and the reader has not, and the anchor cannot yet exist.
+  **The candidate disposition if the answer is INSIDE, narrow and reversible:** drop the two
+  spans and the four parenthetical counts, keep the two order-of-magnitude figures the argument
+  rests on, and append a re-derive instruction. If the answer is OUTSIDE, the roster row says so
+  once and every later sweep stops re-deciding it.
+  **Why `[design-pending]`:** it rules the boundary of a governed audit class, an authoring
+  question about the roster row rather than a code change.
+  **Cost while deferred:** the figures rot silently, and the entry carrying them is the one
+  sizing an unbought port, so a reader prices the work off numbers nothing re-checks — while
+  every future sweep spends the same judgment again on the same shape.
+  Surfaced 2026-08-24 at the `port-remainder-disposition-and-worktree-reclamation` close's
+  internal-identifier-restatement sweep and filed to the gap inbox there; drained and promoted
+  2026-08-24 at this scope.
 
 ## Icebox
 
