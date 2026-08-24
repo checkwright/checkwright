@@ -30,4 +30,6 @@ LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS=("TASK-QUEUE.md" "*/SPEC.md")
 LIFECYCLE_KIT_STAGES=(scope spec align build validate close)
 # comment-tier-exempt: the seam. This harness's worktree lock reason is its own vocabulary, so the kit ships an empty default and the pattern lands here beside the other consumer-vocabulary knobs — a kit literal spelling it would publish one harness's layout. The one capture group is the holder's pid; the start field is matched and not captured, argued in lifecycle-kit/SPEC.md §bin/enter-stage.sh.
 LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE='^claude agent [^ ]+ \(pid ([0-9]+) start [0-9]+\)$'
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the predecessor-journal assertion is ON here, and this close is the only place the switch that section mandates can be thrown: it rules the flip a boundary act rather than a mid-iteration one, and close is the last stage of an iteration, so no session of this iteration runs underneath it. The first stage of an iteration is never asserted against, so the next boundary crosses clean and the first enforced firing is its second stage.
+LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE=1
 declare -A LIFECYCLE_KIT_PREDECESSOR=([spec]=scope [align]=scope [build]=scope [validate]=build [close]=validate)
