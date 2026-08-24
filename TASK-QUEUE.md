@@ -75,60 +75,6 @@
 
 ## Technical Debt
 
-- **worktree-reclamation-cause-falsification** [precondition-ok: upstream-not-blocked] — nothing
-  has established WHY an agent worktree survives, so no reaper can be designed against the
-  mechanism rather than a guess at it.
-  **The valve's cause, stated because a terse tag is not an audit trail.**
-  `check-queue-prose-precondition` reds this entry on its sequencing paragraph, reading "upstream
-  of" and "blocked on" as a forward precondition this entry waits behind. The direction is
-  inverted: this entry is the BLOCKER, holds no precondition of its own, and was pickable first by
-  construction — which is what the paragraph says. Declaring a blocker tag would assert a blocker
-  that does not exist, so the valve is the only one of the gate's four remedies that is true here.
-  The rationale's fourth clause — that rephrasing past-tense would falsify an unrun experiment —
-  is SPENT and retired rather than kept: the experiment has run, the paragraph is past-tense now,
-  and the gate still reds on the surviving direction inversion, which is what keeps the valve
-  earned. Retiring a spent ground is not reversing the ruling that took it.
-  **RUN 2026-08-24 AT SPEC, AND THE HYPOTHESIS IS FALSIFIED. The deliverable is discharged; do
-  not re-buy it.** The hypothesis was that reclamation is tied to the DISPATCHING session's
-  lifetime, so a parent ending abnormally strands the child's worktree. A worktree-isolated agent
-  was dispatched and `git worktree list --porcelain` polled throughout: the worktree, its branch
-  ref and its `.git/worktrees/<name>` admin dir were ALL removed at the child's own normal
-  return, with the dispatching session alive and mid-turn. Reclamation is child-completion-tied,
-  not parent-lifetime-tied.
-  **THE CAUSE, which is what the entry was actually filed to buy.** While a child runs, the
-  worktree is held by a git LOCK whose reason string names the holding process's **pid** and its
-  **start time** — verified equal to that process's own stat entry, so it is a real PID-reuse
-  guard rather than decoration, and strictly richer than the `pid=<n> run=<key>` grammar
-  evidence-kit already reads. Reclamation is the harness releasing that lock and removing the
-  worktree at the child's return. A locked worktree is refused by `git worktree prune` and by
-  `git worktree remove` without `--force`, so a harness dying before its cleanup step strands one
-  that is clean, commitless AND unreclaimable — which is exactly the four survivors the
-  2026-08-18 probe measured and could not explain.
-  **SEQUENCED FIRST inside this iteration, and the ordering is the reason it was taken.** It was
-  UPSTREAM of `agent-worktree-boundary-disposition`, whose second refusal ground was this same
-  hypothesis written as an unverified candidate, and upstream of the seam question inside
-  `turn-end-liveness-exit-two-conflation`'s third disposition. Both read its answer, so the
-  experiment ran before either amendment was authored rather than at build — a spec session
-  authoring against an unrun hypothesis would have been designing against the guess this entry
-  existed to retire. Both amendments are authored against the result above.
-  **DISTINCT from `agent-worktree-reclamation-unenforced`, which a prior iteration completed.**
-  That unit bought the residue's DECLARATION, its UNREACHABILITY to the two index walkers, and
-  a per-iteration BOUND at the boundary refusal — every delta hypothesis-independent by
-  construction, which is why it landed without the cause and why this is not a re-filing of it.
-  This buys the cause: none of those deltas needed it and none of them establishes it.
-  **What the answer bought, and it is NEITHER of the two the question offered.** The fork was a
-  dispatch-protocol fix if reclamation were parent-lifetime-tied, a sweep if not. It is not
-  parent-lifetime-tied, so the fix is a reaper — and the reaper is now designable against a
-  published mechanism rather than against a guess, which is a strictly better answer than the
-  sweep the fork's second horn imagined.
-  **Class:** it runs an experiment and mints no name and no gate, so the litmus makes it debt;
-  what it produces is the input two sibling amendments are blocked on.
-  Filed 2026-08-24 to the gap inbox by spec with an explicit distinct declaration; drained
-  2026-08-24 at close, which verified the completed sibling in `## Done` and found the upstream
-  relation the filing did not name; promoted 2026-08-24 at the next scope on an operator ruling;
-  its experiment run and its finding recorded above 2026-08-24 at spec, which is where the
-  sequencing put it. The terminal move belongs to a later stage, not to the session that ran it.
-
 - **no-port-cause-class-generalization** — one file's `# no-port:` cause is true of a whole
   `scripts/` class, and declaring the class moves the completion predicate by roughly a sixth.
   **The cause, and the two halves it is made of.** `scripts/measured-claims.sh` declares
@@ -7849,6 +7795,8 @@
 - **amendment-roster-omission-detection** [design-pending] — Only a grep catches a short roster.
 
 ## Done
+
+- worktree-reclamation-cause-falsification
 
 - delegation-provenance-floor
 
