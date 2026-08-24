@@ -6481,29 +6481,29 @@
   **Cost while deferred:** low and recurring — one re-derivation per close — plus the standing risk
   that a roadmap-tagged row on a worklist reads as a sanctioned candidate to a session that
   has not read the tier section.
-  recurrence: icebox-candidate-eligibility-unapplied 2026-08-21 2026-08-23
-  **Grounds for both dates, and a THIRD measurement that COLLAPSES the rate.** 2026-08-21
-  (`graph-port-and-config-seam`) and 2026-08-23 (`leak-guard-and-assertion-meta-gate-port`) each
-  ran the worklist and got a byte-identical five rows, 100% ineligible: the same three by the
-  roadmap-tag rule (`plugin-marketplace`, `benchmark-ab-experiment`, `hosted-attestation-service`)
-  and the same two on the live-promotion-trigger clause. `battery-runner-port`'s close then ran it
-  after `5244a33a` lowered the age floor and got **27 rows with the same three ineligible — 11%**.
-  The absolute count of mechanical exclusions is FIXED at three, bounded by the roadmap-tagged
-  population and not by the pool, so widening the pool DILUTES the defect instead of growing it.
-  **That reverses which half of the split now costs the close most, and a ruling session weighs the
-  two shapes against it:** at 27 rows the hand-derivation actually paid for was the JUDGMENT clause
-  — five of the eight kept rows were held by a live-slug citation, each needing an extent
-  extraction and a slug-liveness check — while the filtering shape the two 100% readings argued for
-  drops three rows out of 27 and buys much less than it did out of five.
-  **HELD 2026-08-24 by the lead, and this is the threshold member that came closest to being
-  taken.** Scope proposed it at threshold and flagged it as the one candidate needing no spec
-  amendment — it is classed **debt**, so scope could have promoted it the same session, and
-  TRAJECTORY.md §The closed rulings records the operator acting 2026-08-23 on the deferred pool's
-  measured 8:1 intake-to-exit ratio. Held anyway on two grounds the lead ruled from the governed
-  surfaces: the third measurement above **collapses the rate** it would be taken to fix, from 100%
-  to 11%, and the entry bundles with `deferred-cost-class-opener-vocabulary` on one surface, so
-  taking it alone takes the weaker half of a pair. No date joins the hold; a decline is not a
-  firing.
+  recurrence: icebox-candidate-eligibility-unapplied 2026-08-21 2026-08-23 2026-08-24
+  **Grounds for the three dates, and a FOURTH measurement that REVERSES the rate-collapse
+  reading.** 2026-08-21 (`graph-port-and-config-seam`) and 2026-08-23
+  (`leak-guard-and-assertion-meta-gate-port`) each ran the worklist and got a byte-identical five
+  rows, 100% ineligible — three by the roadmap-tag rule (`plugin-marketplace`,
+  `benchmark-ab-experiment`, `hosted-attestation-service`) and two on the live-promotion-trigger
+  clause. `battery-runner-port`'s close ran it after `5244a33a` lowered the age floor and got 27
+  rows with the same three ineligible — **11%**, which is where the hold below took its ground.
+  **The 2026-08-24 firing is the one that settles it.** That close measured **8 rows, all 8
+  ineligible**, and this scope re-ran the emitter at the next boundary and got the same 8. The
+  five non-roadmap rows are each held by a **live unbuilt queue slug**, which the 2026-08-23
+  operator narrowing (queue-kit/SPEC.md §The icebox tier) makes a live promotion trigger — and a
+  slug-liveness test is exactly what the queue adapter already implements for `check-task-names`
+  and `check-roadmap-fresh`. So **both** halves of the eligibility rule are mechanically
+  decidable, the judgment residue the 11% reading rested on is not judgment at all, and the
+  worklist's false-positive rate is 100% against a predicate the emitter could have computed.
+  **HELD 2026-08-24 by the lead**, and it is the threshold member that came closest to being
+  taken: it is classed **debt**, so scope could have promoted it the same session, against
+  TRAJECTORY.md §The closed rulings' 2026-08-23 operator action on the pool's measured 8:1
+  intake-to-exit ratio. Held on the rate-collapse ground the paragraph above now answers, and on
+  the entry bundling with `deferred-cost-class-opener-vocabulary` on one surface — that second
+  ground stands untouched. The date above joins because the finding RE-FIRED on new evidence,
+  which is what no decline ever does.
   Surfaced 2026-08-19 at the `takeable-tier-batch-and-installer-noop` close's icebox eviction review
   and filed to the gap inbox there; promoted 2026-08-20 by the next iteration's scope.
 
@@ -7646,6 +7646,74 @@
   session is computing over the tree, and invisible to every gate — the friction log is advisory.
   Filed 2026-08-24 at this iteration's close, from its prompt-friction triage, both grant surfaces
   read rather than inferred.
+
+- **kfric-obligation-residency** [design-pending] — the knowledge-friction capture obligation is
+  declared for "any session" and reaches no surface a kit-template session actually loads.
+  CLAUDE.md §Housekeeping binds capture to **any session** with "deferred capture is no capture",
+  and that sentence is the obligation's only statement in this tree. A live grep over the kits'
+  own templates — `lifecycle-kit/templates/`, `delegation-kit/templates/`,
+  `drift-kit/templates/` — finds `kfric` and `knowledge-friction` **only** in
+  drift-kit/templates/close-knowledge.md (the close-side triage, a *reader*) and in
+  `drift-kit/templates/kpis.list`. `lead.md` and `agent-execution.md` carry no line at all.
+  **Attested rather than predicted, and the instance is the worst-case shape.** At the
+  `shell-gate-tail-port-and-completion-oracle` iteration a **lead** session re-derived that
+  `run-gate-tests.sh` takes one argument for the consumer-remainder tree and carried the fact to
+  close in a dispatch prompt instead of stamping it. Probed at that close, not inferred:
+  `.workflow/knowledge-friction.log` was 0 bytes at the close entry, so `kpi-knowledge-friction`
+  read zero re-derivations for an iteration that demonstrably had one, and the KPI's own
+  lower-bound hedge absorbed the miss silently. The fact itself is now homed at
+  gate-sdk/SPEC.md §run-gate-tests and its fix filed, so this entry is the CAPTURE PATH alone.
+  **A lead is the shape that re-derives most and writes least**, and it is exactly the shape no
+  template serves: it runs off `lifecycle-kit/templates/lead.md`, meets no stage template, and
+  reaches the rule only through a consumer's always-loaded file a vendoring adopter need not have
+  written at all — so for that adopter the obligation ships with no carrier.
+  **DISTINCT from `kfric-empty-log-ambiguity`**, which asks how an EMPTY log should be READ and
+  whether the KPI may be trusted at zero; this is the obligation never reaching the writer.
+  **DISTINCT from `dispatch-claim-evidentiary-tier-unmarked`**, where a claim's evidentiary tier
+  is upgraded in transit — the relay here was accurate and the capture simply never happened.
+  **PAIRS with `recurrence-obligation-residency` on one surface**: both are an every-session
+  obligation stated only where some sessions look, both resolve under
+  delegation-kit/SPEC.md §Operative residency's placement rule, and both face the identical trade
+  between one resident line and N template restatements. A unit taking either should take both.
+  **Why `[design-pending]`:** placement is the whole question and the candidates differ in kind —
+  a bounded imperative in the two unserved kit templates, a line on drift-kit's own dispatch
+  surface, or the widest-true-tier answer that disposes of the recurrence twin in the same motion.
+  Class: relocates one imperative and mints no name and no gate, so canon-kit's litmus makes it
+  **debt**.
+  **Cost while deferred:** one silently uncounted re-derivation per lead session that hits one,
+  and a KPI that reads cleanest exactly when the least-instrumented session shape re-derives most.
+  Surfaced 2026-08-24 by the `shell-gate-tail-port-and-completion-oracle` close and filed to the
+  gap inbox there; promoted 2026-08-24 at this scope's drain, which re-ran the template grep
+  first-hand and found both files still empty.
+
+- **release-body-step-has-no-in-tree-witness** [design-pending] — the one release step whose
+  product lives off the tree is the one that was skipped, and its only backstop is next-day.
+  RELEASING.md step 6 fills the GitHub Release body with the note post's apex URL by hand. It is
+  the only release step whose artifact never touches the tree, so no gate, no fixture and no
+  validate suite can see it; the runbook says exactly that and installs a monitor instead —
+  `site-health.yml`'s release-body arm, daily and issue-shaped
+  (site-kit/SPEC.md §templates/site-health.yml).
+  **The step was skipped at the v0.25.0 cut, measured rather than inferred.**
+  `gh release view v0.25.0 --json body` returns an **empty** body, against v0.24.0's well-formed
+  one, while `docs/posts/2026-08-23-checkwright-v0-25-0.md` has been on the site since the cut.
+  The monitor fired as designed and filed the issue the following morning.
+  **What the firing proves, and what it does not.** It proves the backstop works. It does not
+  close the gap, because the latency is precisely the window the runbook itself names as the
+  reason the hand-check stays — "you are the only actor who can fix the body before anyone reads
+  it". A cut whose session skips step 6 is public, wrong and unnoticed for up to a day, on the
+  surface an evaluator reaches first.
+  **DISTINCT from `release-drain-ordering-contradiction`** (step 4's drain/tag ordering) and from
+  `release-runbook-identity-diagnosis` (which account is active); neither reads step 6, and both
+  concern steps whose evidence is in the tree.
+  **Why `[design-pending]`:** three shapes trade real properties. Generate the body from the note
+  post inside the `release` job — retires the hand step, but puts release-note text on a CI path
+  the battery never runs. Have the release-sweep skill emit the exact body text as a copy-ready
+  artifact — cheap, keeps the human in the loop, still skippable. Or move the monitor's cadence
+  toward the cut, which shortens the window without closing it.
+  **Cost while deferred:** one wrong public front door per skipped cut, for up to a day, plus the
+  standing fact that the release's most reader-facing artifact is the least witnessed one.
+  Surfaced 2026-08-24 by GitHub issue #2 and promoted at this scope's boundary sweep, whose probe
+  re-read the v0.25.0 Release body directly rather than trusting the issue text.
 
 ## Icebox
 
