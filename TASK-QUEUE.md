@@ -7606,6 +7606,195 @@
   internal-identifier-restatement sweep and filed to the gap inbox there; drained and promoted
   2026-08-24 at this scope.
 
+- **precondition-gate-direction-blindness** [design-pending] — `check-queue-prose-precondition`
+  reds an entry whose prose says the entry IS the blocker, and three of the four remedies it
+  prints are false for that shape.
+  **Reproduced at this iteration's scope rather than predicted.** Promoting
+  `worktree-reclamation-cause-falsification` to Technical Debt red the member on a paragraph
+  reading "UPSTREAM of <slug>" and "two sibling amendments are blocked on", where the entry held
+  no precondition of its own and was pickable first by construction.
+  **The remedy list is the sharper half, and it was read off the gate at this drain.** The four
+  lines it prints are: tag the real blocker, move the entry to Deferred, rephrase past-tense, or
+  take the `[precondition-ok:]` valve. For an entry naming ITSELF as the upstream, a blocker tag
+  asserts a blocker that does not exist, past-tense rephrasing falsifies an unrun experiment, and
+  a move to Deferred undoes an operator-ruled promotion. Only the valve is true, so the gate's
+  own help text steers a session toward writing something false unless it stops to reason.
+  **Direction, not negation — and the filing's "they do not share a fix" FELL at the drain.**
+  `precondition-gate-negation-false-positive` is the NEGATED shape ("not gated on", "no longer
+  waiting on") against a bare-substring alternation; this is the unnegated, affirmative sentence
+  whose subject is the blocker rather than the blocked, and no phrase-set calibration reaches it.
+  But that entry's third candidate deliverable — declare the valve the intended answer and widen
+  queue-kit/SPEC.md's calibration paragraph to say so — is this entry's second horn verbatim. The
+  two are distinct in TRIGGER and overlap in REMEDY, so whichever is taken first should take
+  both; the filing's claim was read against the sibling's trigger set, never its deliverable list.
+  **No `recurrence:` date joins that sibling:** its finding is the gate redding a NEGATED
+  sentence, and a negated sentence did not re-occur. A neighbouring shape in the same
+  false-positive family did, which is a new defect and files as one.
+  **Deliverable — rule one of two:** the gate attempts a direction read at all (an author-subject
+  test, not a phrase set); or the honest answer is that it cannot, the valve plus a stated cause
+  IS the contract, and queue-kit/SPEC.md's calibration paragraph says so — it currently justifies
+  the blocking grade on a bounded FP scope naming neither this shape nor the negated one.
+  **Cost while deferred:** every entry that names itself as an upstream blocker pays one red and
+  one valve, and the surface teaching the repair teaches three wrong ones.
+  Filed 2026-08-24 to the gap inbox by scope, which reproduced the red; drained and promoted
+  2026-08-25 at close, which read the gate's four help lines first-hand and corrected the filing.
+
+- **worktree-isolated-dispatch-cannot-reach-the-main-checkout** [design-pending] — a
+  worktree-isolated agent resolves neither a binary-dispatched gate nor the capture-tier log its
+  own firings must land in.
+  **Re-probed live at this drain against a running isolated dispatch, not taken on the filing.**
+  The child's worktree carried `native/` with no build output, so every binary-dispatched gate
+  reports unavailable; and both `.workflow/subagent-stop-liveness.log` and
+  `.workflow/prompt-friction.log` were being written INSIDE the worktree, where reclamation
+  destroys them, because the log knobs resolve against the child's own cwd. The close-stage
+  triage that is the decision field's named reader therefore never sees an isolated agent's
+  firings. Second independent reproduction; the first was a 2026-08-24 probe at spec.
+  **The bridge is identified and vendor-neutral, which is why this is filed rather than left
+  open-ended.** `git rev-parse --git-common-dir` run inside the worktree returns the main
+  checkout's `.git` absolutely — re-run at this drain — naming no harness directory and needing
+  nothing but git, squarely on TRAJECTORY.md objective 1.
+  **Distinct from the closed exit-class unit**, which stopped the REFUSAL being wrong; this is
+  the wider hole that no binary-dispatched gate and no shared log runs inside a worktree agent at
+  all, which `agent-worktree-boundary-disposition` ruled by declaration rather than by mechanism.
+  **Why `[design-pending]`:** the bridge is known and the POLICY is not — whether a child
+  redirects its capture-tier writes to the common dir, crossing the isolation boundary the
+  worktree exists to hold; or declares them lost; or the dispatch shape is refused outright.
+  **Cost while deferred:** low and bounded — an isolated agent reports every binary gate
+  unavailable and its refusal record is unrecoverable, so the forcing function's own
+  effectiveness is unmeasurable for exactly the class it was built for.
+  Filed 2026-08-24 by spec from a live dispatch probe; drained and promoted 2026-08-25 at close,
+  which reproduced both halves against its own running child.
+
+- **cited-object-token-sweep-corpus-narrower-than-the-class** [design-pending] — the
+  minted-identifier half of the provenance floor is gated inside one record file and nowhere
+  else, so a fabricated sha in the queue, a SPEC or a commit message reds nothing.
+  **Both halves read off the gate at this drain rather than cited.** `check-survey-record` does
+  widen its existence probe from the `rev` field to every git-object-shaped token in the other
+  three fields, with a `survey-token-exempt` valve carrying a mandatory reason; and its corpus is
+  the survey record alone. So the arm catches the one attested instance exactly, and stops there.
+  **It stops with CAUSE, which is what makes this a calibration question and not a bug.** The
+  same arm over the whole queue or every governed prose surface meets ordinary hex-shaped English
+  and fixture data, and gate-sdk/SPEC.md §When a gate earns its place rules that a gate crying
+  wolf trains its readers to bypass it.
+  **What is unruled** is whether a CONTEXT-QUALIFIED form clears that bar — a hex token inside
+  backticks adjacent to a citation word, say — which a real corpus measurement settles rather
+  than an argument.
+  **Deliverable:** run the false-positive census over the pool FIRST, then rule the corpus.
+  Nothing should be built before that measurement exists.
+  **Cost while deferred:** low and silent — the class stays caught in one file and uncaught
+  everywhere a fabricated identifier is likelier to matter, and nothing says so at the point of
+  writing.
+  Filed 2026-08-24 by spec out of `delegation-provenance-floor`'s amendment, which ships the
+  narrow arm; drained and promoted 2026-08-25 at close.
+
+- **worktree-lock-start-time-guard-untaken** [design-pending] — the harness's worktree lock reason
+  carries a process START TIME beside the pid, and the shipped classification deliberately
+  captures the pid alone.
+  **Re-measured live at this drain, not assumed.** A running agent's lock reason and that
+  process's own `/proc/<pid>/stat` start field agreed exactly, so the field is a real PID-reuse
+  guard and not decoration. Second independent measurement; the first was 2026-08-24 at spec.
+  **Two grounds for not taking it, both stated in the shipped amendment and both re-examinable:**
+  parity, since the `pid=<n> run=<key>` launch-record grammar carries no start-time guard either;
+  and error direction, since a stranded worktree whose pid has been reused classifies LIVE, which
+  refuses and tells the session to wait rather than authorising a removal.
+  **The second ground is the one that DECAYS.** It is safe only while the classification's sole
+  consumer is a refusal message. The moment anything reaps on the classification — automatically,
+  or a session trusting a safe-to-remove verdict — a reused pid becomes a wrong LIVE that merely
+  wastes a wait, while the reverse case is what a reaper must never get wrong. The guard's value
+  is a function of what reads the class, so the trigger here is the first consumer that acts.
+  **Portability is the real cost:** `/proc` is Linux-only and TRAJECTORY.md objective 2 names
+  Windows, so a portable start-time read has to be found or the guard degrades per platform.
+  **Cost while deferred:** zero today and rising with the first consumer that acts on the class
+  rather than printing it.
+  Filed 2026-08-24 by spec from a live lock measurement; drained and promoted 2026-08-25 at
+  close, which re-ran the measurement against its own child's lock.
+
+- **gate-command-status-conflation-third-caller** [design-pending] — a third call site conflates
+  `gate_command`'s harness-error exit with a resolution failure, and its guard for the real case
+  is dead.
+  **Both defects read off the source at this drain rather than cited.** In
+  `gate-sdk/bin/run-gate-tests.sh`, `run_case` reaches `gate_command` through a PROCESS
+  SUBSTITUTION, so the function's exit 2 for a harness error — an absent dispatch binary, a
+  refused knob bridge — kills only the subshell and reaches the caller as an empty argv. The
+  `if !` arm around it is dead, because `mapfile`'s status is `mapfile`'s own and not the
+  substitution's, so only the empty-argv arm ever fires; both arms print the same
+  resolves-in-no-check-dir line, which is FALSE for the binary-absent cause — the gate resolved
+  perfectly well and merely could not be built.
+  **Distinct from the closed exit-class unit, and NOT a re-filing of it.** That unit repaired
+  this shape at `scripts/gate-exec.sh` only and enumerated its blast radius as the name-addressed
+  pre-flight callers; this caller sits in gate-sdk's own `bin/` and outside that unit's audited
+  update-target roster, which is why it was filed rather than folded in.
+  **The verdict is already right and the defect is on the MESSAGE axis alone** — `run_case`
+  returns 2 and the run counts a harness failure, so nothing silently passes. But that is the
+  same axis the closed unit exists for, and gate-sdk/SPEC.md §lib/gate.sh now states the caller
+  obligation generically, so this is a stated-rule violation rather than an inconsistency.
+  **Shape:** `run-gates.sh`'s existing pattern is prior art in the same directory — capture
+  through a command substitution, keep the status, and name resolves-in-no-check-dir only on
+  status 1. It also owes an update to gate-sdk/SPEC.md §run-gate-tests, which is what puts it
+  past a mechanical sweep and made it a scope change rather than in-envelope calibration.
+  **Cost while deferred:** low and diagnostic — a fixture run against a stale binary tells its
+  reader the gate does not exist, pointing at a registration fix instead of at
+  `bash gate-sdk/bin/build-native.sh`.
+  Filed 2026-08-24 by build while landing the exit-class unit; DISPOSITIONED BY OPERATOR-CLASS
+  RULING at the 2026-08-25 close — the lead ruled it STAYS DEFERRED on CLAUDE.md's
+  scope-gated-intake rule, and directed it be promoted as a filing rather than started as work.
+
+- **same-stage-journal-append-uncoordinated** [design-pending] — one journal path per stage means
+  two CONCURRENT sessions of one stage append to one file with no coordination.
+  **The premise re-read at this drain.** lifecycle-kit/SPEC.md §The state machine now derives the
+  journal path from the stage and rules that every session of that stage appends to it, which is
+  what makes the predecessor assertion computable. Nothing in the tree tests the concurrent case,
+  and the coordination is whatever atomicity a single append happens to give.
+  **Sequential batches are unaffected and are the attested shape** — this iteration's own build
+  stage split into three batches that ran one after another, each appending cleanly.
+  **This is a consequence the derivation CREATED, so it is not a re-filing of the unit that
+  landed it.** Before the path became a function of the stage there was no shared file to contend
+  on. Distinct too from `batch-split-stamp-ownership`, which asks who writes the per-session
+  STAMP and is about the evidence file; the two share a trigger — a stage split across sessions —
+  and share no fix.
+  **Deliverable — rule one of three:** the append takes a lock (evidence-kit already owns a
+  create-exclusive claim idiom); or a per-session temp-then-concat; or the honest answer is that
+  concurrent same-stage dispatch is itself out of contract and
+  `lifecycle-kit/templates/lead.md` says so, which costs one line and buys the same safety.
+  **Cost while deferred:** low and bounded to a lead that runs same-stage sessions in parallel —
+  the failure mode is an interleaved or truncated journal block, which degrades the pull channel
+  and the cold-read recovery record rather than any gated surface, and it stays invisible until
+  someone reads the file.
+  Filed 2026-08-25 by build while landing the stage-journal contract; drained and promoted
+  2026-08-25 at close.
+
+- **amendment-update-target-overcount-undetected** [design-pending] — an amendment's
+  `## Existing sections updated` roster is unchecked in the OVER-count direction, so a rostered
+  target with nothing to update is discovered only by a session that goes looking.
+  **The instance, and the correction this drain made to it.** The stage-journal amendment rostered
+  `lifecycle-kit/templates/stages/` as a delta-1 target for "every stage template's
+  dispatch-facing text that names a journal path", and its DoD named hand-spelled journal paths
+  as the strings to chase. No stage template spells one, re-verified here. But the filing's
+  stated sweep result — "NOT ONE tracked file spells a journal path ... anywhere else" — is FALSE
+  as written: `guard-kit/guard-tests/cases.tsv` spells one six times. Those are guard fixture
+  INPUTS with no reader, so the substantive conclusion holds while the sweep's reported reach
+  does not, and the entry carries both rather than the tidier half.
+  **Why the correct outcome is still the defect.** The roster bullet was vacuous and the DoD item
+  was discharged by finding nothing, which at read time is indistinguishable from a skip.
+  **The filing's "neither entry's fix reaches the other's direction" FELL at the drain.**
+  `amendment-reader-roster-undercount` is the under-count direction, where the failure is a
+  missed edit; this is the over-count, where the failure is a session either fabricating an edit
+  to satisfy a bullet or silently dropping it. But two of that entry's three candidate
+  deliverables — make the build-stage re-sweep a contract line, or drop the roster and keep only
+  the sweep instruction — reach BOTH directions squarely. The two are distinct in FAILURE MODE
+  and overlap in REMEDY, so whichever is taken first should take both.
+  **No `recurrence:` date joins that sibling:** its finding is a roster that UNDERCOUNTED, and an
+  undercount did not re-occur. The mirror direction is a new defect and files as one.
+  **Deliverable:** decide whether `check-amendment-update-target` can assert that a rostered path
+  exists AND that the amendment's own cited string is present in it, or whether the honest answer
+  is that a roster is a claim and the merging session owes a stated finding when one comes up
+  empty.
+  **Cost while deferred:** low per instance and paid at the worst moment — a build session either
+  buys a sweep the amendment implied was already scoped, or writes something to make a vacuous
+  target non-vacuous.
+  Filed 2026-08-25 by build; drained and promoted 2026-08-25 at close, which re-ran the sweep and
+  corrected its reported reach.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
