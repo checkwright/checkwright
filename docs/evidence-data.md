@@ -111,3 +111,4 @@
 | battery-runner-port | sc sp a b v c | 2f/10d | 1 · ≤0d | 31s clean | 106 |
 | shell-gate-tail-port-and-completion-oracle | sc sp a b v c | 14f/2d | 2 · ≤1d | 24s 1✗ | 106 |
 | execution-control-reach-and-turn-end-blocking | sc sp a b v c | 4f/1d | 3 · ≤0d | 24s 1✗ | 106 |
+| port-remainder-disposition-and-worktree-reclamation | sc sp a b v c | 4f/1d | 2 · ≤0d | 24s 1✗ | 106 |

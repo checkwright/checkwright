@@ -6958,26 +6958,32 @@
   vendors kit roots with a verbatim `cp -R`, so any git-ignored artifact sitting under a kit's
   tracked tree rides into the installer payload and breaks `checkwright init` on the consumer.
   **The failure it produces.** `init` stages every vendored file with a plain `git add`, which
-  refuses when the consumer's own `.gitignore` also ignores that path ("paths are ignored by one
-  of your .gitignore files"), so init dies with "could not stage the vendored files".
-  **The class, not the instance — both re-probed at the drain.** `scripts/pack-installer.sh:110`
-  still vendors each kit with a bare `cp -R` and the script holds no `git ls-files` filter
-  anywhere, so the class is live. The one *observed* instance is gone: `check-crate-arms`'s
-  source-stamp cache used to land under `gate-sdk/gate-tests/check-crate-arms/good/.tmp/`, and
-  `run-gate-tests.sh` now absolutizes `GATE_SDK_TMP_DIR` for the fixture-pair case invocation
-  (`0c29e19f`, narrowed by `8f2000f0`), so a find over `gate-sdk/gate-tests` for `.tmp` or
-  `*.green` returns nothing and the full spine ran 24 of 24 suites clean at `8f2000f0` with no
-  manual removal. **The original filing's cost line — that every from-scratch validate needs a
-  manual `rm` plus a clean-tree `installer_smoke` re-run — was retracted the same day and is not
-  live.**
+  refuses when the consumer's own `.gitignore` also ignores that path ("paths are ignored by
+  one of your .gitignore files"), so init dies with "could not stage the vendored files".
+  **The class is live, and the instance is live AGAIN — both re-probed at this drain.**
+  `scripts/pack-installer.sh:110` still vendors each kit with a bare `cp -R` and the script
+  holds no tracked-path filter anywhere, so the class is live.
+  **The 2026-08-23 "the observed instance is gone" claim is RETRACTED as stale**, and with it
+  the retraction of the original cost line. Running the gate-sdk fixture suite STANDALONE — not
+  inside the battery, where the earlier re-probe ran and where suite ordering masked it —
+  regenerates `check-crate-arms`'s ignored source-stamp cache under its tracked `good/` case
+  every time. The absolutization credited with the fix reaches SHELL-dispatched members only,
+  so it never protected this one; the mechanism is
+  `bridged-knob-case-tmp-dir-override-inert`'s, already filed, live, and self-declared upstream
+  here.
   **Why `[design-pending]`:** the candidate fix is one filter at the vendoring step, vendoring
   git-tracked paths only, but it needs a decision about consumers vendoring from a non-git
   payload — packaging semantics rather than a patch.
-  **Cost while deferred:** low today and paid only on recurrence — a future gate or tool that
-  writes ignored scratch under a kit root reintroduces the identical `installer_smoke` red, now
-  with the diagnosis written down twice.
-  Filed 2026-08-23 by validate and re-dispositioned by validate the same day; the close drain read
-  both bullets as one disposition and re-ran the vendoring and stray-artifact probes.
+  **Cost while deferred:** paid NOW rather than on recurrence. Every from-scratch validate
+  needs a manual removal plus a clean-tree `installer_smoke` re-run — the original filing's
+  cost line, reinstated because the retraction that replaced it has itself been falsified — and
+  this iteration's own validate paid it, the leaked artifact feeding the pack step and
+  reddening `installer_smoke` for the wrong reason.
+  recurrence: pack-installer-vendors-untracked-scratch 2026-08-24
+  Filed 2026-08-23 by validate and re-dispositioned by validate the same day; the 2026-08-23
+  close drain read both bullets as one disposition and re-ran its probes inside the battery
+  alone, which was not isolated enough to see this; the 2026-08-24 close drain re-probed the
+  fixture suite standalone, reproduced the artifact, and retracted the retraction.
 
 - **bespoke-test-path-knob-pinning** [design-pending] — a bespoke gate-test's cwd sandbox is
   isolated only while `GATE_SDK_TMP_DIR` and `GATE_SDK_WORKFLOW_DIR` happen to hold relative
@@ -7643,6 +7649,121 @@
   standing fact that the release's most reader-facing artifact is the least witnessed one.
   Surfaced 2026-08-24 by GitHub issue #2 and promoted at this scope's boundary sweep, whose probe
   re-read the v0.25.0 Release body directly rather than trusting the issue text.
+
+- **no-port-cause-class-generalization** [design-pending] — one file's `# no-port:` cause is true
+  of a whole `scripts/` class, and ruling the class moves the completion predicate by roughly a
+  sixth.
+  **The cause, and the two halves it is made of.** `scripts/measured-claims.sh` declares `#
+  no-port:` on CLAUDE.md §The provenance seam, and the declaration is a conjunction: (a)
+  `scripts/` rides no installer payload, `pack-installer.sh` assembling from the kit roots
+  alone; (b) the file's keys are this repo's private claim vocabulary, so porting it ships that
+  vocabulary in every adopter's binary.
+  **Re-measured at this drain rather than cited.** `port-blockers --tree` reads 153/2/1/150,
+  and 25 of the owed rows sit under `scripts/`. Half (a) holds for all 25. Half (b) holds only
+  for the config-and-vocabulary files (the per-kit config files plus the enum, claim,
+  graph-vocabulary, payload-claim and transport emitters — about fifteen) and NOT for the
+  mechanism files (the hook guards, the gate exec shim, the liveness readers, the log parser
+  and the packer — about ten), which carry no private vocabulary at all. So the class is real
+  and NOT uniform, and one sweep over-declares. Re-derive the split by reading each header; do
+  not cite these counts.
+  **Why this is OPERATOR-CLASS and was not ruled at the drain.** It disposes roughly a sixth of
+  a completion predicate this iteration does not own, and it sits against TRAJECTORY.md's
+  2026-08-14 consumer-gates ruling. That ruling's stated subject is GATES under `scripts/`, it
+  explicitly ACCEPTS the payload cost this cause refuses, and it records that `scripts/` now
+  keeps no gate script at all — so every remaining owed row falls outside its stated subject.
+  The tension is narrower than a conflict and wider than nothing: one ruling took the payload
+  cost for mechanism, this cause refuses it for vocabulary, and no surface says which axis
+  governs.
+  **Deliverable:** rule whether the cause generalises; if so, whether it generalises on half
+  (a), on half (b), or on their conjunction; and whether declarations land as a sweep or per
+  owning entry.
+  **Cost while deferred:** the predicate keeps about a sixth of its rows ruled-in-principle and
+  unruled-in-fact, so `--tree`'s owed count overstates the remaining work and every cut
+  composed off it is mis-sized by that margin. Filed 2026-08-24 to the gap inbox by spec and
+  held there deliberately rather than asked mid-iteration, since ruling the class would have
+  moved the owed column underneath the amendment then landing; drained and promoted 2026-08-24
+  at close, which re-measured both halves, found the class non-uniform, and escalated the
+  ruling rather than taking it.
+
+- **precondition-gate-negation-false-positive** [design-pending] — `check-queue-prose-precondition`
+  reds on a sentence asserting the OPPOSITE of a precondition, teaching authors away from a
+  true one.
+  **Reproduced at this drain rather than cited.** A probe queue whose active entry reads "The
+  experiment is filed as its own work rather than blocked on anything" reds the member. The
+  trigger set is a phrase-set alternation of bare substrings, so every negating prefix the
+  filer named — "not gated on", "no longer waiting on", "rather than contingent on" — matches
+  by construction rather than by accident; that half was read off the knob's own value, not
+  probed four more times.
+  **What the shipped calibration already says, and where it stops.** queue-kit/SPEC.md
+  §check-queue-prose-precondition calls the gate FP-bearing by construction and justifies the
+  blocking grade on a bounded scope plus an attested silent pick; the `[precondition-ok:]`
+  valve is named one paragraph earlier. What no surface says is whether a NEGATED phrase is an
+  FP that calibration accepts or a miss it would fix — which makes this an authoring question
+  about that paragraph as much as a code one.
+  **Deliverable — rule one of three:** the trigger gains a negation lookbehind; or the
+  calibration accepts the negated FP explicitly, on the phrase-set position other prose gates
+  already take; or the valve is declared the intended answer and the calibration paragraph is
+  widened to say so.
+  **DISTINCT from a matcher-narrowing refusal already on the record**, found at this drain.
+  lifecycle-kit/SPEC.md refuses narrowing the gap inbox's RECURRENCE matcher by exempting a
+  negation, on the ground that an affordance which must be phrased around is miscalibrated.
+  That refusal is about an ADVISORY prompt whose authority was the defect; this is a BLOCKING
+  gate whose recall is. The same move has opposite value on the two tiers, and whichever
+  surface is widened should say so.
+  **Cost while deferred:** low and self-correcting — one round-trip per occurrence, and the fix
+  is a rephrase — but it is a gate steering authors off a true sentence, and a rephrase leaves
+  no trace, so the occurrence count is unmeasurable and the cost cannot rise into view. Filed
+  2026-08-24 to the gap inbox by spec immediately after the refusal it describes; drained and
+  promoted 2026-08-24 at close, which reproduced the red against a probe corpus before
+  dispositioning.
+
+- **worktree-reclamation-cause-falsification** [design-pending] — nothing has established WHY an
+  agent worktree survives, so no reaper can be designed against the mechanism rather than a
+  guess at it.
+  **The hypothesis, unrun.** Reclamation may be tied to the DISPATCHING session's lifetime
+  rather than the child's, so a parent that ends abnormally strands the child's worktree. Cheap
+  to falsify: dispatch an isolated read-only agent, end the parent abnormally, read what stays
+  registered.
+  **DISTINCT from `agent-worktree-reclamation-unenforced`, which this iteration completed.**
+  That unit bought the residue's DECLARATION, its UNREACHABILITY to the two index walkers, and
+  a per-iteration BOUND at the boundary refusal — every delta hypothesis-independent by
+  construction, which is why it landed without the cause and why this is not a re-filing of it.
+  This buys the cause: none of those deltas needed it and none of them establishes it.
+  **UPSTREAM of `agent-worktree-boundary-disposition`, found at this drain and not carried by
+  the filing.** That entry's second refusal ground is this same hypothesis, written there as an
+  unverified candidate, and it refuses a reaper designed against a guess at the selecting
+  mechanism. So this experiment is that entry's missing input rather than a sibling of it, and
+  running it is what turns its refusal into a design.
+  **What the answer buys:** it separates a dispatch-protocol fix from a sweep. If reclamation
+  is parent-lifetime-tied the fix is in how a dispatch ends; if it is not, the fix is a reaper
+  — different owners, different seams, and nothing today says which.
+  **Cost while deferred:** low and bounded. The boundary refusal caps accumulation per
+  iteration either way, so the carry is a design that cannot start rather than residue that
+  grows. Filed 2026-08-24 to the gap inbox by spec with an explicit distinct declaration;
+  drained and promoted 2026-08-24 at close, which verified the completed sibling in `## Done`
+  and found the upstream relation the filing did not name.
+
+- **prune-set-convergence-question** [design-pending] — two kits carry two prune sets that now
+  overlap heavily and differ deliberately, and no surface rules whether they should converge.
+  **Both definitions read at this drain rather than cited.** context-kit's set
+  (`scripts/context-config.sh`) and gate-sdk's (`gate-sdk/lib/gate.sh`) SHARE FOUR leaves and
+  differ in exactly four: context-kit omits the scratch dir and the fixture-corpus dir, and
+  carries two build-output dirs gate-sdk does not.
+  **CORRECTS THE FILING**, which said the two share one leaf. One leaf is what they NEWLY share
+  — the second-copy leaf this iteration added to both — and the shared core was already three
+  deep before it. Read as a shared-set claim the filing understates the overlap fourfold, which
+  matters because the size of the shared core is most of the argument for deriving it.
+  **Deliverable:** rule whether the two sets converge, stay two, or share a derived core with
+  per-kit extensions — the shape gate-sdk's extra-dirs knob already provides on one side.
+  **Why it is not free even though it looks it.** Adding the scratch or fixture-corpus dirs to
+  the index walkers is a corpus NARROWING with its own readers — the index-tests goldens, and a
+  session that legitimately wants a fixture corpus indexed — so convergence costs coverage on
+  the side that gains consistency.
+  **Cost while deferred:** low, and correctness-free: no exposure, since the second-copy leaf
+  that motivated the question is in both sets. The carry is two arrays a reader must not assume
+  agree, and a later author who adds a leaf to one and not the other with nothing in the tree
+  to catch it. Filed 2026-08-24 to the gap inbox by spec; drained and promoted 2026-08-24 at
+  close, which re-read both definitions and corrected the shared-leaf count.
 
 ## Icebox
 
