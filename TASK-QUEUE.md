@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: turn-end-liveness-exit-code-seam
+## Iteration: turn-end-liveness-seam-and-worktree-cause
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -13,6 +13,112 @@
 ## New Features
 
 ## Technical Debt
+
+- **worktree-reclamation-cause-falsification** [precondition-ok: upstream-not-blocked] — nothing
+  has established WHY an agent worktree survives, so no reaper can be designed against the
+  mechanism rather than a guess at it.
+  **The valve's cause, stated because a terse tag is not an audit trail.**
+  `check-queue-prose-precondition` reds this entry on its sequencing paragraph, reading "upstream
+  of" and "blocked on" as a forward precondition this entry waits behind. The direction is
+  inverted: this entry is the BLOCKER, holds no precondition of its own, and is pickable first by
+  construction — which is what the paragraph says. Declaring a blocker tag would assert a blocker
+  that does not exist, and rephrasing past-tense would falsify an unrun experiment, so the valve
+  is the only one of the gate's four remedies that is true here.
+  **The hypothesis, unrun.** Reclamation may be tied to the DISPATCHING session's lifetime
+  rather than the child's, so a parent that ends abnormally strands the child's worktree. Cheap
+  to falsify: dispatch an isolated read-only agent, end the parent abnormally, read what stays
+  registered.
+  **SEQUENCED FIRST inside this iteration, and the ordering is the reason it was taken.** It is
+  UPSTREAM of `agent-worktree-boundary-disposition`, whose second refusal ground is this same
+  hypothesis written as an unverified candidate, and it is upstream of the seam question inside
+  `turn-end-liveness-exit-two-conflation`'s third disposition. Both read its answer, so the
+  experiment runs before either amendment is authored rather than at build — a spec session
+  authoring against an unrun hypothesis would be designing against the guess this entry exists
+  to retire.
+  **DISTINCT from `agent-worktree-reclamation-unenforced`, which a prior iteration completed.**
+  That unit bought the residue's DECLARATION, its UNREACHABILITY to the two index walkers, and
+  a per-iteration BOUND at the boundary refusal — every delta hypothesis-independent by
+  construction, which is why it landed without the cause and why this is not a re-filing of it.
+  This buys the cause: none of those deltas needed it and none of them establishes it.
+  **What the answer buys:** it separates a dispatch-protocol fix from a sweep. If reclamation
+  is parent-lifetime-tied the fix is in how a dispatch ends; if it is not, the fix is a reaper
+  — different owners, different seams, and nothing today says which.
+  **Class:** it runs an experiment and mints no name and no gate, so the litmus makes it debt;
+  what it produces is the input two sibling amendments are blocked on.
+  Filed 2026-08-24 to the gap inbox by spec with an explicit distinct declaration; drained
+  2026-08-24 at close, which verified the completed sibling in `## Done` and found the upstream
+  relation the filing did not name; promoted 2026-08-24 at the next scope on an operator ruling.
+
+- **no-port-cause-class-generalization** — one file's `# no-port:` cause is true of a whole
+  `scripts/` class, and declaring the class moves the completion predicate by roughly a sixth.
+  **The cause, and the two halves it is made of.** `scripts/measured-claims.sh` declares
+  `# no-port:` on CLAUDE.md §The provenance seam, and the declaration is a conjunction: (a)
+  `scripts/` rides no installer payload, `pack-installer.sh` assembling from the kit roots
+  alone; (b) the file's keys are this repo's private claim vocabulary, so porting it ships that
+  vocabulary in every adopter's binary.
+  **OPERATOR-RULED 2026-08-24, relayed through the lead at the close of
+  `port-remainder-disposition-and-worktree-reclamation`: the cause generalises on half (b)
+  ALONE.** Declare the config-and-vocabulary files, which hold the private claim vocabulary;
+  leave the mechanism files owed, since they hold none. The operator's ground: the cause's real
+  basis is the provenance seam, and TRAJECTORY.md's 2026-08-14 ruling already ACCEPTED the
+  payload cost for mechanism, so declaring on half (a) alone would contradict a trade that
+  ruling took. NOT a reversal, demotion or re-scoping of it: its stated subject is gates under
+  `scripts/`, and it records that `scripts/` now keeps no gate script at all, so every owed row
+  this touches falls outside that subject.
+  **Re-measured at scope rather than carried:** half (a) holds for every owed row under
+  `scripts/`; half (b) splits them fifteen vocabulary rows against ten mechanism rows. Re-derive
+  that split by reading each header rather than citing it — the class is real and NOT uniform,
+  so one undifferentiated sweep over-declares.
+  **What is NOT ruled and stays with this iteration:** whether the declarations land as one
+  sweep or per owning entry, and the cause text each row carries. Class: it declares an existing
+  marker on existing files and mints no name and no gate, so the litmus makes it debt.
+  **What the delay costs:** the predicate keeps about a sixth of its rows ruled-in-principle and
+  unruled-in-fact, so `--tree`'s owed count overstates the remaining work and every cut composed
+  off it is mis-sized by that margin.
+  Filed 2026-08-24 to the gap inbox by spec and held there deliberately rather than asked
+  mid-iteration, since ruling the class would have moved the owed column underneath the
+  amendment then landing; drained 2026-08-24 at close, which re-measured both halves and
+  escalated the ruling; promoted 2026-08-24 at the next scope once the operator ruled it.
+
+- **icebox-candidate-eligibility-unapplied** — the eviction worklist lists rows the icebox
+  eligibility rule already forbids, so every close re-derives the same exclusions by hand.
+  **The split is backwards, and that is the finding rather than a calibration complaint.**
+  queue-kit/SPEC.md §The icebox tier states that a roadmap-tagged entry is not icebox-eligible
+  as a hard rule with structural enforcement behind it — `check-roadmap-fresh` reds a one-line
+  entry that cannot carry a `roadmap-summary:` — while the `queue-index --icebox-candidates` arm
+  filters on age and low-cost-opener alone. The mechanically-decidable half of eligibility is
+  unapplied while the judgment half is applied by hand, which is the wrong split.
+  **DISTINCT from any calibration question.** queue-kit/SPEC.md deliberately rules the age and
+  cost filters non-load-bearing because miscalibration only lengthens the list; that reasoning
+  does not extend to a rule the SPEC states as binding either way.
+  **The fork the build stage rules:** one predicate in the emitter that drops the row, or a
+  printed ineligibility reason per row if listing-then-explaining is preferred to filtering. The
+  second keeps the worklist a census and costs the close a read; the first makes it a pick list
+  and hides the tier's reasoning from the session that most needs to have read it. Class:
+  neither shape mints a governed name or a gate, so the litmus makes it debt.
+  **Measured across four closes rather than predicted, and the last reading is the one that
+  settles it.** Two closes each ran the worklist and got a byte-identical five rows, 100%
+  ineligible — three by the roadmap-tag rule and two on the live-promotion-trigger clause. A
+  third ran it after the age floor dropped and got 27 rows with the same three ineligible, an
+  11% rate that was the hold's ground. The fourth measured 8 rows, all 8 ineligible, and scope
+  re-ran the emitter at the next boundary and got the same 8. The five non-roadmap rows are each
+  held by a **live unbuilt queue slug**, which the 2026-08-23 operator narrowing makes a live
+  promotion trigger — and a slug-liveness test is exactly what the queue adapter already
+  implements for `check-task-names` and `check-roadmap-fresh`. So **both** halves of the
+  eligibility rule are mechanically decidable, the judgment residue the 11% reading rested on is
+  not judgment at all, and the worklist's false-positive rate is 100% against a predicate the
+  emitter could have computed. Re-derive these figures rather than citing them.
+  **TAKEN 2026-08-24, operator-ruled at scope's threshold proposal on three recurrence dates**,
+  one hold after the lead came closest to taking it. The rate-collapse ground that hold stood on
+  is answered above; the surface cost was stated to the operator rather than elided — this lands
+  on the queue emitter and not on this iteration's turn-end files — and the ruling took it
+  anyway, against TRAJECTORY.md §The closed rulings' 2026-08-23 operator action on the pool's
+  measured 8:1 intake-to-exit ratio. The bundling with `deferred-cost-class-opener-vocabulary`
+  on one surface stands, and is now an argument for reading that entry beside this one rather
+  than against taking it.
+  Surfaced 2026-08-19 at the `takeable-tier-batch-and-installer-noop` close's icebox eviction
+  review and filed to the gap inbox there; promoted to the deferred pool 2026-08-20 by the next
+  iteration's scope, and to this iteration 2026-08-24 on the recurrence rule.
 
 ## Deferred
 
@@ -2539,18 +2645,17 @@
   Which is right turns on whether the KPI is meant to be trusted at zero, a contract call.
   **Cost while deferred:** the one KPI measuring the tier contract's completeness reads best
   exactly when nobody is capturing, and no other signal contradicts it.
-  **HELD 2026-08-24 by the lead**, proposed at threshold as the rule requires and held on the
-  surface criterion: nothing in the promoted turn-end/scratch-execution control set touches
-  drift-kit's capture loop or the KPI that reads it. No date joins the hold; a decline is not a
-  firing. The log read **empty** again at this boundary, which is the expected reading at an
-  iteration's open and therefore no firing either.
-  **HELD AGAIN 2026-08-24 at the next scope, on the same criterion, and the hold now carries a
-  pairing the earlier one could not.** `kfric-obligation-residency` was promoted at that scope and
-  is this entry's writer-side twin — that entry is the capture obligation never reaching the
-  writer, this is how an empty log may be read once it has. Both resolve alongside
+  **THREE HOLDS, 2026-08-24, across two consecutive scopes and their leads, every one on the
+  surface criterion and none a decline of the finding.** Nothing in the promoted turn-end and
+  worktree control set touches drift-kit's capture loop or the KPI that reads it. The third is
+  operator-ruled. No date joins a hold — a decline is not a firing — and the log read **empty**
+  again at this boundary, the expected reading at an iteration's open and no firing either.
+  **The pairing the first hold could not carry:** `kfric-obligation-residency` is this entry's
+  writer-side twin — that entry is the capture obligation never reaching the writer, this is how
+  an empty log may be read once it has — and both resolve alongside
   `recurrence-obligation-residency` under delegation-kit/SPEC.md §Operative residency's placement
-  rule, so a unit taking the capture loop should take all three; taking this one alone answers the
-  reader's question while leaving the writer unserved. No date joins.
+  rule. A unit taking the capture loop should take all three; taking this one alone answers the
+  reader's question while leaving the writer unserved.
   Filed 2026-08-06 at close, from its own knowledge-friction sweep.
 
 - **reclaim-precondition-outside-the-tree** [design-pending] — a declared `reclaim=` can be
@@ -3607,20 +3712,17 @@
   structural reading above is now the only one left. The same drain found a **second face** the
   candidates above do not cover — a baseline move stales the evidence line computed against the old
   baseline — promoted as `baseline-move-stales-evidence-line`.
-  **EIGHT holds, none a decline of the finding, every one on surface grounds.** The EIGHTH is
-  2026-08-24, lead-ruled at the next scope's threshold proposal, on the ground the SIXTH already
-  settled: the operator re-deferred this fork rather than ruling it, and nothing since has
-  narrowed the three candidates. Count unchanged; no date joins. 2026-08-19 into
-  `budget-batch-and-account-identity-kind` and, the same day, into
-  `takeable-tier-batch-and-installer-noop`, the second on a probed ground the first lacked: the row
-  is **not armed today**, the live baselined `fail` naming a slug that still resolves. THIRD
-  2026-08-20 by the lead into `graph-port-and-config-seam`; FOURTH and FIFTH 2026-08-22, the second
-  operator-ruled, against neither that day's prose-gate spine nor the next iteration's port hold.
-  **SIXTH, OPERATOR-RULED 2026-08-23** into `battery-runner-port`: scope proposed it at threshold as
-  the pre-emption rule requires, the lead declined to rule a fork whose three candidates trade real
-  properties, and the operator re-deferred. **SEVENTH, lead-ruled 2026-08-24**, on the surface
-  criterion alone. Count unchanged at two — **no date joins a decline, the finding not having
-  re-fired** — so each hold is discharged by having reached the authority.
+  **NINE holds, none a decline of the finding, every one on surface or fork grounds.** The NINTH is
+  2026-08-24, OPERATOR-RULED at the next scope's threshold proposal against the turn-end liveness
+  set, with both the nine-hold count and the operator-class nature of the fork put in front of the
+  operator rather than left implicit. It stands on the ground the SIXTH settled: the operator
+  re-deferred this fork rather than ruling it, and nothing since has narrowed the three candidates.
+  The SIXTH and the later of the two 2026-08-22 holds were operator-ruled too; the rest were the
+  lead's, on the surface criterion alone, and their per-iteration enumeration is spent now that
+  every reading agrees. One probed ground is worth keeping out of it: the row is **not armed
+  today**, the live baselined `fail` naming a slug that still resolves. Count unchanged at two —
+  **no date joins a decline, the finding not having re-fired** — so each hold is discharged by
+  having reached the authority.
   Filed 2026-08-10 by close, from its own blocked entry; the escape it needed is
   the evidence. Re-attested 2026-08-12 by close, again from its own blocked entry.
 
@@ -4482,13 +4584,13 @@
   **Cost while deferred:** it lands on exactly the dispatches delegation is pre-authorized for,
   and it defeats normal trust rather than merely being wrong — a relayed finding is the signal a
   reader uses to decide a claim has already been checked.
-  **SIX holds, none a decline, every one on the surface criterion**, and the enumeration is spent
-  now that they agree: 2026-08-19, 2026-08-20, 2026-08-22 twice (the second operator-ruled),
-  2026-08-24, and 2026-08-24 again at the next scope's threshold proposal. The operator-ruled one
-  carries the standing ground — the body concedes a gate over tree state is very likely unbuildable,
-  so the deliverable is a CHOICE between two non-gate shapes rather than a build. The sixth adds
-  that the receiving-side half now HAS a mechanism (delegation-kit/SPEC.md §Resume journal), leaving
-  the doctrine line alone. No date joins a hold, and the rate stays once per iteration.
+  **TAKEN 2026-08-24, operator-ruled at scope's threshold proposal: the SIX holds are DISCHARGED
+  rather than overruled.** Every one stood on the surface criterion and this iteration is that
+  surface; the receiving-side half having landed, only the doctrine line is open.
+  **A FOURTH instance, self-caught and first-person, one step over from the class.** That scope
+  session wrote a FABRICATED short hash into the survey record to make a dated census look precise,
+  then caught it in-session before a reader reached it. An invented identifier rather than a relayed
+  return — the same signature-free shape, which a doctrine line aimed only at returns would miss.
   Filed 2026-08-13 by close, draining the gap inbox on operator direction to file, not promote.
 
 - **handoff-premise-reverification-placement** [design-pending] — `Probe-before-assertion` is
@@ -6464,55 +6566,6 @@
   Filed 2026-08-19 by close from the gap inbox, filed by the lead because the absence is
   observable to the dispatcher and not to the session.
 
-- **icebox-candidate-eligibility-unapplied** [design-pending] — the eviction worklist lists rows the
-  icebox eligibility rule already forbids, so every close re-derives the same exclusions by hand.
-  **The split is backwards, and that is the finding rather than a calibration complaint.**
-  queue-kit/SPEC.md §The icebox tier states that a roadmap-tagged entry is not icebox-eligible
-  as a hard rule with structural enforcement behind it — `check-roadmap-fresh` reds a one-line entry
-  that cannot carry a `roadmap-summary:` — while the `queue-index --icebox-candidates` arm filters
-  on age and low-cost-opener alone. The mechanically-decidable half of eligibility is unapplied
-  while the judgment half is applied by hand, which is the wrong split.
-  **Measured at the generating close rather than predicted:** the worklist returned four rows and
-  **three were roadmap-tagged and therefore ineligible by rule** — 75% of the review list was
-  work no close may take. The fourth was ineligible too, on the tier's other stated clause (a live
-  promotion trigger), which is genuinely a judgment and correctly left to the session.
-  **DISTINCT from any calibration question.** queue-kit/SPEC.md deliberately rules the age and
-  cost filters non-load-bearing because miscalibration only lengthens the list; that reasoning
-  does not extend to a rule the SPEC states as binding either way.
-  **Why `[design-pending]`:** two shapes and neither ruled — one predicate in the emitter that
-  drops the row, or a printed ineligibility reason per row if listing-then-explaining is preferred
-  to filtering. The second keeps the worklist a census and costs the close a read; the first makes
-  it a pick list and hides the tier's reasoning from the session that most needs to have read it.
-  Class: neither shape mints a governed name or a gate, so canon-kit's litmus makes it **debt**.
-  **Cost while deferred:** low and recurring — one re-derivation per close — plus the standing risk
-  that a roadmap-tagged row on a worklist reads as a sanctioned candidate to a session that
-  has not read the tier section.
-  recurrence: icebox-candidate-eligibility-unapplied 2026-08-21 2026-08-23 2026-08-24
-  **Grounds for the three dates, and a FOURTH measurement that REVERSES the rate-collapse
-  reading.** 2026-08-21 (`graph-port-and-config-seam`) and 2026-08-23
-  (`leak-guard-and-assertion-meta-gate-port`) each ran the worklist and got a byte-identical five
-  rows, 100% ineligible — three by the roadmap-tag rule (`plugin-marketplace`,
-  `benchmark-ab-experiment`, `hosted-attestation-service`) and two on the live-promotion-trigger
-  clause. `battery-runner-port`'s close ran it after `5244a33a` lowered the age floor and got 27
-  rows with the same three ineligible — **11%**, which is where the hold below took its ground.
-  **The 2026-08-24 firing is the one that settles it.** That close measured **8 rows, all 8
-  ineligible**, and this scope re-ran the emitter at the next boundary and got the same 8. The
-  five non-roadmap rows are each held by a **live unbuilt queue slug**, which the 2026-08-23
-  operator narrowing (queue-kit/SPEC.md §The icebox tier) makes a live promotion trigger — and a
-  slug-liveness test is exactly what the queue adapter already implements for `check-task-names`
-  and `check-roadmap-fresh`. So **both** halves of the eligibility rule are mechanically
-  decidable, the judgment residue the 11% reading rested on is not judgment at all, and the
-  worklist's false-positive rate is 100% against a predicate the emitter could have computed.
-  **HELD 2026-08-24 by the lead**, and it is the threshold member that came closest to being
-  taken: it is classed **debt**, so scope could have promoted it the same session, against
-  TRAJECTORY.md §The closed rulings' 2026-08-23 operator action on the pool's measured 8:1
-  intake-to-exit ratio. Held on the rate-collapse ground the paragraph above now answers, and on
-  the entry bundling with `deferred-cost-class-opener-vocabulary` on one surface — that second
-  ground stands untouched. The date above joins because the finding RE-FIRED on new evidence,
-  which is what no decline ever does.
-  Surfaced 2026-08-19 at the `takeable-tier-batch-and-installer-noop` close's icebox eviction review
-  and filed to the gap inbox there; promoted 2026-08-20 by the next iteration's scope.
-
 - **deferred-cost-class-opener-vocabulary** [design-pending] — the icebox cost filter reads the
   first word of a free-prose field, so it is undecidable for most of the pool.
   **Censused at this intake, 2026-08-23**, and recorded with its oracle at
@@ -7691,51 +7744,6 @@
   Surfaced 2026-08-24 by GitHub issue #2 and promoted at this scope's boundary sweep, whose probe
   re-read the v0.25.0 Release body directly rather than trusting the issue text.
 
-- **no-port-cause-class-generalization** [design-pending] — one file's `# no-port:` cause is true
-  of a whole `scripts/` class, and ruling the class moves the completion predicate by roughly a
-  sixth.
-  **The cause, and the two halves it is made of.** `scripts/measured-claims.sh` declares `#
-  no-port:` on CLAUDE.md §The provenance seam, and the declaration is a conjunction: (a)
-  `scripts/` rides no installer payload, `pack-installer.sh` assembling from the kit roots
-  alone; (b) the file's keys are this repo's private claim vocabulary, so porting it ships that
-  vocabulary in every adopter's binary.
-  **Re-measured at this drain rather than cited.** `port-blockers --tree` reads 153/2/1/150,
-  and 25 of the owed rows sit under `scripts/`. Half (a) holds for all 25. Half (b) holds only
-  for the config-and-vocabulary files (the per-kit config files plus the enum, claim,
-  graph-vocabulary, payload-claim and transport emitters — about fifteen) and NOT for the
-  mechanism files (the hook guards, the gate exec shim, the liveness readers, the log parser
-  and the packer — about ten), which carry no private vocabulary at all. So the class is real
-  and NOT uniform, and one sweep over-declares. Re-derive the split by reading each header; do
-  not cite these counts.
-  **Why this is OPERATOR-CLASS and was not ruled at the drain.** It disposes roughly a sixth of
-  a completion predicate this iteration does not own, and it sits against TRAJECTORY.md's
-  2026-08-14 consumer-gates ruling. That ruling's stated subject is GATES under `scripts/`, it
-  explicitly ACCEPTS the payload cost this cause refuses, and it records that `scripts/` now
-  keeps no gate script at all — so every remaining owed row falls outside its stated subject.
-  The tension is narrower than a conflict and wider than nothing: one ruling took the payload
-  cost for mechanism, this cause refuses it for vocabulary, and no surface says which axis
-  governs.
-  **OPERATOR-RULED 2026-08-24, relayed through the lead at the close of
-  `port-remainder-disposition-and-worktree-reclamation`: the cause generalises on half (b)
-  ALONE.** Declare the config-and-vocabulary files, which hold the private claim vocabulary;
-  leave the mechanism files owed, since they hold none. The operator's ground: the cause's real
-  basis is the provenance seam, and TRAJECTORY.md's 2026-08-14 ruling already ACCEPTED the
-  payload cost for mechanism, so declaring on half (a) alone would contradict a trade that
-  ruling took. NOT a reversal, demotion or re-scoping of it: its stated subject is gates under
-  `scripts/`, and it records that `scripts/` now keeps no gate script at all.
-  **Re-measured at this scope rather than carried:** the split is fifteen vocabulary rows
-  against ten mechanism rows; re-derive it from each header rather than citing that.
-  **What is NOT ruled and stays with the taking iteration:** whether the declarations land as
-  one sweep or per owning entry, and the cause text each row carries. Class: it declares an
-  existing marker on existing files and mints no name and no gate, so the litmus makes it debt.
-  **Cost while deferred:** the predicate keeps about a sixth of its rows ruled-in-principle and
-  unruled-in-fact, so `--tree`'s owed count overstates the remaining work and every cut
-  composed off it is mis-sized by that margin. Filed 2026-08-24 to the gap inbox by spec and
-  held there deliberately rather than asked mid-iteration, since ruling the class would have
-  moved the owed column underneath the amendment then landing; drained and promoted 2026-08-24
-  at close, which re-measured both halves, found the class non-uniform, and escalated the
-  ruling rather than taking it.
-
 - **precondition-gate-negation-false-positive** [design-pending] — `check-queue-prose-precondition`
   reds on a sentence asserting the OPPOSITE of a precondition, teaching authors away from a
   true one.
@@ -7767,32 +7775,6 @@
   Filed 2026-08-24 to the gap inbox by spec immediately after the refusal it describes; drained and
   promoted 2026-08-24 at close, which reproduced the red against a probe corpus before
   dispositioning.
-
-- **worktree-reclamation-cause-falsification** [design-pending] — nothing has established WHY an
-  agent worktree survives, so no reaper can be designed against the mechanism rather than a
-  guess at it.
-  **The hypothesis, unrun.** Reclamation may be tied to the DISPATCHING session's lifetime
-  rather than the child's, so a parent that ends abnormally strands the child's worktree. Cheap
-  to falsify: dispatch an isolated read-only agent, end the parent abnormally, read what stays
-  registered.
-  **DISTINCT from `agent-worktree-reclamation-unenforced`, which this iteration completed.**
-  That unit bought the residue's DECLARATION, its UNREACHABILITY to the two index walkers, and
-  a per-iteration BOUND at the boundary refusal — every delta hypothesis-independent by
-  construction, which is why it landed without the cause and why this is not a re-filing of it.
-  This buys the cause: none of those deltas needed it and none of them establishes it.
-  **UPSTREAM of `agent-worktree-boundary-disposition`, found at this drain and not carried by
-  the filing.** That entry's second refusal ground is this same hypothesis, written there as an
-  unverified candidate, and it refuses a reaper designed against a guess at the selecting
-  mechanism. So this experiment is that entry's missing input rather than a sibling of it, and
-  running it is what turns its refusal into a design.
-  **What the answer buys:** it separates a dispatch-protocol fix from a sweep. If reclamation
-  is parent-lifetime-tied the fix is in how a dispatch ends; if it is not, the fix is a reaper
-  — different owners, different seams, and nothing today says which.
-  **Cost while deferred:** low and bounded. The boundary refusal caps accumulation per
-  iteration either way, so the carry is a design that cannot start rather than residue that
-  grows. Filed 2026-08-24 to the gap inbox by spec with an explicit distinct declaration;
-  drained and promoted 2026-08-24 at close, which verified the completed sibling in `## Done`
-  and found the upstream relation the filing did not name.
 
 - **prune-set-convergence-question** [design-pending] — two kits carry two prune sets that now
   overlap heavily and differ deliberately, and no surface rules whether they should converge.
