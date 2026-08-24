@@ -196,12 +196,21 @@ the kit roots, `GATE_PRUNE_DIRS` / `GATE_SDK_PRUNE_EXTRA_DIRS` and
 recording it is de-risking the port, not deciding it.
 
 **Most of what the port needs already exists in the crate, which is the second
-half of why the route is recordable now.** `registry.rs` owns the `gates.list`
-member grammar, `gate_resolve`'s declaration path, the `# graph:` field read and
-the `couples=`/`trigger=` kit expansion — the registry walk both registry arms
-run on; `walk.rs` owns the prune resolution the `--tree` corpus needs. What the
-port owes beyond them is the corpus enumeration, the header-block read and the
-three trailers.
+half of why the route is recordable now — verified by reading the crate rather
+than assumed from the SPEC.** `registry.rs` owns the `gates.list` member
+grammar, `gate_resolve`'s declaration path, the `# graph:` field read and the
+`couples=`/`trigger=` kit expansion — the registry walk both registry arms run
+on; `walk.rs` owns the prune resolution the `--tree` corpus needs **and the
+corpus enumeration itself** — `walk::tracked_shell_tree()` is already, by its
+own header, "the compiled face of the `--tree` corpus rule: tracked `*.sh`,
+minus the `*.test.sh` suffix, minus `path_pruned`," and it is not a stub built
+for this unit: `check-gate-exemption-tasks` already calls it for its own
+tree-scoped arm. What the port owes beyond them is narrower than a first read
+of the two files suggests: the header-block read — today a `header_block`
+helper private to `gate_exemption_tasks.rs`, doing the identical
+shebang/comment/blank-line read this arm needs, so the porting unit's choice is
+promoting it to a shared home or duplicating four lines, not writing it fresh —
+and the three trailers, which exist nowhere yet.
 
 **And the name is refused until then.** §The non-gate arm rules a member's caller
 is owed, and the closed-roster rule that a key or a field is "minted **with** its
