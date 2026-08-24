@@ -4,4 +4,4 @@
 
 ---
 
-— scope a8ba5d47 2026-08-24 4c0d3bb4
+turn-end-liveness-exit-code-seam scope a8ba5d47 2026-08-24 4c0d3bb4
