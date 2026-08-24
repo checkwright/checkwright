@@ -62,6 +62,73 @@
   `# port-until:` declaration at a dead slug. The arm's flag spelling is deliberately NOT minted
   yet: a spelling written ahead of its caller is the reservation the closed-roster rule refuses.
 
+- **agent-worktree-reclamation-unenforced** [spec: SPEC-worktree-residue.md] — the
+  documented auto-clean for an unchanged read-only agent worktree does not fire, and nothing
+  sweeps the residue.
+  recurrence: agent-worktree-reclamation-unenforced 2026-08-19 2026-08-22 2026-08-24
+  **FOUR firings, all the identical shape, and the accumulation has DISCHARGED its purpose** — the
+  entry is taken below, so what follows is the findings rather than the case for taking it. Every
+  firing was a LOCKED worktree at a stale stamp with an EMPTY `git status --porcelain` inside, on a
+  read-only sweep that returned normally, each reaped by hand.
+  **Two properties settle with them.** (i) **Reaping leaves a branch ref** — `worktree remove`
+  clears the directory and leaves `worktree-agent-<id>` standing, so a reclaim that only removes
+  worktrees still accretes refs. (ii) **The failure is intermittent** — later read-only dispatches
+  auto-cleaned whole, twice. The FOURTH was found IN-SESSION by the DISPATCHING session, which
+  MOVES a deliverable's cost: the close-stage reclaim costed below as late would NOT have missed it.
+  **The hypothesis a fixing session should falsify first**, unchanged and now four-times
+  consistent: reclamation is tied to the *dispatching* session's lifetime rather than the child's,
+  so a session that ends abnormally — or ends while a child's directory is still held — strands
+  it. It is cheap to test and STILL UNRUN: dispatch, kill the parent, look.
+  **DISTINCT from `readonly-dispatch-isolation-unbuyable`**, deliberately: that entry is about
+  which revision a child *starts* from, this is about worktrees never being *reclaimed* after the
+  child ends. Neither implies the other and fixing either leaves the other standing.
+  **Cost:** each is a full checkout of the tree, so the disk cost is linear in dispatch count with
+  no ceiling. The sharper cost is correctness — a stale worktree is a second live copy of every
+  governed file, which a later `grep -r`, a gate walk, or an audit sweep can reach and read as the
+  tree. Several gates walk globs from the repo root, and the exclusion of `.claude/worktrees/` is
+  per-caller rather than central, so the protection is a habit rather than a property.
+  **Deliverable, and why it was design-pending:** the choice is real — a reclaim step in the close
+  stage's runtime-artifact check (cheap, late, and misses long-running sessions), a guard-side
+  sweep at dispatch time (earlier, but the guard would own lifecycle it does not today), or a
+  central ignore that makes the second copy unreachable to every walker rather than to the
+  careful ones. The third fixes the correctness half without touching the disk half.
+  **A candidate the three above miss:** `.gitignore` asserts the directory is "auto-cleaned",
+  which every firing falsifies. Correcting that claim to best-effort and leaving the residue
+  *declared* is a real option beside owning it, and it is the only one that costs nothing.
+  **HELD once, 2026-08-24 by the lead**, on the surface criterion, in the session that stamped the
+  third firing; superseded the same day by the operator taking it. Each hold was recorded as a hold
+  and each firing as a firing, which is why the declaration above carries three dates and not four:
+  the fourth firing shares the third's date, and the declaration is idempotent per (slug, date).
+  **TAKEN 2026-08-24 by the operator through the lead, at the threshold proposal, and it is the
+  only one of the five threshold members taken.** Grounds: four firings against a two-date
+  threshold, the fourth found in-session, and a cost that grows at the working rate. It shares no
+  surface with the port-remainder pair this iteration also takes, so it is **its own batch**, which
+  the lead sequences. Scope does not promote it either: four live shapes remain and one of them —
+  the guard-side sweep — mints guard lifecycle the guard does not own today, so the class is
+  settled by the ruling and the ruling belongs to the authoring stage.
+  **Cost while deferred:** grows monotonically with every read-only dispatch, and this repo
+  pre-authorizes delegation for read-heavy audits, so the accumulation rate is the working rate.
+  Filed 2026-08-12 by close, draining the gap inbox; found at scope, re-verified here. Widened
+  2026-08-19 at scope, absorbing a gap bullet whose "no entry names `.claude/worktrees/` at all"
+  premise was re-verified **false** — this entry and `agent-worktree-boundary-disposition` name it.
+  **RULED AND PROMOTED 2026-08-24 at spec**, in `SPEC-worktree-residue.md`. Shape (iv) is taken
+  ALONGSIDE the others rather than instead of them, shape (i) moves from the close stage to the
+  ITERATION BOUNDARY as a refusal rather than an auto-clean, shape (iii) reduces to two measured
+  readers, and shape (ii) is REFUSED with grounds — a verdict surface may not own lifecycle, and a
+  dispatch-time sweep cannot tell a live child's worktree from residue, the attested firings being
+  locked, stale-stamped and clean, which is a live child's signature too.
+  **The correctness half was measured over the whole reader set, not sampled.** Exactly two readers
+  would descend into a stale copy — `context-kit/bin/md-index.sh` and
+  `context-kit/bin/pub-index.sh`, each behind its own hand-rolled `-not -path` list.
+  gate-sdk's prune set is genuinely one array
+  read by all three walk adapters and bridged into the compiled substrate, so this entry's
+  "per-caller rather than central" premise is TRUE ONLY IN A NARROWER SENSE, and the narrower sense
+  is the finding.
+  **Every delta is hypothesis-independent**, which is why the unit is takeable with the
+  falsification experiment still unrun: a boundary that refuses on residue refuses whatever caused
+  it. The experiment is filed as its own work rather than treated as a prerequisite.
+  **Class: feature** — the ruling mints a lifecycle boolean knob and `CONTEXT_KIT_PRUNE_DIRS`.
+
 ## Technical Debt
 
 - **gen-pre-commit-tree-declaration-absent** — `gate-sdk/bin/gen-pre-commit.sh` has a closed
@@ -4029,55 +4096,6 @@
   fires, which is the reverse of every recurrence-tracked entry here.
   Filed 2026-08-12 by close on the lead's ruling, from a practice the lead named at this
   session's end; recorded rather than landed, per scope-gated intake.
-
-- **agent-worktree-reclamation-unenforced** [design-pending] — the documented auto-clean for an
-  unchanged read-only agent worktree does not fire, and nothing sweeps the residue.
-  recurrence: agent-worktree-reclamation-unenforced 2026-08-19 2026-08-22 2026-08-24
-  **FOUR firings, all the identical shape, and the accumulation has DISCHARGED its purpose** — the
-  entry is taken below, so what follows is the findings rather than the case for taking it. Every
-  firing was a LOCKED worktree at a stale stamp with an EMPTY `git status --porcelain` inside, on a
-  read-only sweep that returned normally, each reaped by hand.
-  **Two properties settle with them.** (i) **Reaping leaves a branch ref** — `worktree remove`
-  clears the directory and leaves `worktree-agent-<id>` standing, so a reclaim that only removes
-  worktrees still accretes refs. (ii) **The failure is intermittent** — later read-only dispatches
-  auto-cleaned whole, twice. The FOURTH was found IN-SESSION by the DISPATCHING session, which
-  MOVES a deliverable's cost: the close-stage reclaim costed below as late would NOT have missed it.
-  **The hypothesis a fixing session should falsify first**, unchanged and now four-times
-  consistent: reclamation is tied to the *dispatching* session's lifetime rather than the child's,
-  so a session that ends abnormally — or ends while a child's directory is still held — strands
-  it. It is cheap to test and STILL UNRUN: dispatch, kill the parent, look.
-  **DISTINCT from `readonly-dispatch-isolation-unbuyable`**, deliberately: that entry is about
-  which revision a child *starts* from, this is about worktrees never being *reclaimed* after the
-  child ends. Neither implies the other and fixing either leaves the other standing.
-  **Cost:** each is a full checkout of the tree, so the disk cost is linear in dispatch count with
-  no ceiling. The sharper cost is correctness — a stale worktree is a second live copy of every
-  governed file, which a later `grep -r`, a gate walk, or an audit sweep can reach and read as the
-  tree. Several gates walk globs from the repo root, and the exclusion of `.claude/worktrees/` is
-  per-caller rather than central, so the protection is a habit rather than a property.
-  **Deliverable, and why `[design-pending]`:** the choice is real — a reclaim step in the close
-  stage's runtime-artifact check (cheap, late, and misses long-running sessions), a guard-side
-  sweep at dispatch time (earlier, but the guard would own lifecycle it does not today), or a
-  central ignore that makes the second copy unreachable to every walker rather than to the
-  careful ones. The third fixes the correctness half without touching the disk half.
-  **A candidate the three above miss:** `.gitignore` asserts the directory is "auto-cleaned",
-  which every firing falsifies. Correcting that claim to best-effort and leaving the residue
-  *declared* is a real option beside owning it, and it is the only one that costs nothing.
-  **HELD once, 2026-08-24 by the lead**, on the surface criterion, in the session that stamped the
-  third firing; superseded the same day by the operator taking it. Each hold was recorded as a hold
-  and each firing as a firing, which is why the declaration above carries three dates and not four:
-  the fourth firing shares the third's date, and the declaration is idempotent per (slug, date).
-  **TAKEN 2026-08-24 by the operator through the lead, at the threshold proposal, and it is the
-  only one of the five threshold members taken.** Grounds: four firings against a two-date
-  threshold, the fourth found in-session, and a cost that grows at the working rate. It shares no
-  surface with the port-remainder pair this iteration also takes, so it is **its own batch**, which
-  the lead sequences. Scope does not promote it either: four live shapes remain and one of them —
-  the guard-side sweep — mints guard lifecycle the guard does not own today, so the class is
-  settled by the ruling and the ruling belongs to the authoring stage.
-  **Cost while deferred:** grows monotonically with every read-only dispatch, and this repo
-  pre-authorizes delegation for read-heavy audits, so the accumulation rate is the working rate.
-  Filed 2026-08-12 by close, draining the gap inbox; found at scope, re-verified here. Widened
-  2026-08-19 at scope, absorbing a gap bullet whose "no entry names `.claude/worktrees/` at all"
-  premise was re-verified **false** — this entry and `agent-worktree-boundary-disposition` name it.
 
 - **dispatch-unreadable-target-fallback** [design-pending] — a dispatched sweep whose target is
   unreadable validates against the **dispatch prompt's paraphrase** and returns PASS.
