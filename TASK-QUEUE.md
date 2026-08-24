@@ -12,12 +12,8 @@
 
 ## New Features
 
-## Technical Debt
-
-## Deferred
-
-- **turn-end-chokepoint-and-wait-primitive** [design-pending] — the blocking-hook variant,
-  the last open half of the wait rule's fifth firing; its other two halves are closed.
+- **turn-end-chokepoint-and-wait-primitive** [spec: SPEC-turn-end-refusal.md] — the blocking-hook
+  variant, the last open half of the wait rule's fifth firing; its other two halves are closed.
   **Chokepoint half — CLOSED 2026-08-22**, into delegation-kit/SPEC.md §The turn-end liveness
   probe: a turn-end passes no `PreToolUse`, and `SubagentStop` fires per assistant step, so a
   blocking variant needs a SECOND authorization. Rule 14 stands; the class holds.
@@ -40,7 +36,10 @@
   is a design decision inside this unit's own amendment envelope, argued on its own grounds and
   never inherited from the ruling. Scope also probed the hook ALREADY registered in the committed
   settings, so the build is a script change and not a permission edit under the 2026-08-22 wall;
-  that is a cost finding and explicitly not a ground the authorization rests on.
+  that is a cost finding and explicitly not a ground the authorization rests on. **The narrowing
+  is argued and the obligation is discharged** — spec 2026-08-24 refuses on `red` OR `corrupt`,
+  the second arm on a bypass ground of its own, and discloses where a boundary resembles the
+  refused option.
   **The CARRIER argument is answered and stays answered:** a session that wrote the rule down
   itself and still ended the turn retires it, so carriage was never the defect.
   **Cost while deferred:** each further firing costs an orphaned producer plus the lead turn that
@@ -66,6 +65,93 @@
   stays unreachable through it. The no-values privacy ruling stays operator-class.
   Filed 2026-08-16 by close from the gap inbox; demoted 2026-08-23 at build, the measurement half
   delivered and the blocking variant still sequenced.
+
+- **scratch-execution-control-is-bash-only** [spec: SPEC-scratch-bash-only.md] — the scratch-run
+  steer and the runner it steers to are both bash-only, so a non-bash scratch script executes
+  with no compensating control at all.
+  recurrence: scratch-execution-control-is-bash-only 2026-08-16 2026-08-18 2026-08-19 2026-08-23
+  **NOT a split candidate, ruled 2026-08-23 at build** against the criterion queue-kit/SPEC.md
+  section check-queue-entry-budget now states: it accumulates measurements for ONE deliverable, so
+  ruling it leaves nothing unruled — the fifth measurement reversing the third is compression.
+  **THE MEASUREMENT SERIES IS SETTLED at seven readings, and what it settles is the design fork's
+  premise rather than the defect.** Stdin heredocs ran 50 (fourth, 2026-08-19), 9 (fifth), 64
+  (sixth, 2026-08-23, top-ranked of 49 patterns and most editing tracked files by name), 81
+  (seventh, 2026-08-24) — so the fifth's fall was a DIP, and its reading of that fall as evidence
+  FOR the operator's discipline-shaped cause is falsified rather than merely unsupported. The
+  sixth's four `python3 .tmp/<name>.py` runs also retire the fourth's "the path-shaped payload is
+  gone": both shapes are live AT ONCE, which the fork below treated as sequential. The narrowing
+  that survives all seven — stdin carries no `.tmp/` path to match, so even the cheap third option
+  misses it unless the rule names the INTERPRETER rather than the path. The bash side was clean at
+  every reading, so the runner has worked from the first and the REACH is the whole defect.
+  `scripts/bash-guard.sh` blocks a direct scratch run by matching `^bash[[:space:]]+\.tmp/`, and
+  `guard-kit/bin/scratch-run.sh` executes its target with a hardcoded `bash`. Neither reaches a
+  script run under another interpreter. Probed at the 2026-08-13 close against the guard itself:
+  a `python3 .tmp/<script>.py` payload exits **0** — no block, no steer, no advice.
+  **The three-option fork is RULED, spec 2026-08-24, and the amendment owns the argument.** The
+  third option is taken with the first's mechanism: a generic rule keyed on the interpreter, and
+  no runner widening. Widening the runner is refused outright rather than costed — it converts
+  the committed grant for the runner from "run bash on a reviewed body" into "run anything on a
+  reviewed body" with no settings edit, widening a permission behind the operator's own boundary.
+  Distinct from the icebox entry `scratch-execution-allowlist-bar`, which is about the standing
+  allowlist bar for scratch execution rather than about which interpreters the control covers.
+  **Cost while deferred:** the control reads as complete and is not, which is worse than an
+  absent control — a reviewer seeing the rule and the runner has no reason to check its reach.
+  **PROMOTION COMMITTED AT THE NEXT BOUNDARY — OPERATOR RULING 2026-08-23, REVERSING THEIR OWN
+  FOUR PRIOR DECLINES.** The 2026-08-23 deferral-on-the-merits rested on the fifth measurement
+  breaking the trend — "the first evidence *for* the operator's discipline-shaped reading rather
+  than merely consistent with it" — and the sixth measurement above falsifies that exact ground.
+  The operator saw the reversal and ruled the entry promoted at the next iteration boundary. That
+  boundary is 2026-08-24 and it ADMITTED the entry: the operator yielded the port sequence for that
+  iteration alone to pay this commitment and its paired one, a yield recorded at
+  `native-gate-port-remaining-corpus` and reversing nothing. The unstampable seventh measurement is
+  the case `promotion-commitment-stamp-latency` now owns.
+  **The seventh measurement's narrowing is adopted in half, and the disclosure is the amendment's**
+  — the rule names the interpreter, and the stdin-heredoc shape is ruled out of subject on body
+  visibility: a `-c` or heredoc body IS the command string the prompt shows and the guard reads.
+  **The four declines are SPENT, the ruling above having reversed them** — 2026-08-19 twice,
+  2026-08-20 via the lead once the third recurrence put it past lead discretion, re-affirmed
+  2026-08-22; all OPERATOR-class, and **no `recurrence:` date joins a decline**, a decline not
+  being a firing.
+  Filed 2026-08-13 by close, from its own tooling-friction triage; probed at source before filing.
+
+- **prompt-ranking-command-word-shape-blind** [spec: SPEC-friction-key-shape.md] — the friction
+  ranking prints a bare command word, so an answered read steer and an unowned write form share
+  one row.
+  **Re-measured at this intake on the live log, not carried from the filing:**
+  `.workflow/prompt-friction.log` holds 14 `cat` occurrences of which **13 are heredoc writes**
+  (8 `cat >>`, 5 `cat >`) and effectively none is a `cat <file>` read. The filing close measured
+  the same shape at scale — 133 calls, 80 `cat >>` plus 37 `cat >` against roughly 16 reads. Two
+  independent corpora, one shape.
+  **Why the row misleads rather than merely being coarse.** The read half is answered:
+  `scripts/bash-guard.sh` steers `cat <file>` to the Read tool and that steer fires correctly —
+  it fired on this very session's first read. So the ranking's top row shows the *solved* half and
+  hides the unsolved one inside it, and three consecutive closes have triaged the pattern under the
+  read-steer heading for exactly that reason.
+  **The write half has no steer, no grant and no owner.** The mandated alternatives —
+  `guard-kit/bin/scratch-run.sh` for execution, `git commit -F` for a message — govern what happens
+  to a file **after** it exists and say nothing about creating one, so a session authoring a scratch
+  script or a commit message pays an out-of-band decision every time.
+  **The two-deliverable fork is RULED, spec 2026-08-24: this unit is the INSTRUMENT.** The write
+  form's own disposition is filed to the gap inbox as its own candidate, because two of its three
+  shapes are unreachable from a stage session — a grant is a settings edit and so operator-class,
+  a stated habit is no mechanism — and the third, a steer, is a wide behavioral change unrelated
+  to the instrument being wrong. **And the premise is CORRECTED**: the read half cannot be in the
+  row at all, since `guard_rule_cat_file` blocks it before `guard_log_fallthrough` runs. Measured
+  at spec on the live 157-line log: of 19 `cat`-led lines, 14 are `cat >>`, 5 are `cat >`, none is
+  a read. The row is the unowned write ALONE, wearing the word that names the answered steer.
+  **DISTINCT from `guard-read-steer-tool-coverage`** and not a re-file of it: that entry is awk
+  having no read-steer where cat and sed have one, all three on the READ side. **DISTINCT from
+  `scan-prompts-blocking-half-blind`**, whose axis is which verdicts the scan sees, and from the
+  iceboxed `scan-prompts-truncation-quote-desync`, a per-line truncation defect.
+  **Cost while deferred:** the tree's one friction instrument reports its heaviest row wrong, so
+  every triage reading it spends judgment re-deriving the decomposition and can still land on the
+  answered half — three closes did.
+  Filed 2026-08-24 to the gap inbox by `shell-gate-tail-port-and-completion-oracle`'s close;
+  promoted 2026-08-24 at this iteration's scope intake, re-measured on a fresh corpus above.
+
+## Technical Debt
+
+## Deferred
 
 - **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
   — the whole battery onto the binary, and the shell surface down to its residue.
@@ -4424,53 +4510,6 @@
   Filed 2026-08-13 by close, draining the gap inbox; a lead filing, re-verified at the drain by
   reading the template end to end, the search an absence claim needs.
 
-- **scratch-execution-control-is-bash-only** [design-pending] — the scratch-run steer and the
-  runner it steers to are both bash-only, so a non-bash scratch script executes with no
-  compensating control at all.
-  recurrence: scratch-execution-control-is-bash-only 2026-08-16 2026-08-18 2026-08-19 2026-08-23
-  **NOT a split candidate, ruled 2026-08-23 at build** against the criterion queue-kit/SPEC.md
-  section check-queue-entry-budget now states: it accumulates measurements for ONE deliverable, so
-  ruling it leaves nothing unruled — the fifth measurement reversing the third is compression.
-  **THE MEASUREMENT SERIES IS SETTLED at seven readings, and what it settles is the design fork's
-  premise rather than the defect.** Stdin heredocs ran 50 (fourth, 2026-08-19), 9 (fifth), 64
-  (sixth, 2026-08-23, top-ranked of 49 patterns and most editing tracked files by name), 81
-  (seventh, 2026-08-24) — so the fifth's fall was a DIP, and its reading of that fall as evidence
-  FOR the operator's discipline-shaped cause is falsified rather than merely unsupported. The
-  sixth's four `python3 .tmp/<name>.py` runs also retire the fourth's "the path-shaped payload is
-  gone": both shapes are live AT ONCE, which the fork below treated as sequential. The narrowing
-  that survives all seven — stdin carries no `.tmp/` path to match, so even the cheap third option
-  misses it unless the rule names the INTERPRETER rather than the path. The bash side was clean at
-  every reading, so the runner has worked from the first and the REACH is the whole defect.
-  `scripts/bash-guard.sh` blocks a direct scratch run by matching `^bash[[:space:]]+\.tmp/`, and
-  `guard-kit/bin/scratch-run.sh` executes its target with a hardcoded `bash`. Neither reaches a
-  script run under another interpreter. Probed at the 2026-08-13 close against the guard itself:
-  a `python3 .tmp/<script>.py` payload exits **0** — no block, no steer, no advice.
-  **Why `[design-pending]`:** the two halves want different answers. Widening the guard's match to
-  a set of interpreters is a roster that rots; widening the runner needs it to either dispatch on
-  extension or take the interpreter as an argument, and the second re-opens what the runner is
-  allowed to execute. There is also a live third option — rule that scratch execution is
-  bash-only and have the guard say so — which is cheaper and narrows what sessions may do.
-  Distinct from the icebox entry `scratch-execution-allowlist-bar`, which is about the standing
-  allowlist bar for scratch execution rather than about which interpreters the control covers.
-  **Cost while deferred:** the control reads as complete and is not, which is worse than an
-  absent control — a reviewer seeing the rule and the runner has no reason to check its reach.
-  **PROMOTION COMMITTED AT THE NEXT BOUNDARY — OPERATOR RULING 2026-08-23, REVERSING THEIR OWN
-  FOUR PRIOR DECLINES.** The 2026-08-23 deferral-on-the-merits rested on the fifth measurement
-  breaking the trend — "the first evidence *for* the operator's discipline-shaped reading rather
-  than merely consistent with it" — and the sixth measurement above falsifies that exact ground.
-  The operator saw the reversal and ruled the entry promoted at the next iteration boundary. That
-  boundary is 2026-08-24 and it ADMITTED the entry: the operator yielded the port sequence for that
-  iteration alone to pay this commitment and its paired one, a yield recorded at
-  `native-gate-port-remaining-corpus` and reversing nothing. The unstampable seventh measurement is
-  the case `promotion-commitment-stamp-latency` now owns.
-  **The deliverable fork stays OPEN and stays this entry's** — the three options below are
-  untouched, and neither the operator nor the lead picked among them.
-  **The four declines are SPENT, the ruling above having reversed them** — 2026-08-19 twice,
-  2026-08-20 via the lead once the third recurrence put it past lead discretion, re-affirmed
-  2026-08-22; all OPERATOR-class, and **no `recurrence:` date joins a decline**, a decline not
-  being a firing.
-  Filed 2026-08-13 by close, from its own tooling-friction triage; probed at source before filing.
-
 - **ro-bins-write-option-bypass** [design-pending] — `GUARD_KIT_RO_BINS` membership is tested as
   "the segment leads with this binary", but leading with a roster binary does not make the
   invocation read-only, and the read-only-pipeline rule's safety argument assumes it does. The rule
@@ -7547,37 +7586,6 @@
   Filed 2026-08-24 to the gap inbox by `shell-gate-tail-port-and-completion-oracle`'s close, from
   its prompt-friction triage; promoted 2026-08-24 at this iteration's scope intake, its premise
   re-verified and one claim corrected above.
-
-- **prompt-ranking-command-word-shape-blind** [design-pending] — the friction ranking prints a bare
-  command word, so an answered read steer and an unowned write form share one row.
-  **Re-measured at this intake on the live log, not carried from the filing:**
-  `.workflow/prompt-friction.log` holds 14 `cat` occurrences of which **13 are heredoc writes**
-  (8 `cat >>`, 5 `cat >`) and effectively none is a `cat <file>` read. The filing close measured
-  the same shape at scale — 133 calls, 80 `cat >>` plus 37 `cat >` against roughly 16 reads. Two
-  independent corpora, one shape.
-  **Why the row misleads rather than merely being coarse.** The read half is answered:
-  `scripts/bash-guard.sh` steers `cat <file>` to the Read tool and that steer fires correctly —
-  it fired on this very session's first read. So the ranking's top row shows the *solved* half and
-  hides the unsolved one inside it, and three consecutive closes have triaged the pattern under the
-  read-steer heading for exactly that reason.
-  **The write half has no steer, no grant and no owner.** The mandated alternatives —
-  `guard-kit/bin/scratch-run.sh` for execution, `git commit -F` for a message — govern what happens
-  to a file **after** it exists and say nothing about creating one, so a session authoring a scratch
-  script or a commit message pays an out-of-band decision every time.
-  **Why `[design-pending]`:** two different deliverables and neither is ruled. Decomposing a command
-  word by shape inside `guard-kit/bin/scan-prompts.sh` retires the misreading mechanically and buys
-  every future triage a correct row — but it mints an output contract the gate-tests pin. Giving the
-  write form its own disposition (a grant, a steer to the Write tool, or a stated habit) fixes the
-  instance and leaves the instrument blind to the next conflated word.
-  **DISTINCT from `guard-read-steer-tool-coverage`** and not a re-file of it: that entry is awk
-  having no read-steer where cat and sed have one, all three on the READ side. **DISTINCT from
-  `scan-prompts-blocking-half-blind`**, whose axis is which verdicts the scan sees, and from the
-  iceboxed `scan-prompts-truncation-quote-desync`, a per-line truncation defect.
-  **Cost while deferred:** the tree's one friction instrument reports its heaviest row wrong, so
-  every triage reading it spends judgment re-deriving the decomposition and can still land on the
-  answered half — three closes did.
-  Filed 2026-08-24 to the gap inbox by `shell-gate-tail-port-and-completion-oracle`'s close;
-  promoted 2026-08-24 at this iteration's scope intake, re-measured on a fresh corpus above.
 
 - **promotion-commitment-stamp-latency** [design-pending] — between a promotion commitment and the
   boundary that pays it, an at-ceiling entry accrues firings only prose can hold.
