@@ -170,7 +170,12 @@ Primitives a consumer guard composes; each emits the harness's
   carve-out of rules 9/10, and scan-prompts' `allowed()`), so the harness's
   per-segment matching surface is modelled in exactly one place and cannot drift
   between them. Fed a `guard_skeleton` view, so a separator inside a quoted
-  argument is never mistaken for a statement break. Its separator class carries
+  argument is never mistaken for a statement break. **What it models is the
+  harness's matching surface, not shell dataflow**, and that distinction is what
+  rule 22 rests its own two-level splitter on: the emitted segments carry no
+  record of *which* separator produced them, so a rule asking whose stdout feeds
+  whose stdin cannot be a caller — a different question, not a second dialect of
+  this one. Its separator class carries
   **no newline**, and it does not need one: it *emits* segments as lines and
   every consumer reads lines, so a newline already present in the input is
   already a boundary before the substitution runs.
@@ -904,7 +909,76 @@ that harness exists would be designing against no case.
     tracked *directory* under `rm -r` does not match `--error-unmatch` — each
     biases toward passing rather than a false steer. An untracked or gitignored
     target never matches, so scratch deletion is untouched.
-22. **Fall-through logging** — anything neither blocked nor auto-allowed is
+22. **Script execution off a body the command string does not carry** — a
+    command that invokes a script interpreter on a program body it takes from
+    **outside** the command string is **blocked** when that body's source is a
+    path under a `GUARD_KIT_SCRATCH_DIRS` member. Two arms, one predicate:
+    arm **(a)**, the interpreter is `bash` or `sh`, steers to
+    `bin/scratch-run.sh` — the allowlistable path that echoes the body as it
+    executes; arm **(b)**, the interpreter is a
+    `GUARD_KIT_SCRIPT_INTERPRETERS` member, states the bash-only rule
+    (§scratch-run) and names the same runner. Declares `sq dq hd`.
+    **The predicate is body visibility, and the discriminator is the same one
+    that bought the runner its grant.** §scratch-run's whole argument is that a
+    scratch path is rewritable by any session, so the body the operator approved
+    is not necessarily the body that runs, and the runner's echo-at-execution is
+    what restores the correspondence. A body carried **in** the command string —
+    `python3 -c 'print(1)'`, a heredoc, a herestring, a literal piped in — *is*
+    the command string: the permission prompt shows it to the approver verbatim
+    and the friction log records it. There is nothing for a compensating control
+    to compensate for, so a rule firing there would refuse a reviewable act in
+    the name of reviewability.
+    **What that argument may not claim, recorded because the obvious phrasing is
+    the wrong way round.** The guard's own matcher does **not** read those
+    bodies: the skeleton this rule declares strips single- and double-quoted
+    spans and heredoc bodies before the rule sees the command. The visibility
+    carrying the ruling is the **approver's**, not the guard's.
+    **Body source, not operand position.** "Names a path operand under a scratch
+    dir" is a *proxy* for "body invisible" and leaks in one direction: a path
+    operand always implies an invisible body, but an invisible body does not need
+    a path operand. So the rule resolves the body source the way the
+    interpreters themselves do — a `-c`/`-e`/`-m` argument (in the command
+    string), else the first bare operand, else stdin — and fires wherever the
+    scratch path turns out to sit: operand, `<` redirect source, the pipe
+    producer's operand, or a substitution operand.
+    **That resolution is also what keeps the rule off legitimate tooling**, and
+    it is exact rather than a carve-out: `python3 tools/gen.py` and
+    `bash <kit>/bin/scratch-run.sh .tmp/x.sh` both name a body that is **not**
+    under a scratch dir — a tracked tool in the first, the runner itself in the
+    second, with the scratch path an argument *to* it — so neither fires. The
+    scratch-directory scope is not the proxy the previous paragraph drops: the
+    proxy was operand *position*, and position is what this rule stops caring
+    about.
+    **The substitution shape is covered in both spellings, and rule 6 is why it
+    had to be.** Rule 6's match carries no backtick alternative, so it blocks
+    ``python3 -c "$(cat .tmp/x.py)"`` and passes the identical command spelled
+    with backticks. A guard that blocks one spelling of a shape and passes the
+    other teaches the spelling rather than the rule, so this rule reads both
+    substitution spans; rule 6 merely pre-empts one of them by dispatch order,
+    which is ordering rather than duplication.
+    **It splits statements and then pipes, rather than calling
+    `guard_split_compound`**, and the divergence is forced: what this rule needs
+    is dataflow — whose stdout is the interpreter's stdin — and the shared
+    splitter erases the separator that tells a pipe from a `;`. It is not
+    modelling the harness's per-segment matching surface, which is what that
+    splitter is the single implementation of.
+    **Two honest limits, neither closed here.** A body drawn from outside the
+    scratch dir (`python3 - < /elsewhere/x.py`) is out of scope by the paragraph
+    above, and a body with no path at all (`curl … | python3`) is a wider hazard
+    with nothing to do with scratch execution. Both fall through, and a later
+    reader should meet that recorded rather than infer the rule is complete.
+    **Conservative in this ruleset's established directions**, with one named
+    exception: a `${…}`/`$NAME`/`<(…)`/`>(…)` anywhere in the command declines
+    outright (rule 6 blocks those shapes already), and an interpreter option the
+    walk cannot size declines rather than guess which token is the body — but a
+    **backtick** is deliberately *not* declined on, since it is the one
+    body-source spelling rule 6 does not reach and declining there would ship the
+    hole the rule exists to close.
+    **Placed last, immediately before fall-through logging.** It grants nothing,
+    so it inherits no auto-allow ordering argument; and a command reaching it has
+    already been declined by every steer and every grant above, which is exactly
+    the population whose body source is worth resolving.
+23. **Fall-through logging** — anything neither blocked nor auto-allowed is
     appended to the friction log. Always last; never affects the decision.
 
 **Nothing above claims the sleep half was already enforced.** Before rule 13, no
@@ -969,6 +1043,46 @@ decision put it, to *after*, in the transcript a supervisor reads. That is
 the actual posture of the entry, and a consumer unwilling to move review
 downstream should simply not add it: the tool still runs without it, and its
 runs still take that decision.
+
+**Scratch execution is bash-only, and the runner's hardcoded interpreter is the
+statement of that rule rather than an unexamined default.** Executing a program
+body that lives under a scratch directory is bash-only; rule 22 is the
+command-line half of the enforcement and the shebang refusal below is the
+runner's own half.
+
+**Why widening the runner is refused outright rather than costed.** Teaching it
+a second interpreter is not merely more expensive, it is wrong: the runner is
+reached through a committed allowlist grant naming this fixed path, and that
+grant was bought by one specific compensating control — the runner echoes the
+body it is about to execute, and it only ever hands that body to `bash`. A
+second interpreter converts a grant for *"run bash on a reviewed body"* into one
+for *"run anything on a reviewed body"* **with no settings edit**, widening a
+permission behind the boundary the consumer's operator owns, through a code
+change no permission gate reads. That is a security argument rather than a cost
+one, and it stands on its own.
+
+**What bash-only costs, stated rather than glossed.** It removes a capability: a
+session wanting a Python scratch script must write a `.sh` that invokes Python
+with the body inline, or do the work in a language the control covers. The
+narrowing is taken deliberately — the population of non-bash scratch runs is
+small while the control's silent hole applied to every one of them.
+
+**The runner refuses a non-bash shebang, and it reads the file rather than a
+roster.** It already `cat`s the target before executing, so it holds the body:
+when line one is a `#!` naming an interpreter that is neither `bash` nor `sh`
+(resolving the `/usr/bin/env <interp>` spelling to the same answer) it exits 2
+naming the bash-only rule, before the echo — so a refusal still prints no body
+and stays distinguishable from a child that exited 2. A target with **no**
+shebang is unaffected, which keeps every `.sh` the runner handles today working.
+That is **exact** where a roster is approximate, and it is derivation-first: the
+file states its own interpreter. Two mechanisms, each exact for the input it
+actually has — the guard has a command string and no file, the runner has a
+file, and this is why the runner deliberately does not read
+`GUARD_KIT_SCRIPT_INTERPRETERS`.
+
+**What deliberately does not become config: the policy.** Bash-only is a rule,
+not a setting, and a knob that turned it off would restore the honour system the
+rule replaces. The valve is not vendoring the rule.
 
 **Fail-closed on reach.** A target resolving outside the scratch dir is
 refused before any echo or execution, so the tool cannot become a general
@@ -1294,7 +1408,20 @@ repo's layout as defaults):
   hazard `GUARD_KIT_RO_BINS` carries, stated here because this roster's members
   are what bound a *write* rather than a read.
 - `GUARD_KIT_SCRATCH_DIRS` — gitignored scratch dirs named in the
-  rule-3 corrective message; default `(".tmp")`.
+  rule-3 corrective message, and the scope of rules 14, 15 and 22;
+  default `(".tmp")`.
+- `GUARD_KIT_SCRIPT_INTERPRETERS` — the non-bash interpreters rule 22's arm (b)
+  covers; default `(python python3 node deno ruby perl php zsh)`. A roster is the
+  shape the three knobs above already use for a set of this kind, and making it a
+  knob is what answers the *a roster rots* objection: the kit ships a default and
+  the consumer owns the value, so a missing member is a config edit rather than a
+  kit release. Its members are universal interpreter binaries — none of the
+  classes CLAUDE.md §The provenance seam names — so unlike
+  `GUARD_KIT_BREADTH_PROBES` it is kit-shippable *with* defaults; that roster is
+  consumer config because its members are private, so the test is the content and
+  never the shape. It has **exactly one** reader by design: arm (b)'s trigger.
+  `bin/scratch-run.sh` deliberately does not read it (§scratch-run), so the knob
+  never becomes a second copy of a fact the target file itself states.
 
 Both logs are per-iteration scratch: a consumer gitignores them even where
 its workflow dir is otherwise committed.

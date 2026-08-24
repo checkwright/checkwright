@@ -213,5 +213,39 @@ fallthrough	rm scratch.txt
 fallthrough	rm untracked-nowhere.md
 fallthrough	git rm -q tracked.md
 
-# rule 22 — anything else falls through to the friction log
+# rule 22 — a script interpreter taking its program body from a scratch dir.
+#           The firing rows are delta 3's probe table promoted from evidence into
+#           fixtures: one per body source, both arms. Targets are relative, as
+#           rules 3, 16 and 17's are — an `@ROOT@`-absolute one would meet rule 5
+#           seventeen rules earlier.
+# arm (a), bash/sh: the operand form is the steer this rule inherited from a
+#          consumer rule, and the stdin form is the widening the re-key buys it
+block	bash .tmp/x.sh
+block	bash - < .tmp/x.sh
+# arm (b), one row per body source: operand, stdin redirect with and without the
+# '-', the device-path spelling of the same redirect, and the pipe producer
+block	python3 .tmp/x.py
+block	python3 - < .tmp/x.py
+block	python3 < .tmp/x.py
+block	python3 /dev/stdin < .tmp/x.py
+block	cat .tmp/x.py | python3
+# the backtick substitution — the one spelling rule 6 does not reach, which makes
+# it the case whose absence would leave a silently teachable spelling. The '$(…)'
+# spelling is deliberately NOT a case: rule 6 blocks it first, so a row here would
+# pin another rule's verdict and go green for the wrong reason the day rule 6 changed
+block	python3 -c "`cat .tmp/x.py`"
+# falls through — the body rides in the command string, so the approver and the
+# friction log both see it verbatim and there is nothing to compensate for. This
+# is the boundary most likely to regress silently, so it carries the most cases
+fallthrough	python3 -c 'print(1)'
+fallthrough	python3 - <<'PY'@NL@print(1)@NL@PY
+fallthrough	python3 <<< 'print(1)'
+fallthrough	printf 'print(1)' | python3
+# falls through — outside the scratch scope: a tracked tool's body is reviewable
+# in the repo, and the runner's own invocation takes a scratch path as an
+# argument to a tracked script rather than as a body
+fallthrough	python3 tools/gen.py
+fallthrough	bash guard-kit/bin/scratch-run.sh .tmp/x.sh
+
+# rule 23 — anything else falls through to the friction log
 fallthrough	make build

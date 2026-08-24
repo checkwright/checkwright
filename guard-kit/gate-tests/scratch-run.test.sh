@@ -57,6 +57,31 @@ out="$(GATE_SDK_TMP_DIR="$scratch" bash "$RUN" 2>&1)"; rc=$?
 assert_rc  no-args "$rc" 2
 assert_has no-args "usage" "$out"
 
+# Scratch execution is bash-only, and the runner reads the file's own shebang
+# rather than a roster: a target naming a non-bash interpreter is refused
+# unexecuted, and the side-effect file proves it never ran.
+printf '#!/usr/bin/env python3\nopen("%s/PYRAN", "w").close()\n' "$scratch" > "$scratch/py.py"
+out="$(GATE_SDK_TMP_DIR="$scratch" bash "$RUN" "$scratch/py.py" 2>&1)"; rc=$?
+assert_rc     refuse-shebang "$rc" 2
+assert_has    refuse-shebang "bash-only" "$out"
+assert_absent refuse-shebang 'open("' "$out"
+[[ -e "$scratch/PYRAN" ]] && { echo "FAIL [refuse-shebang]: the child ran"; fails=$((fails + 1)); }
+
+# The env-indirected spelling resolves to the same interpreter, and a bash
+# shebang — direct or through env — still runs, which is what keeps every .sh
+# the runner handles today working.
+printf '#!/bin/sh\necho sh-ran\n' > "$scratch/posix.sh"
+out="$(GATE_SDK_TMP_DIR="$scratch" bash "$RUN" "$scratch/posix.sh" 2>&1)"; rc=$?
+assert_rc  allow-sh-shebang "$rc" 0
+assert_has allow-sh-shebang "sh-ran" "$out"
+
+# A target with no shebang at all is unaffected: nothing states an interpreter,
+# so nothing contradicts the rule.
+printf 'echo no-shebang-ran\n' > "$scratch/plain.sh"
+out="$(GATE_SDK_TMP_DIR="$scratch" bash "$RUN" "$scratch/plain.sh" 2>&1)"; rc=$?
+assert_rc  allow-no-shebang "$rc" 0
+assert_has allow-no-shebang "no-shebang-ran" "$out"
+
 [[ "$fails" -eq 0 ]] || { echo "scratch-run.test: $fails assertion(s) failed"; exit 1; }
-echo "scratch-run.test: clean (echo precedes exec; args and exit code pass through; out-of-scratch and traversal targets refused unexecuted)"
+echo "scratch-run.test: clean (echo precedes exec; args and exit code pass through; out-of-scratch and traversal targets refused unexecuted; a non-bash shebang refused unexecuted)"
 exit 0

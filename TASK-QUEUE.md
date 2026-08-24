@@ -12,63 +12,6 @@
 
 ## New Features
 
-- **scratch-execution-control-is-bash-only** [spec: SPEC-scratch-bash-only.md] — the scratch-run
-  steer and the runner it steers to are both bash-only, so a non-bash scratch script executes
-  with no compensating control at all.
-  recurrence: scratch-execution-control-is-bash-only 2026-08-16 2026-08-18 2026-08-19 2026-08-23
-  **NOT a split candidate, ruled 2026-08-23 at build** against the criterion queue-kit/SPEC.md
-  section check-queue-entry-budget now states: it accumulates measurements for ONE deliverable, so
-  ruling it leaves nothing unruled — the fifth measurement reversing the third is compression.
-  **THE MEASUREMENT SERIES IS SETTLED at seven readings, and what it settles is the design fork's
-  premise rather than the defect.** Stdin heredocs ran 50 (fourth, 2026-08-19), 9 (fifth), 64
-  (sixth, 2026-08-23, top-ranked of 49 patterns and most editing tracked files by name), 81
-  (seventh, 2026-08-24) — so the fifth's fall was a DIP, and its reading of that fall as evidence
-  FOR the operator's discipline-shaped cause is falsified rather than merely unsupported. The
-  sixth's four `python3 .tmp/<name>.py` runs also retire the fourth's "the path-shaped payload is
-  gone": both shapes are live AT ONCE, which the fork below treated as sequential. The narrowing
-  that survives all seven — stdin carries no `.tmp/` path to match, so even the cheap third option
-  misses it unless the rule names the INTERPRETER rather than the path. The bash side was clean at
-  every reading, so the runner has worked from the first and the REACH is the whole defect.
-  `scripts/bash-guard.sh` blocks a direct scratch run by matching `^bash[[:space:]]+\.tmp/`, and
-  `guard-kit/bin/scratch-run.sh` executes its target with a hardcoded `bash`. Neither reaches a
-  script run under another interpreter. Probed at the 2026-08-13 close against the guard itself:
-  a `python3 .tmp/<script>.py` payload exits **0** — no block, no steer, no advice.
-  **The three-option fork is RULED, spec 2026-08-24, and the amendment owns the argument.** The
-  third option is taken with the first's mechanism: a generic rule keyed on the interpreter, and
-  no runner widening. Widening the runner is refused outright rather than costed — it converts
-  the committed grant for the runner from "run bash on a reviewed body" into "run anything on a
-  reviewed body" with no settings edit, widening a permission behind the operator's own boundary.
-  Distinct from the icebox entry `scratch-execution-allowlist-bar`, which is about the standing
-  allowlist bar for scratch execution rather than about which interpreters the control covers.
-  **Cost while deferred:** the control reads as complete and is not, which is worse than an
-  absent control — a reviewer seeing the rule and the runner has no reason to check its reach.
-  **PROMOTION COMMITTED AT THE NEXT BOUNDARY — OPERATOR RULING 2026-08-23, REVERSING THEIR OWN
-  FOUR PRIOR DECLINES.** The 2026-08-23 deferral-on-the-merits rested on the fifth measurement
-  breaking the trend — "the first evidence *for* the operator's discipline-shaped reading rather
-  than merely consistent with it" — and the sixth measurement above falsifies that exact ground.
-  The operator saw the reversal and ruled the entry promoted at the next iteration boundary. That
-  boundary is 2026-08-24 and it ADMITTED the entry: the operator yielded the port sequence for that
-  iteration alone to pay this commitment and its paired one, a yield recorded at
-  `native-gate-port-remaining-corpus` and reversing nothing. The unstampable seventh measurement is
-  the case `promotion-commitment-stamp-latency` now owns.
-  **The seventh measurement is adopted in FULL — the stdin shapes are IN subject.** Ruled by the
-  lead 2026-08-24 inside the envelope, correcting spec's first cut: body visibility is the right
-  discriminator, but "names a path operand under a scratch dir" was a PROXY for it and leaks.
-  The predicate is now body-not-present-in-the-command-string, scoped to a scratch source, so a
-  stdin redirect, a pipe and a command substitution all fire while `-c`, a heredoc and a
-  herestring do not. The measurement's diagnosis was the only wrong half: a stdin *redirect* does
-  carry the `.tmp/` path; only a *heredoc* carries none, because it carries the body instead.
-  **Probed, not reasoned:** 15 crafted payloads through the live hook at spec. Seven shapes leak
-  today, including ``python3 -c "`cat .tmp/x.py`"`` — `guard_rule_expansion` has no backtick
-  alternative, so it blocks the `$(…)` spelling and passes the archaic one, which is why the
-  substitution shape stays in subject rather than being ruled covered. `python3 tools/gen.py`
-  falls through and must keep doing so, which is what holds the scratch scope in place.
-  **The four declines are SPENT, the ruling above having reversed them** — 2026-08-19 twice,
-  2026-08-20 via the lead once the third recurrence put it past lead discretion, re-affirmed
-  2026-08-22; all OPERATOR-class, and **no `recurrence:` date joins a decline**, a decline not
-  being a firing.
-  Filed 2026-08-13 by close, from its own tooling-friction triage; probed at source before filing.
-
 - **prompt-ranking-command-word-shape-blind** [spec: SPEC-friction-key-shape.md] — the friction
   ranking prints a bare command word, so an answered read steer and an unowned write form share
   one row.
@@ -4492,9 +4435,12 @@
 
 - **consumer-guard-rule-coverage** [design-pending] — the guard decision table has no reach into
   the consumer copy, so this repo's most destructive guards are its untested ones.
-  `guard-kit/bin/run-guard-tests.sh` drives `guard-kit/templates/bash-guard.sh`, so the four
+  `guard-kit/bin/run-guard-tests.sh` drives `guard-kit/templates/bash-guard.sh`, so the three
   project rules in `scripts/bash-guard.sh` — the hook-bypass block, the harness-scratchpad path
-  block, the `git clean -x` block and the scratch-run steer — carry zero behavioral coverage.
+  block and the `git clean -x` block — carry zero behavioral coverage. It was four until
+  `scratch-execution-control-is-bash-only` generalized the scratch-run steer into rule 22 and
+  deleted the copy's arm, which is the one exit this entry has ever had: a rule that qualifies for
+  the generic lane leaves the uncovered one.
   `check-template-copy-parity` is their only gate and it reads the copy-divergence declaration
   shape, never what the rules do.
   **Distinct from `template-copy-parity-yaml-widening`**, whose predicate is byte-parity between a
@@ -5200,9 +5146,11 @@
   guard-kit ships the decision table `guard-tests/cases.tsv` and guard-kit/SPEC.md §Testing
   requires every **generic** rule to carry a firing and a non-firing case. But
   `bin/run-guard-tests.sh` feeds `guard-kit/templates/bash-guard.sh`, which ships no consumer rule
-  by design (§Consumer rules). Re-verified 2026-08-15: `scripts/bash-guard.sh` carries exactly
-  four project rules — the `--no-verify` block, the harness-scratchpad steer, the `git clean -x`
-  block and the scratch-script steer — and no test file anywhere names any of them.
+  by design (§Consumer rules). Re-verified 2026-08-24: `scripts/bash-guard.sh` carries exactly
+  three project rules — the `--no-verify` block, the harness-scratchpad steer and the
+  `git clean -x` block — and no test file anywhere names any of them. The fourth, a scratch-script
+  steer, left at `scratch-execution-control-is-bash-only`'s build by qualifying for the generic
+  lane, where the table reaches it.
   **Why `[design-pending]`:** the seam is the open part, not the tests. A consumer table needs a
   runner entry point that feeds the *consumer's* guard rather than the template's, and that is
   either a knob on `run-guard-tests.sh`, a second table the kit reads from a consumer-named path,
@@ -7633,6 +7581,7 @@
 ## Done
 
 - turn-end-chokepoint-and-wait-primitive
+- scratch-execution-control-is-bash-only
 
 ## Lessons Learned
 

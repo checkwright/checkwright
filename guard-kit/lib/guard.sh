@@ -31,6 +31,9 @@ declare -p GUARD_KIT_RO_BINS >/dev/null 2>&1 || GUARD_KIT_RO_BINS=(
     grep egrep fgrep rg head tail cat wc sort uniq cut tr nl rev tac paste comm column diff jq find ls xargs
 )
 declare -p GUARD_KIT_APPEND_BINS >/dev/null 2>&1 || GUARD_KIT_APPEND_BINS=(cat printf echo)
+declare -p GUARD_KIT_SCRIPT_INTERPRETERS >/dev/null 2>&1 || GUARD_KIT_SCRIPT_INTERPRETERS=(
+    python python3 node deno ruby perl php zsh
+)
 
 # spec: guard-kit/SPEC.md §The guard framework — the payload cache: called directly (never in a substitution, which would kill the global with its subshell) so a rule needing a second field can have one
 guard_read_input() {
@@ -988,6 +991,132 @@ guard_rule_rm_tracked() {
     done < <(guard_split_compound "$s")
 }
 
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 22's interpreter classification: arm (a) is the bash/sh pair the runner already serves, arm (b) the GUARD_KIT_SCRIPT_INTERPRETERS roster, and a word on neither is not a script interpreter at all
+_guard_interpreter_arm() {
+    local w="${1##*/}" i
+    case "$w" in bash | sh) printf 'a'; return 0 ;; esac
+    for i in ${GUARD_KIT_SCRIPT_INTERPRETERS[@]+"${GUARD_KIT_SCRIPT_INTERPRETERS[@]}"}; do
+        [[ "$w" == "$i" ]] && { printf 'b'; return 0; }
+    done
+    return 1
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 22's scratch-source test on one token, the prefix idiom rule 15's record test already uses
+_guard_is_scratch_path() {
+    local p="$1" d
+    for d in ${GUARD_KIT_SCRATCH_DIRS[@]+"${GUARD_KIT_SCRATCH_DIRS[@]}"}; do
+        case "$p" in "$d"/* | "./$d"/*) return 0 ;; esac
+    done
+    return 1
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 22's cheap bail and its substitution arm's inner test: a scratch dir named anywhere in a string, which every arm of the rule requires
+_guard_names_scratch() {
+    local d
+    for d in ${GUARD_KIT_SCRATCH_DIRS[@]+"${GUARD_KIT_SCRATCH_DIRS[@]}"}; do
+        case "$1" in *"$d"/*) return 0 ;; esac
+    done
+    return 1
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 22's substitution arm: a command-substitution span naming a scratch path, in both spellings, since rule 6 reaches only the '$(…)' one and a guard that blocks one spelling teaches the spelling rather than the rule
+_guard_substitution_scratch() {
+    local span
+    while IFS= read -r span; do
+        _guard_names_scratch "$span" && return 0
+    done < <(grep -oE '`[^`]*`|\$\([^)]*\)' <<<"$1")
+    return 1
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 22's body-source resolution: an interpreter takes its program body from a -c/-e argument, from its first bare operand, or from stdin; emits 'inline', 'file <path>' or 'stdin', and returns non-zero on an option this walk cannot size
+_guard_interpreter_body() {
+    local seg="$1" arm="$2" tok rest k skip=0
+    local -a toks
+    read -ra toks <<<"$seg"
+    for tok in ${toks[@]+"${toks[@]:1}"}; do
+        if [[ "$skip" == 1 ]]; then skip=0; continue; fi
+        case "$tok" in
+            -c | --command | -m | --module) printf 'inline'; return 0 ;;
+            -e | --eval) [[ "$arm" == a ]] || { printf 'inline'; return 0; } ;;
+            - | /dev/stdin | /dev/fd/0) printf 'stdin'; return 0 ;;
+            '<' | '>' | '>>' | '&>' | '&>>' | [0-9]'>' | [0-9]'>>' | [0-9]'<') skip=1 ;;
+            '<'* | '>'* | [0-9]'>'* | [0-9]'<'*) ;;
+            --) ;;
+            -*)
+                rest="${tok#-}"
+                case "$rest" in -*) return 1 ;; esac
+                for ((k = 0; k < ${#rest}; k++)); do
+                    case "${rest:k:1}" in
+                        B | E | I | O | i | l | n | s | t | u | v | x) ;;
+                        *) return 1 ;;
+                    esac
+                done ;;
+            *) printf 'file %s' "$tok"; return 0 ;;
+        esac
+    done
+    printf 'stdin'
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 22's stdin source: a segment's '<' redirect target, never a '<<' heredoc opener, whose body rides in the command string and is the shape the rule deliberately does not fire on
+_guard_stdin_redirect() {
+    grep -oE '(^|[^<])<[[:space:]]*[^[:space:]<>|;&]+' <<<"$1" \
+        | sed -E 's/^[^<]?<[[:space:]]*//'
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 22's two decisions: arm (a) steers to the runner, arm (b) states the bash-only rule, and both resolve the runner from GUARD_KIT_LIB so a consumer that vendors the kit elsewhere is told where its own copy is
+_guard_block_interpreter() {
+    local arm="$1" word="$2" src="$3" runner="${GUARD_KIT_LIB:-guard-kit/lib/guard.sh}"
+    runner="${runner%/lib/guard.sh}/bin/scratch-run.sh"
+    if [[ "$arm" == a ]]; then
+        guard_block "run a scratch script through the runner: 'bash $runner <script> [args…]' (guard-kit/SPEC.md §scratch-run). This call takes the program body for '$word' from '$src', which sits in a scratch dir any session can rewrite, so the body reviewed at the permission decision need not be the body that runs. The runner is allowlistable and echoes the body as it executes, which is the compensating control a direct run has none of. A body carried in the command string — a '-c' argument, a heredoc, a herestring — is untouched. If you genuinely need the direct form, run it yourself with !<command>."
+    fi
+    guard_block "scratch execution is bash-only (guard-kit/SPEC.md §scratch-run) and '$word' is not bash: this call takes its program body from '$src' under a scratch dir, where no compensating control reaches it. Write the body as a shell script and run it through 'bash $runner <script> [args…]', which echoes the body as it executes; a script whose shebang names a non-bash interpreter is refused there too. A body carried in the command string — a '-c' argument, a heredoc, a herestring — is untouched, because the approver and the friction log both see it verbatim. If you genuinely need the direct run, run it yourself with !<command>."
+}
+
+guard_rule_script_interpreter() {
+    local raw="$1" s stmt seg word arm body src tok i j n
+    local -a pipes=() ptoks=()
+    _guard_names_scratch "$raw" || return 0
+    # spec: guard-kit/SPEC.md §The generic ruleset — rule 22 declines on an expansion (rule 6 blocks those shapes already) but *not* on a backtick, which is the one body-source spelling rule 6 does not reach
+    grep -qE '\$\{|<\(|>\(|\$[A-Za-z_]' <<<"$raw" && return 0
+    s="$(guard_skeleton "$raw" sq dq hd)"
+    # spec: guard-kit/SPEC.md §The generic ruleset — rule 22 splits statements then pipes rather than calling guard_split_compound: what it needs is dataflow (which segment's stdout is the interpreter's stdin), and the shared splitter erases the separator that tells a pipe from a ';'
+    while IFS= read -r stmt; do
+        mapfile -t pipes < <(tr '|' '\n' <<<"$stmt")
+        n=${#pipes[@]}
+        for ((i = 0; i < n; i++)); do
+            seg="$(_guard_command_word "${pipes[i]}")"
+            word="${seg%%[[:space:]]*}"
+            [[ -n "$word" ]] || continue
+            arm="$(_guard_interpreter_arm "$word")" || continue
+            body="$(_guard_interpreter_body "$seg" "$arm")" || continue
+            case "$body" in
+                'file '*)
+                    _guard_is_scratch_path "${body#file }" \
+                        && _guard_block_interpreter "$arm" "$word" "${body#file }"
+                    ;;
+                stdin)
+                    while read -r src; do
+                        _guard_is_scratch_path "$src" \
+                            && _guard_block_interpreter "$arm" "$word" "$src"
+                    done < <(_guard_stdin_redirect "${pipes[i]}")
+                    for ((j = 0; j < i; j++)); do
+                        read -ra ptoks <<<"${pipes[j]}"
+                        for tok in ${ptoks[@]+"${ptoks[@]}"}; do
+                            _guard_is_scratch_path "$tok" \
+                                && _guard_block_interpreter "$arm" "$word" "$tok"
+                        done
+                    done
+                    ;;
+                inline)
+                    _guard_substitution_scratch "$raw" \
+                        && _guard_block_interpreter "$arm" "$word" "a command substitution"
+                    ;;
+            esac
+        done
+    done < <(sed -E 's/\|\||&&|;/\n/g' <<<"$s")
+}
+
 guard_generic_rules() {
     local cmd="$1"
     guard_rule_cd_compound "$cmd"
@@ -1011,4 +1140,5 @@ guard_generic_rules() {
     guard_rule_allowlist_chain "$cmd"
     guard_rule_git_rewrite "$cmd"
     guard_rule_rm_tracked "$cmd"
+    guard_rule_script_interpreter "$cmd"
 }
