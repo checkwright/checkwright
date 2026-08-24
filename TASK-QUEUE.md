@@ -5259,29 +5259,41 @@
   for an open one, and the audit that catches it is a per-close human sweep with no oracle.
   Filed 2026-08-16 by close, from the two instances its own roster sweep found.
 
-- **survey-engagement-residue-untracked** [design-pending] — the `survey-engagement` audit class
-  cannot be performed a stage later under this repo's lead-orchestrated posture.
-  **Established at this close, by trying to perform it.** The class asks whether a scope survey
-  ran a counter-evidence pass before recommending against an entry, and the roster already
-  states its residue is "the survey's own reasoning". Under the split posture that reasoning is
-  relayed to the lead and lands in the lead's journal under `.tmp/`, which is gitignored and
-  which `bin/enter-stage.sh`'s boundary reset wipes at the **next scope** — so the evidence has
-  a lifetime shorter than the audit's cadence. A read-only sweep of the committed tree for this
-  iteration's two refused unit candidates found no survey-record block, no `queue-edges.sh`
-  invocation and no committed reasoning; only the operator's overriding ground survives, in a
-  commit body since superseded.
-  **What makes it a defect and not just a limit:** the roster's `last:` stamp asserts the class
-  was audited, and a stamp resting on evidence that no longer exists is exactly the shape
-  `capability-pendency-after-landing` exists to catch, one level up.
-  **Why `[design-pending]`:** three shapes trade off and none is obviously right. Widen
-  `bin/file-survey.sh` so a *refusal* is filed like a census, which puts the residue in the
-  committed survey record — but that record is itself boundary-truncated, so it buys one
-  iteration, not an audit trail. Add a scope-stage obligation to record each refusal's engaged
-  ground in the entry it refuses, which is durable but grows at-cap entries. Or retire the class
-  as unauditable under this posture and say so, which is honest and loses the check.
-  **Cost while deferred:** every close either stamps the class on evidence it cannot read or
-  leaves it unstamped and accruing, and neither is a verdict.
-  Filed 2026-08-16 by close, from the audit it could not discharge.
+- **survey-engagement-residue-untracked** [design-pending] — nothing OBLIGES a survey or its lead
+  to leave durable engagement residue, so the `survey-engagement` audit passes or fails on practice.
+  **RE-FRAMED 2026-08-24 at close, on the operator ruling that widened the class, and the old
+  framing is corrected rather than annotated because three of its grounds went false at once.**
+  The entry used to claim the class "cannot be performed a stage later under this repo's
+  lead-orchestrated posture", resting on the roster's then-reading that residue is "the survey's
+  OWN reasoning" — relayed to the lead, landing in a `.tmp/` journal the boundary reset wipes, an
+  evidence lifetime shorter than the audit's cadence. **Option (c) of three was ruled 2026-08-24
+  by the operator:** durable, git-logged reasoning satisfies the class and a lead's ruling commit
+  is admitted, so the class IS performable and was performed and stamped at that same close.
+  **Two of the three candidate fixes need their costing corrected, and one loses its premise.**
+  (1) Widening `bin/file-survey.sh` so a *refusal* files like a census was rejected on the ground
+  that the survey record "is itself boundary-truncated, so it buys one iteration, not an audit
+  trail" — **that ground is FALSE and was re-probed here:** `.workflow/survey-record.md` is
+  TRACKED (`git ls-files` resolves it), so the boundary reset truncates the working copy while
+  git history keeps every block. It is an audit trail already, which makes this the cheapest
+  option rather than the disqualified one. (2) A scope-stage obligation to record each refusal's
+  engaged ground in the entry it refuses is now ATTESTED PRACTICABLE rather than hypothetical —
+  `execution-control-reach-and-turn-end-blocking`'s five holds each did exactly this, and the
+  at-cap growth it was costed against was paid there by answering grounds. (3) Retiring the class
+  as unauditable has **lost its premise** and is no longer a live option.
+  **What survives the ruling, and it is the whole entry now:** (c) changed what COUNTS as residue,
+  never whether residue is SYSTEMATICALLY captured. The iteration that earned the first stamp
+  earned it by conduct — a lead that wrote its grounds down — and a lead that does not leaves the
+  audit with nothing, with no gate, template line or tool to say so. The class is now auditable
+  and still not *reliably* auditable, which is a different and smaller defect than the one filed.
+  **A second-order cost the widening introduces**, recorded here because the roster row states the
+  limit and this entry owns the fix: the class no longer distinguishes a survey that engaged
+  nothing from a lead that engaged thoroughly, so a mechanism landed under (1) or (2) should
+  attribute the residue to its author rather than only capture it.
+  **Cost while deferred:** the stamp now rests on whichever session happened to write its
+  reasoning down, so the audit reads cleanest exactly when a diligent lead masks an incurious
+  survey — the failure it cannot see is the one it was built for.
+  Filed 2026-08-16 by close, from the audit it could not discharge; re-framed 2026-08-24 at close
+  on the operator ruling, with one rejected option's ground re-probed and overturned.
 
 - **in-crate-module-coupling-derivation** [design-pending] — a ported gate's descriptor can omit
   the crate modules its own verdict depends on, and no gate says so.
