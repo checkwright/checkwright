@@ -576,8 +576,9 @@
   direction.** This entry used to say the vendoring ruling had already fixed the shape to
   resolve-the-platform, place-the-binary, invoke — a three-step bootstrap whose relocation half
   `install-step-relocation` owned and whose size depended on that landing first. Both halves of
-  that sentence were false at HEAD. `install-step-relocation` is **retired as mooted** (`## Done`,
-  2026-08-24): its graph step already dispatches to the binary and its `gen-pre-commit.sh --write`
+  that sentence were false at HEAD. `install-step-relocation` is **retired as mooted**
+  (at this iteration's scope, 2026-08-24): its graph step already dispatches to the binary and its
+  `gen-pre-commit.sh --write`
   step is refused relocation by the closed operator-ratified ruling at gate-sdk/SPEC.md
   §gen-pre-commit. **So the relocation is this entry's now, and it is most of the work.**
   **Measured at the scope that re-verified it, not estimated.** The three-step shape describes
@@ -5819,12 +5820,12 @@
   are different tiers and both stand. Filed 2026-08-18 by close on the lead's ruling, which
   adopted close's own refusal to take the envelope change alone.
 
-- **agent-worktree-boundary-disposition** [design-pending] — registered agent worktrees
-  outlive the iteration that created them, and nothing surfaces or reaps them.
+- **agent-worktree-boundary-disposition** [design-pending] — the iteration boundary now refuses
+  on registered agent worktrees, but nothing reaps them and nothing surfaces one mid-iteration.
   **The finding, operator-directed 2026-08-18.** Four worktrees under the harness's
   worktree directory survived this iteration's close, registered in `git worktree list`
   and invisible to every gate. `.tmp/` has a boundary reset (`bin/enter-stage.sh`, with its
-  keep-list in `scripts/lifecycle-config.sh`); worktrees have nothing.
+  keep-list in `scripts/lifecycle-config.sh`); worktrees had nothing until 2026-08-24's refusal.
   **What scope owes:** whether the boundary should surface them, reap them, or neither —
   and if either, where that mechanism may live.
   **Why folding it into the `.tmp/` boundary reset was REFUSED at the lead** rather than
@@ -5839,25 +5840,26 @@
   or the auto-clean never ran (an agent dying before cleanup is the obvious candidate,
   unverified). The selecting mechanism is therefore NOT established, and a reaper designed
   against a guess at it is worse than no reaper.
-  (iii) *The seam.* `.tmp/` is repo scratch owned by lifecycle-kit's boundary reset; the
-  worktree directory is **harness** state. lifecycle-kit ships to consumers who may not use
-  worktree isolation and may not run this harness at all, so a boundary reset naming that
-  directory is a kit literal encoding one vendor's layout — the class the provenance seam
-  forbids, and the same reason graph vocabulary became consumer config.
+  (iii) *The seam — ANSWERED 2026-08-24, and recorded because it is what shaped the fix.*
+  A boundary reset naming the harness's worktree directory would be a kit literal encoding one
+  vendor's layout, the class the provenance seam forbids. The landed refusal reads
+  `git worktree list` and names no directory, so it carries no vendor layout
+  (lifecycle-kit/SPEC.md §bin/enter-stage.sh). A reaper inherits that constraint.
   **A concurrency gap any reaper closes first.** This repo assumes a foreign session may
   share the index. The `.tmp/` answer is the `.run` liveness record plus a liveness gate at
   every stage entry; a worktree has no analogous signal, so *is anyone still working in
   this one* is unanswerable today. Inventing that signal is the design work here — the
   config line is not.
-  **The cheap half, if scope wants one:** the report, not the removal. Surfacing a count at
-  the boundary (registered / carrying unique commits / dirty) is lossless and leaves removal
-  a human call. Removal, if ever taken, wants the established shape — an optional
-  consumer-config knob defaulting to empty, guarded by an emptiness-and-liveness predicate.
-  **Cost while deferred:** low. Worktrees are gitignored, block nothing, and cost only disk.
-  The carry is that each iteration's operator re-runs `git worktree list` by hand and
-  re-derives whether a survivor is safe to remove, as this one did across four of them.
-  **The honest limit:** one iteration's four worktrees is not a measurement, and nothing
-  reds on a stale worktree. Filed 2026-08-18 by the lead under the operator-directed
+  **The cheap half was TAKEN 2026-08-24** — `agent-worktree-reclamation-unenforced` landed the
+  boundary refusal, which surfaces the paths and leaves removal a session act. What is left is
+  removal, and it wants the established shape: an optional consumer-config knob defaulting to
+  empty, guarded by an emptiness-and-liveness predicate the concurrency gap above still blocks.
+  **Cost while deferred:** low, and lower since the refusal. Worktrees cost only disk, and the
+  boundary now refuses rather than passing silently, so the carry is the reap itself: a session
+  meeting the refusal still re-derives by hand whether each survivor is safe to remove.
+  **The honest limit:** the refusal bounds accumulation per iteration and no gate reads it, so
+  residue inside an iteration is still unsurfaced.
+  Filed 2026-08-18 by the lead under the operator-directed
   direct-to-queue exception, the four having been removed once verified empty and clean.
 
 - **guard-steer-names-absent-tool** [design-pending] — a guard refusal steers the session onto
