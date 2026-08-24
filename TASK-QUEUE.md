@@ -4458,9 +4458,9 @@
   **Why `[design-pending]` and not a rule edit:** placing the obligation everywhere converts one
   re-derivation into a permanent per-handoff tax, which is the cost the always-loaded tier exists
   to refuse. The unit owes a placement argument, not a slogan.
-  **Distinct from `delegation-provenance-floor`** above, which is one specific unobservable
-  (whether a return arrived). This is the general placement question, and it stands whichever way
-  that one is ruled.
+  **Distinct from `delegation-provenance-floor`**, which was one specific unobservable — whether a
+  return arrived — and has since shipped and closed. This is the general placement question, and it
+  survived that ruling rather than being settled by it.
   **Cost while deferred:** the rate is measured and non-trivial — six on governed surfaces in one
   iteration — and each survived a competent session's summary before something downstream caught it.
   Filed 2026-08-13 by close, from its own Lessons judgment.
