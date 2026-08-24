@@ -1818,41 +1818,6 @@
   close as the gap-generalization that inline fix owed, with the coverage gap
   verified against both gates' source and the class sized by sweep.
 
-- **scratch-run-steer-rule** [design-pending] — the sanctioned form for executing
-  a scratch script exists, is allowlisted, and nothing steers anyone to it, so
-  sessions reach for the direct path and pay a permission prompt every time.
-  `guard-kit/bin/scratch-run.sh` is granted by the **committed** allowlist
-  (`Bash(bash guard-kit/bin/scratch-run.sh *)`), while a direct `bash .tmp/x.sh`
-  is granted by nothing and prompts on every distinct script name — by design,
-  since a path under the gitignored scratch dir is rewritable by any session, and
-  scratch-run's echo-at-execution is the compensating control that buys the grant
-  (guard-kit/SPEC.md §scratch-run).
-  **Measured, not asserted:** this iteration's friction log ranks direct
-  `bash .tmp/*.sh` calls as roughly twenty prompts across seventeen distinct
-  one-off script names — the single largest prompting class once the guard's own
-  deliberate steers (`cat`, `grep`, `find`) are set aside, and every one of them
-  avoidable by one word of command.
-  **Shape:** a `scripts/bash-guard.sh` steer arm on a direct scratch-dir
-  execution, pointing at the runner — the same shape the guard already uses to
-  steer `cat` to Read, an absolute repo path to its relative form, and the
-  harness scratchpad to `.tmp/`. The bar itself is **not** being lowered: the
-  prompt on the direct form is the control, and the steer routes to the form that
-  already paid for its grant rather than granting the direct one.
-  **Why `[design-pending]`:** it needs the guard-kit decision-table arm and its
-  fixture, and one real ruling — whether the steer fires on the scratch dir alone
-  or on any `bash <path>.sh` that no allowlist entry covers, which is a much wider
-  net and would collide with legitimate one-off tool invocations. Interacts with
-  the iceboxed `scratch-execution-allowlist-bar`, which records that each close
-  re-derives the standing bar; a steer that names the bar in its message would
-  retire that re-derivation as a side effect.
-  **Cost while deferred:** about twenty interruptions per iteration, paid by
-  whichever session is doing measurement work, and it falls hardest on exactly
-  the sessions that probe the tree most. Non-rotting, bounded, and invisible to
-  every gate — the friction log is the only detector, and it is advisory.
-  Debt: one guard arm plus its decision-table fixture; adds no governed name.
-  Filed 2026-08-02 by close's tooling-friction triage, the ranked log read against
-  the committed allowlist rather than the local overlay.
-
 - **gate-authoring-sdk-surface** [design-pending] [roadmap: next/ecosystem] — a gate-authoring SDK.
   `.gate` as the substrate-neutral surface. **Operator-surfaced during
   `native-gate-dispatch-seam` build; filed so the framing outlives the session that
@@ -7495,6 +7460,105 @@
   Filed 2026-08-24 to the gap inbox by that same close, from its recurrence-stamp attempt;
   promoted 2026-08-24 at this iteration's scope intake, with the window measured above.
 
+- **friction-key-segment-selection-unruled** [design-pending] — the friction ranking keys the first
+  segment of a compound, so a row whose friction lives downstream is filed under a command that
+  caused none.
+  **The filing bullet's premise FELL at the drain, and the corrected one is narrower.** The bullet
+  claimed `scan-prompts.sh` splits compounds for the allowlist filter and not for the key — an
+  internal inconsistency. `pattern_of` DOES split: it reads
+  `guard_split_compound "$skel" | head -1`, and taking segment 1 is a deliberate rule rather than
+  an oversight. guard-kit/SPEC.md §scan-prompts states why: pulling a redirect from anywhere in the
+  line would key `mkdir -p .tmp && cat > x` as `mkdir >` and attribute a write to a command that
+  performs none. The residual is therefore not "split the line" but **which** segment to key.
+  **The SPEC already names it open**, in that same paragraph: "*Which* segment should be keyed when
+  the friction-bearing one is not the first is a separate axis — which segment, not which shape —
+  and is not settled here." This entry is the queue's carrier for that sentence.
+  **Re-measured at the drain, and it bites harder than when filed.** On the live 438-line log 5
+  rows key under `mkdir`, and **4 of 5** are `mkdir -p .tmp && cat > .tmp/<journal>.md <<EOF` — the
+  friction is the journal write, the key names the directory create. The filing measurement was 2
+  of 3.
+  **Why `[design-pending]`:** the candidate rules are not obviously ordered. Keying the LAST segment
+  inverts the current bias without removing it; keying the segment that actually fell through needs
+  a per-segment record the log does not carry; emitting one row per segment changes the ranking's
+  unit and steps the KPI numerator the way the write-shape axis already did once. Each is a
+  different answer to "what is a prompting call", which is the ranking's definitional question and
+  not a tuning knob.
+  **DISTINCT from `prompt-ranking-command-word-shape-blind`**, landed this iteration: that unit's
+  axis is which SHAPE a segment has and this one's is which SEGMENT is read; a shape-aware key over
+  the wrong segment is still wrong. Adds it no recurrence date and re-files none of it.
+  **Cost while deferred:** bounded and self-limiting — it mis-files only compound rows, and it
+  mis-files them onto `mkdir`, a low row nobody triages, so the effect is an under-count on the
+  write class rather than a wrong steer. It grows with the journal-writing discipline the method
+  mandates, which is what makes it worth carrying rather than iceboxing.
+  Filed 2026-08-24 to the gap inbox by spec; drained 2026-08-24 at this iteration's close, which
+  re-read `pattern_of` at HEAD, found the filing premise superseded by work landed after it, and
+  re-measured the residual.
+
+- **file-authoring-act-ungoverned** [design-pending] — writing a file has no steer, no grant and no
+  owner, so authoring one costs an out-of-band permission decision every time.
+  **It is the largest single class in the ranking, measured at the drain.** On the live 438-line
+  friction log `cat >>` is 36 and `cat >` is 5 — **41 of 185** prompting calls, the top two rows by
+  a wide margin. The filing bullet measured the pre-landing form of the same thing (19 of 19
+  `cat`-led lines); the write-shape axis landed this iteration is what makes the class legible as a
+  class rather than an argument about one.
+  **What the mandated alternatives do NOT cover, which is the whole gap.**
+  `guard-kit/bin/scratch-run.sh` governs EXECUTING a scratch script and `git commit -F` governs
+  CONSUMING a message file. Both act on a file that already exists. Nothing governs bringing one
+  into being, and the sessions paying hardest are the ones the method requires to write most:
+  resume journals, scratch scripts, commit messages.
+  **This is the disposition half of a two-half finding whose instrument half landed.**
+  `prompt-ranking-command-word-shape-blind` made the row READ correctly and deliberately left the
+  act ungoverned; guard-kit/SPEC.md §scan-prompts carries the instrument half and says nothing about
+  governing the act, so without this entry that half has no home at all. Adds that unit no
+  recurrence date and re-files none of it.
+  **Why `[design-pending]`, and one of its three shapes is not a stage session's to take.** A
+  committed permission grant is a settings edit and therefore **operator-class** under
+  TRAJECTORY.md §The closed rulings (2026-08-22) — this entry files it and does not land it. A
+  stated habit is not a mechanism. A guard steer onto the Write tool is buildable and is the only
+  self-served shape, but it is a wide behavioural change with a named collision: it must not fire on
+  the `>>`-under-scratch shape rule 17 already auto-allows, which is the shape the mandated
+  resume-journal write itself uses.
+  **Cost while deferred:** one out-of-band decision per authored file, paid by the sessions doing
+  the most durable recording, and invisible to every gate — the friction log is advisory, so nothing
+  reds however far the class grows.
+  Filed 2026-08-24 to the gap inbox by spec, as the surviving half of a split its sibling recorded;
+  drained 2026-08-24 at this close, which confirmed the act half is recorded nowhere at HEAD and
+  re-measured the class against the live log.
+
+- **expansion-rule-backtick-blind** [design-pending] — guard rule 6 blocks the modern
+  command-substitution spelling and passes the archaic one, so a session that meets the block learns
+  the spelling rather than the rule.
+  **Probed live at the drain through the consumer hook, not read off the regex.** The match at
+  `guard-kit/lib/guard.sh:352` has four alternatives — `${`, `$(`, `<(`, `$IDENT` — and no backtick.
+  A crafted PreToolUse payload spelling a command substitution with `$(…)` exits 2 with rule 6's
+  message; the IDENTICAL command spelled with backticks exits 0 and falls through.
+  **Under-coverage rather than style, on the rule's own stated grounds.** Rule 6 exists because the
+  harness's allowlist matcher refuses every expansion, and the matcher refuses a backtick
+  substitution exactly as it refuses `$(…)`. So the fall-through costs the out-of-band decision the
+  rule exists to pre-empt, while telling the session nothing.
+  **Why `[design-pending]` rather than a one-line regex edit — the entry's real content.**
+  Rule 22 is BUILT ON rule 6 not reaching backticks. guard-kit/SPEC.md §The generic ruleset rules
+  that rule 22 declines on every expansion because rule 6 blocks those shapes already, but
+  deliberately does NOT decline on a backtick "since it is the one body-source spelling rule 6 does
+  not reach and declining there would ship the hole the rule exists to close". Closing rule 6's hole
+  makes rule 22's backtick arm unreachable by dispatch order and stales three SPEC paragraphs that
+  argue from the current split. The unit is that re-argument, not the alternative.
+  **The mechanical half is small and known:** one alternative in the regex, a firing and a
+  non-firing case in `guard-kit/guard-tests/cases.tsv`, no message change. One interaction to watch:
+  a backtick is not a matcher glyph like the one rule 7 handles, and `guard_skeleton`'s `sq`/`hdq`
+  modes already strip the spans where a literal backtick could sit innocently.
+  **DISTINCT from every unit landed this iteration and it re-files none of them.** It was found
+  while probing `scratch-execution-control-is-bash-only`'s shape set, and that unit's rule covers
+  the substitution shape under its own body-source predicate in BOTH spellings — so this is about
+  rule 6's coverage of every OTHER command a backtick substitution can appear in. Adds no recurrence
+  date to anything.
+  **Cost while deferred:** one silent permission prompt per backtick substitution, plus the teaching
+  effect, which is the worse half — the guard's whole contract is that meeting a block teaches a
+  rule, and here it teaches a workaround.
+  Filed 2026-08-24 to the gap inbox by spec, after build deliberately left it alone for the blast
+  radius above; drained 2026-08-24 at this iteration's close, which re-probed both spellings at HEAD
+  and confirmed the rule-22 interaction in the SPEC.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
@@ -7556,6 +7620,7 @@
 - turn-end-chokepoint-and-wait-primitive
 - scratch-execution-control-is-bash-only
 - prompt-ranking-command-word-shape-blind
+- scratch-run-steer-rule
 
 ## Lessons Learned
 
