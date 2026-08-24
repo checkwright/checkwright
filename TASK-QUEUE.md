@@ -3416,6 +3416,15 @@
 - **absorbed-duplicate-disposition** [design-pending] — the queue has **no third state between
   live and done** for a slug merged away as a duplicate, so an absorbed entry is counted as a
   shipped deliverable.
+  recurrence: absorbed-duplicate-disposition 2026-08-24
+  **FIRST RECURRENCE 2026-08-24, by a SECOND ROUTE into the class the body does not name.**
+  `install-step-relocation` reached `## Done` at this iteration's scope, on an operator ruling,
+  **retired as mooted** — its work became unnecessary rather than being merged into a sibling. It
+  shipped nothing, and this close's Done clear is what hands it to `kpi-task-split` as a delivered
+  unit. So the class is not "absorbed duplicate" but *any* slug that reaches Done having shipped
+  nothing, and mooted-by-supersession is a route in that neither the lead line nor the `Distinct
+  from the icebox tier` paragraph reaches. That widening is the finding; the missing third state
+  is unchanged.
   `check-task-conservation` diffs the live slug set and its own help sanctions moving a renamed
   slug to Done, so an absorbed duplicate has nowhere else to go. But Done means completed:
   `stage-economics-log-multi-session-undercount` shipped nothing and its content survives under
@@ -5882,6 +5891,14 @@
 
 - **deferred-entry-defer-date-unasserted** [design-pending] — a deferred entry whose provenance
   date is malformed reads as **undated**, and no gate reds on it.
+  recurrence: deferred-entry-defer-date-unasserted 2026-08-24
+  **FIRST RECURRENCE 2026-08-24, in a SHAPE no prior instance covers: the spelling was CANONICAL
+  and a LINE WRAP broke it.** At this close a new deferred entry ended a body line on the word
+  `Filed` with `2026-08-24` beginning the next, and the arm listed it `(undated)`. Probed the same
+  way this entry's founding measurement was: moving the marker and the date onto one line dropped
+  the row from the worklist on re-measure. The reading that widens the class — the parse is
+  LINE-SCOPED, so the defect is reachable by ordinary reflow and not only by careless spelling,
+  which means any session that rewraps an entry can silently create one.
   **PROBED both ways at the 2026-08-18 close, on entries that close itself wrote.** Two of its
   seven new deferred entries spelled the date `filed 2026-08-18 by close` (lowercase, mid-line)
   and `Filed at build 2026-08-18` (a word between the marker and the date). Both were listed by
@@ -7720,8 +7737,8 @@
   surface is widened should say so.
   **Cost while deferred:** low and self-correcting — one round-trip per occurrence, and the fix
   is a rephrase — but it is a gate steering authors off a true sentence, and a rephrase leaves
-  no trace, so the occurrence count is unmeasurable and the cost cannot rise into view. Filed
-  2026-08-24 to the gap inbox by spec immediately after the refusal it describes; drained and
+  no trace, so the occurrence count is unmeasurable and the cost cannot rise into view.
+  Filed 2026-08-24 to the gap inbox by spec immediately after the refusal it describes; drained and
   promoted 2026-08-24 at close, which reproduced the red against a probe corpus before
   dispositioning.
 
@@ -7865,10 +7882,6 @@
 - **amendment-roster-omission-detection** [design-pending] — Only a grep catches a short roster.
 
 ## Done
-
-- install-step-relocation
-- gen-pre-commit-tree-declaration-absent
-- agent-worktree-reclamation-unenforced
 
 ## Lessons Learned
 
