@@ -3936,25 +3936,27 @@
 - **agent-worktree-reclamation-unenforced** [design-pending] — the documented auto-clean for an
   unchanged read-only agent worktree does not fire, and nothing sweeps the residue.
   recurrence: agent-worktree-reclamation-unenforced 2026-08-19 2026-08-22 2026-08-24
-  **Three firings, and what they jointly SETTLE rather than re-attest.** Each was found at a
-  boundary by the session that stamped it, each a LOCKED worktree at a stale stamp with an EMPTY
-  `git status --porcelain` inside — `agent-a00982cef8c0c227d` (2026-08-19, at an align stamp two
-  iterations old), `agent-af31cb92f3c50b68e` at `5aac0757` beside five survivors at four stale
-  revisions (2026-08-22, HELD for want of a surface with that iteration's ruled spine), and
-  `agent-a657c09f453097842` at `5a4e83d4` (2026-08-24). So the documented precondition is met and
-  the reclaim does not fire: probed three times, no longer open. Each residue was reaped by hand,
-  which is the workaround this entry exists to replace and not a discharge of it.
-  **Two properties are settled with it.** (i) **Reaping leaves a branch ref** — `worktree unlock`
-  then `worktree remove` clears the directory and leaves `worktree-agent-<id>` standing, deleted
-  separately with `git branch -d`; confirmed again on the 2026-08-24 instance, so a reclaim that
-  only removes worktrees still accretes refs. (ii) **The failure is intermittent, not systematic**
-  — sessions that dispatched read-only sweeps after reaping had BOTH auto-clean whole, directory
-  and ref, at two separate firings. The harness handles the clean exit; a reclaim need cover only
-  the abnormal one.
-  **The hypothesis a fixing session should falsify first**, unchanged and now three-times
+  **FOUR firings, and what they jointly SETTLE rather than re-attest.** Every one is the identical
+  shape — a LOCKED worktree at a stale stamp with an EMPTY `git status --porcelain` inside, on a
+  read-only sweep that returned normally — so the documented precondition is met and the reclaim
+  does not fire: probed four times, no longer open. Each was reaped by hand, the workaround this
+  entry exists to replace rather than a discharge of it.
+  **Two properties settle with it.** (i) **Reaping leaves a branch ref** — `worktree remove` clears
+  the directory and leaves `worktree-agent-<id>` standing, needing a separate `git branch -d`;
+  confirmed on all four, so a reclaim that only removes worktrees still accretes refs.
+  (ii) **The failure is intermittent, not systematic** — later read-only dispatches auto-cleaned
+  whole, directory and ref, twice. The harness handles the clean exit; a reclaim covers the other.
+  **The FOURTH (2026-08-24) is the first found IN-SESSION by the DISPATCHING session** rather than
+  at a boundary by a later one, and that MOVES one deliverable's cost: the close-stage reclaim is
+  costed below as "cheap, late, and misses long-running sessions", and here it would NOT have
+  missed — the residue was visible to the dispatching session's own runtime-artifact check while
+  that session was still live. It does not falsify the hypothesis below, the parent being alive at
+  the observation. **No `recurrence:` date joins** — the line already carries 2026-08-24 from the
+  third firing and the declaration is idempotent per (slug, date).
+  **The hypothesis a fixing session should falsify first**, unchanged and now four-times
   consistent: reclamation is tied to the *dispatching* session's lifetime rather than the child's,
   so a session that ends abnormally — or ends while a child's directory is still held — strands
-  it. It is cheap to test: dispatch, kill the parent, look.
+  it. It is cheap to test and STILL UNRUN: dispatch, kill the parent, look.
   **DISTINCT from `readonly-dispatch-isolation-unbuyable`**, deliberately: that entry is about
   which revision a child *starts* from, this is about worktrees never being *reclaimed* after the
   child ends. Neither implies the other and fixing either leaves the other standing.
@@ -3979,9 +3981,8 @@
   **Cost while deferred:** grows monotonically with every read-only dispatch, and this repo
   pre-authorizes delegation for read-heavy audits, so the accumulation rate is the working rate.
   Filed 2026-08-12 by close, draining the gap inbox; found at scope, re-verified here. Widened
-  2026-08-19 at scope, absorbing a gap bullet the `budget-batch-and-account-identity-kind` close
-  filed as new: its "no entry names `.claude/worktrees/` at all" premise was re-verified here and
-  is **false** — this entry and `agent-worktree-boundary-disposition` both name it.
+  2026-08-19 at scope, absorbing a gap bullet whose "no entry names `.claude/worktrees/` at all"
+  premise was re-verified **false** — this entry and `agent-worktree-boundary-disposition` name it.
 
 - **dispatch-unreadable-target-fallback** [design-pending] — a dispatched sweep whose target is
   unreadable validates against the **dispatch prompt's paraphrase** and returns PASS.
@@ -5672,8 +5673,11 @@
   this entry stays its carrier meanwhile.
   **Two homes were probed and refused at build**, and the refusals are not rejections of the
   options — recorded that way so a later reader does not mistake one for the other. A live queue
-  entry was blocked because `turn-end-chokepoint-and-wait-primitive` measures 0 lines of
-  headroom. TRAJECTORY.md is refused by CLAUDE.md's own scoping sentence, which admits
+  entry was blocked at that build because the candidate host stood at zero lines of headroom under
+  `check-queue-entry-budget`; **that host has since closed and left the live tree**, so the option
+  is now absent rather than full — a stronger refusal on a different ground, corrected 2026-08-24
+  at close rather than left reading as a cap problem a later reflow could solve.
+  TRAJECTORY.md is refused by CLAUDE.md's own scoping sentence, which admits
   **closed** operator rulings while this one is explicitly open — choosing it means amending
   that sentence, a governance edit rather than a move. lifecycle-kit's scope contract was
   refused as envelope-class: that was a **build session correctly declining an envelope call it
