@@ -155,6 +155,28 @@ without a consumer-side lane.
 `gate-tests/scratch-run.test.sh` gains the shebang refusal: a `.tmp` target whose
 first line names a non-bash interpreter exits 2 and is not executed. {mechanical}
 
+## The provenance seam
+
+**Kit mechanism, and the one roster is ruled kit-shippable rather than assumed
+so.** The rule, the runner's shebang refusal and the message are generic — their
+subject is guard-kit's own scratch-dir knob and guard-kit's own runner.
+`GUARD_KIT_SCRIPT_INTERPRETERS` carries universal interpreter binaries, which are
+none of the classes CLAUDE.md §The provenance seam names (term lists, coupling
+vocabularies, glossary bodies, wire-contract couplings, product constant sets),
+and it sits beside three roster knobs the kit already ships with defaults. The
+`check-graph` contrast is the discriminator worth stating: that roster is
+consumer config **because its members are private**, and this one is not,
+so the test is the content and never the shape.
+
+**A consumer stays able to override it**, which is what keeps the rot objection
+answered without publishing anything: the default is the kit's, the value is the
+consumer's, through `GUARD_KIT_CONFIG_FILE` like every other roster knob.
+
+**What deliberately does not become config: the policy.** Bash-only is a rule,
+not a setting, and a knob that turned it off would restore the honour system the
+rule replaces — the same reasoning delegation-kit's D1 gives for having no knob.
+The valve is not vendoring the rule.
+
 ## Producers and consumers
 
 **New rule — generic rule 22, scratch execution under a non-bash interpreter.**

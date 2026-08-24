@@ -142,6 +142,23 @@ redirect-bearing segment, an append-bearing segment, an fd-dup that must **not**
 produce a suffix, and a compound whose later segment carries the only redirect
 (delta 2's guard against mis-attribution).
 
+## The provenance seam
+
+**All kit mechanism, and the seam is what makes this unit safe to ship at
+all.** The key is *derived* from the logged command's own lexical shape — a
+redirect operator the segment carries — and never from any roster of command
+names. There is no term list, no vocabulary, and nothing about which commands a
+consumer runs enters the kit. That is a stronger position than the ranking's
+existing subcommand roster (`git gh cargo docker npm …`), which this amendment
+leaves untouched and does not extend: extending *that* is where a consumer's
+tooling vocabulary would start leaking into a kit literal, and the shape axis
+gets its bite without going there.
+
+**No knob is added**, because there is no value a consumer would set: the two
+operator tokens are shell grammar, not configuration. `GUARD_KIT_LOG` and the
+two settings knobs the scanner already reads keep this repo's layout as their
+defaults.
+
 ## Producers and consumers
 
 **Changed interface — the ranking key.**

@@ -290,6 +290,26 @@ dead default lived for a whole iteration under a green battery because only the
 consumer configures the reader — and this amendment adds enforcement to exactly
 that seam, so both lanes move together or the seam re-opens.
 
+## The provenance seam
+
+**Everything here ships as kit mechanism, and nothing crosses.** The refusal
+predicate, the exit-code contract, the log grammar and the message are generic:
+their whole vocabulary is `check-producer-liveness`'s exit classes, the `*.run`
+record set and the harness's own event, none of which is a consumer's private
+content.
+
+**The one consumer-owned value is unchanged and stays a knob.**
+`DELEGATION_KIT_LIVENESS_CMD` names the reader, and §The turn-end liveness probe
+(template) already rules that the template ships no default for it — a path only
+a consumer can resolve. Enforcement does not tempt that ruling: a kit-side
+default would now decide whether a tree *refuses*, which makes the existing
+no-default ruling stronger rather than negotiable.
+
+**No knob is added** (delta 4), so the config-via-env convention is satisfied by
+having nothing new to configure. The `GATE_SDK_TMP_DIR` and
+`DELEGATION_KIT_STOP_LOG` knobs the hook already reads keep this repo's layout as
+their defaults.
+
 ## Producers and consumers
 
 **New state — the refusal.**
