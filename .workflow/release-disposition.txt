@@ -2,3 +2,4 @@
 # One line per iteration at its release boundary, close-written; the line
 # grammar is lifecycle-kit/SPEC.md §templates/stages/'s, not restated here.
 
+execution-control-reach-and-turn-end-blocking release deferred:v0.26.0 — minor earned (tightened-gates surface carries check-gate-exemption-tasks; behavior changes in guard rule 22 and the SubagentStop refusal) but no cadence trigger fires: v0.25.0 is 1 day old against the 7-day floor, no decommission, no security or supply-chain fix in the batch, no operator direction; floor already stood at v0.26.0 from the prior deferral.
