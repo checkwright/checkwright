@@ -1,1 +1,25 @@
 # contract: evidence-manifest v1
+port-remainder-disposition-and-worktree-reclamation gates sha256=84cb9a9ac632e32ef70e0ec3dc82fd1b7b50cd1b5a2b7dec2b23004274a96c8b pass=106 fail=0 ignore=0 verdict=clean 2026-08-24
+port-remainder-disposition-and-worktree-reclamation gate_sdk sha256=18f97d208af9a317d22c58c12390a5c319f2cc0e9aa17cba778edc64cc5344fd pass=1 fail=0 ignore=0 verdict=clean 2026-08-24
+port-remainder-disposition-and-worktree-reclamation canon_kit sha256=9d3cf3ab0a1425a5996fd26152019ba03a3e0f5fa5ad31aa0e4a19901b8acb5a pass=1 fail=0 ignore=0 verdict=clean 2026-08-24
+port-remainder-disposition-and-worktree-reclamation context_kit sha256=65e7536ec8b920506d9defb5f2fd338be716ee72482acf2e4819ca5b3fcbe891 pass=1 fail=0 ignore=0 verdict=clean 2026-08-24
+port-remainder-disposition-and-worktree-reclamation delegation_kit sha256=ccc527d5f87226b0de67d84cc9e56417838a2295033aaf6dd1e16d699926131d pass=1 fail=0 ignore=0 verdict=clean 2026-08-24
+port-remainder-disposition-and-worktree-reclamation doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-08-24
+port-remainder-disposition-and-worktree-reclamation evidence_kit sha256=a65e3e3b8e54c0d98a440fe3a2748c31b51d8850b5c0be10d8fcf5316febd55f pass=1 fail=0 ignore=0 verdict=clean 2026-08-24
+port-remainder-disposition-and-worktree-reclamation guard_kit sha256=234e06ba5cdb4ca383be7191965292443198471675d1b3166d8c264175420ae4 pass=1 fail=0 ignore=0 verdict=clean 2026-08-24
+port-remainder-disposition-and-worktree-reclamation lifecycle_kit sha256=433242b590b783ca87eba3496f7c3dcbbe5925c14d1fb5e75df54c869e440871 pass=1 fail=0 ignore=0 verdict=clean 2026-08-24
+port-remainder-disposition-and-worktree-reclamation queue_kit sha256=bd337719dfff15f492ae94d8e8662663a8917b65edd4b3bfcfdd20f1790ba39b pass=1 fail=0 ignore=0 verdict=clean 2026-08-24
+port-remainder-disposition-and-worktree-reclamation site_kit sha256=07f7139ea31865677de58ea44b43f7c98ae6c40c8f3fe57e8975e8d65794be35 pass=1 fail=0 ignore=0 verdict=clean 2026-08-24
+port-remainder-disposition-and-worktree-reclamation scripts sha256=f302eab3cefcc19e12fac91459be10fb1b4c8f02dd63cef5ad040f4deb8dc259 pass=1 fail=0 ignore=0 verdict=clean 2026-08-24
+port-remainder-disposition-and-worktree-reclamation guard_tests sha256=bfd816948bc11b0d8b9c210f0690a29ee3df82ba3698be24fc5334e678daeafc pass=1 fail=0 ignore=0 verdict=clean 2026-08-24
+port-remainder-disposition-and-worktree-reclamation usage_tests sha256=04968d303b3e4ec54f3f8033f0e7e00d4b33ae90fd7507b48347cab56d0bc26d pass=1 fail=0 ignore=0 verdict=clean 2026-08-24
+port-remainder-disposition-and-worktree-reclamation budget_guard_tests sha256=94bbe0c41f3993e3c748a492d29e2a0d22139825b8c53bbae6a528500a8ce402 pass=1 fail=0 ignore=0 verdict=clean 2026-08-24
+port-remainder-disposition-and-worktree-reclamation dispatch_guard_tests sha256=6018943502411c07fe57162c0dae2ac37af304eccc0d0a9a6e0ec4fd733a1daf pass=1 fail=0 ignore=0 verdict=clean 2026-08-24
+port-remainder-disposition-and-worktree-reclamation trend_tests sha256=acdbfef4eab851fca00ca747245b6ac4a4f804b05989f9cd3acd014bb56ac330 pass=1 fail=0 ignore=0 verdict=clean 2026-08-24
+port-remainder-disposition-and-worktree-reclamation demo sha256=1295d54f8b317d525863c5dd5c2c45c027a6c982a3cdef99e9ebe1e8b7eb6075 pass=1 fail=0 ignore=0 verdict=clean 2026-08-24
+port-remainder-disposition-and-worktree-reclamation installer_smoke sha256=4bf781357b4b23b9c4d55852afa89b621d439f38c3354860991f43fd87d25ec5 pass=0 fail=1 ignore=0 verdict=clean 2026-08-24
+port-remainder-disposition-and-worktree-reclamation consumer_smoke sha256=13f7e273e0f160d4449b724f4831bf44365a55317a74869d36a1aec2f42cabb9 pass=1 fail=0 ignore=0 verdict=clean 2026-08-24
+port-remainder-disposition-and-worktree-reclamation upgrade sha256=4d93950e03f5b69f410d7b1627e2539634883c1130ddab3f925e57374d71611d pass=1 fail=0 ignore=0 verdict=clean 2026-08-24
+port-remainder-disposition-and-worktree-reclamation agents_md_smoke sha256=94d273c3b82b5ecdd299a668fabc66164958520763104c53c1006ea39d943c7f pass=1 fail=0 ignore=0 verdict=clean 2026-08-24
+port-remainder-disposition-and-worktree-reclamation index_tests sha256=e14e152466dc5be0296b1e20575bf3d587e1e0a127e7c63ad57671dbcaeaddb8 pass=1 fail=0 ignore=0 verdict=clean 2026-08-24
+port-remainder-disposition-and-worktree-reclamation native_crate sha256=44ef791901fae406fec24f4412e61f24f92f545e5f296766acf10ca48525ad79 pass=1 fail=0 ignore=0 verdict=clean 2026-08-24
