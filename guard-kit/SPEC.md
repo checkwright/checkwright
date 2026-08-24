@@ -1191,8 +1191,15 @@ it needs to know the bite was measured rather than assumed.
 
 `--count` emits the compact `<patterns>/<occurrences>` prompting token for a
 drift-KPI consumer (overlay-covered excluded, so the KPI reads true); an
-explicit file argument overrides the log path (test capability). Its behavior
-— the three-way split, the per-segment matching, the true count, and the
+explicit file argument overrides the log path (test capability). The two
+**compose, in either order** — the argument parse is a loop over argv, not a
+read of `$1` — and that is pinned rather than left implicit because the
+single-argument parse it replaced made `--count <path>` return a real-looking
+number for the *default* log, which is the worst failure mode an instrument has:
+silent, plausible, and reached for first by exactly the measurement session that
+cannot afford it. Its behavior
+— the three-way split, the per-segment matching, the true count, the
+argument-override in both orders, and the
 write-shape suffix's create/append/fd-dup/first-segment cases — is pinned by
 `gate-tests/scan-prompts.test.sh`. What that test pins is the split, the count
 semantics and those four cases; the key's granularity beyond them is not a

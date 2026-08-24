@@ -97,6 +97,20 @@ shape_count="$(GUARD_KIT_SETTINGS="$sb/.claude/settings.json" \
                GUARD_KIT_LOG="$shapeLOG" bash "$SCAN" --count)"
 [[ "$shape_count" == "4/4" ]] || { echo "FAIL [shape-count]: expected 4/4, got '$shape_count'"; fails=$((fails + 1)); }
 
+# The same count reached through the ARGUMENT rather than the knob, in both
+# orders. This is what the SPEC's "an explicit file argument overrides the log
+# path" claims and what a single-arg parse silently broke: it read --count and
+# then counted the DEFAULT log, so an instrument reached for exactly this way
+# returned a real-looking number for the wrong corpus. Asserted against a
+# non-default log so a regression cannot pass by coincidence.
+for order in "--count $shapeLOG" "$shapeLOG --count"; do
+    # shellcheck disable=SC2086  # deliberate word split: $order is an argv pair
+    argv_count="$(GUARD_KIT_SETTINGS="$sb/.claude/settings.json" \
+                  GUARD_KIT_SETTINGS_LOCAL="$sb/.claude/settings.local.json" \
+                  GUARD_KIT_LOG="$LOG" bash "$SCAN" $order)"
+    [[ "$argv_count" == "4/4" ]] || { echo "FAIL [count-argv:$order]: expected 4/4, got '$argv_count'"; fails=$((fails + 1)); }
+done
+
 [[ "$fails" -eq 0 ]] || { echo "scan-prompts.test: $fails assertion(s) failed"; exit 1; }
-echo "scan-prompts.test: clean (overlay-only grants stay off the headline and in the promote-or-prune section; a split-and-refused compound counts as a true prompt; the write-shape suffix splits create from append, skips an fd-dup, and never attributes a downstream write to the leading word)"
+echo "scan-prompts.test: clean (overlay-only grants stay off the headline and in the promote-or-prune section; a split-and-refused compound counts as a true prompt; the write-shape suffix splits create from append, skips an fd-dup, and never attributes a downstream write to the leading word; an explicit log argument overrides the log path alongside --count in either order)"
 exit 0

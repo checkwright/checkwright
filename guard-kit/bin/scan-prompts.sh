@@ -11,11 +11,14 @@ SETTINGS="$GUARD_KIT_SETTINGS"
 SETTINGS_LOCAL="$GUARD_KIT_SETTINGS_LOCAL"
 
 COUNT=0
-case "${1:-}" in
-    --count) COUNT=1 ;;
-    "") ;;
-    *) LOG="$1" ;;
-esac
+while [[ "$#" -gt 0 ]]; do
+    case "$1" in
+        --count) COUNT=1 ;;
+        "") ;;
+        *) LOG="$1" ;;
+    esac
+    shift
+done
 
 if [[ ! -s "$LOG" ]]; then
     [[ "$COUNT" -eq 1 ]] && { echo "0/0"; exit 0; }
