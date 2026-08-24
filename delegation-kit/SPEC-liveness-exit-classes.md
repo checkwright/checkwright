@@ -14,9 +14,10 @@ diagnosis the code itself prints.
 ### (1) Reader exit 2 splits by record count, and the split is decidable from data the hook already holds
 
 `verdict=corrupt` stops being the hook's only reading of reader exit 2: exit 2
-over a **non-empty** `*.run` set stays `corrupt` and stays a refusal, while exit
-2 over an **empty** set becomes a new verdict `unresolved` and allows.
-**{design-bearing}**
+over a **non-empty** `*.run` set stays `corrupt`, and exit 2 over an **empty**
+set becomes a new verdict `unresolved` — a **diagnostic** split, not a decision
+one. Both refuse: `unresolved` carries `decision=refuse`, exit 2, exactly as
+`corrupt` and `red` do. **{design-bearing}**
 
 The ground is not a judgment about appetite, it is a proof from the reader's own
 contract. `check-producer-liveness` in set mode derives corruption **per
@@ -35,42 +36,90 @@ session logged **fifteen** firings into its own worktree, every one
 refusals carried an empty record set. Re-derive by dispatching an isolated agent
 and reading its worktree's own copy of the log rather than citing this figure.
 
-**The record count is not the refused capped variant, and the resemblance is
-disclosed rather than left to be read back in.** §The turn-end liveness hook
-records that a capped option — "refuse only on a `verdict=red live=yes` reading
+**The record count labels the diagnosis and decides nothing — that is the
+ruled shape, not the first-drafted one.** §The turn-end liveness hook records
+that a capped option — "refuse only on a `verdict=red live=yes` reading
 carrying at least one record, stay advisory otherwise" — was offered to the
-operator and **refused**, and that section already discloses one coincidence with
-it. This is a second coincidence and it is disclosed on the same terms. It is not
-that option: the refused variant made the hook **advisory everywhere outside
-red**, and this keeps every refusal that ruling secured — `red` always refuses,
-and `corrupt` over a live record set always refuses. What stops refusing is the
-one reading where there is provably nothing to be corrupt about. That section
-also already establishes the count clause is **vacuous for `red`** (red implies a
-record by the reader's contract); it is not vacuous for exit 2, and that
-asymmetry is the whole content of this delta.
+operator and **refused**, unconditionally, with the record count deliberately
+excluded as a condition on the `corrupt` arm at that same landing. This delta
+does not reopen that exclusion: the record count chooses which **name** a
+refusing exit-2 reading gets — `corrupt` over a non-empty set, `unresolved`
+over an empty one — and it chooses nothing about whether the turn end refuses.
+Both names carry `decision=refuse`. The reader's own contract still supports
+the asymmetry that motivates the *name*: a record count is vacuous for `red`
+(red implies a record) and not vacuous for exit 2 (exit 2 can occur with
+zero) — but that asymmetry earns a diagnostic label, not a second decision
+path. See the ruling below for how this delta's first draft read that
+asymmetry as licensing the latter, and was corrected.
 
-**TRIPWIRE, set by the iteration lead 2026-08-24 and written here because the
-session it binds is the one reading this file.** *Adjacent to a refused option*
-is exactly the shape that reads as derivable when it is not. The claim above is
-that the narrowing removes **no** refusal the operator's ruling secured. If the
-audit stage — or any later session — finds that the record-count precondition
-narrows the refusal set at **even one edge**, that is reversing a recorded
-operator ruling, and it **escalates to the lead for relay**. It is not resolved
-by whoever finds it, however good the grounds and however obvious the repair:
-the strength of the finding is not a reason to skip the escalation, it is the
-reason the escalation exists. Stated as a live condition on this delta, not as
-doubt about the reading.
+**RULED 2026-08-24 by the operator, relayed through the lead at align, and
+recorded here because the deliverable this delta ships is the ruled shape, not
+the one spec first drafted.** Spec's draft mapped `unresolved` to
+`decision=allow`, arguing that `verdict=corrupt records=0` is provably not
+record corruption and that this was a *different* move from the refused
+capped variant, which made the hook advisory everywhere outside `red`. The
+iteration lead set a tripwire on exactly that reasoning at align entry —
+*adjacent to a refused option is exactly the shape that reads as derivable
+when it is not* — requiring any edge of narrowing found later to escalate
+rather than be resolved by whoever found it, however strong the grounds.
+
+**The align audit found the narrowing, independently, and it is recorded as a
+finding rather than left to be re-derived.** Checked directly against the
+shipped hook (`scripts/subagent-stop-liveness.sh`), today's `verdict=corrupt`
+maps to `decision=refuse` **unconditionally**, at every record count. Spec's
+draft `unresolved` arm would have flipped the `records=0` case to
+`decision=allow` — a real, mechanical edge of the operator's 2026-08-24
+"unconditional" ruling that would have narrowed on delivery. The operator
+ruled on that finding: **keep the three-way verdict split for its diagnostic
+value, and map `unresolved` to `decision=refuse`, so no edge of the secured
+refusal set narrows.** That is the shape landed above.
+
+**Not a reversal, demotion or re-scoping of the 2026-08-24 "unconditionally
+refuse on `red` or `corrupt`" ruling — it is that ruling holding intact
+against a delta that would have narrowed it.** Spec's technical grounds were
+sound and are unchanged by this ruling: `records=0` at exit 2 genuinely cannot
+be record corruption, given `check-producer-liveness`'s own per-record
+aggregation contract (§check-producer-liveness). The ruling did not turn on
+that being wrong. It turned on the unconditional refusal being worth more than
+the diagnostic gain of letting one provably-empty reading allow. Spec's claim
+that its draft "kept every refusal the ruling secured" was made in good faith
+on those sound grounds and was simply not what the ruling decided — recorded
+here so this does not read, on a later pass, as the amendment quietly walking
+back a claim it once made carelessly. Two competent sessions reading the same
+delta and disagreeing is exactly the case the tripwire exists for.
+
+**The cost this ruling keeps, stated honestly rather than left for a later
+session to discover and "helpfully" repair.** A worktree-isolated
+`audit-sweep` dispatch is **still refused at turn end** on a binary-absent
+reading: `verdict=unresolved` still means `decision=refuse`, so the refusal
+`turn-end-liveness-exit-two-conflation` was filed against is unchanged by this
+delta. That refusal's disposition, if any, belongs to that entry's own
+subject and is not reopened here — build must not read the still-refusing
+`unresolved` arm as an oversight this delta forgot to loosen.
 
 **Why a new verdict value rather than folding onto `unavailable`.** The three
-non-answering states now take different actions, and a name that merged two of
-them would cost the close-stage triage the distinction it was given `error` for
-in the first place:
+non-answering states carry different follow-up actions for a human, and — per
+the ruling above — two different hook decisions as well: `unresolved`
+refuses, the other two allow. A name that merged `unresolved` into
+`unavailable` would cost the close-stage triage the distinction it was given
+`error` for in the first place, and would also hide that one of the three
+refuses while the other two do not:
 
-| verdict | what happened | is it actionable |
-| --- | --- | --- |
-| `unavailable` | no reader named, or the named path is unreadable | no — this tree never configured enforcement |
-| `error` | a configured reader ran and gave an unmapped answer, or the `timeout` bound fired | yes — this tree's enforcement is broken |
-| `unresolved` | a configured, readable reader ran, exited 2, and held no record to be about | yes — and the fix is a *different* one: the reader could not run at all |
+| verdict | what happened | hook decision | is it actionable |
+| --- | --- | --- | --- |
+| `unavailable` | no reader named, or the named path is unreadable | allow | no — this tree never configured enforcement |
+| `error` | a configured reader ran and gave an unmapped answer, or the `timeout` bound fired | allow | yes — this tree's enforcement is broken |
+| `unresolved` | a configured, readable reader ran, exited 2, and held no record to be about | **refuse** | yes — and the fix is a *different* one: the reader could not run at all |
+
+**The refusal's stderr must not reuse `corrupt`'s wording for `unresolved`.**
+The hook's message branch is two-way today (`red` versus everything else that
+refuses), and folding `unresolved` into the "everything else" arm would print
+"a launch record ... does not parse" over a case where there is no record to
+parse at all — exactly the false-diagnosis shape delta 3 fixes one caller
+over, reintroduced here if the branch is not widened. The branch becomes
+three-way: `red` names a live producer, `corrupt` names a record that does not
+parse, `unresolved` names a reader that produced no reading at all — no
+record and no diagnosis of one — each keeping its own `look` remedy line.
 
 ### (2) The record glob is taken after the reader runs, not before
 
@@ -194,12 +243,15 @@ skipped.
   path this repo already sets to `scripts/producer-liveness-reader.sh`, so it is
   live in this tree the moment the script lands, not test-only.
 - *Consumer:* two, at two transitions. (a) The **hook's own decision**, in the
-  same run: `decision=allow`, exit 0, no stderr — the whole point of the delta.
-  (b) The **close-stage triage** at the close-surface drain, reading
+  same run: `decision=refuse`, exit 2, with a stderr reason distinct from
+  `corrupt`'s (the three-way message branch above) — the diagnosis changes,
+  the decision does not, per the 2026-08-24 ruling. (b) The **close-stage
+  triage** at the close-surface drain, reading
   `.workflow/subagent-stop-liveness.log` before clearing it
   (lifecycle-kit/SPEC.md §The close-surface roster), which reads it to
   distinguish a broken reader (`error`) from one that could not run at all
-  (`unresolved`) — different fixes, which is what earns the third name.
+  (`unresolved`) — different fixes, which is what earns the third name, even
+  though both now refuse identically to `corrupt` at the hook's own decision.
 - *Named reader for every field:* no field is added. `verdict` gains a value and
   keeps its reader; `records`, `live` and `decision` keep theirs unchanged. The
   grammar's field list and its order are untouched, so the space-delimited parse
@@ -229,23 +281,33 @@ the reader of those surfaces — a dispatched agent loading
 `templates/agent-execution.md` at delta 4, the close-stage triage at delta 5.
 
 **Narrowing check (canon-kit/SPEC.md §The causal-completeness check, point 5).**
-Delta 1 **narrows** the set of readings on which the hook refuses, so each
-affected reader's **red condition** is enumerated rather than its subject:
+Delta 1, as ruled, **narrows nothing** — the RULING note above is the record
+of why the first draft did and this shape does not. It is analysed anyway
+because it changes what a verdict reader observes (a new label and a new
+stderr message on an existing refusal), and the point-5 rule is about the
+argument being made rather than about the author's confidence in it:
 
 - `delegation-kit/gate-tests/subagent-stop-liveness.test.sh` — reds when a
   driven verdict arm's **exit code or `decision` column** differs from the
-  asserted one. **Not monotone**: it asserts an exact exit per arm, so
-  narrowing the refusal set turns its `corrupt` assertion red rather than
-  quietly passing. It must be updated in the same unit — the corrupt arm's stub
-  must drive a **non-empty** run dir to keep asserting exit 2, and a new
-  empty-dir case asserts `unresolved` and exit 0.
+  asserted one. **Monotone for every existing case**: the fixture's `corrupt`
+  arm already drives a **non-empty** run dir (`pid=1 run=k`, written before the
+  case loop), so its exit code and decision are untouched by this delta. A new
+  empty-dir case is still owed — it drives reader exit 2 over zero records and
+  asserts `verdict=unresolved`, `decision=refuse`, exit 2, and the three-way
+  branch's own distinct stderr wording, never the `corrupt` arm's "does not
+  parse" text.
 - `scripts/gate-tests/subagent-stop-reader.test.sh` — reds when the configured
-  reader's arm does not produce the asserted verdict, and **fails on
-  `unavailable` by name**. **Not monotone**: it holds a minimum (it requires
-  specific verdicts to appear). Its `green` and `red` arms are untouched by this
-  narrowing — both construct a run dir — but the `unavailable`-by-name assertion
-  must be widened to fail on `unresolved` too, or the seam it exists to hold
-  re-opens against the new value.
+  reader's arm does not produce the asserted verdict. **Monotone for its two
+  existing cases**: `clean` fires over a truly empty directory through the
+  real, resolvable gate and gets `verdict=green` (the gate answers zero
+  records cleanly; it never reaches exit 2), and `live` fires over one
+  live-pid record and gets `verdict=red` — neither exercises exit 2 today, so
+  neither changes under this delta. A **new** case is owed, and it is the one
+  this whole amendment is about: fire through the real reader with
+  `GATE_SDK_NATIVE_BIN=/nonexistent` (the exact probe spec ran) over an empty
+  run dir, and assert `verdict=unresolved decision=refuse` — **not**
+  `unavailable`, which would misreport a resolvable, configured reader as one
+  that was never wired at all.
 - `check-producer-liveness` — **untouched**: no delta changes the gate, its
   exit classes, or the `pid=<n> run=<key>` grammar. Reds on a live pid or a
   malformed record exactly as today.
@@ -260,11 +322,15 @@ affected reader's **red condition** is enumerated rather than its subject:
 ## Existing sections updated
 
 - `delegation-kit/SPEC.md` §The turn-end liveness hook (template) — the
-  five-row verdict table gains `unresolved`; the `corrupt` row gains its
-  record-count precondition; the "**`records=0` is not a clause**" paragraph is
-  rewritten rather than deleted, because it stays true of `red` and becomes
-  false of exit 2, and the refused-capped-variant disclosure is extended to this
-  second coincidence (deltas 1 and 2).
+  five-row verdict table gains `unresolved` as a sixth reading that refuses
+  identically to `corrupt`; the `corrupt`/`unresolved` split is stated as a
+  record-count-driven **diagnosis**, never a record-count-driven **decision**;
+  the "**`records=0` is not a clause**" paragraph is extended rather than
+  rewritten into falsity, since the 2026-08-24 ruling keeps it true of exit 2
+  as well as of `red` — record count decides no refusal anywhere in this hook,
+  before or after this delta — and the refused-capped-variant disclosure is
+  extended to this second coincidence, now resolved in the ruling's favour
+  (deltas 1 and 2).
 - `delegation-kit/SPEC.md` §The turn-end liveness hook (template), the
   per-field bullet list — the `verdict` and `verdict=error` bullets name the
   third actionable state, and the `decision` bullet takes delta 5's honest
@@ -280,7 +346,10 @@ affected reader's **red condition** is enumerated rather than its subject:
   and the lawful response to it (delta 4).
 - `guard-kit/SPEC.md` §The generic ruleset, rule 14 — the recorded divergence
   from the hook's `corrupt` disposition is restated from rule 14's side, since
-  the hook's disposition now has a precondition rule 14's does not (delta 1).
+  the hook now names a `records=0` sub-case (`unresolved`) that rule 14's
+  per-record read has no analogue for, even though neither side's decision
+  changes — the divergence is unchanged in substance, gaining one clause
+  (delta 1).
 - `evidence-kit/SPEC.md` §check-producer-liveness — the aggregation contract
   (*exit 2 wins over red wins over green*) gains the consequence delta 1 rests
   on, stated where the contract lives: the aggregation **cannot** yield exit 2
