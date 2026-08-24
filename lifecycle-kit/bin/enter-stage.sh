@@ -298,6 +298,26 @@ if [[ "$first" == 1 && -f "$LIFECYCLE_KIT_GAP_INBOX_FILE" ]]; then
     fi
 fi
 
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the iteration-boundary linked-worktree refusal, the same contract as the two above: at an iteration boundary no linked worktree should be live, an in-flight dispatch being something that must not straddle a boundary and everything else being residue. Read off 'git worktree list' and never off 'git status' — an ignored worktree leaves the status clean while it still stands, so a status-derived check reports success on exactly the state it exists to catch. The predicate is a property of the boundary rather than a path, so no knob names a residue directory: a kit default spelling one harness's layout would publish it.
+if [[ "$first" == 1 && "$LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK" == "1" ]] \
+    && git rev-parse --git-dir &>/dev/null; then
+    linked="$(git worktree list --porcelain 2>/dev/null \
+        | awk '/^worktree / { if (n++) print substr($0, 10) }')"
+    if [[ -n "$linked" ]]; then
+        wt_n="$(grep -c '' <<<"$linked")"
+        if [[ "$sim" == 1 ]]; then
+            echo "enter-stage (simulate): iteration-boundary entry to '$stage' would be refused — $wt_n linked worktree(s) still stand:" >&2
+            sim_relay "$linked" >&2
+        else
+            echo "enter-stage: iteration-boundary entry to '$stage' refused — $wt_n linked worktree(s) still stand (nothing written):" >&2
+            printf '%s\n' "$linked" >&2
+        fi
+        relay_help "reap each path with 'git worktree remove <path>' (or --force where the child left it locked) and delete the branch ref it leaves behind — 'worktree remove' clears the directory only, so a reap that stops there accretes refs this check cannot see. Then re-run enter-stage $stage."
+        relay_help "the harness's auto-clean of a read-only child's worktree is best-effort, so residue here is expected rather than evidence the child wrote; one 'git status --porcelain' inside a worktree tells a stray write from an unfired reclamation (delegation-kit/SPEC.md §The delegation model)."
+        exit 1
+    fi
+fi
+
 # spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — LIFECYCLE_KIT_BOUNDARY_REQUIRE: at the iteration boundary each member must carry a data line whose first token is the closing iteration's name, else the entry refuses (fail-closed on a missing file); a never-named (—) closing iteration has nothing to disposition and skips the check. Runs after the Lessons refusal and before the boundary truncation, the same refusal contract.
 if [[ "$first" == 1 && "$cur_iter" != "$UNNAMED" ]]; then
     for br in ${LIFECYCLE_KIT_BOUNDARY_REQUIRE[@]+"${LIFECYCLE_KIT_BOUNDARY_REQUIRE[@]}"}; do

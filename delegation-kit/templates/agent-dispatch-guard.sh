@@ -49,7 +49,7 @@ fi
 
 if [[ -n "$_adg_type" && "$_adg_isolation" != "worktree" && ${#DELEGATION_KIT_READONLY_TYPES[@]} -gt 0 ]]; then
     for _adg_ro in "${DELEGATION_KIT_READONLY_TYPES[@]}"; do
-        [[ "$_adg_type" == "$_adg_ro" ]] && guard_block "'$_adg_type' is declared a read-only dispatch type (DELEGATION_KIT_READONLY_TYPES), but this dispatch's shape grants write reach — a subagent inherits its toolset from its type whatever the prompt says, and a type carrying no Edit or Write still reaches git through its shell. Make the claim with the shape: add isolation: worktree, whose commits and index are the child's own, and which the harness auto-cleans when the child really was read-only. If this type is not in fact dispatched read-only, drop it from the roster rather than working around the rule here (delegation-kit/SPEC.md §The delegation model)."
+        [[ "$_adg_type" == "$_adg_ro" ]] && guard_block "'$_adg_type' is declared a read-only dispatch type (DELEGATION_KIT_READONLY_TYPES), but this dispatch's shape grants write reach — a subagent inherits its toolset from its type whatever the prompt says, and a type carrying no Edit or Write still reaches git through its shell. Make the claim with the shape: add isolation: worktree, whose commits and index are the child's own, and which the harness best-effort auto-cleans afterwards. If this type is not in fact dispatched read-only, drop it from the roster rather than working around the rule here (delegation-kit/SPEC.md §The delegation model)."
     done
 fi
 

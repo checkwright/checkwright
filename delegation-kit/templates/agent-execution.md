@@ -175,7 +175,14 @@ drift: do not delete it on sight, and when either rule changes here, propagate.
   it. **(2) The worktree lands inside the repo and untracked**, so an in-flight
   isolated agent reads as a dirty tree and aborts every clean-tree precondition —
   a consumer smoke, a packaging step, any commit. Gitignore the path, and reap
-  agents at the boundary with `git worktree list` rather than off `git status`.
+  agents at the boundary with `git worktree list` rather than off `git status`:
+  once ignored, the status is clean while the worktree still stands. The
+  harness's auto-clean is best-effort, so the reap is **enforced** — the
+  iteration boundary refuses to enter while any linked worktree exists
+  (lifecycle-kit/SPEC.md §bin/enter-stage.sh). Reap **both** halves: `git
+  worktree remove` clears the directory and leaves the agent's branch ref
+  standing, so delete that ref in the same motion, or the refusal clears while
+  the refs accrete unseen.
   **(3) An isolated child sees only committed state.** Untracked and gitignored
   files are in no commit, so no base ref reaches them and naming a rev does not
   help. **A sweep whose corpus includes an untracked surface is not delegable to

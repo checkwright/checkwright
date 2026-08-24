@@ -519,6 +519,12 @@ the clause's reader is a human or agent rather than a gate.
   must carry a data line naming the closing iteration before the iteration
   boundary may be crossed (§bin/enter-stage.sh); a missing member is a
   fail-closed refusal; default empty (an unconfigured consumer sees no change).
+- `LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK` — `0` or `1`; default `1`. At `1` the
+  iteration boundary refuses while any linked worktree stands
+  (§bin/enter-stage.sh). Defaulted on because a consumer that never dispatches an
+  isolated agent has an empty `git worktree list` and the check is vacuous rather
+  than absent; a consumer with a standing long-lived worktree turns it off here
+  rather than teaching the kit its paths.
 - `LIFECYCLE_KIT_ENTRY_PREFLIGHT` — per-stage `<stage>=<command>` entries run
   alongside the built-in pre-flight (§bin/enter-stage.sh); default empty.
 - `LIFECYCLE_KIT_SHIM_NGRAM` — the shared-n-gram width `check-shim-restatement`
@@ -1590,7 +1596,39 @@ never their findings, since printing a possibly-stale judgment ahead of its
 witness is the failure the witness exists to prevent. It rides the tool every
 stage already invokes as its first step, so it adds no invocation point and no
 schedule, and it lands at the one moment a stage session is guaranteed to be
-looking. The boundary entry additionally **refuses
+looking.
+
+The boundary entry also **refuses when any linked worktree still stands** (exit
+1, each path printed, nothing written — the same refusal contract as the two
+above), gated by `LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK`. The predicate is
+deliberately a property of the boundary rather than a path: **at an iteration
+boundary no linked worktree should be live**, an in-flight dispatch being
+something that must not straddle a boundary and everything else being residue.
+So it fires on every entry of `git worktree list` beyond the main checkout — a
+harness's isolated-agent tree, a leaked per-ref worktree, any future producer —
+and no knob names a residue directory, because a kit default spelling one
+harness's layout would publish it. It is read off `git worktree list` and
+**never off `git status`**: a gitignored worktree leaves the status clean while
+it still stands, so a status-derived check reports success on exactly the state
+it exists to catch. The reap stays a session act — this kit does not remove a
+directory whose liveness it cannot establish, and what was missing at every
+attested firing was not a reap but anything that *told* a session there was
+residue. `--simulate` relays the would-be refusal the way it does for lessons,
+and a tree that is not a git checkout at all skips the check rather than failing
+on it. Two bounds are stated rather than banked. The ceiling is **per
+iteration**, not per dispatch: residue still accumulates within an iteration, and
+this is a bound rather than a sweep. And the check **cannot see a dangling branch
+ref** whose worktree is already gone — `git worktree list` does not report one,
+and the branch-name pattern that would is one harness's vocabulary — so the
+refusal's guidance names the branch half explicitly and the reaping session
+removes the ref with the directory. No gate reads it: `check-stage-entry`'s three
+assertions are unchanged and the boundary-precondition family has deliberately
+never had a gate sibling (§check-stage-entry states the predecessor-map omission
+for the same class of reason). The grounds for refusing the earlier, sweep-shaped
+alternative — a reap in the dispatch guard — are delegation-kit's
+(delegation-kit/SPEC.md §The delegation model).
+
+The boundary entry additionally **refuses
 when a `LIFECYCLE_KIT_BOUNDARY_REQUIRE` member lacks a disposition line for the
 closing iteration** (exit 1, nothing written, the same refusal contract): each
 member must carry a data line whose first token is the closing iteration's name,

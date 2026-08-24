@@ -26,8 +26,8 @@ three are advisory `bin/` tools; none joins `gates.list`.
 - **`md-index.sh [paths…]`** — compact structural index for Markdown:
   heading hierarchy with line numbers, each heading followed by its
   section's first sentence, plus a per-file line count (the cost signal —
-  whether to read whole or by section). Defaults to the whole tree,
-  skipping `.git/`, `node_modules/`, and build dirs.
+  whether to read whole or by section). Defaults to the whole tree, minus
+  `CONTEXT_KIT_PRUNE_DIRS`.
 - **`md-section.sh <file> <heading>`** — prints one section, from the
   matched heading to the next heading of the same or higher level. Match
   is case-insensitive and tolerates a leading `§` (so a spec citation
@@ -37,8 +37,8 @@ three are advisory `bin/` tools; none joins `gates.list`.
 - **`pub-index.sh [paths…]`** — compact public API surface: every public
   item with kind, name, and line, sorted by kind then name, in a per-file
   block headed by a count. It is a **dispatcher over per-language
-  extractors**: the dispatcher owns traversal (the prune set is `.git`,
-  `target`, `node_modules`, `dist`, `build`), the kind-then-name sort, and
+  extractors**: the dispatcher owns traversal (the prune set is
+  `CONTEXT_KIT_PRUNE_DIRS`), the kind-then-name sort, and
   the row formatting (the index-tests goldens assert the exact shape); each
   extractor is a sourced bash file
   defining exactly two names — a `PUB_LANG_GLOBS` array (the find globs, e.g.
@@ -67,6 +67,30 @@ three are advisory `bin/` tools; none joins `gates.list`.
   could not index — not before: an unrequested plugin framework would have
   been scaffolding, and AST/tree-sitter parsing is above the tool's grep-grade
   portability altitude (shell over coreutils, Tier one).
+
+**One traversal-exclusion set, read by both walkers.** `CONTEXT_KIT_PRUNE_DIRS`
+is the kit's single exclusion array; `md-index.sh` and `pub-index.sh` each build
+their `find` exclusions from it instead of holding a private literal, and both
+resolve it by sourcing `lib/context.sh` — the kit's one owner of the
+consumer-config seam, which the meter and the footprint already source. Two
+private literals had drifted apart *and* from the tree: neither carried the
+harness's isolated-agent worktree leaf, so both walkers descended into a second
+full copy of the repository and indexed it as tree content, which for `md-index`
+is every governed markdown surface twice.
+
+The match is on the **leaf basename**, the same rule and the same reasoning
+gate-sdk/SPEC.md §lib/gate.sh fixed for its own set: pruning a parent path also
+passes but loses coverage silently, because the governed markdown under it is
+reached by explicit globs no prune touches. `.tmp` and `gate-tests` sit in
+gate-sdk's set and are **deliberately absent from this one** — this set's subject
+is the second copy of the repository, and adding either is a corpus narrowing
+with its own readers (the index-tests goldens; a session that legitimately wants
+a fixture corpus indexed). Whether the two sets should converge is an open
+question, filed rather than taken. They are **not one fact spelled twice**: this
+one omits two members and carries two (`dist`, `build`) that gate-sdk's does not,
+and a hard read of `GATE_PRUNE_DIRS` would make an advisory `bin/` tool fail in a
+tree that vendored context-kit without gate-sdk, so a consumer assigns this knob
+in its own config rather than deriving it from a gate library.
 
 ## The session-context hook (template)
 
@@ -976,6 +1000,11 @@ agreeing ones.
 - `CONTEXT_KIT_PUB_LANGS` — array naming the `pub-index` extractors to
   enable; default every shipped extractor, derived from the `lib/pub-lang/`
   roster at run time (never a maintained list).
+- `CONTEXT_KIT_PRUNE_DIRS` — array of **leaf basenames** both index walkers
+  exclude from their `find` (§Index-first reading); default the union of what the
+  two tools carried privately plus the harness worktree leaf — `.git`,
+  `node_modules`, `target`, `dist`, `build`, `worktrees`. Deliberately not
+  gate-sdk's set and deliberately not derived from it.
 - `CONTEXT_KIT_PUB_LANG_DIR` — the consumer extractor dir searched before the
   kit's `lib/pub-lang/` (a same-basename file shadows the shipped one);
   default `${GATE_SDK_GATES_DIR:-scripts}/pub-lang`.

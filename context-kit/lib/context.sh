@@ -42,6 +42,10 @@ declare -p CONTEXT_KIT_SURFACES >/dev/null 2>&1 || CONTEXT_KIT_SURFACES=("CLAUDE
 
 [[ -v CONTEXT_KIT_ENV_PROFILE_FILE ]] || CONTEXT_KIT_ENV_PROFILE_FILE="ENV.local.md"
 
+# spec: context-kit/SPEC.md §Index-first reading — the kit's one traversal-exclusion set, matched on the leaf basename; the default is the union of the two literals the index tools carried privately plus the worktrees leaf, and .tmp / gate-tests are deliberately absent
+declare -p CONTEXT_KIT_PRUNE_DIRS >/dev/null 2>&1 \
+    || CONTEXT_KIT_PRUNE_DIRS=(.git node_modules target dist build worktrees)
+
 _ck_errs=()
 [[ -n "$CONTEXT_KIT_SETTINGS_FILE" ]] || _ck_errs+=("CONTEXT_KIT_SETTINGS_FILE is empty")
 [[ -n "$CONTEXT_KIT_SETTINGS_PINS" ]] || _ck_errs+=("CONTEXT_KIT_SETTINGS_PINS is empty")

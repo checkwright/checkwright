@@ -368,13 +368,58 @@ template's **A read-only claim is made by isolation, not by sentence** rule
 states the disposition and carries none of its grounds, which are these. "It has
 no Edit tool" is not the safety property it reads as: every agent type available
 for audit-shaped work carries write tools, or at least a shell that reaches
-`git`, so a toolset is never narrowed by the brief describing it. And the
-isolation is not purely a cost — the harness auto-cleans a worktree left
-unchanged, so the worktree survives **iff** the agent was not in fact read-only,
-which makes one mechanism both the confinement and its own detector. Gitignoring
-the worktree path trades that free `git status` signal away, which is why the
-rule's second cost sends the parent to an explicit `git worktree list` at the
-reaping boundary instead.
+`git`, so a toolset is never narrowed by the brief describing it.
+
+**Confinement is the whole of it, and the "its own detector" claim is retired.**
+The isolation was once credited with a second purpose: the harness auto-cleans a
+worktree left unchanged, so a surviving worktree was read as proof the agent had
+written, making one mechanism both the confinement and its own detector. That
+biconditional is false in the direction that matters. Auto-clean is
+**best-effort**: every attested surviving worktree in this repo's record was
+locked at a stale stamp with an *empty* `git status --porcelain` inside, so
+survival does not imply a write. A detector whose positive is unsound is worse
+than no detector, because it trains its reader to investigate nothing — the
+reader who finds a surviving worktree and infers a stray write hunts a change
+that is not there, and stops hunting the third time. What replaces it is a weaker
+true statement and no new mechanism: a surviving worktree means *either* the
+child wrote *or* the reclamation did not fire, and telling the two apart is one
+`git status --porcelain` inside it. Isolation's case is untouched and never
+needed the detector — the template's **A read-only claim is made by isolation,
+not by sentence** rule rests on write confinement, which is a property of the
+mechanism rather than an observation about its cleanup. Gitignoring the worktree
+path trades the free `git status` signal away, which is why the rule's second
+cost sends the parent to an explicit `git worktree list` at the reaping boundary
+instead — a reap now *enforced* there, since the iteration boundary refuses
+outright on any linked worktree (lifecycle-kit/SPEC.md §bin/enter-stage.sh).
+
+**And this is the same failure as the `worktree.baseRef` one below, met from the
+other side.** That paragraph rules that repeated confirmation of a behavior is
+not evidence about its mutability, after a false universal reached shipped
+doctrine on attestations taken under one default. Here it was repeated
+*successful* auto-cleans that confirmed the detector until they did not, each
+success making the mechanism feel more settled and so suppressing the probe that
+would have falsified it. The two corrections are filed one paragraph apart so a
+reader meets the general lesson once with two instances, rather than twice as two
+unrelated repairs.
+
+**A dispatch-time sweep in the guard is refused, and recorded here so the
+earlier-is-better instinct meets the ruling rather than the silence.** The
+obvious earlier fix for accumulating residue is to have the dispatch guard reap
+it on the way past. It is ruled out on two grounds. *A verdict surface may not
+own lifecycle*: the guard's contract is to **decide** — allow or block a dispatch
+— and a guard that removes directories and deletes refs en route to a verdict has
+become a lifecycle owner whose failures are invisible at the only place anyone
+looks, which is the verdict. *And the timing is wrong in the one direction that
+cannot be recovered*: a dispatch-time sweep runs while sibling dispatches are in
+flight, so its predicate would have to establish that a worktree belongs to no
+live child — which the attested residue makes impossible from the outside, being
+locked, stale-stamped and clean, exactly the signature a live child's worktree
+carries too. Lock is not a liveness signal here, and a sweep that guesses wrong
+destroys a running sibling's checkout. The iteration-boundary refusal has the
+opposite property on both counts: it takes no destructive action at all, and it
+runs at the one moment whose whole definition is that the previous iteration's
+work is finished. The guard's contract, its assertions and its source are
+therefore unchanged by this ruling.
 
 **`worktree.baseRef` is vendor configuration, and choosing it is the consumer's
 job.** The template's **Isolation charges three harness costs, and paying them

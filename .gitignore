@@ -27,8 +27,11 @@ scripts/queue-config.local.sh
 # per-user permission grants stay local; the stage skills in commands/ are tracked
 .claude/settings.local.json*
 # harness-managed worktrees for isolated agents — in-repo, untracked and
-# auto-cleaned, so an in-flight agent would otherwise dirty the tree and abort
-# every clean-tree precondition (delegation-kit/templates/agent-execution.md)
+# best-effort auto-cleaned, so an in-flight agent would otherwise dirty the tree
+# and abort every clean-tree precondition
+# (delegation-kit/templates/agent-execution.md). Residue the auto-clean did not
+# reap is caught at the iteration boundary, not here: an ignored worktree leaves
+# the status clean while it still stands (lifecycle-kit/SPEC.md §bin/enter-stage.sh)
 .claude/worktrees/
 # guard-kit per-iteration scratch log (cleared at close-stage triage)
 .workflow/prompt-friction.log

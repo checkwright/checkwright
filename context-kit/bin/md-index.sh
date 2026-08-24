@@ -4,7 +4,16 @@
 
 set -euo pipefail
 
+KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# shellcheck source=../lib/context.sh
+source "$KIT/lib/context.sh"
+
 REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+
+# spec: context-kit/SPEC.md §Index-first reading — the walk's exclusion source is CONTEXT_KIT_PRUNE_DIRS, matched on the leaf basename: pruning a parent path also passes but loses coverage silently, because governed markdown under it is reached by explicit globs no prune touches
+PRUNE=()
+for _mi_d in "${CONTEXT_KIT_PRUNE_DIRS[@]}"; do PRUNE+=(-not -path "*/$_mi_d/*"); done
+unset _mi_d
 
 TARGETS=("${@}")
 if [[ ${#TARGETS[@]} -eq 0 ]]; then
@@ -69,11 +78,7 @@ while IFS= read -r -d '' file; do
         echo ""
         FOUND=1
     fi
-done < <(find "${TARGETS[@]}" -name "*.md" \
-    -not -path "*/target/*" \
-    -not -path "*/.git/*" \
-    -not -path "*/node_modules/*" \
-    -print0 | sort -z)
+done < <(find "${TARGETS[@]}" -name "*.md" "${PRUNE[@]}" -print0 | sort -z)
 
 if [[ "$FOUND" -eq 0 ]]; then
     echo "No Markdown files found in ${TARGETS[*]}"

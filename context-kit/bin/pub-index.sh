@@ -6,22 +6,8 @@ set -uo pipefail
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 
-_ck_cfg="${CONTEXT_KIT_CONFIG_FILE:-}"
-if [[ -n "$_ck_cfg" ]]; then
-    [[ -f "$_ck_cfg" ]] || {
-        echo "context-kit: CONTEXT_KIT_CONFIG_FILE not found: $_ck_cfg" >&2
-        exit 2
-    }
-    # shellcheck source=/dev/null  # consumer config path is resolved at runtime
-    source "$_ck_cfg"
-else
-    _ck_cfg="${GATE_SDK_GATES_DIR:-scripts}/context-config.sh"
-    if [[ -f "$_ck_cfg" ]]; then
-        # shellcheck source=/dev/null  # consumer config path is resolved at runtime
-        source "$_ck_cfg"
-    fi
-fi
-unset _ck_cfg
+# shellcheck source=../lib/context.sh
+source "$KIT/lib/context.sh"
 
 TARGETS=("$@")
 [[ ${#TARGETS[@]} -eq 0 ]] && TARGETS=("$REPO_ROOT")
@@ -47,7 +33,10 @@ else
     fi
 fi
 
-PRUNE=(-not -path '*/.git/*' -not -path '*/target/*' -not -path '*/node_modules/*' -not -path '*/dist/*' -not -path '*/build/*')
+# spec: context-kit/SPEC.md §Index-first reading — the walk's exclusion source is CONTEXT_KIT_PRUNE_DIRS, matched on the leaf basename; the dispatcher and md-index.sh read the one array rather than each holding a literal
+PRUNE=()
+for _pi_d in "${CONTEXT_KIT_PRUNE_DIRS[@]}"; do PRUNE+=(-not -path "*/$_pi_d/*"); done
+unset _pi_d
 
 emit_lang() {   # $1 = extractor path; prints per-file blocks for this language
     (

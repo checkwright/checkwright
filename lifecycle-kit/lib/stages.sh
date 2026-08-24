@@ -67,6 +67,8 @@ declare -p LIFECYCLE_KIT_BOUNDARY_REQUIRE &>/dev/null || LIFECYCLE_KIT_BOUNDARY_
 
 declare -p LIFECYCLE_KIT_BOUNDARY_PRESERVE &>/dev/null || LIFECYCLE_KIT_BOUNDARY_PRESERVE=()
 
+[[ -v LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK ]] || LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK=1
+
 declare -p LIFECYCLE_KIT_ENTRY_PREFLIGHT &>/dev/null || LIFECYCLE_KIT_ENTRY_PREFLIGHT=()
 
 lifecycle_header() {
@@ -186,6 +188,8 @@ for _lc_pf in ${LIFECYCLE_KIT_ENTRY_PREFLIGHT[@]+"${LIFECYCLE_KIT_ENTRY_PREFLIGH
         _lc_errs+=("LIFECYCLE_KIT_ENTRY_PREFLIGHT stage key '${_lc_pf%%=*}' is not in LIFECYCLE_KIT_STAGES")
     fi
 done
+[[ "$LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK" == "0" || "$LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK" == "1" ]] \
+    || _lc_errs+=("LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK must be 0|1 (got '$LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK')")
 if [[ ${#_lc_errs[@]} -gt 0 ]]; then
     printf 'lifecycle-kit: malformed stage-machine config — the gates cannot run:\n' >&2
     printf '  %s\n' "${_lc_errs[@]}" >&2
