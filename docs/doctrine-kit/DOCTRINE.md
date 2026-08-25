@@ -235,8 +235,12 @@ link — an application of the load-trigger residency rule to the doctrine itsel
    three ways: the operator rules, never the session; the fix is minimal and
    ships with its test and its owner-doc correction in the same commit, so the
    hotfix is not a second content tier waiting for the iteration to catch up;
-   and the queue entry records the ruling and closes on it, so the drain sees a
-   disposition and not a bypass. A session that sees an impacting failure
+   and the queue entry is **deleted in that commit, never moved to the done
+   section** — the ruling and the entry's slug go in the commit message, which
+   is the disposition. The done section is the closing iteration's ledger, and
+   a hotfix belongs to no iteration: a row left there is claimed by the next
+   close as its own delivery and can red the next boundary entry. A session
+   that sees an impacting failure
    *proposes* the hotfix with its cost against the iteration's, and files it
    if the operator does not rule — the default is still file.
    *Under agent work:* an eager context reads a raised want as an instruction to

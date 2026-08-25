@@ -7883,6 +7883,5 @@
 
 ## Done
 
-- isolated-dispatch-turn-end-refusal-loop
 ## Lessons Learned
 
