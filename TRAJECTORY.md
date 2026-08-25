@@ -266,8 +266,9 @@ contract's and `check-gate-binary-fresh`'s to catch, and a wrapper that spawns c
 a renderer moves the dependency floor not at all. Every shell gate ported, and the registry oracle
 reads none owed over the battery it walks.
 **What "port complete" means is ruled with it**: the battery runs from the hook to the binary with
-no bash in between, the install bootstrap is the three-step shim written twice
-(`powershell-installer-surface`), and every remaining non-test `.sh` outside it either carries a
+no bash in between, the install bootstrap is the shim ruled by `installer/README.md` §The install
+boundary, written twice (`powershell-installer-surface`), and every remaining non-test `.sh`
+outside it either carries a
 stated `no-port` cause or is deleted. The adopter-facing
 residue is the bootstrap alone: the generated pre-commit hook shim needs no PowerShell twin, because
 git runs hooks through the `sh` Git for Windows ships, so a two-line shim invoking the binary is one
