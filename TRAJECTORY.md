@@ -344,13 +344,24 @@ it reopens none, because what a developer builds from is the artifact that is
 public already. Recorded because the question is worth asking once and expensive
 to ask twice — the two paths sound like a disclosure change and are not one.
 
-**The port's tail — ruled 2026-08-23.** The runner and the shell-gate tail landed; what
-remains is the bootstrap, **one** member, `powershell-installer-surface`, which owns the Windows
+**The port's tail — ruled 2026-08-23.** This names the **sequence** `battery-runner-port`,
+`shell-gate-tail-port`, then the bootstrap, and nothing else: the first two landed, so the
+sequence's remainder is **one** member, `powershell-installer-surface`, which owns the Windows
 half and the relocation of every conditional install step behind the invoke. Its honest size,
 measured 2026-08-24: the "resolve the platform, place the binary, invoke it" shape is roughly
 eighty lines of `installer/lib/init.sh`, and the roughly three hundred and fifty beside it —
 kit-source vendoring, manifest and lock I/O, registry and queue seeding, the commit flow — are
 conditional install logic not yet behind the invoke. After the port: `companion-toolkit-profile`.
+
+**A sequence remainder of one is not a finished port, and reading it as one is the misreading
+this paragraph exists to stop — operator-ruled 2026-08-25.** The completion predicate is the one
+§The closed rulings names, `port-blockers.sh --tree`'s owed count reaching zero, and it stands
+over the whole tracked shell tree rather than over this sequence. Both readings are correct and
+neither absorbs the other: the sequence is what is ordered next, the owed count is what says
+*done*. No figure is carried here, because a count restated is a count that ages — run the
+oracle. The corpus behind that count and its decomposition are
+`native-gate-port-remaining-corpus`'s, which is why the sequence's last member being blocked
+never means the port has nothing to do.
 
 `instruction-surface-bash-focus` unblocks on a threshold rather than a date,
 per its own queue entry. Surge-channel launch stays gated behind the private

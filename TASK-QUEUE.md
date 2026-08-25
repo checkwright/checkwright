@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: platform-reach-and-target-roster
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -13,6 +13,73 @@
 ## New Features
 
 ## Technical Debt
+
+- **platform-support-ci-matrix** [roadmap: next/reliability] — a leg per platform.
+  roadmap-summary: A CI install-smoke leg per supported platform, or an honest label.
+  The per-platform half carved out of `platform-support-contract` when that entry was scoped
+  down to the floor contract for the `activation-path` iteration: a CI install-smoke leg per
+  supported platform (Linux / macOS / Windows-WSL), or an explicit experimental label where no
+  leg exists. The floor contract states *what* the toolchain floors are; this entry is the
+  mechanism that proves a platform actually meets them, and the support matrix's per-platform
+  rows are only as honest as the legs behind them. `docs/install.md` §Requirements is where the
+  claim it falsifies lives — that stock macOS ships bash 3.2 and a BSD userland and that a GNU
+  toolchain is an adopter action there, a statement nothing has ever run against a Mac.
+  **THE FORK IS RULED AT THIS SCOPE — legs, not the honest label.** The label arm was the cheap
+  answer for a tree that could not build anywhere else, and that constraint is gone; it survives
+  only for a platform a leg is deliberately not bought for.
+  **TWO FILED PREMISES ARE MEASURED FALSE, and both are what deferred this.** (i) "Three
+  workflows, none a matrix; every leg still `ubuntu-latest`; no `matrix:` key anywhere" —
+  `.github/workflows/publish.yml` carries a roster-driven build matrix with
+  `runs-on: ${{ matrix.runner }}`, a target-to-runner map beside it, per-target artifact upload,
+  and a merge-and-normalize step feeding `scripts/pack-installer.sh`'s per-target payload loop.
+  The multi-target pipeline is BUILT and exercised; what is missing is targets in the roster, not
+  machinery to build them. (ii) The second un-defer trigger — `native-gate-binary-port` reaching
+  distribution, at the release boundary — HAS FIRED: release `v0.25.0` publishes the gate binary
+  and its `.sha256` sidecar as Release assets. Neither correction reverses the 2026-07-26
+  demand-gate ruling; the gate fired on its own stated terms.
+  **What the demand argument still bounds, stated rather than dropped.** No macOS or WSL adopter
+  exists, so runner spend is still bought without an adopter attesting it. What outranks that is
+  the PRIORITY DIRECTIVE (TRAJECTORY.md): with `native/targets.list` at one target, relocating
+  `installer/lib/init.sh`'s unconditional remainder behind the binary invoke is unreachable under
+  criterion 5's omit-and-declare branch (gate-sdk/SPEC.md §Porting a gate to the binary
+  substrate) — the failure mode is no install at all — so this entry is what stands between the
+  port sequence and its last member.
+  Debt: CI configuration over an already-stated contract; it adds no governed name, and this unit
+  does not make a platform label a gated surface — that branch stays unbuilt.
+  Filed 2026-07-26 by scope, operator ruling at the `activation-path` unit-set escalation, split
+  from `platform-support-contract`. Promoted 2026-08-25 at scope on the operator's unit-set
+  ruling, paired with `gate-binary-target-roster-widening` on one surface.
+
+- **gate-binary-target-roster-widening** [roadmap: next/reliability] — the binary ships one
+  triple, and no queue unit carries widening it.
+  roadmap-summary: A prebuilt gate binary for every platform the project says it supports.
+  `native/targets.list` declares exactly one target triple, so the last release published one
+  binary and every adopter off that triple takes the omit-and-declare outcome. That is a
+  supported result rather than a break — but it leaves the trajectory objective naming every
+  major operating system with nothing behind it on the artifact axis.
+  **THE DESIGN FORK IS SETTLED BY THE TREE rather than by a ruling taken here.** The filed fork
+  was cross-compilation versus a matrix of runners; `.github/workflows/publish.yml` already
+  derives its build legs from this roster and runs each on its own mapped runner, so the
+  matrix-of-runners shape is landed and exercised. Widening is one roster line plus one runner-map
+  line per triple, exactly as `native/targets.list`'s own header predicts. What stays open is
+  which triples and whether each wants a native runner — inside the unit, not ahead of it.
+  **The gap is measurable rather than notional.** `installer/lib/init.sh`'s `target_of_host()`
+  already names four triples — Linux x86_64 and aarch64, Darwin x86_64 and arm64 — against a
+  one-triple roster, so three host classes the installer can name take the omit-and-declare
+  branch on every install today.
+  **Both grounds that held this entry from 2026-08-13 are answered, which is why it is pickable
+  rather than sequenced.** One was the design pick, settled above. The other was the upstream
+  trigger `native/targets.list` names — `platform-support-ci-matrix` landing a CI leg — and that
+  entry is promoted into this same unit, so the leg and the roster line land together in one
+  build rather than across two units. No blocker tag is owed: an intra-unit ordering is the
+  build's to take, and a cross-unit tag would misdescribe it.
+  **Distinct from `powershell-installer-surface`**, which covers the bash bootstrap reaching a
+  second interpreter; this entry is about which binaries the publish step produces. A target
+  joins only when a green run has produced and exercised its artifact — that roster's own bar,
+  and the reason the two entries are one unit rather than two.
+  Filed 2026-08-08 by close, draining the gap inbox; found at scope. **Tagged `next/reliability`
+  2026-08-08 by operator ruling** at the `adopter-floor-integrity` scope. Promoted 2026-08-25 at
+  scope on the operator's unit-set ruling.
 
 ## Deferred
 
@@ -1011,55 +1078,6 @@
   wasted. Bounded and non-rotting — nothing breaks, and the row now accumulates
   per-iteration baselines whether or not the experiment runs.
   Filed 2026-07-22 by close, from the same lead-side economics review.
-
-- **platform-support-ci-matrix** [design-pending] [roadmap: next/reliability] — a leg per platform.
-  roadmap-summary: A CI install-smoke leg per supported platform, or an honest label.
-  The per-platform half carved out
-  of `platform-support-contract` when that entry was scoped down to the floor
-  contract for the `activation-path` iteration: a CI install-smoke leg per
-  supported platform (Linux / macOS / Windows-WSL), or an explicit experimental
-  label where no leg exists. The floor contract states *what* the toolchain
-  floors are; this entry is the mechanism that proves a platform actually meets
-  them, and the support matrix's per-platform rows are only as honest as the
-  legs behind them.
-  **Why deferred rather than built alongside the floors:** the repo runs three
-  workflows (`.github/workflows/gates.yml`, `publish.yml`, `site-health.yml`), none a
-  matrix, so this is new runner spend on macOS and WSL images — and **no macOS
-  or WSL adopter exists** to attest the spend. Demand-gated on exactly that,
-  like the other adoption rungs.
-  **Re-verified 2026-08-02 at scope, and a second un-defer trigger named.** The
-  workflow count moved (two → three); the substance is unchanged — still zero
-  non-Linux legs, no `matrix:` key anywhere, and the adopter trigger unfired. The
-  second trigger: **`native-gate-binary-port` reaching distribution** — refined the
-  same day, because "prerequisite" first stated it too strongly. The two are
-  *different jobs* sharing only runner spend: that entry needs binary build+smoke
-  legs in `publish.yml`, this one specs install-smoke of the bash battery. So
-  neither blocks the other's start, and the port's per-platform obligation attaches
-  to its artifacts clause — the release boundary, not the first ported cohort.
-  **The un-defer trigger, carried so the reason is not re-derived:** the gap
-  that motivates the legs is now *stated* rather than contradicted —
-  `platform-support-contract` landed the floor contract, so `docs/install.md`
-  §Requirements says outright that stock macOS ships bash 3.2 and a BSD
-  userland and that a GNU toolchain is an adopter action there. That statement
-  is the whole of what the floor contract can do; nothing proves whether the
-  battery actually runs on a Mac so prepared until a leg runs there, and the
-  page's macOS support claim rests on reasoning until one does. So this entry
-  un-defers on the first
-  of: a macOS or WSL adopter appearing, or the support matrix wanting to promote
-  a platform from experimental to supported.
-  **Back-pointer 2026-08-25 (lead ruling):** promoting this also unblocks port work — with
-  `native/targets.list` at one target, relocating `installer/lib/init.sh`'s unconditional remainder
-  behind the binary invoke is unreachable (criterion 5's omit-and-declare branch; the failure mode
-  is no install at all), so this entry gates `powershell-installer-surface`'s fork 2 as well.
-  **Cost while deferred:** the support matrix's non-Linux rows rest on
-  reasoning rather than on a green run, so a macOS claim is unfalsified in both
-  directions; zero until a non-Linux adopter exists, then it becomes the
-  dominant support load, which is the same shape the parent entry recorded.
-  Bounded and non-rotting — the floor contract lands the falsifiable half.
-  Debt: CI configuration over an already-stated contract; adds no governed name
-  unless a platform label becomes a gated surface.
-  Filed 2026-07-26 by scope, operator ruling at the `activation-path` unit-set
-  escalation, split from `platform-support-contract`.
 
 - **lint-scope-hook-trigger** [design-pending] — `GATE_SDK_LINT_EXTRA_DIRS` widens
   what `check-shellcheck` scans but cannot widen when the generated hook fires
@@ -2499,13 +2517,15 @@
   or both), and whether a citation of *landed* work should be distinguishable in prose at all
   — a grammar question the SPEC left unanswered when it refused a relational vocabulary, and
   answering it the wrong way re-imports the maintained-roster anti-pattern that refusal avoided.
-  **HELD 2026-08-25 on directive priority, AS A MEMBER OF THE CITATION-LIVENESS BUNDLE** — the
-  hold is the bundle's, not this entry's. It is cluster B's report-only half, riding the
-  resolution `bin/queue-edges.sh` already performs, so separating it re-buys the cluster's
-  context for the cheapest member. The unit that eventually promotes that bundle carries this
-  entry in without re-deriving the membership, and the roster it belongs to is recorded in the
-  survey record for the question "does the citation-liveness deferred family converge on one
-  mechanism" (lifecycle-kit/SPEC.md §The survey record; re-run the witness before citing it).
+  **HELD TWICE AS A BUNDLE MEMBER — 2026-08-25 on directive priority, and again 2026-08-25
+  operator-ruled at the threshold escalation.** The hold is the citation-liveness bundle's, not
+  this entry's: it is cluster B's report-only half, riding the resolution `bin/queue-edges.sh`
+  already performs, so separating it re-buys the cluster's context for the cheapest member.
+  **FOURTH INSTANCE, self-caught: the roster pointer here was one.** It read "recorded in the
+  survey record", a surface `bin/enter-stage.sh` truncates at every iteration boundary, so it
+  resolved to nothing one boundary later — exactly as filed. Repointed to
+  `citation-liveness-family-convergence`, which carries the finding and its witness inline for
+  this reason; re-run that witness before citing it.
   **Cost while deferred:** dead citations accumulate at the rate rulings close, and each is a
   false premise sitting in a survey input at exactly the moment a scope decides what to promote.
   Filed 2026-08-06 at close, draining the gap inbox; found 2026-08-06 at scope.
@@ -2568,16 +2588,16 @@
   Which is right turns on whether the KPI is meant to be trusted at zero, a contract call.
   **Cost while deferred:** the one KPI measuring the tier contract's completeness reads best
   exactly when nobody is capturing, and no other signal contradicts it.
-  **FOUR HOLDS, none a decline of the finding, and the fourth is on a different ground.** Three
-  were 2026-08-24 across two consecutive scopes and their leads, every one on the surface
-  criterion — nothing in the promoted turn-end and worktree control set touched drift-kit's
-  capture loop — and the third was operator-ruled. **The FOURTH, 2026-08-25, is not a fourth of
-  those:** that boundary's directive was undirected, so the surface criterion did not exist to
-  hold on, and the ground is **directive priority** — the operator ruled the iteration to the
-  port's bootstrap and granted no yield. A later reader sees three surface holds and one priority
-  hold, not four of a kind. No date joins a hold — a decline is not a firing — and the log read
-  **empty** again at this boundary, the expected reading at an iteration's open.
-  **The pairing the first hold could not carry:** `kfric-obligation-residency` is this entry's
+  **FIVE HOLDS, none a decline of the finding, and they are not five of a kind.** Three were
+  2026-08-24 on the surface criterion, one of them operator-ruled; the fourth, 2026-08-25, was
+  directive priority under an undirected boundary the operator ruled to the port's bootstrap.
+  **The FIFTH, 2026-08-25, is operator-ruled on the surface criterion** — the promoted CI-legs
+  and target-roster set touches no part of drift-kit's capture loop. What makes it a ruling rather
+  than a default is that both alternatives were put up and **declined**: taking the capture-loop
+  trio now, and ruling a named future iteration for it. Neither was taken, so this entry carries
+  no forward claim on a boundary. No date joins a hold — a decline is not a firing — and the log
+  read **empty** again at this boundary, the expected reading at an iteration's open.
+  **The pairing no hold has yet carried:** `kfric-obligation-residency` is this entry's
   writer-side twin — that entry is the capture obligation never reaching the writer, this is how
   an empty log may be read once it has — and both resolve alongside
   `recurrence-obligation-residency` under delegation-kit/SPEC.md §Operative residency. A unit
@@ -3208,40 +3228,6 @@
   close on operator direction. Sibling on the same step:
   `release-drain-ordering-contradiction` covers step 4's drain/tag ordering, this its diagnosis.
 
-- **gate-binary-target-roster-widening** [design-pending] [roadmap: next/reliability] — the
-  binary ships one triple, and no queue unit carries widening it.
-  roadmap-summary: A prebuilt gate binary for every platform the project says it supports.
-  `native/targets.list` declares exactly one target triple, so the last release published one
-  binary and every adopter off that triple takes the omit-and-declare outcome. That is a
-  supported result rather than a break — but it means the trajectory objective naming every
-  major operating system has no filed unit behind it on the artifact axis.
-  **Distinct from the two entries a reader reaches for first, which is why it is separate.**
-  `powershell-installer-surface` covers the bash bootstrap reaching a second interpreter, and the
-  shell support-matrix CI legs cover the test matrix; neither is about which binaries the publish
-  step produces. The design work is also half done and unowned — `installer/README.md` already
-  records this design's named re-entry and its two candidate shapes, so what is missing is the
-  unit, not the thinking.
-  **Distinctness is not readiness, and the entry read as ready until 2026-08-13.** The paragraph
-  above records that the *jobs* are separate and omitted that one **gates** the other:
-  `native/targets.list` states the widening trigger is `platform-support-ci-matrix` landing a CI
-  leg, "after which widening is one line here plus one runner mapping" — and that entry is
-  demand-gated with both un-defer triggers unfired (re-verified at the 2026-08-13 drain: every
-  workflow leg is still `ubuntu-latest`, and no adopter or promotion is recorded anywhere). So a
-  scope session ranking off this entry alone reads "blocked on a design pick" where the truth is
-  "blocked on a design pick **and** on an unfired upstream trigger". Both surfaces were right and
-  only their union was legible; this paragraph is the union.
-  **Why `[design-pending]`:** the two candidate shapes differ in what they cost the publish
-  workflow and in whether cross-compilation or a matrix of runners carries it, and choosing
-  between them is the unit's substance rather than a detail inside it.
-  **Cost while deferred:** a published objective has no unit behind it on this axis, so the gap
-  is invisible to the roadmap projection and to anyone reading that projection as a commitment.
-  Filed 2026-08-08 by close, draining the gap inbox; found at scope. **Tagged
-  `next/reliability` 2026-08-08 by operator ruling** at the `adopter-floor-integrity` scope,
-  answering the call this entry deliberately left open: a published objective naming every
-  major operating system with no filed unit behind it on the artifact axis is exactly the gap
-  the roadmap projection exists to prevent, so the public commitment is taken deliberately.
-
-
 - **amendment-refusal-acceptance-parity** [design-pending] — an amendment's refusal rationale can
   claim an acceptance criterion asserts something that criterion does not say.
   The `--dry-run` amendment refused a gate on the stated ground that the behavioral property was
@@ -3641,17 +3627,17 @@
   each, measured rather than predicted. The same drain found a **second face** no candidate
   covered — a baseline move stales the evidence line computed against the old baseline — promoted
   as `baseline-move-stales-evidence-line`.
-  **NINE holds preceded the ruling, none a decline of the finding, every one on surface or fork
-  grounds.** The NINTH was 2026-08-24, operator-ruled at a threshold proposal against the turn-end
-  liveness set, with both the count and the operator-class nature of the fork put in front of the
-  operator rather than left implicit; the SIXTH and the later of the two 2026-08-22 holds were
-  operator-ruled too, and the rest were the lead's on the surface criterion. The series ended the
-  tenth time the entry reached the operator, when the fork was ruled instead of re-deferred: what
-  each hold bought was another approach to the authority, and the tenth approach is what the first
-  nine were for. One probed ground stays on record: the row is **not armed today**, the live
-  baselined `fail` naming a slug that still resolves — which is why the ruling could be taken with
-  nothing on fire. Count unchanged at two — **no date joined a decline, the finding not having
-  re-fired**.
+  **The nine-hold enumeration is RETIRED as spent**, the ruling having discharged what it
+  recorded: none was a decline of the finding, each bought another approach to the authority, and
+  the tenth approach is what the first nine were for. One probed ground survives it — the row is
+  **not armed today**, the live baselined `fail` naming a slug that still resolves, which is why
+  the ruling could be taken with nothing on fire.
+  **TAKEN 2026-08-25 as this iteration's second unit, by the operator's unit-set ruling.** It
+  stays in `## Deferred` because promoting a feature *is* writing its amendment
+  (canon-kit/SPEC.md §The amendment lifecycle, the bidirectional rule) and the valve is a new
+  named mechanism on lifecycle-kit's preflight — so `spec` authors and promotes it, and scope
+  stopping here is the split roster working rather than an omission. Count unchanged at two: the
+  finding did not re-fire, and being taken is not a firing.
   Filed 2026-08-10 by close, from its own blocked entry; the escape it needed is
   the evidence. Re-attested 2026-08-12 by close, again from its own blocked entry.
 
