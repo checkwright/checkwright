@@ -16,6 +16,54 @@
 
 ## Deferred
 
+- **isolated-dispatch-turn-end-refusal-loop** [design-pending] — the turn-end liveness hook's
+  `unresolved` refusal loops for the whole child budget under the one dispatch shape the
+  dispatch guard mandates for read-only work, on a SPEC premise the published contract falsifies.
+  **Operator-directed 2026-08-25 through a consult session: promote at the next scope,
+  regardless of theme** — the entry sits first in this section for that reason and not as a
+  claim on the port directive's sequence, which stands as ruled.
+  **Measured, not modelled.** At the 2026-08-25 close a read-only audit dispatched with
+  worktree isolation burned 142 tool uses and ~179k child tokens and returned no report: its
+  worktree carries no build output, so the binary-dispatched reader fails closed, the hook reads
+  `verdict=unresolved` over an empty record set, and `unresolved` refuses. A refused turn end is
+  retried and the condition is invariant, so the refusal is a loop rather than one wasted exit.
+  Three isolated dispatches at that close, three reports lost, one of them this way.
+  **The 2026-08-24 ruling is not reopened.** `unresolved` refusing, recorded verbatim at
+  delegation-kit/SPEC.md §The turn-end liveness hook and re-affirmed at align (Option 3), was
+  priced there as a known cost; what was never priced is that it loops. No edge of the secured
+  refusal set — `red`, `corrupt`, `unresolved` all unconditional — narrows under this entry.
+  **Two premises fell, probed 2026-08-25 against code.claude.com/docs/en/hooks.md.** The SPEC
+  paragraph "Loop protection reads the producer, never `stop_hook_active`" refuses that field
+  as uncontracted; the reference lists it in the SubagentStop input schema, defines it as true
+  when the harness is already continuing from a stop hook, and says to check it to avoid
+  blocking on a condition that will never resolve. And the paragraph's other ground — the loop
+  is bounded by the producer ending — is exactly what fails for `unresolved`, whose condition
+  is a missing binary and never ends. The reference's own 8-consecutive-block cap did not bound
+  the observed loop; presumably the child's tool calls between refusals reset it — observed,
+  not explained.
+  **Deliverable, rule one of three.** (1) Bound the loop and keep the refusal: correct the SPEC
+  paragraph, then read `stop_hook_active` on the `unresolved` arm ONLY — a first refusal
+  stands, a continuation already caused by a refusal allows — so the refusal is one exit rather
+  than a budget and `red`/`corrupt` stay unconditional. (2) Make the reader resolvable inside a
+  worktree: `worktree-isolated-dispatch-cannot-reach-the-main-checkout`'s `git-common-dir`
+  bridge, which dissolves this as a side effect but is the larger design-pending unit. (3) The
+  hook detects a linked worktree and allows `unresolved` there — REFUSED at filing: it narrows
+  the ruled refusal set at precisely the edge the operator ruled must not narrow. The consult
+  recommended (1), with (2) as the root fix this entry does not wait on.
+  **Why [design-pending]:** whether a once-only refusal is a refusal a session can outlast, and
+  whether the SPEC's uncontracted-field doctrine survives a field the contract now names.
+  **Cost while deferred:** one whole dispatch budget and one lost report per isolated read-only
+  agent, paid while a parent waits, on the default shape for every audit this lifecycle runs —
+  the guard and the hook push in opposite directions; plus a SPEC paragraph teaching a false
+  contract fact to every reader.
+  DISTINCT from `worktree-isolated-dispatch-cannot-reach-the-main-checkout` (the child's WRITES;
+  this is the hook refusing its EXIT) and from the inbox's
+  `worktree-isolated-agent-report-lost-to-a-failed-peer-send` (a prompt-shaping fix; no prompt
+  reaches this). Filed 2026-08-25 to the gap inbox by close as
+  `isolated-dispatch-refusal-loop-cost-measured` and by consult as
+  `liveness-hook-loop-guard-premise-fell`; both promoted here 2026-08-25 by the consult on
+  operator direction, consuming the bullets.
+
 - **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
   — the whole battery onto the binary, and the shell surface down to its residue.
   roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
