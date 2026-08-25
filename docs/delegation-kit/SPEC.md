@@ -1002,7 +1002,7 @@ The count picks the **name**, never the decision — both refuse.
 | `green` | no live producer | log, exit 0 — there is nothing to refuse |
 | `red` | a live producer under a launch record | log, **exit 2** — the whole subject |
 | `corrupt` | reader exit 2 over a non-empty record set: a record that does not parse | log, **exit 2** — see below |
-| `unresolved` | reader exit 2 over an **empty** record set: a reader that could not run at all | log, **exit 2** — see below |
+| `unresolved` | reader exit 2 over an **empty** record set: a reader that could not run at all | log, **exit 2 once** — allows when `stop_hook_active` is true; see below |
 | `unavailable` | no reading at all (no reader named or resolvable) | log, exit 0 |
 | `error` | a configured reader that ran and did not answer | log, exit 0 |
 
@@ -1058,10 +1058,27 @@ finding is recorded here and not only the disposition, because a later reader wh
 re-derives the *cannot be corruption* proof will reach the drafted conclusion
 again and needs to find the ruling rather than the argument alone.
 
-**The cost that ruling keeps is stated rather than left to be discovered.** A
-worktree-isolated dispatch is still refused at turn end on a binary-absent
-reading, because `unresolved` refuses. That is a known and costed consequence of
-the ruling, not an oversight for a later session to loosen.
+**The cost that ruling keeps is stated rather than left to be discovered — and it
+was measured, then bounded, without narrowing the ruling.** A worktree-isolated
+dispatch is still refused at turn end on a binary-absent reading, because
+`unresolved` refuses. Priced as one wasted exit when ruled, it was measured on
+2026-08-25 as a **loop**: a refused turn end is retried, the condition — a
+reader that cannot run — is invariant under anything the child does, so one
+read-only audit spent 142 tool uses and ~179k tokens refusing and its report
+was lost with them. **Hotfixed 2026-08-25 on operator ruling: `unresolved`
+refuses once.** The hook reads the payload's `stop_hook_active` — true when the
+harness is already continuing because of a stop hook — and on that firing the
+`unresolved` arm allows, logging `verdict=unresolved decision=allow`, which is
+how a triage reader tells a bounded refusal from a first one without a new
+field. `red` and `corrupt` read nothing from the field and stay unconditional:
+their conditions resolve (the producer ends; the record is deleted), so the
+loop they hold is the rule's own bound, and the field is read for the one arm
+whose condition never resolves. No edge of the 2026-08-24 refusal set narrows —
+the first refusal on every arm stands — and the refused alternative, allowing
+`unresolved` inside a linked worktree, is refused for exactly that reason. The
+root fix, a reader resolvable inside a worktree, is
+`worktree-isolated-dispatch-cannot-reach-the-main-checkout`'s and dissolves the
+arm's firing rather than bounding it.
 
 **`records=0` is not a clause, and the resemblance to the refused option is
 disclosed at both places it arises.** The refused capped variant read
@@ -1335,16 +1352,23 @@ record whose producer has exited is — in rule 14's own words — "not a workar
 it is the statement of fact becoming false and being retracted". The
 operator-class valve is the last resort, not the first.
 
-**Loop protection reads the producer, never `stop_hook_active`.** The live payload
-carries a `stop_hook_active` key — this tree's own `keys` reading found it — and
-the published hook contract does not mention the field at all. Keying the refusal
-off it would couple this hook to an **uncontracted** harness artifact, which is
-the precise ground §The delegation model gives for refusing the transcript-meta
-depth route while a contracted boolean was available. Here the contracted
-alternative is better than a boolean: the refusal's own trigger is a real-world
-condition that ends when the producer ends, so the loop is bounded by the thing
-the rule is about. A producer that never ends is bounded by the message's second
-exit.
+**Loop protection reads the producer on the arms whose condition resolves, and
+the contracted `stop_hook_active` on the one whose condition does not.** An
+earlier revision of this paragraph refused the field as an *uncontracted*
+harness artifact; probed 2026-08-25 against the published hooks reference, that
+premise was false — the field is listed in the `SubagentStop` input schema,
+defined as true when the harness is already continuing because of a stop hook,
+with the reference's own guidance to check it "to avoid blocking on a condition
+that will never resolve", and an 8-consecutive-block harness cap behind it. The
+correction is recorded rather than silently made because the refusal's *other*
+ground still holds and still decides the shape: for `red` and `corrupt` the
+refusal's trigger is a real-world condition that ends when the producer ends or
+the record is retracted, so the loop is bounded by the thing the rule is about
+and the field is not read. For `unresolved` no such bound exists — see §The
+cost that ruling keeps — so the field is read there and nowhere else. The
+harness cap did not bound the measured loop, presumably because a child's tool
+calls between refusals break the consecutive count; recorded as observed, not
+explained, so a reader does not mistake the cap for a guard this tree relies on.
 
 **The shared scratch dir is the subject, stated rather than discovered.** The
 reading is over `${GATE_SDK_TMP_DIR:-.tmp}`, which concurrent sessions in one

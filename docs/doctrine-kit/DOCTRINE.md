@@ -227,6 +227,18 @@ link — an application of the load-trigger residency rule to the doctrine itsel
    licenses no self-exemption — editing a governance surface is itself delivery
    work, so codifying or amending this doctrine is done as a scoped unit, not the
    very out-of-band edit it forbids.
+   **The one valve is the operator's hotfix ruling, and it is a ruling rather
+   than a judgment call.** An *impacting failure* — a defect that is paying a
+   measured, recurring cost on the lifecycle's own default path right now, such
+   that routing it through a whole iteration costs more than the fix — may be
+   landed in-session when the operator rules it a hotfix. The valve is bounded
+   three ways: the operator rules, never the session; the fix is minimal and
+   ships with its test and its owner-doc correction in the same commit, so the
+   hotfix is not a second content tier waiting for the iteration to catch up;
+   and the queue entry records the ruling and closes on it, so the drain sees a
+   disposition and not a bypass. A session that sees an impacting failure
+   *proposes* the hotfix with its cost against the iteration's, and files it
+   if the operator does not rule — the default is still file.
    *Under agent work:* an eager context reads a raised want as an instruction to
    act *now* and will start building it in-session, bypassing scope entirely; the
    default-to-file reflex is the one a fresh window least reliably supplies, so it
@@ -237,7 +249,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
    intake it names is scope's — the survey that bounds an iteration's units
    ([lifecycle-kit/SPEC.md](../lifecycle-kit/SPEC.md) §The state machine) — and the
    filed form rides the queue's Deferred section.
-   *Digest:* a mid-session initiative is filed as a costed Deferred entry by default, never started; work enters only through scope.
+   *Digest:* a mid-session initiative is filed as a costed Deferred entry by default, never started; work enters only through scope — or through an operator-ruled hotfix of an impacting failure, minimal and test-and-doc-complete in one commit.
 
 12. **Probe-before-assertion.** A claim about the tree, the harness, or a tool's
     behavior that one cheap command would settle is probed before it is

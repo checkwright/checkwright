@@ -93,7 +93,7 @@ an engineering-craft section behind the link:
 - **Oracle-first** — run the gate, never emulate it; a red run is the feedback channel.
 - **Spec-over-precedent** — the owner doc is ground truth; history answers what happened, never what is correct.
 - **Gap disposition** — a gap you defer is costed and filed, never flagged-and-skipped.
-- **Scope-gated intake** — a mid-session initiative is filed as a costed Deferred entry by default, never started; work enters only through scope.
+- **Scope-gated intake** — a mid-session initiative is filed as a costed Deferred entry by default, never started; work enters only through scope — or through an operator-ruled hotfix of an impacting failure, minimal and test-and-doc-complete in one commit.
 - **Probe-before-assertion** — a claim one cheap command would settle is probed before it is asserted; relaying an unverified premise is asserting it.
 <!-- doctrine-kit:end -->
 

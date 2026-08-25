@@ -91,6 +91,22 @@ if grep -qF -- "does not parse" "$tmp/reader-unresolved.err"; then
     fails=$((fails + 1))
 fi
 
+# F4 — `unresolved` refuses ONCE. The same reading on a firing whose payload carries
+#     `stop_hook_active:true` — the harness already continuing because of a stop hook — allows,
+#     because the condition (a reader that cannot run) is invariant under turn content and a
+#     second refusal is the start of a budget-spending loop. `red` and `corrupt` on the same
+#     payload still refuse: the guard bounds one arm and narrows no other.
+CONT='{"session_id":"s-1","hook_event_name":"SubagentStop","stop_hook_active":true}'
+log="$tmp/unresolved-cont.log"
+fire unresolved-continuing "$log" "$(stub reader-unresolved-c 2)" "$emptyruns" "$CONT" 0
+want unresolved-continuing "$(cat "$log")" "verdict=unresolved" "records=0" "decision=allow"
+for case_spec in "red 1 2" "corrupt 2 2"; do
+    read -r verdict code rc <<<"$case_spec"
+    log="$tmp/$verdict-cont.log"
+    fire "$verdict-continuing" "$log" "$(stub "reader-$verdict-c" "$code")" "$runs" "$CONT" "$rc"
+    want "$verdict-continuing" "$(cat "$log")" "verdict=$verdict" "decision=refuse"
+done
+
 # F3 — the record glob is taken AFTER the reader has run, and this is the assertion that holds
 #     the order: a stub that writes a record and then exits 2 must read as `corrupt` over
 #     records=1. Move the glob back above the reader and this case flips to unresolved/records=0,
@@ -137,5 +153,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "subagent-stop-liveness.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "subagent-stop-liveness.test: ok (exit 2 on red/corrupt/unresolved with a reason on stderr, 0 on green/unavailable/error with none; reader exit 2 splits by record count into corrupt and unresolved with distinct wording; the glob is taken after the reader; decision= matches the exit; stdout silent on every path; whitespace in a payload cannot split the line; one firing, one line)"
+echo "subagent-stop-liveness.test: ok (exit 2 on red/corrupt/unresolved with a reason on stderr, unresolved allowing once the harness is already continuing, 0 on green/unavailable/error with none; reader exit 2 splits by record count into corrupt and unresolved with distinct wording; the glob is taken after the reader; decision= matches the exit; stdout silent on every path; whitespace in a payload cannot split the line; one firing, one line)"
 exit 0

@@ -18,10 +18,13 @@ payload="$(cat 2>/dev/null)"
 event='-'
 session='-'
 keys='-'
+continuing=no
 if [[ -n "$payload" ]] && command -v jq >/dev/null 2>&1; then
     event="$(sanitize "$(printf '%s' "$payload" | jq -r '.hook_event_name // "-"' 2>/dev/null)")"
     session="$(sanitize "$(printf '%s' "$payload" | jq -r '.session_id // "-"' 2>/dev/null)")"
     keys="$(sanitize "$(printf '%s' "$payload" | jq -r 'keys_unsorted | join(",")' 2>/dev/null)")"
+    # spec: delegation-kit/SPEC.md §The turn-end liveness hook (template) — the contracted loop guard, read only to bound the one arm whose condition never resolves
+    [[ "$(printf '%s' "$payload" | jq -r '.stop_hook_active // false' 2>/dev/null)" == true ]] && continuing=yes
 fi
 
 verdict=unavailable
@@ -56,6 +59,8 @@ fi
 
 decision=allow
 [[ "$verdict" == red || "$verdict" == corrupt || "$verdict" == unresolved ]] && decision=refuse
+# spec: delegation-kit/SPEC.md §The turn-end liveness hook (template) — `unresolved` refuses ONCE: its condition is a reader that cannot run, which no turn content changes, so a second refusal is a loop that spends the session's whole budget; `red` and `corrupt` stay unconditional
+[[ "$verdict" == unresolved && "$continuing" == yes ]] && decision=allow
 
 ts="$(date -u +%Y-%m-%dT%H:%M:%SZ 2>/dev/null)"
 printf -v line '%s  event=%s  session=%s  live=%s  verdict=%s  records=%s  decision=%s  keys=%s' \
