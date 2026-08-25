@@ -58,6 +58,7 @@ everything else to
 
 ### next
 
+- **`linux-install-smoke-ci-leg`** *(reliability)* — The install path is proved by CI on Linux, not only on a maintainer's box.
 - **`platform-support-ci-matrix`** *(reliability)* — A CI install-smoke leg per supported platform, or an honest label.
 - **`gate-binary-target-roster-widening`** *(reliability)* — A prebuilt gate binary for every platform the project says it supports.
 - **`companion-toolkit-profile`** *(ecosystem)* — Gate a tree whose specs another toolkit's workflow wrote.

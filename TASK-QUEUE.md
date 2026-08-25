@@ -14,74 +14,99 @@
 
 ## Technical Debt
 
-- **platform-support-ci-matrix** [roadmap: next/reliability] — a leg per platform.
-  roadmap-summary: A CI install-smoke leg per supported platform, or an honest label.
-  The per-platform half carved out of `platform-support-contract` when that entry was scoped
-  down to the floor contract for the `activation-path` iteration: a CI install-smoke leg per
-  supported platform (Linux / macOS / Windows-WSL), or an explicit experimental label where no
-  leg exists. The floor contract states *what* the toolchain floors are; this entry is the
-  mechanism that proves a platform actually meets them, and the support matrix's per-platform
-  rows are only as honest as the legs behind them. `docs/install.md` §Requirements is where the
-  claim it falsifies lives — that stock macOS ships bash 3.2 and a BSD userland and that a GNU
-  toolchain is an adopter action there, a statement nothing has ever run against a Mac.
-  **THE FORK IS RULED AT THIS SCOPE — legs, not the honest label.** The label arm was the cheap
-  answer for a tree that could not build anywhere else, and that constraint is gone; it survives
-  only for a platform a leg is deliberately not bought for.
-  **TWO FILED PREMISES ARE MEASURED FALSE, and both are what deferred this.** (i) "Three
-  workflows, none a matrix; every leg still `ubuntu-latest`; no `matrix:` key anywhere" —
-  `.github/workflows/publish.yml` carries a roster-driven build matrix with
-  `runs-on: ${{ matrix.runner }}`, a target-to-runner map beside it, per-target artifact upload,
-  and a merge-and-normalize step feeding `scripts/pack-installer.sh`'s per-target payload loop.
-  The multi-target pipeline is BUILT and exercised; what is missing is targets in the roster, not
-  machinery to build them. (ii) The second un-defer trigger — `native-gate-binary-port` reaching
-  distribution, at the release boundary — HAS FIRED: release `v0.25.0` publishes the gate binary
-  and its `.sha256` sidecar as Release assets. Neither correction reverses the 2026-07-26
-  demand-gate ruling; the gate fired on its own stated terms.
-  **What the demand argument still bounds, stated rather than dropped.** No macOS or WSL adopter
-  exists, so runner spend is still bought without an adopter attesting it. What outranks that is
-  the PRIORITY DIRECTIVE (TRAJECTORY.md): with `native/targets.list` at one target, relocating
-  `installer/lib/init.sh`'s unconditional remainder behind the binary invoke is unreachable under
-  criterion 5's omit-and-declare branch (gate-sdk/SPEC.md §Porting a gate to the binary
-  substrate) — the failure mode is no install at all — so this entry is what stands between the
-  port sequence and its last member.
-  Debt: CI configuration over an already-stated contract; it adds no governed name, and this unit
-  does not make a platform label a gated surface — that branch stays unbuilt.
-  Filed 2026-07-26 by scope, operator ruling at the `activation-path` unit-set escalation, split
-  from `platform-support-contract`. Promoted 2026-08-25 at scope on the operator's unit-set
-  ruling, paired with `gate-binary-target-roster-widening` on one surface.
+- **linux-install-smoke-ci-leg** [roadmap: next/reliability] — the activation path has no CI
+  leg on any platform, including the one that has evidence.
+  roadmap-summary: The install path is proved by CI on Linux, not only on a maintainer's box.
+  Split from `platform-support-ci-matrix` 2026-08-25 by operator ruling relayed through the
+  iteration lead, which keeps its slug and its macOS half.
+  **Which side of check-queue-entry-budget's split test the parent fell on, stated on the
+  record because the test is read at the collision and not inferred later:** the
+  SPLIT-CANDIDATE side. It carried two deliverables — a Linux leg and a macOS leg — that take
+  different dispositions, and ruling the Linux one promoted leaves the macOS one entirely
+  unruled. It is not the counter-class, an entry accumulating further grounds for one
+  deliverable, so compression by answering was not the correct relief.
+  **Measured at build 2026-08-25, and this premise is the parent's corrected one.** No job in
+  `.github/workflows/` runs an install smoke on any platform: `gates.yml` is a single
+  `ubuntu-latest` job running the kramdown gem, `build-native.sh`, the battery, the derived
+  fixture suites and the guard table. Corroborated by commit 339d07f4's own message — "Nothing
+  at commit time or in CI runs the consumer smoke, which is why it went unseen."
+  **The leg may not run the smoke bare, and that is ruled rather than left open.** A clean-tree
+  local run passes every profile, the download arm, the toolchain-free arm and the jq-less arm,
+  then exits 1 at the binary-less leg on `run-gates: scripts/gates.list names no gates` — the
+  ruled failure recorded at `.workflow/validate-baseline.txt:93` against
+  `binary-less-dispatch-loop-retirement`. So the leg drives the suite through evidence-kit's
+  baseline comparator and reds on a DEVIATION from that record, never on the recorded fail
+  itself; and it states that dependency in its own text, so a reader meets a leg green against
+  a named baseline rather than green simpliciter. Lead-ruled 2026-08-25 on the hazard the build
+  session named against itself — a CI leg that greens on a known fail.
+  Debt: CI configuration over a suite that already exists; it adds no governed name.
 
-- **gate-binary-target-roster-widening** [roadmap: next/reliability] — the binary ships one
-  triple, and no queue unit carries widening it.
+## Deferred
+
+- **platform-support-ci-matrix** [design-pending] [roadmap: next/reliability] — a macOS
+  install-smoke leg, and nothing has ever run against a Mac.
+  roadmap-summary: A CI install-smoke leg per supported platform, or an honest label.
+  The per-platform half carved out of `platform-support-contract`, narrowed again 2026-08-25
+  when its Linux deliverable split off as `linux-install-smoke-ci-leg` under an operator ruling.
+  What remains is the macOS leg alone — Windows-through-WSL is Linux and resolves to the Linux
+  leg, so this entry's supported-platform set has exactly one member left.
+  **THE FORK STAYS RULED — legs, not the honest label.** The label arm survives only for a
+  platform a leg is deliberately not bought for.
+  **The cost line is rewritten from measurement rather than from the promotion's estimate.**
+  Runners are not the obstacle and never were: the repo is public, so `macos-latest` and
+  `macos-26` (arm64) and `macos-15-intel` / `macos-26-intel` (x64) are all available at no cost,
+  and `macos-13` is retired and no longer a label at all. What the leg must actually buy is a
+  GNU userland — the `macos-15-arm64` image ships bash 3.2.57 with no coreutils and no gawk,
+  while cargo, rustc, jq, node and Homebrew are present. So the leg brew-installs bash,
+  coreutils and gawk and PATH-orders them ahead of `/usr/bin`, which is precisely the adopter
+  action `docs/install.md` §Requirements documents and which this entry exists to put a run
+  behind. Measured at build 2026-08-25 against the runner-image manifests.
+  **One defect it will meet is already known, which is why a first-try green is not the
+  planning assumption.** `installer/lib/init.sh:197`'s unconditional vendoring loop uses
+  `find -printf`, a GNU findutils primary macOS does not carry, so a stock-macOS init vendors
+  zero files and still writes a manifest. Filed to the gap inbox at build 2026-08-25, undrained.
+  **Cost while deferred:** the macOS row of the support matrix stays a claim nothing has ever
+  run, and the port tail stays where it is — `installer/README.md` sequences relocating `init`'s
+  unconditional remainder behind an artifact roster covering every supported platform, and a
+  green run here is the only route to that roster.
+  Filed 2026-07-26 by scope, operator ruling at the `activation-path` unit-set escalation, split
+  from `platform-support-contract`. Promoted 2026-08-25 at scope; narrowed to the macOS half and
+  deferred the same day at build, on an operator ruling relayed through the iteration lead.
+
+- **gate-binary-target-roster-widening** [design-pending] [roadmap: next/reliability] — the
+  binary ships one triple, and no run has produced an artifact anywhere else.
   roadmap-summary: A prebuilt gate binary for every platform the project says it supports.
   `native/targets.list` declares exactly one target triple, so the last release published one
   binary and every adopter off that triple takes the omit-and-declare outcome. That is a
-  supported result rather than a break — but it leaves the trajectory objective naming every
+  supported result rather than a break, and it leaves the trajectory objective naming every
   major operating system with nothing behind it on the artifact axis.
-  **THE DESIGN FORK IS SETTLED BY THE TREE rather than by a ruling taken here.** The filed fork
-  was cross-compilation versus a matrix of runners; `.github/workflows/publish.yml` already
-  derives its build legs from this roster and runs each on its own mapped runner, so the
-  matrix-of-runners shape is landed and exercised. Widening is one roster line plus one runner-map
-  line per triple, exactly as `native/targets.list`'s own header predicts. What stays open is
-  which triples and whether each wants a native runner — inside the unit, not ahead of it.
-  **The gap is measurable rather than notional.** `installer/lib/init.sh`'s `target_of_host()`
-  already names four triples — Linux x86_64 and aarch64, Darwin x86_64 and arm64 — against a
-  one-triple roster, so three host classes the installer can name take the omit-and-declare
-  branch on every install today.
-  **Both grounds that held this entry from 2026-08-13 are answered, which is why it is pickable
-  rather than sequenced.** One was the design pick, settled above. The other was the upstream
-  trigger `native/targets.list` names — `platform-support-ci-matrix` landing a CI leg — and that
-  entry is promoted into this same unit, so the leg and the roster line land together in one
-  build rather than across two units. No blocker tag is owed: an intra-unit ordering is the
-  build's to take, and a cross-unit tag would misdescribe it.
+  **What holds this is the governing spec, not a design fork — re-read at build 2026-08-25 and
+  acted on there by widening nothing.** gate-sdk/SPEC.md §Consumer payload: a target joins only
+  when a green run has produced and exercised its artifact, not when a platform is reasoned
+  about and not when a provider merely offers a runner for it. No such run exists for any triple
+  but `x86_64-unknown-linux-gnu`, so the roster widens by zero until `platform-support-ci-matrix`
+  produces one. A leg written and never run discharges nothing.
+  **The filed design fork is settled and is no longer why this waits.** Cross-compilation versus
+  a matrix of runners: `.github/workflows/publish.yml` already derives its build legs from the
+  roster and runs each on its own mapped runner, so the matrix-of-runners shape is landed.
+  **What widening costs, corrected at build 2026-08-25 — "one roster line plus one runner
+  mapping" was the publish half alone.** Beside it sits
+  `installer/consumer-smoke/run-smoke.sh:43-44`, which stops the whole smoke through its
+  `blocked()` helper at `:17` unless the roster is exactly the running host. The two re-entries
+  are steering its pack with `GATE_SDK_NATIVE_TARGETS_FILE` or giving the step a cross-compiling
+  build, and `installer/README.md` §The consumer smoke records that neither is built.
+  **The gap is measurable.** `installer/lib/init.sh`'s `target_of_host()` names four triples —
+  Linux x86_64 and aarch64, Darwin x86_64 and arm64 — against a one-triple roster, so three host
+  classes the installer can name take the omit-and-declare branch on every install today.
   **Distinct from `powershell-installer-surface`**, which covers the bash bootstrap reaching a
-  second interpreter; this entry is about which binaries the publish step produces. A target
-  joins only when a green run has produced and exercised its artifact — that roster's own bar,
-  and the reason the two entries are one unit rather than two.
+  second interpreter; this entry is about which binaries the publish step produces.
+  **Cost while deferred:** three of the four host classes the installer can name receive no
+  battery at all, and the port tail stays sequenced behind a roster this entry is the only mover
+  of.
   Filed 2026-08-08 by close, draining the gap inbox; found at scope. **Tagged `next/reliability`
   2026-08-08 by operator ruling** at the `adopter-floor-integrity` scope. Promoted 2026-08-25 at
-  scope on the operator's unit-set ruling.
-
-## Deferred
+  scope; deferred the same day at build, paired with `platform-support-ci-matrix`, on an operator
+  ruling relayed through the iteration lead.
 
 - **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
   — the whole battery onto the binary, and the shell surface down to its residue.
