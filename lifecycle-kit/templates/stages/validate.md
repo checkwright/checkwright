@@ -11,7 +11,10 @@ proves invocation, not faithful execution), reading `<session-id>` from
 `bin/session-id.sh`
 (the newest transcript — never hand-picked), using `date +%F`. That stamp *is*
 the transition — the last stamp is the stage cursor, so nothing flips and no
-queue write is involved. Commit the stamp on its own. The tool refuses (writing
+queue write is involved. Commit the stamp on its own — unless the
+pre-flight valve admitted this entry, which rewrites the valve ledger in the
+same motion, so the two commit together (lifecycle-kit/SPEC.md
+§bin/enter-stage.sh). The tool refuses (writing
 nothing) if
 `check-stage-entry` is red — which for `validate` additionally requires the
 active queue drained before this entry (build is not done until the queue is
@@ -60,3 +63,14 @@ manifest.
 Do not declare validate complete until the baseline diff is clean: no
 baseline-pass item regressed, every held-constant red still carries a live
 blocking slug, and any recovered item has been promoted to pass.
+
+**Arm the pre-flight valve when you end on a deliberately accepted red.** A red
+you understand and that is not a regression from this iteration's diff, and that
+the closing stage rather than this one must file against, is a hand-off — not a
+stop for an operator round-trip and not a queue edit. Append one
+`<iteration> <stage> armed <reason>` line to the configured valve ledger and
+commit it with your evidence, writing in the reason what close needs: which
+suite, what the red is, and why it is accepted rather than fixed. The contract,
+its narrowings, and the fact that reaching for it twice in one iteration is the
+failure: lifecycle-kit/SPEC.md §bin/enter-stage.sh. With no ledger configured
+there is no valve, and an accepted red stops here as it always did.

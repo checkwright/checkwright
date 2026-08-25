@@ -84,6 +84,9 @@ declare -p LIFECYCLE_KIT_BOUNDARY_PRESERVE &>/dev/null || LIFECYCLE_KIT_BOUNDARY
 
 declare -p LIFECYCLE_KIT_ENTRY_PREFLIGHT &>/dev/null || LIFECYCLE_KIT_ENTRY_PREFLIGHT=()
 
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the one-shot pre-flight valve's ledger path; the default is empty because a ledger path is one consumer's workflow-directory layout and a kit literal spelling it would ship that layout to every adopter, the same seam the lock-reason pattern one knob up already takes. Empty reads as no valve, which is the unconditional refusal every consumer sees today. No shape arm here: the value is a path that need not exist (header-only is the ledger's resting state), and the ledger's own two fail-closed refusals are the writer's, asserted where the file is read rather than where the knob is resolved.
+[[ -v LIFECYCLE_KIT_PREFLIGHT_VALVE_FILE ]] || LIFECYCLE_KIT_PREFLIGHT_VALVE_FILE=''
+
 lifecycle_header() {
     grep -m1 '^## Iteration:' "$1" 2>/dev/null || true
 }
@@ -210,8 +213,9 @@ done
     || _lc_errs+=("LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE must be 0|1 (got '$LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE')")
 # spec: lifecycle-kit/SPEC.md §lib/stages.sh — a malformed lock-reason pattern is a fail-closed config refusal, never a silent everything-unclassified: bash returns 2 from [[ =~ ]] on a pattern it cannot compile (0 and 1 both meaning it compiled), and a pattern that declares no group would classify every match as pid-less
 if [[ -n "$LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE" ]]; then
-    ( [[ "" =~ $LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE ]] ) 2>/dev/null
-    _lc_re_rc=$?
+    # spec: lifecycle-kit/SPEC.md §lib/stages.sh — the status is captured through a `||` so the probe sits in a condition context: a bare subshell whose non-match returns 1 aborts every `set -e` caller sourcing this loader, which is what a probe designed to fail routinely must never do
+    _lc_re_rc=0
+    ( [[ "" =~ $LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE ]] ) 2>/dev/null || _lc_re_rc=$?
     if [[ "$_lc_re_rc" -gt 1 ]]; then
         _lc_errs+=("LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE '$LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE' is not a valid POSIX ERE")
     elif [[ "$(sed -E 's/\\./X/g' <<<"$LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE")" != *'('* ]]; then

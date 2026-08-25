@@ -164,7 +164,13 @@ condition, when to enter it at all), and the stage gates stay the independent
 verifier. The tool takes no `--force` flag, so the compliant path is the easy
 one — an operator who intends to override writes the stamp by hand, exactly
 as before the tool existed. Committing the stamp remains the skill's
-business — **never with `--no-verify`**: `enter-stage.sh` refuses to write
+business, on its own — with **one** exception, stated here rather than only
+where the valve is, because a session reads this rule at its entry step and the
+valve's contract several sections away: an entry the one-shot pre-flight valve
+admitted rewrites the valve ledger in the same motion as the stamp, so the two
+commit together and the purity assertion exempts exactly that path
+(§bin/enter-stage.sh, §check-stage-evidence). And **never with `--no-verify`**:
+`enter-stage.sh` refuses to write
 while `check-stage-entry` is red, so the hook a bypass skips is exactly the
 battery that would confirm the stamp just written. A stage entry is never the
 one-off-with-cause that a bypass is reserved for.
@@ -578,6 +584,20 @@ the clause's reader is a human or agent rather than a gate.
   declaring no capture group, is a fail-closed config refusal (§lib/stages.sh).
 - `LIFECYCLE_KIT_ENTRY_PREFLIGHT` — per-stage `<stage>=<command>` entries run
   alongside the built-in pre-flight (§bin/enter-stage.sh); default empty.
+- `LIFECYCLE_KIT_PREFLIGHT_VALVE_FILE` — the committed one-shot valve ledger
+  whose `armed` line admits a single entry past a refusing
+  `LIFECYCLE_KIT_ENTRY_PREFLIGHT` command (§bin/enter-stage.sh); **default
+  empty**, meaning no valve and a final refusal, which is the behaviour every
+  consumer has today. The default is off because a ledger path is one consumer's
+  workflow-directory layout, and a kit literal spelling it would ship that layout
+  to every adopter — the seam `LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE` already takes
+  one knob up. Which stages may be valved is likewise not a kit literal: it is
+  whatever an arming line names, bounded by the configured stage roster. A
+  consumer setting it owes the ledger two things: membership in
+  `LIFECYCLE_KIT_BOUNDARY_TRUNCATE`, which bounds "how many times did we reach
+  for the valve" at the iteration and keeps the ledger from accreting into a log
+  nobody reads, and a `close-surface:` declaration (§The close-surface roster),
+  without which a tracked ledger reaches no derived roster at all.
 - `LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN` — the resume journal's path as a function
   of the stage, carrying a `<stage>` placeholder (§The state machine); the
   default is the scratch dir's own knob followed by `/<stage>-journal.md`, so the
@@ -1509,12 +1529,27 @@ status — 2 for a pattern it could not compile, 0 and 1 both meaning it compile
 consumer will actually run against. The refusal exists because the failure it
 replaces is silent: an uncompilable pattern matches nothing and a group-less one
 captures nothing, and either would classify every worktree unclassified while
-looking configured. `LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN` takes the same
+looking configured. **The probe's status is captured in a condition context**, and
+that is a contract of this loader rather than a spelling: a probe designed to
+return non-zero on a routine non-match, run as a bare command, aborts every
+`set -e` caller that sources this file — which is `bin/install-lifecycle.sh`, so
+the observed cost of getting it wrong was a consumer with a pattern configured
+being unable to re-emit its own derived surfaces, silently and at exit 1.
+Exercised in `smoke/` with a pattern actually set, the empty default never
+reaching the branch. `LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN` takes the same
 treatment for the same reason: a pattern with no `<stage>` placeholder names one
 file for every stage, so the entry assertion would read some other session's
 journal and **pass** on it — a wrong answer, not a missing one, which is why it
 is refused rather than tolerated. `LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE` takes the
 `0|1` arm shape `LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK` already has.
+`LIFECYCLE_KIT_PREFLIGHT_VALVE_FILE` is resolved here and deliberately gains
+**no** validator arm, which is the roster's rule applied rather than an omission
+from it: its value is a path that need not exist — header-only is the valve
+ledger's resting state (§bin/enter-stage.sh) — so there is no shape a load-time
+check could refuse. The two fail-closed refusals that surface *are* the ledger's,
+and they live in the writer, where the file is actually read: a loader that
+parsed the ledger would refuse every entry on a malformed one, including entries
+that never asked whether a valve was armed.
 `lifecycle_supersede_set` has a **third
 reader**, `check-scratch-citation`, which forbids a permanent surface pointing a
 retriever at any of its members — so a consumer adding a
@@ -1862,14 +1897,21 @@ the same boundary that then consumes it. **Pre-flight,
 not enforcement:** before writing, it runs the built-in `check-stage-entry`
 for the entered stage plus each `LIFECYCLE_KIT_ENTRY_PREFLIGHT` command whose
 stage key matches, and refuses
-(exit 1, findings printed, no writes) when any is red. The hand-off keeps the
+(exit 1, findings printed, no writes) when any is red.
+The `LIFECYCLE_KIT_ENTRY_PREFLIGHT` half of that refusal is **conditional, and
+that half alone**: the one-shot valve below admits a single entry past it. A
+valve is not the `--force` flag this tool still refuses — it is armed in a
+committed file, carries a mandatory written reason, and valves one arm rather
+than the tool. The hand-off keeps the
 same `<queue> <state>` argv it always had, but **the temp file swapped sides**:
 because the cursor is the last stamp, the candidate transition now lives in a
 temp *state* file under `${GATE_SDK_TMP_DIR}` carrying the not-yet-written
 stamp, while the live queue passes through untouched (the boundary reset, which
 does rewrite the header, passes a temp queue as well). The refusal is advisory
 in the same sense the gate is at commit time (no `--force`, so the easy path is
-the compliant one). `LIFECYCLE_KIT_ENTRY_PREFLIGHT` is a generic per-stage hook
+the compliant one — and the valve does not reinstate one: it is reached by
+committing a file, not by typing a word).
+`LIFECYCLE_KIT_ENTRY_PREFLIGHT` is a generic per-stage hook
 — no consumer surface is named in the kit; a downstream kit whose gate is the
 real precondition for a stage wires itself here (as evidence-kit's manifest gate
 does for close entry), turning a would-be pre-commit deadlock into a loud
@@ -1879,6 +1921,123 @@ its own exec bit: a consumer wiring a gate here configures the gate's *invocatio
 and not its declaration file, and a configured path that stops being executable —
 a member ported to a binary substrate leaving a data-file descriptor behind — is
 a stage-entry breakage rather than a stale reference.
+
+**The one-shot pre-flight valve admits one entry past a refusing pre-flight
+command.** `LIFECYCLE_KIT_PREFLIGHT_VALVE_FILE` names a committed **valve
+ledger**; its default is the empty string, so no valve exists, every pre-flight
+refusal is final, and an unconfigured consumer sees exactly the behaviour above.
+The ledger's grammar is the one this kit's evidence files already use — a
+`# contract:` pointer header, then one data line per arming:
+
+```
+<iteration> <stage> armed|used <reason...>
+```
+
+`<reason>` runs to end of line and is **mandatory**. It is what makes the
+one-shot a documented one, so a line without one is not a weaker arming; it is
+not an arming. It is free text authored by a consumer's own session: the kit
+specifies that it must be non-empty and never what it may say. **There is no
+date field, and its absence is a decision** — the ledger is truncated at the
+boundary, so every line belongs to one iteration by construction and the state
+file already dates that iteration's stages; a date here would be a second,
+drift-capable copy of a fact another surface owns.
+The iteration matched is the **queue header's**, not the stamp's:
+the ledger is truncated at the iteration boundary, so its lines belong to the
+iteration currently open, while the first stage's stamp carries the unnamed
+placeholder rather than a name any arming could have been written against.
+
+When a `LIFECYCLE_KIT_ENTRY_PREFLIGHT` command refuses **and** the ledger carries
+an `armed` line for the entering iteration and stage, the entry is **admitted**
+instead of refused and that line's state token is rewritten `armed` → `used`.
+**The admission is loud**: the report relays the pre-flight command's own
+findings — the text the refusal would have printed — says the valve admitted
+them, prints the reason, and prints how many `used` lines this iteration already
+carried before this one. The entry then proceeds and stamps as normal.
+
+**What the valve is for, stated in its own contract because the ruling makes the
+documentation part of the deliverable.** Exactly one deadlock: a stage whose
+entry pre-flight is refused by a precondition only a *later* stage can clear, so
+the stage chartered to clear it is the stage the pre-flight is refusing.
+**Reaching for it twice in one iteration is the failure rather than a supported
+mode** — a valve gets reached for whenever the refused stage is inconvenient, and
+that prediction is what this contract has to answer. What answers it is not a
+prohibition but a **count at the moment of the act**: the admission report prints
+this iteration's prior `used` count, so the second reach announces itself to the
+session taking it, in its own transcript, before it proceeds. That is the shape
+the predecessor-journal escape below already takes — an evadable assertion whose
+value is that the deviation becomes deliberate and written instead of silent, at
+the one moment someone is looking. The refusal's `help:` line therefore names the
+valve **and that single sanctioned cause together**, so it cannot read as a
+generic bypass.
+
+**The honest limit is stated with it rather than left to be inferred from it.** A
+session can arm its own valve. The valve is bypassable in exactly the sense the
+journal escape is, and claiming otherwise would be a stronger claim than the
+evidence carries. What it buys is that a bypass leaves a committed artifact with
+a written reason, a named obligation on the closing stage (§templates/stages/),
+and a count that makes the second one visible.
+
+**Four narrowings, each a consequence of an existing ruling rather than a
+carve-out.**
+
+- **This arm only.** The valve does not reach the built-in `check-stage-entry`
+  pre-flight (which asserts the state machine's own stamp-protocol invariants),
+  the predecessor-journal assertion (which has its own named escape below), or
+  any iteration-boundary refusal — the Lessons check, the gap-inbox check, the
+  linked-worktree check, `LIFECYCLE_KIT_BOUNDARY_REQUIRE` — each of which guards
+  against work leaking across an iteration boundary and each of which already
+  states a recovery. `LIFECYCLE_KIT_ENTRY_PREFLIGHT` is the **consumer-wired**
+  arm, and a consumer-wired precondition is the only one whose deadlock a
+  consumer can reach at all.
+- **One line per admission.** Only the **first** matching `armed` line is
+  consumed, and one entry consumes at most one however many of its stage's
+  pre-flight commands refused — the valve admits the *entry*, not a command. So
+  arming twice does not admit twice, and the second line is still there for the
+  closing stage to see.
+- **Iteration *and* stage must match.** An arming aimed at another stage or left
+  from another iteration never admits. Both halves are asserted even though the
+  boundary truncation should make the cross-iteration case unreachable, because
+  that truncation is a knob a consumer may decline to set, and an assertion
+  resting on another consumer's configuration is not an assertion.
+- **The idempotent no-op consumes nothing.** A re-entry whose stamp is already
+  the last line exits 0 before the pre-flight runs at all, so a crashed-and-
+  resumed session cannot spend a second valve line on the same transition.
+
+**Two fail-closed refusals (exit 2, nothing written):** a data line with fewer
+than four whitespace-separated fields, and a state token that is neither `armed`
+nor `used`. A ledger that cannot be parsed makes *is it armed?* unanswerable, and
+**both** silent branches are wrong there — admitting hides a malformed arming,
+refusing hides a valid one. The ledger is read only where that question is
+actually asked, which is at a pre-flight refusal: parsing it at every entry would
+let a malformed ledger wedge entries that never needed a valve, a wider refusal
+than the fail-closed arm was ruled for.
+
+**A configured path that does not exist is *not armed*, not an error**, because
+header-only is the ledger's resting state and requiring the file would oblige
+every consumer setting the knob to create one; the failure direction is then a
+refusal, which is the safe one. So that a typo'd path cannot masquerade as a
+never-armed valve, **the refusal message names the configured path** and says
+which of the two cases it is — absent, or present and carrying no matching
+arming.
+
+**Two writers, and the split is contract.** The arming session writes every line
+(§templates/stages/); this tool writes **none** — it rewrites the state token of
+one line that already exists. So the ledger's line set is the arming session's
+alone and this tool can only ever narrow what is admissible, which is what makes
+a two-writer surface safe here. The rewrite rides the **write**, not the match:
+the boundary refusals run after the pre-flight loop, so an entry that matched an
+arming can still refuse, and a refused entry must neither report that it was
+admitted nor spend a line saying so.
+
+**A consumer wiring the knob owes its ledger a `close-surface:` declaration**
+(§The close-surface roster). The ledger is *tracked*, so `check-close-surfaces`'s
+undeclared-surface arm — whose second source is the workflow directory's
+*gitignored* members — never reaches it, and undeclared it would simply not
+appear on the roster the closing stage's inbound-triage sweep recomputes. No
+`reclaim=` field is owed: that is a capture-tier member's obligation. The kit
+names no path here, the ledger's location being consumer configuration and a kit
+literal spelling one consumer's workflow-directory layout being the seam this
+knob's empty default already holds.
 
 **The predecessor-journal assertion runs in that same pre-flight**, gated by
 `LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE` and defaulting off. At `1`, an entry
@@ -1928,7 +2087,10 @@ it runs everything a real entry runs up to the write — config load and stage
 validation, header parse, session-id derivation, the idempotence probe (a
 would-be no-op is reported as such and exits 0), the candidate-stamp temp
 state build, `check-stage-entry`, every matching `LIFECYCLE_KIT_ENTRY_PREFLIGHT`
-entry, the predecessor-journal assertion, and — at an iteration boundary — the
+entry and — where one of those refuses — the valve lookup, which names the line
+a real entry would consume and the reason it carries, leaves the ledger
+byte-identical and holds the mode at exit 0 because the real entry would proceed;
+then the predecessor-journal assertion, and — at an iteration boundary — the
 Lessons check, the gap-inbox check, the linked-worktree check and every
 `LIFECYCLE_KIT_BOUNDARY_REQUIRE` member, in the order a real entry runs
 them; then it stops: no stamp, no boundary truncation, the temp files removed.
@@ -2032,8 +2194,8 @@ re-runs its entry step safely. It reads the `lib/stages.sh` knobs
 `LIFECYCLE_KIT_BOUNDARY_PRESERVE`,
 `LIFECYCLE_KIT_BOUNDARY_REQUIRE`, `LIFECYCLE_KIT_LESSON_EVIDENCE_FILE`,
 `LIFECYCLE_KIT_SURVEY_RECORD_FILE`, `LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE`,
-`LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN`, `LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE`, and
-`LIFECYCLE_KIT_ENTRY_PREFLIGHT`).
+`LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN`, `LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE`,
+`LIFECYCLE_KIT_ENTRY_PREFLIGHT`, and `LIFECYCLE_KIT_PREFLIGHT_VALVE_FILE`).
 
 **This tool depends on `gate-sdk/lib/gate.sh`, and the dependency is stated
 rather than absorbed.** It is sourced at load — from `GATE_SDK_ROOT`, defaulting
@@ -2346,21 +2508,32 @@ Where the state file is among the staged paths *and* introduces a stamp, the
 staged path set must contain **only**:
 
 - the state file — for any stage's stamp; and additionally
+- `LIFECYCLE_KIT_PREFLIGHT_VALVE_FILE` — for **any** stage's stamp, because an
+  admitting entry rewrites the valve ledger's state token in the same motion as
+  the stamp (§bin/enter-stage.sh); and additionally
 - the queue file, `LIFECYCLE_KIT_LESSON_EVIDENCE_FILE`,
   `LIFECYCLE_KIT_SURVEY_RECORD_FILE`, the members of
   `LIFECYCLE_KIT_BOUNDARY_TRUNCATE`, and `LIFECYCLE_KIT_GAP_INBOX_FILE` — for
   the **first stage**'s stamp only, because the iteration-boundary reset
   legitimately writes all of them in one motion (§bin/enter-stage.sh).
 
-The exemption set is **derived from the configuration the boundary reset already
-reads**, so no roster is minted and none can rot; no knob is added. Widening the
+**The set is one predicate, stated as itself: the paths `bin/enter-stage.sh`
+writes at *this* entry.** Every member above derives from that and none is
+minted. The boundary-reset members are scoped to the first stage because the
+boundary reset is the only entry that writes them; the valve ledger is scoped to
+none because an admitting entry is not the first stage's and, more to the point,
+because the scoping it needs rides **membership** rather than a stage name — a
+non-admitting entry leaves the ledger untouched and therefore unstaged, so the
+exemption is unreachable except at the one branch that earns it. Widening the
 set can only remove violations and narrowing it can only add them, so a config
 change here is safe to reason about by inspection in both directions. Gating on
 the *staged* set rather than on the working tree is what keeps a sibling
 session's staged file out of this verdict: a stamp nothing is committing is not
 a stamp this commit introduces. It mechanizes a sentence every stage template
 already carries — *commit the stamp on its own* — which is enforcement-first
-applied to prose that had no gate behind it.
+applied to prose that had no gate behind it, and the one exception that sentence
+now carries (an admitted entry commits the valve ledger with the stamp) is this
+set's second bullet rather than a weakening of the rule.
 
 **The concurrent-session false fire is real and its remedy is cheap.** Where a
 repo shares its git index between sessions, a sibling committing between a
@@ -2977,6 +3150,42 @@ copied into the shim: a shim is loaded on every stage invocation, so a
 restatement there is a per-session token tax on a fact with an owner, and it
 drifts the moment the owner changes. `check-shim-restatement` is the tripwire
 for the copy shape; the tier judgment (residue vs owned fact) stays the author's.
+
+**The `validate` template carries the valve's arming step, and the `close`
+template carries its disposition step** (§bin/enter-stage.sh owns the valve's
+contract; both templates point at it rather than restating it). A validate that
+ends on a **deliberately accepted** red — a suite whose failure is understood and
+is not a regression from this iteration's diff — arms the valve for the closing
+stage and commits the ledger, rather than stopping for an operator round-trip.
+
+**Arming is not a queue write, and that distinction is what makes it validate's
+move to take.** A validate may not pre-empt the closing stage by writing the
+queue: a mid-iteration queue edit is what the gap inbox exists to prevent. Arming
+the valve is an evidence-adjacent record on a surface validate already writes at
+this exact point in its ritual, beside the evidence manifest and the baseline
+diff. The move the machine lacked was never a queue edit; it was a **hand-off**,
+and the ledger is the artifact that carries it. **The reason field is that
+hand-off's payload**, so validate writes what close needs — which suite, what the
+red is, and why it is accepted rather than fixed — and close reads it as the
+input to the task it is about to file.
+
+**A `used` line is a close-stage obligation, not a free pass.** For every `used`
+line in the closing iteration, close **files the blocking task and lands the
+baseline row that names it, in that session**. That is the deadlock's actual
+resolution rather than a courtesy: what makes the valve one-shot in substance and
+not merely in mechanism is that the entry it bought is spent making the next
+iteration's pre-flight pass without one. A close that enters through the valve
+and files nothing has moved the deadlock forward by one iteration at the cost of
+a record. The filed task **inlines** the finding rather than pointing at the
+ledger, the ledger being truncated at the next boundary — the same close the
+retrieval-pointer rule requires on independent grounds (§check-scratch-citation).
+**A residual `armed` line is dispositioned in the same step and with the same
+weight**: it means a session expected a refusal that never came, or armed the
+wrong stage, and either is a fact about the iteration worth one line rather than
+a file the boundary quietly truncates. The horizon is the iteration, because the
+ledger is truncated at the boundary — so "how many times did we reach for the
+valve" has a bounded, committed answer for exactly as long as anyone can act on
+it.
 
 The `close` template carries a **release-disposition step**: every close
 dispositions the iteration at the release boundary — reading the consumer's

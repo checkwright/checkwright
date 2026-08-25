@@ -202,6 +202,37 @@ fi
 cmp -s "$es/s.before" "$ess" || { echo "smoke(enter-stage): --simulate wrote state" >&2; exit 1; }
 cmp -s "$es/q.before" "$esq" || { echo "smoke(enter-stage): --simulate wrote queue" >&2; exit 1; }
 
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the one-shot pre-flight valve on a live install: an armed line admits the entry the same red command would otherwise refuse, the state token flips to used, and --simulate reports the would-be admission ahead of it without touching the ledger
+esv="$es/preflight-valve.txt"
+printf '# contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh\n' > "$esv"
+cat > "$es/valve-stages.sh" <<STAGES
+# shellcheck shell=bash
+LIFECYCLE_KIT_ENTRY_PREFLIGHT=('close=$es/preflight-stub.sh')
+LIFECYCLE_KIT_PREFLIGHT_VALVE_FILE=$esv
+STAGES
+es_valve_run() {
+    env -u CLAUDE_CODE_SESSION_ID -u CLAUDE_CODE_CHILD_SESSION -u LIFECYCLE_KIT_SESSION_ID \
+    LIFECYCLE_KIT_QUEUE_FILE="$esq" \
+    LIFECYCLE_KIT_STATE_FILE="$ess" \
+    LIFECYCLE_KIT_SESSIONS_DIR="$es/sessions" \
+    GATE_SDK_TMP_DIR="$es/tmp" \
+    LIFECYCLE_KIT_CONFIG_FILE="$es/valve-stages.sh" \
+    bash "$SMOKE_KIT_ROOT/bin/enter-stage.sh" "$@"
+}
+rm -f "$es/preflight-ok"
+cp "$ess" "$es/s.before"
+if es_valve_run close >/dev/null 2>&1; then echo "smoke(enter-stage): an unarmed valve should leave the red preflight refusing" >&2; exit 1; fi
+cmp -s "$es/s.before" "$ess" || { echo "smoke(enter-stage): wrote state on an unarmed valve refusal" >&2; exit 1; }
+printf 'pf-iter close armed the accepted red only this stage can file against\n' >> "$esv"
+cp "$esv" "$es/v.before"
+out="$(es_valve_run --simulate close 2>&1)" || { echo "smoke(enter-stage): --simulate of an armed entry should exit 0 -- $out" >&2; exit 1; }
+grep -q "would be consumed" <<<"$out" || { echo "smoke(enter-stage): --simulate did not report the would-be admission: $out" >&2; exit 1; }
+cmp -s "$es/v.before" "$esv" || { echo "smoke(enter-stage): --simulate wrote the valve ledger" >&2; exit 1; }
+out="$(es_valve_run close 2>&1)" || { echo "smoke(enter-stage): an armed valve should admit the entry -- $out" >&2; exit 1; }
+grep -q "valve admitted this entry" <<<"$out" || { echo "smoke(enter-stage): the admitted entry printed no valve report: $out" >&2; exit 1; }
+grep -q "^pf-iter close used " "$esv" || { echo "smoke(enter-stage): the admitted entry did not consume the armed line" >&2; exit 1; }
+grep -Eq "^pf-iter close aabbccdd $d ([0-9a-f]{7,40}|none)\$" "$ess" || { echo "smoke(enter-stage): the admitted entry did not stamp" >&2; exit 1; }
+
 # spec: gate-sdk/SPEC.md §The bin/-tool contract — behavioral coverage, one member at a time: help on stdout at exit 0, an unrecognized leading '-' refused on stderr at exit 2, and the capture members' durable surface byte-unchanged after both (a test reading exit codes alone passes the bug)
 av="$es/argv"; mkdir -p "$av"
 printf '# contract: seeded\n- 2026-01-01 — a real bullet\n' > "$av/inbox.md"
@@ -283,6 +314,11 @@ printf 'README.md merge=iteration-scoped\n' >> "$ma/.gitattributes"   # smuggled
 if ( cd "$ma" && kit_gate check-merge-attrs >/dev/null 2>&1 ); then
     echo "smoke(install-lifecycle): a smuggled out-of-set merge attribute should redden the parity gate" >&2; exit 1
 fi
+
+# spec: lifecycle-kit/SPEC.md §lib/stages.sh — the installer runs under `set -e` and sources the loader, whose lock-pattern probe is a subshell designed to return non-zero on a non-match; with a pattern configured that probe once aborted the installer silently, leaving a consumer unable to re-emit its own derived surfaces. Exercised with a real pattern set, because the kit default is empty and an unconfigured run never reaches the branch.
+printf "LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE='^held by pid ([0-9]+)\$'\n" > "$ma/lock-stages.sh"
+( cd "$ma" && LIFECYCLE_KIT_CONFIG_FILE=lock-stages.sh bash "$SMOKE_KIT_ROOT/bin/install-lifecycle.sh" >/dev/null ) \
+    || { echo "smoke(install-lifecycle): a configured lock-reason pattern aborted the installer" >&2; exit 1; }
 
 # spec: lifecycle-kit/SPEC.md §bin/session-id.sh — the derivation order: env-first, agent- strip, widened + child-narrowed subagents scan (advisory tool, no fixture pair)
 SID="$SMOKE_KIT_ROOT/bin/session-id.sh"

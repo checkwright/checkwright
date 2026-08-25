@@ -58,6 +58,68 @@ HELP_PREFLIGHT="resolve the finding above, or (to override deliberately) perform
 
 QUEUE="$LIFECYCLE_KIT_QUEUE_FILE"
 STATE="$LIFECYCLE_KIT_STATE_FILE"
+VALVE="$LIFECYCLE_KIT_PREFLIGHT_VALVE_FILE"
+
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the valve ledger's two fail-closed shapes, refused together so one pass names every malformed line: a data line under four fields, and a state token that is neither 'armed' nor 'used'. Both silent branches are wrong on a ledger that cannot be parsed — admitting hides a malformed arming, refusing hides a valid one — so neither is taken.
+valve_parse() {
+    awk '
+        /^#/ || /^[[:space:]]*$/ { next }
+        NF < 4 { printf "  line %d carries %d field(s), fewer than the four <iteration> <stage> armed|used <reason...> requires: %s\n", NR, NF, $0; bad = 1; next }
+        $3 != "armed" && $3 != "used" { printf "  line %d carries state token %s, which is neither armed nor used: %s\n", NR, $3, $0; bad = 1 }
+        END { exit bad ? 1 : 0 }
+    ' "$1"
+}
+
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the match: the FIRST armed line whose iteration and stage both equal the entering entry's, printed as '<line-number> <prior-used-count> <reason>' tab-separated. The reason is rebuilt field by field rather than by a bracketed-quantifier strip, because that quantifier is not portable across every awk a consumer runs.
+valve_lookup() {
+    awk -v it="$2" -v st="$3" '
+        /^#/ || /^[[:space:]]*$/ { next }
+        $1 == it && $3 == "used" { used++ }
+        !hit && $1 == it && $2 == st && $3 == "armed" {
+            hit = NR
+            for (i = 4; i <= NF; i++) reason = reason (i > 4 ? " " : "") $i
+        }
+        END { if (!hit) exit 1; printf "%d\t%d\t%s\n", hit, used + 0, reason }
+    ' "$1"
+}
+
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the consumption rewrites field 3 of exactly one line rather than substituting the token's text, because an iteration or stage name may itself contain the token and a text substitution would rewrite the wrong field on that line
+valve_consume() {
+    local vc_tmp="$tmpdir/preflight-valve.$$"
+    awk -v n="$2" 'NR == n { $3 = "used" } { print }' "$1" > "$vc_tmp" && mv "$vc_tmp" "$1"
+}
+
+valve_state=unqueried
+valve_line=""
+valve_used=0
+valve_reason=""
+valve_report=()
+
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the ledger is read only where the question "is it armed?" is actually asked, which is a LIFECYCLE_KIT_ENTRY_PREFLIGHT refusal. Parsing it on every entry would let a malformed ledger wedge entries that never needed a valve, which is a wider refusal than the fail-closed arm was ruled for.
+valve_query() {
+    local vq_bad vq_hit
+    [[ "$valve_state" == unqueried ]] || return 0
+    valve_state=none
+    [[ -n "$VALVE" && -f "$VALVE" ]] || return 0
+    if ! vq_bad="$(valve_parse "$VALVE")"; then
+        echo "enter-stage: the pre-flight valve ledger $VALVE cannot be parsed, so whether this entry is armed is unanswerable — nothing written:" >&2
+        printf '%s\n' "$vq_bad" >&2
+        exit 2
+    fi
+    if vq_hit="$(valve_lookup "$VALVE" "$cur_iter" "$stage")"; then
+        IFS=$'\t' read -r valve_line valve_used valve_reason <<<"$vq_hit"
+        valve_state=armed
+    fi
+}
+
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the admission report is buffered and emitted with the entry's own report rather than at the moment of the match: a stage may wire several pre-flight commands and the boundary refusals run after the loop, so an entry that matched a valve line can still refuse, and an entry that refuses must never have printed that it was admitted or spent a line saying so.
+valve_emit() {
+    local vr
+    [[ ${#valve_report[@]} -gt 0 ]] || return 0
+    for vr in "${valve_report[@]}"; do
+        if [[ "$sim" == 1 ]]; then sim_relay "$vr"; else printf '%s\n' "$vr"; fi
+    done
+}
 
 # spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the linked-worktree scan: one porcelain parse classified live/orphaned/unclassified, shared by the boundary refusal and the mid-iteration advisory so the two cannot disagree about what a path is. Prints '<class>\t<pid>\t<path>\t<head>' per linked worktree; the main checkout is skipped.
 worktree_scan() {
@@ -293,6 +355,13 @@ for pf in ${LIFECYCLE_KIT_ENTRY_PREFLIGHT[@]+"${LIFECYCLE_KIT_ENTRY_PREFLIGHT[@]
     [[ "${pf%%=*}" == "$stage" ]] || continue
     read -r -a pf_argv <<<"${pf#*=}"
     if ! pf_out="$("${pf_argv[@]}" "$pre_queue" "$tmpstate" 2>&1)"; then
+        # spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the valve reaches this arm and no other: LIFECYCLE_KIT_ENTRY_PREFLIGHT is the consumer-wired precondition, and a consumer-wired precondition is the only one whose deadlock a consumer can reach at all
+        valve_query
+        if [[ "$valve_state" == armed ]]; then
+            valve_report+=("the pre-flight valve admitted this entry past a refusing LIFECYCLE_KIT_ENTRY_PREFLIGHT command for '$stage' — the findings it would have refused on:")
+            valve_report+=("$(printf '  %s\n' "$pf_out")")
+            continue
+        fi
         if [[ "$sim" == 1 ]]; then
             echo "enter-stage (simulate): LIFECYCLE_KIT_ENTRY_PREFLIGHT command for '$stage' would refuse the entry:" >&2
             sim_relay "$pf_out" >&2
@@ -301,6 +370,15 @@ for pf in ${LIFECYCLE_KIT_ENTRY_PREFLIGHT[@]+"${LIFECYCLE_KIT_ENTRY_PREFLIGHT[@]
             printf '%s\n' "$pf_out" >&2
         fi
         relay_help "$HELP_PREFLIGHT"
+        # spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the refusal names the configured ledger and its state, so a typo'd path cannot masquerade as a never-armed valve; the cause rides the same line because a valve stated without the one deadlock it is for reads as a generic bypass
+        if [[ -n "$VALVE" ]]; then
+            if [[ -f "$VALVE" ]]; then
+                valve_why="carries no 'armed' line for '$cur_iter $stage'"
+            else
+                valve_why="does not exist (header-only is its resting state, so this is 'not armed' rather than an error — check the path if you meant to arm it)"
+            fi
+            relay_help "or, for the one cause the pre-flight valve is sanctioned for — a stage whose entry pre-flight is refused by a precondition only a later stage can clear — append '$cur_iter $stage armed <reason>' to the valve ledger $VALVE, which $valve_why, and re-run enter-stage $stage. Reaching for it twice in one iteration is the failure rather than a supported mode, and the admitted entry prints the count that makes the second reach visible."
+        fi
         exit 1
     fi
 done
@@ -464,6 +542,12 @@ if [[ "$first" == 1 && "$cur_iter" != "$UNNAMED" ]]; then
 fi
 
 if [[ "$sim" == 1 ]]; then
+    # spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — --simulate reports the would-be admission and leaves the ledger byte-identical: the real entry would proceed, so the mode's verdict is exit 0, and the line it names is the one a real entry would consume
+    if [[ ${#valve_report[@]} -gt 0 ]]; then
+        valve_emit
+        sim_relay "the valve line at $VALVE:$valve_line would be consumed (state 'armed' -> 'used'); its reason: $valve_reason"
+        sim_relay "this iteration already carries $valve_used used valve line(s) — no write, the ledger is untouched."
+    fi
     echo "enter-stage (simulate): entry to '$stage' would proceed — no stamp, nothing written."
     exit 0
 fi
@@ -487,6 +571,11 @@ fi
 trap - EXIT
 rm -f "$tmpqueue" "$tmpstate"
 
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the consumption rides the write, not the match: this tool writes no ledger line ever, it rewrites the state token of exactly one line the arming session already wrote, so the ledger's line set stays the arming session's alone and this tool can only narrow what is admissible
+if [[ ${#valve_report[@]} -gt 0 ]]; then
+    valve_consume "$VALVE" "$valve_line"
+fi
+
 # spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the boundary scratch wipe, distinct from the truncate above (that rewrites a tracked file to its header; this deletes untracked scratch outright). Runs last so this run's own enter-stage.*.$$ temporaries are already gone and never candidates. '.gitkeep' is the kit invariant LIFECYCLE_KIT_BOUNDARY_PRESERVE cannot unset — a consumer that tracks its scratch dir's scaffolding must not have it deleted at the moment the boundary reset is committed.
 if [[ "$first" == 1 && -d "$tmpdir" ]]; then
     wipe_args=(-mindepth 1 -depth ! -name .gitkeep)
@@ -497,6 +586,13 @@ if [[ "$first" == 1 && -d "$tmpdir" ]]; then
     mapfile -t wiped < <(find "$tmpdir" "${wipe_args[@]}" -print -delete 2>/dev/null)
 fi
 
+if [[ ${#valve_report[@]} -gt 0 ]]; then
+    valve_emit
+    echo "  valve reason: $valve_reason"
+    # spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the prior-use count is delta 4's whole mechanism: nothing prohibits the second reach, the count announces it to the session taking it, in its own transcript, at the one moment someone is looking
+    echo "  note: this iteration carried $valve_used used valve line(s) before this one — reaching for the valve twice in one iteration is the failure rather than a supported mode."
+    echo "  next: commit $VALVE with the stamp, and file the blocking task this reason names before the closing stage ends."
+fi
 if [[ "$first" == 1 ]]; then
     echo "enter-stage: iteration-boundary reset — stamped '$stamp_line'; header set to '## Iteration: $UNNAMED'."
     echo "  next: commit $QUEUE and $STATE together (the boundary reset writes both), hook enabled."

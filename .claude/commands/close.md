@@ -23,6 +23,16 @@ to guard-kit/templates/close-triage.md, the knowledge-friction row to
 drift-kit/templates/close-knowledge.md, the essay-harvest row to the essay merge
 named under `harvest-routing`. Any task a sweep files follows
 queue-kit/SPEC.md §The tag algebra.
+  - **The valve ledger is a roster row this binding declares.** It is *tracked*,
+    so the derivation's capture-tier arm never reaches it and no declaration
+    would exist otherwise; the kit names no path, the location being this
+    repo's config. `advisory` is the honest mode — nothing structurally refuses
+    on an undispositioned ledger, the boundary simply truncates it — so the
+    skip is a judgment someone may audit rather than a forcing function
+    claimed and absent. No `reclaim=`: that is a gitignored member's obligation.
+
+    close-surface: .workflow/preflight-valve.txt advisory
+
   - **Audit-roster review** — read `.workflow/audit-roster.txt`; for each
     un-gateable class, judge which `due:` events fired since its `last:` stamp,
     then perform or explicitly defer each due audit (a deferral is costed per

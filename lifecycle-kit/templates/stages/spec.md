@@ -30,8 +30,10 @@ this is not a standalone session) and stop; a refused entry is a gate verdict to
 resolve at its source, never to override. `spec`
 is **not** the iteration boundary, so it **appends** — only the first stage
 resets the evidence file. That stamp *is* the transition — the last stamp is the
-stage cursor, so nothing flips and no queue write is involved. Commit the stamp
-on its own.
+stage cursor, so nothing flips and no queue write is involved. Commit the stamp on its own — unless the
+pre-flight valve admitted this entry, which rewrites the valve ledger in the
+same motion, so the two commit together (lifecycle-kit/SPEC.md
+§bin/enter-stage.sh).
 
 Because this is a **fresh session** — a fresh prompt cache, on the tier the
 lead chose — the causal-completeness authoring no longer re-reads scope's whole

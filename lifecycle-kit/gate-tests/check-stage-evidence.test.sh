@@ -201,6 +201,31 @@ printf '## Iteration: demo-iteration\n\nedited\n' >"$r/TASK-QUEUE.md"
 git -C "$r" add -A
 repo_case "purity-boundary-exemption-is-first-stage-only" "$r" 1 "also stages 'TASK-QUEUE.md'"
 
+# N3 — the valve ledger is exempt at ANY stage, which is the predicate the exemption always had
+#      stated as itself: bin/enter-stage.sh writes the ledger and the stamp in one motion at an
+#      admitting entry, and that entry is never the first stage's. The stage restriction rides
+#      membership — a non-admitting entry leaves the ledger unstaged — so no stage name gates it.
+r="$(repo_new valve-ledger)"
+printf 'demo-iteration close s2 2026-06-13 %s\n' "$(repo_head "$r")" >>"$r/.workflow/WORKFLOW-STATE.txt"
+printf '# contract\ndemo-iteration close used the accepted red this entry was admitted on\n' \
+    >"$r/.workflow/preflight-valve.txt"
+git -C "$r" add -A
+out="$( cd "$r" && gate_env LIFECYCLE_KIT_PREFLIGHT_VALVE_FILE=.workflow/preflight-valve.txt
+        gate_run check-stage-evidence "$DIR/checks" \
+            TASK-QUEUE.md .workflow/WORKFLOW-STATE.txt 2>&1 )"; rc=$?
+if [[ "$rc" -ne 0 ]] || ! grep -qF "clean" <<<"$out"; then
+    echo "  FAIL: purity-valve-ledger-exempt-at-any-stage expected clean exit 0, got $rc: $out"
+    fails=$((fails + 1))
+fi
+
+# N4 — and the widening is exactly one path: the identical commit with the knob unset reds, so the
+#      exemption follows the configuration rather than the filename.
+out="$(repo_run "$r")"; rc=$?
+if [[ "$rc" -ne 1 ]] || ! grep -qF "also stages '.workflow/preflight-valve.txt'" <<<"$out"; then
+    echo "  FAIL: purity-valve-ledger-needs-the-knob expected exit 1 naming the ledger, got $rc: $out"
+    fails=$((fails + 1))
+fi
+
 # O — the migration clause: rewriting the file's existing four-field stamps to five fields is a
 #     REWRITE, not an introduction. Without it the one-time migration — and every consumer's own
 #     recovery, which the spec names as the mitigation — would red against an assertion no
@@ -225,5 +250,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "check-stage-evidence.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "check-stage-evidence.test: ok (unnamed past first stage + stale bootstrap + shared-session-across-stages + unstamped no-cursor state + bogus posture rejected; bootstrap + named later stage + waiver token + multi-session build + iteration-posture shared id accepted; a stale head, a 'none' inside a work tree and work riding the stamp commit rejected; a current head, a lone staged state file, the boundary reset's surfaces, the four-field migration and a column-1 rename accepted)"
+echo "check-stage-evidence.test: ok (unnamed past first stage + stale bootstrap + shared-session-across-stages + unstamped no-cursor state + bogus posture rejected; bootstrap + named later stage + waiver token + multi-session build + iteration-posture shared id accepted; a stale head, a 'none' inside a work tree, work riding the stamp commit and an unconfigured valve ledger rejected; a current head, a lone staged state file, the boundary reset's surfaces, a configured valve ledger at a non-first stage, the four-field migration and a column-1 rename accepted)"
 exit 0

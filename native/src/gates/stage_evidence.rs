@@ -170,9 +170,15 @@ fn provenance(
     }
 
     let mut permitted: Vec<String> = vec![rel_state.clone()];
-    // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the exemption is derived from the
-    // members the iteration-boundary reset already resolves, and applies to the first stage's
-    // stamp alone
+    // spec: lifecycle-kit/SPEC.md §check-stage-evidence — the exemption's predicate is the paths
+    // bin/enter-stage.sh itself writes at this entry, so the valve ledger rides at ANY stage:
+    // its scoping is membership, a non-admitting entry leaving the ledger unstaged
+    let valve = walk::knob_scalar("LIFECYCLE_KIT_PREFLIGHT_VALVE_FILE")?;
+    if !valve.is_empty() {
+        permitted.push(rel(&valve));
+    }
+    // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the boundary reset's own members stay the
+    // first stage's alone, that reset being the only entry that writes them
     if new_stamps.iter().any(|(stg, _, _)| stg == first_stage) {
         permitted.push(rel(queue));
         for p in stages::supersede_set()?.iter().chain(stages::union_set()?.iter()) {
@@ -181,7 +187,7 @@ fn provenance(
     }
     for p in &staged {
         if !permitted.contains(p) {
-            out.push(format!("the commit introducing a stamp also stages '{}' — a stamp commit carries the evidence file alone (the first stage's boundary reset additionally carries {}), so the mark cannot be back-dated into a work commit: {}", p, permitted.join(" "), state));
+            out.push(format!("the commit introducing a stamp also stages '{}' — a stamp commit carries only the paths bin/enter-stage.sh writes at that entry, which here are {}, so the mark cannot be back-dated into a work commit: {}", p, permitted.join(" "), state));
         }
     }
     Ok(out)

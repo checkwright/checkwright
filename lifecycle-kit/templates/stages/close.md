@@ -13,7 +13,10 @@ the entry** — escalate to the lead (where one exists and this is not a standal
 session) and stop; a refused entry is a gate verdict to resolve at its source,
 never to override. That stamp *is* the
 transition — the last stamp is the stage cursor, so nothing flips and no queue
-write is involved. Commit the stamp on its own.
+write is involved. Commit the stamp on its own — unless the
+pre-flight valve admitted this entry, which rewrites the valve ledger in the
+same motion, so the two commit together (lifecycle-kit/SPEC.md
+§bin/enter-stage.sh).
 
 ## Session ritual
 
@@ -120,7 +123,20 @@ session.
    gains nothing. A slug that resolves only in the done section is not a
    recurrence — the finding recurred after its fix landed, which is a new defect,
    and it files as one.
-3. **Sweep the inbound triage surfaces** — run
+3. **Disposition the pre-flight valve ledger** — every line of the closing
+   iteration, in this session. A `used` line means an entry of this iteration
+   was admitted past a refusing pre-flight: **file the blocking task its reason
+   names and land the baseline row that names that task**, so the next
+   iteration's pre-flight passes without a valve. Inline the finding into the
+   filed task rather than pointing it at the ledger — the ledger dies at the
+   next boundary, so a pointer would resolve to nothing. A residual `armed`
+   line is dispositioned with the same weight: a session expected a refusal
+   that never came, or armed the wrong stage, and either is worth one stated
+   line rather than a quiet truncation. A header-only ledger is a clean
+   disposition and says so in one line. The valve's own contract, including
+   why a second reach in one iteration is the failure:
+   lifecycle-kit/SPEC.md §bin/enter-stage.sh.
+4. **Sweep the inbound triage surfaces** — run
    `bash gate-sdk/bin/run-gates.sh --emit close-surfaces` and
    disposition every row (§The close-surface roster). The roster is derived, not
    enumerated here or in the binding below: a `forced=` row has a structural
@@ -131,19 +147,19 @@ session.
    *<housekeeping: your housekeeping sweeps beyond the roster: deprecation scan,
    gate-runtime budget check, backlog-aging / premise-rot review, and the
    per-surface triage procedures the roster's rows route to.>*
-4. **Clear Done.**
-5. Review top-level docs for staleness (*is it still true?*). Same
+5. **Clear Done.**
+6. Review top-level docs for staleness (*is it still true?*). Same
    gap-generalization obligation as step 1, per staleness actually found:
    name the check class that should have caught it, and file the missing
    check as a deferred task or state in one line why no scanner is
    buildable — a silent fix forfeits the check.
-6. **Runtime-artifact lifecycle check** — any gitignored/runtime artifact
+7. **Runtime-artifact lifecycle check** — any gitignored/runtime artifact
    introduced this iteration (log, cache, scratch dir) has a named cleanup
    trigger: a write-path needs a paired reclaim-path. For a workflow-directory
    artifact the roster already answers it: the `reclaim=` field is that named
    trigger, and `check-close-surfaces` blocks a capture-tier declaration without
    one. What stays a judgment here is the artifact *outside* that directory.
-7. **Release disposition** — run after the surface-mutating steps above and
+8. **Release disposition** — run after the surface-mutating steps above and
    **before** the brevity pass (the disposition note is itself such a write).
    Every close dispositions the iteration at the release boundary: read the
    consumer's release policy (the `release-policy` slot below) and either
@@ -165,12 +181,12 @@ session.
    citation, the disposition-evidence path, and any boundary-only sub-procedures
    (e.g. a major-only deprecation sweep); or a plain "no release process — every
    iteration stamps none" line for a consumer without one.>*
-8. **Brevity pass on the always-loaded surfaces** — run this **last**, after
+9. **Brevity pass on the always-loaded surfaces** — run this **last**, after
    every surface-mutating step above. Scope by principle, not a fixed list:
    every surface injected into each agent session. Staleness asks *is it
    still true?*; brevity asks *is each block worth its standing per-session
    token cost?* — reword/delete over annotating; outdated context goes to git
    history. On-demand files (specs, this skill) are exempt — their cost is
    paid only when opened.
-9. **Optionally merge** — an iteration can close without merging if validate
+10. **Optionally merge** — an iteration can close without merging if validate
    is incomplete or a follow-up iteration is planned.

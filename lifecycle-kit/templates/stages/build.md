@@ -34,7 +34,10 @@ the entry** — escalate to the lead (where one exists and this is not a standal
 session) and stop; a refused entry is a gate verdict to resolve at its source,
 never to override. That stamp *is* the
 transition — the last stamp is the stage cursor, so nothing flips and no queue
-write is involved. Commit the stamp on its own.
+write is involved. Commit the stamp on its own — unless the
+pre-flight valve admitted this entry, which rewrites the valve ledger in the
+same motion, so the two commit together (lifecycle-kit/SPEC.md
+§bin/enter-stage.sh).
 
 Build runs one fresh session per task: a fresh session rehydrates the
 governing docs + queue state at full fidelity from disk, where an in-session

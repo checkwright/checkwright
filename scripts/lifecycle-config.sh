@@ -2,7 +2,9 @@
 # spec: lifecycle-kit/SPEC.md §Layout and configuration — this repo's lifecycle-kit consumer config: the boundary-truncate and entry-preflight knobs wire evidence-kit's manifest across the seam, the boundary-require knob makes close's release disposition a boundary precondition, the session-boundary posture is set below; every other knob keeps the platform default
 # no-port: CLAUDE.md §The provenance seam (never cross it) — operator-ruled 2026-08-24 for this repo's scripts/ config-and-vocabulary class, on the vocabulary half of scripts/measured-claims.sh's cause alone (scripts/ riding no installer payload is the half the ruling deliberately does NOT declare on). LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE is this harness's own lock vocabulary, ruled consumer-side against an empty kit default in its comment below, so porting this file would spell one harness's layout in every adopter's binary.
 # shellcheck disable=SC2034  # consumed by lifecycle-kit/lib/stages.sh after sourcing
-LIFECYCLE_KIT_BOUNDARY_TRUNCATE=(.workflow/validate-evidence.txt .workflow/release-disposition.txt)
+LIFECYCLE_KIT_BOUNDARY_TRUNCATE=(.workflow/validate-evidence.txt .workflow/release-disposition.txt .workflow/preflight-valve.txt)
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the one-shot pre-flight valve is live in this tree, the close-entry manifest gate being the wired preflight whose deadlock the valve exists to admit past. The ledger joins the truncate array one line up, so its horizon is the iteration and close's disposition step has a bounded set to answer for.
+LIFECYCLE_KIT_PREFLIGHT_VALVE_FILE=.workflow/preflight-valve.txt
 LIFECYCLE_KIT_BOUNDARY_REQUIRE=(.workflow/release-disposition.txt)
 # spec: context-kit/SPEC.md §The session-context hook — the one scratch member this repo carries across the boundary: the marker the hook reads to suppress the delegation nudge for a lead session, whose lifetime is that live session's, not the iteration's
 LIFECYCLE_KIT_BOUNDARY_PRESERVE=(session-role)
