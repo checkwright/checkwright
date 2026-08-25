@@ -9,3 +9,4 @@ install-relocation-boundary-and-first-cut spec a3f196b1 2026-08-25 d0b54919
 install-relocation-boundary-and-first-cut align a2a9f0f5 2026-08-25 514d2ad4
 install-relocation-boundary-and-first-cut build ab4facc8 2026-08-25 bb02c753
 install-relocation-boundary-and-first-cut validate aaa4abb9 2026-08-25 0c5b714e
+install-relocation-boundary-and-first-cut close a2dbe461 2026-08-25 a74e433b
