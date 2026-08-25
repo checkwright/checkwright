@@ -402,6 +402,23 @@ self-skipped scenario from pass first, so a self-skip cannot masquerade as a
 pass. The shared diff (`ek_diff`) returns non-zero the moment a new failure
 fires, which is also how run-validate derives its verdict.
 
+**Each argument group is `<suite> <logfile> [<status>]`, and the status is
+optional only where the parser can do without it.** A log-parsing suite derives
+its scenarios from the log, so the pair form is complete for it. An `exit-code`
+suite's verdict *is* the status and appears nowhere in the log, so a group naming
+one without a status is **refused at exit 2** rather than run: assuming success
+there would make the tool report pass for every log it is ever handed, clearing
+reds it structurally cannot observe. That is the fail-closed reading of
+§Baseline manifest's rule, applied to the tool's own input rather than to the
+baseline's contents — a comparison tool that cannot see one side of the
+comparison must say so instead of returning the answer that costs nothing.
+
+The optional third token is unambiguous rather than heuristic: a suite name
+suffixes `EVIDENCE_KIT_RUN_<suite>`, so it is a shell identifier and can never
+be all digits, and a status can never be anything else. `run-validate.sh` does
+not go through this path — it holds each suite's status directly at the point it
+ran it, and passes it to `ek_parse` itself.
+
 ### check-evidence-baseline
 
 Invariant: the held-constant baseline stays grammatical and honest. It asserts
