@@ -56,8 +56,11 @@ hook against `--emit` and the hook must therefore exist at install. The step is
 consequently neither droppable nor portable. It is **not** stuck: the compiled
 substrate already spawns `bash <emitter>` for exactly this generator from
 `check-graph`'s assertion D, criterion 7 clears that spawn explicitly because
-`bash` is on the consumer toolchain floor (`context-kit/lib/toolfloor.sh`'s
-`PROBE_SET`), and the arm declares it. So the step moves behind the invoke as a
+`bash` is on `GATE_SDK_PROGRAM_FLOOR` (gate-sdk/SPEC.md §lib/gate.sh) — the
+payload's own assumed-program set and criterion 7's actual test, not
+`context-kit/lib/toolfloor.sh`'s consumer-audience `PROBE_SET`, a different
+kit's install-time probe roster that bash also happens to sit on — and the arm
+declares it. So the step moves behind the invoke as a
 declared spawn, and the *bootstrap* — which is what TRAJECTORY.md §The interpreter
 policy's standing "assume no POSIX shell" obligation binds — spawns nothing.
 Recorded because the natural reading is that this step is a third class that
@@ -136,9 +139,12 @@ of 2026-08-24 and stays true as one.
 `installer/lib/init.sh:277-308` becomes one call to
 `--install place-artifact`. {design-bearing}
 
-It is the one block that satisfies delta 3's takeability rule outright: it sits
-entirely inside `if [[ -n "$ARTIFACT_TARGET" ]]`, so an artifact-less install
-never reaches it. It is also the block whose PowerShell twin would be the most
+It is the one block that satisfies delta 3's takeability rule outright: every
+line of it with an observable effect sits inside `if [[ -n "$ARTIFACT_TARGET" ]]`
+— the one line ahead of the guard is `SEAM="$GATES_DIR/gate-sdk-config.sh"`,
+whose value is read only by the guarded lines that follow it, so an
+artifact-less install never reaches anything the block does. It is also the
+block whose PowerShell twin would be the most
 intricate thing in the bootstrap — a digest re-read, an executable-bit set, and a
 line-filtered atomic rewrite of a sourced shell file — and after the cut that twin
 is zero lines.
