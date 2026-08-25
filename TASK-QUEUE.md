@@ -12,6 +12,40 @@
 
 ## New Features
 
+- **close-entry-baseline-bootstrap-deadlock** [spec: SPEC-preflight-valve.md] — a validate that
+  ends on an accepted red cannot be closed without an operator carve-out.
+  recurrence: close-entry-baseline-bootstrap-deadlock 2026-08-12 2026-08-18
+  The close entry preflight (`scripts/lifecycle-config.sh`'s `LIFECYCLE_KIT_ENTRY_PREFLIGHT`)
+  refuses until every suite carries a clean evidence line. The sanctioned way to make a known red
+  clean is a baseline `fail` row carrying a blocking slug, and `check-evidence-baseline`'s liveness
+  assertion (evidence-kit/SPEC.md §check-evidence-baseline) requires that slug to resolve to a live
+  queue task — but the stage chartered to file that task is close, which cannot enter until the
+  preflight the mark would clear passes. Validate cannot pre-empt it either: a mid-iteration queue
+  edit is exactly what the gap inbox exists to prevent. **So the machine has no in-contract path**
+  for its own "validate ends with an accepted red" case, and the filing close escaped only by the
+  operator-directed filing exception (CLAUDE.md §Housekeeping), a carve-out and not a mechanism.
+  **The design is the amendment's now, not this entry's.** `lifecycle-kit/SPEC-preflight-valve.md`
+  carries the ruled one-shot valve and its knob, the four narrowings, the two fail-closed exits,
+  the three shapes ruled out, and the reader enumeration. What stays here is the finding, its
+  measured history, and the pointer — an entry restating its own amendment is the inlined-design
+  shape canon-kit/SPEC.md §The amendment lifecycle names.
+  **Both recurrences are the same wall, and the repeat is what carried the ruling.** 2026-08-12
+  (`native-cohort-canon-kit`) and 2026-08-18 (`wide-budget-batch-and-hold-declaration`, at
+  `f8c34c20`) both hit `installer_smoke`, the second on the init no-op/regen red, and both escaped
+  by one route — an operator-directed filing relayed by the lead: three consecutive non-clean
+  validates, three operator interrupts, one route, at one full stop and one operator round-trip
+  each, measured rather than predicted. The same drain found a **second face** no candidate
+  covered — a baseline move stales the evidence line computed against the old baseline — promoted
+  as `baseline-move-stales-evidence-line`.
+  **The row is not armed today**, the live baselined `fail` naming a slug that still resolves,
+  which is why the ruling could be taken with nothing on fire and why the build lands the mechanism
+  without a live wedge to exercise it against.
+  Filed 2026-08-10 by close, from its own blocked entry; the escape it needed is the evidence.
+  Re-attested 2026-08-12 by close, again from its own blocked entry. Taken 2026-08-25 as this
+  iteration's second unit by the operator's unit-set ruling, its fork ruled the same day.
+  **Promoted 2026-08-25 at spec**, the stage where writing the amendment is what promotes the
+  entry.
+
 ## Technical Debt
 
 - **platform-support-ci-matrix** [roadmap: next/reliability] — a leg per platform.
@@ -3589,57 +3623,6 @@
   is the channel by which a wrong number reaches a canonical surface with a citation on it.
   Filed 2026-08-09 by close, from its own knowledge-friction triage.
 
-
-- **close-entry-baseline-bootstrap-deadlock** [design-pending] — a validate that
-  ends on an accepted red cannot be closed without an operator carve-out.
-  recurrence: close-entry-baseline-bootstrap-deadlock 2026-08-12 2026-08-18
-  The close entry preflight (`scripts/lifecycle-config.sh`'s
-  `LIFECYCLE_KIT_ENTRY_PREFLIGHT`) refuses until every suite carries a clean
-  evidence line. The sanctioned way to make a known red clean is a baseline `fail`
-  row carrying a blocking slug, and `check-evidence-baseline`'s liveness assertion
-  (evidence-kit/SPEC.md §check-evidence-baseline) requires that slug to resolve to
-  a **live queue task**. But the stage chartered to file
-  that task is close — which cannot enter until the preflight the mark would
-  clear passes. Validate cannot pre-empt it either: a mid-iteration queue edit is
-  exactly what the gap inbox exists to prevent.
-  **So the machine has no in-contract path** for its own "validate ends with an
-  accepted red" case. The filing close escaped only by the operator-directed
-  filing exception (CLAUDE.md §Housekeeping), a carve-out and not a mechanism.
-  **THE FORK IS RULED — 2026-08-25, by the operator, at this scope's threshold escalation.** The
-  chosen candidate is the **documented one-shot preflight valve**; the other two are **closed** —
-  a baseline slug filed against a gap-inbox bullet weakens the liveness check that makes the mark
-  self-retiring, and a configured permanent marker contradicts a red that is not permanent.
-  **The valve's stated cost is part of the ruling rather than a caveat on it** — a valve gets
-  reached for whenever close is inconvenient — so its **documentation carries that cost as a
-  constraint**: a one-shot not saying what it is for, and that reaching for it twice is the
-  failure, is not the thing that was ruled. The tag stays because canon-kit/SPEC.md §The amendment
-  lifecycle makes every deferred entry design-pending until it is promoted out of the section, and
-  no amendment exists yet — the ruling fixed what that amendment will say, and hold history stops
-  accruing here because neither the fork nor the surface is a live ground any more.
-  **Cost while deferred:** paid only when validate ends non-clean, but paid as a
-  full stop that costs an operator round-trip at the boundary, in the exact
-  situation where the tree is already known to be imperfect.
-  **Both recurrences are the same wall, and the repeat is what carried the ruling.** 2026-08-12
-  (`native-cohort-canon-kit`) and 2026-08-18 (`wide-budget-batch-and-hold-declaration`, at
-  `f8c34c20`) both hit `installer_smoke`, the second on the init no-op/regen red, and both escaped
-  by one route — an operator-directed filing relayed by the lead: three consecutive non-clean
-  validates, three operator interrupts, one route, at one full stop and one operator round-trip
-  each, measured rather than predicted. The same drain found a **second face** no candidate
-  covered — a baseline move stales the evidence line computed against the old baseline — promoted
-  as `baseline-move-stales-evidence-line`.
-  **The nine-hold enumeration is RETIRED as spent**, the ruling having discharged what it
-  recorded: none was a decline of the finding, each bought another approach to the authority, and
-  the tenth approach is what the first nine were for. One probed ground survives it — the row is
-  **not armed today**, the live baselined `fail` naming a slug that still resolves, which is why
-  the ruling could be taken with nothing on fire.
-  **TAKEN 2026-08-25 as this iteration's second unit, by the operator's unit-set ruling.** It
-  stays in `## Deferred` because promoting a feature *is* writing its amendment
-  (canon-kit/SPEC.md §The amendment lifecycle, the bidirectional rule) and the valve is a new
-  named mechanism on lifecycle-kit's preflight — so `spec` authors and promotes it, and scope
-  stopping here is the split roster working rather than an omission. Count unchanged at two: the
-  finding did not re-fire, and being taken is not a firing.
-  Filed 2026-08-10 by close, from its own blocked entry; the escape it needed is
-  the evidence. Re-attested 2026-08-12 by close, again from its own blocked entry.
 
 - **knob-default-accessor-singularity** [design-pending] — the missing check class
   behind two knob-default re-spellings drained this iteration.
