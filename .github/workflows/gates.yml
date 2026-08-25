@@ -50,3 +50,53 @@ jobs:
           exit $rc
       - name: guard-kit decision table
         run: bash guard-kit/bin/run-guard-tests.sh
+
+  # The activation path, exercised server-side. It is a job rather than a step in
+  # `gates` because it asserts a different thing — that an adopter's install
+  # works, not that this tree is clean — and because the macOS sibling this unit
+  # deliberately does not buy will join here as a second job.
+  #
+  # Not a matrix, and specifically **not derived from native/targets.list**. That
+  # roster is the artifact commitment, and a smoke leg on a platform is exactly
+  # what has to run *before* that platform may join it (gate-sdk/SPEC.md
+  # §Consumer payload). Deriving this matrix from the roster would close the
+  # loop: no platform could ever earn the run that qualifies it.
+  install-smoke:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      # fetch-depth: 0 — the smoke stamps the packed version from the newest tag
+      # (`git describe --tags`), and a shallow checkout carries none, so without
+      # it the arm silently exercises the fallback version instead of a real one.
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          fetch-depth: 0
+
+      # **This leg is green against a recorded baseline, never green simpliciter,
+      # and the distinction is the whole reason it is shaped this way.** The suite
+      # exits non-zero today at its binary-less leg on `run-gates: scripts/gates.list
+      # names no gates` — a ruled outcome held in .workflow/validate-baseline.txt
+      # against `binary-less-dispatch-loop-retirement`, not a defect this leg may
+      # clear. So the suite's status is captured rather than obeyed, and the
+      # verdict comes from diff-baseline.sh, which reds only where the observed
+      # result *deviates* from that record: a new failure, or the baselined one
+      # recovering unpromoted. Reading this step as a plain smoke run would
+      # misread both what it asserts and what a red here means.
+      #
+      # Stays a bash `run:` on the runner's preinstalled toolchain (no setup-node,
+      # no setup-rust) to keep the checkout+bash tamper floor the steps above state.
+      - name: install smoke, judged against the recorded baseline
+        env:
+          INSTALLER_SMOKE_TMP_DIR: ${{ runner.temp }}
+        run: |
+          log="$RUNNER_TEMP/installer-smoke.log"
+          # The suite's own non-zero is an input to the comparison, not a verdict,
+          # so -e is lifted across it and the status read from PIPESTATUS — tee's
+          # own zero would otherwise be the only status this shell ever sees.
+          set +e
+          bash installer/consumer-smoke/run-smoke.sh 2>&1 | tee "$log"
+          rc="${PIPESTATUS[0]}"
+          set -e
+          echo "installer_smoke exited $rc; the verdict below is the baseline diff, not that status"
+          bash evidence-kit/bin/diff-baseline.sh installer_smoke "$log" "$rc"
