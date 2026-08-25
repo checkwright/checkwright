@@ -181,19 +181,11 @@ that acts on the port's *denominator* rather than its remainder: under the prior
 default every gate landed while the port ran added shell the port then owed.
 The mechanism — the exception criterion that makes "with cause" operable — is
 **delivered** at that same section as three closed classes with a stated cause
-form each, and is not restated here. Ruled with criterion 5's cost in hand and against the recording
-session's own lean, which is why it is recorded rather than argued: a
-`.gate`-declared member is *omitted* on a platform `native/targets.list` carries
-no artifact for, that roster is one target today, and the flip therefore attaches
-that omission to every new gate. **Re-affirmed the same day on corrected
-evidence, recorded because the first ruling was taken on an understated one.**
-The uncovered platform set was put to the operator as narrow and Windows-shaped;
-`native/targets.list` ships a single target, so the set is **every macOS adopter**
-today, for whom omit-and-declare is already the normal path. The operator
-re-affirmed the flip against that cost, unchanged. This records what the ruling
-was weighed against — it is not a re-opening, and the ruling stands as ruled.
-What the ruling does not do is widen the
-roster; the residue it creates is costed and filed as
+form each, and is not restated here. The cost it was weighed against, recorded
+so it is not re-argued: a `.gate`-declared member is *omitted* on a platform
+`native/targets.list` carries no artifact for, and that roster is one target, so
+the flip attaches that omission to **every macOS adopter** for every new gate.
+The ruling does not widen the roster; the residue is costed as
 `born-native-omission-accumulation`, and the roster's own widening trigger
 (`platform-support-ci-matrix` landing a CI leg) is unchanged.
 
@@ -210,15 +202,8 @@ declares it `preview` with an audience it describes as internal iteration, so
 *reaching users late* — the entire cost that trigger exists to avoid — has no
 measured population to land on.
 
-Two things make this a ruling rather than a preference. It was reached twice and
-settled neither time: the `ruling-capture-contracts` close raised it, routed it
-to the operator, and received no direction; the `install-claim-contract` close
-reached the identical question on a broader instance of the same defect class. A
-question two closes have spent real judgment on and neither could close will
-re-fire on the next install-path integrity fix, and each firing spends that
-judgment again for an outcome the cadence floor usually reaches anyway. Second,
-the asymmetry the deferral rests on is worth recording once: a wrong deferral is
-corrected by rewriting one line, and a wrong tag is public.
+The asymmetry the ruling rests on: a wrong deferral is corrected by rewriting
+one line, and a wrong tag is public.
 
 **The honest limit.** This narrows a criterion, so it can only be wrong in one
 direction — an install-path defect that genuinely does reach users late will now
@@ -236,10 +221,7 @@ which is git plus pre-compiled binaries; the crate's build graph is resolved and
 compiled by contributors and CI, and no consumer ever receives, resolves or
 compiles it (install-time builds from vendored source are void under objectives
 1, 2 and 5). So the `native/` crate is under **no** no-external-dependencies
-prohibition and never was. Recorded because the false reading was not merely
-held — it was cited as a *ground* in four places in gate-sdk/SPEC.md and encoded
-in a passing test before an operator correction caught it, which is the cost of
-leaving an objective's scope to be inferred. What the ruling does **not** touch:
+prohibition and never was. What the ruling does **not** touch:
 the dependency **bar** the crate applies to a candidate dependency is
 engineering judgment owned by gate-sdk/SPEC.md, and nothing here loosens it.
 
@@ -252,15 +234,9 @@ a bare `checkout --`. The disposition pair a narrowing chooses between — narro
 that the breadth is intended — is owned by guard-kit/SPEC.md §compare-settings-allow and is not
 restated here.
 
-This is recorded rather than left where it was decided, and that is the whole point of the entry:
-the 2026-08-13 ruling **selected** this question's disposition and never **stated** the direction,
-so for a week the answer lived in no governed surface at all — only a drained gap bullet and a
-commit message, which spec-over-precedent says is not ground truth. **The discharge condition fired
-2026-08-23**: `guard-grant-review` completed when the operator ruled its four `gh` candidates
-intended breadth, and the direction now lives in `scripts/guard-config.sh`'s
-`GUARD_KIT_BREADTH_DECLARED`, one declaration per glob with its grounds. The criterion above stays
-live — it is what a future narrowing question is decided against — and only its pending clause is
-spent.
+The standing declarations live in `scripts/guard-config.sh`'s `GUARD_KIT_BREADTH_DECLARED`, one
+per glob with its grounds; the criterion above is what a future narrowing question is decided
+against.
 
 **A permission-settings edit is operator-class work, and scope never promotes one — ruled
 2026-08-22 by the operator.** An edit to `.claude/settings.json` is not build work and is not
@@ -273,8 +249,7 @@ stronger than a preference about who should do it. Two independent mechanisms re
 auto-mode classifier denies it, and a dispatched stage session's own definition forbids changing
 permission settings on any agent's say-so. So an operator ruling that resolves to "edit the
 allowlist" cannot be discharged by the session sent to discharge it — it is promoted, scoped,
-dispatched, and then stalls at build having spent the whole pipeline to reach a wall. This was
-found at build 2026-08-22, when the narrowing half of `guard-grant-review` hit exactly that wall.
+dispatched, and then stalls at build having spent the whole pipeline to reach a wall.
 
 **The rejected alternative is recorded because it is the tempting one.** The build session offered
 to hand its prepared diff to the supervising session to apply. That was refused: a supervising
@@ -288,12 +263,12 @@ exclusion — ruled 2026-08-23 by the operator.** The "permanently shell" class 
 criterion 7 are both retired, with their refutations recorded where each stood: the shell auditor
 already trusts the binary's `--list`, absence and staleness of the binary are the fail-closed
 contract's and `check-gate-binary-fresh`'s to catch, and a wrapper that spawns cargo, shellcheck or
-a renderer moves the dependency floor not at all. Every remaining shell gate ports; `shell-gate-tail-port`
-took the tail, and the registry oracle now reads none owed over the battery it walks.
-**What "port complete" means is ruled with it**: the battery runs from the hook to the binary with no bash in between
-(`battery-runner-port`), the install bootstrap is the three-step shim written twice
-(`powershell-installer-surface`, which absorbed the relocation half 2026-08-24), and every
-remaining non-test `.sh` outside it either carries a stated `no-port` cause or is deleted. The adopter-facing
+a renderer moves the dependency floor not at all. Every shell gate ported, and the registry oracle
+reads none owed over the battery it walks.
+**What "port complete" means is ruled with it**: the battery runs from the hook to the binary with
+no bash in between, the install bootstrap is the three-step shim written twice
+(`powershell-installer-surface`), and every remaining non-test `.sh` outside it either carries a
+stated `no-port` cause or is deleted. The adopter-facing
 residue is the bootstrap alone: the generated pre-commit hook shim needs no PowerShell twin, because
 git runs hooks through the `sh` Git for Windows ships, so a two-line shim invoking the binary is one
 implementation on every platform. Contributor-side tooling and the test harness ship to no adopter
@@ -349,18 +324,12 @@ npm package and a Release tarball and npm can carry per-platform binaries — is
 the one place a shell dependency may be unavoidable in the strict sense. This
 records the residue; designing it is the unit's work, not this file's.
 
-**What this supersedes, and why the supersession is principled rather than a
-change of mind.** The 2026-08-03 sequencing rule and its 2026-08-06 re-ruling —
-that the track runs toward per-profile coherence rather than whole-corpus
-completion, measured at the adopter's floor and never at a roster substrate
-census — is superseded for the port's scope. What that rule refused was a
-*roster-census* justification: completing a substrate tally for its own sake.
-The case that carries now is different in kind, the elimination of a permanent
-duplicate. **No port-candidate criterion survives as an eligibility gate on
-which gates may be ported** (gate-sdk/SPEC.md §The port-candidate criteria):
-the technical problems those criteria name — self-referential parity, a rule
-depending on an external program — are engineering work the port owes, not
-exclusions it may take.
+**This supersedes the 2026-08-03/06 per-profile-coherence sequencing rule for the
+port's scope.** What that rule refused was a *roster-census* justification; the
+case that carries here is different in kind, the elimination of a permanent
+duplicate. **No port-candidate criterion survives as an eligibility gate**
+(gate-sdk/SPEC.md §The port-candidate criteria): the problems those criteria
+name are engineering work the port owes, not exclusions it may take.
 
 **Both install paths ship, and the disclosure boundary is untouched.** An adopter
 takes a **pre-compiled binary**, or builds from source — where *from source*
@@ -374,38 +343,13 @@ it reopens none, because what a developer builds from is the artifact that is
 public already. Recorded because the question is worth asking once and expensive
 to ask twice — the two paths sound like a disclosure change and are not one.
 
-**The consumer's own gates port into `native/` — ruled 2026-08-14.** The gates
-this repo declares under `scripts/` become subcommands of the existing
-multi-call binary rather than a second consumer-owned crate or a sanctioned
-shell block, so no part of the remaining corpus is now without a destination.
-The ruling's grounds and the cost it accepts — an adopter's binary carries
-subcommands implementing another project's repo rules, which they can never
-register — were the queue entry's, and that entry has since been **discharged
-and retired**: gate-sdk/SPEC.md §The consumer remainder cohort records the last
-tranche, after which `scripts/` keeps no gate script at all. Recorded here
-because it binds every remaining cohort's ordering and the entry that owned it
-was always going to leave the queue.
-
-**The port's tail, in order — ruled 2026-08-23 and re-recorded 2026-08-24:** `battery-runner-port`
-first, because it is the only unit that moves wall-clock and it removes the bash seam every other
-shell member dispatches through; then `shell-gate-tail-port`, the gates the registry oracle read as
-owed plus the kit-shipped shell gates this tree never registers. **Both landed.** Then the
-bootstrap, which is now **one** member rather than a pair. What the sequence names after the port:
-`companion-toolkit-profile`.
-
-**The pair became a single member, ruled 2026-08-24 by the operator on a scope re-verification, and
-what it corrects is a premise rather than a direction.** `install-step-relocation` is **retired as
-mooted**: the graph half of its deliverable already dispatches to the binary through
-`run-gates.sh --emit graph`, and its other half, `gen-pre-commit.sh --write`, is refused relocation
-by the closed operator-ratified ruling at gate-sdk/SPEC.md §gen-pre-commit — so nothing remained for
-it to move. `powershell-installer-surface` absorbs the relocation and is **re-scoped to its honest
-size**. The measurement that forced this: the "resolve the platform, place the binary, invoke it"
-shape describes roughly eighty lines of `installer/lib/init.sh`, while the roughly three hundred and
-fifty lines beside it — kit-source vendoring, manifest and lock I/O, registry and queue seeding, the
-commit flow — are conditional install logic no ruling had put behind the invoke. Read that as the
-directive's scope being stated correctly and its *size* having been understated; the direction, the
-ordering and the completion predicate are untouched, and this is a retirement of a spent premise
-rather than a reversal of anything ruled.
+**The port's tail — ruled 2026-08-23.** The runner and the shell-gate tail landed; what
+remains is the bootstrap, **one** member, `powershell-installer-surface`, which owns the Windows
+half and the relocation of every conditional install step behind the invoke. Its honest size,
+measured 2026-08-24: the "resolve the platform, place the binary, invoke it" shape is roughly
+eighty lines of `installer/lib/init.sh`, and the roughly three hundred and fifty beside it —
+kit-source vendoring, manifest and lock I/O, registry and queue seeding, the commit flow — are
+conditional install logic not yet behind the invoke. After the port: `companion-toolkit-profile`.
 
 `instruction-surface-bash-focus` unblocks on a threshold rather than a date,
 per its own queue entry. Surge-channel launch stays gated behind the private
