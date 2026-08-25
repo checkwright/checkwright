@@ -2486,6 +2486,13 @@
   or both), and whether a citation of *landed* work should be distinguishable in prose at all
   — a grammar question the SPEC left unanswered when it refused a relational vocabulary, and
   answering it the wrong way re-imports the maintained-roster anti-pattern that refusal avoided.
+  **HELD 2026-08-25 on directive priority, AS A MEMBER OF THE CITATION-LIVENESS BUNDLE** — the
+  hold is the bundle's, not this entry's. It is cluster B's report-only half, riding the
+  resolution `bin/queue-edges.sh` already performs, so separating it re-buys the cluster's
+  context for the cheapest member. The unit that eventually promotes that bundle carries this
+  entry in without re-deriving the membership, and the roster it belongs to is recorded in the
+  survey record for the question "does the citation-liveness deferred family converge on one
+  mechanism" (lifecycle-kit/SPEC.md §The survey record; re-run the witness before citing it).
   **Cost while deferred:** dead citations accumulate at the rate rulings close, and each is a
   false premise sitting in a survey input at exactly the moment a scope decides what to promote.
   Filed 2026-08-06 at close, draining the gap inbox; found 2026-08-06 at scope.
@@ -2531,13 +2538,11 @@
   Two events, one fact, zero stamps: stronger than the founding attestation, which had to infer
   its unstamped event from the prompt log. Stamped directly, out of channel, under the rule this
   iteration landed as obliged (lifecycle-kit/SPEC.md §The committed gap inbox).
-  `.workflow/knowledge-friction.log` read **empty** at the 2026-08-06 close, across an
-  iteration that added a Rust module, a build-time source stamp and a new gate. The same
-  iteration's prompt-friction log records a build session reading a *deleted* `.gate`
-  descriptor out of git history to shape the one it was writing — a prior deliverable
-  consulted because no surface carries an example, which is exactly the class
-  drift-kit/templates/close-knowledge.md names and `bin/kfric.sh` exists to stamp. It was not
-  stamped, and nothing noticed.
+  **The founding attestation, 2026-08-06, is the same shape one grade weaker** — the log read
+  **empty** across an iteration that added a Rust module, a source stamp and a gate, while its
+  prompt log records a build session reading a *deleted* `.gate` descriptor out of git history to
+  shape the one it was writing, the class `bin/kfric.sh` exists to stamp. Not stamped, nothing
+  noticed, and inferred from the prompt log rather than observed.
   **The reader is what makes it expensive.** `kpi-knowledge-friction` trends the log toward
   zero and reads that trend as the tier contract's holes filling. A sensor with an
   in-the-moment capture discipline and no independent floor cannot tell a filled hole from an
@@ -2550,17 +2555,20 @@
   Which is right turns on whether the KPI is meant to be trusted at zero, a contract call.
   **Cost while deferred:** the one KPI measuring the tier contract's completeness reads best
   exactly when nobody is capturing, and no other signal contradicts it.
-  **THREE HOLDS, 2026-08-24, across two consecutive scopes and their leads, every one on the
-  surface criterion and none a decline of the finding.** Nothing in the promoted turn-end and
-  worktree control set touches drift-kit's capture loop or the KPI that reads it. The third is
-  operator-ruled. No date joins a hold — a decline is not a firing — and the log read **empty**
-  again at this boundary, the expected reading at an iteration's open and no firing either.
+  **FOUR HOLDS, none a decline of the finding, and the fourth is on a different ground.** Three
+  were 2026-08-24 across two consecutive scopes and their leads, every one on the surface
+  criterion — nothing in the promoted turn-end and worktree control set touched drift-kit's
+  capture loop — and the third was operator-ruled. **The FOURTH, 2026-08-25, is not a fourth of
+  those:** that boundary's directive was undirected, so the surface criterion did not exist to
+  hold on, and the ground is **directive priority** — the operator ruled the iteration to the
+  port's bootstrap and granted no yield. A later reader sees three surface holds and one priority
+  hold, not four of a kind. No date joins a hold — a decline is not a firing — and the log read
+  **empty** again at this boundary, the expected reading at an iteration's open.
   **The pairing the first hold could not carry:** `kfric-obligation-residency` is this entry's
   writer-side twin — that entry is the capture obligation never reaching the writer, this is how
   an empty log may be read once it has — and both resolve alongside
-  `recurrence-obligation-residency` under delegation-kit/SPEC.md §Operative residency's placement
-  rule. A unit taking the capture loop should take all three; taking this one alone answers the
-  reader's question while leaving the writer unserved.
+  `recurrence-obligation-residency` under delegation-kit/SPEC.md §Operative residency. A unit
+  taking the capture loop takes all three; this one alone leaves the writer unserved.
   Filed 2026-08-06 at close, from its own knowledge-friction sweep.
 
 - **reclaim-precondition-outside-the-tree** [design-pending] — a declared `reclaim=` can be
@@ -7906,6 +7914,73 @@
   Surfaced 2026-08-25 by the `turn-end-liveness-seam-and-worktree-cause` close, which reproduced
   it twice while dispatching its own sweeps, and filed to the gap inbox there; promoted
   2026-08-25 at this scope's drain of that inbox.
+
+- **isolated-child-liveness-hook-displaces-its-report** [design-pending] — the turn-end liveness
+  hook does exactly what it was told under worktree isolation, and doing so overwrites the
+  child's report on the only channel the dispatcher reads.
+  **Attested first-hand 2026-08-25 at this scope, not predicted.** A read-only citation-liveness
+  sweep dispatched with `isolation: worktree` completed its whole survey and returned a
+  producer-liveness message instead of it. One resume round-trip carrying an explicit re-emit
+  instruction recovered the full report, so the work was not lost — it was paid for twice.
+  **The hook is not misbehaving, and that is the finding.** `native/target/release/`'s binary is
+  gitignored under `target/`, so it is absent in a fresh worktree, and
+  `scripts/subagent-stop-liveness.sh` already anticipates exactly this: under a worktree-isolated
+  dispatch, binary-dispatched gates do not resolve and "the lawful response there is to report
+  the gate as unavailable and return". It reports, as instructed. The harness then returns only
+  the child's LAST assistant message, so a correct report-and-return displaces the survey.
+  **DISTINCT from `worktree-isolated-agent-report-lost-to-a-failed-peer-send`**, promoted the same
+  session: that failure needs the child to attempt a send to an unresolvable peer. This one needs
+  no send at all — a hook the child never invoked emits the displacing message — so the two share
+  the symptom and share no trigger.
+  **DISTINCT from `worktree-isolated-dispatch-cannot-reach-the-main-checkout`, and downstream of
+  it.** That entry's subject is the child's WRITES, and its bridge is `git rev-parse
+  --git-common-dir`; this is the child's RETURN VALUE. The composition is what neither covers as
+  written: that entry's cause — a binary a worktree child cannot resolve — produces the other
+  entry's symptom, and a session reading either alone concludes it is covered.
+  **Deliverable — rule one of three.** Resolve the binary through the main checkout, which is the
+  sibling's bridge and folds this half into it; or emit the unavailability on a channel that does
+  not become the child's final assistant message; or have the hook return silently when the
+  target is a worktree it cannot resolve, which is cheap and pulls against fail-closed — the
+  reason it is a fork and not an obvious fix.
+  **Cost while deferred:** one wasted dispatch round-trip per isolated sweep, paid while the
+  dispatcher is waiting, and silent in the worse direction — the returned text reads as a
+  liveness complaint rather than as a dropped report, so a less careful dispatcher records a
+  sweep that never reported. That is a correctness risk, not an efficiency one.
+  Attested 2026-08-25 at this scope while dispatching its own survey; filed the same session on
+  the lead's direction, before the resume journal holding it was swept.
+
+- **site-health-issue-venue-unwanted** [design-pending] — the site-health probe files issues on
+  the public repo for failures the iteration lifecycle resolves anyway, and the operator does not
+  want that venue.
+  **Operator-ruled 2026-08-25: the issue-filing path is unwanted.** The objection is to the
+  **venue**, not to the probe — and a later session must not read it as the probe being wrong.
+  Both firings were true positives on the same arm, the release-body note pointer: issue #1
+  2026-08-08 on `v0.22.0` and issue #2 2026-08-24 on `v0.25.0`, each closed by the probe's own
+  recovery path. Verified rather than relayed: #2 closed 2026-08-25T07:09:13Z, and both issues
+  are already **closed**, so nothing needs cleanup. Deleting them is admin-only, irreversible and
+  **not authorized** — it is not part of this deliverable.
+  **The fork, unresolved, and it is two changes rather than one.** (1) Repo-copy only: delete the
+  step and the `issues: write` scope from `.github/workflows/site-health.yml`. One file — but
+  that file is pinned governed repo-meta in `scripts/core-files.list` and is a copy of
+  `site-kit/templates/site-health.yml`, so this forks the template a repo governed by its own
+  kits dogfoods. (2) Kit-level opt-in: the issue path becomes consumer config defaulting **off**
+  under the `<KIT>_<KNOB>` convention, with this repo taking the default — template plus
+  site-kit/SPEC.md plus `site-kit/smoke/install.sh`, which copies the template in.
+  **Option 2 is the recommendation and it is BLOCKED, operator-class.** The template header states
+  the issue path as a standing design ruling — a failed probe opens or updates an issue and
+  recovery self-clears — so making it opt-out reverses that ruling, which is the operator's to do
+  and neither a stage's nor a lead's. Recorded rather than resolved.
+  **The replacement signal is the whole cost, and one half is now probed.** Candidate A, red run
+  only: GitHub's documented scheduled-failure notification targets the last modifier of the
+  **cron syntax** — not the last committer — and here that is `016d522a`, 2026-07-10, the
+  operator, so the channel resolves to the right person today. The limit that cannot be probed
+  from the tree is whether their notification settings deliver it. Candidate B, write the failure
+  report to the run's job summary: visible in the Actions tab and files nothing, but the workflow
+  writes no step summary today, so this is net-new work rather than a redirect.
+  **Cost while deferred:** tracker noise on a public repo, and nothing worse — the probe is
+  accurate and self-clearing, so no outage goes unseen while this waits.
+  Operator-directed filing 2026-08-25, relayed through the lead at this scope; the tree read
+  behind it was re-run here rather than taken on the relay.
 
 ## Icebox
 
