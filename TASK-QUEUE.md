@@ -635,8 +635,9 @@
   without writing that manifest would be a second install model with no upgrade
   or uninstall story, which is the sequencing risk this entry has always
   flagged; the named contract replaces the re-derivation it used to imply.
-  The upgrade/uninstall story itself is `installer-lifecycle-verbs` below —
-  sequence against it rather than duplicating it.
+  The upgrade/uninstall story itself has shipped as the installer's `update`
+  and `uninstall` verbs, specified at installer/README.md §update and
+  §uninstall — sequence against those rather than duplicating them.
   **Negative result — the tarball channel's economics do not transfer here.**
   `release-tarball-delivery-channel` is cheap for a structural reason that is
   absent from this rung: `.github/workflows/publish.yml`'s `pack` job already
@@ -2449,7 +2450,17 @@
 
 - **dead-queue-citation-report** [design-pending] — an in-body citation that resolves to no
   live entry reads exactly like one that does, and nothing names the difference.
-  recurrence: dead-queue-citation-report 2026-08-14
+  recurrence: dead-queue-citation-report 2026-08-14 2026-08-25
+  **THIRD instance, 2026-08-25, found first-hand by the very scope survey it was predicted to
+  mislead.** `plugin-marketplace` read "The upgrade/uninstall story itself is
+  `installer-lifecycle-verbs` below — sequence against it rather than duplicating it", and no
+  entry of that slug exists anywhere in this file: the work landed, the citation kept a
+  directional pointer, and a live entry went on instructing a future promoting session to
+  sequence against a sibling that is not there. The cost field's own sentence, occurring — a
+  false premise in a survey input at the moment a scope decides what to promote — and the
+  battery was clean throughout, since `check-task-conservation` reads membership and a body
+  citation is not a membership claim. Corrected inline in the commit that stamped this date, so
+  the class is what remains and the instance misleads nobody else.
   queue-kit/SPEC.md §The tag algebra rules the in-body single-backtick slug a *reference*
   rather than a membership claim, aggregated by `bin/queue-edges.sh` and "audited by
   nothing". That is a deliberate choice and stays right — entries legitimately name landed
