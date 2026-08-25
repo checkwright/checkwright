@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: install-relocation-boundary-and-first-cut
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -598,6 +598,13 @@
   **Cost while deferred:** the pivot's OS-reach objective stays unmet on the one platform it
   names that no current path reaches, and every install-path change is authored bash-first,
   which is the habit that made this entry necessary.
+  **RULED THIS ITERATION'S UNIT — 2026-08-25 by the operator, and no fourth yield was granted.**
+  The alternative weighed and refused was the citation-liveness bundle, the pool's largest
+  measured exit; the PRIORITY DIRECTIVE took the boundary unencumbered because the directive's
+  three prior yields each spent one named iteration and none carried forward. The shape ruled with
+  it is the entry's own: the fork-1 amendment — what moves behind the invoke and what PowerShell
+  must re-implement — plus the first relocation cut, demoting rather than moving to `## Done` as
+  the port entries do, since fork 2 is unanswerable until fork 1 fixes how many steps there are.
   Filed 2026-08-03 by spec, on the operator's trajectory pivot; re-scoped 2026-08-24 at scope,
   on the operator's ruling, after a first-hand read of the install path rather than an inherited
   premise.
