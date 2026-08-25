@@ -7961,11 +7961,17 @@
   want that venue.
   **Operator-ruled 2026-08-25: the issue-filing path is unwanted.** The objection is to the
   **venue**, not to the probe — and a later session must not read it as the probe being wrong.
-  Both firings were true positives on the same arm, the release-body note pointer: issue #1
-  2026-08-08 on `v0.22.0` and issue #2 2026-08-24 on `v0.25.0`, each closed by the probe's own
-  recovery path. Verified rather than relayed: #2 closed 2026-08-25T07:09:13Z, and both issues
-  are already **closed**, so nothing needs cleanup. Deleting them is admin-only, irreversible and
-  **not authorized** — it is not part of this deliverable.
+  Both firings were true positives on arm #6, the Release body missing its note URL: 2026-08-08
+  on `v0.22.0` and 2026-08-24 on `v0.25.0`, each cleared by the probe's own recovery path.
+  **Those dates sit in this prose deliberately.** The operator has since deleted both issues —
+  probed here, `gh issue list --state all` returns nothing — so the tracker is empty, two dead
+  run-log URLs are all that survives of the evidence, and the underlying defect is tracked at
+  `release-body-step-has-no-in-tree-witness` rather than at any issue that still resolves. The
+  `site-health` label survives and is harmless: the workflow's label creation is idempotent and
+  its open-issue lookup returns empty either way.
+  **The deletion is not the fix, and an empty tracker is not the problem going away.** The
+  workflow is unchanged and still armed on its `17 6 * * *` cron, so the next arm-#6 failure
+  opens a fresh issue. That is the whole reason this entry exists.
   **The fork, unresolved, and it is two changes rather than one.** (1) Repo-copy only: delete the
   step and the `issues: write` scope from `.github/workflows/site-health.yml`. One file — but
   that file is pinned governed repo-meta in `scripts/core-files.list` and is a copy of
