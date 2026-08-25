@@ -39,6 +39,19 @@
   itself; and it states that dependency in its own text, so a reader meets a leg green against
   a named baseline rather than green simpliciter. Lead-ruled 2026-08-25 on the hazard the build
   session named against itself — a CI leg that greens on a known fail.
+  **REHEARSED, AND THE RULED SHAPE DOES NOT YET REACH THE HAZARD — measured, not predicted.**
+  Running the leg's exact body locally, the smoke failed at the *starter* profile and the leg
+  still printed `diff-baseline: clean` at exit 0. Cause is granularity, not the comparator: the
+  suite is on the `exit-code` parser, so its whole verdict is ONE scenario and its baseline row
+  is that scenario at `fail`. Any non-zero matches it, and a zero is an unpromoted recovery, so
+  every outcome reads clean. What the leg proves today is that the activation path RUNS on a
+  clean checkout and prints its findings — real coverage, since nothing in CI did even that —
+  and not that the install is sound. Its own text says so rather than overselling. Closing it
+  needs per-arm scenarios for this suite, which is `validate-baseline-suite-coverage`'s reserved
+  design call; escalated at build 2026-08-25 rather than taken.
+  **UNPROVEN IN CI.** The authorized pull-request run was not bought: the push is refused by
+  this session's own permission settings, which is an operator decision to route back rather
+  than around. So the leg is written and locally rehearsed, never yet executed by a runner.
   Debt: CI configuration over a suite that already exists; it adds no governed name.
 
 ## Deferred
