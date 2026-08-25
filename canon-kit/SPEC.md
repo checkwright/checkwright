@@ -204,6 +204,13 @@ supplies the checklist they invoke and the gate behind the promotion rule.
    This is the branch to state explicitly because it is the uncatchable one — the
    Done-move contract has no gate behind either half, so the wrong terminal move
    reds nothing and is found only by a later reader.
+   **A demotion also lands the entry back inside a size cap, where a Done move
+   would not.** A done entry is a bare slug and nothing measures it; a deferred
+   entry is measured per-entry (queue-kit/SPEC.md §check-queue-entry-budget), so
+   any roster or table this amendment instructs the build to transcribe onto the
+   entry is priced against that cap, and an entry already near it is compressed in
+   the same commit that demotes it. Neither owner states this alone — the cap is
+   queue-kit's and the demotion is this section's — and they meet only here.
 5. Propagate removals (grep every spec for names the change retired), file
    discovered gaps as debt tasks, and commit the merge with the work.
 
