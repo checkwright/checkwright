@@ -6,25 +6,41 @@
 # copy of it to tell "this platform was never committed to" (omit and declare)
 # from "committed to, artifact missing" (a broken payload).
 #
-# It ships one target, and the grounds are measured rather than cautious:
-#   - x86_64-unknown-linux-gnu is the only platform .github/workflows/ has a
-#     runner for — every job is ubuntu-latest and no other runner is declared.
-#   - It is the only platform this repo has green evidence for at all: every
-#     gate run, fixture suite, consumer smoke and CI leg is Linux.
+# It ships one target, and the ground is evidence rather than capability. The
+# two are easy to conflate here, and conflating them is what makes a roster
+# widen on a plan instead of on a run:
+#   - x86_64-unknown-linux-gnu is the only platform this repo has green evidence
+#     for at all: every gate run, fixture suite, consumer smoke and CI leg is
+#     Linux. §Consumer payload's join bound is exactly that evidence, so no
+#     other triple qualifies however reachable it looks.
+#   - Runner availability is not the constraint. This repository is public, so
+#     macOS and arm64-Linux hosted runners are already available to it; what is
+#     missing is a run bought on one, not a machine to buy it on. Measured
+#     2026-08-25. A header claiming the workflows have no runner for a platform
+#     would be reading a fact about this repo as a fact about the world.
+#   - Cross-compiling a target from the Linux runner is refused for the reason
+#     the bound gives rather than on cost: it would publish an artifact no run
+#     has ever executed.
 #   - WSL is Linux and resolves to this same target, so docs/install.md
 #     §Requirements' Windows-through-WSL claim is served exactly as far as that
 #     page already claims and no further; native Windows waits on
 #     `powershell-installer-surface`.
-#   - A macOS target would be built on a runner no workflow has, and
-#     cross-compiling one from ubuntu-latest is worse than omitting it: it would
-#     publish an artifact no run has ever executed.
 #
 # This is not a narrowing of the trajectory — the objectives are the direction
 # and this roster is the tree. A one-target roster makes the omit-and-declare
 # path the normal path for a macOS adopter on day one, which ships that path
 # exercised rather than as the dead code the vacuous-green class exists to
 # refuse. A target joins only when a green run has produced and exercised its
-# artifact, and never beyond what docs/install.md §Requirements already states;
-# the widening trigger is `platform-support-ci-matrix` landing a CI leg, after
-# which widening is one line here plus one runner mapping.
+# artifact, and never beyond what docs/install.md §Requirements already states.
+#
+# What a second line costs, in full rather than the publish half alone: one
+# runner mapping beside the publish matrix, and then the consumer smoke, which
+# builds its artifact from the host it runs on and therefore refuses a roster
+# naming a platform that host is not — steering or a cross-compiling build,
+# neither built ahead of the second target. "One line here plus one runner
+# mapping" is the publish half and not the bill.
+# gate-sdk/SPEC.md §Consumer payload owns both halves;
+# installer/README.md §The consumer smoke owns the smoke's own re-entry. The
+# widening trigger is `platform-support-ci-matrix` producing a green run on a
+# platform, never the leg merely landing.
 x86_64-unknown-linux-gnu

@@ -5780,9 +5780,21 @@ case and never as a payload whose every target went missing.
 **A roster line is a support commitment, so it is bounded twice.** It may not
 exceed what the project's own install documentation already states, and a target
 joins only when a green run has produced and exercised its artifact — not when a
-platform is reasoned about. Widening is therefore mechanical and cheap by
-construction: because the build matrix is roster-derived, a new platform is one
-roster line plus one runner mapping, never a workflow rewrite.
+platform is reasoned about, and not when a provider merely offers a runner for
+it. A build leg written and never run discharges nothing: *produced and
+exercised* is a fact about a run that happened, which is why the bound survives
+contact with a plan that looks certain.
+
+**Widening is cheap on the publish path and not free elsewhere**, and both
+halves are stated because the cheap one alone reads as the whole cost and is
+not. Cheap: the build matrix is roster-derived, so a new platform is one roster
+line plus one runner mapping, never a workflow rewrite. Not free: a consumer
+smoke that builds its artifact from the host it runs on cannot satisfy a roster
+naming a platform that host is not, so the second roster line blocks such a
+smoke until it is steered at a narrowed roster through
+`GATE_SDK_NATIVE_TARGETS_FILE` (§Layout and configuration) or given a
+cross-compiling build. installer/README.md §The consumer smoke owns that
+re-entry and records which of the two is built.
 
 **One payload carries every declared target, not one payload per target**, and
 the artifacts are never produced from a working tree: the pack step takes them
