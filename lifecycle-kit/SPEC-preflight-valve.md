@@ -47,6 +47,30 @@ holds.**
   already owns beside it. Stated as a non-target because the witness's
   read-to-`NF` spelling makes the field look free, and it is not.
 
+**The seam ruling** (CLAUDE.md §The provenance seam) — stated rather than left
+to be inferred from the defaults, because this unit is one where a literal would
+be easy and wrong.
+
+- **Kit mechanism:** the arm, the four-field grammar, the two fail-closed
+  refusals, the match rule, the consumption, the admission report, and the
+  widened purity predicate. All generic — none names a suite, a gate, a stage
+  beyond the configured roster, or any vocabulary of the tree that filed the
+  defect.
+- **Consumer config, via env, per §Conventions established in gate-sdk:**
+  `LIFECYCLE_KIT_PREFLIGHT_VALVE_FILE`, whose **empty default** is the seam being
+  held rather than a convenience — a kit shipping a default ledger path would
+  spell one consumer's workflow-directory layout into every adopter's install, the
+  same reasoning `LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE` already takes for its empty
+  default one knob away. Which stages may be valved is likewise not a kit literal:
+  it is whatever an arming line names, bounded by the configured stage roster.
+- **Private rule content — none, and none is created.** The `<reason>` field is
+  free text authored by a consumer's own session on a consumer's own file; the
+  kit specifies that it must be non-empty and never what it may say. The one
+  deadlock this valve is documented *for* is described generically — a stage whose
+  entry pre-flight is refused by a precondition only a later stage can clear —
+  with this repo's close/manifest instance living in the consumer's queue entry
+  and this amendment, not in the kit's prose.
+
 ## What changes
 
 ### (1) A one-shot valve admits one entry past a refusing entry pre-flight
@@ -321,25 +345,62 @@ clearable by inspection:
   `bin/install-lifecycle.sh` in the same commit. This is the reader most easily
   missed, because the knob edit and the file that goes stale are in different
   kits' surfaces.
-- `check-knob-citation` — reds on a knob defined in code and cited nowhere in its
-  owning SPEC's roster. **Not monotone** (its red condition is a zero citation
-  count): `LIFECYCLE_KIT_PREFLIGHT_VALVE_FILE` reds until §Layout and
-  configuration carries it.
-- `check-knob-default-coupling` — reds when a code default and the SPEC's stated
-  default disagree, and, per its own limit, has **no singularity assertion** — two
-  agreeing literals pass. **Not monotone**: the empty-string default must be
-  stated in both places and spelled the same way, and it must not be
-  open-coded a second time in the consumer config.
-- `check-workflow-tiering` — reds on a `.workflow/` member that is neither
-  tracked nor ignored. **Not monotone** (its red condition is finding an
-  unclassified member): the new ledger reds until it is committed.
-- `check-spec-pointer` — reds on a `# contract:`/`# spec:` comment whose path does
-  not resolve. **Not monotone**: the ledger's header must be pointer-form and
-  resolve, on the pattern `.workflow/release-disposition.txt` already sets.
-- `check-close-surfaces` — reds on a declared close surface missing a required
-  field, and reports an `(undeclared)` capture surface. **Not monotone**: a new
-  per-iteration capture surface under `.workflow/` owes its declaration, and
-  delta 3's obligation is what that declaration's `reclaim=` names.
+- `check-docs-mirror-fresh` — reds when the on-site mirror of a kit SPEC differs
+  byte-wise from the SPEC it mirrors. **Not monotone**, and **certain rather than
+  contingent**: every delta but 6 edits `lifecycle-kit/SPEC.md`, which the gate
+  couples to directly, so it reds until the mirror is regenerated with the emit
+  arm its own help names. Mechanical, and easy to miss because the file that goes
+  stale is in `docs/` while every edit is in the kit.
+- `check-knob-citation` — reds when a knob is stated **with a value** in a
+  manifest file that does **not** own it; a statement inside the owning SPEC is
+  where the value belongs and is no defect (`native/src/gates/knob_citation.rs`,
+  `token_owner`, which returns no owner when the scanned file is the owner).
+  **Not monotone**, and the obligation runs the opposite way from the obvious
+  reading: state the default in `lifecycle-kit/SPEC.md` and nowhere else, and in
+  particular do not restate it in `CLAUDE.md` or another kit's SPEC. The consumer
+  config is outside the manifest set — a `.sh` file matches no manifest glob — so
+  the value there is unreachable to this gate.
+- `check-knob-default-coupling` — **no reader for this knob, probed twice over.**
+  Its red condition is a literal disagreement between code and SPEC. An empty
+  default is not a literal: `classify_literal` in
+  `native/src/gates/knob_default_coupling.rs` returns false on an empty value, and
+  the record is filtered out before the SPEC-agreement assertion ever runs. The
+  consumer config is out of corpus besides — the source walk is kit roots only,
+  and `scripts/` is not one. Recorded as a **non-reader with its evidence**
+  because the obvious reading is that a new knob owes this gate something, and it
+  does not — **so long as the default really is the empty string**, which is the
+  live conditional to re-check if that ever changes. The standing precedent is
+  `LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE`, empty in `lib/stages.sh` and stated
+  "default empty" in §Layout and configuration, with the battery green on it.
+- `check-workflow-tiering` — **two arms, and the second is the one that binds.**
+  (i) partition totality: a member neither tracked nor gitignored — cleared by
+  committing the ledger. (ii) a **tracked** member whose **first line** is not
+  `# contract: ` followed by either the pointer form `<path>.md §<section>` or the
+  version form. **Not monotone**: a tracked ledger with a hand-written or absent
+  header reds on arm (ii) even once arm (i) is clear, which is the arm a reader
+  who stops at "tracked or ignored" will miss. Data lines below the header are
+  unexamined here.
+- `check-spec-pointer` — reds on a directive whose path does not **resolve**, and
+  where the directive carries `§<section>`, on the target file carrying no such
+  heading. **Not monotone**: the ledger's header must name a tracked file and a
+  live heading, on the pattern `.workflow/release-disposition.txt` already sets.
+  **No `CANON_KIT_COMMENT_WHITELIST` entry is owed** — the workflow directory's
+  tracked members are blessed by shape, so shape is not the risk here and
+  resolution is.
+- `check-close-surfaces` — **it will not red on the ledger, and that is the
+  finding rather than a relief.** Its undeclared-surface arm triggers on
+  **capture-tier** members only — the roster's second source is the workflow
+  directory's *gitignored* members — and its `reclaim=` arm runs only where
+  `git check-ignore` succeeds. The ledger is tracked, so neither arm reaches it
+  and no `reclaim=` is owed. **The consequence is the point:** without a
+  deliberate `close-surface:` declaration the ledger never appears on the roster
+  close's inbound-triage sweep recomputes, so delta 3's obligation would rest on
+  prose alone with no forcing function. Declaring it is therefore a **choice this
+  amendment makes**, not a gate satisfied — `advisory`, or `forced=` naming
+  §bin/enter-stage.sh, and a `forced=` mode must be authored on a **manifest**
+  surface for its citation to resolve, which `lifecycle-kit/SPEC.md` is and a
+  stage-skill binding is not. Once declared, the live red condition is a
+  malformed or missing mode.
 - `check-stage-evidence` — three red conditions, and only two of them clear by
   inspection. Stamp **grammar** and **name-axis** disagreement: monotone and
   cleared — no delta touches the grammar, and delta 1's admitted entry writes the
@@ -350,6 +411,21 @@ clearable by inspection:
   the reader that forced delta 5. Recorded at this length because the first two
   arms clear so readily that stopping at "no delta touches the stamp grammar"
   would have shipped delta 1 with its own commit unable to land.
+- `check-scratch-citation` — **the supersede set's third reader, and the one this
+  amendment's first pass missed.** Its red condition is a
+  `LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS` surface carrying a truncated-set path in
+  **retrieval-pointer position** — a markdown link target, or a path introduced by
+  a colon and closing its clause; a bare mention elsewhere in prose is clean.
+  **Not monotone**: delta 6 puts the ledger in the truncated set, so this repo's
+  permanent surfaces (its queue and every `*/SPEC.md`, lifecycle-kit's own
+  included) acquire enforcement over it with no second roster to update, and the
+  build gets it whether or not it wants it.
+  **It converges with delta 3 rather than fighting it, which is the useful
+  reading.** Close may not discharge its obligation by *pointing* the task it
+  files at the ledger, because the ledger dies at the next boundary and the
+  pointer would resolve to nothing — the finding has to be **inlined** into the
+  filed task. The gate that would red is enforcing exactly what delta 3 already
+  requires on independent grounds.
 - `check-stage-entry` — reds on its own three assertions. **Monotone and cleared
   by inspection**: the valve deliberately does not reach this pre-flight (delta
   1's first narrowing), so its verdict is unchanged on every path.
@@ -362,22 +438,45 @@ clearable by inspection:
 - `check-lifecycle-registration` — reds when the resident registration block and
   the live config's rendering disagree. **Monotone and cleared by inspection**:
   that block is rendered from the stage roster, which no delta touches.
-- `check-shim-restatement` / `check-skill-binding` / `check-stage-skill-coverage`
-  — read the stage templates and their skill shims. **Not monotone** for the
-  restatement arm (its red condition is an n-gram overlap between shim and
-  template): deltas 2 and 3 add template prose, so the shims must not acquire a
-  copy of it.
-- `check-surface-duplication` — reds when a canonical definition appears on a
-  second surface. **Not monotone**: the valve's contract is owned by
-  §bin/enter-stage.sh and the stage templates must **point** at it, not restate
-  it. Deltas 2 and 3 are the ones to diff against delta 4's text.
-- `lifecycle-kit/gate-tests/enter-stage.test.sh` — reds when an entry's exit code,
-  written state or emitted text differs from the asserted one. **Not monotone**
-  (exact exits, exact text): existing cases run with the knob unset and are
-  unaffected by the empty default, but new cases are owed for armed-and-admitted,
-  armed-for-another-stage, armed-for-another-iteration, already-`used`, both
-  fail-closed malformed shapes, the configured-but-absent path, and
-  `--simulate` leaving the ledger byte-identical.
+- `check-shim-restatement` — **the one live reader of the template edits.** Its
+  dedup corpus is unconfigured here and so defaults to the always-loaded agent
+  file plus every kit's `templates/**/*.md`, which contains both templates deltas
+  2 and 3 edit. Red condition: a `.claude/commands/` shim sharing a normalized
+  word n-gram of at least `LIFECYCLE_KIT_SHIM_NGRAM` with a corpus surface. **Not
+  monotone** — new template prose can only add n-grams — and contingent on prose
+  not yet written, so it is a judgment at build rather than a fixed edit.
+- `check-skill-binding` — **no reader.** It reds on a `*<slot:` placeholder in a
+  template with no matching `## Bindings` entry in its shim, and back. Deltas 2
+  and 3 add mechanism-owned prose and mint **no new consumer binding slot**, so
+  the gate is untouched. Stated because "I edited a stage template" reads like it
+  should oblige a shim edit, and on this axis it does not.
+- `check-stage-skill-coverage` — **no reader.** Its subject is stage-set to
+  `<stage>.md` coverage and the liveness of the stage names in each skill's
+  `enter-stage.sh <name>` invocations. No delta adds a stage or changes an
+  invocation.
+- `check-rule-citation` — **no reader, definitively.** Its corpus is
+  delegation-kit's SPEC and its agent-execution template, and nothing else.
+  Recorded because its name reads like a general citation rule over templates and
+  it is a single-pair gate.
+- `check-brevity` — **no reader.** Its scanned surface is one named section of the
+  always-loaded agent file, which no delta edits.
+- `check-surface-duplication` — **not a reader in this tree at all: it is
+  registered in no `gates.list` and does not run here.** Its subject is a glossary
+  term's bold-lead-in definition appearing off the glossary, which is not the
+  owner-and-pointer relation this amendment cares about anyway. So the obligation
+  that §bin/enter-stage.sh owns the valve contract while both stage templates
+  **point** at it is **doctrine held by review at the audit stage, with no gate
+  behind it** — stated plainly rather than left to look enforced.
+- `lifecycle-kit/gate-tests/` — the hermetic behavioral suite, whose members are
+  topic-named (`boundary-stage-journal.test.sh`, `rename-iteration.test.sh`, …).
+  **There is no `enter-stage.test.sh`**, probed rather than assumed, so the cases
+  this change owes go in a new sibling rather than into a file that does not
+  exist. Red condition: an entry's exit code, written state or emitted text
+  differing from the asserted one. **Not monotone** (exact exits, exact text).
+  Cases owed: armed-and-admitted, armed-for-another-stage,
+  armed-for-another-iteration, already-`used`, both fail-closed malformed shapes,
+  the configured-but-absent path, and `--simulate` leaving the ledger
+  byte-identical.
 - `lifecycle-kit/smoke/` — reds on its own assertions over a live install.
   **Not monotone**: the `--simulate` scenarios there are the roster's executable
   statement, so the new arm's would-admit branch is owed a scenario beside the
@@ -432,19 +531,32 @@ clearable by inspection:
   than assumed: `gate-tests/check-merge-attrs/{good,bad}` pin a block rendered
   against the *kit defaults*, where `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` is empty, so
   a consumer-side member reaches the tracked root file and nothing else.
-- `.workflow/preflight-valve.txt` — created with its `# contract:` pointer header
-  and committed, which is also what clears `check-workflow-tiering` (delta 6).
-- This repo's close-surface declaration for the new `.workflow/` capture member,
-  including the `reclaim=` field the boundary truncation satisfies (deltas 3
-  and 6).
+- `.workflow/preflight-valve.txt` — created and committed with a first line of
+  exactly `# contract: <owner-path>.md §<section>`, which is what clears **both**
+  of `check-workflow-tiering`'s arms rather than only the tracked/ignored one
+  (delta 6).
+- `docs/lifecycle-kit/SPEC.md` — the on-site mirror, **regenerated** with the
+  docs-mirror emit arm rather than hand-edited, because every delta but 6 edits
+  the SPEC it byte-mirrors (all deltas).
+- `lifecycle-kit/SPEC.md` — a full-line `close-surface: <ledger-path> <mode>`
+  declaration for the ledger, authored **here** because a `forced=` mode needs a
+  manifest surface to resolve its citation and a stage-skill binding is not one.
+  It carries **no** `reclaim=` field: that is owed by gitignored capture members
+  and the ledger is tracked. This target is a deliberate addition rather than a
+  gate satisfied, per the reader enumeration above (deltas 3 and 6).
 - `lifecycle-kit/gate-tests/check-stage-evidence/` and its `.test.sh` — the purity
   assertion's fixture pair and behavioral cases, which pin the exemption set delta
   5 widens; a widening asserted only in prose is a widening with no oracle
   (delta 5).
-- `lifecycle-kit/gate-tests/enter-stage.test.sh` — the hermetic cases the reader
-  enumeration above enumerates (all deltas).
-- `lifecycle-kit/smoke/` — the `--simulate` would-admit scenario beside the
-  existing three (delta 1).
+- `lifecycle-kit/gate-tests/` — a new topic-named `.test.sh` sibling carrying the
+  hermetic cases the reader enumeration above lists, on the naming convention
+  `boundary-stage-journal.test.sh` sets; **not** an `enter-stage.test.sh`, which
+  does not exist (all deltas).
+- `lifecycle-kit/smoke/install.sh` — the enter-stage block that already exercises
+  a red `LIFECYCLE_KIT_ENTRY_PREFLIGHT` command refusing the entry, and the
+  `--simulate` would-no-op / would-pass / would-refuse trio beside it; the
+  would-admit branch joins that trio, and an admitted entry joins the refusal
+  scenario as its sibling (delta 1).
 
 ## Definition of Done
 
@@ -470,5 +582,13 @@ clearable by inspection:
       and both stage templates point at it, diffed rather than assumed.
 - [ ] **The derived surfaces are re-emitted, not hand-edited** — the
       `.gitattributes` block comes from `bin/install-lifecycle.sh` against the
-      live config, and `check-merge-attrs` is green because of that and not
-      because the two were typed to match.
+      live config and the docs mirror from the docs-mirror emit arm;
+      `check-merge-attrs` and `check-docs-mirror-fresh` are green because of that
+      and not because anything was typed to match.
+- [ ] **The three ungated obligations are discharged deliberately** — the
+      `--simulate` roster sentence (a prose completeness claim no gate diffs
+      against the code), the `close-surface:` declaration (no gate forces one for
+      a tracked member), and the owner-and-pointer split between the SPEC and the
+      two stage templates (`check-surface-duplication` does not run in this tree).
+      Each is named here because a build that greens the battery has proved
+      nothing about any of them.
