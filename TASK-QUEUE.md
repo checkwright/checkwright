@@ -1047,6 +1047,10 @@
   un-defers on the first
   of: a macOS or WSL adopter appearing, or the support matrix wanting to promote
   a platform from experimental to supported.
+  **Back-pointer 2026-08-25 (lead ruling):** promoting this also unblocks port work — with
+  `native/targets.list` at one target, relocating `installer/lib/init.sh`'s unconditional remainder
+  behind the binary invoke is unreachable (criterion 5's omit-and-declare branch; the failure mode
+  is no install at all), so this entry gates `powershell-installer-surface`'s fork 2 as well.
   **Cost while deferred:** the support matrix's non-Linux rows rest on
   reasoning rather than on a green run, so a macOS claim is unfalsified in both
   directions; zero until a non-Linux adopter exists, then it becomes the
@@ -7996,6 +8000,134 @@
   accurate and self-clearing, so no outage goes unseen while this waits.
   Operator-directed filing 2026-08-25, relayed through the lead at this scope; the tree read
   behind it was re-run here rather than taken on the relay.
+
+- **citation-liveness-family-convergence** [design-pending] — the citation-liveness deferred family
+  is FOUR gate-touch points, not one resolver and not fourteen tickets; this entry is where that
+  measurement lives.
+  **Why the entry carries the survey rather than pointing at it.** The finding was bought at the
+  2026-08-25 scope into `.workflow/survey-record.md`, a boundary-reset built-in destroyed at the
+  next first-stage entry, and `check-scratch-citation` reds a permanent surface that points into
+  that set — so lifecycle-kit/SPEC.md §The survey record's four witness strings are inlined here,
+  where they are more durable than in the record. Member line numbers are dropped as re-derivable
+  and stale-prone; members are named by slug.
+  **The witness — re-run it before citing this, and dispatch only the delta if either half moved.**
+  corpus `TASK-QUEUE.md ## Deferred + ## Icebox`, `scripts/gates.list`, `native/src/gates/`; oracle
+  `bash queue-kit/bin/queue-edges.sh` plus a `grep -n` over the queue for citation/cite/liveness;
+  rev `ccac82f81f45ff07d5b5cbee6f8446465f070fa6`.
+  **The finding.** Fourteen members, twelve Deferred and two Icebox; none blocks on an
+  operator-class fork. (A) `check-spec-pointer` absorbs `prose-filename-citation-liveness`,
+  `unqualified-section-citation-liveness`, `link-wrapped-section-citation-liveness` and
+  `spec-pointer-self-section-citation` as ONE resolves-to-nothing predicate — those entries say the
+  guard WINDOW, not the citation form, is the variable — plus `spec-section-title-collision` and
+  `qualified-pointer-section-ownership` as two harder separate predicates on the same gate, the
+  latter self-declaring an honest not-buildable as a permitted outcome. (B)
+  `check-queue-slug-liveness` takes about two assertions for `retired-slug-live-pointer-citation`
+  and `queue-status-parenthetical-liveness`, plus two report-only deliverables riding
+  `bin/queue-edges.sh`'s existing resolution — `dead-queue-citation-report` and
+  `done-slug-ownership-citation-report`, both report-not-gate under the SPEC's
+  reference-vs-membership ruling. (C) `check-docs-cmd` widens from fenced-only to inline spans for
+  `cited-script-path-liveness-inline` and `stale-identifier-after-retirement`, likely one ticket,
+  though which gate holds it is an open ruling in the second entry. (D)
+  `guard-rule-number-not-citable-outside-kit` and `guard-rule-number-intra-kit-citations-ungated`
+  are an island: no gate resolves rule-number citations, 111 intra-kit citations were measured at
+  the last renumber, and the false-positive budget is the unknown.
+  **Two members are unverified.** Icebox's `doctrine-rule-number-citation-liveness` and
+  `false-ground-citation-propagation` are title-only — their bodies could not be read — and
+  DOCTRINE.md carries no `rule N` form today, so the first may be speculative.
+  **Excluded with cause:** `scratch-citation-skill-surface-reach` (self-disclaims, a glob-coverage
+  gap), `kit-ref-liveness-stem-token-hole` (env-knob tokens, already checked),
+  `fixture-assertion-liveness`, `survey-oracle-liveness-unasserted`. **Adjacent, unfolded:**
+  `amendment-landing-citation-assertions` and `amendment-owner-position-citation` share the shape
+  but ride `check-amendment-queue` over a corpus deleted at merge.
+  **Size floor:** four gate-touch points, eight to ten new assertions, two report outputs, all
+  native-crate — every gate named is already a native module, so the born-native default binds.
+  **Cost while deferred:** the expensive half of the pool's largest measured exit dies at every
+  first-stage entry that finds it uncarried, and re-buying it costs a full deferred-pool sweep plus
+  a read of four gate sources — the exact re-derivation the survey record exists to prevent, paid
+  by the scope that would otherwise re-propose the bundle.
+  Filed 2026-08-25 by close, draining the gap inbox; survey bought at that iteration's scope.
+
+- **artifact-digest-mismatch-remedy-inert** [design-pending] — `doctor` prints a remedy `init`
+  refuses to perform: a substituted gate binary is kept, not rewritten.
+  `installer/lib/doctor.sh:124` reports a DIGEST MISMATCH when the binary at `GATE_SDK_NATIVE_BIN`
+  no longer hashes to the recorded digest, and the verdict line at `:160` prints `help: re-run
+  init; it re-verifies the published digest and rewrites the binary`. A bare re-run does not
+  rewrite it: the artifact path goes through the ownership rule, and a file whose recorded hash no
+  longer matches is classified as the adopter's, reported in the changed-file list and left alone
+  without `--force`.
+  **Where the rule now lives, corrected at this drain.** The gap was filed against
+  `installer/lib/init.sh:280`, and this iteration's first relocation cut moved it: the ownership
+  test is now `claim()` in `native/src/install.rs:148`, applied to the artifact path at `:247`,
+  with `Claim::Kept` emitting the `kept` verb `init.sh:288` replays. The behaviour is preserved
+  verbatim — which is exactly what the relocation promised — so the defect is unchanged and the fix
+  is now a native-crate change rather than a bash one.
+  **The owner doc is on `doctor`'s side, so the defect is the code's.** `installer/README.md` §The
+  gate binary rules that nothing unverified is ever written and that a mismatch refuses rather than
+  warns; §doctor rules the artifact finding reports without setting the exit status precisely so
+  the re-run that is its own remedy is not blocked — a remedy the code then declines to perform.
+  **Candidate fix, narrow:** retire the ownership rule over the artifact path alone, on the ground
+  that a digest-verified artifact has no adopter-authored version for that rule to protect, and
+  leave every other claimed path untouched.
+  **Distinct from `powershell-installer-surface`**, whose subject is which side of the binary
+  invoke a step lives on; this is what the step does on either side.
+  **Cost while deferred:** the one remedy the installer's own diagnostic verb prints is inert, so an
+  adopter with a substituted binary follows the printed instruction, sees the same finding again,
+  and has nothing left to try short of reading the source.
+  Filed 2026-08-25 by close, draining the gap inbox; found at spec, locus re-verified here.
+
+- **manifest-artifact-files-row-contradiction** [design-pending] — the manifest's owner doc, and the
+  code comment restating it, both say the gate binary is not a `files` row. It is one.
+  `installer/README.md` §The manifest states that `artifact` is its own key *rather than* a `files`
+  row, reasoning that a `files` entry means hashed with `git hash-object` and rewritten when
+  unmodified while this one is hashed with SHA-256 against a published value.
+  `installer/lib/init.sh:334` restates that paragraph almost verbatim as a `spec:` comment.
+  **The shipped behaviour is both, and it is gated.** The `own`/`kept` verbs `record()` the artifact
+  path (`init.sh:287,289`), so it enters `WRITTEN` and the manifest loop at `:339-341` emits a
+  `files` row for it hashed by `files_hash` → `lock_hash`, i.e. `git hash-object` and not SHA-256;
+  the separate top-level `artifact` key is emitted alongside at `:338`.
+  `installer/consumer-smoke/run-smoke.sh:261` asserts `.files` has the binary path as expected
+  behaviour and is green, so the oracle is on the code's side.
+  **The rule both surfaces are groping for**, and the shape of the fix: the artifact's *path* takes
+  a `files` row because `init` wrote it and `uninstall` must reverse it, while the artifact's
+  *digest* rides its own key because it is an integrity claim rather than change detection. The two
+  hash families are real; *rather than a `files` row* is the wrong way to say it.
+  **The comment is a second defect, not a second report.** Per CLAUDE.md a comment restating its
+  owner doc is itself the defect, so the fix deletes the restatement at `init.sh:334` and keeps only
+  its directive tail — why the flag is passed conditionally. Correcting the comment in place would
+  bless the restatement.
+  **Cost while deferred:** the install surface's own reference doc misdescribes what the manifest
+  contains, so a reader reasoning about uninstall coverage, or about what a `files` entry means,
+  reaches the wrong answer and the code comment corroborates it.
+  Pre-existing since 2026-08-08. Filed 2026-08-25 by close, draining the gap inbox; found at align
+  as a comment defect, widened to its owner doc when this drain re-verified it.
+
+- **payload-derivation-ships-untracked-residue** [design-pending] — the installer payload is a
+  filesystem copy, not a tracked-set copy, so any untracked or gitignored file under a packed root
+  ships to adopters.
+  `scripts/pack-installer.sh` assembles the payload with `cp -R` — at `:110` over each
+  `gate_kit_roots_rel` root, and at `:102` over `installer/.` — so the shipped set is whatever is on
+  disk rather than whatever is committed. An ignored path that reaches a consumer then breaks
+  `init`'s `git add` there, because the consumer's own ignore rules refuse to stage it.
+  **Attested once, 2026-08-25 at build.** One run of `run-gate-tests.sh` left
+  `gate-sdk/gate-tests/check-crate-arms/good/.tmp/` behind — the fixture's own scratch dir,
+  gitignored in this tree — the next consumer smoke packed it, and `init` failed for the starter
+  profile with "could not stage the vendored files" on a worktree `git status` called clean. Latent
+  at filing: no ignored path currently sits under a kit root or under `installer/`.
+  **The gap as filed said `find`; the mechanism is `cp -R`** — corrected at this drain, and the
+  reach is wider than reported, since `installer/.` at `:102` is a second instance the report never
+  named at all.
+  **Two candidate fixes, neither taken.** Derive the payload from `git ls-files` rather than from
+  the filesystem — the wider one, since it also stops an unrelated untracked file in a packed root
+  from reaching an adopter — or have `run-gate-tests.sh` clear a fixture's scratch dir after each
+  pair, which closes the attested instance only.
+  **Why nothing catches it today, and the check class owed with the fix:** the residue is invisible
+  to every clean-worktree precondition in the tree, which is why it surfaced as a smoke failure
+  rather than as a refusal to pack. Packing refuses, or reports, on an untracked path in the set it
+  is about to ship.
+  **Cost while deferred:** a release can hand an adopter a payload that cannot install, and the
+  trigger is any tool in this tree leaving scratch under a packed root — which the battery's own
+  fixture runner has done once.
+  Filed 2026-08-25 by close, draining the gap inbox; found at build.
 
 ## Icebox
 
