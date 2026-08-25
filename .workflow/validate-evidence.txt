@@ -1,1 +1,25 @@
 # contract: evidence-manifest v1
+install-relocation-boundary-and-first-cut gates sha256=d66cb33a89598db3d16e158821727eb0c9db7a9146bc72223396ea7932cc19a6 pass=106 fail=0 ignore=0 verdict=clean 2026-08-25
+install-relocation-boundary-and-first-cut gate_sdk sha256=18f97d208af9a317d22c58c12390a5c319f2cc0e9aa17cba778edc64cc5344fd pass=1 fail=0 ignore=0 verdict=clean 2026-08-25
+install-relocation-boundary-and-first-cut canon_kit sha256=9d3cf3ab0a1425a5996fd26152019ba03a3e0f5fa5ad31aa0e4a19901b8acb5a pass=1 fail=0 ignore=0 verdict=clean 2026-08-25
+install-relocation-boundary-and-first-cut context_kit sha256=65e7536ec8b920506d9defb5f2fd338be716ee72482acf2e4819ca5b3fcbe891 pass=1 fail=0 ignore=0 verdict=clean 2026-08-25
+install-relocation-boundary-and-first-cut delegation_kit sha256=ccc527d5f87226b0de67d84cc9e56417838a2295033aaf6dd1e16d699926131d pass=1 fail=0 ignore=0 verdict=clean 2026-08-25
+install-relocation-boundary-and-first-cut doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-08-25
+install-relocation-boundary-and-first-cut evidence_kit sha256=a65e3e3b8e54c0d98a440fe3a2748c31b51d8850b5c0be10d8fcf5316febd55f pass=1 fail=0 ignore=0 verdict=clean 2026-08-25
+install-relocation-boundary-and-first-cut guard_kit sha256=234e06ba5cdb4ca383be7191965292443198471675d1b3166d8c264175420ae4 pass=1 fail=0 ignore=0 verdict=clean 2026-08-25
+install-relocation-boundary-and-first-cut lifecycle_kit sha256=55c0d3e68939b68858a225f53ce20889d8b17a92d840705f272968912d2427c3 pass=1 fail=0 ignore=0 verdict=clean 2026-08-25
+install-relocation-boundary-and-first-cut queue_kit sha256=bd337719dfff15f492ae94d8e8662663a8917b65edd4b3bfcfdd20f1790ba39b pass=1 fail=0 ignore=0 verdict=clean 2026-08-25
+install-relocation-boundary-and-first-cut site_kit sha256=07f7139ea31865677de58ea44b43f7c98ae6c40c8f3fe57e8975e8d65794be35 pass=1 fail=0 ignore=0 verdict=clean 2026-08-25
+install-relocation-boundary-and-first-cut scripts sha256=f302eab3cefcc19e12fac91459be10fb1b4c8f02dd63cef5ad040f4deb8dc259 pass=1 fail=0 ignore=0 verdict=clean 2026-08-25
+install-relocation-boundary-and-first-cut guard_tests sha256=bfd816948bc11b0d8b9c210f0690a29ee3df82ba3698be24fc5334e678daeafc pass=1 fail=0 ignore=0 verdict=clean 2026-08-25
+install-relocation-boundary-and-first-cut usage_tests sha256=04968d303b3e4ec54f3f8033f0e7e00d4b33ae90fd7507b48347cab56d0bc26d pass=1 fail=0 ignore=0 verdict=clean 2026-08-25
+install-relocation-boundary-and-first-cut budget_guard_tests sha256=94bbe0c41f3993e3c748a492d29e2a0d22139825b8c53bbae6a528500a8ce402 pass=1 fail=0 ignore=0 verdict=clean 2026-08-25
+install-relocation-boundary-and-first-cut dispatch_guard_tests sha256=6018943502411c07fe57162c0dae2ac37af304eccc0d0a9a6e0ec4fd733a1daf pass=1 fail=0 ignore=0 verdict=clean 2026-08-25
+install-relocation-boundary-and-first-cut trend_tests sha256=acdbfef4eab851fca00ca747245b6ac4a4f804b05989f9cd3acd014bb56ac330 pass=1 fail=0 ignore=0 verdict=clean 2026-08-25
+install-relocation-boundary-and-first-cut demo sha256=ecda2ddc0e470e880d0e4a61ebd04ca45bdeb690116dec51c0cbe4dc9acb2946 pass=1 fail=0 ignore=0 verdict=clean 2026-08-25
+install-relocation-boundary-and-first-cut installer_smoke sha256=2d071830257aa6e8f8de48ab3849cd0a0bf476091e4450b705fe43c78f7d9598 pass=0 fail=1 ignore=0 verdict=clean 2026-08-25
+install-relocation-boundary-and-first-cut consumer_smoke sha256=1ee19a429fd5755dbce507161824b1fcfaeb930aea78dfe0348681df70762f1b pass=1 fail=0 ignore=0 verdict=clean 2026-08-25
+install-relocation-boundary-and-first-cut upgrade sha256=b00f3f4749272b3d1e30e33808d2a597cdf7b7213b3c9313ede1b8367599cd96 pass=1 fail=0 ignore=0 verdict=clean 2026-08-25
+install-relocation-boundary-and-first-cut agents_md_smoke sha256=a13f736538662b424d888cb6a2d6ffcfdb899c6030fc47f7e20d1339cb313a94 pass=1 fail=0 ignore=0 verdict=clean 2026-08-25
+install-relocation-boundary-and-first-cut index_tests sha256=e14e152466dc5be0296b1e20575bf3d587e1e0a127e7c63ad57671dbcaeaddb8 pass=1 fail=0 ignore=0 verdict=clean 2026-08-25
+install-relocation-boundary-and-first-cut native_crate sha256=af7a9547e4d8eafa71f36a262b12eb4f7344766ae7dd62bfdd0b80cb64628a7a pass=1 fail=0 ignore=0 verdict=clean 2026-08-25
