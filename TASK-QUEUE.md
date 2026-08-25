@@ -3598,36 +3598,39 @@
   **So the machine has no in-contract path** for its own "validate ends with an
   accepted red" case. The filing close escaped only by the operator-directed
   filing exception (CLAUDE.md §Housekeeping), a carve-out and not a mechanism.
-  **Deliverable, and why `[design-pending]`:** the candidates trade off against
-  real properties. Let validate file a baseline slug against a gap-inbox bullet
-  rather than a queue task — cheap, but weakens the liveness check that makes the
-  mark self-retiring. Give the preflight a documented one-shot valve — honest, but
-  a valve that will be reached for whenever close is inconvenient. Or let a
-  configured permanent marker cover the transitional case — smallest change,
-  worst semantics, since the whole point is that the red is *not* permanent.
+  **THE FORK IS RULED — 2026-08-25, by the operator, at this scope's threshold escalation.** The
+  chosen candidate is the **documented one-shot preflight valve**; the other two are **closed** —
+  a baseline slug filed against a gap-inbox bullet weakens the liveness check that makes the mark
+  self-retiring, and a configured permanent marker contradicts a red that is not permanent.
+  **The valve's stated cost is part of the ruling rather than a caveat on it** — a valve gets
+  reached for whenever close is inconvenient — so its **documentation carries that cost as a
+  constraint**: a one-shot not saying what it is for, and that reaching for it twice is the
+  failure, is not the thing that was ruled. The tag stays because canon-kit/SPEC.md §The amendment
+  lifecycle makes every deferred entry design-pending until it is promoted out of the section, and
+  no amendment exists yet — the ruling fixed what that amendment will say, and hold history stops
+  accruing here because neither the fork nor the surface is a live ground any more.
   **Cost while deferred:** paid only when validate ends non-clean, but paid as a
   full stop that costs an operator round-trip at the boundary, in the exact
   situation where the tree is already known to be imperfect.
-  **Second and third firings — 2026-08-12 (`native-cohort-canon-kit`) and 2026-08-18
-  (`wide-budget-batch-and-hold-declaration`, at `f8c34c20`) — and the repeat is the argument.**
-  Both hit the identical wall on `installer_smoke`, the second on the init no-op/regen red, and
-  both escaped by the identical route: an operator-directed filing relayed by the lead. Cost
-  measured rather than predicted: one full stop and one operator round-trip per non-clean close.
-  Three consecutive non-clean validates, three operator interrupts, one route: the
-  structural reading above is now the only one left. The same drain found a **second face** the
-  candidates above do not cover — a baseline move stales the evidence line computed against the old
-  baseline — promoted as `baseline-move-stales-evidence-line`.
-  **NINE holds, none a decline of the finding, every one on surface or fork grounds.** The NINTH is
-  2026-08-24, OPERATOR-RULED at the next scope's threshold proposal against the turn-end liveness
-  set, with both the nine-hold count and the operator-class nature of the fork put in front of the
-  operator rather than left implicit. It stands on the ground the SIXTH settled: the operator
-  re-deferred this fork rather than ruling it, and nothing since has narrowed the three candidates.
-  The SIXTH and the later of the two 2026-08-22 holds were operator-ruled too; the rest were the
-  lead's, on the surface criterion alone, and their per-iteration enumeration is spent now that
-  every reading agrees. One probed ground is worth keeping out of it: the row is **not armed
-  today**, the live baselined `fail` naming a slug that still resolves. Count unchanged at two —
-  **no date joins a decline, the finding not having re-fired** — so each hold is discharged by
-  having reached the authority.
+  **Both recurrences are the same wall, and the repeat is what carried the ruling.** 2026-08-12
+  (`native-cohort-canon-kit`) and 2026-08-18 (`wide-budget-batch-and-hold-declaration`, at
+  `f8c34c20`) both hit `installer_smoke`, the second on the init no-op/regen red, and both escaped
+  by one route — an operator-directed filing relayed by the lead: three consecutive non-clean
+  validates, three operator interrupts, one route, at one full stop and one operator round-trip
+  each, measured rather than predicted. The same drain found a **second face** no candidate
+  covered — a baseline move stales the evidence line computed against the old baseline — promoted
+  as `baseline-move-stales-evidence-line`.
+  **NINE holds preceded the ruling, none a decline of the finding, every one on surface or fork
+  grounds.** The NINTH was 2026-08-24, operator-ruled at a threshold proposal against the turn-end
+  liveness set, with both the count and the operator-class nature of the fork put in front of the
+  operator rather than left implicit; the SIXTH and the later of the two 2026-08-22 holds were
+  operator-ruled too, and the rest were the lead's on the surface criterion. The series ended the
+  tenth time the entry reached the operator, when the fork was ruled instead of re-deferred: what
+  each hold bought was another approach to the authority, and the tenth approach is what the first
+  nine were for. One probed ground stays on record: the row is **not armed today**, the live
+  baselined `fail` naming a slug that still resolves — which is why the ruling could be taken with
+  nothing on fire. Count unchanged at two — **no date joined a decline, the finding not having
+  re-fired**.
   Filed 2026-08-10 by close, from its own blocked entry; the escape it needed is
   the evidence. Re-attested 2026-08-12 by close, again from its own blocked entry.
 
