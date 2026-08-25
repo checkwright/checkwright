@@ -1073,7 +1073,10 @@ the first refusal on every arm stands — and the refused alternative, allowing
 `unresolved` inside a linked worktree, is refused for exactly that reason. The
 root fix, a reader resolvable inside a worktree, is
 `worktree-isolated-dispatch-cannot-reach-the-main-checkout`'s and dissolves the
-arm's firing rather than bounding it.
+arm's firing rather than bounding it. **Measured live the same day, after the
+fix:** a worktree-isolated read-only dispatch was refused once and allowed on
+its next stop — two tool uses, ~18k child tokens, report delivered — against
+the 142 / ~179k / report-lost reading the hotfix answered.
 
 **`records=0` is not a clause, and the resemblance to the refused option is
 disclosed at both places it arises.** The refused capped variant read
