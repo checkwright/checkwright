@@ -71,7 +71,7 @@
   generated from a single declaration. Fork 1 is merged, so how many steps there are is settled.
   **Ordered by the operator's trajectory pivot 2026-08-03** — objective 2 is every major OS
   including Windows, objective 6 a script-interpreter surface that is minimal and
-  dual-implementable; the objective set is TRAJECTORY.md's. The installer is bash end to end, and
+  dual-implementable; the objective set is TRAJECTORY.md's. The bootstrap is bash end to end, and
   `platform-support-ci-matrix` covers Windows only as a **WSL** leg, a Linux userland wearing a
   Windows badge. **RE-SCOPED 2026-08-24 by the operator**: `install-step-relocation` retired as
   mooted, so the relocation is this entry's and most of it.
@@ -7614,6 +7614,16 @@
   spans and the four parenthetical counts, keep the two order-of-magnitude figures the argument
   rests on, and append a re-derive instruction. If the answer is OUTSIDE, the roster row says so
   once and every later sweep stops re-deciding it.
+  **The founding instance is gone and the shape came straight back — 2026-08-25, second instance.**
+  The `install-relocation-boundary-and-first-cut` merge rewrote `powershell-installer-surface`
+  wholesale, deleting the two line ranges and four per-file counts named above. Its replacement is a
+  ~22-row disposition table naming that file's internal functions (`target_of_host`,
+  `select_artifact`, `claim`, `record`, `copy_in`) in execution order, rev-pinned and carrying a
+  "re-derive by reading `init.sh` top to bottom" instruction. So the question is unchanged but its
+  instance is now HARDER, not easier: a named-function roster in execution order reads closer to the
+  class's core "call chain or roster" language than the line spans did. Reported by this close's
+  `internal-identifier-restatement` sweep, which escalated rather than editing, on the ground that
+  the table is the amendment's own merged deliverable — narrowing it is re-scoping landed work.
   **Why `[design-pending]`:** it rules the boundary of a governed audit class, an authoring
   question about the roster row rather than a code change.
   **Cost while deferred:** the figures rot silently, and the entry carrying them is the one
@@ -7959,6 +7969,14 @@
   dispatcher is waiting, and silent in the worse direction — the returned text reads as a
   liveness complaint rather than as a dropped report, so a less careful dispatcher records a
   sweep that never reported. That is a correctness risk, not an efficiency one.
+  recurrence: 2026-08-25
+  **The rate is now measured, not projected.** The close of the filing iteration dispatched two more
+  worktree-isolated read-only sweeps and BOTH were displaced, so the record is 3 for 3 and the cost
+  field's "one wasted dispatch round-trip per isolated sweep" is an observed rate rather than an
+  estimate. One further datum the recovery produced: a resume round-trip is not reliably
+  recoverable either — of the two resumes, one restated its report in full and the other came back
+  with no transcript at all ("this session just started"), so its whole sweep was lost and had to be
+  re-run by the dispatcher. That raises the cost above one round-trip on some fraction of instances.
   Attested 2026-08-25 at this scope while dispatching its own survey; filed the same session on
   the lead's direction, before the resume journal holding it was swept.
 
@@ -8081,10 +8099,10 @@
   row, reasoning that a `files` entry means hashed with `git hash-object` and rewritten when
   unmodified while this one is hashed with SHA-256 against a published value.
   `installer/lib/init.sh:334` restates that paragraph almost verbatim as a `spec:` comment.
-  **The shipped behaviour is both, and it is gated.** The `own`/`kept` verbs `record()` the artifact
-  path (`init.sh:287,289`), so it enters `WRITTEN` and the manifest loop at `:339-341` emits a
-  `files` row for it hashed by `files_hash` → `lock_hash`, i.e. `git hash-object` and not SHA-256;
-  the separate top-level `artifact` key is emitted alongside at `:338`.
+  **The shipped behaviour is both, and it is gated.** `init.sh` records the artifact path on the
+  placement path, so the manifest emits a `files` row for it — carrying the `git hash-object` hash
+  a `files` entry means (`installer/README.md` §The manifest) and not the published SHA-256 —
+  beside the separate top-level `artifact` key.
   `installer/consumer-smoke/run-smoke.sh:261` asserts `.files` has the binary path as expected
   behaviour and is green, so the oracle is on the code's side.
   **The rule both surfaces are groping for**, and the shape of the fix: the artifact's *path* takes
