@@ -61,8 +61,6 @@ COMMIT="$(jq -r '.checkwright.commit // ""' "$PKG" 2>/dev/null)"
 
 LOCK="$(lock_path "$ROOT")"
 PRIOR_FILES=""
-PRIOR_ARTIFACT_TARGET=""
-PRIOR_ARTIFACT_DIGEST=""
 if [[ -f "$LOCK" ]]; then
     lock_schema_ok "$LOCK" || die "$CHECKWRIGHT_LOCK_FILE carries a schema this build does not know" \
         "this manifest was written by a different Checkwright release. Upgrade the installer rather than letting it guess at a shape it was not built for."
@@ -77,8 +75,6 @@ if [[ -f "$LOCK" ]]; then
     fi
     [[ -n "$PROFILE" ]] || PROFILE="$(lock_field "$LOCK" profile)"
     PRIOR_FILES="$(jq -r 'if (.files | type) == "object" then (.files | to_entries[] | "\(.key)\t\(.value)") else empty end' "$LOCK" 2>/dev/null)"
-    PRIOR_ARTIFACT_TARGET="$(jq -r '.artifact.target // ""' "$LOCK" 2>/dev/null)"
-    PRIOR_ARTIFACT_DIGEST="$(jq -r '.artifact.digest // ""' "$LOCK" 2>/dev/null)"
 fi
 
 PROFILE="${PROFILE:-starter}"
@@ -275,36 +271,24 @@ if [[ -n "$QUEUE_SRC" && ! -f "$ROOT/$QUEUE_FILE" ]]; then
 fi
 
 # spec: installer/README.md §The gate binary — the write comes after every config seam is in place and before the hook is generated, because the generator resolves each member's invocation argv and a `.gate` member resolves to this binary: the knob must name it and the file must be there, or the generator reports a dispatch it cannot make
-SEAM="$GATES_DIR/gate-sdk-config.sh"
 if [[ -n "$ARTIFACT_TARGET" ]]; then
-    if claim "$ARTIFACT_PATH"; then
-        if (( ! DRY )); then
-            # spec: installer/README.md §The manifest — an on-disk artifact that still verifies against the recorded digest is not rewritten, which is what makes a bare re-run leave the tree byte-identical
-            if [[ "$PRIOR_ARTIFACT_TARGET" != "$ARTIFACT_TARGET" \
-               || "$PRIOR_ARTIFACT_DIGEST" != "$ARTIFACT_DIGEST" \
-               || ! -f "$ROOT/$ARTIFACT_PATH" \
-               || "$(digest_of "$ROOT/$ARTIFACT_PATH")" != "$ARTIFACT_DIGEST" ]]; then
-                cp "$ARTIFACT_SRC" "$ROOT/$ARTIFACT_PATH" && chmod +x "$ROOT/$ARTIFACT_PATH" \
-                    || die "could not write $ARTIFACT_PATH"
-            fi
-        fi
-        record "$ARTIFACT_PATH"
-    fi
-    # spec: gate-sdk/SPEC.md §Layout and configuration — the install location has one owner and it is this knob, which is why the lock records no path: a consumer's binary sits in their gates directory while the knob's default names the crate's build output, and only the seam can say so without relocating it for every existing reader
-    if claim "$SEAM"; then
-        if (( ! DRY )); then
-            {
-                # spec: gate-sdk/SPEC.md §Layout and configuration — the seam is a sourced shell file, so it carries the same two directives every kit's shipped config template carries: without them the consumer's own check-shellcheck reds on the file init just wrote them
-                [[ -f "$ROOT/$SEAM" ]] || printf '%s\n' \
-                    "# shellcheck shell=bash" \
-                    "# shellcheck disable=SC2034  # consumed by gate-sdk/lib/gate.sh after sourcing"
-                [[ -f "$ROOT/$SEAM" ]] && grep -v '^GATE_SDK_NATIVE_BIN=' "$ROOT/$SEAM"
-                printf 'GATE_SDK_NATIVE_BIN=%s\n' "$ARTIFACT_PATH"
-            } > "$ROOT/$SEAM.tmp" \
-                && mv "$ROOT/$SEAM.tmp" "$ROOT/$SEAM" || die "could not write $SEAM"
-        fi
-        [[ -n "${IS_WRITTEN[$SEAM]:-}" ]] || record "$SEAM"
-    fi
+    # spec: installer/README.md §The install boundary — the placement is one call to the verified payload artifact, run in place out of the payload where step 4 verified it rather than as the installed copy, which on a first install does not exist yet. Every value the op needs arrives as argv and it reads no knob, so the PowerShell twin issues this same call
+    PLACE=("$ARTIFACT_SRC" --install place-artifact
+        --root "$ROOT" --src "$ARTIFACT_SRC" --dest "$ARTIFACT_PATH"
+        --seam "$GATES_DIR/gate-sdk-config.sh"
+        --target "$ARTIFACT_TARGET" --digest "$ARTIFACT_DIGEST")
+    [[ -f "$LOCK" ]] && PLACE+=(--lock "$CHECKWRIGHT_LOCK_FILE")
+    (( FORCE )) && PLACE+=(--force)
+    (( DRY )) && PLACE+=(--dry-run)
+    PLACED="$("${PLACE[@]}")" || die "the gate binary could not be placed" "" "$?"
+    # spec: installer/README.md §The install boundary — the op's two stdout verbs, each performed here in the parent shell for the reason the seam plan above is: a record() inside a process substitution is discarded, so the plan may be produced in a subshell and the writes may not
+    while IFS=$'\t' read -r verb placed_path placed_hash; do
+        case "$verb" in
+            own)  [[ -n "${IS_WRITTEN[$placed_path]:-}" ]] || record "$placed_path" ;;
+            kept) CHANGED+=("$placed_path")
+                  [[ -n "${IS_WRITTEN[$placed_path]:-}" ]] || record "$placed_path" "$placed_hash" ;;
+        esac
+    done <<<"$PLACED"
 fi
 
 # spec: installer/README.md §init — the generated projections are produced by the vendored tools themselves, never restated by the installer: the hook generator and the graph emitter are gate-sdk's, so a consumer's artifacts are the ones their own gate-sdk makes

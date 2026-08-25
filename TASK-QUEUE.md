@@ -12,48 +12,6 @@
 
 ## New Features
 
-- **powershell-installer-surface** [spec: SPEC-install-boundary.md] — a native Windows install
-  path, and the relocation that has to precede it.
-  The installer is bash end to end, so native Windows is unreachable:
-  `native-gate-binary-port` states the limit in its own words — "`init` hands to bash, so
-  Windows stays blocked" — and `platform-support-ci-matrix` covers Windows only as a
-  **WSL** CI leg, which is a Linux userland wearing a Windows badge rather than a native path.
-  **Ordered by the operator's trajectory pivot 2026-08-03**, whose objective 2 is every major
-  OS including Windows and whose objective 6 is a script-interpreter surface that is minimal
-  and dual-implementable — bash for Linux and macOS, PowerShell for Windows. The objective set
-  is recorded in TRAJECTORY.md.
-  **RE-SCOPED 2026-08-24 by the operator, and the correction is a size rather than a
-  direction.** `install-step-relocation` is **retired as mooted**, so the relocation is this
-  entry's and it is most of the work; the `gen-pre-commit.sh --write` step is refused
-  relocation into the binary by the closed operator-ratified ruling at gate-sdk/SPEC.md
-  §gen-pre-commit.
-  **Measured at the scope that re-verified it, not estimated.** The three-step shape describes
-  `installer/lib/init.sh:102-147` and `:277-308` — roughly eighty lines, the platform resolve
-  plus the digest-verified placement. The remaining ~350 lines of that file, and `doctor.sh`
-  (164), `uninstall.sh` (214), `diff.sh` (66) and `update.sh` (34) beside it, are conditional
-  install logic no ruling had put behind the invoke.
-  **RULED THIS ITERATION'S UNIT — 2026-08-25 by the operator, and no fourth yield was
-  granted.** The alternative weighed and refused was the citation-liveness bundle, the pool's
-  largest measured exit; the PRIORITY DIRECTIVE took the boundary unencumbered because the
-  directive's three prior yields each spent one named iteration and none carried forward. The
-  shape ruled with it is the entry's own: the fork-1 amendment plus the first relocation cut,
-  demoting rather than moving to `## Done` as the port entries do, since fork 2 is unanswerable
-  until fork 1 fixes how many steps there are.
-  **FORK 1 IS AUTHORED — spec 2026-08-25, in the amendment this entry's `[spec:]` ref names.**
-  Its answer in one line: **five bootstrap steps, one retirement (`jq`), everything else behind
-  the invoke**; the per-step disposition roster is that amendment's delta 5 and is transcribed
-  onto this entry at demotion, because the file is deleted at merge. The first cut is
-  `init.sh:277-308` becoming one `--install place-artifact` call, chosen on delta 3's
-  takeability rule — a step is takeable now only if it already runs when an artifact was
-  selected, since a relocated step is unreachable on the platforms criterion 5 leaves without a
-  binary. **FORK 2 stays open** — two hand-kept bootstraps held in parity by a smoke leg versus
-  one generated from a single declaration — and is what this entry demotes for.
-  **Cost while deferred:** the pivot's OS-reach objective stays unmet on the one platform it
-  names that no current path reaches, and every install-path change is authored bash-first,
-  which is the habit that made this entry necessary.
-  Filed 2026-08-03 by spec, on the operator's trajectory pivot; re-scoped 2026-08-24 at scope,
-  on the operator's ruling, after a first-hand read of the install path rather than an
-  inherited premise.
 
 ## Technical Debt
 
@@ -108,6 +66,56 @@
   is permanently shell; the sequence is `battery-runner-port`, `shell-gate-tail-port`, then the
   bootstrap — the first two LANDED, and the bootstrap is now ONE member,
   `powershell-installer-surface`, `install-step-relocation` having retired as mooted.
+
+- **powershell-installer-surface** [design-pending] — a native Windows install path. **FORK 2 is
+  what remains**: two hand-kept bootstraps held in parity by a smoke leg, versus one bootstrap
+  generated from a single declaration. Fork 1 is merged, so how many steps there are is settled.
+  **Ordered by the operator's trajectory pivot 2026-08-03** — objective 2 is every major OS
+  including Windows, objective 6 a script-interpreter surface that is minimal and
+  dual-implementable; the objective set is TRAJECTORY.md's. The installer is bash end to end, and
+  `platform-support-ci-matrix` covers Windows only as a **WSL** leg, a Linux userland wearing a
+  Windows badge. **RE-SCOPED 2026-08-24 by the operator**: `install-step-relocation` retired as
+  mooted, so the relocation is this entry's and most of it.
+  **FORK 1'S ANSWER, merged 2026-08-25 into installer/README.md §The install boundary: five
+  bootstrap steps, one retirement (`jq`), everything else behind the invoke.** That count is fork
+  2's input. The `--install <op>` seam both bootstraps call is specified there and the first cut
+  is taken — `--install place-artifact`, the artifact placement and the config-seam write, on the
+  rule that a step is takeable only if it already runs when an artifact was selected: a relocated
+  step is unreachable on the platforms criterion 5 leaves with no binary (gate-sdk/SPEC.md
+  §Porting a gate to the binary substrate). The roster below is that answer in full, measured off
+  `installer/lib/*.sh` and `installer/bin/checkwright.sh` at `d0b54919` — re-derive by reading
+  `init.sh` top to bottom against the step names — in execution order:
+
+  | step | disposition |
+  | --- | --- |
+  | argv parse, `--help` | behind-invoke (bootstrap forwards argv verbatim) |
+  | payload presence | **bootstrap** (step 1) |
+  | git work-tree resolve | behind-invoke |
+  | clean-worktree precondition | behind-invoke |
+  | `jq` preflight | **retired** |
+  | package version/commit read | behind-invoke |
+  | prior-manifest read, downgrade refusal | behind-invoke |
+  | profile to kit set | behind-invoke |
+  | `doctor` precondition | behind-invoke |
+  | `target_of_host` | **bootstrap** (step 2) |
+  | `select_artifact` roster + completeness | **bootstrap** (step 3) |
+  | `select_artifact` digest verify | **bootstrap** (step 4) |
+  | `claim` / `record` / `copy_in` | behind-invoke |
+  | kit-source vendoring | behind-invoke |
+  | `gates.list` synthesis, omission lines | behind-invoke |
+  | config-seam plan, per-kit seeding | behind-invoke |
+  | queue seeding | behind-invoke |
+  | artifact placement + seam write | behind-invoke — **taken 2026-08-25** |
+  | generated projections | behind-invoke, declaring a `bash` spawn |
+  | prior-roster carry-forward | behind-invoke |
+  | manifest emit | behind-invoke |
+  | `git add` / commit flow | behind-invoke |
+  Every sibling surface is `behind-invoke` whole — `doctor.sh`, `diff.sh`, `uninstall.sh`,
+  `update.sh`, all of `lib/common/` — bar `digest.sh`'s hasher resolution, re-implemented rather
+  than called because step 4 needs it first; `bin/checkwright.sh` collapses into the bootstrap.
+  **Cost while deferred:** the pivot's OS-reach objective stays unmet on the one platform it
+  names that no current path reaches, and every install-path change is authored bash-first.
+  Filed 2026-08-03 by spec; re-scoped 2026-08-24 at scope; fork 1 merged and demoted 2026-08-25.
 
 - **port-oracle-instrument-self-disposition** [design-pending] — the tool that measures
   the completion predicate is still shell; its disposition is ruled and declared, and its PORT

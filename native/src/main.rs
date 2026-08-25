@@ -8,6 +8,7 @@ mod ere;
 mod evidence;
 mod fresh;
 mod gates;
+mod install;
 mod json;
 #[cfg(test)]
 mod knobenv;
@@ -17,6 +18,7 @@ mod queue;
 mod registry;
 mod runner;
 mod section;
+mod sha256;
 mod spec;
 mod stages;
 mod walk;
@@ -166,7 +168,7 @@ fn main() {
         Some(a) => a.as_str(),
         None => {
             eprintln!("checkwright-gates: no subcommand given");
-            eprintln!("  usage: checkwright-gates --list | --reads <gate-name> | --needs <gate-name> | --knobs <gate-name> | --source-stamp | --queue-parity <queue-file> | --declaration-parity section <file> <section> | --declaration-parity record <file> | --evidence-lib-parity lock <file>... | --evidence-lib-parity pid <pid>... | --run [--gates-dir <dir>] [--only <name>... | --for <path>...] | --emit-<arm> | <gate-name> [args...]");
+            eprintln!("  usage: checkwright-gates --list | --reads <gate-name> | --needs <gate-name> | --knobs <gate-name> | --source-stamp | --queue-parity <queue-file> | --declaration-parity section <file> <section> | --declaration-parity record <file> | --evidence-lib-parity lock <file>... | --evidence-lib-parity pid <pid>... | --install <op> [--<key> <value>]... | --run [--gates-dir <dir>] [--only <name>... | --for <path>...] | --emit-<arm> | <gate-name> [args...]");
             eprintln!("  bridged arms: {}", emit::arms().join(", "));
             exit(2);
         }
@@ -239,6 +241,14 @@ fn main() {
     // against `ek_lock_read` and `ek_pid_alive`. A top-level flag, like the arms around it.
     if first == "--evidence-lib-parity" {
         exit(evidence_lib_parity(&argv[1..]));
+    }
+
+    // spec: installer/README.md §The install boundary — the install seam both bootstraps call,
+    // resolved here before the registry lookup and absent from `--list` like the arms around it.
+    // spec: gate-sdk/SPEC.md §The non-gate arm — hardcoded, never bridged: the caller may not be
+    // assumed to be a POSIX shell, so every value arrives as argv and the arm reads no knob.
+    if first == "--install" {
+        exit(install::run(&argv[1..]));
     }
 
     // spec: gate-sdk/SPEC.md §check-reads-couples — one line per walk root and nothing else: a

@@ -1488,8 +1488,9 @@ re-deciding, and only the operator reopens a closed ruling.
 
 The binary is a multi-call binary whose *gate* subcommands are dispatched by
 name out of `gates::REGISTRY`. It also carries arms that are **not** gates —
-`--list`, `--reads`, `--knobs`, `--source-stamp`, `--queue-parity` and
-`--declaration-parity` — and the class they form is named here because a
+`--list`, `--reads`, `--knobs`, `--source-stamp`, `--queue-parity`,
+`--declaration-parity`, `--evidence-lib-parity` and `--install` — and the class
+they form is named here because a
 session arriving with a new non-gate thing to port has no other way to learn
 that one exists or what it costs. Each arm's own `spec:` comment explains that
 arm's placement to whoever is already reading it; none of them can reach the
@@ -1619,6 +1620,25 @@ hardcoded top-level flag is reached by neither and receives nothing. A configure
 tool ported as a top-level flag therefore resolves platform defaults and silently
 ignores every consumer override — which is not a calibration between two workable
 shapes but the difference between working and appearing to.
+
+**`--install` is the class's first *deliberately unbridged* member, and that is
+the property the class had not carried before.** Every earlier hardcoded flag is
+hardcoded because it needs no configuration; this one is hardcoded because its
+caller cannot supply any. The forced-family test above resolves on what the
+member reads, and `--install` reads nothing: it is called by the installer's
+bootstrap, which TRAJECTORY.md §The objectives' objective 6 forbids assuming to
+be a POSIX shell at all, so **every value it needs arrives as argv** and it
+resolves no knob and no kit config. A bridged install arm would be resolved by
+`gate_command` — a bash front-end sourcing each owning kit's `lib/*.sh` — and
+would therefore be unreachable from the PowerShell half of that boundary. Its
+named caller is `installer/lib/init.sh` today and its PowerShell twin after,
+and its grammar, channels and exit statuses are
+installer/README.md §The install boundary's. It owes no descriptor,
+registration or fixture pair, like every other member; what it is asserted by is
+the consumer smoke's install path (installer/README.md §The consumer smoke).
+**The zero-config reading is a property, not an exemption** — a later op that
+grows a configured input has to arrive as a new argv key rather than as a knob,
+or it re-breaks the half of the boundary the member exists to serve.
 
 **`bin/port-blockers.sh` is a ruled future member of that table, and recording the
 route is not taking the port.** The tool reads the gates dir, the kit roots, the
@@ -2069,6 +2089,18 @@ that answers each is the one whose corpus matches its question.
    a published artifact today, and a host with none is omitted-and-declared rather
    than dispatched into an absent binary, which is the branch that keeps a freshly
    vendored battery alive on an uncovered platform.
+
+   **That branch bounds what the *installer* may relocate, not only whether a
+   ported gate stays runnable.** Both no-binary outcomes leave `init` with nothing
+   to invoke, so an install step moved behind the binary invoke is a step an
+   artifact-less host cannot run at all: the failure the relocation introduces
+   there is no install rather than a smaller battery. The rule that follows —
+   a step is takeable now iff it already runs only when an artifact was selected,
+   and relocating the unconditional remainder is sequenced behind the roster
+   covering every supported platform — is
+   installer/README.md §The install boundary's, stated there because it governs
+   the installer rather than any gate. This criterion is where a porting session
+   meets it, which is why it is named here rather than only there.
    The placement branch never waited on that tag for its
    evidence — `consumer-smoke-artifact-arm` gave the consumer smoke a leg that builds
    the binary and packs it, so every invocation drives selection, pre-write digest

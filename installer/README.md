@@ -23,7 +23,9 @@ vendored keeps working — it needs nothing from a package registry again.
 
 ## Implementation
 
-Bash. npm is the delivery vehicle, never the implementation: the `bin` entry is
+Bash, up to the boundary §The install boundary rules: the verbs are bash, and
+what the bootstrap hands to the verified gate binary is Rust the same section
+names. npm is the delivery vehicle, never the implementation: the `bin` entry is
 a bash script, so a reader reviewing what they are about to run reads source
 rather than a build product, and the linter that governs every other script in
 the repository governs these too.
@@ -228,7 +230,10 @@ would otherwise leave behind (§uninstall): overwrite what `init` would otherwis
 protect.
 
 `--dry-run` prints the file plan and the manifest that would be written, writes
-nothing, and exits 0.
+nothing, and exits 0. The contract is **end to end, not caller-deep**: a step
+that runs behind the binary invoke is passed `--dry-run` and honors it there
+(§The install boundary), so the plan a dry run prints is produced by the same
+code the real run performs rather than by a second prediction of it.
 
 ## What init seeds
 
@@ -341,6 +346,123 @@ than by coincidence, held there by `check-install-disposition`. The two describe
 two different trees, which is why the disposition is what a kit owns and the
 roster is what each caller derives.
 
+## The install boundary
+
+`init` is bash today, and one part of it must stay whatever language the host
+already runs: the bootstrap that resolves, verifies and executes the gate
+binary. Everything else is **conditional install logic**, and
+TRAJECTORY.md's interpreter policy (§The closed rulings) rules that everything
+conditional belongs on the far side of that invoke — written once, in Rust,
+rather than twice, in bash and in the PowerShell half a native Windows install
+needs. This
+section states the bootstrap's job, the disposition every install step carries,
+and the test that assigns one, so a step's side of the line is read off a rule
+rather than re-argued per step.
+
+**The bootstrap's job is the whole of what is written twice:**
+
+1. resolve the package's own payload directory;
+2. resolve the host to one Rust target triple;
+3. read the payload's target roster and resolve the artifact and its sidecar,
+   refusing a declared target whose pair is incomplete;
+4. verify the artifact's SHA-256 against that sidecar;
+5. execute the verified artifact, forwarding argv verbatim.
+
+**Every step's disposition takes one of three values**, and the test that
+assigns one is *what the step needs that the binary cannot supply at that
+moment*:
+
+- **`bootstrap`** — the step must precede the invoke because the binary cannot
+  select, verify or execute itself. The steps listed above, and nothing else.
+- **`behind-invoke`** — conditional install logic. Written once, in Rust. This
+  is the default: the interpreter policy rules that everything conditional
+  belongs on the far side of the invoke, so a step claiming `bootstrap` owes a
+  reason drawn from the previous bullet and no other.
+- **`retired`** — the step exists only to serve a dependency the relocation
+  removes, and ceases to exist rather than moving. `init`'s `jq` preflight is
+  the worked case: nothing behind the invoke reads JSON with `jq`.
+
+**Step 5 is *execute*, not *install*.** The tracked copy of the binary under the
+consumer's gates directory is an install artifact with ownership semantics —
+claimed against the manifest, carried in `files[]`, removed by `uninstall` — so
+by the rule above it is conditional install logic and sits `behind-invoke`. The
+bootstrap runs the artifact **in place, out of the payload**, where step 4 has
+just verified it; a copy to a scratch path in order to run it would be a copy
+with no reader. The interpreter policy's "place the matching binary" names the
+job *make the binary runnable*, and its very next sentence is what settles which
+half of "place" this is.
+
+**A `behind-invoke` step may spawn `bash`, and one does.** `gen-pre-commit.sh`
+does not port (gate-sdk/SPEC.md §gen-pre-commit), and `check-graph` is
+`install: zero-config`, so a fresh consumer's day-one battery holds the
+generated hook against `--emit` and the hook must therefore exist at install.
+The step is consequently neither droppable nor portable. It is **not** stuck:
+the compiled substrate already spawns `bash <emitter>` for exactly this
+generator from `check-graph`'s own assertion, the port criteria clear that spawn
+explicitly because `bash` is on `GATE_SDK_PROGRAM_FLOOR`
+(gate-sdk/SPEC.md §lib/gate.sh) — the payload's own assumed-program set, not
+`context-kit/lib/toolfloor.sh`'s consumer-audience probe roster that `bash` also
+happens to sit on — and the arm declares it. So the step moves behind the invoke
+as a declared spawn, and the *bootstrap* — which is what the interpreter
+policy's standing "assume no POSIX shell" obligation binds — spawns nothing.
+Recorded because the natural reading is that this step is a third class that
+neither moves nor re-implements.
+
+**`--install <op>` is the seam both bootstraps call**, specified so the two
+calls are byte-identical. It is a non-gate arm of the binary
+(gate-sdk/SPEC.md §The non-gate arm) and deliberately **not** a bridged one: a
+bridged arm's knobs are resolved by `gate_command`, a bash front-end, and this
+arm's caller is the bootstrap, which may not be assumed to be a POSIX shell at
+all. So **every value the arm needs arrives as argv**, and the arm reads no kit
+config and no knob. A bridged install arm would be unreachable from the half of
+the boundary this section exists to make writable.
+
+- **Grammar.** `--install <op> [--<key> <value>]…`, `<op>` from a closed set, an
+  unknown `<op>` or an unknown key exiting 2.
+- **Channels, because the caller is a program in two languages.** *stdout* is a
+  wire: one record per line, tab-separated, `<verb><TAB><field>…`. *stderr* is
+  the adopter-facing report.
+- **Exit status.** `0` performed — or, under `--dry-run`, planned; `1` an
+  adopter-actionable refusal; `2` usage or harness error, on
+  gate-sdk/SPEC.md §Fail-closed contract's terms.
+- **`--dry-run` is owed by every mutating op**, on §The verbs' existing
+  classifier: print the plan, write nothing, exit 0.
+
+`place-artifact` is the one op today and it produces no `1`: its only failures
+are a bad argv and a write it could not make, which are both `2`. The status is
+specified on the family rather than on the op, so an op that *can* refuse
+something the adopter can act on has a status to refuse with rather than minting
+one.
+
+**The relocation's own precondition: an uncovered platform must still install.**
+A step may move behind the invoke only where the binary is reachable on every
+platform that step runs on today, and today it is not. §The gate binary's
+selection table has three outcomes and two of them leave `init` with no binary —
+a host whose triple the payload's roster does not carry
+(`substrate-unavailable`), and a host with no SHA-256 hasher
+(`digest-unverifiable`). Both **proceed** today, omitting the compiled gates and
+declaring the omission in the consumer's `gates.list`, and that branch is what
+keeps a freshly vendored battery alive on an uncovered platform. Once
+conditional install logic sits behind the invoke, the same branch has nothing to
+run at all: the failure mode the relocation introduces is **not a smaller
+battery but no install**, and nothing in tree asserts that a relocated step
+still runs on an artifact-less host.
+
+**The rule that yields, and it is what selects each cut:** a step is takeable
+now iff it *already* runs only when an artifact was selected. Such a step costs
+an artifact-less host nothing, because on that host it never ran. Two
+consequences follow for the steps that are not:
+
+- **Relocating the *unconditional* remainder of `init` is sequenced behind the
+  artifact roster covering every supported platform** — the ground
+  `platform-support-ci-matrix` covers and `native/targets.list` declares.
+- **`digest-unverifiable` must become a refusal rather than an omission** at the
+  same moment, because step 4 of the bootstrap is irreducible: a host that
+  cannot hash cannot verify, and verifying before executing is the whole of the
+  integrity claim. On Windows the branch is vacuous — PowerShell carries
+  `Get-FileHash` — so the cost lands on a POSIX host missing both `sha256sum`
+  and `shasum`.
+
 ## The gate binary
 
 A gate whose implementation is a compiled subcommand needs that binary on disk
@@ -433,11 +555,46 @@ the count and remedy on a line of its own beside its summary
 (gate-sdk/SPEC.md §run-gates), and `doctor` reports it against the reason that
 caused it.
 
+**Placement is one call, and the bootstrap makes it.** Steps 1 to 4 above are
+the bootstrap's; placing the artifact is conditional install logic, so it sits
+behind the invoke as `--install place-artifact` (§The install boundary). The
+bootstrap runs the **payload** artifact it just verified, never the installed
+copy, which on a first install does not exist yet:
+
+```
+<artifact> --install place-artifact
+    --root   <absolute repo root>
+    --src    <the verified payload artifact>
+    --dest   <repo-relative path for the installed binary>
+    --seam   <repo-relative path of <gates-dir>/gate-sdk-config.sh>
+    --target <rust target triple>
+    --digest <the artifact's verified SHA-256>
+    [--lock  <repo-relative manifest path>]
+    [--force] [--dry-run]
+```
+
+Every key has a reader inside the op: `--root` resolves every relative path,
+`--src` is the copy source, `--dest` and `--seam` are the two claimed paths,
+`--target` and `--digest` are compared against the manifest's `artifact` key and
+the on-disk copy for the skip-rewrite branch, `--lock` supplies the recorded
+hashes the claim compares, and `--force` and `--dry-run` carry `init`'s existing
+meanings. `--lock` is optional and absent on a first install, where nothing is
+claimed. Two stdout verbs come back, and each has one reader in the caller:
+
+| verb | record | the caller's reader |
+| --- | --- | --- |
+| `own` | `own<TAB><path>` | the path is recorded and joins the staged set |
+| `kept` | `kept<TAB><path><TAB><hash>` | the path joins the changed-file report and is carried forward at that hash |
+
+A third verb distinguishing an unchanged write from a write is deliberately
+absent: no caller reads the difference, including the `--dry-run` report, and a
+field with no reader is removed.
+
 **The install location has one owner.** The binary is written to your gates
-directory beside the `gates.list` seeded there, and `init` sets
+directory beside the `gates.list` seeded there, and the op sets
 `GATE_SDK_NATIVE_BIN` to that path in `<gates-dir>/gate-sdk-config.sh` — the
 optional persistent config seam gate-sdk's library already sources when it
-exists (gate-sdk/SPEC.md §Layout and configuration). `init` creates that file
+exists (gate-sdk/SPEC.md §Layout and configuration). The op creates that file
 when it places an artifact, and gate-sdk ships no config template for it because
 **the seam file's content is resolved at install time rather than shipped**: its
 one line sets `GATE_SDK_NATIVE_BIN` to the path the artifact was actually placed
@@ -448,12 +605,22 @@ template seam happens to copy, so it does not expire when the copy changes.
 The knob's own default is unchanged and still names the crate's build output,
 because it is a **stable relative path** on purpose: the generated hook persists
 the emitted argv, so a machine-specific path baked into a tracked hook would make
-the graph artifact's freshness comparison machine-dependent.
+the graph artifact's freshness comparison machine-dependent. The seam is claimed
+like any rewritten surface and then rewritten preserving every line except the
+one setting `GATE_SDK_NATIVE_BIN`, seeding the two shellcheck directives only
+when the file is absent — so an adopter's own knobs in that file survive every re-run.
 
-**Ordering is load-bearing.** The config seam and the binary are both in place
-before the pre-commit hook is generated, because the generator resolves each
-member's invocation argv and a `.gate` member resolves to this binary. A hook
-generated first would resolve a dispatch it cannot make.
+**The non-destructive re-run is the op's too.** `--dest` is claimed against the
+hash `--lock` records for it and left alone when it differs, unless `--force`;
+the copy is skipped when the recorded target, the recorded digest and the
+on-disk digest all agree with `--target` and `--digest`, which is what makes a
+bare re-run leave the tree byte-identical.
+
+**Ordering is load-bearing.** The op is called after every config seam is in
+place and before the pre-commit hook is generated, because the generator
+resolves each member's invocation argv and a `.gate` member resolves to this
+binary — the knob must name it and the file must be there. A hook generated
+first would resolve a dispatch it cannot make.
 
 Every row of the table above runs under an oracle rather than a
 hand-verification with a date on it, and the rows are split across §The consumer
@@ -1300,7 +1467,10 @@ either way: with no `kits` key, a tail match returns a vendored fixture for
 **Every arm above rides §The gate binary's placement outcome**, because the
 payload they install carries this run's artifact: the binary is written, an
 `artifact` key reaches the manifest, nothing is omitted, and each profile's
-battery dispatches its `.gate` members through the placed path. The **omission**
+battery dispatches its `.gate` members through the placed path. That outcome is
+now the `--install place-artifact` op's rather than an inline branch of `init`,
+so the same arms are also what asserts the first relocated step behaves as the
+shell block it replaced — the assertions themselves did not move. The **omission**
 outcome is not thereby lost — it is what the binary-less leg above is for, and
 there the members recorded `# omitted:` are exactly the ones the consumer's own
 vendored tree implements as a binary subcommand. That set is derived rather than
@@ -1322,7 +1492,10 @@ the outcomes a single install cannot show. It takes its own extraction of that
 same tarball and mutates the copy, rather than packing a second time — a host
 **off** the roster omits and declares and exits clean, a **tampered** artifact
 refuses with the consumer's tree object unchanged and no manifest written, and a
-**declared** target whose artifact is gone refuses rather than omitting. The last
+**declared** target whose artifact is gone refuses rather than omitting. All
+three are bootstrap outcomes, decided before the invoke, so the arm is unmoved
+by the placement step going behind it: the two refusals are step 3's and step
+4's, and the omission is step 2's. The last
 two are what keep the three outcomes of §The gate binary's table from collapsing
 into each other. Mutating an extracted package rather than adding a flag to the
 publishing path is deliberate: it leaves the publisher no way to ship a payload
