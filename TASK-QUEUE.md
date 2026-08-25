@@ -7825,6 +7825,74 @@
   work. Evicted to the icebox on a low, non-rotting cost; returned to Deferred
   2026-08-25 on a judged recurrence, the tag algebra's own icebox exit.
 
+- **icebox-eviction-line-budget-squeeze** [design-pending] — the icebox tier's one-line grammar
+  and `check-queue-wrap`'s column cap are jointly unsatisfiable above a slug length nothing
+  bounds, and nothing says so at the point of eviction.
+  **Attested first-hand at the 2026-08-25 close, three failed attempts rather than predicted.**
+  Evicting `spec-embedded-source-criterion-4-membership` (icebox) — a 44-character slug — left 31
+  columns after the mandatory `- **<slug>** [design-pending] — ` prefix. All three candidate
+  sentences describing the question redded `check-queue-wrap`, and the line that landed says only
+  "Its port sizing stays unruled." The tier's contract calls for a self-contained sentence; at 31
+  columns that is not achievable, and the grammar gives no relief — `check-queue-entry-budget`
+  assertion B makes an icebox entry EXACTLY one line, so wrapping is a violation and not a
+  workaround.
+  **Why it stays invisible until a session hits it:** the slug is chosen at filing time and the
+  eviction is paid iterations later by a different session, so the two constraints never meet in
+  one edit until they collide.
+  **Deliverable — rule one of three.** Exempt the icebox lead line from `check-queue-wrap` (the
+  run-away-reflow hazard the cap exists for does not apply to a line the tools key on by its
+  `- ` lead); or cap slug length at filing, which is enforceable and retroactively expensive; or
+  state at queue-kit/SPEC.md §The icebox tier that a long-slugged entry's pointer degrades to a
+  bare classification and that this is accepted, so a later session stops re-deriving it.
+  **DISTINCT from `queue-entry-grammar-single-owner`** (icebox), which is two entry grammars
+  disagreeing; this is one grammar whose own two constraints cannot both be met.
+  **DISTINCT from `spec-embedded-source-criterion-4-membership`** (icebox), cited here as the
+  instance and deliberately not re-filed: that slug's finding is a criterion-4 classification
+  question, untouched and still carried in the icebox, while this entry's finding is the eviction
+  grammar that could not describe it. The two share nothing but the eviction that surfaced one
+  while performing the other, so no `recurrence:` date is owed on it.
+  **Cost while deferred:** low and paid at eviction — a session either spends three gate
+  round-trips discovering the budget, or declines an otherwise-eligible eviction because it cannot
+  describe it, which silently biases the tier against exactly the heavily-specified entries the
+  tier was built to drain.
+  Surfaced 2026-08-25 at the `turn-end-liveness-seam-and-worktree-cause` close and filed to the
+  gap inbox there; promoted 2026-08-25 at this scope's drain of that inbox.
+
+- **worktree-isolated-agent-report-lost-to-a-failed-peer-send** [design-pending] — an isolated
+  read-only sweep's final report reaches its dispatcher as a bare `.`, because the child sends to
+  a peer name it cannot resolve and the harness returns only the last assistant message.
+  **Reproduced twice at one close, 2026-08-25, not predicted.** Two `audit-sweep` dispatches
+  carrying `isolation: worktree` each completed substantial work (46 and 49 tool uses, ~163k and
+  ~97k child tokens) and each returned a single period. Both had to be resumed with an explicit
+  "put it in your final assistant message, do not use SendMessage" instruction, after which both
+  reported in full. The work is not lost; it is paid for twice, and the second payment is a whole
+  extra dispatch round-trip.
+  **The cause is stated by the harness itself and is not a guess.** The agent-dispatch guard
+  already warns at dispatch time that a grandchild has no upward channel and that neither level
+  knows its own address; one child said so outright in its recovered report — it could not resolve
+  the dispatcher's name and had no roster tool to find a ref.
+  **NOT the guard's defect.** Its warning is accurate and fires at the right moment; what is
+  missing is that nothing carries the warning INTO the child, so the child learns its own
+  isolation only by failing.
+  **Deliverable — rule one of three.** The dispatch-shape guard appends a return-value-only
+  instruction to a prompt whose type is read-only and whose isolation is worktree, the one shape
+  that provably cannot message back; or delegation-kit/templates/agent-execution.md states the
+  return-value-only obligation as a contract the dispatching session spells into such a prompt,
+  which costs one line and no code; or the agent-type definition for read-only sweep types carries
+  it, which reaches every dispatch of that type without touching any dispatcher.
+  **DISTINCT from `worktree-isolated-dispatch-cannot-reach-the-main-checkout`**, deliberately not
+  re-filed here: that entry is about a child's WRITES — a binary-dispatched gate it cannot resolve
+  and a capture log it writes into a doomed worktree — and its bridge is `git rev-parse
+  --git-common-dir`. This is the child's RETURN VALUE, it has no filesystem half, and that bridge
+  does not touch it. The two share the isolation flag and share no fix.
+  **Cost while deferred:** one wasted dispatch round-trip per isolated sweep, paid by the
+  dispatcher at the moment it is waiting on the result — and silent, since a bare `.` reads as an
+  agent that found nothing rather than as an agent whose report was dropped. That last reading is
+  a correctness risk rather than an efficiency one, and it is the expensive half.
+  Surfaced 2026-08-25 by the `turn-end-liveness-seam-and-worktree-cause` close, which reproduced
+  it twice while dispatching its own sweeps, and filed to the gap inbox there; promoted
+  2026-08-25 at this scope's drain of that inbox.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
