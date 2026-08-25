@@ -1,0 +1,3 @@
+# contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the one-shot pre-flight valve ledger.
+# One line per arming: <iteration> <stage> armed|used <reason...>, the reason
+# mandatory and running to end of line; validate arms, the entry consumes.
