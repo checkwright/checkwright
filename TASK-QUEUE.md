@@ -12,7 +12,6 @@
 
 ## New Features
 
-
 ## Technical Debt
 
 ## Deferred
