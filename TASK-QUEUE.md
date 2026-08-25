@@ -12,6 +12,49 @@
 
 ## New Features
 
+- **powershell-installer-surface** [spec: SPEC-install-boundary.md] — a native Windows install
+  path, and the relocation that has to precede it.
+  The installer is bash end to end, so native Windows is unreachable:
+  `native-gate-binary-port` states the limit in its own words — "`init` hands to bash, so
+  Windows stays blocked" — and `platform-support-ci-matrix` covers Windows only as a
+  **WSL** CI leg, which is a Linux userland wearing a Windows badge rather than a native path.
+  **Ordered by the operator's trajectory pivot 2026-08-03**, whose objective 2 is every major
+  OS including Windows and whose objective 6 is a script-interpreter surface that is minimal
+  and dual-implementable — bash for Linux and macOS, PowerShell for Windows. The objective set
+  is recorded in TRAJECTORY.md.
+  **RE-SCOPED 2026-08-24 by the operator, and the correction is a size rather than a
+  direction.** `install-step-relocation` is **retired as mooted**, so the relocation is this
+  entry's and it is most of the work; the `gen-pre-commit.sh --write` step is refused
+  relocation into the binary by the closed operator-ratified ruling at gate-sdk/SPEC.md
+  §gen-pre-commit.
+  **Measured at the scope that re-verified it, not estimated.** The three-step shape describes
+  `installer/lib/init.sh:102-147` and `:277-308` — roughly eighty lines, the platform resolve
+  plus the digest-verified placement. The remaining ~350 lines of that file, and `doctor.sh`
+  (164), `uninstall.sh` (214), `diff.sh` (66) and `update.sh` (34) beside it, are conditional
+  install logic no ruling had put behind the invoke.
+  **RULED THIS ITERATION'S UNIT — 2026-08-25 by the operator, and no fourth yield was
+  granted.** The alternative weighed and refused was the citation-liveness bundle, the pool's
+  largest measured exit; the PRIORITY DIRECTIVE took the boundary unencumbered because the
+  directive's three prior yields each spent one named iteration and none carried forward. The
+  shape ruled with it is the entry's own: the fork-1 amendment plus the first relocation cut,
+  demoting rather than moving to `## Done` as the port entries do, since fork 2 is unanswerable
+  until fork 1 fixes how many steps there are.
+  **FORK 1 IS AUTHORED — spec 2026-08-25, in the amendment this entry's `[spec:]` ref names.**
+  Its answer in one line: **five bootstrap steps, one retirement (`jq`), everything else behind
+  the invoke**; the per-step disposition roster is that amendment's delta 5 and is transcribed
+  onto this entry at demotion, because the file is deleted at merge. The first cut is
+  `init.sh:277-308` becoming one `--install place-artifact` call, chosen on delta 3's
+  takeability rule — a step is takeable now only if it already runs when an artifact was
+  selected, since a relocated step is unreachable on the platforms criterion 5 leaves without a
+  binary. **FORK 2 stays open** — two hand-kept bootstraps held in parity by a smoke leg versus
+  one generated from a single declaration — and is what this entry demotes for.
+  **Cost while deferred:** the pivot's OS-reach objective stays unmet on the one platform it
+  names that no current path reaches, and every install-path change is authored bash-first,
+  which is the habit that made this entry necessary.
+  Filed 2026-08-03 by spec, on the operator's trajectory pivot; re-scoped 2026-08-24 at scope,
+  on the operator's ruling, after a first-hand read of the install path rather than an
+  inherited premise.
+
 ## Technical Debt
 
 ## Deferred
@@ -560,54 +603,6 @@
   order the launch readiness rule exists to avoid.
   Filed 2026-08-14 at scope, dispositioning the criterion-5 consequence of the same
   session's born-native ruling, under the gap-disposition rule.
-
-- **powershell-installer-surface** [design-pending] — a native Windows install path, and the
-  relocation that has to precede it.
-  The installer is bash end to end, so native Windows is unreachable:
-  `native-gate-binary-port` states the limit in its own words — "`init` hands to bash, so
-  Windows stays blocked" — and `platform-support-ci-matrix` covers Windows only as a
-  **WSL** CI leg, which is a Linux userland wearing a Windows badge rather than a native
-  path. No entry claims this ground today.
-  **Ordered by the operator's trajectory pivot 2026-08-03**, whose objective 2 is every
-  major OS including Windows and whose objective 6 is a script-interpreter surface that is
-  minimal and dual-implementable — bash for Linux and macOS, PowerShell for Windows. The
-  objective set is recorded in TRAJECTORY.md.
-  **RE-SCOPED 2026-08-24 by the operator, and the correction is a size rather than a
-  direction.** This entry used to say the vendoring ruling had already fixed the shape to
-  resolve-the-platform, place-the-binary, invoke — a three-step bootstrap whose relocation half
-  `install-step-relocation` owned and whose size depended on that landing first. Both halves of
-  that sentence were false at HEAD. `install-step-relocation` is **retired as mooted**
-  (at this iteration's scope, 2026-08-24): its graph step already dispatches to the binary and its
-  `gen-pre-commit.sh --write`
-  step is refused relocation by the closed operator-ratified ruling at gate-sdk/SPEC.md
-  §gen-pre-commit. **So the relocation is this entry's now, and it is most of the work.**
-  **Measured at the scope that re-verified it, not estimated.** The three-step shape describes
-  `installer/lib/init.sh:102-147` and `:277-308` — roughly eighty lines, the platform resolve plus
-  the digest-verified placement `installer/README.md` §The gate binary already calls irreducible.
-  The remaining ~350 lines of that file — kit-source vendoring, manifest and lock I/O,
-  `gates.list` and queue seeding, the commit flow — are conditional install logic that no ruling
-  puts behind the invoke, and `doctor.sh` (164), `uninstall.sh` (214), `diff.sh` (66) and
-  `update.sh` (34) sit beside it unaccounted for. Sizing this against the three-step phrasing
-  understates it by roughly fourfold.
-  **Why it is design-pending, and the fork is now two questions rather than one.** First, what
-  moves behind the invoke and what genuinely cannot — the second is the one that binds, because a
-  step that cannot move is a step PowerShell must re-implement. Second, the original fork,
-  unchanged: two hand-kept bootstraps held in parity by a smoke leg, versus one bootstrap
-  generated from a single declaration. The second question is only answerable once the first
-  fixes how many steps there are.
-  **Cost while deferred:** the pivot's OS-reach objective stays unmet on the one platform it
-  names that no current path reaches, and every install-path change is authored bash-first,
-  which is the habit that made this entry necessary.
-  **RULED THIS ITERATION'S UNIT — 2026-08-25 by the operator, and no fourth yield was granted.**
-  The alternative weighed and refused was the citation-liveness bundle, the pool's largest
-  measured exit; the PRIORITY DIRECTIVE took the boundary unencumbered because the directive's
-  three prior yields each spent one named iteration and none carried forward. The shape ruled with
-  it is the entry's own: the fork-1 amendment — what moves behind the invoke and what PowerShell
-  must re-implement — plus the first relocation cut, demoting rather than moving to `## Done` as
-  the port entries do, since fork 2 is unanswerable until fork 1 fixes how many steps there are.
-  Filed 2026-08-03 by spec, on the operator's trajectory pivot; re-scoped 2026-08-24 at scope,
-  on the operator's ruling, after a first-hand read of the install path rather than an inherited
-  premise.
 
 - **instruction-surface-bash-focus** [design-pending] — the always-loaded surfaces assume bash.
   `CLAUDE.md` and the instruction surfaces beside it are written around a shell battery:
