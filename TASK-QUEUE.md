@@ -17,54 +17,54 @@
 ## Deferred
 
 - **platform-support-ci-matrix** [design-pending] [roadmap: next/reliability] — the native Windows
-  install-smoke leg is authored and has never run.
-  **SPLIT 2026-08-26 at build, on an operator ruling reversing this entry's own no-split line.**
-  That line's ground was that the legs share a surface "they are promoted to build", and they are
-  no longer co-built — Windows landed, macOS never started — while the split criterion,
-  dispositionability, was satisfied the moment the same operator gave the two legs different
-  dispositions. macOS and everything measured about it left for `macos-install-smoke-ci-leg`.
+  install-smoke leg is landed and MEASURED, and what it measured is two new source blockers.
+  Split 2026-08-26 at build under an operator ruling; macOS and everything measured about it went
+  to `macos-install-smoke-ci-leg`, whose own provenance line carries the ruling and its ground.
   **The slug is deliberately NOT renamed** though "matrix" now reads oddly for one leg:
   `gate-binary-target-roster-widening` and `powershell-installer-surface` cite it by name.
   roadmap-summary: A CI install-smoke leg per supported platform, or an honest label.
-  **THE LEG IS AUTHORED AND UNMEASURED, landed 2026-08-26 at build.**
-  `.github/workflows/gates.yml`'s `install-smoke-windows` job, shaped as an instrument rather than
-  an assertion; its own header carries the ruling, the steering it stands in for and the promotion
-  condition, so nothing about its shape is restated here.
-  **The two source blockers standing between this leg and green are NOT here** — operator-ruled
-  2026-08-26 to `powershell-installer-surface`, which owns them with their citations and survey.
-  Not this entry's to fix.
-  **VERIFICATION ROUND 1 RETURNED NO MEASUREMENT — 2026-08-26 at build.** master was pushed, but
-  no `gates` run was ever created: the check suite for that head completed with zero check runs,
-  inside a critical third-party Actions incident that had throttled inbound traffic. **An outage,
-  not a defect and not a disproof** — the workflow file was byte-identical on the remote and
-  active, so nothing about the leg was falsified. Evidence in full at commit `8eadb5f8`.
-  **So every question the leg's probe steps exist to answer stands UNANSWERED**, listed here
-  because an unanswered question named is worth more to the follow-up than silence and because
-  each is otherwise a run to buy on its own: the runner's tool inventory, and whether its `awk`,
-  `sed`, `sort`, `grep` and `find` are the GNU flavours docs/install.md §Requirements asserts;
-  whether cargo builds the crate on that host at all; whether a release build leaves the worktree
-  clean enough for the pack step's precondition; npm's Windows bin-shim shape and whether it
-  satisfies `[[ -x ]]`; exec-bit semantics on a freshly written shebang script; whether the one
-  tracked symlink survives `git archive | tar -x` into the payload; and the 260-char path ceiling.
-  Unanswered rather than untested — the instrument is landed and fires on the first run that
-  reaches a runner, and these are the follow-up's scope and spec input rather than its build's.
-  **THIS CANNOT CLOSE UNTIL A DEFERRED SIBLING MOVES.** Its promotion condition is
-  gate-sdk/SPEC.md §Consumer payload's — a run that PRODUCED AND EXERCISED an artifact — and the
-  blockers sit in `powershell-installer-surface`, so promoting this alone exercises nothing.
-  **Push budget, ruled and accounted, so a later reader meets no silent contradiction with
-  CLAUDE.md's one-to-two per iteration.** An operator ruling authorized four to eight verification
-  rounds; the lead ruled ONE plus close's push — two, inside the budget — and the overrun went
-  unspent, because green was ruled unreachable here the moment both blockers routed away.
-  **THE FORK STAYS RULED — legs, not the honest label**, the label arm surviving only for a
-  platform a leg is deliberately not bought for. The 2026-08-26 re-widening that ordered Windows
-  ahead of macOS on a named adopter is TRAJECTORY.md §The closed rulings'; WSL is the interim path.
-  **Cost while deferred:** the one adopter class with a named days-to-weeks adoption window has no
-  measured install path, and `gate-binary-target-roster-widening` and `powershell-installer-surface`
-  both stay sequenced behind a leg that has never reached a runner.
-  Filed 2026-07-26 by scope, split from `platform-support-contract`; its Linux deliverable split off
-  2026-08-25 as `linux-install-smoke-ci-leg` and its macOS one 2026-08-26 as
-  `macos-install-smoke-ci-leg`. Promoted and deferred 2026-08-25, re-promoted 2026-08-26, deferred
-  again at build the same day.
+  **THE LEG IS LANDED AND HAS NOW REPORTED.** `.github/workflows/gates.yml`'s
+  `install-smoke-windows` job, an instrument rather than an assertion; its header carries the
+  ruling, the steering and the promotion condition, so its shape is not restated here. Round 1
+  created no run at all inside a third-party Actions incident — an outage, not a disproof, with the
+  evidence in full at `8eadb5f8`.
+  **ROUND 2 MEASURED EVERYTHING, 2026-08-26 at close**, run `32995643814` on head `261231d2`: the
+  workflow concluded green while this job reported failure, the designed shape, and all four probe
+  steps completed. Host `MINGW64_NT-10.0-26100`, `x86_64-pc-windows-msvc`, bash 5.3.15.
+  **THE SEVEN QUESTIONS ARE NOW ANSWERS.** (1) The GNU floor docs/install.md §Requirements asserts
+  is SATISFIED out of the box — `awk` IS gawk 5.4.0, GNU sed 4.9, coreutils sort 8.32, GNU grep 3.0,
+  findutils 4.10.0 — and `shellcheck` is the one member of the probed inventory MISSING. (2) Cargo
+  does NOT build the crate: blocker 3. (3) Whether a release build leaves the worktree clean stays
+  HONESTLY UNANSWERED — porcelain printed nothing, but after a *failed* build, so it measures
+  nothing about a release one. (4) npm's bin shim SATISFIES `[[ -x ]]`: of the three shims written,
+  the extension-less one is mode `-rwxr-xr-x` and executes. (5) Exec-bit semantics HOLD on a freshly
+  written shebang script despite `core.filemode=false`. (6) The tracked symlink does NOT survive:
+  blocker 4. (7) There is NO 260-char ceiling — a 271-char path wrote clean, `core.longpaths` unset.
+  **TWO NEW SOURCE BLOCKERS, AND NEITHER IS ROUTED — that call is not this entry's to make.** The
+  2026-08-26 ruling sent the first two to `powershell-installer-surface` on grounds specific to
+  them, and neither ground reaches either of these. Blocker 3, the crate is not portable:
+  `native/src/gates/gate_binary_fresh.rs:13` takes `std::os::unix::fs::PermissionsExt`
+  unconditionally and `:15` calls `.mode()` — E0433 and E0599, `build-native` exits 101 — and
+  THREE more unix-only uses sit behind that first failure (`proc.rs:69`, `proc.rs:337`,
+  `install.rs:165`), so it is not a one-line fix. It is also UPSTREAM of the `.exe`-suffix blocker,
+  which is never reached because no artifact is produced. Blocker 4: `pack_tracked()`'s
+  `git archive | tar -x` FAILS on the one tracked symlink — `tar: Cannot create symlink to
+  <its target>: No such file or directory`, then `Exiting with failure status`, and the path is
+  absent afterwards. `core.symlinks` is true, so git is not the refuser: tar is, because the link
+  is DANGLING and Windows needs an existing target to choose the symlink kind.
+  **THIS CANNOT CLOSE UNTIL FOUR BLOCKERS MOVE**, two of them unrouted. Its promotion condition is
+  gate-sdk/SPEC.md §Consumer payload's — a run that PRODUCED AND EXERCISED an artifact — and round
+  2 produced none, so promoting this alone still exercises nothing. The push budget is closed: the
+  lead's ruled two rounds were both spent, the outage and the measurement, inside CLAUDE.md's.
+  **THE FORK STAYS RULED — legs, not the honest label**, and the Windows-ahead-of-macOS ordering
+  with it; both are TRAJECTORY.md §The closed rulings', and WSL is the interim path.
+  **Cost while deferred:** the one adopter class with a named days-to-weeks adoption window still
+  has no working install path — the leg now says exactly why, in four blockers rather than a
+  guess — and `gate-binary-target-roster-widening` and `powershell-installer-surface` both stay
+  sequenced behind it.
+  Filed 2026-07-26 by scope, split from `platform-support-contract`; Linux split off 2026-08-25 as
+  `linux-install-smoke-ci-leg`, macOS 2026-08-26 as `macos-install-smoke-ci-leg`. Promoted and
+  deferred 2026-08-25, re-promoted and deferred again 2026-08-26.
 
 - **macos-install-smoke-ci-leg** [design-pending] [roadmap: next/reliability] — a macOS
   install-smoke leg; nothing has ever run green against macOS.
@@ -194,6 +194,15 @@
   `gate-sdk/bin/build-native.sh:68`'s `BN_ART` names the cargo artifact suffix-less where a Windows
   toolchain emits `<name>.exe`, and `installer/lib/init.sh:98`'s `target_of_host()` maps Linux and
   Darwin alone, so a `MINGW64_NT-*` host matches nothing and takes the omit-and-declare branch.
+  **MEASURED 2026-08-26 at close on a native Windows runner** (`platform-support-ci-matrix` round
+  2, which owns the full harvest). Two assumptions this bootstrap makes are now facts rather than
+  hopes: `[[ -x ]]` HOLDS on a freshly `chmod +x`'d shebang script and it executes directly, despite
+  `core.filemode=false`; and it HOLDS on npm's extension-less bin shim, which is written mode
+  `-rwxr-xr-x` beside its `.cmd` and `.ps1` siblings and executes. So neither `-x` test needs a
+  Windows special case. **What the same run also found is that `BN_ART` above is UNREACHABLE**: the
+  crate does not compile for `x86_64-pc-windows-msvc` at all (`std::os::unix` in four modules), so
+  cargo never emits an artifact whose suffix `BN_ART` could get wrong. That third blocker is
+  unrouted and is not claimed here.
   Surveyed at `.workflow/survey-record.md` 2026-08-26 with the witness a later stage re-runs. The
   ruling refused both alternatives on the table — a new entry, and widening
   `platform-support-ci-matrix` — because both are design-bearing exactly where this entry is
