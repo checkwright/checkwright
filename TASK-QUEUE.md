@@ -59,59 +59,6 @@
   deferred the same day at build, on an operator ruling relayed through the iteration lead.
   Re-promoted 2026-08-26 at scope, Windows leg first, on the operator ruling recorded above.
 
-- **pack-installer-vendors-untracked-scratch** — `scripts/pack-installer.sh`
-  vendors kit roots with a verbatim `cp -R`, so any git-ignored artifact sitting under a kit's
-  tracked tree rides into the installer payload and breaks `checkwright init` on the consumer.
-  **The failure it produces.** `init` stages every vendored file with a plain `git add`, which
-  refuses when the consumer's own `.gitignore` also ignores that path ("paths are ignored by
-  one of your .gitignore files"), so init dies with "could not stage the vendored files".
-  **The class is live, and the instance is live AGAIN — both re-probed at this drain.**
-  `scripts/pack-installer.sh:110` still vendors each kit with a bare `cp -R` and the script
-  holds no tracked-path filter anywhere, so the class is live.
-  **The 2026-08-23 "the observed instance is gone" claim is RETRACTED as stale**, and with it
-  the retraction of the original cost line. Running the gate-sdk fixture suite STANDALONE — not
-  inside the battery, where the earlier re-probe ran and where suite ordering masked it —
-  regenerates `check-crate-arms`'s ignored source-stamp cache under its tracked `good/` case
-  every time. The absolutization credited with the fix reaches SHELL-dispatched members only,
-  so it never protected this one; the mechanism is
-  `bridged-knob-case-tmp-dir-override-inert`'s, already filed, live, and self-declared upstream
-  here.
-  **THE DESIGN QUESTION IS RULED AT THIS SCOPE, AND THE ORACLE ANSWERED IT — there is no non-git
-  case.** The deferral held on "a decision about consumers vendoring from a non-git payload —
-  packaging semantics rather than a patch". `scripts/pack-installer.sh` already fails closed
-  outside a git work tree, twice and by its own preconditions: `:40` refuses a `--root` that is
-  not inside one, and `:50` refuses a default invocation with "not inside a git work tree — the
-  payload's commit stamp has no source". So the case the design question reserved cannot arise,
-  and the filter is unconditional: vendor git-tracked paths only. Debt by the new-names litmus —
-  it converges behavior on a name the specs already carry and mints no script, knob, tag or
-  convention. **Note `:71`'s clean-tree check does NOT cover this**, and that is why the defect
-  survived it: `git status --porcelain` does not report ignored files.
-  **The fix must reach `:102` as well as `:110`.** The duplicate below names
-  `cp -R installer/. "$ASM/"` at `:102`, which this entry never did; both are the same `cp -R`
-  defect and the 2026-08-26 close already ruled them one gap, so covering both call sites is
-  executing that ruling rather than widening this entry.
-  **A THIRD occurrence, 2026-08-25 at build, widens the reproduction claim above.** The 2026-08-24
-  re-probe credited *suite ordering inside the battery* with masking the artifact and reproduced it
-  only by running the gate-sdk fixture suite standalone. This time the plain step-0 battery was the
-  contaminating run: `installer/consumer-smoke/run-smoke.sh` failed on a tree where nothing but the
-  battery had run. So the masking is not a property of the battery, and a standalone suite is not
-  the trigger it was thought to be.
-  **DUPLICATE OF `payload-derivation-ships-untracked-residue`, and the merge is BLOCKED rather
-  than undone.** That entry was filed 2026-08-25 by the previous close's drain, naming this same
-  `cp -R` and this same broken `git add`; it additionally reaches `:102`'s `installer/.`, which
-  this entry never named. The 2026-08-26 close ruled the merge correct and could not execute it:
-  the only destination `check-task-conservation` sanctions for a dropped slug is `## Done`, and
-  `## Done` asserting a deliverable that shipped nothing is a worse defect than the duplication.
-  Cross-referenced instead, on the lead's ruling. Read the two together until
-  `absorbed-duplicate-disposition` lands the third state that lets one absorb the other.
-  recurrence: pack-installer-vendors-untracked-scratch 2026-08-24 2026-08-25
-  Filed 2026-08-23 by validate and re-dispositioned by validate the same day; the 2026-08-23
-  close drain read both bullets as one disposition and re-ran its probes inside the battery
-  alone, which was not isolated enough to see this; the 2026-08-24 close drain re-probed the
-  fixture suite standalone, reproduced the artifact, and retracted the retraction. Promoted
-  2026-08-26 at scope as this iteration's second unit, on the operator ruling that took the
-  Windows leg — it rides as that leg's precondition and as the ruled threshold rider.
-
 ## Deferred
 
 - **gate-binary-target-roster-widening** [design-pending] [roadmap: next/reliability] — the
@@ -8447,6 +8394,8 @@
 - **self-repo-prefix-normalisation-unheld** [design-pending] — Two link-prefix holders, unheld.
 
 ## Done
+
+- pack-installer-vendors-untracked-scratch
 
 ## Lessons Learned
 

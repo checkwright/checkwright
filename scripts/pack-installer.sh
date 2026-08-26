@@ -55,7 +55,7 @@ fi
 cd "$ROOT" || exit 2
 ROOT="$(pwd -P)"
 
-for tool in npm jq git; do
+for tool in npm jq git tar; do
     command -v "$tool" >/dev/null 2>&1 || {
         echo "pack-installer: $tool not found on PATH — the pack step cannot run." >&2
         exit 2
@@ -99,7 +99,18 @@ trap cleanup EXIT
 OUT="${OUT:-$BASE}"
 [[ -d "$OUT" ]] || { echo "pack-installer: output directory not found: $OUT" >&2; exit 2; }
 
-cp -R installer/. "$ASM/" || exit 2
+# comment-tier-exempt: vendor git-tracked paths only, unconditionally — :71's clean-tree check does not see ignored paths (git status --porcelain omits them), so a gitignored artifact under a packed root (a fixture's own scratch dir, e.g.) rode a verbatim `cp -R` straight into the payload and broke a consumer's `init`. `git archive` at the stamped commit is the tracked-set boundary; --strip-components peels exactly SRC's own path depth so the archived prefix does not nest one level too deep in DST.
+pack_tracked() {
+    local src="${1%/}" dst="$2" depth=1 rest="${1%/}"
+    while [[ "$rest" == */* ]]; do
+        depth=$((depth + 1))
+        rest="${rest%/*}"
+    done
+    mkdir -p "$dst" || return 1
+    git archive "$COMMIT" -- "$src" | tar -x --strip-components="$depth" -C "$dst"
+}
+
+pack_tracked installer "$ASM" || exit 2
 
 # spec: CLAUDE.md §Housekeeping — the payload's kit set is gate_kit_roots_rel, the same derivation the battery runs on, so the shipped set cannot drift from the governed one
 mkdir -p "$ASM/payload" || exit 2
@@ -107,7 +118,7 @@ packed=0
 while IFS= read -r kit; do
     kit="${kit%/}"
     [[ -n "$kit" && -d "$kit" ]] || continue
-    cp -R "$kit" "$ASM/payload/${kit##*/}" || exit 2
+    pack_tracked "$kit" "$ASM/payload/${kit##*/}" || exit 2
     packed=$((packed + 1))
 done < <(gate_kit_roots_rel)
 [[ "$packed" -gt 0 ]] || { echo "pack-installer: no kit roots enumerated — the payload would be empty." >&2; exit 2; }
