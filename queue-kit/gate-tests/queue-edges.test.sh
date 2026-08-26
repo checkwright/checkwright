@@ -2,11 +2,16 @@
 # Behavioral test of bin/queue-edges.sh: the citation grammar's four rules
 # (live-set resolution, unresolved token is not an error, no self-citation,
 # [blocked-by:] counts), the verbatim citing line, nearest-preceding-bullet
-# attribution, and --inbound's silence-means-no-edges contract. queue-edges is a
-# tool, not a gate, so it has no good/bad pair; this drives it directly. The
-# repo's own corpus carries no live [blocked-by:] tag, so that path exists here
-# or nowhere. Config is isolated via QUEUE_KIT_CONFIG_FILE so the repo's
-# queue-config.sh does not leak in.
+# attribution, --inbound's silence-means-no-edges contract, and the retired-target
+# half — the retired block, the never-live floor beside it, and the declared
+# no-repository degradation. queue-edges is a tool, not a gate, so it has no
+# good/bad pair; this drives it directly. The repo's own corpus carries no live
+# [blocked-by:] tag, so that path exists here or nowhere. Config is isolated via
+# QUEUE_KIT_CONFIG_FILE so the repo's queue-config.sh does not leak in.
+#
+# The first sandbox is deliberately NOT a git repository: it is the no-repository
+# arm, and it also keeps every pre-existing assertion reading the live block alone.
+# The retired half needs history, so it gets a second sandbox with two revisions.
 #
 # Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
@@ -114,7 +119,7 @@ checks=$((checks + 1))
 
 rc=0; err="$(bash "$EDGES" --inbound no-such-slug "$Q" 2>&1 >/dev/null)" || rc=$?
 rc_is "dead-slug-rc"  "$rc" 1
-want  "dead-slug-msg" "$err" "not a live slug: no-such-slug"
+want  "dead-slug-msg" "$err" "not a live or retired slug: no-such-slug"
 
 # The tool mutates nothing.
 before="$(cksum <"$Q")"
@@ -122,9 +127,104 @@ bash "$EDGES" "$Q" >/dev/null 2>&1
 checks=$((checks + 1))
 [[ "$(cksum <"$Q")" == "$before" ]] || { echo "  FAIL [no-mutation]: the queue file changed"; fails=$((fails + 1)); }
 
+# The declared no-repository degradation: this sandbox has no git history behind
+# it, so the retired set is empty and the tool prints its live block alone --
+# byte-for-byte what it printed before the retired half existed. Asserted rather
+# than inferred, because "silent-safe" is only true if the silence is total.
+absent "no-repo-no-retired-block" "$out" ", retired)"
+
+# ---------------------------------------------------------------------------
+# The retired half. A second sandbox, this one a git repository, whose queue file
+# has two revisions: `gone-a` held a lead line in revision 1 and holds none in
+# revision 2, which is the definition of retired. `landed-thing` never held one.
+GITBOX="$SANDBOX/repo"
+mkdir -p "$GITBOX"
+git -C "$GITBOX" init -q 2>/dev/null
+gitc() { git -C "$GITBOX" -c user.name=t -c user.email=t@t -c commit.gpgsign=false "$@"; }
+
+cat >"$GITBOX/TASK-QUEUE.md" <<'EOF'
+# TASK-QUEUE.md
+
+## Iteration: demo
+
+## New Features
+
+- **feat-a** — a live entry.
+
+## Technical Debt
+
+## Deferred
+
+- **gone-a** — an entry that will be disposed of in the next revision.
+
+## Done
+
+## Lessons Learned
+EOF
+gitc add TASK-QUEUE.md >/dev/null 2>&1
+gitc commit -q --no-verify -m r1 >/dev/null 2>&1
+
+cat >"$GITBOX/TASK-QUEUE.md" <<'EOF'
+# TASK-QUEUE.md
+
+## Iteration: demo
+
+## New Features
+
+- **feat-a** — a live entry.
+  Its body cites `gone-a`, disposed of one revision ago, and also
+  `landed-thing`, a token that never held a lead line at all.
+
+## Technical Debt
+
+- **debt-a** — a second citer, so the retired count is not always one.
+  Sequence against `gone-a` rather than duplicating it, and defer to `feat-a`.
+
+## Deferred
+
+## Done
+
+- gone-a
+
+## Lessons Learned
+EOF
+gitc add TASK-QUEUE.md >/dev/null 2>&1
+gitc commit -q --no-verify -m r2 >/dev/null 2>&1
+
+GQ="$GITBOX/TASK-QUEUE.md"
+gout="$(bash "$EDGES" "$GQ")"
+
+# A citation of a retired slug becomes an edge, marked as such and counted.
+want "retired-target"   "$gout" "gone-a (2 inbound, retired)"
+want "retired-edge"     "$gout" "Sequence against \`gone-a\` rather than duplicating it"
+
+# The floor holds: a token that was never a slug stays off it. This is the whole
+# discriminator -- without it the report is dominated by SHAs and ordinary words.
+absent "never-live-floor" "$gout" "landed-thing ("
+
+# A live target keeps today's unmarked line, and the retired block trails it --
+# the ordering is what lets a reader stop at the live block and read no further.
+want   "live-target-unmarked" "$gout" "feat-a (1 inbound)"
+absent "live-target-unretired" "$gout" "feat-a (1 inbound, retired)"
+live_at="$(grep -n 'feat-a (1 inbound)' <<<"$gout" | head -1 | cut -d: -f1)"
+ret_at="$(grep -n 'gone-a (2 inbound, retired)' <<<"$gout" | head -1 | cut -d: -f1)"
+checks=$((checks + 1))
+[[ -n "$live_at" && -n "$ret_at" && "$ret_at" -gt "$live_at" ]] \
+    || { echo "  FAIL [retired-block-trails]: live at '$live_at', retired at '$ret_at'"; fails=$((fails + 1)); }
+
+# --inbound widens with it: a retired slug is addressable, a never-live token is
+# still the caller error it was, so silence keeps meaning "no inbound edges".
+rc=0; gout_r="$(bash "$EDGES" --inbound gone-a "$GQ")" || rc=$?
+rc_is "retired-inbound-rc" "$rc" 0
+want  "retired-inbound"    "$gout_r" "gone-a (2 inbound, retired)"
+
+rc=0; gerr="$(bash "$EDGES" --inbound landed-thing "$GQ" 2>&1 >/dev/null)" || rc=$?
+rc_is "never-live-inbound-rc"  "$rc" 1
+want  "never-live-inbound-msg" "$gerr" "not a live or retired slug: landed-thing"
+
 if [[ "$fails" -gt 0 ]]; then
     echo "queue-edges.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "queue-edges.test.sh: clean (grammar: live-set resolution, unresolved token, self-citation, blocked-by, done-not-live; verbatim line; sub-task attribution; lead-line prose excluded; --inbound empty vs dead slug; no mutation; $checks checks)"
+echo "queue-edges.test.sh: clean (grammar: live-set resolution, unresolved token, self-citation, blocked-by, done-not-live; verbatim line; sub-task attribution; lead-line prose excluded; --inbound empty vs dead slug; no mutation; retired target + marker, never-live floor, no-repository degradation, --inbound over both domains; $checks checks)"
 exit 0

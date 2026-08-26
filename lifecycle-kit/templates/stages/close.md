@@ -101,6 +101,18 @@ session.
    that session's intake (§The committed gap inbox). Do **not** back-date it into
    a drain that has already run — a second pass over an inbox your own later
    steps keep refilling is the loop that shape was rejected for.
+   **Read the queue's retired citations here too, and this is a command you run
+   rather than a file you already have open.** The drain works from
+   `LIFECYCLE_KIT_GAP_INBOX_FILE`, so nothing in this step has touched the queue
+   yet: invoke queue-kit's inbound-citation tool over the queue file
+   (queue-kit/SPEC.md §bin/queue-edges.sh) and read its **retired** block. Each
+   entry there cites a slug that was once live and is not now — a directional
+   pointer at work that has been disposed of, indistinguishable from a live
+   pointer to any reader who did not run this. It is a finding, never a
+   violation: the correction is inline on the citing entry, in this session,
+   the way every attested instance was fixed. This is the corrective transition
+   for the class; scope's ranking survey is the other reader, and it reads the
+   same block to a different end.
    **Judge the recurrence, in addition to the disposition — you are the judge,
    and nothing upstream ruled.** That framing is the **general** contract rather
    than this stage's local one — every session that judges a recurrence is obliged

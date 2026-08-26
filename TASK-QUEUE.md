@@ -64,58 +64,6 @@
   Surfaced 2026-08-18 by the harness security review of `wide-budget-batch-and-hold-declaration`'s
   close and filed to the gap inbox there; promoted 2026-08-18 by the following scope.
 
-- **dead-queue-citation-report** [spec: SPEC-retired-citations.md] — an in-body citation
-  that resolves to no live entry reads exactly like one that does, and nothing names the
-  difference.
-  recurrence: dead-queue-citation-report 2026-08-14 2026-08-25
-  **THIRD instance, 2026-08-25, found first-hand by the very scope survey it was predicted to
-  mislead.** `plugin-marketplace` read "The upgrade/uninstall story itself is
-  `installer-lifecycle-verbs` below — sequence against it rather than duplicating it", and no
-  entry of that slug exists anywhere in this file: the work landed, the citation kept a
-  directional pointer, and a live entry went on instructing a future promoting session to
-  sequence against a sibling that is not there. The cost field's own sentence, occurring — a
-  false premise in a survey input at the moment a scope decides what to promote — and the
-  battery was clean throughout, since `check-task-conservation` reads membership and a body
-  citation is not a membership claim. Corrected inline in the commit that stamped this date, so
-  the class is what remains and the instance misleads nobody else.
-  queue-kit/SPEC.md §The tag algebra rules the in-body single-backtick slug a *reference*
-  rather than a membership claim, aggregated by `bin/queue-edges.sh` and "audited by
-  nothing". That is a deliberate choice and stays right — entries legitimately name landed
-  work and no gate may punish it — but its cost is now attested rather than hypothetical.
-  **Re-attested 2026-08-14**, one iteration after the last correction and inside a single
-  iteration's own lifetime: `consumer-gate-port-disposition`, filed that morning at scope,
-  cited `port-corpus-grouping-census-unbought`, a slug resolving nowhere in the tree. The
-  citing text was rewritten later the same day for an unrelated reason (`a8354823`), so the
-  instance is gone and the class is not — nothing found it but a reader.
-  `check-queue-slug-liveness` does not reach it: the citation is backticked prose, which the
-  SPEC deliberately rules a reference rather than a membership claim.
-  **The attestation.** Three ruled-and-deleted slugs were cited across four live entries, and
-  two of those entries argued *from* them in the present tense: one framed a "Boundary with
-  the two live companions" whose companions were both dead and settled. A scope session
-  ranking such an entry reads closed rulings as open questions, which is a false premise in a
-  survey input. Both were corrected inline at the 2026-08-06 close; nothing stops the next.
-  **Why a report and not a gate**, which is the design half already half-answered. A red is
-  wrong here by the SPEC's own reasoning, so the cheapest true form is a *listing*:
-  `bin/queue-edges.sh` already resolves every in-body citation against the live set and drops
-  the misses on the floor, so naming them costs one output section and no new scan — the
-  no-red posture kept, the silence ended.
-  **What is genuinely open:** where the listing is read (a close step, a scope survey input,
-  or both), and whether a citation of *landed* work should be distinguishable in prose at all
-  — a grammar question the SPEC left unanswered when it refused a relational vocabulary, and
-  answering it the wrong way re-imports the maintained-roster anti-pattern that refusal avoided.
-  **HELD TWICE AS A BUNDLE MEMBER — 2026-08-25 on directive priority, and again 2026-08-25
-  operator-ruled at the threshold escalation.** The hold is the citation-liveness bundle's, not
-  this entry's: it is cluster B's report-only half, riding the resolution `bin/queue-edges.sh`
-  already performs, so separating it re-buys the cluster's context for the cheapest member.
-  **FOURTH INSTANCE, self-caught: the roster pointer here was one.** It read "recorded in the
-  survey record", a surface `bin/enter-stage.sh` truncates at every iteration boundary, so it
-  resolved to nothing one boundary later — exactly as filed. Repointed to
-  `citation-liveness-family-convergence`, which carries the finding and its witness inline for
-  this reason; re-run that witness before citing it.
-  **Cost while deferred:** dead citations accumulate at the rate rulings close, and each is a
-  false premise sitting in a survey input at exactly the moment a scope decides what to promote.
-  Filed 2026-08-06 at close, draining the gap inbox; found 2026-08-06 at scope.
-
 - **kfric-empty-log-ambiguity** [spec: SPEC-kfric-zero.md] — an empty knowledge-friction
   log is read as no friction, and it is equally consistent with no capture.
   recurrence: kfric-empty-log-ambiguity 2026-08-17 2026-08-23
@@ -8391,6 +8339,7 @@
 
 - gate-binary-target-roster-widening
 - payload-symlink-unextractable-on-windows
+- dead-queue-citation-report
 
 ## Lessons Learned
 

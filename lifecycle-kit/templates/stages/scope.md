@@ -135,7 +135,13 @@ produces that sum, so a unit that several siblings separately converge on,
 subsume, or block against can be read carefully and still ranked low — the
 failure is aggregation, not retrieval, and no amount of following
 cross-references fixes it. So before ranking a candidate, aggregate its inbound
-edges (queue-kit/SPEC.md §bin/queue-edges.sh) and read what cites it. The
+edges (queue-kit/SPEC.md §bin/queue-edges.sh) and read what cites it. **Read the
+same output's retired block, which is an input to this ranking and not a
+footnote to it:** a citation resolving to a slug that was once live and is not
+now points at *disposed* work, so an entry arguing from one is arguing from a
+premise that has already been settled or shipped — and it reads exactly like a
+live one until the block names it. That is the failure this stage is on record
+for committing, against its own survey. The
 promotion dividend lives in the total and in no single entry, which is also why
 splitting an entry is safe only against that total: a split scatters an entry's
 weight across siblings, and the sum is what puts it back together.

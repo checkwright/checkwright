@@ -239,12 +239,30 @@ nothing. The rules below make citations parseable, each covering a shape a live
 corpus contains:
 
 - **Resolution is against the live slug set** — `queue_live_slugs`: active,
-  deferred, and a configured icebox, the existing source of truth.
+  deferred, and a configured icebox, the existing source of truth — **and
+  against the retired one**, the slugs the file's own history shows were once
+  live (§bin/queue-edges.sh). A citation resolving to a retired slug is an edge,
+  marked retired; the two sets are disjoint by construction.
 - **An unresolved token is not an error; it is simply not an edge.** This is the
   load-bearing rule. Entries legitimately name *landed* work — a closed defect
   class, a shipped contract, a settled ruling — and that citation is valuable
   prose no gate may punish, which is why no liveness assertion reaches inward
   from the configured prose surfaces (§check-queue-slug-liveness).
+  **What the remainder actually contains was measured, and the measurement is
+  why no report over it and no gate on it can exist.** After the retired slugs
+  are taken out, what is left is overwhelmingly *not citations at all*: commit
+  SHAs, content digests, iteration names, KPI and gate names, runner labels, CI
+  job names, doctrine rule names, and ordinary backticked words a slug-shaped
+  grammar cannot tell from a slug. On a mature corpus that remainder is the
+  large majority of unresolved tokens. A listing of it is unusable and a red on
+  it would fire on prose that is correct.
+- **Whether a citation of landed work should be distinguishable in prose at all
+  — no**, and the answer follows from the two refusals below rather than adding
+  a third. A prose marker separating landed from live is the maintained roster
+  under a new spelling: it would need writing on every citation a corpus has
+  already written, and re-writing on every disposition. The distinction is
+  **derived** instead (§bin/queue-edges.sh's retired block), which is the form
+  both refusals leave open, and no author writes anything.
 - **Self-citation is not an edge** — an entry naming its own slug in its own
   body is narration, not a relation.
 - **`[blocked-by: <slug>]` is an edge too**, and the one already-structured
@@ -574,6 +592,22 @@ lives in `bin/queue-edges.sh`, which sources this library for the section
 regexes and `queue_live_slugs` it does share. A second reader of body-position
 slug tokens is what would promote the scan into this roster.
 
+**The entry lead-line grammar is here, and it is here by that same rule rather
+than by convention.** `QUEUE_LEAD_RE` (a bullet opening an entry) and
+`QUEUE_SLUG_BOLD_RE` (the bold slug token inside it) are exported globals like
+the section regexes, because three readers now share them: `queue_live_slugs`
+above, `bin/queue-edges.sh`'s bullet scan, and that tool's history walk
+(§bin/queue-edges.sh), which asks the *same* question of an older revision. A
+grammar answering one question in three places is the shape this library exists
+to hold, and a history walk carrying its own spelling would let the retired set
+and the live set disagree about what an entry is.
+
+Both are written with **bracketed literals** (`[*][*]`) rather than backslash
+escapes. They reach `awk` through `-v`, where awk's string-escape pass runs
+before the regex engine sees the value and eats a `\*` with a warning; the
+bracket form has no escape to lose. This is mechanism, not style — the same
+value spelled with backslashes is a different regex by the time it is applied.
+
 **The one-adapter guarantee is split for `queue_live_slugs` and the section
 regexes, and the split is machine-held rather than filed as debt.** The gates
 that read the queue ported to the binary substrate (gate-sdk/SPEC.md §Porting a
@@ -801,8 +835,8 @@ mutates nothing.
 
 ```
 usage: queue-edges.sh [--inbound <slug>] [queue-file]
-  default: every live slug with at least one inbound edge, and its citing entries
-  --inbound <slug>: the inbound set for one slug
+  default: live slugs with inbound edges in queue order, then retired targets
+  --inbound <slug>: the inbound set for one live or retired slug
 ```
 
 **Inbound only.** An outbound view is refused for want of a reader: an entry's
@@ -818,9 +852,57 @@ siblings, and this is what adds it back up.
 Targets print in queue order — the order every other reader of this file walks
 — each with its inbound count, then one line per citing edge. A slug with no
 inbound edges is absent from the default listing and yields empty output under
-`--inbound`; that is the normal case, not a finding. A `--inbound` slug that is
-not live exits 1 with a message on stderr rather than printing nothing, because
-silence from this tool has to mean "no inbound edges" and nothing else.
+`--inbound`; that is the normal case, not a finding. A `--inbound` slug that
+resolves to neither a live nor a retired target exits 1 with a message on stderr
+rather than printing nothing, because silence from this tool has to mean "no
+inbound edges" and nothing else. Widening the addressable domain to retired
+slugs grew that domain and left the meaning of silence exactly where it was.
+
+**The resolution set is the live slugs plus the file's retired ones**, and a
+citation resolving to a retired slug is an edge like any other, marked as such.
+Retired targets print **after** the live block, in a trailing block, each as
+`<slug> (<N> inbound, retired)` above its edges in the same two-column shape.
+They sort **alphabetically**: a retired slug has no queue position to order by,
+and inventing one — last-seen revision, say — would be a datum with no reader.
+
+A **retired** slug is one that held a top-level entry lead line in some earlier
+revision of the queue file and holds none now. That is the whole discriminator,
+and it is what makes the report readable rather than merely longer. The naive
+alternative — listing every backticked token that resolves to no live entry — is
+dominated by commit SHAs, content digests and ordinary backticked words, because
+the token grammar `[a-z0-9][a-z0-9-]*` is not a slug detector. Splitting the
+unresolved remainder against the ever-live set leaves a small retired minority,
+and it is the half a reader wants: on this repo's own corpus, both attested
+instances of a citation instructing a session to sequence against work that no
+longer exists fall in it. Run the tool for the current numbers on your own
+corpus — they are one adopter's queue statistics, not a property of the kit.
+
+**One tool, one job, and this is not a second one.** §bin/queue-counts.sh's
+refusal — folding jobs together gives one tool two output grammars — is honoured
+rather than worked around. The job is *aggregate in-body citations by target*,
+and a retired target is a target whose entry has been disposed of, not a
+different question over the same file.
+
+**The retired set is derived from the file's own history, so nothing is
+maintained.** One `git log -p --format= -- <queue-file>` pass at start-up, its
+added, removed and context lines matched against `lib/queue.sh`'s exported
+lead-line grammar (§lib/queue.sh) — the same grammar the live reader applies,
+never a second spelling. `git` joins `awk` as a dependency of this tool alone;
+the section's "reads the queue, writes **stdout only**, and mutates nothing"
+contract is untouched, and now has a second input. The cost is a *tool's* budget
+rather than a gate's: on a queue file with roughly fifteen hundred revisions the
+whole pass measures well under a second, and it scales with history depth rather
+than with queue size.
+
+**Two degradations are declared rather than discovered.** A queue file **not in
+a git work tree**, or a `git` that is absent, yields an **empty** retired set and
+the tool prints its live block alone — byte for byte the output it printed before
+retired targets existed, which is why the degradation is silent-safe rather than
+misleading. And the derivation sees only the history **this clone has**: a
+shallow clone, or a queue file whose history was rewritten under it, reports
+fewer retired slugs and never more, so the report **under-**claims and never
+invents. Both are stated because the natural reading of "derived from history"
+is that history is total, and here it is whatever the clone holds.
 
 **Each edge carries the citing entry's slug and its citing line verbatim**
 (surrounding whitespace stripped, since the output re-indents). This is what
@@ -861,6 +943,30 @@ outright, because those are overwhelmingly legitimate citations of landed work
 (§The tag algebra), and `check-queue-slug-liveness` already owns the liveness
 invariant on the surfaces where a dead reference *is* a false claim. Extending
 it inward would red on good prose.
+
+**The refusal and the retired block are the same ruling, not a softening of
+it.** Reporting is what a no-red posture always left available, and the retired
+block is only the listing half: an entry citing landed work is legitimate prose,
+so a retired edge is a *finding to read* and never a violation. Nothing about
+it is stricter than the day the refusal was written — the tool gained an output
+section, not a verdict.
+
+**Two named readers, at two named transitions**, because a report nobody reads
+is the failure this listing was built to end:
+
+- **scope, at its ranking survey** — the primary, and the attested harm's own
+  moment: a citation pointing at disposed work is a false premise in a survey
+  input at exactly the point a session decides what to promote. Scope already
+  runs this tool there, so it gains the retired block as one more thing that
+  call's output carries and no new step.
+- **close, at the gap-inbox drain** — the corrective transition, where an
+  instance found is fixed inline on its owning entry. This is that stage's
+  **first** invocation of this tool: its drain dispositions bullets from a
+  different file entirely, so unlike scope's it is a new command in the step
+  rather than a wider reading of an existing one. Still no new mechanism — one
+  more command a session already running shell tools invokes.
+
+Neither stage gains a gate and neither gains a refusal.
 
 ### The roadmap arm
 
