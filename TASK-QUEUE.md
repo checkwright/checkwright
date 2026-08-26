@@ -3249,6 +3249,14 @@
   later session re-grading three earlier sessions' prose is the self-grading hazard that ruling
   names rather than a repair of it. The next observation of this defect stamps. The backfill
   question itself is filed to the gap inbox at that landing for close to disposition.
+  **FIFTH, 2026-08-26 — unanswerable again, and nothing was DECIDED on the missing half.** The
+  `native-windows-ci-leg` close found neither scope survey of that iteration naming
+  `bin/queue-edges.sh` in an `oracle:` field and no tracked surface carrying an edge sum; the six
+  threshold entries that scope raised were displaced by an operator's unit-set ruling rather than
+  refused by a ranking, so the obligation never attached to them.
+  recurrence: survey-edge-aggregation-residue 2026-08-26
+  **The 2026-08-08 shape is TWICE-shipped, which narrows the fork**: the 2026-08-26 scope ran the
+  oracle, named it in its survey record and wrote per-candidate inbound totals into the finding.
   **Why `[design-pending]`:** the cheap fix — have the survey cite its edge sums — risks
   becoming ceremony, a stage writing down that it did the thing rather than doing it. The
   honest alternatives are a survey artifact the sum lands in, folding the sum into the existing
@@ -7909,23 +7917,23 @@
   dispatcher is waiting, and silent in the worse direction — the returned text reads as a
   liveness complaint rather than as a dropped report, so a less careful dispatcher records a
   sweep that never reported. That is a correctness risk, not an efficiency one.
-  **A FOURTH instance, 2026-08-26, is the worst tail and it puts no ceiling on the cost.** An
-  `align` dispatch WEDGED in a Stop-hook loop across THREE resumptions, burned roughly 166k child
-  tokens and returned nothing at all; the dispatcher recovered only by re-dispatching fresh. So an
-  isolated sweep can consume a full context budget and yield zero.
   recurrence: 2026-08-25 2026-08-26
   **THE BIND IS STRUCTURAL, NOT A RATE — measured at the 2026-08-26 scope, which is the finding
   that outranks every count above.** `scripts/agent-dispatch-guard.sh` REFUSES a read-only type
   dispatched **without** `isolation: worktree`, and worktree isolation is precisely what makes the
   binary unresolvable and arms the displacement. The guard's required remedy is what arms the
   defect, so every read-only fan-out in this repo pays it — there is no dispatch shape that avoids
-  it while staying in contract. That scope's own three worktree-isolated read-only dispatches were
-  displaced three for three, carrying the observed record to 6/6 across two sessions, but the rate
-  is corroboration: a session cannot dispatch its way out of this by sampling better.
-  **The round-trip is observed rather than estimated, and the resume is not a reliable recovery.**
-  Of the two resumes at the filing iteration's close, one restated its report in full and the other
-  returned no transcript at all ("this session just started"), so that sweep was lost and re-run —
-  which is what lifts the cost above one round-trip on some fraction of instances.
+  it while staying in contract. The record is **SEVEN FOR SEVEN across three sessions**, but the
+  rate is corroboration: a session cannot dispatch its way out of this by sampling better.
+  **The worst tail puts no ceiling on the cost.** A 2026-08-26 `align` dispatch WEDGED in a
+  Stop-hook loop across THREE resumptions, burned roughly 166k child tokens and returned nothing at
+  all, recovered only by re-dispatching fresh — a full context budget spent for zero yield.
+  **THE RECOVERY, written down because a parent meeting this has no reason to believe the report
+  still exists: resume the child by id and ask it to RE-EMIT VERBATIM, telling it explicitly not
+  to re-run the work.** Full report, first try, one round-trip at the 2026-08-26 close. Not
+  reliable — an earlier resume returned "this session just started" and that sweep was re-run —
+  and the usage block is no signal either: that re-emit reported the ORIGINAL run's tool count
+  and tokens, so the zero-tool-use shape marks some resumes and not all.
   Attested 2026-08-25 at this scope while dispatching its own survey; filed the same session on
   the lead's direction, before the resume journal holding it was swept.
 
