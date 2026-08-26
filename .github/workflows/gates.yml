@@ -55,7 +55,8 @@ jobs:
   # `gates` because it asserts a different thing — that an adopter's install
   # works, not that this tree is clean — and because the per-platform siblings
   # join here as further jobs. The native Windows one is below; the macOS one is
-  # still owed and is what `platform-support-ci-matrix` has left.
+  # still owed and belongs to `macos-install-smoke-ci-leg`, which the same-day
+  # split moved it to after this comment was written.
   #
   # Not a matrix, and specifically **not derived from native/targets.list**. That
   # roster is the artifact commitment, and a smoke leg on a platform is exactly
