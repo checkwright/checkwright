@@ -83,6 +83,7 @@ unset _gmp
 [[ -n "${GATE_SDK_GH_HOST:-}" ]] || GATE_SDK_GH_HOST="github.com"
 [[ -n "${GATE_SDK_TESTS_DIR:-}" ]] || GATE_SDK_TESTS_DIR="$GATE_SDK_GATES_DIR/gate-tests"
 # spec: gate-sdk/SPEC.md §lib/gate.sh — the executable suffix has one owner and no other surface spells `.exe`: given a target triple it answers for that triple, given nothing (or an empty triple, which *is* the host triple — the shape `--target`-less cargo builds for) it answers for the host
+# shellcheck disable=SC2120  # the argument-passing callers are in other files (bin/build-native.sh, the consumer's packer), so a per-file analysis sees only the argument-less call below and cannot see that the parameter is optional by contract rather than unused
 gate_exe_suffix() {
     local triple="${1:-}"
     if [[ -n "$triple" ]]; then
