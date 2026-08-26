@@ -1885,11 +1885,14 @@ resting on the live tree to exercise it.
 
 Invariant: every `TODO(task: <slug>)` marker on a governed source resolves to a
 live queue task. A `<slug>` naming an active or deferred task resolves; a slug
-sitting in `Done` is **stale** (the work finished, the marker did not); a slug
-absent from the queue is **unresolved** (a typo or an unfiled task). Stale and
-unresolved both redden — a marker referencing nothing is a dangling forward
-reference, the source-side twin of a `blocked-by` tag left pointing at a
-completed task.
+sitting in `Done` is **stale** (the entry left the live pool, the marker did
+not); a slug absent from the queue is **unresolved** (a typo or an unfiled
+task). Stale and unresolved both redden — a marker referencing nothing is a
+dangling forward reference, the source-side twin of a `blocked-by` tag left
+pointing at a slug that has exited. The verdict does not turn on whether the
+work *shipped*: a Done line records an exit from the live pool and not a
+delivery (queue-kit/SPEC.md §The queue format), and a marker waiting on an
+entry that was mooted is as dangling as one waiting on an entry that landed.
 
 `check-comment-tier` owns the marker's *shape* — it blesses `TODO(task:` as a
 reason directive — and this gate adds *resolution* on top, exactly as

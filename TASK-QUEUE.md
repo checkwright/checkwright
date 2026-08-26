@@ -216,54 +216,6 @@
   Attested 2026-08-25 at this scope while dispatching its own survey; filed the same session on
   the lead's direction, before the resume journal holding it was swept.
 
-- **absorbed-duplicate-disposition** [spec: SPEC-done-exits.md] — an entry a landed unit
-  has mooted has an exit, and the surfaces that name it disagree about whether it exists.
-  recurrence: absorbed-duplicate-disposition 2026-08-24 2026-08-26
-  **THE DISPOSITION IS ALREADY RULED, so this applies a ruling rather than making one —
-  TRAJECTORY.md §The closed rulings, 2026-08-23 by the OPERATOR** on a measured 8:1
-  intake-to-exit ratio: close's bare `## Done` line is the ordinary exit for an entry a
-  landed unit or a closed ruling has mooted, taken by close under those two criteria
-  rather than escalated, and *neither needs a new section*. Surfaced 2026-08-26 at spec
-  through the lead; the earlier searches missed it because the ruling says neither
-  "absorbed" nor "duplicate".
-  **SO THE 2026-08-26 LEAD RULING IS WHAT WAS OUT OF POSITION, not Done's contract.** That
-  ruling — `## Done` asserting work that never shipped is a false statement in a governance
-  surface — reads Done as a delivery claim, which the standing operator ruling had already
-  said it is not. It is CONFORMED here rather than reversed: obeying a standing operator
-  ruling is what spec-over-precedent requires, and the operator ruling is untouched.
-  **THE OWNER SPEC CONTRADICTS ITSELF and repairing that rides this unit.**
-  queue-kit/SPEC.md §The icebox tier's conserved-moves bullet already agrees with the
-  operator ruling — `either → done for a ruled wontfix` — while §The queue format's "one
-  line per completed task" is the wrong half, and it is the half the lead ruling read.
-  **ONE FILED COST IS FALSIFIED, measured 2026-08-26 at spec against
-  `drift-kit/kpis/kpi-task-split.sh:27-31`.** A Done slug is classified by its landing
-  commit's subject, so an entry that shipped nothing has no `feat`/`fix`/`refactor` commit
-  and falls to **`unclassified`**: the feat/debt SPLIT is not inflated at all, and only
-  `total` — the "of N done" denominator — moves. The accounting cost is smaller than filed.
-  **THE UNFALSIFIED HALF IS WHAT CARRIES THE UNIT.** The absent disposition made a CORRECT
-  merge unexecutable at the 2026-08-26 close: `pack-installer-vendors-untracked-scratch`
-  and `payload-derivation-ships-untracked-residue`, two live entries owning one gap, were
-  ruled merge-correct and left live. Duplicates therefore accumulate by construction and
-  each one keeps drawing re-filings.
-  **THE WORKED EXAMPLE IS LIVE AND IS `payload-derivation-ships-untracked-residue`**, whose
-  absorbing entry SHIPPED while it kept its pool slot with every ground discharged — which
-  is criterion (a) exactly. **ITS DISPOSITION IS CLOSE'S MOVE, never this unit's**: the
-  operator ruling puts the pool's exits in close's hands, so the amendment states what makes
-  the specimen eligible and does not execute it.
-  **FIRST RECURRENCE 2026-08-24, by a SECOND ROUTE.** `install-step-relocation` reached
-  `## Done` at that iteration's scope on an operator ruling, retired as mooted — its work
-  became unnecessary rather than being merged into a sibling. So the class is any slug
-  reaching Done having shipped nothing, and mooted-by-supersession is a route into it.
-  **The fourth-section branch is REFUSED BY THE OPERATOR RULING** — *neither needs a new
-  section* — so it was never available to weigh. An `[absorbed-by: <slug>]` tag is refused
-  beside it: a disposition token has no reader, `check-task-conservation` reading membership,
-  `kpi-task-split` reading the landing commit, and a human reading git history.
-  **Cost while deferred:** the absent disposition blocks a correct merge, so duplicates
-  accumulate and each draws re-filings; the accounting half is smaller than filed and
-  touches `total` alone.
-  Filed 2026-08-09 by close (`install-profile-seam`), draining the bullet that iteration's
-  scope session filed against its own economics merge.
-
 ## Technical Debt
 
 ## Deferred
@@ -8340,6 +8292,7 @@
 - gate-binary-target-roster-widening
 - payload-symlink-unextractable-on-windows
 - dead-queue-citation-report
+- absorbed-duplicate-disposition
 
 ## Lessons Learned
 

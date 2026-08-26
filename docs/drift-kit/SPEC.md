@@ -116,6 +116,20 @@ The generic set — each coupled to a kit-governed surface, each degrading to
   a Done slug no commit message mentions counts as unclassified however
   correctly that commit is typed, and a later `chore` commit naming the slug
   wins the lookup over an earlier `fix` that did not.
+  **What `total` counts is entries that left the live pool, not deliverables.**
+  The done section is the live pool's exit and not a delivery claim
+  (queue-kit/SPEC.md §The queue format), so a slug that shipped nothing reaches
+  it legitimately — mooted by a landed unit or a closed ruling, or ruled
+  wontfix. Such an exit has no `feat`/`fix`/`refactor` commit naming its slug to
+  be classified by, its landing commit being a `chore` or a `docs`, so it falls
+  to **`unclassified` by construction** and the feat/debt **split is not
+  polluted by it**. Only the "of N done" denominator moves.
+  **`unclassified` is a mixed bucket and is not a count of non-shipping exits.**
+  A task that genuinely delivered but whose landing commit was typed `chore` or
+  `docs` lands there too, and so — by the `git log -1` caveat above — does one
+  whose `feat` landing commit was followed by a later `chore` naming the same
+  slug. It is the bucket a non-shipping exit **cannot escape**, which is the
+  honest claim; measuring them would need a reader this KPI does not have.
 - **kpi-gate-backlog** — proposed-but-absent gates: `check-*`/`scan-*`
   names appearing anywhere in the queue with no file in any gate-resolution
   dir, over the live gate count. A name with a file on disk is built and

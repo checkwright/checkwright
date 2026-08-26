@@ -47,8 +47,17 @@ as `##` sections over column-0 bullets:
   each, sitting **after the deferred section and before the done section**.
   Live work, not history: §The icebox tier owns the tier, its grammar, its
   eligibility rule, and the position contract a cross-kit reader depends on.
-- **The done section** (default `Done`) — one line per completed task, the
-  bare slug only; prose about what happened lives in git history.
+- **The done section** (default `Done`) — the record that an entry has **left
+  the live pool**: one line per exit, the bare slug only, with prose about what
+  happened living in git history. An entry reaches it when a **landed unit or a
+  closed ruling has mooted it**, or as a **ruled wontfix**. It is not a delivery
+  claim, and never was — delivery is recorded by the landing commit's *type*,
+  which is where every reader that cares about it already looks (§The icebox
+  tier enumerates the exits; drift-kit/SPEC.md §Bundled KPIs owns what the
+  commit-type reading yields for an exit that shipped nothing).
+  **The grammar is unchanged** — a bare slug line, no tag, no disposition
+  token — so every existing reader parses exactly what it parsed before. What
+  widened is which entries may lawfully arrive, not how they are written.
 
 The **defer date** of an entry is its `Surfaced <date>` mark when present, else
 the date on its `Filed <date>` provenance line. One definition, two readers —
@@ -136,7 +145,10 @@ that is the whole design:
   live and the gate stays silent. No sanctioned disappearance needs inventing,
   and none exists — every exit from the design-pending pool is conserved:
   deferred → icebox, icebox → deferred on real recurrence, and either → done
-  for a ruled wontfix.
+  for a ruled wontfix, **or for an entry a landed unit or a closed ruling has
+  mooted**. The added route is conserved like the rest — the slug stays visible
+  in the file, on a bare done line — which is why the claim above is
+  strengthened by it rather than disturbed.
 - **One namespace, one parse.** `check-task-names` keeps slug uniqueness and
   `[blocked-by:]` resolution across the whole pool; an iceboxed slug is a legal
   blocker target, because it is unbuilt.
@@ -149,6 +161,30 @@ any gate file** — the widening is entirely in `lib/queue.sh`, which is what th
 one-adapter rule was built to buy. `check-queue-prose-precondition` deliberately does not
 reach the tier: forward-looking phrasing is normal vocabulary in a parked
 entry, the same exemption the deferred section already carries.
+
+**A mooted entry takes the done exit, not this one, and the two routes into it
+are worth naming because neither reads like the criterion that covers it.** A
+slug **merged away as a duplicate** — two entries found to own one gap, one of
+them kept — is an entry *a landed unit has mooted*: the first criterion exactly,
+not a new class. A slug **mooted by supersession**, where the work became
+unnecessary rather than being folded into a sibling, is covered by whichever
+criterion did the mooting — a landed unit that made it unnecessary, or a closed
+ruling that did. Both routes are instances and neither is a class needing its
+own state. They are enumerated because the criteria are phrased as supersession,
+so a session holding a duplicate merge will not recognise itself in them.
+
+**Distinct from this tier, which is the reason a merged duplicate does not land
+here.** The icebox holds *unbuilt* work that stays promotable and dormant. An
+absorbed duplicate is not dormant, it is redundant: there is nothing to promote
+it back to, and returning it to any live section would re-open the namespace
+collision the merge closed. The done exit is what closes that collision, because
+a slug reaching Done leaves the live namespace (§check-task-names).
+
+**No disposition token marks which route was taken, and that is a refusal
+rather than an omission.** It would have no reader:
+`check-task-conservation` reads membership, drift-kit's split KPI reads the
+landing commit, and a human reads git history. A field with no named reader is
+removed rather than added.
 
 **The grammar is the lead line and nothing else:**
 
