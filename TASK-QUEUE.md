@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: native-windows-ci-leg
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -14,10 +14,12 @@
 
 ## Technical Debt
 
-## Deferred
-
-- **platform-support-ci-matrix** [design-pending] [roadmap: next/reliability] — a macOS
-  install-smoke leg, and nothing has ever run against a Mac.
+- **platform-support-ci-matrix** [roadmap: next/reliability] — a native Windows install-smoke
+  leg, then a macOS one; nothing has ever run against either platform.
+  **THIS ITERATION TAKES THE WINDOWS LEG.** Operator-ruled 2026-08-26 at this scope's unit-set
+  escalation, on the adopter date below. The macOS leg stays in this entry, unbuilt and second,
+  exactly as the 2026-08-26 ordering ruling sequences it — the entry is not split, because its
+  two legs share the workflow surface and the runner-mapping mechanism they are promoted to build.
   roadmap-summary: A CI install-smoke leg per supported platform, or an honest label.
   The per-platform half carved out of `platform-support-contract`, narrowed again 2026-08-25
   when its Linux deliverable split off as `linux-install-smoke-ci-leg` under an operator ruling.
@@ -44,13 +46,73 @@
   planning assumption.** `installer/lib/init.sh:197`'s unconditional vendoring loop uses
   `find -printf`, a GNU findutils primary macOS does not carry, so a stock-macOS init vendors
   zero files and still writes a manifest. Filed to the gap inbox at build 2026-08-25, undrained.
-  **Cost while deferred:** the macOS row of the support matrix stays a claim nothing has ever
-  run, and the port tail stays where it is — `installer/README.md` sequences relocating `init`'s
-  unconditional remainder behind an artifact roster covering every supported platform, and a
-  green run here is the only route to that roster.
+  **What a green Windows leg unblocks, and it is why this outranked a larger exit.**
+  `gate-binary-target-roster-widening` states its own block in terms — the roster "widens by zero
+  until `platform-support-ci-matrix` produces one" — and `powershell-installer-surface`, the port
+  sequence's last member, both orders behind this leg and uses it as fork 2's parity oracle.
+  **`pack-installer-vendors-untracked-scratch` is promoted beside this**, not coincidentally: a
+  new install-smoke leg runs `scripts/pack-installer.sh` at four call sites in
+  `installer/consumer-smoke/run-smoke.sh` (`:65`, `:378`, `:541`, `:619`), so the leg would red
+  on that defect first, on a host with nobody to diagnose it by hand.
   Filed 2026-07-26 by scope, operator ruling at the `activation-path` unit-set escalation, split
   from `platform-support-contract`. Promoted 2026-08-25 at scope; narrowed to the macOS half and
   deferred the same day at build, on an operator ruling relayed through the iteration lead.
+  Re-promoted 2026-08-26 at scope, Windows leg first, on the operator ruling recorded above.
+
+- **pack-installer-vendors-untracked-scratch** — `scripts/pack-installer.sh`
+  vendors kit roots with a verbatim `cp -R`, so any git-ignored artifact sitting under a kit's
+  tracked tree rides into the installer payload and breaks `checkwright init` on the consumer.
+  **The failure it produces.** `init` stages every vendored file with a plain `git add`, which
+  refuses when the consumer's own `.gitignore` also ignores that path ("paths are ignored by
+  one of your .gitignore files"), so init dies with "could not stage the vendored files".
+  **The class is live, and the instance is live AGAIN — both re-probed at this drain.**
+  `scripts/pack-installer.sh:110` still vendors each kit with a bare `cp -R` and the script
+  holds no tracked-path filter anywhere, so the class is live.
+  **The 2026-08-23 "the observed instance is gone" claim is RETRACTED as stale**, and with it
+  the retraction of the original cost line. Running the gate-sdk fixture suite STANDALONE — not
+  inside the battery, where the earlier re-probe ran and where suite ordering masked it —
+  regenerates `check-crate-arms`'s ignored source-stamp cache under its tracked `good/` case
+  every time. The absolutization credited with the fix reaches SHELL-dispatched members only,
+  so it never protected this one; the mechanism is
+  `bridged-knob-case-tmp-dir-override-inert`'s, already filed, live, and self-declared upstream
+  here.
+  **THE DESIGN QUESTION IS RULED AT THIS SCOPE, AND THE ORACLE ANSWERED IT — there is no non-git
+  case.** The deferral held on "a decision about consumers vendoring from a non-git payload —
+  packaging semantics rather than a patch". `scripts/pack-installer.sh` already fails closed
+  outside a git work tree, twice and by its own preconditions: `:40` refuses a `--root` that is
+  not inside one, and `:50` refuses a default invocation with "not inside a git work tree — the
+  payload's commit stamp has no source". So the case the design question reserved cannot arise,
+  and the filter is unconditional: vendor git-tracked paths only. Debt by the new-names litmus —
+  it converges behavior on a name the specs already carry and mints no script, knob, tag or
+  convention. **Note `:71`'s clean-tree check does NOT cover this**, and that is why the defect
+  survived it: `git status --porcelain` does not report ignored files.
+  **The fix must reach `:102` as well as `:110`.** The duplicate below names
+  `cp -R installer/. "$ASM/"` at `:102`, which this entry never did; both are the same `cp -R`
+  defect and the 2026-08-26 close already ruled them one gap, so covering both call sites is
+  executing that ruling rather than widening this entry.
+  **A THIRD occurrence, 2026-08-25 at build, widens the reproduction claim above.** The 2026-08-24
+  re-probe credited *suite ordering inside the battery* with masking the artifact and reproduced it
+  only by running the gate-sdk fixture suite standalone. This time the plain step-0 battery was the
+  contaminating run: `installer/consumer-smoke/run-smoke.sh` failed on a tree where nothing but the
+  battery had run. So the masking is not a property of the battery, and a standalone suite is not
+  the trigger it was thought to be.
+  **DUPLICATE OF `payload-derivation-ships-untracked-residue`, and the merge is BLOCKED rather
+  than undone.** That entry was filed 2026-08-25 by the previous close's drain, naming this same
+  `cp -R` and this same broken `git add`; it additionally reaches `:102`'s `installer/.`, which
+  this entry never named. The 2026-08-26 close ruled the merge correct and could not execute it:
+  the only destination `check-task-conservation` sanctions for a dropped slug is `## Done`, and
+  `## Done` asserting a deliverable that shipped nothing is a worse defect than the duplication.
+  Cross-referenced instead, on the lead's ruling. Read the two together until
+  `absorbed-duplicate-disposition` lands the third state that lets one absorb the other.
+  recurrence: pack-installer-vendors-untracked-scratch 2026-08-24 2026-08-25
+  Filed 2026-08-23 by validate and re-dispositioned by validate the same day; the 2026-08-23
+  close drain read both bullets as one disposition and re-ran its probes inside the battery
+  alone, which was not isolated enough to see this; the 2026-08-24 close drain re-probed the
+  fixture suite standalone, reproduced the artifact, and retracted the retraction. Promoted
+  2026-08-26 at scope as this iteration's second unit, on the operator ruling that took the
+  Windows leg — it rides as that leg's precondition and as the ruled threshold rider.
+
+## Deferred
 
 - **gate-binary-target-roster-widening** [design-pending] [roadmap: next/reliability] — the
   binary ships one triple, and no run has produced an artifact anywhere else.
@@ -6727,51 +6789,6 @@
   `shell-gate-tail-port-and-completion-oracle`'s close, whose drain re-ran the leg and confirmed
   the ruled empty-registry outcome on a clean tree.
 
-- **pack-installer-vendors-untracked-scratch** [design-pending] — `scripts/pack-installer.sh`
-  vendors kit roots with a verbatim `cp -R`, so any git-ignored artifact sitting under a kit's
-  tracked tree rides into the installer payload and breaks `checkwright init` on the consumer.
-  **The failure it produces.** `init` stages every vendored file with a plain `git add`, which
-  refuses when the consumer's own `.gitignore` also ignores that path ("paths are ignored by
-  one of your .gitignore files"), so init dies with "could not stage the vendored files".
-  **The class is live, and the instance is live AGAIN — both re-probed at this drain.**
-  `scripts/pack-installer.sh:110` still vendors each kit with a bare `cp -R` and the script
-  holds no tracked-path filter anywhere, so the class is live.
-  **The 2026-08-23 "the observed instance is gone" claim is RETRACTED as stale**, and with it
-  the retraction of the original cost line. Running the gate-sdk fixture suite STANDALONE — not
-  inside the battery, where the earlier re-probe ran and where suite ordering masked it —
-  regenerates `check-crate-arms`'s ignored source-stamp cache under its tracked `good/` case
-  every time. The absolutization credited with the fix reaches SHELL-dispatched members only,
-  so it never protected this one; the mechanism is
-  `bridged-knob-case-tmp-dir-override-inert`'s, already filed, live, and self-declared upstream
-  here.
-  **Why `[design-pending]`:** the candidate fix is one filter at the vendoring step, vendoring
-  git-tracked paths only, but it needs a decision about consumers vendoring from a non-git
-  payload — packaging semantics rather than a patch.
-  **Cost while deferred:** paid NOW rather than on recurrence. Every from-scratch validate
-  needs a manual removal plus a clean-tree `installer_smoke` re-run — the original filing's
-  cost line, reinstated because the retraction that replaced it has itself been falsified — and
-  this iteration's own validate paid it, the leaked artifact feeding the pack step and
-  reddening `installer_smoke` for the wrong reason.
-  **A THIRD occurrence, 2026-08-25 at build, widens the reproduction claim above.** The 2026-08-24
-  re-probe credited *suite ordering inside the battery* with masking the artifact and reproduced it
-  only by running the gate-sdk fixture suite standalone. This time the plain step-0 battery was the
-  contaminating run: `installer/consumer-smoke/run-smoke.sh` failed on a tree where nothing but the
-  battery had run. So the masking is not a property of the battery, and a standalone suite is not
-  the trigger it was thought to be.
-  **DUPLICATE OF `payload-derivation-ships-untracked-residue`, and the merge is BLOCKED rather
-  than undone.** That entry was filed 2026-08-25 by the previous close's drain, naming this same
-  `cp -R` and this same broken `git add`; it additionally reaches `:102`'s `installer/.`, which
-  this entry never named. The 2026-08-26 close ruled the merge correct and could not execute it:
-  the only destination `check-task-conservation` sanctions for a dropped slug is `## Done`, and
-  `## Done` asserting a deliverable that shipped nothing is a worse defect than the duplication.
-  Cross-referenced instead, on the lead's ruling. Read the two together until
-  `absorbed-duplicate-disposition` lands the third state that lets one absorb the other.
-  recurrence: pack-installer-vendors-untracked-scratch 2026-08-24 2026-08-25
-  Filed 2026-08-23 by validate and re-dispositioned by validate the same day; the 2026-08-23
-  close drain read both bullets as one disposition and re-ran its probes inside the battery
-  alone, which was not isolated enough to see this; the 2026-08-24 close drain re-probed the
-  fixture suite standalone, reproduced the artifact, and retracted the retraction.
-
 - **bespoke-test-path-knob-pinning** [design-pending] — a bespoke gate-test's cwd sandbox is
   isolated only while `GATE_SDK_TMP_DIR` and `GATE_SDK_WORKFLOW_DIR` happen to hold relative
   values in the invoker's environment, which is an ambient default rather than anything the test
@@ -7925,20 +7942,23 @@
   dispatcher is waiting, and silent in the worse direction — the returned text reads as a
   liveness complaint rather than as a dropped report, so a less careful dispatcher records a
   sweep that never reported. That is a correctness risk, not an efficiency one.
-  **A FOURTH instance, 2026-08-26, and it is the worst tail yet.** An `align` dispatch WEDGED in a
-  Stop-hook loop across THREE resumptions, burned roughly 166k child tokens and returned nothing at
-  all; the dispatcher recovered only by re-dispatching fresh. Where the record above has a resume
-  round-trip failing once out of two, this is a resume path that failed three consecutive times on
-  one child, so the cost is not bounded by "one extra round-trip on some fraction" — an isolated
-  sweep can consume a full context budget and yield zero.
+  **A FOURTH instance, 2026-08-26, is the worst tail and it puts no ceiling on the cost.** An
+  `align` dispatch WEDGED in a Stop-hook loop across THREE resumptions, burned roughly 166k child
+  tokens and returned nothing at all; the dispatcher recovered only by re-dispatching fresh. So an
+  isolated sweep can consume a full context budget and yield zero.
   recurrence: 2026-08-25 2026-08-26
-  **The rate is now measured, not projected.** The close of the filing iteration dispatched two more
-  worktree-isolated read-only sweeps and BOTH were displaced, so the record is 3 for 3 and the cost
-  field's "one wasted dispatch round-trip per isolated sweep" is an observed rate rather than an
-  estimate. One further datum the recovery produced: a resume round-trip is not reliably
-  recoverable either — of the two resumes, one restated its report in full and the other came back
-  with no transcript at all ("this session just started"), so its whole sweep was lost and had to be
-  re-run by the dispatcher. That raises the cost above one round-trip on some fraction of instances.
+  **THE BIND IS STRUCTURAL, NOT A RATE — measured at the 2026-08-26 scope, which is the finding
+  that outranks every count above.** `scripts/agent-dispatch-guard.sh` REFUSES a read-only type
+  dispatched **without** `isolation: worktree`, and worktree isolation is precisely what makes the
+  binary unresolvable and arms the displacement. The guard's required remedy is what arms the
+  defect, so every read-only fan-out in this repo pays it — there is no dispatch shape that avoids
+  it while staying in contract. That scope's own three worktree-isolated read-only dispatches were
+  displaced three for three, carrying the observed record to 6/6 across two sessions, but the rate
+  is corroboration: a session cannot dispatch its way out of this by sampling better.
+  **The round-trip is observed rather than estimated, and the resume is not a reliable recovery.**
+  Of the two resumes at the filing iteration's close, one restated its report in full and the other
+  returned no transcript at all ("this session just started"), so that sweep was lost and re-run —
+  which is what lifts the cost above one round-trip on some fraction of instances.
   Attested 2026-08-25 at this scope while dispatching its own survey; filed the same session on
   the lead's direction, before the resume journal holding it was swept.
 
@@ -8303,7 +8323,17 @@
   did not change** — that commit's `native/src/gates/commit_msg.rs` diff is entirely inside
   `mod tests`, so the whole tightening is data. `.workflow/tightened-gates.txt` carries neither
   `check-commit-msg` nor `check-tree-terms`.
-  **Open call 1 — which section owns it, and the answer differs by adopter.** `claim()`
+  **CALL 1 IS RULED — BOTH SECTIONS, ALWAYS. Operator ruling 2026-08-26**, relayed through the
+  iteration lead at this scope's escalation. A tightening that ships as kit template data
+  declares in **both** `Tightened gates` **and** `Behavior changes`. The ground is the adopter
+  split below: it is real, so the ruling removes the choice rather than making it, at one extra
+  line per event. Executing it — the edits to gate-sdk/SPEC.md §upgrade-smoke and
+  docs/install.md — is a spec stage's act when this entry promotes, deliberately not taken here.
+  **Call 1 CANNOT BE EXECUTED until call 2 is filled, and this coupling is why the ruling is not
+  self-discharging.** "Declare in both sections" names no one who may append when the discovering
+  stage is not build, so `3763bc3e`'s tightening stays undeclared until a producer exists and
+  surfaces at the next release tag as an adopter meeting a red the note never named.
+  **The adopter split the ruling rests on.** `claim()`
   (`installer/lib/init.sh:172`) rewrites a seeded path whose recorded hash still matches, so an
   adopter who never edited their copy TAKES the new pattern on upgrade and both gates can red on
   a clean run — the Tightened-gates allowed-red set's subject exactly. An adopter who did edit it
@@ -8311,8 +8341,10 @@
   "a template you have copied out that then changed *is* depended-on behavior diverging from your
   copy — it is behavior-folded, not dropped". That folding rule reaches the edited population
   only; it never contemplated the unmodified-seeded-copy case, where init writes through. Two
-  populations, two sections, and no surface choosing between them or requiring both.
-  **Open call 2 — who may declare a late-discovered tightening.** gate-sdk/SPEC.md §upgrade-smoke
+  populations, two sections; the ruling above now requires both.
+  **OPEN CALL — who may declare a late-discovered tightening. Left open 2026-08-26 by lead ruling**
+  for a later spec stage: it is a hole inside the existing envelope, and filling a hole in an owner
+  doc is spec's work rather than the operator's. gate-sdk/SPEC.md §upgrade-smoke
   names the build stage the producer, on the ground that build alone "knows what it tightened at
   the moment it tightens it". A tightening found after that stage closed therefore has **no
   declared producer at all**, and every stage that could append is out of contract.
