@@ -102,17 +102,17 @@ jobs:
       # result *deviates* from that record. Reading this step as a plain smoke run
       # would misread both what it asserts and what a red here means.
       #
-      # **The honest limit, stated because the shape above oversells itself.** The
-      # suite is on the `exit-code` parser, so its whole verdict is one scenario
-      # and its baseline row is that scenario at `fail`. Every outcome therefore
-      # reads as clean: any non-zero matches the baselined `fail`, and a zero is an
-      # unpromoted recovery, which is also not a red. So this leg today proves that
-      # the activation path *runs* on a clean checkout and prints its findings into
-      # the log above — real coverage, since nothing in CI did even that — and it
-      # does **not** yet distinguish the ruled failure from a new one. Closing that
-      # needs per-arm scenarios for this suite, which is `validate-baseline-suite-coverage`'s
-      # reserved design call rather than this leg's to take. Do not read a green
-      # here as the install path being sound; read the log.
+      # **What a green here does and does not say.** The suite is on a per-arm
+      # parser, so each printed arm of the smoke is its own baseline scenario and
+      # the diff reds when an arm that is baselined `pass` comes back red *or
+      # absent* (evidence-kit/SPEC.md §Baseline manifest). The ruled failure is
+      # held on the binary-less arm alone, and the arms behind it are recorded at
+      # `ignore` — a non-verdict for arms nobody observed — so an abort that moves
+      # earlier reds every arm it skipped. That is the coverage this leg lacked
+      # while the whole suite was one `exit-code` scenario, where every outcome
+      # read clean and a green meant nothing. Still read the log: a green says the
+      # arms the run reached behaved as recorded, not that the install path is
+      # sound on a platform this leg does not run.
       #
       # Stays a bash `run:` on the runner's preinstalled toolchain (no setup-node,
       # no setup-rust) to keep the checkout+bash tamper floor the steps above state.
@@ -138,10 +138,12 @@ jobs:
   # questions per run as one run can carry.
   #
   # **It does not ride the baseline diff the Linux leg above uses, deliberately.**
-  # That suite sits on the exit-code parser with one scenario baselined at `fail`,
-  # so every outcome reads clean — the limit that leg's own text states. Pointing
-  # a second, differently-failing platform at the same row would not be thin
-  # coverage but zero, dressed as a verdict.
+  # That baseline's `installer_smoke` rows are per-arm and were recorded from a
+  # Linux run, so they are a claim about how those arms behave *there*. A second
+  # platform that fails differently, judged against the first platform's record,
+  # would report deviations that are platform difference rather than regression —
+  # the baseline is held-constant per scenario, and one scenario name cannot hold
+  # two populations at once.
   #
   # **It discharges nothing for `native/targets.list`, and that is measured
   # rather than cautious.** gate-sdk/SPEC.md §Consumer payload admits a triple

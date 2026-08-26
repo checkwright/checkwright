@@ -88,10 +88,23 @@ scripts scripts pass
 guard_tests guard_tests pass
 usage_tests usage_tests pass
 budget_guard_tests budget_guard_tests pass
+dispatch_guard_tests dispatch_guard_tests pass
 trend_tests trend_tests pass
 demo demo pass
-installer_smoke installer_smoke fail binary-less-dispatch-loop-retirement
+installer_smoke build pass
+installer_smoke pack pass
+installer_smoke install pass
+installer_smoke profile-invariant pass
+installer_smoke binary-less-leg fail binary-less-dispatch-loop-retirement
+installer_smoke download-arm ignore binary-less-dispatch-loop-retirement
+installer_smoke toolchain-free-arm ignore binary-less-dispatch-loop-retirement
+installer_smoke jq-less-arm ignore binary-less-dispatch-loop-retirement
+installer_smoke upgrade-arm ignore binary-less-dispatch-loop-retirement
+installer_smoke seam-arm ignore binary-less-dispatch-loop-retirement
+installer_smoke narrowing-arm ignore binary-less-dispatch-loop-retirement
+installer_smoke artifact-arm ignore binary-less-dispatch-loop-retirement
 consumer_smoke consumer_smoke pass
 upgrade upgrade pass
 agents_md_smoke agents_md_smoke pass
 index_tests index_tests pass
+native_crate native_crate pass

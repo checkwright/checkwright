@@ -202,6 +202,34 @@ pub fn run(args: &[String]) -> i32 {
         }
     }
 
+    // spec: evidence-kit/SPEC.md §check-evidence-baseline — every configured suite carries at
+    // least one baseline row; the roster is EVIDENCE_KIT_SUITES, so a suite acquires and drops
+    // the obligation with no edit here, and a suite set that will not resolve is unjudgeable
+    let suites = match walk::knob_array("EVIDENCE_KIT_SUITES") {
+        Ok(s) => s,
+        Err(e) => {
+            eprintln!(
+                "check-evidence-baseline: {} — the check could not run; treating as failure (not clean)",
+                e
+            );
+            return 2;
+        }
+    };
+    if !suites.is_empty() {
+        let covered: Vec<&str> = blines
+            .iter()
+            .filter_map(|l| l.split_whitespace().next())
+            .collect();
+        for s in &suites {
+            if !covered.contains(&s.as_str()) {
+                errors.push(format!(
+                    "configured suite '{}' carries no baseline row — a scenario going absent in it reds nothing",
+                    s
+                ));
+            }
+        }
+    }
+
     if !errors.is_empty() {
         println!(
             "EVIDENCE-BASELINE: {} issue(s) in {}:",
@@ -211,12 +239,13 @@ pub fn run(args: &[String]) -> i32 {
         for e in &errors {
             println!("  {}", e);
         }
-        println!("  help: each line is '<suite> <scenario> <status> [<slug>]'; a fail/ignore carries a live blocking slug; the baseline is edited by human commit only");
+        println!("  help: each line is '<suite> <scenario> <status> [<slug>]'; a fail/ignore carries a live blocking slug; every configured suite owes at least one row, bought by configuring a parser rather than by hand-authoring rows; the baseline is edited by human commit only");
         return 1;
     }
     println!(
-        "EVIDENCE-BASELINE: clean ({} scenario(s); grammar, slug liveness, and coverage hold in {})",
+        "EVIDENCE-BASELINE: clean ({} scenario(s) over {} configured suite(s); grammar, slug liveness, suite coverage, and scenario coverage hold in {})",
         blines.len(),
+        suites.len(),
         baseline
     );
     0

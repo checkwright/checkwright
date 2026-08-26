@@ -12,6 +12,7 @@ SCRATCH="$(mktemp -d "$BASE/installer-smoke.XXXXXX")" || exit 2
 cleanup() { rm -rf "$SCRATCH"; }
 trap cleanup EXIT
 
+# spec: evidence-kit/SPEC.md §Layout and configuration — the unindented arm headers below are a PARSED contract, not narration: the installer_smoke validate parser derives its scenario roster from these `printf` lines and names each scenario by the literal before the parenthetical, so rewording one renames a baseline scenario and changing the header's shape empties the roster
 say() { printf '  %s\n' "$*"; }
 fail() { printf 'INSTALLER-SMOKE: FAIL — %s\n' "$*"; exit 1; }
 blocked() { printf 'INSTALLER-SMOKE: %s\n' "$*" >&2; exit 2; }

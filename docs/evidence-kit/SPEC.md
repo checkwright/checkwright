@@ -54,6 +54,31 @@ Knobs, this repo's surface names as defaults:
   order rather than completion order, so one run's scenario record diffs against
   another's (gate-sdk/SPEC.md §run-gates). Stated rather than left derivable,
   because it is the surface a reader would otherwise re-derive off the runner.
+  **A second consumer suite exercises the knob, and it is the one that shows the
+  contract already covers more than a test runner.** This repo's
+  `installer_smoke` takes a parser emitting **one scenario per arm** of the
+  consumer smoke — arm names, not test names, which the per-suite override admits
+  without amendment because it names a command over a log and says nothing about
+  what a scenario must be. The arm roster is **not listed in the parser**: it is
+  derived from the smoke script's own top-level headers, so an arm added or
+  reworded moves the scenario set with it, and a header shape the derivation
+  cannot read yields an empty roster that `run-validate`'s produced-no-result
+  guard reports as the run failure it is. That derivation is what makes those
+  printed headers a parsed contract rather than narration, so the script says so
+  where they are written.
+  **The suite's fail-fast shape is what makes per-arm rows assert rather than
+  narrate, and it is the non-obvious half.** The smoke exits at its first
+  failure, so arms behind that point never print — and §Baseline manifest's
+  directional rule reds a baselined `pass` scenario that is red **or absent**. An
+  early abort therefore reds every arm behind it instead of hiding them: the
+  property that collapsed the whole suite into one uninformative verdict is the
+  same property that now gives each arm a real one. **The honest limit is that
+  the attribution leans on fail-fast, not the verdict.** An arm is judged failed
+  when the log reaches its header and neither a later header nor the run's own
+  clean line follows, so a smoke that ever gained a *non-fatal* failure path
+  would read that arm as passing. The suite's verdict would still be right,
+  because the arms behind a real abort are absent either way; what would be wrong
+  is the blame.
 - `EVIDENCE_KIT_SCENARIO_GLOBS` — optional per-suite globs; configuring one
   arms the manifest↔disk set-equality assertion for that suite.
 - `EVIDENCE_KIT_BASELINE_FILE` (default `.workflow/validate-baseline.txt`),
@@ -107,6 +132,20 @@ result lines (a Rust `cargo test` suite), `exit-code` emits one scenario per
 suite keyed off the suite command's exit. Any other value is a consumer command
 run on the log.
 
+**`libtest` shipping is not `libtest` being owed, and the refusal is recorded
+here because the adapter already exists — a later reader would otherwise read the
+silence as an oversight.** Pointing it at a mature crate suite turns one row into
+one row per test, hundreds where the suite today owes one, over the
+fastest-moving surface a repository has: a renamed or deleted test is routine
+work, and each one reds the baseline for a non-defect. That is exactly the
+hand-maintained roster §Baseline manifest refuses, at an order more rows. What
+the adapter would actually buy is **per-test absence** detection — a red in the
+suite is already caught by the absent-row rule — and absence is precisely what
+churn produces. **The call is reserved on a measurement rather than on a taste,
+and this sentence is the trigger that re-opens it:** the day a suite's test names
+stop churning, so that a baseline row survives an iteration, `libtest` is the
+right answer and the rows follow a run as §Baseline manifest requires.
+
 Which adapter a suite gets is resolved by `ek_parser_for <suite>`
 (`EVIDENCE_KIT_PARSER_<suite>`, else the global `EVIDENCE_KIT_PARSER`), and the
 dispatch lives inside `ek_parse` — so both spine callers, `run-validate` and
@@ -157,6 +196,28 @@ when status is `fail` or `ignore` and forbidden when `pass`; each slug resolves
 to a live queue task (the queue-file knob) or a configured permanent marker.
 Tooling never writes it — a promotion (a held-constant red recovering to pass)
 is a human commit, which is what keeps the baseline honest.
+
+**A row is a claim about one scenario, and a suite's scenarios come from its
+parser.** What the row asserts is that *that scenario* is held at the recorded
+status; what counts as a scenario is whatever the suite's configured parser emits
+(§lib/evidence.sh). Two consequences follow. A suite carrying a single scenario
+has a baseline that asserts about the suite as a whole and nothing finer —
+**adequate** where the suite's arms are not independently meaningful, and
+**empty** where they are. And finer coverage is bought by **configuring a
+parser**, never by hand-authoring rows: the rows follow the parser's output, so
+they are recorded from a run rather than maintained against one. A suite that
+owes finer coverage owes a parser, which is why under-coverage here is a parser
+question and not a row-count one.
+
+**The degenerate end of that axis is named because it is reachable and has been
+reached.** A suite on the `exit-code` parser has one scenario, its whole verdict;
+baseline that scenario at `fail` and enumerate the outcomes, and every one reads
+clean — any non-zero matches the baselined `fail`, and a zero is an unpromoted
+recovery, which is also not a red. Such a row asserts **nothing at all**. That is
+not thin coverage but none, wearing a verdict, and a consumer writing a baseline
+needs to meet it here rather than discover it from a green that meant nothing.
+The remedy is the rule above: give the suite a parser, so its arms become
+scenarios a `pass` row can hold.
 
 **Which task a slug names, when more than one could.** The slug names the
 **standing** unpaid price the row was written to hold visible, never the topmost
@@ -424,9 +485,11 @@ ran it, and passes it to `ek_parse` itself.
 Invariant: the held-constant baseline stays grammatical and honest. It asserts
 the `<suite> <scenario> <status> [<slug>]` shape, blocking-slug liveness — every
 `fail`/`ignore` slug resolves to a live queue task or a permanent marker, and a
-slug present only under `## Done` is stale-red — and, for every suite carrying a
+slug present only under `## Done` is stale-red — for every suite carrying a
 configured scenario glob, manifest↔disk set equality (a baseline scenario with
-no matching file, or a file with no baseline line, reddens). Argument mode
+no matching file, or a file with no baseline line, reddens); and **suite
+coverage**, that every suite in `EVIDENCE_KIT_SUITES`
+(§Layout and configuration) carries at least one row. Argument mode
 `$1 $2` (baseline, queue) with configured defaults makes it fixture-capable; the
 liveness and coverage branches beyond the one good/bad pair are covered by
 `gate-tests/check-evidence-baseline.test.sh`.
@@ -442,6 +505,27 @@ kit default — an empty map — so its whole battery crosses the *empty* arm an
 defect in the keyed wire would pass it; the non-empty arm is exercised by the
 coverage case in this gate's own behavioral test, which is therefore the
 load-bearing evidence for it rather than an extra scenario.
+
+**The suite-coverage arm is a derived obligation and not a maintained roster,
+which is the whole of its justification.** Nothing in the gate enumerates
+suites — the roster is the configured one, so a suite added there acquires the
+obligation with no edit anywhere else and a suite removed drops it. What a row
+buys over the fail-closed rule §Baseline manifest already states is the *absent*
+direction: a rowless suite going **red** is still caught, while a rowless suite
+**silently ceasing to run** — dropped from the roster, or renamed under a config
+edit — is not, and that is the failure this arm closes. It is the enforcement
+half of §Baseline manifest's granularity rule and belongs in the same unit as any
+fix to a rowless suite, or the gap simply recurs at the next suite added.
+
+**Two branches sit at the ends of that roster and only one of them is clean.** A
+suite set that **will not resolve**, where a baseline file exists, is
+**fail-closed (exit 2)**: a config the gate cannot judge is not a clean run
+(gate-sdk/SPEC.md §Fail-closed contract). A consumer configuring **no** suites at
+all disarms the arm at a **declared early-out**, the shape
+§check-evidence-manifest's no-cursor branch already takes — a gate with nothing
+to say says nothing at a named branch rather than falling through a live
+assertion. The clean line reports the configured suite count for that reason: it
+is what tells a reader which of the two branches a green run took.
 
 ### check-evidence-manifest
 

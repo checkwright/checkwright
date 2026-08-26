@@ -79,9 +79,46 @@ elif ! grep -qF "no baseline line" <<<"$out"; then
     echo "  FAIL: coverage gap wrong finding: $out"; fails=$((fails + 1))
 fi
 
+# G — a consumer configuring NO suites disarms the suite-coverage arm at a
+#     declared early-out, rather than falling through the live assertions.
+_nosuites_cfg() {
+    local d="$tmp/nosuites"; mkdir -p "$d/scripts"
+    printf 'EVIDENCE_KIT_SUITES=()\n' >"$d/scripts/evidence-config.sh"
+    printf '# fixture\nu a pass\n' >"$d/base.txt"
+    ( cd "$d" && unset EVIDENCE_KIT_CONFIG_FILE \
+        && gate_env GATE_SDK_GATES_DIR=scripts \
+        && gate_run check-evidence-baseline "$DIR/checks" base.txt 2>&1 )
+}
+if ! out="$(_nosuites_cfg)" || ! grep -qF "0 configured suite(s)" <<<"$out"; then
+    echo "  FAIL: an empty suite roster did not disarm cleanly at the declared early-out: $out"; fails=$((fails + 1))
+fi
+
+# H — a suite roster the bridge could not carry is exit 2, never a clean run:
+#     the argv the bridge built, minus that one assignment, is exactly that state.
+_unresolvable() {
+    local d="$tmp/unres"; mkdir -p "$d/scripts"
+    printf 'EVIDENCE_KIT_SUITES=(gates)\n' >"$d/scripts/evidence-config.sh"
+    printf '# fixture\ngates gates pass\n' >"$d/base.txt"
+    ( cd "$d" && unset EVIDENCE_KIT_CONFIG_FILE \
+        && gate_env GATE_SDK_GATES_DIR=scripts \
+        && source "$GATE_SDK_TEST_LIB_DIR/gate.sh" \
+        && mapfile -t argv < <(gate_command check-evidence-baseline "$DIR/checks") \
+        && kept=() \
+        && for a in "${argv[@]}"; do
+               [[ "$a" == GATE_SDK_KNOB_EVIDENCE_KIT_SUITES=* ]] || kept+=("$a")
+           done \
+        && "${kept[@]}" base.txt 2>&1 )
+}
+out="$(_unresolvable)"; rc=$?
+if [[ "$rc" -ne 2 ]]; then
+    echo "  FAIL: an unresolvable suite roster exited $rc, want 2 (fail-closed): $out"; fails=$((fails + 1))
+elif ! grep -qF "could not run" <<<"$out"; then
+    echo "  FAIL: the fail-closed refusal did not name itself as a non-run: $out"; fails=$((fails + 1))
+fi
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-evidence-baseline.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "check-evidence-baseline.test: ok (done-stale + unknown + pass-with-slug + coverage-gap rejected; live-slug + permanent-marker accepted)"
+echo "check-evidence-baseline.test: ok (done-stale + unknown + pass-with-slug + coverage-gap rejected; live-slug + permanent-marker accepted; no-suites disarms, unresolvable suites fail closed)"
 exit 0

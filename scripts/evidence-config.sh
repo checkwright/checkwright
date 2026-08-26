@@ -16,6 +16,10 @@ EVIDENCE_KIT_PARSER=exit-code
 # spec: evidence-kit/SPEC.md §Layout and configuration — per-gate scenarios for the gates suite; the verbose run is what emits the per-gate tails the parser reads
 EVIDENCE_KIT_PARSER_gates='bash scripts/parse-gates-log.sh'
 EVIDENCE_KIT_RUN_gates='env GATE_SDK_VERBOSE=1 bash gate-sdk/bin/run-gates.sh'
+
+# spec: evidence-kit/SPEC.md §Layout and configuration — per-arm scenarios for the installer smoke; the arm roster is derived from the smoke's own headers, and the suite's fail-fast shape is what turns an early abort into a red on every arm behind it rather than a hidden one
+EVIDENCE_KIT_PARSER_installer_smoke='bash scripts/parse-installer-smoke-log.sh'
+
 EVIDENCE_KIT_RUN_guard_tests='bash guard-kit/bin/run-guard-tests.sh'
 EVIDENCE_KIT_RUN_usage_tests='bash delegation-kit/bin/run-usage-tests.sh'
 EVIDENCE_KIT_RUN_budget_guard_tests='bash delegation-kit/bin/run-budget-guard-tests.sh'

@@ -925,6 +925,7 @@ pub const REGISTRY: &[GateEntry] = &[
             "EVIDENCE_KIT_QUEUE_FILE",
             "EVIDENCE_KIT_SCENARIO_GLOBS",
             "EVIDENCE_KIT_PERMANENT_SLUGS",
+            "EVIDENCE_KIT_SUITES",
         ],
         "evidence-kit",
         &[("bash", "")],

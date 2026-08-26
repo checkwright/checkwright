@@ -12,55 +12,6 @@
 
 ## New Features
 
-- **validate-baseline-suite-coverage** [spec: SPEC-baseline-grain.md] — two validate suites carry no
-  held-constant-red baseline row, so a regression in either passes the baseline arm silently.
-  **Verified at the 2026-08-14 drain by diffing the two files' suite columns**, not taken from
-  the bullet: `.workflow/validate-baseline.txt` carries rows for **22** suites while
-  `run-validate.sh` runs **24**. The two with no row are `dispatch_guard_tests` and
-  `native_crate`.
-  **Pre-existing, and an omission rather than lag.** Both suites predate the baseline's last
-  edit (`eb94126b`, 2026-08-13), so nothing about this iteration introduced it.
-  **The consequence is narrow and real.** `diff-baseline` flags a *new* failure against a
-  *listed* scenario, so a regression in either suite is caught only by the suite failing
-  outright — which is exactly the coverage the held-constant mechanism exists to add on top of.
-  `native_crate` is the sharper half: it is the crate's own 92-test suite, it now spans a
-  dependency graph and an MSRV floor that both moved this iteration, and it is the arm the next
-  port cohort leans on hardest.
-  **Why this needed design and not a two-line fix:** which scenarios are worth holding constant
-  is an evidence-kit judgment, not a mechanical backfill — a baseline row is a *claim* that a
-  verdict is expected to stay put, and adding twenty-four rows because twenty-four suites exist
-  is the maintained-roster shape derivation-first refuses. The design call is whether the
-  baseline is per-suite or per-scenario for a suite this size.
-  **DISTINCT from `baseline-row-prose-coupling-gate`**, which is prose asserting what the
-  baseline holds; this is the baseline not holding it.
-  **Cost while deferred:** the two suites keep their weakest protection while the crate is the
-  fastest-moving surface in the tree.
-  **Second instance, one granularity down — 2026-08-19, and it is the entry's own open call.**
-  The suite-level claim above re-verified unchanged (22 rows for 24 suites, the same two absent).
-  What is new: *within* the `gates` suite the run reports 104 scenarios while the baseline names
-  **75**, so 29 registered gates hold no row. Probed at the source rather than assumed
-  (`evidence-kit/lib/evidence.sh:137,156,166`): the diff is directional, so a rowless gate going
-  red is still a new-failure — what a `pass` row alone buys is that the scenario going **absent**
-  reds too. The uncovered 29 can therefore be deregistered, renamed or silently skipped with the
-  battery still green, which is a different loss from the one the suite-level half names.
-  **Third instance, 2026-08-25 at build, and it turns the open call above into a forcing case.**
-  `installer_smoke` sits on the exit-code parser, so its whole verdict is ONE scenario and its
-  baseline row is that scenario at `fail`. Enumerate the outcomes and the coverage is not thin but
-  **empty**: any non-zero exit matches the baselined fail and reads clean, and a zero is an
-  unpromoted recovery, which is also not a red. Measured by rehearsing the new CI leg's body
-  locally — the smoke printed a `FAIL` for the starter profile's init while the leg printed
-  `diff-baseline: clean` and exited 0. The failure that demonstrated it was **not** the baselined
-  one: the baselined failure is the binary-less leg's missing-gates refusal, and what actually broke
-  was an unrelated arm, absorbed silently. Where the 2026-08-19 line reports rowless scenarios
-  inside a suite, this is the degenerate end of the same axis — a suite whose single row makes the
-  mechanism assert nothing at all. The candidate remedy is a per-suite parser emitting one scenario
-  per arm, which is consumer config rather than a kit change; lead-ruled at build to leave it,
-  because it decides this entry's reserved design call out of band. Carried meanwhile:
-  `.github/workflows/gates.yml`'s install-smoke leg states the limit in its own text.
-  recurrence: validate-baseline-suite-coverage 2026-08-19 2026-08-25
-  Filed 2026-08-14 by close, draining a gap-inbox bullet the lead filed after the validate
-  session declined to act on its own finding unilaterally.
-
 - **isolated-child-liveness-hook-displaces-its-report** [spec: SPEC-worktree-reader.md] —
   the turn-end liveness hook does exactly what it was told under worktree isolation, and
   doing so overwrites the
@@ -6546,7 +6497,7 @@
   **Cost while deferred:** an adopter on an uncovered platform installs successfully, receives a
   `gates.list` that declares every omission honestly, and then finds the battery cannot run — the
   disclosure is correct and the experience is a broken install. Held visible meanwhile by the
-  `installer_smoke installer_smoke fail binary-less-dispatch-loop-retirement` row in
+  `installer_smoke binary-less-leg fail binary-less-dispatch-loop-retirement` row in
   `.workflow/validate-baseline.txt`, which validate writes, per criterion 5's own UNPAID-price
   mechanism. The loop's own carry is unchanged and secondary — roughly 180 duplicated dispatch
   lines in `run-gates.sh`, held honest by an executed byte-comparison against the `--run` arm
@@ -8192,6 +8143,7 @@
 - absorbed-duplicate-disposition
 - relayed-ruling-provenance-unrecorded
 - kfric-empty-log-ambiguity
+- validate-baseline-suite-coverage
 
 ## Lessons Learned
 

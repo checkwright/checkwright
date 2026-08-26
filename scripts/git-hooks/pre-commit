@@ -360,7 +360,7 @@ if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md'; then
 fi
 
 if staged_matches '*.md' 'scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh'; then
-    run_gate check-measured-claim env $'GATE_SDK_KNOB_CANON_KIT_MEASURED_CLAIMS_CMD=bash scripts/measured-claims.sh' $'GATE_SDK_KNOB_CANON_KIT_MEASURED_SURFACE_GLOBS=CLAUDE.md\tREADME.md\tCONTRIBUTING.md\tCODE_OF_CONDUCT.md\tSECURITY.md\tRELEASING.md\tROADMAP.md\tTRAJECTORY.md\t*/SPEC.md\t*/README.md\treserve/*/README.md\tdoctrine-kit/DOCTRINE.md\tdocs/*.md\tdocs/*/index.md\tdocs/posts/*.md\t.claude/commands/*.md' $'GATE_SDK_KNOB_CANON_KIT_MEASURED_KEYS=ported-gate-members\tgate-substrates\ttree-shell-owed' $'GATE_SDK_KNOB_CANON_KIT_MEASURED_VALUES=106\tnative\t140' native/target/release/checkwright-gates check-measured-claim
+    run_gate check-measured-claim env $'GATE_SDK_KNOB_CANON_KIT_MEASURED_CLAIMS_CMD=bash scripts/measured-claims.sh' $'GATE_SDK_KNOB_CANON_KIT_MEASURED_SURFACE_GLOBS=CLAUDE.md\tREADME.md\tCONTRIBUTING.md\tCODE_OF_CONDUCT.md\tSECURITY.md\tRELEASING.md\tROADMAP.md\tTRAJECTORY.md\t*/SPEC.md\t*/README.md\treserve/*/README.md\tdoctrine-kit/DOCTRINE.md\tdocs/*.md\tdocs/*/index.md\tdocs/posts/*.md\t.claude/commands/*.md' $'GATE_SDK_KNOB_CANON_KIT_MEASURED_KEYS=ported-gate-members\tgate-substrates\ttree-shell-owed' $'GATE_SDK_KNOB_CANON_KIT_MEASURED_VALUES=106\tnative\t141' native/target/release/checkwright-gates check-measured-claim
 fi
 
 if staged_matches '*.md' 'scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh'; then
@@ -404,7 +404,7 @@ if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*
 fi
 
 if staged_matches '.workflow/validate-baseline.txt' 'TASK-QUEUE.md' 'native/src/gates/evidence_baseline.rs' 'native/src/evidence.rs'; then
-    run_gate check-evidence-baseline env GATE_SDK_KNOB_EVIDENCE_KIT_BASELINE_FILE=.workflow/validate-baseline.txt GATE_SDK_KNOB_EVIDENCE_KIT_QUEUE_FILE=TASK-QUEUE.md GATE_SDK_KNOB_EVIDENCE_KIT_SCENARIO_GLOBS= GATE_SDK_KNOB_EVIDENCE_KIT_PERMANENT_SLUGS= native/target/release/checkwright-gates check-evidence-baseline
+    run_gate check-evidence-baseline env GATE_SDK_KNOB_EVIDENCE_KIT_BASELINE_FILE=.workflow/validate-baseline.txt GATE_SDK_KNOB_EVIDENCE_KIT_QUEUE_FILE=TASK-QUEUE.md GATE_SDK_KNOB_EVIDENCE_KIT_SCENARIO_GLOBS= GATE_SDK_KNOB_EVIDENCE_KIT_PERMANENT_SLUGS= $'GATE_SDK_KNOB_EVIDENCE_KIT_SUITES=gates\tgate_sdk\tcanon_kit\tcontext_kit\tdelegation_kit\tdoctrine_kit\tevidence_kit\tguard_kit\tlifecycle_kit\tqueue_kit\tsite_kit\tscripts\tguard_tests\tusage_tests\tbudget_guard_tests\tdispatch_guard_tests\ttrend_tests\tdemo\tinstaller_smoke\tconsumer_smoke\tupgrade\tagents_md_smoke\tindex_tests\tnative_crate' native/target/release/checkwright-gates check-evidence-baseline
 fi
 
 if staged_matches '.workflow/validate-evidence.txt' 'TASK-QUEUE.md' '.workflow/WORKFLOW-STATE.txt' 'native/src/gates/evidence_manifest.rs' 'native/src/evidence.rs'; then

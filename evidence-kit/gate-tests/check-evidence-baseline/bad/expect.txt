@@ -1,1 +1,2 @@
 requires a blocking slug
+configured suite 'ghost' carries no baseline row
