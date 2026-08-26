@@ -147,7 +147,7 @@
   rule that a step is takeable only if it already runs when an artifact was selected: a relocated
   step is unreachable on the platforms criterion 5 leaves with no binary (gate-sdk/SPEC.md
   §Porting a gate to the binary substrate). The roster below is that answer in full, measured off
-  `installer/lib/*.sh` and `installer/bin/checkwright.sh` at `d0b54919` — re-derive by reading
+  `installer/lib/*.sh` and `installer/bin/checkwright.sh` at `0cc4c86a` — re-derive by reading
   `init.sh` top to bottom against the step names — in execution order:
 
   | step | disposition |
@@ -326,7 +326,7 @@
   about 640 ms on every invocation that resolves it, and no entry owns the residue.
   **RE-SCOPED 2026-08-23 at `battery-runner-port`'s close, on a lead ruling: correcting a false
   claim in an entry is not a descope.** Three of this entry's four load-bearing statements moved
-  under `df42c13b`, and the retired ones are deleted rather than annotated.
+  under `6d813968`, and the retired ones are deleted rather than annotated.
   **Its blocking design question is ANSWERED, by an executed fact rather than a preference.** It
   asked whether one knob's resolved value may legitimately differ between two members in the same
   run. It may not: resolution is **member-independent**, verified by reading the resolver rather
@@ -474,7 +474,7 @@
   "lead, own authority" a first-class value rather than an absence.** All three above record only
   HOW an authorization arrived, and 2026-08-24 fired in the direction none catches — a lead's own
   ruling recorded as the OPERATOR's, corrected at gate-sdk/SPEC.md §check-gate-fail-closed, which
-  names the lead and says commit `0f9cc492` misattributes it and is deliberately not rewritten.
+  names the lead and says commit `0153a5c9` misattributes it and is deliberately not rewritten.
   The same iteration also caught the lead attributing a lead ruling to the operator: both
   over-attribute upward, and since "operator-ruled" marks a decision a later session may not
   reverse alone, this direction is a false FLOOR on re-ruling where the filed shape is a false
@@ -2330,7 +2330,7 @@
   *gnu-userland* — documentation only, no shipped-code path.
   **Cost while deferred:** exactly that reconstruction, paid again by whoever composes each
   release note, against evidence that is coldest when the batch count is highest.
-  **A live instance, 2026-08-25 at build in commit `2a9a632b`, and it sharpens the open question
+  **A live instance, 2026-08-25 at build in commit `04f81ad8`, and it sharpens the open question
   above.** `evidence-kit/bin/diff-baseline.sh` gained a refusal: each argument group is now
   `<suite> <logfile> [<status>]`, and a suite on the exit-code parser named *without* a status is
   refused at exit 2 rather than handed a hardcoded 0. A vendored consumer invoking the old pair form
@@ -2568,7 +2568,7 @@
   **The 2026-08-23 date is a direct stamp too, and the corroboration is the strongest yet.**
   `battery-runner-port` ran six stage sessions plus a consult and the log read **empty**, while
   that iteration's prompt log records at least four history-archaeology reads shaping a new
-  deliverable: a build session reading commit `b86f3c96`'s diff to locate pipe sites, a session
+  deliverable: a build session reading commit `e3579fda`'s diff to locate pipe sites, a session
   archaeologising when `check-crate-arms`'s cache was introduced, a spec session reading a
   *deleted* amendment (`SPEC-eighth-cut.md`) to shape a new one, and this close reading a prior
   close's commit to shape its own. Four events, zero stamps.
@@ -4570,7 +4570,7 @@
   **The instance, measured 2026-08-22.** Batch A landed `check-unmarked-claim` (`install:
   on-surface`) without registering it in `canon-kit/smoke/install.sh`. The precommit battery passed
   at 105 and then at 106 across four commits and three independent lead verifications; validate's
-  `consumer_smoke` caught it, fixed in one line at `93cda68d`. The same iteration's batch-B gate was
+  `consumer_smoke` caught it, fixed in one line at `1e18d154`. The same iteration's batch-B gate was
   `zero-config` and WAS registered, so the seam is the disposition split rather than a careless
   batch.
   **Why `[design-pending]`:** the fix shape needs a ruling, not a build. Either widen
@@ -4669,7 +4669,7 @@
   reached any of it.
   **Both surfaces were repaired in that same commit**, so this entry is not the fix: the
   pointer was re-scoped, the precondition now states that `permissions.push` answers for
-  whichever account is *active* and that a machine may carry several logins, and the
+  whichever account is *active* and that a machine may carry more than one login, and the
   never-switch-identity prohibition was **deleted** rather than narrowed — it was wrong in the
   case that occurs here, and `release-runbook-identity-diagnosis` owns why. What replaced it is
   an identity-before-status-code rule plus the recording obligation the old clause was really
@@ -6780,8 +6780,8 @@
   **Probed, not inferred (2026-08-23 validate).** With `GATE_SDK_TMP_DIR` pointed at an absolute
   dir holding a live-pid `run-validate.lock`, `producer-lock.test.sh` reds on 4 assertions because
   its inner run-validate reads the real lock; with `GATE_SDK_WORKFLOW_DIR` absolute it reds on 4
-  more, reading a foreign `validate-evidence.txt`. That is the same failure `0c29e19f`'s
-  process-wide export produced and `8f2000f0` narrowed away — an export was one way to supply an
+  more, reading a foreign `validate-evidence.txt`. That is the same failure `c1375e99`'s
+  process-wide export produced and `80d74291` narrowed away — an export was one way to supply an
   ambient absolute value, not the only one. `producer-lock` is the sharpest case: the evidence_kit
   suite runs inside the spine *while a real run-validate producer is live by construction*.
   **Why `[design-pending]`:** two fix shapes, and choosing is the deliverable. Have each exposed
@@ -6823,7 +6823,7 @@
   **The instance, from `battery-runner-port` 2026-08-23.** Validate's spine went red on an
   INHERITED defect — a gate depositing runtime state inside the tracked fixture corpus it is the
   oracle for — and closing it took a diagnosis, a fix, a self-caught overreach (the first cut
-  exported the pin process-wide and broke `producer-lock.test.sh`'s sandbox, narrowed at `8f2000f0`)
+  exported the pin process-wide and broke `producer-lock.test.sh`'s sandbox, narrowed at `80d74291`)
   and three spine runs. The lead re-dispatched the stage on the more capable tier for exactly that
   reason, so the corrective already happened; what is unrecorded is why.
   **The distinction worth keeping, and it is the whole content: the TIER may well be right and the
@@ -7061,7 +7061,7 @@
   gates.
   **Reproduced live rather than reasoned.** `check-crate-arms` ported from `.sh` to `.gate` plus a
   crate module this iteration, which silently reopened exactly the corpus-pollution class
-  `0c29e19f`/`8f2000f0` closed. With both fixture `.tmp` dirs deleted, a plain `gate_sdk`
+  `c1375e99`/`80d74291` closed. With both fixture `.tmp` dirs deleted, a plain `gate_sdk`
   fixture-suite run — no manual invocation — regenerated
   `gate-sdk/gate-tests/check-crate-arms/good/.tmp/crate-arms-<hash>.green`. Watched twice.
   **DISTINCT from `pack-installer-vendors-untracked-scratch`, and upstream of it.** That entry's
@@ -7989,7 +7989,7 @@
   **The witness — re-run it before citing this, and dispatch only the delta if either half moved.**
   corpus `TASK-QUEUE.md ## Deferred + ## Icebox`, `scripts/gates.list`, `native/src/gates/`; oracle
   `bash queue-kit/bin/queue-edges.sh` plus a `grep -n` over the queue for citation/cite/liveness;
-  rev `ccac82f81f45ff07d5b5cbee6f8446465f070fa6`.
+  rev `457148bd2a5681a9630c4a73b1358e35c170aa2d`.
   **The finding.** Fourteen members, twelve Deferred and two Icebox; none blocks on an
   operator-class fork. (A) `check-spec-pointer` absorbs `prose-filename-citation-liveness`,
   `unqualified-section-citation-liveness`, `link-wrapped-section-citation-liveness` and
@@ -8243,7 +8243,7 @@
   correlates identities. The bad-fixture sentence a fix should pin is that one, not a contrived
   minimal pair.
   **Where the limit currently lives, and why that is the filing's whole point.** It is stated in
-  commit `234edaa5`'s body ("the plural form slips: tolerating it was measured and still costs
+  commit `3763bc3e`'s body ("the plural form slips: tolerating it was measured and still costs
   three rewordings of prose that is not wrong") and NOWHERE in `gate-sdk/SPEC.md`
   §check-commit-msg, which records only the OTHER limit that commit names — that account topology
   is a proposition no token pattern reaches. Verified by grepping that commit's own SPEC diff. So
