@@ -14,45 +14,30 @@
 
 ## Technical Debt
 
-- **platform-support-ci-matrix** [roadmap: next/reliability] — a native Windows install-smoke
-  leg, then a macOS one; nothing has ever run green against either platform.
-  **THIS ITERATION TAKES THE WINDOWS LEG.** Operator-ruled 2026-08-26 at this scope's unit-set
-  escalation, on the adopter date below. The macOS leg stays in this entry, unbuilt and second,
-  exactly as the 2026-08-26 ordering ruling sequences it — the entry is not split, because its
-  two legs share the workflow surface and the runner-mapping mechanism they are promoted to build.
-  **THE WINDOWS LEG IS AUTHORED AND UNMEASURED, landed 2026-08-26 at build.**
-  `.github/workflows/gates.yml`'s `install-smoke-windows` job: `windows-latest`, `shell: bash`
-  named on every step, `continue-on-error: true`, and shaped as an instrument rather than an
-  assertion — a runner probe, a crate-build probe, then the steered suite — because one remote
-  run is the only oracle it has and a run that dies at a preflight says nothing about the host.
-  Its header carries the ruling, the steering it stands in for and the promotion condition;
-  nothing is restated here. Verified locally as far as local verification reaches: the YAML
-  parses, all five `run:` bodies are ShellCheck-clean at `-S warning`, the probe step was
-  executed, the roster and artifact-name steerings were exercised through `gate.sh`'s accessors,
-  and the battery is green. None of that is evidence the leg runs.
-  **What build measured off the tree, because it moves what "green" costs.** Reaching a green
-  Windows leg is not CI configuration alone, which is what the promotion assumed. Two
-  source blockers sit in front of it, neither settled by a governing spec, both surveyed at
-  `.workflow/survey-record.md` 2026-08-26 with the witness a later stage re-runs:
-  `installer/lib/init.sh:98`'s `target_of_host()` maps Linux and Darwin alone, so a Windows host
-  takes the omit-and-declare branch and never selects the artifact the leg builds; and cargo
-  emits `<name>.exe` where `GATE_SDK_NATIVE_BIN` names the artifact suffix-less. The second is
-  the wider of the two and reads narrow: every production check in this tree dispatches through
-  `gate_native_bin`, so the omission stops the whole battery on that platform rather than only
-  the smoke's preflight, and the workflow's steering of it holds for this tree alone — an
-  installed consumer's config seam assigns the same name and outranks the environment. Both are
-  design-bearing — the knob's default is spec'd and a Windows triple's `target_of_host` mapping
-  is entangled with `powershell-installer-surface`'s bootstrap — and were escalated rather than
-  taken at build. **Operator-ruled 2026-08-26 through the iteration lead: both route to
-  `powershell-installer-surface`**, which carries them now — not a new entry, and not this one's
-  to fix.
-  **VERIFICATION ROUND 1 WAS BOUGHT AND RETURNED NO MEASUREMENT — 2026-08-26 at build.** master
-  pushed `f04cf334..28b378ba` and the remote head confirms it, but **no `gates` run was ever
-  created**: the `github-actions` check suite for that sha completed with zero check runs, while
-  GitHub ran a critical Actions incident opened 15:11:58Z whose 15:48Z update reads "we've
-  throttled inbound traffic". The push landed 16:07:03Z, inside it. The workflow file was
-  byte-identical on the remote and the workflow `active`, so nothing in this tree explains the
-  absence and nothing about the leg was disproved.
+## Deferred
+
+- **platform-support-ci-matrix** [design-pending] [roadmap: next/reliability] — the native Windows
+  install-smoke leg is authored and has never run.
+  **SPLIT 2026-08-26 at build, on an operator ruling reversing this entry's own no-split line.**
+  That line's ground was that the legs share a surface "they are promoted to build", and they are
+  no longer co-built — Windows landed, macOS never started — while the split criterion,
+  dispositionability, was satisfied the moment the same operator gave the two legs different
+  dispositions. macOS and everything measured about it left for `macos-install-smoke-ci-leg`.
+  **The slug is deliberately NOT renamed** though "matrix" now reads oddly for one leg:
+  `gate-binary-target-roster-widening` and `powershell-installer-surface` cite it by name.
+  roadmap-summary: A CI install-smoke leg per supported platform, or an honest label.
+  **THE LEG IS AUTHORED AND UNMEASURED, landed 2026-08-26 at build.**
+  `.github/workflows/gates.yml`'s `install-smoke-windows` job, shaped as an instrument rather than
+  an assertion; its own header carries the ruling, the steering it stands in for and the promotion
+  condition, so nothing about its shape is restated here.
+  **The two source blockers standing between this leg and green are NOT here** — operator-ruled
+  2026-08-26 to `powershell-installer-surface`, which owns them with their citations and survey.
+  Not this entry's to fix.
+  **VERIFICATION ROUND 1 RETURNED NO MEASUREMENT — 2026-08-26 at build.** master was pushed, but
+  no `gates` run was ever created: the check suite for that head completed with zero check runs,
+  inside a critical third-party Actions incident that had throttled inbound traffic. **An outage,
+  not a defect and not a disproof** — the workflow file was byte-identical on the remote and
+  active, so nothing about the leg was falsified. Evidence in full at commit `8eadb5f8`.
   **So every question the leg's probe steps exist to answer stands UNANSWERED**, listed here
   because an unanswered question named is worth more to the follow-up than silence and because
   each is otherwise a run to buy on its own: the runner's tool inventory, and whether its `awk`,
@@ -62,60 +47,51 @@
   satisfies `[[ -x ]]`; exec-bit semantics on a freshly written shebang script; whether the one
   tracked symlink survives `git archive | tar -x` into the payload; and the 260-char path ceiling.
   Unanswered rather than untested — the instrument is landed and fires on the first run that
-  reaches a runner.
-  **THIS ENTRY CANNOT CLOSE UNTIL A DEFERRED ENTRY MOVES.** Its promotion condition is
-  gate-sdk/SPEC.md §Consumer payload's — a green run that PRODUCED AND EXERCISED an artifact — and
-  the two blockers between here and that condition now sit in `powershell-installer-surface`,
-  which is Deferred. A follow-up iteration that takes this entry alone reaches an
-  omit-and-declare install and exercises nothing, so scoping the follow-up without promoting that
-  sibling beside it buys a second unmeasured leg.
+  reaches a runner, and these are the follow-up's scope and spec input rather than its build's.
+  **THIS CANNOT CLOSE UNTIL A DEFERRED SIBLING MOVES.** Its promotion condition is
+  gate-sdk/SPEC.md §Consumer payload's — a run that PRODUCED AND EXERCISED an artifact — and the
+  blockers sit in `powershell-installer-surface`, so promoting this alone exercises nothing.
   **Push budget, ruled and accounted, so a later reader meets no silent contradiction with
   CLAUDE.md's one-to-two per iteration.** An operator ruling authorized four to eight verification
-  rounds here; the iteration lead ruled ONE round plus close's push — two, inside the budget — and
-  the authorized overrun went unspent. The ground is that green was ruled unreachable inside this
-  iteration the moment both blockers routed to a deferred entry, and iterating toward an
-  unreachable state buys nothing. Round 1 returning no measurement (above) is a separate fact from
-  the budget: whether a retry is bought is the lead's call, not this entry's.
-  roadmap-summary: A CI install-smoke leg per supported platform, or an honest label.
-  The per-platform half carved out of `platform-support-contract`, narrowed again 2026-08-25
-  when its Linux deliverable split off as `linux-install-smoke-ci-leg` under an operator ruling.
-  Windows-through-WSL is Linux and resolves to the Linux leg, so after that split the macOS leg
-  was the only member left. **RE-WIDENED 2026-08-26 by operator ruling at a consult
-  (TRAJECTORY.md §The closed rulings): a native Windows leg joins, ordered AHEAD of macOS**, on a
-  named adopter — a native-Windows project ready to adopt within days to weeks. The Windows leg
-  is also fork 2's parity oracle for `powershell-installer-surface` and the only route to a
-  Windows triple in `native/targets.list`; whether the crate builds and its gates run on a
-  Windows host at all is unmeasured, so a first-try green is not the planning assumption there
-  either. The interim adopter path is WSL, as docs/install.md §Requirements states.
-  **THE FORK STAYS RULED — legs, not the honest label.** The label arm survives only for a
-  platform a leg is deliberately not bought for.
-  **The cost line is rewritten from measurement rather than from the promotion's estimate.**
-  Runners are not the obstacle and never were: the repo is public, so `macos-latest` and
-  `macos-26` (arm64) and `macos-15-intel` / `macos-26-intel` (x64) are all available at no cost,
-  and `macos-13` is retired and no longer a label at all. What the leg must actually buy is a
-  GNU userland — the `macos-15-arm64` image ships bash 3.2.57 with no coreutils and no gawk,
-  while cargo, rustc, jq, node and Homebrew are present. So the leg brew-installs bash,
-  coreutils and gawk and PATH-orders them ahead of `/usr/bin`, which is precisely the adopter
-  action `docs/install.md` §Requirements documents and which this entry exists to put a run
-  behind. Measured at build 2026-08-25 against the runner-image manifests.
-  **One defect it will meet is already known, which is why a first-try green is not the
-  planning assumption.** `installer/lib/init.sh:197`'s unconditional vendoring loop uses
-  `find -printf`, a GNU findutils primary macOS does not carry, so a stock-macOS init vendors
-  zero files and still writes a manifest. Filed to the gap inbox at build 2026-08-25, undrained.
-  **What a green Windows leg unblocks, and it is why this outranked a larger exit.**
-  `gate-binary-target-roster-widening` states its own block in terms — the roster "widens by zero
-  until `platform-support-ci-matrix` produces one" — and `powershell-installer-surface`, the port
-  sequence's last member, both orders behind this leg and uses it as fork 2's parity oracle.
-  **`pack-installer-vendors-untracked-scratch` is promoted beside this**, not coincidentally: a
-  new install-smoke leg runs `scripts/pack-installer.sh` at four call sites in
-  `installer/consumer-smoke/run-smoke.sh` (`:65`, `:378`, `:541`, `:619`), so the leg would red
-  on that defect first, on a host with nobody to diagnose it by hand.
-  Filed 2026-07-26 by scope, operator ruling at the `activation-path` unit-set escalation, split
-  from `platform-support-contract`. Promoted 2026-08-25 at scope; narrowed to the macOS half and
-  deferred the same day at build, on an operator ruling relayed through the iteration lead.
-  Re-promoted 2026-08-26 at scope, Windows leg first, on the operator ruling recorded above.
+  rounds; the lead ruled ONE plus close's push — two, inside the budget — and the overrun went
+  unspent, because green was ruled unreachable here the moment both blockers routed away.
+  **THE FORK STAYS RULED — legs, not the honest label**, the label arm surviving only for a
+  platform a leg is deliberately not bought for. The 2026-08-26 re-widening that ordered Windows
+  ahead of macOS on a named adopter is TRAJECTORY.md §The closed rulings'; WSL is the interim path.
+  **Cost while deferred:** the one adopter class with a named days-to-weeks adoption window has no
+  measured install path, and `gate-binary-target-roster-widening` and `powershell-installer-surface`
+  both stay sequenced behind a leg that has never reached a runner.
+  Filed 2026-07-26 by scope, split from `platform-support-contract`; its Linux deliverable split off
+  2026-08-25 as `linux-install-smoke-ci-leg` and its macOS one 2026-08-26 as
+  `macos-install-smoke-ci-leg`. Promoted and deferred 2026-08-25, re-promoted 2026-08-26, deferred
+  again at build the same day.
 
-## Deferred
+- **macos-install-smoke-ci-leg** [design-pending] [roadmap: next/reliability] — a macOS
+  install-smoke leg; nothing has ever run green against macOS.
+  roadmap-summary: A CI install-smoke leg on macOS, so the platform claim has a run behind it.
+  Split 2026-08-26 at build from `platform-support-ci-matrix`, which keeps the Windows leg, under
+  the operator ruling that reversed that entry's no-split line: the two legs stopped being
+  co-built when Windows landed and macOS never started, and they now take different dispositions.
+  **The cost is measured rather than estimated.** Runners are not the obstacle and never were: the
+  repo is public, so `macos-latest`, `macos-26` (arm64) and `macos-15-intel` / `macos-26-intel`
+  (x64) are all available at no cost, and `macos-13` is retired and no longer a label at all. What
+  the leg must actually buy is a GNU userland — the `macos-15-arm64` image ships bash 3.2.57 with
+  no coreutils and no gawk, while cargo, rustc, jq, node and Homebrew are present. So the leg
+  brew-installs bash, coreutils and gawk and PATH-orders them ahead of `/usr/bin`, which is
+  precisely the adopter action `docs/install.md` §Requirements documents and which this entry
+  exists to put a run behind. Measured at build 2026-08-25 against the runner-image manifests.
+  **One defect it will meet is already known, which is why a first-try green is not the planning
+  assumption.** `installer/lib/init.sh:197`'s unconditional vendoring loop uses `find -printf`, a
+  GNU findutils primary macOS does not carry, so a stock-macOS init vendors zero files and still
+  writes a manifest. Filed to the gap inbox at build 2026-08-25, undrained.
+  **What the Windows leg already bought this one.** `platform-support-ci-matrix` carries the
+  instrument shape a second leg copies — a non-blocking probe-then-suite job — and most of the
+  unanswered probe questions it lists are ones a macOS host owes answers to as well. Read that
+  entry before designing this leg rather than re-deriving its shape.
+  **Cost while deferred:** macOS is named in the trajectory's OS-reach objective and every claim
+  the project makes about it stays a reading rather than a measurement, and the `find -printf`
+  defect above sits unfixed on the install path every macOS adopter takes today.
+  Filed 2026-08-26 by build, split from `platform-support-ci-matrix` under an operator ruling.
 
 - **gate-binary-target-roster-widening** [design-pending] [roadmap: next/reliability] — the
   binary ships one triple, and no run has produced an artifact anywhere else.
