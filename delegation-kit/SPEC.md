@@ -1036,7 +1036,11 @@ that produces it in practice is a **worktree-isolated dispatch**: a fresh
 member dispatches to is absent and the reader fails closed before it reads a
 record. The hook already computes `records` by its own glob over the same
 directory, so the discriminator costs no new field, no new knob and no second
-reader.
+reader. **The arm stays reachable once a consumer's reader takes the
+worktree-resolvability requirement below, and the row is not retired**: a reader
+whose own binary is genuinely missing in a main checkout still lands here, and so
+does every consumer whose adapter has not taken that requirement. What it removes
+is the isolated dispatch as this arm's *routine* producer, never the arm.
 
 **The count labels the diagnosis and decides nothing, and that is a ruling rather
 than a first draft.** The split was first drafted with `unresolved` **allowing**,
@@ -1158,8 +1162,50 @@ and discharged it with a **consumer-side front end** resolving the name —
 would be a kit-contract change". The same reasoning binds here, and it is the
 reason this repair changes no contract: the value is still a path this hook runs
 with the scratch dir as its only argument. This repo's own reader is
-`scripts/producer-liveness-reader.sh`, two lines that reach the gate by name
+`scripts/producer-liveness-reader.sh`, which reaches the gate by name
 through the front end its whole pre-flight roster already uses.
+
+**A consumer's reader must resolve from a worktree-isolated dispatch, and this is
+a requirement on the adapter rather than advice to it.** The consequence of one
+that does not is severe and indirect, so it is named here: a fresh
+`git worktree add` checkout carries no build output, a reader that dispatches to
+a compiled binary therefore fails closed inside it, the hook reads `unresolved`
+over an empty record set and refuses — and because the harness returns only a
+dispatched session's **last** assistant message, that refusal **displaces the
+child's report** on the only channel the dispatcher reads. The child did the
+work; the parent receives a liveness complaint, and the failure is silent in the
+worse direction, since the returned text reads as a liveness complaint rather
+than as a dropped report. The bind can be structural rather than a rate: where a
+consumer's dispatch rules *require* isolation for read-only agents, isolation is
+also what arms this, and no dispatch shape avoids it while staying in contract.
+
+**The kit states the bar and cannot clear it, which is why this is stated at
+all.** Only a consumer knows its front end — the reason the knob has no default —
+so the requirement takes the same shape as the reader's exit-code contract above:
+something a consumer's adapter must satisfy. This repo's own reader satisfies it
+by resolving the configured binary against the **main checkout** when the
+configured path does not exist and the cwd is a linked worktree, deriving the
+main checkout vendor-neutrally from `git rev-parse --git-common-dir`.
+**That narrow resolution is safe where a general one would not be:**
+`check-producer-liveness` reads `*.run` records and nothing else, so its verdict
+does not depend on the binary matching the worktree's source and a main-checkout
+binary answers the same question a locally-built one would. That is emphatically
+not true of gates in general — `check-gate-binary-fresh` exists precisely to
+compare a binary against the source in its own tree — which is why this belongs
+in one consumer front end for one gate and not in how the binary knob resolves.
+
+**It resolves an artifact; it does not build one.** The recorded refusal this
+might look like reversing is untouched: an isolated agent still may not build the
+crate, and there is still no hook that can reach a worktree which does not exist
+yet at dispatch time. This resolves a binary that already exists in a tree that
+already exists, at the moment the reader runs.
+
+**The cost is stated beside the requirement, because it is what makes the bar
+worth stating rather than leaving to be discovered.** The ordinary case is one
+wasted round-trip paid while the dispatcher waits. The worst attested tail put no
+ceiling on it: an isolated dispatch wedged in a stop-hook loop across three
+resumptions, spent a full context budget and returned nothing at all, recovered
+only by re-dispatching fresh.
 
 **One line per firing**, appended, space-delimited `key=value` after a leading
 timestamp:
@@ -1256,9 +1302,15 @@ list does not name one for:
   refusal is countable is true of **main-checkout firings only**. Not repaired
   here, and the reason is a seam rather than appetite: pointing the knob at an
   absolute main-checkout path would bake a machine path into a consumer surface,
-  and deriving the main checkout from inside a worktree is possible
-  vendor-neutrally (`git rev-parse --git-common-dir`) but is a mechanism no unit
-  has scoped. It is filed rather than flagged and skipped.
+  and the vendor-neutral derivation (`git rev-parse --git-common-dir`) now exists
+  in this repo's *reader* without reaching this *writer* — a read-side bridge for
+  one gate is not a write-side one. It is filed rather than flagged and skipped.
+  **What the reader's resolution changes is which class goes unseen.** Where a
+  consumer's adapter resolves inside a worktree, an isolated child's firings read
+  `verdict=green records=0 decision=allow` rather than `unresolved … refuse`, so
+  the triage still cannot see them and what it cannot see is an allow. That is a
+  smaller loss and not a closed one. The log line's grammar, field list and order are untouched,
+  so the space-delimited parse the triage uses does not move.
 - **`keys`** — the payload's top-level key set, nothing more. Read **once**, at
   the first firing, to settle what a `SubagentStop` payload carries without
   asserting anything about it in advance. **It returned against the advance

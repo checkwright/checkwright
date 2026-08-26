@@ -198,14 +198,32 @@ drift: do not delete it on sight, and when either rule changes here, propagate.
   is a mutation, and it is exactly the mutation isolation was bought to prevent
   for an agent dispatched read-only. Name the gate that could not run, say why,
   and return; the parent's checkout has the binary and can run it. Attested rather
-  than inferred: a fresh worktree checkout carries no build output, and its
-  turn-end liveness hook refuses there on a binary-absent reading
-  (delegation-kit/SPEC.md §The turn-end liveness hook (template)) — and an
-  isolated agent met with that refusal **reported building the binary to escape
-  it**, a claim carried at the tier it arrived on rather than verified. The
-  behaviour is the point either way: a refusal whose message names no reachable
-  remedy invites a read-only agent to invent a mutating one, so the limit is
-  stated here with its lawful response attached.
+  than inferred: a fresh worktree checkout carries no build output, and an
+  isolated agent met with the turn-end liveness hook's refusal there **reported
+  building the binary to escape it**, a claim carried at the tier it arrived on
+  rather than verified. The behaviour is the point either way: a refusal whose
+  message names no reachable remedy invites a read-only agent to invent a
+  mutating one, so the limit is stated here with its lawful response attached.
+  **One exception, and it is the consumer's to supply rather than yours to
+  assume**: the **turn-end liveness reader** may already be resolved for you by
+  the consumer's adapter (delegation-kit/SPEC.md §The turn-end liveness hook
+  (template)), so the refusal that used to meet an isolated agent at every turn
+  end — the one that invited the mutating remedy — need not fire. Nothing else
+  here moves. Every other binary-dispatched gate is still unresolvable inside a
+  worktree, and the **do-not-build** prohibition is unchanged for all of them,
+  that one included.
+  **(5) Your report can be displaced, and the recovery is written down because a
+  parent meeting one has no reason to believe the report still exists.** The
+  harness returns only a dispatched session's **last** assistant message, so any
+  turn-end hook that speaks overwrites whatever you returned. Recovery: **resume
+  the child by id and ask it to re-emit its report verbatim, telling it
+  explicitly not to re-run the work.** Two limits, both attested. It is **not
+  reliable** — an earlier resume answered that the session had just started, and
+  that sweep had to be re-run. And the usage block is **no signal either**: a
+  successful re-emit reported the *original* run's tool count and tokens, so the
+  zero-tool-use shape marks some resumes and not all. Still reachable from any
+  consumer whose liveness adapter has not taken (4)'s exception, an adopter
+  vendoring this kit today included.
 - **One commit per unit, sized to finish within budget.** Each unit gets its own
   commit (+ a `[blocked-by: prior]` tag where ordered). A unit that investigates
   long before its first commit is the only thing an interrupt can destroy —

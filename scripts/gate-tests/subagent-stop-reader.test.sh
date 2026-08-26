@@ -69,9 +69,51 @@ line="$(fire no-binary "$absent" 2 GATE_SDK_NATIVE_BIN=/nonexistent)"
 want no-binary "$line" "verdict=unresolved" "live=no" "records=0" "decision=refuse"
 want no-binary-message "$(cat "$tmp/no-binary.err")" "turn-end refused" "produced no reading at all"
 
+# D — the reader run from inside a REAL linked worktree with no build output of its own. This is
+#     the only executable statement of the worktree resolution: a fresh checkout carries no
+#     native/target, so before the resolution the reader failed closed here and the hook's
+#     `unresolved` refusal displaced the child's report. The worktree is genuine (git worktree
+#     add) but the script under test is copied in from the working tree, so the arm holds the
+#     code being edited rather than whatever HEAD happens to carry.
+#     GATE_SDK_NATIVE_BIN IS UNSET FOR THESE RUNS AND THE ARM IS VACUOUS WITHOUT IT: the hermetic
+#     preamble exports an ABSOLUTE path into the main checkout, which is the one shape that
+#     resolves inside a worktree anyway and the one shape the resolution deliberately skips. A
+#     dispatched child inherits no such variable, so unsetting it is what makes this arm the
+#     dispatch's environment rather than the harness's. Verified by reverting the reader: with the
+#     export in place the pre-fix reader passed this arm.
+wt="$tmp/wt"
+if ! git worktree add --detach -q "$wt" HEAD 2>/dev/null; then
+    echo "  FAIL: could not create a linked worktree — the worktree arm asserted nothing"; fails=$((fails + 1))
+else
+    cp "$ROOT/scripts/producer-liveness-reader.sh" "$wt/scripts/producer-liveness-reader.sh"
+    [[ ! -e "$wt/native/target" ]] \
+        || { echo "  FAIL: the linked worktree carries build output — the arm's premise is gone"; fails=$((fails + 1)); }
+    mkdir -p "$wt/.tmp"
+    out="$( cd "$wt" && env -u GATE_SDK_NATIVE_BIN bash scripts/producer-liveness-reader.sh .tmp 2>&1 )"; rc=$?
+    [[ "$rc" -eq 0 ]] \
+        || { echo "  FAIL: the reader exited $rc from a linked worktree, want 0: $out"; fails=$((fails + 1)); }
+
+    # The resolution must remove the TRIGGER, not the signal: the same worktree with a live
+    # record still answers red rather than answering green because it could not look.
+    printf 'pid=1 run=k\n' >"$wt/.tmp/k.run"
+    out="$( cd "$wt" && env -u GATE_SDK_NATIVE_BIN bash scripts/producer-liveness-reader.sh .tmp 2>&1 )"; rc=$?
+    [[ "$rc" -eq 1 ]] \
+        || { echo "  FAIL: a live record inside a linked worktree read $rc, want 1: $out"; fails=$((fails + 1)); }
+    git worktree remove --force "$wt" 2>/dev/null || rm -rf "$wt"
+    git worktree prune 2>/dev/null
+fi
+
+# E — the refusal still fires where it should: a main checkout whose configured binary is broken
+#     is unresolvable for a reason the worktree resolution must not paper over. D removed a
+#     trigger; this is the assertion that it removed no signal.
+mkdir -p "$tmp/main-rd"
+out="$(GATE_SDK_NATIVE_BIN=native/target/release/nope bash "$ROOT/scripts/producer-liveness-reader.sh" "$tmp/main-rd" 2>&1)"; rc=$?
+[[ "$rc" -eq 2 ]] \
+    || { echo "  FAIL: a broken binary in a MAIN checkout exited $rc, want 2: $out"; fails=$((fails + 1)); }
+
 if [[ "$fails" -gt 0 ]]; then
     echo "subagent-stop-reader.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "subagent-stop-reader.test: ok (the configured reader resolves and answers, and its verdict reaches the exit: clean scratch dir green and allowed, live producer red and refused with a reason, absent dispatch binary unresolved and refused rather than reported unavailable)"
+echo "subagent-stop-reader.test: ok (the configured reader resolves and answers, and its verdict reaches the exit: clean scratch dir green and allowed, live producer red and refused with a reason, absent dispatch binary unresolved and refused rather than reported unavailable; a linked worktree resolves through the main checkout and still reads its records, while a main checkout with a broken binary still refuses)"
 exit 0

@@ -12,58 +12,6 @@
 
 ## New Features
 
-- **isolated-child-liveness-hook-displaces-its-report** [spec: SPEC-worktree-reader.md] —
-  the turn-end liveness hook does exactly what it was told under worktree isolation, and
-  doing so overwrites the
-  child's report on the only channel the dispatcher reads.
-  **Attested first-hand 2026-08-25 at this scope, not predicted.** A read-only citation-liveness
-  sweep dispatched with `isolation: worktree` completed its whole survey and returned a
-  producer-liveness message instead of it. One resume round-trip carrying an explicit re-emit
-  instruction recovered the full report, so the work was not lost — it was paid for twice.
-  **The hook is not misbehaving, and that is the finding.** `native/target/release/`'s binary is
-  gitignored under `target/`, so it is absent in a fresh worktree, and
-  `scripts/subagent-stop-liveness.sh` already anticipates exactly this: under a worktree-isolated
-  dispatch, binary-dispatched gates do not resolve and "the lawful response there is to report
-  the gate as unavailable and return". It reports, as instructed. The harness then returns only
-  the child's LAST assistant message, so a correct report-and-return displaces the survey.
-  **DISTINCT from `worktree-isolated-agent-report-lost-to-a-failed-peer-send`**, promoted the same
-  session: that failure needs the child to attempt a send to an unresolvable peer. This one needs
-  no send at all — a hook the child never invoked emits the displacing message — so the two share
-  the symptom and share no trigger.
-  **DISTINCT from `worktree-isolated-dispatch-cannot-reach-the-main-checkout`, and downstream of
-  it.** That entry's subject is the child's WRITES, and its bridge is `git rev-parse
-  --git-common-dir`; this is the child's RETURN VALUE. The composition is what neither covers as
-  written: that entry's cause — a binary a worktree child cannot resolve — produces the other
-  entry's symptom, and a session reading either alone concludes it is covered.
-  **Deliverable — rule one of three.** Resolve the binary through the main checkout, which is the
-  sibling's bridge and folds this half into it; or emit the unavailability on a channel that does
-  not become the child's final assistant message; or have the hook return silently when the
-  target is a worktree it cannot resolve, which is cheap and pulls against fail-closed — the
-  reason it is a fork and not an obvious fix.
-  **Cost while deferred:** one wasted dispatch round-trip per isolated sweep, paid while the
-  dispatcher is waiting, and silent in the worse direction — the returned text reads as a
-  liveness complaint rather than as a dropped report, so a less careful dispatcher records a
-  sweep that never reported. That is a correctness risk, not an efficiency one.
-  recurrence: 2026-08-25 2026-08-26
-  **THE BIND IS STRUCTURAL, NOT A RATE — measured at the 2026-08-26 scope, which is the finding
-  that outranks every count above.** `scripts/agent-dispatch-guard.sh` REFUSES a read-only type
-  dispatched **without** `isolation: worktree`, and worktree isolation is precisely what makes the
-  binary unresolvable and arms the displacement. The guard's required remedy is what arms the
-  defect, so every read-only fan-out in this repo pays it — there is no dispatch shape that avoids
-  it while staying in contract. The record is **SEVEN FOR SEVEN across three sessions**, but the
-  rate is corroboration: a session cannot dispatch its way out of this by sampling better.
-  **The worst tail puts no ceiling on the cost.** A 2026-08-26 `align` dispatch WEDGED in a
-  Stop-hook loop across THREE resumptions, burned roughly 166k child tokens and returned nothing at
-  all, recovered only by re-dispatching fresh — a full context budget spent for zero yield.
-  **THE RECOVERY, written down because a parent meeting this has no reason to believe the report
-  still exists: resume the child by id and ask it to RE-EMIT VERBATIM, telling it explicitly not
-  to re-run the work.** Full report, first try, one round-trip at the 2026-08-26 close. Not
-  reliable — an earlier resume returned "this session just started" and that sweep was re-run —
-  and the usage block is no signal either: that re-emit reported the ORIGINAL run's tool count
-  and tokens, so the zero-tool-use shape marks some resumes and not all.
-  Attested 2026-08-25 at this scope while dispatching its own survey; filed the same session on
-  the lead's direction, before the resume journal holding it was swept.
-
 ## Technical Debt
 
 ## Deferred
@@ -7364,8 +7312,10 @@
   redirects its capture-tier writes to the common dir, crossing the isolation boundary the
   worktree exists to hold; or declares them lost; or the dispatch shape is refused outright.
   **Cost while deferred:** low and bounded — an isolated agent reports every binary gate
-  unavailable and its refusal record is unrecoverable, so the forcing function's own
-  effectiveness is unmeasurable for exactly the class it was built for.
+  unavailable bar the one its consumer's liveness reader now bridges, and its firing record is
+  unrecoverable either way, so the forcing function's own effectiveness is unmeasurable for
+  exactly the class it was built for. The probe paragraph above is a dated observation and stands
+  as recorded; this line is the present-tense one and moves.
   Filed 2026-08-24 by spec from a live dispatch probe; drained and promoted 2026-08-25 at close,
   which reproduced both halves against its own running child.
 
@@ -8144,6 +8094,7 @@
 - relayed-ruling-provenance-unrecorded
 - kfric-empty-log-ambiguity
 - validate-baseline-suite-coverage
+- isolated-child-liveness-hook-displaces-its-report
 
 ## Lessons Learned
 
