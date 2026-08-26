@@ -4661,9 +4661,10 @@
   never sent to the runbook, and stops.
   **Attested, not hypothesised.** This close read `gh api repos/<owner>/<repo> --jq
   .permissions` as `push: false`, applied the precondition literally, and escalated the
-  release as blocked on a permission defect. The machine carries two `gh` logins and the
-  non-writing one was merely *active*; selecting the maintainer account returned full write.
-  The runbook already carried the account roster, the working transport, and the line *"check
+  release as blocked on a permission defect. That probe answers for whichever identity is merely
+  *active*, not for the identity that actually pushes; the same read taken under the pushing
+  identity returned full write, which it had held all along.
+  The runbook already carried the identity selection, the working transport, and the line *"check
   the pushing identity, not the `gh` login, if this regresses again"* — the session never
   reached any of it.
   **Both surfaces were repaired in that same commit**, so this entry is not the fix: the
