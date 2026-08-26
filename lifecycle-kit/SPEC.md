@@ -150,6 +150,22 @@ transitions: promotion and naming (the first stage), the Done move riding each
 amendment-merge commit, and the closing dispositions. Stage motion never
 touches it.
 
+**A stage session landing a ruling writes its provenance in the same commit as
+the ruling's content.** The queue's `ruled:` declaration (queue-kit/SPEC.md
+§The tag algebra) names who ruled, when, and through what channel; this section
+owns *when* the session writes it, because the session is the party whose commit
+is the audit artifact. Not afterwards, and not in a later pass: the relay that
+carried the ruling is transport, never a store, so a ruling landed without its
+declaration has already lost the only party who could attest it, and the next
+session has no way to tell a relayed ruling from an invented one. Where the
+relaying party stated no authority, the session **asks** rather than defaulting
+to the higher one — reading an authority into a silence is the invention the
+declaration exists to prevent, and inflating a relaying party's own ruling to the
+authority above it freezes a decision that should have stayed re-rulable at the
+relay. The obligation binds both parties and neither half discharges the other's:
+the relay states the facts (`templates/lead.md`), the landing session records
+them here.
+
 The **deterministic half** of that first step — read the iteration from the
 header, read the id from `session-id.sh`, append the stamp — is mechanized by
 `bin/enter-stage.sh <stage>`, the same
@@ -381,6 +397,15 @@ the template carries no second copy. The loader validates the machine
 (unknown stages in the map, a waiver token colliding with a stage name, a
 non-integer n-gram width, a malformed preflight entry) and exits 2 on a
 malformed config — a broken machine must not gate anything.
+
+**No knob carries the ruling-authority vocabulary, and this is where a reader
+looking for one finds out why.** §The state machine obliges a stage session to
+record who ruled a ruling it lands, and the authorities a project recognises are
+its own governance roles — named on the consumer's always-loaded surface, not
+here. No kit mechanism reads those values: nothing in this kit branches on them,
+so a knob holding them would have `check-knob-citation` as its only reader, which
+is a knob that should not exist. The grammar itself is queue-kit's
+(§The tag algebra owns the slot); this kit owns only the timing.
 
 Knob-rename compat precedent. A rename carries two obligations of different
 natures, and each answers to its own threshold.

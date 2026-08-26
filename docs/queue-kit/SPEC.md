@@ -409,7 +409,10 @@ marks no move across a pending/ready boundary, so it fails canon-kit's
 further-tag test. `check-tag-lead-line` does not govern it, and it cannot collide
 with the bracket scans.
 
-The **self-naming slug field is mechanism, not decoration**. `check-queue-hygiene`
+The **self-naming slug field is mechanism, not decoration**, and it is the rule
+for *every* body-line declaration this format defines rather than for
+`recurrence:` alone, so a declaration added later inherits it instead of
+re-arguing it. `check-queue-hygiene`
 rejects any exact-duplicate non-blank line across the whole file, unnormalized, so
 a slug-free `recurrence: <date>` on two entries stamped the same day would red the
 gate — and same-day recurrence on two entries is exactly the case the declaration
@@ -434,9 +437,10 @@ commit — and the cap's remedy is only half self-served (§check-queue-entry-bu
 relocating grounds into an entry that already owns their subject is self-served
 for a mandated write, while minting a *new* entry to hold them stays
 authorization-gated). That ground survives the discount §check-queue-entry-budget
-grants this declaration, **because the discount is one line**: the second and
-later lines of a per-recurrence variant are counted like any other, so the variant
-still grows an entry linearly against the cap. The single-line form costs **no**
+grants this declaration, **because the discount is one line per grammar**: the
+second and later lines of a per-recurrence variant match the grammar already
+discounted and are counted like any other, so the variant still grows an entry
+linearly against the cap. The single-line form costs **no**
 counted line at all, which strengthens the case for it rather than weakening it.
 Its own ceiling is
 `check-queue-wrap`'s budget, reached after a handful of dates on a long slug, and
@@ -452,6 +456,69 @@ the finding re-occurred, read off the filed prose rather than derived from it
 (lifecycle-kit/SPEC.md §The committed gap inbox owns the rule and the standard) —
 and hand-read; an entry with no declaration is simply an entry that has not
 recurred.
+
+A **ruling recorded onto the entry it rules** carries a further declaration on
+the same pattern, `ruled: <slug> <authority> <YYYY-MM-DD> <channel>` — one
+indented body line naming the entry's own slug, then the authority that ruled,
+the date it was taken, and a keyword naming how the authorization reached the
+recording session. One line per ruling, appended and never rewritten; rulings
+sharing an authority and a channel share a line on the `recurrence:` model, and
+a ruling that shares neither takes a counted second one. It is a declaration
+rather than a tag on the same further-tag test `recurrence:` clears — its
+readers scan a line of its own and it marks no move across a pending/ready
+boundary — so `check-tag-lead-line` does not govern it and it cannot collide
+with the bracket scans. The date form is `recurrence:`'s, so one date grammar
+serves the file.
+
+**`<authority>` is required and has no default, and that requirement is the
+whole of the grammar.** Every other way a queue entry records an authorization
+states only *how* one arrived, so a ruling a party took on its own authority and
+one it relayed from elsewhere are written identically. The expensive direction is
+the second: a ruling recorded as coming from the authority a later session may
+not overrule alone freezes a decision that should have stayed re-rulable, and it
+freezes it silently. A party's own ruling is therefore written naming that party,
+never left unmarked — an absence reads as *nobody claims this*, and
+gate-sdk/SPEC.md §check-gate-fail-closed carries a worked instance of what
+repairing a misattribution after the fact costs. `<channel>` is a **keyword and
+not a sentence**, for the reason `[gate-exempt:]`'s reason keyword is one:
+`check-queue-wrap`'s budget is the line's ceiling and free prose reaches it
+immediately, while the full account of how a ruling arrived has its reader in the
+entry body already.
+
+**The authority vocabulary is the consumer's and no kit enumerates it.**
+Governance roles are a project's own vocabulary, and a kit literal spelling them
+would ship one project's posture as everyone's — the provenance seam. The kit
+ships the **slot**: position, requiredness, one line, self-naming. Which
+authorities exist is named on the consumer's own always-loaded surface, where a
+session already learns its governance roles. **No knob is minted**, because no
+kit mechanism reads the values, and a knob whose only reader is
+`check-knob-citation` is a knob that should not exist.
+
+**Presence is deliberately ungated, and the residual bound is stated here rather
+than left to be inferred.** No gate asserts that an entry claiming a ruling
+carries the declaration. Its one machine reader is §check-queue-entry-budget's
+discount, so a malformed line is simply not discounted — a soft, self-correcting
+consequence rather than a red. A presence gate would demand a declaration on
+every entry already carrying ruling vocabulary, and for the older ones the
+provenance is **unrecoverable**: the recording session's transcript is gone, so
+the only way to make such a gate green is to *invent* the fact it audits, which
+is the precise failure the declaration exists to prevent. Grandfathering by date
+would instead leave a permanent unexplained boundary in the file. `recurrence:`
+has no presence gate either, on the compatible ground that a declaration written
+under judgment is not one a scanner can demand — which is also why the grammar
+lands with **no retrofit**: existing entries are not back-filled.
+
+**What the line does and does not buy, stated because a claim without its bound
+is the defect this declaration repairs.** It is still the relaying party's own
+word about a channel the tracked record cannot reach, so it **raises the cost**
+of inventing a ruling and does **not** make an invented one detectable. No
+governed surface may state it as verification. What it closes is the direction
+the unstructured practice missed: an unattributed ruling stops being
+indistinguishable from one taken at the highest authority, and a party ruling on
+its own authority gains a first-class way to record that rather than an absence.
+Its reader is the **auditing** one — a security review, a later session, or an
+operator reading the tracked record at the moment a recorded ruling is relied on
+or re-ruled.
 
 Two tags ride **Lessons Learned** entries — a lesson is a top-level bullet
 under the fixed-spelling `## Lessons Learned` heading, and the `queue-index` arm
@@ -1201,13 +1268,15 @@ assertions:
   lines. An entry's **extent** is the lead line through the line before the next
   bullet at the same or shallower indent — the same extent
   the `queue-index` arm's `--extent` yields, so the range the gate measures is the
-  range an eviction deletes. Its **count** is that extent less **at most one**
-  line matching the `recurrence:` declaration grammar (§The tag algebra). Extent
-  and count differ by that one discounted line and by nothing else, which is what
+  range an eviction deletes. Its **count** is that extent less **at most one line
+  of each declaration grammar the queue format defines** (§The tag algebra) —
+  today `recurrence:` and `ruled:`, and any later grammar by construction rather
+  than by a further edit here. Extent and count differ by those discounted lines
+  and by nothing else, at most one per grammar, which is what
   keeps the equality above a statement about the *range* while the cap binds the
   *count*. A sub-task nests inside its parent's extent and is measured as its own
-  entry too — and claims its own at-most-one discount, so a parent whose extent
-  holds two declarations still discounts one.
+  entry too — and claims its own at-most-one-per-grammar discount, so a parent
+  whose extent holds two `recurrence:` lines still discounts one of them.
 - **(B) Icebox shape.** Every icebox entry is exactly one line; a continuation
   line under an icebox bullet is a violation. Skips clean when
   `QUEUE_KIT_ICEBOX_SECTION` is empty, the empty-knob behavior
@@ -1256,19 +1325,26 @@ test below) that reads an entry's *composition* rather than its collision
 history. What a firing count would have been evidence for, the split criterion
 decides directly.
 
-*Why one `recurrence:` line is discounted, and why exactly one.* The line is
+*Why a declaration line is discounted, and why exactly one of each grammar.* Such
+a line is
 **fixed-shape and width-bounded** — §The tag algebra rules its ceiling to be
 `check-queue-wrap`'s budget and rules reaching that ceiling the *correct*
 complaint, so the discount cannot let an entry grow without bound. It is exactly
 the **generated-shaped content** that argued content was otherwise spent to seat,
 so making the count blind to it removes that trade rather than arbitrating it.
-And it is **one line, not a grammar-wide exemption**: the declaration's own rule
-is one line per entry with dates appended, so one line is the whole of what that
-form can claim — §The tag algebra refuses the one-line-per-recurrence variant
-partly *because* it grows an entry linearly against this cap, and a grammar-wide
-exemption would retire that refusal's ground as a side effect. The match is the
-declaration's own grammar — the `recurrence:` lead token, a slug, then at least
-one ISO date, the shape drift-kit's `kpi-incident-recurrence` already reads —
+And it is **one line per grammar, not a grammar-wide exemption**: each
+declaration's own rule is one line per entry with its repeats appended, so one
+line is the whole of what each form can claim — §The tag algebra refuses the
+one-line-per-recurrence variant partly *because* it grows an entry linearly
+against this cap, and a grammar-wide exemption would retire that refusal's ground
+as a side effect. Widening from one line to one of each is **the invariant's own
+third side doing its job rather than a relaxation of the cap**: a provenance
+declaration is record, not filing, and an entry forced to drop who ruled it in
+order to stay under the cap is the cap spending the record to stay inside
+itself — precisely the failure that third side names. The match is each
+declaration's own grammar — its lead token, a slug, then at least
+one ISO date past the slug, the shape drift-kit's `kpi-incident-recurrence`
+already reads for `recurrence:` —
 with no entry-boundary or self-slug condition added, since the at-most-one bound
 is what does the scoping. The discount narrows the **count** only and removes
 nothing from the scan, so (B), which counts icebox continuation lines, and (C),
@@ -1283,8 +1359,9 @@ whose obligation is citable to that contract by name. Two instances exist, both
 already in the tree rather than invented here: a judged `recurrence:` date and
 the grounds it is read from, which must land in the commit the judging session is
 already making because that commit is the audit artifact (lifecycle-kit/SPEC.md
-§The committed gap inbox); and a ruling recorded onto the entry it rules, under
-the recording-in-the-moment rule below. Its **producers** are the sessions those
+§The committed gap inbox); and a ruling recorded onto the entry it rules — its
+content under the recording-in-the-moment rule below, and its `ruled:`
+declaration in that same commit under lifecycle-kit/SPEC.md §The state machine. Its **producers** are the sessions those
 two contracts already bind — any session that judges a recurrence, the gap-inbox
 drain being its mechanized instance, and any session recording a
 ruling — both running today with no new trigger, no new field and nothing to
@@ -1417,9 +1494,11 @@ number moves the number without moving the line — and the entries that would
 claim an exception are the likeliest ungoverned amendments. A conditional cap
 collapses back into authorization anyway, or it is the self-issued exemption
 the delegation doctrine already names as the standard failure mode. The
-recurrence discount is **not** that widening and must not be read as one: it
+declaration discount is **not** that widening and must not be read as one: it
 changes what the count includes, never the number, and it is unconditional —
-no entry claims it by being exceptional.
+no entry claims it by being exceptional. Widening it to one line of each grammar
+keeps both properties, since a grammar either is one the format defines or is
+not, which is a property of the format rather than of the entry claiming it.
 
 **A ruling the operator restates from memory is filed in the moment.** The
 compression rule above is an authoring contract, so a break in it is silent, and

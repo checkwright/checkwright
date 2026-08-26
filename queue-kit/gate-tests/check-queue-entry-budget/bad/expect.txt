@@ -1,6 +1,7 @@
 beta-idea — 9 lines (cap 6)
 zeta-idea — 7 lines (cap 6)
 eta-idea — 7 lines (cap 6), after discounting one recurrence: line
+theta-idea — 7 lines (cap 6), after discounting one ruled: line
 no 'Cost while deferred' field
 gamma-idea
 delta-idea — 3 content lines; an icebox entry is exactly one

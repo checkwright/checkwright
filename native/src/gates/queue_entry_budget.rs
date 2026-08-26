@@ -12,7 +12,7 @@ struct Open {
     sec: Sec,
     costed: bool,
     nb: usize,
-    recur: bool,
+    decls: u32,
 }
 
 #[derive(PartialEq, Clone, Copy)]
@@ -32,12 +32,32 @@ fn is_iso_date(tok: &str) -> bool {
             .all(|&i| b[i].is_ascii_digit())
 }
 
-// spec: queue-kit/SPEC.md §check-queue-entry-budget — the discounted line is the `recurrence:`
-// declaration by its own grammar, lead token then slug then at least one ISO date, with no
-// entry-boundary or self-slug condition added
-fn is_recurrence(line: &str) -> bool {
-    let mut f = line.split_whitespace();
-    f.next() == Some("recurrence:") && f.next().is_some() && f.any(is_iso_date)
+// spec: queue-kit/SPEC.md §check-queue-entry-budget — at most one line of EACH declaration
+// grammar the queue format defines is discounted, each matched by its own grammar: lead token,
+// slug, then at least one ISO date past the slug, with no entry-boundary or self-slug condition
+const DECLARATIONS: [(&str, usize); 2] = [("recurrence:", 3), ("ruled:", 5)];
+
+fn declaration(line: &str) -> Option<usize> {
+    let f: Vec<&str> = line.split_whitespace().collect();
+    DECLARATIONS
+        .iter()
+        .position(|&(tok, min)| f.len() >= min && f[0] == tok && f[2..].iter().any(|t| is_iso_date(t)))
+}
+
+// spec: queue-kit/SPEC.md §check-queue-entry-budget — the finding names which grammars were
+// discounted, so a reader checks the arithmetic against the extent without re-deriving the set
+fn discounted(decls: u32) -> String {
+    let toks: Vec<&str> = DECLARATIONS
+        .iter()
+        .enumerate()
+        .filter(|(i, _)| decls & (1 << i) != 0)
+        .map(|(_, (tok, _))| *tok)
+        .collect();
+    if toks.is_empty() {
+        String::new()
+    } else {
+        format!(", after discounting one {} line", toks.join(" and one "))
+    }
 }
 
 fn is_rule(line: &str) -> bool {
@@ -115,8 +135,8 @@ pub fn run(args: &[String]) -> i32 {
                 match o.sec {
                     Sec::Deferred => {
                         // spec: queue-kit/SPEC.md §check-queue-entry-budget — the count is the
-                        // extent less at most one `recurrence:` declaration line per entry
-                        let n = bound - o.start - usize::from(o.recur);
+                        // extent less at most one line of each declaration grammar per entry
+                        let n = bound - o.start - o.decls.count_ones() as usize;
                         if n > cap {
                             size.push(format!(
                                 "{}:{}: {} — {} lines (cap {}){}",
@@ -125,11 +145,7 @@ pub fn run(args: &[String]) -> i32 {
                                 o.slug,
                                 n,
                                 cap,
-                                if o.recur {
-                                    ", after discounting one recurrence: line"
-                                } else {
-                                    ""
-                                }
+                                discounted(o.decls)
                             ));
                         }
                         if o.ind == 0 && !o.costed {
@@ -199,7 +215,7 @@ pub fn run(args: &[String]) -> i32 {
                         sec,
                         costed: false,
                         nb: 1,
-                        recur: false,
+                        decls: 0,
                     });
                     if costed {
                         for o in open.iter_mut() {
@@ -212,10 +228,10 @@ pub fn run(args: &[String]) -> i32 {
         }
 
         if !open.is_empty() && !line.trim().is_empty() {
-            let recur = is_recurrence(line);
+            let decl = declaration(line).map_or(0, |i| 1u32 << i);
             for o in open.iter_mut() {
                 o.nb += 1;
-                o.recur |= recur;
+                o.decls |= decl;
             }
         }
         if !open.is_empty() && line.contains(COST_MARK) {
@@ -257,7 +273,7 @@ pub fn run(args: &[String]) -> i32 {
         println!("        an entry that ALREADY owns its subject is self-served only for a");
         println!("        mandated write; minting a NEW entry to hold it stays authorization-");
         println!("        gated (queue-kit/SPEC.md section check-queue-entry-budget, which");
-        println!("        defines the class and owns the recurrence-line discount above).");
+        println!("        defines the class and owns the declaration-line discount above).");
         return 1;
     }
 

@@ -30,6 +30,14 @@
   **Cost while deferred:** low — the discount is what keeps this filing legible.
   Filed 2026-01-03 by scope.
 
+- **theta-idea** [design-pending] — eight extent lines against the same cap: one
+  line of *each* declaration grammar is discounted, so an entry that records who
+  ruled it pays nothing for the record. Under a single-grammar discount this
+  entry is one line over.
+  recurrence: theta-idea 2026-01-05
+  ruled: theta-idea operator 2026-01-05 relay
+  **Cost while deferred:** low.
+
 ## Icebox
 
 - **delta-idea** [design-pending] — dormant: cheap to carry, nothing waiting.

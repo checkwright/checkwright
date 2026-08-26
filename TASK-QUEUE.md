@@ -12,58 +12,6 @@
 
 ## New Features
 
-- **relayed-ruling-provenance-unrecorded** [spec: SPEC-ruling-authority.md] — a relayed
-  operator ruling lands in a tracked governance surface as "operator-directed" with no
-  provenance a later reader can check.
-  **Found by the harness's own security review**, which flagged the 2026-08-18 `gh` account-restore
-  ruling as possible instruction poisoning: the recording session had landed an operator direction
-  authorizing an elevated-credential account switch and a push to master, deviating from the local
-  release runbook, while its own transcript contained no operator message at all.
-  **The authorization was genuine** — the operator selected it through the harness question
-  mechanism in the lead session — so this is not an incident report; the flag was correct to fire
-  on what it could see.
-  **The gap:** under the split-posture lead architecture (lifecycle-kit/templates/lead.md) an
-  operator ruling reaches a stage session as a peer message and is landed in the queue as
-  "operator-directed". Nothing in the tracked record distinguishes a genuinely relayed ruling from
-  one a compromised or confused lead invented, and the reviewing layer cannot see the lead's
-  transcript. The class most often relayed this way is the highest-consequence one — credentials,
-  pushes, releases, runbook deviations.
-  **DISTINCT from `delegation-provenance-floor`**, which is a *parent* relaying a *child's* return
-  that never arrived; this is a *child* recording a *parent's* ruling into a permanent tracked
-  surface, where the artifact outlives every session that could attest it.
-  **Why this needed design, and it is envelope-class:** three shapes, none ruled — the lead cites
-  the authorization channel and turn in its relay and the recording session records that citation
-  alongside the ruling; or operator-class rulings are landed by the operator directly rather than
-  relayed; or a provenance field on ruling records naming how the authorization arrived, so an
-  unverifiable one is visibly unverifiable rather than indistinguishable.
-  **The first shape was PRACTISED 2026-08-19, one day after filing, and the trial is worth more
-  than the entry's prose.** The lead relaying five rulings stated the authorization channel
-  unprompted — three questions put to the operator through the harness's question mechanism, each
-  answered by selecting the recommended option, not free text and not the lead's inference — and
-  the recording session carried that citation onto each ruled entry, where an auditor now has it.
-  **Two limits the trial exposed, both owed an answer.** The citation is still the relaying
-  party's own word about a channel the tracked record cannot reach, so it raises the cost of
-  inventing a ruling without making an invented one detectable. And it **did not fit twice**:
-  `close-entry-baseline-bootstrap-deadlock` and `stage-stamp-ordering-unenforced` took their
-  rulings at 0–1 lines of headroom and carry no channel, the displacement class
-  queue-kit/SPEC.md §check-queue-entry-budget's split criterion now decides.
-  recurrence: relayed-ruling-provenance-unrecorded 2026-08-24 2026-08-25
-  **A FOURTH SHAPE, AND IT CONSTRAINS THE OTHER THREE: the field must record WHO RULED, with
-  "lead, own authority" a first-class value rather than an absence.** All three above record only
-  HOW an authorization arrived, and 2026-08-24 fired in the direction none catches — a lead's own
-  ruling recorded as the OPERATOR's, corrected at gate-sdk/SPEC.md §check-gate-fail-closed, which
-  names the lead and says commit `0153a5c9` misattributes it and is deliberately not rewritten.
-  The same iteration also caught the lead attributing a lead ruling to the operator: both
-  over-attribute upward, and since "operator-ruled" marks a decision a later session may not
-  reverse alone, this direction is a false FLOOR on re-ruling where the filed shape is a false
-  CEILING on verifiability.
-  **Cost while deferred:** silent and audit-side. Every relayed ruling already in the queue carries
-  the same unverifiable provenance, the tracked record is all a later auditor or a fresh session
-  has, and it will not red a gate — it surfaces as a security flag on an honest session, which is
-  where it surfaced.
-  Surfaced 2026-08-18 by the harness security review of `wide-budget-batch-and-hold-declaration`'s
-  close and filed to the gap inbox there; promoted 2026-08-18 by the following scope.
-
 - **kfric-empty-log-ambiguity** [spec: SPEC-kfric-zero.md] — an empty knowledge-friction
   log is read as no friction, and it is equally consistent with no capture.
   recurrence: kfric-empty-log-ambiguity 2026-08-17 2026-08-23
@@ -8178,9 +8126,9 @@
   `8a29e8ec`. It is not a width problem: the conforming form is 85 columns against
   `check-queue-wrap`'s 100.
   **The only reader is a discount heuristic, not a checker.**
-  `native/src/gates/queue_entry_budget.rs`'s `is_recurrence()` tests `f.next() == "recurrence:"`,
-  then `f.next().is_some()`, then `f.any(is_iso_date)`. The slugless line satisfies all three —
-  its second token is the first date and a later token is an ISO date — so it passes silently and
+  `native/src/gates/queue_entry_budget.rs`'s `declaration()` tests the `recurrence:` lead token,
+  then a minimum field count, then an ISO date past the slug. The slugless line satisfies all
+  three — its second token is the first date and a later token is an ISO date — so it passes and
   earns the budget discount it was never checked for.
   **Why this is worse than a formatting defect, and it is the whole ground.**
   lifecycle-kit/templates/stages/scope.md reads the pre-emption threshold off "one anchored grep
@@ -8293,6 +8241,7 @@
 - payload-symlink-unextractable-on-windows
 - dead-queue-citation-report
 - absorbed-duplicate-disposition
+- relayed-ruling-provenance-unrecorded
 
 ## Lessons Learned
 

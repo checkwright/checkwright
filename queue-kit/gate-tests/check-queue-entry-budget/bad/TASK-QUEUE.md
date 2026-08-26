@@ -31,11 +31,19 @@
 
 - **eta-idea** [design-pending] — a declaration and one further excess line: the
   discount removes one line from the count and this entry is still over, which
-  is the other half of the same demonstration — the discount is one line, not a
-  grammar-wide exemption.
+  is the other half of the same demonstration — the discount is one line per
+  grammar, not a grammar-wide exemption.
   recurrence: eta-idea 2026-01-04 2026-01-08
   **Cost while deferred:** low.
   Filed 2026-01-04 by scope.
+
+- **theta-idea** [design-pending] — two rulings on one entry and one further
+  excess line: the discount is one line per *grammar*, so the second `ruled:`
+  line is counted like any other and an entry taking many rulings still pays
+  for them.
+  ruled: theta-idea operator 2026-01-05 relay
+  ruled: theta-idea lead 2026-01-06 own-authority
+  **Cost while deferred:** low.
 
 ## Icebox
 

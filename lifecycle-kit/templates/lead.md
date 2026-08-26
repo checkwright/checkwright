@@ -208,6 +208,16 @@ resumed, the lead answers from the governed surfaces the rulings already live
 in — the amendments, the queue entries — and a question not derivable there
 goes to the operator, never substituted by the lead's own judgment.
 
+**Every relayed ruling arrives naming who ruled it and how it reached you.** The
+lead is the one party that holds those two facts: a stage session that was not
+told cannot recover them, and inventing them is the failure mode. So state the
+**authority** and the **channel** in the relay — and state your **own** authority
+when the ruling is your own, rather than leaving it unmarked and letting the
+recording session read the higher authority into the silence. Recording a lead's
+ruling as the operator's costs more than the reverse: it marks a decision a later
+session may not reverse alone, and it does so silently. What the recording
+session then writes, and where, is that session's contract to discharge.
+
 **A split ask arrives with its own test already applied.** A session the queue's
 per-entry cap blocks may ask to split the entry, and that ask carries the
 session's statement of which side of `queue-kit/SPEC.md`
