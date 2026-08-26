@@ -43,7 +43,39 @@
   installed consumer's config seam assigns the same name and outranks the environment. Both are
   design-bearing — the knob's default is spec'd and a Windows triple's `target_of_host` mapping
   is entangled with `powershell-installer-surface`'s bootstrap — and were escalated rather than
-  taken at build.
+  taken at build. **Operator-ruled 2026-08-26 through the iteration lead: both route to
+  `powershell-installer-surface`**, which carries them now — not a new entry, and not this one's
+  to fix.
+  **VERIFICATION ROUND 1 WAS BOUGHT AND RETURNED NO MEASUREMENT — 2026-08-26 at build.** master
+  pushed `f04cf334..28b378ba` and the remote head confirms it, but **no `gates` run was ever
+  created**: the `github-actions` check suite for that sha completed with zero check runs, while
+  GitHub ran a critical Actions incident opened 15:11:58Z whose 15:48Z update reads "we've
+  throttled inbound traffic". The push landed 16:07:03Z, inside it. The workflow file was
+  byte-identical on the remote and the workflow `active`, so nothing in this tree explains the
+  absence and nothing about the leg was disproved.
+  **So every question the leg's probe steps exist to answer stands UNANSWERED**, listed here
+  because an unanswered question named is worth more to the follow-up than silence and because
+  each is otherwise a run to buy on its own: the runner's tool inventory, and whether its `awk`,
+  `sed`, `sort`, `grep` and `find` are the GNU flavours docs/install.md §Requirements asserts;
+  whether cargo builds the crate on that host at all; whether a release build leaves the worktree
+  clean enough for the pack step's precondition; npm's Windows bin-shim shape and whether it
+  satisfies `[[ -x ]]`; exec-bit semantics on a freshly written shebang script; whether the one
+  tracked symlink survives `git archive | tar -x` into the payload; and the 260-char path ceiling.
+  Unanswered rather than untested — the instrument is landed and fires on the first run that
+  reaches a runner.
+  **THIS ENTRY CANNOT CLOSE UNTIL A DEFERRED ENTRY MOVES.** Its promotion condition is
+  gate-sdk/SPEC.md §Consumer payload's — a green run that PRODUCED AND EXERCISED an artifact — and
+  the two blockers between here and that condition now sit in `powershell-installer-surface`,
+  which is Deferred. A follow-up iteration that takes this entry alone reaches an
+  omit-and-declare install and exercises nothing, so scoping the follow-up without promoting that
+  sibling beside it buys a second unmeasured leg.
+  **Push budget, ruled and accounted, so a later reader meets no silent contradiction with
+  CLAUDE.md's one-to-two per iteration.** An operator ruling authorized four to eight verification
+  rounds here; the iteration lead ruled ONE round plus close's push — two, inside the budget — and
+  the authorized overrun went unspent. The ground is that green was ruled unreachable inside this
+  iteration the moment both blockers routed to a deferred entry, and iterating toward an
+  unreachable state buys nothing. Round 1 returning no measurement (above) is a separate fact from
+  the budget: whether a retry is bought is the lead's call, not this entry's.
   roadmap-summary: A CI install-smoke leg per supported platform, or an honest label.
   The per-platform half carved out of `platform-support-contract`, narrowed again 2026-08-25
   when its Linux deliverable split off as `linux-install-smoke-ci-leg` under an operator ruling.
@@ -179,43 +211,35 @@
   retired as mooted, re-scoped 2026-08-24), and the native Windows leg `platform-support-ci-matrix`
   now orders first. A named adopter is live (gap inbox, 2026-08-26), so the trigger is no longer
   dormant. **Ordered by the trajectory pivot 2026-08-03** — objectives 2 and 6, TRAJECTORY.md's.
+  **TWO SOURCE BLOCKERS ROUTE HERE, operator-ruled 2026-08-26** through the iteration lead at the
+  native Windows leg's build, which measured both and neither fixed nor re-filed them:
+  `gate-sdk/bin/build-native.sh:68`'s `BN_ART` names the cargo artifact suffix-less where a Windows
+  toolchain emits `<name>.exe`, and `installer/lib/init.sh:98`'s `target_of_host()` maps Linux and
+  Darwin alone, so a `MINGW64_NT-*` host matches nothing and takes the omit-and-declare branch.
+  Surveyed at `.workflow/survey-record.md` 2026-08-26 with the witness a later stage re-runs. The
+  ruling refused both alternatives on the table — a new entry, and widening
+  `platform-support-ci-matrix` — because both are design-bearing exactly where this entry is
+  design-pending: `GATE_SDK_NATIVE_BIN`'s default is spec'd, and a Windows triple's
+  `target_of_host` mapping is step 2 of the bootstrap roster below rather than a CI concern.
   The bootstrap is bash end to end. The `--install <op>` seam both bootstraps call is specified
   there and the first cut is taken — `--install place-artifact`, the artifact placement and the
   config-seam write, on the rule that a step is takeable only if it already runs when an artifact
   was selected: a relocated step is unreachable on the platforms criterion 5 leaves with no binary
-  (gate-sdk/SPEC.md §Porting a gate to the binary substrate). The roster below is that answer in
-  full, measured off `installer/lib/*.sh` and `installer/bin/checkwright.sh` at `0cc4c86a` —
-  re-derive by reading `init.sh` top to bottom against the step names — in execution order:
-
-  | step | disposition |
-  | --- | --- |
-  | argv parse, `--help` | behind-invoke (bootstrap forwards argv verbatim) |
-  | payload presence | **bootstrap** (step 1) |
-  | git work-tree resolve | behind-invoke |
-  | clean-worktree precondition | behind-invoke |
-  | `jq` preflight | **retired** |
-  | package version/commit read | behind-invoke |
-  | prior-manifest read, downgrade refusal | behind-invoke |
-  | profile to kit set | behind-invoke |
-  | `doctor` precondition | behind-invoke |
-  | `target_of_host` | **bootstrap** (step 2) |
-  | `select_artifact` roster + completeness | **bootstrap** (step 3) |
-  | `select_artifact` digest verify | **bootstrap** (step 4) |
-  | `claim` / `record` / `copy_in` | behind-invoke |
-  | kit-source vendoring | behind-invoke |
-  | `gates.list` synthesis, omission lines | behind-invoke |
-  | config-seam plan, per-kit seeding | behind-invoke |
-  | queue seeding | behind-invoke |
-  | artifact placement + seam write | behind-invoke — **taken 2026-08-25** |
-  | generated projections | behind-invoke, declaring a `bash` spawn |
-  | prior-roster carry-forward | behind-invoke |
-  | manifest emit | behind-invoke |
-  | `git add` / commit flow | behind-invoke |
+  (gate-sdk/SPEC.md §Porting a gate to the binary substrate). **The per-step roster is no longer
+  restated here** — fork 1's merge put the assigning rule and the five bootstrap steps in
+  installer/README.md §The install boundary and made `behind-invoke` that section's stated default,
+  so any step's disposition is read off the rule against `init.sh` top to bottom rather than off a
+  second copy pinned to a stale commit (the table was that copy; deleted 2026-08-26 at build under
+  queue-kit/SPEC.md §check-queue-entry-budget's compress-by-answering rule). `target_of_host` is
+  bootstrap step 2, which is why the routing above lands here and not on a CI entry.
   Every sibling surface is `behind-invoke` whole — `doctor.sh`, `diff.sh`, `uninstall.sh`,
   `update.sh`, all of `lib/common/` — bar `digest.sh`'s hasher resolution, re-implemented rather
   than called because step 4 needs it first; `bin/checkwright.sh` collapses into the bootstrap.
   **Cost while deferred:** the pivot's OS-reach objective stays unmet on the one platform it
   names that no current path reaches, and every install-path change is authored bash-first.
+  **Since 2026-08-26 it is also what stops `platform-support-ci-matrix` closing**: that promoted
+  entry's condition wants an artifact produced AND exercised, and the two blockers routed here are
+  precisely what stop a Windows host selecting one — so a Deferred entry now gates a promoted one.
   Filed 2026-08-03 by spec; re-scoped 2026-08-24 at scope; fork 1 merged and demoted 2026-08-25.
 
 - **port-oracle-instrument-self-disposition** [design-pending] — the tool that measures
