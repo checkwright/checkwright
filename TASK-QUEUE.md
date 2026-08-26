@@ -14,46 +14,6 @@
 
 ## Technical Debt
 
-- **linux-install-smoke-ci-leg** [roadmap: next/reliability] — the activation path has no CI
-  leg on any platform, including the one that has evidence.
-  roadmap-summary: The install path is proved by CI on Linux, not only on a maintainer's box.
-  Split from `platform-support-ci-matrix` 2026-08-25 by operator ruling relayed through the
-  iteration lead, which keeps its slug and its macOS half.
-  **Which side of check-queue-entry-budget's split test the parent fell on, stated on the
-  record because the test is read at the collision and not inferred later:** the
-  SPLIT-CANDIDATE side. It carried two deliverables — a Linux leg and a macOS leg — that take
-  different dispositions, and ruling the Linux one promoted leaves the macOS one entirely
-  unruled. It is not the counter-class, an entry accumulating further grounds for one
-  deliverable, so compression by answering was not the correct relief.
-  **Measured at build 2026-08-25, and this premise is the parent's corrected one.** No job in
-  `.github/workflows/` runs an install smoke on any platform: `gates.yml` is a single
-  `ubuntu-latest` job running the kramdown gem, `build-native.sh`, the battery, the derived
-  fixture suites and the guard table. Corroborated by commit 339d07f4's own message — "Nothing
-  at commit time or in CI runs the consumer smoke, which is why it went unseen."
-  **The leg may not run the smoke bare, and that is ruled rather than left open.** A clean-tree
-  local run passes every profile, the download arm, the toolchain-free arm and the jq-less arm,
-  then exits 1 at the binary-less leg on `run-gates: scripts/gates.list names no gates` — the
-  ruled failure recorded at `.workflow/validate-baseline.txt:93` against
-  `binary-less-dispatch-loop-retirement`. So the leg drives the suite through evidence-kit's
-  baseline comparator and reds on a DEVIATION from that record, never on the recorded fail
-  itself; and it states that dependency in its own text, so a reader meets a leg green against
-  a named baseline rather than green simpliciter. Lead-ruled 2026-08-25 on the hazard the build
-  session named against itself — a CI leg that greens on a known fail.
-  **REHEARSED, AND THE RULED SHAPE DOES NOT YET REACH THE HAZARD — measured, not predicted.**
-  Running the leg's exact body locally, the smoke failed at the *starter* profile and the leg
-  still printed `diff-baseline: clean` at exit 0. Cause is granularity, not the comparator: the
-  suite is on the `exit-code` parser, so its whole verdict is ONE scenario and its baseline row
-  is that scenario at `fail`. Any non-zero matches it, and a zero is an unpromoted recovery, so
-  every outcome reads clean. What the leg proves today is that the activation path RUNS on a
-  clean checkout and prints its findings — real coverage, since nothing in CI did even that —
-  and not that the install is sound. Its own text says so rather than overselling. Closing it
-  needs per-arm scenarios for this suite, which is `validate-baseline-suite-coverage`'s reserved
-  design call; escalated at build 2026-08-25 rather than taken.
-  **UNPROVEN IN CI.** The authorized pull-request run was not bought: the push is refused by
-  this session's own permission settings, which is an operator decision to route back rather
-  than around. So the leg is written and locally rehearsed, never yet executed by a runner.
-  Debt: CI configuration over a suite that already exists; it adds no governed name.
-
 ## Deferred
 
 - **platform-support-ci-matrix** [design-pending] [roadmap: next/reliability] — a macOS
@@ -8179,6 +8139,7 @@
 ## Done
 
 - close-entry-baseline-bootstrap-deadlock
+- linux-install-smoke-ci-leg
 
 ## Lessons Learned
 
