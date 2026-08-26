@@ -8,3 +8,4 @@ native-windows-ci-leg scope a32e89b9 2026-08-26 e672e290
 native-windows-ci-leg build ac548b75 2026-08-26 79f4bbb7
 native-windows-ci-leg build a9a96298 2026-08-26 7a8b40a9
 native-windows-ci-leg build aa7cfc55 2026-08-26 fe3dd793
+native-windows-ci-leg validate a7a90581 2026-08-26 f21a762b
