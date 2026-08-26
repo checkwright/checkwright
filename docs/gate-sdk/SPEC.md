@@ -12255,7 +12255,8 @@ the shape of a harness-injected session-id trailer. Both are generic mechanism �
 a public host and a shape, no private term — so they ship tracked, not local. The
 UUID half is anchored to a trailer-shaped line so the shared pattern set (also
 read by check-tree-terms §check-tree-terms) matches an injected footer, never the
-synthetic session UUIDs the tracked `smoke/` trees legitimately carry). A
+synthetic session UUIDs the tracked `smoke/` trees legitimately carry; the
+account-identification class ruled below is the fourth). A
 no-argument run (the whole-tree battery)
 is a clean skip: the message is not a tracked surface and the history-scan
 backstop is deferred to the hosted-attestation rung. A missing message-file
@@ -12264,6 +12265,37 @@ argument-with-value, or a missing required tracked pattern file, is fail-closed
 not a tree path — the gate is emitted into the commit-msg hook, not the
 pre-commit hook. Subject *shape* is the sibling check-commit-subject's job:
 this gate stays the leak guard, that one the parse guarantee.
+
+**The account-identification class bans a shape, not a name.** Public prose
+cites the *role* — "the account carrying `workflow` scope" — and never the
+account filling it, because forge accounts are volatile and naming one
+correlates identities. A denylist of names cannot carry that rule: it catches
+only a name someone already thought to list, and the attested leak was a handle
+nobody had listed. So the shipped pattern matches the shape — a **handle-shaped**
+backticked token within a few characters of an account noun, in either order —
+and spells no handle, domain or project term of its own, which is what lets it
+ship tracked rather than local (CLAUDE.md §The provenance seam) and hold in a
+fresh clone carrying no private list. Handle-shaped **excludes a short
+all-lowercase token**, which is a CLI name — `gh`, `git`, `npm`, `cargo`, `ssh`
+— rather than an account.
+
+**That exclusion is what makes it tree-exact, and tree-exact is a stricter
+calibration than a message-only guard would take.** One pattern source feeds two
+readers (§check-tree-terms) whose economics do not match. An over-refusal in a
+*message* is argued down once, by a human, at the one commit it blocks — a cost
+worth paying for a guard that must not under-refuse. An over-refusal in the
+*tree* is a standing red clearable only by rewriting prose that was never wrong,
+and rewriting a tracked sentence to satisfy a heuristic inverts the rule the
+heuristic serves — flatly so where that sentence is a quotation, which editing
+would falsify. So where the two tolerances disagree the tree's wins.
+
+**Its honest limit, stated rather than discovered:** the scope is handle
+identification and nothing wider. Account *topology* — that one machine holds
+two accounts, that one of them maintains this repo — is a proposition rather
+than a token, and no pattern reaches a proposition. A message can leak the
+topology while matching nothing here. That residue is a review obligation, and
+naming it here is what keeps a green gate from being read as the whole
+assurance.
 
 **The pattern set crosses the bridge as two arrays, `GATE_MSG_PATTERN_FILES` and
 `GATE_MSG_PATTERN_FILES_LOCAL`**, resolved in `lib/gate.sh` from the two

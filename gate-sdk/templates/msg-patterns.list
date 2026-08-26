@@ -19,3 +19,11 @@ claude\.com/claude-code
 # footer, never a synthetic session UUID that check-tree-terms scans in smoke/.
 claude\.ai/
 ^[A-Za-z][A-Za-z-]*: .*[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}
+
+# Account-identification class — cite the role, never the account. A
+# handle-shaped backticked token near an account noun names a forge account
+# whoever it belongs to, so it holds for a handle nobody listed; a short
+# all-lowercase token is a CLI name, not a handle. Calibrated tree-exact, since
+# this set also scans tracked files where a false red has no per-commit appeal.
+# Scope and honest limit: gate-sdk/SPEC.md §check-commit-msg.
+(^|[^A-Za-z])(account|login|username|handle)[^A-Za-z`-][^`]{0,6}`([a-z]*[0-9A-Z_.-][A-Za-z0-9_.-]*|[a-z]{6,})`|`([a-z]*[0-9A-Z_.-][A-Za-z0-9_.-]*|[a-z]{6,})`[^A-Za-z`][^`]{0,6}(account|login|username|handle)([^A-Za-z-]|$)
