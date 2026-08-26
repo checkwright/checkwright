@@ -8409,7 +8409,5 @@
 
 ## Done
 
-- pack-installer-vendors-untracked-scratch
-
 ## Lessons Learned
 
