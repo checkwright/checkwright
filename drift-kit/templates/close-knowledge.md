@@ -19,6 +19,8 @@ tooling-friction triage (guard-kit's close-triage pattern).
 3. **Clear the log** — its named reclaim path:
    `: > .workflow/knowledge-friction.log`.
 
-Goal: the tier contract's holes fill over iterations, and `kpi-knowledge-friction`
-(drift-kit/SPEC.md §Bundled KPIs) trends toward zero as they do — detection is
-the loop, elimination is the tiering edit.
+Goal: the tier contract's holes fill over iterations — detection is the loop,
+elimination is the tiering edit. **Do not read `kpi-knowledge-friction`
+(drift-kit/SPEC.md §Bundled KPIs) as the measure of that.** It counts captures,
+so a fall in it is not evidence the holes filled, and a zero is not evidence
+there was no friction — only that nothing was stamped.

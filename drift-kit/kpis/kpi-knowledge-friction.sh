@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# spec: drift-kit/SPEC.md §The knowledge-friction loop — kpi-knowledge-friction: re-derivations logged this iteration
+# spec: drift-kit/SPEC.md §The knowledge-friction loop — three log states, three lines: absent is
+# no capture loop, empty is not evidence of zero friction, non-empty is a lower bound. --trend
+# keeps one grammar across all three, so a series spanning this change stays one series.
 set -uo pipefail
 
 LOG="${DRIFT_KIT_KNOWLEDGE_LOG:-${GATE_SDK_WORKFLOW_DIR:-.workflow}/knowledge-friction.log}"
@@ -15,6 +17,10 @@ count="$(grep -cE '[^[:space:]]' "$LOG")" || count=0
 
 if [[ "${1:-}" == "--trend" ]]; then
     printf 'kfric %d\n' "$count"
+    exit 0
+fi
+if [[ "$count" -eq 0 ]]; then
+    printf 'lag\tknowledge friction\t0 logged — not evidence of zero friction; no capture floor exists\n'
     exit 0
 fi
 printf 'lag\tknowledge friction\t%d re-derivation(s) logged this iteration (lower bound)\n' "$count"

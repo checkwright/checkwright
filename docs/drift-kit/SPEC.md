@@ -236,7 +236,12 @@ Lag:
 - **kpi-knowledge-friction** — re-derivations captured this iteration: the
   line count of the knowledge-friction log (§The knowledge-friction loop).
   Lag by construction: only what a session *noticed and logged* is counted,
-  so the value lower-bounds the real rate.
+  so the value lower-bounds the real rate. **The degenerate case is the one to
+  read carefully, because the lag label alone does not warn a reader off it:** a
+  lower bound of **zero** bounds nothing, so an empty log is not evidence of zero
+  friction, and the emitter says so in a line of its own rather than reporting a
+  count of nothing in the sentence that reads as a measurement of zero
+  (§The knowledge-friction loop owns the three-state contract).
 - **kpi-incident-recurrence** — re-filings of the same finding, summed over the
   queue's `recurrence:` declarations (queue-kit/SPEC.md §The tag algebra owns the
   grammar), plus the highest-count slug. Like `kpi-deferred-age` it re-implements
@@ -244,7 +249,8 @@ Lag:
   — one owner doc, two implementations, both carrying a `spec:` line citing the
   owner. **The lag label is a measurement claim, not a priority one.** A
   recurrence nobody files is uncounted, exactly `kpi-knowledge-friction`'s
-  structure — and so is one no session **judged**, since each date records a
+  structure, **degenerate case included** — and so is one no session **judged**,
+  since each date records a
   judgment rather than a derivation: the same lag structure, one step later in
   the chain. So lag is the honest fidelity tier even though the metric is highly
   actionable. **It is a judged count, so it is only comparable across a fixed
@@ -317,15 +323,58 @@ derivation. The loop mirrors guard-kit's, with capture moved to convention:
    looked to where the owner is. Never a standing session-start
    instruction: that converts one re-derivation into a permanent
    per-session tax, exactly what context-kit's brevity machinery rejects.
+   **This is a rule about standing instructions, not a rule about triage** — it
+   binds the **capture** side identically, which is why a per-stage capture
+   prompt is refused below rather than reconsidered each time the log reads
+   empty.
    Then clear the log — its named reclaim path. Nothing refuses a close that
    skips the walk, so the log declares itself advisory on the close-surface
    roster (lifecycle-kit/SPEC.md §The close-surface roster) with that clear as
    its reclaim command:
 
    close-surface: .workflow/knowledge-friction.log advisory reclaim=: > .workflow/knowledge-friction.log
-3. **Aggregate (drift)** — `kpi-knowledge-friction` trends the per-iteration
-   count; it falls as the tier contract's holes fill. Detection is the
+3. **Aggregate (drift)** — `kpi-knowledge-friction` reports the per-iteration
+   **capture** count, and reading it as a friction count is the error to avoid.
+   It moves with two independent things — how much friction occurred, and how
+   much of it a session stamped — so a **fall is attributable to neither**. In
+   particular a **zero reading is not evidence of zero friction**: it is what an
+   iteration produces when nobody captured, it is equally what one produces when
+   nobody re-derived, and the log cannot tell a reader which. The error runs in
+   the expensive direction, which is why it is stated here rather than left to a
+   careful reader: the KPI reads **best** exactly where it is **least**
+   trustworthy, so an iteration whose capture discipline collapsed is
+   indistinguishable from one whose tier contract is complete — and the first is
+   the one that needs acting on. The emitter carries the non-inference at the
+   point of reading rather than leaving it to a reader who has read this section:
+   three log states, three lines — **absent** (`n/a`: this tree runs no capture
+   loop), **present and empty** (a count of nothing, said as such), and
+   **present and non-empty** (a lower bound). A log holding only blank lines is
+   the empty state, since the count is of non-blank lines. `--trend`'s grammar
+   does **not** move for the empty state and emits `kfric 0` as before: a trend
+   consumer plots a series, and changing a series' grammar for one of its values
+   makes the history unreadable across the change (§Bundled KPIs applies the same
+   reasoning to `kpi-incident-recurrence`). The limit belongs on the human-read
+   line, where a reader can act on it. Detection is the
    loop; elimination is a tiering edit.
+
+**Three alternatives were weighed and refused, and they are recorded so the next
+session meeting an empty log does not re-open a settled call as if it were an
+oversight.**
+
+- *A corroborating signal* — refused for **weakness**, not for cost. A prompt log
+  records that a session read history; it does not record *what fact* was
+  re-derived, so it can raise a suspicion and can never resolve one. A signal
+  that cannot identify an instance cannot correct a count.
+- *A per-stage capture prompt* — refused on the ground step 2 already states for
+  the remediation side: a standing session-start instruction converts one
+  re-derivation into a permanent per-session tax. That reasoning binds the
+  **capture** side identically.
+- *A capture floor* — an independent signal that capture happened, which is the
+  one this loop is most likely to be mistaken for having. **None cheap exists,
+  and none is supplied here.** The honest consequence is that the KPI stops
+  asserting what it cannot support; it does not start supporting it. The one
+  metric measuring the tier contract's completeness still reads best exactly when
+  nobody is capturing, and now says so.
 
 The heavy alternative — periodic LLM-scan of session transcripts reduced to
 each party's messages — is deliberately out of kit scope: it needs harness

@@ -55,6 +55,28 @@ grep -q 'kpi-does-not-exist.*n/a' <<<"$out" || fail "missing plugin did not yiel
 awk '/^--- Lag/{f=1;next} /^Read trend/{f=0} f' <<<"$out" | grep -q 'knowledge friction.*n/a' \
     || fail "kpi-knowledge-friction did not render an n/a row under the Lag section (log absent in the throwaway consumer)"
 
+# spec: drift-kit/SPEC.md §The knowledge-friction loop — three log states, three lines. The
+# absent arm above is one; without these two the empty state is indistinguishable from a
+# measurement of zero, which is the reading the loop refuses.
+kfric() { DRIFT_KIT_KNOWLEDGE_LOG="$1" bash "$SMOKE_KIT_ROOT/kpis/kpi-knowledge-friction.sh" "${2:-}"; }
+: > "$work/kfric-empty.log"
+printf '2026-01-01 a fact - a surface\n' > "$work/kfric-full.log"
+
+kfric "$work/kfric-empty.log" | grep -q 'not evidence of zero friction' \
+    || fail "an empty knowledge log did not carry its non-inference at the point of reading"
+if kfric "$work/kfric-empty.log" | grep -q 'lower bound'; then
+    fail "an empty knowledge log reported the non-empty sentence, which reads a count of nothing as a measurement of zero"
+fi
+kfric "$work/kfric-full.log" | grep -q '1 re-derivation(s) logged this iteration (lower bound)' \
+    || fail "a non-empty knowledge log lost its lower-bound qualifier"
+
+# spec: drift-kit/SPEC.md §The knowledge-friction loop — --trend's grammar does not move for the
+# empty state; a series spanning a grammar change is two series, not one.
+[[ "$(kfric "$work/kfric-empty.log" --trend)" == 'kfric 0' ]] \
+    || fail "--trend changed grammar for the empty log, breaking comparability across the change"
+[[ "$(kfric "$work/kfric-full.log" --trend)" == 'kfric 1' ]] \
+    || fail "--trend did not report the non-empty count"
+
 # spec: drift-kit/SPEC.md §Testing — the per-plugin contribution probe: the report masks a silent
 # plugin with its own 'n/a (plugin failed)' row, so the floor above cannot see one; a name
 # resolving to no plugin is skipped.

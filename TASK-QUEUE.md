@@ -12,57 +12,6 @@
 
 ## New Features
 
-- **kfric-empty-log-ambiguity** [spec: SPEC-kfric-zero.md] — an empty knowledge-friction
-  log is read as no friction, and it is equally consistent with no capture.
-  recurrence: kfric-empty-log-ambiguity 2026-08-17 2026-08-23
-  **The 2026-08-23 date is a direct stamp too, and the corroboration is the strongest yet.**
-  `battery-runner-port` ran six stage sessions plus a consult and the log read **empty**, while
-  that iteration's prompt log records at least four history-archaeology reads shaping a new
-  deliverable: a build session reading commit `e3579fda`'s diff to locate pipe sites, a session
-  archaeologising when `check-crate-arms`'s cache was introduced, a spec session reading a
-  *deleted* amendment (`SPEC-eighth-cut.md`) to shape a new one, and this close reading a prior
-  close's commit to shape its own. Four events, zero stamps.
-  **The 2026-08-17 date is a direct stamp, and its grounds are first-person.** The log read
-  **empty** at this close across a six-session iteration — and the closing session itself
-  re-derived a fact no doc owns (that `git log -S` misses an eviction leaving the slug behind)
-  and did not run `kfric.sh`, filing `queue-recovery-pickaxe-wrong-oracle` instead. The survey
-  record shows scope re-deriving the *same* fact independently earlier in the same iteration.
-  Two events, one fact, zero stamps: stronger than the founding attestation, which had to infer
-  its unstamped event from the prompt log. Stamped directly, out of channel, under the rule this
-  iteration landed as obliged (lifecycle-kit/SPEC.md §The committed gap inbox).
-  **The founding attestation, 2026-08-06, is the same shape one grade weaker** — the log read
-  **empty** across an iteration that added a Rust module, a source stamp and a gate, while its
-  prompt log records a build session reading a *deleted* `.gate` descriptor out of git history to
-  shape the one it was writing, the class `bin/kfric.sh` exists to stamp. Not stamped, nothing
-  noticed, and inferred from the prompt log rather than observed.
-  **The reader is what makes it expensive.** `kpi-knowledge-friction` trends the log toward
-  zero and reads that trend as the tier contract's holes filling. A sensor with an
-  in-the-moment capture discipline and no independent floor cannot tell a filled hole from an
-  unstamped one, so the KPI reads best exactly where it is least trustworthy.
-  **Why this needed design:** the honest answers differ in kind. A corroborating signal is
-  cheap and weak — the prompt log already records history archaeology and close already reads
-  both surfaces. A per-stage capture prompt is stronger and is precisely the standing-
-  instruction tax context-kit's brevity machinery rejects. Stating the limit on the KPI
-  instead — an empty log is not evidence of zero — costs one line and buys no detection.
-  Which is right turns on whether the KPI is meant to be trusted at zero, a contract call.
-  **Cost while deferred:** the one KPI measuring the tier contract's completeness reads best
-  exactly when nobody is capturing, and no other signal contradicts it.
-  **FIVE HOLDS, none a decline of the finding, and they are not five of a kind.** Three were
-  2026-08-24 on the surface criterion, one of them operator-ruled; the fourth, 2026-08-25, was
-  directive priority under an undirected boundary the operator ruled to the port's bootstrap.
-  **The FIFTH, 2026-08-25, is operator-ruled on the surface criterion** — the promoted CI-legs
-  and target-roster set touches no part of drift-kit's capture loop. What makes it a ruling rather
-  than a default is that both alternatives were put up and **declined**: taking the capture-loop
-  trio now, and ruling a named future iteration for it. Neither was taken, so this entry carries
-  no forward claim on a boundary. No date joins a hold — a decline is not a firing — and the log
-  read **empty** again at this boundary, the expected reading at an iteration's open.
-  **The pairing no hold has yet carried:** `kfric-obligation-residency` is this entry's
-  writer-side twin — that entry is the capture obligation never reaching the writer, this is how
-  an empty log may be read once it has — and both resolve alongside
-  `recurrence-obligation-residency` under delegation-kit/SPEC.md §Operative residency. A unit
-  taking the capture loop takes all three; this one alone leaves the writer unserved.
-  Filed 2026-08-06 at close, from its own knowledge-friction sweep.
-
 - **validate-baseline-suite-coverage** [spec: SPEC-baseline-grain.md] — two validate suites carry no
   held-constant-red baseline row, so a regression in either passes the baseline arm silently.
   **Verified at the 2026-08-14 drain by diffing the two files' suite columns**, not taken from
@@ -8242,6 +8191,7 @@
 - dead-queue-citation-report
 - absorbed-duplicate-disposition
 - relayed-ruling-provenance-unrecorded
+- kfric-empty-log-ambiguity
 
 ## Lessons Learned
 
