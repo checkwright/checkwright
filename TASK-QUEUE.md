@@ -8323,6 +8323,39 @@
   Surfaced 2026-08-26 to the gap inbox by the close of the `platform-reach-and-target-roster`
   iteration, while re-probing that close's release disposition; promoted 2026-08-26 at scope.
 
+- **recurrence-declaration-grammar-ungated** [design-pending] — the `recurrence:` declaration has
+  a stated grammar and no gate, and the stage rule that reads it prescribes an oracle that a
+  malformed declaration is invisible to.
+  queue-kit/SPEC.md §The tag algebra rules the shape `recurrence: <slug> <YYYY-MM-DD> [...]` —
+  "one indented body line naming the entry's own slug, then one date per re-filing". Nothing
+  validates it. `TASK-QUEUE.md`'s `isolated-child-liveness-hook-displaces-its-report` carries
+  `recurrence: 2026-08-25 2026-08-26`, with no slug, written by a close on 2026-08-26 at
+  `8a29e8ec`. It is not a width problem: the conforming form is 85 columns against
+  `check-queue-wrap`'s 100.
+  **The only reader is a discount heuristic, not a checker.**
+  `native/src/gates/queue_entry_budget.rs`'s `is_recurrence()` tests `f.next() == "recurrence:"`,
+  then `f.next().is_some()`, then `f.any(is_iso_date)`. The slugless line satisfies all three —
+  its second token is the first date and a later token is an ISO date — so it passes silently and
+  earns the budget discount it was never checked for.
+  **Why this is worse than a formatting defect, and it is the whole ground.**
+  lifecycle-kit/templates/stages/scope.md reads the pre-emption threshold off "one anchored grep
+  over the deferred section". An anchored grep keys on the slug, so a slugless declaration is
+  invisible to the oracle the stage contract names — and the count it produces is what decides
+  whether an entry pre-empts a standing directive. The rule's own oracle can silently undercount.
+  This scope found the seventh threshold entry only by grepping `recurrence:` unanchored.
+  **DISTINCT from `recurrence-threshold-counts-dates-not-incidences`**, which is about two
+  incidences collapsing into one calendar date. That entry's declaration is well-formed and
+  readable; this one is a declaration the oracle cannot see at all.
+  **Why `[design-pending]`:** whether the gate asserts the slug MATCHES the enclosing entry, or
+  merely that a slug is present, is a real call — the first catches a copy-paste into the wrong
+  entry and needs the entry-boundary parse `queue_entry_budget` already has, the second is a
+  one-line shape test. Enforcement-first pairs the gate with the one malformed line's repair.
+  **Cost while deferred:** silent and aimed at the pre-emption rule. One live declaration is
+  already unreadable to the prescribed oracle, and every future one is unchecked, so a threshold
+  entry can go unpromoted with nothing in the tree to say so.
+  Filed 2026-08-26 by scope, found while running its own recurrence census; the census and its
+  corrected oracle are in `.workflow/survey-record.md`.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
