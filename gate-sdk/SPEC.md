@@ -10133,8 +10133,8 @@ module is not a second one.** The module carried a private copy taking
 deleted and the call site reaches the shared one. Enforcement-first prefers
 de-duplicating the copy to gating it, and the copy was the crate's **only**
 un-gated unix-API use — the whole reason the crate would not compile for
-`x86_64-pc-windows-msvc`, where it is `E0433` on the `use` and `E0599` on
-`.mode()` and `build-native.sh` exits 101 before cargo emits anything.
+`x86_64-pc-windows-msvc` at all, where `cargo build --target` failed on the
+copy and `build-native.sh` propagated cargo's own non-zero status.
 **One behavioural difference rides the de-duplication, in the right direction:**
 the deleted copy returned true for any path with an execute bit, a directory
 included, where the shared predicate additionally requires `is_file()`. This gate

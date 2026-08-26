@@ -259,7 +259,11 @@ session computes for itself, not minting one. Two things follow for a lead
 splitting one stage across sessions: the batch discriminator belongs in a
 **heading inside** that stage's journal and never in its filename, and the
 lead therefore reads **one** pull channel per stage rather than one per
-dispatch.
+dispatch. **The consequence of getting it wrong lands on someone else**, which
+is why the rule is stated here rather than left to taste: a per-batch filename
+leaves the derived path empty, so the *next* same-stage entry refuses on a
+journal that exists under a name it cannot compute — and that session meets the
+refusal cold, holding only the written escape.
 
 ## A running session is asked, never instructed
 
