@@ -12,56 +12,6 @@
 
 ## New Features
 
-- **gate-binary-target-roster-widening** [spec: SPEC-win-build.md] [roadmap: next/reliability] — the
-  binary ships one triple, and no run has produced an artifact anywhere else.
-  roadmap-summary: A prebuilt gate binary for every platform the project says it supports.
-  `native/targets.list` declares exactly one target triple, so the last release published one
-  binary and every adopter off that triple takes the omit-and-declare outcome — a supported
-  result rather than a break, leaving the objective naming every major OS nothing on that axis.
-  **What holds this is the governing spec, not a design fork.** gate-sdk/SPEC.md §Consumer
-  payload: a target joins only when a green run has PRODUCED AND EXERCISED its artifact, never
-  when a platform is reasoned about or a provider merely offers a runner. No such run exists for
-  any triple but `x86_64-unknown-linux-gnu`, so the roster widens by zero.
-  **A green run is NOT the sufficient condition, falsified 2026-08-26. THE CRATE DOES NOT COMPILE
-  FOR `x86_64-pc-windows-msvc` AT ALL**, measured on a native Windows runner at that leg's round
-  2: `native/src/gates/gate_binary_fresh.rs:13` takes `std::os::unix::fs::PermissionsExt`
-  unconditionally and `:15` calls `.mode()` — E0433 and E0599, `build-native` exits 101. Cargo
-  itself is fine there: the index updates and every dependency compiles clean.
-  **THE SIZING IS FALSIFIED TOO — "a portability pass over four modules" — re-verified against
-  the tree at the 2026-08-26 scope, and this is what a promoting stage plans against.** THREE of
-  the four sites named were already portable, in two idioms: `proc.rs:67` and `install.rs:163`
-  are `#[cfg(unix)]`/`#[cfg(not(unix))]` twin FUNCTIONS, while `proc.rs:335` is an inline
-  `#[cfg(unix)]` BLOCK in `exit_code` that vanishes on non-unix and falls through to `2`, needing
-  no twin. Each cfg predates the measurement (`e3abf907`, `da6c6645`, both ancestors of head
-  `261231d2`), so the three-further-uses claim was a grep read past the compiler's first error
-  batch. **ONE un-gated site exists**, `gate_binary_fresh.rs:12-17`, a local `is_executable`
-  duplicating `proc.rs`'s portable one, so the repair is a DE-DUPLICATION. **Honest limit:** a
-  census of all 139 `.rs` files found no other site but cannot prove absence — a compiler halts
-  at its first batch, so only a real `cargo check --target` proves the build.
-  **TWO MORE BLOCKERS JOIN HERE, operator-ruled 2026-08-26**, amending that day's earlier routing
-  of both to `powershell-installer-surface` (TRAJECTORY.md §The closed rulings owns the ruling
-  and its grounds): `gate-sdk/bin/build-native.sh:68`'s `BN_ART` names the cargo artifact
-  suffix-less where a Windows toolchain emits `<name>.exe`, and `installer/lib/init.sh:98`'s
-  `target_of_host()` maps Linux and Darwin alone, so a `MINGW64_NT-*` host matches nothing.
-  `BN_ART` is unreachable until the crate compiles, so it sits behind the de-duplication.
-  **So a target needs TWO things this entry holds apart** — a host the crate *builds* for, and a
-  green run that produces and exercises the artifact. For Windows the first binds and is upstream
-  of everything the CI leg can buy. The Darwin triples are UNMEASURED, assumed neither way.
-  **The filed design fork is settled and no longer why this waits:** `.github/workflows/publish.yml`
-  already derives its build legs from the roster onto mapped runners, so that shape is landed.
-  **What widening costs — "one roster line plus one runner mapping" was the publish half alone.**
-  Beside it sits `installer/consumer-smoke/run-smoke.sh:43-44`, which stops the whole smoke
-  through its `blocked()` helper at `:17` unless the roster is exactly the running host. The two
-  re-entries are steering its pack with `GATE_SDK_NATIVE_TARGETS_FILE` or giving the step a
-  cross-compiling build, and `installer/README.md` §The consumer smoke records neither is built.
-  **Distinct from `powershell-installer-surface`** now that the two blockers moved: that entry
-  owns the PowerShell bootstrap and its design; this owns whether a binary exists to bootstrap to.
-  **Cost while deferred:** three of the four host classes the installer can name receive no
-  battery at all, and the port tail stays sequenced behind a roster this entry is the only mover.
-  Filed 2026-08-08 by close, draining the gap inbox; found at scope. **Tagged `next/reliability`
-  2026-08-08 by operator ruling.** Promoted 2026-08-25 at scope; deferred the same day at build
-  beside `platform-support-ci-matrix`, on an operator ruling relayed through the lead.
-
 - **payload-symlink-unextractable-on-windows** [spec: SPEC-payload-links.md] — the
   payload's tracked-set copy cannot reproduce the tree on Windows: `tar` refuses the one
   tracked symlink and aborts.
@@ -8471,6 +8421,8 @@
 - **stage-cursor-rerun-stamp-gap** [design-pending] — A skipped re-run stamp points the cursor back.
 
 ## Done
+
+- gate-binary-target-roster-widening
 
 ## Lessons Learned
 

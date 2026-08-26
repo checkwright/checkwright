@@ -498,6 +498,24 @@ most, since a vendored tree is shared by construction. Two fields rather than
 is what a PowerShell half can answer without parsing prose. Nothing reads the
 kernel version, so nothing collects it.
 
+**The map answers "which published artifact fits this host", which is why a
+MinGW, MSYS or Cygwin `uname` maps to `x86_64-pc-windows-msvc`.** Those `uname`
+strings report the *shell environment* — the measured runner answers
+`MINGW64_NT-10.0-26100`/`x86_64` — and not the toolchain that built the artifact
+the adopter is about to receive; what a Windows build leg would publish is what
+that host's own `rustc` reports as its host triple, `x86_64-pc-windows-msvc`.
+Before this arm those hosts matched nothing and the function returned empty.
+**The arm's verdict is unchanged today, stated rather than left to be
+discovered**: its reader is `select_artifact`'s roster comparison, live on every
+install, and that comparison still fails because `native/targets.list` does not
+name the triple — a target joins the roster only on a run that produced and
+exercised its artifact (gate-sdk/SPEC.md §Consumer payload), and none has. It is
+reachable **now** for testing through `GATE_SDK_NATIVE_TARGETS_FILE`, the same
+steering knob §The consumer smoke already documents as the roster re-entry.
+Whether an msvc-built binary runs on an arbitrary Windows host is a question no
+run has answered, and withholding that answer until one has is that join bound
+doing its job.
+
 **Selection has three outcomes, and collapsing any two is the defect.** The
 payload carries the target roster verbatim beside the artifacts
 (gate-sdk/SPEC.md §Consumer payload), and `init` reads it rather than inferring
@@ -560,7 +578,13 @@ because there are two remedies:
 - `digest-unverifiable` — an artifact exists but no hasher does. Install
   `sha256sum` or `shasum` and re-run `init`.
 
-A third token would need a third remedy to earn its place. Which members are
+A third token would need a third remedy to earn its place, and one was
+**proposed and refused on exactly that rule**: splitting `substrate-unavailable`
+into *host-unmapped* (the `uname` pair maps to no triple) and
+*target-not-published* (it maps to one the roster does not carry), which
+`select_artifact` collapses into a single token today. Both cases have the
+**same** remedy — there is no adopter action, the platform is not in the support
+roster — so no token is minted and the collapse stands. Which members are
 affected is derived from the payload, never maintained here: a starting-roster
 gate the payload declares as `<kit>/checks/<name>.gate` — and does not also ship
 as a shell script — is one that dispatches to the binary. `run-gates.sh` reports

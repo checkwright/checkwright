@@ -101,6 +101,10 @@ target_of_host() {   # -> the Rust target triple this host is, empty when it map
         Linux/aarch64|Linux/arm64)  printf 'aarch64-unknown-linux-gnu' ;;
         Darwin/x86_64)              printf 'x86_64-apple-darwin' ;;
         Darwin/arm64)               printf 'aarch64-apple-darwin' ;;
+        # spec: installer/README.md §The gate binary — the map answers which *published artifact*
+        # fits this host, so a MinGW/MSYS/Cygwin `uname` — which reports the shell environment and
+        # not the toolchain — maps to the msvc triple a Windows build leg would publish
+        MINGW*/x86_64|MSYS*/x86_64|CYGWIN*/x86_64) printf 'x86_64-pc-windows-msvc' ;;
         *) : ;;
     esac
 }
