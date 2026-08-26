@@ -3199,19 +3199,19 @@
 
 - **release-runbook-identity-diagnosis** [design-pending] — where the which-account-is-active
   check belongs in the release procedure is unplaced; the diagnosis itself is now settled.
-  A refused write on a machine authenticated as several accounts is an *identity* fault, not a
+  A refused write on a machine that may carry more than one login is an *identity* fault, not a
   permission one: the same 404 appears with the permission model already correct, and reading
-  it as permission points the resolution at granting write to the account the private brief
-  rules must **not** hold the namespace.
+  it as permission points the resolution at granting write to an account that must **not** hold
+  it — the one action the identity boundary forbids.
   **Reachability, not merely wording.** A close that defers its release never meets this; a
   close that *cuts* one meets it mid-cut, with a note committed and a tag pending.
   **Armed and demonstrated 2026-08-14** — this supersedes the 2026-08-08 correction that judged
   it latent, which is the ground that fell. The close session of
   `native-port-grouping-and-eighth-cohort` ran `gh api repos/<owner>/<repo> --jq .permissions`
-  with the **non-owning** account active, read `push: false`, applied the runbook literally, and
-  reported the release blocked on a permission defect. Selecting the owning account returned
-  `admin/maintain/pull/push/triage` all true. Cost paid: a stage session's forward motion, at
-  exactly the mid-cut point predicted above.
+  without first establishing which account was active, read `push: false`, applied the runbook
+  literally, and reported the release blocked on a permission defect. The same read taken under
+  the release account the ops runbook designates returned write, which it had held all along.
+  Cost paid: a stage session's forward motion, at exactly the mid-cut point predicted above.
   **The other 2026-08-08 ground stays answered and is not re-opened:** the speculation that this
   fault explained the last tag's unwritten Release body was falsified by `gh release view
   v0.22.0` — a written body and all four assets — so step 6 was reached on the last cut, and
