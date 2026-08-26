@@ -351,6 +351,54 @@
   Attested 2026-08-25 at this scope while dispatching its own survey; filed the same session on
   the lead's direction, before the resume journal holding it was swept.
 
+- **absorbed-duplicate-disposition** [spec: SPEC-done-exits.md] — an entry a landed unit
+  has mooted has an exit, and the surfaces that name it disagree about whether it exists.
+  recurrence: absorbed-duplicate-disposition 2026-08-24 2026-08-26
+  **THE DISPOSITION IS ALREADY RULED, so this applies a ruling rather than making one —
+  TRAJECTORY.md §The closed rulings, 2026-08-23 by the OPERATOR** on a measured 8:1
+  intake-to-exit ratio: close's bare `## Done` line is the ordinary exit for an entry a
+  landed unit or a closed ruling has mooted, taken by close under those two criteria
+  rather than escalated, and *neither needs a new section*. Surfaced 2026-08-26 at spec
+  through the lead; the earlier searches missed it because the ruling says neither
+  "absorbed" nor "duplicate".
+  **SO THE 2026-08-26 LEAD RULING IS WHAT WAS OUT OF POSITION, not Done's contract.** That
+  ruling — `## Done` asserting work that never shipped is a false statement in a governance
+  surface — reads Done as a delivery claim, which the standing operator ruling had already
+  said it is not. It is CONFORMED here rather than reversed: obeying a standing operator
+  ruling is what spec-over-precedent requires, and the operator ruling is untouched.
+  **THE OWNER SPEC CONTRADICTS ITSELF and repairing that rides this unit.**
+  queue-kit/SPEC.md §The icebox tier's conserved-moves bullet already agrees with the
+  operator ruling — `either → done for a ruled wontfix` — while §The queue format's "one
+  line per completed task" is the wrong half, and it is the half the lead ruling read.
+  **ONE FILED COST IS FALSIFIED, measured 2026-08-26 at spec against
+  `drift-kit/kpis/kpi-task-split.sh:27-31`.** A Done slug is classified by its landing
+  commit's subject, so an entry that shipped nothing has no `feat`/`fix`/`refactor` commit
+  and falls to **`unclassified`**: the feat/debt SPLIT is not inflated at all, and only
+  `total` — the "of N done" denominator — moves. The accounting cost is smaller than filed.
+  **THE UNFALSIFIED HALF IS WHAT CARRIES THE UNIT.** The absent disposition made a CORRECT
+  merge unexecutable at the 2026-08-26 close: `pack-installer-vendors-untracked-scratch`
+  and `payload-derivation-ships-untracked-residue`, two live entries owning one gap, were
+  ruled merge-correct and left live. Duplicates therefore accumulate by construction and
+  each one keeps drawing re-filings.
+  **THE WORKED EXAMPLE IS LIVE AND IS `payload-derivation-ships-untracked-residue`**, whose
+  absorbing entry SHIPPED while it kept its pool slot with every ground discharged — which
+  is criterion (a) exactly. **ITS DISPOSITION IS CLOSE'S MOVE, never this unit's**: the
+  operator ruling puts the pool's exits in close's hands, so the amendment states what makes
+  the specimen eligible and does not execute it.
+  **FIRST RECURRENCE 2026-08-24, by a SECOND ROUTE.** `install-step-relocation` reached
+  `## Done` at that iteration's scope on an operator ruling, retired as mooted — its work
+  became unnecessary rather than being merged into a sibling. So the class is any slug
+  reaching Done having shipped nothing, and mooted-by-supersession is a route into it.
+  **The fourth-section branch is REFUSED BY THE OPERATOR RULING** — *neither needs a new
+  section* — so it was never available to weigh. An `[absorbed-by: <slug>]` tag is refused
+  beside it: a disposition token has no reader, `check-task-conservation` reading membership,
+  `kpi-task-split` reading the landing commit, and a human reading git history.
+  **Cost while deferred:** the absent disposition blocks a correct merge, so duplicates
+  accumulate and each draws re-filings; the accounting half is smaller than filed and
+  touches `total` alone.
+  Filed 2026-08-09 by close (`install-profile-seam`), draining the bullet that iteration's
+  scope session filed against its own economics merge.
+
 ## Technical Debt
 
 ## Deferred
@@ -3640,56 +3688,6 @@
   It is the generalization `spec-measured-count-gate` names as the scope-claim axis it cannot
   reach, and is cross-referenced there rather than folded into it — that entry designs a scanner
   over authored prose, this one designs a stamp over a session act.
-
-- **absorbed-duplicate-disposition** [design-pending] — the queue has **no third state between
-  live and done** for a slug merged away as a duplicate, so an absorbed entry is counted as a
-  shipped deliverable.
-  recurrence: absorbed-duplicate-disposition 2026-08-24 2026-08-26
-  **SECOND RECURRENCE 2026-08-26, and it is the first instance where the missing state BLOCKED a
-  merge rather than mis-counting one that happened.** The close found two live entries owning one
-  gap — `pack-installer-vendors-untracked-scratch` and
-  `payload-derivation-ships-untracked-residue`, the second filed by the previous close's drain
-  against a mechanism the first already named — ruled the merge correct, and could not execute it.
-  The lead's ruling is the reason and it belongs here: `## Done` asserting work that never shipped
-  is a false statement in a governance surface, and that is worse than the duplication it would
-  resolve. So the two stay live and cross-referenced. THE WIDENING: the body above reads the cost
-  as silent and per-instance, inflating a KPI nobody can audit. This instance shows a second,
-  louder cost — the absent state makes a CORRECT merge unexecutable, so duplicates accumulate by
-  construction and each one keeps drawing re-filings. That converts the entry from accounting
-  hygiene into a live blocker, and it is the ground a promoting scope should weigh.
-  **THE WORKED EXAMPLE IS LIVE AND IS `payload-derivation-ships-untracked-residue`**, sharpened
-  2026-08-26 when the absorbing entry SHIPPED while the absorbed one kept its pool slot with every
-  ground discharged. That close ruled — lead-confirmed — that both remaining slots lie: `## Done`
-  asserts a deliverable that never shipped and the icebox asserts latent work that does not exist,
-  so the specimen is HELD rather than disposed of, because disposing of it is this entry's own
-  question and pre-empting that destroys the instance.
-  **FIRST RECURRENCE 2026-08-24, by a SECOND ROUTE into the class the body does not name.**
-  `install-step-relocation` reached `## Done` at this iteration's scope, on an operator ruling,
-  **retired as mooted** — its work became unnecessary rather than being merged into a sibling. It
-  shipped nothing, and this close's Done clear is what hands it to `kpi-task-split` as a delivered
-  unit. So the class is not "absorbed duplicate" but *any* slug that reaches Done having shipped
-  nothing, and mooted-by-supersession is a route in that neither the lead line nor the `Distinct
-  from the icebox tier` paragraph reaches. That widening is the finding; the missing third state
-  is unchanged.
-  `check-task-conservation` diffs the live slug set and its own help sanctions moving a renamed
-  slug to Done, so an absorbed duplicate has nowhere else to go. But Done means completed:
-  `stage-economics-log-multi-session-undercount` shipped nothing and its content survives under
-  `stage-economics-log-key-session-collision`, which is untouched and still live. `kpi-task-split`
-  reads Done, so this iteration's feat/debt split inherits a row nothing built.
-  **Distinct from the icebox tier**, which is the deferred pool's exit and holds *unbuilt* work
-  that stays promotable; an absorbed duplicate is not dormant, it is redundant, and putting it
-  back in a live section would re-open the namespace collision the merge closed.
-  **Why `[design-pending]`:** every cheap answer costs something the conservation gate is holding.
-  A fourth section re-opens the section-order contract queue-kit/SPEC.md §The icebox tier already
-  records as gate-unenforced; an `[absorbed-by: <slug>]` tag keeps one section and obliges the
-  KPI readers to learn it; and letting the slug simply vanish is the sanctioned disappearance the
-  icebox tier's design explicitly declined to invent.
-  **Cost while deferred:** low per instance and silent — every merge inflates the delivered-unit
-  count by one and no reader of the KPI can tell. It recurs whenever a scope survey merges a
-  filed duplicate, which the deferred pool's intake asymmetry makes routine.
-  Filed 2026-08-09 by close (`install-profile-seam`), draining the bullet this iteration's own
-  scope session filed against its own economics merge. This close dispositions the standing
-  instance as an absorbed duplicate rather than as a deliverable, in its Done-clearing commit.
 
 - **dispatch-cited-evidence-unverified** [design-pending] — a dispatched sweep's **quoted
   evidence** is covered by no verification rule, and one returned an attributed quotation that
