@@ -8,3 +8,4 @@ windows-adopter-unblock scope a5b51a4d 2026-08-26 c502fa64
 windows-adopter-unblock spec ab7b186a 2026-08-26 c2cdef35
 windows-adopter-unblock align a69acc31 2026-08-26 31580b48
 windows-adopter-unblock build a768327f 2026-08-26 d4a5feba
+windows-adopter-unblock build ad0e012b 2026-08-26 3f6bdf5f
