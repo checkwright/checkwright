@@ -21,8 +21,14 @@
   roadmap-summary: A CI install-smoke leg per supported platform, or an honest label.
   The per-platform half carved out of `platform-support-contract`, narrowed again 2026-08-25
   when its Linux deliverable split off as `linux-install-smoke-ci-leg` under an operator ruling.
-  What remains is the macOS leg alone — Windows-through-WSL is Linux and resolves to the Linux
-  leg, so this entry's supported-platform set has exactly one member left.
+  Windows-through-WSL is Linux and resolves to the Linux leg, so after that split the macOS leg
+  was the only member left. **RE-WIDENED 2026-08-26 by operator ruling at a consult
+  (TRAJECTORY.md §The closed rulings): a native Windows leg joins, ordered AHEAD of macOS**, on a
+  named adopter — a native-Windows project ready to adopt within days to weeks. The Windows leg
+  is also fork 2's parity oracle for `powershell-installer-surface` and the only route to a
+  Windows triple in `native/targets.list`; whether the crate builds and its gates run on a
+  Windows host at all is unmeasured, so a first-try green is not the planning assumption there
+  either. The interim adopter path is WSL, as docs/install.md §Requirements states.
   **THE FORK STAYS RULED — legs, not the honest label.** The label arm survives only for a
   platform a leg is deliberately not bought for.
   **The cost line is rewritten from measurement rather than from the promotion's estimate.**
@@ -131,24 +137,22 @@
   bootstrap — the first two LANDED, and the bootstrap is now ONE member,
   `powershell-installer-surface`, `install-step-relocation` having retired as mooted.
 
-- **powershell-installer-surface** [design-pending] — a native Windows install path. **FORK 2 is
-  what remains**: two hand-kept bootstraps held in parity by a smoke leg, versus one bootstrap
-  generated from a single declaration. Fork 1 is merged, so how many steps there are is settled.
-  **Ordered by the operator's trajectory pivot 2026-08-03** — objective 2 is every major OS
-  including Windows, objective 6 a script-interpreter surface that is minimal and
-  dual-implementable; the objective set is TRAJECTORY.md's. The bootstrap is bash end to end, and
-  `platform-support-ci-matrix` covers Windows only as a **WSL** leg, a Linux userland wearing a
-  Windows badge. **RE-SCOPED 2026-08-24 by the operator**: `install-step-relocation` retired as
-  mooted, so the relocation is this entry's and most of it.
-  **FORK 1'S ANSWER, merged 2026-08-25 into installer/README.md §The install boundary: five
-  bootstrap steps, one retirement (`jq`), everything else behind the invoke.** That count is fork
-  2's input. The `--install <op>` seam both bootstraps call is specified there and the first cut
-  is taken — `--install place-artifact`, the artifact placement and the config-seam write, on the
-  rule that a step is takeable only if it already runs when an artifact was selected: a relocated
-  step is unreachable on the platforms criterion 5 leaves with no binary (gate-sdk/SPEC.md
-  §Porting a gate to the binary substrate). The roster below is that answer in full, measured off
-  `installer/lib/*.sh` and `installer/bin/checkwright.sh` at `0cc4c86a` — re-derive by reading
-  `init.sh` top to bottom against the step names — in execution order:
+- **powershell-installer-surface** [design-pending] — a native Windows install path. **Both
+  forks are RULED**: fork 2 on 2026-08-26 by the operator — two hand-kept bootstraps, parity held
+  by the per-platform install-smoke legs, mechanism and the refused generated-twins alternative at
+  installer/README.md §The install boundary; fork 1 merged 2026-08-25 into that same section —
+  five bootstrap steps, one retirement (`jq`), everything else behind the invoke. What remains is
+  the work: the PowerShell half, the relocation (this entry's since `install-step-relocation`
+  retired as mooted, re-scoped 2026-08-24), and the native Windows leg `platform-support-ci-matrix`
+  now orders first. A named adopter is live (gap inbox, 2026-08-26), so the trigger is no longer
+  dormant. **Ordered by the trajectory pivot 2026-08-03** — objectives 2 and 6, TRAJECTORY.md's.
+  The bootstrap is bash end to end. The `--install <op>` seam both bootstraps call is specified
+  there and the first cut is taken — `--install place-artifact`, the artifact placement and the
+  config-seam write, on the rule that a step is takeable only if it already runs when an artifact
+  was selected: a relocated step is unreachable on the platforms criterion 5 leaves with no binary
+  (gate-sdk/SPEC.md §Porting a gate to the binary substrate). The roster below is that answer in
+  full, measured off `installer/lib/*.sh` and `installer/bin/checkwright.sh` at `0cc4c86a` —
+  re-derive by reading `init.sh` top to bottom against the step names — in execution order:
 
   | step | disposition |
   | --- | --- |

@@ -382,6 +382,19 @@ moment*:
   removes, and ceases to exist rather than moving. `init`'s `jq` preflight is
   the worked case: nothing behind the invoke reads JSON with `jq`.
 
+**The two bootstraps are hand-kept, and parity is held by running, not by
+generation — ruled 2026-08-26.** Each half is authored in its own language
+against the five steps above, and the oracle that holds them equal is the
+per-platform install-smoke leg (`platform-support-ci-matrix`): a leg per
+bootstrap, each exercising the payload end to end on the host that bootstrap is
+for. The alternative refused is one declaration generating both halves. Its
+grounds: at five steps the generator is a third artifact — a template language,
+a freshness gate and a projection-roster row — maintained for a surface small
+enough to be written twice by design, and a generated twin still needs the
+platform leg to prove it runs, so the generator buys no oracle the legs do not
+already supply. Two hand-kept halves drifting is a *real* cost, and the leg is
+the mechanism that turns that drift into a red run rather than a reading.
+
 **Step 5 is *execute*, not *install*.** The tracked copy of the binary under the
 consumer's gates directory is an install artifact with ownership semantics —
 claimed against the manifest, carried in `files[]`, removed by `uninstall` — so

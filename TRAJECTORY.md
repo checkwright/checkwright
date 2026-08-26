@@ -298,6 +298,20 @@ commit and tests at validate, was refused: CI runs the battery and the fixture s
 validate, so the narrowing would have moved the test arm out of CI's reach. The source-stamp
 cache is owned at gate-sdk/SPEC.md §check-crate-arms.
 
+**A native Windows CI leg joins `platform-support-ci-matrix`, ordered ahead of the macOS leg —
+ruled 2026-08-26 by the operator.** This reopens the 2026-08-25 narrowing of that entry's
+platform set to macOS alone, and the ground is a named adopter rather than a plan: a native
+Windows project is ready to adopt, the first member of the population objective 2 was ruled for.
+The roster rule is untouched — a Windows triple joins `native/targets.list` only once that leg
+has produced and exercised its artifact — which is exactly why the leg is what is ordered. The
+alternative refused: leaving native Windows to WSL, which serves the adopter today and is the
+interim path until the leg is green, but reaches no evaluator objective 2 names.
+
+**The two bootstraps are hand-kept, held in parity by the per-platform install-smoke legs —
+ruled 2026-08-26 by the operator**, closing `powershell-installer-surface`'s fork 2. The
+mechanism and the refused generated-twins alternative are owned at `installer/README.md`
+§The install boundary.
+
 ## PRIORITY DIRECTIVE — the port track's sequence
 
 **Ruled 2026-08-09 by the operator, and it is the track's top priority: complete
