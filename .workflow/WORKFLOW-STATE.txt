@@ -11,3 +11,4 @@ platform-reach-and-target-roster build a3bc76c9 2026-08-25 96d27893
 platform-reach-and-target-roster build aa4d7e91 2026-08-25 941bbe1b
 platform-reach-and-target-roster validate a1bbc7dc 2026-08-26 88be6fd3
 platform-reach-and-target-roster validate a13e4ff9 2026-08-26 234edaa5
+platform-reach-and-target-roster close aef12e66 2026-08-26 fd5d85e3
