@@ -8295,6 +8295,34 @@
   promoting scope reads.
   Filed 2026-08-26 by close, on the lead's ruling, from the close's own audit-roster review.
 
+- **shipped-config-tightening-undeclared** [design-pending] — a kit-shipped pattern-list change
+  tightens two gates in an adopter's tree, and no surface says which release section owns it or
+  who may declare it once the landing stage is gone.
+  `3763bc3e` added an account-identification pattern to `gate-sdk/templates/msg-patterns.list`,
+  the config template `installer/lib/init.sh` seeds into a consumer's gates dir. **The gate code
+  did not change** — that commit's `native/src/gates/commit_msg.rs` diff is entirely inside
+  `mod tests`, so the whole tightening is data. `.workflow/tightened-gates.txt` carries neither
+  `check-commit-msg` nor `check-tree-terms`.
+  **Open call 1 — which section owns it, and the answer differs by adopter.** `claim()`
+  (`installer/lib/init.sh:172`) rewrites a seeded path whose recorded hash still matches, so an
+  adopter who never edited their copy TAKES the new pattern on upgrade and both gates can red on
+  a clean run — the Tightened-gates allowed-red set's subject exactly. An adopter who did edit it
+  keeps their copy and diverges, which docs/install.md folds into Behavior changes by name:
+  "a template you have copied out that then changed *is* depended-on behavior diverging from your
+  copy — it is behavior-folded, not dropped". That folding rule reaches the edited population
+  only; it never contemplated the unmodified-seeded-copy case, where init writes through. Two
+  populations, two sections, and no surface choosing between them or requiring both.
+  **Open call 2 — who may declare a late-discovered tightening.** gate-sdk/SPEC.md §upgrade-smoke
+  names the build stage the producer, on the ground that build alone "knows what it tightened at
+  the moment it tightens it". A tightening found after that stage closed therefore has **no
+  declared producer at all**, and every stage that could append is out of contract.
+  **Cost while deferred:** nothing can red for it. `check-tightened-gates-note-parity` compares
+  the note against the declaration surface, never against the tree, so an omission passes now and
+  passes again at composition. It surfaces as an adopter meeting a red the release note never
+  named — the defect docs/install.md assigns to the release rather than to the adopter's work.
+  Surfaced 2026-08-26 to the gap inbox by the close of the `platform-reach-and-target-roster`
+  iteration, while re-probing that close's release disposition; promoted 2026-08-26 at scope.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
