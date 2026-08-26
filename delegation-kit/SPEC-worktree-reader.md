@@ -220,9 +220,15 @@ condition** is enumerated rather than its subject:
   reads true once one of those dispositions stops firing under isolation.
 <!-- update-target-exempt: owned by no delta — the sibling entry's own scope, which this unit deliberately does not take -->
 - `TASK-QUEUE.md`'s `worktree-isolated-dispatch-cannot-reach-the-main-checkout`
-  entry — no content change; its subject is the child's **writes** and stays
-  open. Re-read at merge so the boundary it draws against this entry still holds
-  once the read side has a bridge and the write side does not.
+  entry — no content change. **Its subject is wider than "writes":** the entry's
+  own text names two things, "resolves neither a binary-dispatched gate nor the
+  capture-tier log its own firings must land in" — a read/resolution side and a
+  write side. Delta 1 bridges exactly one gate for one consumer (the liveness
+  reader), which narrows the read side by that one instance and leaves both the
+  rest of that class and the write side untouched, so the entry stays open on
+  its own terms rather than on a writes-only reading of it. Re-read at merge so
+  the boundary drawn here still holds once the read side has a bridge for one
+  gate and the write side and the rest of the gate class do not.
 
 ## Definition of Done
 

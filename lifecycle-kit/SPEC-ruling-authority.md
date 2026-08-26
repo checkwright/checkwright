@@ -56,8 +56,9 @@ recording session. Repeat per ruling; never rewritten. **{design-bearing}**
   shape.** A lead's own ruling is written `lead … own-authority`, not left
   unmarked. An absence today reads as *nobody claims this*, and the attested
   correction at gate-sdk/SPEC.md §check-gate-fail-closed — which names the lead
-  and records that commit `0153a5c9` misattributes the ruling and is deliberately
-  not rewritten — is what an absence costs to repair.
+  and records that the commit which landed the ruling (`0153a5c9`, per `git log`;
+  the section itself names no SHA) misattributes it and is deliberately not
+  rewritten — is what an absence costs to repair.
 - `<YYYY-MM-DD>` — the date the ruling was taken, matching `recurrence:`'s date
   form so one date grammar serves the file.
 - `<channel>` — **a keyword, not a sentence.** `check-queue-wrap`'s budget is the

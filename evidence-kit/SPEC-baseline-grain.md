@@ -102,8 +102,9 @@ taste: the rename rate falling to where a baseline row survives an iteration.
 scenario per printed arm** of `installer/consumer-smoke/run-smoke.sh` — the arms
 the smoke already names on stdout as it enters them (`build`, `pack`, `install`,
 `profile invariant`, the binary-less leg, and the download, toolchain-free,
-jq-less, upgrade and seam arms). Consumer config, not a kit change, exactly as
-the entry's third instance predicted. **{design-bearing}**
+jq-less, upgrade, seam, narrowing and artifact arms — twelve in total, re-counted
+against the script rather than against this list). Consumer config, not a kit
+change, exactly as the entry's third instance predicted. **{design-bearing}**
 
 **The smoke's fail-fast shape is what makes this work, and it is the
 non-obvious part.** `run-smoke.sh:16`'s `fail()` exits 1 at the first failure, so

@@ -141,8 +141,16 @@ legitimate prose, so a retired edge is a *finding to read*, never a violation.
   target as retired and records the edge in a second ordered list.
 - *Named readers for the output,* at named transitions: the **scope** stage at
   its ranking survey, and the **close** stage at the gap-inbox drain (delta 4).
-  Both are stages that already run shell tools against this file, so neither
-  needs a new affordance to read it.
+  **Asymmetric today, re-verified against both templates rather than assumed
+  even.** Scope already runs `bin/queue-edges.sh` at its ranking survey
+  (`templates/stages/scope.md` §the ranking survey already cites it) and gains
+  only the retired block as a further thing that call's output carries. Close's
+  gap-inbox drain runs no queue-kit tool against `TASK-QUEUE.md` today — it
+  dispositions bullets from `LIFECYCLE_KIT_GAP_INBOX_FILE`, a different file —
+  so delta 4 is that stage's **first** touch of `bin/queue-edges.sh`, not a
+  second read through an existing one. Still no new mechanism: the touch is one
+  more command a session already capable of running shell tools invokes, not a
+  new script or gate.
 
 **The `retired` marker on a target line** is the only new field.
 
@@ -204,7 +212,9 @@ readers that move are enumerated by red condition anyway:
 - `lifecycle-kit/templates/stages/scope.md` — the ranking survey names the
   retired block as an input it reads before ranking (delta 4).
 - `lifecycle-kit/templates/stages/close.md` — the gap-inbox drain names the
-  retired block as an input, on the same terms (delta 4).
+  retired block as an input and gains its first invocation of
+  `bin/queue-edges.sh`, unlike scope's edit, which extends an existing one
+  (delta 4).
 - `queue-kit/gate-tests/queue-edges.test.sh` — the tool's behavioural coverage;
   its expectations assert `queue-edges.sh` output and move with delta 1, gaining
   a retired-target arm, a never-live-token arm proving the floor, and a
