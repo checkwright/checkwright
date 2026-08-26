@@ -36,6 +36,23 @@ jobs:
       # checkout+bash tamper floor the kramdown step above states.
       - name: build the native gate binary
         run: bash gate-sdk/bin/build-native.sh
+      # The standing oracle for the crate's whole unix-only class: `cargo check` does
+      # not link, so no MSVC linker is needed and a Linux runner can answer whether
+      # the crate compiles for Windows; `rustup target add` fetches a precompiled std.
+      # The next un-gated `std::os::unix` use reds on the commit that adds it rather
+      # than on a Windows adopter's machine. Three limits ship with it. A compiler
+      # halts at its first error batch, so a green proves the crate compiles and a red
+      # names one batch — never the full set, so this cannot prove absence. It proves
+      # compilation, NOT correctness: `proc.rs`'s `PATH` split compiles cleanly for
+      # this triple and is wrong there. And it is NOT a gate and must not become one —
+      # it needs `rustup` and network, which this repo's contributor floor does not
+      # carry (context-kit/SPEC.md §bin/env-probe), and a registry member that cannot
+      # run in a contributor's tree reds for the wrong reason. It rides this job, so
+      # it costs no additional push and no additional workflow run.
+      - name: cross-check the crate compiles for Windows
+        run: |
+          rustup target add x86_64-pc-windows-msvc
+          cargo check --release --manifest-path native/Cargo.toml --target x86_64-pc-windows-msvc
       - name: full battery
         run: bash gate-sdk/bin/run-gates.sh
       - name: fixture suites (derived from */gate-tests)

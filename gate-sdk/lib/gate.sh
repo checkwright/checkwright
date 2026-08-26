@@ -82,7 +82,20 @@ unset _gmp
 # spec: gate-sdk/SPEC.md §check-identity — the host whose block the account kind reads, config-via-env on the CLI's own host-variable shape rather than a third manifest field
 [[ -n "${GATE_SDK_GH_HOST:-}" ]] || GATE_SDK_GH_HOST="github.com"
 [[ -n "${GATE_SDK_TESTS_DIR:-}" ]] || GATE_SDK_TESTS_DIR="$GATE_SDK_GATES_DIR/gate-tests"
-[[ -n "${GATE_SDK_NATIVE_BIN:-}" ]] || GATE_SDK_NATIVE_BIN="native/target/release/checkwright-gates"
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the executable suffix has one owner and no other surface spells `.exe`: given a target triple it answers for that triple, given nothing (or an empty triple, which *is* the host triple — the shape `--target`-less cargo builds for) it answers for the host
+gate_exe_suffix() {
+    local triple="${1:-}"
+    if [[ -n "$triple" ]]; then
+        case "$triple" in
+        *-windows-*) printf '.exe' ;;
+        esac
+        return 0
+    fi
+    case "$(uname -s 2>/dev/null)" in
+    MINGW* | MSYS* | CYGWIN* | Windows_NT) printf '.exe' ;;
+    esac
+}
+[[ -n "${GATE_SDK_NATIVE_BIN:-}" ]] || GATE_SDK_NATIVE_BIN="native/target/release/checkwright-gates$(gate_exe_suffix)"
 # spec: gate-sdk/SPEC.md §lib/gate.sh — the crate root is normalized where it is resolved rather than at each read, so the value the bridge carries is the canonical one gate_native_crate already printed
 [[ -n "${GATE_SDK_NATIVE_CRATE:-}" ]] || GATE_SDK_NATIVE_CRATE="native"
 GATE_SDK_NATIVE_CRATE="${GATE_SDK_NATIVE_CRATE%/}"

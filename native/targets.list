@@ -23,8 +23,15 @@
 #     has ever executed.
 #   - WSL is Linux and resolves to this same target, so docs/install.md
 #     §Requirements' Windows-through-WSL claim is served exactly as far as that
-#     page already claims and no further; native Windows waits on
-#     `powershell-installer-surface`.
+#     page already claims and no further. Native Windows is no longer
+#     *impossible*: the crate now compiles for x86_64-pc-windows-msvc, held
+#     there by the cross-check step in .github/workflows/gates.yml's `gates`
+#     job. Compiling is not the join bound. The msvc triple stays off this
+#     roster until a run has produced AND EXERCISED its artifact, which is
+#     `platform-support-ci-matrix`'s promotion condition, unchanged. An
+#     iteration named *unblock* removes a blocker; it does not grant a
+#     permission, and a reader taking the one for the other widens this roster
+#     on a plan.
 #
 # This is not a narrowing of the trajectory — the objectives are the direction
 # and this roster is the tree. A one-target roster makes the omit-and-declare

@@ -170,10 +170,17 @@ already rests on plus `bash`, `sh` and `git`; the programs the payload is
 entitled to assume present, so a command-position word among them is not a
 criterion-7 requirement — the default is written once in `lib/gate.sh`, see
 there and §port-blockers), and
-`GATE_SDK_NATIVE_BIN` (default `native/target/release/checkwright-gates`; the
-multi-call binary `gate_command` dispatches a `.gate`-declared member to — see
-§lib/gate.sh; also the binary §check-gate-binary-fresh asks for its baked source
-stamp). Its default is a **stable relative path** deliberately: the
+`GATE_SDK_NATIVE_BIN` (default **computed**: `native/target/release/checkwright-gates`
+with the **host's** executable suffix appended, `gate_exe_suffix`'s no-argument
+form — so `…/checkwright-gates` everywhere but a Windows host and
+`…/checkwright-gates.exe` there. This default is the one place in the tree where
+a suffix-less cargo artifact would otherwise be assumed, which is why the suffix
+is derived here rather than at any reader. A consumer pinning the knob explicitly
+keeps its exact value; only the default moves. Stated as prose because a
+computed default has no literal for `check-knob-default-coupling` to couple to;
+the multi-call binary `gate_command` dispatches a `.gate`-declared member to —
+see §lib/gate.sh; also the binary §check-gate-binary-fresh asks for its baked
+source stamp). Its default is a **stable relative path** deliberately: the
 generated pre-commit hook persists the emitted argv, and a machine-specific
 absolute path baked into a tracked hook would make `check-graph`'s byte-freshness
 comparison machine-dependent. **A vendored consumer's value is set for them**, to
@@ -5785,6 +5792,19 @@ it. A build leg written and never run discharges nothing: *produced and
 exercised* is a fact about a run that happened, which is why the bound survives
 contact with a plan that looks certain.
 
+**Removing a blocker is not the granting of a permission, and the bound is
+unchanged by an unblocking.** Work that makes a target *possible* — the crate
+compiling for it, an installer host-map answering for it, an artifact name
+deriving correctly for it — moves that target from **impossible** to **eligible
+to be measured**, and measures nothing. The join bound above is untouched by
+every such change: the target still joins only on a run that produced and
+exercised its artifact. This is stated because the failure mode is specific and
+likely — an iteration named *unblock* invites its next reader to read the
+removal of a blocker as the arrival of a permission, and a roster widened on that
+reading is widened on a plan. `x86_64-pc-windows-msvc` is the worked instance:
+the crate compiles for it (§build-native, and the cross-check step in the `gates`
+workflow that holds it there), and it is **not** on the roster.
+
 **Widening is cheap on the publish path and not free elsewhere**, and both
 halves are stated because the cheap one alone reads as the whole cost and is
 not. Cheap: the build matrix is roster-derived, so a new platform is one roster
@@ -5797,7 +5817,14 @@ cross-compiling build. installer/README.md §The consumer smoke owns that
 re-entry and records which of the two is built.
 
 **One payload carries every declared target, not one payload per target**, and
-the artifacts are never produced from a working tree: the pack step takes them
+that is exactly why the packed **artifact name is derived per roster line from
+that line's own target** — `gate_exe_suffix "$target"` appended to the stripped
+binary basename, inside the roster loop rather than once before it
+(§lib/gate.sh). A single host-derived name is correct only while every roster
+line is the host's platform class, which is a landmine that fires on the commit
+widening the roster and nowhere before it; it is fixed here, with the roster
+still one line, for that reason. The artifacts are never produced from a working
+tree: the pack step takes them
 from the run artifacts the build legs uploaded and builds nothing itself, so a
 locally-built binary can never substitute for a released one — the same reasoning
 the vendoring ruling applied to the crate source, arriving one layer out. **The
@@ -6336,6 +6363,24 @@ reader needs outlive the refactor that renames a helper:
   `gate_native_crate` is the third, holding `GATE_SDK_NATIVE_CRATE`'s default and
   its trailing-slash stripping in one place now that the knob has three shell
   readers rather than one.
+- `gate_exe_suffix [<triple>]` is the **executable suffix's single owner**, and no
+  other surface in any kit spells `.exe`. It prints `.exe` and nothing else, or
+  empty. Two forms: given a non-empty **target triple** it answers for that triple
+  (`*-windows-*` matches, everything else is empty); given **no argument — or an
+  empty one, which *is* the host triple, being the shape a `--target`-less cargo
+  build emits for** — it answers for the **host**, matching `uname -s` against
+  `MINGW*`, `MSYS*`, `CYGWIN*` and `Windows_NT`. Three readers take it and each
+  picks its form from what it is naming: `GATE_SDK_NATIVE_BIN`'s default (§Layout
+  and configuration) takes the **host** form, because the knob names a binary on
+  the machine resolving it; `bin/build-native.sh`'s `BN_ART` and
+  `scripts/pack-installer.sh`'s per-roster-line artifact name take the **target**
+  form, because both name an artifact built *for* a triple that need not be the
+  host's (§build-native, §Consumer payload). `installer/lib/init.sh`'s
+  `select_artifact` deliberately takes **neither**: it discovers the artifact name
+  with `find … -maxdepth 1 -type f ! -name '*.sha256'` and asserts exactly one, so
+  it is already name-agnostic and a `.exe` satisfies it unchanged — named here
+  because the instinct is to add a fourth reader, and adding one would replace a
+  working derivation with a spelling.
 - `gate_native_source_stamp` is the **tree side of the source stamp**
   (§check-gate-binary-fresh) and the only shell spelling of it: the same three git
   invocations `native/build.rs` bakes into the binary, so the comparison is one
@@ -8174,9 +8219,19 @@ than to a second vocabulary this tool would carry. A hit is exit 2 naming the
 artifact and the matched text. This is the difference between a flag that is
 *set* and a property that *holds*: a build path losing the flags, or a prefix
 outside `CARGO_HOME` and `HOME` reaching the binary, is caught here rather than
-in an adopter's first battery. The artifact path is derived from the crate dir
-plus any `--target <triple>`, and an absent artifact after a successful build is
-itself exit 2 rather than a silently skipped verification.
+in an adopter's first battery. The artifact path is derived from the crate dir,
+any `--target <triple>`, and **that target's executable suffix** — the
+`--target` value is named as `BN_TARGET` because two derivations now read it, the
+output directory and the suffix, and the suffix is `gate_exe_suffix`'s **target**
+form, never the host's (§lib/gate.sh). A cross build from Linux for a Windows
+triple emits `<name>.exe` under `target/<triple>/release/`, and a host-derived
+name would look for `<name>` there and report *"cargo reported success but no
+artifact is at …"* — a message correct about the path and **wrong about the
+cause**, diagnosing an emit-path problem where the defect was the derivation's
+own. An empty `BN_TARGET` is the `--target`-less host build and takes the host
+suffix by the accessor's empty-argument rule, which is what keeps a native
+Windows build correct as well as a cross one. An absent artifact after a
+successful build is itself exit 2 rather than a silently skipped verification.
 
 Fail-closed (§Fail-closed contract), each **exit 2 with cause** rather than a
 silent success or a skip:
@@ -10031,6 +10086,25 @@ With ≥1 **dispatching** member an absent or non-executable binary is **exit 2*
 not a violation — the §Fail-closed contract, and the same verdict `gate_command`
 already gives, since "cannot verify" and "verified fresh" must not share an exit
 code.
+
+**Executability has one spelling in the crate, `proc::is_executable`, and this
+module is not a second one.** The module carried a private copy taking
+`std::os::unix::fs::PermissionsExt` with no `cfg`, duplicating a predicate
+`proc` already twins across `#[cfg(unix)]` / `#[cfg(not(unix))]`; the copy is
+deleted and the call site reaches the shared one. Enforcement-first prefers
+de-duplicating the copy to gating it, and the copy was the crate's **only**
+un-gated unix-API use — the whole reason the crate would not compile for
+`x86_64-pc-windows-msvc`, where it is `E0433` on the `use` and `E0599` on
+`.mode()` and `build-native.sh` exits 101 before cargo emits anything.
+**One behavioural difference rides the de-duplication, in the right direction:**
+the deleted copy returned true for any path with an execute bit, a directory
+included, where the shared predicate additionally requires `is_file()`. This gate
+uses the predicate to decide whether the path `GATE_SDK_NATIVE_BIN` names is a
+runnable binary, and a directory there is not one, so the shared predicate is
+strictly more correct at this call site. On non-unix the twin is `is_file()`
+alone, the honest answer where the filesystem carries no execute bit —
+executability on Windows is an *extension* question, and that question belongs to
+`gate_exe_suffix` (§lib/gate.sh), not here.
 
 **Why this is deliberately *not* assertion B's split-halves shape, which a reader
 one section away will otherwise think is owed here.** Assertion B was corrected to

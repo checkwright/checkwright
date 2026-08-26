@@ -133,9 +133,12 @@ if [[ -n "$ARTIFACTS" ]]; then
         exit 2
     }
     [[ ${#targets[@]} -gt 0 ]] || { echo "pack-installer: the target roster at $ROSTER declares no targets." >&2; exit 2; }
-    binary="$(gate_native_bin)"; binary="${binary##*/}"
     mkdir -p "$ASM/payload/artifact" || exit 2
     for target in "${targets[@]}"; do
+        # spec: gate-sdk/SPEC.md §Consumer payload — the artifact name is derived per roster line from
+        # that *target*'s executable suffix, never once from the host's: one payload carries every
+        # target, so a host-derived name is correct only while every line is the host's platform class
+        binary="$(gate_native_bin)"; binary="${binary##*/}"; binary="${binary%.exe}$(gate_exe_suffix "$target")"
         src="$ARTIFACTS/$target"
         [[ -d "$src" ]] || {
             echo "pack-installer: roster target '$target' has no artifact directory at $src." >&2

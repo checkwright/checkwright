@@ -9,13 +9,6 @@ use std::path::Path;
 
 const REBUILD: &str = "bash gate-sdk/bin/build-native.sh";
 
-fn is_executable(p: &str) -> bool {
-    use std::os::unix::fs::PermissionsExt;
-    std::fs::metadata(p)
-        .map(|m| m.permissions().mode() & 0o111 != 0)
-        .unwrap_or(false)
-}
-
 pub fn run(args: &[String]) -> i32 {
     let gates_dir = match args.first() {
         Some(a) => a.clone(),
@@ -109,7 +102,7 @@ pub fn run(args: &[String]) -> i32 {
 
     // spec: gate-sdk/SPEC.md §Fail-closed contract — with the binary load-bearing, an absent or
     // unreadable one is "cannot verify", which must not share an exit code with "verified fresh"
-    if !is_executable(&bin) {
+    if !proc::is_executable(Path::new(&bin)) {
         eprintln!("check-gate-binary-fresh: {} is absent or not executable, but {} registered member(s) dispatch to it — the check could not run; treating as failure (not clean)", bin, dispatching.len());
         eprintln!("  help: build it — {}", REBUILD);
         return 2;

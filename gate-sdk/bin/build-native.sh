@@ -57,19 +57,26 @@ cargo build --release --manifest-path "$CRATE/Cargo.toml" "$@" || exit $?
 # from the flag: this is the one place every shipped build passes through, and a leak that reaches
 # a consumer's tracked tree reds their first battery instead of this one
 BN_OUT="$CRATE/target"
+# spec: gate-sdk/SPEC.md §build-native — the --target value earns a name because two derivations now
+# read it: the output directory, and the artifact's executable suffix below
+BN_TARGET=""
 for _bn_i in "$@"; do
     case "$_bn_i" in
-        --target=*) BN_OUT="$CRATE/target/${_bn_i#--target=}" ;;
+        --target=*) BN_TARGET="${_bn_i#--target=}"; BN_OUT="$CRATE/target/$BN_TARGET" ;;
         --target)   _bn_want_target=1 ;;
-        *)          [[ "${_bn_want_target:-}" == 1 ]] && { BN_OUT="$CRATE/target/$_bn_i"; _bn_want_target=0; } ;;
+        *)          [[ "${_bn_want_target:-}" == 1 ]] && { BN_TARGET="$_bn_i"; BN_OUT="$CRATE/target/$_bn_i"; _bn_want_target=0; } ;;
     esac
 done
 unset _bn_i _bn_want_target
+# spec: gate-sdk/SPEC.md §build-native — the suffix is the *target*'s and never the host's: a cross
+# build from Linux for a Windows triple emits `<name>.exe`, and an empty BN_TARGET is the host build
 BN_ART="$BN_OUT/release/$(basename "$(gate_native_bin)")"
+BN_ART="${BN_ART%.exe}$(gate_exe_suffix "$BN_TARGET")"
 [[ -f "$BN_ART" ]] || {
     echo "build-native: cargo reported success but no artifact is at $BN_ART" >&2
-    echo "  help: the artifact path is derived from the crate dir and any --target; if this build" >&2
-    echo "        emits somewhere else, that derivation is what needs fixing." >&2
+    echo "  help: the artifact path is derived from the crate dir, any --target, and the executable" >&2
+    echo "        suffix that target implies; if this build emits somewhere else, or under a suffix" >&2
+    echo "        gate_exe_suffix does not derive, that derivation is what needs fixing." >&2
     exit 2
 }
 

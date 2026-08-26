@@ -64,8 +64,11 @@ pub fn on_path(program: &str) -> bool {
     })
 }
 
+// spec: gate-sdk/SPEC.md §check-gate-binary-fresh — the crate's one executability predicate, in
+// the two forms the platform admits: an execute bit on unix, mere file-ness where the filesystem
+// carries none
 #[cfg(unix)]
-fn is_executable(p: &std::path::Path) -> bool {
+pub fn is_executable(p: &std::path::Path) -> bool {
     use std::os::unix::fs::PermissionsExt;
     std::fs::metadata(p)
         .map(|m| m.is_file() && m.permissions().mode() & 0o111 != 0)
@@ -73,7 +76,7 @@ fn is_executable(p: &std::path::Path) -> bool {
 }
 
 #[cfg(not(unix))]
-fn is_executable(p: &std::path::Path) -> bool {
+pub fn is_executable(p: &std::path::Path) -> bool {
     p.is_file()
 }
 
