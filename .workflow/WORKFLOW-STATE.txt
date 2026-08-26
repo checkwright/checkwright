@@ -11,3 +11,4 @@ windows-adopter-unblock build a768327f 2026-08-26 d4a5feba
 windows-adopter-unblock build ad0e012b 2026-08-26 3f6bdf5f
 windows-adopter-unblock build a8887e7c 2026-08-27 d8dd7470
 windows-adopter-unblock validate abadc432 2026-08-27 c6a4dfbd
+windows-adopter-unblock close ae6340e4 2026-08-27 da44a550
