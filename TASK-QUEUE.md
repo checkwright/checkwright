@@ -12,39 +12,6 @@
 
 ## New Features
 
-- **payload-symlink-unextractable-on-windows** [spec: SPEC-payload-links.md] — the
-  payload's tracked-set copy cannot reproduce the tree on Windows: `tar` refuses the one
-  tracked symlink and aborts.
-  `scripts/pack-installer.sh`'s `pack_tracked()` vendors through `git archive "$COMMIT" | tar -x`.
-  On a native Windows host that pipeline fails on
-  `gate-sdk/gate-tests/check-tree-terms/good/tree/dangling-link` — `tar: Cannot create symlink to
-  <its target>: No such file or directory`, then `Exiting with failure status` — and the path is
-  absent afterwards, so the assembly does not merely warn, it aborts mid-kit.
-  **The mechanism is precise and it is not git's.** `core.symlinks` is `true` on the runner, so git
-  would honour the link; `tar` is the refuser, and it refuses because the link is **dangling**.
-  Windows picks the file-versus-directory symlink kind from the target, so a target that does not
-  exist has no kind to pick. A resolvable symlink is untested and may well pass.
-  **Measured 2026-08-26 at close** on `windows-latest` under Git-for-Windows bash, at
-  `platform-support-ci-matrix` round 2, which owns the full harvest. Routed here by the lead, and
-  a new entry rather than a home in `payload-derivation-ships-untracked-residue` — that entry is
-  the near miss and the wrong home, its subject being untracked content *shipping* where this is
-  tracked content *not surviving*, the opposite failure in the same file.
-  **WINDOWS-ONLY, AND THAT IS THE SCOPING, not a hedge: this files, it does not earn a hotfix.**
-  Re-verified first-hand on Linux at this close — `git archive HEAD -- <the link> | tar -x` exits 0
-  and lands the dangling symlink intact — and validate's own fold corroborates it, `installer_smoke`
-  having driven `pack-installer.sh` through all four call sites and failed only on the baselined
-  binary-less row. No adopter on a measured platform is impacted today.
-  **Why this needed design, and the fork is worth more than the fix.** The narrow repair is to make
-  the pipeline tolerate an unextractable link (`tar --skip-old-files`-style, or resolve the fixture
-  to a live target). The wider question the offending path poses is whether `gate-tests/` belongs
-  in the consumer payload **at all** — the blocker is test-fixture content, shipped to adopters who
-  never run the fixtures, so the narrow fix may be repairing the transport of something that should
-  not be in transit. This entry poses that question without answering it.
-  **Cost while deferred:** the first Windows host to get past the crate-portability blocker meets
-  this one immediately, so it is sequenced dead behind
-  `gate-binary-target-roster-widening` and will be the next thing measured whenever that moves.
-  Filed 2026-08-26 by close from the Windows harvest, on the lead's routing ruling.
-
 - **relayed-ruling-provenance-unrecorded** [spec: SPEC-ruling-authority.md] — a relayed
   operator ruling lands in a tracked governance surface as "operator-directed" with no
   provenance a later reader can check.
@@ -8423,6 +8390,7 @@
 ## Done
 
 - gate-binary-target-roster-widening
+- payload-symlink-unextractable-on-windows
 
 ## Lessons Learned
 

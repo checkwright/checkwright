@@ -639,6 +639,23 @@ escape for whole-tree scanners whose state has no static-fixture representation
 a stopgap is filed as debt and fixtured, never given a dishonest "infeasible"
 reason.
 
+**Stated non-target: an invariant whose `bad/` case would itself be unshippable
+payload content cannot take the pair form, and takes a producer-side refusal
+instead.** The worked instance is *the packed set carries no tracked symlink*
+(§Consumer payload). No `good/`+`bad/` gate can hold it, because a `bad/` case
+proving the red would have to **be** a tracked symlink inside a kit root —
+reintroducing the exact artifact the invariant forbids and shipping it to every
+adopter in the payload. `GATE_PRUNE_DIRS` excluding `gate-tests` does not rescue
+it: pruning removes the path from a gate's **corpus**, never from the
+**payload**, so the fixture would still break the extraction it exists to
+prevent. This is written down rather than left as an absence because the rule
+above makes the pair mandatory for a shipped gate, so the next reader meeting the
+gap will read it as an omission and try to close it. It is not one — the
+four-contract shape is what *refuses* the gate here, and `pack_tracked`'s
+pre-flight refusal is the form the invariant can take. Same class of disclosure
+as §check-tree-terms recording which arms a case dir is structurally unable to
+reach.
+
 **The pair is shipping-side, and under §Consumer payload it is the consumer's
 whole verification oracle.** It vendors already — `installer/lib/init.sh`
 enumerates a kit's payload with an unfiltered `find . -type f`, so the pair
@@ -5761,7 +5778,15 @@ needs:
   product. A gate that says only *no* is worse than no gate.
 - **The `good/`+`bad/` fixture pair**, which is shipping-side and is the
   consumer's whole verification oracle once the source is withheld
-  (§Fixture-pair discipline owns what it is evidence of).
+  (§Fixture-pair discipline owns what it is evidence of). **Because the pair
+  ships, a fixture is payload content**, and payload content is bound by what
+  the payload's transport can carry: a fixture that cannot be vendored onto a
+  supported host is a **broken fixture** however well it proves its arm. That
+  clause is the general rule, and the tracked dangling symlink `check-tree-terms`
+  once carried in `good/tree/` is its instance — `tar` cannot create a dangling
+  link on a native Windows host, so the packed kit aborted part-way through and
+  the arm moved into the bespoke `.test.sh`, which ships too and constructs the
+  link at run time (§check-tree-terms).
 
 **The target roster is the surface that asserts platform support.** One Rust
 target triple per live line in the file `GATE_SDK_NATIVE_TARGETS_FILE` names
@@ -5823,7 +5848,26 @@ binary basename, inside the roster loop rather than once before it
 (§lib/gate.sh). A single host-derived name is correct only while every roster
 line is the host's platform class, which is a landmine that fires on the commit
 widening the roster and nowhere before it; it is fixed here, with the roster
-still one line, for that reason. The artifacts are never produced from a working
+still one line, for that reason.
+
+**`pack_tracked` is fail-closed on content it cannot vendor.** The tracked-set
+copy is `git archive <commit> -- <root> | tar -x`, so the packed kit is only as
+portable as `tar`'s ability to reproduce it, and a **tracked symlink** is the
+shape that fails: on a native Windows host `tar` refuses a dangling link — the
+kind, file or directory, is picked from the target, and an absent target has no
+kind — and the pipeline's status is `tar`'s, so the run reports failure *after*
+writing a partial kit. The helper therefore pre-flights `git ls-files -s` for
+mode `120000` over the root it is about to pack and **exits 2** naming each
+offending path, the platform class it breaks and the remedy, before writing
+anything. Fail-closed at the producer is the whole enforcement and it is exact:
+it covers precisely what is packed — every kit root plus `installer/`, both going
+through this one helper — with no corpus knob to configure and no roster to
+maintain, and it is exercised on every path that assembles a payload, the release
+pack included. A refusal that writes nothing and names its cause beats a failure
+that half-vendors, and the difference matters most on the host that cannot debug
+it.
+
+The artifacts are never produced from a working
 tree: the pack step takes them
 from the run artifacts the build legs uploaded and builds nothing itself, so a
 locally-built binary can never substitute for a released one — the same reasoning
@@ -12526,9 +12570,8 @@ all (§The port-candidate criteria, whose couple-clears-walk-binds register this
 member joins). The pair stood at two of twelve control arms and was widened first
 in three directions: `good/` gained a pruned-directory file, a `msg-patterns.list`
 and a `msg-patterns.local.list` — the second proving the self-exemption is a
-prefix glob and not an exact-name match — and a dangling symlink whose own blob
-content is a banned shape, each carrying a banned shape so its skip is proved by
-**greenness** rather than by absence; `good/patterns.list` gained a blank line and
+prefix glob and not an exact-name match — each carrying a banned shape so its skip
+is proved by **greenness** rather than by absence; `good/patterns.list` gained a blank line and
 the live shapes the fixture omitted, including the only anchored one, whose ERE
 anchoring a port can silently drop; and `bad/` gained a second leaking file and
 one carrying two leaks on a line plus two on identical separate lines, which pins
@@ -12549,6 +12592,28 @@ resolution path — which both cases short-circuit by passing a positional — t
 empty-pattern-set *tree unchecked* clean, the binary path-only record, and the
 record **order** a pair cannot assert, each `expect.txt` line being an independent
 substring test.
+
+**A fourth direction the pair once carried lives there too, and for a different
+reason — it is an arm a case dir *may not ship*, not one it cannot reach.** The
+widening's dangling symlink, whose own blob content is a banned shape so its skip
+is proved by greenness, was a **tracked** symlink inside `good/tree/`, and a
+fixture is payload content (§Consumer payload): `tar` cannot create a dangling
+link on a native Windows host, so that one path aborted the vendor mid-kit. The
+arm relocates rather than retires — the `.test.sh` ships too, so consumer-side
+coverage is unchanged — and constructs the link at run time in its own sandbox
+repository, `git add`ing it and asserting the index really holds mode `120000`,
+since an unstaged plant leaves the arm running over nothing. **The link must stay
+dangling**, which is the trap here: the module filters with `is_file()`, which
+**follows** the link, so a resolvable symlink is *scanned* rather than skipped and
+would both change `good/expect.txt`'s count and invert what the arm proves. The
+arm **skips and declares** where `ln -s` fails, creating a symlink needing a
+privilege an ordinary Windows account may not hold — the honest shape for an
+assertion whose precondition is a platform capability, and the same capability
+that made the tracked form unshippable. **No `expect.txt` moved:** `good/`'s
+remaining paths still scan as `2 tracked file(s) scanned`, the symlink having been
+excluded by `is_file()` all along, so this is a relocation and not a reduction.
+Why no gate holds the invariant instead: §Fixture-pair discipline's stated
+non-target.
 
 **The parity run's verdict, recorded as the register §The port-candidate criteria
 sets for a member binding criterion 4.** Assertion A forbids a descriptor and a

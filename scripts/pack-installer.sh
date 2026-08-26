@@ -101,7 +101,16 @@ OUT="${OUT:-$BASE}"
 
 # comment-tier-exempt: vendor git-tracked paths only, unconditionally — :71's clean-tree check does not see ignored paths (git status --porcelain omits them), so a gitignored artifact under a packed root (a fixture's own scratch dir, e.g.) rode a verbatim `cp -R` straight into the payload and broke a consumer's `init`. `git archive` at the stamped commit is the tracked-set boundary; --strip-components peels exactly SRC's own path depth so the archived prefix does not nest one level too deep in DST.
 pack_tracked() {
-    local src="${1%/}" dst="$2" depth=1 rest="${1%/}"
+    local src="${1%/}" dst="$2" depth=1 rest="${1%/}" links pl
+    # spec: gate-sdk/SPEC.md §Consumer payload — refuse an unvendorable tracked symlink BEFORE the pipeline, never after it: the pipeline's status is tar's, so today's failure lands mid-kit having already written a partial vendor, where a pre-flight writes nothing and names the cause. On a native Windows host tar cannot create a dangling link — Windows picks the file-versus-directory kind from the target, and a target that does not exist has no kind to pick — so the payload must carry no symlink at all.
+    links="$(git ls-files -s -- "$src" | grep '^120000 ' | cut -f2-)"
+    if [[ -n "$links" ]]; then
+        echo "pack-installer: $src carries tracked symlink(s), which the payload may not:" >&2
+        while IFS= read -r pl; do printf '  %s\n' "$pl" >&2; done <<<"$links"
+        echo "  help: the payload reproduces the tracked set with tar, and a host that cannot create a symlink aborts the extraction part-way through the kit." >&2
+        echo "  help: remove it from the packed set; an assertion that needs one constructs it at run time in its own sandbox instead." >&2
+        return 2
+    fi
     while [[ "$rest" == */* ]]; do
         depth=$((depth + 1))
         rest="${rest%/*}"
