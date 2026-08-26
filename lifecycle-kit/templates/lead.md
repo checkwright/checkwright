@@ -287,6 +287,18 @@ the whole session that reported it is disproved by arithmetic the lead already
 holds. Relaying an unverified figure into a dispatch is what converts one
 session's guess into standing instruction for every session after it.
 
+**A completion notification's own usage block is a figure of that kind, and it
+counts the notifying turn rather than the run.** The same task id can notify more
+than once, so a resumed agent's second notification reports the resume turn — and
+a resume that only relays a finished report reads as zero tool uses over a large
+token count, which is the exact shape of an agent that read nothing. The two
+readings are indistinguishable from the notification alone, so the lead does not
+choose between them: it asks the dispatcher, which holds the resume history, or
+checks the claim against the tree. Attested, and the cost is the class's
+signature — a child's 14-entry survey was weighted down on a relayed
+`tool_uses: 0` whose run had recorded 48, and the receiving stage had to spend a
+tree probe to refute standing instruction.
+
 ## Policy is config, not prose
 
 All *standing* dispatch policy — everything true of every dispatch, not the

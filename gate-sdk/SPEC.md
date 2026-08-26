@@ -11956,7 +11956,7 @@ manufactures false positives, so the step's effective shell comes from its
 
 | `shell:` | resolution |
 | --- | --- |
-| absent | `-s bash` — GitHub's documented default for a `run:` step on every hosted runner |
+| absent | `-s bash` — GitHub's documented default for a `run:` step on a Linux or macOS runner. It is **`pwsh` on a Windows runner**, so this row is a resolution the gate assumes rather than derives, and a Windows step omitting the key is linted under the wrong dialect. `action-run-shell-dialect-by-runner` owns resolving it from `runs-on` |
 | `bash` (with or without arguments) | `-s bash` |
 | `sh` / `dash` / `ksh` | the matching ShellCheck dialect — linting a POSIX body as bash hides the portability findings that dialect exists to surface |
 | anything else (`pwsh`, `python`, a custom `{0}` template) | the block is **skipped and counted** — the body is not shell, so there is no shell to lint |

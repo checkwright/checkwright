@@ -83,7 +83,9 @@
   **One defect it will meet is already known, which is why a first-try green is not the planning
   assumption.** `installer/lib/init.sh:197`'s unconditional vendoring loop uses `find -printf`, a
   GNU findutils primary macOS does not carry, so a stock-macOS init vendors zero files and still
-  writes a manifest. Filed to the gap inbox at build 2026-08-25, undrained.
+  writes a manifest. Owned by `init-vendoring-assumes-gnu-findutils`, which the 2026-08-26 drain
+  promoted out of the gap inbox — read that entry for the two candidate fixes rather than
+  re-diagnosing here. (This paragraph said "undrained" when it was written; corrected at close.)
   **What the Windows leg already bought this one.** `platform-support-ci-matrix` carries the
   instrument shape a second leg copies — a non-blocking probe-then-suite job — and most of the
   unanswered probe questions it lists are ones a macOS host owes answers to as well. Read that
@@ -8072,43 +8074,37 @@
   Pre-existing since 2026-08-08. Filed 2026-08-25 by close, draining the gap inbox; found at align
   as a comment defect, widened to its owner doc when this drain re-verified it.
 
-- **payload-derivation-ships-untracked-residue** [design-pending] — the installer payload is a
-  filesystem copy, not a tracked-set copy, so any untracked or gitignored file under a packed root
-  ships to adopters.
-  `scripts/pack-installer.sh` assembles the payload with `cp -R` — at `:110` over each
-  `gate_kit_roots_rel` root, and at `:102` over `installer/.` — so the shipped set is whatever is on
-  disk rather than whatever is committed. An ignored path that reaches a consumer then breaks
-  `init`'s `git add` there, because the consumer's own ignore rules refuse to stage it.
-  **Attested once, 2026-08-25 at build.** One run of `run-gate-tests.sh` left
-  `gate-sdk/gate-tests/check-crate-arms/good/.tmp/` behind — the fixture's own scratch dir,
-  gitignored in this tree — the next consumer smoke packed it, and `init` failed for the starter
-  profile with "could not stage the vendored files" on a worktree `git status` called clean. Latent
-  at filing: no ignored path currently sits under a kit root or under `installer/`.
-  **The gap as filed said `find`; the mechanism is `cp -R`** — corrected at this drain, and the
-  reach is wider than reported, since `installer/.` at `:102` is a second instance the report never
-  named at all.
-  **Two candidate fixes, neither taken.** Derive the payload from `git ls-files` rather than from
-  the filesystem — the wider one, since it also stops an unrelated untracked file in a packed root
-  from reaching an adopter — or have `run-gate-tests.sh` clear a fixture's scratch dir after each
-  pair, which closes the attested instance only.
-  **Why nothing catches it today, and the check class owed with the fix:** the residue is invisible
-  to every clean-worktree precondition in the tree, which is why it surfaced as a smoke failure
-  rather than as a refusal to pack. Packing refuses, or reports, on an untracked path in the set it
-  is about to ship.
-  **Cost while deferred:** a release can hand an adopter a payload that cannot install, and the
-  trigger is any tool in this tree leaving scratch under a packed root — which the battery's own
-  fixture runner has done once.
-  **DUPLICATE OF `pack-installer-vendors-untracked-scratch`, which has been live since 2026-08-23
-  and carries two dated recurrences.** This entry was filed one iteration later by a drain that
-  did not find it; the drain's own premise correction (`find` -> `cp -R`) is the tell, since that
-  is the mechanism the older entry already named. What this entry holds that the older one does
-  not: `installer/.` at `:102` as a second instance, the `git ls-files` candidate fix, and the
-  packing-refuses check class. The 2026-08-26 close ruled the merge correct and could NOT execute
-  it — the only destination `check-task-conservation` sanctions for a dropped slug is `## Done`,
-  which would assert a deliverable that shipped nothing. Cross-referenced instead, on the lead's
-  ruling; `absorbed-duplicate-disposition` owns the missing third state that would let one absorb
-  the other, and this pair is its sharpest instance.
-  Filed 2026-08-25 by close, draining the gap inbox; found at build.
+- **payload-derivation-ships-untracked-residue** [design-pending] — **its premise is DEAD and only
+  its disposition remains open**; re-diagnosed 2026-08-26 at close against the tree.
+  As filed, the entry said `scripts/pack-installer.sh` assembled the payload with `cp -R` at two
+  call sites, so the shipped set was whatever sat on disk rather than whatever was committed, and an
+  ignored path reaching a consumer broke `init`'s `git add` there. Attested once, 2026-08-25 at
+  build, when a `run-gate-tests.sh` fixture scratch dir rode into a payload and failed `init` for
+  the starter profile on a worktree `git status` called clean.
+  **The duplicate this entry cross-referenced SHIPPED.** `pack-installer-vendors-untracked-scratch`
+  landed at `7a8b40a9` and sits in `## Done`: `pack_tracked()` copies through
+  `git archive "$COMMIT" | tar -x`, and it is the *only* vendoring path — the sole surviving `cp -R`
+  in the file is the word inside the comment explaining what was removed. Established at this drain
+  by `git grep -n 'cp -R' -- scripts/pack-installer.sh` (one hit, the comment) and by reading both
+  call sites, `installer` and each `gate_kit_roots_rel` root, now `pack_tracked`.
+  **Both candidate fixes are answered.** The wider one — derive from the tracked set rather than the
+  filesystem — is what landed, in its `git archive` spelling; the narrower one (clear a fixture's
+  scratch after each pair) is moot for this class, since residue under a packed root no longer
+  reaches a payload however long it lingers.
+  **The check class it owed is answered by construction rather than by a gate, and that is the
+  stronger outcome.** "Packing refuses, or reports, on an untracked path in the set it is about to
+  ship" was the enforcement owed against a filesystem copy; a tracked-set copy cannot select an
+  untracked path at all, so there is no state for a gate to catch.
+  **What is genuinely left is one disposition call, not one deliverable.** Nothing this entry names
+  is unfixed, so it is an eviction-or-close candidate rather than work — and the only destination
+  `check-task-conservation` sanctions for a dropped slug is `## Done`, which would assert a
+  deliverable this slug never shipped. `absorbed-duplicate-disposition` owns that missing third
+  state, and this pair is now its sharpest instance: the absorbing entry has *shipped* and the
+  absorbed one still occupies the pool.
+  **Cost while deferred:** a pool entry whose every ground is discharged reads as live work to every
+  future scope survey, and it is the standing counter-example to the claim that the pool is costed.
+  Filed 2026-08-25 by close, draining the gap inbox; found at build. Premise retired 2026-08-26 at
+  close, draining the gap-inbox bullet that reported it stale.
 
 - **boundary-wipe-preserve-lifetime-scope** [design-pending] — the iteration-boundary scratch wipe
   preserves by *iteration* lifetime, so an artifact whose lifetime is a **live session's** is
@@ -8358,6 +8354,33 @@
   entry can go unpromoted with nothing in the tree to say so.
   Filed 2026-08-26 by scope, found while running its own recurrence census; the census and its
   corrected oracle are in `.workflow/survey-record.md`.
+
+- **action-run-shell-dialect-by-runner** [design-pending] — `check-action-run-shell` resolves an
+  absent `shell:` key to the bash dialect on a ground that is false for one runner class, so the
+  first Windows step that omits the key gets linted as bash.
+  gate-sdk/SPEC.md §check-action-run-shell's dialect table reads
+  `absent | -s bash — GitHub's documented default for a run: step on every hosted runner`.
+  On a `windows-*` runner GitHub's default `run:` shell is `pwsh`, not bash — and the table's own
+  last row already says a `pwsh` block is *skipped and counted*, so the resolver takes the opposite
+  branch from the one it would take on the same body spelled explicitly.
+  **Nothing is red today, and the reason is a habit rather than a mechanism.**
+  `.github/workflows/gates.yml`'s `install-smoke-windows` job names `shell: bash` on every one of
+  its six steps, and its header says why in those words. A habit holds until the next step is
+  written, and the failure mode when it lapses is the false-positive engine that section's own
+  extractor rules exist to prevent: a PowerShell body linted as shell.
+  **Two halves, and only one is design-bearing.** The SPEC sentence is a false claim in governed
+  prose and was corrected at this drain to say what it actually holds for. The gate change — resolve
+  the dialect from the job's `runs-on` when `shell:` is absent — is the deliverable, and it is
+  `[design-pending]` because `runs-on` is not always a literal: it takes a matrix expression, a
+  `${{ }}` interpolation and a runner-group object, and what a resolver does with an *unreadable*
+  `runs-on` is the call. Refusing reads right (a gate that cannot resolve its dialect should not
+  guess), but it turns any expression-valued `runs-on` into a red on a tree that lints clean now.
+  **Enforcement-first note:** the gate change carries its own `good/`+`bad/` fixture pair, a Windows
+  job with an absent `shell:` being exactly the `bad/` case no current fixture holds.
+  **Cost while deferred:** the correction landed on the prose, so the gate now visibly disagrees
+  with its own spec — the honest state, and a standing invitation to re-derive which one is right.
+  The exposure grows with every platform leg the roadmap's `next/reliability` tag commits to.
+  Filed 2026-08-26 by close, draining the gap inbox; found at build against the Windows leg.
 
 ## Icebox
 
