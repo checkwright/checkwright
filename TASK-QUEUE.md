@@ -657,9 +657,9 @@
   now born native unless an exception is argued, so the omitted set on an uncovered host
   grows monotonically at the rate the battery grows. `native/targets.list` ships **one**
   target, `x86_64-unknown-linux-gnu`, and states its own grounds: it is the only platform
-  any workflow has a runner for. So the uncovered set today is not a hypothetical Windows
-  adopter — it is **every macOS adopter**, for whom omit-and-declare is already the normal
-  path on day one.
+  this repo holds green evidence for, runner availability explicitly NOT being the
+  constraint. So the uncovered set today is not a hypothetical Windows adopter — it is
+  **every macOS adopter**, for whom omit-and-declare is already the normal path on day one.
   **Why the existing entries do not cover it.** `gate-binary-target-roster-widening` owns
   widening the roster and `platform-support-ci-matrix` owns the CI leg that is its stated
   trigger; both are about *closing* the gap. Neither owns the *accumulation* the flip
@@ -5609,39 +5609,6 @@
   re-verified that no permanent surface carries the clause — the only hits were the inbox this
   drain truncates and the survey record the next first-stage entry truncates.
 
-- **lead-dispatch-simulate-optionality** [design-pending] — the lead's dispatch contract makes
-  `--simulate` optional, so the liveness gate wired into it runs only when the lead chooses to
-  pay for it.
-  **This entry is what survived a corrected premise, and the correction is the point.** It was
-  filed as "detection costs a lead a hand-run gate it must remember to run", off the FOURTH
-  ATTESTED FIRING of the turn-end residency rule (2026-08-17, the first after this iteration
-  shipped its enforcement): validate ended its turn to wait on a background loop, the harness
-  fired a completion notification reading "finished" while the producer was still writing the
-  evidence manifest, and a lead taking that at face value would have dispatched close over a
-  half-written manifest.
-  **The machine held, and the drain established more than the bullet claimed.**
-  `lifecycle-kit/bin/enter-stage.sh` runs `LIFECYCLE_KIT_ENTRY_PREFLIGHT` under `--simulate`
-  too, and `scripts/lifecycle-config.sh` wires `check-producer-liveness` against the scratch
-  directory at **every** stage — widened this iteration. So the bullet's candidate, that the
-  lead's dispatch path run the liveness gate before dispatching stage N+1, is **already
-  satisfied whenever the lead simulates**, and lifecycle-kit/templates/lead.md already states
-  that qualification in prose.
-  **What actually survives is one word.** That template says the lead "dispatches and trusts
-  `enter-stage.sh`'s fail-closed refusal, **or** gates an expensive dispatch cheaply first with
-  `--simulate`". A lead taking the first branch dispatches over a live producer; the stage
-  session's own entry then refuses, one dispatch later.
-  **Why [design-pending]:** making `--simulate` mandatory is an envelope change to a kit
-  template binding every consumer, and it trades a cheap always-run probe against that rule's
-  own stated reason for the optional branch — the lead must not re-derive what the machinery
-  rules on. Whether an always-run `--simulate` is re-derivation or is exactly the machinery is
-  the call.
-  **Cost while deferred:** low, and now honestly low. The harm is a wasted dispatch caught one
-  stage later, not lost evidence — both chokepoints that covered the fourth firing, guard rule
-  14 and the widened preflight, stay live.
-  Filed 2026-08-18 by close from the gap inbox; the drain probed the `--simulate` preflight
-  path and the consumer wiring, which is what narrowed the entry from the bullet's shape to
-  this one.
-
 - **stage-cursor-rerun-stamp-gap** [design-pending] — a stage re-run that skips its stamp leaves
   the cursor naming an earlier stage, and nothing reds.
   **Observed in `port-selector-permanence-and-batch` with the battery green.** The iteration's
@@ -5849,29 +5816,6 @@
   Surfaced 2026-08-18. Filed 2026-08-18 by close, draining the gap inbox; a lead filing about the
   lead's own conduct, re-verified here.
 
-- **self-repo-prefix-normalisation-unheld** [design-pending] — the origin-to-blob-prefix
-  normalisation has two holders in the crate with no gate or test holding them equal.
-  **The filed premise was falsified at the drain, in the direction that mattered.** The bullet
-  said two holders; there were three — `native/src/emit/mod.rs:16` (pub), a byte-identical private
-  copy at `native/src/emit/enforcement_map.rs:74` shadowing its own parent module's, and
-  `native/src/gates/md_refs.rs:284` (private, `Result`-returning). The emit pair diffed identical
-  apart from visibility and the `proc::run` path spelling, so it was a port leftover rather than a
-  design fork: `mod.rs`'s own comment says the copy was hoisted "because two arms render self-repo
-  links, and a second copy of the normalisation is a second identity to disagree about".
-  **The leftover was fixed inline at this drain** — the `enforcement_map.rs` copy deleted and the
-  parent's imported; `--emit enforcement-map` byte-matched before and after, so the dedup is
-  behaviour-preserving. What remains is a design question rather than a sweep: `md_refs.rs`'s
-  variant returns `Result<String, String>` where emit's returns `String` and degrades to empty.
-  The signatures encode different fail postures — a gate wants the error, an emitter wants the
-  degradation — so unifying them is a decision, not a deletion.
-  **Deliverable:** either one holder with a fail posture both callers can take, or two holders
-  with a gate or shared test asserting they agree on the same input. `Enforcement-first` says
-  removing the duplication outranks gating it, so the one-holder shape is favoured and unproven.
-  **Cost while deferred:** low and bounded — both copies are exercised, and a disagreement
-  presents as a wrong link rather than a wrong verdict. It is on the list because the third copy
-  appeared without anyone deciding to add one, which is the mechanism that produces a fourth.
-  Surfaced 2026-08-18. Filed 2026-08-18 by close, draining the gap inbox; premise corrected here.
-
 - **stage-completion-unattested** [design-pending] — the stage stamp marks entry, so a stage that
   is entered and abandoned is indistinguishable in the tree from one that finished.
   **Observed this iteration at validate, not hypothesised.** The session backgrounded
@@ -5903,6 +5847,15 @@
   the tree. Both recurrences declined at the drain on those grounds.
   **Cost while deferred:** silent, and it lands hardest when recovery is most expensive — a lost
   or compacted lead is exactly the case where the notification that would have caught it is gone.
+  **The inherited remainder fired, attested 2026-08-25 and recorded rather than reasoned about.**
+  This iteration's build implemented its first batch BEFORE running `bin/enter-stage.sh build`.
+  Purity and provenance both hold, the recorded head is the post-work one, the battery is green —
+  and the work still preceded the mark, which is exactly the case
+  `lifecycle-kit/SPEC.md` §check-stage-evidence names as reached by neither assertion. So the
+  composition this entry owes is not hypothetical: a clean verdict stood for clean ordering, in
+  this tree, this iteration. NOT stamped as a recurrence of this entry, and the decline is the
+  point: this entry's own axis is a mark on time over an absent deliverable, and the axis that
+  fired is the retired sibling's opposite one.
   Surfaced 2026-08-18. Filed 2026-08-18 by close, draining the gap inbox; filed by the lead
   because the evidence is a notification the stage cannot observe about itself.
 
@@ -7898,6 +7851,20 @@
   dispatcher at the moment it is waiting on the result — and silent, since a bare `.` reads as an
   agent that found nothing rather than as an agent whose report was dropped. That last reading is
   a correctness risk rather than an efficiency one, and it is the expensive half.
+  **The floor's coverage is now measured, and it is half of shape one.**
+  `scripts/agent-dispatch-guard.sh:50-52` refuses a read-only type dispatched WITHOUT
+  `isolation: worktree`, and `:58` appends the return-value-only advice — but that second branch
+  fires only when the dispatcher is ITSELF a dispatched agent (`_adg_nested == nested`). A
+  top-level lead dispatching the same read-only sweep gets the isolation refusal and no
+  return-value instruction at all. So the guard already reaches the ISOLATION half of shape one and
+  is silent on the CHANNEL half, which is the half this entry is about.
+  **A further ground, three sessions paid for it 2026-08-26.** For a read-only fan-out the RETURN
+  VALUE is the contract; the resume-journal path a dispatcher grants is for agents that MUTATE.
+  Worktree isolation and the journal answer different questions, and granting the journal to a
+  read-only child buys nothing while making the dropped return look like a channel that was
+  offered. `delegation-kit/templates/agent-execution.md` already draws the distinction; nothing
+  makes a dispatcher pay it, which is shape two of the deliverable restated as an observed cost.
+  recurrence: worktree-isolated-agent-report-lost-to-a-failed-peer-send 2026-08-26
   Surfaced 2026-08-25 by the `turn-end-liveness-seam-and-worktree-cause` close, which reproduced
   it twice while dispatching its own sweeps, and filed to the gap inbox there; promoted
   2026-08-25 at this scope's drain of that inbox.
@@ -7933,7 +7900,13 @@
   dispatcher is waiting, and silent in the worse direction — the returned text reads as a
   liveness complaint rather than as a dropped report, so a less careful dispatcher records a
   sweep that never reported. That is a correctness risk, not an efficiency one.
-  recurrence: 2026-08-25
+  **A FOURTH instance, 2026-08-26, and it is the worst tail yet.** An `align` dispatch WEDGED in a
+  Stop-hook loop across THREE resumptions, burned roughly 166k child tokens and returned nothing at
+  all; the dispatcher recovered only by re-dispatching fresh. Where the record above has a resume
+  round-trip failing once out of two, this is a resume path that failed three consecutive times on
+  one child, so the cost is not bounded by "one extra round-trip on some fraction" — an isolated
+  sweep can consume a full context budget and yield zero.
+  recurrence: 2026-08-25 2026-08-26
   **The rate is now measured, not projected.** The close of the filing iteration dispatched two more
   worktree-isolated read-only sweeps and BOTH were displaced, so the record is 3 for 3 and the cost
   field's "one wasted dispatch round-trip per isolated sweep" is an observed rate rather than an
@@ -8169,9 +8142,13 @@
   standing launch-liveness rule, wrote `.tmp/validate-entry-wait.run` naming its own pid. This repo
   wires `check-producer-liveness .tmp` as a validate entry pre-flight, so the poll refused on the
   record the poll itself had written; the only thing still blocking the loop was the loop.
-  **Second-order harm, also observed.** The tracked-tree-mutation rule correctly refuses every git
-  index, worktree or ref write in *every* session while a record names a live pid, so the build
-  session could not commit the queue drain the waiter was waiting for. Two sessions, one record.
+  **Second-order harm, wider than the filing claimed — corroborated at this close from a surface
+  the filer never cited.** The tracked-tree-mutation rule correctly refuses every git index,
+  worktree or ref write in *every* session while a record names a live pid, so the build session
+  could not commit the queue drain the waiter was waiting for. And
+  `.workflow/subagent-stop-liveness.log` shows the SAME record refusing SubagentStop 21 times
+  between 07:05Z and 07:15Z on 2026-08-26 (`live=yes verdict=red records=1 decision=refuse`), so
+  the wedge reached the turn-end path too, not only the poll. Three consumers, one record.
   **The distinction the rule does not draw, and one surface already draws it.** A *producer* writes
   artifacts a reader must not race and owes a record; an *observer* writes nothing and owes none.
   `guard-kit/lib/guard.sh`'s own advisory says exactly that, while
@@ -8188,6 +8165,62 @@
   and every concurrent one, and the only escape is deleting a record that still names a live pid —
   the one act the rule names as retracting a statement that is still true.
   Filed 2026-08-26 by close, draining the gap inbox; found 2026-08-26 at build, observing validate.
+
+- **enter-stage-refusal-help-contradicts-its-guard** [design-pending] — the entry tool's refusal
+  offers "perform the stamp by hand" as the deliberate override, and three other surfaces say that
+  is exactly what must not happen.
+  `lifecycle-kit/bin/enter-stage.sh`'s `HELP_PREFLIGHT` string is printed under BOTH pre-flight
+  refusals — the built-in `check-stage-entry` one and every `LIFECYCLE_KIT_ENTRY_PREFLIGHT` one —
+  and it reads "resolve the finding above, or (to override deliberately) perform the stamp by
+  hand."
+  **What contradicts it, all three checked first-hand.** `scripts/workflow-state-guard.sh` is a
+  `PreToolUse(Write|Edit)` hook that BLOCKS a hand edit of the state file outright, and its own
+  block text ends "If enter-stage refuses, that refusal is a gate verdict to resolve at its source,
+  not to write around." `lifecycle-kit/templates/stages/close.md`'s first step says "On a refusal,
+  **do not force the entry** — escalate ... a refused entry is a gate verdict to resolve at its
+  source, never to override." And the valve the same iteration shipped exists precisely so the one
+  sanctioned deadlock has an in-contract path instead of a hand stamp.
+  **It is a kit-side defect, not a consumer one.** A consumer without this repo's guard still has
+  the kit's own close template telling it the opposite of the kit's own help line, so the
+  contradiction ships.
+  **NOT the same as the two escapes the tool legitimately offers**, and the distinction is what
+  makes this narrow: writing a missing predecessor journal by hand is stated as evadable by design
+  on a DIFFERENT file, and arming the valve is a ledger write, not a stamp. Only the stamp itself
+  is the guarded surface.
+  **Why `[design-pending]`:** the wording is one line, but what the line should SAY is the open
+  call — name the valve and the escalation as the two recoveries, or say only "resolve the finding
+  at its source", or make the recovery text conditional on which pre-flight refused. The third is
+  the only one that stays true for a consumer wiring its own pre-flight commands.
+  **Cost while deferred:** the one help line a refused session actually reads points it at the act
+  a hook then blocks, so the tool's own recovery advice costs a round-trip and teaches the wrong
+  model of what a refusal means.
+  Filed 2026-08-26 by close from the knowledge-friction log; captured 2026-08-26 by validate.
+
+- **account-noun-plural-slips-the-shape** [design-pending] — the account-identification pattern
+  matches a singular account noun only, so the plural form passes both readers.
+  **Probed rather than reasoned, at this close.** Feeding a three-line sample through
+  `grep -nE -f scripts/msg-patterns.list` matches the singular line and matches NEITHER plural: the
+  noun alternation is `(account|login|username|handle)` followed by a required non-letter, and a
+  trailing `s` is a letter. The reach is wider than the limit was reported as — `accounts` slips
+  with `logins`.
+  **Where the limit currently lives, and why that is the filing's whole point.** It is stated in
+  commit `234edaa5`'s body ("the plural form slips: tolerating it was measured and still costs
+  three rewordings of prose that is not wrong") and NOWHERE in `gate-sdk/SPEC.md`
+  §check-commit-msg, which records only the OTHER limit that commit names — that account topology
+  is a proposition no token pattern reaches. Verified by grepping that commit's own SPEC diff. So
+  the limit is held in history, and history answers what happened, never what is correct
+  (CLAUDE.md §Delivery doctrine, spec-over-precedent).
+  **The tolerance was a measured choice, not an oversight**, and it is the reason this is
+  `[design-pending]` rather than a patch: extending the noun set to plurals reds three tracked
+  sentences that are not wrong, and the same tree-exact calibration that governs the singular form
+  says rewriting prose to satisfy a heuristic inverts the rule the heuristic serves. The open call
+  is which of the three moves to take — accept the three rewordings, add a plural arm scoped to the
+  MESSAGE reader only (whose over-refusal economics differ, per §check-commit-msg), or leave the
+  gap and record it in the SPEC where the sibling limit already sits.
+  **Cost while deferred:** the leak class the pattern was built for reaches public history through
+  one letter, and nobody reading the SPEC learns that — the section's stated scope reads as
+  complete.
+  Filed 2026-08-26 by close, triaging a build finding relayed through the lead.
 
 ## Icebox
 
@@ -8244,6 +8277,8 @@
 - **false-ground-citation-propagation** [design-pending] — Nothing re-reads a ground once cited.
 - **amendment-roster-omission-detection** [design-pending] — Only a grep catches a short roster.
 - **spec-embedded-source-criterion-4-membership** [design-pending] — Its port sizing stays unruled.
+- **lead-dispatch-simulate-optionality** [design-pending] — Dispatch may skip the pre-flight.
+- **self-repo-prefix-normalisation-unheld** [design-pending] — Two link-prefix holders, unheld.
 
 ## Done
 
