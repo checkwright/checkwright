@@ -53,8 +53,9 @@ jobs:
 
   # The activation path, exercised server-side. It is a job rather than a step in
   # `gates` because it asserts a different thing — that an adopter's install
-  # works, not that this tree is clean — and because the macOS sibling this unit
-  # deliberately does not buy will join here as a second job.
+  # works, not that this tree is clean — and because the per-platform siblings
+  # join here as further jobs. The native Windows one is below; the macOS one is
+  # still owed and is what `platform-support-ci-matrix` has left.
   #
   # Not a matrix, and specifically **not derived from native/targets.list**. That
   # roster is the artifact commitment, and a smoke leg on a platform is exactly
@@ -111,3 +112,214 @@ jobs:
           set -e
           echo "installer_smoke exited $rc; the verdict below is the baseline diff, not that status"
           bash evidence-kit/bin/diff-baseline.sh installer_smoke "$log" "$rc"
+
+  # The native Windows sibling, and the first thing this repository has ever run
+  # on a non-Linux host. Its product is the log: whether the crate builds and the
+  # vendored battery runs under Git for Windows' bash is unmeasured, so this leg
+  # is an instrument before it is an assertion and is shaped to answer as many
+  # questions per run as one run can carry.
+  #
+  # **It does not ride the baseline diff the Linux leg above uses, deliberately.**
+  # That suite sits on the exit-code parser with one scenario baselined at `fail`,
+  # so every outcome reads clean — the limit that leg's own text states. Pointing
+  # a second, differently-failing platform at the same row would not be thin
+  # coverage but zero, dressed as a verdict.
+  #
+  # **It discharges nothing for `native/targets.list`, and that is measured
+  # rather than cautious.** gate-sdk/SPEC.md §Consumer payload admits a triple
+  # only on a green run that produced *and exercised* the artifact. Two facts read
+  # off this tree say this leg cannot do that yet, recorded here so a later
+  # session does not read the leg's existence as the block being cleared:
+  #   - `installer/lib/init.sh`'s `target_of_host()` maps Linux and Darwin alone,
+  #     so a Windows host takes the omit-and-declare branch whatever the payload
+  #     carries — the artifact this leg builds is packed and then never selected.
+  #   - cargo emits `<name>.exe` here while `GATE_SDK_NATIVE_BIN` names the
+  #     artifact suffix-less, which the steering below stands in for on this tree
+  #     and cannot stand in for inside an installed consumer.
+  # Both are source rulings, and this leg takes neither.
+  #
+  # **Every `run:` names `shell: bash`.** GitHub's default `run:` shell on a
+  # Windows runner is `pwsh`, while check-action-run-shell resolves an absent
+  # `shell:` to bash (gate-sdk/SPEC.md §check-action-run-shell) — right for every
+  # job above, wrong here. Naming it keeps the runner and the gate agreeing on
+  # what this text is.
+  install-smoke-windows:
+    runs-on: windows-latest
+    # The instrument runs to its end and reports; it does not decide this
+    # workflow. Drop this line on the run it is first observed green and not
+    # before — that same observation is the roster's join condition.
+    continue-on-error: true
+    # MSYS emulates fork on every process spawn and this suite spawns thousands,
+    # so the 272 seconds it takes on a Linux developer machine
+    # (installer/README.md §The consumer smoke) is not the number to plan from.
+    timeout-minutes: 90
+    permissions:
+      contents: read
+    steps:
+      # Before the checkout, so the tree is written with the line endings every
+      # gate, digest and `git status --porcelain` comparison in this repository
+      # assumes. Git for Windows sets core.autocrlf=true in its system config and
+      # --global outranks it.
+      - name: check the tree out with LF line endings
+        shell: bash
+        run: git config --global core.autocrlf false
+
+      # fetch-depth: 0 — the smoke stamps the packed version from `git describe
+      # --tags`, for the reason the Linux leg above states.
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          fetch-depth: 0
+
+      # Reporting only, and it never fails. Every claim this project makes about
+      # a non-Linux platform is currently a reading rather than a measurement,
+      # and this step is where that stops being true — it is worth more than the
+      # suite below on the first run, because a suite that dies at its preflight
+      # says nothing about the host and this says it all at once.
+      - name: probe the runner
+        shell: bash
+        run: |
+          set +e
+          echo "== interpreter =="
+          echo "BASH_VERSION=$BASH_VERSION"
+          uname -a
+          echo "== toolchain, by what PATH actually resolves =="
+          for t in bash git jq awk gawk sed grep sort find realpath cygpath \
+                   sha256sum tar npm node cargo rustc rustup shellcheck ruby; do
+            printf '%-11s %s\n' "$t" "$(command -v "$t" 2>/dev/null || echo '<MISSING>')"
+          done
+          echo "== flavours, against the GNU-first floor docs/install.md asserts =="
+          for t in awk sed sort grep find; do
+            printf '%-6s %s\n' "$t" "$("$t" --version 2>&1 | head -n1)"
+          done
+          echo "== rust =="
+          rustc -vV
+          echo "== git =="
+          for k in core.autocrlf core.symlinks core.longpaths core.filemode; do
+            printf '%-16s %s\n' "$k" "$(git config --get "$k" || echo '<unset>')"
+          done
+          echo "-- porcelain on a fresh checkout; empty is what every pack step demands --"
+          git status --porcelain | head -n 40
+          echo "== scratch =="
+          echo "RUNNER_TEMP=$RUNNER_TEMP"
+          echo "cygpath -u  =$(cygpath -u "$RUNNER_TEMP" 2>/dev/null)"
+          echo "TMPDIR=${TMPDIR:-<unset>}"
+          exit 0
+
+      # Both values every later step needs, derived once here and handed on
+      # through the environment file rather than spelled per step. The artifact
+      # name belongs to the knob and only the platform suffix belongs to this
+      # leg; the scratch base arrives in Windows spelling and everything below
+      # is handled by MSYS bash, so it is translated exactly once.
+      - name: resolve the host's artifact name and scratch base
+        shell: bash
+        run: |
+          set -uo pipefail
+          source gate-sdk/lib/gate.sh
+          tmp="$(cygpath -u "$RUNNER_TEMP" 2>/dev/null || printf '%s' "$RUNNER_TEMP")"
+          {
+            echo "GATE_SDK_NATIVE_BIN=$(gate_native_bin).exe"
+            echo "SMOKE_TMP=$tmp"
+          } >> "$GITHUB_ENV"
+          echo "artifact name suffixed for this platform; scratch base $tmp"
+
+      # Reporting only, and it never fails. The suite stops at the first defect
+      # it meets, and the questions that actually decide how many round-trips
+      # this leg costs sit *behind* that point — each of them otherwise a run to
+      # buy on its own, bought here in one and ahead of the suite. None is
+      # answerable from a Linux machine, which is why they are probed rather
+      # than reasoned about.
+      - name: probe the platform behaviours the suite depends on
+        shell: bash
+        run: |
+          set +e
+          probe="$(mktemp -d "${SMOKE_TMP:-/tmp}/probe.XXXXXX")"
+          echo "== a freshly written shebang script =="
+          printf '#!/usr/bin/env bash\necho reached\n' > "$probe/s.sh"
+          chmod +x "$probe/s.sh"
+          if [[ -x "$probe/s.sh" ]]; then echo "[[ -x ]] holds"; else echo "[[ -x ]] FAILS after chmod +x"; fi
+          "$probe/s.sh" || echo "direct execution FAILS — only 'bash <file>' reaches it here"
+          echo "== npm's bin shim, which is how the smoke reaches checkwright =="
+          mkdir -p "$probe/pkg" "$probe/host"
+          printf '#!/usr/bin/env bash\necho shim-reached\n' > "$probe/pkg/cli.sh"
+          chmod +x "$probe/pkg/cli.sh"
+          printf '{"name":"probe-cli","version":"1.0.0","bin":{"probe-cli":"cli.sh"}}\n' > "$probe/pkg/package.json"
+          printf '{"name":"probe-host","version":"1.0.0","private":true}\n' > "$probe/host/package.json"
+          ( cd "$probe/host" && npm install --no-audit --no-fund --loglevel=error "$probe/pkg" )
+          ls -l "$probe/host/node_modules/.bin/" 2>&1 | head -n 10
+          shim="$probe/host/node_modules/.bin/probe-cli"
+          if [[ -x "$shim" ]]; then echo "[[ -x ]] holds on the shim"; else echo "[[ -x ]] FAILS on the shim"; fi
+          "$shim" || echo "the shim would not execute — installer/bin/checkwright.sh is unreachable this way"
+          echo "== the tracked symlink the payload carries =="
+          link="$(git ls-files -s | awk '$1 == "120000" { print $4; exit }')"
+          echo "tracked symlink: ${link:-<none>}"
+          if [[ -n "$link" ]]; then
+            mkdir -p "$probe/arch"
+            git archive HEAD -- "$link" | tar -x -C "$probe/arch"
+            ls -l "$probe/arch/$link" 2>&1
+            if [[ -L "$probe/arch/$link" ]]; then
+              echo "survives git archive | tar -x as a symlink"
+            else
+              echo "materialised as something other than a symlink — the payload's copy differs from the tree's"
+            fi
+          fi
+          echo "== path length, against the 260-char ceiling =="
+          deep="$probe"
+          for _ in 1 2 3 4 5 6 7 8; do deep="$deep/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"; done
+          if mkdir -p "$deep" && printf 'x' > "$deep/f"; then
+            echo "wrote a ${#deep} char path"
+          else
+            echo "FAILED to write a ${#deep} char path"
+          fi
+          exit 0
+
+      # Reporting only. The crate is where a non-Linux host fails first if it
+      # fails at all, and a build that dies inside the suite makes every later
+      # step's silence unreadable — so it is probed alone, before the suite that
+      # depends on it, and the worktree is re-read afterwards because a release
+      # build leaving mode or line-ending churn is what breaks the clean-tree
+      # precondition the pack step holds.
+      - name: probe the crate build
+        shell: bash
+        run: |
+          set +e
+          bash gate-sdk/bin/build-native.sh
+          echo "build-native exited $?"
+          ls -l native/target/release/ 2>&1 | head -n 20
+          echo "-- porcelain after a release build; the smoke asserts this is empty --"
+          git status --porcelain | head -n 40
+          exit 0
+
+      # The suite itself, under one steering that is **measurement scaffolding
+      # and not a fix**: run-smoke.sh blocks unless the target roster is exactly
+      # this host, and this host is not the one declared triple. The re-entry is
+      # the one installer/README.md §The consumer smoke records — steer this
+      # smoke's pack at the host alone while the published payload still commits
+      # to what it commits to. pack-installer.sh copies the steered file verbatim
+      # into the payload, so the packed roster is this host's and no second copy
+      # is read anywhere downstream.
+      - name: install smoke on a native Windows host
+        shell: bash
+        run: |
+          set +e
+          # Both resolutions are asserted rather than assumed: an instrument that
+          # cascades from a silently empty variable reports the wrong defect.
+          tmp="${SMOKE_TMP:-}"
+          [[ -d "$tmp" ]] \
+            || { echo "scratch base did not resolve: RUNNER_TEMP=$RUNNER_TEMP -> $tmp"; exit 2; }
+          host="$(rustc -vV | awk '/^host:/{print $2}')"
+          [[ -n "$host" ]] \
+            || { echo "rustc reported no host triple, so the roster cannot be steered"; exit 2; }
+          echo "host triple: $host"
+          roster="$tmp/targets.list"
+          printf '%s\n' "$host" > "$roster"
+          log="$tmp/installer-smoke-windows.log"
+          GATE_SDK_NATIVE_TARGETS_FILE="$roster" INSTALLER_SMOKE_TMP_DIR="$tmp" \
+            bash installer/consumer-smoke/run-smoke.sh 2>&1 | tee "$log"
+          rc="${PIPESTATUS[0]}"
+          echo "== verdict =="
+          echo "installer_smoke on native Windows exited $rc"
+          echo "This leg reports; it does not judge. The log above is the measurement."
+          echo "A zero here is not a roster join on its own: gate-sdk/SPEC.md §Consumer payload"
+          echo "wants an artifact produced AND exercised, and an omit-and-declare install"
+          echo "exercises none. See this job's header for what stands between the two."
+          exit "$rc"

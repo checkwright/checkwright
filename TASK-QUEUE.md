@@ -15,11 +15,35 @@
 ## Technical Debt
 
 - **platform-support-ci-matrix** [roadmap: next/reliability] — a native Windows install-smoke
-  leg, then a macOS one; nothing has ever run against either platform.
+  leg, then a macOS one; nothing has ever run green against either platform.
   **THIS ITERATION TAKES THE WINDOWS LEG.** Operator-ruled 2026-08-26 at this scope's unit-set
   escalation, on the adopter date below. The macOS leg stays in this entry, unbuilt and second,
   exactly as the 2026-08-26 ordering ruling sequences it — the entry is not split, because its
   two legs share the workflow surface and the runner-mapping mechanism they are promoted to build.
+  **THE WINDOWS LEG IS AUTHORED AND UNMEASURED, landed 2026-08-26 at build.**
+  `.github/workflows/gates.yml`'s `install-smoke-windows` job: `windows-latest`, `shell: bash`
+  named on every step, `continue-on-error: true`, and shaped as an instrument rather than an
+  assertion — a runner probe, a crate-build probe, then the steered suite — because one remote
+  run is the only oracle it has and a run that dies at a preflight says nothing about the host.
+  Its header carries the ruling, the steering it stands in for and the promotion condition;
+  nothing is restated here. Verified locally as far as local verification reaches: the YAML
+  parses, all five `run:` bodies are ShellCheck-clean at `-S warning`, the probe step was
+  executed, the roster and artifact-name steerings were exercised through `gate.sh`'s accessors,
+  and the battery is green. None of that is evidence the leg runs.
+  **What build measured off the tree, because it moves what "green" costs.** Reaching a green
+  Windows leg is not CI configuration alone, which is what the promotion assumed. Two
+  source blockers sit in front of it, neither settled by a governing spec, both surveyed at
+  `.workflow/survey-record.md` 2026-08-26 with the witness a later stage re-runs:
+  `installer/lib/init.sh:98`'s `target_of_host()` maps Linux and Darwin alone, so a Windows host
+  takes the omit-and-declare branch and never selects the artifact the leg builds; and cargo
+  emits `<name>.exe` where `GATE_SDK_NATIVE_BIN` names the artifact suffix-less. The second is
+  the wider of the two and reads narrow: every production check in this tree dispatches through
+  `gate_native_bin`, so the omission stops the whole battery on that platform rather than only
+  the smoke's preflight, and the workflow's steering of it holds for this tree alone — an
+  installed consumer's config seam assigns the same name and outranks the environment. Both are
+  design-bearing — the knob's default is spec'd and a Windows triple's `target_of_host` mapping
+  is entangled with `powershell-installer-surface`'s bootstrap — and were escalated rather than
+  taken at build.
   roadmap-summary: A CI install-smoke leg per supported platform, or an honest label.
   The per-platform half carved out of `platform-support-contract`, narrowed again 2026-08-25
   when its Linux deliverable split off as `linux-install-smoke-ci-leg` under an operator ruling.
