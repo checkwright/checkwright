@@ -40,20 +40,19 @@
   the extension-less one is mode `-rwxr-xr-x` and executes. (5) Exec-bit semantics HOLD on a freshly
   written shebang script despite `core.filemode=false`. (6) The tracked symlink does NOT survive:
   blocker 4. (7) There is NO 260-char ceiling — a 271-char path wrote clean, `core.longpaths` unset.
-  **TWO NEW SOURCE BLOCKERS, AND NEITHER IS ROUTED — that call is not this entry's to make.** The
-  2026-08-26 ruling sent the first two to `powershell-installer-surface` on grounds specific to
-  them, and neither ground reaches either of these. Blocker 3, the crate is not portable:
-  `native/src/gates/gate_binary_fresh.rs:13` takes `std::os::unix::fs::PermissionsExt`
-  unconditionally and `:15` calls `.mode()` — E0433 and E0599, `build-native` exits 101 — and
-  THREE more unix-only uses sit behind that first failure (`proc.rs:69`, `proc.rs:337`,
-  `install.rs:165`), so it is not a one-line fix. It is also UPSTREAM of the `.exe`-suffix blocker,
-  which is never reached because no artifact is produced. Blocker 4: `pack_tracked()`'s
-  `git archive | tar -x` FAILS on the one tracked symlink — `tar: Cannot create symlink to
-  <its target>: No such file or directory`, then `Exiting with failure status`, and the path is
-  absent afterwards. `core.symlinks` is true, so git is not the refuser: tar is, because the link
-  is DANGLING and Windows needs an existing target to choose the symlink kind.
-  **THIS CANNOT CLOSE UNTIL FOUR BLOCKERS MOVE**, two of them unrouted. Its promotion condition is
-  gate-sdk/SPEC.md §Consumer payload's — a run that PRODUCED AND EXERCISED an artifact — and round
+  **TWO NEW SOURCE BLOCKERS, ROUTED 2026-08-26 by the lead and SPLIT rather than paired**, neither
+  to `powershell-installer-surface`, whose 2026-08-26 grounds reach neither. Blocker 3 →
+  `gate-binary-target-roster-widening`, whose subject it *is*: the crate does not compile for
+  `x86_64-pc-windows-msvc` at all — `build-native` exits 101 on unix-only source reaching four
+  modules — and that entry now carries the citations and the block condition this falsified. It is
+  UPSTREAM of the `.exe`-suffix blocker, never reached because no artifact is produced. Blocker 4 →
+  `payload-symlink-unextractable-on-windows`, minted for it because no entry owned the subject:
+  `pack_tracked()`'s `git archive | tar -x` FAILS on the one tracked symlink and exits with
+  failure status, leaving the path absent. `core.symlinks` is true, so git is not the refuser: tar
+  is, because the link is DANGLING and Windows needs an existing target to pick the symlink kind.
+  **THIS CANNOT CLOSE UNTIL FOUR BLOCKERS MOVE**, all four now routed away. Its promotion
+  condition is gate-sdk/SPEC.md §Consumer payload's — a run that PRODUCED AND EXERCISED an
+  artifact — and round
   2 produced none, so promoting this alone still exercises nothing. The push budget is closed: the
   lead's ruled two rounds were both spent, the outage and the measurement, inside CLAUDE.md's.
   **THE FORK STAYS RULED — legs, not the honest label**, and the Windows-ahead-of-macOS ordering
@@ -106,8 +105,22 @@
   acted on there by widening nothing.** gate-sdk/SPEC.md §Consumer payload: a target joins only
   when a green run has produced and exercised its artifact, not when a platform is reasoned
   about and not when a provider merely offers a runner for it. No such run exists for any triple
-  but `x86_64-unknown-linux-gnu`, so the roster widens by zero until `platform-support-ci-matrix`
-  produces one. A leg written and never run discharges nothing.
+  but `x86_64-unknown-linux-gnu`, so the roster widens by zero. A leg written and never run
+  discharges nothing.
+  **THE BLOCK CONDITION AS PREVIOUSLY STATED WAS FALSIFIED 2026-08-26 and is corrected here.** It
+  read that the roster "widens by zero until `platform-support-ci-matrix` produces one" — making a
+  green run the sufficient condition. It is not. **THE CRATE DOES NOT COMPILE FOR
+  `x86_64-pc-windows-msvc` AT ALL**, measured on a native Windows runner at that leg's round 2 and
+  routed here by the lead as this entry's own subject rather than that leg's:
+  `native/src/gates/gate_binary_fresh.rs:13` takes `std::os::unix::fs::PermissionsExt`
+  unconditionally and `:15` calls `.mode()` — E0433 and E0599, `build-native` exits 101 — and three
+  further unix-only uses sit behind that first failure at `proc.rs:69`, `proc.rs:337` and
+  `install.rs:165`, so the fix is a portability pass over four modules rather than one line. Cargo
+  itself is fine on that host: the index updates and every dependency compiles clean.
+  **So a target now needs TWO things this entry must hold apart** — a host the crate *builds* for,
+  and a green run that produces and exercises the artifact. The second was the only one recorded;
+  for Windows the first is what actually binds, and it is upstream of everything the CI leg can
+  buy. Whether the same holds for the Darwin triples is UNMEASURED and is not assumed either way.
   **The filed design fork is settled and is no longer why this waits.** Cross-compilation versus
   a matrix of runners: `.github/workflows/publish.yml` already derives its build legs from the
   roster and runs each on its own mapped runner, so the matrix-of-runners shape is landed.
@@ -3504,6 +3517,12 @@
   louder cost — the absent state makes a CORRECT merge unexecutable, so duplicates accumulate by
   construction and each one keeps drawing re-filings. That converts the entry from accounting
   hygiene into a live blocker, and it is the ground a promoting scope should weigh.
+  **THE WORKED EXAMPLE IS LIVE AND IS `payload-derivation-ships-untracked-residue`**, sharpened
+  2026-08-26 when the absorbing entry SHIPPED while the absorbed one kept its pool slot with every
+  ground discharged. That close ruled — lead-confirmed — that both remaining slots lie: `## Done`
+  asserts a deliverable that never shipped and the icebox asserts latent work that does not exist,
+  so the specimen is HELD rather than disposed of, because disposing of it is this entry's own
+  question and pre-empting that destroys the instance.
   **FIRST RECURRENCE 2026-08-24, by a SECOND ROUTE into the class the body does not name.**
   `install-step-relocation` reached `## Done` at this iteration's scope, on an operator ruling,
   **retired as mooted** — its work became unnecessary rather than being merged into a sibling. It
@@ -8356,6 +8375,38 @@
   with its own spec — the honest state, and a standing invitation to re-derive which one is right.
   The exposure grows with every platform leg the roadmap's `next/reliability` tag commits to.
   Filed 2026-08-26 by close, draining the gap inbox; found at build against the Windows leg.
+
+- **payload-symlink-unextractable-on-windows** [design-pending] — the payload's tracked-set copy
+  cannot reproduce the tree on Windows: `tar` refuses the one tracked symlink and aborts.
+  `scripts/pack-installer.sh`'s `pack_tracked()` vendors through `git archive "$COMMIT" | tar -x`.
+  On a native Windows host that pipeline fails on
+  `gate-sdk/gate-tests/check-tree-terms/good/tree/dangling-link` — `tar: Cannot create symlink to
+  <its target>: No such file or directory`, then `Exiting with failure status` — and the path is
+  absent afterwards, so the assembly does not merely warn, it aborts mid-kit.
+  **The mechanism is precise and it is not git's.** `core.symlinks` is `true` on the runner, so git
+  would honour the link; `tar` is the refuser, and it refuses because the link is **dangling**.
+  Windows picks the file-versus-directory symlink kind from the target, so a target that does not
+  exist has no kind to pick. A resolvable symlink is untested and may well pass.
+  **Measured 2026-08-26 at close** on `windows-latest` under Git-for-Windows bash, at
+  `platform-support-ci-matrix` round 2, which owns the full harvest. Routed here by the lead, and
+  a new entry rather than a home in `payload-derivation-ships-untracked-residue` — that entry is
+  the near miss and the wrong home, its subject being untracked content *shipping* where this is
+  tracked content *not surviving*, the opposite failure in the same file.
+  **WINDOWS-ONLY, AND THAT IS THE SCOPING, not a hedge: this files, it does not earn a hotfix.**
+  Re-verified first-hand on Linux at this close — `git archive HEAD -- <the link> | tar -x` exits 0
+  and lands the dangling symlink intact — and validate's own fold corroborates it, `installer_smoke`
+  having driven `pack-installer.sh` through all four call sites and failed only on the baselined
+  binary-less row. No adopter on a measured platform is impacted today.
+  **Why `[design-pending]`, and the fork is worth more than the fix.** The narrow repair is to make
+  the pipeline tolerate an unextractable link (`tar --skip-old-files`-style, or resolve the fixture
+  to a live target). The wider question the offending path poses is whether `gate-tests/` belongs
+  in the consumer payload **at all** — the blocker is test-fixture content, shipped to adopters who
+  never run the fixtures, so the narrow fix may be repairing the transport of something that should
+  not be in transit. This entry poses that question without answering it.
+  **Cost while deferred:** the first Windows host to get past the crate-portability blocker meets
+  this one immediately, so it is sequenced dead behind
+  `gate-binary-target-roster-widening` and will be the next thing measured whenever that moves.
+  Filed 2026-08-26 by close from the Windows harvest, on the lead's routing ruling.
 
 ## Icebox
 
