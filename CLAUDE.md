@@ -30,7 +30,9 @@ per-kit runner lives in [README.md](README.md) §This repo, governed.
 The git index is shared with any concurrent session: check `git status` for a
 foreign staged path before `git add`, or stage and commit in one motion.
 
-A master push is verified against the remote oracle: watch the `gates` workflow
+Internal work lands as **direct commits to master and never rides a pull
+request** — the PR channel is inbound-only, for external contributors. A master
+push is verified against the remote oracle: watch the `gates` workflow
 to green (`gh run watch`) before calling the push done — and **budget one to two
 pushes per iteration**. Commits accumulate locally and ride a single watched push
 at close; a release tag earns the second run (`publish`). Every push also costs a
