@@ -8282,8 +8282,5 @@
 
 ## Done
 
-- close-entry-baseline-bootstrap-deadlock
-- linux-install-smoke-ci-leg
-
 ## Lessons Learned
 
