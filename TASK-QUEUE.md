@@ -8318,15 +8318,5 @@
 
 ## Done
 
-- gate-binary-target-roster-widening
-- payload-symlink-unextractable-on-windows
-- dead-queue-citation-report
-- absorbed-duplicate-disposition
-- relayed-ruling-provenance-unrecorded
-- kfric-empty-log-ambiguity
-- validate-baseline-suite-coverage
-- isolated-child-liveness-hook-displaces-its-report
-- payload-derivation-ships-untracked-residue
-
 ## Lessons Learned
 
