@@ -3443,7 +3443,19 @@
 - **absorbed-duplicate-disposition** [design-pending] — the queue has **no third state between
   live and done** for a slug merged away as a duplicate, so an absorbed entry is counted as a
   shipped deliverable.
-  recurrence: absorbed-duplicate-disposition 2026-08-24
+  recurrence: absorbed-duplicate-disposition 2026-08-24 2026-08-26
+  **SECOND RECURRENCE 2026-08-26, and it is the first instance where the missing state BLOCKED a
+  merge rather than mis-counting one that happened.** The close found two live entries owning one
+  gap — `pack-installer-vendors-untracked-scratch` and
+  `payload-derivation-ships-untracked-residue`, the second filed by the previous close's drain
+  against a mechanism the first already named — ruled the merge correct, and could not execute it.
+  The lead's ruling is the reason and it belongs here: `## Done` asserting work that never shipped
+  is a false statement in a governance surface, and that is worse than the duplication it would
+  resolve. So the two stay live and cross-referenced. THE WIDENING: the body above reads the cost
+  as silent and per-instance, inflating a KPI nobody can audit. This instance shows a second,
+  louder cost — the absent state makes a CORRECT merge unexecutable, so duplicates accumulate by
+  construction and each one keeps drawing re-filings. That converts the entry from accounting
+  hygiene into a live blocker, and it is the ground a promoting scope should weigh.
   **FIRST RECURRENCE 2026-08-24, by a SECOND ROUTE into the class the body does not name.**
   `install-step-relocation` reached `## Done` at this iteration's scope, on an operator ruling,
   **retired as mooted** — its work became unnecessary rather than being merged into a sibling. It
@@ -6741,6 +6753,14 @@
   contaminating run: `installer/consumer-smoke/run-smoke.sh` failed on a tree where nothing but the
   battery had run. So the masking is not a property of the battery, and a standalone suite is not
   the trigger it was thought to be.
+  **DUPLICATE OF `payload-derivation-ships-untracked-residue`, and the merge is BLOCKED rather
+  than undone.** That entry was filed 2026-08-25 by the previous close's drain, naming this same
+  `cp -R` and this same broken `git add`; it additionally reaches `:102`'s `installer/.`, which
+  this entry never named. The 2026-08-26 close ruled the merge correct and could not execute it:
+  the only destination `check-task-conservation` sanctions for a dropped slug is `## Done`, and
+  `## Done` asserting a deliverable that shipped nothing is a worse defect than the duplication.
+  Cross-referenced instead, on the lead's ruling. Read the two together until
+  `absorbed-duplicate-disposition` lands the third state that lets one absorb the other.
   recurrence: pack-installer-vendors-untracked-scratch 2026-08-24 2026-08-25
   Filed 2026-08-23 by validate and re-dispositioned by validate the same day; the 2026-08-23
   close drain read both bullets as one disposition and re-ran its probes inside the battery
@@ -8082,6 +8102,16 @@
   **Cost while deferred:** a release can hand an adopter a payload that cannot install, and the
   trigger is any tool in this tree leaving scratch under a packed root — which the battery's own
   fixture runner has done once.
+  **DUPLICATE OF `pack-installer-vendors-untracked-scratch`, which has been live since 2026-08-23
+  and carries two dated recurrences.** This entry was filed one iteration later by a drain that
+  did not find it; the drain's own premise correction (`find` -> `cp -R`) is the tell, since that
+  is the mechanism the older entry already named. What this entry holds that the older one does
+  not: `installer/.` at `:102` as a second instance, the `git ls-files` candidate fix, and the
+  packing-refuses check class. The 2026-08-26 close ruled the merge correct and could NOT execute
+  it — the only destination `check-task-conservation` sanctions for a dropped slug is `## Done`,
+  which would assert a deliverable that shipped nothing. Cross-referenced instead, on the lead's
+  ruling; `absorbed-duplicate-disposition` owns the missing third state that would let one absorb
+  the other, and this pair is its sharpest instance.
   Filed 2026-08-25 by close, draining the gap inbox; found at build.
 
 - **boundary-wipe-preserve-lifetime-scope** [design-pending] — the iteration-boundary scratch wipe
@@ -8201,8 +8231,16 @@
   **Probed rather than reasoned, at this close.** Feeding a three-line sample through
   `grep -nE -f scripts/msg-patterns.list` matches the singular line and matches NEITHER plural: the
   noun alternation is `(account|login|username|handle)` followed by a required non-letter, and a
-  trailing `s` is a letter. The reach is wider than the limit was reported as — `accounts` slips
-  with `logins`.
+  trailing `s` is a letter, so the boundary fails in BOTH orderings of the shape. The reach is
+  wider than the limit was reported as — `accounts` slips with `logins`.
+  **THE HOLE IN THE FORM THAT MATTERS, because the plural is not an exotic phrasing but the
+  natural way to write the exact leak this pattern exists to catch.** A sentence of the shape
+  *"the accounts were X and Y"*, with X and Y handle-shaped and backticked, passes both readers
+  clean — while the singular *"the account is X"* reds. So the guard is strongest against the
+  phrasing that names ONE identity and weakest against the phrasing that names SEVERAL, which is
+  the correlation case, and inverts the pattern's own stated rationale that naming an account
+  correlates identities. The bad-fixture sentence a fix should pin is that one, not a contrived
+  minimal pair.
   **Where the limit currently lives, and why that is the filing's whole point.** It is stated in
   commit `234edaa5`'s body ("the plural form slips: tolerating it was measured and still costs
   three rewordings of prose that is not wrong") and NOWHERE in `gate-sdk/SPEC.md`
@@ -8221,6 +8259,36 @@
   one letter, and nobody reading the SPEC learns that — the section's stated scope reads as
   complete.
   Filed 2026-08-26 by close, triaging a build finding relayed through the lead.
+
+- **survey-engagement-trigger-narrower-than-its-class** [design-pending] — the `survey-engagement`
+  audit row fires on "every **scope** survey that ranks or recommends against an entry", and the
+  behaviour the class audits is not scope-specific, so a qualifying survey bought by any other
+  stage is invisible to it.
+  **The gap fired 2026-08-26 and the row had to decline on wording, which is how it was found.**
+  That close read both of the iteration's surveys rather than counting them. Scope's — "Is the
+  native port's tail actually blocked, and what does unblocking it cost?" — ranks no cohort and
+  recommends against no entry; its direction is the opposite, arguing an entry is LESS blocked
+  than believed. Build's — "What would a per-platform CI leg cost, and can any triple beyond
+  x86_64-unknown-linux-gnu satisfy the roster's join criterion today?" — recommends against
+  sharply and with its oracle written down: *zero triples satisfy the join criterion today*,
+  because no green run has produced or exercised an artifact anywhere else. So the class's own
+  subject occurred, in a durable tracked record, and the row could not reach it.
+  **Deliverable:** one word — `due:` reads "every survey that ranks or recommends against an
+  entry". The audit itself is unchanged; only which surveys enter its corpus moves.
+  **Why `[design-pending]` for a one-word edit, and this is the whole of it:** a `due:` trigger is
+  a STANDING OBLIGATION on every later close, so widening it is a scope decision rather than an
+  edit slipped in after a stamped close. Lead-ruled 2026-08-26 on exactly that ground. The
+  reserved call is whether the widening should be unqualified or should name the stages that can
+  buy a survey, since a trigger that admits every stage also admits stages whose surveys are
+  routinely costing rather than ranking.
+  **Cost while deferred:** two parts, and the second is the one a scope should price. Per
+  iteration, a qualifying non-scope survey goes unaudited and the row records a decline where the
+  class actually fired — already true once, with the evidence sitting in that row. And on landing,
+  the widening imposes an audit-cost delta on every future close: the corpus grows from scope's
+  surveys to all of them, which is more reading per close, forever. Nothing is lost meanwhile —
+  the 2026-08-26 decline is recorded WITH CAUSE in the row itself, which is the exact surface a
+  promoting scope reads.
+  Filed 2026-08-26 by close, on the lead's ruling, from the close's own audit-roster review.
 
 ## Icebox
 
