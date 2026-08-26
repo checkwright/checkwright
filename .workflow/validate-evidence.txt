@@ -1,5 +1,5 @@
 # contract: evidence-manifest v1
-platform-reach-and-target-roster gates sha256=ae9659df8361c110c81853676611053944418e96c48c4934a40b44739fc1ea06 pass=106 fail=0 ignore=0 verdict=clean 2026-08-26
+platform-reach-and-target-roster gates sha256=5097faabbb73d7921e9ac4f154d8c6d1d01b6bcc57f829c34e525ce9dab481d8 pass=106 fail=0 ignore=0 verdict=clean 2026-08-26
 platform-reach-and-target-roster gate_sdk sha256=18f97d208af9a317d22c58c12390a5c319f2cc0e9aa17cba778edc64cc5344fd pass=1 fail=0 ignore=0 verdict=clean 2026-08-26
 platform-reach-and-target-roster canon_kit sha256=9d3cf3ab0a1425a5996fd26152019ba03a3e0f5fa5ad31aa0e4a19901b8acb5a pass=1 fail=0 ignore=0 verdict=clean 2026-08-26
 platform-reach-and-target-roster context_kit sha256=65e7536ec8b920506d9defb5f2fd338be716ee72482acf2e4819ca5b3fcbe891 pass=1 fail=0 ignore=0 verdict=clean 2026-08-26
@@ -16,10 +16,10 @@ platform-reach-and-target-roster usage_tests sha256=04968d303b3e4ec54f3f8033f0e7
 platform-reach-and-target-roster budget_guard_tests sha256=94bbe0c41f3993e3c748a492d29e2a0d22139825b8c53bbae6a528500a8ce402 pass=1 fail=0 ignore=0 verdict=clean 2026-08-26
 platform-reach-and-target-roster dispatch_guard_tests sha256=6018943502411c07fe57162c0dae2ac37af304eccc0d0a9a6e0ec4fd733a1daf pass=1 fail=0 ignore=0 verdict=clean 2026-08-26
 platform-reach-and-target-roster trend_tests sha256=acdbfef4eab851fca00ca747245b6ac4a4f804b05989f9cd3acd014bb56ac330 pass=1 fail=0 ignore=0 verdict=clean 2026-08-26
-platform-reach-and-target-roster demo sha256=b66916916f0f659dc84186b6701dc22e863dca50d8a04fd08f84f9fa44234741 pass=1 fail=0 ignore=0 verdict=clean 2026-08-26
-platform-reach-and-target-roster installer_smoke sha256=f2b6d1478c98a1309c6b68dcbf6f4797523b4e7e41052bd51e372f6b949839fd pass=0 fail=1 ignore=0 verdict=clean 2026-08-26
-platform-reach-and-target-roster consumer_smoke sha256=2a8e2afcbe439762146ce9264847f9153bc3963602486d8bb1f162b34d52244e pass=1 fail=0 ignore=0 verdict=clean 2026-08-26
-platform-reach-and-target-roster upgrade sha256=8a14db1a92c1abc80316afcbe837e48eb2cf018ed101ce9739cea5648c45ffae pass=1 fail=0 ignore=0 verdict=clean 2026-08-26
-platform-reach-and-target-roster agents_md_smoke sha256=744abf1f41027acf69eff93432f1ae189b1330746bdff19ab17e033055129bee pass=1 fail=0 ignore=0 verdict=clean 2026-08-26
+platform-reach-and-target-roster demo sha256=611c82d29b827aa6bcbc9c05aabcdef6897af51aa2bb8afd781633199232e5f4 pass=1 fail=0 ignore=0 verdict=clean 2026-08-26
+platform-reach-and-target-roster installer_smoke sha256=0ee513e0b16331a0ca18c877eb22a2ed8fb66e11ec414187ae974a4a01610e76 pass=0 fail=1 ignore=0 verdict=clean 2026-08-26
+platform-reach-and-target-roster consumer_smoke sha256=3c5cedf4796716aebe16fdc9895a693db1426b85bc81a3a27badbfa50a544413 pass=1 fail=0 ignore=0 verdict=clean 2026-08-26
+platform-reach-and-target-roster upgrade sha256=e932355665d7f14e5fdff15b62a84f2c7219a7b1bfb06bfba68fa77d89c11341 pass=1 fail=0 ignore=0 verdict=clean 2026-08-26
+platform-reach-and-target-roster agents_md_smoke sha256=45ba14b4ea4c1209fbf65386f3f6a55fe21322768b1885e7ae16bbdd2f53860d pass=1 fail=0 ignore=0 verdict=clean 2026-08-26
 platform-reach-and-target-roster index_tests sha256=e14e152466dc5be0296b1e20575bf3d587e1e0a127e7c63ad57671dbcaeaddb8 pass=1 fail=0 ignore=0 verdict=clean 2026-08-26
-platform-reach-and-target-roster native_crate sha256=afa893d2263848f3f54316f6bd2a3094d28c09dea92c8a6a620f7879842d799b pass=1 fail=0 ignore=0 verdict=clean 2026-08-26
+platform-reach-and-target-roster native_crate sha256=78935d755e1c12e6f2e4c7545ad210cce4931b0d32f597af1afcb4f8d356ed1c pass=1 fail=0 ignore=0 verdict=clean 2026-08-26
