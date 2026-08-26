@@ -58,9 +58,9 @@ everything else to
 
 ### next
 
+- **`gate-binary-target-roster-widening`** *(reliability)* — A prebuilt gate binary for every platform the project says it supports.
 - **`platform-support-ci-matrix`** *(reliability)* — A CI install-smoke leg per supported platform, or an honest label.
 - **`macos-install-smoke-ci-leg`** *(reliability)* — A CI install-smoke leg on macOS, so the platform claim has a run behind it.
-- **`gate-binary-target-roster-widening`** *(reliability)* — A prebuilt gate binary for every platform the project says it supports.
 - **`companion-toolkit-profile`** *(ecosystem)* — Gate a tree whose specs another toolkit's workflow wrote.
 - **`gate-authoring-sdk-surface`** *(ecosystem)* — Author a gate in any language behind one substrate-neutral descriptor.
 

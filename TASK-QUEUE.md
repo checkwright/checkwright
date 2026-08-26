@@ -12,6 +12,345 @@
 
 ## New Features
 
+- **gate-binary-target-roster-widening** [spec: SPEC-win-build.md] [roadmap: next/reliability] — the
+  binary ships one triple, and no run has produced an artifact anywhere else.
+  roadmap-summary: A prebuilt gate binary for every platform the project says it supports.
+  `native/targets.list` declares exactly one target triple, so the last release published one
+  binary and every adopter off that triple takes the omit-and-declare outcome — a supported
+  result rather than a break, leaving the objective naming every major OS nothing on that axis.
+  **What holds this is the governing spec, not a design fork.** gate-sdk/SPEC.md §Consumer
+  payload: a target joins only when a green run has PRODUCED AND EXERCISED its artifact, never
+  when a platform is reasoned about or a provider merely offers a runner. No such run exists for
+  any triple but `x86_64-unknown-linux-gnu`, so the roster widens by zero.
+  **A green run is NOT the sufficient condition, falsified 2026-08-26. THE CRATE DOES NOT COMPILE
+  FOR `x86_64-pc-windows-msvc` AT ALL**, measured on a native Windows runner at that leg's round
+  2: `native/src/gates/gate_binary_fresh.rs:13` takes `std::os::unix::fs::PermissionsExt`
+  unconditionally and `:15` calls `.mode()` — E0433 and E0599, `build-native` exits 101. Cargo
+  itself is fine there: the index updates and every dependency compiles clean.
+  **THE SIZING IS FALSIFIED TOO — "a portability pass over four modules" — re-verified against
+  the tree at the 2026-08-26 scope, and this is what a promoting stage plans against.** THREE of
+  the four sites named were already portable, in two idioms: `proc.rs:67` and `install.rs:163`
+  are `#[cfg(unix)]`/`#[cfg(not(unix))]` twin FUNCTIONS, while `proc.rs:335` is an inline
+  `#[cfg(unix)]` BLOCK in `exit_code` that vanishes on non-unix and falls through to `2`, needing
+  no twin. Each cfg predates the measurement (`e3abf907`, `da6c6645`, both ancestors of head
+  `261231d2`), so the three-further-uses claim was a grep read past the compiler's first error
+  batch. **ONE un-gated site exists**, `gate_binary_fresh.rs:12-17`, a local `is_executable`
+  duplicating `proc.rs`'s portable one, so the repair is a DE-DUPLICATION. **Honest limit:** a
+  census of all 139 `.rs` files found no other site but cannot prove absence — a compiler halts
+  at its first batch, so only a real `cargo check --target` proves the build.
+  **TWO MORE BLOCKERS JOIN HERE, operator-ruled 2026-08-26**, amending that day's earlier routing
+  of both to `powershell-installer-surface` (TRAJECTORY.md §The closed rulings owns the ruling
+  and its grounds): `gate-sdk/bin/build-native.sh:68`'s `BN_ART` names the cargo artifact
+  suffix-less where a Windows toolchain emits `<name>.exe`, and `installer/lib/init.sh:98`'s
+  `target_of_host()` maps Linux and Darwin alone, so a `MINGW64_NT-*` host matches nothing.
+  `BN_ART` is unreachable until the crate compiles, so it sits behind the de-duplication.
+  **So a target needs TWO things this entry holds apart** — a host the crate *builds* for, and a
+  green run that produces and exercises the artifact. For Windows the first binds and is upstream
+  of everything the CI leg can buy. The Darwin triples are UNMEASURED, assumed neither way.
+  **The filed design fork is settled and no longer why this waits:** `.github/workflows/publish.yml`
+  already derives its build legs from the roster onto mapped runners, so that shape is landed.
+  **What widening costs — "one roster line plus one runner mapping" was the publish half alone.**
+  Beside it sits `installer/consumer-smoke/run-smoke.sh:43-44`, which stops the whole smoke
+  through its `blocked()` helper at `:17` unless the roster is exactly the running host. The two
+  re-entries are steering its pack with `GATE_SDK_NATIVE_TARGETS_FILE` or giving the step a
+  cross-compiling build, and `installer/README.md` §The consumer smoke records neither is built.
+  **Distinct from `powershell-installer-surface`** now that the two blockers moved: that entry
+  owns the PowerShell bootstrap and its design; this owns whether a binary exists to bootstrap to.
+  **Cost while deferred:** three of the four host classes the installer can name receive no
+  battery at all, and the port tail stays sequenced behind a roster this entry is the only mover.
+  Filed 2026-08-08 by close, draining the gap inbox; found at scope. **Tagged `next/reliability`
+  2026-08-08 by operator ruling.** Promoted 2026-08-25 at scope; deferred the same day at build
+  beside `platform-support-ci-matrix`, on an operator ruling relayed through the lead.
+
+- **payload-symlink-unextractable-on-windows** [spec: SPEC-payload-links.md] — the
+  payload's tracked-set copy cannot reproduce the tree on Windows: `tar` refuses the one
+  tracked symlink and aborts.
+  `scripts/pack-installer.sh`'s `pack_tracked()` vendors through `git archive "$COMMIT" | tar -x`.
+  On a native Windows host that pipeline fails on
+  `gate-sdk/gate-tests/check-tree-terms/good/tree/dangling-link` — `tar: Cannot create symlink to
+  <its target>: No such file or directory`, then `Exiting with failure status` — and the path is
+  absent afterwards, so the assembly does not merely warn, it aborts mid-kit.
+  **The mechanism is precise and it is not git's.** `core.symlinks` is `true` on the runner, so git
+  would honour the link; `tar` is the refuser, and it refuses because the link is **dangling**.
+  Windows picks the file-versus-directory symlink kind from the target, so a target that does not
+  exist has no kind to pick. A resolvable symlink is untested and may well pass.
+  **Measured 2026-08-26 at close** on `windows-latest` under Git-for-Windows bash, at
+  `platform-support-ci-matrix` round 2, which owns the full harvest. Routed here by the lead, and
+  a new entry rather than a home in `payload-derivation-ships-untracked-residue` — that entry is
+  the near miss and the wrong home, its subject being untracked content *shipping* where this is
+  tracked content *not surviving*, the opposite failure in the same file.
+  **WINDOWS-ONLY, AND THAT IS THE SCOPING, not a hedge: this files, it does not earn a hotfix.**
+  Re-verified first-hand on Linux at this close — `git archive HEAD -- <the link> | tar -x` exits 0
+  and lands the dangling symlink intact — and validate's own fold corroborates it, `installer_smoke`
+  having driven `pack-installer.sh` through all four call sites and failed only on the baselined
+  binary-less row. No adopter on a measured platform is impacted today.
+  **Why this needed design, and the fork is worth more than the fix.** The narrow repair is to make
+  the pipeline tolerate an unextractable link (`tar --skip-old-files`-style, or resolve the fixture
+  to a live target). The wider question the offending path poses is whether `gate-tests/` belongs
+  in the consumer payload **at all** — the blocker is test-fixture content, shipped to adopters who
+  never run the fixtures, so the narrow fix may be repairing the transport of something that should
+  not be in transit. This entry poses that question without answering it.
+  **Cost while deferred:** the first Windows host to get past the crate-portability blocker meets
+  this one immediately, so it is sequenced dead behind
+  `gate-binary-target-roster-widening` and will be the next thing measured whenever that moves.
+  Filed 2026-08-26 by close from the Windows harvest, on the lead's routing ruling.
+
+- **relayed-ruling-provenance-unrecorded** [spec: SPEC-ruling-authority.md] — a relayed
+  operator ruling lands in a tracked governance surface as "operator-directed" with no
+  provenance a later reader can check.
+  **Found by the harness's own security review**, which flagged the 2026-08-18 `gh` account-restore
+  ruling as possible instruction poisoning: the recording session had landed an operator direction
+  authorizing an elevated-credential account switch and a push to master, deviating from the local
+  release runbook, while its own transcript contained no operator message at all.
+  **The authorization was genuine** — the operator selected it through the harness question
+  mechanism in the lead session — so this is not an incident report; the flag was correct to fire
+  on what it could see.
+  **The gap:** under the split-posture lead architecture (lifecycle-kit/templates/lead.md) an
+  operator ruling reaches a stage session as a peer message and is landed in the queue as
+  "operator-directed". Nothing in the tracked record distinguishes a genuinely relayed ruling from
+  one a compromised or confused lead invented, and the reviewing layer cannot see the lead's
+  transcript. The class most often relayed this way is the highest-consequence one — credentials,
+  pushes, releases, runbook deviations.
+  **DISTINCT from `delegation-provenance-floor`**, which is a *parent* relaying a *child's* return
+  that never arrived; this is a *child* recording a *parent's* ruling into a permanent tracked
+  surface, where the artifact outlives every session that could attest it.
+  **Why this needed design, and it is envelope-class:** three shapes, none ruled — the lead cites
+  the authorization channel and turn in its relay and the recording session records that citation
+  alongside the ruling; or operator-class rulings are landed by the operator directly rather than
+  relayed; or a provenance field on ruling records naming how the authorization arrived, so an
+  unverifiable one is visibly unverifiable rather than indistinguishable.
+  **The first shape was PRACTISED 2026-08-19, one day after filing, and the trial is worth more
+  than the entry's prose.** The lead relaying five rulings stated the authorization channel
+  unprompted — three questions put to the operator through the harness's question mechanism, each
+  answered by selecting the recommended option, not free text and not the lead's inference — and
+  the recording session carried that citation onto each ruled entry, where an auditor now has it.
+  **Two limits the trial exposed, both owed an answer.** The citation is still the relaying
+  party's own word about a channel the tracked record cannot reach, so it raises the cost of
+  inventing a ruling without making an invented one detectable. And it **did not fit twice**:
+  `close-entry-baseline-bootstrap-deadlock` and `stage-stamp-ordering-unenforced` took their
+  rulings at 0–1 lines of headroom and carry no channel, the displacement class
+  queue-kit/SPEC.md §check-queue-entry-budget's split criterion now decides.
+  recurrence: relayed-ruling-provenance-unrecorded 2026-08-24 2026-08-25
+  **A FOURTH SHAPE, AND IT CONSTRAINS THE OTHER THREE: the field must record WHO RULED, with
+  "lead, own authority" a first-class value rather than an absence.** All three above record only
+  HOW an authorization arrived, and 2026-08-24 fired in the direction none catches — a lead's own
+  ruling recorded as the OPERATOR's, corrected at gate-sdk/SPEC.md §check-gate-fail-closed, which
+  names the lead and says commit `0153a5c9` misattributes it and is deliberately not rewritten.
+  The same iteration also caught the lead attributing a lead ruling to the operator: both
+  over-attribute upward, and since "operator-ruled" marks a decision a later session may not
+  reverse alone, this direction is a false FLOOR on re-ruling where the filed shape is a false
+  CEILING on verifiability.
+  **Cost while deferred:** silent and audit-side. Every relayed ruling already in the queue carries
+  the same unverifiable provenance, the tracked record is all a later auditor or a fresh session
+  has, and it will not red a gate — it surfaces as a security flag on an honest session, which is
+  where it surfaced.
+  Surfaced 2026-08-18 by the harness security review of `wide-budget-batch-and-hold-declaration`'s
+  close and filed to the gap inbox there; promoted 2026-08-18 by the following scope.
+
+- **dead-queue-citation-report** [spec: SPEC-retired-citations.md] — an in-body citation
+  that resolves to no live entry reads exactly like one that does, and nothing names the
+  difference.
+  recurrence: dead-queue-citation-report 2026-08-14 2026-08-25
+  **THIRD instance, 2026-08-25, found first-hand by the very scope survey it was predicted to
+  mislead.** `plugin-marketplace` read "The upgrade/uninstall story itself is
+  `installer-lifecycle-verbs` below — sequence against it rather than duplicating it", and no
+  entry of that slug exists anywhere in this file: the work landed, the citation kept a
+  directional pointer, and a live entry went on instructing a future promoting session to
+  sequence against a sibling that is not there. The cost field's own sentence, occurring — a
+  false premise in a survey input at the moment a scope decides what to promote — and the
+  battery was clean throughout, since `check-task-conservation` reads membership and a body
+  citation is not a membership claim. Corrected inline in the commit that stamped this date, so
+  the class is what remains and the instance misleads nobody else.
+  queue-kit/SPEC.md §The tag algebra rules the in-body single-backtick slug a *reference*
+  rather than a membership claim, aggregated by `bin/queue-edges.sh` and "audited by
+  nothing". That is a deliberate choice and stays right — entries legitimately name landed
+  work and no gate may punish it — but its cost is now attested rather than hypothetical.
+  **Re-attested 2026-08-14**, one iteration after the last correction and inside a single
+  iteration's own lifetime: `consumer-gate-port-disposition`, filed that morning at scope,
+  cited `port-corpus-grouping-census-unbought`, a slug resolving nowhere in the tree. The
+  citing text was rewritten later the same day for an unrelated reason (`a8354823`), so the
+  instance is gone and the class is not — nothing found it but a reader.
+  `check-queue-slug-liveness` does not reach it: the citation is backticked prose, which the
+  SPEC deliberately rules a reference rather than a membership claim.
+  **The attestation.** Three ruled-and-deleted slugs were cited across four live entries, and
+  two of those entries argued *from* them in the present tense: one framed a "Boundary with
+  the two live companions" whose companions were both dead and settled. A scope session
+  ranking such an entry reads closed rulings as open questions, which is a false premise in a
+  survey input. Both were corrected inline at the 2026-08-06 close; nothing stops the next.
+  **Why a report and not a gate**, which is the design half already half-answered. A red is
+  wrong here by the SPEC's own reasoning, so the cheapest true form is a *listing*:
+  `bin/queue-edges.sh` already resolves every in-body citation against the live set and drops
+  the misses on the floor, so naming them costs one output section and no new scan — the
+  no-red posture kept, the silence ended.
+  **What is genuinely open:** where the listing is read (a close step, a scope survey input,
+  or both), and whether a citation of *landed* work should be distinguishable in prose at all
+  — a grammar question the SPEC left unanswered when it refused a relational vocabulary, and
+  answering it the wrong way re-imports the maintained-roster anti-pattern that refusal avoided.
+  **HELD TWICE AS A BUNDLE MEMBER — 2026-08-25 on directive priority, and again 2026-08-25
+  operator-ruled at the threshold escalation.** The hold is the citation-liveness bundle's, not
+  this entry's: it is cluster B's report-only half, riding the resolution `bin/queue-edges.sh`
+  already performs, so separating it re-buys the cluster's context for the cheapest member.
+  **FOURTH INSTANCE, self-caught: the roster pointer here was one.** It read "recorded in the
+  survey record", a surface `bin/enter-stage.sh` truncates at every iteration boundary, so it
+  resolved to nothing one boundary later — exactly as filed. Repointed to
+  `citation-liveness-family-convergence`, which carries the finding and its witness inline for
+  this reason; re-run that witness before citing it.
+  **Cost while deferred:** dead citations accumulate at the rate rulings close, and each is a
+  false premise sitting in a survey input at exactly the moment a scope decides what to promote.
+  Filed 2026-08-06 at close, draining the gap inbox; found 2026-08-06 at scope.
+
+- **kfric-empty-log-ambiguity** [spec: SPEC-kfric-zero.md] — an empty knowledge-friction
+  log is read as no friction, and it is equally consistent with no capture.
+  recurrence: kfric-empty-log-ambiguity 2026-08-17 2026-08-23
+  **The 2026-08-23 date is a direct stamp too, and the corroboration is the strongest yet.**
+  `battery-runner-port` ran six stage sessions plus a consult and the log read **empty**, while
+  that iteration's prompt log records at least four history-archaeology reads shaping a new
+  deliverable: a build session reading commit `e3579fda`'s diff to locate pipe sites, a session
+  archaeologising when `check-crate-arms`'s cache was introduced, a spec session reading a
+  *deleted* amendment (`SPEC-eighth-cut.md`) to shape a new one, and this close reading a prior
+  close's commit to shape its own. Four events, zero stamps.
+  **The 2026-08-17 date is a direct stamp, and its grounds are first-person.** The log read
+  **empty** at this close across a six-session iteration — and the closing session itself
+  re-derived a fact no doc owns (that `git log -S` misses an eviction leaving the slug behind)
+  and did not run `kfric.sh`, filing `queue-recovery-pickaxe-wrong-oracle` instead. The survey
+  record shows scope re-deriving the *same* fact independently earlier in the same iteration.
+  Two events, one fact, zero stamps: stronger than the founding attestation, which had to infer
+  its unstamped event from the prompt log. Stamped directly, out of channel, under the rule this
+  iteration landed as obliged (lifecycle-kit/SPEC.md §The committed gap inbox).
+  **The founding attestation, 2026-08-06, is the same shape one grade weaker** — the log read
+  **empty** across an iteration that added a Rust module, a source stamp and a gate, while its
+  prompt log records a build session reading a *deleted* `.gate` descriptor out of git history to
+  shape the one it was writing, the class `bin/kfric.sh` exists to stamp. Not stamped, nothing
+  noticed, and inferred from the prompt log rather than observed.
+  **The reader is what makes it expensive.** `kpi-knowledge-friction` trends the log toward
+  zero and reads that trend as the tier contract's holes filling. A sensor with an
+  in-the-moment capture discipline and no independent floor cannot tell a filled hole from an
+  unstamped one, so the KPI reads best exactly where it is least trustworthy.
+  **Why this needed design:** the honest answers differ in kind. A corroborating signal is
+  cheap and weak — the prompt log already records history archaeology and close already reads
+  both surfaces. A per-stage capture prompt is stronger and is precisely the standing-
+  instruction tax context-kit's brevity machinery rejects. Stating the limit on the KPI
+  instead — an empty log is not evidence of zero — costs one line and buys no detection.
+  Which is right turns on whether the KPI is meant to be trusted at zero, a contract call.
+  **Cost while deferred:** the one KPI measuring the tier contract's completeness reads best
+  exactly when nobody is capturing, and no other signal contradicts it.
+  **FIVE HOLDS, none a decline of the finding, and they are not five of a kind.** Three were
+  2026-08-24 on the surface criterion, one of them operator-ruled; the fourth, 2026-08-25, was
+  directive priority under an undirected boundary the operator ruled to the port's bootstrap.
+  **The FIFTH, 2026-08-25, is operator-ruled on the surface criterion** — the promoted CI-legs
+  and target-roster set touches no part of drift-kit's capture loop. What makes it a ruling rather
+  than a default is that both alternatives were put up and **declined**: taking the capture-loop
+  trio now, and ruling a named future iteration for it. Neither was taken, so this entry carries
+  no forward claim on a boundary. No date joins a hold — a decline is not a firing — and the log
+  read **empty** again at this boundary, the expected reading at an iteration's open.
+  **The pairing no hold has yet carried:** `kfric-obligation-residency` is this entry's
+  writer-side twin — that entry is the capture obligation never reaching the writer, this is how
+  an empty log may be read once it has — and both resolve alongside
+  `recurrence-obligation-residency` under delegation-kit/SPEC.md §Operative residency. A unit
+  taking the capture loop takes all three; this one alone leaves the writer unserved.
+  Filed 2026-08-06 at close, from its own knowledge-friction sweep.
+
+- **validate-baseline-suite-coverage** [spec: SPEC-baseline-grain.md] — two validate suites carry no
+  held-constant-red baseline row, so a regression in either passes the baseline arm silently.
+  **Verified at the 2026-08-14 drain by diffing the two files' suite columns**, not taken from
+  the bullet: `.workflow/validate-baseline.txt` carries rows for **22** suites while
+  `run-validate.sh` runs **24**. The two with no row are `dispatch_guard_tests` and
+  `native_crate`.
+  **Pre-existing, and an omission rather than lag.** Both suites predate the baseline's last
+  edit (`eb94126b`, 2026-08-13), so nothing about this iteration introduced it.
+  **The consequence is narrow and real.** `diff-baseline` flags a *new* failure against a
+  *listed* scenario, so a regression in either suite is caught only by the suite failing
+  outright — which is exactly the coverage the held-constant mechanism exists to add on top of.
+  `native_crate` is the sharper half: it is the crate's own 92-test suite, it now spans a
+  dependency graph and an MSRV floor that both moved this iteration, and it is the arm the next
+  port cohort leans on hardest.
+  **Why this needed design and not a two-line fix:** which scenarios are worth holding constant
+  is an evidence-kit judgment, not a mechanical backfill — a baseline row is a *claim* that a
+  verdict is expected to stay put, and adding twenty-four rows because twenty-four suites exist
+  is the maintained-roster shape derivation-first refuses. The design call is whether the
+  baseline is per-suite or per-scenario for a suite this size.
+  **DISTINCT from `baseline-row-prose-coupling-gate`**, which is prose asserting what the
+  baseline holds; this is the baseline not holding it.
+  **Cost while deferred:** the two suites keep their weakest protection while the crate is the
+  fastest-moving surface in the tree.
+  **Second instance, one granularity down — 2026-08-19, and it is the entry's own open call.**
+  The suite-level claim above re-verified unchanged (22 rows for 24 suites, the same two absent).
+  What is new: *within* the `gates` suite the run reports 104 scenarios while the baseline names
+  **75**, so 29 registered gates hold no row. Probed at the source rather than assumed
+  (`evidence-kit/lib/evidence.sh:137,156,166`): the diff is directional, so a rowless gate going
+  red is still a new-failure — what a `pass` row alone buys is that the scenario going **absent**
+  reds too. The uncovered 29 can therefore be deregistered, renamed or silently skipped with the
+  battery still green, which is a different loss from the one the suite-level half names.
+  **Third instance, 2026-08-25 at build, and it turns the open call above into a forcing case.**
+  `installer_smoke` sits on the exit-code parser, so its whole verdict is ONE scenario and its
+  baseline row is that scenario at `fail`. Enumerate the outcomes and the coverage is not thin but
+  **empty**: any non-zero exit matches the baselined fail and reads clean, and a zero is an
+  unpromoted recovery, which is also not a red. Measured by rehearsing the new CI leg's body
+  locally — the smoke printed a `FAIL` for the starter profile's init while the leg printed
+  `diff-baseline: clean` and exited 0. The failure that demonstrated it was **not** the baselined
+  one: the baselined failure is the binary-less leg's missing-gates refusal, and what actually broke
+  was an unrelated arm, absorbed silently. Where the 2026-08-19 line reports rowless scenarios
+  inside a suite, this is the degenerate end of the same axis — a suite whose single row makes the
+  mechanism assert nothing at all. The candidate remedy is a per-suite parser emitting one scenario
+  per arm, which is consumer config rather than a kit change; lead-ruled at build to leave it,
+  because it decides this entry's reserved design call out of band. Carried meanwhile:
+  `.github/workflows/gates.yml`'s install-smoke leg states the limit in its own text.
+  recurrence: validate-baseline-suite-coverage 2026-08-19 2026-08-25
+  Filed 2026-08-14 by close, draining a gap-inbox bullet the lead filed after the validate
+  session declined to act on its own finding unilaterally.
+
+- **isolated-child-liveness-hook-displaces-its-report** [spec: SPEC-worktree-reader.md] —
+  the turn-end liveness hook does exactly what it was told under worktree isolation, and
+  doing so overwrites the
+  child's report on the only channel the dispatcher reads.
+  **Attested first-hand 2026-08-25 at this scope, not predicted.** A read-only citation-liveness
+  sweep dispatched with `isolation: worktree` completed its whole survey and returned a
+  producer-liveness message instead of it. One resume round-trip carrying an explicit re-emit
+  instruction recovered the full report, so the work was not lost — it was paid for twice.
+  **The hook is not misbehaving, and that is the finding.** `native/target/release/`'s binary is
+  gitignored under `target/`, so it is absent in a fresh worktree, and
+  `scripts/subagent-stop-liveness.sh` already anticipates exactly this: under a worktree-isolated
+  dispatch, binary-dispatched gates do not resolve and "the lawful response there is to report
+  the gate as unavailable and return". It reports, as instructed. The harness then returns only
+  the child's LAST assistant message, so a correct report-and-return displaces the survey.
+  **DISTINCT from `worktree-isolated-agent-report-lost-to-a-failed-peer-send`**, promoted the same
+  session: that failure needs the child to attempt a send to an unresolvable peer. This one needs
+  no send at all — a hook the child never invoked emits the displacing message — so the two share
+  the symptom and share no trigger.
+  **DISTINCT from `worktree-isolated-dispatch-cannot-reach-the-main-checkout`, and downstream of
+  it.** That entry's subject is the child's WRITES, and its bridge is `git rev-parse
+  --git-common-dir`; this is the child's RETURN VALUE. The composition is what neither covers as
+  written: that entry's cause — a binary a worktree child cannot resolve — produces the other
+  entry's symptom, and a session reading either alone concludes it is covered.
+  **Deliverable — rule one of three.** Resolve the binary through the main checkout, which is the
+  sibling's bridge and folds this half into it; or emit the unavailability on a channel that does
+  not become the child's final assistant message; or have the hook return silently when the
+  target is a worktree it cannot resolve, which is cheap and pulls against fail-closed — the
+  reason it is a fork and not an obvious fix.
+  **Cost while deferred:** one wasted dispatch round-trip per isolated sweep, paid while the
+  dispatcher is waiting, and silent in the worse direction — the returned text reads as a
+  liveness complaint rather than as a dropped report, so a less careful dispatcher records a
+  sweep that never reported. That is a correctness risk, not an efficiency one.
+  recurrence: 2026-08-25 2026-08-26
+  **THE BIND IS STRUCTURAL, NOT A RATE — measured at the 2026-08-26 scope, which is the finding
+  that outranks every count above.** `scripts/agent-dispatch-guard.sh` REFUSES a read-only type
+  dispatched **without** `isolation: worktree`, and worktree isolation is precisely what makes the
+  binary unresolvable and arms the displacement. The guard's required remedy is what arms the
+  defect, so every read-only fan-out in this repo pays it — there is no dispatch shape that avoids
+  it while staying in contract. The record is **SEVEN FOR SEVEN across three sessions**, but the
+  rate is corroboration: a session cannot dispatch its way out of this by sampling better.
+  **The worst tail puts no ceiling on the cost.** A 2026-08-26 `align` dispatch WEDGED in a
+  Stop-hook loop across THREE resumptions, burned roughly 166k child tokens and returned nothing at
+  all, recovered only by re-dispatching fresh — a full context budget spent for zero yield.
+  **THE RECOVERY, written down because a parent meeting this has no reason to believe the report
+  still exists: resume the child by id and ask it to RE-EMIT VERBATIM, telling it explicitly not
+  to re-run the work.** Full report, first try, one round-trip at the 2026-08-26 close. Not
+  reliable — an earlier resume returned "this session just started" and that sweep was re-run —
+  and the usage block is no signal either: that re-emit reported the ORIGINAL run's tool count
+  and tokens, so the zero-tool-use shape marks some resumes and not all.
+  Attested 2026-08-25 at this scope while dispatching its own survey; filed the same session on
+  the lead's direction, before the resume journal holding it was swept.
+
 ## Technical Debt
 
 ## Deferred
@@ -93,56 +432,6 @@
   the project makes about it stays a reading rather than a measurement, and the `find -printf`
   defect above sits unfixed on the install path every macOS adopter takes today.
   Filed 2026-08-26 by build, split from `platform-support-ci-matrix` under an operator ruling.
-
-- **gate-binary-target-roster-widening** [design-pending] [roadmap: next/reliability] — the
-  binary ships one triple, and no run has produced an artifact anywhere else.
-  roadmap-summary: A prebuilt gate binary for every platform the project says it supports.
-  `native/targets.list` declares exactly one target triple, so the last release published one
-  binary and every adopter off that triple takes the omit-and-declare outcome — a supported
-  result rather than a break, leaving the objective naming every major OS nothing on that axis.
-  **What holds this is the governing spec, not a design fork.** gate-sdk/SPEC.md §Consumer
-  payload: a target joins only when a green run has PRODUCED AND EXERCISED its artifact, never
-  when a platform is reasoned about or a provider merely offers a runner. No such run exists for
-  any triple but `x86_64-unknown-linux-gnu`, so the roster widens by zero.
-  **A green run is NOT the sufficient condition, falsified 2026-08-26. THE CRATE DOES NOT COMPILE
-  FOR `x86_64-pc-windows-msvc` AT ALL**, measured on a native Windows runner at that leg's round
-  2: `native/src/gates/gate_binary_fresh.rs:13` takes `std::os::unix::fs::PermissionsExt`
-  unconditionally and `:15` calls `.mode()` — E0433 and E0599, `build-native` exits 101. Cargo
-  itself is fine there: the index updates and every dependency compiles clean.
-  **THE SIZING IS FALSIFIED TOO — "a portability pass over four modules" — re-verified against
-  the tree at the 2026-08-26 scope, and this is what a promoting stage plans against.** THREE of
-  the four sites named were already portable, in two idioms: `proc.rs:67` and `install.rs:163`
-  are `#[cfg(unix)]`/`#[cfg(not(unix))]` twin FUNCTIONS, while `proc.rs:335` is an inline
-  `#[cfg(unix)]` BLOCK in `exit_code` that vanishes on non-unix and falls through to `2`, needing
-  no twin. Each cfg predates the measurement (`e3abf907`, `da6c6645`, both ancestors of head
-  `261231d2`), so the three-further-uses claim was a grep read past the compiler's first error
-  batch. **ONE un-gated site exists**, `gate_binary_fresh.rs:12-17`, a local `is_executable`
-  duplicating `proc.rs`'s portable one, so the repair is a DE-DUPLICATION. **Honest limit:** a
-  census of all 139 `.rs` files found no other site but cannot prove absence — a compiler halts
-  at its first batch, so only a real `cargo check --target` proves the build.
-  **TWO MORE BLOCKERS JOIN HERE, operator-ruled 2026-08-26**, amending that day's earlier routing
-  of both to `powershell-installer-surface` (TRAJECTORY.md §The closed rulings owns the ruling
-  and its grounds): `gate-sdk/bin/build-native.sh:68`'s `BN_ART` names the cargo artifact
-  suffix-less where a Windows toolchain emits `<name>.exe`, and `installer/lib/init.sh:98`'s
-  `target_of_host()` maps Linux and Darwin alone, so a `MINGW64_NT-*` host matches nothing.
-  `BN_ART` is unreachable until the crate compiles, so it sits behind the de-duplication.
-  **So a target needs TWO things this entry holds apart** — a host the crate *builds* for, and a
-  green run that produces and exercises the artifact. For Windows the first binds and is upstream
-  of everything the CI leg can buy. The Darwin triples are UNMEASURED, assumed neither way.
-  **The filed design fork is settled and no longer why this waits:** `.github/workflows/publish.yml`
-  already derives its build legs from the roster onto mapped runners, so that shape is landed.
-  **What widening costs — "one roster line plus one runner mapping" was the publish half alone.**
-  Beside it sits `installer/consumer-smoke/run-smoke.sh:43-44`, which stops the whole smoke
-  through its `blocked()` helper at `:17` unless the roster is exactly the running host. The two
-  re-entries are steering its pack with `GATE_SDK_NATIVE_TARGETS_FILE` or giving the step a
-  cross-compiling build, and `installer/README.md` §The consumer smoke records neither is built.
-  **Distinct from `powershell-installer-surface`** now that the two blockers moved: that entry
-  owns the PowerShell bootstrap and its design; this owns whether a binary exists to bootstrap to.
-  **Cost while deferred:** three of the four host classes the installer can name receive no
-  battery at all, and the port tail stays sequenced behind a roster this entry is the only mover.
-  Filed 2026-08-08 by close, draining the gap inbox; found at scope. **Tagged `next/reliability`
-  2026-08-08 by operator ruling.** Promoted 2026-08-25 at scope; deferred the same day at build
-  beside `platform-support-ci-matrix`, on an operator ruling relayed through the lead.
 
 - **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
   — the whole battery onto the binary, and the shell surface down to its residue.
@@ -491,57 +780,6 @@
   Surfaced 2026-08-18 at the `wide-budget-batch-and-hold-declaration` close's tooling-friction
   triage and filed to the gap inbox there; promoted 2026-08-18 by the next iteration's scope,
   draining that inbox.
-
-- **relayed-ruling-provenance-unrecorded** [design-pending] — a relayed operator ruling lands in a
-  tracked governance surface as "operator-directed" with no provenance a later reader can check.
-  **Found by the harness's own security review**, which flagged the 2026-08-18 `gh` account-restore
-  ruling as possible instruction poisoning: the recording session had landed an operator direction
-  authorizing an elevated-credential account switch and a push to master, deviating from the local
-  release runbook, while its own transcript contained no operator message at all.
-  **The authorization was genuine** — the operator selected it through the harness question
-  mechanism in the lead session — so this is not an incident report; the flag was correct to fire
-  on what it could see.
-  **The gap:** under the split-posture lead architecture (lifecycle-kit/templates/lead.md) an
-  operator ruling reaches a stage session as a peer message and is landed in the queue as
-  "operator-directed". Nothing in the tracked record distinguishes a genuinely relayed ruling from
-  one a compromised or confused lead invented, and the reviewing layer cannot see the lead's
-  transcript. The class most often relayed this way is the highest-consequence one — credentials,
-  pushes, releases, runbook deviations.
-  **DISTINCT from `delegation-provenance-floor`**, which is a *parent* relaying a *child's* return
-  that never arrived; this is a *child* recording a *parent's* ruling into a permanent tracked
-  surface, where the artifact outlives every session that could attest it.
-  **Why `[design-pending]`, and it is envelope-class:** three shapes, none ruled — the lead cites
-  the authorization channel and turn in its relay and the recording session records that citation
-  alongside the ruling; or operator-class rulings are landed by the operator directly rather than
-  relayed; or a provenance field on ruling records naming how the authorization arrived, so an
-  unverifiable one is visibly unverifiable rather than indistinguishable.
-  **The first shape was PRACTISED 2026-08-19, one day after filing, and the trial is worth more
-  than the entry's prose.** The lead relaying five rulings stated the authorization channel
-  unprompted — three questions put to the operator through the harness's question mechanism, each
-  answered by selecting the recommended option, not free text and not the lead's inference — and
-  the recording session carried that citation onto each ruled entry, where an auditor now has it.
-  **Two limits the trial exposed, both owed an answer.** The citation is still the relaying
-  party's own word about a channel the tracked record cannot reach, so it raises the cost of
-  inventing a ruling without making an invented one detectable. And it **did not fit twice**:
-  `close-entry-baseline-bootstrap-deadlock` and `stage-stamp-ordering-unenforced` took their
-  rulings at 0–1 lines of headroom and carry no channel, the displacement class
-  queue-kit/SPEC.md §check-queue-entry-budget's split criterion now decides.
-  recurrence: relayed-ruling-provenance-unrecorded 2026-08-24 2026-08-25
-  **A FOURTH SHAPE, AND IT CONSTRAINS THE OTHER THREE: the field must record WHO RULED, with
-  "lead, own authority" a first-class value rather than an absence.** All three above record only
-  HOW an authorization arrived, and 2026-08-24 fired in the direction none catches — a lead's own
-  ruling recorded as the OPERATOR's, corrected at gate-sdk/SPEC.md §check-gate-fail-closed, which
-  names the lead and says commit `0153a5c9` misattributes it and is deliberately not rewritten.
-  The same iteration also caught the lead attributing a lead ruling to the operator: both
-  over-attribute upward, and since "operator-ruled" marks a decision a later session may not
-  reverse alone, this direction is a false FLOOR on re-ruling where the filed shape is a false
-  CEILING on verifiability.
-  **Cost while deferred:** silent and audit-side. Every relayed ruling already in the queue carries
-  the same unverifiable provenance, the tracked record is all a later auditor or a fresh session
-  has, and it will not red a gate — it surfaces as a security flag on an honest session, which is
-  where it surfaced.
-  Surfaced 2026-08-18 by the harness security review of `wide-budget-batch-and-hold-declaration`'s
-  close and filed to the gap inbox there; promoted 2026-08-18 by the following scope.
 
 - **boundary-wipe-preserve-basename-reach** [design-pending] — the iteration-boundary scratch wipe
   matches its preserve list by **basename at any depth**, so one nested `.gitkeep` makes a whole
@@ -2545,57 +2783,6 @@
   boundary, which is exactly when the state is most valuable and least reconstructible.
   Filed 2026-08-04 at close, from the close session's own misfire.
 
-- **dead-queue-citation-report** [design-pending] — an in-body citation that resolves to no
-  live entry reads exactly like one that does, and nothing names the difference.
-  recurrence: dead-queue-citation-report 2026-08-14 2026-08-25
-  **THIRD instance, 2026-08-25, found first-hand by the very scope survey it was predicted to
-  mislead.** `plugin-marketplace` read "The upgrade/uninstall story itself is
-  `installer-lifecycle-verbs` below — sequence against it rather than duplicating it", and no
-  entry of that slug exists anywhere in this file: the work landed, the citation kept a
-  directional pointer, and a live entry went on instructing a future promoting session to
-  sequence against a sibling that is not there. The cost field's own sentence, occurring — a
-  false premise in a survey input at the moment a scope decides what to promote — and the
-  battery was clean throughout, since `check-task-conservation` reads membership and a body
-  citation is not a membership claim. Corrected inline in the commit that stamped this date, so
-  the class is what remains and the instance misleads nobody else.
-  queue-kit/SPEC.md §The tag algebra rules the in-body single-backtick slug a *reference*
-  rather than a membership claim, aggregated by `bin/queue-edges.sh` and "audited by
-  nothing". That is a deliberate choice and stays right — entries legitimately name landed
-  work and no gate may punish it — but its cost is now attested rather than hypothetical.
-  **Re-attested 2026-08-14**, one iteration after the last correction and inside a single
-  iteration's own lifetime: `consumer-gate-port-disposition`, filed that morning at scope,
-  cited `port-corpus-grouping-census-unbought`, a slug resolving nowhere in the tree. The
-  citing text was rewritten later the same day for an unrelated reason (`a8354823`), so the
-  instance is gone and the class is not — nothing found it but a reader.
-  `check-queue-slug-liveness` does not reach it: the citation is backticked prose, which the
-  SPEC deliberately rules a reference rather than a membership claim.
-  **The attestation.** Three ruled-and-deleted slugs were cited across four live entries, and
-  two of those entries argued *from* them in the present tense: one framed a "Boundary with
-  the two live companions" whose companions were both dead and settled. A scope session
-  ranking such an entry reads closed rulings as open questions, which is a false premise in a
-  survey input. Both were corrected inline at the 2026-08-06 close; nothing stops the next.
-  **Why a report and not a gate**, which is the design half already half-answered. A red is
-  wrong here by the SPEC's own reasoning, so the cheapest true form is a *listing*:
-  `bin/queue-edges.sh` already resolves every in-body citation against the live set and drops
-  the misses on the floor, so naming them costs one output section and no new scan — the
-  no-red posture kept, the silence ended.
-  **What is genuinely open:** where the listing is read (a close step, a scope survey input,
-  or both), and whether a citation of *landed* work should be distinguishable in prose at all
-  — a grammar question the SPEC left unanswered when it refused a relational vocabulary, and
-  answering it the wrong way re-imports the maintained-roster anti-pattern that refusal avoided.
-  **HELD TWICE AS A BUNDLE MEMBER — 2026-08-25 on directive priority, and again 2026-08-25
-  operator-ruled at the threshold escalation.** The hold is the citation-liveness bundle's, not
-  this entry's: it is cluster B's report-only half, riding the resolution `bin/queue-edges.sh`
-  already performs, so separating it re-buys the cluster's context for the cheapest member.
-  **FOURTH INSTANCE, self-caught: the roster pointer here was one.** It read "recorded in the
-  survey record", a surface `bin/enter-stage.sh` truncates at every iteration boundary, so it
-  resolved to nothing one boundary later — exactly as filed. Repointed to
-  `citation-liveness-family-convergence`, which carries the finding and its witness inline for
-  this reason; re-run that witness before citing it.
-  **Cost while deferred:** dead citations accumulate at the rate rulings close, and each is a
-  false premise sitting in a survey input at exactly the moment a scope decides what to promote.
-  Filed 2026-08-06 at close, draining the gap inbox; found 2026-08-06 at scope.
-
 - **guard-steer-grant-mismatch** [design-pending] — the guard steers sessions onto forms the
   committed allowlist does not grant, so obeying it costs a prompt.
   Attested at the 2026-08-06 close triage. `scripts/bash-guard.sh` refuses a shell expansion
@@ -2618,57 +2805,6 @@
   the guard itself, and each close re-derives the same mismatches off the same log.
   Filed 2026-08-06 at close, from its own prompt-friction triage; scope-gated intake, so the
   report is costed here rather than built here.
-
-- **kfric-empty-log-ambiguity** [design-pending] — an empty knowledge-friction log is read as
-  no friction, and it is equally consistent with no capture.
-  recurrence: kfric-empty-log-ambiguity 2026-08-17 2026-08-23
-  **The 2026-08-23 date is a direct stamp too, and the corroboration is the strongest yet.**
-  `battery-runner-port` ran six stage sessions plus a consult and the log read **empty**, while
-  that iteration's prompt log records at least four history-archaeology reads shaping a new
-  deliverable: a build session reading commit `e3579fda`'s diff to locate pipe sites, a session
-  archaeologising when `check-crate-arms`'s cache was introduced, a spec session reading a
-  *deleted* amendment (`SPEC-eighth-cut.md`) to shape a new one, and this close reading a prior
-  close's commit to shape its own. Four events, zero stamps.
-  **The 2026-08-17 date is a direct stamp, and its grounds are first-person.** The log read
-  **empty** at this close across a six-session iteration — and the closing session itself
-  re-derived a fact no doc owns (that `git log -S` misses an eviction leaving the slug behind)
-  and did not run `kfric.sh`, filing `queue-recovery-pickaxe-wrong-oracle` instead. The survey
-  record shows scope re-deriving the *same* fact independently earlier in the same iteration.
-  Two events, one fact, zero stamps: stronger than the founding attestation, which had to infer
-  its unstamped event from the prompt log. Stamped directly, out of channel, under the rule this
-  iteration landed as obliged (lifecycle-kit/SPEC.md §The committed gap inbox).
-  **The founding attestation, 2026-08-06, is the same shape one grade weaker** — the log read
-  **empty** across an iteration that added a Rust module, a source stamp and a gate, while its
-  prompt log records a build session reading a *deleted* `.gate` descriptor out of git history to
-  shape the one it was writing, the class `bin/kfric.sh` exists to stamp. Not stamped, nothing
-  noticed, and inferred from the prompt log rather than observed.
-  **The reader is what makes it expensive.** `kpi-knowledge-friction` trends the log toward
-  zero and reads that trend as the tier contract's holes filling. A sensor with an
-  in-the-moment capture discipline and no independent floor cannot tell a filled hole from an
-  unstamped one, so the KPI reads best exactly where it is least trustworthy.
-  **Why `[design-pending]`:** the honest answers differ in kind. A corroborating signal is
-  cheap and weak — the prompt log already records history archaeology and close already reads
-  both surfaces. A per-stage capture prompt is stronger and is precisely the standing-
-  instruction tax context-kit's brevity machinery rejects. Stating the limit on the KPI
-  instead — an empty log is not evidence of zero — costs one line and buys no detection.
-  Which is right turns on whether the KPI is meant to be trusted at zero, a contract call.
-  **Cost while deferred:** the one KPI measuring the tier contract's completeness reads best
-  exactly when nobody is capturing, and no other signal contradicts it.
-  **FIVE HOLDS, none a decline of the finding, and they are not five of a kind.** Three were
-  2026-08-24 on the surface criterion, one of them operator-ruled; the fourth, 2026-08-25, was
-  directive priority under an undirected boundary the operator ruled to the port's bootstrap.
-  **The FIFTH, 2026-08-25, is operator-ruled on the surface criterion** — the promoted CI-legs
-  and target-roster set touches no part of drift-kit's capture loop. What makes it a ruling rather
-  than a default is that both alternatives were put up and **declined**: taking the capture-loop
-  trio now, and ruling a named future iteration for it. Neither was taken, so this entry carries
-  no forward claim on a boundary. No date joins a hold — a decline is not a firing — and the log
-  read **empty** again at this boundary, the expected reading at an iteration's open.
-  **The pairing no hold has yet carried:** `kfric-obligation-residency` is this entry's
-  writer-side twin — that entry is the capture obligation never reaching the writer, this is how
-  an empty log may be read once it has — and both resolve alongside
-  `recurrence-obligation-residency` under delegation-kit/SPEC.md §Operative residency. A unit
-  taking the capture loop takes all three; this one alone leaves the writer unserved.
-  Filed 2026-08-06 at close, from its own knowledge-friction sweep.
 
 - **reclaim-precondition-outside-the-tree** [design-pending] — a declared `reclaim=` can be
   runnable and still un-runnable, and the gate that demands one cannot tell.
@@ -3681,7 +3817,6 @@
   is the channel by which a wrong number reaches a canonical surface with a citation on it.
   Filed 2026-08-09 by close, from its own knowledge-friction triage.
 
-
 - **knob-default-accessor-singularity** [design-pending] — the missing check class
   behind two knob-default re-spellings drained this iteration.
   `check-knob-default-coupling` asserts that every literal site for one knob
@@ -3904,7 +4039,6 @@
   and the thing missed is an auto-allow grant over attacker- or accident-writable content —
   the one allowlist class whose whole point is that it does not look dangerous.
   Filed 2026-08-12 by close, from its own overlay triage.
-
 
 - **throughput-and-wait-time-unmeasured** [design-pending] — nothing splits session wall-clock
   into waiting-on-model versus local execution, and nothing measures per-model throughput.
@@ -4848,55 +4982,6 @@
   Filed 2026-08-14 by close, draining a gap-inbox bullet; the context-kit sentence was
   re-verified at the drain.
 
-- **validate-baseline-suite-coverage** [design-pending] — two validate suites carry no
-  held-constant-red baseline row, so a regression in either passes the baseline arm silently.
-  **Verified at the 2026-08-14 drain by diffing the two files' suite columns**, not taken from
-  the bullet: `.workflow/validate-baseline.txt` carries rows for **22** suites while
-  `run-validate.sh` runs **24**. The two with no row are `dispatch_guard_tests` and
-  `native_crate`.
-  **Pre-existing, and an omission rather than lag.** Both suites predate the baseline's last
-  edit (`eb94126b`, 2026-08-13), so nothing about this iteration introduced it.
-  **The consequence is narrow and real.** `diff-baseline` flags a *new* failure against a
-  *listed* scenario, so a regression in either suite is caught only by the suite failing
-  outright — which is exactly the coverage the held-constant mechanism exists to add on top of.
-  `native_crate` is the sharper half: it is the crate's own 92-test suite, it now spans a
-  dependency graph and an MSRV floor that both moved this iteration, and it is the arm the next
-  port cohort leans on hardest.
-  **Why `[design-pending]` and not a two-line fix:** which scenarios are worth holding constant
-  is an evidence-kit judgment, not a mechanical backfill — a baseline row is a *claim* that a
-  verdict is expected to stay put, and adding twenty-four rows because twenty-four suites exist
-  is the maintained-roster shape derivation-first refuses. The design call is whether the
-  baseline is per-suite or per-scenario for a suite this size.
-  **DISTINCT from `baseline-row-prose-coupling-gate`**, which is prose asserting what the
-  baseline holds; this is the baseline not holding it.
-  **Cost while deferred:** the two suites keep their weakest protection while the crate is the
-  fastest-moving surface in the tree.
-  **Second instance, one granularity down — 2026-08-19, and it is the entry's own open call.**
-  The suite-level claim above re-verified unchanged (22 rows for 24 suites, the same two absent).
-  What is new: *within* the `gates` suite the run reports 104 scenarios while the baseline names
-  **75**, so 29 registered gates hold no row. Probed at the source rather than assumed
-  (`evidence-kit/lib/evidence.sh:137,156,166`): the diff is directional, so a rowless gate going
-  red is still a new-failure — what a `pass` row alone buys is that the scenario going **absent**
-  reds too. The uncovered 29 can therefore be deregistered, renamed or silently skipped with the
-  battery still green, which is a different loss from the one the suite-level half names.
-  **Third instance, 2026-08-25 at build, and it turns the open call above into a forcing case.**
-  `installer_smoke` sits on the exit-code parser, so its whole verdict is ONE scenario and its
-  baseline row is that scenario at `fail`. Enumerate the outcomes and the coverage is not thin but
-  **empty**: any non-zero exit matches the baselined fail and reads clean, and a zero is an
-  unpromoted recovery, which is also not a red. Measured by rehearsing the new CI leg's body
-  locally — the smoke printed a `FAIL` for the starter profile's init while the leg printed
-  `diff-baseline: clean` and exited 0. The failure that demonstrated it was **not** the baselined
-  one: the baselined failure is the binary-less leg's missing-gates refusal, and what actually broke
-  was an unrelated arm, absorbed silently. Where the 2026-08-19 line reports rowless scenarios
-  inside a suite, this is the degenerate end of the same axis — a suite whose single row makes the
-  mechanism assert nothing at all. The candidate remedy is a per-suite parser emitting one scenario
-  per arm, which is consumer config rather than a kit change; lead-ruled at build to leave it,
-  because it decides this entry's reserved design call out of band. Carried meanwhile:
-  `.github/workflows/gates.yml`'s install-smoke leg states the limit in its own text.
-  recurrence: validate-baseline-suite-coverage 2026-08-19 2026-08-25
-  Filed 2026-08-14 by close, draining a gap-inbox bullet the lead filed after the validate
-  session declined to act on its own finding unilaterally.
-
 - **gap-capture-argv-prompt-friction** [design-pending] — the mandated capture tools take their
   prose as an argv string, so every filing whose prose contains shell punctuation costs an
   out-of-band permission decision.
@@ -5804,7 +5889,6 @@
   gate or knob would make it a feature, and the promoting scope call settles it.
   Surfaced 2026-08-18 at the `port-selector-permanence-and-batch` close, at its backlog-eviction
   step; promoted from the gap inbox at this iteration's scope.
-
 
 - **survey-oracle-liveness-unasserted** [design-pending] — a survey record's `oracle:` field can
   name a boundary-wiped path, and the record's own gate accepts it.
@@ -7882,57 +7966,6 @@
   it twice while dispatching its own sweeps, and filed to the gap inbox there; promoted
   2026-08-25 at this scope's drain of that inbox.
 
-- **isolated-child-liveness-hook-displaces-its-report** [design-pending] — the turn-end liveness
-  hook does exactly what it was told under worktree isolation, and doing so overwrites the
-  child's report on the only channel the dispatcher reads.
-  **Attested first-hand 2026-08-25 at this scope, not predicted.** A read-only citation-liveness
-  sweep dispatched with `isolation: worktree` completed its whole survey and returned a
-  producer-liveness message instead of it. One resume round-trip carrying an explicit re-emit
-  instruction recovered the full report, so the work was not lost — it was paid for twice.
-  **The hook is not misbehaving, and that is the finding.** `native/target/release/`'s binary is
-  gitignored under `target/`, so it is absent in a fresh worktree, and
-  `scripts/subagent-stop-liveness.sh` already anticipates exactly this: under a worktree-isolated
-  dispatch, binary-dispatched gates do not resolve and "the lawful response there is to report
-  the gate as unavailable and return". It reports, as instructed. The harness then returns only
-  the child's LAST assistant message, so a correct report-and-return displaces the survey.
-  **DISTINCT from `worktree-isolated-agent-report-lost-to-a-failed-peer-send`**, promoted the same
-  session: that failure needs the child to attempt a send to an unresolvable peer. This one needs
-  no send at all — a hook the child never invoked emits the displacing message — so the two share
-  the symptom and share no trigger.
-  **DISTINCT from `worktree-isolated-dispatch-cannot-reach-the-main-checkout`, and downstream of
-  it.** That entry's subject is the child's WRITES, and its bridge is `git rev-parse
-  --git-common-dir`; this is the child's RETURN VALUE. The composition is what neither covers as
-  written: that entry's cause — a binary a worktree child cannot resolve — produces the other
-  entry's symptom, and a session reading either alone concludes it is covered.
-  **Deliverable — rule one of three.** Resolve the binary through the main checkout, which is the
-  sibling's bridge and folds this half into it; or emit the unavailability on a channel that does
-  not become the child's final assistant message; or have the hook return silently when the
-  target is a worktree it cannot resolve, which is cheap and pulls against fail-closed — the
-  reason it is a fork and not an obvious fix.
-  **Cost while deferred:** one wasted dispatch round-trip per isolated sweep, paid while the
-  dispatcher is waiting, and silent in the worse direction — the returned text reads as a
-  liveness complaint rather than as a dropped report, so a less careful dispatcher records a
-  sweep that never reported. That is a correctness risk, not an efficiency one.
-  recurrence: 2026-08-25 2026-08-26
-  **THE BIND IS STRUCTURAL, NOT A RATE — measured at the 2026-08-26 scope, which is the finding
-  that outranks every count above.** `scripts/agent-dispatch-guard.sh` REFUSES a read-only type
-  dispatched **without** `isolation: worktree`, and worktree isolation is precisely what makes the
-  binary unresolvable and arms the displacement. The guard's required remedy is what arms the
-  defect, so every read-only fan-out in this repo pays it — there is no dispatch shape that avoids
-  it while staying in contract. The record is **SEVEN FOR SEVEN across three sessions**, but the
-  rate is corroboration: a session cannot dispatch its way out of this by sampling better.
-  **The worst tail puts no ceiling on the cost.** A 2026-08-26 `align` dispatch WEDGED in a
-  Stop-hook loop across THREE resumptions, burned roughly 166k child tokens and returned nothing at
-  all, recovered only by re-dispatching fresh — a full context budget spent for zero yield.
-  **THE RECOVERY, written down because a parent meeting this has no reason to believe the report
-  still exists: resume the child by id and ask it to RE-EMIT VERBATIM, telling it explicitly not
-  to re-run the work.** Full report, first try, one round-trip at the 2026-08-26 close. Not
-  reliable — an earlier resume returned "this session just started" and that sweep was re-run —
-  and the usage block is no signal either: that re-emit reported the ORIGINAL run's tool count
-  and tokens, so the zero-tool-use shape marks some resumes and not all.
-  Attested 2026-08-25 at this scope while dispatching its own survey; filed the same session on
-  the lead's direction, before the resume journal holding it was swept.
-
 - **site-health-issue-venue-unwanted** [design-pending] — the site-health probe files issues on
   the public repo for failures the iteration lifecycle resolves anyway, and the operator does not
   want that venue.
@@ -8379,38 +8412,6 @@
   with its own spec — the honest state, and a standing invitation to re-derive which one is right.
   The exposure grows with every platform leg the roadmap's `next/reliability` tag commits to.
   Filed 2026-08-26 by close, draining the gap inbox; found at build against the Windows leg.
-
-- **payload-symlink-unextractable-on-windows** [design-pending] — the payload's tracked-set copy
-  cannot reproduce the tree on Windows: `tar` refuses the one tracked symlink and aborts.
-  `scripts/pack-installer.sh`'s `pack_tracked()` vendors through `git archive "$COMMIT" | tar -x`.
-  On a native Windows host that pipeline fails on
-  `gate-sdk/gate-tests/check-tree-terms/good/tree/dangling-link` — `tar: Cannot create symlink to
-  <its target>: No such file or directory`, then `Exiting with failure status` — and the path is
-  absent afterwards, so the assembly does not merely warn, it aborts mid-kit.
-  **The mechanism is precise and it is not git's.** `core.symlinks` is `true` on the runner, so git
-  would honour the link; `tar` is the refuser, and it refuses because the link is **dangling**.
-  Windows picks the file-versus-directory symlink kind from the target, so a target that does not
-  exist has no kind to pick. A resolvable symlink is untested and may well pass.
-  **Measured 2026-08-26 at close** on `windows-latest` under Git-for-Windows bash, at
-  `platform-support-ci-matrix` round 2, which owns the full harvest. Routed here by the lead, and
-  a new entry rather than a home in `payload-derivation-ships-untracked-residue` — that entry is
-  the near miss and the wrong home, its subject being untracked content *shipping* where this is
-  tracked content *not surviving*, the opposite failure in the same file.
-  **WINDOWS-ONLY, AND THAT IS THE SCOPING, not a hedge: this files, it does not earn a hotfix.**
-  Re-verified first-hand on Linux at this close — `git archive HEAD -- <the link> | tar -x` exits 0
-  and lands the dangling symlink intact — and validate's own fold corroborates it, `installer_smoke`
-  having driven `pack-installer.sh` through all four call sites and failed only on the baselined
-  binary-less row. No adopter on a measured platform is impacted today.
-  **Why `[design-pending]`, and the fork is worth more than the fix.** The narrow repair is to make
-  the pipeline tolerate an unextractable link (`tar --skip-old-files`-style, or resolve the fixture
-  to a live target). The wider question the offending path poses is whether `gate-tests/` belongs
-  in the consumer payload **at all** — the blocker is test-fixture content, shipped to adopters who
-  never run the fixtures, so the narrow fix may be repairing the transport of something that should
-  not be in transit. This entry poses that question without answering it.
-  **Cost while deferred:** the first Windows host to get past the crate-portability blocker meets
-  this one immediately, so it is sequenced dead behind
-  `gate-binary-target-roster-widening` and will be the next thing measured whenever that moves.
-  Filed 2026-08-26 by close from the Windows harvest, on the lead's routing ruling.
 
 ## Icebox
 
