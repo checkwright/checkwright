@@ -469,7 +469,7 @@
   `close-entry-baseline-bootstrap-deadlock` and `stage-stamp-ordering-unenforced` took their
   rulings at 0–1 lines of headroom and carry no channel, the displacement class
   queue-kit/SPEC.md §check-queue-entry-budget's split criterion now decides.
-  recurrence: relayed-ruling-provenance-unrecorded 2026-08-24
+  recurrence: relayed-ruling-provenance-unrecorded 2026-08-24 2026-08-25
   **A FOURTH SHAPE, AND IT CONSTRAINS THE OTHER THREE: the field must record WHO RULED, with
   "lead, own authority" a first-class value rather than an absence.** All three above record only
   HOW an authorization arrived, and 2026-08-24 fired in the direction none catches — a lead's own
@@ -2330,6 +2330,17 @@
   *gnu-userland* — documentation only, no shipped-code path.
   **Cost while deferred:** exactly that reconstruction, paid again by whoever composes each
   release note, against evidence that is coldest when the batch count is highest.
+  **A live instance, 2026-08-25 at build in commit `2a9a632b`, and it sharpens the open question
+  above.** `evidence-kit/bin/diff-baseline.sh` gained a refusal: each argument group is now
+  `<suite> <logfile> [<status>]`, and a suite on the exit-code parser named *without* a status is
+  refused at exit 2 rather than handed a hardcoded 0. A vendored consumer invoking the old pair form
+  against such a suite now gets an exit 2 where it used to get a verdict. Nothing owes a
+  declaration for it: `.workflow/tightened-gates.txt`'s own contract line takes *one bare
+  kit-shipped gate name* per data line, and `diff-baseline.sh` is a `bin` tool and not a registered
+  gate — so the surface cannot hold it even in principle. That is the reconstruction cost this entry
+  predicts, arriving in the half the open question is about: the tightening is real and the existing
+  surface's grammar, not just its scope, is what excludes it.
+  recurrence: behavior-change-surface 2026-08-25
   Filed 2026-08-04 at close from the gap inbox; the design question left open on purpose.
 
 - **consumer-smoke-subset-accounting-verdict** [design-pending] — a per-kit smoke run reds an
@@ -4784,7 +4795,21 @@
   red is still a new-failure — what a `pass` row alone buys is that the scenario going **absent**
   reds too. The uncovered 29 can therefore be deregistered, renamed or silently skipped with the
   battery still green, which is a different loss from the one the suite-level half names.
-  recurrence: validate-baseline-suite-coverage 2026-08-19
+  **Third instance, 2026-08-25 at build, and it turns the open call above into a forcing case.**
+  `installer_smoke` sits on the exit-code parser, so its whole verdict is ONE scenario and its
+  baseline row is that scenario at `fail`. Enumerate the outcomes and the coverage is not thin but
+  **empty**: any non-zero exit matches the baselined fail and reads clean, and a zero is an
+  unpromoted recovery, which is also not a red. Measured by rehearsing the new CI leg's body
+  locally — the smoke printed a `FAIL` for the starter profile's init while the leg printed
+  `diff-baseline: clean` and exited 0. The failure that demonstrated it was **not** the baselined
+  one: the baselined failure is the binary-less leg's missing-gates refusal, and what actually broke
+  was an unrelated arm, absorbed silently. Where the 2026-08-19 line reports rowless scenarios
+  inside a suite, this is the degenerate end of the same axis — a suite whose single row makes the
+  mechanism assert nothing at all. The candidate remedy is a per-suite parser emitting one scenario
+  per arm, which is consumer config rather than a kit change; lead-ruled at build to leave it,
+  because it decides this entry's reserved design call out of band. Carried meanwhile:
+  `.github/workflows/gates.yml`'s install-smoke leg states the limit in its own text.
+  recurrence: validate-baseline-suite-coverage 2026-08-19 2026-08-25
   Filed 2026-08-14 by close, draining a gap-inbox bullet the lead filed after the validate
   session declined to act on its own finding unilaterally.
 
@@ -6757,7 +6782,13 @@
   cost line, reinstated because the retraction that replaced it has itself been falsified — and
   this iteration's own validate paid it, the leaked artifact feeding the pack step and
   reddening `installer_smoke` for the wrong reason.
-  recurrence: pack-installer-vendors-untracked-scratch 2026-08-24
+  **A THIRD occurrence, 2026-08-25 at build, widens the reproduction claim above.** The 2026-08-24
+  re-probe credited *suite ordering inside the battery* with masking the artifact and reproduced it
+  only by running the gate-sdk fixture suite standalone. This time the plain step-0 battery was the
+  contaminating run: `installer/consumer-smoke/run-smoke.sh` failed on a tree where nothing but the
+  battery had run. So the masking is not a property of the battery, and a standalone suite is not
+  the trigger it was thought to be.
+  recurrence: pack-installer-vendors-untracked-scratch 2026-08-24 2026-08-25
   Filed 2026-08-23 by validate and re-dispositioned by validate the same day; the 2026-08-23
   close drain read both bullets as one disposition and re-ran its probes inside the battery
   alone, which was not isolated enough to see this; the 2026-08-24 close drain re-probed the
@@ -8079,6 +8110,84 @@
   trigger is any tool in this tree leaving scratch under a packed root — which the battery's own
   fixture runner has done once.
   Filed 2026-08-25 by close, draining the gap inbox; found at build.
+
+- **boundary-wipe-preserve-lifetime-scope** [design-pending] — the iteration-boundary scratch wipe
+  preserves by *iteration* lifetime, so an artifact whose lifetime is a **live session's** is
+  deleted underneath the session that owns it.
+  `scripts/lifecycle-config.sh` sets `LIFECYCLE_KIT_BOUNDARY_PRESERVE=(session-role)` and
+  `lifecycle-kit/bin/enter-stage.sh`'s boundary block deletes every other `.tmp/` member at the
+  first stage's entry.
+  **Attested first-hand 2026-08-25** by the scope session that ran the reset: `.tmp/lead-journal.md`
+  was deleted while the lead session that owns it was still running, so the one surface that lead
+  resumes from vanished mid-iteration.
+  **The premise the list already concedes.** `session-role` sits on the list on exactly this
+  ground — context-kit/SPEC.md §The session-context hook argues it from the marker's lifetime being
+  a live session's rather than the iteration's — and a lead's resume journal has the same lifetime
+  by the same argument. The list covers the argument's one attested member, not the argument.
+  **Why `[design-pending]`, three shapes differing in kind:** add the journal basename to the
+  preserve list, which re-buys the same omission the next time a session-lifetime artifact appears;
+  give the preserve knob a lifetime vocabulary instead of a name list; or move a live session's
+  journal out of the wiped directory, which reopens where delegation-kit sends a journal at all.
+  **DISTINCT from `boundary-wipe-preserve-basename-reach`**, whose subject is the matcher's *reach*
+  — an unanchored `! -name` making a nested tree immortal. This one is which *lifetimes* the list
+  must cover, and it is live whichever way that matcher is anchored.
+  **Cost while deferred:** every boundary crossed while a lead session is live destroys that lead's
+  resume journal, silently — `.tmp/` is gitignored, so nothing reds and the loss is discovered only
+  when the lead next reads.
+  Filed 2026-08-26 by close, draining the gap inbox; found 2026-08-25 by scope at its own reset.
+
+- **init-vendoring-assumes-gnu-findutils** [design-pending] — `checkwright init` enumerates each
+  kit's payload with `find -printf`, a GNU findutils extension, in the loop that vendors every
+  install — so a stock macOS or BSD host vendors zero files and still writes a manifest.
+  `installer/lib/init.sh:197` runs `find . -type f -printf '%P\n'` unconditionally per kit; `:126`
+  uses the same construct on the artifact path, conditionally and with stderr suppressed. Where
+  `find` refuses the primary, the `while`-read loop receives nothing and `init` reports a successful
+  install over an empty tree instead of refusing.
+  **The documented floor does not cover it, and the near-miss is the trap.**
+  `context-kit/lib/toolfloor.sh`'s `PROBE_SET` names `awk::GNU` and `sort::coreutils` and no
+  findutils member; `docs/install.md` §Requirements offers coreutils and gawk as the stand-ins.
+  `find` ships in findutils, so an adopter who installs exactly what the page names still has a
+  broken `init` and no probe fires.
+  **Why `[design-pending]`, two candidate fixes differing in kind:** name GNU findutils on the
+  toolchain floor and in §Requirements, a user-facing widening of what an adopter must install; or
+  replace the construct with a portable one, an adopter-path code change costing nobody anything.
+  The second reads preferable on its face, and the open call is whether the floor should widen
+  anyway, since this loop is not the only GNU-ism the install path may carry.
+  **Found by reading, on a machine with no Mac.** This is the class `platform-support-ci-matrix`
+  exists to surface, and it CITES that entry rather than waiting on it: the defect is live whether
+  or not a macOS leg is ever bought.
+  **Cost while deferred:** the published install path is silently broken for every non-GNU host,
+  in the worst available failure mode — a green `init` over an empty vendor tree, discovered later
+  as missing kits rather than at install time.
+  Filed 2026-08-26 by close, draining the gap inbox; found 2026-08-25 by build.
+
+- **wait-record-self-deadlock** [design-pending] — a backgrounded **wait** that registers itself as
+  a producer makes its own exit condition unsatisfiable, and blocks every concurrent session's
+  commits while it spins.
+  **Attested live 2026-08-26.** This iteration's validate session backgrounded
+  `until bash lifecycle-kit/bin/enter-stage.sh --simulate validate; do sleep 15; done` and, per the
+  standing launch-liveness rule, wrote `.tmp/validate-entry-wait.run` naming its own pid. This repo
+  wires `check-producer-liveness .tmp` as a validate entry pre-flight, so the poll refused on the
+  record the poll itself had written; the only thing still blocking the loop was the loop.
+  **Second-order harm, also observed.** The tracked-tree-mutation rule correctly refuses every git
+  index, worktree or ref write in *every* session while a record names a live pid, so the build
+  session could not commit the queue drain the waiter was waiting for. Two sessions, one record.
+  **The distinction the rule does not draw, and one surface already draws it.** A *producer* writes
+  artifacts a reader must not race and owes a record; an *observer* writes nothing and owes none.
+  `guard-kit/lib/guard.sh`'s own advisory says exactly that, while
+  `delegation-kit/templates/agent-execution.md`'s launch-liveness rule reads as unconditional for
+  any backgrounded shell child — and that is the wording the attested instance followed.
+  **Why `[design-pending]`, three candidate fixes differing in kind:** state the producer/observer
+  split in the agent-execution rule so a wait never registers; have `check-producer-liveness` ignore
+  a record whose run key names the stage being entered; or refuse the self-naming record at write
+  time.
+  **DISTINCT from `close-entry-baseline-bootstrap-deadlock`**, closed this iteration: that one is a
+  circularity in what the close-entry evidence manifest demands, with queue and baseline content on
+  both sides. This is a liveness record invalidating its own waiter, with neither involved.
+  **Cost while deferred:** the rule as written walks a session into a wedge that costs that session
+  and every concurrent one, and the only escape is deleting a record that still names a live pid —
+  the one act the rule names as retracting a statement that is still true.
+  Filed 2026-08-26 by close, draining the gap inbox; found 2026-08-26 at build, observing validate.
 
 ## Icebox
 

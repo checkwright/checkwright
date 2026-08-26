@@ -114,3 +114,4 @@
 | port-remainder-disposition-and-worktree-reclamation | sc sp a b v c | 4f/1d | 2 · ≤0d | 24s 1✗ | 106 |
 | turn-end-liveness-seam-and-worktree-cause | sc sp a b v c | 8f/1d | 5 · ≤1d | 24s 1✗ | 106 |
 | install-relocation-boundary-and-first-cut | sc sp a b v c | 3f/1d | 1 · ≤0d | 24s 1✗ | 106 |
+| platform-reach-and-target-roster | sc sp a b v c | 4f/4d | 1 · ≤0d | 31s 2✗ | 106 |
