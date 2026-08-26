@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: windows-adopter-unblock
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -98,50 +98,51 @@
   binary ships one triple, and no run has produced an artifact anywhere else.
   roadmap-summary: A prebuilt gate binary for every platform the project says it supports.
   `native/targets.list` declares exactly one target triple, so the last release published one
-  binary and every adopter off that triple takes the omit-and-declare outcome. That is a
-  supported result rather than a break, and it leaves the trajectory objective naming every
-  major operating system with nothing behind it on the artifact axis.
-  **What holds this is the governing spec, not a design fork — re-read at build 2026-08-25 and
-  acted on there by widening nothing.** gate-sdk/SPEC.md §Consumer payload: a target joins only
-  when a green run has produced and exercised its artifact, not when a platform is reasoned
-  about and not when a provider merely offers a runner for it. No such run exists for any triple
-  but `x86_64-unknown-linux-gnu`, so the roster widens by zero. A leg written and never run
-  discharges nothing.
-  **THE BLOCK CONDITION AS PREVIOUSLY STATED WAS FALSIFIED 2026-08-26 and is corrected here.** It
-  read that the roster "widens by zero until `platform-support-ci-matrix` produces one" — making a
-  green run the sufficient condition. It is not. **THE CRATE DOES NOT COMPILE FOR
-  `x86_64-pc-windows-msvc` AT ALL**, measured on a native Windows runner at that leg's round 2 and
-  routed here by the lead as this entry's own subject rather than that leg's:
-  `native/src/gates/gate_binary_fresh.rs:13` takes `std::os::unix::fs::PermissionsExt`
-  unconditionally and `:15` calls `.mode()` — E0433 and E0599, `build-native` exits 101 — and three
-  further unix-only uses sit behind that first failure at `proc.rs:69`, `proc.rs:337` and
-  `install.rs:165`, so the fix is a portability pass over four modules rather than one line. Cargo
-  itself is fine on that host: the index updates and every dependency compiles clean.
-  **So a target now needs TWO things this entry must hold apart** — a host the crate *builds* for,
-  and a green run that produces and exercises the artifact. The second was the only one recorded;
-  for Windows the first is what actually binds, and it is upstream of everything the CI leg can
-  buy. Whether the same holds for the Darwin triples is UNMEASURED and is not assumed either way.
-  **The filed design fork is settled and is no longer why this waits.** Cross-compilation versus
-  a matrix of runners: `.github/workflows/publish.yml` already derives its build legs from the
-  roster and runs each on its own mapped runner, so the matrix-of-runners shape is landed.
-  **What widening costs, corrected at build 2026-08-25 — "one roster line plus one runner
-  mapping" was the publish half alone.** Beside it sits
-  `installer/consumer-smoke/run-smoke.sh:43-44`, which stops the whole smoke through its
-  `blocked()` helper at `:17` unless the roster is exactly the running host. The two re-entries
-  are steering its pack with `GATE_SDK_NATIVE_TARGETS_FILE` or giving the step a cross-compiling
-  build, and `installer/README.md` §The consumer smoke records that neither is built.
-  **The gap is measurable.** `installer/lib/init.sh`'s `target_of_host()` names four triples —
-  Linux x86_64 and aarch64, Darwin x86_64 and arm64 — against a one-triple roster, so three host
-  classes the installer can name take the omit-and-declare branch on every install today.
-  **Distinct from `powershell-installer-surface`**, which covers the bash bootstrap reaching a
-  second interpreter; this entry is about which binaries the publish step produces.
+  binary and every adopter off that triple takes the omit-and-declare outcome — a supported
+  result rather than a break, leaving the objective naming every major OS nothing on that axis.
+  **What holds this is the governing spec, not a design fork.** gate-sdk/SPEC.md §Consumer
+  payload: a target joins only when a green run has PRODUCED AND EXERCISED its artifact, never
+  when a platform is reasoned about or a provider merely offers a runner. No such run exists for
+  any triple but `x86_64-unknown-linux-gnu`, so the roster widens by zero.
+  **A green run is NOT the sufficient condition, falsified 2026-08-26. THE CRATE DOES NOT COMPILE
+  FOR `x86_64-pc-windows-msvc` AT ALL**, measured on a native Windows runner at that leg's round
+  2: `native/src/gates/gate_binary_fresh.rs:13` takes `std::os::unix::fs::PermissionsExt`
+  unconditionally and `:15` calls `.mode()` — E0433 and E0599, `build-native` exits 101. Cargo
+  itself is fine there: the index updates and every dependency compiles clean.
+  **THE SIZING IS FALSIFIED TOO — "a portability pass over four modules" — re-verified against
+  the tree at the 2026-08-26 scope, and this is what a promoting stage plans against.** THREE of
+  the four sites named were already portable, in two idioms: `proc.rs:67` and `install.rs:163`
+  are `#[cfg(unix)]`/`#[cfg(not(unix))]` twin FUNCTIONS, while `proc.rs:335` is an inline
+  `#[cfg(unix)]` BLOCK in `exit_code` that vanishes on non-unix and falls through to `2`, needing
+  no twin. Each cfg predates the measurement (`e3abf907`, `da6c6645`, both ancestors of head
+  `261231d2`), so the three-further-uses claim was a grep read past the compiler's first error
+  batch. **ONE un-gated site exists**, `gate_binary_fresh.rs:12-17`, a local `is_executable`
+  duplicating `proc.rs`'s portable one, so the repair is a DE-DUPLICATION. **Honest limit:** a
+  census of all 139 `.rs` files found no other site but cannot prove absence — a compiler halts
+  at its first batch, so only a real `cargo check --target` proves the build.
+  **TWO MORE BLOCKERS JOIN HERE, operator-ruled 2026-08-26**, amending that day's earlier routing
+  of both to `powershell-installer-surface` (TRAJECTORY.md §The closed rulings owns the ruling
+  and its grounds): `gate-sdk/bin/build-native.sh:68`'s `BN_ART` names the cargo artifact
+  suffix-less where a Windows toolchain emits `<name>.exe`, and `installer/lib/init.sh:98`'s
+  `target_of_host()` maps Linux and Darwin alone, so a `MINGW64_NT-*` host matches nothing.
+  `BN_ART` is unreachable until the crate compiles, so it sits behind the de-duplication.
+  **So a target needs TWO things this entry holds apart** — a host the crate *builds* for, and a
+  green run that produces and exercises the artifact. For Windows the first binds and is upstream
+  of everything the CI leg can buy. The Darwin triples are UNMEASURED, assumed neither way.
+  **The filed design fork is settled and no longer why this waits:** `.github/workflows/publish.yml`
+  already derives its build legs from the roster onto mapped runners, so that shape is landed.
+  **What widening costs — "one roster line plus one runner mapping" was the publish half alone.**
+  Beside it sits `installer/consumer-smoke/run-smoke.sh:43-44`, which stops the whole smoke
+  through its `blocked()` helper at `:17` unless the roster is exactly the running host. The two
+  re-entries are steering its pack with `GATE_SDK_NATIVE_TARGETS_FILE` or giving the step a
+  cross-compiling build, and `installer/README.md` §The consumer smoke records neither is built.
+  **Distinct from `powershell-installer-surface`** now that the two blockers moved: that entry
+  owns the PowerShell bootstrap and its design; this owns whether a binary exists to bootstrap to.
   **Cost while deferred:** three of the four host classes the installer can name receive no
-  battery at all, and the port tail stays sequenced behind a roster this entry is the only mover
-  of.
+  battery at all, and the port tail stays sequenced behind a roster this entry is the only mover.
   Filed 2026-08-08 by close, draining the gap inbox; found at scope. **Tagged `next/reliability`
-  2026-08-08 by operator ruling** at the `adopter-floor-integrity` scope. Promoted 2026-08-25 at
-  scope; deferred the same day at build, paired with `platform-support-ci-matrix`, on an operator
-  ruling relayed through the iteration lead.
+  2026-08-08 by operator ruling.** Promoted 2026-08-25 at scope; deferred the same day at build
+  beside `platform-support-ci-matrix`, on an operator ruling relayed through the lead.
 
 - **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
   — the whole battery onto the binary, and the shell surface down to its residue.
@@ -202,25 +203,20 @@
   retired as mooted, re-scoped 2026-08-24), and the native Windows leg `platform-support-ci-matrix`
   now orders first. A named adopter is live (gap inbox, 2026-08-26), so the trigger is no longer
   dormant. **Ordered by the trajectory pivot 2026-08-03** — objectives 2 and 6, TRAJECTORY.md's.
-  **TWO SOURCE BLOCKERS ROUTE HERE, operator-ruled 2026-08-26** through the iteration lead at the
-  native Windows leg's build, which measured both and neither fixed nor re-filed them:
-  `gate-sdk/bin/build-native.sh:68`'s `BN_ART` names the cargo artifact suffix-less where a Windows
-  toolchain emits `<name>.exe`, and `installer/lib/init.sh:98`'s `target_of_host()` maps Linux and
-  Darwin alone, so a `MINGW64_NT-*` host matches nothing and takes the omit-and-declare branch.
+  **THE TWO SOURCE BLOCKERS THAT ROUTED HERE ON 2026-08-26 HAVE MOVED OUT, operator-ruled the
+  same day**: `BN_ART` and `target_of_host()` join the Windows blocker unit at
+  `gate-binary-target-roster-widening`, and TRAJECTORY.md §The closed rulings owns the amendment
+  and its grounds. `target_of_host` is still bootstrap step 2 wherever the bootstrap is built —
+  what moved is the one-line repair, never the design, which stays this entry's whole.
   **MEASURED 2026-08-26 at close on a native Windows runner** (`platform-support-ci-matrix` round
   2, which owns the full harvest). Two assumptions this bootstrap makes are now facts rather than
   hopes: `[[ -x ]]` HOLDS on a freshly `chmod +x`'d shebang script and it executes directly, despite
   `core.filemode=false`; and it HOLDS on npm's extension-less bin shim, which is written mode
   `-rwxr-xr-x` beside its `.cmd` and `.ps1` siblings and executes. So neither `-x` test needs a
-  Windows special case. **What the same run also found is that `BN_ART` above is UNREACHABLE**: the
-  crate does not compile for `x86_64-pc-windows-msvc` at all (`std::os::unix` in four modules), so
-  cargo never emits an artifact whose suffix `BN_ART` could get wrong. That third blocker is
-  unrouted and is not claimed here.
-  Surveyed at `.workflow/survey-record.md` 2026-08-26 with the witness a later stage re-runs. The
-  ruling refused both alternatives on the table — a new entry, and widening
-  `platform-support-ci-matrix` — because both are design-bearing exactly where this entry is
-  design-pending: `GATE_SDK_NATIVE_BIN`'s default is spec'd, and a Windows triple's
-  `target_of_host` mapping is step 2 of the bootstrap roster below rather than a CI concern.
+  Windows special case.
+  The 2026-08-26 routing ruling refused two alternatives on the table, a new entry and widening
+  `platform-support-ci-matrix`; the operator's amendment above supersedes only where it sent the
+  two blockers, and reopens neither refusal.
   The bootstrap is bash end to end. The `--install <op>` seam both bootstraps call is specified
   there and the first cut is taken — `--install place-artifact`, the artifact placement and the
   config-seam write, on the rule that a step is takeable only if it already runs when an artifact
@@ -230,17 +226,17 @@
   installer/README.md §The install boundary and made `behind-invoke` that section's stated default,
   so any step's disposition is read off the rule against `init.sh` top to bottom rather than off a
   second copy pinned to a stale commit (the table was that copy; deleted 2026-08-26 at build under
-  queue-kit/SPEC.md §check-queue-entry-budget's compress-by-answering rule). `target_of_host` is
-  bootstrap step 2, which is why the routing above lands here and not on a CI entry.
+  queue-kit/SPEC.md §check-queue-entry-budget's compress-by-answering rule).
   Every sibling surface is `behind-invoke` whole — `doctor.sh`, `diff.sh`, `uninstall.sh`,
   `update.sh`, all of `lib/common/` — bar `digest.sh`'s hasher resolution, re-implemented rather
   than called because step 4 needs it first; `bin/checkwright.sh` collapses into the bootstrap.
   **Cost while deferred:** the pivot's OS-reach objective stays unmet on the one platform it
   names that no current path reaches, and every install-path change is authored bash-first.
-  **Since 2026-08-26 it is also what stops `platform-support-ci-matrix` closing**: that promoted
-  entry's condition wants an artifact produced AND exercised, and the two blockers routed here are
-  precisely what stop a Windows host selecting one — so a Deferred entry now gates a promoted one.
-  Filed 2026-08-03 by spec; re-scoped 2026-08-24 at scope; fork 1 merged and demoted 2026-08-25.
+  **It no longer stops `platform-support-ci-matrix` closing**: that promoted entry wants an
+  artifact produced AND exercised, and every blocker stopping a Windows host from selecting one
+  now sits at `gate-binary-target-roster-widening` rather than here.
+  Filed 2026-08-03 by spec; re-scoped 2026-08-24 at scope; fork 1 merged and demoted 2026-08-25;
+  the two source blockers re-scoped out 2026-08-26 by operator ruling.
 
 - **port-oracle-instrument-self-disposition** [design-pending] — the tool that measures
   the completion predicate is still shell; its disposition is ruled and declared, and its PORT

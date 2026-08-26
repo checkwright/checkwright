@@ -4,4 +4,4 @@
 
 ---
 
-— scope a5b51a4d 2026-08-26 c502fa64
+windows-adopter-unblock scope a5b51a4d 2026-08-26 c502fa64

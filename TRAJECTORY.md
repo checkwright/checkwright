@@ -312,6 +312,17 @@ ruled 2026-08-26 by the operator**, closing `powershell-installer-surface`'s for
 mechanism and the refused generated-twins alternative are owned at `installer/README.md`
 §The install boundary.
 
+**`BN_ART` and `target_of_host` leave `powershell-installer-surface` and join the Windows
+blocker unit — ruled 2026-08-26 by the operator**, amending that same day's earlier routing of
+both to that entry. `powershell-installer-surface` is otherwise untouched: it keeps the
+PowerShell half and the whole bootstrap design, and `target_of_host` remains bootstrap step 2
+wherever the bootstrap is built. The grounds the operator ruled on: each blocker is one
+assignment and one `case` arm, neither carries the bootstrap's design weight, and `BN_ART` is
+not testable under the earlier routing at all until the crate compiles for a Windows triple —
+so that routing sequenced a one-line repair behind a design-pending entry that could not
+exercise it. Where the two blockers now live is the queue's to say; what this records is that
+an operator moved them, because the ruling it amends was operator-class too.
+
 ## PRIORITY DIRECTIVE — the port track's sequence
 
 **Ruled 2026-08-09 by the operator, and it is the track's top priority: complete
