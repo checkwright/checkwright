@@ -10,3 +10,4 @@ installer-trial-lifecycle-repair align a9c95d90 2026-08-27 a14f9bea
 installer-trial-lifecycle-repair build aa7e14db 2026-08-27 a335908c
 installer-trial-lifecycle-repair build a8fc6746 2026-08-28 875b418d
 installer-trial-lifecycle-repair validate a37dde35 2026-08-28 b7664bfa
+installer-trial-lifecycle-repair close a73e36f5 2026-08-28 98b0f6a9
