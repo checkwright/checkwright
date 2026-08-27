@@ -36,6 +36,15 @@ the template §Economics "Tier each batch to its work class" rule now names:
   draw read flat in cost, so align's trend is judged on the `cr` column of
   `.metric/stage-economics-log.txt`, never on `cost`. It fell at the ruling rather
   than continuing to climb; one point is not a trend.
+  **Measured again 2026-08-28 at `installer-trial-lifecycle-repair`: `cr=6394126`** —
+  the second-lowest of the last ten sonnet aligns and below their median, so the
+  draw is still not climbing. The revert signal did not fire: align found three
+  real amendment defects, all traced to one wrong premise about the
+  `installer_smoke` baseline's scenario count, fixed them inside the amendment's
+  envelope, escalated nothing, and its correction was verified independently at the
+  boundary. That is the datum the watch wants — a stage catching a premise error in
+  the contract it is auditing and repairing it without escalating is the behaviour
+  the tier was ruled on. The watch stays live and the ruling is untouched.
 
 scope, `spec`, and close stay on Opus, their generative and verificational
 judgment being what justifies the tier. Re-judge every tier when the harness
