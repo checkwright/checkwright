@@ -371,7 +371,10 @@ three of them are not monotone.
 - `gate-sdk/SPEC.md` §check-action-gh-repo — the standing sentence that its walk
   is its own and §check-action-run-shell's extractor is not reusable is amended
   to say **which** pair it now holds between, since the sibling amendment
-  answers the same question the other way for a different pair (delta 2).
+  answers the same question the other way for a different pair (delta 2). The
+  sibling amendment's own delta 1 names this same paragraph, for the opposite
+  reason — recording the second consumer this rewrite is actually about;
+  whichever batch lands second reconciles one paragraph rather than two.
 - `.github/workflows/gates.yml` — the `install-smoke-windows` job's header
   comment (`:162-166`) currently explains the habit by citing the gate's wrong
   resolution: "check-action-run-shell resolves an absent `shell:` to bash …

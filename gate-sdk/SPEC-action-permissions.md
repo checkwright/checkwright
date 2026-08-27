@@ -400,7 +400,11 @@ not monotone under an addition:
   its second consumer, the marker spelling becomes a parameter, and the sentence
   that no second consumer exists is retired. Its companion claim — that
   §check-action-run-shell's extractor is not reusable — **stays true and stays**,
-  now scoped to the pair it holds between (delta 1).
+  now scoped to the pair it holds between (delta 1). Its sibling amendment
+  `SPEC-run-shell-dialect.md` names the same paragraph from its own delta 2, for
+  the opposite reason — recording that §check-action-run-shell is *not* the
+  second consumer this rewrite is about; whichever batch lands second reconciles
+  one paragraph rather than two.
 - `gate-sdk/SPEC.md` §check-action-gh-repo — the detector, the checkout arm, the
   `env:` ladder and the valve's indentation binding are now **shared mechanism**
   described in one place; that section keeps them as its own rule and cites the
@@ -409,14 +413,23 @@ not monotone under an addition:
 - `gate-sdk/SPEC.md` §check-action-run-shell — the standing "a helper earns its
   place at a second consumer and there is none" sentence is amended to say which
   pair it still holds between, now that a second consumer has arrived for the
-  *other* walk (delta 1). Its sibling amendment `SPEC-run-shell-dialect.md` names
-  the same target from its own delta 2; whichever batch lands second reconciles
-  one sentence rather than two.
+  *other* walk (delta 1). This is this amendment's edit alone: the sibling
+  amendment's own delta 1 states this sentence "survives this delta intact",
+  so no reconciliation is owed here — unlike the §check-action-gh-repo paragraph
+  above, which both amendments do edit.
 - `gate-sdk/SPEC.md` §Fail-closed contract — the `Command`-absent roster test's
   stated corpus is "every module under `native/src/gates/`", and delta 1 moves
   code out of it; the paragraph gains the one-line statement that
   `native/src/actions.rs` is shared gate mechanism outside that corpus and why the
   property still holds (delta 1).
+- `site-kit/SPEC.md` — the release-body arm's paragraph motivating
+  `site-health.yml`'s `permissions:` declaration currently closes "No gate
+  parses a `permissions:` block (workflow-security linting is an explicit
+  non-goal, gate-sdk/SPEC.md §check-action-run-shell), so this one is held by
+  review rather than by an oracle" — the exact in-tree instance this amendment's
+  own opening cites. That sentence is retired: `check-action-permissions` is the
+  oracle it says does not exist, and it is a **cross-kit** citation this
+  amendment must repair since site-kit does not own gate-sdk's roster (delta 3).
 - `gate-sdk/README.md` — the `<!-- gate-roster:begin -->` block gains the row
   (delta 6).
 - `scripts/gates.list` — the registration row (delta 6).
@@ -444,7 +457,9 @@ not monotone under an addition:
       flight (canon-kit/SPEC.md §Merging an amendment, step 3).
 - [ ] **Removals propagated** — grepped every spec for names this change
       retired; nothing dangles. Specifically: every citation of the walk as
-      `check-action-gh-repo`'s own, and the "there is none" clause.
+      `check-action-gh-repo`'s own, the "there is none" clause, and — found by
+      the same grep discipline turned cross-kit — `site-kit/SPEC.md`'s "No gate
+      parses a `permissions:` block" sentence.
 - [ ] **Gaps filed** — cross-component gaps discovered during the work filed as
       debt tasks (a build-time causal gap is resolved that session, not
       deferred).
