@@ -126,7 +126,8 @@ load behind that trigger, so they are not resident here.
   (gate-sdk/SPEC.md §The workflow directory). `BRIEF.local.md` (private brief),
   `OPS.local.md` (private ops runbook — DNS, GitHub repo-settings desired state,
   and the release account and push transport; consult it before any domain,
-  repo-settings **or release** work), and `ENV.local.md` (context-kit's probed
+  repo-settings, release **or push** work — its account step is per-push, never
+  per-session), and `ENV.local.md` (context-kit's probed
   machine profile plus hand-authored gotchas — context-kit/SPEC.md §bin/env-probe)
   are gitignored, local-only.
 - `reserve/` holds the crates.io name-reservation placeholder — do not develop

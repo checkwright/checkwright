@@ -1313,7 +1313,9 @@
   owes two pairs, not one, and `gates-workflow.yml` is the pair whose halves must agree.
   Size: one existing gate widened plus a pair registry.
   **Feature-shaped — self-label corrected 2026-08-04 at close**, on the same read as
-  its `workflow-permissions-scope-oracle` sibling: the label read "Debt" while naming
+  its `workflow-permissions-scope-oracle` sibling (which reached Done at
+  `windows-artifact-proof` and is cited here as history, not as live work): the label read
+  "Debt" while naming
   the consumer knob it mints, and canon-kit/SPEC.md §The amendment lifecycle's litmus
   makes any such name a feature, so promoting it authors an amendment.
   Filed 2026-08-01 at close from the gap inbox, confirmed at this iteration's align
@@ -4377,6 +4379,18 @@
   **Cost while deferred:** one stage of latency on a mechanical zero-judgement condition a precommit
   gate could hold, plus a validate red that presents as a build defect — the batch session reads a
   registration omission as its own gate misbehaving.
+  **RECURRED 2026-08-27**, and the recurrence is exact rather than analogous.
+  `check-action-permissions` landed at `windows-artifact-proof` build batch 1 carrying
+  `install: on-surface`, unregistered; the precommit battery passed across five commits and
+  validate's `consumer_smoke` caught it, fixed in one line at `d0b496fa`. Two independent
+  instances now, both `on-surface`, both one line, both one stage late — so the seam is the
+  disposition split and nothing about either batch. What the second instance ADDS to the
+  first: the registrar was a *different kit* from the shipping one (gate-sdk ships the
+  `check-action-*` family; site-kit registers it, being the kit that writes the workflow
+  surface those gates read), so whichever tier ends up holding the full accounting must
+  resolve registration cross-kit rather than in the gate's own kit — a constraint the
+  2026-08-22 instance did not expose.
+  recurrence: install-disposition-smoke-accounting-split 2026-08-27
   Filed 2026-08-22 by close, draining the gap inbox; the lead filed the bullet at validate and this
   drain re-verified the skip at its source rather than off the gate's `spec:` line.
 
@@ -8256,6 +8270,155 @@
   a green remote one — is false for one member, and the failure mode is a burned push.
   Filed 2026-08-27 by scope into this iteration's ledger, draining the gap inbox; attested
   2026-08-27 by the `windows-adopter-unblock` close's own verifying push.
+
+- **worktree-lock-pid-is-not-agent-liveness** [design-pending] — a linked worktree's lock
+  reason names the harness PROCESS rather than the agent that created the worktree, so
+  reading that pid for liveness always answers "still in use" and the iteration-boundary
+  refusal on a linked worktree looks unclearable.
+  **Re-verified live at this close, and the premise sharpened rather than taken on the
+  bullet's word.** The filed bullet called the pid "the dispatching harness session's". It is
+  not the dispatching *session's*: it is the top-level `claude` process's, and the identical
+  value appears for every worktree that any session in the run creates. This close dispatched
+  three read-only sweeps and all three lock reasons carried the same pid the lead had
+  recorded hours earlier from `scope`'s fan-out under a different session, with
+  `ps -o pid,etime` showing one `claude` process alive for the whole run. So the signal is
+  not merely indirect — it is CONSTANT across the run and carries no information about any
+  agent at all.
+  **Why it traps a compliant session.** delegation-kit's protocol teaches a session to
+  distrust pattern matching and to trust a recorded PID's liveness, so a session meeting a
+  locked worktree does exactly the sanctioned thing, reads a live pid, and concludes the
+  worktree is in use. It is not: the agent that created it had finished. The boundary refusal
+  (lifecycle-kit/SPEC.md §bin/enter-stage.sh) then meets a session with no lawful remedy,
+  which is the shape that has previously invited an agent to invent a mutating one.
+  **The remedy is cheap and was exercised**: unlock, then remove, then delete the branch, no
+  force needed, after verifying the worktree clean and carrying no commits past its base.
+  Nothing about the lock's pid gates that.
+  **Why `[design-pending]`:** three uncosted shapes — have the boundary refusal name that
+  remedy so the message is not a dead end; state in delegation-kit's isolation bullet that a
+  lock reason's pid is the harness's and is not a liveness signal for the agent, that bullet
+  being where a session learns to reap both halves; or have the reap be asserted at the
+  dispatching session's own turn end rather than at the next boundary, so it lands on the
+  party that can see what the worktree was for.
+  **DISTINCT from delegation-kit's reap-both-halves rule**, which says WHAT to delete and is
+  silent on how to judge whether deleting is safe.
+  **Cost while deferred:** every boundary crossing behind an orphaned worktree is a session
+  reasoning correctly to a false conclusion, and its only honest fallback is to ask.
+  Filed 2026-08-27 by the lead at scope, promoted 2026-08-27 by close draining the gap inbox.
+
+- **exe-suffix-single-spelling-unenforced** [design-pending] — gate-sdk/SPEC.md §lib/gate.sh
+  asserts that `gate_exe_suffix` is the executable suffix's single owner and that no other
+  surface in any kit spells the Windows suffix, with no gate behind it, so a second spelling
+  lands silently. Enforcement-first says an invariant and its gate ship together.
+  **The filed sizing was a cheap literal scan with `lib/gate.sh` exempt, and the drain's
+  re-verification did not survive it.** That scan is NOT clean at HEAD: `bin/build-native.sh`
+  and `scripts/pack-installer.sh` each spell the suffix in a parameter-expansion STRIP, and
+  both are correct — they strip before asking the owner for the right one — while the SPEC
+  section stating the invariant necessarily spells it in stating it. So the gate cannot be a
+  literal scan. It has to discriminate a strip from an emit, or carry a declared-exemption
+  model, and that discrimination is the design question this entry actually owns.
+  **The live neighbour that keeps it honest**: the crate's `PATHEXT`-derived candidate set
+  answers a different suffix question — what an already-installed program may be named — and
+  is deliberately outside any kit, so a scanner must not reach it.
+  **Why `[design-pending]`:** the assertion's enforceable form is unsettled between a
+  strip/emit discrimination, a declared-exemption list, and narrowing the SPEC's claim to
+  what a scanner can actually hold.
+  **Cost while deferred:** an invariant stated in a SPEC with nothing behind it, which is the
+  shape enforcement-first exists to refuse, and the exposure grows with each new
+  artifact-naming reader.
+  Filed 2026-08-27 by build, promoted 2026-08-27 by close with its sizing corrected at the
+  drain.
+
+- **intra-stage-batch-stamp-unobserved** [design-pending] — an intra-stage batch session that
+  skips its entry stamp leaves no trace and no gate notices, so the stamp roster reads as a
+  complete account of a stage's sessions while being an incomplete one.
+  **The instance, re-counted at this close against the tree rather than off the bullet.**
+  This iteration ran six build sessions and `.workflow/WORKFLOW-STATE.txt` carries five build
+  stamps: the work commit `f3c53dae` landed with no stamp of its own and is traceable only
+  because the NEXT batch's stamp happens to name it as that session's base. The full battery
+  passed at every point.
+  **Why no gate sees it.** `check-stage-entry`'s predecessor assertion keys on the *previous
+  stage's* stamp, which the stage's first entry already satisfied for every sibling, so a
+  sibling's stamp is required by lifecycle-kit/SPEC.md's per-batch-provenance sentence and is
+  load-bearing for nothing the machine checks. The cursor stayed correct throughout: what was
+  lost is provenance, not sequencing — one batch's session id and base commit appear nowhere.
+  **The unstated converse.** lifecycle-kit/SPEC.md's honest-limit sentence states the forward
+  direction, that a stamp proves the skill was invoked and not that work happened. The
+  converse is unstated and is this entry: a MISSING stamp proves nothing about whether work
+  happened.
+  **Why `[design-pending]`:** three uncosted shapes — make the lead's own dispatch record the
+  cross-check rather than adding a gate, since the lead knows the batch count and the machine
+  does not; give `check-stage-evidence` a same-stage arm flagging a tree-touching commit
+  between two stamps of one stage with no stamp of its own, which is cheap but fires on every
+  lead or gap-filing commit; or accept it as provenance-only and state the converse limit
+  where the forward one lives.
+  **Cost while deferred:** one batch per iteration is plausibly invisible, and a roster a
+  later audit reads as complete is not.
+  Filed 2026-08-27 by build, promoted 2026-08-27 by close.
+
+- **observation-predicate-entry-cannot-drain-in-its-own-iteration** [design-pending] — an
+  entry whose completion predicate is an OBSERVATION of a remote run rather than a tree state
+  — the run-observed precondition shape — structurally cannot complete in the
+  iteration that buys it under the normal one-push-at-close budget.
+  **The bind, probed with `--simulate` at both stages 2026-08-27.** `check-stage-entry`
+  refuses close while the active queue is non-empty, drain-exempt entries included, so the drain
+  gate sits UPSTREAM of the push that would justify the drain: the close push produces the
+  observation the entry needed in order to be drained before that push was permitted. This is
+  a standing property of the state machine, not a quirk of `windows-artifact-proof`.
+  **What this iteration paid to discover it:** three pushes rather than the budgeted one to
+  two, by operator ruling — one to observe round 3, one to observe round 4's repair so the
+  drain could happen upstream of close, and a third reserved for close itself. The headline
+  entry still did not complete: it was deferred with its PRODUCED half discharged.
+  **Why `[design-pending]`:** no shape is costed, and each obvious candidate costs something
+  real — a two-iteration protocol for observation-predicate entries, a standing extra push,
+  or splitting every such entry into a produce half and an observe half at scope.
+  **Cost while deferred:** every entry of this shape either overruns its push budget or
+  defers, and the deferral is invisible until the close that cannot drain it.
+  Filed 2026-08-27 by the lead at build, promoted 2026-08-27 by close.
+
+- **msys-path-dialect-boundary-unmodelled** [design-pending] — this codebase never models
+  which PATH DIALECT a root variable is in, so on an MSYS host a root can arrive in Windows
+  spelling and every downstream resolution silently produces nothing.
+  **Measured on Windows 2026-08-27.** On an MSYS host the installed consumer's root is
+  carried in Windows spelling, so the runner's resolve-dirs come out as a POSIX leading slash
+  prefixed onto a drive-lettered absolute path with backslashes intact. Every gate then
+  resolves to nothing and the run reported its entire roster failed, unresolved. It takes the
+  WHOLE roster rather than part of it because the starter profile vendors gate-sdk alone and
+  gate-sdk's shipped roster is `.gate` descriptors with no `.sh` fallback, so a resolver that
+  cannot reach the binary has nothing else to run.
+  **Two mechanisms are plausible and NEITHER was pinned** — npm's own MSYS bin shim, which
+  converts its basedir to Windows spelling and is how the smoke reaches the entry point, and
+  the toplevel probe under Git-for-Windows, a native Windows binary. Neither fully explains
+  the observed spelling, which carries a POSIX leading slash *and* backslashes, so a third
+  step is unaccounted for. The symptom's own propagation does not run through the installer's
+  root at all: the resolve-dirs derive from how the runner was invoked, a different chain
+  again.
+  **Why this wants a contract and not a patch.** Dozens of call sites take a root from a
+  program that, on MSYS, may not answer in our dialect, and nothing states which dialect a
+  root variable is in — so no call site can be judged right or wrong. The deliverable is a
+  CONTRACT: which dialect a root is in, where the boundary is crossed, and who crosses it.
+  **The cost, and re-derive it rather than reading this line.**
+  `grep -rn 'show-toplevel' --include=*.sh --include=*.rs` counts the call sites and names
+  the roots; at the drain it spanned eight roots in shell alone, one of which (`guard-kit`)
+  the filed bullet's own roster omitted. Fixing at the layer where the value enters means a
+  shared root-normalization helper plus a migration of every call site — a normalization
+  seam, which is the named signal that this is not a hotfix, and is why an operator-ruled
+  hotfix attempt was STOPPED at sizing 2026-08-27 rather than grown.
+  **No local oracle**: MSYS path semantics cannot be exercised on this machine, so the
+  contract has to be held by a fixture pair plus a labelled reasoned-from-shape arm, the way
+  this iteration's `on_path` unit did it.
+  **DISTINCT from `platform-support-ci-matrix`**, whose subject is buying an OBSERVATION and
+  whose body records what each round measured; this is a located source defect in the
+  resolver, with its own emitter and its own fix, that would be worth fixing if the Windows
+  leg were deleted tomorrow. It cites that entry only as the surface where the symptom first
+  appeared — and it is now what blocks that entry's EXERCISED half, and with it the first
+  honest measurement of this iteration's `on_path` repair, which has gone two rounds
+  unmeasured behind the same resolver.
+  **Why `[design-pending]`:** the deliverable is a dialect contract and the diagnosis was
+  stopped at sizing rather than grown.
+  **Cost while deferred:** the Windows leg produces an artifact nothing exercises, so every
+  Windows claim this repo makes rests on reasoning rather than on a run.
+  Filed 2026-08-27 by build under a stopped hotfix, promoted 2026-08-27 by close with the
+  call-site roster re-derived and corrected at the drain.
 
 
 ## Icebox

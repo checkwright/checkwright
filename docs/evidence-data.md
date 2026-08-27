@@ -117,3 +117,4 @@
 | platform-reach-and-target-roster | sc sp a b v c | 4f/4d | 1 · ≤0d | 31s 2✗ | 106 |
 | native-windows-ci-leg | sc · · b v c | 0f/1d | 0 | 24s 1✗ | 106 |
 | windows-adopter-unblock | sc sp a b v c | 10f/1d | 8 · ≤1d | 24s 1✗ | 106 |
+| windows-artifact-proof | sc sp a b v c | 3f/5d | 2 · ≤0d | 31s 3✗ | 107 |

@@ -202,3 +202,16 @@ session.
    paid only when opened.
 10. **Optionally merge** — an iteration can close without merging if validate
    is incomplete or a follow-up iteration is planned.
+11. **The push precondition — select the writing identity, immediately before
+   each push.** Any push this stage makes runs the consumer's identity
+   precondition first, and that holds for the *ordinary* close push and not only
+   for a release — a close that pushes without releasing otherwise never reaches
+   the precondition its release procedure already carries. It is **per-push,
+   never per-session**: an identity selected at the start of a session is not
+   evidence about the moment a later push happens, so a session that pushes twice
+   runs it twice. Where the consumer keeps its account and transport mechanics
+   outside the tree, the release procedure's pointer to that local runbook is the
+   one to follow here too, rather than a second formulation. **No gate
+   substitutes for this** — an identity check grades that a login exists, never
+   which one is selected, and the selected identity is evidence only about the
+   moment the write happens, which is why the mechanism has to be a stage step.
