@@ -46,36 +46,6 @@
 
 ## Technical Debt
 
-- **artifact-digest-mismatch-remedy-inert** — `doctor` prints a remedy `init`
-  refuses to perform: a substituted gate binary is kept, not rewritten.
-  `installer/lib/doctor.sh:124` reports a DIGEST MISMATCH when the binary at `GATE_SDK_NATIVE_BIN`
-  no longer hashes to the recorded digest, and the verdict line at `:160` prints `help: re-run
-  init; it re-verifies the published digest and rewrites the binary`. A bare re-run does not
-  rewrite it: the artifact path goes through the ownership rule, and a file whose recorded hash no
-  longer matches is classified as the adopter's, reported in the changed-file list and left alone
-  without `--force`.
-  **Where the rule lives.** The gap was filed against `installer/lib/init.sh:280`, and the first
-  relocation cut moved it: the ownership test is now `claim()` in `native/src/install.rs:148`,
-  applied to the artifact path at `:247`, with `Claim::Kept` emitting the `kept` verb `init.sh:288`
-  replays. The behaviour is preserved verbatim — which is exactly what the relocation promised — so
-  the defect is unchanged and the fix is a native-crate change rather than a bash one.
-  **The owner doc is on `doctor`'s side, so the defect is the code's.** `installer/README.md` §The
-  gate binary rules that nothing unverified is ever written and that a mismatch refuses rather than
-  warns; §doctor rules the artifact finding reports without setting the exit status precisely so
-  the re-run that is its own remedy is not blocked — a remedy the code then declines to perform.
-  **Candidate fix, narrow:** retire the ownership rule over the artifact path alone, on the ground
-  that a digest-verified artifact has no adopter-authored version for that rule to protect, and
-  leave every other claimed path untouched.
-  **Distinct from `powershell-installer-surface`**, whose subject is which side of the binary
-  invoke a step lives on; this is what the step does on either side.
-  **Why promoted:** the one remedy the installer's own diagnostic verb prints is inert, so an
-  adopter with a substituted binary follows the printed instruction, sees the same finding again,
-  and has nothing left to try short of reading the source. The owner doc already rules the intended
-  behaviour on both sides, so the fix converges code onto names the specs carry — debt, not design.
-  ruled: artifact-digest-mismatch-remedy-inert operator 2026-08-27 lead-relay
-  Filed 2026-08-25 by close, draining the gap inbox; found at spec, locus re-verified there.
-  Promoted 2026-08-27 by scope as member 2 of `installer-trial-lifecycle-repair`.
-
 ## Deferred
 
 - **platform-support-ci-matrix** [design-pending] [roadmap: next/reliability]
@@ -8615,6 +8585,7 @@
 ## Done
 
 - manifest-artifact-files-row-contradiction
+- artifact-digest-mismatch-remedy-inert
 
 ## Lessons Learned
 

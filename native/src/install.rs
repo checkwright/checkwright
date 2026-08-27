@@ -244,26 +244,24 @@ fn place(p: &Placement, recorded: &Recorded) -> Result<Vec<String>, String> {
     let mut records = Vec::new();
     let dest_path = p.root.join(p.dest);
 
-    match claim(&p.root, p.dest, recorded, p.force)? {
-        Claim::Kept(h) => records.push(format!("kept\t{}\t{}", p.dest, h)),
-        Claim::Take => {
-            // spec: installer/README.md §The manifest — an on-disk artifact that still verifies
-            // against the recorded digest is not rewritten, which is what makes a bare re-run
-            // leave the tree byte-identical.
-            if !p.dry {
-                let stale = recorded.target != p.target
-                    || recorded.digest != p.digest
-                    || !dest_path.is_file()
-                    || sha256::file_hex(&dest_path)? != p.digest;
-                if stale {
-                    std::fs::copy(p.src, &dest_path)
-                        .map_err(|e| format!("could not write {}: {}", p.dest, e))?;
-                    make_executable(&dest_path)?;
-                }
-            }
-            records.push(format!("own\t{}", p.dest));
+    // spec: installer/README.md §The gate binary — the artifact path is exempt from the ownership
+    // rule the seam below still runs, so a substituted binary is rewritten rather than kept and
+    // the remedy §doctor prints is one a bare re-run performs.
+    if !p.dry {
+        // spec: installer/README.md §The manifest — an on-disk artifact that still verifies
+        // against the recorded digest is not rewritten, which is what makes a bare re-run
+        // leave the tree byte-identical.
+        let stale = recorded.target != p.target
+            || recorded.digest != p.digest
+            || !dest_path.is_file()
+            || sha256::file_hex(&dest_path)? != p.digest;
+        if stale {
+            std::fs::copy(p.src, &dest_path)
+                .map_err(|e| format!("could not write {}: {}", p.dest, e))?;
+            make_executable(&dest_path)?;
         }
     }
+    records.push(format!("own\t{}", p.dest));
 
     match claim(&p.root, p.seam, recorded, p.force)? {
         Claim::Kept(h) => records.push(format!("kept\t{}\t{}", p.seam, h)),
@@ -520,13 +518,22 @@ mod tests {
         .expect("the bare re-run failed");
         assert_eq!(again, owned);
 
-        let stale_files = format!(r#"{{"{}":"{}"}}"#, dest, "0".repeat(40));
-        let kept = place(
+        // spec: installer/README.md §The gate binary — the substitution case, which is the one
+        // §doctor reports as a digest mismatch: the artifact carries no adopter-authored version,
+        // so a re-run rewrites it from the verified payload rather than reporting it kept.
+        std::fs::write(dir.join(dest), "substituted bytes\n").expect("cannot substitute");
+        let substituted = format!(r#"{{"{}":"{}"}}"#, dest, "0".repeat(40));
+        let rewritten = place(
             &placement(&dir, &src_s, &digest, false),
-            &recorded(&stale_files, "x86_64-unknown-linux-gnu", &digest),
+            &recorded(&substituted, "x86_64-unknown-linux-gnu", &digest),
         )
-        .expect("the kept run failed");
-        assert_eq!(kept[0], format!("kept\t{}\t{}", dest, "0".repeat(40)));
+        .expect("the substituted run failed");
+        assert_eq!(rewritten[0], format!("own\t{}", dest));
+        assert_eq!(
+            sha256::file_hex(&dir.join(dest)).expect("the artifact went missing"),
+            digest,
+            "a substituted artifact must be rewritten from the verified payload"
+        );
 
         std::fs::remove_file(dir.join(dest)).expect("cannot clear the placed artifact");
         let planned = place(&placement(&dir, &src_s, &digest, true), &Recorded::none())

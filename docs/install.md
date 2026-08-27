@@ -281,7 +281,11 @@ recorded in `checkwright.lock`, rewrites what still matches, and **reports
 rather than overwrites** anything you have changed since, unless you pass
 `--force`. Every file `init` rewrites is claimed before it is written, so that
 covers each kit's config seam and the commit-message patterns — the files you are
-most expected to edit — as well as the vendored kit source. Nor does the
+most expected to edit — as well as the vendored kit source. The gate binary is
+the single exception, because no version of a compiled artifact is yours to
+protect: one that fails its recorded digest is corrupt or substituted rather than
+edited, so `init` rewrites it from the copy it just verified, which is what makes
+`doctor`'s advice to re-run something a re-run performs. Nor does the
 protection expire: `init` owns a path because it wrote the file there, so the
 path keeps its recorded hash until the file leaves your tree, across later
 upgrades and across a release that stops shipping it. Idempotent is a claim about

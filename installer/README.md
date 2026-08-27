@@ -194,7 +194,9 @@ again. It does not expire when a release **stops shipping** the file either.
 `init` owns what it wrote there, not what the current payload happens to carry,
 so the path stays on the roster at that hash and a release that later re-adds it
 meets the same protection rather than a clean slate — which is the one window in
-which an unowned path could otherwise be written straight over your edits. A
+which an unowned path could otherwise be written straight over your edits. The
+gate binary is the single exception, and §The gate binary states it: no version
+of a compiled artifact is yours, so a re-run rewrites a substituted one. A
 re-run that finds
 nothing to change says so and exits clean; an unchanged tree is the success
 case, not an error.
@@ -550,6 +552,20 @@ artifact is omitted rather than written unverified. Both halves are load-bearing
 never write what was not verified, and never fail an install over something the
 adopter did not choose.
 
+**The artifact is the one path the changed-file protection does not cover, and
+that is what makes the digest actionable.** Everywhere else `init` writes, a file
+whose recorded hash disagrees with the tree is yours: you authored the
+difference, so it is reported and left alone (§init). A compiled artifact has no
+version you authored for that rule to protect — a binary that fails the recorded
+digest is corrupt or substituted, never edited — so `init` rewrites it from the
+payload copy it just verified rather than adding it to the changed-file report.
+Without the exemption the diagnosis and the remedy come apart: §doctor reports
+the mismatch and names a re-run as the fix, and a re-run that classified the
+binary as yours would leave it exactly where it was, reporting the same finding
+forever. `--force` is therefore never needed here and means nothing extra. The
+exemption is scoped to the artifact path alone: the config seam written beside it
+is a file you genuinely do edit, and it is claimed like everything else.
+
 *The honest bound, stated so no surface overclaims it.* The digest travelled
 inside the same payload as the artifact, so it catches corruption and a
 substitution made to the artifact alone — not a compromised publisher, which no
@@ -611,12 +627,12 @@ copy, which on a first install does not exist yet:
 ```
 
 Every key has a reader inside the op: `--root` resolves every relative path,
-`--src` is the copy source, `--dest` and `--seam` are the two claimed paths,
-`--target` and `--digest` are compared against the manifest's `artifact` key and
-the on-disk copy for the skip-rewrite branch, `--lock` supplies the recorded
-hashes the claim compares, and `--force` and `--dry-run` carry `init`'s existing
-meanings. `--lock` is optional and absent on a first install, where nothing is
-claimed. Two stdout verbs come back, and each has one reader in the caller:
+`--src` is the copy source, `--seam` is the claimed path, `--dest` is written on
+the rule below instead, `--target` and `--digest` are compared against the
+manifest's `artifact` key and the on-disk copy for the skip-rewrite branch,
+`--lock` supplies the recorded hash the claim compares, and `--force` and
+`--dry-run` carry `init`'s existing meanings. `--lock` is optional and absent on
+a first install, where nothing is claimed. Two stdout verbs come back, and each has one reader in the caller:
 
 | verb | record | the caller's reader |
 | --- | --- | --- |
@@ -647,11 +663,13 @@ like any rewritten surface and then rewritten preserving every line except the
 one setting `GATE_SDK_NATIVE_BIN`, seeding the two shellcheck directives only
 when the file is absent — so an adopter's own knobs in that file survive every re-run.
 
-**The non-destructive re-run is the op's too.** `--dest` is claimed against the
-hash `--lock` records for it and left alone when it differs, unless `--force`;
-the copy is skipped when the recorded target, the recorded digest and the
-on-disk digest all agree with `--target` and `--digest`, which is what makes a
-bare re-run leave the tree byte-identical.
+**The non-destructive re-run is the op's too, and `--seam` is where it applies.**
+The seam is claimed against the hash `--lock` records for it and left alone when
+it differs, unless `--force` — it is a file you edit. `--dest` is not claimed
+(§The gate binary): the copy is skipped when the recorded target, the recorded
+digest and the on-disk digest all agree with `--target` and `--digest`, and made
+otherwise. That is what makes a bare re-run leave the tree byte-identical and a
+substituted binary get replaced, from the one test rather than two.
 
 **Ordering is load-bearing.** The op is called after every config seam is in
 place and before the pre-commit hook is generated, because the generator
