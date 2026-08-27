@@ -67,7 +67,23 @@
   declaration where a `gh` call makes it verb-dependent and a verb-to-scope map would be a shipped
   vocabulary; and this gate is the SECOND CONSUMER that promotes `check-action-gh-repo`'s
   job-partitioned walk into a shared `native/src/actions.rs`, which is the delta carrying the risk.
+  **THE FILED SIZE — "one gate plus fixtures" — IS FALSE, and it did not survive the promotion:
+  that line was dropped rather than carried, so this replaces it rather than correcting it where
+  it stood.** Delta 1 is not gate-shaped work at all. It lifts the WHOLE of
+  `check-action-gh-repo`'s job-partitioned walk — its event enum, its workflow/job/step `env:`
+  ladder, its `gh` command-position detector and its indentation-bound valve — out of that module
+  into a shared `native/src/actions.rs` under this gate as its second consumer, and it carries an
+  obligation no gate holds for it: `check-action-gh-repo` must come out BYTE-IDENTICAL — findings,
+  counts, clean line, exit code — across the live tree and both fixture cases, before and after
+  the move. The gate itself, its fixture pair, its SPEC section, its `gates.list` row, its
+  descriptor and the new-gate projection fan-out all sit BESIDE that delta, not inside it.
+  **BATCH CUT RULED 2026-08-27: delta 1 is its own build batch**, the amendment staying whole.
+  Grounds: §check-action-gh-repo's own standing rule prescribes extraction at a second consumer
+  and there is now one, and duplicating the walk instead would land the parallel copy the
+  content-tiering rule names as the defect. The amendment's Definition of Done carries the
+  byte-identical assertion, so the batch boundary has an oracle rather than an intention.
   ruled: workflow-permissions-scope-oracle operator 2026-08-27 lead-relay
+  ruled: workflow-permissions-scope-oracle lead 2026-08-27 own-authority
   Filed 2026-08-01 at close from the gap inbox, confirmed at this iteration's align audit against
   the gates that read workflow YAML — a count that read "nine" until spec found it inflated by the
   three `.workflow/`-reading gates whose names collide with the Actions sense of the word.
