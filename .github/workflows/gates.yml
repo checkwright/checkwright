@@ -150,8 +150,8 @@ jobs:
   # **What still stands between this leg and `native/targets.list`, corrected
   # 2026-08-27 at scope against the tree rather than carried.** gate-sdk/SPEC.md
   # §Consumer payload admits a triple only on a green run that produced *and
-  # exercised* the artifact. The two SOURCE facts that once said this leg could
-  # not do that at all have both shipped, and are recorded as discharged so a
+  # exercised* the artifact. The three SOURCE facts that once said this leg could
+  # not do that at all have all shipped, and are recorded as discharged so a
   # later session does not re-derive them as live:
   #   - `installer/lib/init.sh`'s `target_of_host()` now maps `MINGW*`, `MSYS*`
   #     and `CYGWIN*` on x86_64 to `x86_64-pc-windows-msvc`, so a Windows host
@@ -159,7 +159,17 @@ jobs:
   #   - `GATE_SDK_NATIVE_BIN`'s default derives its suffix from
   #     `gate_exe_suffix`, so the knob names the artifact cargo actually emits
   #     inside an installed consumer and not only on this tree.
-  # What remains is the run itself: a green one, produced and exercised.
+  #   - `shellcheck`'s bullet in docs/install.md §Requirements justified an
+  #     ADOPTER floor member with contributor-only language, so nothing told an
+  #     adopter why `init` refuses without it. Round 3 measured that refusal
+  #     here; the bullet now states the adopter's own stake and where each
+  #     platform takes the member from, and the step above supplies it on this
+  #     host. PRODUCED was discharged by that same round — the artifact built
+  #     natively and packed — so only EXERCISED is still owed.
+  # What remains is the run itself: a green one, produced and exercised. Each of
+  # the three above removed a blocker, and gate-sdk/SPEC.md §Consumer payload is
+  # explicit that removing one grants nothing — this leg has now spent two rounds
+  # proving that clause the hard way.
   #
   # **Every `run:` names `shell: bash`.** GitHub's default `run:` shell on a
   # Windows runner is `pwsh`, so a step here that omitted the key would run
@@ -314,6 +324,40 @@ jobs:
           ls -l native/target/release/ 2>&1 | head -n 20
           echo "-- porcelain after a release build; the smoke asserts this is empty --"
           git status --porcelain | head -n 40
+          exit 0
+
+      # `shellcheck` is an ADOPTER floor member (docs/install.md §Requirements,
+      # context-kit/lib/toolfloor.sh's PROBE_SET, where it carries no audience
+      # token) and windows-latest ships without it — so `checkwright init`
+      # refuses the toolchain and the suite never reaches the artifact. That is
+      # what round 3 measured on 2026-08-27, and it is a real adopter-facing
+      # defect rather than a CI one; the repair is the docs half, which now
+      # states the adopter's own stake in this member and where each platform
+      # takes it from.
+      #
+      # **This step is measurement scaffolding and not a support claim**, the
+      # same class as the roster steering below and declared for the same
+      # reason. docs/install.md sends a Windows adopter through WSL, where this
+      # member comes from the distribution — and this runner is deliberately
+      # NATIVE Windows, because the native path is precisely what is unmeasured.
+      # So there is no documented native route to mirror here yet; chocolatey is
+      # this host's own package manager, already the source of its `jq`. When a
+      # native Windows path is supported, this step's route is what that
+      # section has to name, or the leg goes back to measuring nobody's path.
+      - name: install the one adopter floor member this runner lacks
+        shell: bash
+        run: |
+          set +e
+          choco install shellcheck -y --no-progress
+          echo "choco exited $?"
+          hash -r
+          echo "shellcheck resolves to: $(command -v shellcheck || echo '<MISSING>')"
+          shellcheck --version
+          # Loud and specific rather than silent: if this did not land, the suite
+          # below fails at doctor exactly as it did in round 3, and the next
+          # reader must be told which of the two defects they are looking at.
+          command -v shellcheck >/dev/null 2>&1 \
+            || echo "SCAFFOLDING FAILED — shellcheck is still absent, so a doctor refusal below is THIS step's failure and not a new finding"
           exit 0
 
       # The suite itself, under one steering that is **measurement scaffolding

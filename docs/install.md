@@ -99,9 +99,19 @@ your `PATH`, and the note says what breaks without it:
   `realpath --relative-to` in the gate library every check sources; the release,
   drift and usage tooling reach for `sort -V`, `date -d` and `stat -c` besides.
   No BSD equivalent carries those flags.
-- `shellcheck` — the `check-shellcheck` meta-gate runs
-  [ShellCheck](https://www.shellcheck.net/) over every shipped script, and a
-  lint finding blocks the commit.
+- `shellcheck` — an **adopter** requirement and not merely a contributor one,
+  which is why it carries no audience token where `cargo` below does. You
+  inherit the battery: the `check-shellcheck` meta-gate runs
+  [ShellCheck](https://www.shellcheck.net/) over every shipped script, and once
+  the generated hooks are installed it runs over **your** scripts at commit time
+  too, where a lint finding blocks the commit. So `init` enforces it up front —
+  this member is part of the toolchain contract `checkwright doctor` decides
+  before any partial install (see the three preconditions under `init` below),
+  and a machine without ShellCheck is **refused rather than half-installed**.
+  Nothing in the install supplies it: take it from your distribution on Linux,
+  from Homebrew on macOS, and on Windows from inside the WSL distribution this
+  section already sends you to, which is where a Windows adopter satisfies this
+  member.
 - `cargo` (≥ 1.71, @contributor) — a **contributor** requirement with **no install-time role at
   all**: the `native/` crate carries the gate implementations that dispatch to a
   binary subcommand, and the floor is the highest MSRV in the crate's resolved

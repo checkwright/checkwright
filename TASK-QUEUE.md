@@ -90,6 +90,25 @@
   with bash `command -v`, not the crate, and the battery that would have run `check-shellcheck`,
   `check-action-run-shell`, `check-crate-arms` and the evidence runner's `ps` probe never started.
   Their Windows behaviour remains READ, not MEASURED.
+  **BLOCKER 5 IS REPAIRED, 2026-08-27 at build, as an operator-ruled hotfix** — minimal and
+  test-and-doc-complete in one commit, so it minted no queue entry of its own; the `ruled:` line
+  below already carries this ruling's authority, date and channel and is not duplicated for it.
+  What the operator ruled: the empty audience field on `shellcheck` is CORRECT and stays, because an
+  adopter who vendors the kits and installs the hooks runs the battery on their own tree and
+  genuinely needs the tool — the defect was never the floor, it was the JUSTIFICATION. So the fix is
+  the docs half plus a job step, in that order: docs/install.md §Requirements' `shellcheck` bullet
+  had justified an adopter-gating member with contributor-only language (`check-shellcheck` runs
+  over *shipped* scripts), leaving an adopter no way to learn why `init` refuses without it; it now
+  states the adopter's own stake, that `doctor` decides this floor before any partial install, and
+  where each platform takes the member from — Windows from inside WSL, which is the path
+  docs/install.md §Requirements already sends a Windows adopter down. The leg's own step is declared
+  measurement scaffolding rather than a support claim, because this runner is deliberately NATIVE
+  Windows and no documented native route exists yet to mirror.
+  **AND THE REPAIR IS, AGAIN, NOT AN OBSERVATION.** That sentence is this entry's own standard and
+  it has now caught two rounds running — round 2's `.exe` repair and this one. What stands between
+  the entry and its promotion condition is ONE RUN, and the entry has been wrong about exactly that
+  claim once already, at round 3. It cannot be drained from the tree: the next push is the
+  observation, and PRODUCED is already discharged, so what round 4 has to show is EXERCISED.
   **THE FORK STAYS RULED — legs, not the honest label**, and the Windows-ahead-of-macOS ordering
   with it; both are TRAJECTORY.md §The closed rulings', and WSL is the interim path.
   **Cost this iteration is buying down:** the one adopter class with a named days-to-weeks adoption
