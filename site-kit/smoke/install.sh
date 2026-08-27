@@ -15,6 +15,7 @@ check-docs-cname-parity
 check-action-pinning
 check-action-run-shell
 check-action-gh-repo
+check-action-permissions
 check-docs-render-fidelity
 EOF
 
