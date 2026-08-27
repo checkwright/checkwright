@@ -165,13 +165,13 @@ suite's only lever on payload shape, and that what the arm asserts is therefore
 removability-after-a-shape-change and roster coverage of the upgrade write set —
 not a moving hash. **{design-bearing}**
 
-Two existing claims in the same section are re-read as part of this delta and
-one moves. **The tree-object-equality paragraph** ("it proves more than
+Two existing claims in the same section are re-read as part of this delta, and
+neither relocates. **The tree-object-equality paragraph** ("it proves more than
 `uninstall`" — that nothing else asserts the manifest covers everything `init`
-wrote) is today true only of a first `init`; it gains the cross-version reach.
-**The reversal-arm paragraph's** "every profile is installed *and* reversed"
-stays exactly as it is: it is a claim about the per-profile loop and this arm is
-not in it.
+wrote) is today true only of a first `init`; it is edited in place, gaining the
+cross-version reach. **The reversal-arm paragraph's** "every profile is
+installed *and* reversed" stays exactly as it is, untouched: it is a claim
+about the per-profile loop and this arm is not in it.
 
 **Checked and left alone, recorded so the next reader knows it was checked.** The
 dated cost measurement ("272 seconds", re-measured 2026-08-13) enumerates cost
@@ -229,7 +229,7 @@ new call is named against the interface it uses.
   scripts/parse-installer-smoke-log.sh'` and `EVIDENCE_KIT_RUN_installer_smoke`
   in `scripts/evidence-config.sh`, both set today, and `installer_smoke` is
   already in `EVIDENCE_KIT_SUITES`. No config is added and none is test-only —
-  this is the same channel the nine existing arm scenarios ride.
+  this is the same channel the twelve existing scenarios ride.
 - **Consumer 1** — `scripts/parse-installer-smoke-log.sh`, which needs **no
   edit**: it derives its arm roster from the smoke script's own headers
   (`:17-26`) and matches a log line against each (`:37-42`). It emits
@@ -278,8 +278,8 @@ has no subject here: delta 1 adds a call site, delta 3 adds a baseline row, delt
 4 extends two prose lines, and no glob, prune set, roster or file set anywhere
 gets smaller. The one reader whose verdict *could* be non-monotone —
 `check-evidence-baseline`'s suite-coverage arm, which reds on a suite carrying
-**no** row — is moved in the safe direction: `installer_smoke` gains a tenth row
-and never approaches zero.
+**no** row — is moved in the safe direction: `installer_smoke` gains a
+thirteenth row and never approaches zero.
 
 ## Existing sections updated
 
@@ -289,8 +289,8 @@ and never approaches zero.
 - `installer/consumer-smoke/run-smoke.sh`'s file-header `# spec:` restatement and
   its terminal `INSTALLER-SMOKE: clean` summary, both of which enumerate the arm
   set (delta 4).
-- `.workflow/validate-baseline.txt` — the `installer_smoke` slice gains its tenth
-  row (delta 3).
+- `.workflow/validate-baseline.txt` — the `installer_smoke` slice gains its
+  thirteenth row (delta 3).
 - `evidence-kit/SPEC.md` §Baseline manifest — <!-- update-target-exempt: the row this
   amendment adds is an instance of the grammar that section already specifies, and its
   `ignore`-plus-standing-slug disposition is the rule that section already states; changing
