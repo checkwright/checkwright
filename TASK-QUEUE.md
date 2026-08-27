@@ -14,143 +14,57 @@
 
 ## Technical Debt
 
-- **platform-support-ci-matrix** [roadmap: next/reliability] [precondition-ok: run-observed] —
-  the native Windows install-smoke leg is landed and MEASURED. The opt-out is exact and is not a
-  waiver: what this entry waits on is an **observation** — a CI run that produces and exercises an
-  artifact — and no blocked-by tag can name a run, because no queue slug owns one. Every slug that
-  did block it has shipped.
-  Split 2026-08-26 at build under an operator ruling; macOS and everything measured about it went
-  to `macos-install-smoke-ci-leg`, whose own provenance line carries the ruling and its ground.
-  **The slug is deliberately NOT renamed** though "matrix" now reads oddly for one leg:
-  `powershell-installer-surface` cites it by name, and `gate-binary-target-roster-widening` did
-  until it shipped to `## Done`.
+## Deferred
+
+- **platform-support-ci-matrix** [design-pending] [roadmap: next/reliability]
+  [precondition-ok: run-observed] — a CI leg that PRODUCES AND EXERCISES a Windows gate-binary
+  artifact, which is gate-sdk/SPEC.md
+  §Consumer payload's join condition for `x86_64-pc-windows-msvc`. Four rounds bought; deferred
+  2026-08-27 at build by operator ruling, with PRODUCED discharged and one named, sized obstacle.
   roadmap-summary: A CI install-smoke leg per supported platform, or an honest label.
-  **THE LEG IS LANDED AND HAS NOW REPORTED.** `.github/workflows/gates.yml`'s
-  `install-smoke-windows` job, an instrument rather than an assertion; its header carries the
-  ruling, the steering and the promotion condition, so its shape is not restated here. Round 1
-  created no run at all inside a third-party Actions incident — an outage, not a disproof, with the
-  evidence in full at `8eadb5f8`.
-  **ROUND 2 MEASURED EVERYTHING, 2026-08-26 at close**, run `32995643814` on head `261231d2`: the
-  workflow concluded green while this job reported failure, the designed shape, and all four probe
-  steps completed. Host `MINGW64_NT-10.0-26100`, `x86_64-pc-windows-msvc`, bash 5.3.15.
-  **THE SEVEN QUESTIONS ARE NOW ANSWERS.** (1) The GNU floor docs/install.md §Requirements asserts
-  is SATISFIED out of the box — `awk` IS gawk 5.4.0, GNU sed 4.9, coreutils sort 8.32, GNU grep 3.0,
-  findutils 4.10.0 — and `shellcheck` is the one member of the probed inventory MISSING. (2) Cargo
-  does NOT build the crate: blocker 3. (3) Whether a release build leaves the worktree clean stays
-  HONESTLY UNANSWERED — porcelain printed nothing, but after a *failed* build, so it measures
-  nothing about a release one. (4) npm's bin shim SATISFIES `[[ -x ]]`: of the three shims written,
-  the extension-less one is mode `-rwxr-xr-x` and executes. (5) Exec-bit semantics HOLD on a freshly
-  written shebang script despite `core.filemode=false`. (6) The tracked symlink does NOT survive:
-  blocker 4. (7) There is NO 260-char ceiling — a 271-char path wrote clean, `core.longpaths` unset.
-  **THE TWO SOURCE BLOCKERS ROUTED 2026-08-26 by the lead ARE BOTH SHIPPED**, diagnoses dropped as
-  answered. Blocker 3, the crate not compiling for `x86_64-pc-windows-msvc`, went to
-  `gate-binary-target-roster-widening` (`c45d0f4c`, held by that workflow's cross-check step);
-  blocker 4, packing aborting on the one tracked symlink, to
-  `payload-symlink-unextractable-on-windows` (`d3f68006`). Both are `## Done`, so all four blockers
-  are away and shipped.
-  **WHY ROUND 2 PRODUCED NOTHING IS NOW DIAGNOSED AND REPAIRED — 2026-08-27 at scope.** Cargo DID
-  succeed and DID emit an artifact; only the existence check looked at the wrong path, because this
-  job appended a literal `.exe` onto a value `GATE_SDK_NATIVE_BIN` had begun deriving. The repair
-  landed with this iteration's gap drain, and the job's header no longer carries the two source
-  facts that had aged into falsehoods. Its promotion condition is unchanged — gate-sdk/SPEC.md
-  §Consumer payload's run that PRODUCED AND EXERCISED an artifact — and what stands between the
-  entry and that condition is now ONE RUN rather than a blocker. Nothing here promotes it: an
-  observation is the join bound, and a repair is not an observation.
-  **THAT LAST CLAUSE IS FALSIFIED BY ROUND 3 — one run was not what stood between them.** The
-  repair worked exactly as diagnosed and a FOURTH blocker was waiting behind it, in the half of the
-  suite round 2 never reached.
-  **ROUND 3, 2026-08-27 at build, run `33066446525` on head `090dd038`: the artifact was PRODUCED
-  and was NOT EXERCISED, so this entry does NOT drain.** The workflow concluded green while the job
-  reported failure, the designed shape, and every step ran. What the repair bought is real and is
-  measured: the job resolved `artifact name native/target/release/checkwright-gates.exe` — ONE
-  suffix, the round-2 defect gone — `build-native.sh` exited 0 building natively on the runner in
-  50.48s, `checkwright-gates.exe` landed at 3,015,680 bytes, and the pack step reported
-  `checkwright-0.25.0.tgz (... 1 prebuilt gate binary/binaries)`. PRODUCED is therefore
-  DISCHARGED and is not in question again.
-  **EXERCISED failed on BLOCKER 5, which is not a CI defect but an ADOPTER-FACING one.** The
-  `starter` scenario reached `checkwright init`; doctor reported `shellcheck NOT FOUND` against a
-  toolchain otherwise clean (bash 5.3.15, git 2.55.0, jq 1.8.1, awk 5.4.1, sort 8.32), printed
-  `DOCTOR: below contract`, and init REFUSED — `the toolchain is below contract — refusing to
-  install` — yielding `INSTALLER-SMOKE: FAIL — init failed for the starter profile`. The binary was
-  packed and shipped and never once invoked. The fact was in this entry already, as round 2's
-  answer (1); what nobody connected is its CONSEQUENCE: `shellcheck` sits in
-  `context-kit/lib/toolfloor.sh`'s `PROBE_SET` with NO audience token, so it is an ADOPTER floor
-  member, not a contributor one — and `windows-latest` ships without it. A real Windows adopter
-  following docs/install.md hits this same refusal. The instrument measured the product, which is
-  what an instrument is for.
-  **THREE FURTHER ANSWERS ROUND 3 BOUGHT.** Round 2's question (3) — whether a release build leaves
-  the worktree clean — is ANSWERED at last and the answer is YES: porcelain printed nothing after a
-  build that SUCCEEDED, where round 2 could only read it after a failed one. The tracked symlink is
-  GONE (`tracked symlink: <none>`), so `payload-symlink-unextractable-on-windows` is confirmed
-  against the host rather than the tree. And the crate compiles for `x86_64-pc-windows-msvc` twice
-  over — the `gates` job's cross-check step green, plus the runner's own native release build —
-  which is the only compile oracle the `#[cfg(windows)]` arms in `native/src/proc.rs` have.
-  **WHAT ROUND 3 DID NOT MEASURE, stated so it is not read as measured.** No gate ran on Windows.
-  The `on_path` repair those arms carry compiled but was NOT exercised: doctor probes the toolchain
-  with bash `command -v`, not the crate, and the battery that would have run `check-shellcheck`,
-  `check-action-run-shell`, `check-crate-arms` and the evidence runner's `ps` probe never started.
-  Their Windows behaviour remains READ, not MEASURED.
-  **BLOCKER 5 IS REPAIRED, 2026-08-27 at build, as an operator-ruled hotfix** — minimal and
-  test-and-doc-complete in one commit, so it minted no queue entry of its own; the `ruled:` line
-  below already carries this ruling's authority, date and channel and is not duplicated for it.
-  What the operator ruled: the empty audience field on `shellcheck` is CORRECT and stays, because an
-  adopter who vendors the kits and installs the hooks runs the battery on their own tree and
-  genuinely needs the tool — the defect was never the floor, it was the JUSTIFICATION. So the fix is
-  the docs half plus a job step, in that order: docs/install.md §Requirements' `shellcheck` bullet
-  had justified an adopter-gating member with contributor-only language (`check-shellcheck` runs
-  over *shipped* scripts), leaving an adopter no way to learn why `init` refuses without it; it now
-  states the adopter's own stake, that `doctor` decides this floor before any partial install, and
-  where each platform takes the member from — Windows from inside WSL, which is the path
-  docs/install.md §Requirements already sends a Windows adopter down. The leg's own step is declared
-  measurement scaffolding rather than a support claim, because this runner is deliberately NATIVE
-  Windows and no documented native route exists yet to mirror.
-  **AND THE REPAIR IS, AGAIN, NOT AN OBSERVATION.** That sentence is this entry's own standard and
-  it has now caught two rounds running — round 2's `.exe` repair and this one. What stands between
-  the entry and its promotion condition is ONE RUN, and the entry has been wrong about exactly that
-  claim once already, at round 3. It cannot be drained from the tree: the next push is the
-  observation, and PRODUCED is already discharged, so what round 4 has to show is EXERCISED.
-  **ROUND 4, 2026-08-27 at build, run `33068870024` on head `74874a02`: BLOCKER 5 IS CONFIRMED
-  REPAIRED, EXERCISED STILL FAILS, AND A SIXTH BLOCKER IS NAMED. The entry does NOT drain.** The
-  workflow concluded green, the job reported failure, the designed shape held a second time.
-  **Blocker 5's repair is MEASURED, not inferred.** `choco exited 0`, `shellcheck resolves to:
-  /c/ProgramData/Chocolatey/bin/shellcheck`, and then the line this leg had never produced:
-  `init: INIT: vendored 1 kit(s) at the starter profile (v0.25.0) and committed them.` **That is
-  the first time `checkwright init` has ever succeeded on a Windows host.** The scaffolding step's
-  own residual — that `choco install shellcheck` landing was an inference — is now closed as an
-  answer, and the docs half stands on a measured refusal-then-clearance rather than a reading.
-  **BLOCKER 6: on MSYS the installed consumer's root is carried in WINDOWS spelling, so a fully
-  ported roster resolves to NOTHING.** The battery ran and reported `10 of 10 gates FAILED`, every
-  one of them `unresolved`, against this path: `scripts
-  /D:\a\_temp\installer-smoke.ZSB6T4\consumer-starter.nIe1YI/gate-sdk/checks` — a POSIX `/`
-  prefixed onto a `D:\`-spelled absolute path, backslashes intact, with `/gate-sdk/checks` appended
-  in the other dialect. The emitter is `gate-sdk/bin/run-gates.sh:289` printing `RESOLVE_DIRS`,
-  built at :153-154 from `gate_kit_roots`. Why it takes the WHOLE roster rather than some of it:
-  all ten are `.gate` descriptors in `gate-sdk/checks/` — fully ported, binary-only, no `.sh` to
-  fall back to — and `starter` vendors gate-sdk alone, so a resolver that cannot reach the binary
-  has nothing else to run. `check-shellcheck` is in that unresolved ten, which is its own irony.
-  **SO THE ARTIFACT WAS PRODUCED AND WAS NOT EXERCISED, for the third round running.** It built
-  natively, packed (`1 prebuilt gate binary/binaries`), and was vendored into a consumer that then
-  invoked ZERO gates. Placement is not exercise; gate-sdk/SPEC.md §Consumer payload wants the
-  artifact RUN, and nothing ran it.
-  **AND `on_path` IS STILL UNMEASURED, a second round running.** The three gates plus the evidence
-  runner's `ps` probe that batch 4 repaired sit behind a resolver that never reached them, so
-  whether they now answer truthfully on Windows remains READ and not MEASURED. Blocker 6 is what
-  stands between this entry and that measurement as much as between it and the drain.
-  **THE FORK STAYS RULED — legs, not the honest label**, and the Windows-ahead-of-macOS ordering
-  with it; both are TRAJECTORY.md §The closed rulings', and WSL is the interim path.
-  **Cost this iteration is buying down:** the one adopter class with a named days-to-weeks adoption
-  window still has no working install path, and `powershell-installer-surface` — the port
-  sequence's one remaining member — stays sequenced behind this entry.
-  **The design-pending marker is DELETED rather than converted**, on canon-kit/SPEC.md §The
-  amendment lifecycle's rule for a deferred debt entry: the design this entry owed is ruled and
-  recorded (the fork, the Windows-ahead-of-macOS ordering, the leg's instrument shape), and what
-  remains buys an observation without minting a governed name. It is debt, so no amendment pairs.
+  **The slug is deliberately NOT renamed** though "matrix" now reads oddly for one leg:
+  `powershell-installer-surface` cites it by name. The fork (legs, not an honest label) and the
+  Windows-ahead-of-macOS ordering are TRAJECTORY.md §The closed rulings'; WSL is the interim path;
+  macOS split off 2026-08-26 as `macos-install-smoke-ci-leg`.
+  **PRODUCED IS DISCHARGED** — rounds 3 (`33066446525`) and 4 (`33068870024`): the crate builds
+  natively on the host, `checkwright-gates.exe` is emitted at ~3.0 MB, and pack carries it
+  (`1 prebuilt gate binary/binaries`). Settled, and not to be re-bought.
+  **EXERCISED IS OWED, AND NOTHING HAS EVER RUN A GATE ON WINDOWS.** Placement is not exercise and a
+  repair is not an observation — the standard that has caught this entry four rounds running.
+  **Blocker 5 (shellcheck) is REPAIRED AND MEASURED, not inferred.** It was an adopter floor member
+  absent from `windows-latest`, so `init` refused the toolchain; docs/install.md §Requirements now
+  states the adopter's own stake and the leg supplies the member. Round 4 measured it end to end —
+  `choco exited 0`, `shellcheck resolves to: /c/ProgramData/Chocolatey/bin/shellcheck`, then the
+  line this project had never once produced: `init: INIT: vendored 1 kit(s) at the starter profile
+  (v0.25.0) and committed them.` **That is the first successful `checkwright init` on a Windows
+  host, ever.**
+  **Blocker 6 is what remains, filed and sized in the gap inbox**, which owns its detail and its
+  contract argument so it is not inlined here: on MSYS the vendored consumer's root is carried in
+  Windows spelling, `run-gates.sh`'s RESOLVE_DIRS came out as a POSIX slash on a backslashed
+  `D:\`-path, and the run reported `10 of 10 gates FAILED`, every one `unresolved` — the starter
+  profile vendors gate-sdk alone and its whole shipped roster is `.gate` descriptors with no `.sh`
+  fallback, so a resolver that cannot reach the binary has nothing left to run.
+  **Clearing blocker 6 also buys the first honest measurement of batch 4's `on_path` repair**
+  (`native/src/proc.rs`, the `#[cfg(windows)]` PATHEXT and `#[cfg(not(unix))]` `is_executable`
+  arms), unmeasured for two rounds because the three gates consuming it — `check-shellcheck`,
+  `check-action-run-shell`, `check-crate-arms` — and the evidence runner's `ps` probe all sit behind
+  that same resolver. Those arms COMPILE on Windows; their behaviour is READ, not MEASURED.
+  **Why deferred rather than fixed:** a hotfix was ruled, attempted, and stopped at sizing on three
+  independent grounds — the mechanism is UNPINNED (neither npm's MSYS `cygpath -w` bin shim nor
+  native-Windows `git rev-parse --show-toplevel` produces the measured spelling, which carries a
+  POSIX leading slash AND backslashes, so a third step is unaccounted for); the propagation runs
+  `RESOLVE_DIRS <- gate_kit_roots <- gate_sdk_root <- BASH_SOURCE` and not through the likelier
+  candidate, so a fix aimed there would have missed; and the fix is seam-sized, `show-toplevel`
+  alone having ~38-41 call sites across 8 roots. There is no local oracle for MSYS path semantics.
+  **Cost while deferred:** the one adopter class with a named days-to-weeks adoption
+  window still has no working install path on Windows, and
+  `powershell-installer-surface` — the port sequence's one remaining member — stays
+  sequenced behind this entry. Each further round costs one push, and three were spent
+  this iteration against a one-to-two budget, by operator ruling.
   ruled: platform-support-ci-matrix operator 2026-08-27 lead-relay
   Filed 2026-07-26 by scope, split from `platform-support-contract`; Linux split off 2026-08-25 as
-  `linux-install-smoke-ci-leg`, macOS 2026-08-26 as `macos-install-smoke-ci-leg`. Promoted and
-  deferred 2026-08-25, re-promoted and deferred again 2026-08-26.
-
-## Deferred
+  `linux-install-smoke-ci-leg`, macOS 2026-08-26. Promoted and deferred 2026-08-25, re-promoted and
+  deferred 2026-08-26, deferred again 2026-08-27 at build.
 
 - **macos-install-smoke-ci-leg** [design-pending] [roadmap: next/reliability] — a macOS
   install-smoke leg; nothing has ever run green against macOS.
