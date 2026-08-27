@@ -1002,7 +1002,7 @@ the shape behind it.
 | `commit` | the 40-hex commit the payload was assembled from | `doctor` prints it — it is what lets a reviewer resolve the vendored tree to an exact upstream state |
 | `profile` | the profile selected | a re-run of `init` re-applies the same profile without asking again |
 | `kits` | the vendored kit set | `init`'s re-run file plan, and `doctor`'s installed-set report |
-| `files` | `init`'s ownership roster — each path it has written, at the content hash it last wrote there, until the file leaves the tree | `init`'s changed-file detection: a file whose hash still matches is rewritten, one that has changed is reported rather than overwritten, and stays on the roster so the next run reads it the same way, whether or not the running release still ships that path. `uninstall` walks the same roster to decide what it may remove and what it must keep, and `diff` classifies it against the tree |
+| `files` | `init`'s ownership roster — each path it has written, at the content hash it last wrote there, until the file leaves the tree | `init`'s changed-file detection: a file whose hash still matches is rewritten, one that has changed is reported rather than overwritten — the gate binary's row excepted, §The gate binary — and stays on the roster so the next run reads it the same way, whether or not the running release still ships that path. `uninstall` walks the same roster to decide what it may remove and what it must keep, and `diff` classifies it against the tree |
 | `artifact` | the gate binary's `target` and its SHA-256 `digest`, or absent | `doctor` reports the target and re-verifies the digest in place; a re-run of `init` compares the target against this host and skips the rewrite while the digest still holds |
 
 **Resolving one of your own seam files is an exact-path question, not a search.**
@@ -1142,9 +1142,10 @@ the file there and §uninstall must reverse it against the same roster — an
 artifact off that roster would be a file `init` created and left behind. Only
 the *digest* rides the separate `artifact` key, on the split just above. So the
 map's uniformity holds where it was ever claimed: every `files` hash is still
-`git hash-object`. Row and key compose on the one file — the row says whether you
-have edited it, the key says whether it is the artifact that was published — and
-§doctor and §uninstall each read the one they mean.
+`git hash-object`. Row and key compose on the one file — the row says whether the
+tree still holds what `init` wrote, the key says whether it is the artifact that
+was published — and §doctor, §uninstall and §init each read the one they mean,
+§init alone reading the row as ownership for every path but this one.
 
 A new optional top-level key is additive within the versioned wire key: a reader
 that does not know it sees the same manifest it always did.
@@ -1467,10 +1468,10 @@ hop's clean-worktree assertion carries no tripwire, and widening it is a separat
 judgment.
 
 **The cross-version reversal arm** reverses a consumer that crossed all three of
-those versions, because every reversal above runs on a consumer that has only
-ever met one version's payload — the per-profile loop, the download arm and the
-artifact arm each reverse a *first* `init`, and the upgrade arm asserts no
-reversal at all. It is its own scratch consumer at the lattice minimum with **no
+those versions, because every other reversal in the suite runs on a consumer
+that has only ever met one version's payload — each of them reverses a *first*
+`init` — and the upgrade arm asserts no reversal at all. It is its own scratch
+consumer at the lattice minimum with **no
 adopter edit**: it re-runs the upgrade arm's two already-extracted packages with
 no flags, so it costs no pack, and the edited case belongs to the protection
 branch below, since an adopter edit is what tree-object equality cannot host. It
@@ -1481,9 +1482,9 @@ back to the one the consumer had before its first `init`.
 
 *What that reaches is narrower than a recorded hash moving, and the limit is the
 harness's rather than the assertion's.* `pack-installer.sh` assembles every
-version from one worktree, so those payloads carry byte-identical content and
-the relinquish deletion is this suite's only lever on payload shape; the arm
-therefore does not exercise a hash that changed under a path that stayed. What
+version from one worktree, so no vendored path's content differs between hops
+and the arm does not exercise a hash that changed under a path that stayed; the
+shape changes it does cross are path additions and removals. What
 it does exercise, and nothing else here does: a tree whose payload lost a path
 on one hop and regained it on the next must still be **wholly removable**, and
 the roster must cover an **upgrade** hop's write set — a rewritten manifest,

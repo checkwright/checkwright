@@ -180,7 +180,7 @@ design ruling rather than a default", and it is the only measure taken so far
 that acts on the port's *denominator* rather than its remainder: under the prior
 default every gate landed while the port ran added shell the port then owed.
 The mechanism — the exception criterion that makes "with cause" operable — is
-**delivered** at that same section as three closed classes with a stated cause
+**delivered** at that same section as closed classes with a stated cause
 form each, and is not restated here. The cost it was weighed against, recorded
 so it is not re-argued: a `.gate`-declared member is *omitted* on a platform
 `native/targets.list` carries no artifact for, and that roster is one target, so
