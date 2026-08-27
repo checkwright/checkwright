@@ -12,6 +12,38 @@
 
 ## New Features
 
+- **installer-uninstall-diff-stale-hash-coverage** [spec: SPEC-cross-version-reversal.md] — the
+  reverse-to-pre-install property is asserted only on consumers that have ever met one
+  version's payload, so it is unasserted on the path every adopter is on after a release.
+  **The filing's premise was wrong and the drain corrected it before promoting.** The bullet
+  said both smoke arms run `uninstall` against a fresh install. They do not: the install
+  assertion ends with an idempotent **re-run** of `init` and the reversal runs on that same
+  consumer, and the seam arm drives init, an edit, a re-run, `diff` and `uninstall` in sequence.
+  **What survives the correction, narrowed to what is uncovered.** Every reversal runs after a
+  **same-version** re-run, where the payload is byte-identical and the written set cannot
+  change. The upgrade arm is the only place a re-run carries a *different* payload — a
+  relinquish hop and a re-add hop — and it asserts no reversal at all.
+  **THE FORK IS RULED AT SPEC 2026-08-27, and it was not the smoke-cost judgment the entry
+  framed it as.** The chain answer CANNOT assert the named property: the upgrade arm's consumer
+  carries two committed adopter edits, which is exactly the case tree-object equality cannot
+  host — the smoke says so in those words where the seam arm's protection branch chains — so a
+  chain would re-inline that kept-set block and assert the neighbouring keep branch while
+  looking like closure. The own-arm answer reuses `assert_reversal` unchanged and buys NO new
+  pack, since both upgrade packages are already extracted, so the cost half falls too.
+  **What makes it a feature is not the arm name the entry was watching.** The smoke's own
+  header rules its unindented `printf` arm headers a PARSED contract and
+  `scripts/parse-installer-smoke-log.sh` derives its scenario roster from them, so a new header
+  mints a baseline SCENARIO in `.workflow/validate-baseline.txt`, which evidence-kit/SPEC.md
+  §Baseline manifest holds constant and rules tooling never writes. That is a contract another
+  component must honor — canon-kit's litmus verbatim — and it is what makes the amendment
+  cross-component: installer and evidence-kit, not installer and `native/`, which carries no
+  roster surface at all.
+  ruled: installer-uninstall-diff-stale-hash-coverage operator 2026-08-27 lead-relay
+  Filed 2026-08-19 by close from the gap inbox, discharging the operator's refusal of the widen
+  at `installer-init-noop-regen-conflict`; the drain read the smoke's call order and the
+  bullet's central claim fell. Selected into the unit set 2026-08-27 by scope; fork ruled and
+  promoted at spec the same day.
+
 ## Technical Debt
 
 - **manifest-artifact-files-row-contradiction** — the manifest's owner doc, and the
@@ -5996,36 +6028,6 @@
   gets exit 2 on a file that is fine, and no gate anywhere would have predicted it.
   Filed 2026-08-19 by close from the gap inbox, which carried it twice — from the port survey and
   from the port; the drain reproduced the refusal rather than reading for it.
-
-- **installer-uninstall-diff-stale-hash-coverage** [design-pending] — the reverse-to-pre-install
-  property is asserted only where a stale carried hash cannot arise, so the class that produced
-  `installer-init-noop-regen-conflict` would land again on a green suite.
-  **The filing's premise was wrong and the drain corrected it before promoting.** The bullet
-  said both smoke arms run `uninstall` against a fresh install. They do not: the install
-  assertion ends with an idempotent **re-run** of `init`, and the reversal assertion runs on that
-  same consumer immediately after, so `uninstall` already meets a twice-initialised tree — and
-  the seam arm drives init, an edit, a re-run, `diff` and `uninstall` in sequence as well.
-  **What survives the correction, narrowed to what is actually uncovered.** Every reversal runs
-  after a **same-version** re-run, where the payload is byte-identical and the written set cannot
-  change. The upgrade arm is the only place a re-run carries a *different* payload — a relinquish
-  hop and a re-add hop — and it asserts no reversal at all. So the hop that can actually move a
-  recorded hash is the one hop whose reversal nothing asserts.
-  **Why `[design-pending]`:** whether to chain a reversal onto the upgrade arm's second hop or
-  give it its own arm is a smoke-cost judgment, and that arm is already the most expensive in the
-  suite.
-  **SELECTED AS MEMBER 3 of `installer-trial-lifecycle-repair`, and it stays here rather than
-  moving up, which is the classification and not a hedge.** The fork above IS the feature-vs-debt
-  litmus: chaining onto the existing hop mints no name and is debt, while a new arm mints an arm
-  name on a governed surface and is a feature owing an amendment. This repo splits authoring into
-  a dedicated `spec` stage, so scope may promote neither answer — `spec` resolves the fork and
-  promotes accordingly. Nothing about the finding is pending; only its class is.
-  ruled: installer-uninstall-diff-stale-hash-coverage operator 2026-08-27 lead-relay
-  **Cost while deferred:** the property the whole adoption story rests on is asserted on the
-  paths where it cannot fail and unasserted on the one where it can — and objective 4 makes that
-  property the product rather than a test of it.
-  Filed 2026-08-19 by close from the gap inbox, discharging the operator's refusal of the widen
-  at `installer-init-noop-regen-conflict`; the drain read the smoke's call order and the bullet's
-  central claim fell. Selected into the unit set 2026-08-27 by scope.
 
 - **pipeline-membership-idiom-latent** [design-pending] — the SIGPIPE-under-pipefail membership
   idiom that produced `installer-init-noop-regen-conflict` has no gate, so nothing stops the next
