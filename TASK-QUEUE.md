@@ -109,6 +109,33 @@
   the entry and its promotion condition is ONE RUN, and the entry has been wrong about exactly that
   claim once already, at round 3. It cannot be drained from the tree: the next push is the
   observation, and PRODUCED is already discharged, so what round 4 has to show is EXERCISED.
+  **ROUND 4, 2026-08-27 at build, run `33068870024` on head `74874a02`: BLOCKER 5 IS CONFIRMED
+  REPAIRED, EXERCISED STILL FAILS, AND A SIXTH BLOCKER IS NAMED. The entry does NOT drain.** The
+  workflow concluded green, the job reported failure, the designed shape held a second time.
+  **Blocker 5's repair is MEASURED, not inferred.** `choco exited 0`, `shellcheck resolves to:
+  /c/ProgramData/Chocolatey/bin/shellcheck`, and then the line this leg had never produced:
+  `init: INIT: vendored 1 kit(s) at the starter profile (v0.25.0) and committed them.` **That is
+  the first time `checkwright init` has ever succeeded on a Windows host.** The scaffolding step's
+  own residual — that `choco install shellcheck` landing was an inference — is now closed as an
+  answer, and the docs half stands on a measured refusal-then-clearance rather than a reading.
+  **BLOCKER 6: on MSYS the installed consumer's root is carried in WINDOWS spelling, so a fully
+  ported roster resolves to NOTHING.** The battery ran and reported `10 of 10 gates FAILED`, every
+  one of them `unresolved`, against this path: `scripts
+  /D:\a\_temp\installer-smoke.ZSB6T4\consumer-starter.nIe1YI/gate-sdk/checks` — a POSIX `/`
+  prefixed onto a `D:\`-spelled absolute path, backslashes intact, with `/gate-sdk/checks` appended
+  in the other dialect. The emitter is `gate-sdk/bin/run-gates.sh:289` printing `RESOLVE_DIRS`,
+  built at :153-154 from `gate_kit_roots`. Why it takes the WHOLE roster rather than some of it:
+  all ten are `.gate` descriptors in `gate-sdk/checks/` — fully ported, binary-only, no `.sh` to
+  fall back to — and `starter` vendors gate-sdk alone, so a resolver that cannot reach the binary
+  has nothing else to run. `check-shellcheck` is in that unresolved ten, which is its own irony.
+  **SO THE ARTIFACT WAS PRODUCED AND WAS NOT EXERCISED, for the third round running.** It built
+  natively, packed (`1 prebuilt gate binary/binaries`), and was vendored into a consumer that then
+  invoked ZERO gates. Placement is not exercise; gate-sdk/SPEC.md §Consumer payload wants the
+  artifact RUN, and nothing ran it.
+  **AND `on_path` IS STILL UNMEASURED, a second round running.** The three gates plus the evidence
+  runner's `ps` probe that batch 4 repaired sit behind a resolver that never reached them, so
+  whether they now answer truthfully on Windows remains READ and not MEASURED. Blocker 6 is what
+  stands between this entry and that measurement as much as between it and the drain.
   **THE FORK STAYS RULED — legs, not the honest label**, and the Windows-ahead-of-macOS ordering
   with it; both are TRAJECTORY.md §The closed rulings', and WSL is the interim path.
   **Cost this iteration is buying down:** the one adopter class with a named days-to-weeks adoption

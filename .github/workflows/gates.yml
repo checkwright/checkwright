@@ -166,10 +166,21 @@ jobs:
   #     platform takes the member from, and the step above supplies it on this
   #     host. PRODUCED was discharged by that same round — the artifact built
   #     natively and packed — so only EXERCISED is still owed.
-  # What remains is the run itself: a green one, produced and exercised. Each of
-  # the three above removed a blocker, and gate-sdk/SPEC.md §Consumer payload is
-  # explicit that removing one grants nothing — this leg has now spent two rounds
-  # proving that clause the hard way.
+  # All three are CONFIRMED discharged by round 4 (run 33068870024): the step
+  # below cleared the toolchain and `init` vendored and committed for the first
+  # time ever on a Windows host. What remains is NOT merely the run — round 4
+  # named a fourth blocker, and this line said "one run" twice before and was
+  # wrong both times:
+  #   - On MSYS the installed consumer's root is carried in WINDOWS spelling, so
+  #     `run-gates.sh`'s RESOLVE_DIRS came out as
+  #     `/D:\a\_temp\...\consumer-starter.../gate-sdk/checks` — a POSIX `/` on a
+  #     `D:\` path — and all 10 gates reported `unresolved`. The starter profile
+  #     vendors gate-sdk alone and its whole shipped roster is `.gate`
+  #     descriptors with no shell fallback, so nothing ran at all.
+  # gate-sdk/SPEC.md §Consumer payload is explicit that removing a blocker grants
+  # nothing, and this leg has now spent three rounds proving that clause the hard
+  # way. PRODUCED is discharged; EXERCISED is what is owed, and placing the
+  # artifact in a consumer that then invokes zero gates is not exercising it.
   #
   # **Every `run:` names `shell: bash`.** GitHub's default `run:` shell on a
   # Windows runner is `pwsh`, so a step here that omitted the key would run
