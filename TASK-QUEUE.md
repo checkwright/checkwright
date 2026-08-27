@@ -5303,7 +5303,9 @@
 - **queue-lib-dead-derivation** [design-pending] — three derivations in `queue-kit/lib/queue.sh`
   outlived the shell tool that read them, and their only surviving reader is a gate-test.
   **Re-verified at this scope rather than carried from the bullet, and the premise holds at
-  HEAD.** `QUEUE_ACTIVE_RE`, `QUEUE_DEFERRED_RE` and `QUEUE_ICEBOX_RE` (lib/queue.sh:71-87) are
+  HEAD.** `QUEUE_ACTIVE_RE`, `QUEUE_DEFERRED_RE` and `QUEUE_ICEBOX_RE` — named rather than given
+  as a line range, since the range spanned seven identifiers by 2026-08-27 and four of them are
+  live, and any insertion above it reslides it silently — are
   read by nothing but their own definitions and `queue-kit/gate-tests/queue-lib-parity.test.sh`,
   the shell tool that read them having been deleted by the queue-index port. Their siblings
   `QUEUE_TASK_RE` and `QUEUE_SECTION_RE` **do** still have live readers —
@@ -8255,6 +8257,84 @@
   **Cost while deferred:** every arm added under this harness is unproven against its own condition,
   and the defect it hides is the one class of failure a green battery cannot report.
   Filed 2026-08-27 by close; attested at build and fixed there in place.
+
+- **verbose-battery-idiom-steered-to-its-granted-spelling** [design-pending] — the repo's own
+  verbose-battery idiom is spelled the one way nothing grants, so it costs an out-of-band
+  decision every call.
+  **Measured 2026-08-27 at close's prompt-friction triage:** `GATE_SDK_VERBOSE=1` ranks 7th in
+  the log. The committed allowlist carries `Bash(env GATE_SDK_VERBOSE=1 bash
+  gate-sdk/bin/run-gates.sh)` and its `*` twin; nothing matches the bare assignment-prefix form
+  `GATE_SDK_VERBOSE=1 bash …`, which is the form a session reaches for first because it is the
+  ordinary shell idiom.
+  **The disposition is a guard STEER and explicitly NOT a second allowlist entry**, and that is
+  what keeps this entry promotable at all: a better form already exists and is already granted,
+  so blessing the ungranted spelling would bless a form the repo has already chosen against. The
+  shape is the existing bash-guard steers for decorated allowlisted commands
+  (`scripts/bash-guard.sh` over guard-kit's generic ruleset). Because the deliverable is guard-kit
+  rule code rather than an edit to `.claude/settings.json`, TRAJECTORY.md §The closed rulings'
+  2026-08-22 bar on scope promoting a permission-settings edit does not reach it — stated here so
+  a later reader does not re-derive the question.
+  **Why `[design-pending]`:** whether the steer is a rule 6 narrowing, a new generic rule, or a
+  consumer-side rule is unruled, and rule 15's consumer-vocabulary refusal bears on the choice.
+  **DISTINCT from `wait-loop-grant-lost-its-carrier`**, whose mandated form is a loop condition no
+  glob CAN match — this form is matchable and is simply spelled the other way. **DISTINCT from
+  `overlay-only-oracle-grants-uncommitted`**, whose subject is which oracles are granted at all
+  rather than which spelling of a granted one.
+  **Cost while deferred:** one out-of-band decision per verbose battery run, on the idiom this
+  repo's own instructions reach for, paid by every session in every iteration.
+  Filed 2026-08-27 by scope into this iteration's ledger, draining the gap inbox; found
+  2026-08-27 by the `windows-adopter-unblock` close's prompt-friction triage.
+
+- **audit-roster-decision-tier-and-findings-tier-share-one-line** [design-pending] —
+  `.workflow/audit-roster.txt`'s rows are unbounded accretion, so the cheap question a close asks
+  is priced at the expensive one.
+  **Measured 2026-08-27, and re-measured at this scope rather than carried:** the file is 7 data
+  rows on 11 lines and about 138 KB. The `internal-identifier-restatement` row alone is 37,266
+  characters — past a 25,000-token read cap on its own — with `capability-pendency-after-landing`
+  at 34,192 and `close-surface-actually-read` at 26,400. A close must read a row in full to judge
+  one `due:` field and one `last:` stamp.
+  **The accretion is NOT waste, which is what makes this a design call.** The header grammar is
+  `<class-slug> — <audit scope> — due: <event(s)> — last: <iteration>`, four fields, and the scope
+  field has become an append-only sweep log — eighteen sweeps of narrative on the first row. Each
+  sweep's reading-to-carry is the row's most valuable output and several were written for a later
+  sweep to act on, which is why nobody has deleted any. The defect is that the carrying medium is
+  the field a close reads to decide due-ness.
+  **Why `[design-pending]`:** three candidate shapes, none costed, and choosing re-scopes what the
+  roster IS — split into a thin due/last register plus a per-class findings file the sweep reads
+  only when it fires; cap the carried readings at the last N and let git history hold the rest; or
+  rule that a reading which has been acted on is retired from the row the way a spent ruling is
+  retired from TRAJECTORY.md.
+  **Cost while deferred:** every close pays a ~138 KB read to answer seven due-ness questions, and
+  the cost grows monotonically with each sweep that does its job.
+  Filed 2026-08-27 by scope into this iteration's ledger while draining the gap inbox; found
+  2026-08-27 by the `windows-adopter-unblock` close.
+
+- **shellcheck-analyser-version-unpinned-in-ci** [design-pending] — one battery member's verdict is
+  a function of the host, so a green local battery is not evidence of a green CI battery.
+  **Attested 2026-08-27 first-hand and expensively at close.** The full battery read 106/106
+  locally and the pushed run went RED on `check-shellcheck` alone, with SC2120 against
+  `gate-sdk/lib/gate.sh`'s `gate_exe_suffix`. Local shellcheck is 0.11.0 and does not emit that
+  finding; the `ubuntu-latest` runner's stock shellcheck does. Nothing in
+  `.github/workflows/gates.yml` installs or pins shellcheck, so CI takes whatever the runner image
+  ships and that floats under this repo without a signal.
+  **The finding was a true positive for the older analyser and a false positive for the code** —
+  `gate_exe_suffix`'s argument-passing callers live in `gate-sdk/bin/build-native.sh` and
+  `scripts/pack-installer.sh`, so a per-file analysis cannot tell an optional-by-contract parameter
+  from an unused one. Silenced inline with a justifying comment, the remedy the gate's own help
+  prescribes. **The class is not that finding.** It is that this member wraps an external analyser
+  whose rule set changes between releases, which makes 106/106 a claim about one machine; every
+  other member is deterministic given the tree.
+  **DISTINCT from any entry about the gate's own logic** — the gate behaved correctly and reported
+  honestly on both hosts. **DISTINCT from the Windows-host inventory finding that shellcheck is
+  ABSENT there**: absence is graded and visible, a version skew is silent and reverses a verdict.
+  **Why `[design-pending]`:** three uncosted shapes — pin the analyser version in the workflow and
+  state it where the gate's contract is specified; have the gate REPORT the version it ran so two
+  runs are comparable; or accept the float and say in the gate's SPEC section that this member's
+  verdict is host-dependent.
+  **Cost while deferred:** the pre-push battery's central promise — that a green local run predicts
+  a green remote one — is false for one member, and the failure mode is a burned push.
+  Filed 2026-08-27 by scope into this iteration's ledger, draining the gap inbox; attested
+  2026-08-27 by the `windows-adopter-unblock` close's own verifying push.
 
 
 ## Icebox

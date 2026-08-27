@@ -145,18 +145,19 @@ jobs:
   # the baseline is held-constant per scenario, and one scenario name cannot hold
   # two populations at once.
   #
-  # **It discharges nothing for `native/targets.list`, and that is measured
-  # rather than cautious.** gate-sdk/SPEC.md §Consumer payload admits a triple
-  # only on a green run that produced *and exercised* the artifact. Two facts read
-  # off this tree say this leg cannot do that yet, recorded here so a later
-  # session does not read the leg's existence as the block being cleared:
-  #   - `installer/lib/init.sh`'s `target_of_host()` maps Linux and Darwin alone,
-  #     so a Windows host takes the omit-and-declare branch whatever the payload
-  #     carries — the artifact this leg builds is packed and then never selected.
-  #   - cargo emits `<name>.exe` here while `GATE_SDK_NATIVE_BIN` names the
-  #     artifact suffix-less, which the steering below stands in for on this tree
-  #     and cannot stand in for inside an installed consumer.
-  # Both are source rulings, and this leg takes neither.
+  # **What still stands between this leg and `native/targets.list`, corrected
+  # 2026-08-27 at scope against the tree rather than carried.** gate-sdk/SPEC.md
+  # §Consumer payload admits a triple only on a green run that produced *and
+  # exercised* the artifact. The two SOURCE facts that once said this leg could
+  # not do that at all have both shipped, and are recorded as discharged so a
+  # later session does not re-derive them as live:
+  #   - `installer/lib/init.sh`'s `target_of_host()` now maps `MINGW*`, `MSYS*`
+  #     and `CYGWIN*` on x86_64 to `x86_64-pc-windows-msvc`, so a Windows host
+  #     selects the artifact instead of taking the omit-and-declare branch.
+  #   - `GATE_SDK_NATIVE_BIN`'s default derives its suffix from
+  #     `gate_exe_suffix`, so the knob names the artifact cargo actually emits
+  #     inside an installed consumer and not only on this tree.
+  # What remains is the run itself: a green one, produced and exercised.
   #
   # **Every `run:` names `shell: bash`.** GitHub's default `run:` shell on a
   # Windows runner is `pwsh`, while check-action-run-shell resolves an absent
@@ -226,10 +227,12 @@ jobs:
           exit 0
 
       # Both values every later step needs, derived once here and handed on
-      # through the environment file rather than spelled per step. The artifact
-      # name belongs to the knob and only the platform suffix belongs to this
-      # leg; the scratch base arrives in Windows spelling and everything below
-      # is handled by MSYS bash, so it is translated exactly once.
+      # through the environment file rather than spelled per step. The suffix
+      # has ONE owner — `gate_exe_suffix`, which `GATE_SDK_NATIVE_BIN`'s default
+      # already applies — so this leg appends none: a hand-written twin beside a
+      # derivation double-suffixes the path, which is exactly what it did until
+      # 2026-08-27. The scratch base arrives in Windows spelling and everything
+      # below is handled by MSYS bash, so it is translated exactly once.
       - name: resolve the host's artifact name and scratch base
         shell: bash
         run: |
@@ -237,10 +240,10 @@ jobs:
           source gate-sdk/lib/gate.sh
           tmp="$(cygpath -u "$RUNNER_TEMP" 2>/dev/null || printf '%s' "$RUNNER_TEMP")"
           {
-            echo "GATE_SDK_NATIVE_BIN=$(gate_native_bin).exe"
+            echo "GATE_SDK_NATIVE_BIN=$(gate_native_bin)"
             echo "SMOKE_TMP=$tmp"
           } >> "$GITHUB_ENV"
-          echo "artifact name suffixed for this platform; scratch base $tmp"
+          echo "artifact name $(gate_native_bin); scratch base $tmp"
 
       # Reporting only, and it never fails. The suite stops at the first defect
       # it meets, and the questions that actually decide how many round-trips
