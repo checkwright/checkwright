@@ -52,6 +52,20 @@ that genuinely moves needs payload content that genuinely differs, which this
 harness has no lever for and which this amendment does not build one for. What
 the arm reaches is stated in delta 1 and is narrower and true.
 
+**The seam, ruled explicitly because this amendment names a kit surface.**
+Nothing here ships as kit mechanism. Every surface it writes is
+repo-root-governed and owned by no kit — `installer/`, its `consumer-smoke/`
+harness, and `.workflow/`'s local capture — and the one kit-owned surface the
+amendment names, evidence-kit/SPEC.md §Baseline manifest, is **obeyed rather than
+amended**: delta 3 adds an instance of a grammar that section already specifies,
+which is why its update target is exempt below. No private rule content lands: no
+vocabulary, no term list, no product constant, and no consumer config. It adds
+**no knob** — `INSTALLER_SMOKE_TMP_DIR` stays the smoke's only one, and the
+config-via-env convention has nothing to bind because there is nothing to
+configure. The arm's one roster-shaped input, the scenario set, is **derived** by
+the log parser from the smoke's own headers rather than listed anywhere, so the
+delta adds no maintained list either.
+
 **What it does not touch.** It does not change `uninstall`, `claim()`, the
 manifest wire shape, or any verb's behaviour; it asserts contracts
 installer/README.md §uninstall and §The manifest already carry. It does not
