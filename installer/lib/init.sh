@@ -335,10 +335,10 @@ files_hash() {   # $1 = repo-relative path -> the hash its files[] entry carries
 # spec: installer/README.md §The manifest — the wire shape has one writer and it is lock.sh's lock_emit; what stays here is init's own rule about which hash an entry carries, which is not the schema's business
 manifest() {
     local f
-    # spec: installer/README.md §The manifest — the binary is neither vendored nor generated, so it joins as its own key rather than a files[] row: a files[] entry means hashed with git hash-object and rewritten when unmodified, and this one is hashed with SHA-256 against a published value and rewritten on a different rule. Its absence on a run that omitted the artifact is the omission's machine-readable form, which is why the flag is passed only when a target was selected
     local -a args=(version="$VERSION" profile="$PROFILE" kits="${KITS[*]}")
     # spec: installer/README.md §The manifest — commit is passed on the same conditional footing as the artifact key, for the reason lock_emit already states: an identity field is present exactly when the caller supplied it, and an empty commit written as "" would be a placeholder standing in for an omission. Its emptiness was masked by statement order alone until the jq preflight landed ahead of it; with jq's absence ruled out, an empty commit means only that the package carries no commit stamp, and the existing rule settles what to do about it
     [[ -n "$COMMIT" ]] && args+=(commit="$COMMIT")
+    # spec: installer/README.md §The manifest — the key's absence on a run that omitted the artifact is the omission's machine-readable form, which is why the flag is passed only when a target was selected; the binary's path needs no flag here because it already rode record() onto WRITTEN as an ordinary files[] row
     [[ -n "$ARTIFACT_TARGET" ]] && args+=(--artifact "$ARTIFACT_TARGET" "$ARTIFACT_DIGEST")
     for f in "${WRITTEN[@]}"; do
         printf '%s\t%s\n' "$f" "$(files_hash "$f")"

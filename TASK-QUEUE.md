@@ -46,35 +46,6 @@
 
 ## Technical Debt
 
-- **manifest-artifact-files-row-contradiction** — the manifest's owner doc, and the
-  code comment restating it, both say the gate binary is not a `files` row. It is one.
-  `installer/README.md` §The manifest states that `artifact` is its own key *rather than* a `files`
-  row, reasoning that a `files` entry means hashed with `git hash-object` and rewritten when
-  unmodified while this one is hashed with SHA-256 against a published value.
-  `installer/lib/init.sh:334` restates that paragraph almost verbatim as a `spec:` comment.
-  **The shipped behaviour is both, and it is gated.** `init.sh` records the artifact path on the
-  placement path, so the manifest emits a `files` row for it — carrying the `git hash-object` hash
-  a `files` entry means (`installer/README.md` §The manifest) and not the published SHA-256 —
-  beside the separate top-level `artifact` key.
-  `installer/consumer-smoke/run-smoke.sh:261` asserts `.files` has the binary path as expected
-  behaviour and is green, so the oracle is on the code's side.
-  **The rule both surfaces are groping for**, and the shape of the fix: the artifact's *path* takes
-  a `files` row because `init` wrote it and `uninstall` must reverse it, while the artifact's
-  *digest* rides its own key because it is an integrity claim rather than change detection. The two
-  hash families are real; *rather than a `files` row* is the wrong way to say it.
-  **The comment is a second defect, not a second report.** Per CLAUDE.md a comment restating its
-  owner doc is itself the defect, so the fix deletes the restatement at `init.sh:334` and keeps only
-  its directive tail — why the flag is passed conditionally. Correcting the comment in place would
-  bless the restatement.
-  **Why promoted:** the install surface's own reference doc misdescribes what the manifest
-  contains, so a reader reasoning about uninstall coverage, or about what a `files` entry means,
-  reaches the wrong answer and the code comment corroborates it. It carries no design fork — the
-  owner doc's own reasoning names both hash families already — so it is debt and scope promotes it.
-  ruled: manifest-artifact-files-row-contradiction operator 2026-08-27 lead-relay
-  Pre-existing since 2026-08-08. Filed 2026-08-25 by close, draining the gap inbox; found at align
-  as a comment defect, widened to its owner doc when that drain re-verified it. Promoted 2026-08-27
-  by scope as member 1 of `installer-trial-lifecycle-repair`.
-
 - **artifact-digest-mismatch-remedy-inert** — `doctor` prints a remedy `init`
   refuses to perform: a substituted gate binary is kept, not rewritten.
   `installer/lib/doctor.sh:124` reports a DIGEST MISMATCH when the binary at `GATE_SDK_NATIVE_BIN`
@@ -8642,6 +8613,8 @@
 - **stage-cursor-rerun-stamp-gap** [design-pending] — A skipped re-run stamp points the cursor back.
 
 ## Done
+
+- manifest-artifact-files-row-contradiction
 
 ## Lessons Learned
 

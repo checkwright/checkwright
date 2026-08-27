@@ -1106,9 +1106,10 @@ toolchain contract asserts, its object hash is content-addressed and stable, so
 the manifest's integrity story stays inside the toolchain that contract already
 covers.
 
-**Two hash families, on two classes of file, each stated where it is used.** The
-scope above is exactly `files`, and `artifact` is deliberately outside it. The
-two hashes answer different questions and are not unified. A `files` hash is
+**Two hash families, answering two questions, each stated where it is used.**
+The rule above is scoped to `files`, and the `artifact` digest is deliberately
+outside it — not because the two describe different files, but because they ask
+different things about one. The two hashes are not unified. A `files` hash is
 **change detection** — has the adopter edited something `init` wrote — where
 collision resistance is not the property needed and staying inside git's
 already-asserted toolchain is worth more. The artifact's digest is an
@@ -1116,24 +1117,33 @@ already-asserted toolchain is worth more. The artifact's digest is an
 defaults to SHA-1, and a SHA-1 supply-chain digest would undercut the one claim
 §The gate binary makes.
 
-That is also why `artifact` is its own key rather than a `files` row. A `files`
-entry means *hashed with `git hash-object`, rewritten when unmodified*, and this
-one is hashed with SHA-256 against a published value and rewritten on a
-different rule — so a `files` row would put two hash families on one map. The
-uniformity that map is held to is the hash *function* across every entry, which
-is why the argument survives the paragraphs above: it never rested on an entry
-agreeing with the tree. The consumer smoke does assert that agreement entry by
-entry, against a **freshly initialized** consumer, where no adopter edit exists
-for a carried-forward hash to come from. The
-binary is still written by `init` and still tracked. A new optional top-level key
-is additive within the versioned wire key: a reader that does not know it sees
-the same manifest it always did.
+**The artifact is on both maps, and the split is path versus digest rather than
+key versus row.** The binary's *path* is an ordinary `files` row, recorded with
+the same `git hash-object` hash every other entry carries, because `init` wrote
+the file there and §uninstall must reverse it against the same roster — an
+artifact off that roster would be a file `init` created and left behind. Only
+the *digest* rides the separate `artifact` key, on the split just above. So the
+map's uniformity holds where it was ever claimed: every `files` hash is still
+`git hash-object`. Row and key compose on the one file — the row says whether you
+have edited it, the key says whether it is the artifact that was published — and
+§doctor and §uninstall each read the one they mean.
 
-**The path is absent, and that is not an omission.** The install location has
-exactly one owner — `GATE_SDK_NATIVE_BIN` in your `gate-sdk-config.sh` — and
-that value is what the battery actually dispatches to. A stored copy could
-disagree with the live one, so every reader that wants the path resolves it from
-the same owner.
+A new optional top-level key is additive within the versioned wire key: a reader
+that does not know it sees the same manifest it always did.
+
+**The `artifact` key carries no path, and that is not an omission.** The install
+location has exactly one owner — `GATE_SDK_NATIVE_BIN` in your
+`gate-sdk-config.sh` — and that value is what the battery actually dispatches
+to. A second copy under this key could disagree with the live one, so every
+reader asking *where is the binary* resolves it from the same owner: §doctor
+reads the knob and re-verifies whatever it finds there.
+
+**The `files` row is not that copy, even though it is a path.** It records where
+`init` wrote, which is a fact about the install and stays true when the knob is
+later repointed; the knob records where the battery dispatches. They coincide on
+every tree nobody has repointed, and where they part it is the row that is still
+right about what `uninstall` has to reverse. The distinction is the one every
+`files` row already carries, not a special case for this one.
 
 ## The consumer smoke
 
