@@ -7,3 +7,4 @@
 installer-trial-lifecycle-repair scope a483ba80 2026-08-27 dc37d003
 installer-trial-lifecycle-repair spec ab8ada1f 2026-08-27 f397725d
 installer-trial-lifecycle-repair align a9c95d90 2026-08-27 a14f9bea
+installer-trial-lifecycle-repair build aa7e14db 2026-08-27 a335908c
