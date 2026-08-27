@@ -1,5 +1,5 @@
 # contract: evidence-manifest v1
-windows-artifact-proof gates sha256=b6bc3d5d002d59dd09a4725f536a703c9cd94338830468cf1419f904e758bf87 pass=107 fail=0 ignore=0 verdict=clean 2026-08-27
+windows-artifact-proof gates sha256=3f89c551e4cfa13bbd5a8af26462067f18671884c9fcd69b0c35e2987808354b pass=107 fail=0 ignore=0 verdict=clean 2026-08-27
 windows-artifact-proof gate_sdk sha256=5265040781becdb971b169674003255d72228df47211f1d28c1c60fe28a5fa4c pass=1 fail=0 ignore=0 verdict=clean 2026-08-27
 windows-artifact-proof canon_kit sha256=9d3cf3ab0a1425a5996fd26152019ba03a3e0f5fa5ad31aa0e4a19901b8acb5a pass=1 fail=0 ignore=0 verdict=clean 2026-08-27
 windows-artifact-proof context_kit sha256=65e7536ec8b920506d9defb5f2fd338be716ee72482acf2e4819ca5b3fcbe891 pass=1 fail=0 ignore=0 verdict=clean 2026-08-27
@@ -16,10 +16,10 @@ windows-artifact-proof usage_tests sha256=04968d303b3e4ec54f3f8033f0e7e00d4b33ae
 windows-artifact-proof budget_guard_tests sha256=94bbe0c41f3993e3c748a492d29e2a0d22139825b8c53bbae6a528500a8ce402 pass=1 fail=0 ignore=0 verdict=clean 2026-08-27
 windows-artifact-proof dispatch_guard_tests sha256=6018943502411c07fe57162c0dae2ac37af304eccc0d0a9a6e0ec4fd733a1daf pass=1 fail=0 ignore=0 verdict=clean 2026-08-27
 windows-artifact-proof trend_tests sha256=acdbfef4eab851fca00ca747245b6ac4a4f804b05989f9cd3acd014bb56ac330 pass=1 fail=0 ignore=0 verdict=clean 2026-08-27
-windows-artifact-proof demo sha256=327bce78215721b499db9b57d08ea3e82475ffee104b0fe7f3dbb8d2f11fdb87 pass=1 fail=0 ignore=0 verdict=clean 2026-08-27
-windows-artifact-proof installer_smoke sha256=50190c096f841dd2370556945b291297684120a21e3b482f1955a2088ab63cbb pass=4 fail=1 ignore=0 verdict=clean 2026-08-27
-windows-artifact-proof consumer_smoke sha256=1e0b7b9ae2de38ed1a08ce84feb4ef7511e9a1b194a1880a6db2c90107f935d8 pass=0 fail=1 ignore=0 verdict=new-failures 2026-08-27
-windows-artifact-proof upgrade sha256=5a60756ae3b9f3cb69a6f4b37438f39192743fbd4c9ff1a418188109306ea772 pass=1 fail=0 ignore=0 verdict=clean 2026-08-27
-windows-artifact-proof agents_md_smoke sha256=4af11300f337be8e48eed5a1a60189da515606b3b93354a2f5e8d5bb4008940b pass=1 fail=0 ignore=0 verdict=clean 2026-08-27
+windows-artifact-proof demo sha256=4627523d0e4142c4ad68677b10766681af4de6ce968ccfb19a72ab726dc412a4 pass=1 fail=0 ignore=0 verdict=clean 2026-08-27
+windows-artifact-proof installer_smoke sha256=f6315e0b4c1e257cf10b7a3cf32f5c4701de80efe40155ba29b3c4503911b549 pass=4 fail=1 ignore=0 verdict=clean 2026-08-27
+windows-artifact-proof consumer_smoke sha256=cb149cab182e6ecf733c2a73538df83a99d0d4befb079a04b6dacddaafb1074d pass=1 fail=0 ignore=0 verdict=clean 2026-08-27
+windows-artifact-proof upgrade sha256=5d957352bf2769f909671ec06eae0a70debe24e365f0b0d2ef72d2164584a52c pass=1 fail=0 ignore=0 verdict=clean 2026-08-27
+windows-artifact-proof agents_md_smoke sha256=d62e72f3b34f4c0faec36a535a4c9edbd2e900feb77cbf9a9cb0ae14cab65311 pass=1 fail=0 ignore=0 verdict=clean 2026-08-27
 windows-artifact-proof index_tests sha256=e14e152466dc5be0296b1e20575bf3d587e1e0a127e7c63ad57671dbcaeaddb8 pass=1 fail=0 ignore=0 verdict=clean 2026-08-27
-windows-artifact-proof native_crate sha256=a60af3f0c426f3481f7584281d81d9b31c4be3145731508d4e52b9ba1f05a53b pass=1 fail=0 ignore=0 verdict=clean 2026-08-27
+windows-artifact-proof native_crate sha256=7adbc9e834ad91031143814bd093e164a0b35b51a1869fbc7a68079661674eea pass=1 fail=0 ignore=0 verdict=clean 2026-08-27
