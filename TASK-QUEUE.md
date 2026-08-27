@@ -56,6 +56,40 @@
   §Consumer payload's run that PRODUCED AND EXERCISED an artifact — and what stands between the
   entry and that condition is now ONE RUN rather than a blocker. Nothing here promotes it: an
   observation is the join bound, and a repair is not an observation.
+  **THAT LAST CLAUSE IS FALSIFIED BY ROUND 3 — one run was not what stood between them.** The
+  repair worked exactly as diagnosed and a FOURTH blocker was waiting behind it, in the half of the
+  suite round 2 never reached.
+  **ROUND 3, 2026-08-27 at build, run `33066446525` on head `090dd038`: the artifact was PRODUCED
+  and was NOT EXERCISED, so this entry does NOT drain.** The workflow concluded green while the job
+  reported failure, the designed shape, and every step ran. What the repair bought is real and is
+  measured: the job resolved `artifact name native/target/release/checkwright-gates.exe` — ONE
+  suffix, the round-2 defect gone — `build-native.sh` exited 0 building natively on the runner in
+  50.48s, `checkwright-gates.exe` landed at 3,015,680 bytes, and the pack step reported
+  `checkwright-0.25.0.tgz (... 1 prebuilt gate binary/binaries)`. PRODUCED is therefore
+  DISCHARGED and is not in question again.
+  **EXERCISED failed on BLOCKER 5, which is not a CI defect but an ADOPTER-FACING one.** The
+  `starter` scenario reached `checkwright init`; doctor reported `shellcheck NOT FOUND` against a
+  toolchain otherwise clean (bash 5.3.15, git 2.55.0, jq 1.8.1, awk 5.4.1, sort 8.32), printed
+  `DOCTOR: below contract`, and init REFUSED — `the toolchain is below contract — refusing to
+  install` — yielding `INSTALLER-SMOKE: FAIL — init failed for the starter profile`. The binary was
+  packed and shipped and never once invoked. The fact was in this entry already, as round 2's
+  answer (1); what nobody connected is its CONSEQUENCE: `shellcheck` sits in
+  `context-kit/lib/toolfloor.sh`'s `PROBE_SET` with NO audience token, so it is an ADOPTER floor
+  member, not a contributor one — and `windows-latest` ships without it. A real Windows adopter
+  following docs/install.md hits this same refusal. The instrument measured the product, which is
+  what an instrument is for.
+  **THREE FURTHER ANSWERS ROUND 3 BOUGHT.** Round 2's question (3) — whether a release build leaves
+  the worktree clean — is ANSWERED at last and the answer is YES: porcelain printed nothing after a
+  build that SUCCEEDED, where round 2 could only read it after a failed one. The tracked symlink is
+  GONE (`tracked symlink: <none>`), so `payload-symlink-unextractable-on-windows` is confirmed
+  against the host rather than the tree. And the crate compiles for `x86_64-pc-windows-msvc` twice
+  over — the `gates` job's cross-check step green, plus the runner's own native release build —
+  which is the only compile oracle the `#[cfg(windows)]` arms in `native/src/proc.rs` have.
+  **WHAT ROUND 3 DID NOT MEASURE, stated so it is not read as measured.** No gate ran on Windows.
+  The `on_path` repair those arms carry compiled but was NOT exercised: doctor probes the toolchain
+  with bash `command -v`, not the crate, and the battery that would have run `check-shellcheck`,
+  `check-action-run-shell`, `check-crate-arms` and the evidence runner's `ps` probe never started.
+  Their Windows behaviour remains READ, not MEASURED.
   **THE FORK STAYS RULED — legs, not the honest label**, and the Windows-ahead-of-macOS ordering
   with it; both are TRAJECTORY.md §The closed rulings', and WSL is the interim path.
   **Cost this iteration is buying down:** the one adopter class with a named days-to-weeks adoption
