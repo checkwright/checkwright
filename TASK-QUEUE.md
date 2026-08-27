@@ -41,17 +41,20 @@
   the extension-less one is mode `-rwxr-xr-x` and executes. (5) Exec-bit semantics HOLD on a freshly
   written shebang script despite `core.filemode=false`. (6) The tracked symlink does NOT survive:
   blocker 4. (7) There is NO 260-char ceiling — a 271-char path wrote clean, `core.longpaths` unset.
-  **THE TWO SOURCE BLOCKERS ROUTED 2026-08-26 by the lead ARE BOTH SHIPPED**, and their diagnoses
-  are dropped as answered rather than carried. Blocker 3, the crate not compiling for
-  `x86_64-pc-windows-msvc` at all, went to `gate-binary-target-roster-widening` and landed at
-  `c45d0f4c`, held by that workflow's cross-check step. Blocker 4, packing aborting on the one
-  tracked symlink, went to `payload-symlink-unextractable-on-windows` and landed at `d3f68006`,
-  which deleted the symlink and made packing pre-flight any other. Both entries are `## Done`.
-  **THIS CANNOT CLOSE UNTIL FOUR BLOCKERS MOVE** — all four routed away, and 3 and 4 now shipped
-  rather than merely routed. Its promotion condition is gate-sdk/SPEC.md §Consumer payload's — a
-  run that PRODUCED AND EXERCISED an artifact — and round 2 produced none, so promoting this alone
-  still exercises nothing. The push budget is closed: the lead's ruled two rounds were both spent,
-  the outage and the measurement, inside CLAUDE.md's.
+  **THE TWO SOURCE BLOCKERS ROUTED 2026-08-26 by the lead ARE BOTH SHIPPED**, diagnoses dropped as
+  answered. Blocker 3, the crate not compiling for `x86_64-pc-windows-msvc`, went to
+  `gate-binary-target-roster-widening` (`c45d0f4c`, held by that workflow's cross-check step);
+  blocker 4, packing aborting on the one tracked symlink, to
+  `payload-symlink-unextractable-on-windows` (`d3f68006`). Both are `## Done`, so all four blockers
+  are away and shipped.
+  **WHY ROUND 2 PRODUCED NOTHING IS NOW DIAGNOSED AND REPAIRED — 2026-08-27 at scope.** Cargo DID
+  succeed and DID emit an artifact; only the existence check looked at the wrong path, because this
+  job appended a literal `.exe` onto a value `GATE_SDK_NATIVE_BIN` had begun deriving. The repair
+  landed with this iteration's gap drain, and the job's header no longer carries the two source
+  facts that had aged into falsehoods. Its promotion condition is unchanged — gate-sdk/SPEC.md
+  §Consumer payload's run that PRODUCED AND EXERCISED an artifact — and what stands between the
+  entry and that condition is now ONE RUN rather than a blocker. Nothing here promotes it: an
+  observation is the join bound, and a repair is not an observation.
   **THE FORK STAYS RULED — legs, not the honest label**, and the Windows-ahead-of-macOS ordering
   with it; both are TRAJECTORY.md §The closed rulings', and WSL is the interim path.
   **Cost while deferred:** the one adopter class with a named days-to-weeks adoption window still
@@ -8016,9 +8019,18 @@
   guess), but it turns any expression-valued `runs-on` into a red on a tree that lints clean now.
   **Enforcement-first note:** the gate change carries its own `good/`+`bad/` fixture pair, a Windows
   job with an absent `shell:` being exactly the `bad/` case no current fixture holds.
+  **THIS IS A PRECONDITION OF THE ROSTER WIDENING, not a sibling lint hazard — found first-hand
+  2026-08-27 at scope and the reason this entry's cost line understates it.** `.github/workflows/
+  publish.yml` names `shell:` on NONE of its five `run:` blocks, and its `build` job is
+  `runs-on: ${{ matrix.runner }}`, derived from `native/targets.list` through the `roster` job's
+  hand-kept runner map. So the day `x86_64-pc-windows-msvc` joins that roster and the map gains a
+  `windows-latest` entry, every bash body in that leg runs under `pwsh` and the RELEASE breaks —
+  while this gate lints those same bodies as bash and reports clean. The habit that protects
+  `gates.yml` was never extended to `publish.yml`, which has no `shell:` key to be a habit about.
   **Cost while deferred:** the correction landed on the prose, so the gate now visibly disagrees
   with its own spec — the honest state, and a standing invitation to re-derive which one is right.
-  The exposure grows with every platform leg the roadmap's `next/reliability` tag commits to.
+  The exposure grows with every platform leg the roadmap's `next/reliability` tag commits to, and
+  it stops being latent the moment `platform-support-ci-matrix` earns its roster line.
   Filed 2026-08-26 by close, draining the gap inbox; found at build against the Windows leg.
 
 - **scratch-citation-introducer-form-reach** [design-pending] — `check-scratch-citation` recognises
@@ -8071,9 +8083,12 @@
   **Why it was NOT folded into the Windows blocker unit**, whose envelope was the crate COMPILING
   for the msvc triple: both defects compile cleanly, so neither that unit's cargo-check oracle nor
   the scope census could see them. Behaving correctly on Windows was never that envelope.
-  **Why not fixed at this drain.** The change is small and the verdict is untestable here — no
-  Windows host is reachable from this tree, so a fix would land unexercised, which is the
-  vacuous-green shape the roster exists to refuse.
+  **The "untestable here" ground EXPIRED 2026-08-27, corrected at scope where it stood.** A Windows
+  host IS reachable from this tree — `platform-support-ci-matrix`'s `install-smoke-windows` leg is
+  one, and its round-2 blocker was repaired at that same scope. So a fix rides that leg's next run
+  and lands exercised, which is the only condition this entry was waiting on. It also makes the
+  leg's own claim honest: four gates take `on_path`, so an artifact whose program probes all answer
+  false is produced but not meaningfully *exercised*.
   **Cost while deferred:** zero today and a cliff on the day it is not. No run has ever exercised
   the binary on Windows, so no adopter is impacted — and the first one who is meets four gates
   refusing on programs they have installed.
