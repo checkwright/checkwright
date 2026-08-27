@@ -14,10 +14,11 @@
 
 ## Technical Debt
 
-## Deferred
-
-- **platform-support-ci-matrix** [design-pending] [roadmap: next/reliability] — the native Windows
-  install-smoke leg is landed and MEASURED, and what it measured is two new source blockers.
+- **platform-support-ci-matrix** [roadmap: next/reliability] [precondition-ok: run-observed] —
+  the native Windows install-smoke leg is landed and MEASURED. The opt-out is exact and is not a
+  waiver: what this entry waits on is an **observation** — a CI run that produces and exercises an
+  artifact — and no blocked-by tag can name a run, because no queue slug owns one. Every slug that
+  did block it has shipped.
   Split 2026-08-26 at build under an operator ruling; macOS and everything measured about it went
   to `macos-install-smoke-ci-leg`, whose own provenance line carries the ruling and its ground.
   **The slug is deliberately NOT renamed** though "matrix" now reads oddly for one leg:
@@ -57,13 +58,65 @@
   observation is the join bound, and a repair is not an observation.
   **THE FORK STAYS RULED — legs, not the honest label**, and the Windows-ahead-of-macOS ordering
   with it; both are TRAJECTORY.md §The closed rulings', and WSL is the interim path.
-  **Cost while deferred:** the one adopter class with a named days-to-weeks adoption window still
-  has no working install path — the leg now says exactly why, in four blockers rather than a
-  guess — and `powershell-installer-surface` stays sequenced behind it, though
-  `gate-binary-target-roster-widening` has shipped and left the pool.
+  **Cost this iteration is buying down:** the one adopter class with a named days-to-weeks adoption
+  window still has no working install path, and `powershell-installer-surface` — the port
+  sequence's one remaining member — stays sequenced behind this entry.
+  **The design-pending marker is DELETED rather than converted**, on canon-kit/SPEC.md §The
+  amendment lifecycle's rule for a deferred debt entry: the design this entry owed is ruled and
+  recorded (the fork, the Windows-ahead-of-macOS ordering, the leg's instrument shape), and what
+  remains buys an observation without minting a governed name. It is debt, so no amendment pairs.
+  ruled: platform-support-ci-matrix operator 2026-08-27 lead-relay
   Filed 2026-07-26 by scope, split from `platform-support-contract`; Linux split off 2026-08-25 as
   `linux-install-smoke-ci-leg`, macOS 2026-08-26 as `macos-install-smoke-ci-leg`. Promoted and
   deferred 2026-08-25, re-promoted and deferred again 2026-08-26.
+
+- **on-path-windows-probe-answers-false** [precondition-ok: co-scheduled] —
+  `native/src/proc.rs`'s `on_path()` has TWO independent Windows defects, and fixing either alone
+  leaves the presence probe broken. The opt-out is exact: the leg this entry rides is
+  `platform-support-ci-matrix`, promoted **beside** it in this same iteration, so the relation is
+  co-scheduling and not blocking — the fix must land before that run, not after it.
+  **Defect 1, the separator.** `on_path()` splits `PATH` on `':'`. On a Windows host the separator
+  is `';'` and a drive letter carries a colon, so every entry after the first is mis-parsed.
+  `std::env::split_paths` is the portable API.
+  **Defect 2, the executable suffix.** `on_path()` joins the bare program name onto each `PATH`
+  directory and asks `proc::is_executable`, whose non-unix twin is `p.is_file()`. A Windows
+  toolchain names the file `<program>.exe`, so the candidate is not a file and the probe answers
+  false however the `PATH` was split.
+  **THE FORK IS RULED AT THIS SCOPE, which is what deletes the tag.** `PATHEXT`-aware, reading the
+  variable and falling back to the `.COM;.EXE;.BAT;.CMD` set when it is unset or empty — not the
+  `.exe`-appending twin. Two grounds: the shell side already answers this question from the
+  environment rather than from a literal (`gate-sdk/lib/gate.sh`'s `gate_exe_suffix` dispatches on
+  `uname`), so an appended literal would put the crate a second step behind it; and a probe that
+  can only find `.exe` reports `false` for a program installed as a `.cmd` shim, which is exactly
+  npm's own bin shape and therefore the shape this repo's own install path produces. The suffix
+  question gains ONE crate-side owner, mirroring `gate_exe_suffix`'s single ownership on the shell
+  side; the name it takes is the implementing session's, not a reservation minted here.
+  **This mints no governed name, so it is debt and no amendment pairs** — `std::env::split_paths`
+  is std, and a crate-internal suffix helper is an internal identifier rather than a script, knob,
+  file convention, tag, or cross-component contract (canon-kit/SPEC.md §The amendment lifecycle).
+  **THE BLAST RADIUS IS A REFUSAL, NOT A WRONG VERDICT**, and that is what earns the entry.
+  `on_path` is the wrapper contract's presence probe, so a false answer makes a gate report its
+  program absent and take its not-found path with the program installed. Four gates take it —
+  `check-shellcheck`, `check-action-run-shell`, `check-crate-arms` on `cargo` — plus the evidence
+  runner's `ps` probe.
+  **ASYMMETRY WORTH RECORDING:** `gate-sdk/lib/gate.sh` now owns `gate_exe_suffix` for exactly this
+  question on the shell side, and the crate has no equivalent, so the two substrates disagree about
+  what an executable is named.
+  **Why it was NOT folded into the Windows blocker unit**, whose envelope was the crate COMPILING
+  for the msvc triple: both defects compile cleanly, so neither that unit's cargo-check oracle nor
+  the scope census could see them. Behaving correctly on Windows was never that envelope.
+  **The "untestable here" ground EXPIRED 2026-08-27, corrected at scope where it stood.** A Windows
+  host IS reachable from this tree — `platform-support-ci-matrix`'s `install-smoke-windows` leg is
+  one, and its round-2 blocker was repaired at that same scope. So a fix rides that leg's next run
+  and lands exercised, which is the only condition this entry was waiting on. It also makes the
+  leg's own claim honest: four gates take `on_path`, so an artifact whose program probes all answer
+  false is produced but not meaningfully *exercised*.
+  **Cost this iteration is buying down:** zero today and a cliff on the day it is not — the first
+  adopter to run the binary on Windows meets four gates refusing on programs they have installed.
+  ruled: on-path-windows-probe-answers-false operator 2026-08-27 lead-relay
+  Filed 2026-08-27 by close, draining two gap-inbox bullets; found at spec and at build.
+
+## Deferred
 
 - **macos-install-smoke-ci-leg** [design-pending] [roadmap: next/reliability] — a macOS
   install-smoke leg; nothing has ever run green against macOS.
@@ -111,18 +164,18 @@
   false 2026-08-24; that entry's re-scope records the ~350 uncovered `init.sh` lines.
   **Every closed cohort and cut — members, counts, holds, grounds, price — is recorded at
   gate-sdk/SPEC.md §The first cohort, and the rule that selects the next, so this entry states
-  what remains.** Cut widths are ruled **per cut and never inherited**, members are **selected by
-  running** `port-blockers.sh --group`, and the size arm is **permanently** exhausted, so the
-  budget arm is the only composer left.
-  **The residue's three-way shape is SPENT, and both oracles were re-run at this boundary rather
-  than cited.** The 2026-08-23 ruling retired the permanently-shell class outright; `--group` reads
-  106 scanned, **0 owed and 0 takeable** (none permanent, none held — the battery is finished) and
-  `--tree` reads 154/12/1/**141 owed**; prior readings are dropped as re-derivable. Re-run, never
-  cite. Only `--tree` is the predicate; `--group`'s zero is a finished battery not a finished port;
-  `ported-gate-members`, a registry walk, answers neither. **The owed count ROSE in an iteration
-  that ported nothing**, the tree predicate working rather than a regression:
-  `scripts/parse-installer-smoke-log.sh` landed 2026-08-27 as a consumer-config log parser and not
-  a gate, so the born-native default does not bind it; the 2026-08-23 closed ruling is untouched.
+  what remains.** Cut widths are ruled **per cut and never inherited**, and the size arm is
+  **permanently** exhausted, so the budget arm is the only composer left.
+  **THE COMPOSER DOES NOT REACH THE TREE REMAINDER — found 2026-08-27 at scope, and it is why
+  "advance the port" is not dispatchable as a build unit today.** This entry says members are
+  selected by running `port-blockers.sh --group`; that arm walks the **gate registry**, which reads
+  106 scanned, **0 owed and 0 takeable** — a finished battery, and its own `--help` says a registry
+  arm reading zero "says nothing about the tree". `--tree` reads 154/12/1/**141 owed**, and nothing
+  selects a cut from those 141. Deciding the composer is deferred to the port's next dispatch — the
+  **lead's own** ruling, not the operator's, sharing the declaration below. Only `--tree` is the
+  predicate; `ported-gate-members` answers neither. **The owed count ROSE in an iteration that
+  ported nothing** — `scripts/parse-installer-smoke-log.sh` landed as a consumer-config log parser
+  and not a gate — the tree predicate working rather than a regression. Both oracles re-run here.
   ruled: native-gate-port-remaining-corpus lead 2026-08-27 own-authority
   **Cost while deferred:** large and known — the **owed** remainder (the trailer's own arm,
   never the unported count) plus the runners and the install-lifecycle layer; since the
@@ -1313,6 +1366,18 @@
   "Debt" while naming the governed gate name it mints; canon-kit/SPEC.md §The
   amendment lifecycle's litmus makes that a feature, so promoting it authors an
   amendment.
+  **A LIVE INSTANCE IN THIS TREE, probed 2026-08-27 at scope rather than argued
+  from the class.** `.github/workflows/gates.yml`'s own `gates` job — the battery
+  every push depends on — declares NO `permissions:` block, while the two
+  install-smoke jobs beside it both do. So the omission is not hypothetical and
+  not confined to a copying consumer.
+  **RULED INTO `windows-artifact-proof` as a FEATURE unit, and it stays in this
+  section rather than promoting at this scope**: the roster splits authoring out,
+  so `spec` authors the amendment and pairs the entry. Its bill was put to the
+  operator separately and taken knowing it: a new gate carries the full contract
+  envelope — fixture pair, SPEC section, `gates.list` row, graph manifest — on
+  top of a set already spanning `gate-sdk/`, `native/` and `.github/`.
+  ruled: workflow-permissions-scope-oracle operator 2026-08-27 lead-relay
   Filed 2026-08-01 at close from the gap inbox, confirmed at this iteration's
   align audit against all nine gates that read workflow YAML.
 
@@ -6318,26 +6383,27 @@
   `overlay-only-oracle-grants-uncommitted`, the parent's other split half, whose subject is four
   Rust/gh toolchain oracles and not the wait form.
   recurrence: wait-loop-grant-lost-its-carrier 2026-08-24 2026-08-27
-  **SECOND RECURRENCE, 2026-08-27, and it FALSIFIES the reading the first one left.** Measured the
-  same way, off this iteration's log: **6** `kill -0` occurrences and **12** `until` calls, against
-  the sixty and eight below. A tenfold FALL, in an iteration that delegated more heavily than the
-  one that set the record. So the carry does not scale with compliance-as-such; it scales with the
-  number of **shell** producers backgrounded, and this iteration reached for `Agent` dispatches
-  instead, whose completion notification is a wait with no loop to grant. The correction matters to
-  a scope pricing this: the cost is a function of which wait primitive the work happens to need, so
-  a single iteration's measurement — high or low — is a sample and not a rate, and the 60 should be
-  read as this class's observed ceiling rather than its trend.
-  **FIRST RECURRENCE, 2026-08-24, and the PRICE IS THREE TIMES WHAT THIS ENTRY CARRIED.** Measured
-  at close's prompt-friction triage off the log rather than impression: **60** `while kill -0 <pid>`
-  occurrences across this iteration, ranked as the log's third-heaviest prompting pattern, against
-  the nineteen the cost line below was written on. Eight `until` calls beside them. The mechanic did
-  not change and the rule did not change; the iteration simply backgrounded more producers, which is
-  what a methodology mandating in-turn waits produces as it is followed more closely. So the carry
-  is not a fixed nineteen-per-iteration tax — **it scales with compliance**, which is the worst
-  shape a friction cost can have and is the reading a later scope should price against.
+  **THE TWO RECURRENCES, kept as measurements now that the ruling below carries their reading.**
+  2026-08-24 at close's prompt-friction triage, off the log rather than impression: **60**
+  `while kill -0 <pid>` occurrences and **8** `until` calls, the log's third-heaviest prompting
+  pattern, against the nineteen the cost line was written on. 2026-08-27, measured the same way:
+  **6** and **12** — a tenfold FALL, in an iteration that delegated *more* heavily, because it
+  reached for `Agent` dispatches whose completion notification is a wait with no loop to grant.
+  The mechanic did not change and the rule did not change either time.
+  **RE-DEFERRED 2026-08-27, and the substance of the ruling is the reading rather than the
+  outcome.** The threshold rule put this entry in front of the authority regardless of theme — its
+  two judged dates meet `LIFECYCLE_KIT_RECURRENCE_THRESHOLD`, and an anchored sweep found it the
+  only entry in the pool that does. What the authority ruled on is that **the second recurrence
+  falsified the first's price trend**: the carry scales with the number of *shell* producers a
+  session backgrounds, not with compliance-as-such, so a single iteration's figure is a sample and
+  never a rate. The sixty below is this class's observed **ceiling**, not its level, and the cost
+  line beneath is read that way from here on. The entry is guard-kit code, so TRAJECTORY.md §The
+  closed rulings' 2026-08-22 bar on promoting a permission-settings edit was checked and does not
+  reach it — recorded so the next threshold firing does not re-derive that.
+  ruled: wait-loop-grant-lost-its-carrier operator 2026-08-27 lead-relay
   **Cost while deferred:** rule 6 decides the mandated `kill -0 "$pid"` loop out of band on
-  *every* call — sixty decisions in this iteration alone, for a mechanic the methodology
-  mandates — and the price is now invisible to scope because no entry carries it.
+  *every* call — sixty decisions in the iteration that set the ceiling, for a mechanic the
+  methodology mandates — and the price is invisible to scope because no entry carries it.
   Filed 2026-08-23 by build and ruled by the lead to stay a filed gap for this drain; drained at
   that iteration's close, which confirmed rule 17 carries the discharged precondition; re-measured
   at `shell-gate-tail-port-and-completion-oracle`'s close.
@@ -8031,6 +8097,13 @@
   with its own spec — the honest state, and a standing invitation to re-derive which one is right.
   The exposure grows with every platform leg the roadmap's `next/reliability` tag commits to, and
   it stops being latent the moment `platform-support-ci-matrix` earns its roster line.
+  **RULED INTO `windows-artifact-proof` as a FEATURE unit, so it stays here rather than promoting
+  at this scope**: the gate's resolution contract and its SPEC dialect table both change and a
+  `bad/` fixture is minted, which is the new-names litmus. This roster splits authoring out, so the
+  `spec` stage authors the amendment and pairs the entry — writing the amendment *is* promoting it
+  (canon-kit/SPEC.md §The amendment lifecycle). The `[design-pending]` fork is untouched and is
+  spec's to rule: what a resolver does with an unreadable `runs-on`.
+  ruled: action-run-shell-dialect-by-runner operator 2026-08-27 lead-relay
   Filed 2026-08-26 by close, draining the gap inbox; found at build against the Windows leg.
 
 - **scratch-citation-introducer-form-reach** [design-pending] — `check-scratch-citation` recognises
@@ -8061,38 +8134,6 @@
   every reader until the boundary truncates its target, and the gate that exists to catch exactly
   that stays green.
   Filed 2026-08-27 by close, draining the gap inbox; found at the 2026-08-26 scope, self-caught.
-
-- **on-path-windows-probe-answers-false** [design-pending] — `native/src/proc.rs`'s `on_path()` has
-  TWO independent Windows defects, and fixing either alone leaves the presence probe broken.
-  **Defect 1, the separator.** `on_path()` splits `PATH` on `':'`. On a Windows host the separator
-  is `';'` and a drive letter carries a colon, so every entry after the first is mis-parsed.
-  `std::env::split_paths` is the portable API.
-  **Defect 2, the executable suffix.** `on_path()` joins the bare program name onto each `PATH`
-  directory and asks `proc::is_executable`, whose non-unix twin is `p.is_file()`. A Windows
-  toolchain names the file `<program>.exe`, so the candidate is not a file and the probe answers
-  false however the `PATH` was split. A `PATHEXT`-aware or `.exe`-appending candidate loop pairs
-  with the split fix; neither is designed yet, which is why this is `[design-pending]`.
-  **THE BLAST RADIUS IS A REFUSAL, NOT A WRONG VERDICT**, and that is what earns the entry.
-  `on_path` is the wrapper contract's presence probe, so a false answer makes a gate report its
-  program absent and take its not-found path with the program installed. Four gates take it —
-  `check-shellcheck`, `check-action-run-shell`, `check-crate-arms` on `cargo` — plus the evidence
-  runner's `ps` probe.
-  **ASYMMETRY WORTH RECORDING:** `gate-sdk/lib/gate.sh` now owns `gate_exe_suffix` for exactly this
-  question on the shell side, and the crate has no equivalent, so the two substrates disagree about
-  what an executable is named.
-  **Why it was NOT folded into the Windows blocker unit**, whose envelope was the crate COMPILING
-  for the msvc triple: both defects compile cleanly, so neither that unit's cargo-check oracle nor
-  the scope census could see them. Behaving correctly on Windows was never that envelope.
-  **The "untestable here" ground EXPIRED 2026-08-27, corrected at scope where it stood.** A Windows
-  host IS reachable from this tree — `platform-support-ci-matrix`'s `install-smoke-windows` leg is
-  one, and its round-2 blocker was repaired at that same scope. So a fix rides that leg's next run
-  and lands exercised, which is the only condition this entry was waiting on. It also makes the
-  leg's own claim honest: four gates take `on_path`, so an artifact whose program probes all answer
-  false is produced but not meaningfully *exercised*.
-  **Cost while deferred:** zero today and a cliff on the day it is not. No run has ever exercised
-  the binary on Windows, so no adopter is impacted — and the first one who is meets four gates
-  refusing on programs they have installed.
-  Filed 2026-08-27 by close, draining two gap-inbox bullets; found at spec and at build.
 
 - **threshold-entry-escalation-travel-unruled** [design-pending] — the recurrence-threshold rule
   does not say how a threshold entry TRAVELS through the escalation it rides, and the two
