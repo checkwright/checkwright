@@ -2677,6 +2677,10 @@ gate-sdk prune set applied, and `templates/` paths excluded — a shipped
 same exclusion canon-kit's finders apply): it fires when amendment files span
 ≥2 component dirs, OR when a single amendment's component set — its own dir ∪
 the contract-surface tokens in its body that resolve to a roster dir — is ≥2.
+A **component dir** (equivalently a roster dir) is a directory holding
+`LIFECYCLE_KIT_ROSTER_BASENAME`, and nothing else counts: a root without one
+is not a component however much source it carries, so a single-amendment
+second component can only arrive through a body token resolving to such a dir.
 The
 waiver rides the same file the stamps do (auditable) and is written only on
 an explicit user ruling — never self-issued by the entering session; it

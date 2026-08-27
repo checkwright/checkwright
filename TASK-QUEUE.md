@@ -3628,10 +3628,21 @@
   most of the useful allowlist and would over-match badly. Ruling where the line sits is the
   unit; the scan itself is an afternoon, and the local-vs-local redundancy arm is a one-line
   widening of an existing loop.
+  **The hand-read ran again 2026-08-28 and returned a live instance it then declined to remove**,
+  which sharpens the deliverable rather than adding a second one. The overlay carries
+  `Bash(native/target/release/checkwright-gates *)` — a path-naming grant over a gitignored,
+  session-writable file, exactly the shape. The template's remedy (route through the sanctioned
+  runner, drop the direct grant) does not apply: `scripts/gate-exec.sh` resolves **gates** and
+  reaches none of the binary's non-gate arms, so dropping the grant would push the tree's own
+  live deliverable back behind a prompt. The instance was kept and the judgment stated. What that
+  shows is that "names a writable path" is too coarse a predicate on its own — the artifact here
+  is built from tracked source by an allowlisted command and held current by
+  `check-gate-binary-fresh`, and none of that is content-pinning, but all of it changes the
+  verdict. A useful arm has to report the shape AND leave the ruling to the reader.
   **Cost while deferred:** paid once per close as an unbounded hand-read whose miss is silent,
   and the thing missed is an auto-allow grant over attacker- or accident-writable content —
   the one allowlist class whose whole point is that it does not look dangerous.
-  Filed 2026-08-12 by close, from its own overlay triage.
+  Filed 2026-08-12 by close, from its own overlay triage; hand-read re-run and recorded 2026-08-28.
 
 - **throughput-and-wait-time-unmeasured** [design-pending] — nothing splits session wall-clock
   into waiting-on-model versus local execution, and nothing measures per-model throughput.
@@ -6288,14 +6299,18 @@
   completion is this entry's precondition rather than this work; and from
   `overlay-only-oracle-grants-uncommitted`, the parent's other split half, whose subject is four
   Rust/gh toolchain oracles and not the wait form.
-  recurrence: wait-loop-grant-lost-its-carrier 2026-08-24 2026-08-27
-  **THE TWO RECURRENCES, kept as measurements now that the ruling below carries their reading.**
+  recurrence: wait-loop-grant-lost-its-carrier 2026-08-24 2026-08-27 2026-08-28
+  **THE THREE RECURRENCES, kept as measurements now that the ruling below carries their reading.**
   2026-08-24 at close's prompt-friction triage, off the log rather than impression: **60**
   `while kill -0 <pid>` occurrences and **8** `until` calls, the log's third-heaviest prompting
   pattern, against the nineteen the cost line was written on. 2026-08-27, measured the same way:
   **6** and **12** — a tenfold FALL, in an iteration that delegated *more* heavily, because it
   reached for `Agent` dispatches whose completion notification is a wait with no loop to grant.
-  The mechanic did not change and the rule did not change either time.
+  2026-08-28, measured the same way at `installer-trial-lifecycle-repair`'s close: **8** and **1**,
+  nine calls against the eighteen of the iteration before and the sixty-eight of the ceiling. The
+  mechanic did not change and the rule did not change any of the three times, and the third sample
+  is the first to arrive *after* the reading below was ruled — it is consistent with it rather than
+  a test of it, since this iteration backgrounded few shell producers and delegated the rest.
   **RE-DEFERRED 2026-08-27, and the substance of the ruling is the reading rather than the
   outcome.** The threshold rule put this entry in front of the authority regardless of theme — its
   two judged dates meet `LIFECYCLE_KIT_RECURRENCE_THRESHOLD`, and an anchored sweep found it the
@@ -7008,7 +7023,16 @@
 - **inline-body-interpreter-grant-absent** [design-pending] — `python3` with a body carried IN the
   command string is the tree's standard scratch-computation form, is safe by the tree's own stated
   argument, and is granted by nothing.
-  **Measured at this close's prompt-friction triage.** 45 `python3`-led fall-throughs on the live
+  recurrence: inline-body-interpreter-grant-absent 2026-08-28
+  **FIRST RECURRENCE, and it falsifies this entry's own per-iteration rate.** Measured the same
+  way at `installer-trial-lifecycle-repair`'s close, off its 331-line log: **8** `python3 -`
+  fall-throughs, against the 45 the cost line below was written on. The form is unchanged and
+  still granted on neither surface — what fell is the volume, because this iteration's queue
+  surgery went through inline heredocs a handful of times rather than forty. Read the cost line
+  as a ceiling and this as a sample, the same correction `wait-loop-grant-lost-its-carrier`
+  took: the carry scales with how much a session computes over the tree, never with compliance.
+  **Measured at the filing close's prompt-friction triage.** 45 `python3`-led fall-throughs on the
+  live
   438-line log, the largest binary-level class after the write class. The inline shapes are the bulk
   — `python3 -` 30, `python3 -c` 5, `python3 <<<` 1, `python3 /dev/stdin` 1 — and the remainder is
   `python3 .tmp/x.py` 3, `python3 <` 2, `python3 tools/gen.py` 2.
@@ -8456,6 +8480,16 @@
 - **subagent-liveness-log-unattributed-refusal** [design-pending] — the turn-end liveness log
   records a refusal without recording whose, so a reader cannot tell the guard working from the
   guard wedged.
+  recurrence: subagent-liveness-log-unattributed-refusal 2026-08-28
+  **FIRST RECURRENCE — a THIRD cluster, on a third day, and still unclassifiable.** Read at
+  `installer-trial-lifecycle-repair`'s close off the live log: 172 events, 161 green and **11
+  `live=yes verdict=red records=1 decision=refuse`** in three sub-clusters between 20:58Z and
+  21:26Z on 2026-08-27, at roughly 30-second retry intervals — the same signature as the two
+  21-refusal clusters below. Every row again carries the top-level harness session in `session=`
+  and names neither the refused subagent nor the matched record, so this close could not tell a
+  guard correctly holding a turn against a live build producer from a guard wedged on a waiter's
+  own record. The finding is not that refusals happened; it is that a third measurement bought
+  the same nothing the first two did.
   **Read at the windows-artifact-proof close:** 366 events, 345 of them from that day, 21 of them
   `verdict=red live=yes records=1 decision=refuse` in three clusters at roughly 30-second retry
   intervals. Every row, green and red alike, carries the same `session=` value — the top-level
