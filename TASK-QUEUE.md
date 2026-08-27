@@ -43,51 +43,6 @@
   ruled: action-run-shell-dialect-by-runner operator 2026-08-27 lead-relay
   Filed 2026-08-26 by close, draining the gap inbox; found at build against the Windows leg.
 
-- **workflow-permissions-scope-oracle** [spec: SPEC-action-permissions.md] — no gate parses a
-  workflow `permissions:` block, so every scope a workflow needs is landed on reading alone.
-  The failure mode is concrete and this repo supplied it: a `permissions:` block is an
-  **allowlist**, an undeclared scope makes the read come back as an HTTP 404, and a 404 on a read
-  is indistinguishable from an absent resource — the site-health release-body arm needs
-  `contents: read` and would have reported "no such Release" without it. On a public repository
-  the omission stays invisible until a private-repo consumer copies the workflow.
-  **Precedent, stated precisely** (the gap's own framing overstated it): gate-sdk/SPEC.md declares
-  **GitHub-expression injection** a non-goal and defers it to "a dedicated workflow-security
-  linter". It does *not* rule the whole workflow-security category out of scope, so that line is
-  supporting precedent for keeping the gate narrow, never a standing exclusion to argue against.
-  **TWO LIVE INSTANCES, probed rather than argued from the class.**
-  `.github/workflows/gates.yml`'s own `gates` job — the battery every push depends on — checks out
-  and declares NO `permissions:` block, and that file carries no workflow-level one to inherit.
-  And `gate-sdk/templates/gates-workflow.yml`, the KIT TEMPLATE consumers vendor, has none at all
-  while its one job checks out — which is what makes this kit mechanism rather than a consumer
-  gate, and it is the second instance scope had not yet seen.
-  **PROMOTED 2026-08-27 at spec.** The amendment `gate-sdk/SPEC-action-permissions.md` owns the
-  design. Three rulings a later reader will look for: the gate is `check-action-permissions`,
-  because §check-action-pinning already refuses `check-workflow-*` over `.github/workflows/`; the
-  assertion is two arms — `contents:` where a checkout makes the scope exact, a non-empty
-  declaration where a `gh` call makes it verb-dependent and a verb-to-scope map would be a shipped
-  vocabulary; and this gate is the SECOND CONSUMER that promotes `check-action-gh-repo`'s
-  job-partitioned walk into a shared `native/src/actions.rs`, which is the delta carrying the risk.
-  **THE FILED SIZE — "one gate plus fixtures" — IS FALSE, and it did not survive the promotion:
-  that line was dropped rather than carried, so this replaces it rather than correcting it where
-  it stood.** Delta 1 is not gate-shaped work at all. It lifts the WHOLE of
-  `check-action-gh-repo`'s job-partitioned walk — its event enum, its workflow/job/step `env:`
-  ladder, its `gh` command-position detector and its indentation-bound valve — out of that module
-  into a shared `native/src/actions.rs` under this gate as its second consumer, and it carries an
-  obligation no gate holds for it: `check-action-gh-repo` must come out BYTE-IDENTICAL — findings,
-  counts, clean line, exit code — across the live tree and both fixture cases, before and after
-  the move. The gate itself, its fixture pair, its SPEC section, its `gates.list` row, its
-  descriptor and the new-gate projection fan-out all sit BESIDE that delta, not inside it.
-  **BATCH CUT RULED 2026-08-27: delta 1 is its own build batch**, the amendment staying whole.
-  Grounds: §check-action-gh-repo's own standing rule prescribes extraction at a second consumer
-  and there is now one, and duplicating the walk instead would land the parallel copy the
-  content-tiering rule names as the defect. The amendment's Definition of Done carries the
-  byte-identical assertion, so the batch boundary has an oracle rather than an intention.
-  ruled: workflow-permissions-scope-oracle operator 2026-08-27 lead-relay
-  ruled: workflow-permissions-scope-oracle lead 2026-08-27 own-authority
-  Filed 2026-08-01 at close from the gap inbox, confirmed at this iteration's align audit against
-  the gates that read workflow YAML — a count that read "nine" until spec found it inflated by the
-  three `.workflow/`-reading gates whose names collide with the Actions sense of the word.
-
 ## Technical Debt
 
 - **platform-support-ci-matrix** [roadmap: next/reliability] [precondition-ok: run-observed] —
@@ -1434,7 +1389,11 @@
   **Cost while deferred:** charged against every future edit to either copy. This
   iteration widened the exposure rather than creating it — the release-body arm
   adds a second hand-mirrored block to the same pair, and its own amendment stated
-  outright that nothing catches a missed half.
+  outright that nothing catches a missed half. **A second pair joined the exposure
+  2026-08-27 at build**: `check-action-permissions` put a `permissions:` block into
+  `gate-sdk/templates/gates-workflow.yml` and its filled copy `.github/workflows/
+  gates.yml`, hand-mirrored with nothing holding them together — so the widening now
+  owes two pairs, not one, and `gates-workflow.yml` is the pair whose halves must agree.
   Size: one existing gate widened plus a pair registry.
   **Feature-shaped — self-label corrected 2026-08-04 at close**, on the same read as
   its `workflow-permissions-scope-oracle` sibling: the label read "Debt" while naming
@@ -8442,6 +8401,8 @@
 - **stage-cursor-rerun-stamp-gap** [design-pending] — A skipped re-run stamp points the cursor back.
 
 ## Done
+
+- workflow-permissions-scope-oracle
 
 ## Lessons Learned
 

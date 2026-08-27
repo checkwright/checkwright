@@ -41,6 +41,7 @@ check-workflow-tiering
 check-action-pinning
 check-action-run-shell
 check-action-gh-repo
+check-action-permissions
 check-core-files
 check-identity
 check-stage-evidence

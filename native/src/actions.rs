@@ -15,7 +15,20 @@ pub enum Ev {
     Checkout(usize),
     Gh(usize, bool),
     WorkflowEnv,
+    WorkflowPerms(Perms, usize),
+    JobPerms(Perms, usize),
+    Token,
     BareMarker(usize),
+}
+
+// spec: gate-sdk/SPEC.md §check-action-permissions — the walk hands the resolved shape rather
+// than the raw text, so the refusal is raised by the consumer at the file it can name and no
+// reader re-parses a value the walk already read.
+#[derive(Clone)]
+pub enum Perms {
+    All,
+    Scopes(Vec<(String, String)>),
+    Unreadable(String),
 }
 
 #[derive(PartialEq, Clone, Copy)]
@@ -24,6 +37,13 @@ enum EnvScope {
     Workflow,
     Job,
     Step,
+}
+
+#[derive(PartialEq, Clone, Copy)]
+enum PermScope {
+    None,
+    Workflow,
+    Job,
 }
 
 fn is_blank(s: &str) -> bool {
@@ -49,6 +69,43 @@ fn keyof(s: &str) -> Option<&str> {
         return None;
     }
     Some(name)
+}
+
+// spec: gate-sdk/SPEC.md §check-action-permissions — the scope value is what tells `read` from
+// `none`, so it is carried beside the key rather than the key alone.
+fn valueof(s: &str) -> &str {
+    match s.find(':') {
+        Some(i) => s[i + 1..].trim_matches([' ', '\t']),
+        None => "",
+    }
+}
+
+fn unquote(s: &str) -> &str {
+    s.trim_matches(['"', '\''])
+}
+
+// spec: gate-sdk/SPEC.md §check-action-permissions — three value shapes are recognised because
+// GitHub admits all three; anything else is a refusal rather than a guess.
+fn parse_perms(v: &str) -> Perms {
+    let v = v.trim_matches([' ', '\t']);
+    if matches!(unquote(v), "read-all" | "write-all") {
+        return Perms::All;
+    }
+    if let Some(body) = v.strip_prefix('{').and_then(|r| r.strip_suffix('}')) {
+        let mut out = Vec::new();
+        for item in body.split(',') {
+            let item = item.trim_matches([' ', '\t']);
+            if item.is_empty() {
+                continue;
+            }
+            match keyof(item) {
+                Some(k) => out.push((k.to_string(), unquote(valueof(item)).to_string())),
+                None => return Perms::Unreadable(v.to_string()),
+            }
+        }
+        return Perms::Scopes(out);
+    }
+    Perms::Unreadable(v.to_string())
 }
 
 fn substr_from(s: &str, start: usize) -> &str {
@@ -148,6 +205,10 @@ pub struct Walk<'a> {
     stepdashcol: i64,
     envscope: EnvScope,
     envcol: i64,
+    permscope: PermScope,
+    permcol: i64,
+    permline: usize,
+    permacc: Vec<(String, String)>,
     curjob: String,
     pendjob: bool,
     pendstep: bool,
@@ -173,6 +234,10 @@ impl<'a> Walk<'a> {
             stepdashcol: -1,
             envscope: EnvScope::None,
             envcol: 0,
+            permscope: PermScope::None,
+            permcol: 0,
+            permline: 0,
+            permacc: Vec::new(),
             curjob: String::new(),
             pendjob: false,
             pendstep: false,
@@ -184,6 +249,42 @@ impl<'a> Walk<'a> {
             rbuf: Vec::new(),
             out: Vec::new(),
         }
+    }
+
+    // spec: gate-sdk/SPEC.md §check-action-permissions — an inline value is the whole block; an
+    // empty one opens a subtree the following deeper lines fill, so both spellings of the same
+    // declaration reach the arms as one shape.
+    fn startperms(&mut self, scope: PermScope, col: i64, line: &str, ln: usize) {
+        let v = valueof(line);
+        if v.is_empty() {
+            self.permscope = scope;
+            self.permcol = col;
+            self.permline = ln;
+            self.permacc.clear();
+            return;
+        }
+        let p = parse_perms(v);
+        self.emitperms(scope, p, ln);
+    }
+
+    fn emitperms(&mut self, scope: PermScope, p: Perms, ln: usize) {
+        self.out.push(match scope {
+            PermScope::Workflow => Ev::WorkflowPerms(p, ln),
+            _ => Ev::JobPerms(p, ln),
+        });
+    }
+
+    // spec: gate-sdk/SPEC.md §check-action-permissions — a subtree that collected no key is the
+    // empty allowlist, which grants nothing and is not the same as no block at all.
+    fn flushperms(&mut self) {
+        let scope = self.permscope;
+        if scope == PermScope::None {
+            return;
+        }
+        self.permscope = PermScope::None;
+        let acc = std::mem::take(&mut self.permacc);
+        let ln = self.permline;
+        self.emitperms(scope, Perms::Scopes(acc), ln);
     }
 
     // spec: gate-sdk/SPEC.md §check-action-gh-repo — a `gh` token counts only where a shell
@@ -348,6 +449,15 @@ impl<'a> Walk<'a> {
     fn line(&mut self, raw: &str, fnr: usize) {
         let line = raw.strip_suffix('\r').unwrap_or(raw);
 
+        // spec: gate-sdk/SPEC.md §check-action-permissions — the token reference is a textual
+        // match over the job's whole extent, over-detecting in the direction the walk's other
+        // detector already takes; a job outside `jobs:` has no extent to match in.
+        if !self.curjob.is_empty()
+            && (line.contains("secrets.GITHUB_TOKEN") || line.contains("github.token"))
+        {
+            self.out.push(Ev::Token);
+        }
+
         if self.inrun {
             if is_blank(line) {
                 self.rbuf.push((String::new(), fnr));
@@ -389,6 +499,17 @@ impl<'a> Walk<'a> {
             self.envscope = EnvScope::None;
         }
 
+        if self.permscope != PermScope::None {
+            if c > self.permcol {
+                if let Some(k) = keyof(line) {
+                    let v = unquote(valueof(line)).to_string();
+                    self.permacc.push((k.to_string(), v));
+                }
+                return;
+            }
+            self.flushperms();
+        }
+
         if c == 0 {
             let topkey = keyof(line).unwrap_or("");
             self.injobs = topkey == "jobs";
@@ -398,6 +519,9 @@ impl<'a> Walk<'a> {
             if topkey == "env" {
                 self.envscope = EnvScope::Workflow;
                 self.envcol = 0;
+            }
+            if topkey == "permissions" {
+                self.startperms(PermScope::Workflow, 0, line, fnr);
             }
             return;
         }
@@ -441,6 +565,9 @@ impl<'a> Walk<'a> {
                 self.envscope = EnvScope::Job;
                 self.envcol = c;
             }
+            if k == "permissions" {
+                self.startperms(PermScope::Job, c, line, fnr);
+            }
             return;
         }
 
@@ -474,6 +601,7 @@ impl<'a> Walk<'a> {
         if self.inrun {
             self.endrun();
         }
+        self.flushperms();
         self.out
     }
 }
@@ -569,6 +697,86 @@ mod tests {
         assert_eq!(keyof("- not a mapping"), None);
         assert_eq!(dash_prefix_len("      - uses: x"), Some(8));
         assert_eq!(dash_prefix_len("      -uses: x"), None);
+    }
+
+    fn shape(p: &Perms) -> String {
+        match p {
+            Perms::All => "all".to_string(),
+            Perms::Scopes(v) => v
+                .iter()
+                .map(|(k, val)| format!("{}={}", k, val))
+                .collect::<Vec<_>>()
+                .join(","),
+            Perms::Unreadable(v) => format!("unreadable:{}", v),
+        }
+    }
+
+    // spec: gate-sdk/SPEC.md §check-action-permissions — three value shapes are recognised and
+    // a fourth is a refusal, so a block the gate cannot resolve never reads as a grant.
+    #[test]
+    fn three_value_shapes_resolve_and_a_fourth_refuses() {
+        assert_eq!(shape(&parse_perms("read-all")), "all");
+        assert_eq!(shape(&parse_perms("write-all")), "all");
+        assert_eq!(shape(&parse_perms("{}")), "");
+        assert_eq!(shape(&parse_perms("{contents: read}")), "contents=read");
+        assert_eq!(
+            shape(&parse_perms("${{ inputs.perms }}")),
+            "unreadable:${{ inputs.perms }}"
+        );
+        assert_eq!(shape(&parse_perms("*base")), "unreadable:*base");
+    }
+
+    fn perms(text: &str) -> Vec<String> {
+        walk_file(text, GH)
+            .into_iter()
+            .filter_map(|e| match e {
+                Ev::WorkflowPerms(p, l) => Some(format!("w:{}:{}", l, shape(&p))),
+                Ev::JobPerms(p, l) => Some(format!("j:{}:{}", l, shape(&p))),
+                _ => None,
+            })
+            .collect()
+    }
+
+    // spec: gate-sdk/SPEC.md §check-action-permissions — a job-level block replaces the
+    // workflow-level one, so both reach the arms separately and attributed.
+    #[test]
+    fn the_two_levels_are_emitted_apart_and_a_comment_is_no_scope() {
+        assert_eq!(
+            perms(concat!(
+                "permissions:\n",
+                "  contents: read\n",
+                "jobs:\n",
+                "  a:\n",
+                "    permissions:\n",
+                "      # why id-token is here\n",
+                "      id-token: write\n",
+                "    steps:\n",
+                "      - run: echo\n",
+            )),
+            vec!["w:1:contents=read", "j:5:id-token=write"]
+        );
+    }
+
+    // spec: gate-sdk/SPEC.md §check-action-permissions — an empty allowlist is a declaration
+    // granting nothing, which is not the same fact as no block at all.
+    #[test]
+    fn an_empty_subtree_and_an_empty_mapping_are_the_same_empty_allowlist() {
+        assert_eq!(perms("permissions:\njobs:\n  a:\n"), vec!["w:1:"]);
+        assert_eq!(perms("permissions: {}\njobs:\n  a:\n"), vec!["w:1:"]);
+        assert!(perms("jobs:\n  a:\n").is_empty());
+    }
+
+    // spec: gate-sdk/SPEC.md §check-action-permissions — the token reference arms the job whose
+    // extent carries it, and a reference outside `jobs:` belongs to no job.
+    #[test]
+    fn the_token_reference_is_job_scoped() {
+        let inside = walk_file(
+            "jobs:\n  a:\n    steps:\n      - env:\n          GH_TOKEN: ${{ github.token }}\n",
+            GH,
+        );
+        assert_eq!(inside.iter().filter(|e| matches!(e, Ev::Token)).count(), 1);
+        let outside = walk_file("env:\n  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}\njobs:\n", GH);
+        assert!(!outside.iter().any(|e| matches!(e, Ev::Token)));
     }
 
     #[test]

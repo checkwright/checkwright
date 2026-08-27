@@ -474,7 +474,12 @@ filesystem walks — so each new spawning member inherits the property instead o
 re-buying it. That corpus is the gate modules and stops there: the `#[cfg(test)]`
 helpers bridging to the shell library from `walk.rs` and `main.rs` check their
 own status already, and pulling them in would make the production wrapper carry
-a cwd and an env nothing in production reads. Widening `proc.rs` is how a member
+a cwd and an env nothing in production reads. `native/src/actions.rs` is shared
+gate mechanism sitting **outside** that corpus by construction and is named here
+because the move that put it there is the easiest reader to miss: it spawns
+nothing, and the property is preserved not by the roster test but by the
+single-spawn-site rule above — `proc.rs` is where a spawn would have to be added,
+and adding one there is what the corpus test is watching. Widening `proc.rs` is how a member
 that needs more of the child's result gets it; building its own `Command` is what
 the test refuses.
 
@@ -12046,8 +12051,14 @@ later commit adding a step cannot falsify it.
 
 **The extractor** is one awk pass per file, keyed on block-scalar indentation,
 and stays inline in the check script rather than moving to `lib/` — a helper
-earns its place at a second consumer and there is none. Its rules, each of which
-a prototype proved necessary by failing without it:
+earns its place at a second consumer and **this extractor** has none. The clause
+is scoped rather than absolute, because the tree now holds one of each answer:
+§check-action-gh-repo's job-partitioned walk *did* find its second consumer and
+moved to `native/src/actions.rs` under it (§check-action-permissions), while this
+extractor is deliberately not that walk's third consumer — the two share an
+indentation convention, not a mechanism, and §check-action-gh-repo carries the
+reasoning for both directions. Its rules, each of which a prototype proved
+necessary by failing without it:
 
 - **The key column is the column of the key token, never the list dash.** A
   `- run: |` item's dash sits left of the key; taking the dash's column as the
@@ -12307,16 +12318,32 @@ because this valve stands a job outside a *release-path* assertion, where an
 unexplained exemption is the failure mode the gate exists for; whether the
 siblings should follow is not this section's question.
 
-**The walk is this gate's own, and §check-action-run-shell's extractor is not
-reusable here.** That extractor has no theory of `jobs:` at all: it partitions by
-*file*, and what it emits carries no job identity and none of the `uses:` or
-`env:` lines the arms read. This gate needs a job-partitioned walk carrying all
-three, so it is **not** the second consumer that section's standing
-rule waits for: its "a helper earns its place at a second consumer and there is
-none", and the matching `# spec:` comment at the extractor itself, stay true.
-Stated because the opposite reading is the natural one, and because
-§lib/declaration.sh met the *same* standing rule with the opposite answer — only
-the difference in what is being extracted decides it.
+**The walk is this gate's rule and lives in shared code, and
+§check-action-run-shell's extractor is still not reusable here.** The rule above
+— the job partition, the `gh` detector with its command-position roster and
+logical-line joining, the checkout arm's `uses:` recognition with its ordering
+line, the workflow/job/step `env:` ladder, and the valve's indentation binding —
+is owned by this section and *held* in `native/src/actions.rs`, beside `walk.rs`,
+because §check-action-permissions arrived as the second consumer that wanted the
+walk whole. Only the **valve marker's spelling** is the caller's, handed to the
+walk as an argument: this gate passes `gh-repo-exempt`, its sibling passes its
+own token, and the required-reason rule and the bare-marker failure class are the
+walk's and are shared. Duplicating the state machine to rename one string is the
+parallel copy the content-tiering rule names as the defect, and the move was held
+to byte-identical verdicts on the live tree and both fixture cases rather than
+reasoned safe.
+
+§check-action-run-shell's extractor is **not** that walk's third consumer, and
+the standing rule it lives under still holds **between those two**. That
+extractor has no theory of `jobs:` at all: it partitions by *file*, and what it
+emits carries no job identity and none of the `uses:` or `env:` lines the arms
+read; it must also reassemble a block scalar byte-exactly and refuse four
+constructs loudly, where this walk over-detects by design and refuses nothing.
+What the two share is an *indentation convention*, not a mechanism, and a helper
+holding fifteen lines of convention for two differently-shaped state machines has
+no invariant to hold. Stated because the opposite reading is the natural one, and
+because §lib/declaration.sh met the *same* standing rule with the opposite answer
+— only the difference in what is being extracted decides it.
 
 Tier `precommit`; the `# graph:` couples the surfaces §check-action-pinning
 couples, `dir=one` — a one-way audit. A tree holding no YAML, or no job invoking
@@ -12349,6 +12376,173 @@ set outright. What is *not* changed on that finding is the published requirement
 docs/install.md §Requirements by `check-install-toolchain`, and narrowing a
 user-facing requirement is filed rather than taken in passing
 (§check-gate-assertions).
+
+### check-action-permissions
+
+Invariant: in every Actions-shaped YAML file, a **job** that consumes the GitHub
+token has the scopes it takes **declared** rather than inherited from an
+invisible repository default. A `permissions:` block is an **allowlist**, so an
+undeclared scope makes the read come back as an HTTP 404 — and a 404 on a read is
+indistinguishable from an absent resource, which is why the failure arrives
+looking like "no such Release" rather than "not permitted".
+
+The class is concrete and this repo supplied it: site-kit's release-body arm
+needs `contents: read` and would have reported an absent Release without it. On a
+**public** repository the omission stays invisible, because the content is
+anonymously readable anyway; it surfaces the first time a private-repo consumer
+copies the workflow, which is exactly the shape a kit ships into.
+
+Kit mechanism rather than a consumer gate, on §check-action-run-shell's and
+§check-action-gh-repo's deciding fact reached by the same route: *kits* ship
+workflow templates their consumers vendor — §templates/gates-workflow.yml and
+site-kit's `templates/site-health.yml` — so a consumer gate could repair one tree
+and leave every downstream vendor of the template unchecked. Named `action-`, not
+`check-workflow-*`, for §check-action-pinning's reason, and that collision is not
+hypothetical: `check-workflow-tiering` already governs §The workflow directory.
+
+**Scan set, split predicate and walk are §check-action-gh-repo's, consumed
+whole** — the derived `*.yml` / `*.yaml` walk from the scan root with the shared
+prune set, the `jobs:`-key subject with a `runs:`-shaped composite action
+**skipped and counted**, and the job-partitioned walk in `native/src/actions.rs`
+this gate is the second consumer of. A composite action has no job and no
+`permissions:` of its own, inheriting the calling job's, so the assertion belongs
+to the caller. Nothing of that mechanism is restated here; what this section adds
+is what the walk emits for it and what is done with it.
+
+**The trigger — a job is armed by any one of three**, and the set is the same
+detector the walk already runs for its sibling:
+
+1. a step whose `uses:` ref before the `@` is `actions/checkout`;
+2. a `gh` invocation in one of the job's `run:` bodies;
+3. a `secrets.GITHUB_TOKEN` or `github.token` reference in the job's extent.
+
+Trigger 3 is a **textual** match, and its over-detection is the safe direction —
+§check-action-gh-repo's stated bias, inherited with the walk. A job that mentions
+the token in a comment arms the gate and its author writes one `permissions:`
+block or one valve; a job that consumes it silently is the failure this gate
+exists for. `secrets.NPM_TOKEN` and every other secret are **not** matched: they
+are not the GitHub token and carry no `permissions:` scope. `publish.yml`'s `npm`
+job is the in-tree case that proves the distinction matters — it references
+`secrets.NPM_TOKEN` and nothing else, and is correctly inert. The reference's
+**line number is deliberately not carried**: a finding names the job, never the
+evidence line, so the event is a bare marker that the job is armed rather than a
+field populated at one transition and read at none.
+
+**The scopes in scope for a job** are its own block where it has one, and the
+file's workflow-level block otherwise. A job-level block **replaces** the
+workflow-level one rather than adding to it — GitHub's own rule — so a job
+declaring `id-token: write` alone inherits no `contents:` from a workflow-level
+block that names it. **Modelling the inheritance is load-bearing, not
+completeness**: site-kit's `templates/site-health.yml` and its filled instance
+both leave the `probe` job's block at workflow level, so a gate implementing only
+the job-level lookup would red a correct live file on day one and read as a false
+positive — the shape §check-action-gh-repo's step-level `GH_REPO` lookup has, and
+named here for the same reason.
+
+**Scopes are read as key names with their values, and three value shapes are
+recognised**, because GitHub admits all three and a gate reading only the mapping
+form would answer wrongly on the other two: a mapping of
+`<scope>: read|write|none` (block or flow); the scalar shorthands `read-all` and
+`write-all`, which grant every scope at that level; and the **empty** mapping —
+`{}`, or a `permissions:` key with an empty subtree — which grants nothing. The
+two shorthands are not told apart, because nothing reads the difference: both
+satisfy both arms below, and a distinction with no reader is a field populated at
+one transition and read at none.
+
+**Two arms, disjoined by what the trigger proves:**
+
+- **Arm A — `contents:`, where the consumption is exact.** A job armed by trigger
+  1 must have `contents:` at `read` or `write` in scope (`write` satisfies
+  `read`; either shorthand satisfies both). A checkout fetches repository
+  contents, so the scope is not a guess and the gate may name it.
+- **Arm B — a declaration, where the scope depends on the call.** A job armed by
+  triggers 2 or 3 and not by 1 must have a **non-empty** set of scopes in scope.
+  Which scope a given `gh` call consumes depends on the subcommand, and a
+  verb-to-scope map is a **vocabulary** — unbounded, provider-versioned, and
+  the kind of rule content a kit must not ship as a literal
+  (CLAUDE.md §The provenance seam). So this arm asserts that the job *says*
+  what it takes, which is the whole difference between a reviewed allowlist and
+  a repository default nobody in the tree can see.
+
+A job armed by 1 takes arm A, which is the stronger; the arms are not mixed
+within a job. A job armed by none is **inert and counted**, the counted inertness
+that makes this kit mechanism: a consumer running no GitHub Actions, or none that
+touches the token, pays nothing for it.
+
+**`permissions: {}` fails both arms, and that is the gate working rather than a
+harshness to soften.** An empty allowlist grants nothing, so a job that checks
+out under it has no `contents:` and fails at runtime — on a private repository
+immediately, and on a public one only once the content stops being anonymously
+readable. That silence is the whole observation this gate is built on, and the
+`bad/` fixture opens on it.
+
+**A reusable-workflow call (`jobs.<id>.uses:`) has no `steps:`, so triggers 1 and
+2 cannot fire in it.** Trigger 3 still can, and where it does the assertion is
+right rather than incidental: a job handing the token to a called workflow passes
+its own `permissions:` along with it, so declaring them is exactly the act the
+arm asks for. The called workflow's *own* jobs are held by this gate in the file
+that defines them — the same boundary §check-action-run-shell draws for a called
+workflow's `run:` bodies. Stated because the silence would otherwise read as an
+oversight.
+
+**Output.** Clean is one line naming what was checked — armed jobs, inert jobs,
+Actions-shaped files, walked files and the files the predicate skipped. A finding
+names the file, the job id, its line and which arm failed; the two arms are two
+failure classes and take **two `help:` lines** (§Output contract), one naming
+`contents: read` and one naming the declaration. The bare-marker class inherited
+with the walk keeps its own third.
+
+**The valve.** `# action-permissions-exempt: <reason>`, the kit's established
+marker shape, reason **required and non-empty**, binding by indentation exactly
+as its sibling's does (§check-action-gh-repo owns the binding rule): at or left
+of the job-id column it precedes a job, at the step-list dash column it precedes
+a step, inside a step's keys it binds that step. A job-bound marker skips the
+job; a step-bound one drops that step's evidence from the trigger set and leaves
+the job's other evidence held. A valve is minted here — unlike in
+§check-action-run-shell, where the remedy is always one `shell:` line — because
+the remedy is **not** always available: the `gh` detector over-detects by design,
+and a job reaching the token through a third-party action's own machinery is
+outside this gate's theory.
+
+**The refusals, and the fidelity limits that ship with them.** Exit 2, naming the
+construct, and only inside the Actions-shape subject: a `permissions:` value that
+is neither a mapping, nor `read-all`/`write-all`, nor empty — a `${{ }}`
+interpolation, an anchor or an alias. The gate cannot resolve what such a block
+grants and does not guess.
+
+*Out of ability, stated as cost rather than papered over.* A **third-party action
+that consumes the token implicitly** — passed through its own `with:` inputs or
+read from the environment — is not detected; the trigger set is checkout, `gh`
+and an explicit token reference, and widening it by guessing at action names
+would be a maintained roster of someone else's software. A **`curl` to
+`api.github.com`** is likewise undetected: it is a bare URL in a shell body with
+no token binding the gate can see. Both take the valve, and both are the honest
+limit of a tree-local reader.
+
+*Not asserted, deliberately.* That a declared scope is **not wider than
+necessary**. Over-declaration is a real hazard and it is a different gate: it
+needs the verb-to-scope map arm B refuses to ship, and asserting a minimum is
+mechanically decidable where asserting a maximum is not. Named so a later reader
+does not read the silence as an omission.
+
+Tier `precommit`; the `# graph:` couples the surfaces §check-action-pinning
+couples, `dir=one valve=none` — a one-way audit with no leading surface, the
+`valve=` field being §The `# graph:` manifest's cycle-valve classification and
+carrying no relation to the exemption marker above. **No new knob**: the scan set
+is derived, the prune set is the shared one, and the asserted scope name is
+GitHub's own published vocabulary rather than rule content a consumer could own
+differently — a knob here would be a scope-roster surface with no second consumer
+and nothing private to externalize.
+
+**Its implementation is a compiled subcommand, born native.** The declaration
+path is `check-action-permissions.gate` and the rule runs out of the gate binary
+(§Porting a gate to the binary substrate — new gates here are born on that
+substrate, so there is no shell form to prove byte-identical against). The
+verdict-invariance obligation this gate did carry is its *sibling's*: widening the
+shared walk's event stream for it had to leave §check-action-gh-repo's findings,
+counts, clean line and exit code byte-identical, which was proved by driving both
+binaries from the same cwd with the same argv over the live tree and both fixture
+cases rather than reasoned.
 
 ### check-commit-msg
 

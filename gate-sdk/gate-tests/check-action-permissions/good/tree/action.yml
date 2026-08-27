@@ -1,0 +1,9 @@
+# A composite action has no job of its own and no permissions: of its own, inheriting
+# the calling job's, so the assertion belongs to the caller. Skipped and counted.
+name: composite
+description: a runs:-shaped file that checks out and declares nothing
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0

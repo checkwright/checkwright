@@ -137,6 +137,7 @@ check-workflow-tiering
 check-action-pinning
 check-action-run-shell
 check-action-gh-repo
+check-action-permissions
 check-commit-msg
 check-commit-subject
 check-tree-terms

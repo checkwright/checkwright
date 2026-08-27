@@ -1,0 +1,22 @@
+name: valve-cases
+
+on:
+  workflow_dispatch:
+
+jobs:
+  # A job-bound marker sits at or left of the job-id column and skips the job whole.
+  # action-permissions-exempt: the token arrives through a self-hosted runner's own credential helper, outside this gate's theory
+  job_bound:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+
+  # A step-bound marker drops that step's evidence from the trigger set. This job's
+  # only evidence is the exempted step, so the job is left armed by nothing.
+  step_bound:
+    runs-on: ubuntu-latest
+    steps:
+      # action-permissions-exempt: the curl reaches api.github.com with no token binding the gate can see
+      - name: a call the gate over-detects
+        run: |
+          gh --version

@@ -116,7 +116,9 @@ impl Audit {
                 self.srepo.push(repo);
                 self.have_step = true;
             }
-            Ev::WorkflowEnv => {}
+            // spec: gate-sdk/SPEC.md §check-action-permissions — an existing consumer ignores a
+            // stream member it has no arm for, which is what makes widening the stream additive.
+            Ev::WorkflowEnv | Ev::WorkflowPerms(_, _) | Ev::JobPerms(_, _) | Ev::Token => {}
             Ev::BareMarker(line) => self.bare.push(format!(
                 "{}:{}: a {} marker with no reason",
                 self.curfile, line, MARKER

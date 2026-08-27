@@ -1,0 +1,25 @@
+name: gates
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  # The attested in-tree miss: the battery job every push depends on checks out and
+  # declares no block, with no workflow-level one to inherit.
+  gates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          fetch-depth: 0
+      - name: full battery
+        run: bash gate-sdk/bin/run-gates.sh
+
+  # A bare marker records that a job was stood outside the assertion without saying
+  # why, so it is its own failure class and does not exempt the job.
+  # action-permissions-exempt
+  bare_valve:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0

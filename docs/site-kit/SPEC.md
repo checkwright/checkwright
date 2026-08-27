@@ -536,9 +536,13 @@ scope it omits is `none` — so reading the tag list and the Release bodies need
 appears to work without it; at a private-repo consumer it is the difference
 between the arm working and the arm 404ing on every note, because GitHub masks an
 unauthorized read as an absent resource — the failure arrives looking like "no
-such Release" rather than "not permitted". No gate parses a `permissions:` block
-(workflow-security linting is an explicit non-goal, gate-sdk/SPEC.md
-§check-action-run-shell), so this one is held by review rather than by an oracle.
+such Release" rather than "not permitted". This declaration is held by an oracle
+rather than by review: `check-action-permissions` (gate-sdk/SPEC.md
+§check-action-permissions) reds a job that consumes the GitHub token without
+declaring what it takes, and this template's `probe` job is armed by all three of
+its triggers. What stays a non-goal is the wider workflow-security category the
+gate deliberately does not enter — expression injection (gate-sdk/SPEC.md
+§check-action-run-shell) and over-declaration alike.
 
 **The release-body arm.** For every tracked release note whose front-matter tag
 key names a tag that exists on the remote, the arm asserts two properties over

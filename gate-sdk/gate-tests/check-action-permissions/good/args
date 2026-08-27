@@ -1,0 +1,5 @@
+# Accept case: a witness for each arm (the checkout arm on its own block, on
+# inheritance, and on a job-level block that replaces the workflow-level one; the
+# declaration arm on read-all and on a token reference), an inert job, both valve
+# placements, and the two file shapes the Actions-shape predicate skips.
+tree

@@ -1,0 +1,3 @@
+# Reject case: it opens on the empty allowlist — the invisible construct — then the
+# attested miss itself, a gh job under an empty declaration, and a bare valve marker.
+tree

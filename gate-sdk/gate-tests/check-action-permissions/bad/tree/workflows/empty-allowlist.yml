@@ -1,0 +1,29 @@
+name: the empty allowlist
+
+on:
+  push:
+    branches: [main]
+
+# The invisible case, and the construct that makes the assertion bite: an empty
+# allowlist reads as a declaration and grants nothing, so a job checking out under
+# it has no contents: scope and 404s on a private repository.
+permissions: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - name: build under a scope it does not have
+        run: |
+          make all
+
+  report:
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: a gh call under an empty declaration
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue list --repo owner/repo --state open

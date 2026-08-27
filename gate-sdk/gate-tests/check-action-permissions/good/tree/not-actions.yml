@@ -1,0 +1,7 @@
+# Neither a top-level jobs: key nor a top-level runs: key, so it is outside the
+# subject entirely: not asserted over and not refused.
+title: a foreign-schema file that spells a key permissions
+permissions_note: this is not a permissions: block and nothing here is read
+steps:
+  - name: a CI dialect that is not GitHub Actions
+    run: echo "outside the subject"

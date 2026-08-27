@@ -29,6 +29,11 @@ on:
 jobs:
   gates:
     runs-on: ubuntu-latest
+    # An allowlist, not an addition: every scope omitted is `none`. The job checks
+    # out and does nothing else against the API, so `contents: read` is exact
+    # (gate-sdk/SPEC.md §check-action-permissions).
+    permissions:
+      contents: read
     steps:
       # fetch-depth: 0 — history-reading gates (e.g. drift-kit's trajectory
       # extractor) need the full commit graph, not a shallow checkout.

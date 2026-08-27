@@ -1,0 +1,1 @@
+ACTION-PERMISSIONS: clean (5 job(s) consuming the GitHub token across 2 Actions-shaped file(s) of 4 walked, all declaring the scopes they take; 2 job(s) consuming none, 1 exempt, 1 composite-action file(s) and 1 non-Actions file(s) skipped)

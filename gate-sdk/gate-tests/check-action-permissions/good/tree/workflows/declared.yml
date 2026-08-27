@@ -1,0 +1,69 @@
+name: accept-cases
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  # Satisfied by its own block, on the stronger arm: a checkout consumes repository
+  # contents exactly, and write satisfies read.
+  own_block:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+
+  # Satisfied by inheritance. The job declares no block of its own, so the file's
+  # workflow-level one is what is in scope — the lookup a gate implementing only the
+  # job level would red on day one.
+  inherits:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+
+  # A job-level block replaces the workflow-level one rather than adding to it, so
+  # this one re-declares contents: beside the scope it actually came for.
+  replaces:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+
+  # Satisfied by the grant-everything shorthand, on the declaration arm: which scope
+  # a gh subcommand consumes is verb-dependent, so the arm asserts that the job says
+  # what it takes and never which scope it should have named.
+  read_all:
+    runs-on: ubuntu-latest
+    permissions: read-all
+    steps:
+      - name: a gh call under a declared allowlist
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue list --repo owner/repo --state open
+
+  # Armed by the token reference alone, with no checkout and no gh call.
+  token_ref:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: a third-party action handed the token explicitly
+        uses: some/action@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v1.0.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  # Armed by none of the three: inert and counted, which is what makes this kit
+  # mechanism rather than a cost every consumer pays.
+  inert:
+    runs-on: ubuntu-latest
+    steps:
+      - name: no checkout, no gh, no token
+        run: |
+          echo "nothing here consumes a repository scope"

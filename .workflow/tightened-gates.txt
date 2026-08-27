@@ -2,3 +2,4 @@
 check-gate-exemption-tasks
 check-survey-record
 check-evidence-baseline
+check-action-permissions
