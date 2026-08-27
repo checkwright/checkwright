@@ -89,7 +89,14 @@ jobs:
       # states. Since the settings cohort the crate carries dependencies, so a leg
       # is no longer network-free: every leg fetches the tracked lock's crates from
       # the registry on a cold cache, and no cargo cache is provisioned here.
+      # This job's `runs-on` is an expression, so no tree-local reader can state
+      # its runner — and on the day the roster gains a Windows target this leg's
+      # runner becomes `windows-latest`, where GitHub's default `run:` shell is
+      # `pwsh`. `shell: bash` is what keeps the body below running as written,
+      # and it selects Git-for-Windows bash there, as the Windows leg of
+      # .github/workflows/gates.yml already does.
       - name: build the gate binary for ${{ matrix.target }}
+        shell: bash
         env:
           TARGET: ${{ matrix.target }}
         run: |

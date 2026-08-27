@@ -1,3 +1,5 @@
-# Reject case: a run: block carrying a genuine -S warning ShellCheck finding —
-# workflow shell nothing else in the battery reaches.
+# Reject case: both exit-1 failure classes. A run: block carrying a genuine -S
+# warning ShellCheck finding — workflow shell nothing else in the battery reaches
+# — and two blocks whose dialect nothing states, one under a Windows runner and
+# one under an expression-valued runs-on.
 tree

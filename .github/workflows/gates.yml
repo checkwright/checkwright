@@ -162,10 +162,12 @@ jobs:
   # What remains is the run itself: a green one, produced and exercised.
   #
   # **Every `run:` names `shell: bash`.** GitHub's default `run:` shell on a
-  # Windows runner is `pwsh`, while check-action-run-shell resolves an absent
-  # `shell:` to bash (gate-sdk/SPEC.md §check-action-run-shell) — right for every
-  # job above, wrong here. Naming it keeps the runner and the gate agreeing on
-  # what this text is.
+  # Windows runner is `pwsh`, so a step here that omitted the key would run
+  # PowerShell over a bash body. check-action-run-shell now *requires* the key on
+  # a Windows step rather than assuming bash (gate-sdk/SPEC.md
+  # §check-action-run-shell), so the habit this comment used to describe is the
+  # mechanism: `shell: bash` selects Git-for-Windows bash and keeps the runner
+  # and the gate agreeing on what this text is.
   install-smoke-windows:
     runs-on: windows-latest
     # The instrument runs to its end and reports; it does not decide this

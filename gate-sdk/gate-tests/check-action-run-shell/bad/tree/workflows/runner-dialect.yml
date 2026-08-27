@@ -1,0 +1,36 @@
+# The dialect table's second axis, reject side: both conditions under which the
+# gate cannot state a step's dialect. Each is discharged by one `shell:` key, and
+# each body below is ShellCheck-clean, so what reds here is the unstated dialect
+# rather than the shell.
+name: runner-dialect-reject-cases
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  # The Windows row. The runner's default `run:` shell is pwsh and this step does
+  # not say otherwise, so the dialect the gate would have to assume is the wrong
+  # one — the false-positive engine the extractor's rules exist to prevent.
+  windows_without_a_shell_key:
+    runs-on: windows-latest
+    steps:
+      - name: a bash body on a Windows runner with no shell key
+        run: |
+          set -euo pipefail
+          printf '%s\n' "this body is bash and nothing in the tree says so"
+
+  # The unreadable row. The runner is chosen at runtime, so no tree-local reader
+  # can resolve it. That is a property of the workflow rather than a construct the
+  # gate cannot process, which is why it is exit 1 and not a refusal.
+  unreadable_runner_without_a_shell_key:
+    strategy:
+      matrix:
+        runner: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - name: a bash body under an expression-valued runs-on
+        run: |
+          set -euo pipefail
+          printf '%s\n' "the runner is decided at runtime, so the dialect is not stated"

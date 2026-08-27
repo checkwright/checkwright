@@ -1,1 +1,3 @@
 tree/workflows/ci.yml:14:1: warning: Use 'cd ... || exit' or 'cd ... || return' in case cd fails. [SC2164]
+tree/workflows/runner-dialect.yml:20: the enclosing job runs on a Windows runner, whose default run: shell is pwsh, and the step names no shell:
+tree/workflows/runner-dialect.yml:34: the enclosing job's runs-on cannot be read, so the dialect cannot be stated, and the step names no shell:

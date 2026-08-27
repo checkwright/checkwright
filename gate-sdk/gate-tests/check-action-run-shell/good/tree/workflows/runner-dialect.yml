@@ -1,0 +1,71 @@
+# The dialect table's second axis, accept side: what an absent `shell:` resolves
+# to from the job's `runs-on`, and what an explicit key does over it. No fixture
+# carried a Windows job or a non-literal `runs-on` before this one, so every row
+# below was unexercised. The finding rows live in bad/.
+name: runner-dialect-accept-cases
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  # A Windows job that names bash. On a Windows runner `shell: bash` selects
+  # Git-for-Windows bash, so the one line that makes the dialect knowable is the
+  # same line that keeps a bash body running as written.
+  windows_naming_bash:
+    runs-on: windows-latest
+    steps:
+      - name: a Windows step whose body is bash and says so
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf '%s\n' "linted as bash because the step named bash"
+
+  # A Windows job that means PowerShell. This is the row that already existed: a
+  # dialect ShellCheck has no theory of is skipped and counted, never linted as
+  # shell. Drop that arm and this body reads as an unassigned-variable finding.
+  windows_naming_pwsh:
+    runs-on: windows-latest
+    steps:
+      - name: a Windows step whose body is not shell at all
+        shell: pwsh
+        run: |
+          $host.UI.WriteLine("skipped and counted, never linted as shell")
+
+  # The table's first row, held rather than moved: a non-Windows runner with no
+  # `shell:` key is bash. The apostrophe below is load-bearing — resolve this to
+  # a non-shell dialect by mistake and the block is silently dropped instead.
+  inferred_from_a_literal_label:
+    runs-on: ubuntu-latest
+    steps:
+      - name: an absent shell key on a non-Windows runner
+        run: |
+          set -euo pipefail
+          printf '%s\n' "the runner's default here is bash, derived rather than assumed"
+
+  # A sequence value is its members. None of these is a Windows label, so the job
+  # is non-Windows; lose the sequence arm and the value yields no labels at all,
+  # which is the unreadable finding rather than a quiet dialect change.
+  inferred_from_a_label_sequence:
+    runs-on: [self-hosted, linux, x64]
+    steps:
+      - name: an absent shell key on a sequence of non-Windows labels
+        run: |
+          set -euo pipefail
+          printf '%s\n' "a mixed selector carrying no windows label is bash"
+
+  # The finding is about the *step*, not the job. This job's runner is decided at
+  # runtime and cannot be read here, and the step is clean anyway because it
+  # states its own dialect — which is the whole remedy the finding names.
+  unreadable_runner_with_an_explicit_shell:
+    strategy:
+      matrix:
+        runner: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - name: an explicit shell key over an unreadable runs-on
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf '%s\n' "the step states what the job cannot"

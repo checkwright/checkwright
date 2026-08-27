@@ -1,3 +1,4 @@
-# Accept case: the extractor's traps, the dialect table, and the reach ruling —
-# each pinned by a row that reds if the corresponding rule regresses.
+# Accept case: the extractor's traps, both axes of the dialect table — the
+# step's shell: key and the enclosing job's runs-on — and the reach ruling, each
+# pinned by a row that reds if the corresponding rule regresses.
 tree

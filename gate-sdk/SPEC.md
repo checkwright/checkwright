@@ -12070,6 +12070,31 @@ necessary by failing without it:
   double-extracted.
 - **A comment line is never a header** — the commented example a shipped template
   carries is not a step.
+- **The job partition.** A column-0 key `jobs` opens the job section and any
+  other column-0 key closes it — the Actions-shape predicate's own test, reused
+  rather than re-spelled, since a `jobs:` key at any other indent is a foreign
+  schema the predicate already refuses to see. The first indent under `jobs:` is
+  the **job column**: a line at it begins a job, ends the job before it, and
+  resets that job's `runs-on` to *absent*. The first indent under a job id is the
+  **job-key column**, where a `runs-on:` key captures the job's runner value; a
+  value that is empty on the key line takes the following lines more indented
+  than that column, so a block sequence and a mapping are captured whole rather
+  than read as absent. A trailing YAML comment is stripped from the captured
+  value, so a label carrying one is still matched by the Windows test below.
+- **A `runs:`-shaped composite action never enters the job section**, so its
+  steps carry no job and no `runs-on`. That is correct rather than a gap:
+  GitHub's own schema makes `shell:` **required** on a composite `run:` step, so
+  a composite step reaching the unresolved row of the dialect table is invalid
+  Actions YAML and the finding is true.
+
+**Resolution happens at two boundaries, and the split is what makes the second
+axis derivable.** The step boundary stamps the step's **explicit** `shell:` onto
+its blocks, because that sibling key may sit either side of the `run:` block it
+governs. A job's `runs-on` has the same freedom against the whole `steps:` list —
+YAML admits it after `steps:` — so the *inferred* half cannot be resolved at the
+step boundary without reading a key that may not have arrived. A block therefore
+carries its step's explicit value as an **optional**, and the job boundary (or
+the file's end) stamps the job's `runs-on` class onto every block that has none.
 
 **GitHub expressions.** `${{ … }}` is not shell syntax; left raw it is a parse
 error. It is replaced per line by `${GHEXPR}`, a braced parameter expansion,
@@ -12079,16 +12104,78 @@ stylistic: a literal constant drags ShellCheck's constant-expression analysis
 into firing on correct code, manufacturing SC2050 inside `[ … ]` and SC2194
 inside `case`. The braced form causes no finding in any tested position.
 
-**Dialect — resolved, never assumed.** Linting a block under the wrong dialect
-manufactures false positives, so the step's effective shell comes from its
-`shell:` sibling key, which may sit either side of the `run:` block:
+**Dialect — resolved, never assumed, on two axes.** Linting a block under the
+wrong dialect manufactures false positives, so the step's effective shell comes
+from its `shell:` sibling key where it has one and from the enclosing job's
+`runs-on` where it does not:
 
-| `shell:` | resolution |
-| --- | --- |
-| absent | `-s bash` — GitHub's documented default for a `run:` step on a Linux or macOS runner. It is **`pwsh` on a Windows runner**, so this row is a resolution the gate assumes rather than derives, and a Windows step omitting the key is linted under the wrong dialect. `action-run-shell-dialect-by-runner` owns resolving it from `runs-on` |
-| `bash` (with or without arguments) | `-s bash` |
-| `sh` / `dash` / `ksh` | the matching ShellCheck dialect — linting a POSIX body as bash hides the portability findings that dialect exists to surface |
-| anything else (`pwsh`, `python`, a custom `{0}` template) | the block is **skipped and counted** — the body is not shell, so there is no shell to lint |
+| `shell:` | `runs-on` | resolution |
+| --- | --- | --- |
+| absent | non-Windows | `-s bash` — GitHub's documented default for a `run:` step everywhere but a Windows runner |
+| absent | Windows | **finding** — the runner's default is `pwsh` and the step does not say so |
+| absent | unreadable, or the step has no enclosing job | **finding** — the dialect cannot be stated, so it is not assumed |
+| `bash` (with or without arguments) | any | `-s bash` |
+| `sh` / `dash` / `ksh` | any | the matching ShellCheck dialect — linting a POSIX body as bash hides the portability findings that dialect exists to surface |
+| anything else (`pwsh`, `python`, a custom `{0}` template) | any | the block is **skipped and counted** — the body is not shell, so there is no shell to lint |
+
+**One rule covers both new rows: a step's dialect must be knowable, and where the
+gate cannot state it the step says it.** The finding line names the file, the
+`run:` block's line and which condition fired; the class takes its own `help:`
+line (§Output contract's rule for a gate with more than one failure class), and
+the remedy it names is one line — `shell: bash`, or `shell: pwsh` where pwsh is
+what was meant.
+
+**`runs-on` is classified by a Windows test, never by a platform roster.** The
+captured value resolves to one of three classes:
+
+- **Labels.** A scalar value is one label. A sequence — flow (`[a, b]`) or block
+  — is its members. A mapping is a runner group: its `labels:` members are the
+  labels, and a mapping carrying `group:` with no `labels:` yields none.
+- **Windows** if any label, lowercased and stripped of surrounding quotes, is
+  exactly `windows` or begins `windows-`. *Any* label matching makes the job
+  Windows: a mixed self-hosted selector may land on a Windows machine, and a
+  dialect that is only *probably* bash is not one the gate may state.
+- **Unreadable** if the captured text contains `${{` anywhere, or if the value
+  yields no labels at all — the group-only mapping, an empty value, an absent
+  `runs-on`.
+- **Non-Windows** otherwise, and that is the *only* other answer. There is no
+  Linux label set and no macOS label set, because bash is GitHub's default
+  everywhere that is not Windows: enumerating the platforms that resolve to bash
+  would be a maintained roster of runner labels drifting against a provider's
+  release notes, which derivation-first refuses. The gate asserts one distinction
+  because one distinction is what the dialect turns on.
+
+**The honest limit, stated rather than papered over.** A self-hosted Windows
+runner registered without a `windows` label reads as non-Windows and its
+unshelled bodies are linted as bash. The label convention is the only platform
+signal a tree-local reader has, and widening the match by guessing at label
+vocabularies is what turns a stated assertion back into a heuristic. The remedy
+in that tree is the same one line the finding asks for.
+
+**Why the Windows row is a finding and not a skip.** Skipping would make the
+inferred case agree with the explicit `pwsh` row, and that disagreement was the
+original complaint — the resolver taking the opposite branch from the one it
+takes on the same body spelled out. But agreement is not the objective: nothing
+was red under the assumed resolution *because of a habit rather than a
+mechanism*, `.github/workflows/gates.yml`'s Windows job naming `shell: bash` on
+every one of its steps with a header comment saying why. A skip leaves that habit
+a habit and adds a silent lint hole on exactly the platform this tree is buying.
+A finding converts the header comment into the mechanism it describes, at a cost
+of one line on a Windows step — and a Windows author who genuinely wants pwsh
+writes `shell: pwsh` and is skipped-and-counted through the row that already
+existed.
+
+**Why the unreadable row is a finding and not a refusal.** Exit 2 is for a
+construct the gate cannot process; here the gate processed the file perfectly and
+found a step whose dialect nothing in the tree states. That is a property of the
+workflow, which is exit 1 — and unlike a refusal it names a remedy the author can
+take. §Fail-closed contract is untouched: nothing is captured and read as clean.
+The class is not hypothetical and its in-tree instance is the one that mattered:
+`.github/workflows/publish.yml`'s `build` job is `runs-on: ${{ matrix.runner }}`,
+resolved at runtime from the roster job's hand-kept runner map, so on the day a
+Windows target joins `native/targets.list` that leg's bash bodies would run under
+`pwsh` while this gate reported them clean. Its step names `shell: bash`, which is
+both the line that clears the finding and the line that keeps the release working.
 
 **Its implementation is a compiled subcommand, and it is criterion 7's second
 landed wrapper.** The declaration path is `check-action-run-shell.gate` and the
@@ -12153,8 +12240,21 @@ subject**: a folded block scalar (`run: >`, `run: >-`), because reassembling
 folded lines needs YAML's folding rules and mis-folding manufactures findings;
 an explicit block-scalar indentation indicator (`run: |2`), which can contradict
 the indent derived from the first body line; a YAML anchor or alias as the `run:`
-value, since no anchor resolution is attempted; and an unbalanced `${{` on a body
-line. Refusing the folded form makes the literal form a conformance requirement
+value, since no anchor resolution is attempted; an unbalanced `${{` on a body
+line; and a `defaults:` key at column 0 or at the job-key column whose subtree
+carries a `run:` key. That last one is the dialect resolution's own refusal:
+`defaults.run.shell` overrides the runner default for every step beneath it, at
+workflow or job level, so a resolver reading `runs-on` and not `defaults` would
+answer bash for a job whose steps all run under pwsh — the wrong-dialect lint
+this gate exists to end, reintroduced one level up. Modelling it properly means a
+third inheritance layer with its own precedence rules; refusing it costs nothing
+and can never become a false negative, which is this section's own stated reason
+for preferring a loud refusal. **The cost is measured at zero**: a tree-wide grep
+for `defaults:` in every `.yml`/`.yaml` returns exactly one hit, `docs/_config.yml`,
+which is Jekyll's and is not Actions-shaped — no workflow, no kit template and no
+fixture carries one. The refusal is the `run:` key rather than the `defaults:`
+key: a `defaults:` block setting anything else changes no step's dialect and is
+extracted normally. Refusing the folded form makes the literal form a conformance requirement
 for a multi-line `run:` body *in an Actions-shaped file* — governance where
 gate-sdk ships the template and owns the contract. The chomping indicators `|-`
 and `|+` are ordinary spellings, handled and extracted with the body bytes
@@ -12185,7 +12285,13 @@ happening before the shell ever runs, and a different and worse class belonging
 to a dedicated workflow-security linter.
 
 Tier `precommit`; **no new knob** — the scan set is derived, the prune set is the
-shared one, and the severity is the family's literal. A missing `shellcheck`
+shared one, and the severity is the family's literal. **No valve either, and the
+refusal is deliberate:** the `# graph:` manifest keeps `valve=none`, because
+every finding the unstated-dialect class raises is discharged by one `shell:`
+key, which is strictly better than an exemption marker in the same place — the
+marker would be one line that leaves the dialect unstated, the key is one line
+that states it. A valve is worth minting where the remedy is unavailable, and
+here it never is. A missing `shellcheck`
 binary is exit 2, as §check-shellcheck models. A tree holding no YAML exits clean
 on a zero count, the counted inertness that makes this kit mechanism: a consumer
 running no GitHub Actions pays nothing for it.
@@ -12330,13 +12436,17 @@ reasoned safe.
 
 §check-action-run-shell's extractor is **not** that walk's third consumer, and
 the standing rule it lives under still holds **between those two**. That
-extractor has no theory of `jobs:` at all: it partitions by *file*, and what it
-emits carries no job identity and none of the `uses:` or `env:` lines the arms
-read; it must also reassemble a block scalar byte-exactly and refuse four
-constructs loudly, where this walk over-detects by design and refuses nothing.
-What the two share is an *indentation convention*, not a mechanism, and a helper
+extractor carries a job partition of its own, because its dialect resolution
+happens at the job boundary; what separates the two is therefore not a theory of
+`jobs:`. What it emits carries none of the `uses:` or `env:` lines the
+arms read; it must reassemble a block scalar byte-exactly and refuse five
+constructs loudly, where this walk over-detects by design, carries no body
+reassembly and refuses nothing.
+What the two share is an *indentation convention* — find the job column, find the
+job-key column — not a mechanism, and a helper
 holding fifteen lines of convention for two differently-shaped state machines has
-no invariant to hold. Stated because the opposite reading is the natural one, and
+no invariant to hold. That the two now answer the same structural question is
+exactly why the refusal is stated rather than assumed. Stated because the opposite reading is the natural one, and
 because §lib/declaration.sh met the *same* standing rule with the opposite answer
 — only the difference in what is being extracted decides it.
 

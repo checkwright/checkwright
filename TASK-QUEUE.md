@@ -12,37 +12,6 @@
 
 ## New Features
 
-- **action-run-shell-dialect-by-runner** [spec: SPEC-run-shell-dialect.md] —
-  `check-action-run-shell` resolves an absent `shell:` key to the bash dialect on a ground that is
-  false for one runner class, so the first Windows step that omits the key gets linted as bash.
-  On a `windows-*` runner GitHub's default `run:` shell is `pwsh`, not bash — and the dialect
-  table's own last row already says a `pwsh` block is *skipped and counted*, so the resolver takes
-  the opposite branch from the one it would take on the same body spelled explicitly.
-  **Nothing is red today, and the reason is a habit rather than a mechanism.**
-  `.github/workflows/gates.yml`'s `install-smoke-windows` job names `shell: bash` on every one of
-  its six steps, and its header says why in those words. A habit holds until the next step is
-  written, and the failure mode when it lapses is the false-positive engine that section's own
-  extractor rules exist to prevent: a PowerShell body linted as shell.
-  **THIS IS A PRECONDITION OF THE ROSTER WIDENING, not a sibling lint hazard — found first-hand
-  2026-08-27 at scope and re-verified at spec.** `.github/workflows/publish.yml` names `shell:` on
-  NONE of its five `run:` blocks, and its `build` job is `runs-on: ${{ matrix.runner }}`, derived
-  from `native/targets.list` through the `roster` job's hand-kept runner map. So the day
-  `x86_64-pc-windows-msvc` joins that roster and the map gains a `windows-latest` entry, every bash
-  body in that leg runs under `pwsh` and the RELEASE breaks — while this gate lints those same
-  bodies as bash and reports clean. The habit that protects `gates.yml` was never extended to
-  `publish.yml`, which has no `shell:` key to be a habit about.
-  **PROMOTED 2026-08-27 at spec, which is where the fork was ruled.** The amendment
-  `gate-sdk/SPEC-run-shell-dialect.md` owns the design; the ruling in one line is that a step's
-  dialect must be KNOWABLE, so an absent `shell:` under a Windows runner and one under an
-  unreadable `runs-on` are the same new finding class, discharged by naming `shell:` — which is
-  what turns the habit above into the mechanism it describes.
-  **The fork was priced against the corpus rather than against the fear.** 40 `runs-on:` values
-  tree-wide, 39 plain literals, zero arrays, zero runner-group objects, and exactly ONE unreadable
-  — `publish.yml:81` — holding exactly ONE `run:` block. So the red the entry feared is one
-  finding and one `shell: bash` line, landing on the very job whose runner becomes Windows.
-  ruled: action-run-shell-dialect-by-runner operator 2026-08-27 lead-relay
-  Filed 2026-08-26 by close, draining the gap inbox; found at build against the Windows leg.
-
 ## Technical Debt
 
 - **platform-support-ci-matrix** [roadmap: next/reliability] [precondition-ok: run-observed] —
@@ -8403,6 +8372,7 @@
 ## Done
 
 - workflow-permissions-scope-oracle
+- action-run-shell-dialect-by-runner
 
 ## Lessons Learned
 

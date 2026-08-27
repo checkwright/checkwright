@@ -81,6 +81,100 @@ check_case chomp_dash '      - run: |-
 check_case chomp_plus '      - run: |+
           echo kept' 0 "1 run: block(s) linted"
 
+# E2 — a `defaults:` subtree carrying `run:` is refused at either level.
+# `defaults.run.shell` overrides the runner default for every step beneath it, so a
+# resolver reading `runs-on` and not `defaults` would answer bash for a job whose
+# steps all run under pwsh — the wrong-dialect lint this gate exists to end,
+# reintroduced one level up. Modelling it means a third inheritance layer with its
+# own precedence rules; refusing it costs nothing and can never be a false negative.
+# The whole workflow is the case here, so these do not ride check_case's template.
+# $1=label  $2=whole workflow  $3=want-rc  $4=want-substring
+wf_case() {
+    local label="$1" body="$2" want="$3" substr="$4" out rc
+    mkdir -p "$tmp/$label/tree"
+    printf '%s\n' "$body" > "$tmp/$label/tree/wf.yml"
+    out="$( cd "$tmp/$label" && gate_run check-action-run-shell "$CHECKS" tree 2>&1 )"; rc=$?
+    if [[ "$rc" -ne "$want" ]]; then
+        echo "  FAIL [$label]: want exit $want, got $rc -- $out"; fails=$((fails + 1)); return
+    fi
+    if ! grep -qF -- "$substr" <<<"$out"; then
+        echo "  FAIL [$label]: exit $rc OK but output lacks '$substr': $out"; fails=$((fails + 1))
+    fi
+}
+
+defaults_refusal="a defaults: block carrying a run: key"
+
+wf_case defaults_workflow 'name: workflow-level defaults
+
+defaults:
+  run:
+    shell: pwsh
+
+jobs:
+  j:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo body' 2 "$defaults_refusal"
+
+wf_case defaults_job 'name: job-level defaults
+
+jobs:
+  j:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - run: |
+          echo body' 2 "$defaults_refusal"
+
+# E3 — the refusal is the `run:` key, not the `defaults:` key. A defaults block
+# setting anything else changes no step's dialect, so it is extracted normally —
+# without this arm the refusal could be a blanket ban on the key and still pass.
+wf_case defaults_without_run 'name: a defaults block that is not defaults.run
+
+defaults:
+  shell: pwsh
+
+jobs:
+  j:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo body' 0 "1 run: block(s) linted"
+
+# G — the dialect table's second axis. An absent shell: key resolves from the
+# enclosing job's runs-on, so a Windows runner and an unreadable one are the same
+# new finding class, discharged by naming the key.
+wf_case windows_default 'name: an absent shell key on a Windows runner
+
+jobs:
+  j:
+    runs-on: windows-latest
+    steps:
+      - run: |
+          echo body' 1 "the enclosing job runs on a Windows runner"
+
+wf_case unreadable_runner 'name: an absent shell key under an unreadable runs-on
+
+jobs:
+  j:
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - run: |
+          echo body' 1 "the enclosing job's runs-on cannot be read"
+
+wf_case windows_named 'name: a Windows step that names its dialect
+
+jobs:
+  j:
+    runs-on: windows-latest
+    steps:
+      - shell: bash
+        run: |
+          echo body' 0 "1 run: block(s) linted"
+
 # F — every refusal fires only inside the Actions-shape subject. The same folded
 # scalar in a file carrying no top-level jobs:/runs: key is skipped and counted,
 # never refused: the gate did not read it as shell.
@@ -98,5 +192,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "check-action-run-shell.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "check-action-run-shell.test: ok (folded scalars, an explicit indentation indicator, a YAML alias, a YAML anchor on either scalar style and an unbalanced GitHub expression each refuse at exit 2 naming the construct; |- and |+ extract normally; a quoted value merely starting with & is not an anchor; a refusable construct outside the Actions-shape subject is skipped and counted rather than refused)"
+echo "check-action-run-shell.test: ok (folded scalars, an explicit indentation indicator, a YAML alias, a YAML anchor on either scalar style, an unbalanced GitHub expression and a defaults: subtree carrying run: at either level each refuse at exit 2 naming the construct; |- and |+ extract normally; a quoted value merely starting with & is not an anchor; a defaults: block with no run: key extracts normally; an absent shell: key under a Windows or an unreadable runs-on is a finding at exit 1 and naming the key clears it; a refusable construct outside the Actions-shape subject is skipped and counted rather than refused)"
 exit 0

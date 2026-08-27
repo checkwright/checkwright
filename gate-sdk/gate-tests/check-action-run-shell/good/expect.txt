@@ -1,1 +1,1 @@
-ACTION-RUN-SHELL: clean (10 run: block(s) linted at -S warning across 2 Actions-shaped file(s) of 3 walked; 1 file(s) skipped by the Actions-shape predicate, 1 plain-scalar run: value(s) skipped, 1 block(s) skipped on a non-shell dialect)
+ACTION-RUN-SHELL: clean (14 run: block(s) linted at -S warning across 3 Actions-shaped file(s) of 4 walked; 1 file(s) skipped by the Actions-shape predicate, 1 plain-scalar run: value(s) skipped, 2 block(s) skipped on a non-shell dialect)
