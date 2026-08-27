@@ -6187,6 +6187,16 @@
 
 - **backgrounded-shell-child-run-record-unenforced** [design-pending] — the launch-time liveness
   record is advised and never required.
+  recurrence: backgrounded-shell-child-run-record-unenforced 2026-08-28
+  **FIRST RECURRENCE, and it is a SHARPER SHAPE that narrows the design fork below.** Attested at
+  `installer-trial-lifecycle-repair`'s close: `stage-economics.sh` exceeded its foreground timeout
+  and **the harness backgrounded it**, leaving a live producer writing `.metric/` with no `.run`
+  record — and no session act could have written one, because the launch was never a session act.
+  Rule 15 fires on the *write* side of an explicit backgrounding and this path never reaches it,
+  so the first of the two candidate detection shapes recorded below is not merely
+  text-shaped-limited here, it is structurally unreachable. The second — a session-end check over
+  the scratch dir — is the only candidate that sees this instance at all, which is a real
+  narrowing of an otherwise even fork.
   **The drain corrected this finding's premise.** It was filed claiming "prompts request, guards
   enforce, and here only the prompt exists". guard-kit generic rule 15
   (`guard_rule_background_no_record`) had landed the day before, on 2026-08-22, and does fire on
