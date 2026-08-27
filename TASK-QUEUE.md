@@ -12,6 +12,66 @@
 
 ## New Features
 
+- **action-run-shell-dialect-by-runner** [spec: SPEC-run-shell-dialect.md] —
+  `check-action-run-shell` resolves an absent `shell:` key to the bash dialect on a ground that is
+  false for one runner class, so the first Windows step that omits the key gets linted as bash.
+  On a `windows-*` runner GitHub's default `run:` shell is `pwsh`, not bash — and the dialect
+  table's own last row already says a `pwsh` block is *skipped and counted*, so the resolver takes
+  the opposite branch from the one it would take on the same body spelled explicitly.
+  **Nothing is red today, and the reason is a habit rather than a mechanism.**
+  `.github/workflows/gates.yml`'s `install-smoke-windows` job names `shell: bash` on every one of
+  its six steps, and its header says why in those words. A habit holds until the next step is
+  written, and the failure mode when it lapses is the false-positive engine that section's own
+  extractor rules exist to prevent: a PowerShell body linted as shell.
+  **THIS IS A PRECONDITION OF THE ROSTER WIDENING, not a sibling lint hazard — found first-hand
+  2026-08-27 at scope and re-verified at spec.** `.github/workflows/publish.yml` names `shell:` on
+  NONE of its five `run:` blocks, and its `build` job is `runs-on: ${{ matrix.runner }}`, derived
+  from `native/targets.list` through the `roster` job's hand-kept runner map. So the day
+  `x86_64-pc-windows-msvc` joins that roster and the map gains a `windows-latest` entry, every bash
+  body in that leg runs under `pwsh` and the RELEASE breaks — while this gate lints those same
+  bodies as bash and reports clean. The habit that protects `gates.yml` was never extended to
+  `publish.yml`, which has no `shell:` key to be a habit about.
+  **PROMOTED 2026-08-27 at spec, which is where the fork was ruled.** The amendment
+  `gate-sdk/SPEC-run-shell-dialect.md` owns the design; the ruling in one line is that a step's
+  dialect must be KNOWABLE, so an absent `shell:` under a Windows runner and one under an
+  unreadable `runs-on` are the same new finding class, discharged by naming `shell:` — which is
+  what turns the habit above into the mechanism it describes.
+  **The fork was priced against the corpus rather than against the fear.** 40 `runs-on:` values
+  tree-wide, 39 plain literals, zero arrays, zero runner-group objects, and exactly ONE unreadable
+  — `publish.yml:81` — holding exactly ONE `run:` block. So the red the entry feared is one
+  finding and one `shell: bash` line, landing on the very job whose runner becomes Windows.
+  ruled: action-run-shell-dialect-by-runner operator 2026-08-27 lead-relay
+  Filed 2026-08-26 by close, draining the gap inbox; found at build against the Windows leg.
+
+- **workflow-permissions-scope-oracle** [spec: SPEC-action-permissions.md] — no gate parses a
+  workflow `permissions:` block, so every scope a workflow needs is landed on reading alone.
+  The failure mode is concrete and this repo supplied it: a `permissions:` block is an
+  **allowlist**, an undeclared scope makes the read come back as an HTTP 404, and a 404 on a read
+  is indistinguishable from an absent resource — the site-health release-body arm needs
+  `contents: read` and would have reported "no such Release" without it. On a public repository
+  the omission stays invisible until a private-repo consumer copies the workflow.
+  **Precedent, stated precisely** (the gap's own framing overstated it): gate-sdk/SPEC.md declares
+  **GitHub-expression injection** a non-goal and defers it to "a dedicated workflow-security
+  linter". It does *not* rule the whole workflow-security category out of scope, so that line is
+  supporting precedent for keeping the gate narrow, never a standing exclusion to argue against.
+  **TWO LIVE INSTANCES, probed rather than argued from the class.**
+  `.github/workflows/gates.yml`'s own `gates` job — the battery every push depends on — checks out
+  and declares NO `permissions:` block, and that file carries no workflow-level one to inherit.
+  And `gate-sdk/templates/gates-workflow.yml`, the KIT TEMPLATE consumers vendor, has none at all
+  while its one job checks out — which is what makes this kit mechanism rather than a consumer
+  gate, and it is the second instance scope had not yet seen.
+  **PROMOTED 2026-08-27 at spec.** The amendment `gate-sdk/SPEC-action-permissions.md` owns the
+  design. Three rulings a later reader will look for: the gate is `check-action-permissions`,
+  because §check-action-pinning already refuses `check-workflow-*` over `.github/workflows/`; the
+  assertion is two arms — `contents:` where a checkout makes the scope exact, a non-empty
+  declaration where a `gh` call makes it verb-dependent and a verb-to-scope map would be a shipped
+  vocabulary; and this gate is the SECOND CONSUMER that promotes `check-action-gh-repo`'s
+  job-partitioned walk into a shared `native/src/actions.rs`, which is the delta carrying the risk.
+  ruled: workflow-permissions-scope-oracle operator 2026-08-27 lead-relay
+  Filed 2026-08-01 at close from the gap inbox, confirmed at this iteration's align audit against
+  the gates that read workflow YAML — a count that read "nine" until spec found it inflated by the
+  three `.workflow/`-reading gates whose names collide with the Actions sense of the word.
+
 ## Technical Debt
 
 - **platform-support-ci-matrix** [roadmap: next/reliability] [precondition-ok: run-observed] —
@@ -1336,50 +1396,6 @@
   unless the floor lands.
   Filed 2026-08-01 at close from the gap inbox, operator-directed, from a live
   instance in this iteration's own opening.
-
-- **workflow-permissions-scope-oracle** [design-pending] — no gate parses a
-  workflow `permissions:` block, so every scope a workflow needs is landed on
-  reading alone. Re-verified exhaustively at this close: no check script matches
-  `permissions:` at all, and every `permissions` hit across the tree is `jq` over
-  the harness `settings.json`, an unrelated concept. The failure mode is concrete
-  and this iteration supplied it: a `permissions:` block is an **allowlist**, an
-  undeclared scope makes the read come back as an HTTP 404, and a 404 on a read is
-  indistinguishable from an absent resource — the site-health release-body arm
-  needs `contents: read` and would have reported "no such Release" without it.
-  On a public repository the omission stays invisible until a private-repo
-  consumer copies the workflow.
-  **Precedent, stated precisely** (the gap's own framing overstated it):
-  gate-sdk/SPEC.md declares **GitHub-expression injection** a non-goal and defers
-  it to "a dedicated workflow-security linter". It does *not* rule the whole
-  workflow-security category out of scope, so that line is supporting precedent
-  for keeping the gate narrow, never a standing exclusion to argue against.
-  **Deliverable:** a gate far narrower than a security linter — a workflow job
-  whose `run:` bodies invoke `gh`, or that checks out, must declare the scopes
-  those calls consume, starting with `contents: read`. Tree-local, hermetic,
-  cheap: one gate, a `good/`+`bad/` fixture pair, a `gates.list` row, a graph
-  manifest.
-  **Cost while deferred:** charged against every workflow that gains an API call;
-  the detector today is a 404 read as a missing object, which is the exact
-  misreading `release-credential-precondition-scope-vs-permission` was filed for.
-  Size: one gate plus fixtures.
-  **Feature-shaped — self-label corrected 2026-08-04 at close.** This line read
-  "Debt" while naming the governed gate name it mints; canon-kit/SPEC.md §The
-  amendment lifecycle's litmus makes that a feature, so promoting it authors an
-  amendment.
-  **A LIVE INSTANCE IN THIS TREE, probed 2026-08-27 at scope rather than argued
-  from the class.** `.github/workflows/gates.yml`'s own `gates` job — the battery
-  every push depends on — declares NO `permissions:` block, while the two
-  install-smoke jobs beside it both do. So the omission is not hypothetical and
-  not confined to a copying consumer.
-  **RULED INTO `windows-artifact-proof` as a FEATURE unit, and it stays in this
-  section rather than promoting at this scope**: the roster splits authoring out,
-  so `spec` authors the amendment and pairs the entry. Its bill was put to the
-  operator separately and taken knowing it: a new gate carries the full contract
-  envelope — fixture pair, SPEC section, `gates.list` row, graph manifest — on
-  top of a set already spanning `gate-sdk/`, `native/` and `.github/`.
-  ruled: workflow-permissions-scope-oracle operator 2026-08-27 lead-relay
-  Filed 2026-08-01 at close from the gap inbox, confirmed at this iteration's
-  align audit against all nine gates that read workflow YAML.
 
 - **template-copy-parity-yaml-widening** [design-pending] — a kit `.yml` template
   and this repository's copy of it are mirrored by hand and a missed half is caught
@@ -8062,49 +8078,6 @@
   oracle is an UNANCHORED `grep -n 'recurrence:'` over the deferred section, inlined here because
   the census that produced it lives on a boundary-truncated surface and this pointer would resolve
   to nothing at the next boundary.
-
-- **action-run-shell-dialect-by-runner** [design-pending] — `check-action-run-shell` resolves an
-  absent `shell:` key to the bash dialect on a ground that is false for one runner class, so the
-  first Windows step that omits the key gets linted as bash.
-  gate-sdk/SPEC.md §check-action-run-shell's dialect table reads
-  `absent | -s bash — GitHub's documented default for a run: step on every hosted runner`.
-  On a `windows-*` runner GitHub's default `run:` shell is `pwsh`, not bash — and the table's own
-  last row already says a `pwsh` block is *skipped and counted*, so the resolver takes the opposite
-  branch from the one it would take on the same body spelled explicitly.
-  **Nothing is red today, and the reason is a habit rather than a mechanism.**
-  `.github/workflows/gates.yml`'s `install-smoke-windows` job names `shell: bash` on every one of
-  its six steps, and its header says why in those words. A habit holds until the next step is
-  written, and the failure mode when it lapses is the false-positive engine that section's own
-  extractor rules exist to prevent: a PowerShell body linted as shell.
-  **Two halves, and only one is design-bearing.** The SPEC sentence is a false claim in governed
-  prose and was corrected at this drain to say what it actually holds for. The gate change — resolve
-  the dialect from the job's `runs-on` when `shell:` is absent — is the deliverable, and it is
-  `[design-pending]` because `runs-on` is not always a literal: it takes a matrix expression, a
-  `${{ }}` interpolation and a runner-group object, and what a resolver does with an *unreadable*
-  `runs-on` is the call. Refusing reads right (a gate that cannot resolve its dialect should not
-  guess), but it turns any expression-valued `runs-on` into a red on a tree that lints clean now.
-  **Enforcement-first note:** the gate change carries its own `good/`+`bad/` fixture pair, a Windows
-  job with an absent `shell:` being exactly the `bad/` case no current fixture holds.
-  **THIS IS A PRECONDITION OF THE ROSTER WIDENING, not a sibling lint hazard — found first-hand
-  2026-08-27 at scope and the reason this entry's cost line understates it.** `.github/workflows/
-  publish.yml` names `shell:` on NONE of its five `run:` blocks, and its `build` job is
-  `runs-on: ${{ matrix.runner }}`, derived from `native/targets.list` through the `roster` job's
-  hand-kept runner map. So the day `x86_64-pc-windows-msvc` joins that roster and the map gains a
-  `windows-latest` entry, every bash body in that leg runs under `pwsh` and the RELEASE breaks —
-  while this gate lints those same bodies as bash and reports clean. The habit that protects
-  `gates.yml` was never extended to `publish.yml`, which has no `shell:` key to be a habit about.
-  **Cost while deferred:** the correction landed on the prose, so the gate now visibly disagrees
-  with its own spec — the honest state, and a standing invitation to re-derive which one is right.
-  The exposure grows with every platform leg the roadmap's `next/reliability` tag commits to, and
-  it stops being latent the moment `platform-support-ci-matrix` earns its roster line.
-  **RULED INTO `windows-artifact-proof` as a FEATURE unit, so it stays here rather than promoting
-  at this scope**: the gate's resolution contract and its SPEC dialect table both change and a
-  `bad/` fixture is minted, which is the new-names litmus. This roster splits authoring out, so the
-  `spec` stage authors the amendment and pairs the entry — writing the amendment *is* promoting it
-  (canon-kit/SPEC.md §The amendment lifecycle). The `[design-pending]` fork is untouched and is
-  spec's to rule: what a resolver does with an unreadable `runs-on`.
-  ruled: action-run-shell-dialect-by-runner operator 2026-08-27 lead-relay
-  Filed 2026-08-26 by close, draining the gap inbox; found at build against the Windows leg.
 
 - **scratch-citation-introducer-form-reach** [design-pending] — `check-scratch-citation` recognises
   one introducer form, so a live permanent-surface pointer into a boundary-truncated surface walks
