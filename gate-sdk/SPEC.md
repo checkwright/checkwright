@@ -579,6 +579,13 @@ in `proc.rs` so a cohort of wrappers buys them once:
   false green is closed the same way: the caller reads `code()`, or grades the
   stream by a framing count an empty capture cannot satisfy.
 
+**Who consumes `on_path` is derived, never listed here.** The sections below name
+members as instances of a rule, not as a roster, and a reader wanting the live
+consumer set greps the crate for the symbol — the arms include non-gate ones, so
+a gate roster would not answer it either. Named because the absence of a stated
+owner sends a reader to assemble the set by hand, and the assembled set is stale
+the next time an arm is added.
+
 **A wrapper's refusal is not always an `on_path` refusal, and the class has both
 shapes.** `on_path` serves a member that *tests for* its program;
 `check-docs-render-fidelity` **probes its oracle by running it** — two documents
@@ -1183,7 +1190,13 @@ The manifest grammar:
   one-way audit.
 - `valve=` — `PROPOSED` marks a cycle valve: a coupling where a leading
   (design) surface may run ahead of a lagging (code) surface via a
-  queue-tracked marker; `none` means the sides must agree now.
+  queue-tracked marker; `none` means the sides must agree now. **It is
+  `check-graph`'s field and nothing else's**, and in particular it has no
+  relation to a gate's own exemption marker: a gate that owns an exemption
+  array still declares `valve=none` here, and `check-gate-exemption-tasks`
+  reads the exemption arrays and `# port-until:` headers rather than this
+  field. Stated because the two are read as one classification otherwise, and
+  the descriptor gives no other clue that they are separate.
 - `tier=` — `precommit` gates emit a trigger block in the generated
   `pre-commit` hook; `align-only` gates run only in the full battery;
   `commit-msg` gates emit an unconditional invocation into the generated

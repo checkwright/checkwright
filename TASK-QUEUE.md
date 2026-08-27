@@ -49,13 +49,11 @@
   arms), unmeasured for two rounds because the three gates consuming it — `check-shellcheck`,
   `check-action-run-shell`, `check-crate-arms` — and the evidence runner's `ps` probe all sit behind
   that same resolver. Those arms COMPILE on Windows; their behaviour is READ, not MEASURED.
-  **Why deferred rather than fixed:** a hotfix was ruled, attempted, and stopped at sizing on three
-  independent grounds — the mechanism is UNPINNED (neither npm's MSYS `cygpath -w` bin shim nor
-  native-Windows `git rev-parse --show-toplevel` produces the measured spelling, which carries a
-  POSIX leading slash AND backslashes, so a third step is unaccounted for); the propagation runs
-  `RESOLVE_DIRS <- gate_kit_roots <- gate_sdk_root <- BASH_SOURCE` and not through the likelier
-  candidate, so a fix aimed there would have missed; and the fix is seam-sized, `show-toplevel`
-  alone having ~38-41 call sites across 8 roots. There is no local oracle for MSYS path semantics.
+  **Why deferred rather than fixed:** a hotfix was ruled, attempted, and stopped at sizing —
+  unpinned mechanism, a propagation chain that misses the likely candidate, a seam-sized fix
+  and no local oracle for MSYS path semantics. All four grounds, and the re-derivable cost,
+  now live on `msys-path-dialect-boundary-unmodelled`, filed at this iteration's close: that
+  entry owns the resolver fix and the dialect contract, and this one owns the observation.
   **Cost while deferred:** the one adopter class with a named days-to-weeks adoption
   window still has no working install path on Windows, and
   `powershell-installer-surface` — the port sequence's one remaining member — stays
@@ -107,23 +105,24 @@
   is the work, and designing the bootstrap is still its. It inherits gate-sdk/SPEC.md §Porting a
   gate to the binary substrate for the procedure and §Consumer payload for the payload rule.
   **Two objections answered:** wall-clock is the weaker case (the win is retiring the shell
-  *sources* the payload carries), and the toolchain-free arm rides the pre-compiled path. Its old
-  third clause — `powershell-installer-surface` shrinking to the bootstrap — is DELETED as measured
-  false 2026-08-24; that entry's re-scope records the ~350 uncovered `init.sh` lines.
+  *sources* the payload carries), and the toolchain-free arm rides the pre-compiled path. A third
+  clause was DELETED as measured false 2026-08-24; `powershell-installer-surface` records it.
   **Every closed cohort and cut — members, counts, holds, grounds, price — is recorded at
   gate-sdk/SPEC.md §The first cohort, and the rule that selects the next, so this entry states
   what remains.** Cut widths are ruled **per cut and never inherited**, and the size arm is
   **permanently** exhausted, so the budget arm is the only composer left.
   **THE COMPOSER DOES NOT REACH THE TREE REMAINDER — found 2026-08-27 at scope, and it is why
   "advance the port" is not dispatchable as a build unit today.** This entry says members are
-  selected by running `port-blockers.sh --group`; that arm walks the **gate registry**, which reads
-  106 scanned, **0 owed and 0 takeable** — a finished battery, and its own `--help` says a registry
-  arm reading zero "says nothing about the tree". `--tree` reads 154/12/1/**141 owed**, and nothing
-  selects a cut from those 141. Deciding the composer is deferred to the port's next dispatch — the
+  selected by running `port-blockers.sh --group`; that arm walks the **gate registry**, which
+  reports **0 owed and 0 takeable** — a finished battery, and its own `--help` says a registry
+  arm reading zero "says nothing about the tree". `--tree` reports a large owed remainder, and
+  nothing selects a cut from it. Deciding the composer is deferred to the port's next dispatch — the
   **lead's own** ruling, not the operator's, sharing the declaration below. Only `--tree` is the
-  predicate; `ported-gate-members` answers neither. **The owed count ROSE in an iteration that
-  ported nothing** — `scripts/parse-installer-smoke-log.sh` landed as a consumer-config log parser
-  and not a gate — the tree predicate working rather than a regression. Both oracles re-run here.
+  predicate; `ported-gate-members` answers neither, and its owed count RISES when a non-gate shell
+  file lands, which is that predicate working rather than a regression.
+  **Prints neither count deliberately; run both arms.** Three consecutive sweeps found a digit
+  here stale, the third within one calendar day of its authoring, under this entry's own former
+  claim that both oracles had been re-run. A freshness assertion is not freshness.
   ruled: native-gate-port-remaining-corpus lead 2026-08-27 own-authority
   **Cost while deferred:** large and known — the **owed** remainder (the trailer's own arm,
   never the unported count) plus the runners and the install-lifecycle layer; since the
@@ -132,8 +131,6 @@
   criterion-relaxation question is closed at gate-sdk/SPEC.md §The port-candidate criteria — an
   ordering signal, never an eligibility screen. Both battery entries said the port subsumes
   them; `gate-battery-parallel-execution` closed on that, leaving `gate-battery-result-cache`.
-  **TEN cuts are delivered**, each one's members, findings and price staying at its own
-  §check-<gate> section; the last two are the tail's first two, which emptied the takeable tier.
   **The PRIORITY DIRECTIVE has yielded THREE times — 2026-08-22, and twice 2026-08-24 — each for
   one named iteration alone, each operator-ruled through the lead, and NONE a reversal, demotion or
   re-scoping**: a yield spends one iteration's turn, never the sequence's claim on the next.
@@ -2282,8 +2279,10 @@
 - **consumer-smoke-subset-accounting-verdict** [design-pending] — a per-kit smoke run reds an
   accounting the subset cannot decide, and says nothing about it.
   `gate-sdk/bin/run-consumer-smoke.sh` given a KIT SUBSET reds the registration accounting on
-  gates the no-arg run accounts for: `check-action-gh-repo`, `check-action-pinning` and
-  `check-action-run-shell` probe exit 0 in a two-kit scratch consumer and self-declare in the
+  gates the no-arg run accounts for: `check-action-gh-repo`, `check-action-pinning`,
+  `check-action-run-shell` and — since 2026-08-27, when the family gained a fourth sibling
+  registered the same way — `check-action-permissions` probe exit 0 in a two-kit scratch
+  consumer and self-declare in the
   full one. So a per-kit invocation prints a FAIL that is not a repo finding, and nothing in
   its output says the verdict needs the full roster — the reader has no way to tell an
   artifact of the subset from a real one. Master itself is clean (11 kits probed, 0
@@ -5379,6 +5378,10 @@
   **Cost while deferred:** low while this entry exists and unbounded without it — the entry IS
   the carrier, so deferring the *home* decision costs only that a possibly-general rule reads
   as one parked entry's prose; not filing at all would have cost the clause to git history.
+  **NOT ICEBOX-ELIGIBLE, though the worklist keeps proposing it on that low cost line** — the
+  line prices the CARRY, never the eviction, and eviction deletes the body that holds the clause
+  verbatim, which is the 2026-08-17 ruling's refused attrition performed by procedure. It leaves
+  Deferred when a permanent home lands, not before.
   Filed 2026-08-18 by close from the gap inbox on the 2026-08-17 operator ruling; the drain
   re-verified that no permanent surface carries the clause — the only hits were the inbox this
   drain truncates and the survey record the next first-stage entry truncates.
@@ -8481,10 +8484,6 @@
 - **stage-cursor-rerun-stamp-gap** [design-pending] — A skipped re-run stamp points the cursor back.
 
 ## Done
-
-- workflow-permissions-scope-oracle
-- action-run-shell-dialect-by-runner
-- on-path-windows-probe-answers-false
 
 ## Lessons Learned
 
