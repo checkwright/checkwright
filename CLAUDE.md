@@ -62,7 +62,7 @@ projections, which also carries the full fan-out a new gate stales; each
 freshness gate prints its own command on red.
 
 New gates here are **born native** — a Rust module plus a `.gate` descriptor;
-shell needs a cause from the two live exception classes, stated in the gate's
+shell needs a cause from the live exception classes, stated in the gate's
 own SPEC section (gate-sdk/SPEC.md §The port-candidate criteria) — no gate is
 permanently shell (TRAJECTORY.md §The closed rulings, 2026-08-23). `port-blockers.sh`
 has **two** oracles: its registry arms answer for the battery, `--tree` for the
