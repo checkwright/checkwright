@@ -8490,6 +8490,73 @@
   Filed 2026-08-27 to the gap inbox by the windows-artifact-proof close after its roster read;
   promoted 2026-08-27 by the next scope, with the filing bullet's live-sibling premise falsified.
 
+- **artifact-substitution-remedy-has-no-end-to-end-arm** [design-pending] — the remedy
+  `artifact-digest-mismatch-remedy-inert` shipped — `init` rewriting a gate binary whose bytes no
+  longer hash to the manifest's `artifact.digest`, rather than leaving it kept — has no oracle that
+  drives it over a real install. Its only assertion is a crate unit test,
+  `a_placement_owns_both_paths_and_a_bare_re_run_rewrites_nothing` in `native/src/install.rs`,
+  which exercises `place()` against a synthesised `Recorded` and never an installed tree.
+  **The deliverable, sized on the arm that already exists.**
+  `installer/consumer-smoke/run-smoke.sh`'s artifact arm installs a consumer at the minimum profile
+  and then drives the three SELECTION outcomes on a mutated copy of the packed payload — target and
+  digest recorded, a host off the roster omitted-and-declared, a tampered artifact refused
+  pre-write, a declared-but-absent target refused rather than omitted. What it never does is
+  put bytes over the
+  *already-installed* binary. The addition: substitute over that installed binary, assert `doctor`
+  names the digest finding while still exiting 0, re-run `init`, assert the binary hashes back to
+  the manifest's `artifact.digest` and does not appear in the changed-file report.
+  **The filing bullet's cost premise fell at the drain, and the correction cuts both ways.** The
+  bullet said the addition "mints a baseline scenario" and would therefore be recorded `ignore`. It
+  need not mint one at all — the arm's own consumer is already installed at its head, so the
+  assertions land under the existing `artifact arm` printf header and no new parsed scenario
+  appears. But the conclusion survives by a stronger route: `.workflow/validate-baseline.txt`
+  already carries `installer_smoke artifact-arm ignore binary-less-dispatch-loop-retirement`, and
+  `fail()` in the smoke is `exit 1`, so the run *stops* at the binary-less leg. This iteration's
+  validate measured exactly that — `installer_smoke pass=4 fail=1 ignore=0`, five of thirteen
+  baselined scenarios emitting at all. The artifact arm does not run today, so any assertion added
+  to it is unexecuted code until that leg is repaired.
+  **DISTINCT from `binary-less-dispatch-loop-retirement`**, which this entry cites only as the
+  sequencing constraint on when the arm starts paying. That entry's subject is why a binary-less
+  payload leaves the prose registry naming no gates; this one's is an uncovered behaviour on the
+  payload that DOES carry a binary. Distinct too from `artifact-digest-mismatch-remedy-inert`,
+  which is done: that entry made the remedy real, this one gives it an oracle.
+  **Cost while deferred:** the substitution remedy is a behaviour the installer's own end-to-end
+  suite cannot regress-detect, so a refactor of `place()` that reverts to keep-and-report stays
+  green in the smoke and is caught only by a unit test that never touches a tree.
+  Filed 2026-08-28 to the gap inbox by build batch 1; promoted 2026-08-28 at close, with the
+  baseline-minting premise corrected and the sequencing constraint re-measured.
+
+- **uninstall-artifact-ownership-asymmetry** [design-pending] — `init` and `uninstall` disagree
+  about who owns a substituted gate binary, and the docs make the asymmetry visible.
+  `artifact-digest-mismatch-remedy-inert` established in installer/README.md §The gate binary that
+  no version of a compiled artifact is the adopter's, which is the ground for `init` rewriting one
+  that fails its recorded digest. §uninstall still runs the artifact row through the general
+  removal rule — "the roster walk removes it like any other row, because `artifact` is identity
+  rather than ownership" — and that rule keeps-and-reports on a hash mismatch. So an adopter who
+  substitutes the binary and then uninstalls without an intervening `init` gets it KEPT, left on
+  disk as if they had authored it, under a ground the same document now denies.
+  **Verified at the drain against the implementation, not only the prose.**
+  `installer/lib/uninstall.sh` carries no artifact special case: its removal walk is the hash test
+  and the keep/report branch, and nothing in it reads `artifact`. The prose and the code agree with
+  each other and disagree with §The gate binary.
+  **The window is narrow and the direction is conservative**, which is why this is a consistency
+  gap rather than a data-loss one: any `init` in between re-records the hash, and the smoke's
+  uninstall arm removes all and keeps 0.
+  **Why `[design-pending]` — the fork is real and unruled.** Either extend the artifact exemption
+  to the removal rule, so `uninstall` removes the artifact row unconditionally on the ground that a
+  compiled artifact is never the adopter's; or rule that removal is a different question from
+  rewriting — leaving a file behind costs an adopter nothing, while overwriting one is the act the
+  ownership contract exists to bound — and state in §uninstall why the artifact stays under the
+  general test. Whichever wins, the losing reading has to stop being derivable from the docs.
+  **DISTINCT from `artifact-digest-mismatch-remedy-inert`**, which is done and whose subject was
+  `init`'s refusal to perform the remedy `doctor` printed; this is the sibling surface that fix
+  deliberately did not widen to.
+  **Cost while deferred:** two adjacent sections of one document support opposite answers to "is a
+  compiled artifact ever yours", so an adopter reading either one alone reads a contract the other
+  contradicts.
+  Filed to the gap inbox 2026-08-28 by build batch 1 off the docs alone; promoted the same day at
+  close, once the keep-and-report mechanism was re-verified against `installer/lib/uninstall.sh`.
+
 
 ## Icebox
 
