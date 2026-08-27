@@ -3002,33 +3002,29 @@
   **2026-08-08 — answerable, and passed.** Scope named `bin/queue-edges.sh` as an oracle in the
   survey record and wrote per-candidate inbound totals into the finding. "Fold the sum into the
   existing survey record" is therefore a **shipped instance**, not a hypothetical design option.
-  **2026-08-09 and 2026-08-12 — unanswerable again, twice.** Both ranked (129 Deferred entries
-  into seven clusters; 85 shell gates into three cohorts) and the second recommended against a
-  group by name, so the due-condition fired squarely on each. Both named a different oracle —
-  `bin/queue-index.sh`, then `bin/port-blockers.sh` — and neither records an inbound sum for any
-  candidate. Both did premise-falsification well, and the second did it very well (refuting a
-  member's inclusion from the source, surfacing a spec-versus-oracle contradiction rather than
-  picking a side, stating its own limit). So the split is stable: the falsification half is
-  healthy and the aggregation half is simply absent.
+  **2026-08-09 and 2026-08-12 — unanswerable again, twice.** Both ranked a large corpus and the
+  second recommended against a group by name, so the due-condition fired squarely on each; both
+  named a different oracle and neither recorded an inbound sum. Both did premise-falsification
+  well. The split is stable: the falsification half is healthy, the aggregation half is absent.
   **The alternation is the evidence, and it is what makes this the requirement's property rather
-  than any session's.** Answerable once, unanswerable three times, on one roster line, with
-  nothing changed but the survey — and the entry predicted its own recurrence before two of them.
+  than any session's** — the entry predicted its own recurrence before two of them.
   **The ground for declining a `recurrence:` date is SPENT, 2026-08-17**, when
-  `recurrence-drain-input-widening` landed the direct stamp as sanctioned *and obliged*: an
-  observation reaching a session from the rostered close audit rather than the capture channel is
-  now stamped by whoever judges it. These four are **not** back-filled — the obligation attaches
-  to the judging session at the moment of judgment, the landing rule undertook no backfill, and a
-  later session re-grading three earlier sessions' prose is the self-grading hazard that ruling
-  names rather than a repair of it. The next observation of this defect stamps. The backfill
-  question itself is filed to the gap inbox at that landing for close to disposition.
-  **FIFTH, 2026-08-26 — unanswerable again, and nothing was DECIDED on the missing half.** The
-  `native-windows-ci-leg` close found neither scope survey of that iteration naming
-  `bin/queue-edges.sh` in an `oracle:` field and no tracked surface carrying an edge sum; the six
-  threshold entries that scope raised were displaced by an operator's unit-set ruling rather than
-  refused by a ranking, so the obligation never attached to them.
-  recurrence: survey-edge-aggregation-residue 2026-08-26
-  **The 2026-08-08 shape is TWICE-shipped, which narrows the fork**: the 2026-08-26 scope ran the
-  oracle, named it in its survey record and wrote per-candidate inbound totals into the finding.
+  `recurrence-drain-input-widening` landed the direct stamp as obliged: a close-audit observation
+  is stamped by whoever judges it. The first four are **not** back-filled — the obligation
+  attaches at the moment of judgment, and re-grading earlier sessions' prose is the self-grading
+  hazard that ruling names rather than a repair of it.
+  **FIFTH, 2026-08-26 — unanswerable again, and nothing was DECIDED on the missing half.** No
+  scope survey of that iteration named `bin/queue-edges.sh` in an `oracle:` field and no tracked
+  surface carried an edge sum; the six threshold entries scope raised were displaced by an
+  operator's unit-set ruling rather than refused by a ranking, so the obligation never attached.
+  **SIXTH, 2026-08-27 — the close re-found the fifth's shape and read the operator-ruled unit set
+  as a NEW question. It is not new: the fifth above already records it.** What that close did add
+  is the unruled half stated plainly — when a ruling supplies the set, is the pass owed at all?
+  recurrence: survey-edge-aggregation-residue 2026-08-26 2026-08-27
+  **The 2026-08-08 shape is now THRICE-shipped, which narrows the fork further**: 2026-08-26 and
+  2026-08-27 both ran the oracle, named it in an `oracle:` field and wrote per-candidate inbound
+  totals into the finding, the second adding a retired-target read. Two of the three alternatives
+  below now have a shipped instance each; the third has none.
   **Why `[design-pending]`:** the cheap fix — have the survey cite its edge sums — risks
   becoming ceremony, a stage writing down that it did the thing rather than doing it. The
   honest alternatives are a survey artifact the sum lands in, folding the sum into the existing
@@ -8422,6 +8418,136 @@
   Windows claim this repo makes rests on reasoning rather than on a run.
   Filed 2026-08-27 by build under a stopped hotfix, promoted 2026-08-27 by close with the
   call-site roster re-derived and corrected at the drain.
+
+- **site-health-probe-no-retry-on-transient** [design-pending] — the scheduled site probe files a
+  GitHub issue on a single non-200, so one transient edge response costs a maintainer triage.
+  **Observed, not projected.** Issue #4 was opened 2026-08-27 17:39Z reporting that the v0.19.0
+  release-body URL answered `503`. Re-probed at this boundary sweep: `200` on three consecutive
+  requests, with the apex answering `200` between them. Nothing was broken at any point a human
+  could have looked. The issue is closed with cause and is deliberately not re-used as this
+  entry's tracker.
+  **The mechanism, read rather than assumed.** `.github/workflows/site-health.yml:207` probes each
+  apex URL found in a Release body with one `curl -sS -m 20` and appends a failure on the first
+  non-200. Neither that arm nor the apex, `www`, HTTP-redirect and alt-domain arms above it
+  (`:74`, `:78`, `:85`, `:92`) retries anything; the workflow contains no retry, backoff or
+  confirm step at all. So every arm is one sample against a CDN.
+  **Why this class is worth an entry rather than a shrug.** The workflow's whole product is an
+  issue nobody asked for, opened while nobody is watching. A blocking gate's false positive is
+  argued down once by the session it blocks; an unattended prober's false positive is triaged by
+  whoever next reads the tracker, and the project's own threat model ranks exactly this — a wrong
+  red converting enforcement into distrust — as a top threat.
+  **Why `[design-pending]`:** confirm-before-filing is not one obvious change. Retrying inside the
+  arm hides a genuine flap the probe arguably exists to report; a second scheduled confirm run
+  before filing splits the verdict across runs and needs somewhere to hold the first; a
+  fail-count threshold across consecutive scheduled runs needs state the workflow does not have.
+  Which of the three is right turns on whether a flap is a finding, and that is unruled.
+  **DISTINCT from every gate entry in this pool**: the site-health workflow is not a battery gate,
+  runs on a schedule against a live host rather than a tree, and is out of a precommit gate's
+  reach by construction — the tier split its own `:216` comment already argues.
+  **Cost while deferred:** low per incident and unbounded in count — each transient edge response
+  spends one maintainer triage, and the arm cannot distinguish the one outage worth reporting from
+  the blips, so the tracker's signal degrades in exactly the direction that makes a real red
+  ignorable. Surfaced 2026-08-27 by GitHub issue #4.
+  Filed 2026-08-27 by scope at the GitHub boundary sweep, the issue dispositioned closed-with-cause
+  in the same pass.
+
+- **boundary-sweep-github-write-skips-identity-step** [design-pending] — the account-selection step
+  is bound to push work, and the boundary sweep writes to GitHub without it.
+  **It fired at this boundary, and the detection was luck of ordering.** The sweep posted its
+  disposition comment on issue #4 with the non-writing account active, because nothing told it to
+  select an account first. Posting a comment needs no write permission, so it succeeded silently;
+  the `gh issue close` that followed was refused, and that refusal is the only reason the wrong
+  account surfaced at all. Had the sweep's disposition been comment-only — which two of the three
+  lanes' dispositions are — nothing would have failed and nothing would have been noticed.
+  **What it cost and what was done.** The comment was deleted, the account switched, permissions
+  re-probed, the comment re-posted and the issue closed; the surviving comment's author was
+  verified. The exposure was minutes on a public surface, and it is an *attribution* exposure
+  rather than a content one — the comment's text was fine and its byline was not.
+  **The binding gap, which is the durable half.** The private ops runbook states the
+  account-selection step for release and push work, and the always-loaded rule scopes it
+  per-push. The scope stage's GitHub boundary sweep performs GitHub *writes* on three lanes —
+  issue comments and closes, PR merges and reviews, advisory-thread dispositions — and no surface
+  binds the step to any of them. The sweep's own text says only that its `gh` calls run inside it.
+  **Why `[design-pending]`:** the fix's tier is the question. Widening the always-loaded rule's
+  trigger from push to any GitHub write is one line and reaches every session; putting the step in
+  the sweep binding reaches the one stage that provably needs it and leaves every other writer
+  uncovered; a preflight refusing a `gh` write under an unselected account is the only mechanized
+  form and needs a home no kit obviously owns. The runbook itself already rules that no gate can
+  cover this, because an identity check is evidence only about the identity selected at the moment
+  the write happens — so a mechanism has to sit at the call, not before it.
+  **Cost while deferred:** every boundary sweep, and every session reaching for `gh` outside a
+  push, is one habit away from attributing a public act to an account that must not be correlated
+  with the public one — and the failure is silent on exactly the dispositions the sweep takes most.
+  Filed 2026-08-27 by scope, from its own firing at that boundary, remediated in the same session.
+
+- **prompt-ranking-ungrantable-shape-class** [design-pending] — the friction ranking's unit mixes
+  rows an allowlist entry could retire with rows no entry can ever match, so each close re-triages
+  a class no action retires.
+  **Measured at the windows-artifact-proof close:** of 208 prompting calls across 52 patterns, the
+  redirect-shaped rows are ungrantable *by construction* — `cat >>`, `cat >`, `grep >`, `head >`,
+  `while >`, `until >`, `python3 - >`, `nohup >`, `find >`, `git log >` and four `bash <script> >`
+  rows. `cat >>` alone is the single top row at 26x.
+  **The guard says so in its own refusal text**, which is what makes this structural rather than a
+  tuning complaint: a `Bash(...)` entry matches a bare command, so any chaining, redirect or
+  expansion breaks the match and the call is decided out of band whatever the allowlist holds.
+  **All three of the triage's dispositions are wrong for these rows.** An allowlist entry cannot
+  reach them. A guard steer exists for the read shapes already, and the write shapes are mostly
+  legitimate journal and scratch appends with no better spelling. A recorded habit change leaves
+  the row ranking identically next close, because the shape and not the habit is what falls
+  through. The honest disposition is a fourth the ranking does not offer: structurally ungrantable,
+  and retired from the actionable set.
+  **DISTINCT from `friction-key-segment-selection-unruled`**, whose axis is *which* segment of a
+  compound is keyed: that entry would change which name a row files under and would leave every
+  one of these rows ranking. DISTINCT from `file-authoring-act-ungoverned`, which owns whether the
+  authoring act is governed at all — its guard-steer shape would retire these rows by changing
+  behaviour, where this entry's question is what the ranking should say while it has not.
+  **Why `[design-pending]`:** the three candidate shapes buy different things and none is
+  obviously right. Partitioning the ranked output the way it already partitions overlay-covered
+  rows is the most legible and changes the KPI's denominator. Grading each row against the
+  allowlist's own matching rule is the most accurate and duplicates that rule in a second reader.
+  Stating in guard-kit/SPEC.md that a close is expected to skip them is cheapest and buys least.
+  **Cost while deferred:** one re-triage of the same unretireable rows per close, on the surface a
+  close reads to decide where friction actually is — and the top row by a wide margin is one of
+  them, so the ranking's most prominent signal is the one no reader can act on.
+  Filed 2026-08-27 to the gap inbox by the windows-artifact-proof close, which paid the cost;
+  promoted 2026-08-27 by the next scope, at the boundary that could legally run the drain.
+
+- **subagent-liveness-log-unattributed-refusal** [design-pending] — the turn-end liveness log
+  records a refusal without recording whose, so a reader cannot tell the guard working from the
+  guard wedged.
+  **Read at the windows-artifact-proof close:** 366 events, 345 of them from that day, 21 of them
+  `verdict=red live=yes records=1 decision=refuse` in three clusters at roughly 30-second retry
+  intervals. Every row, green and red alike, carries the same `session=` value — the top-level
+  harness session — so the field discriminates nothing, and no row names the refused subagent or
+  the record that refused it.
+  **The payload already carries the attribution and the hook drops it.** Each line's own `keys=`
+  field lists `agent_id` and `agent_type` among the hook payload's keys, so logging those two plus
+  the run key of the matched record would make every one of these rows readable. The hook is
+  `scripts/subagent-stop-liveness.sh`, 91 lines, whose contract is delegation-kit/SPEC.md §The
+  turn-end liveness hook.
+  **The motive the filing bullet gave is a DISPOSED premise, corrected here.** The bullet argues
+  the gap blocks verifying `waiter-predicate-self-match`, "which is live". It is not: that slug is
+  retired, its work landed at `05af5200`, and `bin/queue-edges.sh` reports it retired with its one
+  citation coming from `waiter-loop-condition-predicate-gap`. What falls with the premise is the
+  urgency framing, not the finding — an unattributed refusal is unreadable whether or not a
+  particular entry wanted to read it.
+  **What survives the correction, and it is the general form.** A refusal is correct when a real
+  producer is running and is a wedge when the record naming a live pid belongs to the waiter
+  itself. That distinction is the log's whole diagnostic value, and no row carries the field that
+  would settle it. Two 21-refusal clusters are now on record, on two different days, and neither
+  can be classified either way from the log.
+  **Why `[design-pending]`:** the candidate shapes differ in who they serve. Logging `agent_id`,
+  `agent_type` and the matched run key serves a later reader. Naming the matched record in the
+  *refusal message* serves the refused session, which can then act on it. Dropping `session=`
+  serves neither but stops a field reading as attribution while carrying none. Whether the log is
+  a diagnostic for a reader or a steer for the refused session is the unruled half.
+  **DISTINCT from the close-surface roster question**, which asks whether the log is read at all;
+  this asks what it can say once read.
+  **Cost while deferred:** every refusal cluster is uninterpretable, so the one instrument that
+  could measure whether the producer/observer split works reads the same for a working guard and a
+  wedged one — and a wedged guard costs a session its turn.
+  Filed 2026-08-27 to the gap inbox by the windows-artifact-proof close after its roster read;
+  promoted 2026-08-27 by the next scope, with the filing bullet's live-sibling premise falsified.
 
 
 ## Icebox
