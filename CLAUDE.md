@@ -126,7 +126,10 @@ load behind that trigger, so they are not resident here.
   (gate-sdk/SPEC.md §The workflow directory). `BRIEF.local.md` (private brief),
   `OPS.local.md` (private ops runbook — DNS, GitHub repo-settings desired state,
   and the release account and push transport; consult it before any domain,
-  repo-settings, release **or push** work — its account step is per-push, never
+  repo-settings, release or push work, and run its account step before **any
+  GitHub write** — an issue comment or close, a PR merge or review, an advisory
+  disposition — because a write needing no permission succeeds silently under the
+  wrong account; that step is per-write, never
   per-session), and `ENV.local.md` (context-kit's probed
   machine profile plus hand-authored gotchas — context-kit/SPEC.md §bin/env-probe)
   are gitignored, local-only.
