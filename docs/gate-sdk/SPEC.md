@@ -521,7 +521,28 @@ in `proc.rs` so a cohort of wrappers buys them once:
   whatever it was. A refusal message is a
   documented surface — a session debugging its PATH reads the message, not the
   exit code. `run`'s `Err` arm stays the backstop for a program that vanishes
-  between the probe and the spawn.
+  between the probe and the spawn. **Two platform axes decide whether it answers
+  at all, and getting either wrong makes it report a program the host has as
+  absent** — a wrapper refusing on an installed program, the exact false verdict
+  the class exists to prevent. The **separator** is `std::env::split_paths`'s,
+  never a literal `':'`: a Windows `PATH` separates on `';'` and its entries carry
+  drive-letter colons, so a literal split shears every entry past the first into a
+  fragment. The **name** is not the bare program: a Windows toolchain installs
+  `<program>.exe` and npm's own bin shape installs a `.cmd` shim, so the probe
+  tries the program with each `PATHEXT` extension appended, falling back to
+  `.COM;.EXE;.BAT;.CMD` when the variable is unset or empty — read from the
+  environment rather than appended as a literal, on `gate_exe_suffix`'s ground
+  (§lib/gate.sh), and owned by `exe_candidates` alone so no call site spells an
+  extension. That is a **different question** from `gate_exe_suffix`'s — what an
+  *installed* program may be named, not what a *built artifact* is named — which
+  is why the two substrates hold separate single owners rather than one. The bare
+  name stays a candidate, so a caller naming `cargo.exe` and a Unix host both
+  resolve through the same loop. The resolution is therefore a **pure function of
+  (PATH, PATHEXT, an existence predicate)**: its Windows arms cannot execute on the
+  host that develops them, so a fake predicate is the only oracle a unit test here
+  has. The separator has none even so — `split_paths` compiles to the host's rule,
+  so what a test can pin is that the literal has not come back, and the arms
+  themselves are exercised by the Windows CI leg or not at all.
 - **`run_merged` and `Merged`** — the `2>&1` capture a wrapper's shell form takes.
   `Completed` withholds stdout unless the status succeeded, which is right for a
   reader and wrong for a wrapper: for a linter the **non-zero** run is the one
@@ -6429,7 +6450,10 @@ reader needs outlive the refactor that renames a helper:
   with `find … -maxdepth 1 -type f ! -name '*.sha256'` and asserts exactly one, so
   it is already name-agnostic and a `.exe` satisfies it unchanged — named here
   because the instinct is to add a fourth reader, and adding one would replace a
-  working derivation with a spelling.
+  working derivation with a spelling. The crate is **not** a kit and holds the
+  *other* suffix question — what an already-installed program may be named, from
+  `PATHEXT` — under its own single owner (§Fail-closed contract); nothing there
+  names a built artifact, and nothing here reads `PATHEXT`.
 - `gate_native_source_stamp` is the **tree side of the source stamp**
   (§check-gate-binary-fresh) and the only shell spelling of it: the same three git
   invocations `native/build.rs` bakes into the binary, so the comparison is one

@@ -70,52 +70,6 @@
   `linux-install-smoke-ci-leg`, macOS 2026-08-26 as `macos-install-smoke-ci-leg`. Promoted and
   deferred 2026-08-25, re-promoted and deferred again 2026-08-26.
 
-- **on-path-windows-probe-answers-false** [precondition-ok: co-scheduled] —
-  `native/src/proc.rs`'s `on_path()` has TWO independent Windows defects, and fixing either alone
-  leaves the presence probe broken. The opt-out is exact: the leg this entry rides is
-  `platform-support-ci-matrix`, promoted **beside** it in this same iteration, so the relation is
-  co-scheduling and not blocking — the fix must land before that run, not after it.
-  **Defect 1, the separator.** `on_path()` splits `PATH` on `':'`. On a Windows host the separator
-  is `';'` and a drive letter carries a colon, so every entry after the first is mis-parsed.
-  `std::env::split_paths` is the portable API.
-  **Defect 2, the executable suffix.** `on_path()` joins the bare program name onto each `PATH`
-  directory and asks `proc::is_executable`, whose non-unix twin is `p.is_file()`. A Windows
-  toolchain names the file `<program>.exe`, so the candidate is not a file and the probe answers
-  false however the `PATH` was split.
-  **THE FORK IS RULED AT THIS SCOPE, which is what deletes the tag.** `PATHEXT`-aware, reading the
-  variable and falling back to the `.COM;.EXE;.BAT;.CMD` set when it is unset or empty — not the
-  `.exe`-appending twin. Two grounds: the shell side already answers this question from the
-  environment rather than from a literal (`gate-sdk/lib/gate.sh`'s `gate_exe_suffix` dispatches on
-  `uname`), so an appended literal would put the crate a second step behind it; and a probe that
-  can only find `.exe` reports `false` for a program installed as a `.cmd` shim, which is exactly
-  npm's own bin shape and therefore the shape this repo's own install path produces. The suffix
-  question gains ONE crate-side owner, mirroring `gate_exe_suffix`'s single ownership on the shell
-  side; the name it takes is the implementing session's, not a reservation minted here.
-  **This mints no governed name, so it is debt and no amendment pairs** — `std::env::split_paths`
-  is std, and a crate-internal suffix helper is an internal identifier rather than a script, knob,
-  file convention, tag, or cross-component contract (canon-kit/SPEC.md §The amendment lifecycle).
-  **THE BLAST RADIUS IS A REFUSAL, NOT A WRONG VERDICT**, and that is what earns the entry.
-  `on_path` is the wrapper contract's presence probe, so a false answer makes a gate report its
-  program absent and take its not-found path with the program installed. Four gates take it —
-  `check-shellcheck`, `check-action-run-shell`, `check-crate-arms` on `cargo` — plus the evidence
-  runner's `ps` probe.
-  **ASYMMETRY WORTH RECORDING:** `gate-sdk/lib/gate.sh` now owns `gate_exe_suffix` for exactly this
-  question on the shell side, and the crate has no equivalent, so the two substrates disagree about
-  what an executable is named.
-  **Why it was NOT folded into the Windows blocker unit**, whose envelope was the crate COMPILING
-  for the msvc triple: both defects compile cleanly, so neither that unit's cargo-check oracle nor
-  the scope census could see them. Behaving correctly on Windows was never that envelope.
-  **The "untestable here" ground EXPIRED 2026-08-27, corrected at scope where it stood.** A Windows
-  host IS reachable from this tree — `platform-support-ci-matrix`'s `install-smoke-windows` leg is
-  one, and its round-2 blocker was repaired at that same scope. So a fix rides that leg's next run
-  and lands exercised, which is the only condition this entry was waiting on. It also makes the
-  leg's own claim honest: four gates take `on_path`, so an artifact whose program probes all answer
-  false is produced but not meaningfully *exercised*.
-  **Cost this iteration is buying down:** zero today and a cliff on the day it is not — the first
-  adopter to run the binary on Windows meets four gates refusing on programs they have installed.
-  ruled: on-path-windows-probe-answers-false operator 2026-08-27 lead-relay
-  Filed 2026-08-27 by close, draining two gap-inbox bullets; found at spec and at build.
-
 ## Deferred
 
 - **macos-install-smoke-ci-leg** [design-pending] [roadmap: next/reliability] — a macOS
@@ -8373,6 +8327,7 @@
 
 - workflow-permissions-scope-oracle
 - action-run-shell-dialect-by-runner
+- on-path-windows-probe-answers-false
 
 ## Lessons Learned
 

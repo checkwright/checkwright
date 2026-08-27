@@ -52,15 +52,71 @@ pub fn run(program: &str, args: &[&str]) -> Result<Completed, String> {
 // `command -v <prog>`: it exists so a wrapper's refusal is its own message at the shell form's
 // own point in the order, with `run`'s `Err` arm left as the backstop
 pub fn on_path(program: &str) -> bool {
+    #[cfg(windows)]
+    let pathext = Some(std::env::var("PATHEXT").unwrap_or_default());
+    #[cfg(not(windows))]
+    let pathext: Option<String> = None;
+    resolve_on_path(
+        program,
+        std::env::var_os("PATH").as_deref(),
+        pathext.as_deref(),
+        is_executable,
+    )
+}
+
+// spec: gate-sdk/SPEC.md §Fail-closed contract — the fallback the section names, spelled once so
+// the candidate set has a value when the host offers none
+const PATHEXT_DEFAULT: &str = ".COM;.EXE;.BAT;.CMD";
+
+// spec: gate-sdk/SPEC.md §Fail-closed contract — the crate's single owner of what an *installed*
+// program may be named; `None` is a platform with no such question, so no caller appends an
+// extension of its own and the two substrates stop disagreeing
+fn exe_candidates(program: &str, pathext: Option<&str>) -> Vec<String> {
+    let mut out = vec![program.to_string()];
+    let Some(raw) = pathext else {
+        return out;
+    };
+    let raw = if raw.trim().is_empty() {
+        PATHEXT_DEFAULT
+    } else {
+        raw
+    };
+    out.extend(
+        raw.split(';')
+            .map(str::trim)
+            .filter(|e| !e.is_empty())
+            .map(|e| format!("{}{}", program, e)),
+    );
+    out
+}
+
+// spec: gate-sdk/SPEC.md §Fail-closed contract — the resolution as a pure function of its three
+// inputs, because the arms that matter cannot execute on the host that develops them: the caller
+// reads the environment, this decides, and a test supplies both halves
+fn resolve_on_path<F: Fn(&std::path::Path) -> bool>(
+    program: &str,
+    path: Option<&std::ffi::OsStr>,
+    pathext: Option<&str>,
+    exists: F,
+) -> bool {
+    let candidates = exe_candidates(program, pathext);
     if program.contains('/') {
-        return is_executable(std::path::Path::new(program));
+        return candidates
+            .iter()
+            .any(|c| exists(std::path::Path::new(c)));
     }
-    let Ok(path) = std::env::var("PATH") else {
+    let Some(path) = path else {
         return false;
     };
-    path.split(':').any(|dir| {
-        let base = if dir.is_empty() { "." } else { dir };
-        is_executable(&std::path::Path::new(base).join(program))
+    // spec: gate-sdk/SPEC.md §Fail-closed contract — the separator is std's, never a literal, so a
+    // drive letter's colon does not shear every entry past the first into a fragment
+    std::env::split_paths(path).any(|dir| {
+        let dir = if dir.as_os_str().is_empty() {
+            std::path::PathBuf::from(".")
+        } else {
+            dir
+        };
+        candidates.iter().any(|c| exists(&dir.join(c)))
     })
 }
 
@@ -428,6 +484,94 @@ mod tests {
                 .expect("no stdout from a child that exited zero")
                 .is_empty(),
             "git --version printed nothing"
+        );
+    }
+
+    // spec: gate-sdk/SPEC.md §Fail-closed contract — a host with no suffix question asks for the
+    // bare name and nothing else, so the Windows arm cannot leak a `.EXE` probe onto a Unix PATH
+    #[test]
+    fn a_platform_without_the_suffix_question_probes_the_bare_name_only() {
+        assert_eq!(exe_candidates("cargo", None), vec!["cargo".to_string()]);
+    }
+
+    // spec: gate-sdk/SPEC.md §Fail-closed contract — unset and empty are the same input to this
+    // question and both take the fallback, which is the half a host that *has* PATHEXT never shows
+    #[test]
+    fn an_absent_or_blank_pathext_falls_back_to_the_default_set() {
+        for raw in ["", "   "] {
+            assert_eq!(
+                exe_candidates("cargo", Some(raw)),
+                vec![
+                    "cargo".to_string(),
+                    "cargo.COM".to_string(),
+                    "cargo.EXE".to_string(),
+                    "cargo.BAT".to_string(),
+                    "cargo.CMD".to_string(),
+                ],
+                "a blank PATHEXT ({:?}) did not take the fallback set",
+                raw
+            );
+        }
+    }
+
+    // spec: gate-sdk/SPEC.md §Fail-closed contract — the environment outranks the fallback, and a
+    // host that lists an extension this crate never spelled is exactly why it is read at all
+    #[test]
+    fn a_populated_pathext_is_read_rather_than_the_fallback() {
+        assert_eq!(
+            exe_candidates("cargo", Some(".EXE; .PS1 ;;.CMD")),
+            vec![
+                "cargo".to_string(),
+                "cargo.EXE".to_string(),
+                "cargo.PS1".to_string(),
+                "cargo.CMD".to_string(),
+            ]
+        );
+    }
+
+    // spec: gate-sdk/SPEC.md §Fail-closed contract — the defect in full: a program installed only
+    // as a shim answers `false` without the suffix set, which is a refusal on a present program
+    #[test]
+    fn a_program_installed_only_as_a_shim_is_found_by_the_suffix_set() {
+        let path = std::env::join_paths(["/nowhere", "/opt/bin"]).expect("cannot join a PATH");
+        let only_the_shim = |p: &Path| p == Path::new("/opt/bin/cargo.CMD");
+        assert!(
+            resolve_on_path("cargo", Some(&path), Some(""), only_the_shim),
+            "the PATHEXT candidate set did not reach a .CMD shim"
+        );
+        assert!(
+            !resolve_on_path("cargo", Some(&path), None, only_the_shim),
+            "the bare name matched a .CMD shim, so this test proves nothing about the suffix set"
+        );
+    }
+
+    // spec: gate-sdk/SPEC.md §Fail-closed contract — an empty PATH entry is the cwd, bash's own
+    // reading, kept across the rewrite
+    #[test]
+    fn an_empty_path_entry_still_means_the_working_directory() {
+        let path = std::env::join_paths(["", "/opt/bin"]).expect("cannot join a PATH");
+        assert!(resolve_on_path(
+            "cargo",
+            Some(&path),
+            None,
+            |p: &Path| p == Path::new("./cargo")
+        ));
+    }
+
+    // spec: gate-sdk/SPEC.md §Fail-closed contract — the separator has no Linux-runnable oracle,
+    // since `split_paths` compiles to the host's rule; this pins the API against a literal
+    // returning, which is the only half of the defect a host here can still observe
+    #[test]
+    fn the_path_separator_is_never_spelled_as_a_literal() {
+        let src = std::fs::read_to_string(
+            Path::new(env!("CARGO_MANIFEST_DIR")).join("src/proc.rs"),
+        )
+        .expect("cannot read proc.rs");
+        let literal = format!("split('{}')", ':');
+        assert!(
+            !src.contains(&literal),
+            "a literal PATH separator is back in proc.rs — a Windows PATH separates on ';' and \
+             its drive letters carry colons, so std::env::split_paths is the portable API"
         );
     }
 
