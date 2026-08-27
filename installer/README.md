@@ -1300,7 +1300,8 @@ than `uninstall`.** Nothing else here asserts that the manifest covers
 *everything* `init` wrote — the per-profile check runs the other direction,
 every recorded entry against the tree. A file `init` wrote and failed to record
 survives the removal and breaks this equality, so the arm closes that hole as a
-side effect. It is also the assertion form of the claim the install page makes:
+side effect — for a *first* `init` here, and for an upgrade hop's own write set
+in the cross-version reversal arm below. It is also the assertion form of the claim the install page makes:
 an install an evaluator can reverse.
 
 The equality holds for a reason rather than by luck. The surfaces `init` seeds
@@ -1464,6 +1465,33 @@ arm onto a profile whose kit set ships a member `init` seeds and dispatches to
 the binary, never drop the assertion.** Its scope is the first hop; the second
 hop's clean-worktree assertion carries no tripwire, and widening it is a separate
 judgment.
+
+**The cross-version reversal arm** reverses a consumer that crossed all three of
+those versions, because every reversal above runs on a consumer that has only
+ever met one version's payload — the per-profile loop, the download arm and the
+artifact arm each reverse a *first* `init`, and the upgrade arm asserts no
+reversal at all. It is its own scratch consumer at the lattice minimum with **no
+adopter edit**: it re-runs the upgrade arm's two already-extracted packages with
+no flags, so it costs no pack, and the edited case belongs to the protection
+branch below, since an adopter edit is what tree-object equality cannot host. It
+then drives the same `diff`, `uninstall --dry-run` and `uninstall` the reversal
+arm does, with the **latest** package's verb — what an adopter holds after an
+upgrade — against a roster three versions old, and the tree object must come
+back to the one the consumer had before its first `init`.
+
+*What that reaches is narrower than a recorded hash moving, and the limit is the
+harness's rather than the assertion's.* `pack-installer.sh` assembles every
+version from one worktree, so those payloads carry byte-identical content and
+the relinquish deletion is this suite's only lever on payload shape; the arm
+therefore does not exercise a hash that changed under a path that stayed. What
+it does exercise, and nothing else here does: a tree whose payload lost a path
+on one hop and regained it on the next must still be **wholly removable**, and
+the roster must cover an **upgrade** hop's write set — a rewritten manifest,
+regenerated projections, whatever a future release adds. The arm proves its own
+premise before it reverses, in the tripwire idiom above: the relinquish must
+still be in effect, the manifest must record the third version, and the
+relinquished path must still be on the roster. Each failure names the re-scope,
+never a licence to drop the assertion.
 
 **The seam arm** covers the two surfaces `init` rewrites on every run — a
 `templates/*-config.sh` destination and gate-sdk's `msg-patterns.list` — which no

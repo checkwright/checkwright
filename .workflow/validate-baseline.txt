@@ -100,6 +100,7 @@ installer_smoke download-arm ignore binary-less-dispatch-loop-retirement
 installer_smoke toolchain-free-arm ignore binary-less-dispatch-loop-retirement
 installer_smoke jq-less-arm ignore binary-less-dispatch-loop-retirement
 installer_smoke upgrade-arm ignore binary-less-dispatch-loop-retirement
+installer_smoke cross-version-reversal-arm ignore binary-less-dispatch-loop-retirement
 installer_smoke seam-arm ignore binary-less-dispatch-loop-retirement
 installer_smoke narrowing-arm ignore binary-less-dispatch-loop-retirement
 installer_smoke artifact-arm ignore binary-less-dispatch-loop-retirement

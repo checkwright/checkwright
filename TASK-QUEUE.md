@@ -12,38 +12,6 @@
 
 ## New Features
 
-- **installer-uninstall-diff-stale-hash-coverage** [spec: SPEC-cross-version-reversal.md] — the
-  reverse-to-pre-install property is asserted only on consumers that have ever met one
-  version's payload, so it is unasserted on the path every adopter is on after a release.
-  **The filing's premise was wrong and the drain corrected it before promoting.** The bullet
-  said both smoke arms run `uninstall` against a fresh install. They do not: the install
-  assertion ends with an idempotent **re-run** of `init` and the reversal runs on that same
-  consumer, and the seam arm drives init, an edit, a re-run, `diff` and `uninstall` in sequence.
-  **What survives the correction, narrowed to what is uncovered.** Every reversal runs after a
-  **same-version** re-run, where the payload is byte-identical and the written set cannot
-  change. The upgrade arm is the only place a re-run carries a *different* payload — a
-  relinquish hop and a re-add hop — and it asserts no reversal at all.
-  **THE FORK IS RULED AT SPEC 2026-08-27, and it was not the smoke-cost judgment the entry
-  framed it as.** The chain answer CANNOT assert the named property: the upgrade arm's consumer
-  carries two committed adopter edits, which is exactly the case tree-object equality cannot
-  host — the smoke says so in those words where the seam arm's protection branch chains — so a
-  chain would re-inline that kept-set block and assert the neighbouring keep branch while
-  looking like closure. The own-arm answer reuses `assert_reversal` unchanged and buys NO new
-  pack, since both upgrade packages are already extracted, so the cost half falls too.
-  **What makes it a feature is not the arm name the entry was watching.** The smoke's own
-  header rules its unindented `printf` arm headers a PARSED contract and
-  `scripts/parse-installer-smoke-log.sh` derives its scenario roster from them, so a new header
-  mints a baseline SCENARIO in `.workflow/validate-baseline.txt`, which evidence-kit/SPEC.md
-  §Baseline manifest holds constant and rules tooling never writes. That is a contract another
-  component must honor — canon-kit's litmus verbatim — and it is what makes the amendment
-  cross-component: installer and evidence-kit, not installer and `native/`, which carries no
-  roster surface at all.
-  ruled: installer-uninstall-diff-stale-hash-coverage operator 2026-08-27 lead-relay
-  Filed 2026-08-19 by close from the gap inbox, discharging the operator's refusal of the widen
-  at `installer-init-noop-regen-conflict`; the drain read the smoke's call order and the
-  bullet's central claim fell. Selected into the unit set 2026-08-27 by scope; fork ruled and
-  promoted at spec the same day.
-
 ## Technical Debt
 
 ## Deferred
@@ -8586,6 +8554,7 @@
 
 - manifest-artifact-files-row-contradiction
 - artifact-digest-mismatch-remedy-inert
+- installer-uninstall-diff-stale-hash-coverage
 
 ## Lessons Learned
 
