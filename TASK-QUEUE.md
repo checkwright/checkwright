@@ -8653,9 +8653,5 @@
 
 ## Done
 
-- manifest-artifact-files-row-contradiction
-- artifact-digest-mismatch-remedy-inert
-- installer-uninstall-diff-stale-hash-coverage
-
 ## Lessons Learned
 
