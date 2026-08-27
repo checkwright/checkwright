@@ -14,6 +14,65 @@
 
 ## Technical Debt
 
+- **manifest-artifact-files-row-contradiction** — the manifest's owner doc, and the
+  code comment restating it, both say the gate binary is not a `files` row. It is one.
+  `installer/README.md` §The manifest states that `artifact` is its own key *rather than* a `files`
+  row, reasoning that a `files` entry means hashed with `git hash-object` and rewritten when
+  unmodified while this one is hashed with SHA-256 against a published value.
+  `installer/lib/init.sh:334` restates that paragraph almost verbatim as a `spec:` comment.
+  **The shipped behaviour is both, and it is gated.** `init.sh` records the artifact path on the
+  placement path, so the manifest emits a `files` row for it — carrying the `git hash-object` hash
+  a `files` entry means (`installer/README.md` §The manifest) and not the published SHA-256 —
+  beside the separate top-level `artifact` key.
+  `installer/consumer-smoke/run-smoke.sh:261` asserts `.files` has the binary path as expected
+  behaviour and is green, so the oracle is on the code's side.
+  **The rule both surfaces are groping for**, and the shape of the fix: the artifact's *path* takes
+  a `files` row because `init` wrote it and `uninstall` must reverse it, while the artifact's
+  *digest* rides its own key because it is an integrity claim rather than change detection. The two
+  hash families are real; *rather than a `files` row* is the wrong way to say it.
+  **The comment is a second defect, not a second report.** Per CLAUDE.md a comment restating its
+  owner doc is itself the defect, so the fix deletes the restatement at `init.sh:334` and keeps only
+  its directive tail — why the flag is passed conditionally. Correcting the comment in place would
+  bless the restatement.
+  **Why promoted:** the install surface's own reference doc misdescribes what the manifest
+  contains, so a reader reasoning about uninstall coverage, or about what a `files` entry means,
+  reaches the wrong answer and the code comment corroborates it. It carries no design fork — the
+  owner doc's own reasoning names both hash families already — so it is debt and scope promotes it.
+  ruled: manifest-artifact-files-row-contradiction operator 2026-08-27 lead-relay
+  Pre-existing since 2026-08-08. Filed 2026-08-25 by close, draining the gap inbox; found at align
+  as a comment defect, widened to its owner doc when that drain re-verified it. Promoted 2026-08-27
+  by scope as member 1 of `installer-trial-lifecycle-repair`.
+
+- **artifact-digest-mismatch-remedy-inert** — `doctor` prints a remedy `init`
+  refuses to perform: a substituted gate binary is kept, not rewritten.
+  `installer/lib/doctor.sh:124` reports a DIGEST MISMATCH when the binary at `GATE_SDK_NATIVE_BIN`
+  no longer hashes to the recorded digest, and the verdict line at `:160` prints `help: re-run
+  init; it re-verifies the published digest and rewrites the binary`. A bare re-run does not
+  rewrite it: the artifact path goes through the ownership rule, and a file whose recorded hash no
+  longer matches is classified as the adopter's, reported in the changed-file list and left alone
+  without `--force`.
+  **Where the rule lives.** The gap was filed against `installer/lib/init.sh:280`, and the first
+  relocation cut moved it: the ownership test is now `claim()` in `native/src/install.rs:148`,
+  applied to the artifact path at `:247`, with `Claim::Kept` emitting the `kept` verb `init.sh:288`
+  replays. The behaviour is preserved verbatim — which is exactly what the relocation promised — so
+  the defect is unchanged and the fix is a native-crate change rather than a bash one.
+  **The owner doc is on `doctor`'s side, so the defect is the code's.** `installer/README.md` §The
+  gate binary rules that nothing unverified is ever written and that a mismatch refuses rather than
+  warns; §doctor rules the artifact finding reports without setting the exit status precisely so
+  the re-run that is its own remedy is not blocked — a remedy the code then declines to perform.
+  **Candidate fix, narrow:** retire the ownership rule over the artifact path alone, on the ground
+  that a digest-verified artifact has no adopter-authored version for that rule to protect, and
+  leave every other claimed path untouched.
+  **Distinct from `powershell-installer-surface`**, whose subject is which side of the binary
+  invoke a step lives on; this is what the step does on either side.
+  **Why promoted:** the one remedy the installer's own diagnostic verb prints is inert, so an
+  adopter with a substituted binary follows the printed instruction, sees the same finding again,
+  and has nothing left to try short of reading the source. The owner doc already rules the intended
+  behaviour on both sides, so the fix converges code onto names the specs carry — debt, not design.
+  ruled: artifact-digest-mismatch-remedy-inert operator 2026-08-27 lead-relay
+  Filed 2026-08-25 by close, draining the gap inbox; found at spec, locus re-verified there.
+  Promoted 2026-08-27 by scope as member 2 of `installer-trial-lifecycle-repair`.
+
 ## Deferred
 
 - **platform-support-ci-matrix** [design-pending] [roadmap: next/reliability]
@@ -96,52 +155,53 @@
 - **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
   — the whole battery onto the binary, and the shell surface down to its residue.
   roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
-  The entry demotes at build rather than moving to `## Done`: it is the **whole corpus**, the oracle
-  below still counts gates owed, and a Done move would assert a finished port and silently drop it
-  from the **public** roadmap projection, which reads `[roadmap:]` tags off live entries.
+  The entry demotes at build rather than moving to `## Done`: it is the **whole corpus**, and a Done
+  move would assert a finished port and silently drop it from the **public** roadmap projection,
+  which reads `[roadmap:]` tags off live entries.
   **Operator-ruled 2026-08-09: complete the port, ASAP** — the ruling, its grounds and its
   supersession of the 2026-08-06 measurement-locus clause are [TRAJECTORY.md](TRAJECTORY.md)
-  §PRIORITY DIRECTIVE's, with the scope, both install paths and the bootstrap residue; this entry
-  is the work, and designing the bootstrap is still its. It inherits gate-sdk/SPEC.md §Porting a
-  gate to the binary substrate for the procedure and §Consumer payload for the payload rule.
-  **Two objections answered:** wall-clock is the weaker case (the win is retiring the shell
-  *sources* the payload carries), and the toolchain-free arm rides the pre-compiled path. A third
-  clause was DELETED as measured false 2026-08-24; `powershell-installer-surface` records it.
+  §PRIORITY DIRECTIVE's, with the scope, both install paths and the bootstrap residue; this entry is
+  the work, designing the bootstrap included. It inherits gate-sdk/SPEC.md §Porting a gate to the
+  binary substrate for the procedure and §Consumer payload for the payload rule.
+  **Two objections answered:** wall-clock is the weaker case (the win is retiring the payload's
+  shell *sources*), the toolchain-free arm rides the pre-compiled path, and a third clause was
+  DELETED as measured false 2026-08-24, recorded at `powershell-installer-surface`.
   **Every closed cohort and cut — members, counts, holds, grounds, price — is recorded at
-  gate-sdk/SPEC.md §The first cohort, and the rule that selects the next, so this entry states
-  what remains.** Cut widths are ruled **per cut and never inherited**, and the size arm is
-  **permanently** exhausted, so the budget arm is the only composer left.
+  gate-sdk/SPEC.md §The first cohort, so this entry states what remains.** Cut widths are ruled
+  **per cut and never inherited**, and the size arm is **permanently** exhausted.
   **THE COMPOSER DOES NOT REACH THE TREE REMAINDER — found 2026-08-27 at scope, and it is why
   "advance the port" is not dispatchable as a build unit today.** This entry says members are
-  selected by running `port-blockers.sh --group`; that arm walks the **gate registry**, which
-  reports **0 owed and 0 takeable** — a finished battery, and its own `--help` says a registry
-  arm reading zero "says nothing about the tree". `--tree` reports a large owed remainder, and
-  nothing selects a cut from it. Deciding the composer is deferred to the port's next dispatch — the
-  **lead's own** ruling, not the operator's, sharing the declaration below. Only `--tree` is the
-  predicate; `ported-gate-members` answers neither, and its owed count RISES when a non-gate shell
-  file lands, which is that predicate working rather than a regression.
-  **Prints neither count deliberately; run both arms.** Three consecutive sweeps found a digit
-  here stale, the third within one calendar day of its authoring, under this entry's own former
-  claim that both oracles had been re-run. A freshness assertion is not freshness.
+  selected by `port-blockers.sh --group`; that arm walks the **gate registry**, which reports **0
+  owed and 0 takeable** — a finished battery, and its own `--help` says a registry arm reading zero
+  "says nothing about the tree". `--tree` reports a large owed remainder and nothing selects a cut
+  from it. Only `--tree` is the predicate; `ported-gate-members` answers neither, and its owed count
+  RISES when a non-gate shell file lands, which is that predicate working rather than a regression.
+  **THE COMPOSER STAYS UNRULED, and the decomposition it needs is now bought rather than owed** — a
+  2026-08-27 scope survey, block in `.workflow/survey-record.md` with its corpus, oracle and rev, so
+  the next dispatch re-runs a witness instead of the sweep. Two cohesive cuts against three that are
+  not; the lead left the composer open on the survey's own reading, that both cohesive cuts advance
+  the owed COUNT and neither the CLAIM, the larger being contributor-side under the 2026-08-23 tail
+  ruling because its kit ships in no profile.
+  **Prints neither count; run both arms.** Three sweeps running found a digit stale here, the third
+  within a day of authoring, under this entry's claim both were re-run — asserted freshness is not.
   ruled: native-gate-port-remaining-corpus lead 2026-08-27 own-authority
-  **Cost while deferred:** large and known — the **owed** remainder (the trailer's own arm,
-  never the unported count) plus the runners and the install-lifecycle layer; since the
-  2026-08-14 born-native default (TRAJECTORY.md §The closed rulings) a gate landed meanwhile no
-  longer adds shell to it. Not a single-iteration delta; scope owns the decomposition, and the
-  criterion-relaxation question is closed at gate-sdk/SPEC.md §The port-candidate criteria — an
-  ordering signal, never an eligibility screen. Both battery entries said the port subsumes
-  them; `gate-battery-parallel-execution` closed on that, leaving `gate-battery-result-cache`.
-  **The PRIORITY DIRECTIVE has yielded THREE times — 2026-08-22, and twice 2026-08-24 — each for
-  one named iteration alone, each operator-ruled through the lead, and NONE a reversal, demotion or
-  re-scoping**: a yield spends one iteration's turn, never the sequence's claim on the next.
-  Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
+  **Cost while deferred:** large and known — the **owed** remainder (the trailer's own arm, never
+  the unported count) plus the runners and the install-lifecycle layer; since the 2026-08-14
+  born-native default (TRAJECTORY.md §The closed rulings) a gate landed meanwhile no longer adds
+  shell to it. Not a single-iteration delta, and the criterion-relaxation question is closed at
+  gate-sdk/SPEC.md §The port-candidate criteria — an ordering signal, never an eligibility screen.
+  `gate-battery-result-cache` is the one battery entry the port has not subsumed.
+  **The PRIORITY DIRECTIVE has yielded FOUR times — 2026-08-22, twice 2026-08-24, and 2026-08-27 —
+  each for one named iteration alone and NONE a reversal, demotion or re-scoping**: a yield spends
+  one iteration's turn, never the sequence's claim on the next. The first three were operator-ruled
+  through the lead; the fourth is the lead's own, on the composer reading above.
+  Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction under the
   direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope. Since then it is
-  promoted at spec and demoted at build once per increment on the entry-outlives-the-amendment
-  branch, each cut's record staying at its SPEC section.
+  promoted at spec and demoted at build once per increment, each cut's record at its SPEC section.
   **Tail ruled 2026-08-23, re-recorded 2026-08-24** (TRAJECTORY.md §PRIORITY DIRECTIVE): no member
   is permanently shell; the sequence is `battery-runner-port`, `shell-gate-tail-port`, then the
-  bootstrap — the first two LANDED, and the bootstrap is now ONE member,
-  `powershell-installer-surface`, `install-step-relocation` having retired as mooted.
+  bootstrap — the first two LANDED and the bootstrap is now ONE member,
+  `powershell-installer-surface` (`install-step-relocation` retired as mooted).
 
 - **powershell-installer-surface** [design-pending] — a native Windows install path. **Both
   forks are RULED**: fork 2 on 2026-08-26 by the operator — two hand-kept bootstraps, parity held
@@ -2994,14 +3054,13 @@
   before ranking it, because the promotion dividend lives in the total and in no single entry.
   The `survey-engagement` audit class then asks each close whether that pass ran, and declares
   its only residue to be "the survey's own reasoning".
-  **The residue does not carry the claim, and four dated observations now settle it** — the
-  question is answered, so the narration of each is compressed to what it proved.
+  **The residue does not carry the claim, and six dated observations now settle it** — the
+  question is answered, so each is compressed to what it proved.
   **2026-08-07:** scope's reasoning landed only as conclusions in a commit message. Its
   counter-evidence half was done properly, but nothing in any artifact said whether an edge sum
   was taken, so the audit could return neither verdict — **unanswerable, not un-gateable.**
   **2026-08-08 — answerable, and passed.** Scope named `bin/queue-edges.sh` as an oracle in the
-  survey record and wrote per-candidate inbound totals into the finding. "Fold the sum into the
-  existing survey record" is therefore a **shipped instance**, not a hypothetical design option.
+  survey record and wrote per-candidate inbound totals into the finding.
   **2026-08-09 and 2026-08-12 — unanswerable again, twice.** Both ranked a large corpus and the
   second recommended against a group by name, so the due-condition fired squarely on each; both
   named a different oracle and neither recorded an inbound sum. Both did premise-falsification
@@ -3025,11 +3084,18 @@
   2026-08-27 both ran the oracle, named it in an `oracle:` field and wrote per-candidate inbound
   totals into the finding, the second adding a retired-target read. Two of the three alternatives
   below now have a shipped instance each; the third has none.
-  **Why `[design-pending]`:** the cheap fix — have the survey cite its edge sums — risks
-  becoming ceremony, a stage writing down that it did the thing rather than doing it. The
-  honest alternatives are a survey artifact the sum lands in, folding the sum into the existing
-  survey record, or accepting that this class is not auditable and retiring the roster line
-  rather than restamping it each close.
+  **RE-DEFERRED 2026-08-27 WITH THE FORK NARROWED TO ONE ALTERNATIVE, which is what a later
+  session inherits instead of the choice.** The threshold rule put this in front of the authority
+  once the sixth observation was stamped; the ruling was to keep it deferred and spend the boundary
+  narrowing rather than building. **Fold the sum into the existing survey record** is the surviving
+  alternative — three shipped instances, 2026-08-08, 2026-08-26 and 2026-08-27. A separate survey
+  artifact for the sum has one instance and buys a second surface for what one already carries.
+  Retiring the roster line as unauditable has **zero** instances and is now the weaker read, since
+  three answerable closes in a row are what an unauditable class does not produce.
+  **What is still open, and it is smaller than the old fork:** whether the pass is owed per RANKED
+  candidate when an operator supplies the unit set, which the 2026-08-24 widening did not reach.
+  The ceremony objection stands against a *declaration*, never against the sum itself.
+  ruled: survey-edge-aggregation-residue lead 2026-08-27 own-authority
   **Cost while deferred:** every close restamps an audit it did not actually perform, which is
   worse than a skipped audit — the roster reads as coverage.
   Filed 2026-08-07 by close, performing the `survey-engagement` audit its roster made due.
@@ -5947,11 +6013,19 @@
   **Why `[design-pending]`:** whether to chain a reversal onto the upgrade arm's second hop or
   give it its own arm is a smoke-cost judgment, and that arm is already the most expensive in the
   suite.
+  **SELECTED AS MEMBER 3 of `installer-trial-lifecycle-repair`, and it stays here rather than
+  moving up, which is the classification and not a hedge.** The fork above IS the feature-vs-debt
+  litmus: chaining onto the existing hop mints no name and is debt, while a new arm mints an arm
+  name on a governed surface and is a feature owing an amendment. This repo splits authoring into
+  a dedicated `spec` stage, so scope may promote neither answer — `spec` resolves the fork and
+  promotes accordingly. Nothing about the finding is pending; only its class is.
+  ruled: installer-uninstall-diff-stale-hash-coverage operator 2026-08-27 lead-relay
   **Cost while deferred:** the property the whole adoption story rests on is asserted on the
-  paths where it cannot fail and unasserted on the one where it can.
+  paths where it cannot fail and unasserted on the one where it can — and objective 4 makes that
+  property the product rather than a test of it.
   Filed 2026-08-19 by close from the gap inbox, discharging the operator's refusal of the widen
   at `installer-init-noop-regen-conflict`; the drain read the smoke's call order and the bullet's
-  central claim fell.
+  central claim fell. Selected into the unit set 2026-08-27 by scope.
 
 - **pipeline-membership-idiom-latent** [design-pending] — the SIGPIPE-under-pipefail membership
   idiom that produced `installer-init-noop-regen-conflict` has no gate, so nothing stops the next
@@ -7624,16 +7698,14 @@
 - **citation-liveness-family-convergence** [design-pending] — the citation-liveness deferred family
   is FOUR gate-touch points, not one resolver and not fourteen tickets; this entry is where that
   measurement lives.
-  **Why the entry carries the survey rather than pointing at it.** The finding was bought at the
-  2026-08-25 scope into `.workflow/survey-record.md`, a boundary-reset built-in destroyed at the
-  next first-stage entry, and `check-scratch-citation` reds a permanent surface that points into
-  that set — so lifecycle-kit/SPEC.md §The survey record's four witness strings are inlined here,
-  where they are more durable than in the record. Member line numbers are dropped as re-derivable
-  and stale-prone; members are named by slug.
-  **The witness — re-run it before citing this, and dispatch only the delta if either half moved.**
-  corpus `TASK-QUEUE.md ## Deferred + ## Icebox`, `scripts/gates.list`, `native/src/gates/`; oracle
+  **Why the entry carries the survey rather than pointing at it.** It was bought at the 2026-08-25
+  scope into `.workflow/survey-record.md`, which the next first-stage entry destroys, and
+  `check-scratch-citation` reds a permanent surface pointing into that set. Members are by slug.
+  **The witness — RE-RUN 2026-08-27 AND IT HOLDS, zero delta.** corpus `TASK-QUEUE.md ## Deferred
+  + ## Icebox`, `scripts/gates.list`, `native/src/gates/`; oracle
   `bash queue-kit/bin/queue-edges.sh` plus a `grep -n` over the queue for citation/cite/liveness;
-  rev `457148bd2a5681a9630c4a73b1358e35c170aa2d`.
+  rev `457148bd2a5681a9630c4a73b1358e35c170aa2d`. Every member below was live at the re-run and all
+  three gates are registered native modules with no shell fallback. Re-run it again before citing.
   **The finding.** Fourteen members, twelve Deferred and two Icebox; none blocks on an
   operator-class fork. (A) `check-spec-pointer` absorbs `prose-filename-citation-liveness`,
   `unqualified-section-citation-liveness`, `link-wrapped-section-citation-liveness` and
@@ -7642,25 +7714,29 @@
   `qualified-pointer-section-ownership` as two harder separate predicates on the same gate, the
   latter self-declaring an honest not-buildable as a permitted outcome. (B)
   `check-queue-slug-liveness` takes about two assertions for `retired-slug-live-pointer-citation`
-  and `queue-status-parenthetical-liveness`, plus ONE remaining report-only deliverable riding
-  `bin/queue-edges.sh`'s existing resolution — `done-slug-ownership-citation-report`,
-  report-not-gate under the SPEC's
-  reference-vs-membership ruling. Its twin `dead-queue-citation-report` SHIPPED 2026-08-26 at
-  `68e84081`, which is the delta this entry's own witness tells a reader to dispatch on, so the
-  member count above is one stale. (C) `check-docs-cmd` widens from fenced-only to inline spans for
-  `cited-script-path-liveness-inline` and `stale-identifier-after-retirement`, likely one ticket,
-  though which gate holds it is an open ruling in the second entry. (D)
-  `guard-rule-number-not-citable-outside-kit` and `guard-rule-number-intra-kit-citations-ungated`
-  are an island: no gate resolves rule-number citations, 111 intra-kit citations were measured at
-  the last renumber, and the false-positive budget is the unknown.
-  **Two members are unverified.** Icebox's `doctrine-rule-number-citation-liveness` and
-  `false-ground-citation-propagation` are title-only — their bodies could not be read — and
-  DOCTRINE.md carries no `rule N` form today, so the first may be speculative.
+  and `queue-status-parenthetical-liveness`, plus ONE report-only deliverable riding
+  `bin/queue-edges.sh`'s resolution — `done-slug-ownership-citation-report`, report-not-gate under
+  the SPEC's reference-vs-membership ruling; its twin `dead-queue-citation-report` SHIPPED at
+  `68e84081`, the one stale in the count above and the only member state the re-run moved. (C)
+  `check-docs-cmd` widens from fenced-only to inline spans for `cited-script-path-liveness-inline`
+  and `stale-identifier-after-retirement`, likely one ticket, though which gate holds it is an open
+  ruling in the second entry. (D) `guard-rule-number-not-citable-outside-kit` and
+  `guard-rule-number-intra-kit-citations-ungated` are an island and **are the long pole rather than
+  an equal quarter, corrected at the re-run**: (A)-(C) widen gates that already resolve citations,
+  while (D) has no gate to widen at all and an unmeasured false-positive budget over the 111
+  intra-kit citations counted at the last renumber. Size it separately; never average it in.
+  **Two members are unverified**, and one is now measured rather than suspected: Icebox's
+  `false-ground-citation-propagation` is still title-only, and `doctrine-rule-number-citation-
+  liveness` is a forward bet — a 2026-08-27 probe found DOCTRINE.md carrying **zero** `rule N`
+  forms, so the only measured rule-number corpus is guard-kit/SPEC.md, which is (D)'s.
   **Excluded with cause:** `scratch-citation-skill-surface-reach` (self-disclaims, a glob-coverage
   gap), `kit-ref-liveness-stem-token-hole` (env-knob tokens, already checked),
   `fixture-assertion-liveness`, `survey-oracle-liveness-unasserted`. **Adjacent, unfolded:**
   `amendment-landing-citation-assertions` and `amendment-owner-position-citation` share the shape
-  but ride `check-amendment-queue` over a corpus deleted at merge.
+  but ride `check-amendment-queue` over a corpus deleted at merge. **A FIFTH touch point sits
+  outside this roster**, filed after the rev and so invisible to the witness:
+  `scratch-citation-introducer-form-reach`, on `check-scratch-citation` — fold or exclude it
+  deliberately.
   **Size floor:** four gate-touch points, eight to ten new assertions, two report outputs, all
   native-crate — every gate named is already a native module, so the born-native default binds.
   **Cost while deferred:** the expensive half of the pool's largest measured exit dies at every
@@ -7668,60 +7744,6 @@
   a read of four gate sources — the exact re-derivation the survey record exists to prevent, paid
   by the scope that would otherwise re-propose the bundle.
   Filed 2026-08-25 by close, draining the gap inbox; survey bought at that iteration's scope.
-
-- **artifact-digest-mismatch-remedy-inert** [design-pending] — `doctor` prints a remedy `init`
-  refuses to perform: a substituted gate binary is kept, not rewritten.
-  `installer/lib/doctor.sh:124` reports a DIGEST MISMATCH when the binary at `GATE_SDK_NATIVE_BIN`
-  no longer hashes to the recorded digest, and the verdict line at `:160` prints `help: re-run
-  init; it re-verifies the published digest and rewrites the binary`. A bare re-run does not
-  rewrite it: the artifact path goes through the ownership rule, and a file whose recorded hash no
-  longer matches is classified as the adopter's, reported in the changed-file list and left alone
-  without `--force`.
-  **Where the rule now lives, corrected at this drain.** The gap was filed against
-  `installer/lib/init.sh:280`, and this iteration's first relocation cut moved it: the ownership
-  test is now `claim()` in `native/src/install.rs:148`, applied to the artifact path at `:247`,
-  with `Claim::Kept` emitting the `kept` verb `init.sh:288` replays. The behaviour is preserved
-  verbatim — which is exactly what the relocation promised — so the defect is unchanged and the fix
-  is now a native-crate change rather than a bash one.
-  **The owner doc is on `doctor`'s side, so the defect is the code's.** `installer/README.md` §The
-  gate binary rules that nothing unverified is ever written and that a mismatch refuses rather than
-  warns; §doctor rules the artifact finding reports without setting the exit status precisely so
-  the re-run that is its own remedy is not blocked — a remedy the code then declines to perform.
-  **Candidate fix, narrow:** retire the ownership rule over the artifact path alone, on the ground
-  that a digest-verified artifact has no adopter-authored version for that rule to protect, and
-  leave every other claimed path untouched.
-  **Distinct from `powershell-installer-surface`**, whose subject is which side of the binary
-  invoke a step lives on; this is what the step does on either side.
-  **Cost while deferred:** the one remedy the installer's own diagnostic verb prints is inert, so an
-  adopter with a substituted binary follows the printed instruction, sees the same finding again,
-  and has nothing left to try short of reading the source.
-  Filed 2026-08-25 by close, draining the gap inbox; found at spec, locus re-verified here.
-
-- **manifest-artifact-files-row-contradiction** [design-pending] — the manifest's owner doc, and the
-  code comment restating it, both say the gate binary is not a `files` row. It is one.
-  `installer/README.md` §The manifest states that `artifact` is its own key *rather than* a `files`
-  row, reasoning that a `files` entry means hashed with `git hash-object` and rewritten when
-  unmodified while this one is hashed with SHA-256 against a published value.
-  `installer/lib/init.sh:334` restates that paragraph almost verbatim as a `spec:` comment.
-  **The shipped behaviour is both, and it is gated.** `init.sh` records the artifact path on the
-  placement path, so the manifest emits a `files` row for it — carrying the `git hash-object` hash
-  a `files` entry means (`installer/README.md` §The manifest) and not the published SHA-256 —
-  beside the separate top-level `artifact` key.
-  `installer/consumer-smoke/run-smoke.sh:261` asserts `.files` has the binary path as expected
-  behaviour and is green, so the oracle is on the code's side.
-  **The rule both surfaces are groping for**, and the shape of the fix: the artifact's *path* takes
-  a `files` row because `init` wrote it and `uninstall` must reverse it, while the artifact's
-  *digest* rides its own key because it is an integrity claim rather than change detection. The two
-  hash families are real; *rather than a `files` row* is the wrong way to say it.
-  **The comment is a second defect, not a second report.** Per CLAUDE.md a comment restating its
-  owner doc is itself the defect, so the fix deletes the restatement at `init.sh:334` and keeps only
-  its directive tail — why the flag is passed conditionally. Correcting the comment in place would
-  bless the restatement.
-  **Cost while deferred:** the install surface's own reference doc misdescribes what the manifest
-  contains, so a reader reasoning about uninstall coverage, or about what a `files` entry means,
-  reaches the wrong answer and the code comment corroborates it.
-  Pre-existing since 2026-08-08. Filed 2026-08-25 by close, draining the gap inbox; found at align
-  as a comment defect, widened to its owner doc when this drain re-verified it.
 
 - **boundary-wipe-preserve-lifetime-scope** [design-pending] — the iteration-boundary scratch wipe
   preserves by *iteration* lifetime, so an artifact whose lifetime is a **live session's** is
@@ -8463,22 +8485,30 @@
   re-probed, the comment re-posted and the issue closed; the surviving comment's author was
   verified. The exposure was minutes on a public surface, and it is an *attribution* exposure
   rather than a content one — the comment's text was fine and its byline was not.
-  **The binding gap, which is the durable half.** The private ops runbook states the
-  account-selection step for release and push work, and the always-loaded rule scopes it
-  per-push. The scope stage's GitHub boundary sweep performs GitHub *writes* on three lanes —
-  issue comments and closes, PR merges and reviews, advisory-thread dispositions — and no surface
-  binds the step to any of them. The sweep's own text says only that its `gh` calls run inside it.
-  **Why `[design-pending]`:** the fix's tier is the question. Widening the always-loaded rule's
-  trigger from push to any GitHub write is one line and reaches every session; putting the step in
-  the sweep binding reaches the one stage that provably needs it and leaves every other writer
-  uncovered; a preflight refusing a `gh` write under an unselected account is the only mechanized
-  form and needs a home no kit obviously owns. The runbook itself already rules that no gate can
-  cover this, because an identity check is evidence only about the identity selected at the moment
-  the write happens — so a mechanism has to sit at the call, not before it.
-  **Cost while deferred:** every boundary sweep, and every session reaching for `gh` outside a
-  push, is one habit away from attributing a public act to an account that must not be correlated
-  with the public one — and the failure is silent on exactly the dispositions the sweep takes most.
-  Filed 2026-08-27 by scope, from its own firing at that boundary, remediated in the same session.
+  **THE ALWAYS-LOADED HALF IS CLOSED, so this entry is narrowed to its residue rather than left
+  asserting a gap that no longer exists.** Operator-ruled at this boundary and landed as a hotfix:
+  the always-loaded rule now binds the account step to any GitHub write, names the three lanes, and
+  spells its cadence per-write. The clause it turns on is the one the incident taught — a write
+  needing no write permission succeeds silently under the wrong account, so two of the three lanes'
+  dispositions would have failed invisibly.
+  ruled: boundary-sweep-github-write-skips-identity-step operator 2026-08-27 lead-relay
+  **What survives, and it is two things.** First, the runbook-side binding: the private ops runbook
+  still states its step for release and push work in its own prose, so the two tiers now disagree
+  about the trigger and the narrower one is the one a reader reaches by following the pointer.
+  Second, and this is the real residue: **no mechanism enforces it, and the runbook rules that none
+  can** — an identity check is evidence only about the identity actually selected at the moment the
+  write happens, so a preflight cannot cover a write it does not itself perform. A wrapper that
+  performs the write is the only shape that could, and it has no owner.
+  **Why `[design-pending]`:** which of those two is worth buying. The runbook edit is minutes and
+  is out of reach of every gate in this tree by construction, since the file is untracked. The
+  wrapper is a real mechanism and needs a home no kit obviously owns — the writes are lifecycle's
+  boundary sweep, but the identity is the consumer's ops posture, which is exactly the seam a kit
+  may not cross.
+  **Cost while deferred:** unchanged in kind and much smaller in size — the standing instruction is
+  now correct, so what remains is one stale sentence in an untracked file and a rule that only
+  discipline enforces, on an act whose failure is silent.
+  Filed 2026-08-27 by scope, from its own firing at that boundary, remediated in the same session;
+  narrowed to its residue in the same commit that recorded the ruling closing its first half.
 
 - **prompt-ranking-ungrantable-shape-class** [design-pending] — the friction ranking's unit mixes
   rows an allowlist entry could retire with rows no entry can ever match, so each close re-triages
