@@ -12,6 +12,31 @@
 
 ## New Features
 
+- **port-oracle-instrument-self-disposition** [spec: SPEC-port-blockers-arm.md] — the tool that
+  measures the port's completion predicate is still shell; its disposition is ruled and declared,
+  and its PORT is what remains.
+  **The design is `gate-sdk/SPEC-port-blockers-arm.md` and is not restated here** — eleven deltas,
+  their work classes, the causal completeness and the red conditions live there. What this entry
+  keeps is the disposition history the amendment does not carry.
+  **The disposition increment LANDED 2026-08-24** in the port-remainder iteration, merged into
+  gate-sdk/SPEC.md §port-blockers, §The non-gate arm, §gen-pre-commit and §The
+  `# graph:` manifest. `gate-sdk/bin/port-blockers.sh` declares `# port-until:` against THIS slug;
+  `scripts/measured-claims.sh` — the value of `CANON_KIT_MEASURED_CLAIMS_CMD`, in a directory
+  `pack-installer.sh` never packs — declares `# no-port:` on the provenance seam instead, which is
+  where the two instrument files parted.
+  **THE DONE MOVE IS UNBLOCKED BY THE WORK ITSELF, which is why it demoted before.** The entry
+  demoted rather than moving to Done because a Done move would have stranded that declaration at a
+  dead slug and red `check-gate-exemption-tasks`; the deletion removes the declaration, so the
+  blocker is discharged in the same commit that earns the move.
+  **DISTINCT from `native-gate-port-remaining-corpus`**, whose deliverable is the remaining corpus
+  and its demotion rule; this is one named file with a route already ruled. It fits the 2026-08-28
+  contract composer's shape without being a cut of that entry, and does not displace the drift-kit
+  cut that entry names first.
+  Filed 2026-08-24 by build to the gap inbox, promoted at
+  `shell-gate-tail-port-and-completion-oracle`'s close, ruled at spec in `SPEC-owed-column.md`,
+  demoted 2026-08-24 by build once the disposition increment had landed, and promoted to
+  spec-ready 2026-08-28 by spec at this boundary.
+
 ## Technical Debt
 
 ## Deferred
@@ -188,44 +213,6 @@
   sat at `gate-binary-target-roster-widening` rather than here — shipped now, and `## Done`.
   Filed 2026-08-03 by spec; re-scoped 2026-08-24 at scope; fork 1 merged and demoted 2026-08-25;
   the two source blockers re-scoped out 2026-08-26 by operator ruling.
-
-- **port-oracle-instrument-self-disposition** [design-pending] — the tool that measures
-  the completion predicate is still shell; its disposition is ruled and declared, and its PORT
-  is what remains.
-  **The disposition increment LANDED 2026-08-24** in the port-remainder iteration, merged into
-  gate-sdk/SPEC.md §port-blockers, §The non-gate arm, §gen-pre-commit and §The
-  `# graph:` manifest. `gate-sdk/bin/port-blockers.sh` declares `# port-until:` against THIS slug;
-  `scripts/measured-claims.sh` — the value of `CANON_KIT_MEASURED_CLAIMS_CMD`, in a directory
-  `pack-installer.sh` never packs — declares `# no-port:` on the provenance seam instead, which is
-  where the two instrument files parted. `--tree` moved 153/0/0/153 to 153/2/1/150 with the hook
-  regenerated behind it. The entry DEMOTED rather than moving to Done because a Done move would
-  strand that declaration at a dead slug and red `check-gate-exemption-tasks`.
-  **Deliverable — the port itself:** `port-blockers.sh` becomes a **bridged-arm table member** of
-  the non-gate arm class, the family gate-sdk/SPEC.md §The non-gate arm already forces for a tool
-  reading the gates dir, the kit roots, the prune set and the program floor. Route ruled, port
-  unbought.
-  **Why [design-pending]:** the arm's flag spelling is deliberately UNMINTED — a spelling written
-  ahead of its caller is the reservation the closed-roster rule refuses — so the porting unit mints
-  it WITH its reader, which is an amendment's act rather than a mechanical one.
-  **Two constraints the porting unit inherits rather than discovers**, both recorded at §The
-  non-gate arm. (i) `measured-claims.sh` reads the `--tree` trailer by spawning `bash` today and
-  must move to the arm IN THE SAME COMMIT, or the consumer's claim oracle exits 2. (ii) Most of the
-  substrate exists — the registry walk, the prune resolution and the `--tree` corpus rule's
-  compiled face are already shared crate mechanism, so what the port owes is the header-block read
-  and the three arms' trailers. What exists, what is owed, and the promote-or-duplicate choice are
-  enumerated at §The non-gate arm and are deliberately not re-listed here.
-  **The reflexivity is priced and is not a problem:** the arm's shell implementation and the arm's
-  own row leave the tree in the same commit, so the measurement is not a fixed point and its last
-  act is to remove itself from its own corpus. The arm reads headers, not behaviour, so there is no
-  fixed point to converge on.
-  **DISTINCT from `native-gate-port-remaining-corpus`**, whose deliverable is the remaining corpus
-  and its demotion rule; this is one named file with a route already ruled.
-  **Cost while deferred:** low and legible — the tool stays shell, so the port is not complete
-  however the owed column reads, and `--tree`'s held tier carries exactly this one row. The
-  declaration already bought the legibility half: the row reads as named work, not unexamined work.
-  Filed 2026-08-24 by build to the gap inbox, promoted at
-  `shell-gate-tail-port-and-completion-oracle`'s close, ruled at spec in `SPEC-owed-column.md`,
-  and demoted 2026-08-24 by build once the disposition increment had landed.
 
 - **validate-suite-wall-clock-unowned** [design-pending] — the validate run is about seventeen
   minutes and no entry owns the sixteen of them that are not the gate battery.
