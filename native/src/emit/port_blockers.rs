@@ -794,6 +794,99 @@ mod tests {
         assert!(got.contains("on_hook"));
     }
 
+    fn bare_registry() -> Registry {
+        Registry {
+            gates_dir: "scripts".to_string(),
+            check_dirs: vec!["scripts".to_string()],
+            tests_dirs: vec!["scripts/gate-tests".to_string()],
+            floor: ["bash", "git"].iter().map(|s| (*s).to_string()).collect(),
+            kit_funcs: BTreeSet::new(),
+            kit_roots_rel: vec!["gate-sdk".to_string()],
+        }
+    }
+
+    // spec: gate-sdk/SPEC.md §port-blockers — the compiled-member path: a program takes the same
+    // floor filter a scanned command word takes, so an on-floor program is suppressed on both
+    // substrates by one rule, and an off-floor one keeps its `(--needs)` evidence.
+    #[test]
+    fn a_compiled_members_requirement_is_read_off_the_registry_and_floor_filtered() {
+        let reg = bare_registry();
+        let m = needs_rows("check-shellcheck", "gate-sdk/checks/check-shellcheck.gate", &reg);
+        assert!(!m.undecidable);
+        let progs: Vec<&str> = m.rows.iter().map(|r| r.program.as_str()).collect();
+        assert!(progs.contains(&"shellcheck"), "the off-floor requirement is missing");
+        assert!(
+            !progs.contains(&"bash"),
+            "an on-floor program survived the filter the scanned path applies"
+        );
+        assert!(m.rows[0].evidence.ends_with("(--needs)"));
+    }
+
+    // spec: gate-sdk/SPEC.md §Fail-closed contract — a member the registry cannot answer for is
+    // reported undecidable, never as an empty requirement set: a member silently reported clean
+    // because the question failed is the captured-emptiness false green in report form.
+    #[test]
+    fn a_member_the_registry_cannot_answer_for_is_undecidable_rather_than_clean() {
+        let reg = bare_registry();
+        let m = needs_rows("check-not-a-registered-member", "scripts/absent.gate", &reg);
+        assert!(m.undecidable, "the cannot-answer branch did not reach the counter");
+        assert_eq!(m.rows.len(), 1);
+        assert_eq!(m.rows[0].program, "?");
+        assert!(m.rows[0].evidence.contains("--needs unavailable"));
+    }
+
+    // spec: gate-sdk/SPEC.md §port-blockers — a command-position expansion whose default cannot be
+    // resolved prints `?` and reaches the undecidable counter both arms read, while a resolvable
+    // one becomes an ordinary row; reporting nothing would be the false negative.
+    #[test]
+    fn an_unresolvable_expansion_counts_undecidable_and_a_resolvable_one_becomes_a_row() {
+        let reg = bare_registry();
+        let blind = scan_rows(
+            "check-probe",
+            "scripts/check-probe.sh",
+            "\"$PORT_BLOCKERS_UNBRIDGED\" --check\n\"$PORT_BLOCKERS_UNBRIDGED\" again\n",
+            &reg,
+        );
+        assert!(blind.undecidable);
+        assert_eq!(blind.rows.len(), 1, "one row per unresolvable knob, not one per site");
+        assert_eq!(blind.rows[0].program, "?");
+        assert!(blind.rows[0].evidence.contains("default unresolvable"));
+
+        let knobs = crate::knobenv::lock();
+        knobs.set("GATE_SDK_KNOB_PORT_BLOCKERS_SCAN", "ruby -w");
+        let seeing = scan_rows(
+            "check-probe",
+            "scripts/check-probe.sh",
+            "\"$PORT_BLOCKERS_SCAN\" --check\n",
+            &reg,
+        );
+        knobs.remove("GATE_SDK_KNOB_PORT_BLOCKERS_SCAN");
+        assert!(!seeing.undecidable);
+        assert_eq!(seeing.rows.len(), 1);
+        assert_eq!(seeing.rows[0].program, "ruby");
+        assert!(seeing.rows[0].evidence.ends_with("($PORT_BLOCKERS_SCAN)"));
+    }
+
+    // spec: gate-sdk/SPEC.md §port-blockers — the kit-library call set is the default arm's own
+    // filter inverted: a name a kit library defines is discarded as a requirement and is exactly
+    // what the `--group` key is made of, so no roster of corpus primitives is maintained anywhere.
+    #[test]
+    fn a_kit_library_call_leaves_the_rows_and_joins_the_key() {
+        let mut reg = bare_registry();
+        reg.kit_funcs.insert("gate_find".to_string());
+        let m = scan_rows(
+            "check-probe",
+            "scripts/check-probe.sh",
+            "gate_find . '*.sh'\nshellcheck x\n",
+            &reg,
+        );
+        assert_eq!(m.libcalls.iter().cloned().collect::<Vec<_>>(), vec!["gate_find"]);
+        assert_eq!(
+            m.rows.iter().map(|r| r.program.as_str()).collect::<Vec<_>>(),
+            vec!["shellcheck"]
+        );
+    }
+
     // spec: gate-sdk/SPEC.md §port-blockers — keyword and builtin status is asked of the
     // interpreter, one batched query per run, so the classification is a property of bash.
     #[test]

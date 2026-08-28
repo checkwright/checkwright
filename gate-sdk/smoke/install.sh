@@ -126,9 +126,9 @@ grep -q 'unused_var' <<<"$out" || { echo "smoke(hook): red hook output not verba
 git reset -q -- scripts/smoke-hook-probe.sh
 rm scripts/smoke-hook-probe.sh
 
-# spec: gate-sdk/SPEC.md §port-blockers — the tokenizer rules, exercised behaviourally because
-# the tool is a bin/ tool and owed no fixture pair: a scan that truncates at a here-string, or
-# steals a case-pattern close inside a substitution, reports the trailing requirement as absent
+# spec: gate-sdk/SPEC.md §port-blockers — the tokenizer rules, exercised behaviourally because the
+# arm owes no fixture pair and no in-crate test reaches the front-end path: a scan that truncates at
+# a here-string, or steals a case-pattern close inside a substitution, loses the trailing requirement
 pb="$(mktemp -d)"
 printf '%s\n' 'check-smoke-tokenizer' > "$pb/gates.list"
 cat > "$pb/check-smoke-tokenizer.sh" <<'EOF'
@@ -143,7 +143,10 @@ read -r w <<<"$v"
 for f in ./*.sh; do pb_tail_prog "$f" "$w"; done
 fail_closed 0 SMOKE-TOKENIZER probe
 EOF
-pb_run() { GATE_SDK_GATES_DIR="$pb" bash "$SDK/bin/port-blockers.sh" "$@"; }
+# spec: gate-sdk/SPEC.md §The non-gate arm — the arm is reached through the one front-end that
+# resolves a bridged arm's environment; --gates-dir is what scopes the arm's own declared-knob
+# union, so the invocation asserted here is the one a caller actually makes
+pb_run() { GATE_SDK_GATES_DIR="$pb" bash "$SDK/bin/run-gates.sh" --emit port-blockers --gates-dir "$pb" "$@"; }
 
 out="$(pb_run)" || { echo "smoke(port-blockers): default arm exited non-zero" >&2; exit 1; }
 for prog in pb_bravo_prog pb_charlie_prog pb_delta_prog pb_tail_prog; do
@@ -167,11 +170,31 @@ grep -Eq "check-smoke-tokenizer +lines=$pb_decl_lines +c2=" <<<"$out" || {
 if pb_run --nope >/dev/null 2>&1; then
     echo "smoke(port-blockers): an unrecognized argument was not refused" >&2; exit 1
 fi
-pb_run --help >/dev/null || { echo "smoke(port-blockers): --help did not exit 0" >&2; exit 1; }
+# spec: gate-sdk/SPEC.md §The bin/-tool contract — help before arity: -h/--help as the *first*
+# argument prints usage at exit 0 whatever follows it, which the arm adopts rather than repairing.
+# First is load-bearing: a --gates-dir ahead of it is an unrecognized argument, not a help request.
+pb_help() { bash "$SDK/bin/run-gates.sh" --emit port-blockers "$@"; }
+pb_help --help >/dev/null || { echo "smoke(port-blockers): --help did not exit 0" >&2; exit 1; }
+pb_help --help --group >/dev/null || {
+    echo "smoke(port-blockers): --help stopped winning over what follows it" >&2; exit 1; }
+if pb_help --gates-dir "$pb" --help >/dev/null 2>&1; then
+    echo "smoke(port-blockers): help was honoured from a position the contract does not give it" >&2
+    exit 1
+fi
+# spec: gate-sdk/SPEC.md §port-blockers — the missing-registry refusal, structurally absent from
+# every in-crate test: a registry arm handed a directory with no gates.list refuses rather than
+# reporting an empty battery
+mkdir -p "$pb/empty"
+if err="$(GATE_SDK_GATES_DIR="$pb" bash "$SDK/bin/run-gates.sh" --emit port-blockers \
+    --gates-dir "$pb/empty" 2>&1 >/dev/null)"; then
+    echo "smoke(port-blockers): a missing registry did not refuse" >&2; exit 1
+fi
+grep -q 'registry not found' <<<"$err" || {
+    echo "smoke(port-blockers): missing-registry refusal did not name its cause: $err" >&2; exit 1; }
 rm -rf "$pb"
 
 # spec: gate-sdk/SPEC.md §port-blockers — the tree arm's corpus rules and its three dispositions,
-# exercised behaviourally on the bin/-tool contract's terms; asserted as *deltas* against a
+# exercised behaviourally on the terms §The bin/-tool contract states; asserted as *deltas* against a
 # baseline run rather than as absolute counts, because the surrounding consumer tree's own shell
 # corpus is not this assertion's subject and pinning it would break on every unrelated addition
 # spec: gate-sdk/SPEC.md §port-blockers — the four counts are lifted by matching the trailer's whole
@@ -179,7 +202,8 @@ rm -rf "$pb"
 pbt_counts() {
     tail -1 | sed -nE 's/^port-blockers --tree: ([0-9]+) file\(s\) scanned, ([0-9]+) declared no-port, ([0-9]+) temporarily held, ([0-9]+) owed$/\1 \2 \3 \4/p'
 }
-pbt_before="$(bash "$SDK/bin/port-blockers.sh" --tree | pbt_counts)"
+pbt_tree() { bash "$SDK/bin/run-gates.sh" --emit port-blockers --tree; }
+pbt_before="$(pbt_tree | pbt_counts)"
 [[ -n "$pbt_before" ]] || { echo "smoke(port-blockers): --tree trailer did not match its specified grammar" >&2; exit 1; }
 read -r pbt_n0 pbt_p0 pbt_h0 pbt_o0 <<<"$pbt_before"
 mkdir -p pbtree/gate-tests
@@ -219,7 +243,7 @@ EOF
 cp pbtree/permanent.sh pbtree/excluded.test.sh
 cp pbtree/permanent.sh pbtree/gate-tests/fixture.sh
 git add pbtree
-pbt="$(bash "$SDK/bin/port-blockers.sh" --tree)"
+pbt="$(pbt_tree)"
 read -r pbt_n1 pbt_p1 pbt_h1 pbt_o1 <<<"$(pbt_counts <<<"$pbt")"
 
 for row in "pbtree/plain.sh	owed" "pbtree/permanent.sh	no-port" \
@@ -247,3 +271,25 @@ pbt_held_lines=$(($(wc -l < pbtree/held.sh)))
 grep -q "^pbtree/held.sh	port-until:check-smoke-blocker	lines=$pbt_held_lines$" <<<"$pbt" || {
     echo "smoke(port-blockers): --tree row lost lines=$pbt_held_lines: $pbt" >&2; exit 1; }
 git rm -rqf pbtree
+
+# spec: gate-sdk/SPEC.md §port-blockers — the non-repository refusal, the one place this arm
+# diverges from the shared corpus rule it is built on: that rule degrades to an empty corpus, and a
+# silently empty one would print the completion predicate where the arm must refuse
+# spec: gate-sdk/SPEC.md §run-gates — reached by invoking the binary rather than the front-end, and
+# that is the finding rather than a shortcut: run-gates.sh refuses a non-repository before it execs,
+# so the front-end cannot reach this branch and a leg run through it would pass on the wrong refusal
+pbt_bin="$( source "$SDK/lib/gate.sh" >/dev/null 2>&1; gate_native_bin )"
+case "$pbt_bin" in /*) ;; *) pbt_bin="$PWD/$pbt_bin" ;; esac
+nogit="$(mktemp -d)"
+if out="$(cd "$nogit" && "$pbt_bin" --emit-port-blockers --tree 2>&1)"; then
+    echo "smoke(port-blockers): --tree did not refuse outside a repository: $out" >&2
+    rm -rf "$nogit"; exit 1
+fi
+grep -q 'not a git repository' <<<"$out" || {
+    echo "smoke(port-blockers): non-repository refusal did not name its cause: $out" >&2
+    rm -rf "$nogit"; exit 1; }
+if grep -q ' owed' <<<"$out"; then
+    echo "smoke(port-blockers): --tree printed a count over an empty corpus: $out" >&2
+    rm -rf "$nogit"; exit 1
+fi
+rm -rf "$nogit"
