@@ -143,16 +143,16 @@
   sitting behind one specification section, ported behind the one amendment that section needs.
   Size-ordered and kit-ordered composers stay refused; a contract-cohort composer is derivable from
   the 2026-08-27 corpus and neither of those two is.
-  **The fork that ruling was left open on COLLAPSED, on a ground measured false.** It held the
-  larger cohesive cut contributor-side because its kit ships in no profile; drift-kit DOES ship, by
-  the derived `full` profile, and the resolver chain proving it is in the survey record. So
-  largest-and-cleanest and adopter-facing select the SAME cut and no judgment was left to make.
+  **The fork that ruling was left open on COLLAPSED, on a ground measured false:** it held the
+  larger cut contributor-side because its kit ships in no profile, but drift-kit DOES ship, by the
+  derived `full` profile (resolver chain: the survey record), so both selectors pick the same cut.
   **FIRST CUT UNDER THE RULE, next rather than now:** drift-kit, 18 adopter-facing files behind
   drift-kit/SPEC.md §The KPI plugin contract, its driver moving with its plugins because the
-  discovery contract is what the port amends. Held only on how those files count toward the
-  predicate — `port-completion-predicate-contributor-side-accounting`'s question.
+  discovery contract is what the port amends. The hold RELEASED 2026-08-28 — the operator ruled
+  the predicate literal (TRAJECTORY.md §The closed rulings), so the cut moves the owed column.
   **Prints neither count; run both arms** — four sweeps running found a digit stale here.
   ruled: native-gate-port-remaining-corpus lead 2026-08-28 own-authority
+  ruled: native-gate-port-remaining-corpus operator 2026-08-28 lead-relay
   **Cost while deferred:** large and known — the **owed** remainder (the trailer's own arm, never
   the unported count) plus the runners and the install-lifecycle layer; since the 2026-08-14
   born-native default (TRAJECTORY.md §The closed rulings) a gate landed meanwhile no longer adds
@@ -8681,35 +8681,6 @@
   Surfaced 2026-08-28 by the close of `installer-trial-lifecycle-repair`, filed to the gap inbox
   there; promoted 2026-08-28 by scope at this boundary's drain.
 
-- **port-completion-predicate-contributor-side-accounting** [design-pending] — the port's completion
-  predicate and its contributor-side carve-out disagree, and no surface reconciles them.
-  **The predicate.** TRAJECTORY.md §The closed rulings makes `port-blockers.sh --tree`'s owed count
-  reaching zero the completion sentence itself, and gate-sdk/SPEC.md §port-blockers explicitly
-  refuses minting any exclusion knob against that column.
-  **The carve-out.** TRAJECTORY.md §PRIORITY DIRECTIVE says contributor-side tooling and the test
-  harness ship to no adopter and port opportunistically, never as a gate on the claim.
-  **The contradiction is mechanical, not rhetorical.** No `# no-port:` cause class covers
-  "contributor-side", so under the oracle every one of those files must be ported or the owed count
-  never reaches zero — while the ruling says they are not on the claim. Both readings are
-  defensible from the governed surfaces and nothing says which is meant.
-  **The disputed set, measured 2026-08-28, and SMALLER than an earlier sweep reported:** 33 files,
-  about 4,436 lines — 21 kit `smoke/` members, 8 test runners, 4 walkthrough drivers. The earlier
-  figure of 46 counted drift-kit's 13 KPI plugins as contributor-side; they are not, because
-  drift-kit ships in the derived `full` profile.
-  **Three options, none ruled:** (i) the predicate is literal and the carve-out sets priority only;
-  (ii) mint a contributor-side cause class so the carve-out becomes decidable in the column;
-  (iii) narrow the predicate's corpus.
-  **Why `[design-pending]`, and why it is OPERATOR-CLASS:** it interprets a stated objective's own
-  completion predicate, which no stage and no lead may re-scope. This entry exists so the operator's
-  answer has somewhere to land that outlives the sessions that raised it.
-  **DISTINCT from `native-gate-port-remaining-corpus`**, whose subject is the remaining corpus and
-  the composer that cuts it — that composer is ruled and this question is not what blocks it — and
-  from `port-oracle-instrument-self-disposition`, one named file's own port.
-  **Cost while deferred:** bounded but compounding — every cut lands against a completion number
-  nobody can count, so "how much is left" has two defensible answers thirty-three files apart, and
-  the first cut under the new composer is held on exactly this.
-  Filed 2026-08-28 by scope, escalated to the operator through the lead at this boundary.
-
 
 ## Icebox
 
@@ -8771,6 +8742,8 @@
 - **stage-cursor-rerun-stamp-gap** [design-pending] — A skipped re-run stamp points the cursor back.
 
 ## Done
+
+- port-completion-predicate-contributor-side-accounting
 
 ## Lessons Learned
 

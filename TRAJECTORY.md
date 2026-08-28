@@ -272,8 +272,13 @@ outside it either carries a
 stated `no-port` cause or is deleted. The adopter-facing
 residue is the bootstrap alone: the generated pre-commit hook shim needs no PowerShell twin, because
 git runs hooks through the `sh` Git for Windows ships, so a two-line shim invoking the binary is one
-implementation on every platform. Contributor-side tooling and the test harness ship to no adopter
-and port opportunistically, never as a gate on the claim.
+implementation on every platform. Contributor-side tooling and the test harness port behind
+adopter-facing work, sequenced and never blocking a cut — a priority statement that subtracts
+nothing from the owed column (the 2026-08-28 ruling below). Kit `smoke/` suites and kit-resident
+test runners ride the installer payload with their kit roots and land committed in adopter trees,
+so they are kit mechanism on the claim like any owed file; the residue genuinely shipping to no
+adopter — `demo/`, `installer/consumer-smoke/`, the declared `scripts/` class — takes a per-file
+disposition when reached.
 
 **That predicate has an oracle, and it is not the one that measures the battery.**
 `bash gate-sdk/bin/port-blockers.sh --tree` reports the port disposition of every tracked non-test
@@ -322,6 +327,28 @@ not testable under the earlier routing at all until the crate compiles for a Win
 so that routing sequenced a one-line repair behind a design-pending entry that could not
 exercise it. Where the two blockers now live is the queue's to say; what this records is that
 an operator moved them, because the ruling it amends was operator-class too.
+
+**The port's completion predicate is literal — `--tree`'s owed count reaching zero, over the whole
+derived corpus, with no contributor-side subtraction — ruled 2026-08-28 by the operator**, directly
+to the lead session, answering the question scope escalated as
+`port-completion-predicate-contributor-side-accounting`; the operator ruled on a consulted
+session's recommendation whose citations the lead relayed unverified, and reversing this stays
+operator-class under this file's preamble — no later session reverses it alone. The carve-out
+sentence in the 2026-08-23 ruling above never subtracted from the owed column: it scopes the
+**adopter-facing** residue claim and sets sequencing, and each file it covers, when reached, ports,
+leaves the tree with the surface it drives, or takes a per-file declared disposition under the
+case-by-case residue rule below. Two alternatives were refused with the ruling. **A
+contributor-side `# no-port:` class**: the field declares permanence while the carve-out's own text
+says those files do port, so the declaration would negate the ruling it cites; its class ground —
+ships to no adopter — was measured false for 31 of the disputed 33 files (kit `smoke/` suites and
+kit-resident runners ride the payload; only `demo/run-demo.sh` and
+`installer/consumer-smoke/run-smoke.sh` do not), and the 2026-08-24 `scripts/` declarations already
+deliberately decline that ground. No mechanism is missing — a cause is free text — only a standing
+ruling that would make one true, and none does. **Narrowing the predicate's corpus**: its
+defensible content is already the corpus rule (the `*.test.sh` suffix and the prune set,
+gate-sdk/SPEC.md §port-blockers), and widening the exclusion would let *port complete* be claimed
+while a full-profile adopter's vendored tree still runs bash — a false claim at the front door, the
+cost §What the objectives are not names.
 
 ## PRIORITY DIRECTIVE — the port track's sequence
 
