@@ -502,10 +502,10 @@
 - **baseline-move-stales-evidence-line** [design-pending] — promoting a task and moving a suite's
   baseline is not enough to close: the evidence line already recorded against the *old* baseline is
   stale, and nothing says so until the entry gate refuses a second time for a different reason.
-  **The second face of `close-entry-baseline-bootstrap-deadlock`**, which owns the first (close is
-  the only stage that may file the blocking slug, and cannot enter without it). That entry's
-  candidate fixes all address the first face and leave this one standing, which is why it is filed
-  apart rather than folded in.
+  **The second face of `close-entry-baseline-bootstrap-deadlock`**, which owned the first (close is
+  the only stage that may file the blocking slug, and cannot enter without it) and has since been
+  ruled and retired. Its fix addressed the first face and left this one standing, which is why this
+  was filed apart rather than folded in, and is why the retirement does not carry it away.
   **The mechanism.** A recorded verdict is *relative* to whichever baseline was live when the suite
   ran, so moving a suite from `pass` to a slug-carrying `fail` invalidates every line computed
   before the move. `check-evidence-manifest`'s close-entry assertion then still refuses on "no clean
@@ -1623,7 +1623,7 @@
   longer one.** The composition it stated had since been re-ruled, so the sentence
   contradicted the ruling it was meant to carry; the fix is to name the owner rather
   than to re-state a ruling this file does not hold. The rung's own sequencing is
-  unchanged, and it now depends on `prose-profile` shipping.
+  unchanged, and the `prose-profile` dependency it named landed 2026-08-09.
   **Sequencing is the load-bearing part.** The preview runs *before*
   `benchmark-ab-experiment`, so pilot findings shape that experiment's task
   classes and metrics rather than being retrofitted to them; per-gate
@@ -2918,8 +2918,8 @@
   second is the sharper one — a "keeps" list is the author's claim about what a change does not
   touch, so align reading it as a boundary inherits the exact blind spot that produced the miss.
   **Why `[design-pending]`:** a mechanical fan-out check over an amendment's roster is a real
-  candidate and is already filed as `amendment-update-target-coverage`, so the open question is
-  the split — how much of this is a checklist edit to the align template, how much is a gate, and
+  candidate and was filed and merged as `amendment-update-target-coverage`, now retired, so the open
+  question is the split — how much is a checklist edit to align's template, how much a gate, and
   whether a "keeps" list should keep its standing as an input at all.
   **A second, separate failure class, recorded beside this one rather than folded into it.** The
   validate session — also Sonnet — ended its turn on work still running in order to wait for it,
@@ -5577,7 +5577,7 @@
   works, commits, then stamps, and with the per-stage surface roster refused there, the exit mark
   this entry would mint is the only declared boundary left. That case closes as a composition of
   the two entries, never as more work inside the sibling.
-  **Distinct from `delegation-provenance-floor`**, which is a
+  **Distinct from `delegation-provenance-floor`**, retired, which was a
   parent unable to attest a *child's* return; this is a session's own completion unobservable in
   the tree. Both recurrences declined at the drain on those grounds.
   **Cost while deferred:** silent, and it lands hardest when recovery is most expensive — a lost
