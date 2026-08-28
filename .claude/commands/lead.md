@@ -45,6 +45,25 @@ the template §Economics "Tier each batch to its work class" rule now names:
   boundary. That is the datum the watch wants — a stage catching a premise error in
   the contract it is auditing and repairing it without escalating is the behaviour
   the tier was ruled on. The watch stays live and the ruling is untouched.
+  **Measured again 2026-08-28 at `port-oracle-and-composer-ruling`: `cr=11255403`,
+  and this one ROSE** — 8th of the last ten sonnet aligns ascending, above both
+  their median and the all-time median across 52. The previous datum's "the draw
+  is still not climbing" does not hold at this point and is not restated. Read it
+  work-side rather than tier-side, which is the reading `align-context-draw-growth`
+  already owns: the two higher points in the last ten are also the two heaviest
+  iterations, and this align audited a large amendment against a tree that had
+  moved under it. The revert signal did not fire — the stamp file shows one
+  validate entry and no re-entry, so no build round-trip. The stage found **seven**
+  real amendment defects and resolved all seven inside the envelope, escalating
+  none; the lead read the whole diff against the one question that matters,
+  whether any edit moved asserted behavior, and none did. Two are the datum rather
+  than volume: one where the lead flagged a vacated clause and align confirmed it
+  *and* found a second instance of the same shape nobody had flagged, and one that
+  retired a roster item because the cited section binds its oracle through a knob
+  and never names the path — then located the real one-sentence hit elsewhere.
+  That second is the verificational judgment the tier was ruled on, and it is the
+  finding most likely to have been waved through. **The tier holds for a second
+  full iteration; the watch stays live and now has a rising draw to watch.**
 
 scope, `spec`, and close stay on Opus, their generative and verificational
 judgment being what justifies the tier. Re-judge every tier when the harness
