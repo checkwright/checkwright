@@ -1620,7 +1620,7 @@ topology exists). `align-only` tier.
 `canon-kit/checks/check-surface-duplication.gate` with its rule in
 `native/src/gates/surface_duplication.rs`. It is one of the two members that
 ported on the directive's scope rather than the registry oracle's: this tree
-registers it in no `gates.list`, so `port-blockers.sh`'s two registry arms never
+registers it in no `gates.list`, so the port arm's two registry arms never
 counted it and the port moved no number of theirs
 (gate-sdk/SPEC.md §The port-candidate criteria, criterion 7). Criteria 1
 and 3 therefore both fail on their own terms rather than by a proxy, and what

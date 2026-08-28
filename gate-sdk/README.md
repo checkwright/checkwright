@@ -33,21 +33,6 @@ honest:
   substrate: resolves the crate from `GATE_SDK_NATIVE_CRATE`, passes trailing
   arguments to cargo (so a per-target build reuses it), and returns cargo's own
   exit code. Every reader of that command cites this script rather than copying it.
-- `bin/port-blockers.sh` — the port report, in three exclusive arms over two
-  corpora. The default arm gives, per registered gate, the external programs its
-  rule requires beyond `GATE_SDK_PROGRAM_FLOOR` — tokenized out of a shell rule, or
-  read off the binary's `--needs` for a member that has ported; `--group`
-  partitions the still-shell
-  members by derived corpus derivation, largest group first, with the
-  mechanically derivable port criteria beside each member. Those two walk the gate
-  registry and so answer for the **battery** alone, and each counts what it could
-  not decide. `--tree` walks the **tracked shell tree** instead and gives each
-  non-test script its port disposition — `owed`, `no-port` or `port-until:<slug>` —
-  with a trailer whose owed count is the project's completion predicate; it has no
-  undecidable class, an undeclared file being `owed`. All three derive from the tree
-  rather than from a list anywhere. Advisory — never a `gates.list` member; nothing
-  parses any arm's rows, and the one machine-read line is `--tree`'s trailer, which
-  a consumer's measured-claim emitter may read.
 - `checks/` — the meta-gates that hold the family to its own standard:
   ShellCheck self-lint, the output contract, the fail-closed contract, fixture
   coverage, SPEC↔code assertion coupling, exemption-list hygiene, and manifest
@@ -89,6 +74,7 @@ mkdir -p .workflow docs
 bash gate-sdk/bin/gen-pre-commit.sh --write                       # generate the hook
 bash gate-sdk/bin/run-gates.sh --emit graph > scripts/CHECK-GRAPH.html   # the coupling graph
 bash gate-sdk/bin/run-gates.sh --emit enforcement-map > docs/enforcement.md # the enforcement map (regenerate on any class-registry change)
+bash gate-sdk/bin/run-gates.sh --emit port-blockers --tree        # the port report over the tracked shell tree
 bash gate-sdk/bin/install-hooks.sh                                # opt in this clone
 
 bash gate-sdk/bin/run-gates.sh                                    # the full battery

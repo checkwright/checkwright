@@ -12,31 +12,6 @@
 
 ## New Features
 
-- **port-oracle-instrument-self-disposition** [spec: SPEC-port-blockers-arm.md] — the tool that
-  measures the port's completion predicate is still shell; its disposition is ruled and declared,
-  and its PORT is what remains.
-  **The design is `gate-sdk/SPEC-port-blockers-arm.md` and is not restated here** — eleven deltas,
-  their work classes, the causal completeness and the red conditions live there. What this entry
-  keeps is the disposition history the amendment does not carry.
-  **The disposition increment LANDED 2026-08-24** in the port-remainder iteration, merged into
-  gate-sdk/SPEC.md §port-blockers, §The non-gate arm, §gen-pre-commit and §The
-  `# graph:` manifest. `gate-sdk/bin/port-blockers.sh` declares `# port-until:` against THIS slug;
-  `scripts/measured-claims.sh` — the value of `CANON_KIT_MEASURED_CLAIMS_CMD`, in a directory
-  `pack-installer.sh` never packs — declares `# no-port:` on the provenance seam instead, which is
-  where the two instrument files parted.
-  **THE DONE MOVE IS UNBLOCKED BY THE WORK ITSELF, which is why it demoted before.** The entry
-  demoted rather than moving to Done because a Done move would have stranded that declaration at a
-  dead slug and red `check-gate-exemption-tasks`; the deletion removes the declaration, so the
-  blocker is discharged in the same commit that earns the move.
-  **DISTINCT from `native-gate-port-remaining-corpus`**, whose deliverable is the remaining corpus
-  and its demotion rule; this is one named file with a route already ruled. It fits the 2026-08-28
-  contract composer's shape without being a cut of that entry, and does not displace the drift-kit
-  cut that entry names first.
-  Filed 2026-08-24 by build to the gap inbox, promoted at
-  `shell-gate-tail-port-and-completion-oracle`'s close, ruled at spec in `SPEC-owed-column.md`,
-  demoted 2026-08-24 by build once the disposition increment had landed, and promoted to
-  spec-ready 2026-08-28 by spec at this boundary.
-
 ## Technical Debt
 
 ## Deferred
@@ -8744,6 +8719,7 @@
 ## Done
 
 - port-completion-predicate-contributor-side-accounting
+- port-oracle-instrument-self-disposition
 
 ## Lessons Learned
 

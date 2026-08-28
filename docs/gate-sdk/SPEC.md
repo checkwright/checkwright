@@ -1037,7 +1037,7 @@ more words — a self-declaration whose would-be reader could not verify what it
 read. A `# needs:` line declaring the member's external programs (§The
 port-candidate criteria, criterion 7) earns the identical refusal on the identical
 ground, and is recorded here so a later author does not re-propose it as the cheap
-answer to `port-blockers.sh`'s undecidable count. Both sets live in the crate's
+answer to §port-blockers' undecidable count. Both sets live in the crate's
 registry instead, where a unit test runs the member and compares the declaration
 against what it actually did. This is
 also why §check-gate-substrate-parity assertion D's manifest-class partition is
@@ -2458,8 +2458,8 @@ that answers each is the one whose corpus matches its question.
    the cohort that caused it.
 6. **Its corpus derivation is self-contained**, unless the duplication the port
    creates is machine-held. **The roster for this criterion is derived too, and
-   by the same tool criterion 7 uses**: `bash gate-sdk/bin/port-blockers.sh
-   --group` partitions the still-shell members by derived corpus derivation
+   by the same tool criterion 7 uses**: `bash gate-sdk/bin/run-gates.sh --emit
+   port-blockers --group` partitions the still-shell members by derived corpus derivation
    (§port-blockers), so *which members share a derivation* is read off a run
    rather than answered by hand, per member, at cohort-cut time. What the arm
    emits is a decidable partition plus a counted remainder; the *unless* clause
@@ -2681,7 +2681,7 @@ that answers each is the one whose corpus matches its question.
    ground is stated in its own section, never when the report shrugs.
 
    **The roster is derived and lives in no document, including this one** —
-   `bash gate-sdk/bin/port-blockers.sh` reports it against the tree at the moment
+   `bash gate-sdk/bin/run-gates.sh --emit port-blockers` reports it against the tree at the moment
    a session sequences a cohort. That is a correctness requirement, not a
    preference for freshness. A gate's requirement need not be spelled in its
    source at all: `check-docs-render-fidelity`'s is the first element of whichever
@@ -2986,7 +2986,7 @@ because that section is written in the same unit as the gate (§Consumer smoke's
 kit-landing checklist), and it has three readers rather than none: the reviewing
 session, which finds it where every other ruling for that gate already lives; the
 port-track selector, for which a class-(c) cause states a blocker and its owning
-entry that `bash gate-sdk/bin/port-blockers.sh` can derive but not attribute; and
+entry that `bash gate-sdk/bin/run-gates.sh --emit port-blockers` can derive but not attribute; and
 the session landing the missing substrate or the missing target, for which a
 class-(b) or class-(c) cause *is* the list of gates that become portable with it.
 **A held member's cause now has a machine-read companion and the two must agree**:
@@ -3092,7 +3092,7 @@ is criterion 7's own case, above.
 **The next cohort is the largest set of criteria-clearing gates sharing one
 corpus derivation** — an ordering rule, not a bound: the 2026-08-09 ruling ports
 every gate. **The instrument that makes the rule applicable is
-`bash gate-sdk/bin/port-blockers.sh --group`** (§port-blockers): it partitions
+`bash gate-sdk/bin/run-gates.sh --emit port-blockers --group`** (§port-blockers): it partitions
 the still-shell members by derived corpus derivation, largest group first, with
 the mechanically derivable criterion columns beside each member — so "largest",
 "criteria-clearing" and "sharing one corpus derivation" are each read off a run
@@ -3116,7 +3116,7 @@ instance and its smallest, a pair of members in separate kits behind one
 wire-format change, which is the shape the override is *for* rather than a weak
 case of it;
 the budget arm is reachable **only** when a `bash
-gate-sdk/bin/port-blockers.sh --group` run reports no takeable group — so its
+gate-sdk/bin/run-gates.sh --emit port-blockers --group` run reports no takeable group — so its
 precondition is a verdict from the instrument this section already names for the
 size arm, never a session's reading of the tree.
 **The size arm is now permanently exhausted rather than exhausted at a cut, and
@@ -3982,7 +3982,7 @@ findings and no member roster — membership is derivable from the tree and the
 count from `scripts/measured-claims.sh`'s `ported-gate-members`.
 
 **The size arm is permanently exhausted, and that is a change to the rule rather
-than a reading of one cut.** `bash gate-sdk/bin/port-blockers.sh --group`
+than a reading of one cut.** `bash gate-sdk/bin/run-gates.sh --emit port-blockers --group`
 partitions the owed members into groups of exactly one, 0 undecidable — no group
 has a second member to amortize a walk across — and since the born-native default
 no new gate can arrive to form one. The budget arm's stated precondition, a
@@ -5566,7 +5566,7 @@ measured on the **gate file**, so a gate whose work is behind a spawn reads as
 *unsized* rather than as large — `check-close-surfaces` sourced only
 `lib/gate.sh` while the tool it spawned sourced `lib/stages.sh`. **A spawned
 tool is invisible to every static sizing signal the selector has,
-`port-blockers.sh --group`'s line counts included.** Stated once here rather
+`bash gate-sdk/bin/run-gates.sh --emit port-blockers --group`'s line counts included.** Stated once here rather
 than rediscovered per member. **The class is now exhausted**: the one remaining
 unrecorded instance was `check-graph`, whose spawned generator is sized in its
 own section (§check-graph) at the 2026-08-17 close that drained the bullet; the

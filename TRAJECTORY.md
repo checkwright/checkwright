@@ -281,7 +281,7 @@ adopter — `demo/`, `installer/consumer-smoke/`, the declared `scripts/` class 
 disposition when reached.
 
 **That predicate has an oracle, and it is not the one that measures the battery.**
-`bash gate-sdk/bin/port-blockers.sh --tree` reports the port disposition of every tracked non-test
+`bash gate-sdk/bin/run-gates.sh --emit port-blockers --tree` reports the port disposition of every tracked non-test
 `.sh`, and its trailer's owed count reaching zero *is* the sentence above: at zero, every remaining
 script either carries a stated cause or is gone. The registry arms beside it walk `gates.list` and
 answer for the gate battery alone — so a session reading zero owed **there** is reading a finished
@@ -407,7 +407,7 @@ conditional install logic not yet behind the invoke. After the port: `companion-
 
 **A sequence remainder of one is not a finished port, and reading it as one is the misreading
 this paragraph exists to stop — operator-ruled 2026-08-25.** The completion predicate is the one
-§The closed rulings names, `port-blockers.sh --tree`'s owed count reaching zero, and it stands
+§The closed rulings names, `bash gate-sdk/bin/run-gates.sh --emit port-blockers --tree`'s owed count reaching zero, and it stands
 over the whole tracked shell tree rather than over this sequence. Both readings are correct and
 neither absorbs the other: the sequence is what is ordered next, the owed count is what says
 *done*. No figure is carried here, because a count restated is a count that ages — run the

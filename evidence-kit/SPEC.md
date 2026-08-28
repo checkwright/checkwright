@@ -795,7 +795,7 @@ reach as init. The unit test carries all four plus the suffix bound.
 `native/src/gates/producer_liveness.rs` and the two library readers it shares
 with `bin/run-validate.sh` in `native/src/evidence.rs`. Like
 §check-surface-duplication it ported on the directive's scope rather than the
-registry oracle's — `port-blockers.sh`'s two registry arms walk `gates.list` and
+registry oracle's — the port arm's two registry arms walk `gates.list` and
 this member is in none — so the port moved no number of theirs, and the fixture
 pair plus this kit's smoke is what
 stands in for the dispatch proof criteria 1 and 3 would have bought.

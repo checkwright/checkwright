@@ -73,8 +73,9 @@ told to load but cannot find. Knobs:
   **Its value is also a port blocker, and repointing it moves one.** The first
   element of whatever this knob holds is an external program
   `check-docs-render-fidelity` requires, which is what gate-sdk's criterion 7
-  screens for and what `gate-sdk/bin/port-blockers.sh` derives by resolving this
-  knob (gate-sdk/SPEC.md §port-blockers). The dependency is spelled nowhere in the
+  screens for and what `bash gate-sdk/bin/run-gates.sh --emit port-blockers` derives
+  by resolving this knob (gate-sdk/SPEC.md §port-blockers). The dependency is
+  spelled nowhere in the
   gate's own source, so it is recorded here, where the knob lives: a consumer who
   points this at a renderer their payload already carries removes that blocker,
   and one who points it at a heavier toolchain deepens it.
@@ -254,7 +255,7 @@ under those knobs and are not restated here.
 
 **Its requirement is knob-derived, and it is *two* knobs rather than one.**
 `--needs` declares `git` plus `?<TAB>SITE_KIT_RENDERER_BATCH` and
-`?<TAB>SITE_KIT_RENDERER`, and `port-blockers.sh` resolves the pair through the
+`?<TAB>SITE_KIT_RENDERER`, and the port arm resolves the pair through the
 same bridge the dispatcher uses. Naming only `SITE_KIT_RENDERER` — as this section
 did before the port — is wrong for a reason no zero-config run exposes: with the
 batch knob non-empty the gate never invokes the per-document one, so a consumer
