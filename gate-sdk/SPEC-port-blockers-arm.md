@@ -34,6 +34,29 @@ Delta 9 rewrites `gate-sdk/smoke/install.sh`, which is inside that question's
 disputed 33, but rewriting a file changes neither its disposition nor its
 membership in the set.
 
+**The seam, ruled.** Everything in deltas 1 through 10 is **kit mechanism**: an
+arm, a knob roster, a sentinel, a corpus rule, a tokenizer and a report format,
+none of which names a project's directories, vocabulary or work queue. The
+`# no-port:` cause and the `# port-until:` slug the arm reads stay **consumer
+content** by construction, exactly as the fields already rule. The one file that
+stays shell stays shell *because* of the seam: the measured-claim emitter is the
+value of a consumer knob, sits in a directory the payload assembler never packs,
+and carries this project's claim vocabulary — porting it would ship that
+vocabulary in every adopter's binary. No knob is minted for either payload and
+none for the builtin classification, which is a property of the interpreter
+rather than a consumer's to configure.
+
+**One coupling the port removes and may not replace, ruled rather than left to
+be met at build.** The consumer claim gate's `couples=` reaches this tool today
+through its kit-root shell glob, so an edit to the tool re-runs the gate whose
+value it feeds. After the port the implementation is crate source, which that
+field does not reach — and it must **not** be widened to reach it, because that
+descriptor is a canon-kit descriptor and naming this project's crate directory
+in a kit literal publishes this project's layout. The gap is recorded and left
+covered by the full-battery-before-every-commit rule, which is exactly the
+disposition §port-blockers already takes for the consumer-defined corpus its own
+uncovered set sits in.
+
 ## What changes
 
 ### (1) `--emit-port-blockers`, and the argv grammar the three arms become
