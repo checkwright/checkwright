@@ -329,11 +329,10 @@ exercise it. Where the two blockers now live is the queue's to say; what this re
 an operator moved them, because the ruling it amends was operator-class too.
 
 **The port's completion predicate is literal — `--tree`'s owed count reaching zero, over the whole
-derived corpus, with no contributor-side subtraction — ruled 2026-08-28 by the operator**, directly
-to the lead session, answering the question scope escalated as
+derived corpus, with no contributor-side subtraction — ruled 2026-08-28 by the operator**,
+answering the question scope escalated as
 `port-completion-predicate-contributor-side-accounting`; the operator ruled on a consulted
-session's recommendation whose citations the lead relayed unverified, and reversing this stays
-operator-class under this file's preamble — no later session reverses it alone. The carve-out
+session's recommendation whose citations the lead relayed unverified. The carve-out
 sentence in the 2026-08-23 ruling above never subtracted from the owed column: it scopes the
 **adopter-facing** residue claim and sets sequencing, and each file it covers, when reached, ports,
 leaves the tree with the surface it drives, or takes a per-file declared disposition under the
