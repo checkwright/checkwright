@@ -2705,12 +2705,13 @@
 
 - **ruling-record-condition-staleness-probe** [design-pending] — a ruling conditioned on an
   event nobody retires once the event fires.
-  `TRAJECTORY.md` carries rulings whose text is conditioned on a future event — "at
-  `<iteration>`'s close" is the surviving example, and "until the first binaries tag" was the
-  other until the prune deleted every ruling carrying it — and nothing retires one when its
-  condition is met. Today obsolescence rides the unit that discharges the ruling, whose own
-  entry names the rows it removes on landing; that holds only where an author remembered to
-  write the removal in, and nothing catches the ruling whose condition a unit met silently.
+  `TRAJECTORY.md` carries rulings whose text is conditioned on a future event — the 2026-08-26
+  Windows-leg ruling's "only once that leg has produced and exercised its artifact" is a live
+  example re-verified 2026-08-28, beside "After the port: `companion-toolkit-profile`" — and
+  nothing retires one when its condition is met. Today obsolescence rides the unit that
+  discharges the ruling, whose own entry names the rows it removes on landing; that holds only
+  where an author remembered to write the removal in, and nothing catches the ruling whose
+  condition a unit met silently.
   **The enforceable half is a probe, never a prune — and the ground for that has moved.** It
   rested on retirement being operator-class; the 2026-08-08 pruning directive
   (`trajectory-prune-on-completion`) authorizes the prune, so what keeps this entry to a probe is
@@ -3401,6 +3402,22 @@
   this is about a populated one whose entries carry no distinction between a measurement and an
   estimate. Adjacent to `dispatch-cited-evidence-unverified`, which covers what a dispatched
   sweep *cites*; this covers what a session captures about its own work.
+  recurrence: kfric-capture-unverified-assertion 2026-08-28
+  **SECOND INSTANCE, 2026-08-28, and it is a wrong MECHANISM rather than a wrong number.** A kfric
+  stamped at spec asserted that `check-stage-entry` assertion C's component dir is a directory
+  holding `LIFECYCLE_KIT_ROSTER_BASENAME`, so `installer/` and `native/` are not components; close's
+  remediation wrote that into `lifecycle-kit/SPEC.md` §check-stage-entry as a definition. It is
+  false against `native/src/gates/stage_entry.rs`: the roster is consulted as a predicate at exactly
+  one site, :185; the multi-file arm returns at :147 on `amend_dirs.len() >= 2` with no roster test;
+  and the single-amendment arm seeds `comps` with `dir(af)` unconditionally at :172. Corrected in
+  the same close. So the harm this entry's cost line predicts is now attested on a governed kit
+  SPEC, not only on a scratch log.
+  **That instance opens a SECOND deliverable axis, on the DRAIN rather than on capture.**
+  `drift-kit/templates/close-knowledge.md` tells close to remediate each entry as a doc-owner edit
+  and never to re-verify the entry's claim, while lifecycle-kit/SPEC.md §The committed gap inbox
+  makes exactly that re-verification mandatory for the other frictionless capture channel, on an
+  argument that transfers verbatim — capture is deliberately cheap, so nothing upstream established
+  the claim. Two channels, one property, one guard.
   **Deliverable, and the design question that makes it `[design-pending]`:** whether the
   affordance should carry a measured-vs-estimated distinction at all. The whole value of
   `bin/kfric.sh` is that stamping is cheaper than deferring, so a field that slows capture buys
@@ -7710,6 +7727,11 @@
   **DISTINCT from `boundary-wipe-preserve-basename-reach`**, whose subject is the matcher's *reach*
   — an unanchored `! -name` making a nested tree immortal. This one is which *lifetimes* the list
   must cover, and it is live whichever way that matcher is anchored.
+  recurrence: boundary-wipe-preserve-lifetime-scope 2026-08-28
+  **SECOND ATTESTATION, 2026-08-28, identical in shape and one iteration later.** The scope session
+  that ran this boundary's reset under a live dispatching lead watched `.tmp/lead-journal.md` go
+  into the wipe list again. Nothing about the mechanism changed between the two; the preserve list
+  still carries `session-role` alone.
   **Cost while deferred:** every boundary crossed while a lead session is live destroys that lead's
   resume journal, silently — `.tmp/` is gitignored, so nothing reds and the loss is discovered only
   when the lead next reads.
@@ -8600,6 +8622,78 @@
   contradicts.
   Filed to the gap inbox 2026-08-28 by build batch 1 off the docs alone; promoted the same day at
   close, once the keep-and-report mechanism was re-verified against `installer/lib/uninstall.sh`.
+
+- **icebox-standing-ineligibility-unrecordable** [design-pending] — the eviction worklist has no
+  slot for a standing not-eligible ruling, so an entry a ruling already removed from the running is
+  re-proposed at every close.
+  **The live instance, re-verified 2026-08-28 at this boundary.**
+  `threshold-recurrence-routing-residency` carries an explicit not-icebox-eligible paragraph with
+  grounds — the cost line prices the CARRY and never the eviction, and eviction would delete the
+  verbatim clause the 2026-08-17 operator ruling filed the entry to preserve — and
+  `run-gates.sh --emit queue-index --icebox-candidates` ranked it the sole eligible row again
+  today, the other ten rows all excluded.
+  **The mechanism has exactly three exclusion causes and no fourth.**
+  `native/src/emit/queue_index.rs`'s `ineligibility()` reads a roadmap tag on the lead line, a
+  dated `recurrence:` body line, and a body naming a live slug. Nothing anywhere reads a standing
+  ruling. The eligibility rule those three implement is queue-kit/SPEC.md §The icebox tier's.
+  **Why `[design-pending]`, a real and unruled fork:** a `not-icebox-eligible:` body declaration on
+  the entry — one line against `check-queue-entry-budget`'s cap, mechanically readable, and a fourth
+  cause of the same shape as the three — versus the emitter reading a prose marker already in the
+  body, which costs no line and re-opens the class of prose-predicate scanners this tree keeps
+  refusing. Neither is obviously right.
+  **DISTINCT from `deferred-cost-class-opener-vocabulary`**, which owns the cost axis
+  UNDER-selecting because most of the pool's cost fields open with an unrecognised token; this is
+  the opposite direction, an entry the filter correctly selects and a ruling has already removed
+  from the running. Distinct also from `icebox-eviction-line-budget-squeeze`, the one-liner's line
+  budget at the moment of writing an eviction, and from `close-eviction-refiles-without-checking`,
+  close re-filing a duplicate entry — both downstream of this row.
+  **Cost while deferred:** low and recurring — one re-read of a forty-nine-line entry at every
+  close, forever, plus the risk that a session in a hurry evicts against a ruling it did not read to
+  the bottom. queue-kit/SPEC.md §The queue-index arm rules both worklist filters deliberately
+  non-load-bearing, which bounds the harm to the review list rather than the disposition, and is why
+  this is filed rather than built.
+  Surfaced 2026-08-28 by the close of `installer-trial-lifecycle-repair`, which filed it to the gap
+  inbox; promoted 2026-08-28 by scope, whose own emitter re-run reproduced the sole-candidate row.
+
+- **wait-primitive-and-record-compose-to-false-completion** [design-pending] — the mandated in-turn
+  wait and the mandated launch-liveness record compose into a waiter that reports success while its
+  condition is still false.
+  **Attested 2026-08-28.** A session issued a backgrounded call whose body forked a
+  `nohup bash -c 'until <cond>; do sleep N; done'` and then wrote `pid=$!` into a `.run` record. The
+  harness notifies on the outer command's exit, which is immediate — the launcher having only
+  forked — so a completion arrived within a minute at exit zero while the loop ran on as an orphan.
+  The session read that as its condition, probed, found the condition false, then deleted the `.run`
+  record while its producer was alive, which the record rule forbids. The orphan was found and
+  killed.
+  **Both mandates sit in one file and neither carries the caveat.**
+  delegation-kit/templates/agent-execution.md mandates a backgrounded command wrapping
+  `until <cond>; do sleep N; done` and asserts the notification fires the moment the condition
+  holds — true only if the loop IS the top-level backgrounded command — and separately mandates a
+  `pid=<n> run=<key>` record at launch, which presupposes something forked. Its one composition
+  warning is the polarity trap and explicitly not this one. The resident copies under
+  `.claude/agents/` carry both mandates and neither caveat.
+  **The guard is worse than silent: the antipattern buys its own exemption.**
+  `guard_rule_background_no_record` in `guard-kit/lib/guard.sh` arms on the backgrounding, then
+  returns clean the moment `_guard_writes_run_record` matches a redirect into a scratch `*.run`
+  path. So writing the record — the one act that creates the orphan — exempts the call before any
+  further test, and no scan for `nohup`, `&`, `disown` or `setsid` exists in any guard surface.
+  **Why `[design-pending]`, three dispositions differing in kind:** state the composition in the
+  policy, cheapest and no mechanism; a guard rule reading a backgrounded body for a fork, mechanical
+  and text-shaped, whose text-shaped limits this family already attests; or drop the record for
+  waiters, since a waiter produces nothing a commit could corrupt.
+  **DISTINCT** from `waiter-loop-condition-predicate-gap` and
+  `wait-loop-exemption-blind-behind-a-script-name`, both about the loop's own condition or the
+  exemption's reach; from `backgrounded-shell-child-run-record-unenforced`, a producer with no
+  record at all, where here the record existed and was correct; and from
+  `subagent-liveness-log-unattributed-refusal`. **COUPLED to `wait-record-self-deadlock`**, the
+  opposite symptom — a waiter that cannot exit rather than one that exits early — whose first
+  candidate fix is this entry's third, so whichever lands first takes the other's remedy into
+  account.
+  **Cost while deferred:** low per call and unbounded in the tail — a session that composes the two
+  mandates gets a completion notification that lies, and the rule written to catch a recordless
+  background is silenced by the very record the other rule mandates.
+  Surfaced 2026-08-28 by the close of `installer-trial-lifecycle-repair`, filed to the gap inbox
+  there; promoted 2026-08-28 by scope at this boundary's drain.
 
 
 ## Icebox
