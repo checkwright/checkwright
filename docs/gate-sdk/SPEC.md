@@ -1703,39 +1703,73 @@ the consumer smoke's install path (installer/README.md §The consumer smoke).
 grows a configured input has to arrive as a new argv key rather than as a knob,
 or it re-breaks the half of the boundary the member exists to serve.
 
-**`bin/port-blockers.sh` is a ruled future member of that table, and recording the
-route is not taking the port.** The tool reads the gates dir, the kit roots, the
-prune set `GATE_PRUNE_DIRS` / `GATE_SDK_PRUNE_EXTRA_DIRS` resolves and
-`GATE_SDK_PROGRAM_FLOOR`, so the forced-family test above settles its family with
-nothing left to calibrate — a top-level flag would resolve platform defaults and
-ignore every one of those overrides. The route follows from a rule already on the
-books, which is why it is recordable ahead of the unit that takes it; until that
-unit lands, the tool declares `# port-until:` against the live entry that owes the
-port (§port-blockers).
+**`--emit-port-blockers` is a landed member of that table, and the route it took
+was recorded here before it was taken.** The port oracle reads the gates dir, the
+kit roots, the prune set `GATE_PRUNE_DIRS` / `GATE_SDK_PRUNE_EXTRA_DIRS` resolves,
+`GATE_SDK_PROGRAM_FLOOR` and the fixture-dirs root criterion 2's column reads
+through, so the forced-family test above settled its family with nothing left to
+calibrate — a top-level flag would have resolved platform defaults and ignored
+every one of those overrides. The arm's own argv is the three arms' spellings
+unchanged, plus a `--gates-dir` the rule itself consumes, so the distinguishing
+test bound zero times and nothing was deleted (§port-blockers).
 
-**And the flag spelling is refused until then.** This section rules that a member
-owes a named caller; the closed-roster rule that a key or a field is minted *with*
-its reader or not at all applies to a flag spelling identically, and a spelling
-written into a SPEC ahead of its implementation is a reservation. The porting unit
-mints it. **That unit's caller is already known, and it is named here as a
-constraint rather than as an interface:** a consumer's measured-claim emitter reads
-the `--tree` trailer today by spawning `bash` (§port-blockers) and will read the arm
-instead, so the port that deletes the shell tool **must** land the emitter's
-call-site change in the same commit or the consumer's claim oracle exits 2. The
-failure lands at an adopter's battery rather than in the crate, which is why the
-constraint is recorded where the route is rather than left to be discovered.
+**The flag spelling was refused until the porting unit minted it, and this is
+the record of that mint.** This section rules that a member owes a named caller;
+the closed-roster rule that a key or a field is minted *with* its reader or not
+at all applies to a flag spelling identically, and a spelling written into a SPEC
+ahead of its implementation is a reservation. The spelling is
+`--emit-port-blockers`, and it was not a third stretch of the word *emit*: all
+three of its modes render a roster, and the prefix carries the reachability,
+because `bin/run-gates.sh --emit <name>` composes the flag as `--emit-<name>` and
+a differently-spelled arm would have been reachable by no shipped caller at all.
+**That unit's caller was known ahead of it and recorded here as a constraint:** a
+consumer's measured-claim emitter reads the `--tree` trailer (§port-blockers) and
+had to move to the arm in the very commit that deleted the shell tool, or the
+consumer's claim oracle exits 2 — a failure landing at an adopter's battery
+rather than in the crate, which is why the constraint was recorded where the
+route was rather than left to be discovered.
 
-**Most of what that port needs is already in the crate**, which is the other half
-of why the route is recordable now. `registry.rs` owns the registry walk both
-registry arms run on; the prune resolution and the `--tree` corpus rule's own
-compiled face are shared crate mechanism too, and the latter is no stub built
-ahead of demand — §check-gate-exemption-tasks' tree arm has called it since that
-arm landed. What the port owes beyond them is narrower than a first read
-suggests: the header-block read, which exists today only inside the gate module
-that needed it first, so the choice is promoting it to a shared home or
-duplicating it rather than writing it fresh — and the three arms' trailers, which
-exist nowhere yet. Re-derive the helper's size and its home from the crate rather
-than from this paragraph; both are the port's to move.
+**The declared knob roster carries a union sentinel, and that is the read the
+recorded route did not account for.** The route's list of what the tool reads named
+**four reads and was one short**: beyond the structural knobs — those four, plus
+the fixture-dirs root criterion 2's column reads through — the tool resolves an
+*arbitrary* knob's default, one discovered at scan time from a command-position
+expansion or named by a `?` row of a compiled member's requirement declaration.
+A bridged arm receives only its declared knobs and the bridge refuses an
+undeclared read, so a fixed roster cannot answer. All three fallbacks are refused: reporting `?` for every expansion loses
+rows the tool resolves today, parsing kit config inside the crate is a second
+definition of the one resolver, and re-entering the shell library from the
+compiled arm is the thing the port exists to end. The mechanism is the union
+sentinel `check-reads-couples` already declares when its knob names are not known
+until run time, minted here as a second member of that class: it expands to the
+union of every knob every member of the **tree's** registry declares, scoped by
+the arm's own `--gates-dir` argv for the correctness requirement `--run`'s union
+is scoped for. The union is provably sufficient — a command-position expansion
+naming a knob its own member does not declare already fails the bridge's
+undeclared-knob refusal at that member's own dispatch — so a knob outside it is
+reported `?` with the same *default unresolvable* evidence, the fail-safe
+direction unchanged.
+
+**The dispatch union keys on the arm's *variant* rather than on the member, and
+the sentinel is what let a second member express a union without moving it.**
+`knobs` answers `Arm::Run` with the dispatch union and `Arm::Emit` with the
+member's own roster; that is exact today because one member carries the
+dispatching variant, and the port did not have to widen it, because a sentinel in
+a member's declared roster expresses the same union per member. Recorded because
+the two mechanisms look interchangeable and are not: the dispatcher hands each
+*child* its own slice, where the sentinel resolves a union the arm itself reads.
+
+**Most of what that port needed was already in the crate**, which was the other
+half of why the route was recordable ahead of it. `registry.rs` owns the registry
+walk both registry arms run on; the prune resolution and the `--tree` corpus
+rule's own compiled face were shared crate mechanism too, the latter no stub
+built ahead of demand — §check-gate-exemption-tasks' tree arm had called it since
+that arm landed. What the port owed beyond them was the header-block read, which
+lived inside the gate module that needed it first and was promoted to the
+universal layer beside that corpus rule rather than duplicated; the fixture-dir
+resolution, extracted from §check-gate-fixture-coverage and shared with its roots
+as a parameter; the three arms' trailers; and the command-position tokenizer,
+which existed nowhere and was the port's cost centre.
 
 **That is why the table is named for *bridged*, not for *emit*.** What its members
 share is not that each renders a document — `--emit-queue-index extent` answers
@@ -8383,10 +8417,13 @@ new build path that both bypasses this script **and** publishes without an `init
 ### port-blockers
 
 The derived roster for the port's remaining work, at each invocation. Run
-`bash gate-sdk/bin/port-blockers.sh` from the repo root: the default arm answers
-criterion 7 and `--group` answers criterion 6 — both over the same registry,
-through the same `gates_list_members` / `gate_resolve` path — while `--tree`
-answers over the **tracked shell tree** instead. **Why any of the three rosters
+`bash gate-sdk/bin/run-gates.sh --emit port-blockers [--gates-dir <dir>] [--group | --tree]`
+from the repo root: the default arm answers criterion 7 and `--group` answers
+criterion 6 — both over the same registry, through the one registry walk
+`registry.rs` owns — while `--tree` answers over the **tracked shell tree**
+instead. It is a **bridged-arm table member** of the binary, not a `bin/` tool
+(§The non-gate arm, which owns the route, the forced family and the flag
+spelling); the front-end resolves its declared knobs and execs it. **Why any of the three rosters
 is derived rather than written down** is §The port-candidate criteria's, criteria
 7 and 6; this section owns how. The arms are **exclusive**: each replaces the
 others' report rather than appending to it.
@@ -8401,11 +8438,21 @@ questions have different answers at the same moment, and a registry arm reading
 A session reading completion off the registry arms is reading the wrong number,
 which is a mistake the tool used to make unavoidable and now does not.
 
-**Adding an arm has twice left the arms beside it byte-unchanged, and each time
-that was run rather than claimed.** `--group`'s addition changed no byte of the
-default arm's output, and `--tree`'s addition changed no byte of **either**
-registry arm's — both proved by capturing every arm across the commit, same cwd
-and same argv, and diffing exit codes included. Each is a fact about that change
+**Adding an arm has twice left the arms beside it byte-unchanged, and changing
+substrate left all three unchanged; each time that was run rather than claimed.**
+`--group`'s addition changed no byte of the default arm's output, and `--tree`'s
+addition changed no byte of **either** registry arm's — both proved by capturing
+every arm across the commit, same cwd and same argv, and diffing exit codes
+included. The port to the binary was held to the same oracle: all three arms'
+stdout and exit status were captured from the shell tool at the commit before its
+deletion and diffed against the compiled arm's, byte for byte, and the arms are
+identical. What the **retirement** then moves is one row — the instrument's own —
+and the trailer's *scanned* and *temporarily held* counts by one each; **the owed
+count does not move**, because the file was held rather than owed. And because
+the byte-identity oracle is empty over the tokenizer in a tree whose every
+registered member has ported, the compiled scan was additionally held against the
+shell scan's own token stream over the whole tracked shell tree, and both
+registry arms against a planted still-shell registry. Each is a fact about that change
 and **not** a standing guarantee that an arm's output never moves: the truncation
 repair below moved the default arm's deliberately, and a session diffing two runs
 across that commit is seeing the repair rather than a regression. What `--tree`'s
@@ -8434,8 +8481,10 @@ dispatched binary is handed.
 
 **Those three read a shell rule; a compiled member is read from its substrate
 instead, and the row is the same shape.** A `.gate` member has no rule text to
-tokenize, so this arm asks the binary `--needs <member>` and maps the three line
-kinds §The `# graph:` manifest specifies onto the rows it already emits: a program
+tokenize, so this arm reads the registry's own requirement declaration — the
+lookup `--needs` prints, called in process rather than spawned — and maps the
+three line kinds §The `# graph:` manifest specifies onto the rows it already
+emits: a program
 name takes the **same floor filter** a scanned command word takes, so an on-floor
 program is suppressed on both substrates by one rule; a `?<TAB><knob>` takes the
 **same bridge resolution** a command-position expansion takes, which is what keeps
@@ -8445,18 +8494,24 @@ shape is minted, because there is no fourth reader. **The `--group` arm does not
 consume `--needs`** and is unchanged: it excludes ported members from the
 partition entirely, so it has no row to fill.
 
-**A binary that cannot answer is reported undecidable, never as an empty
-requirement set.** An older binary predating the arm refuses it, and folding that
-refusal into "declares nothing" would report the member clean because the question
-failed — the captured-emptiness false green of §Fail-closed contract in report
-form. The arm therefore reads the answer's exit status before its lines.
+**A member the registry cannot answer for is reported undecidable, never as an
+empty requirement set.** In the shell form an older binary predating the arm
+refused the question; in the compiled form the same branch is the **absent
+member**, and it keeps the same undecidable row, because folding either into
+"declares nothing" would report the member clean because the question failed —
+the captured-emptiness false green of §Fail-closed contract in report form.
 
 Two **negative** inputs keep the positive ones honest, and both are derived from
 the tree rather than listed. Keyword and builtin status is asked of the
-interpreter (`type -t`), a property of bash rather than a roster to maintain. And
-`declare -F <name>` — this tree's convention for dispatching an optional shell
-hook — marks a name a function however the scan would otherwise classify it, the
-exact mirror of the `command -v` guard.
+interpreter (`type -t`), a property of bash rather than a roster to maintain, and
+it stays so across the port: the compiled arm asks bash in **one batched query
+per run** rather than baking a roster into the crate, which would drift against
+the host's own bash, and rather than making it consumer config, which a property
+of the interpreter is not. The query adds no floor — `bash` is already on
+`GATE_SDK_PROGRAM_FLOOR`. And `declare -F <name>` — this tree's convention for
+dispatching an optional shell hook — marks a name a function however the scan
+would otherwise classify it, the exact mirror of the `command -v` guard; that
+harvest is a text scan and stayed one.
 
 **The `--group` arm answers criterion 6.** It emits a **corpus-derivation
 partition over the still-shell members**, groups ordered by size descending, each
@@ -8488,7 +8543,7 @@ field is deliberately **trigger**-shaped and wide on purpose. A bare
 callers spanning canon-kit, gate-sdk and `scripts/` that share no corpus whatever.
 `check-shellcheck` is the worked case in both directions — it *does* call
 `gate_kit_roots`, then composes four fixed subdirectory names and a `*.sh` glob on
-top of it, while `bin/port-blockers.sh` composes the same call with one
+top of it, where the shell port oracle composed the same call with one
 subdirectory. Same primitive, different corpus.
 
 - **Kit-library call set** — the command-position words the scan emits that the
@@ -8582,7 +8637,9 @@ derivation, so each member's row carries the three criteria that are mechanicall
 derivable: **criterion 2** as `c2=pair` / `c2=no-fixture` / `c2=none`, read
 through the fixture dirs §check-gate-fixture-coverage resolves and in that order,
 so the report and that gate cannot disagree about whether a member carries a
-pair; **criterion 3** as `c3=<tier>` from the manifest; and **criterion 7** as
+pair — one **shared** resolution rather than two, taking its kit roots as a
+parameter because the gate resolves absolute roots where this report's evidence
+column must stay repo-relative; **criterion 3** as `c3=<tier>` from the manifest; and **criterion 7** as
 `c7=`, the default arm's own verdict for that member — `clean`, the programs it
 requires, or `?`. Criterion 1 is true by construction, the walk being the
 registry. Criteria 4, 5 and 6 are **not** emitted: each needs judgment the tool
@@ -8667,7 +8724,16 @@ confusion the arm exists to end.
 `git ls-files` over tracked `*.sh`, minus the `*.test.sh` suffix — which the
 directive itself names by writing *non-test* — minus the shared prune-dir set
 `GATE_SDK_PRUNE_DIRS` and `GATE_SDK_PRUNE_EXTRA_DIRS` resolve, which is what
-removes `gate-tests/` fixture content without naming it. Both are honoured, on
+removes `gate-tests/` fixture content without naming it. That derivation is the
+crate's one tracked-shell-tree rule and not a second copy of it: §check-gate-exemption-tasks'
+tree arm reads the same one. **It diverges in exactly one place, and the arm
+absorbs the divergence rather than the shared rule.** Where git cannot answer,
+the shared rule degrades to an empty corpus, deliberately and on a monotonicity
+ground its other reader states for itself; this arm **refuses** at exit 2
+instead, probing for a repository before it calls, because its whole subject is
+the tracked tree and a silently empty corpus would print `0 owed` — the
+completion predicate — where the tool refuses. Repairing the shared rule would
+break its other reader. Both are honoured, on
 §check-reads-couples' ground that a substrate honouring one of an additive pair
 scans a different tree than the shell for any consumer who set the other.
 **Enumeration rather than a walk is correct here and this is the one place it
@@ -8693,9 +8759,10 @@ and until this tree's first three declarations landed it had none — the column
 counted correctly and **discriminated nothing**, a file refused by a ratified
 structural ruling, a file held behind named work and a file nobody had ever looked
 at all reading the same row. §gen-pre-commit's generator is the first tracked file
-in this tree to sit squarely in the declaring class; `bin/port-blockers.sh` is the
-first to sit in the held one; and a consumer's measured-claim emitter is the first
-refused on a provenance ground rather than a structural one. Recorded because a
+in this tree to sit squarely in the declaring class; the shell port oracle was the
+first — and, until another file earns one, the last — to sit in the held one, and
+its hold discharged when the port landed; and a consumer's measured-claim emitter
+is the first refused on a provenance ground rather than a structural one. Recorded because a
 reader who finds three declarations and no history reasonably assumes the field had
 always been exercised, and the interval in which it was not is what the empty-set
 misread above is evidence from.
@@ -8711,11 +8778,16 @@ registered gate's row carries its disposition on the same terms as any other fil
 **the arm does not partition gates from scripts, because the directive does not.**
 
 **A disposition is read only from a well-formed declaration, and everything else
-is `owed`.** Exactly one of the pair, with its payload present: a `# no-port:`
-whose cause is empty, a `# port-until:` naming no slug, and a file carrying
-**both** are each read as `owed`. Those are not separate rules but one — a file
-that has not made a reviewable declaration has not made one — and it is the same
-over-count direction absence already takes. There is no fourth count because there
+is `owed`.** Exactly one line carrying one of the pair, with its payload present:
+a `# no-port:` whose cause is empty, a `# port-until:` naming no slug, a doubled
+field and a file carrying **both** are each read as `owed`. Those are not
+separate rules but one — a file that has not made a reviewable declaration has
+not made one — and it is the same over-count direction absence already takes. The
+triple and the header-block read it is computed from sit on the crate's universal
+layer beside the corpus rule, with **two** named readers and no third: this arm,
+which prints the disposition as a row's second column, and §check-gate-exemption-tasks'
+tree half, which reads the held field's slug for liveness and inlined a narrower
+scan of its own before the promotion. There is no fourth count because there
 is no fourth disposition, and *held* is separated from *no-port* for the reason
 `--group` separates *still owed* from *takeable*: a temporary hold is not a
 permanent disposition, and folding the two silently falsifies the subtraction a
@@ -8759,25 +8831,32 @@ the first live run reported a hold against a heredoc literal in `gate-sdk/smoke/
 and the shell arm masked the same exposure behind the contradiction rule above,
 which is why the rule is stated for the corpus and not for one reader.
 
-**The arm reads a corpus it is inside, and that is a property rather than a
-problem.** `bin/port-blockers.sh` and this repo's measured-claims emitter are both
-tracked non-test shell outside the prune set, so both appear in the arm's own
-output. Nothing about the derivation is self-referential — the arm reads headers,
-not behaviour, and a header the tool reads about itself is the same kind of fact as
-a header it reads about any other file — but a reader finding the tool in its own
-report should find that recorded rather than wonder.
+**The arm reads a corpus it is outside, while the emitter that reads *it* is
+inside one — and the asymmetry is the port's doing rather than a change of
+rule.** A compiled arm is not a tracked shell file, so nothing about it enters
+the corpus; while the instrument was shell it was tracked, non-test and outside
+the prune set, so it printed itself a row. Nothing about the derivation was ever self-referential —
+the arm reads headers, not behaviour, and a header the tool read about itself was
+the same kind of fact as a header it reads about any other file — but this repo's
+measured-claims emitter is still in the corpus and still declares, so a reader
+finding a report's own consumer in it should find that recorded rather than
+wonder.
 
-**The two rows are not the same row, which is the half a reader is likeliest to
-assume away.** They were ruled together and they parted. The tool is **held**,
-declaring `# port-until:` against the live entry that owes its port, because it is
-kit mechanism: it sits in a kit root, rides the installer payload with that root,
-and every adopter runs it, so *everything portable ports* reaches it with nothing to
-excuse it. The emitter is **refused**, declaring `# no-port:`, because it is not kit
-mechanism at all — it is the *value* of `CANON_KIT_MEASURED_CLAIMS_CMD`, it sits in
-a consumer directory the payload assembler never packs, and it carries that
-project's own claim vocabulary, so porting it would put one project's vocabulary
-into every adopter's binary. Held versus refused is therefore a reading of what
-each file **is**, not a judgment about how far along each one's port is.
+**The two rows were not the same row, which is the half a reader is likeliest to
+assume away, and the two files ended in different places.** They were ruled
+together and they parted. The instrument was **held**, declaring `# port-until:`
+against the live entry that owed its port, because it was kit mechanism: it sat in
+a kit root, rode the installer payload with that root, and every adopter ran it,
+so *everything portable ports* reached it with nothing to excuse it — and it is
+now an arm of the binary, its hold discharged by the port rather than by a
+re-reading. The emitter is **refused**, declaring `# no-port:` and staying shell,
+because it is not kit mechanism at all — it is the *value* of
+`CANON_KIT_MEASURED_CLAIMS_CMD`, it sits in a consumer directory the payload
+assembler never packs, and it carries that project's own claim vocabulary, so
+porting it would put one project's vocabulary into every adopter's binary. Held
+versus refused was therefore a reading of what each file **was**, not a judgment
+about how far along each one's port had got — which is why one moved and the
+other did not.
 
 **Its consumer is a human session and nothing parses it**, exactly like the two
 arms beside it: the reader is a session asking whether the port is done, and the
@@ -8832,10 +8911,14 @@ because a reader finding an old run's `?` for this member and no adjudication
 would reasonably conclude the remainder had simply been ignored.
 
 **The tokenizer rules that were bugs first, stated here because reading the
-source alone reaches the wrong verdict on one of them.** A **here-string** is
-consumed as a single redirection operator, ahead of the heredoc branch; and
-**inside `[[ … ]]` only**, a `)` pops a pushed substitution frame ahead of any
-case-pattern reading. Both were repaired after the scan was found abandoning most
+source alone reaches the wrong verdict on one of them.** They are the port's
+cost centre and its risk — a character state machine over quoting,
+command-substitution frames, heredocs, here-strings, double-bracket state, `case`
+levels, arithmetic and array-literal skipping, with no counterpart in the crate
+before it — and both repairs were carried forward by name rather than left to a
+rewrite to rediscover. A **here-string** is consumed as a single redirection
+operator, ahead of the heredoc branch; and **inside `[[ … ]]` only**, a `)` pops
+a pushed substitution frame ahead of any case-pattern reading. Both were repaired after the scan was found abandoning most
 declarations part-way and reporting the unread remainder as *clean* — a silent
 under-report in both arms, and a false green in the criterion-7 roster that stood
 through every cohort delivered before it.
@@ -8852,8 +8935,13 @@ was conflating that state with a real `case` context in the first place.
 the frame depth to zero, the real closing `)` then lands on an empty stack and is
 absorbed, and the file balances at EOF by coincidence while everything after the
 `case` is lost. That is why this pair is covered behaviourally in `smoke/` by a
-declaration carrying both shapes, per §The `bin/`-tool contract's ruling that a
-`bin/` tool earns behavioural coverage rather than a fixture pair.
+declaration carrying both shapes, on the ground §The `bin/`-tool contract states
+for behavioural coverage — that the predicate that matters is behavioral, a
+ground about the rule rather than about a file's extension, so it followed the
+function into the binary. The pair is **additionally** covered by crate tests over
+planted declarations, where a state machine is tested far more cheaply and far
+more exhaustively than by a planted registry, and where the crate's test arm runs
+in the battery through §check-crate-arms.
 
 The here-string case is the one to state rather than leave to a reader. The
 heredoc branch **does** carry a here-string guard — it declines `<<` as a heredoc
@@ -8873,29 +8961,52 @@ scan never reached carry command-position expansions it cannot resolve, and each
 is now reported `?` rather than passed over. A lower count under a blind scan was
 never the better number.
 
-**Arguments, now that the tool has modes.** It takes no positional arguments and
-gains none, so §The `bin/`-tool contract's free-text rule does not bind it. Two of
-that contract's three behaviors are adopted anyway: `-h` / `--help` prints usage
-on **stdout** at exit **0**, and an unrecognized argument is a **refusal** — usage
-on stderr, exit 2. The contract states that refusal for a leading-`-` argument;
-since this tool has no positionals, a bare word is unrecognized on the same
-footing and is refused identically. `--` is **not** adopted: it ends option
-processing in favor of free-text positionals, and this tool has none to end it in
-favor of. The ground is the cost that section already measures — a session that
-ran a stage writer with `--help`, got `'--help' is not a lifecycle stage` in place
-of usage, and went three guards deep working around a contract the usage text
-would have told it did not exist. A tool with one undiscoverable mode is that cost
-waiting to be paid; a tool with none was not, and a tool with two has it twice
-over — which is why the usage text carries every arm and the `# usage:` header,
-bounded to `CANON_KIT_COMMENT_RUN_CAP` physical comment lines, points at it rather
-than trying to hold the detail itself.
+**The arm's argv contract.** It takes no positional arguments: the three arms
+are `--group`, `--tree` and no argument at all, and `--gates-dir <dir>` names the
+registry the two registry arms walk and scopes the arm's own declared-knob union.
+That argument is the rule's own input rather than a redirect of resolved config,
+which is the gates-dir-positional shape §The non-gate arm's distinguishing test
+already rules ports unchanged. `--tree` needs no registry and **takes none**: a
+documented flag that silently changed nothing would be worse than no flag.
 
-It is a tool, not a gate: **no arm** carries a `# graph:` manifest or a fixture
-pair, and the behavioural coverage §The `bin/`-tool contract mandates in place of a
-pair covers all three in `smoke/` — the `--tree` case planting a corpus with each
-disposition, each ill-formed declaration, and one file of each excluded class, and
-asserting the trailer's counts as exact **deltas** rather than absolutes, because
-the surrounding tree's own shell corpus is not that assertion's subject.
+Three of §The `bin/`-tool contract's behaviours are adopted — the arm cites that
+contract for the behaviours it adopts, never for a `bin/` membership it does not
+hold. `-h` / `--help` **as the first argument** prints usage on **stdout** at exit
+**0**, *whatever follows it*: the help-before-arity ordering is what that contract
+decides, and refusing help-plus-extra would have been a silent behaviour change on
+a case already ruled. An unrecognized argument is a **refusal** — usage on stderr,
+exit 2. The contract states that refusal for a leading-`-` argument; since this
+arm has no positionals, a bare word is unrecognized on the same footing and is
+refused identically, and so is a `--gates-dir` standing ahead of `--help`, which
+is help out of the position the contract gives it. `--` is **not** adopted: it
+ends option processing in favor of free-text positionals, and this arm has none to
+end it in favor of. The ground is the cost that section already measures — a
+session that ran a stage writer with `--help`, got `'--help' is not a lifecycle
+stage` in place of usage, and went three guards deep working around a contract the
+usage text would have told it did not exist. A tool with one undiscoverable mode
+is that cost waiting to be paid; a tool with none was not, and one with three has
+it three times over, which is why the usage text carries every arm.
+
+**The arm's channels are `Arm::Emit`'s, and the variant was forced rather than
+chosen**: a rendered document to stdout at exit 0 and a message on stderr at exit
+2 is the whole of the shell tool's own exit behaviour, covering the help arm, the
+unrecognized-argument refusal, the non-repository refusal, the missing-registry
+refusal and the unresolvable-member refusal with nothing left over. It does not
+inherit the dispatch union `Arm::Run` carries, which is correct: it dispatches
+nothing.
+
+It is an arm, not a gate: it carries no `# graph:` manifest and no fixture pair,
+and the behavioural coverage stands in place of a pair for all three arms in
+`smoke/` — reached **through the front-end**, which is the invocation a caller
+actually makes and which no in-crate test covers. The `--tree` case plants a
+corpus with each disposition, each ill-formed declaration, and one file of each
+excluded class, and asserts the trailer's counts as exact **deltas** rather than
+absolutes, because the surrounding tree's own shell corpus is not that
+assertion's subject. **The non-repository refusal is the one leg the front-end
+cannot reach**, because `bin/run-gates.sh` refuses a non-repository before it
+execs; it is asserted by invoking the binary, which is a caller rather than a
+second entry point, and stating that is what stops the leg being rewritten into
+one that passes on git's own message instead.
 
 **One line of one arm's output is machine-read, and the distinction is the whole
 of it.** The rows of every arm are read beside a diff by the session asking the
@@ -8919,7 +9030,15 @@ whole tracked shell tree becomes an input to a byte-gated artifact. `check-graph
 holds that artifact fresh, but its `couples=` is a trigger over paths, and no
 kit-shipped trigger can cover a corpus a *consumer's* emitter defines — which is
 the seam rather than a gap to close: a kit descriptor naming one project's
-directories would publish that project's layout as kit mechanism. In this tree the
+directories would publish that project's layout as kit mechanism. **The port
+removed a second coupling on the same seam and may not replace it**: the consumer
+claim gate's `couples=` reached the shell tool through its kit-root shell glob, so
+an edit to the tool re-ran the gate whose value it feeds; the implementation is
+now crate source, which that field does not reach, and widening a canon-kit
+descriptor to name this project's crate directory would publish this project's
+layout for exactly the reason above. The gap is left covered by the
+full-battery-before-every-commit rule, which is the disposition this section
+already takes for the consumer-defined corpus its own uncovered set sits in. In this tree the
 uncovered set is the twelve files under `installer/` and `demo/`, and the
 full-battery-before-every-commit rule is what covers them, since it runs
 `check-graph` unconditionally where the hook's own trigger does not. **The
@@ -8928,28 +9047,31 @@ thirteen moved the corpus file set and ten of those already owed a hook
 regeneration for an unrelated reason, so the marginal cost is three commits in two
 hundred.
 
-**The tool is inside the corpus it measures, and so is any emitter that reads
-it.** `gate-sdk/bin/port-blockers.sh` is tracked, non-test, outside the prune set: it prints
-itself as a row. The consequence is not cosmetic — **the completion predicate
-cannot reach zero while the instrument is still shell**, and unlike the battery
-runner and the install bootstrap, which the predicate disposes of by being owed and
-by declaring, the instrument had to have a disposition ruled **about itself**. It
-now has one. A `bin/` tool takes no `.gate` descriptor, so its only port route is a
-non-gate arm of the binary, and the family is forced rather than chosen: this tool
-needs the gates dir, the kit roots, the prune set and the program floor, so it is a
-**bridged-arm table member** or it is a tool that silently ignores every consumer
-override (§The non-gate arm, which owns the route and the refusal to mint the arm's
-flag spelling ahead of its caller). Until that port lands, the tool's own row reads
-`port-until:` against the live entry that owes it, so it counts as **named work
-rather than unexamined work** — which is the whole of what the declaration buys,
-since a held file is owed either way.
+**The instrument was inside the corpus it measures, and any emitter that reads
+it still is.** While it was shell, `gate-sdk/bin/port-blockers.sh` was tracked,
+non-test and outside the prune set: it printed itself a row. The consequence was
+not cosmetic — **the completion predicate could not reach zero while the
+instrument was still shell**, and unlike the battery runner and the install
+bootstrap, which the predicate disposes of by being owed and by declaring, the
+instrument had to have a disposition ruled **about itself**. A `bin/` tool takes
+no `.gate` descriptor, so its only port route was a non-gate arm of the binary,
+and the family was forced rather than chosen: the tool needs the gates dir, the
+kit roots, the prune set, the program floor, the fixture-dirs root and an
+arbitrary knob besides, so it was a **bridged-arm table member** or a tool that
+silently ignores every consumer override (§The non-gate arm, which owns the
+route, the forced family, the minted spelling and the union sentinel). Until the
+port landed, the tool's own row read `port-until:` against the live entry that
+owed it, so it counted as **named work rather than unexamined work** — which is
+the whole of what the declaration bought, since a held file is owed either way.
 
-**The reflexivity is real and it is not a problem.** When the port lands, the arm's
-shell implementation and the arm's own row leave the tree in the same commit: the
-measurement is not a fixed point and its last act is to remove itself from its own
-corpus. That is a property of a header read, not of a self-referential derivation —
-the arm's verdict about itself is computed the same way its verdict about any other
-file is, so there is no fixed point to converge on and nothing to iterate.
+**The reflexivity was real and it was not a problem.** The arm's shell
+implementation and the arm's own row left the tree in the same commit: the
+measurement was not a fixed point, and its last act was to remove itself from its
+own corpus. That was a property of a header read, not of a self-referential
+derivation — the arm's verdict about itself was computed the same way its verdict
+about any other file is, so there was no fixed point to converge on and nothing to
+iterate. What the departure moved is stated exactly above: one row, and *scanned*
+and *temporarily held* each falling by one, with **owed unmoved**.
 
 ### check-shellcheck
 
