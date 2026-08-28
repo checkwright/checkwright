@@ -346,9 +346,13 @@ and the section heading is kept. {design-bearing}
 §port-blockers keeps its heading `### port-blockers`, and that is a ruling
 rather than an oversight: the section's subject is the report and its three
 arms, which are what a reader looks it up by, and it survived the tool gaining
-arms exactly as it survives the tool changing substrate. Twenty-one
-cross-references resolve unchanged as a consequence, which is a consequence and
-not the ground.
+arms exactly as it survives the tool changing substrate. **A count is not
+carried here, on the align audit's own finding**: every `§port-blockers`
+cross-reference in the tree — inside this file, elsewhere in gate-sdk/SPEC.md,
+and in every other governed surface — resolves unchanged as a consequence,
+which is a consequence and not the ground; a session wanting the number greps
+it, since a count restated here is a count that ages the moment a citing
+section is added or merged.
 
 What changes inside it: the invocation spelling throughout; the arguments
 paragraph, which now states the arm's argv contract and cites §The `bin/`-tool
@@ -393,24 +397,34 @@ adopter's binary. The trailer's grammar is unchanged, so the parse itself does
 not move — only the command in front of it.
 
 The remaining surfaces, each naming the path or the shell invocation: this
-repo's always-loaded instruction file; the trajectory's port-sequence section;
-gate-sdk's README `bin/` roster, whose entry retires and whose invocation joins
-the emit-arm examples beside it — a roster with no gate behind it, which is worth
-knowing while editing it; §The port-candidate criteria, §The first cohort, and
-the rule that selects the next, §The fourth budget batch, §The twelfth cohort and
-§The `# graph:` manifest inside gate-sdk's own SPEC; and one sentence each in
-site-kit, canon-kit, evidence-kit and delegation-kit's SPECs — delegation-kit's
-being the sharpest, since it cites this file as an example of a runnable artifact
-a session invokes by hand, which is the property the port removes.
+repo's always-loaded instruction file; the trajectory's port-sequence section,
+**and, found only by the align audit's grep, the one earlier standing-prose
+invocation inside the trajectory's closed-rulings record** (the 2026-08-23
+ruling's own statement of the oracle command — not a dated transcript of a run,
+so it is not covered by the dated-transcript exemption above and must move with
+the rest); gate-sdk's README `bin/` roster, whose entry retires and whose
+invocation joins the emit-arm examples beside it — a roster with no gate
+behind it, which is worth knowing while editing it; §The port-candidate
+criteria, §The first cohort, and the rule that selects the next, §The fourth
+budget batch, §The twelfth cohort and §The `# graph:` manifest inside
+gate-sdk's own SPEC; one sentence each in canon-kit, evidence-kit and
+delegation-kit's SPECs — delegation-kit's being the sharpest, since it cites
+this file as an example of a runnable artifact a session invokes by hand,
+which is the property the port removes; and **two** in site-kit's, not one —
+the align audit's grep found a second beside the `SITE_KIT_RENDERER` knob
+paragraph, in §check-docs-render-fidelity's `--needs` discussion, that this
+amendment's authoring pass missed.
 
 **No gate catches a missed prose path**, which is why the sweep is enumerated
 rather than left to a run: the fenced-invocation gate reaches only fenced repo-
 relative paths and this tool is cited in backticks throughout.
 
-Three mechanical consequences ride the same commit: the five generated SPEC and
-README mirrors regenerate; the generated hooks and the coupling-graph artifact
-regenerate, staged first and regenerated second; and the binary is rebuilt,
-which the battery does not discharge.
+Three mechanical consequences ride the same commit: the six generated SPEC and
+README mirrors regenerate (gate-sdk's SPEC and README, and the SPEC of
+canon-kit, site-kit, evidence-kit and delegation-kit — corrected from a
+miscounted five by the align audit); the generated hooks and the
+coupling-graph artifact regenerate, staged first and regenerated second; and
+the binary is rebuilt, which the battery does not discharge.
 
 Two dead permission-allowlist entries in this repo's harness settings name the
 deleted script. They are **removals of grants, never additions**, and a settings
@@ -527,16 +541,25 @@ reader, by what makes it **red**:
 - gate-sdk/SPEC.md §check-crate-arms and §check-gate-binary-fresh — the crate
   gains its largest single module and the binary must be rebuilt in the same
   commit (deltas 5, 11).
-- canon-kit/SPEC.md §check-measured-claim — the consumer oracle's command moves;
-  the keys, the grammar and the parse do not (delta 11).
-- site-kit/SPEC.md, canon-kit/SPEC.md, evidence-kit/SPEC.md and
-  delegation-kit/SPEC.md — one sentence each naming the shell path; delegation-kit's
-  cites it as a runnable artifact a session invokes by hand, the property the
-  port removes (delta 11).
+- canon-kit/SPEC.md §check-measured-claim — **retired by the align audit**: the
+  section binds the consumer oracle through `CANON_KIT_MEASURED_CLAIMS_CMD`
+  and never names `port-blockers.sh` or its invocation literally, so it owes no
+  edit here; the one canon-kit sentence that does name the path is
+  §check-surface-duplication's, folded into the next bullet, and the moving
+  command is `scripts/measured-claims.sh`'s own bullet below (delta 11).
+- canon-kit/SPEC.md and evidence-kit/SPEC.md — one sentence each naming the
+  shell path; delegation-kit/SPEC.md — one sentence, citing it as a runnable
+  artifact a session invokes by hand, the property the port removes;
+  site-kit/SPEC.md — **two**, not one: the `SITE_KIT_RENDERER` knob paragraph
+  in §Layout and configuration and §check-docs-render-fidelity's `--needs`
+  paragraph, the second found only by the align audit's grep (delta 11).
 - CLAUDE.md — the always-loaded sentence naming the script and its two oracles
   (delta 11).
 - TRAJECTORY.md §PRIORITY DIRECTIVE — the port track's sequence — the sentence
-  naming the instrument (delta 11).
+  naming the instrument; **and, found only by the align audit's grep,**
+  §The closed rulings' 2026-08-23 ruling carries a second, standing (not
+  dated-transcript) invocation of the same oracle command that must move with
+  it (delta 11).
 - gate-sdk/README.md — the `bin/` roster entry retires and the invocation joins
   the emit-arm examples (delta 11).
 - scripts/measured-claims.sh — the call site, in the same commit as the
@@ -544,9 +567,16 @@ reader, by what makes it **red**:
 - gate-sdk/smoke/install.sh — both blocks re-pointed at the arm through the
   front-end (delta 9).
 - TASK-QUEUE.md — this entry moves to Done once the declaration's referent
-  leaves with the file; `native-gate-port-remaining-corpus`'s held-file sentence
-  and `port-completion-predicate-contributor-side-accounting`'s oracle spelling
-  follow (delta 11).
+  leaves with the file (delta 11). **Two clauses this bullet originally named
+  are retired by the align audit, the tree having moved under the amendment
+  after authoring**: `port-completion-predicate-contributor-side-accounting`
+  already drained to a bare `## Done` line at the 2026-08-28 consult ruling
+  (TRAJECTORY.md §The closed rulings), before this amendment reached align, so
+  it carries no oracle spelling left to move; and `native-gate-port-remaining-corpus`
+  carries no held-file sentence today — its text deliberately states no figure
+  ("Prints neither count; run both arms") — so there is nothing there for this
+  delta to touch either. Neither omission is this amendment's to repair; both
+  are recorded here so a build session does not go looking for either.
 - The generated mirrors of every kit SPEC and README edited above, the generated
   hooks and the coupling-graph artifact, the enforcement map and the value
   rollup — regenerated, never hand-edited (all deltas).
