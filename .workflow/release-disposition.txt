@@ -2,3 +2,4 @@
 # One line per iteration at its release boundary, close-written; the line
 # grammar is lifecycle-kit/SPEC.md §templates/stages/'s, not restated here.
 
+port-oracle-and-composer-ruling release deferred:v0.26.0 — criteria met (5 tightened gates accumulated since v0.25.0, plus this iteration removing the shipped gate-sdk/bin/port-blockers.sh from every vendored tree) but no cadence trigger fired: v0.25.0 is 5 days old against the 7-day floor, and the removal is NOT a major — it decommissions no *deprecated* surface (the tool carried no marker and took no release-sweep disposition) and the two-phase contract reconciles it from the note alone, since a Behavior-changes bullet naming the replacement arm is all an adopter needs. Floor is the higher of the derived minor and the outstanding deferral, and both read v0.26.0.

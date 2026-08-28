@@ -8770,8 +8770,5 @@
 
 ## Done
 
-- port-completion-predicate-contributor-side-accounting
-- port-oracle-instrument-self-disposition
-
 ## Lessons Learned
 
