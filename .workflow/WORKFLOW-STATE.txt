@@ -5,3 +5,4 @@
 ---
 
 port-oracle-and-composer-ruling scope aedfb469 2026-08-28 60b7b70b
+port-oracle-and-composer-ruling spec ad3228b1 2026-08-28 9984502a
