@@ -105,44 +105,44 @@
   the work, designing the bootstrap included. It inherits gate-sdk/SPEC.md §Porting a gate to the
   binary substrate for the procedure and §Consumer payload for the payload rule.
   **Two objections answered:** wall-clock is the weaker case (the win is retiring the payload's
-  shell *sources*), the toolchain-free arm rides the pre-compiled path, and a third clause was
-  DELETED as measured false 2026-08-24, recorded at `powershell-installer-surface`.
+  shell *sources*), and the toolchain-free arm rides the pre-compiled path.
   **Every closed cohort and cut — members, counts, holds, grounds, price — is recorded at
   gate-sdk/SPEC.md §The first cohort, so this entry states what remains.** Cut widths are ruled
   **per cut and never inherited**, and the size arm is **permanently** exhausted.
-  **THE COMPOSER DOES NOT REACH THE TREE REMAINDER — found 2026-08-27 at scope, and it is why
-  "advance the port" is not dispatchable as a build unit today.** This entry says members are
-  selected by `port-blockers.sh --group`; that arm walks the **gate registry**, which reports **0
-  owed and 0 takeable** — a finished battery, and its own `--help` says a registry arm reading zero
-  "says nothing about the tree". `--tree` reports a large owed remainder and nothing selects a cut
-  from it. Only `--tree` is the predicate; `ported-gate-members` answers neither, and its owed count
-  RISES when a non-gate shell file lands, which is that predicate working rather than a regression.
-  **THE COMPOSER STAYS UNRULED, and the decomposition it needs is now bought rather than owed** — a
-  2026-08-27 scope survey, block in `.workflow/survey-record.md` with its corpus, oracle and rev, so
-  the next dispatch re-runs a witness instead of the sweep. Two cohesive cuts against three that are
-  not; the lead left the composer open on the survey's own reading, that both cohesive cuts advance
-  the owed COUNT and neither the CLAIM, the larger being contributor-side under the 2026-08-23 tail
-  ruling because its kit ships in no profile.
-  **Prints neither count; run both arms.** Three sweeps running found a digit stale here, the third
-  within a day of authoring, under this entry's claim both were re-run — asserted freshness is not.
-  ruled: native-gate-port-remaining-corpus lead 2026-08-27 own-authority
+  **THE COMPOSER DOES NOT REACH THE TREE REMAINDER.** `port-blockers.sh --group` walks the **gate
+  registry**, which reports 0 owed and 0 takeable — a finished battery, and its own `--help` says a
+  registry arm reading zero "says nothing about the tree". Only `--tree` is the predicate;
+  `ported-gate-members` answers neither, and its owed count RISES when a non-gate shell file lands,
+  which is that predicate working rather than a regression.
+  **THE COMPOSER IS RULED 2026-08-28: select the next cut by STATED CONTRACT** — the owed files
+  sitting behind one specification section, ported behind the one amendment that section needs.
+  Size-ordered and kit-ordered composers stay refused; a contract-cohort composer is derivable from
+  the 2026-08-27 corpus and neither of those two is.
+  **The fork that ruling was left open on COLLAPSED, on a ground measured false.** It held the
+  larger cohesive cut contributor-side because its kit ships in no profile; drift-kit DOES ship, by
+  the derived `full` profile, and the resolver chain proving it is in the survey record. So
+  largest-and-cleanest and adopter-facing select the SAME cut and no judgment was left to make.
+  **FIRST CUT UNDER THE RULE, next rather than now:** drift-kit, 18 adopter-facing files behind
+  drift-kit/SPEC.md §The KPI plugin contract, its driver moving with its plugins because the
+  discovery contract is what the port amends. Held only on how those files count toward the
+  predicate — `port-completion-predicate-contributor-side-accounting`'s question.
+  **Prints neither count; run both arms** — four sweeps running found a digit stale here.
+  ruled: native-gate-port-remaining-corpus lead 2026-08-28 own-authority
   **Cost while deferred:** large and known — the **owed** remainder (the trailer's own arm, never
   the unported count) plus the runners and the install-lifecycle layer; since the 2026-08-14
   born-native default (TRAJECTORY.md §The closed rulings) a gate landed meanwhile no longer adds
   shell to it. Not a single-iteration delta, and the criterion-relaxation question is closed at
   gate-sdk/SPEC.md §The port-candidate criteria — an ordering signal, never an eligibility screen.
   `gate-battery-result-cache` is the one battery entry the port has not subsumed.
-  **The PRIORITY DIRECTIVE has yielded FOUR times — 2026-08-22, twice 2026-08-24, and 2026-08-27 —
-  each for one named iteration alone and NONE a reversal, demotion or re-scoping**: a yield spends
-  one iteration's turn, never the sequence's claim on the next. The first three were operator-ruled
-  through the lead; the fourth is the lead's own, on the composer reading above.
+  **The PRIORITY DIRECTIVE has yielded FOUR times — 2026-08-22, twice 2026-08-24, 2026-08-27 — each
+  for one named iteration alone and NONE a reversal, demotion or re-scoping**: a yield spends one
+  iteration's turn, never the sequence's claim on the next. The 2026-08-28 boundary did not yield.
   Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction under the
-  direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope. Since then it is
-  promoted at spec and demoted at build once per increment, each cut's record at its SPEC section.
-  **Tail ruled 2026-08-23, re-recorded 2026-08-24** (TRAJECTORY.md §PRIORITY DIRECTIVE): no member
-  is permanently shell; the sequence is `battery-runner-port`, `shell-gate-tail-port`, then the
-  bootstrap — the first two LANDED and the bootstrap is now ONE member,
-  `powershell-installer-surface` (`install-step-relocation` retired as mooted).
+  direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope, promoted at spec and
+  demoted at build once per increment since.
+  **The tail, ruled 2026-08-23 and re-recorded 2026-08-24, is TRAJECTORY.md §PRIORITY DIRECTIVE's
+  and is not restated here** — no member is permanently shell, and it names the sequence whose one
+  remaining member is `powershell-installer-surface`.
 
 - **powershell-installer-surface** [design-pending] — a native Windows install path. **Both
   forks are RULED**: fork 2 on 2026-08-26 by the operator — two hand-kept bootstraps, parity held
@@ -3011,33 +3011,33 @@
   than any session's** — the entry predicted its own recurrence before two of them.
   **The ground for declining a `recurrence:` date is SPENT, 2026-08-17**, when
   `recurrence-drain-input-widening` landed the direct stamp as obliged: a close-audit observation
-  is stamped by whoever judges it. The first four are **not** back-filled — the obligation
-  attaches at the moment of judgment, and re-grading earlier sessions' prose is the self-grading
-  hazard that ruling names rather than a repair of it.
-  **FIFTH, 2026-08-26 — unanswerable again, and nothing was DECIDED on the missing half.** No
-  scope survey of that iteration named `bin/queue-edges.sh` in an `oracle:` field and no tracked
-  surface carried an edge sum; the six threshold entries scope raised were displaced by an
-  operator's unit-set ruling rather than refused by a ranking, so the obligation never attached.
-  **SIXTH, 2026-08-27 — the close re-found the fifth's shape and read the operator-ruled unit set
-  as a NEW question. It is not new: the fifth above already records it.** What that close did add
-  is the unruled half stated plainly — when a ruling supplies the set, is the pass owed at all?
+  is stamped by whoever judges it. The first four are **not** back-filled — the obligation attaches
+  at the moment of judgment, and re-grading earlier sessions' prose is the self-grading hazard that
+  ruling names rather than a repair of it.
+  **FIFTH and SIXTH, 2026-08-26 and 2026-08-27 — one shape twice, not two findings.** Neither
+  named `bin/queue-edges.sh` nor carried an edge sum; both times the threshold entries scope raised
+  were displaced by an operator's unit-set ruling rather than refused by a ranking, so the
+  obligation never attached. What the second added is the unruled half stated plainly — when a
+  ruling supplies the set, is the pass owed at all?
   recurrence: survey-edge-aggregation-residue 2026-08-26 2026-08-27
-  **The 2026-08-08 shape is now THRICE-shipped, which narrows the fork further**: 2026-08-26 and
-  2026-08-27 both ran the oracle, named it in an `oracle:` field and wrote per-candidate inbound
-  totals into the finding, the second adding a retired-target read. Two of the three alternatives
-  below now have a shipped instance each; the third has none.
+  **The 2026-08-08 shape is now FOUR-times shipped, which narrows the fork further**: 2026-08-26,
+  2026-08-27 and 2026-08-28 each ran the oracle, named it in an `oracle:` field and wrote
+  per-candidate inbound totals plus a retired-target read into the finding.
   **RE-DEFERRED 2026-08-27 WITH THE FORK NARROWED TO ONE ALTERNATIVE, which is what a later
   session inherits instead of the choice.** The threshold rule put this in front of the authority
   once the sixth observation was stamped; the ruling was to keep it deferred and spend the boundary
   narrowing rather than building. **Fold the sum into the existing survey record** is the surviving
-  alternative — three shipped instances, 2026-08-08, 2026-08-26 and 2026-08-27. A separate survey
-  artifact for the sum has one instance and buys a second surface for what one already carries.
-  Retiring the roster line as unauditable has **zero** instances and is now the weaker read, since
-  three answerable closes in a row are what an unauditable class does not produce.
+  alternative, on four shipped instances. A separate artifact for the sum buys a second surface for
+  what one already carries, and retiring the roster line as unauditable has **zero** instances —
+  four answerable closes in a row are what an unauditable class does not produce.
   **What is still open, and it is smaller than the old fork:** whether the pass is owed per RANKED
   candidate when an operator supplies the unit set, which the 2026-08-24 widening did not reach.
   The ceremony objection stands against a *declaration*, never against the sum itself.
+  **RE-DEFERRED AGAIN 2026-08-28, spent on neither building nor narrowing:** the threshold fired a
+  second time under an UNDIRECTED dispatch, so the open half above had nothing to test — the pass
+  was owed, performed, and filed to the survey record.
   ruled: survey-edge-aggregation-residue lead 2026-08-27 own-authority
+  ruled: survey-edge-aggregation-residue lead 2026-08-28 own-authority
   **Cost while deferred:** every close restamps an audit it did not actually perform, which is
   worse than a skipped audit — the roster reads as coverage.
   Filed 2026-08-07 by close, performing the `survey-engagement` audit its roster made due.
@@ -6307,25 +6307,24 @@
 - **wait-loop-grant-lost-its-carrier** [design-pending] — the mandated in-turn wait's grant is
   owned by no queue entry, and became unowned by a completion rather than by a ruling.
   **`session-mechanic-grants-uncommitted` carried it** as the third member of its class — 19
-  measured out-of-band calls across two sessions in this iteration alone, every one a
-  `kill -0 "$pid"` loop condition that a `Bash(...)` glob provably cannot match, because the
-  mandated form *is* a loop condition and so is decorated by construction. That entry's promotion
-  deliberately excluded the wait-loop grant, sequencing it behind the wait-primitive measurement
-  on the stated ground that a grant minted around the currently-sanctioned form would be shaped
-  to a primitive the measurement might correct. The exclusion was right and is not questioned.
-  **What the sequencing did not account for** is that the entry itself completed at this build
-  and moved to Done, so the grant lost its carrier. The refusal survives at guard-kit/SPEC.md
-  §The generic ruleset rule 17 — but a SPEC paragraph is not a work item.
+  measured out-of-band calls, every one a `kill -0 "$pid"` loop condition that a `Bash(...)` glob
+  provably cannot match, the mandated form *being* a loop condition and so decorated by
+  construction. That entry's promotion deliberately excluded the wait-loop grant, sequencing it
+  behind the wait-primitive measurement so a grant would not be shaped to a primitive the
+  measurement might correct; the exclusion was right and is not questioned. **What it did not
+  account for** is that the entry completed and moved to Done, so the grant lost its carrier. The
+  refusal survives at guard-kit/SPEC.md §The generic ruleset rule 17 — but a SPEC paragraph is not
+  a work item.
   **The precondition is discharged.** The measurement returned at that same build: the ordering
   stands and the polarity was the bug, so rule 17 now records that a grant is shaped to
   `while kill -0 "$pid" …` as well as `until <cond> …`. Nothing here needs re-deriving.
   **Why `[design-pending]` rather than ready-to-build:** the deliverable is guard-kit code and is
   landable by a stage session — rule 17's own landing demonstrated that end to end — but the
   grant's shape (a rule 6 narrowing, a new generic rule, or a raw-command exemption) is unruled.
-  **DISTINCT from `turn-end-chokepoint-and-wait-primitive`**, the measurement half, whose
-  completion is this entry's precondition rather than this work; and from
+  **DISTINCT from `turn-end-chokepoint-and-wait-primitive`**, the measurement half whose completion
+  is this entry's precondition rather than this work, and from
   `overlay-only-oracle-grants-uncommitted`, the parent's other split half, whose subject is four
-  Rust/gh toolchain oracles and not the wait form.
+  Rust/gh toolchain oracles rather than the wait form.
   recurrence: wait-loop-grant-lost-its-carrier 2026-08-24 2026-08-27 2026-08-28
   **THE THREE RECURRENCES, kept as measurements now that the ruling below carries their reading.**
   2026-08-24 at close's prompt-friction triage, off the log rather than impression: **60**
@@ -6334,21 +6333,21 @@
   **6** and **12** — a tenfold FALL, in an iteration that delegated *more* heavily, because it
   reached for `Agent` dispatches whose completion notification is a wait with no loop to grant.
   2026-08-28, measured the same way at `installer-trial-lifecycle-repair`'s close: **8** and **1**,
-  nine calls against the eighteen of the iteration before and the sixty-eight of the ceiling. The
-  mechanic did not change and the rule did not change any of the three times, and the third sample
-  is the first to arrive *after* the reading below was ruled — it is consistent with it rather than
-  a test of it, since this iteration backgrounded few shell producers and delegated the rest.
-  **RE-DEFERRED 2026-08-27, and the substance of the ruling is the reading rather than the
-  outcome.** The threshold rule put this entry in front of the authority regardless of theme — its
-  two judged dates meet `LIFECYCLE_KIT_RECURRENCE_THRESHOLD`, and an anchored sweep found it the
-  only entry in the pool that does. What the authority ruled on is that **the second recurrence
-  falsified the first's price trend**: the carry scales with the number of *shell* producers a
-  session backgrounds, not with compliance-as-such, so a single iteration's figure is a sample and
-  never a rate. The sixty below is this class's observed **ceiling**, not its level, and the cost
-  line beneath is read that way from here on. The entry is guard-kit code, so TRAJECTORY.md §The
-  closed rulings' 2026-08-22 bar on promoting a permission-settings edit was checked and does not
-  reach it — recorded so the next threshold firing does not re-derive that.
+  nine calls against the eighteen before and the sixty-eight of the ceiling. The mechanic and the
+  rule changed none of the three times, and the third sample is the first to arrive *after* the
+  reading below was ruled — consistent with it rather than a test of it, this iteration having
+  backgrounded few shell producers and delegated the rest. **Re-deferred on it 2026-08-28**, the
+  threshold's second firing, with the boundary spent narrowing nothing.
+  **RE-DEFERRED 2026-08-27, and the substance of that ruling is the reading rather than the
+  outcome.** What the authority ruled on is that **the second recurrence falsified the first's price
+  trend**: the carry scales with the number of *shell* producers a session backgrounds, not with
+  compliance-as-such, so a single iteration's figure is a sample and never a rate. The sixty below
+  is this class's observed **ceiling**, not its level, and the cost line beneath is read that way
+  from here on. The entry is guard-kit code, so TRAJECTORY.md §The closed rulings' 2026-08-22 bar on
+  promoting a permission-settings edit was checked and does not reach it — recorded so the next
+  threshold firing does not re-derive that.
   ruled: wait-loop-grant-lost-its-carrier operator 2026-08-27 lead-relay
+  ruled: wait-loop-grant-lost-its-carrier lead 2026-08-28 own-authority
   **Cost while deferred:** rule 6 decides the mandated `kill -0 "$pid"` loop out of band on
   *every* call — sixty decisions in the iteration that set the ceiling, for a mechanic the
   methodology mandates — and the price is invisible to scope because no entry carries it.
@@ -8694,6 +8693,35 @@
   background is silenced by the very record the other rule mandates.
   Surfaced 2026-08-28 by the close of `installer-trial-lifecycle-repair`, filed to the gap inbox
   there; promoted 2026-08-28 by scope at this boundary's drain.
+
+- **port-completion-predicate-contributor-side-accounting** [design-pending] — the port's completion
+  predicate and its contributor-side carve-out disagree, and no surface reconciles them.
+  **The predicate.** TRAJECTORY.md §The closed rulings makes `port-blockers.sh --tree`'s owed count
+  reaching zero the completion sentence itself, and gate-sdk/SPEC.md §port-blockers explicitly
+  refuses minting any exclusion knob against that column.
+  **The carve-out.** TRAJECTORY.md §PRIORITY DIRECTIVE says contributor-side tooling and the test
+  harness ship to no adopter and port opportunistically, never as a gate on the claim.
+  **The contradiction is mechanical, not rhetorical.** No `# no-port:` cause class covers
+  "contributor-side", so under the oracle every one of those files must be ported or the owed count
+  never reaches zero — while the ruling says they are not on the claim. Both readings are
+  defensible from the governed surfaces and nothing says which is meant.
+  **The disputed set, measured 2026-08-28, and SMALLER than an earlier sweep reported:** 33 files,
+  about 4,436 lines — 21 kit `smoke/` members, 8 test runners, 4 walkthrough drivers. The earlier
+  figure of 46 counted drift-kit's 13 KPI plugins as contributor-side; they are not, because
+  drift-kit ships in the derived `full` profile.
+  **Three options, none ruled:** (i) the predicate is literal and the carve-out sets priority only;
+  (ii) mint a contributor-side cause class so the carve-out becomes decidable in the column;
+  (iii) narrow the predicate's corpus.
+  **Why `[design-pending]`, and why it is OPERATOR-CLASS:** it interprets a stated objective's own
+  completion predicate, which no stage and no lead may re-scope. This entry exists so the operator's
+  answer has somewhere to land that outlives the sessions that raised it.
+  **DISTINCT from `native-gate-port-remaining-corpus`**, whose subject is the remaining corpus and
+  the composer that cuts it — that composer is ruled and this question is not what blocks it — and
+  from `port-oracle-instrument-self-disposition`, one named file's own port.
+  **Cost while deferred:** bounded but compounding — every cut lands against a completion number
+  nobody can count, so "how much is left" has two defensible answers thirty-three files apart, and
+  the first cut under the new composer is held on exactly this.
+  Filed 2026-08-28 by scope, escalated to the operator through the lead at this boundary.
 
 
 ## Icebox
