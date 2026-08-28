@@ -109,11 +109,11 @@
   **Every closed cohort and cut — members, counts, holds, grounds, price — is recorded at
   gate-sdk/SPEC.md §The first cohort, so this entry states what remains.** Cut widths are ruled
   **per cut and never inherited**, and the size arm is **permanently** exhausted.
-  **THE COMPOSER DOES NOT REACH THE TREE REMAINDER.** `port-blockers.sh --group` walks the **gate
-  registry**, which reports 0 owed and 0 takeable — a finished battery, and its own `--help` says a
-  registry arm reading zero "says nothing about the tree". Only `--tree` is the predicate;
-  `ported-gate-members` answers neither, and its owed count RISES when a non-gate shell file lands,
-  which is that predicate working rather than a regression.
+  **THE COMPOSER DOES NOT REACH THE TREE REMAINDER.** `run-gates.sh --emit port-blockers --group`
+  walks the **gate registry**, which reports 0 owed and 0 takeable — a finished battery, and its
+  `--help` says a registry arm reading zero "says nothing about the tree". Only `--tree` is the
+  predicate; `ported-gate-members` answers neither, and its owed count RISES when a non-gate shell
+  file lands, which is that predicate working rather than a regression.
   **THE COMPOSER IS RULED 2026-08-28: select the next cut by STATED CONTRACT** — the owed files
   sitting behind one specification section, ported behind the one amendment that section needs.
   Size-ordered and kit-ordered composers stay refused; a contract-cohort composer is derivable from
@@ -6819,10 +6819,12 @@
 
 - **single-gate-front-end-form-unruled** [design-pending] — the tree mandates one front end for a
   single-gate run and grants a different one, and which form it reinforces is unruled.
-  **Re-verified at this intake rather than carried:** the committed `.claude/settings.json` holds
-  **106** `Bash(` entries and **zero** naming `scripts/gate-exec.sh` in any form, while
-  `bash gate-sdk/bin/run-gates.sh *` is granted at lines 11-14 and covers `--only <gate>`. So a
-  granted alternative genuinely exists and this is a choice between forms, not an absent grant.
+  **RE-VERIFIED AGAIN 2026-08-28 at close's drain, and the intake's own measurement is now FALSE:
+  the grant horn was TAKEN.** `.claude/settings.json` names `scripts/gate-exec.sh` in **two** forms,
+  bare and argument, added 2026-08-27 by `dc37d003` on an operator ruling out of the previous
+  close's proposal. The intake's "**zero** naming it in any form" and its `Bash(` count both date
+  from 2026-08-24 and neither reproduces. `bash gate-sdk/bin/run-gates.sh *` is granted too and
+  covers `--only <gate>`, so BOTH forms are now granted and the fork is no longer grant-vs-no-grant.
   **The mandate's scope is NARROWER than the filing bullet claimed, corrected here.**
   evidence-kit/SPEC.md §check-evidence-manifest binds the **pre-flight caller** —
   `LIFECYCLE_KIT_ENTRY_PREFLIGHT` execs with no interpreter word, so a `.gate` descriptor cannot
@@ -6830,23 +6832,25 @@
   `gate_command`. It does not rule that every evidence entry reaches a gate through that front end.
   The tension survives the correction: the roster the front end serves is the consumer's whole
   pre-flight set, so a session obeying it hand-runs an ungranted path.
-  **Why `[design-pending]`:** the two dispositions bless opposite futures. Proposing the committed
-  grant reinforces a front end the port may retire — `scripts/gate-exec.sh` is 22 lines and reads
-  `owed` on `port-blockers.sh --tree` — and the grant itself is **operator-class** under
-  TRAJECTORY.md §The closed rulings (2026-08-22), so no stage session may land it. Steering onto
-  `run-gates.sh --only` is landable in guard-kit today and makes the SPEC's own discharge the
-  unreinforced path. Neither horn is costed, and the port disposition of the front end decides it.
+  **Why `[design-pending]`, restated on what survives the grant landing.** The reinforcement
+  question is untouched: the granted front end is still one the port may retire —
+  `scripts/gate-exec.sh` is **29** lines and the oracle's `--tree` arm carries it `owed` (the intake
+  attributed that reading to the script itself, which resolves a gate *name* and invokes no oracle
+  at all; corrected here). Steering onto `run-gates.sh --only` stays landable in guard-kit today.
+  What the grant removed is only the operator-class barrier; which form the tree reinforces is
+  still unruled, still uncosted, and still decided by the port disposition of the front end.
   **DISTINCT from `guard-steer-grant-mismatch`**, a steer whose target nothing grants: no guard
   rule steers to `gate-exec.sh` at all, the mandate living in a kit SPEC. **DISTINCT from
   `overlay-only-oracle-grants-uncommitted`**, whose four oracles are granted in an untracked
   overlay rather than nowhere, and whose question is which surface carries a grant all parties
   agree is wanted. **DISTINCT from `crate-toolchain-grant-uncommitted`**, ruled toward pruning.
-  **Cost while deferred:** an out-of-band decision per single-gate run for any session that obeys
-  the SPEC, invisible on a clone whose overlay has absorbed it, and a standing risk that a session
-  reads the ungranted form as unsanctioned and stops using the discharge the SPEC designed.
+  **Cost while deferred, and the grant landing CUT it.** The filing cost — an out-of-band decision
+  per single-gate run — is paid off; what remains is that the tree now grants two front ends for
+  one act and reinforces neither, so a session picks by habit and a later port retiring one strands
+  a committed grant nobody attributes.
   Filed 2026-08-24 to the gap inbox by `shell-gate-tail-port-and-completion-oracle`'s close, from
-  its prompt-friction triage; promoted 2026-08-24 at this iteration's scope intake, its premise
-  re-verified and one claim corrected above.
+  its prompt-friction triage; promoted 2026-08-24 at that iteration's scope intake; three carried
+  measurements re-verified and corrected 2026-08-28 at close's drain.
 
 - **promotion-commitment-stamp-latency** [design-pending] — between a promotion commitment and the
   boundary that pays it, an at-ceiling entry accrues firings only prose can hold.
@@ -7685,6 +7689,23 @@
   preserve list, which re-buys the same omission the next time a session-lifetime artifact appears;
   give the preserve knob a lifetime vocabulary instead of a name list; or move a live session's
   journal out of the wiped directory, which reopens where delegation-kit sends a journal at all.
+  **A FOURTH SHAPE, raised by the operator 2026-08-28 and recorded here rather than ruled: move the
+  wipe out of `enter-stage.sh` and into the lead**, fired at iteration start before any stage is
+  dispatched. It differs from the three above in KIND — they change what the wipe preserves, this
+  changes who fires it and when. **Three grounds against, each re-read off its surface at close's
+  drain and each still standing.** (1) `lifecycle-kit/templates/lead.md` opens by ruling the lead
+  OPTIONAL, so a lead-less iteration would never wipe at all — a silent regression landing exactly
+  where no supervisor watches. (2) The lead writes no lifecycle state, so relocating the wipe puts
+  it out of reach of the stage-entry gates entirely. (3) It patches TIMING, not lifetime: ordering
+  saves the lead journal alone and touches no other session-lifetime artifact — not a live consult
+  session's, and not a `<key>.run` record whose producer still runs, which guard-kit reads to block
+  index-writing git commands, so deleting one retracts a true statement about a live process.
+  **The steelman, so the refusal is costed:** the lead is the one actor that knows an iteration is
+  opening AND holds its dispatched sessions' identities, so it alone could preserve by *liveness*
+  rather than by name — which is what shape 2 wants. Its limit is that lead-privileged knowledge
+  reaches only sessions the lead dispatched, and the attested victim in both attestations is the
+  lead journal, which no dispatch created. The grounds above are the lead's, not the operator's;
+  the shape stays available if the operator overrides them.
   **DISTINCT from `boundary-wipe-preserve-basename-reach`**, whose subject is the matcher's *reach*
   — an unanchored `! -name` making a nested tree immortal. This one is which *lifetimes* the list
   must cover, and it is live whichever way that matcher is anchored.
@@ -8655,6 +8676,37 @@
   background is silenced by the very record the other rule mandates.
   Surfaced 2026-08-28 by the close of `installer-trial-lifecycle-repair`, filed to the gap inbox
   there; promoted 2026-08-28 by scope at this boundary's drain.
+
+- **readme-bin-roster-underived** [design-pending] — every kit README's **gate** roster is held by a
+  gate and its **`bin/` tool** roster is held by nothing, so a tool added, renamed or retired leaves
+  a hand-authored list silently stale.
+  **The scope limit is the gate's, stated and verified rather than inferred.** `check-readme-roster`
+  asserts name-set parity in both directions over exactly two sets: the names inside a README's
+  gate-roster marker block, and the kit's `checks/` basenames (gate-sdk/SPEC.md
+  §check-readme-roster; the descriptor's `couples=` field and the compiled rule agree). A `bin/`
+  tool sits outside both sets, so nothing reds.
+  **A live witness, standing right now and independent of what surfaced this.**
+  `gate-sdk/bin/upgrade-smoke.sh` ships in `gate-sdk/bin/` and appears nowhere in that README's
+  hand-authored `bin/` prose. It predates the surfacing iteration, so the roster was already wrong
+  before the event that exposed the class — the omission is not a one-off a sweep would have caught.
+  **This is Derivation-first in the shape the doctrine names:** a roster maintained rather than
+  derived, with a freshness gate sitting one directory away that does not reach it.
+  **Why `[design-pending]`, two dispositions trading different properties.** Make the `bin/` roster
+  a **generated projection**, rostered in docs/site-architecture.md with a trigger and a regen
+  command like every other — which buys derivation but puts a marker block and a freshness gate on
+  a surface whose annotation prose is the part a reader wants. Or **widen `check-readme-roster`**
+  to a second marker block over `bin/` basenames — cheaper, reuses the shape the gate already
+  has, but asserts parity over a set whose membership rule ("a shipped tool") is less crisp than
+  `checks/`'s, since `bin/` mixes adopter-facing entry points with internal helpers and the gate
+  would have to rule which are roster-owed.
+  **DISTINCT from `readme-roster-enum-coverage`**, whose subject is the gate's own enum coverage
+  inside the block it already reads. This one is a corpus the gate never reaches at all.
+  **Cost while deferred:** one stale roster line per tool retired or added, each unattributable by a
+  later reader, on the surface an adopter reads first to learn what a kit ships — and the tree has
+  one such line standing today.
+  Relayed 2026-08-28 by the lead on the spec session's behalf (`file-gap.sh` contended on an
+  uncommitted inbox); promoted 2026-08-28 by close at this boundary's drain, its scope claim
+  re-verified against the descriptor and the compiled rule and its witness found here.
 
 
 ## Icebox

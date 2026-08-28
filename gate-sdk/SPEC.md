@@ -1557,7 +1557,12 @@ session that has not started.
 A **non-gate arm** is specified by three properties:
 
 - **It is a top-level `--`-prefixed flag, resolved in `main` before the
-  registry lookup, and it is absent from `--list`.** The placement is
+  registry lookup, and it is absent from `--list`.** The flag's spelling and the
+  front-end's grammar are **one decision, not two**: `bin/run-gates.sh` composes
+  `--emit-<name>` from its `--emit <name>` operand, so a member spelled anything
+  else is reachable by no shipped front-end and is callable only against the
+  binary directly. Read the `--emit-` prefix as load-bearing rather than as the
+  family's house style. The placement is
   load-bearing rather than stylistic: §check-gate-substrate-parity assertion B
   equates the `.gate` descriptor set with exactly the roster `--list` prints, so
   an arm inside that roster would read as a subcommand nothing declares and red
@@ -8447,7 +8452,14 @@ count does not move**, because the file was held rather than owed. And because
 the byte-identity oracle is empty over the tokenizer in a tree whose every
 registered member has ported, the compiled scan was additionally held against the
 shell scan's own token stream over the whole tracked shell tree, and both
-registry arms against a planted still-shell registry. Each is a fact about that change
+registry arms against a planted still-shell registry. **That token oracle stays
+re-runnable and the recovery is one command, not archaeology**: the shell scanner
+was the `PB_SCAN` awk program, and `git show <deletion-commit>^:gate-sdk/bin/port-blockers.sh`
+piped through `awk 'NR>=180 && NR<=356'` reproduces it verbatim, the two elided
+lines being the shell quoting around it. Recorded because the extraction a session
+makes to re-run this lives in scratch and dies at the next boundary, while the
+line range is the only part that is not re-derivable from the file itself.
+Each is a fact about that change
 and **not** a standing guarantee that an arm's output never moves: the truncation
 repair below moved the default arm's deliberately, and a session diffing two runs
 across that commit is seeing the repair rather than a regression. What `--tree`'s
@@ -8538,8 +8550,8 @@ field is deliberately **trigger**-shaped and wide on purpose. A bare
 callers spanning canon-kit, gate-sdk and `scripts/` that share no corpus whatever.
 `check-shellcheck` is the worked case in both directions — it *does* call
 `gate_kit_roots`, then composes four fixed subdirectory names and a `*.sh` glob on
-top of it, where the shell port oracle composed the same call with one
-subdirectory. Same primitive, different corpus.
+top of it, where `bin/run-consumer-smoke.sh` composes the same call with one
+`smoke/` path. Same primitive, different corpus.
 
 - **Kit-library call set** — the command-position words the scan emits that the
   gate itself, or a kit library it can source, defines as a shell function. This
@@ -8984,9 +8996,9 @@ it three times over, which is why the usage text carries every arm.
 
 **The arm's channels are `Arm::Emit`'s, and the variant was forced rather than
 chosen**: a rendered document to stdout at exit 0 and a message on stderr at exit
-2 is the whole of the shell tool's own exit behaviour, covering the help arm, the
-unrecognized-argument refusal, the non-repository refusal, the missing-registry
-refusal and the unresolvable-member refusal with nothing left over. It does not
+2 is the whole of what this tool ever needs, and the compiled arm still exercises
+every refusal path the shell form did — each one reaching stderr and exit 2, with
+nothing left over that would want a third channel. It does not
 inherit the dispatch union `Arm::Run` carries, which is correct: it dispatches
 nothing.
 

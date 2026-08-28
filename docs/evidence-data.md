@@ -119,3 +119,4 @@
 | windows-adopter-unblock | sc sp a b v c | 10f/1d | 8 · ≤1d | 24s 1✗ | 106 |
 | windows-artifact-proof | sc sp a b v c | 3f/5d | 2 · ≤0d | 31s 3✗ | 107 |
 | installer-trial-lifecycle-repair | sc sp a b v c | 3f/3d | 1 · ≤1d | 24s 1✗ | 107 |
+| port-oracle-and-composer-ruling | sc sp a b v c | 2f/1d | 1 · ≤0d | 24s 1✗ | 107 |
