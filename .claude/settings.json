@@ -32,8 +32,6 @@
       "Bash(bash gate-sdk/bin/install-hooks.sh)",
       "Bash(bash gate-sdk/bin/build-native.sh)",
       "Bash(bash gate-sdk/bin/build-native.sh *)",
-      "Bash(bash gate-sdk/bin/port-blockers.sh)",
-      "Bash(bash gate-sdk/bin/port-blockers.sh *)",
       "Bash(bash lifecycle-kit/bin/session-id.sh)",
       "Bash(bash lifecycle-kit/bin/enter-stage.sh *)",
       "Bash(bash lifecycle-kit/bin/file-gap.sh *)",
