@@ -41,6 +41,17 @@ pub fn resolve_dirs(gates_dir: &str, kit_roots: &[String]) -> Vec<String> {
     dirs
 }
 
+// spec: gate-sdk/SPEC.md §port-blockers — the fixture dirs check-gate-fixture-coverage resolves,
+// shared rather than duplicated, and taking its roots as a *parameter* because the gate resolves
+// absolute ones where this report's evidence column must stay repo-relative.
+pub fn fixture_dirs(tests_dir: &str, kit_roots: &[String]) -> Vec<String> {
+    let mut dirs = vec![tests_dir.to_string()];
+    for k in kit_roots {
+        dirs.push(format!("{}/gate-tests", k.trim_end_matches('/')));
+    }
+    dirs
+}
+
 pub fn list_path(gates_dir: &str) -> String {
     format!("{}/gates.list", gates_dir)
 }

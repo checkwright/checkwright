@@ -6,6 +6,7 @@ pub mod docs_mirror;
 pub mod enforcement_map;
 pub mod footprint;
 pub mod graph;
+pub mod port_blockers;
 pub mod queue_index;
 pub mod roadmap;
 pub mod trajectory;
@@ -180,6 +181,14 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
             "QUEUE_KIT_ICEBOX_AGE_DAYS",
         ],
     ),
+    // spec: gate-sdk/SPEC.md §port-blockers — the port oracle: three arms over two corpora, whose
+    // `--tree` owed count is the port track's completion predicate. A table member rather than a
+    // hardcoded flag because it reads five structural knobs and an arbitrary sixth.
+    (
+        "--emit-port-blockers",
+        Arm::Emit(port_blockers::emit),
+        port_blockers::KNOBS,
+    ),
     // spec: gate-sdk/SPEC.md §run-gates — the battery runner: the class's first bridged member
     // that returns a verdict rather than a document, and the reason the table is keyed by flag.
     (
@@ -202,9 +211,31 @@ pub fn lookup(arm: &str) -> Option<&'static Arm> {
 pub fn knobs(arm: &str, rest: &[String]) -> Option<Vec<&'static str>> {
     let (_, f, own) = BRIDGED_ARMS.iter().find(|(a, _, _)| *a == arm)?;
     match f {
-        Arm::Emit(_) => Some(own.to_vec()),
+        Arm::Emit(_) => Some(sentinel_union(own, rest)),
         Arm::Run(_) => Some(dispatch_union(own, rest)),
     }
+}
+
+// spec: gate-sdk/SPEC.md §The non-gate arm — the union sentinel, expressible per member without
+// moving the dispatch union: an arm whose roster carries it is bridged every knob the *tree's*
+// registry declares, and an arm that does not carry it keeps exactly its own roster.
+fn sentinel_union(own: &'static [&'static str], rest: &[String]) -> Vec<&'static str> {
+    if !own.contains(&port_blockers::EVERY_REGISTERED_KNOB) {
+        return own.to_vec();
+    }
+    let mut all: Vec<&'static str> = own
+        .iter()
+        .copied()
+        .filter(|k| *k != port_blockers::EVERY_REGISTERED_KNOB)
+        .collect();
+    for name in port_blockers::registered_members(rest) {
+        if let Some(k) = crate::gates::knobs(&name) {
+            all.extend_from_slice(k);
+        }
+    }
+    all.sort_unstable();
+    all.dedup();
+    all
 }
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — the union is scoped to the members **this tree

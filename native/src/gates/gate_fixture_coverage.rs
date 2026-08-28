@@ -37,10 +37,8 @@ pub fn run(_args: &[String]) -> i32 {
             return 2;
         }
     };
-    let mut tests_dirs = vec![tests_dir];
-    tests_dirs.extend(kit_roots.iter().map(|k| format!("{}/gate-tests", k)));
-    let mut resolve_dirs = vec![dir.clone()];
-    resolve_dirs.extend(kit_roots.iter().map(|k| format!("{}/checks", k)));
+    let tests_dirs = registry::fixture_dirs(&tests_dir, &kit_roots);
+    let resolve_dirs = registry::resolve_dirs(&dir, &kit_roots);
 
     let list = format!("{}/gates.list", dir);
     if !Path::new(&list).is_file() {
