@@ -48,6 +48,74 @@ pub fn tracked_shell_tree() -> Result<Vec<String>, String> {
         .collect())
 }
 
+// spec: gate-sdk/SPEC.md §port-blockers — the file's own header block, the leading run of shebang,
+// comment and blank lines. It sits on this universal layer beside the corpus rule it is the other
+// half of, and both readers of the disposition below are readers of it.
+pub fn header_block(text: &str) -> String {
+    let mut out = String::new();
+    for (idx, line) in text.lines().enumerate() {
+        let t = line.trim_start_matches([' ', '\t']);
+        if !(t.is_empty() || t.starts_with('#') || (idx == 0 && line.starts_with("#!"))) {
+            break;
+        }
+        out.push_str(line);
+        out.push('\n');
+    }
+    out
+}
+
+// spec: gate-sdk/SPEC.md §port-blockers — the port disposition a header block declares. There is no
+// fourth member because there is no fourth disposition, and *held* is separated from *no-port*
+// because a temporary hold is not a permanent one: folding them silently falsifies a subtraction.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Disposition {
+    Owed,
+    NoPort,
+    PortUntil(String),
+}
+
+// spec: gate-sdk/SPEC.md §port-blockers — one well-formedness rule rather than three: an empty
+// cause, a missing slug, a doubled field and a file carrying **both** are each `Owed`, because a
+// file that has not made a reviewable declaration has not made one.
+pub fn disposition(header: &str) -> Disposition {
+    let no_port = header_field(header, "no-port:");
+    let port_until = header_field(header, "port-until:");
+    match (no_port.as_slice(), port_until.as_slice()) {
+        ([cause], []) => {
+            if cause.chars().all(char::is_whitespace) {
+                Disposition::Owed
+            } else {
+                Disposition::NoPort
+            }
+        }
+        ([], [payload]) => {
+            let t = payload.trim_start_matches([' ', '\t']).as_bytes();
+            let mut n = 0usize;
+            while n < t.len() && (t[n].is_ascii_lowercase() || t[n].is_ascii_digit() || t[n] == b'-')
+            {
+                n += 1;
+            }
+            if n == 0 {
+                Disposition::Owed
+            } else {
+                Disposition::PortUntil(String::from_utf8_lossy(&t[..n]).into_owned())
+            }
+        }
+        _ => Disposition::Owed,
+    }
+}
+
+// spec: gate-sdk/SPEC.md §The `# graph:` manifest — a header field opens the line: '#' in column
+// one, optional blanks, the field name. An indented '#' is a comment inside a block rather than a
+// header field, which is what keeps a nested declaration out of the read.
+fn header_field<'a>(header: &'a str, name: &str) -> Vec<&'a str> {
+    header
+        .lines()
+        .filter_map(|l| l.strip_prefix('#'))
+        .filter_map(|r| r.trim_start_matches([' ', '\t']).strip_prefix(name))
+        .collect()
+}
+
 // spec: gate-sdk/SPEC.md §lib/gate.sh — the bridged read of one tab-joined array knob,
 // the shape `prune_dirs` above has; an absent variable is an error because the crate holds
 // no default for a bridged knob, and an empty one is a resolved-empty set.
@@ -685,6 +753,57 @@ pub fn fixture_case_dirs(gate: &str) -> Vec<PathBuf> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // spec: gate-sdk/SPEC.md §port-blockers — the header block ends at the first line that is
+    // neither shebang, comment nor blank, which is what stops a declaration being read out of a
+    // heredoc literal in a script that writes shell
+    #[test]
+    fn the_header_block_ends_at_the_first_code_line() {
+        let text = "#!/usr/bin/env bash\n# no-port: a cause\n\nset -e\n# port-until: later\n";
+        let header = header_block(text);
+        assert!(header.contains("# no-port: a cause"));
+        assert!(
+            !header.contains("port-until"),
+            "a field below the first code line was read as a header field"
+        );
+        assert_eq!(disposition(&header), Disposition::NoPort);
+    }
+
+    // spec: gate-sdk/SPEC.md §port-blockers — one well-formedness rule rather than three: an empty
+    // cause, a missing slug, a doubled field and a file carrying both are each `Owed`
+    #[test]
+    fn a_declaration_that_is_not_reviewable_is_owed() {
+        assert_eq!(disposition("# no-port:\n"), Disposition::Owed);
+        assert_eq!(disposition("# no-port:   \n"), Disposition::Owed);
+        assert_eq!(disposition("# port-until:\n"), Disposition::Owed);
+        assert_eq!(disposition("# port-until: NotASlug\n"), Disposition::Owed);
+        assert_eq!(
+            disposition("# no-port: a cause\n# port-until: a-slug\n"),
+            Disposition::Owed,
+            "a file carrying both fields declared neither"
+        );
+        assert_eq!(
+            disposition("# no-port: one\n# no-port: two\n"),
+            Disposition::Owed,
+            "two causes are not one reviewable declaration"
+        );
+        assert_eq!(disposition("#!/usr/bin/env bash\n\n"), Disposition::Owed);
+    }
+
+    // spec: gate-sdk/SPEC.md §port-blockers — the slug is the leading run of `[a-z0-9-]` after the
+    // field, and an indented '#' is a comment inside a block rather than a header field
+    #[test]
+    fn a_held_declaration_yields_its_slug_and_an_indented_one_yields_none() {
+        assert_eq!(
+            disposition("#port-until: a-slug trailing prose\n"),
+            Disposition::PortUntil("a-slug".to_string())
+        );
+        assert_eq!(
+            disposition("#\tport-until:\ta-slug\n"),
+            Disposition::PortUntil("a-slug".to_string())
+        );
+        assert_eq!(disposition("  # port-until: a-slug\n"), Disposition::Owed);
+    }
 
     // spec: gate-sdk/SPEC.md §lib/gate.sh — the prune predicate is a path *component* test, so a
     // basename that merely starts with a prune name is not pruned. One test, because there is now
