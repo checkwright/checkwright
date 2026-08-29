@@ -4130,7 +4130,7 @@
   `guard-kit/bin/run-guard-tests.sh` drives `guard-kit/templates/bash-guard.sh`, so the three
   project rules in `scripts/bash-guard.sh` — the hook-bypass block, the harness-scratchpad path
   block and the `git clean -x` block — carry zero behavioral coverage. It was four until
-  `scratch-execution-control-is-bash-only` generalized the scratch-run steer into rule 22 and
+  `scratch-execution-control-is-bash-only` generalized the scratch-run steer into rule 23 and
   deleted the copy's arm, which is the one exit this entry has ever had: a rule that qualifies for
   the generic lane leaves the uncovered one.
   `check-template-copy-parity` is their only gate and it reads the copy-divergence declaration
@@ -6124,12 +6124,19 @@
   rule is this entry's.
   **Two dispositions and neither is free:** sweep cross-corpus prose on every renumber, a corpus
   nobody has costed; or state in guard-kit/SPEC.md that a rule number is not a citable identifier
-  outside the kit and have every cross-corpus reference name the rule — the way rule 20 already
+  outside the kit and have every cross-corpus reference name the rule — the way rule 21 already
   cites DOCTRINE.md by name rather than number, for exactly this reason.
+  **Recurred 2026-08-29, and this entry's own citation was one of the six that rotted.** Rule 19's
+  insertion pushed rules 19-23 to 20-24; the renumber sweep held guard-kit but not this file, so
+  five citations of the scratch-execution rule by its pre-insertion number, and this entry's own
+  citation of the history-rewrite advisory by its pre-insertion number, all pointed
+  at the wrong rule. Corrected in place at close, by number rather than by name, because naming
+  them here would silently do the second disposition's work and rewrap five capped entries.
   **Why `[design-pending]`:** the second is a one-paragraph boundary note plus a sweep of unknown
   size, and whether a bare "rule N" outside the kit is gateable at all needs a false-positive
   budget nobody has measured.
   **Cost while deferred:** a reader follows the number to the wrong rule and reasons from it.
+  recurrence: guard-rule-number-not-citable-outside-kit 2026-08-29
   Filed 2026-08-22 at align's cross-audit; drained at that iteration's close, which found the
   bullet had named the wrong slug and located the real entry before dispositioning.
 
@@ -6900,11 +6907,11 @@
   substitution exactly as it refuses `$(…)`. So the fall-through costs the out-of-band decision the
   rule exists to pre-empt, while telling the session nothing.
   **Why `[design-pending]` rather than a one-line regex edit — the entry's real content.**
-  Rule 22 is BUILT ON rule 6 not reaching backticks. guard-kit/SPEC.md §The generic ruleset rules
-  that rule 22 declines on every expansion because rule 6 blocks those shapes already, but
+  Rule 23 is BUILT ON rule 6 not reaching backticks. guard-kit/SPEC.md §The generic ruleset rules
+  that rule 23 declines on every expansion because rule 6 blocks those shapes already, but
   deliberately does NOT decline on a backtick "since it is the one body-source spelling rule 6 does
   not reach and declining there would ship the hole the rule exists to close". Closing rule 6's hole
-  makes rule 22's backtick arm unreachable by dispatch order and stales three SPEC paragraphs that
+  makes rule 23's backtick arm unreachable by dispatch order and stales three SPEC paragraphs that
   argue from the current split. The unit is that re-argument, not the alternative.
   **The mechanical half is small and known:** one alternative in the regex, a firing and a
   non-firing case in `guard-kit/guard-tests/cases.tsv`, no message change. One interaction to watch:
@@ -6972,7 +6979,7 @@
   `Bash(python3 .tmp/*)`, was removed at a 2026-08-12 close as a glob over writable scratch and is
   recorded in `settings-content-pin-report-absent`; nothing replaced it for the inline shapes.
   **Disposition (a), and the tree already argued the safety case.** guard-kit/SPEC.md §The generic
-  ruleset rules that rule 22 deliberately does not fire on a body carried in the command string,
+  ruleset rules that rule 23 deliberately does not fire on a body carried in the command string,
   because "the permission prompt shows it to the approver verbatim and the friction log records it.
   There is nothing for a compensating control to compensate for." A grant over exactly that shape
   reinforces the form the ruleset already blesses — the opposite of the masking risk the triage
@@ -6984,7 +6991,7 @@
   reaches `python3 -c` and `python3 -` and stops at a bare file operand, which is the split that
   matches the safety argument — but a Bash allow-glob's `*` spans `/` and `..`
   (`grant-argument-bounding-mechanism`), so it cannot be relied on to bound anything, and the
-  scratch-operand shapes rule 22 now blocks must stay blocked by the guard rather than by the glob.
+  scratch-operand shapes rule 23 now blocks must stay blocked by the guard rather than by the glob.
   **DISTINCT from `overlay-only-oracle-grants-uncommitted`**, whose four oracles are granted in the
   overlay and whose question is which surface carries them; this shape is granted on no surface at
   all. DISTINCT from `file-authoring-act-ungoverned`, which governs bringing a file into being where
@@ -8894,6 +8901,45 @@
   Probed 2026-08-29 by spec at the boundary and filed to the gap inbox; promoted 2026-08-29 by
   close, the count re-measured and the truncation read at its source.
 
+- **amendment-roster-omission-detection** [design-pending] — an amendment's `## Existing sections
+  updated` roster can be short by a surface, and only a grep finds the missing one.
+  **Returned from the icebox 2026-08-29 on a recurrence that broke the cost line it was iceboxed
+  under.** That cost said the class is bounded and self-limiting because "the miss is caught by the
+  next reader who greps". This iteration it was not: guard-kit's rule-19 insertion renumbered rules
+  19-23 to 20-24, the sweep's roster held the kit and not the queue, and **six cross-corpus
+  citations shipped stale** — five of the scratch-execution rule and one on
+  `guard-rule-number-not-citable-outside-kit`, the entry whose own subject is that decay. Nothing
+  caught them until this close's `internal-identifier-restatement` audit, a full stage after the
+  landing. A shipped miss is a different cost from a caught one.
+  **Three of four amendments this iteration shipped a short roster, and the misses are not one
+  shape.** The edge-sum amendment missed three surfaces (a `.gate` spec line, a smoke comment, a
+  Rust help string). The wait unit's renumber needed four site classes a `rule <N>` grep does not
+  reach at all: markdown ordinals, parenthesized placement citations, a comma-list roster
+  (`rules 14, 15 and 22`), and ordinal prose (`seventeen rules earlier`). The anchor amendment
+  missed six roster gaps. So the deriving grep is not merely unrun — for a renumber it is not
+  expressible as one pattern, which the entry's literal-substitution slice did not anticipate.
+  **The align-stage rule is doing part of the job, measured.** Align found and fixed one real
+  roster omission this iteration (three README surfaces stale on a deleted shell driver), so the
+  step works where the amendment names a literal. It did not reach the renumber, whose evidence is
+  a numeric relation rather than a literal.
+  **The converse of a retired entry, and the distinction is load-bearing.**
+  `amendment-update-target-coverage` owned a roster *entry* naming no owning delta — a listed
+  target with no claim. This owns a *target with no entry*, which no scan over the amendment alone
+  can see, because the evidence is in the tree rather than in the document.
+  **Why it stays design-pending:** the general form is not gateable — deciding which surfaces an
+  amendment *should* have listed is the semantics of the change. The narrow slice that might be is
+  a **literal-substitution** amendment, checkable by grepping the tree for survivors of the old
+  literal not named in the roster; the cost is a new amendment-grammar field every amendment pays
+  whether or not it substitutes anything. What this iteration adds is a second slice the first does
+  not cover: a **renumber**, where the old and new values are a relation over a range and the
+  citations do not share a spelling. Whether one mechanism covers both is the open question.
+  **Cost while deferred:** revised upward from the iceboxing. A short roster now ships, and the
+  reader who eventually greps is a later stage or a later iteration, so the stale sentence is
+  live in the tree for the whole of that gap.
+  recurrence: amendment-roster-omission-detection 2026-08-29
+  Filed 2026-08-14 by close from its own lesson triage; iceboxed for low cost; returned
+  2026-08-29 by close, the six stale citations verified against guard-kit/SPEC.md at HEAD.
+
 
 ## Icebox
 
@@ -8947,7 +8993,6 @@
 - **installer-artifact-omission-residue** [design-pending] — An omission update strands a binary.
 - **doctrine-rule-number-citation-liveness** [design-pending] — A renumber stales citations.
 - **false-ground-citation-propagation** [design-pending] — Nothing re-reads a ground once cited.
-- **amendment-roster-omission-detection** [design-pending] — Only a grep catches a short roster.
 - **spec-embedded-source-criterion-4-membership** [design-pending] — Its port sizing stays unruled.
 - **lead-dispatch-simulate-optionality** [design-pending] — Dispatch may skip the pre-flight.
 - **self-repo-prefix-normalisation-unheld** [design-pending] — Two link-prefix holders, unheld.
