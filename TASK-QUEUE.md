@@ -12,68 +12,6 @@
 
 ## New Features
 
-- **msys-path-dialect-boundary-unmodelled** [spec: SPEC-dialect.md] — this codebase never models
-  which PATH DIALECT a root variable is in, so on an MSYS host a root can arrive in Windows
-  spelling and every downstream resolution silently produces nothing.
-  **Measured on Windows 2026-08-27.** On an MSYS host the installed consumer's root is
-  carried in Windows spelling, so the runner's resolve-dirs come out as a POSIX leading slash
-  prefixed onto a drive-lettered absolute path with backslashes intact. Every gate then
-  resolves to nothing and the run reported its entire roster failed, unresolved. It takes the
-  WHOLE roster rather than part of it because the starter profile vendors gate-sdk alone and
-  gate-sdk's shipped roster is `.gate` descriptors with no `.sh` fallback, so a resolver that
-  cannot reach the binary has nothing else to run.
-  **Two mechanisms are plausible and NEITHER was pinned** — npm's own MSYS bin shim, which
-  converts its basedir to Windows spelling and is how the smoke reaches the entry point, and
-  the toplevel probe under Git-for-Windows, a native Windows binary. Neither fully explains
-  the observed spelling, which carries a POSIX leading slash *and* backslashes, so a third
-  step is unaccounted for. The symptom's own propagation does not run through the installer's
-  root at all: the resolve-dirs derive from how the runner was invoked, a different chain
-  again.
-  **Why this wants a contract and not a patch.** Dozens of call sites take a root from a
-  program that, on MSYS, may not answer in our dialect, and nothing states which dialect a
-  root variable is in — so no call site can be judged right or wrong. The deliverable is a
-  CONTRACT: which dialect a root is in, where the boundary is crossed, and who crosses it.
-  Fixing at the layer where the value enters would mean a shared root-normalization helper
-  plus a migration of every call site — the normalization seam that is the named signal this
-  is no hotfix, and why an operator-ruled hotfix attempt was STOPPED at sizing 2026-08-27.
-  **RULED 2026-08-29: bundled with `native-gate-port-remaining-corpus`'s drift-kit cut, CONTRACT
-  ONLY.** The envelope is the contract plus dialect-correct root resolution for the call sites
-  the cut itself writes or touches — the four drift-kit `bin/` tools, each a `show-toplevel` site,
-  which is what makes the shared surface pay: the cut stops ADDING dialect-unmodelled sites
-  without buying the corpus. **The general migration is split out NOW rather than left as a
-  contingency**, to `msys-dialect-migration`, and the ground is that this entry's
-  own recorded cost re-derived to roughly five times what a reader takes it for — a mis-sized
-  unit already, not a risk to discover at build, and a mid-build judgment call would fall to the
-  session least able to afford it.
-  ruled: msys-path-dialect-boundary-unmodelled lead 2026-08-29 own-authority
-  **No local oracle**: MSYS path semantics cannot be exercised on this machine, so the
-  contract has to be held by a fixture pair plus a labelled reasoned-from-shape arm, the way
-  this iteration's `on_path` unit did it.
-  **DISTINCT from `platform-support-ci-matrix`**, whose subject is buying an OBSERVATION and
-  whose body records what each round measured; this is a located source defect in the
-  resolver, with its own emitter and its own fix, that would be worth fixing if the Windows
-  leg were deleted tomorrow. It cites that entry only as the surface where the symptom first
-  appeared — and it is now what blocks that entry's EXERCISED half, and with it the first
-  honest measurement of this iteration's `on_path` repair, which has gone two rounds
-  unmeasured behind the same resolver.
-  **Why it was design-pending:** the deliverable is a dialect contract and the diagnosis was
-  stopped at sizing rather than grown.
-  **Cost while deferred:** the Windows leg produces an artifact nothing exercises, so every
-  Windows claim this repo makes rests on reasoning rather than on a run.
-  Filed 2026-08-27 by build under a stopped hotfix, promoted 2026-08-27 by close with the
-  call-site roster re-derived and corrected at the drain.
-  **DIAGNOSIS FALSIFIED AND RELOCATED 2026-08-29, and the repair is admitted with the contract.**
-  The unaccounted third step this entry names is `native/src/walk.rs`: `abs_against` tests
-  absoluteness with a POSIX-only leading-slash predicate, `normalize_abs` splits on `/` alone and
-  then UNCONDITIONALLY PREPENDS one. That reproduces the observed string character-for-character;
-  NEITHER recorded candidate (the npm bin shim, the toplevel probe) does, and both are superseded
-  rather than deleted. The shell side is EXONERATED — gate.sh emits kit roots relative to PWD by
-  design. COROLLARY, now a first-class contract clause: porting to Rust does NOT retire dialect
-  exposure — the crate composes paths with String and format! rather than Path, so here the port
-  CREATED the defect. The judging predicate is CONSUMPTION: a root consumed only by `cd` is
-  tolerant, one consumed by concatenation is exposed; `|| pwd` confers nothing, since it fires
-  only when git FAILS and on MSYS git SUCCEEDS in the wrong dialect.
-
 - **native-gate-port-remaining-corpus** [spec: SPEC-kpi-port.md] [roadmap: now/reliability]
   — the whole battery onto the binary, and the shell surface down to its residue.
   roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
@@ -8478,15 +8416,22 @@
   defers, and the deferral is invisible until the close that cannot drain it.
   Filed 2026-08-27 by the lead at build, promoted 2026-08-27 by close.
 
-- **msys-dialect-migration** [design-pending] [blocked-by: msys-path-dialect-boundary-unmodelled]
-  — once the dialect contract exists, every root call site outside the cut that authored it still
-  has to be migrated onto it, and that corpus is five times the size the parent's cost line reads
-  as.
+- **msys-dialect-migration** [design-pending]
+  — the dialect contract now exists (gate-sdk/SPEC.md §The path-dialect contract), and every root
+  call site outside the cut that authored it still has to be migrated onto it; that corpus is five
+  times the size the parent's cost line reads as.
+  **UNBLOCKED 2026-08-29 by build**, on `check-task-names`' own verdict once the parent went Done —
+  the blocked-by tag was the only thing keeping this unpickable. It stays `[design-pending]`
+  because the migration's SHAPE is still unauthored; what changed is that the contract that rules
+  the shape is now readable, so the design is buyable rather than blocked.
   **THE FIGURE, re-derived 2026-08-29 at scope and the reason this is its own entry.**
-  `grep -rn 'show-toplevel'` over the tree counts **52** call sites: 25 non-test shell, 16 Rust,
-  11 `gate-tests`. The parent's cost line says the class "spanned eight roots in shell alone" —
-  which is true, and is a count of distinct ROOT VARIABLES, not of call sites. Nothing marks it
-  as the former, so it reads as the unit's size and understates it by roughly 5x.
+  `grep -rn 'show-toplevel'` over the tree counts **52** occurrences, of which **48** are real
+  call sites: 25 non-test shell, 16 Rust, 11 `gate-tests`. The parent's cost line says the class
+  "spanned eight roots in shell alone" — which is true, and is a count of TOP-LEVEL DIRECTORIES
+  carrying such a site, not of call sites and **not of root variables either**, of which there are
+  four. Nothing marks it as the former, so it reads as the unit's size and understates it by
+  roughly 5x. Corrected 2026-08-29 by build under `msys-path-dialect-boundary-unmodelled`, whose
+  own gloss of this line as a root-variable count was the second premise the probe killed.
   **The correction is the filing's first deliverable**, and it lands whether or not the migration
   is ever built: a spent premise travelling into a spec session is worse than either disposition
   of the work. Re-derive rather than reading this line — the corpus moves with every ported file,
@@ -8497,8 +8442,8 @@
   and the per-site migration. The `gate-tests` third of the corpus may fall out entirely — those
   sites carry a `|| pwd` fallback and may already be dialect-correct by construction — but that is
   a judgment the contract makes, not one this entry may assume.
-  **Why `[design-pending]`:** the migration's shape is whatever the contract rules, and the
-  contract is unwritten. This entry is unpickable until it is, which the `[blocked-by:]` says.
+  **Why `[design-pending]`:** the migration's shape is whatever the contract rules, and while the
+  contract is now written the shape is not — a spec stage still has to buy it.
   **DISTINCT from `msys-path-dialect-boundary-unmodelled`**, which owns the contract and the
   located resolver defect and would be worth landing if this migration were never taken. This owns
   only the corpus the contract then binds. DISTINCT from `init-vendoring-assumes-gnu-findutils`,
@@ -9010,6 +8955,8 @@
 - **stage-cursor-rerun-stamp-gap** [design-pending] — A skipped re-run stamp points the cursor back.
 
 ## Done
+
+- msys-path-dialect-boundary-unmodelled
 
 ## Lessons Learned
 

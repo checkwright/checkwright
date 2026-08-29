@@ -241,7 +241,9 @@ defaulting it to scratch instead is refused, because it would cold-build the rea
 crate on every battery run to buy a hermeticity the real tree does not need.
 Paths are
 repo-root-relative; every entry point `cd`s to `git rev-parse --show-toplevel`
-before resolving them.
+before resolving them. That sentence states **shape and mechanism and never
+dialect** — which spelling a root arrives in, and who owes the conversion, is
+§The path-dialect contract below.
 
 `lib/gate.sh` auto-sources the consumer config seam on load, so every gate sees
 the same knob resolution, whether it sources the library itself or is dispatched
@@ -255,6 +257,141 @@ default the invoking shell may override), but the file is how an override
 consumer that must relocate a layout knob for every session sets it here. The
 one knob the file cannot set is `GATE_SDK_GATES_DIR`, which locates the file
 itself — it stays env-or-default (a config file cannot name its own directory).
+
+## The path-dialect contract
+
+A **root** is a path this tree passes between components, and the sentence above
+says which *shape* one has and never which **spelling**. On a host carrying two
+path dialects — an MSYS or Cygwin shell over a Windows filesystem — that omission
+is not academic. A root can arrive drive-lettered and backslash-separated, every
+downstream resolution then composes a string no filesystem answers to, and the
+battery reports its **entire** roster unresolved rather than failing at the
+crossing. This section states the three things that make a call site judgeable at
+all: which dialect a root is in, where the boundary is crossed, and who crosses
+it.
+
+**The declared dialect.** Every root variable in this tree is **POSIX-spelled** —
+forward separators, no drive letter. That is the invariant, and it is a property
+of a value *anywhere inside the tree*, not only of the point that produced it.
+
+**The boundary, and who crosses it.** The dialect boundary is crossed exactly
+where a value enters from a **platform-native producer**: `git rev-parse
+--show-toplevel` under Git-for-Windows (a native Windows binary, so it answers in
+Windows spelling even to a POSIX shell), `std::env::current_dir()` in a
+`*-windows-msvc` binary, and an npm bin shim's basedir. The **crosser** is the
+entry point that reads such a producer, and normalizing there is the crosser's
+obligation. A shell builtin is *not* a platform-native producer — bash's own `pwd`
+answers in bash's dialect, so a root derived by `cd … && pwd` is POSIX by
+construction and its deriving line is itself the crossing. A value already inside
+the tree is POSIX by the clause above and is **never re-normalized**: a second
+normalization is how a contract decays into a ritual, and it erases the one place
+a reader can look to find where the conversion happened.
+
+**The judging predicate is about consumption rather than about the producer.**
+This is the clause that makes the contract usable, and the one a reader gets
+wrong:
+
+> A root consumed only by `cd` is **dialect-tolerant**. A root consumed by
+> **string concatenation** is **dialect-exposed**.
+
+`cd` accepts either spelling on an MSYS host; `"$ROOT/sub"` does not. So the audit
+question at a call site is never *where did this root come from* but *what is done
+with it* — provenance is a chase across components, consumption is local and
+decidable by reading one line. An exposed site is not thereby broken: exposure
+says its value must have reached it through a crosser, and the two halves are
+judged separately.
+
+**A `|| pwd` fallback confers nothing, and believing otherwise is the trap.** It
+fires only when `git` **fails**; on MSYS `git` **succeeds**, in the wrong dialect.
+It is a missing-repository guard and must never be read as a dialect one — which
+is why a bucket of call sites carrying it does not fall out of an audit by
+construction.
+
+### Porting to Rust does not retire dialect exposure
+
+A clause of the contract rather than a footnote to it, because the inference it
+kills is the intuitive one: *shell is the dialect-fragile substrate, so a ported
+file's dialect problem goes away.* That is **false in this crate**, and the defect
+this contract was written from is the proof — the port did not inherit the
+exposure, it **created** it. `native/src/walk.rs` composed roots with `String`,
+`split('/')` and `format!` rather than with `Path`/`PathBuf`, so it
+re-implemented by hand the POSIX assumptions `std::path` would have carried. Rust
+is dialect-safe only where `Path` is actually used, and a port reaching for string
+composition — as a port of a shell file naturally does, because the shell it is
+porting composed strings — is exactly where a *new* exposure is born. The reader
+this clause is for is the session porting the next kit (§Porting a gate to the
+binary substrate), at the moment it assumes the port retires the question.
+
+### The crate's crosser
+
+`native/src/walk.rs` holds the crate's single owner of absoluteness, `path_root`,
+and the pair that crosses the boundary. `cwd()` is the platform-native producer;
+`abs_against` and `normalize_abs` are pure functions of their inputs and convert
+into the declared dialect once, on entry:
+
+- absoluteness is a **two-dialect** question — a separator-rooted path and a
+  drive-rooted one are both absolute, and a leading-slash test answers *false* on
+  the second, sending an already-absolute root down the join-onto-cwd arm;
+- segments split on **either** separator, so a backslash run is not one segment;
+- the composed result carries the **input's own** root, never an unconditional
+  POSIX slash prepended onto whatever arrived.
+
+A rootless input keeps the pre-repair reading, treated as separator-rooted,
+because the contract puts no relative path here and the repair is scoped to
+dialect rather than to that caller error. UNC (`\\server\share`) is out of scope
+and is not claimed — no surface here produces one.
+
+`native/src/registry.rs` is the consumer whose failure was the observed one: it
+appends the `checks` segment to each resolved root and enumerates descriptors from
+it, so a root resolving to nothing takes **every** gate with it. That is this
+pair's honest blast radius — it has no small one, which is the argument for
+keeping the repair a change to how two functions map inputs to outputs and to
+nothing about when they are called.
+
+### How the claim is held, with no oracle that can run it
+
+There is **no CI oracle** for this, and the contract says so rather than implying
+one: the Windows leg runs the installer smoke, `continue-on-error`, and dies
+before the battery runs, while the Ubuntu leg only cross-compiles. So the arm is
+local and host-independent, on the mechanism §Fail-closed contract already
+established for `on_path` — the platform-dependent input is **injected**, which
+makes the decision a pure function a Linux host can exercise, and the assertion is
+**paired with a control** that fails if it would otherwise pass vacuously. Here
+the injected input is `cwd()`'s spelling, and the control is the pre-repair
+composition itself, kept in the test and asserted to still reproduce the string
+the Windows leg printed. `on_path`'s third part — a source scan standing in where
+no behavioural call could run — is **not** owed here: once the spelling is
+injected the composition rule is fully reachable, and a scan would assert shape
+where behavior is available.
+
+**The honest limit, so a green board is never read as a Windows run.** What these
+tests exercise is the composition rule, on the string the windows-msvc leg
+reported. That `std::env::current_dir()` answers in Windows spelling there is the
+**injected premise**, held by the observation this contract was written from and
+by nothing this repo can run.
+
+### Worked dispositions, because a judged-safe site and an unjudged one look identical
+
+Recording a verdict is the deliverable, not only changing what a verdict
+condemns — an unjudged site and a judged-safe site are indistinguishable on the
+page, and the contract's value is precisely that difference. drift-kit's `bin/`
+tools are the worked set:
+
+- `kfric.sh`, `overhead-meter.sh` and `stage-economics.sh` each resolve one
+  `REPO_ROOT` and consume it exactly once, on the next line, with `cd`.
+  **Dialect-tolerant; no change owed.**
+- `drift-report.sh` carries a second root, `KIT`, and consumes it by
+  **concatenation** — the one dialect-exposed consumption among them. Its crosser
+  is `cd "$(dirname …)" && pwd`, a shell builtin, so the value is POSIX by
+  construction and the exposed consumption is already satisfied at its crossing:
+  **no change owed**, and adding a normalization here would be exactly the
+  re-normalization the boundary clause forbids.
+
+The tree's remaining root call sites are **not** migrated onto this contract yet.
+That corpus is its own unit of work; until it lands, the contract holds where a
+site has been judged and nowhere else, and every newly ported file adds a site to
+the remainder rather than removing one — which is the §Porting to Rust clause
+above, read as a cost.
 
 ## The workflow directory
 
@@ -542,7 +679,12 @@ in `proc.rs` so a cohort of wrappers buys them once:
   host that develops them, so a fake predicate is the only oracle a unit test here
   has. The separator has none even so — `split_paths` compiles to the host's rule,
   so what a test can pin is that the literal has not come back, and the arms
-  themselves are exercised by the Windows CI leg or not at all.
+  themselves are exercised by the Windows CI leg or not at all. **This is the
+  cannot-exercise-locally doctrine's first instance and it now has a second** —
+  §The path-dialect contract's root resolution, held by the same injected-input
+  shape and the same paired vacuity control, differing only in that its decision
+  *is* behaviourally reachable once the input is injected and so owes no source
+  scan. The mechanism is stated here and cited there rather than restated.
 - **`run_merged` and `Merged`** — the `2>&1` capture a wrapper's shell form takes.
   `Completed` withholds stdout unless the status succeeded, which is right for a
   reader and wrong for a wrapper: for a linter the **non-zero** run is the one
@@ -6486,7 +6628,11 @@ reader needs outlive the refactor that renames a helper:
   its trailing-slash stripping in one place now that the knob has three shell
   readers rather than one.
 - `gate_exe_suffix [<triple>]` is the **executable suffix's single owner**, and no
-  other surface in any kit spells `.exe`. It prints `.exe` and nothing else, or
+  other surface in any kit spells `.exe`. It is the tree's existing
+  dialect-dispatching helper, and §The path-dialect contract is what it dispatches
+  *on*: the `MINGW*|MSYS*|CYGWIN*|Windows_NT` host match below is that contract's
+  two-dialect host, recognised here for the artifact-name question and there for
+  the root-spelling one. It prints `.exe` and nothing else, or
   empty. Two forms: given a non-empty **target triple** it answers for that triple
   (`*-windows-*` matches, everything else is empty); given **no argument — or an
   empty one, which *is* the host triple, being the shape a `--target`-less cargo

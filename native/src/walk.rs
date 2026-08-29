@@ -236,22 +236,44 @@ fn cwd() -> Result<String, String> {
         .to_string())
 }
 
+// spec: gate-sdk/SPEC.md §The path-dialect contract — absoluteness is a two-dialect question, and
+// this is its single owner: `Some("")` is separator-rooted, `Some("D:")` drive-rooted, `None`
+// relative.
+fn path_root(p: &str) -> Option<&str> {
+    let b = p.as_bytes();
+    match b.first() {
+        Some(b'/') | Some(b'\\') => return Some(""),
+        _ => {}
+    }
+    if b.len() >= 3 && b[0].is_ascii_alphabetic() && b[1] == b':' && (b[2] == b'/' || b[2] == b'\\')
+    {
+        return Some(&p[..2]);
+    }
+    None
+}
+
+// spec: gate-sdk/SPEC.md §The path-dialect contract — this pair is the crate's crosser, and `cwd()`
+// is the platform-native producer it converts on entry.
 // spec: gate-sdk/SPEC.md §lib/gate.sh — a relative bridged root may climb out with `..`, so the
 // join is normalised rather than concatenated: an unnormalised `..` component makes every later
 // path-prefix comparison fail silently, the defect the canon-kit cohort's edge tree caught.
 fn abs_against(here: &str, p: &str) -> String {
-    if p.starts_with('/') {
+    if path_root(p).is_some() {
         return normalize_abs(p);
     }
     if p == "." {
-        return here.to_string();
+        return normalize_abs(here);
     }
     normalize_abs(&format!("{}/{}", here, p.strip_prefix("./").unwrap_or(p)))
 }
 
+// spec: gate-sdk/SPEC.md §The path-dialect contract — the composed result carries the input's own
+// root and segments split on either separator; that section also rules the rootless input, which
+// keeps its pre-repair reading.
 pub fn normalize_abs(abs: &str) -> String {
+    let root = path_root(abs).unwrap_or("");
     let mut stack: Vec<&str> = Vec::new();
-    for seg in abs.split('/') {
+    for seg in abs[root.len()..].split(['/', '\\']) {
         match seg {
             "" | "." => {}
             ".." => {
@@ -260,7 +282,7 @@ pub fn normalize_abs(abs: &str) -> String {
             s => stack.push(s),
         }
     }
-    format!("/{}", stack.join("/"))
+    format!("{}/{}", root, stack.join("/"))
 }
 
 // spec: gate-sdk/SPEC.md §The port-candidate criteria — bash's `[[ str == pat ]]`: whole
@@ -821,6 +843,81 @@ mod tests {
         assert!(path_pruned("worktrees/a.md", &p));
         assert!(!path_pruned("kit/gate-tests-notes/a.md", &p));
         assert!(!path_pruned("a/b.md", &p));
+    }
+
+    // spec: gate-sdk/SPEC.md §How the claim is held, with no oracle that can run it — `cwd()`'s
+    // spelling is the injected input, so the decision under test is a pure function of `(here, p)`;
+    // that section carries the honest limit a green run here does not discharge.
+    #[test]
+    fn a_drive_lettered_working_directory_composes_a_root_the_registry_can_resolve() {
+        let here = "D:\\a\\_temp\\x";
+        let resolved = abs_against(here, "gate-sdk");
+        assert_eq!(resolved, "D:/a/_temp/x/gate-sdk");
+        assert_eq!(
+            format!("{}/checks", resolved),
+            "D:/a/_temp/x/gate-sdk/checks",
+            "the registry's `checks` segment did not compose onto a resolvable root"
+        );
+        assert_eq!(
+            abs_against(here, "D:\\a\\_temp\\y"),
+            "D:/a/_temp/y",
+            "an already-absolute drive-lettered root was joined onto the working directory"
+        );
+        assert_eq!(abs_against(here, "."), "D:/a/_temp/x");
+        assert_eq!(normalize_abs("D:\\a\\b\\..\\c"), "D:/a/c");
+    }
+
+    // spec: gate-sdk/SPEC.md §How the claim is held, with no oracle that can run it — the paired
+    // vacuity control that section requires: the fixture exercises the defect only for as long as
+    // the pre-repair composition still reproduces the string the Windows leg printed.
+    #[test]
+    fn the_pre_repair_composition_still_reproduces_the_observed_failure_string() {
+        fn posix_only(abs: &str) -> String {
+            let mut stack: Vec<&str> = Vec::new();
+            for seg in abs.split('/') {
+                match seg {
+                    "" | "." => {}
+                    ".." => {
+                        stack.pop();
+                    }
+                    s => stack.push(s),
+                }
+            }
+            format!("/{}", stack.join("/"))
+        }
+        let here = "D:\\a\\_temp\\x";
+        let drive_rooted = "D:\\a\\_temp\\y";
+        assert!(
+            !drive_rooted.starts_with('/'),
+            "the leading-slash test did not misjudge a drive-rooted path, so the join-onto-cwd \
+             arm is not the one under repair and the pairing proves nothing"
+        );
+        assert_eq!(
+            posix_only(&format!("{}/{}", here, "gate-sdk")),
+            "/D:\\a\\_temp\\x/gate-sdk",
+            "the pre-repair composition no longer reproduces the observed failure string"
+        );
+        assert_ne!(
+            posix_only(&format!("{}/{}", here, "gate-sdk")),
+            abs_against(here, "gate-sdk"),
+            "the repair returns what the defect returned, so the assertion pair is vacuous"
+        );
+    }
+
+    // spec: gate-sdk/SPEC.md §The crate's crosser — the repaired pair reaches every reader of a
+    // resolved root, so the POSIX mapping is pinned unchanged: it has no small blast radius, and a
+    // silent shift here would move every gate's corpus at once.
+    #[test]
+    fn a_posix_root_maps_exactly_as_it_did_before_the_dialect_repair() {
+        assert_eq!(normalize_abs("/r/a/../b/c"), "/r/b/c");
+        assert_eq!(normalize_abs("/r/a/./b"), "/r/a/b");
+        assert_eq!(normalize_abs("/"), "/");
+        assert_eq!(normalize_abs("r/a"), "/r/a");
+        assert_eq!(abs_against("/srv/x/repo", "gate-sdk"), "/srv/x/repo/gate-sdk");
+        assert_eq!(abs_against("/srv/x/repo", "./gate-sdk"), "/srv/x/repo/gate-sdk");
+        assert_eq!(abs_against("/srv/x/repo", "../sib"), "/srv/x/sib");
+        assert_eq!(abs_against("/srv/x/repo", "/opt/kit"), "/opt/kit");
+        assert_eq!(abs_against("/srv/x/repo", "."), "/srv/x/repo");
     }
 
     // spec: gate-sdk/SPEC.md §lib/gate.sh — the prefix form's receiving half: the family is keyed

@@ -41,6 +41,19 @@ separable delta** so that narrowing is a **batch-cut decision rather than a
 re-spec**. Its cost line and the interaction that follows from deferring it are
 stated there.
 
+**This port does not retire the dialect question, and the session writing the new
+arms is the reader gate-sdk/SPEC.md §Porting to Rust does not retire dialect
+exposure was written for.** The crate composes paths with `String` and `format!`
+rather than with `Path`, so an arm that reads a root and concatenates onto it
+**creates** a dialect-exposed site where the shell it replaces had one or did not;
+gate-sdk/SPEC.md §The path-dialect contract's consumption predicate is what judges
+the new arms, and its crosser clause is what says a value already inside the tree
+is not re-normalized. Concretely, `drift-report.sh`'s `KIT` root disappears with
+the shell driver (delta 2) — that site is judged and closed there, so this cut
+must neither re-fix nor re-break it, and the arms replacing it inherit the crate's
+already-repaired `walk::abs_against`/`normalize_abs` rather than composing roots of
+their own.
+
 ## What changes
 
 ### (1) The extensibility contract, stated in drift-kit's own SPEC
