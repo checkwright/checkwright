@@ -2715,7 +2715,7 @@
   it. Now that pruning is licensed, every prune manufactures this exposure. Three instances were
   verified individually at that close, each having survived a full green battery, and all fixed
   there. **No denominator is stated on purpose:** two sweeps of the citation corpus returned
-  counts irreconcilable under differing exclusion sets — `spec-measured-count-gate`'s subject.
+  counts irreconcilable under differing exclusion sets — `check-measured-claim`'s subject.
   **The design input worth more than the instances, because a probe would miss it.** A fourth
   instance — `gate-timing-baseline-comparability`, corrected at the same close — cites the
   deleted ruling **by its distinctive phrasing, naming no file at all**, so no probe scoped to
@@ -3210,7 +3210,7 @@
   claim it currently cannot evidence. The two closes above are the attested instances.
   Filed 2026-08-09 by close (`install-profile-seam`), draining the criterion-5 staleness bullet:
   the bullet's own finding is fixed in this close, and this entry is the mechanism half of it.
-  It is the generalization `spec-measured-count-gate` names as the scope-claim axis it cannot
+  It is the generalization `check-measured-claim` names as the scope-claim axis it cannot
   reach, and is cross-referenced there rather than folded into it — that entry designs a scanner
   over authored prose, this one designs a stamp over a session act.
 
@@ -3259,7 +3259,7 @@
   **Why `[design-pending]`, and an honest "not buildable" is a permitted outcome.** Deciding
   whether a section *supports* a sentence is comprehension, not scanning. The only mechanical
   approximations are term-overlap heuristics between the citing sentence and the target
-  section, whose false-positive surface is the one `spec-measured-count-gate` escaped by ruling
+  section, whose false-positive surface is the one `check-measured-claim` escaped by ruling
   for an author-applied marker — an escape closed here, because that gate needs the author only
   to *declare* what was measured while this one must judge a citation nobody annotated.
   A term-overlap red on a correct citation is worse than silence on a wrong one.
@@ -3698,9 +3698,9 @@
   this queue tracks leaves *something* — a stale figure, a vacuous fixture, an absent entry.
   This one leaves a well-argued disposition that happens to coincide with what fitted.
   **Worked instance from this close.** `cardinal-notation-splits-gate-reach` was ruled its own
-  entry rather than grounds on `spec-measured-count-gate`. That entry stands at exactly 50
-  lines, so the grounds ruling would have required compressing peer prose to land. Had the
-  headroom been read first, the ruling that avoided the compression would also have been the
+  entry rather than grounds on the entry that has since shipped as `check-measured-claim`, which
+  stood at exactly 50 lines, so the grounds ruling would have required compressing peer prose.
+  Had the headroom been read first, the ruling that avoided the compression would also have been the
   ruling that fitted — and would have read as principled either way. The order is what kept the
   two questions separable.
   **Deliverable:** one line in lifecycle-kit/templates/stages/close.md placing the headroom read
@@ -7422,7 +7422,7 @@
   tree-wide, to be complete. The unit owes a survey of what each candidate set
   would red before it is declared, plus a ruling on whether a behavioural set
   living in a conditional is an enum set at all or wants a different parity
-  shape. The count half of this class is `spec-measured-count-gate`'s, not this
+  shape. The count half of this class is `check-measured-claim`'s, not this
   entry's: a bare cardinal qualifying a roster is a different scanner from a
   membership check.
   **Cost while deferred:** paid once per close by the staleness read, which is
