@@ -104,30 +104,28 @@
   §PRIORITY DIRECTIVE's, with the scope, both install paths and the bootstrap residue; this entry is
   the work, designing the bootstrap included. It inherits gate-sdk/SPEC.md §Porting a gate to the
   binary substrate for the procedure and §Consumer payload for the payload rule.
-  **Two objections answered:** wall-clock is the weaker case (the win is retiring the payload's
-  shell *sources*), and the toolchain-free arm rides the pre-compiled path.
-  **Every closed cohort and cut — members, counts, holds, grounds, price — is recorded at
-  gate-sdk/SPEC.md §The first cohort, so this entry states what remains.** Cut widths are ruled
+  **The wall-clock objection is the weaker case** — the win is retiring the payload's shell
+  *sources*. **Every closed cohort and cut — members, counts, holds, grounds, price — is recorded
+  at gate-sdk/SPEC.md §The first cohort, so this entry states what remains.** Cut widths are ruled
   **per cut and never inherited**, and the size arm is **permanently** exhausted.
-  **THE COMPOSER DOES NOT REACH THE TREE REMAINDER.** `run-gates.sh --emit port-blockers --group`
-  walks the **gate registry**, which reports 0 owed and 0 takeable — a finished battery, and its
-  `--help` says a registry arm reading zero "says nothing about the tree". Only `--tree` is the
-  predicate; `ported-gate-members` answers neither, and its owed count RISES when a non-gate shell
-  file lands, which is that predicate working rather than a regression.
+  **THE COMPOSER DOES NOT REACH THE TREE REMAINDER.** `--emit port-blockers --group` walks the
+  **gate registry**, which reports 0 owed and 0 takeable — a finished battery, and a registry arm
+  reading zero "says nothing about the tree". Only `--tree` is the predicate; `ported-gate-members`
+  answers neither, and its owed count RISES when a non-gate shell file lands, which is that
+  predicate working rather than a regression.
   **THE COMPOSER IS RULED 2026-08-28: select the next cut by STATED CONTRACT** — the owed files
   sitting behind one specification section, ported behind the one amendment that section needs.
-  Size-ordered and kit-ordered composers stay refused; a contract-cohort composer is derivable from
-  the 2026-08-27 corpus and neither of those two is.
-  **The fork that ruling was left open on COLLAPSED, on a ground measured false:** it held the
-  larger cut contributor-side because its kit ships in no profile, but drift-kit DOES ship, by the
-  derived `full` profile (resolver chain: the survey record), so both selectors pick the same cut.
-  **FIRST CUT UNDER THE RULE, next rather than now:** drift-kit, 18 adopter-facing files behind
-  drift-kit/SPEC.md §The KPI plugin contract, its driver moving with its plugins because the
-  discovery contract is what the port amends. The hold RELEASED 2026-08-28 — the operator ruled
-  the predicate literal (TRAJECTORY.md §The closed rulings), so the cut moves the owed column.
+  Size-ordered and kit-ordered composers stay refused; the fork that ruling was left open on
+  collapsed on a ground measured false, drift-kit shipping by the derived `full` profile.
+  **FIRST CUT UNDER THE RULE, and TAKEN 2026-08-29 as this iteration's anchor:** drift-kit, 18
+  adopter-facing files behind drift-kit/SPEC.md §The KPI plugin contract, its driver moving with its
+  plugins because the discovery contract is what the port amends. Re-verified at that boundary
+  against `--tree`, which reds 21 drift-kit files: the 18 are those less the three `bin/` tools that
+  are not the KPI driver. The hold RELEASED 2026-08-28.
   **Prints neither count; run both arms** — four sweeps running found a digit stale here.
   ruled: native-gate-port-remaining-corpus lead 2026-08-28 own-authority
   ruled: native-gate-port-remaining-corpus operator 2026-08-28 lead-relay
+  ruled: native-gate-port-remaining-corpus lead 2026-08-29 own-authority
   **Cost while deferred:** large and known — the **owed** remainder (the trailer's own arm, never
   the unported count) plus the runners and the install-lifecycle layer; since the 2026-08-14
   born-native default (TRAJECTORY.md §The closed rulings) a gate landed meanwhile no longer adds
@@ -135,14 +133,16 @@
   gate-sdk/SPEC.md §The port-candidate criteria — an ordering signal, never an eligibility screen.
   `gate-battery-result-cache` is the one battery entry the port has not subsumed.
   **The PRIORITY DIRECTIVE has yielded FOUR times — 2026-08-22, twice 2026-08-24, 2026-08-27 — each
-  for one named iteration alone and NONE a reversal, demotion or re-scoping**: a yield spends one
-  iteration's turn, never the sequence's claim on the next. The 2026-08-28 boundary did not yield.
+  for one named iteration alone and NONE a reversal**: a yield spends one iteration's turn, never
+  the sequence's claim on the next. Neither the 2026-08-28 nor the 2026-08-29 boundary yielded.
+  **A FIFTH YIELD IS NOT A LEAD'S TO RULE — 2026-08-29.** The composer ruling and the hold release
+  are both recorded, so yielding re-scopes a recorded operator ruling, the one class a lead rules
+  under neither posture. A cut arguing for one ESCALATES rather than being narrowed in-session.
   Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction under the
   direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope, promoted at spec and
   demoted at build once per increment since.
-  **The tail, ruled 2026-08-23 and re-recorded 2026-08-24, is TRAJECTORY.md §PRIORITY DIRECTIVE's
-  and is not restated here** — no member is permanently shell, and it names the sequence whose one
-  remaining member is `powershell-installer-surface`.
+  **The tail is TRAJECTORY.md §PRIORITY DIRECTIVE's and is not restated here** — no member is
+  permanently shell, and the sequence's one remaining member is `powershell-installer-surface`.
 
 - **powershell-installer-surface** [design-pending] — a native Windows install path. **Both
   forks are RULED**: fork 2 on 2026-08-26 by the operator — two hand-kept bootstraps, parity held
@@ -2960,48 +2960,44 @@
   its only residue to be "the survey's own reasoning".
   **The residue does not carry the claim, and six dated observations now settle it** — the
   question is answered, so each is compressed to what it proved.
-  **2026-08-07:** scope's reasoning landed only as conclusions in a commit message. Its
-  counter-evidence half was done properly, but nothing in any artifact said whether an edge sum
-  was taken, so the audit could return neither verdict — **unanswerable, not un-gateable.**
+  **2026-08-07, 2026-08-09 and 2026-08-12 — unanswerable three times.** Each ranked a corpus with
+  the due-condition squarely fired, each named a different oracle, none recorded an inbound sum, so
+  the audit could return neither verdict — **unanswerable, not un-gateable.** All three did
+  premise-falsification well: the split is stable, that half healthy and this one absent.
   **2026-08-08 — answerable, and passed.** Scope named `bin/queue-edges.sh` as an oracle in the
   survey record and wrote per-candidate inbound totals into the finding.
-  **2026-08-09 and 2026-08-12 — unanswerable again, twice.** Both ranked a large corpus and the
-  second recommended against a group by name, so the due-condition fired squarely on each; both
-  named a different oracle and neither recorded an inbound sum. Both did premise-falsification
-  well. The split is stable: the falsification half is healthy, the aggregation half is absent.
   **The alternation is the evidence, and it is what makes this the requirement's property rather
-  than any session's** — the entry predicted its own recurrence before two of them.
-  **The ground for declining a `recurrence:` date is SPENT, 2026-08-17**, when
-  `recurrence-drain-input-widening` landed the direct stamp as obliged: a close-audit observation
-  is stamped by whoever judges it. The first four are **not** back-filled — the obligation attaches
-  at the moment of judgment, and re-grading earlier sessions' prose is the self-grading hazard that
-  ruling names rather than a repair of it.
+  than any session's** — the entry predicted its own recurrence before two of them. The first four
+  observations are **not** back-filled with `recurrence:` dates: the obligation attaches at the
+  moment of judgment (`recurrence-drain-input-widening`, 2026-08-17), and re-grading an earlier
+  session's prose is the self-grading hazard that ruling names rather than a repair of it.
   **FIFTH and SIXTH, 2026-08-26 and 2026-08-27 — one shape twice, not two findings.** Neither
   named `bin/queue-edges.sh` nor carried an edge sum; both times the threshold entries scope raised
   were displaced by an operator's unit-set ruling rather than refused by a ranking, so the
   obligation never attached. What the second added is the unruled half stated plainly — when a
   ruling supplies the set, is the pass owed at all?
   recurrence: survey-edge-aggregation-residue 2026-08-26 2026-08-27
-  **The 2026-08-08 shape is now FOUR-times shipped, which narrows the fork further**: 2026-08-26,
-  2026-08-27 and 2026-08-28 each ran the oracle, named it in an `oracle:` field and wrote
-  per-candidate inbound totals plus a retired-target read into the finding.
-  **RE-DEFERRED 2026-08-27 WITH THE FORK NARROWED TO ONE ALTERNATIVE, which is what a later
-  session inherits instead of the choice.** The threshold rule put this in front of the authority
-  once the sixth observation was stamped; the ruling was to keep it deferred and spend the boundary
-  narrowing rather than building. **Fold the sum into the existing survey record** is the surviving
-  alternative, on four shipped instances. A separate artifact for the sum buys a second surface for
-  what one already carries, and retiring the roster line as unauditable has **zero** instances —
-  four answerable closes in a row are what an unauditable class does not produce.
-  **What is still open, and it is smaller than the old fork:** whether the pass is owed per RANKED
-  candidate when an operator supplies the unit set, which the 2026-08-24 widening did not reach.
-  The ceremony objection stands against a *declaration*, never against the sum itself.
-  **RE-DEFERRED AGAIN 2026-08-28, spent on neither building nor narrowing:** the threshold fired a
-  second time under an UNDIRECTED dispatch, so the open half above had nothing to test — the pass
-  was owed, performed, and filed to the survey record.
+  **RE-DEFERRED 2026-08-27 WITH THE FORK NARROWED TO ONE ALTERNATIVE**, and again 2026-08-28 when
+  the threshold fired a second time under an undirected dispatch that left the open half nothing to
+  test. **Fold the sum into the existing survey record** is the surviving alternative: a separate
+  artifact buys a second surface for what one already carries, and retiring the roster line as
+  unauditable has **zero** instances — answerable closes in a row are what an unauditable class does
+  not produce. **What stayed open** was whether the pass is owed per RANKED candidate when an
+  authority supplies the unit set, which the 2026-08-24 widening did not reach.
+  **RULED 2026-08-29: BUILD the surviving alternative — fold the sum into the survey record as an
+  obliged field.** Five shipped instances now (2026-08-26 through 2026-08-29), and the open half
+  failed to become testable on a THIRD consecutive boundary, every one of them undirected. The
+  ruling's ground is that an untestable condition is not a reason to keep waiting; it is the
+  evidence the wait is not converging. The ceremony objection stands against a *declaration* and
+  never against the sum, so the field carries the sum rather than an attestation that it was taken.
   ruled: survey-edge-aggregation-residue lead 2026-08-27 own-authority
   ruled: survey-edge-aggregation-residue lead 2026-08-28 own-authority
-  **Cost while deferred:** every close restamps an audit it did not actually perform, which is
-  worse than a skipped audit — the roster reads as coverage.
+  ruled: survey-edge-aggregation-residue lead 2026-08-29 own-authority
+  **Cost while deferred:** CORRECTED 2026-08-29, unconditionally and independent of the disposition
+  above. The old line read "every close restamps an audit it did not actually perform" and has been
+  FALSE for five consecutive boundaries; left standing it would travel into the amendment as a
+  ground. The real carry is smaller and different: the sum is taken every time and recorded nowhere
+  a later stage can read it, so each boundary re-buys an aggregation the last one already paid for.
   Filed 2026-08-07 by close, performing the `survey-engagement` audit its roster made due.
 
 - **release-runbook-identity-diagnosis** [design-pending] — where the which-account-is-active
@@ -6271,51 +6267,52 @@
   **`session-mechanic-grants-uncommitted` carried it** as the third member of its class — 19
   measured out-of-band calls, every one a `kill -0 "$pid"` loop condition that a `Bash(...)` glob
   provably cannot match, the mandated form *being* a loop condition and so decorated by
-  construction. That entry's promotion deliberately excluded the wait-loop grant, sequencing it
-  behind the wait-primitive measurement so a grant would not be shaped to a primitive the
-  measurement might correct; the exclusion was right and is not questioned. **What it did not
-  account for** is that the entry completed and moved to Done, so the grant lost its carrier. The
-  refusal survives at guard-kit/SPEC.md §The generic ruleset rule 17 — but a SPEC paragraph is not
-  a work item.
-  **The precondition is discharged.** The measurement returned at that same build: the ordering
-  stands and the polarity was the bug, so rule 17 now records that a grant is shaped to
-  `while kill -0 "$pid" …` as well as `until <cond> …`. Nothing here needs re-deriving.
+  construction. Its promotion deliberately excluded this grant, sequencing it behind the
+  wait-primitive measurement so a grant would not be shaped to a primitive the measurement might
+  correct; the exclusion was right and is not questioned. **What it did not account for** is that
+  the entry reached Done, so the grant lost its carrier — the refusal survives at
+  guard-kit/SPEC.md §The generic ruleset rule 17, but a SPEC paragraph is not a work item.
+  **The precondition is discharged**: the measurement returned at that same build, the ordering
+  stands and the polarity was the bug, so rule 17 already records that a grant is shaped to
+  `while kill -0 "$pid" …` as well as `until <cond> …`.
   **Why `[design-pending]` rather than ready-to-build:** the deliverable is guard-kit code and is
   landable by a stage session — rule 17's own landing demonstrated that end to end — but the
   grant's shape (a rule 6 narrowing, a new generic rule, or a raw-command exemption) is unruled.
   **DISTINCT from `turn-end-chokepoint-and-wait-primitive`**, the measurement half whose completion
   is this entry's precondition rather than this work, and from
-  `overlay-only-oracle-grants-uncommitted`, the parent's other split half, whose subject is four
-  Rust/gh toolchain oracles rather than the wait form.
+  `overlay-only-oracle-grants-uncommitted`, the parent's other split half, four Rust/gh oracles.
   recurrence: wait-loop-grant-lost-its-carrier 2026-08-24 2026-08-27 2026-08-28
   **THE THREE RECURRENCES, kept as measurements now that the ruling below carries their reading.**
-  2026-08-24 at close's prompt-friction triage, off the log rather than impression: **60**
-  `while kill -0 <pid>` occurrences and **8** `until` calls, the log's third-heaviest prompting
-  pattern, against the nineteen the cost line was written on. 2026-08-27, measured the same way:
-  **6** and **12** — a tenfold FALL, in an iteration that delegated *more* heavily, because it
-  reached for `Agent` dispatches whose completion notification is a wait with no loop to grant.
-  2026-08-28, measured the same way at `installer-trial-lifecycle-repair`'s close: **8** and **1**,
-  nine calls against the eighteen before and the sixty-eight of the ceiling. The mechanic and the
-  rule changed none of the three times, and the third sample is the first to arrive *after* the
-  reading below was ruled — consistent with it rather than a test of it, this iteration having
-  backgrounded few shell producers and delegated the rest. **Re-deferred on it 2026-08-28**, the
-  threshold's second firing, with the boundary spent narrowing nothing.
+  Each off the prompt-friction log rather than impression, as `while kill -0 <pid>` / `until`
+  counts: 2026-08-24, **60**/**8**, the log's third-heaviest prompting pattern against the nineteen
+  the cost line was written on; 2026-08-27, **6**/**12**, a tenfold FALL in an iteration that
+  delegated *more* heavily, reaching for `Agent` dispatches whose completion notification is a wait
+  with no loop to grant; 2026-08-28, **8**/**1**. The mechanic and the rule changed none of the
+  three times. **Re-deferred 2026-08-28** on the threshold's second firing, narrowing nothing.
+  **RULED 2026-08-29: TAKEN, and the SHAPE is deliberately NOT pre-ruled.** Three recurrences
+  against a threshold of 2, precondition discharged, deliverable landable by a stage session, and
+  the iteration that takes it is one that backgrounds cargo producers — so it exercises the class
+  rather than arguing about it. The shape is design-bearing and the roster splits authoring out of
+  scope, so it goes to `spec` as part of the amendment: cost all three options above and take **the
+  narrowest that covers the measured class**. Two hard bounds. (1) The deliverable is **guard-kit
+  code**; the 2026-08-22 operator bar on promoting a permission-settings edit stands untouched, and
+  a chosen shape needing a committed-settings edit is neither spec's to land nor the lead's to
+  authorize — it ESCALATES. (2) **Measure the class here** and record a fourth datum, worth more
+  than a fourth argument; but do NOT re-price off any single figure, this iteration's included.
+  ruled: wait-loop-grant-lost-its-carrier lead 2026-08-29 own-authority
   **RE-DEFERRED 2026-08-27, and the substance of that ruling is the reading rather than the
-  outcome.** What the authority ruled on is that **the second recurrence falsified the first's price
-  trend**: the carry scales with the number of *shell* producers a session backgrounds, not with
-  compliance-as-such, so a single iteration's figure is a sample and never a rate. The sixty below
-  is this class's observed **ceiling**, not its level, and the cost line beneath is read that way
-  from here on. The entry is guard-kit code, so TRAJECTORY.md §The closed rulings' 2026-08-22 bar on
-  promoting a permission-settings edit was checked and does not reach it — recorded so the next
-  threshold firing does not re-derive that.
+  outcome.** The authority ruled that **the second recurrence falsified the first's price trend**:
+  the carry scales with the number of *shell* producers a session backgrounds, not with
+  compliance-as-such, so one iteration's figure is a sample and never a rate. The sixty below is
+  this class's observed **ceiling**, not its level, and the cost line is read that way from here on.
+  The 2026-08-22 permission-settings bar was checked then and does not reach guard-kit code.
   ruled: wait-loop-grant-lost-its-carrier operator 2026-08-27 lead-relay
   ruled: wait-loop-grant-lost-its-carrier lead 2026-08-28 own-authority
   **Cost while deferred:** rule 6 decides the mandated `kill -0 "$pid"` loop out of band on
   *every* call — sixty decisions in the iteration that set the ceiling, for a mechanic the
   methodology mandates — and the price is invisible to scope because no entry carries it.
-  Filed 2026-08-23 by build and ruled by the lead to stay a filed gap for this drain; drained at
-  that iteration's close, which confirmed rule 17 carries the discharged precondition; re-measured
-  at `shell-gate-tail-port-and-completion-oracle`'s close.
+  Filed 2026-08-23 by build; drained at that iteration's close, which confirmed rule 17 carries the
+  discharged precondition; re-measured at `shell-gate-tail-port-and-completion-oracle`'s close.
 
 - **wait-loop-exemption-blind-behind-a-script-name** [design-pending] — guard rule 15's wait-loop
   exemption is command-text-shaped, so a wait loop inside a script draws the advisory anyway.
@@ -8366,13 +8363,19 @@
   program that, on MSYS, may not answer in our dialect, and nothing states which dialect a
   root variable is in — so no call site can be judged right or wrong. The deliverable is a
   CONTRACT: which dialect a root is in, where the boundary is crossed, and who crosses it.
-  **The cost, and re-derive it rather than reading this line.**
-  `grep -rn 'show-toplevel' --include=*.sh --include=*.rs` counts the call sites and names
-  the roots; at the drain it spanned eight roots in shell alone, one of which (`guard-kit`)
-  the filed bullet's own roster omitted. Fixing at the layer where the value enters means a
-  shared root-normalization helper plus a migration of every call site — a normalization
-  seam, which is the named signal that this is not a hotfix, and is why an operator-ruled
-  hotfix attempt was STOPPED at sizing 2026-08-27 rather than grown.
+  Fixing at the layer where the value enters would mean a shared root-normalization helper
+  plus a migration of every call site — the normalization seam that is the named signal this
+  is no hotfix, and why an operator-ruled hotfix attempt was STOPPED at sizing 2026-08-27.
+  **RULED 2026-08-29: bundled with `native-gate-port-remaining-corpus`'s drift-kit cut, CONTRACT
+  ONLY.** The envelope is the contract plus dialect-correct root resolution for the call sites
+  the cut itself writes or touches — the four drift-kit `bin/` tools, each a `show-toplevel` site,
+  which is what makes the shared surface pay: the cut stops ADDING dialect-unmodelled sites
+  without buying the corpus. **The general migration is split out NOW rather than left as a
+  contingency**, to `msys-dialect-migration`, and the ground is that this entry's
+  own recorded cost re-derived to roughly five times what a reader takes it for — a mis-sized
+  unit already, not a risk to discover at build, and a mid-build judgment call would fall to the
+  session least able to afford it.
+  ruled: msys-path-dialect-boundary-unmodelled lead 2026-08-29 own-authority
   **No local oracle**: MSYS path semantics cannot be exercised on this machine, so the
   contract has to be held by a fixture pair plus a labelled reasoned-from-shape arm, the way
   this iteration's `on_path` unit did it.
@@ -8389,6 +8392,39 @@
   Windows claim this repo makes rests on reasoning rather than on a run.
   Filed 2026-08-27 by build under a stopped hotfix, promoted 2026-08-27 by close with the
   call-site roster re-derived and corrected at the drain.
+
+- **msys-dialect-migration** [design-pending] [blocked-by: msys-path-dialect-boundary-unmodelled]
+  — once the dialect contract exists, every root call site outside the cut that authored it still
+  has to be migrated onto it, and that corpus is five times the size the parent's cost line reads
+  as.
+  **THE FIGURE, re-derived 2026-08-29 at scope and the reason this is its own entry.**
+  `grep -rn 'show-toplevel'` over the tree counts **52** call sites: 25 non-test shell, 16 Rust,
+  11 `gate-tests`. The parent's cost line says the class "spanned eight roots in shell alone" —
+  which is true, and is a count of distinct ROOT VARIABLES, not of call sites. Nothing marks it
+  as the former, so it reads as the unit's size and understates it by roughly 5x.
+  **The correction is the filing's first deliverable**, and it lands whether or not the migration
+  is ever built: a spent premise travelling into a spec session is worse than either disposition
+  of the work. Re-derive rather than reading this line — the corpus moves with every ported file,
+  and the Rust half in particular grows as the port advances.
+  **What the split leaves here, stated so the boundary is not re-argued.** The parent keeps the
+  contract and the sites its own cut writes or touches (the four drift-kit `bin/` tools). This
+  entry owns everything else: a shared root-normalization helper, if the contract calls for one,
+  and the per-site migration. The `gate-tests` third of the corpus may fall out entirely — those
+  sites carry a `|| pwd` fallback and may already be dialect-correct by construction — but that is
+  a judgment the contract makes, not one this entry may assume.
+  **Why `[design-pending]`:** the migration's shape is whatever the contract rules, and the
+  contract is unwritten. This entry is unpickable until it is, which the `[blocked-by:]` says.
+  **DISTINCT from `msys-path-dialect-boundary-unmodelled`**, which owns the contract and the
+  located resolver defect and would be worth landing if this migration were never taken. This owns
+  only the corpus the contract then binds. DISTINCT from `init-vendoring-assumes-gnu-findutils`,
+  a different non-portable primary on the same install path with no dialect content at all.
+  **Cost while deferred:** low today and rising with the port — the contract holds only where a
+  site has been migrated onto it, so until this lands the dialect claim is true of the cut that
+  authored it and of nothing else, and every ported file adds a site to the remainder.
+  ruled: msys-dialect-migration lead 2026-08-29 own-authority
+  Filed 2026-08-29 by scope, split from `msys-path-dialect-boundary-unmodelled` under the lead
+  ruling that bundled that entry's contract half into this iteration, with the 52-site figure
+  measured here rather than carried.
 
 - **site-health-probe-no-retry-on-transient** [design-pending] — the scheduled site probe files a
   GitHub issue on a single non-200, so one transient edge response costs a maintainer triage.
