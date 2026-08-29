@@ -1,0 +1,16 @@
+# Fixture registry for the widened population predicate: this kit ships **no**
+# sibling directory, and is in population on the binary's native-dispatch
+# declaration alone. gate-sdk/SPEC.md §check-template-registry-parity.
+kpi-always-loaded
+kpi-amendment-age
+kpi-deferred-age
+kpi-gate-backlog
+kpi-gate-runtime
+kpi-incident-recurrence
+kpi-knowledge-friction
+kpi-overhead
+kpi-price-table-age
+kpi-prompt-friction
+kpi-queue-net-delta
+kpi-settings-local
+kpi-task-split

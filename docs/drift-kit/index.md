@@ -24,7 +24,7 @@ plugin list, and wire the trend summary into your session-start brief.
 ## Quick start
 
 ```bash
-bash drift-kit/bin/drift-report.sh                   # the full advisory report
+bash gate-sdk/bin/run-gates.sh --emit drift-report   # the full advisory report
 ```
 
 ## Contracts

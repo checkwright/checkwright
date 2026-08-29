@@ -4,3 +4,4 @@ check-survey-record
 check-evidence-baseline
 check-action-permissions
 check-action-run-shell
+check-template-registry-parity

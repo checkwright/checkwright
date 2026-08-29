@@ -12,74 +12,6 @@
 
 ## New Features
 
-- **native-gate-port-remaining-corpus** [spec: SPEC-kpi-port.md] [roadmap: now/reliability]
-  — the whole battery onto the binary, and the shell surface down to its residue.
-  roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
-  The entry demotes at build rather than moving to `## Done`: it is the **whole corpus**, and a Done
-  move would assert a finished port and silently drop it from the **public** roadmap projection,
-  which reads `[roadmap:]` tags off live entries.
-  **Operator-ruled 2026-08-09: complete the port, ASAP** — the ruling, its grounds and its
-  supersession of the 2026-08-06 measurement-locus clause are [TRAJECTORY.md](TRAJECTORY.md)
-  §PRIORITY DIRECTIVE's, with the scope, both install paths and the bootstrap residue; this entry is
-  the work, designing the bootstrap included. It inherits gate-sdk/SPEC.md §Porting a gate to the
-  binary substrate for the procedure and §Consumer payload for the payload rule.
-  **The wall-clock objection is the weaker case** — the win is retiring the payload's shell
-  *sources*. **Every closed cohort and cut — members, counts, holds, grounds, price — is recorded
-  at gate-sdk/SPEC.md §The first cohort, so this entry states what remains.** Cut widths are ruled
-  **per cut and never inherited**, and the size arm is **permanently** exhausted.
-  **THE COMPOSER DOES NOT REACH THE TREE REMAINDER.** `--emit port-blockers --group` walks the
-  **gate registry**, which reports 0 owed and 0 takeable — a finished battery, and a registry arm
-  reading zero "says nothing about the tree". Only `--tree` is the predicate; `ported-gate-members`
-  answers neither, and its owed count RISES when a non-gate shell file lands, which is that
-  predicate working rather than a regression.
-  **THE COMPOSER IS RULED 2026-08-28: select the next cut by STATED CONTRACT** — the owed files
-  sitting behind one specification section, ported behind the one amendment that section needs.
-  Size-ordered and kit-ordered composers stay refused; the fork that ruling was left open on
-  collapsed on a ground measured false, drift-kit shipping by the derived `full` profile.
-  **FIRST CUT UNDER THE RULE, and TAKEN 2026-08-29 as this iteration's anchor:** drift-kit, 18
-  adopter-facing files behind drift-kit/SPEC.md §The KPI plugin contract, its driver moving with its
-  plugins because the discovery contract is what the port amends. Re-verified at that boundary
-  against `--tree`, which reds 21 drift-kit files: the 18 are those less the three `bin/` tools that
-  are not the KPI driver. The hold RELEASED 2026-08-28.
-  **Prints neither count; run both arms** — four sweeps running found a digit stale here.
-  ruled: native-gate-port-remaining-corpus lead 2026-08-28 own-authority
-  ruled: native-gate-port-remaining-corpus operator 2026-08-28 lead-relay
-  ruled: native-gate-port-remaining-corpus lead 2026-08-29 own-authority
-  ruled: native-gate-port-remaining-corpus operator 2026-08-29 lead-relay
-  **Cost while deferred:** large and known — the **owed** remainder (the trailer's own arm, never
-  the unported count) plus the runners and the install-lifecycle layer; since the 2026-08-14
-  born-native default (TRAJECTORY.md §The closed rulings) a gate landed meanwhile no longer adds
-  shell to it. Not a single-iteration delta, and the criterion-relaxation question is closed at
-  gate-sdk/SPEC.md §The port-candidate criteria — an ordering signal, never an eligibility screen.
-  `gate-battery-result-cache` is the one battery entry the port has not subsumed.
-  **The PRIORITY DIRECTIVE has yielded FOUR times — 2026-08-22, twice 2026-08-24, 2026-08-27 — each
-  for one named iteration alone and NONE a reversal**: a yield spends one iteration's turn, never
-  the sequence's claim on the next. Neither the 2026-08-28 nor the 2026-08-29 boundary yielded.
-  **A FIFTH YIELD IS NOT A LEAD'S TO RULE — 2026-08-29.** The composer ruling and the hold release
-  are both recorded, so yielding re-scopes a recorded operator ruling, the one class a lead rules
-  under neither posture. A cut arguing for one ESCALATES rather than being narrowed in-session.
-  Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction under the
-  direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope, promoted at spec and
-  demoted at build once per increment since.
-  **The tail is TRAJECTORY.md §PRIORITY DIRECTIVE's and is not restated here** — no member is
-  permanently shell, and the sequence's one remaining member is `powershell-installer-surface`.
-  **THIS CUT RESOLVES 18 -> 14 PORTED + 4 DECLARED, ruled 2026-08-29.** `# no-port:` on
-  `lib/drift.sh` (sole resolver for the kit's config bridge, three compiled arms sourcing it) and
-  on both `templates/` files (provenance seam: an adopter's config seam, and the seam's own worked
-  example whose marker spelling is a consumer literal). `# port-until:` on `smoke/install.sh`,
-  whose 559 lines are ~400 lines asserting on the three tools this envelope EXCLUDES.
-  **THE EXTENSION POINT SURVIVES THE PORT** — consumer `kpi-*.sh` keep resolution, direct exec and
-  the env-export contract; only the 13 bundled plugins move in-crate. Ground is drift-kit's OWN
-  surfaces, not gate-sdk analogy. If the cut proves too large THE PORT GIVES, never the extension
-  point: delta 6 is authored as the single separable delta so narrowing is a batch-cut.
-  **SETTINGS GRANTS RULED 2026-08-29 (operator, lead-relay):** removing a permission grant
-  whose target a RULED PORT CUT DELETES is OUTSIDE the 2026-08-22 bar — a pure narrowing
-  forced by the cut, the delete's authority already ruled. The bar stands unchanged for
-  every other permission-settings edit; this is a carve-out for one mechanically-decidable
-  class. Build removes the dead lines IN THE SAME COMMIT AS THE DELETE. Count reconciled by
-  probe: settings carry EIGHT drift-kit grants (lines 19-26), not two — 19-20 die with the
-  driver, 25-26 with the 13 plugins, and 21-24 grant the three EXCLUDED tools and SURVIVE.
-
 - **survey-edge-aggregation-residue** [spec: SPEC-edge-sum.md] — the audit that asks whether a scope
   survey aggregated inbound edges has nothing to read.
   `templates/stages/scope.md` requires it plainly — aggregate a candidate's inbound edges
@@ -196,6 +128,57 @@
 ## Technical Debt
 
 ## Deferred
+
+- **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
+  — the whole battery onto the binary, and the shell surface down to its residue.
+  roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
+  The entry demotes at build rather than moving to `## Done`: it is the **whole corpus**, and a Done
+  move would assert a finished port and silently drop it from the **public** roadmap projection.
+  **Operator-ruled 2026-08-09: complete the port, ASAP** — that ruling, its grounds, its
+  supersession of the 2026-08-06 measurement-locus clause, the scope, both install paths and the
+  tail are [TRAJECTORY.md](TRAJECTORY.md) §PRIORITY DIRECTIVE's and are not restated; this entry is
+  the work, bootstrap design included, and inherits gate-sdk/SPEC.md §Porting a gate to the binary
+  substrate and §Consumer payload. **Every closed cohort and cut — members, counts, holds, grounds,
+  price — is recorded at gate-sdk/SPEC.md §The first cohort, so this entry states what remains.**
+  Cut widths are ruled **per cut and never inherited**; the size arm is **permanently** exhausted.
+  **THE COMPOSER DOES NOT REACH THE TREE REMAINDER.** `--emit port-blockers --group` walks the
+  **gate registry**, reporting 0 owed and 0 takeable — a finished battery, and a registry arm
+  reading zero "says nothing about the tree". Only `--tree` is the predicate; `ported-gate-members`
+  answers neither, and `--tree`'s owed count RISES when a non-gate shell file lands, which is that
+  predicate working. **Neither count is printed; run both arms** — four sweeps found a digit stale
+  here. **THE COMPOSER IS RULED 2026-08-28: select the next cut by STATED CONTRACT** — the owed
+  files behind one specification section, ported behind the one amendment that section needs. Size-
+  and kit-ordered composers stay refused; the fork it was left open on collapsed on a ground
+  measured false, drift-kit shipping by the derived `full` profile. **FIRST CUT UNDER THE RULE,
+  LANDED 2026-08-29:** drift-kit's 18 files behind §The KPI plugin contract resolved to **14 ported
+  + 4 declared**; `--tree` moved 141 -> 123 owed. **(1) A CUT NARROWS THE PORT, NEVER AN EXTENSION
+  POINT.** Where a kit ships a consumer-facing plugin or config seam, that seam's resolution, direct
+  execution and env contract survive and only the bundled members move in-crate; the ground is the
+  porting kit's OWN governed surfaces plus CLAUDE.md §The provenance seam, never analogy to a
+  sibling cut — worked at drift-kit/SPEC.md §The extensibility contract. **(2) SETTINGS
+  GRANTS, RULED 2026-08-29 (operator, lead-relay):** removing a permission grant whose target a
+  RULED PORT CUT DELETES is OUTSIDE the 2026-08-22 bar — a pure narrowing forced by the cut, the
+  delete's authority already ruled — and build removes the dead lines IN THE SAME COMMIT AS THE
+  DELETE, the window the requirement exists to close. The bar stands unchanged for every other
+  permission-settings edit: a carve-out for one class. Scope is the files THAT COMMIT deletes, never
+  a path prefix — drift-kit's own grant count went two -> EIGHT under probe, four of them live.
+  ruled: native-gate-port-remaining-corpus lead 2026-08-28 own-authority
+  ruled: native-gate-port-remaining-corpus operator 2026-08-28 lead-relay
+  ruled: native-gate-port-remaining-corpus lead 2026-08-29 own-authority
+  ruled: native-gate-port-remaining-corpus operator 2026-08-29 lead-relay
+  **Cost while deferred:** large and known — the **owed** remainder (the trailer's own arm, never
+  the unported count) plus the runners and the install-lifecycle layer; since the 2026-08-14
+  born-native default a gate landed meanwhile no longer adds shell to it. Not a single-iteration
+  delta, and criterion relaxation is closed at gate-sdk/SPEC.md §The port-candidate criteria — an
+  ordering signal, never an eligibility screen. `gate-battery-result-cache` is the one battery entry
+  the port has not subsumed; `powershell-installer-surface` is the sequence's one remaining member.
+  **The PRIORITY DIRECTIVE has yielded FOUR times — 2026-08-22, twice 2026-08-24, 2026-08-27 — each
+  for one named iteration alone and NONE a reversal**: a yield spends one iteration's turn, never
+  the sequence's claim on the next. **A FIFTH YIELD IS NOT A LEAD'S TO RULE — 2026-08-29**: the
+  composer ruling and the hold release are both recorded, so yielding re-scopes a recorded operator
+  ruling, and a cut arguing for one ESCALATES rather than being narrowed in-session. Filed
+  2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction; cohorts ruled at scope
+  2026-08-11/12; promoted at spec and demoted at build once per increment since.
 
 - **kit-lib-port-disposition-cohort** [design-pending] — every kit's `lib/*.sh` is owed by the port
   oracle and none has ever been dispositioned, so the class has no ruling and each cut re-argues it.

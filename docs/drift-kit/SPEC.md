@@ -25,14 +25,14 @@ product- and toolchain-shaped KPIs stay in the consumer repo (§Out of scope).
 
 ## The report skeleton
 
-`bin/drift-report.sh` — the collator. It owns the frame; every measurement
-lives in a plugin:
+`--emit drift-report` — the collator, a **bridged arm** of the gate binary
+(gate-sdk/SPEC.md §The non-gate arm), reached as
+`bash gate-sdk/bin/run-gates.sh --emit drift-report [--trend]`. It owns the
+frame; every measurement lives in a member:
 
-1. Read the KPI registry (`kpis.list` — one plugin name per line, `#`
-   comments; the gates.list grammar) and resolve each name against the
-   consumer KPI dir first, then each vendored kit's `kpis/` (the gate-sdk
-   resolution pattern: a consumer shadows a bundled KPI by dropping a
-   same-named file in its own dir).
+1. Read the KPI registry (`kpis.list` — one member name per line, `#`
+   comments; the gates.list grammar) and resolve each name through the three
+   tiers of §The extensibility contract.
 2. Derive the iteration-start commit **before** the plugin export loop, not at
    print time, and assign it to `DRIFT_KIT_ITERATION_START` so the loop carries
    it to every plugin. Both the derivation and its invocation sit above the
@@ -54,11 +54,57 @@ lives in a plugin:
    volunteers, joined with `·` — consumed by context-kit's session-context
    hook (`CONTEXT_KIT_DRIFT_REPORT`, already wired in its template).
 
-Degrade discipline: exit is always 0. A plugin that exits non-zero or
-prints nothing yields a visible `<name>  n/a (plugin failed)` row in the
-lead section — fail-visible, not fail-closed, because a silently vanishing
-KPI is itself drift. A plugin whose *surface* is missing (no log yet, no
-timings file) degrades to `n/a (<reason>)` in its own value, not by dying.
+Degrade discipline: exit is always 0. A member that fails or produces nothing
+yields a visible `<name>  n/a (plugin failed)` row in the lead section —
+fail-visible, not fail-closed, because a silently vanishing KPI is itself drift.
+A member whose *surface* is missing (no log yet, no timings file) degrades to
+`n/a (<reason>)` in its own value, not by dying.
+
+**Why a bridged arm rather than a top-level flag.** The front-end composes
+`--emit-<name>` from its `--emit <name>` operand and resolves each member's
+declared knob roster; a hardcoded top-level flag receives no consumer override at
+all. For a kit whose entire surface is consumer-overridable knobs that would be a
+silent functional regression rather than a porting detail.
+
+**The collator's own knobs resolve in `lib/drift.sh`** (§lib/drift.sh), not in the
+arm: the config bridge resolves a declared name by sourcing the owning kit's
+library alone, so a default left beside the reader would resolve to nothing and a
+default restated on the crate side would be a second producer.
+
+## The extensibility contract
+
+**A consumer adds its own KPI by dropping a plugin in its own KPI dir. That is
+drift-kit's promise to adopters, and no substrate move narrows it.** It is stated
+here as a contract rather than left inferable from the README and from
+`DRIFT_KIT_KPI_DIRS`' purpose, because inference is what the next session would
+otherwise have to repeat.
+
+A registry name resolves through **three tiers, consumer-first**, and the first
+tier that answers wins:
+
+1. each entry of `DRIFT_KIT_KPI_DIRS` — the adopter's own dirs, default the
+   consumer gates dir — for a file named `<name>.sh`;
+2. each vendored kit's `kpis/<name>.sh`;
+3. the **built-in members the binary carries** (§Bundled KPIs).
+
+So a consumer file named `kpi-task-split.sh` **shadows** the built-in of that
+name. Tier 3 is where the bundled set lives after the port; tiers 1 and 2 are
+unchanged, which is the whole point — the port moved the kit's own members and
+touched nothing about how a consumer's are found.
+
+A tier-1 or tier-2 hit is **executed directly** (`"$path"`, never
+`bash "$path"`), so the execute bit still governs and a non-executable plugin
+degrades to the fail-visible row rather than running anyway. A consumer plugin
+reads the exported environment of §The KPI plugin contract; a built-in reads the
+same resolved values in process. **Same values, same transition** — a consumer
+plugin is not a second-class reader of the contract this extension point
+promises.
+
+`DRIFT_KIT_KPI_DIRS` exists for nothing but this, and a knob whose only purpose
+is an extension point *is* that extension point's specification. Underneath that,
+a consumer-first plugin registry is the `check-graph`/`graph-vocab.sh`
+consumer-config pattern in another dress: narrowing it would narrow the
+provenance seam's own mechanism.
 
 ## The KPI plugin contract
 
@@ -75,22 +121,37 @@ the report degrades that row to its fail-visible read. Two modes:
   (a plugin may opt out of the trend line).
 
 Plugins read **exported env only** — a plain assignment in the consumer
-config reaches the collator's shell but never a child plugin. The collator
-closes that gap structurally: before invoking plugins, `drift-report.sh`
-exports every scalar `DRIFT_KIT_*` variable (`compgen` over the namespace;
-arrays skipped — bash cannot export them, and array knobs like
-`DRIFT_KIT_KPI_DIRS` are consumed inside the collator itself), so a config
-override reaches writer and reader alike with no fixed export list to drift
-out of parity. It also exports `DRIFT_KIT_KIT_ROOTS` — newline-separated kit
-roots, `gate_kit_roots` when gate-sdk resolves, else the kit's parent; a
-plugin needing sibling-kit surfaces reads it rather than re-deriving the
-roster, and falls back to its own derivation when run standalone without it.
-The driver's handoff, not a consumer knob: `drift-report.sh` recomputes it
-every run.
+config reaches the collator but never a child plugin. The collator closes that
+gap structurally: before invoking a plugin it exports every scalar `DRIFT_KIT_*`
+value the config bridge resolved, so a config override reaches writer and reader
+alike **with no fixed export list to drift out of parity**.
+
+**The derivation is the contract, and the arm keeps it derived.** The shell
+collator spelled it `compgen -v DRIFT_KIT_`; the arm declares the **prefix
+family** `DRIFT_KIT_*` in its knob roster, which the config bridge resolves by
+running that same `compgen` inside the owning kit's already-sourced subshell
+(gate-sdk/SPEC.md §lib/gate.sh). A knob a consumer's own `drift-config.sh`
+declares and nothing in this repo names therefore crosses the bridge and reaches
+the plugin. A transcribed `DRIFT_KIT_*` roster would lose exactly that knob and
+would land on the derivation-first rule; none is introduced anywhere.
+
+Arrays are skipped, as bash skipped them: the wire format joins an array's
+elements with a tab, and the two array knobs (`DRIFT_KIT_KPI_DIRS`,
+`DRIFT_KIT_STAGES`) are consumed inside the collator itself. **Honest limit:** a
+*consumer-declared* one-element array is indistinguishable from a scalar on the
+wire and crosses as one, where bash would have dropped it. That is a difference in
+a consumer's favour, and it is the only place the exported set is not exactly the
+shell's.
+
+It also exports `DRIFT_KIT_KIT_ROOTS` — newline-separated kit roots, the resolved
+kit-root set; a plugin needing sibling-kit surfaces reads it rather than
+re-deriving the roster. The driver's handoff, not a consumer knob: the arm
+recomputes it every run.
 
 `DRIFT_KIT_ITERATION_START` is the same *class* of handoff as
 `DRIFT_KIT_KIT_ROOTS` — computed by the driver every run, reaching every plugin
-as exported environment, never a consumer knob. What it does not share is the
+as exported environment and every built-in as the same resolved value, never a
+consumer knob. What it does not share is the
 parity hazard: it introduces no fixed export list that could drift out of step
 with the knob set it travels beside. A plugin reading it gets the empty string
 when no baseline is derivable and degrades to `n/a` on its own rows rather than
@@ -104,7 +165,20 @@ past measurement rather than live state (the gate-runtime pattern below).
 ## Bundled KPIs
 
 The generic set — each coupled to a kit-governed surface, each degrading to
-`n/a` when the consumer lacks that surface. Lead:
+`n/a` when the consumer lacks that surface. They are **built-in members the
+binary carries**, resolution tier 3 of §The extensibility contract, and their
+measurement semantics are exactly what they were on the shell substrate: the
+parity oracle for the move is byte-identity of the emitted report across the two
+substrates, captured before the originals were deleted and diffed after, in both
+the full and `--trend` modes.
+
+Two members read a date and are held to the operator's civil zone rather than to
+UTC: they resolve a day through `date -d`, the choice queue-kit's queue-index
+cutoff already made and for the same reason. `kpi-settings-local` has one
+degrade fewer than its shell original: the compiled member parses the overlay
+itself, so it carries no external-program dependency an absent `jq` could take.
+
+Lead:
 
 - **kpi-task-split** — the feature↔debt split of the queue's Done slugs,
   classified by their commit subjects (`feat` / `fix`+`refactor`); reads
@@ -995,26 +1069,22 @@ instead, which is what lets **a reader reached through the bridge carry no
 default**: a reader that had to recognise the default path would be a second home
 for it.
 
-**The default has a second home today, and the scope of the claim above is
-exactly the bridge.** `bin/drift-report.sh` resolves the same knob inline with
-its own copy of the default and is *not* a bridge reader, so it is untouched by
-this library and nothing holds the two literals in lockstep. The duplication is
-real, bounded, and the ordinary transitional state — collapsing it means
-`drift-report.sh` sourcing this library, which would also give it this library's
-refusal where it currently degrades in both modes, a behaviour change outside the
-amendment that introduced this file. It is filed rather than absorbed
-(`drift-kpis-default-two-homes`), not left for a later reader to rediscover.
+**The default had a second home, and the port closed it rather than the filing
+doing so.** The shell collator resolved the same knob inline with its own copy and
+was not a bridge reader; once the collator became a bridged arm it reads what this
+library resolves, so this library is the knob's only home. The report's other
+knobs moved here for the same reason and by the same forcing: a default left
+beside a compiled reader resolves to nothing, because the bridge sources this
+library and nothing else.
 
 ## Layout and configuration
 
 ```
 drift-kit/
   lib/drift.sh                   # sourced knob resolution; the config bridge sources it
-  bin/drift-report.sh
   bin/kfric.sh                   # the knowledge-friction capture affordance
   bin/overhead-meter.sh          # the governance-overhead byte-proxy meter
   bin/stage-economics.sh         # the stage × model × iteration spend pricer
-  kpis/kpi-*.sh                  # the bundled generic set
   templates/drift-config.sh
   templates/kpis.list            # the shipped registry: every bundled KPI (consumer copies + prunes)
   templates/kpi-deprecated-surface.sh   # example toolchain-shaped KPI (§Out of scope)
@@ -1028,14 +1098,16 @@ drift-kit/
 Registers no gates (advisory; the guard-kit precedent), so no `checks/`,
 `gate-tests/`, or `smoke/violation.sh`.
 
-`templates/kpis.list` names every plugin in `kpis/`, never a starter subset: it
-is the kit's claim about what it bundles, which the roster above, this SPEC, and
-the smoke's per-KPI row assertion are all stated over. Pruning is the
-*consumer's* act on its own copy, and the template's header says so.
+`templates/kpis.list` names every bundled member, never a starter subset: it is
+the kit's claim about what it bundles, which the roster above, this SPEC, and the
+smoke's per-member row assertion are all stated over. Pruning is the *consumer's*
+act on its own copy, and the template's header says so.
 `gate-sdk/SPEC.md §check-template-registry-parity` holds the two in parity both
-ways — the sibling-directory pairing is what puts this template in that gate's
-population, and `templates/kpi-deprecated-surface.sh`, an example a consumer
-adapts rather than a bundled plugin, out of it.
+ways. The kit ships **no `kpis/` directory** now that the bundled set is
+natively dispatched, so what puts this template in that gate's population is the
+binary's own native-dispatch declaration rather than a sibling directory; the
+gate's population predicate takes either. `templates/kpi-deprecated-surface.sh`,
+an example a consumer adapts rather than a bundled member, stays out of it.
 
 Config follows the established kit pattern: copy `templates/drift-config.sh`
 into the gates dir (or point `DRIFT_KIT_CONFIG_FILE` elsewhere) and override
@@ -1046,7 +1118,8 @@ Knobs (this repo's layout as defaults):
 - `DRIFT_KIT_KPIS_FILE` — the registry; default
   `${GATE_SDK_GATES_DIR:-scripts}/kpis.list`.
 - `DRIFT_KIT_KPI_DIRS` — extra resolution roots searched before the
-  vendored kits' `kpis/` dirs; default: the consumer gates dir.
+  vendored kits' `kpis/` dirs and before the binary's built-in members
+  (§The extensibility contract, tier 1); default: the consumer gates dir.
 - `DRIFT_KIT_QUEUE_FILE` — default `${GATE_SDK_QUEUE_FILE:-TASK-QUEUE.md}`.
 - `DRIFT_KIT_KNOWLEDGE_LOG` — default
   `${GATE_SDK_WORKFLOW_DIR:-.workflow}/knowledge-friction.log`.
@@ -1071,10 +1144,10 @@ Knobs (this repo's layout as defaults):
 - `DRIFT_KIT_OVERHEAD_LOG` — the overhead meter's append log; default
   `$DRIFT_KIT_METRIC_DIR/overhead-log.txt` (gitignored, so the private
   transcript's derived counts never enter version control; the meter
-  `mkdir -p`s the log's dirname). All three resolvers — the meter,
-  `kpi-overhead`, and the collator's namespace export — compute this same
-  default, and the smoke's writer/reader assertion holds them together
-  (§Testing).
+  `mkdir -p`s the log's dirname). Two resolvers compute this default — the
+  meter, which is a standalone tool, and `lib/drift.sh`, through which the
+  collator and `kpi-overhead` both now read it — and the smoke's writer/reader
+  assertion holds them together (§Testing).
 - `DRIFT_KIT_DONE_SECTION` / `DRIFT_KIT_DEFERRED_SECTION` — queue section
   headings the task-split and deferred-age KPIs scan; defaults `Done` /
   `Deferred` (queue-kit's).
@@ -1105,9 +1178,14 @@ Knobs (this repo's layout as defaults):
   `$DRIFT_KIT_METRIC_DIR/stage-economics-log.txt` (gitignored; the meter
   `mkdir -p`s the dirname).
 - `DRIFT_KIT_PRICE_TABLE` — the consumer-owned model→price roster the
-  stage-economics meter prices through; default
+  stage-economics meter prices through and `kpi-price-table-age` ages; default
   `${GATE_SDK_GATES_DIR:-scripts}/price-table.tsv` (beside `graph-vocab.sh`, the
   consumer-config precedent). Absent, cost degrades to `n/a` and tokens still report.
+  Two sites compute this default, not three: `lib/drift.sh` for every bridge
+  reader, and the standalone meter. The KPI's own restatement went with the port —
+  a compiled member reads what the bridge resolved, so the substrate move
+  *removed* a duplicate here rather than converting one into a cross-substrate
+  pair, which is the outcome that was priced as a hazard.
 - `DRIFT_KIT_SUPERVISION_LABEL` — the reserved value the stage-economics meter
   writes into the trend log's `<stage>` column for a lead's own burn
   (§The stage-economics meter, the reserved `supervision` value); default
@@ -1252,7 +1330,7 @@ convention first if it ever ships). A deprecated-surface trend is the same
 shape — it counts markers over the consumer's `CANON_KIT_DEPRECATION_MARKERS`
 roster (canon-kit's `check-deprecation-task` vocabulary), so it ships as
 `templates/kpi-deprecated-surface.sh`, an **example** the consumer registers in
-its `kpis.list` rather than a bundled plugin under `kpis/`: the marker spelling
+its `kpis.list` rather than a bundled member: the marker spelling
 is a consumer literal, and the kit stays deprecation-neutral. Registered, it
 trends the live-marker backlog between majors so it surfaces gradually instead
 of at one release; it degrades to `n/a` when the roster is unset (the bundled

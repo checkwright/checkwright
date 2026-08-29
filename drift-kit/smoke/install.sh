@@ -2,6 +2,7 @@
 # spec: drift-kit/SPEC.md §Testing — advisory report smoke; drift-kit ships no gate, so the
 # installer proves the report itself inline (guard-kit's precedent). Also gate-sdk/SPEC.md §Consumer smoke.
 # cwd = scratch-consumer root; SMOKE_KIT_ROOT = the vendored drift-kit copy.
+# port-until: kit-smoke-port-disposition-cohort
 set -euo pipefail
 : "${SMOKE_KIT_ROOT:?run via run-consumer-smoke.sh}"
 # shellcheck source=../../gate-sdk/lib/gate.sh
@@ -28,15 +29,42 @@ EOF
 
 registered="$(grep -cEv '^[[:space:]]*(#|$)' "$work/kpis.list")"
 
+# spec: gate-sdk/SPEC.md §The non-gate arm — the collator is a compiled arm reached through the
+# front-end that resolves its bridged knobs, the shape the trajectory extractor below already has.
+DRIFT_ARM="$SMOKE_KIT_ROOT/../gate-sdk/bin/run-gates.sh"
+
 report() {
     DRIFT_KIT_KPIS_FILE="$work/kpis.list" \
     DRIFT_KIT_QUEUE_FILE="$work/TASK-QUEUE.md" \
     DRIFT_KIT_TMP_DIR="$work" \
     DRIFT_KIT_TIMINGS_FILE="$work/no-such-timings.txt" \
-    bash "$SMOKE_KIT_ROOT/bin/drift-report.sh" "$@"
+    bash "$DRIFT_ARM" --emit drift-report "$@"
 }
 
 fail() { echo "drift-kit/smoke/install.sh: $1" >&2; exit 1; }
+
+# spec: drift-kit/SPEC.md §Testing — one member exercised in isolation *through* the collator
+# rather than beside it: a one-name registry is the collator's own selector, so an isolated probe
+# runs the real resolution and rendering path instead of a bypass the kit does not ship.
+solo() {
+    local name="$1"
+    shift
+    printf '%s\n' "$name" > "$work/solo.list"
+    DRIFT_KIT_KPIS_FILE="$work/solo.list" \
+    DRIFT_KIT_QUEUE_FILE="${DRIFT_KIT_QUEUE_FILE:-$work/TASK-QUEUE.md}" \
+    DRIFT_KIT_TMP_DIR="$work" \
+    DRIFT_KIT_TIMINGS_FILE="$work/no-such-timings.txt" \
+    bash "$DRIFT_ARM" --emit drift-report "$@"
+}
+
+# spec: drift-kit/SPEC.md §The report skeleton — the rendered rows of one labelled section, which
+# is where a member's rows land once the collator owns the frame and the member owns no printf.
+rows() { awk -v b="^--- $1" '$0 ~ b {f=1;next} /^$/{f=0} f && /^  [^ ]/'; }
+row_count() { rows "$1" | grep -c ''; }
+
+# spec: drift-kit/SPEC.md §The report skeleton — the trend line is the joined fragments behind one
+# `drift: ` lead, so a single-member probe reads its fragment back off that frame.
+trend_frag() { local o; o="$(solo "$@" --trend)"; printf '%s' "${o#drift: }"; }
 
 set +e
 out="$(report)"; rc=$?
@@ -58,7 +86,8 @@ awk '/^--- Lag/{f=1;next} /^Read trend/{f=0} f' <<<"$out" | grep -q 'knowledge f
 # spec: drift-kit/SPEC.md §The knowledge-friction loop — three log states, three lines. The
 # absent arm above is one; without these two the empty state is indistinguishable from a
 # measurement of zero, which is the reading the loop refuses.
-kfric() { DRIFT_KIT_KNOWLEDGE_LOG="$1" bash "$SMOKE_KIT_ROOT/kpis/kpi-knowledge-friction.sh" "${2:-}"; }
+kfric() { DRIFT_KIT_KNOWLEDGE_LOG="$1" solo kpi-knowledge-friction; }
+kfric_trend() { DRIFT_KIT_KNOWLEDGE_LOG="$1" trend_frag kpi-knowledge-friction; }
 : > "$work/kfric-empty.log"
 printf '2026-01-01 a fact - a surface\n' > "$work/kfric-full.log"
 
@@ -72,35 +101,61 @@ kfric "$work/kfric-full.log" | grep -q '1 re-derivation(s) logged this iteration
 
 # spec: drift-kit/SPEC.md §The knowledge-friction loop — --trend's grammar does not move for the
 # empty state; a series spanning a grammar change is two series, not one.
-[[ "$(kfric "$work/kfric-empty.log" --trend)" == 'kfric 0' ]] \
+[[ "$(kfric_trend "$work/kfric-empty.log")" == 'kfric 0' ]] \
     || fail "--trend changed grammar for the empty log, breaking comparability across the change"
-[[ "$(kfric "$work/kfric-full.log" --trend)" == 'kfric 1' ]] \
+[[ "$(kfric_trend "$work/kfric-full.log")" == 'kfric 1' ]] \
     || fail "--trend did not report the non-empty count"
 
-# spec: drift-kit/SPEC.md §Testing — the per-plugin contribution probe: the report masks a silent
-# plugin with its own 'n/a (plugin failed)' row, so the floor above cannot see one; a name
-# resolving to no plugin is skipped.
-plugin() {
-    DRIFT_KIT_KPIS_FILE="$work/kpis.list" \
-    DRIFT_KIT_QUEUE_FILE="$work/TASK-QUEUE.md" \
-    DRIFT_KIT_TMP_DIR="$work" \
-    DRIFT_KIT_TIMINGS_FILE="$work/no-such-timings.txt" \
-    bash "$1"
-}
+# spec: drift-kit/SPEC.md §Testing — the per-member contribution probe: the report's own
+# 'n/a (plugin failed)' mask, read through the dispatch a session gets, since the row-count
+# floor above cannot see a silent member.
+if grep -q 'n/a (plugin failed)' <<<"$out"; then
+    fail "a registered member produced nothing and the report masked it: $(grep 'n/a (plugin failed)' <<<"$out")"
+fi
 
-probed=0
-while IFS= read -r kname; do
-    [[ -n "$kname" ]] || continue
-    kpath="$SMOKE_KIT_ROOT/kpis/$kname.sh"
-    [[ -f "$kpath" ]] || continue
-    set +e
-    pout="$(plugin "$kpath")"; prc=$?
-    set -e
-    [[ "$prc" -eq 0 ]] || fail "$kname exited $prc standalone — the report would mask it as 'n/a (plugin failed)'"
-    [[ -n "$pout" ]] || fail "$kname emitted no row standalone — the report would mask it as 'n/a (plugin failed)', so the row-count floor cannot see it"
-    probed=$((probed + 1))
-done < <(grep -Ev '^[[:space:]]*(#|$)' "$work/kpis.list")
-[[ "$probed" -gt 0 ]] || fail "no registered name resolved to a bundled plugin — the per-plugin probe asserted nothing"
+# spec: drift-kit/SPEC.md §Testing — and the control, so the assertion above is not vacuous: a
+# member that *does* fail must reach that row rather than vanishing from the report.
+mkdir -p "$work/failing"
+printf '#!/usr/bin/env bash\nexit 3\n' > "$work/failing/kpi-deliberately-broken.sh"
+chmod +x "$work/failing/kpi-deliberately-broken.sh"
+printf 'DRIFT_KIT_KPI_DIRS=("%s")\n' "$work/failing" > "$work/failing-config.sh"
+broke="$(DRIFT_KIT_CONFIG_FILE="$work/failing-config.sh" solo kpi-deliberately-broken)"
+grep -q 'n/a (plugin failed)' <<<"$broke" \
+    || fail "a member exiting non-zero must reach the fail-visible row, or the assertion above passes vacuously: $broke"
+
+# spec: drift-kit/SPEC.md §The extensibility contract — the extension point end to end: resolve,
+# execute directly, shadow a built-in of its own name, read both handoffs, and receive a knob only
+# the consumer's config declares. A port is where each of those is dropped silently.
+mkdir -p "$work/consumer-kpis"
+cat > "$work/consumer-kpis/kpi-knowledge-friction.sh" <<'SHADOW'
+#!/usr/bin/env bash
+[[ "${1:-}" == "--trend" ]] && exit 0
+printf 'lead\tconsumer shadow\troots=%s start=%s custom=%s\n' \
+    "$(printf '%s' "$DRIFT_KIT_KIT_ROOTS" | grep -c '')" \
+    "${DRIFT_KIT_ITERATION_START+set}" \
+    "$DRIFT_KIT_SMOKE_CUSTOM"
+SHADOW
+chmod +x "$work/consumer-kpis/kpi-knowledge-friction.sh"
+printf 'DRIFT_KIT_KPI_DIRS=("%s")\nDRIFT_KIT_SMOKE_CUSTOM=reached\n' "$work/consumer-kpis" > "$work/consumer-config.sh"
+xp() { DRIFT_KIT_CONFIG_FILE="$work/consumer-config.sh" solo kpi-knowledge-friction; }
+
+xpout="$(xp)"
+grep -q 'consumer shadow' <<<"$xpout" \
+    || fail "a consumer plugin did not shadow the bundled member of its own name: $xpout"
+# spec: drift-kit/SPEC.md §The KPI plugin contract — the iteration-start handoff is asserted
+# *present*, not non-empty: no baseline is derivable in a throwaway consumer, and the contract's
+# promise there is the empty string rather than an absent variable.
+grep -qE 'roots=[1-9][0-9]* start=set' <<<"$xpout" \
+    || fail "the consumer plugin did not receive both driver handoffs (kit roots, iteration start): $xpout"
+grep -q 'custom=reached' <<<"$xpout" \
+    || fail "a knob only the consumer config declares did not reach the plugin — the export set is transcribed, not derived: $xpout"
+
+# spec: drift-kit/SPEC.md §The KPI plugin contract — invoked directly, never under `bash`, so the
+# execute bit still governs and a non-executable plugin degrades fail-visibly instead of running.
+chmod -x "$work/consumer-kpis/kpi-knowledge-friction.sh"
+grep -q 'n/a (plugin failed)' <<<"$(xp)" \
+    || fail "a non-executable consumer plugin ran anyway — the collator is invoking it under an interpreter, so the execute bit no longer governs"
+chmod +x "$work/consumer-kpis/kpi-knowledge-friction.sh"
 
 set +e
 trend="$(report --trend)"; trc=$?
@@ -168,16 +223,16 @@ meter >/dev/null   # re-measure replaces the session's line, never doubles it
 [[ "$(grep -c '' "$ovlog")" -eq 1 ]] || fail "re-measure double-counted the session (dedup broken)"
 
 set +e
-kout="$(DRIFT_KIT_OVERHEAD_LOG="$ovlog" bash "$SMOKE_KIT_ROOT/kpis/kpi-overhead.sh")"; krc=$?
+kout="$(DRIFT_KIT_OVERHEAD_LOG="$ovlog" solo kpi-overhead)"; krc=$?
 set -e
 [[ "$krc" -eq 0 ]] || fail "kpi-overhead exited $krc"
-[[ "$(grep -c '^lead' <<<"$kout")" -eq 2 ]] || fail "kpi-overhead did not emit its two lead rows over a live log"
+[[ "$(row_count Lead <<<"$kout")" -eq 2 ]] || fail "kpi-overhead did not emit its two lead rows over a live log"
 grep -q 'byte-proxy' <<<"$kout" || fail "kpi-overhead rows missing the byte-proxy caveat"
-ktrend="$(DRIFT_KIT_OVERHEAD_LOG="$ovlog" bash "$SMOKE_KIT_ROOT/kpis/kpi-overhead.sh" --trend)"
+ktrend="$(DRIFT_KIT_OVERHEAD_LOG="$ovlog" trend_frag kpi-overhead)"
 grep -qE '^ovh [0-9]+%$' <<<"$ktrend" || fail "kpi-overhead --trend not 'ovh <n>%': $ktrend"
 
 set +e
-kna="$(DRIFT_KIT_OVERHEAD_LOG="$work/no-such-overhead.txt" bash "$SMOKE_KIT_ROOT/kpis/kpi-overhead.sh")"; knrc=$?
+kna="$(DRIFT_KIT_OVERHEAD_LOG="$work/no-such-overhead.txt" solo kpi-overhead)"; knrc=$?
 set -e
 [[ "$knrc" -eq 0 ]] || fail "kpi-overhead (log absent) exited $knrc"
 grep -q 'n/a' <<<"$kna" || fail "kpi-overhead did not degrade to a visible n/a row without a log"
@@ -190,16 +245,17 @@ DRIFT_KIT_METRIC_DIR="$mdir" bash "$SMOKE_KIT_ROOT/bin/overhead-meter.sh" "$fixt
     || fail "overhead-meter failed under a DRIFT_KIT_METRIC_DIR-only override"
 [[ -s "$mdir/overhead-log.txt" ]] || fail "writer did not resolve DRIFT_KIT_METRIC_DIR into its default log path"
 set +e
-kmd="$(DRIFT_KIT_METRIC_DIR="$mdir" bash "$SMOKE_KIT_ROOT/kpis/kpi-overhead.sh")"; kmrc=$?
+kmd="$(DRIFT_KIT_METRIC_DIR="$mdir" solo kpi-overhead)"; kmrc=$?
 set -e
 [[ "$kmrc" -eq 0 ]] || fail "kpi-overhead exited $kmrc under the shared DRIFT_KIT_METRIC_DIR override"
 if grep -q 'n/a' <<<"$kmd"; then fail "writer/reader default divergence: reader missed the log the writer wrote under one DRIFT_KIT_METRIC_DIR override"; fi
-[[ "$(grep -c '^lead' <<<"$kmd")" -eq 2 ]] || fail "kpi-overhead did not read the metric-dir log the meter wrote"
+[[ "$(row_count Lead <<<"$kmd")" -eq 2 ]] || fail "kpi-overhead did not read the metric-dir log the meter wrote"
 
 # spec: drift-kit/SPEC.md §Testing — kpi-price-table-age over purpose-built tables: the
 # dated-header reads, each row's independent degradation, and the inversion the KPI
 # exists for (fresh age, expired prices, in one report).
-ptkpi() { DRIFT_KIT_PRICE_TABLE="$1" bash "$SMOKE_KIT_ROOT/kpis/kpi-price-table-age.sh" "${2:-}"; }
+ptkpi() { DRIFT_KIT_PRICE_TABLE="$1" solo kpi-price-table-age; }
+pttrend_of() { DRIFT_KIT_PRICE_TABLE="$1" trend_frag kpi-price-table-age; }
 
 pt_both="$work/pt-both.tsv"
 cat > "$pt_both" <<EOF
@@ -212,10 +268,10 @@ set +e
 ptout="$(ptkpi "$pt_both")"; ptrc=$?
 set -e
 [[ "$ptrc" -eq 0 ]] || fail "kpi-price-table-age exited $ptrc (advisory plugins always exit 0)"
-[[ "$(grep -c '^lead' <<<"$ptout")" -eq 2 ]] || fail "kpi-price-table-age did not emit its two lead rows over a fully dated table"
+[[ "$(row_count Lead <<<"$ptout")" -eq 2 ]] || fail "kpi-price-table-age did not emit its two lead rows over a fully dated table"
 grep -q 'priced 3d ago (as-of' <<<"$ptout" || fail "age row did not read the priced-as-of: header: $ptout"
 grep -q 'expires in 10d (through' <<<"$ptout" || fail "expiry row did not read the prices-valid-through: header: $ptout"
-pttrend="$(ptkpi "$pt_both" --trend)"
+pttrend="$(pttrend_of "$pt_both")"
 [[ "$pttrend" == 'price 3d' ]] || fail "kpi-price-table-age --trend not 'price 3d': $pttrend"
 
 pt_inv="$work/pt-inverted.tsv"
@@ -229,7 +285,7 @@ ptinv="$(ptkpi "$pt_inv")"
 grep -q 'priced 0d ago' <<<"$ptinv" || fail "inversion fixture: age row should read fresh (0d), got: $ptinv"
 grep -q 'EXPIRED 1d ago — re-verify (through' <<<"$ptinv" \
     || fail "inversion fixture: a lapsed prices-valid-through: must read EXPIRED even beside a fresh age row: $ptinv"
-[[ "$(ptkpi "$pt_inv" --trend)" == 'price 0d' ]] \
+[[ "$(pttrend_of "$pt_inv")" == 'price 0d' ]] \
     || fail "inversion fixture: the trend fragment tracks age only, and must still emit"
 
 pt_noexp="$work/pt-noexpiry.tsv"
@@ -244,7 +300,7 @@ printf '# prices-valid-through: %s\ntest-model\t0.000001\t0.000002\t0.0000001\t0
 ptna="$(ptkpi "$pt_noage")"
 grep -q 'n/a (no priced-as-of: header)' <<<"$ptna" || fail "absent priced-as-of: must degrade the age row visibly: $ptna"
 grep -q 'expires in 5d' <<<"$ptna" || fail "the expiry row degrades independently of the age row: $ptna"
-[[ -z "$(ptkpi "$pt_noage" --trend)" ]] || fail "--trend must emit nothing when the age value is n/a"
+[[ -z "$(pttrend_of "$pt_noage")" ]] || fail "--trend must emit nothing when the age value is n/a"
 
 pt_bad="$work/pt-bad.tsv"
 printf '# priced-as-of: not-a-date\n# prices-valid-through: 2026-13-45\ntest-model\t0.000001\t0.000002\t0.0000001\t0.000002\n' > "$pt_bad"
@@ -253,13 +309,14 @@ grep -q 'n/a (unparseable priced-as-of date)' <<<"$ptbad" || fail "malformed pri
 grep -q 'n/a (unparseable prices-valid-through date)' <<<"$ptbad" || fail "malformed prices-valid-through must read as unparseable, not as absent: $ptbad"
 
 ptmiss="$(ptkpi "$work/no-such-price-table.tsv")"
-[[ "$(grep -c '^lead' <<<"$ptmiss")" -eq 1 ]] || fail "with no table the KPI emits one row, not an expiry row for a table that is not there: $ptmiss"
+[[ "$(row_count Lead <<<"$ptmiss")" -eq 1 ]] || fail "with no table the KPI emits one row, not an expiry row for a table that is not there: $ptmiss"
 grep -q 'n/a (no price table)' <<<"$ptmiss" || fail "absent price table must degrade fail-visibly: $ptmiss"
 
 # spec: drift-kit/SPEC.md §Testing — kpi-incident-recurrence over purpose-built queues:
 # the sum across declarations, the highest-count slug, the trend fragment, and the two
 # degradations. Fixture-stable, like kpi-price-table-age: it reads a file the fixture writes.
-irkpi() { DRIFT_KIT_QUEUE_FILE="$1" bash "$SMOKE_KIT_ROOT/kpis/kpi-incident-recurrence.sh" "${2:-}"; }
+irkpi() { DRIFT_KIT_QUEUE_FILE="$1" solo kpi-incident-recurrence; }
+irtrend_of() { DRIFT_KIT_QUEUE_FILE="$1" trend_frag kpi-incident-recurrence; }
 
 ir_q="$work/recurrence-queue.md"
 cat > "$ir_q" <<'EOF'
@@ -276,15 +333,15 @@ set +e
 irout="$(irkpi "$ir_q")"; irrc=$?
 set -e
 [[ "$irrc" -eq 0 ]] || fail "kpi-incident-recurrence exited $irrc (advisory plugins always exit 0)"
-[[ "$(grep -c '^lag' <<<"$irout")" -eq 1 ]] || fail "kpi-incident-recurrence must emit exactly one lag row: $irout"
+[[ "$(row_count Lag <<<"$irout")" -eq 1 ]] || fail "kpi-incident-recurrence must emit exactly one lag row: $irout"
 grep -q '4 re-filing(s) recorded' <<<"$irout" || fail "the count must sum dates across every declaration, not count declarations: $irout"
 grep -q 'highest thrice at 3' <<<"$irout" || fail "the highest-count slug row is missing or wrong: $irout"
-[[ "$(irkpi "$ir_q" --trend)" == 'recur 4' ]] || fail "kpi-incident-recurrence --trend not 'recur 4': $(irkpi "$ir_q" --trend)"
+[[ "$(irtrend_of "$ir_q")" == 'recur 4' ]] || fail "kpi-incident-recurrence --trend not 'recur 4': $(irtrend_of "$ir_q")"
 
 irnone="$(irkpi "$work/TASK-QUEUE.md")"
 grep -q 'n/a (no recurrence declaration in the queue)' <<<"$irnone" \
     || fail "a queue with no declaration must degrade fail-visibly rather than reporting 0: $irnone"
-[[ -z "$(irkpi "$work/TASK-QUEUE.md" --trend)" ]] || fail "--trend must emit nothing when no declaration exists"
+[[ -z "$(irtrend_of "$work/TASK-QUEUE.md")" ]] || fail "--trend must emit nothing when no declaration exists"
 grep -q 'n/a (no queue file)' <<<"$(irkpi "$work/no-such-queue.md")" \
     || fail "an absent queue file must degrade fail-visibly"
 

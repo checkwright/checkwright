@@ -375,12 +375,23 @@ tools are the worked set:
 - `kfric.sh`, `overhead-meter.sh` and `stage-economics.sh` each resolve one
   `REPO_ROOT` and consume it exactly once, on the next line, with `cd`.
   **Dialect-tolerant; no change owed.**
-- `drift-report.sh` carries a second root, `KIT`, and consumes it by
-  **concatenation** — the one dialect-exposed consumption among them. Its crosser
-  is `cd "$(dirname …)" && pwd`, a shell builtin, so the value is POSIX by
-  construction and the exposed consumption is already satisfied at its crossing:
-  **no change owed**, and adding a normalization here would be exactly the
-  re-normalization the boundary clause forbids.
+- `drift-report.sh` carried a second root, `KIT`, consumed by **concatenation** —
+  the one dialect-exposed consumption among them. Its crosser was
+  `cd "$(dirname …)" && pwd`, a shell builtin, so the value was POSIX by
+  construction and the exposed consumption was already satisfied at its crossing:
+  **no change owed**, and adding a normalization would have been exactly the
+  re-normalization the boundary clause forbids. **That site is gone**, deleted with
+  the shell collator by the 2026-08-29 drift-kit cut. The disposition is kept in
+  the past tense rather than struck out, because what it teaches is the predicate,
+  not the file: it is this set's only worked example of *exposed-but-satisfied*,
+  which is the verdict a reader most needs a worked instance of.
+- The arm that replaced it composes `<kit-root>/kpis/<name>.sh` from the resolved
+  kit-root set — a **new** dialect-exposed site, born of the port exactly as
+  §Porting to Rust does not retire dialect exposure says it would. It is
+  **satisfied**: those roots reach it through `walk::abs_against`, the crate's own
+  crosser, so they are already in the declared dialect and the boundary clause
+  forbids re-normalizing them. `registry.rs`' `checks` append is the same shape and
+  the same verdict.
 
 The tree's remaining root call sites are **not** migrated onto this contract yet.
 That corpus is its own unit of work; until it lands, the contract holds where a
@@ -1689,7 +1700,9 @@ re-deciding, and only the operator reopens a closed ruling.
 The binary is a multi-call binary whose *gate* subcommands are dispatched by
 name out of `gates::REGISTRY`. It also carries arms that are **not** gates —
 `--list`, `--reads`, `--knobs`, `--source-stamp`, `--queue-parity`,
-`--declaration-parity`, `--evidence-lib-parity` and `--install` — and the class
+`--declaration-parity`, `--evidence-lib-parity` and `--install`, plus the
+`--emit-` family the bridged-arm table keys (`--emit-drift-report` is its
+2026-08-29 member) — and the class
 they form is named here because a
 session arriving with a new non-gate thing to port has no other way to learn
 that one exists or what it costs. Each arm's own `spec:` comment explains that
@@ -1900,6 +1913,20 @@ dispatching variant, and the port did not have to widen it, because a sentinel i
 a member's declared roster expresses the same union per member. Recorded because
 the two mechanisms look interchangeable and are not: the dispatcher hands each
 *child* its own slice, where the sentinel resolves a union the arm itself reads.
+
+**A derived knob set is not always the union sentinel, and the two are near
+enough to be confused.** drift-kit's collator (drift-kit/SPEC.md §The report
+skeleton) arrived at this class with the same shape of problem — its contract is
+built on `compgen -v DRIFT_KIT_` precisely so that no fixed export list can drift
+out of parity, so a transcribed roster would replace a derivation and land on the
+derivation-first rule. The sentinel is **not** its answer: the sentinel is scoped
+to the *gate* registry's members, and that arm's registry is a KPI list whose
+members declare no knobs at all. Its answer is the **prefix family** `DRIFT_KIT_*`,
+which the bridge resolves by running that same `compgen` inside the owning kit's
+already-sourced subshell (§lib/gate.sh) — the shell contract moved rather than
+re-implemented, on `--emit-enforcement-map`'s `EVIDENCE_KIT_RUN_*` precedent.
+Recorded because both mechanisms answer "the roster is not knowable here" and
+only one answers "the roster is the namespace".
 
 **Most of what that port needed was already in the crate**, which was the other
 half of why the route was recordable ahead of it. `registry.rs` owns the registry
@@ -2177,9 +2204,11 @@ that answers each is the one whose corpus matches its question.
    over-selection above — the gate does read `*.sh` names as content, but only
    under a `<kit>/<name>/` directory that a sibling `<kit>/templates/<name>.list`
    registers, and no kit ships a template registering `checks/`. Against this
-   tree that walk reaches one live registry, `drift-kit/kpis/`, with
-   `gate-sdk/templates/msg-patterns.list` skipped for want of a sibling — neither
-   holding a gate declaration, which is what its conservation row already records.
+   tree that walk reaches one live registry, drift-kit's `kpis.list` — held in
+   population by native dispatch rather than by a sibling directory since the
+   2026-08-29 cut — with `gate-sdk/templates/msg-patterns.list` skipped for want of
+   either — neither holding a gate declaration, which is what its conservation row
+   already records.
    Under the borrowed term the member reads as a criterion-4 failure and under
    criterion 4's own predicate it does not. The corpus is derived from the tree,
    so the verdict is taken by running the derivation at cohort-cut time, never
@@ -4672,8 +4701,10 @@ the gate really does read `*.sh` names as content, through
 `git ls-files -- '*.sh'`. It is a **content couple wider than the walk**: the
 names it reads are only those under a `<kit>/<name>/` directory that a sibling
 `<kit>/templates/<name>.list` registers, and no kit ships a template registering
-`checks/`. Against this tree that walk reaches one live registry, `drift-kit/kpis/`,
-with `gate-sdk/templates/msg-patterns.list` skipped for want of a sibling. The
+`checks/`. Against this tree that walk reaches one live registry, drift-kit's `kpis.list`,
+held in population by native dispatch since the 2026-08-29 cut rather than by a
+sibling directory, with `gate-sdk/templates/msg-patterns.list` skipped for want of
+either. The
 port therefore changes nothing the gate reads and the parity proof is not
 self-referential. Recorded at this length because every mechanical screen puts
 this member *out*, and because the amendment that proposed the cohort argued it
@@ -7521,8 +7552,8 @@ properties bind:
   is likewise registry-ordered.
 - **The timings file is not a contended writer.** Per-member elapsed times are
   collected in memory and written once after the join, in registry order,
-  `TOTAL` last — the grammar `drift-kit/kpis/kpi-gate-runtime.sh` and
-  `drift-kit/bin/drift-report.sh` read, unchanged. `TOTAL` is the **sum** of
+  `TOTAL` last — the grammar drift-kit's `kpi-gate-runtime` member and its
+  collator read, unchanged. `TOTAL` is the **sum** of
   per-member times, as it always was, and therefore stops approximating
   wall-clock: under a pool the two part company, and per-member times themselves
   rise with CPU contention while the run gets shorter. Stated because those two
@@ -12168,7 +12199,7 @@ is not executable" cannot read as "a descriptor is not covered": the descriptor
 is data — a manifest and directives, never sourced and never run — and an
 executable one invites a reader to run a file carrying no interpreter line. The
 first class is by-path-invoked kit scripts — gate-sdk's runner
-(`run-gates.sh`), drift-kit's collator (`drift-report.sh`), and lifecycle-kit's
+(`run-gates.sh`), drift-kit's overhead meter (`overhead-meter.sh`), and lifecycle-kit's
 entry preflight all invoke kit scripts **by path**, and a shebang'd `bin/` tool
 is by-convention path-invocable — so a script committed `100644` degrades
 silently in a fresh clone: a KPI plugin to `n/a (plugin failed)`, a
@@ -13393,16 +13424,48 @@ and a SPEC that named the KPI.
 
 **Scope derives from layout, never a roster** — §check-template-copy-parity's
 rule, applied one axis over. A template enters the population when
-`<kit>/templates/<name>.list` has a sibling **directory** `<kit>/<name>/`
-holding the artifacts the list registers; a `.list` with no such sibling is
-skipped-and-counted, not failed, the same silent-skip exclusion its sibling gate
-gives an unpaired template. Shipped members are the basenames of that
-directory's `*.sh` files, extension stripped, read from `git ls-files` so an
-untracked scratch file forces no registry line; registry members are the
-non-comment, non-blank lines — the `gates.list` grammar `gates_list_members`
-reads, the same grammar `drift-kit/bin/drift-report.sh` resolves its registry
-through, so the gate calls a name registered exactly when the consumer's
+`<kit>/templates/<name>.list` has a sibling **directory** `<kit>/<name>/` holding
+the artifacts the list registers, **or** when the binary declares that it
+natively dispatches that registry; a `.list` with neither is skipped-and-counted,
+not failed, the same silent-skip exclusion its sibling gate gives an unpaired
+template. Shipped members are the basenames of the sibling directory's `*.sh`
+files, extension stripped, read from `git ls-files` so an untracked scratch file
+forces no registry line, **joined with** the natively dispatched member names;
+registry members are the non-comment, non-blank lines — the `gates.list` grammar
+`gates_list_members` reads, the same grammar the consumer's own KPI resolver
+reads its registry through, so the gate calls a name registered exactly when that
 resolver would.
+
+**Native dispatch is a shipping mechanism, and the widening says so rather than
+working around it.** A kit whose registry members moved into the binary ships
+them as surely as it shipped files — the members answer the same registry names
+at the same transition — so the gate's question is *what answers this name*, not
+*what file answers it*. The gate **predates the substrate**, and every later kit
+port meets it; enforcement-first puts the fix in the unit that first breaks it
+rather than in a shim, which is why thirteen files whose only purpose was to
+satisfy this gate were refused: they would each then need their own port
+disposition, converting a blind spot into permanent corpus. Scoping the gate off
+the kit was refused as scoping enforcement off the thing it exists to check.
+
+**The widened predicate is not satisfiable by the population going empty, and
+that is its load-bearing constraint.** Emptying a sibling directory reds every
+registry line, while *deleting* it takes the template out of the sibling arm
+entirely — and a narrowing that removes a violation by removing the check is
+strictly worse than the red, because a later session reads a green board with no
+way to see it. The native declaration is what holds such a template in
+population, so a declaration whose roster is empty reds every registry line
+through assertion (B) rather than skipping. **Assertion (C)**
+closes the declaration's own side: where the declaring kit is in the scan's root
+set, its registry template must have been reached, so a declaration outliving its
+template is a finding. Scoping (C) to the enumerated roots is what keeps a
+sandboxed fixture — which vendors neither the kit nor its template — out of it.
+
+**The honest limit.** The population predicate is *inferred*, from a sibling
+directory or a native declaration, and there is no third signal. A tree that
+deletes a registry's artifacts **and** its native declaration in one motion
+degrades that template to skipped, silently. Nothing here can catch that, because
+deleting the declaration is deleting the dispatch, and the gate cannot tell an
+intentional retirement from an accidental one. It is named rather than closed.
 
 **The population predicate carries the provenance seam, and that is why it is
 structural.** The flat form of the rule — *a kit's `templates/` registry must be
@@ -13422,9 +13485,10 @@ the failure mode of forgetting is a kit literal publishing a private vocabulary.
 
 A second structural consequence, stated so it is not read as an omission:
 `drift-kit/templates/kpi-deprecated-surface.sh` is an example plugin shipped *as
-a template* for a consumer to adapt. It is not in `drift-kit/kpis/`, so it is
-not a bundled artifact and is not required in the registry — the shipped set is
-the sibling directory's contents and nothing else.
+a template* for a consumer to adapt. It is a template rather than a bundled
+member, so it is not a shipped artifact and is not required in the registry — the
+shipped set is the sibling directory's contents joined with the natively
+dispatched roster, and nothing else.
 
 Sweep: kit roots come from `gate_kit_roots` (the `GATE_SDK_KIT_DIRS` knob —
 §Layout and configuration), the sibling roster meta-gates' shape; config adds
@@ -13438,7 +13502,11 @@ defect, which is what (A) and (B) split between them — tier `precommit`. The
 fixture pair synthesizes both sides at once: `good/` proves green on a registry
 in parity while carrying both structural exclusions (a `.list` with no sibling,
 and a non-`.list` template), and `bad/` proves a registry that is one-sided in
-each direction at the same time.
+each direction at the same time. The pair also carries the widening: `good/`
+holds a kit whose registry has **no sibling directory at all** and is in
+population anyway, on the native declaration the binary carries, and `bad/` holds
+that same shape one-sided in both directions — the case the sibling-only
+predicate cannot reach at all.
 
 **Its implementation is a compiled subcommand**, on §check-action-pinning's
 terms — declaration path `check-template-registry-parity.gate`, rule out of the

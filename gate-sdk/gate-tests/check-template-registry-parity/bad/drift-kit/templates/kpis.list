@@ -1,0 +1,18 @@
+# Fixture registry for the widened population predicate: this kit ships **no**
+# sibling directory, and is one-sided against the binary's native-dispatch
+# declaration alone. gate-sdk/SPEC.md §check-template-registry-parity.
+# One natively dispatched member is unregistered (A) and one registered name
+# nothing dispatches (B) — the pair that used to be a silent skip.
+kpi-always-loaded
+kpi-amendment-age
+kpi-deferred-age
+kpi-gate-backlog
+kpi-gate-runtime
+kpi-incident-recurrence
+kpi-knowledge-friction
+kpi-price-table-age
+kpi-prompt-friction
+kpi-queue-net-delta
+kpi-settings-local
+kpi-task-split
+kpi-nothing-dispatches-this

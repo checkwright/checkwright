@@ -8,7 +8,7 @@ cd "$REPO_ROOT" 2>/dev/null || exit 0
 
 RUN_GATES="gate-sdk/bin/run-gates.sh"             # the --emit front-end: queue-kit's queue surface, bridged
 CTX_BIN="context-kit/bin"                         # context-kit index tools
-DRIFT_REPORT="${CONTEXT_KIT_DRIFT_REPORT:-drift-kit/bin/drift-report.sh}"  # drift-kit trend line
+DRIFT_ARM="${CONTEXT_KIT_DRIFT_REPORT:-drift-report}"  # drift-kit trend line: an --emit arm name
 STAGE_RULES="${CONTEXT_KIT_STAGE_RULES:-doctrine-kit/bin/stage-rules.sh}"  # doctrine-kit craft-rule router
 STATE_FILE="${CONTEXT_KIT_STATE_FILE:-${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt}"  # lifecycle stage cursor
 
@@ -44,10 +44,11 @@ if [[ ${#changed[@]} -gt 0 && -f "$CTX_BIN/pub-index.sh" ]]; then
     echo
 fi
 
-if [[ -n "$DRIFT_REPORT" && -f "$DRIFT_REPORT" ]]; then
-    drift_line="$(bash "$DRIFT_REPORT" --trend 2>/dev/null)" || true
+# spec: context-kit/SPEC.md §The session-context hook — the knob names an arm of the --emit front-end, not a script path; a `-f` test on an arm name passes for nothing, which is how this line would have vanished with no red anywhere.
+if [[ -n "$DRIFT_ARM" && -f "$RUN_GATES" ]]; then
+    drift_line="$(bash "$RUN_GATES" --emit "$DRIFT_ARM" --trend 2>/dev/null)" || true
     if [[ -n "$drift_line" ]]; then
-        echo "$drift_line  (full: bash $DRIFT_REPORT)"
+        echo "$drift_line  (full: bash $RUN_GATES --emit $DRIFT_ARM)"
         echo
     fi
 fi

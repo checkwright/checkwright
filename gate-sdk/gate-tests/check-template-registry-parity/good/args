@@ -5,4 +5,6 @@
 # ways. beta-kit carries the two structural exclusions: rules.list has no
 # beta-kit/rules/ sibling (skipped-and-counted), and table.tsv is not a .list
 # at all, so it never reaches the sibling test.
+# drift-kit carries the widening: a registry template with no sibling
+# directory, in population on the binary's native-dispatch declaration.
 .

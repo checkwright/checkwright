@@ -1216,7 +1216,7 @@ contract, which is why an additive suffix leaves its substring assertions true.
 
 **The KPI's numerator steps at the landing commit, for a definitional reason.**
 Splitting one key into two raises `<patterns>` while leaving `<occurrences>`
-unchanged, so `drift-kit/kpis/kpi-prompt-friction.sh` reads a discontinuity that
+unchanged, so drift-kit's `kpi-prompt-friction` member reads a discontinuity that
 is not behavioral. The `^[0-9]+/[0-9]+$` contract it asserts is unbroken, so
 nothing reds — which is exactly what makes the step silent and worth stating. The
 pre-change reading, so a later trend read can attribute the step rather than

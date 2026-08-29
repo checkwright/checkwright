@@ -9,7 +9,7 @@ cd "$REPO_ROOT" 2>/dev/null || exit 0
 # spec: context-kit/SPEC.md §The session-context hook — consumer layout: vendored kit tools + governed queue file, retarget to yours [EDIT ME]. The queue index is reached through the battery runner's --emit front-end rather than by tool path: the front-end sources the shell library and supplies the bridged environment, so a consumer's section and cap overrides reach the arm (gate-sdk/SPEC.md §The non-gate arm).
 RUN_GATES="gate-sdk/bin/run-gates.sh"
 CTX_BIN="context-kit/bin"
-DRIFT_REPORT="${CONTEXT_KIT_DRIFT_REPORT:-}"
+DRIFT_ARM="${CONTEXT_KIT_DRIFT_REPORT:-}"
 STAGE_RULES="${CONTEXT_KIT_STAGE_RULES:-}"
 STATE_FILE="${CONTEXT_KIT_STATE_FILE:-${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt}"
 
@@ -47,11 +47,11 @@ if [[ ${#changed[@]} -gt 0 && -f "$CTX_BIN/pub-index.sh" ]]; then
     echo
 fi
 
-# spec: context-kit/SPEC.md §The session-context hook — step 3 drift line (drift-kit owns the report; the seam is this optional line)
-if [[ -n "$DRIFT_REPORT" && -f "$DRIFT_REPORT" ]]; then
-    drift_line="$(bash "$DRIFT_REPORT" --trend 2>/dev/null)" || true
+# spec: context-kit/SPEC.md §The session-context hook — step 3 drift line (drift-kit owns the report; the seam is this optional line). The knob names an **arm** of the battery runner's --emit front-end, not a script path: a `-f` test on an arm name is a test nothing can pass, so the guard is a non-empty name plus the front-end's own presence.
+if [[ -n "$DRIFT_ARM" && -f "$RUN_GATES" ]]; then
+    drift_line="$(bash "$RUN_GATES" --emit "$DRIFT_ARM" --trend 2>/dev/null)" || true
     if [[ -n "$drift_line" ]]; then
-        echo "$drift_line  (full: bash $DRIFT_REPORT)"
+        echo "$drift_line  (full: bash $RUN_GATES --emit $DRIFT_ARM)"
         echo
     fi
 fi

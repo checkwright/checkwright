@@ -3,9 +3,11 @@
 // comparator calling `emit()`, a stage step, a gate reaching it in process.
 pub mod close_surfaces;
 pub mod docs_mirror;
+pub mod drift_report;
 pub mod enforcement_map;
 pub mod footprint;
 pub mod graph;
+pub mod kpi;
 pub mod port_blockers;
 pub mod queue_index;
 pub mod roadmap;
@@ -188,6 +190,14 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         "--emit-port-blockers",
         Arm::Emit(port_blockers::emit),
         port_blockers::KNOBS,
+    ),
+    // spec: drift-kit/SPEC.md §The report skeleton — the collator, a *bridged* arm rather than a
+    // top-level flag: a hardcoded flag receives no consumer override, which for a kit whose whole
+    // surface is overridable knobs would be a functional regression rather than a porting detail.
+    (
+        "--emit-drift-report",
+        Arm::Emit(drift_report::emit),
+        drift_report::KNOBS,
     ),
     // spec: gate-sdk/SPEC.md §run-gates — the battery runner: the class's first bridged member
     // that returns a verdict rather than a document, and the reason the table is keyed by flag.

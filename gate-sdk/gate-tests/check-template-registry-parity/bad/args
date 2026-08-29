@@ -1,4 +1,6 @@
 # Same anchoring as good/. alpha-kit's registry is one-sided in both
 # directions at once: widget-two ships and is unregistered (assertion A),
 # widget-three is registered and ships nothing (assertion B).
+# drift-kit carries the widening: a registry template with no sibling
+# directory, in population on the binary's native-dispatch declaration.
 .

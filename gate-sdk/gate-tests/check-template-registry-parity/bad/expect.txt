@@ -1,1 +1,3 @@
 alpha-kit/templates/widgets.list does not register shipped artifact: widget-two
+drift-kit: drift-kit/templates/kpis.list does not register shipped artifact: kpi-overhead
+drift-kit: drift-kit/templates/kpis.list registers a name no shipped artifact answers: kpi-nothing-dispatches-this

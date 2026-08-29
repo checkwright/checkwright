@@ -162,7 +162,8 @@ fn gate_section(gates_dir: &str) -> Result<Option<Section>, String> {
 }
 
 // spec: gate-sdk/SPEC.md §enforcement-map — Advisory KPIs: the drift-kit KPI registry, kit from
-// where each plugin resolves (the gates dir, then each kit's kpis/)
+// where each member resolves — the gates dir, then each kit's `kpis/`, then native dispatch, which
+// is drift-kit/SPEC.md §The extensibility contract's own three tiers read for attribution
 fn kpi_section(gates_dir: &str) -> Result<Option<Section>, String> {
     let file = walk::knob_scalar(KPIS_KNOB)?;
     if file.is_empty() || !Path::new(&file).is_file() {
@@ -185,6 +186,16 @@ fn kpi_section(gates_dir: &str) -> Result<Option<Section>, String> {
                     break;
                 }
             }
+        }
+        // spec: gate-sdk/SPEC.md §enforcement-map — a natively dispatched member has no source
+        // path to attribute by, so it is attributed to the kit that declares the registry; without
+        // this arm the fallback below would credit every ported member to the consumer's gates dir
+        if src.is_empty() && crate::emit::kpi::lookup(&name).is_some() {
+            rows.push(Row {
+                kit: crate::emit::kpi::REGISTRY_KIT.into(),
+                cells: vec![name],
+            });
+            continue;
         }
         if src.is_empty() {
             src = direct;

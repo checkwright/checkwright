@@ -205,6 +205,33 @@ pub fn run_merged(program: &str, args: &[&str]) -> Result<Merged, String> {
     Ok(Merged { status, output })
 }
 
+// spec: drift-kit/SPEC.md §The KPI plugin contract — `run` with additions to the *child's*
+// environment, the one shape `run` cannot carry. Writing the child's rather than the process's is
+// what leaves knobenv's guard the only writer of the process-global one.
+pub fn run_with_env(
+    program: &str,
+    args: &[&str],
+    env: &[(String, String)],
+) -> Result<Completed, String> {
+    #[cfg(test)]
+    recorder::note(program);
+    let mut cmd = Command::new(program);
+    cmd.args(args);
+    for (k, v) in env {
+        cmd.env(k, v);
+    }
+    let out = cmd.output().map_err(|e| {
+        format!(
+            "cannot run {}: {} — the check could not run; treating as failure (not clean)",
+            program, e
+        )
+    })?;
+    Ok(Completed {
+        status: out.status,
+        stdout: out.stdout,
+    })
+}
+
 static MERGE_SEQ: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
 
 // spec: gate-sdk/SPEC.md §Fail-closed contract — `run` with a body written to the child's stdin,

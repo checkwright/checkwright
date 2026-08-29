@@ -9,7 +9,7 @@ Drift reporting for coding-agent sessions. Gates block what a single diff makes
 mechanically decidable; **drift is what accumulates between commits** — a
 backlog ages, an always-loaded surface swells, friction recurs, and every
 stateless session looks fine because none of them ever sees the slope. drift-kit
-is that trend surface: an advisory `drift-report.sh` that collates pluggable
+is that trend surface: an advisory `--emit drift-report` arm that collates pluggable
 KPIs from the other kits' governed surfaces, groups them under honest weight
 labels (**lead** — act before drift compounds; **lag** — undercounts by
 construction), and emits a one-line trend summary the session-start hook injects,
@@ -41,9 +41,9 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
    over-broad registry is safe but noisy.
 
 2. Wire the trend line — point context-kit's session-context hook at the report
-   by pointing `CONTEXT_KIT_DRIFT_REPORT` at `drift-kit/bin/drift-report.sh` (or
-   the `DRIFT_REPORT` default in your hook copy). The hook runs `--trend` and prints
-   one line; absent the variable, the line is silently skipped.
+   by setting `CONTEXT_KIT_DRIFT_REPORT` to the arm name `drift-report` (or the
+   `DRIFT_ARM` default in your hook copy). The hook runs the arm with `--trend`
+   and prints one line; absent the variable, the line is silently skipped.
 
 Configuration follows the established kit pattern — override any knob in
 `drift-config.sh` (registry path, extra KPI dirs, the queue/log/timings surfaces,
@@ -72,8 +72,8 @@ doc owned the fact (drift-kit/SPEC.md §The knowledge-friction loop). It shows
 ## Use
 
 ```bash
-bash drift-kit/bin/drift-report.sh            # full report: lead/lag rows under the honesty labels
-bash drift-kit/bin/drift-report.sh --trend    # one compact line (fragments joined with ·)
+bash gate-sdk/bin/run-gates.sh --emit drift-report          # full report: lead/lag rows under the honesty labels
+bash gate-sdk/bin/run-gates.sh --emit drift-report --trend  # one compact line (fragments joined with ·)
 bash gate-sdk/bin/run-gates.sh --emit trajectory   # governed-trajectory table (one row per closed iteration)
 bash drift-kit/bin/overhead-meter.sh          # governance-vs-task byte proxy for the newest session transcript
 bash drift-kit/bin/stage-economics.sh         # real spend by stage × model × iteration (stamps ⋈ transcripts ⋈ price table)
@@ -105,9 +105,11 @@ one post-iteration cost narrative — a reporting ritual the close skill may
 invoke, not a lifecycle stage and not a gate.
 
 A KPI plugin is `kpi-<name>.sh`, resolved through `kpis.list` against your KPI
-dirs then each vendored kit's `kpis/`. Add your own by dropping a plugin in your
-gates dir and naming it in the registry; shadow a bundled one with a same-named
-file. The bundled set (drift-kit/SPEC.md §Bundled KPIs) covers, as lead KPIs, the
+dirs, then each vendored kit's `kpis/`, then the binary's built-in members —
+three tiers, consumer-first. Add your own by dropping a plugin in your gates dir
+and naming it in the registry; shadow a bundled one with a same-named file. Your
+plugin is executed directly and reads the exported `DRIFT_KIT_*` environment,
+both unchanged by the bundled set moving in-crate. The bundled set (drift-kit/SPEC.md §Bundled KPIs) covers, as lead KPIs, the
 queue split and its per-iteration net delta, the gate backlog, amendment/deferred
 age, prompt friction, the always-loaded surface, the local permission overlay,
 gate runtime, session overhead, and the price table's age and expiry; and as lag

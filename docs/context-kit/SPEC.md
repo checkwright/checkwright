@@ -144,7 +144,7 @@ Steps, in order:
    surface is already in context. Component detection and the index
    command live in a marked consumer section of the template — they are
    layout assumptions, not mechanism.
-3. **Drift line** — one `drift-report --trend` summary line when the
+3. **Drift line** — one `--emit <arm> --trend` summary line when the
    consumer has a drift report; silently absent otherwise (drift-kit owns
    the report; the seam is this optional line).
 4. **Stage-conditioned nudges** — short reminders keyed on a stage set
@@ -458,7 +458,7 @@ front-end, `--collapse-deferred`, when resolvable). The approximation is deliber
 session-context hook itself — the hook emits this meter's own output line,
 so self-measurement would recurse and inflate.
 
-The meter lives here, not in `drift-report.sh`, because the *metric* is
+The meter lives here, not in drift-kit's collator, because the *metric* is
 context economics and the *report* is drift reporting — drift-kit's
 `kpi-always-loaded` consumes this script for its row instead of re-embedding
 the measurement.
@@ -1020,9 +1020,16 @@ agreeing ones.
   the steady-state hook body; default queue-kit's
   `run-gates.sh --emit queue-index --collapse-deferred` when resolvable, else empty
   (surfaces only).
-- `CONTEXT_KIT_DRIFT_REPORT` — path to the consumer's drift-report script;
-  the session-context hook runs it with `--trend` for the brief's drift
-  line; default empty (the line is omitted).
+- `CONTEXT_KIT_DRIFT_REPORT` — the **`--emit` arm name** of the consumer's
+  drift report, not a path: the hook runs
+  `run-gates.sh --emit <name> --trend` for the brief's drift line; default
+  empty (the line is omitted), and this repo's own copy sets `drift-report`.
+  **It was a script path until 2026-08-29**, and the change is called out
+  because the guard changed with it: a `-f` existence test on an arm name
+  passes for nothing, so a hook that kept testing the value as a path would
+  have dropped the drift line with no red anywhere. A consumer whose config
+  still holds the old path degrades to no drift line, which is the same
+  degrade an absent report always had.
 - `CONTEXT_KIT_STAGE_RULES` — path to a stage→craft-rule pointer emitter
   (doctrine-kit's `stage-rules.sh`); the session-context hook runs it with the
   current stage for the brief's craft-rule block; default empty (the block is
@@ -1161,8 +1168,8 @@ names its own extra indexes in the hook template's footer. `check-md-refs`
 unclaimed, not this kit's) and `check-md-sections` (a required-heading map is
 rule content, and the queue surface it guards is already gated by queue-kit).
 A close-stage harvest pipeline (`[pub]` lessons, publication paths) is
-product workflow, not context mechanism. `drift-report.sh` itself is
-drift-kit's surface — only the always-loaded KPI lives here. A consumer's
+product workflow, not context mechanism. The drift report itself is
+drift-kit's surface — only the always-loaded meter lives here. A consumer's
 session-context content — its delegation nudge wording, component roster,
 and extra index commands — stays in its own copied hook. Memory **content**
 is out of scope by construction: the memory-off gates govern presence (the
