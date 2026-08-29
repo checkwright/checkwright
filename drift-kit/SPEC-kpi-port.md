@@ -144,11 +144,25 @@ this delta defers whole and nothing above it is re-specified.
 Two consequences of deferring it, stated here so the decision is made with them
 rather than discovered after:
 
-- The thirteen shell files stay **shipped**, so delta 5's gate is not broken by
-  this increment and its widening would become **speculative** — enforcement-first
-  would then move it to the increment that actually breaks it.
+> **THE CUT RULE, ruled by the lead 2026-08-29 and binding rather than advisory:
+> if delta 6 is cut, delta 5 is cut with it, and lines 25-26 of the settings
+> reconciliation below are cut with both.** They are one unit at batch-cut and may
+> not be separated.
+
+The ground is enforcement-first, inverted: deferring delta 6 leaves the thirteen
+shell files **shipped**, so nothing in the increment breaks registry parity — and
+a gate widened ahead of the breakage it anticipates is speculative enforcement,
+landing unexercised by the very thing it exists for. The doctrine is that the fix
+and the gate that catches it land in **one** unit; delta 5 travels with delta 6
+because delta 6 is what makes delta 5 true.
+
+The rest of what deferring costs, so the call is made with it rather than after:
+
 - `--tree`'s owed count falls by one rather than by fourteen, and the entry
   demotes having ported the driver alone.
+- Of the four settings grants this cut orphans, only the `drift-report.sh` pair
+  dies; the `kpis/*.sh` pair survives with the files. See the reconciliation
+  below, which is itself split along this seam.
 
 Carried hazards for whoever implements it: `kpi-prompt-friction` and
 `kpi-always-loaded` **shell out to sibling kits** and one of them *prose-parses*
@@ -214,6 +228,16 @@ Parity is asserted by **byte-identity of the emitted report** across the two
 substrates, captured before the delete and diffed after — the shipped oracle for
 this class, and the reason no fixture pair is owed for a plain script port.
 
+**The delete carries its settings grants with it, in the same commit.** Part of
+the operator's 2026-08-29 ruling rather than a convenience: a commit that deletes
+a granted target and leaves its grant standing opens a window in which the
+committed settings name a file that is gone, and it is that window the
+same-commit requirement exists to close — not the tidiness of the removal. So the
+commit deleting `drift-kit/bin/drift-report.sh` removes settings lines 19-20, and
+the commit deleting the thirteen plugins (delta 6) removes lines 25-26. Lines
+21-24 are untouched in both. The scope of the removal is the files **this commit
+deletes**, never the `drift-kit/` prefix.
+
 ### (10) The fan-out this cut stales
 
 Each with its trigger, since a port stales more than it changes. {mechanical}
@@ -227,13 +251,37 @@ Each with its trigger, since a port stales more than it changes. {mechanical}
 `scripts/kpi-*.sh` arm **must be retained**, because that arm is what still
 governs the consumer extension point. `check-footprint-fresh` does **not** fire.
 
-**One red is a stated build-time precondition rather than this amendment's to
-fix.** `check-settings-paths` reds on two now-dead `Bash(bash drift-kit/…)`
-grants in the committed settings. Removing them is a **permission-settings edit**,
-which the 2026-08-22 operator bar reserves; the question is with the operator and
-**this amendment does not touch those grants**. The red arrives only when delta 6
-or delta 9 deletes the files, so the dependency is due before the *delete* lands,
-not before this amendment does. Build meets a stated precondition, not a surprise.
+**`check-settings-paths`, RULED — and the grant count is reconciled here because
+a wrong number is how a live grant gets deleted beside the dead ones.**
+
+**The ruling (`operator`, 2026-08-29, relayed by the lead).** Removing a
+permission grant whose target file a **ruled port cut deletes** is **outside** the
+2026-08-22 bar: it is a pure narrowing forced by the cut, removing a capability
+rather than adding one, and the cut's authority to delete the file is already
+ruled. **The bar itself is untouched** and stands unchanged for every other
+permission-settings edit — this is a carve-out for one mechanically-decidable
+class, not a relaxation. **Build removes the dead lines in the same commit as the
+delete**, so a grant and its target die together and no window exists in which the
+settings name a file that is gone. That same-commit requirement is part of the
+ruling, which is why it is stated in delta 9 — the delta that owns the delete —
+rather than left here as prose.
+
+**The reconciliation, probed at spec rather than carried.**
+`grep -n "drift-kit" .claude/settings.json` returns **eight** grants, lines 19-26,
+not the two an earlier reading of this amendment asserted. They split three ways
+and only the first four are this cut's:
+
+| lines | grant | disposition |
+|---|---|---|
+| 19-20 | `drift-kit/bin/drift-report.sh`, bare and `*` | **dies with delta 9's delete of the driver's shell entry point** |
+| 25-26 | `drift-kit/kpis/*.sh`, bare and `*` | **dies with delta 6's delete of the thirteen plugins** |
+| 21-24 | `kfric.sh`, `overhead-meter.sh`, `stage-economics.sh` (four grants) | **SURVIVE UNTOUCHED** |
+
+Lines 21-24 point at the three `bin/` tools this cut's envelope **excludes**. They
+are live grants for live files and removing them would be a capability loss the
+ruling does not cover and the cut does not force. **Four die, four survive**, and
+the four that die are split by the cut rule above: if delta 6 is cut, **only lines
+19-20 go**.
 
 ## Producers and consumers
 
@@ -285,8 +333,10 @@ makes it red — not by what it is about:
   `kpis/`; a vacuous pass is not a pass, which is why its `scripts/` arm is
   retained explicitly rather than left to survive by accident.
 - **`check-settings-paths`** — reds on a settings path naming no file. **Zero-count
-  shaped and non-monotone**: the delete *creates* the violation. Stated as a
-  build-time precondition above; not fixed here.
+  shaped and non-monotone**: the delete *creates* the violation, which is the
+  attested shape that makes a narrowing unsafe to clear by inspection. **Ruled and
+  fixed in-cut** — the same commit that deletes removes exactly the orphaned lines
+  (19-20, and 25-26 only if delta 6 lands), per the reconciliation above.
 - **`check-gate-binary-fresh`** — reds when the committed binary predates the
   crate sources. Monotone; cleared only by `build-native.sh`.
 - **`check-crate-arms`, `check-docs-mirror-fresh`, `check-comment-tier`,
@@ -323,9 +373,10 @@ makes it red — not by what it is about:
 - `docs/drift-kit/SPEC.md`, `docs/gate-sdk/SPEC.md`, `docs/context-kit/SPEC.md` —
   generated mirrors, stale the moment any delta lands (`all deltas`).
 
-<!-- update-target-exempt: the two dead settings grants are a permission-settings edit reserved by the 2026-08-22 operator bar, escalated and pending, so they are deliberately owned by no delta here -->
-- `.claude/settings.json`'s two `Bash(bash drift-kit/…)` grants — **not touched**;
-  a stated build-time precondition, not a delta.
+- `.claude/settings.json` — the orphaned grants at lines 19-20, and 25-26 only if
+  delta 6 lands, removed in the same commit as the delete they follow from
+  (deltas 6, 9). Lines 21-24 are **not** touched: they grant live files this cut
+  excludes.
 
 ## Definition of Done
 
@@ -349,6 +400,7 @@ makes it red — not by what it is about:
       0 headroom carrying more ruling content than it left with.
 - [ ] **Removals propagated** — every ported original deleted, and every surface
       naming a deleted path swept (both `session-context.sh` copies, the compiled
-      enforcement map, the settings grants **flagged not fixed**).
+      enforcement map, and exactly the orphaned settings grants — four of the
+      eight, never the four that grant the excluded tools).
 - [ ] **Gaps filed** — the two cohort entries filed; further cross-component gaps
       routed to the gap inbox.

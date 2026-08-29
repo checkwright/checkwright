@@ -107,6 +107,7 @@
   ruled: native-gate-port-remaining-corpus lead 2026-08-28 own-authority
   ruled: native-gate-port-remaining-corpus operator 2026-08-28 lead-relay
   ruled: native-gate-port-remaining-corpus lead 2026-08-29 own-authority
+  ruled: native-gate-port-remaining-corpus operator 2026-08-29 lead-relay
   **Cost while deferred:** large and known — the **owed** remainder (the trailer's own arm, never
   the unported count) plus the runners and the install-lifecycle layer; since the 2026-08-14
   born-native default (TRAJECTORY.md §The closed rulings) a gate landed meanwhile no longer adds
@@ -133,6 +134,13 @@
   the env-export contract; only the 13 bundled plugins move in-crate. Ground is drift-kit's OWN
   surfaces, not gate-sdk analogy. If the cut proves too large THE PORT GIVES, never the extension
   point: delta 6 is authored as the single separable delta so narrowing is a batch-cut.
+  **SETTINGS GRANTS RULED 2026-08-29 (operator, lead-relay):** removing a permission grant
+  whose target a RULED PORT CUT DELETES is OUTSIDE the 2026-08-22 bar — a pure narrowing
+  forced by the cut, the delete's authority already ruled. The bar stands unchanged for
+  every other permission-settings edit; this is a carve-out for one mechanically-decidable
+  class. Build removes the dead lines IN THE SAME COMMIT AS THE DELETE. Count reconciled by
+  probe: settings carry EIGHT drift-kit grants (lines 19-26), not two — 19-20 die with the
+  driver, 25-26 with the 13 plugins, and 21-24 grant the three EXCLUDED tools and SURVIVE.
 
 - **survey-edge-aggregation-residue** [spec: SPEC-edge-sum.md] — the audit that asks whether a scope
   survey aggregated inbound edges has nothing to read.
