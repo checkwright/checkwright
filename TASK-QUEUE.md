@@ -12,6 +12,119 @@
 
 ## New Features
 
+- **survey-edge-aggregation-residue** [spec: SPEC-edge-sum.md] — the audit that asks whether a scope
+  survey aggregated inbound edges has nothing to read.
+  `templates/stages/scope.md` requires it plainly — aggregate a candidate's inbound edges
+  before ranking it, because the promotion dividend lives in the total and in no single entry.
+  The `survey-engagement` audit class then asks each close whether that pass ran, and declares
+  its only residue to be "the survey's own reasoning".
+  **The residue does not carry the claim, and six dated observations now settle it** — the
+  question is answered, so each is compressed to what it proved.
+  **2026-08-07, 2026-08-09 and 2026-08-12 — unanswerable three times.** Each ranked a corpus with
+  the due-condition squarely fired, each named a different oracle, none recorded an inbound sum, so
+  the audit could return neither verdict — **unanswerable, not un-gateable.** All three did
+  premise-falsification well: the split is stable, that half healthy and this one absent.
+  **2026-08-08 — answerable, and passed.** Scope named `bin/queue-edges.sh` as an oracle in the
+  survey record and wrote per-candidate inbound totals into the finding.
+  **The alternation is the evidence, and it is what makes this the requirement's property rather
+  than any session's** — the entry predicted its own recurrence before two of them. The first four
+  observations are **not** back-filled with `recurrence:` dates: the obligation attaches at the
+  moment of judgment (`recurrence-drain-input-widening`, 2026-08-17), and re-grading an earlier
+  session's prose is the self-grading hazard that ruling names rather than a repair of it.
+  **FIFTH and SIXTH, 2026-08-26 and 2026-08-27 — one shape twice, not two findings.** Neither
+  named `bin/queue-edges.sh` nor carried an edge sum; both times the threshold entries scope raised
+  were displaced by an operator's unit-set ruling rather than refused by a ranking, so the
+  obligation never attached. What the second added is the unruled half stated plainly — when a
+  ruling supplies the set, is the pass owed at all?
+  recurrence: survey-edge-aggregation-residue 2026-08-26 2026-08-27
+  **RE-DEFERRED 2026-08-27 WITH THE FORK NARROWED TO ONE ALTERNATIVE**, and again 2026-08-28 when
+  the threshold fired a second time under an undirected dispatch that left the open half nothing to
+  test. **Fold the sum into the existing survey record** is the surviving alternative: a separate
+  artifact buys a second surface for what one already carries, and retiring the roster line as
+  unauditable has **zero** instances — answerable closes in a row are what an unauditable class does
+  not produce. **What stayed open** was whether the pass is owed per RANKED candidate when an
+  authority supplies the unit set, which the 2026-08-24 widening did not reach.
+  **RULED 2026-08-29: BUILD the surviving alternative — fold the sum into the survey record as an
+  obliged field.** Five shipped instances now (2026-08-26 through 2026-08-29), and the open half
+  failed to become testable on a THIRD consecutive boundary, every one of them undirected. The
+  ruling's ground is that an untestable condition is not a reason to keep waiting; it is the
+  evidence the wait is not converging. The ceremony objection stands against a *declaration* and
+  never against the sum, so the field carries the sum rather than an attestation that it was taken.
+  ruled: survey-edge-aggregation-residue lead 2026-08-27 own-authority
+  ruled: survey-edge-aggregation-residue lead 2026-08-28 own-authority
+  ruled: survey-edge-aggregation-residue lead 2026-08-29 own-authority
+  **Cost while deferred:** CORRECTED 2026-08-29, unconditionally and independent of the disposition
+  above. The old line read "every close restamps an audit it did not actually perform" and has been
+  FALSE for five consecutive boundaries; left standing it would travel into the amendment as a
+  ground. The real carry is smaller and different: the sum is taken every time and recorded nowhere
+  a later stage can read it, so each boundary re-buys an aggregation the last one already paid for.
+  Filed 2026-08-07 by close, performing the `survey-engagement` audit its roster made due.
+  **CORRECTED AT SPEC 2026-08-29, and the correction moved the design.** This iteration's
+  scope DID record its sums — inside `finding:`, as one clause of a ~700-word prose line. So the
+  recording is not absent, it is UNADDRESSABLE: nothing asserts it is there and nothing finds it
+  without reading the blob. Also probed: the `survey-engagement` audit class EXISTS NOWHERE IN
+  THE TREE (grep hits this file only), so the amendment updates no roster line for it.
+
+- **wait-loop-grant-lost-its-carrier** [spec: SPEC-wait.md] — the mandated in-turn wait's grant is
+  owned by no queue entry, and became unowned by a completion rather than by a ruling.
+  **`session-mechanic-grants-uncommitted` carried it** as the third member of its class — 19
+  measured out-of-band calls, every one a `kill -0 "$pid"` loop condition that a `Bash(...)` glob
+  provably cannot match, the mandated form *being* a loop condition and so decorated by
+  construction. Its promotion deliberately excluded this grant, sequencing it behind the
+  wait-primitive measurement so a grant would not be shaped to a primitive the measurement might
+  correct; the exclusion was right and is not questioned. **What it did not account for** is that
+  the entry reached Done, so the grant lost its carrier — the refusal survives at
+  guard-kit/SPEC.md §The generic ruleset rule 17, but a SPEC paragraph is not a work item.
+  [precondition-ok: the wait-primitive measurement returned; rule 17 already records the discharge]
+  **The precondition is discharged**: the measurement returned at that same build, the ordering
+  stands and the polarity was the bug, so rule 17 already records that a grant is shaped to
+  `while kill -0 "$pid" …` as well as `until <cond> …`.
+  **Why it was design-pending rather than ready-to-build:** the deliverable is guard-kit code and is
+  landable by a stage session — rule 17's own landing demonstrated that end to end — but the
+  grant's shape (a rule 6 narrowing, a new generic rule, or a raw-command exemption) is unruled.
+  **DISTINCT from `turn-end-chokepoint-and-wait-primitive`**, the measurement half whose completion
+  is this entry's precondition rather than this work, and from
+  `overlay-only-oracle-grants-uncommitted`, the parent's other split half, four Rust/gh oracles.
+  recurrence: wait-loop-grant-lost-its-carrier 2026-08-24 2026-08-27 2026-08-28
+  **THE THREE RECURRENCES, kept as measurements now that the ruling below carries their reading.**
+  Each off the prompt-friction log rather than impression, as `while kill -0 <pid>` / `until`
+  counts: 2026-08-24, **60**/**8**, the log's third-heaviest prompting pattern against the nineteen
+  the cost line was written on; 2026-08-27, **6**/**12**, a tenfold FALL in an iteration that
+  delegated *more* heavily, reaching for `Agent` dispatches whose completion notification is a wait
+  with no loop to grant; 2026-08-28, **8**/**1**. The mechanic and the rule changed none of the
+  three times. **Re-deferred 2026-08-28** on the threshold's second firing, narrowing nothing.
+  **RULED 2026-08-29: TAKEN, and the SHAPE is deliberately NOT pre-ruled.** Three recurrences
+  against a threshold of 2, precondition discharged, deliverable landable by a stage session, and
+  the iteration that takes it is one that backgrounds cargo producers — so it exercises the class
+  rather than arguing about it. The shape is design-bearing and the roster splits authoring out of
+  scope, so it goes to `spec` as part of the amendment: cost all three options above and take **the
+  narrowest that covers the measured class**. Two hard bounds. (1) The deliverable is **guard-kit
+  code**; the 2026-08-22 operator bar on promoting a permission-settings edit stands untouched, and
+  a chosen shape needing a committed-settings edit is neither spec's to land nor the lead's to
+  authorize — it ESCALATES. (2) **Measure the class here** and record a fourth datum, worth more
+  than a fourth argument; but do NOT re-price off any single figure, this iteration's included.
+  ruled: wait-loop-grant-lost-its-carrier lead 2026-08-29 own-authority
+  **RE-DEFERRED 2026-08-27, and the substance of that ruling is the reading rather than the
+  outcome.** The authority ruled that **the second recurrence falsified the first's price trend**:
+  the carry scales with the number of *shell* producers a session backgrounds, not with
+  compliance-as-such, so one iteration's figure is a sample and never a rate. The sixty below is
+  this class's observed **ceiling**, not its level, and the cost line is read that way from here on.
+  The 2026-08-22 permission-settings bar was checked then and does not reach guard-kit code.
+  ruled: wait-loop-grant-lost-its-carrier operator 2026-08-27 lead-relay
+  ruled: wait-loop-grant-lost-its-carrier lead 2026-08-28 own-authority
+  **Cost while deferred:** rule 6 decides the mandated `kill -0 "$pid"` loop out of band on
+  *every* call — sixty decisions in the iteration that set the ceiling, for a mechanic the
+  methodology mandates — and the price is invisible to scope because no entry carries it.
+  Filed 2026-08-23 by build; drained at that iteration's close, which confirmed rule 17 carries the
+  discharged precondition; re-measured at `shell-gate-tail-port-and-completion-oracle`'s close.
+  **THE COST LINE ABOVE IS FALSE BY CONSTRUCTION — probed at spec 2026-08-29.** Rule 6 does not
+  decide the `kill -0 "$pid"` spelling out of band: it BLOCKS it (exit 2), and `guard_block`
+  exits before the fall-through logger, so that spelling CANNOT be in the friction log. The
+  19/60/6/8 figures count something else. FOURTH DATUM: 4 prompting calls / 3 patterns, ZERO of
+  them `kill -0`; every one a COMPOUND (loop then read). Shape TAKEN: a new generic rule, the
+  only one of the three that emits a grant — `guard_allow` already exists, so the operator bar
+  is not reached. Full costing of all three in the amendment.
+
 ## Technical Debt
 
 ## Deferred
@@ -2951,54 +3064,6 @@
   the stage's signal value decays toward zero while its cost does not — and a zero-divergence
   pass is read as evidence the amendments were right.
   Filed 2026-08-07 by close, from the lead's per-batch tiering watch.
-
-- **survey-edge-aggregation-residue** [design-pending] — the audit that asks whether a scope
-  survey aggregated inbound edges has nothing to read.
-  `templates/stages/scope.md` requires it plainly — aggregate a candidate's inbound edges
-  before ranking it, because the promotion dividend lives in the total and in no single entry.
-  The `survey-engagement` audit class then asks each close whether that pass ran, and declares
-  its only residue to be "the survey's own reasoning".
-  **The residue does not carry the claim, and six dated observations now settle it** — the
-  question is answered, so each is compressed to what it proved.
-  **2026-08-07, 2026-08-09 and 2026-08-12 — unanswerable three times.** Each ranked a corpus with
-  the due-condition squarely fired, each named a different oracle, none recorded an inbound sum, so
-  the audit could return neither verdict — **unanswerable, not un-gateable.** All three did
-  premise-falsification well: the split is stable, that half healthy and this one absent.
-  **2026-08-08 — answerable, and passed.** Scope named `bin/queue-edges.sh` as an oracle in the
-  survey record and wrote per-candidate inbound totals into the finding.
-  **The alternation is the evidence, and it is what makes this the requirement's property rather
-  than any session's** — the entry predicted its own recurrence before two of them. The first four
-  observations are **not** back-filled with `recurrence:` dates: the obligation attaches at the
-  moment of judgment (`recurrence-drain-input-widening`, 2026-08-17), and re-grading an earlier
-  session's prose is the self-grading hazard that ruling names rather than a repair of it.
-  **FIFTH and SIXTH, 2026-08-26 and 2026-08-27 — one shape twice, not two findings.** Neither
-  named `bin/queue-edges.sh` nor carried an edge sum; both times the threshold entries scope raised
-  were displaced by an operator's unit-set ruling rather than refused by a ranking, so the
-  obligation never attached. What the second added is the unruled half stated plainly — when a
-  ruling supplies the set, is the pass owed at all?
-  recurrence: survey-edge-aggregation-residue 2026-08-26 2026-08-27
-  **RE-DEFERRED 2026-08-27 WITH THE FORK NARROWED TO ONE ALTERNATIVE**, and again 2026-08-28 when
-  the threshold fired a second time under an undirected dispatch that left the open half nothing to
-  test. **Fold the sum into the existing survey record** is the surviving alternative: a separate
-  artifact buys a second surface for what one already carries, and retiring the roster line as
-  unauditable has **zero** instances — answerable closes in a row are what an unauditable class does
-  not produce. **What stayed open** was whether the pass is owed per RANKED candidate when an
-  authority supplies the unit set, which the 2026-08-24 widening did not reach.
-  **RULED 2026-08-29: BUILD the surviving alternative — fold the sum into the survey record as an
-  obliged field.** Five shipped instances now (2026-08-26 through 2026-08-29), and the open half
-  failed to become testable on a THIRD consecutive boundary, every one of them undirected. The
-  ruling's ground is that an untestable condition is not a reason to keep waiting; it is the
-  evidence the wait is not converging. The ceremony objection stands against a *declaration* and
-  never against the sum, so the field carries the sum rather than an attestation that it was taken.
-  ruled: survey-edge-aggregation-residue lead 2026-08-27 own-authority
-  ruled: survey-edge-aggregation-residue lead 2026-08-28 own-authority
-  ruled: survey-edge-aggregation-residue lead 2026-08-29 own-authority
-  **Cost while deferred:** CORRECTED 2026-08-29, unconditionally and independent of the disposition
-  above. The old line read "every close restamps an audit it did not actually perform" and has been
-  FALSE for five consecutive boundaries; left standing it would travel into the amendment as a
-  ground. The real carry is smaller and different: the sum is taken every time and recorded nowhere
-  a later stage can read it, so each boundary re-buys an aggregation the last one already paid for.
-  Filed 2026-08-07 by close, performing the `survey-engagement` audit its roster made due.
 
 - **release-runbook-identity-diagnosis** [design-pending] — where the which-account-is-active
   check belongs in the release procedure is unplaced; the diagnosis itself is now settled.
@@ -6261,58 +6326,6 @@
   which is exactly how the raw-vs-skeleton one survived.
   Filed 2026-08-23 by build; drained at that iteration's close, which re-counted the citations
   and confirmed no gate matches them.
-
-- **wait-loop-grant-lost-its-carrier** [design-pending] — the mandated in-turn wait's grant is
-  owned by no queue entry, and became unowned by a completion rather than by a ruling.
-  **`session-mechanic-grants-uncommitted` carried it** as the third member of its class — 19
-  measured out-of-band calls, every one a `kill -0 "$pid"` loop condition that a `Bash(...)` glob
-  provably cannot match, the mandated form *being* a loop condition and so decorated by
-  construction. Its promotion deliberately excluded this grant, sequencing it behind the
-  wait-primitive measurement so a grant would not be shaped to a primitive the measurement might
-  correct; the exclusion was right and is not questioned. **What it did not account for** is that
-  the entry reached Done, so the grant lost its carrier — the refusal survives at
-  guard-kit/SPEC.md §The generic ruleset rule 17, but a SPEC paragraph is not a work item.
-  **The precondition is discharged**: the measurement returned at that same build, the ordering
-  stands and the polarity was the bug, so rule 17 already records that a grant is shaped to
-  `while kill -0 "$pid" …` as well as `until <cond> …`.
-  **Why `[design-pending]` rather than ready-to-build:** the deliverable is guard-kit code and is
-  landable by a stage session — rule 17's own landing demonstrated that end to end — but the
-  grant's shape (a rule 6 narrowing, a new generic rule, or a raw-command exemption) is unruled.
-  **DISTINCT from `turn-end-chokepoint-and-wait-primitive`**, the measurement half whose completion
-  is this entry's precondition rather than this work, and from
-  `overlay-only-oracle-grants-uncommitted`, the parent's other split half, four Rust/gh oracles.
-  recurrence: wait-loop-grant-lost-its-carrier 2026-08-24 2026-08-27 2026-08-28
-  **THE THREE RECURRENCES, kept as measurements now that the ruling below carries their reading.**
-  Each off the prompt-friction log rather than impression, as `while kill -0 <pid>` / `until`
-  counts: 2026-08-24, **60**/**8**, the log's third-heaviest prompting pattern against the nineteen
-  the cost line was written on; 2026-08-27, **6**/**12**, a tenfold FALL in an iteration that
-  delegated *more* heavily, reaching for `Agent` dispatches whose completion notification is a wait
-  with no loop to grant; 2026-08-28, **8**/**1**. The mechanic and the rule changed none of the
-  three times. **Re-deferred 2026-08-28** on the threshold's second firing, narrowing nothing.
-  **RULED 2026-08-29: TAKEN, and the SHAPE is deliberately NOT pre-ruled.** Three recurrences
-  against a threshold of 2, precondition discharged, deliverable landable by a stage session, and
-  the iteration that takes it is one that backgrounds cargo producers — so it exercises the class
-  rather than arguing about it. The shape is design-bearing and the roster splits authoring out of
-  scope, so it goes to `spec` as part of the amendment: cost all three options above and take **the
-  narrowest that covers the measured class**. Two hard bounds. (1) The deliverable is **guard-kit
-  code**; the 2026-08-22 operator bar on promoting a permission-settings edit stands untouched, and
-  a chosen shape needing a committed-settings edit is neither spec's to land nor the lead's to
-  authorize — it ESCALATES. (2) **Measure the class here** and record a fourth datum, worth more
-  than a fourth argument; but do NOT re-price off any single figure, this iteration's included.
-  ruled: wait-loop-grant-lost-its-carrier lead 2026-08-29 own-authority
-  **RE-DEFERRED 2026-08-27, and the substance of that ruling is the reading rather than the
-  outcome.** The authority ruled that **the second recurrence falsified the first's price trend**:
-  the carry scales with the number of *shell* producers a session backgrounds, not with
-  compliance-as-such, so one iteration's figure is a sample and never a rate. The sixty below is
-  this class's observed **ceiling**, not its level, and the cost line is read that way from here on.
-  The 2026-08-22 permission-settings bar was checked then and does not reach guard-kit code.
-  ruled: wait-loop-grant-lost-its-carrier operator 2026-08-27 lead-relay
-  ruled: wait-loop-grant-lost-its-carrier lead 2026-08-28 own-authority
-  **Cost while deferred:** rule 6 decides the mandated `kill -0 "$pid"` loop out of band on
-  *every* call — sixty decisions in the iteration that set the ceiling, for a mechanic the
-  methodology mandates — and the price is invisible to scope because no entry carries it.
-  Filed 2026-08-23 by build; drained at that iteration's close, which confirmed rule 17 carries the
-  discharged precondition; re-measured at `shell-gate-tail-port-and-completion-oracle`'s close.
 
 - **wait-loop-exemption-blind-behind-a-script-name** [design-pending] — guard rule 15's wait-loop
   exemption is command-text-shaped, so a wait loop inside a script draws the advisory anyway.
