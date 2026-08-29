@@ -12,6 +12,128 @@
 
 ## New Features
 
+- **msys-path-dialect-boundary-unmodelled** [spec: SPEC-dialect.md] — this codebase never models
+  which PATH DIALECT a root variable is in, so on an MSYS host a root can arrive in Windows
+  spelling and every downstream resolution silently produces nothing.
+  **Measured on Windows 2026-08-27.** On an MSYS host the installed consumer's root is
+  carried in Windows spelling, so the runner's resolve-dirs come out as a POSIX leading slash
+  prefixed onto a drive-lettered absolute path with backslashes intact. Every gate then
+  resolves to nothing and the run reported its entire roster failed, unresolved. It takes the
+  WHOLE roster rather than part of it because the starter profile vendors gate-sdk alone and
+  gate-sdk's shipped roster is `.gate` descriptors with no `.sh` fallback, so a resolver that
+  cannot reach the binary has nothing else to run.
+  **Two mechanisms are plausible and NEITHER was pinned** — npm's own MSYS bin shim, which
+  converts its basedir to Windows spelling and is how the smoke reaches the entry point, and
+  the toplevel probe under Git-for-Windows, a native Windows binary. Neither fully explains
+  the observed spelling, which carries a POSIX leading slash *and* backslashes, so a third
+  step is unaccounted for. The symptom's own propagation does not run through the installer's
+  root at all: the resolve-dirs derive from how the runner was invoked, a different chain
+  again.
+  **Why this wants a contract and not a patch.** Dozens of call sites take a root from a
+  program that, on MSYS, may not answer in our dialect, and nothing states which dialect a
+  root variable is in — so no call site can be judged right or wrong. The deliverable is a
+  CONTRACT: which dialect a root is in, where the boundary is crossed, and who crosses it.
+  Fixing at the layer where the value enters would mean a shared root-normalization helper
+  plus a migration of every call site — the normalization seam that is the named signal this
+  is no hotfix, and why an operator-ruled hotfix attempt was STOPPED at sizing 2026-08-27.
+  **RULED 2026-08-29: bundled with `native-gate-port-remaining-corpus`'s drift-kit cut, CONTRACT
+  ONLY.** The envelope is the contract plus dialect-correct root resolution for the call sites
+  the cut itself writes or touches — the four drift-kit `bin/` tools, each a `show-toplevel` site,
+  which is what makes the shared surface pay: the cut stops ADDING dialect-unmodelled sites
+  without buying the corpus. **The general migration is split out NOW rather than left as a
+  contingency**, to `msys-dialect-migration`, and the ground is that this entry's
+  own recorded cost re-derived to roughly five times what a reader takes it for — a mis-sized
+  unit already, not a risk to discover at build, and a mid-build judgment call would fall to the
+  session least able to afford it.
+  ruled: msys-path-dialect-boundary-unmodelled lead 2026-08-29 own-authority
+  **No local oracle**: MSYS path semantics cannot be exercised on this machine, so the
+  contract has to be held by a fixture pair plus a labelled reasoned-from-shape arm, the way
+  this iteration's `on_path` unit did it.
+  **DISTINCT from `platform-support-ci-matrix`**, whose subject is buying an OBSERVATION and
+  whose body records what each round measured; this is a located source defect in the
+  resolver, with its own emitter and its own fix, that would be worth fixing if the Windows
+  leg were deleted tomorrow. It cites that entry only as the surface where the symptom first
+  appeared — and it is now what blocks that entry's EXERCISED half, and with it the first
+  honest measurement of this iteration's `on_path` repair, which has gone two rounds
+  unmeasured behind the same resolver.
+  **Why it was design-pending:** the deliverable is a dialect contract and the diagnosis was
+  stopped at sizing rather than grown.
+  **Cost while deferred:** the Windows leg produces an artifact nothing exercises, so every
+  Windows claim this repo makes rests on reasoning rather than on a run.
+  Filed 2026-08-27 by build under a stopped hotfix, promoted 2026-08-27 by close with the
+  call-site roster re-derived and corrected at the drain.
+  **DIAGNOSIS FALSIFIED AND RELOCATED 2026-08-29, and the repair is admitted with the contract.**
+  The unaccounted third step this entry names is `native/src/walk.rs`: `abs_against` tests
+  absoluteness with a POSIX-only leading-slash predicate, `normalize_abs` splits on `/` alone and
+  then UNCONDITIONALLY PREPENDS one. That reproduces the observed string character-for-character;
+  NEITHER recorded candidate (the npm bin shim, the toplevel probe) does, and both are superseded
+  rather than deleted. The shell side is EXONERATED — gate.sh emits kit roots relative to PWD by
+  design. COROLLARY, now a first-class contract clause: porting to Rust does NOT retire dialect
+  exposure — the crate composes paths with String and format! rather than Path, so here the port
+  CREATED the defect. The judging predicate is CONSUMPTION: a root consumed only by `cd` is
+  tolerant, one consumed by concatenation is exposed; `|| pwd` confers nothing, since it fires
+  only when git FAILS and on MSYS git SUCCEEDS in the wrong dialect.
+
+- **native-gate-port-remaining-corpus** [spec: SPEC-kpi-port.md] [roadmap: now/reliability]
+  — the whole battery onto the binary, and the shell surface down to its residue.
+  roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
+  The entry demotes at build rather than moving to `## Done`: it is the **whole corpus**, and a Done
+  move would assert a finished port and silently drop it from the **public** roadmap projection,
+  which reads `[roadmap:]` tags off live entries.
+  **Operator-ruled 2026-08-09: complete the port, ASAP** — the ruling, its grounds and its
+  supersession of the 2026-08-06 measurement-locus clause are [TRAJECTORY.md](TRAJECTORY.md)
+  §PRIORITY DIRECTIVE's, with the scope, both install paths and the bootstrap residue; this entry is
+  the work, designing the bootstrap included. It inherits gate-sdk/SPEC.md §Porting a gate to the
+  binary substrate for the procedure and §Consumer payload for the payload rule.
+  **The wall-clock objection is the weaker case** — the win is retiring the payload's shell
+  *sources*. **Every closed cohort and cut — members, counts, holds, grounds, price — is recorded
+  at gate-sdk/SPEC.md §The first cohort, so this entry states what remains.** Cut widths are ruled
+  **per cut and never inherited**, and the size arm is **permanently** exhausted.
+  **THE COMPOSER DOES NOT REACH THE TREE REMAINDER.** `--emit port-blockers --group` walks the
+  **gate registry**, which reports 0 owed and 0 takeable — a finished battery, and a registry arm
+  reading zero "says nothing about the tree". Only `--tree` is the predicate; `ported-gate-members`
+  answers neither, and its owed count RISES when a non-gate shell file lands, which is that
+  predicate working rather than a regression.
+  **THE COMPOSER IS RULED 2026-08-28: select the next cut by STATED CONTRACT** — the owed files
+  sitting behind one specification section, ported behind the one amendment that section needs.
+  Size-ordered and kit-ordered composers stay refused; the fork that ruling was left open on
+  collapsed on a ground measured false, drift-kit shipping by the derived `full` profile.
+  **FIRST CUT UNDER THE RULE, and TAKEN 2026-08-29 as this iteration's anchor:** drift-kit, 18
+  adopter-facing files behind drift-kit/SPEC.md §The KPI plugin contract, its driver moving with its
+  plugins because the discovery contract is what the port amends. Re-verified at that boundary
+  against `--tree`, which reds 21 drift-kit files: the 18 are those less the three `bin/` tools that
+  are not the KPI driver. The hold RELEASED 2026-08-28.
+  **Prints neither count; run both arms** — four sweeps running found a digit stale here.
+  ruled: native-gate-port-remaining-corpus lead 2026-08-28 own-authority
+  ruled: native-gate-port-remaining-corpus operator 2026-08-28 lead-relay
+  ruled: native-gate-port-remaining-corpus lead 2026-08-29 own-authority
+  **Cost while deferred:** large and known — the **owed** remainder (the trailer's own arm, never
+  the unported count) plus the runners and the install-lifecycle layer; since the 2026-08-14
+  born-native default (TRAJECTORY.md §The closed rulings) a gate landed meanwhile no longer adds
+  shell to it. Not a single-iteration delta, and the criterion-relaxation question is closed at
+  gate-sdk/SPEC.md §The port-candidate criteria — an ordering signal, never an eligibility screen.
+  `gate-battery-result-cache` is the one battery entry the port has not subsumed.
+  **The PRIORITY DIRECTIVE has yielded FOUR times — 2026-08-22, twice 2026-08-24, 2026-08-27 — each
+  for one named iteration alone and NONE a reversal**: a yield spends one iteration's turn, never
+  the sequence's claim on the next. Neither the 2026-08-28 nor the 2026-08-29 boundary yielded.
+  **A FIFTH YIELD IS NOT A LEAD'S TO RULE — 2026-08-29.** The composer ruling and the hold release
+  are both recorded, so yielding re-scopes a recorded operator ruling, the one class a lead rules
+  under neither posture. A cut arguing for one ESCALATES rather than being narrowed in-session.
+  Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction under the
+  direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope, promoted at spec and
+  demoted at build once per increment since.
+  **The tail is TRAJECTORY.md §PRIORITY DIRECTIVE's and is not restated here** — no member is
+  permanently shell, and the sequence's one remaining member is `powershell-installer-surface`.
+  **THIS CUT RESOLVES 18 -> 14 PORTED + 4 DECLARED, ruled 2026-08-29.** `# no-port:` on
+  `lib/drift.sh` (sole resolver for the kit's config bridge, three compiled arms sourcing it) and
+  on both `templates/` files (provenance seam: an adopter's config seam, and the seam's own worked
+  example whose marker spelling is a consumer literal). `# port-until:` on `smoke/install.sh`,
+  whose 559 lines are ~400 lines asserting on the three tools this envelope EXCLUDES.
+  **THE EXTENSION POINT SURVIVES THE PORT** — consumer `kpi-*.sh` keep resolution, direct exec and
+  the env-export contract; only the 13 bundled plugins move in-crate. Ground is drift-kit's OWN
+  surfaces, not gate-sdk analogy. If the cut proves too large THE PORT GIVES, never the extension
+  point: delta 6 is authored as the single separable delta so narrowing is a batch-cut.
+
 - **survey-edge-aggregation-residue** [spec: SPEC-edge-sum.md] — the audit that asks whether a scope
   survey aggregated inbound edges has nothing to read.
   `templates/stages/scope.md` requires it plainly — aggregate a candidate's inbound edges
@@ -129,6 +251,50 @@
 
 ## Deferred
 
+- **kit-lib-port-disposition-cohort** [design-pending] — every kit's `lib/*.sh` is owed by the port
+  oracle and none has ever been dispositioned, so the class has no ruling and each cut re-argues it.
+  **The ground has precedent; the COHORT has never been swept, and conflating those is the trap.**
+  `gate-sdk/bin/gen-pre-commit.sh` declares `# no-port:` on exactly this ground — resolving a knob
+  means sourcing the owning kit's lib, and gate-sdk/SPEC.md §lib/gate.sh rules exactly one place a
+  knob's value is computed, so a crate-side resolver is the second producer criterion 6 refuses.
+  `drift-kit/lib/drift.sh` declared on that stated ground at `native-gate-port-remaining-corpus`'s
+  drift-kit cut, 2026-08-29, which is what makes the rest of the class visible.
+  **Why a lib is not a smoke harness**, and why this is filed apart from
+  `kit-smoke-port-disposition-cohort`: a `lib/*.sh` is **load-bearing at runtime** — the config
+  bridge has no other resolver and already-compiled arms source it — so its disposition is a
+  correctness question about the bridge. A smoke harness is a test surface and its question is
+  about bootstrap. Averaging the two grounds would produce a ruling that answers neither.
+  **What this entry owes:** the census (how many kit `lib/*.sh` are owed, which are sole resolvers
+  for their kit's bridge and which are not), then one ruling for the class rather than per cut.
+  Re-derive the count rather than reading one here — it moves with every ported file.
+  **Cost while deferred:** low and recurring — every kit cut from here pays the same argument, and
+  a cut that declares without stating the ground leaves precedent-by-example behind it.
+  ruled: kit-lib-port-disposition-cohort lead 2026-08-29 own-authority
+  Filed 2026-08-29 by spec, under the lead ruling that resolved the drift-kit cut's
+  four declarations.
+
+- **kit-smoke-port-disposition-cohort** [design-pending] — all eleven kits ship a
+  `smoke/install.sh`, every one is owed by the port oracle, and not one is ported or declared.
+  **Zero precedent in either direction**, which is why the first cut to touch one rules the class
+  for all eleven and should not do so in passing. `drift-kit/smoke/install.sh` took
+  `# port-until:` against this entry at the 2026-08-29 drift-kit cut rather than settling it.
+  **The ground is bootstrap, not size.** A consumer smoke asserts the ADOPTION path, and
+  `gate-sdk/smoke/install.sh` already carries `# no-port: the adoption bootstrap runs before any
+  binary exists` on one of its arms — so at least part of this class is structurally unportable and
+  the question is where the line falls, not whether the files are large.
+  **The drift-kit instance also showed the envelope hazard:** ~400 of its 559 lines assert on three
+  `bin/` tools that cut EXCLUDED, so porting the harness would have carried the envelope with it.
+  A smoke is the only behavioural oracle its kit has, which is the second reason not to move one
+  casually.
+  **DISTINCT from `kit-lib-port-disposition-cohort`**, filed the same day from the same ruling: a
+  lib is load-bearing at runtime for the config bridge, this is a test surface. Same cut, different
+  grounds, deliberately not averaged into one entry.
+  **Cost while deferred:** low today — a held file is honestly marked and the oracle counts it —
+  and rising only in that each kit cut re-meets the same undecided question.
+  ruled: kit-smoke-port-disposition-cohort lead 2026-08-29 own-authority
+  Filed 2026-08-29 by spec, under the lead ruling that held drift-kit's smoke rather
+  than porting it.
+
 - **platform-support-ci-matrix** [design-pending] [roadmap: next/reliability]
   [precondition-ok: run-observed] — a CI leg that PRODUCES AND EXERCISES a Windows gate-binary
   artifact, which is gate-sdk/SPEC.md
@@ -205,57 +371,6 @@
   the project makes about it stays a reading rather than a measurement, and the `find -printf`
   defect above sits unfixed on the install path every macOS adopter takes today.
   Filed 2026-08-26 by build, split from `platform-support-ci-matrix` under an operator ruling.
-
-- **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
-  — the whole battery onto the binary, and the shell surface down to its residue.
-  roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
-  The entry demotes at build rather than moving to `## Done`: it is the **whole corpus**, and a Done
-  move would assert a finished port and silently drop it from the **public** roadmap projection,
-  which reads `[roadmap:]` tags off live entries.
-  **Operator-ruled 2026-08-09: complete the port, ASAP** — the ruling, its grounds and its
-  supersession of the 2026-08-06 measurement-locus clause are [TRAJECTORY.md](TRAJECTORY.md)
-  §PRIORITY DIRECTIVE's, with the scope, both install paths and the bootstrap residue; this entry is
-  the work, designing the bootstrap included. It inherits gate-sdk/SPEC.md §Porting a gate to the
-  binary substrate for the procedure and §Consumer payload for the payload rule.
-  **The wall-clock objection is the weaker case** — the win is retiring the payload's shell
-  *sources*. **Every closed cohort and cut — members, counts, holds, grounds, price — is recorded
-  at gate-sdk/SPEC.md §The first cohort, so this entry states what remains.** Cut widths are ruled
-  **per cut and never inherited**, and the size arm is **permanently** exhausted.
-  **THE COMPOSER DOES NOT REACH THE TREE REMAINDER.** `--emit port-blockers --group` walks the
-  **gate registry**, which reports 0 owed and 0 takeable — a finished battery, and a registry arm
-  reading zero "says nothing about the tree". Only `--tree` is the predicate; `ported-gate-members`
-  answers neither, and its owed count RISES when a non-gate shell file lands, which is that
-  predicate working rather than a regression.
-  **THE COMPOSER IS RULED 2026-08-28: select the next cut by STATED CONTRACT** — the owed files
-  sitting behind one specification section, ported behind the one amendment that section needs.
-  Size-ordered and kit-ordered composers stay refused; the fork that ruling was left open on
-  collapsed on a ground measured false, drift-kit shipping by the derived `full` profile.
-  **FIRST CUT UNDER THE RULE, and TAKEN 2026-08-29 as this iteration's anchor:** drift-kit, 18
-  adopter-facing files behind drift-kit/SPEC.md §The KPI plugin contract, its driver moving with its
-  plugins because the discovery contract is what the port amends. Re-verified at that boundary
-  against `--tree`, which reds 21 drift-kit files: the 18 are those less the three `bin/` tools that
-  are not the KPI driver. The hold RELEASED 2026-08-28.
-  **Prints neither count; run both arms** — four sweeps running found a digit stale here.
-  ruled: native-gate-port-remaining-corpus lead 2026-08-28 own-authority
-  ruled: native-gate-port-remaining-corpus operator 2026-08-28 lead-relay
-  ruled: native-gate-port-remaining-corpus lead 2026-08-29 own-authority
-  **Cost while deferred:** large and known — the **owed** remainder (the trailer's own arm, never
-  the unported count) plus the runners and the install-lifecycle layer; since the 2026-08-14
-  born-native default (TRAJECTORY.md §The closed rulings) a gate landed meanwhile no longer adds
-  shell to it. Not a single-iteration delta, and the criterion-relaxation question is closed at
-  gate-sdk/SPEC.md §The port-candidate criteria — an ordering signal, never an eligibility screen.
-  `gate-battery-result-cache` is the one battery entry the port has not subsumed.
-  **The PRIORITY DIRECTIVE has yielded FOUR times — 2026-08-22, twice 2026-08-24, 2026-08-27 — each
-  for one named iteration alone and NONE a reversal**: a yield spends one iteration's turn, never
-  the sequence's claim on the next. Neither the 2026-08-28 nor the 2026-08-29 boundary yielded.
-  **A FIFTH YIELD IS NOT A LEAD'S TO RULE — 2026-08-29.** The composer ruling and the hold release
-  are both recorded, so yielding re-scopes a recorded operator ruling, the one class a lead rules
-  under neither posture. A cut arguing for one ESCALATES rather than being narrowed in-session.
-  Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction under the
-  direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope, promoted at spec and
-  demoted at build once per increment since.
-  **The tail is TRAJECTORY.md §PRIORITY DIRECTIVE's and is not restated here** — no member is
-  permanently shell, and the sequence's one remaining member is `powershell-installer-surface`.
 
 - **powershell-installer-surface** [design-pending] — a native Windows install path. **Both
   forks are RULED**: fork 2 on 2026-08-26 by the operator — two hand-kept bootstraps, parity held
@@ -8354,57 +8469,6 @@
   **Cost while deferred:** every entry of this shape either overruns its push budget or
   defers, and the deferral is invisible until the close that cannot drain it.
   Filed 2026-08-27 by the lead at build, promoted 2026-08-27 by close.
-
-- **msys-path-dialect-boundary-unmodelled** [design-pending] — this codebase never models
-  which PATH DIALECT a root variable is in, so on an MSYS host a root can arrive in Windows
-  spelling and every downstream resolution silently produces nothing.
-  **Measured on Windows 2026-08-27.** On an MSYS host the installed consumer's root is
-  carried in Windows spelling, so the runner's resolve-dirs come out as a POSIX leading slash
-  prefixed onto a drive-lettered absolute path with backslashes intact. Every gate then
-  resolves to nothing and the run reported its entire roster failed, unresolved. It takes the
-  WHOLE roster rather than part of it because the starter profile vendors gate-sdk alone and
-  gate-sdk's shipped roster is `.gate` descriptors with no `.sh` fallback, so a resolver that
-  cannot reach the binary has nothing else to run.
-  **Two mechanisms are plausible and NEITHER was pinned** — npm's own MSYS bin shim, which
-  converts its basedir to Windows spelling and is how the smoke reaches the entry point, and
-  the toplevel probe under Git-for-Windows, a native Windows binary. Neither fully explains
-  the observed spelling, which carries a POSIX leading slash *and* backslashes, so a third
-  step is unaccounted for. The symptom's own propagation does not run through the installer's
-  root at all: the resolve-dirs derive from how the runner was invoked, a different chain
-  again.
-  **Why this wants a contract and not a patch.** Dozens of call sites take a root from a
-  program that, on MSYS, may not answer in our dialect, and nothing states which dialect a
-  root variable is in — so no call site can be judged right or wrong. The deliverable is a
-  CONTRACT: which dialect a root is in, where the boundary is crossed, and who crosses it.
-  Fixing at the layer where the value enters would mean a shared root-normalization helper
-  plus a migration of every call site — the normalization seam that is the named signal this
-  is no hotfix, and why an operator-ruled hotfix attempt was STOPPED at sizing 2026-08-27.
-  **RULED 2026-08-29: bundled with `native-gate-port-remaining-corpus`'s drift-kit cut, CONTRACT
-  ONLY.** The envelope is the contract plus dialect-correct root resolution for the call sites
-  the cut itself writes or touches — the four drift-kit `bin/` tools, each a `show-toplevel` site,
-  which is what makes the shared surface pay: the cut stops ADDING dialect-unmodelled sites
-  without buying the corpus. **The general migration is split out NOW rather than left as a
-  contingency**, to `msys-dialect-migration`, and the ground is that this entry's
-  own recorded cost re-derived to roughly five times what a reader takes it for — a mis-sized
-  unit already, not a risk to discover at build, and a mid-build judgment call would fall to the
-  session least able to afford it.
-  ruled: msys-path-dialect-boundary-unmodelled lead 2026-08-29 own-authority
-  **No local oracle**: MSYS path semantics cannot be exercised on this machine, so the
-  contract has to be held by a fixture pair plus a labelled reasoned-from-shape arm, the way
-  this iteration's `on_path` unit did it.
-  **DISTINCT from `platform-support-ci-matrix`**, whose subject is buying an OBSERVATION and
-  whose body records what each round measured; this is a located source defect in the
-  resolver, with its own emitter and its own fix, that would be worth fixing if the Windows
-  leg were deleted tomorrow. It cites that entry only as the surface where the symptom first
-  appeared — and it is now what blocks that entry's EXERCISED half, and with it the first
-  honest measurement of this iteration's `on_path` repair, which has gone two rounds
-  unmeasured behind the same resolver.
-  **Why `[design-pending]`:** the deliverable is a dialect contract and the diagnosis was
-  stopped at sizing rather than grown.
-  **Cost while deferred:** the Windows leg produces an artifact nothing exercises, so every
-  Windows claim this repo makes rests on reasoning rather than on a run.
-  Filed 2026-08-27 by build under a stopped hotfix, promoted 2026-08-27 by close with the
-  call-site roster re-derived and corrected at the drain.
 
 - **msys-dialect-migration** [design-pending] [blocked-by: msys-path-dialect-boundary-unmodelled]
   — once the dialect contract exists, every root call site outside the cut that authored it still
