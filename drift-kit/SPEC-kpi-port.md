@@ -367,6 +367,15 @@ makes it red — not by what it is about:
   target is an arm, not a script path (delta 2).
 - `native/src/emit/enforcement_map.rs` — its hardcoded plugin path and SPEC anchor
   (delta 4).
+- **Found at align, roster omission.** `drift-kit/README.md` — the install step
+  pointing `CONTEXT_KIT_DRIFT_REPORT` at `drift-kit/bin/drift-report.sh` and the
+  `## Use` section's two literal `bash drift-kit/bin/drift-report.sh[…]`
+  invocations both name a path delta 9 deletes; the live precedent for the
+  replacement wording is context-kit/README.md's own `--emit footprint` line and
+  queue-kit's table row, which already read "the binary's `<name>` arm" rather
+  than a script filename post-port (deltas 2, 9). `README.md`'s drift-kit table
+  row ("a `drift-report.sh` that collates…") gets the same treatment for the same
+  reason (delta 2).
 - TASK-QUEUE.md — the entry's terminal move is a **demotion**, not a Done move, and
   the entry lands back inside `check-queue-entry-budget`'s cap at **0 lines of
   headroom**, so it is compressed in the same commit that demotes it (all deltas).
@@ -400,7 +409,8 @@ makes it red — not by what it is about:
       0 headroom carrying more ruling content than it left with.
 - [ ] **Removals propagated** — every ported original deleted, and every surface
       naming a deleted path swept (both `session-context.sh` copies, the compiled
-      enforcement map, and exactly the orphaned settings grants — four of the
-      eight, never the four that grant the excluded tools).
+      enforcement map, `drift-kit/README.md`'s install step and `## Use` section,
+      `README.md`'s drift-kit table row, and exactly the orphaned settings
+      grants — four of the eight, never the four that grant the excluded tools).
 - [ ] **Gaps filed** — the two cohort entries filed; further cross-component gaps
       routed to the gap inbox.
