@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: consumer-smoke-contract-port
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -13,6 +13,132 @@
 ## New Features
 
 ## Technical Debt
+
+- **platform-support-ci-matrix** [roadmap: next/reliability] [drain-exempt: close-observes]
+  [precondition-ok: run-observed] — a CI leg that PRODUCES AND EXERCISES a Windows gate-binary
+  artifact, which is gate-sdk/SPEC.md
+  §Consumer payload's join condition for `x86_64-pc-windows-msvc`. Four rounds bought; promoted
+  2026-08-30 by operator ruling, with PRODUCED discharged and the last named obstacle discharged.
+  roadmap-summary: A CI install-smoke leg per supported platform, or an honest label.
+  **The slug is deliberately NOT renamed** though "matrix" now reads oddly for one leg:
+  `powershell-installer-surface` cites it by name. The fork (legs, not an honest label) and the
+  Windows-ahead-of-macOS ordering are TRAJECTORY.md §The closed rulings'; WSL is the interim path;
+  macOS split off 2026-08-26 as `macos-install-smoke-ci-leg`.
+  **PRODUCED IS DISCHARGED** — rounds 3 (`33066446525`) and 4 (`33068870024`): the crate builds
+  natively on the host, `checkwright-gates.exe` is emitted at ~3.0 MB, and pack carries it
+  (`1 prebuilt gate binary/binaries`). Settled, and not to be re-bought.
+  **EXERCISED IS OWED, AND NOTHING HAS EVER RUN A GATE ON WINDOWS.** Placement is not exercise and a
+  repair is not an observation — the standard that has caught this entry four rounds running, and
+  promotion does not relax it: what discharges this entry is a green run, never a landed repair.
+  **Blocker 5 (shellcheck) is REPAIRED AND MEASURED, not inferred.** It was an adopter floor member
+  absent from `windows-latest`, so `init` refused the toolchain; docs/install.md §Requirements now
+  states the adopter's own stake and the leg supplies the member. Round 4 measured it end to end —
+  `choco exited 0`, `shellcheck resolves to: /c/ProgramData/Chocolatey/bin/shellcheck`, then the
+  line this project had never once produced: `init: INIT: vendored 1 kit(s) at the starter profile
+  (v0.25.0) and committed them.` **That is the first successful `checkwright init` on a Windows
+  host, ever.**
+  **BLOCKER 6 IS DISCHARGED, and this paragraph replaces the one that called it what remains.** Its
+  symptom was `10 of 10 gates FAILED`, every one `unresolved`, from a POSIX-slash compose over a
+  backslashed `D:\` root. The repair belonged to `msys-path-dialect-boundary-unmodelled`, which
+  owned the resolver and the contract while this entry owns only the observation; that entry
+  shipped 2026-08-29 at `48cff8d3`, whose pre-repair chain reproduced the observed
+  all-gates-unresolved string character-for-character. **So no blocker is named against this entry
+  and none is known.** `msys-dialect-migration` carries the residue and blocks nothing here.
+  **What remains is one observation and its two consequences.** Read the Windows leg on the next
+  run; if green, drop `continue-on-error: true` from `install-smoke-windows` and join
+  `x86_64-pc-windows-msvc` to `native/targets.list` — the job's own comment states that observation
+  IS the roster's join condition, so both moves execute a stated rule rather than adding one, which
+  is why this promotes as debt with the design-pending tag deleted rather than converted.
+  **Clearing blocker 6 also buys the first honest measurement of batch 4's `on_path` repair**
+  (`native/src/proc.rs`, the `#[cfg(windows)]` PATHEXT and `#[cfg(not(unix))]` `is_executable`
+  arms), unmeasured for two rounds because the three gates consuming it — `check-shellcheck`,
+  `check-action-run-shell`, `check-crate-arms` — and the evidence runner's `ps` probe all sit behind
+  that same resolver. Those arms COMPILE on Windows; their behaviour is READ, not MEASURED.
+  **`[drain-exempt: close-observes]`, and the reason is structural rather than convenient.** The
+  observation arrives from the iteration's own close push, so this entry cannot complete before the
+  drain stage entry — its remaining half IS drain-stage work, which is the residue class
+  `check-stage-entry` assertion B models. The successor backstop still binds: it drains at close or
+  it demotes there. `observation-predicate-entry-cannot-drain-in-its-own-iteration` owns the shape.
+  **THE PUSH PRICE WAS PROBED AND IS CORRECTED HERE, not appended to.** The superseded claim was
+  that each further round costs one push. `install-smoke-windows` runs on `windows-latest` under
+  `continue-on-error: true` in `.github/workflows/gates.yml`, whose `on: push` names master with no
+  `if:` on the job — so the next observation rides the ordinary close push at ZERO incremental cost.
+  The superseded claim was true only while rounds were being iterated within one iteration.
+  **Cost while deferred:** the one adopter class with a named days-to-weeks adoption
+  window still has no working install path on Windows, and
+  `powershell-installer-surface` — the port sequence's one remaining member — stays
+  sequenced behind this entry.
+  ruled: platform-support-ci-matrix operator 2026-08-27 lead-relay
+  ruled: platform-support-ci-matrix operator 2026-08-30 lead-relay
+  Filed 2026-07-26 by scope, split from `platform-support-contract`; Linux split off 2026-08-25 as
+  `linux-install-smoke-ci-leg`, macOS 2026-08-26. Promoted and deferred 2026-08-25, re-promoted and
+  deferred 2026-08-26, deferred again 2026-08-27 at build; promoted 2026-08-30 by scope on the
+  operator's unit-set ruling, its last blocker discharged by a sibling that shipped meanwhile.
+
+- **boundary-wipe-preserve-lifetime-scope** [precondition-ok: shape-ruled] — the iteration-boundary
+  scratch wipe preserves by *iteration* lifetime, so an artifact whose lifetime is a **live
+  session's** is deleted underneath the session that owns it.
+  `scripts/lifecycle-config.sh` sets `LIFECYCLE_KIT_BOUNDARY_PRESERVE=(session-role)` and
+  `lifecycle-kit/bin/enter-stage.sh`'s boundary block deletes every other `.tmp/` member at the
+  first stage's entry.
+  **THE SHAPE IS RULED, 2026-08-30 by the operator: take the narrow fix — widen
+  `LIFECYCLE_KIT_BOUNDARY_PRESERVE` past the bare `session-role`.** That is shape 1 of the three
+  below, and it promotes as **debt** with the design-pending tag deleted rather than converted: it
+  adds no name to a governed surface, the knob and its semantics already existing, so it converges
+  behaviour on a contract lifecycle-kit already carries and needs no amendment. Shape 1's stated
+  weakness stands and is accepted rather than answered — it re-buys the same omission the next time
+  a session-lifetime artifact appears, which is the cost of taking the narrow fix over shape 2's
+  lifetime vocabulary.
+  **THE FOURTH SHAPE IS REFUSED ON THE OPERATOR'S OWN READING, 2026-08-30 — a declined override is
+  a ruling, not a silence.** The operator raised that shape on 2026-08-28 (move the wipe out of
+  `enter-stage.sh` and into the lead, fired at iteration start) and on 2026-08-30 **declined to
+  override** the three grounds against it. Those grounds were the lead's when written and are now
+  the operator's too, so the sentence that used to say "the shape stays available if the operator
+  overrides them" is superseded by this paragraph rather than standing beside it: the shape is
+  closed, and reopening it is operator-class like any closed ruling.
+  **Attested first-hand 2026-08-25** by the scope session that ran the reset: `.tmp/lead-journal.md`
+  was deleted while the lead session that owns it was still running, so the one surface that lead
+  resumes from vanished mid-iteration.
+  **The premise the list already concedes.** `session-role` sits on the list on exactly this
+  ground — context-kit/SPEC.md §The session-context hook argues it from the marker's lifetime being
+  a live session's rather than the iteration's — and a lead's resume journal has the same lifetime
+  by the same argument. The list covers the argument's one attested member, not the argument.
+  **The three shapes, kept because the ruling selected among them:** add the journal basename to the
+  preserve list (**ruled**); give the preserve knob a lifetime vocabulary instead of a name list; or
+  move a live session's journal out of the wiped directory, which reopens where delegation-kit sends
+  a journal at all.
+  **The three grounds the fourth shape was refused on, each re-read off its surface and each still
+  standing.** (1) `lifecycle-kit/templates/lead.md` opens by ruling the lead
+  OPTIONAL, so a lead-less iteration would never wipe at all — a silent regression landing exactly
+  where no supervisor watches. (2) The lead writes no lifecycle state, so relocating the wipe puts
+  it out of reach of the stage-entry gates entirely. (3) It patches TIMING, not lifetime: ordering
+  saves the lead journal alone and touches no other session-lifetime artifact — not a live consult
+  session's, and not a `<key>.run` record whose producer still runs, which guard-kit reads to block
+  index-writing git commands, so deleting one retracts a true statement about a live process.
+  **The steelman, so the refusal stays costed:** the lead is the one actor that knows an iteration
+  is opening AND holds its dispatched sessions' identities, so it alone could preserve by *liveness*
+  rather than by name — which is what shape 2 wants. Its limit is that lead-privileged knowledge
+  reaches only sessions the lead dispatched, and the attested victim in all three attestations is
+  the lead journal, which no dispatch created.
+  **DISTINCT from `boundary-wipe-preserve-basename-reach`**, whose subject is the matcher's *reach*
+  — an unanchored `! -name` making a nested tree immortal. This one is which *lifetimes* the list
+  must cover, and it is live whichever way that matcher is anchored.
+  recurrence: boundary-wipe-preserve-lifetime-scope 2026-08-28 2026-08-30
+  **SECOND ATTESTATION, 2026-08-28, identical in shape and one iteration later.** The scope session
+  that ran this boundary's reset under a live dispatching lead watched `.tmp/lead-journal.md` go
+  into the wipe list again. Nothing about the mechanism changed between the two; the preserve list
+  still carries `session-role` alone.
+  **THIRD ATTESTATION, 2026-08-30, again identical and again one iteration later**, first-hand at
+  this boundary's reset under a live dispatching lead; the reset's own note named
+  `.tmp/lead-journal.md` in the wiped set. That third date reached the recurrence threshold, which
+  is what routed this entry to the operator regardless of the iteration's theme; the promotion
+  below is that route's outcome.
+  **Cost while deferred:** every boundary crossed while a lead session is live destroys that lead's
+  resume journal, silently — `.tmp/` is gitignored, so nothing reds and the loss is discovered only
+  when the lead next reads.
+  ruled: boundary-wipe-preserve-lifetime-scope operator 2026-08-30 lead-relay
+  Filed 2026-08-26 by close, draining the gap inbox; found 2026-08-25 by scope at its own reset;
+  promoted 2026-08-30 by scope on the operator's ruling, at the recurrence threshold.
 
 ## Deferred
 
@@ -107,57 +233,26 @@
   grounds, deliberately not averaged into one entry.
   **Cost while deferred:** low today — a held file is honestly marked and the oracle counts it —
   and rising only in that each kit cut re-meets the same undecided question.
+  **THIS CLASS IS THE NEXT CUT — operator-ruled 2026-08-30, selecting `gate-sdk/SPEC.md §Consumer
+  smoke` under the 2026-08-28 stated-contract composer, which stands unamended.** The alternative
+  refused was a `kit-lib-port-disposition-cohort` cut: it yields more owed lines, and it is not one
+  stated contract (that corpus spans thirteen SPEC sections), so taking it would have meant reading
+  the composer loosely or amending it. The ruling took neither.
+  **The census the cut is scoped against, derived rather than estimated:** every owed file names its
+  owning section on its own `# spec:` line, so grouping the oracle's owed list by that line ranks
+  the contracts. §Consumer smoke leads on both axes — 17 owed files, 1572 owed lines, 14% of the
+  owed file count in one section. Re-derive rather than reading those figures here; they move with
+  every ported file.
+  **THE CLASS IS NOT ONE CONTRACT, and a cut scoped from this entry's own lead line will get that
+  wrong.** Seventeen of the owed smoke-related files answer to gate-sdk §Consumer smoke;
+  context-kit's three and delegation-kit's two answer to their **own** §Testing sections. So "all
+  eleven kits ship
+  a `smoke/install.sh`" is true of the files and false of the contracts, and a stated-contract cut
+  reaches ten kits' pairs plus the two gate-sdk harness members — not eleven kits.
   ruled: kit-smoke-port-disposition-cohort lead 2026-08-29 own-authority
+  ruled: kit-smoke-port-disposition-cohort operator 2026-08-30 lead-relay
   Filed 2026-08-29 by spec, under the lead ruling that held drift-kit's smoke rather
   than porting it.
-
-- **platform-support-ci-matrix** [design-pending] [roadmap: next/reliability]
-  [precondition-ok: run-observed] — a CI leg that PRODUCES AND EXERCISES a Windows gate-binary
-  artifact, which is gate-sdk/SPEC.md
-  §Consumer payload's join condition for `x86_64-pc-windows-msvc`. Four rounds bought; deferred
-  2026-08-27 at build by operator ruling, with PRODUCED discharged and one named, sized obstacle.
-  roadmap-summary: A CI install-smoke leg per supported platform, or an honest label.
-  **The slug is deliberately NOT renamed** though "matrix" now reads oddly for one leg:
-  `powershell-installer-surface` cites it by name. The fork (legs, not an honest label) and the
-  Windows-ahead-of-macOS ordering are TRAJECTORY.md §The closed rulings'; WSL is the interim path;
-  macOS split off 2026-08-26 as `macos-install-smoke-ci-leg`.
-  **PRODUCED IS DISCHARGED** — rounds 3 (`33066446525`) and 4 (`33068870024`): the crate builds
-  natively on the host, `checkwright-gates.exe` is emitted at ~3.0 MB, and pack carries it
-  (`1 prebuilt gate binary/binaries`). Settled, and not to be re-bought.
-  **EXERCISED IS OWED, AND NOTHING HAS EVER RUN A GATE ON WINDOWS.** Placement is not exercise and a
-  repair is not an observation — the standard that has caught this entry four rounds running.
-  **Blocker 5 (shellcheck) is REPAIRED AND MEASURED, not inferred.** It was an adopter floor member
-  absent from `windows-latest`, so `init` refused the toolchain; docs/install.md §Requirements now
-  states the adopter's own stake and the leg supplies the member. Round 4 measured it end to end —
-  `choco exited 0`, `shellcheck resolves to: /c/ProgramData/Chocolatey/bin/shellcheck`, then the
-  line this project had never once produced: `init: INIT: vendored 1 kit(s) at the starter profile
-  (v0.25.0) and committed them.` **That is the first successful `checkwright init` on a Windows
-  host, ever.**
-  **Blocker 6 is what remains, filed and sized in the gap inbox**, which owns its detail and its
-  contract argument so it is not inlined here: on MSYS the vendored consumer's root is carried in
-  Windows spelling, `run-gates.sh`'s RESOLVE_DIRS came out as a POSIX slash on a backslashed
-  `D:\`-path, and the run reported `10 of 10 gates FAILED`, every one `unresolved` — the starter
-  profile vendors gate-sdk alone and its whole shipped roster is `.gate` descriptors with no `.sh`
-  fallback, so a resolver that cannot reach the binary has nothing left to run.
-  **Clearing blocker 6 also buys the first honest measurement of batch 4's `on_path` repair**
-  (`native/src/proc.rs`, the `#[cfg(windows)]` PATHEXT and `#[cfg(not(unix))]` `is_executable`
-  arms), unmeasured for two rounds because the three gates consuming it — `check-shellcheck`,
-  `check-action-run-shell`, `check-crate-arms` — and the evidence runner's `ps` probe all sit behind
-  that same resolver. Those arms COMPILE on Windows; their behaviour is READ, not MEASURED.
-  **Why deferred rather than fixed:** a hotfix was ruled, attempted, and stopped at sizing —
-  unpinned mechanism, a propagation chain that misses the likely candidate, a seam-sized fix
-  and no local oracle for MSYS path semantics. All four grounds, and the re-derivable cost,
-  now live on `msys-path-dialect-boundary-unmodelled`, filed at this iteration's close: that
-  entry owns the resolver fix and the dialect contract, and this one owns the observation.
-  **Cost while deferred:** the one adopter class with a named days-to-weeks adoption
-  window still has no working install path on Windows, and
-  `powershell-installer-surface` — the port sequence's one remaining member — stays
-  sequenced behind this entry. Each further round costs one push, and three were spent
-  this iteration against a one-to-two budget, by operator ruling.
-  ruled: platform-support-ci-matrix operator 2026-08-27 lead-relay
-  Filed 2026-07-26 by scope, split from `platform-support-contract`; Linux split off 2026-08-25 as
-  `linux-install-smoke-ci-leg`, macOS 2026-08-26. Promoted and deferred 2026-08-25, re-promoted and
-  deferred 2026-08-26, deferred again 2026-08-27 at build.
 
 - **macos-install-smoke-ci-leg** [design-pending] [roadmap: next/reliability] — a macOS
   install-smoke leg; nothing has ever run green against macOS.
@@ -6965,11 +7060,19 @@
   **Why it sits in the queue rather than being taken:** a committed grant is a settings edit and
   therefore **operator-class** under TRAJECTORY.md §The closed rulings (2026-08-22). This entry is
   the proposal's durable form; no stage session may land it.
-  **The design question surviving the operator decision** is the glob's shape. `Bash(python3 -*)`
+  **RULED IN, 2026-08-30 by the operator, at the `Bash(python3 -*)` shape — and being ruled moves
+  neither which session may write it nor this entry's state.** The edit lands out of band, by the
+  operator; no stage session touches `.claude/settings.json` for it, so this entry is **not
+  promoted** and is not a build unit. The 2026-08-22 bar is unchanged, and the 2026-08-29 carve-out
+  on `native-gate-port-remaining-corpus` does not reach here — that one covers REMOVING a grant a
+  ruled port cut deletes, where this is an addition.
+  **The caveat was put to the operator and is accepted rather than answered.** `Bash(python3 -*)`
   reaches `python3 -c` and `python3 -` and stops at a bare file operand, which is the split that
   matches the safety argument — but a Bash allow-glob's `*` spans `/` and `..`
-  (`grant-argument-bounding-mechanism`), so it cannot be relied on to bound anything, and the
-  scratch-operand shapes rule 23 now blocks must stay blocked by the guard rather than by the glob.
+  (`grant-argument-bounding-mechanism`), so it bounds nothing, and the scratch-operand shapes rule
+  23 blocks stay blocked by the guard rather than by the glob. The ruling was taken with that limit
+  stated, so nothing here may later be read as a finding that the glob contains anything.
+  ruled: inline-body-interpreter-grant-absent operator 2026-08-30 lead-relay
   **DISTINCT from `overlay-only-oracle-grants-uncommitted`**, whose four oracles are granted in the
   overlay and whose question is which surface carries them; this shape is granted on no surface at
   all. DISTINCT from `file-authoring-act-ungoverned`, which governs bringing a file into being where
@@ -7603,56 +7706,6 @@
   a read of four gate sources — the exact re-derivation the survey record exists to prevent, paid
   by the scope that would otherwise re-propose the bundle.
   Filed 2026-08-25 by close, draining the gap inbox; survey bought at that iteration's scope.
-
-- **boundary-wipe-preserve-lifetime-scope** [design-pending] — the iteration-boundary scratch wipe
-  preserves by *iteration* lifetime, so an artifact whose lifetime is a **live session's** is
-  deleted underneath the session that owns it.
-  `scripts/lifecycle-config.sh` sets `LIFECYCLE_KIT_BOUNDARY_PRESERVE=(session-role)` and
-  `lifecycle-kit/bin/enter-stage.sh`'s boundary block deletes every other `.tmp/` member at the
-  first stage's entry.
-  **Attested first-hand 2026-08-25** by the scope session that ran the reset: `.tmp/lead-journal.md`
-  was deleted while the lead session that owns it was still running, so the one surface that lead
-  resumes from vanished mid-iteration.
-  **The premise the list already concedes.** `session-role` sits on the list on exactly this
-  ground — context-kit/SPEC.md §The session-context hook argues it from the marker's lifetime being
-  a live session's rather than the iteration's — and a lead's resume journal has the same lifetime
-  by the same argument. The list covers the argument's one attested member, not the argument.
-  **Why `[design-pending]`, three shapes differing in kind:** add the journal basename to the
-  preserve list, which re-buys the same omission the next time a session-lifetime artifact appears;
-  give the preserve knob a lifetime vocabulary instead of a name list; or move a live session's
-  journal out of the wiped directory, which reopens where delegation-kit sends a journal at all.
-  **A FOURTH SHAPE, raised by the operator 2026-08-28 and recorded here rather than ruled: move the
-  wipe out of `enter-stage.sh` and into the lead**, fired at iteration start before any stage is
-  dispatched. It differs from the three above in KIND — they change what the wipe preserves, this
-  changes who fires it and when. **Three grounds against, each re-read off its surface at close's
-  drain and each still standing.** (1) `lifecycle-kit/templates/lead.md` opens by ruling the lead
-  OPTIONAL, so a lead-less iteration would never wipe at all — a silent regression landing exactly
-  where no supervisor watches. (2) The lead writes no lifecycle state, so relocating the wipe puts
-  it out of reach of the stage-entry gates entirely. (3) It patches TIMING, not lifetime: ordering
-  saves the lead journal alone and touches no other session-lifetime artifact — not a live consult
-  session's, and not a `<key>.run` record whose producer still runs, which guard-kit reads to block
-  index-writing git commands, so deleting one retracts a true statement about a live process.
-  **The steelman, so the refusal is costed:** the lead is the one actor that knows an iteration is
-  opening AND holds its dispatched sessions' identities, so it alone could preserve by *liveness*
-  rather than by name — which is what shape 2 wants. Its limit is that lead-privileged knowledge
-  reaches only sessions the lead dispatched, and the attested victim in both attestations is the
-  lead journal, which no dispatch created. The grounds above are the lead's, not the operator's;
-  the shape stays available if the operator overrides them.
-  **DISTINCT from `boundary-wipe-preserve-basename-reach`**, whose subject is the matcher's *reach*
-  — an unanchored `! -name` making a nested tree immortal. This one is which *lifetimes* the list
-  must cover, and it is live whichever way that matcher is anchored.
-  recurrence: boundary-wipe-preserve-lifetime-scope 2026-08-28 2026-08-30
-  **SECOND ATTESTATION, 2026-08-28, identical in shape and one iteration later.** The scope session
-  that ran this boundary's reset under a live dispatching lead watched `.tmp/lead-journal.md` go
-  into the wipe list again. Nothing about the mechanism changed between the two; the preserve list
-  still carries `session-role` alone.
-  **THIRD ATTESTATION, 2026-08-30, again identical and again one iteration later**, first-hand at
-  this boundary's reset under a live dispatching lead; the reset's own note named
-  `.tmp/lead-journal.md` in the wiped set. The date count now reaches the recurrence threshold.
-  **Cost while deferred:** every boundary crossed while a lead session is live destroys that lead's
-  resume journal, silently — `.tmp/` is gitignored, so nothing reds and the loss is discovered only
-  when the lead next reads.
-  Filed 2026-08-26 by close, draining the gap inbox; found 2026-08-25 by scope at its own reset.
 
 - **init-vendoring-assumes-gnu-findutils** [design-pending] — `checkwright init` enumerates each
   kit's payload with `find -printf`, a GNU findutils extension, in the loop that vendors every
