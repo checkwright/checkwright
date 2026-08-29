@@ -372,29 +372,6 @@
   Filed 2026-08-21 twice, by spec and by build; promoted at `graph-port-and-config-seam`'s close;
   re-scoped here after the batch landed, with every retired figure deleted.
 
-- **installer-graph-artifact-literal** [design-pending] — `installer/lib/init.sh` spells the graph
-  artifact's path as a literal where a resolver owns it.
-  **The two sites are exact**, re-verified at the drain: `installer/lib/init.sh` line 311 (the
-  `GENERATED` roster) and line 317 (the emit redirect) both write `$GATES_DIR/CHECK-GRAPH.html`,
-  while `gate-sdk/lib/gate.sh` resolves `GATE_SDK_GRAPH_ARTIFACT` for the same file.
-  **DISTINCT from `upgrade-smoke-graph-artifact-literal`**, which the graph port discharged: that
-  entry was scoped to `gate-sdk/bin/upgrade-smoke.sh`, and this is a second site the port's caller
-  sweep surfaced.
-  **It is also weaker, and the weakness is the whole cost question.** `init` writes a freshly
-  initialised consumer whose config seam `init` itself authors, so the default holds by construction
-  on a first run. The live exposure is a **re-run** over a tree whose adopter has since set
-  `GATE_SDK_GRAPH_ARTIFACT`: `init` would write the default path and record it in the manifest while
-  the consumer's own gate looks elsewhere. The `GATE_SDK_GATES_DIR` half is already handled,
-  `$GATES_DIR` being init's own variable.
-  **Why `[design-pending]`:** the fix is not obviously "resolve the knob" — `init` runs before the
-  consumer's gate library is necessarily sourceable, which is why it literalises at all, and whether
-  the installer may reach into a vendored kit's resolver at that point is an installer-layering
-  question this entry does not settle.
-  **Cost while deferred:** low and bounded to the re-run case, but it is exactly the standing
-  invitation the discharged sibling entry named on its way out.
-  Filed 2026-08-21 by build into the gap inbox; promoted at `graph-port-and-config-seam`'s close,
-  which re-verified both line numbers and the resolver against the tree.
-
 - **amendment-reader-roster-undercount** [design-pending] — an amendment's reader/caller roster is a
   dated measurement presented as a roster, and it undercounted twice in one iteration.
   **Both misses were the same spec session, one iteration.** `SPEC-graph-port.md` delta 5 scoped ONE
@@ -6962,14 +6939,14 @@
 - **inline-body-interpreter-grant-absent** [design-pending] — `python3` with a body carried IN the
   command string is the tree's standard scratch-computation form, is safe by the tree's own stated
   argument, and is granted by nothing.
-  recurrence: inline-body-interpreter-grant-absent 2026-08-28
-  **FIRST RECURRENCE, and it falsifies this entry's own per-iteration rate.** Measured the same
-  way at `installer-trial-lifecycle-repair`'s close, off its 331-line log: **8** `python3 -`
-  fall-throughs, against the 45 the cost line below was written on. The form is unchanged and
-  still granted on neither surface — what fell is the volume, because this iteration's queue
-  surgery went through inline heredocs a handful of times rather than forty. Read the cost line
-  as a ceiling and this as a sample, the same correction `wait-loop-grant-lost-its-carrier`
-  took: the carry scales with how much a session computes over the tree, never with compliance.
+  recurrence: inline-body-interpreter-grant-absent 2026-08-28 2026-08-29
+  **TWO RECURRENCES, and between them they falsify a rate in each direction — so the entry now
+  claims a range and no rate at all.** At `installer-trial-lifecycle-repair`'s close, off a
+  331-line log: **8** `python3 -` fall-throughs. At `drift-kpi-contract-port`'s, off a 625-line
+  log: **109** (102 bare, 7 redirected), the largest class in the scan by a factor of four and
+  more than double the 45 the cost line was written on. The form is unchanged and still granted on
+  neither surface, checked again at both. What moves is how much a session computes over the tree,
+  never compliance — so 8 is not a ceiling reached and 109 is not a regression.
   **Measured at the filing close's prompt-friction triage.** 45 `python3`-led fall-throughs on the
   live
   438-line log, the largest binary-level class after the write class. The inline shapes are the bulk
@@ -6997,8 +6974,9 @@
   overlay and whose question is which surface carries them; this shape is granted on no surface at
   all. DISTINCT from `file-authoring-act-ungoverned`, which governs bringing a file into being where
   this governs executing a visible body. It re-files neither and adds neither a recurrence date.
-  **Cost while deferred:** roughly forty out-of-band decisions per iteration, paid by whichever
-  session is computing over the tree, and invisible to every gate — the friction log is advisory.
+  **Cost while deferred:** between eight and a hundred-odd out-of-band decisions per iteration —
+  three measurements, no rate — paid by whichever session is computing over the tree, and
+  invisible to every gate, the friction log being advisory.
   Filed 2026-08-24 at this iteration's close, from its prompt-friction triage, both grant surfaces
   read rather than inferred.
 
@@ -7200,8 +7178,15 @@
   class's core "call chain or roster" language than the line spans did. Reported by this close's
   `internal-identifier-restatement` sweep, which escalated rather than editing, on the ground that
   the table is the amendment's own merged deliverable — narrowing it is re-scoping landed work.
+  **Third instance 2026-08-29, and the first where the rot was OBSERVED rather than predicted.**
+  `installer-graph-artifact-literal` carried "the two sites are exact, re-verified at the drain:
+  `installer/lib/init.sh` line 311 and line 317". Both had moved to 299 and 305 — the defect still
+  live at both, only the numbers wrong. So the cost line below is no longer a forecast: a dated,
+  explicitly re-verified span in the deferred pool rotted inside eight days without any edit to the
+  entry, and the eviction that followed is what removed it rather than any sweep.
   **Why `[design-pending]`:** it rules the boundary of a governed audit class, an authoring
   question about the roster row rather than a code change.
+  recurrence: dated-measurement-restatement-class 2026-08-29
   **Cost while deferred:** the figures rot silently, and the entry carrying them is the one
   sizing an unbought port, so a reader prices the work off numbers nothing re-checks — while
   every future sweep spends the same judgment again on the same shape.
@@ -8801,9 +8786,9 @@
   with their reasoning evicted — the failure the "why (b) was never available" text on
   `native-gate-port-remaining-corpus` exists to prevent, and that text is itself one of the lines
   that consumed the last of an entry's budget.
-  Raised 2026-08-29 by scope at this boundary and filed to the gap inbox by the lead, scope having
-  flagged it and declined to file it; promoted 2026-08-29 by close, the measurement re-run over the
-  live pool rather than carried from the bullet.
+  Filed 2026-08-29 to the gap inbox by the lead, raised by scope at this boundary and declined
+  there; promoted 2026-08-29 by close, the measurement re-run over the live pool rather than
+  carried from the bullet.
 
 - **design-pending-boilerplate-reds-its-own-promotion** [design-pending] — the standard explanatory
   line that names the `[design-pending]` token in prose is legal in the deferred section and
@@ -8879,7 +8864,7 @@
   dependency, which is honest but keeps the narrowed run unavailable.
   **Cost while deferred:** the per-kit smoke is unusable for one kit and silently so, and the
   session that needs it is the one least able to tell a harness failure from its own.
-  Found 2026-08-29 by build while narrowing the smoke to lifecycle-kit and filed to the gap inbox;
+  Filed 2026-08-29 to the gap inbox by build, found while narrowing the smoke to lifecycle-kit;
   promoted 2026-08-29 by close, the failure reproduced rather than quoted.
 
 - **boundary-truncate-blank-run-accretes** [design-pending] — the boundary truncation preserves
@@ -8899,8 +8884,8 @@
   to write, not a close-stage edit.
   **Cost while deferred:** cosmetic today and unbounded in the tail — one line per iteration on
   every truncated surface, paid as a record whose head no reader can scan.
-  Probed 2026-08-29 by spec at the boundary and filed to the gap inbox; promoted 2026-08-29 by
-  close, the count re-measured and the truncation read at its source.
+  Filed 2026-08-29 to the gap inbox by spec, probed there; promoted 2026-08-29 by close, the
+  count re-measured and the truncation read at its source.
 
 - **amendment-roster-omission-detection** [design-pending] — an amendment's `## Existing sections
   updated` roster can be short by a surface, and only a grep finds the missing one.
@@ -8992,6 +8977,7 @@
 - **template-out-of-tree-copy-obligation** [design-pending] — Out-of-tree copies are unreachable.
 - **queue-entry-grammar-single-owner** [design-pending] — Two entry grammars disagree, latently.
 - **installer-artifact-omission-residue** [design-pending] — An omission update strands a binary.
+- **installer-graph-artifact-literal** [design-pending] — Init literalises a resolver-owned path.
 - **doctrine-rule-number-citation-liveness** [design-pending] — A renumber stales citations.
 - **false-ground-citation-propagation** [design-pending] — Nothing re-reads a ground once cited.
 - **spec-embedded-source-criterion-4-membership** [design-pending] — Its port sizing stays unruled.

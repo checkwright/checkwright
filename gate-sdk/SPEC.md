@@ -1839,6 +1839,14 @@ tool ported as a top-level flag therefore resolves platform defaults and silentl
 ignores every consumer override — which is not a calibration between two workable
 shapes but the difference between working and appearing to.
 
+**A default the deleted shell driver held inline moves into the owning kit's
+library in the same cut that deletes the driver, never after.** The bridge
+resolves a declared knob by sourcing exactly one kit's library (§lib/gate.sh),
+so a default left beside the compiled reader is sourced by nothing and resolves
+empty — which the reader takes as an unset knob rather than as an error, so the
+failure is silent. The library is the knob's only home from the moment the
+shell home goes; drift-kit's report knobs are the worked instance.
+
 **`--install` is the class's first *deliberately unbridged* member, and that is
 the property the class had not carried before.** Every earlier hardcoded flag is
 hardcoded because it needs no configuration; this one is hardcoded because its
