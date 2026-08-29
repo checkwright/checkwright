@@ -9,3 +9,4 @@ drift-kpi-contract-port spec a19f4e24 2026-08-29 53bd93cd
 drift-kpi-contract-port align a5bbee7e 2026-08-29 eb4c70ed
 drift-kpi-contract-port build ac87a49b 2026-08-29 0eedc033
 drift-kpi-contract-port validate a7e321c6 2026-08-29 8d91bd9c
+drift-kpi-contract-port close a6fd4224 2026-08-29 c4d63536
