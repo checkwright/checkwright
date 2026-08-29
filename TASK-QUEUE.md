@@ -7641,11 +7641,14 @@
   **DISTINCT from `boundary-wipe-preserve-basename-reach`**, whose subject is the matcher's *reach*
   — an unanchored `! -name` making a nested tree immortal. This one is which *lifetimes* the list
   must cover, and it is live whichever way that matcher is anchored.
-  recurrence: boundary-wipe-preserve-lifetime-scope 2026-08-28
+  recurrence: boundary-wipe-preserve-lifetime-scope 2026-08-28 2026-08-30
   **SECOND ATTESTATION, 2026-08-28, identical in shape and one iteration later.** The scope session
   that ran this boundary's reset under a live dispatching lead watched `.tmp/lead-journal.md` go
   into the wipe list again. Nothing about the mechanism changed between the two; the preserve list
   still carries `session-role` alone.
+  **THIRD ATTESTATION, 2026-08-30, again identical and again one iteration later**, first-hand at
+  this boundary's reset under a live dispatching lead; the reset's own note named
+  `.tmp/lead-journal.md` in the wiped set. The date count now reaches the recurrence threshold.
   **Cost while deferred:** every boundary crossed while a lead session is live destroys that lead's
   resume journal, silently — `.tmp/` is gitignored, so nothing reds and the loss is discovered only
   when the lead next reads.
