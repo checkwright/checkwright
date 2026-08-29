@@ -2,12 +2,16 @@
 # Columns are USD per single token (a $/MTok price / 1,000,000), tab-separated.
 # One row per model id as it appears in a transcript's message.model.
 #
-# priced-as-of: 2026-08-01 — transcribed from the published Anthropic model-pricing
+# priced-as-of: 2026-08-29 — transcribed from the published Anthropic model-pricing
 # table. Prices are a dated literal with no machine-readable feed to derive them from,
 # so nothing but this date says when it was last checked; re-verify against the
-# published table when kpi-price-table-age raises it.
+# published table when kpi-price-table-age raises it. Every row below was re-verified
+# against the published table on this date and every one was already correct.
 #
-# prices-valid-through: 2026-08-31 — the last date every row below is still true.
+# prices-valid-through: 2026-11-30 — and the field's meaning is weaker here than its
+# wording, which is worth stating rather than leaving to be inferred. It normally names
+# a known cliff. No future change is announced for any row, so this date is a RE-CHECK
+# HORIZON: it says nobody has looked past it, not that a change lands on it.
 # Both headers are read by kpi-price-table-age (drift-kit/SPEC.md §Bundled KPIs):
 # age alone cannot see a cliff, since a freshly retyped table reads freshest on the
 # morning its prices stop being true.
@@ -18,11 +22,12 @@
 # Cache reads dominate the totals by one to two orders of magnitude, so the convention
 # moves the result far less than the cache_read column does.
 #
-# KNOWN CLIFF: the Sonnet 5 row is INTRODUCTORY pricing. Past the prices-valid-through:
-# date above it becomes 3 / 15 / 0.30 / 6 per MTok, i.e.
-# input 0.000003, output 0.000015, cache_read 0.0000003, cache_creation 0.000006.
-# That moves the Opus:Sonnet ratio from 2.5x to ~1.67x on every column — any tier
-# comparison run after that date against these numbers overstates the saving.
+# RETRACTED CLIFF, recorded so nobody restores it from memory: the Sonnet 5 row was
+# INTRODUCTORY pricing through 2026-08-31, scheduled to rise to 3 / 15 / 0.30 / 6 per
+# MTok on 2026-09-01. The published table now states that 2 / 10 IS the standard price
+# and that the increase WILL NOT OCCUR. So the 2.5x Opus:Sonnet ratio these rows carry
+# does not step down, and a tier comparison run past 2026-08-31 is no longer overstating
+# the saving — which is the opposite of what this block said until 2026-08-29.
 #
 # KNOWN UNDERCOUNT: fast mode bills the same model id at a different rate — Opus 5 at
 # speed=fast is 10 / 50 per MTok, double the standard row below. The meter keys a price

@@ -8987,10 +8987,5 @@
 
 ## Done
 
-- drift-kpis-default-two-homes
-- msys-path-dialect-boundary-unmodelled
-- survey-edge-aggregation-residue
-- wait-loop-grant-lost-its-carrier
-
 ## Lessons Learned
 
