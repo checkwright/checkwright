@@ -8855,17 +8855,51 @@
   **Reproduced 2026-08-29 by this close, verbatim.** `run-consumer-smoke.sh lifecycle-kit` exits at
   `install-lifecycle: agent file not found: CLAUDE.md — nothing to install into`, and the runner
   reports it as an environment failure. The full battery is green, so CI never sees it.
+  **A SECOND mechanism, found at this close and worse than the first — the narrowed run is broken
+  for every kit, not one.** `run-consumer-smoke.sh <kit>` for any kit *other than* lifecycle-kit
+  fails inside **gate-sdk's own** smoke, before the named kit is reached:
+  `check-reads-couples` declares a lifecycle-kit knob, and with lifecycle-kit unvendored the config
+  bridge cannot resolve it, so the green hook run fails and the runner reports a broken installer.
+  Reproduced 2026-08-29 against `drift-kit` and `canon-kit`, identical output both times. So the
+  two mechanisms bracket the whole argument space: lifecycle-kit fails on a sibling's seeding, and
+  every other kit fails on gate-sdk declaring a knob only lifecycle-kit defines.
   **Why the failure lands where it is worth the most.** A narrowed run is bought precisely by a
   build session that touched one kit and wants the cheap check; that session gets a red that is
   about the harness rather than its change, and the cheapest recovery is to stop narrowing.
-  **Why it stays design-pending — two closes that differ in kind:** have lifecycle-kit's smoke seed
-  the agent file it installs into, self-sufficient per kit on the run-gate-tests hermeticity
-  precedent; or have the runner refuse a single-kit argument whose kit declares an install
-  dependency, which is honest but keeps the narrowed run unavailable.
-  **Cost while deferred:** the per-kit smoke is unusable for one kit and silently so, and the
+  **Why it stays design-pending — the closes differ in kind and the second mechanism adds one.**
+  Have each kit's smoke seed what it installs into, self-sufficient per kit on the run-gate-tests
+  hermeticity precedent; or have the runner refuse a single-kit argument whose kit declares an
+  install dependency, honest but keeping the narrowed run unavailable; or resolve the cross-kit
+  knob declaration, which is the sharper question the second mechanism raises — a gate declaring a
+  sibling kit's knob is a coupling nothing else in the tree makes visible.
+  **Cost while deferred:** the per-kit smoke is unusable for **every** kit and silently so, and the
   session that needs it is the one least able to tell a harness failure from its own.
   Filed 2026-08-29 to the gap inbox by build, found while narrowing the smoke to lifecycle-kit;
-  promoted 2026-08-29 by close, the failure reproduced rather than quoted.
+  promoted 2026-08-29 by close, the failure reproduced rather than quoted, and widened the same day
+  by close's vacuous-assertion sweep, whose byproduct was the second mechanism.
+
+- **upgrade-smoke-refuses-inside-a-worktree** [design-pending] — `gate-sdk/bin/upgrade-smoke.sh`
+  tests its repo root with `[[ -d "$REPO/.git" ]]`, so it refuses in every linked git worktree,
+  where `.git` is a file rather than a directory.
+  **Read at the source 2026-08-29, not inferred.** Line 15 tests `-d` on a path that a linked
+  worktree makes a gitdir *pointer file*; the tool exits 2 naming the repo as "not a git
+  repository". The predicate is wrong about the thing it is checking, not merely strict.
+  **Why the reach is worse than it looks here.** This tree *mandates* worktree isolation for a
+  read-only dispatch — `agent-dispatch-guard` refuses such a dispatch that does not carry it — so
+  every delegated session runs somewhere this tool structurally cannot run. The one escape,
+  setting `GATE_SDK_UPGRADE_REPO` to the main checkout, is undocumented at the refusal and defeats
+  the isolation the worktree was for.
+  **It is the OPPOSITE of a vacuous pass, which is why it survived a sweep hunting that shape.** A
+  fail-closed false negative announces itself; nothing silently passes. That is also why nothing
+  will fix it incidentally: the tool is simply never run from where it refuses.
+  **Why it stays design-pending despite an obvious one-character fix.** `-e` admits both shapes,
+  but the honest predicate is `git -C "$REPO" rev-parse --git-dir`, and choosing between them is a
+  question about what the guard is *for* — refusing a non-repo, or refusing a tree the smoke's
+  vendoring step cannot safely write. The fixture obligation follows whichever answer wins.
+  **Cost while deferred:** the upgrade smoke is unavailable to every delegated session, which is
+  the class of session most likely to be auditing an upgrade path in the first place.
+  Filed 2026-08-29 by close, from its vacuous-assertion sweep's byproduct notes, the guard read at
+  its source before the finding was accepted.
 
 - **boundary-truncate-blank-run-accretes** [design-pending] — the boundary truncation preserves
   every blank line ahead of the first data line, so a surface whose blocks are appended with a
