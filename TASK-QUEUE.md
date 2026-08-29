@@ -1406,20 +1406,12 @@
   unowned. This iteration recorded **one** `build` line in
   `.workflow/WORKFLOW-STATE.txt` for five batch sessions.
   **Premise corrected 2026-08-01 by the undirected scope survey — the filed
-  diagnosis was wrong and the next reader would otherwise re-derive it.** The
-  entry said "the two surfaces disagree in effect", with
-  `lifecycle-kit/templates/stages/build.md`'s "Every session still stamps"
-  paragraph against a lead that "tells batches 2..n not to re-stamp". **The
-  surfaces agree.** build.md:45 does say every build session re-runs
-  `enter-stage.sh build`; `lifecycle-kit/templates/lead.md`:226-230 says batches
-  are "N sibling stage sessions … each entering through `enter-stage.sh` as a
-  same-stage re-entry … each leaving its own stamp and the cursor staying put" —
-  the same instruction, not its opposite, and present since 2026-07-17, two weeks
-  before the divergence. So the gap is **practice against instruction**, not
-  instruction against instruction: the batches simply did not run the entry.
-  Nor is the id the obstacle — dispatched stage sessions do resolve distinct
-  session ids (this survey's own stamp differs from its lead's), so
-  `bin/session-id.sh` was never the blocker.
+  diagnosis was wrong and the next reader would otherwise re-derive it.** The entry said the two
+  surfaces disagree in effect. **They agree**, and have since 2026-07-17: build.md's
+  "Every session still stamps" paragraph and lead.md's batch paragraph carry the same instruction,
+  so the gap is **practice against instruction**, not instruction against instruction — the batches
+  simply did not run the entry. Nor is the id the obstacle: dispatched sessions resolve distinct
+  ids.
   **Practice confirmed correct once, 2026-08-01.** This iteration's two build
   batches each wrote their own stamp — two `build` lines with distinct session
   ids in `.workflow/WORKFLOW-STATE.txt` — so a per-batch trail is achievable
@@ -1449,6 +1441,11 @@
   this stage take" — an economics question the drift KPIs would otherwise want.
   Debt: one contract narrowed, or one oracle added; adds no governed name unless
   the oracle lands.
+  **Recurred 2026-08-29 in a new sub-shape: directed, not omitted.** Three build batches, one
+  `build` stamp, under an explicit lead instruction not to re-stamp — the shape
+  `lifecycle-kit/templates/lead.md` has named as the failure since 2026-08-04, so prose has now
+  failed against a lead that had it in context. That is the second half of the fork's own argument.
+  recurrence: batch-split-stamp-ownership 2026-08-29
   Filed 2026-08-01 at close from the gap inbox, filed by this iteration's build.
 
 - **template-spec-restatement-reach** [design-pending] — the gap generalization
@@ -3174,8 +3171,8 @@
 
 - **drift-baseline-unnamed-iteration** [design-pending] — every since-iteration-start KPI
   baselines on an ancient commit for the whole of scope, silently.
-  `drift-kit/bin/drift-report.sh`'s `iteration_start()` reads the queue header's iteration name
-  and runs `git log -S"<iteration> scope " -- .workflow/WORKFLOW-STATE.txt | tail -1`. While the
+  The crate's `--emit drift-report` arm reads the queue header's iteration name and runs
+  `git log -S"<iteration> scope " -- .workflow/WORKFLOW-STATE.txt`, taking the last line. While the
   header carries the unnamed-iteration sentinel — which is every scope stage, from the boundary
   reset until the stage names the iteration — the pickaxe matches the *sentinel* rather than a
   name, and `tail -1` then returns the **oldest** sentinel-bearing commit in the whole history
@@ -5040,8 +5037,9 @@
   **Why `[design-pending]` rather than a gate:** the dir is per-clone and gitignored, so a gate
   reds on one operator's local state and never on anything a commit produced — the
   low-false-positive contract site-kit/SPEC.md §The monitor boundary rules on for a different
-  subject. The candidate shapes are a shape assertion inside `drift-report.sh` (advisory, where
-  the reader already is), a wipe-non-conforming-members arm on the meter, or ruling the contract
+  subject. The candidate shapes are a shape assertion inside the `--emit drift-report` arm
+  (advisory, where the reader already is), a wipe-non-conforming-members arm on the meter, or
+  ruling the contract
   advisory and saying so. Which one turns on whether the contract is a privacy rule or a
   housekeeping rule; the gitignore already carries the privacy half.
   **Cost while deferred:** unbounded accretion in the one directory with no reclaim path, paid
@@ -8764,6 +8762,138 @@
   the gap inbox there; promoted 2026-08-29 by scope at this boundary's drain, the gate's assertion
   set re-read at its SPEC section.
 
+- **ruling-accretion-outgrows-the-entry-cap** [design-pending] — ruling content accretes
+  monotonically on a deferred entry while `QUEUE_KIT_ENTRY_LINE_CAP` is fixed, so the entries that
+  attract rulings pay for each one by evicting the grounds the ruling answers.
+  **Measured 2026-08-29 at this close; the class is no longer hypothetical.** Across 270 deferred
+  entries, **8 sit at 51 physical / 50 counted lines — the cap exactly** — and 9 more sit at 50.
+  The saturated band is 17 entries and it is populated by the most-ruled entries in the file,
+  `native-gate-port-remaining-corpus` among them: density and contention correlate, so the cap
+  binds hardest exactly where the reasoning is most contested.
+  **Two live hits this iteration, both first-hand rather than inferred.** Build's demotion landed
+  `native-gate-port-remaining-corpus` at 51/50, with no line left for the next ruling. This close
+  then judged a recurrence onto `batch-split-stamp-ownership`, itself at 50/50: recording the
+  judgment cost six lines of compression on that entry's own premise-correction block before the
+  five-line datum would fit. The compression was survivable — what went was narration of how the
+  correction was found — but nothing distinguished that from evicting grounds, and no gate would
+  have.
+  **Why the eviction is invisible where it lands.** A mid-build session reading a compressed entry
+  cannot tell that grounds it lacks were once written; the extent is the only artifact and reads
+  identical either way. `git log -p -S'<slug>' -- TASK-QUEUE.md` recovers the text, but nobody runs
+  it against an entry that looks complete.
+  **Why it stays design-pending — three shapes differing in kind, none obviously right:** measure
+  ruling records separately from grounds (a `ruled:` block is protocol rather than argument, and
+  the count already discounts one line of each declaration grammar, so widening that discount to
+  the whole block is the smallest change); raise the cap for entries carrying rulings, trading the
+  budget's uniformity for its purpose; or rule that a capped entry accumulating rulings is the
+  signal to **split**, the only shape that bounds the growth rather than re-pricing it.
+  **DISTINCT from `icebox-eviction-line-budget-squeeze`**, which is pool-level eviction pressure
+  across entries; this is one entry's internal budget spent by a content class that only grows.
+  **Cost while deferred:** the queue's most-ruled entries degrade toward a list of dispositions
+  with their reasoning evicted — the failure the "why (b) was never available" text on
+  `native-gate-port-remaining-corpus` exists to prevent, and that text is itself one of the lines
+  that consumed the last of an entry's budget.
+  Raised 2026-08-29 by scope at this boundary and filed to the gap inbox by the lead, scope having
+  flagged it and declined to file it; promoted 2026-08-29 by close, the measurement re-run over the
+  live pool rather than carried from the bullet.
+
+- **design-pending-boilerplate-reds-its-own-promotion** [design-pending] — the standard explanatory
+  line that names the `[design-pending]` token in prose is legal in the deferred section and
+  forbidden in an active one, so it reds the battery on the very entry it explains, at the moment
+  of promotion.
+  **The mechanism, read at the gate rather than inferred.** The amendment-queue gate's
+  active-queue-prose arm rejects the literal token anywhere in an active-section body, with the
+  lead-line tag gate firing beside it. The boilerplate that carries the token — the bold
+  ``Why `[design-pending]``` lead-in — is exactly the prose a promotion moves across that boundary.
+  **Measured 2026-08-29 at this close: 126 deferred entries carry the boilerplate**, against one
+  that uses the safe prose form. Every one of the 126 reds the battery on promotion. Spec hit it
+  twice in this iteration alone, once per promotion.
+  **A premise in the filing is false and is corrected here.** The bullet claimed nothing teaches
+  the fix; the gate's own failure message does — it prints `say "needs design" in prose`. What is
+  untaught is the *authoring* side: nothing at filing time steers scope away from a spelling that
+  is only a defect one section-move later, and the corrective arrives to whoever is unlucky enough
+  to promote.
+  **Why it stays design-pending — three dispositions, none obviously right:** teach the safe
+  spelling at authoring time and sweep the 126 (cheap, no mechanism, and the sweep is the cost);
+  exempt an occurrence inside a bold explanatory lead-in, which risks blessing the violation class
+  the arm exists for; or move the explanation to a surface promotion does not carry, since its
+  reader is the scope session that filed the entry rather than the build session that receives it.
+  **DISTINCT from any entry about tag placement:** this is not a tag on the wrong line, it is a
+  tag-shaped token inside prose that must survive a section move.
+  **Cost while deferred:** one avoidable red per promotion, paid by a session mid-way through a
+  queue write, plus the standing risk that the hand-fix silently drops the explanation rather than
+  rephrasing it.
+  Filed 2026-08-29 to the gap inbox by spec, measured there; promoted 2026-08-29 by close, the
+  count and the gate's message both re-derived.
+
+- **wait-mandate-template-spelling-unreachable** [design-pending] — the in-turn wait the
+  methodology mandates is spelled with a quoted PID variable, which the bash guard blocks before
+  the rule that grants the wait is ever reached; the guard-kit half of this is closed and the
+  doctrine half is not.
+  **What closed, and what survives.** Rule 19 landed 2026-08-29 and grants the bounded in-turn wait
+  outright; rule 13's corrective was moved onto the literal-PID spelling in the same unit, so the
+  ruleset no longer argues with itself. Untouched:
+  `delegation-kit/templates/agent-execution.md` spells the mandate with a quoted PID at lines 68,
+  70, 88 and 109, and CLAUDE.md's standing dispatch policy relays that spelling — so the mandate as
+  written is still refused and the grant cannot reach it.
+  **Re-probed first-hand 2026-08-29 by this close, not carried from the filing.** Running the
+  template's own spelling returns rule 6's expansion refusal at exit 2; running the literal-PID
+  form returns clean. Both forms were executed, not reasoned about.
+  **Why it stays design-pending — both candidate closes cross a bound already set.** Widening rule
+  6 past its measured class re-opens holes that rules 12, 13, 14, 15, 22 and 23 each decline on the
+  ground that rule 6 already blocked the expansion. Editing the template leaves the guard-kit-code
+  bound the wait unit was scoped inside. Neither is available to a session working within that
+  scope, which is why build took neither and why this needs an authority over a sibling kit's
+  surface.
+  **DISTINCT from the wait family already filed:** `waiter-loop-condition-predicate-gap` and
+  `wait-loop-exemption-blind-behind-a-script-name` are about the loop's condition and the
+  exemption's reach; `wait-primitive-and-record-compose-to-false-completion` is about the two
+  mandates composing into a false completion. This one is the *spelling* of the mandate against the
+  guard that reads it.
+  **Cost while deferred:** every dispatched session that follows the mandate literally is refused
+  at exit 2 and must re-derive the working spelling, and the refusal reads as a guard defect rather
+  than a template one.
+  Filed 2026-08-29 to the gap inbox by spec and updated there by build once rule 19 landed;
+  promoted 2026-08-29 by close, both spellings re-probed.
+
+- **consumer-smoke-single-kit-run-not-self-sufficient** [design-pending] — narrowing the consumer
+  smoke to one kit fails for `lifecycle-kit`, because the scratch consumer's agent file is seeded
+  by a sibling kit's install earlier in the full run.
+  **Reproduced 2026-08-29 by this close, verbatim.** `run-consumer-smoke.sh lifecycle-kit` exits at
+  `install-lifecycle: agent file not found: CLAUDE.md — nothing to install into`, and the runner
+  reports it as an environment failure. The full battery is green, so CI never sees it.
+  **Why the failure lands where it is worth the most.** A narrowed run is bought precisely by a
+  build session that touched one kit and wants the cheap check; that session gets a red that is
+  about the harness rather than its change, and the cheapest recovery is to stop narrowing.
+  **Why it stays design-pending — two closes that differ in kind:** have lifecycle-kit's smoke seed
+  the agent file it installs into, self-sufficient per kit on the run-gate-tests hermeticity
+  precedent; or have the runner refuse a single-kit argument whose kit declares an install
+  dependency, which is honest but keeps the narrowed run unavailable.
+  **Cost while deferred:** the per-kit smoke is unusable for one kit and silently so, and the
+  session that needs it is the one least able to tell a harness failure from its own.
+  Found 2026-08-29 by build while narrowing the smoke to lifecycle-kit and filed to the gap inbox;
+  promoted 2026-08-29 by close, the failure reproduced rather than quoted.
+
+- **boundary-truncate-blank-run-accretes** [design-pending] — the boundary truncation preserves
+  every blank line ahead of the first data line, so a surface whose blocks are appended with a
+  leading newline gains one permanent blank per iteration.
+  **Measured 2026-08-29 at this close.** `.workflow/survey-record.md` carries **45 blank lines**
+  between its contract header and its first block, which sits at line 47 of 94 — half the file is
+  the residue of evicted blocks. The record is green under its own gate, so nothing surfaces it.
+  **The mechanism, read at the source.** `lifecycle-kit/bin/enter-stage.sh`'s truncation walks the
+  header run printing blanks and comment lines until the first data line sets its drop flag; the
+  newline that separates the header from the first surviving block is therefore carried across the
+  boundary and a fresh one is added when the next iteration's first block is appended.
+  **Why it stays design-pending rather than a one-line fix.** The truncation is shared by every
+  boundary-truncated member, including the lesson-evidence file and any consumer-declared member,
+  and a blank line inside a multi-line header is legitimate. Collapsing the run to header-plus-one
+  is a behaviour change to a kit tool with fixtures and a smoke, so it is build work with an oracle
+  to write, not a close-stage edit.
+  **Cost while deferred:** cosmetic today and unbounded in the tail — one line per iteration on
+  every truncated surface, paid as a record whose head no reader can scan.
+  Probed 2026-08-29 by spec at the boundary and filed to the gap inbox; promoted 2026-08-29 by
+  close, the count re-measured and the truncation read at its source.
+
 
 ## Icebox
 
@@ -8799,7 +8929,6 @@
 - **survey-record-extension-tier-hybrid** [design-pending] — Paid only by a future workflow author.
 - **install-lifecycle-reversibility** [design-pending] — A declined branch; only optionality owed.
 - **pack-installer-payload-kit-set-anchor** [design-pending] — Latent --root trap, no caller.
-- **drift-kpis-default-two-homes** [design-pending] — Two literals, one string, never diverged.
 - **installer-jq-usability-probe** [design-pending] — Broken-but-present jq is unobserved.
 - **rendered-site-link-monitor** [design-pending] — Rendered-site link rot waits on a launch crawl.
 - **kit-index-page-vocabulary-ungated** [design-pending] — Index-page enums are ungated.
@@ -8826,6 +8955,7 @@
 
 ## Done
 
+- drift-kpis-default-two-homes
 - msys-path-dialect-boundary-unmodelled
 - survey-edge-aggregation-residue
 - wait-loop-grant-lost-its-carrier
