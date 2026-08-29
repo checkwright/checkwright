@@ -1224,21 +1224,23 @@ contracts do not fit; context-kit's reasoning). `smoke/install.sh` builds
 the throwaway consumer, registers the bundled set, and asserts: exit 0 with
 both section headers and **at least** one row per registered KPI; a registry
 naming a missing plugin yields its visible `n/a` row without failing; `--trend`
-emits exactly one line; and, per registered name resolving to a bundled plugin,
-that **the plugin itself emits a row when invoked directly**.
+emits exactly one line; and, per registered name, that **the member still emits a
+row when it is the registry's only entry** — a `solo` run, one name written to a
+throwaway registry and collated through the real resolution and rendering path,
+because the kit ships no bypass that would invoke a member on its own.
 
-A floor, not equality, because a plugin owns one *or more* rows —
+A floor, not equality, because a member owns one *or more* rows —
 `kpi-queue-net-delta` (§Bundled KPIs) emits two by design — so equality would red
-the moment the bundled set contains a multi-row plugin. The per-plugin probe
+the moment the bundled set contains a multi-row member. The solo probe
 beside it is what carries the bite the floor cannot: the report substitutes its
-own `n/a (plugin failed)` row for a plugin that exits non-zero or emits nothing,
-so the row count holds even where every plugin is silent, and a multi-row plugin
+own `n/a (plugin failed)` row for a member that fails or emits nothing,
+so the row count holds even where every member is silent, and a multi-row member
 would in any case offset a sibling contributing none. Contribution is the
-property, not health — an `n/a` row is a row — and a name resolving to no plugin
+property, not health — an `n/a` row is a row — and a name resolving to no member
 is skipped, that row being the report's own and asserted separately. The probe
 asserts it probed something, so a resolution change cannot make it vacuous.
-Residual limit, stated because it is real: neither assertion pins *which* plugin
-emitted a given row, so a plugin emitting the wrong number of rows is not caught.
+Residual limit, stated because it is real: neither assertion pins *which* member
+emitted a given row, so a member emitting the wrong number of rows is not caught.
 The trajectory extractor needs committed history the
 throwaway consumer lacks, so `smoke/install.sh` proves it against a hermetic
 fake-history repo — one closed, range-bounded iteration — and asserts the
@@ -1340,5 +1342,5 @@ exemptions (a `scan-exceptions` disposition split) and backlog-aging finding
 counts — both read consumer gates. A narration-marker by-eye count is
 superseded by canon-kit's `check-manifest-temporal`, which gates the same axis
 instead of trending it. The always-loaded baseline mechanics are context-kit's
-surface; drift-kit ships only the `kpi-always-loaded` plugin that reads its
-meter.
+surface; drift-kit ships only the `kpi-always-loaded` built-in member that reads
+its meter.

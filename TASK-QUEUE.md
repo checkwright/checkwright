@@ -316,8 +316,9 @@
   traversing path, and whether that is in the narrowing ruling's scope is unsettled.
   **The exposure, stated plainly:** `Bash(bash */checks/check-*.sh)` matches
   `bash ../../evil/checks/check-x.sh`, because a Bash rule's `*` spans `/`. Its siblings carry the
-  same shape — `bash */bin/run-*-tests.sh`, `bash */gate-tests/*.test.sh`, `bash */smoke/install.sh`
-  and the `drift-kit/kpis/*.sh` pair. Verified at build 2026-08-22.
+  same shape — `bash */bin/run-*-tests.sh`, `bash */gate-tests/*.test.sh` and
+  `bash */smoke/install.sh`. Verified at build 2026-08-22; the `drift-kit/kpis/*.sh` pair was
+  listed here too and was retired with the 2026-08-29 KPI port, leaving four live globs.
   **Ruled OUT of scope for the 2026-08-20 narrowing, by the lead 2026-08-22**, on the reading that
   that ruling is scoped to data-loss forms and that declining to widen a recorded ruling is the
   conservative move. Recorded here so the exposure is not lost along with the decision.
