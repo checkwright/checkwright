@@ -8488,6 +8488,19 @@
   **Cost while deferred:** one re-triage of the same unretireable rows per close, on the surface a
   close reads to decide where friction actually is — and the top row by a wide margin is one of
   them, so the ranking's most prominent signal is the one no reader can act on.
+  recurrence: prompt-ranking-ungrantable-shape-class 2026-08-28
+  **SECOND MEASUREMENT, 2026-08-28 at `port-oracle-and-composer-ruling`'s close**, arriving as a gap
+  bullet that re-derived this diagnosis without finding this entry, and drained here on a dedup
+  sweep rather than promoted. A different head, the same class:
+  `bash scripts/producer-liveness-reader.sh` at 64 prompting calls, **63 of the 64 composed** —
+  chained, redirected or expanding — and 46 of those one repeated poll string. It also
+  **falsifies a tempting sub-case**: the `GATE_SDK_VERBOSE=1` cluster at 10x read as a
+  missing-`env`-word steer against the committed
+  `Bash(env GATE_SDK_VERBOSE=1 bash gate-sdk/bin/run-gates.sh *)` grant, but all ten were piped into
+  `grep`, so the prefix would have changed nothing. **What the second sample adds to the design**:
+  the first measured the ungrantable rows as a redirect-shaped *tail*, this finds them at the *head*
+  under a different command entirely, so the partitioning disposition is sizing the ranking's bulk
+  rather than a tail bucket.
   Filed 2026-08-27 to the gap inbox by the windows-artifact-proof close, which paid the cost;
   promoted 2026-08-27 by the next scope, at the boundary that could legally run the drain.
 
@@ -8707,6 +8720,113 @@
   Relayed 2026-08-28 by the lead on the spec session's behalf (`file-gap.sh` contended on an
   uncommitted inbox); promoted 2026-08-28 by close at this boundary's drain, its scope claim
   re-verified against the descriptor and the compiled rule and its witness found here.
+
+- **readonly-dispatch-type-cannot-see-gitignored-surfaces** [design-pending] — the one dispatch type
+  this tree declares for audit work is structurally unable to read most of the surfaces close's own
+  triage must audit.
+  **The refusal is correct and is not what is in question.** `agent-dispatch-guard`'s D2 blocks any
+  `DELEGATION_KIT_READONLY_TYPES` member — `scripts/delegation-config.sh` holds one, `audit-sweep` —
+  dispatched without `isolation: worktree` (delegation-kit/SPEC.md §The decision table), on the
+  sound ground that a type's toolset comes from its definition and a shell reaches git regardless.
+  **A linked worktree carries only TRACKED content, and the close-surface roster is mostly not.**
+  Measured here rather than carried: `run-gates.sh --emit close-surfaces` prints nine rows and
+  `git check-ignore` reds **five** of them — `.workflow/essay-harvest.md`,
+  `knowledge-friction.log`, `prompt-friction.log`, `subagent-stop-liveness.log` and
+  `wait-primitive-evidence.txt`. The surfacing bullet said four and omitted the last; the majority
+  finding is the one that matters, and it is stronger than the bullet claimed.
+  **So every option at the moment of dispatch is bad, and the guard steers toward the worst.** Do it
+  in-session at full parent-context cost (what the surfacing close did, correctly); dispatch a
+  NON-declared type such as `general-purpose` into the main checkout, which the guard's own message
+  forbids in the same breath as it names worktree isolation as THE way to make the read-only claim;
+  or hand the child an absolute main-checkout path from inside its worktree, defeating the isolation
+  just mandated.
+  **Why `[design-pending]`, and the second disposition is a real answer rather than a concession:**
+  either the read-only claim can be made by a shape other than a worktree — a tools-restricted type
+  dispatched in the main checkout, with D2 reading the type's declared toolset rather than its
+  isolation flag — or gitignored capture surfaces are simply out of delegation's reach and the
+  roster triage is permanently a parent-context act. The second would cost nothing to state and
+  would stop each close re-deriving it; what it may not do is stay unstated.
+  **DISTINCT from `worktree-isolated-dispatch-cannot-reach-the-main-checkout`**, which is the WRITE
+  direction — an isolated child's own capture appends land in the worktree copy and are lost on
+  reclamation — where this is the READ direction, an audit that cannot see content that already
+  exists. Same root cause, opposite arrow, and a fix for either leaves the other standing. DISTINCT
+  from `worktree-isolated-agent-report-lost-to-a-failed-peer-send`, whose subject is the channel
+  back and which states it has no filesystem half at all.
+  **Cost while deferred:** every close either pays the triage in the parent's context or quietly
+  takes the workaround the guard's message points at, and the tree's one declared audit type reads
+  as available for work it cannot perform.
+  Surfaced 2026-08-28 by the close of `port-oracle-and-composer-ruling`, filed to the gap inbox
+  there; promoted 2026-08-29 by scope at this boundary's drain, its row count re-measured and
+  corrected here.
+
+- **kfric-second-field-direction-inverted** [design-pending] — the knowledge-friction capture's
+  second field is being filled with the surface that OUGHT TO OWN the fact rather than the surface
+  the session actually read it from, which pre-judges the remediation the close triage exists to
+  choose.
+  **The grammar is unambiguous and both holders agree.** `drift-kit/bin/kfric.sh` line 3 and its
+  `usage()` both spell `"<fact re-derived>" "<surface it was read from>"`, and line 59 emits
+  `<date> <fact> ← <surface>`; drift-kit/SPEC.md §The knowledge-friction loop says the same.
+  **Measured 2026-08-28 at `port-oracle-and-composer-ruling`'s close: all three of that iteration's
+  captures inverted it.** Each names a SPEC section where the read-from surface was an
+  implementation — a fact about `bin/run-gates.sh` citing §The non-gate arm, one about
+  `gate-sdk/README.md`'s roster citing §check-readme-roster, one about `gate_knob_env_set` in
+  `lib/gate.sh` citing §lib/gate.sh.
+  **This is not cosmetic, and the reason is the triage's own fork.** Its two remediation shapes —
+  give the fact a home, versus point from where the session looked to where the owner already is —
+  can only be told apart if the field says where the session LOOKED. When it says where the fact
+  BELONGS the second shape becomes unreachable. Demonstrated rather than argued: running the triage
+  both ways, one capture's fact turned out already owned in five places, which is the pointer
+  disposition, and its own field had asserted the opposite.
+  **Why `[design-pending]`, three dispositions acting at different layers:** the affordance
+  (`kfric.sh` validating or prompting for a non-SPEC second argument, cheapest and heuristic); the
+  grammar (rename the field, or take BOTH surfaces as separate arguments, which is what the triage
+  actually needs and what changes the log's shape); or the always-loaded doctrine line, which
+  describes the capture as firing when a session re-derives "a fact no doc owns" and so invites
+  naming the doc that should own it — a candidate CAUSE of the misuse rather than a third fix.
+  **DISTINCT from `kfric-capture-unverified-assertion`**, whose axis is whether the FACT is verified
+  rather than which surface the second argument names, and from `kfric-obligation-residency`, whose
+  axis is that the capture never happens at all. Neither body reaches this field's direction.
+  **Cost while deferred:** every close's knowledge-friction triage re-derives which reading a line
+  intends, and the loop's one measurable output degrades from a record of where re-derivation
+  happened into a list of doc wishes — which is the failure mode the loop was built to avoid.
+  Surfaced 2026-08-28 by that same close and filed to the gap inbox there; promoted 2026-08-29 by
+  scope at this boundary's drain, the grammar re-read at both of its holders.
+
+- **baseline-self-certification-unasserted** [design-pending] — a validate session may both move a
+  suite's baseline and record a clean verdict against it, and nothing in the tree tells that apart
+  from an honest run.
+  **The concrete case, not a hypothetical.** The committed manifest at `1a0e712b` carries 24 rows
+  all `verdict=clean`, one of them `installer_smoke pass=4 fail=1 ignore=0 verdict=clean`. A
+  `fail=1` reading clean is BASELINE-HELD rather than green, so the row is trustworthy only if
+  the baseline it was held against was not moved by the run that produced it.
+  **The property was established BY HAND, twice, and no artifact records that it was.** At
+  `port-oracle-and-composer-ruling`'s close the lead read the two validate commits and confirmed
+  they touched only `.workflow/WORKFLOW-STATE.txt` and `.workflow/validate-evidence.txt` — a
+  per-iteration human diff read, and the second consecutive iteration in which a supervisor
+  performed it and said so in scratch that the next boundary wipes.
+  **It is mechanically decidable and every input is tracked**: the baseline file, the evidence
+  manifest, and `.workflow/WORKFLOW-STATE.txt`'s stamps, which name the session and the head each
+  stage entered at. "No session both moved a suite's baseline and recorded a verdict against that
+  suite in the same iteration" is a statement about commit ranges between two stamps, not about
+  intent. `check-evidence-baseline` asserts the row shape, blocking-slug liveness, manifest-to-disk
+  set equality and suite coverage (evidence-kit/SPEC.md §check-evidence-baseline) — none of them
+  this, verified by reading that section rather than inferred from the gate's name.
+  **DISTINCT from `baseline-move-stales-evidence-line`, and the distinction is the whole reason this
+  is a separate filing.** That entry owns the STALE-EVIDENCE direction, where a legitimate move
+  leaves an already-recorded verdict measuring against the old baseline — and `check-evidence-
+  manifest` already refuses on it, so that direction is mechanized where this one is not. This owns
+  the ORDERING direction, where the move and the verdict come from the same session and the verdict
+  is self-served. A fix for either leaves the other standing. Also DISTINCT from
+  `baseline-row-prose-coupling-gate`, whose subject is prose asserting what a baseline row says.
+  **Why `[design-pending]`:** where the assertion lives is unruled — a widened
+  `check-evidence-baseline`, a new stamp-range gate, or a validate-stage obligation to record the
+  range it did not write in — and the three differ in whether the check can run at commit time.
+  **Cost while deferred:** a baseline-held red is the one evidence shape that looks identical to a
+  pass in the manifest, so the honesty of every close's `verdict=clean` read rests on a hand check
+  that no artifact records having happened.
+  Surfaced 2026-08-28 by the lead at the close of `port-oracle-and-composer-ruling` and filed to
+  the gap inbox there; promoted 2026-08-29 by scope at this boundary's drain, the gate's assertion
+  set re-read at its SPEC section.
 
 
 ## Icebox
