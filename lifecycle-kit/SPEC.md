@@ -1138,14 +1138,43 @@ prose header, then one block per survey:
 - corpus: <git pathspec the survey covered>
 - oracle: <the command whose verdict grounds it, or the literal `none`>
 - rev: <full commit sha the survey was taken at>
+- edges: <the inbound-citation sum per candidate this survey ranked, or the literal `none`>
 - finding: <the judgment, in prose>
 ```
 
-Four fields, and each earns its place by being read at a named transition —
-`corpus` and `rev` by the diff, `oracle` by the re-run, `finding` by the
-consuming session. The heading is the discovery key and it states the
-*question*, because a later stage searches by the question it is about to ask,
-not by the corpus it has not yet chosen.
+Five fields, and each earns its place by being read at a named transition —
+`corpus` and `rev` by the diff, `oracle` by the re-run, `edges` by the next
+boundary's ranking, `finding` by the consuming session. The heading is the
+discovery key and it states the *question*, because a later stage searches by
+the question it is about to ask, not by the corpus it has not yet chosen.
+
+**`edges` sits fourth, between the witness and the judgment, and the position is
+not arbitrary.** `corpus`, `oracle` and `rev` are the *witness* — the three
+strings the two-command re-use protocol consumes — and they stay contiguous.
+`edges` and `finding` are the *judgment half*: an input to a ranking and the
+ranking's reading. Appending `edges` after `finding` would put the field a
+reader wants at a glance behind the longest line in the block.
+
+**`edges` is obliged on every block, with the literal `none` legal — the second
+reader of `oracle:`'s convention rather than a new one.** A field present only
+on ranking blocks reintroduces exactly the "absent, or taken and dropped?"
+ambiguity this field exists to remove, and the grammar is rigidly positional
+precisely so that question never has to be asked. A field obliging every block
+to write `edges: n/a — not a ranking survey` closes the ambiguity by making
+every non-ranking block carry a *declaration*, which is the ceremony this
+surface refuses. `edges: none` is one word, asserts nothing about a pass having
+run, and is true of every survey that ranked no candidates; an *empty* value is
+the silent form and is refused, exactly as `oracle`'s is. When the value is not
+`none` it carries one inbound-citation sum per candidate the survey ranked, in
+the spelling scope already writes — `<slug> <n>`, comma-separated, with any
+caveat the sum needs. Free prose, deliberately: what makes the field usable is
+that it is *addressable*, not that it is parseable.
+
+The sum itself is bought at scope (queue-kit/SPEC.md §bin/queue-edges.sh) and
+was, before this field, recorded only inside `finding:` if at all — present but
+unaddressable, so the next boundary could not tell "no sum was taken" from "the
+sum is in there somewhere" and re-bought an aggregation the last boundary had
+already paid for. The field is what makes it readable instead of re-buyable.
 
 **No field for "how long this stays true."** Deliberately absent: an author
 cannot know it, and a field carrying a guess would be read as a warrant.
@@ -1153,14 +1182,14 @@ cannot know it, and a field carrying a guess would be read as a warrant.
 ruling above.
 
 **Every field's git-object-shaped tokens are real, not the `rev` field's alone.**
-`rev` is machine-stamped and probed, but the other three are free prose an author
+`rev` is machine-stamped and probed, but the other four are free prose an author
 writes — and a fabricated short hash in `corpus`, put there to make a dated
 census read as precise, is an attested failure of exactly this surface. Its
 class — *an identifier you did not read is not a citation* — is owned by
 delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps.
 So a word-bounded run of 7-40 lowercase hex
-carrying at least one `a`-`f`, in **any** of `corpus`, `oracle` or `finding`,
-must name a real object in this repository. A block that carries such a token on
+carrying at least one `a`-`f`, in **any** of `corpus`, `oracle`, `edges` or
+`finding`, must name a real object in this repository. A block that carries such a token on
 purpose — an illustrative sha in an `oracle:` command, a fixture literal — takes
 a valve line inside the block:
 
@@ -1189,11 +1218,11 @@ witness:
 2. **Oracle still?** Re-run `<oracle>` and compare its verdict to the one the
    finding was written against.
 
-**The witness is four strings, and that is what makes a finding portable.** It is
+**The witness is five strings, and that is what makes a finding portable.** It is
 not a property of the record file: the protocol's whole input is `corpus`,
-`oracle`, `rev` and `finding`, each a short string, and both commands run from
-HEAD. Copied onto another surface the witness is *more* durable than it is here,
-because the copy is not truncated.
+`oracle`, `rev`, `edges` and `finding`, each a short string, and both commands
+run from HEAD. Copied onto another surface the witness is *more* durable than it
+is here, because the copy is not truncated.
 
 Both hold → **cite the record; do not re-buy the survey.** Either moved →
 **dispatch only the delta**, the dispatch prompt naming the record block and the
@@ -1219,14 +1248,19 @@ every block on any commit* — too coarse to leave the mechanism any use; the
 `corpus` pathspec exists precisely to make invalidation proportionate.
 
 **The affordance.** `bin/file-survey.sh [--] "<question>" "<corpus>" "<oracle>"
-"<finding>"` appends one block, seeding the contract header when the record does
-not yet exist. It follows `bin/file-gap.sh` exactly: repo-root cd,
+"<edges>" "<finding>"` appends one block, seeding the contract header when the
+record does not yet exist. It follows `bin/file-gap.sh` exactly: repo-root cd,
 config-via-env, exit 2 on a missing or empty argument, and the free-text
 argument-shape contract of gate-sdk/SPEC.md §The bin/-tool contract — whose
-refusal here scans **every** positional, since four slots make arity no
+refusal here scans **every** positional, since five slots make arity no
 protection at all. Advisory tooling, not a
 gate — the raw append stays a legal fallback, the grammar being the surface's
 contract rather than the writer.
+
+The tool **does not default the `edges` slot**. An omitted fifth argument is the
+arity misuse the tool already refuses, which is the behavior wanted: a session
+that forgot the field is told at filing time, by the producer, rather than at
+commit time by the gate.
 
 It **stamps `rev` and the date itself and derives `<stage>` from the cursor**
 (`lifecycle_current_stage`), which is the load-bearing decision in the tool:
@@ -1248,7 +1282,7 @@ outside the boundary-truncated set — a queue entry, a SPEC section — must no
 promise a reader retrievable content in this record: the boundary reset below
 empties it, so the pointer resolves to nothing one iteration after it is written,
 and the finding survives only in the evicting commit. It inlines the finding
-together with the block's four witness fields instead, which is what keeps the
+together with the block's five witness fields instead, which is what keeps the
 finding *re-usable* rather than merely readable. Naming this record as a
 **subject** is unaffected — "the survey record is per-iteration scratch" promises
 nobody a retrieval — and that distinction is exactly what
@@ -1265,7 +1299,8 @@ class of value this section already rules an author gets wrong.
 **The affordance that makes inlining one command.** `bin/cite-survey.sh [--]
 "<heading-substring>"` selects the one block whose `## ` heading contains the
 substring and writes it to stdout as an inline-ready snippet — the heading and all
-four fields. It refuses (exit 2) on no match, on an ambiguous match, and on a
+five fields, off the same field set the block grammar above defines. It refuses
+(exit 2) on no match, on an ambiguous match, and on a
 record with no blocks, rather than guessing: the author asked for one finding, and
 a silently-chosen sibling would be pasted onto a permanent surface as if it were
 the one they read. It follows `bin/file-survey.sh` exactly — repo-root cd,
@@ -2898,23 +2933,32 @@ precedent).
 ### check-survey-record
 
 Invariant: every block in the survey record (§The survey record) carries a whole
-witness. Over each `## ` block: all four keys present, in order, one per line
-(and no fifth key, no stray line); `corpus` non-empty; `oracle` non-empty, where
-the literal `none` is legal and is the honest form and an *empty* value is the
-silent form and is refused; and `rev` a full 40-hex sha naming a commit that
+witness. Over each `## ` block: all five keys present, in order, one per line
+(and no sixth key, no stray line); `corpus` non-empty; `oracle` and `edges`
+non-empty, where the literal `none` is legal and is the honest form and an
+*empty* value is the silent form and is refused; and `rev` a full 40-hex sha
+naming a commit that
 exists — the assertion that catches the short-sha and wrong-rev cases, and the
 reason the field is machine-stamped rather than author-supplied. **And every
-git-object-shaped token in the other three fields names an object that exists**
-(§The survey record), unless the block carries the valve.
+git-object-shaped token in the other four non-`rev` fields names an object that
+exists** (§The survey record), unless the block carries the valve.
+
+`edges` is asserted on the same two footings as `oracle` — present, and
+non-empty with `none` legal — because it answers the same question in its own
+dimension: an absent key and an empty value are both the silent form of "no sum
+was taken", and the field exists precisely so a later boundary can tell that
+apart from a sum it can read.
 
 **The widened arm reuses the `rev` arm's probe over a wider input, and its two
 asymmetries with that arm are deliberate.** The mechanism was already here and
 already trusted — `git cat-file -e` — pointed at the one field the attested
-fabrication did not use. First asymmetry: the widened arm accepts **any object
-type**, where `rev` demands `^{commit}`. A sha naming a blob or a tree is a real
-citation, and demanding a commit outside `rev` would red a legitimate one.
-Second: the token shape requires at least one `a`-`f`, where `rev` takes any
-40-hex string. That is false-positive control rather than rigour — a 7-plus
+fabrication did not use. Its input is every field but `rev`, `edges` included:
+a sum whose caveat pastes a sha is a citation like any other, so the arm covers
+it by construction rather than by a second arm. First asymmetry: the widened arm
+accepts **any object type**, where `rev` demands `^{commit}`. A sha naming a blob
+or a tree is a real citation, and demanding a commit outside `rev` would red a
+legitimate one. Second: the token shape requires at least one `a`-`f`, where
+`rev` takes any 40-hex string. That is false-positive control rather than rigour — a 7-plus
 run of bare digits in prose is a count, a compact date or a byte figure far more
 often than a sha — and its honest limit is that an all-digit short sha is not
 probed at all. `rev` itself is **excluded** from the widened scan: it has the
@@ -2963,8 +3007,12 @@ grammar and `bin/file-survey.sh` on the finding path (output); exit 2 on an
 unreadable or explicitly-named-but-missing record and on a failed parse
 (fail-closed); a `good/`+`bad/` fixture pair under `gate-tests/` driven through
 the hermetic argument — the good case a three-block record including an
-`oracle: none` note and a valved block, the bad case a short sha, an empty
-oracle, a block with its `oracle` line missing and a reasonless valve — plus
+`oracle: none` note, a valved block, one block carrying a real per-candidate sum
+and two carrying `edges: none`, the bad case a short sha, an empty
+oracle, a block with its `oracle` line missing, an **empty** `edges` and a block
+whose `edges` line is **missing** — which are different findings with different
+remedies, one "write `none`" and one "the grammar grew a field" — and a
+reasonless valve — plus
 `gate-tests/check-survey-record.test.sh` for the half the pair cannot hold,
 which is everything the probe decides: both arms of the rev-existence probe in a
 sandbox repo (a rev naming a real commit, and a well-formed 40-hex rev naming

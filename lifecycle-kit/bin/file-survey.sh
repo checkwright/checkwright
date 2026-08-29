@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # spec: lifecycle-kit/SPEC.md §The survey record — the capture affordance; stamps the block grammar, no caller-side redirect (the file-gap.sh pattern)
-# usage: file-survey.sh "<question>" "<corpus>" "<oracle>" "<finding>"   (four, each non-empty)
-#   appends one block '## <YYYY-MM-DD> <stage> — <question>' plus its corpus/oracle/rev/finding
+# usage: file-survey.sh "<question>" "<corpus>" "<oracle>" "<edges>" "<finding>"   (five, each non-empty)
+#   appends one block '## <YYYY-MM-DD> <stage> — <question>' plus its corpus/oracle/rev/edges/finding
 #   lines to the committed survey record; exit 2 on misuse
 set -uo pipefail
 
@@ -13,7 +13,7 @@ REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 cd "$REPO_ROOT" 2>/dev/null || exit 1
 
 usage() {
-    printf 'usage: %s [-h|--help] [--] "<question>" "<corpus>" "<oracle>" "<finding>"\n' "$(basename "$0")"
+    printf 'usage: %s [-h|--help] [--] "<question>" "<corpus>" "<oracle>" "<edges>" "<finding>"\n' "$(basename "$0")"
     printf '  appends one dated block to %s; "--" files a field beginning with "-"\n' \
         "$LIFECYCLE_KIT_SURVEY_RECORD_FILE"
 }
@@ -35,7 +35,8 @@ else
     done
 fi
 
-if [[ $# -ne 4 || -z "${1:-}" || -z "${2:-}" || -z "${3:-}" || -z "${4:-}" ]]; then
+# spec: lifecycle-kit/SPEC.md §The survey record — the edges slot takes no default: an omitted fifth argument is the arity misuse the tool already refuses, so a session that forgot the field is told at filing time rather than at commit time
+if [[ $# -ne 5 || -z "${1:-}" || -z "${2:-}" || -z "${3:-}" || -z "${4:-}" || -z "${5:-}" ]]; then
     usage >&2
     exit 2
 fi
@@ -56,8 +57,8 @@ mkdir -p "$(dirname "$RECORD")" 2>/dev/null || true
 _fs_stage="$(lifecycle_current_stage)"
 [[ -n "$_fs_stage" ]] || _fs_stage="—"
 
-printf '\n## %s %s — %s\n- corpus: %s\n- oracle: %s\n- rev: %s\n- finding: %s\n' \
-    "$(date +%F)" "$_fs_stage" "$1" "$2" "$3" "$_fs_rev" "$4" >> "$RECORD"
+printf '\n## %s %s — %s\n- corpus: %s\n- oracle: %s\n- rev: %s\n- edges: %s\n- finding: %s\n' \
+    "$(date +%F)" "$_fs_stage" "$1" "$2" "$3" "$_fs_rev" "$4" "$5" >> "$RECORD"
 
 printf 'file-survey: ## %s %s — %s (rev %s)\n' "$(date +%F)" "$_fs_stage" "$1" "$_fs_rev"
 

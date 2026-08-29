@@ -135,7 +135,11 @@ produces that sum, so a unit that several siblings separately converge on,
 subsume, or block against can be read carefully and still ranked low — the
 failure is aggregation, not retrieval, and no amount of following
 cross-references fixes it. So before ranking a candidate, aggregate its inbound
-edges (queue-kit/SPEC.md §bin/queue-edges.sh) and read what cites it. **Read the
+edges (queue-kit/SPEC.md §bin/queue-edges.sh) and read what cites it. **The sum
+lands in the survey record's `edges` field** (lifecycle-kit/SPEC.md §The survey
+record), which is what makes it readable at the next boundary instead of dying
+with this session — a sum recorded only inside the finding's prose is present
+and unaddressable, and the next boundary re-buys it. **Read the
 same output's retired block, which is an input to this ranking and not a
 footnote to it:** a citation resolving to a slug that was once live and is not
 now points at *disposed* work, so an entry arguing from one is arguing from a

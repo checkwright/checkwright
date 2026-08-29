@@ -220,7 +220,7 @@ pub fn run(args: &[String]) -> i32 {
         println!("  help: a boundary-truncated surface is emptied by the next enter-stage.sh boundary reset, so the");
         println!("        pointer resolves to nothing one iteration after it is written. Inline the finding instead —");
         println!("        bash lifecycle-kit/bin/cite-survey.sh \"<heading-substring>\" emits the block's heading and");
-        println!("        all four witness fields, which is what keeps it re-usable rather than merely readable.");
+        println!("        all five witness fields, which is what keeps it re-usable rather than merely readable.");
         println!("        A surface that must quote a dead citation verbatim tags the line above it");
         println!("        'scratch-citation-exempt: <reason>'.");
         return 1;

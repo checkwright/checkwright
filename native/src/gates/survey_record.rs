@@ -1,11 +1,11 @@
 // spec: lifecycle-kit/SPEC.md §check-survey-record — every survey block carries its whole
-// witness: the four keys in order, a full-sha rev naming a real commit, a non-empty corpus
-// and a non-empty oracle
+// witness: the five keys in order, a full-sha rev naming a real commit, a non-empty corpus
+// and a non-empty oracle and edges
 use crate::proc;
 use crate::walk;
 use std::path::Path;
 
-const WANT: [&str; 4] = ["corpus", "oracle", "rev", "finding"];
+const WANT: [&str; 5] = ["corpus", "oracle", "rev", "edges", "finding"];
 
 fn is_space(c: char) -> bool {
     c == ' ' || c == '\t' || c == '\r' || c == '\u{b}' || c == '\u{c}'
@@ -99,7 +99,7 @@ fn finish(
         findings.push((
             e.2,
             format!(
-                "block carries a fifth key '- {}:' — the grammar is exactly corpus/oracle/rev/finding",
+                "block carries a sixth key '- {}:' — the grammar is exactly corpus/oracle/rev/edges/finding",
                 e.0
             ),
         ));
@@ -191,6 +191,11 @@ pub fn run(args: &[String]) -> i32 {
         if key == "oracle" && val.is_empty() {
             raw.push((fnr, "empty oracle — write the grounding command, or the literal 'none' (which marks the block a note, not a re-usable survey)".to_string()));
         }
+        // spec: lifecycle-kit/SPEC.md §check-survey-record — edges is asserted on oracle's two
+        // footings: an absent key and an empty value are both the silent form of 'no sum was taken'
+        if key == "edges" && val.is_empty() {
+            raw.push((fnr, "empty edges — write the per-candidate inbound sum, or the literal 'none' (which says this survey ranked no candidates)".to_string()));
+        }
         if key == "rev" {
             if is_full_sha(&val) {
                 revs.push((fnr, val));
@@ -199,8 +204,8 @@ pub fn run(args: &[String]) -> i32 {
             }
             continue;
         }
-        // spec: lifecycle-kit/SPEC.md §check-survey-record — the widened corpus is the other three
-        // fields; rev has its own stricter arm above and reporting it twice would say one thing in
+        // spec: lifecycle-kit/SPEC.md §check-survey-record — the widened corpus is every field but
+        // rev; rev has its own stricter arm above and reporting it twice would say one thing in
         // two voices
         b.tokens
             .extend(hex_tokens(&val).into_iter().map(|t| (fnr, t)));
@@ -258,7 +263,7 @@ pub fn run(args: &[String]) -> i32 {
         for f in &findings {
             println!("  {}", f);
         }
-        println!("  help: each '## <date> <stage> — <question>' block carries exactly four lines — '- corpus:', '- oracle:', '- rev:', '- finding:' — in that order, with a non-empty corpus, a non-empty oracle (the literal 'none' is the honest form for a survey no oracle grounds), and a full 40-hex rev naming a real commit. Every git-object-shaped token in the other three fields must name a real object too — an identifier you did not read is not a citation — and one that names none on purpose takes a '<!-- survey-token-exempt: <reason> -->' line on its block, reason mandatory. File blocks with 'bash lifecycle-kit/bin/file-survey.sh \"<question>\" \"<corpus>\" \"<oracle>\" \"<finding>\"', which stamps the rev itself.");
+        println!("  help: each '## <date> <stage> — <question>' block carries exactly five lines — '- corpus:', '- oracle:', '- rev:', '- edges:', '- finding:' — in that order, with a non-empty corpus, a non-empty oracle (the literal 'none' is the honest form for a survey no oracle grounds), a full 40-hex rev naming a real commit, and a non-empty edges carrying the per-candidate inbound-citation sum this survey ranked on (the literal 'none' when it ranked none). Every git-object-shaped token in the other four fields must name a real object too — an identifier you did not read is not a citation — and one that names none on purpose takes a '<!-- survey-token-exempt: <reason> -->' line on its block, reason mandatory. File blocks with 'bash lifecycle-kit/bin/file-survey.sh \"<question>\" \"<corpus>\" \"<oracle>\" \"<edges>\" \"<finding>\"', which stamps the rev itself.");
         return 1;
     }
 

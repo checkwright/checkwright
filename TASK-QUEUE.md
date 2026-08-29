@@ -12,59 +12,6 @@
 
 ## New Features
 
-- **survey-edge-aggregation-residue** [spec: SPEC-edge-sum.md] — the audit that asks whether a scope
-  survey aggregated inbound edges has nothing to read.
-  `templates/stages/scope.md` requires it plainly — aggregate a candidate's inbound edges
-  before ranking it, because the promotion dividend lives in the total and in no single entry.
-  The `survey-engagement` audit class then asks each close whether that pass ran, and declares
-  its only residue to be "the survey's own reasoning".
-  **The residue does not carry the claim, and six dated observations now settle it** — the
-  question is answered, so each is compressed to what it proved.
-  **2026-08-07, 2026-08-09 and 2026-08-12 — unanswerable three times.** Each ranked a corpus with
-  the due-condition squarely fired, each named a different oracle, none recorded an inbound sum, so
-  the audit could return neither verdict — **unanswerable, not un-gateable.** All three did
-  premise-falsification well: the split is stable, that half healthy and this one absent.
-  **2026-08-08 — answerable, and passed.** Scope named `bin/queue-edges.sh` as an oracle in the
-  survey record and wrote per-candidate inbound totals into the finding.
-  **The alternation is the evidence, and it is what makes this the requirement's property rather
-  than any session's** — the entry predicted its own recurrence before two of them. The first four
-  observations are **not** back-filled with `recurrence:` dates: the obligation attaches at the
-  moment of judgment (`recurrence-drain-input-widening`, 2026-08-17), and re-grading an earlier
-  session's prose is the self-grading hazard that ruling names rather than a repair of it.
-  **FIFTH and SIXTH, 2026-08-26 and 2026-08-27 — one shape twice, not two findings.** Neither
-  named `bin/queue-edges.sh` nor carried an edge sum; both times the threshold entries scope raised
-  were displaced by an operator's unit-set ruling rather than refused by a ranking, so the
-  obligation never attached. What the second added is the unruled half stated plainly — when a
-  ruling supplies the set, is the pass owed at all?
-  recurrence: survey-edge-aggregation-residue 2026-08-26 2026-08-27
-  **RE-DEFERRED 2026-08-27 WITH THE FORK NARROWED TO ONE ALTERNATIVE**, and again 2026-08-28 when
-  the threshold fired a second time under an undirected dispatch that left the open half nothing to
-  test. **Fold the sum into the existing survey record** is the surviving alternative: a separate
-  artifact buys a second surface for what one already carries, and retiring the roster line as
-  unauditable has **zero** instances — answerable closes in a row are what an unauditable class does
-  not produce. **What stayed open** was whether the pass is owed per RANKED candidate when an
-  authority supplies the unit set, which the 2026-08-24 widening did not reach.
-  **RULED 2026-08-29: BUILD the surviving alternative — fold the sum into the survey record as an
-  obliged field.** Five shipped instances now (2026-08-26 through 2026-08-29), and the open half
-  failed to become testable on a THIRD consecutive boundary, every one of them undirected. The
-  ruling's ground is that an untestable condition is not a reason to keep waiting; it is the
-  evidence the wait is not converging. The ceremony objection stands against a *declaration* and
-  never against the sum, so the field carries the sum rather than an attestation that it was taken.
-  ruled: survey-edge-aggregation-residue lead 2026-08-27 own-authority
-  ruled: survey-edge-aggregation-residue lead 2026-08-28 own-authority
-  ruled: survey-edge-aggregation-residue lead 2026-08-29 own-authority
-  **Cost while deferred:** CORRECTED 2026-08-29, unconditionally and independent of the disposition
-  above. The old line read "every close restamps an audit it did not actually perform" and has been
-  FALSE for five consecutive boundaries; left standing it would travel into the amendment as a
-  ground. The real carry is smaller and different: the sum is taken every time and recorded nowhere
-  a later stage can read it, so each boundary re-buys an aggregation the last one already paid for.
-  Filed 2026-08-07 by close, performing the `survey-engagement` audit its roster made due.
-  **CORRECTED AT SPEC 2026-08-29, and the correction moved the design.** This iteration's
-  scope DID record its sums — inside `finding:`, as one clause of a ~700-word prose line. So the
-  recording is not absent, it is UNADDRESSABLE: nothing asserts it is there and nothing finds it
-  without reading the blob. Also probed: the `survey-engagement` audit class EXISTS NOWHERE IN
-  THE TREE (grep hits this file only), so the amendment updates no roster line for it.
-
 - **wait-loop-grant-lost-its-carrier** [spec: SPEC-wait.md] — the mandated in-turn wait's grant is
   owned by no queue entry, and became unowned by a completion rather than by a ruling.
   **`session-mechanic-grants-uncommitted` carried it** as the third member of its class — 19
@@ -8940,6 +8887,7 @@
 ## Done
 
 - msys-path-dialect-boundary-unmodelled
+- survey-edge-aggregation-residue
 
 ## Lessons Learned
 

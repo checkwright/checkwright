@@ -70,6 +70,7 @@ bash "$SMOKE_KIT_ROOT/bin/file-survey.sh" \
     "smoke: does a freshly vendored install leave a survey record check-survey-record can parse" \
     ".workflow/survey-record.md" \
     "bash gate-sdk/bin/run-gates.sh --for .workflow/survey-record.md" \
+    "none" \
     "yes — a filed block naming the seed commit parses clean" >/dev/null
 
 # spec: lifecycle-kit/README.md §Install — step 4 points the consumer's own always-loaded agent file at the machine; run it on the consumer, not only on a scratch copy, or check-lifecycle-registration has nothing to hold
@@ -255,15 +256,15 @@ for t in file-gap.sh file-survey.sh cite-survey.sh enter-stage.sh; do
     grep -q '^usage: ' <<<"$out" || { echo "smoke(argv): $t -h wrote no usage to stdout" >&2; exit 1; }
 done
 
-# spec: gate-sdk/SPEC.md §The bin/-tool contract — enter-stage is exempt from the refusal half (its positionals are membership-validated), the three free-text members are not; file-survey.sh's refusal scans every positional because four slots make arity no protection
+# spec: gate-sdk/SPEC.md §The bin/-tool contract — enter-stage is exempt from the refusal half (its positionals are membership-validated), the three free-text members are not; file-survey.sh's refusal scans every positional because five slots make arity no protection
 for t in file-gap.sh file-survey.sh cite-survey.sh; do
     rc=0; av_run "$t" --list >/dev/null 2>&1 || rc=$?
     [[ "$rc" -eq 2 ]] || { echo "smoke(argv): $t refused --list with exit $rc, want 2" >&2; exit 1; }
     so="$(av_run "$t" --list 2>/dev/null)" || true
     [[ -z "$so" ]] || { echo "smoke(argv): $t wrote usage to stdout on a refusal: $so" >&2; exit 1; }
 done
-rc=0; av_run file-survey.sh q c o --finding >/dev/null 2>&1 || rc=$?
-[[ "$rc" -eq 2 ]] || { echo "smoke(argv): file-survey.sh took a flag in its fourth slot (exit $rc)" >&2; exit 1; }
+rc=0; av_run file-survey.sh q c o e --finding >/dev/null 2>&1 || rc=$?
+[[ "$rc" -eq 2 ]] || { echo "smoke(argv): file-survey.sh took a flag in its fifth slot (exit $rc)" >&2; exit 1; }
 
 cmp -s "$av/inbox.before" "$av/inbox.md" \
     || { echo "smoke(argv): file-gap.sh wrote the gap inbox on a help or refusal path" >&2; exit 1; }

@@ -2,4 +2,6 @@ rev is not a full 40-hex sha: '0123456'
 empty oracle
 expected the '- oracle:' line here, found '- rev:'
 valve carries no reason
+empty edges
+expected the '- edges:' line here, found '- finding:'
 help:

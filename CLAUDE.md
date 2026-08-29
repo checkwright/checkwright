@@ -194,7 +194,7 @@ load behind that trigger, so they are not resident here.
 - **Survey capture (any stage session):** bought a survey — a census, a cohort
   sweep, a roster over a corpus — that a later stage will want? land it before
   you act on it with
-  `bash lifecycle-kit/bin/file-survey.sh "<question>" "<corpus>" "<oracle>" "<finding>"`;
+  `bash lifecycle-kit/bin/file-survey.sh "<question>" "<corpus>" "<oracle>" "<edges>" "<finding>"`;
   and before buying one, read the record and run its witness
   (lifecycle-kit/SPEC.md §The survey record).
 - No per-user memory files: durable guidance goes in tracked manifests (this

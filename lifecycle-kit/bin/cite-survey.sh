@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # spec: lifecycle-kit/SPEC.md §The survey record — the citation affordance: emits one record block as an inline-ready snippet, so carrying a finding onto a permanent surface is one command rather than a pointer that dies at the next boundary
 # usage: cite-survey.sh "<heading-substring>"   (one, non-empty)
-#   writes the matched block's heading and all four witness fields to stdout as
+#   writes the matched block's heading and all five witness fields to stdout as
 #   markdown for the author to paste; exit 2 on no match, an ambiguous match, or an empty record
 set -uo pipefail
 
@@ -65,7 +65,7 @@ _cs_start="${_cs_headings[0]%%:*}"
 block="$(awk -v start="$_cs_start" '
     FNR == start { inb = 1; print; next }
     inb && /^## / { exit }
-    inb && /^- (corpus|oracle|rev|finding): / { print }
+    inb && /^- (corpus|oracle|rev|edges|finding): / { print }
 ' "$RECORD")"; st=$?
 [[ "$st" -eq 0 ]] || {
     printf 'cite-survey: awk exited %s reading %s — the block could not be extracted.\n' "$st" "$RECORD" >&2
