@@ -6,9 +6,15 @@
 #           non-firing cases are the load-bearing ones: an inline record
 #           discharges the obligation, a wait loop is a waiter rather than a
 #           producer, a read-only pipeline owns nothing a commit could corrupt,
-#           and a foreground call never reaches the rule at all.
+#           and a foreground call never reaches the rule at all. The wait-loop
+#           row is an `allow` rather than a `fallthrough` because rule 19 grants
+#           it two rules later, which still proves rule 15's exemption: an advise
+#           emits additionalContext and would classify as `advise`, not `allow`.
+#           It is also where rule 19's indifference to the harness flag is pinned
+#           — the flag backgrounds the call without changing its text, so clause
+#           (0) never sees it.
 advise	true	bash worker.sh
 fallthrough	true	bash worker.sh > .tmp/worker.log 2>&1 & printf 'pid=1 run=worker\n' > .tmp/worker.run
-fallthrough	true	until grep -q DONE .tmp/worker.log; do sleep 5; done
+allow	true	until grep -q DONE .tmp/worker.log; do sleep 5; done
 allow	true	grep -rn foo src | head
 fallthrough	false	bash worker.sh

@@ -19,7 +19,7 @@ SANDBOX="$(mktemp -d)"
 trap 'rm -rf "$SANDBOX"' EXIT
 git -C "$SANDBOX" init -q
 printf 'scratch.txt\n.tmp/\nfriction.log\n' >"$SANDBOX/.gitignore"
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 21 splits on tracked vs not, so the sandbox needs one of each
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 22 splits on tracked vs not, so the sandbox needs one of each
 printf 'tracked\n' >"$SANDBOX/tracked.md"
 printf 'scratch\n' >"$SANDBOX/scratch.txt"
 git -C "$SANDBOX" add tracked.md

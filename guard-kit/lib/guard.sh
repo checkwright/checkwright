@@ -249,7 +249,7 @@ guard_skeleton() {
     printf '%s' "$out"
 }
 
-# spec: guard-kit/SPEC.md §The guard framework — one splitter for every consumer that reasons per compound segment (rules 8/12/14/15/17/18/19/21, the read-compound carve-out, scan-prompts), fed a guard_skeleton view so the harness's per-segment boundary set never drifts
+# spec: guard-kit/SPEC.md §The guard framework — one splitter for every consumer that reasons per compound segment (rules 8/12/14/15/17/18/19/20/22, the read-compound carve-out, scan-prompts), fed a guard_skeleton view so the harness's per-segment boundary set never drifts
 guard_split_compound() {
     sed -E 's/\|\||&&|;|\|/\n/g' <<<"$1"
 }
@@ -277,7 +277,7 @@ _guard_segment_core() {
     printf '%s' "$seg"
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — true when the segment exactly matches a committed *bare* allow entry (no glob): the reviewed-lead half of rule 18's predicate and rule 19's lead test
+# spec: guard-kit/SPEC.md §The generic ruleset — true when the segment exactly matches a committed *bare* allow entry (no glob): the reviewed-lead half of rule 18's predicate and rule 20's lead test
 _guard_is_bare_allow() {
     local core bl
     core="$(_guard_segment_core "$1")"
@@ -644,7 +644,7 @@ guard_rule_bare_sleep() {
         [[ "$tok" == sleep && "$cmdpos" == 1 && "$depth" == 0 ]] && bare=1
     done <<<"$span"
     [[ "$bare" == 1 ]] || return 0
-    guard_block "don't wait by sleeping in the foreground — a wait must end when its condition goes true, not when a duration expires, and a foreground sleep spends a full-price turn doing nothing. Background a command that *exits* on the condition ('run_in_background' wrapping 'until <cond>; do sleep N; done') and take its completion notification: it fires the moment the condition holds and then ends. A dispatched agent is awaited by its own completion notification and never by a path on disk. The harness's event-stream form stays armed to its deadline after its event fires when the command it was armed with is unbounded, so it is the second choice for a single completion. Mind the polarity: 'until' takes a done predicate ('until [ -f marker ]'), while a PID's liveness is a still-running one and takes 'while' ('while kill -0 \"\$pid\" 2>/dev/null; do sleep N; done') — inverted, the loop exits at once with the producer still running. A sleep inside a condition loop is untouched — that is the sanctioned form. If you genuinely need the settle, run it yourself with !<command>."
+    guard_block "don't wait by sleeping in the foreground — a wait must end when its condition goes true, not when a duration expires, and a foreground sleep spends a full-price turn doing nothing. Background a command that *exits* on the condition ('run_in_background' wrapping 'until <cond>; do sleep N; done') and take its completion notification: it fires the moment the condition holds and then ends. A dispatched agent is awaited by its own completion notification and never by a path on disk. The harness's event-stream form stays armed to its deadline after its event fires when the command it was armed with is unbounded, so it is the second choice for a single completion. Mind the polarity: 'until' takes a done predicate ('until [ -f marker ]'), while a PID's liveness is a still-running one and takes 'while' ('while kill -0 <pid> 2>/dev/null; do sleep N; done') — inverted, the loop exits at once with the producer still running. Spell that PID as the literal number you read out of the .run record: a '\"\$var\"' expansion in the condition is refused by the expansion rule before this steer can be followed, and the literal form is the one the bounded-wait grant recognizes. A sleep inside a condition loop is untouched — that is the sanctioned form. If you genuinely need the settle, run it yourself with !<command>."
 }
 
 # spec: guard-kit/SPEC.md §The generic ruleset — rule 14's record reader: the one-line 'pid=<n> run=<key>' grammar is evidence-kit/SPEC.md §The producer-liveness lock's and is read rather than sourced, because a PreToolUse hook cannot depend on a sibling kit being vendored; a record that does not parse yields nothing, so the rule declines on one
@@ -914,6 +914,104 @@ guard_rule_ro_pipeline() {
     guard_allow "read-only search pipeline (${GUARD_NAME:-guard} auto-allow)"
 }
 
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 19's inert-redirect test: a target that is not /dev/null and not an fd-dup is a write, and a grant may not bless one
+_guard_wait_redirects_inert() {
+    local pair tgt
+    while IFS= read -r pair; do
+        [[ -z "$pair" ]] && continue
+        pair="${pair#"${pair%%[!0-9]*}"}"
+        tgt="${pair#>}"
+        tgt="${tgt#>}"
+        tgt="${tgt#"${tgt%%[![:space:]]*}"}"
+        case "$tgt" in /dev/null | '&'[0-9-]*) ;; *) return 1 ;; esac
+    done < <(_guard_redirect_pairs "$1")
+    return 0
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 19's clause (c): the loop condition runs once per iteration, unboundedly often, so it is held to rule 18's segment test plus the two condition forms that are read-only without being roster binaries — the shell tests, and 'kill -0', which asks a PID a question and sends no signal
+_guard_is_wait_condition_segment() {
+    local seg="$1" core cw first
+    _guard_wait_redirects_inert "$seg" || return 1
+    core="$(_guard_segment_core "$seg")"
+    cw="$(_guard_command_word "$core")"
+    first="${cw%%[[:space:]]*}"
+    case "$first" in
+        '[' | '[[' | test) return 0 ;;
+        kill) grep -qE '(^|[[:space:]])-0([[:space:]]|$)' <<<"$cw" && return 0; return 1 ;;
+    esac
+    _guard_is_ro_segment "$cw"
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 19's clause (d): every statement after the loop meets rule 18's own test, so the grant covers the compound the measured class is written in and grants nothing rule 18 standing alone would not have granted
+_guard_is_wait_tail_segment() {
+    local seg="$1" core
+    _guard_wait_redirects_inert "$seg" || return 1
+    core="$(_guard_segment_core "$seg")"
+    core="${core#"${core%%[![:space:]]*}"}"
+    [[ -z "$core" ]] && return 0
+    _guard_is_banner "$core" && return 0
+    _guard_is_ro_segment "$core"
+}
+
+guard_rule_bounded_wait() {
+    local raw="$1" s view cond body tail seg
+    # spec: guard-kit/SPEC.md §The guard framework — the raw-command carve-out every auto-allow rule takes, adopted unchanged rather than reasoned about afresh
+    grep -qE '\$\(|<\(|>\(' <<<"$raw" && return 0
+    case "$raw" in *'`'*) return 0 ;; esac
+    s="$(guard_skeleton "$raw" sq dq hd)"
+    grep -q "['\"]" <<<"$s" && return 0
+    # spec: guard-kit/SPEC.md §The generic ruleset — rule 19 clause (0): a compound that launches something beside its wait is a producer, not a waiter, and that is rule 15's subject
+    _guard_shell_backgrounds "$s" && return 0
+
+    # spec: guard-kit/SPEC.md §The generic ruleset — rule 19 clause (a), on the ruleset's one shell-keyword walk: the first statement is a while/until loop carrying exactly one balanced do…done span
+    local span depth cmdpos tok dos=0 dones=0 firsttok=''
+    span="$(_guard_loop_span "$s")" || return 0
+    while read -r depth cmdpos tok; do
+        [[ -z "$firsttok" ]] && firsttok="$tok"
+        [[ "$tok" == "do" ]] && dos=$((dos + 1))
+        [[ "$tok" == "done" ]] && dones=$((dones + 1))
+    done <<<"$span"
+    [[ "$firsttok" == until || "$firsttok" == while ]] || return 0
+    [[ "$dos" == 1 && "$dones" == 1 ]] || return 0
+
+    view="$(tr '\n' ';' <<<"$s")"
+    [[ "$view" =~ ^[[:space:]]*(until|while)[[:space:]]+(.+)[[:space:]]+do[[:space:]]+(.+)[[:space:]]+done([[:space:];].*)?$ ]] || return 0
+    cond="${BASH_REMATCH[2]}"
+    body="${BASH_REMATCH[3]}"
+    tail="${BASH_REMATCH[4]:-}"
+
+    # spec: guard-kit/SPEC.md §The generic ruleset — rule 19 clause (b), the rule's safety core: a loop body running anything but sleep is unbounded work executing an unbounded number of times under a grant, and no clause elsewhere would bound it
+    local sleeps=0
+    local -a btoks
+    while IFS= read -r seg; do
+        seg="${seg#"${seg%%[![:space:]]*}"}"
+        seg="${seg%"${seg##*[![:space:]]}"}"
+        [[ -z "$seg" ]] && continue
+        read -ra btoks <<<"$seg"
+        [[ "${#btoks[@]}" -eq 2 && "${btoks[0]}" == sleep ]] || return 0
+        case "${btoks[1]}" in *[!0-9.]*) return 0 ;; esac
+        sleeps=$((sleeps + 1))
+    done < <(guard_split_compound "$body")
+    [[ "$sleeps" -ge 1 ]] || return 0
+
+    local conds=0
+    while IFS= read -r seg; do
+        seg="${seg#"${seg%%[![:space:]]*}"}"
+        [[ -z "$seg" ]] && continue
+        _guard_is_wait_condition_segment "$seg" || return 0
+        conds=$((conds + 1))
+    done < <(guard_split_compound "$cond")
+    [[ "$conds" -ge 1 ]] || return 0
+
+    while IFS= read -r seg; do
+        seg="${seg#"${seg%%[![:space:]]*}"}"
+        [[ -z "$seg" ]] && continue
+        _guard_is_wait_tail_segment "$seg" || return 0
+    done < <(guard_split_compound "$tail")
+
+    guard_allow "bounded in-turn wait (${GUARD_NAME:-guard} auto-allow)"
+}
+
 guard_rule_allowlist_chain() {
     local cmd="$1" inner
     local -a bare_leads=() pattern_inners=()
@@ -991,7 +1089,7 @@ guard_rule_rm_tracked() {
     done < <(guard_split_compound "$s")
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 22's interpreter classification: arm (a) is the bash/sh pair the runner already serves, arm (b) the GUARD_KIT_SCRIPT_INTERPRETERS roster, and a word on neither is not a script interpreter at all
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 23's interpreter classification: arm (a) is the bash/sh pair the runner already serves, arm (b) the GUARD_KIT_SCRIPT_INTERPRETERS roster, and a word on neither is not a script interpreter at all
 _guard_interpreter_arm() {
     local w="${1##*/}" i
     case "$w" in bash | sh) printf 'a'; return 0 ;; esac
@@ -1001,7 +1099,7 @@ _guard_interpreter_arm() {
     return 1
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 22's scratch-source test on one token, the prefix idiom rule 15's record test already uses
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 23's scratch-source test on one token, the prefix idiom rule 15's record test already uses
 _guard_is_scratch_path() {
     local p="$1" d
     for d in ${GUARD_KIT_SCRATCH_DIRS[@]+"${GUARD_KIT_SCRATCH_DIRS[@]}"}; do
@@ -1010,7 +1108,7 @@ _guard_is_scratch_path() {
     return 1
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 22's cheap bail and its substitution arm's inner test: a scratch dir named anywhere in a string, which every arm of the rule requires
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 23's cheap bail and its substitution arm's inner test: a scratch dir named anywhere in a string, which every arm of the rule requires
 _guard_names_scratch() {
     local d
     for d in ${GUARD_KIT_SCRATCH_DIRS[@]+"${GUARD_KIT_SCRATCH_DIRS[@]}"}; do
@@ -1019,7 +1117,7 @@ _guard_names_scratch() {
     return 1
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 22's substitution arm: a command-substitution span naming a scratch path, in both spellings, since rule 6 reaches only the '$(…)' one and a guard that blocks one spelling teaches the spelling rather than the rule
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 23's substitution arm: a command-substitution span naming a scratch path, in both spellings, since rule 6 reaches only the '$(…)' one and a guard that blocks one spelling teaches the spelling rather than the rule
 _guard_substitution_scratch() {
     local span
     while IFS= read -r span; do
@@ -1028,7 +1126,7 @@ _guard_substitution_scratch() {
     return 1
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 22's body-source resolution: an interpreter takes its program body from a -c/-e argument, from its first bare operand, or from stdin; emits 'inline', 'file <path>' or 'stdin', and returns non-zero on an option this walk cannot size
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 23's body-source resolution: an interpreter takes its program body from a -c/-e argument, from its first bare operand, or from stdin; emits 'inline', 'file <path>' or 'stdin', and returns non-zero on an option this walk cannot size
 _guard_interpreter_body() {
     local seg="$1" arm="$2" tok rest k skip=0
     local -a toks
@@ -1057,13 +1155,13 @@ _guard_interpreter_body() {
     printf 'stdin'
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 22's stdin source: a segment's '<' redirect target, never a '<<' heredoc opener, whose body rides in the command string and is the shape the rule deliberately does not fire on
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 23's stdin source: a segment's '<' redirect target, never a '<<' heredoc opener, whose body rides in the command string and is the shape the rule deliberately does not fire on
 _guard_stdin_redirect() {
     grep -oE '(^|[^<])<[[:space:]]*[^[:space:]<>|;&]+' <<<"$1" \
         | sed -E 's/^[^<]?<[[:space:]]*//'
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rule 22's two decisions: arm (a) steers to the runner, arm (b) states the bash-only rule, and both resolve the runner from GUARD_KIT_LIB so a consumer that vendors the kit elsewhere is told where its own copy is
+# spec: guard-kit/SPEC.md §The generic ruleset — rule 23's two decisions: arm (a) steers to the runner, arm (b) states the bash-only rule, and both resolve the runner from GUARD_KIT_LIB so a consumer that vendors the kit elsewhere is told where its own copy is
 _guard_block_interpreter() {
     local arm="$1" word="$2" src="$3" runner="${GUARD_KIT_LIB:-guard-kit/lib/guard.sh}"
     runner="${runner%/lib/guard.sh}/bin/scratch-run.sh"
@@ -1077,10 +1175,10 @@ guard_rule_script_interpreter() {
     local raw="$1" s stmt seg word arm body src tok i j n
     local -a pipes=() ptoks=()
     _guard_names_scratch "$raw" || return 0
-    # spec: guard-kit/SPEC.md §The generic ruleset — rule 22 declines on an expansion (rule 6 blocks those shapes already) but *not* on a backtick, which is the one body-source spelling rule 6 does not reach
+    # spec: guard-kit/SPEC.md §The generic ruleset — rule 23 declines on an expansion (rule 6 blocks those shapes already) but *not* on a backtick, which is the one body-source spelling rule 6 does not reach
     grep -qE '\$\{|<\(|>\(|\$[A-Za-z_]' <<<"$raw" && return 0
     s="$(guard_skeleton "$raw" sq dq hd)"
-    # spec: guard-kit/SPEC.md §The generic ruleset — rule 22 splits statements then pipes rather than calling guard_split_compound: what it needs is dataflow (which segment's stdout is the interpreter's stdin), and the shared splitter erases the separator that tells a pipe from a ';'
+    # spec: guard-kit/SPEC.md §The generic ruleset — rule 23 splits statements then pipes rather than calling guard_split_compound: what it needs is dataflow (which segment's stdout is the interpreter's stdin), and the shared splitter erases the separator that tells a pipe from a ';'
     while IFS= read -r stmt; do
         mapfile -t pipes < <(tr '|' '\n' <<<"$stmt")
         n=${#pipes[@]}
@@ -1137,6 +1235,7 @@ guard_generic_rules() {
     guard_rule_truncate_scratch "$cmd"
     guard_rule_append_scratch "$cmd"
     guard_rule_ro_pipeline "$cmd"
+    guard_rule_bounded_wait "$cmd"
     guard_rule_allowlist_chain "$cmd"
     guard_rule_git_rewrite "$cmd"
     guard_rule_rm_tracked "$cmd"

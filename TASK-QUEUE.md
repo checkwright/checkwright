@@ -12,66 +12,6 @@
 
 ## New Features
 
-- **wait-loop-grant-lost-its-carrier** [spec: SPEC-wait.md] — the mandated in-turn wait's grant is
-  owned by no queue entry, and became unowned by a completion rather than by a ruling.
-  **`session-mechanic-grants-uncommitted` carried it** as the third member of its class — 19
-  measured out-of-band calls, every one a `kill -0 "$pid"` loop condition that a `Bash(...)` glob
-  provably cannot match, the mandated form *being* a loop condition and so decorated by
-  construction. Its promotion deliberately excluded this grant, sequencing it behind the
-  wait-primitive measurement so a grant would not be shaped to a primitive the measurement might
-  correct; the exclusion was right and is not questioned. **What it did not account for** is that
-  the entry reached Done, so the grant lost its carrier — the refusal survives at
-  guard-kit/SPEC.md §The generic ruleset rule 17, but a SPEC paragraph is not a work item.
-  [precondition-ok: the wait-primitive measurement returned; rule 17 already records the discharge]
-  **The precondition is discharged**: the measurement returned at that same build, the ordering
-  stands and the polarity was the bug, so rule 17 already records that a grant is shaped to
-  `while kill -0 "$pid" …` as well as `until <cond> …`.
-  **Why it was design-pending rather than ready-to-build:** the deliverable is guard-kit code and is
-  landable by a stage session — rule 17's own landing demonstrated that end to end — but the
-  grant's shape (a rule 6 narrowing, a new generic rule, or a raw-command exemption) is unruled.
-  **DISTINCT from `turn-end-chokepoint-and-wait-primitive`**, the measurement half whose completion
-  is this entry's precondition rather than this work, and from
-  `overlay-only-oracle-grants-uncommitted`, the parent's other split half, four Rust/gh oracles.
-  recurrence: wait-loop-grant-lost-its-carrier 2026-08-24 2026-08-27 2026-08-28
-  **THE THREE RECURRENCES, kept as measurements now that the ruling below carries their reading.**
-  Each off the prompt-friction log rather than impression, as `while kill -0 <pid>` / `until`
-  counts: 2026-08-24, **60**/**8**, the log's third-heaviest prompting pattern against the nineteen
-  the cost line was written on; 2026-08-27, **6**/**12**, a tenfold FALL in an iteration that
-  delegated *more* heavily, reaching for `Agent` dispatches whose completion notification is a wait
-  with no loop to grant; 2026-08-28, **8**/**1**. The mechanic and the rule changed none of the
-  three times. **Re-deferred 2026-08-28** on the threshold's second firing, narrowing nothing.
-  **RULED 2026-08-29: TAKEN, and the SHAPE is deliberately NOT pre-ruled.** Three recurrences
-  against a threshold of 2, precondition discharged, deliverable landable by a stage session, and
-  the iteration that takes it is one that backgrounds cargo producers — so it exercises the class
-  rather than arguing about it. The shape is design-bearing and the roster splits authoring out of
-  scope, so it goes to `spec` as part of the amendment: cost all three options above and take **the
-  narrowest that covers the measured class**. Two hard bounds. (1) The deliverable is **guard-kit
-  code**; the 2026-08-22 operator bar on promoting a permission-settings edit stands untouched, and
-  a chosen shape needing a committed-settings edit is neither spec's to land nor the lead's to
-  authorize — it ESCALATES. (2) **Measure the class here** and record a fourth datum, worth more
-  than a fourth argument; but do NOT re-price off any single figure, this iteration's included.
-  ruled: wait-loop-grant-lost-its-carrier lead 2026-08-29 own-authority
-  **RE-DEFERRED 2026-08-27, and the substance of that ruling is the reading rather than the
-  outcome.** The authority ruled that **the second recurrence falsified the first's price trend**:
-  the carry scales with the number of *shell* producers a session backgrounds, not with
-  compliance-as-such, so one iteration's figure is a sample and never a rate. The sixty below is
-  this class's observed **ceiling**, not its level, and the cost line is read that way from here on.
-  The 2026-08-22 permission-settings bar was checked then and does not reach guard-kit code.
-  ruled: wait-loop-grant-lost-its-carrier operator 2026-08-27 lead-relay
-  ruled: wait-loop-grant-lost-its-carrier lead 2026-08-28 own-authority
-  **Cost while deferred:** rule 6 decides the mandated `kill -0 "$pid"` loop out of band on
-  *every* call — sixty decisions in the iteration that set the ceiling, for a mechanic the
-  methodology mandates — and the price is invisible to scope because no entry carries it.
-  Filed 2026-08-23 by build; drained at that iteration's close, which confirmed rule 17 carries the
-  discharged precondition; re-measured at `shell-gate-tail-port-and-completion-oracle`'s close.
-  **THE COST LINE ABOVE IS FALSE BY CONSTRUCTION — probed at spec 2026-08-29.** Rule 6 does not
-  decide the `kill -0 "$pid"` spelling out of band: it BLOCKS it (exit 2), and `guard_block`
-  exits before the fall-through logger, so that spelling CANNOT be in the friction log. The
-  19/60/6/8 figures count something else. FOURTH DATUM: 4 prompting calls / 3 patterns, ZERO of
-  them `kill -0`; every one a COMPOUND (loop then read). Shape TAKEN: a new generic rule, the
-  only one of the three that emits a grant — `guard_allow` already exists, so the operator bar
-  is not reached. Full costing of all three in the amendment.
-
 ## Technical Debt
 
 ## Deferred
@@ -8888,6 +8828,7 @@
 
 - msys-path-dialect-boundary-unmodelled
 - survey-edge-aggregation-residue
+- wait-loop-grant-lost-its-carrier
 
 ## Lessons Learned
 

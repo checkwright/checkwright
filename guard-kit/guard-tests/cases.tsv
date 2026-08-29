@@ -40,8 +40,8 @@ fallthrough	awk '$1' data.txt
 # cannot expand, and the shell is what guarantees that — so its body is inert
 block	cat <<EOF > .tmp/n.md@NL@value is $(date)@NL@EOF
 fallthrough	cat <<'EOF' > .tmp/n.md@NL@value is $(date)@NL@EOF
-# reaches rule 20's advisory, which is the correct verdict for a commit -F; the
-# point is that rule 6 no longer blocks it before rule 20 is ever consulted
+# reaches rule 21's advisory, which is the correct verdict for a commit -F; the
+# point is that rule 6 no longer blocks it before rule 21 is ever consulted
 advise	git commit -F - <<'MSG'@NL@names a $(cmd) in the body@NL@MSG
 
 # rule 7 — unquoted brace glyph: bare {} placeholder rewritten, expansions blocked.
@@ -110,13 +110,14 @@ fallthrough	pgrep run-smoke.sh; bash run-smoke.sh
 
 # rule 13 — bare foreground sleep steered to a condition wait. The non-firing
 #           cases are the load-bearing ones: a sleep inside an `until … do … done`
-#           loop *is* the sanctioned form, and a quoted mention is inert. The
-#           quoted-mention row is an `allow` because rule 17 grants the append
-#           outright, which still proves rule 13 inert: a block exits 2 at rule
-#           13 and never reaches an auto-allow eight rules later.
+#           loop *is* the sanctioned form, and a quoted mention is inert. Both
+#           are `allow` rather than `fallthrough` because a later auto-allow
+#           grants them outright — rule 17 the append, rule 19 the wait — and
+#           each still proves rule 13 inert, since a block exits 2 at rule 13 and
+#           never reaches an auto-allow six rules later.
 block	sleep 30
 block	sleep 180; echo waited
-fallthrough	until grep -q DONE .tmp/smoke.log; do sleep 5; done
+allow	until grep -q DONE .tmp/smoke.log; do sleep 5; done
 allow	printf 'sleep 5' >> .tmp/note.txt
 
 # rule 14 — tracked-tree mutation under a live producer. The sandbox's only
@@ -169,7 +170,7 @@ fallthrough	grep foo file | awk '{print}'
 allow	echo === | grep foo src
 fallthrough	echo a | echo b
 # widened lead: a bare committed allow entry may lead, since it was reviewed —
-# but only where something decorates it, so the undecorated form (rule 19's
+# but only where something decorates it, so the undecorated form (rule 20's
 # 'fallthrough git status' below) is still never intercepted here
 allow	git status | head
 allow	git status | head -20
@@ -186,7 +187,40 @@ fallthrough	grep -rln foo src | xargs sed -i s/a/b/
 block	ls | xargs chmod 777
 block	ls | xargs xargs rm
 
-# rule 19 — decorated allowlisted bare lead with an unmatched segment blocked;
+# rule 19 — bounded in-turn wait auto-allowed. The grant rows are the two of the
+#           four measured calls this rule is shaped to cover, both compounds; the
+#           refusing rows are one per clause, so no clause can be deleted without
+#           a red. The two named non-targets (`pgrep` and `gh` as conditions) are
+#           clause (c)'s refusals and are declined on purpose.
+allow	until grep -q DONE .tmp/smoke.log; do sleep 20; done; echo waited
+allow	until grep -q DONE .tmp/smoke.log 2>/dev/null; do sleep 30; done; grep -n ERR .tmp/smoke.log
+# the literal-PID liveness wait rule 13's corrective now spells, in both
+# polarities — the form the ruleset steers toward, granted rather than prompted
+allow	while kill -0 2147483646 2>/dev/null; do sleep 5; done
+allow	until ! kill -0 2147483646 2>/dev/null; do sleep 5; done
+allow	until [ -f .tmp/marker ]; do sleep 10; done
+# clause (0) — a statement-ending `&` is a launch, not a wait, whatever else the
+# command does. Rule 15 exempts the wait loop, so this row reaches rule 19 and
+# is refused there rather than by an earlier rule's ordering
+fallthrough	until grep -q DONE .tmp/smoke.log; do sleep 5; done &
+# clause (a) — the first statement is not the loop
+fallthrough	echo start; until grep -q DONE .tmp/smoke.log; do sleep 5; done
+# clause (b) — the body runs something besides sleep
+fallthrough	until grep -q DONE .tmp/smoke.log; do grep -c x .tmp/smoke.log; sleep 5; done
+# clause (c) — the two stated non-targets: a pattern match where a PID belongs,
+# and a network tool that already has a blocking primitive
+fallthrough	while pgrep -f worker >/dev/null 2>&1; do sleep 20; done; echo waited
+fallthrough	until gh run view 12 --json status 2>/dev/null | grep -q completed; do sleep 30; done
+# clause (d) — a tail statement rule 18 would not have granted standing alone
+fallthrough	until grep -q DONE .tmp/smoke.log; do sleep 5; done; git commit -m done
+# clause (e) — a backtick anywhere in the raw command; the `$(…)` spelling is
+# deliberately not a row, since rule 6 blocks it first and the row would pin
+# another rule's verdict
+fallthrough	until grep -q DONE `cat .tmp/f`; do sleep 5; done
+# a non-inert redirect on the loop itself is a write, and a grant may not bless one
+fallthrough	until grep -q DONE .tmp/smoke.log; do sleep 5; done > out.txt
+
+# rule 20 — decorated allowlisted bare lead with an unmatched segment blocked;
 #           chaining steer, redirect steer, and the untouched non-firing cases
 block	git status && rm -rf tmp
 block	git status 2>&1
@@ -195,7 +229,7 @@ fallthrough	frobnicate && git status
 fallthrough	git status && ls
 fallthrough	git status && printf done
 
-# rule 20 — git history-rewrite advisory: amend / commit -F / soft-reset steered;
+# rule 21 — git history-rewrite advisory: amend / commit -F / soft-reset steered;
 #           a plain commit and a non-soft reset pass
 advise	git commit --amend
 advise	git commit --amend --no-edit
@@ -204,7 +238,7 @@ advise	git reset --soft HEAD~1
 fallthrough	git commit -m done
 fallthrough	git reset --hard HEAD~1
 
-# rule 21 — bare rm of a tracked path steers to 'git rm -q'; untracked,
+# rule 22 — bare rm of a tracked path steers to 'git rm -q'; untracked,
 #           gitignored, and the already-correct git rm form pass
 block	rm tracked.md
 block	rm -f tracked.md
@@ -213,11 +247,11 @@ fallthrough	rm scratch.txt
 fallthrough	rm untracked-nowhere.md
 fallthrough	git rm -q tracked.md
 
-# rule 22 — a script interpreter taking its program body from a scratch dir.
+# rule 23 — a script interpreter taking its program body from a scratch dir.
 #           The firing rows are delta 3's probe table promoted from evidence into
 #           fixtures: one per body source, both arms. Targets are relative, as
 #           rules 3, 16 and 17's are — an `@ROOT@`-absolute one would meet rule 5
-#           seventeen rules earlier.
+#           eighteen rules earlier.
 # arm (a), bash/sh: the operand form is the steer this rule inherited from a
 #          consumer rule, and the stdin form is the widening the re-key buys it
 block	bash .tmp/x.sh
@@ -247,5 +281,5 @@ fallthrough	printf 'print(1)' | python3
 fallthrough	python3 tools/gen.py
 fallthrough	bash guard-kit/bin/scratch-run.sh .tmp/x.sh
 
-# rule 23 — anything else falls through to the friction log
+# rule 24 — anything else falls through to the friction log
 fallthrough	make build
