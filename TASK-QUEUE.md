@@ -75,71 +75,6 @@
   deferred 2026-08-26, deferred again 2026-08-27 at build; promoted 2026-08-30 by scope on the
   operator's unit-set ruling, its last blocker discharged by a sibling that shipped meanwhile.
 
-- **boundary-wipe-preserve-lifetime-scope** [precondition-ok: shape-ruled] — the iteration-boundary
-  scratch wipe preserves by *iteration* lifetime, so an artifact whose lifetime is a **live
-  session's** is deleted underneath the session that owns it.
-  `scripts/lifecycle-config.sh` sets `LIFECYCLE_KIT_BOUNDARY_PRESERVE=(session-role)` and
-  `lifecycle-kit/bin/enter-stage.sh`'s boundary block deletes every other `.tmp/` member at the
-  first stage's entry.
-  **THE SHAPE IS RULED, 2026-08-30 by the operator: take the narrow fix — widen
-  `LIFECYCLE_KIT_BOUNDARY_PRESERVE` past the bare `session-role`.** That is shape 1 of the three
-  below, and it promotes as **debt** with the design-pending tag deleted rather than converted: it
-  adds no name to a governed surface, the knob and its semantics already existing, so it converges
-  behaviour on a contract lifecycle-kit already carries and needs no amendment. Shape 1's stated
-  weakness stands and is accepted rather than answered — it re-buys the same omission the next time
-  a session-lifetime artifact appears, which is the cost of taking the narrow fix over shape 2's
-  lifetime vocabulary.
-  **THE FOURTH SHAPE IS REFUSED ON THE OPERATOR'S OWN READING, 2026-08-30 — a declined override is
-  a ruling, not a silence.** The operator raised that shape on 2026-08-28 (move the wipe out of
-  `enter-stage.sh` and into the lead, fired at iteration start) and on 2026-08-30 **declined to
-  override** the three grounds against it. Those grounds were the lead's when written and are now
-  the operator's too, so the sentence that used to say "the shape stays available if the operator
-  overrides them" is superseded by this paragraph rather than standing beside it: the shape is
-  closed, and reopening it is operator-class like any closed ruling.
-  **Attested first-hand 2026-08-25** by the scope session that ran the reset: `.tmp/lead-journal.md`
-  was deleted while the lead session that owns it was still running, so the one surface that lead
-  resumes from vanished mid-iteration.
-  **The premise the list already concedes.** `session-role` sits on the list on exactly this
-  ground — context-kit/SPEC.md §The session-context hook argues it from the marker's lifetime being
-  a live session's rather than the iteration's — and a lead's resume journal has the same lifetime
-  by the same argument. The list covers the argument's one attested member, not the argument.
-  **The three shapes, kept because the ruling selected among them:** add the journal basename to the
-  preserve list (**ruled**); give the preserve knob a lifetime vocabulary instead of a name list; or
-  move a live session's journal out of the wiped directory, which reopens where delegation-kit sends
-  a journal at all.
-  **The three grounds the fourth shape was refused on, each re-read off its surface and each still
-  standing.** (1) `lifecycle-kit/templates/lead.md` opens by ruling the lead
-  OPTIONAL, so a lead-less iteration would never wipe at all — a silent regression landing exactly
-  where no supervisor watches. (2) The lead writes no lifecycle state, so relocating the wipe puts
-  it out of reach of the stage-entry gates entirely. (3) It patches TIMING, not lifetime: ordering
-  saves the lead journal alone and touches no other session-lifetime artifact — not a live consult
-  session's, and not a `<key>.run` record whose producer still runs, which guard-kit reads to block
-  index-writing git commands, so deleting one retracts a true statement about a live process.
-  **The steelman, so the refusal stays costed:** the lead is the one actor that knows an iteration
-  is opening AND holds its dispatched sessions' identities, so it alone could preserve by *liveness*
-  rather than by name — which is what shape 2 wants. Its limit is that lead-privileged knowledge
-  reaches only sessions the lead dispatched, and the attested victim in all three attestations is
-  the lead journal, which no dispatch created.
-  **DISTINCT from `boundary-wipe-preserve-basename-reach`**, whose subject is the matcher's *reach*
-  — an unanchored `! -name` making a nested tree immortal. This one is which *lifetimes* the list
-  must cover, and it is live whichever way that matcher is anchored.
-  recurrence: boundary-wipe-preserve-lifetime-scope 2026-08-28 2026-08-30
-  **SECOND ATTESTATION, 2026-08-28, identical in shape and one iteration later.** The scope session
-  that ran this boundary's reset under a live dispatching lead watched `.tmp/lead-journal.md` go
-  into the wipe list again. Nothing about the mechanism changed between the two; the preserve list
-  still carries `session-role` alone.
-  **THIRD ATTESTATION, 2026-08-30, again identical and again one iteration later**, first-hand at
-  this boundary's reset under a live dispatching lead; the reset's own note named
-  `.tmp/lead-journal.md` in the wiped set. That third date reached the recurrence threshold, which
-  is what routed this entry to the operator regardless of the iteration's theme; the promotion
-  below is that route's outcome.
-  **Cost while deferred:** every boundary crossed while a lead session is live destroys that lead's
-  resume journal, silently — `.tmp/` is gitignored, so nothing reds and the loss is discovered only
-  when the lead next reads.
-  ruled: boundary-wipe-preserve-lifetime-scope operator 2026-08-30 lead-relay
-  Filed 2026-08-26 by close, draining the gap inbox; found 2026-08-25 by scope at its own reset;
-  promoted 2026-08-30 by scope on the operator's ruling, at the recurrence threshold.
-
 ## Deferred
 
 - **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
@@ -9054,6 +8989,7 @@
 
 ## Done
 
+- boundary-wipe-preserve-lifetime-scope
 - kit-smoke-port-disposition-cohort
 
 ## Lessons Learned

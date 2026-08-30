@@ -2117,8 +2117,12 @@ consequence of an existing ruling rather than a carve-out:
   because they are different mistakes.
 - **The in-iteration predecessor only.** The boundary reset wipes the scratch dir
   at the first stage's entry and `LIFECYCLE_KIT_BOUNDARY_PRESERVE` deliberately
-  does not keep journals, so the first stage of an iteration has no predecessor
-  journal by construction and is never asserted against.
+  does not keep **stage** journals, so the first stage of an iteration has no
+  predecessor journal by construction and is never asserted against. The
+  qualifier is load-bearing rather than pedantic: a *supervising* session's
+  journal is a legitimate keep-list member (§templates/lead.md) and is not a
+  stage journal, so keeping one leaves this assertion's construction untouched —
+  the bullet below is that same distinction reached from the other side.
 - **Stages only.** A supervising session's own journal is not a stage journal: it
   has no stamp, so the cursor cannot name it, and a second roster to reach it is
   a surface this assertion did not buy.
@@ -3436,7 +3440,21 @@ wasted dispatch — rather than undetected, and a duplicate reading of one fact
 would buy only the timing the simulate read already buys for free.
 The template also carries the lead's first step —
 writing the session-role marker context-kit's hook reads
-(context-kit/SPEC.md §The session-context hook). Dispatch safety is not re-owned — it inherits
+(context-kit/SPEC.md §The session-context hook).
+**Both of the lead's scratch artifacts outlive the iteration the boundary wipe
+reclaims, and that is one fact rather than two exceptions.** A lead session is
+live *at* the boundary — it files a boundary judgment there for the entering
+session's intake — so its session-role marker and its own resume journal alike
+have a live session's lifetime rather than the iteration's, and a consumer that
+names either keeps it on `LIFECYCLE_KIT_BOUNDARY_PRESERVE` (§bin/enter-stage.sh).
+The contrast with §templates/consult.md is deliberate and reached from the
+opposite direction: a consult session may span the boundary too and still takes
+**no** preserve entry, because its rulings are discharged into a commit as each
+closes, so a preserved journal would outlive the session that can interpret it. A
+*stage* session's journal takes none either, being spent by the boundary it is
+reclaimed at. So the question a keep-list candidate answers is **where its
+content is discharged**, not which session class wrote it — and a lead's journal
+is the case where the answer is *nowhere yet*, the channel still being read. Dispatch safety is not re-owned — it inherits
 delegation-kit's protocol by citation (delegation-kit/SPEC.md §The delegation
 model: background dispatch, the per-dispatch budget guard, verify after any
 agent commit) — with one lifecycle **instance** the generic rule cannot state
