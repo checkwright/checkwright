@@ -12,81 +12,6 @@
 
 ## New Features
 
-- **no-port-cause-validation-scoped-to-registry** [spec: SPEC-port-declaration-shape.md] — the
-  malformed-shape validation for port-disposition declarations reaches only
-  registered gates, where the field is rarest, and never the tree-wide
-  population where it actually lives.
-  **Verified at the 2026-08-30 drain by source, not by reading the DoD.**
-  `check-gate-substrate-parity` assertion G validates the declaration's
-  malformed shapes — empty cause, no slug, both fields, duplicate field,
-  field-on-descriptor — only along registered-gate declaration paths, resolved
-  through its assertion-A loop over `gates.list` members. **No registered gate
-  carries either field today**: the sole `.gate` file mentioning them does so
-  in a `spec:` line describing them, not as a declaration. The assertion is
-  therefore VACUOUS on its own corpus right now.
-  **Meanwhile the field's stated domain is "any tracked script"**, and dozens
-  of files outside `gates.list` carry a port disposition today: `scripts/*.sh`,
-  kit `lib/*.sh`, kit `templates/*.sh`, the hook generator, and the 17
-  tree-wide declarations the smoke cut added on 2026-08-30. None is a
-  registered gate, so none is ever read by assertion G.
-  **And no sibling covers it**: `check-gate-exemption-tasks`' tree-wide loop
-  validates only slug-liveness for the temporary field —
-  `native/src/gates/gate_exemption_tasks.rs:449-450` matches the temporary
-  disposition and continues past everything else, so it never touches the
-  permanent field. The gap bullet cited line 447; the arm is at 449-450, and
-  the finding is unaffected.
-  **IN THE `port-declaration-cohort` UNIT SET AS THE ENFORCEMENT-FIRST PAIR — ruled 2026-08-30
-  (operator, lead-relay).** It rides the three cuts rather than taking a cut number: those cuts
-  license up to 44 new tree-wide declarations, every one of them outside `gates.list` and so
-  outside the only validation that exists, which would ship the largest single batch of unchecked
-  causes the field has ever taken. Enforcement-first says the widening lands WITH the declarations
-  it must check, not after them — so the widened scan is this unit set's, and its own sequencing
-  inside the iteration is build's to order against whichever cut lands first.
-  **Cost while deferred:** every cause added outside `gates.list`, which is
-  the overwhelming majority of the field's real population, is checked for
-  well-formedness by human reading rather than by an oracle, silently — and
-  DoD language elsewhere in the tree may already over-claim this coverage.
-  ruled: no-port-cause-validation-scoped-to-registry operator 2026-08-30 lead-relay
-  Filed 2026-08-30 by close from the gap inbox; the parity gate's own source
-  was re-read at the drain before this was written.
-
-- **kit-lib-port-disposition-cohort** [spec: SPEC-kit-lib-port.md] — every kit's `lib/*.sh` is
-  owed by the port oracle and only two are dispositioned, so the class still has no ruling and
-  each cut re-argues it.
-  **The ground has precedent; the COHORT has never been swept, and conflating those is the trap.**
-  `gate-sdk/bin/gen-pre-commit.sh` declares `# no-port:` on exactly this ground — resolving a knob
-  means sourcing the owning kit's lib, and gate-sdk/SPEC.md §lib/gate.sh rules exactly one place a
-  knob's value is computed, so a crate-side resolver is the second producer criterion 6 refuses.
-  `drift-kit/lib/drift.sh` declared on that stated ground at `native-gate-port-remaining-corpus`'s
-  drift-kit cut, 2026-08-29, which is what makes the rest of the class visible.
-  **Corrected 2026-08-30 at scope, two stale premises.** The headline said none had EVER been
-  dispositioned: `gate-sdk/lib/consumer-smoke.sh` is the second, declared under the 2026-08-30
-  smoke class ruling. And the sibling this was filed apart from,
-  `kit-smoke-port-disposition-cohort`, no longer exists — that class was ruled and its owner is now
-  gate-sdk/SPEC.md §Consumer smoke, *The port disposition*. Neither correction touches the ground.
-  **Why a lib is not a smoke harness**, and why the split from that class still holds: a `lib/*.sh`
-  is **load-bearing at runtime** — the config
-  bridge has no other resolver and already-compiled arms source it — so its disposition is a
-  correctness question about the bridge. A smoke harness is a test surface and its question is
-  about bootstrap. Averaging the two grounds would produce a ruling that answers neither.
-  **What this entry owes:** the census (how many kit `lib/*.sh` are owed, which are sole resolvers
-  for their kit's bridge and which are not), then one ruling for the class rather than per cut.
-  Re-derive the count rather than reading one here — it moves with every ported file.
-  **IN THE `port-declaration-cohort` UNIT SET AS CUT 2 OF 3 — ruled 2026-08-30 (operator,
-  lead-relay).** Width, stated per cut and never inherited: **16 files, 3,588 lines** — by far the
-  heaviest of the three by line count and the lightest by argument, since two members already carry
-  declarations on the stated ground. Sequenced SECOND on precedent density, behind the config class
-  and ahead of the harness class. `guard-kit/lib/guard.sh` alone is 1,243 lines of it, and its
-  port-versus-declare disposition is DECIDED by this cut rather than separately takeable.
-  **What this cut owes is the class ruling and the declarations it licenses — not a count.** Any
-  port work the ruling turns out to create is FILED as its own entry, never absorbed here.
-  **Cost while deferred:** low and recurring — every kit cut from here pays the same argument, and
-  a cut that declares without stating the ground leaves precedent-by-example behind it.
-  ruled: kit-lib-port-disposition-cohort lead 2026-08-29 own-authority
-  ruled: kit-lib-port-disposition-cohort operator 2026-08-30 lead-relay
-  Filed 2026-08-29 by spec, under the lead ruling that resolved the drift-kit cut's
-  four declarations.
-
 - **kit-config-template-port-disposition** [spec: SPEC-config-template-port.md] — seven kit config
   templates are counted owed by the port oracle while their drift-kit sibling
   declares no-port, and no entry reaches the class.
@@ -113,11 +38,12 @@
   surface running before any binary exists) and runtime sole-resolver (the
   config bridge has no other producer). This one's ground is the edit seam.
   Same shape, three grounds, deliberately not averaged.
-  **IN THE `port-declaration-cohort` UNIT SET AS CUT 1 OF 3 — ruled 2026-08-30 (operator,
-  lead-relay).** Width, stated per cut and never inherited: **11 files, 113 lines** (seven kit
-  `templates/*-config.sh` at 24 lines, four `scripts/` consumer copies at 89). Sequenced FIRST of
-  the three on precedent density — it is the only one of the three carrying a sibling declaration
-  on its own ground, so it is the cheapest to argue and the argument informs the two after it.
+  **IN THE `port-declaration-cohort-and-windows-leg` UNIT SET AS CUT 1 OF 3 — ruled 2026-08-30
+  (operator, lead-relay).** Width, stated per cut and never inherited: **11 files, 113 lines**
+  (seven kit `templates/*-config.sh` at 24 lines, four `scripts/` consumer copies at 89).
+  Sequenced FIRST of the three on precedent density — it is the only one of the three carrying a
+  sibling declaration on its own ground, so it is the cheapest to argue and the argument informs
+  the two after it.
   **The deliverable is the class RULING plus whatever declarations it licenses, not a guaranteed
   count.** If the ruling comes back *port* for any member, the port work is FILED as its own entry
   under scope-gated intake, never absorbed into this iteration's envelope.
@@ -128,6 +54,44 @@
   ruled: kit-config-template-port-disposition operator 2026-08-30 lead-relay
   Filed 2026-08-30 by close from the gap inbox; premises re-verified against
   the port oracle at the drain.
+
+- **kit-lib-port-disposition-cohort** [spec: SPEC-kit-lib-port.md] — every kit's `lib/*.sh` is
+  owed by the port oracle and only two are dispositioned, so the class still has no ruling and
+  each cut re-argues it.
+  **The ground has precedent; the COHORT has never been swept, and conflating those is the trap.**
+  `gate-sdk/bin/gen-pre-commit.sh` declares `# no-port:` on exactly this ground — resolving a knob
+  means sourcing the owning kit's lib, and gate-sdk/SPEC.md §lib/gate.sh rules exactly one place a
+  knob's value is computed, so a crate-side resolver is the second producer criterion 6 refuses.
+  `drift-kit/lib/drift.sh` declared on that stated ground at `native-gate-port-remaining-corpus`'s
+  drift-kit cut, 2026-08-29, which is what makes the rest of the class visible.
+  **Corrected 2026-08-30 at scope, two stale premises.** The headline said none had EVER been
+  dispositioned: `gate-sdk/lib/consumer-smoke.sh` is the second, declared under the 2026-08-30
+  smoke class ruling. And the sibling this was filed apart from,
+  `kit-smoke-port-disposition-cohort`, no longer exists — that class was ruled and its owner is now
+  gate-sdk/SPEC.md §Consumer smoke, *The port disposition*. Neither correction touches the ground.
+  **Why a lib is not a smoke harness**, and why the split from that class still holds: a `lib/*.sh`
+  is **load-bearing at runtime** — the config
+  bridge has no other resolver and already-compiled arms source it — so its disposition is a
+  correctness question about the bridge. A smoke harness is a test surface and its question is
+  about bootstrap. Averaging the two grounds would produce a ruling that answers neither.
+  **What this entry owes:** the census (how many kit `lib/*.sh` are owed, which are sole resolvers
+  for their kit's bridge and which are not), then one ruling for the class rather than per cut.
+  Re-derive the count rather than reading one here — it moves with every ported file.
+  **IN THE `port-declaration-cohort-and-windows-leg` UNIT SET AS CUT 2 OF 3 — ruled 2026-08-30
+  (operator, lead-relay).** Width, stated per cut and never inherited: **16 files, 3,588 lines** —
+  by far the heaviest of the three by line count and the lightest by argument, since two members
+  already carry declarations on the stated ground. Sequenced SECOND on precedent density, behind
+  the config class and ahead of the harness class. `guard-kit/lib/guard.sh` alone is 1,243 lines
+  of it, and its port-versus-declare disposition is DECIDED by this cut rather than separately
+  takeable.
+  **What this cut owes is the class ruling and the declarations it licenses — not a count.** Any
+  port work the ruling turns out to create is FILED as its own entry, never absorbed here.
+  **Cost while deferred:** low and recurring — every kit cut from here pays the same argument, and
+  a cut that declares without stating the ground leaves precedent-by-example behind it.
+  ruled: kit-lib-port-disposition-cohort lead 2026-08-29 own-authority
+  ruled: kit-lib-port-disposition-cohort operator 2026-08-30 lead-relay
+  Filed 2026-08-29 by spec, under the lead ruling that resolved the drift-kit cut's
+  four declarations.
 
 - **harness-template-port-disposition** [spec: SPEC-harness-template-port.md] — the vendored hook
   and guard templates are uniformly owed and no sibling declaration exists on
@@ -156,10 +120,10 @@
   day: that class turns on an existing sibling declaration its members lack;
   this one turns on there being no declaration anywhere and no ground yet
   stated. Neither implies the other's answer.
-  **IN THE `port-declaration-cohort` UNIT SET AS CUT 3 OF 3 — ruled 2026-08-30 (operator,
-  lead-relay).** Width, stated per cut and never inherited: **17 files, 965 lines** (eleven
-  templates at 591, six `scripts/` copies at 374). Sequenced LAST on precedent density, and it is
-  last because it has NONE — no declaration on either side, no ground ever stated.
+  **IN THE `port-declaration-cohort-and-windows-leg` UNIT SET AS CUT 3 OF 3 — ruled 2026-08-30
+  (operator, lead-relay).** Width, stated per cut and never inherited: **17 files, 965 lines**
+  (eleven templates at 591, six `scripts/` copies at 374). Sequenced LAST on precedent density,
+  and it is last because it has NONE — no declaration on either side, no ground ever stated.
   **THIS IS THE CLASS WHERE A PARTIAL-PORT OUTCOME IS LIVE, and the unit set was ruled without
   assuming otherwise.** Its members are executable harness and git-hook mechanism a vendored tree
   invokes on disk, which is neither the config class's edit-seam ground nor the lib class's
@@ -173,42 +137,48 @@
   Filed 2026-08-30 by close from the gap inbox; line counts re-derived at the
   drain against the tree arm.
 
+- **no-port-cause-validation-scoped-to-registry** [spec: SPEC-port-declaration-shape.md] — the
+  malformed-shape validation for port-disposition declarations reaches only
+  registered gates, where the field is rarest, and never the tree-wide
+  population where it actually lives.
+  **Verified at the 2026-08-30 drain by source, not by reading the DoD.**
+  `check-gate-substrate-parity` assertion G validates the declaration's
+  malformed shapes — empty cause, no slug, both fields, duplicate field,
+  field-on-descriptor — only along registered-gate declaration paths, resolved
+  through its assertion-A loop over `gates.list` members. **No registered gate
+  carries either field today**: the sole `.gate` file mentioning them does so
+  in a `spec:` line describing them, not as a declaration. The assertion is
+  therefore VACUOUS on its own corpus right now.
+  **Meanwhile the field's stated domain is "any tracked script"**, and dozens
+  of files outside `gates.list` carry a port disposition today: `scripts/*.sh`,
+  kit `lib/*.sh`, kit `templates/*.sh`, the hook generator, and the 17
+  tree-wide declarations the smoke cut added on 2026-08-30. None is a
+  registered gate, so none is ever read by assertion G.
+  **And no sibling covers it**: `check-gate-exemption-tasks`' tree-wide loop
+  validates only slug-liveness for the temporary field —
+  `native/src/gates/gate_exemption_tasks.rs:449-450` matches the temporary
+  disposition and continues past everything else, so it never touches the
+  permanent field. The gap bullet cited line 447; the arm is at 449-450, and
+  the finding is unaffected.
+  **IN THE `port-declaration-cohort-and-windows-leg` UNIT SET AS THE ENFORCEMENT-FIRST PAIR —
+  ruled 2026-08-30 (operator, lead-relay).** It rides the three cuts rather than taking a cut
+  number: those cuts license up to 44 new tree-wide declarations, every one of them outside
+  `gates.list` and so outside the only validation that exists, which would ship the largest single
+  batch of unchecked causes the field has ever taken. Enforcement-first says the widening lands
+  WITH the declarations it must check, not after them — so the widened scan is this unit set's,
+  and its own sequencing inside the iteration is build's to order against whichever cut lands
+  first.
+  **Cost while deferred:** every cause added outside `gates.list`, which is
+  the overwhelming majority of the field's real population, is checked for
+  well-formedness by human reading rather than by an oracle, silently — and
+  DoD language elsewhere in the tree may already over-claim this coverage.
+  ruled: no-port-cause-validation-scoped-to-registry operator 2026-08-30 lead-relay
+  Filed 2026-08-30 by close from the gap inbox; the parity gate's own source
+  was re-read at the drain before this was written.
+
 ## Technical Debt
 
-## Deferred
-
-- **drain-order-retroactive-debt-sweep** [design-pending] — apply the 2026-08-30 drain-order
-  ruling to the pool it was measured against: the ten entries the last drain promoted, none of
-  which was tried against →fix or →icebox before it was written.
-  **Operator-directed at the 2026-08-30 consult, filed directly under CLAUDE.md §Housekeeping's
-  sanctioned exception.** The ruling (TRAJECTORY.md, lifecycle-kit/SPEC.md §The committed gap
-  inbox) orders the drain fix → icebox → promote for new intake; this unit runs the same triage
-  once over the entries already promoted, so the ruling is tested on the fortnight's evidence
-  rather than only on what arrives next.
-  **The cohort, by the 2026-08-30 drain commit `40ff7930`:** `kit-config-template-port-disposition`,
-  `harness-template-port-disposition`, `declaration-shape-outside-header-unreadable`,
-  `inline-interpreter-substrate-census`, `entry-compression-contract-unenforced`,
-  `no-port-cause-validation-scoped-to-registry`, `boundary-preserve-covers-names-not-lifetimes`,
-  `stage-journal-absence-caught-only-downstream`, `enter-stage-flag-position-silently-ignored`,
-  `stamp-provenance-remedy-loops-when-uncommitted`.
-  **Deliverable:** every one of the ten takes exactly one of three exits, stated per slug in the
-  landing commit — **fixed** (debt-shaped by the interstitial litmus, test-and-doc-complete, its
-  slug on a bare `## Done` line), **iceboxed** (machinery finding blocking no entry or push,
-  compressed to the one-line grammar), or **kept** with the one sentence saying which of the two
-  it failed. Two are known defects with a fix the entry already names —
-  `enter-stage-flag-position-silently-ignored` (a trailing `--simulate` performs a real stamp)
-  and `stamp-provenance-remedy-loops-when-uncommitted` (a gate's help prescribes a remedy that
-  does not clear its red) — and the planning assumption is that those two fix, the two
-  port-disposition entries keep (they name live port work), and the rest icebox.
-  **Why [design-pending]:** per-slug exits are judgments the unit makes at build, not now;
-  recovery of each body is mandatory before ruling on it.
-  **Cost while deferred:** low, and it compounds — each close under the new order files new
-  intake correctly while the measured backlog keeps its old shape, so the `qnet` the ruling's
-  discharge event reads stays flattered by nothing this unit would have retired.
-  ruled: drain-order-retroactive-debt-sweep operator 2026-08-30 consult
-  Filed 2026-08-30 by the consult session, operator-directed.
-
-- **platform-support-ci-matrix** [design-pending] [roadmap: next/reliability]
+- **platform-support-ci-matrix** [roadmap: next/reliability]
   [precondition-ok: run-observed]
   — a CI leg that PRODUCES AND EXERCISES a Windows gate-binary artifact, which is
   gate-sdk/SPEC.md §Consumer payload's join condition for `x86_64-pc-windows-msvc`. Five rounds
@@ -247,17 +217,51 @@
   **Cost while deferred:** the one adopter class with a named days-to-weeks adoption window still
   has no working install path on Windows, and `powershell-installer-surface` — the port sequence's
   one remaining member — stays sequenced behind this entry.
-  **IN THE `port-declaration-cohort` UNIT SET AS THE RIDER, AND IT STOPS AT GREEN — ruled
-  2026-08-30 (operator, lead-relay).** Round 6 rides the iteration's single close push. On green,
-  drop `continue-on-error` on the job comment's own stated trigger and STOP: the `targets.list`
-  join above is separately measured work and does not enter this iteration. On a NEW red cause,
-  file the finding and defer — do not loop; the one-to-two push budget is what the stop protects.
+  **IN THE `port-declaration-cohort-and-windows-leg` UNIT SET AS THE RIDER, AND IT STOPS AT GREEN
+  — ruled 2026-08-30 (operator, lead-relay).** Round 6 rides the iteration's single close push. On
+  green, drop `continue-on-error` on the job comment's own stated trigger and STOP: the
+  `targets.list` join above is separately measured work and does not enter this iteration. On a
+  NEW red cause, file the finding and defer — do not loop; the one-to-two push budget is what the
+  stop protects.
   ruled: platform-support-ci-matrix operator 2026-08-27 lead-relay
   ruled: platform-support-ci-matrix operator 2026-08-30 lead-relay
   Filed 2026-07-26 by scope, split from `platform-support-contract`; Linux split 2026-08-25, macOS
   08-26. Promoted and deferred 2026-08-25, 08-26, 08-27; promoted 2026-08-30 by scope, demoted
   2026-08-30 by close on the red round-5 observation the close push itself bought — the
   drain-exempt residue path, now spent and that tag dropped from the lead line.
+
+## Deferred
+
+- **drain-order-retroactive-debt-sweep** [design-pending] — apply the 2026-08-30 drain-order
+  ruling to the pool it was measured against: the ten entries the last drain promoted, none of
+  which was tried against →fix or →icebox before it was written.
+  **Operator-directed at the 2026-08-30 consult, filed directly under CLAUDE.md §Housekeeping's
+  sanctioned exception.** The ruling (TRAJECTORY.md, lifecycle-kit/SPEC.md §The committed gap
+  inbox) orders the drain fix → icebox → promote for new intake; this unit runs the same triage
+  once over the entries already promoted, so the ruling is tested on the fortnight's evidence
+  rather than only on what arrives next.
+  **The cohort, by the 2026-08-30 drain commit `40ff7930`:** `kit-config-template-port-disposition`,
+  `harness-template-port-disposition`, `declaration-shape-outside-header-unreadable`,
+  `inline-interpreter-substrate-census`, `entry-compression-contract-unenforced`,
+  `no-port-cause-validation-scoped-to-registry`, `boundary-preserve-covers-names-not-lifetimes`,
+  `stage-journal-absence-caught-only-downstream`, `enter-stage-flag-position-silently-ignored`,
+  `stamp-provenance-remedy-loops-when-uncommitted`.
+  **Deliverable:** every one of the ten takes exactly one of three exits, stated per slug in the
+  landing commit — **fixed** (debt-shaped by the interstitial litmus, test-and-doc-complete, its
+  slug on a bare `## Done` line), **iceboxed** (machinery finding blocking no entry or push,
+  compressed to the one-line grammar), or **kept** with the one sentence saying which of the two
+  it failed. Two are known defects with a fix the entry already names —
+  `enter-stage-flag-position-silently-ignored` (a trailing `--simulate` performs a real stamp)
+  and `stamp-provenance-remedy-loops-when-uncommitted` (a gate's help prescribes a remedy that
+  does not clear its red) — and the planning assumption is that those two fix, the two
+  port-disposition entries keep (they name live port work), and the rest icebox.
+  **Why [design-pending]:** per-slug exits are judgments the unit makes at build, not now;
+  recovery of each body is mandatory before ruling on it.
+  **Cost while deferred:** low, and it compounds — each close under the new order files new
+  intake correctly while the measured backlog keeps its old shape, so the `qnet` the ruling's
+  discharge event reads stays flattered by nothing this unit would have retired.
+  ruled: drain-order-retroactive-debt-sweep operator 2026-08-30 consult
+  Filed 2026-08-30 by the consult session, operator-directed.
 
 - **declaration-shape-outside-header-unreadable** [design-pending] — a
   port-disposition string outside a file's header block is not a declaration,
