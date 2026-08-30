@@ -12,6 +12,44 @@
 
 ## New Features
 
+- **no-port-cause-validation-scoped-to-registry** [spec: SPEC-port-declaration-shape.md] — the
+  malformed-shape validation for port-disposition declarations reaches only
+  registered gates, where the field is rarest, and never the tree-wide
+  population where it actually lives.
+  **Verified at the 2026-08-30 drain by source, not by reading the DoD.**
+  `check-gate-substrate-parity` assertion G validates the declaration's
+  malformed shapes — empty cause, no slug, both fields, duplicate field,
+  field-on-descriptor — only along registered-gate declaration paths, resolved
+  through its assertion-A loop over `gates.list` members. **No registered gate
+  carries either field today**: the sole `.gate` file mentioning them does so
+  in a `spec:` line describing them, not as a declaration. The assertion is
+  therefore VACUOUS on its own corpus right now.
+  **Meanwhile the field's stated domain is "any tracked script"**, and dozens
+  of files outside `gates.list` carry a port disposition today: `scripts/*.sh`,
+  kit `lib/*.sh`, kit `templates/*.sh`, the hook generator, and the 17
+  tree-wide declarations the smoke cut added on 2026-08-30. None is a
+  registered gate, so none is ever read by assertion G.
+  **And no sibling covers it**: `check-gate-exemption-tasks`' tree-wide loop
+  validates only slug-liveness for the temporary field —
+  `native/src/gates/gate_exemption_tasks.rs:449-450` matches the temporary
+  disposition and continues past everything else, so it never touches the
+  permanent field. The gap bullet cited line 447; the arm is at 449-450, and
+  the finding is unaffected.
+  **IN THE `port-declaration-cohort` UNIT SET AS THE ENFORCEMENT-FIRST PAIR — ruled 2026-08-30
+  (operator, lead-relay).** It rides the three cuts rather than taking a cut number: those cuts
+  license up to 44 new tree-wide declarations, every one of them outside `gates.list` and so
+  outside the only validation that exists, which would ship the largest single batch of unchecked
+  causes the field has ever taken. Enforcement-first says the widening lands WITH the declarations
+  it must check, not after them — so the widened scan is this unit set's, and its own sequencing
+  inside the iteration is build's to order against whichever cut lands first.
+  **Cost while deferred:** every cause added outside `gates.list`, which is
+  the overwhelming majority of the field's real population, is checked for
+  well-formedness by human reading rather than by an oracle, silently — and
+  DoD language elsewhere in the tree may already over-claim this coverage.
+  ruled: no-port-cause-validation-scoped-to-registry operator 2026-08-30 lead-relay
+  Filed 2026-08-30 by close from the gap inbox; the parity gate's own source
+  was re-read at the drain before this was written.
+
 - **kit-lib-port-disposition-cohort** [spec: SPEC-kit-lib-port.md] — every kit's `lib/*.sh` is
   owed by the port oracle and only two are dispositioned, so the class still has no ruling and
   each cut re-argues it.
@@ -314,44 +352,6 @@
   entries are exactly the ones paying it.
   Filed 2026-08-30 by close from the gap inbox; both of the owning spec's
   concessions were re-read at the drain.
-
-- **no-port-cause-validation-scoped-to-registry** [design-pending] — the
-  malformed-shape validation for port-disposition declarations reaches only
-  registered gates, where the field is rarest, and never the tree-wide
-  population where it actually lives.
-  **Verified at the 2026-08-30 drain by source, not by reading the DoD.**
-  `check-gate-substrate-parity` assertion G validates the declaration's
-  malformed shapes — empty cause, no slug, both fields, duplicate field,
-  field-on-descriptor — only along registered-gate declaration paths, resolved
-  through its assertion-A loop over `gates.list` members. **No registered gate
-  carries either field today**: the sole `.gate` file mentioning them does so
-  in a `spec:` line describing them, not as a declaration. The assertion is
-  therefore VACUOUS on its own corpus right now.
-  **Meanwhile the field's stated domain is "any tracked script"**, and dozens
-  of files outside `gates.list` carry a port disposition today: `scripts/*.sh`,
-  kit `lib/*.sh`, kit `templates/*.sh`, the hook generator, and the 17
-  tree-wide declarations the smoke cut added on 2026-08-30. None is a
-  registered gate, so none is ever read by assertion G.
-  **And no sibling covers it**: `check-gate-exemption-tasks`' tree-wide loop
-  validates only slug-liveness for the temporary field —
-  `native/src/gates/gate_exemption_tasks.rs:449-450` matches the temporary
-  disposition and continues past everything else, so it never touches the
-  permanent field. The gap bullet cited line 447; the arm is at 449-450, and
-  the finding is unaffected.
-  **IN THE `port-declaration-cohort` UNIT SET AS THE ENFORCEMENT-FIRST PAIR — ruled 2026-08-30
-  (operator, lead-relay).** It rides the three cuts rather than taking a cut number: those cuts
-  license up to 44 new tree-wide declarations, every one of them outside `gates.list` and so
-  outside the only validation that exists, which would ship the largest single batch of unchecked
-  causes the field has ever taken. Enforcement-first says the widening lands WITH the declarations
-  it must check, not after them — so the widened scan is this unit set's, and its own sequencing
-  inside the iteration is build's to order against whichever cut lands first.
-  **Cost while deferred:** every cause added outside `gates.list`, which is
-  the overwhelming majority of the field's real population, is checked for
-  well-formedness by human reading rather than by an oracle, silently — and
-  DoD language elsewhere in the tree may already over-claim this coverage.
-  ruled: no-port-cause-validation-scoped-to-registry operator 2026-08-30 lead-relay
-  Filed 2026-08-30 by close from the gap inbox; the parity gate's own source
-  was re-read at the drain before this was written.
 
 - **boundary-preserve-covers-names-not-lifetimes** [design-pending] — the
   iteration-boundary keep-list enumerates named members where the property it
