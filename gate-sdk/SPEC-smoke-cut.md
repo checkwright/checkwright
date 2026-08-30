@@ -177,7 +177,7 @@ must land on this ruling, not re-open the question it already answers.
 Each of the seventeen gains a header `# no-port:` line naming the leg its own
 membership rests on and citing the new §Consumer smoke subsection delta 3 adds —
 stated rather than cited-by-example, the discipline the drift-kit cut's own four
-declarations established for a class that has never been swept. The eleven
+declarations established for a class that has never been swept. The fifteen
 per-kit scripts cite legs 2 and 3; the two harness members cite leg 1. {mechanical}
 
 `drift-kit/smoke/install.sh`'s `# port-until: kit-smoke-port-disposition-cohort`
