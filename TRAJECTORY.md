@@ -368,7 +368,19 @@ also records the refused net-growth gate. **A finding about the delivery machine
 the lifecycle, queue, guard or drift tooling as it governs this tree, as opposed to the kits as
 product — that blocks no stage entry and no push is icebox-class by default**: it lands as one
 line under queue-kit/SPEC.md §The icebox tier's grammar and returns on a real recurrence by the
-conserved route that tier already has. The ground is the objectives: every dollar an iteration
+conserved route that tier already has. **That class has a witness discriminator, ruled
+2026-08-30 by the operator when the role clause just above proved to under-determine it in a
+repo that dogfoods its own kits: a finding is machinery-class when its only demand witness is
+this repo's own delivery process, and product when an adopter-facing claim — the install path, a
+gate's verdict, the payload, a front-door statement — witnesses or would witness it, wherever
+the fix lands.** Two readings were refused with it, and their grounds are what make the
+discriminator non-obvious. Reading the class by *where the fix lands* alone empties this ruling's
+own measured class, since the drained ten were mostly fixes landing in shipped kit code, and a
+reading that voids its ruling's evidence base is wrong. Reading it by *subject* alone misbins an
+adopter-reaching defect that dogfooding happened to find, the MSYS resolver being the worked
+instance. The discriminator qualifies this default and retires with it on the discharge event
+below, rather than outliving the paragraph it exists to make operable.
+The ground is the objectives: every dollar an iteration
 spends on the machinery's self-findings is a dollar the port track and the Windows leg do not
 get, at seventy to one hundred and eighty dollars an iteration measured over the last eight, and
 the machinery has been finding defects in itself faster than any iteration retires them. The

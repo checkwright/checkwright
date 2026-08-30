@@ -225,7 +225,23 @@ trigger is a **live, unbuilt queue slug** the entry names, a dated `recurrence:`
 line, or a `[roadmap:]` tag. A trigger that is itself gated on launch — a first
 external adopter, a preview cohort, an install count — is **dormant**: the entry
 waits in the icebox until the event occurs and returns on it, which is the round
-trip the tier already conserves. The cost field's opening token is the class word the
+trip the tier already conserves.
+
+**A self-citing set does not manufacture its own liveness.** Where a consumer
+classifies a *set* of entries dormant as a class, citations from one member of
+that set to another do not count as live triggers for its members; only the
+blocks-nothing criterion governs. Without this the live-slug limb inverts the
+eligibility rule exactly where a class disposition is most wanted: members of a
+mutually-citing set each name another live unbuilt slug, so every one of them
+holds a live trigger, and the larger and better cross-referenced the set the
+more certainly none of it ever qualifies. The safety valve is the round trip the
+tier already conserves rather than a new mechanism — a member that genuinely
+re-fires returns on a real recurrence, which is a trigger arriving from outside
+the set and therefore untouched by this clause. Nothing here narrows a
+`[roadmap:]` tag or a dated `recurrence:` line, both of which stay live inside
+such a set exactly as they are outside one.
+
+The cost field's opening token is the class word the
 `--icebox-candidates` arm reads (`low`, `zero`, `bounded`, `cosmetic`), so a
 cost field that opens in prose has declared no class and is read as not-low;
 authoring the class word first is the contract, and the gate that holds it is
