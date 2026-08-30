@@ -57,13 +57,11 @@
   roadmap-summary: A CI install-smoke leg per supported platform, or an honest label.
   **PRODUCED AND EXERCISED ARE BOTH DISCHARGED — round 5 (`33298006656`, head `fb9ed980`,
   2026-08-30) is the first run in this project's history to execute gates on Windows.** The leg
-  synthesizes a host-triple roster, so it built `checkwright-gates.exe` (3,217,408 bytes) for
-  `x86_64-pc-windows-msvc`, packed it (`1 prebuilt gate binary/binaries`), installed from the
-  tarball and ran the battery through it. Not an omit-and-declare install, which is what makes it
-  an exercise. Rounds 3-4's PRODUCED claim is superseded by this stronger one rather than restated;
-  blocker 5 (shellcheck) and blocker 6 (the MSYS resolver, repaired at `48cff8d3`) are both now
-  MEASURED rather than read, steps 1-8 of the leg being green — so batch 4's `on_path` repair has
-  its first honest measurement too, the one this entry called owed for two rounds.
+  synthesized a host-triple roster, built `checkwright-gates.exe` for `x86_64-pc-windows-msvc`,
+  packed it, installed from the tarball and ran the battery through it — not an omit-and-declare
+  install, which is what makes it an exercise. Steps 1-8 green, so blocker 5 (shellcheck) and
+  blocker 6 (the MSYS resolver, repaired at `48cff8d3`) are MEASURED rather than read, and batch
+  4's `on_path` repair has the honest measurement this entry called owed for two rounds.
   **WHAT REMAINS IS A GREEN RUN, and the gap is now two named gates rather than a class.**
   `2 of 10 gates FAILED: check-graph check-install-disposition` — eight pass natively.
   `check-graph` reports `gen-pre-commit.sh --emit failed` and `--emit-commit-msg failed`, so the
@@ -82,14 +80,17 @@
   job's own comment drops it "on the run it is first observed green and not before", and round 5
   was observed RED. `x86_64-pc-windows-msvc` stays off `native/targets.list` on the same fact.
   **The join half is more expensive than a line edit, and that is measured rather than assumed.**
-  `native/targets.list:43-48` owns it: the consumer smoke builds its artifact from the host it runs
-  on and refuses a roster naming a platform that host is not, so the join needs steering or a
-  cross-compiling build, "neither built ahead of the second target". Budget it as work, not a line.
-  **Platform probes are clean and need no re-buying**: `[[ -x ]]` holds on a fresh shebang script
-  and on npm's bin shim, direct execution reaches, 260-char depth written.
+  `native/targets.list:43-48` owns it: the consumer smoke builds from the host it runs on and
+  refuses a roster naming another platform, so the join needs steering or a cross-compiling build.
+  **Probes clean**: `[[ -x ]]` holds on a shebang and npm's shim, both execute; 260-char depth OK.
   **Cost while deferred:** the one adopter class with a named days-to-weeks adoption window still
   has no working install path on Windows, and `powershell-installer-surface` — the port sequence's
   one remaining member — stays sequenced behind this entry.
+  **IN THE `port-declaration-cohort` UNIT SET AS THE RIDER, AND IT STOPS AT GREEN — ruled
+  2026-08-30 (operator, lead-relay).** Round 6 rides the iteration's single close push. On green,
+  drop `continue-on-error` on the job comment's own stated trigger and STOP: the `targets.list`
+  join above is separately measured work and does not enter this iteration. On a NEW red cause,
+  file the finding and defer — do not loop; the one-to-two push budget is what the stop protects.
   ruled: platform-support-ci-matrix operator 2026-08-27 lead-relay
   ruled: platform-support-ci-matrix operator 2026-08-30 lead-relay
   Filed 2026-07-26 by scope, split from `platform-support-contract`; Linux split 2026-08-25, macOS
@@ -123,10 +124,19 @@
   surface running before any binary exists) and runtime sole-resolver (the
   config bridge has no other producer). This one's ground is the edit seam.
   Same shape, three grounds, deliberately not averaged.
+  **IN THE `port-declaration-cohort` UNIT SET AS CUT 1 OF 3 — ruled 2026-08-30 (operator,
+  lead-relay).** Width, stated per cut and never inherited: **11 files, 113 lines** (seven kit
+  `templates/*-config.sh` at 24 lines, four `scripts/` consumer copies at 89). Sequenced FIRST of
+  the three on precedent density — it is the only one of the three carrying a sibling declaration
+  on its own ground, so it is the cheapest to argue and the argument informs the two after it.
+  **The deliverable is the class RULING plus whatever declarations it licenses, not a guaranteed
+  count.** If the ruling comes back *port* for any member, the port work is FILED as its own entry
+  under scope-gated intake, never absorbed into this iteration's envelope.
   **Cost while deferred:** it inflates the operator-ruled completion predicate
   by about ten files for a class already ruled structural elsewhere, and no
   gate asserts disposition parity across identically shaped siblings, so the
   next port cut meets the question undecided again.
+  ruled: kit-config-template-port-disposition operator 2026-08-30 lead-relay
   Filed 2026-08-30 by close from the gap inbox; premises re-verified against
   the port oracle at the drain.
 
@@ -157,10 +167,20 @@
   day: that class turns on an existing sibling declaration its members lack;
   this one turns on there being no declaration anywhere and no ground yet
   stated. Neither implies the other's answer.
+  **IN THE `port-declaration-cohort` UNIT SET AS CUT 3 OF 3 — ruled 2026-08-30 (operator,
+  lead-relay).** Width, stated per cut and never inherited: **17 files, 964 lines** (eleven
+  templates at 590, six `scripts/` copies at 374). Sequenced LAST on precedent density, and it is
+  last because it has NONE — no declaration on either side, no ground ever stated.
+  **THIS IS THE CLASS WHERE A PARTIAL-PORT OUTCOME IS LIVE, and the unit set was ruled without
+  assuming otherwise.** Its members are executable harness and git-hook mechanism a vendored tree
+  invokes on disk, which is neither the config class's edit-seam ground nor the lib class's
+  sole-resolver ground — so "declare" is not the presumed answer here, and any port work this
+  ruling creates is FILED as its own entry rather than absorbed into the iteration.
   **Cost while deferred:** 964 owed lines whose disposition every future
   stated-contract cut re-meets undecided, and a hook whose port disposition is
   unruled is one a cut may port into the binary while the harness still needs
   an on-disk executable path to invoke.
+  ruled: harness-template-port-disposition operator 2026-08-30 lead-relay
   Filed 2026-08-30 by close from the gap inbox; line counts re-derived at the
   drain against the tree arm.
 
@@ -281,10 +301,18 @@
   disposition and continues past everything else, so it never touches the
   permanent field. The gap bullet cited line 447; the arm is at 449-450, and
   the finding is unaffected.
+  **IN THE `port-declaration-cohort` UNIT SET AS THE ENFORCEMENT-FIRST PAIR — ruled 2026-08-30
+  (operator, lead-relay).** It rides the three cuts rather than taking a cut number: those cuts
+  license up to 44 new tree-wide declarations, every one of them outside `gates.list` and so
+  outside the only validation that exists, which would ship the largest single batch of unchecked
+  causes the field has ever taken. Enforcement-first says the widening lands WITH the declarations
+  it must check, not after them — so the widened scan is this unit set's, and its own sequencing
+  inside the iteration is build's to order against whichever cut lands first.
   **Cost while deferred:** every cause added outside `gates.list`, which is
   the overwhelming majority of the field's real population, is checked for
   well-formedness by human reading rather than by an oracle, silently — and
   DoD language elsewhere in the tree may already over-claim this coverage.
+  ruled: no-port-cause-validation-scoped-to-registry operator 2026-08-30 lead-relay
   Filed 2026-08-30 by close from the gap inbox; the parity gate's own source
   was re-read at the drain before this was written.
 
@@ -421,52 +449,52 @@
   — the whole battery onto the binary, and the shell surface down to its residue.
   roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
   It DEMOTES at build, never `## Done` — canon-kit/SPEC.md §Merging an amendment's corpus branch.
-  **Operator-ruled 2026-08-09: complete the port, ASAP** — that ruling, its grounds, its
-  supersession of the 2026-08-06 measurement-locus clause, the scope, both install paths and the
-  tail are [TRAJECTORY.md](TRAJECTORY.md) §PRIORITY DIRECTIVE's and are not restated; this entry is
-  the work, bootstrap design included, and inherits gate-sdk/SPEC.md §Porting a gate to the binary
-  substrate and §Consumer payload. **Every closed cohort and cut — members, counts, holds, grounds,
-  price — is recorded at gate-sdk/SPEC.md §The first cohort, so this entry states what remains.**
+  **Operator-ruled 2026-08-09: complete the port, ASAP** — that ruling, its grounds, its scope,
+  both install paths and the tail are [TRAJECTORY.md](TRAJECTORY.md) §PRIORITY DIRECTIVE's, not
+  restated; this entry is the work, bootstrap design included, inheriting gate-sdk/SPEC.md
+  §Porting a gate to the binary substrate and §Consumer payload. **Each closed cut's record —
+  members, counts, holds, grounds, price — lives in the contract section that cut selected**, so
+  this entry states only what remains (drift-kit/SPEC.md §The KPI plugin contract, gate-sdk/SPEC.md
+  §Consumer smoke, *The port disposition*).
   Cut widths are ruled **per cut and never inherited**; the size arm is **permanently** exhausted.
-  **THE COMPOSER DOES NOT REACH THE TREE REMAINDER.** `--emit port-blockers --group` walks the
-  **gate registry**, reporting 0 owed and 0 takeable — a finished battery, and a registry arm
-  reading zero "says nothing about the tree". Only `--tree` is the predicate; `ported-gate-members`
-  answers neither, and `--tree`'s owed count RISES when a non-gate shell file lands, which is that
-  predicate working. **Neither count is printed; run both arms** — four sweeps found a digit stale
-  here. **THE COMPOSER IS RULED 2026-08-28: select the next cut by STATED CONTRACT** — the owed
+  **THE COMPOSER DOES NOT REACH THE TREE REMAINDER** — the registry arm answers for the battery,
+  only `--tree` is the predicate, and both arms are run. That two-axis misreading, the rise in owed
+  on a landing shell file, and the bounds are gate-sdk/SPEC.md §port-blockers'.
+  **THE COMPOSER IS RULED 2026-08-28: select the next cut by STATED CONTRACT** — the owed
   files behind one specification section, ported behind the one amendment that section needs. Size-
-  and kit-ordered composers stay refused. **TWO CUTS HAVE LANDED UNDER IT**, each recorded in the
-  contract it selected: drift-kit's 18 behind §The KPI plugin contract, 14 ported + 4 declared,
-  2026-08-29; §Consumer smoke's 17, **ALL DECLARED, NO RUST**, 2026-08-30 — the class ruling, its
-  four legs and its reopening condition at gate-sdk/SPEC.md §Consumer smoke, The port disposition.
-  `--tree` moved 141 -> 123 -> 102 owed. **(1) A CUT NARROWS THE PORT, NEVER AN EXTENSION
-  POINT.** Where a kit ships a consumer-facing plugin or config seam, that seam's resolution, direct
-  execution and env contract survive and only the bundled members move in-crate; the ground is the
-  porting kit's OWN governed surfaces plus CLAUDE.md §The provenance seam, never analogy to a
-  sibling cut — worked at drift-kit/SPEC.md §The extensibility contract. **(2) SETTINGS
+  and kit-ordered composers stay refused. **IT CONSTRAINS SELECTION, NOT ITERATION PACKAGING —
+  ruled 2026-08-30 (operator, lead-relay):** the clauses above say what makes ONE cut well-formed;
+  how many an iteration holds is owned elsewhere. Refused with it — three cohorts as ONE cut, which
+  fails this ruling's own words (*one* section, *the one* amendment) and averages the grounds all
+  three entries forbid, shared setup being logistics; and one cut per iteration, an over-read
+  paying three iteration floors for no added decision quality.
+  **(1) A CUT NARROWS THE PORT, NEVER AN EXTENSION POINT.** Where a kit ships a consumer-facing
+  plugin or config seam, that seam's resolution, direct execution and env contract survive and only
+  the bundled members move in-crate; the ground is the porting kit's OWN governed surfaces plus
+  CLAUDE.md §The provenance seam, never analogy — worked at drift-kit/SPEC.md §The extensibility
+  contract. **(2) SETTINGS
   GRANTS, RULED 2026-08-29 (operator, lead-relay):** removing a permission grant whose target a
-  RULED PORT CUT DELETES is OUTSIDE the 2026-08-22 bar — a pure narrowing forced by the cut, the
-  delete's authority already ruled — and build removes the dead lines IN THE SAME COMMIT AS THE
-  DELETE, the window the requirement exists to close. The bar stands unchanged for every other
-  permission-settings edit: a carve-out for one class. Scope is the files THAT COMMIT deletes, never
-  a path prefix — drift-kit's own grant count went two -> EIGHT under probe, four of them live.
+  RULED PORT CUT DELETES is OUTSIDE the 2026-08-22 bar — a pure narrowing forced by the cut — and
+  build removes the dead lines IN THE SAME COMMIT AS THE DELETE, the window the requirement exists
+  to close. The bar stands unchanged for every other permission-settings edit: a carve-out for one
+  class. Scope is the files THAT COMMIT deletes, never a path prefix — probe the count, never
+  assume it, the attested probe having quadrupled one kit's.
   ruled: native-gate-port-remaining-corpus lead 2026-08-28 own-authority
   ruled: native-gate-port-remaining-corpus operator 2026-08-28 lead-relay
   ruled: native-gate-port-remaining-corpus lead 2026-08-29 own-authority
   ruled: native-gate-port-remaining-corpus operator 2026-08-29 lead-relay
+  ruled: native-gate-port-remaining-corpus operator 2026-08-30 lead-relay
   **Cost while deferred:** large and known — the **owed** remainder (the trailer's own arm, never
-  the unported count) plus the runners and the install-lifecycle layer; since the 2026-08-14
-  born-native default a gate landed meanwhile no longer adds shell to it. Not a single-iteration
-  delta, and criterion relaxation is closed at gate-sdk/SPEC.md §The port-candidate criteria — an
-  ordering signal, never an eligibility screen. `gate-battery-result-cache` is the one battery entry
-  the port has not subsumed; `powershell-installer-surface` is the sequence's one remaining member.
-  **The PRIORITY DIRECTIVE has yielded FOUR times — 2026-08-22, twice 2026-08-24, 2026-08-27 — each
-  for one named iteration alone and NONE a reversal**: a yield spends one iteration's turn, never
-  the sequence's claim on the next. **A FIFTH YIELD IS NOT A LEAD'S TO RULE — 2026-08-29**: the
-  composer ruling and the hold release are both recorded, so yielding re-scopes a recorded operator
-  ruling, and a cut arguing for one ESCALATES rather than being narrowed in-session. Filed
-  2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction; cohorts ruled at scope
-  2026-08-11/12; promoted at spec and demoted at build once per increment since.
+  the unported count) plus the runners and the install-lifecycle layer. Not a single-iteration
+  delta; criterion relaxation is closed at gate-sdk/SPEC.md §The port-candidate criteria, an
+  ordering signal and never an eligibility screen. `gate-battery-result-cache` is the one battery
+  entry unsubsumed; `powershell-installer-surface` is the sequence's last member.
+  **A FIFTH YIELD IS NOT A LEAD'S TO RULE — 2026-08-29.** The directive has yielded four times,
+  each for one named iteration and none a reversal — a yield spends one iteration's turn, never
+  the sequence's claim on the next — and a further one re-scopes a recorded operator ruling, so a
+  cut arguing for one ESCALATES rather than being narrowed in-session.
+  Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction; cohorts ruled at
+  scope 2026-08-11/12; promoted at spec and demoted at build once per increment since.
 
 - **kit-lib-port-disposition-cohort** [design-pending] — every kit's `lib/*.sh` is owed by the port
   oracle and only two are dispositioned, so the class still has no ruling and each cut re-argues it.
@@ -489,9 +517,18 @@
   **What this entry owes:** the census (how many kit `lib/*.sh` are owed, which are sole resolvers
   for their kit's bridge and which are not), then one ruling for the class rather than per cut.
   Re-derive the count rather than reading one here — it moves with every ported file.
+  **IN THE `port-declaration-cohort` UNIT SET AS CUT 2 OF 3 — ruled 2026-08-30 (operator,
+  lead-relay).** Width, stated per cut and never inherited: **16 files, 3,588 lines** — by far the
+  heaviest of the three by line count and the lightest by argument, since two members already carry
+  declarations on the stated ground. Sequenced SECOND on precedent density, behind the config class
+  and ahead of the harness class. `guard-kit/lib/guard.sh` alone is 1,243 lines of it, and its
+  port-versus-declare disposition is DECIDED by this cut rather than separately takeable.
+  **What this cut owes is the class ruling and the declarations it licenses — not a count.** Any
+  port work the ruling turns out to create is FILED as its own entry, never absorbed here.
   **Cost while deferred:** low and recurring — every kit cut from here pays the same argument, and
   a cut that declares without stating the ground leaves precedent-by-example behind it.
   ruled: kit-lib-port-disposition-cohort lead 2026-08-29 own-authority
+  ruled: kit-lib-port-disposition-cohort operator 2026-08-30 lead-relay
   Filed 2026-08-29 by spec, under the lead ruling that resolved the drift-kit cut's
   four declarations.
 
@@ -7862,27 +7899,28 @@
   and `stale-identifier-after-retirement`, likely one ticket, though which gate holds it is an open
   ruling in the second entry. (D) `guard-rule-number-not-citable-outside-kit` and
   `guard-rule-number-intra-kit-citations-ungated` are an island and **are the long pole rather than
-  an equal quarter, corrected at the re-run**: (A)-(C) widen gates that already resolve citations,
-  while (D) has no gate to widen at all and an unmeasured false-positive budget over the 111
-  intra-kit citations counted at the last renumber. Size it separately; never average it in.
-  **Two members are unverified**, and one is now measured rather than suspected: Icebox's
-  `false-ground-citation-propagation` is still title-only, and `doctrine-rule-number-citation-
-  liveness` is a forward bet — a 2026-08-27 probe found DOCTRINE.md carrying **zero** `rule N`
-  forms, so the only measured rule-number corpus is guard-kit/SPEC.md, which is (D)'s.
+  an equal quarter**: (A)-(C) widen gates that already resolve citations, while (D) has no gate to
+  widen and an unmeasured false-positive budget over 111 intra-kit citations. Never average it in.
+  **Two members are unverified:** Icebox's `false-ground-citation-propagation` is still title-only,
+  and `doctrine-rule-number-citation-liveness` is a forward bet — a 2026-08-27 probe found
+  DOCTRINE.md carrying **zero** `rule N` forms, so the only measured corpus is (D)'s.
   **Excluded with cause:** `scratch-citation-skill-surface-reach` (self-disclaims, a glob-coverage
   gap), `kit-ref-liveness-stem-token-hole` (env-knob tokens, already checked),
   `fixture-assertion-liveness`, `survey-oracle-liveness-unasserted`. **Adjacent, unfolded:**
   `amendment-landing-citation-assertions` and `amendment-owner-position-citation` share the shape
-  but ride `check-amendment-queue` over a corpus deleted at merge. **A FIFTH touch point sits
-  outside this roster**, filed after the rev and so invisible to the witness:
-  `scratch-citation-introducer-form-reach`, on `check-scratch-citation` — fold or exclude it
-  deliberately.
+  but ride `check-amendment-queue` over a corpus deleted at merge. **A FIFTH touch point**, filed
+  after the rev and invisible to the witness: `scratch-citation-introducer-form-reach`, on
+  `check-scratch-citation` — fold or exclude it deliberately.
   **Size floor:** four gate-touch points, eight to ten new assertions, two report outputs, all
   native-crate — every gate named is already a native module, so the born-native default binds.
+  **FIRST APPLICATION OF THE 2026-08-30 WITNESS DISCRIMINATOR, and the sweep is CLOSE'S TO TAKE,
+  not scope's.** This family is machinery-class — its only demand witness is this repo's own
+  delivery process — so the expected shape is the twenty members iceboxed and THIS entry retained
+  live as the hub. It carries zero inbound edges, so no inbound ranking will ever surface it.
   **Cost while deferred:** the expensive half of the pool's largest measured exit dies at every
   first-stage entry that finds it uncarried, and re-buying it costs a full deferred-pool sweep plus
-  a read of four gate sources — the exact re-derivation the survey record exists to prevent, paid
-  by the scope that would otherwise re-propose the bundle.
+  a read of four gate sources — the re-derivation the survey record exists to prevent.
+  ruled: citation-liveness-family-convergence lead 2026-08-30 own-authority
   Filed 2026-08-25 by close, draining the gap inbox; survey bought at that iteration's scope.
 
 - **init-vendoring-assumes-gnu-findutils** [design-pending] — `checkwright init` enumerates each
