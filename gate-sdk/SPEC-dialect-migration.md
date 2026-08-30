@@ -224,12 +224,17 @@ second grammar for no error class the existing one does not catch, and would mak
 this a two-component amendment for a naming convenience.
 
 **A producer named inside a comment is not an occurrence.** This is a correctness
-requirement, not a nicety: two sites would false-positive today —
-`gate-sdk/gate-tests/check-graph-tree.test.sh` and
+requirement, not a nicety, though the nearest examples in this tree are not live
+counterexamples: `gate-sdk/gate-tests/check-graph-tree.test.sh` and
 `gate-sdk/gate-tests/check-template-copy-parity.test.sh` each name
 `git rev-parse --show-toplevel` in a header comment explaining what their fixture
-pair cannot reach. The gate strips comments before scanning, and the `bad/` fixture
-carries a commented producer as a case that must stay green.
+pair cannot reach, and `walk::tracked_shell_tree` already excludes both — by its
+`*.test.sh` filename filter and by `gate-tests` sitting in the default
+`GATE_PRUNE_DIRS` (`gate-sdk/lib/gate.sh`) — so neither reaches the scanner
+today. The exclusion is corpus configuration, not a property of comments, and a
+producer named in prose in any file the corpus *does* reach would false-positive
+with no such rule. The gate strips comments before scanning on that ground, and
+the `bad/` fixture carries a commented producer as a case that must stay green.
 
 **Fail-closed, and the honest limit.** The gate's verdict is a syntactic property
 of the source, fully exercisable on any host, so its fixture pair is an ordinary
