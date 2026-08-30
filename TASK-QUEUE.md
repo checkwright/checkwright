@@ -12,6 +12,43 @@
 
 ## New Features
 
+- **kit-lib-port-disposition-cohort** [spec: SPEC-kit-lib-port.md] — every kit's `lib/*.sh` is
+  owed by the port oracle and only two are dispositioned, so the class still has no ruling and
+  each cut re-argues it.
+  **The ground has precedent; the COHORT has never been swept, and conflating those is the trap.**
+  `gate-sdk/bin/gen-pre-commit.sh` declares `# no-port:` on exactly this ground — resolving a knob
+  means sourcing the owning kit's lib, and gate-sdk/SPEC.md §lib/gate.sh rules exactly one place a
+  knob's value is computed, so a crate-side resolver is the second producer criterion 6 refuses.
+  `drift-kit/lib/drift.sh` declared on that stated ground at `native-gate-port-remaining-corpus`'s
+  drift-kit cut, 2026-08-29, which is what makes the rest of the class visible.
+  **Corrected 2026-08-30 at scope, two stale premises.** The headline said none had EVER been
+  dispositioned: `gate-sdk/lib/consumer-smoke.sh` is the second, declared under the 2026-08-30
+  smoke class ruling. And the sibling this was filed apart from,
+  `kit-smoke-port-disposition-cohort`, no longer exists — that class was ruled and its owner is now
+  gate-sdk/SPEC.md §Consumer smoke, *The port disposition*. Neither correction touches the ground.
+  **Why a lib is not a smoke harness**, and why the split from that class still holds: a `lib/*.sh`
+  is **load-bearing at runtime** — the config
+  bridge has no other resolver and already-compiled arms source it — so its disposition is a
+  correctness question about the bridge. A smoke harness is a test surface and its question is
+  about bootstrap. Averaging the two grounds would produce a ruling that answers neither.
+  **What this entry owes:** the census (how many kit `lib/*.sh` are owed, which are sole resolvers
+  for their kit's bridge and which are not), then one ruling for the class rather than per cut.
+  Re-derive the count rather than reading one here — it moves with every ported file.
+  **IN THE `port-declaration-cohort` UNIT SET AS CUT 2 OF 3 — ruled 2026-08-30 (operator,
+  lead-relay).** Width, stated per cut and never inherited: **16 files, 3,588 lines** — by far the
+  heaviest of the three by line count and the lightest by argument, since two members already carry
+  declarations on the stated ground. Sequenced SECOND on precedent density, behind the config class
+  and ahead of the harness class. `guard-kit/lib/guard.sh` alone is 1,243 lines of it, and its
+  port-versus-declare disposition is DECIDED by this cut rather than separately takeable.
+  **What this cut owes is the class ruling and the declarations it licenses — not a count.** Any
+  port work the ruling turns out to create is FILED as its own entry, never absorbed here.
+  **Cost while deferred:** low and recurring — every kit cut from here pays the same argument, and
+  a cut that declares without stating the ground leaves precedent-by-example behind it.
+  ruled: kit-lib-port-disposition-cohort lead 2026-08-29 own-authority
+  ruled: kit-lib-port-disposition-cohort operator 2026-08-30 lead-relay
+  Filed 2026-08-29 by spec, under the lead ruling that resolved the drift-kit cut's
+  four declarations.
+
 - **kit-config-template-port-disposition** [spec: SPEC-config-template-port.md] — seven kit config
   templates are counted owed by the port oracle while their drift-kit sibling
   declares no-port, and no entry reaches the class.
@@ -495,42 +532,6 @@
   cut arguing for one ESCALATES rather than being narrowed in-session.
   Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction; cohorts ruled at
   scope 2026-08-11/12; promoted at spec and demoted at build once per increment since.
-
-- **kit-lib-port-disposition-cohort** [design-pending] — every kit's `lib/*.sh` is owed by the port
-  oracle and only two are dispositioned, so the class still has no ruling and each cut re-argues it.
-  **The ground has precedent; the COHORT has never been swept, and conflating those is the trap.**
-  `gate-sdk/bin/gen-pre-commit.sh` declares `# no-port:` on exactly this ground — resolving a knob
-  means sourcing the owning kit's lib, and gate-sdk/SPEC.md §lib/gate.sh rules exactly one place a
-  knob's value is computed, so a crate-side resolver is the second producer criterion 6 refuses.
-  `drift-kit/lib/drift.sh` declared on that stated ground at `native-gate-port-remaining-corpus`'s
-  drift-kit cut, 2026-08-29, which is what makes the rest of the class visible.
-  **Corrected 2026-08-30 at scope, two stale premises.** The headline said none had EVER been
-  dispositioned: `gate-sdk/lib/consumer-smoke.sh` is the second, declared under the 2026-08-30
-  smoke class ruling. And the sibling this was filed apart from,
-  `kit-smoke-port-disposition-cohort`, no longer exists — that class was ruled and its owner is now
-  gate-sdk/SPEC.md §Consumer smoke, *The port disposition*. Neither correction touches the ground.
-  **Why a lib is not a smoke harness**, and why the split from that class still holds: a `lib/*.sh`
-  is **load-bearing at runtime** — the config
-  bridge has no other resolver and already-compiled arms source it — so its disposition is a
-  correctness question about the bridge. A smoke harness is a test surface and its question is
-  about bootstrap. Averaging the two grounds would produce a ruling that answers neither.
-  **What this entry owes:** the census (how many kit `lib/*.sh` are owed, which are sole resolvers
-  for their kit's bridge and which are not), then one ruling for the class rather than per cut.
-  Re-derive the count rather than reading one here — it moves with every ported file.
-  **IN THE `port-declaration-cohort` UNIT SET AS CUT 2 OF 3 — ruled 2026-08-30 (operator,
-  lead-relay).** Width, stated per cut and never inherited: **16 files, 3,588 lines** — by far the
-  heaviest of the three by line count and the lightest by argument, since two members already carry
-  declarations on the stated ground. Sequenced SECOND on precedent density, behind the config class
-  and ahead of the harness class. `guard-kit/lib/guard.sh` alone is 1,243 lines of it, and its
-  port-versus-declare disposition is DECIDED by this cut rather than separately takeable.
-  **What this cut owes is the class ruling and the declarations it licenses — not a count.** Any
-  port work the ruling turns out to create is FILED as its own entry, never absorbed here.
-  **Cost while deferred:** low and recurring — every kit cut from here pays the same argument, and
-  a cut that declares without stating the ground leaves precedent-by-example behind it.
-  ruled: kit-lib-port-disposition-cohort lead 2026-08-29 own-authority
-  ruled: kit-lib-port-disposition-cohort operator 2026-08-30 lead-relay
-  Filed 2026-08-29 by spec, under the lead ruling that resolved the drift-kit cut's
-  four declarations.
 
 - **macos-install-smoke-ci-leg** [design-pending] [roadmap: next/reliability] — a macOS
   install-smoke leg; nothing has ever run green against macOS.
