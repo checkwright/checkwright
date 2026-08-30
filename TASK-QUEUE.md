@@ -66,6 +66,317 @@
   2026-08-30 by close on the red round-5 observation the close push itself bought — the
   drain-exempt residue path, now spent and that tag dropped from the lead line.
 
+- **kit-config-template-port-disposition** [design-pending] — seven kit config
+  templates are counted owed by the port oracle while their drift-kit sibling
+  declares no-port, and no entry reaches the class.
+  **Re-derived at the 2026-08-30 drain rather than taken from the bullet.**
+  `--emit port-blockers --tree` reports the `templates/*-config.sh` of
+  `canon-kit/`, `context-kit/`, `delegation-kit/`, `evidence-kit/`,
+  `guard-kit/`, `lifecycle-kit/` and `queue-kit/` as **owed** — 24 lines
+  between them, most being 2-line stubs — while
+  `drift-kit/templates/drift-config.sh` is **no-port** on a cause naming no
+  drift-kit-specific fact. The asymmetry is structural, not editorial.
+  **The ground the class turns on**: a kit config template IS the adopter's
+  edit seam, so porting it into the binary deletes the thing the adopter is
+  meant to edit. That ground is either right for all eight or right for none.
+  **The same asymmetry recurs one layer down**: `scripts/context-config.sh`,
+  `scripts/delegation-config.sh` and `scripts/evidence-config.sh` are owed
+  while their `scripts/` siblings carry the 2026-08-24 no-port ruling —
+  because that ruling was scoped to the private-vocabulary ground rather than
+  to seam structure, and those three hold no vocabulary.
+  **DISTINCT from `kit-lib-port-disposition-cohort` and from the smoke class
+  ruled 2026-08-30**, re-filing neither: their grounds are bootstrap (a test
+  surface running before any binary exists) and runtime sole-resolver (the
+  config bridge has no other producer). This one's ground is the edit seam.
+  Same shape, three grounds, deliberately not averaged.
+  **Cost while deferred:** it inflates the operator-ruled completion predicate
+  by about ten files for a class already ruled structural elsewhere, and no
+  gate asserts disposition parity across identically shaped siblings, so the
+  next port cut meets the question undecided again.
+  Filed 2026-08-30 by close from the gap inbox; premises re-verified against
+  the port oracle at the drain.
+
+- **harness-template-port-disposition** [design-pending] — the vendored hook
+  and guard templates are uniformly owed with no ground stated anywhere, which
+  is exactly why nothing has ever forced the disposition.
+  **Measured at the 2026-08-30 drain.** Owed, with no declaration on either
+  side: `delegation-kit/templates/` `agent-budget-guard.sh` (18),
+  `agent-dispatch-guard.sh` (61), `statusline-usage.sh` (101),
+  `subagent-stop-liveness.sh` (91), `usage-poller.sh` (67);
+  `guard-kit/templates/` `bash-guard.sh` (20), `escalation-guard.sh` (27),
+  `wakeup-guard.sh` (20); `context-kit/templates/session-context.sh` (133);
+  `lifecycle-kit/templates/workflow-state-guard.sh` (29);
+  `gate-sdk/templates/check-skeleton.sh` (23). **590 lines**, and their
+  `scripts/` consumer copies add about 255 more. The gap bullet estimated
+  "about 570"; the measured figure is 590.
+  **Unlike the config-template class this one carries NO internal asymmetry**
+  — uniformly owed on both sides — so no existing declaration can be read
+  across to it and no ground has ever been stated. These are executable
+  harness and git-hook mechanism that RUNS IN the adopter tree rather than a
+  seam the adopter edits, so neither the config-seam ground nor the
+  sole-resolver ground reaches them.
+  **DISTINCT from `kit-config-template-port-disposition`**, filed the same
+  day: that class turns on an existing sibling declaration its members lack;
+  this one turns on there being no declaration anywhere and no ground yet
+  stated. Neither implies the other's answer.
+  **Cost while deferred:** about 590 owed lines whose disposition every future
+  stated-contract cut re-meets undecided, and a hook whose port disposition is
+  unruled is one a cut may port into the binary while the harness still needs
+  an on-disk executable path to invoke.
+  Filed 2026-08-30 by close from the gap inbox; line counts re-derived at the
+  drain against the tree arm.
+
+- **declaration-shape-outside-header-unreadable** [design-pending] — a
+  port-disposition string outside a file's header block is not a declaration,
+  but nothing distinguishes one for a human reader and a grep cannot.
+  **The rule**: gate-sdk/SPEC.md §The graph manifest rules each such field
+  "one optional header line", and `native/src/walk.rs` reads a header field
+  only. Everything else is inert text.
+  **CORRECTED AT THE 2026-08-30 DRAIN — the filing premise was already
+  stale.** The bullet said the oracle "reports that file owed" for
+  `gate-sdk/smoke/install.sh`. It does not any more: that file was declared
+  no-port at `fbaf3f06` under the smoke class ruling of the same day. **The
+  finding is sharper for it, not weaker.** That one file now carries a REAL
+  declaration in its header AND three fixture-writing heredoc literals further
+  down — including one whose text is verbatim the false premise a spec session
+  carried for a day and from which an operator cut selection was argued in
+  part. Real and inert now sit in one file and read identically to grep.
+  **A second family showed the same shape at this very close**:
+  `check-tag-lead-line` went red on a literal queue tag surviving inside prose
+  on a continuation line. Different vocabulary, same defect — a
+  declaration-shaped token in a non-declaration position that some reader
+  takes as live.
+  **Candidate shapes, none costed:** a gate arm reding a declaration-shaped
+  comment in a non-header position that is not inside a fixture-writing
+  heredoc; or a spelling convention for fixture declarations (an interpolated
+  prefix) so the literal never appears; or accept it and rely on
+  probe-before-assertion.
+  **Cost while deferred:** every port cut reads the corpus by grep, and a
+  fixture-planted literal reads as a live declaration to every reader but the
+  oracle.
+  Filed 2026-08-30 by close from the gap inbox, with the stale oracle premise
+  corrected at the drain.
+
+- **inline-interpreter-substrate-census** [design-pending] — whether the
+  recurring inline-interpreter computations are one-off scratch, or unported
+  tooling that belongs in the binary as subcommands.
+  **What this asks that no ruled entry did**: the 2026-08-30 grant settled
+  whether the shape is GRANTED. It never asked whether it is the right
+  SUBSTRATE. If a chunk of the fall-throughs re-derive the SAME computation
+  every iteration, those are unported tooling and the grant entrenches
+  re-deriving them at a terminal; if they are genuinely one-off, the grant is
+  right and no port is owed.
+  **FIRST CENSUS DATUM, measured at the 2026-08-30 drain, and the reason this
+  is filed rather than discarded.** `scan-prompts.sh` over this iteration's
+  log: **1 occurrence** of the inline-interpreter form in **556**
+  fall-throughs, against 144 prompting calls across 39 patterns. That is
+  evidence toward one-off rather than recurring — but it is ONE iteration, and
+  the entry that asked the question recorded that the prior log had been
+  wiped, so its own 8-and-109 figures were never re-verifiable. A second
+  sample does not yet exist. Start the next read from 1/556, not from zero.
+  **Re-verified at the drain**: the tree ships zero tracked Python, and the
+  interpreter appears only as one member of a generic interpreter list at
+  `guard-kit/lib/guard.sh:35` and `guard-kit/bin/scan-prompts.sh:114`, beside
+  node, deno, ruby, perl, php and zsh. So it is kit mechanism recognising an
+  inline body, never a language dependency, and the claim that the inline form
+  is "the tree's standard scratch-computation form" is loose: it is the
+  standard form for SESSIONS computing at a terminal, and the tree has none.
+  **Cost while deferred:** the substrate question stays unasked while the
+  grant makes the terminal form frictionless, which is the condition under
+  which unported tooling accumulates unnoticed.
+  Filed 2026-08-30 by close from the gap inbox, carrying the first census
+  datum it asked for.
+
+- **entry-compression-contract-unenforced** [design-pending] — the compression
+  relief that queue-kit/SPEC.md §check-queue-entry-budget mandates most often
+  is enforced by nothing, and the failure is invisible where it lands.
+  **The concession is the spec's own, twice**, re-read at the 2026-08-30
+  drain: queue-kit/SPEC.md:1377 ("it sees an entry's current extent, and
+  judging whether a removed line was answered or discarded is semantic") and
+  again at :1509 for the recording-in-the-moment rule. So the rule that
+  compression proceed by ANSWERING grounds, never by dropping them, has no
+  oracle at all.
+  **Why the failure is invisible**: extent is the only artifact, and a
+  compressed entry reads identically whether its missing grounds were answered
+  or silently discarded. A later reader cannot tell that grounds it lacks were
+  ever written.
+  **Candidate shape, unpriced and not started**: a gate arm reding a commit in
+  which a deferred entry's counted extent SHRINKS while that same commit adds
+  a ruling or recurrence line, unless the commit also carries the relocation
+  citation the section already specifies. Both halves are machine-readable,
+  which is what makes it a proxy for "a mandated write displaced grounds";
+  what it cannot decide is the semantic half, so it reds a shape rather than a
+  judgment.
+  **This SUPERSEDES rather than re-files `ruling-accretion-outgrows-the-entry-cap`**,
+  whose three shapes were all refused by the owning spec and which was dropped
+  by operator ruling 2026-08-30. That entry proposed re-pricing the cap. This
+  one's subject is the enforceability of the relief the spec ALREADY rules
+  correct, which stays live precisely because those three were refused.
+  **Cost while deferred:** every mandated write onto a saturated entry pays
+  the same unenforced honour-system compression, and the queue's most-ruled
+  entries are exactly the ones paying it.
+  Filed 2026-08-30 by close from the gap inbox; both of the owning spec's
+  concessions were re-read at the drain.
+
+- **no-port-cause-validation-scoped-to-registry** [design-pending] — the
+  malformed-shape validation for port-disposition declarations reaches only
+  registered gates, where the field is rarest, and never the tree-wide
+  population where it actually lives.
+  **Verified at the 2026-08-30 drain by source, not by reading the DoD.**
+  `check-gate-substrate-parity` assertion G validates the declaration's
+  malformed shapes — empty cause, no slug, both fields, duplicate field,
+  field-on-descriptor — only along registered-gate declaration paths, resolved
+  through its assertion-A loop over `gates.list` members. **No registered gate
+  carries either field today**: the sole `.gate` file mentioning them does so
+  in a `spec:` line describing them, not as a declaration. The assertion is
+  therefore VACUOUS on its own corpus right now.
+  **Meanwhile the field's stated domain is "any tracked script"**, and dozens
+  of files outside `gates.list` carry a port disposition today: `scripts/*.sh`,
+  kit `lib/*.sh`, kit `templates/*.sh`, the hook generator, and the 17
+  tree-wide declarations the smoke cut added on 2026-08-30. None is a
+  registered gate, so none is ever read by assertion G.
+  **And no sibling covers it**: `check-gate-exemption-tasks`' tree-wide loop
+  validates only slug-liveness for the temporary field —
+  `native/src/gates/gate_exemption_tasks.rs:449-450` matches the temporary
+  disposition and continues past everything else, so it never touches the
+  permanent field. The gap bullet cited line 447; the arm is at 449-450, and
+  the finding is unaffected.
+  **Cost while deferred:** every cause added outside `gates.list`, which is
+  the overwhelming majority of the field's real population, is checked for
+  well-formedness by human reading rather than by an oracle, silently — and
+  DoD language elsewhere in the tree may already over-claim this coverage.
+  Filed 2026-08-30 by close from the gap inbox; the parity gate's own source
+  was re-read at the drain before this was written.
+
+- **boundary-preserve-covers-names-not-lifetimes** [design-pending] — the
+  iteration-boundary keep-list enumerates named members where the property it
+  means to protect is a LIFETIME, so each new session-lifetime artifact
+  re-buys the same omission.
+  **State at the 2026-08-30 drain**: the keep-list holds two named members,
+  `session-role` and the lead's journal, both session-lifetime artifacts,
+  neither expressed as a lifetime. This is shape 1's accepted weakness
+  LANDING, not a defect in it: the operator selected the narrow fix knowingly
+  on 2026-08-30.
+  **The two alternatives NOT refused are recorded here because their entry
+  went to Done and its text went with it**: (2) give the knob a lifetime
+  vocabulary instead of a name list, and (3) move a live session's journal out
+  of the wiped directory, which reopens where a journal is sent at all. Both
+  remain available; shape 1 was chosen over them, not against them.
+  **The fourth shape IS refused and stays refused** — moving the wipe into the
+  lead. The operator declined to override its three grounds on 2026-08-30, so
+  reopening it is operator-class and this entry does not.
+  **DISTINCT from `boundary-wipe-preserve-basename-reach`**, which owns the
+  matcher's anchoring and the basename-versus-path kit contract. This entry's
+  subject is which lifetimes the list must cover, and whether anything holds
+  it there.
+  **Cost while deferred:** one re-argument per new session-lifetime artifact,
+  and nothing holds the two current members — a keep-list entry deleted by a
+  later edit reds no gate, the wipe is silent about what it took, and the
+  directory is gitignored, which is exactly how this defect survived three
+  attestations.
+  Filed 2026-08-30 by close from the gap inbox; the config line was re-read at
+  the drain.
+
+- **stage-journal-absence-caught-only-downstream** [design-pending] — a stage
+  session can complete, stamp and commit a full evidence spine while leaving
+  no resume journal at all, and the only thing that notices is the NEXT
+  stage's entry, by which time the session that owed it is gone.
+  **Attested 2026-08-30 at this close.** The validate session of
+  `consumer-smoke-contract-port` left no validate journal, and the
+  predecessor-journal assertion refused close's entry. The assertion works —
+  that is not the finding. The finding is WHEN it fires.
+  **Precisely stated, because the gap bullet overstated it and is corrected
+  here.** The bullet said the assertion "fired at the LAST stage instead" of
+  the predicted second stage. Not so: it was EVALUATED at spec, align, build
+  and validate and PASSED each time, those four journals all existing. Close
+  is the first REFUSAL, not the first firing, and the config comment's
+  prediction was about evaluation and was correct.
+  **What the refusal cost.** The close session took the documented escape —
+  writing the stand-in itself and stating plainly that validate left none —
+  rather than forcing the entry, so the absence is recorded. But a stand-in
+  written by a session that did not do the work can only point at durable
+  artifacts: the stamp, two commits, the evidence manifest, 24 parsed suite
+  rows. It cannot carry validate's reasoning, which is the one thing a journal
+  exists for, and which is now permanently lost for that iteration.
+  **Candidate shapes, none costed**: have the entry tool WRITE a skeleton
+  journal at its own stamp so the artifact exists from the stage's first
+  moment and the session fills it; or assert the journal at the stage's OWN
+  exit, where the session that owes it is still live and can be told; or
+  accept the escape and rely on the successor's honesty.
+  **DISTINCT from the boundary keep-list entries**, which own the wipe's reach
+  over journals that EXIST. This entry's subject is a journal never written at
+  all, which no wipe rule reaches.
+  **Cost while deferred:** one iteration's stage reasoning is lost per firing,
+  and the loss is discovered by the one session structurally unable to make
+  it good.
+  Filed 2026-08-30 by close from the gap inbox, with the bullet's own
+  overstatement corrected at the drain.
+
+- **enter-stage-flag-position-silently-ignored** [design-pending] — the entry
+  tool's read-only mode is recognised only as the first positional argument,
+  and a mis-ordered flag is dropped in silence rather than refused, so a probe
+  performs a real state write.
+  **Attested on itself 2026-08-30 at this close.** Passing the flag after the
+  stage name leaves it in position two, which nothing reads. The mode is
+  silently off: the tool stamped the workflow-state file for real, printed its
+  ordinary success line with no simulate prefix, and exited 0. The session
+  intended a read-only probe.
+  **No harm landed, and that was luck rather than design** — the entry
+  happened to be clean and the stamp was wanted a moment later. Probing an
+  entry the session did NOT want to make would have left a write recoverable
+  only by hand-editing the evidence file.
+  **The caller was wrong and the tool is still at fault.** The usage string
+  does document flag-first. The defect is that a surplus argument is accepted
+  and ignored rather than refused, and an in-repo precedent already settles
+  which behaviour is right: `run-gates.sh` refuses an unrecognised option by
+  name and prints usage, asserted by its own consumer smoke. The entry tool
+  does neither.
+  **Candidate shapes, none costed:** refuse any argument after the stage name;
+  or accept the flag in any position; or make the mode an env knob so position
+  cannot express it. The first is smallest and matches the in-repo precedent.
+  **Cost while deferred:** the read-only mode is specifically the LEAD's
+  instrument, gating an expensive dispatch on a cheap probe — so the caller
+  most likely to probe rather than enter is the one a mis-ordered flag
+  silently converts into a stamping session, and the stamp IS the cursor.
+  **DISTINCT from every entry about what the entry gate ASSERTS**: this one's
+  subject is argument parsing, and it stands whatever those assertions say.
+  Filed 2026-08-30 by close from the gap inbox, attested by the filing session
+  upon itself.
+
+- **stamp-provenance-remedy-loops-when-uncommitted** [design-pending] — the
+  stamp-provenance refusal's help text prescribes a recovery that does not
+  clear the red when the offending stamp is uncommitted, so a session
+  following it literally loops with no exit.
+  **The help says** to re-run the entry tool, which appends a fresh stamp at
+  the current head, then commit that stamp on its own. That is correct when
+  the offending stamp is already COMMITTED: the appended line becomes the
+  operative cursor and history carries both.
+  **It is wrong when the stale stamp is still in the working tree**, because
+  the gate scans every stamp line in the file rather than the last. Re-running
+  appends a good line BESIDE the bad one, and the gate reds on the bad one
+  again, identically, with the help repeating the instruction that just
+  failed.
+  **Attested 2026-08-30 at this close**, twice in a row with a byte-identical
+  message, and resolved only by deleting the stale uncommitted line by hand —
+  an action the help never mentions.
+  **The precipitating mistake is ordinary and will recur**: the session
+  stamped, then committed a piece of preceding work, so the head moved
+  underneath an uncommitted stamp.
+  **Candidate shapes, none costed:** branch the help on whether the offending
+  stamp is committed and name the delete for the uncommitted case; or have the
+  entry tool REPLACE rather than append a same-iteration same-stage stamp not
+  yet committed, which makes the existing help true as written; or scope the
+  provenance assertion to committed stamps only. The second fixes the text by
+  fixing the behaviour.
+  **DISTINCT from `enter-stage-flag-position-silently-ignored`**, filed the
+  same day: that one is a flag never taking effect, this one is a recovery
+  instruction that is conditionally wrong. Neither fix implies the other.
+  **Cost while deferred:** this is the recovery path for a state reached by an
+  easy ordering mistake, and as written it sends an already-off-script session
+  round a loop with no exit.
+  Filed 2026-08-30 by close from the gap inbox, attested by that session while
+  recovering from the loop this describes.
+
 - **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
   — the whole battery onto the binary, and the shell surface down to its residue.
   roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.

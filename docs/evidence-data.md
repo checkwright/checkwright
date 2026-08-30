@@ -121,3 +121,4 @@
 | installer-trial-lifecycle-repair | sc sp a b v c | 3f/3d | 1 · ≤1d | 24s 1✗ | 107 |
 | port-oracle-and-composer-ruling | sc sp a b v c | 2f/1d | 1 · ≤0d | 24s 1✗ | 107 |
 | drift-kpi-contract-port | sc sp a b v c | 7f/0d | 4 · ≤0d | 24s 1✗ | 107 |
+| consumer-smoke-contract-port | sc sp a b v c | 4f/1d | 1 · ≤0d | 24s 1✗ | 107 |
