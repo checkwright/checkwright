@@ -6,8 +6,6 @@ set -uo pipefail
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SDK="${GATE_SDK_ROOT:-$KIT/../gate-sdk}"
 cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" 2>/dev/null || { echo "env-probe: cannot enter repo root" >&2; exit 2; }
-# shellcheck disable=SC2034  # pwd -P is the dialect crossing itself (gate-sdk/SPEC.md §The path-dialect contract); re-derived even though nothing here reads it further
-REPO_ROOT="$(pwd -P)"
 # shellcheck source=../../gate-sdk/lib/inject.sh
 source "$SDK/lib/inject.sh"
 

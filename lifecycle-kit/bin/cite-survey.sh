@@ -10,8 +10,6 @@ KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 source "$KIT/lib/stages.sh"
 
 cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" 2>/dev/null || exit 1
-# shellcheck disable=SC2034  # pwd -P is the dialect crossing itself (gate-sdk/SPEC.md §The path-dialect contract); re-derived even though nothing here reads it further
-REPO_ROOT="$(pwd -P)"
 
 usage() {
     printf 'usage: %s [-h|--help] [--] "<heading-substring>"\n' "$(basename "$0")"

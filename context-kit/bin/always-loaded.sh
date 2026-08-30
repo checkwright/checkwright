@@ -5,8 +5,6 @@ set -uo pipefail
 
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" 2>/dev/null || { echo "always-loaded: cannot enter repo root" >&2; exit 2; }
-# shellcheck disable=SC2034  # pwd -P is the dialect crossing itself (gate-sdk/SPEC.md §The path-dialect contract); re-derived even though nothing here reads it further
-REPO_ROOT="$(pwd -P)"
 
 UPDATE=0
 [[ "${1:-}" == "--update-baseline" ]] && UPDATE=1
