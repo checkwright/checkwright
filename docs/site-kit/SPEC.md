@@ -501,6 +501,12 @@ The sourced config loader: it loads `SITE_KIT_CONFIG_FILE` (or the gates-dir
 gate and a fixture read one resolved configuration. It carries no gate logic —
 structure stays in the check, values in config, defaults here.
 
+**It is permanently shell and declares so in its own header**, as the config
+bridge's sole resolver for the `SITE_KIT_*` knobs — gate-sdk/SPEC.md §The
+kit-library port disposition rules the class and gate-sdk/SPEC.md §lib/gate.sh
+states the ground. Its only non-bridge reader left in the tree is its own
+gate-test, so the bridge is very nearly the whole of its live role.
+
 Every knob's default is filled whenever the consumer left it unset, with one
 exception the loader is the only place to state: `SITE_KIT_RENDERER_BATCH` is
 filled only where the loader also owns `SITE_KIT_RENDERER` — where the consumer

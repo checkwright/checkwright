@@ -1,5 +1,6 @@
 # shellcheck shell=bash
 # spec: site-kit/SPEC.md §lib/site.sh — sourced config loader + defaults for the deployment-truth gate; this repo's layout as defaults
+# no-port: gate-sdk/SPEC.md §The kit-library port disposition — the class ruling of 2026-08-30, reached by ground rather than by scope. This library is the config bridge's sole resolver for the SITE_KIT_* knobs: gate-sdk/SPEC.md §lib/gate.sh rules exactly one place a knob's value is computed, and the bridge computes it by sourcing this file, so a crate-side resolver would be the second producer criterion 6 refuses. Its only non-bridge reader left in the tree is its own gate-test, so the bridge is very nearly the whole of its live role. Structural, not a sizing judgment.
 
 _st_cfg="${SITE_KIT_CONFIG_FILE:-}"
 if [[ -n "$_st_cfg" ]]; then

@@ -1,5 +1,6 @@
 # shellcheck shell=bash
 # spec: evidence-kit/SPEC.md §lib/evidence.sh — sourced config loader, parser adapters, and baseline/manifest read helpers; values + adapters, never tool structure
+# no-port: gate-sdk/SPEC.md §The kit-library port disposition — the class ruling of 2026-08-30, reached by ground rather than by scope. This library is the config bridge's sole resolver for the EVIDENCE_KIT_* knobs: gate-sdk/SPEC.md §lib/gate.sh rules exactly one place a knob's value is computed, and the bridge computes it by sourcing this file, so a crate-side resolver would be the second producer criterion 6 refuses. The parser adapters beside those defaults are a separate question this ruling does not reach and does not foreclose. Structural, not a sizing judgment.
 
 # spec: evidence-kit/SPEC.md §lib/evidence.sh — requires gate-sdk vendored beside it, sourced for fail_closed + the prune adapters
 _ek_gate_lib="${GATE_SDK_LIB:-${BASH_SOURCE[0]%/*}/../../gate-sdk/lib/gate.sh}"

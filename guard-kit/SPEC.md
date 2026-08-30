@@ -289,6 +289,37 @@ primitive. The state file's path lives with lifecycle-kit, never here, so
 guard-kit gains no dependency on a kit it does not otherwise know about
 (lifecycle-kit/SPEC.md §check-stage-evidence).
 
+**This library is permanently shell, and it declares so on two independent
+grounds because both are live.** The declaration sits in its own header and
+§port-blockers' `--tree` arm reads it there.
+
+- **It is the config bridge's sole resolver for the `GUARD_KIT_*` knobs.**
+  gate-sdk/SPEC.md §lib/gate.sh rules exactly one place a knob's value is
+  computed — the owning kit's shell library — so a crate-side resolver would be
+  the second producer criterion 6 refuses. The class ruling this ground belongs
+  to is gate-sdk/SPEC.md §The kit-library port disposition, and it reaches this
+  file by ground rather than by scope. **The route is a ported non-gate arm, not
+  a gate**, which is the part that misleads: this kit ships no `checks/`
+  directory and no registered member, so nothing it owns is ever baked into a
+  generated hook — and neither fact bears on the bridge, because a ported
+  emitter declares knobs and resolves them the same way, as
+  gate-sdk/SPEC.md §The non-gate arm states. The question *does the bridge source
+  this file* is answered by running the bridge for the arm in question and by
+  nothing else.
+- **It is the API a consumer's own shell rules are composed from.** §Consumer
+  rules rules that a consumer's project block/steer/allow rules live in its copy
+  of `templates/bash-guard.sh`, composed from the primitives above; the `kit
+  owning the rule ships the guard` pattern just stated is every other consumer
+  doing the same through the `GUARD_KIT_LIB` indirection. Porting this library
+  would delete that extension point, which `native-gate-port-remaining-corpus`'
+  ruling (1) refuses — *a cut narrows the port, never an extension point* — on a
+  seam whose interface is a set of shell functions.
+
+**What reopens it:** the first ground dissolves if this kit's knobs stop crossing
+the bridge, or if gate-sdk/SPEC.md §lib/gate.sh ever admits a second bridge
+producer; the second dissolves if §Consumer rules stops composing a consumer's
+rules from these primitives. Both would have to go for the disposition to move.
+
 ## Consumer rules
 
 A consumer's project-specific block/steer/allow rules live in its copy of
@@ -306,6 +337,13 @@ This is a placement contract, not a mechanism: guard-kit ships no consumer rule
 and names none. What a project blocks or steers is its own toolchain knowledge
 and stays in its copy, which is why the copy legitimately diverges from the
 template here and why no rule content crosses into the kit.
+
+**The primitives a consumer composes from are permanently shell, which is what
+makes this contract durable rather than provisional.** A consumer writes its
+rules against `lib/guard.sh`'s functions; if that library moved in-crate the
+composition seam would move with it and every consumer copy would be written
+against an interface the tree does not carry. §The guard framework
+(`lib/guard.sh`) states the disposition and both grounds it rests on.
 
 **Placement is a verification decision before it is a seam one, and this is the
 sentence that makes the contract usable.** The generic lane carries §Testing's

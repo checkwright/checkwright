@@ -666,6 +666,11 @@ identically — a shared adapter removes that drift axis), and the slug/tag
 extraction helpers. Values and adapters only, never gate structure
 (gate-sdk's `lib/gate.sh` rule).
 
+**It is permanently shell and declares so in its own header**, as the config
+bridge's sole resolver for the `QUEUE_KIT_*` knobs — gate-sdk/SPEC.md §The
+kit-library port disposition rules the class and gate-sdk/SPEC.md §lib/gate.sh
+states the ground.
+
 The loader validates what it loads: an empty or non-numeric knob is a
 broken grammar, and the roadmap vocabulary is validated as a pair (§Layout and
 configuration) rather than per-array, because the failure the check exists to

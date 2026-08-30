@@ -345,6 +345,11 @@ knob's default — so the installer and the gate read one resolved configuration
 It carries no gate logic: structure stays in the check, values in config,
 defaults here.
 
+**It is permanently shell and declares so in its own header**, as the config
+bridge's sole resolver for the `DOCTRINE_KIT_*` knobs — gate-sdk/SPEC.md §The
+kit-library port disposition rules the class and gate-sdk/SPEC.md §lib/gate.sh
+states the ground.
+
 ## Layout and configuration
 
 The kit is vendored beside gate-sdk (conventionally at `doctrine-kit/`); its

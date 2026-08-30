@@ -944,6 +944,21 @@ context-kit/
   smoke/agents-md.sh             # the AGENTS.md adapter smoke (its own validate suite)
 ```
 
+**The two library members beside `lib/context.sh` are owed to the port, and each
+is owed for its own reason** — gate-sdk/SPEC.md §The kit-library port disposition
+reaches neither, so the silence here is not an undecided class.
+`lib/toolfloor.sh` rides the config bridge's `lib/*.sh` glob and resolves no
+bridged knob (`PROBE_SET` carries no kit prefix); what sequences it is that its
+roster is read on the **installer** path and by `check-install-toolchain`'s
+parity assertion, so it moves behind the installer's own two unresolved port
+readings, `installer-boundary-behind-invoke-port-reading` and
+`consumer-smoke-runner-port-disposition`. The `lib/pub-lang/` extractors sit one
+directory deeper and are never sourced by the bridge at all; they are the
+**bundled members** of the consumer-first plug-in registry `bin/pub-index.sh`
+resolves, which `native-gate-port-remaining-corpus`' ruling (1) sends in-crate
+while the seam survives — so their port waits on that resolver, itself owed. The
+entry that owns all three is `kit-library-port-residue`.
+
 The install also seeds the committed baseline the footprint contract holds
 (§The consumer footprint): after wiring the hook it runs
 `always-loaded.sh --update-baseline` once to write
@@ -979,6 +994,13 @@ library in a subshell, and **exits 2 on a knob that library does not define**
 `.gate`-dispatched member whose knobs were defaulted inside a check script would
 resolve none of them. That mechanism is indifferent to what any crate links: a
 member receives its knobs this way whatever the binary carries.
+
+**Which is also why it is permanently shell, and it declares so in its own
+header**: being the bridge's sole resolver for the `CONTEXT_KIT_*` knobs is
+exactly the property above, read as a port disposition — gate-sdk/SPEC.md §The
+kit-library port disposition rules the class. The ruling reaches this file alone
+among the kit's libraries; `lib/toolfloor.sh` and the `lib/pub-lang/` extractors
+are owed and their sequencing is below.
 
 **Every default here is repo-relative, and that is a bridge requirement rather
 than a style.** A bridged value is baked verbatim into the tracked pre-commit

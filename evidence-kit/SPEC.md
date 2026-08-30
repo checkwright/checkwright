@@ -124,6 +124,12 @@ line yet — so a caller's `|| true` yields an empty stage for either. Values an
 sources gate-sdk's `lib/gate.sh` for `fail_closed`, so evidence-kit requires
 gate-sdk vendored beside it.
 
+**It is permanently shell and declares so in its own header**, as the config
+bridge's sole resolver for the `EVIDENCE_KIT_*` knobs — gate-sdk/SPEC.md §The
+kit-library port disposition rules the class and gate-sdk/SPEC.md §lib/gate.sh
+states the ground. The adapters listed above ride the same file and are not
+themselves the ground.
+
 The parser adapters map a captured log — and, for `exit-code`, the suite's exit
 status — to `<scenario> <pass|fail|ignore>` lines: `libtest` reads per-test
 result lines (a Rust `cargo test` suite), `exit-code` emits one scenario per

@@ -1,5 +1,6 @@
 # shellcheck shell=bash
 # spec: lifecycle-kit/SPEC.md §lib/stages.sh — the stage machine as config: platform defaults, consumer overrides
+# no-port: gate-sdk/SPEC.md §The kit-library port disposition — the class ruling of 2026-08-30, reached by ground rather than by scope. This library is the config bridge's sole resolver for the LIFECYCLE_KIT_* knobs: gate-sdk/SPEC.md §lib/gate.sh rules exactly one place a knob's value is computed, and the bridge computes it by sourcing this file, so a crate-side resolver would be the second producer criterion 6 refuses. LIFECYCLE_KIT_PREDECESSOR is the tree's live keyed-knob instance and crosses the bridge from here, which is this member's sharpest form of the ground. Structural, not a sizing judgment.
 _lc_cfg="${LIFECYCLE_KIT_CONFIG_FILE:-}"
 if [[ -n "$_lc_cfg" ]]; then
     [[ -f "$_lc_cfg" ]] || {

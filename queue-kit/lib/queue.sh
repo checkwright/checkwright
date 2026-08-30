@@ -1,5 +1,6 @@
 # shellcheck shell=bash
 # spec: queue-kit/SPEC.md §lib/queue.sh — sourced config loader + shared section/slug adapters, never gate structure
+# no-port: gate-sdk/SPEC.md §The kit-library port disposition — the class ruling of 2026-08-30, reached by ground rather than by scope. This library is the config bridge's sole resolver for the QUEUE_KIT_* knobs: gate-sdk/SPEC.md §lib/gate.sh rules exactly one place a knob's value is computed, and the bridge computes it by sourcing this file, so a crate-side resolver would be the second producer criterion 6 refuses. Every QUEUE_KIT_-prefixed knob crosses under its own name rather than a bridge-specific spelling, which is the shape gate-sdk/SPEC.md §lib/gate.sh names this kit for. Structural, not a sizing judgment.
 
 _qk_cfg="${QUEUE_KIT_CONFIG_FILE:-}"
 if [[ -n "$_qk_cfg" ]]; then

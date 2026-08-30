@@ -2423,6 +2423,13 @@ delegation-kit/
   smoke/violation.sh
 ```
 
+**`lib/delegation.sh` is permanently shell and declares so in its own header**,
+as the config bridge's sole resolver for the `DELEGATION_KIT_*` knobs —
+gate-sdk/SPEC.md §The kit-library port disposition rules the class and
+gate-sdk/SPEC.md §lib/gate.sh states the ground. The disposition is recorded here
+rather than in a library section because this kit has none; the layout line above
+is the file's only other mention.
+
 Config follows the established kit pattern: copy
 `templates/delegation-config.sh` into the gates dir (or point
 `DELEGATION_KIT_CONFIG_FILE` elsewhere) and override any knob; defaults

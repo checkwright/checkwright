@@ -12,45 +12,6 @@
 
 ## New Features
 
-- **kit-lib-port-disposition-cohort** [spec: SPEC-kit-lib-port.md] — every kit's `lib/*.sh` is
-  owed by the port oracle and only two are dispositioned, so the class still has no ruling and
-  each cut re-argues it.
-  **The ground has precedent; the COHORT has never been swept, and conflating those is the trap.**
-  `gate-sdk/bin/gen-pre-commit.sh` declares `# no-port:` on exactly this ground — resolving a knob
-  means sourcing the owning kit's lib, and gate-sdk/SPEC.md §lib/gate.sh rules exactly one place a
-  knob's value is computed, so a crate-side resolver is the second producer criterion 6 refuses.
-  `drift-kit/lib/drift.sh` declared on that stated ground at `native-gate-port-remaining-corpus`'s
-  drift-kit cut, 2026-08-29, which is what makes the rest of the class visible.
-  **Corrected 2026-08-30 at scope, two stale premises.** The headline said none had EVER been
-  dispositioned: `gate-sdk/lib/consumer-smoke.sh` is the second, declared under the 2026-08-30
-  smoke class ruling. And the sibling this was filed apart from,
-  `kit-smoke-port-disposition-cohort`, no longer exists — that class was ruled and its owner is now
-  gate-sdk/SPEC.md §Consumer smoke, *The port disposition*. Neither correction touches the ground.
-  **Why a lib is not a smoke harness**, and why the split from that class still holds: a `lib/*.sh`
-  is **load-bearing at runtime** — the config
-  bridge has no other resolver and already-compiled arms source it — so its disposition is a
-  correctness question about the bridge. A smoke harness is a test surface and its question is
-  about bootstrap. Averaging the two grounds would produce a ruling that answers neither.
-  **What this entry owes:** the census (how many kit `lib/*.sh` are owed, which are sole resolvers
-  for their kit's bridge and which are not), then one ruling for the class rather than per cut.
-  Re-derive the count rather than reading one here — it moves with every ported file.
-  **IN THE `port-declaration-cohort-and-windows-leg` UNIT SET AS CUT 2 OF 3 — ruled 2026-08-30
-  (operator, lead-relay).** Width, stated per cut and never inherited: **16 files, 3,588 lines** —
-  by far the heaviest of the three by line count and the lightest by argument, since two members
-  already carry declarations on the stated ground. Sequenced SECOND on precedent density, behind
-  the config class and ahead of the harness class. `guard-kit/lib/guard.sh` alone is 1,243 lines
-  of it, and its port-versus-declare disposition is DECIDED by this cut rather than separately
-  takeable.
-  **What this cut owes is the class ruling and the declarations it licenses — not a count.** Any
-  port work the ruling turns out to create is FILED as its own entry, never absorbed here.
-  **Cost while deferred:** low and recurring — every kit cut from here pays the same argument, and
-  a cut that declares without stating the ground leaves precedent-by-example behind it.
-  ruled: kit-lib-port-disposition-cohort lead 2026-08-29 own-authority
-  ruled: kit-lib-port-disposition-cohort operator 2026-08-30 lead-relay
-  ruled: kit-lib-port-disposition-cohort lead 2026-08-30 own-authority
-  Filed 2026-08-29 by spec, under the lead ruling that resolved the drift-kit cut's
-  four declarations.
-
 - **harness-template-port-disposition** [spec: SPEC-harness-template-port.md] — the vendored hook
   and guard templates are uniformly owed and no sibling declaration exists on
   either side, which is why nothing had ever forced the disposition.
@@ -150,6 +111,46 @@
   drain-exempt residue path, now spent and that tag dropped from the lead line.
 
 ## Deferred
+
+- **kit-library-port-residue** [design-pending] — the kit `lib/*.sh` members the 2026-08-30 class
+  ruling deliberately leaves owed, filed rather than absorbed per that cut's own boundary.
+  **What the ruling settled and what it did not.** gate-sdk/SPEC.md §The kit-library port
+  disposition rules a library permanently shell when it is the config bridge's **sole resolver**
+  for its kit's knobs. The discriminator is content, not directory, so two kinds of member fall
+  outside it: a file that rides the bridge's flat `lib/*.sh` glob while resolving no bridged knob,
+  and a file one directory deeper that the glob never reaches. Both are **owed, not undecided** —
+  each already carries a sentence in its own SPEC section naming this entry.
+  **The members, measured 2026-08-30 at build against `--emit port-blockers --tree`:**
+  `gate-sdk/lib/declaration.sh` (59), `gate-sdk/lib/inject.sh` (80),
+  `gate-sdk/lib/test-hermetic.sh` (37), `context-kit/lib/toolfloor.sh` (58),
+  `context-kit/lib/pub-lang/rust.sh` (26), `context-kit/lib/pub-lang/ts.sh` (32).
+  **Each is owed on its own ground, and they do not resolve together** — which is why this is one
+  entry owning a residue rather than one cut:
+  `declaration.sh` is already dual-implemented against `native/src/declaration.rs` under the
+  standing `--declaration-parity` lane, so criterion 6's *unless* clause admits the duplication;
+  its stated test is whether the shell caller set empties, and `bin/upgrade-smoke.sh` keeps it
+  non-empty. Temporary, not permanent.
+  `inject.sh` has three shell sourcers — `context-kit/bin/env-probe.sh`,
+  `lifecycle-kit/bin/install-lifecycle.sh`, `doctrine-kit/bin/install-doctrine.sh` — each itself
+  owed, so it moves behind them.
+  `test-hermetic.sh` is **deliberately not declared**: it computes a second default for the bridged
+  knob `GATE_SDK_NATIVE_BIN`, and declaring a file that holds a second producer would bless the
+  duplication the class ruling rests on refusing. Its disposition waits on the defect below.
+  `toolfloor.sh`'s roster is read on the installer path and by `check-install-toolchain`'s parity
+  assertion, so it is sequenced behind `installer-boundary-behind-invoke-port-reading` and
+  `consumer-smoke-runner-port-disposition` rather than by anything in this class.
+  The two `pub-lang/` extractors are the **bundled members** of a consumer-first plug-in registry
+  and `native-gate-port-remaining-corpus`' ruling (1) positively sends them in-crate — the
+  disposition drift-kit's KPI plugins already took — so they wait on the resolver that finds them,
+  `context-kit/bin/pub-index.sh`, which is itself owed.
+  **The one live defect inside this set, already filed:** `gate-sdk/lib/test-hermetic.sh:14`
+  omits the executable-suffix helper `gate-sdk/lib/gate.sh:99` appends, so on a Windows host every
+  bespoke test pins `GATE_SDK_NATIVE_BIN` to a path that cannot exist. It is in the gap inbox as
+  of 2026-08-30 and is **not** re-filed here; this entry owns the port disposition that waits on it.
+  **Cost while deferred:** low and non-recurring — the ground is stated and each member's sequencing
+  is written into its own SPEC section, so no future cut re-argues the class. What is owed is the
+  work, not the argument.
+  Filed 2026-08-30 by build, at the landing of the kit-library class ruling.
 
 - **drain-order-retroactive-debt-sweep** [design-pending] — apply the 2026-08-30 drain-order
   ruling to the pool it was measured against: the ten entries the last drain promoted, none of
@@ -9319,6 +9320,7 @@
 
 - no-port-cause-validation-scoped-to-registry
 - kit-config-template-port-disposition
+- kit-lib-port-disposition-cohort
 
 ## Lessons Learned
 

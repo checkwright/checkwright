@@ -513,6 +513,11 @@ never gate structure. It centralizes the surfaces and vocabularies the
 spec-scanning gates share, so a rule enters once and every sibling matches the
 same shapes:
 
+**It is permanently shell and declares so in its own header**, as the config
+bridge's sole resolver for the `CANON_KIT_*` knobs — gate-sdk/SPEC.md §The
+kit-library port disposition rules the class and gate-sdk/SPEC.md §lib/gate.sh
+states the ground.
+
 - **Section grammar and queue resolution:** the section-regex builders the
   queue-facing gates use (queue-kit's rule — both sides of a section boundary
   must parse identically), and the one queue walk that emits a live slug for a

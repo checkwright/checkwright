@@ -1550,6 +1550,12 @@ then validation. Also owns the shared state adapters
 `lifecycle_stage_known`) — both gates must read the two axes identically, and
 a shared adapter removes that drift axis.
 
+**It is permanently shell and declares so in its own header**, as the config
+bridge's sole resolver for the `LIFECYCLE_KIT_*` knobs — gate-sdk/SPEC.md §The
+kit-library port disposition rules the class and gate-sdk/SPEC.md §lib/gate.sh
+states the ground. `LIFECYCLE_KIT_PREDECESSOR` crosses the bridge from here as
+the tree's live keyed-knob instance, which is this member's sharpest form of it.
+
 `lifecycle_current_stage <state-file>` is the **cursor derivation**: the last
 data line's `<stage>` token, the read `bin/enter-stage.sh` already performed
 inline, hoisted so every lifecycle reader shares one definition of "current

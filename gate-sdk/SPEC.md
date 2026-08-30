@@ -7136,6 +7136,20 @@ for every `.gate` member before emitting argv. That is the same
 makes an unread bridged knob impossible — the crate declares only the knobs its
 own code reads.
 
+**So there is exactly one place a knob's value is computed — the owning kit's
+shell library — and the crate holds no default to drift from.** The rule is the
+mechanism above read as a rule, and it is stated here because the sites that rely
+on it all cite it to this section: §The port-candidate criteria's criterion 6,
+§Consumer smoke *The port disposition*'s leg 1, §Meta-gate conservation's
+`check-knob-default-coupling` row, §check-core-files' bridged-root-set paragraph,
+§gen-pre-commit and §run-gates each turn on it, and a fact whose only statements
+are its citations has no owner. The strict form is already what the crate's
+readers implement: an **absent** bridge variable is an error rather than a
+fallback, and an **empty** one is a resolved-empty set — so a compiled member
+cannot silently substitute a value the shell library did not produce. Everything
+below is how that one place is reached; the disposition it forces on the
+libraries themselves is §The kit-library port disposition.
+
 Resolution, per declared knob:
 
 - **The owning kit comes from the knob's own `<KIT>_<KNOB>` prefix**, mapped to
@@ -7553,10 +7567,118 @@ hand every declared reader an unset variable.
 could not execute (an awk/jq/parser crash) — never `grep`'s exit 1, which is
 the expected "no match"; the caller draws that line at the capture site.
 
+### The kit-library port disposition
+
+**A kit's `lib/*.sh` that is the config bridge's sole resolver for its kit's
+knobs carries `# no-port:` — ruled 2026-08-30 for the class, on one ground and
+not on size.** §port-blockers' `--tree` arm reclassifies each member `owed` →
+`no-port`, so the completion predicate TRAJECTORY.md states over that arm's owed
+count subtracts them. The ground is §lib/gate.sh's rule above: the value is
+computed in the kit's shell library and nowhere else, so a crate-side resolver
+would be the **second producer** criterion 6 refuses.
+
+**That refusal is not a preference; it is a deletion this tree already paid
+for.** When the bridge landed, the crate's prune-dir default and the unit test
+holding it equal to the shell default were **removed rather than extended**, and
+§The port-candidate criteria records the departure with a warning that a later
+reader must not restore the parity test as a missing piece. Porting a sole
+resolver would re-create exactly the duplication that deletion bought its way out
+of, and would do it on a surface where the drift is silent: the two defaults
+disagree only for a consumer whose config narrows the input.
+
+**The ground has a stated precedent rather than a precedent by example.**
+`drift-kit/lib/drift.sh` already declares on it in full — the bridge's "**sole
+resolver** for the `DRIFT_KIT_*` knobs … so a crate-side resolver would be the
+second producer criterion 6 refuses" — and says why it stated the ground rather
+than citing one: "the class of kit `lib/*.sh` files has never been swept, and a
+cohort inherits a stated reason where it cannot inherit a precedent-by-example."
+This ruling is that sweep. `gate-sdk/lib/consumer-smoke.sh` is the second, under
+§Consumer smoke *The port disposition*'s leg 1.
+
+**The discriminator is content, not directory, and the mechanism says so.** The
+bridge sources `<kit>/lib/*.sh` — a **flat** glob — whenever any compiled member
+declares a knob that kit owns. Two consequences fall out and both are
+load-bearing:
+
+- **A file one directory deeper is never sourced at all.** `lib/pub-lang/`'s
+  extractors sit outside the bridge entirely, so the ground cannot reach them
+  whatever else is true of them.
+- **A file directly under `lib/` rides the glob whether or not it resolves
+  anything.** Bridge membership is by position; being *the resolver* is not. A
+  member sourced into the resolution subshell that computes no knob contributes
+  nothing to the bridge and is **not** held by this ground — deleting it would
+  leave the bridge sourcing one file fewer and resolving exactly the same values.
+
+**Membership is therefore derived and never rostered**: the members are the kit
+libraries that carry their own kit's knob defaults, which is the same predicate
+the bridge's own `declare -p` confirmation applies — a knob whose default is
+visible after the owning kit's library is sourced. A kit whose library computes
+no knob of its own is simply not a member, and no roster here can rot away from
+the tree, because §port-blockers' `--tree` arm reports the answer directly.
+
+**`gate-sdk/lib/gate.sh` is the same ground held twice over, and it is stated
+separately because the stronger case is easy to under-read.** It is not a client
+of the bridge; it **is** the bridge — the machinery that sources every other
+member and derives which kit owns a knob. A crate-side form would have to either
+source shell libraries from inside a binary or re-implement every kit's defaults,
+which is the second producer squared. §gen-pre-commit already declares on
+precisely this ground from the opposite direction: the hook generator bakes a
+*resolved* knob, so it cannot move either.
+
+**The ruling reaches by ground, not by scope, and `guard-kit/lib/guard.sh` is
+the worked instance.** A stated-contract cut reaches the files answering to this
+section; the class is wider, exactly as §Consumer smoke *The port disposition*
+already rules for its own — a member takes this disposition because the ground
+holds of it, not because this section reaches it, and each declares in its own
+header with its own kit's section stating why. guard-kit is that case in both
+directions at once. Its library **is** a sole resolver — a ported non-gate arm
+declares a `GUARD_KIT_` knob and the bridge resolves it by sourcing this file
+(§The non-gate arm) — and it is **also** the API a consumer's own shell rules are
+composed from, which is the ground guard-kit's own section states and the one a
+reader of that kit needs. Both hold; neither is folded into the other. The
+sole-resolver face is why it is a member of this class at all, and
+guard-kit/SPEC.md §The guard framework (`lib/guard.sh`) is where its second,
+independent ground is stated.
+
+**The negative that looks like a measurement and is not, recorded because it
+cost this cut a stage.** *guard-kit ships no `checks/` directory and no
+registered member* is true, and `grep -c GUARD_KIT` over the generated
+`pre-commit` is genuinely `0`. Neither establishes that the bridge does not
+source the file: the hook bakes only the knobs of the gates the hook runs, and
+the bridge's clients are not only `.gate` members — every ported non-gate arm
+resolves through it too. A negative about the bridge is answered by the bridge,
+`gate_knob_env` for the arm in question, and by nothing else.
+
+**The honest limit: the members this ruling leaves owed are left owed on
+purpose, and one set it positively says must port.** `lib/pub-lang/`'s shipped
+extractors are the **bundled members** of a consumer-first plug-in registry, and
+`native-gate-port-remaining-corpus`' ruling (1) is that a seam's resolution,
+direct execution and env contract survive while *only the bundled members move
+in-crate* — the disposition drift-kit's KPI plugins already took (drift-kit/SPEC.md
+§The extensibility contract). They are owed, not undecided. The libraries that
+ride the glob resolving nothing are owed too, each for its own reason, and each
+names the entry that owns its port in its own section.
+
+**What reopens it**, written as a reopening condition rather than a permanence
+claim, on §Consumer smoke *The port disposition*'s terms: the ground dissolves
+generally if §lib/gate.sh ever admits a second bridge producer, and it dissolves
+for an individual member whose kit's knobs stop crossing the bridge — a member
+outside the bridge is not a sole resolver, and its disposition is then whatever
+its own kit's section can state for it, which is the position `lib/pub-lang/`
+already occupies.
+
 ### lib/inject.sh
 
 The marker-bounded span mechanics every kit's agent-file injector shares — three
 functions over one notion of a well-formed block.
+
+**It is owed to the port, not dispositioned by §The kit-library port
+disposition.** It rides the bridge's `lib/*.sh` glob and resolves no knob, so
+that ruling's ground does not reach it; what sequences it instead is its sourcer
+set, every member of which is itself owed
+(`context-kit/bin/env-probe.sh`, `lifecycle-kit/bin/install-lifecycle.sh`,
+`doctrine-kit/bin/install-doctrine.sh`). The entry that owns the work is
+`kit-library-port-residue`.
 
 **A compiled counterpart exists, and it is a divergence rather than a
 translation.** `native/src/marker.rs` carries a read half and a write half for
@@ -7670,6 +7792,13 @@ the artifact it claims to read. So the helper refuses, and the refusal is what
 closes the class permanently: no future markup variant can disarm the assertion,
 only red it.
 
+**It is owed to the port, not dispositioned by §The kit-library port
+disposition.** It rides the bridge's `lib/*.sh` glob and resolves no knob, so
+that ruling's ground does not reach it; its own disposition is criterion 6's
+*unless* clause, worked immediately below, and it is **temporary rather than
+permanent** — the stated test is whether the shell caller set empties, and it has
+not. The entry that owns the work is `kit-library-port-residue`.
+
 **The library is dual, and one live caller is what makes that true rather than
 asserted.** `bin/upgrade-smoke.sh` at its declaration-resolve step uses both arms
 (§upgrade-smoke) and is the shell form's **only** caller since §The declaration
@@ -7760,6 +7889,25 @@ design: a config-pinning tool cannot itself be configured by the surface it
 pins. A test that must exercise real config overrides after the source (a later
 assignment, or an `env -u <KIT>_CONFIG_FILE` prefix so the loader falls back to
 its cwd-relative default) — ordering wins, no opt-in flag needed.
+
+**It is owed to the port and is deliberately *not* declared, which is a stronger
+statement than being unreached.** It rides the bridge's `lib/*.sh` glob and
+resolves no knob of its own, so §The kit-library port disposition does not reach
+it — but it also computes a **second** default for a bridged knob,
+`GATE_SDK_NATIVE_BIN`, and declaring a file that does that would bless the very
+duplication the class ruling rests on refusing. The second spelling is not
+gratuitous: pinning the knob absolute is documented and deliberate, since the
+repo-relative default resolves to nothing from a sandbox cwd (§Layout and
+configuration). What is undefended is that this spelling omits the
+executable-suffix helper §lib/gate.sh's default appends, so on a Windows host
+every bespoke test pins the knob to a suffix-less path that cannot exist. **The
+order that makes it reachable is the test's, not the bridge's**: this library is
+sourced at the top of every `gate-tests/*.test.sh`, before `lib/gate.sh` is
+sourced at all, so its value is already set when `lib/gate.sh`'s own guarded
+assignment runs and that assignment is the no-op. Inside the bridge's own
+subshell the glob orders `gate.sh` first and the hazard is unreachable. The
+defect is filed to the gap inbox and the disposition waits on it; the entry that
+owns the port work is `kit-library-port-residue`.
 
 ### run-gates
 

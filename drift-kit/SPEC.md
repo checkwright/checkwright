@@ -1024,6 +1024,13 @@ is derived from the knob's own `DRIFT_KIT_` prefix. So a knob this kit owns can
 only be resolved from here; there is no other place that would work, and a knob
 no library defines is the bridge's undeclared-knob refusal (gate-sdk/SPEC.md §lib/gate.sh).
 
+**Its `# no-port:` declaration is now the class's stated precedent rather than a
+lone case.** It landed at the drift-kit cut saying the class of kit `lib/*.sh`
+had never been swept and that a cohort inherits a stated reason where it cannot
+inherit a precedent-by-example; gate-sdk/SPEC.md §The kit-library port
+disposition is that sweep, and it rules on this file's stated ground rather than
+minting a new one. Nothing in the declaration changes.
+
 **The trajectory arm's four knobs live here for exactly that reason, and their
 move is what the port paid.** `DRIFT_KIT_CONFIG_FILE`,
 `DRIFT_KIT_TRAJECTORY_SURFACES`, `DRIFT_KIT_GATES_FILE` and `DRIFT_KIT_STAGES`

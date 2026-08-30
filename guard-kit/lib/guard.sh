@@ -1,5 +1,6 @@
 # shellcheck shell=bash
 # spec: guard-kit/SPEC.md §The guard framework — hook primitives + generic ruleset; no project rule content
+# no-port: guard-kit/SPEC.md §The guard framework (`lib/guard.sh`) — permanently shell on two independent grounds, and that section states them. (1) The config bridge: this library is the sole resolver for the GUARD_KIT_* knobs, one of which a ported non-gate arm declares and the bridge resolves by sourcing this file, so a crate-side resolver would be the second producer criterion 6 refuses — gate-sdk/SPEC.md §The kit-library port disposition is the class ruling and gate-sdk/SPEC.md §lib/gate.sh the rule it rests on. (2) The extension point: guard-kit/SPEC.md §Consumer rules rules that a consumer's project block/steer/allow rules live in its copy of templates/bash-guard.sh, composed from these primitives, so this library is the API those rules are written against and porting it deletes the extension point — which is native-gate-port-remaining-corpus' ruling (1), a cut narrows the port and never an extension point. Structural, not a sizing judgment.
 
 # spec: guard-kit/SPEC.md §Layout and configuration — a set-but-missing GUARD_KIT_CONFIG_FILE exits 2, surfacing as a hook block with this message on the first guarded command
 _frik_cfg="${GUARD_KIT_CONFIG_FILE:-}"

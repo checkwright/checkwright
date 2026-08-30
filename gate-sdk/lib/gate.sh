@@ -1,5 +1,6 @@
 # shellcheck shell=bash
 # spec: gate-sdk/SPEC.md §lib/gate.sh — sourced library: values + adapters, never gate structure
+# no-port: gate-sdk/SPEC.md §The kit-library port disposition — the class ruling of 2026-08-30, reached by ground rather than by scope, and this file is the ground held twice over. It is not a client of the config bridge; it IS the bridge — the machinery that sources every other kit's lib/*.sh and derives which kit owns a knob from its prefix. gate-sdk/SPEC.md §lib/gate.sh rules exactly one place a knob's value is computed, so a crate-side form would have to either source shell libraries from inside a binary or re-implement every kit's defaults, which is the second producer criterion 6 refuses, squared. gate-sdk/SPEC.md §gen-pre-commit already declares on this ground from the opposite direction: the hook generator bakes a resolved knob and so cannot move either. Structural, not a sizing judgment.
 
 # spec: gate-sdk/SPEC.md §Layout and configuration — auto-source the consumer config seam so a layout knob's override persists past the shell that set it; GATE_SDK_CONFIG_FILE wins, else <gates-dir>/gate-sdk-config.sh (GATE_SDK_GATES_DIR stays env-or-default — a config file cannot name its own directory)
 _gate_sdk_config="${GATE_SDK_CONFIG_FILE:-}"

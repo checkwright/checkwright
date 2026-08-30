@@ -1,5 +1,6 @@
 # shellcheck shell=bash
 # spec: canon-kit/SPEC.md §lib/spec.sh — sourced config loader + shared section/spec adapters, never gate structure
+# no-port: gate-sdk/SPEC.md §The kit-library port disposition — the class ruling of 2026-08-30, reached by ground rather than by scope. This library is the config bridge's sole resolver for the CANON_KIT_* knobs: gate-sdk/SPEC.md §lib/gate.sh rules exactly one place a knob's value is computed, and the bridge computes it by sourcing this file, so a crate-side resolver would be the second producer criterion 6 refuses. It carries the widest knob-default set in the tree and canon-kit's compiled members read it on every battery pass, so the duplication a port created would be both the largest and the least visible. Structural, not a sizing judgment.
 
 _sk_cfg="${CANON_KIT_CONFIG_FILE:-}"
 if [[ -n "$_sk_cfg" ]]; then

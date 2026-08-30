@@ -1,5 +1,6 @@
 # shellcheck shell=bash
 # spec: doctrine-kit/SPEC.md §lib/doctrine.sh — sourced config loader + the knob defaults, never gate structure
+# no-port: gate-sdk/SPEC.md §The kit-library port disposition — the class ruling of 2026-08-30, reached by ground rather than by scope. This library is the config bridge's sole resolver for the DOCTRINE_KIT_* knobs: gate-sdk/SPEC.md §lib/gate.sh rules exactly one place a knob's value is computed, and the bridge computes it by sourcing this file, so a crate-side resolver would be the second producer criterion 6 refuses. Being among the smallest members changes nothing, since the ground is what the file resolves and not how much of it there is. Structural, not a sizing judgment.
 
 _dk_cfg="${DOCTRINE_KIT_CONFIG_FILE:-}"
 if [[ -n "$_dk_cfg" ]]; then

@@ -1,5 +1,6 @@
 # shellcheck shell=bash
-# spec: context-kit/SPEC.md §lib/context.sh — sourced config loader + the kit's knob defaults, never gate structure; the config bridge sources this to resolve a `.gate`-dispatched member's declared knobs
+# spec: context-kit/SPEC.md §lib/context.sh — sourced config loader + the kit's knob defaults, never gate structure; the config bridge sources this to resolve a compiled member's declared knobs
+# no-port: gate-sdk/SPEC.md §The kit-library port disposition — the class ruling of 2026-08-30, reached by ground rather than by scope. This library is the config bridge's sole resolver for the CONTEXT_KIT_* knobs: gate-sdk/SPEC.md §lib/gate.sh rules exactly one place a knob's value is computed, and the bridge computes it by sourcing this file, so a crate-side resolver would be the second producer criterion 6 refuses. Its sibling members under lib/ take their own dispositions on their own grounds and are not covered here. Structural, not a sizing judgment.
 
 _ck_cfg="${CONTEXT_KIT_CONFIG_FILE:-}"
 if [[ -n "$_ck_cfg" ]]; then
