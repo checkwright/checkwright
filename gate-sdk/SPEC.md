@@ -414,6 +414,35 @@ substitution untouched: it is a missing-repository guard, the clause below rules
 that it confers nothing against dialect, and the idiom neither needs it gone nor
 is weakened by it.
 
+**The idiom crosses a variable; a script that composes two roots must also anchor
+its own cwd.** Both forms above capture `pwd -P` into a name and leave the
+shell **standing** in the producer's spelling, because `cd` with an absolute
+argument sets `PWD` from that argument. `PWD` is exported, so the foreign
+spelling reaches every child process; and a *relative* `cd … && pwd` — the shape
+an entry point uses to find its own kit from `BASH_SOURCE` — concatenates onto
+it, so a second root derived that way comes out foreign while the captured one is
+crossed. A shell builtin still produces no foreign value, which is why
+`check-path-dialect`'s vocabulary names none: it **propagates** one. Where a
+script then composes those two roots by string arithmetic — `realpath
+--relative-to="$A" "$B"`, whose operands must share a dialect — the mismatch is a
+hard failure rather than a wrong answer, and under `set -e` it kills the script
+at a line that names nothing. The obligation is on the composing script and is
+two builtins:
+
+    cd "$(pwd -P)"                     # before deriving anything from BASH_SOURCE
+    …
+    cd "$(git rev-parse --show-toplevel 2>/dev/null)" || { …refuse as today…; }
+    REPO_ROOT="$(pwd -P)"
+    cd "$REPO_ROOT"                    # re-anchor: the toplevel cd re-entered the producer's spelling
+
+Both are no-ops on a single-dialect host, and both are the same `-P` crossing the
+idiom above already rules — applied to the shell's cwd rather than to a name.
+`gate-sdk/bin/gen-pre-commit.sh` is the site this was written from: it is the one
+entry point that spells a kit root **relative to** a repo root, and its 2026-08-30
+refusal on a Windows runner reported only that the generator "failed". A script
+that merely `cd`s to a root and reads files under it is dialect-tolerant by the
+consumption predicate below and owes no anchor.
+
 **No shared shell normalizer is introduced, and the refusal is load-bearing.** No
 kit's `lib/` holds one, so a helper would be new rather than a second copy — but
 the corpus's three families source three different libraries and two resolve their
@@ -468,6 +497,23 @@ composition — as a port of a shell file naturally does, because the shell it i
 porting composed strings — is exactly where a *new* exposure is born. The reader
 this clause is for is the session porting the next kit (§Porting a gate to the
 binary substrate), at the moment it assumes the port retires the question.
+
+**And `Path` is not the safe half either — it is the other horn.** Reaching for
+`std::path` fixes *reachability* and breaks *spelling*. `Path::join` and
+`DirEntry::path` append `MAIN_SEP`, which on a `*-windows-msvc` host is `\` — a
+separator the declared dialect above excludes. The filesystem answers such a value
+happily, so nothing fails at the composition; what fails is the **reader**, and
+every reader in this crate splits on `/` because that is what the dialect
+declares. A directory walk descending through `join` therefore hands back
+`D:/w/kit\checks\check-graph.gate`, whose `/`-split basename is the whole tail,
+and a gate keying a lookup on that basename reports its entire corpus missing
+rather than failing at the crossing — the same **whole roster unresolved** shape
+§The path-dialect contract opens with. The two horns together are the reason
+walk.rs owns a `child` speller: it is the crate's sole path **producer**
+(§The crate's crosser) and, by the same rule and for this second reason, its sole
+path **speller**. No module outside it composes a path, in either style. Measured
+on the 2026-08-30 Windows leg, where `check-install-disposition` read every
+zero-config gate-sdk member as unregistered in its own kit's smoke.
 
 ### The crate's crosser
 
@@ -831,7 +877,12 @@ nothing, and the property is preserved not by the roster test but by the
 single-spawn-site rule above — `proc.rs` is where a spawn would have to be added,
 and adding one there is what the corpus test is watching. Widening `proc.rs` is how a member
 that needs more of the child's result gets it; building its own `Command` is what
-the test refuses.
+the test refuses. `Completed::stderr_on_failure` is the first such widening, and
+it exists because a wrapper that reports "the child failed" and drops what the
+child said turns one line of stderr into a whole CI round: it is reachable only on
+the arm where `stdout()` already answered `None`, so it adds a *cause* to a
+refusal and no path to a false clean. A caller composes it into its own finding
+line; an empty answer is the honest case of a child that said nothing.
 
 **The same contract binds the *dispatcher*, and there the refusal is raised
 inside `gate_command` — which is a trap for its callers.** A `.gate` member whose
@@ -11981,6 +12032,16 @@ lives in the check. A `# graph:` manifest embedded in a `SPEC-*.md` amendment
 body is held to the glob grammar but not to the vocabulary or hook-parity — the
 gate it describes is unbuilt, so its coupled surface may itself be design-ahead;
 parity re-fires through the normal registry path once the gate lands.
+
+**A generator that could not run reports why it could not run.** The hook
+guarantees are asserted by spawning the generator, and a generator dying under
+`set -e` says nothing on stdout, so the refusal used to name only the arm. It now
+carries the child's own stderr (§Fail-closed contract's widening), because the
+alternative costs a full CI round per attempt: the 2026-08-30 Windows leg bought
+two rounds' worth of `--emit failed` before the cause — one unguarded external
+command in the generator's prologue — could be read off the source instead of the
+log. A child that fails silently still yields a bare refusal, so the suffix is
+composed rather than assumed.
 
 Dual-couple manifest: the artifact path is a knob, but check-graph's own
 `# graph:` manifest is kit-shipped static text a consumer never edits, so it

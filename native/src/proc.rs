@@ -8,6 +8,7 @@ use std::process::Command;
 pub struct Completed {
     status: std::process::ExitStatus,
     stdout: Vec<u8>,
+    stderr: Vec<u8>,
 }
 
 impl Completed {
@@ -28,6 +29,21 @@ impl Completed {
     pub fn code(&self) -> Option<i32> {
         self.status.code()
     }
+
+    // spec: gate-sdk/SPEC.md §Fail-closed contract — the sanctioned widening: the failed child's
+    // own account of itself, reachable only where `stdout()` already said `None`, trimmed because
+    // the caller composes a finding line rather than replaying a stream
+    pub fn stderr_on_failure(&self) -> Option<String> {
+        if self.status.success() {
+            return None;
+        }
+        let s = String::from_utf8_lossy(&self.stderr).trim().to_string();
+        if s.is_empty() {
+            None
+        } else {
+            Some(s)
+        }
+    }
 }
 
 // spec: gate-sdk/SPEC.md §Fail-closed contract — `Err` is a *spawn* failure and nothing
@@ -45,6 +61,7 @@ pub fn run(program: &str, args: &[&str]) -> Result<Completed, String> {
     Ok(Completed {
         status: out.status,
         stdout: out.stdout,
+        stderr: out.stderr,
     })
 }
 
@@ -229,6 +246,7 @@ pub fn run_with_env(
     Ok(Completed {
         status: out.status,
         stdout: out.stdout,
+        stderr: out.stderr,
     })
 }
 
@@ -265,6 +283,7 @@ pub fn run_with_stdin(program: &str, args: &[&str], input: &[u8]) -> Result<Comp
     Ok(Completed {
         status: out.status,
         stdout: out.stdout,
+        stderr: out.stderr,
     })
 }
 

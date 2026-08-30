@@ -463,7 +463,9 @@ pub fn find_with_prune(
         let mut entries: Vec<PathBuf> = Vec::new();
         for ent in rd {
             let ent = ent.map_err(|e| format!("cannot read entry in {}: {}", dir.display(), e))?;
-            entries.push(ent.path());
+            if let Some(p) = entry_path(&dir, &ent) {
+                entries.push(p);
+            }
         }
         entries.sort();
         for p in entries {
@@ -584,6 +586,27 @@ fn has_meta(s: &str) -> bool {
     s.bytes().any(|b| b == b'*' || b == b'?' || b == b'[')
 }
 
+// spec: gate-sdk/SPEC.md §Porting to Rust does not retire dialect exposure — the descent's one
+// speller. `Path::join` appends `MAIN_SEP`, which is not the declared dialect's separator, and the
+// fs answering it is what makes the wrong spelling survive to a `/`-splitting reader.
+fn child(dir: &Path, name: &str) -> PathBuf {
+    let d = dir.display().to_string();
+    if d.is_empty() {
+        return PathBuf::from(name);
+    }
+    if d.ends_with('/') || d.ends_with('\\') {
+        return PathBuf::from(format!("{}{}", d, name));
+    }
+    PathBuf::from(format!("{}/{}", d, name))
+}
+
+// spec: gate-sdk/SPEC.md §The path-dialect contract — a directory entry named through `child`
+// rather than through `DirEntry::path`, so one line answers "what is this entry's path" for every
+// walk in the crate and a reader cannot reach the unspelled form by accident
+fn entry_path(dir: &Path, ent: &fs::DirEntry) -> Option<PathBuf> {
+    ent.file_name().to_str().map(|n| child(dir, n))
+}
+
 // spec: gate-sdk/SPEC.md §The port-candidate criteria — `**`-capable list matching over a
 // bridged glob array, the semantics committed once there rather than re-decided per port.
 // Bash-faithful: no prune set applies, because pathname expansion has none.
@@ -617,7 +640,7 @@ fn expand(base: &Path, comps: &[&str], out: &mut Vec<PathBuf>) -> Result<(), Str
         return Ok(());
     }
     if !has_meta(head) {
-        return expand(&base.join(head), rest, out);
+        return expand(&child(base, head), rest, out);
     }
     let rd = match fs::read_dir(base) {
         Ok(r) => r,
@@ -626,7 +649,9 @@ fn expand(base: &Path, comps: &[&str], out: &mut Vec<PathBuf>) -> Result<(), Str
     let mut names: Vec<PathBuf> = Vec::new();
     for ent in rd {
         let ent = ent.map_err(|e| format!("cannot read entry in {}: {}", base.display(), e))?;
-        names.push(ent.path());
+        if let Some(p) = entry_path(base, &ent) {
+            names.push(p);
+        }
     }
     names.sort();
     for p in names {
@@ -716,7 +741,9 @@ fn subdirs(base: &Path) -> Result<Vec<PathBuf>, String> {
     let mut out = Vec::new();
     for ent in rd {
         let ent = ent.map_err(|e| format!("cannot read entry in {}: {}", base.display(), e))?;
-        let p = ent.path();
+        let Some(p) = entry_path(base, &ent) else {
+            continue;
+        };
         let meta = fs::symlink_metadata(&p).map_err(|e| format!("cannot stat {}: {}", p.display(), e))?;
         if meta.is_dir() {
             let hidden = p
@@ -1056,6 +1083,23 @@ mod tests {
         assert_eq!(abs_against("/srv/x/repo", "../sib"), "/srv/x/sib");
         assert_eq!(abs_against("/srv/x/repo", "/opt/kit"), "/opt/kit");
         assert_eq!(abs_against("/srv/x/repo", "."), "/srv/x/repo");
+    }
+
+    // spec: gate-sdk/SPEC.md §Porting to Rust does not retire dialect exposure — asserted by
+    // construction rather than by running a walk, because the host that develops this is the one
+    // dialect in which the fault cannot appear
+    #[test]
+    fn a_descent_composes_in_the_declared_dialect_whatever_the_host_separator_is() {
+        let hit = child(&child(Path::new("D:/w/gate-sdk"), "checks"), "check-graph.gate");
+        assert_eq!(hit.display().to_string(), "D:/w/gate-sdk/checks/check-graph.gate");
+        assert!(!hit.display().to_string().contains('\\'));
+        assert_eq!(
+            hit.display().to_string().rsplit_once('/').map(|(_, b)| b),
+            Some("check-graph.gate")
+        );
+        assert_eq!(child(Path::new("/srv/repo"), "kit").display().to_string(), "/srv/repo/kit");
+        assert_eq!(child(Path::new("/"), "kit").display().to_string(), "/kit");
+        assert_eq!(child(Path::new(""), "kit").display().to_string(), "kit");
     }
 
     // spec: gate-sdk/SPEC.md §lib/gate.sh — the prefix form's receiving half: the family is keyed

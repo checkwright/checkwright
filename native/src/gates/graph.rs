@@ -372,11 +372,27 @@ fn read_stripped(p: &str) -> Result<String, String> {
 
 // spec: gate-sdk/SPEC.md §check-graph — the generator stays shell (§gen-pre-commit), so assertion D
 // spawns it; criterion 7 clears the spawn because `bash` is on the program floor
-fn generator_emit(gen: &str, arm: &str) -> Result<Option<String>, String> {
+// spec: gate-sdk/SPEC.md §check-graph — assertion D's refusal carries the generator's own stderr,
+// so a verdict arrives with its cause. The `Err` payload is empty where the child said nothing,
+// which is a reachable arm rather than an impossible one.
+fn generator_emit(gen: &str, arm: &str) -> Result<Result<String, String>, String> {
     let out = proc::run("bash", &[gen, arm])?;
-    Ok(out
-        .stdout()
-        .map(|b| String::from_utf8_lossy(b).trim_end_matches('\n').to_string()))
+    match out.stdout() {
+        Some(b) => Ok(Ok(String::from_utf8_lossy(b)
+            .trim_end_matches('\n')
+            .to_string())),
+        None => Ok(Err(out.stderr_on_failure().unwrap_or_default())),
+    }
+}
+
+// spec: gate-sdk/SPEC.md §check-graph — the cause as a finding suffix: present it on one line so a
+// CI log reader sees it beside the verdict, absent where the child said nothing
+fn because(cause: &str) -> String {
+    if cause.is_empty() {
+        String::new()
+    } else {
+        format!(" — it said: {}", cause.replace('\n', " | "))
+    }
 }
 
 fn rule(args: &[String]) -> Result<i32, String> {
@@ -614,8 +630,8 @@ fn rule(args: &[String]) -> Result<i32, String> {
         errors.push(format!("ARTIFACT: {} does not exist; regenerate: bash gate-sdk/bin/gen-pre-commit.sh --write", hook));
     } else {
         match hook_emitted {
-            None => errors.push("ARTIFACT: gen-pre-commit.sh --emit failed; fix the generator before trusting the hook".to_string()),
-            Some(ref e) => {
+            Err(ref cause) => errors.push(format!("ARTIFACT: gen-pre-commit.sh --emit failed; fix the generator before trusting the hook{}", because(cause))),
+            Ok(ref e) => {
                 if e.as_str() != read_stripped(&hook)?.trim_end_matches('\n') {
                     errors.push(format!("ARTIFACT: {} is stale vs the '# graph:' manifests; regenerate: bash gate-sdk/bin/gen-pre-commit.sh --write", hook));
                 }
@@ -631,8 +647,8 @@ fn rule(args: &[String]) -> Result<i32, String> {
             errors.push(format!("ARTIFACT: {} does not exist but a tier=commit-msg gate is registered; regenerate: bash gate-sdk/bin/gen-pre-commit.sh --write", msg_hook));
         } else {
             match msg_emitted {
-                None => errors.push("ARTIFACT: gen-pre-commit.sh --emit-commit-msg failed; fix the generator before trusting the hook".to_string()),
-                Some(ref e) => {
+                Err(ref cause) => errors.push(format!("ARTIFACT: gen-pre-commit.sh --emit-commit-msg failed; fix the generator before trusting the hook{}", because(cause))),
+                Ok(ref e) => {
                     if e.as_str() != read_stripped(&msg_hook)?.trim_end_matches('\n') {
                         errors.push(format!("ARTIFACT: {} is stale vs the '# graph:' manifests; regenerate: bash gate-sdk/bin/gen-pre-commit.sh --write", msg_hook));
                     }

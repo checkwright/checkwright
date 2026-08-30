@@ -3,7 +3,10 @@
 # no-port: gate-sdk/SPEC.md §gen-pre-commit — the hook bakes resolved argv, resolving a knob means sourcing the owning kit's lib/*.sh, and §lib/gate.sh rules exactly one place a knob's value is computed, so a crate-side emitter would be the second producer criterion 6 refuses; structural rather than a sizing judgment, and ratified by the operator 2026-08-21.
 set -euo pipefail
 
-SDK="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# spec: gate-sdk/SPEC.md §The path-dialect contract — the cwd anchor a composing script owes,
+# taken before anything is derived from BASH_SOURCE
+cd "$(pwd -P)"
+SDK="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 # shellcheck source=../lib/gate.sh
 source "$SDK/lib/gate.sh"
 
@@ -12,6 +15,9 @@ cd "$(git rev-parse --show-toplevel 2>/dev/null)" || {
     exit 2
 }
 REPO_ROOT="$(pwd -P)"
+# spec: gate-sdk/SPEC.md §The path-dialect contract — re-anchor: the cd above re-entered the
+# producer's spelling, and REL_DIRS below composes this root against a kit root
+cd "$REPO_ROOT"
 
 GATES_DIR="$(gate_sdk_gates_dir)"
 LIST="$GATES_DIR/gates.list"

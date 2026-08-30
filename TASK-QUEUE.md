@@ -29,19 +29,19 @@
   install, which is what makes it an exercise. Steps 1-8 green, so blocker 5 (shellcheck) and
   blocker 6 (the MSYS resolver, repaired at `48cff8d3`) are MEASURED rather than read, and batch
   4's `on_path` repair has the honest measurement this entry called owed for two rounds.
-  **WHAT REMAINS IS A GREEN RUN, and the gap is now two named gates rather than a class.**
-  `2 of 10 gates FAILED: check-graph check-install-disposition` — eight pass natively.
-  `check-graph` reports `gen-pre-commit.sh --emit failed` and `--emit-commit-msg failed`, so the
-  generator does not run on this host. `check-install-disposition` reports 10 findings shaped
-  `gate-sdk/checks/gate-sdk\checks\check-commit-msg.gate: declares zero-config but
-  gate-sdk/smoke/install.sh does not register it` — the path is DOUBLED AND MIXED-DIALECT, a POSIX
-  prefix concatenated with a backslashed tail, so those gates are looked up under a mangled key
-  rather than being genuinely unregistered. Read the log, not this summary, before repairing.
-  **THE ROUND-5 BLOCKER HAS LANDED — a TENSE fix, not a claim the leg is fixed** (re-tensed
-  2026-08-30 at close by the capability-pendency-after-landing audit). `msys-dialect-migration`
-  was the only thing between this leg and green; it closed and left the queue, so nothing waits on
-  it. Round 6's question is open and different: whether the doubled mixed-dialect key clears under
-  the migrated resolution, which was authored and verified on Linux with this leg its only observer.
+  **WHAT REMAINS IS A GREEN RUN.** Round 5's `2 of 10 gates FAILED: check-graph
+  check-install-disposition` was diagnosed off the job log and REPAIRED at build 2026-08-30, so
+  round 6 is an OBSERVATION rather than a repair. Neither cause was the dialect migration's, which
+  had not landed at round 5's head and does not reach either site. `check-install-disposition`'s
+  doubled mixed-dialect key came from `walk::expand` descending through `Path::join`, which spells
+  `\` on a `*-windows-msvc` host, so a `/`-splitting basename yielded the whole tail as the smoke
+  lookup key; walk.rs took a `child` speller (gate-sdk/SPEC.md §Porting to Rust does not retire
+  dialect exposure). `check-graph`'s two arms died together in `gen-pre-commit.sh`'s prologue: the
+  toplevel `cd` leaves an exported `$PWD` in the producer's spelling, a relative `cd … && pwd`
+  composes onto it, and that script's `realpath --relative-to` then straddles two dialects under
+  `set -e`; it anchors its own cwd, and assertion D carries the generator's stderr so a further red
+  arrives with its cause. **NEITHER REPAIR HAS BEEN EXECUTED ON WINDOWS** — no session here reaches
+  that host, so the close push is the first observation of both.
   **The two consequences stay UNEXECUTED and their precondition is unchanged.**
   `.github/workflows/gates.yml`'s `install-smoke-windows` keeps `continue-on-error: true` — the
   job's own comment drops it "on the run it is first observed green and not before", and round 5
