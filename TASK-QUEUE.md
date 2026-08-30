@@ -14,68 +14,57 @@
 
 ## Technical Debt
 
-- **platform-support-ci-matrix** [roadmap: next/reliability] [drain-exempt: close-observes]
-  [precondition-ok: run-observed] — a CI leg that PRODUCES AND EXERCISES a Windows gate-binary
-  artifact, which is gate-sdk/SPEC.md
-  §Consumer payload's join condition for `x86_64-pc-windows-msvc`. Four rounds bought; promoted
-  2026-08-30 by operator ruling, with PRODUCED discharged and the last named obstacle discharged.
+## Deferred
+
+- **platform-support-ci-matrix** [design-pending] [roadmap: next/reliability]
+  [precondition-ok: run-observed]
+  — a CI leg that PRODUCES AND EXERCISES a Windows gate-binary artifact, which is
+  gate-sdk/SPEC.md §Consumer payload's join condition for `x86_64-pc-windows-msvc`. Five rounds
+  bought. **The slug is deliberately NOT renamed** though "matrix" now reads oddly for one leg —
+  `powershell-installer-surface` cites it by name. The fork, the Windows-ahead-of-macOS ordering
+  and WSL-as-interim are TRAJECTORY.md §The closed rulings'; macOS is `macos-install-smoke-ci-leg`.
   roadmap-summary: A CI install-smoke leg per supported platform, or an honest label.
-  **The slug is deliberately NOT renamed** though "matrix" now reads oddly for one leg:
-  `powershell-installer-surface` cites it by name. The fork (legs, not an honest label) and the
-  Windows-ahead-of-macOS ordering are TRAJECTORY.md §The closed rulings'; WSL is the interim path;
-  macOS split off 2026-08-26 as `macos-install-smoke-ci-leg`.
-  **PRODUCED IS DISCHARGED** — rounds 3 (`33066446525`) and 4 (`33068870024`): the crate builds
-  natively on the host, `checkwright-gates.exe` is emitted at ~3.0 MB, and pack carries it
-  (`1 prebuilt gate binary/binaries`). Settled, and not to be re-bought.
-  **EXERCISED IS OWED, AND NOTHING HAS EVER RUN A GATE ON WINDOWS.** Placement is not exercise and a
-  repair is not an observation — the standard that has caught this entry four rounds running, and
-  promotion does not relax it: what discharges this entry is a green run, never a landed repair.
-  **Blocker 5 (shellcheck) is REPAIRED AND MEASURED, not inferred.** It was an adopter floor member
-  absent from `windows-latest`, so `init` refused the toolchain; docs/install.md §Requirements now
-  states the adopter's own stake and the leg supplies the member. Round 4 measured it end to end —
-  `choco exited 0`, `shellcheck resolves to: /c/ProgramData/Chocolatey/bin/shellcheck`, then the
-  line this project had never once produced: `init: INIT: vendored 1 kit(s) at the starter profile
-  (v0.25.0) and committed them.` **That is the first successful `checkwright init` on a Windows
-  host, ever.**
-  **BLOCKER 6 IS DISCHARGED, and this paragraph replaces the one that called it what remains.** Its
-  symptom was `10 of 10 gates FAILED`, every one `unresolved`, from a POSIX-slash compose over a
-  backslashed `D:\` root. The repair belonged to `msys-path-dialect-boundary-unmodelled`, which
-  owned the resolver and the contract while this entry owns only the observation; that entry
-  shipped 2026-08-29 at `48cff8d3`, whose pre-repair chain reproduced the observed
-  all-gates-unresolved string character-for-character. **So no blocker is named against this entry
-  and none is known.** `msys-dialect-migration` carries the residue and blocks nothing here.
-  **What remains is one observation and its two consequences.** Read the Windows leg on the next
-  run; if green, drop `continue-on-error: true` from `install-smoke-windows` and join
-  `x86_64-pc-windows-msvc` to `native/targets.list` — the job's own comment states that observation
-  IS the roster's join condition, so both moves execute a stated rule rather than adding one, which
-  is why this promotes as debt with the design-pending tag deleted rather than converted.
-  **Clearing blocker 6 also buys the first honest measurement of batch 4's `on_path` repair**
-  (`native/src/proc.rs`, the `#[cfg(windows)]` PATHEXT and `#[cfg(not(unix))]` `is_executable`
-  arms), unmeasured for two rounds because the three gates consuming it — `check-shellcheck`,
-  `check-action-run-shell`, `check-crate-arms` — and the evidence runner's `ps` probe all sit behind
-  that same resolver. Those arms COMPILE on Windows; their behaviour is READ, not MEASURED.
-  **`[drain-exempt: close-observes]`, and the reason is structural rather than convenient.** The
-  observation arrives from the iteration's own close push, so this entry cannot complete before the
-  drain stage entry — its remaining half IS drain-stage work, which is the residue class
-  `check-stage-entry` assertion B models. The successor backstop still binds: it drains at close or
-  it demotes there. `observation-predicate-entry-cannot-drain-in-its-own-iteration` owns the shape.
-  **THE PUSH PRICE WAS PROBED AND IS CORRECTED HERE, not appended to.** The superseded claim was
-  that each further round costs one push. `install-smoke-windows` runs on `windows-latest` under
-  `continue-on-error: true` in `.github/workflows/gates.yml`, whose `on: push` names master with no
-  `if:` on the job — so the next observation rides the ordinary close push at ZERO incremental cost.
-  The superseded claim was true only while rounds were being iterated within one iteration.
-  **Cost while deferred:** the one adopter class with a named days-to-weeks adoption
-  window still has no working install path on Windows, and
-  `powershell-installer-surface` — the port sequence's one remaining member — stays
-  sequenced behind this entry.
+  **PRODUCED AND EXERCISED ARE BOTH DISCHARGED — round 5 (`33298006656`, head `fb9ed980`,
+  2026-08-30) is the first run in this project's history to execute gates on Windows.** The leg
+  synthesizes a host-triple roster, so it built `checkwright-gates.exe` (3,217,408 bytes) for
+  `x86_64-pc-windows-msvc`, packed it (`1 prebuilt gate binary/binaries`), installed from the
+  tarball and ran the battery through it. Not an omit-and-declare install, which is what makes it
+  an exercise. Rounds 3-4's PRODUCED claim is superseded by this stronger one rather than restated;
+  blocker 5 (shellcheck) and blocker 6 (the MSYS resolver, repaired at `48cff8d3`) are both now
+  MEASURED rather than read, steps 1-8 of the leg being green — so batch 4's `on_path` repair has
+  its first honest measurement too, the one this entry called owed for two rounds.
+  **WHAT REMAINS IS A GREEN RUN, and the gap is now two named gates rather than a class.**
+  `2 of 10 gates FAILED: check-graph check-install-disposition` — eight pass natively.
+  `check-graph` reports `gen-pre-commit.sh --emit failed` and `--emit-commit-msg failed`, so the
+  generator does not run on this host. `check-install-disposition` reports 10 findings shaped
+  `gate-sdk/checks/gate-sdk\checks\check-commit-msg.gate: declares zero-config but
+  gate-sdk/smoke/install.sh does not register it` — the path is DOUBLED AND MIXED-DIALECT, a POSIX
+  prefix concatenated with a backslashed tail, so those gates are looked up under a mangled key
+  rather than being genuinely unregistered. Read the log, not this summary, before repairing.
+  **THE `blocks nothing here` LINE WAS FALSE AND IS RETRACTED, on measurement not on reading.**
+  This entry previously asserted "`msys-dialect-migration` carries the residue and blocks nothing
+  here." Round 5 falsifies it: the residue behind the second finding is that migration's corpus and
+  is now the ONLY thing between this leg and green. `msys-dialect-migration` is this entry's live
+  blocker, and the dependency runs that way round rather than the reverse.
+  **The two consequences stay UNEXECUTED and their precondition is unchanged.**
+  `.github/workflows/gates.yml`'s `install-smoke-windows` keeps `continue-on-error: true` — the
+  job's own comment drops it "on the run it is first observed green and not before", and round 5
+  was observed RED. `x86_64-pc-windows-msvc` stays off `native/targets.list` on the same fact.
+  **The join half is more expensive than a line edit, and that is measured rather than assumed.**
+  `native/targets.list:43-48` owns it: the consumer smoke builds its artifact from the host it runs
+  on and refuses a roster naming a platform that host is not, so the join needs steering or a
+  cross-compiling build, "neither built ahead of the second target". Budget it as work, not a line.
+  **Platform probes are clean and need no re-buying**: `[[ -x ]]` holds on a fresh shebang script
+  and on npm's bin shim, direct execution reaches, 260-char depth written.
+  **Cost while deferred:** the one adopter class with a named days-to-weeks adoption window still
+  has no working install path on Windows, and `powershell-installer-surface` — the port sequence's
+  one remaining member — stays sequenced behind this entry.
   ruled: platform-support-ci-matrix operator 2026-08-27 lead-relay
   ruled: platform-support-ci-matrix operator 2026-08-30 lead-relay
-  Filed 2026-07-26 by scope, split from `platform-support-contract`; Linux split off 2026-08-25 as
-  `linux-install-smoke-ci-leg`, macOS 2026-08-26. Promoted and deferred 2026-08-25, re-promoted and
-  deferred 2026-08-26, deferred again 2026-08-27 at build; promoted 2026-08-30 by scope on the
-  operator's unit-set ruling, its last blocker discharged by a sibling that shipped meanwhile.
-
-## Deferred
+  Filed 2026-07-26 by scope, split from `platform-support-contract`; Linux split 2026-08-25, macOS
+  08-26. Promoted and deferred 2026-08-25, 08-26, 08-27; promoted 2026-08-30 by scope, demoted
+  2026-08-30 by close on the red round-5 observation the close push itself bought — the
+  drain-exempt residue path, now spent and that tag dropped from the lead line.
 
 - **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
   — the whole battery onto the binary, and the shell surface down to its residue.
