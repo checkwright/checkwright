@@ -10,3 +10,4 @@ msys-dialect-migration align a830808a 2026-08-30 72d40279
 msys-dialect-migration build ad3313e1 2026-08-30 33a5eef7
 msys-dialect-migration build ad3313e1 2026-08-30 14b7994b
 msys-dialect-migration build ac35bcd0 2026-08-30 2eb0ff15
+msys-dialect-migration build a9abc50b 2026-08-30 222b6bbe
