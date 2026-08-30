@@ -136,9 +136,64 @@ git -C "$D" init -q
 git -C "$D" add crate/main.src
 run_case publishing-no-roster "$D" 1 'no target roster'
 
+# --- E: assertion G's tree half, driven to a finding on each widened clause ---
+# The good/+bad/ pair cannot reach this arm, and the reason is the **scope rule** rather than the
+# corpus: a case directory sits inside this repository and its files are tracked, so `git ls-files`
+# from one answers with the case's own shell files rather than with nothing — but both cases point
+# GATE_SDK_NATIVE_CRATE at a directory that does not exist, so neither is a publishing tree and the
+# tree half is out of scope inside the pair. This sandbox is a repository of its own with tracked
+# crate source, which is the only shape that opens the arm.
+E="$(make_sandbox tree-shape)"
+printf 'check-alpha\n' > "$E/scripts/gates.list"
+mkdir -p "$E/crate" "$E/tools"
+printf 'fn main() {}\n' > "$E/crate/main.src"
+printf '#!/usr/bin/env bash\n# no-port:\necho x\n'                        > "$E/tools/bare-cause.sh"
+printf '#!/usr/bin/env bash\n# port-until:\necho x\n'                     > "$E/tools/no-slug.sh"
+printf '#!/usr/bin/env bash\n# no-port: one\n# no-port: two\necho x\n'    > "$E/tools/doubled.sh"
+printf '#!/usr/bin/env bash\n# port-until: a-one\n# port-until: a-two\necho x\n' > "$E/tools/doubled-hold.sh"
+printf '#!/usr/bin/env bash\n# no-port: a cause\n# port-until: a-slug\necho x\n' > "$E/tools/both.sh"
+printf '#!/usr/bin/env bash\n# no-port: a cause naming its ruling\necho x\n' > "$E/tools/clean.sh"
+# The header block ends at the first code line, so a disposition token written *by* a script — the
+# heredoc-literal class a live run found in gate-sdk/smoke/ — is correctly not read as a declaration.
+printf '#!/usr/bin/env bash\necho x\n# no-port:\n# port-until:\n'         > "$E/tools/below-header.sh"
+git -C "$E" init -q
+git -C "$E" add crate/main.src tools scripts
+if run_case tree-shape "$E" 1 "port declaration with no cause: tools/bare-cause.sh"; then
+    expect_present tree-shape-slug   "hold declaration with no slug: tools/no-slug.sh"
+    expect_present tree-shape-double "more than one port declaration: tools/doubled.sh carries 2"
+    expect_present tree-shape-held   "more than one hold declaration: tools/doubled-hold.sh carries 2"
+    expect_present tree-shape-both   "contradictory port declarations: tools/both.sh"
+    expect_absent  tree-shape-clean  "tools/clean.sh"
+    expect_absent  tree-shape-below  "tools/below-header.sh"
+fi
+
+# --- F: the same sandbox with no crate source — the tree half is out of scope and says so ---
+# The scope rule's own boundary, and the shape the fixture pair is in: a vendored kit's malformed
+# cause is the kit author's to fix, so an adopter is held to none of it. The declaration half still
+# asserts, which is what makes the widening monotone.
+F="$(make_sandbox tree-unscoped)"
+printf 'check-alpha\n' > "$F/scripts/gates.list"
+mkdir -p "$F/tools"
+printf '#!/usr/bin/env bash\n# no-port:\necho x\n' > "$F/tools/bare-cause.sh"
+git -C "$F" init -q
+git -C "$F" add tools scripts
+if run_case tree-unscoped "$F" 0 'the tracked shell tree beyond that set out of scope here'; then
+    expect_absent tree-unscoped-quiet "tools/bare-cause.sh"
+fi
+
+# --- G: outside any repository at all — the corpus is empty and the verdict is still green ---
+# `git ls-files` fails rather than answering, which walk::tracked_shell_tree degrades to an empty
+# corpus. Case C above is the same shape by another route; this one names it directly, so the
+# degradation is proved rather than inherited from a case that is about something else.
+G="$(make_sandbox tree-no-repo)"
+printf 'check-alpha\n' > "$G/scripts/gates.list"
+mkdir -p "$G/crate"
+printf 'fn main() {}\n' > "$G/crate/main.src"
+run_case tree-no-repo "$G" 0 '0 file(s) read for header-declaration shape and 0 of them declaring'
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-gate-substrate-parity.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-gate-substrate-parity.test.sh: clean (declaration configurations: no descriptors, where the roster half is the only live half; descriptors present with none dispatching and no roster, where assertion F stays quiet; a consumer dispatching with no crate, which is also assertion G's empty shell-declaration corpus reported as a counted zero; and the publishing counterpart, where the same absent roster reds — $cases assertions over 4 sandboxes, with assertion B's roster matrix held in the crate unit tests beside the rule)"
+echo "check-gate-substrate-parity.test.sh: clean (declaration configurations: no descriptors, where the roster half is the only live half; descriptors present with none dispatching and no roster, where assertion F stays quiet; a consumer dispatching with no crate, which is also assertion G's empty shell-declaration corpus reported as a counted zero; and the publishing counterpart, where the same absent roster reds. Assertion G's tree half adds three: every widened clause driven to a finding over tracked shell files in a publishing sandbox, with a well-formed declaration and a below-header token both correctly silent; the same tree out of scope where no crate source is tracked; and the empty corpus outside any repository — $cases assertions over 7 sandboxes, with assertion B's roster matrix held in the crate unit tests beside the rule)"
 exit 0

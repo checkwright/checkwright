@@ -212,6 +212,19 @@ fn authoring_tree(crate_dir: &str) -> bool {
     }
 }
 
+// spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion G's report, one finding per
+// shape fault, in the gate's existing per-finding shape. One formatter for both corpora, so a
+// malformed declaration reads the same wherever it sits.
+fn shape_finding(path: &str, fault: &walk::ShapeFault) -> String {
+    match fault {
+        walk::ShapeFault::DoubledCause(n) => format!("more than one port declaration: {} carries {} '# no-port:' lines — a declaration carries at most one", path, n),
+        walk::ShapeFault::EmptyCause => format!("port declaration with no cause: {} carries a bare '# no-port:' line — the cause names the ruling that makes the member permanent, and is the field's whole payload", path),
+        walk::ShapeFault::DoubledHold(n) => format!("more than one hold declaration: {} carries {} '# port-until:' lines — a declaration carries at most one", path, n),
+        walk::ShapeFault::EmptySlug => format!("hold declaration with no slug: {} carries a bare '# port-until:' line — the slug names the live queue entry that owns the blocker, and is the field's whole payload", path),
+        walk::ShapeFault::BothFields => format!("contradictory port declarations: {} carries both '# no-port:' and '# port-until:' — permanent and temporarily-held are opposite verdicts about the same member", path),
+    }
+}
+
 fn ind(line: &str) -> i64 {
     match line.bytes().position(|b| b != b' ') {
         Some(n) => n as i64,
@@ -478,23 +491,17 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
 
         declpaths_shell += 1;
-        if noport > 1 {
-            ctx.findings.push(format!("more than one port declaration: {} carries {} '# no-port:' lines — a declaration carries at most one", src, noport));
-        } else if noport == 1 {
-            noport_declared += 1;
-            let cause = first_payload(&text, "no-port").unwrap_or("");
-            if trim(cause).is_empty() {
-                ctx.findings.push(format!("port declaration with no cause: {} carries a bare '# no-port:' line — the cause names the ruling that makes the member permanent, and is the field's whole payload", src));
-            }
+        // spec: gate-sdk/SPEC.md §check-gate-substrate-parity — clauses 2 through 5 read the shared
+        // shape verdict rather than a second implementation of it, over this half's whole-file scan
+        // scope, which a widening may not narrow
+        for fault in walk::shape(&text).faults {
+            ctx.findings.push(shape_finding(&src, &fault));
         }
-        if portuntil > 1 {
-            ctx.findings.push(format!("more than one hold declaration: {} carries {} '# port-until:' lines — a declaration carries at most one", src, portuntil));
-        } else if portuntil == 1 {
+        if noport == 1 {
+            noport_declared += 1;
+        }
+        if portuntil == 1 {
             portuntil_declared += 1;
-            let slug = first_payload(&text, "port-until").unwrap_or("");
-            if trim(slug).is_empty() {
-                ctx.findings.push(format!("hold declaration with no slug: {} carries a bare '# port-until:' line — the slug names the live queue entry that owns the blocker, and is the field's whole payload", src));
-            }
 
             // assertion H: a held declaration's ground is reachable in one hop — the section
             // the declaration's own `# spec:` field names states the hold, so a reader arriving
@@ -521,8 +528,37 @@ fn rule(args: &[String]) -> Result<i32, String> {
                 }
             }
         }
-        if noport > 0 && portuntil > 0 {
-            ctx.findings.push(format!("contradictory port declarations: {} carries both '# no-port:' and '# port-until:' — permanent and temporarily-held are opposite verdicts about the same member", src));
+    }
+
+    // spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion G's tree half: the corpus is
+    // the union of the declaration set above and §port-blockers' tracked-shell-tree rule,
+    // de-duplicated against the declaration set (assertion A resolves one set, so the sibling's
+    // two-half dedup collapses to this). Scoped to the publishing tree on assertion F's own
+    // predicate: a vendored kit's malformed cause is the kit author's to fix.
+    let mut tree_scanned = 0usize;
+    let mut tree_declared = 0usize;
+    let mut tree_state = "out of scope here, this tree having authored no declaration it carries";
+    if publishing {
+        tree_state = "walked";
+        for f in walk::tracked_shell_tree()? {
+            if declpaths.contains(&f) {
+                continue;
+            }
+            // spec: gate-sdk/SPEC.md §port-blockers — the header block alone over this corpus: it
+            // carries scripts that *write* shell, and a line-anywhere scan cannot tell a
+            // declaration from a heredoc literal
+            let Ok(bytes) = std::fs::read(Path::new(&f)) else {
+                continue;
+            };
+            let header = walk::header_block(&String::from_utf8_lossy(&bytes));
+            tree_scanned += 1;
+            let sh = walk::shape(&header);
+            if sh.declared.is_some() {
+                tree_declared += 1;
+            }
+            for fault in sh.faults {
+                ctx.findings.push(shape_finding(&f, &fault));
+            }
         }
     }
 
@@ -708,7 +744,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
 
     println!(
-        "GATE-SUBSTRATE-PARITY: clean ({declared} member(s) with one declaration each, {dispatching} of them dispatching to the binary; {noport_declared} of the {declpaths_shell} shell declaration(s) declare '# no-port:' with a cause and {portuntil_declared} declare '# port-until:' with a slug, neither on any descriptor nor both on one declaration; {portuntil_grounded} of those held declaration(s) reach their ground in one hop, the section their own '# spec:' field names stating the hold; {ndesc} descriptor(s) in parity with the {nsub}-subcommand roster ({in_scope} in scope, {out_of_scope} out of scope — an unvendored kit, or a consumer declaration from another tree), {refonly} reference-only; {sensitive} substrate-sensitive member(s) all dispositioned; {impl_scanned} implementation source(s) free of manifest-class annotation; {kit_scanned} kit root(s) scanned for an implementation sibling, crate root {crate_dir} outside every kit root; target roster {roster_state} at {roster_file} with {roster_targets} well-formed target(s); publish workflow {wf_state} at {workflow}, {wf_matrix} matrix declaration(s) roster-derived across {wf_jobs} job(s) with one producer per digest)",
+        "GATE-SUBSTRATE-PARITY: clean ({declared} member(s) with one declaration each, {dispatching} of them dispatching to the binary; {noport_declared} of the {declpaths_shell} shell declaration(s) declare '# no-port:' with a cause and {portuntil_declared} declare '# port-until:' with a slug, neither on any descriptor nor both on one declaration; the tracked shell tree beyond that set {tree_state}, {tree_scanned} file(s) read for header-declaration shape and {tree_declared} of them declaring, counted apart from the declaration set so an empty one stays visible; {portuntil_grounded} of those held declaration(s) reach their ground in one hop, the section their own '# spec:' field names stating the hold; {ndesc} descriptor(s) in parity with the {nsub}-subcommand roster ({in_scope} in scope, {out_of_scope} out of scope — an unvendored kit, or a consumer declaration from another tree), {refonly} reference-only; {sensitive} substrate-sensitive member(s) all dispositioned; {impl_scanned} implementation source(s) free of manifest-class annotation; {kit_scanned} kit root(s) scanned for an implementation sibling, crate root {crate_dir} outside every kit root; target roster {roster_state} at {roster_file} with {roster_targets} well-formed target(s); publish workflow {wf_state} at {workflow}, {wf_matrix} matrix declaration(s) roster-derived across {wf_jobs} job(s) with one producer per digest)",
         ndesc = descriptors.len(),
         nsub = roster.len(),
         in_scope = verdict.in_scope,

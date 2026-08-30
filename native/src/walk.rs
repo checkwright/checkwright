@@ -74,35 +74,84 @@ pub enum Disposition {
     PortUntil(String),
 }
 
-// spec: gate-sdk/SPEC.md §port-blockers — one well-formedness rule rather than three: an empty
-// cause, a missing slug, a doubled field and a file carrying **both** are each `Owed`, because a
-// file that has not made a reviewable declaration has not made one.
-pub fn disposition(header: &str) -> Disposition {
-    let no_port = header_field(header, "no-port:");
-    let port_until = header_field(header, "port-until:");
-    match (no_port.as_slice(), port_until.as_slice()) {
-        ([cause], []) => {
-            if cause.chars().all(char::is_whitespace) {
-                Disposition::Owed
-            } else {
-                Disposition::NoPort
-            }
-        }
-        ([], [payload]) => {
-            let t = payload.trim_start_matches([' ', '\t']).as_bytes();
-            let mut n = 0usize;
-            while n < t.len() && (t[n].is_ascii_lowercase() || t[n].is_ascii_digit() || t[n] == b'-')
-            {
-                n += 1;
-            }
-            if n == 0 {
-                Disposition::Owed
-            } else {
-                Disposition::PortUntil(String::from_utf8_lossy(&t[..n]).into_owned())
-            }
-        }
-        _ => Disposition::Owed,
+// spec: gate-sdk/SPEC.md §port-blockers — the shape fault the one well-formedness rule found.
+// There is no fifth member because the rule has four ways to be broken; each is read by
+// §check-gate-substrate-parity's assertion G at its own run, one finding apiece.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ShapeFault {
+    DoubledCause(usize),
+    EmptyCause,
+    DoubledHold(usize),
+    EmptySlug,
+    BothFields,
+}
+
+// spec: gate-sdk/SPEC.md §port-blockers — the richer verdict the disposition triple projects from:
+// the faults in the order a reader meets them, and the declaration a fault-free file made. One
+// derivation with two readers, so the classifier and assertion G cannot disagree about well-formedness.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Shape {
+    pub faults: Vec<ShapeFault>,
+    pub declared: Option<Disposition>,
+}
+
+impl Shape {
+    // spec: gate-sdk/SPEC.md §port-blockers — every fault maps to `Owed`, which is what the reader
+    // returned before the verdict was made explicit: a file that has not made a reviewable
+    // declaration has not made one, and so is indistinguishable here from one that made none.
+    pub fn project(&self) -> Disposition {
+        self.declared.clone().unwrap_or(Disposition::Owed)
     }
+}
+
+// spec: gate-sdk/SPEC.md §port-blockers — one well-formedness rule rather than three: an empty
+// cause, a missing slug, a doubled field and a file carrying **both** are each a fault, because a
+// file that has not made a reviewable declaration has not made one.
+// spec: gate-sdk/SPEC.md §check-gate-substrate-parity — its argument is a text and not a corpus,
+// so the declaration half hands it a whole file and the tree half a `header_block`
+pub fn shape(text: &str) -> Shape {
+    let no_port = header_field(text, "no-port:");
+    let port_until = header_field(text, "port-until:");
+    let mut faults: Vec<ShapeFault> = Vec::new();
+    if no_port.len() > 1 {
+        faults.push(ShapeFault::DoubledCause(no_port.len()));
+    } else if no_port.len() == 1 && no_port[0].chars().all(char::is_whitespace) {
+        faults.push(ShapeFault::EmptyCause);
+    }
+    let mut slug = String::new();
+    if port_until.len() > 1 {
+        faults.push(ShapeFault::DoubledHold(port_until.len()));
+    } else if port_until.len() == 1 {
+        let t = port_until[0].trim_start_matches([' ', '\t']).as_bytes();
+        let mut n = 0usize;
+        while n < t.len() && (t[n].is_ascii_lowercase() || t[n].is_ascii_digit() || t[n] == b'-') {
+            n += 1;
+        }
+        if n == 0 {
+            faults.push(ShapeFault::EmptySlug);
+        } else {
+            slug = String::from_utf8_lossy(&t[..n]).into_owned();
+        }
+    }
+    if !no_port.is_empty() && !port_until.is_empty() {
+        faults.push(ShapeFault::BothFields);
+    }
+    let declared = if !faults.is_empty() {
+        None
+    } else if no_port.len() == 1 {
+        Some(Disposition::NoPort)
+    } else if port_until.len() == 1 {
+        Some(Disposition::PortUntil(slug))
+    } else {
+        None
+    };
+    Shape { faults, declared }
+}
+
+// spec: gate-sdk/SPEC.md §port-blockers — the three-valued disposition, now a projection of the
+// verdict above rather than a second computation of it
+pub fn disposition(header: &str) -> Disposition {
+    shape(header).project()
 }
 
 // spec: gate-sdk/SPEC.md §The `# graph:` manifest — a header field opens the line: '#' in column
@@ -849,6 +898,56 @@ mod tests {
             "two causes are not one reviewable declaration"
         );
         assert_eq!(disposition("#!/usr/bin/env bash\n\n"), Disposition::Owed);
+    }
+
+    // spec: gate-sdk/SPEC.md §port-blockers — the projection maps every fault to `Owed`, which is
+    // the byte-identity the port-blockers arms rest on: the fault kind is new information beside a
+    // verdict that did not move, never a verdict that moved.
+    #[test]
+    fn every_shape_fault_projects_to_owed_and_a_clean_declaration_projects_to_itself() {
+        for (text, want) in [
+            ("# no-port:\n", ShapeFault::EmptyCause),
+            ("# no-port:   \n", ShapeFault::EmptyCause),
+            ("# port-until:\n", ShapeFault::EmptySlug),
+            ("# port-until: NotASlug\n", ShapeFault::EmptySlug),
+            ("# no-port: one\n# no-port: two\n", ShapeFault::DoubledCause(2)),
+            (
+                "# port-until: a-one\n# port-until: a-two\n",
+                ShapeFault::DoubledHold(2),
+            ),
+        ] {
+            let s = shape(text);
+            assert!(s.faults.contains(&want), "{}: {:?}", text, s.faults);
+            assert_eq!(s.project(), Disposition::Owed, "{}", text);
+            assert_eq!(s.declared, None, "{}", text);
+        }
+        let both = shape("# no-port: a cause\n# port-until: a-slug\n");
+        assert_eq!(both.faults, vec![ShapeFault::BothFields]);
+        assert_eq!(both.project(), Disposition::Owed);
+        assert!(shape("#!/usr/bin/env bash\n\n").faults.is_empty());
+        assert_eq!(shape("#!/usr/bin/env bash\n\n").project(), Disposition::Owed);
+        let clean = shape("# no-port: a cause\n");
+        assert!(clean.faults.is_empty());
+        assert_eq!(clean.project(), Disposition::NoPort);
+    }
+
+    // spec: gate-sdk/SPEC.md §port-blockers — the faults arrive in the order a reader meets them:
+    // the cause clauses, the hold clauses, then the clause neither field owns alone. Assertion G
+    // emits one finding per fault in this order, so it is the report's order too.
+    #[test]
+    fn the_faults_of_one_file_are_ordered_cause_then_hold_then_the_shared_clause() {
+        assert_eq!(
+            shape("# no-port:\n# port-until:\n").faults,
+            vec![
+                ShapeFault::EmptyCause,
+                ShapeFault::EmptySlug,
+                ShapeFault::BothFields
+            ]
+        );
+        assert_eq!(
+            shape("# no-port: a\n# no-port: b\n# port-until: a-slug\n").faults,
+            vec![ShapeFault::DoubledCause(2), ShapeFault::BothFields]
+        );
     }
 
     // spec: gate-sdk/SPEC.md §port-blockers — the slug is the leading run of `[a-z0-9-]` after the

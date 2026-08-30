@@ -1180,17 +1180,27 @@ rule: a `.gate` descriptor still carries **neither**.
 
 **Its readers.** `# no-port:` is read by §port-blockers' `--group` arm over the
 registry and its `--tree` arm over the tracked shell tree, and by
-§check-gate-substrate-parity's assertion G. `# port-until:` is read by those three
+§check-gate-substrate-parity's assertion G — over **both** corpora, the assertion
+having widened with the fields. `# port-until:` is read by those three
 and, for its slug's liveness, by §check-gate-exemption-tasks. Both are read by
 §check-comment-tier, which is what keeps the line from reading as a restatement,
 and which needed no widening: both spellings were already in its built-in directive
 roster and its corpus was already the whole governed tree rather than the
-declaration paths the fields widen *from*. **Assertions G and H do not widen with
-the fields**, and stating that is the easily-missed half: their subject is the
-*gate registry*, and a plain script has no registry membership and no `# spec:`
-pointer for H to open, so widening their walk would red every script that declared.
-The reader of a plain script's declaration is `--tree` and, for a slug,
-§check-gate-exemption-tasks.
+declaration paths the fields widen *from*. **Assertion H does not widen with
+the fields, and assertion G widens in four of its five clauses** — the correction
+of an over-general sentence that once said neither did, and stating the split is
+the easily-missed half. H's whole mechanism is opening the section a declaration's
+`# spec:` field names, and a plain script has no such pointer, so widening its walk
+would red every script that declared; the same is true of **clause 1 of G**, which
+is about descriptors and has nothing to range over on a plain script. It is *not*
+true of G's clauses 2 through 5, which read a header field and need neither a
+registry membership nor a pointer. **The reason was never reversed, only bounded**:
+the split the two fields already draw is unchanged and is what put the shape
+widening on that gate rather than on §check-gate-exemption-tasks — *a field's
+spelling-domain is the dispatch seam's own partition, while a claim about the queue
+belongs with the gate that already reads the queue*, and shape is spelling-domain.
+The readers of a plain script's declaration are `--tree`, assertion G for its
+shape, and §check-gate-exemption-tasks for a slug's liveness.
 
 **What the widening does not gain is a knob**, and the reason it does not is worth
 stating precisely, because the argument that held for the declaration path does not
@@ -1642,7 +1652,7 @@ holds for the same reason it always did.
 | `check-graph`, `check-kit-enum`, `check-gate-fixture-coverage`, `check-enforcement-fresh` | **Survive unchanged** — all four read the declaration path as text (directly, or through the enforcement-map and footprint emitters, which do), which the descriptor still is. |
 | `check-value-rollup-fresh` | **Survives unchanged in mechanism, and is itself `.gate`-dispatched** since §The consumer remainder cohort — so this row now describes a ported member reading ported members' declaration paths. It reads them as text through the footprint emitter, a non-gate arm this gate calls in-process (§The non-gate arm), and the declaration path is what that emitter reads — which is why the port moves nothing about its rule. What the port *did* move is one term of its coupling, recorded because the re-derivation confirmed it rather than assuming it: its `couples=` names `scripts/*.sh,kit:*.sh`, and after that cohort emptied the consumer's gates directory of check scripts, `scripts/*.sh` covers **no** registry member's declaration path at all. That left `kit:*.sh` as the whole of its selection, and **`shell-gate-tail-port` emptied that token too**: with no shell gate declaration left in any kit, the derivation does not select this member and its row is a **retained record rather than an owed disposition**. Both halves of the same narrowing, a cohort apart, which is why the second is stated here rather than treated as new. A narrowing is still not a clearance — `scripts/` and the kits retain many non-gate `*.sh`, and the coupling still earns its trigger — but a later reader deriving the set must not read either `*.sh` token as the thing that selects this row, because neither does. |
 | `check-gate-binary-fresh` | **Retained by construction — and recorded here before the derivation reaches it, deliberately.** It reads declaration paths as a *set*, to decide whether the binary is load-bearing, and never reads a gate's source, so a port is its trigger rather than its blind spot: a ported member is exactly the case that switches it on. Its couples name `kit:checks/*.gate` specifically, so it was **not yet substrate-sensitive** by assertion C's runtime derivation when this row was written, with zero descriptors then on disk, and the row was not yet owed — it was written ahead of the trigger rather than left to be discovered. The first cohort's descriptors have since landed, so the gate is sensitive and the row is owed; the commit that landed them would have reddened on a missing disposition, and that commit's session was the worst possible one to be learning this table exists. That is the foresight paying, and it is the same reasoning as the gate itself: the oracle ahead of the hole (§check-gate-binary-fresh). |
-| `check-gate-substrate-parity` | **Retained by construction, and `.gate`-dispatched since `shell-gate-tail-port`** — it is substrate-sensitive by the same derivation it performs, and it reads declaration paths both as text and as a *set*, which is precisely what it exists to see, so this row now describes the auditor of the dispatch relation auditing itself. It ported under the 2026-08-23 ruling that retired born-native exception class (a): the shell form already read one side of its comparison through `--list`, so the auditor's independence from the binary was never more than the absent-binary case, which the fail-closed contract owns — and compiled, that case has no reachable input, the binary being the process the assertion runs in. The port moves nothing in the rule: the descriptor set is still globbed off the resolve dirs and the roster is still the binary's, reached in process rather than through a spawn (§check-gate-substrate-parity). Its own row is written out rather than left to the section's prose mention: assertion C is satisfied by any occurrence of a member's name in this section, and a gate passing its own assertion by being *discussed* is a coincidence, not a disposition. |
+| `check-gate-substrate-parity` | **Retained by construction, and `.gate`-dispatched since `shell-gate-tail-port`** — it is substrate-sensitive by the same derivation it performs, and it reads declaration paths both as text and as a *set*, which is precisely what it exists to see, so this row now describes the auditor of the dispatch relation auditing itself. It ported under the 2026-08-23 ruling that retired born-native exception class (a): the shell form already read one side of its comparison through `--list`, so the auditor's independence from the binary was never more than the absent-binary case, which the fail-closed contract owns — and compiled, that case has no reachable input, the binary being the process the assertion runs in. The port moves nothing in the rule: the descriptor set is still globbed off the resolve dirs and the roster is still the binary's, reached in process rather than through a spawn (§check-gate-substrate-parity). Its own row is written out rather than left to the section's prose mention: assertion C is satisfied by any occurrence of a member's name in this section, and a gate passing its own assertion by being *discussed* is a coincidence, not a disposition. Assertion G's widening to the tracked shell tree adds **no** member here, and the absence is a ruling rather than an omission: the corpus is one this gate now walks itself, so there is no further member whose disposition the widening puts in question. |
 | `check-install-disposition` | **Retained, and substrate-blind by construction** — it reads both declaration spellings as text, taking the `# install:` header line off a `.gate` descriptor exactly as off a `.sh` implementation, because a ported gate is still a gate a kit ships and its disposition is a property of the gate rather than of its substrate (§The install disposition). A port therefore moves nothing here: the declaration travels with the descriptor, which is the same file the installer's payload already carries. It is **`.gate`-dispatched since `shell-gate-tail-port`**, ported with its sibling auditor under the 2026-08-23 ruling: the assertion that a gate declares itself is a text walk over both declaration spellings, and a binary that is absent cannot pass it silently — the battery exits 2 rather than skipping (§Fail-closed contract). What its own port moved is one number rather than any part of its rule — its clean line counts one fewer `.sh` and one more `.gate`, which is the substrate-blindness above measured rather than asserted. |
 | `check-docs-cmd`, `check-install-claim`, `check-payload-claim`, `check-queue-slug-liveness` | **Survive unchanged — reverse triggers.** Each names `scripts/*.sh`/`kit:*.sh` in `couples=` only so that a script change re-runs it; the corpus each actually scans is the governed-doc set, and none reads a gate script's *content* as its assertion target. `check-docs-cmd` is worth naming: it will correctly — not vacuously — red on a doc still fencing a deleted `.sh` path after a port. That is real signal. Every member of this row is a ported one — `check-queue-slug-liveness` since the queue-kit cohort, `check-docs-cmd` since the canon-kit one, and the remaining pair since the ERE cohort — so the row describes `.gate`-declared gates throughout; the reasoning is unaffected, because what they scan is the governed-doc set rather than any gate's content. |
 | `check-settings-paths` | **Survives unchanged — reverse trigger, and a port is its subject rather than its blind spot.** Its `couples=` names `kit:checks/*.sh` only so that a check-script edit re-runs it; what it scans is the committed permission allow-list, never a gate script's content. A port is the event it exists for: replacing `checks/<gate>.sh` with a descriptor strands every allow entry naming the old path, so the gate reddens *because* of a port rather than falling silent after one — the shape `check-docs-cmd` has in the row above. Two limits are recorded rather than left to be re-derived. The glob is deliberately not widened to `*.gate`, because a descriptor path is not something a `Bash(…)` grant invokes and the widening would add no assertion. And the trigger is a **partial route by construction**: the generated hook matches staged `ACMR` paths, so a *deleted* `.sh` never fires it; what catches a cohort's stranded grants is the whole-tree battery, which runs with no trigger filter. The trigger still earns its place — it catches the ordinary edit that strands a grant — but it is not what makes the gate's landing order necessary (context-kit/SPEC.md §check-settings-paths). **This member is itself `.gate`-dispatched from the settings cohort**, so the row describes a ported gate: the reverse trigger and both limits above are properties of its rule, not of its substrate, and survived the port unchanged. |
@@ -9260,10 +9270,18 @@ field and a file carrying **both** are each read as `owed`. Those are not
 separate rules but one — a file that has not made a reviewable declaration has
 not made one — and it is the same over-count direction absence already takes. The
 triple and the header-block read it is computed from sit on the crate's universal
-layer beside the corpus rule, with **two** named readers and no third: this arm,
-which prints the disposition as a row's second column, and §check-gate-exemption-tasks'
+layer beside the corpus rule, with **three** named readers: this arm,
+which prints the disposition as a row's second column; §check-gate-exemption-tasks'
 tree half, which reads the held field's slug for liveness and inlined a narrower
-scan of its own before the promotion. There is no fourth count because there
+scan of its own before the promotion; and §check-gate-substrate-parity's assertion
+G, which reads the **shape fault** rather than the projection. **The rule the
+classifier applies is the explicit half of a richer verdict**, so that third reader
+added no second implementation of well-formedness: the reader yields the fault it
+found — empty cause, empty slug, doubled field, both fields — and this triple is a
+**projection** of it, mapping every fault to `owed`, which is what the reader
+returned before the verdict was named. The arms' behaviour is byte-identical by
+construction rather than by a parity lane. There is no fourth fault and no fourth
+disposition, and nothing is minted for a reader that does not exist. There is no fourth count because there
 is no fourth disposition, and *held* is separated from *no-port* for the reason
 `--group` separates *still owed* from *takeable*: a temporary hold is not a
 permanent disposition, and folding the two silently falsifies the subtraction a
@@ -10363,9 +10381,12 @@ placement; and (H) a held declaration's ground reachable in one hop.
   from being either vacuous in this repo (which has a roster, registers both
   ported members, and is checked in full) or hostile to a consumer that has no
   crate.
-- **assertion G — port-declaration placement.** Five clauses over the declaration
+- **assertion G — port-declaration placement.** Five clauses over the **union**
+  of two corpora: the declaration
   set assertion A already derives, which resolves every member to exactly one
-  declaration and knows which spelling it got — the entire input, which is why
+  declaration and knows which spelling it got, and the tracked shell tree
+  §port-blockers derives for its own `--tree` arm. The declaration set is the
+  entire input to clause 1, which is why
   this folds in here rather than shipping as its own gate, on the precedent
   assertion E states for itself. **A `.gate` descriptor carries no `# no-port:`
   line and no `# port-until:` line**, §The `# graph:` manifest's placement rule for
@@ -10384,6 +10405,75 @@ placement; and (H) a held declaration's ground reachable in one hop.
   where a declaration field may live by spelling is the dispatch seam's own
   partition, the question assertion D answers for the
   implementation-versus-declaration axis.
+
+  **Which clauses reach the tree corpus, and which do not.** Clauses 2 through 5
+  — a non-empty cause, at most one `# no-port:`, a non-empty slug, and never both
+  fields — read a header field and nothing else, so they apply to a plain tracked
+  script unchanged. **Clause 1 stays on the declaration set**: a plain script is
+  not a descriptor, so the clause has nothing to range over there. The corpus is a
+  **union** and never a replacement, for a reason worth stating because the
+  replacement reads simpler: a `.gate` descriptor is no `*.sh`, so a corpus that
+  replaced the declaration set would silently drop every descriptor-borne field
+  and lose clause 1 entirely. The tree half is de-duplicated against the
+  declaration set, which is the whole of assertion A's output — the sibling at
+  §check-gate-exemption-tasks de-duplicates against both halves of its own walk
+  because its scope rule splits one, and assertion A's does not.
+
+  **A disposition is read from the header block alone over the tree corpus, and
+  the declaration corpus keeps its whole-file scan.** The tree corpus contains
+  scripts that *write* shell — smoke recipes, installers, template authors — and a
+  line-anywhere scan cannot tell a declaration from a heredoc literal; the
+  restriction is the field's own name rather than a new rule, both being **header**
+  fields, and §port-blockers owns it for the corpus rather than for one reader.
+  Leaving the declaration corpus alone is what keeps the widening monotone:
+  narrowing a scan that already shipped would retire findings, which a widening may
+  not do. The asymmetry between the two corpora is deliberate and reads like an
+  oversight, which is why it is stated; its sibling adopted it after a live run
+  reported against a heredoc literal in a smoke recipe.
+
+  **The tree half is scoped to the tree that authored the declaration**, on the
+  same ground and with the same predicate assertion F computes for its publishing
+  test: a vendored kit's malformed cause is the kit author's, and asserting it in
+  an adopter tree demands of an adopter something only the kit author can satisfy.
+  Where there is no tracked set the tree half is empty and the declaration half
+  still asserts, which returns exactly the pre-widening assertion — monotone again,
+  and the opposite disposition from §port-blockers' `--tree` arm, whose *whole*
+  subject is the tracked tree and which therefore refuses. Here the tree corpus is
+  an **addition** to a corpus the gate can still read. **Its honest limit, stated
+  rather than discovered:** the predicate is the publishing test alone, where
+  §check-gate-exemption-tasks widens its own with a second clause for the
+  consumer's own gates directory — so in a non-authoring tree a malformed
+  declaration on a script that tree wrote itself, outside a kit root, is not caught
+  here. Narrowing that costs a second scope clause on a gate whose subject is the
+  seam rather than the queue, and it is the sibling's clause to lend if a consumer
+  ever wants it.
+
+  **The clean line counts the two corpora separately**, so the counted-zero tell
+  survives the widening: assertion G's declaration corpus is empty in this tree and
+  its verdict is green-with-a-counted-zero, and folding the tree count into the
+  declaration count would make an empty declaration half indistinguishable from a
+  populated one.
+
+  **One derivation, two readers — the well-formedness rule is not implemented
+  twice.** The clauses do not re-derive what §port-blockers' classifier already
+  computes: the disposition reader on the crate's universal layer yields the
+  **shape fault** it found — empty cause, empty slug, doubled field, both fields —
+  and the three-valued disposition is a **projection** of that richer verdict,
+  mapping every fault to `owed`. §port-blockers' classifier and this assertion
+  therefore read one function and can never disagree about whether a declaration is
+  well formed. This is criterion 6's *unless* clause satisfied in its strongest
+  form — the duplication is not machine-held, it is **absent** — which is the same
+  discharge the config bridge takes and is preferred to a parity lane for exactly
+  the reason criterion 6 gives: a lane expires at the next edit to either side. The
+  two corpora differ only in the **scan scope** handed to that one function, a
+  whole file for the declaration set and a `header_block` for the tree, which is
+  not a second rule. **What that unification moved, stated because it is a real
+  behavioral delta and not a refactor:** the slug clause reads *a leading run of
+  `[a-z0-9-]`*, the classifier's own test, where a separate implementation of it
+  here would read *payload non-empty* and let `# port-until: NotASlug` pass while
+  §port-blockers counted it `owed`. Unification picks a side, and the direction it
+  picks is a finding added and none retired: the reader's rule wins because it is
+  the rule being made explicit rather than replaced.
 
   **Presence is deliberately not asserted for either field, and the asymmetry is
   what makes that safe.** No clause demands that a permanently-shell member
@@ -10406,25 +10496,39 @@ placement; and (H) a held declaration's ground reachable in one hop.
   Landing it here instead would give this gate a queue-file coupling it
   deliberately has none of, it being the auditor of the dispatch seam.
 
-  **Its corpus narrows to empty in this tree, and the verdict there is
-  green-with-a-counted-zero.** Within **this assertion's** corpus — the declaration
+  **Its declaration corpus narrows to empty in this tree, and the verdict there is
+  green-with-a-counted-zero.** Within that half — the declaration
   set assertion A derives — both fields reach only the `<name>.sh` spelling, so once
   no registered member declares in that spelling the clause set has nothing to range
-  over. That is a statement about G's corpus and **not** about the fields' domain,
-  which §The `# graph:` manifest widened to any tracked script: a plain script
-  carrying either field is read by `--tree` and, for a slug, by
-  §check-gate-exemption-tasks, and is invisible here by design. That is a **corpus narrowing**, one of the three non-monotone shapes
+  over there. That is a statement about one corpus and **not** about the fields'
+  domain, which §The `# graph:` manifest widened to any tracked script — and the
+  tree half above is this assertion's reach over that domain, so a plain
+  script's malformed declaration is visible here through it. That emptiness is a **corpus narrowing**, one of the three non-monotone shapes
   §The causal-completeness check point 5 names, and the red condition is stated so
-  it stays on the right side of it: *a `<name>.sh` declaration whose field is
+  it stays on the right side of it: *a declaration whose field is
   malformed or whose `# spec:` section does not state the hold* — never *no
   declaration found*. The counted zero is on the clean line for the same reason
   assertion H's grounded count is, and the empty case is carried explicitly in the
-  bespoke test rather than left to arrive with the last port.
+  bespoke test rather than left to arrive with the last port. **The widening itself
+  runs the other way** — a corpus grows — so point 5's enumeration does not bind on
+  it in the direction it guards; it is stated anyway because the widening ships
+  beside cuts that *add* declarations and the two must not read as one narrowing.
+  No reader over this corpus reds on finding none, asserts an exact count, or holds
+  a coverage floor.
+
+  **Presence is still not asserted, on the widened corpus either.** No clause
+  demands that a permanently-shell *script* declare, for the reason the
+  declaration-set paragraph above gives: permanence is a ruling in prose and a gate
+  deriving which files hold one would have to parse argument text. An undeclared
+  file is counted owed, the status-quo over-count, so the widening still fails
+  toward today's state rather than toward an under-count. And slug **liveness**
+  stays where it is: this gate gains no queue coupling from the widening.
 
   The gate was shell under the since-retired exception class (a) when this
   assertion landed, so widening it raised no substrate question, and the
-  assertion adds no member to the conservation table: the corpus is the
-  declaration set it already walks.
+  assertion adds no member to the conservation table: the tree corpus is one this
+  gate now walks itself, so the absence of a row is a ruling rather than an
+  omission.
 - **assertion H — a held declaration's ground is reachable in one hop.** For every
   declaration carrying `# port-until:`, the SPEC section its own `# spec:` header
   field points at names the field. §The port-candidate criteria rules that a held
@@ -10473,6 +10577,15 @@ placement; and (H) a held declaration's ground reachable in one hop.
   is *wider*, so the monotonicity argument below does not bind on it; what it costs
   is one section read per held declaration, bounded by the held tier.
 
+  **Assertion G's tree half adds `scripts/*.sh` and `kit:*.sh` on the same
+  accounting.** They are the exact tokens §check-gate-exemption-tasks already
+  carries for the same corpus, so the spelling is precedented rather than invented.
+  Without them the most likely red arrives a tier late: a script gaining a
+  malformed declaration touches no file the pre-widening manifest names. The
+  existing tokens are **kept rather than folded** on this paragraph's own ground —
+  each answers for a different assertion, and folding would lose one silently for a
+  consumer whose configuration drops the other.
+
   **Why it folds in here rather than shipping as its own gate.** Assertion C is
   the precedent and it is exact: C asserts that a *SPEC document records a
   disposition* for every substrate-sensitive member — the same prose-placement
@@ -10510,8 +10623,9 @@ a **stale** binary — the only state where an in-process and a spawned answer c
 differ — is §check-gate-binary-fresh's red and never this member's. The compiled
 form therefore **reaches the registry in process and the spawn is deleted**, the
 shape §check-reads-couples took at its own port, so this member's `c7` row is gone
-rather than answered. What it does spawn is `git`, once, for assertion F's
-publishing test, and it declares that (§The `# graph:` manifest, `--needs`);
+rather than answered. What it does spawn is `git` — for assertion F's
+publishing test, and for the tracked-set read assertion G's tree half rides — and
+it declares that (§The `# graph:` manifest, `--needs`);
 `port-blockers` never saw it because the call sits in `gate_authoring_tree` rather
 than in the gate's own text, which is the shared-library blind spot
 `port-oracle-corpus-narrower-than-the-directive` owns.
@@ -10530,6 +10644,21 @@ case tree and each pointer is case-relative, so the pair proves the resolution
 rather than the live tree's accident of already being green. It also covers
 assertions C, D, E and F end to end, each over the case's own hermetic surfaces.
 
+**Assertion G's tree half is proved in the bespoke test rather than in the pair,
+and the reason is the scope rule rather than the corpus.** The tempting statement
+— *a fixture case directory is not a repository, so the tracked-set corpus
+degrades to empty inside one* — is **false**, and recording that it is false is
+what keeps a later session from resting a coverage claim on it: a case directory
+sits inside this repository, its files are tracked, §run-gate-tests runs each case
+**in place** rather than in a copy, and the tracked-set read from inside one
+therefore answers with the case's own shell files, relative to the case
+directory, with the prune set unable to see a `gate-tests` component those
+relative paths do not carry. What actually keeps the arm out of the pair is
+that neither case is a **publishing** tree — each points `GATE_SDK_NATIVE_CRATE`
+at a directory that does not exist — so the tree half is out of scope inside both.
+The `good/` case asserts exactly that on its clean line, which is the scope rule's
+degrade proved rather than assumed.
+
 The bespoke `gate-tests/check-gate-substrate-parity.test.sh` holds the
 declaration configurations one pair cannot reach, each a sandbox rather than a
 live tree: **no descriptors at all** — the post-revert tree, where the roster half
@@ -10541,7 +10670,16 @@ assertion G's **empty shell-declaration corpus** reported as a counted zero rath
 than as a red for finding none; and **the publishing counterpart**, where the same
 absent roster reds because declaring platform support is the act of the tree that
 builds the artifact. The last two are that predicate's own boundary, and a
-too-loose one passes the `good/` case and reds only there.
+too-loose one passes the `good/` case and reds only there. Three more stand up a
+throwaway **repository** for assertion G's tree half, which is the only shape that
+opens the arm: **a publishing sandbox carrying tracked shell files that drive each
+widened clause to a finding** — a bare `# no-port:`, a slug-less `# port-until:`,
+a doubled field of each kind, a file carrying both, beside a well-formed
+declaration that stays clean and a disposition token below the header block that
+is correctly *not* read; **the same tree with no tracked crate source**, where the
+half is out of scope and says so on the clean line; and **the empty corpus outside
+any repository**, where the tracked-set read fails rather than answering and
+degrades to nothing.
 
 **Assertion B's roster matrix lives in the crate's own unit tests, and the port is
 what moved it there.** A roster is not name-addressable, so where
@@ -11410,12 +11548,16 @@ this gate holds the live-section span, the bullet-lead-line predicate and the
 queue-file coupling **today**, so the invariant generalizes with **no** new holder
 of a predicate the cost paragraph below prices at five. The rival would have made
 that a sixth, and would have added a queue-file coupling to a gate that
-deliberately has none. **The corpus half of that argument has since expired and the
-ruling survives without it**: the two corpora coincided when the arm landed here,
-and the field's widening to any tracked script parted them, so this gate now walks
-a corpus assertion G does not. The five-versus-six accounting is untouched, and it
-was always the load-bearing half — a second holder of one claim about one queue is
-the cost, whatever the corpora do.
+deliberately has none. **The corpus half of that argument expired and then reversed, and the
+ruling survives both**: the two corpora coincided when the arm landed here, the
+field's widening to any tracked script parted them, and assertion G's own widening
+to the same tracked shell tree rejoined them — so this gate and that one walk
+the same corpus and the ruling rests on none of that. The five-versus-six
+accounting is untouched, and it was always the load-bearing half — a second holder
+of one claim about one queue is the cost, whatever the corpora do. What went the
+other way went on the stated split rather than against it: **shape** is the
+dispatch seam's own partition and widened there, while slug **liveness** is a claim
+about the queue and stayed here.
 The spelling collision with `# until:` is the precedent being cited rather than an
 accident to rename: the two differ in subject and in prefix and are read by one
 liveness predicate, and a reader who greps `until:` finds both, which is correct.
@@ -11462,7 +11604,10 @@ a **wider** walk: the `gate_check_dirs` declaration set plus the tracked shell
 tree. A **bare** field with no slug
 is assertion G's shape clause and is passed over here: there is no slug to
 resolve, and reporting it in both places would give one defect two reds whose
-wording disagrees about what is wrong.
+wording disagrees about what is wrong. That hand-off used to leave a bare field on
+a *plain script* reported by neither gate, the corpora having parted; assertion G's
+widening to this same tracked shell tree closed that, so the sentence now holds
+over the whole walk rather than over the declaration set alone.
 
 **The live-section span is positional, and a consumer's optional queue tiers
 ride on that.** The scan opens on the first of those headings and closes on the
