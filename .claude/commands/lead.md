@@ -36,6 +36,13 @@ the template §Economics "Tier each batch to its work class" rule now names:
   draw read flat in cost, so align's trend is judged on the `cr` column of
   `.metric/stage-economics-log.txt`, never on `cost`. It fell at the ruling rather
   than continuing to climb; one point is not a trend.
+  **The comparison set is the bare `align` rows, and naming it is what stops a
+  reading turning on the wrong population.** That log carries a second family,
+  `align+fanout`, attributing a dispatched fan-out's draw to the stage; a stage
+  session that dispatched nothing files a bare row and no fan-out row at all, so
+  reading such a datum against the mixed range compares two populations. Every
+  reading recorded below was taken against the bare family — this states the ground
+  those readings already stand on rather than choosing a new one.
   **Measured again 2026-08-28 at `installer-trial-lifecycle-repair`: `cr=6394126`** —
   the second-lowest of the last ten sonnet aligns and below their median, so the
   draw is still not climbing. The revert signal did not fire: align found three

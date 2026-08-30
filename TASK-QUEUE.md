@@ -9232,6 +9232,7 @@
 - **stage-cursor-rerun-stamp-gap** [design-pending] — A skipped re-run stamp points the cursor back.
 - **interpreter-grant-redirect-residue** [design-pending] — Seven redirected shapes stay ungranted.
 - **canonicalize-extended-length-prefix** [design-pending] — A Windows `\\?\` root is unconverted.
+- **spec-authoring-self-check-pass** [design-pending] — Its defects land downstream, none shipped.
 
 ## Done
 
