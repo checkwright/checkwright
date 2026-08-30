@@ -12,6 +12,48 @@
 
 ## New Features
 
+- **kit-config-template-port-disposition** [spec: SPEC-config-template-port.md] — seven kit config
+  templates are counted owed by the port oracle while their drift-kit sibling
+  declares no-port, and no entry reaches the class.
+  **Re-derived at the 2026-08-30 drain rather than taken from the bullet.**
+  `--emit port-blockers --tree` reports the `templates/*-config.sh` of
+  `canon-kit/`, `context-kit/`, `delegation-kit/`, `evidence-kit/`,
+  `guard-kit/`, `lifecycle-kit/` and `queue-kit/` as **owed** — 24 lines
+  between them, most being 2-line stubs — while
+  `drift-kit/templates/drift-config.sh` is **no-port** on a cause naming no
+  drift-kit-specific fact. The asymmetry is structural, not editorial.
+  **The ground the class turns on**: a kit config template IS the adopter's
+  edit seam, so porting it into the binary deletes the thing the adopter is
+  meant to edit. That ground is either right for all eight or right for none.
+  **The same asymmetry recurs one layer down**: `scripts/context-config.sh`,
+  `scripts/delegation-config.sh`, `scripts/drift-config.sh` and
+  `scripts/evidence-config.sh` are owed while their `scripts/` siblings carry
+  the 2026-08-24 no-port ruling — that ruling was scoped to the
+  private-vocabulary ground, not to seam structure, and these four hold none.
+  Corrected 2026-08-30 at scope: this said THREE, and `scripts/drift-config.sh`
+  is the one that sharpens it — drift-kit's TEMPLATE is the sole no-port
+  declaration above, while its own `scripts/` consumer copy is owed.
+  **DISTINCT from `kit-lib-port-disposition-cohort` and from the smoke class
+  ruled 2026-08-30**, re-filing neither: their grounds are bootstrap (a test
+  surface running before any binary exists) and runtime sole-resolver (the
+  config bridge has no other producer). This one's ground is the edit seam.
+  Same shape, three grounds, deliberately not averaged.
+  **IN THE `port-declaration-cohort` UNIT SET AS CUT 1 OF 3 — ruled 2026-08-30 (operator,
+  lead-relay).** Width, stated per cut and never inherited: **11 files, 113 lines** (seven kit
+  `templates/*-config.sh` at 24 lines, four `scripts/` consumer copies at 89). Sequenced FIRST of
+  the three on precedent density — it is the only one of the three carrying a sibling declaration
+  on its own ground, so it is the cheapest to argue and the argument informs the two after it.
+  **The deliverable is the class RULING plus whatever declarations it licenses, not a guaranteed
+  count.** If the ruling comes back *port* for any member, the port work is FILED as its own entry
+  under scope-gated intake, never absorbed into this iteration's envelope.
+  **Cost while deferred:** it inflates the operator-ruled completion predicate
+  by about ten files for a class already ruled structural elsewhere, and no
+  gate asserts disposition parity across identically shaped siblings, so the
+  next port cut meets the question undecided again.
+  ruled: kit-config-template-port-disposition operator 2026-08-30 lead-relay
+  Filed 2026-08-30 by close from the gap inbox; premises re-verified against
+  the port oracle at the drain.
+
 - **harness-template-port-disposition** [spec: SPEC-harness-template-port.md] — the vendored hook
   and guard templates are uniformly owed and no sibling declaration exists on
   either side, which is why nothing had ever forced the disposition.
@@ -141,48 +183,6 @@
   08-26. Promoted and deferred 2026-08-25, 08-26, 08-27; promoted 2026-08-30 by scope, demoted
   2026-08-30 by close on the red round-5 observation the close push itself bought — the
   drain-exempt residue path, now spent and that tag dropped from the lead line.
-
-- **kit-config-template-port-disposition** [design-pending] — seven kit config
-  templates are counted owed by the port oracle while their drift-kit sibling
-  declares no-port, and no entry reaches the class.
-  **Re-derived at the 2026-08-30 drain rather than taken from the bullet.**
-  `--emit port-blockers --tree` reports the `templates/*-config.sh` of
-  `canon-kit/`, `context-kit/`, `delegation-kit/`, `evidence-kit/`,
-  `guard-kit/`, `lifecycle-kit/` and `queue-kit/` as **owed** — 24 lines
-  between them, most being 2-line stubs — while
-  `drift-kit/templates/drift-config.sh` is **no-port** on a cause naming no
-  drift-kit-specific fact. The asymmetry is structural, not editorial.
-  **The ground the class turns on**: a kit config template IS the adopter's
-  edit seam, so porting it into the binary deletes the thing the adopter is
-  meant to edit. That ground is either right for all eight or right for none.
-  **The same asymmetry recurs one layer down**: `scripts/context-config.sh`,
-  `scripts/delegation-config.sh`, `scripts/drift-config.sh` and
-  `scripts/evidence-config.sh` are owed while their `scripts/` siblings carry
-  the 2026-08-24 no-port ruling — that ruling was scoped to the
-  private-vocabulary ground, not to seam structure, and these four hold none.
-  Corrected 2026-08-30 at scope: this said THREE, and `scripts/drift-config.sh`
-  is the one that sharpens it — drift-kit's TEMPLATE is the sole no-port
-  declaration above, while its own `scripts/` consumer copy is owed.
-  **DISTINCT from `kit-lib-port-disposition-cohort` and from the smoke class
-  ruled 2026-08-30**, re-filing neither: their grounds are bootstrap (a test
-  surface running before any binary exists) and runtime sole-resolver (the
-  config bridge has no other producer). This one's ground is the edit seam.
-  Same shape, three grounds, deliberately not averaged.
-  **IN THE `port-declaration-cohort` UNIT SET AS CUT 1 OF 3 — ruled 2026-08-30 (operator,
-  lead-relay).** Width, stated per cut and never inherited: **11 files, 113 lines** (seven kit
-  `templates/*-config.sh` at 24 lines, four `scripts/` consumer copies at 89). Sequenced FIRST of
-  the three on precedent density — it is the only one of the three carrying a sibling declaration
-  on its own ground, so it is the cheapest to argue and the argument informs the two after it.
-  **The deliverable is the class RULING plus whatever declarations it licenses, not a guaranteed
-  count.** If the ruling comes back *port* for any member, the port work is FILED as its own entry
-  under scope-gated intake, never absorbed into this iteration's envelope.
-  **Cost while deferred:** it inflates the operator-ruled completion predicate
-  by about ten files for a class already ruled structural elsewhere, and no
-  gate asserts disposition parity across identically shaped siblings, so the
-  next port cut meets the question undecided again.
-  ruled: kit-config-template-port-disposition operator 2026-08-30 lead-relay
-  Filed 2026-08-30 by close from the gap inbox; premises re-verified against
-  the port oracle at the drain.
 
 - **declaration-shape-outside-header-unreadable** [design-pending] — a
   port-disposition string outside a file's header block is not a declaration,
