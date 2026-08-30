@@ -122,10 +122,60 @@ ruling wants raised, and it is the one live argument for porting this class. Thi
 declaration leaves it standing rather than refuting it; a session that wants to
 answer it is answering a §Consumer payload question, not a §Consumer smoke one.
 
+**A standing ruling names this exact corpus, and it is reconciled here rather
+than reversed — flagged at align, re-put to the operator with the passage
+below in front of them, and re-affirmed 2026-08-30 (the entry's existing
+`ruled: kit-smoke-port-disposition-cohort operator 2026-08-30 lead-relay`
+line is this ruling too — same authority, date and channel, so no second line
+is owed under queue-kit/SPEC.md §The tag algebra's sharing rule).** TRAJECTORY.md
+§The closed rulings, 2026-08-28 ("The port's completion predicate is literal"),
+corrected the carve-out in place to read: "Kit `smoke/` suites and kit-resident
+test runners ride the installer payload with their kit roots and land committed
+in adopter trees, so they are **kit mechanism on the claim like any owed file**;
+the residue genuinely shipping to no adopter — `demo/`, `installer/consumer-smoke/`,
+the declared `scripts/` class — takes a per-file disposition when reached." Two
+paragraphs later it refuses "a contributor-side `# no-port:` class" for that same
+corpus, on two counts: the field "declares permanence while the carve-out's own
+text says those files do port," and its offered ground, "ships to no adopter,"
+"was measured false for 31 of the disputed 33 files (kit `smoke/` suites and
+kit-resident runners ride the payload...)." Both counts are live objections to
+*this* declaration and are answered on the text, not argued around:
+
+- **The "when reached" clause is not scoped to the three named examples.** The
+  ruling's own construing sentence — "each file it covers, when reached, ports,
+  leaves the tree with the surface it drives, or takes a per-file declared
+  disposition under the case-by-case residue rule below" — restates over "each
+  file [the carve-out] covers," and the carve-out it construes covers
+  "contributor-side tooling and the test harness" as a whole, where kit `smoke/`
+  suites sit. The three-name list (`demo/`, `installer/consumer-smoke/`, the
+  `scripts/` class) belongs to the *earlier*, 2026-08-23 sentence being corrected,
+  not to this restatement. The "case-by-case residue rule below" it names is the
+  2026-08-09 PRIORITY DIRECTIVE: "Surviving shell is residue justified case by
+  case, never a protected category." Four measured legs, each individually cited
+  on its own file (delta 2), is that case-by-case reasoning applied to a class
+  whose members happen to share legs — not a categorical "it is a smoke harness"
+  exemption, which is exactly what "never a protected category" refuses.
+- **The refused ground is not this ground.** "Ships to no adopter" is refuted by
+  the same 31-of-33 measurement leg 3 **concedes rather than disputes** — "vendors
+  to an adopter with its kit" is leg 3's own opening clause. What leg 3 actually
+  rests on is narrower and untouched by that measurement: *executed by no adopter
+  path* (the `SMOKE_KIT_ROOT` entry-point guard, the three `EVIDENCE_KIT_RUN_*`
+  callers). Legs 1, 2 and 4 do not use the shipping question at all. "No mechanism
+  is missing — a cause is free text — only a standing ruling that would make one
+  true, and none does," the 2026-08-28 ruling closes; four measured, individually-
+  cited structural grounds are that ruling now existing.
+
+**The counterweight is real and it was ruled against, not absent.** The 2026-08-28
+text's contrast — kit `smoke/` "on the claim like any owed file" against a residue
+that "takes a per-file disposition" — genuinely reads, on its own, as putting this
+corpus on the must-port side, and a seventeen-file sweep is class-shaped even
+when every line cites its own ground. A later reader meeting that passage alone
+must land on this ruling, not re-open the question it already answers.
+
 ### (2) Seventeen `# no-port:` declarations, each stating the class ground
 
 Each of the seventeen gains a header `# no-port:` line naming the leg its own
-membership rests on and citing the new §Consumer smoke subsection delta 4 adds —
+membership rests on and citing the new §Consumer smoke subsection delta 3 adds —
 stated rather than cited-by-example, the discipline the drift-kit cut's own four
 declarations established for a class that has never been swept. The eleven
 per-kit scripts cite legs 2 and 3; the two harness members cite leg 1. {mechanical}
@@ -141,8 +191,10 @@ recipe, and it stays owed under context-kit §Testing. {mechanical}
 ### (3) §Consumer smoke gains the disposition, in its own subsection
 
 A new subsection **"The port disposition"** under §Consumer smoke states the
-ruling, its four legs, its honest limit, and the reach-by-ground clause — so a
-later cut meeting a `smoke/` file reads the class ruling off the contract that
+ruling, its four legs, its honest limit, the reach-by-ground clause, **and the
+TRAJECTORY.md §The closed rulings reconciliation** (delta 1) — so a later cut
+meeting a `smoke/` file, or a reader meeting the 2026-08-28 "on the claim"
+passage alone, reads the class ruling and its answer off the contract that
 owns the class rather than off a declaration line or a queue entry.
 {design-bearing}
 
@@ -301,9 +353,9 @@ first; delta 4 updates the second.
       reachable producer and a named consumer; every new field has a named
       reader at a named transition; every reader under the narrowing has its
       **red condition** enumerated, not merely its subject.
-- [ ] **Merged with no information lost** — the disposition and its four legs
-      integrated into §Consumer smoke as a subsection, not appended; the
-      reopening condition lands with the ruling.
+- [ ] **Merged with no information lost** — the disposition, its four legs, and
+      the TRAJECTORY.md reconciliation integrated into §Consumer smoke as a
+      subsection, not appended; the reopening condition lands with the ruling.
 - [ ] **Amendment deleted** — this file removed on merge; none remain for
       gate-sdk (`ls gate-sdk/SPEC-*.md`).
 - [ ] **Every declaration carries a non-empty cause** — verified by reading each
