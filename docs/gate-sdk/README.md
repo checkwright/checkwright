@@ -110,6 +110,7 @@ check-gate-binary-fresh
 check-crate-arms
 check-install-disposition
 check-test-hermetic
+check-path-dialect
 check-assertion-strength
 check-gate-exemption-tasks
 check-graph

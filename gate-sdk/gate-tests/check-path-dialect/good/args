@@ -1,0 +1,3 @@
+# No positional arguments: the corpus is the tracked shell tree (git ls-files, scoped to this
+# case dir by cwd) and GATE_SDK_NATIVE_SRC, whose repo-relative default resolves to this case's
+# own native/src. Both arms are exercised here; neither is reachable from the other's fixture.

@@ -1,0 +1,8 @@
+PATH-DIALECT: clean
+6 shell file(s), 4 Rust file(s) scanned
+12 producer occurrence(s)
+3 in `cd` position
+2 `Path`-typed
+3 inside the crate's crosser
+2 by recorded verdict
+2 presence probe(s) binding no value

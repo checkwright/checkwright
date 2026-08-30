@@ -235,20 +235,75 @@ site to the remainder, and the port is still running. {design-bearing}
 corpus two other arms use) and `native/src/**/*.rs`, every occurrence of a
 producer in delta 4's four-form roster is red unless one of these holds:
 
-- **shell, crossing position** — the substitution is the direct argument of a `cd`
-  whose result is read back with `pwd -P`;
+- **shell, `cd` position** — the substitution is the direct argument of a `cd`;
 - **Rust, inside `native/src/walk.rs`** — the declared crosser's own body;
 - **Rust, `Path`-typed** — the occurrence is the direct argument of `Path::new(`
   or `PathBuf::from(`, so the value never becomes a string and `std::path` carries
   the dialect. This is §Porting to Rust does not retire dialect exposure read
-  positively, and it is what clears the eight `env!("CARGO_MANIFEST_DIR")` sites
+  positively, and it is what clears the `env!("CARGO_MANIFEST_DIR")` sites
   with no edit;
 - **a recorded verdict** — an adjacent `spec:` comment citing
   `§The path-dialect contract`, for a site that deliberately does not cross.
 
-A call to `walk::cwd` or `walk::toplevel` is not an occurrence of a producer at
-all; it is named here only so a reader does not hunt for an exemption that is not
-needed.
+A call to `walk::cwd`, `walk::toplevel`, `walk::toplevel_in`, `walk::toplevel_opt`
+or `walk::canonicalize` is not an occurrence of a producer at all; it is named here
+only so a reader does not hunt for an exemption that is not needed.
+
+**Three things are not occurrences of a producer, and they are one rule.** A
+producer *produces a value*; where no value is bound, nothing was produced and
+there is nothing to cross. That single test — **is a value bound at this
+occurrence** — is what the comment rule below and the two clauses ruled at build
+are each an instance of, and it is answered **at the occurrence**, never by tracing
+a binding through a file, which is the locality delta 4's producer discipline was
+bought to preserve.
+
+**Ruled at build, in-envelope: the shell clearance is `cd`, and the `pwd -P`
+read-back is owed only where a root is bound** (the seventh correction this
+amendment has carried; `lead 2026-08-30 own-authority` for the decision's
+delegation, the reasoning this session's). `cd` is the dialect-tolerant consumer
+§The judging predicate names, so a producer's value handed to it becomes a chdir
+rather than a tree-internal string — the shell's exact counterpart of the
+`Path`-typed rule, which clears for that same reason. The read-back is what a site
+does when it *wants* a root value out of that `cd`; it is not a second half the
+`cd` needs in order to have crossed. Requiring it unconditionally would demand a
+conversion at sites that consume no converted value — and, **probed rather than
+assumed, it does not even buy the residue it appears to: `pwd -P` prints the
+physical directory and never assigns `PWD`.** A `cd` to a foreign-dialect absolute
+path leaves bash's own `$PWD` foreign whether or not a binding follows it, so a
+binding nothing reads protects nothing. (Repairing `PWD` is `cd -P`'s business, and
+is outside this amendment.) Delta 4's substance at its three named drift-kit
+exemplars is untouched by this and was re-read before the ruling rather than
+inferred: those sites bound the producer's answer into `REPO_ROOT` and `cd`'d it
+indirectly, which this predicate reds, and their conversion to a direct `cd`
+argument is what delta 4's override actually bought.
+
+**One red rides on that clearance, and it is the trap delta 2 exists for.** Where a
+producer sits in `cd` position and the `cd`'s effect *is* read back into a value,
+the read-back is `pwd -P` and never a bare `pwd`: bash's logical `pwd` prints the
+argument straight back, so that spelling "changes nothing while looking exactly
+like the fix". The arm is anchored to a cleared occurrence — it reads the first
+non-blank, non-comment line after the `cd` and nothing else — so the gate's red set
+stays a **subset** of the predicate this paragraph relaxes, rather than reaching a
+form the roster does not carry.
+
+**Ruled at build, in-envelope: the git spawn's roster is per-substrate, on the same
+value-bound test.** `--git-dir` and `--git-common-dir` stay in the **shell** roster,
+where `scripts/producer-liveness-reader.sh` produces a root from one and delta 6
+teaches from it, and where the discard is visible at the occurrence: a stdout
+redirected to `/dev/null` binds nothing, which is the whole of the four
+presence-probes the shell census found. They leave the **Rust** roster, whose git
+form is `--show-toplevel` — the flag §The crate's crosser's producer monopoly is
+stated over, and the only one from which the crate produces a root. On that
+substrate the discard is *not* visible at the occurrence: `proc::run` binds a
+`Completed` and the presence read (`stdout().is_some()`) lands a statement or more
+later, so a rule that recognized it would be tracing a binding. This is delta 1's
+own shape — one principle, evaluated per substrate, each carrying its own
+consequence — and the consequence is named rather than hidden: **the Rust arm does
+not assert that a future `--git-dir` answer is crossed.** What holds that is delta
+3's monopoly and the review that keeps it, not this gate. Writing a `spec:` verdict
+at each of the crate's presence probes was refused on the same ground delta 6
+retired the roster for: it re-creates a maintained enumeration of exactly what
+derivation can decide.
 
 **The exemption needs no new comment grammar.** It reuses canon-kit's `spec:`
 one-line binding, which already carries a mandatory cited section and is already
@@ -325,8 +380,9 @@ zero-config like every gate here, so there is no knob a deployed configuration
 could fail to set and no test-only reachability. Consumers: `bin/run-gates.sh` at
 battery time, the generated pre-commit hook at commit time, and the `gates`
 workflow at push. **Red condition, named rather than described:** a producer
-occurrence, outside a comment, that is neither in crossing position nor `Path`-typed
-nor carrying a `spec:` citation to §The path-dialect contract. Its verdict is
+occurrence that binds a value and is neither in `cd` position nor `Path`-typed nor
+carrying a `spec:` citation to §The path-dialect contract — plus, anchored to a
+`cd`-cleared occurrence, a read-back spelled `pwd` rather than `pwd -P`. Its verdict is
 **monotone in the violation set** — it reds on finding a violation, never on
 finding none, asserts no count, and holds no coverage floor.
 

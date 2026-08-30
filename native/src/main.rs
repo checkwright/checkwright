@@ -372,6 +372,9 @@ mod tests {
     // the baked constant against the shell library's computation of the same thing
     #[test]
     fn source_stamp_agrees_with_the_shell_library() {
+        // spec: gate-sdk/SPEC.md §The path-dialect contract — recorded verdict: cargo's build-time
+        // constant reaches only directory-consuming APIs here, `walk::toplevel_in`'s `-C` and
+        // `Command::current_dir`, and is never composed, so it is owed no crossing
         let crate_dir = env!("CARGO_MANIFEST_DIR");
         let root = crate::walk::toplevel_in(crate_dir).expect("cannot resolve the repo toplevel");
 

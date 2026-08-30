@@ -5,3 +5,4 @@ check-evidence-baseline
 check-action-permissions
 check-action-run-shell
 check-template-registry-parity
+check-path-dialect

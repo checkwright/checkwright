@@ -476,6 +476,12 @@ reported. That `std::env::current_dir()` answers in Windows spelling there is th
 **injected premise**, held by the observation this contract was written from and
 by nothing this repo can run.
 
+`check-path-dialect` (§check-path-dialect) is the standing oracle over the *other*
+half — that every producer crosses at all — and it **inherits this premise rather
+than discharging it**. Its verdict is a syntactic property of the source, so it
+runs anywhere; what it asserts is that the crossing is written, never that the
+crossing works. A green board is still not a Windows run.
+
 ### Worked dispositions, because a judged-safe site and an unjudged one look identical
 
 Recording a verdict is the deliverable, not only changing what a verdict
@@ -11093,6 +11099,132 @@ binary, proved parity-identical before the shell gate was deleted
 (§The kit-roots `gate_kit_roots` cohort). Its two `# assertion` markers moved
 with the rule to the implementation module, which is where §check-gate-assertions
 now looks for a `.gate`-declared member's.
+
+### check-path-dialect
+
+Invariant: **every platform-native path producer in the tree converts at its own
+point of production, or records at the site why it does not** (§The path-dialect
+contract). It exists because the migration decays inside its own iteration
+otherwise: every newly ported file adds a producer to the remainder, and the port
+is still running. It is the record that replaced §Worked dispositions' per-site
+roster — a roster goes stale on every ported file, and an at-site verdict does not.
+
+**The corpus is two halves.** The tracked shell tree (`walk::tracked_shell_tree`,
+already two other arms' corpus, so its `*.test.sh` filter and its prune set are the
+ones this tree already resolves) and the crate source under `GATE_SDK_NATIVE_SRC`,
+walked with the same prune set.
+
+**The producer roster is per-substrate**, which is §The path-dialect contract's own
+shape rather than an exception to it. On **shell**: `git rev-parse` with
+`--show-toplevel`, `--git-dir` or `--git-common-dir`. On **Rust**:
+`std::env::current_dir()`, `std::fs::canonicalize()`,
+`env!("CARGO_MANIFEST_DIR")`, and the `git rev-parse --show-toplevel` spawn —
+`--git-dir` and `--git-common-dir` are **not** on the Rust roster, for the reason
+the value-bound rule below states.
+
+**One test decides what counts as an occurrence: is a value bound here.** A
+producer *produces a value*; where none is bound, nothing was produced and there is
+nothing to cross. The test is answered **at the occurrence**, never by tracing a
+binding through a file — that locality is what §The path-dialect contract's
+producer discipline was adopted to preserve, and giving it up here would buy back
+the per-site audit the discipline retired. Three consequences, each an instance of
+the one test rather than a separate rule:
+
+- **A producer named inside a comment is not an occurrence.** The gate splits each
+  line's code half from its comment half before scanning. This is a correctness
+  requirement rather than a nicety: a producer named in prose in any file the
+  corpus reaches would otherwise false-positive, and both fixture cases carry a
+  commented producer that must stay green.
+- **A shell occurrence whose stdout is redirected to `/dev/null` is not one.** Only
+  the exit status is read, and an exit status has no dialect. The redirect is read
+  as the descriptor names it — a bare `>` and `1>` are stdout, `&>` is both, `2>`
+  is the stderr hedge every crossed site already carries and clears nothing — and
+  the search is scoped to the occurrence's own command substitution, so a redirect
+  belonging to a later command on the same line cannot clear it.
+- **`--git-dir` and `--git-common-dir` leave the Rust roster** because there the
+  same test cannot be answered locally: `proc::run` binds a `Completed` and the
+  presence read (`stdout().is_some()`) lands a statement or more later. The
+  consequence is named rather than hidden — **this gate does not assert that a
+  future `--git-dir` answer in the crate is crossed**; §The crate's crosser's
+  producer monopoly and the review that holds it are what cover that. Writing a
+  recorded verdict at each of the crate's presence probes was refused on the ground
+  §Worked dispositions retired its roster for: it re-creates a maintained
+  enumeration of what derivation decides.
+
+A call to `walk::cwd`, `walk::toplevel`, `walk::toplevel_in`, `walk::toplevel_opt`
+or `walk::canonicalize` is not an occurrence either — those are the crosser's own
+API, and they are named here only so a reader does not hunt for an exemption that
+is not needed.
+
+**Four clearances, and the shell one is `cd`.** An occurrence that binds a value is
+red unless: the substitution is the **direct argument of a `cd`**; it is inside
+`native/src/walk.rs`, the declared crosser's own body; it is **`Path`-typed**, the
+direct argument of `Path::new(` or `PathBuf::from(`, so the value never becomes a
+string and `std::path` carries the dialect (this is §Porting to Rust does not
+retire dialect exposure read positively, and it clears the crate's
+`env!("CARGO_MANIFEST_DIR")` sites with no edit); or it carries a **recorded
+verdict**, an adjacent `spec:` comment citing §The path-dialect contract, read on
+the occurrence's own trailing comment or the contiguous comment run above it.
+
+**Why `cd` alone clears, and the `pwd -P` read-back is owed only where a root is
+bound.** `cd` is the dialect-tolerant consumer §The judging predicate names, so a
+value handed to it becomes a chdir rather than a tree-internal string — the shell's
+exact counterpart of the `Path`-typed rule, clearing for the same reason. The
+read-back is what a site does when it *wants* a root out of that `cd`, not a second
+half the `cd` needs in order to have crossed; and demanding it where nothing reads
+the binding does not even buy the residue it appears to. **`pwd -P` prints the
+physical directory and never assigns `PWD`** — probed, not assumed — so a `cd` to a
+foreign-dialect absolute path leaves bash's own `$PWD` foreign whether or not a
+binding follows it. Repairing `PWD` would be `cd -P`'s business and is out of this
+contract's scope. What the clearance does **not** weaken is the sweep it holds: the
+pre-migration shape bound the producer's answer into a variable and `cd`'d that
+variable indirectly, and every such site is red.
+
+**One red rides on that clearance.** Where a producer sits in `cd` position and the
+`cd`'s effect **is** read back into a value, the read-back is `pwd -P` and never a
+bare `pwd`: bash's logical `pwd` prints an absolute argument straight back, so that
+spelling changes nothing while looking exactly like the fix — the trap §The shell
+crossing idiom exists for. The arm is anchored to an already-cleared occurrence and
+reads the first non-blank, non-comment line after the `cd` and nothing else, so the
+gate's red set stays inside the producer roster rather than reaching a form the
+roster does not carry.
+
+**The exemption needs no new comment grammar.** It reuses canon-kit's `spec:`
+one-line binding, which already carries a mandatory cited section and is already
+gate-read on both sides; `walk.rs` writes exactly that form. A dedicated tag class
+was considered and refused — a second grammar for no error class the existing one
+does not catch. `check-comment-tier` is unchanged by this: the citation is a real
+binding to a real section, which is what that gate already requires.
+
+**Its own vocabulary is a recorded verdict, and its unit tests compose from that
+one site.** The module names the forms it hunts, so it would red on itself; the two
+constants carrying the roster take the same `spec:` verdict any other deliberate
+non-crossing site takes. The unit tests then build their inputs from those
+constants with `format!` rather than re-spelling a producer, which is why a scan
+of this module finds the roster in exactly one place and why a test line cannot
+drift from the roster it exercises.
+
+**Fail-closed, and the honest limit.** The tracked shell corpus degrades to empty
+outside a work tree, so the repository is probed first and an absent one refuses
+with exit 2 rather than reporting a clean scan over nothing. The verdict is
+otherwise a syntactic property of the source, fully exercisable on any host, so the
+fixture pair is an ordinary one and no injected input is owed *for the gate*. What
+stays unexercisable is the premise underneath — that `getcwd(3)` answers in the MSYS
+spelling and `git rev-parse` does not. The gate **inherits that premise rather than
+discharging it** (§How the claim is held, with no oracle that can run it): a green
+`check-path-dialect` asserts that every producer crosses, never that the crossing
+works. Its verdict is monotone in the violation set — it reds on finding a
+violation, never on finding none — and it holds no coverage floor.
+
+**Its implementation is a compiled subcommand, born native**, on §The
+port-candidate criteria's terms for a new gate: declaration path
+`check-path-dialect.gate`, rule out of the gate binary, no shell form ever written.
+Tier `precommit` with `trigger=*` — the corpus is the whole tracked shell tree, so
+no couple glob covers it and the hook invocation is unconditional (§check-tree-terms
+takes the same shape for the same reason). Its fixture pair exercises both corpus
+arms and every clearance, and its `bad/` case asserts the violation **count**, which
+is what gives the green files beside the violations a reader: a clearance arm that
+stopped clearing reds that case rather than passing quietly.
 
 ### check-assertion-strength
 

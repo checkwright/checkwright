@@ -29,6 +29,7 @@ check-exec-bit
 check-hook-exec-bit
 check-identity
 check-kit-enum
+check-path-dialect
 check-readme-roster
 check-reads-couples
 check-smoke-entry-guard

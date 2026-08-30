@@ -44,6 +44,7 @@ leaves its section absent.
 | [gate-sdk](gate-sdk/index.md) | check-crate-arms | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-install-disposition | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-test-hermetic | precommit |
+| [gate-sdk](gate-sdk/index.md) | check-path-dialect | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-assertion-strength | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-graph | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-reads-couples | precommit |

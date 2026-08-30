@@ -1,0 +1,3 @@
+# Same corpus resolution as good/. The green files beside the violations are standing guards:
+# the violation COUNT is asserted in expect.txt, so a clearance arm that stopped clearing —
+# the comment rule, the presence-probe rule, the crosser's own body — reds this case.

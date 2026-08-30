@@ -63,6 +63,7 @@ pub mod md_refs;
 pub mod measured_claim;
 pub mod memory_off;
 pub mod merge_attrs;
+pub mod path_dialect;
 pub mod payload_claim;
 pub mod producer_liveness;
 pub mod prose_enum;
@@ -1702,6 +1703,17 @@ pub const REGISTRY: &[GateEntry] = &[
         &["EVIDENCE_KIT_LOCK_FILE"],
         "evidence-kit",
         &[("bash", ""), ("ps", "")],
+    ),
+    // spec: gate-sdk/SPEC.md §check-path-dialect — one unbounded root, the crate source tree,
+    // whose location is a knob's value rather than a literal this entry could name. The shell
+    // corpus is `git ls-files`, which §check-reads-couples rules outside the walk class.
+    (
+        "check-path-dialect",
+        path_dialect::run,
+        &[("?", "")],
+        &["GATE_SDK_NATIVE_SRC", "GATE_PRUNE_DIRS"],
+        "gate-sdk",
+        &[("git", "")],
     ),
 ];
 

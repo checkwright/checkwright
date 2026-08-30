@@ -1,0 +1,3 @@
+# graph: couples=scripts/*.sh,kit:*.sh,kit:bin/*.sh,kit:lib/*.sh,kit:checks/*.sh,kit:templates/*.sh,native/src/*.rs,native/src/gates/*.rs dir=one valve=none tier=precommit trigger=*
+# install: zero-config
+# spec: gate-sdk/SPEC.md §check-path-dialect — every platform-native path producer in the tracked shell tree and the crate converts at its own point of production, or records the verdict at the site

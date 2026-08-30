@@ -203,6 +203,9 @@ mod tests {
     // is exercised here against the crate the test itself is compiled from.
     #[test]
     fn the_tree_side_stamp_is_the_one_the_build_baked() {
+        // spec: gate-sdk/SPEC.md §The path-dialect contract — recorded verdict: cargo's build-time
+        // constant is handed to a directory-consuming API and never composed, the Rust counterpart
+        // of a cd-consumed root, so it is owed no crossing
         let crate_dir = env!("CARGO_MANIFEST_DIR");
         let stamp = fresh::source_stamp(crate_dir).expect("git could not hash the crate's tracked source");
         assert_eq!(
