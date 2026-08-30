@@ -15,11 +15,16 @@ every malformed shape into `Owed`: an empty cause, a slug-less hold, a doubled
 field and a file carrying both are one rule, "a file that has not made a
 reviewable declaration has not made one". That fold is correct for §port-blockers,
 whose job is to count. Its consequence is that a malformed declaration is
-**indistinguishable from no declaration**, and `--tree` is an `--emit` report
-that no battery member runs. So a malformed declaration lands in a commit, reads
-as made to every human reader, passes the whole battery green, and keeps being
-counted as owed against the completion predicate. The silence is at commit time,
-not in the oracle.
+**indistinguishable from no declaration**, and no battery assertion reads
+`--tree`'s per-file disposition to check it. `check-measured-claim` does run the
+arm — transitively, through `scripts/measured-claims.sh`'s owed-count read
+(`SPEC-config-template-port.md`'s Consumer 4) — but only to fold the trailer's
+count into a measured claim, never to inspect a row's shape; that reader cannot
+tell a malformed row from any other owed row, which is the gap restated rather
+than closed. So a malformed declaration lands in a commit, reads as made to
+every human reader, passes the whole battery green, and keeps being counted as
+owed against the completion predicate. The silence is at commit time, not in
+the oracle.
 
 **Probed rather than assumed, before this was written**: over the whole tracked
 non-test shell corpus at this iteration's head, **no** file carries a malformed
