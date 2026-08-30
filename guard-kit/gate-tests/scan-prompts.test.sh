@@ -3,8 +3,8 @@
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
-ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
-cd "$ROOT" || exit 2
+cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" || exit 2
+ROOT="$(pwd -P)"
 SCAN="guard-kit/bin/scan-prompts.sh"
 [[ -x "$SCAN" ]] || { echo "scan-prompts.test: scanner not found: $SCAN"; exit 2; }
 command -v jq >/dev/null 2>&1 || { echo "scan-prompts.test: jq not found on PATH"; exit 2; }

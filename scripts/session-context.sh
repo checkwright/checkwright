@@ -3,8 +3,8 @@
 
 set -uo pipefail
 
-REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
-cd "$REPO_ROOT" 2>/dev/null || exit 0
+cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" 2>/dev/null || exit 0
+REPO_ROOT="$(pwd -P)"
 
 RUN_GATES="gate-sdk/bin/run-gates.sh"             # the --emit front-end: queue-kit's queue surface, bridged
 CTX_BIN="context-kit/bin"                         # context-kit index tools
@@ -87,6 +87,7 @@ if [[ "$role" != lead ]]; then
     esac
 fi
 
+# spec: gate-sdk/SPEC.md §The path-dialect contract — this fold compares against a harness-owned directory name, the one place the per-substrate dialects would meet; which spelling the harness uses on Windows is not decidable from this tree, so the producer above is normalized like any other and this open question is recorded rather than guessed (gap filed)
 MEM_DIRS="${CONTEXT_KIT_MEMORY_DIRS:-$HOME/.claude/projects/$(printf '%s' "$REPO_ROOT" | tr '/.' '-')/memory}"
 for _md in $MEM_DIRS; do
     [[ -d "$_md" ]] || continue

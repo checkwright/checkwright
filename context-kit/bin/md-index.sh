@@ -8,7 +8,7 @@ KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # shellcheck source=../lib/context.sh
 source "$KIT/lib/context.sh"
 
-REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+REPO_ROOT="$( { cd "$(git rev-parse --show-toplevel 2>/dev/null)" && pwd -P; } 2>/dev/null || pwd)"
 
 # spec: context-kit/SPEC.md §Index-first reading — the walk's exclusion source is CONTEXT_KIT_PRUNE_DIRS, matched on the leaf basename: pruning a parent path also passes but loses coverage silently, because governed markdown under it is reached by explicit globs no prune touches
 PRUNE=()

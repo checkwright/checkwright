@@ -37,7 +37,7 @@ if [[ -n "$ROOT" ]]; then
         echo "pack-installer: --root is not a directory: $ROOT" >&2
         exit 2
     }
-    ROOT_TOP="$(git -C "$ROOT" rev-parse --show-toplevel 2>/dev/null)" || {
+    ROOT_TOP="$( { cd "$(git -C "$ROOT" rev-parse --show-toplevel 2>/dev/null)" && pwd -P; } 2>/dev/null )" || {
         echo "pack-installer: --root is not inside a git work tree: $ROOT" >&2
         exit 2
     }
@@ -47,7 +47,7 @@ if [[ -n "$ROOT" ]]; then
         exit 2
     }
 else
-    ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || {
+    ROOT="$( { cd "$(git rev-parse --show-toplevel 2>/dev/null)" && pwd -P; } 2>/dev/null )" || {
         echo "pack-installer: not inside a git work tree — the payload's commit stamp has no source." >&2
         exit 2
     }

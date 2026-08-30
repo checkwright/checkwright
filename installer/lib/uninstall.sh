@@ -32,7 +32,7 @@ done
 die() { printf 'checkwright uninstall: %s\n' "$1" >&2; [[ -n "${2:-}" ]] && printf '  help: %s\n' "$2" >&2; exit "${3:-2}"; }
 
 # spec: installer/README.md §init — every precondition refuses rather than warns and all of them are checked before anything is removed, for init's own reason: a partial removal is the outcome none of them may produce
-ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" \
+ROOT="$( { cd "$(git rev-parse --show-toplevel 2>/dev/null)" && pwd -P; } 2>/dev/null )" \
     || die "not inside a git work tree" \
        "uninstall stages and commits the removal the same way init committed the install, so it needs the repository it is reversing."
 

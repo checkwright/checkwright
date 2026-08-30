@@ -10,11 +10,12 @@ SDK="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # shellcheck source=../lib/gate.sh
 source "$SDK/lib/gate.sh"
 
-REPO_ROOT="$(git rev-parse --show-toplevel)" || {
+cd "$(git rev-parse --show-toplevel 2>/dev/null)" || {
     echo "run-gates: not inside a git repository" >&2
     exit 2
 }
-cd "$REPO_ROOT" || exit 2
+# shellcheck disable=SC2034  # pwd -P is the dialect crossing itself (gate-sdk/SPEC.md §The path-dialect contract); re-derived even though nothing here reads it further
+REPO_ROOT="$(pwd -P)"
 
 # spec: gate-sdk/SPEC.md §run-gates — the one usage text, the stdout body of a help request and
 # the stderr body of an unrecognized-option refusal, per §The bin/-tool contract

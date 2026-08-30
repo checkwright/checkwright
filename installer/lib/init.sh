@@ -40,7 +40,7 @@ die() { printf 'checkwright init: %s\n' "$1" >&2; [[ -n "${2:-}" ]] && printf ' 
     "init copies kit source out of the package's own payload/, assembled at pack time — run it from an installed package, not from a source checkout."
 
 # spec: installer/README.md §init — the three preconditions all refuse rather than warn, and all three are checked before any file is written: a partial install is the outcome none of them may produce
-ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" \
+ROOT="$( { cd "$(git rev-parse --show-toplevel 2>/dev/null)" && pwd -P; } 2>/dev/null )" \
     || die "not inside a git work tree" \
        "the vendored source is meant to be committed, which is what makes it auditable. Run 'git init' first, or run init inside the repository you want governed."
 

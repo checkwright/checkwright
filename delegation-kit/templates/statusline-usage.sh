@@ -60,7 +60,7 @@ _counters() {
 }
 
 ITER=""; STAGE=""; COUNTS=""
-ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
+ROOT=$( { cd "$(git rev-parse --show-toplevel 2>/dev/null)" && pwd -P; } 2>/dev/null )
 if [ -n "$ROOT" ] && [ -f "$ROOT/TASK-QUEUE.md" ]; then
   HEADER=$(grep -m1 '^## Iteration:' "$ROOT/TASK-QUEUE.md")
   ITER=$(printf '%s' "$HEADER" | sed -E 's/^## Iteration:[[:space:]]*//; s/[[:space:]]*\[stage:.*$//')

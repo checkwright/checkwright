@@ -11,7 +11,7 @@ source "$SDK/lib/consumer-smoke.sh"
 source "$SDK/lib/declaration.sh"
 
 # spec: gate-sdk/SPEC.md §upgrade-smoke — resolve the source repo, FROM, and TO (each knob read exactly here)
-REPO="${GATE_SDK_UPGRADE_REPO:-$(git -C "$SDK" rev-parse --show-toplevel 2>/dev/null)}"
+REPO="${GATE_SDK_UPGRADE_REPO:-$( { cd "$(git -C "$SDK" rev-parse --show-toplevel 2>/dev/null)" && pwd -P; } 2>/dev/null )}"
 [[ -n "$REPO" && -d "$REPO/.git" ]] \
     || { echo "upgrade-smoke: GATE_SDK_UPGRADE_REPO is not a git repository: ${REPO:-<unset>}" >&2; exit 2; }
 

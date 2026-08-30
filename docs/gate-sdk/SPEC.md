@@ -356,10 +356,15 @@ wrong:
 
 `cd` accepts either spelling on an MSYS host; `"$ROOT/sub"` does not. So the audit
 question at a call site is never *where did this root come from* but *what is done
-with it* — provenance is a chase across components, consumption is local and
-decidable by reading one line. An exposed site is not thereby broken: exposure
-says its value must have reached it through a crosser, and the two halves are
-judged separately.
+with it* — provenance is a chase across components, and consumption is local
+**within a file** rather than always at the call site itself: a root handed to a
+shared helper is judged at the helper, not re-derived at every site that reaches
+it through one. `installer/lib/common/lock.sh`'s `lock_path()` concatenates
+whatever root it is handed and is the sole exposure path for
+`installer/lib/update.sh`, whose only use of its own root is to pass it there — so
+the site that matters for that root's audit is the helper, not the caller. An
+exposed site is not thereby broken: exposure says its value must have reached it
+through a crosser, and the two halves are judged separately.
 
 **A `|| pwd` fallback confers nothing, and believing otherwise is the trap.** It
 fires only when `git` **fails**; on MSYS `git` **succeeds**, in the wrong dialect.

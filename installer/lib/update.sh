@@ -24,7 +24,7 @@ done
 die() { printf 'checkwright update: %s\n' "$1" >&2; [[ -n "${2:-}" ]] && printf '  help: %s\n' "$2" >&2; exit "${3:-2}"; }
 
 # spec: installer/README.md §update — the one added precondition, and the whole behavioral difference from init: checkwright.lock must already exist at the repository root, so a verb named update never performs a first install. It checks existence only and no more — a present-but-unreadable schema, a stale downgrade, a below-contract toolchain, and every other init precondition are init's own checks, one call away, and repeating any of them here would be a second copy that could drift from the original. Not being inside a git work tree at all is not this verb's precondition to own either: init's own "not inside a git work tree" refusal already exists and already names the accurate remedy, so an unresolvable root here just falls through to it rather than being reported as an absent manifest
-ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"
+ROOT="$( { cd "$(git rev-parse --show-toplevel 2>/dev/null)" && pwd -P; } 2>/dev/null )"
 if [[ -n "$ROOT" ]] && [[ ! -f "$(lock_path "$ROOT")" ]]; then
     die "no $CHECKWRIGHT_LOCK_FILE at $ROOT" \
         "update manages an install init already made; there isn't one yet. Run 'checkwright init' first."

@@ -3,8 +3,8 @@
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
-ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
-cd "$ROOT" || exit 2
+cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" || exit 2
+ROOT="$(pwd -P)"
 # spec: gate-sdk/SPEC.md §The non-gate arm — the emitter is a compiled arm reached through the front-end that resolves its bridged knobs, so this suite drives that entry point rather than a script
 EMIT=(gate-sdk/bin/run-gates.sh --emit enforcement-map)
 [[ -x "${EMIT[0]}" ]] || { echo "enforcement-map.test: front-end not found: ${EMIT[0]}"; exit 2; }

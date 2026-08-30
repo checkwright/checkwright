@@ -4,8 +4,9 @@
 #   advisory by construction: exit is always 0, never joins gates.list; writes counts only, never transcript content
 set -uo pipefail
 
-REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
-cd "$REPO_ROOT" 2>/dev/null || exit 0
+cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" 2>/dev/null || exit 0
+# shellcheck disable=SC2034  # pwd -P is the dialect crossing itself (gate-sdk/SPEC.md §The path-dialect contract); re-derived even though nothing here reads it further
+REPO_ROOT="$(pwd -P)"
 
 # spec: drift-kit/SPEC.md §Layout and configuration
 _ds_cfg="${DRIFT_KIT_CONFIG_FILE:-}"

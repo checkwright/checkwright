@@ -3,8 +3,8 @@
 
 set -uo pipefail
 
-REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
-cd "$REPO_ROOT" 2>/dev/null || exit 0
+cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" 2>/dev/null || exit 0
+REPO_ROOT="$(pwd -P)"
 
 # spec: context-kit/SPEC.md §The session-context hook — consumer layout: vendored kit tools + governed queue file, retarget to yours [EDIT ME]. The queue index is reached through the battery runner's --emit front-end rather than by tool path: the front-end sources the shell library and supplies the bridged environment, so a consumer's section and cap overrides reach the arm (gate-sdk/SPEC.md §The non-gate arm).
 RUN_GATES="gate-sdk/bin/run-gates.sh"
@@ -82,6 +82,7 @@ if [[ "$role" != lead ]]; then
 fi
 
 # spec: context-kit/SPEC.md §The session-context hook — step 5 memory-off backstop; check-memory-off fires at commit, this surfaces pollution between commits
+# spec: gate-sdk/SPEC.md §The path-dialect contract — this fold compares against a harness-owned directory name, the one place the per-substrate dialects would meet; which spelling the harness uses on Windows is not decidable from this tree, so the producer above is normalized like any other and this open question is recorded rather than guessed (gap filed)
 MEM_DIRS="${CONTEXT_KIT_MEMORY_DIRS:-$HOME/.claude/projects/$(printf '%s' "$REPO_ROOT" | tr '/.' '-')/memory}"
 for _md in $MEM_DIRS; do
     [[ -d "$_md" ]] || continue

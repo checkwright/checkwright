@@ -23,7 +23,7 @@ esac
 die() { printf 'checkwright diff: %s\n' "$1" >&2; [[ -n "${2:-}" ]] && printf '  help: %s\n' "$2" >&2; exit "${3:-2}"; }
 
 # spec: installer/README.md §init — every precondition refuses rather than warns, and is checked before anything is compared: diff's subject is exactly the roster init recorded, so it needs the repository that roster is in
-ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" \
+ROOT="$( { cd "$(git rev-parse --show-toplevel 2>/dev/null)" && pwd -P; } 2>/dev/null )" \
     || die "not inside a git work tree" \
        "diff compares the tree against the manifest init committed there, so it needs the repository that manifest is in."
 

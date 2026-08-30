@@ -7,11 +7,11 @@ SDK="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # shellcheck source=../lib/gate.sh
 source "$SDK/lib/gate.sh"
 
-REPO_ROOT="$(git rev-parse --show-toplevel)" || {
+cd "$(git rev-parse --show-toplevel 2>/dev/null)" || {
     echo "gen-pre-commit: not inside a git repository" >&2
     exit 2
 }
-cd "$REPO_ROOT" || exit 2
+REPO_ROOT="$(pwd -P)"
 
 GATES_DIR="$(gate_sdk_gates_dir)"
 LIST="$GATES_DIR/gates.list"

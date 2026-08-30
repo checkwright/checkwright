@@ -70,7 +70,7 @@ for elem in "${PROBE_SET[@]}"; do
     render "$TOOL_FLOOR_NAME" "$(tool_floor_check "$elem" "$banner")"
 done
 
-ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || ROOT=""
+ROOT="$( { cd "$(git rev-parse --show-toplevel 2>/dev/null)" && pwd -P; } 2>/dev/null )" || ROOT=""
 [[ -n "$ROOT" ]] || ROOT="$PWD"
 LOCK="$(lock_path "$ROOT")"
 
