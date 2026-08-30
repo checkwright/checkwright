@@ -5,3 +5,4 @@
 ---
 
 port-declaration-cohort-and-windows-leg scope a175b6d5 2026-08-30 6e345565
+port-declaration-cohort-and-windows-leg spec ab805e98 2026-08-30 372ef055
