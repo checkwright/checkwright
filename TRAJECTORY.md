@@ -343,7 +343,12 @@ ships to no adopter — was measured false for 31 of the disputed 33 files (kit 
 kit-resident runners ride the payload; only `demo/run-demo.sh` and
 `installer/consumer-smoke/run-smoke.sh` do not), and the 2026-08-24 `scripts/` declarations already
 deliberately decline that ground. No mechanism is missing — a cause is free text — only a standing
-ruling that would make one true, and none does. **Narrowing the predicate's corpus**: its
+ruling that would make one true, and none does. **Superseded for the `smoke/` class alone,
+2026-08-30**, on exactly the condition that last sentence names — a standing ruling now exists
+where none did. Two correct rulings in sequence rather than a mistake: this refusal was right on
+the evidence it had. The distinction the later one turns on is gate-sdk/SPEC.md §Consumer smoke,
+*The port disposition*'s, cited and not restated here. Untouched: kit-resident runners, which that
+ruling does not reach, and the corpus alternative next. **Narrowing the predicate's corpus**: its
 defensible content is already the corpus rule (the `*.test.sh` suffix and the prune set,
 gate-sdk/SPEC.md §port-blockers), and widening the exclusion would let *port complete* be claimed
 while a full-profile adopter's vendored tree still runs bash — a false claim at the front door, the
