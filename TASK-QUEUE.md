@@ -12,48 +12,6 @@
 
 ## New Features
 
-- **msys-dialect-migration** [spec: SPEC-dialect-migration.md]
-  — migrate every root call site outside the cut that authored the contract onto it, and land the
-  gate that keeps the claim true while the port continues.
-  **The shape is authored** — gate-sdk/SPEC-dialect-migration.md, six deltas: the declared dialect
-  becomes per-substrate, the shell crossing idiom is named with `pwd -P` as the half that crosses,
-  `native/src/walk.rs` becomes the crate's sole platform-native producer, the corpus crosses at
-  every producer rather than only at the exposed sites, `check-path-dialect` is born native, and
-  §Worked dispositions drops its roster for the at-site record.
-  **THE CENSUS, re-derived 2026-08-30 at spec** and filed as a survey with its witness: **60
-  producer occurrences across 54 files — 33 shell / 32 files, 27 Rust / 22 files — of which 30 are
-  dialect-exposed and uncrossed today (17 shell, 13 Rust).** The producer set is FOUR forms, not
-  the one `show-toplevel` the earlier figure counted, so that figure and this one measure different
-  corpora and neither supersedes the other. Re-derive rather than reading either — the corpus moves
-  with every ported file, and the Rust half grows as the port advances. The scope-stage figure's
-  own deliverable is spent: the parent's "spanned eight roots in shell alone" cost line was
-  corrected 2026-08-29 by build, and reads as a top-level-directory count.
-  **What the split leaves here, stated so the boundary is not re-argued.** The parent keeps the
-  contract and the sites its own cut writes or touches (the four drift-kit `bin/` tools). This
-  entry owns everything else. **The `gate-tests` third does NOT fall out, and the hedge that said
-  it might is spent** — a `|| pwd` fallback "confers nothing", firing only when `git` fails while
-  on MSYS `git` succeeds in the wrong dialect. Spec's producer-discipline ruling makes the point
-  moot for every site: consumption is no longer what judges one.
-  **DISTINCT from `msys-path-dialect-boundary-unmodelled`**, which owns the contract and the
-  located resolver defect and would be worth landing if this migration were never taken. This owns
-  only the corpus the contract then binds. DISTINCT from `init-vendoring-assumes-gnu-findutils`,
-  a different non-portable primary on the same install path with no dialect content at all.
-  **Cost while deferred:** low today and rising with the port — the contract holds only where a
-  site has been migrated onto it, so until this lands the dialect claim is true of the cut that
-  authored it and of nothing else, and every ported file adds a site to the remainder.
-  **AN ITERATION ON THIS ENTRY IS NOT A YIELD OF THE PRIORITY DIRECTIVE — operator-ruled
-  2026-08-30.** The 2026-08-25 ruling holds the sequence and the owed count both correct with
-  neither absorbing the other, so measuring a tail unit by its `--tree` delta measures it against
-  the wrong axis; this entry blocks `platform-support-ci-matrix`, which blocks
-  `powershell-installer-surface`, so working it executes the directive's own ordered tail rather
-  than departing from it. Recorded here rather than on `native-gate-port-remaining-corpus`'s yield
-  ledger because that entry is at zero headroom under the entry cap; the `remainder of one`
-  misreading has needed a ruling once already, which is why it is recorded at all.
-  ruled: msys-dialect-migration lead 2026-08-29 own-authority
-  ruled: msys-dialect-migration operator 2026-08-30 lead-relay
-  Filed 2026-08-29 by scope, split from `msys-path-dialect-boundary-unmodelled` under the lead
-  ruling that bundled that entry's contract half into this iteration; promoted 2026-08-30 by spec.
-
 ## Technical Debt
 
 ## Deferred
@@ -9298,5 +9256,6 @@
 ## Done
 
 - ops-push-transport-leaves-tracking-ref-stale
+- msys-dialect-migration
 ## Lessons Learned
 
