@@ -12,3 +12,4 @@ msys-dialect-migration build ad3313e1 2026-08-30 14b7994b
 msys-dialect-migration build ac35bcd0 2026-08-30 2eb0ff15
 msys-dialect-migration build a9abc50b 2026-08-30 222b6bbe
 msys-dialect-migration validate af0b448e 2026-08-30 182ef304
+msys-dialect-migration close ac897805 2026-08-30 1b257fc8
