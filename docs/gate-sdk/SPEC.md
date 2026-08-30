@@ -8757,8 +8757,9 @@ set cwd and get that tree's crate, and it is why the contract says "from the rep
 root" rather than leaving the working directory unstated.
 
 **The crate is deliberately not `rustfmt`-clean, and running `cargo fmt` over it
-is a defect rather than housekeeping.** Measured 2026-08-30: 437 files diverge
-from rustfmt's output. The coupling is §check-gate-output, which reads a gate's
+is a defect rather than housekeeping.** Measured 2026-08-30 by
+`cargo fmt --check`: 130 of the crate's files diverge from rustfmt's output,
+across 437 hunks. The coupling is §check-gate-output, which reads a gate's
 `help:` remedy as a **single-line string literal**; rustfmt wraps a long
 `println!` argument onto its own line and reds that gate across the battery. A
 session that formats after a three-file edit therefore reformats the tree and

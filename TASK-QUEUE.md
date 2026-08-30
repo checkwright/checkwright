@@ -9235,8 +9235,5 @@
 
 ## Done
 
-- ops-push-transport-leaves-tracking-ref-stale
-- msys-dialect-migration
-- inline-body-interpreter-grant-absent
 ## Lessons Learned
 
