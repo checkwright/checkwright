@@ -6366,6 +6366,15 @@ cannot make, since it fixes the kit defaults under zero config
 builds the same FROM baseline, then diverges into the two-phase upgrade proof
 (§upgrade-smoke).
 
+**The library's sourcer set is wider than the builder's caller set, and the two
+are counted separately.** The three named above are the callers of
+`csmoke_vendor_and_install`. The file itself has a **fourth** sourcer:
+`demo/run-demo.sh`, which sources it for `csmoke_place_binary` alone and never
+builds a scratch consumer at all. So "sourced by three" is false of the library
+and true only of the builder — read the distinction off this paragraph rather
+than counting callers of one function and generalising, which is the
+re-derivation that put a wrong count into an amendment.
+
 **The `smoke/` per-kit contract.** Every vendored kit ships a `smoke/`
 directory — shipping it joins fixtures + README + SPEC in the kit-landing
 checklist; a kit root lacking `smoke/` is an environment error (exit 2). Every

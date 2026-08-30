@@ -2825,12 +2825,16 @@
   the same way. A filer who describes a defect rather than naming it produces a bullet that is
   present, is a genuine recurrence, and matches nothing; the drain files it as a new entry,
   fragmenting the backlog the inbox exists to keep whole.
-  **The third face of one matcher, which is why the three cost together.**
-  `gap-resolver-mention-overcount` covers the inflating direction only (a bare mention counted as
-  a recurrence); `recurrence-drain-input-widening` covers a recurrence reaching close with no
-  bullet at all. Neither covers a bullet that is present and fails to match. All three are the
-  same bounded-substring predicate from three sides, and a scope taking one alone re-derives the
-  other two.
+  **The third face of one matcher, and the only face still open.** Its two siblings covered the
+  inflating direction (a bare mention counted as a recurrence) and a recurrence reaching close
+  with no bullet at all; neither covered a bullet that is present and fails to match, which is
+  this entry. All three were the same bounded-substring predicate from three sides.
+  **Corrected 2026-08-30 at close, and the joint-costing instruction is RETRACTED.** This
+  paragraph told a scope that the three "cost together" and that taking one alone re-derives the
+  other two. Both siblings have since shipped independently — `gap-resolver-mention-overcount`
+  2026-08-08, `recurrence-drain-input-widening` 2026-08-17 — so there is nothing left to cost
+  jointly and a scope should take this entry on its own. The shared predicate is why their
+  landed fixes are worth READING before building this one, which is a different and weaker claim.
   **Attested twice in one drain, in the over-counting direction.** Two of this iteration's nine
   bullets carried an auto-stamped recurrence prefix fired by a bare mention — one naming
   `gap-resolver-mention-overcount`, one naming `recurrence-drain-input-widening` — and both had
@@ -4322,10 +4326,12 @@
   repo *constrains* the operator or *adapts* to them. Distinct from
   `bash-guard-auto-mode-rationale`, which reworded the guard's messages to be mode-independent
   and is done: this is the repo declaring an expectation, a different assertion.
-  **Relationship to `guard-grant-review`, stated without pre-empting it:** the mode is an input
-  to that entry's open narrow-or-declare direction, since it changes whether a grant is load-
-  bearing at all. Naming the dependence is not choosing the direction, which is operator-class
-  and unruled.
+  **Relationship to the narrow-or-declare direction, stated without pre-empting it:** the mode is
+  an input to that direction, since it changes whether a grant is load-bearing at all. Naming the
+  dependence is not choosing it, which is operator-class and unruled.
+  **Re-pointed 2026-08-30 at close.** This paragraph named `guard-grant-review`, which was split
+  2026-08-22 and is retired; the open narrow-or-declare question now lives, still unruled, in
+  `breadth-declaration-committed-glob-home`. The dependence is unchanged — only its address was.
   **Cost while deferred:** every session that reasons about the allowlist or the guard re-derives
   the mode by probe, and a mode drift costs hours before it presents as anything legible.
   Filed 2026-08-13 by close, draining the gap inbox; filed by the lead and re-verified here.
@@ -9288,9 +9294,6 @@
 - **stage-cursor-rerun-stamp-gap** [design-pending] — A skipped re-run stamp points the cursor back.
 
 ## Done
-
-- boundary-wipe-preserve-lifetime-scope
-- kit-smoke-port-disposition-cohort
 
 ## Lessons Learned
 
