@@ -6,3 +6,4 @@
 
 consumer-smoke-contract-port scope a5141ee9 2026-08-30 e9496c24
 consumer-smoke-contract-port spec ac4a49ef 2026-08-30 679f2e9c
+consumer-smoke-contract-port align aab585ed 2026-08-30 d2146192
