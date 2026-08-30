@@ -12,6 +12,50 @@
 
 ## New Features
 
+- **harness-template-port-disposition** [spec: SPEC-harness-template-port.md] — the vendored hook
+  and guard templates are uniformly owed and no sibling declaration exists on
+  either side, which is why nothing had ever forced the disposition.
+  **Measured at the 2026-08-30 drain.** Owed, with no declaration on either
+  side: `delegation-kit/templates/` `agent-budget-guard.sh` (18),
+  `agent-dispatch-guard.sh` (61), `statusline-usage.sh` (101),
+  `subagent-stop-liveness.sh` (91), `usage-poller.sh` (67);
+  `guard-kit/templates/` `bash-guard.sh` (20), `escalation-guard.sh` (27),
+  `wakeup-guard.sh` (20); `context-kit/templates/session-context.sh` (134);
+  `lifecycle-kit/templates/workflow-state-guard.sh` (29);
+  `gate-sdk/templates/check-skeleton.sh` (23). **591 lines**, and their
+  `scripts/` consumer copies add **374** more — 965 owed between them. The gap
+  bullet estimated "about 570"; the measured figure is 591.
+  Corrected 2026-08-30 at scope: the copies line said "about 255". Only SIX of
+  the eleven templates carry a `scripts/` copy at all — agent-budget-guard 18,
+  agent-dispatch-guard 61, bash-guard 39, session-context 136,
+  subagent-stop-liveness 91, workflow-state-guard 29.
+  **No member of this class declares, on either side** — so no sibling
+  declaration can be read across to it, and neither the config-seam ground nor
+  the sole-resolver ground reaches these. **Corrected 2026-08-30 at spec: the
+  asymmetry is in GROUND AVAILABILITY, not in declaration status.** Two grounds
+  this tree already holds reach part of the class, which is why the ruling is a
+  partition; the argument and its members are the amendment's.
+  **DISTINCT from `kit-config-template-port-disposition`**, filed the same
+  day: that class turns on an existing sibling declaration its members lack;
+  this one turns on there being no declaration anywhere and no ground yet
+  stated. Neither implies the other's answer.
+  **IN THE `port-declaration-cohort` UNIT SET AS CUT 3 OF 3 — ruled 2026-08-30 (operator,
+  lead-relay).** Width, stated per cut and never inherited: **17 files, 965 lines** (eleven
+  templates at 591, six `scripts/` copies at 374). Sequenced LAST on precedent density, and it is
+  last because it has NONE — no declaration on either side, no ground ever stated.
+  **THIS IS THE CLASS WHERE A PARTIAL-PORT OUTCOME IS LIVE, and the unit set was ruled without
+  assuming otherwise.** Its members are executable harness and git-hook mechanism a vendored tree
+  invokes on disk, which is neither the config class's edit-seam ground nor the lib class's
+  sole-resolver ground — so "declare" is not the presumed answer here, and any port work this
+  ruling creates is FILED as its own entry rather than absorbed into the iteration.
+  **Cost while deferred:** 965 owed lines whose disposition every future
+  stated-contract cut re-meets undecided, and a hook whose port disposition is
+  unruled is one a cut may port into the binary while the harness still needs
+  an on-disk executable path to invoke.
+  ruled: harness-template-port-disposition operator 2026-08-30 lead-relay
+  Filed 2026-08-30 by close from the gap inbox; line counts re-derived at the
+  drain against the tree arm.
+
 ## Technical Debt
 
 ## Deferred
@@ -139,50 +183,6 @@
   ruled: kit-config-template-port-disposition operator 2026-08-30 lead-relay
   Filed 2026-08-30 by close from the gap inbox; premises re-verified against
   the port oracle at the drain.
-
-- **harness-template-port-disposition** [design-pending] — the vendored hook
-  and guard templates are uniformly owed with no ground stated anywhere, which
-  is exactly why nothing has ever forced the disposition.
-  **Measured at the 2026-08-30 drain.** Owed, with no declaration on either
-  side: `delegation-kit/templates/` `agent-budget-guard.sh` (18),
-  `agent-dispatch-guard.sh` (61), `statusline-usage.sh` (101),
-  `subagent-stop-liveness.sh` (91), `usage-poller.sh` (67);
-  `guard-kit/templates/` `bash-guard.sh` (20), `escalation-guard.sh` (27),
-  `wakeup-guard.sh` (20); `context-kit/templates/session-context.sh` (133);
-  `lifecycle-kit/templates/workflow-state-guard.sh` (29);
-  `gate-sdk/templates/check-skeleton.sh` (23). **590 lines**, and their
-  `scripts/` consumer copies add **374** more — 964 owed between them. The gap
-  bullet estimated "about 570"; the measured figure is 590.
-  Corrected 2026-08-30 at scope: the copies line said "about 255". Only SIX of
-  the eleven templates carry a `scripts/` copy at all — agent-budget-guard 18,
-  agent-dispatch-guard 61, bash-guard 39, session-context 136,
-  subagent-stop-liveness 91, workflow-state-guard 29.
-  **Unlike the config-template class this one carries NO internal asymmetry**
-  — uniformly owed on both sides — so no existing declaration can be read
-  across to it and no ground has ever been stated. These are executable
-  harness and git-hook mechanism that RUNS IN the adopter tree rather than a
-  seam the adopter edits, so neither the config-seam ground nor the
-  sole-resolver ground reaches them.
-  **DISTINCT from `kit-config-template-port-disposition`**, filed the same
-  day: that class turns on an existing sibling declaration its members lack;
-  this one turns on there being no declaration anywhere and no ground yet
-  stated. Neither implies the other's answer.
-  **IN THE `port-declaration-cohort` UNIT SET AS CUT 3 OF 3 — ruled 2026-08-30 (operator,
-  lead-relay).** Width, stated per cut and never inherited: **17 files, 964 lines** (eleven
-  templates at 590, six `scripts/` copies at 374). Sequenced LAST on precedent density, and it is
-  last because it has NONE — no declaration on either side, no ground ever stated.
-  **THIS IS THE CLASS WHERE A PARTIAL-PORT OUTCOME IS LIVE, and the unit set was ruled without
-  assuming otherwise.** Its members are executable harness and git-hook mechanism a vendored tree
-  invokes on disk, which is neither the config class's edit-seam ground nor the lib class's
-  sole-resolver ground — so "declare" is not the presumed answer here, and any port work this
-  ruling creates is FILED as its own entry rather than absorbed into the iteration.
-  **Cost while deferred:** 964 owed lines whose disposition every future
-  stated-contract cut re-meets undecided, and a hook whose port disposition is
-  unruled is one a cut may port into the binary while the harness still needs
-  an on-disk executable path to invoke.
-  ruled: harness-template-port-disposition operator 2026-08-30 lead-relay
-  Filed 2026-08-30 by close from the gap inbox; line counts re-derived at the
-  drain against the tree arm.
 
 - **declaration-shape-outside-header-unreadable** [design-pending] — a
   port-disposition string outside a file's header block is not a declaration,
