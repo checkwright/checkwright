@@ -155,13 +155,21 @@ the permanent tier and a class ruling owes the reader what would falsify it.
 
 ### (4) The cohort entry's two false premises corrected, and the class ruled
 
-`kit-smoke-port-disposition-cohort` loses the ten-kits arithmetic and the
-false "already carries `# no-port:`" sentence, gains the eight-kit member
-roster and the four-leg disposition in compressed form, and carries the
-`ruled:` declaration for the class ruling. The entry then **demotes** with the
-`[spec:]` tag dropped only if the class ruling leaves residue; otherwise it moves
-to `## Done`, since its deliverable — one ruling for the class rather than one
-per cut — is complete rather than incremental. {design-bearing}
+**Landed at spec, so build does not re-do it:** `kit-smoke-port-disposition-cohort`
+has already lost the ten-kits arithmetic and the false "already carries
+`# no-port:`" sentence, gained the eight-kit member roster and the four-leg
+disposition in compressed form, and carries `ruled:
+kit-smoke-port-disposition-cohort lead 2026-08-30 own-authority` — the class
+ruling is the **lead's own**, distinct from the operator's 2026-08-30 selection
+of the cut, and the two must not be collapsed into one authority.
+
+**What build still owes on this entry:** the terminal move. It moves to `## Done`,
+not a demotion — its deliverable is *one ruling for the class rather than one per
+cut*, which the merge completes rather than increments, so the corpus-entry
+demotion branch of §Merging an amendment step 4 does not apply to it. Verify that
+against the merged text rather than taking it from here: if the ruling leaves
+residue the entry must instead demote with the `[spec:]` tag dropped.
+{design-bearing}
 
 `native-gate-port-remaining-corpus` demotes as the corpus entry it is, recording
 the cut's oracle move. It sits at **0 lines of headroom** (probed, not inferred:

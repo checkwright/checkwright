@@ -49,8 +49,15 @@
   grounds, deliberately not averaged into one entry.
   **Cost while deferred:** low today — a held file is honestly marked and the oracle counts it —
   and rising only in that each kit cut re-meets the same undecided question.
+  **THE CLASS DISPOSITION IS RULED — all seventeen `# no-port:`, on the four legs
+  `SPEC-smoke-cut.md` measures, and the cut therefore writes no Rust.** The selection was re-put to
+  the operator WITH that zero-Rust measurement in front of them and stands: a cut is not less
+  legitimate for resolving to declarations when the declarations are structural. Neither re-cutting
+  for Rust nor switching to `kit-lib-port-disposition-cohort` was taken. The **opacity** ground
+  (§Consumer payload) is left **standing, not disposed of** — this ruling does not answer it.
   ruled: kit-smoke-port-disposition-cohort lead 2026-08-29 own-authority
   ruled: kit-smoke-port-disposition-cohort operator 2026-08-30 lead-relay
+  ruled: kit-smoke-port-disposition-cohort lead 2026-08-30 own-authority
   Filed 2026-08-29 by spec, under the lead ruling that held drift-kit's smoke rather
   than porting it; promoted 2026-08-30 by spec with the amendment, two false premises corrected.
 
@@ -8833,21 +8840,37 @@
   cannot tell that grounds it lacks were once written; the extent is the only artifact and reads
   identical either way. `git log -p -S'<slug>' -- TASK-QUEUE.md` recovers the text, but nobody runs
   it against an entry that looks complete.
-  **Why it stays design-pending — three shapes differing in kind, none obviously right:** measure
-  ruling records separately from grounds (a `ruled:` block is protocol rather than argument, and
-  the count already discounts one line of each declaration grammar, so widening that discount to
-  the whole block is the smallest change); raise the cap for entries carrying rulings, trading the
-  budget's uniformity for its purpose; or rule that a capped entry accumulating rulings is the
-  signal to **split**, the only shape that bounds the growth rather than re-pricing it.
+  **ALL THREE CANDIDATE SHAPES ARE ALREADY REFUSED BY THE OWNING SPEC, AND THIS ENTRY IS DROPPED
+  FROM THE UNIT SET ON THAT READING — operator-ruled 2026-08-30.** The owner is
+  queue-kit/SPEC.md §check-queue-entry-budget, and it ruled every shape before this entry was even
+  filed: widening the `ruled:` discount to the whole block is the grammar-wide exemption it refuses
+  at "one line per grammar, not a grammar-wide exemption"; raising the cap for entries carrying
+  rulings is refused at "Why the cap is not widened for exceptional content", conditional caps
+  included; and ruling-count as the split signal is refused **by name** as "a symptom shared by both
+  classes", the ruled criterion being **dispositionability**, under which an entry accreting further
+  grounds for ONE deliverable is explicitly not a split candidate however hard it collides.
+  Ordering is the point: `b1f3bee0` 2026-08-16 and `bbed56a5` 2026-08-23 both precede this entry's
+  own 2026-08-29 filing at `d452e90d`.
+  **The premise that displacement is unpriced is false**, corrected rather than deleted: bounding
+  what the cap may displace is that gate's invariant's own THIRD SIDE, and a ruling recorded onto
+  the entry it rules is one of its two named **mandated writes**, with a self-served relocation
+  relief. The 2026-08-30 instance that read as a new failure mode — a composer ruling landing on
+  `kit-smoke-port-disposition-cohort` rather than a zero-headroom
+  `native-gate-port-remaining-corpus` — is that relief working.
+  **The measurement survives, the analysis does not;** the saturated band is re-derivable from the
+  gate's own headroom line, which is its authority. The one residue the spec concedes rather than
+  answers — the compression contract has no oracle — is NEW work, filed separately.
   **DISTINCT from `icebox-eviction-line-budget-squeeze`**, which is pool-level eviction pressure
   across entries; this is one entry's internal budget spent by a content class that only grows.
   **Cost while deferred:** the queue's most-ruled entries degrade toward a list of dispositions
   with their reasoning evicted — the failure the "why (b) was never available" text on
   `native-gate-port-remaining-corpus` exists to prevent, and that text is itself one of the lines
   that consumed the last of an entry's budget.
+  ruled: ruling-accretion-outgrows-the-entry-cap operator 2026-08-30 lead-relay
   Filed 2026-08-29 to the gap inbox by the lead, raised by scope at this boundary and declined
-  there; promoted 2026-08-29 by close, the measurement re-run over the live pool rather than
-  carried from the bullet.
+  there; landed in this section 2026-08-29 by close, the measurement re-run over the live pool
+  rather than carried from the bullet; dropped from the unit set 2026-08-30 by spec, which read the
+  three shapes against their owning spec and found each already refused.
 
 - **design-pending-boilerplate-reds-its-own-promotion** [design-pending] — the standard explanatory
   line that names the `[design-pending]` token in prose is legal in the deferred section and
