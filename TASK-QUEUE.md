@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: msys-dialect-migration
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -7244,15 +7244,15 @@
   more than double the 45 the cost line was written on. The form is unchanged and still granted on
   neither surface, checked again at both. What moves is how much a session computes over the tree,
   never compliance — so 8 is not a ceiling reached and 109 is not a regression.
-  **Measured at the filing close's prompt-friction triage.** 45 `python3`-led fall-throughs on the
-  live
-  438-line log, the largest binary-level class after the write class. The inline shapes are the bulk
-  — `python3 -` 30, `python3 -c` 5, `python3 <<<` 1, `python3 /dev/stdin` 1 — and the remainder is
-  `python3 .tmp/x.py` 3, `python3 <` 2, `python3 tools/gen.py` 2.
-  **Granted NOWHERE, checked both surfaces rather than assumed:** no `Bash(python3*)` entry in the
-  committed `.claude/settings.json` and none in the local overlay. The one that used to exist,
-  `Bash(python3 .tmp/*)`, was removed at a 2026-08-12 close as a glob over writable scratch and is
-  recorded in `settings-content-pin-report-absent`; nothing replaced it for the inline shapes.
+  **RETIRES AT THE NEXT CLOSE AS A BARE `## Done` LINE — DISCHARGED AT THE RULED SHAPE, NOT AT THE
+  CLASS IT MEASURED.** `Bash(python3 -*)` is now live in the committed `.claude/settings.json`,
+  superseding this entry's former "granted nowhere" reading; the 2026-08-12 removal of
+  `Bash(python3 .tmp/*)` is recorded in `settings-content-pin-report-absent`. It reaches
+  `python3 -c` and `python3 -` only, so the filing triage's other shapes stay ungranted —
+  `python3 <<<` 1, `python3 /dev/stdin` 1, `python3 <` 2, `python3 .tmp/x.py` 3,
+  `python3 tools/gen.py` 2 — and the 109-count above reads 102 bare against 7 redirected. That
+  residue is filed to the gap inbox at this scope, so the drain rules on it rather than closing it.
+  ruled: inline-body-interpreter-grant-absent lead 2026-08-30 own-authority
   **Disposition (a), and the tree already argued the safety case.** guard-kit/SPEC.md §The generic
   ruleset rules that rule 23 deliberately does not fire on a body carried in the command string,
   because "the permission prompt shows it to the approver verbatim and the friction log records it.
@@ -8558,9 +8558,11 @@
   **What the split leaves here, stated so the boundary is not re-argued.** The parent keeps the
   contract and the sites its own cut writes or touches (the four drift-kit `bin/` tools). This
   entry owns everything else: a shared root-normalization helper, if the contract calls for one,
-  and the per-site migration. The `gate-tests` third of the corpus may fall out entirely — those
-  sites carry a `|| pwd` fallback and may already be dialect-correct by construction — but that is
-  a judgment the contract makes, not one this entry may assume.
+  and the per-site migration. **The `gate-tests` third does NOT fall out, and the hedge that said
+  it might is spent** — this entry deferred that judgment to the contract, and gate-sdk/SPEC.md
+  §The path-dialect contract has since made it against the hedge: a `|| pwd` fallback "confers
+  nothing", firing only when `git` fails while on MSYS `git` succeeds in the wrong dialect. Those
+  eleven sites are judged by the same consumption predicate as every other.
   **Why `[design-pending]`:** the migration's shape is whatever the contract rules, and while the
   contract is now written the shape is not — a spec stage still has to buy it.
   **DISTINCT from `msys-path-dialect-boundary-unmodelled`**, which owns the contract and the
@@ -8570,7 +8572,16 @@
   **Cost while deferred:** low today and rising with the port — the contract holds only where a
   site has been migrated onto it, so until this lands the dialect claim is true of the cut that
   authored it and of nothing else, and every ported file adds a site to the remainder.
+  **AN ITERATION ON THIS ENTRY IS NOT A YIELD OF THE PRIORITY DIRECTIVE — operator-ruled
+  2026-08-30.** The 2026-08-25 ruling holds the sequence and the owed count both correct with
+  neither absorbing the other, so measuring a tail unit by its `--tree` delta measures it against
+  the wrong axis; this entry blocks `platform-support-ci-matrix`, which blocks
+  `powershell-installer-surface`, so working it executes the directive's own ordered tail rather
+  than departing from it. Recorded here rather than on `native-gate-port-remaining-corpus`'s yield
+  ledger because that entry is at zero headroom under the entry cap; the `remainder of one`
+  misreading has needed a ruling once already, which is why it is recorded at all.
   ruled: msys-dialect-migration lead 2026-08-29 own-authority
+  ruled: msys-dialect-migration operator 2026-08-30 lead-relay
   Filed 2026-08-29 by scope, split from `msys-path-dialect-boundary-unmodelled` under the lead
   ruling that bundled that entry's contract half into this iteration, with the 52-site figure
   measured here rather than carried.

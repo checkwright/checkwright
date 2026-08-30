@@ -4,4 +4,4 @@
 
 ---
 
-— scope a3eadae7 2026-08-30 5621f0ab
+msys-dialect-migration scope a3eadae7 2026-08-30 5621f0ab
