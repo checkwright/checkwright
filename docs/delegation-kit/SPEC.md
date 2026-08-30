@@ -2433,8 +2433,10 @@ Config follows the established kit pattern: copy
 `DELEGATION_KIT_CONFIG_FILE` elsewhere) and override any knob; defaults
 fill what the consumer left unset. The loader is fail-closed: a
 `DELEGATION_KIT_CONFIG_FILE` named but absent, or a config leaving any knob
-malformed, exits 2 (a broken machine gates nothing). Knobs (this repo's
-layout as defaults):
+malformed, exits 2 (a broken machine gates nothing). That template and the
+copy it seeds are **permanently shell**, each carrying the `# no-port:` cause of
+the class ruling at gate-sdk/SPEC.md §The config-seam port disposition. Knobs
+(this repo's layout as defaults):
 
 - `DELEGATION_KIT_USAGE_FILE` — default
   `${CLAUDE_CONFIG_DIR:-$HOME/.claude}/usage.txt`; positional `$1`

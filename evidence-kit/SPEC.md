@@ -22,7 +22,10 @@ multi-kit path. Config follows the established kit pattern: copy
 point `EVIDENCE_KIT_CONFIG_FILE` elsewhere) and override any knob; the loader
 fills every unset knob with a default, then validates and exits 2 on a malformed
 machine (a suite name that is not a valid variable suffix) — a broken config
-gates nothing.
+gates nothing. Both sides of that seam — this template and the
+`evidence-config.sh` it becomes — are **permanently shell**, each carrying the
+`# no-port:` cause of the class ruling at gate-sdk/SPEC.md §The config-seam port
+disposition.
 
 Knobs, this repo's surface names as defaults:
 

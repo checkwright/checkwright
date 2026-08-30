@@ -1112,7 +1112,12 @@ an example a consumer adapts rather than a bundled member, stays out of it.
 Config follows the established kit pattern: copy `templates/drift-config.sh`
 into the gates dir (or point `DRIFT_KIT_CONFIG_FILE` elsewhere) and override
 any knob; defaults fill what the consumer left unset, and a set-but-missing
-`DRIFT_KIT_CONFIG_FILE` exits 2 rather than silently running on defaults.
+`DRIFT_KIT_CONFIG_FILE` exits 2 rather than silently running on defaults. This
+template's own `# no-port:` cause, the first statement of the edit-seam ground
+anywhere, is now the **precedent for a class rather than a lone case**: gate-sdk/SPEC.md
+§The config-seam port disposition reads that ground across every kit's config
+seam and reaches the `<gates-dir>/drift-config.sh` this template is seeded into,
+which the precedent alone had left owed.
 Knobs (this repo's layout as defaults):
 
 - `DRIFT_KIT_KPIS_FILE` — the registry; default

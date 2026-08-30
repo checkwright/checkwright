@@ -1,5 +1,6 @@
 # shellcheck shell=bash
 # spec: evidence-kit/SPEC.md §Layout and configuration — this repo's evidence-kit consumer config
+# no-port: gate-sdk/SPEC.md §The config-seam port disposition — the class ruling of 2026-08-30, reached by ground rather than by scope: this is the seeded-copy side of evidence-kit's config seam, the file this repo actually edits and the more edited of the two, so porting it deletes the seam outright. Its suite roster and per-suite runner commands are this repo's own test topology — half of it derived from the gate-tests dirs on disk — and name tools no kit owns. The 2026-08-24 vocabulary ruling left it owed deliberately — suite names and runner commands, read as tooling layout — which answers "does this hold private vocabulary?" and never "is this an edit seam?"; that verdict is untouched here and the two grounds are cumulative. Structural, not a sizing judgment.
 # shellcheck disable=SC2034  # every knob below is consumed by evidence-kit/lib/evidence.sh after sourcing
 
 EVIDENCE_KIT_SUITES=(gates)

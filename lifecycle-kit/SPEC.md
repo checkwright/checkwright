@@ -396,7 +396,9 @@ set only what you override — this roster owns every knob and its default;
 the template carries no second copy. The loader validates the machine
 (unknown stages in the map, a waiver token colliding with a stage name, a
 non-integer n-gram width, a malformed preflight entry) and exits 2 on a
-malformed config — a broken machine must not gate anything.
+malformed config — a broken machine must not gate anything. That template and
+the copy it seeds are **permanently shell**, each carrying the `# no-port:`
+cause of the class ruling at gate-sdk/SPEC.md §The config-seam port disposition.
 
 **No knob carries the ruling-authority vocabulary, and this is where a reader
 looking for one finds out why.** §The state machine obliges a stage session to

@@ -316,7 +316,9 @@ leave a dangle without turning a gate red.
 Config follows queue-kit's pattern: copy `templates/canon-config.sh` into
 the gates dir as `canon-config.sh` (or point `CANON_KIT_CONFIG_FILE`
 elsewhere) and override any knob; defaults fill what the consumer left
-unset, and the loader exits 2 on a malformed config. Knobs:
+unset, and the loader exits 2 on a malformed config. That template and the
+copy it seeds are **permanently shell**, each carrying the `# no-port:` cause of
+the class ruling at gate-sdk/SPEC.md §The config-seam port disposition. Knobs:
 
 - `CANON_KIT_SPEC_NAME` — canonical spec filename, default `SPEC.md`.
 - `CANON_KIT_AMENDMENT_GLOB` — default `SPEC-*.md`.

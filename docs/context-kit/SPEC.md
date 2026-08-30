@@ -962,8 +962,10 @@ Config follows the established kit pattern: copy
 `templates/context-config.sh` into the gates dir (or point
 `CONTEXT_KIT_CONFIG_FILE` elsewhere) and override any knob; defaults fill
 what the consumer left unset, and a set-but-missing `CONTEXT_KIT_CONFIG_FILE`
-exits 2 rather than silently running on defaults. Knobs (this repo's layout
-as defaults):
+exits 2 rather than silently running on defaults. That template and the
+`<gates-dir>/context-config.sh` it seeds are **permanently shell**, each
+carrying the `# no-port:` cause of the class ruling at gate-sdk/SPEC.md §The
+config-seam port disposition. Knobs (this repo's layout as defaults):
 
 ### lib/context.sh
 

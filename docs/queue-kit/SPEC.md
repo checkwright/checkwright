@@ -575,7 +575,9 @@ elsewhere) and override any knob; defaults fill what the consumer left unset,
 and the loader exits 2 on a malformed config — a broken grammar must not gate
 anything. A gitignored `queue-config.local.sh` beside that file sources last
 (§lib/queue.sh) — the home for a private value a tracked config cannot carry.
-Knobs:
+That template and the copy it seeds are **permanently shell**, each carrying the
+`# no-port:` cause of the class ruling at gate-sdk/SPEC.md §The config-seam port
+disposition. Knobs:
 
 - `QUEUE_KIT_QUEUE_FILE` — default `${GATE_SDK_QUEUE_FILE:-TASK-QUEUE.md}`;
   every gate also takes the file as `$1` (fixture capability).

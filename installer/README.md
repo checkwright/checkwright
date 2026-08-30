@@ -245,7 +245,10 @@ battery green on the tree it just made.
 The **config seam is derived, never listed**: a kit's consumer config is
 whatever `templates/*-config.sh` it ships, and the destination is always your
 gates directory under the file's own name. A kit that grows a config template
-is picked up with no edit here.
+is picked up with no edit here. The class this derivation defines — both sides
+of it, template and seeded copy — is **permanently shell**, ruled at
+gate-sdk/SPEC.md §The config-seam port disposition on the ground stated below:
+these are the files you edit, and a port would leave nothing to edit.
 
 **Everything `init` seeds takes one of two disciplines, and which one follows
 from whether `init` keeps rewriting the file.** A surface `init` creates once and

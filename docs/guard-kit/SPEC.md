@@ -1561,8 +1561,10 @@ exits 2 rather than silently running on defaults. In a hook that sources the
 lib, that exit 2 surfaces as a hook block carrying the not-found message —
 loud on the first guarded command, the intended fail-closed (the guards
 gate the lib source on file existence only, so the message is never
-swallowed; a lib that is not vendored at all stays fail-open). Knobs (this
-repo's layout as defaults):
+swallowed; a lib that is not vendored at all stays fail-open). That template
+and the copy it seeds are **permanently shell**, each carrying the `# no-port:`
+cause of the class ruling at gate-sdk/SPEC.md §The config-seam port disposition.
+Knobs (this repo's layout as defaults):
 
 - `GUARD_KIT_LIB` — the vendored `lib/guard.sh` path the copied guards
   source (the test runner points it at the tree under test); default

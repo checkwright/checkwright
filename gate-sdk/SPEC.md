@@ -253,6 +253,93 @@ consumer that must relocate a layout knob for every session sets it here. The
 one knob the file cannot set is `GATE_SDK_GATES_DIR`, which locates the file
 itself — it stays env-or-default (a config file cannot name its own directory).
 
+### The config-seam port disposition
+
+**Every kit's `templates/<kit>-config.sh`, and the `<gates-dir>/<kit>-config.sh`
+copy `init` seeds from it, carry `# no-port:` — ruled 2026-08-30 for the class,
+on one ground and not on size.** A config file **is** the adopter's seam rather
+than kit mechanism reaching it, so porting one deletes the thing there is to
+edit: a knob compiled into the binary is a knob no adopter can open. §port-blockers'
+`--tree` arm reclassifies each member `owed` → `no-port`, so the completion
+predicate TRAJECTORY.md states over that arm's owed count subtracts them. The
+ruling comes back **uniform**, and the uniformity is the finding: the ground is
+either right for the whole class or right for none of it.
+
+**The class is derived, never rostered**, and the derivation already has an
+owner — installer/README.md §What init seeds rules that "the config seam is
+derived, never listed: a kit's consumer config is whatever `templates/*-config.sh`
+it ships, and the destination is always your gates directory under the file's own
+name". A kit that ships no config template is simply **not a member**, and
+nothing here obliges one to exist: this repo's `<gates-dir>/gate-sdk-config.sh`
+and `<gates-dir>/site-config.sh` are hand-authored consumer configs for such
+kits rather than seeded copies, and they reach `no-port` by the separate ground
+below. **Both sides of the seam are members**, template and seeded copy alike —
+they are one artifact at two points of one derivation, the copy is what the
+template exists to become, and the copy is the *more* edited of the two. A ruling
+taking one side would leave the other re-arguing the same ground at the next cut.
+
+**The ground is not minted here; it is read across its own class.**
+`drift-kit/templates/drift-config.sh` already declares on it verbatim — it "**is**
+the adopter's config seam rather than kit mechanism reaching it, so porting it
+deletes the seam: there would be nothing left for a consumer to edit" — landed at
+the drift-kit cut. What that precedent leaves standing alone is an **incoherence**,
+and closing it is the sharpest case for a class ruling: the template declares on
+the edit-seam ground while `<gates-dir>/drift-config.sh`, the copy it is seeded
+into, stays owed. A template declaring on a ground its own consumer copy is denied
+is a state the tree already carries, so this ruling resolves one rather than
+creating an exception.
+
+**Two mechanisms here already treat the class as an edit surface, and they are
+cited as evidence rather than as argument.** `installer/lib/init.sh` claims a
+rewritten file before writing it, comparing the file's on-disk hash against the
+hash `init` recorded for it, so an adopter's edit is reported rather than
+clobbered on a re-run — the seam is a file the installer *expects* to have been
+changed (installer/README.md §What init seeds). And §check-template-copy-parity
+excludes `*-config.sh` from the template↔copy parity assertion **by name suffix**,
+on the stated ground that a config template is a starting point the consumer
+customizes "so equality would be the defect". A gate that refuses to hold this
+class to its own template is a gate already saying the class is the consumer's.
+
+**A caller-side check the class invites and does not need.** Every kit library
+takes `<KIT>_CONFIG_FILE` when set and otherwise resolves
+`<gates-dir>/<kit>-config.sh`, sourcing it **only when the file exists** — the
+loader paragraph above is gate-sdk's instance of a shape each kit's own §Layout
+and configuration repeats for its own library. A member's declaration therefore
+changes no resolution path and no absent-file behavior. Verified at each kit
+library rather than generalised from one, because the file those defaults name is
+this class's whole subject.
+
+**This does not reverse the 2026-08-24 vocabulary ruling, and the two grounds are
+cumulative rather than competing.** That ruling scoped itself in its own words: it
+generalises `scripts/measured-claims.sh`'s cause **on its vocabulary half alone**,
+so files holding this repo's private claim vocabulary declare and mechanism files
+stay owed — the clause every declaration it landed still carries. It left this
+class's seeded copies owed *deliberately*, and each reason it gave answers the
+vocabulary question and only that one: layout, a harness-generic type roster plus
+path globs, a stage roster derived from a sibling rather than held literally,
+tooling layout. None of them is an answer to *is this an edit seam?* A ruling that
+names the half it generalises on has said where it stops. So the verdict this one
+agrees with is untouched and stays true, and a file may be reached by either
+ground — the two already meet on `<gates-dir>/gate-sdk-config.sh` and its
+vocabulary-declared siblings, which this class does not contain and does not need
+to. The caution that ruling states for itself is **adopted here rather than set
+aside**: over-declaring wrongly excuses a file from the port and mis-sizes a
+governed completion predicate with nothing red to catch it, where under-declaring
+is visible and cheap. It is why this ruling reaches only files whose whole
+documented purpose is to be edited.
+
+**The honest limit.** This says nothing about the **knob defaults** a config
+template's owning kit library holds. Those live one directory over, they are a
+different question, and they are the kit-library cut's — stated here because the
+two look alike from a distance and a reader meeting one first must not carry its
+answer to the other.
+
+**What reopens it**, written as a reopening condition rather than a permanence
+claim, on §Consumer smoke *The port disposition*'s terms: the ground dissolves for
+a kit whose config template stops being seeded into the consumer's gates
+directory — the derivation installer/README.md §What init seeds owns — because
+the file is then kit mechanism *reaching* a seam rather than the seam itself.
+
 ## The path-dialect contract
 
 A **root** is a path this tree passes between components, and the sentence above
@@ -13852,6 +13939,12 @@ first argument, default the git toplevel). Two exclusions, both derivable:
 `*-config.sh` is out of scope by name suffix — a config template is a starting
 point the consumer customizes, so equality would be the defect — and a template
 with **no** same-named file under the gates dir is silently skipped, not failed.
+That first exclusion partitions the template corpus along the same line a port
+disposition does, which is worth saying once here so a reader arriving from
+either side meets it: the excluded `*-config.sh` class is exactly the class
+§The config-seam port disposition rules permanently shell, on the ground this
+exclusion's own sentence states, while the executable templates this gate **does**
+hold in parity are a separate corpus whose disposition that ruling does not reach.
 An unpaired template was never vendored out and has no copy to be in parity
 with; running a template in place (this repo wires two from the template path
 itself) is a legitimate adoption mode, so failing closed there would red a tree
