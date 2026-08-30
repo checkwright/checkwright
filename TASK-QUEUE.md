@@ -12,6 +12,48 @@
 
 ## New Features
 
+- **kit-smoke-port-disposition-cohort** [spec: SPEC-smoke-cut.md] — all eleven kits ship a
+  `smoke/install.sh`, the class has never been dispositioned, and every cut that meets one
+  re-argues it. `drift-kit/smoke/install.sh` took `# port-until:` against this entry at the
+  2026-08-29 drift-kit cut rather than settling it.
+  **THIS CLASS IS THE NEXT CUT — operator-ruled 2026-08-30, selecting `gate-sdk/SPEC.md §Consumer
+  smoke` under the 2026-08-28 stated-contract composer, which stands unamended.** The alternative
+  refused was a `kit-lib-port-disposition-cohort` cut: it yields more owed lines, and it is not one
+  stated contract (that corpus spans thirteen SPEC sections), so taking it would have meant reading
+  the composer loosely or amending it. The ruling took neither.
+  **The census the cut is scoped against, derived rather than estimated:** every owed file names its
+  owning section on its own `# spec:` line, so grouping the oracle's owed list by that line ranks
+  the contracts. §Consumer smoke leads on both axes — 17 owed files, 1572 owed lines, 14% of the
+  owed file count in one section. Re-derive rather than reading those figures here; they move with
+  every ported file.
+  **THE CLASS IS NOT ONE CONTRACT — it crosses FOUR, not three.** Seventeen owed files answer to
+  gate-sdk §Consumer smoke; context-kit's three and delegation-kit's two answer to their **own**
+  §Testing sections; drift-kit's held one answers to drift-kit §Testing. So "all eleven kits ship a
+  `smoke/install.sh`" is true of the files and false of the contracts.
+  **THE CUT REACHES EIGHT KITS, and the ten-kits arithmetic this entry used to carry was
+  impossible** — ten pairs is twenty files. The 17 are seven kits' pairs (canon, doctrine, evidence,
+  gate-sdk, lifecycle, queue, site), guard-kit's `install.sh` alone (it ships no `violation.sh`),
+  and the two gate-sdk harness members `bin/run-consumer-smoke.sh` and `lib/consumer-smoke.sh`.
+  **ZERO PRECEDENT IN EITHER DIRECTION, and the sentence that used to deny it was false.** This
+  entry cited `gate-sdk/smoke/install.sh` as already carrying `# no-port: the adoption bootstrap
+  runs before any binary exists`. It does not: that string sits inside a quoted heredoc writing a
+  *fixture* file into the scratch consumer to exercise the oracle's own declaration parser, and the
+  oracle reports the file `owed` because a declaration is read from a file's header alone.
+  Corrected 2026-08-30 at spec, probed at the oracle rather than read off this entry.
+  **The ground is the config bridge and bootstrap, never size.** The disposition, its four measured
+  legs, its reopening condition and its honest limit are `SPEC-smoke-cut.md`'s. The one this entry
+  keeps is that a smoke is the only behavioural oracle its kit has, which is why the class is not
+  moved casually.
+  **DISTINCT from `kit-lib-port-disposition-cohort`**, filed the same day from the same ruling: a
+  lib is load-bearing at runtime for the config bridge, this is a test surface. Same cut, different
+  grounds, deliberately not averaged into one entry.
+  **Cost while deferred:** low today — a held file is honestly marked and the oracle counts it —
+  and rising only in that each kit cut re-meets the same undecided question.
+  ruled: kit-smoke-port-disposition-cohort lead 2026-08-29 own-authority
+  ruled: kit-smoke-port-disposition-cohort operator 2026-08-30 lead-relay
+  Filed 2026-08-29 by spec, under the lead ruling that held drift-kit's smoke rather
+  than porting it; promoted 2026-08-30 by spec with the amendment, two false premises corrected.
+
 ## Technical Debt
 
 - **platform-support-ci-matrix** [roadmap: next/reliability] [drain-exempt: close-observes]
@@ -214,45 +256,6 @@
   ruled: kit-lib-port-disposition-cohort lead 2026-08-29 own-authority
   Filed 2026-08-29 by spec, under the lead ruling that resolved the drift-kit cut's
   four declarations.
-
-- **kit-smoke-port-disposition-cohort** [design-pending] — all eleven kits ship a
-  `smoke/install.sh`, every one is owed by the port oracle, and not one is ported or declared.
-  **Zero precedent in either direction**, which is why the first cut to touch one rules the class
-  for all eleven and should not do so in passing. `drift-kit/smoke/install.sh` took
-  `# port-until:` against this entry at the 2026-08-29 drift-kit cut rather than settling it.
-  **The ground is bootstrap, not size.** A consumer smoke asserts the ADOPTION path, and
-  `gate-sdk/smoke/install.sh` already carries `# no-port: the adoption bootstrap runs before any
-  binary exists` on one of its arms — so at least part of this class is structurally unportable and
-  the question is where the line falls, not whether the files are large.
-  **The drift-kit instance also showed the envelope hazard:** ~400 of its 559 lines assert on three
-  `bin/` tools that cut EXCLUDED, so porting the harness would have carried the envelope with it.
-  A smoke is the only behavioural oracle its kit has, which is the second reason not to move one
-  casually.
-  **DISTINCT from `kit-lib-port-disposition-cohort`**, filed the same day from the same ruling: a
-  lib is load-bearing at runtime for the config bridge, this is a test surface. Same cut, different
-  grounds, deliberately not averaged into one entry.
-  **Cost while deferred:** low today — a held file is honestly marked and the oracle counts it —
-  and rising only in that each kit cut re-meets the same undecided question.
-  **THIS CLASS IS THE NEXT CUT — operator-ruled 2026-08-30, selecting `gate-sdk/SPEC.md §Consumer
-  smoke` under the 2026-08-28 stated-contract composer, which stands unamended.** The alternative
-  refused was a `kit-lib-port-disposition-cohort` cut: it yields more owed lines, and it is not one
-  stated contract (that corpus spans thirteen SPEC sections), so taking it would have meant reading
-  the composer loosely or amending it. The ruling took neither.
-  **The census the cut is scoped against, derived rather than estimated:** every owed file names its
-  owning section on its own `# spec:` line, so grouping the oracle's owed list by that line ranks
-  the contracts. §Consumer smoke leads on both axes — 17 owed files, 1572 owed lines, 14% of the
-  owed file count in one section. Re-derive rather than reading those figures here; they move with
-  every ported file.
-  **THE CLASS IS NOT ONE CONTRACT, and a cut scoped from this entry's own lead line will get that
-  wrong.** Seventeen of the owed smoke-related files answer to gate-sdk §Consumer smoke;
-  context-kit's three and delegation-kit's two answer to their **own** §Testing sections. So "all
-  eleven kits ship
-  a `smoke/install.sh`" is true of the files and false of the contracts, and a stated-contract cut
-  reaches ten kits' pairs plus the two gate-sdk harness members — not eleven kits.
-  ruled: kit-smoke-port-disposition-cohort lead 2026-08-29 own-authority
-  ruled: kit-smoke-port-disposition-cohort operator 2026-08-30 lead-relay
-  Filed 2026-08-29 by spec, under the lead ruling that held drift-kit's smoke rather
-  than porting it.
 
 - **macos-install-smoke-ci-leg** [design-pending] [roadmap: next/reliability] — a macOS
   install-smoke leg; nothing has ever run green against macOS.
