@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # spec: context-kit/SPEC.md §The session-context hook (template) — consumer-copy SessionStart hook (bash-guard pattern); assembles the session brief, every step guarded, never fails a session
+# no-port: gate-sdk/SPEC.md §The harness-template port disposition — the class ruling of 2026-08-30, reached by ground rather than by scope: this file carries an [EDIT ME] gap at every layout-judgment step (tool paths, the dirty-surface pre-run, the stage-conditioned nudges, the index footer, the probe path), and context-kit/README.md tells an adopter to edit them as layout judgment rather than mechanism. The gaps ARE the extension point, so porting the file leaves an adopter nothing to fill. Structural, not a sizing judgment.
 
 set -uo pipefail
 

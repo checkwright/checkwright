@@ -12,50 +12,6 @@
 
 ## New Features
 
-- **harness-template-port-disposition** [spec: SPEC-harness-template-port.md] — the vendored hook
-  and guard templates are uniformly owed and no sibling declaration exists on
-  either side, which is why nothing had ever forced the disposition.
-  **Measured at the 2026-08-30 drain.** Owed, with no declaration on either
-  side: `delegation-kit/templates/` `agent-budget-guard.sh` (18),
-  `agent-dispatch-guard.sh` (61), `statusline-usage.sh` (101),
-  `subagent-stop-liveness.sh` (91), `usage-poller.sh` (67);
-  `guard-kit/templates/` `bash-guard.sh` (20), `escalation-guard.sh` (27),
-  `wakeup-guard.sh` (20); `context-kit/templates/session-context.sh` (134);
-  `lifecycle-kit/templates/workflow-state-guard.sh` (29);
-  `gate-sdk/templates/check-skeleton.sh` (23). **591 lines**, and their
-  `scripts/` consumer copies add **374** more — 965 owed between them. The gap
-  bullet estimated "about 570"; the measured figure is 591.
-  Corrected 2026-08-30 at scope: the copies line said "about 255". Only SIX of
-  the eleven templates carry a `scripts/` copy at all — agent-budget-guard 18,
-  agent-dispatch-guard 61, bash-guard 39, session-context 136,
-  subagent-stop-liveness 91, workflow-state-guard 29.
-  **No member of this class declares, on either side** — so no sibling
-  declaration can be read across to it, and neither the config-seam ground nor
-  the sole-resolver ground reaches these. **Corrected 2026-08-30 at spec: the
-  asymmetry is in GROUND AVAILABILITY, not in declaration status.** Two grounds
-  this tree already holds reach part of the class, which is why the ruling is a
-  partition; the argument and its members are the amendment's.
-  **DISTINCT from `kit-config-template-port-disposition`**, filed the same
-  day: that class turns on an existing sibling declaration its members lack;
-  this one turns on there being no declaration anywhere and no ground yet
-  stated. Neither implies the other's answer.
-  **IN THE `port-declaration-cohort-and-windows-leg` UNIT SET AS CUT 3 OF 3 — ruled 2026-08-30
-  (operator, lead-relay).** Width, stated per cut and never inherited: **17 files, 965 lines**
-  (eleven templates at 591, six `scripts/` copies at 374). Sequenced LAST on precedent density,
-  and it is last because it has NONE — no declaration on either side, no ground ever stated.
-  **THIS IS THE CLASS WHERE A PARTIAL-PORT OUTCOME IS LIVE, and the unit set was ruled without
-  assuming otherwise.** Its members are executable harness and git-hook mechanism a vendored tree
-  invokes on disk, which is neither the config class's edit-seam ground nor the lib class's
-  sole-resolver ground — so "declare" is not the presumed answer here, and any port work this
-  ruling creates is FILED as its own entry rather than absorbed into the iteration.
-  **Cost while deferred:** 965 owed lines whose disposition every future
-  stated-contract cut re-meets undecided, and a hook whose port disposition is
-  unruled is one a cut may port into the binary while the harness still needs
-  an on-disk executable path to invoke.
-  ruled: harness-template-port-disposition operator 2026-08-30 lead-relay
-  Filed 2026-08-30 by close from the gap inbox; line counts re-derived at the
-  drain against the tree arm.
-
 ## Technical Debt
 
 - **platform-support-ci-matrix** [roadmap: next/reliability]
@@ -111,6 +67,54 @@
   drain-exempt residue path, now spent and that tag dropped from the lead line.
 
 ## Deferred
+
+- **harness-template-port-residue** [design-pending] — the harness and git-hook template members
+  the 2026-08-30 class ruling deliberately leaves owed, filed rather than absorbed per that cut's
+  own boundary.
+  **What the ruling settled and what it did not.**
+  gate-sdk/SPEC.md §The harness-template port disposition rules a template permanently shell on
+  two grounds: its body carries the marked gap a consumer fills, or it is a consumer copy holding
+  rule content the kit is forbidden to name. The ruling is a **partition**, so these members are
+  **owed, not undecided** — each is named on the owed side of that section by the ruling itself,
+  and nothing there argues they are hard to port, only that no stated ground reaches them.
+  **The owed side, read off `--emit port-blockers --tree` at the 2026-08-30 landing:**
+  `delegation-kit/templates/` `agent-budget-guard.sh` (18), `agent-dispatch-guard.sh` (61),
+  `statusline-usage.sh` (101), `subagent-stop-liveness.sh` (91), `usage-poller.sh` (67);
+  `guard-kit/templates/` `escalation-guard.sh` (27), `wakeup-guard.sh` (20);
+  `lifecycle-kit/templates/workflow-state-guard.sh` (29); and the `scripts/` copies
+  `agent-budget-guard.sh` (18), `agent-dispatch-guard.sh` (61), `subagent-stop-liveness.sh` (91),
+  `workflow-state-guard.sh` (29). 613 lines. A copy is not separately portable: it is **deleted**
+  when its template ports, which is the copy rule that section states once.
+  **THREE FACTS A PORTING SESSION WOULD OTHERWISE BUY AGAIN, each measured at this build.**
+  **(1) The crate has no arm of the required kind.** `native/src/emit/mod.rs`'s `BRIDGED_ARMS`
+  table holds emitters plus the battery runner; none reads a harness hook payload from stdin,
+  none writes a hook-JSON envelope, and none uses a non-zero exit as protocol — which
+  `subagent-stop-liveness.sh` and `wakeup-guard.sh` both do. A port of this residue mints an arm
+  **kind**, not another arm, so it is sequenced behind a contract for one.
+  **(2) The non-gate arm's own contract cuts against it.** `native/src/main.rs` states that the
+  caller may not be assumed to be a POSIX shell, "so every value arrives as argv and the arm reads
+  no knob" — and `session-context.sh` and `statusline-usage.sh` both read their environment.
+  **(3) The settings surface is named twice, and only one half is gated.**
+  `.claude/settings.json`'s `permissions.allow[]` carries a repo-relative grant naming
+  `delegation-kit/templates/usage-poller.sh`, which is `check-settings-paths`' corpus, so deleting
+  that file reds a gate unless the grant moves in the same commit —
+  `native-gate-port-remaining-corpus`' settings-grant carve-out exactly. **The larger half reds
+  nowhere**: seven more class members are wired as hook `command` fields in the same file
+  (`statusline-usage.sh` as the statusLine, and the `scripts/` copies of `session-context.sh`,
+  `subagent-stop-liveness.sh`, `bash-guard.sh`, `agent-budget-guard.sh`, `agent-dispatch-guard.sh`
+  and `workflow-state-guard.sh`), and `check-settings-paths` reads the allow array alone
+  (`native/src/gates/settings_paths.rs`'s `allow_entries` on `/permissions/allow`). That coverage
+  hole is `settings-hook-command-path-gate`, filed 2026-08-22 and **not** re-filed here; this entry
+  records only that the residue is the population which would walk into it.
+  **Why `[design-pending]`:** the arm-kind question above is a contract decision, not an
+  implementation one — whether a hook substrate belongs in this binary at all, and if so whether it
+  is one arm per hook or one dispatching arm, is the shape nobody has ruled. Recovering each
+  member's harness wiring is mandatory before ruling on it.
+  **Cost while deferred:** low and non-recurring for the argument, standing for the work — the
+  ground is stated and every member is named on the owed side of its own ruling, so no future cut
+  re-argues the class; what is owed is the port, and the 613 lines sit in the `--tree` arm's owed
+  column that TRAJECTORY.md's completion predicate is stated over.
+  Filed 2026-08-30 by build, at the landing of the harness-template class ruling.
 
 - **kit-library-port-residue** [design-pending] — the kit `lib/*.sh` members the 2026-08-30 class
   ruling deliberately leaves owed, filed rather than absorbed per that cut's own boundary.
@@ -9321,6 +9325,7 @@
 - no-port-cause-validation-scoped-to-registry
 - kit-config-template-port-disposition
 - kit-lib-port-disposition-cohort
+- harness-template-port-disposition
 
 ## Lessons Learned
 

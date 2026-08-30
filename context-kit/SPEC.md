@@ -103,6 +103,16 @@ pattern): wired as the harness's session-start hook via
 Every step is guarded and degrades silently — the hook never fails a
 session.
 
+**The template and its consumer copy are both permanently shell**, declared
+`# no-port:` under the class ruling at gate-sdk/SPEC.md §The harness-template port disposition.
+The template carries an `[EDIT ME]` gap at every layout-judgment step below —
+tool paths, the dirty-surface pre-run, the stage-conditioned nudges, the index
+footer, the probe path — and README.md tells an adopter to fill them as layout
+judgment rather than mechanism, so those gaps *are* the extension point and a
+compiled form would leave nothing to fill. The copy declares on the second
+ground: it is the filled instance, so everything it holds beyond the template is
+this repo's own layout content.
+
 **A `hooks[]` edit arms immediately, and this is the kit set's record of it** —
 true of every hook registration in the settings file, not just this template's:
 the running session and its already-dispatched subagents pick it up with no

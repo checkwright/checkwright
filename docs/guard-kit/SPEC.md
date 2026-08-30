@@ -343,6 +343,16 @@ and names none. What a project blocks or steers is its own toolchain knowledge
 and stays in its copy, which is why the copy legitimately diverges from the
 template here and why no rule content crosses into the kit.
 
+**Both sides of this seam are permanently shell, and each declares on its own
+half of the contract above.** `templates/bash-guard.sh` declares `# no-port:`
+because the position this section says the template marks is the *whole* of the
+template — a resolve-source-read preamble around one `[EDIT ME]` gap — so a
+compiled form would carry the mechanism and delete the seam. The consumer copy
+declares on the other half: what it holds beyond the template is project rule
+content, which the paragraph above rules the kit's to never name. That is why
+this repo's `<gates-dir>/bash-guard.sh` is the one copy in its corpus carrying
+`# copy-divergence:` declarations. The class ruling both cite is gate-sdk/SPEC.md §The harness-template port disposition.
+
 **The primitives a consumer composes from are permanently shell, which is what
 makes this contract durable rather than provisional.** A consumer writes its
 rules against `lib/guard.sh`'s functions; if that library moved in-crate the

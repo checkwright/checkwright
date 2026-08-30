@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # spec: context-kit/SPEC.md §The session-context hook (template) — consumer copy assembling the per-session brief; every step guarded, never fails a session
+# no-port: CLAUDE.md §The provenance seam (never cross it) — the class ruling of 2026-08-30 at gate-sdk/SPEC.md §The harness-template port disposition, reached by ground rather than by scope: this copy is the filled instance of its template's [EDIT ME] gaps, so every value it holds beyond the template is this repo's own layout judgment. It also takes its template's disposition under gate-sdk/SPEC.md §check-template-copy-parity's bidirectional parity, so the ground here stands whatever becomes of the template's. Structural, not a sizing judgment.
 
 set -uo pipefail
 

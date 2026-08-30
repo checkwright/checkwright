@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # spec: guard-kit/SPEC.md §Consumer rules — PreToolUse(Bash) hook (consumer copy): block, steer, or auto-allow
+# no-port: CLAUDE.md §The provenance seam (never cross it) — the class ruling of 2026-08-30 at gate-sdk/SPEC.md §The harness-template port disposition, reached by ground rather than by scope: this copy carries this project's own blocking rules and the only # copy-divergence: declarations in the corpus, which is rule content a kit is forbidden to hold — the same material gate-sdk/SPEC.md §check-template-copy-parity's case: class discards rather than reads. It also takes its template's disposition under that section's bidirectional parity, so the ground here stands whatever becomes of the template's. Structural, not a sizing judgment.
 set -uo pipefail
 
 # shellcheck disable=SC2034  # consumed by the sourced lib/guard.sh (guard_block et al.)

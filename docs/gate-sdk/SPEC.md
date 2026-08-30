@@ -14096,8 +14096,13 @@ That first exclusion partitions the template corpus along the same line a port
 disposition does, which is worth saying once here so a reader arriving from
 either side meets it: the excluded `*-config.sh` class is exactly the class
 §The config-seam port disposition rules permanently shell, on the ground this
-exclusion's own sentence states, while the executable templates this gate **does**
-hold in parity are a separate corpus whose disposition that ruling does not reach.
+exclusion's own sentence states, while the executable templates left in this
+derivation are the corpus §The harness-template port disposition rules — in part,
+naming both the members it reaches and the members it does not. The two
+exclusions differ in kind and that ruling turns on the difference: the suffix
+exclusion takes files out of the derivation, while an unpaired template stays in
+it and is only skipped by the assertions, which is how a member this gate never
+asserts on is still a member the disposition reaches.
 An unpaired template was never vendored out and has no copy to be in parity
 with; running a template in place (this repo wires two from the template path
 itself) is a legitimate adoption mode, so failing closed there would red a tree
@@ -14205,6 +14210,115 @@ already repaired, so `good/` proves green-on-a-sanctioned-`spec:`-prose-differen
 (alongside an unpaired template and a divergent `*-config.sh` pair, proving both
 scope exclusions) and `bad/` proves all three assertions red on a hand-edited
 copy. Tier `precommit`.
+
+### The harness-template port disposition
+
+**Part of the executable-template corpus §check-template-copy-parity derives
+carries `# no-port:` — ruled 2026-08-30 — and the rest of it stays owed. The
+ruling is a partition, and the partition is the finding.** The declaring members
+are `guard-kit/templates/bash-guard.sh` and its `<gates-dir>/` copy,
+`context-kit/templates/session-context.sh` and its `<gates-dir>/` copy, and
+`gate-sdk/templates/check-skeleton.sh`. §port-blockers' `--tree` arm reclassifies
+each `owed` → `no-port`, so the completion predicate TRAJECTORY.md states over
+that arm's owed count subtracts them and keeps the remainder. The sibling cuts of
+the same day came back uniform because one ground was either right for a whole
+class or right for none of it; here two grounds this tree already holds reach part
+of the corpus and reach no further, and stretching either to cover the remainder
+would be the cross-class averaging §The config-seam port disposition and §The
+kit-library port disposition each refuse in their own terms.
+
+**The corpus is the neighbouring section's, not one assembled for the occasion.**
+§check-template-copy-parity derives its population from layout —
+`<kit>/templates/<name>.sh` paired with `<gates-dir>/<name>.sh` — and its
+`*-config.sh` suffix exclusion is exactly §The config-seam port disposition's
+class, so the two cuts partition one population with no overlap and no gap. A
+template with no `<gates-dir>/` counterpart stays inside that derivation and is
+merely skipped by the parity assertions, which is why `templates/check-skeleton.sh`
+is ruled here even though the gate never asserts on it.
+
+**The first ground — a cut narrows the port, never an extension point.** Where a
+template's own body carries the marked gap a consumer fills, that template *is*
+the extension point, and porting it deletes the thing there is to fill. This is
+`native-gate-port-remaining-corpus`' ruling (1) applied to a seam that is a file
+rather than a knob, and it is the ground `drift-kit/templates/drift-config.sh`
+declares on in the sibling class — that file "**is** the adopter's config seam
+rather than kit mechanism reaching it, so porting it deletes the seam".
+
+**The gap is marked in the source, so membership on this ground is read rather
+than judged.** The marker is `[EDIT ME]` on a `# spec:` line, and across the
+tracked shell tree it sits in `guard-kit/templates/bash-guard.sh` — whose whole
+body is a resolve-source-read preamble around one such gap — and in
+`context-kit/templates/session-context.sh`, which carries one at every
+layout-judgment step and whose README instructs an adopter to edit them as
+"layout judgment, not mechanism". Nowhere else.
+`gate-sdk/templates/check-skeleton.sh` carries the same seam in the other
+spelling this tree uses, angle-bracket fill-ins inside a runnable frame that
+exists to be replaced: §Layout and configuration describes a consumer's own
+`check-*.sh` gates as "copy-edits of `templates/check-skeleton.sh`", and
+§templates/check-skeleton.sh rules it "a template, never a registry member". A
+vendoring adopter with no crate births a shell gate from that file, so porting it
+deletes the only thing gate-sdk hands that adopter.
+
+**The second ground — a consumer copy carrying the consumer's own rule content
+cannot cross into kit mechanism** (CLAUDE.md §The provenance seam), which is the
+ground `drift-kit/templates/kpi-deprecated-surface.sh` declares on.
+`<gates-dir>/bash-guard.sh` is the one copy in this corpus that declares
+divergence at all, and what its `# copy-divergence:` reasons name is this
+project's own blocking rule content — the very material this gate's `case:` class
+refuses to read, on the same seam. `<gates-dir>/session-context.sh` is the filled
+instance of its template's marked gaps, so this repo's layout judgment is the
+whole of its divergence.
+
+**Both sides of a declaring pair are named, and a copy does not rest on its
+template's ground alone.** A `<gates-dir>/` copy takes its template's disposition
+because the pair is held to one declared contract surface in both directions —
+this gate's `dir=bi` ruling is that parity is symmetric, "either side going stale
+is the defect" — so a disposition differing by side would itself be an undeclared
+divergence. The copies here carry the second ground on top of the first, so a
+later ruling that ported their templates still could not take them. A copy on the
+owed side is not un-portable: it is **deleted** when its template ports, which
+satisfies TRAJECTORY.md's completion predicate directly.
+
+**The ruling reaches by ground, not by scope.** A member outside gate-sdk declares
+in its own header and its own SPEC section says so: guard-kit/SPEC.md §Consumer
+rules for `bash-guard.sh` and its copy, and context-kit/SPEC.md §The session-context hook (template)
+for `session-context.sh` and its copy. Nothing here reaches a file because of the
+directory it sits in.
+
+**The members the ground does not reach are named too, and they stay owed rather
+than undecided**: `agent-budget-guard.sh`, `agent-dispatch-guard.sh`,
+`statusline-usage.sh`, `subagent-stop-liveness.sh`, `usage-poller.sh`,
+`escalation-guard.sh`, `wakeup-guard.sh`, `workflow-state-guard.sh`, and the
+`<gates-dir>/` copies of the first, second, fourth and last. None carries a marked
+gap and none holds a consumer literal of its own. Reading a consumer roster
+*through the config bridge* is what the bridge exists for rather than a reason a
+file cannot port: `agent-dispatch-guard.sh` reads `DELEGATION_KIT_READONLY_TYPES`
+and defaults it empty on both sides of its pair, while the vocabulary filling it
+lives in `<gates-dir>/delegation-config.sh` — a member of the sibling class,
+declaring on the seam ground. Their port work is filed as
+`harness-template-port-residue` rather than absorbed into this cut.
+
+**One near-miss, stated because a reader will meet the sentence and ask.**
+delegation-kit/SPEC.md §The statusline template calls `statusline-usage.sh` a
+consumer-owned template whose repo-root-relative reads stay hardcoded because "a
+consumer-owned template adds no knob". That does not satisfy the first ground:
+the paths it hardcodes are queue-kit's and lifecycle-kit's own defaults rather
+than consumer vocabulary, and the file carries no marked gap. Being consumer-owned
+is not the test — carrying the seam is.
+
+**The honest limit, stated because this ruling does not answer it.** The owed side
+is the larger half by line count, and nothing here argues those files are hard to
+port; only that no *stated* ground reaches them. What they actually meet is
+recorded on `harness-template-port-residue`, and the absence of a ground is not
+asserted here as though it were a disposition.
+
+**What reopens it**, on §Consumer smoke *The port disposition*'s terms, because
+`# no-port:` is the permanent tier and a class ruling owes its reader what would
+falsify it. The extension-point face dissolves for a member whose marked gap
+leaves its template — the seam having moved elsewhere or ceased to exist — which
+is a source-readable condition rather than a judgment. The provenance face
+dissolves for a copy that holds no rule content its template lacks, which is the
+state assertion C of §check-template-copy-parity already reports on.
 
 ### check-template-registry-parity
 
@@ -14325,6 +14439,16 @@ template (structure + fail-closed + output contract). A new gate is a
 copy-edit of it, shipping with its fixture pair. It is a template, never a
 registry member; structure is copied, not imported, so it stays per-gate and
 legible.
+
+**It is permanently shell**, declared `# no-port:` under §The harness-template
+port disposition, and the reason is the sentence above rather than the file's
+size: a tree carrying the crate births its gates as crate modules, but a
+vendoring adopter with no crate births one by copy-editing this file, so
+compiling it deletes the only gate-authoring surface gate-sdk hands that adopter.
+The declaration is a property of *this* template and not of anything copied from
+it, so its cause carries the instruction to drop the line on copy — a birthed
+gate's disposition is its own, decided by §The port-candidate criteria like any
+other member's.
 
 ### templates/gates-workflow.yml
 
