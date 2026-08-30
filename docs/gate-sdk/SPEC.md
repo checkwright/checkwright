@@ -270,9 +270,33 @@ crossing. This section states the three things that make a call site judgeable a
 all: which dialect a root is in, where the boundary is crossed, and who crosses
 it.
 
-**The declared dialect.** Every root variable in this tree is **POSIX-spelled** —
-forward separators, no drive letter. That is the invariant, and it is a property
-of a value *anywhere inside the tree*, not only of the point that produced it.
+**The declared dialect is per-substrate.** A root is spelled in **its own
+substrate's** dialect — forward separators, absolute by that substrate's rules —
+and is converted into it **once, at the producer**. MSYS bash holds `/c/repo`; a
+`*-windows-msvc` binary holds `C:/repo`. What carries the weight is a property of
+a value *anywhere inside the tree*, not only of the point that produced it: no
+value inside the tree is in a foreign dialect, and no value is normalized twice.
+
+Two dialects rather than one because **each substrate's correct dialect is the
+other's defect**. The crate's crosser is where that becomes concrete:
+`normalize_abs` keeps `path_root(abs)`, so `C:\repo` becomes `C:/repo` —
+separators normalized, drive letter preserved (§The crate's crosser: "the composed
+result carries the **input's own** root"). Teaching it to strip the drive is
+**refused**, and the refusal is the substance of this clause: a `*-windows-msvc`
+binary reaches the filesystem through `std::path`, which cannot resolve `/c/repo`,
+so there the drive letter is not residue but the only absolute spelling that
+works. An MSYS bash process wants the opposite — its own `getcwd(3)` answers
+`/c/repo`, and every sibling path such a shell derives carries that spelling, so a
+root spelled `C:/repo` compares unequal to a path spelled `/c/repo` while naming
+one directory. No single spelling is available to declare.
+
+**The split leaks nothing, because roots cross the shell/crate boundary
+relative, never absolute.** `walk::kit_roots_abs` re-absolutises each bridged root
+against the crate's own cwd — which is §lib/gate.sh's `GATE_KIT_ROOTS_HERE` rule,
+each root spelled relative to the invoking directory, read here as a dialect
+guarantee rather than only as the public-file constraint it was written for. No
+value arrives in a substrate whose dialect it was not spelled
+in, so the per-substrate declaration costs nothing at the seam.
 
 **The boundary, and who crosses it.** The dialect boundary is crossed exactly
 where a value enters from a **platform-native producer**: `git rev-parse
@@ -280,10 +304,46 @@ where a value enters from a **platform-native producer**: `git rev-parse
 Windows spelling even to a POSIX shell), `std::env::current_dir()` in a
 `*-windows-msvc` binary, and an npm bin shim's basedir. The **crosser** is the
 entry point that reads such a producer, and normalizing there is the crosser's
-obligation. A shell builtin is *not* a platform-native producer — bash's own `pwd`
-answers in bash's dialect, so a root derived by `cd … && pwd` is POSIX by
-construction and its deriving line is itself the crossing. A value already inside
-the tree is POSIX by the clause above and is **never re-normalized**: a second
+obligation. A shell builtin is *not* a platform-native producer — but which
+builtin, and in which form, is the whole of the shell crossing, so it is spelled
+out rather than gestured at.
+
+**The shell crossing idiom, and why `pwd -P` is the half that crosses.** bash's
+`cd` with an **absolute** argument sets `PWD` from the argument itself and never
+calls `getcwd`. So `cd 'C:/repo'; pwd` prints `C:/repo` straight back,
+unconverted: a migration written `cd … && pwd` changes nothing while looking
+exactly like the fix. `pwd -P` calls `getcwd(3)`, which under the MSYS runtime
+answers in the MSYS spelling. **The crossing lives in `-P`.** In the
+cwd-preserving form most sites take:
+
+    ROOT="$( { cd "$(git rev-parse --show-toplevel 2>/dev/null)" && pwd -P; } 2>/dev/null )"
+
+and, where the entry point means to *be* at the root, the two-line form that keeps
+the site's existing refusal arm verbatim:
+
+    cd "$(git rev-parse --show-toplevel 2>/dev/null)" || { …refuse exactly as today…; }
+    ROOT="$(pwd -P)"
+
+Two properties travel with the idiom rather than being left to a reader. `pwd -P`
+also resolves symlinks — a behavior change accepted rather than overlooked, and a
+no-op in practice because `git rev-parse --show-toplevel` already answers a
+physical path. And the `|| pwd` hedge several sites carry survives inside the
+substitution untouched: it is a missing-repository guard, the clause below rules
+that it confers nothing against dialect, and the idiom neither needs it gone nor
+is weakened by it.
+
+**No shared shell normalizer is introduced, and the refusal is load-bearing.** No
+kit's `lib/` holds one, so a helper would be new rather than a second copy — but
+the corpus's three families source three different libraries and two resolve their
+root before sourcing anything at all, so a shared helper buys a cross-kit
+dependency to save a one-line idiom, against the provenance seam and for no error
+class `check-path-dialect` does not already catch. The idiom needs no name:
+`scripts/producer-liveness-reader.sh` and `scripts/pack-installer.sh` both write
+it already, neither as a dialect measure, which is the evidence that it is the
+shape a shell author reaches for unprompted.
+
+A value already inside the tree is in the declared dialect by the clause above and
+is **never re-normalized**: a second
 normalization is how a contract decays into a ritual, and it erases the one place
 a reader can look to find where the conversion happened.
 
@@ -325,9 +385,34 @@ binary substrate), at the moment it assumes the port retires the question.
 ### The crate's crosser
 
 `native/src/walk.rs` holds the crate's single owner of absoluteness, `path_root`,
-and the pair that crosses the boundary. `cwd()` is the platform-native producer;
-`abs_against` and `normalize_abs` are pure functions of their inputs and convert
-into the declared dialect once, on entry:
+and it is also the crate's **sole platform-native producer**: `std::env::current_dir()`,
+the `git rev-parse` spawn and `std::fs::canonicalize()` live there and nowhere
+else in the crate. Ownership of absoluteness without ownership of the producers
+only moves the question one call back, which is what this monopoly closes.
+
+- **`walk::cwd()`** is public and **normalizing** — `normalize_abs` of
+  `std::env::current_dir()`. It was private with one caller, `kit_roots_abs`,
+  which normalized downstream through `abs_against`; promoting it moves the
+  obligation to the source rather than closing a live hole.
+- **`walk::toplevel()`** is the crate's only `git rev-parse --show-toplevel`
+  spawn, its answer passed through `normalize_abs` on the way out.
+  Git-for-Windows is a native Windows binary and answers in Windows spelling even
+  to a Rust process, so this producer crosses for the same reason `cwd()` does.
+  Its refusals — `not a git repository`, `git resolved no toplevel`, and
+  `proc::run`'s own spawn message propagated — are relocated rather than
+  invented, so no caller gains a failure mode it does not already handle:
+  `fresh::toplevel()` keeps its name, its two callers and its own sentences by
+  suffixing `— the emitter anchor cannot be resolved` onto whichever arrives.
+- **There is one normalizer.** `check-stage-evidence`'s `norm()` was a second
+  implementation that split on `'/'` only, so it could not repair a
+  backslash-spelled root — a normalizer that silently does nothing is worse than
+  none, and the single-owner rule is what forbids it. It is retired onto
+  `walk::normalize_abs` and survives only as the frame shift that removes the
+  leading separator, because its result is also spliced into a `HEAD:`-prefixed
+  revision.
+
+`abs_against` and `normalize_abs` are the pure half — functions of their inputs
+alone, converting into the declared dialect once, on entry:
 
 - absoluteness is a **two-dialect** question — a separator-rooted path and a
   drive-rooted one are both absolute, and a leading-slash test answers *false* on
@@ -374,35 +459,38 @@ by nothing this repo can run.
 
 Recording a verdict is the deliverable, not only changing what a verdict
 condemns — an unjudged site and a judged-safe site are indistinguishable on the
-page, and the contract's value is precisely that difference. drift-kit's `bin/`
-tools are the worked set:
+page, and the contract's value is precisely that difference. **Where that verdict
+is recorded is at the site**, as the `spec:` citation `check-path-dialect` reads,
+never as a roster here: a per-site enumeration in this section goes stale on every
+ported file and duplicates a record the gate already reads.
 
-- `kfric.sh`, `overhead-meter.sh` and `stage-economics.sh` each resolve one
-  `REPO_ROOT` and consume it exactly once, on the next line, with `cd`.
-  **Dialect-tolerant; no change owed.**
-- `drift-report.sh` carried a second root, `KIT`, consumed by **concatenation** —
-  the one dialect-exposed consumption among them. Its crosser was
-  `cd "$(dirname …)" && pwd`, a shell builtin, so the value was POSIX by
-  construction and the exposed consumption was already satisfied at its crossing:
-  **no change owed**, and adding a normalization would have been exactly the
-  re-normalization the boundary clause forbids. **That site is gone**, deleted with
-  the shell collator by the 2026-08-29 drift-kit cut. The disposition is kept in
-  the past tense rather than struck out, because what it teaches is the predicate,
-  not the file: it is this set's only worked example of *exposed-but-satisfied*,
-  which is the verdict a reader most needs a worked instance of.
+What this section keeps is the one verdict a reader most needs a worked instance
+of, *exposed-but-satisfied* — a site whose consumption **is** dialect-exposed and
+which is nonetheless owed no change, because its value was already crossed:
+
+- `scripts/producer-liveness-reader.sh` resolves `git rev-parse --git-common-dir`
+  inline with `pwd -P`, then **concatenates** the result (`${_plr_common%/*}`, then
+  `"$_plr_main/$GATE_SDK_NATIVE_BIN"`). Exposed consumption, satisfied at its own
+  crossing: **no change owed**, and adding a normalization downstream would be
+  exactly the re-normalization the boundary clause forbids.
+- drift-kit's `drift-report.sh` carried the same verdict on a second root, `KIT`,
+  crossed by `cd "$(dirname …)" && pwd`. **That site is gone**, deleted with the
+  shell collator by the 2026-08-29 drift-kit cut, and it is kept in the past tense
+  rather than struck out because what it teaches is the predicate rather than the
+  file. Read with the clause above, it also dates itself: `pwd` without `-P` is
+  today a no-op, so a site written that way is uncrossed, not satisfied.
 - The arm that replaced it composes `<kit-root>/kpis/<name>.sh` from the resolved
   kit-root set — a **new** dialect-exposed site, born of the port exactly as
   §Porting to Rust does not retire dialect exposure says it would. It is
   **satisfied**: those roots reach it through `walk::abs_against`, the crate's own
-  crosser, so they are already in the declared dialect and the boundary clause
-  forbids re-normalizing them. `registry.rs`' `checks` append is the same shape and
-  the same verdict.
+  crosser, so they are already in the declared dialect. `registry.rs`' `checks`
+  append is the same shape and the same verdict.
 
-The tree's remaining root call sites are **not** migrated onto this contract yet.
-That corpus is its own unit of work; until it lands, the contract holds where a
-site has been judged and nowhere else, and every newly ported file adds a site to
-the remainder rather than removing one — which is the §Porting to Rust clause
-above, read as a cost.
+`check-path-dialect` is what holds the claim across the remaining port, and what
+it asserts is bounded: every producer in the corpus crosses, or carries a recorded
+verdict. It does **not** assert that the crossing works — that rests on the
+injected premise §How the claim is held names — and it holds no coverage floor, so
+a green verdict is the absence of an uncrossed producer and nothing more.
 
 ## The workflow directory
 

@@ -18,15 +18,7 @@ pub fn fail_closed(what: &str, code: Option<i32>) -> String {
 // anchor at their own script's directory, which a compiled subcommand cannot recover; each of
 // these members is consumer-declared and sat one level under the toplevel, so the two agree.
 pub fn toplevel() -> Result<String, String> {
-    let c = proc::run("git", &["rev-parse", "--show-toplevel"])?;
-    let out = c
-        .stdout()
-        .ok_or_else(|| "not a git repository — the emitter anchor cannot be resolved".to_string())?;
-    let s = String::from_utf8_lossy(out).trim().to_string();
-    if s.is_empty() {
-        return Err("git resolved no toplevel — the emitter anchor cannot be resolved".to_string());
-    }
-    Ok(s)
+    crate::walk::toplevel().map_err(|e| format!("{} — the emitter anchor cannot be resolved", e))
 }
 
 // spec: gate-sdk/SPEC.md §check-gate-binary-fresh — the tree side of the source stamp, in the

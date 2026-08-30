@@ -34,18 +34,10 @@ fn is_head(s: &str) -> bool {
 
 // spec: lifecycle-kit/SPEC.md §check-stage-evidence — the repo-root-relative spelling the
 // purity assertion compares in, the frame `git diff --cached --name-only` prints
+// spec: gate-sdk/SPEC.md §The crate's crosser — one normalizer in the crate, so this is a frame
+// shift over its owner rather than a second implementation
 fn norm(p: &str) -> String {
-    let mut out: Vec<&str> = Vec::new();
-    for seg in p.split('/') {
-        match seg {
-            "" | "." => {}
-            ".." => {
-                out.pop();
-            }
-            s => out.push(s),
-        }
-    }
-    out.join("/")
+    walk::normalize_abs(p).trim_start_matches('/').to_string()
 }
 
 fn git_line(args: &[&str]) -> Option<String> {
@@ -382,5 +374,16 @@ mod tests {
         assert!(!is_date("2026-8-13"));
         assert!(!is_date("2026-08-13 "));
         assert!(!is_date(""));
+    }
+
+    // spec: gate-sdk/SPEC.md §The crate's crosser — the retirement's two halves: the compared
+    // frame stays relative, so `rel_state` is still spliceable into `HEAD:<path>`, and the
+    // backslash run the retired local normalizer could not see is now repaired
+    #[test]
+    fn the_compared_frame_stays_relative_while_a_backslash_run_is_now_repaired() {
+        assert_eq!(norm(".workflow/STATE.txt"), ".workflow/STATE.txt");
+        assert_eq!(norm("sub/../.workflow/./x"), ".workflow/x");
+        assert_eq!(norm(""), "");
+        assert_eq!(norm(".workflow\\STATE.txt"), ".workflow/STATE.txt");
     }
 }

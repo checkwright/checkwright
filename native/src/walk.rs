@@ -227,13 +227,28 @@ pub fn kit_roots_abs() -> Result<Vec<String>, String> {
         .collect())
 }
 
-fn cwd() -> Result<String, String> {
-    Ok(std::env::current_dir()
-        .map_err(|e| format!("cannot read the current directory: {}", e))?
-        .display()
-        .to_string()
-        .trim_end_matches('/')
-        .to_string())
+// spec: gate-sdk/SPEC.md §The crate's crosser — the crate's only `std::env::current_dir()`, and
+// the crossing itself: the producer's answer converts here, once, so no reader downstream has to
+pub fn cwd() -> Result<String, String> {
+    Ok(normalize_abs(
+        &std::env::current_dir()
+            .map_err(|e| format!("cannot read the current directory: {}", e))?
+            .display()
+            .to_string(),
+    ))
+}
+
+// spec: gate-sdk/SPEC.md §The crate's crosser — the crate's only `git rev-parse --show-toplevel`
+// spawn. Git-for-Windows answers in Windows spelling even to a Rust process, so this producer
+// crosses for the same reason `cwd()` does.
+pub fn toplevel() -> Result<String, String> {
+    let c = crate::proc::run("git", &["rev-parse", "--show-toplevel"])?;
+    let out = c.stdout().ok_or_else(|| "not a git repository".to_string())?;
+    let s = String::from_utf8_lossy(out).trim().to_string();
+    if s.is_empty() {
+        return Err("git resolved no toplevel".to_string());
+    }
+    Ok(normalize_abs(&s))
 }
 
 // spec: gate-sdk/SPEC.md §The path-dialect contract — absoluteness is a two-dialect question, and
@@ -252,8 +267,8 @@ fn path_root(p: &str) -> Option<&str> {
     None
 }
 
-// spec: gate-sdk/SPEC.md §The path-dialect contract — this pair is the crate's crosser, and `cwd()`
-// is the platform-native producer it converts on entry.
+// spec: gate-sdk/SPEC.md §The crate's crosser — the pure half: `cwd()` and `toplevel()` are the
+// producers, and these two are functions of their inputs alone.
 // spec: gate-sdk/SPEC.md §lib/gate.sh — a relative bridged root may climb out with `..`, so the
 // join is normalised rather than concatenated: an unnormalised `..` component makes every later
 // path-prefix comparison fail silently, the defect the canon-kit cohort's edge tree caught.
