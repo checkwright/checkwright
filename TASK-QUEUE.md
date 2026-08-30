@@ -16,6 +16,37 @@
 
 ## Deferred
 
+- **drain-order-retroactive-debt-sweep** [design-pending] — apply the 2026-08-30 drain-order
+  ruling to the pool it was measured against: the ten entries the last drain promoted, none of
+  which was tried against →fix or →icebox before it was written.
+  **Operator-directed at the 2026-08-30 consult, filed directly under CLAUDE.md §Housekeeping's
+  sanctioned exception.** The ruling (TRAJECTORY.md, lifecycle-kit/SPEC.md §The committed gap
+  inbox) orders the drain fix → icebox → promote for new intake; this unit runs the same triage
+  once over the entries already promoted, so the ruling is tested on the fortnight's evidence
+  rather than only on what arrives next.
+  **The cohort, by the 2026-08-30 drain commit `40ff7930`:** `kit-config-template-port-disposition`,
+  `harness-template-port-disposition`, `declaration-shape-outside-header-unreadable`,
+  `inline-interpreter-substrate-census`, `entry-compression-contract-unenforced`,
+  `no-port-cause-validation-scoped-to-registry`, `boundary-preserve-covers-names-not-lifetimes`,
+  `stage-journal-absence-caught-only-downstream`, `enter-stage-flag-position-silently-ignored`,
+  `stamp-provenance-remedy-loops-when-uncommitted`.
+  **Deliverable:** every one of the ten takes exactly one of three exits, stated per slug in the
+  landing commit — **fixed** (debt-shaped by the interstitial litmus, test-and-doc-complete, its
+  slug on a bare `## Done` line), **iceboxed** (machinery finding blocking no entry or push,
+  compressed to the one-line grammar), or **kept** with the one sentence saying which of the two
+  it failed. Two are known defects with a fix the entry already names —
+  `enter-stage-flag-position-silently-ignored` (a trailing `--simulate` performs a real stamp)
+  and `stamp-provenance-remedy-loops-when-uncommitted` (a gate's help prescribes a remedy that
+  does not clear its red) — and the planning assumption is that those two fix, the two
+  port-disposition entries keep (they name live port work), and the rest icebox.
+  **Why [design-pending]:** per-slug exits are judgments the unit makes at build, not now;
+  recovery of each body is mandatory before ruling on it.
+  **Cost while deferred:** low, and it compounds — each close under the new order files new
+  intake correctly while the measured backlog keeps its old shape, so the `qnet` the ruling's
+  discharge event reads stays flattered by nothing this unit would have retired.
+  ruled: drain-order-retroactive-debt-sweep operator 2026-08-30 consult
+  Filed 2026-08-30 by the consult session, operator-directed.
+
 - **platform-support-ci-matrix** [design-pending] [roadmap: next/reliability]
   [precondition-ok: run-observed]
   — a CI leg that PRODUCES AND EXERCISES a Windows gate-binary artifact, which is
