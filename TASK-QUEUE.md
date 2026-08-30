@@ -72,11 +72,11 @@
   gate-sdk/smoke/install.sh does not register it` — the path is DOUBLED AND MIXED-DIALECT, a POSIX
   prefix concatenated with a backslashed tail, so those gates are looked up under a mangled key
   rather than being genuinely unregistered. Read the log, not this summary, before repairing.
-  **THE `blocks nothing here` LINE WAS FALSE AND IS RETRACTED, on measurement not on reading.**
-  This entry previously asserted "`msys-dialect-migration` carries the residue and blocks nothing
-  here." Round 5 falsifies it: the residue behind the second finding is that migration's corpus and
-  is now the ONLY thing between this leg and green. `msys-dialect-migration` is this entry's live
-  blocker, and the dependency runs that way round rather than the reverse.
+  **THE ROUND-5 BLOCKER HAS LANDED — a TENSE fix, not a claim the leg is fixed** (re-tensed
+  2026-08-30 at close by the capability-pendency-after-landing audit). `msys-dialect-migration`
+  was the only thing between this leg and green; it closed and left the queue, so nothing waits on
+  it. Round 6's question is open and different: whether the doubled mixed-dialect key clears under
+  the migrated resolution, which was authored and verified on Linux with this leg its only observer.
   **The two consequences stay UNEXECUTED and their precondition is unchanged.**
   `.github/workflows/gates.yml`'s `install-smoke-windows` keeps `continue-on-error: true` — the
   job's own comment drops it "on the run it is first observed green and not before", and round 5
