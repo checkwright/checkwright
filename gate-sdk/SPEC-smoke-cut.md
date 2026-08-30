@@ -205,14 +205,25 @@ that exists.
 `--emit port-blockers` (`native/src/emit/port_blockers.rs`) reads it at every
 oracle run and reclassifies the file `owed → no-port`.
 `check-gate-substrate-parity` assertion G reads the declaration set at every
-battery run. `check-comment-tier` reads `no-port:` as a directive-tier tag
+battery run **over its own registered-gate corpus alone**, which none of the
+seventeen is a member of — named for completeness of the field's reader roster,
+not as a live consumer of this cut's additions (§Red conditions below).
+`check-comment-tier` reads `no-port:` as a directive-tier tag
 (`native/src/gates/comment_tier.rs`'s tag array) at every battery run, which is
 what keeps a seventeen-line declaration sweep from reading as seventeen new
 comments.
 
 **Every field has a named reader.** The field has exactly one payload — the
-cause — and its reader is the port-blockers emitter, which prints it, and
-`check-gate-exemption-tasks`, which reds an empty one. No new field is added.
+cause — and its reader is the port-blockers emitter, which prints it. **Correction
+at align:** the sentence this replaces claimed `check-gate-exemption-tasks` reds
+an empty cause; verified against the source, it does not — its `tree_texts`
+loop matches `walk::Disposition::PortUntil` only and `continue`s past every
+other disposition, including `NoPort`, and its `exception-list:` array
+handling (`Kind::Permanent`) accepts a bare `# permanent:` with no reason at
+all. No gate validates `no-port:` cause non-emptiness outside
+`check-gate-substrate-parity` assertion G's own registered-gate corpus (below),
+which this cut's seventeen additions are not members of. Filed as a gap rather
+than answered here. No new field is added.
 
 **Red conditions, enumerated because delta 2 narrows a corpus** (seventeen files
 leave the `owed` set) and §The causal-completeness check point 5 binds:
@@ -220,13 +231,19 @@ leave the `owed` set) and §The causal-completeness check point 5 binds:
 - `--emit port-blockers --tree` — reds never; it is an emitter. Its *count*
   falls, which is the intended move and the operator-ruled completion predicate.
   **Monotone, clearable by inspection.**
-- `check-gate-substrate-parity` assertion G — reds on a declaration that is
-  ill-formed (a `no-port:` with an empty cause, a `port-until:` naming no slug,
-  both fields at once). Seventeen well-formed additions cannot red it; a
-  malformed one can. **Not monotone in the file set, but monotone in
-  well-formedness — the build's obligation is that every added line carries a
-  non-empty cause, and the fixture at `gate-sdk/smoke/install.sh`'s `pbtree`
-  block already exercises all three malformed shapes.**
+- `check-gate-substrate-parity` assertion G — **does not read any of the
+  seventeen at all, verified against the source rather than assumed from the
+  field's reader roster.** Its declaration loop (`native/src/gates/gate_substrate_parity.rs`,
+  assertion A's loop) walks `gates.list`'s registered members resolved to their
+  own `checks/` declaration path; none of the seventeen is a registered gate,
+  so `count_field` never opens one of these files. The malformed shapes (a
+  `no-port:` with an empty cause, a `port-until:` naming no slug, both fields at
+  once, more than one of either, or either field on a `.gate` descriptor) are
+  real red conditions of that assertion, but over its own registered-gate
+  corpus, not this one — the fixture at `gate-sdk/smoke/install.sh`'s `pbtree`
+  block exercises them against synthetic tree-walk fixtures, a different
+  reader (`--tree`) entirely. **Vacuously monotone: not merely well-formed but
+  structurally unreachable.**
 - `check-comment-tier` — reds on a comment carrying no directive tier. A
   `# no-port:` line is in its exempt tag array, so seventeen additions are
   invisible to it. **Monotone.**
@@ -289,9 +306,14 @@ first; delta 4 updates the second.
       reopening condition lands with the ruling.
 - [ ] **Amendment deleted** — this file removed on merge; none remain for
       gate-sdk (`ls gate-sdk/SPEC-*.md`).
-- [ ] **Every declaration carries a non-empty cause** — the malformed shapes
-      `check-gate-substrate-parity` assertion G reds on are absent, verified by
-      the oracle rather than by reading.
+- [ ] **Every declaration carries a non-empty cause** — verified by reading each
+      of the seventeen headers directly. `check-gate-substrate-parity` assertion
+      G reds on exactly these malformed shapes but only over its own
+      registered-gate corpus (§Red conditions above, corrected at align); none
+      of the seventeen is a registered gate, so no oracle exercises this
+      obligation here. The coverage gap this exposes — no gate validates a
+      `no-port:` cause tree-wide — is filed to the gap inbox rather than
+      answered by this cut.
 - [ ] **The oracle move is measured, not asserted** — `--emit port-blockers
       --tree` re-run and its four counts read off the trailer; `--emit
       port-blockers --group` (the registry arm) run beside it, since only
