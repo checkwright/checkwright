@@ -861,6 +861,30 @@ contending on. A `file-gap.sh` that stamped a `recurrence:` declaration onto a
 queue entry would do the one thing the inbox was built to prevent. The queue write
 therefore belongs to the closing stage's drain, which writes the queue anyway.
 
+**The drain's dispositions are ordered, and promotion is last — ruled 2026-08-30
+by the operator, on a measured drain.** The disposition set is fix, icebox,
+promote, discard; the drain tries them in that order per bullet and a promotion
+states in the close commit message which earlier disposition it failed and why.
+The measurement: with the set listed promotion-first, fifteen consecutive drained
+bullets over two closes were promoted and none fixed or iceboxed, on a pool whose
+intake had outrun its exits three to one for a fortnight — so the unordered set
+was read as a promotion default, and a three-line defect cost a thirty-line
+entry plus the iteration that would one day build it. **A bullet is fix-shaped
+when it is debt-shaped by the interstitial litmus above — it adds no governed
+name — and lands test-and-doc-complete in the drain's own commit**; that litmus
+is the one this section's interstitial mitigation already applies, so no new
+criterion is minted. Fixing in the drain is not the refused hotfix track: it
+contends on no live stage surface (the closing stage holds the index), and
+what it admits is exactly what that refusal said a hotfix is not — debt-shaped
+work. It is also not an intake violation: scope gates *initiatives*, and a
+defect the drain fixes in one commit adds nothing for scope to weigh. A bullet
+is icebox-shaped on queue-kit/SPEC.md §The icebox tier's eligibility, read at
+the drain. The alternative refused with the ruling: a gate reddening a close on
+net pool growth. Enforcement-first would prefer it, but the refusal ground is
+that the exits are judgments — a forced exit is a fake one — so the figure is
+surfaced instead: drift-kit's `kpi-queue-net-delta` already computes it, and
+the drain's commit message states its `qnet` fragment.
+
 It also **warns at the point of capture**, reading the cursor
 (`lifecycle_current_stage`) to say which consequence the filer is buying: an
 ordinary filing is told the bullet blocks the next first-stage entry until the

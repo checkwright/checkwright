@@ -71,11 +71,18 @@ session.
    rule).>*
 2. **Drain the gap inbox** (`LIFECYCLE_KIT_GAP_INBOX_FILE`,
    §The committed gap inbox) → disposition every `- <date> — <gap>` bullet,
-   then **truncate the inbox to its `# contract:` header**. The disposition set
-   is →promote (file a deferred `[design-pending]` queue entry for the gap),
-   →fix (resolve it inline this session), or →discard (state why in the close
-   commit message — the bullet's own prose is the disposition body). The date
-   feeds the staleness read (an aged bullet is a signal, not a free pass).
+   then **truncate the inbox to its `# contract:` header**. The disposition set,
+   **tried in this order** (§The committed gap inbox owns the order and why):
+   →fix (resolve it inline this session — the default for a debt-shaped bullet),
+   →icebox (a one-line entry for a low-class bullet naming no live trigger,
+   queue-kit/SPEC.md §The icebox tier), →promote (file a deferred
+   `[design-pending]` queue entry — only what neither earlier disposition takes),
+   or →discard (state why in the close commit message — the bullet's own prose is
+   the disposition body). A →promote states in the commit message which of the
+   two earlier dispositions it failed and why; the commit message also states
+   drift-kit's `qnet` figure for the iteration, so the pool's net motion is read
+   at every close rather than discovered at a consult. The date feeds the
+   staleness read (an aged bullet is a signal, not a free pass).
    Draining is not deleting: a bullet naming a concrete unfixed gap must become a
    task or a fix, not evaporate — the same clearing-is-not-processing rule as
    Lessons.

@@ -4753,37 +4753,6 @@
   Filed 2026-08-14 by close, on operator direction, and drained in the same session that
   filed it — the cursor was already at close, so no later stage existed to drain it.
 
-- **ops-push-transport-leaves-tracking-ref-stale** [design-pending] — the sanctioned push
-  transport pushes to an explicit URL, so it never updates the remote-tracking ref, and the
-  ahead-count reads wrong right after a successful push.
-  The private ops runbook's push command targets an explicit HTTPS URL rather than the `origin`
-  remote, because the credential helper has to be named on the command. A push that way updates
-  the remote branch and leaves `refs/remotes/origin/master` untouched.
-  **Attested at the v0.23.0 release close, not hypothesised.** Immediately after pushing 33
-  commits successfully, `git rev-list --count origin/master..HEAD` still reported **34** ahead.
-  Real remote state was confirmed out-of-band with `gh api
-  repos/<owner>/<repo>/git/refs/heads/master`, and the count corrected to 1 by an explicit
-  `git fetch <url> master:refs/remotes/origin/master`. Nothing reds: the push genuinely
-  succeeded and the tree is correct — only the local view of it is wrong.
-  **Cost while deferred, and why it is worse than cosmetic.** The ahead-count is the exact
-  reading a close session uses to decide whether it still owes a push, and the stale form says
-  "you have not pushed" *after* a successful push. One failure mode is a redundant push, which
-  under this repo's one-to-two-push budget burns a whole `gates` run plus a
-  `pages-build-deployment`. The other is a session that learns to distrust the number and
-  re-derives remote state by hand at every boundary.
-  **Candidate fixes, neither ruled:** have the runbook's push also update the tracking ref (a
-  refspec that writes it, or the fetch above appended); or set the `origin` remote's `pushurl`
-  so a plain `git push origin master` uses the credential helper and the tracking ref updates
-  for free. The second looks better because it deletes the special-case command rather than
-  lengthening it — but it touches local git config rather than a tracked surface, which makes
-  it an ops-runbook decision rather than a repo one. That placement question is the
-  `[design-pending]` half.
-  **DISTINCT from `tracked-to-untracked-pointer-scope`:** that entry is a pointer failing to
-  send a reader to the runbook at all; this is a defect in what the runbook's command leaves
-  behind once it has been followed correctly.
-  Filed 2026-08-14 by close at the release boundary, and drained in the same session — the
-  cursor was already at close, so no later stage existed to drain it.
-
 - **born-native-flip-enforcement-gate** [design-pending] — the born-native default is held by
   discipline alone, and the cheapest enforcing shape is now priced rather than refused.
   **This is the enforcement residue of a closed ruling, not a challenge to it.** TRAJECTORY.md
@@ -9295,5 +9264,6 @@
 
 ## Done
 
+- ops-push-transport-leaves-tracking-ref-stale
 ## Lessons Learned
 

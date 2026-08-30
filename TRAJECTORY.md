@@ -354,6 +354,32 @@ gate-sdk/SPEC.md §port-blockers), and widening the exclusion would let *port co
 while a full-profile adopter's vendored tree still runs bash — a false claim at the front door, the
 cost §What the objectives are not names.
 
+**The deferred pool's intake is triaged at the drain, and machinery findings are dormant by
+default — ruled 2026-08-30 by the operator in a consult, on a re-measured pool.** The 2026-08-23
+ruling above bought its exits once — the pool fell from 252 to 228 on the day — and then intake
+resumed at the prior slope: 227 to 284 entries across the eleven days to this ruling, 181 filed
+against 64 removed, with the last two drains promoting fifteen of fifteen bullets and iceboxing
+none. The intake's dominant class was measured, not assumed: ten of the last drain's ten entries
+concern the lifecycle machinery governing this repo — journals, stamps, boundary wipes, entry
+caps, tag positions — and by slug roughly three deferred entries in five do, against one in six
+on the product the objectives above name. Three things are ruled. **The drain's dispositions are
+ordered, promotion last** — mechanism at lifecycle-kit/SPEC.md §The committed gap inbox, which
+also records the refused net-growth gate. **A finding about the delivery machinery itself —
+the lifecycle, queue, guard or drift tooling as it governs this tree, as opposed to the kits as
+product — that blocks no stage entry and no push is icebox-class by default**: it lands as one
+line under queue-kit/SPEC.md §The icebox tier's grammar and returns on a real recurrence by the
+conserved route that tier already has. The ground is the objectives: every dollar an iteration
+spends on the machinery's self-findings is a dollar the port track and the Windows leg do not
+get, at seventy to one hundred and eighty dollars an iteration measured over the last eight, and
+the machinery has been finding defects in itself faster than any iteration retires them. The
+alternative refused: a per-iteration meta-work budget or ratio. It would need a classifier no
+gate can honestly run, and the icebox default reaches the same end with a mechanism that
+already exists. **The pool's net motion is stated at every close** rather than re-derived at a
+consult — the `qnet` figure, owned by drift-kit/SPEC.md `kpi-queue-net-delta`, is written into
+the drain's commit message; an enforcing gate on it was refused, grounds at the lifecycle-kit
+section above. Discharge event for this paragraph: three consecutive closes each reading
+`qnet` at or below zero, at which point the ordering is habit and the record is retired.
+
 ## PRIORITY DIRECTIVE — the port track's sequence
 
 **Ruled 2026-08-09 by the operator, and it is the track's top priority: complete
