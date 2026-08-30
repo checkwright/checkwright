@@ -52,6 +52,7 @@
   gate asserts disposition parity across identically shaped siblings, so the
   next port cut meets the question undecided again.
   ruled: kit-config-template-port-disposition operator 2026-08-30 lead-relay
+  ruled: kit-config-template-port-disposition lead 2026-08-30 own-authority
   Filed 2026-08-30 by close from the gap inbox; premises re-verified against
   the port oracle at the drain.
 
@@ -90,6 +91,7 @@
   a cut that declares without stating the ground leaves precedent-by-example behind it.
   ruled: kit-lib-port-disposition-cohort lead 2026-08-29 own-authority
   ruled: kit-lib-port-disposition-cohort operator 2026-08-30 lead-relay
+  ruled: kit-lib-port-disposition-cohort lead 2026-08-30 own-authority
   Filed 2026-08-29 by spec, under the lead ruling that resolved the drift-kit cut's
   four declarations.
 

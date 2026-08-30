@@ -33,6 +33,15 @@ nothing left for a consumer to edit" — landed at the drift-kit cut. This rulin
 is that declaration's ground read across its own class, which is what the entry
 means by *right for all of them or right for none*.
 
+**What the precedent leaves standing on its own is an incoherence, and closing
+it is the sharpest case for the class ruling.** `drift-kit/templates/drift-config.sh`
+declares on the edit-seam ground while `<gates-dir>/drift-config.sh`, the copy
+that template is seeded into, stays owed. That is a template declaring on a
+ground its own consumer copy is denied — and the copy is the *more* edited of
+the two, being the file an adopter actually changes. A class ruling that reaches
+both sides therefore resolves a state the tree already carries rather than
+creating an exception to one.
+
 **Two mechanisms in this tree already treat the class as an edit surface, and
 they are cited as evidence rather than as argument.** `installer/lib/init.sh`
 compares a placed file's on-disk hash against the hash it was written with
@@ -52,11 +61,16 @@ cut. `gate-sdk`'s own `<gates-dir>/gate-sdk-config.sh` is already declared and
 is the shape the rest of the copies take.
 
 **This does not reverse the 2026-08-24 vocabulary ruling, and the dates are why
-the two never met.** That ruling generalised
-`scripts/measured-claims.sh`'s cause **on its private-vocabulary half alone**,
-and it enumerated four of this class's copies as left owed *deliberately*,
-because they hold layout rather than vocabulary — a verdict this ruling agrees
-with and does not touch. The edit-seam ground is a different ground, and it did
+the two never met.** That ruling scoped itself in its own
+words — `scripts/measured-claims.sh`'s cause "generalises on its **VOCABULARY**
+half alone: files holding this repo's private claim vocabulary declare,
+mechanism files stay owed" — and it enumerated four of this class's copies as
+left owed *deliberately*. Each of the four reasons it gave answers the
+vocabulary question and only that one: *layout*, *a one-member harness-generic
+type roster plus path globs*, *holds no literal roster of its own*, *tooling
+layout*. None of them is an answer to *is this an edit seam?*, so the verdict
+this ruling agrees with and does not touch is untouched and stays true. A ruling
+that names the half it generalises on has said where it stops. The edit-seam ground is a different ground, and it did
 not exist on 2026-08-24: its first statement anywhere is the drift-kit
 declaration above, five days later. The two grounds are cumulative, not
 competing, and a file may be reached by either. The caution that ruling states
