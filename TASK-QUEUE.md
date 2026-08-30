@@ -111,10 +111,13 @@
   edit seam, so porting it into the binary deletes the thing the adopter is
   meant to edit. That ground is either right for all eight or right for none.
   **The same asymmetry recurs one layer down**: `scripts/context-config.sh`,
-  `scripts/delegation-config.sh` and `scripts/evidence-config.sh` are owed
-  while their `scripts/` siblings carry the 2026-08-24 no-port ruling —
-  because that ruling was scoped to the private-vocabulary ground rather than
-  to seam structure, and those three hold no vocabulary.
+  `scripts/delegation-config.sh`, `scripts/drift-config.sh` and
+  `scripts/evidence-config.sh` are owed while their `scripts/` siblings carry
+  the 2026-08-24 no-port ruling — that ruling was scoped to the
+  private-vocabulary ground, not to seam structure, and these four hold none.
+  Corrected 2026-08-30 at scope: this said THREE, and `scripts/drift-config.sh`
+  is the one that sharpens it — drift-kit's TEMPLATE is the sole no-port
+  declaration above, while its own `scripts/` consumer copy is owed.
   **DISTINCT from `kit-lib-port-disposition-cohort` and from the smoke class
   ruled 2026-08-30**, re-filing neither: their grounds are bootstrap (a test
   surface running before any binary exists) and runtime sole-resolver (the
@@ -138,8 +141,12 @@
   `wakeup-guard.sh` (20); `context-kit/templates/session-context.sh` (133);
   `lifecycle-kit/templates/workflow-state-guard.sh` (29);
   `gate-sdk/templates/check-skeleton.sh` (23). **590 lines**, and their
-  `scripts/` consumer copies add about 255 more. The gap bullet estimated
-  "about 570"; the measured figure is 590.
+  `scripts/` consumer copies add **374** more — 964 owed between them. The gap
+  bullet estimated "about 570"; the measured figure is 590.
+  Corrected 2026-08-30 at scope: the copies line said "about 255". Only SIX of
+  the eleven templates carry a `scripts/` copy at all — agent-budget-guard 18,
+  agent-dispatch-guard 61, bash-guard 39, session-context 136,
+  subagent-stop-liveness 91, workflow-state-guard 29.
   **Unlike the config-template class this one carries NO internal asymmetry**
   — uniformly owed on both sides — so no existing declaration can be read
   across to it and no ground has ever been stated. These are executable
@@ -150,7 +157,7 @@
   day: that class turns on an existing sibling declaration its members lack;
   this one turns on there being no declaration anywhere and no ground yet
   stated. Neither implies the other's answer.
-  **Cost while deferred:** about 590 owed lines whose disposition every future
+  **Cost while deferred:** 964 owed lines whose disposition every future
   stated-contract cut re-meets undecided, and a hook whose port disposition is
   unruled is one a cut may port into the binary while the harness still needs
   an on-disk executable path to invoke.
@@ -240,7 +247,9 @@
   judgment.
   **This SUPERSEDES rather than re-files `ruling-accretion-outgrows-the-entry-cap`**,
   whose three shapes were all refused by the owning spec and which was dropped
-  by operator ruling 2026-08-30. That entry proposed re-pricing the cap. This
+  from the UNIT SET by operator ruling 2026-08-30 — the entry itself stays live
+  in this section, and the bare "dropped" here read as retired (corrected
+  2026-08-30 at scope). That entry proposed re-pricing the cap. This
   one's subject is the enforceability of the relief the spec ALREADY rules
   correct, which stays live precisely because those three were refused.
   **Cost while deferred:** every mandated write onto a saturated entry pays
@@ -460,15 +469,20 @@
   2026-08-11/12; promoted at spec and demoted at build once per increment since.
 
 - **kit-lib-port-disposition-cohort** [design-pending] — every kit's `lib/*.sh` is owed by the port
-  oracle and none has ever been dispositioned, so the class has no ruling and each cut re-argues it.
+  oracle and only two are dispositioned, so the class still has no ruling and each cut re-argues it.
   **The ground has precedent; the COHORT has never been swept, and conflating those is the trap.**
   `gate-sdk/bin/gen-pre-commit.sh` declares `# no-port:` on exactly this ground — resolving a knob
   means sourcing the owning kit's lib, and gate-sdk/SPEC.md §lib/gate.sh rules exactly one place a
   knob's value is computed, so a crate-side resolver is the second producer criterion 6 refuses.
   `drift-kit/lib/drift.sh` declared on that stated ground at `native-gate-port-remaining-corpus`'s
   drift-kit cut, 2026-08-29, which is what makes the rest of the class visible.
-  **Why a lib is not a smoke harness**, and why this is filed apart from
-  `kit-smoke-port-disposition-cohort`: a `lib/*.sh` is **load-bearing at runtime** — the config
+  **Corrected 2026-08-30 at scope, two stale premises.** The headline said none had EVER been
+  dispositioned: `gate-sdk/lib/consumer-smoke.sh` is the second, declared under the 2026-08-30
+  smoke class ruling. And the sibling this was filed apart from,
+  `kit-smoke-port-disposition-cohort`, no longer exists — that class was ruled and its owner is now
+  gate-sdk/SPEC.md §Consumer smoke, *The port disposition*. Neither correction touches the ground.
+  **Why a lib is not a smoke harness**, and why the split from that class still holds: a `lib/*.sh`
+  is **load-bearing at runtime** — the config
   bridge has no other resolver and already-compiled arms source it — so its disposition is a
   correctness question about the bridge. A smoke harness is a test surface and its question is
   about bootstrap. Averaging the two grounds would produce a ruling that answers neither.
@@ -521,9 +535,11 @@
   dormant. **Ordered by the trajectory pivot 2026-08-03** — objectives 2 and 6, TRAJECTORY.md's.
   **THE TWO SOURCE BLOCKERS THAT ROUTED HERE ON 2026-08-26 HAVE MOVED OUT, operator-ruled the
   same day**: `BN_ART` and `target_of_host()` joined the Windows blocker unit at
-  `gate-binary-target-roster-widening`, which has since shipped both repairs and moved to
-  `## Done`; TRAJECTORY.md §The closed rulings owns the amendment
-  and its grounds. `target_of_host` is still bootstrap step 2 wherever the bootstrap is built —
+  `gate-binary-target-roster-widening`, which shipped both repairs and reached `## Done` — cleared
+  from it since, so recover it from git history and not that section (corrected 2026-08-30 at
+  scope, which found this pointing at an empty `## Done`).
+  TRAJECTORY.md §The closed rulings owns the amendment and its grounds.
+  `target_of_host` is still bootstrap step 2 wherever the bootstrap is built —
   what moved is the one-line repair, never the design, which stays this entry's whole.
   **MEASURED 2026-08-26 at close on a native Windows runner** (`platform-support-ci-matrix` round
   2, which owns the full harvest). Two assumptions this bootstrap makes are now facts rather than
@@ -4800,6 +4816,15 @@
   (2026-08-14 build): 1697 ms over 72 paths at two `git log` calls each, 5/72 rename
   false-positives, all five resolved by `--follow`. `gates.yml` already checks out at full
   depth for `check-trajectory-fresh`, so the CI precondition is paid.
+  **THE DISCRIMINATOR'S PROBLEM HAS DISSOLVED — measured 2026-08-30 at scope, premise correction
+  only.** The shape exists to tell a newly authored shell gate from one still awaiting its port,
+  and the awaiting-port population is now **zero**: the registry arm reads 108 members with none
+  owed and every live declaration is a `.gate` file. So a new `check-*.sh` is already unambiguous
+  without `git log --follow`, without the literal anchor commit, and without any retrospective
+  declaration — the three costs below that the flip's timing bought. One precision, because a
+  naive grep appears to refute this: 14 `checks/*.sh` survive, every one inside a `gate-tests/`
+  fixture tree, so the gate's corpus needs the prune set the port oracle already defines.
+  The disposition is untouched by this and stays close's to take.
   **What it still costs, stated so the entry is not read as shovel-ready.** `--follow` is a
   heuristic and not a guarantee; the anchor is a literal commit no derivation produces; and as
   weighed the shape is **publisher-local**, because in a vendored tree every declaration file
@@ -4813,9 +4838,9 @@
   baseline roster rots at every cohort; the per-gate header becomes cheap only once the residue
   is small, which is its own revisit condition).
   **Cost while deferred:** every gate authored while the port runs is a coin flip against a
-  rule nothing reads, and the failure is invisible — a shell gate born after the flip looks
-  exactly like one of the sixty awaiting a port, which is the same indistinguishability the
-  refusal was built on and the discriminator dissolves.
+  rule nothing reads — though the failure is no longer invisible, since the awaiting-port
+  population reaching zero (above) makes a shell gate born after the flip distinguishable on
+  sight. What stays unenforced is the discipline, not the discrimination.
   Filed 2026-08-14 by close, draining two gap-inbox bullets — the batch-1 filing whose "no
   discriminator exists" premise the batch-2 probe falsified, merged into the corrected one.
 
@@ -7439,7 +7464,10 @@
   entry, and the eviction that followed is what removed it rather than any sweep.
   **Why `[design-pending]`:** it rules the boundary of a governed audit class, an authoring
   question about the roster row rather than a code change.
-  recurrence: dated-measurement-restatement-class 2026-08-29
+  recurrence: dated-measurement-restatement-class 2026-08-25 2026-08-29
+  **AT THRESHOLD 2026-08-30, promotion DECLINED this iteration:** machinery-class by default and
+  no unit set here reaches it; the decline holds under EITHER machinery/product reading.
+  ruled: dated-measurement-restatement-class lead 2026-08-30 own-authority
   **Cost while deferred:** the figures rot silently, and the entry carrying them is the one
   sizing an unbought port, so a reader prices the work off numbers nothing re-checks — while
   every future sweep spends the same judgment again on the same shape.
@@ -8054,8 +8082,9 @@
   queue-kit/SPEC.md §The tag algebra rules the shape `recurrence: <slug> <YYYY-MM-DD> [...]` —
   "one indented body line naming the entry's own slug, then one date per re-filing". Nothing
   validates it. `TASK-QUEUE.md`'s `isolated-child-liveness-hook-displaces-its-report` carried
-  `recurrence: 2026-08-25 2026-08-26`, with no slug, written by a close on 2026-08-26 at
-  `8a29e8ec`; that entry reached `## Done` at `c6a4dfbd` and the malformed line went with it, so
+  `recurrence: 2026-08-25 2026-08-26`, with no slug — created at `2c312f23` and only EXTENDED at
+  `8a29e8ec` (corrected 2026-08-30 at scope, which had that attribution the wrong way round);
+  that entry reached `## Done` at `c6a4dfbd` and the malformed line went with it, so
   **the attesting instance is spent and the gap is not** — the discount still fires unchecked on
   the next one. It was not a width problem: the conforming form is 85 columns against
   `check-queue-wrap`'s 100.
@@ -8085,9 +8114,11 @@
   merely that a slug is present, is a real call — the first catches a copy-paste into the wrong
   entry and needs the entry-boundary parse `queue_entry_budget` already has, the second is a
   one-line shape test. Enforcement-first pairs the gate with the one malformed line's repair.
-  **Cost while deferred:** silent and aimed at the pre-emption rule. One live declaration is
-  already unreadable to the prescribed oracle, and every future one is unchecked, so a threshold
-  entry can go unpromoted with nothing in the tree to say so.
+  **Cost while deferred:** silent and aimed at the pre-emption rule. Every future declaration is
+  unchecked, so a threshold entry can go unpromoted with nothing in the tree to say so. Corrected
+  2026-08-30 at scope: this claimed a LIVE unreadable declaration, contradicting the spent-instance
+  sentence above — a census that day found none surviving, so the anchored/unanchored delta at HEAD
+  is zero and the enforcement-first pairing has no malformed line left to repair alongside.
   Filed 2026-08-26 by scope, found while running its own recurrence census — whose corrected
   oracle is an UNANCHORED `grep -n 'recurrence:'` over the deferred section, inlined here because
   the census that produced it lives on a boundary-truncated surface and this pointer would resolve
@@ -8955,8 +8986,8 @@
   what the cap may displace is that gate's invariant's own THIRD SIDE, and a ruling recorded onto
   the entry it rules is one of its two named **mandated writes**, with a self-served relocation
   relief. The 2026-08-30 instance that read as a new failure mode — a composer ruling landing on
-  `kit-smoke-port-disposition-cohort` rather than a zero-headroom
-  `native-gate-port-remaining-corpus` — is that relief working.
+  the smoke class's own owner rather than on a zero-headroom
+  `native-gate-port-remaining-corpus` — is that relief working. (That owner's slug has retired.)
   **The measurement survives, the analysis does not;** the saturated band is re-derivable from the
   gate's own headroom line, which is its authority. The one residue the spec concedes rather than
   answers — the compression contract has no oracle — is NEW work, filed separately.
@@ -9171,6 +9202,94 @@
   that produces it on both substrates, and a fixture pinning the cross-substrate agreement.
   Filed 2026-08-30 by close, promoted from the gap inbox (spec filed it; the three sites carry a
   recorded `spec:` verdict naming the open question rather than an invented answer).
+
+- **installer-boundary-behind-invoke-port-reading** [design-pending] — `installer/README.md` §The
+  install boundary states a disposition for every install step and never says it in the port
+  oracle's vocabulary, so no cut can select `installer/` behind it.
+  **What the section actually says**, read 2026-08-30 at scope: `behind-invoke` is "conditional
+  install logic. Written once, in Rust", and it is the **default** — a step claiming `bootstrap`
+  owes a reason and no other. On its face that is a port COMMITMENT, not a no-port cause.
+  **The gap is addressability, not silence.** The section contains no occurrence of `no-port`,
+  `port-blockers` or `port disposition`. So a session composing a stated-contract cut
+  (`native-gate-port-remaining-corpus`'s 2026-08-28 composer ruling) cannot cite it as the
+  specification section its cut is taken behind, and a session reading a `# no-port:` header has
+  nothing here to point the cause at. The contract exists and is unquotable in the one grammar
+  that consumes it.
+  **Three readings, and the entry is the ruling between them:** (1) `behind-invoke` IS the port
+  obligation, so `installer/`'s owed lines are simply owed and the fix is a vocabulary bridge;
+  (2) it answers a different question — WHEN a step runs relative to the invoke, not WHETHER its
+  implementation ports — and the port disposition is genuinely unstated; (3) `bootstrap` supplies
+  a no-port cause for its own five steps while `behind-invoke` supplies a port obligation, making
+  the section a two-sided disposition nobody has read as one.
+  **Why `[design-pending]`:** which reading holds decides whether any declaration is owed at all,
+  and reading (2) means the install boundary needs a port clause it has never had.
+  **DISTINCT from `powershell-installer-surface`**, which owns the bootstrap's design and the
+  relocation of conditional steps; this owns only how the resulting dispositions are spelled for
+  the port oracle. Neither implies the other's answer.
+  **Cost while deferred:** **2,088 owed lines** across `installer/lib/` and `installer/bin/` —
+  the third-largest bucket in the owed column — whose disposition every future cut re-meets with
+  a contract it cannot cite, and the entry that would consume the ruling
+  (`powershell-installer-surface`) is sequenced behind a CI leg, so the ambiguity outlives several
+  iterations without anyone being forced to resolve it.
+  ruled: installer-boundary-behind-invoke-port-reading lead 2026-08-30 own-authority
+  Filed 2026-08-30 at scope by lead ruling, from the port-track decomposition survey recorded at
+  `.workflow/survey-record.md`; the owed figure is that survey's, taken at rev 6e345565.
+
+- **consumer-smoke-runner-port-disposition** [design-pending] — the installer's own
+  `consumer-smoke/run-smoke.sh` is a consumer-smoke harness sitting outside any kit's `smoke/`,
+  so the 2026-08-30 smoke class ruling neither plainly covers nor plainly excludes it.
+  **The file**: 851 owed lines, the second-largest single owed file in the tree, measured
+  2026-08-30 at scope against `--emit port-blockers --tree`.
+  **Why the ruling does not settle it.** gate-sdk/SPEC.md §Consumer smoke, *The port disposition*
+  rules the smoke class and its members are reached by ground rather than by path — which is what
+  makes this file arguable in both directions. It is a consumer-smoke harness in substance, and
+  its siblings under that ruling are declared: `gate-sdk/bin/run-consumer-smoke.sh` and
+  `gate-sdk/lib/consumer-smoke.sh` both carry `no-port` today. Against that, it lives under
+  `installer/` rather than in any kit's `smoke/`, and it is one of the two files the 2026-08-28
+  predicate ruling named as genuinely shipping to no adopter — a ground that ruling explicitly
+  DECLINED to convert into a declaration class.
+  **Why `[design-pending]`:** the call is whether the smoke ruling's ground reaches a harness the
+  payload does not carry. Ruling it in makes the declaration mechanical; ruling it out leaves the
+  largest single non-installer-lib file owed with no stated cause, which is a real port obligation
+  rather than a formality.
+  **DISTINCT from `installer-boundary-behind-invoke-port-reading`**, filed the same day: that one
+  is about `installer/`'s runtime library and how its disposition is spelled; this is one test
+  harness and whether an existing class ruling already reaches it. Neither answers the other.
+  **Cost while deferred:** 851 lines sit in the operator-ruled completion predicate with an
+  arguable-but-unargued disposition, and the next stated-contract cut that reaches `installer/`
+  pays the same argument again rather than reading a ruling.
+  ruled: consumer-smoke-runner-port-disposition lead 2026-08-30 own-authority
+  Filed 2026-08-30 at scope by lead ruling, from the same port-track decomposition survey.
+
+- **same-day-recurrence-date-multiplicity** [design-pending] — two judged recurrences falling on
+  one calendar day have no ruled spelling, and the two governing specs imply opposite ones.
+  **The two readings, both citable.** queue-kit/SPEC.md:397-405 rules the declaration
+  `recurrence: <slug> <YYYY-MM-DD> [<YYYY-MM-DD>…]` as "one date per re-filing", appended in order
+  and never rewritten — which reads as the date appearing TWICE. lifecycle-kit reads the threshold
+  off the date count as a judged-recurrence tally with `(slug, date)` idempotence, which reads as
+  ONCE. Neither spec acknowledges the other's reading, so this is an ambiguity the governing specs
+  do not resolve rather than a defect in either.
+  **No gate decides it.** `check-queue-hygiene` rejects duplicate *lines*, not a repeated token
+  within one line, so both spellings pass today and a reader cannot tell which was intended.
+  **What turns on it.** The count is the pre-emption rule's input
+  (`LIFECYCLE_KIT_RECURRENCE_THRESHOLD`, default 2 here), so a wrong spelling moves an entry across
+  the threshold in either direction. `close-eviction-refiles-without-checking` is the live entry
+  whose declaration this reaches, and a same-day double drain is exactly the case its subject —
+  a close re-filing without checking — makes likely.
+  **Why `[design-pending]`:** the ruling has to pick an owner before it picks an answer. Both specs
+  currently imply a rule and neither states one, so the deliverable is one sentence in the owning
+  spec plus whichever of the two gates then has something to assert.
+  **DISTINCT from `recurrence-threshold-counts-dates-not-incidences`** (two incidences collapsing
+  into one date, which presumes the once spelling) and from
+  `recurrence-declaration-grammar-ungated` (a declaration the oracle cannot read at all). This one
+  is a well-formed, readable declaration whose meaning is undetermined.
+  **Cost while deferred:** low and silent — no instance is known to have occurred, so this is a
+  latent ambiguity rather than an active defect; it becomes a wrong promotion decision the first
+  time one does, with nothing in the tree to flag it.
+  ruled: same-day-recurrence-date-multiplicity lead 2026-08-30 own-authority
+  Filed 2026-08-30 at scope by lead ruling, from the recurrence pre-emption census recorded at
+  `.workflow/survey-record.md`; both readings recorded rather than one picked, the ambiguity not
+  being a stage's or a lead's to close by fiat.
 
 
 ## Icebox
