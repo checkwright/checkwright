@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # spec: gate-sdk/SPEC.md §Consumer smoke — scratch-consumer install+violation harness (a bin/ tool, never a registered gate)
+# no-port: gate-sdk/SPEC.md §Consumer smoke, The port disposition — leg 1 of the class ruling of 2026-08-30, the config bridge. The registration accounting below probes each unregistered gate through gate_command, which resolves that gate knobs by sourcing the owning kit lib/*.sh, and gate-sdk/SPEC.md §lib/gate.sh rules exactly one place a knob value is computed, so a crate-side probe would be the second producer criterion 6 refuses. Nor can the probe be delegated back to a bash front-end: run-gates.sh --only resolves against the registry and this pass whole subject is gates that are NOT in it. The same structural ground gen-pre-commit.sh declares on, reached from the opposite direction; not a sizing judgment.
 set -uo pipefail
 
 SDK="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

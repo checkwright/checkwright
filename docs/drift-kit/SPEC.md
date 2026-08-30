@@ -1323,6 +1323,15 @@ fragment, and both degradations (a queue with no declaration, and no queue file 
 all) including the trend's silence under the first. Gate-sdk's `check-shellcheck`
 lints all kit sources as usual.
 
+`smoke/install.sh` stays on the shell substrate permanently and carries
+`# no-port:` saying so, its temporary hold released 2026-08-30. The disposition
+is not this section's to argue: it is the class ruling at gate-sdk/SPEC.md
+§Consumer smoke, *The port disposition*, which reaches this file by its **ground**
+rather than by its scope — that ruling's stated-contract cut covers the recipes
+answering to §Consumer smoke, and this one answers here, but legs 2 and 3 hold of
+it identically. A `smoke/install.sh` is an executable install recipe an oracle
+reads as text, and it is executed by no adopter path.
+
 ## Out of scope
 
 Toolchain-shaped KPIs are consumer content: orphan-crate and bare-`#[allow]`

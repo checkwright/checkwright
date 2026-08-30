@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # spec: delegation-kit/SPEC.md §Testing — consumer-smoke install (README.md §Install)
 # cwd = scratch-consumer root; SMOKE_KIT_ROOT = the vendored delegation-kit copy.
+# no-port: gate-sdk/SPEC.md §Consumer smoke, The port disposition — legs 2 and 3 of the class ruling of 2026-08-30, which reaches this file by its GROUND rather than by its scope: that ruling stated-contract cut covers the recipes answering to §Consumer smoke and this one answers to delegation-kit/SPEC.md §Testing, but both legs hold of it identically. Leg 2: an executable install recipe by stated contract whose body check-install-disposition assertion B reads as text, this kit shipping check-gate-tamper zero-config, so a crate table ADDS violations rather than removing them. Leg 3: it vendors with the kit but is executed by no adopter path — the SMOKE_KIT_ROOT entry-point guard refuses a bare invocation and the only callers are this repo own validate suites. Structural, not a sizing judgment.
 set -euo pipefail
 : "${SMOKE_KIT_ROOT:?run via run-consumer-smoke.sh}"
 SDK="$SMOKE_KIT_ROOT/../gate-sdk"   # the vendored gate-sdk beside this kit

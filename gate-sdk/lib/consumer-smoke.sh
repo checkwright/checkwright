@@ -1,5 +1,6 @@
 # shellcheck shell=bash
 # spec: gate-sdk/SPEC.md §Consumer smoke — the shared scratch-consumer builder both smoke harnesses vendor through (run-consumer-smoke.sh and context-kit/smoke/agents-md.sh)
+# no-port: gate-sdk/SPEC.md §Consumer smoke, The port disposition — leg 1 of the class ruling of 2026-08-30, the config bridge. This library is sourced into its callers own shell and resolves GATE_SDK_NATIVE_BIN through lib/gate.sh accessor to place the binary, so it sits inside the bridge rather than beside it; the accounting the harness it builds then runs probes unregistered gates through gate_command, and §lib/gate.sh rules exactly one place a knob value is computed, so a crate-side form would be the second producer criterion 6 refuses. Three of its four sourcers are outside this cut and keep sourcing it (upgrade-smoke.sh, context-kit/smoke/agents-md.sh and demo/run-demo.sh, the last of which sources it for csmoke_place_binary alone rather than for the builder). Structural, not a sizing judgment.
 
 # spec: gate-sdk/SPEC.md §Consumer smoke — csmoke_gate_descriptors: the one derivation of whether a kit set needs the binary at all, so a caller that must produce one before it can name a source tree asks the same question the placement asks
 csmoke_gate_descriptors() {   # $@ = vendorable kit roots -> the number of .gate descriptors under them

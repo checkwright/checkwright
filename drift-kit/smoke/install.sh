@@ -2,7 +2,7 @@
 # spec: drift-kit/SPEC.md §Testing — advisory report smoke; drift-kit ships no gate, so the
 # installer proves the report itself inline (guard-kit's precedent). Also gate-sdk/SPEC.md §Consumer smoke.
 # cwd = scratch-consumer root; SMOKE_KIT_ROOT = the vendored drift-kit copy.
-# port-until: kit-smoke-port-disposition-cohort
+# no-port: gate-sdk/SPEC.md §Consumer smoke, The port disposition — leg 3 of the class ruling of 2026-08-30, which reaches this file by its GROUND rather than by its scope: that ruling stated-contract cut covers the recipes answering to §Consumer smoke and this one answers to drift-kit/SPEC.md §Testing, but leg 3 holds of it identically. Leg 3: it vendors to an adopter with its kit but is executed by no adopter path — the SMOKE_KIT_ROOT entry-point guard refuses a bare invocation and the only callers in existence are this repo own validate suites — so it costs an adopter no interpreter dependency. Leg 2 assertion-B half does not reach here, drift-kit shipping no checks/ at all. This replaces the temporary hold on kit-smoke-port-disposition-cohort, the entry that ruling closes; structural, not a sizing judgment.
 set -euo pipefail
 : "${SMOKE_KIT_ROOT:?run via run-consumer-smoke.sh}"
 # shellcheck source=../../gate-sdk/lib/gate.sh

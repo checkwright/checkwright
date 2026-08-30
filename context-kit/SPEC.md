@@ -1140,6 +1140,16 @@ appending at end-of-file: a co-vendored kit may append a trailing section (the
 doctrine-kit installer adds one), and an EOF-appended bullet would land outside
 `check-brevity`'s scanned section and silently disarm the smoke.
 
+Both of those scripts stay on the shell substrate permanently and carry
+`# no-port:` saying so. The disposition is not this section's to argue: it is the
+class ruling at gate-sdk/SPEC.md §Consumer smoke, *The port disposition*, which
+reaches them by its **ground** rather than by its scope — that ruling's
+stated-contract cut covers the recipes answering to §Consumer smoke, and these
+two answer here, but its legs 2 and 3 hold of them identically. `smoke/agents-md.sh`
+below is **not** a member and stays owed to the port: it is a standalone
+validate-suite driver, not an install or violation recipe, and neither leg
+reaches it.
+
 `smoke/agents-md.sh` is the agent-file adapter smoke — the exercise behind the
 Tier-two compatibility claim (docs/positioning.md §The tiered compatibility
 claim). It vendors a scratch consumer through the shared consumer-smoke

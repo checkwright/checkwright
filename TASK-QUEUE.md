@@ -12,55 +12,6 @@
 
 ## New Features
 
-- **kit-smoke-port-disposition-cohort** [spec: SPEC-smoke-cut.md] — all eleven kits ship a
-  `smoke/install.sh`, the class has never been dispositioned, and every cut that meets one
-  re-argues it. `drift-kit/smoke/install.sh` took `# port-until:` against this entry at the
-  2026-08-29 drift-kit cut rather than settling it.
-  **THIS CLASS IS THE NEXT CUT — operator-ruled 2026-08-30, selecting `gate-sdk/SPEC.md §Consumer
-  smoke` under the 2026-08-28 stated-contract composer, which stands unamended.** The alternative
-  refused was a `kit-lib-port-disposition-cohort` cut: it yields more owed lines, and it is not one
-  stated contract (that corpus spans thirteen SPEC sections), so taking it would have meant reading
-  the composer loosely or amending it. The ruling took neither.
-  **The census the cut is scoped against, derived rather than estimated:** every owed file names its
-  owning section on its own `# spec:` line, so grouping the oracle's owed list by that line ranks
-  the contracts. §Consumer smoke leads on both axes — 17 owed files, 1572 owed lines, 14% of the
-  owed file count in one section. Re-derive rather than reading those figures here; they move with
-  every ported file.
-  **THE CLASS IS NOT ONE CONTRACT — it crosses FOUR, not three.** Seventeen owed files answer to
-  gate-sdk §Consumer smoke; context-kit's three and delegation-kit's two answer to their **own**
-  §Testing sections; drift-kit's held one answers to drift-kit §Testing. So "all eleven kits ship a
-  `smoke/install.sh`" is true of the files and false of the contracts.
-  **THE CUT REACHES EIGHT KITS, and the ten-kits arithmetic this entry used to carry was
-  impossible** — ten pairs is twenty files. The 17 are seven kits' pairs (canon, doctrine, evidence,
-  gate-sdk, lifecycle, queue, site), guard-kit's `install.sh` alone (it ships no `violation.sh`),
-  and the two gate-sdk harness members `bin/run-consumer-smoke.sh` and `lib/consumer-smoke.sh`.
-  **ZERO PRECEDENT IN EITHER DIRECTION, and the sentence that used to deny it was false.** This
-  entry cited `gate-sdk/smoke/install.sh` as already carrying `# no-port: the adoption bootstrap
-  runs before any binary exists`. It does not: that string sits inside a quoted heredoc writing a
-  *fixture* file into the scratch consumer to exercise the oracle's own declaration parser, and the
-  oracle reports the file `owed` because a declaration is read from a file's header alone.
-  Corrected 2026-08-30 at spec, probed at the oracle rather than read off this entry.
-  **The ground is the config bridge and bootstrap, never size.** The disposition, its four measured
-  legs, its reopening condition and its honest limit are `SPEC-smoke-cut.md`'s. The one this entry
-  keeps is that a smoke is the only behavioural oracle its kit has, which is why the class is not
-  moved casually.
-  **DISTINCT from `kit-lib-port-disposition-cohort`**, filed the same day from the same ruling: a
-  lib is load-bearing at runtime for the config bridge, this is a test surface. Same cut, different
-  grounds, deliberately not averaged into one entry.
-  **Cost while deferred:** low today — a held file is honestly marked and the oracle counts it —
-  and rising only in that each kit cut re-meets the same undecided question.
-  **THE CLASS DISPOSITION IS RULED — all seventeen `# no-port:`, on the four legs
-  `SPEC-smoke-cut.md` measures, and the cut therefore writes no Rust.** The selection was re-put to
-  the operator WITH that zero-Rust measurement in front of them and stands: a cut is not less
-  legitimate for resolving to declarations when the declarations are structural. Neither re-cutting
-  for Rust nor switching to `kit-lib-port-disposition-cohort` was taken. The **opacity** ground
-  (§Consumer payload) is left **standing, not disposed of** — this ruling does not answer it.
-  ruled: kit-smoke-port-disposition-cohort lead 2026-08-29 own-authority
-  ruled: kit-smoke-port-disposition-cohort operator 2026-08-30 lead-relay
-  ruled: kit-smoke-port-disposition-cohort lead 2026-08-30 own-authority
-  Filed 2026-08-29 by spec, under the lead ruling that held drift-kit's smoke rather
-  than porting it; promoted 2026-08-30 by spec with the amendment, two false premises corrected.
-
 ## Technical Debt
 
 - **platform-support-ci-matrix** [roadmap: next/reliability] [drain-exempt: close-observes]
@@ -194,8 +145,7 @@
 - **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
   — the whole battery onto the binary, and the shell surface down to its residue.
   roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
-  The entry demotes at build rather than moving to `## Done`: it is the **whole corpus**, and a Done
-  move would assert a finished port and silently drop it from the **public** roadmap projection.
+  It DEMOTES at build, never `## Done` — canon-kit/SPEC.md §Merging an amendment's corpus branch.
   **Operator-ruled 2026-08-09: complete the port, ASAP** — that ruling, its grounds, its
   supersession of the 2026-08-06 measurement-locus clause, the scope, both install paths and the
   tail are [TRAJECTORY.md](TRAJECTORY.md) §PRIORITY DIRECTIVE's and are not restated; this entry is
@@ -210,10 +160,11 @@
   predicate working. **Neither count is printed; run both arms** — four sweeps found a digit stale
   here. **THE COMPOSER IS RULED 2026-08-28: select the next cut by STATED CONTRACT** — the owed
   files behind one specification section, ported behind the one amendment that section needs. Size-
-  and kit-ordered composers stay refused; the fork it was left open on collapsed on a ground
-  measured false, drift-kit shipping by the derived `full` profile. **FIRST CUT UNDER THE RULE,
-  LANDED 2026-08-29:** drift-kit's 18 files behind §The KPI plugin contract resolved to **14 ported
-  + 4 declared**; `--tree` moved 141 -> 123 owed. **(1) A CUT NARROWS THE PORT, NEVER AN EXTENSION
+  and kit-ordered composers stay refused. **TWO CUTS HAVE LANDED UNDER IT**, each recorded in the
+  contract it selected: drift-kit's 18 behind §The KPI plugin contract, 14 ported + 4 declared,
+  2026-08-29; §Consumer smoke's 17, **ALL DECLARED, NO RUST**, 2026-08-30 — the class ruling, its
+  four legs and its reopening condition at gate-sdk/SPEC.md §Consumer smoke, The port disposition.
+  `--tree` moved 141 -> 123 -> 102 owed. **(1) A CUT NARROWS THE PORT, NEVER AN EXTENSION
   POINT.** Where a kit ships a consumer-facing plugin or config seam, that seam's resolution, direct
   execution and env contract survive and only the bundled members move in-crate; the ground is the
   porting kit's OWN governed surfaces plus CLAUDE.md §The provenance seam, never analogy to a
@@ -9102,6 +9053,8 @@
 - **stage-cursor-rerun-stamp-gap** [design-pending] — A skipped re-run stamp points the cursor back.
 
 ## Done
+
+- kit-smoke-port-disposition-cohort
 
 ## Lessons Learned
 

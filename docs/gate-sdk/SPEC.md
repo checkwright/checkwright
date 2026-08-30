@@ -1764,6 +1764,16 @@ A **non-gate arm** is specified by three properties:
   session reaching a mode through the front-end counts exactly as a stage step
   does.
 
+**The class gained no member from the consumer smoke, and the near miss is
+recorded because the next reader will size that harness the same way.**
+`bin/run-consumer-smoke.sh` is a `bin/` tool with a named caller and a document
+to emit, so it reads as a candidate on every property above. It is not one: its
+registration accounting probes each unregistered gate through `gate_command`
+(§lib/gate.sh), which resolves that gate's knobs by sourcing the owning kit's
+`lib/*.sh`, and a crate-side arm doing the same would be the second producer
+criterion 6 refuses. The harness declares `# no-port:` on that ground instead
+(§Consumer smoke, *The port disposition*).
+
 **A gate argument that selects where configuration comes from cannot survive a
 port, and the reason is an ordering rather than a limitation.** `gate_command`
 resolves every knob a member declares *before* it execs the binary, so an argument
@@ -3111,10 +3121,12 @@ judgment call.
   (criterion 7's passage above). **No `# no-port:` holder remains among the
   registry's members**, and the six members these rulings held are owed to
   `shell-gate-tail-port`. The field's live holders sit outside that registry: it
-  reaches any tracked script (§The `# graph:` manifest), and two of this tree's
-  plain scripts declare on it — the hook generator on criterion 6's
-  single-producer rule (§gen-pre-commit) and a consumer's measured-claim emitter
-  on a provenance ground (§port-blockers).
+  reaches any tracked script (§The `# graph:` manifest), and this tree's plain
+  scripts declare on it in a count only §port-blockers' `--tree` trailer is
+  authority for — the hook generator on criterion 6's single-producer rule
+  (§gen-pre-commit), a consumer's measured-claim emitter on a provenance ground
+  (§port-blockers), and the whole consumer-smoke class on the 2026-08-30 ruling
+  at §Consumer smoke, *The port disposition*.
   Scoping the sentence to the registry is what keeps it true of a corpus that has
   since parted from the field's own.
 - **(b) The gate's subject is a platform the target roster does not cover.**
@@ -3330,7 +3342,7 @@ two and the takeable tier empty, so every unported member again sits behind
 `cohort-held-members-port-prerequisites`. **The 2026-08-23 ruling then emptied
 both excluded tiers at once** — no `# no-port:` and no `# port-until:` holder
 remains **in the registry this arm walks**, the tree corpus `--tree` walks being a
-different set that now carries three — and the same command trailed *0 permanently shell and excluded, 0
+different set whose own holders only that arm's trailer counts — and the same command trailed *0 permanently shell and excluded, 0
 temporarily held and excluded; 6 still owed, 6 takeable at this cut*, the six
 owed to `shell-gate-tail-port`. **That unit then took all six, and the arm's
 trailer reaches the floor**: re-run at its closing cut, the same command trails
@@ -6368,7 +6380,9 @@ checklist; a kit root lacking `smoke/` is an environment error (exit 2). Every
 command, so a bare invocation (outside the harness that exports
 `SMOKE_KIT_ROOT`) refuses instead of writing into the caller's repo;
 `check-smoke-entry-guard` (§check-smoke-entry-guard) holds the guard's presence
-across the roster. The
+across the roster. Every script in that roster stays on the shell substrate
+permanently and declares `# no-port:` saying so — the class ruling, its four
+legs and what would reopen it are *The port disposition* below. The
 README item of that checklist carries the register-the-gates block in
 `<!-- gate-roster:begin -->` / `<!-- gate-roster:end -->` markers, held in
 name-set parity with the kit's shipped `checks/` by `check-readme-roster`
@@ -6590,6 +6604,129 @@ maintained roster. The **gate exit contract** (§Output contract) gains a second
 reader in that phase, beside `run-gates.sh` — no gate is modified and none
 acquires an obligation it did not already carry; what the phase adds is the
 disambiguation of exit 2, which the contract deliberately leaves general.
+
+### The port disposition
+
+**Every `smoke/` install and violation recipe, and both members of this harness,
+carry `# no-port:` — ruled 2026-08-30 for every kit `gate_kit_roots` vendors, on
+four measured legs and none of them size.** The declaration sits on
+`bin/run-consumer-smoke.sh` and `lib/consumer-smoke.sh` here, and on each kit
+root's `smoke/install.sh` and `smoke/violation.sh`; §port-blockers' `--tree` arm
+reclassifies each one `owed` → `no-port`, so the completion predicate
+TRAJECTORY.md states over that arm's owed count subtracts them. **It is not a
+size judgment and must not be read as one**: the criteria relaxation is closed at
+§The port-candidate criteria as an ordering signal, never an eligibility screen,
+so what decides this class is what its members *are*. **The cut was re-put to the
+operator with the measurement that it resolves to declarations and writes no
+Rust, and it stands** — a cut is not less legitimate for resolving to
+declarations when the declarations are structural, and re-cutting for Rust was
+the alternative refused.
+
+**Leg 1 — the config bridge, and it is the load-bearing one.** *The registration
+accounting* above probes each unregistered gate through `gate_command`
+(§lib/gate.sh), which builds the bridge by sourcing each owning kit's `lib/*.sh`.
+§lib/gate.sh rules **exactly one place a knob's value is computed**, so a
+crate-side probe would be the second producer criterion 6 refuses. Nor can the
+probe be delegated back to a bash front-end: `run-gates.sh --only` resolves
+against the registry, and the accounting's entire subject is gates that are
+**not** in it — which is why this harness calls `gate_command` directly rather
+than the front-end. That is the same structural ground §gen-pre-commit is
+already declared on, reached from the opposite direction: the hook generator
+bakes a resolved knob, this harness resolves a knob for a member no registry
+names. The two harness members rest here.
+
+**Leg 2 — a `smoke/install.sh` is an executable recipe by stated contract, and
+porting one is non-monotone for a live reader.** *Not derived from the README
+roster* above already declined to derive the registration out of a doc, "on a
+boundary, not on merit: it would turn `smoke/install.sh` from an executable
+install recipe into a derivation over a doc" — and a crate table is that same
+boundary crossed harder. The script is also read **as text** by an oracle:
+§check-install-disposition assertion B reds on a kit that ships a `zero-config`
+gate and no `smoke/install.sh`, and its registration arm greps the script body
+for each gate name. Deleting or de-textualizing these scripts therefore *adds*
+violations rather than removing them.
+
+**Leg 3 — the class costs an adopter no interpreter dependency, which is the
+objective the port serves.** A `smoke/` directory is kit-authored content
+(§Consumer payload's kit-authored roster names it) and vendors to an adopter with
+its kit — conceded rather than disputed — but it is **executed by no adopter
+path**: the entry-point guard above refuses a bare invocation, and the only
+callers in existence are this repo's own validate suites. It ships inert.
+
+**Leg 4 — the envelope, measured class-wide rather than argued.** Measured at the
+2026-08-30 cut, roughly three quarters of the in-contract `smoke/install.sh` line
+count sat in the four files that drive and assert on *their own kit's* `bin/`
+tools — lifecycle-kit's, gate-sdk's, doctrine-kit's and evidence-kit's — against
+tools owned by seven **other** stated contracts, every one of them still owed.
+Porting those four moves a behavioural envelope this contract does not own, which
+is the hazard the drift-kit cut's held member showed on one file and this
+measurement shows across the class. The rest are pure recipe and fall to legs 2
+and 3. What rides on getting this wrong is stated with the leg rather than left
+implicit: a kit's `smoke/` is the only end-to-end behavioural oracle it has — a
+fixture pair proves one gate in isolation, this proves the kit installs and runs
+under zero config — so the class is not moved casually whatever a size arm says.
+
+**The ruling reaches by ground, not by scope.** A stated-contract cut reaches
+only the files answering to this section, and the class is wider than that: the
+`smoke/` recipes under context-kit/SPEC.md §Testing, delegation-kit/SPEC.md
+§Testing and drift-kit/SPEC.md §Testing are the same shape and take the same
+disposition because legs 2 and 3 hold of them, not because this section reaches
+them. Each declares in its own header and its own SPEC section says so.
+`context-kit/smoke/agents-md.sh` is **not** a member — it is a validate-suite
+driver rather than an install or violation recipe, and it stays owed.
+
+**The honest limit, stated because this ruling does not answer it.** The smoke
+corpus is a worked, cleartext catalogue of exactly what reddens each gate, and it
+vendors to every adopter. That is the analysis surface §Consumer payload's
+opacity ruling wants raised, and it is the one live argument for porting this
+class. This disposition leaves that argument standing rather than refuting it: a
+session that wants to answer it is answering a §Consumer payload question, not a
+§Consumer smoke one.
+
+**A standing ruling names this exact corpus, and it is reconciled here rather
+than reversed.** TRAJECTORY.md §The closed rulings, 2026-08-28 corrected the
+2026-08-23 carve-out in place to read that kit `smoke/` suites and kit-resident
+test runners ride the installer payload with their kit roots and land committed
+in adopter trees, so they are *kit mechanism on the claim like any owed file*,
+the residue genuinely shipping to no adopter taking a per-file disposition when
+reached; two paragraphs later it refuses "a contributor-side `# no-port:` class"
+over that same corpus, on two counts. Both are live objections to this
+disposition and both are answered on the text:
+
+- **The "when reached" clause is not scoped to the three named no-adopter
+  examples.** The ruling's own construing sentence restates over "each file [the
+  carve-out] covers", and the carve-out it construes covers contributor-side
+  tooling and the test harness as a whole, where kit `smoke/` suites sit. The
+  three-name list belongs to the earlier sentence being corrected, not to that
+  restatement. The "case-by-case residue rule" it names is the 2026-08-09
+  PRIORITY DIRECTIVE — "surviving shell is residue justified case by case, never
+  a protected category" — and four measured legs, each cited on its own file, is
+  that reasoning applied to a class whose members happen to share legs, rather
+  than the categorical "it is a smoke harness" exemption the directive refuses.
+- **The refused ground is not this ground.** "Ships to no adopter" was measured
+  false for 31 of the 33 disputed files, and leg 3 **concedes** that measurement
+  rather than disputing it — vendoring with the kit is leg 3's own opening
+  clause. What leg 3 rests on is narrower and untouched by it: *executed by no
+  adopter path*. Legs 1, 2 and 4 do not use the shipping question at all. The
+  2026-08-28 ruling closes by saying no mechanism is missing, "only a standing
+  ruling that would make one true, and none does"; four measured,
+  individually-cited structural grounds are that ruling now existing.
+
+**The counterweight is real and it was ruled against, not absent.** The
+2026-08-28 text's contrast — kit `smoke/` "on the claim like any owed file"
+against a residue that "takes a per-file disposition" — genuinely reads, on its
+own, as putting this corpus on the must-port side, and a seventeen-file sweep is
+class-shaped even when every line cites its own ground. It is recorded here in
+those terms so a later reader meeting that passage alone lands on this ruling
+rather than re-opening the question it already answers.
+
+**What reopens it**, written as a reopening condition rather than a permanence
+claim, because `# no-port:` is the permanent tier and a class ruling owes its
+reader what would falsify it: leg 1 dissolves if §lib/gate.sh ever admits a
+second bridge producer; legs 2 and 4 dissolve together if
+§check-install-disposition assertion B stops reading the script as text **and**
+the `bin/` tools the four envelope files drive are themselves ported. Leg 3
+dissolves if any adopter path executes a `smoke/` script.
 
 ## Per-component contracts
 

@@ -2795,6 +2795,13 @@ the scratch consumer and asserts the battery reds (assertion A) — the
 violation is craftable, so the file is mandatory
 (gate-sdk/SPEC.md §Consumer smoke).
 
+Both scripts stay on the shell substrate permanently and carry `# no-port:`
+saying so. The disposition is not this section's to argue: it is the class ruling
+at gate-sdk/SPEC.md §Consumer smoke, *The port disposition*, which reaches them by
+its **ground** rather than by its scope — that ruling's stated-contract cut covers
+the recipes answering to §Consumer smoke, and these two answer here, but its legs
+2 and 3 hold of them identically.
+
 ## Out of scope
 
 A consumer's validate battery (its compile/lint/test command set and rename
