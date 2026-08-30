@@ -34,11 +34,7 @@ pub fn run(args: &[String]) -> i32 {
         return 2;
     }
 
-    let repo_root = match proc::run("git", &["rev-parse", "--show-toplevel"])
-        .ok()
-        .and_then(|c| c.stdout().map(|o| String::from_utf8_lossy(o).trim().to_string()))
-        .filter(|s| !s.is_empty())
-    {
+    let repo_root = match walk::toplevel().ok() {
         Some(r) => r,
         None => {
             eprintln!("check-kit-enum: not a git repository — cannot test tracked kit files");

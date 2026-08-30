@@ -373,12 +373,7 @@ mod tests {
     #[test]
     fn source_stamp_agrees_with_the_shell_library() {
         let crate_dir = env!("CARGO_MANIFEST_DIR");
-        let top = Command::new("git")
-            .args(["-C", crate_dir, "rev-parse", "--show-toplevel"])
-            .output()
-            .expect("cannot run git rev-parse --show-toplevel");
-        assert!(top.status.success(), "git rev-parse --show-toplevel failed");
-        let root = String::from_utf8_lossy(&top.stdout).trim().to_string();
+        let root = crate::walk::toplevel_in(crate_dir).expect("cannot resolve the repo toplevel");
 
         let out = Command::new("bash")
             .arg("-c")

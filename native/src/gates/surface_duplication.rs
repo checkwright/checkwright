@@ -391,9 +391,7 @@ fn dirname(p: &str) -> Option<String> {
 }
 
 fn abs_root(root: &str) -> String {
-    std::fs::canonicalize(root)
-        .map(|p| p.display().to_string())
-        .unwrap_or_else(|_| root.to_string())
+    crate::walk::canonicalize(root).unwrap_or_else(|| root.to_string())
 }
 
 #[cfg(test)]

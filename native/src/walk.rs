@@ -242,13 +242,37 @@ pub fn cwd() -> Result<String, String> {
 // spawn. Git-for-Windows answers in Windows spelling even to a Rust process, so this producer
 // crosses for the same reason `cwd()` does.
 pub fn toplevel() -> Result<String, String> {
-    let c = crate::proc::run("git", &["rev-parse", "--show-toplevel"])?;
-    let out = c.stdout().ok_or_else(|| "not a git repository".to_string())?;
-    let s = String::from_utf8_lossy(out).trim().to_string();
-    if s.is_empty() {
-        return Err("git resolved no toplevel".to_string());
-    }
-    Ok(normalize_abs(&s))
+    toplevel_opt()?.ok_or_else(|| "not a git repository".to_string())
+}
+
+// spec: gate-sdk/SPEC.md §The crate's crosser — the same producer asked from another directory.
+// Two callers compare a `-C` answer against a bare one, so both sides must cross or the compare
+// is between dialects rather than between directories.
+pub fn toplevel_in(dir: &str) -> Result<String, String> {
+    toplevel_args(&["-C", dir])?.ok_or_else(|| "not a git repository".to_string())
+}
+
+// spec: gate-sdk/SPEC.md §The crate's crosser — the producer's two refusals kept apart, for the
+// callers that report a dead `git` differently from a directory outside a work tree
+pub fn toplevel_opt() -> Result<Option<String>, String> {
+    toplevel_args(&[])
+}
+
+fn toplevel_args(anchor: &[&str]) -> Result<Option<String>, String> {
+    let mut args: Vec<&str> = anchor.to_vec();
+    args.extend_from_slice(&["rev-parse", "--show-toplevel"]);
+    let c = crate::proc::run("git", &args)?;
+    Ok(c.stdout()
+        .map(|o| String::from_utf8_lossy(o).trim().to_string())
+        .filter(|s| !s.is_empty())
+        .map(|s| normalize_abs(&s)))
+}
+
+// spec: gate-sdk/SPEC.md §The crate's crosser — the crate's only `std::fs::canonicalize`, and the
+// one producer that hands its answer back unconverted; the UNC clause there rules why, and what
+// the two callers may assume.
+pub fn canonicalize(p: impl AsRef<Path>) -> Option<String> {
+    fs::canonicalize(p).ok().map(|c| c.display().to_string())
 }
 
 // spec: gate-sdk/SPEC.md §The path-dialect contract — absoluteness is a two-dialect question, and

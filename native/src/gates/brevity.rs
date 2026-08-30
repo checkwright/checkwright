@@ -1,7 +1,6 @@
 // spec: context-kit/SPEC.md §The brevity gate — an over-budget bullet in the budgeted
 // always-loaded section that admits its detail lives elsewhere
 use crate::ere::Ere;
-use crate::proc;
 use crate::section;
 use crate::walk;
 
@@ -92,15 +91,15 @@ pub fn run(args: &[String]) -> i32 {
             };
             // spec: context-kit/SPEC.md §The brevity gate — the knob spells the governed file
             // relative to the repo root, so the default arm resolves that root rather than cwd
-            let completed = match proc::run("git", &["rev-parse", "--show-toplevel"]) {
-                Ok(c) => c,
+            let completed = match walk::toplevel_opt() {
+                Ok(t) => t,
                 Err(e) => {
                     eprintln!("check-brevity: {}", e);
                     return 2;
                 }
             };
-            match completed.stdout() {
-                Some(out) => format!("{}/{}", String::from_utf8_lossy(out).trim(), file),
+            match completed {
+                Some(top) => format!("{}/{}", top, file),
                 None => {
                     eprintln!("check-brevity: not inside a git repository");
                     return 2;

@@ -9,14 +9,7 @@ use std::path::Path;
 // toplevel, so the toplevel is resolved before either knob is read and a non-repo cwd is the
 // misconfiguration exit rather than a doc-not-found one
 fn toplevel() -> Option<String> {
-    let c = proc::run("git", &["rev-parse", "--show-toplevel"]).ok()?;
-    let out = c.stdout()?;
-    let s = String::from_utf8_lossy(out).trim().to_string();
-    if s.is_empty() {
-        None
-    } else {
-        Some(s)
-    }
+    walk::toplevel().ok()
 }
 
 fn read_doc(path: &str) -> Result<String, String> {

@@ -216,10 +216,7 @@ fn context(root: &str) -> Result<Ctx, String> {
     if !fresh::is_dir(&root) {
         return Err(format!("not a directory: {}", root));
     }
-    let here = std::env::current_dir()
-        .map_err(|e| format!("cannot read the current directory: {}", e))?
-        .display()
-        .to_string();
+    let here = walk::cwd()?;
     let abs_root = if root.starts_with('/') {
         walk::normalize_abs(&root)
     } else {

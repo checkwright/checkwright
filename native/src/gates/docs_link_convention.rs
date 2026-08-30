@@ -78,10 +78,7 @@ fn resolve(base: &str, path: &str) -> Result<String, String> {
     if !joined.starts_with('/') {
         return Ok(normalize_rel(&joined));
     }
-    let here = std::env::current_dir()
-        .map_err(|e| format!("cannot read the current directory: {}", e))?
-        .display()
-        .to_string();
+    let here = walk::cwd()?;
     Ok(relative_to(&walk::normalize_abs(&joined), &here))
 }
 

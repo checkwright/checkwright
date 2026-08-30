@@ -2,7 +2,7 @@
 // memory dir stays empty and no local settings override re-enables a pinned key
 use crate::gates::template_registry_parity::list_members;
 use crate::json::{values_equal, Path};
-use crate::{proc, walk};
+use crate::walk;
 use serde_json::Value;
 
 fn trim(s: &str) -> &str {
@@ -13,14 +13,9 @@ fn trim(s: &str) -> &str {
 // its absolute path with '/' and '.' folded to '-', and this is the rule's one implementation
 // since the shell library's copy left with the gate that called it.
 fn memory_dir_default() -> Result<Option<String>, String> {
-    let c = proc::run("git", &["rev-parse", "--show-toplevel"])?;
-    let Some(out) = c.stdout() else {
+    let Some(top) = walk::toplevel_opt()? else {
         return Ok(None);
     };
-    let top = String::from_utf8_lossy(out).trim().to_string();
-    if top.is_empty() {
-        return Ok(None);
-    }
     // spec: context-kit/SPEC.md §check-memory-off — the shell reads `$HOME` under `set -u`, so an
     // unset HOME aborts it rather than yielding a verdict; the port refuses on the same state
     // instead of deriving a path under `/` that would be absent and therefore read as clean

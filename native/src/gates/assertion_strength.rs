@@ -316,10 +316,7 @@ fn scan_file(path: &str, text: &str, kitroot: &str, scan: &mut Scan) -> Result<(
 // spec: gate-sdk/SPEC.md §check-assertion-strength — `cd "$d/.." && pwd`: the callee's kit root,
 // logically resolved so a bridged relative dir and an absolute one land on the same place
 fn parent_abs(d: &str) -> Result<String, String> {
-    let here = std::env::current_dir()
-        .map_err(|e| format!("cannot read the current directory: {}", e))?
-        .display()
-        .to_string();
+    let here = walk::cwd()?;
     let joined = if d.starts_with('/') {
         format!("{}/..", d)
     } else {

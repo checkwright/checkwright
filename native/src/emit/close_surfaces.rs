@@ -19,13 +19,7 @@ pub fn base(args: &[String]) -> Result<String, String> {
             Ok(root.to_string())
         }
         None => {
-            let c = proc::run("git", &["rev-parse", "--show-toplevel"])?;
-            let out = c.stdout().ok_or_else(not_a_repo)?;
-            let s = String::from_utf8_lossy(out).trim().to_string();
-            if s.is_empty() {
-                return Err(not_a_repo());
-            }
-            Ok(s)
+            crate::walk::toplevel_opt()?.ok_or_else(not_a_repo)
         }
     }
 }

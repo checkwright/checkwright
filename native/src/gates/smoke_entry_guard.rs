@@ -1,7 +1,6 @@
 // spec: gate-sdk/SPEC.md §check-smoke-entry-guard — every mutating smoke script (install.sh,
 // violation.sh) carries the ${SMOKE_KIT_ROOT:?} entry-point guard so a bare run refuses instead
 // of mutating the caller's tree
-use crate::proc;
 use crate::walk;
 use std::path::Path;
 
@@ -16,11 +15,8 @@ pub fn scan_root(args: &[String], gate: &str) -> Option<String> {
     // spec: gate-sdk/SPEC.md §Fail-closed contract — every arm that yields no root says so: a
     // non-zero `git rev-parse` is what a non-repo cwd looks like, and returning it silently
     // would exit 2 with nothing on stderr for the caller to act on
-    let s = match proc::run("git", &["rev-parse", "--show-toplevel"]) {
-        Ok(c) => c
-            .stdout()
-            .map(|o| String::from_utf8_lossy(o).trim().to_string())
-            .unwrap_or_default(),
+    let s = match walk::toplevel_opt() {
+        Ok(t) => t.unwrap_or_default(),
         Err(e) => {
             eprintln!("{}: {}", gate, e);
             return None;

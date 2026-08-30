@@ -18,15 +18,9 @@ const CLOSE_STAGE: &str = "close";
 // `cd` to the toplevel and fell back to the cwd outside a repository, where every git read then
 // fails and the table degrades to its one n/a row. Both halves are reproduced.
 fn toplevel() -> String {
-    let resolved = proc::run("git", &["rev-parse", "--show-toplevel"])
-        .ok()
-        .and_then(|c| c.stdout().map(|o| String::from_utf8_lossy(o).trim().to_string()))
-        .filter(|s| !s.is_empty());
-    resolved.unwrap_or_else(|| {
-        std::env::current_dir()
-            .map(|p| p.display().to_string())
-            .unwrap_or_else(|_| ".".to_string())
-    })
+    crate::walk::toplevel()
+        .or_else(|_| crate::walk::cwd())
+        .unwrap_or_else(|_| ".".to_string())
 }
 
 struct Git {

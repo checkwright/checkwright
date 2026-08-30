@@ -69,10 +69,7 @@ fn provenance(
     // spec: lifecycle-kit/SPEC.md §check-stage-evidence — inertness (a): no work tree holding
     // the state file, or a different one from the work tree the configured surfaces resolve
     // against — a vendored tree under test, a sandbox fixture
-    let (Some(root_s), Some(root_c)) = (
-        git_line(&["-C", &dir, "rev-parse", "--show-toplevel"]),
-        git_line(&["rev-parse", "--show-toplevel"]),
-    ) else {
+    let (Ok(root_s), Ok(root_c)) = (walk::toplevel_in(&dir), walk::toplevel()) else {
         return inert;
     };
     if root_s != root_c {

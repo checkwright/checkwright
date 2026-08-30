@@ -72,11 +72,7 @@ pub fn read_text(path: &Path) -> Result<String, String> {
 }
 
 fn cwd() -> String {
-    std::env::current_dir()
-        .map(|c| c.display().to_string())
-        .unwrap_or_else(|_| ".".to_string())
-        .trim_end_matches('/')
-        .to_string()
+    crate::walk::cwd().unwrap_or_else(|_| ".".to_string())
 }
 
 // spec: canon-kit/SPEC.md §lib/spec.sh — the scan root's absolute form on
@@ -413,9 +409,7 @@ pub fn spec_name() -> Result<String, String> {
 // the two members that resolve a doc-relative token so neither carries a path algebra of
 // its own
 pub fn relative_to_cwd(p: &str) -> String {
-    let cwd = std::env::current_dir()
-        .map(|c| c.display().to_string())
-        .unwrap_or_else(|_| "/".to_string());
+    let cwd = crate::walk::cwd().unwrap_or_else(|_| "/".to_string());
     let abs = if p.starts_with('/') {
         p.to_string()
     } else {

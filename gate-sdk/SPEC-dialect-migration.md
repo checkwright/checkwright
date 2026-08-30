@@ -123,6 +123,40 @@ Every other crate site binding a producer migrates onto `walk::cwd()` /
 delta 1, so `normalize_abs` itself needs no change and this delta adds no new
 normalization rule anywhere.
 
+**Corrected at build, three defects the sweep itself surfaced** (the fourth,
+fifth and sixth this amendment has carried; ruled in-envelope, `lead 2026-08-30
+own-authority` for the batch boundary that exposed them).
+
+1. **The producer count is 25, not the 27 §The census records** — and 23, not
+   "nine plus fourteen", once `fresh.rs`'s own spawn is counted where it belongs.
+   Outside `walk.rs` at `14b7994b`: 9 `std::env::current_dir()` (7 shipping, 2 in
+   `gates/mod.rs` under `#[cfg(test)]`), 14 `--show-toplevel` spawns **including**
+   `fresh.rs`'s, and 2 `std::fs::canonicalize()`. The 2-off is `main.rs`'s
+   `.expect()` and `assert!()` *message strings*, which name the producer in prose
+   — a grep counts them and a producer census must not. Same error class as
+   delta 5's comment-stripping rule, one file earlier.
+2. **`std::fs::canonicalize()` had no named producer.** Delta 3's rule names three
+   forms but §Producers and consumers gives functions for two. `walk::canonicalize()`
+   is the third, and it is the one producer that **does not convert**: on Windows
+   that call answers in the extended-length spelling `\\?\C:\repo`, which
+   `path_root` reads as separator-rooted and `normalize_abs` would mangle to
+   `/?/C:/repo`. Both callers compare its output only against its own, so the
+   asymmetry is unobservable; the verdict and the open question are recorded in
+   §The crate's crosser and the gap is filed.
+3. **Two spawn sites take `-C <dir>`**, which no delta anticipated:
+   `stage_evidence.rs` compares a `-C` answer against a bare one — a root-to-root
+   string comparison, the exact shape delta 1 warns of — and `main.rs`'s test
+   anchors on `CARGO_MANIFEST_DIR`. `walk::toplevel_in(dir)` crosses both sides.
+   `walk::toplevel_opt()` is the same producer with its two refusals kept apart,
+   for the five callers that report a dead `git` differently from a directory
+   outside a work tree.
+
+The `--git-dir` and `--git-common-dir` occurrences are **not** delta-3 producers
+and were probed rather than assumed: all 20 in the crate read `stdout().is_some()`
+and discard the value, so each is a repository-presence probe that yields no root.
+They remain in delta 5's scan roster, which is stated here because that gate will
+meet them.
+
 ### (4) The corpus migrates onto the two idioms — every producer, not only the exposed ones
 
 Every producer occurrence in the census below crosses, **including the sites the

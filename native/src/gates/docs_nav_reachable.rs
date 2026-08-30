@@ -138,8 +138,7 @@ fn basename(p: &str) -> &str {
 // --relative-to=. --`: a lexical resolution that needs no existing path, then re-spelled
 // against the invoking directory, which is what makes a link target comparable to a page path
 fn relative_to_cwd(joined: &str) -> Option<String> {
-    let here = std::env::current_dir().ok()?.display().to_string();
-    let here = here.trim_end_matches('/').to_string();
+    let here = walk::cwd().ok()?;
     let abs = if joined.starts_with('/') {
         walk::normalize_abs(joined)
     } else {

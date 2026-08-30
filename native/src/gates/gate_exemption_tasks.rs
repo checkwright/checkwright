@@ -279,9 +279,7 @@ fn header_hits(text: &str, opener: &str) -> Vec<(usize, String)> {
 }
 
 fn canon(p: &Path) -> Option<String> {
-    std::fs::canonicalize(p)
-        .ok()
-        .map(|c| c.display().to_string())
+    walk::canonicalize(p)
 }
 
 // spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — the scope rule: a temporary disposition is

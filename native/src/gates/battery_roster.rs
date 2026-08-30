@@ -1,7 +1,6 @@
 // spec: evidence-kit/SPEC.md §check-battery-roster — the runner doc's battery-roster block holds
 // name-set parity with EVIDENCE_KIT_SUITES, both directions
 use crate::fresh;
-use crate::proc;
 use crate::walk;
 use std::path::Path;
 
@@ -86,10 +85,8 @@ fn inner(args: &[String]) -> Result<i32, String> {
     let doc = match args.first().filter(|a| !a.is_empty()) {
         Some(a) => a.clone(),
         None => {
-            let top = proc::run("git", &["rev-parse", "--show-toplevel"])
-                .map_err(|e| format!("check-battery-roster: {}", e))?;
-            let top = top.stdout().map(|o| String::from_utf8_lossy(o).trim().to_string());
-            let Some(top) = top.filter(|t| !t.is_empty()) else {
+            let top = walk::toplevel_opt().map_err(|e| format!("check-battery-roster: {}", e))?;
+            let Some(top) = top else {
                 return Err(
                     "check-battery-roster: not a git repository and no runner-doc argument".into(),
                 );

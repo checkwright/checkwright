@@ -23,13 +23,8 @@ enum Token {
 }
 
 fn rule(args: &[String]) -> Result<i32, String> {
-    let top_out = proc::run("git", &["rev-parse", "--show-toplevel"])?;
-    let top = match top_out.stdout() {
-        Some(o) => String::from_utf8_lossy(o).trim().to_string(),
-        None => {
-            return Err("not a git repository — cannot verify tracked paths/knobs".to_string());
-        }
-    };
+    let top = walk::toplevel()
+        .map_err(|_| "not a git repository — cannot verify tracked paths/knobs".to_string())?;
 
     let exclude = spec::knob_array_pub("CANON_KIT_MDREF_EXCLUDE")?;
     let files: Vec<String> = if !args.is_empty() {

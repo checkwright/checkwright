@@ -398,11 +398,21 @@ only moves the question one call back, which is what this monopoly closes.
   spawn, its answer passed through `normalize_abs` on the way out.
   Git-for-Windows is a native Windows binary and answers in Windows spelling even
   to a Rust process, so this producer crosses for the same reason `cwd()` does.
-  Its refusals — `not a git repository`, `git resolved no toplevel`, and
-  `proc::run`'s own spawn message propagated — are relocated rather than
-  invented, so no caller gains a failure mode it does not already handle:
-  `fresh::toplevel()` keeps its name, its two callers and its own sentences by
-  suffixing `— the emitter anchor cannot be resolved` onto whichever arrives.
+  It has **two refusals, kept apart because callers report them differently**: a
+  dead `git` is `proc::run`'s own spawn message, propagated; a directory outside
+  a work tree is the absent answer. `toplevel_opt()` returns that pair as
+  `Result<Option<String>, String>` for the five callers that distinguish them,
+  and `toplevel()` is the convenience form that folds the second into
+  `not a git repository`. Both are relocated rather than invented, so no caller
+  gains a failure mode it does not already handle — `fresh::toplevel()` keeps its
+  name, its two callers and its own sentence by suffixing
+  `— the emitter anchor cannot be resolved`.
+- **`walk::toplevel_in(dir)`** asks the same producer from another directory.
+  It exists because two callers compare a `-C` answer against a bare one, and an
+  uncrossed side would make that a comparison between dialects rather than
+  between directories.
+- **`walk::canonicalize()`** is the crate's only `std::fs::canonicalize`, and the
+  one producer here that **does not convert** — see the UNC clause below.
 - **There is one normalizer.** `check-stage-evidence`'s `norm()` was a second
   implementation that split on `'/'` only, so it could not repair a
   backslash-spelled root — a normalizer that silently does nothing is worse than
@@ -423,8 +433,19 @@ alone, converting into the declared dialect once, on entry:
 
 A rootless input keeps the pre-repair reading, treated as separator-rooted,
 because the contract puts no relative path here and the repair is scoped to
-dialect rather than to that caller error. UNC (`\\server\share`) is out of scope
-and is not claimed — no surface here produces one.
+dialect rather than to that caller error.
+
+**UNC and the extended-length prefix are out of scope, and one surface does
+produce one.** `path_root` reads `\\?\C:\repo` as separator-rooted, so
+`normalize_abs` would return `/?/C:/repo` — a mangling, not a conversion. On
+Windows `std::fs::canonicalize` answers in exactly that spelling, which is why
+`walk::canonicalize()` is the one producer that hands its answer back unconverted
+rather than crossing. That is safe on the evidence and only on it: both callers
+compare its output **against its own output only** — `check-gate-exemption-tasks`
+matches two canonicalized directories, `check-surface-duplication` takes a
+basename — so the spelling is symmetric and unobservable. No third caller may
+assume that. Which spelling Windows actually returns, and whether a strip rule is
+owed, is not decidable from a Linux host and is filed rather than guessed.
 
 `native/src/registry.rs` is the consumer whose failure was the observed one: it
 appends the `checks` segment to each resolved root and enumerates descriptors from

@@ -1,7 +1,6 @@
 // spec: gate-sdk/SPEC.md §check-template-copy-parity — a kit template and its vendored consumer
 // copy agree on their declared contract surface, with copy-side additions declared
 use crate::ere::Ere;
-use crate::proc;
 use crate::walk;
 use std::path::Path;
 
@@ -225,11 +224,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
             // spec: gate-sdk/SPEC.md §check-template-copy-parity — the root defaults to the git
             // toplevel, a derivation no injected fixture case can reach, so a sibling harness
             // drives it against the live tree instead
-            let out = proc::run("git", &["rev-parse", "--show-toplevel"])
-                .ok()
-                .and_then(|c| c.stdout().map(|o| String::from_utf8_lossy(o).trim().to_string()))
-                .filter(|s| !s.is_empty());
-            match out {
+            match walk::toplevel().ok() {
                 Some(r) => r,
                 None => return Err("not a git repository and no root given".to_string()),
             }
