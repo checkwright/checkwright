@@ -167,7 +167,12 @@ recoverable:
   rollup block (`bash gate-sdk/bin/run-gates.sh --emit value-rollup --write`,
   derived from the map above),
   `docs/check-graph.html` (`bash gate-sdk/bin/run-gates.sh --emit graph >
-  docs/check-graph.html`), and — for a hook-tier gate — the generated hooks
+  docs/check-graph.html`), the owning kit's `smoke/install.sh` expected-gate
+  roster (hand-maintained, so a new gate is added there or carries a
+  `smoke-unregistered:` declaration — `gate-sdk/SPEC.md` §Consumer smoke owns
+  which), `docs/install.md`'s
+  `ported-gate-members` measured claim (for a gate born native, which every new
+  gate now is), and — for a hook-tier gate — the generated hooks
   (`bash gate-sdk/bin/gen-pre-commit.sh --write`). `docs/footprint.md` is absent
   for the reason the row above gives: a gate is a script or a crate module and
   the footprint measures neither. A prose-only SPEC edit reds the on-site mirror

@@ -7233,58 +7233,6 @@
   its home in gate-sdk/SPEC.md §run-gate-tests; filed rather than fixed under the scope-gated intake
   rule, the harness being validate-critical and this close post-validate.
 
-- **inline-body-interpreter-grant-absent** [design-pending] — `python3` with a body carried IN the
-  command string is the tree's standard scratch-computation form, is safe by the tree's own stated
-  argument, and is granted by nothing.
-  recurrence: inline-body-interpreter-grant-absent 2026-08-28 2026-08-29
-  **TWO RECURRENCES, and between them they falsify a rate in each direction — so the entry now
-  claims a range and no rate at all.** At `installer-trial-lifecycle-repair`'s close, off a
-  331-line log: **8** `python3 -` fall-throughs. At `drift-kpi-contract-port`'s, off a 625-line
-  log: **109** (102 bare, 7 redirected), the largest class in the scan by a factor of four and
-  more than double the 45 the cost line was written on. The form is unchanged and still granted on
-  neither surface, checked again at both. What moves is how much a session computes over the tree,
-  never compliance — so 8 is not a ceiling reached and 109 is not a regression.
-  **RETIRES AT THE NEXT CLOSE AS A BARE `## Done` LINE — DISCHARGED AT THE RULED SHAPE, NOT AT THE
-  CLASS IT MEASURED.** `Bash(python3 -*)` is now live in the committed `.claude/settings.json`,
-  superseding this entry's former "granted nowhere" reading; the 2026-08-12 removal of
-  `Bash(python3 .tmp/*)` is recorded in `settings-content-pin-report-absent`. It reaches
-  `python3 -c` and `python3 -` only, so the filing triage's other shapes stay ungranted —
-  `python3 <<<` 1, `python3 /dev/stdin` 1, `python3 <` 2, `python3 .tmp/x.py` 3,
-  `python3 tools/gen.py` 2 — and the 109-count above reads 102 bare against 7 redirected. That
-  residue is filed to the gap inbox at this scope, so the drain rules on it rather than closing it.
-  ruled: inline-body-interpreter-grant-absent lead 2026-08-30 own-authority
-  **Disposition (a), and the tree already argued the safety case.** guard-kit/SPEC.md §The generic
-  ruleset rules that rule 23 deliberately does not fire on a body carried in the command string,
-  because "the permission prompt shows it to the approver verbatim and the friction log records it.
-  There is nothing for a compensating control to compensate for." A grant over exactly that shape
-  reinforces the form the ruleset already blesses — the opposite of the masking risk the triage
-  criterion warns of, which is why (a) is right here and (b) is not.
-  **Why it sits in the queue rather than being taken:** a committed grant is a settings edit and
-  therefore **operator-class** under TRAJECTORY.md §The closed rulings (2026-08-22). This entry is
-  the proposal's durable form; no stage session may land it.
-  **RULED IN, 2026-08-30 by the operator, at the `Bash(python3 -*)` shape — and being ruled moves
-  neither which session may write it nor this entry's state.** The edit lands out of band, by the
-  operator; no stage session touches `.claude/settings.json` for it, so this entry is **not
-  promoted** and is not a build unit. The 2026-08-22 bar is unchanged, and the 2026-08-29 carve-out
-  on `native-gate-port-remaining-corpus` does not reach here — that one covers REMOVING a grant a
-  ruled port cut deletes, where this is an addition.
-  **The caveat was put to the operator and is accepted rather than answered.** `Bash(python3 -*)`
-  reaches `python3 -c` and `python3 -` and stops at a bare file operand, which is the split that
-  matches the safety argument — but a Bash allow-glob's `*` spans `/` and `..`
-  (`grant-argument-bounding-mechanism`), so it bounds nothing, and the scratch-operand shapes rule
-  23 blocks stay blocked by the guard rather than by the glob. The ruling was taken with that limit
-  stated, so nothing here may later be read as a finding that the glob contains anything.
-  ruled: inline-body-interpreter-grant-absent operator 2026-08-30 lead-relay
-  **DISTINCT from `overlay-only-oracle-grants-uncommitted`**, whose four oracles are granted in the
-  overlay and whose question is which surface carries them; this shape is granted on no surface at
-  all. DISTINCT from `file-authoring-act-ungoverned`, which governs bringing a file into being where
-  this governs executing a visible body. It re-files neither and adds neither a recurrence date.
-  **Cost while deferred:** between eight and a hundred-odd out-of-band decisions per iteration —
-  three measurements, no rate — paid by whichever session is computing over the tree, and
-  invisible to every gate, the friction log being advisory.
-  Filed 2026-08-24 at this iteration's close, from its prompt-friction triage, both grant surfaces
-  read rather than inferred.
-
 - **kfric-obligation-residency** [design-pending] — the knowledge-friction capture obligation is
   declared for "any session" and reaches no surface a kit-template session actually loads.
   recurrence: kfric-obligation-residency 2026-08-24
@@ -9194,6 +9142,36 @@
   Filed 2026-08-14 by close from its own lesson triage; iceboxed for low cost; returned
   2026-08-29 by close, the six stale citations verified against guard-kit/SPEC.md at HEAD.
 
+- **harness-project-dir-fold-dialect-unresolved** [design-pending] — the harness project-dir
+  derivation `check-memory-off` and its two shell twins share folds a repo root's `/` and `.` to
+  `-`, and under gate-sdk/SPEC.md §The path-dialect contract's per-substrate dialects the two
+  substrates fold the *same* Windows checkout to two different names: the crate reads a
+  drive-lettered root and yields one spelling, an MSYS shell reads the `/c/…` spelling and yields
+  another. Only one can match the directory the harness itself creates, so on Windows at most one
+  of the three sites is right and nothing here says which.
+  **The three sites, verified 2026-08-30:** `native/src/gates/memory_off.rs:26-29` (a char fold
+  over the raw repo root) and `scripts/session-context.sh:91` /
+  `context-kit/templates/session-context.sh:86` (`tr '/.' '-'`, same fold).
+  **Why it promotes rather than fixing or iceboxing.** →fix fails on evidence, not on effort: the
+  missing fact is *which spelling the harness uses on Windows*, an observation of another program
+  on a host this tree has none of, and no command on a Linux box produces it — writing a fold
+  without it would be inventing a Windows fact, which is what spec declined to do. →icebox fails
+  because a live trigger exists and is dated: `platform-support-ci-matrix`'s Windows leg is the
+  run that can observe it, and the migration that just landed made every *other* producer
+  dialect-correct, so these three are now the tree's recorded exception rather than part of a
+  uniform unfixed background.
+  **Owner is context-kit, not gate-sdk.** The rule's home is context-kit/SPEC.md §Layout and
+  configuration; the dialect contract is gate-sdk's. It is that seam, not a migration defect.
+  **Pre-existing, not a regression** — the fold is already wrong on a backslash-spelled root
+  today, so `msys-dialect-migration` discharged its whole deliverable without answering this.
+  **Cost while deferred:** low today and stepwise later — no Windows adopter exists pre-launch, so
+  the wrong fold silently disables a memory check nobody is running; it becomes reader-visible the
+  first time a Windows session opens, which is the same event that supplies the answer.
+  **Deliverable:** the observed harness spelling recorded as a fact with its witness, one fold
+  that produces it on both substrates, and a fixture pinning the cross-substrate agreement.
+  Filed 2026-08-30 by close, promoted from the gap inbox (spec filed it; the three sites carry a
+  recorded `spec:` verdict naming the open question rather than an invented answer).
+
 
 ## Icebox
 
@@ -9252,10 +9230,13 @@
 - **lead-dispatch-simulate-optionality** [design-pending] — Dispatch may skip the pre-flight.
 - **self-repo-prefix-normalisation-unheld** [design-pending] — Two link-prefix holders, unheld.
 - **stage-cursor-rerun-stamp-gap** [design-pending] — A skipped re-run stamp points the cursor back.
+- **interpreter-grant-redirect-residue** [design-pending] — Seven redirected shapes stay ungranted.
+- **canonicalize-extended-length-prefix** [design-pending] — A Windows `\\?\` root is unconverted.
 
 ## Done
 
 - ops-push-transport-leaves-tracking-ref-stale
 - msys-dialect-migration
+- inline-body-interpreter-grant-absent
 ## Lessons Learned
 

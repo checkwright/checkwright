@@ -232,7 +232,7 @@ fn inner(args: &[String]) -> Result<i32, String> {
         println!("  help: restructure the offending block so kramdown's GFM parser renders it faithfully — an");
         println!("        indented (4-space) code block avoids the consecutive-fence and unclosed-fence leakage");
         println!("        class; a doubled-backtick code span kept on one line (never split across a newline");
-        println!("        before a <word> token) avoids the severed-span class.");
+        println!("        before a <word> token) avoids the severed-span class; a span whose content begins or ends with a space forms no span at all, so its backtick pairs with the next one on the page and the reported line is downstream of the defect.");
         return Ok(1);
     }
     println!(

@@ -171,11 +171,18 @@ observed on this tree: (1) a code span that wraps across a line break whose
 continuation begins with a block-level or generic XML tag; (2) a single-line code
 span whose embedded angle-bracket token (a placeholder such as `<verdict>` or
 `<n>`) is consumed as a raw HTML span before the span can close, no line break
-involved; (3) a code span nesting escaped backticks alongside such a token. All
+involved; (3) a code span nesting escaped backticks alongside such a token. Those
 three are the same kramdown behavior — parsing blocks before spans, it treats the
 angle-bracket token as the start of an HTML block, severing the span so it emits
 raw HTML that swallows the rest of the page (`gettalong/kramdown#843`, closed
-works-as-designed: a documented, permanent divergence, not a pending fix). A
+works-as-designed: a documented, permanent divergence, not a pending fix). Cause
+(4) is a **different mechanism with the same signature**, which is why keying on
+the symptom rather than on the parse pays: a single-backtick span whose content
+begins or ends with a space does not form a span at all under the GFM parser, so
+its opening backtick stays literal and pairs with the *next* backtick on the
+page, severing a span further down that is itself well-formed. The reported
+location is therefore downstream of the defect, and a session that reads only the
+reported line re-buys the diagnosis (measured 2026-08-30: two battery cycles). A
 severed span never forms the closing fence run, so it leaves not a multi-backtick
 marker but a **single** stray backtick and a **raw placeholder tag** in the
 rendered text — which is exactly the symptom the assertion keys on, so the gate is

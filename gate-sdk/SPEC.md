@@ -8751,6 +8751,18 @@ what lets a caller running from a scratch tree — the consumer smoke's build le
 set cwd and get that tree's crate, and it is why the contract says "from the repo
 root" rather than leaving the working directory unstated.
 
+**The crate is deliberately not `rustfmt`-clean, and running `cargo fmt` over it
+is a defect rather than housekeeping.** Measured 2026-08-30: 437 files diverge
+from rustfmt's output. The coupling is §check-gate-output, which reads a gate's
+`help:` remedy as a **single-line string literal**; rustfmt wraps a long
+`println!` argument onto its own line and reds that gate across the battery. A
+session that formats after a three-file edit therefore reformats the tree and
+buys itself a red battery it did not cause — the accident this paragraph exists
+to stop re-buying. Making the crate fmt-clean is a real option, but it is a
+`skip_macro_invocations` configuration plus a whole-tree reformat, not a
+side effect of an unrelated unit; until some unit takes that on deliberately,
+the rule is that no session runs `cargo fmt` here.
+
 cargo's exit code passes through unmodified and both streams pass through
 untouched, so a caller capturing build output keeps working. A **successful**
 cargo build can still exit 2 here, on the artifact verification below — the one
