@@ -4141,19 +4141,20 @@
   re-insert it elsewhere — and each re-derives the section grammar from scratch, guarded only by
   hand-written asserts over raw list-slice arithmetic.
   **queue-kit already parses that grammar**: `queue_live_slugs` plus the section classifier behind
-  `check-queue-sections` and `check-task-conservation`, with `bin/` shipping `queue-counts`,
-  `queue-edges`, `queue-index` and `roadmap` over it. The write side is not missing knowledge,
-  only a caller — **the grammar has one reader and N ad-hoc writers**.
+  `check-queue-sections` and `check-task-conservation`, with the gate binary shipping the
+  `queue-counts`, `queue-edges`, `queue-index` and `roadmap` arms over it. The write side is not
+  missing knowledge, only a caller — **the grammar has one reader and N ad-hoc writers**.
   **This is a correctness argument, not a convenience one.** `check-task-conservation` exists
   because entries get lost in exactly these moves, so gating the damage after a hand-rolled
   `del lines[start:end+2]` is the enforcement-first inversion: removing the duplication outranks
   gating it.
-  **Deliverable, and why `[design-pending]`:** a slug-addressed `queue-kit/bin/queue-edit.sh` with
-  promote/done/defer/icebox verbs reusing queue-kit's own classifier and running the conservation
-  check over its own output before writing — the write-side counterpart to the `queue-index`
-  arm. What is open is which grammar it writes against, since
-  `queue-entry-grammar-single-owner` records that queue-kit carries two and a verb must pick a
-  side.
+  **Deliverable, and why `[design-pending]`:** a slug-addressed queue-edit **verb** with
+  promote/done/defer/icebox modes reusing queue-kit's own classifier and running the conservation
+  check over its own output before writing — the write-side counterpart to the `queue-index` arm.
+  Substrate is not open: the born-native rule and the 2026-08-31 cut that left the kit with no
+  `bin/` at all make it a binary arm, never a shell script. What IS open is which grammar it
+  writes against, since `queue-entry-grammar-single-owner` records that queue-kit carries two and
+  a verb must pick a side.
   **RELATED, NOT DUPLICATE:** `amendment-done-move-assertions` designs a *gate* for the Done-move
   contract a verb would make unreachable; `scope-rename-guard-deadlock` was this same missing-verb
   shape on `.workflow/WORKFLOW-STATE.txt`, and it closed 2026-08-13 with `enter-stage.sh --rename`
@@ -7373,7 +7374,7 @@
   **AT THRESHOLD AND DECLINED THREE TIMES — 2026-08-30, then twice on 2026-08-31.** First:
   machinery-class by default, no unit set reaching it. Second and third, on the stronger ground and
   on the RUN rather than the merits: the port-only run forecloses a non-port unit while the oracle
-  reads owed (61 at the third), so the rot above argues RETURN at the post-port triage, not now.
+  reads owed (61 measured 2026-08-31; re-run it), so the rot argues RETURN at the triage, not now.
   ruled: dated-measurement-restatement-class lead 2026-08-30 own-authority
   ruled: dated-measurement-restatement-class lead 2026-08-31 own-authority
   **Cost while deferred:** the figures rot silently, and the entry carrying them is the one
@@ -7751,7 +7752,7 @@
   `check-scratch-citation` reds a permanent surface pointing into that set. Members are by slug.
   **The witness — re-run 2026-08-27, and again 2026-08-31 at close.** corpus `TASK-QUEUE.md ##
   Deferred + ## Icebox`, `scripts/gates.list`, `native/src/gates/`; oracle
-  `bash queue-kit/bin/queue-edges.sh` plus a `grep -n` for citation/cite/liveness; rev
+  `bash gate-sdk/bin/run-gates.sh --emit queue-edges` plus `grep -n` for citation/cite/liveness; rev
   `457148bd2a5681a9630c4a73b1358e35c170aa2d`. Named gates are native. Re-run before citing.
   **The finding.** Thirteen live members, eleven Deferred and two Icebox; none blocks on an
   operator-class fork. (A) `check-spec-pointer` absorbs `prose-filename-citation-liveness`,
@@ -8605,7 +8606,7 @@
   so `agent_id`, `agent_type` and the matched run key stay addable in one table edit. Both halves
   of the deferral's price are paid, so the entry IS takeable on its merits. **Second declination,
   at the next scope: ON THE RUN AND NOT ON MERIT** — the port-only run forecloses a non-port unit
-  while the oracle reads 61 owed, and its one yield is spent on the Windows leg's round 7.
+  while the oracle reads owed at all, and its one yield went to the Windows leg's round 7.
   ruled: subagent-liveness-log-unattributed-refusal lead 2026-08-31 own-authority
   **Cost while deferred:** every refusal cluster is uninterpretable, so the one instrument that
   could measure whether the producer/observer split works reads the same for a working guard and a

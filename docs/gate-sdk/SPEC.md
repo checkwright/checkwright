@@ -2063,9 +2063,13 @@ A **non-gate arm** is specified by three properties:
 That flag takes a *gate* name and reads the requirement element of that gate's
 `REGISTRY` row; a `BRIDGED_ARMS` row carries a flag spelling, the arm and a knob
 roster, and no requirement element at all. An arm's spawned programs are
-therefore recorded in prose and nowhere a machine reads — `date -d` under
-`--emit-queue-index`, `git` under `--emit-queue-edges` and under the origin-URL
-lookup this table's own module makes, `bash` under `--lesson-sink`. This states
+therefore recorded in prose and nowhere a machine reads, and the set is wider
+than a reader would guess: `git` under several `--emit-` arms and under the
+origin-URL lookup this table's own module makes, `date` under
+`--emit-queue-index`, `bash` under `--lesson-sink` and `--emit-port-blockers`,
+and under `--emit-drift-report` whatever program a consumer's KPI plugin names.
+`grep -rn 'proc::' native/src/emit/` is the derivation; nothing maintains a
+list, and an enumeration written here would be one more thing to stale. This states
 the scope as it stands and rules nothing about whether it should: making arm
 requirements machine-readable is open work under
 `bridged-arm-requirements-undeclared`.

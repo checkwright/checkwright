@@ -781,10 +781,10 @@ computes a knob's value by sourcing exactly this file (gate-sdk/SPEC.md
 §lib/gate.sh), so every crate-side reader above resolves *through* it. The shell
 form therefore cannot be deleted the way a ported primitive's is, and a port-time
 byte-identity proof would expire at the next edit to either side.
-**The kit ships no `bin/` directory and no shell gate, so `grep -rl lib/queue.sh
-queue-kit/bin queue-kit/checks` — the roster a reader reaches for — answers
-empty, and the derived globals' one live in-tree reader is the parity harness
-below.** That is stated so the empty answer is not read as the library being
+**The kit ships no `bin/` directory and no shell gate, so the roster a reader
+reaches for — a grep for `lib/queue.sh` under the kit's own script directories —
+finds no caller at all, and the derived globals' one live in-tree reader is the
+parity harness below.** That is stated so the empty answer is not read as the library being
 dead: it narrows what the split *guards*, never whether it holds, because the
 resolver role above is what makes the library permanent and that role has no
 shell caller in it. What holds the
@@ -872,9 +872,8 @@ arm collapses every error to 2 and every success to 0. It is an `Arm::Run` membe
 of the same bridged table, which is why that table is keyed by flag rather than
 by family (gate-sdk/SPEC.md §The non-gate arm).
 
-**No `-h`/`--help` arm crosses with any of the three.** Each shell form spelled
-its usage by reading its own source file, which has no in-crate spelling at all,
-and usage for a bridged arm lives in `run-gates.sh --help` and in
+**No `-h`/`--help` arm crosses with any of the three.** Each shell form carried
+a usage flag with no in-crate counterpart, and usage for a bridged arm lives in `run-gates.sh --help` and in
 queue-kit/README.md — where the class already keeps it. A per-arm help flag would
 be a second home for one sentence, so `-h` lands on the unknown-option refusal
 like any other unrecognised flag. This arm's own `--help` predates the ruling and
@@ -1097,7 +1096,7 @@ Targets print in queue order — the order every other reader of this file walks
 — each with its inbound count, then one line per citing edge. A slug with no
 inbound edges is absent from the default listing and yields empty output under
 `--inbound`; that is the normal case, not a finding. A `--inbound` slug that
-resolves to neither a live nor a retired target exits 1 with a message on stderr
+resolves to neither a live nor a retired target refuses with a message on stderr
 rather than printing nothing, because silence from this arm has to mean "no
 inbound edges" and nothing else. Widening the addressable domain to retired
 slugs grew that domain and left the meaning of silence exactly where it was.
@@ -1385,23 +1384,24 @@ prose rather than in a `--needs` declaration, because `--needs` answers over the
 `.gate`-declared registry and a non-gate arm carries no descriptor — the same
 disposition §The queue-index arm's `date -d` derivation takes.
 
-**`exec` becomes spawn-and-report.** The shell form `exec`ed, so the sink's
-status *was* the tool's by process replacement. The arm spawns through
+**The child's status is reported rather than inherited.** The observable
+contract is unchanged — the sink's exit status becomes the arm's — but the arm
+now spawns rather than being replaced by the child. It spawns through
 `proc::run_streamed(…, Stderr::Inherit)`, whose `code()` is already backed by the
 crate's signal-aware exit-code spelling, so a signal-killed sink reports
-`128 + n` with no new accessor. `Stderr::Inherit` matches the shell form's
-inherited stderr; stdout is **captured** rather than inherited, so the arm
-re-emits it on its own stdout — stated so "spawn-and-report" is not read as the
+`128 + n` with no new accessor. `Stderr::Inherit` leaves the sink's diagnostics
+on the terminal as before; stdout is **captured** rather than inherited, so the
+arm re-emits it on its own stdout — stated so the reporting is not read as the
 child's stdout still reaching the terminal by descriptor inheritance.
 
-**stdin is buffered rather than streamed.** The shell form handed the child an
-inherited descriptor; the arm reads the body to completion first. A lesson body
+**stdin is buffered rather than streamed.** The body used to reach the sink as
+a stream; the arm reads it to completion first. A lesson body
 is one queue entry's prose, so the bound is the queue's own per-entry cap
 (§check-queue-entry-budget), and this is recorded rather than absorbed because it
 is the one place the port changes what an arbitrarily large input would do.
 
-**One tightening rides with the fail-open default.** The shell form spelled its
-own `${GATE_SDK_WORKFLOW_DIR:-.workflow}` inline; the arm resolves the knob
+**One tightening rides with the fail-open default.** The staging directory used
+to fall back to a built-in default when the knob was unset; the arm resolves it
 through the bridge, where unset is an error. The knob has a shipped default, so
 no configured consumer moves — an adopter who deleted it from their config gets
 a refusal instead of a silent write to `.workflow`, which is the better failure
