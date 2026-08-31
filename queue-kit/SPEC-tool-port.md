@@ -150,10 +150,22 @@ Three behaviours are named because the port moves each of them:
   in the spec so a later selector would not re-derive it. `bash` joins `--needs`.
 - **`exec` becomes spawn-and-report.** The shell form `exec`s, so the sink's
   status *is* the tool's by process replacement. The arm spawns through
-  `proc::run_with_stdin` and returns the child's code, with a signal-killed sink
-  reporting `128 + n` through `proc.rs`'s existing `exit_code` spelling — the
-  same one `gate-sdk/SPEC-generator-cause.md` delta (2) reaches for, so the two
-  amendments must not mint two spellings of it.
+  `proc::run_streamed(program, args, input, Stderr::Inherit)`, not
+  `run_with_stdin` — `run_with_stdin` returns a `Completed`, whose only exit-code
+  accessor is `code() -> Option<i32>` off `status.code()` and drops the signal
+  case, while `Streamed::code() -> i32` is already backed by `proc.rs`'s private
+  `exit_code`, so a signal-killed sink reports `128 + n` **without a new
+  accessor** — the same spelling `gate-sdk/SPEC-generator-cause.md` delta (2)
+  reaches for, so the two amendments must not mint two spellings of it, and this
+  one mints none. `Stderr::Inherit` matches the shell form's inherited stderr;
+  `check-docs-render-fidelity`'s `spawn_filter`
+  (`native/src/gates/docs_render_fidelity.rs`) is this arm's own precedent for
+  "a configured command run against a stdin body" and is read rather than
+  assumed. The one divergence `run_streamed` does not erase: stdout is
+  **captured**, not inherited, so the arm must re-emit `Streamed::stdout()` on
+  its own stdout for the caller to see it at all — stated here so a later
+  reader does not take "spawn-and-report" to mean the child's stdout still
+  reaches the terminal by descriptor inheritance.
 - **stdin is buffered rather than streamed.** The shell form hands the child an
   inherited descriptor; the arm reads the body to completion first. A lesson body
   is one queue entry's prose, so the bound is the queue's own per-entry cap, and
@@ -291,7 +303,12 @@ Every surface naming a deleted path is repointed in the deleting commit
   `check-settings-paths` is the oracle on both halves.
 - `.claude/commands/close.md` and `lifecycle-kit/templates/stages/scope.md` and
   `close.md` — the three stage/skill surfaces that invoke a deleted path.
-- `queue-kit/README.md`'s command roster (four lines), and its docs mirror.
+- `queue-kit/README.md`'s command roster (four lines) **and** its opening
+  overview paragraph, which names `queue-counts.sh` and `queue-edges.sh` by
+  filename one clause after naming `queue-index` by its arm spelling in the
+  same sentence — found by grepping the file for all three names rather than
+  trusting the roster's own count, the align audit's stated method for this
+  class of documentation surface. Both spots, and the docs mirror.
 - `docs/site-architecture.md`'s standing-instance sentence, which names
   `bin/queue-edges.sh` as a tool with no stored projection. The **ruling**
   survives the port on the stored-projection ground alone, exactly as the
@@ -403,7 +420,8 @@ so the build session is not the one that learns it.
   three surfaces citing the edge tool by path (deltas 3 and 7).
 - `docs/site-architecture.md` — the standing-instance sentence naming the edge
   tool, whose ruling survives the port unchanged (delta 7).
-- `queue-kit/README.md`'s command roster (delta 7).
+- `queue-kit/README.md`'s command roster and its opening overview paragraph
+  (delta 7).
 - `TASK-QUEUE.md`, the `native-gate-port-remaining-corpus` entry — promoted with
   `[design-pending]` swapped for this amendment's `[spec:]` ref; it demotes at
   build and never reaches `## Done`, which its own body already rules (all deltas).
@@ -441,6 +459,10 @@ so the build session is not the one that learns it.
       trailer delta.
 - [ ] **The regeneration fan-out is discharged in the landing commit** — the
       generated hooks, the graph artifact, the SPEC mirrors and the gate binary.
-- [ ] **Both amendments' shared file is sequenced** — `native/src/proc.rs` is
-      touched by this cut and by `gate-sdk/SPEC-generator-cause.md`, and the
-      `exit_code` spelling is reused rather than duplicated.
+- [ ] **The shared file is read, not fought over** — `native/src/proc.rs` is
+      **modified** by `gate-sdk/SPEC-generator-cause.md` alone; this cut only
+      calls its existing public surface (`run_streamed`, `run`), so there is no
+      edit to sequence against the sibling amendment. The `exit_code` spelling
+      is reused rather than duplicated because `--lesson-sink` reaches it
+      through `Streamed::code()`, which already wraps it — never through a new
+      accessor this cut would otherwise have had to add and coordinate.
