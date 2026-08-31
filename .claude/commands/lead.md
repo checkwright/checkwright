@@ -87,6 +87,31 @@ the template §Economics "Tier each batch to its work class" rule now names:
   one, and a fourth heavy-iteration reading that also sets a record would make
   scale-explains-it unfalsifiable. The tier is not proposed for reversal and the
   ruling stands; what this buys is a next judge reading three points and not one.
+  **Measured again 2026-08-31 at `harness-hook-arm-port`: `cr=10576405`, and this
+  is the test the previous datum asked for.** That datum named the falsifier —
+  a fourth heavy-iteration record would make scale-explains-it unfalsifiable —
+  and the work-side reading's other half is the prediction it makes on a *light*
+  iteration. This one is light where the last was heavy: **one** amendment
+  against a tree that did not move under align, where that one audited four. The
+  reading is near-median — 10576405 against a recomputed bare-family median of
+  9544072, so +10.8%, 12th of seventeen ascending and rank 86 of 111 across the
+  whole bare family; above the 6394126 low, **below** 11255403, far below the
+  21907218 max. Scale predicted a near-median draw and a near-median draw is what
+  the row holds, so the work-side explanation survives a test that could have
+  broken it. **The honest limit rides with the datum:** this is a falsification
+  test *passed*, not a confirmation — it had power only against a high draw, and
+  two of the seventeen points still carry most of the spread. The revert signal
+  did not fire: no build round-trip and no re-entry in the stamp file. align
+  corrected two amendment premises inside the envelope and escalated neither,
+  both by reading the source rather than the prose that described it — one
+  dropped a declared knob whose claimed reader does not exist in the shipped
+  producer, and one grew a delta by four path-bearing surfaces its own count had
+  missed, two of them consumer-smoke recipes whose breakage would have surfaced
+  a stage later as a validate red. The tier holds for a third full iteration and
+  the watch stays live. **One reading for the next judge that this watch does not
+  cover:** the same log has `build` at `cr=95047678` for this iteration, roughly
+  5.4x the next stage row, so align is not where the draw lives and a watch
+  scoped to align alone will keep saying so.
 
 scope, `spec`, and close stay on Opus, their generative and verificational
 judgment being what justifies the tier. Re-judge every tier when the harness
