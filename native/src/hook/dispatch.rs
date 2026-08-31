@@ -28,17 +28,10 @@ pub fn run(payload: Option<&Value>) -> i32 {
     let isolation = hook::field(Some(doc), &["tool_input", "isolation"]);
     let nested = doc.get("agent_id").is_some_and(|v| !v.is_null());
 
-    // spec: delegation-kit/SPEC.md §The delegation model — D1 precedes D2 because the fork ban is
-    // unconditional and its message is the more specific one for a dispatch violating both
-    if subagent_type == "fork" {
-        return hook::block(NAME, FORK_BAN);
-    }
-
-    if !subagent_type.is_empty()
-        && isolation != "worktree"
-        && roster.contains(&subagent_type)
-    {
-        return hook::block(NAME, &read_only_claim(&subagent_type));
+    match route(&subagent_type, &isolation, nested, &roster) {
+        "block" if subagent_type == "fork" => return hook::block(NAME, FORK_BAN),
+        "block" => return hook::block(NAME, &read_only_claim(&subagent_type)),
+        _ => {}
     }
 
     let notes = if nested {
@@ -72,6 +65,22 @@ fn read_only_claim(subagent_type: &str) -> String {
     )
 }
 
+// spec: delegation-kit/SPEC.md §The delegation model — the routing the kit's decision table
+// asserts over, kept apart from the messages so the table drives the decision rather than a
+// process. D1 precedes D2: the fork ban is unconditional and its message is the more specific one.
+fn route(subagent_type: &str, isolation: &str, nested: bool, roster: &[String]) -> &'static str {
+    if subagent_type == "fork" {
+        return "block";
+    }
+    if !subagent_type.is_empty() && isolation != "worktree" && roster.iter().any(|t| t == subagent_type) {
+        return "block";
+    }
+    if nested {
+        return "advise";
+    }
+    "fallthrough"
+}
+
 const FORK_BAN: &str = "a fork inherits the dispatcher's whole context, toolset and model tier and disclaims nothing, so any narrowing this prompt states exists only as a sentence. Two lawful alternatives: dispatch a TYPED agent whose definition carries the narrower authority, brief and tier, so the narrowing is structural rather than requested; or, where the child does the same job at the same authority and you only want parallelism or its own index, dispatch that typed agent with isolation: worktree. There is no per-dispatch override — a knob here would restore the honour system this rule replaced, so the valve is unregistering the hook. The full protocol is /agent-execution (delegation-kit/SPEC.md §The delegation model).";
 
 const NESTED: &str = "you are yourself a dispatched agent, so this call creates a grandchild with no upward channel to you: it cannot message you mid-run, and neither level knows its own address or its parent's. Give it return-value-only work, or grant it a durable path in the main checkout, named absolutely in its prompt, and read that path yourself (delegation-kit/SPEC.md §Operative residency).";
@@ -103,6 +112,42 @@ mod tests {
             plain.get("agent_id").is_none(),
             "a top-level agent_id is what makes a dispatch nested"
         );
+    }
+
+    // spec: delegation-kit/SPEC.md §The delegation model — the kit's own decision table, read
+    // from disk rather than transcribed into Rust literals: the table is reviewable test data and
+    // a copy here would trade that review for a recompile. This test replaces its shell driver.
+    #[test]
+    fn the_kits_decision_table_routes_every_case() {
+        let table = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../delegation-kit/usage-tests/dispatch-guard-cases.tsv");
+        let text = std::fs::read_to_string(&table).expect("the kit's decision table must be read");
+        // spec: delegation-kit/SPEC.md §Testing — the driver fixed one roster for the whole table
+        let roster = vec!["ro-type".to_string()];
+        let mut ran = 0usize;
+        for line in text.lines() {
+            if line.trim().is_empty() || line.starts_with('#') {
+                continue;
+            }
+            let cols: Vec<&str> = line.split('\t').collect();
+            assert!(cols.len() >= 4, "malformed case row: {}", line);
+            let (want, ty, iso, nested) = (cols[0], cols[1], cols[2], cols[3]);
+            let desc = cols.get(4).copied().unwrap_or("");
+            fn dash(v: &str) -> &str { if v == "-" { "" } else { v } }
+            // spec: delegation-kit/SPEC.md §Testing — the table's two sentinels in the type
+            // column: `UNPARSEABLE` is the degraded path, which always advises without reaching
+            // the routing, and a `noroster:` prefix runs the same type against an empty roster
+            let got = if ty == "UNPARSEABLE" {
+                "advise"
+            } else if let Some(bare) = ty.strip_prefix("noroster:") {
+                route(bare, dash(iso), dash(nested) == "yes", &[])
+            } else {
+                route(dash(ty), dash(iso), dash(nested) == "yes", &roster)
+            };
+            assert_eq!(got, want, "case [{}]: {}", desc, line);
+            ran += 1;
+        }
+        assert!(ran >= 9, "only {} cases parsed — the table did not load", ran);
     }
 
     // spec: delegation-kit/SPEC.md §The delegation model — the degraded advisory is the same

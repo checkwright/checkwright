@@ -92,7 +92,8 @@ scope, `spec`, and close stay on Opus, their generative and verificational
 judgment being what justifies the tier. Re-judge every tier when the harness
 model roster churns.
 
-**escalation-guard** — inert, the optional-guard default (as
-`guard-kit/templates/wakeup-guard.sh`, unwired in `.claude/settings.json`). A
-lead-model session wires `guard-kit/templates/escalation-guard.sh` on
-SendMessage per guard-kit/SPEC.md §wakeup-guard.
+**escalation-guard** — inert, the optional-guard default (as `--hook
+wakeup-guard`, unwired in `.claude/settings.json`). A lead-model session wires
+`--hook escalation-guard` on SendMessage per guard-kit/SPEC.md §wakeup-guard.
+Wiring is now a `command` field naming the arm, never a template copied into
+`scripts/`.

@@ -166,9 +166,9 @@ leaves its section absent.
 | kit | surface | intercepts |
 | --- | --- | --- |
 | (consumer) | scripts/bash-guard.sh | Bash |
-| (consumer) | scripts/agent-budget-guard.sh | Agent |
-| (consumer) | scripts/agent-dispatch-guard.sh | Agent |
-| (consumer) | scripts/workflow-state-guard.sh | Write\|Edit |
+| [gate-sdk](gate-sdk/index.md) | gate-sdk/bin/run-gates.sh | Agent |
+| [gate-sdk](gate-sdk/index.md) | gate-sdk/bin/run-gates.sh | Agent |
+| [gate-sdk](gate-sdk/index.md) | gate-sdk/bin/run-gates.sh | Write\|Edit |
 
 ## Session warnings
 
@@ -194,8 +194,6 @@ leaves its section absent.
 | [gate-sdk](gate-sdk/index.md) | scripts |
 | [guard-kit](guard-kit/index.md) | guard_tests |
 | [delegation-kit](delegation-kit/index.md) | usage_tests |
-| [delegation-kit](delegation-kit/index.md) | budget_guard_tests |
-| [delegation-kit](delegation-kit/index.md) | dispatch_guard_tests |
 | [delegation-kit](delegation-kit/index.md) | trend_tests |
 | (consumer) | demo |
 | (consumer) | installer_smoke |

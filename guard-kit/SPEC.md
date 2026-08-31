@@ -1579,17 +1579,15 @@ guard-kit/
   bin/scan-prompts.sh
   bin/compare-settings-allow.sh
   bin/scratch-run.sh        # echo-then-exec runner for scratch scripts
-  bin/run-guard-tests.sh    # decision-table runner
+  bin/run-guard-tests.sh    # decision-table runner, narrowed to bash-guard with the escalation-guard port
   guard-tests/cases.tsv     # expected-decision <TAB> command
-  guard-tests/escalation-cases.tsv  # expected-decision <TAB> to <TAB> message
+  guard-tests/escalation-cases.tsv  # expected-decision <TAB> to <TAB> message; read by the crate test that replaced this runner's escalation lane
   guard-tests/background-cases.tsv  # expected-decision <TAB> run_in_background <TAB> command
   gate-tests/scratch-run.test.sh    # bespoke unit test, run by gate-sdk's runner
   gate-tests/scan-prompts.test.sh   # bespoke unit test, run by gate-sdk's runner
   gate-tests/compare-settings-allow.test.sh  # bespoke unit test, run by gate-sdk's runner
   templates/bash-guard.sh   # consumer copy: generic rules on, marked
                             #   consumer-rules section
-  templates/wakeup-guard.sh
-  templates/escalation-guard.sh
   templates/guard-config.sh
   templates/settings-hooks.json  # the PreToolUse wiring snippet
   templates/close-triage.md
@@ -1730,12 +1728,17 @@ block the guard makes. A change converting a block into a grant therefore reads
 as a pure improvement on the scan and as nothing at all — which is why the
 table, not the scan, is what a narrowing change is measured on.
 
-The same runner drives the escalation-guard from a second table,
-`guard-tests/escalation-cases.tsv` (`<decision> <TAB> <to> <TAB> <message>`),
-feeding a `SendMessage`-shaped payload instead of a command: a firing case (a
-headerless message to `main` → advise) and its non-firing pair (a fully shaped
-block, and a non-`main` recipient → fallthrough) hold the same fixture-pair
-discipline for the advisory.
+A second table, `guard-tests/escalation-cases.tsv`
+(`<decision> <TAB> <to> <TAB> <message>`), holds the same fixture-pair
+discipline for the escalation advisory: a firing case (a headerless message to
+`main` → advise) and its non-firing pair (a fully shaped block, and a non-`main`
+recipient → fallthrough). **Its driver is the crate test, not this runner.**
+The escalation-guard is a binary arm, so its cases are read by the crate test
+under that member's own module, and `bin/run-guard-tests.sh` covers
+`bash-guard.sh` alone — the one member of this kit that stays shell, because it
+is the extension point a consumer's own rules are written in.
+The table stayed on disk rather than becoming Rust literals: it is kit test data
+a reviewer reads, and a literal would trade that review for a recompile.
 
 A **third** table, `guard-tests/background-cases.tsv`
 (`<decision> <TAB> <run_in_background> <TAB> <command>`), extends that same

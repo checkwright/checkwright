@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Behavioral test of this repo's wiring of the SubagentStop hook: that the reader
-# scripts/subagent-stop-liveness.sh defaults to actually answers, and that its verdict reaches
+# Behavioral test of this repo's wiring of the SubagentStop hook: that the reader the
+# --hook subagent-stop-liveness arm defaults to actually answers, and that its verdict reaches
 # the exit code. delegation-kit's own test drives the hook with a stub reader, so it holds every
 # verdict arm and cannot see whether the CONFIGURED reader resolves — which is how a port that
 # deleted the reader's target left the hook logging verdict=unavailable on every firing with a
@@ -11,7 +11,13 @@ set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-HOOK="$ROOT/scripts/subagent-stop-liveness.sh"
+# spec: gate-sdk/SPEC.md §lib/test-hermetic.sh — the preamble above pins every kit's config file at
+# an empty one so a KIT test runs on kit defaults; this is a CONSUMER-wiring test and since the
+# port the reader's default lives in this repo's consumer config, so that file IS the subject here
+export DELEGATION_KIT_CONFIG_FILE="$ROOT/scripts/delegation-config.sh"
+# spec: gate-sdk/SPEC.md §The non-gate arm — the hook is a binary arm now, dispatched through the
+# front-end; the subject of arms A-C is unchanged and only its substrate moved
+HOOK_CMD=(bash "$ROOT/gate-sdk/bin/run-gates.sh" --hook subagent-stop-liveness)
 
 fails=0
 tmp="$(mktemp -d)"
@@ -20,13 +26,14 @@ trap 'rm -rf "$tmp"' EXIT
 PAYLOAD='{"session_id":"s-1","hook_event_name":"SubagentStop"}'
 
 # fire <name> <run-dir> <want-rc> — one firing against a scratch run dir, returning the logged
-# line. The knob is deliberately NOT set: the default in the consumer copy is the subject.
+# line. The knob is deliberately NOT set where the default is the subject: since the port that
+# default lives in scripts/delegation-config.sh, so these arms are also what proves it resolves.
 fire() {
     local name="$1" rundir="$2" want_rc="$3" log rc
     shift 3
     log="$tmp/$name.log"
     printf '%s' "$PAYLOAD" | env "$@" DELEGATION_KIT_STOP_LOG="$log" GATE_SDK_TMP_DIR="$rundir" \
-        bash "$HOOK" >/dev/null 2>"$tmp/$name.err"
+        "${HOOK_CMD[@]}" >/dev/null 2>"$tmp/$name.err"
     rc=$?
     [[ "$rc" -eq "$want_rc" ]] || { echo "  FAIL: $name exited $rc, want $want_rc"; fails=$((fails + 1)); }
     cat "$log" 2>/dev/null
@@ -59,15 +66,25 @@ line="$(fire live "$live" 2)"
 want live "$line" "verdict=red" "live=yes" "records=1" "decision=refuse"
 want live-message "$(cat "$tmp/live.err")" "turn-end refused" "delete the record once the producer has exited"
 
-# C — the reader is configured, readable and resolvable, but the binary its gate dispatches to is
-#     absent: the shape a worktree-isolated dispatch takes, whose fresh checkout carries no build
-#     output. Over an EMPTY run dir the reading is `unresolved` and it refuses. It must NOT be
-#     `unavailable` — that would misreport a wired reader as a tree that never configured one,
-#     and it is the arm the stub lane cannot reach because a stub is not the configured reader.
+# C1 — the hook's OWN binary is absent. Before the port this arm broke only the reader's dispatch,
+#      because the hook was a script; the hook and the reader now share one binary and one knob, so
+#      GATE_SDK_NATIVE_BIN can no longer break one without the other. What it exercises instead is
+#      the rule that replaced the old expectation: gate-sdk/SPEC.md §The non-gate arm fails a
+#      harness-integration arm OPEN when it cannot run at all, so an absent binary allows the turn
+#      end and writes no record, rather than refusing every turn end in a tree that never built.
 absent="$tmp/absent"; mkdir -p "$absent"
-line="$(fire no-binary "$absent" 2 GATE_SDK_NATIVE_BIN=/nonexistent)"
-want no-binary "$line" "verdict=unresolved" "live=no" "records=0" "decision=refuse"
-want no-binary-message "$(cat "$tmp/no-binary.err")" "turn-end refused" "produced no reading at all"
+line="$(fire no-binary "$absent" 0 GATE_SDK_NATIVE_BIN=/nonexistent)"
+[[ -z "$line" ]] || { echo "  FAIL: an absent binary still wrote a record: $line"; fails=$((fails + 1)); }
+want no-binary-message "$(cat "$tmp/no-binary.err")" "absent or not" "build-native.sh"
+
+# C2 — the reader is configured and resolvable but produces no reading: over an EMPTY run dir that
+#      is `unresolved` and it refuses. It must NOT be `unavailable` — that would misreport a wired
+#      reader as a tree that never configured one, and it is the arm the stub lane cannot reach.
+#      Driven by a reader that exits 2 rather than by the shared binary knob, which C1 now owns.
+mute="$tmp/mute-reader.sh"; printf 'exit 2\n' > "$mute"
+line="$(fire unresolved "$absent" 2 DELEGATION_KIT_LIVENESS_CMD="$mute")"
+want unresolved "$line" "verdict=unresolved" "live=no" "records=0" "decision=refuse"
+want unresolved-message "$(cat "$tmp/unresolved.err")" "turn-end refused" "produced no reading at all"
 
 # D — the reader run from inside a REAL linked worktree with no build output of its own. This is
 #     the only executable statement of the worktree resolution: a fresh checkout carries no
@@ -115,5 +132,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "subagent-stop-reader.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "subagent-stop-reader.test: ok (the configured reader resolves and answers, and its verdict reaches the exit: clean scratch dir green and allowed, live producer red and refused with a reason, absent dispatch binary unresolved and refused rather than reported unavailable; a linked worktree resolves through the main checkout and still reads its records, while a main checkout with a broken binary still refuses)"
+echo "subagent-stop-reader.test: ok (the configured reader resolves and answers, and its verdict reaches the exit: clean scratch dir green and allowed, live producer red and refused with a reason, an absent dispatch binary declining open with no record, a reader that produces no reading unresolved and refused rather than reported unavailable; a linked worktree resolves through the main checkout and still reads its records, while a main checkout with a broken binary still refuses)"
 exit 0

@@ -34,7 +34,7 @@ if [[ "$vrc" -ne 1 ]]; then
 fi
 rm -f "$snap"
 
-# spec: delegation-kit/SPEC.md §The usage.txt contract — the poll producer through its file:// stub seam: happy path writes a contract-valid snapshot, fetch failure leaves a pre-seeded one byte-identical
+# spec: delegation-kit/SPEC.md §The usage.txt contract — the --usage-poll arm through its file:// stub seam: happy path writes a contract-valid snapshot, fetch failure leaves a pre-seeded one byte-identical
 pp="$PWD/.tmp/poller-smoke"
 rm -rf "$pp"; mkdir -p "$pp"
 printf '{"claudeAiOauth":{"accessToken":"smoke-stub-token","subscriptionType":"stub"}}\n' > "$pp/creds.json"
@@ -46,7 +46,7 @@ poller() {
     DELEGATION_KIT_CRED_FILE="$pp/creds.json" \
     DELEGATION_KIT_ACCOUNT_CONFIG="$pp/absent.json" \
     DELEGATION_KIT_USAGE_ENDPOINT="$1" \
-    bash "$SMOKE_KIT_ROOT/templates/usage-poller.sh"
+    bash "$SDK/bin/run-gates.sh" --usage-poll
 }
 poller "file://$pp/stub.json" || { echo "delegation-kit/smoke: poller happy path failed" >&2; exit 1; }
 # spec: delegation-kit/SPEC.md §Testing — same line-local cred pin as the 95% check above
@@ -60,7 +60,7 @@ cmp -s "$pp/usage.before" "$pp/usage.txt" || {
     echo "delegation-kit/smoke: poller fetch failure touched the snapshot" >&2; exit 1; }
 rm -rf "$pp"
 
-# spec: delegation-kit/SPEC.md §The turn-end liveness hook (template) — the hook is exercised in place with a crafted payload on its allowing arm: the knob is emptied, so the firing holds no reading (verdict=unavailable) whatever the run dir carries, and it must exit 0 and append exactly one grammar-conformant line
+# spec: delegation-kit/SPEC.md §The turn-end liveness hook (template) — the --hook subagent-stop-liveness arm is exercised with a crafted payload on its allowing arm: the knob is emptied, so the firing holds no reading (verdict=unavailable) whatever the run dir carries, and it must exit 0 and append exactly one grammar-conformant line
 sp="$PWD/.tmp/stop-probe-smoke"
 rm -rf "$sp"; mkdir -p "$sp"
 printf 'pid=1 run=smoke\n' > "$sp/smoke.run"
@@ -68,7 +68,7 @@ printf '{"session_id":"smoke","hook_event_name":"SubagentStop"}' | \
     DELEGATION_KIT_STOP_LOG="$sp/probe.log" \
     DELEGATION_KIT_LIVENESS_CMD="" \
     GATE_SDK_TMP_DIR="$sp" \
-    bash "$SMOKE_KIT_ROOT/templates/subagent-stop-liveness.sh" || {
+    bash "$SDK/bin/run-gates.sh" --hook subagent-stop-liveness || {
     echo "delegation-kit/smoke: the SubagentStop hook did not exit 0 on its unavailable arm" >&2; exit 1; }
 probe_line="$(cat "$sp/probe.log")"
 case "$probe_line" in

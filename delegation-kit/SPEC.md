@@ -2418,14 +2418,11 @@ delegation-kit/
   bin/usage-verdict.sh
   bin/usage-trend.sh              # footprint trend reporter over the history log
   bin/run-usage-tests.sh          # verdict decision-table runner
-  bin/run-budget-guard-tests.sh   # budget-guard decision-table runner
-  bin/run-dispatch-guard-tests.sh # dispatch-guard decision-table runner (D1/D2/D3)
   bin/run-trend-tests.sh          # trend-reporter assertion runner
   bin/wait-probe.sh               # wait-primitive probe: hand-invoked, no trigger, wired into no tier
   lib/delegation.sh               # shared helpers for the usage tools and the kit's gates
   usage-tests/cases.tsv           # expected-verdict <TAB> scenario knobs
-  usage-tests/budget-guard-cases.tsv  # expected-action <TAB> scenario knobs
-  usage-tests/dispatch-guard-cases.tsv  # expected-outcome <TAB> scenario knobs
+  usage-tests/dispatch-guard-cases.tsv  # expected-outcome <TAB> scenario knobs; read by the crate test that replaced its shell driver
   usage-tests/trend-history.log   # fixture history for the trend runner
   checks/check-gate-tamper.gate  # binary-dispatched; live arm reads the index through git
   checks/check-rule-citation.gate  # hermetic, binary-dispatched: every SPEC rule citation resolves to a template lead-in
@@ -2436,11 +2433,6 @@ delegation-kit/
   gate-tests/check-agent-tier-explicit/{good,bad}/
   templates/agent-execution.md            # full protocol, bound as a skill shim
   templates/dispatch-checklists.md        # deletion/rename/audit pre-flight, reached by a pointer
-  templates/agent-budget-guard.sh         # PreToolUse(Agent) budget guard
-  templates/agent-dispatch-guard.sh       # PreToolUse(Agent) dispatch-shape guard (D1/D2/D3)
-  templates/statusline-usage.sh           # push usage.txt producer (statusline hook) + status bar incl. the queue counter group
-  templates/usage-poller.sh               # poll usage.txt producer (timer-driven, fail-soft)
-  templates/subagent-stop-liveness.sh     # SubagentStop turn-end liveness hook: logs, and refuses by exit 2 on a red or corrupt reading
   templates/delegation-config.sh          # knob overrides (arrays live here)
   smoke/install.sh
   smoke/violation.sh
@@ -2610,7 +2602,7 @@ commit here.
 `agent-budget-guard.sh` is not a gate — it is a hook, so it registers not in
 `gates.list` but under `PreToolUse` matcher `Agent` in the consumer's
 `.claude/settings.json` (beside the guard-kit Bash guard). Copy the template
-into the gates dir and wire `bash scripts/agent-budget-guard.sh`; it resolves
+arm and wire `bash gate-sdk/bin/run-gates.sh --hook agent-budget-guard`; it resolves
 `guard-kit/lib/guard.sh` and `bin/usage-verdict.sh` at their vendored paths,
 overridable with `GUARD_KIT_LIB` / `DELEGATION_KIT_VERDICT_BIN`. Registration
 is the whole opt-in: unwired, the guard is inert. This repo registers it, and
@@ -2622,7 +2614,7 @@ edit; the context-kit template stays uncoupled from delegation-kit.
 event. It registers under `SubagentStop` in the consumer's `.claude/settings.json`
 — an event that takes **no matcher**, so the entry carries a `hooks` array alone
 and is not tool-scoped, the shape a `SessionStart` entry already has. Copy the
-template into the gates dir and wire `bash scripts/subagent-stop-liveness.sh`; it
+arm and wire `bash gate-sdk/bin/run-gates.sh --hook subagent-stop-liveness`; it
 sources no kit lib at all (§The turn-end liveness hook (template) owns why) and
 resolves its reader through `DELEGATION_KIT_LIVENESS_CMD`. Registration is again
 the whole opt-in, and here the opt-in is also the consent: the wiring is a
@@ -2752,49 +2744,35 @@ averaged; token deltas and weekly headroom on the report; and the
 fail-closed exits (knob unset / history missing → 2). No fixture pair owed —
 neither script is a gate.
 
-`agent-budget-guard.sh` is a hook, not a gate, so it speaks exit-2 + hook
-JSON rather than the gate output contract — and like the verdict it ships a
-decision-table runner beside the verdict tests: `usage-tests/budget-guard-cases.tsv`
-pairs an expected action (`block`/`advise`) with the same snapshot knobs
-(`action pct age_off reset_off cred_age desc`, `pct=UNREADABLE` for the
-no-snapshot case), and `bin/run-budget-guard-tests.sh` drives the *template*
-with each injected snapshot — feeding an Agent hook JSON on stdin, pointing
-`DELEGATION_KIT_USAGE_FILE` at the generated fixture — and classifies the
-result: PAUSE → `block` (exit 2, verdict on stderr), OK/RESET-OK/STALE/unreadable
-→ `advise` (exit 0, verdict in `additionalContext`). The block branch carries
-its firing (PAUSE) and non-firing (the four advise cases) — the fixture-pair
-discipline again — and every case asserts the live verdict text rides the
-output so a memory-quoted percentage cannot be the acting source.
+`agent-budget-guard` and `agent-dispatch-guard` are hooks rather than gates, so
+each speaks exit-2 + hook JSON rather than the gate output contract — and each
+shipped a decision-table runner beside the verdict tests until the port moved
+both members into the binary. **The runners retired with their subjects; one
+table stayed and one did not**, and the split is the rule rather than an
+accident. `usage-tests/dispatch-guard-cases.tsv` stays on disk and is now read
+by the crate test that replaced `bin/run-dispatch-guard-tests.sh`: it pairs an
+expected outcome (`block`/`advise`/`fallthrough`) with
+`subagent_type isolation nested desc`, fixes one roster for its whole run
+(`DELEGATION_KIT_READONLY_TYPES=(ro-type)`), and carries two sentinels in the
+type column — a `noroster:` prefix runs that row against an empty roster, the
+row that proves D2 is inert on the roster's *absence* rather than on a type
+missing from a populated one, and `UNPARSEABLE` is the degraded row that makes
+the fail-open-but-loud posture testable rather than merely stated. It is kit
+test data rather than consumer config, so moving it into Rust literals would
+trade a reviewable table for a recompile. `usage-tests/budget-guard-cases.tsv`
+went with `bin/run-budget-guard-tests.sh` instead: its columns
+(`action pct age_off reset_off cred_age desc`) are `usage-verdict`'s inputs
+rather than the guard's, and the guard-side assertion they drove is a two-branch
+routing — exit 1 blocks, every other status advises — which the member's own
+crate test covers directly. A six-row table of another tool's inputs, kept to
+exercise two branches, is data whose reader left.
 
-`agent-dispatch-guard.sh` takes its own decision-table lane rather than
-guard-kit's `guard-tests/` (keyed on a command, or a to+message — neither can
-express a dispatch's parameters, the same reason the budget guard has its own
-runner) or the budget guard's table (a different payload grammar again):
-`usage-tests/dispatch-guard-cases.tsv` pairs an expected outcome
-(`block`/`advise`/`fallthrough`) with `subagent_type isolation nested desc`,
-and `bin/run-dispatch-guard-tests.sh` drives the *template* with a built Agent
-hook payload — `tool_input.subagent_type`/`.isolation`, and, for a nested case,
-the top-level `agent_id`/`agent_type` the harness only sets inside a subagent —
-classifying block (exit 2) / advise (exit 0, `additionalContext` present) /
-fallthrough (exit 0, empty stdout). The table fixes one roster for its whole
-run, `DELEGATION_KIT_READONLY_TYPES=(ro-type)`, supplied through a generated
-config file and `DELEGATION_KIT_CONFIG_FILE`; a `subagent_type` prefixed
-`noroster:` runs instead with no config file at all (an empty declare),
-stripped before it reaches the guard — the row that proves D2 is inert on the
-roster's *absence*, not merely on this dispatch's type missing from a
-populated one. Every rule carries a firing and a non-firing case (the
-fixture-pair discipline, transplanted): D1 — a fork blocks, a typed dispatch
-under an empty roster does not; D2 — a rostered type without isolation blocks,
-the same type with `isolation: worktree` does not, an unrostered type under a
-populated roster does not, and the empty-roster case does not; D3 — a payload
-carrying `agent_id` advises, one without it falls through. The degradation
-posture gets its own case rather than being asserted only in prose: an
-unparseable payload (`subagent_type` `UNPARSEABLE`, sent as invalid JSON on
-stdin) advises rather than blocks — the assertion that makes delta 6's
-fail-open-but-loud posture testable, not merely stated, and the one case this
-lane must not drop for brevity. The runner strips ambient `DELEGATION_KIT_*` at
-every invocation, the discipline `run-budget-guard-tests.sh` already uses, so a
-consumer's live roster or config-file pointer cannot leak into the fixture.
+**Every rule still carries a firing and a non-firing case** (the fixture-pair
+discipline, transplanted): D1 — a fork blocks, a typed dispatch under an empty
+roster does not; D2 — a rostered type without isolation blocks, the same type
+with `isolation: worktree` does not, an unrostered type under a populated roster
+does not, and the empty-roster case does not; D3 — a payload carrying `agent_id`
+advises, one without it falls through.
 
 `smoke/install.sh` copies the templates and `bin/` tools into the scratch
 consumer, registers the tamper gate, and drives one crafted snapshot

@@ -83,6 +83,30 @@ mod tests {
         assert!(!contains_word("", "Question"));
     }
 
+    // spec: guard-kit/SPEC.md §escalation-guard — the kit's own advisory table, read from disk
+    // rather than transcribed into Rust literals: the table is reviewable test data and a copy
+    // here would trade that review for a recompile. This test replaces its shell driver.
+    #[test]
+    fn the_kits_advisory_table_routes_every_case() {
+        let table = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../guard-kit/guard-tests/escalation-cases.tsv");
+        let text = std::fs::read_to_string(&table).expect("the kit's advisory table must be read");
+        let mut ran = 0usize;
+        for line in text.lines() {
+            if line.trim().is_empty() || line.starts_with('#') {
+                continue;
+            }
+            let cols: Vec<&str> = line.split('\t').collect();
+            assert!(cols.len() >= 3, "malformed case row: {}", line);
+            let (want, to, message) = (cols[0], cols[1], cols[2]);
+            let fires = to == "main" && HEADERS.iter().any(|h| !contains_word(message, h));
+            let got = if fires { "advise" } else { "fallthrough" };
+            assert_eq!(got, want, "case [-> {}: {}]", to, message);
+            ran += 1;
+        }
+        assert_eq!(ran, 3, "the table's case count moved; read it before changing this");
+    }
+
     // spec: guard-kit/SPEC.md §escalation-guard — only an upward message is an escalation, and an
     // uninspectable payload is not one either
     #[test]

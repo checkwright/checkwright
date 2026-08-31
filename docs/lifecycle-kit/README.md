@@ -99,8 +99,8 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
    driver needs no such step). `check-merge-attrs` (step 1) holds the block in
    parity with the derived supersede and union sets.
 
-5. Optional — narrow the hand-edit window: copy
-   `templates/workflow-state-guard.sh` into your gates dir and register it as a
+5. Optional — narrow the hand-edit window: register
+   `bash gate-sdk/bin/run-gates.sh --hook workflow-state-guard` as a
    `PreToolUse(Write|Edit)` hook (guard-kit's `templates/settings-hooks.json`
    carries the block). It refuses an agent write to the stage-stamp file, whose
    only sanctioned writer is `bin/enter-stage.sh` — the gates that would catch a

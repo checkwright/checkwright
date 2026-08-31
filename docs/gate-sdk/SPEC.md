@@ -14352,9 +14352,21 @@ exclusion takes files out of the derivation, while an unpaired template stays in
 it and is only skipped by the assertions, which is how a member this gate never
 asserts on is still a member the disposition reaches.
 An unpaired template was never vendored out and has no copy to be in parity
-with; running a template in place (this repo wires two from the template path
-itself) is a legitimate adoption mode, so failing closed there would red a tree
-for six files that are working as designed. The same principle applies one axis
+with; running a template in place is a legitimate adoption mode, so failing
+closed there would red a tree for files that are working as designed. This repo
+wired **two** from the template path itself — `statusline-usage.sh` and
+`usage-poller.sh` — and wires neither that way now: both are binary arms, and
+what a `command` field or a refresh knob names is an arm rather than a path. The
+in-place mode is unchanged and still supported; this tree simply stopped being
+an instance of it.
+
+**The derivation has no floor and no count, which is what let four pairs leave it
+at once.** An unpaired template is silently skipped rather than failed and an
+empty corpus asserts nothing, so removing pairs is monotone and clearable by
+inspection — the property that made the harness-template port a delete rather
+than a migration. The fixture pair is a **synthetic tree rooted at the fixture
+dir itself**, carrying its own copies of the names it asserts over, so it is
+untouched by any delete in the real tree. The same principle applies one axis
 over in `check-template-registry-parity` (§check-template-registry-parity),
 which derives *its* population from layout too — so a reader arriving at either
 meets both. They do not overlap: this gate compares a template to a **consumer
@@ -14533,32 +14545,47 @@ rules for `bash-guard.sh` and its copy, and context-kit/SPEC.md §The session-co
 for `session-context.sh` and its copy. Nothing here reaches a file because of the
 directory it sits in.
 
-**The members the ground does not reach are named too, and they stay owed rather
-than undecided**: `agent-budget-guard.sh`, `agent-dispatch-guard.sh`,
-`statusline-usage.sh`, `subagent-stop-liveness.sh`, `usage-poller.sh`,
-`escalation-guard.sh`, `wakeup-guard.sh`, `workflow-state-guard.sh`, and the
-`<gates-dir>/` copies of the first, second, fourth and last. None carries a marked
-gap and none holds a consumer literal of its own. Reading a consumer roster
-*through the config bridge* is what the bridge exists for rather than a reason a
-file cannot port: `agent-dispatch-guard.sh` reads `DELEGATION_KIT_READONLY_TYPES`
-and defaults it empty on both sides of its pair, while the vocabulary filling it
-lives in `<gates-dir>/delegation-config.sh` — a member of the sibling class,
-declaring on the seam ground. Their port work is filed as
-`harness-template-port-residue` rather than absorbed into this cut.
+**The members the ground did not reach are gone, and the disposition they took is
+recorded here rather than left to the reader**: `agent-budget-guard.sh`,
+`agent-dispatch-guard.sh`, `statusline-usage.sh`, `subagent-stop-liveness.sh`,
+`usage-poller.sh`, `escalation-guard.sh`, `wakeup-guard.sh`,
+`workflow-state-guard.sh`, and the `<gates-dir>/` copies of the first, second,
+fourth and last — twelve files, 613 lines — are **deleted**, ported to the
+harness-integration arms §The non-gate arm mints. None carried a marked gap and
+none held a consumer literal of its own; reading a consumer roster *through the
+config bridge* is what the bridge exists for rather than a reason a file cannot
+port, and that is what the port did.
+
+**A member carrying a `<gates-dir>/` copy loses both sides together, and after
+the port a consumer's per-member surface is the kit's config file alone.** That
+is the correct end state and it cost one migration, which is recorded because the
+next such cut will meet the same shape: the corpus carried **one live behavioural
+divergence and it was untagged**. `templates/subagent-stop-liveness.sh` defaulted
+`DELEGATION_KIT_LIVENESS_CMD` empty while the `<gates-dir>/` copy defaulted it to
+this repo's reader, and neither side carried `# copy-divergence:` — the copy
+documented the fork in a plain `# spec:` comment — so a port author scanning for
+the tag alone would have deleted the filled default and left a guard logging a
+verdict it never probed. The default moved into the **consumer's** config seam in
+the same commit as the delete: §The non-gate arm's inline-default rule read one
+tier out, because the value is a consumer path, so the kit library's shipped
+default stays empty and the consumer names its own reader.
 
 **One near-miss, stated because a reader will meet the sentence and ask.**
-delegation-kit/SPEC.md §The statusline template calls `statusline-usage.sh` a
+delegation-kit/SPEC.md §The statusline template called `statusline-usage.sh` a
 consumer-owned template whose repo-root-relative reads stay hardcoded because "a
-consumer-owned template adds no knob". That does not satisfy the first ground:
+consumer-owned template adds no knob". That did not satisfy the first ground:
 the paths it hardcodes are queue-kit's and lifecycle-kit's own defaults rather
-than consumer vocabulary, and the file carries no marked gap. Being consumer-owned
-is not the test — carrying the seam is.
+than consumer vocabulary, and the file carried no marked gap. Being consumer-owned
+is not the test — carrying the seam is. The port kept those reads hardcoded at
+their literal paths, which is behaviour preservation and not a second reading of
+this ground.
 
-**The honest limit, stated because this ruling does not answer it.** The owed side
-is the larger half by line count, and nothing here argues those files are hard to
-port; only that no *stated* ground reaches them. What they actually meet is
-recorded on `harness-template-port-residue`, and the absence of a ground is not
-asserted here as though it were a disposition.
+**The honest limit this ruling left open is now closed, and how it closed is the
+part worth keeping.** The owed side was the larger half by line count, and the
+ruling argued only that no *stated* ground reached it — never that the files were
+hard to port. That was the right shape: the absence of a ground was not asserted
+as though it were a disposition, and when the port came it needed no new ground
+at this section at all, only a contract for the arm class the members became.
 
 **What reopens it**, on §Consumer smoke *The port disposition*'s terms, because
 `# no-port:` is the permanent tier and a class ruling owes its reader what would

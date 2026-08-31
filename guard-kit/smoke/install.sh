@@ -6,7 +6,6 @@ set -euo pipefail
 : "${SMOKE_KIT_ROOT:?run via run-consumer-smoke.sh}"
 
 cp "$SMOKE_KIT_ROOT/templates/bash-guard.sh"     scripts/bash-guard.sh
-cp "$SMOKE_KIT_ROOT/templates/wakeup-guard.sh"   scripts/wakeup-guard.sh
 cp "$SMOKE_KIT_ROOT/templates/guard-config.sh"   scripts/guard-config.sh
 
 mkdir -p .claude

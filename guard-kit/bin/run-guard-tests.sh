@@ -4,13 +4,11 @@ set -uo pipefail
 
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BASH_GUARD="$KIT/templates/bash-guard.sh"
-ESC_GUARD="$KIT/templates/escalation-guard.sh"
 LIB="$KIT/lib/guard.sh"
 CASES="${1:-$KIT/guard-tests/cases.tsv}"
-ESC_CASES="${2:-$KIT/guard-tests/escalation-cases.tsv}"
-BG_CASES="${3:-$KIT/guard-tests/background-cases.tsv}"
+BG_CASES="${2:-$KIT/guard-tests/background-cases.tsv}"
 
-for f in "$BASH_GUARD" "$ESC_GUARD" "$LIB" "$CASES" "$ESC_CASES" "$BG_CASES"; do
+for f in "$BASH_GUARD" "$LIB" "$CASES" "$BG_CASES"; do
     [[ -f "$f" ]] || { echo "run-guard-tests: missing $f" >&2; exit 2; }
 done
 command -v jq >/dev/null 2>&1 || { echo "run-guard-tests: jq not found on PATH" >&2; exit 2; }
@@ -88,23 +86,16 @@ while IFS=$'\t' read -r want rib cmd; do
     check_case "$want" "$(classify "$rc" "$out")" "[run_in_background=$rib] $cmd"
 done <"$BG_CASES"
 
-# spec: guard-kit/SPEC.md §wakeup-guard — drives the escalation-guard advisory table
-while IFS=$'\t' read -r want to msg; do
-    [[ -z "${want// }" ]] && continue
-    [[ "$want" == \#* ]] && continue
-    json="$(jq -nc --arg t "$to" --arg m "$msg" '{tool_input:{to:$t,message:$m}}')"
-    out="$(printf '%s' "$json" | bash "$ESC_GUARD" 2>/dev/null)"
-    rc=$?
-    check_case "$want" "$(classify "$rc" "$out")" "-> $to: $msg"
-done <"$ESC_CASES"
-
 if [[ "$ran" -eq 0 ]]; then
-    echo "run-guard-tests: no cases parsed from $CASES / $BG_CASES / $ESC_CASES" >&2
+    echo "run-guard-tests: no cases parsed from $CASES / $BG_CASES" >&2
     exit 2
 fi
 if [[ "$fails" -gt 0 ]]; then
     echo "run-guard-tests: $fails/$ran case(s) failed"
     exit 1
 fi
-echo "run-guard-tests: ok ($ran cases across the generic ruleset, the backgrounding arm, and the escalation advisory)"
+# spec: guard-kit/SPEC.md §Testing — narrowed with the escalation-guard port: bash-guard.sh stays
+# shell and keeps this runner, and the escalation advisory table is now read by the crate test
+# that replaced this harness's escalation lane
+echo "run-guard-tests: ok ($ran cases across the generic ruleset and the backgrounding arm)"
 exit 0

@@ -49,8 +49,9 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
      digest.
 
 3. Wire a `usage.txt` producer so `usage-verdict` has a snapshot to read — point
-   your harness `statusLine` at `templates/statusline-usage.sh` (or copy it),
-   point `DELEGATION_KIT_REFRESH_CMD` at `templates/usage-poller.sh` so every
+   your harness `statusLine` at `bash gate-sdk/bin/run-gates.sh --statusline`,
+   point `DELEGATION_KIT_REFRESH_CMD` at
+   `bash gate-sdk/bin/run-gates.sh --usage-poll` so every
    verdict call refreshes the snapshot on demand (or wire the same poller under
    a timer), keeping it fresh while a supervising session sits static, or
    have any producer honour the snapshot contract (SPEC §The usage.txt contract).
@@ -58,15 +59,16 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
    SPEC §The statusline template's; the three mandatory snapshot lines are the
    floor, and supplying the optional weekly keys arms the second (7-day) pause axis.
 
-4. Optional — wire the Agent budget guard: copy `templates/agent-budget-guard.sh`
-   into your gates dir and register it under `PreToolUse` matcher `Agent` in
-   `.claude/settings.json`. It fires `usage-verdict` at every dispatch, blocking
+4. Optional — wire the Agent budget guard: register
+   `bash gate-sdk/bin/run-gates.sh --hook agent-budget-guard` under `PreToolUse`
+   matcher `Agent` in `.claude/settings.json`. There is nothing to copy: the
+   guard is a binary arm, and the `command` field names it directly. It fires `usage-verdict` at every dispatch, blocking
    on a PAUSE verdict and advising otherwise (SPEC §The delegation model).
    Unwired, it is inert.
 
-5. Optional — wire the turn-end liveness hook: copy
-   `templates/subagent-stop-liveness.sh` into your gates dir and register it
-   under `SubagentStop` in `.claude/settings.json` (that event takes no matcher).
+5. Optional — wire the turn-end liveness hook: register
+   `bash gate-sdk/bin/run-gates.sh --hook subagent-stop-liveness` under
+   `SubagentStop` in `.claude/settings.json` (that event takes no matcher).
    It logs one line per subagent turn end saying whether any launch record named
    a live producer, and **refuses the turn end** — exit 2, its stderr the
    blocking reason — when that reading is `red`, `corrupt` or `unresolved`; it emits no hook
@@ -100,6 +102,5 @@ directly with `--fixture <dir>` only for testing.
 ```bash
 bash gate-sdk/bin/run-gate-tests.sh delegation-kit/gate-tests delegation-kit/checks  # every gate's fixture pair
 bash delegation-kit/bin/run-usage-tests.sh                                           # usage-verdict verdict table
-bash delegation-kit/bin/run-budget-guard-tests.sh                                    # budget-guard action table
 bash delegation-kit/bin/run-trend-tests.sh                                           # usage-trend segmentation assertions
 ```

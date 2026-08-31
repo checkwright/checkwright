@@ -1,5 +1,5 @@
 {
-  "//": "guard-kit hook wiring — merge into .claude/settings.json. The bash-guard is the PreToolUse(Bash) hook; the wakeup-guard and the path-guard block are optional (drop a block to skip it). The third block shows the path-shaped guard shape guard_read_path serves — lifecycle-kit's workflow-state-guard is the shipped instance. Paths assume the guards were copied into scripts/.",
+  "//": "guard-kit hook wiring — merge into .claude/settings.json. The bash-guard is the PreToolUse(Bash) hook; the wakeup-guard and the path-guard block are optional (drop a block to skip it). The third block shows the path-shaped guard shape guard_read_path serves — lifecycle-kit's workflow-state-guard is the shipped instance. The substrate is MIXED by design: bash-guard.sh is a script you copy into scripts/ and edit, because it is where your own project rules live; the other two are binary arms dispatched through run-gates.sh and there is nothing to copy for them.",
   "hooks": {
     "PreToolUse": [
       {
@@ -11,13 +11,13 @@
       {
         "matcher": "ScheduleWakeup|CronCreate",
         "hooks": [
-          { "type": "command", "command": "bash scripts/wakeup-guard.sh" }
+          { "type": "command", "command": "bash gate-sdk/bin/run-gates.sh --hook wakeup-guard" }
         ]
       },
       {
         "matcher": "Write|Edit",
         "hooks": [
-          { "type": "command", "command": "bash scripts/workflow-state-guard.sh" }
+          { "type": "command", "command": "bash gate-sdk/bin/run-gates.sh --hook workflow-state-guard" }
         ]
       }
     ]

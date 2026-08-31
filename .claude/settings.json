@@ -58,7 +58,6 @@
       "Bash(bash context-kit/smoke/agents-md.sh)",
       "Bash(bash context-kit/smoke/agents-md.sh *)",
       "Bash(bash delegation-kit/bin/usage-verdict.sh)",
-      "Bash(bash delegation-kit/templates/usage-poller.sh)",
       "Bash(bash delegation-kit/bin/usage-trend.sh)",
       "Bash(bash queue-kit/bin/queue-edges.sh)",
       "Bash(bash queue-kit/bin/queue-edges.sh *)",
@@ -117,7 +116,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "bash delegation-kit/templates/statusline-usage.sh"
+    "command": "bash gate-sdk/bin/run-gates.sh --statusline"
   },
   "hooks": {
     "SessionStart": [
@@ -135,7 +134,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash scripts/subagent-stop-liveness.sh"
+            "command": "bash gate-sdk/bin/run-gates.sh --hook subagent-stop-liveness"
           }
         ]
       }
@@ -155,11 +154,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash scripts/agent-budget-guard.sh"
+            "command": "bash gate-sdk/bin/run-gates.sh --hook agent-budget-guard"
           },
           {
             "type": "command",
-            "command": "bash scripts/agent-dispatch-guard.sh"
+            "command": "bash gate-sdk/bin/run-gates.sh --hook agent-dispatch-guard"
           }
         ]
       },
@@ -168,7 +167,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash scripts/workflow-state-guard.sh"
+            "command": "bash gate-sdk/bin/run-gates.sh --hook workflow-state-guard"
           }
         ]
       }

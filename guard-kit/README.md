@@ -28,9 +28,14 @@ Vendor the kit beside [gate-sdk](../gate-sdk/), then:
 
    ```bash
    cp guard-kit/templates/bash-guard.sh      scripts/bash-guard.sh
-   cp guard-kit/templates/wakeup-guard.sh    scripts/wakeup-guard.sh   # optional
    cp guard-kit/templates/guard-config.sh    scripts/guard-config.sh
    ```
+
+   The optional wakeup-guard and escalation-guard are **not** copied: they are
+   binary arms, wired by pointing a hook's `command` field at
+   `bash gate-sdk/bin/run-gates.sh --hook wakeup-guard` (or
+   `--hook escalation-guard`). Only `bash-guard.sh` is a copied script, because
+   it is where your own project rules live.
 
    Add your project's block/steer/allow rules in `bash-guard.sh`'s marked
    consumer-rules section (before the generic ruleset). The generic ruleset and
