@@ -1,1 +1,25 @@
 # contract: evidence-manifest v1
+port-declaration-cohort-and-windows-leg gates sha256=fab2a204d42388250182ec5cfc6d740f021229ba407ac595a9ec9d75f34f24e8 pass=108 fail=0 ignore=0 verdict=clean 2026-08-31
+port-declaration-cohort-and-windows-leg gate_sdk sha256=a7f27f93a1a0249ed5f6df62a96225edc7b5f9d0f5f9b0d041861daa605b93c0 pass=1 fail=0 ignore=0 verdict=clean 2026-08-31
+port-declaration-cohort-and-windows-leg canon_kit sha256=9d3cf3ab0a1425a5996fd26152019ba03a3e0f5fa5ad31aa0e4a19901b8acb5a pass=1 fail=0 ignore=0 verdict=clean 2026-08-31
+port-declaration-cohort-and-windows-leg context_kit sha256=65e7536ec8b920506d9defb5f2fd338be716ee72482acf2e4819ca5b3fcbe891 pass=1 fail=0 ignore=0 verdict=clean 2026-08-31
+port-declaration-cohort-and-windows-leg delegation_kit sha256=ccc527d5f87226b0de67d84cc9e56417838a2295033aaf6dd1e16d699926131d pass=1 fail=0 ignore=0 verdict=clean 2026-08-31
+port-declaration-cohort-and-windows-leg doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-08-31
+port-declaration-cohort-and-windows-leg evidence_kit sha256=ae2a2f19285bce1b8d4b6490f91bce3d998afb05553e102569916c62cec919c4 pass=1 fail=0 ignore=0 verdict=clean 2026-08-31
+port-declaration-cohort-and-windows-leg guard_kit sha256=234e06ba5cdb4ca383be7191965292443198471675d1b3166d8c264175420ae4 pass=1 fail=0 ignore=0 verdict=clean 2026-08-31
+port-declaration-cohort-and-windows-leg lifecycle_kit sha256=b9de7487ab4631bf35012720f1fe0fca5159ca5bf5e8f8600ec7c0b538886ba4 pass=1 fail=0 ignore=0 verdict=clean 2026-08-31
+port-declaration-cohort-and-windows-leg queue_kit sha256=bd337719dfff15f492ae94d8e8662663a8917b65edd4b3bfcfdd20f1790ba39b pass=1 fail=0 ignore=0 verdict=clean 2026-08-31
+port-declaration-cohort-and-windows-leg site_kit sha256=07f7139ea31865677de58ea44b43f7c98ae6c40c8f3fe57e8975e8d65794be35 pass=1 fail=0 ignore=0 verdict=clean 2026-08-31
+port-declaration-cohort-and-windows-leg scripts sha256=f302eab3cefcc19e12fac91459be10fb1b4c8f02dd63cef5ad040f4deb8dc259 pass=1 fail=0 ignore=0 verdict=clean 2026-08-31
+port-declaration-cohort-and-windows-leg guard_tests sha256=0e5059c68c41d19418dd47aee76a09141deee924871b380f7b2fca6efb230d29 pass=1 fail=0 ignore=0 verdict=clean 2026-08-31
+port-declaration-cohort-and-windows-leg usage_tests sha256=04968d303b3e4ec54f3f8033f0e7e00d4b33ae90fd7507b48347cab56d0bc26d pass=1 fail=0 ignore=0 verdict=clean 2026-08-31
+port-declaration-cohort-and-windows-leg budget_guard_tests sha256=94bbe0c41f3993e3c748a492d29e2a0d22139825b8c53bbae6a528500a8ce402 pass=1 fail=0 ignore=0 verdict=clean 2026-08-31
+port-declaration-cohort-and-windows-leg dispatch_guard_tests sha256=6018943502411c07fe57162c0dae2ac37af304eccc0d0a9a6e0ec4fd733a1daf pass=1 fail=0 ignore=0 verdict=clean 2026-08-31
+port-declaration-cohort-and-windows-leg trend_tests sha256=acdbfef4eab851fca00ca747245b6ac4a4f804b05989f9cd3acd014bb56ac330 pass=1 fail=0 ignore=0 verdict=clean 2026-08-31
+port-declaration-cohort-and-windows-leg demo sha256=82d30c9b6731ed73c7368817ca9d6947746f597993a3f5de840d51bc51a20057 pass=1 fail=0 ignore=0 verdict=clean 2026-08-31
+port-declaration-cohort-and-windows-leg installer_smoke sha256=c9f079f133b77fc9ee4b80ab41dea55444805b3f302d6267d587849fa0dcf139 pass=4 fail=1 ignore=0 verdict=clean 2026-08-31
+port-declaration-cohort-and-windows-leg consumer_smoke sha256=2fca2df1f9c1d127f35f336645e6d6f26c6ff89f6419f6f303ff8d81ba03b993 pass=1 fail=0 ignore=0 verdict=clean 2026-08-31
+port-declaration-cohort-and-windows-leg upgrade sha256=83ec25b29f870b0bc1fd7de0714b118703d1b0b9030564b94b66cb7e5a90f6c3 pass=1 fail=0 ignore=0 verdict=clean 2026-08-31
+port-declaration-cohort-and-windows-leg agents_md_smoke sha256=235f9dc7233f8509da24bbbdd89fddfeb5c24932da646aa4a05359fabb2e752a pass=1 fail=0 ignore=0 verdict=clean 2026-08-31
+port-declaration-cohort-and-windows-leg index_tests sha256=e14e152466dc5be0296b1e20575bf3d587e1e0a127e7c63ad57671dbcaeaddb8 pass=1 fail=0 ignore=0 verdict=clean 2026-08-31
+port-declaration-cohort-and-windows-leg native_crate sha256=8ba654a25d122f526f482f363f6e90a98844da5a821c0acc0a80f78ef6538dd3 pass=1 fail=0 ignore=0 verdict=clean 2026-08-31
