@@ -12,6 +12,39 @@
 
 ## New Features
 
+- **harness-template-port-residue** [spec: SPEC-hook-arm.md] — port the twelve harness and
+  git-hook template members, 613 lines, off the shell substrate into the gate binary's
+  harness-integration arms. Contract, member roster, channel table, causal completeness and
+  the per-delta work classes: [gate-sdk/SPEC-hook-arm.md](gate-sdk/SPEC-hook-arm.md).
+  **THE ARM KIND WAS RULED BEFORE THIS CUT WAS COMPOSED** — one dispatching hook arm, hook
+  name as argv, harness payload on stdin, hook-JSON envelope out, exit status as protocol,
+  with its env read exempted for that arm alone from the reads-no-knob sentence. That ruling
+  and its two refused shapes are TRAJECTORY.md §The closed rulings'; the amendment authors
+  the contract it was sequenced behind, and its landing retires that paragraph.
+  ruled: harness-template-port-residue operator 2026-08-31 consult
+  **THE MEMBER SET IS RULED SEPARATELY AND THE AUTHORITY IS THE OPERATOR'S, RELAYED.** Two of
+  the twelve do not speak the hook protocol, and one of those — the usage poller — gives the
+  INSTALLED binary a path that reads an OAuth credential file and reaches an external
+  endpoint. TRAJECTORY.md §The objectives rules nothing on that binary's capability surface,
+  so spec escalated rather than deciding. **Ruled: ship all twelve.** If the question ever
+  returns the fallback is ELEVEN members, 67 lines owed, never six — only the poller raises
+  it, `statusline-usage` being a plain ANSI line with no credential and no network.
+  ruled: harness-template-port-residue operator 2026-08-31 lead-relay
+  **SELECTED AS `harness-hook-arm-port`'s CUT, 2026-08-31**, by the composer's
+  stated-contract rule — one section (gate-sdk/SPEC.md §The non-gate arm), one amendment —
+  and decisively because it is the only owed cohort whose blocking design fork is already
+  closed. **A SECOND CUT WAS NOT REFUSED ON PACKAGING GROUNDS AND THIS IS NO PRECEDENT FOR
+  ONE CUT PER ITERATION**, which the 2026-08-30 operator ruling calls an over-read: none was
+  available, every alternative needing an unruled fork opened before it could be composed. A
+  later iteration holding two ready cuts takes both. **The port ships 12 of the 14 wired
+  harness members** — `scripts/session-context.sh` and `scripts/bash-guard.sh` are declared
+  `no-port`, so the hook substrate stays mixed by design. The absent-binary fail-open rule,
+  the `Arm`-variant knob mis-declaration and the untagged `DELEGATION_KIT_LIVENESS_CMD`
+  divergence are the amendment's deltas 3, 5 and 9 rather than this entry's.
+  ruled: harness-template-port-residue lead 2026-08-31 own-authority
+  Filed 2026-08-30 by build, at the landing of the harness-template class ruling; promoted
+  2026-08-31 by spec, paired with its amendment in one commit.
+
 ## Technical Debt
 
 ## Deferred
@@ -157,57 +190,6 @@
   Filed 2026-08-31 by close, draining two 2026-08-30 gap bullets. Fix was tried first and refused
   (the assertion the second bullet proposes reds a benign population); icebox second, refused
   because a gate's verdict on an adopter's host is adopter-facing.
-
-- **harness-template-port-residue** [design-pending] — the harness and git-hook template members
-  the 2026-08-30 class ruling deliberately leaves owed, filed rather than absorbed per that cut's
-  own boundary.
-  **These members are owed, not undecided.** gate-sdk/SPEC.md §The harness-template port
-  disposition is a **partition** — it rules a template permanently shell only where its body
-  carries a consumer-filled gap or holds rule content the kit may not name — and it names each
-  member below on its owed side. Nothing there argues they are hard to port.
-  **The owed side, re-verified at 2026-08-31 scope against `--emit port-blockers --tree`:**
-  `delegation-kit/templates/` `agent-budget-guard.sh` (18), `agent-dispatch-guard.sh` (61),
-  `statusline-usage.sh` (101), `subagent-stop-liveness.sh` (91), `usage-poller.sh` (67);
-  `guard-kit/templates/` `escalation-guard.sh` (27), `wakeup-guard.sh` (20);
-  `lifecycle-kit/templates/workflow-state-guard.sh` (29); and the `scripts/` copies
-  `agent-budget-guard.sh` (18), `agent-dispatch-guard.sh` (61), `subagent-stop-liveness.sh` (91),
-  `workflow-state-guard.sh` (29). 613 lines. A copy is not separately portable: it is **deleted**
-  when its template ports, which is the copy rule that section states once.
-  **THREE FACTS A PORTING SESSION WOULD OTHERWISE BUY AGAIN; the 2026-08-31 ruling below spent the
-  first two, so only their residue is kept.** **(1)** `native/src/emit/mod.rs`'s `BRIDGED_ARMS`
-  holds emitters plus the battery runner and no arm reading a hook payload from stdin, writing a
-  hook-JSON envelope, or using exit status as protocol — which `subagent-stop-liveness.sh` and
-  `wakeup-guard.sh` both do. This port mints an arm **kind**; the contract it was sequenced behind
-  is now this cut's own amendment. **(2)** `native/src/main.rs`'s reads-no-knob sentence is
-  answered by that ruling's env exemption, and of the two env readers it named
-  `session-context.sh` is declared `no-port` while `statusline-usage.sh` is covered.
-  **(3) The settings surface is named twice and only one half is gated**, re-probed 2026-08-31.
-  `.claude/settings.json:61`'s `permissions.allow[]` grant naming
-  `delegation-kit/templates/usage-poller.sh` is `check-settings-paths`' corpus, so deleting that
-  file reds a gate unless the grant moves in the same commit — `native-gate-port-remaining-corpus`'
-  settings-grant carve-out exactly. **The larger half reds nowhere:** seven members are wired as
-  hook `command` fields at lines 120-171 that `check-settings-paths` never reads, it taking the
-  allow array alone. That hole is `settings-hook-command-path-gate`, filed 2026-08-22 and **not**
-  re-filed here; this entry records only that the residue is the population walking into it.
-  **THE ARM-KIND QUESTION IS RULED 2026-08-31 (operator, consult): one dispatching hook arm.** A
-  hook substrate belongs in the binary as ONE arm — hook name as argv, harness payload on stdin,
-  hook-JSON envelope out, exit status as protocol — with its env read exempted for this arm alone
-  from the reads-no-knob sentence. Ruling and refused shapes: TRAJECTORY.md §The closed rulings.
-  Recovering each member's harness wiring stays mandatory before authoring the contract.
-  ruled: harness-template-port-residue operator 2026-08-31 consult
-  **SELECTED AS `harness-hook-arm-port`'s CUT, 2026-08-31**, by the composer's stated-contract rule
-  — one section (gate-sdk/SPEC.md §The non-gate arm), one amendment — and decisively because it is
-  the only owed cohort whose blocking design fork is already closed. **A SECOND CUT WAS NOT
-  REFUSED ON PACKAGING GROUNDS AND THIS IS NO PRECEDENT FOR ONE CUT PER ITERATION**, which the
-  2026-08-30 operator ruling calls an over-read: none was available, every alternative needing an
-  unruled fork opened before it could be composed. A later iteration holding two ready cuts takes
-  both. **The port ships 12 of the 14 wired harness members** — `scripts/session-context.sh` and
-  `scripts/bash-guard.sh` are declared `no-port`, so the hook substrate stays mixed by design.
-  ruled: harness-template-port-residue lead 2026-08-31 own-authority
-  **Cost while deferred:** low for the argument, standing for the work — the ground is stated, so
-  no future cut re-argues the class; the 613 lines sit in the owed column TRAJECTORY.md's
-  completion predicate is stated over.
-  Filed 2026-08-30 by build, at the landing of the harness-template class ruling.
 
 - **kit-library-port-residue** [design-pending] — the kit `lib/*.sh` members the 2026-08-30 class
   ruling deliberately leaves owed, filed rather than absorbed per that cut's own boundary.
