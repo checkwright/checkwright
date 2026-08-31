@@ -222,6 +222,40 @@ pub fn run_merged(program: &str, args: &[&str]) -> Result<Merged, String> {
     Ok(Merged { status, output })
 }
 
+// spec: delegation-kit/SPEC.md §The turn-end liveness hook — `run` under a wall-clock bound, the
+// one shape `run` cannot carry: a hook member calling a consumer-named reader must not hang a turn
+// on it. `Ok(None)` is the bound expiring, `timeout(1)`'s 124 without the optional program.
+pub fn run_bounded(program: &str, args: &[&str], secs: u64) -> Result<Option<i32>, String> {
+    #[cfg(test)]
+    recorder::note(program);
+    let mut child = Command::new(program)
+        .args(args)
+        .stdin(std::process::Stdio::null())
+        .stdout(std::process::Stdio::null())
+        .stderr(std::process::Stdio::null())
+        .spawn()
+        .map_err(|e| {
+            format!(
+                "cannot run {}: {} — the check could not run; treating as failure (not clean)",
+                program, e
+            )
+        })?;
+    let deadline = std::time::Instant::now() + std::time::Duration::from_secs(secs);
+    loop {
+        match child.try_wait() {
+            Ok(Some(status)) => return Ok(Some(exit_code(&status))),
+            Ok(None) => {}
+            Err(e) => return Err(format!("cannot wait for {}: {}", program, e)),
+        }
+        if std::time::Instant::now() >= deadline {
+            let _ = child.kill();
+            let _ = child.wait();
+            return Ok(None);
+        }
+        std::thread::sleep(std::time::Duration::from_millis(25));
+    }
+}
+
 // spec: drift-kit/SPEC.md §The KPI plugin contract — `run` with additions to the *child's*
 // environment, the one shape `run` cannot carry. Writing the child's rather than the process's is
 // what leaves knobenv's guard the only writer of the process-global one.

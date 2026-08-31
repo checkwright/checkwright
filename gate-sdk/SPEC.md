@@ -1970,7 +1970,7 @@ name out of `gates::REGISTRY`. It also carries arms that are **not** gates —
 `--list`, `--reads`, `--knobs`, `--source-stamp`, `--queue-parity`,
 `--declaration-parity`, `--evidence-lib-parity` and `--install`, plus the
 `--emit-` family the bridged-arm table keys (`--emit-drift-report` is its
-2026-08-29 member) — and the class
+2026-08-29 member) and the **harness-integration** arms below it — and the class
 they form is named here because a
 session arriving with a new non-gate thing to port has no other way to learn
 that one exists or what it costs. Each arm's own `spec:` comment explains that
@@ -2191,14 +2191,30 @@ undeclared-knob refusal at that member's own dispatch — so a knob outside it i
 reported `?` with the same *default unresolvable* evidence, the fail-safe
 direction unchanged.
 
-**The dispatch union keys on the arm's *variant* rather than on the member, and
-the sentinel is what let a second member express a union without moving it.**
-`knobs` answers `Arm::Run` with the dispatch union and `Arm::Emit` with the
-member's own roster; that is exact today because one member carries the
-dispatching variant, and the port did not have to widen it, because a sentinel in
-a member's declared roster expresses the same union per member. Recorded because
-the two mechanisms look interchangeable and are not: the dispatcher hands each
-*child* its own slice, where the sentinel resolves a union the arm itself reads.
+**The declared-knob union keys on the member's own roster and never on the arm's
+*variant*, because `Arm` is a return shape and a union is a read set.** `knobs`
+once answered `Arm::Run` with the dispatch union and `Arm::Emit` with the
+member's own roster. That was exact only while one member carried `Arm::Run`, and
+the harness-integration arms ended it: each of them prints on its own channels
+and returns a status, so each is `Arm::Run`, and **none of them dispatches a
+gate**. Left keyed on the variant, every one would have declared the union of
+every registered gate's knobs and the bridge would have resolved the whole
+battery's configuration to run one hook. So the union moved into a **sentinel in
+the member's own declared roster** — the shape `--emit-port-blockers` already
+carried — `--run` carries it, and `knobs` expands whatever sentinels a roster
+holds without asking what the arm returns. Recorded because the variant test and
+the sentinel look interchangeable and are not: the dispatcher hands each *child*
+its own slice, where the sentinel resolves a union the arm itself reads.
+
+**A sentinel is minted with its expansion, and there are two.**
+`EVERY_REGISTERED_KNOB` expands to every knob the **tree's** registry declares,
+scoped by the arm's own `--gates-dir` argv; `EVERY_HOOK_KNOB` expands to one
+hook member's knobs where the arm's argv names a member and to the union over the
+hook table where it does not. Both live beside `knobs` rather than beside a
+member that spells one, because the expansion is the mechanism's and a member
+only declares it — and the two registry-scoped expansions that grew up beside
+their first callers collapsed to one when the second sentinel made the
+duplication unavoidable.
 
 **A derived knob set is not always the union sentinel, and the two are near
 enough to be confused.** drift-kit's collator (drift-kit/SPEC.md §The report
@@ -2269,6 +2285,123 @@ property read forward: the runner never invokes a sibling arm, so declaring its
 knobs would violate the very rule `--knobs` exists to hold. A gate that reaches
 an emitter in-process declares that emitter's knobs on its own registry entry,
 which is the transitive-coupling rule below already covering the case.
+
+#### The harness-integration arm
+
+A **harness-integration arm** is a bridged non-gate arm whose named caller is the
+**coding harness** rather than a battery, a stage step, a regen command or a gate
+reaching it in process. It satisfies the class's three properties unchanged —
+`--`-prefixed and resolved before the registry lookup, absent from `--list`; no
+descriptor, no `gates.list` registration, no `good/`+`bad/` fixture pair; a named
+caller. What it adds is that **its channels are the harness's, not the gate
+output contract's**: stdin carries a harness payload, stdout carries whatever
+that integration point reads, and the exit status means what the harness says it
+means rather than what §Output contract says. That sentence is the whole of the
+new property, and it is worth stating because every earlier member of the class
+answers to a caller this project wrote.
+
+**The family is forced, not chosen.** The forced-family test above settles it:
+these members read a consumer's own rosters and paths — a read-only dispatch-type
+roster, a verdict binary, a liveness reader — out of the owning kit's config. A
+hardcoded top-level flag receives no consumer override and would resolve platform
+defaults while silently ignoring them, the difference between working and
+appearing to. So every member is a **bridged-arm table** member and its knobs
+reach it through `gate_knob_env`.
+
+**`--hook <member>` takes the member name as argv, never the hook *event*
+name.** `.claude/settings.json` scopes hooks by `matcher` inside an event, and a
+`PreToolUse` carrying several matcher groups need not have interchangeable
+members — a shell member and a ported member may sit in one group, which is what
+the mixed substrate means. An event-named arm would have to re-derive the matcher
+from the payload, would fire on every tool call rather than the matched ones, and
+could not express that mixture. The member name makes the port a one-for-one
+substitution of the `command` value and leaves every matcher untouched.
+
+**Two shapes are refused, and the refusals are the contract rather than
+commentary.** *One arm per member* is refused because arms speaking one protocol
+each owe a named caller and share one, so the class rule above is met once rather
+than once per member; a per-member flag spelling would also have to be composed
+by the front-end's grammar, which is the second copy of a decision the crate
+already holds. *Hooks stay shell as a class* is refused because a per-hook bash
+file is exactly the duplicate a second-platform port has to write twice — the
+substrate question this class exists to settle. Both were ruled at the operator's
+2026-08-31 consult and land here as the contract that ruling was sequenced behind.
+
+**The channels.** *argv* is `<member>`, one token from the table's closed roster;
+an unknown member is exit 2 with the roster named, the `no_such_gate` shape.
+*stdin* is the harness payload, read whole and parsed with `serde_json`; an
+absent, empty or unparseable payload takes the member's own **degraded** path —
+the path each shell member already had for a missing `jq` — never a panic and
+never a block the member would not otherwise have issued. *stdout* is the
+hook-JSON envelope where the member emits one, **serialized rather than composed
+by `printf`**, which retires a live fragility: a shell member's jq-absent arm
+hand-wrote the envelope with no escaper and kept its advisory literals free of
+any character JSON must escape by convention alone. A member emitting no envelope
+writes nothing on stdout. *stderr* is the member's block or refusal text, which
+the harness shows. *exit status* is the harness's protocol, returned unchanged:
+`0` allow or advise, `2` block or refuse. A member using the status channel alone
+is using the protocol, not excepted from it.
+
+**The member table is the single roster.** `native/src/hook/mod.rs` owns a
+`HOOKS` table keyed by member name, each row carrying the member's function and
+its declared knob slice, with one module per member beside it. That table is what
+the arm dispatches on, what `--knobs --hook` reads through the `EVERY_HOOK_KNOB`
+sentinel, and what the unknown-member refusal prints — derived once, never
+transcribed. Two knob shapes do **not** reach a member's slice. `GUARD_KIT_LIB`
+does not, because it named the shell library the member sourced for its
+primitives and a compiled member sources nothing. A knob that **selects which
+config file the bridge sources** does not either: it redirects something
+`gate_command` has already resolved before the exec, which is the distinguishing
+test above, and it keeps working one layer out because the bridge reads it from
+the environment when it sources the owning kit's library.
+
+**A default the deleted shell driver held inline moves into the owning kit's
+library in the same cut**, and for these members that rule is load-bearing rather
+than tidy: the bridge **refuses the whole environment** for a declared knob the
+owning kit's `lib/` does not define, and on a hook path that refusal is a block.
+A member's roster and its kit library's defaults are therefore one change, never
+two.
+
+**The absent-binary behavior, which the port creates and must therefore settle.**
+`exec_arm` exits 2 when the binary is absent or not executable, and on a hook path
+that status is *block the tool call* — so a tree that vendored the kits and has no
+binary for its platform, criterion 5's omit-and-declare branch, would refuse every
+guarded call. Today that failure mode does not exist, because a shell member is
+always present once vendored; the port creates it, so the port owes the rule.
+**The rule:** a harness-integration arm whose exit status is a **gate on a user
+action** fails **open** when it cannot run at all — the front-end writes the
+diagnostic and the remedy to stderr and exits `0`, so the guard declines rather
+than wedging the session. *Cannot run at all* has exactly two causes the
+front-end can see, and both take this branch: the binary is absent, and the
+config bridge refused. The second is not a widening but the same finding reached
+one step later — and it is what keeps a malformed *unrelated* knob in a kit's
+validating loader from wedging every guarded tool call, which is the property a
+shell member bought by reading its one knob outside that loader. A member that
+finds its own declared knob unresolved declines the same way, loudly, on the
+reasoning that reaching the arm without the bridge is the same fact seen from
+inside. An arm whose caller is a refresh command or a session rather than a gate
+on a tool call keeps exit 2.
+
+**There is no tension with §Fail-closed contract to reconcile, and saying so once
+is the point of this paragraph.** That contract attaches to a *gate* — this
+section rules it onto "a thing that returns a verdict a battery reads" — and a
+harness-integration arm returns a verdict to the harness, not to a battery. A
+later reader meeting a non-gate arm that fails open should read a class that was
+never governed by it, rather than filing a defect against a contract that does
+not reach here. **The ground is guard-kit's own, not an invention:**
+`guard-kit/lib/guard.sh` already fails open on missing infrastructure, so a
+missing jq or settings file emits nothing and every reader declines. A guard that
+cannot run must decline, not brick. The alternative — fail closed, matching the
+gate battery — is refused because its blast radius is every tool call in the
+session and its trigger is an adopter's platform rather than an adopter's error.
+
+**The port necessarily mints a second producer of the hook envelope**, in Rust,
+beside `guard-kit/lib/guard.sh`'s, because that library stays permanently shell
+on its own declared grounds. That is not the duplication criterion 6 refuses —
+the refused shape is a second resolver of one *configuration*, and this is one
+*protocol* spoken on two substrates — and it is exactly what a mixed hook
+substrate means. Recorded rather than left to be re-derived, because the next
+reader will meet two envelope writers and ask.
 
 **A gate that reaches an arm in-process acquires a source coupling its
 descriptor must carry, and the trigger set does not follow the port on its
@@ -8227,6 +8360,29 @@ trusted to keep stderr clean. Reproducing it locally means restoring the
 signal environment (`trap '' PIPE`), which is what makes the
 `lib-gate.test.sh` arm deterministic instead of environmental.
 
+`run-gates.sh --hook <member>` dispatches a **harness-integration arm** (§The
+non-gate arm), and it is the front-end's one branch whose caller is not this
+project's. The member name is an **operand** here and the **whole flag** in the
+crate — unlike `--emit <name>`, which the front-end composes into `--emit-<name>`
+— because composing `--hook-<member>` would be one arm per member, the refused
+shape, reached by the front-end's grammar instead of by the crate's. There is no
+new shell file: `exec_arm` already resolves the bridged environment and `exec`s,
+and `exec` preserves stdin, so the harness payload reaches the arm untouched and
+the front-end writes nothing on stdout along this path. A dedicated
+`bin/run-hook.sh` was weighed and refused — it would add an owed shell member to
+the column this port exists to drain, and duplicate `exec_arm`.
+
+**`exec_arm` gains one variant, and it is a status rather than a second
+function.** The two ways a dispatch can fail before the arm runs — an absent or
+non-executable binary, and a config bridge that refused — both exit
+`$ARM_UNAVAILABLE_STATUS`, which is `2` for every arm whose verdict a battery or
+a session reads and `0` for `--hook`, whose status is the harness's allow/block
+signal. The diagnostic is written to stderr either way, so the failure is loud on
+both settings; only the status differs, which is §The non-gate arm's fail-open
+rule spelled at the one place both causes converge. A status rather than a second
+`exec_arm` is what keeps the bridge resolution, the `env` composition and the
+`exec` single-sourced.
+
 `run-gates.sh --for <path> [<path>...]` is the path-scoped selector, the
 agent-callable half of the oracle-first rule: it resolves the registry exactly
 as a bare run, then runs only the members whose *effective trigger* (`trigger=`
@@ -8305,8 +8461,8 @@ have to.
 **The runner honours §The bin/-tool contract**, which binds because its
 positional is free text — a path — and an arity check is not a shape check. `-h`
 or `--help` as the first argument prints the usage on **stdout** at exit 0; a
-first argument beginning with `-` that is none of `--emit`, `--for`, `--only`,
-`-h`, `--help` or `--` is a refusal, usage on **stderr** at exit 2, naming the
+first argument beginning with `-` that is none of `--emit`, `--hook`, `--for`,
+`--only`, `-h`, `--help` or `--` is a refusal, usage on **stderr** at exit 2, naming the
 unrecognized option; and `--` ends option processing, so a gates-dir legitimately
 spelled with a leading dash stays reachable. A name beginning with `-` is an
 unrecognized option wherever it stands, so `--only --for` refuses at the name

@@ -2529,6 +2529,14 @@ the class ruling at gate-sdk/SPEC.md §The config-seam port disposition. Knobs
   filter: a
   prefix the consumer declared cannot be lost, and without `gate.sh` the config
   is used exactly as written.
+- `DELEGATION_KIT_VERDICT_BIN` — the budget verdict binary the D1/D2 budget guard
+  spawns and grades by exit status (§The delegation model); default
+  `delegation-kit/bin/usage-verdict.sh`, the vendored path. It is a knob rather
+  than a literal because a consumer may vendor the kit elsewhere, and the
+  default lives in `lib/delegation.sh` rather than beside its reader for the
+  reason gate-sdk/SPEC.md §The non-gate arm states: the config bridge resolves a
+  declared knob by sourcing exactly that library, so a default sitting anywhere
+  else is sourced by nothing and the bridge refuses the whole environment.
 - `DELEGATION_KIT_STOP_LOG` — the turn-end probe's log (§The turn-end liveness
   probe (template)); default
   `${GATE_SDK_WORKFLOW_DIR:-.workflow}/subagent-stop-liveness.log`, the same

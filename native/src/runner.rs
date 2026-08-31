@@ -14,14 +14,15 @@ use std::time::Instant;
 // message shapes are the tool's documented surface and the arm is what the front-end exec'd
 const TOOL: &str = "run-gates";
 
-// spec: gate-sdk/SPEC.md §The non-gate arm — the arm's own bridged reads. The roster `--knobs --run`
-// prints is the *union* of these with every registry member's and every sibling arm's, derived in
-// `emit::knobs` rather than maintained here.
+// spec: gate-sdk/SPEC.md §The non-gate arm — the arm's own bridged reads, plus the union sentinel:
+// `--knobs --run` prints these with every registry member's added, expanded in `emit::knobs`. The
+// sentinel is what expresses the dispatch union per member rather than per `Arm` variant.
 pub const KNOBS: &[&str] = &[
     "GATE_SDK_GATES_DIR",
     "GATE_KIT_ROOTS_HERE",
     "GATE_KIT_ROOTS_REL",
     "GATE_SDK_TMP_DIR",
+    crate::emit::EVERY_REGISTERED_KNOB,
 ];
 
 // spec: gate-sdk/SPEC.md §run-gates — one selected member: the name, and the staged-mode positional
@@ -77,20 +78,6 @@ fn parse(args: &[String]) -> Result<Args, String> {
         }
     }
     Ok(out)
-}
-
-// spec: gate-sdk/SPEC.md §The non-gate arm — the member set the declared-knob union is scoped to:
-// the `gates.list` the caller named. An unreadable or unnamed registry yields nothing, so the run
-// itself is what produces the `no registry at` refusal.
-pub fn registered_members(args: &[String]) -> Vec<String> {
-    let Ok(a) = parse(args) else { return Vec::new() };
-    let Some(dir) = a.gates_dir else {
-        return Vec::new();
-    };
-    match std::fs::read_to_string(registry::list_path(&dir)) {
-        Ok(t) => registry::members(&t),
-        Err(_) => Vec::new(),
-    }
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — worker count: `GATE_SDK_JOBS` where the environment carries a

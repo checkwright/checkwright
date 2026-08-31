@@ -23,6 +23,7 @@ usage: run-gates.sh [gates-dir]                run every registered gate
        run-gates.sh --only <name> [<name>...]  run only the named registered gates
        run-gates.sh --for <path> [<path>...]   run only gates coupling to those paths
        run-gates.sh --emit <arm> [args...]     dispatch a ported non-gate emitter arm
+       run-gates.sh --hook <member>            dispatch a harness hook member, payload on stdin
        run-gates.sh -h | --help                this text, on stdout, exit 0
 
   --only  runs the named members in registry order whatever order they were
@@ -34,6 +35,12 @@ usage: run-gates.sh [gates-dir]                run every registered gate
           would. A path no gate couples to is a note, not a failure.
   --emit  dispatches the named non-gate arm of the native binary, handing it
           every remaining argument.
+  --hook  dispatches the named harness hook member: the harness payload passes
+          through on stdin, the hook-JSON envelope (where the member emits one)
+          comes back on stdout, and the exit status is the harness's own
+          allow/block signal. Where the binary is absent or its configuration
+          cannot be resolved, this arm declines with a diagnostic on stderr and
+          exit 0 rather than blocking every guarded tool call.
   --      ends option processing, so a gates-dir spelled with a leading dash
           is still reachable.
 
@@ -53,7 +60,8 @@ unrecognized_option() {
     exit 2
 }
 
-# spec: gate-sdk/SPEC.md §run-gates — the bridged environment for one arm, resolved and exec'd: the front-end's whole job beyond argv, and the shape `--emit` already had
+# spec: gate-sdk/SPEC.md §run-gates — the bridged environment for one arm, resolved and exec'd: the front-end's whole job beyond argv, and the shape `--emit` already had. $ARM_UNAVAILABLE_STATUS is the status a *dispatch* failure exits — 2 for every arm whose verdict a battery or a session reads, 0 for a harness-integration arm gating a user action, which §The non-gate arm rules must decline rather than wedge the session
+ARM_UNAVAILABLE_STATUS=2
 exec_arm() {
     local arm="$1"
     shift
@@ -63,9 +71,9 @@ exec_arm() {
     if [[ ! -x "$bin" ]]; then
         printf 'run-gates: %s dispatches to the native binary, but %s is absent or not ' "$arm" "$bin" >&2
         printf 'executable — it could not run. Build it: bash gate-sdk/bin/build-native.sh\n' >&2
-        exit 2
+        exit "$ARM_UNAVAILABLE_STATUS"
     fi
-    env_out="$(gate_knob_env "$arm" "$@")" || exit 2
+    env_out="$(gate_knob_env "$arm" "$@")" || exit "$ARM_UNAVAILABLE_STATUS"
     [[ -n "$env_out" ]] && mapfile -t elems <<<"$env_out"
     exec env ${elems[@]+"${elems[@]}"} "$bin" "$arm" "$@"
 }
@@ -89,6 +97,19 @@ case "${1-}" in
         [[ -n "$EMIT_ARM_NAME" ]] || { echo "run-gates: --emit needs an arm name" >&2; exit 2; }
         shift
         exec_arm "--emit-$EMIT_ARM_NAME" "$@"
+        ;;
+    # spec: gate-sdk/SPEC.md §The non-gate arm — the harness-integration arm: the member name is an
+    # operand, never composed into the flag, and `exec` preserves stdin so the harness payload
+    # reaches the arm untouched
+    # spec: gate-sdk/SPEC.md §run-gates — the fail-open status: this arm's exit is the harness's
+    # allow/block signal, so a tree with no binary for its platform declines rather than refusing
+    # every guarded tool call
+    --hook)
+        shift
+        HOOK_MEMBER="${1:-}"
+        [[ -n "$HOOK_MEMBER" ]] || { echo "run-gates: --hook needs a member name" >&2; exit 2; }
+        ARM_UNAVAILABLE_STATUS=0
+        exec_arm --hook "$@"
         ;;
     --for)
         shift

@@ -30,6 +30,17 @@ unset _dk_cfg
 [[ -v DELEGATION_KIT_FAN_WIDTH ]] || DELEGATION_KIT_FAN_WIDTH=2
 [[ -v DELEGATION_KIT_AGENT_DIR ]] || DELEGATION_KIT_AGENT_DIR=".claude/agents"
 
+# spec: gate-sdk/SPEC.md §The non-gate arm — the defaults the deleted shell drivers held inline,
+# moved here in the same cut: the bridge resolves a declared knob by sourcing exactly this
+# library, and refuses the whole environment for one it finds undefined
+[[ -v DELEGATION_KIT_VERDICT_BIN ]] || DELEGATION_KIT_VERDICT_BIN="delegation-kit/bin/usage-verdict.sh"
+[[ -v DELEGATION_KIT_STOP_LOG ]] || DELEGATION_KIT_STOP_LOG="${GATE_SDK_WORKFLOW_DIR:-.workflow}/subagent-stop-liveness.log"
+# spec: delegation-kit/SPEC.md §The turn-end liveness hook — no shipped default: the reader is a path the consumer names, because the gate behind it is name-addressed and this knob is not taught to resolve a name
+[[ -v DELEGATION_KIT_LIVENESS_CMD ]] || DELEGATION_KIT_LIVENESS_CMD=""
+
+# spec: delegation-kit/SPEC.md §The delegation model — D2's roster ships empty: a read-only dispatch type is a consumer's own vocabulary, so the kit declares the knob and names no member of it
+declare -p DELEGATION_KIT_READONLY_TYPES &>/dev/null || DELEGATION_KIT_READONLY_TYPES=()
+
 declare -p DELEGATION_KIT_GATE_FILES &>/dev/null || DELEGATION_KIT_GATE_FILES=(
     "${GATE_SDK_GATES_DIR:-scripts}/check-*.sh"
     "${GATE_SDK_GATES_DIR:-scripts}/check-*.gate"

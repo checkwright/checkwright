@@ -52,11 +52,16 @@ pub fn self_repo_prefix(reference: &str) -> String {
 pub type EmitFn = fn(&[String]) -> Result<String, String>;
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — a bridged arm either renders a document or returns an
-// exit code; the class the table keys is *bridged*, not *emitting*, so both shapes sit in it.
+// exit code; the class the table keys is *bridged*, not *emitting*. The variant is a return shape
+// and nothing else — no declared-knob union keys on it.
 pub enum Arm {
     Emit(EmitFn),
     Run(fn(&[String]) -> i32),
 }
+
+// spec: gate-sdk/SPEC.md §The non-gate arm — the registry union sentinel, owned beside `knobs`
+// rather than beside the first member that spelled it: the expansion is the mechanism's.
+pub const EVERY_REGISTERED_KNOB: &str = "@every-registered-knob";
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — the **bridged-arm table**, keyed by the arm's own flag
 // spelling: `--knobs` publishes each member's roster and a front-end resolves it, which is the
@@ -200,11 +205,14 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         drift_report::KNOBS,
     ),
     // spec: gate-sdk/SPEC.md §run-gates — the battery runner: the class's first bridged member
-    // that returns a verdict rather than a document, and the reason the table is keyed by flag.
+    // that returns a verdict rather than a document, and the reason the table is keyed by flag
+    ("--run", Arm::Run(crate::runner::run), crate::runner::KNOBS),
+    // spec: gate-sdk/SPEC.md §The non-gate arm — the one dispatching harness-integration arm; its
+    // roster is a sentinel because the answer is one member's knobs, scoped by its own argv
     (
-        "--run",
-        Arm::Run(crate::runner::run),
-        crate::runner::KNOBS,
+        "--hook",
+        Arm::Run(crate::hook::run),
+        &[crate::hook::EVERY_HOOK_KNOB],
     ),
 ];
 
@@ -215,52 +223,69 @@ pub fn lookup(arm: &str) -> Option<&'static Arm> {
         .map(|(_, f, _)| f)
 }
 
-// spec: gate-sdk/SPEC.md §The non-gate arm — a dispatching arm's declared reads are the **union** of
-// its own with every registry member's and every sibling arm's, derived from the registry and this
-// table rather than maintained beside them, which is the data both already hold.
+// spec: gate-sdk/SPEC.md §The non-gate arm — an arm's declared reads are its own roster with every
+// sentinel in it expanded, derived rather than maintained. One expansion for every member: the
+// `Arm` variant is not consulted at all.
 pub fn knobs(arm: &str, rest: &[String]) -> Option<Vec<&'static str>> {
-    let (_, f, own) = BRIDGED_ARMS.iter().find(|(a, _, _)| *a == arm)?;
-    match f {
-        Arm::Emit(_) => Some(sentinel_union(own, rest)),
-        Arm::Run(_) => Some(dispatch_union(own, rest)),
-    }
+    let (_, _, own) = BRIDGED_ARMS.iter().find(|(a, _, _)| *a == arm)?;
+    Some(expand(own, rest))
 }
 
-// spec: gate-sdk/SPEC.md §The non-gate arm — the union sentinel, expressible per member without
-// moving the dispatch union: an arm whose roster carries it is bridged every knob the *tree's*
-// registry declares, and an arm that does not carry it keeps exactly its own roster.
-fn sentinel_union(own: &'static [&'static str], rest: &[String]) -> Vec<&'static str> {
-    if !own.contains(&port_blockers::EVERY_REGISTERED_KNOB) {
+// spec: gate-sdk/SPEC.md §The non-gate arm — an arm carrying no sentinel keeps exactly its own
+// roster, argv for argv; one carrying either is bridged that sentinel's expansion instead, and the
+// result is sorted and deduped because two sentinels can name one knob.
+fn expand(own: &'static [&'static str], rest: &[String]) -> Vec<&'static str> {
+    if !own.iter().any(|k| is_sentinel(k)) {
         return own.to_vec();
     }
-    let mut all: Vec<&'static str> = own
-        .iter()
-        .copied()
-        .filter(|k| *k != port_blockers::EVERY_REGISTERED_KNOB)
-        .collect();
-    for name in port_blockers::registered_members(rest) {
-        if let Some(k) = crate::gates::knobs(&name) {
-            all.extend_from_slice(k);
+    let mut all: Vec<&'static str> = own.iter().copied().filter(|k| !is_sentinel(k)).collect();
+    if own.contains(&EVERY_REGISTERED_KNOB) {
+        for name in registered_members(rest) {
+            if let Some(k) = crate::gates::knobs(&name) {
+                all.extend_from_slice(k);
+            }
         }
+    }
+    if own.contains(&crate::hook::EVERY_HOOK_KNOB) {
+        all.extend_from_slice(&hook_knobs(rest));
     }
     all.sort_unstable();
     all.dedup();
     all
 }
 
-// spec: gate-sdk/SPEC.md §The non-gate arm — the union is scoped to the members **this tree
-// registers**, which is why the caller's own argv reaches it: the crate carries every ported
-// member whatever the consumer vendored.
-fn dispatch_union(own: &'static [&'static str], rest: &[String]) -> Vec<&'static str> {
-    let mut all: Vec<&'static str> = own.to_vec();
-    for name in crate::runner::registered_members(rest) {
-        if let Some(k) = crate::gates::knobs(&name) {
-            all.extend_from_slice(k);
-        }
+fn is_sentinel(knob: &str) -> bool {
+    knob == EVERY_REGISTERED_KNOB || knob == crate::hook::EVERY_HOOK_KNOB
+}
+
+// spec: gate-sdk/SPEC.md §The non-gate arm — `--knobs --hook <member>` answers that member's own
+// roster and `--knobs --hook` with no member the union over the table: the per-member answer is
+// what makes the bridge resolve one guard's configuration rather than six.
+fn hook_knobs(rest: &[String]) -> Vec<&'static str> {
+    match rest.first().and_then(|m| crate::hook::knobs(m)) {
+        Some(k) => k.to_vec(),
+        None => crate::hook::HOOKS
+            .iter()
+            .flat_map(|(_, _, k)| k.iter().copied())
+            .collect(),
     }
-    all.sort_unstable();
-    all.dedup();
-    all
+}
+
+// spec: gate-sdk/SPEC.md §The non-gate arm — the member set the registry sentinel scopes to, and
+// the crate's one implementation of that scan: the scope arrives as argv, so `--gates-dir` is read
+// out of whatever grammar the arm carries and its absence under-reports rather than fails open.
+fn registered_members(args: &[String]) -> Vec<String> {
+    let Some(dir) = args
+        .iter()
+        .position(|a| a == "--gates-dir")
+        .and_then(|i| args.get(i + 1))
+    else {
+        return Vec::new();
+    };
+    match std::fs::read_to_string(crate::registry::list_path(dir)) {
+        Ok(t) => crate::registry::members(&t),
+        Err(_) => Vec::new(),
+    }
 }
 
 pub fn arms() -> Vec<&'static str> {

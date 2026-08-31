@@ -17,13 +17,11 @@ pub const KNOBS: &[&str] = &[
     "GATE_PRUNE_DIRS",
     "GATE_SDK_PROGRAM_FLOOR",
     "GATE_SDK_TESTS_DIR",
-    EVERY_REGISTERED_KNOB,
+    // spec: gate-sdk/SPEC.md §The non-gate arm — the union sentinel: this arm resolves an
+    // *arbitrary* knob discovered at scan time, so a fixed roster cannot name what it must read.
+    // It expands to the knobs of every member the **tree's** registry names, `--gates-dir`-scoped.
+    super::EVERY_REGISTERED_KNOB,
 ];
-
-// spec: gate-sdk/SPEC.md §The non-gate arm — the union sentinel: this arm resolves an *arbitrary*
-// knob discovered at scan time, so a fixed roster cannot name what it must read. It expands to the
-// knobs of every member the **tree's** registry names, which the `--gates-dir` argv scopes.
-pub const EVERY_REGISTERED_KNOB: &str = "@every-registered-knob";
 
 const USAGE: &str = "\
 usage: run-gates.sh --emit port-blockers [--gates-dir <dir>] [--group | --tree]
@@ -482,24 +480,6 @@ fn scan_rows(member: &str, decl: &str, text: &str, reg: &Registry) -> Member {
         });
     }
     m
-}
-
-// spec: gate-sdk/SPEC.md §The non-gate arm — the union sentinel's scope arrives as argv because the
-// expansion happens before the bridge is built; absent it the union degrades to the arm's own knobs
-// and a command-position expansion reports `?`, which is an under-report and never a fail-open.
-pub fn registered_members(args: &[String]) -> Vec<String> {
-    let dir = match args
-        .iter()
-        .position(|a| a == "--gates-dir")
-        .and_then(|i| args.get(i + 1))
-    {
-        Some(d) => d,
-        None => return Vec::new(),
-    };
-    match std::fs::read_to_string(registry::list_path(dir)) {
-        Ok(t) => registry::members(&t),
-        Err(_) => Vec::new(),
-    }
 }
 
 // spec: gate-sdk/SPEC.md §port-blockers — criterion 2's column reads the fixture dirs

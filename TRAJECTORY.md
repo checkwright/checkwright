@@ -369,22 +369,16 @@ gate-sdk/SPEC.md §port-blockers), and widening the exclusion would let *port co
 while a full-profile adopter's vendored tree still runs bash — a false claim at the front door, the
 cost §What the objectives are not names.
 
-**Three port dispositions closed in one consult — ruled 2026-08-31 by the operator.** Two are
+**Two port dispositions closed in one consult — ruled 2026-08-31 by the operator.** Both are
 mechanism and live where their contract does: `installer/consumer-smoke/run-smoke.sh` is declared
 `no-port` per file, minting no class (installer/README.md §The consumer smoke, *The port
 disposition*), and the install boundary's three step values are now readable in the port oracle's
 vocabulary — `bootstrap` the one declarable cause, `behind-invoke` a port obligation — with the two
-other readings refused there (installer/README.md §The install boundary). The third has no
-contract home yet, so it is recorded here until spec gives it one: **the harness hook substrate
-belongs in the binary as one dispatching arm** — the hook name as argv, the harness payload on
-stdin, the hook-JSON envelope on stdout, exit status as protocol — and its environment read is the
-harness's own protocol, exempted for that arm alone from the reads-no-knob sentence
-`installer/README.md` §The install boundary states for `--install`. Two alternatives refused:
-*one arm per hook*, because eight arms speaking one protocol each owe a named caller and share
-one, so the class rule at gate-sdk/SPEC.md §The non-gate arm is met once rather than eight times;
-and *hooks stay shell as a class*, because a per-hook bash file is exactly the PowerShell
-duplicate the directive's second ground refuses. The contract lands at gate-sdk/SPEC.md §The
-non-gate arm when `harness-template-port-residue` is specified; this paragraph then retires.
+other readings refused there (installer/README.md §The install boundary). That consult closed a
+third, the harness hook substrate's arm kind, which had no contract home at the time and was
+carried here until one existed; it now lives at gate-sdk/SPEC.md §The non-gate arm, *The
+harness-integration arm*, with both refused shapes, and this sentence is the pointer that replaces
+it rather than a second copy of it.
 
 **The Windows leg's round 7 is cause-only — ruled 2026-08-31 by the operator in consult**, one
 round past the rider rule of 2026-08-30 and not a loop: its single change is the instrument, so
