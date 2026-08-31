@@ -8512,6 +8512,12 @@
   **Machinery-class, but NOT icebox-class by default**, because TRAJECTORY.md's 2026-08-30
   discriminator is conjunctive and the second conjunct fails: this DID block a stage entry,
   validate's, until a lead ruling cleared it.
+  **THE FOUR SHAPES ALL ADDRESS THE DRAIN SIDE; A FIFTH IS OWED FOR THE RECORD SIDE.** Measured
+  2026-08-31 on that same ride: the round-6 outcome exists only AFTER the close push, so writing
+  it onto the entry is a commit that postdates the push meant to be the iteration's last — and
+  landing it spends the second push the green branch was supposed to earn. A two-iteration
+  protocol, a standing extra push, a scope-time produce/observe split and demote-at-build each
+  answer *when the entry may be drained*; none answers *where the observation is written down*.
   **Cost while deferred:** every entry of this shape either overruns its push budget or
   defers, and the deferral is invisible until the close that cannot drain it.
   recurrence: observation-predicate-entry-cannot-drain-in-its-own-iteration 2026-08-31

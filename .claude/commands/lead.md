@@ -71,6 +71,22 @@ the template §Economics "Tier each batch to its work class" rule now names:
   That second is the verificational judgment the tier was ruled on, and it is the
   finding most likely to have been waved through. **The tier holds for a second
   full iteration; the watch stays live and now has a rising draw to watch.**
+  **Measured again 2026-08-31 at `port-declaration-cohort-and-windows-leg`:
+  `cr=21907218`, a NEW MAXIMUM** over the prior fifteen bare-align rows (prior
+  max 17.12M, median about 9.6M) and 3.7x the preceding iteration's 5882211.
+  The revert signal did not fire: no build round-trip and no re-entry in the
+  stamp file, and align found and repaired one real amendment defect — a false
+  claim that `--tree` is an `--emit` report no battery member runs, which
+  `check-measured-claim` refutes. The plausible driver is scale rather than
+  tier: this align audited **four** amendments where a typical iteration ships
+  one, and the two prior high points were likewise the two heaviest iterations,
+  which is the work-side reading `align-context-draw-growth` owns. **What a
+  later judge weighs, and why this datum is recorded rather than absorbed:**
+  three of the last three measurements sit at or above the prior median, so the
+  work-side explanation is now carrying every point rather than the occasional
+  one, and a fourth heavy-iteration reading that also sets a record would make
+  scale-explains-it unfalsifiable. The tier is not proposed for reversal and the
+  ruling stands; what this buys is a next judge reading three points and not one.
 
 scope, `spec`, and close stay on Opus, their generative and verificational
 judgment being what justifies the tier. Re-judge every tier when the harness

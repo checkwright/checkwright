@@ -247,6 +247,32 @@ cost field that opens in prose has declared no class and is read as not-low;
 authoring the class word first is the contract, and the gate that holds it is
 owed — filed 2026-08-23 into the gap inbox, drained by the next close.
 
+**That opener is not re-authored to unblock an eviction — ruled 2026-08-31 by
+the lead on its own authority.** A session holding an entry whose prose opener
+keeps it off the `--icebox-candidates` worklist may not rewrite the field to
+read low. The opener is an honest signal, and re-authoring it makes an entry
+*look* evictable without making it dormant — emulating the oracle rather than
+running it, which is oracle-first stated as its inverse. An entry whose true
+cost is high is correctly blocked, and the blocking is this eligibility rule
+working rather than an obstacle to route around. Two alternatives were refused,
+with their grounds, so neither is re-argued at full cost. *Per-entry
+re-authoring with the true cost stated*: if the true cost is genuinely low the
+field was simply mis-authored and correcting it is ordinary repair needing no
+ruling, and if it is not low the re-authoring is the gaming this refuses — the
+option only has force in the case it is wrong for. *Waiting for the owed
+opener gate above*: that gate would enforce the opener's **shape** and never
+adjudicate a cost's truth, so it cannot answer this question and waiting on it
+defers indefinitely for no information. The measurement the ruling turned on
+was the substance behind two such openers on a citation-liveness hub — 171
+unqualified citations and 902 directive pointers, which are not low-cost
+carries.
+
+**Recorded with it, because a silent clause reads like a broken one:** the
+self-citing-set clause above was measured **non-firing** on that same eviction,
+because the cost limb blocks first and the clause's own antecedent — *where a
+consumer classifies a set dormant as a class* — never obtains. A second limb
+does not fail by being unreached; that is the clause working as written.
+
 **Direct filing into the icebox is permitted on one condition — ruled
 2026-08-23, reversing the prior rule.** The prior rule held that nothing files
 directly into the icebox because a newly filed finding has never been triaged.
