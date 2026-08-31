@@ -203,14 +203,14 @@ the emitter** — a public page, a file a fresh clone needs before its tooling
 works. Derivation-first is satisfied by deriving on demand otherwise, and a
 committed copy of a high-churn source's derivation buys a per-commit
 regeneration tax for nobody. So **a tool with no stored projection has nothing to
-hold fresh** and stays off this roster: queue-kit's `queue-index` arm and
-`bin/queue-edges.sh` are the standing instances, the latter with its refusal
-reasoned in its own contract (queue-kit/SPEC.md §bin/queue-edges.sh) and as the
-one whose only consumer is still a session with a shell. Their absence is a
+hold fresh** and stays off this roster: queue-kit's `queue-index` and
+`queue-edges` arms are the standing instances, the latter with its refusal
+reasoned in its own contract (queue-kit/SPEC.md §The queue-edges arm). Their
+absence is a
 ruling, not an oversight — the question to ask of a new derived surface is who
-reads it, not whether it could be generated. The `queue-index` ruling survived
-its port onto the binary on that stored-projection ground alone, the
-shell-consumer half having stopped being true when the consumer became a session
+reads it, not whether it could be generated. **Both rulings survived a port onto
+the binary on that stored-projection ground alone**, and the shell-consumer half
+of each stopped being true at its own port, when the consumer became a session
 reaching a compiled arm through the `--emit` front-end.
 
 **The compiled gate binary is the third standing instance, and it fails the

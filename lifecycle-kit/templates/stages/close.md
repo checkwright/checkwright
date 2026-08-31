@@ -111,8 +111,8 @@ session.
    **Read the queue's retired citations here too, and this is a command you run
    rather than a file you already have open.** The drain works from
    `LIFECYCLE_KIT_GAP_INBOX_FILE`, so nothing in this step has touched the queue
-   yet: invoke queue-kit's inbound-citation tool over the queue file
-   (queue-kit/SPEC.md §bin/queue-edges.sh) and read its **retired** block. Each
+   yet: invoke queue-kit's inbound-citation arm over the queue file
+   (queue-kit/SPEC.md §The queue-edges arm) and read its **retired** block. Each
    entry there cites a slug that was once live and is not now — a directional
    pointer at work that has been disposed of, indistinguishable from a live
    pointer to any reader who did not run this. It is a finding, never a

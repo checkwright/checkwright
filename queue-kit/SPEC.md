@@ -312,14 +312,14 @@ is a **citation** of the named entry: the relation an author already drew while
 writing about something else. The two forms are deliberately different claims.
 The bold-code form is a *membership* claim, and a dead one is a false statement
 `check-queue-slug-liveness` reds on; the in-body citation is a *reference*,
-aggregated by `bin/queue-edges.sh` (§bin/queue-edges.sh) and audited by
+aggregated by §The queue-edges arm and audited by
 nothing. The rules below make citations parseable, each covering a shape a live
 corpus contains:
 
 - **Resolution is against the live slug set** — `queue_live_slugs`: active,
   deferred, and a configured icebox, the existing source of truth — **and
   against the retired one**, the slugs the file's own history shows were once
-  live (§bin/queue-edges.sh). A citation resolving to a retired slug is an edge,
+  live (§The queue-edges arm). A citation resolving to a retired slug is an edge,
   marked retired; the two sets are disjoint by construction.
 - **An unresolved token is not an error; it is simply not an edge.** This is the
   load-bearing rule. Entries legitimately name *landed* work — a closed defect
@@ -339,7 +339,7 @@ corpus contains:
   a third. A prose marker separating landed from live is the maintained roster
   under a new spelling: it would need writing on every citation a corpus has
   already written, and re-writing on every disposition. The distinction is
-  **derived** instead (§bin/queue-edges.sh's retired block), which is the form
+  **derived** instead (§The queue-edges arm's retired block), which is the form
   both refusals leave open, and no author writes anything.
 - **Self-citation is not an edge** — an entry naming its own slug in its own
   body is narration, not a relation.
@@ -355,7 +355,7 @@ That is the provenance seam, the same reason `[roadmap:]`'s horizons and tracks
 are consumer-configured arrays rather than kit literals. Declaring no vocabulary
 means there is no vocabulary to leak and no consumer config to invent: a
 relation's *kind* rides the citing line itself, quoted verbatim
-(§bin/queue-edges.sh).
+(§The queue-edges arm).
 
 **A `relates: <kind> <slug>` declaration on the `roadmap-summary:` pattern was
 weighed and refused.** It is precise and it carries a kind — and it is wrong
@@ -577,8 +577,8 @@ close-surface: TASK-QUEUE.md#Lessons-Learned forced=lifecycle-kit/SPEC.md §bin/
   channel): the tag names, their sinks, and their handling are consumer rule
   content — a kit literal carrying them would publish a private vocabulary
   (the provenance seam, `check-graph`/`graph-vocab` pattern). The close ritual
-  streams a tagged entry's body through `bin/lesson-sink.sh <tag>`
-  (§bin/lesson-sink.sh), which resolves the sink from `QUEUE_KIT_LESSON_SINKS`;
+  streams a tagged entry's body through the lesson-sink arm
+  (§The lesson-sink arm), which resolves the sink from `QUEUE_KIT_LESSON_SINKS`;
   the tracked close skill names that mechanism, never a sink value. queue-kit
   only parses the tag's placement.
 
@@ -642,8 +642,8 @@ disposition. Knobs:
   `check-tag-lead-line` for placement. Names, sinks, and handling are consumer
   rule content — the kit ships none.
 - `QUEUE_KIT_LESSON_SINKS` — associative array, harvest tag → sink command,
-  default empty; read by `bin/lesson-sink.sh`, which owns resolution and the
-  fail-open default (§bin/lesson-sink.sh). A private sink value belongs in the
+  default empty; read by the lesson-sink arm, which owns resolution and the
+  fail-open default (§The lesson-sink arm). A private sink value belongs in the
   local overlay, not this tracked file.
 - `QUEUE_KIT_ATTEND_CAP` — positive integer, default `3`; the maximum `[attend]`
   lead lines the `queue-index` arm emits in its attention block before folding
@@ -714,7 +714,7 @@ optional section regex owes that guard.
 deferred section, and a configured icebox, in configured order — exposed rather
 than consumed and discarded. `QUEUE_TASK_RE` is built from it, and a reader that
 needs the sections *individually* rather than as one alternation
-(§bin/queue-counts.sh) reads the array. One composition, two shapes of the same
+(§The queue-counts arm) reads the array. One composition, two shapes of the same
 answer: a second reader recomposing the set from the three knobs is the drift
 axis a shared adapter exists to remove.
 
@@ -740,19 +740,22 @@ simply empty.
 
 The in-body citation scan (§The tag algebra) is deliberately **not** here: it
 has one reader, and this library holds adapters two or more readers share. It
-lives in `bin/queue-edges.sh`, which sources this library for the section
-regexes and `queue_live_slugs` it does share. A second reader of body-position
-slug tokens is what would promote the scan into this roster.
+lives in the queue-edges arm, which takes the section matchers and the live-slug
+reading from `native/src/queue.rs`, this library's counterpart, rather than
+carrying its own. A second reader of body-position slug tokens is what would
+promote the scan into that roster.
 
 **The entry lead-line grammar is here, and it is here by that same rule rather
 than by convention.** `QUEUE_LEAD_RE` (a bullet opening an entry) and
 `QUEUE_SLUG_BOLD_RE` (the bold slug token inside it) are exported globals like
-the section regexes, because three readers now share them: `queue_live_slugs`
-above, `bin/queue-edges.sh`'s bullet scan, and that tool's history walk
-(§bin/queue-edges.sh), which asks the *same* question of an older revision. A
-grammar answering one question in three places is the shape this library exists
-to hold, and a history walk carrying its own spelling would let the retired set
-and the live set disagree about what an entry is.
+the section regexes. Three readers shared them when the grammar landed here:
+`queue_live_slugs` above, the edge aggregator's bullet scan, and its history
+walk, which asks the *same* question of an older revision. The last two are now
+one crate module (§The queue-edges arm) reading `native/src/queue.rs`'s
+counterpart, so the sharing moved substrate rather than dissolving — a history
+walk carrying its own spelling would still let the retired set and the live set
+disagree about what an entry is, which is why the crate side shares
+`bullet_slug` between them exactly as this side shared these two.
 
 Both are written with **bracketed literals** (`[*][*]`) rather than backslash
 escapes. They reach `awk` through `-v`, where awk's string-escape pass runs
@@ -764,16 +767,23 @@ value spelled with backslashes is a different regex by the time it is applied.
 regexes, and the split is machine-held rather than filed as debt.** The gates
 that read the queue ported to the binary substrate (gate-sdk/SPEC.md §Porting a
 gate to the binary substrate), so `check-queue-slug-liveness` and
-`check-task-conservation` call a Rust reimplementation of that helper while
-`bin/queue-edges.sh` keeps calling this one; the same is true of the section
-regexes, every one of which a `bin/` script still reads directly. The split is
-**permanent** — every `bin/` script in the kit still sources this library
-(`grep -rl lib/queue.sh queue-kit/bin queue-kit/checks` is the roster, and the
-`checks/` half of it is empty now that every gate here dispatches to the binary)
-— so the
-shell form cannot be deleted the way a ported primitive's is, and a port-time
-byte-identity proof would expire at the next edit to either side. What holds the
-two equal from here is `gate-tests/queue-lib-parity.test.sh`: it feeds one canned
+`check-task-conservation` call a Rust reimplementation of that helper; the same
+is true of the section regexes, and of the counter and edge readings, which are
+now arms of the same binary. **The split is permanent, and the reason is the
+resolver rather than any shell caller:** this library is
+the config bridge's **sole resolver** for every `QUEUE_KIT_*` knob — the bridge
+computes a knob's value by sourcing exactly this file (gate-sdk/SPEC.md
+§lib/gate.sh), so every crate-side reader above resolves *through* it. The shell
+form therefore cannot be deleted the way a ported primitive's is, and a port-time
+byte-identity proof would expire at the next edit to either side.
+**The kit ships no `bin/` directory and no shell gate, so `grep -rl lib/queue.sh
+queue-kit/bin queue-kit/checks` — the roster a reader reaches for — answers
+empty, and the derived globals' one live in-tree reader is the parity harness
+below.** That is stated so the empty answer is not read as the library being
+dead: it narrows what the split *guards*, never whether it holds, because the
+resolver role above is what makes the library permanent and that role has no
+shell caller in it. What holds the
+two equal is `gate-tests/queue-lib-parity.test.sh`: it feeds one canned
 corpus to both and compares their **classification** of it byte for byte
 (§The queue format owns why classification is the comparable thing), which is
 criterion 6's *machine-held* disposition rather than its duplication-absent one
@@ -824,6 +834,47 @@ silently drops the tally in every consumer that configures a tier. The derived
 regexes the shell library built (`QUEUE_ACTIVE_RE` and its siblings) were never a
 configuration surface, only that library's internal spelling of these knobs, so
 none of them crosses into the arm and nothing is lost by their not crossing.
+**This paragraph settles the caller that reaches an arm *as* an arm, and an
+in-process call from a hook module is outside it** — neither the front end nor a
+direct binary invoke — so that path owes its own answer, which
+delegation-kit/SPEC.md §The statusline arm gives. Read this paragraph's silence
+on it as silence rather than as coverage.
+
+**The three tools that remained in `bin/` take this section's dispositions, and
+that class ruling is what composed the cut they landed in.** Each was "a tool,
+not a gate (no `# graph:` manifest)" in its own words, and §The queue-edges arm
+already stated its membership as *following the queue-index precedent*. This
+section ported the **first** member of that class and settled every question the
+other three raised: that the front-end is required, which knobs cross the bridge,
+that the derived shell regexes were never a configuration surface and so do not
+cross, that a mode rides the arm's own argv tail rather than earning a second
+arm, and that stdout is byte-preserved while an error path's exit code collapses
+to 2. So §The queue-counts arm, §The queue-edges arm and §The lesson-sink arm
+each take those answers rather than re-deciding them, and the ruling lives here
+because this is the section the answers came from. **The kit reaching zero owed
+files is a result of taking the class, not the reason for taking it** — a
+kit-ordered composer is refused (`native-gate-port-remaining-corpus`'s 2026-08-28
+ruling), and the test this cut met would still be met if a fourth queue-kit tool
+were owed or if one of the three sat in another kit. **The cut's well-formedness
+under that composer was ruled 2026-08-31 by the lead on own authority**, naming
+this section as the one contract the cut selects; the ruling's home is here
+because this is where a later selector meets it.
+
+**One member does not take the `--emit-` spelling, and the exception is a
+contract question rather than a naming preference.** §The lesson-sink arm's
+stated contract is that its child's exit status becomes its own, and an emitting
+arm collapses every error to 2 and every success to 0. It is an `Arm::Run` member
+of the same bridged table, which is why that table is keyed by flag rather than
+by family (gate-sdk/SPEC.md §The non-gate arm).
+
+**No `-h`/`--help` arm crosses with any of the three.** Each shell form spelled
+its usage by reading its own source file, which has no in-crate spelling at all,
+and usage for a bridged arm lives in `run-gates.sh --help` and in
+queue-kit/README.md — where the class already keeps it. A per-arm help flag would
+be a second home for one sentence, so `-h` lands on the unknown-option refusal
+like any other unrecognised flag. This arm's own `--help` predates the ruling and
+is left standing rather than removed for symmetry: three modes need the mode
+roster somewhere, and a single-grammar arm does not.
 
 **The three modes stay three modes on one arm**, selected from the arm's own
 argv tail — the emitter type is defined over an argv slice precisely so a mode
@@ -937,17 +988,31 @@ port that shifts the cutoff by a day is not the behaviour-preserving port this
 was. Its refusal on a `date` without `-d` survives with it.
 
 This is a *task-selection* surface, walking bullet lead lines. Its sibling
-`bin/queue-edges.sh` walks entry **bodies** to aggregate citations — a
-different question over the same file (§bin/queue-edges.sh). They stay two
-tools rather than one with a fourth mode, because folding them would give
-one tool two jobs and two output grammars.
+§The queue-edges arm walks entry **bodies** to aggregate citations — a
+different question over the same file. They stay two
+arms rather than one with a fourth mode, because folding them would give
+one arm two jobs and two output grammars.
 
-### bin/queue-counts.sh
+### The queue-counts arm
+
+A **non-gate arm of the binary** (gate-sdk/SPEC.md §The non-gate arm), reached
+through the battery runner's `--emit` front-end:
+`run-gates.sh --emit queue-counts [<queue-file>]`. It registers in the
+bridged-arm table under the derived spelling `--emit-queue-counts`, stays outside
+`--list`, and owes no `.gate` descriptor, no `gates.list` registration and no
+`good/`+`bad/` fixture pair. Its bridged reads are the four
+§The queue-index arm resolves less that arm's two own: the queue file and the
+three section knobs. `QUEUE_KIT_DONE_SECTION` is deliberately **not** among
+them — Done is not a task section, and the arm must not acquire a read it does
+not make.
 
 One job: the size of each **task section**, for a caller that wants the shape of
 the queue rather than its contents. It emits one `<section-name><TAB><count>`
 line per task section, in configured order, and nothing else — no flags, no
-modes, one output grammar.
+modes, one output grammar. The optional `[queue-file]` positional ports
+unchanged, on gate-sdk/SPEC.md §The non-gate arm's distinguishing test: it is an
+argument the rule itself consumes, falling back to a knob, the shape
+`check-amendment-queue` and `check-evidence-manifest` already carry.
 
 The section set is **derived, never listed**: it is `QUEUE_TASK_SECTIONS`, the
 same composition `QUEUE_TASK_RE` is built from (§lib/queue.sh). So
@@ -962,42 +1027,64 @@ The counted unit is the **top-level entry bullet** — the same unit
 sizes for one queue. Not lines, and not bullets: an indented bullet inside an
 entry body is body.
 
-**Why a second tool rather than a fourth mode on the `queue-index` arm.** That
+**Why a second arm rather than a fourth mode on the `queue-index` arm.** That
 arm's modes are fixed at `index`, `extent` and `icebox-candidates`
 (§The queue-index arm), on the stated grounds that folding jobs together gives one
-tool two output grammars — the same refusal that keeps `bin/queue-edges.sh`
+arm two output grammars — the same refusal that keeps §The queue-edges arm
 separate. A tally keyed by section name is a different job with a different
 grammar, so it lands beside the index rather than inside it. Recorded here
-because the next reader meeting two queue tools would otherwise read the split as
+because the next reader meeting two queue arms would otherwise read the split as
 an oversight and merge them.
 
-**It is invoked as a subprocess, never sourced.** `lib/queue.sh` exits 2 at
-source time on a missing `QUEUE_KIT_CONFIG_FILE` and on any malformed-config
-assertion — correct for a gate, and fatal for a long-lived caller that sourced
-it. A subprocess turns that contract into a non-zero exit and empty stdout, which
-a caller degrades on. The caller this was built for is delegation-kit's
-statusline arm, whose own contract records the degradation
-(delegation-kit/SPEC.md §The statusline arm).
+**Two callers at two transitions.** delegation-kit's statusline arm calls the
+rendering **in process** at each statusline fire, resolving the four knobs above
+through the bridge that arm's own exec already carries
+(delegation-kit/SPEC.md §The statusline arm); and a session invokes the arm
+through the front-end at the command queue-kit/README.md documents. The
+subprocess call the statusline once made is retired with the shell tool, and the
+paragraph that ruled the subprocess shape a *contract* retires with it: its
+stated ground was that `lib/queue.sh` exits 2 at source time on a malformed
+config, which is a property of a **sourced shell library** and has no spelling on
+this substrate. The rendering resolves its knobs through `walk::knob_scalar` and
+`knob_array`, which return `Result` and cannot exit, so a malformed queue config
+becomes an `Err` the caller absorbs and the counter group vanishes exactly as it
+did before.
 
-### bin/queue-edges.sh
+### The queue-edges arm
 
-The inbound-citation aggregator: a tool, not a gate (no `# graph:` manifest),
-following the queue-index precedent. It reads the queue, writes **stdout only**, and
-mutates nothing.
+The inbound-citation aggregator: a **non-gate arm of the binary**
+(gate-sdk/SPEC.md §The non-gate arm), reached as
+`run-gates.sh --emit queue-edges [--inbound <slug>] [<queue-file>]` and
+registered under the derived spelling `--emit-queue-edges`, following the
+queue-index precedent and taking §The queue-index arm's dispositions. It reads
+the queue, writes **stdout only**, and mutates nothing.
 
 ```
-usage: queue-edges.sh [--inbound <slug>] [queue-file]
+--emit queue-edges [--inbound <slug>] [queue-file]
   default: live slugs with inbound edges in queue order, then retired targets
   --inbound <slug>: the inbound set for one live or retired slug
 ```
 
+The mode rides the arm's **own argv tail**, the mechanism §The queue-index arm
+already uses for its three modes; the bridged reads are §The queue-counts arm's
+same four.
+
+**One observable moved, and the ruling that moves it is inherited rather than
+retaken.** A `--inbound` slug that is neither live nor retired exited **1** and
+now exits **2**, because the emitter type returns a `Result` and the dispatcher
+maps every error arm to 2. That is precisely §The queue-index arm's `--extent`
+finding — preserving the old code would mean widening the class's return contract
+for one mode's error path, and no caller reads it. This arm's callers are the
+same kind: two stage steps, read by a session. Every mode's **stdout** grammar is
+byte-preserved.
+
 **Inbound only.** An outbound view is refused for want of a reader: an entry's
 outbound edges *are* its own body, which a session asking the question is
 already reading. Inbound is the direction invisible without a scan of the whole
-file — which is the entire finding this tool answers. Nothing anywhere sums an
+file — which is the entire finding this arm answers. Nothing anywhere sums an
 entry's inbound edges into that entry's own cost and benefit, so a survey that
 reads every sibling entry individually can still misrank a unit that several of
-them separately depend on. The tool is that missing sum, which is also what
+them separately depend on. The arm is that missing sum, which is also what
 makes splitting an entry safe: a split scatters an entry's weight across
 siblings, and this is what adds it back up.
 
@@ -1006,7 +1093,7 @@ Targets print in queue order — the order every other reader of this file walks
 inbound edges is absent from the default listing and yields empty output under
 `--inbound`; that is the normal case, not a finding. A `--inbound` slug that
 resolves to neither a live nor a retired target exits 1 with a message on stderr
-rather than printing nothing, because silence from this tool has to mean "no
+rather than printing nothing, because silence from this arm has to mean "no
 inbound edges" and nothing else. Widening the addressable domain to retired
 slugs grew that domain and left the meaning of silence exactly where it was.
 
@@ -1026,29 +1113,31 @@ the token grammar `[a-z0-9][a-z0-9-]*` is not a slug detector. Splitting the
 unresolved remainder against the ever-live set leaves a small retired minority,
 and it is the half a reader wants: on this repo's own corpus, both attested
 instances of a citation instructing a session to sequence against work that no
-longer exists fall in it. Run the tool for the current numbers on your own
+longer exists fall in it. Run the arm for the current numbers on your own
 corpus — they are one adopter's queue statistics, not a property of the kit.
 
-**One tool, one job, and this is not a second one.** §bin/queue-counts.sh's
-refusal — folding jobs together gives one tool two output grammars — is honoured
+**One arm, one job, and this is not a second one.** §The queue-counts arm's
+refusal — folding jobs together gives one arm two output grammars — is honoured
 rather than worked around. The job is *aggregate in-body citations by target*,
 and a retired target is a target whose entry has been disposed of, not a
 different question over the same file.
 
 **The retired set is derived from the file's own history, so nothing is
 maintained.** One `git log -p --format= -- <queue-file>` pass at start-up, its
-added, removed and context lines matched against `lib/queue.sh`'s exported
-lead-line grammar (§lib/queue.sh) — the same grammar the live reader applies,
-never a second spelling. `git` joins `awk` as a dependency of this tool alone;
+added, removed and context lines matched against the lead-line grammar
+§lib/queue.sh owns — the same one the live reader applies, through the same
+shared adapter, never a second spelling. `git` is this arm's one program requirement, recorded
+here in prose rather than in a `--needs` declaration for the reason
+§The lesson-sink arm states;
 the section's "reads the queue, writes **stdout only**, and mutates nothing"
-contract is untouched, and now has a second input. The cost is a *tool's* budget
+contract is untouched, and now has a second input. The cost is an *arm's* budget
 rather than a gate's: on a queue file with roughly fifteen hundred revisions the
 whole pass measures well under a second, and it scales with history depth rather
 than with queue size.
 
 **Two degradations are declared rather than discovered.** A queue file **not in
 a git work tree**, or a `git` that is absent, yields an **empty** retired set and
-the tool prints its live block alone — byte for byte the output it printed before
+the arm prints its live block alone — byte for byte the output it printed before
 retired targets existed, which is why the degradation is silent-safe rather than
 misleading. And the derivation sees only the history **this clone has**: a
 shallow clone, or a queue file whose history was rewritten under it, reports
@@ -1061,7 +1150,7 @@ is that history is total, and here it is whatever the clone holds.
 buys a relation's *kind* without declaring a vocabulary for one: the nature of
 the relation is already written, in the citing author's own words, by the
 person who understood it. Quoting it beats a one-token classification from a
-fixed set, and it is free. It also keeps the tool honest about precision — a
+fixed set, and it is free. It also keeps the arm honest about precision — a
 citation that is a passing mention rather than a relation is *visibly* a
 passing mention once its line is on screen, so a reader discards it in the time
 it takes to read one line. Recall is what the surface needs, and a
@@ -1072,13 +1161,13 @@ sub-task cites in its own name rather than its parent's, and a lead line
 contributes its `[blocked-by:]` tag alone — never its prose, which is title and
 tags rather than relation.
 
-The body-citation scan lives **in this tool, not in `lib/queue.sh`**: it has
-exactly one reader, and the library's rule is shared adapters (§lib/queue.sh).
-It reuses that library's section regexes and `queue_live_slugs`; a second
-reader of body-position slugs is what would move it.
+The body-citation scan lives **in this arm, not in the shared adapter**: it has
+exactly one reader, and the rule is shared adapters (§lib/queue.sh). It reuses
+the shared section matchers and live-slug reading; a second reader of
+body-position slugs is what would move it.
 
 **No tracked projection, and no freshness gate.** A tracked artifact needs a
-reader who cannot run the tool, and there is none — the one consumer is a
+reader who cannot run the arm, and there is none — the one consumer is a
 session with a shell. A generated public page like the roadmap is tracked
 because its audience is outside the repo; this has no such audience. Against
 that, a committed copy of derived edges over what is typically a repo's
@@ -1100,7 +1189,7 @@ it inward would red on good prose.
 it.** Reporting is what a no-red posture always left available, and the retired
 block is only the listing half: an entry citing landed work is legitimate prose,
 so a retired edge is a *finding to read* and never a violation. Nothing about
-it is stricter than the day the refusal was written — the tool gained an output
+it is stricter than the day the refusal was written — the arm gained an output
 section, not a verdict.
 
 **Two named readers, at two named transitions**, because a report nobody reads
@@ -1109,14 +1198,14 @@ is the failure this listing was built to end:
 - **scope, at its ranking survey** — the primary, and the attested harm's own
   moment: a citation pointing at disposed work is a false premise in a survey
   input at exactly the point a session decides what to promote. Scope already
-  runs this tool there, so it gains the retired block as one more thing that
+  runs this arm there, so it gains the retired block as one more thing that
   call's output carries and no new step.
 - **close, at the gap-inbox drain** — the corrective transition, where an
   instance found is fixed inline on its owning entry. This is that stage's
-  **first** invocation of this tool: its drain dispositions bullets from a
+  **first** invocation of this arm: its drain dispositions bullets from a
   different file entirely, so unlike scope's it is a new command in the step
   rather than a wider reading of an existing one. Still no new mechanism — one
-  more command a session already running shell tools invokes.
+  more command a session already running the front-end invokes.
 
 Neither stage gains a gate and neither gains a refusal.
 
@@ -1252,21 +1341,66 @@ compare included: the generated hook's `staged_matches` trigger is derived from
 that field, so an omitted module leaves the gate registered and green while the
 page it holds goes stale at commit time.
 
-### bin/lesson-sink.sh
+### The lesson-sink arm
 
 The outbound channel's router: reads a lesson body on stdin and resolves the
 sink for its `<tag>` argument from `QUEUE_KIT_LESSON_SINKS`. A configured entry
 runs as a **command** with the body streamed to its stdin — a command, not a
 path, so the sink may reformat the body into a downstream backlog's own
-grammar; the command's exit status becomes the tool's, so a failing sink is a
+grammar; the command's exit status becomes the arm's, so a failing sink is a
 red close step and harvest material is never half-routed to a silent fallback.
 An unconfigured tag falls **open** to appending the body to
-`${GATE_SDK_WORKFLOW_DIR:-.workflow}/<tag>-harvest.md` — the honest
+`<workflow-dir>/<tag>-harvest.md` — the honest
 manual-drain default that keeps a fresh clone (no overlay) closing cleanly and
-preserves the staging file's documented reclaim path. A tool, not a gate (no
-`# graph:` manifest); the consumer close skill invokes it so the tracked skill
+preserves the staging file's documented reclaim path. The consumer close skill
+invokes it so the tracked skill
 names the mechanism, never a sink value, and a private sink command lives in
 the `queue-config.local.sh` overlay (§lib/queue.sh).
+
+**A bridged non-gate arm, and the `--emit-` spelling is refused rather than
+declined.** It is reached as `run-gates.sh --lesson-sink <tag>` and registers in
+the bridged-arm table as an **`Arm::Run`** member beside `--statusline` and
+`--usage-poll` (gate-sdk/SPEC.md §The non-gate arm), with a matching case in the
+front-end's argument grammar (gate-sdk/SPEC.md §run-gates). The `--emit-` family
+cannot carry it: an emitting arm collapses every error to exit 2 and every
+success to 0, which would erase the paragraph above. `Arm::Run` returns the
+code, which is the whole reason the table is keyed by flag rather than by
+family. Its `ARM_UNAVAILABLE_STATUS` is **2**, matching `--usage-poll` and not
+`--hook`/`--statusline`: it gates no tool call and its caller is a close-stage
+step whose failure must be visible. It is not a harness-integration arm — no
+harness event reaches it.
+
+**The seam survives; only the resolver moves in-crate.** `QUEUE_KIT_LESSON_SINKS`
+stays the adopter's configuration, a configured entry still runs as `bash -c
+"<value>"` with the body on its stdin, and a private sink value still lives in
+the `queue-config.local.sh` overlay. The map crosses the bridge through the
+keyed-map arm (gate-sdk/SPEC.md §lib/gate.sh), which is what made this member
+portable at all. `bash` is the arm's one program requirement, recorded here in
+prose rather than in a `--needs` declaration, because `--needs` answers over the
+`.gate`-declared registry and a non-gate arm carries no descriptor — the same
+disposition §The queue-index arm's `date -d` derivation takes.
+
+**`exec` becomes spawn-and-report.** The shell form `exec`ed, so the sink's
+status *was* the tool's by process replacement. The arm spawns through
+`proc::run_streamed(…, Stderr::Inherit)`, whose `code()` is already backed by the
+crate's signal-aware exit-code spelling, so a signal-killed sink reports
+`128 + n` with no new accessor. `Stderr::Inherit` matches the shell form's
+inherited stderr; stdout is **captured** rather than inherited, so the arm
+re-emits it on its own stdout — stated so "spawn-and-report" is not read as the
+child's stdout still reaching the terminal by descriptor inheritance.
+
+**stdin is buffered rather than streamed.** The shell form handed the child an
+inherited descriptor; the arm reads the body to completion first. A lesson body
+is one queue entry's prose, so the bound is the queue's own per-entry cap
+(§check-queue-entry-budget), and this is recorded rather than absorbed because it
+is the one place the port changes what an arbitrarily large input would do.
+
+**One tightening rides with the fail-open default.** The shell form spelled its
+own `${GATE_SDK_WORKFLOW_DIR:-.workflow}` inline; the arm resolves the knob
+through the bridge, where unset is an error. The knob has a shipped default, so
+no configured consumer moves — an adopter who deleted it from their config gets
+a refusal instead of a silent write to `.workflow`, which is the better failure
+and is stated so it is not read as a regression.
 
 ### check-queue-hygiene
 
@@ -1432,7 +1566,7 @@ contract — and that third relief is **two acts wearing one name**.
   mandated write. The relocating session cites the mandating contract in the
   commit that makes the relocation, and names the target with a
   single-backticked slug in the entry body — already a citation under §The tag
-  algebra and already aggregated by `bin/queue-edges.sh`, so the link needs no
+  algebra and already aggregated by the queue-edges arm, so the link needs no
   declaration of its own. A `relocated:` declaration is refused on the ground
   §The tag algebra refuses `relates:` on: it would cost a counted line against
   this very cap, on the entry least able to pay it.

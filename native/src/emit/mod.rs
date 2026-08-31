@@ -8,7 +8,10 @@ pub mod enforcement_map;
 pub mod footprint;
 pub mod graph;
 pub mod kpi;
+pub mod lesson_sink;
 pub mod port_blockers;
+pub mod queue_counts;
+pub mod queue_edges;
 pub mod queue_index;
 pub mod roadmap;
 pub mod trajectory;
@@ -188,6 +191,32 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
             "QUEUE_KIT_ICEBOX_AGE_DAYS",
         ],
     ),
+    // spec: queue-kit/SPEC.md §The queue-counts arm — the four knobs `Sections::active_and_deferred`
+    // resolves, plus the queue file. `QUEUE_KIT_DONE_SECTION` deliberately not: Done is not a task
+    // section, and the arm must not acquire a read it does not make.
+    (
+        "--emit-queue-counts",
+        Arm::Emit(queue_counts::emit),
+        &[
+            "QUEUE_KIT_QUEUE_FILE",
+            "QUEUE_KIT_ACTIVE_SECTIONS",
+            "QUEUE_KIT_DEFERRED_SECTION",
+            "QUEUE_KIT_ICEBOX_SECTION",
+        ],
+    ),
+    // spec: queue-kit/SPEC.md §The queue-edges arm — the same section vocabulary read over entry
+    // *bodies* rather than lead lines: a different question over the same file, so the two stay
+    // two arms rather than one with a fourth mode.
+    (
+        "--emit-queue-edges",
+        Arm::Emit(queue_edges::emit),
+        &[
+            "QUEUE_KIT_QUEUE_FILE",
+            "QUEUE_KIT_ACTIVE_SECTIONS",
+            "QUEUE_KIT_DEFERRED_SECTION",
+            "QUEUE_KIT_ICEBOX_SECTION",
+        ],
+    ),
     // spec: gate-sdk/SPEC.md §port-blockers — the port oracle: three arms over two corpora, whose
     // `--tree` owed count is the port track's completion predicate. A table member rather than a
     // hardcoded flag because it reads five structural knobs and an arbitrary sixth.
@@ -226,6 +255,14 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         "--usage-poll",
         Arm::Run(crate::hook::poll::run),
         crate::hook::poll::KNOBS,
+    ),
+    // spec: queue-kit/SPEC.md §The lesson-sink arm — an `Arm::Run` and not an `--emit-` member:
+    // its contract is the sink's exit status, which an emitting arm cannot carry. Its caller is a
+    // stage step, so it is not a harness-integration arm either
+    (
+        "--lesson-sink",
+        Arm::Run(lesson_sink::run),
+        lesson_sink::KNOBS,
     ),
 ];
 

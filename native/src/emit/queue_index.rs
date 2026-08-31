@@ -2,7 +2,7 @@
 // Three modes on one arm, selected from the arm's own argv tail rather than from three arms:
 // the emitter type is defined over an argv slice precisely so a mode rides as a flag.
 use crate::proc;
-use crate::queue::{self, Sections};
+use crate::queue::{self, is_top_level_bullet, Sections};
 
 const TITLE_CAP: usize = 64;
 const OPENER_CAP: usize = 48;
@@ -99,14 +99,6 @@ fn truncate_chars(s: &str, cap: usize) -> String {
     }
 }
 
-// spec: queue-kit/SPEC.md §The queue-index arm — awk's `/^-[[:space:]]/`, the column-0 bullet the
-// section scanners key on: an indented sub-task is deliberately outside it.
-fn is_top_level_bullet(line: &str) -> bool {
-    let b = line.as_bytes();
-    matches!(b.first(), Some(&c) if c == b'-')
-        && matches!(b.get(1), Some(&c) if c == b' ' || c == b'\t')
-}
-
 // spec: queue-kit/SPEC.md §The queue-index arm — awk's `gsub(/\[[^]]*\]/, "", t)`: every bracketed
 // tag comes off before the slug-and-dash strip, so the dash is adjacent when that strip runs.
 fn remove_bracketed(s: &str) -> String {
@@ -180,28 +172,10 @@ fn drain_exempt(line: &str) -> Option<String> {
     Some(body.trim_end_matches([' ', '\t']).to_string())
 }
 
-// spec: queue-kit/SPEC.md §The queue-index arm — every `[blocked-by: <slug>]` on the lead line, in
-// order; the presence of any one is what flips the row's ready mark.
+// spec: queue-kit/SPEC.md §The queue-index arm — the lead line's `[blocked-by:]` set, read
+// through the shared adapter; the presence of any one is what flips the row's ready mark.
 fn blockers(line: &str) -> String {
-    let mut found: Vec<&str> = Vec::new();
-    let mut rest = line;
-    while let Some(open) = rest.find("[blocked-by:") {
-        let after = &rest[open + "[blocked-by:".len()..];
-        let body = after.trim_start_matches([' ', '\t']);
-        let consumed = after.len() - body.len();
-        let b = body.as_bytes();
-        let mut j = 0usize;
-        if !b.is_empty() && (b[0].is_ascii_lowercase() || b[0].is_ascii_digit()) {
-            j = 1;
-            while j < b.len() && (b[j].is_ascii_lowercase() || b[j].is_ascii_digit() || b[j] == b'-')
-            {
-                j += 1;
-            }
-            found.push(&body[..j]);
-        }
-        rest = &after[consumed + j..];
-    }
-    found.join(", ")
+    queue::blocked_by(line).join(", ")
 }
 
 #[derive(PartialEq)]

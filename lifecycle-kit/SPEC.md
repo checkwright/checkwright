@@ -1196,7 +1196,7 @@ the spelling scope already writes — `<slug> <n>`, comma-separated, with any
 caveat the sum needs. Free prose, deliberately: what makes the field usable is
 that it is *addressable*, not that it is parseable.
 
-The sum itself is bought at scope (queue-kit/SPEC.md §bin/queue-edges.sh) and
+The sum itself is bought at scope (queue-kit/SPEC.md §The queue-edges arm) and
 was, before this field, recorded only inside `finding:` if at all — present but
 unaddressable, so the next boundary could not tell "no sum was taken" from "the
 sum is in there somewhere" and re-bought an aggregation the last boundary had

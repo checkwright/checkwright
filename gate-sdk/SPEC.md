@@ -1986,8 +1986,10 @@ The binary is a multi-call binary whose *gate* subcommands are dispatched by
 name out of `gates::REGISTRY`. It also carries arms that are **not** gates —
 `--list`, `--reads`, `--needs`, `--knobs`, `--source-stamp`, `--queue-parity`,
 `--declaration-parity`, `--evidence-lib-parity` and `--install`, plus the
-`--emit-` family the bridged-arm table keys (`--emit-drift-report` is its
-2026-08-29 member) and the **harness-integration** arms below it — and the class
+`--emit-` family the bridged-arm table keys (`--emit-queue-counts` and
+`--emit-queue-edges` are its 2026-08-31 members), the **harness-integration**
+arms below it, and `--lesson-sink`, a bridged `Arm::Run` member that is neither
+(queue-kit/SPEC.md §The lesson-sink arm) — and the class
 they form is named here because a
 session arriving with a new non-gate thing to port has no other way to learn
 that one exists or what it costs. Each arm's own `spec:` comment explains that
@@ -2269,6 +2271,18 @@ of the word *emit*. The rename is the one this section declined to take for
 `extent` on the ground that it was "a gate-sdk unit of its own"; it is taken here
 by the unit that needed it, as a generalization of the property already stated
 rather than as a new class.
+
+**A member whose stated contract is its child's exit status cannot take the
+`--emit-` spelling at all, and that is the sentence the class did not yet hold.**
+`--lesson-sink` (queue-kit/SPEC.md §The lesson-sink arm) runs a consumer-configured
+command with a body on its stdin and rules that the command's status becomes the
+arm's, so a failing sink is a red close step. `Arm::Emit` collapses every error to
+2 and every success to 0, so an emitting arm *cannot* carry that contract — the
+family choice is forced by the return shape rather than chosen by naming taste,
+which is the second half of "keyed by flag rather than by family" and the first
+member to demonstrate it outside the harness-integration arms. Its caller is a
+stage step rather than the harness, so it is not one of those either: it is a
+plain bridged `Arm::Run`, and the class needs no new sub-kind to hold it.
 
 **`--run` is the class's first bridged member that returns a verdict rather than
 a document** (§run-gates). It satisfies the three properties: it is
@@ -7599,10 +7613,11 @@ Resolution, per declared knob:
   read independently.
 
   The knob-shaped instances part company on whether a gate reads them.
-  `QUEUE_KIT_LESSON_SINKS` has no gate reader — only
-  `queue-kit/bin/lesson-sink.sh` reads it — so the queue-kit cohort ported before
-  this arm existed and is unaffected by it; it becomes portable now, and is named
-  here so a later selector does not re-derive its status.
+  `QUEUE_KIT_LESSON_SINKS` has no gate reader, so the queue-kit cohort ported
+  before this arm existed and was unaffected by it. **That forecast is
+  discharged:** the 2026-08-31 cut ported its one reader onto this arm as
+  `--lesson-sink` (queue-kit/SPEC.md §The lesson-sink arm), which is the map's
+  live third instance and the only one whose reader is not a gate.
   `EVIDENCE_KIT_SCENARIO_GLOBS` and `LIFECYCLE_KIT_PREDECESSOR` are each read
   **by key** by a registered gate, `check-evidence-baseline` and
   `check-stage-entry` respectively, and are the arm's live instances: the second
@@ -8439,7 +8454,13 @@ a session reads and `0` for the two harness-integration arms whose status the
 harness itself interprets — `--hook`, where it is the allow/block signal, and
 `--statusline`, where the harness ignores it, so a failed dispatch that exited 2
 would be a verdict nothing reads. `--usage-poll` keeps `2`: its caller is a
-timer, not the harness.
+timer, not the harness. `run-gates.sh --lesson-sink <tag>` is the third
+non-`--emit` arm case and keeps `2` on the same discriminator: it gates no tool
+call and its caller is a close-stage step whose failure must be visible
+(queue-kit/SPEC.md §The lesson-sink arm). Like `--hook`, it takes its operand as
+argv and relies on `exec` preserving stdin, so the lesson body reaches the arm
+untouched; unlike `--emit`, its flag is the whole spelling rather than a
+composed one, because it is not a member of that family.
 The diagnostic is written to stderr either way, so the failure is loud on
 both settings; only the status differs, which is §The non-gate arm's fail-open
 rule spelled at the one place both causes converge. A status rather than a second

@@ -168,6 +168,41 @@ pub fn strip_bullet_lead(line: &str) -> Option<&str> {
     Some(&line[i..])
 }
 
+// spec: queue-kit/SPEC.md §The queue format — awk's `/^-[[:space:]]/`, the column-0 bullet the
+// section scanners key on: an indented sub-task is deliberately outside it
+// spec: queue-kit/SPEC.md §The queue-counts arm — shared, because the index and the counters
+// report one queue's size and a second copy is what would let them disagree
+pub fn is_top_level_bullet(line: &str) -> bool {
+    let b = line.as_bytes();
+    matches!(b.first(), Some(&c) if c == b'-')
+        && matches!(b.get(1), Some(&c) if c == b' ' || c == b'\t')
+}
+
+// spec: queue-kit/SPEC.md §The tag algebra — every `[blocked-by: <slug>]` on a line, in order
+// spec: queue-kit/SPEC.md §lib/queue.sh — a shared adapter because the grammar has two readers:
+// the index arm marks a row blocked with it, the edges arm attributes an edge with it
+pub fn blocked_by(line: &str) -> Vec<&str> {
+    const TAG: &str = "[blocked-by:";
+    let mut found: Vec<&str> = Vec::new();
+    let mut rest = line;
+    while let Some(open) = rest.find(TAG) {
+        let after = &rest[open + TAG.len()..];
+        let body = after.trim_start_matches([' ', '\t']);
+        let consumed = after.len() - body.len();
+        let b = body.as_bytes();
+        let mut j = 0usize;
+        if !b.is_empty() && is_slug_head(b[0]) {
+            j = 1;
+            while j < b.len() && is_slug_byte(b[j]) {
+                j += 1;
+            }
+            found.push(&body[..j]);
+        }
+        rest = &after[consumed + j..];
+    }
+    found
+}
+
 // spec: queue-kit/SPEC.md §The queue format — `^[[:space:]]*-[[:space:]]` (one space, no
 // `+`), the looser bullet test the section scanners use
 pub fn is_bullet(line: &str) -> bool {
@@ -497,6 +532,30 @@ mod tests {
         assert_eq!(bare_bullet_slug("- -leading-dash"), None);
         assert_eq!(bare_bullet_slug("-nospace"), None);
         assert_eq!(bare_bullet_slug("- "), None);
+    }
+
+    // spec: queue-kit/SPEC.md §The tag algebra — every tag on the line, in order, and a tag with
+    // no slug after the colon contributes nothing rather than swallowing the next one
+    #[test]
+    fn every_blocked_by_tag_on_a_line_is_read_in_order() {
+        assert_eq!(blocked_by("- **a** [blocked-by: b] — x"), vec!["b"]);
+        assert_eq!(
+            blocked_by("- **a** [blocked-by: b] [blocked-by:c2] — x"),
+            vec!["b", "c2"]
+        );
+        assert_eq!(blocked_by("- **a** — no tag"), Vec::<&str>::new());
+        assert_eq!(blocked_by("[blocked-by: ] [blocked-by: d]"), vec!["d"]);
+    }
+
+    // spec: queue-kit/SPEC.md §The queue format — the counted unit is the column-0 bullet, so an
+    // indented sub-task bullet is body to every reader of this adapter
+    #[test]
+    fn a_top_level_bullet_is_the_column_zero_one() {
+        assert!(is_top_level_bullet("- **a** — x"));
+        assert!(is_top_level_bullet("-\tx"));
+        assert!(!is_top_level_bullet("  - **a** — x"));
+        assert!(!is_top_level_bullet("-nospace"));
+        assert!(!is_top_level_bullet(""));
     }
 
     #[test]

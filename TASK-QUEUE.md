@@ -12,64 +12,6 @@
 
 ## New Features
 
-- **native-gate-port-remaining-corpus** [spec: SPEC-tool-port.md] [roadmap: now/reliability]
-  — the whole battery onto the binary, and the shell surface down to its residue.
-  roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
-  It DEMOTES at build, never `## Done` — canon-kit/SPEC.md §Merging an amendment's corpus branch.
-  **Operator-ruled 2026-08-09: complete the port, ASAP** — that ruling, its grounds, its scope,
-  both install paths and the tail are [TRAJECTORY.md](TRAJECTORY.md) §PRIORITY DIRECTIVE's, not
-  restated; this entry is the work, bootstrap design included, inheriting gate-sdk/SPEC.md
-  §Porting a gate to the binary substrate and §Consumer payload. **Each closed cut's record —
-  members, counts, holds, grounds, price — lives in the contract section that cut selected**, so
-  this entry states only what remains (drift-kit/SPEC.md §The KPI plugin contract, gate-sdk/SPEC.md
-  §Consumer smoke, *The port disposition*).
-  Cut widths are ruled **per cut and never inherited**; the size arm is **permanently** exhausted.
-  **THE COMPOSER DOES NOT REACH THE TREE REMAINDER** — the registry arm answers for the battery,
-  only `--tree` is the predicate, and both arms are run. That two-axis misreading, the rise in owed
-  on a landing shell file, and the bounds are gate-sdk/SPEC.md §port-blockers'.
-  **THE COMPOSER IS RULED 2026-08-28: select the next cut by STATED CONTRACT** — the owed
-  files behind one specification section, ported behind the one amendment that section needs. Size-
-  and kit-ordered composers stay refused. **IT CONSTRAINS SELECTION, NOT ITERATION PACKAGING —
-  ruled 2026-08-30 (operator, lead-relay):** the clauses above say what makes ONE cut well-formed;
-  how many an iteration holds is owned elsewhere. Refused with it — three cohorts as ONE cut, which
-  fails this ruling's own words (*one* section, *the one* amendment) and averages the grounds all
-  three entries forbid, shared setup being logistics; and one cut per iteration, an over-read
-  paying three iteration floors for no added decision quality.
-  **(1) A CUT NARROWS THE PORT, NEVER AN EXTENSION POINT.** Where a kit ships a consumer-facing
-  plugin or config seam, that seam's resolution, direct execution and env contract survive and only
-  the bundled members move in-crate; the ground is the porting kit's OWN governed surfaces plus
-  CLAUDE.md §The provenance seam, never analogy — worked at drift-kit/SPEC.md §The extensibility
-  contract. **(2) SETTINGS
-  GRANTS, RULED 2026-08-29 (operator, lead-relay):** removing a permission grant whose target a
-  RULED PORT CUT DELETES is OUTSIDE the 2026-08-22 bar — a pure narrowing forced by the cut — and
-  build removes the dead lines IN THE SAME COMMIT AS THE DELETE, the window the requirement exists
-  to close. The bar stands unchanged for every other permission-settings edit: a carve-out for one
-  class. Scope is the files THAT COMMIT deletes, never a path prefix — probe the count, never
-  assume it, the attested probe having quadrupled one kit's.
-  ruled: native-gate-port-remaining-corpus lead 2026-08-28 own-authority
-  ruled: native-gate-port-remaining-corpus operator 2026-08-28 lead-relay
-  ruled: native-gate-port-remaining-corpus lead 2026-08-29 own-authority
-  ruled: native-gate-port-remaining-corpus operator 2026-08-29 lead-relay
-  ruled: native-gate-port-remaining-corpus operator 2026-08-30 lead-relay
-  **Cost while deferred:** large and known — the **owed** remainder (the trailer's own arm, never
-  the unported count) plus the runners and the install-lifecycle layer. Not a single-iteration
-  delta; criterion relaxation is closed at gate-sdk/SPEC.md §The port-candidate criteria, an
-  ordering signal and never an eligibility screen. `gate-battery-result-cache` is the one battery
-  entry unsubsumed; `powershell-installer-surface` is the sequence's last member.
-  **A FIFTH YIELD IS NOT A LEAD'S TO RULE — 2026-08-29.** Four yields, each one named iteration
-  and none a reversal; a further one re-scopes an operator ruling, so a cut arguing for one
-  ESCALATES. **SUPERSEDED BY THE PORT-ONLY RUN, RULED 2026-08-31 (operator, consult)**: no yield
-  at all until `--tree` reads zero owed — TRAJECTORY.md §PRIORITY DIRECTIVE owns the run.
-  ruled: native-gate-port-remaining-corpus operator 2026-08-31 consult
-  **TWO RULINGS AT THIS CUT'S SPEC STAGE — 2026-08-31, lead, own authority.** The cut is
-  WELL-FORMED under the 2026-08-28 composer: its one section is queue-kit/SPEC.md §The
-  queue-index arm, and the whole-owed-column fact is a CONSEQUENCE, never the selector.
-  And the statusline's counter caller goes IN-PROCESS, both subprocess clauses retiring with
-  their shared bash ground, conditioned on the amendment stating where the bridged knobs
-  resolve. Content: SPEC-tool-port.md deltas 1 and 5.
-  ruled: native-gate-port-remaining-corpus lead 2026-08-31 own-authority
-  Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close; cohorts ruled at scope 2026-08-11/12.
-
 ## Technical Debt
 
 ## Deferred
@@ -524,6 +466,56 @@
   round a loop with no exit.
   Filed 2026-08-30 by close from the gap inbox, attested by that session while
   recovering from the loop this describes.
+
+- **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
+  — the whole battery onto the binary, and the shell surface down to its residue.
+  roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
+  It DEMOTES at build, never `## Done` — canon-kit/SPEC.md §Merging an amendment's corpus branch.
+  **Operator-ruled 2026-08-09: complete the port, ASAP** — that ruling, its grounds, its scope,
+  both install paths and the tail are [TRAJECTORY.md](TRAJECTORY.md) §PRIORITY DIRECTIVE's, not
+  restated; this entry is the work, bootstrap design included, inheriting gate-sdk/SPEC.md
+  §Porting a gate to the binary substrate and §Consumer payload. **Each closed cut's record —
+  members, counts, holds, grounds, price — lives in the contract section that cut selected**, so
+  this entry states only what remains (drift-kit/SPEC.md §The KPI plugin contract, gate-sdk/SPEC.md
+  §Consumer smoke, *The port disposition*).
+  Cut widths are ruled **per cut and never inherited**; the size arm is **permanently** exhausted.
+  **THE COMPOSER DOES NOT REACH THE TREE REMAINDER** — the registry arm answers for the battery,
+  only `--tree` is the predicate, and both arms are run. That two-axis misreading, the rise in owed
+  on a landing shell file, and the bounds are gate-sdk/SPEC.md §port-blockers'.
+  **THE COMPOSER IS RULED 2026-08-28: select the next cut by STATED CONTRACT** — the owed
+  files behind one specification section, ported behind the one amendment that section needs. Size-
+  and kit-ordered composers stay refused. **IT CONSTRAINS SELECTION, NOT ITERATION PACKAGING —
+  ruled 2026-08-30 (operator, lead-relay):** the clauses above say what makes ONE cut well-formed;
+  how many an iteration holds is owned elsewhere. Refused with it — three cohorts as ONE cut, which
+  fails this ruling's own words (*one* section, *the one* amendment) and averages the grounds all
+  three entries forbid, shared setup being logistics; and one cut per iteration, an over-read
+  paying three iteration floors for no added decision quality.
+  **(1) A CUT NARROWS THE PORT, NEVER AN EXTENSION POINT.** Where a kit ships a consumer-facing
+  plugin or config seam, that seam's resolution, direct execution and env contract survive and only
+  the bundled members move in-crate; the ground is the porting kit's OWN governed surfaces plus
+  CLAUDE.md §The provenance seam, never analogy — worked at drift-kit/SPEC.md §The extensibility
+  contract. **(2) SETTINGS GRANTS, RULED 2026-08-29 (operator, lead-relay):** removing a permission
+  grant whose target a RULED PORT CUT DELETES is OUTSIDE the 2026-08-22 bar — a pure narrowing
+  forced by the cut — and build removes the dead lines IN THE SAME COMMIT AS THE DELETE, the window
+  the requirement exists to close. The bar stands unchanged for every other permission-settings
+  edit: a carve-out for one class. Scope is the files THAT COMMIT deletes, never a path prefix —
+  probe the count, never assume it, the attested probe having quadrupled one kit's.
+  ruled: native-gate-port-remaining-corpus lead 2026-08-28 own-authority
+  ruled: native-gate-port-remaining-corpus operator 2026-08-28 lead-relay
+  ruled: native-gate-port-remaining-corpus lead 2026-08-29 own-authority
+  ruled: native-gate-port-remaining-corpus operator 2026-08-29 lead-relay
+  ruled: native-gate-port-remaining-corpus operator 2026-08-30 lead-relay
+  **Cost while deferred:** large and known — the **owed** remainder (the trailer's own arm, never
+  the unported count) plus the runners and the install-lifecycle layer. Not a single-iteration
+  delta; criterion relaxation is closed at gate-sdk/SPEC.md §The port-candidate criteria, an
+  ordering signal and never an eligibility screen. `gate-battery-result-cache` is the one battery
+  entry unsubsumed; `powershell-installer-surface` is the sequence's last member.
+  **NO YIELD AT ALL until `--tree` reads zero owed — the port-only run, ruled 2026-08-31
+  (operator, consult); TRAJECTORY.md §PRIORITY DIRECTIVE owns it.** It SUBSUMES rather than
+  repeals the 2026-08-29 four-yield rule: with no yield available there is none to escalate.
+  ruled: native-gate-port-remaining-corpus operator 2026-08-31 consult
+  ruled: native-gate-port-remaining-corpus lead 2026-08-31 own-authority
+  Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close; cohorts ruled at scope 2026-08-11/12.
 
 - **macos-install-smoke-ci-leg** [design-pending] [roadmap: next/reliability] — a macOS
   install-smoke leg; nothing has ever run green against macOS.
@@ -5626,9 +5618,9 @@
   live, and any insertion above it reslides it silently — are
   read by nothing but their own definitions and `queue-kit/gate-tests/queue-lib-parity.test.sh`,
   the shell tool that read them having been deleted by the queue-index port. Their siblings
-  `QUEUE_TASK_RE` and `QUEUE_SECTION_RE` **do** still have live readers —
-  `bin/queue-counts.sh`, `bin/queue-edges.sh`, and `queue_live_slugs` in
-  the library itself — so this is a **partial** death and a blanket section deletion is wrong.
+  `QUEUE_TASK_RE` and `QUEUE_SECTION_RE` **do** still have a live reader — `queue_live_slugs` in
+  the library itself, the other two named here until the 2026-08-31 tool cut deleted them — so
+  this is a **partial** death and a blanket section deletion is still wrong.
   **queue-kit/SPEC.md already rules the three internal**, which is what makes the deletion look
   safe: §The queue-index arm says the derived regexes "were never a configuration surface, only
   that library's internal spelling of these knobs".
@@ -7770,7 +7762,7 @@
   latter self-declaring an honest not-buildable as a permitted outcome. (B)
   `check-queue-slug-liveness` takes about two assertions for `retired-slug-live-pointer-citation`
   and `queue-status-parenthetical-liveness`, plus ONE report-only deliverable riding
-  `bin/queue-edges.sh`'s resolution — `done-slug-ownership-citation-report`, report-not-gate under
+  the queue-edges arm's resolution — `done-slug-ownership-citation-report`, report-not-gate under
   the SPEC's reference-vs-membership ruling; its twin `dead-queue-citation-report` has shipped. (C)
   `check-docs-cmd` widens from fenced-only to inline spans for `cited-script-path-liveness-inline`
   and `stale-identifier-after-retirement`, likely one ticket, though which gate holds it is an open

@@ -1,29 +1,24 @@
 #!/usr/bin/env bash
-# Behavioral test of bin/queue-counts.sh: the emitted section set is the
-# *configured* task sections in configured order — not a fixed four — and the
-# count is the top-level entry, the unit the queue-index arm lists. The
-# icebox-unset case is the discriminating one: a hardcoded implementation passes
-# a run against this repo's own config and fails only here. queue-counts is a
-# tool, not a gate, so it has no good/bad pair; this drives it directly.
+# spec: queue-kit/SPEC.md §The queue-counts arm — the seam a crate unit test cannot see: that the
+# battery runner's --emit front-end resolves the arm at all, and that a set consumer knob actually
+# reaches the rendering through the shell bridge. The discriminating case is the icebox-UNSET one,
+# which a hardcoded implementation passes against this repo's own config and fails only here. The
+# rendering itself — the derived section set, the top-level-entry unit, Done excluded, renamed
+# sections coming back renamed — is pinned in the ported module's own #[cfg(test)] tests, where
+# check-crate-arms runs them; duplicating it here would assert the same thing twice.
 #
 # Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
-DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # queue-kit/
-BIN="$DIR/bin/queue-counts.sh"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+RUN_GATES="$ROOT/gate-sdk/bin/run-gates.sh"
 SANDBOX="$(mktemp -d)"
 trap 'rm -rf "$SANDBOX"' EXIT
-: >"$SANDBOX/empty-config.sh"
-export QUEUE_KIT_CONFIG_FILE="$SANDBOX/empty-config.sh"
 
 fails=0
 checks=0
-
-eq() {     # $1=label $2=got $3=want
-    checks=$((checks + 1))
-    [[ "$2" == "$3" ]] || { echo "  FAIL [$1]: got '$2', want '$3'"; fails=$((fails + 1)); }
-}
+note() { echo "  FAIL [$1]: $2"; fails=$((fails + 1)); }
 
 cat >"$SANDBOX/TASK-QUEUE.md" <<'EOF'
 # TASK-QUEUE.md
@@ -33,7 +28,6 @@ cat >"$SANDBOX/TASK-QUEUE.md" <<'EOF'
 ## New Features
 
 - **feat-a** — do a thing.
-  - **not-an-entry** — an indented bullet is body, not a second entry.
 - **feat-b** — do another.
 
 ## Technical Debt
@@ -49,68 +43,40 @@ cat >"$SANDBOX/TASK-QUEUE.md" <<'EOF'
 ## Done
 
 - done-a
-- **done-b** — a Done entry shaped like an active one, to prove Done is out.
 
 ## Lessons Learned
-
-- **l1** [attend] — a lesson is not a task section.
 EOF
 
-# (a) with an icebox configured: the four configured task sections, in order,
-#     with Done and Lessons excluded and the indented bullet not counted.
-out="$(QUEUE_KIT_ICEBOX_SECTION=Chill bash "$BIN" "$SANDBOX/TASK-QUEUE.md")"
-eq "icebox-set" "$(tr '\t' '=' <<<"$out" | paste -sd, -)" \
-   'New Features=2,Technical Debt=0,Deferred=1,Chill=1'
-
-# (b) the discriminating case: no icebox configured -> three lines, and the
-#     section that is no longer a task section contributes nothing.
-out="$(bash "$BIN" "$SANDBOX/TASK-QUEUE.md")"
-eq "icebox-unset" "$(tr '\t' '=' <<<"$out" | paste -sd, -)" \
-   'New Features=2,Technical Debt=0,Deferred=1'
-
-# (c) renamed sections come back renamed — the tool resolves, never enumerates.
-cat >"$SANDBOX/renamed-config.sh" <<'EOF'
-QUEUE_KIT_ACTIVE_SECTIONS=("Work")
-QUEUE_KIT_DEFERRED_SECTION="Someday"
-QUEUE_KIT_ICEBOX_SECTION=""
-EOF
-cat >"$SANDBOX/renamed.md" <<'EOF'
-## Work
-
-- **w1** — one.
-
-## Someday
-
-- **s1** — two.
-- **s2** — three.
-
-## Done
-
-- **d1** — not counted.
-EOF
-out="$(QUEUE_KIT_CONFIG_FILE="$SANDBOX/renamed-config.sh" bash "$BIN" "$SANDBOX/renamed.md")"
-eq "renamed" "$(tr '\t' '=' <<<"$out" | paste -sd, -)" 'Work=1,Someday=2'
-
-# (d) over a queue whose bullets are all top-level, the total agrees with
-#     queue_live_slugs — the two readers must not disagree about one queue's size.
-#     The fixture is the renamed one deliberately: the main fixture's indented
-#     decoy is an entry to queue_live_slugs' grammar and a body bullet to this
-#     tool's, a latent divergence between two *existing* readers that this test
-#     must not silently adopt as agreement.
-lib_total="$(QUEUE_KIT_CONFIG_FILE="$SANDBOX/renamed-config.sh" bash -c \
-    'source "$1/lib/queue.sh"; queue_live_slugs "$2" | wc -l' _ "$DIR" "$SANDBOX/renamed.md")"
-counts_total="$(QUEUE_KIT_CONFIG_FILE="$SANDBOX/renamed-config.sh" bash "$BIN" "$SANDBOX/renamed.md" \
-    | awk -F'\t' '{ n += $2 } END { print n + 0 }')"
-eq "agrees-with-queue_live_slugs" "$counts_total" "$lib_total"
-
-# (e) a missing queue file is exit 2, never an empty clean answer.
+# --- the front-end resolves the arm at all ---
 checks=$((checks + 1))
-( bash "$BIN" "$SANDBOX/nope.md" >/dev/null 2>&1 )
-[[ "$?" -eq 2 ]] || { echo "  FAIL [missing-file]: expected exit 2"; fails=$((fails + 1)); }
+out="$( cd "$ROOT" && bash "$RUN_GATES" --emit queue-counts "$SANDBOX/TASK-QUEUE.md" 2>&1 )"; rc=$?
+[[ "$rc" -eq 0 ]] || note resolve "the front-end did not resolve --emit queue-counts (exit $rc): $out"
+grep -qxF "$(printf 'New Features\t2')" <<<"$out" \
+    || note resolve-render "the arm resolved but rendered no tally: $out"
+
+# --- a set consumer knob reaches the rendering through the bridge: the icebox section ---
+# The arm cannot know this section name; it arrives only if the bridge carried it.
+checks=$((checks + 1))
+out="$( cd "$ROOT" && env QUEUE_KIT_ICEBOX_SECTION='Chill' \
+    bash "$RUN_GATES" --emit queue-counts "$SANDBOX/TASK-QUEUE.md" 2>&1 )"
+grep -qxF "$(printf 'Chill\t1')" <<<"$out" \
+    || note bridge-icebox "a configured icebox section did not reach the arm through the bridge: $out"
+
+# --- the discriminating case: an emptied icebox knob leaves the tier off the tally entirely ---
+checks=$((checks + 1))
+out="$( cd "$ROOT" && env QUEUE_KIT_ICEBOX_SECTION= \
+    bash "$RUN_GATES" --emit queue-counts "$SANDBOX/TASK-QUEUE.md" 2>&1 )"
+grep -q 'Chill' <<<"$out" \
+    && note bridge-icebox-empty "an emptied icebox knob still tallied the tier: $out"
+
+# --- a missing queue file is a refusal, never an empty clean answer ---
+checks=$((checks + 1))
+( cd "$ROOT" && bash "$RUN_GATES" --emit queue-counts "$SANDBOX/nope.md" >/dev/null 2>&1 )
+[[ "$?" -eq 2 ]] || note missing-file "a missing queue file did not exit 2"
 
 if [[ "$fails" -gt 0 ]]; then
-    echo "queue-counts.test: $fails of $checks assertion(s) failed"
+    echo "queue-counts.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "queue-counts.test: ok ($checks assertions; configured task sections resolved, icebox derived, Done excluded, entry unit agrees with queue_live_slugs)"
+echo "queue-counts.test.sh: clean (the --emit front-end resolves the arm, a configured icebox section and an emptied one each reach the rendering through the bridge, and a missing file refuses; $checks checks)"
 exit 0

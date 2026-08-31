@@ -26,6 +26,7 @@ usage: run-gates.sh [gates-dir]                run every registered gate
        run-gates.sh --hook <member>            dispatch a harness hook member, payload on stdin
        run-gates.sh --statusline               render the harness status line, payload on stdin
        run-gates.sh --usage-poll               refresh the usage snapshot from its source
+       run-gates.sh --lesson-sink <tag>        route a lesson body on stdin to its sink
        run-gates.sh -h | --help                this text, on stdout, exit 0
 
   --only  runs the named members in registry order whatever order they were
@@ -48,6 +49,10 @@ usage: run-gates.sh [gates-dir]                run every registered gate
   --usage-poll  runs one poll cycle against the usage source and rewrites the
           snapshot. Its caller is a refresh command or a session rather than a
           gate on a tool call, so it refuses with exit 2 when unavailable.
+  --lesson-sink  reads a lesson body on stdin and runs the sink configured for
+          <tag>, or appends to <workflow-dir>/<tag>-harvest.md when none is.
+          The sink's exit status is this arm's, so a failing sink is visible to
+          the close step that ran it; unavailable is exit 2 for the same reason.
   --      ends option processing, so a gates-dir spelled with a leading dash
           is still reachable.
 
@@ -129,6 +134,13 @@ case "${1-}" in
     --usage-poll)
         shift
         exec_arm --usage-poll "$@"
+        ;;
+    # spec: queue-kit/SPEC.md §The lesson-sink arm — a bridged arm outside the `--emit-` family,
+    # because its contract is the sink's exit status and an emitting arm collapses it. It keeps
+    # exit 2 when unavailable: its caller is a close-stage step whose failure must be visible
+    --lesson-sink)
+        shift
+        exec_arm --lesson-sink "$@"
         ;;
     --for)
         shift

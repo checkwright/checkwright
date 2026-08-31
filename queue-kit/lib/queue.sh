@@ -87,7 +87,7 @@ QUEUE_SECTION_RE="^## "
 # shellcheck disable=SC2034  # consumed by sourcing tools, never within this lib
 QUEUE_LESSONS_RE="^## Lessons Learned[[:space:]]*$"
 
-# spec: queue-kit/SPEC.md §lib/queue.sh — the entry lead-line grammar as a shared adapter rather than an internal of the live-slug reader: bin/queue-edges.sh's history walk is its second reader, and the library's rule is that a grammar with more than one reader is named here
+# spec: queue-kit/SPEC.md §lib/queue.sh — the entry lead-line grammar as a shared adapter rather than an internal of the live-slug reader: the library's rule is that a grammar with more than one reader is named here, and the queue-edges arm's history walk asks the same question of an older revision
 # spec: queue-kit/SPEC.md §lib/queue.sh — bracketed literals, never backslash escapes: these cross into awk through -v, where awk's string-escape pass would eat a backslash before the regex ever sees it
 # shellcheck disable=SC2034  # consumed by sourcing tools, never within this lib
 QUEUE_SLUG_BOLD_RE="[*][*][a-z0-9][a-z0-9-]*[*][*]"

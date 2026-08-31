@@ -4,16 +4,22 @@
 use crate::emit::kpi;
 use crate::hook::{self, usage};
 use crate::hook::usage::Snapshot;
-use crate::proc;
 use crate::walk;
 
 // spec: delegation-kit/SPEC.md §The statusline arm — the arm's declared reads. NOT
 // `DELEGATION_KIT_USAGE_HISTORY`: the shipped producer calls `usage-verdict` nowhere, so the knob
-// has no reader here and a declared one would be a field with no named reader.
+// has no reader here and a declared one would be a field with no named reader
+// spec: delegation-kit/SPEC.md §The statusline arm — the four `QUEUE_KIT_*` names are the
+// counter rendering's, and declaring them here IS what puts them in front of an in-process
+// reader that resolves through the bridge
 pub const KNOBS: &[&str] = &[
     "DELEGATION_KIT_USAGE_FILE",
     "DELEGATION_KIT_CRED_FILE",
     "DELEGATION_KIT_ACCOUNT_CONFIG",
+    "QUEUE_KIT_QUEUE_FILE",
+    "QUEUE_KIT_ACTIVE_SECTIONS",
+    "QUEUE_KIT_DEFERRED_SECTION",
+    "QUEUE_KIT_ICEBOX_SECTION",
 ];
 
 // spec: delegation-kit/SPEC.md §The statusline arm — the gauge's geometry and its three
@@ -216,18 +222,10 @@ fn project() -> (String, String, String) {
         .ok()
         .map(|t| last_stamp_stage(&t))
         .unwrap_or_default();
-    // spec: delegation-kit/SPEC.md §The statusline arm — a subprocess and never an in-process
-    // call: the counter's own library exits 2 on a malformed queue config, which here would take
-    // the whole status bar down for a component worth four characters.
-    let counter = format!("{}/queue-kit/bin/queue-counts.sh", root);
-    let counts = if proc::is_executable(std::path::Path::new(&counter)) {
-        proc::run("bash", &[&counter])
-            .ok()
-            .and_then(|c| c.stdout().map(|o| String::from_utf8_lossy(o).into_owned()))
-            .unwrap_or_default()
-    } else {
-        String::new()
-    };
+    // spec: delegation-kit/SPEC.md §The statusline arm — the counter rendering, called in
+    // process. `Err` maps to an empty counter group, so an unresolvable queue file and a
+    // malformed queue config drop the whole group and change nothing else about the bar.
+    let counts = crate::emit::queue_counts::emit(&[]).unwrap_or_default();
     (iteration, stage, counts)
 }
 

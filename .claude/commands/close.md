@@ -4,7 +4,7 @@ Execute the template at lifecycle-kit/templates/stages/close.md, applying the bi
 
 **harvest-routing** — harvest routing (`QUEUE_KIT_LESSON_TAGS`,
 `scripts/queue-config.sh`): stream each tagged entry's body through `bash
-queue-kit/bin/lesson-sink.sh <tag>`, which resolves the sink from the local
+gate-sdk/bin/run-gates.sh --lesson-sink <tag>`, which resolves the sink from the local
 `QUEUE_KIT_LESSON_SINKS` overlay or falls open to the default
 `.workflow/<tag>-harvest.md` staging append.
   - `[essay]` — no sink command is configured here, so the body stages to

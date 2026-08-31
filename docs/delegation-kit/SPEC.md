@@ -2273,31 +2273,71 @@ separator or a partial parse.
 
 **The counter group** is a compact `N12 T3 D48 I7` tally of the queue's task
 sections, appended last. The arm does not know how many sections exist,
-what they are called, or which tiers the set contains: it runs
-queue-kit's `bin/queue-counts.sh` and renders whatever
+what they are called, or which tiers the set contains: it calls queue-kit's
+counter rendering and renders whatever
 `<section-name><TAB><count>` lines come back, labelling each with the initial of
-the name it was handed (queue-kit/SPEC.md §bin/queue-counts.sh). The section
+the name it was handed (queue-kit/SPEC.md §The queue-counts arm). The section
 vocabulary therefore stays entirely inside the kit that owns it — there is
 nothing here for a later editor to hardcode. As soon as two returned names share
 an initial, **every** label widens to two characters, so a colliding pair stays
 distinguishable and the group stays aligned rather than only the collision
 changing width.
 
-**It is a subprocess call, and that is the contract, not an implementation
-detail.** The counter's library exits 2 on a malformed queue config; calling it
-in-process would take the whole status bar down — model, context gauge, both
-rate-limit gauges — over a component worth four characters. As a subprocess the
-same fault is a non-zero exit the render absorbs. An absent or non-executable
-counter, a non-zero exit, and empty output all drop the group and change
-nothing else about the bar, matching the two degradations the arm already
-performs (an absent queue file drops the iteration; an absent evidence file
-drops the `@stage` suffix). The existence guard is kept even though every
-installer profile wiring this statusline also carries queue-kit, because a
-future profile pairing differently would otherwise turn a roster fact into a
-broken status bar.
+**The call is in process, and the paragraph that ruled a subprocess call *the
+contract* retires with its ground — ruled 2026-08-31 by the lead on own
+authority, uniformly across this section and queue-kit/SPEC.md §The queue-counts
+arm, whose own subprocess paragraph stated the same ground and retires with it.**
+That ground was that the counter's shell
+library exits 2 at source time on a malformed queue config, so an in-process call
+would take the whole status bar down — model, context gauge, both rate-limit
+gauges — over a component worth four characters. The hazard is a **sourced shell
+library** calling `exit` in its caller's process, and the ported rendering has no
+spelling for it: it resolves its knobs through the crate's bridged reads, which
+return `Result` and cannot exit, so a malformed queue config becomes an `Err`
+this arm maps to an empty counter group. The isolation argument's remaining force
+was already spent in any case — this module imports `crate::emit::kpi` and
+renders it in process, so the bar has never been isolated from crate code. It was
+isolated from *shell*, and that is what the port removed.
 
-The render cost is one subprocess per statusline fire, which is the kit's most
-frequent trigger by a wide margin (§The usage.txt contract). A full scan of a
+**Everything the sentence protected is preserved.** An unresolvable queue file, a
+malformed config and empty output all still drop the group and change nothing
+else about the bar, matching the two degradations the arm already performs (an
+absent queue file drops the iteration; an absent evidence file drops the `@stage`
+suffix). There is no existence guard: the rendering ships in the same binary, so
+a profile that vendored this kit without queue-kit has no missing script to guard
+against.
+
+**The arm's declared reads gain the counter rendering's four**
+(`QUEUE_KIT_QUEUE_FILE` and the three section knobs), because the subprocess used
+to resolve its own and an in-process reader resolves through the bridge. That
+*improves* on the state it replaces — knob resolution stops happening twice by
+two mechanisms. **Where those four resolve is stated here rather than inherited,
+because queue-kit/SPEC.md §The queue-index arm's front-end paragraph settles the
+caller that reaches an arm *as* an arm and an in-process call from a hook module
+is neither the front end nor a direct binary invoke:**
+
+- **They resolve from the bridged environment this arm's own exec already
+  carries.** The harness invokes `bash gate-sdk/bin/run-gates.sh --statusline`,
+  so the front end sources the shell library, resolves this arm's declared roster
+  and execs the binary with `GATE_SDK_KNOB_<NAME>=…` in the environment. Adding
+  the four names to the roster is therefore not bookkeeping — it *is* the
+  mechanism that puts them there. A consumer override in the gates dir's
+  `queue-config.sh` reaches this reader by exactly the path it reached the
+  subprocess, since the front end sources the same library either way.
+- **The silent-override-ignored failure that path could have had is structurally
+  unavailable.** The crate's bridged read returns `Err` when its variable is
+  absent — the crate holds no default — so an unbridged or partially-bridged
+  invocation cannot substitute a platform default for a consumer's value. It has
+  none to substitute.
+- **So the residual failure is total and visible, never partial and wrong.** A
+  roster widened to three of the four, or a caller invoking the binary directly
+  and bypassing the front end, drops the **whole** counter group and changes
+  nothing else about the bar — one of the degradations above. The failure the
+  front-end paragraph exists to prevent, a consumer's configured tier silently
+  missing from a rendered tally, has no spelling on this path.
+
+The render cost is one in-process scan per statusline fire, which is the kit's
+most frequent trigger by a wide margin (§The usage.txt contract). A full scan of a
 ~3,600-line queue measures in single-digit milliseconds, so the group needs no
 cache — recorded so a later session does not add one on suspicion.
 
