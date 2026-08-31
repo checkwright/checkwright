@@ -4,14 +4,4 @@
 
 ---
 
-port-declaration-cohort-and-windows-leg scope a175b6d5 2026-08-30 6e345565
-port-declaration-cohort-and-windows-leg spec ab805e98 2026-08-30 372ef055
-port-declaration-cohort-and-windows-leg align adc19654 2026-08-30 3de4bc3d
-port-declaration-cohort-and-windows-leg build aa13b652 2026-08-30 cef36253
-port-declaration-cohort-and-windows-leg build aca21279 2026-08-30 06944a24
-port-declaration-cohort-and-windows-leg build a12d1b02 2026-08-30 b458f09c
-port-declaration-cohort-and-windows-leg build a6edf0ee 2026-08-30 e3030b8e
-port-declaration-cohort-and-windows-leg build af820f35 2026-08-30 16bf1553
-port-declaration-cohort-and-windows-leg build a5c63a3d 2026-08-31 474481c6
-port-declaration-cohort-and-windows-leg validate a5da9d3f 2026-08-31 427e8003
-port-declaration-cohort-and-windows-leg close a7e4a47c 2026-08-31 b1f4aa0f
+— scope a42f2deb 2026-08-31 d6e006ea
