@@ -369,17 +369,6 @@ gate-sdk/SPEC.md §port-blockers), and widening the exclusion would let *port co
 while a full-profile adopter's vendored tree still runs bash — a false claim at the front door, the
 cost §What the objectives are not names.
 
-**Two port dispositions closed in one consult — ruled 2026-08-31 by the operator.** Both are
-mechanism and live where their contract does: `installer/consumer-smoke/run-smoke.sh` is declared
-`no-port` per file, minting no class (installer/README.md §The consumer smoke, *The port
-disposition*), and the install boundary's three step values are now readable in the port oracle's
-vocabulary — `bootstrap` the one declarable cause, `behind-invoke` a port obligation — with the two
-other readings refused there (installer/README.md §The install boundary). That consult closed a
-third, the harness hook substrate's arm kind, which had no contract home at the time and was
-carried here until one existed; it now lives at gate-sdk/SPEC.md §The non-gate arm, *The
-harness-integration arm*, with both refused shapes, and this sentence is the pointer that replaces
-it rather than a second copy of it.
-
 **The Windows leg's round 7 is cause-only — ruled 2026-08-31 by the operator in consult**, one
 round past the rider rule of 2026-08-30 and not a loop: its single change is the instrument, so
 `check-graph`'s generator spawn prints the generator's own output on any non-zero exit whichever

@@ -653,10 +653,12 @@ once the arm does run:
 Two implementation facts those rows force, recorded because the obvious build
 gets each of them wrong:
 
-- **There is no `jq`-absent arm to protect.** The compiled member serializes
-  its own advisory envelope directly (`serde_json`, never `printf`), so the
-  shell original's escape-by-convention fragility and its jq-backed delivery
-  primitive both retire with it rather than needing a compiled equivalent.
+- **There is no `jq`-absent arm to protect.** The compiled member emits its own
+  advisory envelope, serializing every interpolated value rather than quoting it
+  by hand (the braces and key order stay literal, to hold `guard_advise`'s wire
+  shape), so the shell original's escape-by-convention fragility and its jq-backed
+  delivery primitive both retire with it rather than needing a compiled
+  equivalent.
 - **The guard reads its roster through delegation-kit's validating config
   loader now, not around it — the port reversed that.** Pre-port the shell guard read
   `DELEGATION_KIT_READONLY_TYPES` on its own, deliberately outside the loader,
@@ -979,7 +981,8 @@ Claude and is itself the blocking reason when the hook emits no JSON decision**.
 So the refusal speaks through stderr, mints no guard-kit primitive, and leaves
 this hook's standing property intact — it **does not source guard-kit's lib**,
 which is what keeps delegation-kit from acquiring a dependency on guard-kit being
-vendored. The two payload fields it reads still cost a `cat` and a `jq -r`.
+vendored. Reading the payload costs the compiled member one stdin read and one
+parse, not a program apiece.
 
 **There is no advisory tier at this event, so the choice was deliver or do not.**
 At exit 0 a hook's stderr goes to the debug log only and Claude never sees it. A
@@ -1115,16 +1118,20 @@ deny-guard whose rule turns on an external reader, the same posture §The
 delegation model's dispatch guard already takes, and the `verdict=error` value in
 the grammar below is what supplies the "loud".
 
-**`jq`-absence does not disable enforcement, and this is the one place this hook
-is strictly better off than its `PreToolUse` siblings.** The decision reads the
-liveness reader over the run directory and reads **no payload field at all**; the
-payload feeds only the log's `event`, `session` and `keys` columns. So an absent
-`jq` degrades the log line and leaves the refusal exact, and the
-advisory-envelope problem the dispatch guard had to solve by hand does not arise
-here.
+**An unreadable payload does not disable enforcement, and this is the one place
+this hook is strictly better off than its `PreToolUse` siblings.** The verdict
+comes from the liveness reader over the run directory, so a payload that will not
+parse costs the log line its `event`, `session` and `keys` columns and leaves the
+verdict exact. It does not leave the *decision* exact in every arm, and the
+exception is stated rather than rounded away: `stop_hook_active` is a payload
+field, and on the `unresolved` arm alone it flips a refusal into an allow (the
+already-continuing bound below). Every other arm decides on the verdict alone.
+The advisory-envelope problem the dispatch guard had to solve by hand does not
+arise here either way, and no separate JSON program is on this path at all.
 
 **The bounded call stays, and its meaning inverts.** The reader is invoked under
-`timeout` where one is available. While this hook only logged, the bound was
+a wait bound the member applies unconditionally, which is one optional program
+fewer than the shell form's conditional `timeout`. While this hook only logged, the bound was
 there because a reader that hung would have refused the turn end by accident —
 the blocking variant arrived at sideways. Now that the hook *is* the blocking
 variant, the bound is what keeps a hung **reader** from being read as a live
@@ -1549,18 +1556,22 @@ an empty run dir — the isolated-dispatch shape, and the one arm that must **no
 come back `unavailable`, which would misreport a wired reader as one that was
 never configured. `unavailable` fails that lane by name.
 
-**The hermetic stub-driven lane that used to hold every verdict arm retired with
-the port, and it is a gap rather than a fact folded quietly into the paragraph
-above.** This kit's own `gate-tests/subagent-stop-liveness.test.sh` drove a
+**The hermetic stub-driven lane that used to hold every verdict arm moved into
+the member's own module with the port, and the move is stated rather than left to
+be inferred from this section's silence.** The retired
+`gate-tests/subagent-stop-liveness.test.sh` drove a
 **stub** reader through all six arms (`green`, `red`, `corrupt`, `unresolved`,
 `unavailable`, `error`) hermetically, `corrupt` and `unresolved` twice each — once
 over a run dir holding a record and once over an empty one, since they are one
 reader exit read through two record counts — asserting the exit code, the
 `decision` column and the refusing arms' stderr wording apart from the verdict.
-The compiled member's own tests cover its record-format and key-derivation
-helpers, not this state machine, and the real-reader lane above never reaches
-`corrupt` or `error` either. The gap is filed rather than left to be inferred
-from this section's silence.
+That whole case set is the compiled member's, carried across expectation by
+expectation rather than re-derived from the code it tests, with one deliberate
+divergence: `keys` is asserted sorted, this section's own rule, where the table
+recorded document order. The real-reader lane above still reaches neither
+`corrupt` nor `error`, and does not need to — the stub lane is where a reader's
+exit class is chosen, and the real lane exists to prove the *configured* reader
+resolves at all.
 
 ### What `background_tasks` carries
 
@@ -2060,10 +2071,11 @@ timer producers are unchanged.
 
 The refresh is **short-circuited** by `DELEGATION_KIT_REFRESH_MIN_AGE`: the
 command runs only when the snapshot is missing, unreadable, or its
-`updated_at` age is at least that value. The statusline calls `usage-verdict`
-on every render for trend sampling; without the floor a configured refresh
-would hammer the source on the render path. At dispatch-decision time a
-stale-enough snapshot still polls.
+`updated_at` age is at least that value. The floor exists because the verdict's
+callers fire in bursts rather than on a schedule — the dispatch guard runs it
+once per `Agent` call and the session-start brief once per session — so without
+it a configured refresh would hammer the source across a fan-out. At
+dispatch-decision time a stale-enough snapshot still polls.
 
 It is **fail-soft**: a non-zero refresh exit leaves the snapshot untouched and
 the verdict proceeds on the cached file — the staleness machinery above judges
@@ -2563,8 +2575,8 @@ the class ruling at gate-sdk/SPEC.md §The config-seam port disposition. Knobs
   reason gate-sdk/SPEC.md §The non-gate arm states: the config bridge resolves a
   declared knob by sourcing exactly that library, so a default sitting anywhere
   else is sourced by nothing and the bridge refuses the whole environment.
-- `DELEGATION_KIT_STOP_LOG` — the turn-end probe's log (§The turn-end liveness
-  probe (template)); default
+- `DELEGATION_KIT_STOP_LOG` — the turn-end hook's log (§The turn-end liveness
+  hook); default
   `${GATE_SDK_WORKFLOW_DIR:-.workflow}/subagent-stop-liveness.log`, the same
   deferral guard-kit's two logs already take. No scratch-dir knob sits beside it:
   the launch record's home is `${GATE_SDK_TMP_DIR:-.tmp}`, the cross-kit deferral

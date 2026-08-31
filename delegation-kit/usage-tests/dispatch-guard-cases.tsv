@@ -2,10 +2,10 @@
 # decision is block (exit 2) / advise (exit 0, additionalContext) / fallthrough
 # (exit 0, no output). Tab-separated; # and blank lines ignored. '-' marks an
 # absent isolation/nested value — never a truly empty field between tabs, since
-# a whitespace IFS collapses runs of empty fields (the exact bug the guard's own
-# jq-to-read split works around; see agent-dispatch-guard.sh).
+# a whitespace-split reader collapses runs of empty fields, which is a property of
+# this table's own encoding rather than of any one reader of it.
 #
-# The runner fixes one roster for the whole table: DELEGATION_KIT_READONLY_TYPES=(ro-type).
+# The reader fixes one roster for the whole table: DELEGATION_KIT_READONLY_TYPES=(ro-type).
 # A subagent_type prefixed 'noroster:' runs with no roster config at all (an
 # empty declare), proving D2 stays inert on the roster's absence rather than on
 # this type's absence from a populated one; the prefix is stripped before it

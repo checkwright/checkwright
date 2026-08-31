@@ -7688,9 +7688,9 @@
   agent that found nothing rather than as an agent whose report was dropped. That last reading is
   a correctness risk rather than an efficiency one, and it is the expensive half.
   **The floor's coverage is now measured, and it is half of shape one.**
-  `scripts/agent-dispatch-guard.sh:50-52` refuses a read-only type dispatched WITHOUT
-  `isolation: worktree`, and `:58` appends the return-value-only advice — but that second branch
-  fires only when the dispatcher is ITSELF a dispatched agent (`_adg_nested == nested`). A
+  The `agent-dispatch-guard` arm's D2 rule refuses a read-only type dispatched WITHOUT
+  `isolation: worktree`, and its D3 rule appends the return-value-only advice — but that second
+  branch fires only when the dispatcher is ITSELF a dispatched agent (a nested dispatch). A
   top-level lead dispatching the same read-only sweep gets the isolation refusal and no
   return-value instruction at all. So the guard already reaches the ISOLATION half of shape one and
   is silent on the CHANNEL half, which is the half this entry is about.
@@ -7859,7 +7859,7 @@
   refusals — the built-in `check-stage-entry` one and every `LIFECYCLE_KIT_ENTRY_PREFLIGHT` one —
   and it reads "resolve the finding above, or (to override deliberately) perform the stamp by
   hand."
-  **What contradicts it, all three checked first-hand.** `scripts/workflow-state-guard.sh` is a
+  **What contradicts it, all three checked first-hand.** The `workflow-state-guard` arm is a
   `PreToolUse(Write|Edit)` hook that BLOCKS a hand edit of the state file outright, and its own
   block text ends "If enter-stage refuses, that refusal is a gate verdict to resolve at its source,
   not to write around." `lifecycle-kit/templates/stages/close.md`'s first step says "On a refusal,
@@ -8566,33 +8566,29 @@
   records a refusal without recording whose, so a reader cannot tell the guard working from the
   guard wedged.
   recurrence: subagent-liveness-log-unattributed-refusal 2026-08-28 2026-08-31
-  **SECOND RECURRENCE — a FOURTH measurement, the largest yet, buying the same nothing.** Read at
-  this close: 440 events, 19 `live=yes verdict=red records=1 decision=refuse`, every row again
-  carrying only the top-level harness session and naming neither the refused subagent nor the
-  matched record. Volume moved 11-of-172, 21-of-366, 19-of-440; readability did not move at all.
-  **FIRST RECURRENCE — a THIRD cluster, on a third day, and still unclassifiable.** Read at
-  `installer-trial-lifecycle-repair`'s close off the live log: 172 events, 161 green and **11
-  `live=yes verdict=red records=1 decision=refuse`** in three sub-clusters between 20:58Z and
-  21:26Z on 2026-08-27, at roughly 30-second retry intervals — the same signature as the two
-  21-refusal clusters below. Every row again carries the top-level harness session in `session=`
-  and names neither the refused subagent nor the matched record, so this close could not tell a
-  guard correctly holding a turn against a live build producer from a guard wedged on a waiter's
-  own record. The finding is not that refusals happened; it is that a third measurement bought
-  the same nothing the first two did.
-  **Read at the windows-artifact-proof close:** 366 events, 21 refusals, identical signature —
-  three clusters at roughly 30-second retries, `session=` uniform across green and red rows alike.
+  **FIVE measurements across four days, and the SERIES is the finding rather than any one of
+  them.** Events / refusals, in order: 366/21 at `windows-artifact-proof`'s close, 172/11 at
+  `installer-trial-lifecycle-repair`'s (three sub-clusters, 20:58Z-21:26Z on 2026-08-27), 440/19,
+  then 298/7 at this close — the first reading taken off the log the PORTED arm writes. Every
+  refusal in every one of them is `live=yes records=1 decision=refuse`, arriving in ~30-second
+  retry sub-clusters, with `session=` carrying the top-level harness session uniformly across
+  green and red rows alike. Volume moved four times and readability moved none: not one refusal in
+  any measurement can be told from a guard correctly holding a turn against a live producer, or
+  from one wedged on a waiter's own record. **That ground is answered, not open — a sixth
+  measurement is known in advance to buy the same nothing**, and the port did not change it.
   **The payload already carries the attribution and the hook drops it.** Each line's own `keys=`
   field lists `agent_id` and `agent_type` among the hook payload's keys, so logging those two plus
-  the run key of the matched record would make every one of these rows readable. The hook is
-  `scripts/subagent-stop-liveness.sh`, 91 lines, whose contract is delegation-kit/SPEC.md §The
-  turn-end liveness hook.
+  the run key of the matched record would make every one of these rows readable. The hook is the
+  `subagent-stop-liveness` harness-integration arm, whose contract is delegation-kit/SPEC.md §The
+  turn-end liveness hook; the shell copy this entry was filed against is gone, and the field set it
+  writes is `native/src/hook/stop_liveness.rs`'s — still carrying no `agent_id` or `agent_type`, so
+  the finding is unmoved by the substrate.
   **The filing bullet's motive was a DISPOSED premise** — it argued the gap blocks verifying
   `waiter-predicate-self-match`, which is retired, its work landed at `05af5200`. The urgency
   framing falls with it; the finding does not.
   **What survives, and it is the general form.** A refusal is correct when a real producer is
   running and is a wedge when the record naming a live pid belongs to the waiter itself. That
-  distinction is the log's whole diagnostic value, and no row carries the field that would settle
-  it. Four measurements across three days, and not one refusal in any of them is classifiable.
+  distinction is the log's whole diagnostic value, and no row carries a field that would settle it.
   **Why `[design-pending]`:** the candidate shapes differ in who they serve. Logging `agent_id`,
   `agent_type` and the matched run key serves a later reader. Naming the matched record in the
   *refusal message* serves the refused session, which can then act on it. Dropping `session=`
@@ -8601,11 +8597,15 @@
   **DISTINCT from the close-surface roster question**, which asks whether the log is read at all;
   this asks what it can say once read.
   **AT THRESHOLD 2026-08-31, promotion DECLINED, and the deleted-fix-site argument read the other
-  way.** `scripts/subagent-stop-liveness.sh` is a member of the `harness-hook-arm-port` cut, so a
-  fix authored now is authored against shell that cut removes; authoring it against the LANDED arm
-  is better information, and deferral gains. Refused: folding it into the port amendment, since
-  settling a live `[design-pending]` fork inside a port cut is non-port design work. **ONE
-  CONSTRAINT RIDES OUT:** the arm's logging contract must not foreclose adding attribution later.
+  way.** The shell hook was a member of the `harness-hook-arm-port` cut, so a
+  fix authored then would have been authored against shell that cut removes; authoring it against
+  the LANDED arm is better information, and deferral gained. Refused: folding it into the port
+  amendment, since settling a live `[design-pending]` fork inside a port cut is non-port design
+  work. **ONE CONSTRAINT RODE OUT AND IS DISCHARGED, 2026-08-31 at that cut's build:** the arm's
+  logging contract must not foreclose adding attribution later, and delta 8 specified the record's
+  field set OPEN, so `agent_id`, `agent_type` and the matched run key stay addable in one table
+  edit. Both halves of the deferral's own price are therefore paid — the arm exists and the
+  constraint held — and the entry is takeable on its merits rather than waiting on a substrate.
   ruled: subagent-liveness-log-unattributed-refusal lead 2026-08-31 own-authority
   **Cost while deferred:** every refusal cluster is uninterpretable, so the one instrument that
   could measure whether the producer/observer split works reads the same for a working guard and a
@@ -9239,10 +9239,6 @@
 - **port-blockers-library-mediated-scan** [design-pending] — A library-mediated spawn reads clean.
 
 ## Done
-
-- installer-boundary-behind-invoke-port-reading
-- consumer-smoke-runner-port-disposition
-- harness-template-port-residue
 
 ## Lessons Learned
 

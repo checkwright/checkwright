@@ -1972,7 +1972,7 @@ re-deciding, and only the operator reopens a closed ruling.
 
 The binary is a multi-call binary whose *gate* subcommands are dispatched by
 name out of `gates::REGISTRY`. It also carries arms that are **not** gates —
-`--list`, `--reads`, `--knobs`, `--source-stamp`, `--queue-parity`,
+`--list`, `--reads`, `--needs`, `--knobs`, `--source-stamp`, `--queue-parity`,
 `--declaration-parity`, `--evidence-lib-parity` and `--install`, plus the
 `--emit-` family the bridged-arm table keys (`--emit-drift-report` is its
 2026-08-29 member) and the **harness-integration** arms below it — and the class
@@ -2338,8 +2338,10 @@ an unknown member is exit 2 with the roster named, the `no_such_gate` shape.
 absent, empty or unparseable payload takes the member's own **degraded** path —
 the path each shell member already had for a missing `jq` — never a panic and
 never a block the member would not otherwise have issued. *stdout* is the
-hook-JSON envelope where the member emits one, **serialized rather than composed
-by `printf`**, which retires a live fragility: a shell member's jq-absent arm
+hook-JSON envelope where the member emits one, with **every interpolated value
+serialized rather than quoted by hand** — the envelope's own braces and key order
+stay a literal, deliberately, so the wire shape is the one `guard_advise`
+already published. That retires a live fragility: a shell member's jq-absent arm
 hand-wrote the envelope with no escaper and kept its advisory literals free of
 any character JSON must escape by convention alone. A member emitting no envelope
 writes nothing on stdout. *stderr* is the member's block or refusal text, which
@@ -2385,7 +2387,16 @@ shell member bought by reading its one knob outside that loader. A member that
 finds its own declared knob unresolved declines the same way, loudly, on the
 reasoning that reaching the arm without the bridge is the same fact seen from
 inside. An arm whose caller is a refresh command or a session rather than a gate
-on a tool call keeps exit 2.
+on a tool call keeps exit 2 — `--usage-poll` is that case, its caller a timer.
+**One member the two branches do not cover, stated rather than folded into
+either.** `--statusline` declines at `0`, and neither branch reaches it: it gates
+no tool call, so the fail-open branch's ground is absent, and its caller is the
+harness, which **discards** its status, so an exit 2 would be a verdict with no
+reader. The status is fixed at the front-end and this paragraph records it.
+Whether that is a third branch of this rule — *a harness-integration arm whose
+status the harness ignores declines at 0* — or an instance of the fail-open one
+read more widely is **not settled here**; both readings produce today's behaviour
+and choosing between them shapes the next member rather than this one.
 
 **There is no tension with §Fail-closed contract to reconcile, and saying so once
 is the point of this paragraph.** That contract attaches to a *gate* — this
@@ -8412,8 +8423,12 @@ the column this port exists to drain, and duplicate `exec_arm`.
 function.** The two ways a dispatch can fail before the arm runs — an absent or
 non-executable binary, and a config bridge that refused — both exit
 `$ARM_UNAVAILABLE_STATUS`, which is `2` for every arm whose verdict a battery or
-a session reads and `0` for `--hook`, whose status is the harness's allow/block
-signal. The diagnostic is written to stderr either way, so the failure is loud on
+a session reads and `0` for the two harness-integration arms whose status the
+harness itself interprets — `--hook`, where it is the allow/block signal, and
+`--statusline`, where the harness ignores it, so a failed dispatch that exited 2
+would be a verdict nothing reads. `--usage-poll` keeps `2`: its caller is a
+timer, not the harness.
+The diagnostic is written to stderr either way, so the failure is loud on
 both settings; only the status differs, which is §The non-gate arm's fail-open
 rule spelled at the one place both causes converge. A status rather than a second
 `exec_arm` is what keeps the bridge resolution, the `env` composition and the
