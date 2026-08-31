@@ -6,3 +6,4 @@
 
 harness-hook-arm-port scope a42f2deb 2026-08-31 d6e006ea
 harness-hook-arm-port spec acbab8e9 2026-08-31 845bb48b
+harness-hook-arm-port align a9499bf2 2026-08-31 adfb93bd
