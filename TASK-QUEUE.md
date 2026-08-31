@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: cause-instrument-and-queue-kit-cut
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -27,18 +27,15 @@
   **PRODUCED AND EXERCISED ARE BOTH DISCHARGED — round 5 (`33298006656`, head `fb9ed980`,
   2026-08-30) is the first run in this project's history to execute gates on Windows.** It built
   `checkwright-gates.exe` for `x86_64-pc-windows-msvc`, packed it, installed from the tarball and
-  ran the battery through it — an exercise, not an omit-and-declare install — so blockers 5 and 6
-  and batch 4's `on_path` repair are MEASURED rather than read.
+  ran the battery through it, so blockers 5 and 6 and batch 4's `on_path` repair are MEASURED.
   **ROUND 6 IS OBSERVED — run `33392360228`, head `e0e4355e`, 2026-08-31 — AND IT SPLIT.** Round
   5's `2 of 10 gates FAILED: check-graph check-install-disposition` became `1 of 11 gates FAILED:
-  check-graph`, both repairs having landed at build in `ef65956b` and both verified on Linux
-  alone, the one dialect that cannot exhibit either fault. **`check-install-disposition` IS
-  REPAIRED**, confirmed on the only host that can show it: the `Path::join` separator fix in
-  `walk::expand` holds, the smoke's roster grew from ten gates to eleven, and no lookup misses on
-  a mangled key. That mechanism is gate-sdk/SPEC.md §Porting to Rust does not retire dialect
-  exposure's. **`check-graph` IS NOT.** Both `gen-pre-commit.sh --emit` arms still fail, unchanged
-  from round 5, so the cwd anchor gate-sdk/SPEC.md §The path-dialect contract prescribes did not
-  reach the cause. Same-gate red, so the ruling below fires: FILED AND DEFERRED, no further round.
+  check-graph`, both repairs having landed at build in `ef65956b` and verified on Linux alone.
+  **`check-install-disposition` IS REPAIRED**, confirmed on the only host that can show it; the
+  mechanism is gate-sdk/SPEC.md §Porting to Rust does not retire dialect exposure's.
+  **`check-graph` IS NOT** — both `gen-pre-commit.sh --emit` arms still fail unchanged from round
+  5, so the cwd anchor gate-sdk/SPEC.md §The path-dialect contract prescribes did not reach the
+  cause. Same-gate red, so the ruling below fires: FILED AND DEFERRED, no further round.
   **THE OPERATOR'S 2026-08-30 RULING, WHICH THIS DEMOTION LEAVES INTACT:** the rider stops at
   green — on green, drop `continue-on-error` on the job comment's own trigger and STOP, since the
   `targets.list` join below is separately measured work; on a red cause, file and defer without
@@ -53,17 +50,20 @@
   **Cost while deferred:** the one adopter class with a named days-to-weeks adoption window still
   has no working install path on Windows, and `powershell-installer-surface` — the port sequence's
   one remaining member — stays sequenced behind this entry.
-  **DEMOTED 2026-08-31 AT BUILD SO THE ITERATION COULD ENTER VALIDATE, AND IT RETIRES NOTHING.**
-  The observation only the close push buys sits AFTER the stage that demands completion, so
-  `## Done` was unavailable; the `[roadmap:]` tag survives and TRAJECTORY.md's 2026-08-23
-  protection forbids RETIRING, not demoting. The operator's rider ruling above is undemoted.
+  **DEMOTED 2026-08-31 AT BUILD SO THE ITERATION COULD ENTER VALIDATE, AND IT RETIRES NOTHING** —
+  the observation only the close push buys sits AFTER the stage that demands completion, so
+  `## Done` was unavailable. The `[roadmap:]` tag and the operator's rider ruling both survive.
   **ROUND 7 IS RULED 2026-08-31 (operator, consult) AS CAUSE-ONLY**: its one change is the
   instrument — `generator_emit` prints the generator's own output on any non-zero exit — and no
   repair ships in it; grounds and the refused shape at TRAJECTORY.md §The closed rulings.
+  **ROUND 7 SHIPS INSIDE `cause-instrument-and-queue-kit-cut` (operator, 2026-08-31), so its
+  reading is taken on a binary ALSO carrying that iteration's queue-kit arms.** No ported member is
+  a gate, so the 11-gate roster is unchanged — but the rebuild is not diff-free; do not read it so.
   ruled: platform-support-ci-matrix operator 2026-08-27 lead-relay
   ruled: platform-support-ci-matrix operator 2026-08-30 lead-relay
   ruled: platform-support-ci-matrix lead 2026-08-30 own-authority
   ruled: platform-support-ci-matrix operator 2026-08-31 consult
+  ruled: platform-support-ci-matrix operator 2026-08-31 lead-relay
   Filed 2026-07-26 by scope, split from `platform-support-contract`; Linux split 08-25, macOS 08-26;
   promoted/deferred 08-25 through 08-31; round 6 observed and recorded 08-31 by close's own push.
 
@@ -7371,10 +7371,10 @@
   **Why `[design-pending]`:** it rules the boundary of a governed audit class, an authoring
   question about the roster row rather than a code change.
   recurrence: dated-measurement-restatement-class 2026-08-25 2026-08-29
-  **AT THRESHOLD AND DECLINED TWICE ON DIFFERENT GROUNDS — 2026-08-30, then 2026-08-31.** First:
-  machinery-class by default, no unit set reaching it, under EITHER reading. Second, on no
-  precedent and the stronger of the two: the port-only run forecloses a non-port unit, so the rot
-  measured above argues this entry's RETURN at the post-port triage iteration, never promotion.
+  **AT THRESHOLD AND DECLINED THREE TIMES — 2026-08-30, then twice on 2026-08-31.** First:
+  machinery-class by default, no unit set reaching it. Second and third, on the stronger ground and
+  on the RUN rather than the merits: the port-only run forecloses a non-port unit while the oracle
+  reads owed (61 at the third), so the rot above argues RETURN at the post-port triage, not now.
   ruled: dated-measurement-restatement-class lead 2026-08-30 own-authority
   ruled: dated-measurement-restatement-class lead 2026-08-31 own-authority
   **Cost while deferred:** the figures rot silently, and the entry carrying them is the one
@@ -8596,16 +8596,17 @@
   a diagnostic for a reader or a steer for the refused session is the unruled half.
   **DISTINCT from the close-surface roster question**, which asks whether the log is read at all;
   this asks what it can say once read.
-  **AT THRESHOLD 2026-08-31, promotion DECLINED, and the deleted-fix-site argument read the other
-  way.** The shell hook was a member of the `harness-hook-arm-port` cut, so a
+  **AT THRESHOLD 2026-08-31, promotion DECLINED TWICE THAT DAY, and the deleted-fix-site argument
+  read the other way.** First: the shell hook was a member of the `harness-hook-arm-port` cut, so a
   fix authored then would have been authored against shell that cut removes; authoring it against
   the LANDED arm is better information, and deferral gained. Refused: folding it into the port
   amendment, since settling a live `[design-pending]` fork inside a port cut is non-port design
-  work. **ONE CONSTRAINT RODE OUT AND IS DISCHARGED, 2026-08-31 at that cut's build:** the arm's
-  logging contract must not foreclose adding attribution later, and delta 8 specified the record's
-  field set OPEN, so `agent_id`, `agent_type` and the matched run key stay addable in one table
-  edit. Both halves of the deferral's own price are therefore paid — the arm exists and the
-  constraint held — and the entry is takeable on its merits rather than waiting on a substrate.
+  work. **ONE CONSTRAINT RODE OUT AND IS DISCHARGED at that cut's build:** the arm's logging
+  contract must not foreclose attribution later, and delta 8 specified the record's field set OPEN,
+  so `agent_id`, `agent_type` and the matched run key stay addable in one table edit. Both halves
+  of the deferral's price are paid, so the entry IS takeable on its merits. **Second declination,
+  at the next scope: ON THE RUN AND NOT ON MERIT** — the port-only run forecloses a non-port unit
+  while the oracle reads 61 owed, and its one yield is spent on the Windows leg's round 7.
   ruled: subagent-liveness-log-unattributed-refusal lead 2026-08-31 own-authority
   **Cost while deferred:** every refusal cluster is uninterpretable, so the one instrument that
   could measure whether the producer/observer split works reads the same for a working guard and a
