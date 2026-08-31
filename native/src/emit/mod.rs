@@ -214,6 +214,19 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         Arm::Run(crate::hook::run),
         &[crate::hook::EVERY_HOOK_KNOB],
     ),
+    // spec: gate-sdk/SPEC.md §The non-gate arm — the two harness-integration arms that are not
+    // members of `--hook`: neither speaks the hook protocol, so each names its own caller and
+    // carries its own fixed roster rather than folding into an arm whose contract it would void
+    (
+        "--statusline",
+        Arm::Run(crate::hook::statusline::run),
+        crate::hook::statusline::KNOBS,
+    ),
+    (
+        "--usage-poll",
+        Arm::Run(crate::hook::poll::run),
+        crate::hook::poll::KNOBS,
+    ),
 ];
 
 pub fn lookup(arm: &str) -> Option<&'static Arm> {

@@ -24,6 +24,8 @@ usage: run-gates.sh [gates-dir]                run every registered gate
        run-gates.sh --for <path> [<path>...]   run only gates coupling to those paths
        run-gates.sh --emit <arm> [args...]     dispatch a ported non-gate emitter arm
        run-gates.sh --hook <member>            dispatch a harness hook member, payload on stdin
+       run-gates.sh --statusline               render the harness status line, payload on stdin
+       run-gates.sh --usage-poll               refresh the usage snapshot from its source
        run-gates.sh -h | --help                this text, on stdout, exit 0
 
   --only  runs the named members in registry order whatever order they were
@@ -41,6 +43,11 @@ usage: run-gates.sh [gates-dir]                run every registered gate
           allow/block signal. Where the binary is absent or its configuration
           cannot be resolved, this arm declines with a diagnostic on stderr and
           exit 0 rather than blocking every guarded tool call.
+  --statusline  renders the status line for the harness's statusLine hook and
+          rewrites the usage snapshot; declines like --hook when unavailable.
+  --usage-poll  runs one poll cycle against the usage source and rewrites the
+          snapshot. Its caller is a refresh command or a session rather than a
+          gate on a tool call, so it refuses with exit 2 when unavailable.
   --      ends option processing, so a gates-dir spelled with a leading dash
           is still reachable.
 
@@ -110,6 +117,18 @@ case "${1-}" in
         [[ -n "$HOOK_MEMBER" ]] || { echo "run-gates: --hook needs a member name" >&2; exit 2; }
         ARM_UNAVAILABLE_STATUS=0
         exec_arm --hook "$@"
+        ;;
+    # spec: gate-sdk/SPEC.md §The non-gate arm — the two harness-integration arms outside the hook
+    # protocol. --statusline gates no tool call but the harness ignores its status, so it declines
+    # the same way; --usage-poll keeps exit 2, its caller being a refresh command or a session
+    --statusline)
+        shift
+        ARM_UNAVAILABLE_STATUS=0
+        exec_arm --statusline "$@"
+        ;;
+    --usage-poll)
+        shift
+        exec_arm --usage-poll "$@"
         ;;
     --for)
         shift

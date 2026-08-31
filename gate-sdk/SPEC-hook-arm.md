@@ -462,7 +462,25 @@ predicting it.
 Every SPEC section describing a member's shell form is rewritten to describe its
 arm, and every generated projection is regenerated from its own trigger. {mechanical}
 
-The prose targets are enumerated under §Existing sections updated. The generated
+The prose targets are enumerated under §Existing sections updated. **That
+enumeration is shared with the deltas it attributes each section to, and the
+boundary is ruled rather than left to be read** (`ruled:
+harness-template-port-residue lead 2026-08-31 own-authority`). Both readings are
+available on this text: the roster attributes those sections to deltas 2, 6, 7,
+8, 9, 10 and 11, while the sentence above claims every one of them for this
+delta. The line is **the path-bearing one**. A delta of this amendment other
+than 12 owns a section only where it names a **deleted path** — delta 10's own
+list plus the four the align audit's grep added — or where a knob roster the
+implementing code forces has to be stated. Everything else in those sections is
+delta 12's: every substrate-describing rewrite, and every section title's
+`(template)` removal, across `delegation-kit/SPEC.md`, `guard-kit/SPEC.md` and
+`lifecycle-kit/SPEC.md`. Two reasons, and the second is why the boundary is
+worth a ruling rather than a preference: the path-bearing line is the one under
+which each landing commit stays green and self-contained, since no gate reds on
+substrate-describing prose and `check-md-refs` reds only on a live markdown link
+to a deleted path; and it is the line that leaves this delta at the size its
+`{mechanical}` label was assigned against, where the roster reading would shrink
+it to regen commands and defeat the per-delta work tiering. The generated
 set is `docs/` mirrors, `docs/enforcement.md`, `ROADMAP.md` where the entry's tags
 move, and `scripts/git-hooks/pre-commit` — each with the trigger and regen command
 `docs/site-architecture.md` §Generated projections already rosters. Release posts

@@ -6,7 +6,10 @@ use serde_json::Value;
 pub mod budget;
 pub mod dispatch;
 pub mod escalation;
+pub mod poll;
+pub mod statusline;
 pub mod stop_liveness;
+pub mod usage;
 pub mod wakeup;
 pub mod workflow_state;
 
@@ -104,8 +107,9 @@ pub fn decline(name: &str, reason: &str) -> i32 {
     0
 }
 
-// spec: gate-sdk/SPEC.md §The non-gate arm — one string field of the payload by object path, empty
-// where the payload, the object or the field is absent or is not a string; `jq -r '<path> // ""'`.
+// spec: gate-sdk/SPEC.md §The non-gate arm — one field of the payload by object path, rendered as
+// `jq -r '<path> // ""'` renders it: a string bare, a number by its own spelling, and null, false
+// or absent as empty, `//` being an alternative operator that fires on false too.
 pub fn field(payload: Option<&Value>, path: &[&str]) -> String {
     let mut cur = match payload {
         Some(v) => v,
@@ -117,7 +121,11 @@ pub fn field(payload: Option<&Value>, path: &[&str]) -> String {
             None => return String::new(),
         }
     }
-    cur.as_str().unwrap_or("").to_string()
+    match cur {
+        Value::String(s) => s.clone(),
+        Value::Null | Value::Bool(false) => String::new(),
+        other => other.to_string(),
+    }
 }
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — the arm's dispatch: the member name is argv, never the
@@ -142,7 +150,7 @@ pub fn run(args: &[String]) -> i32 {
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — the payload read whole and parsed once; a read error,
 // an empty body and a body that is not JSON collapse to `None`, the member's degraded input.
-fn read_payload() -> Option<Value> {
+pub fn read_payload() -> Option<Value> {
     use std::io::Read;
     let mut buf = Vec::new();
     std::io::stdin().read_to_end(&mut buf).ok()?;
@@ -217,7 +225,22 @@ mod tests {
             .expect("the fixture must parse");
         assert_eq!(field(Some(&doc), &["tool_input", "to"]), "main");
         assert_eq!(field(Some(&doc), &["tool_input", "message"]), "");
-        assert_eq!(field(Some(&doc), &["n"]), "");
         assert_eq!(field(None, &["tool_input", "to"]), "");
+    }
+
+    // spec: gate-sdk/SPEC.md §The non-gate arm — a number reads as its own spelling, never as
+    // empty: the harness sends `used_percentage` as a number, and a reader that took only strings
+    // rendered every gauge at zero while a string-spelled fixture agreed with it
+    #[test]
+    fn a_number_field_reads_as_jq_renders_it() {
+        let doc: Value = serde_json::from_str(
+            r#"{"context_window":{"used_percentage":42.7},"n":1,"t":true,"f":false,"z":null}"#,
+        )
+        .expect("the fixture must parse");
+        assert_eq!(field(Some(&doc), &["context_window", "used_percentage"]), "42.7");
+        assert_eq!(field(Some(&doc), &["n"]), "1");
+        assert_eq!(field(Some(&doc), &["t"]), "true");
+        assert_eq!(field(Some(&doc), &["f"]), "", "jq's // fires on false too");
+        assert_eq!(field(Some(&doc), &["z"]), "");
     }
 }

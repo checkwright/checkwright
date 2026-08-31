@@ -2400,6 +2400,37 @@ cannot run must decline, not brick. The alternative — fail closed, matching th
 gate battery — is refused because its blast radius is every tool call in the
 session and its trigger is an adopter's platform rather than an adopter's error.
 
+**Two harness-integration arms are siblings of `--hook` rather than members of
+it, and the reason is the contract rather than the taxonomy.** That arm's
+contract *is* the hook protocol — an envelope on stdout, the exit status as the
+harness's allow/block signal. A status-line renderer writes an ANSI line and the
+harness ignores its exit status; a usage-snapshot refresher has no harness event
+at all, its callers being a refresh-command knob and the session that invokes it.
+Folding either into `--hook` would make that arm's stated output contract
+"whatever the member's integration point expects", which is not a contract. Each
+satisfies the class's three properties on its own and names its own caller, so
+each is a member in its own right — the same reading by which `--run` sits in the
+bridged-arm table beside the `--emit-` family without being one of them. Their
+spellings are `--statusline` and `--usage-poll`, minted with their
+implementations here, because a spelling written into a SPEC ahead of its
+implementation is the reservation this section refuses.
+
+**`--usage-poll` gives the binary a path that reads an OAuth credential file and
+reaches an external endpoint, and a reader sizing what the installed binary is
+entitled to do should meet that sentence here rather than derive it from a module
+list.** The capability is not new to the *product* — it ships today as kit shell
+an adopter vendors — but it is new to the *binary* an adopter installs.
+TRAJECTORY.md §The objectives rules nothing on the installed binary's capability
+surface, which is why the question went to the operator rather than being derived;
+the operator ruled the path admitted, 2026-08-31, with the tradeoff stated. No
+HTTP client enters the crate and no dependency is added: `curl` stays external and
+stays spawned through `proc::run`, exactly as the shell member spawned it.
+Objective 3 reads *toward* this move rather than against it — a credential-reading
+path moving out of a vendored, readable shell file and into the binary is
+"opacity is a goal, not a side effect" working as stated. Recorded because the
+instinct on meeting a credential read inside a shipped binary is to reach for a
+capability-minimisation argument the objectives do not make.
+
 **The port necessarily mints a second producer of the hook envelope**, in Rust,
 beside `guard-kit/lib/guard.sh`'s, because that library stays permanently shell
 on its own declared grounds. That is not the duplication criterion 6 refuses —

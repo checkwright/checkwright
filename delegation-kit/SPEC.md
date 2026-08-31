@@ -1325,6 +1325,29 @@ list does not name one for:
 `decision` sits before `keys` deliberately: `keys` is the one free-ish field and
 stays last, so the space-delimited parse never has to step over it.
 
+**The record's field set is OPEN, and that is a contract rather than a
+description of today's list.** A reader parses this record **by key** and never
+by position or arity; the writer's field set is one table in the member's own
+module, so a field added to it appears in the line without any existing reader
+changing. Nothing here settles *what* is logged — the list above is still the
+whole of it and the two omissions above are still refused — only that the
+**shape does not lock**. The constraint this discharges is a live one: the
+question of per-session attribution (the agent id, the agent type, the matched
+run key) is open and belongs to a later unit, and it must find a record it can
+extend in one table edit rather than a positional format it would have to break.
+`keys` staying last is what keeps that true in practice, because a field added
+before it lands between two keyed fields and a field added after it would sit
+past the one free-ish value.
+
+**One value's spelling moved with the substrate and is recorded rather than left
+to be noticed.** `keys` is the payload's top-level key set **sorted**, where the
+shell form's `jq keys_unsorted` gave it in document order. The compiled member's
+JSON object is ordered, and the alternative — preserving document order — costs a
+dependency this cut refuses to add. Nothing reads the order: the field exists to
+answer *which keys a payload carries*, which is a set question, and the record is
+parsed by key. The grammar, the field list and the field order are untouched, so
+the space-delimited parse the triage uses does not move.
+
 **No field is carried that this list does not name a reader for**, and the two the
 authorization might have invited and that are **not** carried are recorded so the
 omission does not read as an oversight: no session-attribution field (no payload
@@ -2445,6 +2468,10 @@ the class ruling at gate-sdk/SPEC.md §The config-seam port disposition. Knobs
   overrides (test injection).
 - `DELEGATION_KIT_CRED_FILE` — default the usage file's sibling
   `.credentials.json`; positional `$2` overrides.
+- `DELEGATION_KIT_ACCOUNT_CONFIG` — the harness config the account uuid is read
+  out of, for the snapshot's optional `account` field; default
+  `$HOME/.claude.json`. Both usage producers read it and neither requires it: an
+  unreadable file leaves the field unwritten rather than failing the cycle.
 - `DELEGATION_KIT_USAGE_ENDPOINT` — the poll producer's usage source; default
   `https://api.anthropic.com/api/oauth/usage`. The test seam (a `file://` stub)
   and the stability valve when the unpublished source moves (§The usage.txt

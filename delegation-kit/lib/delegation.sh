@@ -34,6 +34,8 @@ unset _dk_cfg
 # moved here in the same cut: the bridge resolves a declared knob by sourcing exactly this
 # library, and refuses the whole environment for one it finds undefined
 [[ -v DELEGATION_KIT_VERDICT_BIN ]] || DELEGATION_KIT_VERDICT_BIN="delegation-kit/bin/usage-verdict.sh"
+[[ -v DELEGATION_KIT_ACCOUNT_CONFIG ]] || DELEGATION_KIT_ACCOUNT_CONFIG="$HOME/.claude.json"
+[[ -v DELEGATION_KIT_USAGE_ENDPOINT ]] || DELEGATION_KIT_USAGE_ENDPOINT="https://api.anthropic.com/api/oauth/usage"
 [[ -v DELEGATION_KIT_STOP_LOG ]] || DELEGATION_KIT_STOP_LOG="${GATE_SDK_WORKFLOW_DIR:-.workflow}/subagent-stop-liveness.log"
 # spec: delegation-kit/SPEC.md §The turn-end liveness hook — no shipped default: the reader is a path the consumer names, because the gate behind it is name-addressed and this knob is not taught to resolve a name
 [[ -v DELEGATION_KIT_LIVENESS_CMD ]] || DELEGATION_KIT_LIVENESS_CMD=""
