@@ -25,6 +25,14 @@ const FIELDS: &[&str] = &[
     "keys",
 ];
 
+// spec: delegation-kit/SPEC.md §The turn-end liveness hook — one firing's whole observable: the
+// exit status the harness reads, and the refusal reason, which IS the blocking message. Returned
+// rather than printed so the member's cases can assert both without a process.
+pub struct Firing {
+    pub code: i32,
+    pub stderr: String,
+}
+
 pub fn run(payload: Option<&Value>) -> i32 {
     let log = match walk::knob_scalar("DELEGATION_KIT_STOP_LOG") {
         Ok(v) => v,
@@ -38,7 +46,17 @@ pub fn run(payload: Option<&Value>) -> i32 {
         Ok(v) => v,
         Err(e) => return hook::decline("subagent-stop-liveness", &e),
     };
+    let firing = fire(payload, &log, &liveness_cmd, &run_dir);
+    if !firing.stderr.is_empty() {
+        eprint!("{}", firing.stderr);
+    }
+    firing.code
+}
 
+// spec: delegation-kit/SPEC.md §The turn-end liveness hook — the firing itself, knobs already
+// resolved. Nothing here writes stdout: this member emits no hook JSON on any path, and a byte
+// there would be a decision it never makes.
+pub fn fire(payload: Option<&Value>, log: &str, liveness_cmd: &str, run_dir: &str) -> Firing {
     let event = sanitize(&hook::field(payload, &["hook_event_name"]));
     let session = sanitize(&hook::field(payload, &["session_id"]));
     let keys = sanitize(&top_level_keys(payload));
@@ -49,12 +67,12 @@ pub fn run(payload: Option<&Value>) -> i32 {
         .and_then(Value::as_bool)
         .unwrap_or(false);
 
-    let reader_status = read_liveness(&liveness_cmd, &run_dir);
+    let reader_status = read_liveness(liveness_cmd, run_dir);
 
     // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the record set is counted AFTER
     // the reader ran, so a record created during the reading is counted rather than missed and an
     // in-flight record errs toward refusing
-    let records = count_records(&run_dir);
+    let records = count_records(run_dir);
 
     let verdict = match reader_status {
         None => "unavailable",
@@ -90,12 +108,12 @@ pub fn run(payload: Option<&Value>) -> i32 {
         decision,
         keys.as_str(),
     ];
-    append_record(&log, &hook::utc_stamp(kpi::now_epoch()), &values);
+    append_record(log, &hook::utc_stamp(kpi::now_epoch()), &values);
 
     if decision != "refuse" {
-        return 0;
+        return Firing { code: 0, stderr: String::new() };
     }
-    refuse(verdict, &liveness_cmd, &run_dir)
+    Firing { code: 2, stderr: refusal(verdict, liveness_cmd, run_dir) }
 }
 
 // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the record's line form: the stamp,
@@ -181,7 +199,7 @@ fn count_records(run_dir: &str) -> usize {
 // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the message branch is three-way
 // because the three refusing verdicts have three findings and three remedies; folding `unresolved`
 // onto `corrupt`'s arm would print "does not parse" over a case holding no record to parse
-fn refuse(verdict: &str, liveness_cmd: &str, run_dir: &str) -> i32 {
+fn refusal(verdict: &str, liveness_cmd: &str, run_dir: &str) -> String {
     let ways = "Two ways forward: wait for the producer on its own artifact, in a loop that ends when the condition goes true; or delete the record once the producer has exited.";
     let (finding, ways, look) = match verdict {
         "red" => (
@@ -200,15 +218,261 @@ fn refuse(verdict: &str, liveness_cmd: &str, run_dir: &str) -> i32 {
             "to see the reader's own reason",
         ),
     };
-    eprintln!("turn-end refused: {}.", finding);
-    eprintln!("{}", ways);
-    eprintln!("Run `bash {} {}` {}.", liveness_cmd, run_dir, look);
-    2
+    format!(
+        "turn-end refused: {}.\n{}\nRun `bash {} {}` {}.\n",
+        finding, ways, liveness_cmd, run_dir, look
+    )
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the payload the recovered case
+    // table fires with, carried verbatim so the `keys` expectation below is over its real key set
+    const PAYLOAD: &str = r#"{"session_id":"s-1","transcript_path":"/x/y.jsonl","hook_event_name":"SubagentStop","stop_hook_active":false}"#;
+    const CONTINUING: &str = r#"{"session_id":"s-1","hook_event_name":"SubagentStop","stop_hook_active":true}"#;
+
+    // spec: gate-sdk/SPEC.md §check-test-hermetic — one scratch root per case, named for the case,
+    // so parallel tests never share a run dir or a log
+    struct Scratch(std::path::PathBuf);
+
+    impl Scratch {
+        fn new(case: &str) -> Scratch {
+            let d = std::env::temp_dir().join(format!("cw-stop-{}-{}", std::process::id(), case));
+            let _ = std::fs::remove_dir_all(&d);
+            std::fs::create_dir_all(d.join("runs")).expect("scratch must be creatable");
+            Scratch(d)
+        }
+        fn at(&self, rel: &str) -> String {
+            self.0.join(rel).display().to_string()
+        }
+        // comment-tier-exempt: a reader stub, one per exit class — the case table's own shape
+        fn reader(&self, name: &str, code: i32) -> String {
+            let p = self.at(name);
+            std::fs::write(&p, format!("exit {}\n", code)).expect("stub must be writable");
+            p
+        }
+        fn record(&self, name: &str) {
+            std::fs::write(self.0.join("runs").join(name), "pid=1 run=k\n").expect("record");
+        }
+        fn log(&self, name: &str) -> String {
+            std::fs::read_to_string(self.at(name)).unwrap_or_default()
+        }
+    }
+
+    impl Drop for Scratch {
+        fn drop(&mut self) {
+            let _ = std::fs::remove_dir_all(&self.0);
+        }
+    }
+
+    fn payload(src: &str) -> Option<Value> {
+        if src.is_empty() {
+            return None;
+        }
+        serde_json::from_str(src).ok()
+    }
+
+    // spec: gate-sdk/SPEC.md §The port-candidate criteria — criterion 2: a port proves the two
+    // substrates agree at port time and nothing keeps them agreeing after. These expectations are
+    // the deleted case table's, carried forward as the coverage that replaces a spent oracle.
+    fn want(line: &str, case: &str, parts: &[&str]) {
+        for p in parts {
+            assert!(line.contains(p), "case {}: line lacks '{}': {}", case, p, line);
+        }
+    }
+
+    // spec: delegation-kit/SPEC.md §The turn-end liveness hook — case A: no reader at all. The
+    // hook holds no reading, so it says so rather than reporting a clean tree it never asked
+    // about, and allows.
+    // spec: delegation-kit/SPEC.md §The turn-end liveness hook — `keys` is the SORTED set, the
+    // ruled replacement for `jq keys_unsorted`'s document order, so the ruling is asserted here
+    // rather than the deleted table's literal.
+    #[test]
+    fn no_reader_at_all_is_unavailable_and_allows() {
+        let s = Scratch::new("no-reader");
+        let f = fire(payload(PAYLOAD).as_ref(), &s.at("a.log"), "", &s.at("runs"));
+        assert_eq!(f.code, 0);
+        assert!(f.stderr.is_empty(), "an allowing firing must write no reason");
+        want(&s.log("a.log"), "no-reader", &[
+            "event=SubagentStop", "session=s-1", "live=no", "verdict=unavailable",
+            "records=0", "decision=allow",
+            "keys=hook_event_name,session_id,stop_hook_active,transcript_path",
+        ]);
+    }
+
+    // spec: delegation-kit/SPEC.md §The turn-end liveness hook — cases B-E: one firing per reader
+    // exit class over a non-empty record set. The exit code is the predicate; `corrupt` carries
+    // `live=no decision=refuse`, which is why decision cannot be derived from live.
+    #[test]
+    fn each_reader_exit_class_takes_its_own_verdict_arm() {
+        for (verdict, code, live, decision, rc) in [
+            ("green", 0, "live=no", "allow", 0),
+            ("red", 1, "live=yes", "refuse", 2),
+            ("corrupt", 2, "live=no", "refuse", 2),
+            ("error", 77, "live=no", "allow", 0),
+        ] {
+            let s = Scratch::new(&format!("class-{}", verdict));
+            s.record("k.run");
+            let stub = s.reader(&format!("reader-{}", verdict), code);
+            let log = s.at(&format!("{}.log", verdict));
+            let f = fire(payload(PAYLOAD).as_ref(), &log, &stub, &s.at("runs"));
+            assert_eq!(f.code, rc, "reader exit {} must map to exit {}", code, rc);
+            assert_eq!(
+                !f.stderr.is_empty(), rc == 2,
+                "a refusal carries its reason on stderr and an allow carries none: {}", verdict
+            );
+            want(&s.log(&format!("{}.log", verdict)), verdict, &[
+                &format!("verdict={}", verdict), live, "records=1",
+                &format!("decision={}", decision),
+            ]);
+        }
+    }
+
+    // spec: delegation-kit/SPEC.md §The turn-end liveness hook — case F: each refusing arm names
+    // its own finding and its own remedy, and the red arm names the reader command so the session
+    // can see the record set for itself
+    #[test]
+    fn each_refusing_arm_names_its_own_finding_and_remedy() {
+        let s = Scratch::new("messages");
+        s.record("k.run");
+        let red = fire(payload(PAYLOAD).as_ref(), &s.at("r.log"), &s.reader("rr", 1), &s.at("runs"));
+        want(&red.stderr, "red-message", &[
+            "turn-end refused", "wait for the producer on its own artifact",
+            "delete the record once the producer has exited", &s.at("runs"),
+        ]);
+        let corrupt = fire(payload(PAYLOAD).as_ref(), &s.at("c.log"), &s.reader("cc", 2), &s.at("runs"));
+        want(&corrupt.stderr, "corrupt-message", &["does not parse", "which record is malformed"]);
+    }
+
+    // spec: delegation-kit/SPEC.md §The turn-end liveness hook — case F2: the SAME reader exit
+    // over an EMPTY record set is a different reading. It still refuses — the count names the
+    // diagnosis and decides nothing.
+    #[test]
+    fn reader_exit_two_over_an_empty_set_is_unresolved_not_corrupt() {
+        let s = Scratch::new("unresolved");
+        let f = fire(payload(PAYLOAD).as_ref(), &s.at("u.log"), &s.reader("ru", 2), &s.at("runs"));
+        assert_eq!(f.code, 2);
+        want(&s.log("u.log"), "unresolved", &[
+            "verdict=unresolved", "live=no", "records=0", "decision=refuse",
+        ]);
+        want(&f.stderr, "unresolved-message", &[
+            "turn-end refused", "produced no reading at all", "the reader's own reason",
+        ]);
+        assert!(
+            !f.stderr.contains("does not parse"),
+            "the unresolved arm reused the corrupt arm's wording over a case holding no record"
+        );
+    }
+
+    // spec: delegation-kit/SPEC.md §The turn-end liveness hook — case F4: `unresolved` refuses
+    // ONCE, its condition being invariant under turn content; `red` and `corrupt` on the same
+    // payload still refuse.
+    #[test]
+    fn unresolved_allows_once_the_harness_is_already_continuing() {
+        let s = Scratch::new("continuing");
+        let f = fire(payload(CONTINUING).as_ref(), &s.at("uc.log"), &s.reader("ruc", 2), &s.at("runs"));
+        assert_eq!(f.code, 0);
+        want(&s.log("uc.log"), "unresolved-continuing", &[
+            "verdict=unresolved", "records=0", "decision=allow",
+        ]);
+        s.record("k.run");
+        for (verdict, code) in [("red", 1), ("corrupt", 2)] {
+            let log = s.at(&format!("{}c.log", verdict));
+            let g = fire(payload(CONTINUING).as_ref(), &log, &s.reader(&format!("c{}", verdict), code), &s.at("runs"));
+            assert_eq!(g.code, 2, "{} still refuses while continuing", verdict);
+            want(&s.log(&format!("{}c.log", verdict)), verdict, &[
+                &format!("verdict={}", verdict), "decision=refuse",
+            ]);
+        }
+    }
+
+    // spec: delegation-kit/SPEC.md §The turn-end liveness hook — case F3: the record set is
+    // counted AFTER the reader ran: a stub that writes a record and then exits 2 reads as
+    // `corrupt` over records=1, where counting first would miss the in-flight record.
+    #[test]
+    fn the_record_set_is_counted_after_the_reader_ran() {
+        let s = Scratch::new("race");
+        let stub = s.at("reader-race");
+        std::fs::write(
+            &stub,
+            format!("printf 'pid=1 run=r\\n' > {}/r.run\nexit 2\n", s.at("runs")),
+        )
+        .expect("stub must be writable");
+        let f = fire(payload(PAYLOAD).as_ref(), &s.at("race.log"), &stub, &s.at("runs"));
+        assert_eq!(f.code, 2);
+        want(&s.log("race.log"), "race", &["verdict=corrupt", "records=1", "decision=refuse"]);
+    }
+
+    // spec: delegation-kit/SPEC.md §The turn-end liveness hook — case G: a reader that cannot be
+    // run at all is the vendoring prerequisite failing, so the hook degrades to `unavailable` and
+    // allows rather than refusing every turn end in a tree that never configured enforcement.
+    #[test]
+    fn an_unresolvable_reader_path_is_unavailable_and_allows() {
+        let s = Scratch::new("absent");
+        s.record("k.run");
+        let f = fire(payload(PAYLOAD).as_ref(), &s.at("g.log"), &s.at("nowhere/check.sh"), &s.at("runs"));
+        assert_eq!(f.code, 0);
+        assert!(f.stderr.is_empty());
+        want(&s.log("g.log"), "absent-reader", &["verdict=unavailable", "live=no", "decision=allow"]);
+    }
+
+    // spec: delegation-kit/SPEC.md §The turn-end liveness hook — case H: an unwritable log drops
+    // the line silently. The reading still decides, so the firing allows on its verdict rather
+    // than on the log.
+    #[test]
+    fn an_unwritable_log_drops_the_line_and_decides_anyway() {
+        let s = Scratch::new("unwritable");
+        std::fs::write(s.at("blocker"), "not a directory\n").expect("blocker");
+        let f = fire(payload(PAYLOAD).as_ref(), &s.at("blocker/probe.log"), "", &s.at("runs"));
+        assert_eq!(f.code, 0);
+    }
+
+    // spec: delegation-kit/SPEC.md §The turn-end liveness hook — case I: whitespace in a payload
+    // value must not split the space-delimited line. The FIELD COUNT is the assertion, because a
+    // split is invisible to a substring match.
+    #[test]
+    fn whitespace_in_a_payload_cannot_split_the_line() {
+        let s = Scratch::new("spacey");
+        let f = fire(
+            payload(r#"{"session_id":"a b\tc","hook_event_name":"Subagent Stop"}"#).as_ref(),
+            &s.at("i.log"),
+            "",
+            &s.at("runs"),
+        );
+        assert_eq!(f.code, 0);
+        let line = s.log("i.log");
+        assert_eq!(
+            line.split_whitespace().count(), 8,
+            "want 8 whitespace-separated fields (stamp + 7 keys), got: {}", line
+        );
+    }
+
+    // spec: delegation-kit/SPEC.md §The turn-end liveness hook — case J: an empty payload degrades
+    // every payload-derived field to `-`, and the refusal is exact, because the decision reads the
+    // liveness reader and no payload field.
+    #[test]
+    fn an_empty_payload_degrades_its_fields_and_still_decides() {
+        let s = Scratch::new("empty-payload");
+        s.record("k.run");
+        let f = fire(None, &s.at("j.log"), &s.reader("rj", 1), &s.at("runs"));
+        assert_eq!(f.code, 2);
+        want(&s.log("j.log"), "empty-payload", &[
+            "event=-", "session=-", "keys=-", "live=yes", "decision=refuse",
+        ]);
+    }
+
+    // spec: delegation-kit/SPEC.md §The turn-end liveness hook — case K: one firing appends
+    // exactly one line, so the log is a firing count as well as a record.
+    #[test]
+    fn one_firing_appends_exactly_one_line() {
+        let s = Scratch::new("append");
+        let log = s.at("k.log");
+        fire(payload(PAYLOAD).as_ref(), &log, "", &s.at("runs"));
+        fire(payload(PAYLOAD).as_ref(), &log, "", &s.at("runs"));
+        assert_eq!(s.log("k.log").lines().filter(|l| !l.is_empty()).count(), 2);
+    }
 
     // spec: delegation-kit/SPEC.md §The turn-end liveness hook — every value is one whitespace-free
     // token and an absent one is `-`, so the space-delimited line can never be split by content
