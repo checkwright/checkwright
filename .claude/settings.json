@@ -72,7 +72,6 @@
       "Bash(rm .tmp/*)",
       "Bash(rm -f .tmp/*)",
       "Bash(rm -rf .tmp/*)",
-      "Bash(cat >> .tmp/*)",
       "Bash(git add *)",
       "Bash(git grep *)",
       "Bash(git commit -m *)",
