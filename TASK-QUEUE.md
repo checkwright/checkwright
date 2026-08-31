@@ -61,6 +61,13 @@
   ESCALATES. **SUPERSEDED BY THE PORT-ONLY RUN, RULED 2026-08-31 (operator, consult)**: no yield
   at all until `--tree` reads zero owed — TRAJECTORY.md §PRIORITY DIRECTIVE owns the run.
   ruled: native-gate-port-remaining-corpus operator 2026-08-31 consult
+  **TWO RULINGS AT THIS CUT'S SPEC STAGE — 2026-08-31, lead, own authority.** The cut is
+  WELL-FORMED under the 2026-08-28 composer: its one section is queue-kit/SPEC.md §The
+  queue-index arm, and the whole-owed-column fact is a CONSEQUENCE, never the selector.
+  And the statusline's counter caller goes IN-PROCESS, both subprocess clauses retiring with
+  their shared bash ground, conditioned on the amendment stating where the bridged knobs
+  resolve. Content: SPEC-tool-port.md deltas 1 and 5.
+  ruled: native-gate-port-remaining-corpus lead 2026-08-31 own-authority
   Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close; cohorts ruled at scope 2026-08-11/12.
 
 - **platform-support-ci-matrix** [spec: SPEC-generator-cause.md] [roadmap: next/reliability]

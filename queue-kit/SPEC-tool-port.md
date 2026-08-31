@@ -47,12 +47,24 @@ three members share one ground and it is not their kit:
   from in the shell library, verified line by line rather than assumed. So the
   cut adds no derivation; it adds readers of one that exists.
 
-**What is not the ground, stated so the record does not read as kit-ordered.**
+**The whole-column fact is a consequence, not the selector — ruled well-formed
+2026-08-31 by the lead on own authority, against the composer read directly.**
 That queue-kit's owed column happens to fit one cut is how the *candidate* was
-found; it is not why the cut is well-formed. A cut is well-formed here because
-one section rules all three members and one amendment is what that section needs
-— which is the composer's own test, and which would still be met if a fourth
-queue-kit tool were owed or if one of these three sat in another kit.
+found; it is not why the cut is well-formed, and the distinction is load-bearing
+rather than pedantic because **the coincidence cuts the wrong way**. The framing
+that reached the operator for Option B was kit-wise — "the only kit whose whole
+owed column fits one cut" — and a record that states that fact as the *ground*
+reads as exactly the kit-ordered composer the 2026-08-28 ruling refuses, with no
+way for a later reader to tell the coincidence from the reason. So the ground is
+stated as what it is: **§The queue-index arm's stated contract**, which settles
+the front-end requirement, the bridged-knob rule, the
+derived-regexes-were-never-a-configuration-surface finding, the argv-tail modes,
+and byte-preserved stdout with error paths collapsing to exit 2 — every question
+the other three members raise. Membership is stated in the members' own sections
+rather than inferred from the kit root. The test would still be met if a fourth
+queue-kit tool were owed, or if one of these three sat in another kit; and the
+kit reaching zero owed is a **result** of taking the class, recorded above as a
+measurement rather than offered here as a reason.
 
 ### (2) `--emit-queue-counts` — the section tally, in the `--emit-` family
 
@@ -162,8 +174,13 @@ the better failure and is stated so it is not read as a regression.
 `native/src/hook/statusline.rs` spawns `bash <root>/queue-kit/bin/queue-counts.sh`
 today. The cut deletes that script, so this caller must move, and **the shape it
 moves to is a design decision two governed sentences currently forbid**
-{design-bearing}. It calls the counts rendering **in process** and maps an `Err`
-to an empty counter group.
+{design-bearing}. **Ruled 2026-08-31 by the lead on own authority**: it calls the
+counts rendering **in process** and maps an `Err` to an empty counter group, and
+both sentences retire with their ground. The ruling is envelope-class and
+reverses nothing recorded — neither sentence carries a `ruled:` marker or an
+authority attribution; they are SPEC design clauses with stated grounds, and
+retiring a clause whose stated ground the port has removed is what a port cut
+does.
 
 The two sentences and why both retire together:
 
@@ -199,6 +216,42 @@ happening twice by two mechanisms and goes through the single producer criterion
 6 names. The property §The statusline arm actually cares about is untouched: the
 section vocabulary still arrives as returned names, so there is still nothing
 here for a later editor to hardcode.
+
+**Where those four knobs resolve on the in-process path, and what a consumer
+override does — stated because §The queue-index arm's *The front-end is not
+optional dressing* does not reach this caller.** That paragraph settles the
+front-end requirement for a caller reaching an arm *as* an arm, and names its own
+hazard: a caller that "invoked the binary directly would resolve platform
+defaults and silently ignore every consumer override", the worked instance being
+an arm that cannot see `QUEUE_KIT_ICEBOX_SECTION` and "silently drops the tally
+in every consumer that configures a tier". An in-process call from a hook module
+is neither the front end nor a direct binary invoke, so it sits outside what that
+paragraph settled and owes its own answer:
+
+- **They resolve from the bridged environment `--statusline`'s own exec already
+  carries.** The harness invokes `bash gate-sdk/bin/run-gates.sh --statusline`
+  (`.claude/settings.json`), so the front end sources the shell library, resolves
+  the arm's declared roster and execs the binary with
+  `GATE_SDK_KNOB_<NAME>=…` in the environment. Adding the four names to
+  `--statusline`'s roster is therefore not bookkeeping — it *is* the mechanism
+  that puts them there, and it is the whole of what the in-process reader needs.
+  A consumer override set in `<gates-dir>/queue-config.sh` reaches this reader by
+  exactly the path it reached the subprocess: the front end sources the same
+  library either way, and the override is resolved before the exec in both.
+- **The silent-override-ignored failure this path could have had is structurally
+  unavailable, and the reason is the crate's own rule rather than care.**
+  `walk::knob_scalar` reads `GATE_SDK_KNOB_<NAME>` and returns `Err` when it is
+  absent — "the crate holds no default" — so an unbridged or partially-bridged
+  invocation cannot substitute a platform default for a consumer's value. It has
+  no default to substitute. The reader errors, `Err` maps to an empty counter
+  group, and the group **vanishes** rather than rendering a wrong tally.
+- **So the residual failure is total and visible, never partial and wrong.** A
+  roster widened to three of the four knobs, or a caller invoking
+  `checkwright-gates --statusline` directly and bypassing the front end, drops
+  the whole counter group and changes nothing else about the bar — which is one
+  of the degradations §The statusline arm already specifies. The failure mode the
+  front-end paragraph exists to prevent is a consumer's configured tier silently
+  missing from a rendered tally; on this path that outcome has no spelling.
 
 ### (6) The two bespoke tests narrow to the seam a crate test cannot see
 
@@ -312,7 +365,11 @@ so the build session is not the one that learns it.
 
 - `queue-kit/SPEC.md §The queue-index arm` — gains the class ruling this cut
   rests on: that its own port settled the questions the three remaining tools
-  raise, and that they take the same dispositions (delta 1).
+  raise, and that they take the same dispositions. Its *The front-end is not
+  optional dressing* paragraph gains one sentence marking an **in-process call
+  from a hook module** as outside what it settles, and pointing at the section
+  that answers that path — so a later reader meeting the paragraph does not read
+  its silence as coverage (deltas 1 and 5).
 - `queue-kit/SPEC.md §bin/queue-counts.sh` — renamed to its arm and rewritten for
   the new home: the derived section set, the top-level-entry counting unit and
   the "why a second tool rather than a fourth mode" refusal all survive; the
@@ -339,7 +396,9 @@ so the build session is not the one that learns it.
   its "becomes portable now" forecast is discharged and says so (delta 4).
 - `delegation-kit/SPEC.md §The statusline arm` — the counter group's subprocess
   paragraph is replaced by the in-process reading and its preserved
-  degradations, and the arm's declared reads are stated (delta 5).
+  degradations; the arm's declared reads are stated, together with **where they
+  resolve** and what a consumer override does on that path, which is the
+  condition the 2026-08-31 lead ruling attached (delta 5).
 - `lifecycle-kit/SPEC.md` and `templates/stages/scope.md` and `close.md` — the
   three surfaces citing the edge tool by path (deltas 3 and 7).
 - `docs/site-architecture.md` — the standing-instance sentence naming the edge
