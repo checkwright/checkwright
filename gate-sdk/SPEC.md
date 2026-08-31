@@ -1928,6 +1928,14 @@ exactly as that section bounds it, raised cost of analysis and never
 confidentiality. A later session weighing a port weighs that ruling, not the
 constraint set this record was written under.
 
+**Which queue entry a cut rides, stated because only half of it was written
+down.** A cut files no per-cut residue entry: the scoping stage promotes the
+standing composer entry `native-gate-port-remaining-corpus` itself, carrying
+that cut's own `[spec:]` amendment ref, and that entry states its own
+build-stage demotion. The demotion half has always been on the entry; the
+promotion half was derivable only from `git log -S` over the queue, which is a
+re-derivation every cut's scoping session paid.
+
 ### The decisions this substrate already closed
 
 Two questions behind the port are settled. Both are recorded here because the
@@ -2045,6 +2053,17 @@ A **non-gate arm** is specified by three properties:
   §The queue-index arm's refusal to ship a queue-mutating tool rests on it. A
   session reaching a mode through the front-end counts exactly as a stage step
   does.
+
+**`--needs` answers about registry members only, and a bridged arm is not one.**
+That flag takes a *gate* name and reads the requirement element of that gate's
+`REGISTRY` row; a `BRIDGED_ARMS` row carries a flag spelling, the arm and a knob
+roster, and no requirement element at all. An arm's spawned programs are
+therefore recorded in prose and nowhere a machine reads — `date -d` under
+`--emit-queue-index`, `git` under `--emit-queue-edges` and under the origin-URL
+lookup this table's own module makes, `bash` under `--lesson-sink`. This states
+the scope as it stands and rules nothing about whether it should: making arm
+requirements machine-readable is open work under
+`bridged-arm-requirements-undeclared`.
 
 **The class gained no member from the consumer smoke, and the near miss is
 recorded because the next reader will size that harness the same way.**
@@ -11317,6 +11336,16 @@ runs in a **building** tree, this repo and CI, and is deliberately absent from
 the consumer smoke's scratch registry, where the accounting derives its exemption
 every run rather than accepting a written one (§Consumer smoke).
 
+**The stamp's two axes read different tree states, and the roster axis makes
+`git add` part of the trigger.** The path roster is `ls-files`, the **index**;
+the content is `hash-object` over the **worktree**. So editing a tracked crate
+file moves the stamp with no staging at all, while a *new* crate file is outside
+the stamp entirely until it is staged — and the `git add` alone, before any
+commit, moves it. A session that builds the binary and then stages a new crate
+source therefore holds a stale binary and reds at commit time on a build it
+believed current. Build after staging, not before: the gate is reading the
+source set the commit will actually carry.
+
 §check-gate-substrate-parity assertion B diffs the descriptor set against the
 binary's `--list` roster — set membership only, never the binary's *content*
 against the source it was built from. `gate_command` dispatches a
@@ -12300,6 +12329,13 @@ unreachable on success, and where the type demands that impossibility be handled
 the fallback is a **named non-empty refusal** rather than an empty string — a
 default that could still compose a bare refusal is the defect this paragraph
 records, not an acceptable coercion.
+
+**How that arm is exercised at all, since no fixture input reaches it.** The
+generator is resolved as `<GATE_SDK_ROOT_HERE>/bin/gen-pre-commit.sh`, so the
+failure path is observable end-to-end only by pointing that bridged knob at a
+scratch kit root whose `bin/gen-pre-commit.sh` exits non-zero. A `good/`+`bad/`
+pair cannot reach it: the fixture varies the gate's *input*, and no input makes
+a healthy child crash.
 
 Dual-couple manifest: the artifact path is a knob, but check-graph's own
 `# graph:` manifest is kit-shipped static text a consumer never edits, so it
