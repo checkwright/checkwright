@@ -29,43 +29,43 @@
   `checkwright-gates.exe` for `x86_64-pc-windows-msvc`, packed it, installed from the tarball and
   ran the battery through it — an exercise, not an omit-and-declare install — so blockers 5 and 6
   and batch 4's `on_path` repair are MEASURED rather than read.
-  **WHAT REMAINS IS A GREEN RUN, AND ROUND 6 IS UNOBSERVED.** Round 5's `2 of 10 gates FAILED:
-  check-graph check-install-disposition` was diagnosed off the job log and REPAIRED at build
-  2026-08-30 (`ef65956b`): a `Path::join` separator in `walk::expand`, and an uncrossed `$PWD`
-  reaching `gen-pre-commit.sh`'s `realpath`. Both mechanisms are owned by gate-sdk/SPEC.md
-  §Porting to Rust does not retire dialect exposure and §The path-dialect contract.
-  **BOTH REPAIRS ARE VERIFIED ON LINUX ALONE, which is the one dialect that cannot exhibit either
-  fault** — so the close push is their first execution, and it is where round 6 is observed.
-  **A ROUND-6 RED ON THE SAME TWO GATES FILES AND DEFERS** rather than buying another round: it
-  would mean the diagnosis missed, and a second push spends the budget on the loop the operator's
-  stop forbids. Ruled at build after the repair landed, as the disposition that case was owed.
+  **ROUND 6 IS OBSERVED — run `33392360228`, head `e0e4355e`, 2026-08-31 — AND IT SPLIT.** Round
+  5's `2 of 10 gates FAILED: check-graph check-install-disposition` became `1 of 11 gates FAILED:
+  check-graph`, both repairs having landed at build in `ef65956b` and both verified on Linux
+  alone, the one dialect that cannot exhibit either fault. **`check-install-disposition` IS
+  REPAIRED**, confirmed on the only host that can show it: the `Path::join` separator fix in
+  `walk::expand` holds, the smoke's roster grew from ten gates to eleven, and no lookup misses on
+  a mangled key. That mechanism is gate-sdk/SPEC.md §Porting to Rust does not retire dialect
+  exposure's. **`check-graph` IS NOT.** Both `gen-pre-commit.sh --emit` arms still fail, unchanged
+  from round 5, so the cwd anchor gate-sdk/SPEC.md §The path-dialect contract prescribes did not
+  reach the cause. Same-gate red, so the ruling below fires: FILED AND DEFERRED, no further round.
   **THE OPERATOR'S 2026-08-30 RULING, WHICH THIS DEMOTION LEAVES INTACT:** the rider stops at
   green — on green, drop `continue-on-error` on the job comment's own trigger and STOP, since the
   `targets.list` join below is separately measured work; on a red cause, file and defer without
   looping, which is what the one-to-two push budget protects.
-  **The two consequences stay UNEXECUTED and their precondition is unchanged.**
+  **The two consequences stay UNEXECUTED, now on an OBSERVED ground rather than an unobserved one.**
   `.github/workflows/gates.yml`'s `install-smoke-windows` keeps `continue-on-error: true` — the
-  job's own comment drops it "on the run it is first observed green and not before", and no green
-  observation is held. `x86_64-pc-windows-msvc` stays off `native/targets.list` on the same fact.
+  job's own comment drops it "on the run it is first observed green and not before", and round 6
+  is red. `x86_64-pc-windows-msvc` stays off `native/targets.list` on the same fact.
   **The join half is more expensive than a line edit, and that is measured rather than assumed.**
   `native/targets.list:43-48` owns it: the consumer smoke builds from the host it runs on and
   refuses a roster naming another platform, so the join needs steering or a cross-compiling build.
   **Cost while deferred:** the one adopter class with a named days-to-weeks adoption window still
   has no working install path on Windows, and `powershell-installer-surface` — the port sequence's
   one remaining member — stays sequenced behind this entry.
-  **DEMOTED HERE 2026-08-31 AT BUILD SO THE ITERATION COULD ENTER VALIDATE, AND IT RETIRES
-  NOTHING.** The rider's work landed; what is left is an observation only the close push buys, so
-  this unit's completion predicate sits AFTER the stage that demands completion and `## Done` was
-  unavailable. The `[roadmap:]` tag survives, so TRAJECTORY.md's 2026-08-23 protection is
-  untouched: that rule forbids RETIRING such an entry, and a demotion is its opposite. The
-  operator's ruling above is undemoted — it ruled round 6's WORK into the unit set, and that
-  work is landed.
+  **DEMOTED 2026-08-31 AT BUILD SO THE ITERATION COULD ENTER VALIDATE, AND IT RETIRES NOTHING.**
+  The rider's work landed; the observation only the close push buys sits AFTER the stage that
+  demands completion, so `## Done` was unavailable. The `[roadmap:]` tag survives and
+  TRAJECTORY.md's 2026-08-23 protection is untouched: it forbids RETIRING such an entry, and a
+  demotion is its opposite. The operator's ruling above is undemoted — it ruled round 6's WORK
+  into the unit set, and that work is landed and now measured.
   ruled: platform-support-ci-matrix operator 2026-08-27 lead-relay
   ruled: platform-support-ci-matrix operator 2026-08-30 lead-relay
   ruled: platform-support-ci-matrix lead 2026-08-30 own-authority
   Filed 2026-07-26 by scope, split from `platform-support-contract`; Linux split 2026-08-25, macOS
   08-26. Promoted and deferred 2026-08-25, 08-26, 08-27; promoted 2026-08-30 by scope, demoted
-  2026-08-30 by close, re-promoted 08-30 by spec, demoted 08-31 at build once its repairs landed.
+  2026-08-30 by close, re-promoted 08-30 by spec, demoted 08-31 at build once its repairs landed;
+  round 6 observed and recorded 08-31 by close, whose push bought it.
 
 - **spec-authoring-self-check-pass** [design-pending] — spec-stage amendment authoring asserts tree
   facts a one-command probe refutes, and every instance is caught downstream rather than at
