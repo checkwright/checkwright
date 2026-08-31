@@ -72,13 +72,27 @@ release-sweep first, its boundary-only sub-procedure) when any of:
 
 - **Elapsed time** — the newest tag's creator date is at least 7 days old
   (`git for-each-ref --sort=-creatordate --count=1 refs/tags`). A floor, never a
-  schedule: it permits a release and never forces one.
+  schedule: it permits a release and never forces one — and **it is dormant
+  while `docs/install.md` §The release channel reads `preview`, ruled 2026-08-31
+  by the operator through the lead**, on fourteen consecutive deferrals at one
+  version as the measured evidence that a permit-only limb never converts. That
+  section declares tag rhythm an artifact of internal iteration rather than a
+  stability signal, so a tag cut on elapsed time alone reaches no audience, and
+  accumulating costs nothing: the `deferred:vX.Y.Z` stamp is already a
+  mechanical floor on the next note (§Versioning's second input, which
+  `check-release-bump` reads). **A close does not re-argue this limb.** The
+  others are events, and an event either fired or it did not — which is the
+  whole of what the ruling bought, a basis to apply in place of a fifteenth
+  re-derivation reaching the same answer.
 - **A major** — the accumulated notes since the newest tag derive a major bump
   under §Versioning (a decommission). A decommission waiting behind the cadence
   floor is a deprecation promise coming due late, so it releases immediately.
 - **A security or supply-chain fix** in the batch. Reaching users late is the
   whole cost being avoided.
 - **Explicit operator direction**, recorded in the disposition line's basis.
+- **The channel's audience arriving** — the launch TRAJECTORY.md gates behind
+  the private brief's readiness rule. The accumulated `deferred:` floor ships as
+  one release there rather than as a backfilled run of tags nobody read.
 
 Otherwise stamp the disposition line's deferral form (lifecycle-kit/SPEC.md
 §templates/stages/ — `deferred:vX.Y.Z`, the version the criteria would have

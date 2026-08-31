@@ -504,21 +504,6 @@ unchanged, and the oracle read 61 owed at `harness-hook-arm-port`'s close. Disch
 7's finding recorded on `platform-support-ci-matrix`, the same event that retires the cause-only
 paragraph above, at which point this paragraph is deleted with it.
 
-**The release cadence gets a standing basis rather than a fifteenth re-derivation — ruled
-2026-08-31 by the operator, relayed by the lead.** v0.26.0 has now been deferred fourteen
-consecutive times, and the previous close escalated the question with no answer recorded on any
-governed surface, so each close has re-derived the same judgment from scratch and reached the same
-deferral. The ruling is on the recurrence, not on the cut: a close writes the disposition rule
-into `.workflow/release-disposition.txt`'s grammar, so a later close reads a basis and applies it
-instead of re-deriving one. What that basis has to settle is what the fourteen deferrals never
-did — the trigger a bump waits on, stated so it can fire without a fresh judgment. The two
-alternatives refused are cutting v0.26.0 next (nothing forces the timing: the close that measured
-the major limb found eight kit-shipped adopter-facing templates removed, but nothing removed was
-ever deprecated and the two-phase contract reconciles the rest from one note bullet, so the bump
-is a minor) and holding explicitly with the ground recorded, which converts the silence into a
-disposition but leaves the question live to be asked a fifteenth time. Discharge event: the
-grammar carries the basis, at which point this paragraph is deleted and the basis owns it.
-
 **A sequence remainder of one is not a finished port, and reading it as one is the misreading
 this paragraph exists to stop — operator-ruled 2026-08-25.** The completion predicate is the one
 §The closed rulings names, `bash gate-sdk/bin/run-gates.sh --emit port-blockers --tree`'s owed count reaching zero, and it stands
