@@ -317,6 +317,22 @@ fn toplevel_args(anchor: &[&str]) -> Result<Option<String>, String> {
         .map(|s| normalize_abs(&s)))
 }
 
+// spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — the authoring predicate both port gates
+// scope by, held here so it is shared rather than spelled twice: tracked *source* under the crate
+// root, so build output cannot read as authorship, and every refusal degrades to false
+pub fn authoring_tree(crate_dir: &str) -> bool {
+    if !Path::new(crate_dir).is_dir() {
+        return false;
+    }
+    match crate::proc::run("git", &["-C", crate_dir, "ls-files"]) {
+        Ok(c) => c
+            .stdout()
+            .map(|o| !String::from_utf8_lossy(o).trim().is_empty())
+            .unwrap_or(false),
+        Err(_) => false,
+    }
+}
+
 // spec: gate-sdk/SPEC.md §The crate's crosser — the crate's only `std::fs::canonicalize`, and the
 // one producer that hands its answer back unconverted; the UNC clause there rules why, and what
 // the two callers may assume.
@@ -1083,6 +1099,29 @@ mod tests {
         assert_eq!(abs_against("/srv/x/repo", "../sib"), "/srv/x/sib");
         assert_eq!(abs_against("/srv/x/repo", "/opt/kit"), "/opt/kit");
         assert_eq!(abs_against("/srv/x/repo", "."), "/srv/x/repo");
+    }
+
+    // spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — the shared authoring predicate, pinned
+    // on both verdicts: this crate's own directory is tracked source, and every refusal (absent
+    // directory, untracked directory) degrades to "not the authoring tree" rather than erroring.
+    #[test]
+    fn the_authoring_predicate_answers_for_a_tracked_crate_and_degrades_otherwise() {
+        let crate_dir = env!("CARGO_MANIFEST_DIR");
+        assert!(authoring_tree(crate_dir), "the crate's own source is tracked");
+        assert!(!authoring_tree(&format!("{}/no-such-dir", crate_dir)));
+        assert!(!authoring_tree(&format!("{}/Cargo.toml", crate_dir)));
+    }
+
+    // spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — the property the union's de-duplication
+    // rests on: the declaration walk and the tracked tree spell one file differently, so only a
+    // canonicalized comparison matches it to itself
+    #[test]
+    fn two_spellings_of_one_path_canonicalize_to_one_string() {
+        let direct = format!("{}/Cargo.toml", env!("CARGO_MANIFEST_DIR"));
+        let detoured = format!("{}/src/../Cargo.toml", env!("CARGO_MANIFEST_DIR"));
+        assert_ne!(direct, detoured, "the two spellings differ, which is the hazard");
+        assert_eq!(canonicalize(&direct), canonicalize(&detoured));
+        assert!(canonicalize(&direct).is_some(), "an unresolved pair proves nothing");
     }
 
     // spec: gate-sdk/SPEC.md §Porting to Rust does not retire dialect exposure — asserted by

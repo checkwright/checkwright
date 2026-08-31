@@ -303,6 +303,21 @@ commit and tests at validate, was refused: CI runs the battery and the fixture s
 validate, so the narrowing would have moved the test arm out of CI's reach. The source-stamp
 cache is owned at gate-sdk/SPEC.md §check-crate-arms.
 
+**`scripts/`'s `# no-port:` class generalises on its vocabulary half alone — ruled 2026-08-24 by
+the operator**, and recorded here at the 2026-08-31 drain because the causes that cite this ruling
+by date had only a commit message to resolve against. `scripts/measured-claims.sh`'s cause has two
+halves. The **vocabulary** half generalises: a file holding this repo's private claim vocabulary —
+the content classes CLAUDE.md §The provenance seam names — declares, and a mechanism file stays
+owed. The half about `scripts/` riding no installer payload deliberately does **not**, because the
+2026-08-14 ruling above accepted the payload cost for mechanism. Membership is re-derived per file
+against the seam's classes rather than swept by filename, and the ruling's own caution is the
+asymmetry: over-declaring excuses a file from the port and mis-sizes a governed completion
+predicate with nothing red to catch it, while under-declaring is visible and cheap. No roster is
+kept here — each declaring file's `# no-port:` cause states its own instance and the owed set is
+the port oracle's answer. Untouched by the 2026-08-30 config-seam ruling, which reaches part of
+the left-owed set on an **edit-seam** ground the vocabulary question never asked; gate-sdk/SPEC.md
+§The config-seam port disposition states the two grounds as cumulative.
+
 **A native Windows CI leg joins `platform-support-ci-matrix`, ordered ahead of the macOS leg —
 ruled 2026-08-26 by the operator.** This reopens the 2026-08-25 narrowing of that entry's
 platform set to macOS alone, and the ground is a named adopter rather than a plan: a native

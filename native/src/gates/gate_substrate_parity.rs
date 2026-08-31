@@ -3,7 +3,6 @@
 // no implementation source in the vendoring set, and one owner for the target roster
 use crate::fresh;
 use crate::gates;
-use crate::proc;
 use crate::registry;
 use crate::section;
 use crate::walk;
@@ -194,22 +193,6 @@ fn roster_parity(
         ));
     }
     v
-}
-
-// spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion F's publishing test: this tree
-// carries the crate's *tracked source*, which is what makes it the tree that declared the kits it
-// carries. Source, so build output under the crate root cannot read as authorship.
-fn authoring_tree(crate_dir: &str) -> bool {
-    if !fresh::is_dir(crate_dir) {
-        return false;
-    }
-    match proc::run("git", &["-C", crate_dir, "ls-files"]) {
-        Ok(c) => c
-            .stdout()
-            .map(|o| !String::from_utf8_lossy(o).trim().is_empty())
-            .unwrap_or(false),
-        Err(_) => false,
-    }
 }
 
 // spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion G's report, one finding per
@@ -422,7 +405,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // spec: gate-sdk/SPEC.md §check-gate-substrate-parity — the publishing test is computed once
     // and read twice: by assertion B's consumer-declared scope clause and assertion F's
     // missing-roster arm. One holder, shared with §check-gate-exemption-tasks' scope rule.
-    let publishing = authoring_tree(&crate_dir);
+    let publishing = walk::authoring_tree(&crate_dir);
 
     let mut ctx = Ctx {
         findings: Vec::new(),

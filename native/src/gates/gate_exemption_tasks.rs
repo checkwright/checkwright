@@ -1,7 +1,6 @@
 // spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — every temporary-disposition annotation a
 // gate declaration carries names a live task: an exception-list element's until:, or the
 // declaration's own port-until: header field
-use crate::proc;
 use crate::walk;
 use std::path::Path;
 
@@ -282,19 +281,11 @@ fn canon(p: &Path) -> Option<String> {
     walk::canonicalize(p)
 }
 
-// spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — the scope rule: a temporary disposition is
-// asserted against the queue of the tree that authored the declaration, so a kit-shipped one is
-// out of scope wherever this tree vendored that kit rather than authoring it
+// spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — the scope rule, on walk's shared predicate
+// rather than a second spelling: a temporary disposition is asserted against the queue of the tree
+// that authored the declaration, so a kit-shipped one is out of scope in a vendoring tree
 fn authoring_tree() -> Result<bool, String> {
-    let crate_dir = walk::knob_scalar("GATE_SDK_NATIVE_CRATE")?;
-    if !Path::new(&crate_dir).is_dir() {
-        return Ok(false);
-    }
-    let out = match proc::run("git", &["-C", &crate_dir, "ls-files"]) {
-        Ok(c) => c,
-        Err(_) => return Ok(false),
-    };
-    Ok(out.stdout().map(|o| !o.is_empty()).unwrap_or(false))
+    Ok(walk::authoring_tree(&walk::knob_scalar("GATE_SDK_NATIVE_CRATE")?))
 }
 
 fn rule(args: &[String]) -> Result<i32, String> {
@@ -362,12 +353,16 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // lifted from a directory to a file so a vendoring adopter is held to no kit author's slug
     let tree_scoped: Vec<String> = walk::tracked_shell_tree()?;
     // spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — the union de-duplicates against BOTH
-    // halves of the declaration walk, in scope and out: a declaration already counted as skipped
-    // would otherwise be counted a second time through the tree corpus that also reaches it
-    let seen: Vec<String> = scan_files.iter().chain(oos_files.iter()).cloned().collect();
+    // halves of the declaration walk, in scope and out, canonicalized because the two producers
+    // spell one file differently and a raw match would therefore never fire
+    let seen: Vec<String> = scan_files
+        .iter()
+        .chain(oos_files.iter())
+        .filter_map(|p| canon(Path::new(p)))
+        .collect();
     let mut tree_texts: Vec<(String, String)> = Vec::new();
     for f in &tree_scoped {
-        if seen.contains(f) {
+        if canon(Path::new(f)).is_some_and(|c| seen.contains(&c)) {
             continue;
         }
         let in_scope = authoring || Path::new(f).starts_with(&gates_dir);

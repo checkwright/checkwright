@@ -123,3 +123,4 @@
 | drift-kpi-contract-port | sc sp a b v c | 7f/0d | 4 · ≤0d | 24s 1✗ | 107 |
 | consumer-smoke-contract-port | sc sp a b v c | 4f/1d | 1 · ≤0d | 24s 1✗ | 107 |
 | msys-dialect-migration | sc sp a b v c | 5f/1d | 1 · ≤0d | 24s 1✗ | 108 |
+| port-declaration-cohort-and-windows-leg | sc sp a b v c | 8f/2d | 4 · ≤0d | 24s 1✗ | 108 |
