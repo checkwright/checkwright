@@ -2217,10 +2217,16 @@ append author (§usage-verdict); the poller writes the snapshot only.
 
 Because the
 statusline fires far more often than the per-session /
-per-dispatch verdict calls, a consumer wanting a denser trend history can drive
-sampling from the render path — `usage-verdict` stays the single append author
-(§usage-verdict), so the statusline calls it (with `DELEGATION_KIT_USAGE_HISTORY`
-set) rather than appending the log itself.
+per-dispatch verdict calls, the render path is where a denser trend history
+would come from — but **the shipped statusline arm calls `usage-verdict`
+nowhere**, and its declared reads omit `DELEGATION_KIT_USAGE_HISTORY` for
+exactly that reason (§The statusline arm), so the sampling a consumer actually
+gets from setting that knob is whatever `usage-verdict`'s own per-session /
+per-dispatch callers produce. A consumer wanting the denser history drives the
+call from its own render path; `usage-verdict` stays the single append author
+(§usage-verdict), so such a consumer calls it rather than appending the log
+itself. The kit ships the knob and the append author, not the render-path
+call.
 
 **The sample line.** With sampling enabled (§usage-verdict), `usage-verdict`
 appends one line per parsed snapshot — the trend log's wire contract between

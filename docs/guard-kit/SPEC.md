@@ -1527,6 +1527,14 @@ reviewed and deleted in the same close-stage triage pass as the friction
 log. Deliberate scheduling stays possible by disabling the hook for a
 session — the block is the default, not a capability removal.
 
+The attempt log is a capture-tier surface on the same terms as the friction log
+— gitignored, advisory, reclaimed by the triage pass named above — and it
+declares itself so whether or not the consumer wires the hook, because the tier
+has to hold the file the *first* time the guard fires rather than after a
+workflow-tiering red says it does not:
+
+close-surface: .workflow/wakeup-attempts.log advisory reclaim=: > .workflow/wakeup-attempts.log
+
 ### escalation-guard
 
 escalation-guard is the wakeup-guard's sibling — same `--hook` dispatch,

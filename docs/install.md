@@ -90,10 +90,16 @@ your `PATH`, and the note says what breaks without it:
   model is git-native end to end.
 - `jq` — the settings and evidence gates, and guard-kit's JSON tooling, parse
   their inputs with it.
-- `awk` (GNU) — the gates still on the shell substrate and the generated hooks
-  do their line scanning and field extraction with it, so it stays on the floor
-  until that residue is gone. GNU awk specifically: the 3-argument
-  `match()` in `check-gate-assertions` is a gawk extension.
+- `awk` (GNU) — the generated hooks do their line scanning and field extraction
+  with it, so it stays on the floor until that residue is gone. The shell gate
+  corpus that once shared the floor with them is empty: the member whose
+  3-argument `match()` was the originally-published ground for requiring **GNU**
+  awk specifically, `check-gate-assertions`, ported to the binary. Whether what
+  remains needs a GNU extension at all is unmeasured, and the re-probe with the
+  decision it feeds — narrow this to plain `awk`, or drop it — is
+  `interpreter-floor-gawk-residue-empty`'s. The floor stands unnarrowed until
+  that lands, because an adopter following a *wider* requirement is never broken
+  by it.
 - `sort` (coreutils) — the battery's file plumbing assumes GNU coreutils, and
   `sort` is the member standing for that family. The binding construct is
   `realpath --relative-to` in the gate library every check sources; the release,

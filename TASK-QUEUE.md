@@ -183,8 +183,12 @@
   knob `GATE_SDK_NATIVE_BIN`, and declaring a file that holds a second producer would bless the
   duplication the class ruling rests on refusing. Its disposition waits on the defect below.
   `toolfloor.sh`'s roster is read on the installer path and by `check-install-toolchain`'s parity
-  assertion, so it is sequenced behind `installer-boundary-behind-invoke-port-reading` and
-  `consumer-smoke-runner-port-disposition` rather than by anything in this class.
+  assertion, so it is sequenced behind the installer's behind-invoke relocation rather than by
+  anything in this class. Both slugs that carried that sequencing were ruled wontfix by the
+  operator in the 2026-08-31 consult and left the queue, so the sequencing now reads off the
+  rulings' own home, installer/README.md §The install boundary — `behind-invoke` is a port
+  obligation that keeps a file owed until the step moves behind the invoke — and the live entry
+  owning that relocation is `powershell-installer-surface`.
   The two `pub-lang/` extractors are the **bundled members** of a consumer-first plug-in registry
   and `native-gate-port-remaining-corpus`' ruling (1) positively sends them in-crate — the
   disposition drift-kit's KPI plugins already took — so they wait on the resolver that finds them,
@@ -384,6 +388,17 @@
   **Cost while deferred:** one iteration's stage reasoning is lost per firing,
   and the loss is discovered by the one session structurally unable to make
   it good.
+  **Second occurrence 2026-08-31 (`harness-hook-arm-port`), and it re-priced the
+  cost downward.** align left no journal; build's entry refused; the journal was
+  recovered from the still-resumable align session, so this firing lost nothing
+  — the permanent loss above holds only where the owing session is gone. The
+  gap bullet raised two questions and re-verification at the drain falsified
+  both: the obligation is **already** the stage's rather than the dispatch's
+  (lifecycle-kit/SPEC.md §The state machine says so in those words), so no
+  stage-skill restatement is owed; and the assertion is **not** `--simulate`-only
+  — `bin/enter-stage.sh` refuses a real entry on the same branch. What survives
+  is this entry's own subject, the firing point, unchanged.
+  recurrence: stage-journal-absence-caught-only-downstream 2026-08-31
   Filed 2026-08-30 by close from the gap inbox, with the bullet's own
   overstatement corrected at the drain.
 
@@ -6523,45 +6538,6 @@
   Filed 2026-08-23 by the lead; drained at that iteration's close, which dated rule 15 against
   the filing and read `guard_advise` to establish that it never blocks.
 
-- **interpreter-floor-gawk-residue-empty** [design-pending] —
-  the published GNU-awk requirement's *stated ground* is dead while the floor itself still stands.
-  **Measured, not reasoned — and the measurement was scoped narrower than the conclusion drawn
-  from it, corrected 2026-08-23 at scope.** Probed at the eighth port cut with a `gawk --posix`
-  shim on PATH, which refuses every gawk extension: `check-action-run-shell` ran clean at
-  exit 0, holding no gawk extension at all; `check-gate-assertions` died loudly ("match: third
-  argument is a gawk extension", exit 2). That member ported at this cut. **The probe covered
-  those two members only**, so "the shell residue is empty" overreached its own corpus: it was
-  not — `check-docs-render-fidelity` was registered in `scripts/gates.list`, was still shell, and
-  ran GNU-awk-only `BEGINFILE`/`ENDFILE`/`ARGIND` in live program text. Both members were probed
-  at their then-shell declaration paths, deleted since by the port below; the probe records stand
-  as history and no live path is cited here.
-  **THE STATED PRECONDITION IS DISCHARGED, 2026-08-24 — the entry is UNBLOCKED and its slug is
-  now true.** "The floor keeps one live holder and `shell-gate-tail-port` is what retires it":
-  that port landed, delta 8 taking `check-docs-render-fidelity` to a `.gate` descriptor plus
-  `native/src/gates/docs_render_fidelity.rs`, so the GNU-awk residue is empty **by measurement**
-  and no shell holder of the floor survives. The rename this entry's own body says is owed with
-  the unblock is now due with it.
-  gate-sdk/SPEC.md §check-gate-assertions, §check-action-gh-repo and §The first cohort record
-  the probe with its scope, corrected at the same session; the stale header on the then-shell
-  `check-action-run-shell` was corrected at the generating close.
-  **What the cut did NOT change, and this entry owns.** `awk::GNU` is still an element of
-  `context-kit/lib/toolfloor.sh`'s probe roster, held to docs/install.md §Requirements by
-  `check-install-toolchain` in both directions — and that section still justifies the requirement
-  by "the 3-argument `match()` in `check-gate-assertions`", which the port retired. The stated
-  ground is dead while the requirement stands.
-  **Why `[design-pending]`:** narrowing a user-facing requirement is an envelope change, so the
-  deliverable is a decision — narrow `awk (GNU)` to `awk`, or drop awk from the floor entirely —
-  taken only after re-probing every remaining shell gate and both generated hooks under
-  `--posix` — a re-probe that now collapses to the two hooks, the shell gate corpus being empty.
-  The docs/install.md edge is operator-class; the re-probe is not.
-  **Cost while deferred:** low, and no longer conditional on an unblock — an adopter is told to
-  install gawk on a ground that no longer holds, for a floor **no gate** genuinely needs any
-  more, so the published requirement is neither right by accident nor justified on its face.
-  Filed 2026-08-23 by build; drained at that iteration's close, which re-read the probe roster
-  and found docs/install.md's stated ground retired by the cut that ported its named holder;
-  unblocked 2026-08-24 at `shell-gate-tail-port-and-completion-oracle`'s close, whose drain
-  re-verified both cited declaration paths absent and the last shell holder ported.
-
 - **guard-rule-number-intra-kit-citations-ungated** [design-pending] — guard-kit cites its own
   rule numbers everywhere and nothing holds a single citation to the ruleset.
   **Measured at the rule-17 insertion, 2026-08-23**, which shifted rules 17-21 to 18-22: the
@@ -9224,6 +9200,8 @@
 - **gate-tamper-consumer-gate-coverage** [design-pending] — A glob and a roster audit remain.
 - **upgrade-contract-rename-routing-unstated** [design-pending] — One clause leans on it.
 - **md-refs-tree-link-resolution** [design-pending] — Unreachable while one generator produces.
+- **interpreter-floor-gawk-residue-empty** [design-pending] — Its ground died; awk stands.
+- **inline-interpreter-heredoc-unsteered** [design-pending] — No rule steers `python3 -`.
 - **advisory-lane-draft-state-unswept** [design-pending] — GitHub's notifications are the sweep.
 - **amendment-done-move-assertions** [design-pending] — Zero cost while merges are hand-checked.
 - **guard-advise-jq-dependency** [design-pending] — Needs jq; the one consumer works around it.

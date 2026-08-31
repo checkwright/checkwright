@@ -35,6 +35,10 @@ scripts/queue-config.local.sh
 .claude/worktrees/
 # guard-kit per-iteration scratch log (cleared at close-stage triage)
 .workflow/prompt-friction.log
+# guard-kit wakeup-attempt log (advisory close surface, reviewed and deleted at
+# the same triage pass as the friction log; unwired here, so it appears only
+# where a consumer registers the hook)
+.workflow/wakeup-attempts.log
 # drift-kit per-iteration scratch log (cleared at close-stage knowledge-friction triage)
 .workflow/knowledge-friction.log
 # delegation-kit SubagentStop probe log (advisory close surface, cleared at triage)
