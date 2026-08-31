@@ -282,11 +282,21 @@ refreshes the usage snapshot. {design-bearing}
 `--statusline` reads the harness's session payload on stdin
 (`.model.display_name`, `.effort.level`, `.context_window.used_percentage`, and
 the two `.rate_limits.*` pairs), reads `DELEGATION_KIT_USAGE_FILE`,
-`DELEGATION_KIT_CRED_FILE`, `DELEGATION_KIT_ACCOUNT_CONFIG` and
-`DELEGATION_KIT_USAGE_HISTORY`, and writes one ANSI-coloured line on stdout. The
-gauge escapes are self-contained by delegation-kit/SPEC.md §The statusline
-template's own rule and stay so — no asset leaves the binary. The harness ignores
-the exit status, so the member has none to speak.
+`DELEGATION_KIT_CRED_FILE` and `DELEGATION_KIT_ACCOUNT_CONFIG`, and writes one
+ANSI-coloured line on stdout. **Not `DELEGATION_KIT_USAGE_HISTORY`**: an
+earlier draft of this delta carried it on the strength of
+delegation-kit/SPEC.md §The usage.txt contract's "the statusline calls it
+(with `DELEGATION_KIT_USAGE_HISTORY` set)" sentence, and the align audit read
+that against `delegation-kit/templates/statusline-usage.sh` rather than
+trusting the prose — the shipped producer never calls `usage-verdict` at all,
+so the knob has no reader there today. Declaring it on the arm would have been
+exactly the causal-completeness defect this amendment's own DoD refuses: a
+field with no named reader. Filed to `.workflow/gap-inbox.md` at the
+2026-08-31 align audit rather than fixed here, because wiring the call is a
+behavior change the port-only run does not carry. The gauge escapes are
+self-contained by delegation-kit/SPEC.md §The statusline template's own rule
+and stay so — no asset leaves the binary. The harness ignores the exit
+status, so the member has none to speak.
 
 `--usage-poll` reads `DELEGATION_KIT_USAGE_FILE`, `DELEGATION_KIT_CRED_FILE`,
 `DELEGATION_KIT_ACCOUNT_CONFIG` and `DELEGATION_KIT_USAGE_ENDPOINT`, spawns
@@ -355,8 +365,11 @@ shipped default stays empty because the path is this repo's vocabulary.
 
 ### (10) Every surface naming a deleted path moves in the same commit as the delete
 
-Three path-bearing surfaces, and the count is probed rather than assumed at build
-time. {mechanical}
+Three **wiring** surfaces, and four more the align audit's own tree grep
+found beyond authoring's count — the count is probed rather than assumed at
+build time, and the probe is a literal-string grep for each of the twelve
+basenames over the whole tree, not a re-read of this list.
+{mechanical}
 
 - `.claude/settings.json` — five hook `command` fields (lines 138, 158, 162, 171
   and the `statusLine.command` at 120) and **one** `permissions.allow[]` grant
@@ -380,6 +393,42 @@ delegation-kit ships **no** settings template — its wiring is prose in
 guard-kit's and context-kit's JSON fragments are. The asymmetry is stated so the
 build does not conclude from two JSON hits that it has found them all.
 `installer/` names no member of the corpus.
+
+**Four more, not wiring but every one load-bearing on its own reading, found
+by the align audit's grep and not by this delta's own count.** None reopens
+the member set or the arm kind; each is the same disposition as the three
+above, read one level down from deployment config to the surfaces that
+exercise or describe a deleted path directly.
+
+- `delegation-kit/smoke/install.sh:49,71` — the delegation-kit consumer-smoke
+  recipe **invokes** two deleted templates directly, `bash
+  "$SMOKE_KIT_ROOT/templates/usage-poller.sh"` and `bash
+  "$SMOKE_KIT_ROOT/templates/subagent-stop-liveness.sh"`, as the assertions
+  exercising `--usage-poll`'s and `subagent-stop-liveness`'s behavior
+  (gate-sdk/bin/run-consumer-smoke.sh, part of this repo's own validate
+  battery). Deleting the templates without rewriting these two invocations to
+  dispatch the arm — through `gate-sdk/bin/run-gates.sh`, the pattern the
+  same file's line 84 already uses for `--emit graph` — silently drops smoke
+  coverage for both members rather than porting it.
+- `guard-kit/smoke/install.sh:9` — the guard-kit consumer-smoke recipe
+  copies the deleted `templates/wakeup-guard.sh` into the scratch consumer's
+  `scripts/`; the copied file is never itself exercised in this recipe, but
+  an unguarded `cp` off a path the delete removes fails the recipe outright,
+  before the `bash-guard.sh` assertion it exists to reach. Falls with this
+  delta's own rewrite of `guard-kit/templates/settings-hooks.json` above: once
+  that fragment's `wakeup-guard` command names the arm instead of a script,
+  this copy line has nothing left to stage and is dropped with it.
+- `delegation-kit/templates/delegation-config.sh:6` — a `shellcheck disable`
+  comment reads "consumed by `templates/agent-dispatch-guard.sh` after
+  sourcing"; that file is one of delta 9's four deletes. The comment is prose,
+  not wiring, and no gate reads it, but a reader meeting it after the port
+  would chase a path that no longer exists. Reworded to name the `--hook
+  agent-dispatch-guard` arm as the consumer instead.
+- `.claude/commands/lead.md:95-98` — the lead-model binding's optional-guard
+  paragraph names `guard-kit/templates/wakeup-guard.sh` and
+  `guard-kit/templates/escalation-guard.sh` as what a lead session wires;
+  post-port, wiring means pointing the hook's `command` field at the binary,
+  never copying a template, so the paragraph is reworded to name the arms.
 
 ### (11) The shell test estate retires with its subjects
 
