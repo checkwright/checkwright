@@ -867,8 +867,11 @@ hands out stdout only through an accessor that has already read the exit status.
 So "capture `stdout`, ignore `status`" has no spelling, and a program that could
 not be run is an exit-2 refusal rather than an empty capture read as clean.
 The wrapper is proved the way the shell helper is, directly rather than through a
-member's fixture pair: unit tests over a spawn that never happened, a child that
-exited non-zero, and one that succeeded. A further test holds the routing — the
+member's fixture pair — no static input crashes a child, so no member's fixture
+pair can reach these arms: unit tests over a spawn that never happened, a child
+that exited non-zero, one that succeeded, and the two branches the report below
+exists for — a child that failed writing **only to stdout**, and one that failed
+writing to **neither** stream. A further test holds the routing — the
 `Command` spelling is asserted absent from every module under
 `native/src/gates/`, the roster shape §check-reads-couples' unit test B uses for
 filesystem walks — so each new spawning member inherits the property instead of
@@ -882,12 +885,26 @@ nothing, and the property is preserved not by the roster test but by the
 single-spawn-site rule above — `proc.rs` is where a spawn would have to be added,
 and adding one there is what the corpus test is watching. Widening `proc.rs` is how a member
 that needs more of the child's result gets it; building its own `Command` is what
-the test refuses. `Completed::stderr_on_failure` is the first such widening, and
-it exists because a wrapper that reports "the child failed" and drops what the
-child said turns one line of stderr into a whole CI round: it is reachable only on
-the arm where `stdout()` already answered `None`, so it adds a *cause* to a
-refusal and no path to a false clean. A caller composes it into its own finding
-line; an empty answer is the honest case of a child that said nothing.
+the test refuses. `Completed::failure_report` is the widening, and it exists
+because a wrapper that reports "the child failed" and drops what the child said
+turns one line of diagnosis into a whole CI round: it hands back the failed
+child's **exit code and both captured streams**, composed into one string. Two
+properties keep it off the false-clean path, and the second is the one a later
+session widening `proc.rs` again most needs and cannot re-derive. It returns
+`None` when the status succeeded, so it is reachable only on the arm where
+`stdout()` already answered `None` — it adds a *cause* to a refusal and no path
+to a clean verdict. And it returns a composed `String`, never `&[u8]`: the defect
+the narrowing closed is a rule *branching on* a crashed child's empty capture as
+though it were the child's answer, and a string whose only operation is printing
+cannot be parsed back into a verdict. It is not the child's stdout — it is a
+report *about* the child, labelled with its exit code, which is why carrying
+stdout here reopens no hole. `Completed::stdout()` is untouched, so the one path
+to the child's bytes still reads the status first. The report is **non-empty by
+construction**: the exit code always exists, taken through the same private
+`exit_code` §run-gates uses so a signal-killed child reads `128 + n`, and both
+stream labels are always present because *which* stream was empty is the reading
+a bare refusal cannot give. A caller composes it into its own finding line and
+needs no empty case.
 
 **The same contract binds the *dispatcher*, and there the refusal is raised
 inside `gate_command` — which is a trap for its callers.** A `.gate` member whose
@@ -12243,12 +12260,30 @@ parity re-fires through the normal registry path once the gate lands.
 **A generator that could not run reports why it could not run.** The hook
 guarantees are asserted by spawning the generator, and a generator dying under
 `set -e` says nothing on stdout, so the refusal used to name only the arm. It now
-carries the child's own stderr (§Fail-closed contract's widening), because the
-alternative costs a full CI round per attempt: the 2026-08-30 Windows leg bought
-two rounds' worth of `--emit failed` before the cause — one unguarded external
-command in the generator's prologue — could be read off the source instead of the
-log. A child that fails silently still yields a bare refusal, so the suffix is
-composed rather than assumed.
+carries the child's whole account of itself — exit code and both streams
+(§Fail-closed contract's widening) — because the alternative costs a full CI
+round per attempt: the 2026-08-30 Windows leg bought two rounds' worth of
+`--emit failed` before the cause — one unguarded external command in the
+generator's prologue — could be read off the source instead of the log, and the
+2026-08-31 round then came back with the same failure and an **empty cause**,
+which is the reading that forced the second widening. Two mechanisms produced
+that emptiness and the refusal could not tell them apart: a generator diagnosing
+itself on stdout, which `stdout()` withholds on a non-zero exit, and a generator
+silent on stderr, which the old accessor folded to nothing. Both are closed, so
+the suffix is always present — a silent child now yields its exit code rather
+than a bare refusal.
+
+The suffix's *grammar* is unchanged, which is what keeps the widening monotone
+for every reader: the same verdict, the same one-line fold of newlines, so
+`scripts/parse-gates-log.sh` and a CI log reader both see the shape they already
+parse. The one reader the widening exists for is a **session** reading the
+Windows leg's job log; nothing parses the suffix and nothing must. Because the
+report is non-empty on every non-zero exit, the caller composes it with no empty
+case: `Completed::failure_report` returns an `Option` only to keep itself
+unreachable on success, and where the type demands that impossibility be handled
+the fallback is a **named non-empty refusal** rather than an empty string — a
+default that could still compose a bare refusal is the defect this paragraph
+records, not an acceptable coercion.
 
 Dual-couple manifest: the artifact path is a knob, but check-graph's own
 `# graph:` manifest is kit-shipped static text a consumer never edits, so it

@@ -372,27 +372,25 @@ fn read_stripped(p: &str) -> Result<String, String> {
 
 // spec: gate-sdk/SPEC.md §check-graph — the generator stays shell (§gen-pre-commit), so assertion D
 // spawns it; criterion 7 clears the spawn because `bash` is on the program floor
-// spec: gate-sdk/SPEC.md §check-graph — assertion D's refusal carries the generator's own stderr,
-// so a verdict arrives with its cause. The `Err` payload is empty where the child said nothing,
-// which is a reachable arm rather than an impossible one.
+// spec: gate-sdk/SPEC.md §check-graph — assertion D's refusal carries the generator's whole
+// account of itself, so a verdict arrives with its cause. The `Err` payload is non-empty on every
+// non-zero exit, the fallback included, so no arm here composes the bare refusal.
 fn generator_emit(gen: &str, arm: &str) -> Result<Result<String, String>, String> {
     let out = proc::run("bash", &[gen, arm])?;
     match out.stdout() {
         Some(b) => Ok(Ok(String::from_utf8_lossy(b)
             .trim_end_matches('\n')
             .to_string())),
-        None => Ok(Err(out.stderr_on_failure().unwrap_or_default())),
+        None => Ok(Err(out
+            .failure_report()
+            .unwrap_or_else(|| format!("bash {} {} left no account of its failure", gen, arm)))),
     }
 }
 
 // spec: gate-sdk/SPEC.md §check-graph — the cause as a finding suffix: present it on one line so a
-// CI log reader sees it beside the verdict, absent where the child said nothing
+// CI log reader sees it beside the verdict
 fn because(cause: &str) -> String {
-    if cause.is_empty() {
-        String::new()
-    } else {
-        format!(" — it said: {}", cause.replace('\n', " | "))
-    }
+    format!(" — it said: {}", cause.replace('\n', " | "))
 }
 
 fn rule(args: &[String]) -> Result<i32, String> {

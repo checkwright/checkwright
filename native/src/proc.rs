@@ -31,18 +31,26 @@ impl Completed {
     }
 
     // spec: gate-sdk/SPEC.md §Fail-closed contract — the sanctioned widening: the failed child's
-    // own account of itself, reachable only where `stdout()` already said `None`, trimmed because
-    // the caller composes a finding line rather than replaying a stream
-    pub fn stderr_on_failure(&self) -> Option<String> {
+    // whole account of itself, reachable only where `stdout()` already said `None`, composed into
+    // a `String` so no caller can parse it back into a verdict
+    pub fn failure_report(&self) -> Option<String> {
         if self.status.success() {
             return None;
         }
-        let s = String::from_utf8_lossy(&self.stderr).trim().to_string();
-        if s.is_empty() {
-            None
-        } else {
-            Some(s)
-        }
+        let part = |label: &str, raw: &[u8]| {
+            let s = String::from_utf8_lossy(raw).trim().to_string();
+            if s.is_empty() {
+                format!("{}: <empty>", label)
+            } else {
+                format!("{}: {}", label, s)
+            }
+        };
+        Some(format!(
+            "exit {}; {}; {}",
+            exit_code(&self.status),
+            part("stdout", &self.stdout),
+            part("stderr", &self.stderr)
+        ))
     }
 }
 
@@ -553,6 +561,47 @@ mod tests {
             "the spawn-failure line dropped the fail-closed wording, so a caller printing it \
              would not say the check did not run: {}",
             e
+        );
+    }
+
+    // spec: gate-sdk/SPEC.md §Fail-closed contract — the branch the narrowing itself made
+    // unreadable: a child that diagnoses itself on stdout, which a shell script's own `echo`
+    // does by default, and which `stdout()` withholds on a non-zero exit
+    #[test]
+    fn a_child_that_failed_on_stdout_alone_still_reports_what_it_said() {
+        let c = run("bash", &["-c", "echo the-generator-said-this; exit 3"])
+            .expect("bash is absent — it is on the program floor the gate modules spawn against");
+        let report = c
+            .failure_report()
+            .expect("no report from a child that exited non-zero");
+        assert!(
+            report.contains("the-generator-said-this"),
+            "the report dropped a failed child's stdout, so a generator that diagnoses itself \
+             there is unreadable exactly as it was before the widening: {}",
+            report
+        );
+        assert!(
+            report.contains("exit 3"),
+            "the report did not name the exit code: {}",
+            report
+        );
+    }
+
+    // spec: gate-sdk/SPEC.md §Fail-closed contract — the 2026-08-31 Windows round's own shape: a
+    // child that exits non-zero and says nothing on either stream still names the status it died
+    // with, because the exit code is the datum that always exists
+    #[test]
+    fn a_child_that_failed_silently_still_reports_its_exit_code() {
+        let c = run("bash", &["-c", "exit 4"])
+            .expect("bash is absent — it is on the program floor the gate modules spawn against");
+        let report = c
+            .failure_report()
+            .expect("no report from a child that exited non-zero");
+        assert!(
+            report.contains("exit 4"),
+            "a silent child yielded a report that does not name its exit code — the bare refusal \
+             that cost a whole CI round is representable again: {:?}",
+            report
         );
     }
 
