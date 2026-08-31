@@ -9237,6 +9237,7 @@
 - **crate-arms-relink-under-worker-pool** [design-pending] — It relinks the binary it runs in.
 - **build-native-obligation-unconditional** [design-pending] — A crate-free commit still rebuilds.
 - **port-blockers-library-mediated-scan** [design-pending] — A library-mediated spawn reads clean.
+- **bridged-arm-requirements-undeclared** [design-pending] — `--needs` omits what an arm spawns.
 
 ## Done
 
