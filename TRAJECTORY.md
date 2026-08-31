@@ -369,6 +369,33 @@ gate-sdk/SPEC.md §port-blockers), and widening the exclusion would let *port co
 while a full-profile adopter's vendored tree still runs bash — a false claim at the front door, the
 cost §What the objectives are not names.
 
+**Three port dispositions closed in one consult — ruled 2026-08-31 by the operator.** Two are
+mechanism and live where their contract does: `installer/consumer-smoke/run-smoke.sh` is declared
+`no-port` per file, minting no class (installer/README.md §The consumer smoke, *The port
+disposition*), and the install boundary's three step values are now readable in the port oracle's
+vocabulary — `bootstrap` the one declarable cause, `behind-invoke` a port obligation — with the two
+other readings refused there (installer/README.md §The install boundary). The third has no
+contract home yet, so it is recorded here until spec gives it one: **the harness hook substrate
+belongs in the binary as one dispatching arm** — the hook name as argv, the harness payload on
+stdin, the hook-JSON envelope on stdout, exit status as protocol — and its environment read is the
+harness's own protocol, exempted for that arm alone from the reads-no-knob sentence
+`installer/README.md` §The install boundary states for `--install`. Two alternatives refused:
+*one arm per hook*, because eight arms speaking one protocol each owe a named caller and share
+one, so the class rule at gate-sdk/SPEC.md §The non-gate arm is met once rather than eight times;
+and *hooks stay shell as a class*, because a per-hook bash file is exactly the PowerShell
+duplicate the directive's second ground refuses. The contract lands at gate-sdk/SPEC.md §The
+non-gate arm when `harness-template-port-residue` is specified; this paragraph then retires.
+
+**The Windows leg's round 7 is cause-only — ruled 2026-08-31 by the operator in consult**, one
+round past the rider rule of 2026-08-30 and not a loop: its single change is the instrument, so
+`check-graph`'s generator spawn prints the generator's own output on any non-zero exit whichever
+branch took it, and no repair ships in the same round. The alternative refused is a third
+fix-and-observe round. Rounds 5 and 6 each shipped a repair reasoned on Linux, and round 6 came
+back with the failure the instrument was built to explain and an empty cause; a guessed repair
+buys one bit per push, the instrument buys the cause. Discharge event: round 7's finding recorded
+on `platform-support-ci-matrix`, at which point the rider rule resumes and this paragraph is
+deleted.
+
 **The deferred pool's intake is triaged at the drain, and machinery findings are dormant by
 default — ruled 2026-08-30 by the operator in a consult, on a re-measured pool.** The 2026-08-23
 ruling above bought its exits once — the pool fell from 252 to 228 on the day — and then intake
@@ -460,7 +487,24 @@ half and the relocation of every conditional install step behind the invoke. Its
 measured 2026-08-24: the "resolve the platform, place the binary, invoke it" shape is roughly
 eighty lines of `installer/lib/init.sh`, and the roughly three hundred and fifty beside it —
 kit-source vendoring, manifest and lock I/O, registry and queue seeding, the commit flow — are
-conditional install logic not yet behind the invoke. After the port: `companion-toolkit-profile`.
+conditional install logic not yet behind the invoke. After the port: **one deferred-pool triage
+iteration**, then `companion-toolkit-profile`.
+
+**The port-only run — ruled 2026-08-31 by the operator in consult, on a measured rate.** The
+2026-08-31 survey record measured the track since the predicate landed: roughly one iteration in
+three shipped a port, the rest bought the Windows leg, repairs and rulings, and the largest class
+of the owed column had not moved a line. So until `--tree` reads zero owed, every iteration is a
+port cut selected by the ruled composer — no yield, which supersedes the four-yield count on
+`native-gate-port-remaining-corpus` — and close's drain takes fix, icebox and wontfix but
+**promotes nothing**; the one exception is the operator-ruled hotfix CLAUDE.md §Delivery doctrine
+already admits. The alternative refused is interleaving backlog units with cuts, which is the
+measured rate itself. **The pool is answered after the port, not during it, and as triage rather
+than as work**: one iteration that iceboxes by class, retires what a landed unit or a closed ruling
+has mooted, and keeps the product-witnessed and `[roadmap:]`-tagged remainder — most of the pool
+argues from a delivery process that the port changes under it, so working it earlier buys entries
+the port then re-litigates. Discharge event: the oracle's owed count reads zero, at which point
+the run is over and this paragraph is deleted; the triage sentence above it is the sequence and
+stays.
 
 **A sequence remainder of one is not a finished port, and reading it as one is the misreading
 this paragraph exists to stop — operator-ruled 2026-08-25.** The completion predicate is the one

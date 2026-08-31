@@ -54,18 +54,18 @@
   has no working install path on Windows, and `powershell-installer-surface` — the port sequence's
   one remaining member — stays sequenced behind this entry.
   **DEMOTED 2026-08-31 AT BUILD SO THE ITERATION COULD ENTER VALIDATE, AND IT RETIRES NOTHING.**
-  The rider's work landed; the observation only the close push buys sits AFTER the stage that
-  demands completion, so `## Done` was unavailable. The `[roadmap:]` tag survives and
-  TRAJECTORY.md's 2026-08-23 protection is untouched: it forbids RETIRING such an entry, and a
-  demotion is its opposite. The operator's ruling above is undemoted — it ruled round 6's WORK
-  into the unit set, and that work is landed and now measured.
+  The observation only the close push buys sits AFTER the stage that demands completion, so
+  `## Done` was unavailable; the `[roadmap:]` tag survives and TRAJECTORY.md's 2026-08-23
+  protection forbids RETIRING, not demoting. The operator's rider ruling above is undemoted.
+  **ROUND 7 IS RULED 2026-08-31 (operator, consult) AS CAUSE-ONLY**: its one change is the
+  instrument — `generator_emit` prints the generator's own output on any non-zero exit — and no
+  repair ships in it; grounds and the refused shape at TRAJECTORY.md §The closed rulings.
   ruled: platform-support-ci-matrix operator 2026-08-27 lead-relay
   ruled: platform-support-ci-matrix operator 2026-08-30 lead-relay
   ruled: platform-support-ci-matrix lead 2026-08-30 own-authority
-  Filed 2026-07-26 by scope, split from `platform-support-contract`; Linux split 2026-08-25, macOS
-  08-26. Promoted and deferred 2026-08-25, 08-26, 08-27; promoted 2026-08-30 by scope, demoted
-  2026-08-30 by close, re-promoted 08-30 by spec, demoted 08-31 at build once its repairs landed;
-  round 6 observed and recorded 08-31 by close, whose push bought it.
+  ruled: platform-support-ci-matrix operator 2026-08-31 consult
+  Filed 2026-07-26 by scope, split from `platform-support-contract`; Linux split 08-25, macOS 08-26;
+  promoted/deferred 08-25 through 08-31; round 6 observed and recorded 08-31 by close's own push.
 
 - **spec-authoring-self-check-pass** [design-pending] — spec-stage amendment authoring asserts tree
   facts a one-command probe refutes, and every instance is caught downstream rather than at
@@ -196,10 +196,13 @@
   (`native/src/gates/settings_paths.rs`'s `allow_entries` on `/permissions/allow`). That coverage
   hole is `settings-hook-command-path-gate`, filed 2026-08-22 and **not** re-filed here; this entry
   records only that the residue is the population which would walk into it.
-  **Why `[design-pending]`:** the arm-kind question above is a contract decision, not an
-  implementation one — whether a hook substrate belongs in this binary at all, and if so whether it
-  is one arm per hook or one dispatching arm, is the shape nobody has ruled. Recovering each
-  member's harness wiring is mandatory before ruling on it.
+  **THE ARM-KIND QUESTION IS RULED 2026-08-31 (operator, consult): one dispatching hook arm.** A
+  hook substrate belongs in the binary as ONE arm — hook name as argv, harness payload on stdin,
+  hook-JSON envelope out, exit status as protocol — with its env read exempted for this arm alone
+  from the reads-no-knob sentence. Ruling and refused shapes: TRAJECTORY.md §The closed rulings;
+  the contract lands at gate-sdk/SPEC.md §The non-gate arm when spec takes the unit. Recovering
+  each member's harness wiring is still mandatory before authoring it.
+  ruled: harness-template-port-residue operator 2026-08-31 consult
   **Cost while deferred:** low and non-recurring for the argument, standing for the work — the
   ground is stated and every member is named on the owed side of its own ruling, so no future cut
   re-argues the class; what is owed is the port, and the 613 lines sit in the `--tree` arm's owed
@@ -544,12 +547,12 @@
   delta; criterion relaxation is closed at gate-sdk/SPEC.md §The port-candidate criteria, an
   ordering signal and never an eligibility screen. `gate-battery-result-cache` is the one battery
   entry unsubsumed; `powershell-installer-surface` is the sequence's last member.
-  **A FIFTH YIELD IS NOT A LEAD'S TO RULE — 2026-08-29.** The directive has yielded four times,
-  each for one named iteration and none a reversal — a yield spends one iteration's turn, never
-  the sequence's claim on the next — and a further one re-scopes a recorded operator ruling, so a
-  cut arguing for one ESCALATES rather than being narrowed in-session.
-  Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction; cohorts ruled at
-  scope 2026-08-11/12; promoted at spec and demoted at build once per increment since.
+  **A FIFTH YIELD IS NOT A LEAD'S TO RULE — 2026-08-29.** Four yields, each one named iteration
+  and none a reversal; a further one re-scopes an operator ruling, so a cut arguing for one
+  ESCALATES. **SUPERSEDED BY THE PORT-ONLY RUN, RULED 2026-08-31 (operator, consult)**: no yield
+  at all until `--tree` reads zero owed — TRAJECTORY.md §PRIORITY DIRECTIVE owns the run.
+  ruled: native-gate-port-remaining-corpus operator 2026-08-31 consult
+  Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close; cohorts ruled at scope 2026-08-11/12.
 
 - **macos-install-smoke-ci-leg** [design-pending] [roadmap: next/reliability] — a macOS
   install-smoke leg; nothing has ever run green against macOS.
@@ -9207,64 +9210,6 @@
   Filed 2026-08-30 by close, promoted from the gap inbox (spec filed it; the three sites carry a
   recorded `spec:` verdict naming the open question rather than an invented answer).
 
-- **installer-boundary-behind-invoke-port-reading** [design-pending] — `installer/README.md` §The
-  install boundary states a disposition for every install step and never says it in the port
-  oracle's vocabulary, so no cut can select `installer/` behind it.
-  **What the section actually says**, read 2026-08-30 at scope: `behind-invoke` is "conditional
-  install logic. Written once, in Rust", and it is the **default** — a step claiming `bootstrap`
-  owes a reason and no other. On its face that is a port COMMITMENT, not a no-port cause.
-  **The gap is addressability, not silence.** The section contains no occurrence of `no-port`,
-  `port-blockers` or `port disposition`. So a session composing a stated-contract cut
-  (`native-gate-port-remaining-corpus`'s 2026-08-28 composer ruling) cannot cite it as the
-  specification section its cut is taken behind, and a session reading a `# no-port:` header has
-  nothing here to point the cause at. The contract exists and is unquotable in the one grammar
-  that consumes it.
-  **Three readings, and the entry is the ruling between them:** (1) `behind-invoke` IS the port
-  obligation, so `installer/`'s owed lines are simply owed and the fix is a vocabulary bridge;
-  (2) it answers a different question — WHEN a step runs relative to the invoke, not WHETHER its
-  implementation ports — and the port disposition is genuinely unstated; (3) `bootstrap` supplies
-  a no-port cause for its own five steps while `behind-invoke` supplies a port obligation, making
-  the section a two-sided disposition nobody has read as one.
-  **Why `[design-pending]`:** which reading holds decides whether any declaration is owed at all,
-  and reading (2) means the install boundary needs a port clause it has never had.
-  **DISTINCT from `powershell-installer-surface`**, which owns the bootstrap's design and the
-  relocation of conditional steps; this owns only how the resulting dispositions are spelled for
-  the port oracle. Neither implies the other's answer.
-  **Cost while deferred:** **2,088 owed lines** across `installer/lib/` and `installer/bin/` —
-  the third-largest bucket in the owed column — whose disposition every future cut re-meets with
-  a contract it cannot cite, and the entry that would consume the ruling
-  (`powershell-installer-surface`) is sequenced behind a CI leg, so the ambiguity outlives several
-  iterations without anyone being forced to resolve it.
-  ruled: installer-boundary-behind-invoke-port-reading lead 2026-08-30 own-authority
-  Filed 2026-08-30 at scope by lead ruling, from the port-track decomposition survey recorded at
-  `.workflow/survey-record.md`; the owed figure is that survey's, taken at rev 6e345565.
-
-- **consumer-smoke-runner-port-disposition** [design-pending] — the installer's own
-  `consumer-smoke/run-smoke.sh` is a consumer-smoke harness sitting outside any kit's `smoke/`,
-  so the 2026-08-30 smoke class ruling neither plainly covers nor plainly excludes it.
-  **The file**: 851 owed lines, the second-largest single owed file in the tree, measured
-  2026-08-30 at scope against `--emit port-blockers --tree`.
-  **Why the ruling does not settle it.** gate-sdk/SPEC.md §Consumer smoke, *The port disposition*
-  rules the smoke class and its members are reached by ground rather than by path — which is what
-  makes this file arguable in both directions. It is a consumer-smoke harness in substance, and
-  its siblings under that ruling are declared: `gate-sdk/bin/run-consumer-smoke.sh` and
-  `gate-sdk/lib/consumer-smoke.sh` both carry `no-port` today. Against that, it lives under
-  `installer/` rather than in any kit's `smoke/`, and it is one of the two files the 2026-08-28
-  predicate ruling named as genuinely shipping to no adopter — a ground that ruling explicitly
-  DECLINED to convert into a declaration class.
-  **Why `[design-pending]`:** the call is whether the smoke ruling's ground reaches a harness the
-  payload does not carry. Ruling it in makes the declaration mechanical; ruling it out leaves the
-  largest single non-installer-lib file owed with no stated cause, which is a real port obligation
-  rather than a formality.
-  **DISTINCT from `installer-boundary-behind-invoke-port-reading`**, filed the same day: that one
-  is about `installer/`'s runtime library and how its disposition is spelled; this is one test
-  harness and whether an existing class ruling already reaches it. Neither answers the other.
-  **Cost while deferred:** 851 lines sit in the operator-ruled completion predicate with an
-  arguable-but-unargued disposition, and the next stated-contract cut that reaches `installer/`
-  pays the same argument again rather than reading a ruling.
-  ruled: consumer-smoke-runner-port-disposition lead 2026-08-30 own-authority
-  Filed 2026-08-30 at scope by lead ruling, from the same port-track decomposition survey.
-
 - **same-day-recurrence-date-multiplicity** [design-pending] — two judged recurrences falling on
   one calendar day have no ruled spelling, and the two governing specs imply opposite ones.
   **The two readings, both citable.** queue-kit/SPEC.md:397-405 rules the declaration
@@ -9361,6 +9306,9 @@
 - **port-blockers-library-mediated-scan** [design-pending] — A library-mediated spawn reads clean.
 
 ## Done
+
+- installer-boundary-behind-invoke-port-reading
+- consumer-smoke-runner-port-disposition
 
 ## Lessons Learned
 

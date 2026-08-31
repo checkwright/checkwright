@@ -387,6 +387,26 @@ moment*:
   removes, and ceases to exist rather than moving. `init`'s `jq` preflight is
   the worked case: nothing behind the invoke reads JSON with `jq`.
 
+**How the port oracle reads those three values — ruled 2026-08-31 by the
+operator in consult, so a cut can cite this section as its stated contract.**
+The section is a two-sided port disposition. `bootstrap` is the port's
+irreducible (TRAJECTORY.md §PRIORITY DIRECTIVE — the port track's sequence). A
+file whose *whole* body is bootstrap steps declares `# no-port:` citing this paragraph, and that is the
+only `no-port` cause `installer/` may carry. `behind-invoke` is a **port
+obligation**: a file carrying any such step stays `owed` in
+`--emit port-blockers --tree` until the step is relocated behind the invoke and
+the shell that ran it is deleted. `retired` steps are deleted, not declared. So
+today no `installer/lib/` or `installer/bin/` file declares, and none should
+until the relocation lands — the owed column is reading this section correctly.
+Two readings were refused with it, so the next cut does not re-argue them:
+*`behind-invoke` alone is the obligation and `bootstrap` is silent* — refused
+because it leaves the one shell surface the trajectory sanctions with no cause
+to declare on, so the bootstrap would read as owed forever; and *the section
+answers only WHEN a step runs, not WHETHER its implementation ports* — refused
+because the section's own words for `behind-invoke` are "written once, in
+Rust", which is a port commitment, and a reading that voids the section's text
+is wrong.
+
 **The two bootstraps are hand-kept, and parity is held by running, not by
 generation — ruled 2026-08-26.** Each half is authored in its own language
 against the five steps above, and the oracle that holds them equal is the
@@ -1172,6 +1192,21 @@ right about what `uninstall` has to reverse. The distinction is the one every
 `consumer-smoke/run-smoke.sh` is the acceptor for everything above, and it is
 registered as a validate suite so a bit-rotted activation path is a red
 validate rather than a discovery at announcement.
+
+**The port disposition — `run-smoke.sh` is declared `no-port`, ruled 2026-08-31
+by the operator in consult.** It is this repo's acceptance harness and rides no
+payload: `scripts/pack-installer.sh` assembles both transports out of the kit
+roots and never out of `installer/consumer-smoke/`, so no adopter receives it
+and no adopter path executes it — the ground gate-sdk/SPEC.md §Consumer smoke,
+*The port disposition* declares the kit `smoke/` class on at its leg 3, reached
+one step further here for a harness the payload does not even carry. The 2026-08-28
+predicate ruling (TRAJECTORY.md §The closed rulings) named this file as one of
+the two that ship to no adopter and declined to turn that ground into a
+*class*; this is a per-file disposition under the case-by-case residue rule that
+ruling left standing, and it mints no class. The declaration sits in the file's
+own header and cites this paragraph. What it does **not** say: nothing here
+reaches `installer/lib/` or `installer/bin/`, whose disposition §The install
+boundary states.
 
 **The smoke packs the tree it lives in, by construction — the current directory
 does not select it.** The script resolves that tree from its own path and hands
