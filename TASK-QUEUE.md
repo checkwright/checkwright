@@ -70,60 +70,60 @@
   ruled: native-gate-port-remaining-corpus lead 2026-08-31 own-authority
   Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close; cohorts ruled at scope 2026-08-11/12.
 
-- **platform-support-ci-matrix** [spec: SPEC-generator-cause.md] [roadmap: next/reliability]
+## Technical Debt
+
+## Deferred
+
+- **platform-support-ci-matrix** [design-pending] [roadmap: next/reliability]
   [precondition-ok: run-observed]
   — a CI leg that PRODUCES AND EXERCISES a Windows gate-binary artifact, which is
-  gate-sdk/SPEC.md §Consumer payload's join condition for `x86_64-pc-windows-msvc`. Five rounds
+  gate-sdk/SPEC.md §Consumer payload's join condition for `x86_64-pc-windows-msvc`. Six rounds
   bought. **The slug is deliberately NOT renamed** though "matrix" now reads oddly for one leg —
   `powershell-installer-surface` cites it by name. The fork, the Windows-ahead-of-macOS ordering
   and WSL-as-interim are TRAJECTORY.md §The closed rulings'; macOS is `macos-install-smoke-ci-leg`.
   roadmap-summary: A CI install-smoke leg per supported platform, or an honest label.
-  **PRODUCED AND EXERCISED ARE BOTH DISCHARGED — round 5 (`33298006656`, head `fb9ed980`,
-  2026-08-30) is the first run in this project's history to execute gates on Windows.** It built
-  `checkwright-gates.exe` for `x86_64-pc-windows-msvc`, packed it, installed from the tarball and
-  ran the battery through it, so blockers 5 and 6 and batch 4's `on_path` repair are MEASURED.
-  **ROUND 6 IS OBSERVED — run `33392360228`, head `e0e4355e`, 2026-08-31 — AND IT SPLIT.** Round
-  5's `2 of 10 gates FAILED: check-graph check-install-disposition` became `1 of 11 gates FAILED:
-  check-graph`, both repairs having landed at build in `ef65956b` and verified on Linux alone.
-  **`check-install-disposition` IS REPAIRED**, confirmed on the only host that can show it; the
-  mechanism is gate-sdk/SPEC.md §Porting to Rust does not retire dialect exposure's.
-  **`check-graph` IS NOT** — both `gen-pre-commit.sh --emit` arms still fail unchanged from round
-  5, so the cwd anchor gate-sdk/SPEC.md §The path-dialect contract prescribes did not reach the
-  cause. Same-gate red, so the ruling below fires: FILED AND DEFERRED, no further round.
-  **THE OPERATOR'S 2026-08-30 RULING, WHICH THIS DEMOTION LEAVES INTACT:** the rider stops at
-  green — on green, drop `continue-on-error` on the job comment's own trigger and STOP, since the
-  `targets.list` join below is separately measured work; on a red cause, file and defer without
-  looping, which is what the one-to-two push budget protects.
-  **The two consequences stay UNEXECUTED, now on an OBSERVED ground rather than an unobserved one.**
-  `.github/workflows/gates.yml`'s `install-smoke-windows` keeps `continue-on-error: true` — the
-  job's own comment drops it "on the run it is first observed green and not before", and round 6
-  is red. `x86_64-pc-windows-msvc` stays off `native/targets.list` on the same fact.
+  **PRODUCED AND EXERCISED ARE BOTH DISCHARGED** — round 5 (`33298006656`, head `fb9ed980`) built,
+  packed, installed and ran the battery through `checkwright-gates.exe`, so blockers 5 and 6 and
+  batch 4's `on_path` repair are MEASURED. **ROUND 6 IS OBSERVED (`33392360228`, head `e0e4355e`)
+  AND IT SPLIT:** `check-install-disposition` IS REPAIRED on the only host that can show it;
+  **`check-graph` IS NOT** — both `--emit` arms fail unchanged, so the cwd anchor gate-sdk/SPEC.md
+  §The path-dialect contract prescribes did not reach it, AND ITS REFUSAL CARRIED AN EMPTY CAUSE.
+  **THE OPERATOR'S 2026-08-30 RULING:** the rider stops at green — on green, drop
+  `continue-on-error` on the job comment's own trigger and STOP, since the `targets.list` join
+  below is separately measured work; on a red cause, file and defer without looping, which is what
+  the one-to-two push budget protects.
+  **The two consequences stay UNEXECUTED on an OBSERVED ground.** `install-smoke-windows` keeps
+  `continue-on-error: true` — its own comment in `.github/workflows/gates.yml` drops it "on the run
+  it is first observed green and not before"; `x86_64-pc-windows-msvc` stays off `targets.list`.
   **The join half is more expensive than a line edit, and that is measured rather than assumed.**
   `native/targets.list:43-48` owns it: the consumer smoke builds from the host it runs on and
   refuses a roster naming another platform, so the join needs steering or a cross-compiling build.
   **Cost while deferred:** the one adopter class with a named days-to-weeks adoption window still
   has no working install path on Windows, and `powershell-installer-surface` — the port sequence's
   one remaining member — stays sequenced behind this entry.
-  **DEMOTED 2026-08-31 AT BUILD SO THE ITERATION COULD ENTER VALIDATE, AND IT RETIRES NOTHING** —
-  the observation only the close push buys sits AFTER the stage that demands completion, so
-  `## Done` was unavailable. The `[roadmap:]` tag and the operator's rider ruling both survive.
-  **ROUND 7 IS RULED 2026-08-31 (operator, consult) AS CAUSE-ONLY**: its one change is the
-  instrument — `generator_emit` prints the generator's own output on any non-zero exit — and no
-  repair ships in it; grounds and the refused shape at TRAJECTORY.md §The closed rulings.
+  **ROUND 7'S CAUSE-ONLY INSTRUMENT IS LANDED (`2799b22b`) AND NO REPAIR RODE WITH IT**, per the
+  operator's 2026-08-31 consult ruling. Assertion D's refusal now carries the generator's whole
+  account — exit code and BOTH streams, each labelled — so the two mechanisms round 6 could not
+  tell apart are legible in the job log. Read the suffix `— it said: exit N; stdout: …; stderr: …`;
+  a silent child now reads `exit N; stdout: <empty>; stderr: <empty>` where round 6 read nothing.
   **ROUND 7 SHIPS INSIDE `cause-instrument-and-queue-kit-cut` (operator, 2026-08-31), so its
   reading is taken on a binary ALSO carrying that iteration's queue-kit arms.** No ported member is
   a gate, so the 11-gate roster is unchanged — but the rebuild is not diff-free; do not read it so.
+  **DEMOTED 2026-09-01 AT BUILD, AND IT RETIRES NOTHING.** The observation only the close push buys
+  sits AFTER the stage that demands completion, so `## Done` was unavailable — and it is refused on
+  two independent canon-kit/SPEC.md §Merging an amendment grounds rather than on precedent: a Done
+  move asserts a finished deliverable that is not finished, and a bare-slug entry sheds
+  `[roadmap:]`, silently dropping an outstanding item from public `ROADMAP.md`. SECOND exercise of
+  demote-at-build, and the wedge recurred in a NEW iteration on a FRESH amendment — not one ride
+  continuing, which is the half that makes it a recurrence rather than a tail.
   ruled: platform-support-ci-matrix operator 2026-08-27 lead-relay
   ruled: platform-support-ci-matrix operator 2026-08-30 lead-relay
   ruled: platform-support-ci-matrix lead 2026-08-30 own-authority
   ruled: platform-support-ci-matrix operator 2026-08-31 consult
   ruled: platform-support-ci-matrix operator 2026-08-31 lead-relay
+  ruled: platform-support-ci-matrix lead 2026-09-01 own-authority
   Filed 2026-07-26 by scope, split from `platform-support-contract`; Linux split 08-25, macOS 08-26;
-  promoted/deferred 08-25 through 08-31; round 6 observed and recorded 08-31 by close's own push.
-
-## Technical Debt
-
-## Deferred
+  promoted/deferred 08-25 through 09-01; rounds 6 and 7 recorded 08-31 and 09-01.
 
 - **spec-authoring-self-check-pass** [design-pending] — spec-stage amendment authoring asserts tree
   facts a one-command probe refutes, and every instance is caught downstream rather than at
@@ -8452,7 +8452,7 @@
   answer *when the entry may be drained*; none answers *where the observation is written down*.
   **Cost while deferred:** every entry of this shape either overruns its push budget or
   defers, and the deferral is invisible until the close that cannot drain it.
-  recurrence: observation-predicate-entry-cannot-drain-in-its-own-iteration 2026-08-31
+  recurrence: observation-predicate-entry-cannot-drain-in-its-own-iteration 2026-08-31 2026-09-01
   Filed 2026-08-27 by the lead at build, promoted 2026-08-27 by close.
 
 - **site-health-probe-no-retry-on-transient** [design-pending] — the scheduled site probe files a
