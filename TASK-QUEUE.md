@@ -161,13 +161,11 @@
 - **harness-template-port-residue** [design-pending] — the harness and git-hook template members
   the 2026-08-30 class ruling deliberately leaves owed, filed rather than absorbed per that cut's
   own boundary.
-  **What the ruling settled and what it did not.**
-  gate-sdk/SPEC.md §The harness-template port disposition rules a template permanently shell on
-  two grounds: its body carries the marked gap a consumer fills, or it is a consumer copy holding
-  rule content the kit is forbidden to name. The ruling is a **partition**, so these members are
-  **owed, not undecided** — each is named on the owed side of that section by the ruling itself,
-  and nothing there argues they are hard to port, only that no stated ground reaches them.
-  **The owed side, read off `--emit port-blockers --tree` at the 2026-08-30 landing:**
+  **These members are owed, not undecided.** gate-sdk/SPEC.md §The harness-template port
+  disposition is a **partition** — it rules a template permanently shell only where its body
+  carries a consumer-filled gap or holds rule content the kit may not name — and it names each
+  member below on its owed side. Nothing there argues they are hard to port.
+  **The owed side, re-verified at 2026-08-31 scope against `--emit port-blockers --tree`:**
   `delegation-kit/templates/` `agent-budget-guard.sh` (18), `agent-dispatch-guard.sh` (61),
   `statusline-usage.sh` (101), `subagent-stop-liveness.sh` (91), `usage-poller.sh` (67);
   `guard-kit/templates/` `escalation-guard.sh` (27), `wakeup-guard.sh` (20);
@@ -175,38 +173,40 @@
   `agent-budget-guard.sh` (18), `agent-dispatch-guard.sh` (61), `subagent-stop-liveness.sh` (91),
   `workflow-state-guard.sh` (29). 613 lines. A copy is not separately portable: it is **deleted**
   when its template ports, which is the copy rule that section states once.
-  **THREE FACTS A PORTING SESSION WOULD OTHERWISE BUY AGAIN, each measured at this build.**
-  **(1) The crate has no arm of the required kind.** `native/src/emit/mod.rs`'s `BRIDGED_ARMS`
-  table holds emitters plus the battery runner; none reads a harness hook payload from stdin,
-  none writes a hook-JSON envelope, and none uses a non-zero exit as protocol — which
-  `subagent-stop-liveness.sh` and `wakeup-guard.sh` both do. A port of this residue mints an arm
-  **kind**, not another arm, so it is sequenced behind a contract for one.
-  **(2) The non-gate arm's own contract cuts against it.** `native/src/main.rs` states that the
-  caller may not be assumed to be a POSIX shell, "so every value arrives as argv and the arm reads
-  no knob" — and `session-context.sh` and `statusline-usage.sh` both read their environment.
-  **(3) The settings surface is named twice, and only one half is gated.**
-  `.claude/settings.json`'s `permissions.allow[]` carries a repo-relative grant naming
-  `delegation-kit/templates/usage-poller.sh`, which is `check-settings-paths`' corpus, so deleting
-  that file reds a gate unless the grant moves in the same commit —
-  `native-gate-port-remaining-corpus`' settings-grant carve-out exactly. **The larger half reds
-  nowhere**: seven more class members are wired as hook `command` fields in the same file
-  (`statusline-usage.sh` as the statusLine, and the `scripts/` copies of `session-context.sh`,
-  `subagent-stop-liveness.sh`, `bash-guard.sh`, `agent-budget-guard.sh`, `agent-dispatch-guard.sh`
-  and `workflow-state-guard.sh`), and `check-settings-paths` reads the allow array alone
-  (`native/src/gates/settings_paths.rs`'s `allow_entries` on `/permissions/allow`). That coverage
-  hole is `settings-hook-command-path-gate`, filed 2026-08-22 and **not** re-filed here; this entry
-  records only that the residue is the population which would walk into it.
+  **THREE FACTS A PORTING SESSION WOULD OTHERWISE BUY AGAIN; the 2026-08-31 ruling below spent the
+  first two, so only their residue is kept.** **(1)** `native/src/emit/mod.rs`'s `BRIDGED_ARMS`
+  holds emitters plus the battery runner and no arm reading a hook payload from stdin, writing a
+  hook-JSON envelope, or using exit status as protocol — which `subagent-stop-liveness.sh` and
+  `wakeup-guard.sh` both do. This port mints an arm **kind**; the contract it was sequenced behind
+  is now this cut's own amendment. **(2)** `native/src/main.rs`'s reads-no-knob sentence is
+  answered by that ruling's env exemption, and of the two env readers it named
+  `session-context.sh` is declared `no-port` while `statusline-usage.sh` is covered.
+  **(3) The settings surface is named twice and only one half is gated**, re-probed 2026-08-31.
+  `.claude/settings.json:61`'s `permissions.allow[]` grant naming
+  `delegation-kit/templates/usage-poller.sh` is `check-settings-paths`' corpus, so deleting that
+  file reds a gate unless the grant moves in the same commit — `native-gate-port-remaining-corpus`'
+  settings-grant carve-out exactly. **The larger half reds nowhere:** seven members are wired as
+  hook `command` fields at lines 120-171 that `check-settings-paths` never reads, it taking the
+  allow array alone. That hole is `settings-hook-command-path-gate`, filed 2026-08-22 and **not**
+  re-filed here; this entry records only that the residue is the population walking into it.
   **THE ARM-KIND QUESTION IS RULED 2026-08-31 (operator, consult): one dispatching hook arm.** A
   hook substrate belongs in the binary as ONE arm — hook name as argv, harness payload on stdin,
   hook-JSON envelope out, exit status as protocol — with its env read exempted for this arm alone
-  from the reads-no-knob sentence. Ruling and refused shapes: TRAJECTORY.md §The closed rulings;
-  the contract lands at gate-sdk/SPEC.md §The non-gate arm when spec takes the unit. Recovering
-  each member's harness wiring is still mandatory before authoring it.
+  from the reads-no-knob sentence. Ruling and refused shapes: TRAJECTORY.md §The closed rulings.
+  Recovering each member's harness wiring stays mandatory before authoring the contract.
   ruled: harness-template-port-residue operator 2026-08-31 consult
-  **Cost while deferred:** low and non-recurring for the argument, standing for the work — the
-  ground is stated and every member is named on the owed side of its own ruling, so no future cut
-  re-argues the class; what is owed is the port, and the 613 lines sit in the `--tree` arm's owed
-  column that TRAJECTORY.md's completion predicate is stated over.
+  **SELECTED AS `harness-hook-arm-port`'s CUT, 2026-08-31**, by the composer's stated-contract rule
+  — one section (gate-sdk/SPEC.md §The non-gate arm), one amendment — and decisively because it is
+  the only owed cohort whose blocking design fork is already closed. **A SECOND CUT WAS NOT
+  REFUSED ON PACKAGING GROUNDS AND THIS IS NO PRECEDENT FOR ONE CUT PER ITERATION**, which the
+  2026-08-30 operator ruling calls an over-read: none was available, every alternative needing an
+  unruled fork opened before it could be composed. A later iteration holding two ready cuts takes
+  both. **The port ships 12 of the 14 wired harness members** — `scripts/session-context.sh` and
+  `scripts/bash-guard.sh` are declared `no-port`, so the hook substrate stays mixed by design.
+  ruled: harness-template-port-residue lead 2026-08-31 own-authority
+  **Cost while deferred:** low for the argument, standing for the work — the ground is stated, so
+  no future cut re-argues the class; the 613 lines sit in the owed column TRAJECTORY.md's
+  completion predicate is stated over.
   Filed 2026-08-30 by build, at the landing of the harness-template class ruling.
 
 - **kit-library-port-residue** [design-pending] — the kit `lib/*.sh` members the 2026-08-30 class
@@ -7426,10 +7426,8 @@
   roster's own reading of the shape is the ground to rule against — a ruled-but-unbought port is
   its ideal host, because such a paragraph's whole job is to price a port against a source the
   author has read and the reader has not, and the anchor cannot yet exist.
-  **The candidate disposition if the answer is INSIDE, narrow and reversible:** drop the two
-  spans and the four parenthetical counts, keep the two order-of-magnitude figures the argument
-  rests on, and append a re-derive instruction. If the answer is OUTSIDE, the roster row says so
-  once and every later sweep stops re-deciding it.
+  **If the answer is OUTSIDE, the roster row says so once and every later sweep stops re-deciding
+  it.** The INSIDE half is spent: it prescribed editing spans the merge below already deleted.
   **The founding instance is gone and the shape came straight back — 2026-08-25, second instance.**
   The `install-relocation-boundary-and-first-cut` merge rewrote `powershell-installer-surface`
   wholesale, deleting the two line ranges and four per-file counts named above. Its replacement is a
@@ -7437,9 +7435,8 @@
   `select_artifact`, `claim`, `record`, `copy_in`) in execution order, rev-pinned and carrying a
   "re-derive by reading `init.sh` top to bottom" instruction. So the question is unchanged but its
   instance is now HARDER, not easier: a named-function roster in execution order reads closer to the
-  class's core "call chain or roster" language than the line spans did. Reported by this close's
-  `internal-identifier-restatement` sweep, which escalated rather than editing, on the ground that
-  the table is the amendment's own merged deliverable — narrowing it is re-scoping landed work.
+  class's core "call chain or roster" language than the line spans did. That table is the merged
+  amendment's own deliverable, so narrowing it is re-scoping landed work.
   **Third instance 2026-08-29, and the first where the rot was OBSERVED rather than predicted.**
   `installer-graph-artifact-literal` carried "the two sites are exact, re-verified at the drain:
   `installer/lib/init.sh` line 311 and line 317". Both had moved to 299 and 305 — the defect still
@@ -7449,9 +7446,12 @@
   **Why `[design-pending]`:** it rules the boundary of a governed audit class, an authoring
   question about the roster row rather than a code change.
   recurrence: dated-measurement-restatement-class 2026-08-25 2026-08-29
-  **AT THRESHOLD 2026-08-30, promotion DECLINED this iteration:** machinery-class by default and
-  no unit set here reaches it; the decline holds under EITHER machinery/product reading.
+  **AT THRESHOLD AND DECLINED TWICE ON DIFFERENT GROUNDS — 2026-08-30, then 2026-08-31.** First:
+  machinery-class by default, no unit set reaching it, under EITHER reading. Second, on no
+  precedent and the stronger of the two: the port-only run forecloses a non-port unit, so the rot
+  measured above argues this entry's RETURN at the post-port triage iteration, never promotion.
   ruled: dated-measurement-restatement-class lead 2026-08-30 own-authority
+  ruled: dated-measurement-restatement-class lead 2026-08-31 own-authority
   **Cost while deferred:** the figures rot silently, and the entry carrying them is the one
   sizing an unbought port, so a reader prices the work off numbers nothing re-checks — while
   every future sweep spends the same judgment again on the same shape.
@@ -8654,27 +8654,20 @@
   guard correctly holding a turn against a live build producer from a guard wedged on a waiter's
   own record. The finding is not that refusals happened; it is that a third measurement bought
   the same nothing the first two did.
-  **Read at the windows-artifact-proof close:** 366 events, 345 of them from that day, 21 of them
-  `verdict=red live=yes records=1 decision=refuse` in three clusters at roughly 30-second retry
-  intervals. Every row, green and red alike, carries the same `session=` value — the top-level
-  harness session — so the field discriminates nothing, and no row names the refused subagent or
-  the record that refused it.
+  **Read at the windows-artifact-proof close:** 366 events, 21 refusals, identical signature —
+  three clusters at roughly 30-second retries, `session=` uniform across green and red rows alike.
   **The payload already carries the attribution and the hook drops it.** Each line's own `keys=`
   field lists `agent_id` and `agent_type` among the hook payload's keys, so logging those two plus
   the run key of the matched record would make every one of these rows readable. The hook is
   `scripts/subagent-stop-liveness.sh`, 91 lines, whose contract is delegation-kit/SPEC.md §The
   turn-end liveness hook.
-  **The motive the filing bullet gave is a DISPOSED premise, corrected here.** The bullet argues
-  the gap blocks verifying `waiter-predicate-self-match`, "which is live". It is not: that slug is
-  retired, its work landed at `05af5200`, and `bin/queue-edges.sh` reports it retired with its one
-  citation coming from `waiter-loop-condition-predicate-gap`. What falls with the premise is the
-  urgency framing, not the finding — an unattributed refusal is unreadable whether or not a
-  particular entry wanted to read it.
-  **What survives the correction, and it is the general form.** A refusal is correct when a real
-  producer is running and is a wedge when the record naming a live pid belongs to the waiter
-  itself. That distinction is the log's whole diagnostic value, and no row carries the field that
-  would settle it. Two 21-refusal clusters are now on record, on two different days, and neither
-  can be classified either way from the log.
+  **The filing bullet's motive was a DISPOSED premise** — it argued the gap blocks verifying
+  `waiter-predicate-self-match`, which is retired, its work landed at `05af5200`. The urgency
+  framing falls with it; the finding does not.
+  **What survives, and it is the general form.** A refusal is correct when a real producer is
+  running and is a wedge when the record naming a live pid belongs to the waiter itself. That
+  distinction is the log's whole diagnostic value, and no row carries the field that would settle
+  it. Four measurements across three days, and not one refusal in any of them is classifiable.
   **Why `[design-pending]`:** the candidate shapes differ in who they serve. Logging `agent_id`,
   `agent_type` and the matched run key serves a later reader. Naming the matched record in the
   *refusal message* serves the refused session, which can then act on it. Dropping `session=`
@@ -8682,6 +8675,13 @@
   a diagnostic for a reader or a steer for the refused session is the unruled half.
   **DISTINCT from the close-surface roster question**, which asks whether the log is read at all;
   this asks what it can say once read.
+  **AT THRESHOLD 2026-08-31, promotion DECLINED, and the deleted-fix-site argument read the other
+  way.** `scripts/subagent-stop-liveness.sh` is a member of the `harness-hook-arm-port` cut, so a
+  fix authored now is authored against shell that cut removes; authoring it against the LANDED arm
+  is better information, and deferral gains. Refused: folding it into the port amendment, since
+  settling a live `[design-pending]` fork inside a port cut is non-port design work. **ONE
+  CONSTRAINT RIDES OUT:** the arm's logging contract must not foreclose adding attribution later.
+  ruled: subagent-liveness-log-unattributed-refusal lead 2026-08-31 own-authority
   **Cost while deferred:** every refusal cluster is uninterpretable, so the one instrument that
   could measure whether the producer/observer split works reads the same for a working guard and a
   wedged one — and a wedged guard costs a session its turn.
