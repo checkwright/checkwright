@@ -276,7 +276,7 @@ back exactly where the observed failures are. Recorded here because the rule
 and the caveat otherwise read as each other's contradiction and the next
 reader re-litigates them.
 
-`templates/agent-budget-guard.sh` closes the gap the template's
+agent-budget-guard closes the gap the template's
 **Budget-check before *each* dispatch in a fan-out** rule leaves when it relies
 on the agent *choosing* to run the tool: a memory-quoted percentage acts in its
 place (a session quoted ~5% while the live verdict read 29%). It is a `PreToolUse` hook (matcher `Agent`) the
@@ -285,13 +285,13 @@ per-dispatch freshness, not a start-of-session reading a mid-session window
 outlives. It runs `usage-verdict` at the decision point and routes on the exit
 code:
 
-- **PAUSE (1)** → `guard_block`: the verdict line plus its corrective (wait for
-  the window reset, or re-run with `DELEGATION_KIT_PAUSE_PCT` deliberately
+- **PAUSE (1)** → block, exit 2, with the verdict line plus its corrective (wait
+  for the window reset, or re-run with `DELEGATION_KIT_PAUSE_PCT` deliberately
   raised). This is guard-kit's one sanctioned fail-closed deny — the hook
   matcher proves the tool identity and PAUSE is reachable only through a fresh,
   readable, over-threshold snapshot, so blocking cannot wedge a consumer with
   no producer.
-- **STALE / unreadable (2)** and **OK / RESET-OK (0)** → `guard_advise`,
+- **STALE / unreadable (2)** and **OK / RESET-OK (0)** → advise, exit 0,
   feeding the verdict line back as `additionalContext` so the live reading
   rides in context at every dispatch and a memory-quoted percentage can never
   be the acting source. The advise arm relays that line and adds nothing: the
@@ -526,7 +526,7 @@ measured.** A `SubagentStop` hook *is* a chokepoint at the turn-end, so it is th
 one candidate that could falsify the axis — and the decisive question was whether
 the harness already defers a subagent's stop while a background child is live,
 since a harness that deferred would dissolve the class this rule exists for. The
-probe at §The turn-end liveness hook (template) put a live producer
+probe at §The turn-end liveness hook put a live producer
 under a deliberate turn-end and read `live=yes`: **the stop is not deferred**. So
 the sentence stands as written for the `PreToolUse` axis it was said on, the
 relocation to guard-kit rule 14 stands, and the turn-end's own event is reachable.
@@ -535,8 +535,8 @@ relocation to guard-kit rule 14 stands, and the turn-end's own event is reachabl
 the qualification is stated rather than left to be read past.** *A turn-end does
 not* pass a chokepoint on the **tool-call** axis, which is the axis the block is
 about. On the harness's own event axis it does, and the hook there **refuses**,
-by exit 2, on an operator authorization since spent (§The turn-end liveness hook
-(template) owns the mechanism and the authorization's content). So the turn-end
+by exit 2, on an operator authorization since spent (§The turn-end liveness
+hook owns the mechanism and the authorization's content). So the turn-end
 rule carries enforcement on both axes — rule 14 over the harm, this hook over the
 act — and neither is the other's substitute, since rule 14 reaches acts this
 hook's event never sees and this hook reaches a session that mutates nothing.
@@ -553,7 +553,7 @@ consequences carry the guard below: the fork ban has an exact trigger
 `agent_id` is present iff the dispatching session is itself a subagent, so its
 presence means the call about to be made creates a grandchild. **That is a
 discriminator on the field's *presence*, never on its value**, and the
-distinction is worth one clause because §The turn-end liveness hook (template)
+distinction is worth one clause because §The turn-end liveness hook
 records a live doubt about the value: an observation of five firings in one
 session saw five distinct `agent_id` values. Nothing in that doubt touches this
 trigger — presence is still presence whether the value is per-agent or per-firing
@@ -580,10 +580,9 @@ stage-economics meter, the fan-out row) because it needs the whole spawn forest
 and no contracted field supplies it; a hook needs one bit and gets it under
 contract. The axis is what the contract supplies, not appetite for risk.
 
-`templates/agent-dispatch-guard.sh` is that oracle — a second `PreToolUse` hook
-on matcher `Agent`, beside the budget guard, composed from
-`guard-kit/lib/guard.sh` primitives. It reads the payload once and runs the
-rules below, in order:
+agent-dispatch-guard is that oracle — a second `PreToolUse` hook
+on matcher `Agent`, beside the budget guard. It reads the payload once and runs
+the rules below, in order:
 
 | # | rule | trigger | decision |
 | --- | --- | --- | --- |
@@ -633,37 +632,39 @@ carries the judgment the trigger cannot.
 
 **Degradation — fail-open, but loud**, the posture guard-kit/SPEC.md §The guard
 framework names for a deny-guard whose matcher proves the tool but whose rule
-turns on a payload field:
+turns on a payload field. The binary being absent, or the config bridge
+refusing the whole environment, take the general fail-open path
+(gate-sdk/SPEC.md §The non-gate arm) before this member ever runs — silently,
+with no advisory of this guard's own. What follows is the degradation surface
+once the arm does run:
 
 | what is missing | behavior |
 | --- | --- |
-| `jq` absent | allow; one advisory naming the unenforced rules |
-| payload unparseable, or `tool_input` absent | allow; same advisory |
+| payload unparseable, or `tool_input` absent | allow; one advisory naming both D1 and D2 unenforced |
 | `subagent_type` absent from a parseable payload | D1 and D2 do not fire (nothing to match); D3 unaffected |
-| `DELEGATION_KIT_READONLY_TYPES` unset or empty | D2 inert, and silently so; D1 and D3 unaffected |
-| `DELEGATION_KIT_CONFIG_FILE` set but naming no file | allow; advisory naming D2 unenforced |
-| `guard-kit/lib/guard.sh` not vendored | the guard exits 0 before sourcing, as both shipped guards already do |
+| `DELEGATION_KIT_READONLY_TYPES` resolves empty | D2 inert, and silently so; D1 and D3 unaffected |
+| `DELEGATION_KIT_READONLY_TYPES` declared but its own read fails | allow; advisory naming D2 unenforced, D1 and D3 unaffected |
 
 Two implementation facts those rows force, recorded because the obvious build
 gets each of them wrong:
 
-- **The `jq`-absent arm cannot deliver through `guard_advise`.** That primitive
-  is itself jq-backed, and measuring it rather than assuming settles what
-  happens: with `jq` off `PATH` it writes an empty stdout and leaves a shell
-  "command not found" on stderr, which names none of the unenforced rules — the
-  silent success these rules exist to end, arriving inside the mechanism meant
-  to prevent it. The guard therefore emits the advisory envelope itself on that
-  arm, and every advisory literal it carries is kept free of the characters
-  JSON must escape, since that fallback carries no escaper.
-- **The guard does not source delegation-kit's validating config loader**, only
-  the consumer config file, for the one array it reads. The loader exits 2 on
-  any malformed knob and a hook that exits 2 blocks, so routing the fork ban
-  through a validator for `DELEGATION_KIT_FAN_WIDTH` would let an unrelated
-  typo wedge every dispatch in the consumer whose primary token lever is
-  delegation — the fail-closed posture this guard is specified against,
-  arriving through the config door. The distinction the last two table rows
-  draw is this kit's standing one: a roster **configured to nothing** is
-  silent, a roster that **could not be read** is loud.
+- **There is no `jq`-absent arm to protect.** The compiled member serializes
+  its own advisory envelope directly (`serde_json`, never `printf`), so the
+  shell original's escape-by-convention fragility and its jq-backed delivery
+  primitive both retire with it rather than needing a compiled equivalent.
+- **The guard reads its roster through delegation-kit's validating config
+  loader now, not around it — the port reversed that.** Pre-port the shell guard read
+  `DELEGATION_KIT_READONLY_TYPES` on its own, deliberately outside the loader,
+  so a malformed *unrelated* knob could not wedge a dispatch. Post-port the
+  config bridge resolves this knob by sourcing that same loader
+  (gate-sdk/SPEC.md §The non-gate arm), so the risk the old design sidestepped
+  is real again — and the mitigation moved with it: a config bridge that
+  refuses the whole environment for any reason, unrelated knob included, takes
+  the general fail-open path above and never reaches this guard at all, so an
+  unrelated typo still cannot wedge a dispatch, only through a different door.
+  The distinction the table's last two rows still draw is this kit's standing
+  one: a roster **resolved to nothing** is silent, a roster whose own read
+  fails **despite the bridge otherwise succeeding** is loud.
 
 ### One template, a resident pointer
 
@@ -861,8 +862,8 @@ N copies of the bug rather than N chances to catch it.
 **No gate is owed *over the act*, and not for budget — but one is now owed over
 its harm, and it exists.** No check can read a session's choice to end a turn:
 the act leaves no tracked artifact, and no `PreToolUse` chokepoint sees it. The
-harness's own turn-end event does see it — measured, not assumed (§The turn-end
-liveness hook (template)) — and that hook **refuses** there as well as seeing, on
+harness's own turn-end event does see it — measured, not assumed (§The
+turn-end liveness hook) — and that hook **refuses** there as well as seeing, on
 an authorization since given and spent. So the relocation below is not the only
 enforcement, and it is not the enforcement for want of an alternative: it is that
 on the merits, because the harm it blocks reaches a chokepoint the turn-end event
@@ -902,7 +903,7 @@ that leave no tracked artifact either, yet they are gated. The axis that
 separates them is **interception, not durability**: a dispatch passes a
 chokepoint the harness fires a hook on, and a turn-end passes none the
 dispatch-shape rules could have used (§The delegation model, which owns the
-generalization, and §The turn-end liveness hook (template), which measured the
+generalization, and §The turn-end liveness hook, which measured the
 harness's own turn-end event and found it reachable). So "no tracked artifact" is
 why neither rule gets a *gate* over the tree, and it is not by itself a reason
 to stop looking for an oracle. Recorded here for the same reason §The
@@ -920,9 +921,9 @@ sentence saying *keep looking* is cheap to write and easy to leave un-acted, and
 the next reader should find the outcome beside the licence rather than have to
 reconstruct whether anyone ever looked.
 
-## The turn-end liveness hook (template)
+## The turn-end liveness hook
 
-`templates/subagent-stop-liveness.sh` is an opt-in `SubagentStop` hook, inert
+The `subagent-stop-liveness` hook is an opt-in `SubagentStop` hook, inert
 until a consumer registers it, that **refuses a dispatched session's turn end
 while the launch records under the scratch dir say a producer is live**. It
 shipped as a probe first, and the probe's own result is what made it this: the
@@ -971,7 +972,7 @@ other way for the exit-code route: `SubagentStop` is listed as an event a hook
 **can** block, exit 2 is the blocking route, and the hook's **stderr is shown to
 Claude and is itself the blocking reason when the hook emits no JSON decision**.
 So the refusal speaks through stderr, mints no guard-kit primitive, and leaves
-this template's standing property intact — it **does not source guard-kit's lib**,
+this hook's standing property intact — it **does not source guard-kit's lib**,
 which is what keeps delegation-kit from acquiring a dependency on guard-kit being
 vendored. The two payload fields it reads still cost a `cat` and a `jq -r`.
 
@@ -1143,7 +1144,7 @@ a hook that answers nothing and refuses nothing. That is honest degradation and 
 is preferable to a silent third parse that would work everywhere and drift from
 its owner.
 
-**The template ships no default reader, and enforcement makes that ruling
+**The kit ships no default reader, and enforcement makes that ruling
 stronger rather than negotiable.** It defaulted to
 `evidence-kit/checks/check-producer-liveness.sh` while that gate was
 shell-declared. `shell-gate-tail-port` made the gate a descriptor dispatched to
@@ -1533,35 +1534,34 @@ nothing in the battery says so.
 
 **One half of that is now observed, and the half that is not is the same half.**
 The *registration* is still unwatched, for the reasons above. What is watched is
-the **configured reader**, and both sides of the copy seam are covered because
-enforcement lands exactly on that seam. This kit's own
-`gate-tests/subagent-stop-liveness.test.sh` drives a **stub** reader per exit
-class — which is what lets it hold every verdict arm hermetically, and a stub is
-by construction not the configured one — and asserts the exit code per arm (2 on
-`red`, `corrupt` and `unresolved`, 0 on `green`, `unavailable` and `error`), the
-`decision` column that goes with it, and a non-empty stderr on each refusing arm,
-because that stderr *is* the blocking reason. Because `corrupt` and `unresolved`
-are **one reader exit read through two record counts**, the stub lane drives that
-exit twice — once over a run dir holding a record and once over an empty one —
-and asserts the message wording apart as well as the verdict, so a two-way branch
-regrown behind a three-way spec reds. The consumer's own
-`scripts/gate-tests/subagent-stop-reader.test.sh` fires this repo's hook copy
-against its own configured reader over a scratch run dir it constructs, asserting
-`green` and an allowed exit on an empty dir, `red`, `decision=refuse` and exit 2
-with a reason on a record naming a PID that is always alive, and
-`unresolved decision=refuse` when the reader is real and resolvable but the
-binary it dispatches to is absent over an empty run dir — the isolated-dispatch
-shape, and the one arm that must **not** come back `unavailable`, which would
-misreport a wired reader as one that was never configured. `unavailable` fails
-that lane by name. The gap between those two lanes is exactly where the dead
-default lived for a whole iteration under a green battery, so both lanes move
-together or the seam re-opens.
+the **configured reader**, on `scripts/gate-tests/subagent-stop-reader.test.sh`,
+which fires this repo's wired `--hook subagent-stop-liveness` arm against its own
+configured reader over a scratch run dir it constructs, asserting `green` and an
+allowed exit on an empty dir, `red`, `decision=refuse` and exit 2 with a reason on
+a record naming a PID that is always alive, and `unresolved decision=refuse` when
+the reader is real and resolvable but the binary it dispatches to is absent over
+an empty run dir — the isolated-dispatch shape, and the one arm that must **not**
+come back `unavailable`, which would misreport a wired reader as one that was
+never configured. `unavailable` fails that lane by name.
+
+**The hermetic stub-driven lane that used to hold every verdict arm retired with
+the port, and it is a gap rather than a fact folded quietly into the paragraph
+above.** This kit's own `gate-tests/subagent-stop-liveness.test.sh` drove a
+**stub** reader through all six arms (`green`, `red`, `corrupt`, `unresolved`,
+`unavailable`, `error`) hermetically, `corrupt` and `unresolved` twice each — once
+over a run dir holding a record and once over an empty one, since they are one
+reader exit read through two record counts — asserting the exit code, the
+`decision` column and the refusing arms' stderr wording apart from the verdict.
+The compiled member's own tests cover its record-format and key-derivation
+helpers, not this state machine, and the real-reader lane above never reaches
+`corrupt` or `error` either. The gap is filed rather than left to be inferred
+from this section's silence.
 
 ### What `background_tasks` carries
 
 The `keys` field settled that the payload has this top-level key and left what is
 in it open. A deliberate one-off read then took it, **out of band and without
-touching this template**: the consumer's hook copy dumped each firing's raw
+touching this hook**: the consumer's hook copy dumped each firing's raw
 payload to gitignored scratch across five firings and was restored byte-for-byte,
 so the grammar above still logs keys and never values.
 
@@ -1578,8 +1578,8 @@ overturn it.** The only named reader a value log would ever have had was the
 harness-view substitution below, and the read falsified that reader outright. A
 ruling with nothing on the other side of it has stopped being a restriction.
 A derived non-value — a count, a type tally — was weighed and refused on the same
-ground: it serves no reader either, and a grammar delta plus a template and a
-consumer edit are not spent on a field nothing reads.
+ground: it serves no reader either, and a grammar delta plus a member edit are
+not spent on a field nothing reads.
 Should a reader appear, it reopens as a new question and not as this one.
 
 **It is a live-children enumeration, and it is populated.** An array of objects in
@@ -1595,7 +1595,7 @@ above reads. **`agent_id` appears in that list as a key and nothing more.** The
 same five firings that enumerated these keys carried five *distinct* top-level
 `agent_id` values, none matching the stable `id` this array reported for the one
 live dispatched agent — so listing it here asserts nothing about its being able
-to tell one agent from another. §The turn-end liveness hook (template)'s
+to tell one agent from another. §The turn-end liveness hook's
 `session` bullet owns that doubt and the reason this tree cannot settle it.
 
 **It enumerates what the harness launched, not what is running — and that is the
@@ -1606,7 +1606,7 @@ asymmetric names as one of `live=no`'s three readings and guard-kit rule 15
 advises against without closing. So the blocking hook **cannot substitute** the
 harness's view for the `*.run` record set: the two disagree exactly on the class
 the waiting rule exists for. Supplementing is the most it could do — and now that
-the hook refuses on the record set alone (§The turn-end liveness hook (template)),
+the hook refuses on the record set alone (§The turn-end liveness hook),
 this is a constraint on a shipped mechanism rather than on a hypothetical one.
 
 **No entry carries a pid.** Those six field names are the whole schema, and a
@@ -1638,7 +1638,7 @@ session backgrounds a producer that runs long, writes its `<key>.run` record, an
 then ends its turn. Both outcomes are results: the hook fires immediately with
 `live=yes`, so the harness does not defer and §Operative residency's axis holds at
 the turn-end too; or the hook does not fire until the child exits, so the harness
-does defer, the class dissolves, and this template's remaining value is the
+does defer, the class dissolves, and this hook's remaining value is the
 evidence for retiring it. The log is what makes that firing, and every later
 accidental one, legible.
 
@@ -1650,7 +1650,7 @@ half minutes. **The harness does not defer the stop**, so the class the waiting
 rule exists for does not dissolve, the relocation to guard-kit rule 14 stands, and
 a blocking hook was the only lever left. That was a second authorization this
 result did not grant; it was asked for and given, and the hook blocks (§The
-turn-end liveness hook (template)). This subsection is kept as the evidence the
+turn-end liveness hook). This subsection is kept as the evidence the
 authorization was argued from, not as a standing limit on it.
 
 **The same firings settled a second thing nothing could have settled before
@@ -1662,7 +1662,7 @@ assistant step produced no firing at all. The blocking variant therefore fires a
 what a bounded run of blocks is actually spent on. Recorded here because it was a
 cost the authorization was weighed against, and because it is exactly the class of
 fact a probe exists to buy. **The cost came in smaller than the estimate, and the
-measurement is at §The turn-end liveness hook (template)**: an intermediate firing
+measurement is at §The turn-end liveness hook**: an intermediate firing
 that exits 2 delivers nothing to the session, so the per-step frequency costs the
 session nothing and buys a countable `decision=refuse` line.
 
@@ -2092,7 +2092,7 @@ immediately before the `` -> <verdict> `` arrow, read from
 `DELEGATION_KIT_FAN_WIDTH` (§Layout and configuration). It is the knob's
 mechanical reader: the budget check already runs before every dispatch, so the
 read-only fan-out bound surfaces at exactly the wave-sizing decision point, and
-`agent-budget-guard.sh` relays the verdict line verbatim (block on PAUSE, advise
+`agent-budget-guard` relays the verdict line verbatim (block on PAUSE, advise
 otherwise) so the width rides into context with the budget verdict. *Verbatim*
 governs the verdict line's own text, not the surrounding frame: the guard
 prefixes the relayed line and the PAUSE arm appends its corrective, but no arm
@@ -2158,7 +2158,7 @@ source has no value, never written empty; keys the verdict does not read
 pass through unchanged.
 
 The kit ships two reference producers — one push, one poll — and any producer
-honoring the contract works beside them. `templates/statusline-usage.sh` is
+honoring the contract works beside them. The `--statusline` arm is
 the push producer: a statusline hook
 that parses the harness's rate-limit JSON and atomically writes the
 snapshot (`tmp` + `mv`) to `${CLAUDE_CONFIG_DIR:-$HOME/.claude}/usage.txt`.
@@ -2168,13 +2168,13 @@ overridable via `DELEGATION_KIT_CRED_FILE` / `DELEGATION_KIT_ACCOUNT_CONFIG`).
 It ships no `tokens_in` / `tokens_out` producer: this harness's payload
 carries no cumulative token count, so under the dead-producer rule the keys
 stay defined here for third-party producers but no dead producer is shipped.
-Beyond the snapshot write it renders a status bar (§The statusline template).
+Beyond the snapshot write it renders a status bar (§The statusline arm).
 The snapshot write is the contract; the bar is reference UX a consumer may
 restyle or discard. The source is pluggable
 (`DELEGATION_KIT_USAGE_FILE`), so no
 single-operator `CLAUDE_CONFIG_DIR` assumption is baked in.
 
-`templates/usage-poller.sh` is the poll producer, closing the push producer's
+The `--usage-poll` arm is the poll producer, closing the push producer's
 blind spot: the statusline fires on the supervising session's own message
 flow, so a lead that delegates stops producing exactly when it goes static —
 a delegated build can run for hours with every per-dispatch budget verdict
@@ -2189,7 +2189,8 @@ discipline). No daemon, no loop: scheduling belongs to the consumer, and two
 modes are sanctioned. **Demand-driven** (§usage-verdict): point
 `DELEGATION_KIT_REFRESH_CMD` at the poller and the same one-cycle producer runs
 at verdict time, which puts the freshest reading exactly at the decision point.
-**Timer-driven**: a cron line such as `*/5 * * * * bash usage-poller.sh` or a
+**Timer-driven**: a cron line such as
+`*/5 * * * * bash gate-sdk/bin/run-gates.sh --usage-poll` or a
 systemd timer, for consumers wanting continuous trend density independent of
 verdict calls. Either entry is the enabling config; with neither, the producer
 is dead. The usage endpoint is harness-account plumbing, not a
@@ -2233,22 +2234,22 @@ append-only (the tmp-prune / boundary-truncate conventions own cleanup), and
 carries operator-local account identifiers, so it lives under the gitignored
 measurement dir and never reaches a tracked file.
 
-### The statusline template
+### The statusline arm
 
-`templates/statusline-usage.sh` renders model/effort, a context gauge, the 5h
+The `--statusline` arm renders model/effort, a context gauge, the 5h
 and 7d windows with reset countdowns, an `iteration@stage` readout, and a queue
 counter group. Self-contained ANSI, no external asset (§Out of scope).
 
 The `iteration@stage` readout's two halves come from two surfaces: the iteration
 from the queue header, the stage from the lifecycle evidence file's **last data
-line**. Both are repo-root-relative reads in the template's existing hardcode
-style — a consumer-owned template adds no knob. With no cursor to read (no
+line**. Both are repo-root-relative reads in the arm's existing hardcode
+style — the arm adds no knob. With no cursor to read (no
 evidence file, or one truncated to its preamble at an iteration boundary) the
 readout degrades to the iteration alone rather than printing a dangling
 separator or a partial parse.
 
 **The counter group** is a compact `N12 T3 D48 I7` tally of the queue's task
-sections, appended last. The template does not know how many sections exist,
+sections, appended last. The arm does not know how many sections exist,
 what they are called, or which tiers the set contains: it runs
 queue-kit's `bin/queue-counts.sh` and renders whatever
 `<section-name><TAB><count>` lines come back, labelling each with the initial of
@@ -2260,17 +2261,17 @@ distinguishable and the group stays aligned rather than only the collision
 changing width.
 
 **It is a subprocess call, and that is the contract, not an implementation
-detail.** The counter's library exits 2 at *source* time on a malformed queue
-config; sourced into this shell it would take the whole status bar down — model,
-context gauge, both rate-limit gauges — over a component worth four characters.
-As a subprocess the same fault is a non-zero exit the render absorbs. An absent
-or non-executable counter, a non-zero exit, and empty output all drop the group
-and change nothing else about the bar, matching the two degradations the
-template already performs (an absent queue file drops the iteration; an absent
-evidence file drops the `@stage` suffix). The existence guard is kept even
-though every installer profile carrying this template also carries queue-kit,
-because a future profile pairing differently would otherwise turn a roster fact
-into a broken status bar.
+detail.** The counter's library exits 2 on a malformed queue config; calling it
+in-process would take the whole status bar down — model, context gauge, both
+rate-limit gauges — over a component worth four characters. As a subprocess the
+same fault is a non-zero exit the render absorbs. An absent or non-executable
+counter, a non-zero exit, and empty output all drop the group and change
+nothing else about the bar, matching the two degradations the arm already
+performs (an absent queue file drops the iteration; an absent evidence file
+drops the `@stage` suffix). The existence guard is kept even though every
+installer profile wiring this statusline also carries queue-kit, because a
+future profile pairing differently would otherwise turn a roster fact into a
+broken status bar.
 
 The render cost is one subprocess per statusline fire, which is the kit's most
 frequent trigger by a wide margin (§The usage.txt contract). A full scan of a
@@ -2571,8 +2572,7 @@ the class ruling at gate-sdk/SPEC.md §The config-seam port disposition. Knobs
   mode, a path run with the scratch dir as its only argument; **no default**.
   A knob rather than a literal because a consumer's evidence-kit may sit
   elsewhere, and defaultless because the gate behind it is reached by *name*
-  rather than by path and only a consumer knows its front end (§The turn-end
-  liveness hook (template) owns why the knob is not taught to resolve a name).
+  rather than by path and only a consumer knows its front end (§The turn-end liveness hook owns why the knob is not taught to resolve a name).
   Unset and empty are therefore the same value here, and both are the supported
   way to run the hook with no reader at all — the honest-degradation case the
   section states, in which every firing logs `verdict=unavailable decision=allow`
@@ -2584,9 +2584,9 @@ the class ruling at gate-sdk/SPEC.md §The config-seam port disposition. Knobs
   reasoning that ships `GUARD_KIT_BREADTH_PROBES` with no default probes.
   Deliberately not knobbed alongside it, each ruled out for a stated reason: a
   fork-type-name knob and an accepted-isolation-values knob — `fork` and
-  `worktree` are the **harness's** dispatch vocabulary, and a guard template
-  carries its harness's tool vocabulary as literals the same way
-  `wakeup-guard.sh` matches `ScheduleWakeup`/`CronCreate` literally, so
+  `worktree` are the **harness's** dispatch vocabulary, and a guard carries its
+  harness's tool vocabulary as literals the same way the wakeup-guard member
+  matches `ScheduleWakeup`/`CronCreate` literally, so
   knobbing them would imply a portability the mechanism does not have; a
   warn-only or per-rule opt-out — a doctrine downgradable per session is the
   honour system these rules exist to end, so the valve stays the whole guard's
@@ -2599,35 +2599,34 @@ the class ruling at gate-sdk/SPEC.md §The config-seam port disposition. Knobs
 (tier: precommit) — in this repo's too; dogfooding is day-one, and agents
 commit here.
 
-`agent-budget-guard.sh` is not a gate — it is a hook, so it registers not in
+`agent-budget-guard` is not a gate — it is a hook, so it registers not in
 `gates.list` but under `PreToolUse` matcher `Agent` in the consumer's
-`.claude/settings.json` (beside the guard-kit Bash guard). Copy the template
-arm and wire `bash gate-sdk/bin/run-gates.sh --hook agent-budget-guard`; it resolves
-`guard-kit/lib/guard.sh` and `bin/usage-verdict.sh` at their vendored paths,
-overridable with `GUARD_KIT_LIB` / `DELEGATION_KIT_VERDICT_BIN`. Registration
+`.claude/settings.json` (beside the guard-kit Bash guard). Wire
+`bash gate-sdk/bin/run-gates.sh --hook agent-budget-guard`; it resolves
+`bin/usage-verdict.sh` at its vendored path, overridable with
+`DELEGATION_KIT_VERDICT_BIN`. Registration
 is the whole opt-in: unwired, the guard is inert. This repo registers it, and
 its consumer session brief (`scripts/session-context.sh`) additionally prints
 the verdict line at SessionStart for planning-time visibility — a consumer-side
 edit; the context-kit template stays uncoupled from delegation-kit.
 
-`subagent-stop-liveness.sh` is a third hook, and the only one on a non-`PreToolUse`
+`subagent-stop-liveness` is a third hook, and the only one on a non-`PreToolUse`
 event. It registers under `SubagentStop` in the consumer's `.claude/settings.json`
 — an event that takes **no matcher**, so the entry carries a `hooks` array alone
-and is not tool-scoped, the shape a `SessionStart` entry already has. Copy the
-arm and wire `bash gate-sdk/bin/run-gates.sh --hook subagent-stop-liveness`; it
-sources no kit lib at all (§The turn-end liveness hook (template) owns why) and
+and is not tool-scoped, the shape a `SessionStart` entry already has. Wire
+`bash gate-sdk/bin/run-gates.sh --hook subagent-stop-liveness`; it
+sources no kit lib at all (§The turn-end liveness hook owns why) and
 resolves its reader through `DELEGATION_KIT_LIVENESS_CMD`. Registration is again
 the whole opt-in, and here the opt-in is also the consent: the wiring is a
 permission-surface write, so it is the consumer's own act and never an agent
 session's.
 
-`agent-dispatch-guard.sh` is a second hook on that same matcher, registered the
+`agent-dispatch-guard` is a second hook on that same matcher, registered the
 same way and **independently**: the harness fires every hook a matcher carries
 and any exit 2 blocks, so neither guard knows about the other and a consumer
-may wire either one alone (§The delegation model owns why they are two scripts
-rather than one). It resolves `guard-kit/lib/guard.sh` at its vendored path,
-overridable with `GUARD_KIT_LIB`, and reads the consumer's delegation config for
-D2's roster and nothing else. Registration is again the whole opt-in: unwired,
+may wire either one alone (§The delegation model owns why they are two hook
+members rather than one). It reads the consumer's delegation config for D2's
+roster and nothing else. Registration is again the whole opt-in: unwired,
 it is inert — and an unwired dispatch guard is the exact failure shape it
 exists to catch, so wiring it is not optional dogfooding for a consumer that
 delegates.

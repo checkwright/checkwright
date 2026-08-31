@@ -981,8 +981,8 @@ source time on a missing `QUEUE_KIT_CONFIG_FILE` and on any malformed-config
 assertion — correct for a gate, and fatal for a long-lived caller that sourced
 it. A subprocess turns that contract into a non-zero exit and empty stdout, which
 a caller degrades on. The caller this was built for is delegation-kit's
-statusline template, whose own contract records the degradation
-(delegation-kit/SPEC.md §The statusline template).
+statusline arm, whose own contract records the degradation
+(delegation-kit/SPEC.md §The statusline arm).
 
 ### bin/queue-edges.sh
 

@@ -14566,7 +14566,7 @@ tier out, because the value is a consumer path, so the kit library's shipped
 default stays empty and the consumer names its own reader.
 
 **One near-miss, stated because a reader will meet the sentence and ask.**
-delegation-kit/SPEC.md §The statusline template called `statusline-usage.sh` a
+delegation-kit/SPEC.md §The statusline arm called `statusline-usage.sh` a
 consumer-owned template whose repo-root-relative reads stay hardcoded because "a
 consumer-owned template adds no knob". That did not satisfy the first ground:
 the paths it hardcodes are queue-kit's and lifecycle-kit's own defaults rather

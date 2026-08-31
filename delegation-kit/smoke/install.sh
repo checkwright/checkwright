@@ -60,7 +60,7 @@ cmp -s "$pp/usage.before" "$pp/usage.txt" || {
     echo "delegation-kit/smoke: poller fetch failure touched the snapshot" >&2; exit 1; }
 rm -rf "$pp"
 
-# spec: delegation-kit/SPEC.md §The turn-end liveness hook (template) — the --hook subagent-stop-liveness arm is exercised with a crafted payload on its allowing arm: the knob is emptied, so the firing holds no reading (verdict=unavailable) whatever the run dir carries, and it must exit 0 and append exactly one grammar-conformant line
+# spec: delegation-kit/SPEC.md §The turn-end liveness hook — the --hook subagent-stop-liveness arm is exercised with a crafted payload on its allowing arm: the knob is emptied, so the firing holds no reading (verdict=unavailable) whatever the run dir carries, and it must exit 0 and append exactly one grammar-conformant line
 sp="$PWD/.tmp/stop-probe-smoke"
 rm -rf "$sp"; mkdir -p "$sp"
 printf 'pid=1 run=smoke\n' > "$sp/smoke.run"

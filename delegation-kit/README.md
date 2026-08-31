@@ -51,7 +51,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    a timer), keeping it fresh while a supervising session sits static, or
    have any producer honour the snapshot contract (SPEC §The usage.txt contract).
    The statusline producer also renders a status bar, whose field set is
-   SPEC §The statusline template's; the three mandatory snapshot lines are the
+   SPEC §The statusline arm's; the three mandatory snapshot lines are the
    floor, and supplying the optional weekly keys arms the second (7-day) pause axis.
 
 4. Optional — wire the Agent budget guard: register
@@ -67,7 +67,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    It logs one line per subagent turn end saying whether any launch record named
    a live producer, and **refuses the turn end** — exit 2, its stderr the
    blocking reason — when that reading is `red`, `corrupt` or `unresolved`; it emits no hook
-   JSON on either path (SPEC §The turn-end liveness hook (template)). There is
+   JSON on either path (SPEC §The turn-end liveness hook). There is
    no knob: unwiring is the valve. Unwired, it is inert; wiring it is a
    permission-surface change, so it is yours to make.
 

@@ -1,4 +1,4 @@
-// spec: delegation-kit/SPEC.md §The statusline template — the harness's `statusLine` integration
+// spec: delegation-kit/SPEC.md §The statusline arm — the harness's `statusLine` integration
 // point: it writes the snapshot `usage-verdict` reads and renders one ANSI-coloured line on stdout.
 // The harness ignores the exit status, so this member has none to speak.
 use crate::emit::kpi;
@@ -7,7 +7,7 @@ use crate::hook::usage::Snapshot;
 use crate::proc;
 use crate::walk;
 
-// spec: delegation-kit/SPEC.md §The statusline template — the arm's declared reads. NOT
+// spec: delegation-kit/SPEC.md §The statusline arm — the arm's declared reads. NOT
 // `DELEGATION_KIT_USAGE_HISTORY`: the shipped producer calls `usage-verdict` nowhere, so the knob
 // has no reader here and a declared one would be a field with no named reader.
 pub const KNOBS: &[&str] = &[
@@ -16,7 +16,7 @@ pub const KNOBS: &[&str] = &[
     "DELEGATION_KIT_ACCOUNT_CONFIG",
 ];
 
-// spec: delegation-kit/SPEC.md §The statusline template — the gauge's geometry and its three
+// spec: delegation-kit/SPEC.md §The statusline arm — the gauge's geometry and its three
 // thresholds, the one place either is spelled
 const GAUGE_WIDTH: usize = 10;
 const BG_HOT: u16 = 124;
@@ -91,7 +91,7 @@ pub fn run(_args: &[String]) -> i32 {
     0
 }
 
-// spec: delegation-kit/SPEC.md §The statusline template — the model's first word, lowercased, with
+// spec: delegation-kit/SPEC.md §The statusline arm — the model's first word, lowercased, with
 // every non-alphanumeric character dropped: a name the harness may spell any way becomes a token
 // narrow enough for a status bar.
 fn slug(display_name: &str) -> String {
@@ -105,7 +105,7 @@ fn slug(display_name: &str) -> String {
         .collect()
 }
 
-// spec: delegation-kit/SPEC.md §The statusline template — the gauge escapes are self-contained by
+// spec: delegation-kit/SPEC.md §The statusline arm — the gauge escapes are self-contained by
 // that section's own rule and stay so: no asset leaves the binary. The reading is truncated to its
 // integer part and clamped, so a source spelling a percentage any way still renders in ten cells.
 fn gauge(reading: &str) -> String {
@@ -143,7 +143,7 @@ fn gauge(reading: &str) -> String {
     out
 }
 
-// spec: delegation-kit/SPEC.md §The statusline template — the time left on an axis, coarsened to
+// spec: delegation-kit/SPEC.md §The statusline arm — the time left on an axis, coarsened to
 // two units: a window that has already reset renders nothing rather than a negative span.
 fn remaining(resets_at: &str) -> String {
     if resets_at.is_empty() || resets_at == "null" {
@@ -164,7 +164,7 @@ fn remaining(resets_at: &str) -> String {
     }
 }
 
-// spec: delegation-kit/SPEC.md §The statusline template — the section vocabulary is the counter
+// spec: delegation-kit/SPEC.md §The statusline arm — the section vocabulary is the counter
 // tool's, never this member's: each label is the initial of a name the tool returned, widened to
 // two characters for every counter as soon as two returned names share one.
 fn counters(tsv: &str) -> String {
@@ -188,7 +188,7 @@ fn counters(tsv: &str) -> String {
         .join(" ")
 }
 
-// spec: delegation-kit/SPEC.md §The statusline template — the project trio, read at their literal
+// spec: delegation-kit/SPEC.md §The statusline arm — the project trio, read at their literal
 // tracked paths exactly as the shell member read them: an unresolvable root leaves all three empty
 // and the render drops their sections rather than printing a partial parse.
 fn project() -> (String, String, String) {
@@ -216,7 +216,7 @@ fn project() -> (String, String, String) {
         .ok()
         .map(|t| last_stamp_stage(&t))
         .unwrap_or_default();
-    // spec: delegation-kit/SPEC.md §The statusline template — a subprocess and never an in-process
+    // spec: delegation-kit/SPEC.md §The statusline arm — a subprocess and never an in-process
     // call: the counter's own library exits 2 on a malformed queue config, which here would take
     // the whole status bar down for a component worth four characters.
     let counter = format!("{}/queue-kit/bin/queue-counts.sh", root);
@@ -256,7 +256,7 @@ fn last_stamp_stage(text: &str) -> String {
 mod tests {
     use super::*;
 
-    // spec: delegation-kit/SPEC.md §The statusline template — the gauge is ten cells wide whatever
+    // spec: delegation-kit/SPEC.md §The statusline arm — the gauge is ten cells wide whatever
     // the reading, clamps out of range, and carries its own escapes with no asset outside the
     // binary
     #[test]
@@ -277,7 +277,7 @@ mod tests {
         assert!(gauge("0").contains(&format!("\u{1b}[48;5;{}m", BG_EMPTY)));
     }
 
-    // spec: delegation-kit/SPEC.md §The statusline template — the label widens to two characters
+    // spec: delegation-kit/SPEC.md §The statusline arm — the label widens to two characters
     // only when two returned names share an initial, so a colliding pair stays readable
     #[test]
     fn a_colliding_initial_widens_every_label() {
@@ -301,7 +301,7 @@ mod tests {
         assert_eq!(last_stamp_stage("header\n---\n"), "");
     }
 
-    // spec: delegation-kit/SPEC.md §The statusline template — the model name becomes one narrow
+    // spec: delegation-kit/SPEC.md §The statusline arm — the model name becomes one narrow
     // token: its first word, lowercased, with every non-alphanumeric character dropped
     #[test]
     fn the_model_name_narrows_to_one_token() {

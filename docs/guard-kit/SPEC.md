@@ -273,24 +273,31 @@ guard degrading *because* `jq` is absent cannot reach for it and must emit the
 advisory envelope directly, or the loud half is lost in exactly the case it was
 written for.
 
-delegation-kit is this framework's second and third consumer, and they do not
-cost the kit alike. `agent-budget-guard.sh` composes these primitives into a
-`PreToolUse(Agent)` hook that blocks on a PAUSE budget verdict and advises
-otherwise — cite-only; no guard-kit mechanism moves for it.
-`agent-dispatch-guard.sh` shares that matcher and enforces delegation-kit's
-dispatch-shape rules; guard-kit mechanism **does** move for that one, by
-exactly one clause — the fail-open-but-loud posture above, which it is the
+delegation-kit's agent-budget-guard and agent-dispatch-guard were this
+framework's second and third consumers, and did not cost the kit alike, before
+both ported to compiled harness-integration arms: agent-budget-guard composed
+these primitives into a `PreToolUse(Agent)` hook that blocks on a PAUSE budget
+verdict and advises otherwise — cite-only, no guard-kit mechanism moved for it;
+agent-dispatch-guard shared that matcher and enforces delegation-kit's
+dispatch-shape rules, and guard-kit mechanism **did** move for that one, by
+exactly one clause — the fail-open-but-loud posture above, which it was the
 shipped instance of (delegation-kit/SPEC.md §The delegation model).
 
-lifecycle-kit is the fourth consumer, on the same axis: its
-`templates/workflow-state-guard.sh` is a `PreToolUse(Write|Edit)` hook refusing a
-direct write to the lifecycle state file, and guard-kit mechanism **does** move
-for it, again by exactly one clause — `guard_read_path` above. Nothing else was
-missing: `guard_block` and `guard_advise` never read a command, so they were
-already tool-agnostic. This is the rule the three consumers now make explicit —
-**the kit owning the rule ships the guard**, riding `lib/guard.sh` through the
-`GUARD_KIT_LIB` indirection, and guard-kit moves only where the lib lacks a
-primitive. The state file's path lives with lifecycle-kit, never here, so
+lifecycle-kit's workflow-state-guard was the fourth consumer, on the same axis:
+a `PreToolUse(Write|Edit)` hook refusing a direct write to the lifecycle state
+file, and guard-kit mechanism **did** move for it, again by exactly one clause —
+`guard_read_path` above; nothing else was missing, since `guard_block` and
+`guard_advise` never read a command and were already tool-agnostic. That was the
+rule the three consumers made explicit while all three were shell — **the kit
+owning the rule ships the guard**, riding `lib/guard.sh` through the
+`GUARD_KIT_LIB` indirection where the lib holds a primitive the rule needs.
+**All three are now harness-integration arms** (gate-sdk/SPEC.md §The non-gate
+arm) reproducing the same postures in their own compiled module, so none rides
+this library or the `GUARD_KIT_LIB` indirection any longer — ownership of the
+rule stayed with the kit that had it; only the mechanism moved off this shell
+framework, onto the crate's own hook-JSON serializer, which makes this library
+one of two independent producers of that envelope shape rather than the sole
+one. The state file's path still lives with lifecycle-kit, never here, so
 guard-kit gains no dependency on a kit it does not otherwise know about
 (lifecycle-kit/SPEC.md §check-stage-evidence).
 
@@ -650,7 +657,7 @@ that harness exists would be designing against no case.
     already wired, which is what this rule fires on. The harness's own turn-end
     event reaches the act itself on a different axis, measured rather than
     assumed, and the hook there **refuses** as well as observes
-    (delegation-kit/SPEC.md §The turn-end liveness hook (template)). This rule's own
+    (delegation-kit/SPEC.md §The turn-end liveness hook). This rule's own
     behavior is untouched by that and it stays the enforcement on its own axis: it
     reaches mutations the turn-end event never sees, and that hook reaches a
     session that mutates nothing.
@@ -683,7 +690,7 @@ that harness exists would be designing against no case.
     under a scratch dir suppress every turn-end refusal in the tree — a bypass
     this rule does not have and cannot have. The same divergence is stated from
     the other side at
-    delegation-kit/SPEC.md §The turn-end liveness hook (template), so neither
+    delegation-kit/SPEC.md §The turn-end liveness hook, so neither
     surface reads as the other's drift.
     **The hook has since named a `records=0` sub-case this rule has no analogue
     for, and neither side's decision moves.** Reading a whole set through one
@@ -1508,9 +1515,9 @@ a declared entry is not outstanding. A third number for the declared count is
 refused — no reader needs it, and the two-number line is a shape a consumer may
 already parse.
 
-## wakeup-guard (template)
+## wakeup-guard
 
-Optional second guard, same framework, opposite posture: blocks
+Optional second guard, same `--hook` dispatch, opposite posture: blocks
 self-scheduled wakeups (`ScheduleWakeup`/`CronCreate`) unconditionally and
 logs each attempt — a stored prompt re-fires in a later session as if the
 user typed it, long after its premises are stale, and the scheduling call
@@ -1520,9 +1527,9 @@ reviewed and deleted in the same close-stage triage pass as the friction
 log. Deliberate scheduling stays possible by disabling the hook for a
 session — the block is the default, not a capability removal.
 
-### escalation-guard (template)
+### escalation-guard
 
-`templates/escalation-guard.sh` is the wakeup-guard's sibling — same framework,
+escalation-guard is the wakeup-guard's sibling — same `--hook` dispatch,
 a tool-targeted matcher, a separate opt-in hook — but **advisory, not
 fail-closed**, and the opposite failure posture: an advisory never blocks a
 message, so any inability to inspect the payload passes silently. Registered as
@@ -1538,7 +1545,7 @@ shape, this guard enforces it. The header grammar is the kit's mechanism; the
 ruling-class roster — what a stage session must escalate at all — stays consumer
 config in the dispatched agent-definition, never here. Opt-in is the consumer's
 settings registration, the same valve as the wakeup-guard; absent it the
-template is inert prose, the intended default (this repo leaves it unwired, as
+arm goes undispatched, the intended default (this repo leaves it unwired, as
 it does the wakeup-guard). That stated default is the *only* enforcement of the
 wiring: no gate observes it — `check-settings-pins` and `check-memory-off` stay
 green whether the hook is wired or not — so a session decides whether to wire an

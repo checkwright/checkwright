@@ -2680,28 +2680,29 @@ name the `HEAD` it claims to have been taken at, so it is not byte-identical to
 HEAD` writes an identical line, and a stamp that is never committed is never
 checked at all.
 
-`templates/workflow-state-guard.sh` closes the part of that window an agent
-tooling actually passes through. It is a `PreToolUse(Write|Edit)` hook (register
-it on the alternation matcher; guard-kit's wiring template carries the block) that
-refuses a write whose target **resolves** to the state file, naming
-`bin/enter-stage.sh` as the sanctioned writer. Resolved, not textual: an absolute
-path, a `./` prefix and a route through a symlinked directory are one file, and a
-textual comparison catches only the spelling it was written against. It reads the
-path through guard-kit's `guard_read_path` and rides `lib/guard.sh` on the
-`GUARD_KIT_LIB` indirection, so lifecycle-kit ships the rule and guard-kit ships
-the mechanism (guard-kit/SPEC.md §The guard framework). The
-`GATE_SDK_WORKFLOW_DIR` indirection is honored, so a consumer who relocated the
-workflow directory gets a guard that follows it. No knob is added: there is no
-value to configure.
+The `workflow-state-guard` harness-integration arm
+(`bash gate-sdk/bin/run-gates.sh --hook workflow-state-guard`) closes the part of
+that window an agent tooling actually passes through. It is a
+`PreToolUse(Write|Edit)` hook (register it on the alternation matcher; guard-kit's
+wiring template carries the block) that refuses a write whose target **resolves**
+to the state file, naming `bin/enter-stage.sh` as the sanctioned writer. Resolved,
+not textual: an absolute path, a `./` prefix and a route through a symlinked
+directory are one file, and a textual comparison catches only the spelling it was
+written against. It resolves the path and advises or blocks through the same
+channels every harness-integration arm uses (gate-sdk/SPEC.md §The non-gate arm),
+sourcing no kit library of its own. The `GATE_SDK_WORKFLOW_DIR` indirection is
+honored, so a consumer who relocated the workflow directory gets a guard that
+follows it. No knob is added: there is no value to configure.
 
 The residual is stated because an unstated residual reads as a closed hole. The
 guard reaches agent `Write`/`Edit` tool calls and nothing else — not a `Bash`
 redirect, not `--no-verify` at the commit that would have caught the result, not a
 human editing the file outside the agent tooling, and not any future writer that
 is not one of those tool calls. It narrows the window to the writers the harness
-routes through a hook; it does not close it. And it is inert until wired: shipping
-the template without the settings block yields a file that enforces nothing while
-looking like it does.
+routes through a hook; it does not close it. And it is inert until wired: a
+consumer who omits the settings-json block from guard-kit's wiring template gets a
+hook that enforces nothing while looking like it does, because the arm only ever
+runs when the harness's `PreToolUse(Write|Edit)` hook invokes it.
 
 ### check-stage-entry
 

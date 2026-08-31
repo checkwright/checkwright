@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: delegation-kit/SPEC.md §The turn-end liveness hook (template) — this repo's reader for
+# spec: delegation-kit/SPEC.md §The turn-end liveness hook — this repo's reader for
 # DELEGATION_KIT_LIVENESS_CMD, a path run with the scratch dir as its only argument; the gate is
 # name-addressed, so the adapter is consumer-side (evidence-kit/SPEC.md §check-evidence-manifest)
 set -uo pipefail
@@ -8,7 +8,7 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=../gate-sdk/lib/gate.sh
 source "$HERE/../gate-sdk/lib/gate.sh"
 
-# spec: delegation-kit/SPEC.md §The turn-end liveness hook (template) — a linked worktree carries
+# spec: delegation-kit/SPEC.md §The turn-end liveness hook — a linked worktree carries
 # no build output, so the configured binary is absent there and this reader would refuse before
 # reading a record; resolve it against the main checkout, and only in that one shape
 if [[ ! -x "$GATE_SDK_NATIVE_BIN" && "$GATE_SDK_NATIVE_BIN" != /* ]]; then

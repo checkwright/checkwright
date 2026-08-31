@@ -756,7 +756,7 @@ the empty directory takes green unconditionally. A caller that observes exit 2
 alongside a zero record count is therefore reading something that is provably
 **not** record corruption — the gate failed to run at all, before it read a
 record — and a caller may branch on that without re-deriving it here
-(delegation-kit/SPEC.md §The turn-end liveness hook (template) is the one that
+(delegation-kit/SPEC.md §The turn-end liveness hook is the one that
 does). Only `*.run` is read — a
 stray file in the same directory is not a record and its unreadability is not
 corruption, which is the whole point of giving the record a suffix.

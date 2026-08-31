@@ -12,39 +12,6 @@
 
 ## New Features
 
-- **harness-template-port-residue** [spec: SPEC-hook-arm.md] — port the twelve harness and
-  git-hook template members, 613 lines, off the shell substrate into the gate binary's
-  harness-integration arms. Contract, member roster, channel table, causal completeness and
-  the per-delta work classes: [gate-sdk/SPEC-hook-arm.md](gate-sdk/SPEC-hook-arm.md).
-  **THE ARM KIND WAS RULED BEFORE THIS CUT WAS COMPOSED** — one dispatching hook arm, hook
-  name as argv, harness payload on stdin, hook-JSON envelope out, exit status as protocol,
-  with its env read exempted for that arm alone from the reads-no-knob sentence. That ruling
-  and its two refused shapes are TRAJECTORY.md §The closed rulings'; the amendment authors
-  the contract it was sequenced behind, and its landing retires that paragraph.
-  ruled: harness-template-port-residue operator 2026-08-31 consult
-  **THE MEMBER SET IS RULED SEPARATELY AND THE AUTHORITY IS THE OPERATOR'S, RELAYED.** Two of
-  the twelve do not speak the hook protocol, and one of those — the usage poller — gives the
-  INSTALLED binary a path that reads an OAuth credential file and reaches an external
-  endpoint. TRAJECTORY.md §The objectives rules nothing on that binary's capability surface,
-  so spec escalated rather than deciding. **Ruled: ship all twelve.** If the question ever
-  returns the fallback is ELEVEN members, 67 lines owed, never six — only the poller raises
-  it, `statusline-usage` being a plain ANSI line with no credential and no network.
-  ruled: harness-template-port-residue operator 2026-08-31 lead-relay
-  **SELECTED AS `harness-hook-arm-port`'s CUT, 2026-08-31**, by the composer's
-  stated-contract rule — one section (gate-sdk/SPEC.md §The non-gate arm), one amendment —
-  and decisively because it is the only owed cohort whose blocking design fork is already
-  closed. **A SECOND CUT WAS NOT REFUSED ON PACKAGING GROUNDS AND THIS IS NO PRECEDENT FOR
-  ONE CUT PER ITERATION**, which the 2026-08-30 operator ruling calls an over-read: none was
-  available, every alternative needing an unruled fork opened before it could be composed. A
-  later iteration holding two ready cuts takes both. **The port ships 12 of the 14 wired
-  harness members** — `scripts/session-context.sh` and `scripts/bash-guard.sh` are declared
-  `no-port`, so the hook substrate stays mixed by design. The absent-binary fail-open rule,
-  the `Arm`-variant knob mis-declaration and the untagged `DELEGATION_KIT_LIVENESS_CMD`
-  divergence are the amendment's deltas 3, 5 and 9 rather than this entry's.
-  ruled: harness-template-port-residue lead 2026-08-31 own-authority
-  Filed 2026-08-30 by build, at the landing of the harness-template class ruling; promoted
-  2026-08-31 by spec, paired with its amendment in one commit.
-
 ## Technical Debt
 
 ## Deferred
@@ -9297,6 +9264,7 @@
 
 - installer-boundary-behind-invoke-port-reading
 - consumer-smoke-runner-port-disposition
+- harness-template-port-residue
 
 ## Lessons Learned
 
