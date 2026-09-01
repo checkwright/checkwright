@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: index-first-and-survey-record-cuts
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -7340,12 +7340,11 @@
   `internal-identifier-restatement` sweep judged it LOW-MEDIUM and filed the call rather than
   taking it. That entry stays live and unchanged either way, and its subject — the uncovered
   install surface — is untouched by this one.
-  **What makes it borderline rather than clear.** Every figure was verified EXACT at HEAD, and
-  the paragraph is dated and headed "Measured ... not estimated", the form prior sweeps of the
-  class have consistently cleared. Against that: a line RANGE is the most rot-prone form the
-  class takes, it sits in the deferred pool — the longest rot window in the tree, and the corpus
-  the class was widened to cover 2026-08-15 — and the install path is live code any installer
-  edit moves.
+  **What makes it borderline rather than clear.** Every figure was verified EXACT at HEAD, and the
+  paragraph is dated and headed "Measured ... not estimated", the form prior sweeps have cleared.
+  Against that: a line RANGE is the most rot-prone form the class takes, it sits in the deferred
+  pool — the longest rot window in the tree, and the corpus the class was widened to cover
+  2026-08-15 — and the install path is live code any installer edit moves.
   **Why it generalises past one entry:** the ruling reaches every "measured at <date>" paragraph
   in the pool, which is why the sweep escalated rather than editing one entry. The audit
   roster's own reading of the shape is the ground to rule against — a ruled-but-unbought port is
@@ -7355,13 +7354,12 @@
   it.** The INSIDE half is spent: it prescribed editing spans the merge below already deleted.
   **The founding instance is gone and the shape came straight back — 2026-08-25, second instance.**
   The `install-relocation-boundary-and-first-cut` merge rewrote `powershell-installer-surface`
-  wholesale, deleting the two line ranges and four per-file counts named above. Its replacement is a
-  ~22-row disposition table naming that file's internal functions (`target_of_host`,
-  `select_artifact`, `claim`, `record`, `copy_in`) in execution order, rev-pinned and carrying a
-  "re-derive by reading `init.sh` top to bottom" instruction. So the question is unchanged but its
-  instance is now HARDER, not easier: a named-function roster in execution order reads closer to the
-  class's core "call chain or roster" language than the line spans did. That table is the merged
-  amendment's own deliverable, so narrowing it is re-scoping landed work.
+  wholesale, deleting the two line ranges and four per-file counts named above; its replacement is a
+  ~22-row disposition table naming that file's internal functions in execution order, rev-pinned,
+  carrying a "re-derive by reading `init.sh` top to bottom" instruction. The question is unchanged
+  but its instance is now HARDER, not easier: a named-function roster in execution order reads
+  closer to the class's core "call chain or roster" language than the line spans did. That table is
+  the merged amendment's own deliverable, so narrowing it is re-scoping landed work.
   **Third instance 2026-08-29, and the first where the rot was OBSERVED rather than predicted.**
   `installer-graph-artifact-literal` carried "the two sites are exact, re-verified at the drain:
   `installer/lib/init.sh` line 311 and line 317". Both had moved to 299 and 305 — the defect still
@@ -7371,12 +7369,14 @@
   **Why `[design-pending]`:** it rules the boundary of a governed audit class, an authoring
   question about the roster row rather than a code change.
   recurrence: dated-measurement-restatement-class 2026-08-25 2026-08-29
-  **AT THRESHOLD AND DECLINED THREE TIMES — 2026-08-30, then twice on 2026-08-31.** First:
-  machinery-class by default, no unit set reaching it. Second and third, on the stronger ground and
-  on the RUN rather than the merits: the port-only run forecloses a non-port unit while the oracle
-  reads owed (61 measured 2026-08-31; re-run it), so the rot argues RETURN at the triage, not now.
+  **AT THRESHOLD AND DECLINED FOUR TIMES — 2026-08-30, twice on 2026-08-31, then 2026-09-01.**
+  First: machinery-class by default, no unit set reaching it. The three since, on the stronger
+  ground and on the RUN rather than the merits: the port-only run forecloses a non-port unit while
+  the oracle reads owed (58 measured 2026-09-01; re-run it), so the rot argues RETURN at the
+  post-port triage, never promotion now. No declination has reached the operator.
   ruled: dated-measurement-restatement-class lead 2026-08-30 own-authority
   ruled: dated-measurement-restatement-class lead 2026-08-31 own-authority
+  ruled: dated-measurement-restatement-class lead 2026-09-01 own-authority
   **Cost while deferred:** the figures rot silently, and the entry carrying them is the one
   sizing an unbought port, so a reader prices the work off numbers nothing re-checks — while
   every future sweep spends the same judgment again on the same shape.
@@ -8426,32 +8426,34 @@
   could enter validate. Its price is legibility: the queue grammar has no way to mark a unit
   landed-but-unobservable, so a demoted entry reads as unstarted work and the next rider of this
   shape re-buys the same wedge.
-  **RECURRENCE JUDGED 2026-08-31 by close, and the recurrence is a sharper datum than the
-  instance.** `platform-support-ci-matrix` rode `port-declaration-cohort-and-windows-leg` carrying
-  the `precondition-ok: run-observed` tag whose spelling THIS entry's own lead line uses, and was
+  **RECURRENCE JUDGED 2026-08-31 by close, and it is a sharper datum than the instance.**
+  `platform-support-ci-matrix` rode `port-declaration-cohort-and-windows-leg` carrying the
+  `precondition-ok: run-observed` tag whose spelling THIS entry's own lead line uses, and was
   structurally undrainable from the moment it entered the unit set. So the miss is not that two
-  facts were never composed: the composition was already written down and deferred three days
-  earlier, and an entry of the named shape was promoted anyway. That makes it a
-  FILING-VISIBILITY failure rather than an analysis one — sharpening the analysis would not have
-  helped — and it is the half a costed look should weigh first.
+  facts were never composed: the composition was written down and deferred three days earlier, and
+  an entry of the named shape was promoted anyway — a FILING-VISIBILITY failure rather than an
+  analysis one — sharpening it would not have helped — and the half a costed look weighs first.
   **Machinery-class, but NOT icebox-class by default**, because TRAJECTORY.md's 2026-08-30
   discriminator is conjunctive and the second conjunct fails: this DID block a stage entry,
   validate's, until a lead ruling cleared it.
   **THE FOUR SHAPES ALL ADDRESS THE DRAIN SIDE; A FIFTH READ AS OWED FOR THE RECORD SIDE, AND ITS
-  PREMISE IS NOW FALSIFIED.** Measured 2026-08-31 on that same ride: the round-6 outcome exists only
-  AFTER the close push, so writing it onto the entry is a commit that postdates the push meant to be
-  the iteration's last — and that was priced as spending the second push the green branch was to
-  earn. **LEAD-RULED 2026-09-01 on the close that actually did it: it spends NONE.** Commits
-  accumulate locally and ride one watched push at close, which that iteration demonstrated by
-  carrying two lead commits unpushed since the previous one. So the record side costs one commit and
-  a compression against the entry's cap, never a push, and the false dichotomy it created —
-  land-and-push against file-cheaply-elsewhere — is what a session meeting this next should not
-  re-derive. The gap that survives is narrower and still real: the four shapes each answer *when the
-  entry may be drained*, none answers it for an observation the drain gate sits upstream of.
+  PREMISE IS NOW FALSIFIED.** Measured 2026-08-31: the round-6 outcome exists only AFTER the close
+  push, so writing it onto the entry is a commit postdating the push meant to be the iteration's
+  last — priced as spending the second push the green branch was to earn. **LEAD-RULED 2026-09-01
+  on the close that actually did it: it spends NONE.** Commits accumulate locally and ride one
+  watched push at close, which that iteration demonstrated by carrying two lead commits unpushed.
+  So the record side costs one commit and a compression against the cap, never a push, and the
+  false dichotomy — land-and-push against file-cheaply-elsewhere — is what a session meeting this
+  next should not re-derive. The gap that survives is narrower and still real: the four shapes each
+  answer *when the entry may be drained*, none for an observation the drain gate sits upstream of.
   ruled: observation-predicate-entry-cannot-drain-in-its-own-iteration lead 2026-09-01 own-authority
   **Cost while deferred:** every entry of this shape either overruns its push budget or
   defers, and the deferral is invisible until the close that cannot drain it.
   recurrence: observation-predicate-entry-cannot-drain-in-its-own-iteration 2026-08-31 2026-09-01
+  **REACHED THRESHOLD 2026-09-01, PROMOTION DECLINED THE SAME DAY, ON THE RUN AND NOT ON MERIT** —
+  the port-only run forecloses a non-port unit while the oracle reads owed (58) and no yield exists.
+  It did not reach the operator; sharing the ruling above's authority, channel and date, that line
+  carries both. Read this at the post-port triage as a unit never weighed, not as one refused.
   Filed 2026-08-27 by the lead at build, promoted 2026-08-27 by close.
 
 - **site-health-probe-no-retry-on-transient** [design-pending] — the scheduled site probe files a
@@ -8602,18 +8604,18 @@
   a diagnostic for a reader or a steer for the refused session is the unruled half.
   **DISTINCT from the close-surface roster question**, which asks whether the log is read at all;
   this asks what it can say once read.
-  **AT THRESHOLD 2026-08-31, promotion DECLINED TWICE THAT DAY, and the deleted-fix-site argument
-  read the other way.** First: the shell hook was a member of the `harness-hook-arm-port` cut, so a
-  fix authored then would have been authored against shell that cut removes; authoring it against
-  the LANDED arm is better information, and deferral gained. Refused: folding it into the port
-  amendment, since settling a live `[design-pending]` fork inside a port cut is non-port design
-  work. **ONE CONSTRAINT RODE OUT AND IS DISCHARGED at that cut's build:** the arm's logging
-  contract must not foreclose attribution later, and delta 8 specified the record's field set OPEN,
-  so `agent_id`, `agent_type` and the matched run key stay addable in one table edit. Both halves
-  of the deferral's price are paid, so the entry IS takeable on its merits. **Second declination,
-  at the next scope: ON THE RUN AND NOT ON MERIT** — the port-only run forecloses a non-port unit
-  while the oracle reads owed at all, and its one yield went to the Windows leg's round 7.
+  **AT THRESHOLD 2026-08-31, promotion DECLINED THREE TIMES.** First: the shell hook was a member
+  of the `harness-hook-arm-port` cut, so a fix authored then would have been written against shell
+  that cut removes, and authoring it against the LANDED arm is better information. Refused with it:
+  folding it into the port amendment, since settling a live `[design-pending]` fork inside a port
+  cut is non-port design work — a refusal this iteration's two cuts re-inherit. **ONE CONSTRAINT
+  RODE OUT AND IS DISCHARGED at that cut's build:** the record's field set was specified OPEN, so
+  `agent_id`, `agent_type` and the matched run key stay addable in one table edit. Both halves of
+  the deferral's price are paid, so the entry IS takeable on its merits. **Declinations two and
+  three are ON THE RUN, NOT ON MERIT** — the port-only run forecloses a non-port unit while the
+  oracle reads owed (58 on 2026-09-01), and no yield exists. Neither reached the operator.
   ruled: subagent-liveness-log-unattributed-refusal lead 2026-08-31 own-authority
+  ruled: subagent-liveness-log-unattributed-refusal lead 2026-09-01 own-authority
   **Cost while deferred:** every refusal cluster is uninterpretable, so the one instrument that
   could measure whether the producer/observer split works reads the same for a working guard and a
   wedged one — and a wedged guard costs a session its turn.
