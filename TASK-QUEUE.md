@@ -9245,6 +9245,9 @@
 - **build-native-obligation-unconditional** [design-pending] — A crate-free commit still rebuilds.
 - **port-blockers-library-mediated-scan** [design-pending] — A library-mediated spawn reads clean.
 - **bridged-arm-requirements-undeclared** [design-pending] — `--needs` omits what an arm spawns.
+- **delta-citation-unresolvable** [design-pending] — A delta number names no openable file.
+- **editor-diagnostic-unruled** [design-pending] — Oracle-first names gates, not editor output.
+- **scratch-grant-backtick-declined** [design-pending] — Rule 17's own clause voids its use case.
 
 ## Done
 
