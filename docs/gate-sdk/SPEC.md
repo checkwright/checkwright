@@ -788,6 +788,14 @@ filing unfileable, and this rule's own subject matter is the instance — record
 that a `--list` argument was captured takes
 `bash lifecycle-kit/bin/file-gap.sh -- "--list is captured at exit 0"`.
 
+**The shape half of this rule outlives a member's port, even though this
+contract's own corpus is `*/bin/*.sh`.** Without saying so the rule reads as
+retiring with the file, which is the wrong reading: the refusal exists because
+free text reaches a *capture*, so it binds on whatever substrate that capture
+runs. §The non-gate arm carries the split — the shape refusal and the `--` escape
+cross the port, the `-h`/`--help` arm retires to the front-end — and
+`--emit-file-survey` is the worked instance.
+
 **No gate reads this rule, and that is ruled rather than deferred.**
 §check-exec-bit's corpus is the whole `*/bin/*.sh` set, and a gate over it could
 assert only the weak static shape — does the file contain a `--help` branch —
@@ -2002,7 +2010,8 @@ name out of `gates::REGISTRY`. It also carries arms that are **not** gates —
 `--emit-` family the bridged-arm table keys (`--emit-queue-counts` and
 `--emit-queue-edges` are its 2026-08-31 members; `--emit-md-index`,
 `--emit-md-section` and `--emit-pub-index`, context-kit's three index-first
-reading tools, its 2026-09-01 ones), the **harness-integration**
+reading tools, plus `--emit-file-survey` and `--emit-cite-survey`, lifecycle-kit's
+two survey-record affordances, its 2026-09-01 ones), the **harness-integration**
 arms below it, and `--lesson-sink`, a bridged `Arm::Run` member that is neither
 (queue-kit/SPEC.md §The lesson-sink arm) — and the class
 they form is named here because a
@@ -2068,7 +2077,8 @@ roster, and no requirement element at all. An arm's spawned programs are
 therefore recorded in prose and nowhere a machine reads, and the set is wider
 than a reader would guess: `git` under several `--emit-` arms and under the
 origin-URL lookup this table's own module makes, `date` under
-`--emit-queue-index`, `bash` under `--lesson-sink`, `--emit-port-blockers` and
+`--emit-queue-index` and `--emit-file-survey` (which spawns `git` too, for the
+`rev` it machine-stamps), `bash` under `--lesson-sink`, `--emit-port-blockers` and
 `--emit-pub-index` — that last twice per enabled language, because a consumer's
 public-surface extractor is a sourced bash file and the seam survives the port
 (context-kit/SPEC.md §Index-first reading) — and under `--emit-drift-report`
@@ -2168,6 +2178,22 @@ hardcoded top-level flag is reached by neither and receives nothing. A configure
 tool ported as a top-level flag therefore resolves platform defaults and silently
 ignores every consumer override — which is not a calibration between two workable
 shapes but the difference between working and appearing to.
+
+**A member taking free-text argv into a *capture* keeps its shape refusal and its
+`--` escape across the port, while its `-h`/`--help` arm retires to the
+front-end.** `--emit-file-survey` (lifecycle-kit/SPEC.md §The survey record) is
+the class's first such member and the sentence is stated here rather than at its
+own section, because it splits §The bin/-tool contract in a way a later porting
+session will meet again. The hazard belongs to the **argument**: a flag captured
+into a committed surface at exit 0 is a property of free text reaching a capture
+tool, not of the tool being a `bin/` script, so the refusal does not retire with
+the file. Usage belongs to the **substrate**: a bridged arm's usage lives in
+`bin/run-gates.sh`'s own help and in the owning kit's README, and a per-arm help
+flag would be a second home for one sentence — the disposition
+`--emit-queue-counts` took at its own port. So `--emit file-survey --help` is a
+refusal rather than a capture, which preserves the substantive half of the
+contract while the discoverability half moves to where the class already keeps it.
+`--emit-cite-survey` rides the same split on the same ground.
 
 **A member may join the table with an *empty* declared roster, and that is the
 sentence the class did not yet hold.** The forced-family test above answers for a

@@ -545,9 +545,9 @@ the clause's reader is a human or agent rather than a gate.
   close skill and read for emptiness by `bin/enter-stage.sh`'s boundary refusal.
 - `LIFECYCLE_KIT_SURVEY_RECORD_FILE` — the committed per-iteration survey record
   (§The survey record); default
-  `${GATE_SDK_WORKFLOW_DIR:-.workflow}/survey-record.md`, written by
-  `bin/file-survey.sh`, asserted by `check-survey-record`, its headings printed
-  and its body truncated by `bin/enter-stage.sh` (a kit-owned boundary built-in,
+  `${GATE_SDK_WORKFLOW_DIR:-.workflow}/survey-record.md`, written by the
+  `--emit file-survey` arm, asserted by `check-survey-record`, its headings
+  printed and its body truncated by `bin/enter-stage.sh` (a kit-owned boundary built-in,
   so it does not ride `LIFECYCLE_KIT_BOUNDARY_TRUNCATE`), and its
   `merge=iteration-scoped` attribute verified by `check-merge-attrs`. One knob,
   and no second one for the grammar, the witness commands, or an opt-out — each
@@ -1278,23 +1278,39 @@ buys nothing the two-command witness does not. *Ruled out: auto-invalidating
 every block on any commit* — too coarse to leave the mechanism any use; the
 `corpus` pathspec exists precisely to make invalidation proportionate.
 
-**The affordance.** `bin/file-survey.sh [--] "<question>" "<corpus>" "<oracle>"
-"<edges>" "<finding>"` appends one block, seeding the contract header when the
-record does not yet exist. It follows `bin/file-gap.sh` exactly: repo-root cd,
-config-via-env, exit 2 on a missing or empty argument, and the free-text
-argument-shape contract of gate-sdk/SPEC.md §The bin/-tool contract — whose
-refusal here scans **every** positional, since five slots make arity no
-protection at all. Advisory tooling, not a
-gate — the raw append stays a legal fallback, the grammar being the surface's
-contract rather than the writer.
+**The affordance.** `bash gate-sdk/bin/run-gates.sh --emit file-survey [--]
+"<question>" "<corpus>" "<oracle>" "<edges>" "<finding>"` appends one block,
+seeding the contract header when the record does not yet exist. It is a bridged
+non-gate arm (gate-sdk/SPEC.md §The non-gate arm) declaring two reads,
+`LIFECYCLE_KIT_SURVEY_RECORD_FILE` and `LIFECYCLE_KIT_STATE_FILE`; the family is
+forced rather than chosen, since the arm resolves consumer knobs and a hardcoded
+flag would resolve platform defaults while silently ignoring every override. It
+keeps the repo-root anchor — a relative record path names the same file from any
+subdirectory, falling back to the working directory outside a repository — exit 2
+on a missing or empty argument, and the free-text argument-shape contract of
+gate-sdk/SPEC.md §The bin/-tool contract, whose refusal here scans **every**
+positional, since five slots make arity no protection at all. Advisory tooling,
+not a gate — the raw append stays a legal fallback, the grammar being the
+surface's contract rather than the writer.
 
-The tool **does not default the `edges` slot**. An omitted fifth argument is the
-arity misuse the tool already refuses, which is the behavior wanted: a session
+**The shape refusal crossed the port and the help arm did not**, and the split is
+the hazard's rather than the substrate's. A flag captured into a committed surface
+at exit 0 is a property of free text reaching a *capture* tool, attested three
+times, so it does not retire when the tool stops being a `bin/` script:
+a positional beginning with `-` that is not preceded by `--` is a refusal at exit
+2, on every slot, and `--` still ends option processing. Usage, by contrast,
+belongs to the substrate and lives in the front-end's own help, so
+`--emit file-survey --help` is a **refusal**, never a capture.
+
+The arm **does not default the `edges` slot**. An omitted fifth argument is the
+arity misuse it already refuses, which is the behavior wanted: a session
 that forgot the field is told at filing time, by the producer, rather than at
 commit time by the gate.
 
 It **stamps `rev` and the date itself and derives `<stage>` from the cursor**
-(`lifecycle_current_stage`), which is the load-bearing decision in the tool:
+(the crate's `stages::current_stage` read over `LIFECYCLE_KIT_STATE_FILE`, which
+is the only reason that knob sits on the arm's roster), which is the load-bearing
+decision in the tool:
 `rev` is the field the entire re-use protocol turns on and exactly the field an
 author would get wrong — a short sha, the rev they *started* at, or none.
 Machine-stamping it is how the mechanism avoids failing silently when someone
@@ -1303,8 +1319,8 @@ elsewhere in this kit. A tree with no `HEAD` commit cannot ground a witness, so
 that is a refusal (exit 2) rather than a blank field; a tree with no cursor yet
 stamps the never-named `—` the queue header already uses.
 
-It **deliberately does not** inherit `file-gap.sh`'s slug resolution. A survey's
-prose routinely names queue slugs as its subject, and that resolver scans whole
+The arm **deliberately does not** inherit `file-gap.sh`'s slug resolution. A
+survey's prose routinely names queue slugs as its subject, and that resolver scans whole
 prose, so it would stamp a recurrence declaration onto the survey's subject.
 Adding no resolver here is a decision, not an omission.
 
@@ -1320,30 +1336,66 @@ nobody a retrieval — and that distinction is exactly what
 §check-scratch-citation's red condition is calibrated against.
 
 **Commit-pinning the citation is wrong by construction, not merely awkward**, and
-it is the close a reader reaches for first. `bin/file-survey.sh` stamps `rev` as
+it is the close a reader reaches for first. The capture arm stamps `rev` as
 HEAD *at filing time*, which precedes the commit that lands the block — so
 `git show <rev>:<record>` reads a blob that does not contain the block being
 cited, and it fails silently by printing a record without it. The sha a pin would
 need is the *landing* commit, which no field carries and which is precisely the
 class of value this section already rules an author gets wrong.
 
-**The affordance that makes inlining one command.** `bin/cite-survey.sh [--]
-"<heading-substring>"` selects the one block whose `## ` heading contains the
-substring and writes it to stdout as an inline-ready snippet — the heading and all
-five fields, off the same field set the block grammar above defines. It refuses
-(exit 2) on no match, on an ambiguous match, and on a
-record with no blocks, rather than guessing: the author asked for one finding, and
+**The affordance that makes inlining one command.**
+`bash gate-sdk/bin/run-gates.sh --emit cite-survey [--] "<heading-substring>"`
+selects the one block whose `## ` heading contains the
+substring and writes it to stdout as an inline-ready snippet — the heading
+rendered `**Carried survey — <heading>**` and all
+five fields in record order, off the same field set the block grammar above
+defines. It refuses (exit 2) on no match, on an ambiguous match, and on an absent
+record, rather than guessing: the author asked for one finding, and
 a silently-chosen sibling would be pasted onto a permanent surface as if it were
-the one they read. It follows `bin/file-survey.sh` exactly — repo-root cd,
-config-via-env, exit 2 on a missing or empty argument, and — per
+the one they read. The no-match refusal prints the record's headings and the
+ambiguous one prints every match, because narrowing is what the author needs
+back. It follows the capture arm exactly — the repo-root anchor, exit 2 on a
+missing or empty argument, and — per
 gate-sdk/SPEC.md §The bin/-tool contract — the shape contract for its one
-free-text positional. It is advisory tooling,
-not a gate, the same disposition its sibling carries. It is a census find rather
-than a firing on that last point: it carries `file-gap.sh`'s exact single-argument
-shape and has simply not been run with a flag yet, and while it writes nothing,
-its help behavior was the same misleading error.
+free-text positional, its help arm retired on the same ground. Its declared read
+is `LIFECYCLE_KIT_SURVEY_RECORD_FILE` **alone**: it derives no stage and stamps no
+rev, so its sibling's second knob is deliberately off its roster. It is advisory
+tooling, not a gate, the same disposition its sibling carries. Its coverage by the
+shape contract is a census find rather than a firing: it carries
+`file-gap.sh`'s exact single-argument shape and had simply never been run with a
+flag, and while it writes nothing, its help behavior was the same misleading
+error — the half of that finding the port discharges outright.
 
-It deliberately does **not** rewrite the citing surface. The author chooses where
+**Four shell files implement this section and the 2026-09-01 port cut took two of
+them**, so the section is not discharged and that is written here rather than
+left to be inferred. The two that moved are the affordances above, each of which
+declared this section in its own `# spec:` header. The two that did not are
+reachable by no stated-contract cut selecting on this section, because each
+declares a different one: `bin/enter-stage.sh` carries this section's **read
+trigger** — the entry report that prints the record's headings and never its
+findings — together with the boundary truncation below, and declares
+§bin/enter-stage.sh, so it ports in a different cut; `lib/stages.sh` carries
+`LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS`, the surface list the no-retrieval-pointer
+rule above reads, and is header-declared `no-port` as the config
+bridge's sole resolver for the `LIFECYCLE_KIT_*` knobs (gate-sdk/SPEC.md §The
+kit-library port disposition). That last is structural rather than a sizing
+judgment, so **this section's contract will not be wholly in-crate while that
+class ruling stands.** The general shape outlives the cut: a stated-contract cut
+ports the files that *declare* a section, not every file that *implements* it,
+and the two sets come apart wherever a shared entry point or a config library
+carries one clause of another section's contract.
+
+**What a consumer with no binary for its host loses is the two affordances and
+not the surface**, which is the whole of the port's residual here. The raw append
+is already ruled the sanctioned fallback, `check-survey-record` is already
+compiled and stays the assertion, and the read trigger and the boundary
+truncation live in `bin/enter-stage.sh`, which the paragraph above shows stays
+shell. So such a consumer still files surveys by hand, still has them asserted,
+still has them printed at every stage entry and still has them truncated at the
+boundary; what it goes without is one convenience and one witness hint.
+
+The citation arm deliberately does **not** rewrite the citing surface. The author
+chooses where
 the finding belongs and how much of the `finding` prose to carry; a tool that
 spliced would need a marker block, which would make a hand-written citation a
 second-class form of the very thing this rule is trying to make ordinary.
@@ -1386,8 +1438,8 @@ on both axes above: routing surveys there would make the boundary refuse on
 residue nobody owes a disposition for.
 
 **Producers and consumers.** Producer: any session that bought a survey, via
-`bin/file-survey.sh` (the raw append the sanctioned fallback); the knob default
-makes the channel live everywhere the kit is vendored, so the deployed
+`--emit file-survey` through the battery front-end (the raw append the sanctioned
+fallback); the knob default makes the channel live everywhere the kit is vendored, so the deployed
 configuration that must be set is none. Consumer: the next stage session, at its
 `bin/enter-stage.sh` entry — which prints the record's headings, the questions
 and never the findings — and at the moment it is about to dispatch a survey,
@@ -1830,7 +1882,11 @@ never their findings, since printing a possibly-stale judgment ahead of its
 witness is the failure the witness exists to prevent. It rides the tool every
 stage already invokes as its first step, so it adds no invocation point and no
 schedule, and it lands at the one moment a stage session is guaranteed to be
-looking.
+looking. **This trigger and the truncation above are the survey record's
+surviving shell half**: the two capture affordances ported onto the binary in the
+2026-09-01 cut, this file declares §bin/enter-stage.sh rather than that section
+and so ports in a different cut, and a later cut selector meets that fact here,
+where it works, rather than only in the other section (§The survey record).
 
 The boundary entry also **refuses when any linked worktree still stands** (exit
 1, each path printed, nothing written — the same refusal contract as the two
@@ -3045,8 +3101,8 @@ pass can never be read as a verified one.
 
 The gate satisfies the four gate-sdk contracts (gate-sdk/SPEC.md §The gate
 model): the single `SURVEY-RECORD: clean` line and a `help:` remedy naming the
-grammar and `bin/file-survey.sh` on the finding path (output); exit 2 on an
-unreadable or explicitly-named-but-missing record and on a failed parse
+grammar and the `--emit file-survey` arm on the finding path (output); exit 2 on
+an unreadable or explicitly-named-but-missing record and on a failed parse
 (fail-closed); a `good/`+`bad/` fixture pair under `gate-tests/` driven through
 the hermetic argument — the good case a three-block record including an
 `oracle: none` note, a valved block, one block carrying a real per-candidate sum
@@ -3117,8 +3173,8 @@ hatch is exercised.
 
 The gate satisfies the four gate-sdk contracts: the single
 `SCRATCH-CITATION: clean` line naming how many surfaces were scanned, and a
-`help:` remedy naming `bin/cite-survey.sh` and the exempt tag on the finding path
-(output); exit 2 on an empty derived target set and on a failed parse
+`help:` remedy naming the `--emit cite-survey` arm and the exempt tag on the
+finding path (output); exit 2 on an empty derived target set and on a failed parse
 (fail-closed); a `good/`+`bad/` pair whose good case copies the mention forms live
 entries actually use — a path opening a wrapped line after a full stop, a
 prepositional mention, a colon-introduced pointer at a **non**-member path, and a

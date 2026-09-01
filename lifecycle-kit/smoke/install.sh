@@ -67,7 +67,7 @@ EOF
 # spec: lifecycle-kit/SPEC.md §check-survey-record — file a real block off the seed commit so the
 # gate's registration exercises its actual grammar + rev-existence assertions, not the absent-record
 # inert pass (the optional-surface case that gate is designed never to redden on)
-bash "$SMOKE_KIT_ROOT/bin/file-survey.sh" \
+bash "$SDK/bin/run-gates.sh" --emit file-survey \
     "smoke: does a freshly vendored install leave a survey record check-survey-record can parse" \
     ".workflow/survey-record.md" \
     "bash gate-sdk/bin/run-gates.sh --for .workflow/survey-record.md" \
@@ -248,7 +248,13 @@ av_run() {
         bash "$SMOKE_KIT_ROOT/bin/$tool" "$@"
 }
 
-for t in file-gap.sh file-survey.sh cite-survey.sh enter-stage.sh; do
+emit_run() {
+    local arm="$1"; shift
+    env LIFECYCLE_KIT_SURVEY_RECORD_FILE="$av/record.md" \
+        bash "$SDK/bin/run-gates.sh" --emit "$arm" "$@"
+}
+
+for t in file-gap.sh enter-stage.sh; do
     out="$(av_run "$t" --help 2>/dev/null)" \
         || { echo "smoke(argv): $t --help should exit 0" >&2; exit 1; }
     grep -q '^usage: ' <<<"$out" \
@@ -257,20 +263,26 @@ for t in file-gap.sh file-survey.sh cite-survey.sh enter-stage.sh; do
     grep -q '^usage: ' <<<"$out" || { echo "smoke(argv): $t -h wrote no usage to stdout" >&2; exit 1; }
 done
 
-# spec: gate-sdk/SPEC.md §The bin/-tool contract — enter-stage is exempt from the refusal half (its positionals are membership-validated), the three free-text members are not; file-survey.sh's refusal scans every positional because five slots make arity no protection
-for t in file-gap.sh file-survey.sh cite-survey.sh; do
-    rc=0; av_run "$t" --list >/dev/null 2>&1 || rc=$?
-    [[ "$rc" -eq 2 ]] || { echo "smoke(argv): $t refused --list with exit $rc, want 2" >&2; exit 1; }
-    so="$(av_run "$t" --list 2>/dev/null)" || true
-    [[ -z "$so" ]] || { echo "smoke(argv): $t wrote usage to stdout on a refusal: $so" >&2; exit 1; }
-done
-rc=0; av_run file-survey.sh q c o e --finding >/dev/null 2>&1 || rc=$?
-[[ "$rc" -eq 2 ]] || { echo "smoke(argv): file-survey.sh took a flag in its fifth slot (exit $rc)" >&2; exit 1; }
+# spec: gate-sdk/SPEC.md §The bin/-tool contract — enter-stage is exempt from the refusal half (its positionals are membership-validated), the surviving free-text bin/ member is not
+rc=0; av_run file-gap.sh --list >/dev/null 2>&1 || rc=$?
+[[ "$rc" -eq 2 ]] || { echo "smoke(argv): file-gap.sh refused --list with exit $rc, want 2" >&2; exit 1; }
+so="$(av_run file-gap.sh --list 2>/dev/null)" || true
+[[ -z "$so" ]] || { echo "smoke(argv): file-gap.sh wrote usage to stdout on a refusal: $so" >&2; exit 1; }
+
+# spec: lifecycle-kit/SPEC.md §The survey record — the discriminating half of the capture arm's argv contract, the seam a crate unit test cannot see: the front-end resolves --emit file-survey, a flag in the FIFTH slot is still exit 2 through the bridge, and the record is byte-unchanged after the refusal (a test reading exit codes alone passes the bug). The grammar cases are pinned in the ported module's own #[cfg(test)] tests, where check-crate-arms runs them.
+rc=0; emit_run file-survey q c o e --finding >/dev/null 2>&1 || rc=$?
+[[ "$rc" -eq 2 ]] || { echo "smoke(argv): --emit file-survey took a flag in its fifth slot (exit $rc)" >&2; exit 1; }
 
 cmp -s "$av/inbox.before" "$av/inbox.md" \
     || { echo "smoke(argv): file-gap.sh wrote the gap inbox on a help or refusal path" >&2; exit 1; }
 cmp -s "$av/record.before" "$av/record.md" \
-    || { echo "smoke(argv): file-survey.sh wrote the survey record on a help or refusal path" >&2; exit 1; }
+    || { echo "smoke(argv): the file-survey arm wrote the survey record on a refusal path" >&2; exit 1; }
+
+# spec: lifecycle-kit/SPEC.md §The survey record — the other half of that seam: a SET consumer knob
+# actually reaches the arm's write through the shell bridge, which the refusal above cannot show
+emit_run file-survey "smoke: does a set record knob reach the arm" c o e f >/dev/null
+grep -q -- '— smoke: does a set record knob reach the arm$' "$av/record.md" \
+    || { echo "smoke(argv): a set LIFECYCLE_KIT_SURVEY_RECORD_FILE did not reach the file-survey arm through the bridge" >&2; exit 1; }
 
 # spec: gate-sdk/SPEC.md §The bin/-tool contract — '--' ends option processing, so the refusal never makes a legitimate filing unfileable
 av_run file-gap.sh -- "--list is captured at exit 0" >/dev/null

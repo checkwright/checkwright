@@ -361,7 +361,7 @@ fn path_root(p: &str) -> Option<&str> {
 // spec: gate-sdk/SPEC.md §lib/gate.sh — a relative bridged root may climb out with `..`, so the
 // join is normalised rather than concatenated: an unnormalised `..` component makes every later
 // path-prefix comparison fail silently, the defect the canon-kit cohort's edge tree caught.
-fn abs_against(here: &str, p: &str) -> String {
+pub fn abs_against(here: &str, p: &str) -> String {
     if path_root(p).is_some() {
         return normalize_abs(p);
     }

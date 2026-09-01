@@ -12,7 +12,11 @@
 
 ## New Features
 
-- **native-gate-port-remaining-corpus** [spec: SPEC-survey-cut.md] [roadmap: now/reliability]
+## Technical Debt
+
+## Deferred
+
+- **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
   — the whole battery onto the binary, and the shell surface down to its residue.
   roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
   It DEMOTES at build, never `## Done` — canon-kit/SPEC.md §Merging an amendment's corpus branch.
@@ -62,10 +66,6 @@
   ruled: native-gate-port-remaining-corpus lead 2026-08-31 own-authority
   ruled: native-gate-port-remaining-corpus lead 2026-09-01 own-authority
   Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close; cohorts ruled at scope 2026-08-11/12.
-
-## Technical Debt
-
-## Deferred
 
 - **kit-library-port-residue** [design-pending] — the kit `lib/*.sh` members the
   2026-08-30 class ruling deliberately leaves owed, filed rather than absorbed at its boundary.
@@ -4918,7 +4918,8 @@
   fewer captures were filed, and the per-filing tax is unchanged.
   **Diagnosed rather than allowlisted, per the triage criterion.** `bash
   lifecycle-kit/bin/file-gap.sh *` is **already** in the committed allowlist, alongside
-  `file-survey.sh *` and `kfric.sh *` — so this is not missing coverage. The harness matcher
+  `kfric.sh *` and — since the 2026-09-01 port made survey capture an arm — the
+  `run-gates.sh *` glob that grants it — so this is not missing coverage. The harness matcher
   refuses a command whose text carries an expansion or a redirect, and gap prose routinely
   carries both: a backticked slug is command substitution, and a bullet describing
   `jq -r … 2>/dev/null` contains a redirect operator inside its quotes. The glob cannot help,
@@ -4928,10 +4929,10 @@
   in-the-moment capture, which is the exact path CLAUDE.md says deferred capture ruins.
   **Deliverable, and it is small:** a body-from-file arm — `file-gap.sh --from <path>` reading
   the prose from a scratch file written with the editor tool — is a fully static command the
-  matcher can grant. The same arm serves `file-survey.sh` and `kfric.sh`, whose `<finding>`
-  fields have the same shape. What needs deciding is whether the arm is per-tool or a shared
-  helper in `lifecycle-kit/lib/`, and whether the argv form stays (it should — a short gap is
-  one call).
+  matcher can grant. The same shape serves `--emit file-survey` and `kfric.sh`, whose `<finding>`
+  fields are the same free text; the capture tool's port to a compiled arm moves where that
+  shape is written and settles nothing here. What needs deciding is whether it is per-member or
+  a shared helper, and whether the argv form stays (it should — a short gap is one call).
   **Why it is not a guard rule:** there is no better *form* to steer to today, which is what a
   guard rule requires. The form has to exist first.
   **Cost while deferred:** a friction tax that scales with how carefully a bullet is written,
@@ -5301,9 +5302,10 @@
   by the operator:** durable, git-logged reasoning satisfies the class and a lead's ruling commit
   is admitted, so the class IS performable and was performed and stamped at that same close.
   **Two of the three candidate fixes need their costing corrected, and one loses its premise.**
-  (1) Widening `bin/file-survey.sh` so a *refusal* files like a census was rejected on the ground
-  that the survey record "is itself boundary-truncated, so it buys one iteration, not an audit
-  trail" — **that ground is FALSE and was re-probed here:** `.workflow/survey-record.md` is
+  (1) Widening the `--emit file-survey` capture arm so a *refusal* files like a census was
+  rejected on the ground that the survey record "is itself boundary-truncated, so it buys one
+  iteration, not an audit trail" — **that ground is FALSE and was re-probed here:**
+  `.workflow/survey-record.md` is
   TRACKED (`git ls-files` resolves it), so the boundary reset truncates the working copy while
   git history keeps every block. It is an audit trail already, which makes this the cheapest
   option rather than the disqualified one. (2) A scope-stage obligation to record each refusal's
@@ -5826,7 +5828,8 @@
 
 - **survey-oracle-liveness-unasserted** [design-pending] — a survey record's `oracle:` field can
   name a boundary-wiped path, and the record's own gate accepts it.
-  **The instance, self-caught at this iteration's scope.** `bin/file-survey.sh` accepted
+  **The instance, self-caught at this iteration's scope.** The capture affordance — now the
+  `--emit file-survey` arm — accepted
   `.tmp/verify-cluster.sh` as the oracle and printed it back as "the witness a later stage runs",
   but `.tmp/` is wiped by `enter-stage.sh`'s boundary reset (CLAUDE.md §Housekeeping), so the
   witness was dead before any later stage could run it — and dead inside this iteration for any

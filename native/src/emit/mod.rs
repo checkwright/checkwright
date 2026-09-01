@@ -1,10 +1,12 @@
 // spec: gate-sdk/SPEC.md §The non-gate arm — the ported arms. Each owes no descriptor, no
 // registration and no fixture pair, and owes a named caller instead: a regen command, a
 // comparator calling `emit()`, a stage step, a gate reaching it in process.
+pub mod cite_survey;
 pub mod close_surfaces;
 pub mod docs_mirror;
 pub mod drift_report;
 pub mod enforcement_map;
+pub mod file_survey;
 pub mod footprint;
 pub mod graph;
 pub mod kpi;
@@ -319,6 +321,21 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         "--emit-drift-report",
         Arm::Emit(drift_report::emit),
         drift_report::KNOBS,
+    ),
+    // spec: lifecycle-kit/SPEC.md §The survey record — the capture affordance, whose free-text
+    // argv keeps the shape refusal and the `--` escape across the port while its help arm retires
+    // to the front-end: the hazard belongs to the argument and the help belongs to the substrate.
+    (
+        "--emit-file-survey",
+        Arm::Emit(file_survey::emit),
+        file_survey::KNOBS,
+    ),
+    // spec: lifecycle-kit/SPEC.md §The survey record — the citation affordance: it derives no stage
+    // and stamps no rev, so its sibling's state-file knob is deliberately off this roster.
+    (
+        "--emit-cite-survey",
+        Arm::Emit(cite_survey::emit),
+        cite_survey::KNOBS,
     ),
     // spec: gate-sdk/SPEC.md §run-gates — the battery runner: the class's first bridged member
     // that returns a verdict rather than a document, and the reason the table is keyed by flag
