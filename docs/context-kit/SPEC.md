@@ -40,9 +40,12 @@ hardcoded flag resolves platform defaults and silently ignores every override.
   whether to read whole or by section). Defaults to the whole tree, minus
   `CONTEXT_KIT_PRUNE_DIRS`, which is its one declared read.
 
-  Four observable properties **are** the contract, each pinned by an
-  index-tests golden (§Testing), because each is a place a reimplementation
-  would quietly differ:
+  Four observable properties **are** the contract, because each is a place a
+  reimplementation would quietly differ. The first two are pinned by an
+  index-tests golden (§Testing); the last two, and the fence asymmetry stated
+  below them, are pinned by the arm's own crate tests, which `check-crate-arms`
+  runs — the golden corpus carries no heading inside a fence and every golden
+  invocation names one explicit file, so no golden reaches them:
 
   - **Per-file block shape** — `<repo-relative path>  (<N>L)` where `N` is the
     `wc -l` newline count, then one indented row per heading
@@ -65,8 +68,8 @@ hardcoded flag resolves platform defaults and silently ignores every override.
 
   The heading scan is deliberately **fence-blind** where the first-sentence
   search above is not: a `##` inside a fenced block is a row. That asymmetry is
-  the shell form's and the goldens record it, so it is contract rather than
-  oversight.
+  the shell form's and the arm's own tests record it, so it is contract rather
+  than oversight.
 
 - **`--emit md-section <file> <heading>`** — prints one section, from the
   matched heading to the next heading of the same or higher level. Match is

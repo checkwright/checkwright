@@ -34,6 +34,30 @@ several, the premise is wrong and the template's §Economics "Split the lead
 where the tail dominates" bullet is what needs amending, not the tier. One
 iteration is one point; do not flip on it either way.
 
+**Second point, 2026-09-01 at `index-first-and-survey-record-cuts`:
+`cost=7.90` of the iteration's 85.65, 9.2%, on Opus — and the discriminator was
+applied rather than the share read.** FOUR escalations, every one ruled by the
+lead alone off a governed surface read directly: the iteration composition
+against the queue's own 2026-08-30 one-cut-per-iteration ruling, the three
+threshold recurrences against TRAJECTORY.md's port-only run, spec's
+two-`[spec:]`-ref blocker against `QUEUE_KIT_WRAP_BUDGET` in
+`queue-kit/lib/queue.sh` with both queue lines' columns measured, and validate's
+dirty-tree block against the lead template's own filing direction. TWO of the
+four found grounds the escalating session had missed — the composition ruling
+decided on a standing ruling rather than on scope's economics argument, and the
+blocker ruling caught an arithmetic error in spec's premise while reaching the
+same conclusion. **The two axes now separate, which is what the second point
+buys.** On cost the split premise holds and strengthens: the share fell from 14%
+to 9.2%, so the lead's turns *are* the cheap tail in dollars. On character it
+fails again: five escalations then, four now, each ruled alone off a surface, so
+"consistently several" is no longer one iteration's accident. Read together they
+say the tier question was never a cost question — a routing-only lead would be
+cheaper still and would have relayed four rulings it instead made. **Still not
+flipped, and now the amendment target is named rather than implied:** two points
+against the premise put the burden on the template's §Economics *Split the lead
+where the tail dominates* bullet rather than on this repo's tier. A third
+iteration at several ruled-alone escalations should amend that bullet.
+
 - **`validate`** — the lead dispatches it with a `model: sonnet` override.
   validate's batches are uniformly *mechanical oracle-running* (run the battery,
   report), so the stage collapses to a single stage-uniform-mechanical default —
@@ -136,6 +160,40 @@ iteration is one point; do not flip on it either way.
   cover:** the same log has `build` at `cr=95047678` for this iteration, roughly
   5.4x the next stage row, so align is not where the draw lives and a watch
   scoped to align alone will keep saying so.
+  **Measured again 2026-09-01 at `index-first-and-survey-record-cuts`:
+  `cr=15878162`.** Read on the bare family, which this iteration makes worth
+  restating because the align session **dispatched** — a worktree-isolated
+  audit-sweep whose whole subtree bills to `align+fanout` at `cr=2388699`, so the
+  two rows are read apart and never summed. The bare row is still align's own
+  context on either kind of session, which is what makes it the comparable
+  population; roughly a third of the bare rows carry a fan-out sibling, so a
+  dispatching align is ordinary rather than a new class. The reading is **above
+  median and well below the record**: +66.4% over a bare-sonnet median of 9540215
+  across 59 rows, rank 52 of 59, 13th of the last 17 ascending, and +15.3% on the
+  preceding iteration's 13768800 against a standing max of 21907218. That is where
+  the work-side reading puts it — two amendments audited against a tree carrying
+  seven deletions and three heavy SPEC rewrites, heavier than the light iteration
+  that drew near-median and lighter than the four-amendment one that set the
+  record. **The honest limit is weaker than the last datum's:** this is
+  interpolation inside a range the explanation already fits rather than the
+  falsification test that one passed, and reading a subagent's report is itself a
+  draw the bare row absorbs. The revert signal did not fire — two build stamps are
+  the planned batch split, both landing before the single validate stamp with no
+  re-entry. align found **six** amendment defects, repaired all six inside the
+  envelope and escalated none, and it re-verified its own subagent's claims
+  against the tree rather than acting on them, which is the verificational
+  judgment the tier was ruled on.
+  **One negative datum, recorded because a watch that logs only confirmations is
+  not a watch.** align read the same two stale-path claims this close's audits
+  later found and declined both as a proportionality call, on the ground that they
+  were backward-looking log entries whose central claims did not depend on the
+  referenced path surviving. Two independent close-stage sweeps converged on them
+  as live present-tense assertions about the tree, and both were repaired here.
+  That is not the stated revert signal, which is a build round-trip, but it is the
+  shape the watch exists for: a near-miss waved through and caught two stages
+  later. It is one miss against six repairs and the tier is not proposed for
+  reversal on it. What it adds for a later judge is a second counter to count —
+  *declined* findings a later stage reverses, not only escalations that fired.
 
 scope, `spec`, and close stay on Opus, their generative and verificational
 judgment being what justifies the tier. Re-judge every tier when the harness

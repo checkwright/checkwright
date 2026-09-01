@@ -2079,8 +2079,9 @@ than a reader would guess: `git` under several `--emit-` arms and under the
 origin-URL lookup this table's own module makes, `date` under
 `--emit-queue-index` and `--emit-file-survey` (which spawns `git` too, for the
 `rev` it machine-stamps), `bash` under `--lesson-sink`, `--emit-port-blockers` and
-`--emit-pub-index` — that last twice per enabled language, because a consumer's
-public-surface extractor is a sourced bash file and the seam survives the port
+`--emit-pub-index` — that last twice per language whose extractor resolves to a
+*consumer* file and not at all for a built-in grammar, because only a consumer's
+public-surface extractor is a sourced bash file and that seam survives the port
 (context-kit/SPEC.md §Index-first reading) — and under `--emit-drift-report`
 whatever program a consumer's KPI plugin names.
 `grep -rn 'proc::' native/src/emit/` is the derivation; nothing maintains a

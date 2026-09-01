@@ -105,7 +105,7 @@
   obligation that keeps a file owed until the step moves behind the invoke — and the live entry
   owning that relocation is `powershell-installer-surface`.
   **The one live defect inside this set, already filed:** `gate-sdk/lib/test-hermetic.sh:14`
-  omits the executable-suffix helper `gate-sdk/lib/gate.sh:99` appends, so on a Windows host every
+  omits the executable-suffix helper `gate-sdk/lib/gate.sh:100` appends, so on a Windows host every
   bespoke test pins `GATE_SDK_NATIVE_BIN` to a path that cannot exist. It is in the gap inbox as
   of 2026-08-30 and is **not** re-filed here; this entry owns the port disposition that waits on it.
   **Cost while deferred:** low and non-recurring — the ground is stated and each member's sequencing
@@ -4948,8 +4948,10 @@
   **Measured 2026-08-15: seven of this repo's 112 local-overlay `Bash(` entries named
   nonexistent paths** — five under a `bin/` directory for tools that live under `checks/` or in a
   different kit. Two sessions this iteration actually called one, `gate-sdk/bin/md-section.sh`,
-  whose real home is `context-kit/bin/md-section.sh` and is already committed-allowlisted; both
-  got ENOENT instead of the prompt that would have named the wrong path.
+  whose real home was then `context-kit/bin/md-section.sh` and was then committed-allowlisted; both
+  got ENOENT instead of the prompt that would have named the wrong path. Both halves of that clause
+  expired 2026-09-01: `64cce1d9` deleted the path and pruned its grant, and the capability is now
+  `--emit md-section`, so repointing a dead grant at it would mint a fresh one.
   **Why the existing tool cannot see it.** `compare-settings-allow.sh` reports redundancy (a
   committed glob already grants the entry) and breadth (a declared probe the glob auto-allows).
   Both compare *globs against globs*; neither resolves a target. A dead entry is redundant with
@@ -5431,8 +5433,10 @@
   `canon-kit/bin/md-section.sh` and `gate-sdk/bin/section.sh` (three calls) for the extractor
   context-kit actually owns, `lifecycle-kit/bin/drain-stage.sh` for the gating read that
   `enter-stage.sh --simulate` performs, and a `scripts/checks/` path for a shell gate this
-  iteration's own port had already deleted. The correct `context-kit/bin/md-section.sh` appears
+  iteration's own port had already deleted. The then-correct `context-kit/bin/md-section.sh` appears
   three times in the same log, so the *script* is known and its *owning kit* is what gets guessed.
+  The 2026-09-01 port retired that spelling to `--emit md-section`, so (c) below must resolve a
+  basename to an **arm** as well as a kit — for this one no owning `bin/` is left to return.
   **What this entry is NOT.** Not every invented form at the triage. `run-gates.sh <gate-name>`
   was also tried and is a habit rather than a hole: the positional argument is a gates-dir and
   the path-scoped selector is owned in prose by gate-sdk/SPEC.md §run-gates. Only the cross-kit
@@ -6051,7 +6055,7 @@
   **FIRST RECURRENCE, 2026-08-23, and the DOMINANT SHAPE FLIPPED — which redirects the design.**
   22 `awk` programs in that log: **8** line-range, **12** section-pattern (`/^## <title>/,/^## /`),
   2 genuine stream transforms, against 19-of-22 line-range below. So the majority then wanted a
-  DIFFERENT target — `context-kit/bin/`'s section extractor, already committed-allowlisted — and a
+  DIFFERENT target — the section extractor, `--emit md-section` since the 2026-09-01 port — and a
   steer built to the earlier measurement would have sent it to `Read`'s offset/limit, the wrong
   tool. What the unit owns grows by one: the parser must also decide WHICH steer to emit.
   **THIRD MEASUREMENT, 2026-08-23 at `battery-runner-port`'s close — the dominant shape flipped
@@ -7382,7 +7386,7 @@
   **AT THRESHOLD AND DECLINED FOUR TIMES — 2026-08-30, twice on 2026-08-31, then 2026-09-01.**
   First: machinery-class by default, no unit set reaching it. The three since, on the stronger
   ground and on the RUN rather than the merits: the port-only run forecloses a non-port unit while
-  the oracle reads owed (58 measured 2026-09-01; re-run it), so the rot argues RETURN at the
+  the oracle reads owed at all, so the rot argues RETURN at the
   post-port triage, never promotion now. No declination has reached the operator.
   ruled: dated-measurement-restatement-class lead 2026-08-30 own-authority
   ruled: dated-measurement-restatement-class lead 2026-08-31 own-authority
@@ -8461,7 +8465,7 @@
   defers, and the deferral is invisible until the close that cannot drain it.
   recurrence: observation-predicate-entry-cannot-drain-in-its-own-iteration 2026-08-31 2026-09-01
   **REACHED THRESHOLD 2026-09-01, PROMOTION DECLINED THE SAME DAY, ON THE RUN AND NOT ON MERIT** —
-  the port-only run forecloses a non-port unit while the oracle reads owed (58) and no yield exists.
+  the port-only run forecloses a non-port unit while the oracle reads owed, and no yield exists.
   It did not reach the operator; sharing the ruling above's authority, channel and date, that line
   carries both. Read this at the post-port triage as a unit never weighed, not as one refused.
   Filed 2026-08-27 by the lead at build, promoted 2026-08-27 by close.
@@ -8623,7 +8627,7 @@
   `agent_id`, `agent_type` and the matched run key stay addable in one table edit. Both halves of
   the deferral's price are paid, so the entry IS takeable on its merits. **Declinations two and
   three are ON THE RUN, NOT ON MERIT** — the port-only run forecloses a non-port unit while the
-  oracle reads owed (58 on 2026-09-01), and no yield exists. Neither reached the operator.
+  oracle reads owed at all, and no yield exists. Neither reached the operator.
   ruled: subagent-liveness-log-unattributed-refusal lead 2026-08-31 own-authority
   ruled: subagent-liveness-log-unattributed-refusal lead 2026-09-01 own-authority
   **Cost while deferred:** every refusal cluster is uninterpretable, so the one instrument that
