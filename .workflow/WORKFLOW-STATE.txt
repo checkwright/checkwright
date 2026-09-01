@@ -6,3 +6,4 @@
 
 index-first-and-survey-record-cuts scope adfa8c44 2026-09-01 e0eb3dc0
 index-first-and-survey-record-cuts spec aeaf27c2 2026-09-01 614cd13b
+index-first-and-survey-record-cuts align aeba14a3 2026-09-01 7f271541
