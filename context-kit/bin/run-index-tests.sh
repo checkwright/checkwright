@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: context-kit/SPEC.md §Testing — expected-output runner for the advisory bin tools
+# spec: context-kit/SPEC.md §Testing — expected-output runner for the advisory index-first tools, three of them arms since the 2026-09-01 port
 # usage: run-index-tests.sh [--update]   (bare: diff vs golden; --update: rewrite goldens)
 set -uo pipefail
 

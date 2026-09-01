@@ -1013,7 +1013,7 @@ context-kit/
   lib/toolfloor.sh               # sourceable owner: the probe roster + the floor predicate
   bin/always-loaded.sh
   bin/env-probe.sh               # derives the marker-bounded local env profile
-  bin/run-index-tests.sh         # expected-output runner for the bin tools
+  bin/run-index-tests.sh         # expected-output runner for the index-first tools
   checks/check-brevity.gate      # hermetic, binary-dispatched: the budgeted section's over-budget pointer bullets
   checks/check-settings-pins.gate  # hermetic, binary-dispatched: pins hold against the settings file
   checks/check-settings-paths.gate # hermetic, binary-dispatched: literal .sh grants resolve in the tree
