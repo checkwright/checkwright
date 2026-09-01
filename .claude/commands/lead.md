@@ -10,6 +10,30 @@ stage inherits the dispatcher's tier (measured leakage was the largest budget
 drain). Three stages depart from the Opus default, and by the per-batch tiering
 the template §Economics "Tier each batch to its work class" rule now names:
 
+**The split here is by session, not by tier, and the `supervision` row is the
+receipt — measured 2026-09-01 at `cause-instrument-and-queue-kit-cut`:
+`cost=13.70` of the iteration's 98.33, 14%, on Opus.** The template's stated
+premise for splitting — what it takes the lead's turns to be, and why they should
+therefore stop paying judgment-tier prices — is the template's own
+§Economics (*Split the lead where the tail dominates*). That premise did not hold
+on this iteration and the discrepancy is recorded rather than smoothed over: the
+lead's turns were judgment. It ruled five escalations, and each one it ruled alone
+it ruled by
+reading a governed surface directly rather than by relaying — the 2026-08-28
+composer against §The queue-index arm, canon-kit §Merging an amendment's
+demotion branch, `main.rs`'s `--needs` arm, `proc.rs`'s two `code()` return
+types. Two of those rulings found grounds the escalating session had missed.
+**The tier is NOT flipped on this datum**, and the reason is the same evidence:
+a cheaper lead plausibly relays those questions instead of answering them, and
+the routing-only lead the premise describes is not the lead this repo's
+escalation protocol actually asks for. What is owed is a decision, not a drift —
+so **the discriminator, for whoever takes it up**: read the escalations of an
+iteration and count how many the lead ruled *alone by reading a governed
+surface*. Near zero, the premise holds and the tier is overpaying; consistently
+several, the premise is wrong and the template's §Economics "Split the lead
+where the tail dominates" bullet is what needs amending, not the tier. One
+iteration is one point; do not flip on it either way.
+
 - **`validate`** — the lead dispatches it with a `model: sonnet` override.
   validate's batches are uniformly *mechanical oracle-running* (run the battery,
   report), so the stage collapses to a single stage-uniform-mechanical default —
