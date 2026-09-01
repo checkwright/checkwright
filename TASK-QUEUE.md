@@ -60,6 +60,7 @@
   repeals the 2026-08-29 four-yield rule: with no yield available there is none to escalate.
   ruled: native-gate-port-remaining-corpus operator 2026-08-31 consult
   ruled: native-gate-port-remaining-corpus lead 2026-08-31 own-authority
+  ruled: native-gate-port-remaining-corpus lead 2026-09-01 own-authority
   Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close; cohorts ruled at scope 2026-08-11/12.
 
 - **kit-library-port-residue** [spec: SPEC-index-cut.md] — the kit `lib/*.sh` members the

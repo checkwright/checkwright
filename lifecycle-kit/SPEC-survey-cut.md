@@ -193,15 +193,21 @@ delta (2)'s help arm; the loop's other members, `file-gap.sh` and
 `enter-stage.sh`, keep theirs unchanged, so the loop narrows rather than
 disappears.
 
-### (6) Two live entries name `file-survey.sh` as their subject; their premises narrow and their verdicts do not
+### (6) Three live entries name `file-survey.sh` as their subject; their premises narrow and their verdicts do not
 
-`gap-capture-argv-prompt-friction` and `survey-oracle-liveness-unasserted` each
-propose a behaviour change to this tool and each states its premise by path
-{mechanical}. Both are corrected in place to name the arm, and **neither verdict
-moves**: a `--from <path>` arm and an oracle-liveness assertion are as open
-against the compiled member as against the script. Recorded as a delta rather
-than left for a later scope to rediscover, because an entry whose stated premise
-a landed cut falsified reads as settled work. Taking either inside a port cut is
+`gap-capture-argv-prompt-friction`, `survey-oracle-liveness-unasserted` and
+`survey-engagement-residue-untracked` each propose a behaviour change to this
+tool and each states its premise by path {mechanical}. The third was found by
+re-checking the census against the tree rather than carrying the two-entry count
+forward: its candidate fix (1) — "Widening `bin/file-survey.sh` so a *refusal*
+files like a census" — was re-opened as the cheapest option at the 2026-08-24
+close that re-probed its disqualifying ground false, so it is a live premise by
+path exactly like the other two. All three are corrected in place to name the
+arm, and **no verdict moves**: a `--from <path>` arm, an oracle-liveness
+assertion and a refusal-also-files widening are each as open against the
+compiled member as against the script. Recorded as a delta rather than left for
+a later scope to rediscover, because an entry whose stated premise a landed cut
+falsified reads as settled work. Taking any of the three inside a port cut is
 non-port design work the composer refuses.
 
 ### (7) Every path-bearing surface moves in the deleting commit
@@ -358,13 +364,17 @@ stage's entry**. Stated here so the build session is not the one that learns it.
   `*/bin/*.sh`; without it the rule reads as retiring with the file (delta 2).
 - `CLAUDE.md`'s survey-capture bullet and `lifecycle-kit/README.md`'s gate-roster
   line (delta 7).
+- `.claude/settings.json`'s one deleted-path grant and `lifecycle-kit/smoke/install.sh`'s
+  narrowed argv-contract coverage — both are path-bearing surfaces deltas (7) and
+  (5) themselves describe and neither has a describing canonical-spec section, so
+  each is named directly here rather than through one (deltas 5 and 7).
 - `TASK-QUEUE.md`, the `native-gate-port-remaining-corpus` entry — promoted with
   `[design-pending]` swapped for this amendment's `[spec:]` ref; it **demotes** at
   build and never reaches `## Done`, which its own body already rules (all
   deltas).
-- `TASK-QUEUE.md`, the `gap-capture-argv-prompt-friction` and
-  `survey-oracle-liveness-unasserted` entries — premises corrected to name the
-  arm, verdicts unchanged (delta 6).
+- `TASK-QUEUE.md`, the `gap-capture-argv-prompt-friction`,
+  `survey-oracle-liveness-unasserted` and `survey-engagement-residue-untracked`
+  entries — premises corrected to name the arm, verdicts unchanged (delta 6).
 - The generated projections this cut stales — the on-site SPEC and README
   mirrors, the generated `pre-commit`/`commit-msg` hooks, `docs/check-graph.html`,
   and the gate binary itself. All are rostered with their triggers and regen

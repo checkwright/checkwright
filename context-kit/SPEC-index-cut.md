@@ -116,8 +116,9 @@ stated contract is none of those: the match is **case-insensitive**, tolerates a
 **text** (hashes and surrounding whitespace stripped) rather than a line prefix,
 and **skips fenced blocks** so a heading inside one is not mistaken for
 structure. So the matcher is new code beside the existing walk, and `section.rs`
-is not widened — widening it would move five other gates' verdicts to save one
-function.
+is not widened — widening it would move the two other gates that call
+`section::sections` (`check-brevity`, `check-doctrine-registration`) across all
+five of their call sites, to save one function.
 
 **One observable moves.** A query matching no heading exits **1** today, with
 `md-section: no heading matched: <query>` on stderr and nothing on stdout; it
@@ -177,8 +178,9 @@ would put a second entry point into the emission path — the thing §The non-ga
 arm forbids.
 
 Their grammars are re-expressed against the crate's POSIX ERE matcher and stay
-**grep-grade**: the Rust extractor takes `pub` / `pub(...)` items of the nine
-declared kinds; the TypeScript extractor takes `export`-declared
+**grep-grade**: the Rust extractor takes `pub` / `pub(...)` items of the eight
+declared kinds (`fn`/`struct`/`enum`/`trait`/`type`/`const`/`static`/`mod`); the
+TypeScript extractor takes `export`-declared
 `function`/`class`/`interface`/`type`/`enum`/`const`/`let`/`var`, `const enum`
 folded to `enum`, and `export default` named or falling back to the literal
 `default`, over `*.ts` and `*.tsx`. Re-exports and multi-line declarations
@@ -319,6 +321,14 @@ The count is probed rather than assumed {mechanical}:
   consumers of `CONTEXT_KIT_PRUNE_DIRS`.
 - `README.md`'s kit-map row, `context-kit/README.md`'s three usage lines, and
   `context-kit/SPEC.md`'s layout tree.
+- `docs/context-kit/index.md`'s Quick-start fenced block, naming `md-index.sh`
+  and `pub-index.sh` — this page is **hand-authored, not the generated on-site
+  SPEC mirror** (`docs/site-architecture.md` §Generated projections scopes that
+  mirror to exactly `SPEC.md`/`README.md`/`DOCTRINE.md`), so it does not
+  regenerate off `context-kit/README.md`'s own fix above and no gate reaches a
+  fenced code span to catch it dangling — the same blindness this delta already
+  states for prose elsewhere, found here by direct grep rather than assumed
+  absent.
 
 ### (11) The regeneration fan-out this cut stales
 
@@ -504,7 +514,21 @@ session is not the one that learns it.
   `--emit <name>` grammar reach it at all (deltas 2, 3 and 4).
 - `gate-sdk/SPEC.md §The non-gate arm`, the spawned-program paragraph — `bash`
   gains a third arm (delta 4).
+- `gate-sdk/SPEC.md §The kit-library port disposition` — its two `lib/pub-lang/`
+  references go stale the moment this cut lands: "they are **owed, not
+  undecided**" and "the position `lib/pub-lang/` already occupies" both describe
+  a shell residue this cut discharges, and both are restated to say the seam's
+  resolution and env contract survive in `pub-index.sh` while the two bundled
+  extractors are now in-crate rather than owed shell (delta 5).
 - `context-kit/README.md`'s three usage lines and `README.md`'s kit-map row
+  (delta 10).
+- `.claude/settings.json`'s three deleted-path grants and `scripts/context-config.sh`'s
+  comment naming the two tools as `CONTEXT_KIT_PRUNE_DIRS`'s consumers — both are
+  path-bearing surfaces delta (10) itself lists and neither has a describing
+  canonical-spec section, so each is named directly here rather than through one
+  (delta 10).
+- `docs/context-kit/index.md`'s Quick-start fenced block — hand-authored, not the
+  generated mirror, so it is a real edit obligation rather than a regeneration
   (delta 10).
 - `docs/site-architecture.md` — no ruling changes; named because delta (11)'s
   fan-out is read off it and a reader checking that the fan-out was honoured
