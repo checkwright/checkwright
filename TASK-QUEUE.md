@@ -9225,34 +9225,6 @@
   single-date spelling here rests on lifecycle-kit's `(slug, date)` idempotence and the ambiguity
   is escalated rather than closed by this session.
 
-- **pack-step-dirty-tree-predicate-unscoped** [design-pending] — `scripts/pack-installer.sh`
-  refuses on a whole-tree dirty check, so a dirty path the payload never reads aborts the pack and
-  with it validate's battery.
-  **Measured, not inferred.** At this iteration's validate, `scripts/pack-installer.sh:71` gated on
-  `git status --porcelain` with no path scoping; the sole dirty path was one uncommitted
-  `.workflow/gap-inbox.md` bullet — the exact artifact CLAUDE.md tells every mid-iteration session
-  to file — and `run-validate.sh` aborted at exit 1 before writing
-  `.workflow/validate-evidence.txt`, after 16 of 22 suites had already run clean.
-  **The predicate is wider than its own stated reason.** Line 70's `spec:` comment grounds the
-  refusal in the payload's commit stamp — a dirty tree would stamp a commit that does not describe
-  the payload. The payload is assembled out of tree from this repo's kit roots and writes nothing
-  in-tree, so a dirty path outside that set cannot make the stamp wrong.
-  **DISTINCT from `gap-inbox-commit-ownership`**, and not a re-filing of it: that entry owns the
-  open question of who *commits* a gap-inbox bullet, while this is a second defect in a different
-  file whose narrow fix lands without that question being answered at all. What this entry gives
-  that one is a measured cost it did not have; what it asks for is separable work.
-  **Why `[design-pending]`:** three candidate shapes, and choosing is design rather than repair —
-  scope the pack step's refusal to the paths the payload is assembled from; or rule gap-inbox
-  commit ownership so the file is never dirty across a stage boundary; or state the pre-flight
-  valve as the sanctioned response. Only the first is narrow, and it still needs a governed
-  statement of which paths constitute the payload, because a wrong scoping silently under-refuses
-  on a genuinely dirty one — the failure the refusal exists to prevent.
-  **Cost while deferred:** low and loud — one aborted battery per occurrence, recoverable by one
-  commit, and it announces itself rather than corrupting anything.
-  Filed 2026-09-01 by close's gap drain, promoted from a lead-filed bullet. Promotion is the third
-  disposition tried: fix failed on the candidate-shape choice above, and icebox failed eligibility
-  — the entry names the live unbuilt slug `gap-inbox-commit-ownership`, a live promotion trigger.
-
 
 ## Icebox
 
@@ -9323,6 +9295,7 @@
 - **delta-citation-unresolvable** [design-pending] — A delta number names no openable file.
 - **scratch-grant-backtick-declined** [design-pending] — Rule 17's own clause voids its use case.
 - **walk-entry-model-unstated** [design-pending] — Walk drops symlinks unstated; tree has none.
+- **pack-step-dirty-tree-predicate-unscoped** [design-pending] — Unscoped dirty check aborts a pack.
 
 ## Done
 
