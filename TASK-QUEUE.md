@@ -853,7 +853,10 @@
   session notices, invisible to `git log` and to any reader who is not looking at a dirty tree,
   and lost outright if that tree is reset. It is also the one class the inbox's own
   merge=union answer cannot cover, since union protects a committed surface and this bullet was
-  never on one.
+  never on one. **That "small and silent" reading is corrected 2026-09-01 by measurement, not by a
+  re-filing:** an uncommitted bullet aborted `run-validate.sh` after 16 of 22 suites had run clean,
+  through the unscoped pack-step predicate `pack-step-dirty-tree-predicate-unscoped` owns. The
+  per-instance cost is loud where it meets that predicate and silent everywhere else.
   **RECURRENCE JUDGED 2026-08-31 by close, on three attested firings inside one iteration.** Build
   batches A, B and C each carried a lead-filed bullet into history by hand-off instruction in the
   dispatch prompt, each recording the carry in its commit message and none dispositioning it; batch
@@ -9185,7 +9188,70 @@
   ruled: same-day-recurrence-date-multiplicity lead 2026-08-30 own-authority
   Filed 2026-08-30 at scope by lead ruling, from the recurrence pre-emption census recorded at
   `.workflow/survey-record.md`; both readings recorded rather than one picked, the ambiguity not
-  being a stage's or a lead's to close by fiat.
+  being a stage's or a lead's to close by fiat. **First live instance 2026-09-01**, at this close's
+  drain: `editor-diagnostic-unruled`'s instances 3 and 4 both fell on that date, so the entry below
+  had to pick a spelling to be written at all, and picked the once reading.
+
+- **editor-diagnostic-unruled** [design-pending] — the harness LSP channel contradicts the tree's
+  own oracles on crate-touching commits, and no surface rules that channel out as an oracle.
+  **Re-tiered out of the icebox 2026-09-01 by close's gap drain, on a dated recurrence.** It was
+  born in the icebox at `9845f2c3` this same iteration, on the stated basis that the channel had
+  "contradicted the tree's own oracle TWICE ... one candidate shape is to do nothing, which is what
+  makes this dormant". Two further instances have since fired, so the eviction's premise is spent
+  and §The icebox tier's own round trip applies — a dated `recurrence:` line is a live promotion
+  trigger, and its assertion (B) bars that line from a one-line entry. The tier's rule applied,
+  not a reversal of the evicting session's judgment.
+  **The four instances, all 2026-09-01.** (1) and (2) are the icebox basis. (3) At `64cce1d9` the
+  channel reported nine rustc errors — E0603 private-import on `emit/mod.rs`'s `targets`,
+  `corpus`, `relative` and `read_text` from `md_index.rs` and `pub_index.rs`, and E0277 missing
+  `Debug` on `pub_index::Extractor` — plus dead_code on `walk.rs`'s new `Links` variant and
+  `find_link_entries_with_prune`. (4) At `65e22a28`, the same shape. Both times the lead ran the
+  oracles rather than reasoning about them: `run-gates.sh` read 108/108 including
+  `check-crate-arms`, and `build-native.sh` compiled the release profile clean.
+  **What the frequency adds.** Instances 3 and 4 are the first two crate-module-adding commits of
+  a new iteration, so the divergence is a standing property of such a commit rather than an
+  incident. The exposure is the direction of trust: a session taking the editor channel as ground
+  would "repair" correct code to silence a stale index, inverting oracle-first at a channel that
+  rule does not name.
+  **Cost while deferred:** low but no longer dormant — it blocks no stage entry and no push, and
+  the whole cost lands on a session that trusts the wrong channel, which is unbounded when that
+  happens and zero when it does not.
+  **Why `[design-pending]`:** the candidate shapes are unchanged and one of them is to do nothing
+  — name the channel in the oracle-first rule as a non-oracle, or leave it to session judgment —
+  so picking one is a doctrine call rather than a defect repair.
+  recurrence: editor-diagnostic-unruled 2026-09-01
+  Filed 2026-09-01 at scope's boundary drain and born in the icebox; re-tiered the same day by
+  close on instances 3 and 4, which postdate the eviction. Both fell on one calendar day, so the
+  single-date spelling here rests on lifecycle-kit's `(slug, date)` idempotence and the ambiguity
+  is escalated rather than closed by this session.
+
+- **pack-step-dirty-tree-predicate-unscoped** [design-pending] — `scripts/pack-installer.sh`
+  refuses on a whole-tree dirty check, so a dirty path the payload never reads aborts the pack and
+  with it validate's battery.
+  **Measured, not inferred.** At this iteration's validate, `scripts/pack-installer.sh:71` gated on
+  `git status --porcelain` with no path scoping; the sole dirty path was one uncommitted
+  `.workflow/gap-inbox.md` bullet — the exact artifact CLAUDE.md tells every mid-iteration session
+  to file — and `run-validate.sh` aborted at exit 1 before writing
+  `.workflow/validate-evidence.txt`, after 16 of 22 suites had already run clean.
+  **The predicate is wider than its own stated reason.** Line 70's `spec:` comment grounds the
+  refusal in the payload's commit stamp — a dirty tree would stamp a commit that does not describe
+  the payload. The payload is assembled out of tree from this repo's kit roots and writes nothing
+  in-tree, so a dirty path outside that set cannot make the stamp wrong.
+  **DISTINCT from `gap-inbox-commit-ownership`**, and not a re-filing of it: that entry owns the
+  open question of who *commits* a gap-inbox bullet, while this is a second defect in a different
+  file whose narrow fix lands without that question being answered at all. What this entry gives
+  that one is a measured cost it did not have; what it asks for is separable work.
+  **Why `[design-pending]`:** three candidate shapes, and choosing is design rather than repair —
+  scope the pack step's refusal to the paths the payload is assembled from; or rule gap-inbox
+  commit ownership so the file is never dirty across a stage boundary; or state the pre-flight
+  valve as the sanctioned response. Only the first is narrow, and it still needs a governed
+  statement of which paths constitute the payload, because a wrong scoping silently under-refuses
+  on a genuinely dirty one — the failure the refusal exists to prevent.
+  **Cost while deferred:** low and loud — one aborted battery per occurrence, recoverable by one
+  commit, and it announces itself rather than corrupting anything.
+  Filed 2026-09-01 by close's gap drain, promoted from a lead-filed bullet. Promotion is the third
+  disposition tried: fix failed on the candidate-shape choice above, and icebox failed eligibility
+  — the entry names the live unbuilt slug `gap-inbox-commit-ownership`, a live promotion trigger.
 
 
 ## Icebox
@@ -9255,8 +9321,8 @@
 - **port-blockers-library-mediated-scan** [design-pending] — A library-mediated spawn reads clean.
 - **bridged-arm-requirements-undeclared** [design-pending] — `--needs` omits what an arm spawns.
 - **delta-citation-unresolvable** [design-pending] — A delta number names no openable file.
-- **editor-diagnostic-unruled** [design-pending] — Oracle-first names gates, not editor output.
 - **scratch-grant-backtick-declined** [design-pending] — Rule 17's own clause voids its use case.
+- **walk-entry-model-unstated** [design-pending] — Walk drops symlinks unstated; tree has none.
 
 ## Done
 
