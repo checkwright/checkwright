@@ -26,38 +26,38 @@
   roadmap-summary: A CI install-smoke leg per supported platform, or an honest label.
   **PRODUCED AND EXERCISED ARE BOTH DISCHARGED** — round 5 (`33298006656`, head `fb9ed980`) built,
   packed, installed and ran the battery through `checkwright-gates.exe`, so blockers 5 and 6 and
-  batch 4's `on_path` repair are MEASURED. **ROUND 6 IS OBSERVED (`33392360228`, head `e0e4355e`)
-  AND IT SPLIT:** `check-install-disposition` IS REPAIRED on the only host that can show it;
-  **`check-graph` IS NOT** — both `--emit` arms fail unchanged, so the cwd anchor gate-sdk/SPEC.md
-  §The path-dialect contract prescribes did not reach it, AND ITS REFUSAL CARRIED AN EMPTY CAUSE.
-  **THE OPERATOR'S 2026-08-30 RULING:** the rider stops at green — on green, drop
-  `continue-on-error` on the job comment's own trigger and STOP, since the `targets.list` join
-  below is separately measured work; on a red cause, file and defer without looping, which is what
-  the one-to-two push budget protects.
-  **The two consequences stay UNEXECUTED on an OBSERVED ground.** `install-smoke-windows` keeps
-  `continue-on-error: true` — its own comment in `.github/workflows/gates.yml` drops it "on the run
-  it is first observed green and not before"; `x86_64-pc-windows-msvc` stays off `targets.list`.
-  **The join half is more expensive than a line edit, and that is measured rather than assumed.**
-  `native/targets.list:43-48` owns it: the consumer smoke builds from the host it runs on and
-  refuses a roster naming another platform, so the join needs steering or a cross-compiling build.
-  **Cost while deferred:** the one adopter class with a named days-to-weeks adoption window still
-  has no working install path on Windows, and `powershell-installer-surface` — the port sequence's
-  one remaining member — stays sequenced behind this entry.
-  **ROUND 7'S CAUSE-ONLY INSTRUMENT IS LANDED (`2799b22b`) AND NO REPAIR RODE WITH IT**, per the
-  operator's 2026-08-31 consult ruling. Assertion D's refusal now carries the generator's whole
-  account — exit code and BOTH streams, each labelled — so the two mechanisms round 6 could not
-  tell apart are legible in the job log. Read the suffix `— it said: exit N; stdout: …; stderr: …`;
-  a silent child now reads `exit N; stdout: <empty>; stderr: <empty>` where round 6 read nothing.
-  **ROUND 7 SHIPS INSIDE `cause-instrument-and-queue-kit-cut` (operator, 2026-08-31), so its
-  reading is taken on a binary ALSO carrying that iteration's queue-kit arms.** No ported member is
-  a gate, so the 11-gate roster is unchanged — but the rebuild is not diff-free; do not read it so.
-  **DEMOTED 2026-09-01 AT BUILD, AND IT RETIRES NOTHING.** The observation only the close push buys
-  sits AFTER the stage that demands completion, so `## Done` was unavailable — and it is refused on
-  two independent canon-kit/SPEC.md §Merging an amendment grounds rather than on precedent: a Done
-  move asserts a finished deliverable that is not finished, and a bare-slug entry sheds
-  `[roadmap:]`, silently dropping an outstanding item from public `ROADMAP.md`. SECOND exercise of
-  demote-at-build, and the wedge recurred in a NEW iteration on a FRESH amendment — not one ride
-  continuing, which is the half that makes it a recurrence rather than a tail.
+  batch 4's `on_path` repair are MEASURED. **ROUND 6 (`33392360228`, head `e0e4355e`) SPLIT:**
+  `check-install-disposition` IS REPAIRED on the only host that can show it; `check-graph` is not,
+  and its refusal carried an EMPTY CAUSE, which is what bought the instrument.
+  **THE OPERATOR'S 2026-08-30 RULING, whose red-cause limb has now fired:** the rider stops at
+  green — on green, drop `continue-on-error` on the job comment's own trigger and STOP, the
+  `targets.list` join below being separately measured work; on a red cause, file and defer without
+  looping, which is what the one-to-two push budget protects and what this entry now does.
+  **Both consequences stay UNEXECUTED on an OBSERVED ground**, per `install-smoke-windows`' own
+  comment: `continue-on-error` and the `targets.list` row both wait on a first-observed-green run.
+  **The join half costs more than a line edit, and that is measured.** `native/targets.list:43-48`
+  owns it: the smoke builds from its host and refuses a foreign roster; steering or a cross-build.
+  **Cost while deferred:** the one adopter class with a named days-to-weeks adoption window has no
+  working install path on Windows, and `powershell-installer-surface` stays sequenced behind this.
+  **ROUND 7 IS READ AND THE CAUSE IS NAMED.** Instrument landed `2799b22b`, cause-only with no
+  repair (operator, 2026-08-31 consult); read at `33447663600`, job `99670277406`, head `954aeda2`.
+  Assertion D reported on BOTH `--emit` arms `exit 1; stdout: Windows Subsystem for Linux has no
+  installed distributions …; stderr: <empty>`. MECHANISM, traced to source and not inferred:
+  `native/src/gates/graph.rs` spawns the generator as a BARE `bash`, and the binary is a NATIVE
+  Windows process taking a Win32 PATH search where System32 precedes Git's `usr/bin`, so `bash`
+  resolves to WSL's launcher and exits 1 with no distro installed — cleared by that spawn's own
+  `spec:` comment because `bash` is on the program floor, an assumption this host falsifies. This
+  record RETIRES both 2026-08-31 TRAJECTORY.md paragraphs, each naming it as their discharge.
+  **TWO READINGS WORTH MORE THAN THE CAUSE.** Round 6's cwd-anchor hypothesis is FALSIFIED: the
+  unguarded command is in the GATE, not the generator's prologue, so neither guessed repair could
+  ever have landed on it — the instrument's case, measured rather than argued. And the SECOND
+  widening is the one that paid, the cause arriving on stdout with stderr EMPTY, exactly the
+  mechanism gate-sdk/SPEC.md §check-graph names; the first alone would have printed empty again.
+  **THE REPAIR IS NOT FILED HERE AND NOT STARTED:** a non-port unit under the no-yield run, whose
+  spent yield is not a precedent for a second, so it wants an operator ruling at the next scope.
+  **DEMOTED 2026-09-01 AT BUILD**, the second exercise and a recurrence rather than a tail — a NEW
+  iteration on a FRESH amendment. The wedge and its five shapes are
+  `observation-predicate-entry-cannot-drain-in-its-own-iteration`'s.
   ruled: platform-support-ci-matrix operator 2026-08-27 lead-relay
   ruled: platform-support-ci-matrix operator 2026-08-30 lead-relay
   ruled: platform-support-ci-matrix lead 2026-08-30 own-authority
@@ -8437,12 +8437,18 @@
   **Machinery-class, but NOT icebox-class by default**, because TRAJECTORY.md's 2026-08-30
   discriminator is conjunctive and the second conjunct fails: this DID block a stage entry,
   validate's, until a lead ruling cleared it.
-  **THE FOUR SHAPES ALL ADDRESS THE DRAIN SIDE; A FIFTH IS OWED FOR THE RECORD SIDE.** Measured
-  2026-08-31 on that same ride: the round-6 outcome exists only AFTER the close push, so writing
-  it onto the entry is a commit that postdates the push meant to be the iteration's last — and
-  landing it spends the second push the green branch was supposed to earn. A two-iteration
-  protocol, a standing extra push, a scope-time produce/observe split and demote-at-build each
-  answer *when the entry may be drained*; none answers *where the observation is written down*.
+  **THE FOUR SHAPES ALL ADDRESS THE DRAIN SIDE; A FIFTH READ AS OWED FOR THE RECORD SIDE, AND ITS
+  PREMISE IS NOW FALSIFIED.** Measured 2026-08-31 on that same ride: the round-6 outcome exists only
+  AFTER the close push, so writing it onto the entry is a commit that postdates the push meant to be
+  the iteration's last — and that was priced as spending the second push the green branch was to
+  earn. **LEAD-RULED 2026-09-01 on the close that actually did it: it spends NONE.** Commits
+  accumulate locally and ride one watched push at close, which that iteration demonstrated by
+  carrying two lead commits unpushed since the previous one. So the record side costs one commit and
+  a compression against the entry's cap, never a push, and the false dichotomy it created —
+  land-and-push against file-cheaply-elsewhere — is what a session meeting this next should not
+  re-derive. The gap that survives is narrower and still real: the four shapes each answer *when the
+  entry may be drained*, none answers it for an observation the drain gate sits upstream of.
+  ruled: observation-predicate-entry-cannot-drain-in-its-own-iteration lead 2026-09-01 own-authority
   **Cost while deferred:** every entry of this shape either overruns its push budget or
   defers, and the deferral is invisible until the close that cannot drain it.
   recurrence: observation-predicate-entry-cannot-drain-in-its-own-iteration 2026-08-31 2026-09-01

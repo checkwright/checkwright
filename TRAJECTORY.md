@@ -369,16 +369,6 @@ gate-sdk/SPEC.md §port-blockers), and widening the exclusion would let *port co
 while a full-profile adopter's vendored tree still runs bash — a false claim at the front door, the
 cost §What the objectives are not names.
 
-**The Windows leg's round 7 is cause-only — ruled 2026-08-31 by the operator in consult**, one
-round past the rider rule of 2026-08-30 and not a loop: its single change is the instrument, so
-`check-graph`'s generator spawn prints the generator's own output on any non-zero exit whichever
-branch took it, and no repair ships in the same round. The alternative refused is a third
-fix-and-observe round. Rounds 5 and 6 each shipped a repair reasoned on Linux, and round 6 came
-back with the failure the instrument was built to explain and an empty cause; a guessed repair
-buys one bit per push, the instrument buys the cause. Discharge event: round 7's finding recorded
-on `platform-support-ci-matrix`, at which point the rider rule resumes and this paragraph is
-deleted.
-
 **The deferred pool's intake is triaged at the drain, and machinery findings are dormant by
 default — ruled 2026-08-30 by the operator in a consult, on a re-measured pool.** The 2026-08-23
 ruling above bought its exits once — the pool fell from 252 to 228 on the day — and then intake
@@ -488,21 +478,6 @@ argues from a delivery process that the port changes under it, so working it ear
 the port then re-litigates. Discharge event: the oracle's owed count reads zero, at which point
 the run is over and this paragraph is deleted; the triage sentence above it is the sequence and
 stays.
-
-**The port-only run yields exactly once, to the Windows leg's round 7 — ruled 2026-08-31 by the
-operator, relayed by the lead.** Two standing rulings had come into conflict rather than one
-being wrong: round 7 was ruled cause-only above on 2026-08-31, and the port-only run ruled the
-same day made every iteration a port cut, so `harness-hook-arm-port` was a cut and the ruled
-instrument was not built. The leg came back red with its cause still empty, byte-identical to the
-round-6 record and with no generator output, which is the second run to buy nothing. So round 7 is
-sequenced next and the no-yield sentence above is suspended for that one iteration rather than
-amended. The alternative refused is recording the recurring cost and continuing to port, which
-keeps the price visible but keeps paying it: every Windows run until the instrument ships re-buys
-the same empty cause, and the instrument exists precisely because a guessed repair buys one bit
-per push. This yield is not a precedent for a second — the port-only run's own discharge event is
-unchanged, and the oracle read 61 owed at `harness-hook-arm-port`'s close. Discharge event: round
-7's finding recorded on `platform-support-ci-matrix`, the same event that retires the cause-only
-paragraph above, at which point this paragraph is deleted with it.
 
 **A sequence remainder of one is not a finished port, and reading it as one is the misreading
 this paragraph exists to stop — operator-ruled 2026-08-25.** The completion predicate is the one
