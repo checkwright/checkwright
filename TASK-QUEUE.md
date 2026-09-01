@@ -4952,6 +4952,13 @@
   got ENOENT instead of the prompt that would have named the wrong path. Both halves of that clause
   expired 2026-09-01: `64cce1d9` deleted the path and pruned its grant, and the capability is now
   `--emit md-section`, so repointing a dead grant at it would mint a fresh one.
+  **A THIRD instance, and it sharpens the corpus question this entry calls its open part.**
+  `65e22a28`'s message states that `cite-survey.sh` "had no grant at all" — true of the COMMITTED
+  allowlist and false of the local overlay, which still granted the deleted path until the operator
+  pruned it 2026-09-01. So a porting session checked the tracked half, read clean, and left a dead
+  grant live on the machine it was working on. That is the tracked-versus-local split this entry
+  already names, now with a measured instance: the gateable corpus is the one that was checked, and
+  the ungateable one is where the dead grant survived.
   **Why the existing tool cannot see it.** `compare-settings-allow.sh` reports redundancy (a
   committed glob already grants the entry) and breadth (a declared probe the glob auto-allows).
   Both compare *globs against globs*; neither resolves a target. A dead entry is redundant with
@@ -9186,15 +9193,70 @@
   into one date, which presumes the once spelling) and from
   `recurrence-declaration-grammar-ungated` (a declaration the oracle cannot read at all). This one
   is a well-formed, readable declaration whose meaning is undetermined.
-  **Cost while deferred:** low and silent — no instance is known to have occurred, so this is a
-  latent ambiguity rather than an active defect; it becomes a wrong promotion decision the first
-  time one does, with nothing in the tree to flag it.
+  **Cost while deferred:** low and silent — it is a latent ambiguity rather than an active defect,
+  becoming a wrong promotion decision the first time one occurs with nothing in the tree to flag it.
+  **That reading is DOUBLY STALE as of 2026-09-01 and both halves are corrected here:** an instance
+  HAS occurred (below), and the ambiguity now has a ruled resolution path, so what remains is not an
+  undetermined meaning but an unbuilt encoding — `record-stamp-encoding-compression` owns it.
   ruled: same-day-recurrence-date-multiplicity lead 2026-08-30 own-authority
+  ruled: same-day-recurrence-date-multiplicity operator 2026-09-01 lead-relay
   Filed 2026-08-30 at scope by lead ruling, from the recurrence pre-emption census recorded at
   `.workflow/survey-record.md`; both readings recorded rather than one picked, the ambiguity not
   being a stage's or a lead's to close by fiat. **First live instance 2026-09-01**, at this close's
   drain: `editor-diagnostic-unruled`'s instances 3 and 4 both fell on that date, so the entry below
-  had to pick a spelling to be written at all, and picked the once reading.
+  had to pick a spelling to be written at all, and picked the once reading. **SUPERSEDED rather
+  than decided 2026-09-01 by operator ruling:** the direction is to re-encode the stamp so the case
+  cannot arise, not to pick once-versus-twice, so the once spelling stands unoverturned on its
+  merits and stops mattering. This entry closes when that encoding lands.
+
+- **record-stamp-encoding-compression** [design-pending] — buy discrimination in the queue's
+  record stamps by RE-ENCODING them rather than by adding text, the deferred pool's per-entry
+  budget being what makes added text the wrong trade.
+  **Operator-ruled 2026-09-01, and the ruling picked a route none of the three escalated options
+  offered.** The escalation asked how to disambiguate two same-day recurrences and proposed, among
+  others, an iteration slug beside the date. That was REFUSED: adding a field spends the budget the
+  format is trying to protect. The worked example given is `YYYY-MM-DD` → a dashless `YYMMDDHHMM` —
+  **the same ten columns, now carrying hour and minute** — which discriminates same-day instances
+  outright and needs no slug. Array notation for multiple stamps is named as a further step, and
+  the direction is stated to generalize to other task-record components rather than to
+  `recurrence:` alone.
+  **The envelope is two knobs and compression pays on both axes**, which is why this is not a
+  tidiness argument: `QUEUE_KIT_WRAP_BUDGET=100` and `QUEUE_KIT_ENTRY_LINE_CAP=50`
+  (`queue-kit/lib/queue.sh:37,39`) bound columns and lines separately, so a shorter stamp frees
+  columns directly and freed columns let prose reflow into fewer lines.
+  **The column axis is WITNESSED LIVE this iteration, not projected.** `/spec` was blocked outright
+  because `native-gate-port-remaining-corpus`'s lead line could not carry two `spec:` amendment refs
+  100 columns — over by two at any legal naming, measured rather than estimated — and the lead ruled
+  option (B) around it. That blocker is the cost this entry is about, and the ruled direction would
+  have dissolved it instead of routing past it.
+  **The gain is the ENCODING, not the list, and the entry says so because the format already has
+  the list.** queue-kit/SPEC.md:440-442 already defines
+  `recurrence: <slug> <YYYY-MM-DD> [<YYYY-MM-DD>…]`, multiple dates on one line today.
+  **A second interaction dissolves with it.** queue-kit/SPEC.md:449-456 grounds the self-naming
+  slug field partly in `check-queue-hygiene` rejecting exact-duplicate lines, naming same-day
+  recurrence on two entries as "exactly the case the declaration exists to record". Under a
+  minute-bearing stamp those two lines stop colliding at all, so one of that field's two stated
+  grounds is retired by the encoding rather than argued against.
+  **The costs, probed rather than listed, because a reader meeting this cold should price it.**
+  Date stamps span `recurrence:` and `ruled:` declarations, filed-prose provenance lines,
+  gap-inbox bullets, survey-record headings and WORKFLOW-STATE stamps, plus the evidence manifest's
+  OPTIONAL trailing date field — optional, so the relayed cost picture overstated that one and it is
+  corrected here. FOUR crate gates carry a date predicate (`stage_evidence.rs`, `stage_entry.rs`,
+  `gap_inbox_neutrality.rs`, `evidence_manifest.rs`, the first two spelling their own `is_date`),
+  and SEVEN shell tools stamp `date +%F` outside fixtures and smoke, none of which stamps a time
+  today. `YY` also drops the century, which is a deliberate trade rather than an oversight to find
+  later.
+  **Why `[design-pending]`:** the ruling fixes the DIRECTION and not the grammar. Open: which
+  components take the new encoding and in what order, whether the change is a migration or a
+  read-both-write-new window, and what each date-reading gate asserts across it — a wrong answer
+  reds every governed surface at once.
+  **Cost while deferred:** low and bounded, and it is the cost of the thing it replaces — every
+  entry that needs discrimination keeps buying it with text against a budget that already blocked
+  one stage this iteration.
+  ruled: record-stamp-encoding-compression operator 2026-09-01 lead-relay
+  Filed 2026-09-01 by close under CLAUDE.md §Housekeeping's operator-directed exception, staged and
+  committed in one motion. FILED AND NOT BUILT: the port-only run forecloses building it while
+  `--tree` reads owed, and this is no hotfix.
 
 - **editor-diagnostic-unruled** [design-pending] — the harness LSP channel contradicts the tree's
   own oracles on crate-touching commits, and no surface rules that channel out as an oracle.
@@ -9202,9 +9264,13 @@
   born in the icebox at `9845f2c3` this same iteration, on the stated basis that the channel had
   "contradicted the tree's own oracle TWICE ... one candidate shape is to do nothing, which is what
   makes this dormant". Two further instances have since fired, so the eviction's premise is spent
-  and §The icebox tier's own round trip applies — a dated `recurrence:` line is a live promotion
-  trigger, and its assertion (B) bars that line from a one-line entry. The tier's rule applied,
-  not a reversal of the evicting session's judgment.
+  and §The icebox tier's own round trip applies. **The ground is ELIGIBILITY, not grammar** — the
+  stronger reading, added by the lead sustaining the move: queue-kit/SPEC.md:220-224 requires an
+  iceboxed entry to have no live promotion trigger and names "a dated `recurrence:` line" as one, so
+  stamping the judged recurrence makes the entry ineligible for the tier by its own eligibility
+  rule. The move out is FORCED, which is exactly why the drain is not promoting anything. The
+  grammatical reading — assertion (B) barring a body line from a one-line entry — is a second,
+  weaker fence around the same conclusion. Not a reversal of the evicting session's judgment.
   **The four instances, all 2026-09-01.** (1) and (2) are the icebox basis. (3) At `64cce1d9` the
   channel reported nine rustc errors — E0603 private-import on `emit/mod.rs`'s `targets`,
   `corpus`, `relative` and `read_text` from `md_index.rs` and `pub_index.rs`, and E0277 missing
@@ -9224,6 +9290,7 @@
   — name the channel in the oracle-first rule as a non-oracle, or leave it to session judgment —
   so picking one is a doctrine call rather than a defect repair.
   recurrence: editor-diagnostic-unruled 2026-09-01
+  ruled: editor-diagnostic-unruled lead 2026-09-01 own-authority
   Filed 2026-09-01 at scope's boundary drain and born in the icebox; re-tiered the same day by
   close on instances 3 and 4, which postdate the eviction. Both fell on one calendar day, so the
   single-date spelling here rests on lifecycle-kit's `(slug, date)` idempotence and the ambiguity
