@@ -27,8 +27,8 @@ hook, and register its gate in `gates.list`.
 ## Quick start
 
 ```bash
-bash context-kit/bin/md-index.sh <file.md>           # outline before body
-bash context-kit/bin/pub-index.sh <component>/src/   # public API surface
+bash gate-sdk/bin/run-gates.sh --emit md-index <file.md>          # outline before body
+bash gate-sdk/bin/run-gates.sh --emit pub-index <component>/src/  # public API surface
 ```
 
 ## Contracts

@@ -7,8 +7,9 @@ set -uo pipefail
 cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" 2>/dev/null || exit 0
 REPO_ROOT="$(pwd -P)"
 
-RUN_GATES="gate-sdk/bin/run-gates.sh"             # the --emit front-end: queue-kit's queue surface, bridged
-CTX_BIN="context-kit/bin"                         # context-kit index tools
+RUN_GATES="gate-sdk/bin/run-gates.sh"             # the --emit front-end: the queue surface and the three index arms, bridged
+CTX_BIN="context-kit/bin"                         # context-kit env probe
+NATIVE_BIN="$(bash -c 'source gate-sdk/lib/gate.sh; gate_native_bin' 2>/dev/null)"  # the binary those arms dispatch to
 DRIFT_ARM="${CONTEXT_KIT_DRIFT_REPORT:-drift-report}"  # drift-kit trend line: an --emit arm name
 STAGE_RULES="${CONTEXT_KIT_STAGE_RULES:-doctrine-kit/bin/stage-rules.sh}"  # doctrine-kit craft-rule router
 STATE_FILE="${CONTEXT_KIT_STATE_FILE:-${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt}"  # lifecycle stage cursor
@@ -35,12 +36,13 @@ mapfile -t changed < <(
         | awk -F/ 'NF>1 { print $1 }' | sort -u \
         | while read -r d; do [[ -d "$d/src" ]] && echo "$d"; done
 )
-if [[ ${#changed[@]} -gt 0 && -f "$CTX_BIN/pub-index.sh" ]]; then
+# spec: context-kit/SPEC.md §The session-context hook — the public-surface block guards on the gate binary, not on a script path: the index tools are arms of it now, and `exec_arm` exits 2 with a diagnostic this call site swallows, so a guard taken *after* the header would print the header and nothing under it on every host the artifact roster does not cover. Read the binary first and the block is absent rather than empty — the way the deleted `-f` guard degraded. The lookup runs in a subshell because the kit library exits 2 on a malformed config, and this hook never fails a session.
+if [[ ${#changed[@]} -gt 0 && -n "$NATIVE_BIN" && -x "$NATIVE_BIN" ]]; then
     echo "Uncommitted changes touch: ${changed[*]}"
     echo "Public API surface of those components (pub-index — read the file for bodies):"
     echo
     for c in "${changed[@]}"; do
-        bash "$CTX_BIN/pub-index.sh" "$c/src/" 2>/dev/null || true
+        bash "$RUN_GATES" --emit pub-index "$c/src/" 2>/dev/null || true
     done
     echo
 fi
@@ -111,9 +113,9 @@ fi
 cat <<EOF
 Before opening source for a task, run the matching surface index first
 (index, then read the one you need):
-  • bash $CTX_BIN/pub-index.sh <component>/src/    — public API surface (per-language extractors; ships rust, ts)
-  • bash $CTX_BIN/md-index.sh <file.md>            — large markdown / SPEC outline
-  • bash $CTX_BIN/md-section.sh <file.md> "<head>" — extract one section by heading
+  • bash $RUN_GATES --emit pub-index <component>/src/    — public API surface (ships rust, ts)
+  • bash $RUN_GATES --emit md-index <file.md>            — large markdown / SPEC outline
+  • bash $RUN_GATES --emit md-section <file.md> "<head>" — extract one section by heading
 EOF
 
 # spec: context-kit/SPEC.md §The session-context hook — step 8 suppressed for a lead (executor-facing)

@@ -467,6 +467,29 @@ pub fn find_with_prune(
     root: &Path,
     prune: &dyn Fn(&str) -> bool,
 ) -> Result<Vec<PathBuf>, String> {
+    walk_pruned(root, prune, Links::Skip)
+}
+
+// spec: context-kit/SPEC.md §Index-first reading — `find`'s own entry model, which that section's
+// traversal rule needs and a gate corpus does not: a symlink is an entry, matched and read through.
+// A gate asking which tracked *source files* these are keeps answering `Skip`.
+pub enum Links {
+    Skip,
+    Entry,
+}
+
+pub fn find_link_entries_with_prune(
+    root: &Path,
+    prune: &dyn Fn(&str) -> bool,
+) -> Result<Vec<PathBuf>, String> {
+    walk_pruned(root, prune, Links::Entry)
+}
+
+fn walk_pruned(
+    root: &Path,
+    prune: &dyn Fn(&str) -> bool,
+    links: Links,
+) -> Result<Vec<PathBuf>, String> {
     // spec: gate-sdk/SPEC.md §check-reads-couples — every walk passes here, so recording at
     // this one line is what makes unit test A's observation complete.
     #[cfg(test)]
@@ -496,7 +519,7 @@ pub fn find_with_prune(
                     continue;
                 }
                 stack.push(p);
-            } else if meta.is_file() {
+            } else if meta.is_file() || (matches!(links, Links::Entry) && meta.is_symlink()) {
                 out.push(p);
             }
         }

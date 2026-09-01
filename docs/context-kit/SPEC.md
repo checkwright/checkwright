@@ -25,63 +25,133 @@ stay in the consumer repo (§Out of scope).
 
 ## Index-first reading
 
-"Index, then read the one you need" — the pattern every tool serves. All
-three are advisory `bin/` tools; none joins `gates.list`.
+"Index, then read the one you need" — the pattern every tool serves. All three
+are **advisory arms of the gate binary**, reached through the battery runner's
+`--emit` front-end (`bash gate-sdk/bin/run-gates.sh --emit <name> …`); none joins
+`gates.list` and none returns a verdict a battery reads, which is the non-gate
+class gate-sdk/SPEC.md §The non-gate arm rules. Each is a **bridged-arm table
+member** rather than a hardcoded flag, and for the first and third that family is
+forced rather than chosen: a tool that resolves a consumer knob and is ported as a
+hardcoded flag resolves platform defaults and silently ignores every override.
 
-- **`md-index.sh [paths…]`** — compact structural index for Markdown:
+- **`--emit md-index [paths…]`** — compact structural index for Markdown:
   heading hierarchy with line numbers, each heading followed by its
   section's first sentence, plus a per-file line count (the cost signal —
   whether to read whole or by section). Defaults to the whole tree, minus
-  `CONTEXT_KIT_PRUNE_DIRS`.
-- **`md-section.sh <file> <heading>`** — prints one section, from the
-  matched heading to the next heading of the same or higher level. Match
-  is case-insensitive and tolerates a leading `§` (so a spec citation
-  pastes directly); headings inside fenced code blocks are not mistaken
-  for structure. The companion: find the heading in the index, extract
-  just that body.
-- **`pub-index.sh [paths…]`** — compact public API surface: every public
+  `CONTEXT_KIT_PRUNE_DIRS`, which is its one declared read.
+
+  Four observable properties **are** the contract, each pinned by an
+  index-tests golden (§Testing), because each is a place a reimplementation
+  would quietly differ:
+
+  - **Per-file block shape** — `<repo-relative path>  (<N>L)` where `N` is the
+    `wc -l` newline count, then one indented row per heading
+    `<indent><hashes> <heading>:<lineno>`, or
+    `<indent><hashes> <heading>:<lineno>  — <first sentence>` where a first
+    sentence was found, then a blank line — after the last block too.
+  - **The first-sentence rule** — the first non-blank line after the heading
+    that is not inside a fence and is not itself a heading or a `---` rule;
+    markdown link syntax reduced to its text, `*`, `_` and backticks stripped,
+    cut at the first `.`, `!` or `?`, else at 120 characters.
+  - **Traversal and order** — `*.md` under the given paths, `find`'s own entry
+    model (a symlinked file is an entry, matched by name and read through),
+    `CONTEXT_KIT_PRUNE_DIRS` matched on the leaf basename, results in byte order
+    of the walked path — absolute in the default form, the default target being
+    the repository toplevel. A file the walk reached but the reader cannot open
+    contributes nothing rather than failing the run.
+  - **The empty case** — `No Markdown files found in <targets>`, where the
+    targets are the ones given and default to the repository toplevel, so the
+    default form of the message carries an absolute path.
+
+  The heading scan is deliberately **fence-blind** where the first-sentence
+  search above is not: a `##` inside a fenced block is a row. That asymmetry is
+  the shell form's and the goldens record it, so it is contract rather than
+  oversight.
+
+- **`--emit md-section <file> <heading>`** — prints one section, from the
+  matched heading to the next heading of the same or higher level. Match is
+  **case-insensitive**, tolerates a **leading `§`** (so a spec citation pastes
+  directly), and compares the heading's **text** — hashes and surrounding
+  whitespace stripped — rather than a line prefix, so a query is a heading name
+  and never a raw heading line. Headings inside fenced code blocks are not
+  mistaken for structure **at either end**: one opens no section, and one does
+  not close the section around it. The companion: find the heading in the index,
+  extract just that body.
+
+  **The matcher is this arm's and the walk is the crate's.**
+  `section::sections` bounds a section by heading level exactly as this tool
+  does, and that half is reused: the arm masks fenced lines out and hands the
+  masked view to that walk, so the fence rule and the match rule stay the
+  matcher's while the bounding stays one implementation. Widening
+  `section::sections` itself would move its other callers across every call
+  site to save one function.
+
+  Matching is **exact on the heading's text**, and the near-miss behaviour that
+  follows from it — empty on a near miss, correct on an exact query — is a
+  stated limit rather than a defect the port fixed.
+
+  **Its declared knob roster is empty**, because the arm resolves no knob; it is
+  a bridged-arm table row regardless, since table membership is what makes
+  `--emit md-section` reach it at all. Exit statuses: `0` with the section on
+  stdout; **`2`** with a diagnostic on stderr for a missing argument, a file
+  that is not there, and a query matching no heading. That last was exit 1 in
+  the deleted shell driver; no caller read the 1.
+
+- **`--emit pub-index [paths…]`** — compact public API surface: every public
   item with kind, name, and line, sorted by kind then name, in a per-file
   block headed by a count. It is a **dispatcher over per-language
-  extractors**: the dispatcher owns traversal (the prune set is
-  `CONTEXT_KIT_PRUNE_DIRS`), the kind-then-name sort, and
-  the row formatting (the index-tests goldens assert the exact shape); each
-  extractor is a sourced bash file
-  defining exactly two names — a `PUB_LANG_GLOBS` array (the find globs, e.g.
-  `*.rs`) and a `pub_lang_extract <file>` function emitting unsorted
-  `kind name lineno` rows. Two names, both read every run; no other
-  extractor-file surface is contract.
+  extractors**, and the port narrowed the tool without narrowing the extension
+  point. The dispatcher owns three jobs: traversal (the prune set is
+  `CONTEXT_KIT_PRUNE_DIRS`, the walk `md-index`'s above), the kind-then-name
+  sort (bytewise, then the whole row), and the row formatting under a
+  `<rel>  (<count>)` block header — the index-tests goldens assert the exact
+  shape.
 
-  Extractors resolve registry-style (the `gates.list` consumer-first
-  precedent): a shipped extractor lives at `lib/pub-lang/<lang>.sh`, and a
-  consumer extractor of the same basename under `CONTEXT_KIT_PUB_LANG_DIR`
-  (default `${GATE_SDK_GATES_DIR:-scripts}/pub-lang`) shadows it. The enabled
-  set is `CONTEXT_KIT_PUB_LANGS`, whose default is every shipped extractor,
-  derived from the `lib/pub-lang/` roster at run time — never maintained as a
-  list (derivation-first). Both knobs are read through the consumer config
-  seam (`context-config.sh`), which the tool sources like the meter and the
-  footprint do.
+  **Resolution stays consumer-first** (the `gates.list` precedent). For each
+  enabled language, a file at `<CONTEXT_KIT_PUB_LANG_DIR>/<lang>.sh` is used if
+  it exists; otherwise the built-in extractor for that language; otherwise the
+  arm refuses at exit 2 naming the language, the path it looked for and what is
+  built in. The built-in roster replaces the deleted `lib/pub-lang/` leg rather
+  than removing it, so a consumer's `rust.sh` still shadows the shipped Rust
+  grammar.
 
-  Two extractors ship: `rust.sh` (every `pub`/`pub(crate)`/`pub(super)` item —
-  the grep-grade grammar the tool has always carried) and `ts.sh`
-  (TypeScript: `export`-declared `function`/`class`/`interface`/`type`/`enum`/
-  `const`/`let`/`var`, `const enum`, and `export default`, over `*.ts` and
-  `*.tsx` with `.d.ts` included as public surface by construction). Both are
-  grep-grade: re-exports (`export { x } from`) and multi-line declarations are
-  stated honest limits, not parsed. The dispatcher shipped when demand named
-  it — a second adopter's tree carries a TypeScript surface its Rust-only copy
-  could not index — not before: an unrequested plugin framework would have
-  been scaffolding, and AST/tree-sitter parsing is above the tool's grep-grade
-  portability altitude (shell over coreutils, Tier one).
+  **A consumer extractor is still a sourced bash file defining exactly two
+  names.** `PUB_LANG_GLOBS` (the find globs, e.g. `*.rs`) and
+  `pub_lang_extract <file>` (emitting unsorted `kind name lineno` rows) are
+  unchanged contract; two names, both read every run, and no other
+  extractor-file surface is contract. The arm runs one through **two `bash`
+  spawns per language** — one sources it and prints `PUB_LANG_GLOBS`, one
+  sources it and calls `pub_lang_extract` over the file list the arm walked.
+  Two rather than one because the globs are needed *before* the walk, and one
+  spawn per contract name rather than a private protocol so the seam a consumer
+  writes against does not change shape. The per-file framing inside the second
+  spawn is the dispatcher's own and reaches no consumer name.
+
+  **Two extractors are built in**, `rust` (every `pub`/`pub(crate)`/`pub(super)`
+  item of the eight declared kinds) and `ts` (TypeScript: `export`-declared
+  `function`/`class`/`interface`/`type`/`enum`/`const`/`let`/`var`, `const enum`
+  folded to `enum`, and `export default` named or falling back to the literal
+  `default`, over `*.ts` and `*.tsx` with `.d.ts` included as public surface by
+  construction). Both stay **grep-grade**, re-expressed against the crate's
+  POSIX ERE matcher: re-exports (`export { x } from`) and multi-line
+  declarations are stated honest limits, not parsed. They are **not arms of
+  their own** — their only caller is the dispatcher and their only output
+  contract is the rows it consumes, so a flag each would mint two spellings with
+  one caller between them and put a second entry point into the emission path.
+  The dispatcher shipped when demand named it — a second adopter's tree carries
+  a TypeScript surface its Rust-only copy could not index — not before: an
+  unrequested plugin framework would have been scaffolding, and AST/tree-sitter
+  parsing is above the tool's grep-grade portability altitude.
 
 **One traversal-exclusion set, read by both walkers.** `CONTEXT_KIT_PRUNE_DIRS`
-is the kit's single exclusion array; `md-index.sh` and `pub-index.sh` each build
-their `find` exclusions from it instead of holding a private literal, and both
-resolve it by sourcing `lib/context.sh` — the kit's one owner of the
-consumer-config seam, which the meter and the footprint already source. Two
-private literals had drifted apart *and* from the tree: neither carried the
-harness's isolated-agent worktree leaf, so both walkers descended into a second
-full copy of the repository and indexed it as tree content, which for `md-index`
-is every governed markdown surface twice.
+is the kit's single exclusion array; the `md-index` and `pub-index` arms share
+one walk over it instead of each holding a private literal, and both receive it
+through gate-sdk's config bridge, which resolves it by sourcing `lib/context.sh`
+— the kit's one owner of the consumer-config seam. Two private literals had
+drifted apart *and* from the tree: neither carried the harness's isolated-agent
+worktree leaf, so both walkers descended into a second full copy of the
+repository and indexed it as tree content, which for `md-index` is every
+governed markdown surface twice.
 
 The match is on the **leaf basename**, the same rule and the same reasoning
 gate-sdk/SPEC.md §lib/gate.sh fixed for its own set: pruning a parent path also
@@ -96,9 +166,9 @@ question, filed rather than taken. They are **not one fact spelled twice**: one
 carries leaves gate-sdk's does not and omits two that it has,
 gate-sdk/SPEC.md §lib/gate.sh owning that set's membership and this knob's
 default owning this one,
-and a hard read of `GATE_PRUNE_DIRS` would make an advisory `bin/` tool fail in a
-tree that vendored context-kit without gate-sdk, so a consumer assigns this knob
-in its own config rather than deriving it from a gate library.
+and deriving this one from the gate library would make context-kit's own
+exclusion rule a gate-sdk read, so a consumer assigns this knob in its own config
+instead.
 
 ## The session-context hook (template)
 
@@ -149,11 +219,21 @@ Steps, in order:
    reads the tier reads `--emit queue-index --icebox-candidates` rather than this
    index.
 2. **Dirty-surface pre-run** — for each component with uncommitted
-   changes, pre-run the matching surface index (default: `pub-index` over
-   top-level dirs containing `src/`), so a resumed session's editing
+   changes, pre-run the matching surface index (default: `--emit pub-index`
+   over top-level dirs containing `src/`), so a resumed session's editing
    surface is already in context. Component detection and the index
    command live in a marked consumer section of the template — they are
    layout assumptions, not mechanism.
+   **The step's availability guard reads the gate binary, and the ordering is
+   the contract rather than a detail.** The index is an arm now, so the guard is
+   that the binary is present and executable and it is taken **before** the block
+   prints its header: `exec_arm` exits 2 with a diagnostic that this call site
+   swallows on both channels, so a guard taken after the header would print
+   `Public API surface of those components…` followed by nothing on every host the
+   artifact roster does not cover. Read first, the block is **absent rather than
+   empty** — the way the deleted script-path guard degraded. The lookup runs in a
+   subshell, because the kit library exits 2 on a malformed config and this hook
+   never fails a session.
 3. **Drift line** — one `--emit <arm> --trend` summary line when the
    consumer has a drift report; silently absent otherwise (drift-kit owns
    the report; the seam is this optional line).
@@ -926,13 +1006,8 @@ no bare collection total.
 
 ```
 context-kit/
-  bin/md-index.sh
-  bin/md-section.sh
-  bin/pub-index.sh               # dispatcher over the per-language extractors
   lib/context.sh                 # sourced config loader + the kit's knob defaults; the config bridge sources it
   lib/toolfloor.sh               # sourceable owner: the probe roster + the floor predicate
-  lib/pub-lang/rust.sh           # shipped extractor: Rust public items
-  lib/pub-lang/ts.sh             # shipped extractor: TypeScript export surface
   bin/always-loaded.sh
   bin/env-probe.sh               # derives the marker-bounded local env profile
   bin/run-index-tests.sh         # expected-output runner for the bin tools
@@ -959,20 +1034,18 @@ context-kit/
   smoke/agents-md.sh             # the AGENTS.md adapter smoke (its own validate suite)
 ```
 
-**The two library members beside `lib/context.sh` are owed to the port, and each
-is owed for its own reason** — gate-sdk/SPEC.md §The kit-library port disposition
-reaches neither, so the silence here is not an undecided class.
-`lib/toolfloor.sh` rides the config bridge's `lib/*.sh` glob and resolves no
-bridged knob (`PROBE_SET` carries no kit prefix); what sequences it is that its
-roster is read on the **installer** path and by `check-install-toolchain`'s
-parity assertion, so it moves behind the installer's own two unresolved port
-readings, `installer-boundary-behind-invoke-port-reading` and
-`consumer-smoke-runner-port-disposition`. The `lib/pub-lang/` extractors sit one
-directory deeper and are never sourced by the bridge at all; they are the
-**bundled members** of the consumer-first plug-in registry `bin/pub-index.sh`
-resolves, which `native-gate-port-remaining-corpus`' ruling (1) sends in-crate
-while the seam survives — so their port waits on that resolver, itself owed. The
-entry that owns all three is `kit-library-port-residue`.
+**The one library member beside `lib/context.sh` is owed to the port** —
+gate-sdk/SPEC.md §The kit-library port disposition does not reach it, so the
+silence here is not an undecided class. `lib/toolfloor.sh` rides the config
+bridge's `lib/*.sh` glob and resolves no bridged knob (`PROBE_SET` carries no kit
+prefix); what sequences it is that its roster is read on the **installer** path
+and by `check-install-toolchain`'s parity assertion, so it moves behind the
+installer's own behind-invoke relocation, whose live entry is
+`powershell-installer-surface`. The entry that owns its port is
+`kit-library-port-residue`. The `lib/pub-lang/` extractors that sat beside it are
+**discharged**: they were the bundled members of the registry `pub-index`
+resolves, and they moved in-crate behind the surviving seam in the cut that
+ported that resolver (§Index-first reading).
 
 The install also seeds the committed baseline the footprint contract holds
 (§The consumer footprint): after wiring the hook it runs
@@ -1014,8 +1087,7 @@ member receives its knobs this way whatever the binary carries.
 header**: being the bridge's sole resolver for the `CONTEXT_KIT_*` knobs is
 exactly the property above, read as a port disposition — gate-sdk/SPEC.md §The
 kit-library port disposition rules the class. The ruling reaches this file alone
-among the kit's libraries; `lib/toolfloor.sh` and the `lib/pub-lang/` extractors
-are owed and their sequencing is below.
+among the kit's libraries; `lib/toolfloor.sh` is owed and its sequencing is below.
 
 **Every default here is repo-relative, and that is a bridge requirement rather
 than a style.** A bridged value is baked verbatim into the tracked pre-commit
@@ -1031,6 +1103,21 @@ derivation as `context_memory_dir_default()`; it left with the shell gate that
 was its only caller, so the layout rule has one implementation rather than two
 agreeing ones.
 
+**Empty-means-derive has a second member, and the ground is the same one read
+from a different direction.** `CONTEXT_KIT_PUB_LANGS` defaults to empty too, and
+its reason is not that its value is absolute but that no repo-relative literal
+can express it at all: the roster it names is the `pub-index` arm's built-in
+extractor set, which lives in the crate. Transcribing that set into shell would
+be the maintained list derivation-first forbids and a second producer of one
+roster, so the expansion belongs to the arm — the one reader of the knob — and
+the library states the default and stops. **Its sibling `CONTEXT_KIT_PUB_LANG_DIR`
+moved here verbatim** from the deleted dispatcher that held it inline, in the
+commit that deleted it, so the documented default and the supplying site became
+one string; the rule that forced the move is gate-sdk/SPEC.md §The non-gate arm's,
+and it is load-bearing rather than tidy — the bridge resolves a declared knob by
+sourcing exactly this library and **exits 2 on a knob it does not define**, so a
+default left beside the compiled reader would refuse the whole arm.
+
 - `CONTEXT_KIT_SURFACES` — array of always-loaded files; default
   `("CLAUDE.md")`. The measured surface is agent-file-name-agnostic: a consumer
   whose harness reads `AGENTS.md` (or any other always-loaded agent file) sets
@@ -1039,17 +1126,23 @@ agreeing ones.
   `smoke/agents-md.sh` adapter smoke exercises exactly that: an `AGENTS.md`
   scratch consumer whose battery is green and whose meter and footprint measure
   `AGENTS.md`.
-- `CONTEXT_KIT_PUB_LANGS` — array naming the `pub-index` extractors to
-  enable; default every shipped extractor, derived from the `lib/pub-lang/`
-  roster at run time (never a maintained list).
+- `CONTEXT_KIT_PUB_LANGS` — array naming the `pub-index` extractors to enable;
+  default **empty**, and empty means *derive it* rather than *no languages*: the
+  one reader of the knob expands it to the arm's built-in extractor roster
+  (§lib/context.sh, the `CONTEXT_KIT_MEMORY_DIRS` shape). Setting it to an
+  explicitly empty array is therefore the same input as leaving it unset, which
+  is the one behaviour the port collapsed — no shipped sentence promised that
+  spelling as a way to disable the tool, and a sentinel meaning "none" would mint
+  vocabulary for a use nobody has.
 - `CONTEXT_KIT_PRUNE_DIRS` — array of **leaf basenames** both index walkers
   exclude from their `find` (§Index-first reading); default the union of what the
   two tools carried privately plus the harness worktree leaf — `.git`,
   `node_modules`, `target`, `dist`, `build`, `worktrees`. Deliberately not
   gate-sdk's set and deliberately not derived from it.
 - `CONTEXT_KIT_PUB_LANG_DIR` — the consumer extractor dir searched before the
-  kit's `lib/pub-lang/` (a same-basename file shadows the shipped one);
-  default `${GATE_SDK_GATES_DIR:-scripts}/pub-lang`.
+  arm's built-in roster (a same-basename file shadows the shipped grammar);
+  default `${GATE_SDK_GATES_DIR:-scripts}/pub-lang`, supplied by
+  §lib/context.sh — the documented default and the supplying site are one string.
 - `CONTEXT_KIT_HOOK_CMD` — command whose output line count approximates
   the steady-state hook body; default queue-kit's
   `run-gates.sh --emit queue-index --collapse-deferred` when resolvable, else empty
@@ -1115,20 +1208,29 @@ and a template with a dozen knobs is harder to own than a marked section.
 
 ## Testing
 
-The three index tools and the meter are advisory and speak plain text, so
+The three index arms and the meter are advisory and speak plain text, so
 the gate contracts do not fit; the kit ships an expected-output runner
 instead: `index-tests/` holds a small fixture corpus (Markdown with nested
 headings, fences, and link-bearing first sentences; Rust with the pub-item
-kinds; TypeScript with every kind the `ts.sh` grammar claims — including
+kinds; TypeScript with every kind the `ts` grammar claims — including
 `const enum` and `export default` — beside re-export and non-export lines it
 must skip; a baseline file) beside expected outputs, and
-`bin/run-index-tests.sh` runs each tool over the corpus and asserts exact
-output, failing on any diff. The Rust golden is the no-regression assertion
-for the extractor-dispatcher refactor: it stays byte-identical across it. A
-consumer-shadowing case points `CONTEXT_KIT_PUB_LANG_DIR` at a scratch dir
-whose `rust.sh` emits a marker row, exercising the consumer-first resolution
-order (the shadow's output, not the shipped grammar's, is what the golden
-records). The floor predicate rides the same runner rather than a fixture pair —
+`bin/run-index-tests.sh` drives each one through the `--emit` front-end over
+that corpus and asserts exact output, failing on any diff. **The goldens are the
+port's parity oracle and they are unusually strong**: they were produced by the
+shell implementations the arms replaced, so holding them byte-for-byte is a
+cross-substrate comparison over a committed corpus rather than an assertion of
+parity. The runner reaches the arms through the front-end rather than the binary,
+because that is what resolves the bridged environment two of them declare.
+A consumer-shadowing case points `CONTEXT_KIT_PUB_LANG_DIR` at a scratch dir
+whose `rust.sh` emits a marker row: it is the extractor seam's **end-to-end
+proof**, the consumer-first resolution order and the `bash` spawn that executes a
+consumer extractor both exercised, with the shadow's output rather than the
+built-in grammar's recorded in the golden. **The runner itself stays shell**, and its ground is its own section rather than
+the arms it drives: it declares §Testing, and that group is blocked as a whole by
+`index-tests/toolfloor-cases.sh`, which exercises `lib/toolfloor.sh`'s floor
+predicate — a library sequenced behind the installer's behind-invoke relocation.
+The floor predicate rides the same runner rather than a fixture pair —
 it is a sourced function, not a gate: `index-tests/toolfloor-cases.sh` sources
 `lib/toolfloor.sh` and prints one line per (element, banner) pair, so the closed
 verdict set, the spellings of an unconstrained member, and the

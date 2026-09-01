@@ -2000,7 +2000,9 @@ name out of `gates::REGISTRY`. It also carries arms that are **not** gates —
 `--list`, `--reads`, `--needs`, `--knobs`, `--source-stamp`, `--queue-parity`,
 `--declaration-parity`, `--evidence-lib-parity` and `--install`, plus the
 `--emit-` family the bridged-arm table keys (`--emit-queue-counts` and
-`--emit-queue-edges` are its 2026-08-31 members), the **harness-integration**
+`--emit-queue-edges` are its 2026-08-31 members; `--emit-md-index`,
+`--emit-md-section` and `--emit-pub-index`, context-kit's three index-first
+reading tools, its 2026-09-01 ones), the **harness-integration**
 arms below it, and `--lesson-sink`, a bridged `Arm::Run` member that is neither
 (queue-kit/SPEC.md §The lesson-sink arm) — and the class
 they form is named here because a
@@ -2066,8 +2068,11 @@ roster, and no requirement element at all. An arm's spawned programs are
 therefore recorded in prose and nowhere a machine reads, and the set is wider
 than a reader would guess: `git` under several `--emit-` arms and under the
 origin-URL lookup this table's own module makes, `date` under
-`--emit-queue-index`, `bash` under `--lesson-sink` and `--emit-port-blockers`,
-and under `--emit-drift-report` whatever program a consumer's KPI plugin names.
+`--emit-queue-index`, `bash` under `--lesson-sink`, `--emit-port-blockers` and
+`--emit-pub-index` — that last twice per enabled language, because a consumer's
+public-surface extractor is a sourced bash file and the seam survives the port
+(context-kit/SPEC.md §Index-first reading) — and under `--emit-drift-report`
+whatever program a consumer's KPI plugin names.
 `grep -rn 'proc::' native/src/emit/` is the derivation; nothing maintains a
 list, and an enumeration written here would be one more thing to stale. This states
 the scope as it stands and rules nothing about whether it should: making arm
@@ -2163,6 +2168,17 @@ hardcoded top-level flag is reached by neither and receives nothing. A configure
 tool ported as a top-level flag therefore resolves platform defaults and silently
 ignores every consumer override — which is not a calibration between two workable
 shapes but the difference between working and appearing to.
+
+**A member may join the table with an *empty* declared roster, and that is the
+sentence the class did not yet hold.** The forced-family test above answers for a
+member that reads *something*; it says nothing about one that reads nothing, and
+the natural reading — no configuration, so a hardcoded flag — is wrong here.
+Table membership is what makes the arm **reachable at all**: the front-end's
+`--emit <name>` operand composes `--emit-<name>`, and `exec_arm` resolves it through
+`gate_knob_env`, which finds a member only in that table. `--emit-md-section`
+(context-kit/SPEC.md §Index-first reading) is the first such member — it resolves
+no knob and must not mint one — and it is recorded so the next reader does not
+read its empty slice as an omission.
 
 **A default the deleted shell driver held inline moves into the owning kit's
 library in the same cut that deletes the driver, never after.** The bridge
@@ -7886,9 +7902,10 @@ bridge sources `<kit>/lib/*.sh` — a **flat** glob — whenever any compiled me
 declares a knob that kit owns. Two consequences fall out and both are
 load-bearing:
 
-- **A file one directory deeper is never sourced at all.** `lib/pub-lang/`'s
-  extractors sit outside the bridge entirely, so the ground cannot reach them
-  whatever else is true of them.
+- **A file one directory deeper is never sourced at all.** context-kit's
+  `lib/pub-lang/` extractors sat outside the bridge entirely, so the ground could
+  not reach them whatever else was true of them — which is why they took a
+  disposition of their own and have since moved in-crate.
 - **A file directly under `lib/` rides the glob whether or not it resolves
   anything.** Bridge membership is by position; being *the resolver* is not. A
   member sourced into the resolution subshell that computes no knob contributes
@@ -7936,13 +7953,17 @@ resolves through it too. A negative about the bridge is answered by the bridge,
 `gate_knob_env` for the arm in question, and by nothing else.
 
 **The honest limit: the members this ruling leaves owed are left owed on
-purpose, and one set it positively says must port.** `lib/pub-lang/`'s shipped
-extractors are the **bundled members** of a consumer-first plug-in registry, and
-`native-gate-port-remaining-corpus`' ruling (1) is that a seam's resolution,
-direct execution and env contract survive while *only the bundled members move
-in-crate* — the disposition drift-kit's KPI plugins already took (drift-kit/SPEC.md
-§The extensibility contract). They are owed, not undecided. The libraries that
-ride the glob resolving nothing are owed too, each for its own reason, and each
+purpose, and one set it positively said must port has since ported.**
+context-kit's `lib/pub-lang/` extractors were the **bundled members** of a
+consumer-first plug-in registry, and `native-gate-port-remaining-corpus`' ruling
+(1) is that a seam's resolution, direct execution and env contract survive while
+*only the bundled members move in-crate* — the disposition drift-kit's KPI plugins
+already took (drift-kit/SPEC.md §The extensibility contract). That is what the
+2026-09-01 cut did: `CONTEXT_KIT_PUB_LANG_DIR` shadowing, the two-name extractor
+file and its `bash` execution all survive in `--emit-pub-index`, and the two
+shipped grammars are in-crate rather than owed shell
+(context-kit/SPEC.md §Index-first reading). The libraries that
+ride the glob resolving nothing are owed still, each for its own reason, and each
 names the entry that owns its port in its own section.
 
 **What reopens it**, written as a reopening condition rather than a permanence
@@ -7950,8 +7971,8 @@ claim, on §Consumer smoke *The port disposition*'s terms: the ground dissolves
 generally if §lib/gate.sh ever admits a second bridge producer, and it dissolves
 for an individual member whose kit's knobs stop crossing the bridge — a member
 outside the bridge is not a sole resolver, and its disposition is then whatever
-its own kit's section can state for it, which is the position `lib/pub-lang/`
-already occupies.
+its own kit's section can state for it, which is the position context-kit's
+`lib/pub-lang/` extractors occupied and discharged.
 
 ### lib/inject.sh
 

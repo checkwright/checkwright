@@ -7,6 +7,10 @@ KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CORPUS="$KIT/index-tests/corpus"
 EXPECTED="$KIT/index-tests/expected"
 BIN="$KIT/bin"
+# spec: context-kit/SPEC.md §Testing — the three index tools are arms of the gate binary, reached
+# through the battery runner's --emit front-end: it resolves the bridged environment the arms
+# declare, which a bare binary invocation would not
+RUN_GATES="gate-sdk/bin/run-gates.sh"
 
 UPDATE=0
 [[ "${1:-}" == "--update" ]] && UPDATE=1
@@ -43,13 +47,13 @@ check() {
     fi
 }
 
-check md-index   "$EXPECTED/md-index.txt"   bash "$BIN/md-index.sh"   "$CORPUS/sample.md"
-check md-section "$EXPECTED/md-section.txt" bash "$BIN/md-section.sh" "$CORPUS/sample.md" "Code First"
-check pub-index  "$EXPECTED/pub-index.txt"  bash "$BIN/pub-index.sh"  "$CORPUS/sample.rs"
-check pub-index-ts "$EXPECTED/pub-index-ts.txt" bash "$BIN/pub-index.sh" "$CORPUS/sample.ts"
+check md-index   "$EXPECTED/md-index.txt"   bash "$RUN_GATES" --emit md-index   "$CORPUS/sample.md"
+check md-section "$EXPECTED/md-section.txt" bash "$RUN_GATES" --emit md-section "$CORPUS/sample.md" "Code First"
+check pub-index  "$EXPECTED/pub-index.txt"  bash "$RUN_GATES" --emit pub-index  "$CORPUS/sample.rs"
+check pub-index-ts "$EXPECTED/pub-index-ts.txt" bash "$RUN_GATES" --emit pub-index "$CORPUS/sample.ts"
 check toolfloor    "$EXPECTED/toolfloor.txt"    bash "$KIT/index-tests/toolfloor-cases.sh"
 
-# spec: context-kit/SPEC.md §Testing — a consumer extractor shadows the kit's shipped one (CONTEXT_KIT_PUB_LANG_DIR resolved first); the scratch rust.sh emits a marker so the kit grammar's absence is visible
+# spec: context-kit/SPEC.md §Testing — the extractor seam's end-to-end proof: a consumer extractor shadows the arm's built-in grammar (CONTEXT_KIT_PUB_LANG_DIR resolved first) and runs through the bash spawn; the scratch rust.sh emits a marker so the built-in grammar's absence is visible
 shadowdir="$(mktemp -d)"
 cat > "$shadowdir/rust.sh" <<'EOS'
 # shellcheck shell=bash disable=SC2034
@@ -62,7 +66,7 @@ shadowcfg="$(mktemp)"
     echo 'CONTEXT_KIT_PUB_LANGS=("rust")'
 } > "$shadowcfg"
 check pub-index-shadow "$EXPECTED/pub-index-shadow.txt" \
-    env "CONTEXT_KIT_CONFIG_FILE=$shadowcfg" bash "$BIN/pub-index.sh" "$CORPUS/sample.rs"
+    env "CONTEXT_KIT_CONFIG_FILE=$shadowcfg" bash "$RUN_GATES" --emit pub-index "$CORPUS/sample.rs"
 
 cfg="$(mktemp)"
 trap 'rm -f "$cfg" "$shadowcfg"; rm -rf "$shadowdir"' EXIT

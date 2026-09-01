@@ -63,7 +63,11 @@
   ruled: native-gate-port-remaining-corpus lead 2026-09-01 own-authority
   Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close; cohorts ruled at scope 2026-08-11/12.
 
-- **kit-library-port-residue** [spec: SPEC-index-cut.md] — the kit `lib/*.sh` members the
+## Technical Debt
+
+## Deferred
+
+- **kit-library-port-residue** [design-pending] — the kit `lib/*.sh` members the
   2026-08-30 class ruling deliberately leaves owed, filed rather than absorbed at its boundary.
   **What the ruling settled and what it did not.** gate-sdk/SPEC.md §The kit-library port
   disposition rules a library permanently shell when it is the config bridge's **sole resolver**
@@ -71,12 +75,18 @@
   outside it: a file that rides the bridge's flat `lib/*.sh` glob while resolving no bridged knob,
   and a file one directory deeper that the glob never reaches. Both are **owed, not undecided** —
   each already carries a sentence in its own SPEC section naming this entry.
-  **The members, measured 2026-08-30 at build against `--emit port-blockers --tree`:**
+  **The members still owed, measured 2026-08-30 at build against `--emit port-blockers --tree`:**
   `gate-sdk/lib/declaration.sh` (59), `gate-sdk/lib/inject.sh` (80),
-  `gate-sdk/lib/test-hermetic.sh` (37), `context-kit/lib/toolfloor.sh` (58),
-  `context-kit/lib/pub-lang/rust.sh` (26), `context-kit/lib/pub-lang/ts.sh` (32).
-  **Each is owed on its own ground, and they do not resolve together** — which is why this is one
-  entry owning a residue rather than one cut:
+  `gate-sdk/lib/test-hermetic.sh` (37), `context-kit/lib/toolfloor.sh` (58).
+  **Two of the original six are DISCHARGED** — `context-kit/lib/pub-lang/{rust,ts}.sh`, the bundled
+  members `native-gate-port-remaining-corpus`' ruling (1) positively sent in-crate. They waited on
+  the resolver that finds them, and 2026-09-01's `SPEC-index-cut` port of `pub-index` is it: the
+  seam survives and the two grammars are crate code (context-kit/SPEC.md §Index-first reading).
+  So this entry **demotes** rather than reaching Done — its deliverable is a corpus and this was
+  one increment, so the next re-promotes with a fresh amendment
+  (canon-kit/SPEC.md §Merging an amendment).
+  **Each remaining member is owed on its own ground, and they do not resolve together** — which is
+  why this is one entry owning a residue rather than one cut:
   `declaration.sh` is already dual-implemented against `native/src/declaration.rs` under the
   standing `--declaration-parity` lane, so criterion 6's *unless* clause admits the duplication;
   its stated test is whether the shell caller set empties, and `bin/upgrade-smoke.sh` keeps it
@@ -94,10 +104,6 @@
   rulings' own home, installer/README.md §The install boundary — `behind-invoke` is a port
   obligation that keeps a file owed until the step moves behind the invoke — and the live entry
   owning that relocation is `powershell-installer-surface`.
-  The two `pub-lang/` extractors are the **bundled members** of a consumer-first plug-in registry
-  and `native-gate-port-remaining-corpus`' ruling (1) positively sends them in-crate — the
-  disposition drift-kit's KPI plugins already took — so they wait on the resolver that finds them,
-  `context-kit/bin/pub-index.sh`, which is itself owed.
   **The one live defect inside this set, already filed:** `gate-sdk/lib/test-hermetic.sh:14`
   omits the executable-suffix helper `gate-sdk/lib/gate.sh:99` appends, so on a Windows host every
   bespoke test pins `GATE_SDK_NATIVE_BIN` to a path that cannot exist. It is in the gap inbox as
@@ -107,10 +113,6 @@
   work, not the argument.
   ruled: kit-library-port-residue lead 2026-09-01 own-authority
   Filed 2026-08-30 by build, at the landing of the kit-library class ruling.
-
-## Technical Debt
-
-## Deferred
 
 - **platform-support-ci-matrix** [design-pending] [roadmap: next/reliability]
   [precondition-ok: run-observed]

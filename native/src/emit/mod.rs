@@ -9,7 +9,11 @@ pub mod footprint;
 pub mod graph;
 pub mod kpi;
 pub mod lesson_sink;
+pub mod md_index;
+pub mod md_section;
 pub mod port_blockers;
+pub mod pub_index;
+pub mod pub_lang;
 pub mod queue_counts;
 pub mod queue_edges;
 pub mod queue_index;
@@ -47,6 +51,67 @@ pub fn self_repo_prefix(reference: &str) -> String {
         return String::new();
     };
     format!("{}/blob/{}/", id, reference)
+}
+
+// spec: context-kit/SPEC.md §Index-first reading — the index walk both index arms share, sited
+// here on `self_repo_prefix`'s reading: one traversal-exclusion set, so one copy of the walk.
+// spec: context-kit/SPEC.md §Index-first reading — the targets, spelled as given because the
+// empty-case message names them back.
+pub fn targets(args: &[String]) -> Result<Vec<String>, String> {
+    if args.is_empty() {
+        return Ok(vec![match crate::walk::toplevel_opt()? {
+            Some(t) => t,
+            None => crate::walk::cwd()?,
+        }]);
+    }
+    Ok(args.to_vec())
+}
+
+// spec: context-kit/SPEC.md §Index-first reading — `find <targets> -name <glob> -not -path
+// "*/<prune>/*"`, in that section's traversal and order, down to what a target that is neither a
+// file nor a directory contributes.
+pub fn corpus(targets: &[String], globs: &[&str]) -> Result<Vec<String>, String> {
+    let prune = crate::walk::knob_array("CONTEXT_KIT_PRUNE_DIRS")?;
+    let mut out: Vec<String> = Vec::new();
+    for t in targets {
+        let path = std::path::Path::new(t);
+        if path.is_dir() {
+            for p in crate::walk::find_link_entries_with_prune(path, &|n| prune.iter().any(|d| d == n))?
+            {
+                out.push(p.display().to_string());
+            }
+        } else if path.is_file() {
+            out.push(t.clone());
+        }
+    }
+    out.retain(|p| {
+        let base = p.rsplit('/').next().unwrap_or(p);
+        globs.iter().any(|g| crate::walk::pattern_match(g, base))
+            && !crate::walk::path_pruned(p, &prune)
+    });
+    out.sort_unstable();
+    Ok(out)
+}
+
+// spec: context-kit/SPEC.md §Index-first reading — the path a block is headed by is repo-relative
+// where the walk stayed inside the repository and the walked spelling otherwise, the shell form's
+// prefix strip; the toplevel is resolved once per run rather than per file.
+pub fn relative(root: &Option<String>, path: &str) -> String {
+    match root {
+        Some(r) => path
+            .strip_prefix(&format!("{}/", r))
+            .unwrap_or(path)
+            .to_string(),
+        None => path.to_string(),
+    }
+}
+
+// spec: gate-sdk/SPEC.md §The non-gate arm — an arm's own read of one file, refusing with the path
+// rather than through a gate's fail-closed diagnostic: this class returns a document, not a verdict
+pub fn read_text(path: &str) -> Result<String, String> {
+    std::fs::read(path)
+        .map(|b| String::from_utf8_lossy(&b).into_owned())
+        .map_err(|e| format!("cannot read {}: {}", path, e))
 }
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — the arm's own argv tail, so a projection whose
@@ -216,6 +281,28 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
             "QUEUE_KIT_DEFERRED_SECTION",
             "QUEUE_KIT_ICEBOX_SECTION",
         ],
+    ),
+    // spec: context-kit/SPEC.md §Index-first reading — the markdown structural index. A table
+    // member rather than a hardcoded flag because it resolves a consumer knob, and a hardcoded flag
+    // receives no consumer override at all.
+    (
+        "--emit-md-index",
+        Arm::Emit(md_index::emit),
+        md_index::KNOBS,
+    ),
+    // spec: gate-sdk/SPEC.md §The non-gate arm — the class's first member whose row exists for
+    // reachability rather than for configuration, its declared roster being empty.
+    (
+        "--emit-md-section",
+        Arm::Emit(md_section::emit),
+        md_section::KNOBS,
+    ),
+    // spec: context-kit/SPEC.md §Index-first reading — the public-surface dispatcher: the extractor
+    // seam survives the port, so the two knobs that resolve it cross the bridge beside the prune set.
+    (
+        "--emit-pub-index",
+        Arm::Emit(pub_index::emit),
+        pub_index::KNOBS,
     ),
     // spec: gate-sdk/SPEC.md §port-blockers — the port oracle: three arms over two corpora, whose
     // `--tree` owed count is the port track's completion predicate. A table member rather than a

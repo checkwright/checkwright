@@ -47,6 +47,12 @@ declare -p CONTEXT_KIT_SURFACES >/dev/null 2>&1 || CONTEXT_KIT_SURFACES=("CLAUDE
 declare -p CONTEXT_KIT_PRUNE_DIRS >/dev/null 2>&1 \
     || CONTEXT_KIT_PRUNE_DIRS=(.git node_modules target dist build worktrees)
 
+# spec: context-kit/SPEC.md §Index-first reading — the consumer extractor dir the pub-index arm searches before its built-in roster; the default moved here verbatim from the deleted dispatcher, because a default left beside a compiled reader is sourced by nothing and the bridge refuses a knob this library does not define
+[[ -v CONTEXT_KIT_PUB_LANG_DIR ]] || CONTEXT_KIT_PUB_LANG_DIR="${GATE_SDK_GATES_DIR:-scripts}/pub-lang"
+
+# spec: context-kit/SPEC.md §lib/context.sh — empty means "derive it", not "no languages": the shipped roster is the crate's built-in extractor set, which no repo-relative literal can express, so the default stays empty and its owner is the one reader of the knob (the CONTEXT_KIT_MEMORY_DIRS shape)
+declare -p CONTEXT_KIT_PUB_LANGS >/dev/null 2>&1 || CONTEXT_KIT_PUB_LANGS=()
+
 _ck_errs=()
 [[ -n "$CONTEXT_KIT_SETTINGS_FILE" ]] || _ck_errs+=("CONTEXT_KIT_SETTINGS_FILE is empty")
 [[ -n "$CONTEXT_KIT_SETTINGS_PINS" ]] || _ck_errs+=("CONTEXT_KIT_SETTINGS_PINS is empty")
