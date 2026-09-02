@@ -339,8 +339,8 @@
   wiped, so its own 8-and-109 figures were never re-verifiable. A second
   sample does not yet exist. Start the next read from 1/556, not from zero.
   **Re-verified at the drain**: the tree ships zero tracked Python, and the
-  interpreter appears only as one member of a generic interpreter list at
-  `guard-kit/lib/guard.sh:35` and `guard-kit/bin/scan-prompts.sh:114`, beside
+  interpreter appears only as one member of a generic interpreter list in
+  `guard-kit/lib/guard.sh`, beside
   node, deno, ruby, perl, php and zsh. So it is kit mechanism recognising an
   inline body, never a language dependency, and the claim that the inline form
   is "the tree's standard scratch-computation form" is loose: it is the
@@ -355,9 +355,9 @@
   relief that queue-kit/SPEC.md §check-queue-entry-budget mandates most often
   is enforced by nothing, and the failure is invisible where it lands.
   **The concession is the spec's own, twice**, re-read at the 2026-08-30
-  drain: queue-kit/SPEC.md:1377 ("it sees an entry's current extent, and
+  drain: queue-kit/SPEC.md ("it sees an entry's current extent, and
   judging whether a removed line was answered or discarded is semantic") and
-  again at :1509 for the recording-in-the-moment rule. So the rule that
+  again for the recording-in-the-moment rule it names. So the rule that
   compression proceed by ANSWERING grounds, never by dropping them, has no
   oracle at all.
   **Why the failure is invisible**: extent is the only artifact, and a
@@ -884,16 +884,18 @@
   environment and nothing else, while a second process-global is written by a test and read by
   production paths a sibling test may be running concurrently.
   **Re-verified at this drain rather than taken from the bullet; all three sub-claims hold.**
-  `native/src/gates/mod.rs:1333`/`:1338` calls `std::env::set_current_dir` per fixture case inside
+  `native/src/gates/mod.rs` calls `std::env::set_current_dir` per fixture case inside
   `every_registry_member_declares_the_roots_it_walks`; `std::env::current_dir()` is read in
   production paths of `walk.rs`, `spec.rs`, `emit/trajectory.rs`, `emit/docs_mirror.rs`,
   `gates/docs_nav_reachable.rs`, `gates/assertion_strength.rs` and `gates/docs_link_convention.rs`;
-  and `native/src/knobenv.rs:41` declares `ENV_WRITE_APIS = ["set_var", "remove_var"]`, so the
+  and `native/src/knobenv.rs` declares `ENV_WRITE_APIS = ["set_var", "remove_var"]`, so the
   machine-side roster names the knob environment alone.
-  **Why it is latent rather than live.** The one cwd-writing test happens to hold
-  `knobenv::lock()` across its whole loop (`mod.rs:1318`), so the existing guard serializes it by
-  accident of where the lock was taken. Nothing states that, and nothing stops the next
-  cwd-changing test from taking no guard — which is the defect, not the current schedule.
+  **Why it is latent rather than live — and the count MOVED while this entry sat, which is the
+  argument rather than a correction to it.** Recounted 2026-09-02: there are now **two**
+  cwd-writing tests, not one, `every_registry_member_declares_the_programs_it_spawns` having
+  joined it, and each happens to take `knobenv::lock()` before its loop — so the existing guard
+  serializes both by accident of where the lock was taken. Nothing states that, and nothing
+  stopped the second test from arriving, exactly as nothing stops the next one taking no guard.
   **Distinct from `crate-test-env-knob-race`, which landed this iteration**: that entry owned
   the knob environment, and its fix (`f2701ff4`) landed the guard this entry calls too narrow. The
   finding
@@ -3751,7 +3753,7 @@
   carries the **same** literal (assertion 1 at canon-kit/SPEC.md
   §check-knob-default-coupling) — an *agreement* assertion. Two identical spellings agree, so they
   pass, and the gate has no *singularity* assertion at all. That is why both
-  `.github/workflows/publish.yml:97` (`GATE_SDK_NATIVE_CRATE`) and
+  `.github/workflows/publish.yml`'s crate resolution (`GATE_SDK_NATIVE_CRATE`) and
   `check-reads-couples`' binary lookup (`GATE_SDK_NATIVE_BIN`) sat green
   while open-coding a default whose accessor exists and whose `# spec:` comment
   calls itself "the one home" of it. Both are fixed; the class is not.
@@ -7401,8 +7403,8 @@
   the oracle reads owed at all, so the rot argues RETURN at the post-port triage, not promotion now.
   **THE 2026-09-02 RECURRENCE FALSIFIES THE CARVE-OUT'S PREMISE, that a date names an iteration:**
   two closes fell on one calendar day, so a count stamped with its own date read clean past a sweep
-  while the oracle had already moved. A fourth shape follows — require the ITERATION SLUG beside the
-  date, which the roster row's wording already implies and the corpus does not practise.
+  while the oracle had already moved. Its slug-beside-the-date shape is REFUSED: the operator ruled
+  2026-09-01 that the direction is compression, not addition (`record-stamp-encoding-compression`).
   ruled: dated-measurement-restatement-class lead 2026-08-30 own-authority
   ruled: dated-measurement-restatement-class lead 2026-08-31 own-authority
   ruled: dated-measurement-restatement-class lead 2026-09-01 own-authority
@@ -8763,8 +8765,9 @@
   **DISTINCT from `readme-roster-enum-coverage`**, whose subject is the gate's own enum coverage
   inside the block it already reads. This one is a corpus the gate never reaches at all.
   **Cost while deferred:** one stale roster line per tool retired or added, each unattributable by a
-  later reader, on the surface an adopter reads first to learn what a kit ships — and the tree has
-  one such line standing today.
+  later reader, on the surface an adopter reads first to learn what a kit ships. The tree carries
+  none today — the 2026-09-02 port deleted the omitted tool, which fixes the instance and leaves
+  the class exactly where it was.
   Relayed 2026-08-28 by the lead on the spec session's behalf (`file-gap.sh` contended on an
   uncommitted inbox); promoted 2026-08-28 by close at this boundary's drain, its scope claim
   re-verified against the descriptor and the compiled rule and its witness found here.
@@ -9132,7 +9135,7 @@
 
 - **same-day-recurrence-date-multiplicity** [design-pending] — two judged recurrences falling on
   one calendar day have no ruled spelling, and the two governing specs imply opposite ones.
-  **The two readings, both citable.** queue-kit/SPEC.md:397-405 rules the declaration
+  **The two readings, both citable.** queue-kit/SPEC.md:440-442 rules the declaration
   `recurrence: <slug> <YYYY-MM-DD> [<YYYY-MM-DD>…]` as "one date per re-filing", appended in order
   and never rewritten — which reads as the date appearing TWICE. lifecycle-kit reads the threshold
   off the date count as a judged-recurrence tally with `(slug, date)` idempotence, which reads as

@@ -757,11 +757,11 @@ here does not silently falsify a sentence somewhere else.
   once tagged, reporting its dormancy rather than letting a drained surface read
   as verification. It is a compiled subcommand
   (gate-sdk/SPEC.md §The declaration cohort) and rides that cohort's holder of the
-  shared grammar rather than a private parser — held to
-  `gate-sdk/lib/declaration.sh`, which the smoke
-  still reads, by a standing parity oracle (gate-sdk/SPEC.md §lib/declaration.sh).
-  That is what stops it passing while the smoke reads a different token set from
-  the same bytes.
+  shared grammar rather than a private parser — held equal to
+  `gate-sdk/lib/declaration.sh` by a standing parity oracle
+  (gate-sdk/SPEC.md §lib/declaration.sh). The upgrade smoke reads that grammar
+  through the same compiled holder, so the two cannot drift apart and read
+  different token sets from the same bytes.
 
   **A declaration precedes its release.** Because the upgrade smoke's untagged
   arm reads a working tree's tightened-gates declaration surface rather than a
