@@ -106,8 +106,9 @@
   owning that relocation is `powershell-installer-surface`.
   **The one live defect inside this set, already filed:** `gate-sdk/lib/test-hermetic.sh:14`
   omits the executable-suffix helper `gate-sdk/lib/gate.sh:100` appends, so on a Windows host every
-  bespoke test pins `GATE_SDK_NATIVE_BIN` to a path that cannot exist. It is in the gap inbox as
-  of 2026-08-30 and is **not** re-filed here; this entry owns the port disposition that waits on it.
+  bespoke test pins `GATE_SDK_NATIVE_BIN` to a path that cannot exist. It is the Deferred entry
+  `hermetic-bin-suffix-pin-placement` (drained there from the gap inbox 2026-08-31 by close) and is
+  **not** re-filed here; this entry owns the port disposition that waits on it.
   **Cost while deferred:** low and non-recurring — the ground is stated and each member's sequencing
   is written into its own SPEC section, so no future cut re-argues the class. What is owed is the
   work, not the argument.
@@ -117,7 +118,7 @@
 - **platform-support-ci-matrix** [design-pending] [roadmap: next/reliability]
   [precondition-ok: run-observed]
   — a CI leg that PRODUCES AND EXERCISES a Windows gate-binary artifact, which is
-  gate-sdk/SPEC.md §Consumer payload's join condition for `x86_64-pc-windows-msvc`. Six rounds
+  gate-sdk/SPEC.md §Consumer payload's join condition for `x86_64-pc-windows-msvc`. Eight rounds
   bought. **The slug is deliberately NOT renamed** though "matrix" now reads oddly for one leg —
   `powershell-installer-surface` cites it by name. The fork, the Windows-ahead-of-macOS ordering
   and WSL-as-interim are TRAJECTORY.md §The closed rulings'; macOS is `macos-install-smoke-ci-leg`.
@@ -557,8 +558,9 @@
   five bootstrap steps, one retirement (`jq`), everything else behind the invoke. What remains is
   the work: the PowerShell half, the relocation (this entry's since `install-step-relocation`
   retired as mooted, re-scoped 2026-08-24), and the native Windows leg `platform-support-ci-matrix`
-  now orders first. A named adopter is live (gap inbox, 2026-08-26), so the trigger is no longer
-  dormant. **Ordered by the trajectory pivot 2026-08-03** — objectives 2 and 6, TRAJECTORY.md's.
+  now orders first. A named adopter is live (the 2026-08-26 Windows-leg ruling, TRAJECTORY.md §The
+  closed rulings), so the trigger is no longer dormant. **Ordered by the trajectory pivot
+  2026-08-03** — objectives 2 and 6, TRAJECTORY.md's.
   **THE TWO SOURCE BLOCKERS THAT ROUTED HERE ON 2026-08-26 HAVE MOVED OUT, operator-ruled the
   same day**: `BN_ART` and `target_of_host()` joined the Windows blocker unit at
   `gate-binary-target-roster-widening`, which shipped both repairs and reached `## Done` — cleared
