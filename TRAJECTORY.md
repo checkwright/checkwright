@@ -414,6 +414,15 @@ rule, its resolves-after-the-next-drain test and the refused gate are owned at l
 §The committed gap inbox. The alternative refused: banning every mention, which would strip filing
 provenance from most of the deferred pool to remove a class measured at two instances.
 
+**A dated attestation freezes the claim, never the locator — ruled 2026-09-03 by the operator,
+lead-relayed from a consult.** A `path:line` in queue prose is live whatever date stands beside it,
+and a dated measurement is history whatever moved since; the rule, its test and its consequence for
+the pendency sweeps are owned at lifecycle-kit/SPEC.md §The committed gap inbox, beside the
+2026-09-02 ruling it generalises. The alternatives refused: reading the date as freezing the locator
+too, which licenses rotting anchors, and reading the locator's drift as falsifying the dated claim,
+which would have every dated figure in this file re-counted — the step toward re-deciding the
+bash-floor ruling above forbids.
+
 ## PRIORITY DIRECTIVE — the port track's sequence
 
 **Ruled 2026-08-09 by the operator, and it is the track's top priority: complete

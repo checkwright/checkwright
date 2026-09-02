@@ -878,6 +878,34 @@ tree-facing heuristic whose over-refusal cost the tree already pays elsewhere, a
 the measured rate — two locators in the inbox's whole life, both caught by one
 read — does not buy one.
 
+**A dated attestation freezes the claim, never the locator — ruled 2026-09-03 by
+the operator on a consult's recommendation, lead-relayed.** The test above
+generalises past these two surfaces to every dated claim in queue prose. A dated
+measurement or judgment — *verified 2026-08-30: the three sites are …* — is
+history: true on its date, immune to later drift, and never refreshed, which is
+the freeze the ruling record's dated-measurement idiom already states per
+instance (TRAJECTORY.md §The closed rulings; gate-sdk/SPEC.md §The decisions this
+substrate already closed). A `path:line` beside it is a locator by construction —
+its only reader follows it now — so drift falsifies the literal, and a literal
+position in prose is the de-literalization defect whatever date sits beside it
+(doctrine-kit/DOCTRINE.md §Methodology-maintenance rules). A date is not a rev:
+two closes have fallen on one calendar day, so a date under-determines the tree,
+where a carried survey's witness is corpus, oracle and rev (§The survey record)
+and the one frozen line range this tree keeps carries its commit
+(gate-sdk/SPEC.md §port-blockers). So a locator worth keeping is de-literalized
+to the name it points at, or rev-pinned where the exact span is load-bearing; the
+rule reaches the bare `verified <date>` standing beside a `path:line` with no
+freezing sentence, a case no surface stated before this. The consequence for the
+pendency sweeps: an anchor whose sentence holds while its line moved is a finding
+of the de-literalization class, fix-shaped at a drain, not of the pendency class;
+an anchor resolving to different text is a false claim. Two readings were
+refused. *A historical record immune to drift* makes a date a licence to carry
+rotting locators, contradicts de-literalization and spec-over-precedent, and
+would un-find a citation resolving to different text. *A live pointer the drift
+falsifies whole* makes the dated-measurement idiom defective and invites the
+recount that ruling forbids. A scanner gate over anchors is refused on the
+grounds the paragraph above already gives.
+
 **The drain's dispositions are ordered, and promotion is last — ruled 2026-08-30
 by the operator, on a measured drain.** The disposition set is fix, icebox,
 promote, discard; the drain tries them in that order per bullet and a promotion
