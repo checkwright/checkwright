@@ -63,7 +63,11 @@
   ruled: native-gate-port-remaining-corpus lead 2026-09-01 own-authority
   Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close; cohorts ruled at scope 2026-08-11/12.
 
-- **kit-library-port-residue** [spec: SPEC-upgrade-smoke-cut.md] — the kit `lib/*.sh` members the
+## Technical Debt
+
+## Deferred
+
+- **kit-library-port-residue** [design-pending] — the kit `lib/*.sh` members the
   2026-08-30 class ruling deliberately leaves owed, filed rather than absorbed at its boundary.
   **What the ruling settled and what it did not.** gate-sdk/SPEC.md §The kit-library port
   disposition rules a library permanently shell when it is the config bridge's **sole resolver**
@@ -78,15 +82,16 @@
   members `native-gate-port-remaining-corpus`' ruling (1) positively sent in-crate. They waited on
   the resolver that finds them, and 2026-09-01's `SPEC-index-cut` port of `pub-index` is it: the
   seam survives and the two grammars are crate code (context-kit/SPEC.md §Index-first reading).
-  So this entry **demotes** rather than reaching Done — its deliverable is a corpus and this was
-  one increment, so the next re-promotes with a fresh amendment
-  (canon-kit/SPEC.md §Merging an amendment).
+  So this entry **demotes** rather than reaching Done — its deliverable is a corpus, and the next
+  cut re-promotes with a fresh amendment (canon-kit/SPEC.md §Merging an amendment). Its two
+  hostings had different grounds: 2026-09-01 delivered two of six members; 2026-09-02's
+  `SPEC-upgrade-smoke-cut` delivered **none** and discharged one member's blocker instead.
   **Each remaining member is owed on its own ground, and they do not resolve together** — which is
   why this is one entry owning a residue rather than one cut:
-  `declaration.sh` is already dual-implemented against `native/src/declaration.rs` under the
-  standing `--declaration-parity` lane, so criterion 6's *unless* clause admits the duplication;
-  its stated test is whether the shell caller set empties, and `bin/upgrade-smoke.sh` keeps it
-  non-empty. Temporary, not permanent.
+  `declaration.sh` is **unblocked and takeable**, never delivered: its stated test was whether the
+  shell caller set empties, and the 2026-09-02 §upgrade-smoke port emptied it by moving the resolve
+  in-crate, leaving only `*.test.sh` sourcers, which that arm's corpus rule excludes. It did not
+  port at that cut, declaring a different stated contract; it is owed under its own section.
   `inject.sh` has three shell sourcers — `context-kit/bin/env-probe.sh`,
   `lifecycle-kit/bin/install-lifecycle.sh`, `doctrine-kit/bin/install-doctrine.sh` — each itself
   owed, so it moves behind them.
@@ -111,10 +116,6 @@
   ruled: kit-library-port-residue lead 2026-09-01 own-authority
   ruled: kit-library-port-residue lead 2026-09-02 own-authority
   Filed 2026-08-30 by build, at the landing of the kit-library class ruling.
-
-## Technical Debt
-
-## Deferred
 
 - **platform-support-ci-matrix** [design-pending] [roadmap: next/reliability]
   [precondition-ok: run-observed]

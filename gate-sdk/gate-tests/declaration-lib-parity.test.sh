@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # Cross-implementation parity for the one derivation gate-sdk holds twice: the
 # shell library gate-sdk/lib/declaration.sh and its compiled counterpart in
-# native/src/declaration.rs. bin/upgrade-smoke.sh still sources the library, so
-# the shell caller set does not empty and the duplication is permanent — which is
-# criterion 6's machine-held disposition rather than the deletion disposition a
-# ported primitive takes (gate-sdk/SPEC.md §The port-candidate criteria,
-# criterion 6; §lib/declaration.sh).
+# native/src/declaration.rs. The shell form's non-test caller set is empty since
+# the upgrade suite's declaration resolve moved in-crate, so the library is
+# takeable under its own section; until it is taken both holders exist, and this
+# is criterion 6's machine-held disposition holding them equal in the meantime
+# (gate-sdk/SPEC.md §The port-candidate criteria, criterion 6; §lib/declaration.sh).
 #
 # A port-time byte-identity proof does not discharge that clause: it proves the
 # two agreed once and expires at the next edit to either side. What is compared

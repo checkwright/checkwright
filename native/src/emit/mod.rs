@@ -21,6 +21,7 @@ pub mod queue_edges;
 pub mod queue_index;
 pub mod roadmap;
 pub mod trajectory;
+pub mod upgrade_smoke;
 pub mod value_rollup;
 
 // spec: gate-sdk/SPEC.md §lib/gate.sh — gate_self_repo_prefix, degrading to nothing on no origin
@@ -359,6 +360,14 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         "--usage-poll",
         Arm::Run(crate::hook::poll::run),
         crate::hook::poll::KNOBS,
+    ),
+    // spec: gate-sdk/SPEC.md §upgrade-smoke — the two-phase upgrade proof: an `Arm::Run` because
+    // its contract is the 1-versus-2 split of its exit status, which an emitting arm collapses, and
+    // a table member because it resolves six knobs a hardcoded flag would silently ignore
+    (
+        "--upgrade-smoke",
+        Arm::Run(upgrade_smoke::run),
+        upgrade_smoke::KNOBS,
     ),
     // spec: queue-kit/SPEC.md §The lesson-sink arm — an `Arm::Run` and not an `--emit-` member:
     // its contract is the sink's exit status, which an emitting arm cannot carry. Its caller is a

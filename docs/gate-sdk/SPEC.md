@@ -1627,12 +1627,29 @@ The manifest grammar:
   missing one would skip a red — and `check-kit-enum` gates the residual
   hand-lists derivation cannot reach. The corollary is a hard authoring rule:
   `couples=` must *cover* every path the gate reads at runtime, never a subset.
-  Globs never cross `/` (and `kit:<glob>` expands one level only), so a gate
-  that walks a directory recursively (`find` / `gate_find`) must couple that
-  recursion — a `<dir>/<sub>/*.ext` sibling glob or a wider one — and never
-  lean on the tree holding only the shape the couple enumerates; an
-  under-covering couple silently skips the gate on the very edit it should
-  catch. `check-graph` verifies couples→hook parity, not reads⊆couples;
+  **The authoring rule is that globs never cross `/`** (and `kit:<glob>` expands
+  one level only), so a gate that walks a directory recursively (`find` /
+  `gate_find`) must couple that recursion — a `<dir>/<sub>/*.ext` sibling glob or
+  a wider one — and never lean on the tree holding only the shape the couple
+  enumerates; an under-covering couple silently skips the gate on the very edit it
+  should catch. **That is the coverage reader's rule and not every reader's, and
+  reading it as universal is a live, attested error.** `check-reads-couples`
+  matches segment-wise and is the reader the rule is written for; the **trigger**
+  readers do not — the generated hook's `staged_matches` is spliced from
+  `gate_staged_matches` in `lib/gate.sh`, whose `[[ "$f" == $pat ]]` leaves the
+  pattern operand unquoted under a standing `# shellcheck disable=SC2053`, so it
+  is bash *string* matching in which `*` spans `/`, and `run-gates --for` reaches
+  the same slash-spanning matcher. So `native/src/*.rs` **does** fire the hook on
+  `native/src/emit/mod.rs` while **not** covering a read there. Stated because the
+  narrow reading alone, applied to a trigger, says a gate will not run when it
+  will: three independent readings in one iteration derived that from a `couples=`
+  line by eye and were wrong, and the remedy is to read the reach through
+  `gate_staged_matches` rather than off the field. **Do not "fix" the unquoting** —
+  it is declared intent, and quoting it would break every trigger in the tree at
+  once. Which of these semantics the field *should* have is not settled here and
+  is `couples-glob-semantics-unowned`'s deliverable; what is settled is that the
+  authoring rule above stays conservative for the coverage reader while the
+  trigger's reach is wider. `check-graph` verifies couples→hook parity, not reads⊆couples;
   `check-reads-couples` (§check-reads-couples) mechanizes the reads⊆couples half
   for the statically resolvable walks — so the author's duty narrows to the
   undecidable remainder that gate skips-and-counts (check-shim-restatement's
@@ -1949,6 +1966,46 @@ build-stage demotion. The demotion half has always been on the entry; the
 promotion half was derivable only from `git log -S` over the queue, which is a
 re-derivation every cut's scoping session paid.
 
+**The rule above presumes one cut per iteration, and the resolution for an
+iteration holding more is stated here rather than re-derived.** Three facts, in
+the order they bind.
+
+- **One lead line carries at most one `[spec:]` tag, and that is arithmetic
+  rather than style.** `[spec:]` and `[roadmap:]` are lead-line-scoped and
+  `check-queue-wrap`'s budget resolves to 100 columns; the composer entry's fixed
+  lead-line part is 66 of them, and a tag costs `9 + len(basename)`. One fits at a
+  basename up to 25 characters; a second cannot at *any* naming, the shortest
+  legal basename being `SPEC-a.md` at 9 for a cost of 18 against the 16 that
+  remain. So the sentence above is unsatisfiable, not merely inconvenient, the
+  moment an iteration holds two cuts.
+- **A two-cut iteration is lawful and needs no waiver.**
+  `native-gate-port-remaining-corpus`' ruling of **2026-08-30 (operator,
+  lead-relay)** rules that the port-candidate criteria *constrain selection, not
+  iteration packaging* — the clauses say what makes **one** cut well-formed; how
+  many an iteration holds is owned elsewhere. Later and higher authority governs.
+- **So a second cut hosts on an existing entry whose own text names that cut's
+  subject as its blocker.** The composer entry hosts a cut that has no other
+  host; an entry already waiting on this cut's subject is the better host rather
+  than the leftover one, because that entry's text changes *because of* the cut.
+  `kit-library-port-residue` hosting §upgrade-smoke's port is the worked
+  instance: its `declaration.sh` paragraph said in as many words that
+  `bin/upgrade-smoke.sh` kept the shell caller set non-empty, and that cut is the
+  event the sentence was waiting on.
+
+**A host that discharges a blocker is not a host that delivers an increment, and
+the two are recorded differently.** canon-kit's corpus branch speaks of an
+amendment delivering one increment of a corpus; a blocker discharge is narrower,
+and a cut taking that ground says so rather than dressing it as delivery — the
+member roster is corrected to *unblocked and takeable*, never to *done*, and the
+terminal move is a demotion (canon-kit/SPEC.md §Merging an amendment).
+
+**This paragraph exists because the same resolution was reached and lost twice.**
+The 2026-09-01 ruling that first did this arithmetic lived only in an amendment's
+delta and went with the file at merge step 3, because step 2 — relocating design
+rationale into the spec's prose, its permanent home — was not performed on it.
+That is a merge defect rather than a property of amendments, and it cost a third
+re-derivation. Stated here so there is no fourth.
+
 ### The decisions this substrate already closed
 
 Two questions behind the port are settled. Both are recorded here because the
@@ -2012,8 +2069,9 @@ name out of `gates::REGISTRY`. It also carries arms that are **not** gates —
 `--emit-md-section` and `--emit-pub-index`, context-kit's three index-first
 reading tools, plus `--emit-file-survey` and `--emit-cite-survey`, lifecycle-kit's
 two survey-record affordances, its 2026-09-01 ones), the **harness-integration**
-arms below it, and `--lesson-sink`, a bridged `Arm::Run` member that is neither
-(queue-kit/SPEC.md §The lesson-sink arm) — and the class
+arms below it, and two bridged `Arm::Run` members that are neither —
+`--lesson-sink` (queue-kit/SPEC.md §The lesson-sink arm) and `--upgrade-smoke`
+(§upgrade-smoke) — and the class
 they form is named here because a
 session arriving with a new non-gate thing to port has no other way to learn
 that one exists or what it costs. Each arm's own `spec:` comment explains that
@@ -2083,7 +2141,11 @@ origin-URL lookup this table's own module makes, `date` under
 *consumer* file and not at all for a built-in grammar, because only a consumer's
 public-surface extractor is a sourced bash file and that seam survives the port
 (context-kit/SPEC.md §Index-first reading) — and under `--emit-drift-report`
-whatever program a consumer's KPI plugin names.
+whatever program a consumer's KPI plugin names. **`--upgrade-smoke` carries the
+heaviest set in the class** and is named because a reader sizing the gap below
+should meet the worst case rather than infer it: `git`, `bash`, `cargo`, `tar` and
+floor utilities, the middle two off `GATE_SDK_PROGRAM_FLOOR` and both ruled a
+requirement on that suite rather than on an adopter (§upgrade-smoke).
 `grep -rn 'proc::' native/src/emit/` is the derivation; nothing maintains a
 list, and an enumeration written here would be one more thing to stale. This states
 the scope as it stands and rules nothing about whether it should: making arm
@@ -2354,6 +2416,15 @@ which is the second half of "keyed by flag rather than by family" and the first
 member to demonstrate it outside the harness-integration arms. Its caller is a
 stage step rather than the harness, so it is not one of those either: it is a
 plain bridged `Arm::Run`, and the class needs no new sub-kind to hold it.
+
+**`--upgrade-smoke` is that ruling's second worked member, and it sharpens what
+"the child's exit status" covers.** `--lesson-sink` returns a *child's* status
+verbatim; the upgrade suite returns a **three-way verdict of its own** — 2 for a
+broken tag or environment, 1 for an upgrade finding, 0 clean — and the 1-versus-2
+split is the whole grammar its callers read. `Arm::Emit` collapses that to 0-or-2
+just as surely, so the rule binds on any member whose *status distinctions* carry
+meaning, not only on one that forwards a child's. Its callers are a validate suite
+and a session, so it is not a harness-integration arm either (§upgrade-smoke).
 
 **`--run` is the class's first bridged member that returns a verdict rather than
 a document** (§run-gates). It satisfies the three properties: it is
@@ -5951,11 +6022,16 @@ whose members' corpora visibly diverge is a finding, and so is a derivation the
 key split.
 
 **Criterion 6 leaves the library dual, and what that owes is a standing oracle
-rather than a port-time proof.** `bin/upgrade-smoke.sh` survives the port as
-`lib/declaration.sh`'s only remaining caller, so neither the duplication-absent
-road nor the deleted-original road is available and the disposition is
+rather than a port-time proof.** At this cohort `bin/upgrade-smoke.sh` survived
+as `lib/declaration.sh`'s only remaining caller, so neither the duplication-absent
+road nor the deleted-original road was available and the disposition was
 queue-kit's `lib/queue.sh` one, taken by the same mechanism. The arm, the test
-and the corpus that carries every branch are §lib/declaration.sh's.
+and the corpus that carries every branch are §lib/declaration.sh's. **The shell
+form has no non-test caller**: §upgrade-smoke's arm reads the declaration
+in-crate, so the library's *own* disposition is unblocked, and
+§lib/declaration.sh carries what that does and does not discharge. The dual
+holding above is unchanged: the standing oracle is what keeps the two forms equal
+for as long as both exist.
 
 **The version comparator is defined over a stated grammar, and a token outside it
 is a loud refusal.** The shell form ordered versions with `sort -V` in four
@@ -6028,7 +6104,7 @@ is costed rather than implicit.
 **The three declare no knobs, and the `.workflow/` asymmetry that exposes is
 preserved rather than repaired** — because repairing it needs an answer this
 tranche does not have. Both `.workflow/` defaults are hardcoded in the gates while
-`bin/upgrade-smoke.sh`, a reader of the *same* declaration file, resolves the
+the upgrade suite, a reader of the *same* declaration file, resolves the
 directory through `GATE_SDK_WORKFLOW_DIR`. Honouring the knob in the compiled form
 would make it a **declared** knob, and the config bridge resolves a declared knob
 against exactly one kit's library — attributed from the knob's own name, never
@@ -6040,6 +6116,16 @@ of its tranche; it is **named here and deliberately not answered**, because
 answering it inside a port whose members need no knob would be designing against
 no case. Keeping the literals keeps `gate_command` on its zero-knob path and
 leaves the asymmetry exactly as visible as it is today.
+
+**The open question this paragraph leaves is narrower than its wording suggests,
+and §upgrade-smoke's arm is why.** That reader is a *bridged arm*, and a bridged
+arm **can** declare `GATE_SDK_WORKFLOW_DIR` — it does, and the bridge resolves it
+against gate-sdk, the kit whose library defines it. So what stays open is the
+narrower question: what happens when a knob's **owning kit** is not the one whose
+library the bridge would source for the declaring member. The asymmetry between
+the literals in the members of this cohort and that arm's resolved value stands
+unchanged and is not repaired here. What this paragraph does **not** claim is that
+a compiled reader is structurally barred from the knob.
 
 **Assertion C's derivation was re-run at the cut, in both directions: zero
 transitions.** The declaration paths moved from `<gates-dir>/<name>.sh` to
@@ -6907,13 +6993,27 @@ context-kit's `smoke/agents-md.sh` is that second caller: it builds the same
 baseline, then converts the consumer to a nondefault agent file (`AGENTS.md`)
 and asserts the agent-file knobs carry it — an assertion `run-consumer-smoke.sh`
 cannot make, since it fixes the kit defaults under zero config
-(context-kit/SPEC.md §Testing). `bin/upgrade-smoke.sh` is the third caller: it
+(context-kit/SPEC.md §Testing). The **upgrade suite** is the third caller: it
 builds the same FROM baseline, then diverges into the two-phase upgrade proof
 (§upgrade-smoke).
 
+**That third caller is a compiled arm, and it reaches the library by spawning
+`bash` rather than by sourcing it.** Its shell driver was deleted at its port, so
+it does not source this file at all; the arm invokes each helper in a `bash -c`
+that sources the unchanged library, calls the function and prints back the one
+value the caller needs. The library gains a caller of a new **kind** and loses a
+shell one, and it acquires no crate twin — which is the whole of why the port
+cleared criterion 6 on the duplication-*absent* road rather than needing the
+machine-held-twin one (§The port-candidate criteria, criterion 6). Two helpers
+here communicate by setting or reading their caller's shell variable — `SCRATCH`
+in both directions — and a process boundary carries neither, so the arm supplies
+it on the way in and reads it off stdout on the way out. That protocol is the
+function's own contract read out, never a private one minted beside it.
+
 **The library's sourcer set is wider than the builder's caller set, and the two
 are counted separately.** The three named above are the callers of
-`csmoke_vendor_and_install`. The file itself has a **fourth** sourcer:
+`csmoke_vendor_and_install`, one of them now across a process boundary. The file
+itself has a **third** shell sourcer beyond the two that build a consumer:
 `demo/run-demo.sh`, which sources it for `csmoke_place_binary` alone and never
 builds a scratch consumer at all. So "sourced by three" is false of the library
 and true only of the builder — read the distinction off this paragraph rather
@@ -8129,18 +8229,28 @@ only red it.
 **It is owed to the port, not dispositioned by §The kit-library port
 disposition.** It rides the bridge's `lib/*.sh` glob and resolves no knob, so
 that ruling's ground does not reach it; its own disposition is criterion 6's
-*unless* clause, worked immediately below, and it is **temporary rather than
-permanent** — the stated test is whether the shell caller set empties, and it has
-not. The entry that owns the work is `kit-library-port-residue`.
+*unless* clause, worked immediately below, and it was **temporary rather than
+permanent** — the stated test is whether the shell caller set empties. **It has
+emptied**, at §upgrade-smoke's port. The entry that owns the work is
+`kit-library-port-residue`.
 
-**The library is dual, and one live caller is what makes that true rather than
-asserted.** `bin/upgrade-smoke.sh` at its declaration-resolve step uses both arms
-(§upgrade-smoke) and is the shell form's **only** caller since §The declaration
-cohort: the members that shared it ship as compiled subcommands and reach
-`native/src/declaration.rs` instead. The shell caller set therefore does not
-empty, so criterion 6's delete-the-shell-form outcome is unavailable and the
-duplication takes the machine-held disposition (§The port-candidate criteria,
-criterion 6).
+**What that discharges is the blocker, not the port.** A grep for sourcers of
+this file over every tracked `.sh` returns `gate-tests/declaration-lib-parity.test.sh`
+and `gate-tests/lib-declaration.test.sh` and nothing else, and the `*.test.sh`
+suffix is outside the `--tree` corpus by that arm's own rule — so the library is
+**takeable** by a later cut under this section, on the deleted-original road
+criterion 6 makes available once the caller set empties. It does **not** port at
+the cut that unblocked it: that cut selects by *stated contract* and this library
+declares a different one, so folding it in would fail the composer's own words.
+Read this paragraph as *unblocked and takeable*, never as *done*.
+
+**The library is dual, and the standing oracle is what makes that true rather
+than asserted.** Every member that once shared this file ships as a compiled
+subcommand and reaches `native/src/declaration.rs`, §upgrade-smoke's arm
+included, so the duplication rests on exactly what criterion 6's *unless* clause
+states and on nothing wider: the machine-held twin below holds the two forms equal
+for as long as both exist, and the `*.test.sh` corpus is what reads the shell form
+(§The port-candidate criteria, criterion 6).
 
 **The standing oracle that discharges it.** A port-time byte-identity proof is
 not machine-held — it proves the two agreed once and expires at the next edit to
@@ -8191,10 +8301,12 @@ never instead of it.
 entry points** — the container arm alone, the markdown arm's verdict, and the
 record arm. There is no writer, no renderer and no section-discovery API, and
 adding one is a design decision with its own reader rather than an omission to
-fill in. Its consumers are four and are named: the three gate modules of §The
-declaration cohort plus the parity arm above. `bin/upgrade-smoke.sh` is
-deliberately not among them, which is the criterion-6 ruling and the reason the
-oracle exists.
+fill in. Its consumers are **five** and are named: the three gate modules of §The
+declaration cohort, the parity arm above, and §upgrade-smoke's arm, whose
+declaration-resolve step moved in-crate at its port. That fifth consumer was
+deliberately *outside* the set while its shell driver existed, which was the
+criterion-6 ruling; the ruling has not changed, the driver has gone, and the
+oracle above still exists for the `*.test.sh` corpus that reads the shell form.
 
 The helper carries no section name and no gate name of its own — both are the
 caller's arguments, and it takes no configuration. That is where the seam falls:
@@ -8839,9 +8951,9 @@ and is the proof that the kit defaults hold on a vendored-kit tree.
 
 ### upgrade-smoke
 
-The two-phase upgrade proof, `bin/upgrade-smoke.sh` — the third caller of
-`csmoke_vendor_and_install` (§Consumer smoke), reusing the same green baseline
-before it diverges. Where run-consumer-smoke proves a *single* release's
+The two-phase upgrade proof, the binary's **`--upgrade-smoke`** arm — the third
+caller of `csmoke_vendor_and_install` (§Consumer smoke), reusing the same green
+baseline before it diverges. Where run-consumer-smoke proves a *single* release's
 defaults hold, this proves the *transition* between two: it vendors every kit at
 a **FROM** ref into a scratch consumer, installs and asserts the baseline is
 green (a red FROM baseline is a broken tag — exit 2, not an upgrade finding),
@@ -8860,10 +8972,36 @@ red gate absent from the declaration, or a declaration that does not parse while
 reds exist, is a fail (exit 1); usage/environment failure is exit 2 (the gate exit
 convention). A malformed declaration is a contract violation rather than a broken
 environment, which is why it takes exit 1 and not 2.
-A `bin/` tool, not a gate — no `good/`+`bad/` fixture pair is owed;
-the `upgrade` validate suite running it (scripts/evidence-config.sh) is its
-evidence, at ~2× run-consumer-smoke's cost since it runs the battery twice in
-scratch (accepted as validate-stage cost, never pre-commit).
+A **bridged non-gate arm**, not a gate (§The non-gate arm) — no `good/`+`bad/`
+fixture pair is owed; the `upgrade` validate suite running it
+(scripts/evidence-config.sh) is its evidence, at ~2× run-consumer-smoke's cost
+since it runs the battery twice in scratch (accepted as validate-stage cost,
+never pre-commit).
+
+**The spelling is `--upgrade-smoke` and the family is forced, both halves.** Its
+contract is the **exit status** above, and `Arm::Emit` collapses every error to 2
+and every success to 0 — so §The non-gate arm's rule that "a member whose stated
+contract is its child's exit status cannot take the `--emit-` spelling at all"
+binds here, and the 1-versus-2 split that is this suite's whole verdict grammar is
+what it is protecting. It is a **bridged-arm table** member rather than a
+hardcoded top-level flag because it resolves six knobs, and a hardcoded flag
+resolves platform defaults while silently ignoring every consumer override. So
+`bin/run-gates.sh` gains a front-end arm beside `--usage-poll` and `--lesson-sink`
+rather than reaching it through the `--emit <name>` composer, and its usage lives
+in that script's own `--help` — a per-arm help flag would be a second home for one
+sentence. **The arm takes no positional and no flag**: the deleted driver's only
+`$1`/`$2` were function-local, so §The non-gate arm's distinguishing test between
+an unportable config-redirecting argument and a portable rule-consumed one had
+nothing to decide, nothing was deleted, and no documented sentence about an
+argument came due.
+
+**Its callers are two and neither is created here.** The `upgrade` validate suite
+reads the exit status at every validate stage and writes it into the validate
+session's evidence file against `.workflow/validate-baseline.txt`'s
+`upgrade upgrade pass` row; a **session** reads it at the standing pre-release
+assertion with `TO` at its `HEAD` default, and at the release procedure's go/no-go.
+A session reaching an arm through the front-end counts exactly as a stage step
+does (§The non-gate arm).
 
 **The determinism assertion is measured between phase A's two steps, and that
 ordering carries the assertion.** Phase A syncs the kit directories, then
@@ -8887,14 +9025,51 @@ fixtures; restating it here bought nothing and rotted on the first change.
 in the *consumer's* library.** The graph emitter is a binary arm, so the step
 goes through the emit front-end that resolves its bridged knobs (§The non-gate
 arm), and the destination comes from the scratch consumer's own
-`GATE_SDK_GRAPH_ARTIFACT` — sourced in that tree — never from this tool's, which
-resolved the *host* repo's config when it sourced `lib/gate.sh` at startup. The
+`GATE_SDK_GRAPH_ARTIFACT` — sourced in that tree — never from the host's, which is
+what this suite's own bridged environment carries. The
 distinction is load-bearing rather than pedantic: a host that republishes its
 artifact (this repo serves `docs/check-graph.html`) would otherwise write the
 scratch consumer's artifact to a path that consumer's own gate never looks at.
 This is what discharges `upgrade-smoke-graph-artifact-literal`, and through
 neither disposition that entry could see: it neither duplicates the default
 expression nor mints an arm on a gate for one caller.
+
+**That read is a `bash -c` sourcing the consumer's own library, and the same
+protocol is how the whole suite reaches `lib/consumer-smoke.sh`.** That library is
+permanently `# no-port:` (§Consumer smoke, *The port disposition*) and keeps
+shell sourcers besides this one, so criterion 6's delete-the-original road is
+unavailable. The road taken is not the *unless* clause's machine-held-twin form
+but its strongest one — **the duplication is absent, because the arm creates
+none**. `csmoke_gate_descriptors`, `csmoke_vendor_and_install` and
+`csmoke_place_binary` are **not reimplemented**: the arm spawns `bash`, sources
+the unchanged library and calls the function that owns the rule, which clears
+criterion 7 by this SPEC's own sentence that "a rule shelling out to
+`bash <emitter>` clears this criterion, because `bash` is on the floor" — the
+`check-graph`→`gen-pre-commit.sh` shape exactly. **The seam problem is the shell
+variable, and the idiom that solves it is the one above.**
+`csmoke_vendor_and_install` communicates by setting its caller's `SCRATCH` and
+`csmoke_place_binary` by reading it, and no process boundary carries either; so
+the arm supplies it on the way in and reads it back off a one-line stdout protocol
+on the way out, which is the function's own contract read out rather than a
+private one minted beside it. **One consequence is visible and is stated rather
+than left to be noticed:** the shell driver let the vendoring step's installer
+output reach *its* stdout, which this section's own contract already reserved for
+the one clean line; the stdout protocol forces that output to stderr, so the
+stated contract and the behaviour agree for the first time.
+
+**The arm resolves gate-sdk's own library through the transported kit roots, and
+that is why `GATE_KIT_ROOTS_HERE` is on the roster below.** The deleted driver
+anchored on its own `BASH_SOURCE`; a compiled arm has no such anchor, and
+§lib/gate.sh already rules that the kit roots are *transported rather than
+re-derived* precisely because "a binary the installer copies elsewhere cannot
+recover it". The arm takes the root whose basename is `gate-sdk` — a name this
+member already spells, since `kit_dirs_in` orders that kit first by name.
+
+**The declaration resolve moved in-crate.** The arm reads TO's tightened-gates
+declaration through `native/src/declaration.rs`, the compiled holder the standing
+`--declaration-parity` lane already holds equal to the shell form, and it does not
+source `lib/declaration.sh` at all. What that empties, and what emptying it does
+and does not discharge, is §lib/declaration.sh's.
 
 **Each phase runs against its own ref's gate binary**, and that pairing is what
 makes phase 1's claim true as written. A `.gate` member dispatches to a binary
@@ -9042,17 +9217,51 @@ truncating to the header, never clearing the file — at the tag in step 4.
 Knobs — config-via-env in the `<KIT>_<KNOB>` shape, defaults this repo's layout,
 each read exactly once at the resolve step:
 
-- `GATE_SDK_UPGRADE_REPO` — the kit-source git repository (default: the
-  enclosing repo's toplevel). A consumer points it at their checkwright clone;
-  the smoke never touches the network.
-- `GATE_SDK_UPGRADE_FROM` — the FROM ref (default: the source repo's newest
-  `v*` tag; none resolvable is exit 2, not a skip).
+- `GATE_SDK_UPGRADE_REPO` — the kit-source git repository; default **empty**, and
+  empty means *derive it* rather than *no value*: the one reader of the knob
+  expands it to the enclosing repo's toplevel. A consumer points it at their
+  checkwright clone; the smoke never touches the network.
+- `GATE_SDK_UPGRADE_FROM` — the FROM ref; default **empty** on the same reading,
+  the reader expanding it to the source repo's newest `v*` tag (none resolvable is
+  exit 2, not a skip).
 - `GATE_SDK_UPGRADE_TO` — the TO ref (default: `HEAD`).
 - Scratch base is the existing `GATE_SDK_TMP_DIR` knob; the extracted trees, the
   per-ref worktrees and the consumer are created under it and trap-removed.
+- The declaration path derives from `GATE_SDK_WORKFLOW_DIR`, and
+  `GATE_KIT_ROOTS_HERE` is how the arm finds the kit library it drives — both
+  declared, both resolved at the same step.
 
-**`cargo` on `PATH` is a requirement on this suite, not on an adopter**, and it
-binds only for a ref that dispatches a member to the binary. `upgrade-smoke` is a
+**All three `GATE_SDK_UPGRADE_*` defaults live in `lib/gate.sh`, and that is
+load-bearing rather than tidy.** They were defaulted inside the deleted driver and
+nowhere else; the bridge resolves a declared knob by sourcing exactly one kit's
+library and **exits 2** on a knob that library does not define, so a default left
+beside the compiled reader is sourced by nothing and the arm refuses on every
+invocation rather than degrading quietly. `_TO` moves **verbatim** as a guarded
+assignment to `HEAD`, keeping the `:-` semantics its use site had, so the
+documented default and the supplying site are one string and
+`check-knob-default-coupling` is its oracle. The other two **cannot** move
+verbatim: each is a *derivation* over a git repository rather than a literal, so
+each defaults empty and its expansion belongs to its one reader — the
+`CONTEXT_KIT_MEMORY_DIRS` / `CONTEXT_KIT_PUB_LANGS` shape, and for the same
+reason, since transcribing a derivation into the library would be the second
+producer criterion 6 refuses. **Two further oracles force the move and neither is
+obvious:** `check-docs-cmd` assertion B reds on a kit-prefixed ALL-CAPS token
+occurring in no tracked *kit* code and `native/` is not a kit root, so a Rust
+`KNOBS` array does not satisfy it; `check-kit-ref-liveness` reds on the same
+resolver over every tracked file, and `TASK-QUEUE.md` already spells
+`GATE_SDK_UPGRADE_REPO` in an entry's prose.
+
+**`cargo` and `tar` on `PATH` are requirements on this suite, not on an adopter**,
+and the first binds only for a ref that dispatches a member to the binary.
+`tar` extracts a `git archive` of a ref inside the scratch tree and rides this
+sentence for the same reason `cargo` does: neither is a gate rule's invocation and
+neither reaches an adopter. Both are off `GATE_SDK_PROGRAM_FLOOR`, and the
+alternative for `tar` was considered and declined — replacing `git archive | tar
+-x` with a per-ref detached worktree would drop it, and the machinery is present
+since the binary build adds worktrees per ref, but the archive's
+committed-content-only property is exactly what the untagged-`TO` declaration arm
+reads against, and swapping an extraction mechanism is a rewrite inside a port.
+Recorded as declined rather than unconsidered. `upgrade-smoke` is a
 validate-stage tool in the kit-source repo, whose contributors already need the
 toolchain for `check-crate-arms` and `bin/build-native.sh`. It reaches no consumer
 and does not touch `GATE_SDK_PROGRAM_FLOOR`, which bounds what a *gate rule* may
@@ -9060,13 +9269,80 @@ invoke — stated because a reader meeting a new `cargo` dependency will reasona
 ask whether §The port-candidate criteria's criterion 7 binds here, and it does
 not.
 
+**The battery-summary parse is a recorded cross-ref coupling, and the obvious
+improvement is unavailable by construction.** The suite reads the scratch
+consumer's battery through two literals — `All [0-9]+ gates passed` for a green
+run and `^[0-9]+ of [0-9]+ gates FAILED:` for the red set — which already have two
+holders in `bin/run-gates.sh` and `native/src/runner.rs`, and the arm is a
+**third reader**. Calling the runner in process instead is refused not on cost but
+on construction: the battery under test is the *scratch consumer's*, vendored at
+a different ref and dispatched to that ref's own binary, and a host binary running
+it in process destroys the one-binary-per-ref pairing this suite exists to assert.
+So this member reads a summary line whose producer is a different implementation
+at a different ref, and the two literals are the contract between them. Stated
+because a later reader will reach for the in-process call. **One spelling did not
+survive and should not:** the shell membership loop avoided a pipe because an
+abandoned producer's SIGPIPE under `pipefail` would flip the verdict; the crate
+expresses set membership directly and the hazard has no spelling there, which is
+criterion 7's incidental-spelling class.
+
+**An arm's spawned programs are recorded in prose and nowhere a machine reads.**
+This member carries the heaviest set in the class — `git`, `bash`, `cargo`, `tar`
+and floor utilities — and re-instances the open gap
+`bridged-arm-requirements-undeclared` by construction rather than widening
+`--needs`, which answers about registry members only (§The non-gate arm).
+
+**The cut that ported this member, recorded here because a cut's record lives in
+the contract section it selected.** It was a **singleton**: this section is the
+stated contract, and no other tracked non-test `.sh` declared it — a singleton is
+as well-formed a cut as a group of five, the composer's unit being the section
+rather than a member count. It was selected on measured leverage: of the owed
+column at the time it was the only file whose deletion ended **another** owed
+member's stated blocker, which is §lib/declaration.sh's.
+
+**The worktree refusal is preserved verbatim, and that is an instruction rather
+than an omission.** The repo predicate is `-d "$REPO/.git"`, which refuses inside
+every linked git worktree, where `.git` is a gitdir *pointer file* rather than a
+directory. A Rust rewrite would not naturally spell `is_dir()` — the idiomatic
+write is the honest predicate — so the port carries the predicate across
+unchanged and the parity run **reproduces the refusal from inside a worktree**
+rather than routing around it. The ground is that settling a live
+`[design-pending]` fork inside a port cut is non-port design work: a port proves
+parity and does not fix the rules it ports. The entry
+`upgrade-smoke-refuses-inside-a-worktree` keeps its premise, its verdict and its
+fixture obligation, and this is the second member of the class
+`md-section-near-miss-match` opened.
+
+**How the port discharged criterion 2, and what that road's standing limit is.**
+The member has no fixture pair and owes none, so the discharge is the
+`# no-fixture:` road: the same cases through both substrates while both
+implementations existed. Executed at the port — one FROM/TO pair, a deliberately
+red phase-B run, and a run from **inside a linked worktree** — compared on the
+exit status, the stdout verdict line and the stderr diagnostics. The worktree case
+is the load-bearing one: running only from the main checkout proves the happy path
+and leaves the ported repo predicate untested in the one place it is known to
+matter. The road's limit is stated rather than assumed away: it proves the two
+agreed *then* and nothing machine-held keeps them agreeing after, which is why the
+shell original is **deleted** rather than left running beside the arm.
+
+**Criterion 5's residual, in its own terms, and it is unusually narrow.** A
+vendored consumer on a host the artifact roster does not cover loses the upgrade
+smoke outright, where a shell script ran anywhere. The class of hosts that reaches
+is smaller than the criterion's usual one, because this suite **already** requires
+`cargo` on `PATH` for any ref that dispatches to the binary — a host with the
+toolchain the suite already demands can build the binary the arm needs. No
+`gates.list` row is omitted and the binary-less residual roster does not move, this
+member carrying no gate. The loss is accepted on the ground that the suite is a
+validate-stage and pre-release instrument in the kit-source repo rather than an
+adopter-facing one.
+
 Producers and consumers: the smoke's verdict (exit code + assertion output) is
 produced by the `upgrade` suite each validate stage, or by a consumer invoking
-the script pre-upgrade; it is consumed by the validate session's evidence file
+the arm pre-upgrade; it is consumed by the validate session's evidence file
 (this repo) or the operator's go/no-go on a consumer tree. The
-`GATE_SDK_UPGRADE_*` knobs are produced by the invoking environment (defaults
-emitted by the script itself, so the zero-config run works here) and read only
-at the resolve step. The declaration path is derived from `GATE_SDK_WORKFLOW_DIR`
+`GATE_SDK_UPGRADE_*` knobs are produced by the invoking environment (defaulted in
+`lib/gate.sh`, so the zero-config run works here) and read only
+at the resolve step, resolved by `gate_command`/`gate_knob_env` before the exec. The declaration path is derived from `GATE_SDK_WORKFLOW_DIR`
 at the same step. The tightened-gates declaration is produced by the build stage
 that lands or tightens a gate, appending to that surface, and composed
 by close into the note at the release boundary; it is consumed at three named

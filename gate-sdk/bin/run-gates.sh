@@ -27,6 +27,7 @@ usage: run-gates.sh [gates-dir]                run every registered gate
        run-gates.sh --statusline               render the harness status line, payload on stdin
        run-gates.sh --usage-poll               refresh the usage snapshot from its source
        run-gates.sh --lesson-sink <tag>        route a lesson body on stdin to its sink
+       run-gates.sh --upgrade-smoke            prove the FROM->TO kit upgrade in scratch
        run-gates.sh -h | --help                this text, on stdout, exit 0
 
   --only  runs the named members in registry order whatever order they were
@@ -53,6 +54,11 @@ usage: run-gates.sh [gates-dir]                run every registered gate
           <tag>, or appends to <workflow-dir>/<tag>-harvest.md when none is.
           The sink's exit status is this arm's, so a failing sink is visible to
           the close step that ran it; unavailable is exit 2 for the same reason.
+  --upgrade-smoke  vendors every kit at GATE_SDK_UPGRADE_FROM into a scratch
+          consumer, swaps them wholesale to GATE_SDK_UPGRADE_TO and asserts the
+          sync is deterministic and the phase-B red set is declared. Takes no
+          argument. Exit 0 clean with one UPGRADE-SMOKE line on stdout, 1 an
+          upgrade finding, 2 a broken tag or environment; unavailable is 2.
   --      ends option processing, so a gates-dir spelled with a leading dash
           is still reachable.
 
@@ -141,6 +147,14 @@ case "${1-}" in
     --lesson-sink)
         shift
         exec_arm --lesson-sink "$@"
+        ;;
+    # spec: gate-sdk/SPEC.md §upgrade-smoke — a second bridged arm outside the `--emit-` family, on
+    # the same ground: its contract is the 1-versus-2 split of its exit status. Unavailable is exit
+    # 2 because its callers are a validate suite and the pre-release assertion, both of which read
+    # the verdict
+    --upgrade-smoke)
+        shift
+        exec_arm --upgrade-smoke "$@"
         ;;
     --for)
         shift

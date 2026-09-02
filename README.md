@@ -137,7 +137,7 @@ bash context-kit/bin/run-index-tests.sh                                         
 cargo test --release --manifest-path native/Cargo.toml                              # native crate unit tests
 bash context-kit/smoke/agents-md.sh                                                 # the AGENTS.md projection, end to end
 bash gate-sdk/bin/run-consumer-smoke.sh                                             # every kit installs into a scratch consumer
-bash gate-sdk/bin/upgrade-smoke.sh                                                  # a vendored tree upgrades in place
+bash gate-sdk/bin/run-gates.sh --upgrade-smoke                                      # a vendored tree upgrades in place
 bash installer/consumer-smoke/run-smoke.sh                                          # the activation path, per profile
 bash demo/run-demo.sh                                                               # the adoption walkthrough
 ```
