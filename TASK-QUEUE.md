@@ -49,8 +49,9 @@
   the requirement exists to close. The bar stands unchanged for every other permission-settings
   edit: a carve-out for one class. Scope is the files THAT COMMIT deletes, never a path prefix —
   probe the count, never assume it, the attested probe having quadrupled one kit's.
-  **(3) A SECTION IS A CUT'S OUTER BOUND, NOT ITS MINIMUM — ruled 2026-09-03 (operator, lead-relay),
-  grounds and refusals at gate-sdk/SPEC.md §Porting a gate to the binary substrate.**
+  **(3) A SECTION IS A CUT'S OUTER BOUND, NOT ITS MINIMUM; (4) A CONSUMER PLUGIN ON A SEAM IS OWED
+  — ruling (1) reaches the seam alone — both ruled 2026-09-03 (operator, lead-relay); grounds and
+  refusals at gate-sdk/SPEC.md §Porting a gate to the binary substrate.**
   ruled: native-gate-port-remaining-corpus lead 2026-08-28 2026-08-29 2026-08-31 own-authority
   ruled: native-gate-port-remaining-corpus operator 2026-08-28 2026-08-29 2026-08-30 lead-relay
   ruled: native-gate-port-remaining-corpus operator 2026-09-03 lead-relay

@@ -2035,6 +2035,40 @@ the cut section a singleton is precedent over spec: the section itself says the
 roster is that library's. No past cut had taken a proper subset of one section's
 owed files, so the ruling stands on the owner doc rather than on precedent.
 
+**A consumer's plugin on a kit seam is owed like any file; ruling (1) reaches the
+seam alone — ruled 2026-09-03 by the operator on a consult's recommendation,
+lead-relayed.** `native-gate-port-remaining-corpus`' ruling (1) protects an
+extension point's resolution, direct execution and env contract, and its own
+cited surfaces bound it. The load-bearing one is §The config-seam port
+disposition: that class *reaches only files whose whole documented purpose is
+to be edited*. Beside it, §The harness-template port disposition reaches a file
+only where its body carries the marked gap a consumer fills, and drift-kit/SPEC.md
+§The extensibility contract records the port moving the kit's own members while
+touching nothing about how a consumer's are found. A file this repo names as a
+knob's **value** — `scripts/parse-gates-log.sh` and
+`scripts/parse-installer-smoke-log.sh` on evidence-kit's
+`EVIDENCE_KIT_PARSER_<suite>`, `scripts/enum-sets.sh` on canon-kit's
+`CANON_KIT_ENUM_SETS_CMD`, `scripts/gate-exec.sh` and
+`scripts/producer-liveness-reader.sh` on the pre-flight and liveness knobs — is
+what the seam resolves, not the seam: no adopter edits it, and its whole
+documented purpose is to run. Porting one moves its mechanism into the binary
+and re-points the value; the knob still takes any consumer command, so no
+extension point narrows, exactly as `DRIFT_KIT_KPI_DIRS` still resolves a
+consumer plugin after the bundled KPIs went in-crate. So the 2026-08-28 literal
+predicate (TRAJECTORY.md §The closed rulings) governs these files unopposed, and
+each takes a per-file port or a per-file declared cause on its own ground — a
+front end's need for the shell bridge, a reader's worktree resolution — never on
+ruling (1). Corroboration rather than ground, since it predates ruling (1) and
+answers the provenance-seam question instead: the 2026-08-25 `scripts/`
+declarations read every mechanism row and left each owed, recording of
+`enum-sets.sh` that *being a knob's value is half (i) of the exemplar's cause,
+and the ruling declares on (b) alone*. Two readings were refused. Ruling (1) as
+exempting a consumer-side plugin file would exempt every file this repo names in
+a knob value — the contributor-side class the 2026-08-28 ruling refused, under
+another name, reached by the analogy ruling (1) itself bars. A `# no-port:` on
+the parsers citing the seam over-declares against files holding no seam content
+class, which mis-sizes the predicate with nothing red to catch it.
+
 ### The decisions this substrate already closed
 
 Two questions behind the port are settled. Both are recorded here because the

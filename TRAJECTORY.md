@@ -431,6 +431,15 @@ amendment, the sequenced member staying owed rather than held. Refused with it: 
 a hold declaration on the remainder (a held file leaves the owed column), and re-homing the remainder's
 `# spec:` to make the section a singleton.
 
+**A consumer's plugin on a kit seam is owed like any file; ruling (1) reaches the seam alone — ruled
+2026-09-03 by the operator, lead-relayed from a consult.** The composer's ruling (1) protects an
+extension point's resolution, execution and env contract, and its own surfaces bound it to files whose
+whole documented purpose is to be edited; a file this repo names as a knob's value is what the seam
+resolves, so the literal predicate above governs it unopposed. Owned with its grounds at
+gate-sdk/SPEC.md §Porting a gate to the binary substrate. Refused with it: reading ruling (1) as a
+contributor-side exemption under another name, and a seam-citing `# no-port:` on files holding no
+seam content class.
+
 ## PRIORITY DIRECTIVE — the port track's sequence
 
 **Ruled 2026-08-09 by the operator, and it is the track's top priority: complete
