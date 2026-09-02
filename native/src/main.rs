@@ -24,6 +24,8 @@ mod section;
 mod sha256;
 mod spec;
 mod stages;
+#[cfg(test)]
+mod usage_tests;
 mod walk;
 
 use std::process::exit;

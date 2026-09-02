@@ -12,7 +12,11 @@
 
 ## New Features
 
-- **native-gate-port-remaining-corpus** [spec: SPEC-test-runner-cut.md] [roadmap: now/reliability]
+## Technical Debt
+
+## Deferred
+
+- **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
   — the whole battery onto the binary, and the shell surface down to its residue.
   roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
   It DEMOTES at build, never `## Done` — canon-kit/SPEC.md §Merging an amendment's corpus branch.
@@ -62,10 +66,6 @@
   ruled: native-gate-port-remaining-corpus lead 2026-08-31 own-authority
   ruled: native-gate-port-remaining-corpus lead 2026-09-01 own-authority
   Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close; cohorts ruled at scope 2026-08-11/12.
-
-## Technical Debt
-
-## Deferred
 
 - **kit-library-port-residue** [design-pending] — the kit `lib/*.sh` members the
   2026-08-30 class ruling deliberately leaves owed, filed rather than absorbed at its boundary.

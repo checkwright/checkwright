@@ -131,8 +131,6 @@ bash gate-sdk/bin/run-gate-tests.sh doctrine-kit/gate-tests doctrine-kit/checks 
 bash gate-sdk/bin/run-gate-tests.sh scripts/gate-tests                              # consumer-gate fixtures
 bash gate-sdk/bin/run-gate-tests.sh guard-kit/gate-tests                            # guard-kit bin unit tests
 bash guard-kit/bin/run-guard-tests.sh                                               # guard-kit decision table
-bash delegation-kit/bin/run-usage-tests.sh                                          # delegation-kit usage accounting
-bash delegation-kit/bin/run-trend-tests.sh                                          # delegation-kit trend reader
 bash context-kit/bin/run-index-tests.sh                                             # context-kit index tools
 cargo test --release --manifest-path native/Cargo.toml                              # native crate unit tests
 bash context-kit/smoke/agents-md.sh                                                 # the AGENTS.md projection, end to end

@@ -86,10 +86,8 @@ queue_kit queue_kit pass
 site_kit site_kit pass
 scripts scripts pass
 guard_tests guard_tests pass
-usage_tests usage_tests pass
 budget_guard_tests budget_guard_tests pass
 dispatch_guard_tests dispatch_guard_tests pass
-trend_tests trend_tests pass
 demo demo pass
 installer_smoke build pass
 installer_smoke pack pass

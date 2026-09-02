@@ -2656,13 +2656,11 @@ evidence is not the record.
 delegation-kit/
   bin/usage-verdict.sh
   bin/usage-trend.sh              # footprint trend reporter over the history log
-  bin/run-usage-tests.sh          # verdict decision-table runner
-  bin/run-trend-tests.sh          # trend-reporter assertion runner
   bin/wait-probe.sh               # wait-primitive probe: hand-invoked, no trigger, wired into no tier
   lib/delegation.sh               # shared helpers for the usage tools and the kit's gates
-  usage-tests/cases.tsv           # expected-verdict <TAB> scenario knobs
+  usage-tests/cases.tsv           # expected-verdict <TAB> scenario knobs; read by the crate test that replaced its shell driver
   usage-tests/dispatch-guard-cases.tsv  # expected-outcome <TAB> scenario knobs; read by the crate test that replaced its shell driver
-  usage-tests/trend-history.log   # fixture history for the trend runner
+  usage-tests/trend-history.log   # fixture history for the trend assertions, read by that same crate module
   checks/check-gate-tamper.gate  # binary-dispatched; live arm reads the index through git
   checks/check-rule-citation.gate  # hermetic, binary-dispatched: every SPEC rule citation resolves to a template lead-in
   checks/check-agent-tier-explicit.gate  # hermetic, binary-dispatched: every agent definition declares an explicit model:
@@ -2919,20 +2917,51 @@ finding a `model:` string; the `bad/` side omits the field.
 clean/violation pair), so — like guard-kit's guard-tests — the kit ships
 its own decision-table runner: `usage-tests/cases.tsv` pairs an expected
 verdict token (`OK`/`PAUSE`/`STALE`/`RESET-OK`) and exit code with scenario
-knobs (percentage, snapshot age offset, reset offset, credential age);
-`bin/run-usage-tests.sh` materializes each case as a generated snapshot
+knobs (percentage, snapshot age offset, reset offset, credential age); the
+crate test module `native/src/usage_tests.rs` reads that table off disk,
+materializes each case as a generated snapshot
 file (timestamps must be computed relative to *now* — static fixtures
-would age into permanent STALE) and asserts verdict and exit code. Each
+would age into permanent STALE) and asserts verdict and exit code. **The clock
+is read once for the whole run**, and every case's timestamps are computed
+against that one reading: a per-case read introduces cross-case skew that flakes
+exactly the at-or-over boundary rows the table exists to pin. Each
 case runs in a throwaway sandbox with no consumer config on the lookup
 path **and** with ambient `DELEGATION_KIT_*` exports stripped at each gate
 invocation, so the gate exercises its own defaults hermetic to the host
 repo — the decision table encodes those defaults, and a host override (a
-raised pause threshold, say) must not reshape it. The trend and
-budget-guard runners below share the strip, each runner under a deliberate
-poison export that fails its own table loudly if the strip ever breaks;
+raised pause threshold, say) must not reshape it. Three properties carry that
+contract, and each is a place a reimplementation would quietly differ:
+
+- **The strip is the whole `DELEGATION_KIT_*` namespace, derived at run time**
+  from the running process's own variables and applied as the child's explicit
+  environment — never a hardcoded list of knob names, which re-creates precisely
+  the failure the poison export exists to catch.
+- **The poison stays a real export in the running process.** The trend runner
+  below shares the strip, each runner under a deliberate
+  poison export that fails its own table loudly if the strip ever breaks — and a
+  port that keeps only a clean child environment, dropping the parent-side
+  poison, passes every assertion while proving nothing. That is the one way this
+  coverage can ship green and vacuous, which is why it is a stated requirement
+  rather than an implication of the strip's description. In the crate the write
+  goes through `knobenv`'s serializing guard, the crate's sole writer of the
+  process-global environment (gate-sdk/SPEC.md §lib/gate.sh).
+- **The subject stays shell and is spawned**, with its cwd inside the sandbox
+  and its two streams **merged** — the `2>&1` capture the shell runner took.
+  Every assertion below is made against the merged stream, and capturing them
+  apart would pass the fail-soft no-leak conjunct vacuously. Every program these
+  tests spawn is on `GATE_SDK_PROGRAM_FLOOR`. The one worth naming is
+  `touch -d "@<epoch>"`, which sets the credentials mtime that is the whole
+  login-window input: on the floor, so the port criteria do not bind, but a
+  POSIX-only call the port does not buy its way out of — the test already spawns
+  `bash` into a shell subject, so it stays unix-bound for as long as
+  §usage-verdict does, and the floor question comes due at that member's own cut,
+  when the bash spawn goes and the mtime set is the last unix-ism left.
+
 `cases.tsv` columns are `verdict exit pct age_off reset_off cred_age pct_7d
 reset7d_off append axis desc` (the offsets seconds from *now*; `pct_7d` `-`
-omits the weekly keys, `append` is the expected sample-line count, `axis`
+omits the weekly keys, `append` is the expected sample-line count — counted as
+`grep -c ''` counts, a final unterminated line included, a line iterator's count
+being silently one short of it — and `axis`
 asserts which window a PAUSE names). Every verdict branch and both pause axes
 carry a firing and a non-firing case — the fixture-pair discipline,
 transplanted — covering a weekly PAUSE while 5h is comfortable, the axis
@@ -2944,7 +2973,14 @@ at-or-over one on either axis is still PAUSE, not STALE — the asymmetry is
 what keeps the reroute from waving an unaffordable dispatch through), and the
 sample-append discipline (a parsed snapshot
 appends one line whatever the verdict; a non-numeric snapshot appends none;
-`pct_7d` present-vs-omitted in the passed-through line).
+`pct_7d` present-vs-omitted in the passed-through line). Every case also asserts
+the fan-width field on the verdict line, matched **with its trailing space** —
+without it `width=20` matches `width=2` and the assertion stops discriminating —
+and one case beside the table proves the field tracks `DELEGATION_KIT_FAN_WIDTH`
+rather than a literal. The default width the per-case match pins, and the
+refresh floor a diagnostic below names, stay **literal expectations of the kit
+defaults**: reading either from the library instead would make the table agree
+with whatever the library says rather than assert what it should say.
 
 The demand-driven refresh needs a command seam the table's columns do not
 carry, so it is asserted beside the table through a stub
@@ -2953,7 +2989,9 @@ poll would need the network): **armed** — a stale snapshot invokes the command
 and the verdict reads the values the refresh wrote, not the cached ones;
 **fail-soft** — a non-zero stub leaves the snapshot byte-identical, the verdict
 proceeds and the cached reading is judged STALE by the existing staleness
-machinery, and no refresh diagnostic leaks into the relayed verdict line;
+machinery, and no refresh diagnostic leaks into the relayed verdict line — a
+**negative** conjunct over the merged stream, because callers relay that line
+verbatim and a stdout captured apart from stderr passes it vacuously;
 **short-circuit** — a snapshot under `DELEGATION_KIT_REFRESH_MIN_AGE` never invokes the
 command. Armed and short-circuit are the firing/non-firing pair over the same
 stub, so the absence proves the floor rather than a broken stub.
@@ -2971,21 +3009,46 @@ empty log still STALEs and leaves exactly its own sample behind, so the
 witness can only ever be a previous reading.
 
 `usage-trend` is likewise not a gate (it renders no clean/violation
-verdict), so it ships an assertion runner, `bin/run-trend-tests.sh`, over a
+verdict), so it ships an assertion set over a
 static fixture history `usage-tests/trend-history.log` (static epochs are
-safe — the reporter measures within-segment deltas, never against *now*). It
+safe — the reporter measures within-segment deltas, never against *now*),
+carried by the same crate module under the same sandbox, strip and poison
+discipline — the poison here being `DELEGATION_KIT_USAGE_HISTORY`, the very knob
+the reporter reads, which is what makes the unset-knob arm below meaningful
+rather than self-satisfying. It
 asserts per-axis segmentation at a reset boundary, a `login_at` change, and
 an account change; per-account grouping reuniting a weekly trajectory across
 a switch-back; a spike-then-correction flagged and excluded rather than
 averaged; token deltas and weekly headroom on the report; and the
-fail-closed exits (knob unset / history missing → 2). No fixture pair owed —
-neither script is a gate.
+fail-closed exits (knob unset / history missing → 2), each read off the child's
+own exit status. **Its needles are exact golden strings and its segment counts
+are anchored on the reporter's own two-space indentation**: loosening a needle
+into a pattern weakens the assertion, and that indentation is load-bearing
+rather than cosmetic. No fixture pair owed —
+neither runner is a gate, and criterion 2's discharge for a non-gate member is
+the both-substrates comparison bought once at port time (gate-sdk/SPEC.md §The
+port-candidate criteria): the table's rows, the beside-the-table assertions and
+the trend fixture were driven through the shell runners and the crate module
+together and their verdicts and exit codes compared, *before* either shell file
+was deleted. Nothing machine-held keeps the two agreeing afterwards, which is
+why the originals are deleted rather than left running beside the crate tests.
 
 `agent-budget-guard` and `agent-dispatch-guard` are hooks rather than gates, so
 each speaks exit-2 + hook JSON rather than the gate output contract — and each
 shipped a decision-table runner beside the verdict tests until the port moved
-both members into the binary. **The runners retired with their subjects; one
-table stayed and one did not**, and the split is the rule rather than an
+both members into the binary. **A runner retires into the crate when its *cases*
+can be driven from there — the subject reached in process *or* spawned.** The
+guards' subjects moved in-crate, so a `#[test]` reached them directly; the two
+usage runners above keep shell subjects and spawn them, `bin/usage-verdict.sh`
+and `bin/usage-trend.sh` each declaring its own section and belonging to the
+kit-`bin/` owed cohort rather than to that cut. The narrower "the runners
+retired with their subjects" was true of its own instance and is not the general
+rule. **What retirement buys is coverage at a second transition**: the
+assertions ran only in a validate suite, and now run under `check-crate-arms` at
+every commit *and* under the `native_crate` validate suite — a widening rather
+than a move, and affordable because the whole case set is under a second of wall
+clock against an arm that already runs at every commit. **One
+table stayed and one did not**, and that split is the rule rather than an
 accident. `usage-tests/dispatch-guard-cases.tsv` stays on disk and is now read
 by the crate test that replaced `bin/run-dispatch-guard-tests.sh`: it pairs an
 expected outcome (`block`/`advise`/`fallthrough`) with

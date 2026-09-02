@@ -96,6 +96,9 @@ directly with `--fixture <dir>` only for testing.
 
 ```bash
 bash gate-sdk/bin/run-gate-tests.sh delegation-kit/gate-tests delegation-kit/checks  # every gate's fixture pair
-bash delegation-kit/bin/run-usage-tests.sh                                           # usage-verdict verdict table
-bash delegation-kit/bin/run-trend-tests.sh                                           # usage-trend segmentation assertions
 ```
+
+The `usage-verdict` decision table and the `usage-trend` assertions are no
+longer shell runners: they retired into the gate binary's crate test lane, where
+they read the same `usage-tests/` fixtures off disk and spawn the two shell
+subjects (SPEC §Testing).
