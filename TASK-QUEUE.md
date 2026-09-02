@@ -12,6 +12,28 @@
 
 ## New Features
 
+- **subagent-liveness-log-unattributed-refusal** [spec: SPEC-refusal-record.md] — the liveness log
+  records a refusal without recording WHICH LAUNCH RECORD it refused on, so a reader cannot tell the
+  guard working from the guard wedged.
+  recurrence: subagent-liveness-log-unattributed-refusal 2026-08-28 2026-08-31
+  **FIVE measurements across four days, and the SERIES is the finding rather than any one of them.**
+  Events / refusals, in order: 366/21, 172/11, 440/19, then 298/7 — the last off the log the PORTED
+  arm writes. Every refusal in every one is `live=yes records=1 decision=refuse`, in ~30-second
+  retry sub-clusters, with `session=` carrying the top-level harness session uniformly across green
+  and red rows alike. Volume moved four times and readability moved none, and the port did not
+  change it, so a sixth measurement is known in advance to buy the same nothing.
+  **OPERATOR-RULED 2026-09-02 (lead-relay): TAKEN AS THE PORT-ONLY RUN'S ONE EXCEPTION**, on the
+  merit two paid declinations left standing. The lead put all three threshold entries to the
+  operator as one batch; this one was taken and the other two stay deferred, which RETIRES the "no
+  declination reached the operator" record rather than extending it.
+  Its fork, its costed refusals and its blast radius are `SPEC-refusal-record.md`'s, not restated:
+  the promotion sheds the design rulings the amendment now owns.
+  ruled: subagent-liveness-log-unattributed-refusal lead 2026-08-31 own-authority
+  ruled: subagent-liveness-log-unattributed-refusal lead 2026-09-01 own-authority
+  ruled: subagent-liveness-log-unattributed-refusal operator 2026-09-02 lead-relay
+  Filed 2026-08-27 to the gap inbox by the windows-artifact-proof close; promoted 2026-08-27 by the
+  next scope, the filing bullet's live-sibling premise falsified; spec'd 2026-09-02.
+
 ## Technical Debt
 
 ## Deferred
@@ -8592,58 +8614,6 @@
   rather than a tail bucket.
   Filed 2026-08-27 to the gap inbox by the windows-artifact-proof close, which paid the cost;
   promoted 2026-08-27 by the next scope, at the boundary that could legally run the drain.
-
-- **subagent-liveness-log-unattributed-refusal** [design-pending] — the turn-end liveness log
-  records a refusal without recording whose, so a reader cannot tell the guard working from the
-  guard wedged.
-  recurrence: subagent-liveness-log-unattributed-refusal 2026-08-28 2026-08-31
-  **FIVE measurements across four days, and the SERIES is the finding rather than any one of
-  them.** Events / refusals, in order: 366/21 at `windows-artifact-proof`'s close, 172/11 at
-  `installer-trial-lifecycle-repair`'s (three sub-clusters, 20:58Z-21:26Z on 2026-08-27), 440/19,
-  then 298/7 — the last taken off the log the PORTED arm writes. Every refusal in every one is
-  `live=yes records=1 decision=refuse`, in ~30-second retry sub-clusters, with `session=` carrying
-  the top-level harness session uniformly across green and red rows alike. Volume moved four times
-  and readability moved none. **That ground is answered, not open — a sixth measurement is known in
-  advance to buy the same nothing**, and the port did not change it.
-  **The payload already carries the attribution and the hook drops it.** Each line's own `keys=`
-  field lists `agent_id` and `agent_type`, so logging those two plus the matched record's run key
-  would make every one of these rows readable. The hook is the `subagent-stop-liveness`
-  harness-integration arm (delegation-kit/SPEC.md §The turn-end liveness hook); the shell copy this
-  entry was filed against is gone and the field set is now `native/src/hook/stop_liveness.rs`'s,
-  still carrying neither name — so the finding is unmoved by the substrate.
-  **The filing bullet's motive was a DISPOSED premise** — it argued the gap blocks verifying
-  `waiter-predicate-self-match`, retired at `05af5200`. The urgency falls, the finding does not.
-  **What survives, and it is the general form.** A refusal is correct when a real producer runs, and
-  a wedge when the record naming a live pid is the waiter's own — the log's whole diagnostic value,
-  and no row carries a field that would settle it.
-  **Why `[design-pending]`:** the candidate shapes differ in who they serve. Logging `agent_id`,
-  `agent_type` and the matched run key serves a later reader; naming the matched record in the
-  *refusal message* serves the refused session, which can then act on it; dropping `session=` serves
-  neither but stops a field reading as attribution while carrying none.
-  **DISTINCT from the close-surface roster question**, which asks whether the log is read at all.
-  **AT THRESHOLD 2026-08-31, promotion DECLINED THREE TIMES.** First: the shell hook was a member of
-  the `harness-hook-arm-port` cut, so a fix authored then would have been written against shell that
-  cut removes. Refused with it: folding it into the port amendment, since settling a live
-  `[design-pending]` fork inside a port cut is non-port design work — a refusal this iteration's two
-  cuts re-inherit, and which this entry's own promotion therefore obeys. **ONE CONSTRAINT
-  RODE OUT AND IS DISCHARGED at that cut's build:** the record's field set was specified OPEN, so
-  `agent_id`, `agent_type` and the matched run key stay addable in one table edit. Both halves of
-  the deferral's price are paid, so the entry IS takeable on its merits — declinations two and three
-  were ON THE RUN, not on that merit.
-  **OPERATOR-RULED 2026-09-02 (lead-relay): TAKEN AS AN EXCEPTION TO THE PORT-ONLY RUN**, on that
-  ground. The lead put all three threshold entries to the operator as one batch; this one was taken
-  and the other two stay deferred, which RETIRES the "no declination reached the operator" record
-  rather than extending it. It rides NEITHER port amendment, and its fork stays spec's to propose.
-  Scope does not move it to the feature section: the entry is `[design-pending]`, and writing the
-  amendment is the act that promotes it (canon-kit/SPEC.md §The amendment lifecycle).
-  ruled: subagent-liveness-log-unattributed-refusal lead 2026-08-31 own-authority
-  ruled: subagent-liveness-log-unattributed-refusal lead 2026-09-01 own-authority
-  ruled: subagent-liveness-log-unattributed-refusal operator 2026-09-02 lead-relay
-  **Cost while deferred:** every refusal cluster is uninterpretable, so the one instrument that
-  could measure whether the producer/observer split works reads the same for a working guard and a
-  wedged one — and a wedged guard costs a session its turn.
-  Filed 2026-08-27 to the gap inbox by the windows-artifact-proof close after its roster read;
-  promoted 2026-08-27 by the next scope, with the filing bullet's live-sibling premise falsified.
 
 - **artifact-substitution-remedy-has-no-end-to-end-arm** [design-pending] — the remedy
   `artifact-digest-mismatch-remedy-inert` shipped — `init` rewriting a gate binary whose bytes no
