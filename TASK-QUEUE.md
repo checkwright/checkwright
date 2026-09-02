@@ -9324,10 +9324,10 @@
 - **walk-entry-model-unstated** [design-pending] — Walk drops symlinks unstated; tree has none.
 - **pack-step-dirty-tree-predicate-unscoped** [design-pending] — Unscoped dirty check aborts a pack.
 - **prune-set-matches-walk-root-ancestors** [design-pending] — A leaf above the root prunes it all.
+- **evidence-baseline-orphan-suite-row** [design-pending] — A row for a retired suite is unread.
 
 ## Done
 
-- subagent-liveness-log-unattributed-refusal
 
 ## Lessons Learned
 
