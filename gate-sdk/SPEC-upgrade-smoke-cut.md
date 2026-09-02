@@ -376,11 +376,31 @@ own `[spec:]` amendment ref" — a sentence written for one cut per iteration.
 floor resolves to 100, so that entry's fixed lead-line part is 66 columns and a
 tag costs `9 + len(basename)`: one fits at a basename up to 25 characters, and a
 second cannot at any naming, the shortest legal basename being `SPEC-a.md` at 9
-for a cost of 18 against the 16 that remain. The sentence's insufficiency for a
-two-cut iteration is **filed to the gap inbox** as its own finding rather than
-absorbed here, because this is the third iteration to re-derive it and the
-2026-09-01 ruling that resolved it landed in an amendment that merged and was
-deleted.
+for a cost of 18 against the 16 that remain.
+
+**The deviation from that sentence is lawful rather than tolerated, and the
+authority is recorded.** The rule at §Porting a gate to the binary substrate
+presumes one cut per iteration; `native-gate-port-remaining-corpus`' ruling of
+**2026-08-30 (operator, lead-relay)** refuses exactly that reading — "IT
+CONSTRAINS SELECTION, NOT ITERATION PACKAGING … the clauses above say what makes
+ONE cut well-formed; how many an iteration holds is owned elsewhere". Later and
+higher authority governs, so a two-cut iteration is not a departure needing a
+waiver. Confirmed for this pairing by the **lead, own authority, 2026-09-02**,
+over the resume channel; it did not reach the operator.
+
+**The one-host resolution relocates into `gate-sdk/SPEC.md` at this amendment's
+merge, and that is merge step 2 rather than new work.** canon-kit/SPEC.md
+§Merging an amendment orders the merge: step 2 relocates design rationale "into
+the spec's prose (its permanent home)", and only step 3 deletes the file. The
+2026-09-01 ruling that first resolved this arithmetic was lost because step 2 was
+not performed on it — a **merge defect**, not a property of amendments — which is
+why this iteration is the third to re-derive it. So the paragraph "Which queue
+entry a cut rides" gains the resolution in its own prose: the entry it names is
+the host for a cut that has no other, an existing entry whose **own text names
+the cut's subject as its blocker** may host instead, and one lead line carries at
+most one `[spec:]` tag. Performing step 2 correctly here is what stops a fourth
+re-derivation, and it costs the merge nothing it did not already owe. The gap
+stays filed with that corrected cause; the remedy rides this merge.
 
 **Second, this host is the right one rather than the leftover one, and the
 ground is the entry's own words.** `kit-library-port-residue` says of
@@ -421,6 +441,38 @@ narrative is compressed in place in the same commit that demotes the entry.
 Stated here because neither owner states it alone — the cap is queue-kit's and
 the demotion is canon-kit's — and because a build meeting it as a red is a batch
 spent rediscovering an arithmetic this amendment already did.
+
+**The terminal move is a demotion and it is the uncatchable branch, so it is
+stated twice on purpose.** canon-kit/SPEC.md §Merging an amendment rules that
+"the Done-move contract has no gate behind either half, so the wrong terminal
+move reds nothing and is found only by a later reader" — nothing will stop a
+build session moving this entry to `## Done`. It must not: the entry's
+deliverable is a corpus, this cut delivers **no member** of it, and a Done move
+would assert a finished residue while three of its four members are still owed
+and the fourth has only just become takeable. A Done move would also strip every
+tag the entry carries, since a done entry is a bare slug.
+
+### (14) The crate-arms trigger does not fire on this cut's files, and the oracle is run rather than relied on
+
+`check-crate-arms` is the gate holding "the crate's lint and test arms run at
+commit time", and its trigger is
+`staged_matches 'native/Cargo.toml' 'native/build.rs' 'native/src/*.rs'
+'native/src/gates/*.rs'` {mechanical}. **This cut's crate files match none of
+it.** A bridged arm lands as a row in `native/src/emit/mod.rs` and an
+implementation beside it in `native/src/emit/`, and — probed rather than assumed
+— `native/src/main.rs:345` dispatches every bridged arm through a **table
+lookup**, `emit::lookup(first)`, so unlike the hand-branched top-level flags at
+`:184-316` this member has **no `main.rs` edit at all** that would make the
+trigger fire incidentally.
+
+So the landing commit runs the gate **explicitly** —
+`bash gate-sdk/bin/run-gates.sh --only check-crate-arms` — rather than trusting a
+trigger known not to fire. That is oracle-first applied to a gate whose *reach*
+is the thing at fault, and it is the whole remedy this cut takes: widening the
+`# graph:` manifest would restage the generated hooks and is gate-manifest work
+the port-only run does not admit, so the trigger omission is **filed to the gap
+inbox** and routed around here. `bash gate-sdk/bin/build-native.sh` does not
+discharge it — that builds the binary and runs neither arm.
 
 ## Producers and consumers
 
@@ -554,6 +606,14 @@ learns it.
 - `gate-sdk/SPEC.md §lib/gate.sh` — the three `GATE_SDK_UPGRADE_*` defaults land
   here, two of them empty-means-derive, joining `CONTEXT_KIT_MEMORY_DIRS`'
   precedent class (delta 5).
+- `gate-sdk/SPEC.md §Porting a gate to the binary substrate`, the **"Which queue
+  entry a cut rides"** paragraph — gains the one-host resolution in its own
+  prose: the composer entry hosts a cut that has no other, an existing entry
+  whose own text names the cut's subject as its blocker may host instead, and
+  one lead line carries at most one `[spec:]` tag. This is **merge step 2
+  performed on this amendment's own rationale**, which is what the previous
+  resolution did not get, and it is the target that stops a fourth
+  re-derivation (delta 12).
 - `gate-sdk/SPEC.md §The port-candidate criteria` — no ruling changes; named
   because criterion 5's own §upgrade-smoke citation is about this member and a
   reader checking the residual arrives from there (delta 9).
@@ -651,6 +711,15 @@ twin holding its rules.
       unchanged and unclosed.
 - [ ] **The heading survives** — `### upgrade-smoke` is not renamed, and
       `check-md-refs` is green over `docs/install.md`'s link to its slug.
+- [ ] **`check-crate-arms` was run explicitly, not left to its trigger** —
+      `bash gate-sdk/bin/run-gates.sh --only check-crate-arms` in the landing
+      commit, because that gate's trigger does not reach `native/src/emit/*.rs`
+      and a bridged arm needs no `main.rs` edit to drag a matching path in
+      (delta 14).
+- [ ] **The terminal move is a demotion, checked by reading the queue** — the
+      host entry is under `## Deferred` with `[design-pending]` restored and is
+      **not** in `## Done`, verified by looking rather than by the absence of a
+      red, the Done-move contract having no gate behind either half.
 - [ ] **The regeneration fan-out is discharged in the landing commit** — the
       generated hook, the graph artifact, the enforcement map, the value rollup,
       the `docs/gate-sdk/` mirror and the gate binary.

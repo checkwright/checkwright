@@ -205,7 +205,35 @@ mirror, which `check-docs-mirror-fresh` byte-gates; it is rostered with its
 trigger and regen command in docs/site-architecture.md §Generated projections and
 is discharged in the landing commit.
 
-### (7) The host entry promotes, is re-priced on its lead line, and reaches Done
+### (7) The crate-arms trigger does not fire on this change, and the oracle is run rather than relied on
+
+Every crate file this amendment touches is under `native/src/hook/`, and
+`check-crate-arms` — the gate whose stated job is that "the crate's lint and test
+arms run at commit time" — triggers on
+`staged_matches 'native/Cargo.toml' 'native/build.rs' 'native/src/*.rs'
+'native/src/gates/*.rs'` {mechanical}. `native/src/hook/*.rs` is in none of it,
+and this change needs no `main.rs` edit either: the hook member is already
+registered and dispatched, so nothing incidentally drags a matching path into the
+commit. **Left to the trigger, this unit's landing commit would run neither the
+lint nor the test arm — including the two arity assertions delta (5) makes the
+guard.**
+
+So the landing commit runs the gate **explicitly**,
+`bash gate-sdk/bin/run-gates.sh --only check-crate-arms`. That is oracle-first
+applied to a gate whose *reach* is at fault rather than its rule, and the reach
+is **filed to the gap inbox** rather than repaired here: widening a `# graph:`
+manifest restages the generated hooks, which is gate-manifest work this iteration
+does not carry. `bash gate-sdk/bin/build-native.sh` does not discharge it — that
+builds the binary and runs neither arm — and the two obligations are separate by
+CLAUDE.md's own words.
+
+This is the sharpest thing in the unit for a build session to get wrong, because
+the failure is silent in both directions: the trigger not firing looks exactly
+like a clean battery, and delta (5)'s positional zip truncates rather than
+panicking. The gate that catches the truncation is the one the trigger will not
+run.
+
+### (8) The host entry promotes, is re-priced on its lead line, and reaches Done
 
 `subagent-liveness-log-unattributed-refusal` moves into `## New Features` with
 `[design-pending]` swapped for `[spec: SPEC-refusal-record.md]` {mechanical}.
@@ -232,7 +260,7 @@ The promoted body sheds the design rulings this file now owns — the
 `[design-pending]` fork paragraph and the three-declination history — rather than
 keeping a second copy of them.
 
-### (8) The coupled wedge entry is cited, not drained
+### (9) The coupled wedge entry is cited, not drained
 
 `wait-record-self-deadlock` is the entry that holds the wedge this log could not
 show: a validate session backgrounded a wait, wrote a record naming **its own**
@@ -338,11 +366,11 @@ that learns it.
   promoted into `## New Features` with `[design-pending]` swapped for this
   amendment's `[spec:]` ref, its lead line re-priced against
   `check-queue-wrap`'s floor, and its body shedding the design rulings this file
-  now owns. It reaches `## Done` at build (delta 7).
+  now owns. It reaches `## Done` at build (deltas 7 and 8).
 - `TASK-QUEUE.md`, the `wait-record-self-deadlock` entry — deliberately
   **unwritten**: it is cited as this unit's worked evidence and its own three
   candidate fixes stay its own, the port-only run promoting nothing beyond this
-  one ruled exception (delta 8).
+  one ruled exception (delta 9).
 
 <!-- update-target-exempt: the gate binary is rebuilt by every commit touching the crate under this repo's standing build obligation, so it is not a target any single delta claims -->
 - The gate binary itself — rebuilt with `bash gate-sdk/bin/build-native.sh`
@@ -398,5 +426,9 @@ that is stated so a later reader does not read the privacy rule as spent.
 - [ ] **The identity refusal is written, not merely absent** — the section says
       why `agent_id` and `agent_type` are not logged and why `session=` stays,
       so the next reader meeting the idea finds it costed.
+- [ ] **`check-crate-arms` was run explicitly, not left to its trigger** —
+      `bash gate-sdk/bin/run-gates.sh --only check-crate-arms` in the landing
+      commit, because that gate's trigger does not reach `native/src/hook/*.rs`
+      and a green battery would otherwise mean it never ran (delta 7).
 - [ ] **The mirror and the binary are fresh in the landing commit** —
       `check-docs-mirror-fresh` and `check-gate-binary-fresh` green.

@@ -296,6 +296,19 @@ restages the generated hooks and is gate-manifest work, which the port-only run
 does not admit. This delta routes around it by siting, and says so, so that the
 next reader does not read the placement as arbitrary.
 
+**Siting is the only lever, and this is the one of the iteration's three units
+where it works** — stated because a build lead cutting batches needs the
+contrast. A crate test module can be placed inside the trigger; a bridged arm and
+a hook member cannot. `native/src/main.rs:345` dispatches every bridged arm
+through a table lookup, `emit::lookup(first)`, so a new arm lands wholly under
+`native/src/emit/` with no `main.rs` edit to drag a matching path into the
+commit; a hook member is already registered, so the same is true of it. Both
+sibling amendments this iteration therefore run
+`bash gate-sdk/bin/run-gates.sh --only check-crate-arms` explicitly in their
+landing commits, and each says so in its own text. **This cut needs no such
+step**: the module matches `native/src/*.rs` and `main.rs` gains its
+`#[cfg(test)] mod usage_tests;` declaration, so the trigger fires twice over.
+
 ### (11) Every path-bearing surface moves in the deleting commit, and four of them no gate sees
 
 The roster is probed rather than assumed {mechanical}:
