@@ -12,6 +12,57 @@
 
 ## New Features
 
+- **kit-library-port-residue** [spec: SPEC-declaration-cut.md] — the kit `lib/*.sh` members the
+  2026-08-30 class ruling deliberately leaves owed, filed rather than absorbed at its boundary.
+  **What the ruling settled and what it did not.** gate-sdk/SPEC.md §The kit-library port
+  disposition rules a library permanently shell when it is the config bridge's **sole resolver**
+  for its kit's knobs. The discriminator is content, not directory, so two kinds of member fall
+  outside it: a file that rides the bridge's flat `lib/*.sh` glob while resolving no bridged knob,
+  and a file one directory deeper that the glob never reaches. Both are **owed, not undecided** —
+  each already carries a sentence in its own SPEC section naming this entry.
+  **The members still owed, measured 2026-08-30 at build against `--emit port-blockers --tree`:**
+  `gate-sdk/lib/declaration.sh` (59), `gate-sdk/lib/inject.sh` (80),
+  `gate-sdk/lib/test-hermetic.sh` (37), `context-kit/lib/toolfloor.sh` (58).
+  **Two of the original six are DISCHARGED** — `context-kit/lib/pub-lang/{rust,ts}.sh`, the bundled
+  members `native-gate-port-remaining-corpus`' ruling (1) positively sent in-crate. They waited on
+  the resolver that finds them, and 2026-09-01's `SPEC-index-cut` port of `pub-index` is it: the
+  seam survives and the two grammars are crate code (context-kit/SPEC.md §Index-first reading).
+  So this entry **demotes** rather than reaching Done — its deliverable is a corpus, and the next
+  cut re-promotes with a fresh amendment (canon-kit/SPEC.md §Merging an amendment). Its two
+  hostings had different grounds: 2026-09-01 delivered two of six members; 2026-09-02's
+  `SPEC-upgrade-smoke-cut` delivered **none** and discharged one member's blocker instead.
+  **Each remaining member is owed on its own ground, and they do not resolve together** — which is
+  why this is one entry owning a residue rather than one cut:
+  `declaration.sh` is **unblocked and takeable**, never delivered: its stated test was whether the
+  shell caller set empties, and the 2026-09-02 §upgrade-smoke port emptied it by moving the resolve
+  in-crate, leaving only `*.test.sh` sourcers, which that arm's corpus rule excludes. It did not
+  port at that cut, declaring a different stated contract; it is owed under its own section.
+  `inject.sh` has three shell sourcers — `context-kit/bin/env-probe.sh`,
+  `lifecycle-kit/bin/install-lifecycle.sh`, `doctrine-kit/bin/install-doctrine.sh` — each itself
+  owed, so it moves behind them.
+  `test-hermetic.sh` is **deliberately not declared**: it computes a second default for the bridged
+  knob `GATE_SDK_NATIVE_BIN`, and declaring a file that holds a second producer would bless the
+  duplication the class ruling rests on refusing. Its disposition waits on the defect below.
+  `toolfloor.sh`'s roster is read on the installer path and by `check-install-toolchain`'s parity
+  assertion, so it is sequenced behind the installer's behind-invoke relocation rather than by
+  anything in this class. Both slugs that carried that sequencing were ruled wontfix by the
+  operator in the 2026-08-31 consult and left the queue, so the sequencing now reads off the
+  rulings' own home, installer/README.md §The install boundary — `behind-invoke` is a port
+  obligation that keeps a file owed until the step moves behind the invoke — and the live entry
+  owning that relocation is `powershell-installer-surface`.
+  **The one live defect inside this set, already filed:** `gate-sdk/lib/test-hermetic.sh:14`
+  omits the executable-suffix helper `gate-sdk/lib/gate.sh:100` appends, so on a Windows host every
+  bespoke test pins `GATE_SDK_NATIVE_BIN` to a path that cannot exist. It is the Deferred entry
+  `hermetic-bin-suffix-pin-placement` (drained there from the gap inbox 2026-08-31 by close) and is
+  **not** re-filed here; this entry owns the port disposition that waits on it.
+  **Cost while deferred:** low and non-recurring — the ground is stated and each member's sequencing
+  is written into its own SPEC section, so no future cut re-argues the class. What is owed is the
+  work, not the argument.
+  ruled: kit-library-port-residue lead 2026-09-01 own-authority
+  ruled: kit-library-port-residue lead 2026-09-02 own-authority
+  ruled: kit-library-port-residue operator 2026-09-03 lead-relay
+  Filed 2026-08-30 by build, at the landing of the kit-library class ruling.
+
 ## Technical Debt
 
 ## Deferred
@@ -66,56 +117,6 @@
   ruled: native-gate-port-remaining-corpus operator 2026-08-31 consult
   ruled: native-gate-port-remaining-corpus lead 2026-09-01 own-authority
   Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close; cohorts ruled at scope 2026-08-11/12.
-
-- **kit-library-port-residue** [design-pending] — the kit `lib/*.sh` members the
-  2026-08-30 class ruling deliberately leaves owed, filed rather than absorbed at its boundary.
-  **What the ruling settled and what it did not.** gate-sdk/SPEC.md §The kit-library port
-  disposition rules a library permanently shell when it is the config bridge's **sole resolver**
-  for its kit's knobs. The discriminator is content, not directory, so two kinds of member fall
-  outside it: a file that rides the bridge's flat `lib/*.sh` glob while resolving no bridged knob,
-  and a file one directory deeper that the glob never reaches. Both are **owed, not undecided** —
-  each already carries a sentence in its own SPEC section naming this entry.
-  **The members still owed, measured 2026-08-30 at build against `--emit port-blockers --tree`:**
-  `gate-sdk/lib/declaration.sh` (59), `gate-sdk/lib/inject.sh` (80),
-  `gate-sdk/lib/test-hermetic.sh` (37), `context-kit/lib/toolfloor.sh` (58).
-  **Two of the original six are DISCHARGED** — `context-kit/lib/pub-lang/{rust,ts}.sh`, the bundled
-  members `native-gate-port-remaining-corpus`' ruling (1) positively sent in-crate. They waited on
-  the resolver that finds them, and 2026-09-01's `SPEC-index-cut` port of `pub-index` is it: the
-  seam survives and the two grammars are crate code (context-kit/SPEC.md §Index-first reading).
-  So this entry **demotes** rather than reaching Done — its deliverable is a corpus, and the next
-  cut re-promotes with a fresh amendment (canon-kit/SPEC.md §Merging an amendment). Its two
-  hostings had different grounds: 2026-09-01 delivered two of six members; 2026-09-02's
-  `SPEC-upgrade-smoke-cut` delivered **none** and discharged one member's blocker instead.
-  **Each remaining member is owed on its own ground, and they do not resolve together** — which is
-  why this is one entry owning a residue rather than one cut:
-  `declaration.sh` is **unblocked and takeable**, never delivered: its stated test was whether the
-  shell caller set empties, and the 2026-09-02 §upgrade-smoke port emptied it by moving the resolve
-  in-crate, leaving only `*.test.sh` sourcers, which that arm's corpus rule excludes. It did not
-  port at that cut, declaring a different stated contract; it is owed under its own section.
-  `inject.sh` has three shell sourcers — `context-kit/bin/env-probe.sh`,
-  `lifecycle-kit/bin/install-lifecycle.sh`, `doctrine-kit/bin/install-doctrine.sh` — each itself
-  owed, so it moves behind them.
-  `test-hermetic.sh` is **deliberately not declared**: it computes a second default for the bridged
-  knob `GATE_SDK_NATIVE_BIN`, and declaring a file that holds a second producer would bless the
-  duplication the class ruling rests on refusing. Its disposition waits on the defect below.
-  `toolfloor.sh`'s roster is read on the installer path and by `check-install-toolchain`'s parity
-  assertion, so it is sequenced behind the installer's behind-invoke relocation rather than by
-  anything in this class. Both slugs that carried that sequencing were ruled wontfix by the
-  operator in the 2026-08-31 consult and left the queue, so the sequencing now reads off the
-  rulings' own home, installer/README.md §The install boundary — `behind-invoke` is a port
-  obligation that keeps a file owed until the step moves behind the invoke — and the live entry
-  owning that relocation is `powershell-installer-surface`.
-  **The one live defect inside this set, already filed:** `gate-sdk/lib/test-hermetic.sh:14`
-  omits the executable-suffix helper `gate-sdk/lib/gate.sh:100` appends, so on a Windows host every
-  bespoke test pins `GATE_SDK_NATIVE_BIN` to a path that cannot exist. It is the Deferred entry
-  `hermetic-bin-suffix-pin-placement` (drained there from the gap inbox 2026-08-31 by close) and is
-  **not** re-filed here; this entry owns the port disposition that waits on it.
-  **Cost while deferred:** low and non-recurring — the ground is stated and each member's sequencing
-  is written into its own SPEC section, so no future cut re-argues the class. What is owed is the
-  work, not the argument.
-  ruled: kit-library-port-residue lead 2026-09-01 own-authority
-  ruled: kit-library-port-residue lead 2026-09-02 own-authority
-  Filed 2026-08-30 by build, at the landing of the kit-library class ruling.
 
 - **platform-support-ci-matrix** [design-pending] [roadmap: next/reliability]
   [precondition-ok: run-observed]
