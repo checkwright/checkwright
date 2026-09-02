@@ -9063,7 +9063,8 @@ anchored on its own `BASH_SOURCE`; a compiled arm has no such anchor, and
 §lib/gate.sh already rules that the kit roots are *transported rather than
 re-derived* precisely because "a binary the installer copies elsewhere cannot
 recover it". The arm takes the root whose basename is `gate-sdk` — a name this
-member already spells, since `kit_dirs_in` orders that kit first by name.
+member already spells, since its vendorable-kit derivation names that kit
+explicitly to order it first.
 
 **The declaration resolve moved in-crate.** The arm reads TO's tightened-gates
 declaration through `native/src/declaration.rs`, the compiled holder the standing
