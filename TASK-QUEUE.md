@@ -49,11 +49,11 @@
   the requirement exists to close. The bar stands unchanged for every other permission-settings
   edit: a carve-out for one class. Scope is the files THAT COMMIT deletes, never a path prefix —
   probe the count, never assume it, the attested probe having quadrupled one kit's.
-  ruled: native-gate-port-remaining-corpus lead 2026-08-28 own-authority
-  ruled: native-gate-port-remaining-corpus operator 2026-08-28 lead-relay
-  ruled: native-gate-port-remaining-corpus lead 2026-08-29 own-authority
-  ruled: native-gate-port-remaining-corpus operator 2026-08-29 lead-relay
-  ruled: native-gate-port-remaining-corpus operator 2026-08-30 lead-relay
+  **(3) A SECTION IS A CUT'S OUTER BOUND, NOT ITS MINIMUM — ruled 2026-09-03 (operator, lead-relay),
+  grounds and refusals at gate-sdk/SPEC.md §Porting a gate to the binary substrate.**
+  ruled: native-gate-port-remaining-corpus lead 2026-08-28 2026-08-29 2026-08-31 own-authority
+  ruled: native-gate-port-remaining-corpus operator 2026-08-28 2026-08-29 2026-08-30 lead-relay
+  ruled: native-gate-port-remaining-corpus operator 2026-09-03 lead-relay
   **Cost while deferred:** large and known — the **owed** remainder (the trailer's own arm, never
   the unported count) plus the runners and the install-lifecycle layer. Not a single-iteration
   delta; criterion relaxation is closed at gate-sdk/SPEC.md §The port-candidate criteria, an
@@ -63,7 +63,6 @@
   (operator, consult); TRAJECTORY.md §PRIORITY DIRECTIVE owns it.** It SUBSUMES rather than
   repeals the 2026-08-29 four-yield rule: with no yield available there is none to escalate.
   ruled: native-gate-port-remaining-corpus operator 2026-08-31 consult
-  ruled: native-gate-port-remaining-corpus lead 2026-08-31 own-authority
   ruled: native-gate-port-remaining-corpus lead 2026-09-01 own-authority
   Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close; cohorts ruled at scope 2026-08-11/12.
 

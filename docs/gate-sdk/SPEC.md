@@ -2006,6 +2006,40 @@ rationale into the spec's prose, its permanent home — was not performed on it.
 That is a merge defect rather than a property of amendments, and it cost a third
 re-derivation. Stated here so there is no fourth.
 
+**A section is a cut's outer bound, never its minimum — ruled 2026-09-03 by the
+operator on a consult's recommendation, lead-relayed.** The composer's *the owed
+files behind one specification section* bounds what a cut may bundle: it refuses
+averaging grounds across sections, and nothing in it obliges a cut to take every
+owed file the section holds. A section whose own text sequences one member
+behind a named unit may cut the unblocked remainder behind that section's
+amendment and carry a second amendment when the sequenced member frees.
+context-kit/SPEC.md is the instance that grounds it, because it states both
+shapes in one file: §bin/env-probe sequences `lib/toolfloor.sh` behind the
+installer's behind-invoke relocation and says nothing of the kind about
+`bin/env-probe.sh`, where §Testing declares its own group *blocked as a whole* —
+so the owner doc has already said which of its groups cuts whole, and
+spec-over-precedent reads it there. Four things bind the shape. The sequenced
+member stays **owed**: it takes no `# port-until:`, because a held file leaves
+§port-blockers' owed column and the 2026-08-28 completion predicate
+(TRAJECTORY.md §The closed rulings) admits no contributor-side subtraction; its
+sequencing is prose in the section, at no cost. The cut record lands in the
+section, as every closed cut's does. The `--group` trailer's *still owed* against
+*takeable at this cut* is already a per-member reading, and §The port-candidate
+criteria already has a cohort sequence a member without declaring it held. And a
+port that must read the sequenced member's content — env-probe sources
+toolfloor's roster and floor predicate — keeps one owner where the crate already
+reads the file (`native/src/gates/install_toolchain.rs` parses the roster off
+`lib/toolfloor.sh`) and holds a predicate twice only under criterion 6's *unless*
+clause with a parity test, evidence-kit/SPEC.md §lib/evidence.sh's shape. Three
+alternatives were refused. *Whole section or nothing* is the over-read the
+2026-08-30 packaging ruling refused for one-cut-per-iteration, contradicts the
+owning SPEC's own per-member sequencing, and prices unblocked lines at the
+Windows bootstrap's clock. *A `# port-until:` on the remainder* subtracts from
+the predicate. *Re-pointing the remainder's `# spec:` at another section* to make
+the cut section a singleton is precedent over spec: the section itself says the
+roster is that library's. No past cut had taken a proper subset of one section's
+owed files, so the ruling stands on the owner doc rather than on precedent.
+
 ### The decisions this substrate already closed
 
 Two questions behind the port are settled. Both are recorded here because the

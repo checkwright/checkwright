@@ -423,6 +423,14 @@ too, which licenses rotting anchors, and reading the locator's drift as falsifyi
 which would have every dated figure in this file re-counted — the step toward re-deciding the
 bash-floor ruling above forbids.
 
+**A section is a cut's outer bound, never its minimum — ruled 2026-09-03 by the operator,
+lead-relayed from a consult.** A reading of the composer recorded on `native-gate-port-remaining-corpus`,
+owned with its grounds at gate-sdk/SPEC.md §Porting a gate to the binary substrate: a section whose
+own text sequences one member behind a named unit cuts its unblocked remainder behind that section's
+amendment, the sequenced member staying owed rather than held. Refused with it: whole-section-or-nothing,
+a hold declaration on the remainder (a held file leaves the owed column), and re-homing the remainder's
+`# spec:` to make the section a singleton.
+
 ## PRIORITY DIRECTIVE — the port track's sequence
 
 **Ruled 2026-08-09 by the operator, and it is the track's top priority: complete
