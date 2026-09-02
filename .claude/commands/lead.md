@@ -58,6 +58,32 @@ against the premise put the burden on the template's §Economics *Split the lead
 where the tail dominates* bullet rather than on this repo's tier. A third
 iteration at several ruled-alone escalations should amend that bullet.
 
+**Third point, 2026-09-02 at `test-runner-and-upgrade-cuts-with-liveness-attribution`:
+`cost=10.27` of the iteration's 105.75, 9.7%, on Opus. THE TRIGGER THE BULLET ABOVE
+NAMED HAS FIRED.** Several escalations again, every one ruled by the lead alone off a
+governed surface read directly: the two-cut composition against the queue's own
+2026-08-30 refusal of one-cut-per-iteration; cut B's host against
+`QUEUE_KIT_WRAP_BUDGET` with both queue lines' columns measured; crate-tests-rather-
+than-bridged-arms against `Arm::Emit`'s error collapse; the crate-arms bullet
+disposition against a replayed predicate; and a correction to spec's stated *cause*
+for a lost ruling, read off `canon-kit/SPEC.md:175-184`. That is three consecutive
+iterations, so "consistently several" is now a trend and not two accidents. The cost
+axis holds a third time (14% → 9.2% → 9.7%), which is the same separation the second
+point bought: the tier question was never a cost question.
+**One ruling was WRONG, and it belongs beside them or this is not a watch.** The lead
+told the operator it had "verified both halves myself" that `native/src/hook/*.rs` and
+`native/src/emit/*.rs` fall outside `check-crate-arms`' trigger. Both halves were
+false. It had read the `.gate` manifest line and `main.rs`'s table dispatch and called
+that verification; the predicate was never run, and a `couples=` field is matched as a
+bash **string** pattern in which `*` crosses `/`. The claim propagated into a gap
+filing, a ruling and two dispatch briefs before a build session ran it. **Why this
+weighs on the amendment rather than merely beside it:** the ruled-alone count credits
+the lead's capacity to settle a question at a governed surface, and this failure is
+that same faculty missing — reading a surface and calling it verification. A later
+judge should read the count and this together rather than netting them, since one
+argues the premise is wrong about what a lead does and the other bounds how much
+credit the count itself carries.
+
 - **`validate`** — the lead dispatches it with a `model: sonnet` override.
   validate's batches are uniformly *mechanical oracle-running* (run the battery,
   report), so the stage collapses to a single stage-uniform-mechanical default —
@@ -194,6 +220,39 @@ iteration at several ruled-alone escalations should amend that bullet.
   later. It is one miss against six repairs and the tier is not proposed for
   reversal on it. What it adds for a later judge is a second counter to count —
   *declined* findings a later stage reverses, not only escalations that fired.
+  **Measured again 2026-09-02 at `test-runner-and-upgrade-cuts-with-liveness-attribution`:
+  `cr=5243426` — rank 6 of 60 ascending, −45% on a recomputed bare-sonnet median of
+  9474141, and the second lowest of the last twenty.** No `align+fanout` row exists
+  this iteration (align dispatched nothing), so the bare row is the whole align spend.
+  **This is the falsification test the 2026-08-31 datum asked for, and it fired in a
+  direction that datum did not name.** The work-side reading predicts draw from scale.
+  This align audited **three** amendments — the heaviest count since the four-amendment
+  iteration that set the window record — and drew second-lowest. Scale predicted high;
+  the reading is near-minimum. So the work-side explanation is contradicted on this
+  point rather than made unfalsifiable, which is the opposite failure from the one that
+  datum was guarding against.
+  **What that does not license, and the pairing is the whole reason.** align left **no
+  resume journal at all** despite an explicit grant, and validate did the same in the
+  same iteration; both absences were invisible in the returning reports and each
+  surfaced only at the next stage's entry gate. A near-minimum draw from the session
+  that skipped a granted artifact reads as *work not done*, not as a cheaper tier —
+  so this point cannot be spent as tier vindication, which is what a watch logging
+  only its confirmations would do with it. This is the **second counter** the datum
+  above added — omitted work a later stage catches — firing for the first time.
+  The stated revert signal did not fire (one validate stamp, no re-entry, no build
+  round-trip), and align found and repaired one real in-envelope defect: two
+  `TASK-QUEUE.md` line citations staled by the liveness entry landing ~18 lines above
+  them at spec. **No tier reversal is proposed.** What a later judge inherits is a
+  point whose cost reading and whose work reading point opposite ways.
+  **A population correction this reading forced.** The datum above reads "a bare-sonnet
+  median of 9540215 across 59 rows … against a standing max of 21907218" — two
+  *different* populations in one sentence. The median and the 59-row rank are the whole
+  bare-align sonnet family; **21907218 is the recent per-iteration window's max only**
+  (the same sentence's "13th of the last 17"). The family's own max is **29650027**, at
+  `native-first-port-cohort`, which sits before the window opens. Both figures are
+  right for their population and the adjacency is what misleads — a lead read the
+  family max against the window record and could not reconcile them. Read "standing
+  max" here as the window's, never the family's.
 
 scope, `spec`, and close stay on Opus, their generative and verificational
 judgment being what justifies the tier. Re-judge every tier when the harness
