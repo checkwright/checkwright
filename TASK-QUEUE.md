@@ -455,7 +455,11 @@
   stage-skill restatement is owed; and the assertion is **not** `--simulate`-only
   — `bin/enter-stage.sh` refuses a real entry on the same branch. What survives
   is this entry's own subject, the firing point, unchanged.
-  recurrence: stage-journal-absence-caught-only-downstream 2026-08-31
+  **Two more 2026-09-02 (`test-runner-and-upgrade-cuts-with-liveness-attribution`):
+  align AND validate both left none in one iteration — both on the sonnet stage
+  tier, both reporting a complete stage, both holding an explicit grant. Two in one
+  iteration is a rate, not a scatter; align's session was gone before close looked.**
+  recurrence: stage-journal-absence-caught-only-downstream 2026-08-31 2026-09-02
   Filed 2026-08-30 by close from the gap inbox, with the bullet's own
   overstatement corrected at the drain.
 
@@ -8724,10 +8728,10 @@
   `wait-loop-exemption-blind-behind-a-script-name`, both about the loop's own condition or the
   exemption's reach; from `backgrounded-shell-child-run-record-unenforced`, a producer with no
   record at all, where here the record existed and was correct; and from
-  `subagent-liveness-log-unattributed-refusal`. **COUPLED to `wait-record-self-deadlock`**, the
-  opposite symptom — a waiter that cannot exit rather than one that exits early — whose first
-  candidate fix is this entry's third, so whichever lands first takes the other's remedy into
-  account.
+  `subagent-liveness-log-unattributed-refusal`, landed 2026-09-02 and retired.
+  **COUPLED to `wait-record-self-deadlock`**, the opposite symptom — a waiter that cannot exit
+  rather than one that exits early — whose first candidate fix is this entry's third, so
+  whichever lands first takes the other's remedy into account.
   **Cost while deferred:** low per call and unbounded in the tail — a session that composes the two
   mandates gets a completion notification that lies, and the rule written to catch a recordless
   background is silenced by the very record the other rule mandates.
