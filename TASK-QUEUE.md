@@ -4021,14 +4021,12 @@
 - **cardinal-notation-splits-gate-reach** [design-pending] — whether a written count is
   enforceable depends on how it is spelled and how large it is, and the queue sits outside the
   scanning corpus entirely; the truncated probe below is a `probe-evidence-sufficiency` sub-case.
-  **The premise that prompted this is falsified, and that is the finding.** Asked whether spelled
-  numerals have a reason, the answer is partly yes: canon-kit/SPEC.md §check-manifest-count
-  documents a cardinal grammar — *"digit sequences and the spelled `two`…`twelve`,
-  case-insensitive; `one` is deliberately outside it"* — implemented as `SPEC_COUNT_CARDINAL_RE`
-  in canon-kit/lib/spec.sh. A word-number table is **not future work; it ships** — and the sweep
-  that costed shipped code as future work searched the **right** term: `digit` matches the
-  dispositive line (canon-kit/SPEC.md:642), but `grep -rn … | head -10` cut the output before
-  canon-kit was reached (queue-kit/SPEC.md supplied 11 of 25). **Truncated, not mis-queried.**
+  **The premise that prompted this is falsified, and that is the finding.** A cardinal grammar
+  **ships, and is not future work**: canon-kit/SPEC.md §check-manifest-count documents *"digit
+  sequences and the spelled `two`…`twelve`, case-insensitive; `one` is deliberately outside it"*,
+  implemented as `SPEC_COUNT_CARDINAL_RE` in canon-kit/lib/spec.sh. The sweep that costed shipped
+  code as future work searched the **right** term and `grep -rn … | head -10` cut the output before
+  canon-kit was reached. **Truncated, not mis-queried.**
   **Discontinuity 1, magnitude.** The word branch stops at `twelve`; the digit branch
   (`[0-9]+`) does not stop. So `13 gates` is matched and `thirteen gates` is not. The SPEC states
   the ceiling without justifying it. Conventional English style — spell through twelve, digits
@@ -4038,12 +4036,10 @@
   none of this reaches the queue. Its 206 spelled numerals from *three* through *fifty*
   (counted independently here, matching the filer) are outside every count gate, at any
   magnitude, in either notation.
-  **The worked example is this close's own edit.** `spec-measured-count-gate` moved from "Twelve
-  instances" to "Thirteen instances" here. In the manifest corpus that single word would have
-  moved the claim from **inside** the matcher's reach to **outside** it — the entry about counts
-  going unenforced, crossing the enforcement boundary, in the act of recording its own thirteenth
-  instance. It happened in the queue, which no count gate scans, so nothing could have caught it
-  either way. That is the two discontinuities composing.
+  **The worked example is a sibling entry's own edit.** `spec-measured-count-gate` moved from
+  "Twelve instances" to "Thirteen instances": in the manifest corpus that one word would have moved
+  the claim from **inside** the matcher's reach to **outside** it. It happened in the queue, which
+  no count gate scans, so nothing could have caught it — the two discontinuities composing.
   **DISTINCT from `spec-measured-count-gate`, deliberately not folded into it as grounds.** That
   entry's thesis is that measured counts **go stale** because nothing derives them; this is that
   notation and corpus decide whether an existing oracle **reaches** a claim at all. A count can be
@@ -4051,9 +4047,8 @@
   true and kept: a digits convention is a genuine **precondition** that makes that entry's gate
   cheaper to build, since matching a digit run is trivial where matching spelled compounds is
   not. Recorded here rather than lost — but a precondition is not the same defect.
-  **Compaction is the weak half, and is stated as weak.** 206 spelled numerals at roughly 4-5
-  characters against a 100-column wrap is on the order of 9 lines file-wide, and a fraction of a
-  line inside any single entry. Real, and not the reason to act.
+  **Compaction is the weak half and is stated as weak:** ~9 lines file-wide against a 100-column
+  wrap, a fraction of one entry. Real, and not the reason to act.
   **The framing that decides it:** `TASK-QUEUE.md` reads like prose but is a gated data surface
   with a line cap, a wrap gate, a tag grammar and slug liveness. Applying a human style guide to
   it optimizes for a reader it does not have.
@@ -4065,7 +4060,12 @@
   **Cost while deferred:** every count written in the queue is unreachable by any oracle, and in
   the manifest corpus a count's enforceability turns on a spelling choice no author is told
   about. Both failures are silent — the gate runs, reports clean, and never saw the claim.
-  recurrence: cardinal-notation-splits-gate-reach 2026-08-19
+  recurrence: cardinal-notation-splits-gate-reach 2026-08-19 2026-09-02
+  **THE 2026-09-02 RECURRENCE SHARPENS (b), re-derived independently rather than read off here.** A
+  maintained total in a live queue entry rotted unseen against that entry's own recorded facts — but
+  it counted CI rounds, no tree fact, so no `measured:` key binds it and widening the corpus reaches
+  the shape while leaving the oracle missing. Third shape: an audit-roster row beside
+  `internal-identifier-restatement`, un-gateable by that row's own reasoning.
   Filed 2026-08-12 by close, from an operator observation; the "no reason exists" premise was
   falsified by probing the count gate's own matcher rather than by grepping for a style rule.
 
@@ -7357,17 +7357,15 @@
 
 - **dated-measurement-restatement-class** [design-pending] — whether a DATED measurement of a
   live file's line spans is inside the internal-identifier-restatement class or outside it.
-  **The instance that forced the question, named as an instance rather than re-filed:**
-  `powershell-installer-surface` restates two live internal line RANGES of
-  `installer/lib/init.sh` plus per-file line counts for four sibling scripts. The fifteenth
-  `internal-identifier-restatement` sweep judged it LOW-MEDIUM and filed the call rather than
-  taking it. That entry stays live and unchanged either way, and its subject — the uncovered
-  install surface — is untouched by this one.
-  **What makes it borderline rather than clear.** Every figure was verified EXACT at HEAD, and the
-  paragraph is dated and headed "Measured ... not estimated", the form prior sweeps have cleared.
-  Against that: a line RANGE is the most rot-prone form the class takes, it sits in the deferred
-  pool — the longest rot window in the tree, and the corpus the class was widened to cover
-  2026-08-15 — and the install path is live code any installer edit moves.
+  **The instance that forced the question, named rather than re-filed:**
+  `powershell-installer-surface` restated live internal line RANGES of `installer/lib/init.sh` plus
+  per-file counts for four siblings; the fifteenth `internal-identifier-restatement` sweep judged it
+  LOW-MEDIUM and filed the call rather than taking it. That entry stays live and unchanged.
+  **What makes it borderline rather than clear.** Every figure was EXACT at HEAD and the paragraph
+  is dated and headed "Measured ... not estimated", the form prior sweeps have cleared. Against
+  that: a line RANGE is the most rot-prone form the class takes, it sits in the deferred pool — the
+  longest rot window in the tree, the corpus the class was widened to cover 2026-08-15 — and the
+  install path is live code any installer edit moves.
   **Why it generalises past one entry:** the ruling reaches every "measured at <date>" paragraph
   in the pool, which is why the sweep escalated rather than editing one entry. The audit
   roster's own reading of the shape is the ground to rule against — a ruled-but-unbought port is
@@ -7384,19 +7382,21 @@
   closer to the class's core "call chain or roster" language than the line spans did. That table is
   the merged amendment's own deliverable, so narrowing it is re-scoping landed work.
   **Third instance 2026-08-29, and the first where the rot was OBSERVED rather than predicted.**
-  `installer-graph-artifact-literal` carried "the two sites are exact, re-verified at the drain:
-  `installer/lib/init.sh` line 311 and line 317". Both had moved to 299 and 305 — the defect still
-  live at both, only the numbers wrong. So the cost line below is no longer a forecast: a dated,
-  explicitly re-verified span in the deferred pool rotted inside eight days without any edit to the
-  entry, and the eviction that followed is what removed it rather than any sweep.
+  `installer-graph-artifact-literal` carried two `installer/lib/init.sh` line numbers "exact,
+  re-verified at the drain"; both had moved, the defect still live at both and only the numbers
+  wrong. So the cost line below is no forecast: a dated, explicitly re-verified span in the deferred
+  pool rotted inside eight days with no edit to the entry, and an eviction removed it, not a sweep.
   **Why `[design-pending]`:** it rules the boundary of a governed audit class, an authoring
   question about the roster row rather than a code change.
-  recurrence: dated-measurement-restatement-class 2026-08-25 2026-08-29
-  **AT THRESHOLD AND DECLINED FOUR TIMES — 2026-08-30, twice on 2026-08-31, then 2026-09-01.**
-  First: machinery-class by default, no unit set reaching it. The three since, on the stronger
-  ground and on the RUN rather than the merits: the port-only run forecloses a non-port unit while
-  the oracle reads owed at all, so the rot argues RETURN at the
-  post-port triage, never promotion now. No declination has reached the operator.
+  recurrence: dated-measurement-restatement-class 2026-08-25 2026-08-29 2026-09-02
+  **AT THRESHOLD, DECLINED FIVE TIMES — 2026-08-30, twice 2026-08-31, 2026-09-01, 2026-09-02, and
+  none has reached the operator.** First: machinery-class by default, no unit set reaching it. The
+  four since, on the RUN rather than the merits — the port-only run forecloses a non-port unit while
+  the oracle reads owed at all, so the rot argues RETURN at the post-port triage, not promotion now.
+  **THE 2026-09-02 RECURRENCE FALSIFIES THE CARVE-OUT'S PREMISE, that a date names an iteration:**
+  two closes fell on one calendar day, so a count stamped with its own date read clean past a sweep
+  while the oracle had already moved. A fourth shape follows — require the ITERATION SLUG beside the
+  date, which the roster row's wording already implies and the corpus does not practise.
   ruled: dated-measurement-restatement-class lead 2026-08-30 own-authority
   ruled: dated-measurement-restatement-class lead 2026-08-31 own-authority
   ruled: dated-measurement-restatement-class lead 2026-09-01 own-authority
@@ -9369,6 +9369,7 @@
 - **scratch-grant-backtick-declined** [design-pending] — Rule 17's own clause voids its use case.
 - **walk-entry-model-unstated** [design-pending] — Walk drops symlinks unstated; tree has none.
 - **pack-step-dirty-tree-predicate-unscoped** [design-pending] — Unscoped dirty check aborts a pack.
+- **prune-set-matches-walk-root-ancestors** [design-pending] — A leaf above the root prunes it all.
 
 ## Done
 
