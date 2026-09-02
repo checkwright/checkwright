@@ -118,8 +118,8 @@
 - **platform-support-ci-matrix** [design-pending] [roadmap: next/reliability]
   [precondition-ok: run-observed]
   — a CI leg that PRODUCES AND EXERCISES a Windows gate-binary artifact, which is
-  gate-sdk/SPEC.md §Consumer payload's join condition for `x86_64-pc-windows-msvc`. Eight rounds
-  bought. **The slug is deliberately NOT renamed** though "matrix" now reads oddly for one leg —
+  gate-sdk/SPEC.md §Consumer payload's join condition for `x86_64-pc-windows-msvc`.
+  **The slug is deliberately NOT renamed** though "matrix" now reads oddly for one leg —
   `powershell-installer-surface` cites it by name. The fork, the Windows-ahead-of-macOS ordering
   and WSL-as-interim are TRAJECTORY.md §The closed rulings'; macOS is `macos-install-smoke-ci-leg`.
   roadmap-summary: A CI install-smoke leg per supported platform, or an honest label.
