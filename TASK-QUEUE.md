@@ -9258,6 +9258,40 @@
   single-date spelling here rests on lifecycle-kit's `(slug, date)` idempotence and the ambiguity
   is escalated rather than closed by this session.
 
+- **lead-tier-split-premise-unamended** [design-pending] — `lifecycle-kit/templates/lead.md`
+  §Economics rests its *Split the lead where the tail dominates* bullet on a premise three
+  consecutive iterations have now measured false, and the template still ships it unqualified.
+  **The trigger is the binding's own and it has fired.** `.claude/commands/lead.md` set the
+  criterion — read an iteration's escalations and count how many the lead ruled ALONE by reading a
+  governed surface; near zero, the premise holds; consistently several, the premise is wrong and
+  the template's bullet is what needs amending, not this repo's tier. It then named the threshold:
+  "a third iteration at several ruled-alone escalations should amend that bullet." Measured five
+  such rulings in 2026-08-31, four in 2026-09-01, and several again in 2026-09-02.
+  **The two axes separate, which is what makes this an amendment rather than a tier flip.** On
+  COST the split premise holds and strengthens — the lead's share fell 14% -> 9.2% -> 9.7%, so the
+  lead's turns really are the cheap tail in dollars. On CHARACTER it fails every time: a
+  routing-only lead would be cheaper still and would have RELAYED the rulings this one made. The
+  template describes a lead the escalation protocol does not ask for.
+  **The counter-evidence, recorded because the entry is weaker without it.** The 2026-09-02 lead
+  also ruled one thing WRONG, and in the same faculty the count credits: it read a `.gate`
+  manifest line and `main.rs`'s dispatch table, called that "verified both halves myself", and
+  both halves were false — the predicate was never run. So the count measures a capacity that
+  demonstrably misfires, and any amendment has to say what a lead's turns ARE without claiming
+  they are reliably verificational.
+  **Why `[design-pending]`:** the deliverable is a kit template's own design rationale, and the
+  shape is unruled — qualify the bullet's premise, split it into a cost limb and a character limb,
+  or replace it with the discriminator the binding already uses. Which one is a doctrine call.
+  **Cost while deferred:** every consumer vendoring lifecycle-kit reads a premise this repo has
+  measured false three times, and each future lead re-derives the same finding against a template
+  that never records it — the binding's evidence is local while the false claim is shipped.
+  **DISTINCT from `economics-posture-binding-stale`**, whose subject is the local shim restating a
+  ruling it should cite; this one is the vendored TEMPLATE's own premise being wrong.
+  Captured 2026-09-02 by close under the close template's own rule that a finding close itself
+  captures files to Deferred; ruled filed-not-performed by the lead the same day, on the ground
+  that amending a kit template is non-port design work the 2026-08-31 port-only run forecloses.
+  Filing it is not the drain's `promote` that ruling bars: `## Deferred` is not an active section,
+  and only scope promotes into one.
+  ruled: lead-tier-split-premise-unamended lead 2026-09-02 own-authority
 
 ## Icebox
 
