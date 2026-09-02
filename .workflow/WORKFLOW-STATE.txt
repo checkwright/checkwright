@@ -5,3 +5,4 @@
 ---
 
 test-runner-and-upgrade-cuts-with-liveness-attribution scope a4df419f 2026-09-02 56a0a4ec
+test-runner-and-upgrade-cuts-with-liveness-attribution spec a6d33734 2026-09-02 2ffcd8e8
