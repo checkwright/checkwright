@@ -5011,8 +5011,8 @@
   search path. The gap is one missing source, not a missing owner.
   **Visible today as an asymmetry rather than a red.** `native/src/gates/release_bump.rs` and
   `native/src/gates/tightened_gates_note_parity.rs` each hardcode a workflow-dir const while
-  `gate-sdk/bin/upgrade-smoke.sh` resolves the same file through `GATE_SDK_WORKFLOW_DIR`. The
-  tenth cohort's three members declare no knobs, so nothing fails yet.
+  `native/src/emit/upgrade_smoke.rs` resolves the same file through `GATE_SDK_WORKFLOW_DIR`, a
+  knob it declares. The tenth cohort's three members declare no knobs, so nothing fails yet.
   **DISTINCT from `consumer-gate-port-disposition`, which it cites rather than re-files.** That
   entry owns the *declaration* question — the owner column and the conservation row, authored
   this iteration — and this owns the *dispatch* question, which that amendment names and
@@ -8746,10 +8746,10 @@
   gate-roster marker block, and the kit's `checks/` basenames (gate-sdk/SPEC.md
   §check-readme-roster; the descriptor's `couples=` field and the compiled rule agree). A `bin/`
   tool sits outside both sets, so nothing reds.
-  **A live witness, standing right now and independent of what surfaced this.**
-  `gate-sdk/bin/upgrade-smoke.sh` ships in `gate-sdk/bin/` and appears nowhere in that README's
-  hand-authored `bin/` prose. It predates the surfacing iteration, so the roster was already wrong
-  before the event that exposed the class — the omission is not a one-off a sweep would have caught.
+  **The witness is dated now rather than live, and it still does its work.**
+  `gate-sdk/bin/upgrade-smoke.sh` shipped in `gate-sdk/bin/` and appeared nowhere in that
+  README's hand-authored `bin/` prose, from before the surfacing iteration until its 2026-09-02
+  port. The roster was wrong across that whole span: the omission is a class, not a one-off.
   **This is Derivation-first in the shape the doctrine names:** a roster maintained rather than
   derived, with a freshness gate sitting one directory away that does not reach it.
   **Why `[design-pending]`, two dispositions trading different properties.** Make the `bin/` roster
@@ -9015,12 +9015,15 @@
   promoted 2026-08-29 by close, the failure reproduced rather than quoted, and widened the same day
   by close's vacuous-assertion sweep, whose byproduct was the second mechanism.
 
-- **upgrade-smoke-refuses-inside-a-worktree** [design-pending] — `gate-sdk/bin/upgrade-smoke.sh`
-  tests its repo root with `[[ -d "$REPO/.git" ]]`, so it refuses in every linked git worktree,
-  where `.git` is a file rather than a directory.
-  **Read at the source 2026-08-29, not inferred.** Line 15 tests `-d` on a path that a linked
-  worktree makes a gitdir *pointer file*; the tool exits 2 naming the repo as "not a git
-  repository". The predicate is wrong about the thing it is checking, not merely strict.
+- **upgrade-smoke-refuses-inside-a-worktree** [design-pending] — the `--upgrade-smoke` arm tests
+  its repo root for a `.git` **directory**, so it refuses in every linked git worktree, where
+  `.git` is a file rather than a directory.
+  **Read at the source 2026-08-29, and re-anchored 2026-09-02 when the port carried the predicate
+  across deliberately** (gate-sdk/SPEC.md §upgrade-smoke): the resolve step in
+  `native/src/emit/upgrade_smoke.rs` runs a directory test on a path a linked worktree makes a
+  gitdir *pointer file*, and exits 2 naming the repo "not a git repository". The predicate is
+  wrong about the thing it is checking, not merely strict — unchanged by the port, which is why
+  the entry keeps its premise, its verdict and its fixture obligation.
   **Why the reach is worse than it looks here.** This tree *mandates* worktree isolation for a
   read-only dispatch — `agent-dispatch-guard` refuses such a dispatch that does not carry it — so
   every delegated session runs somewhere this tool structurally cannot run. The one escape,
@@ -9029,8 +9032,8 @@
   **It is the OPPOSITE of a vacuous pass, which is why it survived a sweep hunting that shape.** A
   fail-closed false negative announces itself; nothing silently passes. That is also why nothing
   will fix it incidentally: the tool is simply never run from where it refuses.
-  **Why it stays design-pending despite an obvious one-character fix.** `-e` admits both shapes,
-  but the honest predicate is `git -C "$REPO" rev-parse --git-dir`, and choosing between them is a
+  **Why it stays design-pending despite an obvious one-line fix.** A plain exists-test admits both
+  shapes, but the honest predicate is `git -C <repo> rev-parse --git-dir`, and choosing between is a
   question about what the guard is *for* — refusing a non-repo, or refusing a tree the smoke's
   vendoring step cannot safely write. The fixture obligation follows whichever answer wins.
   **Cost while deferred:** the upgrade smoke is unavailable to every delegated session, which is
