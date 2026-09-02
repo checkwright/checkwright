@@ -407,6 +407,13 @@ the drain's commit message; an enforcing gate on it was refused, grounds at the 
 section above. Discharge event for this paragraph: three consecutive closes each reading
 `qnet` at or below zero, at which point the ordering is habit and the record is retired.
 
+**A queue entry cites the gap inbox and the survey record as provenance, never as a locator —
+ruled 2026-09-02 by the operator in consult.** Both surfaces are drained or truncated by the
+lifecycle, so a pointer into either as a fact's current home is broken by the next boundary; the
+rule, its resolves-after-the-next-drain test and the refused gate are owned at lifecycle-kit/SPEC.md
+§The committed gap inbox. The alternative refused: banning every mention, which would strip filing
+provenance from most of the deferred pool to remove a class measured at two instances.
+
 ## PRIORITY DIRECTIVE — the port track's sequence
 
 **Ruled 2026-08-09 by the operator, and it is the track's top priority: complete

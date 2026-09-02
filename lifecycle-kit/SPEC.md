@@ -858,6 +858,21 @@ contending on. A `file-gap.sh` that stamped a `recurrence:` declaration onto a
 queue entry would do the one thing the inbox was built to prevent. The queue write
 therefore belongs to the closing stage's drain, which writes the queue anyway.
 
+**A queue entry cites this inbox as provenance, never as a locator — ruled
+2026-09-02 by the operator.** The inbox is drained every close, so a sentence
+naming it as a fact's *current home* — "it is in the gap inbox as of" a date, or
+a parenthetical "(gap inbox," plus a date) — is broken by the next drain, while a
+sentence stating that a finding *was filed there and drained from it on a date*
+is history and stays true. The test is whether the sentence still resolves after
+the next drain. A fact a bullet carries is restated on the entry or cited to the
+surface the drain moved it to; a queue entry that must point at the bullet itself
+is pointing at a surface that will not exist. The same rule binds citations of
+the survey record (§The survey record), which the iteration boundary truncates.
+Held by review rather than a gate: a present-tense scan over queue prose is a
+tree-facing heuristic whose over-refusal cost the tree already pays elsewhere, and
+the measured rate — two locators in the inbox's whole life, both caught by one
+read — does not buy one.
+
 **The drain's dispositions are ordered, and promotion is last — ruled 2026-08-30
 by the operator, on a measured drain.** The disposition set is fix, icebox,
 promote, discard; the drain tries them in that order per bullet and a promotion
@@ -1152,7 +1167,9 @@ expensive half and re-runs the cheap one.
 > dispatches only the delta.**
 
 A survey therefore stays true exactly as long as its witness holds, and the
-witness is checkable in two commands.
+witness is checkable in two commands. A queue entry cites a block here as
+provenance and never as a locator, since the boundary truncates it — the rule
+and its test are §The committed gap inbox's.
 
 **The surface.** `.workflow/survey-record.md` (knob
 `LIFECYCLE_KIT_SURVEY_RECORD_FILE`, §Layout and configuration) is a committed
