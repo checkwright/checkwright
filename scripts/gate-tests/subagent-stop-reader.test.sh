@@ -54,7 +54,7 @@ cd "$ROOT" || { echo "  FAIL: cannot reach the repo root"; exit 1; }
 #     against by name — and under enforcement it would also silently allow every turn end.
 empty="$tmp/empty"; mkdir -p "$empty"
 line="$(fire clean "$empty" 0)"
-want clean "$line" "verdict=green" "live=no" "records=0" "decision=allow"
+want clean "$line" "verdict=green" "live=no" "records=0" "runs=-" "decision=allow"
 
 # B — one record naming a PID that is always alive: the reader reaches the gate's own liveness
 #     predicate rather than merely resolving, so a reader that resolved and answered nothing
@@ -63,8 +63,8 @@ want clean "$line" "verdict=green" "live=no" "records=0" "decision=allow"
 live="$tmp/live"; mkdir -p "$live"
 printf 'pid=1 run=k\n' >"$live/k.run"
 line="$(fire live "$live" 2)"
-want live "$line" "verdict=red" "live=yes" "records=1" "decision=refuse"
-want live-message "$(cat "$tmp/live.err")" "turn-end refused" "delete the record once the producer has exited"
+want live "$line" "verdict=red" "live=yes" "records=1" "runs=k" "decision=refuse"
+want live-message "$(cat "$tmp/live.err")" "turn-end refused" "delete the record once the producer has exited" "runs=k"
 
 # C1 — the hook's OWN binary is absent. Before the port this arm broke only the reader's dispatch,
 #      because the hook was a script; the hook and the reader now share one binary and one knob, so

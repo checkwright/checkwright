@@ -12,28 +12,6 @@
 
 ## New Features
 
-- **subagent-liveness-log-unattributed-refusal** [spec: SPEC-refusal-record.md] — the liveness log
-  records a refusal without recording WHICH LAUNCH RECORD it refused on, so a reader cannot tell the
-  guard working from the guard wedged.
-  recurrence: subagent-liveness-log-unattributed-refusal 2026-08-28 2026-08-31
-  **FIVE measurements across four days, and the SERIES is the finding rather than any one of them.**
-  Events / refusals, in order: 366/21, 172/11, 440/19, then 298/7 — the last off the log the PORTED
-  arm writes. Every refusal in every one is `live=yes records=1 decision=refuse`, in ~30-second
-  retry sub-clusters, with `session=` carrying the top-level harness session uniformly across green
-  and red rows alike. Volume moved four times and readability moved none, and the port did not
-  change it, so a sixth measurement is known in advance to buy the same nothing.
-  **OPERATOR-RULED 2026-09-02 (lead-relay): TAKEN AS THE PORT-ONLY RUN'S ONE EXCEPTION**, on the
-  merit two paid declinations left standing. The lead put all three threshold entries to the
-  operator as one batch; this one was taken and the other two stay deferred, which RETIRES the "no
-  declination reached the operator" record rather than extending it.
-  Its fork, its costed refusals and its blast radius are `SPEC-refusal-record.md`'s, not restated:
-  the promotion sheds the design rulings the amendment now owns.
-  ruled: subagent-liveness-log-unattributed-refusal lead 2026-08-31 own-authority
-  ruled: subagent-liveness-log-unattributed-refusal lead 2026-09-01 own-authority
-  ruled: subagent-liveness-log-unattributed-refusal operator 2026-09-02 lead-relay
-  Filed 2026-08-27 to the gap inbox by the windows-artifact-proof close; promoted 2026-08-27 by the
-  next scope, the filing bullet's live-sibling premise falsified; spec'd 2026-09-02.
-
 - **native-gate-port-remaining-corpus** [spec: SPEC-test-runner-cut.md] [roadmap: now/reliability]
   — the whole battery onto the binary, and the shell surface down to its residue.
   roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
@@ -9343,6 +9321,8 @@
 - **prune-set-matches-walk-root-ancestors** [design-pending] — A leaf above the root prunes it all.
 
 ## Done
+
+- subagent-liveness-log-unattributed-refusal
 
 ## Lessons Learned
 

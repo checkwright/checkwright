@@ -15,12 +15,16 @@ const READER_BOUND_SECS: u64 = 10;
 // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the record's field set is OPEN: a
 // reader parses by key and never by position or arity, and the writer's set is this one table, so
 // per-session attribution can be added later without moving any existing reader.
+// spec: delegation-kit/SPEC.md §The turn-end liveness hook — `runs` sits between `records` and
+// `decision`: beside the count whose set it names, and before `keys`, which stays last as the one
+// free-ish value a space-delimited parse must never step over.
 const FIELDS: &[&str] = &[
     "event",
     "session",
     "live",
     "verdict",
     "records",
+    "runs",
     "decision",
     "keys",
 ];
@@ -69,10 +73,12 @@ pub fn fire(payload: Option<&Value>, log: &str, liveness_cmd: &str, run_dir: &st
 
     let reader_status = read_liveness(liveness_cmd, run_dir);
 
-    // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the record set is counted AFTER
-    // the reader ran, so a record created during the reading is counted rather than missed and an
+    // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the record set is read AFTER the
+    // reader ran, so a record created during the reading is counted rather than missed and an
     // in-flight record errs toward refusing
-    let records = count_records(run_dir);
+    let run_keys = read_run_keys(run_dir);
+    let records = run_keys.len();
+    let runs = sanitize(&run_keys.join(","));
 
     let verdict = match reader_status {
         None => "unavailable",
@@ -105,6 +111,7 @@ pub fn fire(payload: Option<&Value>, log: &str, liveness_cmd: &str, run_dir: &st
         live,
         verdict,
         &records.to_string(),
+        runs.as_str(),
         decision,
         keys.as_str(),
     ];
@@ -113,7 +120,7 @@ pub fn fire(payload: Option<&Value>, log: &str, liveness_cmd: &str, run_dir: &st
     if decision != "refuse" {
         return Firing { code: 0, stderr: String::new() };
     }
-    Firing { code: 2, stderr: refusal(verdict, liveness_cmd, run_dir) }
+    Firing { code: 2, stderr: refusal(verdict, liveness_cmd, run_dir, &runs) }
 }
 
 // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the record's line form: the stamp,
@@ -185,30 +192,39 @@ fn read_liveness(cmd: &str, run_dir: &str) -> Option<i32> {
 // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the record set is the run dir's own
 // `*.run` membership, a single-level listing rather than a walk beneath it, which is the shell
 // form's `shopt -s nullglob; records=("$RUN_DIR"/*.run)`. An unreadable dir is an empty set.
-fn count_records(run_dir: &str) -> usize {
-    walk::list_dir(std::path::Path::new(run_dir))
+// spec: delegation-kit/SPEC.md §The turn-end liveness hook — the keys are kept rather than counted
+// away: `records` is this set's length and `runs` is its members, so the count and the names are
+// one derivation over one listing and never two readings that could disagree.
+fn read_run_keys(run_dir: &str) -> Vec<String> {
+    let mut keys: Vec<String> = walk::list_dir(std::path::Path::new(run_dir))
         .map(|entries| {
             entries
                 .iter()
                 .filter(|(name, is_dir)| !is_dir && name.ends_with(".run"))
-                .count()
+                .map(|(name, _)| name[..name.len() - ".run".len()].to_string())
+                .collect()
         })
-        .unwrap_or(0)
+        .unwrap_or_default();
+    keys.sort();
+    keys
 }
 
 // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the message branch is three-way
 // because the three refusing verdicts have three findings and three remedies; folding `unresolved`
 // onto `corrupt`'s arm would print "does not parse" over a case holding no record to parse
-fn refusal(verdict: &str, liveness_cmd: &str, run_dir: &str) -> String {
+// spec: delegation-kit/SPEC.md §The turn-end liveness hook — the `red` and `corrupt` arms name the
+// record set the decision was taken over, which at `records=1` is the matched record exactly and
+// above it the candidate set; `unresolved` takes no such field, its set being empty by construction
+fn refusal(verdict: &str, liveness_cmd: &str, run_dir: &str, runs: &str) -> String {
     let ways = "Two ways forward: wait for the producer on its own artifact, in a loop that ends when the condition goes true; or delete the record once the producer has exited.";
     let (finding, ways, look) = match verdict {
         "red" => (
-            format!("a launch record under {} names a live producer, so this turn may not end on it", run_dir),
+            format!("a launch record under {} names a live producer, so this turn may not end on it. The record set read was runs={}", run_dir, runs),
             ways.to_string(),
             "to see the record set for yourself",
         ),
         "corrupt" => (
-            format!("a launch record under {} does not parse, so no reading says whether a producer is live and this turn may not end on it", run_dir),
+            format!("a launch record under {} does not parse, so no reading says whether a producer is live and this turn may not end on it. The record set read was runs={}", run_dir, runs),
             ways.to_string(),
             "to see which record is malformed",
         ),
@@ -297,9 +313,63 @@ mod tests {
         assert!(f.stderr.is_empty(), "an allowing firing must write no reason");
         want(&s.log("a.log"), "no-reader", &[
             "event=SubagentStop", "session=s-1", "live=no", "verdict=unavailable",
-            "records=0", "decision=allow",
+            "records=0", "runs=-", "decision=allow",
             "keys=hook_event_name,session_id,stop_hook_active,transcript_path",
         ]);
+    }
+
+    // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the firing/non-firing pair `runs`
+    // owes: a populated run dir names its records' keys, an empty one renders the absent token
+    #[test]
+    fn the_record_set_is_named_by_key_and_an_empty_set_renders_absent() {
+        let s = Scratch::new("runs-pair");
+        // comment-tier-exempt: one row parsed back by key, never by position — the record's own contract
+        fn field(line: &str, key: &str) -> String {
+            line.split_whitespace()
+                .find_map(|t| t.strip_prefix(&format!("{}=", key)))
+                .unwrap_or_default()
+                .to_string()
+        }
+
+        fire(payload(PAYLOAD).as_ref(), &s.at("empty.log"), "", &s.at("runs"));
+        let empty = s.log("empty.log");
+        assert_eq!(field(&empty, "runs"), "-", "an empty record set renders absent: {}", empty);
+        assert_eq!(field(&empty, "records"), "0");
+
+        s.record("beta.run");
+        s.record("alpha.run");
+        fire(payload(PAYLOAD).as_ref(), &s.at("full.log"), "", &s.at("runs"));
+        let full = s.log("full.log");
+        assert_eq!(
+            field(&full, "runs"), "alpha,beta",
+            "the set is the `.run` basenames, suffix stripped, sorted and comma-joined: {}", full
+        );
+        assert_eq!(
+            field(&full, "records"), "2",
+            "the count and the names are one derivation over one listing"
+        );
+    }
+
+    // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the record set reaches the refused
+    // session too, on the two record-bearing arms and never on `unresolved`, whose set is empty by
+    // construction
+    #[test]
+    fn the_two_record_bearing_arms_name_the_set_and_unresolved_does_not() {
+        let s = Scratch::new("runs-message");
+        s.record("sibling.run");
+        let red = fire(payload(PAYLOAD).as_ref(), &s.at("mr.log"), &s.reader("mrr", 1), &s.at("runs"));
+        want(&red.stderr, "red-runs", &["runs=sibling"]);
+        let corrupt = fire(payload(PAYLOAD).as_ref(), &s.at("mc.log"), &s.reader("mcc", 2), &s.at("runs"));
+        want(&corrupt.stderr, "corrupt-runs", &["runs=sibling"]);
+
+        let u = Scratch::new("runs-message-unresolved");
+        let unresolved = fire(payload(PAYLOAD).as_ref(), &u.at("mu.log"), &u.reader("muu", 2), &u.at("runs"));
+        assert_eq!(unresolved.code, 2);
+        assert!(
+            !unresolved.stderr.contains("runs="),
+            "the unresolved arm named a record set that is empty by construction: {}",
+            unresolved.stderr
+        );
     }
 
     // spec: delegation-kit/SPEC.md §The turn-end liveness hook — cases B-E: one firing per reader
@@ -444,8 +514,8 @@ mod tests {
         assert_eq!(f.code, 0);
         let line = s.log("i.log");
         assert_eq!(
-            line.split_whitespace().count(), 8,
-            "want 8 whitespace-separated fields (stamp + 7 keys), got: {}", line
+            line.split_whitespace().count(), 9,
+            "want 9 whitespace-separated fields (stamp + 8 keys), got: {}", line
         );
     }
 
@@ -487,7 +557,7 @@ mod tests {
     // parses by key, so the writer's field set is the table and the line is composed from it
     #[test]
     fn the_record_is_key_addressed_over_the_field_table() {
-        let values = ["SubagentStop", "s1", "no", "green", "0", "allow", "a,b"];
+        let values = ["SubagentStop", "s1", "no", "green", "0", "-", "allow", "a,b"];
         assert_eq!(values.len(), FIELDS.len(), "the table and the row must agree");
         let dir = std::env::temp_dir().join(format!("cw-stop-{}", std::process::id()));
         let log = dir.join("subagent-stop-liveness.log");

@@ -1219,7 +1219,7 @@ only by re-dispatching fresh.
 timestamp:
 
 ```
-<UTC ISO-8601>  event=<hook_event_name|->  session=<session_id|->  live=<yes|no>  verdict=<green|red|corrupt|unresolved|error|unavailable>  records=<n>  decision=<refuse|allow>  keys=<comma-separated top-level payload keys>
+<UTC ISO-8601>  event=<hook_event_name|->  session=<session_id|->  live=<yes|no>  verdict=<green|red|corrupt|unresolved|error|unavailable>  records=<n>  runs=<comma-separated run keys|->  decision=<refuse|allow>  keys=<comma-separated top-level payload keys>
 ```
 
 Every field has a reader at a named transition, and no field is carried that this
@@ -1274,6 +1274,41 @@ list does not name one for:
   and `unresolved` at `records=0`, so a log line's `records` column is the only
   place a later reader can see which of the two it was, and the two want
   different fixes.
+- **`runs`** — the **record set the decision was taken over**: the run dir's
+  `*.run` basenames with the suffix stripped, sorted and comma-joined, `-` over an
+  empty set. It is the same listing `records` is the length of, kept rather than
+  counted away, so the count and the names can never disagree. Its named reader is
+  the **close-stage triage** at the close-surface drain, at the same transition
+  `decision` and the three diagnostic `verdict` values are read at, and it is read
+  for the question that made the field worth having: **is the guard working or is
+  it wedged?** A `decision=refuse` row whose run key names a *sibling* producer is
+  the guard doing its job; one whose run key names the refused session's **own**
+  work is a session waiting on itself, which is a wedge no other field in this
+  record can show. Every attested refusal across five recorded measurements read
+  `live=yes records=1 decision=refuse`, so at `records=1` this field names the
+  matched record **exactly**.
+  **The wedge is a worked case rather than an argument, which is what establishes
+  that this is the right field.** A session backgrounded a wait, wrote a record
+  naming **its own** pid, and that single record refused its turn end **21 times
+  in ten minutes**, every row reading `live=yes verdict=red records=1
+  decision=refuse` — rows identical to a correct refusal in every column the
+  record then carried. Under this field each of those 21 rows would have carried
+  the run key naming that session's own work, and the wedge would have been
+  legible at a glance in the first of them. That is the whole discrimination the
+  field buys, and it is measured rather than projected.
+  **Its honest limit, declared rather than left to be discovered: above
+  `records=1` it names the candidate set and not the match.** The hook holds no
+  reading that distinguishes them — `check-producer-liveness` does print the
+  matched record on stdout, and the bounded call discards that stream (§The
+  bounded call stays) — so claiming the set were the match would be a claim the
+  discarded output cannot support. A superset is strictly more than the nothing
+  the record carried before it, which is what makes the field worth its column
+  anyway.
+  **It carries no identity and is not an attribution field.** A run key is a name
+  the writing session chose for a piece of work, written into a record that same
+  session wrote; it is not an identifier the harness assigns. See the field-set
+  paragraph below, which this field answers in part, and §Attribution was weighed
+  and is not available, which it leaves standing.
 - **`verdict=error`** — a **configured** reader that ran and did not answer: an
   unmapped exit code, or the `timeout` bound firing. Its named reader is the
   close-stage triage below, at the same transition, distinguishing *this tree
@@ -1331,7 +1366,13 @@ list does not name one for:
   read that widened nothing here: §What `background_tasks` carries.
 
 `decision` sits before `keys` deliberately: `keys` is the one free-ish field and
-stays last, so the space-delimited parse never has to step over it.
+stays last, so the space-delimited parse never has to step over it. **`runs` is
+that rule's second worked instance**, and it is worked here rather than asserted:
+it lands **before** `keys` for the same reason and **beside `records`** for a
+second one — the two are the count and the names of one set, and the field list
+already reads `live`/`verdict`/`records` as a group. It is a **new field rather
+than a widened `records`**: the count has a named reader at a named transition
+today, and replacing it would move that reader for no gain.
 
 **The record's field set is OPEN, and that is a contract rather than a
 description of today's list.** A reader parses this record **by key** and never
@@ -1339,13 +1380,38 @@ by position or arity; the writer's field set is one table in the member's own
 module, so a field added to it appears in the line without any existing reader
 changing. Nothing here settles *what* is logged — the list above is still the
 whole of it and the two omissions above are still refused — only that the
-**shape does not lock**. The constraint this discharges is a live one: the
+**shape does not lock**. The constraint this discharges was a live one: the
 question of per-session attribution (the agent id, the agent type, the matched
-run key) is open and belongs to a later unit, and it must find a record it can
-extend in one table edit rather than a positional format it would have to break.
-`keys` staying last is what keeps that true in practice, because a field added
-before it lands between two keyed fields and a field added after it would sit
-past the one free-ish value.
+run key) was open and belonged to a later unit, and it had to find a record it
+could extend in one table edit rather than a positional format it would have to
+break. `keys` staying last is what keeps that true in practice, because a field
+added before it lands between two keyed fields and a field added after it would
+sit past the one free-ish value. **The openness was then spent as designed —
+`runs` landed as one table edit and moved no reader** — which is the contract
+working rather than a claim about it.
+
+**That open question is now answered in part, and the part that is closed is
+closed by a finding rather than by a choice.** Of its three candidates:
+
+- **The matched run key is *unavailable to the hook*, and the cause is
+  structural.** The hook invokes the reader under a bound that discards both its
+  streams, so what it holds is an **exit code and nothing else**.
+  `check-producer-liveness` in set mode does print the matched record, its run key
+  and its pid — on a stdout that goes nowhere. Recovering it would need either a
+  bounded **and capturing** call, where the bound is itself load-bearing (§The
+  bounded call stays), or the hook parsing records for itself, which §The liveness
+  reading reuses `check-producer-liveness` forbids outright as a third copy of a
+  grammar evidence-kit owns. So this candidate is not one table edit and never
+  was, and that is recorded here so the next reader finds it costed.
+- **The record set stands in for it**, which is what `runs` above is: the same
+  discrimination the matched key was wanted for, derived from a listing the hook
+  already performs, exact at `records=1` and a declared superset above it.
+- **The agent id and the agent type stay refused**, on the grounds in the
+  omissions paragraph below rather than on availability.
+
+What remains open is narrower than it was: not *can this record be extended*, and
+not *what stands in for the matched key*, but only whether any **payload** field
+attributes a firing — which §`session` holds is unsettleable from this tree.
 
 **One value's spelling moved with the substrate and is recorded rather than left
 to be noticed.** `keys` is the payload's top-level key set **sorted**, where the
@@ -1370,6 +1436,38 @@ nobody re-reads — if `agent_id` turned out to be per-agent after all. The
 omission's *conclusion* is unchanged either way, because the two reasons for not
 wanting such a field are the ones just given rather than the payload's contents.
 
+**`agent_id` and `agent_type` were proposed for exactly this purpose and are
+refused, and the refusal is written here rather than left as an absence** — so
+the next reader meeting the idea finds it costed instead of re-deriving it.
+`agent_id` is **observed per-firing rather than per-agent** (five firings in one
+session carried five distinct values, none matching the stable identifier the
+same payloads' `background_tasks` array reported for the one live agent; see
+`session` above), so logging it would settle that question rather than consume a
+settled answer — and settling it means reading raw payloads, which the no-values
+ruling holds operator-class. `agent_type`'s stability is measured by **nothing at
+all**, so it has no better standing. Both are *payload values*, where `keys`
+carries key names and never values; the privacy ruling and the identity doubt
+point the same way here, and that is said plainly so a later reader does not read
+the privacy rule as spent by this refusal.
+
+**Dropping `session=` was the third shape proposed and it is refused too.** The
+argument for dropping it was that it "serves neither reader but stops a field
+reading as attribution while carrying none". That mistakes this list's governing
+rule: it is that **no field is carried without a named reader**, never that every
+field must discriminate every question. `session` has a named reader at a named
+transition — separating one top-level session's firings from another's in a
+shared log — so dropping it would delete a live reader in order to fix a
+*misreading*. The misreading is fixed instead by `runs` carrying the
+discrimination `session` never claimed.
+
+**What landed is a *record* field and not an *identity* field, and the
+distinction is drawn here rather than left to be inferred.** The
+session-attribution omission just above is about **identity** and is untouched by
+`runs`; this paragraph's refusals are about identity too. `runs` names the
+consumer's own launch records. A reader arriving from either refusal should find
+that `runs` answers the open question **without minting the field they refuse**,
+which strengthens them rather than narrowing them.
+
 **`records` is counted by the hook's own `*.run` glob, not parsed back out of the
 reader**, and the reason is the reader's output contract rather than convenience:
 `check-producer-liveness` publishes a count only on its green line, printing one
@@ -1378,7 +1476,9 @@ number — and the field stays meaningful when the reader is unavailable, which 
 the case the prerequisite above makes reachable. For the same reason the reader's
 first output line is **not** carried verbatim: over `verdict`, `records` and
 `live` it adds only the blocking record paths, and a free-text field would break
-the space-delimited parse the grammar above is for.
+the space-delimited parse the grammar above is for. **`runs` is that same
+listing's membership rather than a second reading**, so this reasoning covers
+both fields at once and neither can drift from the other.
 
 **The glob is taken *after* the reader has run, and the order is load-bearing
 now that the count names an arm.** A record created between the two would, in the
@@ -1406,8 +1506,28 @@ producer to wait for and no record to delete: what it names instead is the
 (`templates/agent-execution.md`) and the lawful response to it, reporting the
 gate unavailable and returning. Every arm names the reader command with the run
 directory: on `red` to see the record set, on `corrupt` to find which record is
-malformed, on `unresolved` to read the reader's own reason for failing. It
-carries no session identity, because the hook has none to carry.
+malformed, on `unresolved` to read the reader's own reason for failing.
+
+**The `red` and `corrupt` arms also name the record set the decision was taken
+over** — the same `runs` derivation the log line carries, rendered for the
+*refused session* rather than for the later reader. That is what makes the
+message a **steer** rather than a notification: it moves from *run this to see
+the record set for yourself* to *this is the record set, and run this to see it
+for yourself*, and at `records=1` it hands the refused session the one fact that
+tells it whether to wait or to retract its own record. **`unresolved` takes no
+such field**, and the omission is structural rather than an oversight: its record
+set is empty by construction — the reader exited 2 over an empty set — so the
+field would print the absent token inside a sentence about a reader that could
+not run, naming nothing. Both arms keep every existing sentence: the two lawful
+exits guard-kit requires of a block message, and the reader command with the run
+directory.
+
+**It carries no session identity, because the hook has none to carry — and a run
+key is not one.** A run key is the name a session chose for a piece of work at
+launch, written into a record that same session wrote; it is not an identifier
+the harness assigns and it attributes nothing about who is running. The rule is
+unamended by the paragraph above, and it is restated here as *still true* rather
+than left for a reader to check.
 
 **Folding `unresolved` onto the `corrupt` arm is the specific mistake this branch
 exists against.** A two-way branch would print "a launch record does not parse"
@@ -1469,6 +1589,16 @@ shared by a dispatched agent and its dispatcher, and the `pid=<n> run=<key>`
 grammar carries no writer identity. Adding one is a grammar change across
 evidence-kit and guard-kit for a narrowing the paragraph above argues against
 wanting.
+
+**That ruling is unchanged by the `runs` field, and the distinction is drawn here
+because a reader arriving from this paragraph would otherwise infer it.** This
+ruling is about **identity** — who wrote a record, whose turn end is being
+refused. `runs` is about **shape**: it names *which records* the reading ranged
+over, which is a fact about the record set and not about any session. The two are
+reconcilable and are now reconciled in the text rather than left as two paragraphs
+a reader must square. Read only this one, and the whole `runs` field would look
+like something already refused; it is not, and what makes it admissible is
+precisely that it mints no identity.
 
 **The residue is unchanged and is not closed here.** Two firings this hook cannot
 reach: an **unrecorded** launch (guard-kit rule 15's advisory residue), and the
@@ -1549,7 +1679,40 @@ a record naming a PID that is always alive, and `unresolved decision=refuse` whe
 the reader is real and resolvable but the binary it dispatches to is absent over
 an empty run dir — the isolated-dispatch shape, and the one arm that must **not**
 come back `unavailable`, which would misreport a wired reader as one that was
-never configured. `unavailable` fails that lane by name.
+never configured. `unavailable` fails that lane by name. **Both record-bearing
+arms also assert `runs`** — the empty-dir arm that it renders the absent token,
+the live-record arm that the row *and the refusal message* carry that record's
+key — so the field's two consumers are proved on the one lane that exercises the
+real wiring end to end.
+
+**`runs` carries a firing and a non-firing case in both lanes, which is this
+kit's fixture-pair discipline transplanted to a non-gate arm.** The hook owes no
+`good/`+`bad/` pair — it is a hook member and not a gate — so the discipline is
+met by the cases instead: a firing over a run dir holding records asserts the row
+names those records' keys, sorted and comma-joined, and a firing over an empty
+dir asserts the absent token. Without the second half a reader could not tell an
+absent set from a field that silently renders nothing.
+
+**The arity is itself under test, because the record's line is composed by
+*zipping* the field table against a values array and a length mismatch truncates
+silently rather than panicking.** Two cases pin it — one asserting the two arrays
+agree, one asserting the whole line's field count — so a field added to the table
+without its value fails loudly at the two places the truncation would otherwise
+be invisible. A third case lists every field in its expectation rather than a
+subset, on the same reasoning: a case that silently under-covers a field is
+exactly what the arity guard exists against.
+
+**The gate that runs those crate cases does not fire on a change confined to the
+hook's own module, so it is run explicitly rather than left to its trigger.**
+`check-crate-arms` couples the crate manifest, its build script and its top-level
+and gate source globs; a hook member sits under none of them. Left to the
+trigger, a commit touching only this member would run neither the lint nor the
+test arm, and — because the truncation is silent — a green battery would be
+indistinguishable from a battery in which the arity guard never ran. The reach is
+at fault rather than the rule, so a unit landing here runs
+`bash gate-sdk/bin/run-gates.sh --only check-crate-arms` in its own landing
+commit. Building the binary does **not** discharge it: that builds and runs
+neither arm.
 
 **The hermetic stub-driven lane that used to hold every verdict arm moved into
 the member's own module with the port, and the move is stated rather than left to

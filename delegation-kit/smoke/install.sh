@@ -72,7 +72,7 @@ printf '{"session_id":"smoke","hook_event_name":"SubagentStop"}' | \
     echo "delegation-kit/smoke: the SubagentStop hook did not exit 0 on its unavailable arm" >&2; exit 1; }
 probe_line="$(cat "$sp/probe.log")"
 case "$probe_line" in
-    *"event=SubagentStop"*"session=smoke"*"live=no"*"verdict=unavailable"*"records=1"*"decision=allow"*"keys="*) ;;
+    *"event=SubagentStop"*"session=smoke"*"live=no"*"verdict=unavailable"*"records=1"*"runs=smoke"*"decision=allow"*"keys="*) ;;
     *) echo "delegation-kit/smoke: hook line off grammar: $probe_line" >&2; exit 1 ;;
 esac
 if [[ "$(grep -c . "$sp/probe.log")" -ne 1 ]]; then
