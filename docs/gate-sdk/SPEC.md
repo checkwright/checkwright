@@ -9781,6 +9781,17 @@ is derived rather than written down** is §The port-candidate criteria's, criter
 7 and 6; this section owns how. The arms are **exclusive**: each replaces the
 others' report rather than appending to it.
 
+**`--tree` resolves its corpus from the process cwd, and there is no path
+argument that overrides it.** So a measurement *of a particular tree state* — a
+HEAD reading taken while the main checkout carries uncommitted work, the shape a
+close or a lead boundary wants — requires the process to run with its cwd
+**inside** that tree, typically a linked worktree. Run from a modified main
+checkout it silently reports the modified tree's numbers, and those numbers look
+entirely plausible: nothing in the trailer says which tree was scanned. Stated
+because the completion predicate of the port-only run is this count, so a
+measurement attributed to the wrong tree is the one error here that misreports
+whether the run is over.
+
 **Two corpora, and confusing them is the failure this tool is now shaped
 against.** The registry arms speak for the **battery** — what `gates.list`
 names — and can speak for nothing else. `--tree` speaks for the **project**, the
@@ -11617,6 +11628,15 @@ derivation equals the constant the build baked. That test is also where the
 git-based arm is exercised at all: **both** fixture cases pass an explicit stamp
 file, so the derivation the gate exists for has no committed case, and saying so
 here is what keeps a green pair from reading as coverage of it.
+
+**The ordering trap a porting session meets, stated where it meets it.** The
+tree side is derived over `git ls-files`, so an **untracked** new crate source is
+invisible to the stamp and becomes visible the moment it is staged. A session
+that builds the binary first and stages the new file second therefore reds this
+gate at commit time on a tree whose battery ran green minutes earlier — the
+battery was green *because* the file was untracked. The order is **stage the new
+source, then run `bash gate-sdk/bin/build-native.sh`**; a rebuild is what the
+red asks for and re-running the battery without one reproduces it.
 
 **A bespoke case for this member cannot vary the binary through the dispatch.**
 Its subject *is* `GATE_SDK_NATIVE_BIN`, which `gate_command` also resolves the
