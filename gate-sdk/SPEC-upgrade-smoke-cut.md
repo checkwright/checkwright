@@ -457,27 +457,43 @@ would assert a finished residue while three of its four members are still owed
 and the fourth has only just become takeable. A Done move would also strip every
 tag the entry carries, since a done entry is a bare slug.
 
-### (14) The crate-arms trigger does not fire on this cut's files, and the oracle is run rather than relied on
+### (14) The crate-arms trigger *does* fire on this cut's files — the claim that it does not was a misreading of one glob, and the misreading is the finding
 
 `check-crate-arms` is the gate holding "the crate's lint and test arms run at
 commit time", and its trigger is
 `staged_matches 'native/Cargo.toml' 'native/build.rs' 'native/src/*.rs'
-'native/src/gates/*.rs'` {mechanical}. **This cut's crate files match none of
-it.** A bridged arm lands as a row in `native/src/emit/mod.rs` and an
-implementation beside it in `native/src/emit/`, and — probed rather than assumed
-— `native/src/main.rs:345` dispatches every bridged arm through a **table
-lookup**, `emit::lookup(first)`, so unlike the hand-branched top-level flags at
-`:184-316` this member has **no `main.rs` edit at all** that would make the
-trigger fire incidentally.
+'native/src/gates/*.rs'` {mechanical}. An earlier reading of this amendment held
+that a bridged arm's files — a row in `native/src/emit/mod.rs` and an
+implementation beside it in `native/src/emit/` — match none of that, and that the
+landing commit would therefore commit under an unrun arity guard. **That reading
+is false, and it is corrected here rather than carried into the merged SPEC.**
 
-So the landing commit runs the gate **explicitly** —
-`bash gate-sdk/bin/run-gates.sh --only check-crate-arms` — rather than trusting a
-trigger known not to fire. That is oracle-first applied to a gate whose *reach*
-is the thing at fault, and it is the whole remedy this cut takes: widening the
-`# graph:` manifest would restage the generated hooks and is gate-manifest work
-the port-only run does not admit, so the trigger omission is **filed to the gap
-inbox** and routed around here. `bash gate-sdk/bin/build-native.sh` does not
-discharge it — that builds the binary and runs neither arm.
+`scripts/git-hooks/pre-commit` tests each staged path with `[[ "$f" == $pat ]]`,
+the pattern operand **unquoted** under an explicit `# shellcheck disable=SC2053`.
+That is bash *string* pattern matching, not pathname expansion: there is no
+directory-boundary rule because there are no directories involved, only a string,
+so `*` matches `/` and `native/src/*.rs` spans every module directory beneath it.
+`native/src/emit/mod.rs` and `native/src/emit/upgrade_smoke.rs` both match, and
+the trigger fires on this cut exactly as it fires on a gate module.
+
+**The misreading matters more than the fact it got wrong**, which is why it is
+recorded rather than silently deleted. `gate-sdk/bin/gen-pre-commit.sh` emits,
+one line above the comparison it generates, the comment "True if any staged path
+matches one of the given globs (bash glob: `*` spans '/')" — so the false claim
+was contradicted by prose adjacent to the code it misread, and it still
+propagated through a gap filing, a ruling and two build briefs on the strength of
+eyeballing a manifest line. A trigger that *looks* blind but is not will make a
+real blindness elsewhere read as the same false alarm; that is the cost being
+paid down here.
+
+The remaining instruction is unchanged and merely demoted in weight: the landing
+commit still runs `bash gate-sdk/bin/run-gates.sh --only check-crate-arms`
+explicitly, but as belt-and-braces over a trigger that fires rather than as the
+only thing standing between this change and an unrun arity guard. **No
+`# graph:` manifest widening is owed**, and the trigger-omission gap filed
+against this member is answered rather than deferred.
+`bash gate-sdk/bin/build-native.sh` still does not discharge it — that builds the
+binary and runs neither arm.
 
 ## Producers and consumers
 
@@ -716,10 +732,10 @@ twin holding its rules.
       unchanged and unclosed.
 - [ ] **The heading survives** — `### upgrade-smoke` is not renamed, and
       `check-md-refs` is green over `docs/install.md`'s link to its slug.
-- [ ] **`check-crate-arms` was run explicitly, not left to its trigger** —
-      `bash gate-sdk/bin/run-gates.sh --only check-crate-arms` in the landing
-      commit, because that gate's trigger does not reach `native/src/emit/*.rs`
-      and a bridged arm needs no `main.rs` edit to drag a matching path in
+- [ ] **`check-crate-arms` was run explicitly, over a trigger that also fires**
+      — `bash gate-sdk/bin/run-gates.sh --only check-crate-arms` in the landing
+      commit as belt-and-braces, the trigger's `native/src/*.rs` glob reaching
+      `native/src/emit/` because the hook matches strings rather than paths
       (delta 14).
 - [ ] **The terminal move is a demotion, checked by reading the queue** — the
       host entry is under `## Deferred` with `[design-pending]` restored and is

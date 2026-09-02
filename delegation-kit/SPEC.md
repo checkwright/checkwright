@@ -1706,13 +1706,23 @@ exactly what the arity guard exists against.
 guard here at all, and that is worth stating because the reach is easy to
 misread.** The arity cases only bind if something runs them at commit time. In
 this repo `check-crate-arms` does reach a hook member — its couples list carries
-a `native/src/*.rs`-shaped glob, and the generated hook tests it with bash's
+a `native/src/*.rs`-shaped glob, and a `couples=` pattern is matched with bash's
 **unquoted-pattern `[[ str == pat ]]`**, which is *string* matching rather than
 pathname expansion, so `*` matches `/` and the glob spans the module directories
 beneath it. **Read as a filesystem glob it would not**, and that misreading is
 the trap: it makes a trigger look blind that is not, and it would make a real
 blindness elsewhere look like the same false alarm. Verify the predicate, never
 the manifest line alone.
+
+**Those semantics are gate-sdk's and not this hook's, which is why they are cited
+rather than restated.** The matcher has one owner — `gate_staged_matches` in
+gate-sdk's lib — whose body the pre-commit generator emits **verbatim**, so the
+rule governs every gate's `couples=` in every kit rather than one generated file.
+It is deliberate rather than incidental: the body carries a standing
+`shellcheck disable=SC2053`, and SC2053 is precisely *quote the right-hand side
+of `==` to prevent glob matching*, so the unquoting is a declared intent. Anyone
+meeting that line as a latent bug and quoting it would break every trigger in the
+tree at once.
 
 **Where a consumer's trigger genuinely does not reach, the compensating move is
 to run the gate explicitly** —
