@@ -429,13 +429,18 @@ demotion, unlike a Done move, lands the entry **back inside
 are uncapped, so the promotion costs nothing; the debt falls due at the
 demotion.
 
-The headroom is measured rather than estimated. The entry's extent is
-`TASK-QUEUE.md` lines 70–117 = 48 lines, carrying **one** `ruled:` line and no
-`recurrence:` line, so its counted size is 47 against
-`QUEUE_KIT_ENTRY_LINE_CAP` = 50 — **three lines of headroom**. The `ruled:` line
-this promotion would add is *not* free: the discount is at most one line per
-grammar and the entry already spends its one. So the build has **two** lines to
-spend on rewriting the `declaration.sh` paragraph from *blocked, temporary* to
+The headroom is measured rather than estimated. Before this amendment's
+promotion landed, the entry's extent was `TASK-QUEUE.md` lines 70–117 = 48
+lines, carrying **one** `ruled:` line and no `recurrence:` line, so its counted
+size was 47 against `QUEUE_KIT_ENTRY_LINE_CAP` = 50 — **three lines of
+headroom**, with the promotion's own `ruled:` line *not* free against that
+budget: the discount is at most one line per grammar and the entry already
+spent its one. **Re-measured at align entry, `68656122`, after the promotion**:
+the entry now sits at lines 88–136 = 49 lines, carrying **two** `ruled:` lines
+(the second being the pairing's own, landed with the promotion) and no
+`recurrence:` line, so its counted size is 48 — **two lines of headroom**,
+exactly the pre-promotion forecast. So the build has **two** lines to spend on
+rewriting the `declaration.sh` paragraph from *blocked, temporary* to
 *unblocked, takeable under its own section*; if the correction wants more, spent
 narrative is compressed in place in the same commit that demotes the entry.
 Stated here because neither owner states it alone — the cap is queue-kit's and

@@ -436,9 +436,11 @@ per-entry cap** {mechanical}. The active sections are uncapped, so the promotion
 itself costs nothing; the debt falls due at the demotion.
 
 The headroom is measured rather than estimated, and it is **zero**. The entry's
-extent is `TASK-QUEUE.md` lines 19–69 = 51 lines; the count discounts **at most
-one line of each declaration grammar**, and the entry carries eight `ruled:`
-lines and no `recurrence:` line, so seven of the eight are counted and the
+extent is `TASK-QUEUE.md` lines 37–87 = 51 lines (re-measured at align entry,
+`68656122`, after `subagent-liveness-log-unattributed-refusal`'s promotion
+shifted the absolute range without changing the count); the count discounts
+**at most one line of each declaration grammar**, and the entry carries eight
+`ruled:` lines and no `recurrence:` line, so seven of the eight are counted and the
 count is 50 against `QUEUE_KIT_ENTRY_LINE_CAP` = 50. **Every line the build adds
 to this entry is paid for by a compression in the same commit**, and a `ruled:`
 line is not free here — the discount is one per grammar, not one per line.
