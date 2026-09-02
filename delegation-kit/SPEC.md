@@ -1702,17 +1702,24 @@ be invisible. A third case lists every field in its expectation rather than a
 subset, on the same reasoning: a case that silently under-covers a field is
 exactly what the arity guard exists against.
 
-**The gate that runs those crate cases does not fire on a change confined to the
-hook's own module, so it is run explicitly rather than left to its trigger.**
-`check-crate-arms` couples the crate manifest, its build script and its top-level
-and gate source globs; a hook member sits under none of them. Left to the
-trigger, a commit touching only this member would run neither the lint nor the
-test arm, and — because the truncation is silent — a green battery would be
-indistinguishable from a battery in which the arity guard never ran. The reach is
-at fault rather than the rule, so a unit landing here runs
-`bash gate-sdk/bin/run-gates.sh --only check-crate-arms` in its own landing
-commit. Building the binary does **not** discharge it: that builds and runs
-neither arm.
+**A consumer whose crate-arms trigger did not reach this member would have no
+guard here at all, and that is worth stating because the reach is easy to
+misread.** The arity cases only bind if something runs them at commit time. In
+this repo `check-crate-arms` does reach a hook member — its couples list carries
+a `native/src/*.rs`-shaped glob, and the generated hook tests it with bash's
+**unquoted-pattern `[[ str == pat ]]`**, which is *string* matching rather than
+pathname expansion, so `*` matches `/` and the glob spans the module directories
+beneath it. **Read as a filesystem glob it would not**, and that misreading is
+the trap: it makes a trigger look blind that is not, and it would make a real
+blindness elsewhere look like the same false alarm. Verify the predicate, never
+the manifest line alone.
+
+**Where a consumer's trigger genuinely does not reach, the compensating move is
+to run the gate explicitly** —
+`bash gate-sdk/bin/run-gates.sh --only check-crate-arms` in the landing commit —
+because the truncation is silent in both directions: a trigger that does not fire
+is indistinguishable from a clean battery. Building the binary does **not**
+discharge it either way: that builds, and runs neither arm.
 
 **The hermetic stub-driven lane that used to hold every verdict arm moved into
 the member's own module with the port, and the move is stated rather than left to
