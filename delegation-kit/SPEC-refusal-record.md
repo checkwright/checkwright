@@ -348,6 +348,29 @@ that learns it.
 - The gate binary itself — rebuilt with `bash gate-sdk/bin/build-native.sh`
   beside the battery, neither discharging the other.
 
+## The provenance seam
+
+**What ships as kit mechanism:** the `runs` field, its position in the table, its
+derivation from the run dir's `*.run` basenames, and the two refusal-message arms
+that render it. All generic — a field name and a directory listing.
+
+**What stays the consumer's:** every run *key*. A key is a name the consumer's own
+session chose for a piece of work, so the field's values are consumer content and
+the kit ships none of them. No key, no vocabulary and no example key enters a kit
+literal, a fixture or a default. The crate test's fixture uses a synthetic key of
+its own making, as the wired-arm test's arm B already does with `run=k`.
+
+**What becomes consumer config:** nothing new. The field mints no knob; its one
+input is the run dir the already-declared `GATE_SDK_TMP_DIR` resolves.
+
+**Where the seam could have been crossed and is not:** the entry's own fork
+proposed logging `agent_id` and `agent_type`, which are *harness payload values*.
+The no-values privacy ruling holds that `keys=` carries key names and never
+values, and delta (4) declines both fields — so this amendment does not widen the
+record from names to values, and the ground it declines them on is the shipped
+identity doubt rather than the privacy rule. Both grounds point the same way and
+that is stated so a later reader does not read the privacy rule as spent.
+
 ## Definition of Done
 
 - [ ] **Causal completeness** — every new state/event/interface has a named,

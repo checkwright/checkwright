@@ -565,6 +565,32 @@ so the build session is not the one that learns it.
   `cited-script-path-liveness-inline` and `bridged-arm-requirements-undeclared`
   entries — deliberately unwritten.
 
+## The provenance seam
+
+**What ships as kit mechanism:** the crate test module — the case-table walk, the
+explicit child environment, the subject spawn and the assertion set. All generic.
+
+**What stays the consumer's:** the two fixtures. `usage-tests/cases.tsv` and
+`usage-tests/trend-history.log` stay **on disk, tracked, at their paths, in their
+formats**, and are not transcribed into Rust literals — the disposition §Testing
+already took for `dispatch-guard-cases.tsv` on the ground that "moving it into
+Rust literals would trade a reviewable table for a recompile". The seam here is
+kit test data rather than consumer config, and the rule that keeps it out of the
+binary is the same one: a table a reader can edit does not become a compiled
+literal because its reader changed language.
+
+**What becomes consumer config:** nothing new, and pointedly so. Delta (6) is the
+seam held: the declared knob roster is empty because a declared knob would let a
+consumer's tree config reshape a table that must encode the kit defaults. The
+knobs themselves stay exactly where they are, in
+`delegation-kit/lib/delegation.sh`, which is permanently shell as the config
+bridge's sole resolver for this kit.
+
+**What is not crossed:** no term list, no vocabulary and no product constant
+enters the crate. The only literals the module carries are the two that assert
+kit defaults, and delta (6) rules they stay literals rather than being read from
+the library.
+
 ## Definition of Done
 
 - [ ] **Causal completeness** — every new state/event/interface has a named,

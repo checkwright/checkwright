@@ -583,6 +583,41 @@ learns it.
 - `TASK-QUEUE.md`, the `upgrade-smoke-refuses-inside-a-worktree` entry —
   deliberately unwritten.
 
+## The provenance seam
+
+**What ships as kit mechanism:** the arm — the two-phase orchestration, the
+per-ref worktree and build, the determinism read, the containment comparison, and
+the three exit classes. All generic; none of it names a consumer's kits, gates or
+release vocabulary.
+
+**What stays the consumer's, and this cut is where it would have been easiest to
+lose:** three things, each a resolution rather than a literal.
+
+- **The vendorable-kit set** is derived from the tree — the directories shipping
+  `smoke/install.sh`, gate-sdk first — and is never a roster the crate carries. A
+  ported arm holding a kit list would publish this repo's kit names as a kit
+  literal, which is the seam exactly.
+- **The tightened-gates declaration** is the consumer's content at the consumer's
+  ref. The arm reads it through the token predicate and compares set membership;
+  it holds no gate name.
+- **The scratch consumer's own configuration.** The arm resolves the graph
+  artifact path **in the consumer's library, in the consumer's tree**, never from
+  the host's — the ruling §upgrade-smoke already carries, and the one place a
+  port could quietly substitute the host's value and pass every test in this
+  repo. Delta (3)'s `bash -c` protocol is what keeps that resolution the
+  consumer's.
+
+**What becomes consumer config:** nothing new. The five knobs are shipped and
+read today; delta (5) moves three defaults from a deleted driver into the kit
+library, which is the config bridge's only sanctioned home for them, and two of
+those become empty-means-derive precisely so no repo-specific literal is written
+into a kit file.
+
+**What is not crossed:** the two battery-summary patterns delta (7) keeps are
+gate-sdk's own output contract, not a consumer's vocabulary; and `bin/` tools
+that stay shell keep their sources untouched, so no kit library gains a crate
+twin holding its rules.
+
 ## Definition of Done
 
 - [ ] **Causal completeness** — every new state/event/interface has a named,
