@@ -1,1 +1,21 @@
 # contract: evidence-manifest v1
+test-runner-and-upgrade-cuts-with-liveness-attribution gates sha256=4f49830a5cf58fd556895723a6ee021a385b13ab6a0d6fc834b9e564e153cd25 pass=108 fail=0 ignore=0 verdict=clean 2026-09-02
+test-runner-and-upgrade-cuts-with-liveness-attribution gate_sdk sha256=a7f27f93a1a0249ed5f6df62a96225edc7b5f9d0f5f9b0d041861daa605b93c0 pass=1 fail=0 ignore=0 verdict=clean 2026-09-02
+test-runner-and-upgrade-cuts-with-liveness-attribution canon_kit sha256=9d3cf3ab0a1425a5996fd26152019ba03a3e0f5fa5ad31aa0e4a19901b8acb5a pass=1 fail=0 ignore=0 verdict=clean 2026-09-02
+test-runner-and-upgrade-cuts-with-liveness-attribution context_kit sha256=65e7536ec8b920506d9defb5f2fd338be716ee72482acf2e4819ca5b3fcbe891 pass=1 fail=0 ignore=0 verdict=clean 2026-09-02
+test-runner-and-upgrade-cuts-with-liveness-attribution delegation_kit sha256=6d5af78679d3b30bda016b7d6cdeab840c0fc2bde80bfe4ecaad54b15446f963 pass=1 fail=0 ignore=0 verdict=clean 2026-09-02
+test-runner-and-upgrade-cuts-with-liveness-attribution doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-09-02
+test-runner-and-upgrade-cuts-with-liveness-attribution evidence_kit sha256=ae2a2f19285bce1b8d4b6490f91bce3d998afb05553e102569916c62cec919c4 pass=1 fail=0 ignore=0 verdict=clean 2026-09-02
+test-runner-and-upgrade-cuts-with-liveness-attribution guard_kit sha256=234e06ba5cdb4ca383be7191965292443198471675d1b3166d8c264175420ae4 pass=1 fail=0 ignore=0 verdict=clean 2026-09-02
+test-runner-and-upgrade-cuts-with-liveness-attribution lifecycle_kit sha256=55c0d3e68939b68858a225f53ce20889d8b17a92d840705f272968912d2427c3 pass=1 fail=0 ignore=0 verdict=clean 2026-09-02
+test-runner-and-upgrade-cuts-with-liveness-attribution queue_kit sha256=bd337719dfff15f492ae94d8e8662663a8917b65edd4b3bfcfdd20f1790ba39b pass=1 fail=0 ignore=0 verdict=clean 2026-09-02
+test-runner-and-upgrade-cuts-with-liveness-attribution site_kit sha256=07f7139ea31865677de58ea44b43f7c98ae6c40c8f3fe57e8975e8d65794be35 pass=1 fail=0 ignore=0 verdict=clean 2026-09-02
+test-runner-and-upgrade-cuts-with-liveness-attribution scripts sha256=f302eab3cefcc19e12fac91459be10fb1b4c8f02dd63cef5ad040f4deb8dc259 pass=1 fail=0 ignore=0 verdict=clean 2026-09-02
+test-runner-and-upgrade-cuts-with-liveness-attribution guard_tests sha256=00a4ff054b6b31ce5d150b2f791cf35f1047cb2d371b9d6676ba7544335a44ee pass=1 fail=0 ignore=0 verdict=clean 2026-09-02
+test-runner-and-upgrade-cuts-with-liveness-attribution demo sha256=7cdfb2e65adcc60b2c4124e4fbce43948f9a43544ff6239820feaa8571c8fbd5 pass=1 fail=0 ignore=0 verdict=clean 2026-09-02
+test-runner-and-upgrade-cuts-with-liveness-attribution installer_smoke sha256=13b4518ab81c96a020624548182fd5e0f62d3dfd4e6071abd823485d8647c6c5 pass=4 fail=1 ignore=0 verdict=clean 2026-09-02
+test-runner-and-upgrade-cuts-with-liveness-attribution consumer_smoke sha256=fdb5ea455d6b2f3f5c61224561cf581e747c6287caa84c28bb8c7947f313d32a pass=1 fail=0 ignore=0 verdict=clean 2026-09-02
+test-runner-and-upgrade-cuts-with-liveness-attribution upgrade sha256=0d96d572bfc4e259aa3032c6096d69c9464e9aa5c2f9bcfc4c70b5170d38b543 pass=1 fail=0 ignore=0 verdict=clean 2026-09-02
+test-runner-and-upgrade-cuts-with-liveness-attribution agents_md_smoke sha256=7a5d3eba561a9a6d4dab09caf719215d33a15007022fbb6145a62ced64d30e0c pass=1 fail=0 ignore=0 verdict=clean 2026-09-02
+test-runner-and-upgrade-cuts-with-liveness-attribution index_tests sha256=e14e152466dc5be0296b1e20575bf3d587e1e0a127e7c63ad57671dbcaeaddb8 pass=1 fail=0 ignore=0 verdict=clean 2026-09-02
+test-runner-and-upgrade-cuts-with-liveness-attribution native_crate sha256=1b6fb41bcb4fb4f38f5357964cc94a093f58c9f551f7165118efdfede3ed674f pass=1 fail=0 ignore=0 verdict=clean 2026-09-02
