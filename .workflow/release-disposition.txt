@@ -2,4 +2,3 @@
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
 
-session-id-and-env-probe-cuts release deferred:v0.26.0 — minor: two shipped kit shell tools (lifecycle-kit/bin/session-id.sh, context-kit/bin/env-probe.sh) removed and re-pointed at bridged arms, a behavior change a consumer's tree may depend on, and the tightened-gates surface carries eight declared names since v0.25.0; no decommission and no major, probed rather than assumed — neither deleted file carried a deprecation marker. Cadence fired nothing: the elapsed-time limb is dormant while docs/install.md §The release channel reads preview (operator 2026-08-31, not re-argued), no security or supply-chain fix, no operator direction, audience not arrived. Nineteenth deferral, floor unchanged at v0.26.0.
