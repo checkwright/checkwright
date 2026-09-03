@@ -290,6 +290,38 @@ credit the count itself carries.
   intra-document contradiction rather than a stale path. One miss against five
   repairs. **No tier reversal is proposed**, and a later judge inherits a point
   whose cost reading and work reading now agree for the first time in three.
+  **Measured again 2026-09-03 at `session-id-and-env-probe-cuts`: `cr=11284869` —
+  rank 44 of 62 ascending, +17.1% on a recomputed bare-sonnet median of 9640921,
+  and −8.8% on the preceding 12367022.** No `align+fanout` row exists: this align
+  dispatched nothing. **It is the missing cell of the 2x2 the last two points set
+  up, and it is worth more than either of them alone.** Those two varied dispatch
+  and journal TOGETHER — 5243426 dispatched nothing and left no journal, 12367022
+  dispatched three sweeps and journalled — so the near-minimum had two candidate
+  explanations and the prior reading could only prefer one. This point holds the
+  journal fixed and removes the dispatch: journalled as granted, dispatched
+  nothing, and drew +17.1%, within 9% of the dispatching point. So **dispatch is
+  not the driver** and the remaining variable is the one the prior datum
+  suspected — the near-minimum came from a session that skipped a granted
+  artifact, which reads as work not done rather than as a cheaper tier. That
+  suspicion is now designed rather than asserted, and the cell that would refute
+  it (journalled, no dispatch, near-minimum) is the one that did not appear.
+  The stated revert signal did not fire: two build stamps are the planned batch
+  split, one validate stamp, no re-entry. align audited two amendments, found
+  **three** real defects in cut A and repaired all three inside the envelope,
+  escalating none — a DoD missing its regeneration bullet for two staled
+  projections, a delta naming context-kit for a citation that does not exist
+  there, and a NEW delta 13 for five plain-prose `session-id.sh` mentions in
+  `context-kit/SPEC.md` §The session-context hook. Close confirmed that third
+  repair landed and reads correctly post-merge.
+  **The counter-entry, and it is the second counter firing on the same grep that
+  produced align's best find.** align's own survey records a tree-wide grep for
+  both cut scripts' literal names; that grep reaches `drift-kit/SPEC.md:628`,
+  which named `session-id.sh` as the present-tense actor performing the
+  normalization, and no delta rostered it. Close's delegated deleted-shell sweep
+  found it two stages later and repaired it. So the instrument that caught five
+  mentions in one kit missed one in another, which is a roster-completeness miss
+  rather than a judgment miss — a distinction the earlier counters did not need.
+  One miss against three repairs. **No tier reversal is proposed.**
 
 scope, `spec`, and close stay on Opus, their generative and verificational
 judgment being what justifies the tier. Re-judge every tier when the harness

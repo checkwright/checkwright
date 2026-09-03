@@ -9311,13 +9311,14 @@
   criterion — read an iteration's escalations and count how many the lead ruled ALONE by reading a
   governed surface; near zero, the premise holds; consistently several, the premise is wrong and
   the template's bullet is what needs amending, not this repo's tier. It then named the threshold:
-  "a third iteration at several ruled-alone escalations should amend that bullet." Measured five
-  such rulings in 2026-08-31, four in 2026-09-01, several again in 2026-09-02, and **four in
-  2026-09-03** — scope's threshold entry, spec's amendment-tag arithmetic, and build's two, the
-  non-repo-cwd front-end refusal and the four stranded `lib/stages.sh` renderers. A fourth
-  consecutive point, with two of the four ruled on grounds the escalating session had missed and
-  one catching an unreconciled count inside build's own evidence. On COST the premise held again:
-  the lead's priced share read 10.7%, on a partial close and with one lead-side row unpriced.
+  "a third iteration at several ruled-alone escalations should amend that bullet." Measured five in
+  2026-08-31, four in 2026-09-01, several in 2026-09-02, four at
+  `declaration-install-and-stage-helper-cuts`, and **five at
+  `session-id-and-env-probe-cuts`** — the iteration's composition against the
+  port-only run, the refusal of scope's proposed cut C, the deferred-pool questions the run's text
+  forecloses, four gap-bullet dispositions verified at their cites, and the `enter-stage.sh`
+  executable-check envelope. A FIFTH consecutive point. On COST the premise held again: the lead's
+  priced share read 10.7% at the fourth point.
   **The two axes separate, which is what makes this an amendment rather than a tier flip.** On
   COST the split premise holds and strengthens — the lead's share fell 14% -> 9.2% -> 9.7%, so the
   lead's turns really are the cheap tail in dollars. On CHARACTER it fails every time: a
@@ -9329,15 +9330,17 @@
   both halves were false — the predicate was never run. So the count measures a capacity that
   demonstrably misfires, and any amendment has to say what a lead's turns ARE without claiming
   they are reliably verificational.
-  **It recurred on 2026-09-03, one iteration after being written here, and the failing step was
-  PROVENANCE for the second time.** The lead told build that two crate functions were pre-existing
-  halves landed by two named commits; they were build's own code, written that session. What was
-  run was `git log -- <files>`, which reports commits touching the FILES; the function-level
-  inference was stated as fact where `git grep 'fn <name>' HEAD` settles it in one command. The
-  claim survived — build ran the predicate rather than trusting the framing — so the conclusion
-  was lucky and the method was not. **It does not net against the ruled-alone count**: the count
-  measures how many escalations a lead answered off a governed surface, this measures whether the
-  grounds under an answer were probed or inferred, and an amendment owes both readings.
+  **It recurred at `declaration-install-and-stage-helper-cuts`, PROVENANCE for the second time** —
+  two crate functions called pre-existing off a `git log -- <files>` read were build's own code that
+  session, where `git grep 'fn <name>' HEAD` settles it; the claim survived only because build ran
+  the predicate. **A THIRD instance at `session-id-and-env-probe-cuts`, on a failing step the first
+  two do not reach: the lead OVERRODE a fact the session had supplied.** Its ruling closed "promote
+  the two hosts with their `spec:` refs" where scope's own returning report had already said
+  promotion is /spec's, citing lifecycle-kit/SPEC.md:3438-3455 — a surface the lead did not open.
+  Scope ran `check-amendment-queue` rather than complying, so it cost one gate run; compliance would
+  have committed a red. **None of the three net against the ruled-alone count**: that count measures
+  how many escalations a lead answered off a governed surface, these measure whether the grounds
+  under an answer were probed, inferred, or overridden.
   **Why `[design-pending]`:** the deliverable is a kit template's own design rationale, and the
   shape is unruled — qualify the bullet's premise, split it into a cost limb and a character limb,
   or replace it with the discriminator the binding already uses. Which one is a doctrine call.
@@ -9346,11 +9349,10 @@
   that never records it — the binding's evidence is local while the false claim is shipped.
   **DISTINCT from `economics-posture-binding-stale`**, whose subject is the local shim restating a
   ruling it should cite; this one is the vendored TEMPLATE's own premise being wrong.
-  Captured 2026-09-02 by close under the close template's own rule that a finding close itself
-  captures files to Deferred; ruled filed-not-performed by the lead the same day, on the ground
-  that amending a kit template is non-port design work the 2026-08-31 port-only run forecloses.
-  Filing it is not the drain's `promote` that ruling bars: `## Deferred` is not an active section,
-  and only scope promotes into one.
+  Captured 2026-09-02 by close under the close template's rule that a finding close itself captures
+  files to Deferred; ruled filed-not-performed by the lead the same day — amending a kit template is
+  non-port design work the port-only run forecloses, and filing is not the `promote` that ruling
+  bars, `## Deferred` being no active section.
   ruled: lead-tier-split-premise-unamended lead 2026-09-02 own-authority
   recurrence: lead-tier-split-premise-unamended 2026-09-03
 
@@ -9453,7 +9455,5 @@
 - **port-archaeology-restatement-residue** [design-pending] — Prose narrates deleted shell forms.
 
 ## Done
-
-- ruled-line-canonicalization-unruled
 
 ## Lessons Learned
