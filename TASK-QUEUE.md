@@ -187,22 +187,21 @@
   owns it: the smoke builds from its host and refuses a foreign roster; steering or a cross-build.
   **Cost while deferred:** the one adopter class with a named days-to-weeks adoption window has no
   working install path on Windows, and `powershell-installer-surface` stays sequenced behind this.
-  **ROUND 7 IS READ AND THE CAUSE IS NAMED.** Instrument landed `2799b22b`, cause-only with no
-  repair (operator, 2026-08-31 consult); read at `33447663600`, job `99670277406`, head `954aeda2`.
-  Assertion D reported on BOTH `--emit` arms `exit 1; stdout: Windows Subsystem for Linux has no
-  installed distributions …; stderr: <empty>`. MECHANISM, traced to source and not inferred:
-  `native/src/gates/graph.rs` spawns the generator as a BARE `bash`, and the binary is a NATIVE
-  Windows process taking a Win32 PATH search where System32 precedes Git's `usr/bin`, so `bash`
-  resolves to WSL's launcher and exits 1 with no distro installed — cleared by that spawn's own
-  `spec:` comment because `bash` is on the program floor, an assumption this host falsifies. This
-  record RETIRES both 2026-08-31 TRAJECTORY.md paragraphs, each naming it as their discharge.
-  **TWO READINGS WORTH MORE THAN THE CAUSE.** Round 6's cwd-anchor hypothesis is FALSIFIED: the
-  unguarded command is in the GATE, not the generator's prologue, so neither guessed repair could
-  ever have landed on it — the instrument's case, measured rather than argued. And the SECOND
-  widening is the one that paid, the cause arriving on stdout with stderr EMPTY, exactly the
-  mechanism gate-sdk/SPEC.md §check-graph names; the first alone would have printed empty again.
-  **THE REPAIR IS RULED IN 2026-09-03 as an operator-directed hotfix — minimal, one commit, and
-  UNSEQUENCED against the port cut, the sequenced variant offered and declined; spec pairs it.**
+  **ROUND 7 NAMED THE CAUSE, rounds 8-11 repeated it, and it is now ANSWERED** — `graph.rs` spawned
+  a BARE `bash` into a NATIVE Windows process, so a Win32 PATH search found WSL's launcher ahead of
+  Git's `usr/bin`; that record RETIRES both 2026-08-31 TRAJECTORY.md paragraphs naming it. THE
+  METHOD READING THAT OUTLIVES IT: round 6's two guessed repairs could never have landed, the
+  unguarded command being in the GATE rather than the generator's prologue, so cause-read-first is
+  the instrument's whole case — and round 12 is the first repair built on a read cause.
+  **THE REPAIR WAS RULED 2026-09-03 an operator-directed hotfix — minimal, one commit, UNSEQUENCED
+  against the port cut, the sequenced variant offered and declined — AND ROUND 12 VERIFIES IT AT
+  THE REMOTE ORACLE:** run `33782234328`, head `32f73806`, reading `battery: All 11 gates passed`
+  on a native Windows host against round 11's `1 of 11 gates FAILED: check-graph`. The narrow
+  envelope cleared exactly what it was ruled to clear, and align's tree-side probe that it would
+  is confirmed rather than assumed. **The LEG still exits 1, at a strictly later stage the battery
+  was masking:** `477 of 477 manifest entries disagree with the tree` — wholesale rather than
+  per-file, so NO CAUSE IS CLAIMED here and it is filed to the gap inbox, postdating this drain.
+  Both green-limb riders stay unexecuted: the battery is green, the LEG is not.
   **DEMOTED 2026-09-01 AT BUILD**, the second exercise and a recurrence rather than a tail — a NEW
   iteration on a FRESH amendment. The wedge and its five shapes are
   `observation-predicate-entry-cannot-drain-in-its-own-iteration`'s.
@@ -213,7 +212,8 @@
   ruled: platform-support-ci-matrix operator 2026-08-31 2026-09-03 lead-relay
   ruled: platform-support-ci-matrix lead 2026-09-01 own-authority
   Filed 2026-07-26 by scope, split from `platform-support-contract`; Linux split 08-25, macOS 08-26;
-  promoted/deferred 08-25 through 09-01; rounds 6-11 on 08-31 to 09-03, 8-11 identical to 7.
+  promoted/deferred 08-25 through 09-01; rounds 6-12 on 08-31 to 09-03, 8-11 identical to 7 and
+  12 the first state change since.
 
 - **spec-authoring-self-check-pass** [design-pending] — spec-stage amendment authoring asserts tree
   facts a one-command probe refutes, and every instance is caught downstream rather than at
