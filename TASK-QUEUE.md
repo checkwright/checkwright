@@ -166,7 +166,7 @@
   ruled: platform-support-ci-matrix operator 2026-08-31 lead-relay
   ruled: platform-support-ci-matrix lead 2026-09-01 own-authority
   Filed 2026-07-26 by scope, split from `platform-support-contract`; Linux split 08-25, macOS 08-26;
-  promoted/deferred 08-25 through 09-01; rounds 6-9 on 08-31 to 09-02, 8 and 9 identical to 7.
+  promoted/deferred 08-25 through 09-01; rounds 6-10 on 08-31 to 09-03, 8-10 identical to 7.
 
 - **spec-authoring-self-check-pass** [design-pending] — spec-stage amendment authoring asserts tree
   facts a one-command probe refutes, and every instance is caught downstream rather than at
