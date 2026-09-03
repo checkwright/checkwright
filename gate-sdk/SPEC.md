@@ -6731,7 +6731,8 @@ splitting one member across commits.
 
 **The price.** Three crate modules, two descriptors, three shell files deleted,
 one renamed SPEC heading with its citations moved, and the generated-projection
-fan-out §Generated projections rosters. Parity was proved by running both
+fan-out §Generated projections and their freshness gates rosters. Parity was
+proved by running both
 substrates over the live tree: the arm is byte-identical to the deleted script's
 roster, and the ported precondition gate is byte-identical to the deleted one
 over `TASK-QUEUE.md` and over a crafted corpus reaching the bracket-bridging,

@@ -469,7 +469,8 @@ The count is probed rather than assumed {mechanical}:
 
 Deleting one owed `.sh` file moves `measured-claims.sh`'s `tree-shell-owed` key
 (`scripts/measured-claims.sh:42`), read off `--emit port-blockers --tree`'s trailer
-{mechanical}. docs/site-architecture.md §Generated projections rules that a tree
+{mechanical}. docs/site-architecture.md §Generated projections and their
+freshness gates rules that a tree
 edit moving a measured claim stales the generated `pre-commit` and `commit-msg`
 hooks — the baked invocation carries `check-measured-claim`'s resolved values — and
 `docs/check-graph.html` with them. The edits to `guard-kit/SPEC.md`,
@@ -713,7 +714,8 @@ it, and it is the reason this session recommends the audit stage next.
 - The generated projections this cut stales — the on-site SPEC and README mirrors,
   the generated `pre-commit`/`commit-msg` hooks, `docs/check-graph.html`, and the
   gate binary itself. All are rostered with their triggers and regen commands in
-  `docs/site-architecture.md` §Generated projections (all deltas).
+  `docs/site-architecture.md` §Generated projections and their freshness gates
+  (all deltas).
 
 ## Definition of Done
 

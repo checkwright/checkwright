@@ -1611,6 +1611,8 @@ guard-kit/
   gate-tests/scratch-run.test.sh    # bespoke unit test, run by gate-sdk's runner
   gate-tests/scan-prompts.test.sh   # bespoke unit test, run by gate-sdk's runner
   gate-tests/compare-settings-allow.test.sh  # bespoke unit test, run by gate-sdk's runner
+  gate-tests/git-mutation-under-producer.test.sh  # bespoke unit test, run by gate-sdk's runner
+  gate-tests/guard-read-path.test.sh  # bespoke unit test, run by gate-sdk's runner
   templates/bash-guard.sh   # consumer copy: generic rules on, marked
                             #   consumer-rules section
   templates/guard-config.sh
@@ -1822,6 +1824,18 @@ forfeit. A kit's first `gate-tests/` directory also obliges a fixture-runner
 line in the consumer's battery, which `check-kit-registration` reads from
 `git ls-files`: the line belongs in the same commit as the test, never a
 follow-up.
+
+Two `lib/guard.sh` primitives take the same bespoke-unit-test lane for the same
+structural reason — a `decision <TAB> command` row cannot express what they
+need. `gate-tests/git-mutation-under-producer.test.sh` asserts rule 14's firing
+arm (a tracked-tree mutation blocked while a recorded producer is still alive):
+the arm's second conjunct is a *live* PID, and a fixture carrying one would turn
+every other `git` row in `guard-tests/cases.tsv` into a block, so the table
+keeps only the decline arm (a dead record present) and the test owns the
+process the firing arm needs. `gate-tests/guard-read-path.test.sh` asserts
+`guard_read_path`, the file-path counterpart of `guard_read_command`, whose
+discriminating case — an absent `file_path` — is an accessor return value, not
+a command a `cases.tsv` row can carry.
 
 A gateless kit shapes gate-sdk's discovery rule: `gate_kit_roots` recognizes a
 sibling kit by its `checks/` *or* `smoke/` directory. Keying on `checks/`
