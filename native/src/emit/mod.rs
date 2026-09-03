@@ -26,6 +26,7 @@ pub mod pub_lang;
 pub mod queue_counts;
 pub mod queue_edges;
 pub mod queue_index;
+pub mod scan_prompts;
 pub mod stage_rules;
 pub mod roadmap;
 pub mod session_id;
@@ -331,6 +332,14 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         "--emit-drift-report",
         Arm::Emit(drift_report::emit),
         drift_report::KNOBS,
+    ),
+    // spec: guard-kit/SPEC.md §scan-prompts — the ranker, a table member on the forced-family
+    // test rather than by resemblance: it resolves three consumer knobs a hardcoded top-level
+    // flag would receive none of, and its free-text positional keeps the shape refusal.
+    (
+        "--emit-scan-prompts",
+        Arm::Emit(scan_prompts::emit),
+        scan_prompts::KNOBS,
     ),
     // spec: lifecycle-kit/SPEC.md §The survey record — the capture affordance, whose free-text
     // argv keeps the shape refusal and the `--` escape across the port while its help arm retires

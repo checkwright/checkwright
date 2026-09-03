@@ -244,11 +244,20 @@ Lead:
   volunteers none, because intake is the axis a filing session can act on
   inside the session. With no baseline (a standalone run, a fresh clone) both
   rows degrade to `n/a (no iteration baseline)`.
-- **kpi-prompt-friction** — distinct/total prompting calls via guard-kit's
-  `scan-prompts.sh --count`; `n/a` when guard-kit or its log is absent. Its
-  numerator is a **key count**, so a change to how that tool keys a row steps
-  this trend without any behavior moving, and the `^[0-9]+/[0-9]+$` contract
-  stays satisfied throughout — nothing reds, which is what makes such a step
+- **kpi-prompt-friction** — distinct/total prompting calls, read from guard-kit's
+  ported ranker as **two integers in one process**: the member calls the counter
+  in-crate, so there is no spawn, no stdout and no string between the producer
+  and this reader. **The row carries two degrades fewer than a spawn-and-parse
+  would owe**, and the accounting is stated rather than the row simply looking
+  better: a scanner that fails to spawn and a count that cannot be read are
+  failure modes of a process boundary this row does not cross.
+  `n/a (no friction logged)` is a property of the log rather than of the
+  transport, and `n/a (guard-kit absent)` is a property of the tree; both stand.
+  This is the shape `kpi-settings-local` already
+  carries for the same reason on a different dependency. Its
+  numerator is a **key count**, so a change to how the ranker keys a row steps
+  this trend without any behavior moving, and no gate reads the number, so
+  nothing reds — which is what makes such a step
   silent. A trend reader meeting one looks for the definitional cause before the
   behavioral one; guard-kit/SPEC.md §scan-prompts owns the key and records each
   step with its pre-change reading.

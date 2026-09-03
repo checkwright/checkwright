@@ -1322,6 +1322,39 @@ spans a compound the harness would split and refuse — `Bash(git status:*)`
 against `git status && rm -rf x` — does not read as allowed and is counted as
 prompting.
 
+**The invocation, and why the arm is a table member rather than a top-level
+flag.** The ranker is a bridged arm, reached through the shipped front-end as
+`run-gates.sh --emit scan-prompts [--count] [--] [<log>]` with no front-end
+change, since the `--emit <name>` operand composes `--emit-<name>`. Its declared
+roster is three names — `GUARD_KIT_LOG`, `GUARD_KIT_SETTINGS` and
+`GUARD_KIT_SETTINGS_LOCAL` — every one defined and defaulted in `lib/guard.sh`,
+so no default moves into the binary and a tree without guard-kit cannot resolve
+the arm at all. Membership of the bridged-arm table is **forced by that roster**
+rather than chosen by family resemblance: `--knobs` publishes a member's roster
+and the bridge resolves it before the exec, while a hardcoded top-level flag is
+reached by neither (gate-sdk/SPEC.md §The non-gate arm). A hardcoded flag here
+would not resolve a log path at all.
+
+**The residue this section keeps, stated because the arm is not the whole of
+it.** The behaviour below is composed from three `lib/guard.sh` primitives —
+`guard_split_compound`, `guard_skeleton` and `_guard_redirect_pairs` — and that
+library is permanently shell on the two independent grounds §The guard framework
+states. So this section's contract is **not wholly in-crate**, and will not be
+while that disposition stands: the binary holds the ranker, and what holds the
+primitives it is composed from is a compiled twin of each, kept equal to the
+shell original by `--guard-lib-parity`.
+
+**The two settings documents are parsed by the arm itself**, so the ranking
+carries no external-program dependency an absent parser could take. That closes
+a silent inflation and not merely a dependency: a settings read delegated to an
+external program fails *open* when the program is absent — the allowlist reads
+empty, every logged command reads as prompting, and the ranking reports a large,
+plausible, entirely wrong number at exit 0 for a KPI to record as a trend.
+**The claim is bounded to this reader and says nothing wider**: `lib/guard.sh`,
+`bin/compare-settings-allow.sh`, `bin/run-guard-tests.sh` and `smoke/install.sh`
+all still shell to `jq`, and this member never joined the battery, so the
+battery's own program floor moves by nothing at all.
+
 **What "prompting" names in this tool's output.** The word is the tool's shipped
 vocabulary and stays as it is; what it counts is the set of calls **nothing in the
 allowlist grants**, whose decision the harness therefore made out of band. On a
@@ -1426,20 +1459,48 @@ day one is run. The honest reading is that the axis is **general and currently
 near-single-instance**, and a later reader deciding whether to extend or retire
 it needs to know the bite was measured rather than assumed.
 
-`--count` emits the compact `<patterns>/<occurrences>` prompting token for a
-drift-KPI consumer (overlay-covered excluded, so the KPI reads true); an
-explicit file argument overrides the log path (test capability). The two
+`--count` emits the compact `<patterns>/<occurrences>` prompting token
+(overlay-covered excluded, so a counting reader reads true); an explicit file
+argument overrides the log path. The two
 **compose, in either order** — the argument parse is a loop over argv, not a
-read of `$1` — and that is pinned rather than left implicit because the
-single-argument parse it replaced made `--count <path>` return a real-looking
+read of `$1` — and that is pinned rather than left implicit because a
+single-argument parse makes `--count <path>` return a real-looking
 number for the *default* log, which is the worst failure mode an instrument has:
 silent, plausible, and reached for first by exactly the measurement session that
-cannot afford it. Its behavior
+cannot afford it. The positional survives the port on §The non-gate arm's own
+distinguishing test (gate-sdk/SPEC.md): it selects the rule's **input corpus**
+rather than redirecting configuration the bridge has already resolved, so it
+arrives as argv into the arm and the arm consumes it.
+
+**That silent-plausible failure has a second door, and the arm closes it too.**
+A free-text positional absorbs whatever it is handed, so an unrecognized
+`-`-prefixed argument — a one-character typo of the tool's own flag — reads as a
+log path and reports a clean tree at exit 0, which is the same defect one door
+over from the ordering bug above. The arm **refuses an unrecognized `-`-prefixed
+argument with usage on stderr at exit 2**, and `--` ends option processing so a
+log path spelled with a leading dash stays reachable; without that escape the
+refusal would be a capability loss rather than a fix. This is gate-sdk/SPEC.md
+§The bin/-tool contract's shape half, which binds on every free-text argument
+and does not turn on whether the tool captures. Its `-h`/`--help` half does
+**not** cross: usage for a bridged arm lives in the front-end's own help and in
+`guard-kit/README.md`, so `--emit scan-prompts --help` is a refusal rather than
+a help request.
+
+**`--count` keeps a named caller after its machine reader stops going through
+it.** Its callers are a **session** reaching it through the front-end and
+`gate-tests/scan-prompts.test.sh`; a session front-end invocation counts exactly
+as a stage step does (gate-sdk/SPEC.md §The non-gate arm), so the mode is not
+dead weight once `kpi-prompt-friction` calls the counter in-crate instead.
+
+Its behavior
 — the three-way split, the per-segment matching, the true count, the
-argument-override in both orders, and the
-write-shape suffix's create/append/fd-dup/first-segment cases — is pinned by
-`gate-tests/scan-prompts.test.sh`. What that test pins is the split, the count
-semantics and those four cases; the key's granularity beyond them is not a
+argument-override in both orders, the
+write-shape suffix's create/append/fd-dup/first-segment cases, and the
+argv-shape refusal with its `--` escape — is pinned by
+`gate-tests/scan-prompts.test.sh`, which reaches the arm through the front-end
+so the end-to-end path keeps a holder; the key derivation is additionally pinned
+in-crate, where `check-crate-arms` runs it. What that test pins is the split,
+the count semantics and those cases; the key's granularity beyond them is not a
 contract, which is why an additive suffix leaves its substring assertions true.
 
 **The KPI's numerator steps at the landing commit, for a definitional reason.**
@@ -1454,6 +1515,14 @@ changed to compensate: a key change that makes the metric finer is the metric
 getting better, and rebasing it to hide the step would trade a legible one-time
 discontinuity for a permanent lie about granularity. drift-kit reads *trend, not
 level* and carries no annotation affordance, so this sentence is the annotation.
+
+**A substrate change is not such a step, and that is recorded rather than
+assumed.** Moving the measurement off a spawn-and-parse and onto an in-crate
+call leaves the keying untouched, so both `<patterns>` and `<occurrences>` read
+exactly what they read before. The obligation above — record each step with its
+pre-change reading — is therefore discharged for that move by recording that
+there is **no** step, which is a reading a later trend reader can rely on only
+if it was taken while both holders were present.
 
 ## compare-settings-allow
 
@@ -1802,7 +1871,7 @@ a read-only tail must have its expected
 column **re-derived**, never assumed still correct. Rule 17's landing is the
 worked instance and the cheap one: it narrowed refusal and flipped exactly one
 pre-existing row, which the table reported and inspection had not.
-`bin/scan-prompts.sh` cannot
+The `scan-prompts` arm cannot
 substitute for it, and the reason is structural rather than a matter of
 precision: `guard_block` exits 2 before `guard_log_fallthrough` runs, so a
 blocked command never reaches `GUARD_KIT_LOG` and that report is blind to every

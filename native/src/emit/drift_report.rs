@@ -14,6 +14,8 @@ pub const KNOBS: &[&str] = &[
     "GATE_SDK_GATES_DIR",
     "GATE_SDK_WORKFLOW_DIR",
     "GATE_KIT_ROOTS_HERE",
+    "GUARD_KIT_LOG",
+    "GUARD_KIT_SETTINGS",
     "GUARD_KIT_SETTINGS_LOCAL",
 ];
 
@@ -164,6 +166,8 @@ pub fn emit(args: &[String]) -> Result<String, String> {
         overhead_log: scalar(&fam, "OVERHEAD_LOG"),
         price_table: scalar(&fam, "PRICE_TABLE"),
         gates_dir: walk::knob_scalar("GATE_SDK_GATES_DIR")?,
+        guard_log: walk::knob_scalar("GUARD_KIT_LOG")?,
+        settings: walk::knob_scalar("GUARD_KIT_SETTINGS")?,
         settings_local: walk::knob_scalar("GUARD_KIT_SETTINGS_LOCAL")?,
         done_section: scalar(&fam, "DONE_SECTION"),
         deferred_section: scalar(&fam, "DEFERRED_SECTION"),
@@ -330,6 +334,8 @@ mod tests {
             overhead_log: String::new(),
             price_table: String::new(),
             gates_dir: String::new(),
+            guard_log: String::new(),
+            settings: String::new(),
             settings_local: String::new(),
             done_section: String::new(),
             deferred_section: String::new(),

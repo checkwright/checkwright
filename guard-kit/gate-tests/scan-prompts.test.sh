@@ -1,13 +1,22 @@
 #!/usr/bin/env bash
 # spec: guard-kit/SPEC.md §scan-prompts — the headline count filters the friction log against BOTH the committed allowlist and the local overlay, matching per compound segment as the harness does; an overlay-only grant did not prompt (kept off the headline, surfaced in the advisory promote-or-prune section), and a whole-string glob spanning a compound the harness would split and refuse does not read as allowed
+# spec: gate-sdk/SPEC.md §The non-gate arm — the end-to-end holder of the arm's *output shape*, reached through the shipped front-end rather than against the binary, because the front-end is what resolves the three declared knobs; the key derivation is additionally pinned in-crate by check-crate-arms
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
+# shellcheck source=../../gate-sdk/lib/gate.sh
+source "$GATE_SDK_TEST_LIB_DIR/gate.sh"
 
 cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" || exit 2
-ROOT="$(pwd -P)"
-SCAN="guard-kit/bin/scan-prompts.sh"
-[[ -x "$SCAN" ]] || { echo "scan-prompts.test: scanner not found: $SCAN"; exit 2; }
-command -v jq >/dev/null 2>&1 || { echo "scan-prompts.test: jq not found on PATH"; exit 2; }
+
+# spec: gate-sdk/SPEC.md §check-gate-binary-fresh — a declaration is not a dispatch: a consumer on
+# an uncovered platform vendors the kit with no artifact behind it, and an output assertion there
+# would be vacuous rather than true. A binary that is present and refuses the arm is a stale binary,
+# so it fails here.
+BIN="$(gate_native_bin)"
+if [[ ! -x "$BIN" ]]; then
+    echo "scan-prompts.test: ok (0 assertions; skipped — no gate binary at $BIN, so nothing dispatches to the ported arm)"
+    exit 0
+fi
 
 sb="$(mktemp -d)"
 trap 'rm -rf "$sb"' EXIT
@@ -27,9 +36,12 @@ LOG="$sb/friction.log"
     echo 'make build'               # nothing grants it: a true prompt
 } > "$LOG"
 
+# The knobs cross the bridge: gate_command sources guard-kit/lib/guard.sh, whose ':=' defaults
+# yield to a value already in the environment, so a sandbox's settings pair reaches the arm.
 run() { GUARD_KIT_SETTINGS="$sb/.claude/settings.json" \
         GUARD_KIT_SETTINGS_LOCAL="$sb/.claude/settings.local.json" \
-        GUARD_KIT_LOG="$LOG" bash "$SCAN" "$@"; }
+        GUARD_KIT_LOG="$LOG" \
+        bash gate-sdk/bin/run-gates.sh --emit scan-prompts "$@"; }
 
 fails=0
 assert_has()    { grep -qF -- "$2" <<<"$3" || { echo "FAIL [$1]: expected present: $2"; fails=$((fails + 1)); }; }
@@ -61,7 +73,7 @@ count="$(run --count)"
 soleLOG="$sb/sole.log"; printf 'npm test\n' > "$soleLOG"
 sole="$(GUARD_KIT_SETTINGS="$sb/.claude/settings.json" \
         GUARD_KIT_SETTINGS_LOCAL="$sb/.claude/settings.local.json" \
-        bash "$SCAN" "$soleLOG")"
+        bash gate-sdk/bin/run-gates.sh --emit scan-prompts "$soleLOG")"
 assert_has  sole-clean 'clean' "$sole"
 assert_has  sole-worklist 'npm test' "$sole"
 
@@ -79,7 +91,7 @@ shapeLOG="$sb/shape.log"
 } > "$shapeLOG"
 shape="$(GUARD_KIT_SETTINGS="$sb/.claude/settings.json" \
          GUARD_KIT_SETTINGS_LOCAL="$sb/.claude/settings.local.json" \
-         bash "$SCAN" "$shapeLOG")"
+         bash gate-sdk/bin/run-gates.sh --emit scan-prompts "$shapeLOG")"
 assert_row shape-create 'cat >'  "$shape"
 assert_row shape-append 'cat >>' "$shape"
 assert_row shape-fd-dup 'make'   "$shape"
@@ -94,7 +106,8 @@ assert_absent  shape-no-misattribution 'mkdir >' "$shape"
 # the definitional step the KPI row records.
 shape_count="$(GUARD_KIT_SETTINGS="$sb/.claude/settings.json" \
                GUARD_KIT_SETTINGS_LOCAL="$sb/.claude/settings.local.json" \
-               GUARD_KIT_LOG="$shapeLOG" bash "$SCAN" --count)"
+               GUARD_KIT_LOG="$shapeLOG" \
+               bash gate-sdk/bin/run-gates.sh --emit scan-prompts --count)"
 [[ "$shape_count" == "4/4" ]] || { echo "FAIL [shape-count]: expected 4/4, got '$shape_count'"; fails=$((fails + 1)); }
 
 # The same count reached through the ARGUMENT rather than the knob, in both
@@ -105,12 +118,28 @@ shape_count="$(GUARD_KIT_SETTINGS="$sb/.claude/settings.json" \
 # non-default log so a regression cannot pass by coincidence.
 for order in "--count $shapeLOG" "$shapeLOG --count"; do
     # shellcheck disable=SC2086  # deliberate word split: $order is an argv pair
-    argv_count="$(GUARD_KIT_SETTINGS="$sb/.claude/settings.json" \
-                  GUARD_KIT_SETTINGS_LOCAL="$sb/.claude/settings.local.json" \
-                  GUARD_KIT_LOG="$LOG" bash "$SCAN" $order)"
+    argv_count="$(run $order)"
     [[ "$argv_count" == "4/4" ]] || { echo "FAIL [count-argv:$order]: expected 4/4, got '$argv_count'"; fails=$((fails + 1)); }
 done
 
+# The argv-shape refusal the port brings across (gate-sdk/SPEC.md §The bin/-tool
+# contract): a one-character typo of the tool's own flag used to be absorbed as a
+# log path and report a real-looking number at exit 0. It is now a refusal at
+# exit 2 with nothing on stdout, since a diagnostic is not a measurement.
+refusal_out="$(run --count --nonsense 2>/dev/null)"; refusal_status=$?
+[[ "$refusal_status" -eq 2 ]] || { echo "FAIL [shape-refusal]: expected exit 2, got $refusal_status"; fails=$((fails + 1)); }
+[[ -z "$refusal_out" ]] || { echo "FAIL [shape-refusal-stdout]: expected empty stdout, got '$refusal_out'"; fails=$((fails + 1)); }
+
+# The non-firing half the refusal needs: '--' ends option processing, so a log
+# path spelled with a leading dash is still reachable and a refusal is a fix
+# rather than a capability loss. The path is absent on purpose — what is under
+# test is the parse, and '0/0' at exit 0 is what says the token was taken as a
+# log path. That it becomes the *log path* rather than being dropped is pinned
+# in-crate, where the parse can be read directly.
+escape_out="$(run --count -- -dash.log)"; escape_status=$?
+[[ "$escape_status" -eq 0 && "$escape_out" == "0/0" ]] \
+    || { echo "FAIL [dash-escape]: expected 0/0 at exit 0, got '$escape_out' at $escape_status"; fails=$((fails + 1)); }
+
 [[ "$fails" -eq 0 ]] || { echo "scan-prompts.test: $fails assertion(s) failed"; exit 1; }
-echo "scan-prompts.test: clean (overlay-only grants stay off the headline and in the promote-or-prune section; a split-and-refused compound counts as a true prompt; the write-shape suffix splits create from append, skips an fd-dup, and never attributes a downstream write to the leading word; an explicit log argument overrides the log path alongside --count in either order)"
+echo "scan-prompts.test: clean (overlay-only grants stay off the headline and in the promote-or-prune section; a split-and-refused compound counts as a true prompt; the write-shape suffix splits create from append, skips an fd-dup, and never attributes a downstream write to the leading word; an explicit log argument overrides the log path alongside --count in either order; an unrecognized dash-prefixed argument is a refusal at exit 2 and '--' still admits a dash-prefixed path)"
 exit 0

@@ -27,6 +27,8 @@ pub struct Ctx {
     pub overhead_log: String,
     pub price_table: String,
     pub gates_dir: String,
+    pub guard_log: String,
+    pub settings: String,
     pub settings_local: String,
     pub done_section: String,
     pub deferred_section: String,

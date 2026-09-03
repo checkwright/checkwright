@@ -785,12 +785,25 @@ that a `--list` argument was captured takes
 
 **The shape half of this rule outlives a member's port, even though this
 contract's own corpus is `*/bin/*.sh`.** Without saying so the rule reads as
-retiring with the file, which is the wrong reading: the refusal exists because
-free text reaches a *capture*, so it binds on whatever substrate that capture
-runs. §The non-gate arm carries the split — the shape refusal and the `--` escape
+retiring with the file, which is the wrong reading. The ground is the rule's own
+scope rather than the capture emphasis above it: the refusal exists because a
+free-text positional **absorbs whatever it is handed**, and that is a property
+of the argument, not of the substrate the argument arrives on. §The non-gate arm
+carries the split — the shape refusal and the `--` escape
 cross the port, the `-h`/`--help` arm retires to the front-end — and
-`--emit-file-survey`, `--emit-file-gap` and `--emit-kfric` are the three worked
+`--emit-file-survey`, `--emit-file-gap` and `--emit-kfric` are the three capture
 instances.
+
+**`--emit-scan-prompts` is the clause's first *reader* instance, and it is what
+shows the clause does not turn on capture** (guard-kit/SPEC.md §scan-prompts).
+That arm writes nothing durable: it reports a measurement. Absorbing a
+one-character typo of its own flag makes it report a clean tree at exit 0, and a
+KPI records that as a trend — a wrong number written into a durable series,
+which is at least as bad as a capture's bad line and is reached for first by the
+measurement session that can least afford it. Read as capture-scoped, the clause
+would have this rule bind a free-text reader's shell file and then retire at
+that file's port — which is exactly the retiring-with-the-file reading this
+paragraph opens by refusing.
 
 **No gate reads this rule, and that is ruled rather than deferred.**
 §check-exec-bit's corpus is the whole `*/bin/*.sh` set, and a gate over it could
@@ -2193,7 +2206,8 @@ mid-iteration gap-capture affordance (lifecycle-kit/SPEC.md §The committed gap
 inbox), and `--emit-kfric`, drift-kit's knowledge-friction capture affordance
 (drift-kit/SPEC.md §The knowledge-friction loop) — both free-text capture members
 the argv-shape split below governs —
-its 2026-09-03 ones), the
+its 2026-09-03 ones; and `--emit-scan-prompts`, guard-kit's friction-log ranker
+(guard-kit/SPEC.md §scan-prompts)), the
 **harness-integration**
 arms below it, and the bridged `Arm::Run` members that are neither —
 `--lesson-sink` (queue-kit/SPEC.md §The lesson-sink arm), `--upgrade-smoke`
@@ -2417,6 +2431,16 @@ hardcoded top-level flag is reached by neither and receives nothing. A configure
 tool ported as a top-level flag therefore resolves platform defaults and silently
 ignores every consumer override — which is not a calibration between two workable
 shapes but the difference between working and appearing to.
+
+**`--emit-scan-prompts` is the class's first member whose *whole* configuration
+is a permanently-shell library's, which is that test at its sharpest**
+(guard-kit/SPEC.md §scan-prompts). All three knobs it declares are defined and
+defaulted in `guard-kit/lib/guard.sh` — a `no-port` file the bridge sources to
+resolve them — so a hardcoded top-level flag would resolve not a stale default
+but no input path at all, and the arm would be unable to name the corpus it
+measures. The same fact is what makes the member unresolvable in a tree that
+does not vendor guard-kit, which is a second, independent guard on the presence
+its in-crate reader witnesses separately.
 
 **A member taking free-text argv into a *capture* keeps its shape refusal and its
 `--` escape across the port, while its `-h`/`--help` arm retires to the

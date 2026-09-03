@@ -538,6 +538,13 @@ fn match_component(pat: &str, name: &str) -> bool {
     glob_here(pat.as_bytes(), name.as_bytes())
 }
 
+// spec: gate-sdk/SPEC.md §The port-candidate criteria — the whole-string form of the same matcher,
+// which is what `[[ "$s" == $pattern ]]` performs: `*` crosses every byte, the leading-dot and
+// separator rules above belong to the pathname reader and not to the match itself.
+pub fn glob_match(pattern: &str, s: &str) -> bool {
+    glob_here(pattern.as_bytes(), s.as_bytes())
+}
+
 fn glob_here(p: &[u8], s: &[u8]) -> bool {
     let (mut pi, mut si) = (0usize, 0usize);
     let (mut star_p, mut star_s) = (usize::MAX, 0usize);

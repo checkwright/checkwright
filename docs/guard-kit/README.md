@@ -68,10 +68,16 @@ project's vocabulary, not the kit's.
 ## Use
 
 ```bash
-bash guard-kit/bin/scan-prompts.sh                  # rank what nothing granted, filtered by the allowlist
-bash guard-kit/bin/scan-prompts.sh --count          # <patterns>/<occurrences> token (drift KPI)
+bash gate-sdk/bin/run-gates.sh --emit scan-prompts          # rank what nothing granted, filtered by the allowlist
+bash gate-sdk/bin/run-gates.sh --emit scan-prompts --count  # <patterns>/<occurrences> token (drift KPI)
 bash guard-kit/bin/compare-settings-allow.sh        # local-overlay entries a committed glob already grants, and those a probe proves too broad
 ```
+
+`--emit scan-prompts` takes an optional log path, which overrides `GUARD_KIT_LOG`
+and composes with `--count` in either order; `--` ends option processing, so a
+log path spelled with a leading dash is still reachable. An unrecognized
+`-`-prefixed argument is a refusal at exit 2 — there is no per-arm `--help`,
+because a bridged arm's usage lives here and in `run-gates.sh --help`.
 
 ## Test
 
