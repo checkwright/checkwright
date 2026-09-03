@@ -9367,6 +9367,136 @@
   themselves; this is the declaration grammar every registry member shares.
   Filed at spec 2026-09-03; drained here with the disagreement re-read at the source.
 
+- **ruling-line-icebox-grammar-conflict** [design-pending] — the ruling-record line and the icebox
+  tier's one-line grammar cannot both be satisfied, and the gate refuses the pair rather than
+  arbitrating it.
+  **MEASURED, not reasoned.** CLAUDE.md obliges a session landing a ruling to write
+  `ruled: <slug> <authority> <date> <channel>` on the entry in the same commit; queue-kit/SPEC.md
+  §The icebox tier rules an icebox entry the lead line and nothing else; and
+  `check-queue-entry-budget` assertion B REFUSED the pair at the 2026-09-03 close, which wrote the
+  line, ran the gate and got `icebox entry carrying a body ... an icebox entry is exactly one`.
+  **The workaround drops the field the grammar calls load-bearing.** That close carried the ruling
+  in the lead line's prose, which seats authority and date at 98 columns and loses the CHANNEL —
+  the field §The tag algebra calls the whole of the grammar, because it is what separates an
+  own-authority ruling from a relayed one.
+  **The specs read together LOOK like they admit the line**, which is why this was reasoned wrong
+  until the oracle corrected it: the icebox tier's own text says recovery is mandatory before any
+  ruling on the entry, so the tier plainly contemplates rulings on iceboxed entries.
+  **Why `[design-pending]`:** the two candidate shapes differ in what they promise. A
+  declaration-line discount in assertion B's icebox arm (assertion A already carries one for the
+  deferred tier) keeps the full grammar at the cost of a second exception; an explicit icebox
+  clause in the ruling-record grammar names the lead-line prose form and states what it drops.
+  **Cost while deferred:** every ruling on an iceboxed entry lands channel-less, so a later reader
+  cannot tell an own-authority ruling from a relay on exactly the tier whose entries carry no body
+  to say so — a shipped gate's verdict witnesses it, so the 2026-08-30 witness discriminator puts
+  it product-side.
+  Surfaced 2026-09-03 at `capture-and-meter-cuts-with-windows-manifest-diagnostic`'s close; drained
+  here at the boundary after it.
+
+- **init-vendor-staging-argv-overflow** [design-pending] — `installer/lib/init.sh` stages the whole
+  vendored file set as one `git` argv, and on a host with a low `ARG_MAX` that is E2BIG, so a
+  full-profile install cannot complete.
+  **OBSERVED on a real runner, not predicted.** Run `33799627871`, job `install-smoke-windows`,
+  step `read one manifest disagreement in place`: its `init.log` reads
+  `lib/init.sh: line 380: /mingw64/bin/git: Argument list too long` followed by
+  `checkwright init: could not stage the vendored files`, and `init` never completed.
+  **It is profile-size-dependent, which is the whole finding.** In the same job on the same runner
+  minutes apart, the smoke's `init` on the STARTER profile completed and wrote a 477-entry lock,
+  while the diagnostic's `init` on the FULL profile did not. Whether the two are one defect or two
+  is not settled by anything printed.
+  **It blinded the round's instrument, which is how it was found.** The manifest diagnostic that
+  round bought printed none of the five things it exists to print — no `want`, no `got`, neither
+  `git hash-object` run, no `core.autocrlf` origin, no `git check-attr` output — because it bailed
+  at its own early guard before reaching a `checkwright.lock`. NO CAUSE IS CLAIMED HERE for the
+  477-of-477 manifest mismatch; this entry owns the staging defect alone.
+  **Two forks, and they are not the same work.** Standing the diagnostic up on the starter profile
+  the smoke actually uses buys the next cause read; batching the staging call so no host's
+  `ARG_MAX` is the ceiling repairs the install path itself. Only the second is this entry's.
+  **Cost while deferred:** a native-Windows adopter on the full profile cannot install, and the
+  named adopter behind TRAJECTORY.md's 2026-08-26 Windows ruling is exactly that population — an
+  install-path claim witnesses it, so it is product-class outright.
+  **DISTINCT from `platform-support-ci-matrix`**, whose subject is the leg and the manifest
+  mismatch; this is one `git` invocation's argv width, and fixing either leaves the other standing.
+  Surfaced 2026-09-03 at the close of `capture-and-meter-cuts-with-windows-manifest-diagnostic`;
+  drained here at the next boundary.
+
+- **pre-grammar-disposition-authority-ambiguity** [design-pending] — a disposition filed before the
+  `ruled:` grammar existed can name its authority two ways in one sentence, and nothing states how
+  such a sentence is read.
+  **The instance.** `gate-command-status-conflation-third-caller`'s Filed line reads DISPOSITIONED
+  BY OPERATOR-CLASS RULING at the 2026-08-25 close — the lead ruled it STAYS DEFERRED on CLAUDE.md's
+  scope-gated-intake rule, and directed it be promoted as a filing rather than started as work. It
+  labels the ruling operator-class and names the LEAD as the ruler.
+  **The two readings carry different consequences**, which is why it is not cosmetic: if a lead
+  ruled, a later lead may interpret or reverse it; if the operator ruled, the lead template's
+  carve-out bars a lead from touching it at all.
+  **THE OPERATOR RULED 2026-09-03 that the ambiguity is FILED rather than settled now.** The lead's
+  own reading, recorded as a reading and NOT as a ruling: intake note, spent when the filing landed
+  — its cited ground is scope-gated intake, which governs whether work STARTS mid-session rather
+  than an entry's later residency, and unlike `threshold-recurrence-routing-residency` it never
+  declares itself icebox-ineligible. That reading was not acted on, because acting on it would
+  reverse an operator ruling if the operator is in fact the ruler.
+  **IT IS AN INSTANCE OF A CLASS, which is what makes it worth more than the one entry.**
+  lifecycle-kit/templates/lead.md already warns that recording a lead's ruling as the operator's
+  marks a decision a later session may not reverse alone, and does so silently — this is that harm
+  attested, on an entry predating the grammar that would have prevented it.
+  **Why `[design-pending]`:** the two candidate shapes differ in reach. Asking the operator to
+  settle this one entry's provenance and stamping a `ruled:` line fixes one instance; sweeping
+  pre-grammar Filed-line dispositions for the same double-naming and stating in queue-kit/SPEC.md
+  §The tag algebra how an ungrammared historical disposition is read answers the class.
+  **Cost while deferred:** nothing is blocked — the entry stays deferred on either reading — but
+  every drain that meets it re-derives the same question and keeps it conservatively.
+  **DISTINCT from `gate-command-status-conflation-third-caller`** and NOT a re-filing of it: that
+  entry's subject is a `gate_command` exit-status conflation in `gate-sdk/bin/run-gate-tests.sh`;
+  this is the AUTHORITY NAMED ON ITS Filed LINE. Fixing either leaves the other untouched.
+  Surfaced 2026-09-03 by the lead of `capture-and-meter-cuts-with-windows-manifest-diagnostic`
+  after its close stamped; drained here. **Its `ruled:` line is owed and not yet writable** — the
+  relay named the operator as the authority and not the channel, so CLAUDE.md's ask-rather-than-
+  assume clause applies and this scope escalated the channel instead of guessing it.
+
+- **kpi-cost-per-unit** [design-pending] — no KPI prices cost per shipped unit, so a cut's width is
+  judged rather than read.
+  **What it would read.** The stage-economics meter's per-iteration total over that iteration's
+  `## Done` count, emitted as a drift-kit KPI beside `kpi-queue-net-delta` and the overhead meter.
+  **Why it is wanted now.** The 2026-09-03 build-window sizing ruling (TRAJECTORY.md §The closed
+  rulings) sizes a port cut to FILL one build window rather than to a unit count, and refuses a
+  per-iteration unit-count target on the ground that no KPI reads units per iteration or cost per
+  unit. The one wide cut on record — eight members in one iteration — was the cheapest per member
+  and the dearest in total, which is exactly the pair of figures this KPI would print.
+  **Why `[design-pending]`:** the denominator is the design question. An iteration's Done count is
+  not a stable unit — a batch's members are independent deltas under gate-sdk/SPEC.md §The first
+  cohort's never-as-one-cohort property while a cohort's are not — so whether the meter divides by
+  Done entries, by amendment deltas, or by both and says which is what the amendment owes.
+  **Cost while deferred:** every sizing session judges the window's width off the overhead meter
+  and its own reading instead of reading a figure, which is the state the sizing ruling names and
+  declines to leave.
+  ruled: kpi-cost-per-unit operator 2026-09-03 consult
+  Surfaced 2026-09-03 in the consult that closed the build-window sizing ruling; drained here.
+
+- **kit-spec-provenance-seam-sweep** [design-pending] — kit SPECs ride the installer payload and the
+  public site whole, yet carry this project's ruling provenance, which resolves to nothing in a
+  consumer tree and reads there as mechanism.
+  **The measure, taken 2026-09-03.** Thirty-seven dated `ruled 2026-…` operator stamps and fifty
+  TRAJECTORY.md pointers across six kit SPECs — gate-sdk 24 and 43, lifecycle-kit 6 and 1,
+  queue-kit 4 and 0, delegation-kit 1 and 3, context-kit 1 and 1, doctrine-kit 1 and 1.
+  **The deliverable is three-part.** Strip each site to the undated rule with its engineering
+  grounds; move to TRAJECTORY.md any grounds not already there, so nothing is lost rather than
+  relocated; and land a gate holding kit SPECs free of dated operator stamps and TRAJECTORY.md
+  pointers — the seam class CLAUDE.md §The provenance seam (never cross it) now names.
+  **How the class arrived, recorded so the fix aims at its cause.** TRAJECTORY.md's own recording
+  rule sends a ruling with a canonical home to that home by pointer, and sessions read that as
+  licence to write the ruling INTO the kit SPEC with its date and its refusals — so the SPEC became
+  the ruling's home and TRAJECTORY.md the index, while the seam's content classes named vocabulary
+  and never provenance, and no gate held it.
+  **Why `[design-pending]`:** the gate's predicate is the design question. A date-plus-`ruled`
+  pattern and a `TRAJECTORY.md` literal are both easy to spell and both reach past the class if
+  spelled naively, and the sweep's own edits are what calibrate the fixture pair.
+  **Cost while deferred:** every published kit SPEC and every adopter's vendored copy carries
+  private ruling history as mechanism, and pointers a consumer cannot follow — a payload-facing and
+  front-door claim, so product-class outright.
+  ruled: kit-spec-provenance-seam-sweep operator 2026-09-03 consult
+  Surfaced 2026-09-03 in the consult that closed the provenance-seam ruling; drained here.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
@@ -9397,6 +9527,7 @@
 - **gate-tamper-consumer-gate-coverage** [design-pending] — A glob and a roster audit remain.
 - **upgrade-contract-rename-routing-unstated** [design-pending] — One clause leans on it.
 - **md-refs-tree-link-resolution** [design-pending] — Unreachable while one generator produces.
+- **recurrence-judgment-vs-declaration** [design-pending] — The two share a noun, not a meaning.
 - **interpreter-floor-gawk-residue-empty** [design-pending] — Its ground died; awk stands.
 - **inline-interpreter-heredoc-unsteered** [design-pending] — No rule steers `python3 -`.
 - **advisory-lane-draft-state-unswept** [design-pending] — GitHub's notifications are the sweep.
