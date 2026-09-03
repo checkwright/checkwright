@@ -337,13 +337,14 @@ exact-count and coverage-floor shapes are not.
   `--emit-enum-sets` as a 2026-09-03 member, and the paragraph on declared rosters gains
   this member as a worked instance of a **two-kit** roster resolved by the partitioning
   bridge (delta 1).
-- `gate-sdk/SPEC.md §Porting a gate to the binary substrate` — two writes in one section.
-  The port table's `check-prose-enum` row is corrected: its derivation no longer *reads the
-  module as text* but references the table, and the sentence about the derivation crossing
-  the bridge as data gains the reason it must keep doing so. Separately, the 2026-09-03
-  ruling (4)'s worked-instance list keeps this file's name and gains a dated disposition
-  clause — a **shared target with the sibling parser cut**, so the second batch reads the
-  first's edit and neither deletes a name (deltas 3, 5 and 9).
+- `gate-sdk/SPEC.md §Meta-gate conservation for the binary substrate` — the port
+  conservation table's `check-prose-enum` row is corrected: its derivation no longer *reads
+  the module as text* but references the table, and the sentence about the derivation
+  crossing the bridge as data gains the reason it must keep doing so (deltas 3 and 5).
+- `gate-sdk/SPEC.md §Porting a gate to the binary substrate` — the 2026-09-03 ruling (4)'s
+  worked-instance list keeps this file's name and gains a dated disposition clause — a
+  **shared target with the sibling parser cut**, so the second batch reads the first's edit
+  and neither deletes a name (delta 9).
 - `TASK-QUEUE.md`, `prose-uniqueness-claim-unchecked` and `readme-roster-enum-coverage` —
   two live deferred entries citing this derivation as a mechanism reference; each re-points
   to the arm. Neither names the port as a blocker, which scope probed before ruling this
@@ -397,7 +398,9 @@ exact-count and coverage-floor shapes are not.
       about.
 - [ ] **The nested-bridge cost measured**, not asserted: this gate's knob-resolution time
       before and after, on the same tree.
-- [ ] **The five prose citations swept by the list in delta (9)**, because no gate forces
-      any of them and a missed one ships green.
+- [ ] **The seven prose citations swept by the list in delta (9)** — the eight sites minus
+      the one, `gate-sdk/SPEC.md §Porting a gate to the binary substrate`'s ruling paragraph,
+      that delta (9) itself marks not re-pointed — because no gate forces any of them and a
+      missed one ships green.
 - [ ] **The `--tree` owed count re-read to confirm 43 → 42 on this cut**, with no
       `# no-port:` and no `# port-until:` written anywhere by it.

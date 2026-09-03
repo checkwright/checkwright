@@ -379,6 +379,10 @@ exact-count and coverage-floor shapes are not.
   true, which is the point of naming it (delta 10).
 - `gate-sdk/SPEC.md §check-graph` — the widening-is-monotone paragraph names the arm
   rather than the script; nothing about check-graph changes (delta 10).
+- `gate-sdk/SPEC.md §Porting a gate to the binary substrate` — the 2026-09-03 ruling (4)'s
+  worked-instance list keeps both files' names and gains a dated disposition clause; a
+  **shared target with the sibling enum-sets cut**, so whichever batch lands second reads
+  the first's edit and neither deletes a name (delta 10).
 - `native/src/proc.rs` — the `// spec:` comment naming this reader for the tail grammar
   re-points to the arm (delta 10).
 - `scripts/evidence-config.sh` — two knob values re-pointed, in the commit that deletes
