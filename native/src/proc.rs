@@ -155,6 +155,92 @@ fn resolve_on_path<F: Fn(&std::path::Path) -> bool>(
     })
 }
 
+// spec: gate-sdk/SPEC.md §check-graph — the three views Windows shows one system directory
+// through; all three reach the same WSL launcher, so rejecting `System32` alone leaves a PATH
+// spelled with either of its siblings walking straight around the rejection
+const WINDOWS_SYSTEM_DIR_VIEWS: [&str; 3] = ["System32", "SysWOW64", "Sysnative"];
+
+// spec: gate-sdk/SPEC.md §check-graph — a directory folded the way Windows compares one, case and
+// separator both: `c:/windows/system32` and `C:\Windows\System32` are one directory, and a
+// comparison that missed that would pass on every developer host and fail on the one host at issue
+fn windows_dir_key(p: &std::path::Path) -> String {
+    p.to_string_lossy()
+        .replace('/', "\\")
+        .trim_end_matches('\\')
+        .to_lowercase()
+}
+
+// spec: gate-sdk/SPEC.md §check-graph — the rejection as a pure function of its inputs, the shape
+// `resolve_on_path`'s tests already drive: the caller reads the environment and this decides, so
+// the Windows arm is asserted from a host that can never execute it
+// spec: gate-sdk/SPEC.md §check-graph — the directories arrive already split because a Windows
+// PATH cannot survive `split_paths` on a POSIX host, which is what makes the arm injectable
+fn resolve_outside_system_dir<F: Fn(&std::path::Path) -> bool>(
+    program: &str,
+    dirs: &[std::path::PathBuf],
+    pathext: Option<&str>,
+    system_root: Option<&str>,
+    exists: F,
+) -> Result<String, String> {
+    let candidates = exe_candidates(program, pathext);
+    let rejected: Vec<String> = system_root
+        .into_iter()
+        .flat_map(|root| {
+            WINDOWS_SYSTEM_DIR_VIEWS
+                .iter()
+                .map(move |view| windows_dir_key(&std::path::Path::new(root).join(view)))
+        })
+        .collect();
+    dirs.iter()
+        .filter(|dir| !rejected.contains(&windows_dir_key(dir.as_path())))
+        .find_map(|dir| {
+            let dir: &std::path::Path = if dir.as_os_str().is_empty() {
+                std::path::Path::new(".")
+            } else {
+                dir.as_path()
+            };
+            candidates
+                .iter()
+                .map(|c| dir.join(c))
+                .find(|p| exists(p))
+                .map(|p| p.display().to_string())
+        })
+        .ok_or_else(|| {
+            format!(
+                "cannot resolve {0} to an executable on PATH — a Windows system directory is \
+                 skipped, its {0} being the WSL launcher rather than a shell; the check could not \
+                 run, treating as failure (not clean)",
+                program
+            )
+        })
+}
+
+// spec: gate-sdk/SPEC.md §check-graph — the interpreter a spawn runs, resolved to a path rather
+// than named: `GATE_SDK_PROGRAM_FLOOR` guarantees a `bash` exists on the host, never that a bare
+// name reaches it, and on Windows the bare name reaches System32's WSL launcher instead.
+// spec: gate-sdk/SPEC.md §check-graph — its one reader is `gates::graph::generator_emit`. The
+// crate's other bare-`"bash"` spawn sites are deliberately NOT re-pointed by this repair and are
+// open work under the gap filed beside it; meeting this here is no licence to sweep them.
+pub fn resolve_interpreter(program: &str) -> Result<String, String> {
+    #[cfg(windows)]
+    let (pathext, system_root) = (
+        Some(std::env::var("PATHEXT").unwrap_or_default()),
+        std::env::var("SystemRoot").ok(),
+    );
+    #[cfg(not(windows))]
+    let (pathext, system_root): (Option<String>, Option<String>) = (None, None);
+    let dirs: Vec<std::path::PathBuf> = std::env::var_os("PATH")
+        .map(|p| std::env::split_paths(&p).collect())
+        .unwrap_or_default();
+    resolve_outside_system_dir(
+        program,
+        &dirs,
+        pathext.as_deref(),
+        system_root.as_deref(),
+        is_executable,
+    )
+}
+
 // spec: gate-sdk/SPEC.md §check-gate-binary-fresh — the crate's one executability predicate, in
 // the two forms the platform admits: an execute bit on unix, mere file-ness where the filesystem
 // carries none
@@ -692,6 +778,103 @@ mod tests {
         assert_eq!(
             resolve_on_path("cargo", Some(&path), None, |p: &Path| p == Path::new("./cargo")),
             Some("./cargo".to_string())
+        );
+    }
+
+    // spec: gate-sdk/SPEC.md §check-graph — the host's own folding, applied to both sides of every
+    // assertion below, so a test written on a POSIX developer machine still reads a joined path
+    // the way the Windows this repair exists for would
+    fn folded(s: &str) -> String {
+        s.replace('\\', "/").to_lowercase()
+    }
+
+    fn a_bash_in_every_directory(p: &Path) -> bool {
+        folded(&p.to_string_lossy()).ends_with("/bash.exe")
+    }
+
+    // spec: gate-sdk/SPEC.md §check-graph — round 7's measured Windows host as an assertion a
+    // Linux developer machine runs: System32 precedes Git's `usr/bin`, both hold a `bash`, and the
+    // resolution must reach the second because the first one is the WSL launcher
+    #[test]
+    fn the_attested_windows_path_resolves_past_the_wsl_launcher() {
+        let dirs = vec![
+            std::path::PathBuf::from(r"C:\Windows\System32"),
+            std::path::PathBuf::from(r"C:\Program Files\Git\usr\bin"),
+        ];
+        let got = resolve_outside_system_dir(
+            "bash",
+            &dirs,
+            Some(""),
+            Some(r"C:\Windows"),
+            a_bash_in_every_directory,
+        )
+        .expect("nothing resolved on a PATH whose second entry holds a bash");
+        assert_eq!(
+            folded(&got),
+            "c:/program files/git/usr/bin/bash.exe",
+            "the resolution took System32's bash, which is the WSL launcher and not a shell"
+        );
+    }
+
+    // spec: gate-sdk/SPEC.md §check-graph — the case-sensitive comparison passes on every host
+    // except the one this exists for, so the folding is asserted with the two sides spelled apart
+    #[test]
+    fn the_system_directory_is_rejected_in_its_lowercase_spelling_too() {
+        let dirs = vec![
+            std::path::PathBuf::from(r"c:\windows\system32"),
+            std::path::PathBuf::from(r"C:\Program Files\Git\usr\bin"),
+        ];
+        let got = resolve_outside_system_dir(
+            "bash",
+            &dirs,
+            Some(""),
+            Some(r"C:\WINDOWS"),
+            a_bash_in_every_directory,
+        )
+        .expect("nothing resolved on a PATH whose second entry holds a bash");
+        assert_eq!(
+            folded(&got),
+            "c:/program files/git/usr/bin/bash.exe",
+            "a lowercase system directory escaped the rejection"
+        );
+    }
+
+    // spec: gate-sdk/SPEC.md §check-graph — the refusal is named rather than a fall-through to the
+    // bare name, and it is asserted over every view in the roster rather than the one spelling
+    #[test]
+    fn a_path_offering_only_the_system_directory_is_a_named_refusal() {
+        for view in WINDOWS_SYSTEM_DIR_VIEWS {
+            let dirs = vec![Path::new(r"C:\Windows").join(view)];
+            let err = resolve_outside_system_dir(
+                "bash",
+                &dirs,
+                Some(""),
+                Some(r"C:\Windows"),
+                a_bash_in_every_directory,
+            )
+            .expect_err("the WSL launcher was accepted as a bash");
+            assert!(
+                err.contains("WSL launcher") && err.contains("not clean"),
+                "the {} refusal did not name its cause fail-closed: {}",
+                view,
+                err
+            );
+        }
+    }
+
+    // spec: gate-sdk/SPEC.md §check-graph — the arm every host the battery runs on takes: no
+    // system root, so nothing is rejected and the first match wins exactly as it did before
+    #[test]
+    fn a_posix_path_resolves_its_first_match_unchanged() {
+        let dirs = vec![
+            std::path::PathBuf::from("/nowhere"),
+            std::path::PathBuf::from("/opt/bin"),
+        ];
+        assert_eq!(
+            resolve_outside_system_dir("bash", &dirs, None, None, |p: &Path| p
+                == Path::new("/opt/bin/bash")),
+            Ok("/opt/bin/bash".to_string()),
+            "the repair changed the resolution on a platform that has no system directory"
         );
     }
 

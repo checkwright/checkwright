@@ -3618,6 +3618,23 @@ that answers each is the one whose corpus matches its question.
    A *blocker* here is therefore work the port owes, in the sense the roster's
    opening paragraph fixes for all seven; it never reads on whether a gate ports.
 
+   **The floor guarantees a program's presence, never that a bare name resolves
+   to it**, and the criterion was silent on the distinction until a host
+   falsified it. Membership entitles a rule to assume the program *exists*; what
+   argv[0] a spawn of the bare name actually reaches is the operating system's
+   `PATH` search, and on Windows that search is `%SystemRoot%\System32`-first,
+   where the only `bash.exe` the platform ships is the WSL launcher rather than a
+   shell. The attested instance is `check-graph`'s assertion D, whose comment
+   read *"criterion 7 clears the spawn because `bash` is on the program floor"* —
+   true of the floor, false of the spawn, and five Windows CI rounds' worth of
+   red before it was traced (§check-graph, which owns the resolution the repair
+   landed). So a port that clears here on an on-floor program has cleared the
+   *dependency* and not the *resolution*: where the spawned name is one the host
+   also ships under a different meaning, the interpreter is resolved at the call
+   site. Stated as prose rather than gated deliberately — a gate reading every
+   spawn site is a class-wide change, and naming the distinction where a porting
+   session already looks is what this carries instead.
+
    **A blocker here holds a member only where the program is the rule's own
    semantic content**, and the test between the two classes is *whether removing
    the program changes the gate's verdict*. The criterion has been silent on this
@@ -7677,7 +7694,9 @@ reader needs outlive the refactor that renames a helper:
   it instead of patching the derivation. `git` is a member because §The
   port-candidate criteria already rules it the sanctioned exception, *"because it
   is the floor"*, and the set is written here rather than restated in the SPEC
-  prose that cites it.
+  prose that cites it. What membership *entitles a spawn to assume* is criterion
+  7's, not this knob's: the set says a program is present, never that a bare name
+  resolves to it.
 - `gate_native_targets` is the **target roster's single reader**: one Rust target
   triple per live line, `#`-comments and blank lines stripped by the same
   `gates_list_members` grammar `scripts/gates.list` uses. An absent roster emits
@@ -12931,6 +12950,30 @@ lives in the check. A `# graph:` manifest embedded in a `SPEC-*.md` amendment
 body is held to the glob grammar but not to the vocabulary or hook-parity — the
 gate it describes is unbuilt, so its coupled surface may itself be design-ahead;
 parity re-fires through the normal registry path once the gate lands.
+
+**The interpreter assertion D spawns is resolved, not named**, and this is the
+crate's only resolved spawn today. `GATE_SDK_PROGRAM_FLOOR` guarantees that a
+`bash` is *present* on an adopter's host; it never guaranteed that the bare name
+`bash` reaches it (§The port-candidate criteria, criterion 7), and on Windows it
+does not — the installed binary is a native Windows process, so the bare name
+takes a Win32 `PATH` search in which `%SystemRoot%\System32` precedes
+Git-for-Windows' `usr/bin`, and the only `bash.exe` Windows itself ships there is
+the **WSL launcher**: a dispatcher into a Linux VM that on a runner with no
+distro exits 1 saying it has no installed distributions. That, and not the
+generator, is what five consecutive Windows rounds returned on. So the resolution
+walks `PATH` in the operating system's own order over the `PATHEXT` candidate set
+(§Fail-closed contract owns both), with **one rejection**: a candidate directory
+resolving inside the Windows system directory — `%SystemRoot%\System32` and its
+`SysWOW64` and `Sysnative` views — is skipped, because that directory holds
+nothing else the payload wants. The comparison is **case- and separator-folded**,
+since `c:/windows/system32` names the same directory as `C:\Windows\System32` and
+a comparison that missed that would pass on every developer host and fail on the
+one host the rejection exists for. On every other target the rejection is inert:
+no candidate can match it, so no verdict changes on the platforms the battery
+runs on. When nothing survives the rejection the resolution refuses **by name**,
+saying what was skipped and why, and assertion D returns it on the `Err` arm it
+already has — a check-could-not-run verdict, exactly as an absent `bash` is
+today, arriving with a cause rather than as the bare refusal that cost a CI round.
 
 **A generator that could not run reports why it could not run.** The hook
 guarantees are asserted by spawning the generator, and a generator dying under

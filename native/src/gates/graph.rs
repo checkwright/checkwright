@@ -371,12 +371,14 @@ fn read_stripped(p: &str) -> Result<String, String> {
 }
 
 // spec: gate-sdk/SPEC.md §check-graph — the generator stays shell (§gen-pre-commit), so assertion D
-// spawns it; criterion 7 clears the spawn because `bash` is on the program floor
+// spawns it, and the interpreter is resolved rather than named: criterion 7's floor guarantees a
+// `bash` exists on the host, never that the bare name reaches it, which on Windows it does not.
 // spec: gate-sdk/SPEC.md §check-graph — assertion D's refusal carries the generator's whole
 // account of itself, so a verdict arrives with its cause. The `Err` payload is non-empty on every
 // non-zero exit, the fallback included, so no arm here composes the bare refusal.
 fn generator_emit(gen: &str, arm: &str) -> Result<Result<String, String>, String> {
-    let out = proc::run("bash", &[gen, arm])?;
+    let sh = proc::resolve_interpreter("bash")?;
+    let out = proc::run(&sh, &[gen, arm])?;
     match out.stdout() {
         Some(b) => Ok(Ok(String::from_utf8_lossy(b)
             .trim_end_matches('\n')
