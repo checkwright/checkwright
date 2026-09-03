@@ -4,4 +4,4 @@
 
 ---
 
-— scope aaedb015 2026-09-03 1269f00a
+capture-and-meter-cuts-with-windows-manifest-diagnostic scope aaedb015 2026-09-03 1269f00a

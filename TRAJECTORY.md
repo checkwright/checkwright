@@ -501,6 +501,24 @@ the port then re-litigates. Discharge event: the oracle's owed count reads zero,
 the run is over and this paragraph is deleted; the triage sentence above it is the sequence and
 stays.
 
+**The run's ORDERING — not its existence — is reopenable at a later consult, and one ground is
+already on the record: ruled 2026-09-03 by the operator, lead-relayed from an in-session prompt.**
+Nothing reopens now, and the iteration that raised it proceeded under the run unchanged; what the
+operator ruled is that the evidence below *is* grounds to reconsider **which cuts come first**, to
+be weighed at a consult rather than mid-iteration by whichever session happens to find it. The
+evidence, measured 2026-09-03 at scope: `installer/README.md` §The install boundary sequences
+`init`'s unconditional remainder behind the artifact roster covering every supported platform, and
+its port-oracle paragraph holds every `installer/lib` and `installer/bin` file `owed` until that
+relocation lands — **ten of the port oracle's forty owed files, 1237 lines**. So a quarter of the
+owed column is gated on `platform-support-ci-matrix` and `macos-install-smoke-ci-leg`, which the
+run's own composer cannot reach; and `platform-support-ci-matrix` carries **twelve inbound queue
+citations, the highest figure the `queue-edges` arm reports**, above
+`native-gate-port-remaining-corpus`'s eight. The reading this does **not** license, stated because
+it is the tempting one: the run is not weakened, no yield is created, and the exception set is
+still the operator-ruled hotfix alone. Discharge event: the consult that weighs it, at which point
+this paragraph is deleted whichever way that consult goes — or the paragraph above it retires and
+takes this with it.
+
 **A sequence remainder of one is not a finished port, and reading it as one is the misreading
 this paragraph exists to stop — operator-ruled 2026-08-25.** The completion predicate is the one
 §The closed rulings names, `bash gate-sdk/bin/run-gates.sh --emit port-blockers --tree`'s owed count reaching zero, and it stands

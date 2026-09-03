@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: capture-and-meter-cuts-with-windows-manifest-diagnostic
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -13,6 +13,42 @@
 ## New Features
 
 ## Technical Debt
+
+- **windows-manifest-hash-diagnostic** — a PRINT-ONLY step on the
+  `install-smoke-windows` job that buys the cause read for
+  `platform-support-ci-matrix`'s `477 of 477 manifest entries disagree with the tree`.
+  **OPERATOR-RULED 2026-09-03 as the port-only run's one exception** — the run
+  (TRAJECTORY.md §PRIORITY DIRECTIVE) admits an operator-ruled hotfix and nothing else, and this is
+  strictly narrower than the round-12 `check-graph` hotfix that ruling already admitted: it changes
+  no product behavior, repairs nothing, and CLAIMS NO CAUSE. Envelope, and it is a bound rather
+  than a target: **one commit, one job, output only.** A repair in the same unit is out of envelope
+  and escalates rather than lands.
+  **Deliverable:** for one mismatching path, print side by side — `want` as `checkwright.lock`
+  records it; `got`; `git hash-object` run from BOTH cwds (inside the scratch consumer, and from
+  the checkout the smoke runs in) over the same file; `git config --list --show-origin` filtered to
+  `core.autocrlf`; and `git check-attr -a` for that path in both repositories. It never fails the
+  job, exactly as the existing `probe the runner` step never does.
+  **Two branches are ALREADY DEAD and must not be re-bought.** (1) `want` and `got` are the
+  IDENTICAL command — `installer/lib/common/lock.sh`'s `lock_hash` is `git hash-object -- "$1"` and
+  the smoke's check spells the same — so no second hashing algorithm exists and the only asymmetry
+  left is the process context each call runs in. (2) Round 12's log carries ZERO `fatal` lines, so
+  `git hash-object` never errored and `got` is VALID on all 477; two valid, different hashes over
+  one byte-stream is what remains. `core.autocrlf` dies with (2): the workflow pins it false
+  --global before the checkout and it cannot move a hash on an LF-only tree.
+  **One UNVERIFIED corroboration, carried with its provenance and not as a premise:** the lead's
+  grep-grade reading that `git hash-object` discovers its repository — and so its `.gitattributes`
+  and eol config — from the CWD rather than from the file argument, which would give two attribute
+  contexts over one byte-stream and hit all 477 wholesale. No oracle was run for it. It corroborates
+  the both-cwds print the envelope already specifies; it is NOT a cause and does not narrow the
+  print.
+  **The reading lands in a LATER iteration and that is expected, not a defect** — the step's output
+  exists only after a push, and the one-to-two-push budget spends this iteration's at close. That is
+  `observation-predicate-entry-cannot-drain-in-its-own-iteration`'s shape, named so the next close
+  does not read it as an overrun.
+  ruled: windows-manifest-hash-diagnostic operator 2026-09-03 lead-relay
+  Surfaced 2026-09-03. Promoted 2026-09-03 by scope on the operator ruling above, relayed by the
+  iteration lead from an in-session operator prompt. Its grounds are
+  `platform-support-ci-matrix`'s, which stays deferred and keeps the leg.
 
 ## Deferred
 
@@ -506,6 +542,8 @@
   align AND validate both left none in one iteration — both on the sonnet stage
   tier, both reporting a complete stage, both holding an explicit grant. Two in one
   iteration is a rate, not a scatter; align's session was gone before close looked.**
+  **THRESHOLD 2026-09-03: DECLINED ON THE RUN, NOT ON MERIT — weighed and not taken, one of five.**
+  ruled: stage-journal-absence-caught-only-downstream lead 2026-09-03 own-authority
   recurrence: stage-journal-absence-caught-only-downstream 2026-08-31 2026-09-02
   Filed 2026-08-30 by close from the gap inbox, with the bullet's own
   overstatement corrected at the drain.
@@ -4099,11 +4137,10 @@
   implemented as `SPEC_COUNT_CARDINAL_RE` in canon-kit/lib/spec.sh. The sweep that costed shipped
   code as future work searched the **right** term and `grep -rn … | head -10` cut the output before
   canon-kit was reached. **Truncated, not mis-queried.**
-  **Discontinuity 1, magnitude.** The word branch stops at `twelve`; the digit branch
-  (`[0-9]+`) does not stop. So `13 gates` is matched and `thirteen gates` is not. The SPEC states
-  the ceiling without justifying it. Conventional English style — spell through twelve, digits
-  above — is the likely reason and is **unrecorded**, so no reader can tell a deliberate ceiling
-  from an unfinished list, and neither can decide whether to extend it.
+  **Discontinuity 1, magnitude.** The word branch stops at `twelve`; the digit branch (`[0-9]+`)
+  does not, so `13 gates` is matched and `thirteen gates` is not. The SPEC states the ceiling
+  without justifying it; conventional English style is the likely reason and is **unrecorded**, so
+  no reader can tell a deliberate ceiling from an unfinished list, or decide whether to extend it.
   **Discontinuity 2, corpus.** `CANON_KIT_MANIFEST_FILES` does not include `TASK-QUEUE.md`, so
   none of this reaches the queue. Its 206 spelled numerals from *three* through *fifty*
   (counted independently here, matching the filer) are outside every count gate, at any
@@ -4120,10 +4157,9 @@
   cheaper to build, since matching a digit run is trivial where matching spelled compounds is
   not. Recorded here rather than lost — but a precondition is not the same defect.
   **Compaction is the weak half and is stated as weak:** ~9 lines file-wide against a 100-column
-  wrap, a fraction of one entry. Real, and not the reason to act.
-  **The framing that decides it:** `TASK-QUEUE.md` reads like prose but is a gated data surface
-  with a line cap, a wrap gate, a tag grammar and slug liveness. Applying a human style guide to
-  it optimizes for a reader it does not have.
+  wrap, a fraction of one entry. Real, and not the reason to act. **The framing that decides it:**
+  `TASK-QUEUE.md` reads like prose but is a gated data surface with a line cap, a wrap gate, a tag
+  grammar and slug liveness, so a human style guide optimizes it for a reader it does not have.
   **Deliverable, and why `[design-pending]` — three separable calls, and only one is mechanical.**
   (a) Is the `twelve` ceiling deliberate? Record the reason or extend the table. (b) Should
   `TASK-QUEUE.md` join the manifest corpus? That is a widening with its own false-positive
@@ -4132,6 +4168,9 @@
   **Cost while deferred:** every count written in the queue is unreachable by any oracle, and in
   the manifest corpus a count's enforceability turns on a spelling choice no author is told
   about. Both failures are silent — the gate runs, reports clean, and never saw the claim.
+  **THRESHOLD 2026-09-03: DECLINED ON THE RUN AND NOT ON MERIT** — mechanical (c) waits with the
+  two design calls, one of five put up as a batch. Weighed and not taken.
+  ruled: cardinal-notation-splits-gate-reach lead 2026-09-03 own-authority
   recurrence: cardinal-notation-splits-gate-reach 2026-08-19 2026-09-02
   **THE 2026-09-02 RECURRENCE SHARPENS (b), re-derived independently rather than read off here.** A
   maintained total in a live queue entry rotted unseen against that entry's own recorded facts — but
@@ -8528,8 +8567,8 @@
   the port-only run forecloses a non-port unit while the oracle reads owed, and no yield exists.
   **DECLINED AGAIN 2026-09-02, and that one DID reach the operator:** scope put all three
   threshold entries up as one batch, the operator took `subagent-liveness-log-unattributed-refusal`
-  as the run's exception and left this deferred. So it is a unit weighed and not taken, no longer
-  one never weighed — read it that way at the post-port triage.
+  as the run's exception and left this deferred; **DECLINED A THIRD TIME 2026-09-03**, one of five
+  batched, on the run and not on merit. Weighed and not taken — read it so at the post-port triage.
   Filed 2026-08-27 by the lead at build, promoted 2026-08-27 by close.
 
 - **site-health-probe-no-retry-on-transient** [design-pending] — the scheduled site probe files a
