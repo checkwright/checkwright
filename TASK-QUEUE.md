@@ -47,52 +47,6 @@
 
 ## Technical Debt
 
-- **windows-manifest-hash-diagnostic** — a PRINT-ONLY step on the
-  `install-smoke-windows` job that buys the cause read for
-  `platform-support-ci-matrix`'s `477 of 477 manifest entries disagree with the tree`.
-  **OPERATOR-RULED 2026-09-03 as the port-only run's one exception** — the run
-  (TRAJECTORY.md §PRIORITY DIRECTIVE) admits an operator-ruled hotfix and nothing else, and this is
-  strictly narrower than the round-12 `check-graph` hotfix that ruling already admitted: it changes
-  no product behavior, repairs nothing, and CLAIMS NO CAUSE. Envelope, and it is a bound rather
-  than a target: **one commit, one job, output only.** A repair in the same unit is out of envelope
-  and escalates rather than lands.
-  **Deliverable:** for one mismatching path, print side by side — `want` as `checkwright.lock`
-  records it; `got`; `git hash-object` run from BOTH cwds (inside the scratch consumer, and from
-  the checkout the smoke runs in) over the same file; `git config --list --show-origin` filtered to
-  `core.autocrlf`; and `git check-attr -a` for that path in both repositories. It never fails the
-  job, exactly as the existing `probe the runner` step never does.
-  **Two branches are ALREADY DEAD and must not be re-bought.** (1) `want` and `got` are the
-  IDENTICAL command — `installer/lib/common/lock.sh`'s `lock_hash` is `git hash-object -- "$1"` and
-  the smoke's check spells the same — so no second hashing algorithm exists and the only asymmetry
-  left is the process context each call runs in. (2) Round 12's log carries ZERO `fatal` lines, so
-  `git hash-object` never errored and `got` is VALID on all 477; two valid, different hashes over
-  one byte-stream is what remains. `core.autocrlf` dies with (2): the workflow pins it false
-  --global before the checkout and it cannot move a hash on an LF-only tree.
-  **One UNVERIFIED corroboration, carried with its provenance and not as a premise:** the lead's
-  grep-grade reading that `git hash-object` discovers its repository — and so its `.gitattributes`
-  and eol config — from the CWD rather than from the file argument, which would give two attribute
-  contexts over one byte-stream and hit all 477 wholesale. No oracle was run for it. It corroborates
-  the both-cwds print the envelope already specifies; it is NOT a cause and does not narrow the
-  print.
-  **A probed constraint on the ROUTE, not on the envelope — measured 2026-09-03 at spec.** The
-  step must stand up its OWN consumer inside its own step and may not post-mortem the smoke's:
-  `installer/consumer-smoke/run-smoke.sh:12-14` mktemps the scratch and installs `trap cleanup
-  EXIT` with `cleanup() { rm -rf "$SCRATCH"; }`, and `fail()` at `:18` exits 1, so the mismatch
-  at `:193` tears the consumer down before any later step could read `checkwright.lock`.
-  **Measured in the same probe: the preserve-scratch route is out of envelope.** `:9` declares
-  `INSTALLER_SMOKE_TMP_DIR` "the only knob", so no keep-scratch arm exists and minting one would
-  mint a governed name, flip this unit from debt to feature and contradict that sentence. NO
-  CAUSE IS CLAIMED and the deliverable above is unchanged: this rules out routes, adds nothing.
-  **The reading lands in a LATER iteration and that is expected, not a defect** — the step's output
-  exists only after a push, and the one-to-two-push budget spends this iteration's at close. That is
-  `observation-predicate-entry-cannot-drain-in-its-own-iteration`'s shape, named so the next close
-  does not read it as an overrun.
-  ruled: windows-manifest-hash-diagnostic operator 2026-09-03 lead-relay
-  ruled: windows-manifest-hash-diagnostic lead 2026-09-03 own-authority
-  Surfaced 2026-09-03. Promoted 2026-09-03 by scope on the operator ruling above, relayed by the
-  iteration lead from an in-session operator prompt. Its grounds are
-  `platform-support-ci-matrix`'s, which stays deferred and keeps the leg.
-
 ## Deferred
 
 - **kit-library-port-residue** [design-pending]
@@ -9638,5 +9592,7 @@
 - **prune-set-convergence-question** [design-pending] — Two kits' prune sets diverge, unruled.
 
 ## Done
+
+- windows-manifest-hash-diagnostic
 
 ## Lessons Learned
