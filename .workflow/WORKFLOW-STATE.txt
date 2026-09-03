@@ -10,3 +10,4 @@ capture-and-meter-cuts-with-windows-manifest-diagnostic align a218e158 2026-09-0
 capture-and-meter-cuts-with-windows-manifest-diagnostic build a199f453 2026-09-03 2ed607b3
 capture-and-meter-cuts-with-windows-manifest-diagnostic build ae87863b 2026-09-03 99973872
 capture-and-meter-cuts-with-windows-manifest-diagnostic validate a9198348 2026-09-03 eaffa4c7
+capture-and-meter-cuts-with-windows-manifest-diagnostic close abe9387f 2026-09-03 50531ab7
