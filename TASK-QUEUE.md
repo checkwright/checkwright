@@ -5066,36 +5066,40 @@
   directory. Paid by every reader who asks it, and paid silently — there is no red.
   Filed 2026-08-15 by close, draining the gap inbox.
 
-- **declaration-lib-refusal-output-leak** [design-pending] — both declaration-library token
+- **declaration-lib-refusal-output-leak** [design-pending] — the declaration-grammar token
   walkers emit resolved tokens onto the same stream as their refusal, so a container mixing a
   readable and an unreadable bullet reports the readable one as unreadable.
-  **Verified at the drain, in both holders.** In `gate-sdk/lib/declaration.sh`,
-  `decl_section_tokens` prints each good token as it walks, then appends the offending lines and
-  returns 1; `decl_record_tokens` has the identical shape. One stream carries two meanings and
-  the caller cannot tell which line is which.
+  **Verified at the drain, at the one holder left.** `gate-sdk/lib/declaration.sh` and its
+  parity harness `gate-sdk/gate-tests/declaration-lib-parity.test.sh` were both deleted by the
+  2026-09-03 port (gate-sdk/SPEC.md §lib/declaration.sh); the surviving holder is
+  `native/src/declaration.rs`, where `section_tokens` and `record_tokens` push each good token as
+  they walk, then extend the same vector with the offending lines on the `Unparsed` arm. One
+  stream still carries two meanings and the caller still cannot tell which line is which — the
+  port reproduced the leak faithfully rather than repairing it (a port proves parity and does not
+  fix the rules it ports).
   **Consequence, and why nothing is red.** `check-tightened-gates-grammar`'s finding list names
   a readable bullet as having an unreadable lead token, and
   `check-tightened-gates-note-parity`'s exit-2 diagnostic carries the same pollution. **Verdicts
   are unaffected** — a clean container still resolves clean and a polluted one still refuses —
   so the defect lives entirely in the text a reader is sent to act on.
-  **Preserved rather than repaired at the tenth cohort's port, deliberately.** Delta 4 of that
-  amendment rules that a port proves parity and does not fix rules, so
-  `native/src/declaration.rs` reproduces the leak faithfully and
-  `gate-sdk/gate-tests/declaration-lib-parity.test.sh` holds both holders to it. The doctrine
-  deferred the repair out of the port; it did not schedule it.
-  **The repair is known and cannot be one-sided:** buffer the resolved tokens until the loop
-  ends and emit them only on success, **in both holders in one unit**, or the parity test reds.
-  It rides a binary rebuild and whatever the two gates' fixture pairs assert about their output.
-  **Why `[design-pending]` rather than a ready task:** the repair *site* is genuinely open.
-  Buffering in the library changes a shipped output contract on two substrates at once; filtering
-  at the two readers changes one substrate and leaves the library's stream ambiguous for the next
-  caller. The first is correct and wider, the second smaller and defers the ambiguity.
+  **The repair is now single-substrate.** With the shell holder and its parity harness gone,
+  there is no second implementation to keep in step and no parity test left to red: buffer the
+  resolved tokens until the loop ends and emit them only on success, in `native/src/declaration.rs`
+  alone. It rides a binary rebuild and whatever `check-tightened-gates-grammar`'s and
+  `check-tightened-gates-note-parity`'s fixture pairs assert about their output.
+  **Why `[design-pending]` rather than a ready task:** the repair *site* is still open even with
+  one holder — buffering inside `section_tokens`/`record_tokens` changes a shipped output contract
+  those two gates both read, and the alternative (filtering at the two readers instead) leaves the
+  holder's own stream ambiguous for the next caller. The first is correct and wider, the second
+  smaller and defers the ambiguity — the same trade-off the two-holder version of this entry named,
+  now resolved on one substrate rather than two.
   **Cost while deferred:** paid only when a mixed container actually refuses — a rare shape,
   since the declaration file is machine-appended — and paid as a reader sent to the wrong line by
-  the one output whose job is to say where the defect is. Low, and non-rotting in content; but it
-  does not decay either, because the parity test now pins the defect across both substrates.
-  Filed 2026-08-15 by close, draining the gap inbox; not fixed inline because the change is
-  shipped-output work across two substrates, which scope-gated intake files rather than starts.
+  the one output whose job is to say where the defect is. Low, and non-rotting in content; no
+  parity test pins it any more, so nothing but this entry keeps the defect from being forgotten.
+  Filed 2026-08-15 by close, draining the gap inbox; re-grounded 2026-09-03 at validate after the
+  declaration-library port left it citing two deleted files. Not fixed inline because the change is
+  shipped-output work a fixture pair gates, which scope-gated intake files rather than starts.
 
 - **deferred-pool-identifier-restatement-sweep** [design-pending] — the deferred pool entered
   `internal-identifier-restatement`'s corpus on 2026-08-15 and has never been swept under it, so

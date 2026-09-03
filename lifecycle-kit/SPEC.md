@@ -1699,8 +1699,8 @@ is live and unchanged — it holds between the `--install-lifecycle` arm and the
 gates that assert what it writes (§check-merge-attrs,
 §check-lifecycle-registration), in one substrate.
 
-**All four are shell holders with no caller in this tree, and their disposition
-is owed rather than taken.** The 2026-09-03 port of §bin/install-lifecycle.sh
+**All four are shell holders with no caller in this tree, kept rather than
+deleted with this cut.** The 2026-09-03 port of §bin/install-lifecycle.sh
 moved the writer in-crate and emptied their shell caller set; the compiled
 counterparts `crate::stages::registration_block` and
 `crate::stages::merge_attrs_block` are what the arm and the gates read.
@@ -1708,11 +1708,19 @@ An empty caller set makes criterion 6's dead-twin road **available** and does no
 make it that cut's to take: these are documented members of *this* section, that
 cut's stated contract was §bin/install-lifecycle.sh, and a section is a cut's
 outer bound (gate-sdk/SPEC.md §Porting a gate to the binary substrate; §The
-port-candidate criteria, criterion 6). So they stay, they keep reading **owed**,
-they take no `# port-until:` — a held file leaves §port-blockers' owed column —
-and the cut that takes §lib/stages.sh takes all four in one motion. Written here
-so that cut does not rediscover the caller set from scratch (lead-ruled
-2026-09-03, own-authority; filed to the gap inbox with its probe). `lifecycle_stage_journal <stage>` is the **journal-path derivation**:
+port-candidate criteria, criterion 6). So they stay — but **not as an `owed`
+entry of their own**: `--tree` reads a disposition off the whole file's header
+block, and this file's header already declares **no-port**, permanently, as the
+config bridge's sole `LIFECYCLE_KIT_*` resolver (stated three paragraphs above) —
+a declaration this cut neither made nor could narrow to four functions, since the
+oracle has no function-level column, only a file one. These four are dead code
+sitting inside a `no-port` file, not an owed or held file of their own; they take
+no `# port-until:` because that field is file-scoped too and would misdescribe
+the file around them. The cut that next takes §lib/stages.sh's own contract
+removes all four in one motion. Written here so that cut does not rediscover the
+caller set from scratch (lead-ruled 2026-09-03, own-authority; filed to the gap
+inbox with its probe). `lifecycle_stage_journal <stage>` is the **journal-path
+derivation**:
 `LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN` with `<stage>` expanded, hoisted here for
 the same reason the cursor is — three readers must name one file or the
 assertion checks a path nobody was asked to write. Its readers are
