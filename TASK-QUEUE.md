@@ -113,6 +113,42 @@
   ruled: native-gate-port-remaining-corpus lead 2026-09-01 2026-09-03 own-authority
   Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close; cohorts ruled at scope 2026-08-11/12.
 
+- **generator-spawn-resolves-wsl-launcher** [spec: SPEC-generator-spawn.md] — `check-graph`
+  assertion D spawns the pre-commit generator as a BARE `bash`, and in a native Windows process
+  that name resolves against the Win32 PATH where `System32` precedes Git's `usr/bin` — so it
+  reaches the WSL launcher, which is a dispatcher into a Linux VM and not a bash at all.
+  **The rounds, the instrument and the traced mechanism are `platform-support-ci-matrix`'s** and
+  are not restated here; that entry keeps them, and keeps the observation predicate with them.
+  **ADMITTED AS AN OPERATOR-DIRECTED HOTFIX 2026-09-03** — minimal and test-and-doc-complete in
+  one commit, in CLAUDE.md §Delivery doctrine's sense, unsequenced against this iteration's two
+  port cuts, the sequenced variant offered and declined. It is the port-only run's one sanctioned
+  exception, so it is not a yield and sets no precedent for a second.
+  **THE ENVELOPE IS RULED AND IT IS NARROW.** The crate carries no bash resolver and roughly twenty
+  bare `"bash"` spawn sites; ONLY the one that reds is repaired, and a class-wide resolver is NOT
+  admitted — a resolver over the whole class is not *minimal*, and a feature unit beyond the hotfix
+  is the yield the run refuses. The other sites are FILED to the gap inbox by this stage rather
+  than carried, so close disposes of them instead of a build batch adopting them on its own
+  authority. A helpful sweep of the siblings is the one way this unit fails with every gate green.
+  **WHY IT IS A FEATURE though it repairs a defect:** it introduces a resolution contract the crate
+  does not carry — a rule about what a spawned program name means — which is a new name on a
+  governed surface under canon-kit/SPEC.md's litmus. The litmus ran at scope; spec pairs it.
+  **THE TRANSFERABLE HALF is a silence in criterion 7**, and it is why the false clearance was
+  written in the first place: `GATE_SDK_PROGRAM_FLOOR` guarantees that a program EXISTS on an
+  adopter's host, never that a BARE NAME resolves to it. The distinction lands at
+  gate-sdk/SPEC.md §The port-candidate criteria, where the clearing is done, and is deliberately
+  prose rather than a gate — a gate over every spawn site is the class fix this envelope refuses.
+  **THIS ENTRY'S COMPLETION IS THE CODE, ITS TESTS AND ITS DOCS — never a green Windows leg.**
+  The leg's observation stays `platform-support-ci-matrix`'s, whose `continue-on-error` and
+  `targets.list` consequences both still wait on a first-observed-green run. Written this way
+  deliberately: an entry whose predicate is an observation it cannot make in its own iteration is
+  the wedge `observation-predicate-entry-cannot-drain-in-its-own-iteration` records, and the entry
+  above has already been demoted by it once.
+  ruled: generator-spawn-resolves-wsl-launcher operator 2026-09-03 lead-relay
+  ruled: generator-spawn-resolves-wsl-launcher lead 2026-09-03 own-authority
+  Filed 2026-09-03 at spec, with its amendment, on the operator's admission relayed at scope;
+  scope deliberately left it unfiled, having probed the crate and found the resolution contract
+  absent, so the new-names litmus made it spec's to pair rather than scope's to file as debt.
+
 ## Technical Debt
 
 ## Deferred
