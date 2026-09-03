@@ -1,1 +1,21 @@
 # contract: evidence-manifest v1
+declaration-install-and-stage-helper-cuts gates sha256=9170d0b26b9080f64ce1681737bfdc71fd9653d591715086687ccabb0b47e39e pass=108 fail=0 ignore=0 verdict=clean 2026-09-03
+declaration-install-and-stage-helper-cuts gate_sdk sha256=609796bbb425b41b9d5a5ae0143afb40812c8f979b46a47195a10bc86c2daf93 pass=1 fail=0 ignore=0 verdict=clean 2026-09-03
+declaration-install-and-stage-helper-cuts canon_kit sha256=9d3cf3ab0a1425a5996fd26152019ba03a3e0f5fa5ad31aa0e4a19901b8acb5a pass=1 fail=0 ignore=0 verdict=clean 2026-09-03
+declaration-install-and-stage-helper-cuts context_kit sha256=65e7536ec8b920506d9defb5f2fd338be716ee72482acf2e4819ca5b3fcbe891 pass=1 fail=0 ignore=0 verdict=clean 2026-09-03
+declaration-install-and-stage-helper-cuts delegation_kit sha256=6d5af78679d3b30bda016b7d6cdeab840c0fc2bde80bfe4ecaad54b15446f963 pass=1 fail=0 ignore=0 verdict=clean 2026-09-03
+declaration-install-and-stage-helper-cuts doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-09-03
+declaration-install-and-stage-helper-cuts evidence_kit sha256=ae2a2f19285bce1b8d4b6490f91bce3d998afb05553e102569916c62cec919c4 pass=1 fail=0 ignore=0 verdict=clean 2026-09-03
+declaration-install-and-stage-helper-cuts guard_kit sha256=234e06ba5cdb4ca383be7191965292443198471675d1b3166d8c264175420ae4 pass=1 fail=0 ignore=0 verdict=clean 2026-09-03
+declaration-install-and-stage-helper-cuts lifecycle_kit sha256=55c0d3e68939b68858a225f53ce20889d8b17a92d840705f272968912d2427c3 pass=1 fail=0 ignore=0 verdict=clean 2026-09-03
+declaration-install-and-stage-helper-cuts queue_kit sha256=bd337719dfff15f492ae94d8e8662663a8917b65edd4b3bfcfdd20f1790ba39b pass=1 fail=0 ignore=0 verdict=clean 2026-09-03
+declaration-install-and-stage-helper-cuts site_kit sha256=07f7139ea31865677de58ea44b43f7c98ae6c40c8f3fe57e8975e8d65794be35 pass=1 fail=0 ignore=0 verdict=clean 2026-09-03
+declaration-install-and-stage-helper-cuts scripts sha256=f302eab3cefcc19e12fac91459be10fb1b4c8f02dd63cef5ad040f4deb8dc259 pass=1 fail=0 ignore=0 verdict=clean 2026-09-03
+declaration-install-and-stage-helper-cuts guard_tests sha256=00a4ff054b6b31ce5d150b2f791cf35f1047cb2d371b9d6676ba7544335a44ee pass=1 fail=0 ignore=0 verdict=clean 2026-09-03
+declaration-install-and-stage-helper-cuts demo sha256=edc250c9ac0ed80beabd93265e693eeb4ede986e202b0c587539c3ccdd02af76 pass=1 fail=0 ignore=0 verdict=clean 2026-09-03
+declaration-install-and-stage-helper-cuts installer_smoke sha256=96a95053719090b6eb59b7e06e3ab804138bc968a5f7fb5fda127a58843fd781 pass=4 fail=1 ignore=0 verdict=clean 2026-09-03
+declaration-install-and-stage-helper-cuts consumer_smoke sha256=c93d4f30b61889ad63b2921b9dd4b4152d674b8995e1944a86d6ce2572e533aa pass=1 fail=0 ignore=0 verdict=clean 2026-09-03
+declaration-install-and-stage-helper-cuts upgrade sha256=c26195ef377b3ad05ef3708f501d4a968dc977e38227e372e14ffac637d536c1 pass=1 fail=0 ignore=0 verdict=clean 2026-09-03
+declaration-install-and-stage-helper-cuts agents_md_smoke sha256=4d759abe5171a1e0949c16253e7ed34c8a2e31d5101d000738d0a097d880cbb9 pass=1 fail=0 ignore=0 verdict=clean 2026-09-03
+declaration-install-and-stage-helper-cuts index_tests sha256=e14e152466dc5be0296b1e20575bf3d587e1e0a127e7c63ad57671dbcaeaddb8 pass=1 fail=0 ignore=0 verdict=clean 2026-09-03
+declaration-install-and-stage-helper-cuts native_crate sha256=1b0ace92121dd3240ac94438de937a63d81b4d9ffba4ba2b0295649b61a20791 pass=1 fail=0 ignore=0 verdict=clean 2026-09-03
