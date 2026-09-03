@@ -9284,11 +9284,11 @@
   tidiness argument: `QUEUE_KIT_WRAP_BUDGET=100` and `QUEUE_KIT_ENTRY_LINE_CAP=50`
   (`queue-kit/lib/queue.sh:37,39`) bound columns and lines separately, so a shorter stamp frees
   columns directly and freed columns let prose reflow into fewer lines.
-  **The column axis is WITNESSED LIVE this iteration, not projected.** `/spec` was blocked outright
-  because `native-gate-port-remaining-corpus`'s lead line could not carry two `spec:` amendment refs
-  100 columns — over by two at any legal naming, measured rather than estimated — and the lead ruled
-  option (B) around it. That blocker is the cost this entry is about, and the ruled direction would
-  have dissolved it instead of routing past it.
+  **The column axis is WITNESSED TWICE, both measured, neither projected.** 2026-09-01: `/spec` was
+  blocked outright because `native-gate-port-remaining-corpus`'s lead line could not hold two
+  `spec:` refs under 100 columns — over by two at any legal naming — and the lead ruled around it.
+  2026-09-03: the same wall forced MINTING a second host, `drift-kit-bin-port-residue`, so the port
+  corpus fissions into per-directory hosts for an encoding reason, as permanent queue structure.
   **The gain is the ENCODING, not the list, and the entry says so because the format already has
   the list.** queue-kit/SPEC.md:440-442 already defines
   `recurrence: <slug> <YYYY-MM-DD> [<YYYY-MM-DD>…]`, multiple dates on one line today.
@@ -9314,6 +9314,7 @@
   entry that needs discrimination keeps buying it with text against a budget that already blocked
   one stage this iteration.
   ruled: record-stamp-encoding-compression operator 2026-09-01 lead-relay
+  recurrence: record-stamp-encoding-compression 2026-09-03
   Filed 2026-09-01 by close under CLAUDE.md §Housekeeping's operator-directed exception, staged and
   committed in one motion. FILED AND NOT BUILT: the port-only run forecloses building it while
   `--tree` reads owed, and this is no hotfix.
@@ -9598,6 +9599,8 @@
 - **port-archaeology-restatement-residue** [design-pending] — Prose narrates deleted shell forms.
 - **non-gate-arm-testing-floor-unstated** [design-pending] — A new arm's testing floor is unstated.
 - **prune-set-convergence-question** [design-pending] — Two kits' prune sets diverge, unruled.
+- **gap-inbox-slug-predicate-ground** [design-pending] — Its anti-cycle premise died unreplaced.
+- **emit-arm-usage-unreachable** [design-pending] — Prints only on a refusal; lead-ruled 2026-09-03.
 
 ## Done
 

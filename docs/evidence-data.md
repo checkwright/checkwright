@@ -131,3 +131,4 @@
 | declaration-install-and-stage-helper-cuts | sc sp a b v c | 6f/0d | 3 · ≤0d | 20s 1✗ | 108 |
 | session-id-and-env-probe-cuts | sc sp a b v c | 7f/2d | 2 · ≤0d | 20s 1✗ | 108 |
 | parser-and-enum-adapter-cuts-with-graph-hotfix | sc sp a b v c | 5f/2d | 3 · ≤0d | 20s 1✗ | 108 |
+| capture-and-meter-cuts-with-windows-manifest-diagnostic | sc sp a b v c | 5f/0d | 2 · ≤0d | 20s 1✗ | 108 |

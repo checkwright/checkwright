@@ -1945,6 +1945,11 @@ written here rather than left in a commit message because a later reader
 deciding whether to port will read the spec and would otherwise re-attempt it
 into the same wall.
 
+**`cargo fmt` is a defect here rather than housekeeping**, and the rule, its
+measurement and the trade it defers are §build-native's. It is pointed at from
+this section because a session porting a member has its load trigger here and
+not there, which is the whole of what the pointer buys.
+
 **One of the grounds a port is argued on has changed since, and it changed by
 ruling rather than by drift.** The slice was built under the constraint that
 opacity is not claimed, so the case for a port rested on the seam and the
