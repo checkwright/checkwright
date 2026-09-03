@@ -253,6 +253,43 @@ credit the count itself carries.
   right for their population and the adjacency is what misleads — a lead read the
   family max against the window record and could not reconcile them. Read "standing
   max" here as the window's, never the family's.
+  **Measured again 2026-09-03 at `declaration-install-and-stage-helper-cuts`:
+  `cr=12367022` — rank 46 of 61 ascending, +29.6% on the bare-sonnet median of
+  9540215, and 14th of the last twenty.** This align dispatched three
+  worktree-isolated sweeps, so an `align+fanout` row exists at `cr=2362559` and the
+  two are read apart.
+  **This is the matched-count re-test the point above set up, and the point above
+  does not replicate.** That datum drew near-minimum on three amendments and was
+  recorded as contradicting the work-side reading. This align audited **three**
+  amendments too and drew *above* the family median — so the two matched-count
+  points sit on opposite sides of it, and one iteration's near-minimum is not a
+  property of the tier at that scale.
+  **The two are not matched on METHOD, which is what the earlier reading could not
+  see and what most likely explains it.** That align dispatched nothing (no
+  `align+fanout` row exists for it) and left no journal despite a grant; this one
+  dispatched three sweeps and journalled. The suspicion recorded there — that a
+  near-minimum draw from a session which skipped a granted artifact reads as *work
+  not done* rather than as a cheaper tier — has now been tested rather than
+  asserted, and the test agrees with it.
+  **The journal half of that datum is paid, and it reads well.** Five real
+  in-envelope defects found and repaired, none escalated: two substantive — a
+  mirror page misidentified at three separate sites, and a delta undercounting its
+  own roster — and one where align searched the whole tree for a claimed prior
+  instance, found none, and **dropped the unsourced ordinal rather than keeping
+  it**. That is the verificational judgment the tier was ruled on, recorded for the
+  third time.
+  **The counter-entry, and it is the closest the stated revert signal has come to
+  firing.** Cut B's amendment carried a self-consistency defect align did not
+  catch: delta 7 asserted the soft skip of the *driver-config step* while its own
+  Definition of Done over-generalized that to the *cwd*, and the two disagree on
+  the face of the document — which is precisely what auditing an amendment against
+  itself is for. It surfaced at build as a parked cut and an escalation the lead
+  had to rule. Not a build round-trip on a landed cut, so the stated signal did not
+  strictly fire; but it is the *second counter* the 2026-09-01 datum added — a
+  near-miss waved through and caught a stage later — firing on an
+  intra-document contradiction rather than a stale path. One miss against five
+  repairs. **No tier reversal is proposed**, and a later judge inherits a point
+  whose cost reading and work reading now agree for the first time in three.
 
 scope, `spec`, and close stay on Opus, their generative and verificational
 judgment being what justifies the tier. Re-judge every tier when the harness
