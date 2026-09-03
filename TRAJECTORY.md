@@ -445,6 +445,23 @@ alternative below, and is not reopened by this ruling: the width is bought insid
 cost-per-unit meter that would let the next sizing be read rather than judged is queue work filed
 from this consult.
 
+**A kit SPEC carries mechanism only; this project's provenance never ships — ruled 2026-09-03 by
+the operator in consult.** A dated operator stamp (`ruled <date> by the operator`), a pointer into
+this file, and a refused alternative's grounds are this project's ruling history, and the kit SPECs
+ride the installer payload and the public site whole, so every such line lands in a consumer tree
+where it resolves to nothing and reads as mechanism. Provenance lives here and in git history,
+which CLAUDE.md §The provenance seam now names as a class; a SPEC states the rule and its
+engineering grounds, undated. The measure, taken 2026-09-03: thirty-seven dated stamps and fifty
+pointers to this file across six kit SPECs, gate-sdk's carrying twenty-four and forty-three. How
+the class arrived, recorded so the fix is aimed at its cause: this file's own recording rule sends a
+ruling with a canonical home to that home by pointer, and sessions read that as licence to write
+the ruling *into* the kit SPEC with its date and its refusals, so the SPEC became the ruling's home
+and this file the index — the seam's content classes named vocabulary and never provenance, and no
+gate held it. The alternative refused: leaving the class in place as design rationale, which
+publishes private history as mechanism and ships pointers a consumer cannot follow. The sweep and
+the gate that holds the seam afterwards are one queue unit, filed from this consult; discharge
+event: that unit lands and the gate is green, at which point this paragraph is deleted.
+
 ## PRIORITY DIRECTIVE — the port track's sequence
 
 **Ruled 2026-08-09 by the operator, and it is the track's top priority: complete

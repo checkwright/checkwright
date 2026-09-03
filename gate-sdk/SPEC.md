@@ -4340,8 +4340,7 @@ spawn-invisibility rule below). So the count is one input beside the criterion
 columns and the session's own reading, never the answer: a session that reads
 the column as an answer stops looking for the cost the column cannot see.
 
-**The budget's floor is the build window — ruled 2026-09-03 by the operator in
-consult.** The ceremony a cut amortizes — the boundary stages and their
+**The budget's floor is the build window.** The ceremony a cut amortizes — the boundary stages and their
 supervision — is paid once per iteration whatever the cut carries, and under a
 rate-windowed harness the throughput cap is the window rather than the iteration
 count; so a cut sized under what one build stage can carry inside a single window
@@ -4351,8 +4350,7 @@ a member count: a count is the wrong unit because members differ by an order of
 magnitude in cost, which is the `lines=` finding above read at the cut's scale.
 What bounds a cut from above is unchanged — the section bound and the
 shared-surface rule the lead batches by — and filling the window widens *within*
-them. The measurements this was ruled on and the two alternatives refused with it
-are TRAJECTORY.md §The closed rulings', not this kit's.
+them.
 
 **A budget batch records only findings here, never a member roster.** Every
 cohort section below earned its place by having a shared derivation to explain,

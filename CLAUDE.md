@@ -15,7 +15,10 @@ including the harness's default `Claude-Session:` commit trailer.
 
 A kit ships generic mechanism only. **Private rule content never lands here** —
 term lists, coupling vocabularies, glossary bodies, wire-contract couplings,
-product constant sets. When a kit component needs such content, it becomes
+product constant sets — **and this project's provenance**: a dated operator
+stamp, a `TRAJECTORY.md` pointer, a refused alternative's grounds belong in
+`TRAJECTORY.md` and git history, never in a kit SPEC, which states the rule
+undated. When a kit component needs such content, it becomes
 optional consumer config (the `check-graph` / `scripts/graph-vocab.sh`
 pattern), never a kit literal. This is a privacy boundary before it is a design
 one: a kit literal carrying a private vocabulary publishes it.
