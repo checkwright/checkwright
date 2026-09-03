@@ -243,7 +243,7 @@
   algorithm and the only asymmetry left is the process context each runs in. And round 12's log
   carries ZERO `fatal` lines (probed 2026-09-03 at scope), killing the errored-`got` branch and
   leaving two VALID, DIFFERENT hashes over one byte-stream. The next act is a cause read; its facts
-  need a Windows host, so the unit carries a one-shot diagnostic with its fix or spends a round.
+  need a Windows host; 2026-09-03 spent a round, landing the diagnostic print-only and unobserved.
   **DEMOTED 2026-09-01 AT BUILD**, a recurrence rather than a tail — a NEW iteration on a FRESH
   amendment; the wedge is `observation-predicate-entry-cannot-drain-in-its-own-iteration`'s.
   ruled: platform-support-ci-matrix operator 2026-08-27 2026-08-30 2026-08-31 2026-09-03 lead-relay
@@ -6969,35 +6969,6 @@
   Filed 2026-08-24 to the gap inbox by build; promoted 2026-08-24 at
   `shell-gate-tail-port-and-completion-oracle`'s close.
 
-- **check-graph-trigger-consumer-path-reach** [design-pending] — a consumer's measured-claim keys
-  ride the generated pre-commit hook's baked knob values, and `check-graph`'s trigger does not
-  reach every path that consumer's own emitter depends on.
-  **Measured, not predicted.** `scripts/git-hooks/pre-commit` bakes
-  `GATE_SDK_KNOB_CANON_KIT_MEASURED_VALUES` verbatim, so the tree-shell-owed key puts a
-  whole-tree-derived count into a byte-gated artifact. `check-graph`'s `couples=` reaches
-  `scripts/*.sh` and `kit:*.sh` but not `demo/run-demo.sh` or the 11 `installer/**.sh` — 12 files,
-  enumerated by running the expansion. A commit touching only those 12 stales the baked value and
-  fires `check-graph` in neither hook; nothing else catches it, because a key that no inline
-  measured-marker names is invisible to all three `check-measured-claim` arms.
-  **NOT repairable in the kit, and that is the design input this carries.**
-  `gate-sdk/checks/check-graph.gate` ships to consumers, so writing `installer/` and `demo/` into
-  its `couples=` would publish this repo's layout as kit mechanism (CLAUDE.md §The provenance
-  seam). Nor is the hole generically closable: `CANON_KIT_MEASURED_CLAIMS_CMD` names a consumer's
-  own emitter, which may depend on anything. In THIS tree the full-battery-before-every-commit
-  rule covers it, which is why the unit stated the bound at gate-sdk/SPEC.md §port-blockers rather
-  than repairing it.
-  **Deliverable — rule which of three:** (a) a consumer-side shadowing descriptor for
-  `check-graph` carrying this repo's paths, which the registry's consumer-first resolution already
-  permits; (b) a couples-extension knob so a consumer adds trigger paths without forking a
-  descriptor, the `graph-vocab` pattern applied to a new field; or (c) accept the bound as stated
-  and close, on the ground that the mandated full battery already covers it and the hook is a
-  convenience tier.
-  **Cost while deferred:** low and bounded — a stale baked value in the committed hook between a
-  12-file edit and the next full battery run.
-  Filed 2026-08-24 to the gap inbox by build. Promoted 2026-08-24 at
-  `shell-gate-tail-port-and-completion-oracle`'s close, whose drain re-ran the couples expansion
-  and got the same 12 paths.
-
 - **bridged-knob-case-tmp-dir-override-inert** [design-pending] — `run-gate-tests.sh`'s
   `CASE_TMP_DIR` absolutization protects a SHELL-dispatched gate only, so a bridged/native gate
   writes its scratch into the tracked fixture corpus it is the oracle for.
@@ -7371,38 +7342,6 @@
   Surfaced 2026-08-24 by GitHub issue #2 and promoted at this scope's boundary sweep, whose probe
   re-read the v0.25.0 Release body directly rather than trusting the issue text.
 
-- **precondition-gate-negation-false-positive** [design-pending] — `check-queue-prose-precondition`
-  reds on a sentence asserting the OPPOSITE of a precondition, teaching authors away from a
-  true one.
-  **Reproduced at this drain rather than cited.** A probe queue whose active entry reads "The
-  experiment is filed as its own work rather than blocked on anything" reds the member. The
-  trigger set is a phrase-set alternation of bare substrings, so every negating prefix the
-  filer named — "not gated on", "no longer waiting on", "rather than contingent on" — matches
-  by construction rather than by accident; that half was read off the knob's own value, not
-  probed four more times.
-  **What the shipped calibration already says, and where it stops.** queue-kit/SPEC.md
-  §check-queue-prose-precondition calls the gate FP-bearing by construction and justifies the
-  blocking grade on a bounded scope plus an attested silent pick; the `[precondition-ok:]`
-  valve is named one paragraph earlier. What no surface says is whether a NEGATED phrase is an
-  FP that calibration accepts or a miss it would fix — which makes this an authoring question
-  about that paragraph as much as a code one.
-  **Deliverable — rule one of three:** the trigger gains a negation lookbehind; or the
-  calibration accepts the negated FP explicitly, on the phrase-set position other prose gates
-  already take; or the valve is declared the intended answer and the calibration paragraph is
-  widened to say so.
-  **DISTINCT from a matcher-narrowing refusal already on the record**, found at this drain.
-  lifecycle-kit/SPEC.md refuses narrowing the gap inbox's RECURRENCE matcher by exempting a
-  negation, on the ground that an affordance which must be phrased around is miscalibrated.
-  That refusal is about an ADVISORY prompt whose authority was the defect; this is a BLOCKING
-  gate whose recall is. The same move has opposite value on the two tiers, and whichever
-  surface is widened should say so.
-  **Cost while deferred:** low and self-correcting — one round-trip per occurrence, and the fix
-  is a rephrase — but it is a gate steering authors off a true sentence, and a rephrase leaves
-  no trace, so the occurrence count is unmeasurable and the cost cannot rise into view.
-  Filed 2026-08-24 to the gap inbox by spec immediately after the refusal it describes; drained and
-  promoted 2026-08-24 at close, which reproduced the red against a probe corpus before
-  dispositioning.
-
 - **recurrence-threshold-counts-dates-not-incidences** [design-pending] — the pre-emption threshold
   reads a date count as an incidence count, so two incidences in one day count as one and the
   rule fires late.
@@ -7522,78 +7461,6 @@
   one valve, and the surface teaching the repair teaches three wrong ones.
   Filed 2026-08-24 to the gap inbox by scope, which reproduced the red; drained and promoted
   2026-08-25 at close, which read the gate's four help lines first-hand and corrected the filing.
-
-- **worktree-isolated-dispatch-cannot-reach-the-main-checkout** [design-pending] — a
-  worktree-isolated agent resolves neither a binary-dispatched gate nor the capture-tier log its
-  own firings must land in.
-  **Re-probed live at this drain against a running isolated dispatch, not taken on the filing.**
-  The child's worktree carried `native/` with no build output, so every binary-dispatched gate
-  reports unavailable; and both `.workflow/subagent-stop-liveness.log` and
-  `.workflow/prompt-friction.log` were being written INSIDE the worktree, where reclamation
-  destroys them, because the log knobs resolve against the child's own cwd. The close-stage
-  triage that is the decision field's named reader therefore never sees an isolated agent's
-  firings. Second independent reproduction; the first was a 2026-08-24 probe at spec.
-  **The bridge is identified and vendor-neutral, which is why this is filed rather than left
-  open-ended.** `git rev-parse --git-common-dir` run inside the worktree returns the main
-  checkout's `.git` absolutely — re-run at this drain — naming no harness directory and needing
-  nothing but git, squarely on TRAJECTORY.md objective 1.
-  **Distinct from the closed exit-class unit**, which stopped the REFUSAL being wrong; this is
-  the wider hole that no binary-dispatched gate and no shared log runs inside a worktree agent at
-  all, which `agent-worktree-boundary-disposition` ruled by declaration rather than by mechanism.
-  **Why `[design-pending]`:** the bridge is known and the POLICY is not — whether a child
-  redirects its capture-tier writes to the common dir, crossing the isolation boundary the
-  worktree exists to hold; or declares them lost; or the dispatch shape is refused outright.
-  **Cost while deferred:** low and bounded — an isolated agent reports every binary gate
-  unavailable bar the one its consumer's liveness reader now bridges, and its firing record is
-  unrecoverable either way, so the forcing function's own effectiveness is unmeasurable for
-  exactly the class it was built for. The probe paragraph above is a dated observation and stands
-  as recorded; this line is the present-tense one and moves.
-  Filed 2026-08-24 by spec from a live dispatch probe; drained and promoted 2026-08-25 at close,
-  which reproduced both halves against its own running child.
-
-- **cited-object-token-sweep-corpus-narrower-than-the-class** [design-pending] — the
-  minted-identifier half of the provenance floor is gated inside one record file and nowhere
-  else, so a fabricated sha in the queue, a SPEC or a commit message reds nothing.
-  **Both halves read off the gate at this drain rather than cited.** `check-survey-record` does
-  widen its existence probe from the `rev` field to every git-object-shaped token in the other
-  three fields, with a `survey-token-exempt` valve carrying a mandatory reason; and its corpus is
-  the survey record alone. So the arm catches the one attested instance exactly, and stops there.
-  **It stops with CAUSE, which is what makes this a calibration question and not a bug.** The
-  same arm over the whole queue or every governed prose surface meets ordinary hex-shaped English
-  and fixture data, and gate-sdk/SPEC.md §When a gate earns its place rules that a gate crying
-  wolf trains its readers to bypass it.
-  **What is unruled** is whether a CONTEXT-QUALIFIED form clears that bar — a hex token inside
-  backticks adjacent to a citation word, say — which a real corpus measurement settles rather
-  than an argument.
-  **Deliverable:** run the false-positive census over the pool FIRST, then rule the corpus.
-  Nothing should be built before that measurement exists.
-  **Cost while deferred:** low and silent — the class stays caught in one file and uncaught
-  everywhere a fabricated identifier is likelier to matter, and nothing says so at the point of
-  writing.
-  Filed 2026-08-24 by spec out of `delegation-provenance-floor`'s amendment, which ships the
-  narrow arm; drained and promoted 2026-08-25 at close.
-
-- **worktree-lock-start-time-guard-untaken** [design-pending] — the harness's worktree lock reason
-  carries a process START TIME beside the pid, and the shipped classification deliberately
-  captures the pid alone.
-  **Re-measured live at this drain, not assumed.** A running agent's lock reason and that
-  process's own `/proc/<pid>/stat` start field agreed exactly, so the field is a real PID-reuse
-  guard and not decoration. Second independent measurement; the first was 2026-08-24 at spec.
-  **Two grounds for not taking it, both stated in the shipped amendment and both re-examinable:**
-  parity, since the `pid=<n> run=<key>` launch-record grammar carries no start-time guard either;
-  and error direction, since a stranded worktree whose pid has been reused classifies LIVE, which
-  refuses and tells the session to wait rather than authorising a removal.
-  **The second ground is the one that DECAYS.** It is safe only while the classification's sole
-  consumer is a refusal message. The moment anything reaps on the classification — automatically,
-  or a session trusting a safe-to-remove verdict — a reused pid becomes a wrong LIVE that merely
-  wastes a wait, while the reverse case is what a reaper must never get wrong. The guard's value
-  is a function of what reads the class, so the trigger here is the first consumer that acts.
-  **Portability is the real cost:** `/proc` is Linux-only and TRAJECTORY.md objective 2 names
-  Windows, so a portable start-time read has to be found or the guard degrades per platform.
-  **Cost while deferred:** zero today and rising with the first consumer that acts on the class
-  rather than printing it.
-  Filed 2026-08-24 by spec from a live lock measurement; drained and promoted 2026-08-25 at
-  close, which re-ran the measurement against its own child's lock.
 
 - **gate-command-status-conflation-third-caller** [design-pending] — a third call site conflates
   `gate_command`'s harness-error exit with a resolution failure, and its guard for the real case
@@ -9500,28 +9367,6 @@
   themselves; this is the declaration grammar every registry member shares.
   Filed at spec 2026-09-03; drained here with the disagreement re-read at the source.
 
-- **worktree-cleanliness-assertion-scopes-to-checkout** [design-pending] — a suite that asserts
-  the worktree is clean scopes that assertion to the real checkout rather than to the paths its
-  own leg writes, so any session's in-progress edit reads as that leg's failure.
-  **The instance, measured rather than argued.**
-  `installer/consumer-smoke/run-smoke.sh`'s build leg runs `git status --porcelain` against
-  `$REPO`; at validate for `declaration-install-and-stage-helper-cuts` it reported "the build leg
-  left the worktree dirty" while the only dirt was that session's own two uncommitted repairs, and
-  the suite read `new-failures`. Clean on the next round with nothing changed but the commit.
-  **The check class that should have caught it** is a precondition guard: either the leg narrows
-  its assertion to the paths it writes, or the spine refuses to start a roster on a dirty tree and
-  says so in its own voice. Both are buildable, which is why this files as a task rather than as
-  the honest-limit line a gap-generalization may take instead.
-  **Why `[design-pending]`:** which of the two is right is a contract question about what the
-  assertion is FOR — proving the build wrote nothing stray, or proving the tree was pristine — and
-  the two answers differ in what a consumer with a legitimately dirty tree may run.
-  **Cost while deferred:** low and self-correcting per occurrence, one misdiagnosis round-trip
-  each time, but it costs it in the stage least able to absorb a false regression signal.
-  The ordering rule that avoids it landed at `lifecycle-kit/templates/stages/validate.md` in the
-  same commit; this entry is the enforcement half that rule does not buy.
-  Captured 2026-09-03 by close from the Lessons Learned entry
-  `validate-repairs-before-the-worktree-check-suite`, whose rule half is the template edit above.
-
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
@@ -9601,6 +9446,12 @@
 - **prune-set-convergence-question** [design-pending] — Two kits' prune sets diverge, unruled.
 - **gap-inbox-slug-predicate-ground** [design-pending] — Its anti-cycle premise died unreplaced.
 - **emit-arm-usage-unreachable** [design-pending] — Prints only on a refusal; lead-ruled 2026-09-03.
+- **check-graph-trigger-consumer-path-reach** [design-pending] — couples= misses installer/, demo/.
+- **precondition-gate-negation-false-positive** [design-pending] — Reds a true negated precondition.
+- **worktree-isolated-dispatch-cannot-reach-the-main-checkout** [design-pending] — Bridge undecided.
+- **cited-object-token-sweep-corpus-narrower-than-the-class** [design-pending] — Corpus unruled.
+- **worktree-lock-start-time-guard-untaken** [design-pending] — Dormant until a consumer acts on it.
+- **worktree-cleanliness-assertion-scopes-to-checkout** [design-pending] — Reds on foreign dirt.
 
 ## Done
 
