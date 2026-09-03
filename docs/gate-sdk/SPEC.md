@@ -2089,7 +2089,17 @@ what the seam resolves, not the seam: no adopter edits it, and its whole
 documented purpose is to run. Porting one moves its mechanism into the binary
 and re-points the value; the knob still takes any consumer command, so no
 extension point narrows, exactly as `DRIFT_KIT_KPI_DIRS` still resolves a
-consumer plugin after the bundled KPIs went in-crate. So the 2026-08-28 literal
+consumer plugin after the bundled KPIs went in-crate.
+
+**Some of those worked instances have since been ported, and the names above stay
+anyway** — they are the record of what this ruling was *decided against*, so
+deleting one would leave a ruling whose reasoning cites nothing. The dated
+disposition: `scripts/parse-gates-log.sh` and `scripts/parse-installer-smoke-log.sh`
+went in-crate on **2026-09-03** as `--emit-parse-gates-log` and
+`--emit-parse-smoke-log`, each re-pointing its `EVIDENCE_KIT_PARSER_<suite>` value
+and narrowing nothing (evidence-kit/SPEC.md §Layout and configuration).
+
+So the 2026-08-28 literal
 predicate (TRAJECTORY.md §The closed rulings) governs these files unopposed, and
 each takes a per-file port or a per-file declared cause on its own ground — a
 front end's need for the shell bridge, a reader's worktree resolution — never on
@@ -2168,8 +2178,11 @@ name out of `gates::REGISTRY`. It also carries arms that are **not** gates —
 reading tools, plus `--emit-file-survey` and `--emit-cite-survey`, lifecycle-kit's
 two survey-record affordances, its 2026-09-01 ones; `--emit-stage-rules`,
 doctrine-kit's craft-rule router, `--emit-session-id`, lifecycle-kit's stamp-id
-derivation (lifecycle-kit/SPEC.md §bin/session-id.sh), and `--emit-env-probe`,
+derivation (lifecycle-kit/SPEC.md §bin/session-id.sh), `--emit-env-probe`,
 context-kit's machine-profile derivation (context-kit/SPEC.md §bin/env-probe),
+and `--emit-parse-gates-log` and `--emit-parse-smoke-log`, the two parser
+adapters an `EVIDENCE_KIT_PARSER_<suite>` value may name
+(evidence-kit/SPEC.md §Layout and configuration),
 its 2026-09-03 ones), the
 **harness-integration**
 arms below it, and the bridged `Arm::Run` members that are neither —
@@ -2212,7 +2225,13 @@ A **non-gate arm** is specified by three properties:
   `--declaration-parity` left this roster in the 2026-09-03 cut that deleted the
   shell form it compared against (§lib/declaration.sh), because one holder cannot
   be held equal to itself and an arm whose harness can only skip is exactly the
-  unreachable code this property refuses.
+  unreachable code this property refuses. **The same rule read forward refuses a
+  parity arm the cut would have had to mint**: the 2026-09-03 evidence-kit parser
+  cut deleted *both* shell holders it ported, so a parity arm for either could only
+  ever skip, and what stands in its place is a one-time line-for-line comparison
+  taken in the deleting session on a captured log of the suite each parses. A
+  comparison a session runs before a delete is evidence; an arm that can only skip
+  after it is not.
 
   **A *caller* is the requirement; a stored projection is one shape of it, not
   the shape.** The emit arms that opened this class were all generators of a
@@ -2421,6 +2440,16 @@ rather than a port, which is a thing a faithful port may not take on its own
 authority. The pair is what makes the class's shape legible: an empty roster is
 not always a member with no configuration, and where it is the second kind, the
 row is the *only* reachable spelling.
+
+**`--emit-parse-gates-log` and `--emit-parse-smoke-log` are the first kind, and a
+reader should be able to tell which without opening the crate.** Each reads its
+operands — a log path, and for the second a smoke-driver path — straight off its
+own argv and resolves no kit knob at all, so its slice is empty the way
+`--emit-md-section`'s is: it *happens to read nothing*, and a knob it acquired
+later would simply be declared. The second arm's driver path is the sharper half:
+it is the consumer's own file rather than any kit's, so it may not be a crate
+constant, and taking it as an operand is how the provenance seam is held on an arm
+the payload ships (CLAUDE.md §The provenance seam).
 
 **A default the deleted shell driver held inline moves into the owning kit's
 library in the same cut that deletes the driver, never after.** The bridge
@@ -8678,7 +8707,7 @@ interference the per-gate scratch isolation below exists against.
 
 **A child killed by a signal reports `exit 128+n`.** That is the spelling bash's
 `$?` gave the shell dispatcher this replaced, so the tail grammar
-`scripts/parse-gates-log.sh` reads keeps one shape and the port mints no fourth
+`--emit-parse-gates-log` reads keeps one shape and the port mints no fourth
 tail. The tails are `(exit N)`, `(dispatch harness error, exit 2)` and
 `(unresolved)` — cited rather than counted, because a later dispatch shape may
 add one.
@@ -12907,7 +12936,7 @@ than a bare refusal.
 
 The suffix's *grammar* is unchanged, which is what keeps the widening monotone
 for every reader: the same verdict, the same one-line fold of newlines, so
-`scripts/parse-gates-log.sh` and a CI log reader both see the shape they already
+`--emit-parse-gates-log` and a CI log reader both see the shape they already
 parse. The one reader the widening exists for is a **session** reading the
 Windows leg's job log; nothing parses the suffix and nothing must. Because the
 report is non-empty on every non-zero exit, the caller composes it with no empty

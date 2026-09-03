@@ -484,7 +484,7 @@ pub struct Dispatched {
 
 // spec: gate-sdk/SPEC.md §run-gates — a child killed by a signal reports `128 + n`, the spelling
 // bash's own `$?` gave the shell dispatcher this replaced, so the `FAIL: <name> (exit N)` tail
-// keeps one grammar for `scripts/parse-gates-log.sh` and no fourth tail shape is minted
+// keeps one grammar for `--emit-parse-gates-log` and no fourth tail shape is minted
 fn exit_code(status: &std::process::ExitStatus) -> i32 {
     if let Some(c) = status.code() {
         return c;

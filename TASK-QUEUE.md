@@ -12,56 +12,6 @@
 
 ## New Features
 
-- **kit-knob-consumer-adapter-convention** [spec: SPEC-parser-arms-cut.md] — whether a kit may ship
-  a knob whose only working configuration requires the consumer to author an adapter, and whether
-  the front-end shape that answer takes should be a named convention rather than each consumer's
-  invention.
-  **The capability loss that raised it is CLOSED, and this entry is deliberately the residue.**
-  `shell-gate-tail-port` deleted the path `DELEGATION_KIT_LIVENESS_CMD` defaulted to, so the
-  turn-end liveness probe logged `verdict=unavailable` on every firing. The repair landed at the
-  same cut: the kit template dropped a default that pointed at nothing (a path present in no tree
-  reads as a shipped capability and is none), the knob kept its contract exactly — a path run with
-  the scratch dir as its only argument — and this repo named its own reader
-  `scripts/producer-liveness-reader.sh`, reaching the gate by name through `scripts/gate-exec.sh`.
-  Proved by negative control at `scripts/gate-tests/subagent-stop-reader.test.sh`, which fails
-  with exactly `verdict=unavailable` against the dead default.
-  **The capture log priced the loss and then verified the repair, read at close.**
-  `.workflow/subagent-stop-liveness.log` carries **77** `verdict=unavailable` firings, every one
-  inside a single 46-minute window between the port that deleted the path and the repair, and
-  **zero** after it. So the degradation was real, bounded, silent except for that field, and is
-  closed — which is what makes the surviving question a convention question rather than a defect.
-  **The precedent this stands on, which is what makes the question general.** evidence-kit met the
-  identical break one caller over when the same port turned a pre-flight entry's named path into a
-  descriptor, and discharged it with a CONSUMER-SIDE front end resolving the gate name, explicitly
-  refusing to teach the kit's knob to resolve a name as "a kit-contract change". Two kits, two
-  consumers, one shape, invented twice.
-  **Why this needed design:** naming the convention is a cross-kit envelope change and it collides
-  with the provenance seam — a kit template cannot name this repo's `scripts/gate-exec.sh`, the
-  front end evidence-kit/SPEC.md §check-evidence-manifest rules an entry must reach a gate
-  through, so any default is a seam question before it is an ergonomics one.
-  **Cost while deferred:** low and adoption-shaped — every consumer configuring such a knob
-  rediscovers the adapter shape from scratch, and a consumer that does not gets honest degradation
-  rather than a break, which is why nothing forces the issue.
-  **A further instance, and the one that names a candidate answer.** This repo's
-  `EVIDENCE_KIT_PARSER_gates` is `scripts/parse-gates-log.sh`, whose whole body is an awk over
-  `run-gates`' own `PASS:` / `FAIL:` tails — a grammar gate-sdk owns and evidence-kit reads, with
-  nothing of this repo's in it — so every adopter running the battery under `run-validate`
-  re-authors it to get per-gate scenarios instead of one exit-code row. evidence-kit already
-  ships named adapters beside the consumer-command form, so the convention shape exists: a
-  `gates` adapter resolved in-crate through the route `--evidence-lib-parity` already takes
-  would retire the invention, and with it the lines `--tree` counts owed against the consumer
-  file. It sharpens the entry rather than widening it — here the grammar the adapter parses is
-  owned by neither the kit nor the consumer but by a third kit, which is what makes the
-  convention question a seam question a second time over.
-  ruled: kit-knob-consumer-adapter-convention lead 2026-09-03 own-authority
-  Filed 2026-08-24 to the gap inbox by build in two bullets, the second correcting the first's
-  repair premise as measured-false; promoted 2026-08-24 at
-  `shell-gate-tail-port-and-completion-oracle`'s close, whose drain confirmed the reader, its
-  oracle and the surviving question. The instance above was filed 2026-09-03 to the gap inbox by
-  the consult and drained here into this entry rather than into a new one, the port-only run
-  barring the drain's promote.
-  recurrence: kit-knob-consumer-adapter-convention 2026-09-03
-
 - **native-gate-port-remaining-corpus** [spec: SPEC-enum-sets-cut.md] [roadmap: now/reliability]
   — the whole battery onto the binary, and the shell surface down to its residue.
   roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
@@ -201,6 +151,54 @@
   ruled: kit-library-port-residue lead 2026-09-01 2026-09-02 2026-09-03 own-authority
   ruled: kit-library-port-residue operator 2026-09-03 lead-relay
   Filed 2026-08-30 by build, at the landing of the kit-library class ruling.
+
+- **kit-knob-consumer-adapter-convention** [design-pending] — whether a kit may ship
+  a knob whose only working configuration requires the consumer to author an adapter, and whether
+  the front-end shape that answer takes should be a named convention rather than each consumer's
+  invention.
+  **The capability loss that raised it is CLOSED, and this entry is deliberately the residue.**
+  `shell-gate-tail-port` deleted the path `DELEGATION_KIT_LIVENESS_CMD` defaulted to, so the
+  turn-end liveness probe logged `verdict=unavailable` on every firing. The repair landed at the
+  same cut: the kit template dropped a default that pointed at nothing (a path present in no tree
+  reads as a shipped capability and is none), the knob kept its contract exactly — a path run with
+  the scratch dir as its only argument — and this repo named its own reader
+  `scripts/producer-liveness-reader.sh`, reaching the gate by name through `scripts/gate-exec.sh`.
+  Proved by negative control at `scripts/gate-tests/subagent-stop-reader.test.sh`, which fails
+  with exactly `verdict=unavailable` against the dead default.
+  **The capture log priced the loss and then verified the repair, read at close.**
+  `.workflow/subagent-stop-liveness.log` carries **77** `verdict=unavailable` firings, every one
+  inside a single 46-minute window between the port that deleted the path and the repair, and
+  **zero** after it. So the degradation was real, bounded, silent except for that field, and is
+  closed — which is what makes the surviving question a convention question rather than a defect.
+  **The precedent this stands on, which is what makes the question general.** evidence-kit met the
+  identical break one caller over when the same port turned a pre-flight entry's named path into a
+  descriptor, and discharged it with a CONSUMER-SIDE front end resolving the gate name, explicitly
+  refusing to teach the kit's knob to resolve a name as "a kit-contract change". Two kits, two
+  consumers, one shape, invented twice.
+  **Why this needed design:** naming the convention is a cross-kit envelope change and it collides
+  with the provenance seam — a kit template cannot name this repo's `scripts/gate-exec.sh`, the
+  front end evidence-kit/SPEC.md §check-evidence-manifest rules an entry must reach a gate
+  through, so any default is a seam question before it is an ergonomics one.
+  **Cost while deferred:** low and adoption-shaped — every consumer configuring such a knob
+  rediscovers the adapter shape from scratch, and a consumer that does not gets honest degradation
+  rather than a break, which is why nothing forces the issue.
+  **The 2026-09-03 parser cut narrowed the question to its naming and answered nothing else.**
+  Both `EVIDENCE_KIT_PARSER_<suite>` values this repo configures now name bundled arms, so an
+  adopter wanting per-gate or per-arm scenarios writes a knob value instead of authoring a script:
+  the *mechanism* stopped being each consumer's invention. The *name* did not — a third built-in
+  adapter beside `exit-code` and `libtest` was refused twice over, on the ground that absorbing an
+  owed script into a permanently shell library discharges the port's count while defeating its
+  objective, and on the ground that naming the convention is this entry's own deliverable, which a
+  port cut may not rule (evidence-kit/SPEC.md §lib/evidence.sh). So the cut DEMOTES this entry
+  rather than closing it, returning it to the position the 2026-08-24 promotion took it from.
+  ruled: kit-knob-consumer-adapter-convention lead 2026-09-03 own-authority
+  Filed 2026-08-24 to the gap inbox by build in two bullets, the second correcting the first's
+  repair premise as measured-false; promoted 2026-08-24 at
+  `shell-gate-tail-port-and-completion-oracle`'s close, whose drain confirmed the reader, its
+  oracle and the surviving question. The instance above was filed 2026-09-03 to the gap inbox by
+  the consult and drained here into this entry rather than into a new one, the port-only run
+  barring the drain's promote.
+  recurrence: kit-knob-consumer-adapter-convention 2026-09-03
 
 - **platform-support-ci-matrix** [design-pending] [roadmap: next/reliability]
   [precondition-ok: run-observed]

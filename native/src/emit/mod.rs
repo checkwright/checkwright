@@ -15,6 +15,8 @@ pub mod kpi;
 pub mod lesson_sink;
 pub mod md_index;
 pub mod md_section;
+pub mod parse_gates_log;
+pub mod parse_smoke_log;
 pub mod port_blockers;
 pub mod pub_index;
 pub mod pub_lang;
@@ -357,6 +359,20 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         "--emit-session-id",
         Arm::Emit(session_id::emit),
         session_id::KNOBS,
+    ),
+    // spec: evidence-kit/SPEC.md §Layout and configuration — the two parser adapters, reached as
+    // the *value* of `EVIDENCE_KIT_PARSER_<suite>` rather than as a named adapter
+    // spec: gate-sdk/SPEC.md §The non-gate arm — both rosters are empty of the
+    // `--emit-md-section` kind, not the `--emit-session-id` kind
+    (
+        "--emit-parse-gates-log",
+        Arm::Emit(parse_gates_log::emit),
+        parse_gates_log::KNOBS,
+    ),
+    (
+        "--emit-parse-smoke-log",
+        Arm::Emit(parse_smoke_log::emit),
+        parse_smoke_log::KNOBS,
     ),
     // spec: context-kit/SPEC.md §bin/env-probe — an action that reports, so an `Arm::Emit`: both
     // its failures are already exit 2, which is the variant's own collapse. Its one declared knob

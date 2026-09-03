@@ -44,11 +44,19 @@ Knobs, this repo's surface names as defaults:
   knob. The name mirrors the `EVIDENCE_KIT_RUN_<suite>` convention. Suite
   granularity is a floor, not a ceiling: a suite whose runner reports per-case
   results carries a parser that says so, while its siblings keep the global
-  adapter. This repo dogfoods it on the `gates` suite —
-  `scripts/parse-gates-log.sh` maps the verbose `run-gates` log to one scenario
+  adapter. This repo dogfoods it on the `gates` suite — the value
+  `bash gate-sdk/bin/run-gates.sh --emit parse-gates-log` maps the verbose
+  `run-gates` log to one scenario
   per registered gate, so an existing gate turning red diffs as a new failure
   even while a sibling gate is legitimately held red; the whole-battery
-  `exit-code` scenario could not tell those apart. **What that parser reads is the
+  `exit-code` scenario could not tell those apart. **The knob's own contract is
+  untouched by that value naming a bundled arm rather than a consumer script.**
+  A consumer command is what the knob has always taken, so an adopter still points
+  it anywhere; what the payload gained is a *mechanism* an adopter can name
+  instead of authoring, not a narrowing of where a parser may come from — and the
+  arms declare an empty knob roster, reading their operands off argv, so there is
+  no enabling configuration for a consumer to forget
+  (gate-sdk/SPEC.md §The non-gate arm). **What that parser reads is the
   two-space-indented `PASS:` / `FAIL:` tail line and its gate name, and nothing
   else**, and the
   grammar is unchanged by the battery's move onto a compiled arm and a worker
@@ -64,11 +72,33 @@ Knobs, this repo's surface names as defaults:
   without amendment because it names a command over a log and says nothing about
   what a scenario must be. The arm roster is **not listed in the parser**: it is
   derived from the smoke script's own top-level headers, so an arm added or
-  reworded moves the scenario set with it, and a header shape the derivation
-  cannot read yields an empty roster that `run-validate`'s produced-no-result
-  guard reports as the run failure it is. That derivation is what makes those
+  reworded moves the scenario set with it. That derivation is what makes those
   printed headers a parsed contract rather than narration, so the script says so
   where they are written.
+  **A header is a top-level `printf '<literal>\n'` with no redirect, and its name
+  is the literal up to its parenthetical** — which is what makes a header carrying
+  an interpolated profile still name one stable scenario. Two headers name no
+  stable scenario and are skipped: one whose literal is empty, and one that is
+  entirely a format specifier.
+  **The driver is the consumer's own file, so it is an operand rather than a
+  constant.** `bash gate-sdk/bin/run-gates.sh --emit parse-smoke-log <driver>` is
+  the whole of this repo's configured value: the driver path arrives as the arm's
+  leading positional, the arm holds no default for it, and an invocation missing it
+  or naming a driver that does not resolve is exit 2 before any line of the log is
+  judged. The log arrives **last**, after everything the knob value spells, which
+  §lib/evidence.sh's appended-log rule is what fixes.
+  **The completion marker is derived from the same headers, positionally: a
+  driver's *last* top-level header is its completion announcement and the ones
+  before it are its arms.** That replaces what was a literal in the consumer's
+  parser with a rule about the driver's own text, and it is exact rather than
+  approximate — the derivation yields the driver's clean line by construction. The
+  hazard it creates has no oracle and is therefore named: a header printed *after*
+  the completion line would silently become the marker and demote the real one to
+  an arm, so the clause is written beside the clean line in the driver too.
+  The fail-closed arm follows the same rule and is one case tighter than a
+  zero-roster test: **fewer than two headers cannot yield an arm and a marker**, so
+  a header shape the derivation cannot read is exit 2, with `run-validate`'s
+  produced-no-result guard behind it reporting the run failure it is.
   **The suite's fail-fast shape is what makes per-arm rows assert rather than
   narrate, and it is the non-obvious half.** The smoke exits at its first
   failure, so arms behind that point never print — and §Baseline manifest's
@@ -169,6 +199,23 @@ status. That is deliberate: passing suite+status to every consumer command would
 add fields most parsers never read (a field with no reader is removed), and a
 consumer needing exit-code semantics for a suite simply leaves that suite on the
 global adapter.
+
+**Two properties of that branch bind any value written against it, and neither is
+a preference.** The value word-splits — the dispatch runs `$parser "$log"`
+unquoted, with the SC2086 disable in the library saying so — so **no argument a
+value spells may contain a space**; a value needing to pass one passes a rule that
+derives it instead. And the log path is **appended after everything the value
+spells**, which is what the paragraph above fixes: a value carrying its own
+operands spells them first and the log arrives last.
+
+**A third built-in adapter beside `exit-code` and `libtest` is refused, and the
+refusal is recorded here because this is the file that would grow it.** Making a
+consumer's parser a named convention rather than each consumer's invention is a
+live question, and it is not answered by absorbing a consumer's script into this
+library: this library is permanently shell, so a mechanism moved here is a
+mechanism kept off the compiled substrate while the port's own count reads as
+discharged. Naming the convention is the deliverable of a queued entry and is
+ruled there, not by a port cut passing through.
 
 Neither adapter is a gate, so the library's branches are covered by
 `gate-tests/evidence-lib.test.sh`: the per-suite dispatch with its global
