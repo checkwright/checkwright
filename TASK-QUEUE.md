@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: parser-and-enum-adapter-cuts-with-graph-hotfix
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
