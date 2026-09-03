@@ -95,7 +95,41 @@ inline moves into the owning kit's library in the same cut* does not reach it:
 that rule's stated ground is a **declared** knob resolving empty through the
 bridge, and this arm declares none.
 
-### (4) The sole production caller re-points in one line
+### (4) The cwd is an **input** to the derivation, so the production caller reaches the binary directly rather than through the front-end
+
+The one place a faithful port is not free, and it is invisible until probed
+{design-bearing}. Source 3's default sessions dir is
+`<config-home>/projects/<cwd-slug>`, and `bin/session-id.sh` computes the slug
+from `pwd` — so **the process cwd is an argument to this rule**, unlike every
+other ported member, whose inputs are config or argv.
+`gate-sdk/bin/run-gates.sh:13` does `cd "$(git rev-parse --show-toplevel)"` before
+dispatch, which §run-gates states as a rule for every entry point. Routing through
+the front-end therefore **changes the derivation** whenever a caller's cwd is not
+the git toplevel, and turns a non-repository cwd from *working* into *exit 2*
+before the arm is even reached.
+
+**So `enter-stage.sh` invokes the binary directly**, through the
+`gate_native_bin` accessor it already has in scope from `lib/gate.sh`. §The non-gate
+arm sanctions this in as many words — "what the class forbids is a *second* entry
+point into the **emission path**, not a caller" — and the arm's empty roster
+(delta 2) is what makes it free: there is no bridged environment for a front-end
+to supply, so the front-end buys nothing here and costs the cwd. **Recorded as the
+faithful-port road rather than as a preference**: pinning the sessions dir to the
+toplevel is *arguably* a repair, since this harness keys `projects/<slug>` on the
+project root, and taking an arguable repair inside a port is the move this track
+has refused three times.
+
+**The front-end route stays available and is documented with its caveat**, because
+`templates/lead.md` and the smoke both reach the arm that way and both run with
+cwd at the repo root, where the two routes agree.
+
+**One further spelling is load-bearing and is stated so a Rust rewrite does not
+silently change it.** bash's `pwd` prints the **logical** path — the `PWD` the
+shell carries — where `std::env::current_dir()` returns the **physical** one, so a
+session under a symlinked checkout would slug differently. The arm reads `PWD`
+where it is set and falls back to `current_dir()`, which is `pwd`'s own semantics.
+
+### (5) The sole production caller re-points in one line
 
 `lifecycle-kit/bin/enter-stage.sh:290` runs `bash "$KIT/bin/session-id.sh"`
 {mechanical}. It becomes the front-end arm. The file already resolves
@@ -105,7 +139,7 @@ second resolver is written. The `if ! id="$(…)"` guard and its
 "could not read the session id (see above) — nothing written" diagnostic are
 preserved verbatim: the arm's stderr is the *see above*.
 
-### (5) `templates/lead.md` invokes the helper directly and six stage templates name it as the id's source
+### (6) `templates/lead.md` invokes the helper directly and six stage templates name it as the id's source
 
 §bin/session-id.sh already records this as one of two facts a session taking this
 cut should not re-derive, and it is the delta with the widest touch
@@ -118,7 +152,7 @@ transcript — never hand-picked)". Every one is re-pointed at the arm; the
 mis-pick limit and the never-hand-picked rule are unchanged, only the name of
 what prints the id.
 
-### (6) The smoke's five assertions re-point to the front-end and survive case for case
+### (7) The smoke's five assertions re-point to the front-end and survive case for case
 
 `lifecycle-kit/smoke/install.sh` drives the helper directly through
 `SID="$SMOKE_KIT_ROOT/bin/session-id.sh"` and a `sid_run` helper that unsets the
@@ -133,7 +167,7 @@ uses one screen above for `--install-lifecycle`, and `sid_run`'s
 itself stays `# no-port:`; nothing about the five assertions weakens, and the
 build proves that by running them rather than reasoning it.
 
-### (7) Exactly one permission grant is deleted and none is added — the count probed, as the carve-out requires
+### (8) Exactly one permission grant is deleted and none is added — the count probed, as the carve-out requires
 
 `.claude/settings.json:31` carries `Bash(bash lifecycle-kit/bin/session-id.sh)`
 and it is the only line in the file naming this path {design-bearing}. It is
@@ -153,7 +187,7 @@ whose port would need a grant *added*, which the carve-out does not cover and
 which is therefore operator-class; this cut is on the other side of that line and
 the difference is one probe.
 
-### (8) Criterion 6 is discharged by construction: the cut creates no twin
+### (9) Criterion 6 is discharged by construction: the cut creates no twin
 
 The member's whole derivation is self-contained — environment reads, a directory
 walk and an mtime comparison — and it sources no kit library, so there is no
@@ -164,7 +198,7 @@ duplication because the shell caller set **empties**: `enter-stage.sh` and
 gate-sdk/SPEC.md §The port-candidate criteria's *whether the shell caller set
 empties* test resolves to the deleting road with no standing parity oracle owed.
 
-### (9) The section's port-disposition paragraph and its two facts become the cut record
+### (10) The section's port-disposition paragraph and its two facts become the cut record
 
 §bin/session-id.sh today ends in a paragraph headed *The port disposition: owed,
 unblocked and takeable, and deferred once for want of a host*, followed by two
@@ -183,18 +217,32 @@ resolve against it, probed rather than recalled: `delegation-kit/SPEC.md:566`,
 `lifecycle-kit/smoke/install.sh:340`'s `# spec:` header — each doubled in the
 docs mirror.
 
-### (10) The projection fan-out is footprint and the value rollup, and its trigger is a `templates/` markdown edit
+### (11) The projection fan-out has **two independent triggers**, and the second is the one a reader would miss
 
-Delta (5) edits seven `templates/*.md` files, which is one of the three triggers
-`context-kit/SPEC.md` §bin/footprint's load-triggered tier measures
-{mechanical} — the tier is the skill and template **markdown** a kit ships under
-`templates/`, so the line counts move and `docs/footprint.md` goes stale.
-`docs/value.md` takes footprint's per-kit figures as an input, so a footprint
-regen implies a rollup regen (docs/site-architecture.md §Generated projections,
-which is where the full fan-out is read off rather than restated here). The docs
-mirror regenerates for every touched `SPEC.md` and `README.md` as it always does.
+The obvious trigger is delta (6)'s seven `templates/*.md` edits, which is one of
+the three §bin/footprint's load-triggered tier measures {mechanical} — that tier
+is the skill and template **markdown** a kit ships under `templates/`, so the line
+counts move, `docs/footprint.md` goes stale, and `docs/value.md` follows because
+it takes footprint's per-kit figures as an input.
 
-### (11) Two questions this cut deliberately does not answer, each recorded where it lives
+**The second trigger is the deletion itself, and it fires a projection nothing
+about this cut points at.** `scripts/measured-claims.sh` derives a
+`tree-shell-owed` key from the port oracle's `--tree` trailer, and the **generated
+pre-commit hook bakes that value verbatim** — `scripts/git-hooks/pre-commit`
+carries `GATE_SDK_KNOB_CANON_KIT_MEASURED_VALUES=…\t45` today. Deleting one owed
+`.sh` moves it to 44 and stales **both generated hooks and `docs/check-graph.html`
+together**, which `check-graph` byte-holds. So the regeneration set is the docs
+mirror, footprint, the value rollup, the two hooks and the graph page — plus the
+binary itself, whose `--source-stamp` `check-gate-binary-fresh` holds against the
+tracked crate source. `docs/site-architecture.md` §Generated projections is where
+the fan-out is read off rather than restated here, and it states this trigger.
+
+**Two ordering hazards ride with it**, both because the hook and the binary derive
+through `git ls-files`: **stage the deletion first and regenerate second**, and
+build the binary after the crate source is staged. A regeneration taken before the
+deletion is staged bakes the old count and reds on the next run.
+
+### (12) Two questions this cut deliberately does not answer, each recorded where it lives
 
 Stated as a delta so a later reader does not read the silence as a discharge
 {design-bearing}.
@@ -229,9 +277,9 @@ message, and over the deletion it performs.
   point 1 and the reason that point needs no further argument here.
 - **Consumers, both named and both re-pointed in this cut.**
   `lifecycle-kit/bin/enter-stage.sh` reads the id on stdout and substitutes it
-  into the stamp's third field (delta 4); a **session** running `/lead`'s first
+  into the stamp's third field (deltas 4 and 5); a **session** running `/lead`'s first
   step reads it through `templates/lead.md`'s command substitution and writes it
-  into the session-role marker (delta 5). §The non-gate arm's *named caller*
+  into the session-role marker (delta 6). §The non-gate arm's *named caller*
   property is satisfied twice, and the second of those is the class's already
   precedented "a session reaching a mode through the front-end counts exactly as
   a stage step does".
@@ -256,16 +304,36 @@ minimum or a coverage floor. Enumerated rather than described:
 - `check-comment-tier` — reds on a non-directive full-line comment. Monotone in
   the same direction; the crate module's `// spec:` headers are the ported
   comments and carry their bindings.
-- **`check-docs-cmd` assertion A — reds *because* of this cut, which is signal
-  rather than a blind spot.** A governed doc still fencing the deleted
-  `lifecycle-kit/bin/session-id.sh` path is a finding, so this gate is what forces
-  delta (5)'s template sweep and the kit README's roster line rather than leaving
-  them to authorial memory. `check-settings-paths` has the same shape over the
-  committed allow-list and forces delta (7): a stranded grant naming a deleted
-  path reddens on the whole-tree battery. **Neither fires from the generated
-  hook's staged-path trigger on a deletion**, which is that gate's own recorded
-  limit, so both are caught by the full battery run and not by the pre-commit —
-  the build runs the battery, not just the hook.
+- **`check-docs-cmd` assertion A — reds *because* of this cut over the governed
+  doc set, and its reach stops short of the templates.** A governed doc still
+  fencing the deleted `lifecycle-kit/bin/session-id.sh` path is a finding, so it
+  forces the kit README's roster line. `check-settings-paths` has the same shape
+  over the committed allow-list and forces delta (8): a stranded grant naming a
+  deleted path reddens. **Neither fires from the generated hook's staged-path
+  trigger on a deletion** — that gate's own recorded limit — so both are caught by
+  the whole-tree battery and not by the pre-commit; the build runs the battery,
+  not just the hook.
+- **Delta (6)'s seven template edits have NO gate backstop at all, and that is
+  the sweep's most important negative.** Three independent reasons, each probed:
+  `CANON_KIT_PROSE_SURFACE_GLOBS` is `*/templates/*.md`, a **one-level** glob that
+  `templates/stages/*.md` never matches; the prose pass excludes **slot-bearing**
+  templates by design, and `lead.md` carries slots; and even in corpus, assertion
+  A's invocation test would miss `lead.md`'s line, whose first word is `echo`
+  rather than a path or `bash`. §bin/session-id.sh already half-records this — "one
+  of them **invokes it directly**" — and this is the other half: nothing will red
+  if the sweep is skipped. The same holds for `TASK-QUEUE.md`'s two entries naming
+  the path, `.workflow/survey-record.md`, and
+  `drift-kit/bin/stage-economics.sh:45`'s comment attributing the normalization to
+  this file, which `check-comment-tier` judges for tier and never for truth. **A
+  manual authoring obligation stated as one**, because the alternative is a build
+  session inferring a backstop that is not there.
+- **`check-shim-restatement` reds on a shared ≥9-word n-gram between a
+  `.claude/commands/*.md` shim and the dedup corpus — and it reds at exit 2 on an
+  empty corpus, so it is non-monotone twice over.** This repo leaves
+  `LIFECYCLE_KIT_SHIM_DEDUP_CORPUS` empty, so the corpus is derived as `CLAUDE.md`
+  plus every kit's template markdown — **including all seven files delta (6)
+  edits**. New prose describing the arm can collide with existing shim text, and
+  no reading settles it: only a live run does.
 - **`check-docs-cmd` assertion B is the ZERO-COUNT reader here, and it is one
   delta away from red.** Its rule is that every backticked kit-prefixed knob name
   in the governed doc set must occur in the kits' tracked **code**; its corpus is
@@ -304,25 +372,25 @@ minimum or a coverage floor. Enumerated rather than described:
   derivation order now rests on, and the port-disposition paragraph plus its two
   facts replaced by the cut record. The `### bin/session-id.sh` **heading is
   unchanged**, seven probed citation sites resolving against it (deltas 1, 2, 3,
-  9 and 11).
+  4, 10 and 12).
 - `lifecycle-kit/SPEC.md §bin/enter-stage.sh` — the sentence naming
   `session-id.sh` as what it reads the id from; the role survives and the name
-  changes (delta 4).
+  changes (deltas 4 and 5).
 - `lifecycle-kit/SPEC.md §The state machine` and `§Layout and configuration` —
   the former's "`bin/session-id.sh` prints the canonical id by a fixed derivation
   order" sentence, the latter's `bin/` tree listing and its
   `LIFECYCLE_KIT_SESSION_ID` roster entry, whose "source 1 of the derivation
   order" cross-reference survives while the file it points into moves (deltas 2
-  and 9).
+  and 10).
 - `lifecycle-kit/bin/enter-stage.sh` — one invocation and its `# spec:` header's
-  dependency sentence (delta 4).
+  dependency sentence (deltas 4 and 5).
 - `lifecycle-kit/templates/lead.md` and
   `lifecycle-kit/templates/stages/{scope,align,build,validate,close,spec}.md` —
   one live invocation and seven prose namings; the `templates/` markdown edit
-  that fires delta (10)'s fan-out (deltas 5 and 10).
+  that fires delta (11)'s fan-out (deltas 6 and 11).
 - `lifecycle-kit/smoke/install.sh` — the `SID` binding and the `sid_run` helper
   re-pointed at the arm, five assertions preserved; the harness stays `# no-port:`
-  (delta 6).
+  (delta 7).
 - `lifecycle-kit/README.md` — the command roster gains the arm's line beside the
   two survey affordances — the class's stated usage home for a bridged arm, and
   `check-docs-cmd` assertion A is what makes the re-point mandatory rather than
@@ -332,17 +400,17 @@ minimum or a coverage floor. Enumerated rather than described:
   beside `--emit-md-section`, which is what stops the first from reading as a
   one-off (deltas 2 and 3).
 - `.claude/settings.json` — one allow entry deleted, none added, in the commit
-  that deletes its target (delta 7).
+  that deletes its target (delta 8).
 - `docs/site-architecture.md` — no ruling changes; named because delta (10)'s
   fan-out is read off it and a reader must not take the silence for absence
-  (delta 10).
+  (delta 11).
 - `TASK-QUEUE.md`, the `native-gate-port-remaining-corpus` lead line — gains this
   amendment's `[spec:]` ref at **97 of 100 columns**, the arithmetic run on the
   entry rather than carried, and the lead's 2026-09-03 own-authority ruling joins
   the existing `lead … own-authority` declaration at 83 columns for **zero added
   lines**. It **demotes** at build rather than reaching `## Done`, and its counted
   extent is **50 against a cap of 50**, so any roster the build transcribes onto
-  it is compressed in the same commit (deltas 1 and 9).
+  it is compressed in the same commit (deltas 1 and 10).
 
 <!-- update-target-exempt: the composer entry takes no body write from a cut by its own 2026-08-28 ruling — each closed cut's record lives in the contract section that cut selected, which is delta 1's section -->
 - `TASK-QUEUE.md`, `native-gate-port-remaining-corpus`'s body — deliberately
@@ -382,3 +450,7 @@ minimum or a coverage floor. Enumerated rather than described:
 - [ ] **Both knob names still held in `check-docs-cmd` assertion B's corpus after
       the smoke rewrite** — re-probed at the deleting commit, not inferred from
       this amendment's reading, because the crate cannot satisfy that assertion.
+- [ ] **New port prose checked against `check-unmarked-claim`'s `gate-substrates`
+      class** — a rostered phrase such as *dispatches to a compiled subcommand* in a
+      governed manifest paragraph owes a `measured:` marker, and the wording does
+      not exist yet, so no reading settles it ahead of the write.

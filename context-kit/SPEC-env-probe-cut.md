@@ -87,10 +87,18 @@ tidy-up: spec-over-precedent decides it against the implementation quirk, and
 ### (4) The floor predicate becomes a **second holder**, so criterion 6's *unless* clause applies and a **standing** parity oracle is owed
 
 This is the cut's cost centre and its one real design content {design-bearing}.
-The member uses four of `lib/toolfloor.sh`'s five names — `PROBE_SET`,
-`tool_floor_parse`, `tool_floor_version` and `tool_floor_check` — and the crate
-holds **none** of the three functions today; `native/src/gates/install_toolchain.rs`
-parses the roster's quadruple grammar and stops there. Probed rather than assumed:
+The member uses three of `lib/toolfloor.sh`'s five names directly — `PROBE_SET`,
+`tool_floor_parse` and `tool_floor_check` — reaching `tool_floor_version` only
+*inside* the verdict and never calling `tool_floor_consumer_side` at all, since it
+walks the roster whole and marks the audience rather than filtering on it. So the
+port owes exactly **one** new predicate holder, the floor verdict with its version
+extractor: `native/src/gates/install_toolchain.rs` already holds the roster read
+and the quadruple parse and stops there, and the crate's one existing version
+parser (`release_bump.rs`) is unusable here — its own comment refuses `sort -V`
+semantics and it demands an exact three-field triple. `tool_floor_consumer_side`
+owes no holder at all, which is worth stating because a session enumerating the
+library's five names would otherwise port it for symmetry. Probed rather than
+assumed:
 `installer/lib/doctor.sh:66-70` calls `tool_floor_consumer_side`,
 `tool_floor_parse`, `tool_floor_version` and `tool_floor_check` against its own
 **payload copy** of the library, so the shell caller set does **not** empty and the
@@ -123,14 +131,26 @@ cannot reach the second, so it would silently narrow the verdict's reachable
 conditions in the compiled holder while they stay live in the shell one — the two
 holders would then disagree on a BSD or stock-macOS userland, which is precisely
 the population the verdict exists for, and the parity oracle's canned corpus
-cannot express an environmental condition. It would also falsify a published
-claim: `docs/install.md` tells a reader that `init` "compares two versions with
+cannot express an environmental condition. **The decisive ground is that the
+golden already pins it**: `index-tests/toolfloor-cases.sh` carries a
+`sort::coreutils` case, and a parity lane asserting the two holders agree cannot
+be built against a compiled holder that has removed one of the verdict's two
+reachable causes. Closing a live honest limit inside a port is the move this
+track has refused three times — the worktree predicate, §stage-rules' empty
+output on an unknown stage, and this section's own `uncomparable` arm is the
+third. `sort` is on `GATE_SDK_PROGRAM_FLOOR`, so criterion 7 is untouched.
+
+**A near-miss is recorded beside it because the obvious supporting argument is
+wrong.** `docs/install.md` tells a reader that `init` "compares two versions with
 `sort -V`, and `context-kit/bin/env-probe.sh` uses the same flag inside the floor
-predicate", and calls the second "the sharper edge". Closing a live honest limit
-inside a port is the move this track has refused three times — the worktree
-predicate, §stage-rules' empty output on an unknown stage, and this section's own
-`uncomparable` arm is the third. `sort` is on `GATE_SDK_PROGRAM_FLOOR`, so
-criterion 7 is untouched.
+predicate", calling the second "the sharper edge" — which reads as a published
+claim this decision protects. It is not: the `sort -V` that sentence describes
+lives in `lib/toolfloor.sh`, which this cut keeps, so the sentence survives a
+native comparator and needs a **content** repair rather than a path swap either
+way — it should name `lib/toolfloor.sh` and the installer's `doctor` reader, which
+is where that flag actually runs. Stated so the ruling above rests on the golden
+and the parity lane alone, and so delta (10)'s edit to that bullet is not
+mistaken for a path re-point.
 
 ### (5) The roster keeps **one** parser, extracted rather than duplicated
 
@@ -179,12 +199,26 @@ swallow is **preserved verbatim** (repairing it inside a port is fixing the rule
 the port carries), and the Definition of Done requires the refresh **observed**
 from a real hook run rather than read off the diff.
 
-**One gate does read the pair and it is named because it is the only one.**
-`check-template-copy-parity` holds the template and its filled consumer copy in
-bidirectional parity — `scripts/session-context.sh`'s own `# no-port:` header
-says so in as many words — so editing one file and not the other is a red. It
-catches divergence between the two; it cannot catch both being left stale
-together, which is the hazard above.
+**No gate holds this line, and the gate that looks like it does is the trap.**
+`check-template-copy-parity` *does* pair these two files —
+`scripts/session-context.sh`'s own `# no-port:` header says so — but its subject
+is the **declared contract surface**: the `func:` / `case:` / `lib:` / `knob:`
+tokens and the `# spec:` target. A literal path assignment and a `bash <path>`
+call are in none of those classes, so **editing one copy and not the other reds
+nothing**. The kit's own smoke gives no cover either: it copies the template over
+the consumer path and runs it, but step 9 sits inside the profile-file-present
+guard and the scratch consumer has no profile, so the rewritten line is **never
+executed** — which §Layout and configuration already states in its own words, "no
+smoke asserts it". So the pair's symmetry is an authoring obligation, not a
+machine-held one, and both the deleted `CTX_BIN` line and the new invocation must
+be written into both files by hand.
+
+**One thing here *is* gate-caught, and it is the `CTX_BIN` variable rather than
+the call.** Removing only the invocation leaves `CTX_BIN` assigned and unread,
+which is ShellCheck **SC2034 at warning severity** — probed, not inferred — and
+`check-shellcheck` runs at `-S warning` over each kit's `templates/` and the
+gates dir. So the assignment line is deleted in both files, and that deletion is
+the one part of delta (7) a red will catch.
 
 ### (8) `lib/inject.sh`'s sourcer roster goes **2 → 1**, and a false sequencing claim is deleted with it
 
@@ -238,17 +272,34 @@ README's roster line is the class's stated usage home for a bridged arm, and
 `check-docs-cmd` assertion A is what makes each re-point mandatory rather than
 optional once the fenced `.sh` path is gone.
 
-### (11) The projection fan-out is the docs mirror alone
+### (11) The projection fan-out is the docs mirror **and the generated hooks**, and the second trigger is the deletion itself
 
-`context-kit/templates/session-context.sh` is **shell**, and §bin/footprint's
-load-triggered tier measures the skill and template **markdown** a kit ships under
-`templates/` {mechanical}, so delta (7) does not move a footprint figure and
-`docs/value.md` does not follow — the opposite of this iteration's sibling cut,
-and stated because the two look alike. What does regenerate is the docs mirror,
-for every touched `SPEC.md` and `README.md`, and `docs/install.md` is
-hand-authored except for its marker-bounded toolchain block, which this cut does
-not touch. The full fan-out is read off `docs/site-architecture.md` §Generated
-projections rather than restated here.
+**The negative half first, because this cut and its sibling look alike and are
+not.** `context-kit/templates/session-context.sh` is **shell**, and §bin/footprint's
+load-triggered tier globs `templates/**/*.md` {mechanical} — verified at the
+emitter, not read off the prose — so delta (7) moves no footprint figure and
+`docs/value.md` does not follow. `docs/enforcement.md` is likewise untouched: its
+emitter reads only the settings file's two hook arrays and never
+`permissions.allow`, so delta (9) does not reach it.
+
+**The positive half is the docs mirror plus a projection nothing about this cut
+points at.** The mirror regenerates for every touched `SPEC.md` and `README.md`.
+Beyond it, `scripts/measured-claims.sh` derives a `tree-shell-owed` key from the
+port oracle's `--tree` trailer and the **generated pre-commit hook bakes that
+value verbatim** — `scripts/git-hooks/pre-commit` carries
+`GATE_SDK_KNOB_CANON_KIT_MEASURED_VALUES=…\t45` today. Deleting one owed `.sh`
+moves it to 44 and stales **both generated hooks and `docs/check-graph.html`
+together**, which `check-graph` byte-holds. No tracked doc carries a
+`measured: tree-shell-owed` marker, so `check-measured-claim` never sees the
+drift; it lands on the hook alone, which is why a reader looking for the
+projection's trigger in this amendment's own subject matter will not find it.
+
+`docs/install.md` is hand-authored throughout — its marker-bounded toolchain block
+has **no emitter at all**, `check-install-toolchain` only lints it against
+`PROBE_SET`, and this cut touches neither side. The two ordering hazards ride
+here too: the hook and the binary both derive through `git ls-files`, so **stage
+the deletion first and regenerate second**. The full fan-out is read off
+`docs/site-architecture.md` §Generated projections rather than restated here.
 
 ### (12) What the arm spawns, and why this member's set is the widest in its class
 
@@ -288,6 +339,16 @@ unchanged, so the checklist runs over the **relocation** and over the deletion.
 - **The second reader of the artifact is a human**, and the artifact is
   gitignored, so no gate asserts its content — which is exactly why delta (7)'s
   hazard has no oracle and why the DoD demands an observed run.
+- **The installer is not a consumer, probed exhaustively rather than assumed**,
+  and the finding is load-bearing because it is what makes this cut lawful at all.
+  Nothing under `installer/` invokes `env-probe.sh`, and the installer does not
+  wire the session-context hook either — `recipe_seed` has no context-kit arm and
+  its config-seam copier globs `templates/*-config.sh` alone, so wiring the hook
+  is a manual adopter step. **So this member is not behind the install boundary**,
+  where `lib/toolfloor.sh` — read by `installer/lib/doctor.sh` off the payload —
+  is. That asymmetry inside one section is the whole content of delta (1). The
+  payload itself is a per-kit `git archive` with no file list, so it simply stops
+  shipping the deleted file and no roster, count or size claim moves.
 - **No new field.** The block's five bullets are unchanged in grammar and in
   which reader consumes each.
 
@@ -296,13 +357,29 @@ canon-kit/SPEC.md §The causal-completeness check point 5 binds — a reader is
 clearable by inspection only where its verdict is monotone in the violation set,
 and reds-on-finding-none, exact-count and coverage-floor shapes are not.
 
-- **`check-docs-cmd` assertion A — reds *because* of the cut.** A governed doc
-  still fencing `context-kit/bin/env-probe.sh` is a finding. This is signal, and
-  it is what forces delta (10) rather than leaving it to authorial memory.
-  `check-settings-paths` has the same shape over the allow-list and forces delta
-  (9). **Neither fires from the generated hook's staged-path trigger on a
-  deletion** — that gate's own recorded limit — so both are caught by the
-  whole-tree battery.
+- **`check-docs-cmd` assertion A — reds *because* of the cut, and it reds in
+  exactly one place, reproduced rather than predicted.** A whole-battery
+  differential over the mechanical file-plus-grant deletion produces **one** new
+  failure: `context-kit/SPEC.md:1013`, the fenced `bin/` layout-tree line, because
+  the scanner cannot tell a *listing* from an invocation and the line's first token
+  parses as a path ending `.sh`. That is what forces delta (10)'s tree-listing
+  edit. **The other five surfaces delta (10) touches are silent** — the SPEC's
+  four prose namings, the kit README's step 4, and `docs/install.md`'s two — since
+  assertion A scans fences only. `check-settings-paths` has the same red-on-a-cut
+  shape over the allow-list and forces delta (9); its own limit is that a `*`
+  token is never path-verified, which is why the surviving
+  `Bash(bash gate-sdk/bin/run-gates.sh *)` grant needs nothing. **Neither fires
+  from the generated hook's staged-path trigger on a deletion**, so both are
+  caught by the whole-tree battery.
+- **`check-shellcheck` is the second reader that reds *because* of the cut**, on
+  the `CTX_BIN` assignment delta (7) must delete rather than orphan. Monotone as a
+  corpus rule — removing `bin/env-probe.sh` removes findings — but the *edit* adds
+  one.
+- **`check-gate-substrate-parity` assertion B is a bidirectional EQUALITY**
+  between the `.gate` descriptor set and the binary's `--list` roster, so it is
+  the non-monotone shape by construction. It stays clear only because the member
+  joins the bridged-arm table and **not** `gates::REGISTRY`; registering it as a
+  subcommand would red the gate with no descriptor to match.
 - **`check-docs-cmd` assertion B is the zero-count reader, and here it is
   cleared by the file the cut does *not* take.** Its corpus is the kit roots minus
   `*.md` minus `*/gate-tests/*`, and **`native/` is not a kit root** — a kit root
@@ -321,16 +398,31 @@ and reds-on-finding-none, exact-count and coverage-floor shapes are not.
   the cut edits neither the roster nor the marker-bounded block, and delta (5)
   reuses that gate's own parser rather than minting a second one that could
   disagree with it.
-- **`check-install-claim`** — red condition is a **zero count** over the
-  `<!-- install-primary: -->` declaration. The cut deletes no marker and edits no
-  install section's lead transport; `docs/install.md`'s env-probe paragraph is a
-  seed-a-profile instruction, not a transport claim.
+- **`check-install-claim`** — red on a **zero count** of `install-primary:`
+  declarations, on more than one, and on a scanned section leading with a
+  non-primary transport; exit 2 on a declared id outside the vocabulary. Cleared
+  on the sharper of two grounds rather than the obvious one: not merely that the
+  cut deletes no marker, but that its assertion-B scan is **section-scoped** to
+  headings matching the install-section pattern, and `docs/install.md`'s two
+  env-probe sentences sit under `## Requirements`, which that pattern does not
+  select. Its sibling `check-payload-claim` reds on zero and on more than one
+  `payload-discloses:` declaration and is untouched for the same reason.
+- **`check-install-disposition`** — reds on **finding none**, asserts **exactly
+  one** `# install:` per gate, and holds a **coverage floor** over every
+  `zero-config` gate's smoke registration: three non-monotone arms in one gate.
+  Its corpus is `checks/check-*` alone, and this member is not a gate.
+- **`check-prose-enum`'s derivation fail-closes if a kit's `lib/` tracks no
+  top-level `*.sh`** — a reds-on-finding-none arm reached through a *deletion*,
+  which is why it is named. `context-kit/lib/` keeps `context.sh` and
+  `toolfloor.sh`, and delta (6) is what guarantees the second.
 - **The port oracle's `--tree` arm and `check-gate-exemption-tasks`** — the
   former reports rather than reds; the latter reds on a `# port-until:` slug with
   no live queue entry, and delta (6) adds no such declaration. Owed goes 45 → 44.
-- **`check-template-copy-parity`** — reds on divergence between the template and
-  its filled copy, which is delta (7)'s named reader and the whole reason both
-  files move in one commit.
+- **`check-template-copy-parity`** — reds on divergence in the **declared
+  contract surface** of the template/copy pair, and **fail-closes at exit 2 if
+  either copy carries no `${KNOB:-default}` idiom at all**, which is a
+  reds-on-finding-none arm. Both copies keep their knob idioms, so it stays green
+  — and, per delta (7), it does **not** hold the invocation line.
 - **`check-shellcheck` and `check-comment-tier`** — monotone in the same
   direction; removing a file removes findings, and the crate module's `// spec:`
   headers carry the ported comments' bindings.
@@ -361,16 +453,22 @@ and reds-on-finding-none, exact-count and coverage-floor shapes are not.
   to have widened (delta 4).
 - `context-kit/lib/toolfloor.sh` — its `# spec:` header's sentence about "a
   second reader obtains the roster by sourcing" now has a third reader that parses
-  it as text; the file gains **no** `# port-until:` (deltas 5 and 6).
+  it as text, and its `# shellcheck disable=SC2034` comment names the departing
+  sourcer by path. The file gains **no** `# port-until:` (deltas 5 and 6).
 - `context-kit/README.md` — the numbered step 4 and the `--emit` command roster,
   forced by `check-docs-cmd` assertion A (delta 10).
 - `scripts/session-context.sh` and `context-kit/templates/session-context.sh` —
-  one invocation each, `CTX_BIN` retired from both, moved in one commit because
-  `check-template-copy-parity` is bidirectional; the template's `[EDIT ME]` prose
-  re-points at the front-end (delta 7).
-- `docs/install.md` — the seed-a-profile paragraph and the GNU-`sort` bullet; the
-  latter's claim survives *because* of delta (4)'s decision, which is the one
-  place a published page depends on an internal port choice (deltas 4 and 10).
+  one invocation each and the `CTX_BIN` assignment deleted from both, written
+  symmetrically **by hand** because no gate holds this line; the template's
+  `[EDIT ME]` prose re-points at the front-end, and its line-2 `# no-port:` cause
+  enumerates "the probe path" among the gaps grounding its disposition — that
+  enumeration loses one member while four survive, so the disposition itself
+  stands (delta 7).
+- `docs/install.md` — the seed-a-profile paragraph takes a path re-point, and the
+  GNU-`sort` bullet takes a **content** repair: the flag it describes lives in
+  `lib/toolfloor.sh` and runs for the installer's `doctor`, so the sentence names
+  that library rather than either the deleted script or the new arm (deltas 4 and
+  10).
 - `gate-sdk/SPEC.md §lib/inject.sh` — the sourcer roster goes from two to one,
   the false *behind the Windows leg* clause is deleted with the member it
   qualified, and the library stays owed and **not** unblocked (delta 8).
@@ -435,3 +533,9 @@ and reds-on-finding-none, exact-count and coverage-floor shapes are not.
       count re-read to confirm 45 → 44 on this cut, never 43.
 - [ ] **The grant count re-probed at the deleting commit** and the allow entry
       removed in it, per the 2026-08-29 carve-out's own terms.
+- [ ] **New port prose checked against `check-unmarked-claim`'s `gate-substrates`
+      class** — a rostered phrase such as *dispatches to a compiled subcommand* in a
+      governed manifest paragraph owes a `measured:` marker; the wording does not
+      exist yet, so no reading settles it ahead of the write.
+- [ ] **The generated hooks and `docs/check-graph.html` regenerated after the
+      deletion is staged**, the baked `tree-shell-owed` re-read to confirm the move.
