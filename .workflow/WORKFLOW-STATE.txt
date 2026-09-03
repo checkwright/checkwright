@@ -4,10 +4,4 @@
 
 ---
 
-capture-and-meter-cuts-with-windows-manifest-diagnostic scope aaedb015 2026-09-03 1269f00a
-capture-and-meter-cuts-with-windows-manifest-diagnostic spec a32597eb 2026-09-03 3f07cff9
-capture-and-meter-cuts-with-windows-manifest-diagnostic align a218e158 2026-09-03 d605c68a
-capture-and-meter-cuts-with-windows-manifest-diagnostic build a199f453 2026-09-03 2ed607b3
-capture-and-meter-cuts-with-windows-manifest-diagnostic build ae87863b 2026-09-03 99973872
-capture-and-meter-cuts-with-windows-manifest-diagnostic validate a9198348 2026-09-03 eaffa4c7
-capture-and-meter-cuts-with-windows-manifest-diagnostic close abe9387f 2026-09-03 50531ab7
+— scope a7360185 2026-09-03 5171a2b4
