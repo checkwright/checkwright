@@ -6,3 +6,4 @@
 
 parser-and-enum-adapter-cuts-with-graph-hotfix scope a0234b33 2026-09-03 b2e350ad
 parser-and-enum-adapter-cuts-with-graph-hotfix spec ae301dbb 2026-09-03 f8df3379
+parser-and-enum-adapter-cuts-with-graph-hotfix align a221ef62 2026-09-03 21287e4e
