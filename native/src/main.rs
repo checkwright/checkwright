@@ -10,6 +10,7 @@ mod ere;
 mod evidence;
 mod fresh;
 mod gates;
+mod guard;
 mod hook;
 mod install;
 mod json;
@@ -128,6 +129,94 @@ fn toolfloor_parity(args: &[String]) -> i32 {
     }
 }
 
+// spec: guard-kit/SPEC.md §The guard framework — the holder's four classes, so both sides take one
+// spelling; `hd`/`hdq` carry nothing here because the branch reading them is unreachable, and a
+// token outside the four is a malformed corpus rather than a silent no-class.
+fn parse_wants(spec: &str) -> Result<guard::Wants, String> {
+    let mut w = guard::Wants::default();
+    if spec == "-" {
+        return Ok(w);
+    }
+    for t in spec.split(',') {
+        match t {
+            "sq" => w.sq = true,
+            "dq" => w.dq = true,
+            "hd" | "hdq" => {}
+            _ => return Err(t.to_string()),
+        }
+    }
+    Ok(w)
+}
+
+// spec: guard-kit/SPEC.md §The guard framework — the standing oracle criterion 6's *unless* clause
+// owes for the three twinned primitives: this module's classification of one canned corpus,
+// reported as classification and never as an internal representation, `--queue-parity`'s own rule.
+fn guard_lib_parity(args: &[String]) -> i32 {
+    let usage = "  usage: checkwright-gates --guard-lib-parity split <cmd>... | --guard-lib-parity skeleton <wants> <cmd>... | --guard-lib-parity redirect <cmd>...";
+    match args.first().map(String::as_str) {
+        Some("split") => {
+            for c in &args[1..] {
+                for (i, seg) in guard::split_compound(c).iter().enumerate() {
+                    println!("split\t{}\t{}\t{}", c, i, seg);
+                }
+            }
+            0
+        }
+        Some("skeleton") => {
+            let spec = match args.get(1) {
+                Some(s) => s,
+                None => {
+                    eprintln!("checkwright-gates: --guard-lib-parity skeleton needs an inert-class list ('-' for none) — the classification could not be reported; treating as failure (not clean)");
+                    eprintln!("{}", usage);
+                    return 2;
+                }
+            };
+            let w = match parse_wants(spec) {
+                Ok(w) => w,
+                Err(t) => {
+                    eprintln!("checkwright-gates: --guard-lib-parity skeleton got '{}', which is not one of sq, dq, hd, hdq — the classification could not be reported; treating as failure (not clean)", t);
+                    eprintln!("{}", usage);
+                    return 2;
+                }
+            };
+            for c in &args[2..] {
+                match guard::skeleton(c, w) {
+                    Ok(s) => println!("skeleton\t{}\t{}\t{}", spec, c, s),
+                    // spec: guard-kit/SPEC.md §The guard framework — the twin implements the
+                    // newline-free contract, so a newline-bearing corpus is out of contract rather
+                    // than something to normalize with a branch this holder does not carry.
+                    Err(guard::NewlineInInput) => {
+                        eprintln!("checkwright-gates: --guard-lib-parity skeleton was handed a newline-bearing command, which is outside the twin's contract ({} flattens every logged line) — the classification could not be reported; treating as failure (not clean)", guard::LIB);
+                        return 2;
+                    }
+                }
+            }
+            0
+        }
+        Some("redirect") => {
+            for c in &args[1..] {
+                match guard::redirect_pairs(c) {
+                    Ok(pairs) => {
+                        for (i, p) in pairs.iter().enumerate() {
+                            println!("redirect\t{}\t{}\t{}", c, i, p);
+                        }
+                    }
+                    Err(e) => {
+                        eprintln!("checkwright-gates: redirect pattern failed to compile: {} — the classification could not be reported; treating as failure (not clean)", e);
+                        return 2;
+                    }
+                }
+            }
+            0
+        }
+        _ => {
+            eprintln!("checkwright-gates: --guard-lib-parity needs a mode — the classification could not be reported; treating as failure (not clean)");
+            eprintln!("{}", usage);
+            2
+        }
+    }
+}
+
 fn main() {
     let argv: Vec<String> = std::env::args().skip(1).collect();
 
@@ -135,7 +224,7 @@ fn main() {
         Some(a) => a.as_str(),
         None => {
             eprintln!("checkwright-gates: no subcommand given");
-            eprintln!("  usage: checkwright-gates --list | --reads <gate-name> | --needs <gate-name> | --knobs <gate-name> | --source-stamp | --queue-parity <queue-file> | --evidence-lib-parity lock <file>... | --evidence-lib-parity pid <pid>... | --toolfloor-parity <mode> <arg>... | --install <op> [--<key> <value>]... | --run [--gates-dir <dir>] [--only <name>... | --for <path>...] | --hook <member> | --emit-<arm> | <gate-name> [args...]");
+            eprintln!("  usage: checkwright-gates --list | --reads <gate-name> | --needs <gate-name> | --knobs <gate-name> | --source-stamp | --queue-parity <queue-file> | --evidence-lib-parity lock <file>... | --evidence-lib-parity pid <pid>... | --toolfloor-parity <mode> <arg>... | --guard-lib-parity <mode> <arg>... | --install <op> [--<key> <value>]... | --run [--gates-dir <dir>] [--only <name>... | --for <path>...] | --hook <member> | --emit-<arm> | <gate-name> [args...]");
             eprintln!("  bridged arms: {}", emit::arms().join(", "));
             exit(2);
         }
@@ -206,6 +295,13 @@ fn main() {
     // for the harness holding it against `lib/toolfloor.sh`. A top-level flag, like its sibling.
     if first == "--toolfloor-parity" {
         exit(toolfloor_parity(&argv[1..]));
+    }
+
+    // spec: guard-kit/SPEC.md §scan-prompts — a hardcoded top-level flag, measured rather than
+    // assumed: table membership turns on whether the arm resolves a `GUARD_KIT_*` knob, and all
+    // three modes resolve none. A top-level flag, like the arms around it.
+    if first == "--guard-lib-parity" {
+        exit(guard_lib_parity(&argv[1..]));
     }
 
     // spec: installer/README.md §The install boundary — the install seam both bootstraps call,

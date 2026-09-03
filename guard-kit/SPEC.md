@@ -157,14 +157,25 @@ Primitives a consumer guard composes; each emits the harness's
   call site — the classes were never the disagreement, since every rule agrees
   that *some* regions are inert; the disagreement was that each decided privately
   and none recorded why. Not a hook primitive, and a pure function of its
-  arguments: no config read, no subprocess, no global.
+  arguments: no config read, no subprocess, no global. Its **compiled twin
+  implements the reachable subset only**: with no newline in the input the
+  heredoc-body machinery — the pending-terminator queues and the arm that drains
+  them — can never fire, so the twin omits it and refuses a newline-bearing
+  command at its entry point rather than normalizing one with a branch it does
+  not carry. The property that makes the omission the rule rather than an economy
+  is `guard_log_fallthrough`'s: it flattens every `\n` and `\t` to a space before
+  the append, so a logged line is newline-free by construction and `hd`/`hdq` are
+  inert on one. A `<<TERM` opener is therefore emitted verbatim, with nothing
+  following it.
 - `guard_split_compound <skeleton>` — the compound splitter: emits one segment
   per line, splitting on the harness's statement separators (`;`, `&&`, `||`,
   `|`). Also not a hook primitive — the single implementation every consumer
   that reasons *per segment* shares (rules 8/12/14/15/17/18/19/20/22, the read-compound
   carve-out of rules 9/10, and scan-prompts' `allowed()`), so the harness's
-  per-segment matching surface is modelled in exactly one place and cannot drift
-  between them. Fed a `guard_skeleton` view, so a separator inside a quoted
+  per-segment matching surface is modelled in exactly one place **on this
+  substrate**. Across both substrates it is modelled in **two** places, and what
+  prevents the drift between them is the comparator below rather than
+  uniqueness. Fed a `guard_skeleton` view, so a separator inside a quoted
   argument is never mistaken for a statement break. **What it models is the
   harness's matching surface, not shell dataflow**, and that distinction is what
   rule 23 rests its own two-level splitter on: the emitted segments carry no
@@ -174,6 +185,30 @@ Primitives a consumer guard composes; each emits the harness's
   **no newline**, and it does not need one: it *emits* segments as lines and
   every consumer reads lines, so a newline already present in the input is
   already a boundary before the substitution runs.
+
+**Three of these primitives are held twice, and a machine holds them equal.**
+`guard_split_compound`, `guard_skeleton` and `_guard_redirect_pairs` — the set
+`bin/`'s prompt ranker is composed from — each carry a compiled twin in the gate
+binary, while this library itself stays shell. That is admissible only because
+the duplication is machine-held, which is the *unless* clause of gate-sdk's
+port-candidate criterion 6, and the machine is
+`gate-tests/guard-lib-parity.test.sh`: it feeds one canned corpus to both
+holders and compares their **classification**, A against B directly with no
+committed expected file, since a maintained golden would be a third copy to
+drift and the failure it exists to catch is one side edited without the other.
+The compiled side answers through `--guard-lib-parity <mode> <arg>...`, one mode
+per twinned predicate. The library's two `no-port` grounds do not reach the
+three: none of them resolves a knob — each is a pure function of its arguments —
+and the third is an `_`-prefixed internal helper rather than the documented
+`guard_*` surface a consumer composes rules from, so it is specified with the
+ranker that calls it (§scan-prompts) rather than in the roster above.
+
+**The duplication is permanent rather than transitional**, which is what makes
+the machine-held disposition the right one instead of a concession: the shell
+caller set for the three cannot empty, their live callers being rules
+8/12/14/15/17/18/19/20/22 and the read-compound carve-out of rules 9/10, which
+are themselves functions in this same permanently-shell file. So the comparator
+does not retire either, and the arm it answers on is durable by construction.
 
 **Placeholder, never deletion, and this is a correctness point rather than
 taste.** Deleting an inert span **fuses adjacent tokens**: a pattern glued to its
@@ -1343,7 +1378,26 @@ fd-dup target only as an accident of its target class, which is the very reason
 `_guard_redirect_pairs` exists, so resting the fd-dup rule on it would rest it on
 an accident. These are `_`-prefixed internal helpers rather than the documented
 `guard_*` surface, called from a `bin/` tool inside the same kit — a kit-internal
-call that widens no consumer contract.
+call that widens no consumer contract. That is also what clears
+`_guard_redirect_pairs` for a compiled twin while the library it lives in stays
+shell: the second `no-port` ground is about the consumer surface, and this helper
+is not on it (§The guard framework). Its twin is held equal by the same
+comparator as the other two.
+
+**Where `--guard-lib-parity` is dispatched from, and why that was measured
+rather than assumed.** The arm is a **hardcoded top-level flag**, resolved before
+the registry lookup beside the other parity arms, and **not** a `BRIDGED_ARMS`
+row. Table membership turns on one property and not on the family an arm belongs
+to: a member's declared knob roster is what `--knobs` publishes and what the
+bridge resolves before the exec, so an arm resolving a consumer knob must be a
+member and an arm resolving none has nothing for either to do. All three modes
+are pure functions of their arguments — read statically, the three bodies name no
+`GUARD_KIT_*` knob and call nothing that could reach one; read dynamically, their
+classification of a corpus is byte-identical with every knob in this kit's roster
+perturbed. So the roster is empty and the flag is top-level. The empty-roster
+escape that admits an `--emit-`-spelled arm to the table anyway does not reach
+here: its ground is reachability through the front-end's `--emit <name>` operand,
+which composes `--emit-<name>`, and this arm carries no such spelling.
 
 **What the top row actually is, recorded because the entry that bought this
 change predicted otherwise.** A read-shaped `cat <file>` cannot appear in the log
@@ -1613,6 +1667,7 @@ guard-kit/
   gate-tests/compare-settings-allow.test.sh  # bespoke unit test, run by gate-sdk's runner
   gate-tests/git-mutation-under-producer.test.sh  # bespoke unit test, run by gate-sdk's runner
   gate-tests/guard-read-path.test.sh  # bespoke unit test, run by gate-sdk's runner
+  gate-tests/guard-lib-parity.test.sh # holds lib/guard.sh's three twinned primitives to their compiled counterparts
   templates/bash-guard.sh   # consumer copy: generic rules on, marked
                             #   consumer-rules section
   templates/guard-config.sh
@@ -1836,6 +1891,16 @@ process the firing arm needs. `gate-tests/guard-read-path.test.sh` asserts
 `guard_read_path`, the file-path counterpart of `guard_read_command`, whose
 discriminating case — an absent `file_path` — is an accessor return value, not
 a command a `cases.tsv` row can carry.
+
+`gate-tests/guard-lib-parity.test.sh` takes the same lane on a third structural
+ground: it asserts nothing about *one* implementation's decision, so no
+`decision <TAB> command` row could express it. It compares **two**
+implementations of the three twinned primitives over one canned corpus (§The
+guard framework), which is why it is a separate file from `scan-prompts.test.sh`
+rather than cases added to it — that suite asserts one implementation's *output
+shape*, and the two questions do not share an oracle. It does not retire, because
+the shell holder cannot: unlike a parity harness whose second holder is waiting to
+be deleted, this one's is permanently shell.
 
 A gateless kit shapes gate-sdk's discovery rule: `gate_kit_roots` recognizes a
 sibling kit by its `checks/` *or* `smoke/` directory. Keying on `checks/`

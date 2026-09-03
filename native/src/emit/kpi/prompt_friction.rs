@@ -18,10 +18,16 @@ pub fn parse_count(s: &str) -> Option<(u64, u64)> {
     Some((a.parse().ok()?, b.parse().ok()?))
 }
 
+// spec: drift-kit/SPEC.md §Bundled KPIs — the presence witness is the library, never the surface
+// the measurement reads: `lib/guard.sh` is permanently shell, so no later cut can delete it out
+// from under this row.
 pub fn run(ctx: &Ctx, trend: bool) -> Option<String> {
+    if sibling_tool(&ctx.kit_roots, crate::guard::LIB).is_none() {
+        return na("lead", LABEL, "guard-kit absent", trend);
+    }
     let scanner = match sibling_tool(&ctx.kit_roots, "bin/scan-prompts.sh") {
         Some(p) => p,
-        None => return na("lead", LABEL, "guard-kit absent", trend),
+        None => return na("lead", LABEL, "scanner failed", trend),
     };
     let out = proc::run("bash", &[&scanner, "--count"])
         .ok()

@@ -252,6 +252,14 @@ Lead:
   silent. A trend reader meeting one looks for the definitional cause before the
   behavioral one; guard-kit/SPEC.md §scan-prompts owns the key and records each
   step with its pre-change reading.
+  **Guard-kit's presence is witnessed by `lib/guard.sh`, never by the surface the
+  measurement happens to read.** The library is the file whose presence *is* the
+  kit being vendored — the indirection every consumer copy sources — and it is
+  permanently shell, so no port cut can delete the witness out from under this
+  row. A witness that is itself a port candidate invites exactly that: the
+  measuring code survives in the binary, the witness does not, and the row
+  reports a number for a consumer that has no friction log, no allowlist reader
+  and no guard.
 - **kpi-always-loaded** — the standing per-session surface: level and
   since-baseline delta via context-kit's `always-loaded.sh` meter.
 - **kpi-settings-local** — entry count of the untracked local permission

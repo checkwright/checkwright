@@ -2174,7 +2174,8 @@ re-deciding, and only the operator reopens a closed ruling.
 The binary is a multi-call binary whose *gate* subcommands are dispatched by
 name out of `gates::REGISTRY`. It also carries arms that are **not** gates —
 `--list`, `--reads`, `--needs`, `--knobs`, `--source-stamp`, `--queue-parity`,
-`--evidence-lib-parity`, `--toolfloor-parity` and `--install`, plus the
+`--evidence-lib-parity`, `--toolfloor-parity`, `--guard-lib-parity` and
+`--install`, plus the
 `--emit-` family the bridged-arm table keys (`--emit-queue-counts` and
 `--emit-queue-edges` are its 2026-08-31 members; `--emit-md-index`,
 `--emit-md-section` and `--emit-pub-index`, context-kit's three index-first
@@ -2226,9 +2227,13 @@ A **non-gate arm** is specified by three properties:
   arm has to name the caller that reads its output and the transition where it
   is read, or it is dead weight. Every member above satisfies this —
   `--source-stamp` is read by §check-gate-binary-fresh, `--queue-parity`,
-  `--evidence-lib-parity` and `--toolfloor-parity` by their parity harnesses (the
-  last holding context-kit's floor predicate to `lib/toolfloor.sh`, whose shell
-  caller is the installer's `doctor`) — and stating it is what
+  `--evidence-lib-parity`, `--toolfloor-parity` and `--guard-lib-parity` by their
+  parity harnesses (the third holding context-kit's floor predicate to
+  `lib/toolfloor.sh`, whose shell caller is the installer's `doctor`; the fourth
+  holding guard-kit's splitter, normalizer and redirect scan to `lib/guard.sh`,
+  whose callers are rules inside that same file — so it is the member whose
+  second holder cannot empty even in principle, the property
+  `--declaration-parity` lacked) — and stating it is what
   stops the class becoming a place to park unreachable code. **A parity arm's
   caller is the second holder, so the arm retires with it**:
   `--declaration-parity` left this roster in the 2026-09-03 cut that deleted the
@@ -3589,6 +3594,32 @@ that answers each is the one whose corpus matches its question.
    condition — a `sort` without `-V` — so the lane shims such a `sort` onto
    `PATH` and requires both holders to answer `uncomparable`, which is what stops
    the compiled holder quietly narrowing a fail-closed arm.
+
+   **guard-kit's three primitives are the fifth instance, and the first where
+   *both* of the holder's `no-port` grounds are about something other than the
+   twinned predicates.** `guard_split_compound`, `guard_skeleton` and
+   `_guard_redirect_pairs` gained compiled twins when guard-kit's prompt ranker
+   ported (guard-kit/SPEC.md §The guard framework), while `lib/guard.sh` itself
+   stays shell on two grounds — it is the bridge's sole resolver for that kit's
+   knobs, and it is the API a consumer composes its own rules from. Neither
+   reaches these three: none resolves a knob, and one of them is an `_`-prefixed
+   internal helper outside the documented surface. What a later port should read
+   off this instance is that a holder's `no-port` grounds are checked **against
+   the twinned predicates**, not against the file — a file can be permanently
+   shell for reasons that leave a predicate inside it perfectly portable, which is
+   the same shape `lib/toolfloor.sh` and `lib/queue.sh` already carry. It is also
+   the instance where the shell caller set cannot empty even in principle: the
+   surviving callers are rules that are themselves functions in the same
+   permanently-shell file, so the disposition-choosing question above — *does the
+   caller set empty* — is answered structurally rather than by a count. The lane
+   is `guard-kit/gate-tests/guard-lib-parity.test.sh`, in the shape the four above
+   take. What it adds is an assertion about a branch the compiled holder
+   deliberately **omits**: the normalizer's heredoc-body machinery is unreachable
+   on the twin's input by a stated property of that input, and the lane proves the
+   property rather than assuming it — classifying the same corpus with and without
+   the class that machinery reads, and requiring the two to agree. A twin that
+   implements a subset owes that proof; without it, the omission is
+   indistinguishable from a defect the corpus happens not to reach.
 
    **A dead twin is deleted, not held**, and the same enforcement-first ordering
    decides it: where a shell helper has no caller and its compiled counterpart is
