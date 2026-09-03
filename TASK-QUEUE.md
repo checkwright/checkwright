@@ -153,8 +153,8 @@
   ever have landed on it — the instrument's case, measured rather than argued. And the SECOND
   widening is the one that paid, the cause arriving on stdout with stderr EMPTY, exactly the
   mechanism gate-sdk/SPEC.md §check-graph names; the first alone would have printed empty again.
-  **THE REPAIR IS NOT FILED HERE AND NOT STARTED:** a non-port unit under the no-yield run, whose
-  spent yield is not a precedent for a second, so it wants an operator ruling at the next scope.
+  **THE REPAIR IS RULED IN 2026-09-03 as an operator-directed hotfix — minimal, one commit, and
+  UNSEQUENCED against the port cut, the sequenced variant offered and declined; spec pairs it.**
   **DEMOTED 2026-09-01 AT BUILD**, the second exercise and a recurrence rather than a tail — a NEW
   iteration on a FRESH amendment. The wedge and its five shapes are
   `observation-predicate-entry-cannot-drain-in-its-own-iteration`'s.
@@ -162,7 +162,7 @@
   ruled: platform-support-ci-matrix operator 2026-08-30 lead-relay
   ruled: platform-support-ci-matrix lead 2026-08-30 own-authority
   ruled: platform-support-ci-matrix operator 2026-08-31 consult
-  ruled: platform-support-ci-matrix operator 2026-08-31 lead-relay
+  ruled: platform-support-ci-matrix operator 2026-08-31 2026-09-03 lead-relay
   ruled: platform-support-ci-matrix lead 2026-09-01 own-authority
   Filed 2026-07-26 by scope, split from `platform-support-contract`; Linux split 08-25, macOS 08-26;
   promoted/deferred 08-25 through 09-01; rounds 6-11 on 08-31 to 09-03, 8-11 identical to 7.
