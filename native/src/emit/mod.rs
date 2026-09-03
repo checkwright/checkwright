@@ -22,6 +22,7 @@ pub mod queue_edges;
 pub mod queue_index;
 pub mod stage_rules;
 pub mod roadmap;
+pub mod session_id;
 pub mod trajectory;
 pub mod upgrade_smoke;
 pub mod value_rollup;
@@ -347,6 +348,14 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         "--emit-stage-rules",
         Arm::Emit(stage_rules::emit),
         stage_rules::KNOBS,
+    ),
+    // spec: lifecycle-kit/SPEC.md §bin/session-id.sh — an empty-roster member whose roster must
+    // stay empty rather than merely happening to be: neither name it reads is defined in
+    // lifecycle-kit's `lib/stages.sh`, so a declared row would fail-close through the bridge
+    (
+        "--emit-session-id",
+        Arm::Emit(session_id::emit),
+        session_id::KNOBS,
     ),
     // spec: gate-sdk/SPEC.md §run-gates — the battery runner: the class's first bridged member
     // that returns a verdict rather than a document, and the reason the table is keyed by flag
