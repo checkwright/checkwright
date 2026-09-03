@@ -2183,8 +2183,7 @@ adapters an `EVIDENCE_KIT_PARSER_<suite>` value may name
 the bundled enum-set emitter a `CANON_KIT_ENUM_SETS_CMD` value may name
 (canon-kit/SPEC.md §check-prose-enum), and `--emit-file-gap`, lifecycle-kit's
 mid-iteration gap-capture affordance (lifecycle-kit/SPEC.md §The committed gap
-inbox) and the second free-text capture member the argv-shape split below
-governs,
+inbox) and a free-text capture member the argv-shape split below governs,
 its 2026-09-03 ones), the
 **harness-integration**
 arms below it, and the bridged `Arm::Run` members that are neither —
