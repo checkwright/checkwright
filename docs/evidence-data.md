@@ -128,3 +128,4 @@
 | cause-instrument-and-queue-kit-cut | sc sp a b v c | 3f/0d | 2 · ≤1d | 22s 1✗ | 108 |
 | index-first-and-survey-record-cuts | sc sp a b v c | 3f/0d | 2 · ≤0d | 22s 1✗ | 108 |
 | test-runner-and-upgrade-cuts-with-liveness-attribution | sc sp a b v c | 6f/1d | 3 · ≤0d | 20s 1✗ | 108 |
+| declaration-install-and-stage-helper-cuts | sc sp a b v c | 6f/0d | 3 · ≤0d | 20s 1✗ | 108 |

@@ -1973,8 +1973,8 @@ the order they bind.
   because trailing prose reflows onto the continuation lines and a tags-only lead
   line is legal (queue-kit/SPEC.md §check-queue-entry-budget states what that
   costs a reader — the entry renders as a bare slug). Nothing mechanical caps the
-  count either: `check-amendment-queue`'s `spec_refs_in` collects every match on a
-  line into a list (§check-amendment-queue). So the number is measured on the
+  count either: `check-amendment-queue` collects every match on a
+  line (canon-kit/SPEC.md §check-amendment-queue). So the number is measured on the
   entry a cut is actually hosting on, never assumed.
 
   **The composer entry's answer is one, and it is structural rather than a naming
@@ -2163,7 +2163,7 @@ name out of `gates::REGISTRY`. It also carries arms that are **not** gates —
 reading tools, plus `--emit-file-survey` and `--emit-cite-survey`, lifecycle-kit's
 two survey-record affordances, its 2026-09-01 ones; `--emit-stage-rules`,
 doctrine-kit's craft-rule router, its 2026-09-03 one), the **harness-integration**
-arms below it, and two bridged `Arm::Run` members that are neither —
+arms below it, and the bridged `Arm::Run` members that are neither —
 `--lesson-sink` (queue-kit/SPEC.md §The lesson-sink arm), `--upgrade-smoke`
 (§upgrade-smoke) and `--install-lifecycle` (lifecycle-kit/SPEC.md
 §bin/install-lifecycle.sh, its 2026-09-03 member) — and the class
@@ -8358,8 +8358,8 @@ through a `--remove`/reinstall round trip beside it. lifecycle-kit's own
 
 The tightened-gates declaration grammar — **two container arms over one token
 predicate**, held once, in `native/src/declaration.rs`. **This section's name is a
-path the tree does not carry, and that is deliberate**: ten citations
-inside this SPEC and one in `docs/install.md` resolve against
+path the tree does not carry, and that is deliberate**: the citations
+throughout this SPEC and in `docs/install.md` resolve against
 `§lib/declaration.sh`, and renaming the heading strands every one of them. What
 the section owns is the grammar and its compiled holder. The token predicate is
 a bare gate name; the container is the only thing that differs between the arms,

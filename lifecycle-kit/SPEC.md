@@ -1699,9 +1699,12 @@ is live and unchanged — it holds between the `--install-lifecycle` arm and the
 gates that assert what it writes (§check-merge-attrs,
 §check-lifecycle-registration), in one substrate.
 
-**All four are shell holders with no caller in this tree, kept rather than
+**All four are shell holders with no caller outside this file, kept rather than
 deleted with this cut.** The 2026-09-03 port of §bin/install-lifecycle.sh
-moved the writer in-crate and emptied their shell caller set; the compiled
+moved the writer in-crate and closed their caller set on itself: nothing outside
+`lib/stages.sh` names any of the four, and inside it `lifecycle_merge_attrs_block`
+is the sole caller of `lifecycle_supersede_set` and `lifecycle_union_set` — which
+is why they leave together or not at all. The compiled
 counterparts `crate::stages::registration_block` and
 `crate::stages::merge_attrs_block` are what the arm and the gates read.
 An empty caller set makes criterion 6's dead-twin road **available** and does not
@@ -1762,9 +1765,10 @@ check could refuse. The two fail-closed refusals that surface *are* the ledger's
 and they live in the writer, where the file is actually read: a loader that
 parsed the ledger would refuse every entry on a malformed one, including entries
 that never asked whether a valve was armed.
-`lifecycle_supersede_set` has a **third
-reader**, `check-scratch-citation`, which forbids a permanent surface pointing a
-retriever at any of its members — so a consumer adding a
+The derived supersede set **is read past the merge-attribute pair**, and those
+readers take the compiled `crate::stages::supersede_set` rather than this shell
+holder: `check-scratch-citation`, which forbids a permanent surface pointing a
+retriever at any of its members, and `check-stage-evidence`. So a consumer adding a
 `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` member gets citation enforcement over it with no
 second roster to keep in step. Values and adapters only, never
 gate structure (gate-sdk's `lib/gate.sh` rule).
@@ -2464,7 +2468,7 @@ resident registration block
 into the always-loaded agent file (`LIFECYCLE_KIT_AGENT_FILE`, default
 `CLAUDE.md`; the positional override points a smoke or fixture at a scratch
 tree without touching consumer config), idempotently. **The `###
-bin/install-lifecycle.sh` heading is the section name, not a file name** — six
+bin/install-lifecycle.sh` heading is the section name, not a file name** — the
 in-SPEC citations resolve against it, and the shell tool it was named after
 ported on 2026-09-03. The block is bounded by
 fixed marker lines (`<!-- lifecycle-kit:begin -->` … `<!-- lifecycle-kit:end -->`);
@@ -3318,9 +3322,10 @@ and why inlining is the right close are §The survey record's; this section owns
 the red condition.
 
 **The forbidden-target set is derived, never maintained** — it is
-`lifecycle_supersede_set` (§lib/stages.sh), already the single derivation behind
-the installer's `.gitattributes` block and `check-merge-attrs`'s parity check.
-This gate is its third reader, which is why a consumer widening its truncate
+`crate::stages::supersede_set` (§lib/stages.sh states the derivation and its
+shell holder), already the single derivation behind the `.gitattributes` block
+the `--install-lifecycle` arm writes and `check-merge-attrs`'s parity check.
+This gate reads it too, which is why a consumer widening its truncate
 configuration gets citation enforcement for free.
 
 **Retrieval-pointer position, stated as the red condition.** A supersede-set path

@@ -332,7 +332,7 @@ if ( cd "$ma" && kit_gate check-merge-attrs >/dev/null 2>&1 ); then
     echo "smoke(install-lifecycle): a smuggled out-of-set merge attribute should redden the parity gate" >&2; exit 1
 fi
 
-# spec: lifecycle-kit/SPEC.md §lib/stages.sh — the installer runs under `set -e` and sources the loader, whose lock-pattern probe is a subshell designed to return non-zero on a non-match; with a pattern configured that probe once aborted the installer silently, leaving a consumer unable to re-emit its own derived surfaces. Exercised with a real pattern set, because the kit default is empty and an unconfigured run never reaches the branch.
+# spec: lifecycle-kit/SPEC.md §lib/stages.sh — the arm resolves its LIFECYCLE_KIT_* knobs by sourcing the loader in the bridge's subshell, and the loader's lock-pattern probe is itself a subshell designed to return non-zero on a non-match; under a `set -e` sourcer that probe aborted the run silently with a pattern configured, leaving a consumer unable to re-emit its own derived surfaces. Exercised with a real pattern set, because the kit default is empty and an unconfigured run never reaches the branch.
 printf "LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE='^held by pid ([0-9]+)\$'\n" > "$ma/lock-stages.sh"
 ( cd "$ma" && LIFECYCLE_KIT_CONFIG_FILE=lock-stages.sh bash "$SDK/bin/run-gates.sh" --install-lifecycle >/dev/null ) \
     || { echo "smoke(install-lifecycle): a configured lock-reason pattern aborted the installer" >&2; exit 1; }

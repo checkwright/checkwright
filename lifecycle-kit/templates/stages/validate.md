@@ -64,6 +64,16 @@ Do not declare validate complete until the baseline diff is clean: no
 baseline-pass item regressed, every held-constant red still carries a live
 blocking slug, and any recovered item has been promoted to pass.
 
+**Commit a repair the moment you decide it, before you start or resume the
+suite roster.** A suite may assert the worktree is clean against the real
+checkout rather than a scratch clone, and such a suite reads your own
+uncommitted repair as the failure of whatever leg it guards — the failure text
+names that leg, not you, so it is diagnosed as a regression from this
+iteration's diff when it is the session's own state. Batching repairs to commit
+later is what buys the false red; the ordering is the whole fix. Check
+`git status` against the session's own edits before excavating any suite
+failure that mentions a dirty tree.
+
 **Arm the pre-flight valve when you end on a deliberately accepted red.** A red
 you understand and that is not a regression from this iteration's diff, and that
 the closing stage rather than this one must file against, is a hand-off — not a

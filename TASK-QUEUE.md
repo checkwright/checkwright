@@ -54,7 +54,7 @@
   obligation that keeps a file owed until the step moves behind the invoke — and the live entry
   owning that relocation is `powershell-installer-surface`.
   **The one live defect inside this set, already filed:** `gate-sdk/lib/test-hermetic.sh:14`
-  omits the executable-suffix helper `gate-sdk/lib/gate.sh:100` appends, so on a Windows host every
+  omits `gate_exe_suffix`, which `gate-sdk/lib/gate.sh` appends, so on a Windows host every
   bespoke test pins `GATE_SDK_NATIVE_BIN` to a path that cannot exist. It is the Deferred entry
   `hermetic-bin-suffix-pin-placement` (drained there from the gap inbox 2026-08-31 by close) and is
   **not** re-filed here; this entry owns the port disposition that waits on it.
@@ -208,7 +208,7 @@
   **The mechanism, read rather than inferred.** `gate-sdk/lib/test-hermetic.sh:14` exports
   `GATE_SDK_NATIVE_BIN` absolute — deliberate, and reasoned in its own `spec:` directive, because a
   case runs from a sandbox cwd where the repo-relative default resolves to nothing. What it omits is
-  `gate_exe_suffix`, which `gate-sdk/lib/gate.sh:100` appends to its own default.
+  `gate_exe_suffix`, which `gate-sdk/lib/gate.sh` appends to its own default where it resolves it.
   **Why this is a PLACEMENT question and not a missing call, which is what holds it at
   `[design-pending]`.** The suffix has one owner by stated contract — gate-sdk/SPEC.md §lib/gate.sh
   rules that no other surface spells the executable suffix — and `gate.sh` defines it. But
@@ -1901,7 +1901,8 @@
   the prose now names two *classes*, with `docs/install.md` §The upgrade contract
   owning the roster by enumerating it.
   **A ruling that must not be re-derived.** The obvious consolidation — put the
-  set in `gate-sdk/lib/declaration.sh` beside the shared container — is **ruled
+  set in gate-sdk's own declaration holder (gate-sdk/SPEC.md §lib/declaration.sh),
+  beside the shared container — is **ruled
   out**: those section names are consumer content, and a kit literal carrying one
   project's release-note vocabulary crosses the provenance seam (CLAUDE.md §The
   provenance seam), the same ground on which the note-parity gate stays out of
@@ -4331,7 +4332,7 @@
   owning `§lib/*.sh` section may name its exports — or **kit-level**, the reach test an audit
   actually applies: nothing outside the kit calls it, so it is internal.
   **Both populations exist, which is why no reading can be adopted silently.**
-  `gate-sdk/lib/gate.sh`, `guard-kit/lib/guard.sh` and `gate-sdk/lib/declaration.sh` have
+  `gate-sdk/lib/gate.sh` and `guard-kit/lib/guard.sh` have
   verified callers in other kits and in `scripts/` — public on either reading, so they decide
   nothing. `canon-kit/lib/spec.sh` (`spec_manifest_files` and the adapters beside it) and
   `evidence-kit/lib/evidence.sh` (eleven adapters, inventoried in one sentence at
@@ -6844,10 +6845,24 @@
   **Cost while deferred:** low and adoption-shaped — every consumer configuring such a knob
   rediscovers the adapter shape from scratch, and a consumer that does not gets honest degradation
   rather than a break, which is why nothing forces the issue.
+  **A further instance, and the one that names a candidate answer.** This repo's
+  `EVIDENCE_KIT_PARSER_gates` is `scripts/parse-gates-log.sh`, whose whole body is an awk over
+  `run-gates`' own `PASS:` / `FAIL:` tails — a grammar gate-sdk owns and evidence-kit reads, with
+  nothing of this repo's in it — so every adopter running the battery under `run-validate`
+  re-authors it to get per-gate scenarios instead of one exit-code row. evidence-kit already
+  ships named adapters beside the consumer-command form, so the convention shape exists: a
+  `gates` adapter resolved in-crate through the route `--evidence-lib-parity` already takes
+  would retire the invention, and with it the lines `--tree` counts owed against the consumer
+  file. It sharpens the entry rather than widening it — here the grammar the adapter parses is
+  owned by neither the kit nor the consumer but by a third kit, which is what makes the
+  convention question a seam question a second time over.
   Filed 2026-08-24 to the gap inbox by build in two bullets, the second correcting the first's
   repair premise as measured-false; promoted 2026-08-24 at
   `shell-gate-tail-port-and-completion-oracle`'s close, whose drain confirmed the reader, its
-  oracle and the surviving question.
+  oracle and the surviving question. The instance above was filed 2026-09-03 to the gap inbox by
+  the consult and drained here into this entry rather than into a new one, the port-only run
+  barring the drain's promote.
+  recurrence: kit-knob-consumer-adapter-convention 2026-09-03
 
 - **substrate-parity-assertion-c-reach-unannounced** [design-pending] —
   `check-gate-substrate-parity` assertion C is one-directional by design, so its derived set can
@@ -9270,7 +9285,12 @@
   governed surface; near zero, the premise holds; consistently several, the premise is wrong and
   the template's bullet is what needs amending, not this repo's tier. It then named the threshold:
   "a third iteration at several ruled-alone escalations should amend that bullet." Measured five
-  such rulings in 2026-08-31, four in 2026-09-01, and several again in 2026-09-02.
+  such rulings in 2026-08-31, four in 2026-09-01, several again in 2026-09-02, and **four in
+  2026-09-03** — scope's threshold entry, spec's amendment-tag arithmetic, and build's two, the
+  non-repo-cwd front-end refusal and the four stranded `lib/stages.sh` renderers. A fourth
+  consecutive point, with two of the four ruled on grounds the escalating session had missed and
+  one catching an unreconciled count inside build's own evidence. On COST the premise held again:
+  the lead's priced share read 10.7%, on a partial close and with one lead-side row unpriced.
   **The two axes separate, which is what makes this an amendment rather than a tier flip.** On
   COST the split premise holds and strengthens — the lead's share fell 14% -> 9.2% -> 9.7%, so the
   lead's turns really are the cheap tail in dollars. On CHARACTER it fails every time: a
@@ -9282,6 +9302,15 @@
   both halves were false — the predicate was never run. So the count measures a capacity that
   demonstrably misfires, and any amendment has to say what a lead's turns ARE without claiming
   they are reliably verificational.
+  **It recurred on 2026-09-03, one iteration after being written here, and the failing step was
+  PROVENANCE for the second time.** The lead told build that two crate functions were pre-existing
+  halves landed by two named commits; they were build's own code, written that session. What was
+  run was `git log -- <files>`, which reports commits touching the FILES; the function-level
+  inference was stated as fact where `git grep 'fn <name>' HEAD` settles it in one command. The
+  claim survived — build ran the predicate rather than trusting the framing — so the conclusion
+  was lucky and the method was not. **It does not net against the ruled-alone count**: the count
+  measures how many escalations a lead answered off a governed surface, this measures whether the
+  grounds under an answer were probed or inferred, and an amendment owes both readings.
   **Why `[design-pending]`:** the deliverable is a kit template's own design rationale, and the
   shape is unruled — qualify the bullet's premise, split it into a cost limb and a character limb,
   or replace it with the discriminator the binding already uses. Which one is a doctrine call.
@@ -9296,6 +9325,29 @@
   Filing it is not the drain's `promote` that ruling bars: `## Deferred` is not an active section,
   and only scope promotes into one.
   ruled: lead-tier-split-premise-unamended lead 2026-09-02 own-authority
+  recurrence: lead-tier-split-premise-unamended 2026-09-03
+
+- **worktree-cleanliness-assertion-scopes-to-checkout** [design-pending] — a suite that asserts
+  the worktree is clean scopes that assertion to the real checkout rather than to the paths its
+  own leg writes, so any session's in-progress edit reads as that leg's failure.
+  **The instance, measured rather than argued.**
+  `installer/consumer-smoke/run-smoke.sh`'s build leg runs `git status --porcelain` against
+  `$REPO`; at validate for `declaration-install-and-stage-helper-cuts` it reported "the build leg
+  left the worktree dirty" while the only dirt was that session's own two uncommitted repairs, and
+  the suite read `new-failures`. Clean on the next round with nothing changed but the commit.
+  **The check class that should have caught it** is a precondition guard: either the leg narrows
+  its assertion to the paths it writes, or the spine refuses to start a roster on a dirty tree and
+  says so in its own voice. Both are buildable, which is why this files as a task rather than as
+  the honest-limit line a gap-generalization may take instead.
+  **Why `[design-pending]`:** which of the two is right is a contract question about what the
+  assertion is FOR — proving the build wrote nothing stray, or proving the tree was pristine — and
+  the two answers differ in what a consumer with a legitimately dirty tree may run.
+  **Cost while deferred:** low and self-correcting per occurrence, one misdiagnosis round-trip
+  each time, but it costs it in the stage least able to absorb a false regression signal.
+  The ordering rule that avoids it landed at `lifecycle-kit/templates/stages/validate.md` in the
+  same commit; this entry is the enforcement half that rule does not buy.
+  Captured 2026-09-03 by close from the Lessons Learned entry
+  `validate-repairs-before-the-worktree-check-suite`, whose rule half is the template edit above.
 
 ## Icebox
 
@@ -9305,6 +9357,8 @@
   the way in and on the way back out. The removed body is recoverable from
   the evicting commit (`git log -p -S'<slug>' -- TASK-QUEUE.md`).
 
+- **ruled-line-canonicalization-unruled** [design-pending] — `ruled:` line merging is unruled.
+- **craft-rule-step-has-no-reader** [design-pending] — A broken stage-rules knob reds nothing.
 - **runtime-dir-two-tier-detector** [design-pending] — No two-tier proof for file-pattern ignores.
 - **done-slug-commit-naming-gate** [design-pending] — Done-moving commits need not name their slug.
 - **enter-stage-simulate-no-write-fixture** [design-pending] — Guard present, unpinned by a fixture.
@@ -9374,24 +9428,3 @@
 
 
 ## Lessons Learned
-
-- **validate-repairs-before-the-worktree-check-suite** — a validate session that
-  finds and fixes a prose/queue defect mid-run, then keeps the fix staged or
-  uncommitted while the evidence spine still has suites left to run, buys a
-  false red rather than a clean one. `installer/consumer-smoke/run-smoke.sh`'s
-  build leg asserts `git -C "$REPO" status --porcelain` is empty **against the
-  real checkout**, not a scratch clone — so any session's own in-progress repair
-  reads as "the build leg left the worktree dirty" and the suite reports
-  `new-failures` for a reason that has nothing to do with the build.
-  **Attested this iteration, at validate for `declaration-install-and-stage-helper-cuts`.**
-  Two repairs (a stale oracle-column claim in `lifecycle-kit/SPEC.md`
-  §lib/stages.sh, a doubly-deleted-file queue entry) were found, fixed and left
-  uncommitted while `bash evidence-kit/bin/run-validate.sh` was still mid-roster;
-  `installer_smoke` read `new-failures` on that round for exactly this reason,
-  clean on the next round once the fixes were committed to a clean tree first.
-  **The fix is ordering, not tooling:** land an in-session repair (commit it) the
-  moment it is decided, before kicking off — or resuming — a suite roster that
-  includes a worktree-cleanliness assertion against the real checkout, rather
-  than batching commits for later. Cheap to avoid, easy to misdiagnose as a
-  build regression if the suite's own failure text is trusted over a `git status`
-  check of the session's own state at that moment.

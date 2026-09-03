@@ -2,3 +2,5 @@
 # lesson-disposition v1 — one line per dispositioned Lessons entry, close-triage-written:
 # <iteration> lesson <rule <file> | task <slug> | harvest <tag> | discard <reason>> — <lead-line prefix>
 
+declaration-install-and-stage-helper-cuts lesson rule lifecycle-kit/templates/stages/validate.md — **validate-repairs-before-the-worktree-check-suite**
+declaration-install-and-stage-helper-cuts lesson task worktree-cleanliness-assertion-scopes-to-checkout — **validate-repairs-before-the-worktree-check-suite**
