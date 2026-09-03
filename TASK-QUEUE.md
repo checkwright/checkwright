@@ -9604,6 +9604,4 @@
 
 ## Done
 
-- windows-manifest-hash-diagnostic
-
 ## Lessons Learned
