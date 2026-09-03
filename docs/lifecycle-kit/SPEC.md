@@ -172,7 +172,8 @@ the relay states the facts (`templates/lead.md`), the landing session records
 them here.
 
 The **deterministic half** of that first step — read the iteration from the
-header, read the id from `session-id.sh`, append the stamp — is mechanized by
+header, read the id from the `--emit-session-id` arm, append the stamp — is
+mechanized by
 `bin/enter-stage.sh <stage>`, the same
 writer/asserter split as `gen-pre-commit.sh` ↔ `check-graph`: the skill
 invokes it, **judgment stays in the skill** (what the stage means, its exit
@@ -213,8 +214,8 @@ its own section.
 **Honest limit:** a stamp proves the stage skill was *invoked*, not that its
 work was done faithfully — strictly better than skip-and-no-trace, but not
 proof of done. The `<session-id>` field is **read, not hand-picked**:
-`bin/session-id.sh` prints the canonical id by a fixed derivation order
-(§bin/session-id.sh), which rotates per session (including across a context
+the `--emit-session-id` arm prints the canonical id by a fixed derivation
+order (§bin/session-id.sh), which rotates per session (including across a context
 clear), and the stage skills stamp exactly what it prints, so each stage's
 provenance is observed, not guessed.
 `check-stage-evidence`'s invocation floor keys on `<iteration> <stage>`; it
@@ -522,7 +523,9 @@ the clause's reader is a human or agent rather than a gate.
   stamp files, defaulting through gate-sdk's `GATE_SDK_QUEUE_FILE` /
   `GATE_SDK_WORKFLOW_DIR`.
 - `LIFECYCLE_KIT_SESSION_ID` — the harness-neutral stamp-id override, source 1
-  of the derivation order (§bin/session-id.sh); default unset.
+  of the derivation order (§bin/session-id.sh); default unset. Read from the
+  process environment: the arm that reads it declares no knob roster, so this
+  name does not cross the config bridge.
 - `LIFECYCLE_KIT_SESSION_BOUNDARY` — `stage` or `iteration`; default `stage`.
   The knob lives on the session-span/evidence axis only (ruled; no role
   values): manual-versus-lead is the driver/role axis and rides context-kit's
@@ -1781,6 +1784,16 @@ gate structure (gate-sdk's `lib/gate.sh` rule).
 ### bin/session-id.sh
 
 Prints the canonical stamp id so a stage skill reads it rather than guessing.
+**The member is the gate binary's `--emit-session-id` arm**, reached through the
+generic composer as `bash gate-sdk/bin/run-gates.sh --emit session-id`. **The
+heading is a section name, not a file name** — no `.sh` driver stands behind it,
+and it keeps this spelling because the citations pointing here resolve against
+it. It is not a gate — no
+`gates.list` row, no `.gate` descriptor, no fixture pair — but a bridged-arm
+table member (gate-sdk/SPEC.md §The non-gate arm), whose contract is a
+**document**: one normalized id on stdout and exit 0, or a diagnostic on stderr
+and exit 2.
+
 The id derives by a fixed source order, first hit wins, every source ending in
 the same normalization — strip a leading `agent-` token if present, then take
 the first 8 characters:
@@ -1828,25 +1841,76 @@ the first 8 characters:
    correctness break, unchanged from the prior trusting behavior). An absent dir
    or transcript exits 2.
 
-Not a gate — a `bin/` helper invoked (now internally, by `enter-stage.sh`) for
-the `<session-id>` field; the stage skills reach it through `enter-stage.sh`
-rather than calling it directly.
+Invoked internally by `enter-stage.sh` for the `<session-id>` field; the stage
+skills reach it through `enter-stage.sh` rather than calling it themselves. The
+one session that calls it directly is a lead writing its own session-role marker
+(§templates/lead.md), which the front-end route serves.
 
-**The port disposition: owed, unblocked and takeable, and deferred once for want
-of a host — ruled 2026-09-03 by the operator, lead-relayed.** This member was
-selected as a stated-contract cut and dropped from
-`declaration-install-and-stage-helper-cuts` for a reason that is **not** a
-property of the file: nothing sequences it, no blocker stands, and the port is
-takeable whenever a cut carries it. What it lacked was a queue entry to pair its
-amendment with. gate-sdk/SPEC.md §Porting a gate to the binary substrate rules
-that a cut hosts either on the composer entry — which can carry exactly one
-`[spec:]` tag while it carries its `[roadmap:]` tag, an arithmetic that section
-states — or on an entry whose own text names the cut's subject as its blocker,
-and a sweep of the whole queue found **no entry naming this file at all**. Minting
-a host entry to satisfy a width constraint was weighed and refused. **Recorded
-here because the absence of a blocker is exactly what makes this deferral
-invisible**: a later composer reading this section must not infer from the delay
-that something sequences the member.
+**The declared knob roster is empty, and it must be.** `lib/stages.sh` defines
+neither `LIFECYCLE_KIT_SESSION_ID` nor `LIFECYCLE_KIT_SESSIONS_DIR`, and a
+bridged arm declaring a knob its owning kit's library does not define is the
+config bridge's undeclared-knob refusal (gate-sdk/SPEC.md §lib/gate.sh) — the
+arm would fail-close on every invocation. Table membership is nonetheless what
+makes the arm *reachable*, so the row exists with an empty roster, the second
+such member after `--emit-md-section`. Adding the two defaults to `lib/stages.sh`
+so the names could be declared is a **behaviour widening rather than a port** and
+was refused on that ground: the driver sourced no library, so neither name has
+ever resolved from a `LIFECYCLE_KIT_CONFIG_FILE`, and bridging one would make a
+config file start working that does not today.
+
+**Both names reach the arm anyway, and so do the harness's, because the bridge
+*adds* to the environment rather than replacing it.** `gate_command` and
+`exec_arm` both compose `env <resolved knobs> <binary> <arm>` (gate-sdk/SPEC.md
+§lib/gate.sh, §run-gates), never an `env -i`, so `LIFECYCLE_KIT_SESSION_ID`,
+`LIFECYCLE_KIT_SESSIONS_DIR`, `CLAUDE_CODE_SESSION_ID`,
+`CLAUDE_CODE_CHILD_SESSION`, `CLAUDE_CONFIG_DIR` and `HOME` reach it exactly as
+they reached the driver. §The non-gate arm's rule that *a default the deleted
+shell driver held inline moves into the owning kit's library in the same cut*
+does not bind here: its ground is a **declared** knob resolving empty through the
+bridge, and this arm declares none.
+
+**The process cwd is an input to source 3, so `enter-stage.sh` reaches the binary
+directly rather than through the front-end.** `bin/run-gates.sh` cds to the git
+toplevel before dispatch (gate-sdk/SPEC.md §run-gates), which would change the
+sessions-dir slug under any other cwd and turn a non-repository cwd from working
+into exit 2 — so the sole production caller invokes `gate_native_bin`'s
+`--emit-session-id` directly, which §The non-gate arm sanctions in as many words:
+what the class forbids is a second entry point into the emission path, not a
+caller. The front-end route stays available and is what `templates/lead.md` and
+the consumer smoke use, both standing at the repo root where the two agree.
+Pinning the sessions dir to the toplevel would be an *arguable repair* inside a
+port, and was refused as one. One spelling is load-bearing so a later rewrite
+does not silently change it: bash's `pwd` prints the **logical** path it carries
+in `PWD` where `std::env::current_dir()` returns the physical one, so the arm
+reads `PWD` where it is set and the crate's crosser answers otherwise.
+
+**The caller's absent-binary refusal is the port's one added surface.**
+`enter-stage.sh` reads the id before it dispatches any gate, so nothing else in
+that run would have reported an unbuilt binary first; it checks `gate_native_bin`
+is executable and refuses with the build command, in the shape §lib/gate.sh's own
+two readers use. Neither the derivation nor either exit status moved otherwise —
+the port was held against the deleted driver over the derivation order's five
+axes, all three refusal texts, a cross-tier mtime tie, a broken symlink, a
+dotfile and four cwd axes, with no difference in output or status.
+
+**The port disposition: taken 2026-09-03**, hosted on
+`native-gate-port-remaining-corpus`, which discharges the deferral this section
+recorded — the member was dropped once from
+`declaration-install-and-stage-helper-cuts` for want of a host rather than for
+any property of the file, and a host is all it ever needed. Exactly **one**
+`.claude/settings.json` allow entry named the deleted path, and the deleting
+commit carries its deletion — the count probed rather than assumed, per the
+2026-08-29 settings-grant carve-out on that entry. No grant is added: the
+post-port
+invocation is covered by the committed `Bash(bash gate-sdk/bin/run-gates.sh)`
+entries. The cut created no twin — the derivation sources no kit library, and
+the shell caller set emptied — so no parity oracle is owed.
+
+**One question this cut deliberately leaves open**, so a reader does not take the
+silence for a discharge: `LIFECYCLE_KIT_SESSION_ID` is documented on §Layout and
+configuration as a kit knob but is environment-only in practice, and whether it
+should become bridged or be redocumented is filed to the committed gap inbox
+rather than ruled here. It outlives the port in either direction.
 
 Two facts a session taking this cut should not re-derive. Its sole production
 caller is `bin/enter-stage.sh`, which resolves the id internally — but the kit's
@@ -1860,7 +1924,7 @@ settings-grant carve-out on `native-gate-port-remaining-corpus` is exercised
 ### bin/enter-stage.sh
 
 The deterministic writer for a stage transition: `enter-stage.sh <stage>`
-appends the invocation stamp, reading `session-id.sh` for
+appends the invocation stamp, reading the `--emit-session-id` arm for
 the id — never an argument, so the no-hand-picking rule rides into the tool.
 It is the **sole production writer of `<head>`** (§The state machine), read as
 `git rev-parse --short HEAD` in the state file's own work tree at the instant of

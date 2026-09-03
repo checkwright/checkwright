@@ -11,13 +11,13 @@ changes where a stage session's escalations land: at a live lead that can
 rule and resume it, instead of at a cold restart.
 
 **First step — record the session role.** Write `lead <id>` — `<id>` from
-`bash lifecycle-kit/bin/session-id.sh` — to the session-role marker
+`bash gate-sdk/bin/run-gates.sh --emit session-id` — to the session-role marker
 (`CONTEXT_KIT_SESSION_ROLE_FILE`, default
 `${GATE_SDK_TMP_DIR:-.tmp}/session-role`):
 
 ```bash
 mkdir -p "${GATE_SDK_TMP_DIR:-.tmp}" && \
-  echo "lead $(bash lifecycle-kit/bin/session-id.sh)" \
+  echo "lead $(bash gate-sdk/bin/run-gates.sh --emit session-id)" \
   > "${CONTEXT_KIT_SESSION_ROLE_FILE:-${GATE_SDK_TMP_DIR:-.tmp}/session-role}"
 ```
 

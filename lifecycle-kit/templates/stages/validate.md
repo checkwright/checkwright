@@ -8,7 +8,7 @@ held-constant red line carries the live task slug that blocks it>*.
 validate`: it appends `<iteration> validate <session-id> <date> <head>` to
 `.workflow/WORKFLOW-STATE.txt` (required by `check-stage-evidence`; the stamp
 proves invocation, not faithful execution), reading `<session-id>` from
-`bin/session-id.sh`
+the `--emit-session-id` arm
 (the newest transcript — never hand-picked), using `date +%F`. That stamp *is*
 the transition — the last stamp is the stage cursor, so nothing flips and no
 queue write is involved. Commit the stamp on its own — unless the

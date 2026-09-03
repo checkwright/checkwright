@@ -5,7 +5,7 @@ set -uo pipefail
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # shellcheck source=../lib/stages.sh
 source "$KIT/lib/stages.sh"
-# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the kit's bin/ layer depends on gate-sdk, declared at load rather than inside the one arm that dispatches a gate: this tool resolves check-stage-evidence through gate_command instead of by script path, and writing a second dispatch resolver here is the duplicate the substrate exists to remove
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the kit's bin/ layer depends on gate-sdk, declared at load rather than inside the one arm that dispatches a gate: this tool resolves check-stage-evidence through gate_command and the session id through gate_native_bin's --emit-session-id arm instead of by script path, and writing a second dispatch resolver here is the duplicate the substrate exists to remove
 SDK="${GATE_SDK_ROOT:-$KIT/../gate-sdk}"
 # shellcheck source=../../gate-sdk/lib/gate.sh
 source "$SDK/lib/gate.sh"
@@ -287,7 +287,13 @@ else
     stamp_iter="$cur_iter"
 fi
 
-if ! id="$(bash "$KIT/bin/session-id.sh")"; then
+# spec: lifecycle-kit/SPEC.md §bin/session-id.sh — the arm is reached through gate_native_bin rather than through bin/run-gates.sh, because that front-end cds to the git toplevel before dispatch and the process cwd is an input to source 3's default sessions dir; gate-sdk/SPEC.md §The non-gate arm sanctions a caller, forbidding only a second entry point into the emission path
+SID_BIN="$(gate_native_bin)"
+if [[ ! -x "$SID_BIN" ]]; then
+    echo "enter-stage: the session id comes from the native binary, but $SID_BIN is absent or not executable — nothing written. Build it: bash gate-sdk/bin/build-native.sh" >&2
+    exit 2
+fi
+if ! id="$("$SID_BIN" --emit-session-id)"; then
     echo "enter-stage: could not read the session id (see above) — nothing written." >&2
     exit 2
 fi

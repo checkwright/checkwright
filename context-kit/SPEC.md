@@ -296,7 +296,7 @@ off the lifecycle stage cursor, which says nothing about whether the
 role signal a lead draws executor-facing craft rules at every hook fire
 (startup, plus each compact/resume re-fire, the recurring cost). The signal
 is a marker file, **session-id-scoped**: `/lead`'s first step writes one line
-`lead <id>` — `<id>` being `session-id.sh`'s value — to
+`lead <id>` — `<id>` being the `--emit-session-id` arm's value — to
 `CONTEXT_KIT_SESSION_ROLE_FILE` (gitignored scratch, default
 `${GATE_SDK_TMP_DIR:-.tmp}/session-role`). The hook treats the session as
 `lead` only when the marker's id equals the 8-char prefix of **its own
@@ -325,7 +325,7 @@ behavior; the marker's lifetime is the **lead session's, not the iteration's**,
 so a consumer boundary ritual that wipes gitignored scratch (a scope
 evidence-reset, say) must spare the marker file — a lead outliving an iteration
 boundary otherwise reverts silently to absent-signal behavior until it rewrites
-it; and the producer inherits `session-id.sh`'s
+it; and the producer inherits the `--emit-session-id` arm's
 `CLAUDE_CODE_SESSION_ID` dependency — unset, the newest-transcript fallback
 in a lead with live subagents returns an `agent-` prefix the payload can
 never match, and the signal silently no-ops to absent-signal behavior (the
@@ -337,14 +337,14 @@ precedence rule to spec and gate, for a gap one hook fire wide).
 
 **Ruled out — lifecycle stamp-id injection.** The hook payload carries the
 harness session id, and **in a top-level session** its 8-char prefix equals
-what lifecycle-kit's `session-id.sh` computes, so the hook *could* inject the
+what lifecycle-kit's `--emit-session-id` arm computes, so the hook *could* inject the
 canonical stamp id with no shell-out. The parity is top-level-only and holds
 only while the harness sets `CLAUDE_CODE_SESSION_ID`: a subagent is handed its
-*parent's* id in that variable, while `session-id.sh` deliberately derives the
+*parent's* id in that variable, while the arm deliberately derives the
 subagent's own transcript id instead (its `CLAUDE_CODE_CHILD_SESSION` branch),
 so the two quantities diverge there by design. The hook does not inject: lifecycle-kit owns its id derivation
-end-to-end (the stage-entry ritual derives it via `session-id.sh`,
-whatever invokes that script), and having the stage skills
+end-to-end (the stage-entry ritual derives it via `--emit-session-id`,
+whatever invokes that arm), and having the stage skills
 read a context-kit-injected value would wire an upstream kit's protocol to
 a downstream kit's hook for ergonomics only — the trust model gains
 nothing, since `check-stage-evidence` already enforces that the stamped id

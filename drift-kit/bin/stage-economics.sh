@@ -42,7 +42,7 @@ sessions_dir() {
     printf '%s/projects/%s\n' "$home" "$slug"
 }
 
-normalize8() {                 # lifecycle's session-id.sh normalization: strip a leading agent-, take the first 8 chars
+normalize8() {                 # lifecycle's --emit-session-id normalization: strip a leading agent-, take the first 8 chars
     local id="${1#agent-}"
     printf '%s' "${id:0:8}"
 }

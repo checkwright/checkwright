@@ -6,7 +6,7 @@ lessons promoted first).
 close`: it appends `<iteration> close <session-id> <date> <head>` to
 `.workflow/WORKFLOW-STATE.txt` (required by `check-stage-evidence`; the stamp
 proves invocation, not faithful execution), reading `<session-id>` from
-`bin/session-id.sh`
+the `--emit-session-id` arm
 (the newest transcript — never hand-picked), using `date +%F`, and refusing
 (writing nothing) if `check-stage-entry` is red. On a refusal, **do not force
 the entry** — escalate to the lead (where one exists and this is not a standalone

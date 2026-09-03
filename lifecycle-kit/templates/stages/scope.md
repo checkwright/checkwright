@@ -14,8 +14,8 @@ to its header (dropping the prior iteration's stamps — git history is the
 permanent audit trail; the gates only ever read the current iteration), stamps
 `— scope <session-id> <date> <head>` under the unnamed-iteration sentinel, and sets
 the queue header to `## Iteration: —`. It reads `<session-id>`
-from `bin/session-id.sh` itself (the newest transcript — never hand-picked),
-uses `date +%F`, and refuses (writing nothing) if `check-stage-entry` is red.
+from the `--emit-session-id` arm itself (the newest transcript — never
+hand-picked), uses `date +%F`, and refuses (writing nothing) if `check-stage-entry` is red.
 On a refusal, **do not force the entry** — escalate to the lead (where one
 exists and this is not a standalone session) and stop; a refused entry is a gate
 verdict to resolve at its source, never to override.

@@ -124,7 +124,16 @@ bash lifecycle-kit/bin/file-gap.sh "<gap>"             # route a work-shaped fin
 bash gate-sdk/bin/run-gates.sh --install-lifecycle    # (re)write the registration and merge-attribute blocks
 bash gate-sdk/bin/run-gates.sh --emit file-survey "<question>" "<corpus>" "<oracle>" "<edges>" "<finding>"
 bash gate-sdk/bin/run-gates.sh --emit cite-survey "<heading-substring>"   # one carried survey, inline-ready
+bash gate-sdk/bin/run-gates.sh --emit session-id                       # the canonical stamp id, by the derivation order
 ```
+
+`--emit session-id` is [SPEC.md](SPEC.md) §bin/session-id.sh's derivation order,
+which `enter-stage.sh` reads for you: reach for it directly only where a session
+writes an id itself, as `templates/lead.md`'s session-role marker step does. It
+takes no argument and resolves no knob. **The front-end route reads the cwd
+`bin/run-gates.sh` cds to** — the git toplevel — so a caller standing elsewhere
+whose sessions dir is the cwd-slugged default invokes the binary's
+`--emit-session-id` arm directly instead, which is what `enter-stage.sh` does.
 
 The two survey arms are the capture and citation affordances of
 [SPEC.md](SPEC.md) §The survey record, reached through gate-sdk's battery

@@ -338,9 +338,8 @@ printf "LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE='^held by pid ([0-9]+)\$'\n" > "$ma/l
     || { echo "smoke(install-lifecycle): a configured lock-reason pattern aborted the installer" >&2; exit 1; }
 
 # spec: lifecycle-kit/SPEC.md §bin/session-id.sh — the derivation order: env-first, agent- strip, widened + child-narrowed subagents scan (advisory tool, no fixture pair)
-SID="$SMOKE_KIT_ROOT/bin/session-id.sh"
 sid="$es/sid"; mkdir -p "$sid"
-sid_run() { env -u CLAUDE_CODE_SESSION_ID -u CLAUDE_CODE_CHILD_SESSION -u LIFECYCLE_KIT_SESSION_ID -u LIFECYCLE_KIT_SESSIONS_DIR "$@" bash "$SID"; }
+sid_run() { env -u CLAUDE_CODE_SESSION_ID -u CLAUDE_CODE_CHILD_SESSION -u LIFECYCLE_KIT_SESSION_ID -u LIFECYCLE_KIT_SESSIONS_DIR "$@" bash "$SDK/bin/run-gates.sh" --emit session-id; }
 
 o="$(sid_run LIFECYCLE_KIT_SESSION_ID=agent-deadbeefcafe0000)"           # source 1, agent- strip
 [[ "$o" == "deadbeef" ]] || { echo "smoke(session-id): override did not strip agent- (got '$o')" >&2; exit 1; }

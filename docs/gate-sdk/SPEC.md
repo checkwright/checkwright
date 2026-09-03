@@ -2167,7 +2167,9 @@ name out of `gates::REGISTRY`. It also carries arms that are **not** gates —
 `--emit-md-section` and `--emit-pub-index`, context-kit's three index-first
 reading tools, plus `--emit-file-survey` and `--emit-cite-survey`, lifecycle-kit's
 two survey-record affordances, its 2026-09-01 ones; `--emit-stage-rules`,
-doctrine-kit's craft-rule router, its 2026-09-03 one), the **harness-integration**
+doctrine-kit's craft-rule router, and `--emit-session-id`, lifecycle-kit's stamp-id
+derivation (lifecycle-kit/SPEC.md §bin/session-id.sh), its 2026-09-03 ones), the
+**harness-integration**
 arms below it, and the bridged `Arm::Run` members that are neither —
 `--lesson-sink` (queue-kit/SPEC.md §The lesson-sink arm), `--upgrade-smoke`
 (§upgrade-smoke) and `--install-lifecycle` (lifecycle-kit/SPEC.md
@@ -2399,6 +2401,17 @@ Table membership is what makes the arm **reachable at all**: the front-end's
 (context-kit/SPEC.md §Index-first reading) is the first such member — it resolves
 no knob and must not mint one — and it is recorded so the next reader does not
 read its empty slice as an omission.
+
+**`--emit-session-id` is the second, and it turns *happens to read nothing* into
+*may not declare anything*, which is the stronger form.** Its two candidate names
+(lifecycle-kit/SPEC.md §bin/session-id.sh) are read straight off the process
+environment and are defined in **no** kit library, so declaring either would meet
+the undeclared-knob refusal (§lib/gate.sh) and fail-close the arm on every
+invocation. Defining them so they could be declared is a behaviour widening
+rather than a port, which is a thing a faithful port may not take on its own
+authority. The pair is what makes the class's shape legible: an empty roster is
+not always a member with no configuration, and where it is the second kind, the
+row is the *only* reachable spelling.
 
 **A default the deleted shell driver held inline moves into the owning kit's
 library in the same cut that deletes the driver, never after.** The bridge
