@@ -33,6 +33,15 @@ never a ranking of it". Recorded here rather than at build, and reported to the
 lead in the same session, because it moves what "fill the window"
 (gate-sdk/SPEC.md:4343-4353) costs on this cut.
 
+**What that does and does not do to the sizing ruling, filed precisely because the
+loose filing is the tempting one.** The ruling that a single-section cut
+**under-fills lawfully** is **not overturned and was not needed**: its conclusion —
+lawful — is untouched, and what the evidence moves is only the premise scope it was
+offered under. It was conditional relief this cut turned out not to require. A
+later reader recording it as *the sizing ruling was wrong* would be mis-filing it.
+The refusal of a second host is **reinforced** rather than weakened: with the window
+full, no second cut is wanted and none is minted.
+
 ## What changes
 
 ### (1) The cut is the one owed file declaring this section, and the residue is stated rather than implied
@@ -340,20 +349,37 @@ contract rules at gate-sdk/SPEC.md:795-797 that none does, which is how the
 violation survived unremarked.
 
 So the ported arm **refuses an unrecognized `-`-prefixed argument with usage on
-stderr at exit 2**, and `--` ends option processing. This is conformance to a
-contract that already binds this file, not a new behaviour the port invents: no
-governed sentence asserts that an unknown flag is a log path, and the section's own
-prose demands the opposite.
+stderr at exit 2**, and `--` ends option processing.
 
-**It does extend the crossing clause, and that is recorded rather than slipped
-through.** gate-sdk/SPEC.md:786-793 argues the shape half outlives a member's port
-because "the refusal exists because free text reaches a *capture*", and names three
-capture members as its instances. This is the first **reader** to take it. The
-ground is available and is stronger here than the capture ground, not weaker: a
-capture's defect writes a bad line into a surface a human later reads, while a
-reader's writes a wrong number into a trend nothing reviews. Delta stated at
-gate-sdk/SPEC.md §The bin/-tool contract, which is why this amendment's component
-set is three.
+**This is conformance to a rule already in force, not a new behaviour the port
+invents**, and the sentence that settles it is the contract's own: "But it binds
+on **every free-text tool**, because the help half is discoverability and its cost
+is measured too" (gate-sdk/SPEC.md:775-776). The capture emphasis one clause
+earlier — "so the rule binds hardest there" — says where the rule binds *hardest*,
+never where it binds *at all*. `bin/scan-prompts.sh` takes a free-text positional,
+so the contract binds it **today** and the file is in violation **today**: no `-h`
+arm, no `-`-prefix refusal, and `:18`'s `*) LOG="$1"` absorbing whatever it is
+handed. Reading the rule as capture-scoped is the error to avoid here, and it is
+the first one a session reaching for this clause makes.
+
+**The gate-sdk edit is a correction to a grounds sentence, not a widening of the
+rule.** The crossing clause at gate-sdk/SPEC.md:786-793 states its grounds in
+capture terms — "the refusal exists because free text reaches a *capture*" — which
+is **narrower than the rule at :775-776 that it makes cross**. Read as written the
+clause has the rule bind a free-text *reader*'s shell file and then retire at that
+file's port, which is precisely the reading `:787` already names as "the wrong
+reading". Extending the clause to a reader therefore removes an inconsistency the
+section carries against itself rather than granting reach it did not have. That is
+why this delta touches gate-sdk at all, and it is one of the three components the
+amendment's set counts.
+
+**Both alternatives were weighed and refused.** A note without clause force
+reproduces the retiring-with-the-file ambiguity `:787` was written against. And
+reproducing the absorb faithfully would knowingly carry a silent-plausible-number
+defect into a compiled arm, in the one file whose own SPEC calls that failure mode
+the worst an instrument has — the argv loop that *fixed* the `--count <path>`
+ordering bug being the same loop whose `*)` arm now swallows a typo of the flag
+that fix was about.
 
 The `-h`/`--help` half does **not** cross — it retires to the front-end with the
 rest of the class, so `--emit scan-prompts --help` is a refusal.
