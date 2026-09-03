@@ -193,11 +193,13 @@ reader rather than by a second refusal path.
   command-roster line, both `bash lifecycle-kit/bin/install-lifecycle.sh` in
   invocation position. `check-docs-cmd` **assertion A** reds on these the moment
   the file goes, so they are forced rather than optional.
-- **`lifecycle-kit/SPEC.md`**, six further sites beyond §bin/install-lifecycle.sh
+- **`lifecycle-kit/SPEC.md`**, seven further sites beyond §bin/install-lifecycle.sh
   itself: §Layout and configuration's knob bullet, §Multi-operator semantics,
   the `install-hooks.sh` opt-in-class paragraph, §check-merge-attrs' writer
-  attribution, and §lib/stages.sh's two renderer paragraphs — each naming
-  `bin/install-lifecycle.sh` as the writer. The *role* survives and the *name*
+  attribution, §lib/stages.sh's two renderer paragraphs, and §lib/stages.sh's
+  `set -e` caller sentence, which names the installer by path for a different
+  reason (the probe-loader's abort-on-source contract, not the writer role) —
+  each naming `bin/install-lifecycle.sh`. The *role* survives and the *name*
   changes; each is re-pointed at the arm.
 - **`gate-sdk/SPEC.md` §lib/inject.sh**, the three-sourcer roster (delta 5).
 - **`lifecycle-kit/lib/stages.sh`**, the two renderer `# spec:` comments naming
@@ -460,8 +462,8 @@ learns it.
 - `gate-sdk/SPEC.md §lib/inject.sh` — the sourcer roster goes from three to two,
   and the library stays owed and unblocked-by-nothing (delta 5).
 - `gate-sdk/SPEC.md §The non-gate arm` — the class roster gains
-  `--install-lifecycle`; the `--install <op>` refusal is recorded as the second
-  worked instance of a member declining that family, and the argv distinguishing
+  `--install-lifecycle`; the `--install <op>` refusal is recorded as a worked
+  instance of a member declining that family, and the argv distinguishing
   test gains a *ports unchanged* answer beside its two deletions (deltas 2 and 3).
 - `gate-sdk/bin/run-gates.sh` and its `--help` text — the new front-end arm and
   its usage line, the class's stated home for a bridged arm's usage (deltas 2
@@ -474,8 +476,8 @@ learns it.
 - `TASK-QUEUE.md`, the `kit-library-port-residue` entry — gains this amendment's
   `[spec:]` ref **beside** cut A's, at 96 columns with its trailing prose
   reflowed; at build its `inject.sh` paragraph goes from three sourcers to two.
-  It **demotes** at build rather than reaching `## Done`, inside one line of
-  headroom (deltas 5 and 11).
+  It **demotes** at build rather than reaching `## Done`, at zero headroom
+  (deltas 5 and 11).
 
 <!-- update-target-exempt: the composer entry takes no body write from a cut by its own 2026-08-28 ruling — each closed cut's record lives in the contract section that cut selected, which is delta 1's section; its lead line already carries the sibling cut's ref -->
 - `TASK-QUEUE.md`, `native-gate-port-remaining-corpus`'s body — deliberately

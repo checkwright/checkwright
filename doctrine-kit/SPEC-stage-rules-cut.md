@@ -223,7 +223,7 @@ gate.
 - **`context-kit/SPEC.md §Layout and configuration`** — the knob bullet's
   "**path** to a stage→craft-rule pointer emitter" becomes the widened command
   contract, with delta (4)'s honest limit stated on it.
-- **`doctrine-kit/README.md`** and **`docs/doctrine-kit/index.md`** — each carries
+- **`doctrine-kit/README.md`** and **`docs/doctrine-kit/README.md`** — each carries
   the invocation as copy-pasteable text; `check-docs-cmd` assertion A is the reader
   that reds on a repo-relative `.sh` path in invocation position resolving to no
   tracked file, so these are forced rather than optional.
@@ -273,7 +273,7 @@ the default branch is not a leftover here; it is the only branch that applies.
 
 - **The lead line fits.** The entry's fixed lead-line part is 66 columns and
   `check-queue-wrap`'s floor is 100; a tag costs `9 + len(basename)`, and
-  `SPEC-stage-rules-cut.md` is 22, for 97 columns.
+  `SPEC-stage-rules-cut.md` is 23, for 98 columns.
 - **The `ruled:` line is already there and costs nothing.** The entry carries
   `ruled: native-gate-port-remaining-corpus operator 2026-09-03 lead-relay`, landed
   with this iteration's three earlier rulings; the unit-set ruling this promotion
@@ -335,7 +335,7 @@ reaches for.
 - **`check-docs-cmd` assertion A** — reds on a repo-relative `.sh` path in
   invocation position inside a fence in a governed doc that resolves to no tracked
   file. **Not monotone**: the deletion *adds* violations, at `doctrine-kit/README.md`
-  and `docs/doctrine-kit/index.md`. Cleared by delta (9), in the same commit.
+  and `docs/doctrine-kit/README.md`. Cleared by delta (9), in the same commit.
 - **`check-docs-cmd` assertion B** and **`check-kit-ref-liveness` leg (b)** — each
   reds on a kit-prefixed ALL-CAPS token occurring in no tracked kit code, the
   second over every tracked file. **Clear**: this cut moves no knob default, and
@@ -420,7 +420,7 @@ not the one that learns it.
 - `scripts/session-context.sh` and `context-kit/templates/session-context.sh` — the
   invocation shape in both copies and the default in the consumer's, edited together
   because `check-template-copy-parity` reads them as a pair (deltas 4 and 9).
-- `doctrine-kit/README.md` and `docs/doctrine-kit/index.md` — the copy-pasteable
+- `doctrine-kit/README.md` and `docs/doctrine-kit/README.md` — the copy-pasteable
   invocation, forced by `check-docs-cmd` assertion A rather than optional (delta 9).
 - `gate-sdk/SPEC.md §The non-gate arm` — the bridged-arm roster gains
   `--emit-stage-rules`; no ruling changes, and the `Arm::Emit`-versus-`Arm::Run`
