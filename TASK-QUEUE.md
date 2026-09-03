@@ -9375,3 +9375,23 @@
 
 ## Lessons Learned
 
+- **validate-repairs-before-the-worktree-check-suite** — a validate session that
+  finds and fixes a prose/queue defect mid-run, then keeps the fix staged or
+  uncommitted while the evidence spine still has suites left to run, buys a
+  false red rather than a clean one. `installer/consumer-smoke/run-smoke.sh`'s
+  build leg asserts `git -C "$REPO" status --porcelain` is empty **against the
+  real checkout**, not a scratch clone — so any session's own in-progress repair
+  reads as "the build leg left the worktree dirty" and the suite reports
+  `new-failures` for a reason that has nothing to do with the build.
+  **Attested this iteration, at validate for `declaration-install-and-stage-helper-cuts`.**
+  Two repairs (a stale oracle-column claim in `lifecycle-kit/SPEC.md`
+  §lib/stages.sh, a doubly-deleted-file queue entry) were found, fixed and left
+  uncommitted while `bash evidence-kit/bin/run-validate.sh` was still mid-roster;
+  `installer_smoke` read `new-failures` on that round for exactly this reason,
+  clean on the next round once the fixes were committed to a clean tree first.
+  **The fix is ordering, not tooling:** land an in-session repair (commit it) the
+  moment it is decided, before kicking off — or resuming — a suite roster that
+  includes a worktree-cleanliness assertion against the real checkout, rather
+  than batching commits for later. Cheap to avoid, easy to misdiagnose as a
+  build regression if the suite's own failure text is trusted over a `git status`
+  check of the session's own state at that moment.
