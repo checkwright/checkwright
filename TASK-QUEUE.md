@@ -2695,8 +2695,8 @@
   specific reminder is expected after a self-revert and does not countermand its brief;
   cheap, but it does not remove the surface. Not gateable: nothing about it enters the
   tracked tree.
-  **Related to `fork-dispatch-prohibition`** — both are cases where a dispatched agent's
-  authority is narrower than what some in-context text invites it to do.
+  **Related to `fork-dispatch-prohibition`, retired** — both are cases where a dispatched
+  agent's authority is narrower than what some in-context text invites it to do.
   **Why `[design-pending]`:** (1) is the real fix and it is not free — a scratch-copy
   falsifiability harness has to reproduce enough of the build to make the mutation
   meaningful, and whether that lives in the crate's own test tooling or in the gate-test
@@ -4152,10 +4152,10 @@
   "Twelve instances" to "Thirteen instances": in the manifest corpus that one word would have moved
   the claim from **inside** the matcher's reach to **outside** it. It happened in the queue, which
   no count gate scans, so nothing could have caught it — the two discontinuities composing.
-  **DISTINCT from `spec-measured-count-gate`, deliberately not folded into it as grounds.** That
-  entry's thesis is that measured counts **go stale** because nothing derives them; this is that
-  notation and corpus decide whether an existing oracle **reaches** a claim at all. A count can be
-  perfectly current and unreachable, or stale and reachable, so neither closes the other. What is
+  **DISTINCT from `spec-measured-count-gate`, now `check-measured-claim`, and not folded into it
+  as grounds.** That entry's thesis was that measured counts **go stale** because nothing derives
+  them; this is that notation and corpus decide whether an oracle **reaches** a claim at all. A
+  count can be current and unreachable, or stale and reachable, so neither closes the other. What is
   true and kept: a digits convention is a genuine **precondition** that makes that entry's gate
   cheaper to build, since matching a digit run is trivial where matching spelled compounds is
   not. Recorded here rather than lost — but a precondition is not the same defect.
@@ -5122,8 +5122,8 @@
   `native/src/gates/tightened_gates_note_parity.rs` each hardcode a workflow-dir const while
   `native/src/emit/upgrade_smoke.rs` resolves the same file through `GATE_SDK_WORKFLOW_DIR`, a
   knob it declares. The tenth cohort's three members declare no knobs, so nothing fails yet.
-  **DISTINCT from `consumer-gate-port-disposition`, which it cites rather than re-files.** That
-  entry owns the *declaration* question — the owner column and the conservation row, authored
+  **DISTINCT from `consumer-gate-port-disposition`, landed, which it cites rather than re-files.**
+  That entry owned the *declaration* question — the owner column and conservation row, authored
   this iteration — and this owns the *dispatch* question, which that amendment names and
   deliberately leaves unanswered because no member of its first tranche declares a knob.
   **Why `[design-pending]`:** three candidates trade off. Add the consumer config seam to the
@@ -5156,8 +5156,8 @@
   human-readable document names the gate, which is exactly what the marker block buys.
   **Pre-existing rather than opened by the tenth cohort's port** — measured while surveying that
   port's readers, and unchanged by it in either direction.
-  **DISTINCT from `consumer-gate-port-disposition`, which owns porting these gates and not their
-  documentation coverage.** Porting all thirteen would leave this exactly where it is: the corpus
+  **DISTINCT from `consumer-gate-port-disposition`, landed, which owned porting these gates and
+  not their documentation coverage.** Porting all thirteen would leave this where it is: the corpus
   predicate is the kit root, not the substrate, so a ported consumer gate is as unrostered as a
   shell one.
   **Why `[design-pending]`:** the roster's home is the open question, and it is a seam question.
@@ -5412,8 +5412,8 @@
   *added by this same iteration*, weeks-fresh, and falsified by the same iteration's later
   commits (`bd8ef299`, `97b65bdb`, `047c7426`) that landed the unit and moved the slug to
   `## Done`. A reader arrives at a settled question dressed as an open one.
-  **DISTINCT from `dead-queue-citation-report`**, and deliberately not folded into it: that
-  entry's corpus is the queue's own bodies and its subject is a slug resolving *nowhere*. This
+  **DISTINCT from `dead-queue-citation-report`, shipped**, and not folded into it: that entry's
+  corpus was the queue's own bodies and its subject a slug resolving *nowhere*. This
   one's corpus is governed SPEC prose and its subject is a slug resolving in `## Done` — live,
   findable, and closed. Different scan, different reader, different remedy.
   **Why `[design-pending]`:** the tempting form is a red, and a red is wrong for the same
@@ -6258,8 +6258,8 @@
   scan — narrower, and matching the widening already ruled for
   `deferred-pool-identifier-restatement-sweep` over the same pool and for the same rot-window
   reason.
-  **DISTINCT from `installer-init-noop-regen-conflict`**, which owns an installer no-op defect and
-  is only the entry this class was caught inside.
+  **DISTINCT from `installer-init-noop-regen-conflict`, landed**, which owned an installer no-op
+  defect and was only the entry this class was caught inside.
   **Cost while deferred:** every promotion, drain and audit reading the pool prices a dated claim
   against the wrong iteration, and the error is invisible — the sentence stays grammatical and
   stays plausible.

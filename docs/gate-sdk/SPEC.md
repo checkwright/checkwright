@@ -2438,6 +2438,13 @@ contract while the discoverability half moves to where the class already keeps i
 third free-text capture members, which is what turns the sentence above from a
 worked example into a rule with three instances.
 
+**Seeding a capture surface is the arm's own obligation and never the shared
+append's.** A member whose surface may legitimately be absent — an inbox
+truncated at a close, a log no consumer has written yet — creates it and writes
+its contract header itself; nothing these members share does that for them. So a
+port taking its shape from a sibling arm inherits the omission along with the
+shape, which is the one thing about this family that reads off no sibling.
+
 **A member may join the table with an *empty* declared roster, and that is the
 sentence the class did not yet hold.** The forced-family test above answers for a
 member that reads *something*; it says nothing about one that reads nothing, and
