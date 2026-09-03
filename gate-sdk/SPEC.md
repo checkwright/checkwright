@@ -2156,14 +2156,16 @@ re-deciding, and only the operator reopens a closed ruling.
 The binary is a multi-call binary whose *gate* subcommands are dispatched by
 name out of `gates::REGISTRY`. It also carries arms that are **not** gates —
 `--list`, `--reads`, `--needs`, `--knobs`, `--source-stamp`, `--queue-parity`,
-`--evidence-lib-parity` and `--install`, plus the
+`--evidence-lib-parity`, `--toolfloor-parity` and `--install`, plus the
 `--emit-` family the bridged-arm table keys (`--emit-queue-counts` and
 `--emit-queue-edges` are its 2026-08-31 members; `--emit-md-index`,
 `--emit-md-section` and `--emit-pub-index`, context-kit's three index-first
 reading tools, plus `--emit-file-survey` and `--emit-cite-survey`, lifecycle-kit's
 two survey-record affordances, its 2026-09-01 ones; `--emit-stage-rules`,
-doctrine-kit's craft-rule router, and `--emit-session-id`, lifecycle-kit's stamp-id
-derivation (lifecycle-kit/SPEC.md §bin/session-id.sh), its 2026-09-03 ones), the
+doctrine-kit's craft-rule router, `--emit-session-id`, lifecycle-kit's stamp-id
+derivation (lifecycle-kit/SPEC.md §bin/session-id.sh), and `--emit-env-probe`,
+context-kit's machine-profile derivation (context-kit/SPEC.md §bin/env-probe),
+its 2026-09-03 ones), the
 **harness-integration**
 arms below it, and the bridged `Arm::Run` members that are neither —
 `--lesson-sink` (queue-kit/SPEC.md §The lesson-sink arm), `--upgrade-smoke`
@@ -2196,8 +2198,10 @@ A **non-gate arm** is specified by three properties:
 - **It owes a named caller instead.** A gate's reader is the battery; a non-gate
   arm has to name the caller that reads its output and the transition where it
   is read, or it is dead weight. Every member above satisfies this —
-  `--source-stamp` is read by §check-gate-binary-fresh, `--queue-parity` and
-  `--evidence-lib-parity` by their parity harnesses — and stating it is what
+  `--source-stamp` is read by §check-gate-binary-fresh, `--queue-parity`,
+  `--evidence-lib-parity` and `--toolfloor-parity` by their parity harnesses (the
+  last holding context-kit's floor predicate to `lib/toolfloor.sh`, whose shell
+  caller is the installer's `doctor`) — and stating it is what
   stops the class becoming a place to park unreachable code. **A parity arm's
   caller is the second holder, so the arm retires with it**:
   `--declaration-parity` left this roster in the 2026-09-03 cut that deleted the
@@ -2248,6 +2252,11 @@ heaviest set in the class** and is named because a reader sizing the gap below
 should meet the worst case rather than infer it: `git`, `bash`, `cargo`, `tar` and
 floor utilities, the middle two off `GATE_SDK_PROGRAM_FLOOR` and both ruled a
 requirement on that suite rather than on an adopter (§upgrade-smoke).
+**`--emit-env-probe` is the class's first member whose set a consumer can
+change**, and it belongs beside that worst case for the same reason: `uname`,
+`date`, `sort`, and every element of a roster the consumer may shadow, since
+`PROBE_SET` lives in a file rather than in the crate (context-kit/SPEC.md
+§bin/env-probe).
 `grep -rn 'proc::' native/src/emit/` is the derivation; nothing maintains a
 list, and an enumeration written here would be one more thing to stale. This states
 the scope as it stands and rules nothing about whether it should: making arm
@@ -3493,6 +3502,23 @@ that answers each is the one whose corpus matches its question.
    pass for a hold. The lesson to carry forward is procedural: before taking this
    road, enumerate the shell callers of every helper the ported member touches,
    because the disposition turns on whether *that* set empties.
+
+   **The floor predicate is the fourth instance, and it is the first whose
+   surviving shell consumer sits *behind the install boundary* rather than in the
+   battery.** `context-kit/lib/toolfloor.sh`'s `tool_floor_parse` and
+   `tool_floor_check` gained compiled twins when the env-probe member ported
+   (context-kit/SPEC.md §bin/env-probe), and the caller that keeps the shell side
+   live is `installer/lib/doctor.sh`, reading its own **payload copy** of the
+   library rather than a tracked one. That placement matters to a later port
+   sizing this road: the caller-set enumeration this instance's predecessor
+   demands has to reach the installer's payload, where a grep over the tracked
+   battery would report an empty set and licence a deletion that breaks `init`.
+   The lane is `context-kit/gate-tests/toolfloor-parity.test.sh`, in the shape
+   the three above take. What it adds is an assertion no canned corpus can carry:
+   one arm of the verdict set is reachable only through an **environmental**
+   condition — a `sort` without `-V` — so the lane shims such a `sort` onto
+   `PATH` and requires both holders to answer `uncomparable`, which is what stops
+   the compiled holder quietly narrowing a fail-closed arm.
 
    **A dead twin is deleted, not held**, and the same enforcement-first ordering
    decides it: where a shell helper has no caller and its compiled counterpart is
@@ -8273,14 +8299,14 @@ functions over one notion of a well-formed block.
 **It is owed to the port, not dispositioned by §The kit-library port
 disposition.** It rides the bridge's `lib/*.sh` glob and resolves no knob, so
 that ruling's ground does not reach it; what sequences it instead is its sourcer
-set, every member of which is itself owed — **two of them since 2026-09-03**
-(`context-kit/bin/env-probe.sh`, `doctrine-kit/bin/install-doctrine.sh`), the
-third having ported at §bin/install-lifecycle.sh's cut. **Two remaining is not
-unblocked**: `env-probe.sh` sits behind the Windows leg and `install-doctrine.sh`
-behind the installer's behind-invoke relocation, each recorded in its own section,
-so this library is no more takeable than it was. Stated because a reader who
-remembers the three-sourcer roster will read the deletion of one as the discharge
-of the sequencing. The entry that owns the work is
+set, every member of which is itself owed — **one of them**,
+`doctrine-kit/bin/install-doctrine.sh`, the other two having ported at
+§bin/install-lifecycle.sh's cut and at context-kit/SPEC.md §bin/env-probe's.
+**One remaining is not unblocked**: `install-doctrine.sh` sits behind the
+installer's behind-invoke relocation, recorded in its own section, so this
+library is no more takeable than it was. Stated because a reader who
+remembers the three-sourcer roster will read the departure of two as the
+discharge of the sequencing. The entry that owns the work is
 `kit-library-port-residue`.
 
 **A compiled counterpart exists, and it is a divergence rather than a

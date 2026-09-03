@@ -187,6 +187,13 @@ reason the arms beside it are. No committed expected file — a maintained golde
 would be a third copy to drift, and the failure this exists to catch is one side
 edited without the other.
 
+**The shape has adopters outside this kit, and nothing about the rule changes
+for them.** context-kit's floor predicate took it when its env-probe member
+ported (context-kit/SPEC.md §bin/env-probe), reusing the *shape* — a canned
+corpus, classification compared, no committed golden — rather than any part of
+this kit's mechanism. Recorded so a reader meeting the second lane does not read
+it as a second copy of this rule; the rule has one home, and this is it.
+
 ### Baseline manifest
 
 Held-constant, edited by human commit only. It is a tracked checked projection

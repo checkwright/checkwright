@@ -275,8 +275,9 @@ Steps, in order:
    session `lead` — the craft rules are executor-facing.
 9. **Env profile** — when the consumer-local profile file
    (`CONTEXT_KIT_ENV_PROFILE_FILE`, §bin/env-probe) exists, the step first runs
-   `bin/env-probe.sh` to re-probe it (output suppressed so no status line
-   reaches the brief), then emits its whole body verbatim so the session adapts
+   `run-gates.sh --emit env-probe` to re-probe it (output suppressed so no
+   status line reaches the brief), then emits its whole body verbatim so the
+   session adapts
    its commands to the box as it is now. The re-probe sits inside the same
    file-present guard, so producer and consumer co-locate here and the probe
    never auto-seeds a profile the operator did not opt into. Silent when the
@@ -358,29 +359,54 @@ ships none.
 
 ## bin/env-probe
 
-`bin/env-probe.sh` derives a local machine profile so a session adapts to the
+The env-probe member derives a local machine profile so a session adapts to the
 box it runs on — package manager, toolchain versions, absent tools — without
 those machine facts ever landing in the public tree. It writes a
 marker-bounded generated block (`<!-- context-kit:env:begin -->` /
-`:end`, via gate-sdk's shared `inject_marker_block` helper) into the file named
+`:end`, via gate-sdk's shared marker-block writer) into the file named
 by `CONTEXT_KIT_ENV_PROFILE_FILE` (default `ENV.local.md`), replacing an
 existing block or appending a fresh one — but only when the probed content
 actually changed (Cadence, below), so the block's probe date marks the last
 real change, not the last run. The probed half is derivation-first — never
 hand-maintained.
 
+**How it is invoked, and its one knob.** It is a bridged non-gate arm
+(gate-sdk/SPEC.md §The non-gate arm) rather than a script: `--emit-env-probe`,
+reached by every caller as `run-gates.sh --emit env-probe`, so the front-end
+resolves its configuration and hands it over. It is an *action that reports* —
+it rewrites the block and prints one line naming what it did — and both its
+failures exit 2. Its declared knob roster is **`CONTEXT_KIT_ENV_PROFILE_FILE`
+and nothing else**: `lib/context.sh` defaults that name and is the config
+bridge's sole resolver for the family, so the value is computed in one place and
+no second default exists to drift. A hardcoded profile path would resolve
+`ENV.local.md` and silently ignore every consumer override, which is the failure
+gate-sdk/SPEC.md §The non-gate arm names as the difference between working and
+appearing to.
+
+**The marker test is whole-line, on both halves.** The presence test guarding
+the change-detection read and the writer's own test agree, so a marker occurring
+inside prose opens no block: gate-sdk/SPEC.md §lib/inject.sh rules that
+resolution, and this member carries it rather than the shell form's substring
+guard over a whole-line extraction — which reported a replacement it had not
+made.
+
 **What it probes.** OS/distro (`uname`, `/etc/os-release`); the package manager
 (first present of an ordered detection walk over the known managers); each
 roster member's version and its floor verdict (below); the absent-tools list
-(roster members `command -v` cannot resolve); and the below-contract list. The
-roster itself is owned by `lib/toolfloor.sh` and never restated here.
+(roster members `PATH` does not resolve); and the below-contract list. The
+roster itself is owned by `lib/toolfloor.sh` and never restated here. Its
+spawned programs are `uname`, `date`, `sort`, and every roster member it probes
+— the first arm of its class whose spawn set a consumer can change, since
+`PROBE_SET` is a file a consumer can shadow.
 
 **The roster and its floor axis (`lib/toolfloor.sh`).** The roster lives in a
-sourceable library rather than in the script, because `env-probe.sh` does its
-work on execution: a second reader cannot obtain the roster by running it, which
+sourceable library rather than in a member that does its work on execution: a
+reader cannot obtain the roster by running such a member, which
 is why the parity gate greps the array out of a file instead of sourcing it, and
 why a reader that runs before any consumer file exists — an installer's `doctor`
-reading its own payload copy — needs an owner it can source. The library defines
+reading its own payload copy — needs an owner it can source. The compiled holder
+below reads the same array as text, for the reason that gate does: a fixture path
+is untrusted input. The library defines
 the array `PROBE_SET` and the predicate below and executes nothing else. It
 carries no knob, deliberately: the roster is the kit's own dependency set, and a
 consumer who could override it could only make the contract lie.
@@ -411,7 +437,7 @@ reader re-implements that rule against a value set it does not own. A
 consumer-side reader — `installer/lib/doctor.sh`, whose exit status is `init`'s
 last precondition — filters its roster walk through that predicate and does not
 probe, render or fail on a member the predicate excludes. A contributor-side
-reader — `bin/env-probe.sh` — walks the roster whole and marks the audience
+reader — the env-probe arm — walks the roster whole and marks the audience
 instead, since a contributor-side floor is exactly what it is reporting on.
 The field is a grammar axis rather than a filter in the reader that needs it,
 because a hard-coded exception is a literal de-literalization forbids and one
@@ -500,6 +526,30 @@ the fail-closed arm: a banner the predicate cannot parse, or a `sort` without
 `-V`, is reported unverified and never silently as `ok` — the posture
 gate-sdk/SPEC.md §The gate model requires of a gate, applied to a probe that is
 not one.
+
+**The predicate has two holders, and a standing oracle is what licenses that.**
+`installer/lib/doctor.sh` calls the shell library off its own payload copy, so
+the shell caller set does not empty and the deletion road
+gate-sdk/SPEC.md §The port-candidate criteria prefers is unavailable; criterion
+6's *unless* clause applies instead, and what discharges it is an executed
+cross-substrate comparison in the shape evidence-kit/SPEC.md §lib/evidence.sh
+established. `gate-tests/toolfloor-parity.test.sh` drives one canned corpus of
+`(element, banner)` pairs through both holders and compares **classification** —
+the parse's four fields and the verdict's own words — with **no committed
+expected file**, because the failure it exists to catch is one holder edited
+without the other and a golden would be a third copy to drift. The existing
+golden is not retired: §Testing's `index-tests/toolfloor-cases.sh` remains the
+**shell** holder's own oracle, the one `installer/lib/doctor.sh` still runs.
+
+**`sort -V` is preserved in the compiled holder rather than replaced by a native
+comparison.** The `uncomparable` verdict is fail-closed for two conditions, and
+the second — a `sort` without `-V` — is one no in-process comparison can reach.
+Removing the spawn would narrow the verdict's reachable conditions on one holder
+while they stay live on the other, and the population that disagreement lands on
+is exactly the BSD or stock-macOS userland the verdict exists for. The parity
+lane asserts this directly rather than trusting the reading: it puts a `sort`
+that rejects `-V` on `PATH` and requires `uncomparable` from both holders, a
+condition a canned corpus cannot express.
 
 **The rendered verdict.** Each toolchain bullet carries the probed banner and,
 for a constrained member, the constraint and its verdict — `` (floor 4.3, ok) ``,
@@ -1015,7 +1065,6 @@ context-kit/
   lib/context.sh                 # sourced config loader + the kit's knob defaults; the config bridge sources it
   lib/toolfloor.sh               # sourceable owner: the probe roster + the floor predicate
   bin/always-loaded.sh
-  bin/env-probe.sh               # derives the marker-bounded local env profile
   bin/run-index-tests.sh         # expected-output runner for the index-first tools
   checks/check-brevity.gate      # hermetic, binary-dispatched: the budgeted section's over-budget pointer bullets
   checks/check-settings-pins.gate  # hermetic, binary-dispatched: pins hold against the settings file
@@ -1030,6 +1079,7 @@ context-kit/
   gate-tests/check-brevity.test.sh      # the unmatched-section axis the pair cannot hold
   gate-tests/check-memory-off.test.sh   # the local-override axis the pair cannot hold
   gate-tests/check-settings-pins.test.sh # the refusal axis the pair cannot hold
+  gate-tests/toolfloor-parity.test.sh   # the floor predicate's two holders, classification compared
   index-tests/                   # fixture corpus + expected outputs
   templates/session-context.sh   # consumer copy: marked consumer sections
   templates/settings-sessionstart.json
@@ -1058,9 +1108,9 @@ The install also seeds the committed baseline the footprint contract holds
 `always-loaded.sh --update-baseline` once to write
 `always-loaded-baseline.txt`, and `smoke/install.sh` asserts that step by
 running the meter and checking the baseline lands. Install also seeds the local
-env profile — `env-probe.sh` writes the first `ENV.local.md` block
-(§bin/env-probe); being an operator-local, gitignored surface, no smoke asserts
-it (the stated install step is its enforcement).
+env profile — `run-gates.sh --emit env-probe` writes the first `ENV.local.md`
+block (§bin/env-probe); being an operator-local, gitignored surface, no smoke
+asserts it (the stated install step is its enforcement).
 
 Config follows the established kit pattern: copy
 `templates/context-config.sh` into the gates dir (or point
@@ -1254,6 +1304,12 @@ it is a sourced function, not a gate: `index-tests/toolfloor-cases.sh` sources
 `lib/toolfloor.sh` and prints one line per (element, banner) pair, so the closed
 verdict set, the spellings of an unconstrained member, and the
 `uncomparable` fail-closed arm are asserted against a golden rather than assumed.
+**That golden's scope is the shell holder alone**, and saying so is the point: a
+compiled holder now exists (§bin/env-probe), and it is held to this one by
+`gate-tests/toolfloor-parity.test.sh` rather than by this golden. Pointing the
+compiled holder at the same file would make the verdict set a third copy, which
+is what evidence-kit/SPEC.md §lib/evidence.sh's *no committed golden* rule
+refuses for a two-holder comparison.
 The audience axis is pinned in a second table in the same file, printing the
 parsed field and the consumer-side predicate per element rather than a verdict,
 because no verdict reads that field: its present, empty and omitted forms are
@@ -1273,8 +1329,8 @@ check-identity precedent) reading `<dir>/settings.json` against
 `<dir>/settings-pins.conf`, while the memory-off pair drives
 `CONTEXT_KIT_MEMORY_DIRS` from its own case-dir config, because that member's
 fixture arm was deleted for being a code path its live arm never took.
-Three direct unit tests hold the axes the pairs fix and so cannot
-express: `check-brevity.test.sh` holds the unmatched-section resolution (the
+The direct unit tests beside the pairs hold the axes those pairs fix and so
+cannot express: `check-brevity.test.sh` holds the unmatched-section resolution (the
 pair fixes `CONTEXT_KIT_BREVITY_SECTION` at the stock default and always
 supplies a file carrying it, so neither case can express a section that
 resolves to nothing — an unmatched section is exit 2, a broken machine rather

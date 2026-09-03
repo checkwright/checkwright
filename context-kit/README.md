@@ -57,8 +57,8 @@ hook approximation and the session-context template also expect
 3. Set the baseline — `bash context-kit/bin/always-loaded.sh --update-baseline`
    and commit `.workflow/always-loaded-baseline.txt`.
 
-4. Seed your env profile — `bash context-kit/bin/env-probe.sh` writes a
-   marker-bounded machine profile (OS, package manager, toolchain versions,
+4. Seed your env profile — `bash gate-sdk/bin/run-gates.sh --emit env-probe`
+   writes a marker-bounded machine profile (OS, package manager, toolchain versions,
    absent tools) into `ENV.local.md` and seeds a hand-authored gotchas scaffold
    above the markers. The file is local-only (gitignore it); re-run on demand
    when the box changes. The session-context hook emits it when present.
@@ -77,6 +77,7 @@ bash gate-sdk/bin/run-gates.sh --emit pub-index [paths…]           # public AP
 bash context-kit/bin/always-loaded.sh               # standing surface vs baseline (one line)
 bash context-kit/bin/always-loaded.sh --update-baseline   # a close-stage act
 bash gate-sdk/bin/run-gates.sh --emit footprint     # per-kit token footprint (the committed page)
+bash gate-sdk/bin/run-gates.sh --emit env-probe     # re-probe the local machine profile (ENV.local.md)
 ```
 
 ## Test

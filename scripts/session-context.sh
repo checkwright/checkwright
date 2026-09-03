@@ -8,7 +8,6 @@ cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" 2>/dev/null || exit 0
 REPO_ROOT="$(pwd -P)"
 
 RUN_GATES="gate-sdk/bin/run-gates.sh"             # the --emit front-end: the queue surface and the three index arms, bridged
-CTX_BIN="context-kit/bin"                         # context-kit env probe
 NATIVE_BIN="$(bash -c 'source gate-sdk/lib/gate.sh; gate_native_bin' 2>/dev/null)"  # the binary those arms dispatch to
 DRIFT_ARM="${CONTEXT_KIT_DRIFT_REPORT:-drift-report}"  # drift-kit trend line: an --emit arm name
 STAGE_RULES="${CONTEXT_KIT_STAGE_RULES:-bash gate-sdk/bin/run-gates.sh --emit stage-rules}"  # doctrine-kit craft-rule router: a command, not a path
@@ -131,7 +130,7 @@ fi
 ENV_PROFILE_FILE="${CONTEXT_KIT_ENV_PROFILE_FILE:-ENV.local.md}"   # context-kit env-probe profile
 if [[ -f "$ENV_PROFILE_FILE" ]]; then
     # spec: context-kit/SPEC.md §The session-context hook — step 9 per-session auto-refresh: re-probe before emitting, inside the file-present guard (never auto-seeds), output suppressed so it never pollutes the brief
-    [[ -f "$CTX_BIN/env-probe.sh" ]] && bash "$CTX_BIN/env-probe.sh" >/dev/null 2>&1 || true
+    [[ -f "$RUN_GATES" ]] && bash "$RUN_GATES" --emit env-probe >/dev/null 2>&1 || true
     echo
     echo "Local env profile ($ENV_PROFILE_FILE) — adapt commands to this box:"
     cat "$ENV_PROFILE_FILE" 2>/dev/null || true

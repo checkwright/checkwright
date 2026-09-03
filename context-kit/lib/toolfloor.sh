@@ -1,8 +1,8 @@
 # shellcheck shell=bash
-# spec: context-kit/SPEC.md §bin/env-probe — sourceable owner of the probe roster and its floor predicate; defines names and executes nothing, so a second reader obtains the roster by sourcing instead of grepping a script that does its work on execution
+# spec: context-kit/SPEC.md §bin/env-probe — sourceable owner of the probe roster and its floor predicate; defines names and executes nothing, so a sourcing reader obtains the roster without running a script that does its work on execution, and a third reader — the compiled holder behind `--emit env-probe` — parses this array as text rather than sourcing it
 
 # spec: context-kit/SPEC.md §bin/env-probe — the roster, `<name>[:<min-version>[:<impl-token>[:<audience>]]]`; a member gains a floor only where a construct the battery runs forces one, and the SPEC records that construct beside the token
-# shellcheck disable=SC2034  # read by whoever sources this file (bin/env-probe.sh), never here
+# shellcheck disable=SC2034  # read by whoever sources this file (installer/lib/doctor.sh, index-tests/toolfloor-cases.sh), never here
 PROBE_SET=(bash:4.3 git jq awk::GNU sort::coreutils shellcheck cargo:1.71::contributor)
 
 # spec: context-kit/SPEC.md §bin/env-probe — positional fields, an empty field meaning unconstrained on that axis exactly as an omitted trailing one does, so `awk`, `awk:`, `awk::` and `awk:::` parse to one member

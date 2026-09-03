@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # spec: context-kit/SPEC.md §The session-context hook (template) — consumer-copy SessionStart hook (bash-guard pattern); assembles the session brief, every step guarded, never fails a session
-# no-port: gate-sdk/SPEC.md §The harness-template port disposition — the class ruling of 2026-08-30, reached by ground rather than by scope: this file carries an [EDIT ME] gap at every layout-judgment step (tool paths, the dirty-surface pre-run, the stage-conditioned nudges, the index footer, the probe path), and context-kit/README.md tells an adopter to edit them as layout judgment rather than mechanism. The gaps ARE the extension point, so porting the file leaves an adopter nothing to fill. Structural, not a sizing judgment.
+# no-port: gate-sdk/SPEC.md §The harness-template port disposition — the class ruling of 2026-08-30, reached by ground rather than by scope: this file carries an [EDIT ME] gap at every layout-judgment step (tool paths, the dirty-surface pre-run, the stage-conditioned nudges, the index footer), and context-kit/README.md tells an adopter to edit them as layout judgment rather than mechanism. The gaps ARE the extension point, so porting the file leaves an adopter nothing to fill. Structural, not a sizing judgment.
 
 set -uo pipefail
 
@@ -9,7 +9,6 @@ REPO_ROOT="$(pwd -P)"
 
 # spec: context-kit/SPEC.md §The session-context hook — consumer layout: vendored kit tools + governed queue file, retarget to yours [EDIT ME]. The queue index and the three index arms are reached through the battery runner's --emit front-end rather than by tool path: the front-end sources the shell library and supplies the bridged environment, so a consumer's section and cap overrides reach the arm (gate-sdk/SPEC.md §The non-gate arm).
 RUN_GATES="gate-sdk/bin/run-gates.sh"
-CTX_BIN="context-kit/bin"
 NATIVE_BIN="$(bash -c 'source gate-sdk/lib/gate.sh; gate_native_bin' 2>/dev/null)"
 DRIFT_ARM="${CONTEXT_KIT_DRIFT_REPORT:-}"
 STAGE_RULES="${CONTEXT_KIT_STAGE_RULES:-}"
@@ -128,8 +127,8 @@ fi
 # spec: context-kit/SPEC.md §The session-context hook — step 9 env profile; consumer-local machine profile re-probed then emitted verbatim when present (env-profile seam, drift-line precedent)
 ENV_PROFILE_FILE="${CONTEXT_KIT_ENV_PROFILE_FILE:-ENV.local.md}"
 if [[ -f "$ENV_PROFILE_FILE" ]]; then
-    # spec: context-kit/SPEC.md §The session-context hook — per-session auto-refresh: re-probe inside the file-present guard (never auto-seeds), output suppressed; retarget the probe path to your layout [EDIT ME]
-    [[ -f "$CTX_BIN/env-probe.sh" ]] && bash "$CTX_BIN/env-probe.sh" >/dev/null 2>&1 || true
+    # spec: context-kit/SPEC.md §The session-context hook — per-session auto-refresh: re-probe inside the file-present guard (never auto-seeds), output suppressed; reached through the --emit front-end like every other arm, so retarget $RUN_GATES to your layout [EDIT ME]
+    [[ -f "$RUN_GATES" ]] && bash "$RUN_GATES" --emit env-probe >/dev/null 2>&1 || true
     echo
     echo "Local env profile ($ENV_PROFILE_FILE) — adapt commands to this box:"
     cat "$ENV_PROFILE_FILE" 2>/dev/null || true

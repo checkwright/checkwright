@@ -155,8 +155,8 @@ implementation token and audience included — so the page cannot drift from wha
 the gates require.
 
 To see where your machine stands against it, seed a local profile with
-context-kit's env-probe — `bash context-kit/bin/env-probe.sh` writes an
-`ENV.local.md` you keep untracked. It reports each tool's version *and* its
+context-kit's env-probe — `bash gate-sdk/bin/run-gates.sh --emit env-probe`
+writes an `ENV.local.md` you keep untracked. It reports each tool's version *and* its
 verdict against the contract, so the profile answers whether this box qualifies,
 not only what it carries.
 
@@ -177,12 +177,13 @@ not what the battery asserts, so the roster above would be the wrong place to
 claim them.
 
 - **A GNU `sort`.** `init`'s upgrade path compares two versions with `sort -V`,
-  and `context-kit/bin/env-probe.sh` uses the same flag inside the floor
-  predicate. The second is the sharper edge: a stock BSD or macOS userland can
-  fail the probe that exists to tell you whether your box qualifies, in the same
-  way the thing it diagnoses would fail. So the GNU-first instruction above is
-  the install path's requirement too, not the battery's alone. It narrows on its
-  own once these steps move behind a compiled binary.
+  and `context-kit/lib/toolfloor.sh` uses the same flag inside the floor
+  predicate — which is what `checkwright doctor` runs, on the install path, off
+  its own payload copy. The second is the sharper edge: a stock BSD or macOS
+  userland can fail the check that exists to tell you whether your box
+  qualifies, in the same way the thing it diagnoses would fail. So the GNU-first
+  instruction above is the install path's requirement too, not the battery's
+  alone. It narrows on its own once these steps move behind a compiled binary.
 - **`sha256sum` or `shasum`.** `init` verifies a prebuilt gate binary against
   its published digest before writing it, and it will take either hasher —
   `shasum` is there because stock macOS ships it instead. Neither present is not
