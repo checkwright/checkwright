@@ -12,7 +12,11 @@
 
 ## New Features
 
-- **kit-library-port-residue** [spec: SPEC-install-lifecycle.md]
+## Technical Debt
+
+## Deferred
+
+- **kit-library-port-residue** [design-pending]
   — the kit `lib/*.sh` members the 2026-08-30 class ruling deliberately leaves owed, filed
   rather than absorbed at its boundary. **What the ruling settled and what it did not.**
   gate-sdk/SPEC.md §The kit-library port
@@ -36,9 +40,9 @@
   one member's blocker; 2026-09-03 took that unblocked member, which is the delivery ground.
   **Each remaining member is owed on its own ground, and they do not resolve together** — which is
   why this is one entry owning a residue rather than one cut:
-  `inject.sh` has three shell sourcers — `context-kit/bin/env-probe.sh`,
-  `lifecycle-kit/bin/install-lifecycle.sh`, `doctrine-kit/bin/install-doctrine.sh` — each itself
-  owed, so it moves behind them.
+  `inject.sh` has two shell sourcers — `context-kit/bin/env-probe.sh`,
+  `doctrine-kit/bin/install-doctrine.sh` — each itself owed, so it moves behind them. It is NOT
+  unblocked: 2026-09-03's cut took the third sourcer only.
   `test-hermetic.sh` is **deliberately not declared**: it computes a second default for the bridged
   knob `GATE_SDK_NATIVE_BIN`, and declaring a file that holds a second producer would bless the
   duplication the class ruling rests on refusing. Its disposition waits on the defect below.
@@ -61,10 +65,6 @@
   ruled: kit-library-port-residue lead 2026-09-02 own-authority
   ruled: kit-library-port-residue operator 2026-09-03 lead-relay
   Filed 2026-08-30 by build, at the landing of the kit-library class ruling.
-
-## Technical Debt
-
-## Deferred
 
 - **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
   — the whole battery onto the binary, and the shell surface down to its residue.

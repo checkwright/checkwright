@@ -47,6 +47,20 @@ pub fn registration_block() -> Result<String, String> {
     ))
 }
 
+// spec: lifecycle-kit/SPEC.md §bin/install-lifecycle.sh — the .gitattributes merge-driver lines:
+// one `<path> merge=iteration-scoped` per supersede member then one `<path> merge=union` per
+// union member, off the two set derivations above, so writer and asserter cannot drift
+pub fn merge_attrs_block() -> Result<String, String> {
+    let mut out = String::new();
+    for p in supersede_set()? {
+        out.push_str(&format!("{} merge=iteration-scoped\n", p));
+    }
+    for p in union_set()? {
+        out.push_str(&format!("{} merge=union\n", p));
+    }
+    Ok(out)
+}
+
 pub fn header(text: &str) -> Option<&str> {
     text.lines().find(|l| l.starts_with("## Iteration:"))
 }

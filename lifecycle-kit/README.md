@@ -79,7 +79,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    divergence).
 
 4. Point your always-loaded agent file at the machine — run
-   `bash lifecycle-kit/bin/install-lifecycle.sh`. It writes a marker-bounded
+   `bash gate-sdk/bin/run-gates.sh --install-lifecycle`. It writes a marker-bounded
    registration block (the state machine, the stage roster as skill
    invocations, the SPEC link) into `LIFECYCLE_KIT_AGENT_FILE` (default
    `CLAUDE.md`), the roster derived from your config so a reshape (step 5)
@@ -116,7 +116,7 @@ by design.
 ```bash
 bash lifecycle-kit/bin/enter-stage.sh <stage>          # stamp a stage entry (the transition itself)
 bash lifecycle-kit/bin/file-gap.sh "<gap>"             # route a work-shaped finding to the gap inbox
-bash lifecycle-kit/bin/install-lifecycle.sh            # (re)write the registration and merge-attribute blocks
+bash gate-sdk/bin/run-gates.sh --install-lifecycle    # (re)write the registration and merge-attribute blocks
 bash gate-sdk/bin/run-gates.sh --emit file-survey "<question>" "<corpus>" "<oracle>" "<edges>" "<finding>"
 bash gate-sdk/bin/run-gates.sh --emit cite-survey "<heading-substring>"   # one carried survey, inline-ready
 ```

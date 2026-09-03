@@ -509,8 +509,8 @@ the clause's reader is a human or agent rather than a gate.
   reads as a cross-component contract signal; default `("SPEC.md" "proto/")`.
 - `LIFECYCLE_KIT_SKILLS_DIR` — the agent-skill directory
   `check-stage-skill-coverage` scans; default `.claude/commands`.
-- `LIFECYCLE_KIT_AGENT_FILE` — the always-loaded agent file
-  `bin/install-lifecycle.sh` writes the registration block into and
+- `LIFECYCLE_KIT_AGENT_FILE` — the always-loaded agent file the
+  `--install-lifecycle` arm writes the registration block into and
   `check-lifecycle-registration` reads it back from; default `CLAUDE.md`
   (the `DOCTRINE_KIT_AGENT_FILE` sibling).
 - `LIFECYCLE_KIT_QUEUE_FILE` / `LIFECYCLE_KIT_STATE_FILE` — the governed header and
@@ -700,12 +700,12 @@ per-checkout scratch — friction logs — never merges and needs no rule.)
 **`.gitattributes` — the rule mechanized.** Each supersede-set path carries
 `merge=iteration-scoped`; the driver definition (`git config
 merge.iteration-scoped.driver true` — keep ours) is per-clone config installed by
-`bin/install-lifecycle.sh` beside its registration block (the `install-hooks.sh`
+the `--install-lifecycle` arm beside its registration block (the `install-hooks.sh`
 opt-in class). Honest limit: on a clone without the driver installed the
 attribute is inert and the file conflicts normally — the rule above then governs
 the hand resolution, so the uninstalled path degrades to judgment, never to
-silence. Writer/asserter split: the installer emits the attribute block
-(marker-bounded, `lib/inject.sh`), `check-merge-attrs` verifies it — the
+silence. Writer/asserter split: the arm emits the attribute block
+(marker-bounded), `check-merge-attrs` verifies it — the
 `gen-pre-commit.sh` ↔ `check-graph` precedent.
 
 **Who may stamp, at this altitude.** Unchanged: the arriving stage session
@@ -1685,8 +1685,7 @@ is a predicate over the cursor and must not acquire a third caller silently —
 
 The loader also owns `lifecycle_registration_block`,
 which renders the resident registration block (§bin/install-lifecycle.sh) from the
-live config so `bin/install-lifecycle.sh` and `check-lifecycle-registration`
-derive one text and cannot drift. Three more renderers follow the same
+live config. Three more renderers follow the same
 writer/asserter shape for the merge-attribute surface: `lifecycle_supersede_set`
 prints the derived iteration-scoped supersede set (the state file, the two
 kit-owned built-ins — the lesson-evidence file and the survey record — and each
@@ -1695,8 +1694,25 @@ what `bin/enter-stage.sh` truncates at the boundary); `lifecycle_union_set`
 prints the derived union-merge set (the gap inbox — §The committed gap inbox);
 and `lifecycle_merge_attrs_block` renders the supersede set as
 `<path> merge=iteration-scoped` lines and the union set as `<path> merge=union`
-lines, so `bin/install-lifecycle.sh` (writer) and `check-merge-attrs` (asserter)
-read one set (§Multi-operator semantics). `lifecycle_stage_journal <stage>` is the **journal-path derivation**:
+lines (§Multi-operator semantics). The writer/asserter shape those four express
+is live and unchanged — it holds between the `--install-lifecycle` arm and the
+gates that assert what it writes (§check-merge-attrs,
+§check-lifecycle-registration), in one substrate.
+
+**All four are shell holders with no caller in this tree, and their disposition
+is owed rather than taken.** The 2026-09-03 port of §bin/install-lifecycle.sh
+moved the writer in-crate and emptied their shell caller set; the compiled
+counterparts `crate::stages::registration_block` and
+`crate::stages::merge_attrs_block` are what the arm and the gates read.
+An empty caller set makes criterion 6's dead-twin road **available** and does not
+make it that cut's to take: these are documented members of *this* section, that
+cut's stated contract was §bin/install-lifecycle.sh, and a section is a cut's
+outer bound (gate-sdk/SPEC.md §Porting a gate to the binary substrate; §The
+port-candidate criteria, criterion 6). So they stay, they keep reading **owed**,
+they take no `# port-until:` — a held file leaves §port-blockers' owed column —
+and the cut that takes §lib/stages.sh takes all four in one motion. Written here
+so that cut does not rediscover the caller set from scratch (lead-ruled
+2026-09-03, own-authority; filed to the gap inbox with its probe). `lifecycle_stage_journal <stage>` is the **journal-path derivation**:
 `LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN` with `<stage>` expanded, hoisted here for
 the same reason the cursor is — three readers must name one file or the
 assertion checks a path nobody was asked to write. Its readers are
@@ -1716,9 +1732,13 @@ captures nothing, and either would classify every worktree unclassified while
 looking configured. **The probe's status is captured in a condition context**, and
 that is a contract of this loader rather than a spelling: a probe designed to
 return non-zero on a routine non-match, run as a bare command, aborts every
-`set -e` caller that sources this file — which is `bin/install-lifecycle.sh`, so
-the observed cost of getting it wrong was a consumer with a pattern configured
-being unable to re-emit its own derived surfaces, silently and at exit 1.
+`set -e` caller that sources this file. The attested cost of getting it wrong was
+a consumer with a pattern configured being unable to re-emit its own derived
+surfaces, silently and at exit 1 — that caller was `bin/install-lifecycle.sh`,
+which ported on 2026-09-03, and no surviving shell sourcer in this tree
+(`bin/enter-stage.sh`, `bin/file-gap.sh`) runs under `set -e`. The contract binds
+the next one that does, which is why it is stated as a property of the loader
+rather than as a note about one caller.
 Exercised in `smoke/` with a pattern actually set, the empty default never
 reaching the branch. `LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN` takes the same
 treatment for the same reason: a pattern with no `<stage>` placeholder names one
@@ -2431,47 +2451,137 @@ from disk, and a never-named closing iteration each take their branch).
 
 ### bin/install-lifecycle.sh
 
-`bin/install-lifecycle.sh [agent-file]` writes the resident registration block
+`bash gate-sdk/bin/run-gates.sh --install-lifecycle [agent-file]` writes the
+resident registration block
 into the always-loaded agent file (`LIFECYCLE_KIT_AGENT_FILE`, default
 `CLAUDE.md`; the positional override points a smoke or fixture at a scratch
-tree without touching consumer config), idempotently. The block is bounded by
+tree without touching consumer config), idempotently. **The `###
+bin/install-lifecycle.sh` heading is the section name, not a file name** — six
+in-SPEC citations resolve against it, and the shell tool it was named after
+ported on 2026-09-03. The block is bounded by
 fixed marker lines (`<!-- lifecycle-kit:begin -->` … `<!-- lifecycle-kit:end -->`);
 a run replaces the content between the markers when present and appends the
 block when absent, so re-running never duplicates. A begin marker without its
 end is a malformed target (exit 2, rather than guess the bounds); the agent
-file must already exist — the installer edits an always-loaded file, it does
+file must already exist — the arm edits an always-loaded file, it does
 not mint one — so a missing target is exit 2. The marker insert/replace itself
-is not the installer's code: it rides gate-sdk's shared `lib/inject.sh`
-helper (`inject_marker_block`), the one copy `install-doctrine.sh` also uses,
+is not this member's code: it rides `crate::marker`'s installer writer, the
+compiled half of gate-sdk's `lib/inject.sh` (gate-sdk/SPEC.md §lib/inject.sh),
 so no second replace path exists to drift.
 
-The block is pointer-only, its roster derived: `lib/stages.sh`'s
-`lifecycle_registration_block` renders the one line that the repo runs the
+**It is a bridged `Arm::Run` member** (gate-sdk/SPEC.md §The non-gate arm),
+reached by its own `bin/run-gates.sh` front-end branch rather than through the
+`--emit <name>` composer, because its contract is an **action with an exit
+status** — it mutates two files and writes one git config key, printing narration
+on stdout — and `Arm::Emit` collapses every error to 2. **The obvious alternative
+is an op of the `--install <op>` family, and it is refused on that family's own
+stated terms**: installer/README.md §The install boundary rules that arm
+deliberately unbridged, reading no kit config and no knob, because its caller is
+the bootstrap and may not be assumed to be a POSIX shell. This member's whole job
+is to render blocks derived from **resolved kit config**, so an unbridged op
+would have to take all eight knobs on argv from a caller with no way to resolve
+them. Recorded as refused rather than unconsidered, because the name collision
+makes it the first place a reader looks. Its declared roster is the union of what
+the two renderers read, taken from the gates that already declare those knobs
+rather than re-derived: `LIFECYCLE_KIT_AGENT_FILE`, `LIFECYCLE_KIT_STAGES` and
+`LIFECYCLE_KIT_QUEUE_FILE` from `check-lifecycle-registration`, and
+`LIFECYCLE_KIT_STATE_FILE`, `LIFECYCLE_KIT_LESSON_EVIDENCE_FILE`,
+`LIFECYCLE_KIT_SURVEY_RECORD_FILE`, `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` and
+`LIFECYCLE_KIT_GAP_INBOX_FILE` from `check-merge-attrs` — **eight**. A hardcoded
+top-level flag would resolve platform defaults and silently ignore every consumer
+override, which is not a calibration between two workable shapes but the
+difference between working and appearing to.
+
+**The `[agent-file]` positional ports unchanged, and the test that decides it was
+run rather than assumed.** §The non-gate arm's distinguishing test makes an
+argument *unportable* when it redirects something the front-end has already
+resolved from the tree's own config before the exec — it arrives a process too
+late and would silently change nothing. This positional is the other kind: it is
+not a selector for where configuration comes from, it **is the file the rule
+writes into**, read from the arm's own argv and overriding the bridged default.
+The near miss is one line away and is an env var rather than a positional:
+`smoke/install.sh` runs the arm under `LIFECYCLE_KIT_CONFIG_FILE=lock-stages.sh`,
+a genuine config-file selector — and it keeps working, because `gate_knob_env`
+resolves the eight knobs by sourcing `lib/stages.sh` in a subshell that inherits
+the caller's environment, so the redirection happens *inside* the resolution
+rather than arriving after it.
+
+The block is pointer-only, its roster derived: `crate::stages::registration_block`
+renders the one line that the repo runs the
 state machine on `LIFECYCLE_KIT_QUEUE_FILE`, the stage roster as skill
 invocations (`/<stage>` for each `LIFECYCLE_KIT_STAGES` member), and the
 markdown link to the kit SPEC — never stage prose, and never a hand-listed
 roster, so a consumer's reshaped stage set flows into the block by
-construction. The installer and `check-lifecycle-registration` share that one
+construction. The arm and `check-lifecycle-registration` share that one
 renderer, so the emitted block and the block the gate certifies cannot
 diverge.
 
 The same run performs two further steps for the multi-operator merge surface
 (§Multi-operator semantics). **The merge-attribute step** injects a
 marker-bounded block (`# lifecycle-kit:merge:begin` … `# lifecycle-kit:merge:end`,
-`inject_marker_block` again) into `.gitattributes` (repo root) rendered from
-`lifecycle_merge_attrs_block` — one `merge=iteration-scoped` line per supersede
+the same installer writer again) into `.gitattributes` (repo root) rendered from
+`crate::stages::merge_attrs_block` — one `merge=iteration-scoped` line per
+supersede
 member (keep-ours) and one `merge=union` line per union member (the gap inbox,
 git-native) — so a reshaped supersede or union set flows into the attribute lines
-by construction and `check-merge-attrs` certifies the same rendering. Unlike the agent file, the installer legitimately **mints
+by construction and `check-merge-attrs` certifies the same rendering. **The
+writer/asserter split survives the port and its two implementations collapse to
+one**: before 2026-09-03 the writer was shell and the asserter was crate, deriving
+the same lines through two implementations held together by nothing but
+`smoke/install.sh`; they now compose the same two set derivations in one
+substrate. Unlike the agent file, the arm legitimately **mints
 `.gitattributes` when absent** (it is not an always-loaded file the consumer
-authored). **The driver-config step** registers the keep-ours driver — `git
+authored) — two adjacent file writes with opposite absent-file dispositions, which
+is precisely the shape a port unifies by accident. **The driver-config step**
+registers the keep-ours driver — `git
 config merge.iteration-scoped.driver true` — per-clone (the `install-hooks.sh`
 opt-in class); a non-repo cwd degrades to a printed skip, never a hard failure,
 leaving the `.gitattributes` attribute inert until a clone installs the driver.
+The skip goes to **stderr** and the two action lines to **stdout**, and that split
+is load-bearing: the arm is machine-drivable and a finding on stdout is a finding
+in a caller's data stream.
 The union attribute needs no such step — `merge=union` is git-native, so its
 line is live the moment `.gitattributes` carries it.
+
+**The entry point requires a repository, and that removed a silent mis-write
+rather than narrowing a graceful degradation.** `bash gate-sdk/bin/run-gates.sh`
+cds to `git rev-parse --show-toplevel` and refuses outside a repository
+(gate-sdk/SPEC.md §run-gates: *every entry point cds to the toplevel before
+resolving paths*), so a non-repo cwd now exits 2 with nothing written. Read that
+as a repair, not a loss: both install targets are **repo-root-relative by this
+kit's own config**, so the shell tool run outside a repository did not degrade
+gracefully — it wrote two files into whatever directory it happened to be in and
+exited 0. The soft-skip property above is the **driver-config step's**, and it is
+intact: when the arm runs, a cwd whose repository has no driver registered still
+prints its skip to stderr at exit 0. Stated in these terms deliberately, because
+"a narrowing we accepted" invites a later session to try to restore a behaviour
+that was wrong (lead-ruled 2026-09-03, own-authority).
+
 Advisory tooling, not a gate: no fixture pair is owed; every step is exercised
-end-to-end in `smoke/install.sh`.
+end-to-end in `smoke/install.sh`, which is the member's only caller. **Criterion
+2's discharge was the `# no-fixture:` road** — the same cases, both substrates,
+while both implementations existed — bought once at port time over a fourteen-case
+scenario compared on exit status, both output streams and the **bytes of both
+written files**: a fresh agent file, a re-run, a staled block, a missing agent
+file, a begin marker without its end, a fresh scratch repo, a re-run of that, the
+`[agent-file]` positional, and the `LIFECYCLE_KIT_CONFIG_FILE=lock-stages.sh`
+case. Three deltas came out of that run and each is recorded rather than smoothed
+away: the non-repo entry-point refusal above (two of the three, one case and one
+assertion); and the malformed-marker refusal's prefix, which reads
+`install-lifecycle: <file>: begin marker present but end marker missing` where the
+shell named a helper function that has no compiled counterpart to name — the exit
+status is 2 on both sides and only the diagnostic wording moved. The compiled writer's third
+divergence, its whole-line marker-presence test (gate-sdk/SPEC.md §lib/inject.sh),
+produced **no** delta here and is unreachable in all fourteen cases: it is
+recorded at the module that owns it rather than counted against this scenario. **Criterion 5's residual bites at
+adoption rather than during use**, which is unusual: a vendored consumer on a host
+the artifact roster does not cover cannot install or refresh its registration
+block and merge attributes, and that block is what a consumer writes on day one.
+It is accepted on the class's stated terms and on one narrowing fact —
+`check-lifecycle-registration` and `check-merge-attrs` are themselves compiled, so
+a host with no artifact does not run the gates that would demand the block either,
+losing the writer and the asserter together rather than being held to a standard
+it cannot meet.
 
 ### The close-surfaces emit arm
 

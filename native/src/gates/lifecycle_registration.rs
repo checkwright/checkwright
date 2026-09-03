@@ -41,7 +41,7 @@ pub fn run(args: &[String]) -> i32 {
             agent
         );
         println!("  help: install the resident registration block into the always-loaded agent file —");
-        println!("        bash lifecycle-kit/bin/install-lifecycle.sh — so a session that loads it");
+        println!("        bash gate-sdk/bin/run-gates.sh --install-lifecycle — so a session that loads it");
         println!("        is pointed at the stage machine. Override the path with LIFECYCLE_KIT_AGENT_FILE.");
         return 1;
     }
@@ -95,7 +95,7 @@ pub fn run(args: &[String]) -> i32 {
         }
         println!("  help: a reshaped stage machine (LIFECYCLE_KIT_STAGES / LIFECYCLE_KIT_QUEUE_FILE) or a");
         println!("        hand-edited block staled the registration — regenerate it in place:");
-        println!("        bash lifecycle-kit/bin/install-lifecycle.sh");
+        println!("        bash gate-sdk/bin/run-gates.sh --install-lifecycle");
         return 1;
     }
 

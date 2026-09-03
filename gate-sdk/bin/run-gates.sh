@@ -28,6 +28,7 @@ usage: run-gates.sh [gates-dir]                run every registered gate
        run-gates.sh --usage-poll               refresh the usage snapshot from its source
        run-gates.sh --lesson-sink <tag>        route a lesson body on stdin to its sink
        run-gates.sh --upgrade-smoke            prove the FROM->TO kit upgrade in scratch
+       run-gates.sh --install-lifecycle [file] install the lifecycle resident surfaces
        run-gates.sh -h | --help                this text, on stdout, exit 0
 
   --only  runs the named members in registry order whatever order they were
@@ -59,6 +60,12 @@ usage: run-gates.sh [gates-dir]                run every registered gate
           sync is deterministic and the phase-B red set is declared. Takes no
           argument. Exit 0 clean with one UPGRADE-SMOKE line on stdout, 1 an
           upgrade finding, 2 a broken tag or environment; unavailable is 2.
+  --install-lifecycle  writes the lifecycle registration block into the
+          always-loaded agent file, the iteration-scoped merge attributes into
+          .gitattributes, and the keep-ours merge driver into this clone's git
+          config. The optional positional is the agent file to write into,
+          overriding LIFECYCLE_KIT_AGENT_FILE. Idempotent; exit 2 when the agent
+          file is absent or a marker pair is malformed, and unavailable is 2.
   --      ends option processing, so a gates-dir spelled with a leading dash
           is still reachable.
 
@@ -155,6 +162,13 @@ case "${1-}" in
     --upgrade-smoke)
         shift
         exec_arm --upgrade-smoke "$@"
+        ;;
+    # spec: lifecycle-kit/SPEC.md §bin/install-lifecycle.sh — a third bridged arm outside the
+    # `--emit-` family: its contract is an action with an exit status rather than a document.
+    # Unavailable is exit 2 because its caller is an install step whose failure must be visible
+    --install-lifecycle)
+        shift
+        exec_arm --install-lifecycle "$@"
         ;;
     --for)
         shift

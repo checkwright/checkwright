@@ -289,7 +289,7 @@ roster to grow into. **No lifecycle-kit gate is `zero-config`**, and the reasons
 differ across its roster rather than being one reason: some read a stage
 attestation only a stage session can write, others read surfaces a stage session
 authors, and two — `check-lifecycle-registration` and `check-merge-attrs` — read
-what `lifecycle-kit/bin/install-lifecycle.sh` writes, which is the adopter's own
+what the `--install-lifecycle` arm writes, which is the adopter's own
 step and not a stage's. The posture is kit-wide; the reason is per gate.
 
 **A kit's agent-file block is seeded at install iff a gate registered at install

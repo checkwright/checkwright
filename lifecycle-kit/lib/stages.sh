@@ -133,7 +133,7 @@ lifecycle_union_set() {
     printf '%s\n' "$LIFECYCLE_KIT_GAP_INBOX_FILE"
 }
 
-# spec: lifecycle-kit/SPEC.md §bin/install-lifecycle.sh — render the .gitattributes merge-driver lines the installer injects: one `<path> merge=iteration-scoped` per supersede member (keep-ours) then one `<path> merge=union` per union member (git-native). The installer emits this, check-merge-attrs verifies it — the same writer/asserter split as lifecycle_registration_block.
+# spec: lifecycle-kit/SPEC.md §bin/install-lifecycle.sh — the shell holder of the .gitattributes merge-driver lines: one `<path> merge=iteration-scoped` per supersede member (keep-ours) then one `<path> merge=union` per union member (git-native). The `--install-lifecycle` arm emits these and check-merge-attrs verifies them, both in-crate since the 2026-09-03 port; this holder has no caller in this tree and its disposition is §lib/stages.sh's.
 lifecycle_merge_attrs_block() {
     local p
     while IFS= read -r p; do
@@ -144,7 +144,7 @@ lifecycle_merge_attrs_block() {
     done < <(lifecycle_union_set)
 }
 
-# spec: lifecycle-kit/SPEC.md §bin/install-lifecycle.sh — render the resident registration block from the live config so the installer and check-lifecycle-registration derive one text; the roster is the stage set as skill invocations, never hand-listed
+# spec: lifecycle-kit/SPEC.md §bin/install-lifecycle.sh — the shell holder of the resident registration block, rendered from the live config; the roster is the stage set as skill invocations, never hand-listed. The `--install-lifecycle` arm and check-lifecycle-registration derive that one text in-crate since the 2026-09-03 port, so this holder has no caller in this tree either.
 lifecycle_registration_block() {
     local roster="" s
     for s in "${LIFECYCLE_KIT_STAGES[@]}"; do

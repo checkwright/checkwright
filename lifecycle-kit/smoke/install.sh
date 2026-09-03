@@ -4,7 +4,10 @@
 # no-port: gate-sdk/SPEC.md §Consumer smoke, The port disposition — legs 2 and 3 of the class ruling of 2026-08-30. Leg 2: this is an executable install recipe by stated contract, and check-install-disposition assertion B reads its body as text, so a crate table crosses harder the recipe-into-derivation boundary §Consumer smoke already declined to cross, and ADDS violations rather than removing them. Leg 3: it vendors to an adopter with its kit but is executed by no adopter path — the SMOKE_KIT_ROOT entry-point guard refuses a bare invocation and the only callers in existence are this repo own validate suites — so it costs an adopter no interpreter dependency. Structural, not a sizing judgment, and stated rather than cited-by-example because the class had no precedent in either direction before that ruling.
 set -euo pipefail
 : "${SMOKE_KIT_ROOT:?run via run-consumer-smoke.sh}"
-SDK="$SMOKE_KIT_ROOT/../gate-sdk"   # the vendored gate-sdk beside this kit
+SDK="$(cd "$SMOKE_KIT_ROOT/../gate-sdk" && pwd)"   # the vendored gate-sdk beside this kit
+# spec: gate-sdk/SPEC.md §run-gates — pinned absolute for the same reason the binary below is:
+# three of the dispatches run from a sandbox cwd, and the front-end cds to that sandbox's own
+# repository toplevel before resolving anything
 # spec: gate-sdk/SPEC.md §lib/gate.sh — the smoke resolves a kit gate through gate_command, the way
 # a consumer's own battery does: this is the one context where a ported member's `.sh` is genuinely
 # absent, and an absent binary is exit 2 — never a skip, never a pass, never an invented fallback.
@@ -75,7 +78,7 @@ bash "$SDK/bin/run-gates.sh" --emit file-survey \
     "yes — a filed block naming the seed commit parses clean" >/dev/null
 
 # spec: lifecycle-kit/README.md §Install — step 4 points the consumer's own always-loaded agent file at the machine; run it on the consumer, not only on a scratch copy, or check-lifecycle-registration has nothing to hold
-bash "$SMOKE_KIT_ROOT/bin/install-lifecycle.sh" >/dev/null
+bash "$SDK/bin/run-gates.sh" --install-lifecycle >/dev/null
 
 bash "$SDK/bin/gen-pre-commit.sh" --write >/dev/null
 bash "$SDK/bin/run-gates.sh" --emit graph > scripts/CHECK-GRAPH.html
@@ -296,7 +299,7 @@ cat > "$il/CLAUDE.md" <<'EOF'
 
 Resident context the consumer keeps.
 EOF
-il_run() { LIFECYCLE_KIT_AGENT_FILE="$il/CLAUDE.md" bash "$SMOKE_KIT_ROOT/bin/install-lifecycle.sh" "$@"; }
+il_run() { LIFECYCLE_KIT_AGENT_FILE="$il/CLAUDE.md" bash "$SDK/bin/run-gates.sh" --install-lifecycle "$@"; }
 il_gate() { ( export LIFECYCLE_KIT_AGENT_FILE="$il/CLAUDE.md"; kit_gate check-lifecycle-registration "$@" ); }
 
 il_run >/dev/null
@@ -314,14 +317,14 @@ if il_gate >/dev/null 2>&1; then echo "smoke(install-lifecycle): a staled block 
 ma="$es/merge-attrs"; mkdir -p "$ma"
 git -C "$ma" init -q
 printf '# Scratch agent file\n' > "$ma/CLAUDE.md"
-( cd "$ma" && bash "$SMOKE_KIT_ROOT/bin/install-lifecycle.sh" >/dev/null )
+( cd "$ma" && bash "$SDK/bin/run-gates.sh" --install-lifecycle >/dev/null )
 grep -q "^# lifecycle-kit:merge:begin\$" "$ma/.gitattributes" || { echo "smoke(install-lifecycle): merge-attribute block not injected into .gitattributes" >&2; exit 1; }
 grep -q "^\.workflow/WORKFLOW-STATE.txt merge=iteration-scoped\$" "$ma/.gitattributes" || { echo "smoke(install-lifecycle): state-file merge attribute missing" >&2; exit 1; }
 [[ "$(git -C "$ma" config --get merge.iteration-scoped.driver)" == "true" ]] || { echo "smoke(install-lifecycle): keep-ours driver not registered in git config" >&2; exit 1; }
 ( cd "$ma" && kit_gate check-merge-attrs >/dev/null ) || { echo "smoke(install-lifecycle): a freshly installed .gitattributes should pass the parity gate" >&2; exit 1; }
 
 cp "$ma/.gitattributes" "$ma/before"
-( cd "$ma" && bash "$SMOKE_KIT_ROOT/bin/install-lifecycle.sh" >/dev/null )
+( cd "$ma" && bash "$SDK/bin/run-gates.sh" --install-lifecycle >/dev/null )
 cmp -s "$ma/before" "$ma/.gitattributes" || { echo "smoke(install-lifecycle): merge-attribute re-run was not idempotent" >&2; exit 1; }
 
 printf 'README.md merge=iteration-scoped\n' >> "$ma/.gitattributes"   # smuggled reverse-edge line
@@ -331,7 +334,7 @@ fi
 
 # spec: lifecycle-kit/SPEC.md §lib/stages.sh — the installer runs under `set -e` and sources the loader, whose lock-pattern probe is a subshell designed to return non-zero on a non-match; with a pattern configured that probe once aborted the installer silently, leaving a consumer unable to re-emit its own derived surfaces. Exercised with a real pattern set, because the kit default is empty and an unconfigured run never reaches the branch.
 printf "LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE='^held by pid ([0-9]+)\$'\n" > "$ma/lock-stages.sh"
-( cd "$ma" && LIFECYCLE_KIT_CONFIG_FILE=lock-stages.sh bash "$SMOKE_KIT_ROOT/bin/install-lifecycle.sh" >/dev/null ) \
+( cd "$ma" && LIFECYCLE_KIT_CONFIG_FILE=lock-stages.sh bash "$SDK/bin/run-gates.sh" --install-lifecycle >/dev/null ) \
     || { echo "smoke(install-lifecycle): a configured lock-reason pattern aborted the installer" >&2; exit 1; }
 
 # spec: lifecycle-kit/SPEC.md §bin/session-id.sh — the derivation order: env-first, agent- strip, widened + child-narrowed subagents scan (advisory tool, no fixture pair)

@@ -9,6 +9,7 @@ pub mod enforcement_map;
 pub mod file_survey;
 pub mod footprint;
 pub mod graph;
+pub mod install_lifecycle;
 pub mod kpi;
 pub mod lesson_sink;
 pub mod md_index;
@@ -385,6 +386,14 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         "--lesson-sink",
         Arm::Run(lesson_sink::run),
         lesson_sink::KNOBS,
+    ),
+    // spec: lifecycle-kit/SPEC.md §bin/install-lifecycle.sh — an `Arm::Run` because the member
+    // mutates two files and a git config key and emits no document; the `--install <op>` family is
+    // refused with cause there, its unbridged contract being unable to resolve these eight knobs
+    (
+        "--install-lifecycle",
+        Arm::Run(install_lifecycle::run),
+        install_lifecycle::KNOBS,
     ),
 ];
 

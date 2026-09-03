@@ -2164,8 +2164,9 @@ reading tools, plus `--emit-file-survey` and `--emit-cite-survey`, lifecycle-kit
 two survey-record affordances, its 2026-09-01 ones; `--emit-stage-rules`,
 doctrine-kit's craft-rule router, its 2026-09-03 one), the **harness-integration**
 arms below it, and two bridged `Arm::Run` members that are neither —
-`--lesson-sink` (queue-kit/SPEC.md §The lesson-sink arm) and `--upgrade-smoke`
-(§upgrade-smoke) — and the class
+`--lesson-sink` (queue-kit/SPEC.md §The lesson-sink arm), `--upgrade-smoke`
+(§upgrade-smoke) and `--install-lifecycle` (lifecycle-kit/SPEC.md
+§bin/install-lifecycle.sh, its 2026-09-03 member) — and the class
 they form is named here because a
 session arriving with a new non-gate thing to port has no other way to learn
 that one exists or what it costs. Each arm's own `spec:` comment explains that
@@ -2302,6 +2303,32 @@ that deleted are `check-identity`'s two arms (§check-identity) and
 `check-gate-fixture-coverage`'s positionals, whose ground is narrower and stated
 at that member's own section. A relayed count read as a target is how a batch
 talks itself into deletions it never verified.
+
+**A non-gate member ran the test too, and its answer is *ports unchanged* with an
+instructive near miss.** `--install-lifecycle`'s `[agent-file]` positional is not
+a selector for where configuration comes from — it **is the file the rule writes
+into**, read from the arm's own argv and overriding a bridged default, so it is
+the second kind and keeps its place (lifecycle-kit/SPEC.md
+§bin/install-lifecycle.sh). The near miss is one line away in that member's own
+smoke and is an **env var rather than an argument**: `LIFECYCLE_KIT_CONFIG_FILE`
+(lifecycle-kit/SPEC.md §Layout and configuration) is a genuine config-file
+selector, the
+unportable shape exactly — and it survives untouched, because the bridge resolves
+that member's knobs by sourcing the kit library in a subshell that inherits the
+caller's environment, so the redirection happens *inside* the resolution rather
+than arriving after it. Recorded because "an argument that redirects config is
+unportable" is one clause away from "anything that redirects config is
+unportable", and the second is false.
+
+**A member may also decline the `--install <op>` family, and that is a worked
+instance rather than a hypothetical.** `--install-lifecycle` is spelled as its own
+bridged arm and not as an op of that family, refused on the family's own stated
+terms: installer/README.md §The install boundary rules that arm deliberately
+unbridged, reading no kit config and no knob, because its caller is the bootstrap
+and may not be assumed to be a POSIX shell. A member whose whole job is to render
+blocks derived from resolved kit config cannot live there — it would have to take
+every knob on argv from a caller with no way to resolve them. The name collision
+is what makes this worth stating: it is the first place a reader looks.
 
 **§The sixth budget batch applied the same test and it bound zero times, over six
 arguments on five members.** Two shapes cover all six and both port unchanged. A
@@ -8233,9 +8260,14 @@ functions over one notion of a well-formed block.
 **It is owed to the port, not dispositioned by §The kit-library port
 disposition.** It rides the bridge's `lib/*.sh` glob and resolves no knob, so
 that ruling's ground does not reach it; what sequences it instead is its sourcer
-set, every member of which is itself owed
-(`context-kit/bin/env-probe.sh`, `lifecycle-kit/bin/install-lifecycle.sh`,
-`doctrine-kit/bin/install-doctrine.sh`). The entry that owns the work is
+set, every member of which is itself owed — **two of them since 2026-09-03**
+(`context-kit/bin/env-probe.sh`, `doctrine-kit/bin/install-doctrine.sh`), the
+third having ported at §bin/install-lifecycle.sh's cut. **Two remaining is not
+unblocked**: `env-probe.sh` sits behind the Windows leg and `install-doctrine.sh`
+behind the installer's behind-invoke relocation, each recorded in its own section,
+so this library is no more takeable than it was. Stated because a reader who
+remembers the three-sourcer roster will read the deletion of one as the discharge
+of the sequencing. The entry that owns the work is
 `kit-library-port-residue`.
 
 **A compiled counterpart exists, and it is a divergence rather than a
@@ -8254,11 +8286,26 @@ corruption as staleness rather than as damage.
 
 **This library is not retired by that, and the duplication is the ordinary
 transitional state.** Its append-on-absent behaviour is still correct for its own
-callers — the lifecycle installer's attribute and registration blocks among them
-— which are shell and unported. So the same miss reads two ways depending on
+callers — doctrine-kit's installer among them — which are shell and unported. So
+the same miss reads two ways depending on
 which implementation reaches it, until each remaining caller ports in turn;
 retiring `lib/inject.sh` belongs to whichever unit ports its last one. Recorded
 so a later reader does not take the two halves for copies of each other.
+
+**The compiled side carries the append-on-absent writer too, and that is two
+writers by design rather than by drift.** `marker::install_block` is the
+*installer* half — it appends a fresh block when the begin marker is absent,
+exactly as `inject_marker_block` does, because a seeding installer legitimately
+writes into a file that has never carried a block; `marker::write_block` is the
+*generator* half and refuses that same miss, for the reason above. The two
+misses are the whole difference and each has its own caller class, so a porting
+session picks by what the caller is rather than by which function it met first.
+One divergence from the shell original is deliberate and stated: the installer
+writer's marker-presence test is **whole-line**, this module's own documented
+rule, where the shell gated a whole-line `awk` replace on a substring `grep` — so
+a marker occurring inside prose sent the shell down a replace path that matched
+nothing and still reported `replaced`. Spec-over-precedent decides it against the
+implementation quirk.
 
 `inject_marker_block <file> <begin> <end>` takes the inner block content on
 stdin. It writes `<begin>` + the piped content + `<end>` into
@@ -8298,12 +8345,14 @@ one kit's marker vocabulary to every consumer of a generic injector, which is
 the provenance seam this split keeps intact; the caller-side shape is the one
 `bin/gen-pre-commit.sh` already uses for its `gen=manual` regions. So a second
 injector adds no second copy of the awk replace logic — every marker-bounded
-projection in the tree rides them, `doctrine-kit/bin/install-doctrine.sh`
-and `lifecycle-kit/bin/install-lifecycle.sh` among them. A sourced library, not
+projection in the tree rides them or their compiled half,
+`doctrine-kit/bin/install-doctrine.sh` and the `--install-lifecycle` arm among
+them. A sourced library, not
 a gate: exercised end-to-end wherever an installer that rides it runs
-(doctrine-kit and lifecycle-kit `smoke/install.sh`) — doctrine-kit's covers the
+(doctrine-kit's `smoke/install.sh`) — that smoke covers the
 read half through the trim round-trip its acceptor drives, and the removal half
-through a `--remove`/reinstall round trip beside it.
+through a `--remove`/reinstall round trip beside it. lifecycle-kit's own
+`smoke/install.sh` exercises the compiled half at the same transitions.
 
 ### lib/declaration.sh
 
