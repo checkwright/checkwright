@@ -125,11 +125,21 @@
   contexts over one byte-stream and hit all 477 wholesale. No oracle was run for it. It corroborates
   the both-cwds print the envelope already specifies; it is NOT a cause and does not narrow the
   print.
+  **A probed constraint on the ROUTE, not on the envelope — measured 2026-09-03 at spec.** The
+  step must stand up its OWN consumer inside its own step and may not post-mortem the smoke's:
+  `installer/consumer-smoke/run-smoke.sh:12-14` mktemps the scratch and installs `trap cleanup
+  EXIT` with `cleanup() { rm -rf "$SCRATCH"; }`, and `fail()` at `:18` exits 1, so the mismatch
+  at `:193` tears the consumer down before any later step could read `checkwright.lock`.
+  **Measured in the same probe: the preserve-scratch route is out of envelope.** `:9` declares
+  `INSTALLER_SMOKE_TMP_DIR` "the only knob", so no keep-scratch arm exists and minting one would
+  mint a governed name, flip this unit from debt to feature and contradict that sentence. NO
+  CAUSE IS CLAIMED and the deliverable above is unchanged: this rules out routes, adds nothing.
   **The reading lands in a LATER iteration and that is expected, not a defect** — the step's output
   exists only after a push, and the one-to-two-push budget spends this iteration's at close. That is
   `observation-predicate-entry-cannot-drain-in-its-own-iteration`'s shape, named so the next close
   does not read it as an overrun.
   ruled: windows-manifest-hash-diagnostic operator 2026-09-03 lead-relay
+  ruled: windows-manifest-hash-diagnostic lead 2026-09-03 own-authority
   Surfaced 2026-09-03. Promoted 2026-09-03 by scope on the operator ruling above, relayed by the
   iteration lead from an in-session operator prompt. Its grounds are
   `platform-support-ci-matrix`'s, which stays deferred and keeps the leg.
