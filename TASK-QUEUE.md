@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: scan-prompts-cut
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -113,7 +113,6 @@
   members, counts, holds, grounds, price — lives in the contract section that cut selected**, so
   this entry states only what remains (drift-kit/SPEC.md §The KPI plugin contract, gate-sdk/SPEC.md
   §Consumer smoke, *The port disposition*).
-  Cut widths are ruled **per cut and never inherited**; the size arm is **permanently** exhausted.
   **THE COMPOSER DOES NOT REACH THE TREE REMAINDER** — the registry arm answers for the battery,
   only `--tree` is the predicate, and both arms are run. That two-axis misreading, the rise in owed
   on a landing shell file, and the bounds are gate-sdk/SPEC.md §port-blockers'.
@@ -136,8 +135,9 @@
   edit: a carve-out for one class. Scope is the files THAT COMMIT deletes, never a path prefix —
   probe the count, never assume it, the attested probe having quadrupled one kit's.
   **(3) A SECTION IS A CUT'S OUTER BOUND, NOT ITS MINIMUM; (4) A CONSUMER PLUGIN ON A SEAM IS OWED
-  — ruling (1) reaches the seam alone — both ruled 2026-09-03 (operator, lead-relay); grounds and
-  refusals at gate-sdk/SPEC.md §Porting a gate to the binary substrate.**
+  — ruling (1) reaches the seam alone, both 2026-09-03 (operator, lead-relay); (5) SIZING FILLS
+  WITHIN THAT BOUND, 2026-09-04 (lead) — singletons under-fill lawfully, no host minted, widths stay
+  per-cut, size arm permanently spent — gate-sdk/SPEC.md §Porting a gate to the binary substrate.**
   ruled: native-gate-port-remaining-corpus lead 2026-08-28 2026-08-29 2026-08-31 own-authority
   ruled: native-gate-port-remaining-corpus operator 2026-08-28 2026-08-29 2026-08-30 lead-relay
   ruled: native-gate-port-remaining-corpus operator 2026-09-03 lead-relay
@@ -150,7 +150,7 @@
   (operator, consult); TRAJECTORY.md §PRIORITY DIRECTIVE owns it.** It SUBSUMES rather than
   repeals the 2026-08-29 four-yield rule: with no yield available there is none to escalate.
   ruled: native-gate-port-remaining-corpus operator 2026-08-31 consult
-  ruled: native-gate-port-remaining-corpus lead 2026-09-01 2026-09-03 own-authority
+  ruled: native-gate-port-remaining-corpus lead 2026-09-01 2026-09-03 2026-09-04 own-authority
   Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close; cohorts ruled at scope 2026-08-11/12.
 
 - **kit-knob-consumer-adapter-convention** [design-pending] — whether a kit may ship
@@ -9449,10 +9449,10 @@
   **DISTINCT from `gate-command-status-conflation-third-caller`** and NOT a re-filing of it: that
   entry's subject is a `gate_command` exit-status conflation in `gate-sdk/bin/run-gate-tests.sh`;
   this is the AUTHORITY NAMED ON ITS Filed LINE. Fixing either leaves the other untouched.
+  ruled: pre-grammar-disposition-authority-ambiguity operator 2026-09-03 consult
   Surfaced 2026-09-03 by the lead of `capture-and-meter-cuts-with-windows-manifest-diagnostic`
-  after its close stamped; drained here. **Its `ruled:` line is owed and not yet writable** — the
-  relay named the operator as the authority and not the channel, so CLAUDE.md's ask-rather-than-
-  assume clause applies and this scope escalated the channel instead of guessing it.
+  after its close stamped; drained here, its channel asked rather than assumed and answered
+  2026-09-04.
 
 - **kpi-cost-per-unit** [design-pending] — no KPI prices cost per shipped unit, so a cut's width is
   judged rather than read.
