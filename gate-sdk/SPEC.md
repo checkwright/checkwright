@@ -2039,8 +2039,8 @@ owed file the section holds. A section whose own text sequences one member
 behind a named unit may cut the unblocked remainder behind that section's
 amendment and carry a second amendment when the sequenced member frees.
 context-kit/SPEC.md is the instance that grounds it, because it states both
-shapes in one file: §bin/env-probe sequences `lib/toolfloor.sh` behind the
-installer's behind-invoke relocation and says nothing of the kind about
+shapes in one file: §Layout and configuration sequences `lib/toolfloor.sh` behind
+the installer's behind-invoke relocation and says nothing of the kind about
 `bin/env-probe.sh`, where §Testing declares its own group *blocked as a whole* —
 so the owner doc has already said which of its groups cuts whole, and
 spec-over-precedent reads it there. Four things bind the shape. The sequenced

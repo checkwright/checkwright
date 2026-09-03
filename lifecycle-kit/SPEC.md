@@ -1887,6 +1887,13 @@ two readers use. Neither the derivation nor either exit status moved otherwise �
 the port was held against the deleted driver over the derivation order's five
 axes, all three refusal texts, a cross-tier mtime tie, a broken symlink, a
 dotfile and four cwd axes, with no difference in output or status.
+**In-envelope rather than a widening — ruled 2026-09-03 by the lead on its own
+authority.** The cut *opens* this failure mode rather than inheriting it: the
+deleted driver was a vendored shell script, present wherever the kit was, where
+the arm needs a **built** binary — so the refusal covers a case that did not
+exist before the cut, and a faithful port owes the case it created. Recorded as a
+lead ruling and not an operator-blessed one: the operator was asked whether they
+read the added refusal as a widening and had not answered when the cut closed.
 
 **The port disposition: taken 2026-09-03**, hosted on
 `native-gate-port-remaining-corpus`, which discharges the deferral this section

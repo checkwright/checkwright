@@ -279,8 +279,8 @@
   it failed. Two are known defects with a fix the entry already names —
   `enter-stage-flag-position-silently-ignored` (a trailing `--simulate` performs a real stamp)
   and `stamp-provenance-remedy-loops-when-uncommitted` (a gate's help prescribes a remedy that
-  does not clear its red) — and the planning assumption is that those two fix, the two
-  port-disposition entries keep (they name live port work), and the rest icebox.
+  does not clear its red) — and the planning assumption is that those two fix,
+  the two port-disposition entries are two of the three retired above, and the rest icebox.
   **Why [design-pending]:** per-slug exits are judgments the unit makes at build, not now;
   recovery of each body is mandatory before ruling on it.
   **Cost while deferred:** low, and it compounds — each close under the new order files new
@@ -2674,7 +2674,7 @@
   Nothing surfaces the running model, so a session cannot state its own tier without a human
   hand-reading the harness transcript, and no stage can assert the tier it was dispatched at.
   **Operator-proposed shape, recorded 2026-08-04:** a `usage-verdict`-shaped check — snapshot
-  in, exit 0/1/2, fail-soft — reusing `lifecycle-kit/bin/session-id.sh`'s projects-dir
+  in, exit 0/1/2, fail-soft — reusing the `--emit-session-id` arm's projects-dir
   derivation, with the *tier expectation in consumer config* rather than a kit literal. Both
   halves of that placement are forced: a baked model-name ladder is drift by construction
   (delegation-kit's agent-execution rule keys tiering to capability, not to a name), and the
@@ -3224,7 +3224,7 @@
   with its mechanism behind the doctrine-kit link: `Probe-before-assertion`,
   doctrine-kit/DOCTRINE.md rule 12, in the methodology-maintenance register. The three
   near-neighbours it was weighed against stay distinct and are named in the rule itself —
-  `Oracle-first` covers the gate case, `gap-bullet-premise-verification` the gap-inbox case,
+  `Oracle-first` covers the gate case, the gap drain's re-verification step the gap-inbox case,
   and rule 15's inspectable-run discipline the spawned-component case; none covered the
   design-time claim made where no oracle is running, which is what the new rule owns.
   **What remains, and why this stays `[design-pending]`:** the rule shipped with *Enforced by:
@@ -5198,7 +5198,7 @@
 
 - **overhead-meter-measures-the-lead** [design-pending] — under a live lead the overhead meter
   measures the supervising session, never the stage session its own binding names.
-  **Probed at close 2026-08-15, both halves.** `lifecycle-kit/bin/session-id.sh` is
+  **Probed at close 2026-08-15, both halves.** The session-id derivation is
   delegation-aware: with `CLAUDE_CODE_CHILD_SESSION` set it scans the lead's `subagents/` dir
   alone and returned this close session's own id. `drift-kit/bin/overhead-meter.sh` resolves
   "newest transcript" by a bare glob over the project dir with no such branch, and returned the
@@ -5216,7 +5216,7 @@
   by its own `session8`, so nothing needs deleting and re-measuring cannot fix it: the meter run
   again from the same session resolves the same wrong transcript.
   **DISTINCT from the mis-pick limit lifecycle-kit/SPEC.md §bin/session-id.sh already owns**,
-  and deliberately not folded into it: that limit is about `session-id.sh`'s *fallback* picking a
+  and deliberately not folded into it: that limit is about the derivation's *fallback* picking a
   just-finished subagent when the env uuid is absent, and it is documented at
   `lifecycle-kit/templates/lead.md`. This is the opposite direction — the env uuid is present and
   correct, one tool consults it and the other does not.
@@ -9384,6 +9384,7 @@
   the way in and on the way back out. The removed body is recoverable from
   the evicting commit (`git log -p -S'<slug>' -- TASK-QUEUE.md`).
 
+- **non-gate-arm-roster-hand-maintained** [design-pending] — The arm class's flag list is ungated.
 - **craft-rule-step-has-no-reader** [design-pending] — A broken stage-rules knob reds nothing.
 - **runtime-dir-two-tier-detector** [design-pending] — No two-tier proof for file-pattern ignores.
 - **done-slug-commit-naming-gate** [design-pending] — Done-moving commits need not name their slug.

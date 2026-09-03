@@ -625,7 +625,7 @@ priced cost, never the account the tokens billed to.
    that contract, it changes nothing there — its parse names a catch-all past the
    date, which is why the fifth field arrived here as a restatement to update and
    not as a reader to fix). The `<session-id>` field is not a raw
-   transcript id: it is lifecycle's `session-id.sh` *normalization* of one — a
+   transcript id: it is lifecycle's `--emit-session-id` *normalization* of one — a
    leading `agent-` stripped, then the first 8 chars (lifecycle-kit/SPEC.md
    §bin/session-id.sh) — so this repo's stamps carry an 8-char value, `session8`
    below. The stamp supplies the iteration↔stage↔session8 mapping. Read from

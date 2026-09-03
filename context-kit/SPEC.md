@@ -311,7 +311,10 @@ top-level session never bleeds, and a stale marker self-invalidates when the
 id rotates. The payload arrives on the hook's stdin, consumable exactly once,
 so the single read here is its sole consumer — a later payload-derived signal
 (a stage derivation, say) must hoist that one read ahead of this guard, never
-add a second. Top-level scoping is sufficient because both producer and
+add a second. Its guard is *stdin is not a TTY*, which a **manual** run of the
+hook satisfies whenever it inherits an open pipe, so the read blocks and the
+steps below it never emit: run the hook by hand with stdin redirected from
+`/dev/null`. Top-level scoping is sufficient because both producer and
 consumer are top-level by construction — `SessionStart` does not fire for
 Task-spawned subagents, so the only sessions the hook fires in are leads and
 manual runs, and the identity match discriminates exactly those. When the

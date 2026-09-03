@@ -211,6 +211,10 @@ supplies the checklist they invoke and the gate behind the promotion rule.
    entry is priced against that cap, and an entry already near it is compressed in
    the same commit that demotes it. Neither owner states this alone — the cap is
    queue-kit's and the demotion is this section's — and they meet only here.
+   **Return it to the position it was promoted from**, recovered from the
+   promoting commit's own diff. No surface owns a demoted entry's position, so
+   without this each demotion lands wherever the writer put it — and two batches
+   demoting into one section in sequence reverse their prior relative order.
 5. Propagate removals (grep every spec for names the change retired), file
    discovered gaps as debt tasks, and commit the merge with the work.
 
