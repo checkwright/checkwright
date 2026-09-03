@@ -437,7 +437,7 @@ if [[ "$first" == 1 && -f "$LIFECYCLE_KIT_GAP_INBOX_FILE" ]]; then
     gaps="$(awk '/^-[[:space:]]/ { print }' "$LIFECYCLE_KIT_GAP_INBOX_FILE")"
     if [[ -n "$gaps" ]]; then
         gap_n="$(grep -c '' <<<"$gaps")"
-        # spec: lifecycle-kit/SPEC.md §The committed gap inbox — the discriminator, one cursor read shared with bin/file-gap.sh. A never-named closing iteration has no close to have skipped — the guard LIFECYCLE_KIT_BOUNDARY_REQUIRE applies one block down for the same reason — and a boundary with no cursor at all is that case too, which the predicate alone reports as not-reached, so both edges are named here rather than folded into it.
+        # spec: lifecycle-kit/SPEC.md §The committed gap inbox — the discriminator, one cursor read shared with the --emit-file-gap arm. A never-named closing iteration has no close to have skipped — the guard LIFECYCLE_KIT_BOUNDARY_REQUIRE applies one block down for the same reason — and a boundary with no cursor at all is that case too, which the predicate alone reports as not-reached, so both edges are named here rather than folded into it.
         if [[ "$cur_iter" == "$UNNAMED" ]] || lifecycle_closing_stage_reached "$STATE" \
             || [[ -z "$(lifecycle_current_stage "$STATE")" ]]; then
             if [[ "$sim" == 1 ]]; then

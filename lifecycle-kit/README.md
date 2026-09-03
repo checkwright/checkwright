@@ -44,7 +44,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    check-close-surfaces
    check-survey-record          # inert until a survey is filed (--emit file-survey)
    check-scratch-citation       # no permanent surface points a reader into per-iteration scratch
-   check-gap-inbox-neutrality   # inert until a gap is filed (bin/file-gap.sh)
+   check-gap-inbox-neutrality   # inert until a gap is filed (--emit file-gap)
    ```
    <!-- gate-roster:end -->
 
@@ -115,8 +115,8 @@ by design.
 
 ```bash
 bash lifecycle-kit/bin/enter-stage.sh <stage>          # stamp a stage entry (the transition itself)
-bash lifecycle-kit/bin/file-gap.sh "<gap>"             # route a work-shaped finding to the gap inbox
 bash gate-sdk/bin/run-gates.sh --install-lifecycle    # (re)write the registration and merge-attribute blocks
+bash gate-sdk/bin/run-gates.sh --emit file-gap "<gap>"   # route a work-shaped finding to the gap inbox
 bash gate-sdk/bin/run-gates.sh --emit file-survey "<question>" "<corpus>" "<oracle>" "<edges>" "<finding>"
 bash gate-sdk/bin/run-gates.sh --emit cite-survey "<heading-substring>"   # one carried survey, inline-ready
 bash gate-sdk/bin/run-gates.sh --emit session-id                       # the canonical stamp id, by the derivation order

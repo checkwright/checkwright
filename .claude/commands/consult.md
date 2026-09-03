@@ -14,7 +14,7 @@ source.
 - Direction, a closed operator ruling, or a refused alternative with its grounds
   → `TRAJECTORY.md`, under the recording-authority rule it carries.
 - Work — a gap, a task, a promotion signal → `TASK-QUEUE.md` via
-  `bash lifecycle-kit/bin/file-gap.sh` mid-iteration, or a direct entry when the
+  `run-gates.sh --emit file-gap` mid-iteration, or a direct entry when the
   operator directs one (CLAUDE.md §Housekeeping).
 - A ruling about mechanism → the owning kit's `SPEC.md`, which is where a
   mechanism's contract already lives; `TRAJECTORY.md` then registers it by

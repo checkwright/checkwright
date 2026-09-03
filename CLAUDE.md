@@ -186,7 +186,7 @@ load behind that trigger, so they are not resident here.
   no capture; close triages it (drift-kit/SPEC.md §The knowledge-friction loop).
 - **Gap capture (any mid-iteration session):** a work-shaped finding — a gap,
   a task, a defect — routes to the committed gap inbox with
-  `bash lifecycle-kit/bin/file-gap.sh "<gap>"`, never a mid-iteration queue
+  `bash gate-sdk/bin/run-gates.sh --emit file-gap "<gap>"`, never a mid-iteration queue
   edit contending on a stage session's surface; close drains it
   (lifecycle-kit/SPEC.md §The committed gap inbox). The sanctioned exception:
   an operator-directed filing may land in the queue directly, staged and

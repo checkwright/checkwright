@@ -130,9 +130,9 @@ pub fn emit(args: &[String]) -> Result<String, String> {
 }
 
 // spec: lifecycle-kit/SPEC.md §The survey record — append-only within the iteration, never edited
-// in place: the write opens for append rather than rewriting the record, so a filing cannot lose a
-// block a concurrent one landed.
-fn append(path: &std::path::Path, body: &str) -> std::io::Result<()> {
+// in place, so a filing cannot lose a block a concurrent one landed. Shared with `--emit-file-gap`,
+// whose surface carries the same rule as a merge property (§The committed gap inbox).
+pub(super) fn append(path: &std::path::Path, body: &str) -> std::io::Result<()> {
     use std::io::Write;
     let mut f = std::fs::OpenOptions::new().append(true).open(path)?;
     f.write_all(body.as_bytes())

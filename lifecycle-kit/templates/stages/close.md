@@ -103,7 +103,7 @@ session.
    **A finding your own later steps generate postdates this drain, and it routes
    to the inbox like any other.** The audits, the lesson disposition, the
    staleness read and the release disposition all run after this step, so what
-   they turn up has no drainer left in this iteration. File it (`bin/file-gap.sh`)
+   they turn up has no drainer left in this iteration. File it (`--emit file-gap`)
    and let it be carried: the next first-stage entry admits it and takes it as
    that session's intake (§The committed gap inbox). Do **not** back-date it into
    a drain that has already run — a second pass over an inbox your own later

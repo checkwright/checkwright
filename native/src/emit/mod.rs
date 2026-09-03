@@ -8,6 +8,7 @@ pub mod drift_report;
 pub mod enforcement_map;
 pub mod enum_sets;
 pub mod env_probe;
+pub mod file_gap;
 pub mod file_survey;
 pub mod footprint;
 pub mod graph;
@@ -337,6 +338,14 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         "--emit-file-survey",
         Arm::Emit(file_survey::emit),
         file_survey::KNOBS,
+    ),
+    // spec: lifecycle-kit/SPEC.md §The committed gap inbox — the mid-iteration capture affordance,
+    // riding the same argv-shape split as `--emit-file-survey`: the refusal and the `--` escape
+    // cross the port with the argument, the help arm retires to the front-end.
+    (
+        "--emit-file-gap",
+        Arm::Emit(file_gap::emit),
+        file_gap::KNOBS,
     ),
     // spec: lifecycle-kit/SPEC.md §The survey record — the citation affordance: it derives no stage
     // and stamps no rev, so its sibling's state-file knob is deliberately off this roster.

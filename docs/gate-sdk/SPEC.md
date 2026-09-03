@@ -786,7 +786,7 @@ contract the usage text would have told it did not exist.
 The `--` escape is not decoration: without it the refusal makes a legitimate
 filing unfileable, and this rule's own subject matter is the instance — recording
 that a `--list` argument was captured takes
-`bash lifecycle-kit/bin/file-gap.sh -- "--list is captured at exit 0"`.
+`bash gate-sdk/bin/run-gates.sh --emit file-gap -- "--list is captured at exit 0"`.
 
 **The shape half of this rule outlives a member's port, even though this
 contract's own corpus is `*/bin/*.sh`.** Without saying so the rule reads as
@@ -794,7 +794,7 @@ retiring with the file, which is the wrong reading: the refusal exists because
 free text reaches a *capture*, so it binds on whatever substrate that capture
 runs. §The non-gate arm carries the split — the shape refusal and the `--` escape
 cross the port, the `-h`/`--help` arm retires to the front-end — and
-`--emit-file-survey` is the worked instance.
+`--emit-file-survey` and `--emit-file-gap` are the worked instances.
 
 **No gate reads this rule, and that is ruled rather than deferred.**
 §check-exec-bit's corpus is the whole `*/bin/*.sh` set, and a gate over it could
@@ -2186,7 +2186,10 @@ context-kit's machine-profile derivation (context-kit/SPEC.md §bin/env-probe),
 adapters an `EVIDENCE_KIT_PARSER_<suite>` value may name
 (evidence-kit/SPEC.md §Layout and configuration), and `--emit-enum-sets`,
 the bundled enum-set emitter a `CANON_KIT_ENUM_SETS_CMD` value may name
-(canon-kit/SPEC.md §check-prose-enum),
+(canon-kit/SPEC.md §check-prose-enum), and `--emit-file-gap`, lifecycle-kit's
+mid-iteration gap-capture affordance (lifecycle-kit/SPEC.md §The committed gap
+inbox) and the second free-text capture member the argv-shape split below
+governs,
 its 2026-09-03 ones), the
 **harness-integration**
 arms below it, and the bridged `Arm::Run` members that are neither —
@@ -2421,7 +2424,10 @@ flag would be a second home for one sentence — the disposition
 `--emit-queue-counts` took at its own port. So `--emit file-survey --help` is a
 refusal rather than a capture, which preserves the substantive half of the
 contract while the discoverability half moves to where the class already keeps it.
-`--emit-cite-survey` rides the same split on the same ground.
+`--emit-cite-survey` rides the same split on the same ground, and so does
+`--emit-file-gap` (lifecycle-kit/SPEC.md §The committed gap inbox) — a second
+free-text capture member, which is what turns the sentence above from a worked
+example into a rule with more than one instance.
 
 **A member may join the table with an *empty* declared roster, and that is the
 sentence the class did not yet hold.** The forced-family test above answers for a

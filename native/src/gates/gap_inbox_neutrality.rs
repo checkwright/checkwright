@@ -155,7 +155,7 @@ pub fn run(args: &[String]) -> i32 {
         for f in &findings {
             println!("  {}", f);
         }
-        println!("  help: the gap inbox records what a filer observed, and the closing stage's drain is what judges it. File with 'bash lifecycle-kit/bin/file-gap.sh \"<gap prose>\"', which stamps the one legal bullet shape. A bullet that re-files a live entry says so in its own prose — write why you believe it re-occurred and let the drain rule on it; never open the prose with a 'recurrence of <slug>:' verdict, which states a conclusion the capture channel has no standing to reach.");
+        println!("  help: the gap inbox records what a filer observed, and the closing stage's drain is what judges it. File with 'bash gate-sdk/bin/run-gates.sh --emit file-gap \"<gap prose>\"', which stamps the one legal bullet shape. A bullet that re-files a live entry says so in its own prose — write why you believe it re-occurred and let the drain rule on it; never open the prose with a 'recurrence of <slug>:' verdict, which states a conclusion the capture channel has no standing to reach.");
         return 1;
     }
     println!(

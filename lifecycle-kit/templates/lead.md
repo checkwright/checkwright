@@ -362,7 +362,7 @@ Every session that judges a recurrence is obliged to stamp the date onto that
 entry's declaration (lifecycle-kit/SPEC.md §The committed gap inbox) — and the
 no-queue-write rule above leaves you no way to stamp one. You discharge the
 obligation by **filing the judgment and its grounds into a gap bullet**
-(`bin/file-gap.sh`): the session that may write the queue then stamps from your
+(`--emit file-gap`): the session that may write the queue then stamps from your
 prose, exactly as the drain stamps from a filer's. Doing this at the boundary is
 safe — the entry admits a bullet the closing stage could not have drained and
 carries it into the entering session's intake, so a boundary-filed judgment

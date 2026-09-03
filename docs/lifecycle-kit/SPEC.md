@@ -543,7 +543,7 @@ the clause's reader is a human or agent rather than a gate.
   read by `check-lesson-disposition` and the boundary-reset built-in.
 - `LIFECYCLE_KIT_GAP_INBOX_FILE` — the committed append-only gap inbox
   (§The committed gap inbox); default
-  `${GATE_SDK_WORKFLOW_DIR:-.workflow}/gap-inbox.md`, written by `bin/file-gap.sh`,
+  `${GATE_SDK_WORKFLOW_DIR:-.workflow}/gap-inbox.md`, written by the `--emit-file-gap` arm,
   its `merge=union` attribute verified by `check-merge-attrs`, drained by the
   close skill and read for emptiness by `bin/enter-stage.sh`'s boundary refusal.
 - `LIFECYCLE_KIT_SURVEY_RECORD_FILE` — the committed per-iteration survey record
@@ -760,16 +760,43 @@ operators, the finding that rules the gitignored friction log out as the channel
 What *append-only* means on this surface is a merge property, and
 §Multi-operator semantics owns it: this is the kit's one `union`-driver surface.
 
-**The affordance.** `bin/file-gap.sh [--] "<gap prose>"` (the `bin/kfric.sh`
-pattern: repo-root cd, config-via-env, exit 2 on an empty argument) appends one
-dated bullet, seeding the contract header when the inbox does not yet exist. Its
-one positional is free text, so it validates that argument's **shape** to
-gate-sdk/SPEC.md §The bin/-tool contract — help on stdout at exit 0, an
-unrecognized leading `-` refused, `--` ending option processing — which is the
-rule this capture affordance's own three attested firings bought. It is
+**The affordance.** `run-gates.sh --emit file-gap [--] "<gap prose>"` (the
+`bin/kfric.sh` pattern: repo-root anchor, config-via-env, exit 2 on an empty
+argument) appends one dated bullet, seeding the contract header — byte-identical
+to the line close's drain truncates back to — when the inbox does not yet exist.
+It is the `--emit-file-gap` bridged arm (gate-sdk/SPEC.md §The non-gate arm),
+whose declared roster is five knobs already defined in `lib/stages.sh`:
+`LIFECYCLE_KIT_GAP_INBOX_FILE`, `LIFECYCLE_KIT_QUEUE_FILE`,
+`LIFECYCLE_KIT_STATE_FILE`, `LIFECYCLE_KIT_STAGES` and
+`LIFECYCLE_KIT_FIRST_STAGE`. The family is forced rather than chosen: the tool
+resolves consumer knobs, and a hardcoded top-level flag would resolve platform
+defaults while silently ignoring every override.
+Its one positional is free text, so it validates that argument's **shape** to
+gate-sdk/SPEC.md §The bin/-tool contract — an unrecognized leading `-` refused
+at exit 2, `--` ending option processing — which is the rule this capture
+affordance's own three attested firings bought, and which **survives the port
+because the hazard belongs to the argument rather than to the substrate**. The
+`-h`/`--help` arm does **not** survive: usage for a bridged arm lives in
+`run-gates.sh`'s own help and in [README.md](README.md), so `--emit file-gap
+--help` is a refusal rather than a capture. That is the one observable this
+member's port moved. Stdout is the filed bullet and nothing else; the three
+advisories below all ride **stderr**, so a reader pasting the returned line
+never carries a question or a warning inside it. It is
 advisory tooling, not a gate — no fixture pair is owed; the raw append (a bullet
 line into the inbox) stays a legal fallback, the grammar being the surface's
 contract, not the writer.
+
+**Taking that port did not discharge this section, and the residue is written
+rather than implied.** Three implementations carry this section's contract and
+only one of them is in-crate. The capture affordance above is compiled.
+`bin/enter-stage.sh` still holds the **iteration-boundary gap-inbox check** and
+its close-skipped/post-close discriminator (§bin/enter-stage.sh), and it ports in
+a cut of its own. `lib/stages.sh` still holds this surface's union-merge
+membership (§Multi-operator semantics), and it is **permanently shell** under the
+kit-library class ruling as the config bridge's sole `LIFECYCLE_KIT_*` resolver
+(gate-sdk/SPEC.md §The kit-library port disposition) — so this section's contract
+will not be wholly in-crate while that ruling stands. Its already-ported twin
+`native/src/stages.rs` carries the same constant on the crate side.
 
 It also **resolves the prose against the live slug set** at capture and, on a
 match, raises a stderr advisory that **asks** the filer: the prose names live
@@ -794,13 +821,37 @@ and this kit already carries it — `bin/enter-stage.sh`'s boundary refusal and
 `check-lesson-disposition` both scan it.
 The done exclusion is the substantive half: a finding that recurs *after* its fix
 landed is a new defect, not a recurrence, and files as one. Resolution is
-lifecycle-kit's own awk over the
+lifecycle-kit's own scan over the
 queue — the shape `check-stage-entry` assertion B already takes — never
 queue-kit's `queue_live_slugs`, because reaching for it would close a cross-kit
 cycle. queue-kit/SPEC.md §The queue format states that as the general rule (a kit
 that cannot depend on queue-kit re-implements the predicate and both ends cite the
 owner section), and drift-kit's `kpi-deferred-age` records the same accepted
-residual.
+residual. Two further behaviours belong to the predicate rather than to its
+grammar: **longest match wins**, so the advisory names the most specific live
+entry the prose reaches; and the match is **word-bounded** on `[a-z0-9-]` in both
+directions, so a slug embedded in a longer hyphenated token raises nothing.
+
+**The port reproduced that predicate rather than collapsing it onto its compiled
+twin, and the reason is a corpus difference rather than a preference.** The crate
+already carries `queue::live_slugs`, the compiled form of queue-kit's own
+predicate, whose section scope is composed from `QUEUE_KIT_ACTIVE_SECTIONS` plus
+the deferred and icebox section knobs. This section's predicate is
+**grammar-scoped instead** — every column-0 entry bullet outside the
+fixed-spelling Lessons section, needing no section knob of its own. Those are not
+the same corpus: a consumer whose icebox is unconfigured, or whose active-section
+roster differs from its heading set, gets a different live set from each. The
+collapse would therefore be a verdict change on a real consumer, which is not a
+thing a port may take on its own authority.
+
+**The stated ground weakens under that substrate, and the honest note is here
+rather than left for a later reader to re-derive.** "Would close a cross-kit
+cycle" is a claim about a *shell* source dependency — this kit's `bin/` sourcing
+queue-kit's `lib/`. Inside one binary both predicates are already compiled
+together and no vendoring decision separates them, so the anti-cycle premise no
+longer describes the arrangement it was written against. Whether the refusal
+survives on an independent ownership ground, or retires with its premise, is not
+settled by any surface here and is not settled by the port.
 
 **Why the matcher prompts rather than decides, and why it survives at all.** A
 recurrence is a claim about *what a finding is*, not about *what a string
@@ -862,8 +913,8 @@ with no marker field. It is refused on evidence, on four independent grounds.
 **The tool writes no queue file, and that is the load-bearing constraint on the
 whole channel.** This inbox exists precisely because a gap surfaced mid-stage has
 no committed place to land except the queue file a stage session is already
-contending on. A `file-gap.sh` that stamped a `recurrence:` declaration onto a
-queue entry would do the one thing the inbox was built to prevent. The queue write
+contending on. A capture affordance that stamped a `recurrence:` declaration onto
+a queue entry would do the one thing the inbox was built to prevent. The queue write
 therefore belongs to the closing stage's drain, which writes the queue anyway.
 
 **A queue entry cites this inbox as provenance, never as a locator — ruled
@@ -992,9 +1043,14 @@ the filing window do not coincide.
   still not a drain.
 
 The discriminator is the cursor read `lifecycle_closing_stage_reached`
-(§lib/stages.sh), the same predicate `bin/file-gap.sh` warns from at capture, so
-a filer told "none is left to drain it" is told so by the very test that later
-admits the bullet rather than by a lookalike. **Two edges take the post-close
+(§lib/stages.sh), the same predicate the `--emit-file-gap` arm warns from at
+capture, so a filer told "none is left to drain it" is told so by the same test
+that later admits the bullet. **That agreement now holds inside each substrate
+and not across them**: the boundary check here is shell and the capture warning
+is compiled, so until this tool ports the two are lookalikes rather than one
+hoisted predicate. **This check and its discriminator are §The committed gap
+inbox's surviving shell half**, stated here so a later cut selector meets the
+fact where it works rather than in the other section. **Two edges take the post-close
 disposition**, both following precedents the script already carries: a closing
 iteration that was never named (the `—` placeholder) has no close to have
 skipped — the guard `LIFECYCLE_KIT_BOUNDARY_REQUIRE` applies one block down for
@@ -1044,7 +1100,7 @@ so the inbox declares itself on the close-surface roster
 close-surface: .workflow/gap-inbox.md forced=lifecycle-kit/SPEC.md §bin/enter-stage.sh
 
 **Producers and consumers.** Producer: any mid-iteration session (lead or stage)
-via `bin/file-gap.sh` — the knob default makes the channel live everywhere the
+via `--emit file-gap` — the knob default makes the channel live everywhere the
 kit is vendored. Consumers, **two**, one per disposition of the boundary check.
 The close skill's drain step (§templates/stages/) dispositions every bullet —
 promoted to a deferred `[design-pending]` entry, fixed inline that session, or
@@ -1367,7 +1423,7 @@ elsewhere in this kit. A tree with no `HEAD` commit cannot ground a witness, so
 that is a refusal (exit 2) rather than a blank field; a tree with no cursor yet
 stamps the never-named `—` the queue header already uses.
 
-The arm **deliberately does not** inherit `file-gap.sh`'s slug resolution. A
+The arm **deliberately does not** inherit `--emit-file-gap`'s slug resolution. A
 survey's prose routinely names queue slugs as its subject, and that resolver scans whole
 prose, so it would stamp a recurrence declaration onto the survey's subject.
 Adding no resolver here is a decision, not an omission.
@@ -1410,7 +1466,7 @@ is `LIFECYCLE_KIT_SURVEY_RECORD_FILE` **alone**: it derives no stage and stamps 
 rev, so its sibling's second knob is deliberately off its roster. It is advisory
 tooling, not a gate, the same disposition its sibling carries. Its coverage by the
 shape contract is a census find rather than a firing: it carries
-`file-gap.sh`'s exact single-argument shape and had simply never been run with a
+`--emit-file-gap`'s exact single-argument shape and had simply never been run with a
 flag, and while it writes nothing, its help behavior was the same misleading
 error — the half of that finding the port discharges outright.
 
@@ -1680,10 +1736,14 @@ predicate** built on that cursor: success when the cursor equals the last member
 of `LIFECYCLE_KIT_STAGES`, failure otherwise — including for both no-cursor
 shapes, since a cursor that does not exist has not reached anything. It is
 hoisted rather than spelled at each site because its **two callers must agree by
-construction**: `bin/file-gap.sh` reads it for the capture-time warning that
-tells a filer which consequence they are buying, and `bin/enter-stage.sh` reads
-it at the iteration-boundary gap-inbox check to choose between refusing and
-admitting (§The committed gap inbox). A filer warned that "none is left to drain
+construction**: the `--emit-file-gap` arm reads it for the capture-time warning
+that tells a filer which consequence they are buying, and `bin/enter-stage.sh`
+reads it at the iteration-boundary gap-inbox check to choose between refusing and
+admitting (§The committed gap inbox). **Since that arm ported, the guarantee
+holds inside each substrate and is lost across them** — the crate composes the
+same test from `stages::current_stage` and the last `LIFECYCLE_KIT_STAGES`
+element, so the two agree by lookalike until `bin/enter-stage.sh` ports, at which
+point the hoisting's original guarantee returns without further work. A filer warned that "none is left to drain
 it" is warned by the very test that later admits the bullet, rather than by a
 lookalike that can drift from it. **No knob is minted and none is possible**: the
 last configured stage is already `LIFECYCLE_KIT_STAGES`'s last member, so the
@@ -1755,7 +1815,7 @@ return non-zero on a routine non-match, run as a bare command, aborts every
 a consumer with a pattern configured being unable to re-emit its own derived
 surfaces, silently and at exit 1 — that caller was `bin/install-lifecycle.sh`,
 which ported on 2026-09-03, and no surviving shell sourcer in this tree
-(`bin/enter-stage.sh`, `bin/file-gap.sh`) runs under `set -e`. The contract binds
+(`bin/enter-stage.sh`) runs under `set -e`. The contract binds
 the next one that does, which is why it is stated as a property of the loader
 rather than as a note about one caller.
 Exercised in `smoke/` with a pattern actually set, the empty default never

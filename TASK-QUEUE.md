@@ -12,57 +12,6 @@
 
 ## New Features
 
-- **native-gate-port-remaining-corpus** [spec: SPEC-gap-cut.md] [roadmap: now/reliability]
-  — the whole battery onto the binary, and the shell surface down to its residue.
-  roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
-  It DEMOTES at build, never `## Done` — canon-kit/SPEC.md §Merging an amendment's corpus branch.
-  **Operator-ruled 2026-08-09: complete the port, ASAP** — that ruling, its grounds, its scope,
-  both install paths and the tail are [TRAJECTORY.md](TRAJECTORY.md) §PRIORITY DIRECTIVE's, not
-  restated; this entry is the work, bootstrap design included, inheriting gate-sdk/SPEC.md
-  §Porting a gate to the binary substrate and §Consumer payload. **Each closed cut's record —
-  members, counts, holds, grounds, price — lives in the contract section that cut selected**, so
-  this entry states only what remains (drift-kit/SPEC.md §The KPI plugin contract, gate-sdk/SPEC.md
-  §Consumer smoke, *The port disposition*).
-  Cut widths are ruled **per cut and never inherited**; the size arm is **permanently** exhausted.
-  **THE COMPOSER DOES NOT REACH THE TREE REMAINDER** — the registry arm answers for the battery,
-  only `--tree` is the predicate, and both arms are run. That two-axis misreading, the rise in owed
-  on a landing shell file, and the bounds are gate-sdk/SPEC.md §port-blockers'.
-  **THE COMPOSER IS RULED 2026-08-28: select the next cut by STATED CONTRACT** — the owed
-  files behind one specification section, ported behind the one amendment that section needs. Size-
-  and kit-ordered composers stay refused. **IT CONSTRAINS SELECTION, NOT ITERATION PACKAGING —
-  ruled 2026-08-30 (operator, lead-relay):** the clauses above say what makes ONE cut well-formed;
-  how many an iteration holds is owned elsewhere. Refused with it — three cohorts as ONE cut, which
-  fails this ruling's own words (*one* section, *the one* amendment) and averages the grounds all
-  three entries forbid, shared setup being logistics; and one cut per iteration, an over-read
-  paying three iteration floors for no added decision quality.
-  **(1) A CUT NARROWS THE PORT, NEVER AN EXTENSION POINT.** Where a kit ships a consumer-facing
-  plugin or config seam, that seam's resolution, direct execution and env contract survive and only
-  the bundled members move in-crate; the ground is the porting kit's OWN governed surfaces plus
-  CLAUDE.md §The provenance seam, never analogy — worked at drift-kit/SPEC.md §The extensibility
-  contract. **(2) SETTINGS GRANTS, RULED 2026-08-29 (operator, lead-relay):** removing a permission
-  grant whose target a RULED PORT CUT DELETES is OUTSIDE the 2026-08-22 bar — a pure narrowing
-  forced by the cut — and build removes the dead lines IN THE SAME COMMIT AS THE DELETE, the window
-  the requirement exists to close. The bar stands unchanged for every other permission-settings
-  edit: a carve-out for one class. Scope is the files THAT COMMIT deletes, never a path prefix —
-  probe the count, never assume it, the attested probe having quadrupled one kit's.
-  **(3) A SECTION IS A CUT'S OUTER BOUND, NOT ITS MINIMUM; (4) A CONSUMER PLUGIN ON A SEAM IS OWED
-  — ruling (1) reaches the seam alone — both ruled 2026-09-03 (operator, lead-relay); grounds and
-  refusals at gate-sdk/SPEC.md §Porting a gate to the binary substrate.**
-  ruled: native-gate-port-remaining-corpus lead 2026-08-28 2026-08-29 2026-08-31 own-authority
-  ruled: native-gate-port-remaining-corpus operator 2026-08-28 2026-08-29 2026-08-30 lead-relay
-  ruled: native-gate-port-remaining-corpus operator 2026-09-03 lead-relay
-  **Cost while deferred:** large and known — the **owed** remainder (the trailer's own arm, never
-  the unported count) plus the runners and the install-lifecycle layer. Not a single-iteration
-  delta; criterion relaxation is closed at gate-sdk/SPEC.md §The port-candidate criteria, an
-  ordering signal and never an eligibility screen. `gate-battery-result-cache` is the one battery
-  entry unsubsumed; `powershell-installer-surface` is the sequence's last member.
-  **NO YIELD AT ALL until `--tree` reads zero owed — the port-only run, ruled 2026-08-31
-  (operator, consult); TRAJECTORY.md §PRIORITY DIRECTIVE owns it.** It SUBSUMES rather than
-  repeals the 2026-08-29 four-yield rule: with no yield available there is none to escalate.
-  ruled: native-gate-port-remaining-corpus operator 2026-08-31 consult
-  ruled: native-gate-port-remaining-corpus lead 2026-09-01 2026-09-03 own-authority
-  Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close; cohorts ruled at scope 2026-08-11/12.
-
 - **drift-kit-bin-port-residue** [spec: SPEC-kfric-cut.md] — drift-kit's owed `bin/` members,
   hosted together because the port corpus needs a SECOND queue entry and for no stronger reason.
   **The ground is a column budget, not a class ruling, and this entry says so rather than letting
@@ -194,6 +143,57 @@
   ruled: kit-library-port-residue lead 2026-09-01 2026-09-02 2026-09-03 own-authority
   ruled: kit-library-port-residue operator 2026-09-03 lead-relay
   Filed 2026-08-30 by build, at the landing of the kit-library class ruling.
+
+- **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
+  — the whole battery onto the binary, and the shell surface down to its residue.
+  roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
+  It DEMOTES at build, never `## Done` — canon-kit/SPEC.md §Merging an amendment's corpus branch.
+  **Operator-ruled 2026-08-09: complete the port, ASAP** — that ruling, its grounds, its scope,
+  both install paths and the tail are [TRAJECTORY.md](TRAJECTORY.md) §PRIORITY DIRECTIVE's, not
+  restated; this entry is the work, bootstrap design included, inheriting gate-sdk/SPEC.md
+  §Porting a gate to the binary substrate and §Consumer payload. **Each closed cut's record —
+  members, counts, holds, grounds, price — lives in the contract section that cut selected**, so
+  this entry states only what remains (drift-kit/SPEC.md §The KPI plugin contract, gate-sdk/SPEC.md
+  §Consumer smoke, *The port disposition*).
+  Cut widths are ruled **per cut and never inherited**; the size arm is **permanently** exhausted.
+  **THE COMPOSER DOES NOT REACH THE TREE REMAINDER** — the registry arm answers for the battery,
+  only `--tree` is the predicate, and both arms are run. That two-axis misreading, the rise in owed
+  on a landing shell file, and the bounds are gate-sdk/SPEC.md §port-blockers'.
+  **THE COMPOSER IS RULED 2026-08-28: select the next cut by STATED CONTRACT** — the owed
+  files behind one specification section, ported behind the one amendment that section needs. Size-
+  and kit-ordered composers stay refused. **IT CONSTRAINS SELECTION, NOT ITERATION PACKAGING —
+  ruled 2026-08-30 (operator, lead-relay):** the clauses above say what makes ONE cut well-formed;
+  how many an iteration holds is owned elsewhere. Refused with it — three cohorts as ONE cut, which
+  fails this ruling's own words (*one* section, *the one* amendment) and averages the grounds all
+  three entries forbid, shared setup being logistics; and one cut per iteration, an over-read
+  paying three iteration floors for no added decision quality.
+  **(1) A CUT NARROWS THE PORT, NEVER AN EXTENSION POINT.** Where a kit ships a consumer-facing
+  plugin or config seam, that seam's resolution, direct execution and env contract survive and only
+  the bundled members move in-crate; the ground is the porting kit's OWN governed surfaces plus
+  CLAUDE.md §The provenance seam, never analogy — worked at drift-kit/SPEC.md §The extensibility
+  contract. **(2) SETTINGS GRANTS, RULED 2026-08-29 (operator, lead-relay):** removing a permission
+  grant whose target a RULED PORT CUT DELETES is OUTSIDE the 2026-08-22 bar — a pure narrowing
+  forced by the cut — and build removes the dead lines IN THE SAME COMMIT AS THE DELETE, the window
+  the requirement exists to close. The bar stands unchanged for every other permission-settings
+  edit: a carve-out for one class. Scope is the files THAT COMMIT deletes, never a path prefix —
+  probe the count, never assume it, the attested probe having quadrupled one kit's.
+  **(3) A SECTION IS A CUT'S OUTER BOUND, NOT ITS MINIMUM; (4) A CONSUMER PLUGIN ON A SEAM IS OWED
+  — ruling (1) reaches the seam alone — both ruled 2026-09-03 (operator, lead-relay); grounds and
+  refusals at gate-sdk/SPEC.md §Porting a gate to the binary substrate.**
+  ruled: native-gate-port-remaining-corpus lead 2026-08-28 2026-08-29 2026-08-31 own-authority
+  ruled: native-gate-port-remaining-corpus operator 2026-08-28 2026-08-29 2026-08-30 lead-relay
+  ruled: native-gate-port-remaining-corpus operator 2026-09-03 lead-relay
+  **Cost while deferred:** large and known — the **owed** remainder (the trailer's own arm, never
+  the unported count) plus the runners and the install-lifecycle layer. Not a single-iteration
+  delta; criterion relaxation is closed at gate-sdk/SPEC.md §The port-candidate criteria, an
+  ordering signal and never an eligibility screen. `gate-battery-result-cache` is the one battery
+  entry unsubsumed; `powershell-installer-surface` is the sequence's last member.
+  **NO YIELD AT ALL until `--tree` reads zero owed — the port-only run, ruled 2026-08-31
+  (operator, consult); TRAJECTORY.md §PRIORITY DIRECTIVE owns it.** It SUBSUMES rather than
+  repeals the 2026-08-29 four-yield rule: with no yield available there is none to escalate.
+  ruled: native-gate-port-remaining-corpus operator 2026-08-31 consult
+  ruled: native-gate-port-remaining-corpus lead 2026-09-01 2026-09-03 own-authority
+  Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close; cohorts ruled at scope 2026-08-11/12.
 
 - **kit-knob-consumer-adapter-convention** [design-pending] — whether a kit may ship
   a knob whose only working configuration requires the consumer to author an adapter, and whether
@@ -983,8 +983,9 @@
   **Re-tiered out of the icebox 2026-08-19 on a falsified premise, ruled by the iteration lead
   rather than the operator because the entry's own cost field is what decides it.** Icebox
   membership asserts "no named event is waiting to promote it"; a named event has now occurred.
-  **The firing, probed rather than inferred.** `lifecycle-kit/bin/file-gap.sh` appends the bullet
-  and never commits — no `git` invocation anywhere in it. `git log -- .workflow/gap-inbox.md`
+  **The firing, probed rather than inferred.** The capture affordance appends the bullet and
+  never commits — no `git` invocation in it, before or after its port to an arm.
+  `git log -- .workflow/gap-inbox.md`
   shows the `wide-budget-batch-and-hold-declaration` close's first two bullets each landing in
   their own `chore(gap):` commit while the third was written and left in the working tree, so it
   reached a **new iteration's** scope session as an uncommitted modification and was carried into
@@ -994,7 +995,7 @@
   contract (lifecycle-kit/SPEC.md §The committed gap inbox) gives a bullet exactly one
   disposition — promoted, fixed inline, or discarded with cause — and none of them is "committed".
   A surface named *the committed gap inbox* whose filer never commits is the gap in one phrase.
-  **Why `[design-pending]`:** the shapes differ in who pays. Have `file-gap.sh` commit its own
+  **Why `[design-pending]`:** the shapes differ in who pays. Have `--emit file-gap` commit its own
   bullet — cheapest, but it makes a capture affordance a committing tool, and it contends on a
   shared index with whatever stage session is mid-commit. Oblige the filing session to commit in
   the same turn — no tool change, but it is an instruction, and this iteration is the evidence
@@ -2697,7 +2698,7 @@
   to a saturated routing-tier lead.
   **Two mechanisms, ranked.** *(1) Structural and cheapest* — put the triage step in the
   stage ritual where findings are discovered, so it costs a paragraph rather than a
-  dispatch. *(2) Mechanical and self-applying* — `lifecycle-kit/bin/file-gap.sh` takes free
+  dispatch. *(2) Mechanical and self-applying* — `--emit file-gap` takes free
   text, so a bullet saying only that something is broken passes; requiring the three fields
   the doctrine asks for (defect class; mechanism, or the structural removal that obviates
   it; decidability call with a cadence when un-gateable) makes triage unskippable, because
@@ -3062,8 +3063,9 @@
 - **recurrence-resolver-literal-match-only** [design-pending] — a real recurrence whose bullet
   does not spell the slug is drained as a fresh entry.
   The gap-inbox recurrence resolver matches a literal slug substring in a bullet's prose — at
-  capture (`bin/file-gap.sh`'s live-slug scan) and again at the close drain, which re-resolves
-  the same way. A filer who describes a defect rather than naming it produces a bullet that is
+  capture (the `--emit-file-gap` arm's live-slug scan) and again at the close drain, which
+  re-resolves the same way. A filer who describes a defect rather than naming it produces a
+  bullet that is
   present, is a genuine recurrence, and matches nothing; the drain files it as a new entry,
   fragmenting the backlog the inbox exists to keep whole.
   **The third face of one matcher, and the only face still open.** Its two siblings covered the
@@ -3090,7 +3092,7 @@
   **Why `[design-pending]`:** the under-matching direction has no syntactic remedy at all. The
   over-counting sibling can at least imagine a filer-supplied flag; here the missing signal is in
   the filer's head, so the honest candidates are a required recurrence-or-new field on
-  `file-gap.sh`, or accepting the drain's session-side judgment as the only real channel.
+  the capture arm, or accepting the drain's session-side judgment as the only real channel.
   **That contract call has since been made, and this entry survives it.**
   `gap-resolver-mention-overcount` landed the second candidate: the drain is the authoritative
   judge, the capture-time matcher is demoted to an advisory that asks the filer, and the required
@@ -5076,9 +5078,9 @@
   `kfric.sh` none), against six the iteration before. Halved, and the halving is not progress —
   fewer captures were filed, and the per-filing tax is unchanged.
   **Diagnosed rather than allowlisted, per the triage criterion.** `bash
-  lifecycle-kit/bin/file-gap.sh *` is **already** in the committed allowlist, alongside
-  `kfric.sh *` and — since the 2026-09-01 port made survey capture an arm — the
-  `run-gates.sh *` glob that grants it — so this is not missing coverage. The harness matcher
+  gate-sdk/bin/run-gates.sh *` is **already** in the committed allowlist and, since the 2026-09-01
+  and 2026-09-03 ports made survey and gap capture arms, is the one grant covering both; `kfric.sh
+  *` sits beside it — so this is not missing coverage. The harness matcher
   refuses a command whose text carries an expansion or a redirect, and gap prose routinely
   carries both: a backticked slug is command substitution, and a bullet describing
   `jq -r … 2>/dev/null` contains a redirect operator inside its quotes. The glob cannot help,
@@ -5086,7 +5088,7 @@
   **Measured this iteration:** `file-gap.sh` prompted **4** times, `file-survey.sh` and
   `kfric.sh` once each — six out-of-band decisions on the three tools the repo *mandates* for
   in-the-moment capture, which is the exact path CLAUDE.md says deferred capture ruins.
-  **Deliverable, and it is small:** a body-from-file arm — `file-gap.sh --from <path>` reading
+  **Deliverable, and it is small:** a body-from-file arm — `--emit file-gap --from <path>` reading
   the prose from a scratch file written with the editor tool — is a fully static command the
   matcher can grant. The same shape serves `--emit file-survey` and `kfric.sh`, whose `<finding>`
   fields are the same free text; the capture tool's port to a compiled arm moves where that
