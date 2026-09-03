@@ -1234,6 +1234,16 @@ permission behind the boundary the consumer's operator owns, through a code
 change no permission gate reads. That is a security argument rather than a cost
 one, and it stands on its own.
 
+**Re-implementing the runner on another substrate is a permission ADDITION rather
+than a migration, and that is what prices the work.** The grant is an allowlist entry
+naming this fixed path, so a compiled or relocated arm is a different command string
+and the consumer must ADD an entry for it — a permission set is matched, not
+versioned, so the old entry cannot be edited into the new one without a window where
+neither runs. Where a consumer's own rules make a settings edit an operator act, that
+addition is one, and the work stalls at whatever session cannot apply it however small
+the code change is. The opposite case does not reach this: dropping a grant whose
+target a change deletes is a pure narrowing, forced by the change and landing with it.
+
 **What bash-only costs, stated rather than glossed.** It removes a capability: a
 session wanting a Python scratch script must write a `.sh` that invokes Python
 with the body inline, or do the work in a language the control covers. The

@@ -577,7 +577,16 @@ wipes `DRIFT_KIT_TMP_DIR` invites), so the private transcript stays private.
 One line is appended per measured session to `DRIFT_KIT_OVERHEAD_LOG`, grammar
 `<date> <session8> total=<bytes> gov=<bytes> gate=<bytes> pct=<n>` where `pct`
 is the governance share. `session8` is the dedup key the meter reads on append
-— re-measuring a session replaces its line rather than double-counting it. The
+— re-measuring a session replaces its line rather than double-counting it.
+**That key is derived differently from the sibling meter's, and the divergence is
+recorded here rather than reconciled.** This meter takes the transcript basename's
+first eight characters and scans one flat tier of the sessions directory; the
+stage-economics meter strips a leading `agent-` first and scans the subagent tier
+as well (§The stage-economics meter). So one subagent transcript keys differently in
+the two logs, and neither derivation is wrong on its own terms — this meter measures
+the session in front of it while that one joins stamps to transcripts. Which one a
+port or a merge should adopt is unruled, so a cut on either meter meets that question
+rather than inheriting an answer. The
 per-category breakdown beyond `gate=` (hook, stage, governed-doc) stays on the
 meter's stdout at measurement time; a log field with no reader is a field
 removed. Field readers: `kpi-overhead` reads `pct`, `gate`, and `total`

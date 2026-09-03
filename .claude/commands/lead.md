@@ -322,6 +322,38 @@ credit the count itself carries.
   mentions in one kit missed one in another, which is a roster-completeness miss
   rather than a judgment miss — a distinction the earlier counters did not need.
   One miss against three repairs. **No tier reversal is proposed.**
+  **Measured again 2026-09-03 at `parser-and-enum-adapter-cuts-with-graph-hotfix`:
+  `cr=14042462` — rank 53 of 63 ascending, +44.1% on a recomputed bare-sonnet
+  median of 9741627, +24.4% on the preceding 11284869, and 15th of the last
+  twenty.** No `align+fanout` row exists: this align dispatched nothing, and it
+  journalled as granted.
+  **It is the SECOND matched-count re-test of the 2026-09-02 near-minimum, and
+  the three matched points together say the count is a weak predictor.** All
+  three audited THREE amendments: 5243426 at rank 6, 12367022 at +29.6%, and
+  this one at +44.1%. They span rank 6 to rank 53 of 63, a 2.7x spread at fixed
+  scale, so amendment count — the work-side reading's own proxy — does not
+  determine the draw. That is a stronger claim than "the near-minimum does not
+  replicate" and it cuts both ways: it weakens scale as a predictor while
+  leaving the near-minimum's own reading standing, since this point holds the
+  journal present and the dispatch absent, exactly the prior cell's values, and
+  lands nowhere near the minimum.
+  The stated revert signal did not fire: two build stamps are the planned batch
+  split, one validate stamp, no re-entry. align repaired three in-envelope
+  defects and escalated none, and it probed the lead's named escalation trigger
+  from the TREE rather than from the amendment — asking whether the narrow
+  single-site repair can actually green the Windows leg, and answering against
+  both the crate's spawn sites and the CI record's rounds 5-11.
+  **The counter-entry this close was asked to record does NOT belong to align,
+  and establishing that is what reading the source bought.** The dispatch relayed
+  align's spawn finding as "of the four registry gates declaring a `bash` need,
+  only `check-graph`'s own module calls `proc::run("bash", …)` directly", which
+  is imprecise about the reachable call graph: `check-producer-liveness` does
+  reach one, through `evidence.rs`'s `pid_alive`. align's own text carries the
+  qualifier the relay dropped — "contain no bash spawn in their own gate
+  modules" — so the imprecision entered at the relay and not at the stage, and no
+  counter is recorded against align for it. **No tier reversal is proposed**;
+  what a later judge inherits is a third matched-count point and one counter
+  correctly declined at its source.
 
 scope, `spec`, and close stay on Opus, their generative and verificational
 judgment being what justifies the tier. Re-judge every tier when the harness

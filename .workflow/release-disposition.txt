@@ -2,3 +2,4 @@
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
 
+parser-and-enum-adapter-cuts-with-graph-hotfix release deferred:v0.26.0 — minor: three shipped kit shell tools deleted and their knob defaults re-pointed at bridged arms, plus check-graph resolving its interpreter, which changes spawn behavior on a Windows host; no decommission, so no major. No cadence trigger fired — the elapsed limb (11d since v0.25.0) is dormant while the channel reads preview, the graph repair is a correctness fix rather than a security or supply-chain one, and no operator direction was given. The 23rd iteration to defer at this floor, derived over the disposition history rather than carried from the prior close's count.

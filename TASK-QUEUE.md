@@ -786,11 +786,26 @@
   **Nothing else owns the residue.** The surviving `bash` spawn is owned by gate-sdk/SPEC.md
   §gen-pre-commit, where its disposition is recorded, and was ruled 2026-08-23 not to fall to this
   port — only its price did.
-  **Cost while deferred:** every bridged invocation pays 640 ms it cannot avoid, and the cost
-  scales with the number of owning kits rather than with the number of members, so a new kit
-  raises the floor for everyone while a new member no longer does.
+  **The residue is now paid TWICE on one gate, measured at this close rather than estimated.**
+  Cut B's enum-sets port made `CANON_KIT_ENUM_SETS_CMD`'s value itself a bridged arm that
+  re-sources `lib/gate.sh` and resolves its own knobs before exec'ing the binary, so
+  `check-prose-enum`'s whole resolve-and-run went **366 ms -> 1236 ms** (build read a 1223 median
+  at the cut; this drain re-read 1210/1211/1236/1237/1237). The nesting is what the excess is: the
+  same five-run method reads **743-765 ms for `check-core-files`**, one bridge resolution over
+  almost no work, so `check-prose-enum` carries about one further floor on top of it. The
+  commit-hook path pays NOTHING — `gen-pre-commit` bakes the resolved arrays — so the exposure is
+  whole-tree battery runs, `--only` runs, and hook regeneration. The repair refused, named so it
+  is not re-derived: an in-process call from the gate to the bundled emitter would resolve the
+  BUNDLED producer for a consumer who configured a different one, which is the extension point
+  that knob exists to protect.
+  **Cost while deferred:** every bridged invocation pays the floor it cannot avoid — 640 ms
+  best-of-three on 2026-08-23, 743 ms best-of-five at this close, indicative of drift rather than
+  a regression claim and not to be re-quoted without re-running it — and the cost scales with the
+  number of owning kits rather than of members, so a new kit raises the floor for everyone while a
+  new member no longer does. A nested bridge, as `check-prose-enum` now has, pays it twice.
   Filed 2026-08-21 twice, by spec and by build; promoted at `graph-port-and-config-seam`'s close;
   re-scoped here after the batch landed, with every retired figure deleted.
+  recurrence: config-bridge-resolution-cost 2026-09-03
 
 - **amendment-reader-roster-undercount** [design-pending] — an amendment's reader/caller roster is a
   dated measurement presented as a roster, and it undercounted twice in one iteration.
@@ -7345,28 +7360,6 @@
   promoted 2026-08-24 at close, which reproduced the red against a probe corpus before
   dispositioning.
 
-- **prune-set-convergence-question** [design-pending] — two kits carry two prune sets that now
-  overlap heavily and differ deliberately, and no surface rules whether they should converge.
-  **Both definitions read at this drain rather than cited.** context-kit's set
-  (`scripts/context-config.sh`) and gate-sdk's (`gate-sdk/lib/gate.sh`) SHARE FOUR leaves and
-  differ in exactly four: context-kit omits the scratch dir and the fixture-corpus dir, and
-  carries two build-output dirs gate-sdk does not.
-  **CORRECTS THE FILING**, which said the two share one leaf. One leaf is what they NEWLY share
-  — the second-copy leaf this iteration added to both — and the shared core was already three
-  deep before it. Read as a shared-set claim the filing understates the overlap fourfold, which
-  matters because the size of the shared core is most of the argument for deriving it.
-  **Deliverable:** rule whether the two sets converge, stay two, or share a derived core with
-  per-kit extensions — the shape gate-sdk's extra-dirs knob already provides on one side.
-  **Why it is not free even though it looks it.** Adding the scratch or fixture-corpus dirs to
-  the index walkers is a corpus NARROWING with its own readers — the index-tests goldens, and a
-  session that legitimately wants a fixture corpus indexed — so convergence costs coverage on
-  the side that gains consistency.
-  **Cost while deferred:** low, and correctness-free: no exposure, since the second-copy leaf
-  that motivated the question is in both sets. The carry is two arrays a reader must not assume
-  agree, and a later author who adds a leaf to one and not the other with nothing in the tree
-  to catch it. Filed 2026-08-24 to the gap inbox by spec; drained and promoted 2026-08-24 at
-  close, which re-read both definitions and corrected the shared-leaf count.
-
 - **recurrence-threshold-counts-dates-not-incidences** [design-pending] — the pre-emption threshold
   reads a date count as an incidence count, so two incidences in one day count as one and the
   rule fires late.
@@ -7725,6 +7718,19 @@
   tier was built to drain.
   Surfaced 2026-08-25 at the `turn-end-liveness-seam-and-worktree-cause` close and filed to the
   gap inbox there; promoted 2026-08-25 at this scope's drain of that inbox.
+  **IT RECURRED 2026-09-03, on the second of the two branches the cost line names — the one that
+  leaves no gate round-trip behind.** The `parser-and-enum-adapter-cuts-with-graph-hotfix` close
+  ruled `worktree-cleanliness-assertion-scopes-to-checkout` icebox-eligible on the merits (its own
+  cost line reads low and self-correcting, no roadmap tag, no live trigger, and its mitigation had
+  already landed) and then DECLINED the eviction, because that 52-character slug leaves 22 columns
+  after the mandatory prefix and no sentence in 22 columns is the self-contained one the tier's
+  contract asks for. So the eviction was abandoned rather than degraded, which is the silent bias
+  this entry predicted: the entry stays in Deferred carrying a costed body, and nothing in the tree
+  records why except this paragraph. The first attestation cost three gate round-trips and landed a
+  thin line; this one cost one round-trip and landed no line at all. Both branches are now
+  attested, which retires the "predicted" half of the deliverable — the three candidate rulings
+  stand unchanged and none of them is chosen here.
+  recurrence: icebox-eviction-line-budget-squeeze 2026-09-03
 
 - **worktree-isolated-agent-report-lost-to-a-failed-peer-send** [design-pending] — an isolated
   read-only sweep's final report reaches its dispatcher as a bare `.`, because the child sends to
@@ -9305,56 +9311,147 @@
   is escalated rather than closed by this session.
 
 - **lead-tier-split-premise-unamended** [design-pending] — `lifecycle-kit/templates/lead.md`
-  §Economics rests its *Split the lead where the tail dominates* bullet on a premise three
+  §Economics rests its *Split the lead where the tail dominates* bullet on a premise six
   consecutive iterations have now measured false, and the template still ships it unqualified.
-  **The trigger is the binding's own and it has fired.** `.claude/commands/lead.md` set the
-  criterion — read an iteration's escalations and count how many the lead ruled ALONE by reading a
-  governed surface; near zero, the premise holds; consistently several, the premise is wrong and
-  the template's bullet is what needs amending, not this repo's tier. It then named the threshold:
-  "a third iteration at several ruled-alone escalations should amend that bullet." Measured five in
-  2026-08-31, four in 2026-09-01, several in 2026-09-02, four at
-  `declaration-install-and-stage-helper-cuts`, and **five at
-  `session-id-and-env-probe-cuts`** — the iteration's composition against the
-  port-only run, the refusal of scope's proposed cut C, the deferred-pool questions the run's text
-  forecloses, four gap-bullet dispositions verified at their cites, and the `enter-stage.sh`
-  executable-check envelope. A FIFTH consecutive point. On COST the premise held again: the lead's
-  priced share read 10.7% at the fourth point.
+  **The trigger is the binding's own and it has fired six times.** `.claude/commands/lead.md` set
+  the criterion — count the escalations a lead ruled ALONE by reading a governed surface; near
+  zero, the premise holds; consistently several, the template's bullet is what needs amending and
+  not this repo's tier — and named the threshold at a third such iteration. Measured 5, 4,
+  several, 4, 5, and now **SEVEN at `parser-and-enum-adapter-cuts-with-graph-hotfix`**: the
+  iteration's kind and composition against the port-only run; the hotfix envelope ruled narrow on
+  derivable grounds; `check-docs-cmd` reframed from a symmetric coin-flip to an asymmetric choice
+  by reading all four sites, which spec conceded corrected its load-bearing point; build's tiering
+  and its two-batch split off the amendments' own labels; resuming batch 2 after an API 529 rather
+  than committing its staged work; and deferring validate's comment-tier question to validate
+  rather than reverting it. One relayed operator ruling beside them. On COST the premise held
+  again: the lead's priced share read 10.7% at the fourth point.
   **The two axes separate, which is what makes this an amendment rather than a tier flip.** On
   COST the split premise holds and strengthens — the lead's share fell 14% -> 9.2% -> 9.7%, so the
   lead's turns really are the cheap tail in dollars. On CHARACTER it fails every time: a
   routing-only lead would be cheaper still and would have RELAYED the rulings this one made. The
   template describes a lead the escalation protocol does not ask for.
-  **The counter-evidence, recorded because the entry is weaker without it.** The 2026-09-02 lead
-  also ruled one thing WRONG, and in the same faculty the count credits: it read a `.gate`
-  manifest line and `main.rs`'s dispatch table, called that "verified both halves myself", and
-  both halves were false — the predicate was never run. So the count measures a capacity that
-  demonstrably misfires, and any amendment has to say what a lead's turns ARE without claiming
-  they are reliably verificational.
-  **It recurred at `declaration-install-and-stage-helper-cuts`, PROVENANCE for the second time** —
-  two crate functions called pre-existing off a `git log -- <files>` read were build's own code that
-  session, where `git grep 'fn <name>' HEAD` settles it; the claim survived only because build ran
-  the predicate. **A THIRD instance at `session-id-and-env-probe-cuts`, on a failing step the first
-  two do not reach: the lead OVERRODE a fact the session had supplied.** Its ruling closed "promote
-  the two hosts with their `spec:` refs" where scope's own returning report had already said
-  promotion is /spec's, citing lifecycle-kit/SPEC.md:3438-3455 — a surface the lead did not open.
-  Scope ran `check-amendment-queue` rather than complying, so it cost one gate run; compliance would
-  have committed a red. **None of the three net against the ruled-alone count**: that count measures
-  how many escalations a lead answered off a governed surface, these measure whether the grounds
-  under an answer were probed, inferred, or overridden.
+  **The counter-evidence, recorded because the entry is weaker without it, and it is now FOUR
+  instances of ONE shape — a claim verified at one surface and read as covering a wider one.** A
+  `.gate` manifest line and `main.rs`'s dispatch table read as "verified both halves myself" when
+  the predicate was never run; two crate functions called pre-existing off a `git log -- <files>`
+  read were that session's own code; and a lead OVERRODE a fact the session had supplied, ruling
+  "promote the two hosts" where scope's report had already cited the surface saying promotion is
+  /spec's — scope ran the gate rather than complying, and compliance would have committed a red.
+  At this iteration the lead reported three more and RETRACTED the worst in full: an instruction
+  to stamp five `recurrence:` dates on a threshold COUNT no session had judged, which would have
+  frozen five false dated attestations; the clause was read without opening the SPEC section it
+  points into, and scope refused it with grounds. The other two are an imprecise relay of align's
+  spawn finding that dropped its "in their own gate modules" qualifier, and a four-surface host
+  survey reported complete where scope found a fifth. **None nets against the ruled-alone count**,
+  which measures whether an escalation was answered off a governed surface and never whether the
+  grounds under that answer were probed, inferred, or overridden.
+  **A count discrepancy, resolved at this surface.** The dispatching lead relayed the trigger as
+  having fired on FOUR consecutive iterations; this entry enumerates six by name and is the
+  governed surface, so six is the figure. Stated rather than silently reconciled.
   **Why `[design-pending]`:** the deliverable is a kit template's own design rationale, and the
   shape is unruled — qualify the bullet's premise, split it into a cost limb and a character limb,
   or replace it with the discriminator the binding already uses. Which one is a doctrine call.
   **Cost while deferred:** every consumer vendoring lifecycle-kit reads a premise this repo has
-  measured false three times, and each future lead re-derives the same finding against a template
+  measured false six times, and each future lead re-derives the same finding against a template
   that never records it — the binding's evidence is local while the false claim is shipped.
   **DISTINCT from `economics-posture-binding-stale`**, whose subject is the local shim restating a
   ruling it should cite; this one is the vendored TEMPLATE's own premise being wrong.
-  Captured 2026-09-02 by close under the close template's rule that a finding close itself captures
-  files to Deferred; ruled filed-not-performed by the lead the same day — amending a kit template is
-  non-port design work the port-only run forecloses, and filing is not the `promote` that ruling
-  bars, `## Deferred` being no active section.
+  Captured 2026-09-02 by close; ruled filed-not-performed by the lead that day and again at this
+  close — amending a kit template is non-port design work the port-only run forecloses, and filing
+  is not the `promote` that ruling bars, `## Deferred` being no active section.
   ruled: lead-tier-split-premise-unamended lead 2026-09-02 own-authority
   recurrence: lead-tier-split-premise-unamended 2026-09-03
+
+- **crate-interpreter-resolution-residue** [design-pending] — the crate spawns the bare program
+  name `bash` at twenty sites the `check-graph` hotfix deliberately left alone, and each reaches
+  System32's WSL launcher on a native Windows host exactly as that one did.
+  **Probed rather than estimated, and re-probed independently at this drain.** Oracle, over
+  `native/src`:
+  `grep -rn -Pzo '(?s)(proc::)?run[a-z_]*\(\s*\n?\s*"bash"|Command::new\(\s*\n?\s*"bash"'`.
+  **20 sites across 15 files, 11 on the shipped path and 9 test-only.** Filed at spec on an
+  approximate count, re-filed at build with the count probed, and re-derived at this close by a
+  delegated worktree sweep that classified every site by its `#[cfg(test)]` scope in context and
+  reached the same four figures. The shipped eleven are `evidence.rs` (`pid_alive`),
+  `hook/budget.rs`, `hook/stop_liveness.rs`, `emit/port_blockers.rs`, `emit/upgrade_smoke.rs`
+  (three), `emit/kpi/always_loaded.rs`, `emit/kpi/prompt_friction.rs`, `emit/pub_index.rs` and
+  `emit/lesson_sink.rs`.
+  **The repair exists and is deliberately unpointed.** `native/src/proc.rs`'s `resolve_interpreter`
+  is what these would take; its own doc comment names `gates::graph::generator_emit` as its one
+  reader and says in terms that the rest are not re-pointed, so the residue is legible at the
+  source and not only here.
+  **Why it was not taken with the hotfix.** The lead ruled that envelope narrow: a resolver over
+  twenty sites triages as a feature, a feature is a yield, and the port-only run admits the hotfix
+  as its single exception. Filing is not the promotion that ruling bars, `## Deferred` being no
+  active section.
+  **Why `[design-pending]`:** the shape is unruled — one holder with a governed name, a call-site
+  sweep, or a lint that reds a bare interpreter name — and the choice interacts with
+  `registry-needs-conflates-requirement-and-spawn`, which is what a resolved spawn breaks.
+  **Cost while deferred:** each of the eleven shipped sites is a wrong-interpreter spawn on a
+  native Windows host, and the Windows leg is a named objective — an adopter's gate verdict
+  witnesses this, so it sits on the product side of the 2026-08-30 discriminator rather than
+  taking that ruling's machinery default.
+  Filed at spec and re-filed at build 2026-09-03; drained here with the count re-verified.
+  ruled: crate-interpreter-resolution-residue lead 2026-09-03 own-authority
+
+- **docs-cmd-invariant-inline-scope-imprecise** [design-pending] — `check-docs-cmd`'s invariant
+  sentence promises that inline-backticked `.sh` paths are scanned while its own assertion (A)
+  scans only fenced ones, so the sentence over-promises and the class it names stays ungated.
+  **The imprecision, read at the source rather than argued.** `canon-kit/SPEC.md`'s invariant is
+  ONE sentence introducing BOTH assertions, so its "or inline backticks" is satisfied by (B),
+  which genuinely does cover inline — loose prose rather than a flat self-contradiction. (A)
+  carries an explicit justification for its narrowness where the invariant sentence carries none,
+  and `native/src/gates/docs_cmd.rs` matches each assertion precisely: the path scan runs only
+  inside a fence, the knob scan runs in-fence and over inline code spans.
+  **The two repairs are ASYMMETRIC and this entry starts from the narrow one**, ruled by the lead
+  on all four sites read directly, which corrected an earlier framing of it as a symmetric
+  coin-flip. (b) correcting the invariant sentence to say paths are fence-only is the ACCURACY fix
+  and the presumptive default. (a) widening (A) and the implementation to inline code spans is
+  enforcement-first, but it must win a POSITIVE case against that calibration paragraph and it
+  re-arms over the whole governed doc set at once.
+  **The live class that prompted it is DISCHARGED and does not ride this entry.** The eight inline
+  citations the two port cuts made dead were swept as a Definition-of-Done item inside the units;
+  re-verified by grep at this drain, the sharpest of them — `canon-kit/SPEC.md`'s own invoked
+  `bash scripts/enum-sets.sh` — is gone, and what survives in `gate-sdk/SPEC.md` is a dated
+  history paragraph naming the deleted scripts deliberately. This is the gate-precision half alone.
+  **Why `[design-pending]`:** choosing between (a) and (b) is a doctrine call between
+  enforcement-first and a stated calibration, not a coding one.
+  **Cost while deferred:** an invoked `.sh` path in inline backticks stales silently across the
+  governed doc set while a reader of the invariant sentence is told otherwise — an adopter reading
+  a kit SPEC to learn what a gate checks witnesses that, so it is product rather than machinery.
+  **DISTINCT from `prose-filename-citation-liveness`**, which owns bare `.md` filenames falling
+  between `check-md-refs` and `check-spec-pointer`; this is `.sh` paths and the precision of one
+  gate's own invariant sentence.
+  Filed at spec 2026-09-03 and reframed the same day on the lead's four-site read; drained here.
+  ruled: docs-cmd-invariant-inline-scope-imprecise lead 2026-09-03 own-authority
+
+- **registry-needs-conflates-requirement-and-spawn** [design-pending] — the crate's registry
+  declares a member's HOST REQUIREMENT while the test guarding it compares that declaration
+  against the literal program string a spawn used, so a member that resolves its interpreter is
+  undeclarable by construction.
+  **It stopped being latent this iteration.** `native/src/gates/mod.rs` declares `check-graph`'s
+  requirement as bare `bash`; `graph.rs` now spawns `proc::resolve_interpreter("bash")`'s RESOLVED
+  ABSOLUTE PATH; and `declaration_covers` matches by EXACT equality with `?` the only wildcard. So
+  the declaration and the observation now disagree on every host — read at the source at this
+  drain rather than inferred from the filer's prose.
+  **The assertion that would have said so cannot reach the spawn.** Both `check-graph` fixtures
+  pass `--amend-only`, which returns before the generator arm, so the recorder observes nothing
+  and `every_registry_member_declares_the_programs_it_spawns` passes VACUOUSLY on the one member
+  the hotfix changed. The fixture's own comment states why the alternative is hard: the whole-tree
+  generator run anchors to the real repo root and is unfixturable.
+  **Two halves, and only the first is cheap.** The grammar half — teaching the comparison that a
+  resolved path satisfies a declared program name — is a small change to a crate-wide test made on
+  behalf of every registry member. The vacuity half needs a fixture that reaches the generator arm
+  and may not be buildable at all.
+  **Why `[design-pending]`:** whether the declaration is a REQUIREMENT (a resolved path matches by
+  its name) or a LITERAL argv[0] (then a resolving member can declare nothing host-independent) is
+  a contract question gate-sdk/SPEC.md §The `# graph:` manifest owns, and the two answers differ
+  in what `--needs` promises a consumer's machine must carry.
+  **Cost while deferred:** `--needs` is the roster an adopter provisions from, so a member whose
+  declaration silently stops matching its spawn under-reports it; that payload-facing claim is the
+  witness, which puts this on the product side of the 2026-08-30 discriminator.
+  **DISTINCT from `crate-interpreter-resolution-residue`**, whose deliverable is the spawn sites
+  themselves; this is the declaration grammar every registry member shares.
+  Filed at spec 2026-09-03; drained here with the disagreement re-read at the source.
 
 - **worktree-cleanliness-assertion-scopes-to-checkout** [design-pending] — a suite that asserts
   the worktree is clean scopes that assertion to the real checkout rather than to the paths its
@@ -9453,9 +9550,9 @@
 - **prune-set-matches-walk-root-ancestors** [design-pending] — A leaf above the root prunes it all.
 - **evidence-baseline-orphan-suite-row** [design-pending] — A row for a retired suite is unread.
 - **port-archaeology-restatement-residue** [design-pending] — Prose narrates deleted shell forms.
+- **non-gate-arm-testing-floor-unstated** [design-pending] — A new arm's testing floor is unstated.
+- **prune-set-convergence-question** [design-pending] — Two kits' prune sets diverge, unruled.
 
 ## Done
-
-- generator-spawn-resolves-wsl-launcher
 
 ## Lessons Learned

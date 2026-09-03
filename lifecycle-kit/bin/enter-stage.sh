@@ -565,7 +565,8 @@ if [[ "$first" == 1 ]]; then
         [[ -f "$bt" ]] || continue
         bttmp="$tmpdir/boundary-truncate.$$"
         # spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the header run stops at a markdown '## ' section heading as well as at the first data line: on a markdown surface whose blocks are '## ' headings (the survey record) a bare /^#/ predicate reads the first block's heading as part of the header and carries it across the boundary
-        awk 'drop { next } /^[[:space:]]*$/ { print; next } /^#([^#]|$)/ { print; next } { drop = 1 }' "$bt" > "$bttmp"
+        # spec: lifecycle-kit/SPEC.md §The state machine — blanks are held pending and flushed only behind a following header line, so the truncate leaves the header alone: printing them eagerly retains the blank that separated the header from the first block, and since each append writes its own separator the retained run grows by one per boundary rather than staying put
+        awk 'drop { next } /^[[:space:]]*$/ { pend = pend $0 "\n"; next } /^#([^#]|$)/ { printf "%s", pend; pend = ""; print; next } { drop = 1 }' "$bt" > "$bttmp"
         mv "$bttmp" "$bt"
         truncated+=("$bt")
     done

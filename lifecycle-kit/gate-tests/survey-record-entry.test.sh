@@ -86,6 +86,8 @@ body="$(grep -v '^#' "$bnd/.workflow/survey-record.md" | grep -c '[^[:space:]]')
 [[ "$body" -eq 0 ]] || note boundary-truncate "the boundary left $body body line(s) in the survey record"
 head -n1 "$bnd/.workflow/survey-record.md" | grep -q '^# contract: ' \
     || note boundary-header "the boundary truncate did not keep the contract header"
+tail -n1 "$bnd/.workflow/survey-record.md" | grep -q '^# contract: ' \
+    || note boundary-header-trailing "the boundary truncate left a trailing blank run below the header; each append re-separates, so a retained blank grows by one per boundary"
 grep -qF '.workflow/survey-record.md' <<<"$out" \
     || note boundary-report "the boundary report does not name the truncated record: $out"
 grep -qF 'which gates meet every port criterion?' <<<"$out" \
