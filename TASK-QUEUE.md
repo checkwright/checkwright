@@ -12,7 +12,7 @@
 
 ## New Features
 
-- **kit-library-port-residue** [spec: SPEC-declaration-cut.md] [spec: SPEC-install-lifecycle.md]
+- **kit-library-port-residue** [spec: SPEC-install-lifecycle.md]
   — the kit `lib/*.sh` members the 2026-08-30 class ruling deliberately leaves owed, filed
   rather than absorbed at its boundary. **What the ruling settled and what it did not.**
   gate-sdk/SPEC.md §The kit-library port
@@ -21,23 +21,21 @@
   outside it: a file that rides the bridge's flat `lib/*.sh` glob while resolving no bridged knob,
   and a file one directory deeper that the glob never reaches. Both are **owed, not undecided** —
   each already carries a sentence in its own SPEC section naming this entry.
-  **The members still owed, measured 2026-08-30 at build against `--emit port-blockers --tree`:**
-  `gate-sdk/lib/declaration.sh` (59), `gate-sdk/lib/inject.sh` (80),
-  `gate-sdk/lib/test-hermetic.sh` (37), `context-kit/lib/toolfloor.sh` (58).
-  **Two of the original six are DISCHARGED** — `context-kit/lib/pub-lang/{rust,ts}.sh`, the bundled
-  members `native-gate-port-remaining-corpus`' ruling (1) positively sent in-crate. They waited on
-  the resolver that finds them, and 2026-09-01's `SPEC-index-cut` port of `pub-index` is it: the
-  seam survives and the two grammars are crate code (context-kit/SPEC.md §Index-first reading).
+  **The members still owed, measured 2026-09-03 at build against `--emit port-blockers --tree`:**
+  `gate-sdk/lib/inject.sh` (80), `gate-sdk/lib/test-hermetic.sh` (37),
+  `context-kit/lib/toolfloor.sh` (58).
+  **Three of the original six are DISCHARGED.** Two are `context-kit/lib/pub-lang/{rust,ts}.sh`,
+  the bundled members `native-gate-port-remaining-corpus`' ruling (1) positively sent in-crate;
+  they waited on the resolver that finds them, and 2026-09-01's `SPEC-index-cut` port of
+  `pub-index` is it (context-kit/SPEC.md §Index-first reading). The third is
+  `gate-sdk/lib/declaration.sh`: the library, its parity arm and both harnesses deleted, the
+  grammar left with its one compiled holder (gate-sdk/SPEC.md §lib/declaration.sh).
   So this entry **demotes** rather than reaching Done — its deliverable is a corpus, and the next
-  cut re-promotes with a fresh amendment (canon-kit/SPEC.md §Merging an amendment). Its two
-  hostings had different grounds: 2026-09-01 delivered two of six members; 2026-09-02's
-  `SPEC-upgrade-smoke-cut` delivered **none** and discharged one member's blocker instead.
+  cut re-promotes with a fresh amendment (canon-kit/SPEC.md §Merging an amendment). Its hostings
+  differ in ground: 2026-09-01 delivered two members; 2026-09-02 delivered **none** and discharged
+  one member's blocker; 2026-09-03 took that unblocked member, which is the delivery ground.
   **Each remaining member is owed on its own ground, and they do not resolve together** — which is
   why this is one entry owning a residue rather than one cut:
-  `declaration.sh` is **unblocked and takeable**, never delivered: its stated test was whether the
-  shell caller set empties, and the 2026-09-02 §upgrade-smoke port emptied it by moving the resolve
-  in-crate, leaving only `*.test.sh` sourcers, which that arm's corpus rule excludes. It did not
-  port at that cut, declaring a different stated contract; it is owed under its own section.
   `inject.sh` has three shell sourcers — `context-kit/bin/env-probe.sh`,
   `lifecycle-kit/bin/install-lifecycle.sh`, `doctrine-kit/bin/install-doctrine.sh` — each itself
   owed, so it moves behind them.

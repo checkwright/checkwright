@@ -43,86 +43,6 @@ fn no_such_gate(name: &str) -> ! {
     exit(2);
 }
 
-// spec: gate-sdk/SPEC.md §lib/declaration.sh — the arm reports *classification*, never an
-// internal representation: the two holders share no data shape, and a comparison of derived
-// literals would fail on a difference that is not a disagreement
-fn declaration_parity(args: &[String]) -> i32 {
-    let usage = "  usage: checkwright-gates --declaration-parity section <file> <section> | --declaration-parity record <file>";
-    let read = |file: &str| -> Result<String, String> {
-        std::fs::read_to_string(file).map_err(|e| {
-            format!(
-                "cannot read {}: {} — the classification could not be reported; treating as failure (not clean)",
-                file, e
-            )
-        })
-    };
-    let mode = args.first().map(String::as_str);
-    let text = match (mode, args.get(1)) {
-        (Some("section"), Some(f)) | (Some("record"), Some(f)) => match read(f) {
-            Ok(t) => t,
-            Err(e) => {
-                eprintln!("checkwright-gates: {}", e);
-                return 2;
-            }
-        },
-        _ => {
-            eprintln!("checkwright-gates: --declaration-parity needs a mode and a file — the classification could not be reported; treating as failure (not clean)");
-            eprintln!("{}", usage);
-            return 2;
-        }
-    };
-    match mode {
-        Some("section") => {
-            let section = match args.get(2) {
-                Some(s) => s.as_str(),
-                None => {
-                    eprintln!("checkwright-gates: --declaration-parity section needs a section name — the classification could not be reported; treating as failure (not clean)");
-                    eprintln!("{}", usage);
-                    return 2;
-                }
-            };
-            match declaration::section_bullets(&text, section) {
-                None => println!("bullets\tabsent"),
-                Some(b) => println!("bullets\t{}", b.len()),
-            }
-            match declaration::section_tokens(&text, section) {
-                declaration::SectionVerdict::Absent => println!("verdict\tabsent"),
-                declaration::SectionVerdict::ExplicitNone => println!("verdict\tnone"),
-                declaration::SectionVerdict::Tokens(t) => {
-                    println!("verdict\ttokens");
-                    for tok in t {
-                        println!("token\t{}", tok);
-                    }
-                }
-                declaration::SectionVerdict::Unparsed(b) => {
-                    println!("verdict\tunparsed");
-                    for line in b {
-                        println!("unparsed\t{}", line);
-                    }
-                }
-            }
-            0
-        }
-        _ => {
-            match declaration::record_tokens(&text) {
-                Ok(t) => {
-                    println!("record\tok");
-                    for tok in t {
-                        println!("token\t{}", tok);
-                    }
-                }
-                Err(b) => {
-                    println!("record\tmalformed");
-                    for line in b {
-                        println!("malformed\t{}", line);
-                    }
-                }
-            }
-            0
-        }
-    }
-}
-
 // spec: evidence-kit/SPEC.md §lib/evidence.sh — the arm reports *classification* and never an
 // internal representation, `--queue-parity`'s own rule: the two holders share no data shape, so a
 // comparison of derived literals would fail on a difference that is not a disagreement
@@ -173,7 +93,7 @@ fn main() {
         Some(a) => a.as_str(),
         None => {
             eprintln!("checkwright-gates: no subcommand given");
-            eprintln!("  usage: checkwright-gates --list | --reads <gate-name> | --needs <gate-name> | --knobs <gate-name> | --source-stamp | --queue-parity <queue-file> | --declaration-parity section <file> <section> | --declaration-parity record <file> | --evidence-lib-parity lock <file>... | --evidence-lib-parity pid <pid>... | --install <op> [--<key> <value>]... | --run [--gates-dir <dir>] [--only <name>... | --for <path>...] | --hook <member> | --emit-<arm> | <gate-name> [args...]");
+            eprintln!("  usage: checkwright-gates --list | --reads <gate-name> | --needs <gate-name> | --knobs <gate-name> | --source-stamp | --queue-parity <queue-file> | --evidence-lib-parity lock <file>... | --evidence-lib-parity pid <pid>... | --install <op> [--<key> <value>]... | --run [--gates-dir <dir>] [--only <name>... | --for <path>...] | --hook <member> | --emit-<arm> | <gate-name> [args...]");
             eprintln!("  bridged arms: {}", emit::arms().join(", "));
             exit(2);
         }
@@ -230,15 +150,6 @@ fn main() {
             println!("{}", rec);
         }
         exit(0);
-    }
-
-    // spec: gate-sdk/SPEC.md §lib/declaration.sh — the standing oracle the dual disposition owes:
-    // this module's classification of one input, one record per line, for the harness that holds
-    // it against the shell library. A top-level flag rather than a subcommand, for the reason the
-    // arms around it are: check-gate-substrate-parity assertion B reds a subcommand no descriptor
-    // dispatches to, and no gate dispatches here.
-    if first == "--declaration-parity" {
-        exit(declaration_parity(&argv[1..]));
     }
 
     // spec: evidence-kit/SPEC.md §lib/evidence.sh — the standing oracle criterion 6's *unless*

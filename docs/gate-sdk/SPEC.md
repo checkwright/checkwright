@@ -2021,7 +2021,13 @@ the two are recorded differently.** canon-kit's corpus branch speaks of an
 amendment delivering one increment of a corpus; a blocker discharge is narrower,
 and a cut taking that ground says so rather than dressing it as delivery — the
 member roster is corrected to *unblocked and takeable*, never to *done*, and the
-terminal move is a demotion (canon-kit/SPEC.md §Merging an amendment).
+terminal move is a demotion (canon-kit/SPEC.md §Merging an amendment). **The
+delivery ground has its worked instance too**, and it is the same host one
+iteration later: `kit-library-port-residue` hosted §lib/declaration.sh's cut on
+2026-09-03, taking the member the 2026-09-02 hosting had only unblocked. That
+member leaves the roster outright and its paragraph states a delivery instead of
+an *unblocked and takeable* correction. The two hostings are recorded separately
+on purpose — a reader averaging them would read the earlier one as a delivery.
 
 **This paragraph exists because the same resolution was reached and lost twice.**
 The 2026-09-01 ruling that first did this arithmetic lived only in an amendment's
@@ -2155,7 +2161,7 @@ re-deciding, and only the operator reopens a closed ruling.
 The binary is a multi-call binary whose *gate* subcommands are dispatched by
 name out of `gates::REGISTRY`. It also carries arms that are **not** gates —
 `--list`, `--reads`, `--needs`, `--knobs`, `--source-stamp`, `--queue-parity`,
-`--declaration-parity`, `--evidence-lib-parity` and `--install`, plus the
+`--evidence-lib-parity` and `--install`, plus the
 `--emit-` family the bridged-arm table keys (`--emit-queue-counts` and
 `--emit-queue-edges` are its 2026-08-31 members; `--emit-md-index`,
 `--emit-md-section` and `--emit-pub-index`, context-kit's three index-first
@@ -2192,8 +2198,13 @@ A **non-gate arm** is specified by three properties:
   arm has to name the caller that reads its output and the transition where it
   is read, or it is dead weight. Every member above satisfies this —
   `--source-stamp` is read by §check-gate-binary-fresh, `--queue-parity` and
-  `--declaration-parity` by their parity harnesses — and stating it is what
-  stops the class becoming a place to park unreachable code.
+  `--evidence-lib-parity` by their parity harnesses — and stating it is what
+  stops the class becoming a place to park unreachable code. **A parity arm's
+  caller is the second holder, so the arm retires with it**:
+  `--declaration-parity` left this roster in the 2026-09-03 cut that deleted the
+  shell form it compared against (§lib/declaration.sh), because one holder cannot
+  be held equal to itself and an arm whose harness can only skip is exactly the
+  unreachable code this property refuses.
 
   **A *caller* is the requirement; a stored projection is one shape of it, not
   the shape.** The emit arms that opened this class were all generators of a
@@ -3444,6 +3455,18 @@ that answers each is the one whose corpus matches its question.
    (queue-kit/SPEC.md §lib/queue.sh). The bound is **undocumented surface** — a
    helper no SPEC section names — which is what separates such a helper from the
    documented globals beside it, none of which this disposition reaches.
+
+   **`lib/declaration.sh` is the worked instance on a *documented* surface, and
+   the bound above is not widened by it** (§lib/declaration.sh, 2026-09-03). Its
+   twin was disposed of by exactly this clause's test — the shell caller set
+   emptied at §upgrade-smoke's port — and the deletion took the standing oracle
+   with it, one holder being unable to be held equal to itself. What the
+   undocumented-surface bound governs is a helper leaving a *surviving* file with
+   no section to rewrite; a documented member leaves through a stated-contract
+   cut, which restates the section it declared and carries the amendment that
+   says so. Read the two together as: the caller set decides whether the
+   disposition is available, and the bound decides whether the removal owes a
+   section rewrite.
 
    **Glob semantics, committed once here rather than re-decided per port.** The
    bridge transports strings and interprets nothing — it has no glob matcher,
@@ -6113,17 +6136,18 @@ the selecting session's by the rule above, read in its mirror image — a group
 whose members' corpora visibly diverge is a finding, and so is a derivation the
 key split.
 
-**Criterion 6 leaves the library dual, and what that owes is a standing oracle
-rather than a port-time proof.** At this cohort `bin/upgrade-smoke.sh` survived
-as `lib/declaration.sh`'s only remaining caller, so neither the duplication-absent
-road nor the deleted-original road was available and the disposition was
-queue-kit's `lib/queue.sh` one, taken by the same mechanism. The arm, the test
-and the corpus that carries every branch are §lib/declaration.sh's. **The shell
-form has no non-test caller**: §upgrade-smoke's arm reads the declaration
-in-crate, so the library's *own* disposition is unblocked, and
-§lib/declaration.sh carries what that does and does not discharge. The dual
-holding above is unchanged: the standing oracle is what keeps the two forms equal
-for as long as both exist.
+**Criterion 6 left the library dual at this cohort, and the dual holding is now
+closed.** At this cohort `bin/upgrade-smoke.sh` survived as the shell library's
+only remaining caller, so neither the duplication-absent road nor the
+deleted-original road was available and the disposition was queue-kit's
+`lib/queue.sh` one — a standing oracle rather than a port-time proof, taken by
+the same mechanism. §upgrade-smoke's own port then emptied the non-test caller
+set by reading the declaration in-crate, and the 2026-09-03 cut under
+§lib/declaration.sh spent that: the shell form, its oracle arm and both of its
+harnesses are gone and the grammar has one holder. That section carries what the
+emptying discharged and what the deletion did; nothing in this cohort's own
+disposition changed, and the dual holding it records is history rather than a
+live obligation.
 
 **The version comparator is defined over a stated grammar, and a token outside it
 is a loud refusal.** The shell form ordered versions with `sort -V` in four
@@ -6189,8 +6213,9 @@ The compiled form reproduces it and the reasoning is recorded rather than left a
 an accident of translation — the branch is unreachable in the live tree, which
 always has a repository, and in the fixture pair, which supplies the file, so
 there is no case that would prove a change correct. The second the port
-**found**, and it is the shell library's: both arms leak already-resolved tokens
-into the refusal output (§lib/declaration.sh). Both are filed as gaps so the debt
+**found**, and it is the declaration grammar's: both arms leak already-resolved
+tokens into the refusal output (§lib/declaration.sh, where the surviving holder
+carries it and the repair is re-priced). Both are filed as gaps so the debt
 is costed rather than implicit.
 
 **The three declare no knobs, and the `.workflow/` asymmetry that exposes is
@@ -6254,11 +6279,12 @@ this cohort. `check-settings-paths` reds on a committed permission grant naming 
 these: the two grants that could have carry a `*` in the command token and are
 skipped by the predicate. One non-red consequence is recorded so it is not
 mistaken for coverage — those wildcard grants silently stop covering this
-cohort's members, which do not run as scripts. `check-docs-cmd` reddens on
-§lib/declaration.sh's caller roster, where the deleted paths were named, and the
-roster rewrite this cohort already
-owed is what clears it; that is real signal, exactly as the disposition table
-predicts for it. `check-measured-claim` reds because its oracle counts registry
+cohort's members, which do not run as scripts. `check-docs-cmd` reddened on
+§lib/declaration.sh's caller roster, where this cohort's deleted paths were
+named, and the roster rewrite this cohort already
+owed is what cleared it; that was real signal, exactly as the disposition table
+predicts for it. That roster names no shell path at all since the 2026-09-03 cut
+under that section. `check-measured-claim` reds because its oracle counts registry
 members resolving to a `.gate`, so the marked literal in docs/install.md moves
 with the port — and the generated pre-commit hook bakes the same value, which is
 why the hook regen is owed with the doc edit rather than after it.
@@ -8276,36 +8302,49 @@ through a `--remove`/reinstall round trip beside it.
 ### lib/declaration.sh
 
 The tightened-gates declaration grammar — **two container arms over one token
-predicate**, sourced by three callers. The token predicate is a bare gate name;
-the container is the only thing that differs between the arms,
+predicate**, held once, in `native/src/declaration.rs`. **This section's name is a
+path the tree does not carry, and that is deliberate**: ten citations
+inside this SPEC and one in `docs/install.md` resolve against
+`§lib/declaration.sh`, and renaming the heading strands every one of them. What
+the section owns is the grammar and its compiled holder. The token predicate is
+a bare gate name; the container is the only thing that differs between the arms,
 which is what keeps two surfaces from re-opening the same defect from opposite
 directions.
 
 - **The markdown arm** — a note's `## <section>` bullet lead tokens
-  (`decl_section_bullets` for the container alone, `decl_section_tokens` for the
-  verdict). A bullet's
+  (`section_bullets` for the container alone, `section_tokens` for the verdict).
+  A bullet's
   lead token is the backticked, unbolded bare gate name directly after the bullet
   marker; a bullet shaped any other way yields *no* token rather than a stripped
   one, which is what makes the bolded and bold-and-backticked spellings visible
   instead of silent.
 - **The record arm** — a declaration file's data lines, one bare gate name each
-  (`decl_record_tokens`). That surface is deliberately markup-free, so the
-  spelling question does not arise on it at all. A missing file is the empty set
-  rather than an error: a tree that has never declared one is not thereby
+  (`record_tokens`). That surface is deliberately markup-free, so the
+  spelling question does not arise on it at all. The holder is pure over text and
+  reaches no filesystem, so **a missing file is the empty set** at the caller that
+  reads it rather than an error: a tree that has never declared one is not thereby
   malformed.
 
-The status a caller branches on: **0** resolved, with the declared set on stdout
-(empty for an explicit `None`); **1** unparsed while not `None`, with the
-offending lines on stdout — which is empty when the section held no bullet at
-all; **2** the named section is absent. The record arm has no `None` body and so
-no status 2.
+The verdict a caller branches on is a **type**: `Absent`, the named section is
+not there; `ExplicitNone`, a `None` body, which is the resolved empty set;
+`Tokens`, a declared set that is non-empty by construction; and `Unparsed`,
+unparsed while not `None`, carrying the offending lines — which is the *empty*
+list when the container held no bullet at all. The record arm has no `None` body
+and so no `Absent`: it answers `Ok` or `Err`. **The type is the grammar's whole
+spelling now that one holder is left.** The shell holder reported the same
+trichotomy as exit statuses — **0** resolved with the declared set on stdout,
+**1** unparsed-and-not-`None` with the offending lines, **2** the section absent
+— and the compiled holder was deliberately given a type instead, so that a caller
+cannot reach a token list without having matched the resolved-empty arm. Read the
+status grammar as the record of what the type has to keep distinguishable, not as
+a live interface: nothing exits those codes for this grammar any more.
 
 The markdown arm reports the **trichotomy** the grammar defines: an explicit
 `None` body (the resolved empty set), a non-empty token list, or
 unparsed-and-not-`None`. Every arm has a named reader at a named transition, and
 one with none would be removed: *absent* is read by `check-release-bump` at its
 fixed-section presence assertions and by `check-tightened-gates-grammar` at its
-status-2 arm; *explicit `None`* by the grammar gate's `none` counter, which its
+`Absent` arm; *explicit `None`* by the grammar gate's `none` counter, which its
 clean line prints, and by note-parity as the resolved empty set it compares;
 *tokens* by all three, as a bullet count in the bump gate and as a token set in
 the other two; *unparsed* by the grammar gate's finding list and by note-parity's
@@ -8318,96 +8357,95 @@ the artifact it claims to read. So the helper refuses, and the refusal is what
 closes the class permanently: no future markup variant can disarm the assertion,
 only red it.
 
-**It is owed to the port, not dispositioned by §The kit-library port
-disposition.** It rides the bridge's `lib/*.sh` glob and resolves no knob, so
-that ruling's ground does not reach it; its own disposition is criterion 6's
-*unless* clause, worked immediately below, and it was **temporary rather than
-permanent** — the stated test is whether the shell caller set empties. **It has
-emptied**, at §upgrade-smoke's port. The entry that owns the work is
-`kit-library-port-residue`.
+**The port disposition is closed, and the road was deletion.** The shell library
+`gate-sdk/lib/declaration.sh` (59 lines) was owed to the port and not
+dispositioned by §The kit-library port disposition — it rode the bridge's
+`lib/*.sh` glob and resolved no knob, so that ruling's ground never reached it.
+Its own disposition was criterion 6's *unless* clause and it was **temporary
+rather than permanent**, the stated test being whether the shell caller set
+empties. It emptied at §upgrade-smoke's 2026-09-02 port, which moved the
+declaration resolve in-crate; the cut that spent that purchase is the 2026-09-03
+one under this section, selected by stated contract with this section as its
+outer bound and its whole owed set — one file, no sequenced member left behind.
+The library, its `--declaration-parity` arm and both of its `*.test.sh` harnesses
+were deleted in one commit; the entry that carried the work was
+`kit-library-port-residue`, which this cut delivered a member out of.
 
-**What that discharges is the blocker, not the port.** A grep for sourcers of
-this file over every tracked `.sh` returns `gate-tests/declaration-lib-parity.test.sh`
-and `gate-tests/lib-declaration.test.sh` and nothing else, and the `*.test.sh`
-suffix is outside the `--tree` corpus by that arm's own rule — so the library is
-**takeable** by a later cut under this section, on the deleted-original road
-criterion 6 makes available once the caller set empties. It does **not** port at
-the cut that unblocked it: that cut selects by *stated contract* and this library
-declares a different one, so folding it in would fail the composer's own words.
-Read this paragraph as *unblocked and takeable*, never as *done*.
+**Criterion 6 is discharged by the duplication being absent rather than
+machine-held, and that is the clause's own strongest road.** While both holders
+existed the dual holding rested on a standing oracle — a top-level
+`--declaration-parity` arm reporting the compiled holder's classification of one
+input, held against the shell form by a fixture-lane harness over a corpus
+carrying every arm of the trichotomy. A port-time byte-identity proof would not
+have discharged the clause, because it proves the two agreed once and expires at
+the next edit to either side. **What retired the oracle is the second holder
+going, not a weaker proof being accepted**: one holder cannot be held equal to
+itself, and a comparison arm with no second side is a harness that can only skip.
+The arm and the harness came out in the deleting commit for that reason, together
+with `gate-tests/lib-declaration.test.sh` — the shell arm's own runtime lock-in,
+which had no subject left once the shell arm went and would have become a third,
+worse spelling of the crate's unit tests had it been re-pointed at the binary.
+**Neither retirement traded a case for a deletion**: the eleven comparison labels
+and the lock-in's cases were audited against the crate holder's unit tests in the
+deleting commit, and the four the crate did not already reach — a prose-only
+container refusing with no offending line, `None` read at the container head
+only, a record holding just its contract header as the resolved empty set, and
+both refused bold spellings inside one container — landed there as crate unit
+tests in that same commit.
 
-**The library is dual, and the standing oracle is what makes that true rather
-than asserted.** Every member that once shared this file ships as a compiled
-subcommand and reaches `native/src/declaration.rs`, §upgrade-smoke's arm
-included, so the duplication rests on exactly what criterion 6's *unless* clause
-states and on nothing wider: the machine-held twin below holds the two forms equal
-for as long as both exist, and the `*.test.sh` corpus is what reads the shell form
-(§The port-candidate criteria, criterion 6).
+**One conflation the surviving holder carries, recorded rather than repaired.**
+On the refusal path each arm emits the tokens it had already resolved *before*
+the offending lines, because the shell form printed a token as it walked and
+appended the offenders at the end — so a container mixing a readable and an
+unreadable bullet reports the readable one to its caller's finding list as
+unreadable. The verdict is unaffected and only the diagnostic list is wrong; the
+compiled form reproduced it, because a port proves parity and does not fix the
+rules it ports, and the defect is filed as a gap. **What the cut changed is the
+repair's price, in both directions at once.** It was "a two-holder edit in one
+unit or the parity test reds"; it is now a one-holder edit with **no** parity
+test to red. That is a cheaper repair and a weaker guard, and both halves are
+stated because a reader who takes only the first will read the missing oracle as
+an oversight.
 
-**The standing oracle that discharges it.** A port-time byte-identity proof is
-not machine-held — it proves the two agreed once and expires at the next edit to
-either side, which is exactly the failure that clause names. So the binary
-carries a top-level `--declaration-parity` arm reporting the compiled holder's
-*classification* of one input, one record per line, and
-`gate-tests/declaration-lib-parity.test.sh` — in the fixture-runner battery,
-resolving the binary through `GATE_SDK_NATIVE_BIN` — feeds one canned corpus to
-both holders and compares byte for byte. A flag rather than a subcommand, for the
-reason its siblings are one (§check-gate-substrate-parity). The corpus is the
-**trichotomy** rather than a sample of any tree's notes, so it reaches every arm
-both holders have, including the container that is neither `None` nor
-token-bearing and whose status 1 comes with *empty* stdout.
-`gate-tests/lib-declaration.test.sh` keeps its place unchanged: it is the shell
-arm's own runtime lock-in and fails when only the shell is wrong, which a
-comparison of the two structurally cannot.
-
-**One conflation both holders now carry, recorded rather than repaired.** On the
-refusal path each arm emits the tokens it had already resolved *before* the
-offending lines, because the shell form prints a token as it walks and appends
-the offenders at the end — so a container mixing a readable and an unreadable
-bullet reports the readable one to its caller's finding list as unreadable. The
-verdict is unaffected in both holders and only the diagnostic list is wrong; the
-compiled form reproduces it, because a port proves parity and does not fix the
-rules it ports. Repairing it is a two-holder edit in one unit or the parity test
-reds, which is the oracle above doing its job.
-
-The remaining caller relations, stated in one place: this repo's
+The caller relations, stated in one place: this repo's
 `check-tightened-gates-grammar` uses the markdown arm's verdict at each note it
 walks; `check-tightened-gates-note-parity` uses both arms, comparing a note's
 `Tightened gates` section against its declaration-file argument's record set; and
 `check-release-bump` uses the markdown arm's *container* alone, counting bullets
-across the note's declaration-bearing sections. That last caller is why the container and the token predicate are
+across the note's declaration-bearing sections. All three are compiled members
+calling the holder directly, so the relation is a call rather than a source.
+That last caller is why the container and the token predicate are
 separable rather than one pass: Behavior-changes lead tokens are legitimately
 prose phrases, so the bump derivation needs the bullets without the token
-predicate. Before this helper the container was stated three times and two of
-the statements already disagreed on whether a bullet marker could be indented,
+predicate. Before this grammar had a holder the container was stated three times
+and two of the statements already disagreed on whether a bullet marker could be
+indented,
 so the section a bump was derived from and the section an allowed-red set was
-parsed from were not guaranteed to be the same section. A sourced library, not
-a gate, so it owes no `good/`+`bad/` pair. The record arm is exercised a second
+parsed from were not guaranteed to be the same section. Not a gate, so it owes no
+`good/`+`bad/` pair. The record arm is exercised a second
 way, through `scripts/gate-tests/check-tightened-gates-note-parity`'s own
 `good/`+`bad/` pair, whose `tightened-gates.txt` fixture drives it via the gate's
-declaration-file argument — which since the port drives the *compiled* holder,
-so that pair proves the shell arm only through the parity comparison above and
-never instead of it.
+declaration-file argument — which since the port drives the compiled holder, so
+that pair now reaches the only holder there is.
 
 **The compiled holder's public surface is bounded and is exactly these three
 entry points** — the container arm alone, the markdown arm's verdict, and the
 record arm. There is no writer, no renderer and no section-discovery API, and
 adding one is a design decision with its own reader rather than an omission to
-fill in. Its consumers are **five** and are named: the three gate modules of §The
-declaration cohort, the parity arm above, and §upgrade-smoke's arm, whose
-declaration-resolve step moved in-crate at its port. That fifth consumer was
-deliberately *outside* the set while its shell driver existed, which was the
-criterion-6 ruling; the ruling has not changed, the driver has gone, and the
-oracle above still exists for the `*.test.sh` corpus that reads the shell form.
+fill in. Its consumers are **four** and are named: the three gate modules of §The
+declaration cohort and §upgrade-smoke's arm, whose declaration-resolve step moved
+in-crate at its port. That fourth consumer was deliberately *outside* the set
+while its shell driver existed, which was the criterion-6 ruling; the ruling has
+not changed and the driver has gone. The fifth consumer this section used to name
+was the parity arm, which left with the holder it compared against.
 
-The helper carries no section name and no gate name of its own — both are the
+The holder carries no section name and no gate name of its own — both are the
 caller's arguments, and it takes no configuration. That is where the seam falls:
-the parsing is kit mechanism, the parsed content is the consumer's. **The seam
-falls in the same place on the compiled side and is checkable there**:
-`native/src/declaration.rs` takes its section as an argument too, so the four
-published section names live in the three gate modules that pass them — this
-consumer's rule content sitting in this consumer's rules — and a grep of that
-module for any of them returns nothing.
+the parsing is kit mechanism, the parsed content is the consumer's. **The seam is
+checkable**: `native/src/declaration.rs` takes its section as an argument, so the
+four published section names live in the three gate modules that pass them —
+this consumer's rule content sitting in this consumer's rules — and a grep of
+that module for any of them returns nothing.
 
 ### lib/test-hermetic.sh
 
@@ -9159,10 +9197,11 @@ member already spells, since its vendorable-kit derivation names that kit
 explicitly to order it first.
 
 **The declaration resolve moved in-crate.** The arm reads TO's tightened-gates
-declaration through `native/src/declaration.rs`, the compiled holder the standing
-`--declaration-parity` lane already holds equal to the shell form, and it does not
-source `lib/declaration.sh` at all. What that empties, and what emptying it does
-and does not discharge, is §lib/declaration.sh's.
+declaration through `native/src/declaration.rs`, which was then the compiled half
+of a dual holding and is now the grammar's only holder, and it sources no shell
+library. This port is what emptied that library's non-test caller set; what the
+emptying discharged, and what the 2026-09-03 cut that spent it did, is
+§lib/declaration.sh's.
 
 **Each phase runs against its own ref's gate binary**, and that pairing is what
 makes phase 1's claim true as written. A `.gate` member dispatches to a binary
@@ -11212,8 +11251,11 @@ placement; and (H) a held declaration's ground reachable in one hop.
   outside the roster this assertion equates. Recorded because the assertion is
   unchanged by it and the consequence is otherwise rediscovered by reddening it
   (queue-kit/SPEC.md §lib/queue.sh is the first such arm's consumer;
-  §lib/declaration.sh is the second, and the shape held unchanged at the second
-  use, which is what makes it a pattern rather than one harness's accommodation).
+  §lib/declaration.sh was the second, and the shape held unchanged at the second
+  use, which is what makes it a pattern rather than one harness's accommodation.
+  That second arm has since retired with the holder it compared against, which
+  changes nothing here: an arm leaving the binary level is invisible to an
+  assertion that never equated it).
   **A second column rather than a fifth flag — and the skew that ruling was taken
   against is what this member's own port ended.** The column was chosen because
   the gate shipped in a kit and the binary in the payload, versioning

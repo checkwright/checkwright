@@ -4,6 +4,9 @@
 // spec: gate-sdk/SPEC.md §lib/declaration.sh — the trichotomy is a type here rather than the
 // shell's status code, so a caller cannot reach a token list without having matched the
 // resolved-empty arm; nothing else about the grammar changes
+// spec: gate-sdk/SPEC.md §lib/declaration.sh — the grammar's only holder since the 2026-09-03 cut
+// deleted the shell form: every "shell holder" below names the implementation this one was ported
+// from, never a live second side to hold equal
 
 // spec: gate-sdk/SPEC.md §lib/declaration.sh — awk's `[[:space:]]` in the C locale, as a byte
 // class: a Unicode predicate would classify bytes the shell holder never treats as blank
@@ -246,11 +249,23 @@ None, and the trailing clause rides the explicit empty set.
 ## Delta
 
 - **delta-one** — bolded, so no token is read here.
+- **`delta-two`** — bold-and-backticked, the same silence by a second spelling.
 
 ## Epsilon
 
 - `epsilon-one` — readable.
 - see `epsilon-two` — a lead token not directly after the marker.
+
+## Zeta
+
+Prose only: not `None`, and no bullet at all, so the parse resolves to an empty
+set the section contradicts.
+
+## Eta
+
+- `eta-one` — resolved.
+
+None of the above reaches a vendored tree that shadows it.
 ";
 
     #[test]
@@ -274,8 +289,14 @@ None, and the trailing clause rides the explicit empty set.
             SectionVerdict::Tokens(t) => assert_eq!(t, vec!["alpha-one", "alpha-two", "alpha-three"]),
             _ => panic!("a resolving container did not report tokens"),
         }
+        // spec: gate-sdk/SPEC.md §lib/declaration.sh — both spellings the corpus actually carried,
+        // bolded and bold-and-backticked, refused in one container rather than one at a time.
         match section_tokens(CORPUS, "Delta") {
-            SectionVerdict::Unparsed(b) => assert_eq!(b.len(), 1),
+            SectionVerdict::Unparsed(b) => {
+                assert!(b[0].starts_with("- **delta-one"));
+                assert!(b[1].starts_with("- **`delta-two`"));
+                assert_eq!(b.len(), 2);
+            }
             _ => panic!("an unreadable lead token did not report as unparsed"),
         }
         // spec: gate-sdk/SPEC.md §lib/declaration.sh — the preserved conflation: a bare token
@@ -293,6 +314,20 @@ None, and the trailing clause rides the explicit empty set.
         match section_tokens(CORPUS, "Gamma") {
             SectionVerdict::Unparsed(b) => assert!(b.is_empty()),
             _ => panic!("an empty container resolved instead of refusing"),
+        }
+        // spec: gate-sdk/SPEC.md §lib/declaration.sh — a prose-only container is the same refusal
+        // by a different route: content, but no bullet and no `None` body, so the empty offender
+        // list is what the container's own text contradicts.
+        match section_tokens(CORPUS, "Zeta") {
+            SectionVerdict::Unparsed(b) => assert!(b.is_empty()),
+            _ => panic!("a prose-only container resolved instead of refusing"),
+        }
+        // spec: gate-sdk/SPEC.md §lib/declaration.sh — `None` is read off the container's first
+        // line carrying content, so a later line opening with the word leaves a real declaration
+        // resolving rather than emptying it.
+        match section_tokens(CORPUS, "Eta") {
+            SectionVerdict::Tokens(t) => assert_eq!(t, vec!["eta-one"]),
+            _ => panic!("a later `None` line emptied a resolving container"),
         }
     }
 
@@ -320,6 +355,10 @@ None, and the trailing clause rides the explicit empty set.
             Ok(vec!["alpha-one".to_string()])
         );
         assert_eq!(record_tokens(""), Ok(Vec::new()));
+        // spec: gate-sdk/SPEC.md §lib/declaration.sh — a record holding only its contract header
+        // is the resolved empty set, never a refusal: a tree that has never declared one is not
+        // thereby malformed.
+        assert_eq!(record_tokens("# contract: x.md §y\n"), Ok(Vec::new()));
         assert_eq!(
             record_tokens("alpha one\nalpha-two\n"),
             Err(vec!["alpha-two".to_string(), "alpha one".to_string()])
