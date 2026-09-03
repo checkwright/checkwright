@@ -24,6 +24,7 @@ mod section;
 mod sha256;
 mod spec;
 mod stages;
+mod toolfloor;
 #[cfg(test)]
 mod usage_tests;
 mod walk;
@@ -86,6 +87,47 @@ fn evidence_lib_parity(args: &[String]) -> i32 {
     }
 }
 
+// spec: context-kit/SPEC.md §bin/env-probe — the floor predicate's second holder reporting its
+// *classification* over a canned corpus, `--evidence-lib-parity`'s own rule: the parse's four
+// fields and the verdict's own words, never a rendered profile line.
+fn toolfloor_parity(args: &[String]) -> i32 {
+    let usage = "  usage: checkwright-gates --toolfloor-parity parse <element>... | --toolfloor-parity check <element> <banner>...";
+    match args.first().map(String::as_str) {
+        Some("parse") => {
+            for e in &args[1..] {
+                let p = toolfloor::parse(e);
+                println!("parse\t{}\t{}\t{}\t{}\t{}", e, p.name, p.min, p.imp, p.audience);
+            }
+            0
+        }
+        // spec: context-kit/SPEC.md §Testing — the corpus is `(element, banner)` *pairs*, so an odd
+        // tail is a malformed corpus rather than a banner-less element: refusing it is what keeps a
+        // silently-shortened comparison from reading as agreement.
+        Some("check") => {
+            let rest = &args[1..];
+            if rest.len() % 2 != 0 {
+                eprintln!("checkwright-gates: --toolfloor-parity check takes (element, banner) pairs and got an odd count — the classification could not be reported; treating as failure (not clean)");
+                eprintln!("{}", usage);
+                return 2;
+            }
+            for pair in rest.chunks(2) {
+                println!(
+                    "check\t{}\t{}\t{}",
+                    pair[0],
+                    pair[1],
+                    toolfloor::check(&pair[0], &pair[1]).rendered()
+                );
+            }
+            0
+        }
+        _ => {
+            eprintln!("checkwright-gates: --toolfloor-parity needs a mode — the classification could not be reported; treating as failure (not clean)");
+            eprintln!("{}", usage);
+            2
+        }
+    }
+}
+
 fn main() {
     let argv: Vec<String> = std::env::args().skip(1).collect();
 
@@ -93,7 +135,7 @@ fn main() {
         Some(a) => a.as_str(),
         None => {
             eprintln!("checkwright-gates: no subcommand given");
-            eprintln!("  usage: checkwright-gates --list | --reads <gate-name> | --needs <gate-name> | --knobs <gate-name> | --source-stamp | --queue-parity <queue-file> | --evidence-lib-parity lock <file>... | --evidence-lib-parity pid <pid>... | --install <op> [--<key> <value>]... | --run [--gates-dir <dir>] [--only <name>... | --for <path>...] | --hook <member> | --emit-<arm> | <gate-name> [args...]");
+            eprintln!("  usage: checkwright-gates --list | --reads <gate-name> | --needs <gate-name> | --knobs <gate-name> | --source-stamp | --queue-parity <queue-file> | --evidence-lib-parity lock <file>... | --evidence-lib-parity pid <pid>... | --toolfloor-parity <mode> <arg>... | --install <op> [--<key> <value>]... | --run [--gates-dir <dir>] [--only <name>... | --for <path>...] | --hook <member> | --emit-<arm> | <gate-name> [args...]");
             eprintln!("  bridged arms: {}", emit::arms().join(", "));
             exit(2);
         }
@@ -157,6 +199,13 @@ fn main() {
     // against `ek_lock_read` and `ek_pid_alive`. A top-level flag, like the arms around it.
     if first == "--evidence-lib-parity" {
         exit(evidence_lib_parity(&argv[1..]));
+    }
+
+    // spec: context-kit/SPEC.md §bin/env-probe — the standing oracle criterion 6's *unless* clause
+    // owes the floor predicate's second holder: this module's classification of one canned corpus,
+    // for the harness holding it against `lib/toolfloor.sh`. A top-level flag, like its sibling.
+    if first == "--toolfloor-parity" {
+        exit(toolfloor_parity(&argv[1..]));
     }
 
     // spec: installer/README.md §The install boundary — the install seam both bootstraps call,

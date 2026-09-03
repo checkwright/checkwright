@@ -6,7 +6,7 @@ use std::collections::BTreeMap;
 use std::path::Path;
 
 const DEFAULT_INSTALL_MD: &str = "docs/install.md";
-const DEFAULT_ROSTER: &str = "context-kit/lib/toolfloor.sh";
+const DEFAULT_ROSTER: &str = crate::toolfloor::ROSTER;
 const BEGIN: &str = "<!-- toolchain:begin -->";
 const END: &str = "<!-- toolchain:end -->";
 // spec: docs/site-architecture.md §Generated projections and their freshness gates — the floor
@@ -88,26 +88,13 @@ fn parenthetical(rest: &str) -> Option<&str> {
 }
 
 // spec: docs/site-architecture.md §Generated projections and their freshness gates — the roster
-// grammar is parsed here rather than sourced: a fixture path is untrusted input, so the reader
-// that lints the array must not be made to execute the file it reads
+// grammar has one crate-side parser, `toolfloor::parse`, which this gate shares with the env-probe
+// arm rather than holding a second copy the two could disagree about
 fn roster_quad(element: &str) -> (String, String) {
-    let mut it = element.splitn(4, ':');
-    let name = it.next().unwrap_or("").to_string();
-    let min = it.next().unwrap_or("").to_string();
-    let imp = it.next().unwrap_or("").to_string();
-    // spec: docs/site-architecture.md §Generated projections and their freshness gates — the
-    // shell reader takes `${_rest%%:*}` at every step, so a fifth field is dropped rather than
-    // folded into the audience
-    let aud = it
-        .next()
-        .unwrap_or("")
-        .split(':')
-        .next()
-        .unwrap_or("")
-        .to_string();
+    let e = crate::toolfloor::parse(element);
     (
-        name.clone(),
-        format!("{}:{}:{}:{}", name, min, imp, aud),
+        e.name.clone(),
+        format!("{}:{}:{}:{}", e.name, e.min, e.imp, e.audience),
     )
 }
 
@@ -170,18 +157,8 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
 
     let roster_text = fresh::read_captured(roster)?;
-    let roster_line = roster_text
-        .lines()
-        .find(|l| l.starts_with("PROBE_SET=("))
+    let elements = crate::toolfloor::probe_set(&roster_text)
         .ok_or_else(|| format!("no PROBE_SET=(...) array in {}", roster))?;
-    let inner = roster_line
-        .split_once('(')
-        .map(|(_, r)| r)
-        .unwrap_or("")
-        .split(')')
-        .next()
-        .unwrap_or("");
-    let elements: Vec<&str> = inner.split_whitespace().collect();
     if elements.is_empty() {
         return Err(format!("PROBE_SET array is empty in {}", roster));
     }

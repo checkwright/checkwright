@@ -6,6 +6,7 @@ pub mod close_surfaces;
 pub mod docs_mirror;
 pub mod drift_report;
 pub mod enforcement_map;
+pub mod env_probe;
 pub mod file_survey;
 pub mod footprint;
 pub mod graph;
@@ -356,6 +357,14 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         "--emit-session-id",
         Arm::Emit(session_id::emit),
         session_id::KNOBS,
+    ),
+    // spec: context-kit/SPEC.md §bin/env-probe — an action that reports, so an `Arm::Emit`: both
+    // its failures are already exit 2, which is the variant's own collapse. Its one declared knob
+    // is resolved out of `lib/context.sh`, the config bridge's sole resolver for that family.
+    (
+        "--emit-env-probe",
+        Arm::Emit(env_probe::emit),
+        env_probe::KNOBS,
     ),
     // spec: gate-sdk/SPEC.md §run-gates — the battery runner: the class's first bridged member
     // that returns a verdict rather than a document, and the reason the table is keyed by flag

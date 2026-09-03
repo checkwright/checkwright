@@ -77,6 +77,13 @@ pub fn run(program: &str, args: &[&str]) -> Result<Completed, String> {
 // `command -v <prog>`: it exists so a wrapper's refusal is its own message at the shell form's
 // own point in the order, with `run`'s `Err` arm left as the backstop
 pub fn on_path(program: &str) -> bool {
+    which(program).is_some()
+}
+
+// spec: gate-sdk/SPEC.md §Fail-closed contract — the same probe reporting *where* it resolved,
+// `command -v`'s stdout rather than its exit status: a caller that renders the resolved path must
+// not walk PATH a second time to learn it.
+pub fn which(program: &str) -> Option<String> {
     #[cfg(windows)]
     let pathext = Some(std::env::var("PATHEXT").unwrap_or_default());
     #[cfg(not(windows))]
@@ -123,25 +130,28 @@ fn resolve_on_path<F: Fn(&std::path::Path) -> bool>(
     path: Option<&std::ffi::OsStr>,
     pathext: Option<&str>,
     exists: F,
-) -> bool {
+) -> Option<String> {
     let candidates = exe_candidates(program, pathext);
     if program.contains('/') {
         return candidates
             .iter()
-            .any(|c| exists(std::path::Path::new(c)));
+            .find(|c| exists(std::path::Path::new(c)))
+            .cloned();
     }
-    let Some(path) = path else {
-        return false;
-    };
+    let path = path?;
     // spec: gate-sdk/SPEC.md §Fail-closed contract — the separator is std's, never a literal, so a
     // drive letter's colon does not shear every entry past the first into a fragment
-    std::env::split_paths(path).any(|dir| {
+    std::env::split_paths(path).find_map(|dir| {
         let dir = if dir.as_os_str().is_empty() {
             std::path::PathBuf::from(".")
         } else {
             dir
         };
-        candidates.iter().any(|c| exists(&dir.join(c)))
+        candidates
+            .iter()
+            .map(|c| dir.join(c))
+            .find(|p| exists(p))
+            .map(|p| p.display().to_string())
     })
 }
 
@@ -665,11 +675,11 @@ mod tests {
         let path = std::env::join_paths(["/nowhere", "/opt/bin"]).expect("cannot join a PATH");
         let only_the_shim = |p: &Path| p == Path::new("/opt/bin/cargo.CMD");
         assert!(
-            resolve_on_path("cargo", Some(&path), Some(""), only_the_shim),
+            resolve_on_path("cargo", Some(&path), Some(""), only_the_shim).is_some(),
             "the PATHEXT candidate set did not reach a .CMD shim"
         );
         assert!(
-            !resolve_on_path("cargo", Some(&path), None, only_the_shim),
+            resolve_on_path("cargo", Some(&path), None, only_the_shim).is_none(),
             "the bare name matched a .CMD shim, so this test proves nothing about the suffix set"
         );
     }
@@ -679,12 +689,10 @@ mod tests {
     #[test]
     fn an_empty_path_entry_still_means_the_working_directory() {
         let path = std::env::join_paths(["", "/opt/bin"]).expect("cannot join a PATH");
-        assert!(resolve_on_path(
-            "cargo",
-            Some(&path),
-            None,
-            |p: &Path| p == Path::new("./cargo")
-        ));
+        assert_eq!(
+            resolve_on_path("cargo", Some(&path), None, |p: &Path| p == Path::new("./cargo")),
+            Some("./cargo".to_string())
+        );
     }
 
     // spec: gate-sdk/SPEC.md §Fail-closed contract — the separator has no Linux-runnable oracle,
