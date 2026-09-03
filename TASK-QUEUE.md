@@ -12,9 +12,10 @@
 
 ## New Features
 
-- **kit-library-port-residue** [spec: SPEC-declaration-cut.md] — the kit `lib/*.sh` members the
-  2026-08-30 class ruling deliberately leaves owed, filed rather than absorbed at its boundary.
-  **What the ruling settled and what it did not.** gate-sdk/SPEC.md §The kit-library port
+- **kit-library-port-residue** [spec: SPEC-declaration-cut.md] [spec: SPEC-install-lifecycle.md]
+  — the kit `lib/*.sh` members the 2026-08-30 class ruling deliberately leaves owed, filed
+  rather than absorbed at its boundary. **What the ruling settled and what it did not.**
+  gate-sdk/SPEC.md §The kit-library port
   disposition rules a library permanently shell when it is the config bridge's **sole resolver**
   for its kit's knobs. The discriminator is content, not directory, so two kinds of member fall
   outside it: a file that rides the bridge's flat `lib/*.sh` glob while resolving no bridged knob,
