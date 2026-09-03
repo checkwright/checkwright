@@ -500,7 +500,23 @@ indented body line naming the entry's own slug, then the authority that ruled,
 the date it was taken, and a keyword naming how the authorization reached the
 recording session. One line per ruling, appended and never rewritten; rulings
 sharing an authority and a channel share a line on the `recurrence:` model, and
-a ruling that shares neither takes a counted second one. It is a declaration
+a ruling that shares neither takes a counted second one.
+**"Never rewritten" is a test about content and not about bytes**, and stating
+it is owed because the clause beside it forecloses the literal reading: a ruling
+that shares an authority and a channel with one already recorded *joins that
+line*, which rewrites it, so byte immutability cannot be what the phrase means.
+**A rewrite is sanctioned iff every ruling recorded before it is still recorded
+after it, with its authority, its date and its channel.** Retroactively
+canonicalizing already-valid separate lines into the shared form therefore
+appends rather than rewrites, while a consolidation that drops or merges any one
+of those three fields is exactly what the clause forbids — the test is what a
+session under line-budget pressure applies, the first canonicalization being an
+instance of it rather than the permission itself (operator-ruled 2026-09-03,
+verified on that instance: every prior ruling survived with all three fields).
+**Where such a line sits carries no meaning**, and that follows from the first
+field rather than standing as a second permission: the declaration names the
+entry's own slug, so it is entry-scoped, and moving one across paragraph blocks
+re-attributes nothing. It is a declaration
 rather than a tag on the same further-tag test `recurrence:` clears — its
 readers scan a line of its own and it marks no move across a pending/ready
 boundary — so `check-tag-lead-line` does not govern it and it cannot collide

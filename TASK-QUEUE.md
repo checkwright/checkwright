@@ -9358,7 +9358,6 @@
   the way in and on the way back out. The removed body is recoverable from
   the evicting commit (`git log -p -S'<slug>' -- TASK-QUEUE.md`).
 
-- **ruled-line-canonicalization-unruled** [design-pending] — `ruled:` line merging is unruled.
 - **craft-rule-step-has-no-reader** [design-pending] — A broken stage-rules knob reds nothing.
 - **runtime-dir-two-tier-detector** [design-pending] — No two-tier proof for file-pattern ignores.
 - **done-slug-commit-naming-gate** [design-pending] — Done-moving commits need not name their slug.
@@ -9427,5 +9426,6 @@
 
 ## Done
 
+- ruled-line-canonicalization-unruled
 
 ## Lessons Learned
