@@ -370,6 +370,12 @@ session is not the one that learns it.
   this cut takes, that `bin/enter-stage.sh` ports in another cut, and that
   `lib/stages.sh` is permanently shell so the section's contract will not be
   wholly in-crate while the kit-library class ruling stands (deltas 1 and 2).
+  **This restatement's opening sentence carries the parenthetical `(the
+  bin/kfric.sh pattern: ...)`, and `drift-kit/SPEC-kfric-cut.md` lands in the
+  same iteration and also edits it** — that sibling amendment renames the
+  citation from `bin/kfric.sh` to its own arm, so whichever of the two batches
+  merges second reads this sentence as the first batch left it rather than
+  re-deriving the opening clause from scratch.
 - `lifecycle-kit/SPEC.md §The committed gap inbox`, the live-slug paragraph — the
   predicate is reproduced rather than collapsed, with the reason (a different
   corpus, grammar-scoped against knob-scoped) and the honest note that the
@@ -384,13 +390,21 @@ session is not the one that learns it.
   surviving shell half, so a later cut selector meets the fact where it works
   rather than in the other section (delta 1).
 - `gate-sdk/SPEC.md §The non-gate arm` — the class roster gains
-  `--emit-file-gap`; the row carries the fact that this is the class's **second**
-  free-text capture member, so the argv-shape/help split the section states for
-  `--emit-file-survey` is now a rule with two instances rather than one worked
-  example (deltas 2 and 6).
+  `--emit-file-gap`; the row carries the fact that this is a free-text capture
+  member alongside `--emit-file-survey`, so the argv-shape/help split the
+  section states is a rule with more than one instance. **The ordinal is
+  written against this amendment's own authoring state and is not the final
+  count**: `drift-kit/SPEC-kfric-cut.md` lands in the same iteration, adds a
+  third such member (`--emit-kfric`), and its own delta (4) rules that the
+  instance-count sentence is written **once**, by whichever of the two batches
+  merges last, rather than as an ordinal each amendment asserts independently —
+  this amendment's "second" is that sentence's draft, not its final word
+  (deltas 2 and 6).
 - `gate-sdk/SPEC.md §The bin/-tool contract` — its worked example names the arm,
   and the existing pointer that the shape half outlives a member's port gains
-  this second instance (delta 2).
+  this instance, **subject to the same once-only reconciliation** as the
+  roster sentence above, since the sibling amendment's `--emit-kfric` is a
+  third instance of this same pointer (delta 2).
 - `CLAUDE.md`'s gap-capture bullet, `lifecycle-kit/README.md`'s tool-roster line,
   `lifecycle-kit/templates/lead.md`, `lifecycle-kit/templates/stages/close.md`,
   `.claude/commands/consult.md`, and `.workflow/gap-inbox.md`'s contract
@@ -429,6 +443,11 @@ session is not the one that learns it.
 - [ ] **The matcher's oracle survives the port** — every one of the nine scenarios
       `file-gap-recurrence.test.sh` asserts today still has a holder, the
       no-queue-write invariant end-to-end and the grammar cases in-module.
+- [ ] **The sibling's ordinal is reconciled once** — gate-sdk/SPEC.md §The
+      non-gate arm's argv-shape split and §The bin/-tool contract's parallel
+      pointer both state the instance count for the final state of this cut and
+      `drift-kit/SPEC-kfric-cut.md` together, each written by whichever batch
+      merges last, not twice.
 - [ ] **Gaps filed** — cross-component gaps discovered during the work filed as
       debt tasks (a build-time causal gap is resolved that session, not
       deferred); delta (3)'s open collapse question is filed in the spec session

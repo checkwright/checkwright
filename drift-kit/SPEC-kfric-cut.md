@@ -129,6 +129,16 @@ ordinal each amendment asserted independently. Recorded as a delta because this
 is exactly the shape `amendment-dod-sibling-dependence` describes and the
 cheapest moment to catch it is before either merge.
 
+**A second, parallel pointer carries the same count and takes the same
+reconciliation.** gate-sdk/SPEC.md §The bin/-tool contract states the general
+rule that a capture member's shape half outlives its port and cites
+`--emit-file-survey` as "the worked instance"; `lifecycle-kit/SPEC-gap-cut.md`'s
+delta (2) already commits to incrementing that pointer to a second instance for
+`--emit-file-gap`. This amendment adds `--emit-kfric` as a third, so that
+pointer is reconciled to its final count by the same once-only rule as
+§The non-gate arm's roster sentence above — one write, in whichever batch
+merges last, not two independent increments.
+
 ### (5) The behavioural coverage narrows to the seam a crate test cannot see
 
 `drift-kit/smoke/install.sh:590-616` is the **only** surface in the tree that
@@ -328,6 +338,10 @@ the one that learns it.
   the argv-shape/help split gains its instance count, written **once** for the
   final state of both cuts rather than as an ordinal each amendment asserted
   (delta 4).
+- `gate-sdk/SPEC.md §The bin/-tool contract` — its "shape half outlives a
+  member's port" pointer gains `--emit-kfric` as a third instance, reconciled
+  **once** alongside the sibling amendment's second, by the same rule as the
+  roster sentence above (delta 4).
 - `lifecycle-kit/SPEC.md §The committed gap inbox` — its affordance paragraph
   names the arm rather than `bin/kfric.sh` as `bin/file-gap.sh`'s precedent; the
   sibling amendment edits the same paragraph, and the second batch reads what the
@@ -367,8 +381,9 @@ the one that learns it.
       cut; a reader who never saw this amendment can tell no later cut is
       sequenced against it.
 - [ ] **The sibling's ordinal is reconciled once** — gate-sdk/SPEC.md §The
-      non-gate arm's argv-shape split states the instance count for the final
-      state of both cuts, written by whichever batch merges last, not twice.
+      non-gate arm's argv-shape split **and** §The bin/-tool contract's parallel
+      pointer both state the instance count for the final state of both cuts,
+      each written by whichever batch merges last, not twice.
 - [ ] **Gaps filed** — cross-component gaps discovered during the work filed as
       debt tasks (a build-time causal gap is resolved that session, not deferred).
 - [ ] **The oracle moved, and by the roster rather than by a number** — the
