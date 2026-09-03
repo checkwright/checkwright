@@ -71,10 +71,23 @@ That comment is the structural guard on the envelope: a later batch meeting a re
 in `proc.rs` will otherwise read it as the class fix and sweep the callers, which is the
 widening the operator's ruling forbids.
 
-**A location in `graph.rs` was weighed and refused**, and the refusal is the reason the
-comment above has to carry the envelope instead: keeping the helper at its one call site
-would make the narrowness structural, but it would mint a second `PATH` resolver in a
-tree that has exactly one, and de-literalization outranks the legibility gain.
+**A location in `graph.rs` was weighed and refused, and the refusal turns out to be
+mechanized rather than a preference.** Keeping the helper at its one call site would make
+the narrowness structural — but `native/src/proc.rs`'s own test
+`no_gate_module_constructs_a_subprocess_itself` enumerates every `.rs` under
+`native/src/gates/` and asserts none contains `Command::`, and §Fail-closed contract states
+the same rule as prose: *"`proc.rs` is where a spawn would have to be added … building its
+own `Command` is what the test refuses."* So the location is forced and the comment above
+is what carries the envelope instead. Probed rather than reasoned from doctrine, because
+the two arrive at the same place by different routes and only one of them reds.
+
+**Two existing `proc.rs` invariants bind the implementation and are named so the build does
+not meet them by surprise.** The module's self-scanning test
+`the_path_separator_is_never_spelled_as_a_literal` reads `src/proc.rs` back off disk and
+refuses a `split(':')`, so the new resolution splits `PATH` through
+`std::env::split_paths` exactly as `resolve_on_path` already does — a drive letter's colon
+is why. And `exe_candidates` is the single owner of what an installed program may be named,
+so the resolution appends no extension of its own and takes its candidate set from there.
 
 ### (3) The refusal when nothing resolves is **named**, and it reaches the reader assertion D already has
 
@@ -104,7 +117,30 @@ gate.** A gate that read every spawn site and demanded a resolved path is the cl
 the envelope refuses; naming the distinction where the next porting session already
 looks is what the hotfix can honestly carry.
 
-### (5) The graph module's own `spec:` comment is corrected, not merely extended
+### (5) The registry's `needs` declaration is left unchanged, and the reason is a conflation this cut exposes but may not fix
+
+`native/src/gates/mod.rs` registers `check-graph` with `needs = &[("bash", "")]`, and the
+crate-wide test `every_registry_member_declares_the_programs_it_spawns` compares the
+recorder's **observed program string** against that declaration by **exact equality**, with
+`"?"` as the only wildcard {design-bearing}. So a spawn of a resolved absolute path is not
+covered by a declared `"bash"`, and the observed string is host-dependent — which means the
+test as written cannot express the thing this repair does.
+
+**It does not red today, and that is the sharper half.** Both `check-graph` fixtures pass
+`--amend-only`, which returns before `generator_emit` is reached, so the recorder observes
+nothing for this member and the subset check passes **vacuously**. The safety net is
+therefore absent at exactly the site being changed, and a build that read a green run as
+confirmation would be reading nothing at all. Probed rather than assumed.
+
+**The declaration stays `("bash", "")` and the conflation is filed rather than repaired.**
+`needs` answers what a host must *have*, and after this repair the answer is still a bash;
+what the test conflates is that requirement with the literal argv[0] the recorder saw.
+Repairing the conflation is a change to a crate-wide test on behalf of every registry
+member, which is the class-wide work the envelope refuses, so it goes to the gap inbox with
+the vacuity noted beside it. `--emit port-blockers` filters this declaration against
+`GATE_SDK_PROGRAM_FLOOR`, which carries `bash`, so that oracle stays silent either way.
+
+### (6) The graph module's own `spec:` comment is corrected, not merely extended
 
 `native/src/gates/graph.rs:373-374` currently asserts a clearance this host falsifies, so
 the sentence is rewritten rather than appended to {mechanical}: the generator stays shell,
@@ -112,7 +148,7 @@ assertion D spawns it, and the interpreter is resolved because the floor's guara
 not reach a bare name. A comment that still states the false clearance beside the code
 that stopped relying on it is the restatement CLAUDE.md's comment doctrine refuses.
 
-### (6) The `.gate` descriptor does **not** change, and the negative is stated because the instinct is to add a couple
+### (7) The `.gate` descriptor does **not** change, and the negative is stated because the instinct is to add a couple
 
 `gate-sdk/checks/check-graph.gate` couples `native/src/gates/graph.rs` and
 `native/src/emit/graph.rs` and names no universal layer {design-bearing}. §The non-gate
@@ -122,7 +158,7 @@ this repair adds `proc.rs` to no `couples=` field, and a build batch that adds o
 re-running the whole battery from the generated hook on every spawn-layer edit, which is
 de-literalization inverted.
 
-### (7) The residue is filed and named, and this delta is what stops it being carried
+### (8) The residue is filed and named, and this delta is what stops it being carried
 
 The crate's other bare-`"bash"` spawn sites — in `native/src/evidence.rs`,
 `native/src/emit/upgrade_smoke.rs`, `native/src/runner.rs` and elsewhere — keep spawning
@@ -133,7 +169,7 @@ authority. Under the port-only run close promotes nothing, so the expected dispo
 the icebox; the filing is owed either way, and the knowledge-friction stamp scope left is
 not a filing.
 
-### (8) What this unit's completion **is**, stated because getting it wrong re-arms a known wedge
+### (9) What this unit's completion **is**, stated because getting it wrong re-arms a known wedge
 
 The deliverable is the **code, its tests and its documentation** — never a green Windows
 leg {design-bearing}. The leg's observation belongs to `platform-support-ci-matrix`, whose
@@ -181,16 +217,28 @@ the point of it is to say where to look when one goes red:
   the reader of delta (1)'s tests. Its red condition is any failing test, which is
   monotone, and it is what makes the new pure-function tests load-bearing rather than
   decorative.
-- **`check-comment-tier`** — reds on a comment that is not a directive. Delta (5) rewrites
+- **`check-comment-tier`** — reds on a comment that is not a directive. Delta (6) rewrites
   one comment and delta (2) adds one; both must be directives, and relocating the false
   clearance behind a `spec:` tag rather than correcting it is the blessing-a-restatement
-  defect CLAUDE.md names.
+  defect CLAUDE.md names. **Neither it nor `check-spec-pointer` reds on a comment that is
+  merely FALSE** — both validate a directive's shape and its `§` target's existence, never
+  its truth, which is why delta (6) exists at all and why nothing would have caught the
+  clearance the repair falsifies.
+- **`check-tree-terms`** — reds on a banned pattern in a tracked file, and
+  `scripts/msg-patterns.list` bans a `/home/<user>` or `/Users/<user>` spelling. Monotone
+  in the adding direction, and this cut is on the adding side: a test that recorded a real
+  resolved path would trip it, which is why the DoD requires synthetic literals.
+- **`check-path-dialect`** — does **not** fire. Its Rust vocabulary is a closed set of
+  three forms (`env::current_dir(`, `fs::canonicalize(`, `env!("CARGO_MANIFEST_DIR")`) plus
+  a `--show-toplevel` outside the crosser, and a `PATH` resolution reaches none of them.
+  Stated because a repair that resolves an absolute path on a two-dialect host is the first
+  thing a reader would check it against.
 - **`check-gate-binary-fresh`** — reds when the committed binary's source stamp does not
   match the tree, so it fires on this edit and is discharged by
   `bash gate-sdk/bin/build-native.sh`. It is an **equality**, not monotone, and it is the
   commit-time obligation CLAUDE.md states beside the battery.
 - **`check-reads-couples` and `check-graph`'s own manifest assertions** — read `couples=`
-  fields, which delta (6) does not change; both stay green *because* nothing is added.
+  fields, which delta (7) does not change; both stay green *because* nothing is added.
 - **`check-measured-claim` / `check-unmarked-claim`** — the §check-graph runtime paragraph
   carries measured figures. This repair changes neither the spawn count nor the measured
   medians, and the paragraph's numbers are not re-measured by it; a delta that touched
@@ -204,7 +252,7 @@ the point of it is to say where to look when one goes red:
 - `gate-sdk/SPEC.md §check-graph` — the spawn paragraph gains the resolution: assertion D
   spawns a resolved interpreter rather than a bare name, the rejection rule and its
   case-insensitivity, the named refusal when nothing resolves, and the fact that this is
-  the crate's only resolved spawn today (deltas 1, 3 and 5).
+  the crate's only resolved spawn today (deltas 1, 3 and 6).
 - `gate-sdk/SPEC.md §The port-candidate criteria`, **criterion 7** — the distinction the
   criterion was silent on: the floor guarantees the program's presence, never that a bare
   name resolves to it, with this spawn as the attested instance (delta 4).
@@ -213,14 +261,19 @@ the point of it is to say where to look when one goes red:
   sole ownership of the set and the criterion owns the entitlement, so neither restates
   the other (delta 4).
 - `native/src/proc.rs` — the new function and its `spec:` comment, which carries the rule,
-  its one reader, and the envelope's own limit (deltas 1, 2 and 7).
+  its one reader, and the envelope's own limit (deltas 1, 2 and 8).
 - `native/src/gates/graph.rs` — the call site and the corrected `spec:` comment at
   lines 373-374, whose present claim is falsified by the host this repair exists for
-  (deltas 1 and 5).
+  (deltas 1 and 6).
+- `native/src/gates/mod.rs`, `check-graph`'s registry row — its `needs` declaration stays
+  `("bash", "")` and is named here **because** it stays: the crate-wide subset test
+  compares the recorder's observed string by exact equality, so a resolved path would not
+  be covered by it, and the check passes vacuously today because both fixtures return
+  before the spawn. The declaration is unchanged and the conflation is filed (delta 5).
 - `TASK-QUEUE.md`, the new `generator-spawn-resolves-wsl-launcher` entry — filed with this
   amendment's `[spec:]` ref in the same commit, carrying both 2026-09-03 rulings (the
   operator's admission by lead-relay and the lead's own-authority envelope) and stating
-  its completion predicate as the code rather than the run (deltas 7 and 8).
+  its completion predicate as the code rather than the run (deltas 8 and 9).
 
 <!-- update-target-exempt: this entry owns the round history and the observation predicate, both of which stay untouched by design; its continue-on-error and targets.list consequences wait on a first-observed-green run, and it is at 50 of a 50-line cap so any write here would cost a compression the repair does not need -->
 - `TASK-QUEUE.md`, `platform-support-ci-matrix` — deliberately unwritten.
@@ -256,6 +309,10 @@ the point of it is to say where to look when one goes red:
       the named error, not a silent fall-through to the bare name and not a panic.
 - [ ] **The inert arm is a test** — a POSIX `PATH` resolves the first match unchanged, so
       the repair is proved to change nothing on the platform the battery runs on.
+- [ ] **No test pins a path off the developer's machine** — every `PATH`, `PATHEXT` and
+      candidate in the new tests is a synthetic literal, because `check-tree-terms` bans a
+      `/home/<user>` or `/Users/<user>` spelling in a tracked file and a resolved real path
+      is exactly how one gets committed.
 - [ ] **The other bare-`"bash"` spawn sites are UNCHANGED in the diff**, and the commit is
       read for that specifically rather than assumed — the envelope is the ruling, and a
       helpful sweep of the siblings is the one way this unit can fail while every gate is

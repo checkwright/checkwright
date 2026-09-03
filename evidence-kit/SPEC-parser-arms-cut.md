@@ -156,6 +156,19 @@ either way; what it moves *to* is a decision {design-bearing}. It is re-pointed 
 value `ek_parser_for gates` resolves out of `scripts/evidence-config.sh` — not at a
 hardcoded arm invocation — and a second case does the same for `installer_smoke`.
 
+**It must move in the same commit as its subject, because nothing at commit time will say
+it did not.** `scripts/gate-tests/` is held by **no static gate at all**: `GATE_PRUNE_DIRS`
+prunes `gate-tests` for every tree-walking member, and the two gates that do reach a
+`*.test.sh` — `check-test-hermetic` and `check-assertion-strength` — take their corpus from
+the kit roots, which `scripts/` is not. Its only oracle is the `scripts` fixture suite
+actually running. **And left orphaned it reds through one assertion of three**: the
+missing-parser case yields a bash 127 and an empty capture that fails the expected mapping,
+while the no-tail-log case and the fail-closed case both pass *vacuously* on the same
+emptiness. So the diagnostic would read as a mapping defect rather than a deleted subject —
+which is the reading a session under build pressure acts on. `.workflow/validate-baseline.txt`
+carries a `scripts scripts pass` row, so the flip is also a validate-stage red rather than
+only a suite failure.
+
 **The ground is this cut's own host entry.** `kit-knob-consumer-adapter-convention` was
 filed because a knob's configured value pointed at a path a port had deleted, and the
 degradation was silent for 77 firings; its repair was proved by a negative control
@@ -183,12 +196,36 @@ committed, which is what keeps this inside the carve-out rather than against the
 
 ### (10) The prose citations re-point, and **no gate forces them**
 
-Governed prose names these files in five places and each re-points {mechanical}:
-`evidence-kit/SPEC.md §Layout and configuration`'s `EVIDENCE_KIT_PARSER_<suite>` bullet
-(twice, once per adapter), `gate-sdk/SPEC.md §run-gates`' signal-exit-code paragraph,
-`gate-sdk/SPEC.md §check-graph`'s widening-is-monotone paragraph, and the `// spec:`
-comment in `native/src/proc.rs` that names this reader for the same tail grammar. The
-`docs/` mirrors follow as a regenerated projection.
+Six sites name these files by path and each is dispositioned {mechanical}. The count was
+**re-derived at authoring rather than estimated**, and the first pass of this delta had it
+wrong in both directions — it claimed a bullet named both adapters when it names one, and
+it missed the ruling paragraph below entirely. The sites:
+
+- `evidence-kit/SPEC.md §Layout and configuration` — names `scripts/parse-gates-log.sh`
+  **once**; the `installer_smoke` half of that bullet describes its parser without naming
+  a path, so only one spelling re-points.
+- `gate-sdk/SPEC.md §Porting a gate to the binary substrate` — the 2026-09-03 ruling (4)
+  names **both** files as its worked instances, and this is the one site where re-pointing
+  is the wrong move (see below).
+- `gate-sdk/SPEC.md §run-gates` — the signal-exit-code paragraph.
+- `gate-sdk/SPEC.md §check-graph` — the widening-is-monotone paragraph.
+- `native/src/proc.rs` — the `// spec:` comment naming this reader for the same tail
+  grammar.
+- `TASK-QUEUE.md`, this cut's own host entry — the paragraph that names
+  `scripts/parse-gates-log.sh` as the instance sharpening the entry's question. It is
+  rewritten at the **demotion**, in the same commit, and is part of the compression that
+  demotion already owes.
+
+The `docs/` mirrors of the three SPECs follow as a regenerated projection.
+
+**The ruling paragraph is not re-pointed, and that is a ruling of its own.** Ruling (4)'s
+worked-instance list is the record of what the ruling was *decided against*; deleting the
+names would erase its grounds and leave a ruling whose reasoning cites nothing. So the
+names stay and the paragraph gains a dated disposition clause saying which of them have
+since been ported. **It is a shared target with the sibling `enum-sets` cut**, which names
+the third file in the same list, so whichever batch lands second **reads the first's edit**
+rather than assuming the paragraph is as this amendment describes it — and neither batch
+deletes a name.
 
 **The hazard is that a stale citation ships green.** `check-docs-cmd` assertion A resolves
 invoked `.sh` paths **inside a fence only** — its inline-backtick arm scans for *knobs*,
@@ -284,7 +321,20 @@ exact-count and coverage-floor shapes are not.
   in-corpus holder is named: `evidence-kit/lib/evidence.sh:88`.
 - **`check-settings-paths`** — reds on an allow entry naming a path that no longer
   resolves; it reds *because* of the cut, which is what forces delta (9) rather than
-  leaving it to authorial memory.
+  leaving it to authorial memory. **It does not fire from the generated hook**: a deleted
+  path never matches the staged-path trigger, so only the whole-tree battery catches it —
+  that gate's own recorded limit, and the reason the DoD asks for a battery run rather than
+  a clean commit.
+- **`check-graph`** — reds when the committed hook or the graph artifact diverges from the
+  generator's `--emit` output. An **equality** and therefore not monotone, and it fires on
+  this cut for a reason easy to miss: the hook bakes `CANON_KIT_MEASURED_VALUES`' third
+  field, `tree-shell-owed`, which is the port oracle's owed count — so **deleting two owed
+  `.sh` files stales the hook** even though nothing about this cut touches a `# graph:`
+  manifest. Both the hook and `docs/check-graph.html` regenerate.
+- **`check-docs-mirror-fresh`** — reds on a missing, stale or orphaned `docs/<kit>/SPEC.md`;
+  a two-sided parity and therefore not monotone. It fires the moment delta (10)'s citations
+  are edited in `evidence-kit/` and `gate-sdk/`, and is discharged by regenerating the
+  mirror rather than by editing it.
 - **`check-gate-fixture-coverage`** — reds on a registered gate with no `good/`+`bad/`
   pair. Untouched: neither arm is a gate, which is what §The non-gate arm's second property
   buys.

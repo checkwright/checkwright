@@ -132,10 +132,15 @@ into a silently empty set, and §check-prose-enum states both readings today.
 `spec_enum_sets` runs the configured command **while canon-kit's library is being sourced
 by the config bridge**, so after the re-point that command is itself
 `bin/run-gates.sh --emit enum-sets`, which sources `lib/gate.sh` again and resolves the
-arm's own two knobs before exec'ing the binary {design-bearing}. **There is no cycle** —
-the arm declares no canon-kit knob, so the nested resolution cannot re-enter the one that
-started it — and stating that is half the delta, because a reader meeting a bridge call
-inside a bridge call will reasonably suspect one. What is real is the **cost**: one extra
+arm's own two knobs before exec'ing the binary {design-bearing}. **The non-circularity is
+conditional and the condition is a rule the build must hold, not a property it inherits.**
+`canon-kit/lib/spec.sh` runs the command only under `_spec_resolving CANON_KIT_ENUM_SET_NAMES
+CANON_KIT_ENUM_SET_MEMBERS`, which reads `GATE_SDK_RESOLVING_KNOB` — the set the current
+batch is resolving — so the nested resolution terminates **exactly when the arm's declared
+roster excludes those two names**. Delta (1)'s roster does, and it may never gain either.
+**Nothing reds if it does**: the failure is a hang or an unbounded recursion at knob
+resolution, not a verdict, which is why the condition is written here as a constraint on
+the roster rather than left as a reassurance. What is also real is the **cost**: one extra
 `bash` process, one extra `lib/gate.sh` source and one extra binary exec on every
 resolution of this gate's two knobs. §check-graph's own measurement is the precedent for
 taking such a figure seriously, and the build measures it rather than asserting it is
@@ -153,14 +158,57 @@ staling path, which is why the assertion is available rather than invented here.
 difference at all — a member, an order, a set name — is a port defect until argued
 otherwise, and *"the emitter now sorts differently"* is not an argument.
 
+**The hook stales on a second, independent axis and the build must expect two reasons
+rather than one.** Beside the set arrays it bakes `CANON_KIT_MEASURED_VALUES`' third field,
+`tree-shell-owed`, which is `--emit port-blockers --tree`'s owed count — so **deleting this
+file alone stales the hook even if the sets were byte-identical**, and the sibling parser
+cut stales it again. Regeneration is therefore owed by both cuts and the byte comparison
+must be read on the **set arrays specifically**, not off a green `check-graph`: a hook that
+regenerates cleanly proves it matches the *current* emitter, never that the emitter is
+unchanged.
+
+**That same regeneration is the re-pointed value's only seam oracle, and no separate shell
+test is minted for it.** Nothing in the battery asserts that a `CANON_KIT_ENUM_SETS_CMD`
+value names a runnable command — but `gen-pre-commit.sh` resolves the bridge, which runs
+the value, so a value that does not run cannot produce a hook at all. A
+`gate-tests/*.test.sh` for the front-end seam would assert what the regeneration already
+proves, which is the duplication queue-kit's own arm tests decline in as many words.
+
 ### (9) The prose citations re-point, and **no gate forces them** — which is why they are a delta rather than a chore
 
-Five governed surfaces name this file and each re-points to the arm {mechanical}:
-`canon-kit/SPEC.md` §Layout and configuration's `CANON_KIT_ENUM_SETS_CMD` bullet and
-§check-prose-enum's consumer-config paragraph, `queue-kit/SPEC.md`'s lesson-tag
-cross-reference, `gate-sdk/SPEC.md`'s port table row for `check-prose-enum`, and
-`docs/site-architecture.md` §Generated projections' staling clause. The `docs/` mirrors of
-each follow as a regenerated projection.
+**Eight sites** name this file by path and each is dispositioned {mechanical}. The count
+was re-derived at authoring rather than estimated, and a first pass of this delta had it at
+five — it missed the ruling paragraph and both queue entries. The sites:
+
+- `canon-kit/SPEC.md §Layout and configuration` — the `CANON_KIT_ENUM_SETS_CMD` bullet,
+  which spells the value as `bash scripts/enum-sets.sh`. **This is the sharpest one**: it is
+  an *invoked* form, exactly the shape `check-docs-cmd` assertion A exists for, and it is
+  missed only because it is inline rather than fenced.
+- `canon-kit/SPEC.md §check-prose-enum` — the consumer-config paragraph.
+- `gate-sdk/SPEC.md §Porting a gate to the binary substrate` — twice: the 2026-09-03
+  ruling (4) names this file among its worked instances, and the paragraph below it quotes
+  the 2026-08-25 `scripts/` declaration by name. Not re-pointed; see below.
+- `gate-sdk/SPEC.md` — the port conservation table's `check-prose-enum` row, which explains
+  the corpus extension to `tag_lead_line.rs` and names this file as the derivation.
+- `queue-kit/SPEC.md` — the lesson-tag cross-reference.
+- `docs/site-architecture.md §Generated projections` — the hook-staling clause.
+- `TASK-QUEUE.md`, `prose-uniqueness-claim-unchecked` and `readme-roster-enum-coverage` —
+  two live entries citing this derivation as a mechanism reference. Both re-point; neither
+  is a blocker on this cut, which scope probed before naming this entry's host.
+- `native/src/gates/tag_lead_line.rs` — the second-reader comment, which delta (5) already
+  owns.
+
+The `docs/` mirrors of the four governed docs follow as a regenerated projection, and
+`check-docs-mirror-fresh` reds until they are — the one gate in this list that fires
+*because* of the edit rather than in spite of it.
+
+**The ruling paragraph is not re-pointed, and that is a ruling of its own.** Ruling (4)'s
+worked-instance list is the record of what the ruling was *decided against*; deleting the
+name would erase its grounds. So the name stays and the paragraph gains a dated disposition
+clause saying which of its instances have since been ported. **It is a shared target with
+the sibling parser cut**, which names the other two files in the same list, so whichever
+batch lands second **reads the first's edit** rather than assuming the paragraph is as this
+amendment describes it — and neither batch deletes a name.
 
 **The hazard is that a stale citation ships green.** `check-docs-cmd` assertion A resolves
 invoked `.sh` paths **inside a fence only** — its inline-backtick arm scans for *knobs*,
@@ -235,9 +283,19 @@ exact-count and coverage-floor shapes are not.
   must preserve exactly, and the one an accidental `|| true` would silently convert into a
   clean skip.
 - **`check-graph`** — reds when the committed hook diverges from the generator's `--emit`
-  output. An **equality**, therefore not monotone, and it fires on this cut by
-  construction because the baked argv contains the sets. This is signal: it is what forces
-  the regeneration, and its being green afterwards is delta (8)'s whole assertion.
+  output. An **equality**, therefore not monotone, and it fires on this cut for **two**
+  independent reasons: the baked argv contains the sets, and it separately contains
+  `tree-shell-owed`, which this deletion moves. This is signal: it is what forces the
+  regeneration, and its being green afterwards is delta (8)'s whole assertion.
+- **`check-docs-mirror-fresh`** — reds on a missing, stale or orphaned `docs/<kit>/SPEC.md`.
+  A two-sided parity and therefore **not monotone**. It fires the moment delta (9)'s
+  citations are edited in `canon-kit/`, `gate-sdk/` and `queue-kit/`, and is discharged by
+  regenerating the mirror rather than by editing it.
+- **`check-settings-paths`** — reds on an allow entry naming a path that no longer resolves.
+  Cleared because delta (10) probed the count and it is zero. Worth one clause on the
+  mechanism: a **deleted** path does not fire the generated hook's staged-path trigger at
+  all, so on the sibling cut — where the count is one — only the whole-tree battery catches
+  it, never the commit hook.
 - **`check-docs-cmd` assertion A** — reds on a **fenced** invoked `.sh` path that does not
   resolve. Its red condition is *finding an unresolvable path*, monotone, and it is
   **cleared vacuously here** because none of this file's citations is fenced. That vacuity
@@ -246,8 +304,6 @@ exact-count and coverage-floor shapes are not.
   name, so it is one of the three non-monotone shapes by name. Cleared by inspection only
   because the in-corpus holder is named: `CANON_KIT_ENUM_SETS_CMD` in
   `canon-kit/lib/spec.sh`. `scripts/` is not a kit root and contributes nothing to it.
-- **`check-settings-paths`** — reds on an allow-list entry naming a path that no longer
-  resolves. Cleared because delta (10) probed the count and it is zero.
 - **`check-shellcheck`, `check-comment-tier`, `check-exec-bit`** — monotone in the
   removing direction; deleting a file removes findings, and the crate module's `// spec:`
   headers carry the deleted script's comment bindings rather than dropping them.
@@ -273,16 +329,25 @@ exact-count and coverage-floor shapes are not.
   *this repo sets* clause names the arm; the knob's own contract is unchanged, and saying
   so is what stops a reader taking the re-point for a narrowing (delta 2).
 - `canon-kit/SPEC.md §lib/spec.sh` — `spec_enum_sets` is unchanged in contract and gains a
-  named nesting property: the command it runs may itself be a bridged arm, which is a
-  bridge invocation inside the bridge and provably acyclic for this member (delta 7).
+  named nesting property: the command it runs may itself be a bridged arm, which is a bridge
+  invocation inside the bridge, terminating on `_spec_resolving`'s own guard **only while
+  the arm's declared roster excludes the two enum-set knobs** — a constraint on the roster,
+  stated where the guard is, because nothing reds if it is broken (delta 7).
 - `gate-sdk/SPEC.md §The non-gate arm` — the `--emit-` family roster gains
   `--emit-enum-sets` as a 2026-09-03 member, and the paragraph on declared rosters gains
   this member as a worked instance of a **two-kit** roster resolved by the partitioning
   bridge (delta 1).
-- `gate-sdk/SPEC.md §Porting a gate to the binary substrate` — the port table's
-  `check-prose-enum` row is corrected: its derivation no longer *reads the module as text*
-  but references the table, and the sentence about the derivation crossing the bridge as
-  data gains the reason it must keep doing so (deltas 3 and 5).
+- `gate-sdk/SPEC.md §Porting a gate to the binary substrate` — two writes in one section.
+  The port table's `check-prose-enum` row is corrected: its derivation no longer *reads the
+  module as text* but references the table, and the sentence about the derivation crossing
+  the bridge as data gains the reason it must keep doing so. Separately, the 2026-09-03
+  ruling (4)'s worked-instance list keeps this file's name and gains a dated disposition
+  clause — a **shared target with the sibling parser cut**, so the second batch reads the
+  first's edit and neither deletes a name (deltas 3, 5 and 9).
+- `TASK-QUEUE.md`, `prose-uniqueness-claim-unchecked` and `readme-roster-enum-coverage` —
+  two live deferred entries citing this derivation as a mechanism reference; each re-points
+  to the arm. Neither names the port as a blocker, which scope probed before ruling this
+  cut's host, so neither entry's disposition changes (delta 9).
 - `queue-kit/SPEC.md` §The Lessons Learned channel — the cross-reference naming this
   repo's emitter re-points at the arm; the `QUEUE_KIT_LESSON_TAGS` contract is untouched
   and the knob stays the consumer's (deltas 2 and 4).
