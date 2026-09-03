@@ -399,6 +399,10 @@ minimum or a coverage floor. Enumerated rather than described:
   `--emit-session-id`, and the **empty-roster** paragraph gains its second member
   beside `--emit-md-section`, which is what stops the first from reading as a
   one-off (deltas 2 and 3).
+- `drift-kit/bin/stage-economics.sh` — its `normalize8` comment attributes the
+  normalization to "lifecycle's `session-id.sh`", which is a name this cut
+  retires. Ungated for truth — `check-comment-tier` judges a comment's tier and
+  never its accuracy — so an explicit target (delta 6).
 - `.claude/settings.json` — one allow entry deleted, none added, in the commit
   that deletes its target (delta 8).
 - `docs/site-architecture.md` — no ruling changes; named because delta (10)'s
