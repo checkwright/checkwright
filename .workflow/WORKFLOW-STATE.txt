@@ -7,3 +7,4 @@
 declaration-install-and-stage-helper-cuts scope adda4f3f 2026-09-02 8227c576
 declaration-install-and-stage-helper-cuts spec a88f84b9 2026-09-03 39a6cf1f
 declaration-install-and-stage-helper-cuts align a66b972b 2026-09-03 2df161e7
+declaration-install-and-stage-helper-cuts build a3a25ac4 2026-09-03 5a1914d1
