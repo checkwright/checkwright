@@ -215,6 +215,41 @@ Positional overrides `install-doctrine.sh [agent-file [doctrine-file]]` let a
 smoke or a fixture point both paths at a scratch tree without touching consumer
 config; unset, they fall to the knob defaults.
 
+**The port disposition: owed, and sequenced behind the installer's behind-invoke
+relocation — ruled 2026-09-03 by the operator, lead-relayed, on a spec session's
+probe.** This member was selected as a stated-contract cut and **dropped from that
+iteration's unit set** rather than ported, because the relocation's own
+precondition forbids it today. `installer/README.md` §The install boundary states
+the selecting rule as *a step is takeable now iff it already runs only when an
+artifact was selected*, and names what breaks otherwise: two of §The gate binary's
+three selection outcomes leave `init` with no artifact and both **proceed** today,
+so a step that becomes artifact-dependent turns a smaller battery into **no
+install**. Two adopter-path call sites drive this installer and neither gates on
+artifact selection — `init` seeds the reference block through it (the block being
+this installer's to write, so `init` calls it rather than restating it), and
+`uninstall` trims the block through it and **refuses outright** without a payload
+copy, so the marker strings keep their one writer. Both gate on doctrine-kit being
+in the kit set, which an artifact-less host satisfies.
+
+The member therefore stays **`owed`**: it takes no `# port-until:`, because a held
+file leaves §port-blockers' owed column and the 2026-08-28 completion predicate
+(TRAJECTORY.md §The closed rulings) admits no contributor-side subtraction. Its
+sequencing is this paragraph, at no cost, on the shape gate-sdk/SPEC.md §Porting a
+gate to the binary substrate sanctions for a section whose member is sequenced
+behind a named unit; the live entry owning that relocation is
+`powershell-installer-surface`. **This section holds exactly one owed file**, so
+the 2026-09-03 *a section is a cut's outer bound, never its minimum* ruling leaves
+an empty remainder here — there is no partial cut to take, which is why the whole
+cut dropped rather than narrowing. **Written here so no future composer
+re-selects it**: the file reads `owed` with no declared cause, which is exactly
+what a stated-contract composer scores as takeable. A further coupling a porting
+session will meet: the crate's `--upgrade-smoke` arm spawns this script **by path**
+inside the vendored consumer tree, where the FROM ref legitimately still holds the
+shell form. **What reopens it** is the precondition itself — an `init` that can
+reach the binary on every platform it runs on, or a ruling that accepts the
+artifact-less host losing its reference block on criterion 5's accept-and-declare
+terms, which was weighed and not taken.
+
 ## check-doctrine-registration
 
 Invariant, in five assertions: the configured agent file (A) carries a markdown

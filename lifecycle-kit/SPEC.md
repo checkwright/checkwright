@@ -1795,6 +1795,31 @@ Not a gate — a `bin/` helper invoked (now internally, by `enter-stage.sh`) for
 the `<session-id>` field; the stage skills reach it through `enter-stage.sh`
 rather than calling it directly.
 
+**The port disposition: owed, unblocked and takeable, and deferred once for want
+of a host — ruled 2026-09-03 by the operator, lead-relayed.** This member was
+selected as a stated-contract cut and dropped from
+`declaration-install-and-stage-helper-cuts` for a reason that is **not** a
+property of the file: nothing sequences it, no blocker stands, and the port is
+takeable whenever a cut carries it. What it lacked was a queue entry to pair its
+amendment with. gate-sdk/SPEC.md §Porting a gate to the binary substrate rules
+that a cut hosts either on the composer entry — which can carry exactly one
+`[spec:]` tag while it carries its `[roadmap:]` tag, an arithmetic that section
+states — or on an entry whose own text names the cut's subject as its blocker,
+and a sweep of the whole queue found **no entry naming this file at all**. Minting
+a host entry to satisfy a width constraint was weighed and refused. **Recorded
+here because the absence of a blocker is exactly what makes this deferral
+invisible**: a later composer reading this section must not infer from the delay
+that something sequences the member.
+
+Two facts a session taking this cut should not re-derive. Its sole production
+caller is `bin/enter-stage.sh`, which resolves the id internally — but the kit's
+own stage templates and `templates/lead.md` name this helper as the id's source
+and one of them **invokes it directly**, so a port edits kit `templates/*.md` and
+stales whatever projection reads them. And it is the one member of that iteration's
+candidate set whose path a committed permission grant names, so the 2026-08-29
+settings-grant carve-out on `native-gate-port-remaining-corpus` is exercised
+**once** here — the count probed rather than assumed, as that ruling requires.
+
 ### bin/enter-stage.sh
 
 The deterministic writer for a stage transition: `enter-stage.sh <stage>`

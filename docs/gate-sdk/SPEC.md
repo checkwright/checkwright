@@ -1970,14 +1970,38 @@ re-derivation every cut's scoping session paid.
 iteration holding more is stated here rather than re-derived.** Three facts, in
 the order they bind.
 
-- **One lead line carries at most one `[spec:]` tag, and that is arithmetic
-  rather than style.** `[spec:]` and `[roadmap:]` are lead-line-scoped and
-  `check-queue-wrap`'s budget resolves to 100 columns; the composer entry's fixed
-  lead-line part is 66 of them, and a tag costs `9 + len(basename)`. One fits at a
-  basename up to 25 characters; a second cannot at *any* naming, the shortest
-  legal basename being `SPEC-a.md` at 9 for a cost of 18 against the 16 that
-  remain. So the sentence above is unsatisfiable, not merely inconvenient, the
-  moment an iteration holds two cuts.
+- **How many `[spec:]` tags a lead line carries is arithmetic, and the
+  arithmetic resolves per entry rather than once for the queue.** `[spec:]` and
+  `[roadmap:]` are lead-line-scoped and `check-queue-wrap`'s budget resolves to
+  100 columns; a tag costs `9 + len(basename)`; and an entry's **fixed**
+  lead-line part is its `- **<slug>**` plus any tag it permanently carries,
+  because trailing prose reflows onto the continuation lines and a tags-only lead
+  line is legal (queue-kit/SPEC.md §check-queue-entry-budget states what that
+  costs a reader — the entry renders as a bare slug). Nothing mechanical caps the
+  count either: `check-amendment-queue`'s `spec_refs_in` collects every match on a
+  line into a list (§check-amendment-queue). So the number is measured on the
+  entry a cut is actually hosting on, never assumed.
+
+  **The composer entry's answer is one, and it is structural rather than a naming
+  choice.** Its fixed part is 66 columns — 39 for the slug plus 27 for the
+  `[roadmap:]` tag it carries permanently — leaving 34. One tag fits at a basename
+  up to 25 characters; a second cannot at *any* naming, the shortest legal
+  basename being `SPEC-a.md` at 9 for a cost of 18 against the 16 that remain. The
+  `[roadmap:]` tag is what decides it: drop that tag and two would fit, and
+  dropping it is refused because it drops the entry out of the generated public
+  roadmap while the work stands. So for **this** host the presumption above is
+  unsatisfiable, not merely inconvenient, the moment an iteration holds two cuts.
+
+  **Another entry resolves differently, and `kit-library-port-residue` is the
+  worked instance.** Its fixed part is 30 columns and it carries no permanent tag,
+  so two `[spec:]` refs fit at basenames up to 29 and 30 characters with its
+  trailing prose reflowed off the lead line — which is how the
+  `declaration-install-and-stage-helper-cuts` iteration hosted two cuts on it.
+  **Stated as an arithmetic and not as a conclusion because the flat form of this
+  bullet — *one lead line carries at most one tag* — was read as a general rule
+  and cost a spec session an escalation** (ruled 2026-09-03 by the lead on its own
+  authority, on that session's measurement). The correction is what the bullet's
+  own first clause already said: it is arithmetic, so run it.
 - **A two-cut iteration is lawful and needs no waiver.**
   `native-gate-port-remaining-corpus`' ruling of **2026-08-30 (operator,
   lead-relay)** rules that the port-candidate criteria *constrain selection, not
