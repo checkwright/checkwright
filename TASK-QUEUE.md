@@ -63,6 +63,39 @@
   ruled: native-gate-port-remaining-corpus lead 2026-09-01 2026-09-03 own-authority
   Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close; cohorts ruled at scope 2026-08-11/12.
 
+- **drift-kit-bin-port-residue** [spec: SPEC-kfric-cut.md] — drift-kit's owed `bin/` members,
+  hosted together because the port corpus needs a SECOND queue entry and for no stronger reason.
+  **The ground is a column budget, not a class ruling, and this entry says so rather than letting
+  its name imply otherwise.** `native-gate-port-remaining-corpus`'s lead line cannot carry two
+  `[spec:]` refs — measured 2026-09-03 at spec and re-measured by the lead: a 66-column base, two
+  minimal refs 102, the real pair 116, against `QUEUE_KIT_WRAP_BUDGET=100`
+  (`queue-kit/lib/queue.sh:37`) — so a two-cut iteration needs two hosts and this is the second.
+  `kit-library-port-residue` was refused as that host on its own lead sentence, which scopes it to
+  the `lib/*.sh` members a class ruling left owed; the owner text outranks any hosting practice.
+  **What it does NOT license, stated because the name reads like a carve-out.** No class ruling
+  puts a kit's `bin/` members in a cohort. `kit-library-port-residue` warns that the discriminator
+  is CONTENT, NOT DIRECTORY, and that warning is inherited here: this entry mints no disposition
+  for any member, settles no sequencing, and grounds no future cut on directory membership.
+  **The residue, measured 2026-09-03 against `--emit port-blockers --tree`:**
+  `bin/kfric.sh` (60) — unblocked, taken by this promotion's own amendment.
+  `bin/overhead-meter.sh` (105) — BLOCKED, and not on size. drift-kit/SPEC.md §The overhead meter
+  rules its `session8` derivation's divergence from the sibling meter UNRULED and says a cut on
+  either meter meets that question rather than inheriting an answer; and
+  `overhead-meter-measures-the-lead` holds that the transcript resolver a faithful port would
+  carry forward measures the wrong session. Composed for this iteration and DROPPED at spec on
+  the lead's own envelope test, which admitted it only if its amendment matched kfric's shape.
+  `bin/stage-economics.sh` (464) — untouched, never composed, no ground read either way.
+  **It DEMOTES at build, never `## Done`** — its deliverable is a corpus (canon-kit/SPEC.md
+  §Merging an amendment). Minted straight into the active section, so no prior deferred position
+  exists to recover from the promoting diff: it demotes to `## Deferred` immediately after
+  `kit-library-port-residue`, beside the entry whose shape it borrows and whose scope it does not.
+  **Cost while deferred:** two members, 569 lines, and one of them holds an unruled seam a consult
+  has to reach before its cut can be composed at all.
+  ruled: drift-kit-bin-port-residue lead 2026-09-03 own-authority
+  Filed 2026-09-03 by spec, minted and promoted in one motion as the second cut's host on the
+  ruling above; the column budget that forced it is filed as a recurrence of
+  `record-stamp-encoding-compression`, the entry that owns the encoding, not this one.
+
 ## Technical Debt
 
 - **windows-manifest-hash-diagnostic** — a PRINT-ONLY step on the
