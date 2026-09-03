@@ -1235,8 +1235,8 @@ default left beside the compiled reader would refuse the whole arm.
   hook); default `${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt`. Read
   as a named file, never through stdin — the session-role signal consumes stdin
   exactly once, and a second reader there would starve it.
-- `CONTEXT_KIT_ENV_PROFILE_FILE` — the consumer-local env profile file
-  `bin/env-probe.sh` writes and the session-context hook's step 9 emits (§bin/
+- `CONTEXT_KIT_ENV_PROFILE_FILE` — the consumer-local env profile file the
+  env-probe arm writes and the session-context hook's step 9 emits (§bin/
   env-probe); default `ENV.local.md`.
 - `CONTEXT_KIT_SESSION_ROLE_FILE` — the session-role marker `/lead` writes and
   the session-context hook's identity match reads (§The session-context hook);
