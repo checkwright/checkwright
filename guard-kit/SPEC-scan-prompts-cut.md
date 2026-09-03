@@ -179,13 +179,52 @@ borrowed from another kit — which matters because ruling (1) requires the grou
 
 ### (4) `--guard-lib-parity` and its harness — the machine that notices the divergence
 
-The *unless* clause is discharged by a new bridged `Arm::Run` member,
-`--guard-lib-parity <mode> <arg>...`, and a new harness
-`guard-kit/gate-tests/guard-lib-parity.test.sh` {design-bearing}. Three modes, one
-per twinned predicate: `split`, `skeleton`, `redirect`. Shape and grammar are
-`--toolfloor-parity <mode> <arg>...`'s, which is the closest precedent in two
-respects — a permanently-shell holder, and a surviving shell caller outside the
-battery.
+The *unless* clause is discharged by a new `--guard-lib-parity <mode> <arg>...`
+arm and a new harness `guard-kit/gate-tests/guard-lib-parity.test.sh`
+{design-bearing}. Three modes, one per twinned predicate: `split`, `skeleton`,
+`redirect`. Argv grammar is `--toolfloor-parity <mode> <arg>...`'s — the closest
+precedent for **shape**, since both are permanently-shell holders with a
+surviving shell caller outside the battery.
+
+**Placement is a knob test, not an assertion, and this section states the test
+rather than guesses its answer.** `Arm::Run` vs. `Arm::Emit` and table
+membership vs. hardcoded top-level flag are two independent axes, and citing one
+precedent for both is how an earlier draft of this delta collapsed them. The
+first axis is settled: this arm's contract is the comparator's exit status, so
+it is `Arm::Run` if it is a table member at all. The second is not a family
+question — `native/src/emit/mod.rs:146-148`'s own header on `BRIDGED_ARMS`
+states the property table members share: "`--knobs` publishes each member's
+roster and a front-end resolves it, which is the property the members share.
+`--emit-` is one arm family's spelling, not the table's name." `--upgrade-smoke`
+is a table member *because* it resolves six knobs a hardcoded flag would
+silently ignore (`native/src/emit/mod.rs:436-438`); `--install-lifecycle` and
+`--lesson-sink` are table members on the same ground. The parity family
+(`--source-stamp`, `--queue-parity`, `--evidence-lib-parity`,
+`--toolfloor-parity`) sits outside the table as hardcoded top-level flags
+because none of them resolves a knob — `--source-stamp` and `--queue-parity`
+each carry their own comment naming `check-gate-substrate-parity` assertion B
+as the reason, and `--evidence-lib-parity`/`--toolfloor-parity` carry the
+shorthand "a top-level flag, like the arms around it" pointing at the same
+ground (`native/src/main.rs`), not because they are parity arms.
+`--emit-md-section`'s empty-roster escape (gate-sdk/SPEC.md:2443-2452) does not
+transfer here: that sentence's
+reachability ground — "the front-end's `--emit <name>` operand composes
+`--emit-<name>`" — is specific to an `--emit-`-spelled arm's discovery path, and
+`--guard-lib-parity` is not one, so an empty roster buys it no reachability.
+
+So: **`--guard-lib-parity` joins `BRIDGED_ARMS` if and only if it resolves a
+`GUARD_KIT_*` knob; if it resolves none, it is a hardcoded top-level flag beside
+its four siblings, dispatched in `main.rs` before the registry lookup exactly as
+`--toolfloor-parity` is, and this delta has no surviving ground for table
+membership.** `guard-kit/lib/guard.sh:3`'s own `# no-port:` comment states the
+library "is the sole resolver for the `GUARD_KIT_*` knobs, one of which a
+ported non-gate arm declares and the bridge resolves by sourcing this file" —
+which makes a knob read plausible for this arm, but plausible is not measured,
+and this amendment does not resolve it by assertion. Build determines which
+side of the test the three modes land on and lands the table row or the
+top-level flag accordingly; either placement leaves the CLI shape
+(`--guard-lib-parity <mode> <arg>...`), the three modes and the harness
+unchanged.
 
 The harness follows `queue-kit/gate-tests/queue-lib-parity.test.sh` exactly: it
 feeds **one canned corpus** to both holders and compares their **classification**,
@@ -565,8 +604,10 @@ designing against a harness that does not exist.
 
 ## Producers and consumers
 
-The amendment introduces **two interfaces** — two bridged flags — and **no new
-state, no new event, no new field, and no new knob**. All three knobs named are
+The amendment introduces **two interfaces** — two new flags, one a settled
+`BRIDGED_ARMS` row and one whose placement delta (4) leaves to build's knob
+test — and **no new state, no new event, no new field, and no new knob**. All
+three knobs named are
 already shipped, already defaulted in `guard-kit/lib/guard.sh` (which stays
 permanently shell as the bridge's sole `GUARD_KIT_*` resolver, so no default moves)
 and already read by the script being replaced.
@@ -584,10 +625,11 @@ and already read by the script being replaced.
   shipped defaults. Its stdout ranking and its triage-criterion block are read by
   that session at that transition; the overlay-covered section by the same session
   at the same one, feeding step 4's promote-or-prune.
-- **Producer, arm two** — the same table, one row
-  (`"--guard-lib-parity"`, `Arm::Run(guard::parity)`, empty roster). Its roster is
-  empty in the *reads-nothing* sense gate-sdk/SPEC.md:2443-2452 records for
-  `--emit-md-section`: the modes take their corpus on argv and resolve no knob.
+- **Producer, arm two** — `Arm::Run(guard::parity)`, placed by delta (4)'s knob
+  test: a `BRIDGED_ARMS` row (`"--guard-lib-parity"`, `Arm::Run(guard::parity)`,
+  its resolved roster) if the three modes resolve a `GUARD_KIT_*` knob, else a
+  hardcoded top-level flag beside `--toolfloor-parity` with no table row at all.
+  Not stated as settled here, per delta (4).
 - **Consumer, arm two** — `guard-kit/gate-tests/guard-lib-parity.test.sh`, run by
   gate-sdk's `run-gate-tests.sh` at every battery run and at commit time. It is the
   second holder criterion 6's *unless* clause requires, and it does not retire,
@@ -694,10 +736,13 @@ it, and it is the reason this session recommends the audit stage next.
   7).
 - `gate-sdk/SPEC.md §The non-gate arm` — the class roster gains
   `--emit-scan-prompts` and `--guard-lib-parity`. The first is recorded as the
-  class's first member whose *whole* configuration is a permanently-shell library's;
-  the second joins the parity family beside `--toolfloor-parity` with the note that
-  its holder cannot empty, which is the property `--declaration-parity` lacked
-  (deltas 2, 4).
+  class's first member whose *whole* configuration is a permanently-shell
+  library's; the second is recorded beside `--toolfloor-parity` with the note
+  that its holder cannot empty, which is the property `--declaration-parity`
+  lacked, and — per delta (4)'s knob test — with whichever placement build
+  measured: a genuine fifth member of the top-level parity family if it
+  resolves no knob, or the class's first parity-shaped `BRIDGED_ARMS` member if
+  it resolves one (deltas 2, 4).
 - `gate-sdk/SPEC.md §The bin/-tool contract` — the crossing clause gains its first
   **reader** instance and the ground that carries it there: a reader's silent-shape
   defect writes a wrong number into a trend, which is at least as bad as a capture's
@@ -760,3 +805,8 @@ it, and it is the reason this session recommends the audit stage next.
       dated ruling of this project's crossed into the crate or into the merged
       section; the three harness/substrate literals travel on the ruling delta (16)
       cites and mint no knob.
+- [ ] **`--guard-lib-parity`'s placement is measured, not guessed** — the three
+      modes were run against delta (4)'s knob test; the landing recorded which
+      side (a `BRIDGED_ARMS` row or a hardcoded top-level flag beside
+      `--toolfloor-parity`) and why, in the section that cut selected, per the
+      same rule delta (2)'s residue paragraph already follows.
