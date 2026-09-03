@@ -218,15 +218,21 @@ written for a session that had not yet taken it. They are **replaced by the cut
 record**, as every closed cut's record is, in the contract section the cut
 selected: what the arm is, what its empty roster means, that the grant count was
 one, and that the deferral for want of a host is discharged. **The
-`### bin/session-id.sh` heading is not renamed** — nine in-SPEC citations across
-lifecycle-kit, delegation-kit, drift-kit and context-kit resolve against it, and
-renaming strands every one, which is the disposition §upgrade-smoke and
+`### bin/session-id.sh` heading is not renamed** — nine in-SPEC citations,
+probed rather than recalled, across lifecycle-kit, delegation-kit and drift-kit
+(TASK-QUEUE.md's own root-level line among them, not a kit) resolve against it,
+and renaming strands every one, which is the disposition §upgrade-smoke and
 §lib/declaration.sh each took for the same reason. **Seven citation sites**
 resolve against it, probed rather than recalled: `delegation-kit/SPEC.md:566`,
 `drift-kit/SPEC.md:630`, `lifecycle-kit/SPEC.md:212` and `:520`,
 `lifecycle-kit/templates/lead.md:31`, `TASK-QUEUE.md:5219`, and
-`lifecycle-kit/smoke/install.sh:340`'s `# spec:` header — each doubled in the
-docs mirror.
+`lifecycle-kit/smoke/install.sh:340`'s `# spec:` header — the docs mirror
+doubles only the four `SPEC.md` sites (`docs/lifecycle-kit/SPEC.md`,
+`docs/delegation-kit/SPEC.md`, `docs/drift-kit/SPEC.md`); `templates/`,
+`TASK-QUEUE.md` and `smoke/` are not mirrored surfaces
+(docs/site-architecture.md §The on-site SPEC mirror), so the other three sites
+are single-copy. The remaining two of the nine are the file's own two
+`# spec:` headers (lines 2 and 58), which leave with it and need no re-point.
 
 ### (11) The projection fan-out has **two independent triggers**, and the second is the one a reader would miss
 
@@ -271,6 +277,24 @@ Stated as a delta so a later reader does not read the silence as a discharge
   this cut lands. That reshapes the option; it does not rule on it.
 - **`LIFECYCLE_KIT_SESSION_ID`'s knob-versus-environment status**, from delta (2),
   filed to the committed gap inbox at this stage with its probe.
+
+### (13) `context-kit/SPEC.md`'s session-context-hook section names the tool five times in prose, not as a section citation, and none survive the deletion literally
+
+Found by grepping the tree for the literal rather than trusted from either
+amendment's own reach {mechanical}. `context-kit/SPEC.md` §The session-context
+hook names `session-id.sh` five times describing the hook's session-role signal
+and the ruled-out lifecycle-stamp-id injection — "`<id>` being `session-id.sh`'s
+value" (299), "the producer inherits `session-id.sh`'s `CLAUDE_CODE_SESSION_ID`
+dependency" (328), "what lifecycle-kit's `session-id.sh` computes" (340), "while
+`session-id.sh` deliberately derives the subagent's own transcript id" (343), and
+"the stage-entry ritual derives it via `session-id.sh`, whatever invokes that
+script" (346). None is formatted `§bin/session-id.sh`, so none is among delta
+(10)'s nine citation sites and none strands on the heading surviving — but the
+cut deletes the literal file every one of the five names, and the fifth is the
+sharpest: "whatever invokes that script" presupposes a script. All five are
+re-pointed at the arm (`--emit-session-id`, reached through
+`bin/run-gates.sh --emit session-id`); the behaviour each sentence describes is
+unchanged, only the name of what does it moves.
 
 ## Producers and consumers
 
@@ -414,6 +438,9 @@ minimum or a coverage floor. Enumerated rather than described:
   normalization to "lifecycle's `session-id.sh`", which is a name this cut
   retires. Ungated for truth — `check-comment-tier` judges a comment's tier and
   never its accuracy — so an explicit target (delta 6).
+- `context-kit/SPEC.md §The session-context hook` — five prose mentions of
+  `session-id.sh` re-pointed at the arm; none cites the heading, so this is
+  independent of delta (10)'s citation-site count (delta 13).
 - `.claude/settings.json` — one allow entry deleted, none added, in the commit
   that deletes its target (delta 8).
 - `docs/site-architecture.md` — no ruling changes; named because delta (10)'s
@@ -462,6 +489,10 @@ minimum or a coverage floor. Enumerated rather than described:
 - [ ] **`docs/footprint.md` and `docs/value.md` regenerated** in the commit that
       edits the `templates/` markdown, and the port oracle's `--tree` owed count
       re-read to confirm 45 → 44.
+- [ ] **The generated hooks and `docs/check-graph.html` regenerated after the
+      deletion is staged**, the baked `tree-shell-owed` re-read to confirm the
+      move — delta (11)'s second trigger, which no gate catches
+      (`check-measured-claim` sees no `measured:` marker for that key).
 - [ ] **Both knob names still held in `check-docs-cmd` assertion B's corpus after
       the smoke rewrite** — re-probed at the deleting commit, not inferred from
       this amendment's reading, because the crate cannot satisfy that assertion.
