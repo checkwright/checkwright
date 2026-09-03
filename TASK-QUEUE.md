@@ -168,52 +168,52 @@
   [precondition-ok: run-observed]
   — a CI leg that PRODUCES AND EXERCISES a Windows gate-binary artifact, which is
   gate-sdk/SPEC.md §Consumer payload's join condition for `x86_64-pc-windows-msvc`.
-  **The slug is deliberately NOT renamed** though "matrix" now reads oddly for one leg —
-  `powershell-installer-surface` cites it by name. The fork, the Windows-ahead-of-macOS ordering
-  and WSL-as-interim are TRAJECTORY.md §The closed rulings'; macOS is `macos-install-smoke-ci-leg`.
+  **The slug is deliberately NOT renamed**, `powershell-installer-surface` citing it by name. The
+  fork, the ordering and WSL-as-interim are TRAJECTORY.md's; macOS is `macos-install-smoke-ci-leg`.
   roadmap-summary: A CI install-smoke leg per supported platform, or an honest label.
   **PRODUCED AND EXERCISED ARE BOTH DISCHARGED** — round 5 (`33298006656`, head `fb9ed980`) built,
-  packed, installed and ran the battery through `checkwright-gates.exe`, so blockers 5 and 6 and
-  batch 4's `on_path` repair are MEASURED. **ROUND 6 (`33392360228`, head `e0e4355e`) SPLIT:**
-  `check-install-disposition` IS REPAIRED on the only host that can show it; `check-graph` is not,
-  and its refusal carried an EMPTY CAUSE, which is what bought the instrument.
-  **THE OPERATOR'S 2026-08-30 RULING, whose red-cause limb has now fired:** the rider stops at
-  green — on green, drop `continue-on-error` on the job comment's own trigger and STOP, the
-  `targets.list` join below being separately measured work; on a red cause, file and defer without
-  looping, which is what the one-to-two push budget protects and what this entry now does.
-  **Both consequences stay UNEXECUTED on an OBSERVED ground**, per `install-smoke-windows`' own
-  comment: `continue-on-error` and the `targets.list` row both wait on a first-observed-green run.
+  packed, installed and ran the battery through `checkwright-gates.exe`; blockers 5 and 6 MEASURED.
+  **THE OPERATOR'S 2026-08-30 RULING, whose red-cause limb has now fired:** on green, drop
+  `continue-on-error` on the job comment's own trigger and STOP, the `targets.list` join being
+  separately measured work; on a red cause, file and defer without looping, which is what the
+  one-to-two push budget protects. **Both consequences stay UNEXECUTED on an OBSERVED ground**,
+  per `install-smoke-windows`' own comment: both wait on a first-observed-green run.
   **The join half costs more than a line edit, and that is measured.** `native/targets.list:43-48`
   owns it: the smoke builds from its host and refuses a foreign roster; steering or a cross-build.
   **Cost while deferred:** the one adopter class with a named days-to-weeks adoption window has no
-  working install path on Windows, and `powershell-installer-surface` stays sequenced behind this.
-  **ROUND 7 NAMED THE CAUSE, rounds 8-11 repeated it, and it is now ANSWERED** — `graph.rs` spawned
+  working install path on Windows; `powershell-installer-surface` stays sequenced behind this; and
+  installer/README.md §The install boundary sequences `init`'s unconditional remainder behind the
+  artifact roster covering every supported platform, holding every `installer/lib` and
+  `installer/bin` file owed — **10 of the oracle's 40 owed files, 1237 lines, measured 2026-09-03**,
+  a quarter of the port's own owed column, gated on this leg and the macOS one.
+  **ROUND 7 NAMED THE CAUSE, rounds 8-11 repeated it, round 12 ANSWERED it** — `graph.rs` spawned
   a BARE `bash` into a NATIVE Windows process, so a Win32 PATH search found WSL's launcher ahead of
   Git's `usr/bin`; that record RETIRES both 2026-08-31 TRAJECTORY.md paragraphs naming it. THE
   METHOD READING THAT OUTLIVES IT: round 6's two guessed repairs could never have landed, the
-  unguarded command being in the GATE rather than the generator's prologue, so cause-read-first is
-  the instrument's whole case — and round 12 is the first repair built on a read cause.
+  unguarded command being in the GATE and not the generator's prologue — so cause-read-first is the
+  instrument's case, and round 12 is the first repair built on a read cause.
   **THE REPAIR WAS RULED 2026-09-03 an operator-directed hotfix — minimal, one commit, UNSEQUENCED
   against the port cut, the sequenced variant offered and declined — AND ROUND 12 VERIFIES IT AT
-  THE REMOTE ORACLE:** run `33782234328`, head `32f73806`, reading `battery: All 11 gates passed`
-  on a native Windows host against round 11's `1 of 11 gates FAILED: check-graph`. The narrow
-  envelope cleared exactly what it was ruled to clear, and align's tree-side probe that it would
-  is confirmed rather than assumed. **The LEG still exits 1, at a strictly later stage the battery
-  was masking:** `477 of 477 manifest entries disagree with the tree` — wholesale rather than
-  per-file, so NO CAUSE IS CLAIMED here and it is filed to the gap inbox, postdating this drain.
-  Both green-limb riders stay unexecuted: the battery is green, the LEG is not.
-  **DEMOTED 2026-09-01 AT BUILD**, the second exercise and a recurrence rather than a tail — a NEW
-  iteration on a FRESH amendment. The wedge and its five shapes are
-  `observation-predicate-entry-cannot-drain-in-its-own-iteration`'s.
-  ruled: platform-support-ci-matrix operator 2026-08-27 lead-relay
-  ruled: platform-support-ci-matrix operator 2026-08-30 lead-relay
-  ruled: platform-support-ci-matrix lead 2026-08-30 own-authority
+  THE REMOTE ORACLE:** run `33782234328`, head `32f73806`, `battery: All 11 gates passed` against
+  round 11's `1 of 11 gates FAILED: check-graph`. **The LEG still exits 1, at a strictly later
+  stage the battery was masking:** `477 of 477 manifest entries disagree with the tree`.
+  **THE TWO 2026-09-03 GAP BULLETS DRAIN HERE** — filed by
+  `parser-and-enum-adapter-cuts-with-graph-hotfix`'s close and its lead, drained into this entry
+  rather than promoted, the port-only run barring a promote. **They NARROW and claim NO CAUSE.** A
+  binary is in the mismatch set and that same `.exe` produced the job's green battery line, so no
+  content transform mangled it. `want` and `got` are the IDENTICAL command — `lock_hash` is
+  `git hash-object --` and the smoke's check spells the same — so there is no second hashing
+  algorithm and the only asymmetry left is the process context each runs in. And round 12's log
+  carries ZERO `fatal` lines (probed 2026-09-03 at scope), killing the errored-`got` branch and
+  leaving two VALID, DIFFERENT hashes over one byte-stream. The next act is a cause read; its facts
+  need a Windows host, so the unit carries a one-shot diagnostic with its fix or spends a round.
+  **DEMOTED 2026-09-01 AT BUILD**, a recurrence rather than a tail — a NEW iteration on a FRESH
+  amendment; the wedge is `observation-predicate-entry-cannot-drain-in-its-own-iteration`'s.
+  ruled: platform-support-ci-matrix operator 2026-08-27 2026-08-30 2026-08-31 2026-09-03 lead-relay
   ruled: platform-support-ci-matrix operator 2026-08-31 consult
-  ruled: platform-support-ci-matrix operator 2026-08-31 2026-09-03 lead-relay
-  ruled: platform-support-ci-matrix lead 2026-09-01 own-authority
+  ruled: platform-support-ci-matrix lead 2026-08-30 2026-09-01 own-authority
   Filed 2026-07-26 by scope, split from `platform-support-contract`; Linux split 08-25, macOS 08-26;
-  promoted/deferred 08-25 through 09-01; rounds 6-12 on 08-31 to 09-03, 8-11 identical to 7 and
-  12 the first state change since.
+  promoted/deferred 08-25 through 09-01; rounds 6-12 ran 08-31 to 09-03, 8-11 identical to 7.
 
 - **spec-authoring-self-check-pass** [design-pending] — spec-stage amendment authoring asserts tree
   facts a one-command probe refutes, and every instance is caught downstream rather than at
