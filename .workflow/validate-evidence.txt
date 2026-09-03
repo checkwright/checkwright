@@ -1,1 +1,21 @@
 # contract: evidence-manifest v1
+session-id-and-env-probe-cuts gates sha256=ad50f29d1e70661e9bbeb2d878462ea9b818f63b9c5d5df58bdd39db69d6c26e pass=108 fail=0 ignore=0 verdict=clean 2026-09-03
+session-id-and-env-probe-cuts gate_sdk sha256=609796bbb425b41b9d5a5ae0143afb40812c8f979b46a47195a10bc86c2daf93 pass=1 fail=0 ignore=0 verdict=clean 2026-09-03
+session-id-and-env-probe-cuts canon_kit sha256=9d3cf3ab0a1425a5996fd26152019ba03a3e0f5fa5ad31aa0e4a19901b8acb5a pass=1 fail=0 ignore=0 verdict=clean 2026-09-03
+session-id-and-env-probe-cuts context_kit sha256=a72a655fbdc2336af37022b95846efa73ffc06864ae2241f7ed48d2867d96cc0 pass=1 fail=0 ignore=0 verdict=clean 2026-09-03
+session-id-and-env-probe-cuts delegation_kit sha256=6d5af78679d3b30bda016b7d6cdeab840c0fc2bde80bfe4ecaad54b15446f963 pass=1 fail=0 ignore=0 verdict=clean 2026-09-03
+session-id-and-env-probe-cuts doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-09-03
+session-id-and-env-probe-cuts evidence_kit sha256=ae2a2f19285bce1b8d4b6490f91bce3d998afb05553e102569916c62cec919c4 pass=1 fail=0 ignore=0 verdict=clean 2026-09-03
+session-id-and-env-probe-cuts guard_kit sha256=234e06ba5cdb4ca383be7191965292443198471675d1b3166d8c264175420ae4 pass=1 fail=0 ignore=0 verdict=clean 2026-09-03
+session-id-and-env-probe-cuts lifecycle_kit sha256=55c0d3e68939b68858a225f53ce20889d8b17a92d840705f272968912d2427c3 pass=1 fail=0 ignore=0 verdict=clean 2026-09-03
+session-id-and-env-probe-cuts queue_kit sha256=bd337719dfff15f492ae94d8e8662663a8917b65edd4b3bfcfdd20f1790ba39b pass=1 fail=0 ignore=0 verdict=clean 2026-09-03
+session-id-and-env-probe-cuts site_kit sha256=07f7139ea31865677de58ea44b43f7c98ae6c40c8f3fe57e8975e8d65794be35 pass=1 fail=0 ignore=0 verdict=clean 2026-09-03
+session-id-and-env-probe-cuts scripts sha256=f302eab3cefcc19e12fac91459be10fb1b4c8f02dd63cef5ad040f4deb8dc259 pass=1 fail=0 ignore=0 verdict=clean 2026-09-03
+session-id-and-env-probe-cuts guard_tests sha256=00a4ff054b6b31ce5d150b2f791cf35f1047cb2d371b9d6676ba7544335a44ee pass=1 fail=0 ignore=0 verdict=clean 2026-09-03
+session-id-and-env-probe-cuts demo sha256=c68465a722db5e2e07c6be060b4de7588b6edc8dd10647c70ac14163fbd76626 pass=1 fail=0 ignore=0 verdict=clean 2026-09-03
+session-id-and-env-probe-cuts installer_smoke sha256=5f843b8736fdf0e78559b46fc2056b511b15e50bda7fc5454d122fd1645dfef4 pass=4 fail=1 ignore=0 verdict=clean 2026-09-03
+session-id-and-env-probe-cuts consumer_smoke sha256=c50b81b59d78577e2e8e45cf65651d6a1dca0c311aa5122d3ef11adb75306dce pass=1 fail=0 ignore=0 verdict=clean 2026-09-03
+session-id-and-env-probe-cuts upgrade sha256=1e39fc072d56bf5dc3c36b42c8f5c28bb82112bb807c3e82808c7dca25a83a2d pass=1 fail=0 ignore=0 verdict=clean 2026-09-03
+session-id-and-env-probe-cuts agents_md_smoke sha256=0be015db25f458aa655b2017cccc898f67dde2ddad8707552f5e231081d2c63a pass=1 fail=0 ignore=0 verdict=clean 2026-09-03
+session-id-and-env-probe-cuts index_tests sha256=e14e152466dc5be0296b1e20575bf3d587e1e0a127e7c63ad57671dbcaeaddb8 pass=1 fail=0 ignore=0 verdict=clean 2026-09-03
+session-id-and-env-probe-cuts native_crate sha256=7ed49fd96344bd92895dddbe0823d0851751e1a8afa2c00c3520a29e0c83ce15 pass=1 fail=0 ignore=0 verdict=clean 2026-09-03
