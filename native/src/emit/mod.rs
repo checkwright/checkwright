@@ -6,6 +6,7 @@ pub mod close_surfaces;
 pub mod docs_mirror;
 pub mod drift_report;
 pub mod enforcement_map;
+pub mod enum_sets;
 pub mod env_probe;
 pub mod file_survey;
 pub mod footprint;
@@ -359,6 +360,15 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         "--emit-session-id",
         Arm::Emit(session_id::emit),
         session_id::KNOBS,
+    ),
+    // spec: canon-kit/SPEC.md §check-prose-enum — the bundled enum-set emitter, an `Arm::Emit`:
+    // the contract is a document and every failure is already exit 2
+    // spec: gate-sdk/SPEC.md §The non-gate arm — a **two-kit** declared roster, resolved a slice
+    // at a time by the partitioning bridge; it may never gain either enum-set knob
+    (
+        "--emit-enum-sets",
+        Arm::Emit(enum_sets::emit),
+        enum_sets::KNOBS,
     ),
     // spec: evidence-kit/SPEC.md §Layout and configuration — the two parser adapters, reached as
     // the *value* of `EVIDENCE_KIT_PARSER_<suite>` rather than as a named adapter

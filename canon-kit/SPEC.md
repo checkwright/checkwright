@@ -388,8 +388,12 @@ the class ruling at gate-sdk/SPEC.md §The config-seam port disposition. Knobs:
 - `CANON_KIT_ENUM_SETS_CMD` — a consumer command emitting the governed sets
   `check-prose-enum` holds, one `<set-name>`⇥`<member>` line per member,
   default empty ⇒ clean skip (no declared sets). This repo sets
-  `bash scripts/enum-sets.sh`, which derives the queue tag sets from
-  queue-kit's own parser rather than restating them.
+  `bash gate-sdk/bin/run-gates.sh --emit enum-sets`, the bundled emitter, which
+  derives the queue tag sets from queue-kit's own parser rather than restating
+  them. The knob's own contract is unchanged by that value naming a bundled arm:
+  it takes any consumer command, so an adopter still points it anywhere — what the
+  payload gained is an emitter an adopter can name without authoring a script, not
+  a claim on where a consumer's sets come from.
 - `CANON_KIT_INSTALL_TRANSPORTS_CMD` — a consumer command emitting the install
   transports `check-install-claim` holds, one `<transport-id>`⇥`<ERE>` line per
   transport, default empty ⇒ clean skip. `CANON_KIT_INSTALL_SECTION_RE` — an ERE
@@ -639,7 +643,23 @@ states the ground.
   `CANON_KIT_CLAIM_CLASS_IDS` / `..._PATTERNS` (§Layout and configuration). The
   emitting **command** knob is bridged beside each pair, because it is what tells
   *none configured* from *configured, and it declared nothing* — the two clean
-  skips a claim gate reports apart. The tab a POSIX ERE may legitimately carry
+  skips a claim gate reports apart.
+  **A configured command may itself be a bridged arm, which nests one bridge
+  invocation inside another — and the termination is a constraint on the arm's
+  roster rather than a property inherited.** The nested invocation sources
+  `lib/gate.sh` again and resolves the arm's own declared knobs before exec'ing the
+  binary, so it terminates **exactly when that roster excludes the names the outer
+  batch is resolving**: `--emit-enum-sets` declares `GATE_KIT_ROOTS_REL` and
+  `QUEUE_KIT_LESSON_TAGS` and may never gain either enum-set knob. **Nothing reds
+  if it does** — the failure is a hang or an unbounded recursion at knob
+  resolution, not a verdict — which is why the condition is written here, beside
+  the guard, rather than left as a reassurance. The cost is real and was measured at the
+  cut rather than asserted small: one extra `bash`, one extra `lib/gate.sh` source
+  and one extra binary exec per resolution of that pair, which on this tree roughly
+  tripled that gate's resolve-and-run. It is a **residue to file, never a licence**
+  to take the in-process shortcut §check-prose-enum refuses — the array-knob
+  bridge's per-invocation cost already has an owner, and a nested resolution is that
+  residue met twice rather than a new class. The tab a POSIX ERE may legitimately carry
   cannot reach the bridge: `spec_claim_vocabulary` below rejects a line with an
   extra tab before the value is ever serialized.
 - **The count adapter** the restated-total gates share, so a consumer's
@@ -1423,18 +1443,43 @@ the gate over the docs). Consumer: the committing operator via the output
 contract — file, line, set name, count, and the omitted members all read once at
 the scan transition. `CANON_KIT_ENUM_SETS_CMD` is read at startup; both fields of
 each emitted line are read at match time (set name in the report, member in the
-matcher). This repo's consumer config is `scripts/enum-sets.sh`, which derives
+matcher). This repo's configured value is the bundled `--emit-enum-sets` arm,
+which derives
 the queue task-tag set and the Lessons-channel set from queue-kit's own
-lead-line tag parser plus `QUEUE_KIT_LESSON_TAGS` — derived, not restated; the
+lead-line tag vocabulary plus `QUEUE_KIT_LESSON_TAGS` — derived, not restated; the
 two roles are separate sets because a paragraph naming one role's tags is not
 enumerating the other. A set a consumer can only hand-list is that consumer's
 own drift to own; the kit contract asks only for the emit grammar.
+
+**The sets cross the bridge as *data*, and the gate must not call the emitter in
+process — which is a live refusal now that both can sit in one binary.** The
+resolved sets arrive as two parallel arrays filled by `spec_enum_sets` running the
+*configured* command inside canon-kit's own sourced subshell (§lib/spec.sh). Once
+the bundled emitter compiles into the same binary as the gate, an in-process call
+looks free; it is not, because it would resolve the **bundled** producer for a
+consumer who configured a different one — precisely the extension point the knob
+exists to protect. The property that makes the shortcut tempting is the reason to
+write the refusal down rather than leave it to be re-derived.
+
+**The tag vocabulary is referenced from the gate that owns it, not parsed out of
+it.** `check-tag-lead-line`'s class table is the single holder of both the match
+literal and the tag name, and the emitter reads that table directly, terminator
+strip and all, so a rename cannot leave two spellings disagreeing. That direct
+reference is also why the shell form's parse anchors **retire rather than being
+weakened**: a check refusing to run unless the file held exactly one class table
+existed to anchor a text read on the table rather than on position, and a compiled
+reference cannot be ambiguous about which table it names. Recorded with its ground,
+because deleting a fail-closed check inside a port is otherwise exactly the move
+this project refuses.
 
 The same emitter adds two roster families over the kit tree, one set per kit
 root: a `<kit>-lib` set of the tracked top-level `lib/*.sh` basenames and a
 `<kit>-gate-test` set of the tracked top-level `gate-tests/*.test.sh` basenames,
 with the roots read from `gate_kit_roots_rel` (gate-sdk/SPEC.md §lib/gate.sh) so
-the sets cannot enumerate a tree the battery does not. A new kit, lib or unit
+the sets cannot enumerate a tree the battery does not. **Tracked is contract, not
+an implementation accident**: the listing comes from `git`, so an *untracked* new
+sibling does not enrol, and a walk of the filesystem would silently widen a set
+another surface reasons about. A new kit, lib or unit
 test enrols with no edit, which is the property a hand correction per stale
 roster would not have. Members are basenames rather than paths because a
 basename matches prose spelling the file kit-relative, repo-relative or bare —

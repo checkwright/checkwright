@@ -4,8 +4,8 @@ use crate::queue;
 
 // spec: queue-kit/SPEC.md §check-tag-lead-line — one class table, each entry the tag name plus
 // its bracket terminator; the match literal and the arr[] key both come off it, and
-// scripts/enum-sets.sh reads this same table
-const CLASSES: &[&str] = &[
+// `--emit-enum-sets` references this same table rather than parsing this file as text
+pub const CLASSES: &[&str] = &[
     "blocked-by:",
     "spec:",
     "design-pending]",
@@ -14,11 +14,17 @@ const CLASSES: &[&str] = &[
     "roadmap:",
 ];
 
+// spec: queue-kit/SPEC.md §check-tag-lead-line — the terminator strip, held once in the module
+// that owns the table: a tag's name is its entry without the bracket terminator
+pub fn tag_name(class: &str) -> &str {
+    &class[..class.len() - 1]
+}
+
 fn classes_on(line: &str, lesson_tags: &[String]) -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
     for c in CLASSES {
         let term = &c[c.len() - 1..];
-        let name = &c[..c.len() - 1];
+        let name = tag_name(c);
         if line.contains(&format!("[{}{}", name, term)) {
             out.push(name.to_string());
         }
