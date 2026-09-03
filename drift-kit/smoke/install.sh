@@ -587,30 +587,26 @@ EOF
         || fail "losing the meta layer changed a row it does not own: $(diff "$work/fo-intact.txt" "$work/fo-nometa.txt")"
 fi
 
-# spec: gate-sdk/SPEC.md §The bin/-tool contract — kfric.sh's two positionals are free text, so it
-# validates their shape: help on stdout at exit 0, an unrecognized leading '-' refused on stderr at
-# exit 2 in either slot, and the knowledge log byte-unchanged after both.
+# spec: drift-kit/SPEC.md §The knowledge-friction loop — the discriminating half of the capture arm's argv contract, the seam a crate unit test cannot see: the front-end resolves --emit kfric, a leading-dash field is still exit 2 in EITHER slot through the bridge, and the knowledge log is byte-unchanged after the refusal (a test reading exit codes alone passes the bug). The grammar cases are pinned in the ported module's own #[cfg(test)] tests, where check-crate-arms runs them; the -h/--help cases retired with the port, the help half belonging to the substrate.
 kflog="$work/kfric-argv.log"
 printf '2026-01-01 a real fact ← a real surface\n' > "$kflog"
 cp "$kflog" "$work/kfric-argv.before"
-kf() { DRIFT_KIT_KNOWLEDGE_LOG="$kflog" bash "$SMOKE_KIT_ROOT/bin/kfric.sh" "$@"; }
-
-for f in --help -h; do
-    kfout="$(kf "$f" 2>/dev/null)" || fail "kfric.sh $f should exit 0"
-    grep -q '^usage: ' <<<"$kfout" || fail "kfric.sh $f wrote no usage to stdout: $kfout"
-done
+kf() { DRIFT_KIT_KNOWLEDGE_LOG="$kflog" bash "$DRIFT_ARM" --emit kfric "$@"; }
 
 for a in "--list" "second"; do
     kfrc=0
     if [[ "$a" == "--list" ]]; then kf --list a >/dev/null 2>&1 || kfrc=$?
     else kf "$a" --list >/dev/null 2>&1 || kfrc=$?; fi
-    [[ "$kfrc" -eq 2 ]] || fail "kfric.sh refused a flag with exit $kfrc, want 2 (slot: $a)"
+    [[ "$kfrc" -eq 2 ]] || fail "--emit kfric refused a flag with exit $kfrc, want 2 (slot: $a)"
 done
 kfso="$(kf a --list 2>/dev/null)" || true
-[[ -z "$kfso" ]] || fail "kfric.sh wrote usage to stdout on a refusal: $kfso"
+[[ -z "$kfso" ]] || fail "--emit kfric wrote usage to stdout on a refusal: $kfso"
 cmp -s "$work/kfric-argv.before" "$kflog" \
-    || fail "kfric.sh wrote the knowledge log on a help or refusal path"
+    || fail "--emit kfric wrote the knowledge log on a refusal path"
 
+# spec: gate-sdk/SPEC.md §The bin/-tool contract — '--' ends option processing, so the refusal never
+# makes a legitimate filing unfileable; and a SET consumer knob reaches the arm's write through the
+# shell bridge, which the refusal above cannot show.
 kf -- "--list is captured at exit 0" "a surface" >/dev/null
 grep -q -- '--list is captured at exit 0 ← a surface$' "$kflog" \
-    || fail "kfric.sh -- did not file a fact beginning with a dash"
+    || fail "--emit kfric -- did not file a fact beginning with a dash"

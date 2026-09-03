@@ -358,22 +358,32 @@ derivation. The loop mirrors guard-kit's, with capture moved to convention:
    gitignored per-iteration scratch, the prompt-friction.log pattern):
    `<date> <fact re-derived> ← <surface it was read from>`. One line,
    written at the moment of re-derivation — deferred capture is no capture.
-   The affordance is `bin/kfric.sh [--] "<fact>" "<surface>"`: it stamps that
-   grammar (date from `date +%F`) into `DRIFT_KIT_KNOWLEDGE_LOG`, creating
+   The affordance is `run-gates.sh --emit kfric [--] "<fact>" "<surface>"`, the
+   `--emit-kfric` bridged arm (gate-sdk/SPEC.md §The non-gate arm): it stamps
+   that grammar (date from `date +%F`) into `DRIFT_KIT_KNOWLEDGE_LOG`, creating
    the log's parent dir if missing, and refuses with a usage message and
-   exit 2 unless both arguments are present and non-empty. Both are free text,
-   so it also validates their **shape** — see
+   exit 2 unless both positionals are present and non-empty, **in the fixed
+   order fact then surface**. Its declared roster is that one knob, already
+   defined in §lib/drift.sh; the family is forced rather than chosen, since the
+   tool resolves a consumer knob and a hardcoded top-level flag would resolve
+   the platform default while silently ignoring every override. Both positionals
+   are free text, so it also validates their **shape** — see
    gate-sdk/SPEC.md §The bin/-tool contract —
    scanning every positional rather than the first, two slots making arity
-   safe in neither. It exists so
+   safe in neither, with `--` ending option processing. The `-h`/`--help` arm
+   does **not** survive the port: usage for a bridged arm lives in
+   `bin/run-gates.sh`'s own help and in this kit's README, so
+   `--emit kfric --help` is a **refusal** at exit 2 rather than usage at exit 0
+   — the one observable the port moved. It exists so
    capture is prompt-free — the raw form is a shell redirect
    (`printf … >> <log>`) that no allowlist glob suppresses safely (a
    mid-pattern wildcard is the command-injection shape the bash guard
    catches, and a decorated write trips the guard's decoration rule
-   regardless), whereas the helper takes the fact as an argument with no
-   caller-side redirect, so its invocation is a safe end-wildcard prefix-glob
-   allowlist entry and a permission prompt never turns capture into deferred
-   capture. The raw append stays legal as the fallback — the grammar, not
+   regardless), whereas the arm takes the fact as an argument with no
+   caller-side redirect, so its invocation is a static prefix under the
+   front-end's own end-wildcard allowlist entry — one grant covering every
+   bridged arm rather than one per tool — and a permission prompt never turns
+   capture into deferred capture. The raw append stays legal as the fallback — the grammar, not
    the writer, is the log's contract; both consumers below read lines, not
    provenance. The convention costs one always-loaded bullet in the
    consumer's instructions file; that line is the loop's hook and must earn
@@ -430,6 +440,18 @@ derivation. The loop mirrors guard-kit's, with capture moved to convention:
    reasoning to `kpi-incident-recurrence`). The limit belongs on the human-read
    line, where a reader can act on it. Detection is the
    loop; elimination is a tiering edit.
+
+**This section's port-owed set is empty, and that is stated rather than left to
+be inferred.** Every surface declaring this section is now either in-crate or
+declared `# no-port:`: `native/src/emit/kfric.rs` and its `BRIDGED_ARMS` row in
+`native/src/emit/mod.rs` (the capture arm above), `native/src/emit/kpi/knowledge_friction.rs`
+(the reader `kpi-knowledge-friction`), and `smoke/install.sh`, which carries the
+reader's three-state coverage and the arm's argv seam in a file whose own header
+declares `# no-port:`. `bin/kfric.sh` was the one owed surface and the
+2026-09-03 cut took it, so **no later port cut is sequenced against this
+section**. Worth saying rather than leaving to a reader: the 2026-09-01 survey
+cut established a residue paragraph as the norm here, and a reader who learned
+the norm there would go looking for one that does not exist.
 
 **Three alternatives were weighed and refused, and they are recorded so the next
 session meeting an empty log does not re-open a settled call as if it were an
@@ -1085,6 +1107,19 @@ instead, which is what lets **a reader reached through the bridge carry no
 default**: a reader that had to recognise the default path would be a second home
 for it.
 
+**`DRIFT_KIT_KNOWLEDGE_LOG` moved no default at the capture affordance's port,
+and the second copy that vanished with it was never a counter-example to the
+sole-resolver claim above.** The knob was already defined here, so `--emit-kfric`
+declares it and reads what the bridge resolves rather than carrying a default of
+its own. What the port removed is a different duplicate: `bin/kfric.sh` was a
+standalone tool that re-implemented this library's *opening* — its own inline
+`DRIFT_KIT_CONFIG_FILE` resolution block — because it did not source the library
+at all. That copy did not falsify the sole-resolver sentence, whose scope is its
+own next clause, knobs resolved **through the bridge**; a standalone `bin/`
+tool's own resolution fell outside it. So the port removed a genuine duplicate
+without repairing a defect, and this declaration's ground is unchanged in either
+direction — the honest statement, and the one a later sweep of this class needs.
+
 **The default had a second home, and the port closed it rather than the filing
 doing so.** The shell collator resolved the same knob inline with its own copy and
 was not a bridge reader; once the collator became a bridged arm it reads what this
@@ -1098,7 +1133,6 @@ library and nothing else.
 ```
 drift-kit/
   lib/drift.sh                   # sourced knob resolution; the config bridge sources it
-  bin/kfric.sh                   # the knowledge-friction capture affordance
   bin/overhead-meter.sh          # the governance-overhead byte-proxy meter
   bin/stage-economics.sh         # the stage × model × iteration spend pricer
   templates/drift-config.sh

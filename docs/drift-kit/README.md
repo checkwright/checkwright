@@ -62,8 +62,10 @@ doc owned the fact (drift-kit/SPEC.md §The knowledge-friction loop). It shows
    yourself re-deriving a fact off a non-owning surface, append*
    `<date> <fact> ← <surface>` *to `.workflow/knowledge-friction.log`.* That
    bullet is the loop's only hook — earn its cost by the log actually filling.
-   `bin/kfric.sh "<fact>" "<surface>"` is the shipped affordance that stamps
-   that grammar prompt-free — raw append stays legal
+   `run-gates.sh --emit kfric [--] "<fact>" "<surface>"` is the shipped
+   affordance that stamps that grammar prompt-free — both fields required
+   non-empty in that order, `--` files one beginning with a dash, and no per-arm
+   `--help`: the usage is here and in the SPEC. Raw append stays legal
    (drift-kit/SPEC.md §The knowledge-friction loop).
 2. Gitignore the log (per-iteration scratch), and splice
    `templates/close-knowledge.md` into your close skill so each entry becomes a

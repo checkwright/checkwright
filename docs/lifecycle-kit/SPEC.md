@@ -761,7 +761,7 @@ What *append-only* means on this surface is a merge property, and
 §Multi-operator semantics owns it: this is the kit's one `union`-driver surface.
 
 **The affordance.** `run-gates.sh --emit file-gap [--] "<gap prose>"` (the
-`bin/kfric.sh` pattern: repo-root anchor, config-via-env, exit 2 on an empty
+`--emit-kfric` pattern: repo-root anchor, config-via-env, exit 2 on an empty
 argument) appends one dated bullet, seeding the contract header — byte-identical
 to the line close's drain truncates back to — when the inbox does not yet exist.
 It is the `--emit-file-gap` bridged arm (gate-sdk/SPEC.md §The non-gate arm),

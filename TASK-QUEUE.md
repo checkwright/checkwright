@@ -12,39 +12,6 @@
 
 ## New Features
 
-- **drift-kit-bin-port-residue** [spec: SPEC-kfric-cut.md] — drift-kit's owed `bin/` members,
-  hosted together because the port corpus needs a SECOND queue entry and for no stronger reason.
-  **The ground is a column budget, not a class ruling, and this entry says so rather than letting
-  its name imply otherwise.** `native-gate-port-remaining-corpus`'s lead line cannot carry two
-  `[spec:]` refs — measured 2026-09-03 at spec and re-measured by the lead: a 66-column base, two
-  minimal refs 102, the real pair 116, against `QUEUE_KIT_WRAP_BUDGET=100`
-  (`queue-kit/lib/queue.sh:37`) — so a two-cut iteration needs two hosts and this is the second.
-  `kit-library-port-residue` was refused as that host on its own lead sentence, which scopes it to
-  the `lib/*.sh` members a class ruling left owed; the owner text outranks any hosting practice.
-  **What it does NOT license, stated because the name reads like a carve-out.** No class ruling
-  puts a kit's `bin/` members in a cohort. `kit-library-port-residue` warns that the discriminator
-  is CONTENT, NOT DIRECTORY, and that warning is inherited here: this entry mints no disposition
-  for any member, settles no sequencing, and grounds no future cut on directory membership.
-  **The residue, measured 2026-09-03 against `--emit port-blockers --tree`:**
-  `bin/kfric.sh` (60) — unblocked, taken by this promotion's own amendment.
-  `bin/overhead-meter.sh` (105) — BLOCKED, and not on size. drift-kit/SPEC.md §The overhead meter
-  rules its `session8` derivation's divergence from the sibling meter UNRULED and says a cut on
-  either meter meets that question rather than inheriting an answer; and
-  `overhead-meter-measures-the-lead` holds that the transcript resolver a faithful port would
-  carry forward measures the wrong session. Composed for this iteration and DROPPED at spec on
-  the lead's own envelope test, which admitted it only if its amendment matched kfric's shape.
-  `bin/stage-economics.sh` (464) — untouched, never composed, no ground read either way.
-  **It DEMOTES at build, never `## Done`** — its deliverable is a corpus (canon-kit/SPEC.md
-  §Merging an amendment). Minted straight into the active section, so no prior deferred position
-  exists to recover from the promoting diff: it demotes to `## Deferred` immediately after
-  `kit-library-port-residue`, beside the entry whose shape it borrows and whose scope it does not.
-  **Cost while deferred:** two members, 569 lines, and one of them holds an unruled seam a consult
-  has to reach before its cut can be composed at all.
-  ruled: drift-kit-bin-port-residue lead 2026-09-03 own-authority
-  Filed 2026-09-03 by spec, minted and promoted in one motion as the second cut's host on the
-  ruling above; the column budget that forced it is filed as a recurrence of
-  `record-stamp-encoding-compression`, the entry that owns the encoding, not this one.
-
 ## Technical Debt
 
 ## Deferred
@@ -97,6 +64,43 @@
   ruled: kit-library-port-residue lead 2026-09-01 2026-09-02 2026-09-03 own-authority
   ruled: kit-library-port-residue operator 2026-09-03 lead-relay
   Filed 2026-08-30 by build, at the landing of the kit-library class ruling.
+
+- **drift-kit-bin-port-residue** [design-pending] — drift-kit's owed `bin/` members,
+  hosted together because the port corpus needs a SECOND queue entry and for no stronger reason.
+  **The ground is a column budget, not a class ruling, and this entry says so rather than letting
+  its name imply otherwise.** `native-gate-port-remaining-corpus`'s lead line cannot carry two
+  amendment refs — measured 2026-09-03 at spec and re-measured by the lead: a 66-column base, two
+  minimal refs 102, the real pair 116, against `QUEUE_KIT_WRAP_BUDGET=100`
+  (`queue-kit/lib/queue.sh:37`) — so a two-cut iteration needs two hosts and this is the second.
+  `kit-library-port-residue` was refused as that host on its own lead sentence, which scopes it to
+  the `lib/*.sh` members a class ruling left owed; the owner text outranks any hosting practice.
+  **What it does NOT license, stated because the name reads like a carve-out.** No class ruling
+  puts a kit's `bin/` members in a cohort. `kit-library-port-residue` warns that the discriminator
+  is CONTENT, NOT DIRECTORY, and that warning is inherited here: this entry mints no disposition
+  for any member, settles no sequencing, and grounds no future cut on directory membership.
+  **The residue, measured 2026-09-03 against `--emit port-blockers --tree`:**
+  `bin/kfric.sh` (60) — DELIVERED 2026-09-03 by this hosting's own amendment, ported as the
+  `--emit-kfric` bridged arm; the section it declared has no owed surface left
+  (drift-kit/SPEC.md §The knowledge-friction loop), so no later cut is sequenced against it.
+  `bin/overhead-meter.sh` (105) — BLOCKED, and not on size. drift-kit/SPEC.md §The overhead meter
+  rules its `session8` derivation's divergence from the sibling meter UNRULED and says a cut on
+  either meter meets that question rather than inheriting an answer; and
+  `overhead-meter-measures-the-lead` holds that the transcript resolver a faithful port would
+  carry forward measures the wrong session. Composed for this iteration and DROPPED at spec on
+  the lead's own envelope test, which admitted it only if its amendment matched kfric's shape.
+  `bin/stage-economics.sh` (464) — untouched, never composed, no ground read either way.
+  **It DEMOTES at build, never `## Done`** — its deliverable is a corpus (canon-kit/SPEC.md
+  §Merging an amendment), and 2026-09-03's build is the first such demotion: one member of three
+  delivered, a later cut re-promoting with a fresh amendment. Minted straight into the active
+  section, so no prior deferred position existed to recover from the promoting diff; it named
+  this position itself and sits here, beside the entry whose shape it borrows and whose scope it
+  does not.
+  **Cost while deferred:** two members, 569 lines, and one of them holds an unruled seam a consult
+  has to reach before its cut can be composed at all.
+  ruled: drift-kit-bin-port-residue lead 2026-09-03 own-authority
+  Filed 2026-09-03 by spec, minted and promoted in one motion as the second cut's host on the
+  ruling above; the column budget that forced it is filed as a recurrence of
+  `record-stamp-encoding-compression`, the entry that owns the encoding, not this one.
 
 - **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
   — the whole battery onto the binary, and the shell surface down to its residue.
@@ -3841,8 +3845,8 @@
   the claim. Two channels, one property, one guard.
   **Deliverable, and the design question that makes it `[design-pending]`:** whether the
   affordance should carry a measured-vs-estimated distinction at all. The whole value of
-  `bin/kfric.sh` is that stamping is cheaper than deferring, so a field that slows capture buys
-  accuracy with the capture rate the loop depends on. A convention may beat a flag.
+  the `--emit-kfric` affordance is that stamping is cheaper than deferring, so a field that slows
+  capture buys accuracy with the capture rate the loop depends on. A convention may beat a flag.
   **Cost while deferred:** an unverified assertion in the log is indistinguishable from a
   measurement, and close's own triage is chartered to promote it into a doc-owner edit — which
   is the channel by which a wrong number reaches a canonical surface with a citation on it.
@@ -5033,8 +5037,9 @@
   fewer captures were filed, and the per-filing tax is unchanged.
   **Diagnosed rather than allowlisted, per the triage criterion.** `bash
   gate-sdk/bin/run-gates.sh *` is **already** in the committed allowlist and, since the 2026-09-01
-  and 2026-09-03 ports made survey and gap capture arms, is the one grant covering both; `kfric.sh
-  *` sits beside it — so this is not missing coverage. The harness matcher
+  and 2026-09-03 ports made survey, gap and knowledge-friction capture arms, is the one grant
+  covering all three — the per-tool `kfric.sh *` grant went with its file — so this is not missing
+  coverage. The harness matcher
   refuses a command whose text carries an expansion or a redirect, and gap prose routinely
   carries both: a backticked slug is command substitution, and a bullet describing
   `jq -r … 2>/dev/null` contains a redirect operator inside its quotes. The glob cannot help,
@@ -5044,8 +5049,8 @@
   in-the-moment capture, which is the exact path CLAUDE.md says deferred capture ruins.
   **Deliverable, and it is small:** a body-from-file arm — `--emit file-gap --from <path>` reading
   the prose from a scratch file written with the editor tool — is a fully static command the
-  matcher can grant. The same shape serves `--emit file-survey` and `kfric.sh`, whose `<finding>`
-  fields are the same free text; the capture tool's port to a compiled arm moves where that
+  matcher can grant. The same shape serves `--emit file-survey` and `--emit kfric`, whose
+  free-text fields are the same shape; the capture tool's port to a compiled arm moves where that
   shape is written and settles nothing here. What needs deciding is whether it is per-member or
   a shared helper, and whether the argv form stays (it should — a short gap is one call).
   **Why it is not a guard rule:** there is no better *form* to steer to today, which is what a
@@ -8904,9 +8909,12 @@
   second field is being filled with the surface that OUGHT TO OWN the fact rather than the surface
   the session actually read it from, which pre-judges the remediation the close triage exists to
   choose.
-  **The grammar is unambiguous and both holders agree.** `drift-kit/bin/kfric.sh` line 3 and its
-  `usage()` both spell `"<fact re-derived>" "<surface it was read from>"`, and line 59 emits
-  `<date> <fact> ← <surface>`; drift-kit/SPEC.md §The knowledge-friction loop says the same.
+  **The grammar is unambiguous and both holders agree.** The `--emit-kfric` arm's usage string
+  spells `"<fact re-derived>" "<surface it was read from>"` and `native/src/emit/kfric.rs`'s
+  emitter writes `<date> <fact> ← <surface>`; drift-kit/SPEC.md §The knowledge-friction loop says
+  the same. The 2026-09-03 port moved those holders off `drift-kit/bin/kfric.sh` — whose line 3,
+  `usage()` and line 59 this entry cited by exact location until then — and moved nothing in the
+  grammar, so every disposition below is as open against a compiled arm as against the script.
   **Measured 2026-08-28 at `port-oracle-and-composer-ruling`'s close: all three of that iteration's
   captures inverted it.** Each names a SPEC section where the read-from surface was an
   implementation — a fact about `bin/run-gates.sh` citing §The non-gate arm, one about
@@ -8919,9 +8927,9 @@
   both ways, one capture's fact turned out already owned in five places, which is the pointer
   disposition, and its own field had asserted the opposite.
   **Why `[design-pending]`, three dispositions acting at different layers:** the affordance
-  (`kfric.sh` validating or prompting for a non-SPEC second argument, cheapest and heuristic); the
-  grammar (rename the field, or take BOTH surfaces as separate arguments, which is what the triage
-  actually needs and what changes the log's shape); or the always-loaded doctrine line, which
+  (`--emit-kfric` validating or prompting for a non-SPEC second argument, cheapest and heuristic);
+  the grammar (rename the field, or take BOTH surfaces as separate arguments, which is what the
+  triage actually needs and what changes the log's shape); or the always-loaded doctrine line, which
   describes the capture as firing when a session re-derives "a fact no doc owns" and so invites
   naming the doc that should own it — a candidate CAUSE of the misuse rather than a third fix.
   **DISTINCT from `kfric-capture-unverified-assertion`**, whose axis is whether the FACT is verified

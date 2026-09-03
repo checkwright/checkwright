@@ -182,7 +182,7 @@ load behind that trigger, so they are not resident here.
 - **Knowledge-friction capture (any session):** re-deriving a fact no doc owns
   (off an implementation, a gate's source, a commit, or a prior/sibling
   deliverable)? stamp it in the moment with
-  `bash drift-kit/bin/kfric.sh "<fact>" "<surface>"` — deferred capture is
+  `bash gate-sdk/bin/run-gates.sh --emit kfric "<fact>" "<surface>"` — deferred capture is
   no capture; close triages it (drift-kit/SPEC.md §The knowledge-friction loop).
 - **Gap capture (any mid-iteration session):** a work-shaped finding — a gap,
   a task, a defect — routes to the committed gap inbox with

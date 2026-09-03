@@ -13,6 +13,7 @@ pub mod file_survey;
 pub mod footprint;
 pub mod graph;
 pub mod install_lifecycle;
+pub mod kfric;
 pub mod kpi;
 pub mod lesson_sink;
 pub mod md_index;
@@ -346,6 +347,14 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         "--emit-file-gap",
         Arm::Emit(file_gap::emit),
         file_gap::KNOBS,
+    ),
+    // spec: drift-kit/SPEC.md §The knowledge-friction loop — the capture affordance, riding the same
+    // argv-shape split as `--emit-file-survey`: the refusal and the `--` escape cross the port with
+    // the argument, the help arm retires to the front-end.
+    (
+        "--emit-kfric",
+        Arm::Emit(kfric::emit),
+        kfric::KNOBS,
     ),
     // spec: lifecycle-kit/SPEC.md §The survey record — the citation affordance: it derives no stage
     // and stamps no rev, so its sibling's state-file knob is deliberately off this roster.
