@@ -63,11 +63,7 @@
   ruled: native-gate-port-remaining-corpus lead 2026-09-01 2026-09-03 own-authority
   Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close; cohorts ruled at scope 2026-08-11/12.
 
-## Technical Debt
-
-## Deferred
-
-- **kit-library-port-residue** [design-pending]
+- **kit-library-port-residue** [spec: SPEC-env-probe-cut.md]
   — the kit `lib/*.sh` members the 2026-08-30 class ruling deliberately leaves owed, filed
   rather than absorbed at its boundary. **What the ruling settled and what it did not.**
   gate-sdk/SPEC.md §The kit-library port
@@ -112,10 +108,13 @@
   **Cost while deferred:** low and non-recurring — the ground is stated and each member's sequencing
   is written into its own SPEC section, so no future cut re-argues the class. What is owed is the
   work, not the argument.
-  ruled: kit-library-port-residue lead 2026-09-01 own-authority
-  ruled: kit-library-port-residue lead 2026-09-02 own-authority
+  ruled: kit-library-port-residue lead 2026-09-01 2026-09-02 2026-09-03 own-authority
   ruled: kit-library-port-residue operator 2026-09-03 lead-relay
   Filed 2026-08-30 by build, at the landing of the kit-library class ruling.
+
+## Technical Debt
+
+## Deferred
 
 - **platform-support-ci-matrix** [design-pending] [roadmap: next/reliability]
   [precondition-ok: run-observed]
