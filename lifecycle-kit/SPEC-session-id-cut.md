@@ -95,6 +95,17 @@ inline moves into the owning kit's library in the same cut* does not reach it:
 that rule's stated ground is a **declared** knob resolving empty through the
 bridge, and this arm declares none.
 
+**The provenance seam is unchanged, and it is stated because the port moves
+harness-specific names into the crate.** `CLAUDE_CODE_SESSION_ID`, its child flag
+and the `<config-home>/projects/<slug>` layout are one harness's vocabulary, and
+§bin/session-id.sh already rules the seam for them: source 1 is the
+**harness-neutral** consumer override and source 2 "the shipped default source,
+harness-specific by nature", with `LIFECYCLE_KIT_SESSIONS_DIR` the override for
+the layout. That is kit **mechanism** with a consumer escape hatch, not private
+rule content, so it travels in-crate as a literal exactly as it sits in the script
+today — and the escape hatch is what keeps it mechanism. Nothing here becomes
+consumer config that was not already, and nothing private lands.
+
 ### (4) The cwd is an **input** to the derivation, so the production caller reaches the binary directly rather than through the front-end
 
 The one place a faithful port is not free, and it is invisible until probed
