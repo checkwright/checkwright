@@ -243,7 +243,7 @@
   algorithm and the only asymmetry left is the process context each runs in. And round 12's log
   carries ZERO `fatal` lines (probed 2026-09-03 at scope), killing the errored-`got` branch and
   leaving two VALID, DIFFERENT hashes over one byte-stream. The next act is a cause read; its facts
-  need a Windows host; 2026-09-03 spent a round, landing the diagnostic print-only and unobserved.
+  need a Windows host; 2026-09-03 spent a round — the diagnostic bailed before any comparison.
   **DEMOTED 2026-09-01 AT BUILD**, a recurrence rather than a tail — a NEW iteration on a FRESH
   amendment; the wedge is `observation-predicate-entry-cannot-drain-in-its-own-iteration`'s.
   ruled: platform-support-ci-matrix operator 2026-08-27 2026-08-30 2026-08-31 2026-09-03 lead-relay
