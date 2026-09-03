@@ -92,7 +92,7 @@ The contract survives explicitly, behaviour by behaviour:
 - **Matching is per compound segment**, so a whole-string glob spanning a compound
   the harness would split and refuse does not read as allowed. This is the
   behaviour delta (3) has to reproduce and delta (4) has to hold equal.
-- **The ranking key** — leading binary, plus subcommand for the eleven
+- **The ranking key** — leading binary, plus subcommand for the thirteen
   multi-command binaries, plus the write-shape suffix, word and suffix both read
   off the **first** segment. Unchanged, including the fd-dup exclusion and the
   read-redirect exclusion.
@@ -491,6 +491,51 @@ rules. The demotion re-prices it against `check-queue-entry-budget`, unlike a Do
 move, so at zero headroom the demoting commit may add no line to it — which is the
 constraint build meets, stated here so build does not discover it.
 
+### (16) The provenance seam: three command literals cross into the binary, and each is examined rather than waved through
+
+The tool carries three hardcoded command vocabularies, and a port moves them out
+of a vendored kit file and into the shipped binary, so the seam is ruled here
+rather than assumed to travel {design-bearing}. CLAUDE.md §The provenance seam is
+a **privacy** boundary before it is a design one, and guard-kit is the kit that
+states the strictest form of it — §compare-settings-allow's knob roster ships **no
+default probes** because "every string naming a command is the consumer's
+vocabulary, never the kit's" (guard-kit/SPEC.md:1652-1653).
+
+- **`GIT_RO` and `DOCKER_RO`** (`bin/scan-prompts.sh:37-38`) model **the harness's
+  own built-in read-only auto-allows**, which §scan-prompts already names as one of
+  the three things the tool filters against. They are not any project's toolchain
+  knowledge: guard-kit/SPEC.md:402-411 rules exactly this case — "A harness tool
+  name is public, documented, and shared by every consumer of that harness, so it
+  is not private rule content and the provenance seam ... does not reach it. What
+  such a literal does cost is **portability**." That cost is unchanged by the
+  substrate — a second harness with a different built-in set would force a
+  configurable slot whether the set sits in bash or in Rust — so the port neither
+  pays it nor pre-pays it, and mints no knob.
+- **The thirteen multi-command binaries** the ranking key sub-keys on
+  (`bin/scan-prompts.sh:113-116`) are **shell-substrate knowledge**, the class
+  §The generic ruleset admits alongside harness behaviour (guard-kit/SPEC.md:378-380).
+  They name no project's toolchain and no consumer's vocabulary; §scan-prompts
+  already describes the set generically as "the common multi-command binaries", and
+  the *measurement* of which words the write-shape suffix bites (`cat`, `awk`,
+  `grep`, `python3`, `git`, `sed`, `echo`/`printf`) is prose in that section, not a
+  kit literal, and stays there.
+- **What is consumer config and stays consumer config** — the two settings files
+  themselves. The arm reads a consumer's own `permissions.allow[]` through
+  `GUARD_KIT_SETTINGS` and `GUARD_KIT_SETTINGS_LOCAL`; not one allowlist string
+  crosses into the crate, and the arm ships no default allow entry of any kind.
+  This is the `graph-vocab.sh` shape: the mechanism is the kit's, the vocabulary is
+  the consumer's file.
+- **What is this project's provenance and does not ship** — every dated ruling,
+  authority and refused alternative in this amendment. They belong to TRAJECTORY.md
+  and to git history; the merged §scan-prompts states the rules undated, which is
+  the 2026-09-03 consult's own ruling.
+
+**Nothing becomes new consumer config in this cut**, and that is the finding
+rather than an omission: the three knobs already exist, the harness sets are
+already kit-owned on a ruling that does not turn on substrate, and the only thing
+the port could have minted — a knob for the built-in auto-allow set — would be
+designing against a harness that does not exist.
+
 ## Producers and consumers
 
 The amendment introduces **two interfaces** — two bridged flags — and **no new
@@ -683,3 +728,7 @@ it, and it is the reason this session recommends the audit stage next.
       binary.
 - [ ] **The demotion fits** — the entry returns to Deferred at build with no line
       added, against a measured zero headroom.
+- [ ] **The seam held** — no allowlist string, no project toolchain word and no
+      dated ruling of this project's crossed into the crate or into the merged
+      section; the three harness/substrate literals travel on the ruling delta (16)
+      cites and mint no knob.
