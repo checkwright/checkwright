@@ -429,6 +429,22 @@ gate-sdk/SPEC.md §Porting a gate to the binary substrate. Refused with it: read
 contributor-side exemption under another name, and a seam-citing `# no-port:` on files holding no
 seam content class.
 
+**A port cut is sized to fill one build window, never to a unit count — ruled 2026-09-03 by the
+operator in consult, on measured overhead.** The mechanism is owned at gate-sdk/SPEC.md §The first
+cohort, and the rule that selects the next (the budget's floor). The measurements, dated here rather
+than carried live: the overhead meter read a 66 % governance share over the ten sessions to this
+ruling; the stage-economics meter over 134 iterations put build near one fifth of an iteration's
+spend and scope, close and supervision together near three fifths; and the account's seven-day
+window closed each of the four weeks before this ruling between 77 and 97 %, so the cap is the
+window and not the iteration count. Two alternatives were refused with it. A per-iteration
+**unit-count target** (ten or twelve units) measures nothing the window measures and nothing the
+record supports: no KPI reads units per iteration or cost per unit, and the one wide cut on record —
+eight members in one iteration — was the cheapest per member and the dearest in total. And
+**interleaving deferred units with cuts** to fill the window is the port-only run's own refused
+alternative below, and is not reopened by this ruling: the width is bought inside the cut. The
+cost-per-unit meter that would let the next sizing be read rather than judged is queue work filed
+from this consult.
+
 ## PRIORITY DIRECTIVE — the port track's sequence
 
 **Ruled 2026-08-09 by the operator, and it is the track's top priority: complete
