@@ -5232,6 +5232,13 @@
   **Cost while deferred:** an account-bearing trend under `.metric/` keeps accumulating rows
   attributed to the wrong population, and every efficiency claim read off `kpi-overhead` while
   the lead posture is live is a claim about supervision cost wearing a stage-session label.
+  **JUDGED RECURRENCE 2026-09-03 at the scope drain**, arriving as a gap bullet that re-derived
+  this diagnosis and asserted "DISTINCT from every live entry: no queue entry names the overhead
+  meter's session attribution" — false, and this entry is what it names. It adds one datum the
+  2026-08-15 probe did not have: the meter's own dedupe then rewrites the log against the resolved
+  id, so a mis-resolved run overwrites the row belonging to the OTHER session rather than merely
+  filing its own under the wrong key. The seam question above is unchanged and no entry is minted.
+  recurrence: overhead-meter-measures-the-lead 2026-09-03
   Filed 2026-08-15 by close, probed while reconciling its own meter output against its own stage
   stamp; scope-gated intake, so it is filed costed rather than fixed in flight.
 
@@ -6167,9 +6174,22 @@
   **Deliverable: a clause scoping a ruling to one iteration names the ITERATION, not its date.**
   The iteration name is unique by construction — it is the queue header and the state file's first
   field — where the date is not.
-  **Do NOT re-scope the yield ruling itself — operator-class.** Rewriting that clause to name an
-  iteration would DECIDE which one it meant, which is substance and not spelling, and is why this
-  drain promoted rather than fixed.
+  **BOTH INSTANCE COUNTS NOW MEASURE ZERO — re-verified 2026-09-03 at the scope drain.** A
+  tree-wide grep for the yield clause returns this entry's own citing line and nothing else, the
+  clause having been superseded by the 2026-08-31 NO-YIELD ruling; the `HELD at the <date>
+  promotion` form returns nothing at all. Both already read citing-line-only at `8227c576`, so no
+  one iteration caused it — it is a standing queue assertion an earlier close discharged, the
+  blind spot whose corpus is the queue's standing assertions rather than the closing diff.
+  **The clause that stood here is RETIRED**: it forbade re-scoping the yield ruling, and it now
+  guards text that no longer exists. Retiring a spent ruling is not reversing one.
+  **The entry's own disposition is DEFERRED TO THE POST-PORT TRIAGE, both readings recorded so a
+  later session does not re-derive them:** (a) MOOTED, its evidentiary framing having nothing left
+  to measure, taking the Done exit for an entry a closed ruling has mooted; or (b) it survives on
+  its deliverable above, with the instance paragraphs re-tensed to history. Taking (a) now is
+  itself the triage act TRAJECTORY.md §PRIORITY DIRECTIVE schedules for after the port — "retires
+  what a landed unit or a closed ruling has mooted" — so it pre-empts the triage rather than
+  anticipating it, and the deliverable stands either way.
+  ruled: iteration-scoping-clause-date-ambiguity lead 2026-09-03 own-authority
   **DISTINCT from `deferred-entry-time-deixis-rot`** (relative deixis — "this iteration" — silently
   re-pointing as the header moves) **and from `deferred-entry-defer-date-unasserted`** (a
   provenance date malformed or absent). Both are a date stale or missing; this is a date that is
@@ -7389,17 +7409,10 @@
   `powershell-installer-surface` restated live internal line RANGES of `installer/lib/init.sh` plus
   per-file counts for four siblings; the fifteenth `internal-identifier-restatement` sweep judged it
   LOW-MEDIUM and filed the call rather than taking it. That entry stays live and unchanged.
-  **What makes it borderline rather than clear.** Every figure was EXACT at HEAD and the paragraph
-  is dated and headed "Measured ... not estimated", the form prior sweeps have cleared. Against
-  that: a line RANGE is the most rot-prone form the class takes, it sits in the deferred pool — the
-  longest rot window in the tree, the corpus the class was widened to cover 2026-08-15 — and the
-  install path is live code any installer edit moves.
   **Why it generalises past one entry:** the ruling reaches every "measured at <date>" paragraph in
-  the pool, so the sweep escalated rather than editing one entry. A ruled-but-unbought port
-  is its ideal host, because such a paragraph's whole job is to price a port against a source
-  the author has read and the reader has not, and the anchor cannot yet exist.
-  **If the answer is OUTSIDE, the roster row says so once and every later sweep stops re-deciding
-  it.** The INSIDE half is spent: it prescribed editing spans the merge below already deleted.
+  the pool, so the sweep escalated rather than editing one entry. The borderline it weighed — exact
+  dated figures against a line RANGE being the most rot-prone shape the class takes, sitting in the
+  pool with the longest rot window — is what the 2026-09-03 ruling below resolves in both.
   **The founding instance is gone and the shape came straight back — 2026-08-25, second instance.**
   The `install-relocation-boundary-and-first-cut` merge rewrote `powershell-installer-surface`
   wholesale, deleting the two line ranges and four per-file counts named above; its replacement is a
@@ -7413,21 +7426,28 @@
   re-verified at the drain"; both had moved, the defect still live at both and only the numbers
   wrong. So the cost line below is no forecast: a dated, explicitly re-verified span in the deferred
   pool rotted inside eight days with no edit to the entry, and an eviction removed it, not a sweep.
-  **Why `[design-pending]`:** it rules the boundary of a governed audit class, an authoring
-  question about the roster row rather than a code change.
   recurrence: dated-measurement-restatement-class 2026-08-25 2026-08-29 2026-09-02
-  **AT THRESHOLD, DECLINED FIVE TIMES — 2026-08-30, twice 2026-08-31, 2026-09-01, 2026-09-02; the
-  last reached the operator, in a three-entry batch that took a sibling and left this deferred.**
-  First: machinery-class by default, no unit set reaching it. The
-  four since, on the RUN rather than the merits — the port-only run forecloses a non-port unit while
-  the oracle reads owed at all, so the rot argues RETURN at the post-port triage, not promotion now.
+  **AT THRESHOLD, DECLINED SIX TIMES — 2026-08-30, twice 2026-08-31, 2026-09-01, 2026-09-02,
+  2026-09-03; the 09-02 decline reached the operator, in a three-entry batch that took a sibling.**
+  First: machinery-class by default, no unit set reaching it. The five since, on the RUN and not
+  the merits — the run forecloses a non-port unit while the oracle reads owed at all, so the rot
+  argues RETURN at the post-port triage, never promotion now.
   **THE 2026-09-02 RECURRENCE FALSIFIES THE CARVE-OUT'S PREMISE, that a date names an iteration:**
   two closes fell on one calendar day, so a count stamped with its own date read clean past a sweep
   while the oracle had already moved. Its slug-beside-the-date shape is REFUSED: the operator ruled
   2026-09-01 that the direction is compression, not addition (`record-stamp-encoding-compression`).
-  ruled: dated-measurement-restatement-class lead 2026-08-30 own-authority
-  ruled: dated-measurement-restatement-class lead 2026-08-31 own-authority
-  ruled: dated-measurement-restatement-class lead 2026-09-01 own-authority
+  **THE BOUNDARY QUESTION IS ANSWERED BY A CLOSED RULING, RECORDED AS GROUNDS RATHER THAN TAKEN AS
+  A DISPOSITION — lead-verified 2026-09-03**, which also retires the `[design-pending]` ground that
+  stood here (an authoring question about the roster row). lifecycle-kit/SPEC.md §The committed gap
+  inbox's *a dated attestation freezes the claim, never the locator* answers it in BOTH directions:
+  the dated measurement is history immune to drift, while "a literal position in prose is the
+  de-literalization defect whatever date sits beside it" — so a span is OUTSIDE as a claim, INSIDE
+  as an anchor, and an anchor whose sentence holds while its line moved is de-literalization,
+  fix-shaped at a drain, never pendency. That reaches this entry's own forcing instance.
+  **The entry does not move on it**: the Done exit is the post-port triage act TRAJECTORY.md
+  §PRIORITY DIRECTIVE schedules — the sixth decline is the first with the answer in hand.
+  ruled: dated-measurement-restatement-class lead 2026-08-30 2026-08-31 own-authority
+  ruled: dated-measurement-restatement-class lead 2026-09-01 2026-09-03 own-authority
   **Cost while deferred:** the figures rot silently, and the entry carrying them is the one
   sizing an unbought port, so a reader prices the work off numbers nothing re-checks — while
   every future sweep spends the same judgment again on the same shape.
@@ -8597,27 +8617,34 @@
   one of these rows ranking. DISTINCT from `file-authoring-act-ungoverned`, which owns whether the
   authoring act is governed at all — its guard-steer shape would retire these rows by changing
   behaviour, where this entry's question is what the ranking should say while it has not.
-  **Why `[design-pending]`:** the three candidate shapes buy different things and none is
-  obviously right. Partitioning the ranked output the way it already partitions overlay-covered
-  rows is the most legible and changes the KPI's denominator. Grading each row against the
-  allowlist's own matching rule is the most accurate and duplicates that rule in a second reader.
-  Stating in guard-kit/SPEC.md that a close is expected to skip them is cheapest and buys least.
+  **Why `[design-pending]`:** the three candidate shapes buy different things and none is obviously
+  right. Partitioning the ranked output as it already partitions overlay-covered rows is most
+  legible and moves the KPI's denominator; grading each row against the allowlist's own matching
+  rule is most accurate and duplicates that rule; a guard-kit/SPEC.md note is cheapest, buys least.
   **Cost while deferred:** one re-triage of the same unretireable rows per close, on the surface a
-  close reads to decide where friction actually is — and the top row by a wide margin is one of
-  them, so the ranking's most prominent signal is the one no reader can act on.
-  recurrence: prompt-ranking-ungrantable-shape-class 2026-08-28
+  close reads to decide where friction is — and the top row by a wide margin is one of them, so the
+  ranking's most prominent signal is the one no reader can act on.
+  recurrence: prompt-ranking-ungrantable-shape-class 2026-08-28 2026-09-03
+  **THIRD MEASUREMENT, 2026-09-03, drained at scope on the same dedup sweep** — a gap bullet that
+  again re-derived the three-arms-all-wrong finding without finding this entry, naming the FIRST of
+  the two DISTINCT siblings above and missing the entry that owns the class. Same head as the
+  first: `cat >>` top by over twice the next pattern, every call a journal or scratch heredoc
+  append, the same close-triage refusal text as grounds. Its one novel half — a bare-command
+  journal-append affordance the convention could route through — is the SECOND sibling's by that
+  same paragraph, being a behaviour change rather than a ranking one.
+  **REACHED THRESHOLD 2026-09-03, PROMOTION DECLINED THE SAME DAY, ON THE RUN AND NOT ON MERIT** —
+  the run forecloses a non-port unit while the oracle reads owed. Weighed and not taken.
+  ruled: prompt-ranking-ungrantable-shape-class lead 2026-09-03 own-authority
   **SECOND MEASUREMENT, 2026-08-28 at `port-oracle-and-composer-ruling`'s close**, arriving as a gap
   bullet that re-derived this diagnosis without finding this entry, and drained here on a dedup
   sweep rather than promoted. A different head, the same class:
   `bash scripts/producer-liveness-reader.sh` at 64 prompting calls, **63 of the 64 composed** —
   chained, redirected or expanding — and 46 of those one repeated poll string. It also
-  **falsifies a tempting sub-case**: the `GATE_SDK_VERBOSE=1` cluster at 10x read as a
-  missing-`env`-word steer against the committed
-  `Bash(env GATE_SDK_VERBOSE=1 bash gate-sdk/bin/run-gates.sh *)` grant, but all ten were piped into
-  `grep`, so the prefix would have changed nothing. **What the second sample adds to the design**:
-  the first measured the ungrantable rows as a redirect-shaped *tail*, this finds them at the *head*
-  under a different command entirely, so the partitioning disposition is sizing the ranking's bulk
-  rather than a tail bucket.
+  **falsified a tempting sub-case**: a `GATE_SDK_VERBOSE=1` cluster read as a missing-`env`-word
+  steer against the committed grant carrying that prefix, but all ten were piped into `grep`, so
+  the prefix would have changed nothing. **What the second sample adds to the design**: the first
+  measured the ungrantable rows as a redirect-shaped *tail*, this finds them at the *head* under
+  another command, so the partitioning disposition sizes the ranking's bulk, not a tail bucket.
   Filed 2026-08-27 to the gap inbox by the windows-artifact-proof close, which paid the cost;
   promoted 2026-08-27 by the next scope, at the boundary that could legally run the drain.
 
@@ -9423,6 +9450,7 @@
 - **pack-step-dirty-tree-predicate-unscoped** [design-pending] — Unscoped dirty check aborts a pack.
 - **prune-set-matches-walk-root-ancestors** [design-pending] — A leaf above the root prunes it all.
 - **evidence-baseline-orphan-suite-row** [design-pending] — A row for a retired suite is unread.
+- **port-archaeology-restatement-residue** [design-pending] — Prose narrates deleted shell forms.
 
 ## Done
 
