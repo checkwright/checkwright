@@ -259,9 +259,12 @@ Steps, in order:
 7. **Index-reminder footer** — the "index first" ritual with the
    consumer's actual index commands listed (consumer-edited).
 8. **Stage-routed craft-rule pointers** — when `CONTEXT_KIT_STAGE_RULES`
-   names a present emitter (doctrine-kit's `stage-rules.sh`), the current
+   names a **command** (doctrine-kit's `--emit stage-rules` arm), the current
    stage's craft-rule pointer block, so a stage session is reminded of the
-   craft rules bearing on it before the matching action. Silently absent
+   craft rules bearing on it before the matching action. The step runs the
+   resolved command with the stage appended and carries **no `-f` existence
+   guard**, the drift line's own 2026-08-29 shape: a path test on a command
+   passes for nothing. Silently absent
    when the emitter is unset or the stage routes no rules (doctrine-kit owns
    the emitter and its tag grammar; the seam is this optional step, the
    drift-line precedent). Keyed on the derived stage directly, not a
@@ -1160,10 +1163,23 @@ default left beside the compiled reader would refuse the whole arm.
   have dropped the drift line with no red anywhere. A consumer whose config
   still holds the old path degrades to no drift line, which is the same
   degrade an absent report always had.
-- `CONTEXT_KIT_STAGE_RULES` — path to a stage→craft-rule pointer emitter
-  (doctrine-kit's `stage-rules.sh`); the session-context hook runs it with the
-  current stage for the brief's craft-rule block; default empty (the block is
-  omitted).
+- `CONTEXT_KIT_STAGE_RULES` — the **command** that emits stage→craft-rule
+  pointers, not a path: the session-context hook runs it with the current stage
+  appended for the brief's craft-rule block, and carries no `-f` guard. Default
+  empty (the block is omitted); this repo's own copy sets doctrine-kit's
+  `--emit stage-rules` invocation (doctrine-kit/SPEC.md §stage-rules).
+  **It was a path to a bash script until 2026-09-03**, widened when that emitter
+  ported to a compiled arm — a command a consumer can still point anywhere,
+  which is what porting a knob's *value* leaves intact. The honest limit, stated
+  because the migration is not free for everyone: a consumer whose config holds a
+  bare **executable** script path keeps working, a command of one word; a
+  consumer whose config holds a path to a **non-executable** script — which is
+  what this repo's own default was, run under an explicit `bash` — stops working,
+  because the `bash` prefix the hook used to supply is gone. That is one line of
+  config to migrate, and it is what lets the knob name a compiled arm at all.
+  **The knob is not renamed to `…_CMD`**: a rename costs every consumer a config
+  edit for a contract that widens rather than changes subject, and strands its
+  citations in two SPECs and a template.
 - `CONTEXT_KIT_STATE_FILE` — the lifecycle evidence file whose **last data
   line** carries the stage cursor the hook routes on (§The session-context
   hook); default `${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt`. Read

@@ -341,10 +341,13 @@ point at a synthetic agent and doctrine file.
 
 The engineering-craft rules are load-triggered — behind the doctrine link, not
 digested (§The doctrine deliverable) — and a *stage* is itself a load trigger.
-`bin/stage-rules.sh <stage>` closes that gap: it derives, for a given stage, the
+The `--emit-stage-rules` arm closes that gap: it derives, for a given stage, the
 craft rules that bear on it and emits one pointer line per hit, so a session
 entering a stage is reminded of the craft rules to follow *before* the matching
-action, without the always-loaded surface carrying the prose.
+action, without the always-loaded surface carrying the prose. **The `## stage-rules`
+heading is the section name, not a file name** — the shell emitter it was named
+after ported on 2026-09-03 and the citations in `context-kit/SPEC.md` and both
+READMEs resolve against this heading.
 
 **The tag grammar (single source: the rule owns its stage).** Each rule under
 `## Engineering-craft rules` in `DOCTRINE.md` carries a machine-parsable trailer
@@ -355,21 +358,72 @@ carries its own routing and no consumer-side stage↔rule table exists to drift;
 `check-doctrine-registration` assertion D holds every craft rule to exactly one
 well-formed trailer.
 
-**The emitter.** `bin/stage-rules.sh <stage> [doctrine-file]` scans the craft
+**The emitter.** `run-gates.sh --emit stage-rules <stage> [doctrine-file]` scans
+the craft
 section for rules whose `*Stages:*` line names the given stage and prints one
 pointer line each — rule number, name, and the doctrine path — so the reader
 follows the link to the rule body. An unknown stage name yields empty output:
 the tags name the kit-default stages, so a consumer with a renamed stage set
 gets no routing rather than wrong routing (the stated honest limit — a stage
-remap knob is deferred until such a consumer exists). It sources
-`lib/doctrine.sh` for the doctrine path and takes the same positional override
-the gate and installer do; a missing doctrine file is exit 2, an absent craft
-section or a no-match stage is empty output.
+remap knob is deferred until such a consumer exists). A missing doctrine file is
+exit 2, an absent craft section or a no-match stage is empty output.
+
+**It is a bridged `Arm::Emit` member** (gate-sdk/SPEC.md §The non-gate arm),
+reached through the generic `--emit <name>` composer rather than a front-end
+branch of its own, because its contract is a **document** and both of its
+failures — a missing `<stage>` and an unreadable doctrine file — are already the
+exit 2 that variant collapses every error to. Its declared roster is the one knob
+it resolves, `DOCTRINE_KIT_DOCTRINE_FILE`, which crosses the config bridge by
+`lib/doctrine.sh` being sourced: a hardcoded top-level flag would resolve a
+platform default and silently ignore every consumer override. The
+`[doctrine-file]` positional is **kept** rather than dropped as a config
+redirection, because the sibling surfaces it exists to match — `install-doctrine.sh
+[agent-file [doctrine-file]]` and the gate — still take theirs, and dropping it
+here alone would break the symmetry this section states in one sentence with
+them; the arm reads the knob when it is absent and the positional when present,
+the shell precedence unchanged.
+
+**Both graceful limits are preserved verbatim, and that is an instruction rather
+than an omission.** The idiomatic compiled write of a stage lookup that matches
+nothing is an error or a diagnostic, and either would close a stated honest limit
+inside a port. An unknown stage and an absent craft section are each **exit 0
+with empty output**, the same disposition §upgrade-smoke's worktree predicate
+took. The craft-section heading `## Engineering-craft rules` moves into the crate
+module as a literal and stays **kit mechanism** (the kit ships `DOCTRINE.md`),
+never config: what crosses to a consumer is the rule content — numbers, names and
+`*Stages:*` routings — all of which stays in the doctrine file and is read at run
+time. The arm bakes **no stage vocabulary**: each parsed token is compared against
+the `<stage>` its caller supplies, so no kit literal spells any project's stages.
+
+**Criterion 6 is discharged by the duplication being absent rather than
+machine-held.** `lib/doctrine.sh` is permanently `# no-port:` as the config
+bridge's sole resolver for the `DOCTRINE_KIT_*` knobs, and this member's one knob
+crosses that bridge — so the value is computed in exactly one place and the crate
+holds no default to drift. The member sourced that one library and reached no
+other helper, which is the enumeration the criterion demands. **Criterion 5's
+residual is narrow, real and invisible**: a vendored consumer on a host the
+artifact roster does not cover loses the craft-rule pointer block outright, where
+a shell script used to give it to them. It is advisory output in a session brief
+rather than a gate, so the loss is a smaller brief and never a broken battery —
+and because the hook swallows every failure (below), it is silent, which is why
+it is stated here rather than filed under the class's usual terms.
 
 **The surfacing seam.** The emitter is derived data with no standing tier of its
 own; context-kit's session-context hook is its named consumer, emitting the
-current stage's pointer block when the emitter is vendored
+current stage's pointer block when the knob resolves
 (context-kit/SPEC.md §The session-context hook, the drift-line seam precedent).
+**The seam's contract widened from a path to a command with this port**, which is
+that section's to state — a compiled arm has no path to `-f` and is not a script
+`bash` can run. What did **not** move is the seam itself: `CONTEXT_KIT_STAGE_RULES`
+still resolves whatever a consumer sets, still defaults to empty in the kit
+template, and the block is still silently absent when unset, exactly as
+`DRIFT_KIT_KPI_DIRS` still resolves a consumer plugin after the bundled KPIs went
+in-crate. **The hook's swallow is preserved verbatim** (`2>/dev/null … || true`):
+it is the documented behavior of an advisory step, and repairing it inside a port
+would be fixing the rules the port carries. The cost is that a port leaving the
+knob stale renders no block and reds nowhere — no gate reads whether the block
+still renders — which is why the porting session proved it by an observed hook
+run rather than off the diff.
 
 ## lib/doctrine.sh
 

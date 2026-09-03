@@ -19,6 +19,7 @@ pub mod pub_lang;
 pub mod queue_counts;
 pub mod queue_edges;
 pub mod queue_index;
+pub mod stage_rules;
 pub mod roadmap;
 pub mod trajectory;
 pub mod upgrade_smoke;
@@ -337,6 +338,14 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         "--emit-cite-survey",
         Arm::Emit(cite_survey::emit),
         cite_survey::KNOBS,
+    ),
+    // spec: doctrine-kit/SPEC.md §stage-rules — an `Arm::Emit` because the contract is a document
+    // and both its failures are already exit 2, which is the variant's own collapse; reached
+    // through the generic `--emit <name>` composer rather than a front-end branch of its own
+    (
+        "--emit-stage-rules",
+        Arm::Emit(stage_rules::emit),
+        stage_rules::KNOBS,
     ),
     // spec: gate-sdk/SPEC.md §run-gates — the battery runner: the class's first bridged member
     // that returns a verdict rather than a document, and the reason the table is keyed by flag

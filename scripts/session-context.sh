@@ -11,7 +11,7 @@ RUN_GATES="gate-sdk/bin/run-gates.sh"             # the --emit front-end: the qu
 CTX_BIN="context-kit/bin"                         # context-kit env probe
 NATIVE_BIN="$(bash -c 'source gate-sdk/lib/gate.sh; gate_native_bin' 2>/dev/null)"  # the binary those arms dispatch to
 DRIFT_ARM="${CONTEXT_KIT_DRIFT_REPORT:-drift-report}"  # drift-kit trend line: an --emit arm name
-STAGE_RULES="${CONTEXT_KIT_STAGE_RULES:-doctrine-kit/bin/stage-rules.sh}"  # doctrine-kit craft-rule router
+STAGE_RULES="${CONTEXT_KIT_STAGE_RULES:-bash gate-sdk/bin/run-gates.sh --emit stage-rules}"  # doctrine-kit craft-rule router: a command, not a path
 STATE_FILE="${CONTEXT_KIT_STATE_FILE:-${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt}"  # lifecycle stage cursor
 
 echo "── Session context (context-kit session-context hook) ──────────────────"
@@ -119,8 +119,8 @@ Before opening source for a task, run the matching surface index first
 EOF
 
 # spec: context-kit/SPEC.md §The session-context hook — step 8 suppressed for a lead (executor-facing)
-if [[ "$role" != lead && -n "$stage" && -n "$STAGE_RULES" && -f "$STAGE_RULES" ]]; then
-    rules_block="$(bash "$STAGE_RULES" "$stage" 2>/dev/null)" || true
+if [[ "$role" != lead && -n "$stage" && -n "$STAGE_RULES" ]]; then
+    rules_block="$(bash -c "$STAGE_RULES \"\$1\"" stage-rules "$stage" 2>/dev/null)" || true
     if [[ -n "$rules_block" ]]; then
         echo
         echo "Craft rules for the $stage stage — follow the doctrine link before the matching action:"

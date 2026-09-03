@@ -116,8 +116,8 @@ Before opening source for a task, run the matching surface index first
 EOF
 
 # spec: context-kit/SPEC.md §The session-context hook — step 8 stage-routed craft-rule pointers; doctrine-kit owns the emitter, the seam is this optional block (drift-line precedent); suppressed for a lead (executor-facing)
-if [[ "$role" != lead && -n "$stage" && -n "$STAGE_RULES" && -f "$STAGE_RULES" ]]; then
-    rules_block="$(bash "$STAGE_RULES" "$stage" 2>/dev/null)" || true
+if [[ "$role" != lead && -n "$stage" && -n "$STAGE_RULES" ]]; then
+    rules_block="$(bash -c "$STAGE_RULES \"\$1\"" stage-rules "$stage" 2>/dev/null)" || true
     if [[ -n "$rules_block" ]]; then
         echo
         echo "Craft rules for the $stage stage — follow the doctrine link before the matching action:"

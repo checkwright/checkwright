@@ -2166,7 +2166,8 @@ name out of `gates::REGISTRY`. It also carries arms that are **not** gates —
 `--emit-queue-edges` are its 2026-08-31 members; `--emit-md-index`,
 `--emit-md-section` and `--emit-pub-index`, context-kit's three index-first
 reading tools, plus `--emit-file-survey` and `--emit-cite-survey`, lifecycle-kit's
-two survey-record affordances, its 2026-09-01 ones), the **harness-integration**
+two survey-record affordances, its 2026-09-01 ones; `--emit-stage-rules`,
+doctrine-kit's craft-rule router, its 2026-09-03 one), the **harness-integration**
 arms below it, and two bridged `Arm::Run` members that are neither —
 `--lesson-sink` (queue-kit/SPEC.md §The lesson-sink arm) and `--upgrade-smoke`
 (§upgrade-smoke) — and the class
@@ -2528,6 +2529,16 @@ split is the whole grammar its callers read. `Arm::Emit` collapses that to 0-or-
 just as surely, so the rule binds on any member whose *status distinctions* carry
 meaning, not only on one that forwards a child's. Its callers are a validate suite
 and a session, so it is not a harness-integration arm either (§upgrade-smoke).
+
+**The test's *emitting* side is thin on worked instances and gains one at
+`--emit-stage-rules`** (doctrine-kit/SPEC.md §stage-rules, 2026-09-03). Read the
+rule in both directions: the `--emit-` spelling is **available** exactly where a
+member's whole exit grammar already *is* `Arm::Emit`'s collapse. That member's
+contract is a document — one pointer line per routed rule, on stdout — and both of
+its failures, a missing `<stage>` and an unreadable doctrine file, were already
+exit 2 in the shell form it ported from. Nothing is lost in the collapse, so the
+family choice is forced here too, in the opposite direction, and a session
+reading only the refusal above would take the rule for a one-way ban.
 
 **`--run` is the class's first bridged member that returns a verdict rather than
 a document** (§run-gates). It satisfies the three properties: it is

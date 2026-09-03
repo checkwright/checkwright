@@ -30,7 +30,8 @@ well-formed per-rule trailer — `*Stages:*` routing on the craft register,
 `*Digest:*` on the methodology register — fail-closed when a scanned file or
 heading is missing.
 
-The emitter — `bin/stage-rules.sh <stage>` — reads those trailers and prints the
+The emitter — `bash gate-sdk/bin/run-gates.sh --emit stage-rules <stage>` — reads
+those trailers and prints the
 craft-rule pointers that bear on a stage, so a session entering it is reminded of
 the rules to follow before the matching action. It is derived, load-triggered
 data: context-kit's session-context hook is its consumer.
