@@ -572,7 +572,8 @@
   `gate-binary-target-roster-widening`, which shipped both repairs and reached `## Done` — cleared
   from it since, so recover it from git history and not that section (corrected 2026-08-30 at
   scope, which found this pointing at an empty `## Done`).
-  TRAJECTORY.md §The closed rulings owns the amendment and its grounds.
+  The amendment's own record was retired 2026-09-03 as spent, its destination unit having shipped
+  and left the queue; recover its grounds from git history, as with the clearance above.
   `target_of_host` is still bootstrap step 2 wherever the bootstrap is built —
   what moved is the one-line repair, never the design, which stays this entry's whole.
   **MEASURED 2026-08-26 at close on a native Windows runner** (`platform-support-ci-matrix` round

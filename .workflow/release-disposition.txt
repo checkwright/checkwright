@@ -2,3 +2,4 @@
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
 
+declaration-install-and-stage-helper-cuts release deferred:v0.26.0 — minor: three shipped kit shell tools removed and re-pointed at bridged arms (behavior a consumer's tree may depend on), no deprecated surface removed so no decommission and no major; cadence fired nothing — the elapsed-time limb is dormant while the channel reads preview (operator 2026-08-31), no security or supply-chain fix, no operator direction, audience not arrived. Eighteenth deferral, floor unchanged at the outstanding v0.26.0.
