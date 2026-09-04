@@ -93,8 +93,14 @@ if ! out="$(_nosuites_cfg)" || ! grep -qF "0 configured suite(s)" <<<"$out"; the
     echo "  FAIL: an empty suite roster did not disarm cleanly at the declared early-out: $out"; fails=$((fails + 1))
 fi
 
-# H — a suite roster the bridge could not carry is exit 2, never a clean run:
-#     the argv the bridge built, minus that one assignment, is exactly that state.
+# H — a suite roster the bridge could not carry is exit 2, never a clean run. The
+#     argv the bridge built, minus that one assignment, is NOT by itself that
+#     state: the knob is a bridged scalar, which (unlike the old unexportable
+#     EVIDENCE_KIT_SUITES bash array) survives a process boundary, so a caller
+#     such as --run-validate that has it in its own env leaves it ambient for
+#     every child it spawns regardless of what that child's own argv omits.
+#     Isolation needs the name gone from both the argv this case builds AND the
+#     inherited environment, which is what the explicit unset below buys back.
 _unresolvable() {
     local d="$tmp/unres"; mkdir -p "$d/scripts"
     printf 'EVIDENCE_KIT_SUITES=(gates)\n' >"$d/scripts/evidence-config.sh"
@@ -107,6 +113,7 @@ _unresolvable() {
         && for a in "${argv[@]}"; do
                [[ "$a" == GATE_SDK_KNOB_EVIDENCE_KIT_SUITES=* ]] || kept+=("$a")
            done \
+        && unset GATE_SDK_KNOB_EVIDENCE_KIT_SUITES \
         && "${kept[@]}" base.txt 2>&1 )
 }
 out="$(_unresolvable)"; rc=$?
