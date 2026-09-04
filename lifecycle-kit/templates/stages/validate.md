@@ -84,3 +84,9 @@ suite, what the red is, and why it is accepted rather than fixed. The contract,
 its narrowings, and the fact that reaching for it twice in one iteration is the
 failure: lifecycle-kit/SPEC.md §bin/enter-stage.sh. With no ledger configured
 there is no valve, and an accepted red stops here as it always did.
+
+**Last step — the resume journal.** This stage's exit artifact is the resume
+journal `enter-stage.sh` named at the stamp; its path is a derivation
+(lifecycle-kit/SPEC.md §The state machine) and its contract is
+delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps.
+Append `DONE` as the file's last line before you report.

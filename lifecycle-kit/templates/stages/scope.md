@@ -178,3 +178,9 @@ choice at this boundary — driving the rest under a lead versus steering the
 stages by hand, or a plain "no lead — run the stages by hand" line for a
 lead-less or harness-less consumer; point at the consumer's documented
 start sequence by citation, never restating its steps here>*.
+
+**Last step — the resume journal.** This stage's exit artifact is the resume
+journal `enter-stage.sh` named at the stamp; its path is a derivation
+(lifecycle-kit/SPEC.md §The state machine) and its contract is
+delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps.
+Append `DONE` as the file's last line before you report.

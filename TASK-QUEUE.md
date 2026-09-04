@@ -12,57 +12,6 @@
 
 ## New Features
 
-- **stage-journal-absence-caught-only-downstream** [spec: SPEC-stage-journal.md] — a stage
-  session can complete, stamp and commit a full evidence spine while leaving
-  no resume journal at all, and the only thing that notices is the NEXT
-  stage's entry, by which time the session that owed it is gone.
-  **PROMOTED INTO THIS ITERATION BY THE OPERATOR 2026-09-04, lead-relayed: the port-only
-  run is reopened for this ONE non-port unit, which only the operator may do.** No yield is
-  created for anything else and the run is not otherwise weakened. Declined twice before on
-  the run and not on merit (2026-09-03, 2026-09-04), then promoted when the third
-  recurrence below crossed the routing clause `threshold-recurrence-routing-residency`
-  carries, which ends lead discretion at two. **The SECTION MOVE WAS NOT SCOPE'S, and that
-  was probed rather than assumed** — `check-amendment-queue` reds an unpromoted tag left in
-  an active section, so spec made the move with the amendment, which is what promoting a
-  feature entry IS (canon-kit/SPEC.md §The amendment lifecycle, the bidirectional rule).
-  ruled: stage-journal-absence-caught-only-downstream operator 2026-09-04 lead-relay
-  **Attested 2026-08-30 at this close.** The validate session of
-  `consumer-smoke-contract-port` left no validate journal, and the
-  predecessor-journal assertion refused close's entry. The assertion works —
-  that is not the finding. The finding is WHEN it fires: it was EVALUATED at spec,
-  align, build and validate and PASSED each time, so close is the first REFUSAL and not
-  the first firing, the gap bullet's "fired at the LAST stage" was wrong, and the config
-  comment's prediction, being about evaluation, was correct.
-  **What the refusal cost.** The close took the documented escape — writing the stand-in
-  itself and stating that validate left none — rather than forcing the entry, so the
-  absence is recorded. But a stand-in written by a session that did not do the work can
-  only point at durable artifacts; it cannot carry validate's reasoning, lost there.
-  **The four candidate shapes are COSTED AND RULED in the amendment**, which also carries
-  the three refusals and their grounds; the shape taken is the entry tool opening the
-  journal at its own stamp plus the obligation landing on the stage templates, which
-  carried it on no surface at all. The unit stays a LIFECYCLE one: the shape that would
-  have moved it to delegation-kit is the refused report-assertion one.
-  **DISTINCT from the boundary keep-list entries**, which own the wipe's reach over
-  journals that EXIST; this entry's subject is a journal never written at all.
-  **Cost while deferred:** one iteration's stage reasoning is lost per firing, and the
-  loss is discovered by the one session structurally unable to make it good.
-  **Second occurrence 2026-08-31 (`harness-hook-arm-port`) re-priced the cost downward:**
-  align left none, build's entry refused, and the journal was recovered from the
-  still-resumable align session — so the permanent loss above holds only where the owing
-  session is gone. Two questions the gap bullet raised were falsified at the drain: the
-  obligation is **already** the stage's, not the dispatch's (lifecycle-kit/SPEC.md §The
-  state machine, in those words), and the assertion is **not** `--simulate`-only.
-  **Two more 2026-09-02 (`test-runner-and-upgrade-cuts-with-liveness-attribution`): align
-  AND validate both left none in one iteration — sonnet tier, complete reports, explicit
-  grants. A rate, not a scatter; align's session was gone before close looked. A FIFTH
-  2026-09-04 (`usage-verdict-cut`) at align, recovered live as 194 reconstructed lines:
-  two iterations in three. Its zero-findings pairing is the align-watch's.**
-  **THRESHOLD: DECLINED ON THE RUN, NOT ON MERIT, 2026-09-03 and again 2026-09-04 — one of five.**
-  ruled: stage-journal-absence-caught-only-downstream lead 2026-09-03 2026-09-04 own-authority
-  recurrence: stage-journal-absence-caught-only-downstream 2026-08-31 2026-09-02 2026-09-04
-  Filed 2026-08-30 by close from the gap inbox, with the bullet's own
-  overstatement corrected at the drain.
-
 ## Technical Debt
 
 ## Deferred
@@ -9847,5 +9796,7 @@
 - **release-record-retired-knob** [design-pending] — A removal's basis may not name its own knob.
 
 ## Done
+
+- stage-journal-absence-caught-only-downstream
 
 ## Lessons Learned

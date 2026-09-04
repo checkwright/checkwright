@@ -104,3 +104,9 @@ contracts is one — `check-stage-entry` will demand the audit stamp at the next
 stage's entry), otherwise the build stage. A `spec` that authored a
 cross-component amendment should say so rather than let the downstream entry
 discover it.
+
+**Last step — the resume journal.** This stage's exit artifact is the resume
+journal `enter-stage.sh` named at the stamp; its path is a derivation
+(lifecycle-kit/SPEC.md §The state machine) and its contract is
+delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps.
+Append `DONE` as the file's last line before you report.

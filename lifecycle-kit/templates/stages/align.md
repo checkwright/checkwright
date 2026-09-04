@@ -96,3 +96,9 @@ symbol under its plausible spellings **and** the directory that would own it —
 or write the claim bounded ("no match for X") rather than absolute. When scope authored a new gate, the
 audit is that gate's first real run — the drift it surfaces is a backfill
 worklist to land before build, not a reason the gate is wrong.
+
+**Last step — the resume journal.** This stage's exit artifact is the resume
+journal `enter-stage.sh` named at the stamp; its path is a derivation
+(lifecycle-kit/SPEC.md §The state machine) and its contract is
+delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps.
+Append `DONE` as the file's last line before you report.

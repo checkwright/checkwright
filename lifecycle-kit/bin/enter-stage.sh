@@ -395,10 +395,13 @@ if [[ "$first" == 0 && "$LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE" == "1" ]]; then
     if [[ -n "$pred_stage" ]]; then
         pred_journal="$(lifecycle_stage_journal "$pred_stage")"
         pred_why=""
+        # spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — three-way, because the opener made unwritten a state distinct from absent: absent means this tool never ran for that stage, unwritten means it ran and the session did not
         if [[ ! -f "$pred_journal" ]]; then
             pred_why="does not exist"
         elif [[ ! -s "$pred_journal" ]]; then
             pred_why="is empty"
+        elif ! lifecycle_stage_journal_written "$pred_journal"; then
+            pred_why="carries only this tool's own opening line(s) — it was opened at that stage's entry and never written into"
         fi
         if [[ -n "$pred_why" ]]; then
             if [[ "$sim" == 1 ]]; then
@@ -406,7 +409,7 @@ if [[ "$first" == 0 && "$LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE" == "1" ]]; then
             else
                 echo "enter-stage: entry to '$stage' refused — the predecessor stage '$pred_stage' left no resume journal: $pred_journal $pred_why (nothing written)." >&2
             fi
-            relay_help "write $pred_journal yourself, stating plainly that '$pred_stage' left none, then re-run enter-stage $stage. The assertion is evadable by design and this is the escape: what it buys is that the absence becomes deliberate and written instead of silent and unnoticed, at the one moment someone is looking."
+            relay_help "append to $pred_journal yourself, stating plainly that '$pred_stage' left none, then re-run enter-stage $stage. The assertion is evadable by design and this is the escape: what it buys is that the absence becomes deliberate and written instead of silent and unnoticed, at the one moment someone is looking. Where the file exists, its opening line already names the session that owed it and when, so the stand-in is an append under a header rather than a record invented from nothing."
             exit 1
         fi
     fi
@@ -593,6 +596,17 @@ if [[ "$first" == 1 && -d "$tmpdir" ]]; then
     mapfile -t wiped < <(find "$tmpdir" "${wipe_args[@]}" -print -delete 2>/dev/null)
 fi
 
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the journal open runs after the boundary wipe and never under --simulate: a skeleton written ahead of the wipe is deleted by it silently, and the first stage would then look like every firing of the absence this opener exists to remove
+journal_path=""
+if [[ "$LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE" == "1" ]]; then
+    if journal_path="$(lifecycle_stage_journal_open "$stage" "$stamp_iter" "$id" "$today" "$head_at")"; then
+        :
+    else
+        echo "enter-stage: the stamp landed, but the resume journal at $journal_path could not be opened — write it yourself." >&2
+        journal_path=""
+    fi
+fi
+
 if [[ ${#valve_report[@]} -gt 0 ]]; then
     valve_emit
     echo "  valve reason: $valve_reason"
@@ -612,6 +626,9 @@ if [[ ${#truncated[@]} -gt 0 ]]; then
 fi
 if [[ ${#wiped[@]} -gt 0 ]]; then
     echo "  note: boundary-wiped from $tmpdir: ${wiped[*]}"
+fi
+if [[ -n "$journal_path" ]]; then
+    echo "  note: resume journal opened at $journal_path — land your findings there as you confirm them; your stage template's last step owns what it owes at the end."
 fi
 
 # spec: lifecycle-kit/SPEC.md §The survey record — the read trigger: the entry report prints the record's headings (the questions), never the findings, at the one moment a stage session is guaranteed to be looking. Findings stay behind the witness — printing them here would put a possibly-stale judgment into context ahead of the check that qualifies it. A non-empty record never refuses the boundary: unlike the gap inbox one line above, a survey owes nobody a disposition.

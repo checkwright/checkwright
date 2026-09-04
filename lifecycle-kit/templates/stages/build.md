@@ -102,3 +102,9 @@ change carrying an artifact surface — a change whose real output is a deployed
 or generated artifact — names that surface and exercises the artifact
 deployment-faithfully before the stage exits; a green battery is tree-correct,
 not artifact-correct (Oracle-first).
+
+**Last step — the resume journal.** This stage's exit artifact is the resume
+journal `enter-stage.sh` named at the stamp; its path is a derivation
+(lifecycle-kit/SPEC.md §The state machine) and its contract is
+delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps.
+Append `DONE` as the file's last line before you report.

@@ -8,7 +8,7 @@ const TAIL: &str = ", applying the bindings below.";
 
 // spec: lifecycle-kit/SPEC.md §check-skill-binding — the binding directive, anchored at both
 // ends as the shell form's `sed -nE` is, and the first such line in the shim wins
-fn template_of(text: &str) -> Option<&str> {
+pub fn template_of(text: &str) -> Option<&str> {
     text.lines().find_map(|l| {
         l.strip_prefix(LEAD)
             .and_then(|r| r.strip_suffix(TAIL))

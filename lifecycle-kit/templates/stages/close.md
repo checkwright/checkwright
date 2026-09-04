@@ -222,3 +222,9 @@ session.
    substitutes for this** — an identity check grades that a login exists, never
    which one is selected, and the selected identity is evidence only about the
    moment the write happens, which is why the mechanism has to be a stage step.
+
+**Last step — the resume journal.** This stage's exit artifact is the resume
+journal `enter-stage.sh` named at the stamp; its path is a derivation
+(lifecycle-kit/SPEC.md §The state machine) and its contract is
+delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps.
+Append `DONE` as the file's last line before you report.

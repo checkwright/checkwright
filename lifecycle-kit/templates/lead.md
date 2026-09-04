@@ -107,9 +107,31 @@ the lead wants good news.
 The lead never hand-derives prior-stage completeness — reading WORKFLOW-STATE
 or the git log to decide whether a dispatch may proceed re-derives what the
 machinery already rules on. It dispatches and trusts `enter-stage.sh`'s
-fail-closed refusal (relayed in the stage session's report), or gates an
-expensive dispatch cheaply first with `enter-stage.sh --simulate <stage>`
+fail-closed refusal (relayed in the stage session's report), and it gates every
+dispatch cheaply first with `enter-stage.sh --simulate <next stage>`
 (lifecycle-kit/SPEC.md §bin/enter-stage.sh) — oracle-first made concrete.
+
+**That read is a step rather than one of two options, and the ground is what it
+catches.** A would-be refusal naming a predecessor's missing resume journal is
+relayed while the session that owed it is still at its most likely to be
+resumable; unrun, the same finding arrives at the next stage's entry, by which
+time the owing session is usually gone and its reasoning with it. The recoveries
+that cost a round trip and the losses that cost a whole stage's reasoning are
+separated by exactly this read, which is one command.
+
+**Its limit is stated with it, because a step whose failure mode is unstated
+reads as a guarantee.** It moves detection from the next stage's entry to just
+before the next stage's dispatch — earlier by one dispatch and by no more. It
+does not reach a session that ends between the lead's two reads, and where no
+lead runs it does not exist at all. The repair that reaches every stage session
+on every path is the stage template's own last step
+(lifecycle-kit/SPEC.md §templates/stages/); this is the backstop.
+
+**Mandatory is not sufficient.** The step lands *after* the completion
+notification is in hand, never instead of waiting for it: it composes with the
+dispatch precondition above and never substitutes for it. A cleared `--simulate`
+authorizes nothing on its own, which the precondition says in its own words and
+the next paragraph explains.
 
 **That rule and the precondition above answer different questions, and reading
 them as one makes the pair unusable.** This one is a *gating* rule: *may stage

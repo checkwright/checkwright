@@ -66,6 +66,26 @@ lifecycle_stage_journal() {
     printf '%s\n' "${LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN//<stage>/$1}"
 }
 
+# spec: lifecycle-kit/SPEC.md §The state machine — the opening line's fixed lead, spelled once because two readers must agree on it by construction: the opener writes it and the entry assertion tells the tool's own bytes from a session's by it
+LIFECYCLE_STAGE_JOURNAL_MARK='# stage-journal '
+
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the opener: append, never overwrite, so a stage running several sessions accumulates a heading per session instead of losing its predecessors' work. The heading carries the stamp's own five fields, so an unwritten journal names who owed it and when. Prints the path it wrote, which is the entering session's only source for it.
+lifecycle_stage_journal_open() { # <stage> <iteration> <session-id> <date> <head>
+    local p dir
+    p="$(lifecycle_stage_journal "$1")"
+    printf '%s\n' "$p"
+    dir="$(dirname "$p")"
+    [[ -d "$dir" ]] || mkdir -p "$dir" || return 1
+    [[ -s "$p" ]] && printf '\n' >> "$p"
+    printf '%s%s — %s %s %s %s\n' "$LIFECYCLE_STAGE_JOURNAL_MARK" "$1" "$2" "$3" "$4" "$5" >> "$p"
+}
+
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the predicate the entry assertion reads. Non-emptiness went vacuous the moment the opener started writing the file, so "the owing session wrote something" is a line that is neither blank nor an opener heading — the same assertion as before, restated against a file the tool itself creates.
+lifecycle_stage_journal_written() { # <path>
+    [[ -s "$1" ]] || return 1
+    grep -qv -e '^[[:space:]]*$' -e "^$LIFECYCLE_STAGE_JOURNAL_MARK" "$1"
+}
+
 declare -p LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS &>/dev/null || LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS=("*/SPEC.md")
 
 # spec: lifecycle-kit/SPEC.md §The survey record — the surfaces held to the no-retrieval-pointer rule; the queue file alone by default because it is the one permanent surface this kit owns and where both attested firings landed, so the default is non-vacuous in every consumer and over-reaches in none

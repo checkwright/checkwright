@@ -1,1 +1,1 @@
-no skill for stage: close
+no journal step:    commands/validate.md

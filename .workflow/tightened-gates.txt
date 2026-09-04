@@ -7,3 +7,4 @@ check-action-run-shell
 check-template-registry-parity
 check-path-dialect
 check-gate-substrate-parity
+check-stage-skill-coverage

@@ -1,9 +1,20 @@
 // spec: lifecycle-kit/SPEC.md §check-stage-skill-coverage — the configured stage set and the
-// skills dir cover each other: every stage has a skill, every enter-stage-invoking skill
-// names a live stage
+// skills dir cover each other, and every stage's executed surface carries the journal
+// obligation's citation
+use crate::gates::skill_binding;
 use crate::stages;
 use crate::walk;
 use std::path::Path;
+
+// spec: lifecycle-kit/SPEC.md §check-stage-skill-coverage — the marker is this citation and
+// never a sentence: a gate matching prose would become that prose's second author
+const JOURNAL_CITATION: &str = "lifecycle-kit/SPEC.md §The state machine";
+
+// spec: lifecycle-kit/SPEC.md §check-stage-skill-coverage — whitespace is collapsed before the
+// search so a citation the author wrapped across two lines still resolves
+fn normalized(text: &str) -> String {
+    text.split_whitespace().collect::<Vec<&str>>().join(" ")
+}
 
 // spec: lifecycle-kit/SPEC.md §check-stage-skill-coverage — the shell form's
 // `enter-stage\.sh[[:space:]]+[a-z][a-z-]*`: a gate-owned literal shape, so it is matched
@@ -100,7 +111,29 @@ pub fn run(args: &[String]) -> i32 {
         }
     }
 
-    if !missing.is_empty() || !orphan.is_empty() {
+    // spec: lifecycle-kit/SPEC.md §check-stage-skill-coverage — the third direction reads the
+    // surface the stage session actually executes: the template a binding shim names, or the
+    // skill itself where it names none, so the copy-and-specialize fork is covered too
+    let mut uncited: Vec<String> = Vec::new();
+    for s in &stage_set {
+        let skill = format!("{}/{}.md", dir, s);
+        let Ok(bytes) = std::fs::read(&skill) else {
+            continue;
+        };
+        let text = String::from_utf8_lossy(&bytes).into_owned();
+        let (surface, body) = match skill_binding::template_of(&text) {
+            Some(t) => match std::fs::read(t) {
+                Ok(tb) => (t.to_string(), String::from_utf8_lossy(&tb).into_owned()),
+                Err(_) => continue,
+            },
+            None => (skill.clone(), text.clone()),
+        };
+        if !normalized(&body).contains(JOURNAL_CITATION) {
+            uncited.push(format!("{} (stage '{}')", surface, s));
+        }
+    }
+
+    if !missing.is_empty() || !orphan.is_empty() || !uncited.is_empty() {
         println!(
             "check-stage-skill-coverage: stage set ({}) and skills dir {}",
             stage_set.join(" "),
@@ -114,13 +147,20 @@ pub fn run(args: &[String]) -> i32 {
         for o in &orphan {
             println!("  orphan skill:       {}", o);
         }
+        for u in &uncited {
+            println!("  no journal step:    {}", u);
+        }
         println!("  help: add the missing <stage>.md skill, or retire the orphan skill / fix the");
         println!("        stage name it invokes. The stage set is LIFECYCLE_KIT_STAGES (lifecycle-config.sh).");
+        println!(
+            "  help: a stage's executed surface owes the resume-journal step, marked by its"
+        );
+        println!("        '{}' citation.", JOURNAL_CITATION);
         return 1;
     }
 
     println!(
-        "STAGE-SKILL-COVERAGE: clean ({} stage(s) each have a skill; every enter-stage-invoking skill in {} names a live stage)",
+        "STAGE-SKILL-COVERAGE: clean ({} stage(s) each have a skill; every enter-stage-invoking skill in {} names a live stage; every stage's executed surface cites the journal step)",
         stage_set.len(),
         dir
     );
@@ -147,5 +187,15 @@ mod tests {
             invoked_stages("enter-stage.sh build\nenter-stage.sh build\n"),
             vec!["build".to_string()]
         );
+    }
+
+    // spec: lifecycle-kit/SPEC.md §check-stage-skill-coverage — the citation resolves across the
+    // line break an author's wrap puts in it, and a near-miss is not a match
+    #[test]
+    fn the_citation_survives_a_wrap_and_a_near_miss_is_not_a_match() {
+        assert!(normalized("cite (lifecycle-kit/SPEC.md\n§The state machine) here")
+            .contains(JOURNAL_CITATION));
+        assert!(!normalized("cite lifecycle-kit/SPEC.md §The stamp protocol")
+            .contains(JOURNAL_CITATION));
     }
 }

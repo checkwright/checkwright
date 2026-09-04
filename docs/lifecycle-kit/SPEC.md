@@ -87,9 +87,55 @@ writes into it, when, and who may delete it (delegation-kit/SPEC.md §Resume
 journal — agent writes, scratch reset sweeps). What lives here is the **path**,
 because only the stage machine knows the stage: `LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN`
 carries a `<stage>` placeholder, and expanding it is the one derivation a
-dispatching supervisor, a stage session and a stage entry all read. Nothing about
-the contract is restated here and nothing about the path is stated there — the
-owner-and-pointer split, held across the seam rather than inside one surface.
+dispatching supervisor, a stage session and a stage entry all read. Its fourth
+reader is a **writer**: the entry tool opens the journal at the stamp and reports
+the path it wrote (§bin/enter-stage.sh), so the derivation is computed once, by
+one tool, at one moment, and no surface gains a second spelling of it. Nothing
+about the contract is restated here and nothing about the path is stated there —
+the owner-and-pointer split, held across the seam rather than inside one surface.
+
+**The obligation is instructed where the owing session reads it, and not only
+asserted downstream.** Ruling it here made it true of the kit and false of its
+surfaces: it was asserted at the *next* stage's entry, by which time the session
+that owed the journal is typically gone, and no surface a stage session loads
+said anything about it. A supervisor's own agent definition is not that surface —
+it reaches a dispatched session only, and this kit sanctions running a stage as an
+ordinary skill invocation with no supervisor at all. The repair is the stage
+template's **last step**, mirroring the stamp's first step and naming the journal
+as the stage's own exit artifact (§templates/stages/): one instruction, on the one
+surface every stage session loads on every dispatch path. A second detector would
+have been the wrong shape — what was missing was the instruction, and the
+detector that existed was the only thing that ever noticed.
+
+**Three other shapes were available and each is refused on a stated ground**, put
+here so a later reader finds the disposition beside the option rather than
+re-deriving it:
+
+- **An assertion at the session's own turn end, wired to a harness stop event.**
+  The strongest-looking shape, because it fires while the owing session is still
+  live. It is **not mechanizable as stated**: the subagent stop event is *not* the
+  session-end event (delegation-kit/SPEC.md §The delegation model, which records
+  it firing repeatedly inside one dispatched session that had ended no turn at
+  all) — so an assertion wired there fires from the first assistant step, when no
+  journal legitimately exists yet, with no signal telling an intermediate step
+  from a return. Two further holes are structural: a stage run with no supervisor
+  is the top-level session, whose turn end that kit deliberately leaves
+  unregistered, and a worktree-isolated session's stop log resolves against its
+  own cwd and dies with the worktree.
+- **The returning report asserts the path it wrote.** Unenforceable by
+  construction, not by anyone's appetite: a return lives in the parent's context
+  and leaves no artifact
+  (delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps),
+  so tree state is byte-identical whether a return was held or invented, and no
+  scanner over a repository reaches a conversation. It also points the wrong actor
+  at the wrong evidence — §templates/lead.md forbids the supervisor
+  hand-deriving prior-stage completeness and directs it at the machinery instead.
+  This is also the shape that would have moved the unit into delegation-kit;
+  refusing it is what keeps it here.
+- **Accept the escape and trust the successor.** The status quo, and its price is
+  the record: what the escape buys is real and unchanged — an absence that is
+  deliberate and written — but it is bought after the reasoning is gone, by the one
+  session structurally unable to reconstruct it.
 
 **The derivation is the enabling move, and it is why this was unoracled before.**
 A path invented per dispatch leaves no record on disk of what was granted, so no
@@ -633,12 +679,21 @@ the clause's reader is a human or agent rather than a gate.
   default is the scratch dir's own knob followed by `/<stage>-journal.md`, so the
   scratch dir's literal is deferred to rather than restated here. A pattern
   carrying no placeholder is a fail-closed config refusal (§lib/stages.sh).
-- `LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE` — `0` or `1`; default `0`. At `1` a stage
-  entry refuses when the cursor's stage left no journal at that derived path
-  (§bin/enter-stage.sh). Defaulted **off** because the assertion reads the
-  *predecessor*: switching it on mid-iteration asserts against sessions
+- `LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE` — `0` or `1`; default `0`. At `1` the entry
+  tool opens the entering stage's journal at that derived path and a stage entry
+  refuses when the cursor's stage left no written journal there
+  (§bin/enter-stage.sh). One knob gates both, so at the default the opener is inert
+  along with the assertion it serves. Defaulted **off** because the assertion reads
+  the *predecessor*: switching it on mid-iteration asserts against sessions
   dispatched before the rule existed, so a consumer throws it at an iteration
   boundary, where a refusal costs a re-entry rather than a wedge.
+
+The journal opener and `check-stage-skill-coverage`'s third direction add **no
+knob and no tree entry**, and this roster says so because a change that adds a
+writer and a gate direction reads as one that should have added both. The
+opener's inputs are the pattern and the require flag, already resolved here for
+the assertion; the gate direction's input is the executed surface it derives from
+the skills dir it already reads (§check-stage-skill-coverage).
 - `LIFECYCLE_KIT_SHIM_NGRAM` — the shared-n-gram width `check-shim-restatement`
   trips at (positive integer; §check-shim-restatement); default `9`.
 - `LIFECYCLE_KIT_SHIM_DEDUP_CORPUS` — that gate's corpus file list; default
@@ -1799,6 +1854,15 @@ assertion checks a path nobody was asked to write. Its readers are
 the path it grants, and the dispatched stage session deriving where to write
 (§The state machine).
 
+Two members sit beside it, hoisted on the same ground: `lifecycle_stage_journal_open`
+writes the journal's opening line and prints the path it wrote, and
+`lifecycle_stage_journal_written` is the predicate the entry assertion reads. They
+share the derivation above **and** one spelling of the opening line's fixed lead,
+so the writer and the reader that must tell the tool's own bytes from a session's
+cannot drift apart — the failure a second literal here would make silent, since a
+diverged reader passes on every skeleton rather than erroring
+(§bin/enter-stage.sh).
+
 The validator roster is fail-closed on **shape, not merely on presence**, and
 `LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE` states the rule the others follow: a
 non-empty pattern must compile as a POSIX ERE and must declare a capture group,
@@ -2420,6 +2484,32 @@ names no path here, the ledger's location being consumer configuration and a kit
 literal spelling one consumer's workflow-directory layout being the seam this
 knob's empty default already holds.
 
+**The tool opens the entering stage's journal and reports the path it wrote**,
+under the same `LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE` gate as the assertion below,
+so at the kit default a consumer who has not taken the feature gains no file. It
+writes the opening line — the stamp's own five fields, no new field anywhere —
+and prints the path in its report, which is the entering session's source for it
+and lets the stage template's last step name *the journal the entry tool named*
+rather than restate a knob-driven derivation on every stage surface
+(§templates/stages/). What this buys is that **the absence stops being an
+absence**: a session that writes nothing now leaves a file naming who owed it and
+when, so the escape below becomes an append under a header rather than a record
+invented from nothing. Three behaviours are pinned, each being a way to get it
+wrong:
+
+- **It appends where a journal exists, and never overwrites.** A stage may run
+  several sessions and §The state machine rules they share one file, so a second
+  session's entry appends a heading naming itself — which mechanizes the
+  discriminator-belongs-in-a-heading rule that section states and a dispatcher
+  otherwise has to remember.
+- **It writes nothing under `--simulate`.** That mode's contract is that it runs
+  everything up to the write and writes nothing; a skeleton written there would
+  make a read-only probe perform a real state write.
+- **It writes after the boundary wipe, not before.** The first stage of an
+  iteration truncates the state file and then wipes the scratch dir; a skeleton
+  written ahead of that wipe is deleted by it, silently, and that entry would then
+  look like every firing of the absence the opener exists to remove.
+
 **The predecessor-journal assertion runs in that same pre-flight**, gated by
 `LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE` and defaulting off. At `1`, an entry
 refuses when the stage the cursor names left no journal at its derived path
@@ -2435,7 +2525,18 @@ consequence of an existing ruling rather than a carve-out:
   entering session exists *because* the previous stage returned — so asserting
   the marker would mint an obligation its owning section already retires at
   exactly this transition. Absent and empty are told apart in the message,
-  because they are different mistakes.
+  because they are different mistakes. **What non-emptiness means is restated on
+  a file the tool itself opens**: the predicate is that the journal carries a line
+  the opener did not write — neither blank nor an opening line, the two sharing
+  one spelling of that line's shape in `lib/stages.sh` so writer and reader cannot
+  drift. This is the same assertion, not a wider one. Non-emptiness meant *the
+  owing session wrote something*; once the tool opens the file, a bare
+  non-emptiness test passes on every skeleton and asserts nothing at all. Read the
+  other way round it is the opener's own debt: a tool that opens a file owes the
+  assertion that reads it a way to tell its own bytes from a session's. The
+  message discriminates all three states it now earns — **absent** (this tool
+  never ran for that stage), **unwritten** (it ran and the session did not, whether
+  the file is empty or carries opening lines only), and **written**.
 - **The in-iteration predecessor only.** The boundary reset wipes the scratch dir
   at the first stage's entry and `LIFECYCLE_KIT_BOUNDARY_PRESERVE` deliberately
   does not keep **stage** journals, so the first stage of an iteration has no
@@ -2459,7 +2560,11 @@ was that nobody knew one had not. A session that writes "the predecessor left
 none" has produced the recovery record the channel exists for, at the one moment
 someone is looking. The escape is also what keeps the refusal off the deadlock
 class: a refusal with no reachable exit would wedge the lifecycle behind a
-session that has already ended and cannot be asked to fix anything.
+session that has already ended and cannot be asked to fix anything. The opener
+**strengthens** that ground rather than weakening it: where the file exists, its
+opening line already names the session that owed the journal and when, so the
+stand-in is an append under a header rather than a fabricated record — and the
+escape clears an unwritten journal exactly as it clears an absent one.
 
 **Default `0`, and the switch is thrown at a boundary rather than mid-iteration.**
 `REQUIRE=1` asserts against the *predecessor*, so enabling it inside a running
@@ -2490,8 +2595,13 @@ usage/config error, as a real entry.
 rather than a courtesy.** A refusal's `help:` line is its actionable half — the
 real refusal's own design rests on that (§The committed gap inbox) — so each one
 prints under `--simulate` as well, prefixed like every other simulate line. The
-mode's designed consumer is the lead (§templates/lead.md), which gates an
-expensive dispatch on it rather than hand-deriving prior-stage completeness;
+mode's designed consumer is the lead (§templates/lead.md), which runs it before
+every dispatch rather than hand-deriving prior-stage completeness — a **step**
+there rather than one of two options, on the ground that a would-be refusal
+naming a missing predecessor journal is relayed while the session that owed it is
+still at its most likely to be resumable. That step is *gating* and never
+*liveness*: it composes with the lead's dispatch precondition and never
+substitutes for it, which that template states where it states both;
 relaying a verdict while withholding the one line that resolves it hands that
 consumer the refusal and keeps the recovery, which is measured rather than
 supposed — a lead reading a simulated boundary refusal escalated a question the
@@ -3203,16 +3313,50 @@ mechanical residual.
 
 Invariant: the configured stage set and the skills dir (`LIFECYCLE_KIT_SKILLS_DIR`,
 default `.claude/commands`; override with the first argument) cover each other,
-both directions. Forward: every `LIFECYCLE_KIT_STAGES` member has a `<stage>.md`
+**three directions**. Forward: every `LIFECYCLE_KIT_STAGES` member has a `<stage>.md`
 skill file — a stage with no skill cannot be entered. Reverse: every skill file
 that invokes `enter-stage.sh` names a live stage in the token it passes. The
 `enter-stage.sh` invocation is the mechanical marker separating a stage skill
 from an ordinary one, so a retired stage's orphan skill (its `.md` still
 invoking a now-unknown stage) reddens without false-flagging a non-stage skill
 like `/agent-execution`, which never invokes `enter-stage.sh`. A skills dir that
-does not exist is fail-closed (exit 2). The `# graph:` couples the skills dir at
-`tier=precommit`; the whole-tree `run-gates.sh` battery backstops a stage-set
-edit (`lifecycle-config.sh`), which is not itself in the coupled surface.
+does not exist is fail-closed (exit 2).
+
+Third: every configured stage's **executed surface** carries the resume-journal
+step (§templates/stages/, §The state machine). Without it that step is a sentence
+a later template edit drops with nothing noticing — which is the very failure
+class the step exists to close, reproduced one level up, so the fix and its gate
+land as one unit. The direction rides this member rather than a new one because
+it is a direction on this member's own invariant: it already resolves
+`LIFECYCLE_KIT_STAGES` and already uses a mechanical marker in a file to tell a
+stage surface from an ordinary one.
+
+**The executed surface is derived, never configured.** For a stage whose skill
+carries a binding directive it is the template that directive names — the
+resolver `check-skill-binding` already owns — and for a copy-and-specialize skill
+carrying none it is the skill file itself, since that is then the surface the
+stage session executes. So the fork mode is covered rather than exempted, and no
+knob and no second positional is added to reach the template directory. A
+directive naming a file that does not exist is skipped here: that finding is
+`check-skill-binding`'s, and one defect owes one reporting gate rather than a
+second that says the same thing.
+
+**The marker is a citation, never a sentence.** What the gate asserts is the
+step's `lifecycle-kit/SPEC.md §The state machine` citation — a token
+`check-spec-pointer` resolves in the same battery — so no prose is duplicated for
+a gate to match and no gate becomes a second author of wording it does not own. A
+gate matching a sentence acquires editorial control over that sentence. Whitespace
+is collapsed before the search, so a citation an author wrapped across two lines
+still resolves.
+
+The `# graph:` couples the skills dir **and the stage-template dir** at
+`tier=precommit`, the coupling `check-skill-binding` already carries one section
+down, so an edit to either surface fires the gate; the whole-tree `run-gates.sh`
+battery backstops a stage-set edit (`lifecycle-config.sh`), which is not itself in
+the coupled surface. The `good/`+`bad/` pair drives the citation direction — a
+fixture stage set whose surfaces all carry it, and one where a single stage's does
+not; `gate-tests/check-stage-skill-coverage.test.sh` covers the forward and
+reverse directions and the bound-template resolution the one pair cannot hold.
 
 ### check-skill-binding
 
@@ -3566,10 +3710,38 @@ compel a filer to answer the advisory, and the judgment itself is the drain's
 The stage-skill templates (`scope`/`align`/`build`/`validate`/`close`) carry
 the generic stage spine — the stamp first step (performed by invoking
 `enter-stage.sh <stage>` and stating in one line what it does), each stage's
-trigger/ordering rules, and its stage-local doctrine — with **named slots**
-where the consumer's rule content goes. The templates are the owned surface:
-this section states the contract a consumer skill must satisfy and never
-restates what a template carries.
+trigger/ordering rules, its stage-local doctrine, and the **resume-journal last
+step** — with **named slots** where the consumer's rule content goes. The
+templates are the owned surface: this section states the contract a consumer
+skill must satisfy and never restates what a template carries.
+
+**The last step mirrors the first, and its placement is the residency doctrine
+applied rather than a preference.** delegation-kit/SPEC.md §Operative residency
+puts a rule on the surface its bound actor loads, and for a stage session that
+surface is the stage template — the one thing every stage session reads, under a
+supervisor and without one alike. The step **points and does not restate**: the
+journal's contract is delegation-kit's and its path is §The state machine's, so a
+step restating either would put a second carrier on a rule one pointer away. It
+therefore names the **act** — append `DONE` as the file's last line before
+reporting — and cites the two owners, which is also what keeps it short enough
+that `LIFECYCLE_KIT_SHIM_NGRAM`'s bar is nowhere near approached. Naming that one
+act discharges the whole obligation: the marker is meaningful only as the last
+line, so appending it entails that the file exists and that the session wrote into
+it. A consumer's binding **does not** restate the step — a binding that did would
+be `check-shim-restatement`'s subject, the kit templates being its corpus — and
+`check-stage-skill-coverage`'s third direction holds every configured stage's
+executed surface to carrying it.
+
+**The step instructs a marker the entry does not assert, and the two look like one
+change.** §bin/enter-stage.sh's first narrowing — *existence and non-emptiness,
+never the `DONE` marker* — stands untouched, on its own ground that a stage entry
+is not a cold read. Nor is the step the self-asserted completion marker §The stamp
+protocol refuses: that refusal is scoped to the **cursor**, a marker a state
+surface would read as proof of completion, and no surface reads this one — not the
+entry assertion, which reads existence and content, and not any state-machine
+surface, none of which consumes it at all. `DONE` is delegation-kit's own contract
+clause, already spelled and already read there; the step instructs a session to
+discharge it and mints nothing.
 
 Alongside the default-roster templates the kit ships **`spec.md`**, an optional
 **amendment-authoring** stage template — the generative half of design, split
