@@ -26,6 +26,7 @@ usage: run-gates.sh [gates-dir]                run every registered gate
        run-gates.sh --hook <member>            dispatch a harness hook member, payload on stdin
        run-gates.sh --statusline               render the harness status line, payload on stdin
        run-gates.sh --usage-poll               refresh the usage snapshot from its source
+       run-gates.sh --usage-verdict [paths]    budget verdict: 0 OK/RESET-OK, 1 PAUSE, 2 STALE
        run-gates.sh --lesson-sink <tag>        route a lesson body on stdin to its sink
        run-gates.sh --upgrade-smoke            prove the FROM->TO kit upgrade in scratch
        run-gates.sh --install-lifecycle [file] install the lifecycle resident surfaces
@@ -51,6 +52,12 @@ usage: run-gates.sh [gates-dir]                run every registered gate
   --usage-poll  runs one poll cycle against the usage source and rewrites the
           snapshot. Its caller is a refresh command or a session rather than a
           gate on a tool call, so it refuses with exit 2 when unavailable.
+  --usage-verdict  emits one budget verdict line on stdout from the usage
+          snapshot: exit 0 OK / RESET-OK, 1 PAUSE, 2 STALE or unreadable
+          (budget-unknown, which never blocks delegation). Two optional
+          positionals override the snapshot and credentials paths for test
+          injection; a path beginning with a dash is passed after `--`.
+          Unavailable is exit 2, the same code an unreadable snapshot takes.
   --lesson-sink  reads a lesson body on stdin and runs the sink configured for
           <tag>, or appends to <workflow-dir>/<tag>-harvest.md when none is.
           The sink's exit status is this arm's, so a failing sink is visible to
@@ -147,6 +154,13 @@ case "${1-}" in
     --usage-poll)
         shift
         exec_arm --usage-poll "$@"
+        ;;
+    # spec: delegation-kit/SPEC.md §usage-verdict — a bridged arm outside the `--emit-` family: a
+    # three-state exit status an emitting arm collapses. Unavailable keeps exit 2 — the arm gates
+    # no tool call and 2 is already this rule's own budget-unknown code
+    --usage-verdict)
+        shift
+        exec_arm --usage-verdict "$@"
         ;;
     # spec: queue-kit/SPEC.md §The lesson-sink arm — a bridged arm outside the `--emit-` family,
     # because its contract is the sink's exit status and an emitting arm collapses it. It keeps

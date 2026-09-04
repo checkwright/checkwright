@@ -442,6 +442,14 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         Arm::Run(crate::hook::poll::run),
         crate::hook::poll::KNOBS,
     ),
+    // spec: delegation-kit/SPEC.md §usage-verdict — an `Arm::Run` because its three-state exit
+    // status carries a 1 a hook grades, which an emitting arm collapses to {0, 2}; its callers are
+    // a session brief, a kit smoke and a gate in process, so it is no harness-integration arm
+    (
+        "--usage-verdict",
+        Arm::Run(crate::hook::verdict::run),
+        crate::hook::verdict::KNOBS,
+    ),
     // spec: gate-sdk/SPEC.md §upgrade-smoke — the two-phase upgrade proof: an `Arm::Run` because
     // its contract is the 1-versus-2 split of its exit status, which an emitting arm collapses, and
     // a table member because it resolves six knobs a hardcoded flag would silently ignore

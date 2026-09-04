@@ -10,6 +10,7 @@ pub mod poll;
 pub mod statusline;
 pub mod stop_liveness;
 pub mod usage;
+pub mod verdict;
 pub mod wakeup;
 pub mod workflow_state;
 
