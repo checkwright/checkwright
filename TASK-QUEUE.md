@@ -9890,6 +9890,38 @@
   Filed 2026-09-05 to the gap inbox at validate and amended there the same day; promoted
   2026-09-05 by close.
 
+- **release-note-removal-declaration-uncoupled** [design-pending] — no oracle couples a removed
+  adopter-facing entry point to its release-note declaration, so a note that omits one passes
+  green and the adopter meets the omission as a broken invocation at upgrade time.
+  **The instance is measured, not predicted.** The `evidence-runner-trend-and-install-hooks-cuts`
+  iteration deleted four documented kit `bin/` tools — `evidence-kit/bin/run-validate.sh`,
+  `evidence-kit/bin/diff-baseline.sh`, `delegation-kit/bin/usage-trend.sh`,
+  `gate-sdk/bin/install-hooks.sh` — and re-spelled each as a bridged arm.
+  **Why the version contract does not catch it.** Under docs/install.md §Versioning that is a
+  MINOR under the pre-1.0 qualifier and not a major: decommission is scoped there to removing a
+  DEPRECATED surface over the `CANON_KIT_DEPRECATION_MARKERS` roster, and none of the four carried
+  a marker. So the whole protection an adopter gets is that the note declares the move and phase B
+  of the upgrade contract reconciles it — and nothing checks that the note actually declares it.
+  **Probed rather than assumed.** `check-release-bump`'s subject is note ordering and section
+  presence: it reds a patch-only bump whose note declares behavior changes, and never reads the
+  DIFF. `check-docs-cmd`'s invoked-path scan runs only inside a fence, so it cannot see a removal
+  at all.
+  **The candidate oracle is cheap and derivable:** diff the tracked `*/bin/*.sh` set between the
+  newest released tag and the release commit, and require every disappeared path to appear in the
+  pending note's declaration-bearing sections.
+  **DISTINCT from `installer-printed-followup-commands-uncovered`**, promoted at that same close:
+  that owns a printed command inside installer shell source with no gate corpus reaching it, and
+  this owns the coupling between a REMOVAL and a NOTE — a different surface, a different oracle.
+  **Product-class under TRAJECTORY.md's 2026-08-30 witness discriminator**, which is what keeps it
+  off the one-line icebox tier: it blocks no stage entry and no push, but its demand witness is an
+  adopter upgrade rather than this repo's own accounting.
+  **Cost while deferred:** each release that decommissions an entry point re-buys a hand review
+  nobody is obliged to run, and the failure surfaces in an adopter's tree rather than in ours.
+  Filed 2026-09-05 to the gap inbox by the close of `evidence-runner-trend-and-install-hooks-cuts`;
+  promoted here at this iteration's scope, →fix refused (a new gate is build work, not scope's) and
+  →icebox refused on the product witness above. Deferred and not active: the port-only run bars an
+  active-section promotion (TRAJECTORY.md §PRIORITY DIRECTIVE, 2026-09-04).
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
