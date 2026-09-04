@@ -4,10 +4,4 @@
 
 ---
 
-evidence-runner-trend-and-install-hooks-cuts scope ab03c87e 2026-09-04 285cc1cb
-evidence-runner-trend-and-install-hooks-cuts spec a05cb5b4 2026-09-04 5d759cc2
-evidence-runner-trend-and-install-hooks-cuts align adc1a5b3 2026-09-04 7b7160c3
-evidence-runner-trend-and-install-hooks-cuts build a39c9e16 2026-09-04 de11f36b
-evidence-runner-trend-and-install-hooks-cuts build a680d76f 2026-09-04 6c42d3b8
-evidence-runner-trend-and-install-hooks-cuts validate a9a56d53 2026-09-05 756fecd4
-evidence-runner-trend-and-install-hooks-cuts close a412934f 2026-09-05 170d51db
+— scope a0fa10e5 2026-09-05 156576c0
