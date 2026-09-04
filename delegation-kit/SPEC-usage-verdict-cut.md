@@ -591,14 +591,19 @@ The narrowing is the deletion of one file from the tracked `*.sh` tree:
 - `check-crate-arms` — gains rather than loses: one new module and its
   `#[cfg(test)]` coverage join the lint and test arms it runs at every commit.
 
-**Cross-component signal: this amendment's component set is three** —
-delegation-kit (§usage-verdict, §Testing, §Layout and configuration), gate-sdk
-(§The non-gate arm, §The bin/-tool contract, §check-assertion-strength) and the
-crate's hook layer, which is not a kit but whose `HOOKS` roster and budget member
-change contract here — so `check-stage-entry` assertion C fires and the **align
-stamp is demanded at the build stage's entry**. Stated here so the build session is
-not the one that learns it, and it is the reason this session recommends the audit
-stage next.
+**Cross-component signal: two kit contracts change and a third component moves
+with them** — delegation-kit (§usage-verdict, §Testing, §Layout and configuration)
+and gate-sdk (§The non-gate arm, §The bin/-tool contract,
+§check-assertion-strength), plus the crate's hook layer, which is not a kit but
+whose `HOOKS` roster and budget member change here. `check-stage-entry` assertion
+C therefore fires and the **align stamp is demanded at the build stage's entry**.
+That is measured rather than predicted: `enter-stage.sh --simulate build` refuses
+the entry and reports the amendment "references 3 components: canon-kit
+delegation-kit gate-sdk" — the assertion counts SPEC citations, so it reads
+canon-kit off this amendment's methodology cite rather than off a contract change
+there, and the trigger arms on the two that do change contract regardless. Stated
+here so the build session is not the one that learns it, and it is the reason this
+session recommends the audit stage next.
 
 ## Existing sections updated
 
