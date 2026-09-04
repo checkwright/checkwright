@@ -4,11 +4,4 @@
 
 ---
 
-scan-prompts-cut scope a7360185 2026-09-03 5171a2b4
-scan-prompts-cut spec a30ae3fc 2026-09-04 0e7d8363
-scan-prompts-cut align adea03eb 2026-09-04 a94290f9
-scan-prompts-cut build abcb30e8 2026-09-04 242cb6d3
-scan-prompts-cut build a504bdea 2026-09-04 ad2c338d
-scan-prompts-cut build a94ebcfe 2026-09-04 70b49360
-scan-prompts-cut validate af3f4a2d 2026-09-04 c171c7ec
-scan-prompts-cut close ade21c53 2026-09-04 0f7c60bb
+— scope ae215f26 2026-09-04 07b275af
