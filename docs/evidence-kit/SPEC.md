@@ -495,8 +495,12 @@ reasons they are load-bearing). A trap rather than a tail line, because the
 script exits from many guard and fail-closed sites besides its terminal exit, and
 a tail-line release would leak the lock on every failure path — the population
 that matters most, since a crashed run is exactly when a stale lock appears. The
-idiom precedent is `gate-sdk/bin/run-gates.sh --enter-stage`, which claims temp files
-under a scratch dir with an `EXIT` trap.
+idiom precedent is `gate-sdk/bin/run-gates.sh --enter-stage`, which claims temp
+files under a scratch dir and reclaims them on every exit path. That arm is
+compiled, so it spells the idiom as a destructor (`impl Drop for Scratch`,
+`native/src/emit/enter_stage.rs`) rather than as a trap; what the precedent
+carries across substrates is the reclaim-on-every-path property, not the
+mechanism.
 
 **It refuses to start while a live lock is held**, and the refusal falls out of
 the atomic claim rather than being a second mechanism: the claim either succeeds
@@ -796,9 +800,15 @@ reason** and calling this predicate on it (lifecycle-kit/SPEC.md
 §bin/enter-stage.sh). The record it reads is git's, not this kit's grammar — so
 the *gate* does not reach it — but the **predicate** is deliberately shared, so
 how liveness is decided has one holder and a second lifecycle surface cannot
-drift from this one. The caller sources `lib/evidence.sh` only when its
-lock-reason pattern is configured, so this kit does not become a hard dependency
-of that one. Two consequences of the ruling above ride along unchanged and are
+drift from this one. The caller reaches the predicate as an in-crate call and
+makes it **only when its lock-reason pattern is configured** — with the pattern
+unset every worktree classifies as unclassified and the predicate is never
+asked. The port changed the *shape* of that independence rather than its effect,
+and the difference is worth one line because it is the kind a reader assumes
+away: the deleted shell caller sourced this kit's library conditionally, while a
+compiled module is linked whether or not it is ever called, so the whole of the
+guard now sits at the call site.
+Two consequences of the ruling above ride along unchanged and are
 worth the caller knowing: the `kill -0`-then-`ps -p` pair means a holder running
 under another uid reads **alive** rather than free, and the accepted PID-reuse
 residual means a recycled pid reads **live** — in the worktree caller that

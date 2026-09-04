@@ -563,8 +563,8 @@ evidence, first measured 2026-09-03 at scope and corrected where it stands at ea
 `installer/README.md` §The install boundary sequences `init`'s unconditional remainder behind the
 artifact roster covering every supported platform, and
 its port-oracle paragraph holds every `installer/lib` and `installer/bin` file `owed` until that
-relocation lands — **ten of the port oracle's thirty-five owed files, 1237 lines** (2026-09-04, at
-close). So 28.6 % of the owed column is gated on `platform-support-ci-matrix` and
+relocation lands — **ten of the port oracle's thirty-four owed files, 1237 lines** (2026-09-04, at
+close). So 29.4 % of the owed column is gated on `platform-support-ci-matrix` and
 `macos-install-smoke-ci-leg`, which the run's own composer cannot reach — and that share rises with
 no install-boundary line moving every time the run cuts a file it *can* reach, which is the
 direction worth watching rather than the figure; and `platform-support-ci-matrix` carries

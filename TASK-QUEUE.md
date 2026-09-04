@@ -376,7 +376,7 @@
   `enter-stage-flag-position-silently-ignored` (a trailing `--simulate` performs a real stamp)
   and `stamp-provenance-remedy-loops-when-uncommitted` (a gate's help prescribes a remedy that
   does not clear its red) — and the planning assumption is that those two fix,
-  the two port-disposition entries are two of the three retired above, and the rest icebox.
+  the two port-disposition entries are two of the four retired above, and the rest icebox.
   **Why [design-pending]:** per-slug exits are judgments the unit makes at build, not now;
   recovery of each body is mandatory before ruling on it.
   **Cost while deferred:** low, and it compounds — each close under the new order files new
@@ -863,10 +863,11 @@
 - **boundary-wipe-preserve-basename-reach** [design-pending] — the iteration-boundary scratch wipe
   matches its preserve list by **basename at any depth**, so one nested `.gitkeep` makes a whole
   scratch tree immortal and the wipe still reports success.
-  `gate-sdk/bin/run-gates.sh --enter-stage`'s boundary block runs
-  `find "$tmpdir" -mindepth 1 -depth ! -name .gitkeep [! -name <preserve>…] -print -delete`.
-  `! -name` is unanchored, so a `.gitkeep` at any depth survives, its parent's delete then fails
-  as non-empty, and every ancestor up to the scratch root survives with it.
+  `gate-sdk/bin/run-gates.sh --enter-stage`'s boundary block walks the scratch tree depth-first and
+  skips any entry whose **basename** equals `.gitkeep` or a preserve-list member (`wipe_walk`,
+  `native/src/emit/enter_stage.rs`). The test is on the basename alone with no path anchor, so a
+  `.gitkeep` at any depth survives, its parent's directory removal then fails as non-empty, and
+  every ancestor up to the scratch root survives with it.
   **Attested at this very boundary, not reasoned:** `.tmp/upgrepro/` survived this session's wipe
   intact — two full vendored kit payload copies — because
   `.tmp/upgrepro/{up,base}/package/payload/context-kit/gate-tests/check-memory-off/good/memory/.gitkeep`
@@ -2846,11 +2847,13 @@
   not a silent ignore, which is this repo's own fail-closed rule applied to its own tooling.
   A tool that silently discards what it cannot parse fails open on exactly the input a user
   got wrong.
-  **Why `[design-pending]`:** whether the refusal belongs in this script alone or as a shared
-  argument contract across `lifecycle-kit/bin/` is the open call — and the class reading is the
+  **Why `[design-pending]`:** whether the refusal belongs in this arm alone or as a shared
+  argument contract across the bridged arms is the open call — and the class reading is the
   one that held: `file-gap.sh` had the same symptom (`capture-affordance-help-flag`, it filed
   `--help` as a gap), and that closed 2026-08-13 as a shared `bin/` argument-shape contract over
-  five tools rather than as a fix to one script.
+  five tools rather than as a fix to one script. The shared-contract half is now a question about
+  the crate: `lifecycle-kit/bin/` was deleted whole at the 2026-09-04 port, so there is no shell
+  directory left over which to unify.
   Related and worth reading together: `enter-stage-simulate-no-write-fixture` (icebox) pins
   the no-write guard with a fixture, and would **not** have caught this — a fixture written
   the documented way puts the flag first and passes.
@@ -8880,10 +8883,17 @@
   **Measured 2026-08-29 at this close.** `.workflow/survey-record.md` carries **45 blank lines**
   between its contract header and its first block, which sits at line 47 of 94 — half the file is
   the residue of evicted blocks. The record is green under its own gate, so nothing surfaces it.
-  **The mechanism, read at the source.** The `--enter-stage` arm's truncation walks the
-  header run printing blanks and comment lines until the first data line sets its drop flag; the
-  newline that separates the header from the first surviving block is therefore carried across the
-  boundary and a fresh one is added when the next iteration's first block is appended.
+  **The mechanism, read at the source.** The `--enter-stage` arm's truncation
+  (`truncate_to_header`, `native/src/emit/enter_stage.rs`) holds each blank in a pending buffer,
+  flushes it only when a later comment line proves the header runs on, and breaks at the first data
+  line — discarding whatever is still pending.
+  **THE PORT APPEARS TO HAVE MOOTED THIS. Measured 2026-09-04 at close, not ruled there.** The
+  deleted shell printed each blank as it read it, which is what accreted; a buffer discarded at the
+  break cannot. `.workflow/survey-record.md` held **45** blank lines before its first block at the
+  2026-08-29 measurement above and holds **one** now, after a boundary truncation by the compiled
+  arm. One is the steady state — the append adds it, the next truncation discards it — so the
+  per-iteration growth this entry is named for is gone. Left standing rather than taken to the done
+  exit by the session that measured it, the exit being a queue disposition and not a close's call.
   **Why it stays design-pending rather than a one-line fix.** The truncation is shared by every
   boundary-truncated member, including the lesson-evidence file and any consumer-declared member,
   and a blank line inside a multi-line header is legitimate. Collapsing the run to header-plus-one
