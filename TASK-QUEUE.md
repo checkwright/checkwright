@@ -8877,33 +8877,6 @@
   Filed 2026-08-29 by close, from its vacuous-assertion sweep's byproduct notes, the guard read at
   its source before the finding was accepted.
 
-- **boundary-truncate-blank-run-accretes** [design-pending] — the boundary truncation preserves
-  every blank line ahead of the first data line, so a surface whose blocks are appended with a
-  leading newline gains one permanent blank per iteration.
-  **Measured 2026-08-29 at this close.** `.workflow/survey-record.md` carries **45 blank lines**
-  between its contract header and its first block, which sits at line 47 of 94 — half the file is
-  the residue of evicted blocks. The record is green under its own gate, so nothing surfaces it.
-  **The mechanism, read at the source.** The `--enter-stage` arm's truncation
-  (`truncate_to_header`, `native/src/emit/enter_stage.rs`) holds each blank in a pending buffer,
-  flushes it only when a later comment line proves the header runs on, and breaks at the first data
-  line — discarding whatever is still pending.
-  **THE PORT APPEARS TO HAVE MOOTED THIS. Measured 2026-09-04 at close, not ruled there.** The
-  deleted shell printed each blank as it read it, which is what accreted; a buffer discarded at the
-  break cannot. `.workflow/survey-record.md` held **45** blank lines before its first block at the
-  2026-08-29 measurement above and holds **one** now, after a boundary truncation by the compiled
-  arm. One is the steady state — the append adds it, the next truncation discards it — so the
-  per-iteration growth this entry is named for is gone. Left standing rather than taken to the done
-  exit by the session that measured it, the exit being a queue disposition and not a close's call.
-  **Why it stays design-pending rather than a one-line fix.** The truncation is shared by every
-  boundary-truncated member, including the lesson-evidence file and any consumer-declared member,
-  and a blank line inside a multi-line header is legitimate. Collapsing the run to header-plus-one
-  is a behaviour change to a kit tool with fixtures and a smoke, so it is build work with an oracle
-  to write, not a close-stage edit.
-  **Cost while deferred:** cosmetic today and unbounded in the tail — one line per iteration on
-  every truncated surface, paid as a record whose head no reader can scan.
-  Filed 2026-08-29 to the gap inbox by spec, probed there; promoted 2026-08-29 by close, the
-  count re-measured and the truncation read at its source.
-
 - **amendment-roster-omission-detection** [design-pending] — an amendment's `## Existing sections
   updated` roster can be short by a surface, and only a grep finds the missing one.
   **Returned from the icebox 2026-08-29 on a recurrence that broke the cost line it was iceboxed
@@ -9793,5 +9766,7 @@
 - **friction-key-segment-selection-unruled** [design-pending] — Which segment to key is unruled.
 
 ## Done
+
+- boundary-truncate-blank-run-accretes
 
 ## Lessons Learned
