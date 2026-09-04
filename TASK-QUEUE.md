@@ -9696,6 +9696,39 @@
   Filed 2026-07-20 by the `verdict-reader-honesty` close; iceboxed later; restored to Deferred
   2026-09-04 at the gap drain on the zero-reach condition build filed at the landing.
 
+- **audit-roster-row-carry-unruled** [design-pending] — every close appends its sweep reading to
+  the audit-roster row it swept and nothing ever compacts one, so the file has grown past the
+  point where the close step that must read it can.
+  **Re-measured at this drain rather than carried.** `wc -c .workflow/audit-roster.txt` reads
+  **270392** bytes over 11 lines — larger than the filing bullet's 266418 two commits earlier.
+  Seven of those lines are data rows, one row per line, at 10991 / 25427 / 28291 / 36186 / 47746 /
+  54797 / 65785 bytes. The Read tool refuses the whole file at a 256KB cap, so the close skill's
+  mandated **Audit-roster review** sub-step (`.claude/commands/close.md:36`) can now only reach a
+  row through hand-built substring probes — it reads the slug, `due:` and `last:` while
+  structurally NOT reading the accumulated body those fields exist to be judged against.
+  **The design question this waits on, and why no session may just pick one.** Three shapes are
+  visible and none is costed: compact each row to its current standing reading and let git history
+  hold the retired ones; split one row per file under a roster directory; or cap a row and force
+  the appending close to compress. Which is right turns on whether a row's accumulated prior
+  readings are load-bearing for a later judge or are history — and
+  doctrine-kit/DOCTRINE.md's Enforcement-first cadence clause, which owns this roster, says
+  nothing about the roster's own carry. Any of the three adds a name to a governed surface, so
+  this is feature-class and owes an amendment.
+  **A second fact about the same surface, folded in because a remedy for one touches the other:**
+  the file is TRACKED, so the close-surface derivation's capture-tier arm never reaches it and it
+  appears in no `--emit close-surfaces` row, declared or otherwise. That is the situation
+  CLAUDE.md §Housekeeping handles for `.workflow/preflight-valve.txt` with an explicit
+  `close-surface:` declaration and a stated reason; the audit roster has none. It is not UNREAD,
+  so this is a declaration asymmetry between two same-class surfaces and not a missed read.
+  **Cost while deferred:** recurring and accumulating — each close adds roughly 7KB and performs
+  a degraded review, so the mandated step's evidentiary value falls every iteration while the
+  roster keeps its authority. That live per-close trigger is why the icebox tier's
+  "no named event waiting to promote it" test fails here, and the machinery-class default
+  (TRAJECTORY.md, 2026-08-30) is defeated on the tier's own eligibility rule rather than ignored.
+  **NOT ASSERTED:** nobody has measured how much of a row's body a later judge actually uses.
+  Surfaced 2026-09-04 in the gap inbox by the `usage-verdict-cut` close's own later steps and
+  drained at the next iteration's scope entry, which is why its disposition is dated after it.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
@@ -9782,6 +9815,7 @@
 - **cited-object-token-sweep-corpus-narrower-than-the-class** [design-pending] — Corpus unruled.
 - **worktree-lock-start-time-guard-untaken** [design-pending] — Dormant until a consumer acts on it.
 - **worktree-cleanliness-assertion-scopes-to-checkout** [design-pending] — Reds on foreign dirt.
+- **release-record-retired-knob** [design-pending] — A removal's basis may not name its own knob.
 
 ## Done
 
