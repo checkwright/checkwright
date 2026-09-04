@@ -9694,6 +9694,36 @@
   Surfaced 2026-09-04 by the close of `wait-probe-cut-and-stage-journal-absence`; drained
   2026-09-04 at this iteration's scope entry, the boundary having carried it.
 
+- **ere-matcher-capture-groups-unowned** [design-pending] — the crate's POSIX ERE matcher reports
+  spans and cannot report a capture group, so the first consumer needing one shells out to bash.
+  **The sizing this falsifies, and the axis it falsifies it on.** gate-sdk/SPEC.md §The POSIX ERE
+  matcher rules the owed engine "a POSIX ERE matcher with leftmost-longest span reporting, and no
+  substitution engine or capture-group replacement", argued from the nine cohort-held members —
+  eight apply their pattern as a match test and one extracts a span. That argument is about GATE
+  members and holds for them. The `--enter-stage` arm is a non-gate arm, and the worktree-lock pid
+  pattern it reads is consumer config whose whole classification turns on the captured pid, so the
+  API foreclosure below it ("no future consumer can turn a match test into a substitution") was
+  written against a corpus that did not yet contain one.
+  **What shipped instead, ruled 2026-09-04 by the lead at the cut.** `capture_group_one` in
+  `native/src/emit/enter_stage.rs` runs the match through `bash -c` and reads `BASH_REMATCH[1]`.
+  Parity by construction, bash's `[[ =~ ]]` being the semantics the shell original had; the residue
+  is TWO ERE interpreters live on the stage-entry path, which can disagree on a pattern neither this
+  repo nor an adopter is barred from writing. Asserted at the cut, enforced by nothing afterwards.
+  **Verified at the close drain rather than taken from the filing bullet.** `native/src/ere.rs`
+  `enum Inst` is Byte/Split/Jmp/Bol/Eol/Match — there is no `Save`, so the gap is structural rather
+  than an unexposed API, and twenty crate modules reference `ere::`.
+  **COST OF THE FIX, which is why this is a unit and not a line item in a port cut.** A Pike-VM
+  upgrade: an `Inst::Save`, per-thread slot vectors, and a STATED POSIX leftmost-longest
+  subexpression rule — the sub-match rule is the half POSIX specifies and ordinary leftmost-first
+  engines get wrong — against a governed matcher carrying its own acceptance oracle.
+  **Deferred by ruling rather than by ranking.** An active-section promotion is barred by the
+  port-only run, which expressly does not bar a Deferred filing (TRAJECTORY.md §PRIORITY
+  DIRECTIVE); the icebox tier cannot take it either, the trigger being live — every stage entry
+  runs the path.
+  **Cost while deferred:** one bash spawn per iteration-boundary worktree row, and a divergence
+  invisible once green, since nothing compares the two interpreters.
+  Filed 2026-09-04 to the gap inbox by build; drained 2026-09-04 at this iteration's close.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
