@@ -339,6 +339,15 @@ partial manifest that used to survive such an abort was never admissible anyway 
 §check-evidence-manifest's close-entry assertion wants a clean line for every
 configured suite.
 
+**A run killed from outside lands in the same place and says nothing at all** — a
+`timeout`, a SIGTERM, a cancelled session. Stated here rather than left to be
+re-read off the spine, because it is the fact a caller needs *before* wrapping the
+spine in a deadline: the fold is the only write, so a kill at the roster's last
+suite discards every earlier suite's clean row exactly as a kill at its first one
+does. The remedy is to leave the spine unbounded, not to salvage a partial
+manifest — the sentence above already refuses that — and a deadline short enough
+to fire is the caller's defect rather than the spine's.
+
 The header is a wire-format version marker, not a doc pointer —
 gate-sdk/SPEC.md §The workflow directory rules that as one of the two payload
 forms a checked projection may carry, and this section is the statement that

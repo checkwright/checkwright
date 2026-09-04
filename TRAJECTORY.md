@@ -559,14 +559,17 @@ already on the record: ruled 2026-09-03 by the operator, lead-relayed from an in
 Nothing reopens now, and the iteration that raised it proceeded under the run unchanged; what the
 operator ruled is that the evidence below *is* grounds to reconsider **which cuts come first**, to
 be weighed at a consult rather than mid-iteration by whichever session happens to find it. The
-evidence, measured 2026-09-03 at scope: `installer/README.md` §The install boundary sequences
-`init`'s unconditional remainder behind the artifact roster covering every supported platform, and
+evidence, first measured 2026-09-03 at scope and corrected where it stands at each later reading:
+`installer/README.md` §The install boundary sequences `init`'s unconditional remainder behind the
+artifact roster covering every supported platform, and
 its port-oracle paragraph holds every `installer/lib` and `installer/bin` file `owed` until that
-relocation lands — **ten of the port oracle's forty owed files, 1237 lines**. So a quarter of the
-owed column is gated on `platform-support-ci-matrix` and `macos-install-smoke-ci-leg`, which the
-run's own composer cannot reach; and `platform-support-ci-matrix` carries **twelve inbound queue
-citations, the highest figure the `queue-edges` arm reports**, above
-`native-gate-port-remaining-corpus`'s eight. The reading this does **not** license, stated because
+relocation lands — **ten of the port oracle's thirty-five owed files, 1237 lines** (2026-09-04, at
+close). So 28.6 % of the owed column is gated on `platform-support-ci-matrix` and
+`macos-install-smoke-ci-leg`, which the run's own composer cannot reach — and that share rises with
+no install-boundary line moving every time the run cuts a file it *can* reach, which is the
+direction worth watching rather than the figure; and `platform-support-ci-matrix` carries
+**thirteen inbound queue citations, the highest figure the `queue-edges` arm reports**, above
+`native-gate-port-remaining-corpus`'s eleven. The reading this does **not** license, stated because
 it is the tempting one: the run is not weakened, no yield is created, and the exception set is
 still the operator-ruled hotfix alone.
 
@@ -577,14 +580,9 @@ the two operator-class blockers that hold the front end and the crate's build sc
 lawful cut; the two were already on record as needing one consult between them, and this joins the
 ordering question to them rather than scheduling a second sitting. The acting session is not
 imminent, which is why the schedule is recorded here in the moment it was made rather than carried
-in a thread. **The ground re-measured 2026-09-04 at scope, beside the 2026-09-03 figures above
-rather than replacing them, both being dated attestations:** the ten install-boundary files still
-total exactly 1237 lines while the oracle's owed column has fallen to thirty-six, so their share
-rose from a quarter to 27.8 % with no line moving; the two blockers add 531; and
-`platform-support-ci-matrix` now reads thirteen inbound citations against
-`native-gate-port-remaining-corpus`'s eleven, so the corpus's highest-centrality entry is still the
-one the composer cannot reach. Discharge event, unchanged: the consult that weighs it, at which
-point this paragraph is deleted whichever way that consult goes — or the paragraph above it retires
+in a thread. The two blockers hold 546 owed lines of their own, on top of the install boundary's
+1237. Discharge event, unchanged: the consult that weighs it, at which point this paragraph is
+deleted whichever way that consult goes — or the paragraph above it retires
 and takes this with it.
 
 **A sequence remainder of one is not a finished port, and reading it as one is the misreading

@@ -363,7 +363,11 @@
   `inline-interpreter-substrate-census`, `entry-compression-contract-unenforced`,
   `no-port-cause-validation-scoped-to-registry`, `boundary-preserve-covers-names-not-lifetimes`,
   `stage-journal-absence-caught-only-downstream`, `enter-stage-flag-position-silently-ignored`,
-  `stamp-provenance-remedy-loops-when-uncommitted`. Three of the ten are landed and retired.
+  `stamp-provenance-remedy-loops-when-uncommitted`. **Four of the ten are landed and retired, and
+  they are named rather than counted**, because a bare count leaves a reader unable to tell which
+  six are still owed: `kit-config-template-port-disposition`, `harness-template-port-disposition`,
+  `no-port-cause-validation-scoped-to-registry` and `stage-journal-absence-caught-only-downstream`,
+  the last of them at this close.
   **Deliverable:** every one of the ten takes exactly one of three exits, stated per slug in the
   landing commit — **fixed** (debt-shaped by the interstitial litmus, test-and-doc-complete, its
   slug on a bare `## Done` line), **iceboxed** (machinery finding blocking no entry or push,
@@ -5784,8 +5788,8 @@
   clause completes the scope contract's own threshold paragraph, which already puts a
   threshold collision "in front of the authority this stage already escalates to" and stops short
   of saying where that authority changes. Exercised again at this very scope, which is the
-  evidence rather than the argument: `stage-stamp-ordering-unenforced` stands at three
-  recurrences and its last two declines were the operator's, not a lead's.
+  evidence rather than the argument: `stage-stamp-ordering-unenforced`, since landed and retired,
+  stood at three recurrences and its last two declines were the operator's, not a lead's.
   **What is NOT decided here, deliberately.** The clause is not landed in lifecycle-kit's scope
   contract by this stage or this iteration; that stays a feature-shaped unit for a later one, and
   this entry stays its carrier meanwhile.
@@ -7097,40 +7101,6 @@
   as a silent KPI undercount on exactly the entries the project has already judged most recurrent.
   Filed 2026-08-24 to the gap inbox by that same close, from its recurrence-stamp attempt;
   promoted 2026-08-24 at this iteration's scope intake, with the window measured above.
-
-- **friction-key-segment-selection-unruled** [design-pending] — the friction ranking keys the first
-  segment of a compound, so a row whose friction lives downstream is filed under a command that
-  caused none.
-  **The filing bullet's premise FELL at the drain, and the corrected one is narrower.** The bullet
-  claimed `scan-prompts.sh` splits compounds for the allowlist filter and not for the key — an
-  internal inconsistency. The keying DOES split: `ranking_key` takes segment 1 of
-  `guard::split_compound` (`native/src/emit/scan_prompts.rs`), a deliberate rule rather than
-  an oversight. guard-kit/SPEC.md §scan-prompts states why: pulling a redirect from anywhere in the
-  line would key `mkdir -p .tmp && cat > x` as `mkdir >` and attribute a write to a command that
-  performs none. The residual is therefore not "split the line" but **which** segment to key.
-  **The SPEC already names it open**, in that same paragraph: "*Which* segment should be keyed when
-  the friction-bearing one is not the first is a separate axis — which segment, not which shape —
-  and is not settled here." This entry is the queue's carrier for that sentence.
-  **Re-measured at the drain, and it bites harder than when filed.** On the live 438-line log 5
-  rows key under `mkdir`, and **4 of 5** are `mkdir -p .tmp && cat > .tmp/<journal>.md <<EOF` — the
-  friction is the journal write, the key names the directory create. The filing measurement was 2
-  of 3.
-  **Why `[design-pending]`:** the candidate rules are not obviously ordered. Keying the LAST segment
-  inverts the current bias without removing it; keying the segment that actually fell through needs
-  a per-segment record the log does not carry; emitting one row per segment changes the ranking's
-  unit and steps the KPI numerator the way the write-shape axis already did once. Each is a
-  different answer to "what is a prompting call", which is the ranking's definitional question and
-  not a tuning knob.
-  **DISTINCT from `prompt-ranking-command-word-shape-blind`**, landed this iteration: that unit's
-  axis is which SHAPE a segment has and this one's is which SEGMENT is read; a shape-aware key over
-  the wrong segment is still wrong. Adds it no recurrence date and re-files none of it.
-  **Cost while deferred:** bounded and self-limiting — it mis-files only compound rows, and it
-  mis-files them onto `mkdir`, a low row nobody triages, so the effect is an under-count on the
-  write class rather than a wrong steer. It grows with the journal-writing discipline the method
-  mandates, which is what makes it worth carrying rather than iceboxing.
-  Filed 2026-08-24 to the gap inbox by spec; drained 2026-08-24 at that iteration's close, which
-  re-read the keying at HEAD, found the filing premise superseded by work landed after it, and
-  re-measured the residual; re-grounded 2026-09-04 when the shell `pattern_of` it cited was deleted.
 
 - **file-authoring-act-ungoverned** [design-pending] — writing a file has no steer, no grant and no
   owner, so authoring one costs an out-of-band permission decision every time.
@@ -9794,9 +9764,8 @@
 - **worktree-lock-start-time-guard-untaken** [design-pending] — Dormant until a consumer acts on it.
 - **worktree-cleanliness-assertion-scopes-to-checkout** [design-pending] — Reds on foreign dirt.
 - **release-record-retired-knob** [design-pending] — A removal's basis may not name its own knob.
+- **friction-key-segment-selection-unruled** [design-pending] — Which segment to key is unruled.
 
 ## Done
-
-- stage-journal-absence-caught-only-downstream
 
 ## Lessons Learned

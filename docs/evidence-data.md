@@ -134,3 +134,4 @@
 | capture-and-meter-cuts-with-windows-manifest-diagnostic | sc sp a b v c | 5f/0d | 2 · ≤0d | 20s 1✗ | 108 |
 | scan-prompts-cut | sc sp a b v c | 4f/0d | 1 · ≤0d | 20s 1✗ | 108 |
 | usage-verdict-cut | sc sp a b v c | 3f/0d | 1 · ≤0d | 20s 1✗ | 108 |
+| wait-probe-cut-and-stage-journal-absence | sc sp a b v c | 3f/0d | 2 · ≤0d | 20s 1✗ | 108 |
