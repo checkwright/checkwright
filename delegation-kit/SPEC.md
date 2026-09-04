@@ -2208,6 +2208,59 @@ three failure modes a raw percentage reading leaves open:
    needs an account-keyed check against the credential's own identity, not a
    sharper time window.
 
+**The rule is a compiled arm, `bash gate-sdk/bin/run-gates.sh --usage-verdict`,
+and this is the first section in this kit whose whole contract is in-crate.**
+Both reference producers — the `--statusline` push producer and the
+`--usage-poll` poll producer — were already compiled, and the verdict was this
+section's last shell holder. What that does *not* discharge is the kit:
+`bin/usage-trend.sh` (§Trend reporter) and `bin/wait-probe.sh` (§bin/wait-probe)
+each declare their own section and stay owed, and `lib/delegation.sh` stays
+permanently shell as the config bridge's sole `DELEGATION_KIT_*` resolver
+(§Layout and configuration).
+
+**It is a bridged `Arm::Run` and cannot be an `--emit-` member**, which the exit
+contract forces rather than taste choosing: the emitting family maps every
+success to 0 and every failure to 2, and this rule's **1** is the whole blocking
+signal the budget guard grades. So it takes its own flag spelling and its own
+front-end case arm, as `--upgrade-smoke` does (gate-sdk/SPEC.md §The non-gate
+arm). It is **not** a harness-integration arm either — its callers are a session
+brief, a kit smoke and a gate reaching it in process, the caller set that
+subsection's own definition excludes. Unavailable, whether for want of a binary
+on the host or because the config bridge refused, is exit **2** at the
+front-end: already this rule's budget-unknown code, so an artifact-less host
+reads as STALE rather than as a verdict it never took.
+
+**Ten declared knobs, reaching the arm through the config bridge**:
+`DELEGATION_KIT_USAGE_FILE`, `_CRED_FILE`, `_PAUSE_PCT`, `_PAUSE_PCT_7D`,
+`_STALE_AGE`, `_LOGIN_WINDOW`, `_REFRESH_CMD`, `_REFRESH_MIN_AGE`,
+`_USAGE_HISTORY` and `_FAN_WIDTH`, each defined and defaulted in
+`lib/delegation.sh` (§Layout and configuration). The bridge refuses the whole
+environment for a declared knob that library does not define, so the roster and
+those defaults are one change and never two.
+
+**Two positionals and one refusal.** `[usage-file [credentials-file]]` arrive as
+the arm's own argv and override `DELEGATION_KIT_USAGE_FILE` and
+`DELEGATION_KIT_CRED_FILE` — arguments the *rule* consumes rather than
+redirections of already-resolved config, so they cross the port unchanged
+(gate-sdk/SPEC.md §The non-gate arm's distinguishing test). A positional
+beginning with `-` that names no option is a **refusal**, usage on stderr and
+exit 2; `--` ends option processing; `-h`/`--help` belongs to the front-end
+(gate-sdk/SPEC.md §The bin/-tool contract). The refusal is not decoration —
+absorbing the flag made a mistyped invocation report
+`cannot read --help … -> STALE` at exit 2, which the budget guard routes to
+**advise**: a non-reading dressed as a reading at the decision point the rule
+exists to hold.
+
+**One rule, two callers.** `verdict(args) -> (String, i32)` returns the line and
+the status; the arm prints the line and returns the status, and
+`agent-budget-guard` calls that same function in process, grading `code == 1` as
+its block and relaying the `String` verbatim (§The delegation model). A shape
+refusal returns an **empty** line with its usage already on stderr, so the arm
+prints nothing on stdout and the status carries the whole signal. The one
+program the compiled rule spawns is `bash -c`, and only when
+`DELEGATION_KIT_REFRESH_CMD` is non-empty: that knob *is* a command seam, so its
+launcher survives the port.
+
 Check order: parse → RESET-OK → age-STALE → pause axes → login-STALE → OK. The
 RESET-OK branch is the same decision one step earlier and is ordering
 precedent for the witnesses: the file already accepts that a demonstrated roll
@@ -2218,14 +2271,13 @@ re-polled snapshot carries a live `resets_at`.
 Exit codes: **0** OK / RESET-OK, **1** PAUSE, **2** STALE or unreadable. Exit
 2 is fail-closed on *trusting the number* and deliberately fail-open on
 *refusing work* — budget-unknown never blocks delegation — so it is never the
-code a reading that should refuse an expensive dispatch may land on. The bin's
-`# exit:` header declares that mapping, stating exit 2's consequence rather
-than labelling it a bare "fail-closed" (which named only the trust axis and
-read as a claim about the blocking one). That declaration is **machine-read** by
-`check-assertion-strength` (gate-sdk/SPEC.md), which derives the verdict
-vocabulary from it rather than carrying a literal — so the header is a surface
-with a consumer, not loose documentation, and rewording it reshapes what that
-gate can discriminate.
+code a reading that should refuse an expensive dispatch may land on. **The
+mapping stands and its machine reader is gone.** It was declared in the deleted
+tool's `# exit:` header, from which `check-assertion-strength` derived its whole
+live verdict vocabulary; with the header gone that gate's reach is zero, and
+gate-sdk/SPEC.md §check-assertion-strength records the loss, the two candidate
+widenings and their costs. What the mapping still governs is every caller above,
+each of which reads the status rather than a header.
 Fail-closed throughout: missing keys and a non-numeric percentage route to
 STALE; each threshold compare uses `awk`, not integer-only bash
 arithmetic, so a fractional percentage cannot silently skip PAUSE; and both
@@ -2654,7 +2706,6 @@ evidence is not the record.
 
 ```
 delegation-kit/
-  bin/usage-verdict.sh
   bin/usage-trend.sh              # footprint trend reporter over the history log
   bin/wait-probe.sh               # wait-primitive probe: hand-invoked, no trigger, wired into no tier
   lib/delegation.sh               # shared helpers for the usage tools and the kit's gates
@@ -2780,14 +2831,6 @@ the class ruling at gate-sdk/SPEC.md §The config-seam port disposition. Knobs
   filter: a
   prefix the consumer declared cannot be lost, and without `gate.sh` the config
   is used exactly as written.
-- `DELEGATION_KIT_VERDICT_BIN` — the budget verdict binary the D1/D2 budget guard
-  spawns and grades by exit status (§The delegation model); default
-  `delegation-kit/bin/usage-verdict.sh`, the vendored path. It is a knob rather
-  than a literal because a consumer may vendor the kit elsewhere, and the
-  default lives in `lib/delegation.sh` rather than beside its reader for the
-  reason gate-sdk/SPEC.md §The non-gate arm states: the config bridge resolves a
-  declared knob by sourcing exactly that library, so a default sitting anywhere
-  else is sourced by nothing and the bridge refuses the whole environment.
 - `DELEGATION_KIT_STOP_LOG` — the turn-end hook's log (§The turn-end liveness
   hook); default
   `${GATE_SDK_WORKFLOW_DIR:-.workflow}/subagent-stop-liveness.log`, the same
@@ -2838,9 +2881,10 @@ commit here.
 `agent-budget-guard` is not a gate — it is a hook, so it registers not in
 `gates.list` but under `PreToolUse` matcher `Agent` in the consumer's
 `.claude/settings.json` (beside the guard-kit Bash guard). Wire
-`bash gate-sdk/bin/run-gates.sh --hook agent-budget-guard`; it resolves
-`bin/usage-verdict.sh` at its vendored path, overridable with
-`DELEGATION_KIT_VERDICT_BIN`. Registration
+`bash gate-sdk/bin/run-gates.sh --hook agent-budget-guard`; the verdict rule is
+compiled into the same binary, so the guard calls it **in process** and resolves
+no path at all — the guard's declared knob slice is `--usage-verdict`'s ten
+(§usage-verdict). Registration
 is the whole opt-in: unwired, the guard is inert. This repo registers it, and
 its consumer session brief (`scripts/session-context.sh`) additionally prints
 the verdict line at SessionStart for planning-time visibility — a consumer-side
@@ -2921,41 +2965,58 @@ knobs (percentage, snapshot age offset, reset offset, credential age); the
 crate test module `native/src/usage_tests.rs` reads that table off disk,
 materializes each case as a generated snapshot
 file (timestamps must be computed relative to *now* — static fixtures
-would age into permanent STALE) and asserts verdict and exit code. **The clock
+would age into permanent STALE) and asserts verdict and exit code. The subject
+is reached **in process**, one call to the same `verdict(args) -> (String, i32)`
+the budget guard makes (§usage-verdict). **The clock
 is read once for the whole run**, and every case's timestamps are computed
 against that one reading: a per-case read introduces cross-case skew that flakes
 exactly the at-or-over boundary rows the table exists to pin. Each
 case runs in a throwaway sandbox with no consumer config on the lookup
-path **and** with ambient `DELEGATION_KIT_*` exports stripped at each gate
-invocation, so the gate exercises its own defaults hermetic to the host
+path **and** with the ambient bridge namespace stripped before each
+invocation, so the rule exercises the kit defaults hermetic to the host
 repo — the decision table encodes those defaults, and a host override (a
 raised pause threshold, say) must not reshape it. Three properties carry that
 contract, and each is a place a reimplementation would quietly differ:
 
-- **The strip is the whole `DELEGATION_KIT_*` namespace, derived at run time**
-  from the running process's own variables and applied as the child's explicit
-  environment — never a hardcoded list of knob names, which re-creates precisely
-  the failure the poison export exists to catch.
-- **The poison stays a real export in the running process.** The trend runner
-  below shares the strip, each runner under a deliberate
-  poison export that fails its own table loudly if the strip ever breaks — and a
-  port that keeps only a clean child environment, dropping the parent-side
-  poison, passes every assertion while proving nothing. That is the one way this
-  coverage can ship green and vacuous, which is why it is a stated requirement
-  rather than an implication of the strip's description. In the crate the write
-  goes through `knobenv`'s serializing guard, the crate's sole writer of the
-  process-global environment (gate-sdk/SPEC.md §lib/gate.sh).
-- **The subject stays shell and is spawned**, with its cwd inside the sandbox
-  and its two streams **merged** — the `2>&1` capture the shell runner took.
-  Every assertion below is made against the merged stream, and capturing them
-  apart would pass the fail-soft no-leak conjunct vacuously. Every program these
-  tests spawn is on `GATE_SDK_PROGRAM_FLOOR`. The one worth naming is
-  `touch -d "@<epoch>"`, which sets the credentials mtime that is the whole
-  login-window input: on the floor, so the port criteria do not bind, but a
-  POSIX-only call the port does not buy its way out of — the test already spawns
-  `bash` into a shell subject, so it stays unix-bound for as long as
-  §usage-verdict does, and the floor question comes due at that member's own cut,
-  when the bash spawn goes and the mtime set is the last unix-ism left.
+- **The strip is the whole `GATE_SDK_KNOB_*` namespace, derived at run time**
+  from the running process's own variables — never a hardcoded list of knob
+  names, which re-creates precisely the failure the poison exists to catch. That
+  prefix and not `DELEGATION_KIT_*`: a compiled member reads
+  `GATE_SDK_KNOB_<name>` through `walk::knob_scalar`, so a strip aimed at the
+  kit prefix would remove names the subject could not have read and would ship
+  green and vacuous. The stripped pairs are **held and restored** at the end,
+  which is the in-process face of the child-environment boundary a spawn had for
+  free.
+- **The poison stays a real value in the running process** — the bridged
+  spelling of `DELEGATION_KIT_PAUSE_PCT`, at a threshold that PAUSEs every
+  under-threshold row — and it is **re-armed before every case**, so the strip is
+  proved at each one rather than once for the run. What makes it load-bearing is
+  the seeding *order*: the case override is applied first and the kit default
+  fills **only what is unset**, `lib/delegation.sh`'s own `[[ -v X ]] ||` shape,
+  so a poison the strip failed to remove is not overwritten and the table
+  reddens. A port that seeded unconditionally would pass every assertion while
+  proving nothing, which is the one way this coverage can be lost. The write goes
+  through `knobenv`'s serializing guard, the crate's sole writer of the
+  process-global environment (gate-sdk/SPEC.md §lib/gate.sh) — more load-bearing
+  in this form, not less, because the subject now shares that environment with
+  the test.
+- **The per-case expectations stay literal expectations of the kit defaults.**
+  With no child there is no bridge run, so the table does not prove that the
+  defaults it encodes are the ones `lib/delegation.sh` actually ships. Two
+  existing holders carry that link and neither is minted here:
+  `check-knob-default-coupling` holds every literal default site against the
+  owning SPEC, and `smoke/install.sh` drives a real front-end invocation through
+  the real bridge under its hermetic prelude. Spawning the front-end from the
+  crate test would keep the bridge in the loop and is refused: it re-introduces
+  the `bash` spawn this port deleted, one process further out, for what those two
+  already cover. The trend runner below keeps its own spawned shell subject and
+  its own `DELEGATION_KIT_*` strip, that member being `bin/usage-trend.sh`.
+  `touch -d "@<epoch>"` also stays, setting the credentials mtime that is the
+  whole login-window input: `File::set_modified` and `FileTimes` stabilised in
+  Rust 1.75 and `native/Cargo.toml` pins `rust-version = "1.71"`, so **the MSRV
+  against a 1.75 API is what holds this open**, not this member's shell subject —
+  `native/src/emit/session_id.rs` already spawns the identical `touch` in an
+  already-ported member's tests with no shell subject anywhere in it.
 
 `cases.tsv` columns are `verdict exit pct age_off reset_off cred_age pct_7d
 reset7d_off append axis desc` (the offsets seconds from *now*; `pct_7d` `-`
@@ -3032,16 +3093,27 @@ the trend fixture were driven through the shell runners and the crate module
 together and their verdicts and exit codes compared, *before* either shell file
 was deleted. Nothing machine-held keeps the two agreeing afterwards, which is
 why the originals are deleted rather than left running beside the crate tests.
+`usage-verdict`'s own port bought that comparison again on the rule itself:
+every `cases.tsv` row, both beside-the-table sets and the fan-width case run
+against the shell tool and the compiled arm in one session, with the **verdict
+line, the exit code and the appended sample line** compared per case, and each
+row additionally checked against the table's own expected token so two empty
+outputs could not pass as agreement. This member has no live tree corpus — its
+input is a crafted snapshot — so the case set *is* the corpus and the comparison
+over it is complete rather than demoted. The only tolerated variance is the
+clock: two invocations cannot share an instant, so the four clock-derived
+integers on a verdict line are compared numerically within a small band while
+everything else is compared byte for byte.
 
 `agent-budget-guard` and `agent-dispatch-guard` are hooks rather than gates, so
 each speaks exit-2 + hook JSON rather than the gate output contract — and each
 shipped a decision-table runner beside the verdict tests until the port moved
 both members into the binary. **A runner retires into the crate when its *cases*
 can be driven from there — the subject reached in process *or* spawned.** The
-guards' subjects moved in-crate, so a `#[test]` reached them directly; the two
-usage runners above keep shell subjects and spawn them, `bin/usage-verdict.sh`
-and `bin/usage-trend.sh` each declaring its own section and belonging to the
-kit-`bin/` owed cohort rather than to that cut. The narrower "the runners
+guards' subjects moved in-crate, so a `#[test]` reached them directly; the
+verdict's did too, at its own cut, and the trend runner above keeps a shell
+subject and spawns it, `bin/usage-trend.sh` declaring its own section and
+belonging to the kit-`bin/` owed cohort still. The narrower "the runners
 retired with their subjects" was true of its own instance and is not the general
 rule. **What retirement buys is coverage at a second transition**: the
 assertions ran only in a validate suite, and now run under `check-crate-arms` at
@@ -3076,7 +3148,9 @@ advises, one without it falls through.
 
 `smoke/install.sh` copies the templates and `bin/` tools into the scratch
 consumer, registers the tamper gate, and drives one crafted snapshot
-through `usage-verdict` asserting a verdict — self-verifying install. It opens
+through the `--usage-verdict` arm asserting a verdict — self-verifying install,
+and the holder that keeps a real bridge run in this kit's coverage now that the
+crate table reaches the rule in process. It opens
 with **one hermetic env prelude covering the whole file**: it strips the whole
 `DELEGATION_KIT_*` namespace and then sets the knobs with no per-call home —
 sampling off, and both pause thresholds at the defaults the 95% reading is

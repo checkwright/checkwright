@@ -46,7 +46,6 @@
       "Bash(bash */smoke/violation.sh)",
       "Bash(bash context-kit/smoke/agents-md.sh)",
       "Bash(bash context-kit/smoke/agents-md.sh *)",
-      "Bash(bash delegation-kit/bin/usage-verdict.sh)",
       "Bash(bash delegation-kit/bin/usage-trend.sh)",
       "Bash(bash evidence-kit/bin/run-validate.sh)",
       "Bash(bash evidence-kit/bin/run-validate.sh *)",

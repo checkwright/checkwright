@@ -1,5 +1,5 @@
 # shellcheck shell=bash
-# spec: delegation-kit/SPEC.md §Layout and configuration — sourced config loader for usage-verdict + check-gate-tamper, values only
+# spec: delegation-kit/SPEC.md §Layout and configuration — sourced config loader for the usage arms + check-gate-tamper, values only
 # no-port: gate-sdk/SPEC.md §The kit-library port disposition — the class ruling of 2026-08-30, reached by ground rather than by scope. This library is the config bridge's sole resolver for the DELEGATION_KIT_* knobs: gate-sdk/SPEC.md §lib/gate.sh rules exactly one place a knob's value is computed, and the bridge computes it by sourcing this file, so a crate-side resolver would be the second producer criterion 6 refuses. delegation-kit ships no library section, so delegation-kit/SPEC.md §Layout and configuration records the disposition beside the layout line that names this file. Structural, not a sizing judgment.
 _dk_cfg="${DELEGATION_KIT_CONFIG_FILE:-}"
 if [[ -n "$_dk_cfg" ]]; then
@@ -33,7 +33,6 @@ unset _dk_cfg
 # spec: gate-sdk/SPEC.md §The non-gate arm — the defaults the deleted shell drivers held inline,
 # moved here in the same cut: the bridge resolves a declared knob by sourcing exactly this
 # library, and refuses the whole environment for one it finds undefined
-[[ -v DELEGATION_KIT_VERDICT_BIN ]] || DELEGATION_KIT_VERDICT_BIN="delegation-kit/bin/usage-verdict.sh"
 [[ -v DELEGATION_KIT_ACCOUNT_CONFIG ]] || DELEGATION_KIT_ACCOUNT_CONFIG="$HOME/.claude.json"
 [[ -v DELEGATION_KIT_USAGE_ENDPOINT ]] || DELEGATION_KIT_USAGE_ENDPOINT="https://api.anthropic.com/api/oauth/usage"
 [[ -v DELEGATION_KIT_STOP_LOG ]] || DELEGATION_KIT_STOP_LOG="${GATE_SDK_WORKFLOW_DIR:-.workflow}/subagent-stop-liveness.log"

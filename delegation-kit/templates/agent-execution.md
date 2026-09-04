@@ -403,7 +403,8 @@ drift: do not delete it on sight, and when either rule changes here, propagate.
   every agent commit* governs work that landed. This one governs the case where
   **nothing arrived at all**, which none of them reaches.
 - **Budget-check before *each* dispatch in a fan-out**, not once at the start.
-  `bash delegation-kit/bin/usage-verdict.sh` (verdict exit 0/1/2 from `usage.txt` —
+  `bash gate-sdk/bin/run-gates.sh --usage-verdict` (verdict exit 0/1/2 from
+  `usage.txt` —
   it folds in the reading-age and window-validity checks so a dead-window pct
   can't read stale-high; a PAUSE names its axis — a 5h wall clears in hours, a
   7-day wall in days). If the verdict is PAUSE and the work is large, pause for
@@ -426,8 +427,8 @@ drift: do not delete it on sight, and when either rule changes here, propagate.
   Observed: the harness statusline does not refresh while the main session waits
   on a background agent's completion notification, so its displayed budget
   freezes for the length of the dispatch — the longer the unit, the staler the
-  number. Poll `usage-verdict.sh` externally when you need a live reading
-  mid-dispatch (`watch -n 30 bash delegation-kit/bin/usage-verdict.sh`); this is
+  number. Poll the verdict arm externally when you need a live reading
+  mid-dispatch (`watch -n 30 bash gate-sdk/bin/run-gates.sh --usage-verdict`); this is
   the one sanctioned poll and it does not weaken the never-poll rule above,
   which governs waiting for *completion*. Enforcement is unaffected either way:
   the per-dispatch budget check reads a fresh verdict at dispatch time, so a

@@ -805,6 +805,19 @@ would have this rule bind a free-text reader's shell file and then retire at
 that file's port — which is exactly the retiring-with-the-file reading this
 paragraph opens by refusing.
 
+**`--usage-verdict` is the clause's second reader instance, and the ground that
+distinguishes it from the first is where the absorbed argument lands**
+(delegation-kit/SPEC.md §usage-verdict). The shell tool assigned its first
+positional straight into the snapshot path, so `usage-verdict.sh --help` read
+the flag as a file, found it unreadable, and printed
+`cannot read --help … -> STALE` at exit 2 — a status the per-dispatch budget
+guard routes to **advise**. Here the absorbed argument does not write a wrong
+number into a durable trend: it produces a **non-reading dressed as a reading**
+at the exact decision point a hook grades, waving a dispatch through under a line
+that looks like a real budget verdict. The port added all three behaviours the
+shell form had none of, which is the clause working forward rather than
+preserving a shape.
+
 **No gate reads this rule, and that is ruled rather than deferred.**
 §check-exec-bit's corpus is the whole `*/bin/*.sh` set, and a gate over it could
 assert only the weak static shape — does the file contain a `--help` branch —
@@ -2211,8 +2224,9 @@ its 2026-09-03 ones; and `--emit-scan-prompts`, guard-kit's friction-log ranker
 **harness-integration**
 arms below it, and the bridged `Arm::Run` members that are neither —
 `--lesson-sink` (queue-kit/SPEC.md §The lesson-sink arm), `--upgrade-smoke`
-(§upgrade-smoke) and `--install-lifecycle` (lifecycle-kit/SPEC.md
-§bin/install-lifecycle.sh, its 2026-09-03 member) — and the class
+(§upgrade-smoke), `--install-lifecycle` (lifecycle-kit/SPEC.md
+§bin/install-lifecycle.sh, its 2026-09-03 member) and `--usage-verdict`
+(delegation-kit/SPEC.md §usage-verdict, its 2026-09-04 one) — and the class
 they form is named here because a
 session arriving with a new non-gate thing to port has no other way to learn
 that one exists or what it costs. Each arm's own `spec:` comment explains that
@@ -2673,6 +2687,19 @@ just as surely, so the rule binds on any member whose *status distinctions* carr
 meaning, not only on one that forwards a child's. Its callers are a validate suite
 and a session, so it is not a harness-integration arm either (§upgrade-smoke).
 
+**`--usage-verdict` is the third, and the first forced out of the family by a
+status distinction a *hook* grades** (delegation-kit/SPEC.md §usage-verdict). Its
+contract is 0 OK/RESET-OK, 1 PAUSE, 2 STALE, and the 1 is not one distinction
+among three but the whole blocking signal the per-dispatch budget guard reads;
+collapsed to `Arm::Emit`'s {0, 2} the guard would advise on every reading and
+block on none, which is a gate that looks like it is running. Its callers are a
+session brief, a kit smoke and **a gate reaching it in process**, which is the
+caller shape §The harness-integration arm's own definition excludes, so it is a
+plain bridged `Arm::Run` like the two above. Its spawned-program set is
+`bash -c` alone, and only where `DELEGATION_KIT_REFRESH_CMD` is non-empty: that
+knob *is* a command seam, so its launcher survives the port by the reasoning that
+kept `curl` external under `--usage-poll`.
+
 **The test's *emitting* side is thin on worked instances and gains one at
 `--emit-stage-rules`** (doctrine-kit/SPEC.md §stage-rules, 2026-09-03). Read the
 rule in both directions: the `--emit-` spelling is **available** exactly where a
@@ -2781,7 +2808,12 @@ the arm dispatches on, what `--knobs --hook` reads through the `EVERY_HOOK_KNOB`
 sentinel, and what the unknown-member refusal prints — derived once, never
 transcribed. Two knob shapes do **not** reach a member's slice. `GUARD_KIT_LIB`
 does not, because it named the shell library the member sourced for its
-primitives and a compiled member sources nothing. A knob that **selects which
+primitives and a compiled member sources nothing — delegation-kit's
+verdict-binary knob retired on that precedent with one word changed, having
+named the shell binary the member *spawned*, and a compiled member spawns
+nothing; what the row declares instead is the rule's own reads, so the member's
+roster and its kit library's defaults stay one change (delegation-kit/SPEC.md
+§usage-verdict). A knob that **selects which
 config file the bridge sources** does not either: it redirects something
 `gate_command` has already resolved before the exec, which is the distinguishing
 test above, and it keeps working one layer out because the bridge reads it from
@@ -4396,7 +4428,14 @@ file whose behaviour is composed out of a permanently-shell library's primitives
 owes a compiled twin of each *and* criterion 6's machine-held comparator, and
 none of that is in the column, the twins being lines of a file the cut does not
 take. Attested on guard-kit's ranker, whose column saw a single-file port and
-whose real cut was that file plus three twins, a parity arm and a harness. So
+whose real cut was that file plus three twins, a parity arm and a harness. A
+**fourth** is cost the column cannot see because it sits in *another kit's gate*:
+delegation-kit's verdict tool read as a 144-line singleton under-filling its
+window, and what the column could not show was that its `# exit:` header was
+`check-assertion-strength`'s entire live enforcement vocabulary, so deleting it
+took that gate's reach from two call sites to zero — a loss no line count could
+have surfaced and which the cut had to cost deliberately
+(§check-assertion-strength). So
 the count is one input beside the criterion
 columns and the session's own reading, never the answer: a session that reads
 the column as an answer stops looking for the cost the column cannot see.
@@ -12711,13 +12750,31 @@ deriving one cannot.
 
 **Reach is opt-in and the gate never widens it.** A callee declaring no `# exit:`
 header is simply out of reach — the gate demands the header of no one, so the
-unit imposes no new obligation on every script in the tree. Stated honestly, the
-day-one reach is thin: of the two live declarations, `usage-trend.sh` names its
-codes in prose with no uppercase token and so yields an empty map, leaving
-`usage-verdict.sh`'s `PAUSE`→1 and `STALE`→2 as the whole live vocabulary
-(`OK` and `RESET-OK` bind to 0 and are skipped). One declaring script, two usable
-tokens; the success line reports the call count so the reach stays visible rather
-than implied.
+unit imposes no new obligation on every script in the tree. The day-one reach was
+thin and **it is now empty**, which is that design reporting honestly rather than
+a broken gate. `usage-trend.sh` names its codes in prose with no uppercase token
+and so yields an empty map; `usage-verdict.sh`'s `PAUSE`→1 and `STALE`→2 were the
+whole live vocabulary, and that file left the tree when its rule moved into the
+binary (delegation-kit/SPEC.md §usage-verdict). Its two call sites in
+`delegation-kit/smoke/install.sh` now name the front-end, which is not the
+own-kit-bin shape the gate resolves, so the clean line reads
+`104 script(s) scanned; 0 call(s) to a script with a declared exit contract`,
+against `2 call(s)` before the cut. The
+count is the visible surface precisely so a reach that went to zero is legible
+rather than implied — and the substantive loss is smaller than the count
+suggests: one of those two guards already compared `-ne 1` explicitly, and the
+other's message names `OK`, which binds to code 0 and which the skip rule above
+already excludes.
+
+**Two widenings are refused with their grounds, and the residue is filed rather
+than flagged.** *Widening the callee resolution to reach a compiled arm* would
+need the arm's exit contract published on a surface this gate can read, which
+mints a name and a producer — a gate-sdk unit of its own, taken deliberately
+rather than inside a port cut. *Leaving the `# exit:` header behind in a stub
+shell file* keeps a gate green by keeping a dead file, which is the shape a port
+exists to end. The condition — a gate whose live reach is zero, with those two
+candidate widenings and their costs — is in the committed gap inbox, so the close
+stage disposes of it under the standing rules.
 
 **Detection.** For each guard invoking a declaring script through the own-kit-bin
 convention (`bin/<name>.sh` resolved against the scanned dir's kit root) whose

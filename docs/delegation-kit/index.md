@@ -25,7 +25,7 @@ Vendor the `delegation-kit/` directory into your repo, register its gate in
 ## Quick start
 
 ```bash
-bash delegation-kit/bin/usage-verdict.sh             # one budget verdict: OK / PAUSE / STALE
+bash gate-sdk/bin/run-gates.sh --usage-verdict        # one budget verdict: OK / PAUSE / STALE
 ```
 
 ## Contracts

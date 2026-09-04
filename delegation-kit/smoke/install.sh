@@ -27,7 +27,7 @@ now="$(date +%s)"
     printf 'updated_at=%s\n' "$now"
 } > "$snap"
 # spec: delegation-kit/SPEC.md §Testing — the cred pin stays at the invocation (gate-sdk/SPEC.md §check-test-hermetic wants line-local evidence): an absent path zeroes login_at so no ambient auth event reroutes this verdict
-DELEGATION_KIT_CRED_FILE="$snap.nocred" bash "$SMOKE_KIT_ROOT/bin/usage-verdict.sh" "$snap" >/dev/null 2>&1 && vrc=0 || vrc=$?
+DELEGATION_KIT_CRED_FILE="$snap.nocred" bash "$SDK/bin/run-gates.sh" --usage-verdict "$snap" >/dev/null 2>&1 && vrc=0 || vrc=$?
 if [[ "$vrc" -ne 1 ]]; then
     echo "delegation-kit/smoke: usage-verdict on a live 95% reading: want exit 1 (PAUSE), got $vrc" >&2
     rm -f "$snap"; exit 1
@@ -50,7 +50,7 @@ poller() {
 }
 poller "file://$pp/stub.json" || { echo "delegation-kit/smoke: poller happy path failed" >&2; exit 1; }
 # spec: delegation-kit/SPEC.md §Testing — same line-local cred pin as the 95% check above
-DELEGATION_KIT_CRED_FILE="$pp/absent.json" bash "$SMOKE_KIT_ROOT/bin/usage-verdict.sh" "$pp/usage.txt" >/dev/null || {
+DELEGATION_KIT_CRED_FILE="$pp/absent.json" bash "$SDK/bin/run-gates.sh" --usage-verdict "$pp/usage.txt" >/dev/null || {
     echo "delegation-kit/smoke: poller snapshot did not verdict OK" >&2; exit 1; }
 cp "$pp/usage.txt" "$pp/usage.before"
 if poller "file://$pp/nonexistent.json" 2>/dev/null; then

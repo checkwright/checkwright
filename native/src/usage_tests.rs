@@ -1,11 +1,76 @@
 // spec: delegation-kit/SPEC.md §Testing — the crate-side decision-table runner for usage-verdict
 // and assertion runner for usage-trend, driven over the kit's committed fixtures on disk. These
 // replace the two shell runners.
+use crate::hook::verdict;
 use crate::knobenv;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 
 const KIT_PREFIX: &str = "DELEGATION_KIT_";
+
+// spec: gate-sdk/SPEC.md §lib/gate.sh — the namespace a *compiled* member reads: `walk::knob_scalar`
+// resolves `GATE_SDK_KNOB_<name>`, so this is the prefix the in-process subject's strip must aim at.
+// Aimed at `DELEGATION_KIT_` it would remove names the subject could not have read.
+const BRIDGE_PREFIX: &str = "GATE_SDK_KNOB_";
+
+fn bridged(knob: &str) -> String {
+    format!("{}{}", BRIDGE_PREFIX, knob)
+}
+
+// spec: delegation-kit/SPEC.md §Testing — the defaults `lib/delegation.sh` ships, as *literal
+// expectations* rather than reads of that library: reading them would make the table agree with
+// whatever the library says instead of asserting what it should say.
+const KIT_DEFAULTS: &[(&str, &str)] = &[
+    ("DELEGATION_KIT_USAGE_FILE", ""),
+    ("DELEGATION_KIT_CRED_FILE", ""),
+    ("DELEGATION_KIT_PAUSE_PCT", "80"),
+    ("DELEGATION_KIT_PAUSE_PCT_7D", "95"),
+    ("DELEGATION_KIT_STALE_AGE", "600"),
+    ("DELEGATION_KIT_LOGIN_WINDOW", "600"),
+    ("DELEGATION_KIT_REFRESH_CMD", ""),
+    ("DELEGATION_KIT_REFRESH_MIN_AGE", "60"),
+    ("DELEGATION_KIT_USAGE_HISTORY", ""),
+    ("DELEGATION_KIT_FAN_WIDTH", "2"),
+];
+
+// spec: delegation-kit/SPEC.md §Testing — the poison: a real value in the running process that
+// breaks every under-threshold row, so a strip that stops covering the namespace fails the table
+// loudly instead of passing it vacuously.
+const POISON: (&str, &str) = ("DELEGATION_KIT_PAUSE_PCT", "0");
+
+// spec: delegation-kit/SPEC.md §Testing — the in-process face of the child-environment strip: the
+// whole `GATE_SDK_KNOB_*` namespace, derived from the process's own variables at run time and never
+// a hardcoded list. Held so the surrounding process is left as the shell form's parent was.
+fn strip_bridge(knobs: &knobenv::KnobEnv) -> Vec<(String, String)> {
+    let held: Vec<(String, String)> = std::env::vars()
+        .filter(|(n, _)| n.starts_with(BRIDGE_PREFIX))
+        .collect();
+    for (name, _) in &held {
+        knobs.remove(name);
+    }
+    held
+}
+
+fn restore_bridge(knobs: &knobenv::KnobEnv, held: &[(String, String)]) {
+    for (name, value) in held {
+        knobs.set(name, value);
+    }
+}
+
+// spec: delegation-kit/SPEC.md §Testing — the per-case bridge in `lib/delegation.sh`'s own order:
+// the case override first, then a default filling only what is unset. The order is what keeps the
+// poison load-bearing — a surviving one is not overwritten, so the table reddens.
+fn seed_bridge(knobs: &knobenv::KnobEnv, extra: &[(&str, String)]) {
+    for (name, value) in extra {
+        knobs.set(&bridged(name), value);
+    }
+    for (name, value) in KIT_DEFAULTS {
+        let var = bridged(name);
+        if std::env::var_os(&var).is_none() {
+            knobs.set(&var, value);
+        }
+    }
+}
 
 fn kit(rel: &str) -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("..").join(rel)
@@ -70,8 +135,8 @@ fn counted_lines(body: &str) -> usize {
 }
 
 // spec: delegation-kit/SPEC.md §Testing — the credentials mtime is the whole login-window input,
-// and it stays a spawn of the same floor program the shell form used; §usage-verdict's own cut is
-// where the crate-floor question comes due.
+// and it stays a spawn of the same floor program: `File::set_modified` stabilised in Rust 1.75 and
+// `Cargo.toml` pins `rust-version = "1.71"`, so the API is out of reach at the declared floor.
 fn set_mtime(path: &Path, epoch: i64) {
     let status = Command::new("touch")
         .arg("-d")
@@ -93,16 +158,16 @@ fn now_epoch() -> i64 {
         .as_secs() as i64
 }
 
-struct Verdict {
+struct Verdict<'a> {
     sandbox: PathBuf,
-    gate: PathBuf,
     usage: PathBuf,
     cred: PathBuf,
     hist: PathBuf,
     now: i64,
+    knobs: &'a knobenv::KnobEnv,
 }
 
-impl Verdict {
+impl Verdict<'_> {
     // spec: delegation-kit/SPEC.md §Testing — every snapshot timestamp is relative to one reading
     // of the clock: a per-case read introduces cross-case skew at the at-or-over boundary rows.
     fn write_snapshot(&self, pct: &str, age_off: i64, reset_off: i64, weekly: Option<(&str, i64)>) {
@@ -134,9 +199,15 @@ impl Verdict {
         std::fs::read_to_string(&self.hist).unwrap_or_default()
     }
 
+    // spec: delegation-kit/SPEC.md §Testing — the subject is reached **in process**: one call to
+    // the same `verdict(args) -> (String, i32)` the budget guard makes, under a poison re-armed
+    // before every case so the strip is proved at each one rather than once for the run.
     fn run(&self, extra: &[(&str, String)]) -> Ran {
-        let args = vec![text(&self.usage), text(&self.cred)];
-        subject(&self.sandbox, &self.gate, &args, extra)
+        self.knobs.set(&bridged(POISON.0), POISON.1);
+        strip_bridge(self.knobs);
+        seed_bridge(self.knobs, extra);
+        let (out, code) = verdict::verdict(&[text(&self.usage), text(&self.cred)]);
+        Ran { out, code }
     }
 
     fn run_logged(&self) -> Ran {
@@ -173,19 +244,19 @@ fn roll_case(v: &Verdict, desc: &str, tail: &str, want_code: i32, want_verdict: 
 // ride the same sandbox, the same strip and the same single clock reading.
 #[test]
 fn the_kits_verdict_decision_table_holds() {
-    // spec: delegation-kit/SPEC.md §Testing — the poison is a real export in this process, so a
-    // broken strip fails the table loudly instead of passing it vacuously.
+    // spec: delegation-kit/SPEC.md §Testing — the subject now shares this process's environment
+    // with the test, which makes `knobenv`'s serializing guard more load-bearing rather than less.
     let knobs = knobenv::lock();
-    knobs.set("DELEGATION_KIT_PAUSE_PCT", "0");
+    let held = strip_bridge(&knobs);
 
     let dir = sandbox("usage-tests");
     let v = Verdict {
-        gate: kit("delegation-kit/bin/usage-verdict.sh"),
         usage: dir.join("usage.txt"),
         cred: dir.join(".credentials.json"),
         hist: dir.join("history.log"),
         sandbox: dir,
         now: now_epoch(),
+        knobs: &knobs,
     };
 
     let table = kit("delegation-kit/usage-tests/cases.tsv");
@@ -421,8 +492,26 @@ fn the_kits_verdict_decision_table_holds() {
         "[roll-witness-not-self-witnessing]: the run did not leave exactly its own sample behind"
     );
 
+    // spec: delegation-kit/SPEC.md §Testing — the negative control the re-pointed strip owes: with
+    // the strip skipped, the re-armed poison survives, the default-if-unset seed leaves it, and an
+    // under-threshold reading PAUSEs rather than passing.
+    v.write_snapshot("40", 0, 3600, None);
+    v.set_credentials(None);
+    knobs.set(&bridged(POISON.0), POISON.1);
+    seed_bridge(&knobs, &[]);
+    let unstripped = verdict::verdict(&[text(&v.usage), text(&v.cred)]);
+    assert_eq!(
+        unstripped.1, 1,
+        "[poison negative control]: an unstripped poison must PAUSE an under-threshold reading, \
+         or the strip is proving nothing: {}",
+        unstripped.0
+    );
+
     let _ = std::fs::remove_dir_all(&v.sandbox);
-    knobs.remove("DELEGATION_KIT_PAUSE_PCT");
+    for (name, _) in KIT_DEFAULTS {
+        knobs.remove(&bridged(name));
+    }
+    restore_bridge(&knobs, &held);
 }
 
 // spec: delegation-kit/SPEC.md §Testing — the trend needles are exact golden strings; loosening one
