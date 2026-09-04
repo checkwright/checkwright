@@ -33,6 +33,7 @@ pub mod session_id;
 pub mod trajectory;
 pub mod upgrade_smoke;
 pub mod value_rollup;
+pub mod wait_probe;
 
 // spec: gate-sdk/SPEC.md §lib/gate.sh — gate_self_repo_prefix, degrading to nothing on no origin
 // or an unrecognised form. It sits on the family because two arms render self-repo links, and a
@@ -473,6 +474,14 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         "--install-lifecycle",
         Arm::Run(install_lifecycle::run),
         install_lifecycle::KNOBS,
+    ),
+    // spec: delegation-kit/SPEC.md §bin/wait-probe — an `Arm::Run` because its exit contract is
+    // three-state: `report` returns 1 on an empty evidence file, an honest empty reading an emitting
+    // arm would rewrite to the misuse code. Its subcommand word is an operand on `--hook`'s precedent
+    (
+        "--wait-probe",
+        Arm::Run(wait_probe::run),
+        wait_probe::KNOBS,
     ),
 ];
 

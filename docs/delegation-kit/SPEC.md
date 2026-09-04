@@ -2218,10 +2218,11 @@ and this is the first section in this kit whose whole contract is in-crate.**
 Both reference producers — the `--statusline` push producer and the
 `--usage-poll` poll producer — were already compiled, and the verdict was this
 section's last shell holder. What that does *not* discharge is the kit:
-`bin/usage-trend.sh` (§Trend reporter) and `bin/wait-probe.sh` (§bin/wait-probe)
-each declare their own section and stay owed, and `lib/delegation.sh` stays
-permanently shell as the config bridge's sole `DELEGATION_KIT_*` resolver
-(§Layout and configuration).
+`bin/usage-trend.sh` (§Trend reporter) declares its own section and stays owed,
+and `lib/delegation.sh` stays permanently shell as the config bridge's sole
+`DELEGATION_KIT_*` resolver (§Layout and configuration). §bin/wait-probe was the
+kit's other owed section and is discharged, on a narrower reading of *discharged*
+that section states.
 
 **It is a bridged `Arm::Run` and cannot be an `--emit-` member**, which the exit
 contract forces rather than taste choosing: the emitting family maps every
@@ -2608,7 +2609,8 @@ decreases.
 
 ## bin/wait-probe
 
-`bin/wait-probe.sh` is the instrument behind §Operative residency's wait-primitive
+`bash gate-sdk/bin/run-gates.sh --wait-probe <subcommand> [args]` is the
+instrument behind §Operative residency's wait-primitive
 measurement: it stands a **known-duration producer** up and exercises candidate
 wait forms against it, recording one line per trial. Hand-invoked, no trigger,
 wired into **no** tier — it launches processes and sleeps for its declared
@@ -2619,9 +2621,85 @@ producers, markers and launch records go to
 `GATE_SDK_TMP_DIR`, trials to the capture-tier evidence file below, and it mints
 no knob of its own for either (§Layout and configuration owns why).
 
-Exit **0** on a completed subcommand, **2** on misuse; `-h`/`--help` prints the
-subcommand roster on stdout and exits 0, the `bin/`-tool contract
-(gate-sdk/SPEC.md §The bin/-tool contract).
+**Six subcommands, and the subcommand word is an operand rather than part of the
+flag**: `produce`, `waiter`, `arm-local`, `record`, `report`, `sweep`. That is
+`--hook`'s shape, which also settles the arity question — the bridge forwards an
+arm's own argv when resolving its declared knobs, so a subcommand-bearing arm is a
+solved registration rather than a new one (gate-sdk/SPEC.md §The non-gate arm).
+
+**It is a bridged `Arm::Run` with its own front-end case arm, and it cannot be an
+`--emit-` member**, for two independent reasons. The exit contract is the first:
+the emitting family maps success to 0 and failure to 2, so it can never return the
+**1** below. The second stands without it — four of the six subcommands emit no
+document at all, standing processes up, writing launch records and appending a
+trial line, so the `--emit-` spelling would be a stretch this member has no claim
+to. It joins the arms that take their own spelling for their own contract.
+
+**Two declared knobs and the port minted none**: `GATE_SDK_TMP_DIR` and
+`GATE_SDK_WORKFLOW_DIR`, the two the instrument already read. Both are resolved by
+the front-end before the exec, and the arm's status survives that exec verbatim
+because `exec` replaces the shell's process image — so a dispatch failure is the
+only path on which the front-end's own unavailable status is reachable.
+
+**The exit contract is three-state**: **0** on a completed subcommand, **1** for
+`report` with no trials recorded, **2** on misuse. The `1` is contract rather than
+a latent defect, and the tempting collapse is refused on the instrument's own
+subject: *no trials recorded* is not misuse. The invocation is well formed and the
+tool ran; 1 is its substantive finding that there is nothing to classify, and
+folding it into the misuse code would make an honest empty reading
+indistinguishable from a typo — on the one tool whose entire value is telling **a
+reading from a non-reading**, which is the harm gate-sdk/SPEC.md §The bin/-tool
+contract records against the crossing clause. That contract's split binds here:
+the argv-shape refusal and the `--` escape cross to the arm, while the
+`-h`/`--help` arm retires to the front-end. What a front-end's one-line summary
+cannot carry is a six-entry subcommand roster, so the arm keeps its roster print on
+the **misuse** path — stderr, exit 2 — which is not the help arm.
+
+**Three parts of the instrument stay shell, and each has its own ground**, because
+a reader who accepts one may not accept the others. This is gate-sdk/SPEC.md §The
+port-candidate criteria's *the program is the rule* clause applied where the
+program decides a **measurement** rather than an assertion:
+
+- **The wait body.** The `until [ -f <marker> ]` / `until kill -0 <pid>` loop is
+  not an implementation of the instrument — it **is the artifact under
+  measurement**, the exact form `templates/agent-execution.md` prescribes and the
+  exact form guard-kit's loop-polarity rules are shaped to. A compiled loop would
+  measure a form no session ever runs, a silent change of subject on an instrument
+  whose whole output is evidence for a protocol clause. The loop and its four exit
+  traps are one constant the arm **execs** into, so *every form arms the same wait
+  body* is now one constant and one exec path rather than a claim about a script.
+- **The arming of the `local` form.** `arm-local` is defined as arming the waiter
+  as a **detached shell child**, the harness-uninvolved control; a crate-armed
+  child would make that form's name false, and the *form* axis is a measured axis.
+  The arming stays `nohup … &` inside a shell literal, with the launched PID read
+  back and written to the `<key>.run` record.
+- **The producer's launch, and this one is a hazard rather than a definition.** A
+  shell's backgrounded child is **reaped**, so `kill -0` on its recorded PID
+  correctly fails once it exits. A compiled child whose parent outlives it leaves a
+  **zombie**, and `kill -0` on a zombie **succeeds** — which would invert
+  `producer_alive_at_exit` on every trial while the instrument reported clean, and
+  that field is read to establish the *producer verifiably alive* condition that is
+  cause (i)'s whole tell. Keeping the launch in a shell keeps the reaping, and
+  keeping the reaping keeps the field true.
+
+**The arm `exec`s into the wait body rather than spawning and waiting on it, and
+the ground is measurement validity.** Backgrounding the wait puts **one** process
+between the harness and the loop. An arm that spawned the loop would put two, and
+the reaping cause the instrument exists to detect is a property of the process the
+harness signals; `exec` preserves the depth and the signal disposition, so the
+measured configuration is the one a session runs.
+
+**The retained shell dependencies are declared rather than hidden**: the arm spawns
+`bash`, and through it `nohup`, `sleep` and `date`. The first is on
+`GATE_SDK_PROGRAM_FLOOR` and the middle two are not, and that is stated as a cost
+rather than a dividend the port could claim: under the criterion's own ruling they
+are the rule's semantic content — a known-duration producer *is* a `sleep`, and a
+detached shell child *is* what `nohup … &` produces — so they are declared
+dependencies and not port work. The floor does not move, a consumer lacking either
+getting the failure it already got; what changes is only that the dependency is
+visible in a declared prose set instead of sitting in an unregistered script. What
+**left** the set is the instrument's text processing — `awk`, `sed`, `cut`, `cat`,
+`tail`, `mkdir`, `rm` and `dirname` — which is what the port compiled.
 
 **One trial** is: launch a producer that sleeps a declared duration and then writes
 a completion marker; record its PID at launch in a `<key>.run` file exactly as
@@ -2631,6 +2709,15 @@ and to guard rule 14 like any other; arm the wait form under test; and record
 whether the waiter exited **before** the marker appeared. That before/after
 relation is the whole measurement: a waiter that outlives its condition is
 working, and one that exits early is the observed failure.
+
+**The `<key>.run` record's shape is a contract and its coupling is at run time
+rather than in any scan.** `check-producer-liveness` does not read this
+instrument's source; it reads the two-field `pid=<n> run=<key>` line the
+instrument leaves in the scratch directory, exactly as guard rule 14 does. Stated
+because it is the failure a re-implementation is likeliest to ship and no gate
+would report it: a form writing a differently-shaped record would leave its own
+producers **invisible** to the align-entry refusal and to the tracked-tree
+mutation guard, and every battery would stay green.
 
 **The producer's duration is swept, not fixed**, because a single duration cannot
 distinguish the candidate causes. The probe reads no harness internals and asserts
@@ -2694,6 +2781,23 @@ harness's own, calling `record` for each — the tool cannot invoke a harness to
 parameter, so a run that measures the harness forms is a session's run and `sweep`
 is the harness-uninvolved reproducer a second machine executes.
 
+**What is compiled is the instrument *around* the subject**, which is the whole of
+the seam above read from the other side. `record`'s trial-line assembly and its
+four-arm cause attribution are text and arithmetic over files the subject wrote, so
+they move without a seam question. `report`'s verdict block moves with them — the
+per-cell tallies, the **ceiling tell**, and the predicate-shaped conclusion — which
+is where the honest limit above is actually enforced, and it is the one verdict no
+trial line can carry, so it is the one a re-expression can silently drop. `sweep`'s
+orchestration moves too, and it keeps the recorded-PID liveness predicate **and its
+`while` polarity**: a `sweep` written `until` would reproduce, inside the
+instrument, the defect the instrument found. `produce`, `waiter` and `arm-local`
+move their bookkeeping only — the `t0` stamp, the marker and heartbeat paths, the
+`<key>.run` write, the PID read-back — and keep their shell literals.
+
+**The duration sweep is a constant and deliberately not a knob**, on the same
+reading as the rest: the durations are the instrument's calibration, and a consumer
+varying them would be varying the experiment rather than configuring the tool.
+
 **The trials land in `.workflow/wait-primitive-evidence.txt`** — capture-tier,
 gitignored, advisory (gate-sdk/SPEC.md §The workflow directory), declared on the
 close-surface roster (lifecycle-kit/SPEC.md §The close-surface roster) naming its
@@ -2707,12 +2811,20 @@ the honest mode for a probe. The **finding** — the branch the trials select an
 its grounds — lands in this SPEC, never in the log; the log is evidence, and
 evidence is not the record.
 
+**This section is discharged, and the discharge is narrower than the kit's other
+one — narrow enough that stating the difference is this section's contribution to
+the port record.** There, a section's entire contract went in-crate. Here the
+*instrument* goes in-crate and its **subject** does not, so the section records
+itself discharged **with a named shell residue that is not residue**: the wait
+body, the local arming and the producer's launch are the artifact under test, not
+work left undone. A later reader counting a kit's owed sections needs both halves,
+because the second half is the one that looks like an unfinished port and is not.
+
 ## Layout and configuration
 
 ```
 delegation-kit/
   bin/usage-trend.sh              # footprint trend reporter over the history log
-  bin/wait-probe.sh               # wait-primitive probe: hand-invoked, no trigger, wired into no tier
   lib/delegation.sh               # shared helpers for the usage tools and the kit's gates
   usage-tests/cases.tsv           # expected-verdict <TAB> scenario knobs; read by the crate test that replaced its shell driver
   usage-tests/dispatch-guard-cases.tsv  # expected-outcome <TAB> scenario knobs; read by the crate test that replaced its shell driver
@@ -2737,6 +2849,15 @@ gate-sdk/SPEC.md §The kit-library port disposition rules the class and
 gate-sdk/SPEC.md §lib/gate.sh states the ground. The disposition is recorded here
 rather than in a library section because this kit has none; the layout line above
 is the file's only other mention.
+
+**The wait-primitive probe's port retired no knob, and the roster says so rather
+than leaving a reader to infer the pattern from the cut before it.** That cut took
+this kit's last holder of a default site and the knob left with it; this one
+cannot, because the probe's two reads are `GATE_SDK_TMP_DIR` and
+`GATE_SDK_WORKFLOW_DIR` — gate-sdk knobs with many other holders each, declared on
+the arm's own roster (§bin/wait-probe) and defaulted in `gate-sdk/lib/gate.sh`
+rather than here. Nothing moved in `lib/delegation.sh` for it, which is the fact a
+reader tracking the pattern needs.
 
 Config follows the established kit pattern: copy
 `templates/delegation-config.sh` into the gates dir (or point
@@ -2843,13 +2964,16 @@ the class ruling at gate-sdk/SPEC.md §The config-seam port disposition. Knobs
   the launch record's home is `${GATE_SDK_TMP_DIR:-.tmp}`, the cross-kit deferral
   every kit reaching that directory already resolves it through, and a second
   name for it would be the duplication rather than the config. **The rule has
-  since governed a second artifact and held**: `bin/wait-probe` (§bin/wait-probe)
-  writes producers, markers and `<key>.run` records into that same directory and
-  mints no knob of its own for it either. It mints none for its evidence log
+  since governed a second artifact and held**: the wait-primitive probe
+  (§bin/wait-probe) writes producers, markers and `<key>.run` records into that
+  same directory and mints no knob of its own for it either — a reading the
+  probe's port did not disturb, `GATE_SDK_TMP_DIR` crossing as one of its two
+  declared knobs rather than being replaced by a kit-local name. It mints none for
+  its evidence log
   either, and there the reasoning is the narrower one this bullet's own knob does
   not meet: a knob needs a reader, and `DELEGATION_KIT_STOP_LOG` has one — a
   *second process*, the consumer-side hook, which must be told where to write.
-  The probe both writes and reads its own log in one tool, so a knob there would
+  The probe both writes and reads its own log in one arm, so a knob there would
   be a name nothing reads, and the close stage reaches the file through the
   roster's literal rather than through a knob.
 - `DELEGATION_KIT_LIVENESS_CMD` — the liveness reader the probe invokes in set
@@ -3109,6 +3233,22 @@ over it is complete rather than demoted. The only tolerated variance is the
 clock: two invocations cannot share an instant, so the four clock-derived
 integers on a verdict line are compared numerically within a small band while
 everything else is compared byte for byte.
+
+**§bin/wait-probe's port bought the same comparison, and its shape is the one to
+copy where a member's output is a *measurement***. A full `sweep` ran under each
+implementation in one session and four things were compared: the **trial line**
+field by field, the **`<key>.run` record** — a first-class subject of the
+comparison rather than a side effect, since nothing static couples a gate to its
+shape — the **verdict block** byte for byte including the ceiling-tell line, and
+the **exit status per subcommand**, with `report` run against an empty evidence
+file in both substrates so the three-state contract's `1` was compared and not
+assumed. Two fields are deliberately **not** compared for equality, and saying so
+is the honest half: `marker_at_ms` and `waiter_at_ms` are wall-clock elapsed times
+that differ run to run, so what is compared for them is the **relation** —
+`waiter_at >= marker_at`, which is the whole measurement — and the `class` that
+relation produces. A comparison demanding byte equality there would fail on a
+correct port and pass on nothing. This member likewise has no live tree corpus, its
+input being processes it stands up itself, so the sweep *is* the corpus.
 
 `agent-budget-guard` and `agent-dispatch-guard` are hooks rather than gates, so
 each speaks exit-2 + hook JSON rather than the gate output contract — and each

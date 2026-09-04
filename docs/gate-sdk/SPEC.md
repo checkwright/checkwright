@@ -823,6 +823,18 @@ that looks like a real budget verdict. The port added all three behaviours the
 shell form had none of, which is the clause working forward rather than
 preserving a shape.
 
+**`--wait-probe` is the clause's third reader instance, and what distinguishes it
+is that the absorbed distinction is an *exit code* rather than an argument**
+(delegation-kit/SPEC.md §bin/wait-probe). That member's `report` returns **1** when
+no trials are recorded — a well-formed invocation whose substantive finding is that
+there is nothing to classify — and **2** on misuse. The `--emit-` spelling would
+have collapsed the two by construction, and no gate in the battery would have
+reported it. What the collapse costs is the difference between **an empty reading
+and a misuse**, on the one tool whose entire value is telling a reading from a
+non-reading; the harm is the second instance's exactly — a non-reading dressed as a
+reading — reached from a third direction, and the reason a port may not fold a
+status even where the collapse would happen to satisfy a documented sentence.
+
 **No gate reads this rule, and that is ruled rather than deferred.**
 §check-exec-bit's corpus is the whole `*/bin/*.sh` set, and a gate over it could
 assert only the weak static shape — does the file contain a `--help` branch —
@@ -2230,8 +2242,9 @@ its 2026-09-03 ones; and `--emit-scan-prompts`, guard-kit's friction-log ranker
 arms below it, and the bridged `Arm::Run` members that are neither —
 `--lesson-sink` (queue-kit/SPEC.md §The lesson-sink arm), `--upgrade-smoke`
 (§upgrade-smoke), `--install-lifecycle` (lifecycle-kit/SPEC.md
-§bin/install-lifecycle.sh, its 2026-09-03 member) and `--usage-verdict`
-(delegation-kit/SPEC.md §usage-verdict, its 2026-09-04 one) — and the class
+§bin/install-lifecycle.sh, its 2026-09-03 member), `--usage-verdict`
+(delegation-kit/SPEC.md §usage-verdict) and `--wait-probe`
+(delegation-kit/SPEC.md §bin/wait-probe), its 2026-09-04 pair — and the class
 they form is named here because a
 session arriving with a new non-gate thing to port has no other way to learn
 that one exists or what it costs. Each arm's own `spec:` comment explains that
@@ -2252,6 +2265,15 @@ A **non-gate arm** is specified by three properties:
   an arm inside that roster would read as a subcommand nothing declares and red
   the gate. Staying outside it is what keeps that equality true in both
   directions.
+
+  **A member's own *subcommand* word is an operand, never composed into the
+  flag**, and there are two instances rather than one: `--hook` dispatches a
+  member name off its first argument against a fixed table and refuses an unknown
+  one, and `--wait-probe` takes the same shape for its six subcommands
+  (delegation-kit/SPEC.md §bin/wait-probe). Stating it as a shape is what makes it
+  reusable: the arity question it raises is already answered, because `--knobs`
+  forwards the arm's own argv to the bridge, so a subcommand-bearing arm is a
+  solved registration rather than a new one.
 - **It owes no `.gate` descriptor, no `gates.list` registration, and no
   `good/`+`bad/` fixture pair.** Those three are the *gate* contract and they
   attach to a thing that returns a verdict a battery reads. An arm that returns
@@ -2329,6 +2351,14 @@ change**, and it belongs beside that worst case for the same reason: `uname`,
 `date`, `sort`, and every element of a roster the consumer may shadow, since
 `PROBE_SET` lives in a file rather than in the crate (context-kit/SPEC.md
 §bin/env-probe).
+**`--wait-probe` is the class's first member whose *subject* rather than whose
+implementation fixes the set**, and it belongs beside those two because it is the
+one case where a smaller set would be the defect: `bash`, and through it `nohup`,
+`sleep` and `date`. Those are not utilities the arm happens to reach for — they
+*are* what the member measures (delegation-kit/SPEC.md §bin/wait-probe), so an
+implementation that compiled them away would empty the set and change the
+measurement in the same motion. The two off-floor members of that set are stated
+as a cost there rather than claimed as a dividend the port removed.
 `grep -rn 'proc::' native/src/emit/` is the derivation; nothing maintains a
 list, and an enumeration written here would be one more thing to stale. This states
 the scope as it stands and rules nothing about whether it should: making arm
@@ -3785,7 +3815,22 @@ that answers each is the one whose corpus matches its question.
      refusal text and a point in the order. It also settles a second ordering the
      first wrapper could not: a member whose scan root is a positional argument
      checks that root **before** probing the program, so an absent root reports the
-     root and not the linter. **The third, `check-crate-arms`, is the first with
+     root and not the linter. **The clause's first *non-gate* instance is
+     `--wait-probe`, and it is also the first where the program decides a
+     **measurement** rather than an assertion** (delegation-kit/SPEC.md
+     §bin/wait-probe). The program there is `bash`, and what it decides is the
+     subject: the wait loop under measurement is the exact form the protocol
+     prescribes, so compiling it would measure a form no session runs. Two
+     properties of the class read differently from that side and are worth the
+     lines. First, the wrapper **`exec`s into** the program rather than spawning
+     and waiting on it, because the process depth between the caller and the loop
+     is itself part of what is measured. Second, and the concrete way a naive port
+     loses the rule: a shell's backgrounded child is **reaped**, so `kill -0` on
+     its recorded PID fails once it exits, while a compiled child whose parent
+     outlives it leaves a **zombie** that `kill -0` reports as alive — inverting
+     the field the member classifies on while every battery stays green. A
+     verdict-preserving port is the test, and *the program is the rule* is what
+     passes it. **The third, `check-crate-arms`, is the first with
      more than one program, and it is what shows the class rule is about the
      *program*, not about the member**: `cargo` gets a refusal arm and `rustc` gets
      none, because the member refuses without one and merely degrades without the
@@ -4440,7 +4485,18 @@ window, and what the column could not show was that its `# exit:` header was
 `check-assertion-strength`'s entire live enforcement vocabulary, so deleting it
 took that gate's reach from two call sites to zero — a loss no line count could
 have surfaced and which the cut had to cost deliberately
-(§check-assertion-strength). So
+(§check-assertion-strength). A **fifth** is cost that is *evidentiary*, and it is
+reached through a door the fourth does not open: there the coupling was a header a
+grep finds, and here governed prose in more than one kit rests on **trials one file
+produced** and that only it can reproduce on a second machine. Attested on the
+wait-primitive
+probe (delegation-kit/SPEC.md §bin/wait-probe), whose column read as a 184-line
+singleton under-filling its window while what it actually held was the evidence
+behind a resident protocol clause *and* the grant shape of another kit's guard
+rule — a rule whose measurement corrected the shape twice over, the loop's polarity
+and the **primitive**, the measured class turning out to be a wait loop on an
+arbitrary condition rather than anything keyed on one spelling. No line count shows
+that, and a ranking by the column would have deferred it indefinitely. So
 the count is one input beside the criterion
 columns and the session's own reading, never the answer: a session that reads
 the column as an answer stops looking for the cost the column cannot see.

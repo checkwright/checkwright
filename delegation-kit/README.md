@@ -81,8 +81,8 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
 bash gate-sdk/bin/run-gates.sh --usage-verdict            # budget verdict: exit 0 OK/RESET-OK, 1 PAUSE, 2 STALE
 bash gate-sdk/bin/run-gates.sh --usage-verdict <snapshot> # verdict for an explicit usage.txt (test injection)
 bash delegation-kit/bin/usage-trend.sh              # footprint trend over the sample log (needs DELEGATION_KIT_USAGE_HISTORY)
-bash delegation-kit/bin/wait-probe.sh sweep         # wait-primitive probe: the harness-uninvolved reproducer (sleeps for its declared sweep)
-bash delegation-kit/bin/wait-probe.sh report        # classify the recorded trials and print the verdict
+bash gate-sdk/bin/run-gates.sh --wait-probe sweep          # wait-primitive probe: the harness-uninvolved reproducer (sleeps for its declared sweep)
+bash gate-sdk/bin/run-gates.sh --wait-probe report         # classify the recorded trials and print the verdict (exit 1 when none are)
 ```
 
 With `DELEGATION_KIT_USAGE_HISTORY` set, `usage-verdict` logs one sample per

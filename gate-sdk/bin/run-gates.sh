@@ -30,6 +30,7 @@ usage: run-gates.sh [gates-dir]                run every registered gate
        run-gates.sh --lesson-sink <tag>        route a lesson body on stdin to its sink
        run-gates.sh --upgrade-smoke            prove the FROM->TO kit upgrade in scratch
        run-gates.sh --install-lifecycle [file] install the lifecycle resident surfaces
+       run-gates.sh --wait-probe <sub> [args]  the wait-primitive probe: 'sweep' is the reproducer
        run-gates.sh -h | --help                this text, on stdout, exit 0
 
   --only  runs the named members in registry order whatever order they were
@@ -73,6 +74,13 @@ usage: run-gates.sh [gates-dir]                run every registered gate
           config. The optional positional is the agent file to write into,
           overriding LIFECYCLE_KIT_AGENT_FILE. Idempotent; exit 2 when the agent
           file is absent or a marker pair is malformed, and unavailable is 2.
+  --wait-probe  stands known-duration producers up and measures candidate wait
+          forms against them, one trial line per run. The subcommand is an
+          operand: produce, waiter, arm-local, record, report, sweep — the
+          roster prints on stderr at exit 2 on misuse. Exit 0 on a completed
+          subcommand, 1 for `report` with no trials recorded, 2 on misuse;
+          unavailable is 2. Hand-invoked, wired into no tier, and `sweep`
+          sleeps for its declared durations.
   --      ends option processing, so a gates-dir spelled with a leading dash
           is still reachable.
 
@@ -183,6 +191,13 @@ case "${1-}" in
     --install-lifecycle)
         shift
         exec_arm --install-lifecycle "$@"
+        ;;
+    # spec: delegation-kit/SPEC.md §bin/wait-probe — a bridged arm outside the `--emit-` family, on
+    # its three-state exit status. Unavailable keeps exit 2 because the caller is a session reading
+    # the verdict, and the subcommand stays an operand so the flag composes with nothing
+    --wait-probe)
+        shift
+        exec_arm --wait-probe "$@"
         ;;
     --for)
         shift
