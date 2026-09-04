@@ -549,10 +549,18 @@ close of `scan-prompts-cut`, and `build-native-bootstrap-port-disposition-unrule
 `usage-verdict-cut`, which flagged the reading rather than resting on it. Both stand. That two
 sessions converged unaided is why this is recorded rather than left to a third to re-derive.
 **THE RUN IS NOT WEAKENED, stated because that is the reading to guard against.** No yield is
-created, the ruled composer's selection is untouched, the exception set is still the
-operator-ruled hotfix alone, and the discharge event is unchanged. An **active-section** promotion
-stays barred — that is the motion which would consume an iteration, and it is the one the clause
-above is about. Discharge: this paragraph is deleted with the one it qualifies.
+created, the ruled composer's selection is untouched, and the discharge event is unchanged. An
+**active-section** promotion stays barred — that is the motion which would consume an iteration,
+and it is the one the clause above is about. **The exception set has since taken a second member,
+and this sentence is corrected where it stood rather than answered beside itself — ruled
+2026-09-04 by the operator, lead-relayed.** Alongside the operator-ruled hotfix stands one scoped
+entry, `file-authoring-act-ungoverned`, whose own text carries the scoping and states the
+consequence the operator took with it. Recorded here because the bar two sentences up is what a
+later session reads, and reading it alone would make the iteration that takes the exception look
+non-compliant; the specific ruling governs the general bar, both being the operator's and of one
+date, and the entry is the exception's home rather than a roster kept here — a roster would be the
+maintained copy derivation-first refuses. Discharge: this paragraph is deleted with the one it
+qualifies, and this second member goes earlier, when that entry's promotion lands.
 
 **The run's ORDERING — not its existence — is reopenable at a later consult, and one ground is
 already on the record: ruled 2026-09-03 by the operator, lead-relayed from an in-session prompt.**
