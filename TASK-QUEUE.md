@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: wait-probe-cut-and-stage-journal-absence
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -88,15 +88,22 @@
   `overhead-meter-measures-the-lead` holds that the transcript resolver a faithful port would
   carry forward measures the wrong session. Composed for this iteration and DROPPED at spec on
   the lead's own envelope test, which admitted it only if its amendment matched kfric's shape.
-  `bin/stage-economics.sh` (464) — untouched, never composed, no ground read either way.
+  `bin/stage-economics.sh` (464) — **BLOCKED ON THE SAME SENTENCE, corrected in place 2026-09-04
+  at scope; this line previously read "no ground read either way" and that was wrong.** The
+  sibling-meter sentence above is written over BOTH meters — *a cut on **either** meter meets that
+  question* — so the blocker `overhead-meter.sh` already tripped governs this member too, and the
+  entry was under-stating its own text one line up. **This is now load-bearing rather than
+  bookkeeping:** with both members blocked, this host — the corpus's only minted SECOND host — has
+  no takeable member, which is what forecloses a second cut at the 2026-09-04 boundary. So the
+  under-fill there is a measured fact about this entry, not a missing host.
   **It DEMOTES at build, never `## Done`** — its deliverable is a corpus (canon-kit/SPEC.md
   §Merging an amendment), and 2026-09-03's build is the first such demotion: one member of three
   delivered, a later cut re-promoting with a fresh amendment. Minted straight into the active
   section, so no prior deferred position existed to recover from the promoting diff; it named
   this position itself and sits here, beside the entry whose shape it borrows and whose scope it
   does not.
-  **Cost while deferred:** two members, 569 lines, and one of them holds an unruled seam a consult
-  has to reach before its cut can be composed at all.
+  **Cost while deferred:** two members, 569 lines, BOTH behind one unruled seam a consult has to
+  reach before either cut can be composed at all.
   ruled: drift-kit-bin-port-residue lead 2026-09-03 own-authority
   Filed 2026-09-03 by spec, minted and promoted in one motion as the second cut's host on the
   ruling above; the column budget that forced it is filed as a recurrence of
@@ -501,48 +508,48 @@
   session can complete, stamp and commit a full evidence spine while leaving
   no resume journal at all, and the only thing that notices is the NEXT
   stage's entry, by which time the session that owed it is gone.
+  **PROMOTED INTO THIS ITERATION BY THE OPERATOR 2026-09-04, lead-relayed: the port-only
+  run is reopened for this ONE non-port unit, which only the operator may do.** No yield is
+  created for anything else and the run is not otherwise weakened. Declined twice before on
+  the run and not on merit (2026-09-03, 2026-09-04), then promoted when the third
+  recurrence below crossed the routing clause `threshold-recurrence-routing-residency`
+  carries, which ends lead discretion at two. **The SECTION MOVE IS NOT SCOPE'S, and that
+  was probed rather than assumed** — `check-amendment-queue` reds on `[design-pending]` in
+  an active section, so spec makes the move with the amendment, which is what promoting a
+  feature entry IS (canon-kit/SPEC.md §The amendment lifecycle, the bidirectional rule).
+  ruled: stage-journal-absence-caught-only-downstream operator 2026-09-04 lead-relay
   **Attested 2026-08-30 at this close.** The validate session of
   `consumer-smoke-contract-port` left no validate journal, and the
   predecessor-journal assertion refused close's entry. The assertion works —
-  that is not the finding. The finding is WHEN it fires.
-  **Precisely stated, the gap bullet's "fired at the LAST stage" being wrong:** it was
-  EVALUATED at spec, align, build and validate and PASSED each time, those four
-  journals all existing, so close is the first REFUSAL and not the first firing — and
-  the config comment's prediction was about evaluation, and was correct.
-  **What the refusal cost.** The close took the documented escape — writing the
-  stand-in itself and stating that validate left none — rather than forcing the entry,
-  so the absence is recorded. But a stand-in written by a session that did not do the
-  work can only point at durable artifacts (the stamp, two commits, the manifest, 24
-  parsed suite rows); it cannot carry validate's reasoning, permanently lost there.
+  that is not the finding. The finding is WHEN it fires: it was EVALUATED at spec,
+  align, build and validate and PASSED each time, so close is the first REFUSAL and not
+  the first firing, the gap bullet's "fired at the LAST stage" was wrong, and the config
+  comment's prediction, being about evaluation, was correct.
+  **What the refusal cost.** The close took the documented escape — writing the stand-in
+  itself and stating that validate left none — rather than forcing the entry, so the
+  absence is recorded. But a stand-in written by a session that did not do the work can
+  only point at durable artifacts; it cannot carry validate's reasoning, lost there.
   **Candidate shapes, none costed**: have the entry tool WRITE a skeleton journal at
   its own stamp so the artifact exists from the stage's first moment; or assert the
   journal at the stage's OWN exit, where the owing session is still live; or have the
   returning REPORT assert the path it wrote, moving detection to the lead's acceptance
   rather than the next entry gate — a delegation-kit or agent-definition change and not
   a lifecycle one, added 2026-09-04; or accept the escape and trust the successor.
-  **DISTINCT from the boundary keep-list entries**, which own the wipe's reach
-  over journals that EXIST. This entry's subject is a journal never written at
-  all, which no wipe rule reaches.
-  **Cost while deferred:** one iteration's stage reasoning is lost per firing,
-  and the loss is discovered by the one session structurally unable to make
-  it good.
-  **Second occurrence 2026-08-31 (`harness-hook-arm-port`), and it re-priced the
-  cost downward.** align left no journal; build's entry refused; the journal was
-  recovered from the still-resumable align session, so this firing lost nothing
-  — the permanent loss above holds only where the owing session is gone. The
-  gap bullet raised two questions and re-verification at the drain falsified
-  both: the obligation is **already** the stage's rather than the dispatch's
-  (lifecycle-kit/SPEC.md §The state machine says so in those words), so no
-  stage-skill restatement is owed; and the assertion is **not** `--simulate`-only
-  — `bin/enter-stage.sh` refuses a real entry on the same branch. What survives
-  is this entry's own subject, the firing point, unchanged.
-  **Two more 2026-09-02 (`test-runner-and-upgrade-cuts-with-liveness-attribution`):
-  align AND validate both left none in one iteration — sonnet tier, complete reports,
-  explicit grants. A rate, not a scatter; align's session was gone before close looked.
-  A FIFTH 2026-09-04 (`usage-verdict-cut`) at align, recovered from the still-live
-  session as 194 reconstructed lines: two iterations in three, so the mechanism catches
-  it every time and nothing prevents it. That one PAIRED with a zero-findings audit —
-  the confound reading is the align-watch's, recorded there rather than restated here.**
+  **DISTINCT from the boundary keep-list entries**, which own the wipe's reach over
+  journals that EXIST; this entry's subject is a journal never written at all.
+  **Cost while deferred:** one iteration's stage reasoning is lost per firing, and the
+  loss is discovered by the one session structurally unable to make it good.
+  **Second occurrence 2026-08-31 (`harness-hook-arm-port`) re-priced the cost downward:**
+  align left none, build's entry refused, and the journal was recovered from the
+  still-resumable align session — so the permanent loss above holds only where the owing
+  session is gone. Two questions the gap bullet raised were falsified at the drain: the
+  obligation is **already** the stage's, not the dispatch's (lifecycle-kit/SPEC.md §The
+  state machine, in those words), and the assertion is **not** `--simulate`-only.
+  **Two more 2026-09-02 (`test-runner-and-upgrade-cuts-with-liveness-attribution`): align
+  AND validate both left none in one iteration — sonnet tier, complete reports, explicit
+  grants. A rate, not a scatter; align's session was gone before close looked. A FIFTH
+  2026-09-04 (`usage-verdict-cut`) at align, recovered live as 194 reconstructed lines:
+  two iterations in three. Its zero-findings pairing is the align-watch's.**
   **THRESHOLD: DECLINED ON THE RUN, NOT ON MERIT, 2026-09-03 and again 2026-09-04 — one of five.**
   ruled: stage-journal-absence-caught-only-downstream lead 2026-09-03 2026-09-04 own-authority
   recurrence: stage-journal-absence-caught-only-downstream 2026-08-31 2026-09-02 2026-09-04
@@ -3438,13 +3445,12 @@
   candidate and was filed and merged as `amendment-update-target-coverage`, now retired, so the open
   question is the split — how much is a checklist edit to align's template, how much a gate, and
   whether a "keeps" list should keep its standing as an input at all.
-  **A second, separate failure class, recorded beside this one rather than folded into it.** The
-  validate session — also Sonnet — ended its turn on work still running in order to wait for it,
-  which its standing dispatch policy forbids outright. Corrected in-flight; it recovered fully,
-  re-verifying the first run's actual state rather than assuming it. That is a **protocol** miss,
-  not a judgment miss, and it belongs to the dispatch-policy surface rather than to align's
-  checklist. Kept adjacent because both are tier-calibration evidence and the two get read
-  together; kept distinct because a fix for either does nothing for the other.
+  **A second, separate failure class, recorded beside this one rather than folded in.** That
+  iteration's validate session — also Sonnet — ended its turn on running work in order to wait,
+  which its dispatch policy forbids; corrected in-flight, it recovered fully by re-verifying
+  rather than assuming. A **protocol** miss, not a judgment one, belonging to the dispatch-policy
+  surface; kept adjacent as tier-calibration evidence, kept distinct because neither fix helps
+  the other.
   **Second reading, `consumer-cohort-completion-and-wait-enforcement` (2026-08-15) — and it does
   not repeat the first.** Align ran on Sonnet, found **five real defects** and escalated nothing
   spurious, so the zero-divergence shape above did not recur. What did happen is the other half:
@@ -3453,20 +3459,22 @@
   shipped), and a second fail-closed hole.
   **Both facts, stated honestly, because they point opposite ways.** The revert signal **as
   defined** — a missed spec defect surfacing as a **build round-trip** — did **not** fire: build
-  absorbed all three in-session and nothing round-tripped. And three spec defects nonetheless
-  reached build, one of them battery-reddening. Whether a defect absorbed in-session should count
-  against the tier is a **tier judgment**, which is the lead's and the operator's; this close
-  records the data and does not re-tier. That question is itself the calibration this entry is
-  about — the revert trigger is defined on the round-trip, and this iteration is the case where
-  the two readings come apart.
+  absorbed all three in-session. And three spec defects nonetheless reached build, one of them
+  battery-reddening. Whether an in-session absorption counts against the tier is a **tier
+  judgment**, the lead's and the operator's, and it IS this entry's calibration: the trigger is
+  defined on the round-trip, and this is the case where the two readings come apart.
   **Third reading, `leak-guard-and-assertion-meta-gate-port` (2026-08-23): the second reading
   again, at five for five.** Every build batch found its amendment's stated *tree behaviour*
   wrong while its *ruling* was right — batch 4 carried three in one amendment, one of which
   would have refused the exact command its own rule exists to grant, each settled by one probe.
   recurrence: align-checklist-fanout-calibration 2026-08-23 2026-09-04
+  ruled: align-checklist-fanout-calibration lead 2026-09-04 own-authority
   **Cost while deferred:** align keeps returning a clean verdict that build then falsifies, so
   the stage's signal value decays toward zero while its cost does not — and a zero-divergence
   pass is read as evidence the amendments were right.
+  **FIRST THRESHOLD ROUTING 2026-09-04: stays deferred on the port-only run, not on merit.**
+  Never ruled at all before that date — measured three times, routed never — and at a count
+  of two it is lead discretion, the routing clause ending that discretion AT two, not before.
   Filed 2026-08-07 by close, from the lead's per-batch tiering watch.
 
 - **release-runbook-identity-diagnosis** [design-pending] — where the which-account-is-active
@@ -7388,21 +7396,22 @@
   LOW-MEDIUM and filed the call rather than taking it. That entry stays live and unchanged.
   **Why it generalises past one entry:** the ruling reaches every "measured at <date>" paragraph in
   the pool, so the sweep escalated rather than editing one entry. The borderline it weighed — exact
-  dated figures against a line RANGE being the most rot-prone shape the class takes, sitting in the
-  pool with the longest rot window — is what the 2026-09-03 ruling below resolves in both.
+  dated figures against a line RANGE, the most rot-prone shape the class takes — is what the
+  2026-09-03 ruling below resolves in both.
+  **A DONE-EXIT CANDIDATE FOR CLOSE, RECORDED 2026-09-04 AT SCOPE AS A READING AND NOT A
+  DISPOSITION.** Scope re-read the entry and found its own text already says the design ground is
+  retired, leaving mechanical citation repair; the Done exit is close's under the 2026-08-23 ruling
+  and this entry is held on a procedural decision, so scope recorded the reading rather than taking
+  it. Close meets this as a candidate instead of re-deriving it a seventh time.
   **The founding instance is gone and the shape came straight back — 2026-08-25, second instance.**
   The `install-relocation-boundary-and-first-cut` merge rewrote `powershell-installer-surface`
-  wholesale, deleting the two line ranges and four per-file counts named above; its replacement is a
-  ~22-row disposition table naming that file's internal functions in execution order, rev-pinned,
-  carrying a "re-derive by reading `init.sh` top to bottom" instruction. The question is unchanged
-  but its instance is now HARDER, not easier: a named-function roster in execution order reads
-  closer to the class's core "call chain or roster" language than the line spans did. That table is
-  the merged amendment's own deliverable, so narrowing it is re-scoping landed work.
+  wholesale, replacing those spans and counts with a rev-pinned ~22-row table of that file's
+  internal functions in execution order — HARDER, not easier, and closer to the class's own "call
+  chain or roster" language; as that amendment's deliverable, narrowing it re-scopes landed work.
   **Third instance 2026-08-29, and the first where the rot was OBSERVED rather than predicted.**
   `installer-graph-artifact-literal` carried two `installer/lib/init.sh` line numbers "exact,
   re-verified at the drain"; both had moved, the defect still live at both and only the numbers
-  wrong. So the cost line below is no forecast: a dated, explicitly re-verified span in the deferred
-  pool rotted inside eight days with no edit to the entry, and an eviction removed it, not a sweep.
+  wrong — a re-verified span rotted inside eight days with no edit, so the cost line is no forecast.
   recurrence: dated-measurement-restatement-class 2026-08-25 2026-08-29 2026-09-02
   **AT THRESHOLD, DECLINED SEVEN TIMES — 2026-08-30, twice 2026-08-31, 2026-09-01, 2026-09-02,
   2026-09-03, 2026-09-04; TWO were the OPERATOR's: 09-02 in a three-entry batch that took a sibling,
@@ -7421,8 +7430,7 @@
   de-literalization defect whatever date sits beside it" — so a span is OUTSIDE as a claim, INSIDE
   as an anchor, and an anchor whose sentence holds while its line moved is de-literalization,
   fix-shaped at a drain, never pendency. That reaches this entry's own forcing instance.
-  **The entry does not move on it**: the Done exit is the post-port triage act TRAJECTORY.md
-  §PRIORITY DIRECTIVE schedules — the sixth decline is the first with the answer in hand.
+  **The entry does not move on it**: the sixth decline was the first with the answer in hand.
   ruled: dated-measurement-restatement-class lead 2026-08-30 2026-08-31 own-authority
   ruled: dated-measurement-restatement-class lead 2026-09-01 2026-09-03 own-authority
   ruled: dated-measurement-restatement-class operator 2026-09-04 lead-relay
@@ -9540,7 +9548,19 @@
   **Cost while deferred:** every future cut selection re-reads this file and re-derives the same
   contradiction at survey cost, and the first composer that does not stop scores it takeable and
   composes a cut whose own owning section refuses half of it.
+  **A CONSULT IS SCHEDULED AND IT COVERS THREE QUESTIONS, NOT THIS ONE — OPERATOR-RULED
+  2026-09-04, lead-relayed.** One consult weighs this entry, its sibling
+  `build-native-bootstrap-port-disposition-unruled`, and TRAJECTORY.md's 2026-09-03
+  ordering-reopen paragraph together. The two blockers were already on record as needing one
+  consult between them; what the ruling adds is the third limb and the fact that the acting
+  session is NOT imminent, which is why this is landed on the entry now rather than carried
+  in a thread. **The ground that moved, re-measured 2026-09-04 at scope:** the ten owed files
+  behind the install boundary still total exactly 1237 lines, unchanged, while the oracle's
+  owed column fell from forty to thirty-six — so their share rose from 25.0% to 27.8% with no
+  line moving, and with this entry's 421 and its sibling's 110 added, 12 of 36 owed files and
+  1768 lines sit outside any cut the composer can reach.
   ruled: run-gates-front-end-cut-legality-unruled lead 2026-09-04 own-authority
+  ruled: run-gates-front-end-cut-legality-unruled operator 2026-09-04 lead-relay
   Filed 2026-09-04 to the gap inbox at scope; promoted here after →fix failed on the operator-class
   ruling and →icebox failed on the live per-cut-selection trigger.
 
@@ -9564,7 +9584,16 @@
   bootstrap cause and a separate argument for a consult to weigh. A consult reaching one should
   reach both, and neither is composable without it.
   **CONSULT-CLASS, and that is a ruling rather than this entry's own claim.**
+  **THE CONSULT IS SCHEDULED — OPERATOR-RULED 2026-09-04, lead-relayed**, and it is ONE consult
+  over three questions: this entry, `run-gates-front-end-cut-legality-unruled`, and
+  TRAJECTORY.md's 2026-09-03 ordering-reopen paragraph. That discharges this entry's own
+  "a consult reaching one should reach both" without merging the two arguments, which stay
+  distinct: there, one branch the owning section rules must survive; here, a self-reference
+  compiled into the artifact being ported. The acting session is not imminent, which is why
+  the schedule is landed here rather than carried in a thread. The sibling entry holds the
+  re-measured share the third limb turns on.
   ruled: build-native-bootstrap-port-disposition-unruled lead 2026-09-04 own-authority
+  ruled: build-native-bootstrap-port-disposition-unruled operator 2026-09-04 lead-relay
   **DISTINCT from `single-gate-front-end-form-unruled`**, whose subject is which front-end FORM
   `scripts/gate-exec.sh` should take, not whether a file may be declared out of the predicate.
   **Cost while deferred:** every future cut selection re-derives this contradiction at survey cost

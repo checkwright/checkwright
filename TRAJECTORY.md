@@ -568,9 +568,24 @@ run's own composer cannot reach; and `platform-support-ci-matrix` carries **twel
 citations, the highest figure the `queue-edges` arm reports**, above
 `native-gate-port-remaining-corpus`'s eight. The reading this does **not** license, stated because
 it is the tempting one: the run is not weakened, no yield is created, and the exception set is
-still the operator-ruled hotfix alone. Discharge event: the consult that weighs it, at which point
-this paragraph is deleted whichever way that consult goes — or the paragraph above it retires and
-takes this with it.
+still the operator-ruled hotfix alone.
+
+**That consult is now scheduled, and it carries two more limbs — ruled 2026-09-04 by the operator,
+lead-relayed.** One consult weighs this paragraph's ordering question together with
+`run-gates-front-end-cut-legality-unruled` and `build-native-bootstrap-port-disposition-unruled`,
+the two operator-class blockers that hold the front end and the crate's build script out of every
+lawful cut; the two were already on record as needing one consult between them, and this joins the
+ordering question to them rather than scheduling a second sitting. The acting session is not
+imminent, which is why the schedule is recorded here in the moment it was made rather than carried
+in a thread. **The ground re-measured 2026-09-04 at scope, beside the 2026-09-03 figures above
+rather than replacing them, both being dated attestations:** the ten install-boundary files still
+total exactly 1237 lines while the oracle's owed column has fallen to thirty-six, so their share
+rose from a quarter to 27.8 % with no line moving; the two blockers add 531; and
+`platform-support-ci-matrix` now reads thirteen inbound citations against
+`native-gate-port-remaining-corpus`'s eleven, so the corpus's highest-centrality entry is still the
+one the composer cannot reach. Discharge event, unchanged: the consult that weighs it, at which
+point this paragraph is deleted whichever way that consult goes — or the paragraph above it retires
+and takes this with it.
 
 **A sequence remainder of one is not a finished port, and reading it as one is the misreading
 this paragraph exists to stop — operator-ruled 2026-08-25.** The completion predicate is the one
