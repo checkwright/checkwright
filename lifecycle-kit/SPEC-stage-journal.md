@@ -164,6 +164,22 @@ and it does not exist at all where no lead is running — which is why delta (1)
 which reaches every stage session on every path, is the repair and this is the
 backstop.
 
+**The step composes with the dispatch precondition; it does not stand in for it,
+and the merge must leave both legible as two rules.** `templates/lead.md`'s own
+acceptance-boundary rule is unconditional and this delta does not touch it:
+"Stage N+1 is dispatched on stage N's agent completion notification — never on
+its commit, its stamp, a clean tree, a green battery, or a cleared `--simulate`."
+That sentence and this delta answer different questions on the same ground the
+existing reconciliation paragraph already states — one *gating* (*may stage N+1
+proceed, preconditions held?*, which `--simulate` answers and the mandatory step
+now always asks) and one *liveness* (*is stage N over?*, which no instantaneous
+read answers and which the notification alone settles). Mandatory does not mean
+sufficient: the step lands **after** the notification is in hand, never instead
+of waiting for it, and a merge that folded the two into "run `--simulate` and
+dispatch" would manufacture exactly the reading both the precondition sentence
+and its reconciliation paragraph already exist to refuse. Build integrates this
+step beside that sentence without loosening it.
+
 ### (5) The obligation gains a gate, in the same unit as the fix
 
 `check-stage-skill-coverage` gains a **third direction**: every configured stage's
@@ -235,16 +251,31 @@ ended. What the escape buys is real and unchanged — an absence that is deliber
 and written — but it is bought after the reasoning is gone, by the one session
 structurally unable to reconstruct it.
 
-**The standing objection is met rather than dodged.** §The stamp protocol rules
-that "a self-asserted 'stage complete' marker would prove a claim, not completion —
-the kit deliberately has none", and delta (1) instructs a session to write
-something at its own exit, which resembles one. The distinction is the one
-delegation-kit draws in the paragraph quoted above: the tree cannot observe what a
-session **received**, and it can observe what a session **wrote**. A journal is a
-durable artifact whose existence and content the entry already reads mechanically;
-the template step instructs a checkable **act**, and no surface anywhere reads the
-session's word for it. The refused shape is the one where the *claim* is the
-evidence — which is the second refusal above, and it is refused.
+**The standing objection is met rather than dodged, and on inspection the two
+subjects do not intersect at all.** §The stamp protocol rules that "a
+self-asserted 'stage complete' marker would prove a claim, not completion — the
+kit deliberately has none", and delta (1) instructs a session to write something
+at its own exit, which resembles one. That refusal is scoped to the **cursor** —
+a marker a *state surface* would read as proof of completion, since the last
+stamp in `.workflow/WORKFLOW-STATE.txt` is what the machine advances on. `DONE`
+is not that marker: delegation-kit/SPEC.md §Resume journal already contracts it,
+as the fourth clause of its four-clause contract, with its reading already
+settled there rather than minted here — meaningful only as the file's **last
+line**, and the **sole** signal only in a **cold read** (a journal found with no
+return ever consumed). Delta (1) instructs a session to discharge a contract
+another kit already owns; it mints no second completion marker for anything to
+resemble. The discriminator is whether any surface reads the marker as proof of
+stage completion, and none does — not the entry assertion, which this unit's own
+delta (1) states reads existence and content and never the marker, and not any
+state-machine surface, none of which consumes it at all.
+
+The distinction is also the one delegation-kit draws in the paragraph quoted
+above: the tree cannot observe what a session **received**, and it can observe
+what a session **wrote**. A journal is a durable artifact whose existence and
+content the entry already reads mechanically; the template step instructs a
+checkable **act**, and no surface anywhere reads the session's word for it. The
+refused shape is the one where the *claim* is the evidence — which is the second
+refusal above, and it is refused.
 
 ### (7) What this unit does not touch, named so the boundary is legible
 
@@ -438,8 +469,12 @@ index entry and nothing else.
 - `lifecycle-kit/templates/lead.md` — the acceptance boundary gains the
   pre-dispatch `--simulate` step, and the sentence that offers it as one of two
   options becomes the sentence that requires it, with the attested recovery as its
-  ground and its honest limit beside it (delta 4). §Channel design is untouched:
-  the journal stays a pull channel the lead reads and does not delete.
+  ground and its honest limit beside it (delta 4). The unconditional dispatch
+  precondition — never on a cleared `--simulate` among the other named artifacts
+  — and its gating-versus-liveness reconciliation paragraph are untouched by this
+  delta and the new step is stated as composing with them, never substituting for
+  them (delta 4). §Channel design is untouched: the journal stays a pull channel
+  the lead reads and does not delete.
 - `delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps` —
   the four-clause contract acquires a case it did not have: under a stage machine
   the file may **pre-exist** the agent, opened by the entry tool, so *agent writes*

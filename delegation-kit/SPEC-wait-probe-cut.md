@@ -239,7 +239,7 @@ dependency today in either substrate.
 
 ### (6) What compiles is the instrument around the subject
 
-Three subcommands port whole and one ports in part {design-bearing}:
+Three subcommands port whole and three port in part {design-bearing}:
 
 - **`record`** — the trial line's assembly and `classify`'s four-arm cause
   attribution, including the closed list's `unexplained` arm. This is pure text and
