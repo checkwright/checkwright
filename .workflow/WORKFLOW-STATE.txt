@@ -4,9 +4,4 @@
 
 ---
 
-usage-verdict-cut scope ae215f26 2026-09-04 07b275af
-usage-verdict-cut spec a9d4381c 2026-09-04 992bb2b9
-usage-verdict-cut align a2857a92 2026-09-04 a05e4460
-usage-verdict-cut build afdf5233 2026-09-04 25387abc
-usage-verdict-cut validate ac75e11d 2026-09-04 458a8ebf
-usage-verdict-cut close a0b48f2f 2026-09-04 288ef8f7
+— scope ad72224a 2026-09-04 2c634521
