@@ -1178,6 +1178,21 @@ with the scratch dir as its only argument. This repo's own reader is
 `scripts/producer-liveness-reader.sh`, which reaches the gate by name
 through the front end its whole pre-flight roster already uses.
 
+**That ruling's premise has lapsed, and the port disposition follows from the
+lapse.** The refusal above was written while the gate was a descriptor a bash
+front end dispatched, so "only a consumer knows its front end" was true. The hook
+and `check-producer-liveness` are now members of one binary, and a binary knows
+its own path: the hook reaches the gate through its **own executable** rather
+than through any front end, so the default reader is the compiled gate and the
+knob's absence means the default reader, not an unavailable verdict. `DELEGATION_KIT_LIVENESS_CMD`
+survives as the consumer **override** — a path executed directly with the scratch
+dir as its only argument, no interpreter word — for a consumer whose reader is not
+this gate. The worktree-resolution requirement below is discharged by construction
+for the default: the executable that is running is, by definition, present. This
+repo's shell reader and the front end it exec'd leave the tree with that cut; a
+consumer override that is a shell script names its interpreter in its own
+shebang, which is what dropping the `bash` prefix relies on.
+
 **A consumer's reader must resolve from a worktree-isolated dispatch, and this is
 a requirement on the adapter rather than advice to it.** The consequence of one
 that does not is severe and indirect, so it is named here: a fresh

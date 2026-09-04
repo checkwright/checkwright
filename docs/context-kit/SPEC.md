@@ -1299,9 +1299,14 @@ whose `rust.sh` emits a marker row: it is the extractor seam's **end-to-end
 proof**, the consumer-first resolution order and the `bash` spawn that executes a
 consumer extractor both exercised, with the shadow's output rather than the
 built-in grammar's recorded in the golden. **The runner itself stays shell**, and its ground is its own section rather than
-the arms it drives: it declares §Testing, and that group is blocked as a whole by
+the arms it drives: it declares §Testing, and it is sequenced together with
 `index-tests/toolfloor-cases.sh`, which exercises `lib/toolfloor.sh`'s floor
 predicate — a library sequenced behind the installer's behind-invoke relocation.
+That sequencing reaches exactly those two members: `smoke/agents-md.sh` declares
+the same section, sources neither the runner nor the library, and its own header
+calls it a standalone validate suite, so it is unblocked on its own ground
+(gate-sdk/SPEC.md §Porting a gate to the binary substrate — a stated cause reaches
+only the members it names).
 The floor predicate rides the same runner rather than a fixture pair —
 it is a sourced function, not a gate: `index-tests/toolfloor-cases.sh` sources
 `lib/toolfloor.sh` and prints one line per (element, banner) pair, so the closed

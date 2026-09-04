@@ -845,6 +845,15 @@ the one member that forced it: an entry still naming a path is the same trap
 armed for the next port, and re-pointing a still-shell member costs nothing
 because `gate_command` resolves it to exactly the path the entry held.
 
+**The front end's port disposition: the battery front-end's `--only <gate>` form
+is the pre-flight front end, and a consumer-side resolver script leaves the tree
+with the surface it drives.** `run-gates.sh --only` resolves the same name through
+the same `gate_command` and already carries the resolution-failure obligation
+below, so a second front end re-implements it for nothing; every pre-flight entry
+re-points to `<front-end> --only <gate>` and the resolver script is deleted. The
+knob is still not taught to resolve a name — the entry names the front end and
+the gate, and the exec-bit rule above is unchanged.
+
 **Owning the front end means owning what it does with a resolution failure it
 did not cause.** `gate_command` has two failure signals and they are told apart
 only by its **status** (gate-sdk/SPEC.md §lib/gate.sh): `return 1` for a member

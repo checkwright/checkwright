@@ -2151,6 +2151,22 @@ the cut section a singleton is precedent over spec: the section itself says the
 roster is that library's. No past cut had taken a proper subset of one section's
 owed files, so the ruling stands on the owner doc rather than on precedent.
 
+**A stated cause reaches only the members it names, and an always-loaded manifest
+is never a cut boundary.** Two corollaries of the outer-bound rule, stated because
+a composer met both. A section's sequencing sentence holds exactly the members
+whose content it names — a member of the same section that neither sources nor
+reads the sequenced library is unblocked, whatever the section says of its group
+*as a whole*, and the owner doc corrects its own over-declaration where it stands
+(context-kit/SPEC.md §Testing is the instance). And the composer's *one
+specification section* means a section of a kit SPEC or of the owner doc a
+`# spec:` line names for its mechanism; an always-loaded manifest such as a
+consumer's CLAUDE.md owns no mechanism, so a file whose `# spec:` points there is
+**mis-homed** rather than sequenced. The correction re-homes the pointer at the
+doc that owns the file's mechanism, and the file then cuts as a singleton under
+that owner. This is not the re-pointing the paragraph above refuses: that one
+moved a file away from a SPEC section that already owned it, and this one gives a
+file the owner it never had.
+
 **A consumer's plugin on a kit seam is owed like any file; ruling (1) reaches the
 seam alone — ruled 2026-09-03 by the operator on a consult's recommendation,
 lead-relayed.** `native-gate-port-remaining-corpus`' ruling (1) protects an
@@ -9081,6 +9097,24 @@ line and summary alike (§run-gate-tests). `--emit` has no such fallback and
 refuses when the binary is absent, because an emitter has no shell half left to
 run.
 
+**The front-end's port disposition: it ports down to a stub, and the loop above
+retires with the cut.** The loop's only served branch, the omit-and-declare
+install, dispatches nothing once no `.sh` member is registered — an artifact-less
+host then seeds an empty registry, which `run-gates` refuses rather than passes
+vacuously — so the duplication criterion 6 admitted has no branch left to serve
+and is deleted, not ported; the installer's binary-less leg re-scopes at the same
+cut to assert the declared omission and, where nothing survives, say so. The
+per-arm dispatch branches, which grow the file by one per bridged arm, move into
+the binary's own argv parsing. What remains is the residue this section already
+names: resolve the repo root, make the one `gate_knob_env` call that is the config
+bridge's bash producer (§lib/gate.sh, §The config-seam port disposition), and
+`exec` the binary with argv verbatim. That stub declares `# no-port:` on the
+config-seam cause `lib/gate.sh` itself carries — an existing cause, never a new
+class — and it is the whole of what stays shell on the hook-to-binary path. Two
+readings are refused: porting the file whole with the loop inside, which keeps a
+duplication serving no branch; and declaring the whole file, a subtraction that
+grows with every arm.
+
 **The split exists to delete a per-member bash bridge, and the arithmetic is why
 it was worth a port.** The front-end resolves the declared-knob union once for
 the whole run where the loop it replaced resolved one member's knobs at a time —
@@ -10485,6 +10519,17 @@ silent success or a skip:
 It is a tool, not a gate: no `# graph:` manifest, no `# install:` header, no
 fixture pair — the same distinction the kits' remaining `bin/` tools carry. It is
 `100755` in the index like every other `*/bin/*.sh` (§check-exec-bit).
+
+**The port disposition: declared, on a per-file bootstrap cause.** A fresh clone
+carries no binary, so nothing compiled exists to run the first build — the same
+irreducible the install bootstrap records (installer/README.md §The install
+boundary), met on the contributor side. A ported build arm would also be the
+crate's authoritative rebuild-yourself step for its own staleness check
+(§check-gate-binary-fresh names this script as the remedy from inside the crate),
+which cannot hold. So this file takes `# no-port:` citing this paragraph. That
+is a per-file cause and not a class: nothing else in `bin/` may cite it, and a
+second builder is a new file with its own disposition (the residual paragraph
+below).
 
 **When to run it relative to `git add` is §check-gate-binary-fresh's rule, not
 this section's.** A build made before a new crate file is staged bakes a stamp

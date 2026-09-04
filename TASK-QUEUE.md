@@ -138,6 +138,9 @@
   does not.
   **Cost while deferred:** two members, 569 lines, BOTH behind one unruled seam a consult has to
   reach before either cut can be composed at all.
+  **THE SEAM IS RULED 2026-09-05 (operator, consult): both meters adopt the stage-economics
+  derivation, in-crate once** — drift-kit/SPEC.md §The overhead meter. Both members are takeable.
+  ruled: drift-kit-bin-port-residue operator 2026-09-05 consult
   ruled: drift-kit-bin-port-residue lead 2026-09-03 own-authority
   Filed 2026-09-03 by spec, minted and promoted in one motion as the second cut's host on the
   ruling above; the column budget that forced it is filed as a recurrence of
@@ -179,18 +182,18 @@
   — ruling (1) reaches the seam alone, both 2026-09-03 (operator, lead-relay); (5) SIZING FILLS
   WITHIN THAT BOUND, 2026-09-04 (lead) — singletons under-fill lawfully, no host minted, widths stay
   per-cut, size arm permanently spent — gate-sdk/SPEC.md §Porting a gate to the binary substrate.**
+  **(6) PORT-CRITICAL UNITS RIDE THE RUN, 2026-09-05 (operator, consult)** — an entry whose
+  discharge is an owed file's stated precondition rides inside the cut it unblocks, or is its own
+  iteration only when it cannot fit; TRAJECTORY.md §PRIORITY DIRECTIVE owns the test.
   ruled: native-gate-port-remaining-corpus lead 2026-08-28 2026-08-29 2026-08-31 own-authority
   ruled: native-gate-port-remaining-corpus operator 2026-08-28 2026-08-29 2026-08-30 lead-relay
   ruled: native-gate-port-remaining-corpus operator 2026-09-03 lead-relay
   **Cost while deferred:** large and known — the **owed** remainder (the trailer's own arm, never
-  the unported count) plus the runners and the install-lifecycle layer. Not a single-iteration
-  delta; criterion relaxation is closed at gate-sdk/SPEC.md §The port-candidate criteria, an
-  ordering signal and never an eligibility screen. `gate-battery-result-cache` is the one battery
-  entry unsubsumed; `powershell-installer-surface` is the sequence's last member.
+  the unported count) plus the runners and the install-lifecycle layer; criterion relaxation is
+  closed at gate-sdk/SPEC.md §The port-candidate criteria; `gate-battery-result-cache` unsubsumed.
   **NO YIELD AT ALL until `--tree` reads zero owed — the port-only run, ruled 2026-08-31
-  (operator, consult); TRAJECTORY.md §PRIORITY DIRECTIVE owns it.** It SUBSUMES rather than
-  repeals the 2026-08-29 four-yield rule: with no yield available there is none to escalate.
-  ruled: native-gate-port-remaining-corpus operator 2026-08-31 consult
+  (operator, consult); TRAJECTORY.md §PRIORITY DIRECTIVE owns it**, subsuming the four-yield rule.
+  ruled: native-gate-port-remaining-corpus operator 2026-08-31 2026-09-05 consult
   ruled: native-gate-port-remaining-corpus lead 2026-09-01 2026-09-03 2026-09-04 own-authority
   Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close; cohorts ruled at scope 2026-08-11/12.
 
@@ -233,6 +236,10 @@
   objective, and on the ground that naming the convention is this entry's own deliverable, which a
   port cut may not rule (evidence-kit/SPEC.md §lib/evidence.sh). So the cut DEMOTES this entry
   rather than closing it, returning it to the position the 2026-08-24 promotion took it from.
+  **The delegation instance LEAVES the class 2026-09-05 (operator, consult):** the liveness hook
+  reaches its gate through its own executable, so the knob is an override over a working default
+  (delegation-kit/SPEC.md §The turn-end liveness hook); the question survives on the parser knobs.
+  ruled: kit-knob-consumer-adapter-convention operator 2026-09-05 consult
   ruled: kit-knob-consumer-adapter-convention lead 2026-09-03 own-authority
   Filed 2026-08-24 to the gap inbox by build in two bullets, the second correcting the first's
   repair premise as measured-false; promoted 2026-08-24 at
@@ -256,14 +263,12 @@
   separately measured work; on a red cause, file and defer without looping, which is what the
   one-to-two push budget protects. **Both consequences stay UNEXECUTED on an OBSERVED ground**,
   per `install-smoke-windows`' own comment: both wait on a first-observed-green run.
-  **The join half costs more than a line edit, and that is measured.** `native/targets.list:43-48`
-  owns it: the smoke builds from its host and refuses a foreign roster; steering or a cross-build.
+  **The join half is more than a line edit, measured:** `native/targets.list:43-48` owns it — the
+  smoke builds from its host and refuses a foreign roster; steering or a cross-build.
   **Cost while deferred:** the one adopter class with a named days-to-weeks adoption window has no
   working install path on Windows; `powershell-installer-surface` stays sequenced behind this; and
-  installer/README.md §The install boundary sequences `init`'s unconditional remainder behind the
-  artifact roster covering every supported platform, holding every `installer/lib` and
-  `installer/bin` file owed — **10 of the oracle's 40 owed files, 1237 lines, measured 2026-09-03**,
-  a quarter of the port's own owed column, gated on this leg and the macOS one.
+  installer/README.md §The install boundary holds every `installer/lib` and `installer/bin` file
+  owed behind this leg and the macOS one — 1237 lines, measured 2026-09-05 in TRAJECTORY.md.
   **ROUND 7 NAMED THE CAUSE, rounds 8-11 repeated it, round 12 ANSWERED it** — `graph.rs` spawned
   a BARE `bash` into a NATIVE Windows process, so a Win32 PATH search found WSL's launcher ahead of
   Git's `usr/bin`; that record RETIRES both 2026-08-31 TRAJECTORY.md paragraphs naming it. THE
@@ -287,8 +292,9 @@
   need a Windows host; 2026-09-03 spent a round — the diagnostic bailed before any comparison.
   **DEMOTED 2026-09-01 AT BUILD**, a recurrence rather than a tail — a NEW iteration on a FRESH
   amendment; the wedge is `observation-predicate-entry-cannot-drain-in-its-own-iteration`'s.
+  **Port-critical, own-iteration shape — ruled 2026-09-05**, TRAJECTORY.md §PRIORITY DIRECTIVE.
   ruled: platform-support-ci-matrix operator 2026-08-27 2026-08-30 2026-08-31 2026-09-03 lead-relay
-  ruled: platform-support-ci-matrix operator 2026-08-31 consult
+  ruled: platform-support-ci-matrix operator 2026-08-31 2026-09-05 consult
   ruled: platform-support-ci-matrix lead 2026-08-30 2026-09-01 own-authority
   Filed 2026-07-26 by scope, split from `platform-support-contract`; Linux split 08-25, macOS 08-26;
   promoted/deferred 08-25 through 09-01; rounds 6-12 ran 08-31 to 09-03, 8-11 identical to 7.
@@ -352,6 +358,9 @@
   was tried first and refused as a design call; icebox second, refused because a Windows adopter
   running a fixture suite is an adopter-facing witness under TRAJECTORY.md's 2026-08-30
   discriminator.
+  **PORT-CRITICAL, INSIDE-THE-CUT SHAPE — RULED 2026-09-05 (operator, consult):** it rides the
+  `test-hermetic.sh` cut it blocks, TRAJECTORY.md §PRIORITY DIRECTIVE.
+  ruled: hermetic-bin-suffix-pin-placement operator 2026-09-05 consult
 
 - **path-dialect-clauses-unenforced** [design-pending] — the two clauses gate-sdk/SPEC.md §The
   path-dialect contract gained 2026-08-30 are held by review alone, and neither is shaped like the
@@ -634,6 +643,10 @@
   **Cost while deferred:** macOS is named in the trajectory's OS-reach objective and every claim
   the project makes about it stays a reading rather than a measurement, and the `find -printf`
   defect above sits unfixed on the install path every macOS adopter takes today.
+  **PORT-CRITICAL, OWN-ITERATION SHAPE — RULED 2026-09-05 (operator, consult):** a lawful
+  iteration under the port-only run, TRAJECTORY.md §PRIORITY DIRECTIVE; the `find -printf` fix
+  rides inside it.
+  ruled: macos-install-smoke-ci-leg operator 2026-09-05 consult
   Filed 2026-08-26 by build, split from `platform-support-ci-matrix` under an operator ruling.
 
 - **powershell-installer-surface** [design-pending] — a native Windows install path. **Both
@@ -5344,6 +5357,10 @@
   2026-08-15 probe did not have: the meter's own dedupe then rewrites the log against the resolved
   id, so a mis-resolved run overwrites the row belonging to the OTHER session rather than merely
   filing its own under the wrong key. The seam question above is unchanged and no entry is minted.
+  **RULED 2026-09-05 (operator, consult): the seam is the first shape** — the port carries the
+  delegation-aware derivation in-crate and both meters read it; drift-kit/SPEC.md §The overhead
+  meter. Discharged by the meters' port cut, and port-critical to it under TRAJECTORY.md (6).
+  ruled: overhead-meter-measures-the-lead operator 2026-09-05 consult
   recurrence: overhead-meter-measures-the-lead 2026-09-03
   Filed 2026-08-15 by close, probed while reconciling its own meter output against its own stage
   stamp; scope-gated intake, so it is filed costed rather than fixed in flight.
@@ -6819,6 +6836,8 @@
   mechanism. The loop's own carry is unchanged and secondary — roughly 180 duplicated dispatch
   lines in `run-gates.sh`, held honest by an executed byte-comparison against the `--run` arm
   (`gate-sdk/gate-tests/run-arm-contract.test.sh`), so it is gated duplication rather than drift.
+  **Ruled 2026-09-05: folds into the `run-gates.sh` cut** — gate-sdk/SPEC.md §run-gates owns it.
+  ruled: binary-less-dispatch-loop-retirement operator 2026-09-05 consult
   Filed 2026-08-23 by build; drained at that iteration's close, which re-read the blocker's body
   to confirm the two deliverables are distinct; re-scoped 2026-08-24 at
   `shell-gate-tail-port-and-completion-oracle`'s close, whose drain re-ran the leg and confirmed
@@ -7116,6 +7135,11 @@
   per single-gate run — is paid off; what remains is that the tree now grants two front ends for
   one act and reinforces neither, so a session picks by habit and a later port retiring one strands
   a committed grant nobody attributes.
+  **RULED 2026-09-05 (operator, consult): the form is `run-gates.sh --only <gate>`.** The
+  pre-flight roster re-points to it and `scripts/gate-exec.sh` leaves the tree —
+  evidence-kit/SPEC.md §check-evidence-manifest owns it. Answered; the grant on the deleted
+  path drops with the cut under ruling (2).
+  ruled: single-gate-front-end-form-unruled operator 2026-09-05 consult
   Filed 2026-08-24 to the gap inbox by `shell-gate-tail-port-and-completion-oracle`'s close, from
   its prompt-friction triage; promoted 2026-08-24 at that iteration's scope intake; three carried
   measurements re-verified and corrected 2026-08-28 at close's drain.
@@ -9443,17 +9467,13 @@
   **Cost while deferred:** every future cut selection re-reads this file and re-derives the same
   contradiction at survey cost, and the first composer that does not stop scores it takeable and
   composes a cut whose own owning section refuses half of it.
-  **A CONSULT IS SCHEDULED AND IT COVERS THREE QUESTIONS, NOT THIS ONE — OPERATOR-RULED
-  2026-09-04, lead-relayed.** One consult weighs this entry, its sibling
-  `build-native-bootstrap-port-disposition-unruled`, and TRAJECTORY.md's 2026-09-03
-  ordering-reopen paragraph together. The two blockers were already on record as needing one
-  consult between them; what the ruling adds is the third limb and the fact that the acting
-  session is NOT imminent, which is why this is landed on the entry now rather than carried
-  in a thread. **The ground that moved, re-measured 2026-09-04 at scope:** the ten owed files
-  behind the install boundary still total exactly 1237 lines, unchanged, while the oracle's
-  owed column fell from forty to thirty-six — so their share rose from 25.0% to 27.8% with no
-  line moving, and with this entry's 421 and its sibling's 110 added, 12 of 36 owed files and
-  1768 lines sit outside any cut the composer can reach.
+  **RULED 2026-09-05 (operator, consult): disposition (i).** The per-arm dispatch moves in-crate,
+  the binary-less loop RETIRES with the cut (its zero-`.sh` condition arrived 2026-08-24 and
+  `binary-less-dispatch-loop-retirement` folds into this cut), and the stub that remains
+  declares on the config-seam cause `lib/gate.sh` carries — gate-sdk/SPEC.md §run-gates owns
+  the mechanism, TRAJECTORY.md §The closed rulings the refusals of (ii) and (iii). The entry is
+  answered; what is left is the cut, hosted by `native-gate-port-remaining-corpus`.
+  ruled: run-gates-front-end-cut-legality-unruled operator 2026-09-05 consult
   ruled: run-gates-front-end-cut-legality-unruled lead 2026-09-04 own-authority
   ruled: run-gates-front-end-cut-legality-unruled operator 2026-09-04 lead-relay
   Filed 2026-09-04 to the gap inbox at scope; promoted here after →fix failed on the operator-class
@@ -9478,15 +9498,12 @@
   must survive; here, a self-reference compiled into the artifact being ported, which is a stronger
   bootstrap cause and a separate argument for a consult to weigh. A consult reaching one should
   reach both, and neither is composable without it.
-  **CONSULT-CLASS, and that is a ruling rather than this entry's own claim.**
-  **THE CONSULT IS SCHEDULED — OPERATOR-RULED 2026-09-04, lead-relayed**, and it is ONE consult
-  over three questions: this entry, `run-gates-front-end-cut-legality-unruled`, and
-  TRAJECTORY.md's 2026-09-03 ordering-reopen paragraph. That discharges this entry's own
-  "a consult reaching one should reach both" without merging the two arguments, which stay
-  distinct: there, one branch the owning section rules must survive; here, a self-reference
-  compiled into the artifact being ported. The acting session is not imminent, which is why
-  the schedule is landed here rather than carried in a thread. The sibling entry holds the
-  re-measured share the third limb turns on.
+  **RULED 2026-09-05 (operator, consult): DECLARED, on a per-file bootstrap cause** — a fresh
+  clone has no binary to run the first build with, the install bootstrap's irreducible met on the
+  contributor side; gate-sdk/SPEC.md §build-native states the cause the `# no-port:` cites, and
+  it is per-file, never a class. The entry is answered; the one-line declaration rides the next
+  cut under `native-gate-port-remaining-corpus`.
+  ruled: build-native-bootstrap-port-disposition-unruled operator 2026-09-05 consult
   ruled: build-native-bootstrap-port-disposition-unruled lead 2026-09-04 own-authority
   ruled: build-native-bootstrap-port-disposition-unruled operator 2026-09-04 lead-relay
   **DISTINCT from `single-gate-front-end-form-unruled`**, whose subject is which front-end FORM
@@ -9524,6 +9541,12 @@
   **Cost while deferred:** 484 owed lines are unreachable to any composer that respects the stated
   contract, and each scope re-derives both ambiguities from scratch — this iteration's did, at
   survey cost, and took no cut either way.
+  **BOTH RULED 2026-09-05 (operator, consult).** (1) A stated cause reaches only the members it
+  names: `smoke/agents-md.sh` is takeable, and context-kit/SPEC.md §Testing is corrected in
+  place. (2) An always-loaded manifest is never a cut boundary: a `# spec:` pointing at
+  CLAUDE.md is mis-homed, and each of the three files re-homes at its owning doc and cuts as a
+  singleton — gate-sdk/SPEC.md §Porting a gate to the binary substrate owns both. Answered.
+  ruled: cut-boundary-section-legality-unruled operator 2026-09-05 consult
   Filed 2026-09-04 to the gap inbox at scope; promoted here after →fix failed (neither is a stage
   session's to settle) and →icebox failed on the live per-cut-selection trigger.
 
@@ -9786,6 +9809,11 @@
   the two sibling blockers — each its own entry — is what the fix has to reach; →icebox failed on
   the live per-boundary trigger. Machinery-class: its only demand witness is this repo's own port
   accounting.
+  **PRE-AUTHORIZED 2026-09-05 (operator, consult):** build lands the ported arm with the old
+  grant in place and records the one-line grant diff HERE; the operator applies it out of band
+  and the shell path works until then. The 2026-08-22 bar is untouched — TRAJECTORY.md §The
+  closed rulings.
+  ruled: scratch-run-port-blocker-unrecorded operator 2026-09-05 consult
   Filed 2026-09-04 to the gap inbox at scope; promoted 2026-09-05 by close.
 
 - **installer-printed-followup-commands-uncovered** [design-pending] — `init` prints two commands
@@ -9856,6 +9884,9 @@
   debugging, and the next occurrence presents as a fail-closed assertion silently passing rather
   than as a red — the expensive direction.
   →fix failed on the recorded refusal above; →icebox failed on the live per-port trigger.
+  **PORT-CRITICAL, INSIDE-THE-CUT SHAPE — RULED 2026-09-05 (operator, consult):** the strip
+  lands inside the next cut that ports a child-spawning arm, TRAJECTORY.md §PRIORITY DIRECTIVE.
+  ruled: run-validate-child-env-knob-leak operator 2026-09-05 consult
   Filed 2026-09-05 to the gap inbox at validate and amended there the same day; promoted
   2026-09-05 by close.
 

@@ -462,6 +462,54 @@ publishes private history as mechanism and ships pointers a consumer cannot foll
 the gate that holds the seam afterwards are one queue unit, filed from this consult; discharge
 event: that unit lands and the gate is green, at which point this paragraph is deleted.
 
+**The battery front-end ports to a stub and its binary-less loop retires; the crate's build
+script is declared on a bootstrap cause — ruled 2026-09-05 by the operator in consult.** The
+mechanism is gate-sdk/SPEC.md §run-gates and §build-native. Two alternatives were refused for
+`gate-sdk/bin/run-gates.sh`: porting it whole with the shell loop surviving inside the ported
+file, which keeps a duplication whose only served branch — the omit-and-declare install — has
+had nothing to dispatch since the battery's last shell gate left; and a `# no-port:` on the whole
+file, a subtraction that grows by a dispatch branch per bridged arm. The loop's retirement
+condition, zero `.sh` members, arrived 2026-08-24 and was held on the queue as
+`binary-less-dispatch-loop-retirement`; it lands inside this cut rather than as a unit of its
+own. For `gate-sdk/bin/build-native.sh` the refused alternative is porting it: a fresh clone
+has no binary to run the build with, which is the install bootstrap's irreducible met on the
+contributor side, and a per-file cause naming it is not the contributor-side *class* the
+2026-08-28 predicate refuses.
+
+**A stated cause reaches only the members it names, and an always-loaded manifest is never a
+cut boundary — ruled 2026-09-05 by the operator in consult.** Mechanism at gate-sdk/SPEC.md
+§Porting a gate to the binary substrate, beside the outer-bound ruling it extends. Refused: the
+*as a whole* reading of a section whose cause touches two of three members, which held 139
+standalone lines behind a library they never source; and composing three files sharing no
+subject as one cut under CLAUDE.md §Housekeeping, which is averaging grounds under a manifest
+that owns no mechanism. Re-homing a `# spec:` that points at a manifest is a defect correction
+and not the re-homing the 2026-09-03 ruling refused, which was a re-pointing away from a SPEC
+section that already owned the file.
+
+**The turn-end liveness hook reaches its gate through its own executable; the pre-flight front
+end is the battery front-end's `--only` form — ruled 2026-09-05 by the operator in consult.**
+Mechanism at delegation-kit/SPEC.md §The turn-end liveness hook and evidence-kit/SPEC.md
+§check-evidence-manifest. The *no default reader* rule was written while the gate was a
+descriptor a bash front end dispatched; with the gate and the hook compiled into one binary the
+front end is the binary itself, so the worktree-absence problem this repo's reader solved is
+gone rather than ported. Refused: porting the reader as a spawned arm, which carries the
+resolution hack into the crate; and per-file `# no-port:` causes on both scripts, a bash-spawn
+contract and a consumer front end, which subtract fifty-five lines for a contract the binary
+retires. `single-gate-front-end-form-unruled` closes with it.
+
+**Both drift-kit meters adopt the stage-economics session-key derivation — ruled 2026-09-05 by
+the operator in consult.** Mechanism at drift-kit/SPEC.md §The overhead meter. Refused: porting
+each meter with its own derivation, which makes the recorded divergence permanent in-crate and
+leaves `overhead-meter-measures-the-lead`'s mis-attribution standing after the port.
+
+**The scratch runner's port is pre-authorized: build prepares the grant addition, the operator
+applies it — ruled 2026-09-05 by the operator in consult.** The 2026-08-22 bar is untouched:
+build lands the ported arm with the existing path-naming grant still in place and records the
+one-line grant diff on `scratch-run-port-blocker-unrecorded`; the arm goes live when the operator
+applies it out of band, and the shell path keeps working until then, so no window exists where
+neither runs. Refused: a `# no-port:` citing guard-kit's permission-addition paragraph, a
+subtraction on a ground that is a scheduling fact rather than an irreducible.
+
 ## PRIORITY DIRECTIVE — the port track's sequence
 
 **Ruled 2026-08-09 by the operator, and it is the track's top priority: complete
@@ -554,56 +602,32 @@ created, the ruled composer's selection is untouched, and the discharge event is
 and it is the one the clause above is about. Discharge: this paragraph is deleted with the one it
 qualifies.
 
-**The run's ORDERING — not its existence — is reopenable at a later consult, and one ground is
-already on the record: ruled 2026-09-03 by the operator, lead-relayed from an in-session prompt.**
-Nothing reopens now, and the iteration that raised it proceeded under the run unchanged; what the
-operator ruled is that the evidence below *is* grounds to reconsider **which cuts come first**, to
-be weighed at a consult rather than mid-iteration by whichever session happens to find it. The
-evidence, first measured 2026-09-03 at scope and corrected where it stands at each later reading:
-`installer/README.md` §The install boundary sequences `init`'s unconditional remainder behind the
-artifact roster covering every supported platform, and
-its port-oracle paragraph holds every `installer/lib` and `installer/bin` file `owed` until that
-relocation lands — **ten of the port oracle's thirty owed files, 1237 lines** (2026-09-05, at
-close). So 33.3 % of the owed column is gated on `platform-support-ci-matrix` and
-`macos-install-smoke-ci-leg`, which the run's own composer cannot reach — and that share rises with
-no install-boundary line moving every time the run cuts a file it *can* reach, which is the
-direction worth watching rather than the figure. **That direction is now attested rather than
-predicted:** the reading above stood at thirty-four owed files and 29.4 % one iteration earlier,
-and the four cuts that iteration landed moved it to 33.3 % without touching one install-boundary
-line. And `platform-support-ci-matrix` carries
-**thirteen inbound queue citations, the highest figure the `queue-edges` arm reports**, above
-`native-gate-port-remaining-corpus`'s eleven. The reading this does **not** license, stated because
-it is the tempting one: the run is not weakened, no yield is created, and the exception set is
-still the operator-ruled hotfix alone.
-
-**That consult is now scheduled, and it carries two more limbs — ruled 2026-09-04 by the operator,
-lead-relayed.** One consult weighs this paragraph's ordering question together with
-`run-gates-front-end-cut-legality-unruled` and `build-native-bootstrap-port-disposition-unruled`,
-the two operator-class blockers that hold the front end and the crate's build script out of every
-lawful cut; the two were already on record as needing one consult between them, and this joins the
-ordering question to them rather than scheduling a second sitting. The acting session is not
-imminent, which is why the schedule is recorded here in the moment it was made rather than carried
-in a thread. The two blockers hold 562 owed lines of their own, on top of the install boundary's
-1237.
-
-**Three further limbs joined the same sitting — ruled 2026-09-04 by the operator, lead-relayed from
-an in-session prompt.** A scope survey composing that boundary's cut found each of them holding owed
-lines behind a question no composer may decide, and one sitting takes all three rather than three
-answered one at a time as each boundary rediscovers them.
-`cut-boundary-section-legality-unruled` is the first: two governing sections are unusable as cut
-boundaries for reasons their owner docs do not settle, and that entry's own cost field records the
-re-derivation being paid at every scope. The second and third sit in **one sentence** —
-gate-sdk/SPEC.md §Porting a gate to the binary substrate's per-file port-or-declared-cause clause,
-which has now produced three ports and two standoffs. `scripts/producer-liveness-reader.sh` is one:
-three surfaces disagree over whether `DELEGATION_KIT_LIVENESS_CMD` holds any consumer command or a
-path the compiled stop hook runs under bash, and which governs decides whether that file can port at
-all. `scripts/gate-exec.sh` is the other, its blocker mis-attributed to a downstream form question
-until that survey read the clause. Six limbs hold **1048** owed lines between them — counting
-`cut-boundary`'s installer-gated member once, under the install boundary rather than twice — which
-with the install boundary's own 1237 puts **2285 of the oracle's 4261**, near enough four lines in
-seven, beyond the reach of any lawful cut. Discharge event, unchanged: the consult that weighs it,
-at which point this paragraph is deleted whichever way that consult goes — or the paragraph above it
-retires and takes this with it.
+**Port-critical units are lawful under the run, in two shapes — ruled 2026-09-05 by the
+operator in consult, on a measured column.** The consult the 2026-09-03 ordering paragraph
+scheduled sat on this date and weighed its six limbs together; that paragraph and the two that
+joined limbs to it are retired here, their discharge event met. The measure that carried the
+ruling: the oracle read thirty owed files, 3956 lines, of which the ruled composer could reach
+four files and 473 lines — twelve per cent — while the install boundary and its transitive
+sequencing (`context-kit/lib/toolfloor.sh`, its index tests, doctrine-kit's installer and
+`gate-sdk/lib/inject.sh`) held 1713 lines behind two CI legs no cut can buy, and the five
+unruled dispositions ruled below held a further 1668. **The rule:** a deferred entry is
+*port-critical* when its discharge is the stated precondition of an owed file's cut — the
+test is the owning section's own sequencing sentence, never a session's judgment of usefulness.
+A port-critical entry takes one of two shapes and no third: it rides **inside** the cut it
+unblocks when it fits the build window (the hermetic suffix pin, the bridged-family strip in a
+second spawning arm), or it is its **own iteration** only when
+it cannot (the Windows leg's manifest cause-read, the macOS leg). Every other deferred entry
+stays barred exactly as the port-only run bars it; the run's existence, its composer, its
+discharge event and its no-promote clause are untouched. Two alternatives were refused. **A
+dedicated relief iteration** pays a full scope, close and supervision floor — near three fifths
+of an iteration's spend on the 2026-09-03 measure — for members that each fit inside a cut,
+mixes two multi-round remote-oracle legs with one-line fixes under one unit set, and reopens the
+post-port triage the run defers on purpose. **Leaving the run unchanged** takes the 473
+reachable lines and then stalls at eighty-eight per cent of the column unreachable, with the
+legs landing by no route at all. Discharge event: the install boundary's precondition is met —
+`native/targets.list` carries every supported platform — at which point the own-iteration
+shape has no member left and this paragraph retires; the inside-the-cut shape is the
+build-window ruling's ordinary content and needs no record of its own.
 
 **A sequence remainder of one is not a finished port, and reading it as one is the misreading
 this paragraph exists to stop — operator-ruled 2026-08-25.** The completion predicate is the one
