@@ -12,21 +12,6 @@
 
 ## New Features
 
-- **trend-reporter-port-cut** [spec: SPEC-trend-cut.md] — port `delegation-kit/bin/usage-trend.sh`
-  (120) to the bridged `--emit-usage-trend` arm, the one owed file declaring
-  delegation-kit/SPEC.md §Trend reporter. It takes delegation-kit's `bin/` column to zero.
-  **Selection ground and host: as the two evidence-kit cuts above**, not restated.
-  **It is the batch's only `Arm::Emit`, and the exit contract settles that rather than taste:**
-  the tool declares 0 report emitted, 2 fail-closed and NEVER 1, which is that family verbatim, so
-  the member needs no new front-end `case` arm. It is the exact inverse of `--usage-verdict`'s
-  `Arm::Run` ruling one table row away, where the presence of a 1 forced the other answer.
-  **It forecloses one option of a live deferred entry and owes that entry a note in the same
-  commit:** `assertion-strength-exit-header-reach`'s option (c) requires this file to still be
-  shell. The gate's reach was already zero before this cut, so the port narrows a design space
-  rather than a verdict.
-  ruled: trend-reporter-port-cut lead 2026-09-04 own-authority
-  Filed 2026-09-04 by spec, minted with its amendment and promoted in the same commit.
-
 - **hooks-opt-in-port-cut** [spec: SPEC-hooks-cut.md] — port `gate-sdk/bin/install-hooks.sh` (59)
   to the bridged `--install-hooks` arm, the one owed file declaring gate-sdk/SPEC.md
   §install-hooks. It settles one section and does not discharge the kit.
@@ -9639,6 +9624,13 @@
   `usage-trend.sh` an uppercase-token header — one line against a still-owed shell file, restoring
   a nonzero map, but it widens a DECLARATION rather than the gate and its value is unmeasured. (a)
   and (b) are costed at gate-sdk/SPEC.md §check-assertion-strength; (c) is not.
+  **(c) IS FORECLOSED as of 2026-09-04, by `trend-reporter-port-cut`'s own commit.** That cut
+  ported `usage-trend.sh` to `--emit-usage-trend` and deleted the file, so there is no still-owed
+  shell file to give a header to and (c) is no longer a one-line move. The note is factual and
+  takes no position on the value question this entry holds open: the reach was ALREADY zero before
+  that cut, so the port did not cause the zero — it narrowed the design space, leaving (a), the
+  refused (b), and "not worth it". The condition paragraph above is left as the dated reading it
+  was rather than rewritten, since it records what the drain measured.
   **The value question is unchanged and is still the open part**, and a legitimate outcome of the
   design pass is "not worth it" plus a widened honest limit in that section saying why.
   **Why it left the icebox.** It was evicted as *wider header reach may be ceremony* — low,
@@ -9857,5 +9849,6 @@
 
 - evidence-spine-port-cut
 - baseline-diff-port-cut
+- trend-reporter-port-cut
 
 ## Lessons Learned

@@ -1,12 +1,11 @@
 // spec: delegation-kit/SPEC.md §Testing — the crate-side decision-table runner for usage-verdict
 // and assertion runner for usage-trend, driven over the kit's committed fixtures on disk. These
-// replace the two shell runners.
+// replace the two shell runners, and both subjects are now reached in process.
+use crate::emit::usage_trend;
 use crate::hook::verdict;
 use crate::knobenv;
 use std::path::{Path, PathBuf};
-use std::process::{Command, Stdio};
-
-const KIT_PREFIX: &str = "DELEGATION_KIT_";
+use std::process::Command;
 
 // spec: gate-sdk/SPEC.md §lib/gate.sh — the namespace a *compiled* member reads: `walk::knob_scalar`
 // resolves `GATE_SDK_KNOB_<name>`, so this is the prefix the in-process subject's strip must aim at.
@@ -92,40 +91,6 @@ fn sandbox(tag: &str) -> PathBuf {
 struct Ran {
     out: String,
     code: i32,
-}
-
-// spec: delegation-kit/SPEC.md §Testing — the subject is spawned with its cwd inside the sandbox
-// and its two streams merged, the `2>&1` capture the shell form took: every assertion reads the
-// merged stream, and capturing them apart would pass the no-leak conjunct vacuously.
-fn subject(cwd: &Path, script: &Path, args: &[String], extra: &[(&str, String)]) -> Ran {
-    let capture = cwd.join(".merged-capture");
-    let out = std::fs::File::create(&capture).expect("the merge capture must be creatable");
-    let err = out.try_clone().expect("the merge capture must be duplicable");
-    let mut cmd = Command::new("bash");
-    cmd.arg(script)
-        .args(args)
-        .current_dir(cwd)
-        .stdin(Stdio::null())
-        .stdout(Stdio::from(out))
-        .stderr(Stdio::from(err));
-    // spec: delegation-kit/SPEC.md §Testing — the strip is the whole namespace, derived from the
-    // process's own variables at run time; a hardcoded list re-creates the failure the poison
-    // export exists to catch.
-    for (name, _) in std::env::vars() {
-        if name.starts_with(KIT_PREFIX) {
-            cmd.env_remove(&name);
-        }
-    }
-    for (name, value) in extra {
-        cmd.env(name, value);
-    }
-    let status = cmd.status().expect("the subject must be spawnable");
-    let merged = std::fs::read_to_string(&capture).expect("the merged capture must be readable");
-    let _ = std::fs::remove_file(&capture);
-    Ran {
-        out: merged,
-        code: status.code().unwrap_or(-1),
-    }
 }
 
 // spec: delegation-kit/SPEC.md §Testing — `grep -c ''`'s count, under which a final unterminated
@@ -551,45 +516,92 @@ const TREND_SEGMENTS: &[(&str, &str, usize)] = &[
 // safe because the reporter measures within-segment deltas, never against *now*.
 #[test]
 fn the_kits_trend_fixture_reports_its_segments() {
-    // spec: delegation-kit/SPEC.md §Testing — the poison is the same knob the reporter reads, which
-    // is what makes the unset-knob arm below meaningful rather than vacuous.
+    // spec: delegation-kit/SPEC.md §Testing — the in-process face of the strip: the ambient bridge
+    // namespace is held aside and reseeded from the kit defaults, so the reporter reads the same
+    // empty history knob the stripped child read and the unset-knob arm below still fires.
     let knobs = knobenv::lock();
+    let held = strip_bridge(&knobs);
+    seed_bridge(&knobs, &[]);
     let history = kit("delegation-kit/usage-tests/trend-history.log");
+    // spec: delegation-kit/SPEC.md §Testing — the poison, re-aimed by the port: the *unbridged*
+    // spelling carries a real path, so an arm reading the kit variable directly instead of through
+    // the config bridge passes the report arm and then fails the unset arm loudly.
     knobs.set("DELEGATION_KIT_USAGE_HISTORY", &text(&history));
 
     let dir = sandbox("trend-tests");
-    let trend = kit("delegation-kit/bin/usage-trend.sh");
 
-    let ran = subject(&dir, &trend, &[text(&history)], &[]);
-    assert_eq!(ran.code, 0, "want exit 0, got {} -- {}", ran.code, ran.out);
+    let report = usage_trend::emit(&[text(&history)]).expect("the fixture must report");
     for (label, needle) in TREND_NEEDLES {
         assert!(
-            ran.out.contains(needle),
+            report.contains(needle),
             "[{}]: output missing '{}'",
             label,
             needle
         );
     }
     for (label, prefix, want) in TREND_SEGMENTS {
-        let got = ran.out.lines().filter(|l| l.starts_with(prefix)).count();
+        let got = report.lines().filter(|l| l.starts_with(prefix)).count();
         assert_eq!(got, *want, "[{}]: segment lines under '{}'", label, prefix);
     }
 
-    // spec: delegation-kit/SPEC.md §Trend reporter — the two fail-closed arms, each asserting the
-    // child's own status rather than reproducing the shell idiom that read it
-    let unset = subject(&dir, &trend, &[], &[]);
-    assert_eq!(
-        unset.code, 2,
-        "[unset knob]: want exit 2, got {} -- {}",
-        unset.code, unset.out
+    // spec: delegation-kit/SPEC.md §Trend reporter — the two fail-closed arms, preserved as the
+    // arm's own `Err` into `Arm::Emit`'s exit 2 rather than as the shell idiom that read a status
+    let unset = usage_trend::emit(&[]).expect_err("[unset knob]: want a refusal");
+    assert!(
+        unset.contains("no history to report"),
+        "[unset knob]: {}",
+        unset
     );
-    let missing = subject(&dir, &trend, &[text(&dir.join("nope.log"))], &[]);
-    assert_eq!(
-        missing.code, 2,
-        "[missing history]: want exit 2, got {} -- {}",
-        missing.code, missing.out
+    let missing = usage_trend::emit(&[text(&dir.join("nope.log"))])
+        .expect_err("[missing history]: want a refusal");
+    assert!(
+        missing.contains("cannot read history"),
+        "[missing history]: {}",
+        missing
+    );
+
+    // spec: delegation-kit/SPEC.md §Trend reporter — a readable history with no parseable sample
+    // stays exit 0: an empty log is a reading, and collapsing it into the misuse code would be the
+    // reading-versus-non-reading harm the bin/-tool contract records.
+    let empty = dir.join("comments-only.log");
+    std::fs::write(&empty, "# no key=value pair here\n\n").expect("the empty log must be writable");
+    let read = usage_trend::emit(&[text(&empty)]).expect("an unparseable log is still a reading");
+    assert!(
+        read.contains("no parseable samples") && read.contains("(0 segments)"),
+        "[zero segments]: {}",
+        read
+    );
+
+    // spec: gate-sdk/SPEC.md §The bin/-tool contract — the three behaviours this port ADDS, which
+    // exist in one substrate only and are therefore asserted here rather than compared: the shape
+    // refusal, the `--help` instance of it that the shell absorbed as a path, and the `--` escape.
+    let flag = usage_trend::emit(&["--help".to_string()]).expect_err("[--help]: want a refusal");
+    assert!(
+        flag.contains("unrecognized option: --help") && flag.contains("usage: run-gates.sh --emit"),
+        "[--help]: the refusal must name the flag and print the usage block: {}",
+        flag
+    );
+    let dashed = usage_trend::emit(&["-notapath".to_string()])
+        .expect_err("[shape refusal]: want a refusal");
+    assert!(
+        dashed.contains("unrecognized option: -notapath"),
+        "[shape refusal]: {}",
+        dashed
+    );
+    let escape = dir.join("--dashed.log");
+    std::fs::copy(&history, &escape).expect("the dash-led fixture must be copyable");
+    let escaped = usage_trend::emit(&["--".to_string(), text(&escape)])
+        .expect("[-- escape]: a dash-led path must be reachable");
+    assert!(
+        escaped.contains("axis-record(s)"),
+        "[-- escape]: {}",
+        escaped
     );
 
     let _ = std::fs::remove_dir_all(&dir);
     knobs.remove("DELEGATION_KIT_USAGE_HISTORY");
+    for (name, _) in KIT_DEFAULTS {
+        knobs.remove(&bridged(name));
+    }
+    restore_bridge(&knobs, &held);
 }

@@ -11,7 +11,7 @@ DELEGATION_KIT_READONLY_TYPES=(audit-sweep)
 # shellcheck disable=SC2034  # consumed by the --hook subagent-stop-liveness arm, which the config bridge resolves this path for
 [[ -v DELEGATION_KIT_LIVENESS_CMD ]] || DELEGATION_KIT_LIVENESS_CMD="scripts/producer-liveness-reader.sh"
 
-# spec: delegation-kit/SPEC.md §usage-verdict — sample the footprint per verdict into the gitignored measurement dir; usage-trend.sh reports the evolution
+# spec: delegation-kit/SPEC.md §usage-verdict — sample the footprint per verdict into the gitignored measurement dir; --emit-usage-trend reports the evolution
 # shellcheck disable=SC2034  # consumed by delegation-kit/lib/delegation.sh after sourcing
 DELEGATION_KIT_USAGE_HISTORY=".metric/usage-history.log"
 

@@ -35,6 +35,7 @@ pub mod run_validate;
 pub mod session_id;
 pub mod trajectory;
 pub mod upgrade_smoke;
+pub mod usage_trend;
 pub mod value_rollup;
 pub mod wait_probe;
 
@@ -418,6 +419,14 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         "--emit-env-probe",
         Arm::Emit(env_probe::emit),
         env_probe::KNOBS,
+    ),
+    // spec: delegation-kit/SPEC.md §Trend reporter — an `Arm::Emit` settled by the *absence* of a
+    // 1 in the declared contract, the exact inverse of `--usage-verdict` below; the `--emit-`
+    // spelling rides with the family, so no new front-end `case` arm is owed.
+    (
+        "--emit-usage-trend",
+        Arm::Emit(usage_trend::emit),
+        usage_trend::KNOBS,
     ),
     // spec: gate-sdk/SPEC.md §run-gates — the battery runner: the class's first bridged member
     // that returns a verdict rather than a document, and the reason the table is keyed by flag

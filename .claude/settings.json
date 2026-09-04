@@ -45,7 +45,6 @@
       "Bash(bash */smoke/violation.sh)",
       "Bash(bash context-kit/smoke/agents-md.sh)",
       "Bash(bash context-kit/smoke/agents-md.sh *)",
-      "Bash(bash delegation-kit/bin/usage-trend.sh)",
       "Bash(bash demo/run-demo.sh)",
       "Bash(bash installer/consumer-smoke/run-smoke.sh)",
       "Bash(bash installer/consumer-smoke/run-smoke.sh *)",

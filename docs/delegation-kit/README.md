@@ -85,14 +85,14 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
 ```bash
 bash gate-sdk/bin/run-gates.sh --usage-verdict            # budget verdict: exit 0 OK/RESET-OK, 1 PAUSE, 2 STALE
 bash gate-sdk/bin/run-gates.sh --usage-verdict <snapshot> # verdict for an explicit usage.txt (test injection)
-bash delegation-kit/bin/usage-trend.sh              # footprint trend over the sample log (needs DELEGATION_KIT_USAGE_HISTORY)
+bash gate-sdk/bin/run-gates.sh --emit usage-trend          # footprint trend over the sample log (needs DELEGATION_KIT_USAGE_HISTORY)
 bash gate-sdk/bin/run-gates.sh --wait-probe sweep          # wait-primitive probe: the harness-uninvolved reproducer (sleeps for its declared sweep)
 bash gate-sdk/bin/run-gates.sh --wait-probe report         # classify the recorded trials and print the verdict (exit 1 when none are)
 ```
 
 With `DELEGATION_KIT_USAGE_HISTORY` set, `usage-verdict` logs one sample per
-call; `usage-trend` reads that log and reports per-window footprint evolution
-and weekly headroom (advisory — exit 0/2, never a pause verdict).
+call; `--emit usage-trend` reads that log and reports per-window footprint
+evolution and weekly headroom (advisory — exit 0/2, never a pause verdict).
 
 `check-gate-tamper` runs from the pre-commit hook and the battery; invoke it
 directly with `--fixture <dir>` only for testing.
@@ -105,5 +105,5 @@ bash gate-sdk/bin/run-gate-tests.sh delegation-kit/gate-tests delegation-kit/che
 
 The `usage-verdict` decision table and the `usage-trend` assertions are no
 longer shell runners: they retired into the gate binary's crate test lane, where
-they read the same `usage-tests/` fixtures off disk and spawn the two shell
-subjects (SPEC §Testing).
+they read the same `usage-tests/` fixtures off disk and reach both subjects **in
+process** — no shell subject remains on either (SPEC §Testing).

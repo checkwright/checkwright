@@ -853,6 +853,25 @@ one respect: the reader is not a session that might notice the wording, it is a
 CI step whose only output is a check mark. The port added all three behaviours,
 the clause working forward again.
 
+**`--emit-usage-trend` is the clause's fifth reader instance, and the first
+whose absorbed argument costs only *discoverability***
+(delegation-kit/SPEC.md §Trend reporter). Its shell form took the second
+instance's shape exactly — the first positional assigned straight into the
+history path, so `usage-trend.sh --help` printed `cannot read --help` at exit
+2 — but this member renders no verdict, so the misread produces a diagnostic
+rather than a wrong number or a false clean. What it costs is the half this
+contract also measures: a session hunting for the tool's modes gets a
+file-not-found where usage belongs. **And it is the instance that settles where
+the retired `-h`/`--help` arm's usage actually goes for an `--emit-` member.**
+The front-end gives each bridged arm holding its own `case` arm a named line and
+a paragraph in `--help`, but documents the whole `--emit-` family in one generic
+line and enumerates no member — so an `--emit-` member's usage is **not** in the
+front-end's help text and is not owed there. It lives at the member's own shape
+refusal, which prints the usage block at exit 2. Reading "retires to the
+front-end" as "reaches the front-end's help text" is true for a `case`-arm
+member and false for this family, and a member ruled into the `--emit-` family
+takes the narrower reading with it.
+
 **No gate reads this rule, and that is ruled rather than deferred.**
 §check-exec-bit's corpus is the whole `*/bin/*.sh` set, and a gate over it could
 assert only the weak static shape — does the file contain a `--help` branch —
@@ -2255,7 +2274,9 @@ inbox), and `--emit-kfric`, drift-kit's knowledge-friction capture affordance
 (drift-kit/SPEC.md §The knowledge-friction loop) — both free-text capture members
 the argv-shape split below governs —
 its 2026-09-03 ones; and `--emit-scan-prompts`, guard-kit's friction-log ranker
-(guard-kit/SPEC.md §scan-prompts)), the
+(guard-kit/SPEC.md §scan-prompts), and `--emit-usage-trend`, delegation-kit's
+footprint trend reporter (delegation-kit/SPEC.md §Trend reporter), its
+2026-09-04 one), the
 **harness-integration**
 arms below it, and the bridged `Arm::Run` members that are neither —
 `--lesson-sink` (queue-kit/SPEC.md §The lesson-sink arm), `--upgrade-smoke`
@@ -2802,6 +2823,23 @@ natural read of "it prints findings" is that `--emit-` fits. It does not: 1 is
 its verdict and 2 its misuse code, and its one functional caller is a CI leg that
 reads nothing but the status. Recorded because it is the only member so far whose
 family choice a reader could get wrong from the output alone.
+
+**`--emit-usage-trend` is the member that reads the same test from the other
+side: it is in the family because its contract declares *no* 1**
+(delegation-kit/SPEC.md §Trend reporter). The five paragraphs above each record a
+member forced **out** by a status distinction; this one is admitted by the
+documented absence of one — "never 1 (it renders no verdict; the verdict stays
+the sole pause authority)" — so the collapse to {0, 2} discards nothing it ever
+carried, and it produces a document besides. It sits one row from
+`--usage-verdict` in the same kit under the opposite answer from the same test,
+which is the clearest statement of what the test actually asks: not *does it
+print*, but *does a status distinction carry meaning*. **One consequence rides
+with the family** and is recorded because a reader would otherwise assume the
+`case`-arm precedent: an `--emit-` member gets no front-end `case` arm — the
+`--emit <name>` operand composes its flag, which is also why its spelling is
+forced rather than chosen — and therefore no named line and no paragraph in the
+front-end's `--help`. Its usage lives at its own shape refusal instead
+(§The bin/-tool contract).
 
 **`--run-validate`'s spawned-program set is the class's widest, and the first that
 is a *roster* rather than a seam or two.** `--usage-verdict` spawns one consumer
@@ -12952,19 +12990,27 @@ deriving one cannot.
 header is simply out of reach — the gate demands the header of no one, so the
 unit imposes no new obligation on every script in the tree. The day-one reach was
 thin and **it is now empty**, which is that design reporting honestly rather than
-a broken gate. `usage-trend.sh` names its codes in prose with no uppercase token
-and so yields an empty map; `usage-verdict.sh`'s `PAUSE`→1 and `STALE`→2 were the
+a broken gate. `usage-verdict.sh`'s `PAUSE`→1 and `STALE`→2 were the
 whole live vocabulary, and that file left the tree when its rule moved into the
 binary (delegation-kit/SPEC.md §usage-verdict). Its two call sites in
 `delegation-kit/smoke/install.sh` now name the front-end, which is not the
-own-kit-bin shape the gate resolves, so the clean line reads
-`104 script(s) scanned; 0 call(s) to a script with a declared exit contract`,
-against `2 call(s)` before the cut. The
+own-kit-bin shape the gate resolves, so the call count reads **zero** against
+`2 call(s)` before that cut. **The tree now holds no `# exit:` declarer at all**:
+the last one, `delegation-kit/bin/usage-trend.sh`, named its codes in prose with
+no uppercase token and so yielded an empty map anyway, and it left the tree at
+its own port (§Trend reporter there). The
 count is the visible surface precisely so a reach that went to zero is legible
 rather than implied — and the substantive loss is smaller than the count
 suggests: one of those two guards already compared `-ne 1` explicitly, and the
 other's message names `OK`, which binds to code 0 and which the skip rule above
 already excludes.
+
+**The *scanned* half of that line is a dated reading and is deliberately not
+pinned here.** It counted 104 scripts when the reach went to zero and **106** on
+2026-09-04; it moves whenever any kit's `smoke/` or `gate-tests/` gains or loses
+a file, which is unrelated to this gate's reach and to every question this
+section answers. A reader wanting the current figure runs the gate, which prints
+it — the reach is what this section asserts, and the reach is zero.
 
 **Two widenings are refused with their grounds, and the residue is filed rather
 than flagged.** *Widening the callee resolution to reach a compiled arm* would
@@ -12999,6 +13045,19 @@ declaring no exit contract; a message naming a token bound to several codes is
 skipped rather than guessed. What it catches is precisely the attested shape — a
 message more specific than the guard behind it. Like its siblings, a false
 positive is loud (a forced reword or an explicit exemption), never a silent miss.
+
+**A second limit is structural and narrows as the port run proceeds.** The gate
+resolves a callee only through the own-kit-`bin/` convention, so a member that
+has crossed to the binary is not a callee it can reach whatever its exit
+contract — while its scan roots are `smoke/` and `gate-tests/` and never `bin/`,
+so a port changes what it can *resolve* and not what it *scans*. The reach was
+already zero before delegation-kit's trend reporter crossed, so that cut does not
+cause the zero; what it does is **foreclose one option of the live deferred
+entry** that holds the widening open — the option of giving that shell file an
+uppercase-token `# exit:` header needs a shell file, and there is none
+(delegation-kit/SPEC.md §Trend reporter). Widening the resolution to reach
+bridged arms stays a unit of its own, taken deliberately rather than inside a
+port cut.
 
 With no argument the gate scans each `gate_kit_roots` kit's `smoke/` and
 `gate-tests/`; positional args scan the named dir(s), the mode the fixture pair

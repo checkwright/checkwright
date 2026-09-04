@@ -2227,10 +2227,11 @@ three failure modes a raw percentage reading leaves open:
 and this is the first section in this kit whose whole contract is in-crate.**
 Both reference producers — the `--statusline` push producer and the
 `--usage-poll` poll producer — were already compiled, and the verdict was this
-section's last shell holder. What that does *not* discharge is the kit:
-`bin/usage-trend.sh` (§Trend reporter) declares its own section and stays owed,
-and `lib/delegation.sh` stays permanently shell as the config bridge's sole
-`DELEGATION_KIT_*` resolver (§Layout and configuration). §bin/wait-probe was the
+section's last shell holder. §Trend reporter's own reader has since crossed as
+`--emit-usage-trend`, taking the kit's `bin/` column to **zero**; what still
+does *not* discharge the kit is `lib/delegation.sh`, which stays permanently
+shell as the config bridge's sole `DELEGATION_KIT_*` resolver (§Layout and
+configuration) and never enters that column. §bin/wait-probe was the
 kit's other owed section and is discharged, on a narrower reading of *discharged*
 that section states.
 
@@ -2386,7 +2387,7 @@ harness-reported values verbatim; write-time smoothing or correction is
 forbidden (a later corrective push is evidence about the earlier sample, and
 only the reader has both). A STALE exit from an unreadable or unparseable
 snapshot appends nothing — a sample the gate would not trust is not history.
-`usage-trend` (§Trend reporter) reads the log, and so does `usage-verdict`
+`--emit-usage-trend` (§Trend reporter) reads the log, and so does `usage-verdict`
 itself: the newest sample's `resets_at` is one of the two roll witnesses
 (§usage-verdict). That read is the log's only in-verdict consumer and is
 strictly fall-open, so the log stays an advisory trend surface rather than
@@ -2409,13 +2410,21 @@ source exposes them; `usage-verdict` reads the ones it interprets and passes
 the rest through: `seven_day_used_pct` / `seven_day_resets_at` (the weekly
 window — read at the verdict transition to arm the second pause axis),
 `account` (the logged-in account identity — `login_at` detects a switch,
-`account` says to whom, which lets `usage-trend` group a multi-account
+`account` says to whom, which lets the trend reporter group a multi-account
 operator's segments per account), `tier` (subscription tier — the
 denominator behind the percentages), and `tokens_in` / `tokens_out`
 (cumulative token counts, the axis that binds API-billed consumers for whom
 no subscription percentage applies). Optional keys are omitted when their
 source has no value, never written empty; keys the verdict does not read
 pass through unchanged.
+
+**Omit-don't-empty binds the reader as much as the producer**, and it is stated
+here because the two now sit in different substrates and a later producer change
+must meet it: a reader of these lines tests a key's **presence**, defaults an
+absent one rather than failing on it, and never treats an omitted optional as a
+malformed line (§Trend reporter enumerates the defaults its own reader applies).
+A reader that demanded every key would red on a line this contract explicitly
+permits.
 
 The kit ships two reference producers — one push, one poll — and any producer
 honoring the contract works beside them. The `--statusline` arm is
@@ -2485,7 +2494,7 @@ call.
 
 **The sample line.** With sampling enabled (§usage-verdict), `usage-verdict`
 appends one line per parsed snapshot — the trend log's wire contract between
-it and `usage-trend`:
+it and `--emit-usage-trend`:
 
 ```
 updated_at=<epoch> pct=<float> resets_at=<epoch> verdict=<word> login_at=<epoch>[ account=<word>][ tier=<word>][ pct_7d=<float> resets_7d=<epoch>][ tokens_in=<n> tokens_out=<n>]
@@ -2586,7 +2595,8 @@ cache — recorded so a later session does not add one on suspicion.
 
 ## Trend reporter
 
-`bin/usage-trend.sh` reads the history log and reports how the footprint
+`bash gate-sdk/bin/run-gates.sh --emit usage-trend [--] [history-file]` reads
+the history log and reports how the footprint
 evolves — advisory tooling, never a gate: exit **0** report emitted, **2**
 knob unset or history missing/unreadable (fail-closed, mirroring the
 verdict's STALE discipline), never **1** (it renders no verdict; the verdict
@@ -2616,6 +2626,92 @@ decreases.
    when `account` is present, segments group under an account heading so a
    rotating operator reads one weekly trajectory per account rather than an
    interleaved stream.
+
+**The family is `Arm::Emit`, and the *absence* of a 1 is what settles it —
+the exact inverse of the ruling one table row away.** The emitting family maps
+success onto 0 and failure onto 2 and can never return 1
+(gate-sdk/SPEC.md §The non-gate arm); §usage-verdict is an `Arm::Run`
+**because** its 1 is the blocking signal a hook grades, so an emitting arm
+would collapse it. Here the contract *declares* no 1, so the collapse costs
+nothing and the arm is also a document producer on both halves of the family's
+shape. Spelling and grammar are one decision: the front-end composes
+`--emit-usage-trend` from its own `--emit <name>` operand, so **no new
+front-end `case` arm is added** and a member spelled anything else would be
+reachable by no shipped front-end. Two members, one test, opposite answers —
+which is the clearest statement of what that test asks.
+
+**One consequence of taking the `--emit` family is where usage now lives, and
+it is not where a reader would guess.** The front-end's `--help` gives every
+bridged arm holding its own `case` arm a named line and a paragraph, but the
+`--emit-` family gets one generic line and enumerates no member — so this arm's
+usage is **not** in the front-end's help text and is not owed there. It lives at
+the member's own **shape refusal**: `--emit usage-trend --help` prints the usage
+block at exit 2, where the shell form assigned the flag straight into the
+history path and answered `cannot read --help`. That is the discoverability half
+of the `bin/`-tool contract closed (gate-sdk/SPEC.md §The bin/-tool contract) —
+by the refusal rather than by the front-end.
+
+**The `[history-file]` positional survives; the argv shape gains three
+behaviours the shell form never had.** The positional is an argument the rule
+itself consumes rather than a selector for where configuration comes from, so it
+ports unchanged and still overrides the configured path for test injection —
+resolved *lazily*, the knob read only when no positional rides, which is
+`${1:-…}`'s own semantics. Added with the port: a positional beginning with `-`
+that is not a recognized option is a refusal (usage on stderr, exit 2), `--`
+ends option processing so a dash-led path stays reachable, and the `-h`/`--help`
+arm is that refusal's named instance. **No arity refusal is added** — a second
+and later positional is ignored exactly as the shell ignored it, because
+tightening it would turn an accepted invocation into a refusal.
+
+**The declared knob roster is `DELEGATION_KIT_USAGE_HISTORY` and
+`DELEGATION_KIT_PAUSE_PCT_7D`, and neither is minted.** Both are defined and
+defaulted in `lib/delegation.sh`, which the bridge sources, so a default
+hardcoded in the crate would work in this repo and break silently for a consumer
+that overrides either — this tree overrides the history path and does *not*
+override the ceiling, so the headroom line here runs on the kit default. The two
+differ in how absence reads: the history knob's own default **is** the empty
+string, so an absent bridge variable and a configured-empty one are one reading
+and take this tool's own "unset — no history to report" diagnostic; the
+ceiling's default is a real value, so its absence is a bridge failure and
+surfaces as one.
+
+**The wire shape is a contract, not an implementation detail, because the
+producer is already compiled and untouched by this port.** `--usage-verdict`
+appends the sample line (§The usage.txt contract) with optional keys **omitted
+rather than emitted empty**, so the reader defaults a missing `account` or
+`tier` to `-`, a missing `login_at` to `0`, and a missing `verdict`,
+`tokens_in` or `tokens_out` to `-`. Each default is the reader's half of that
+rule, and dropping one would turn an absent optional key into a parse failure on
+a line the producer is entitled to write. The two-axis emission is the same
+contract: a 5h record per sample, and a weekly one only when **both** weekly
+keys ride — presence of the key, not a non-empty value — so a log without them
+yields 5h segments alone rather than an error.
+
+**The segment order is a contract the reader reproduces, and its tie rule is a
+byte comparison of the whole record rather than input order.** Records sort by
+account, axis and tier bytewise — `LC_ALL=C`'s effect, which a byte-ordered
+`str` comparison already has, so a locale-aware comparator would be a silent
+divergence on a non-ASCII account name — then by `login_at`, the axis reset and
+`updated_at` numerically, a value carrying no numeric prefix reading as zero.
+The segmenter keys on that tuple **as text** and flushes on change, so a
+different order silently yields different segments rather than a differently
+ordered report, and reading a number out of the tuple would merge a boundary two
+spellings of one epoch keep apart. The last resort is the seventh comparison and
+it is load-bearing: GNU `sort` absent `-s` falls back to comparing the **whole
+line**, which is not what a merely stable sort does — a stable sort keeps input
+order, and on a full-key tie the two choose different segment endpoints and
+therefore print different token deltas. That difference was measured at the
+port, not reasoned about.
+
+**One option of a live deferred entry leaves the design space with the shell
+file.** `assertion-strength-exit-header-reach`'s option (c) is *give this tool
+an uppercase-token `# exit:` header*, one line against a still-owed shell file
+restoring a nonzero map for a gate whose live reach is already zero. The file is
+gone, so (c) is foreclosed; the gate is not broken by that, because it resolves
+a callee only through the own-kit-`bin/` convention and its scan roots are
+`smoke/` and `gate-tests/` rather than `bin/`, so deleting a `bin/` member
+changes what it can *resolve* and not what it *scans*
+(gate-sdk/SPEC.md §check-assertion-strength).
 
 ## bin/wait-probe
 
@@ -2834,7 +2930,6 @@ because the second half is the one that looks like an unfinished port and is not
 
 ```
 delegation-kit/
-  bin/usage-trend.sh              # footprint trend reporter over the history log
   lib/delegation.sh               # shared helpers for the usage tools and the kit's gates
   usage-tests/cases.tsv           # expected-verdict <TAB> scenario knobs; read by the crate test that replaced its shell driver
   usage-tests/dispatch-guard-cases.tsv  # expected-outcome <TAB> scenario knobs; read by the crate test that replaced its shell driver
@@ -2896,7 +2991,9 @@ the class ruling at gate-sdk/SPEC.md §The config-seam port disposition. Knobs
 - `DELEGATION_KIT_PAUSE_PCT_7D` — weekly-axis pause threshold; default `95`,
   deliberately looser than the 5h axis: a weekly PAUSE is remediated in days,
   not hours, so pausing at the 5h conservatism would strand a fifth of the
-  week's budget — only the true red zone stops delegation on this axis.
+  week's budget — only the true red zone stops delegation on this axis. Read by
+  `--usage-verdict` and declared by `--emit-usage-trend`, which prints it back
+  verbatim as the headroom line's ceiling (§Trend reporter).
 - `DELEGATION_KIT_STALE_AGE` — default `600` (seconds).
 - `DELEGATION_KIT_LOGIN_WINDOW` — default `600` (seconds).
 - `DELEGATION_KIT_REFRESH_CMD` — the command `usage-verdict` runs before
@@ -2912,7 +3009,10 @@ the class ruling at gate-sdk/SPEC.md §The config-seam port disposition. Knobs
 - `DELEGATION_KIT_USAGE_HISTORY` — sample-log path; default empty (sampling
   off). This repo sets `.metric/usage-history.log`, a gitignored persistent
   measurement trend (drift-kit/SPEC.md §Layout and configuration owns the
-  metric-dir retention contract).
+  metric-dir retention contract). Written by `--usage-verdict` and declared by
+  `--emit-usage-trend`, whose `[history-file]` positional overrides it; because
+  the default is empty, an absent bridge variable reads as the configured-empty
+  value rather than as a bridge failure (§Trend reporter).
 - `DELEGATION_KIT_FAN_WIDTH` — read-only-fan-out width bound; default `2`,
   validated a positive integer by the loader. It bounds read-only fan-outs
   only: a committing fan-out serializes or takes its own worktree regardless
@@ -3148,8 +3248,9 @@ contract, and each is a place a reimplementation would quietly differ:
   the real bridge under its hermetic prelude. Spawning the front-end from the
   crate test would keep the bridge in the loop and is refused: it re-introduces
   the `bash` spawn this port deleted, one process further out, for what those two
-  already cover. The trend runner below keeps its own spawned shell subject and
-  its own `DELEGATION_KIT_*` strip, that member being `bin/usage-trend.sh`.
+  already cover. The trend runner below reaches its subject in process on the
+  same terms since that member's own port, so no runner in this module spawns a
+  kit script any more.
   `touch -d "@<epoch>"` also stays, setting the credentials mtime that is the
   whole login-window input: `File::set_modified` and `FileTimes` stabilised in
   Rust 1.75 and `native/Cargo.toml` pins `rust-version = "1.71"`, so **the MSRV
@@ -3208,20 +3309,28 @@ alone. A sixth case asserts the read is not self-witnessing — a run with an
 empty log still STALEs and leaves exactly its own sample behind, so the
 witness can only ever be a previous reading.
 
-`usage-trend` is likewise not a gate (it renders no clean/violation
+`--emit-usage-trend` is likewise not a gate (it renders no clean/violation
 verdict), so it ships an assertion set over a
 static fixture history `usage-tests/trend-history.log` (static epochs are
 safe — the reporter measures within-segment deltas, never against *now*),
 carried by the same crate module under the same sandbox, strip and poison
-discipline — the poison here being `DELEGATION_KIT_USAGE_HISTORY`, the very knob
-the reporter reads, which is what makes the unset-knob arm below meaningful
-rather than self-satisfying. It
+discipline. **The poison is re-aimed by that member's port rather than
+dropped**: the strip is now the in-process one — the ambient `GATE_SDK_KNOB_*`
+namespace held aside and reseeded from the kit defaults, so the arm reads the
+same empty history knob a stripped child read — and the poison is the
+**unbridged** `DELEGATION_KIT_USAGE_HISTORY` carrying a real path, which an arm
+reading the kit variable directly instead of through the config bridge would
+pick up, passing the report arm and then failing the unset arm loudly. It
 asserts per-axis segmentation at a reset boundary, a `login_at` change, and
 an account change; per-account grouping reuniting a weekly trajectory across
 a switch-back; a spike-then-correction flagged and excluded rather than
-averaged; token deltas and weekly headroom on the report; and the
-fail-closed exits (knob unset / history missing → 2), each read off the child's
-own exit status. **Its needles are exact golden strings and its segment counts
+averaged; token deltas and weekly headroom on the report; the
+fail-closed refusals (knob unset / history missing), each read off the arm's own
+`Err` rather than off a child's status; the zero-segment **reading**, which
+stays a document at exit 0 rather than collapsing into the misuse code; and the
+three argv-shape behaviours the port added, which exist in one substrate only
+and are therefore asserted here rather than compared.
+**Its needles are exact golden strings and its segment counts
 are anchored on the reporter's own two-space indentation**: loosening a needle
 into a pattern weakens the assertion, and that indentation is load-bearing
 rather than cosmetic. No fixture pair owed —
@@ -3232,6 +3341,27 @@ the trend fixture were driven through the shell runners and the crate module
 together and their verdicts and exit codes compared, *before* either shell file
 was deleted. Nothing machine-held keeps the two agreeing afterwards, which is
 why the originals are deleted rather than left running beside the crate tests.
+
+**§Trend reporter's own port bought that comparison a second time, on the
+reporter rather than on its runner.** Both implementations ran in one session
+against the same config, and the **whole report was compared byte for byte** —
+the shipped fixture plus four crafted inputs the fixture does not exercise: a
+**full-key tie**, a log carrying one weekly key without the other in both
+directions, a comments-and-blanks-only log, and an account-less log whose every
+sample is suspect. The four exit outcomes were compared with them (report 0,
+zero-segment reading 0, unreadable history 2, unset knob 2), the last emptied at
+the **config bridge both substrates read** rather than by an environment
+variable either would have overridden. Nothing in the report is wall-clock
+dependent, so every field was compared for equality and none for relation —
+unlike §bin/wait-probe's sweep below. Two things the comparison bought that
+reasoning would not have: the **tie rule** is a whole-line byte comparison
+rather than input order, which a stable sort would have got wrong and which the
+tie input caught by printing a different token delta; and the **ceiling knob**
+was proved to cross, a scratch config setting a non-default weekly threshold
+reaching the headroom line verbatim in both substrates, which is the exact
+silent breakage a baked-in default would have caused for a consumer and never
+here. The one variance is the diagnostic **prefix** — the front-end names the
+arm where the shell named the script — the message body after it being identical.
 `usage-verdict`'s own port bought that comparison again on the rule itself:
 every `cases.tsv` row, both beside-the-table sets and the fan-width case run
 against the shell tool and the compiled arm in one session, with the **verdict
@@ -3266,11 +3396,22 @@ shipped a decision-table runner beside the verdict tests until the port moved
 both members into the binary. **A runner retires into the crate when its *cases*
 can be driven from there — the subject reached in process *or* spawned.** The
 guards' subjects moved in-crate, so a `#[test]` reached them directly; the
-verdict's did too, at its own cut, and the trend runner above keeps a shell
-subject and spawns it, `bin/usage-trend.sh` declaring its own section and
-belonging to the kit-`bin/` owed cohort still. The narrower "the runners
+verdict's did too, at its own cut, and the trend runner above followed at
+§Trend reporter's, its subject reached in process as the arm's own function.
+The narrower "the runners
 retired with their subjects" was true of its own instance and is not the general
-rule. **What retirement buys is coverage at a second transition**: the
+rule. **That last move retired the crate's only literal `kit(…)`-resolved
+shell-script invocation** — the two remaining `kit(…)` resolutions name *data*
+fixtures — and the spawn helper that read the merged child stream retired with
+its one caller. **What that does not claim, because it would be false, is that
+no crate code spawns `bash` on an owned kit script**: three sites still source
+`gate-sdk/lib/gate.sh` to read the shell library's *own* resolution of a knob,
+a default or the source stamp, which is deliberate — a literal on the Rust side
+would restore the second source of truth those sites exist to delete, and that
+library is permanently shell by ruling (gate-sdk/SPEC.md §The kit-library port
+disposition). The retired kind is a kit **`bin/` tool spawned as a test
+subject**, which is the kind a port can eliminate; sourcing a no-port library
+for parity is not that kind and does not retire with it. **What retirement buys is coverage at a second transition**: the
 assertions ran only in a validate suite, and now run under `check-crate-arms` at
 every commit *and* under the `native_crate` validate suite — a widening rather
 than a move, and affordable because the whole case set is under a second of wall
