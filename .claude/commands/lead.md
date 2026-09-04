@@ -84,6 +84,43 @@ judge should read the count and this together rather than netting them, since on
 argues the premise is wrong about what a lead does and the other bounds how much
 credit the count itself carries.
 
+**The fourth point is not recorded here and is not lost.** It lives on
+`lead-tier-split-premise-unamended`, which declares itself the governed surface for
+the firing count: `scan-prompts-cut`, 2026-09-04, supervision at 14.8% of an 85.00
+iteration on a ruled-alone count of seven, reversing the fall. That entry also says
+"the priced share read 10.7% at the fourth point" two lines earlier — read that as a
+FIRING ordinal rather than a member of the cost series it prints as `14, 9.2, 9.7,
+14.8`. The entry runs two numberings and does not say which is which; disambiguated
+here rather than reconciled silently, since the reconciliation is a reading.
+
+**Fifth point, 2026-09-04 at `usage-verdict-cut`: `cost=6.6469` of an iteration
+summing to 75.31, 8.8%, on Opus — AND 8.8% IS A CEILING.** The close row was still
+accumulating when the meter last ran, so the completed total is larger and the true
+share smaller. Either way the point sits below the 9.2% that had been the series
+minimum, which says the 14.8 was a spike and not a new level. FOUR escalations, every
+one ruled by the lead alone off a governed surface read directly: the cut selection
+against gate-sdk/SPEC.md's `lines=`-is-a-floor paragraph, where the ESCALATING
+SESSION'S STATED GROUND WAS REPLACED rather than accepted (scope argued "retires a
+contract rather than moving one", a true description of the previous cut and a
+criterion stated nowhere); the threshold-recurrence batch, which SPLIT because
+applying scope's own reported finding moved one entry out of the lead's authority and
+into the operator's; the residency disposition; and the build batching and tiering
+override against delegation-kit's mixed-work split trigger.
+**The counter, and the figure was the lead's own rather than a subagent's.** The
+validate dispatch asserted a gap-inbox depth of three from memory; it held four, two
+of them the lead's own filings from that same session. Cost zero — the validate
+session ran the count and reported the discrepancy instead of acting on the figure,
+so the containment is the stage's and not the lead's. **The corrective is what this
+close can attest to first-hand:** the next dispatch carried the count re-run at
+`grep -c`, said so, and flagged the earlier error unprompted — and the receiving
+session re-ran it anyway and got five. So the class §A running session is asked,
+never instructed names fired and was answered inside one iteration, which is a
+different datum from the failure alone.
+**What a later judge inherits:** five cost points, the premise holding on cost every
+time and failing on character every time. No tier flip is proposed and no entry is
+filed — `lead-tier-split-premise-unamended` already owns the amendment and already
+records that the port-only run forecloses taking it.
+
 - **`validate`** — the lead dispatches it with a `model: sonnet` override.
   validate's batches are uniformly *mechanical oracle-running* (run the battery,
   report), so the stage collapses to a single stage-uniform-mechanical default —
@@ -384,6 +421,52 @@ credit the count itself carries.
   a proxy that does not track the work, so every confirmation above is
   under-powered rather than wrong — read them as weaker evidence, not as void.
   The revert signal did not fire, and **no tier reversal is proposed**.
+  **Measured again 2026-09-04 at `usage-verdict-cut`: `cr=7920496` — rank 21 of 66
+  ascending, −17.9% on a recomputed bare-sonnet median of 9640921, and 6th of the
+  last twenty.** No `align+fanout` row exists: this align dispatched nothing.
+  **NO PREDICTION IS SCORED AGAINST THIS POINT**, which is the retirement above
+  working rather than an omission: amendment count is no longer the scale proxy, no
+  replacement has earned the cell, so a below-median draw here is a reading and not
+  a test.
+  **It is the first ZERO-REPAIR point this watch has recorded**, and that is what
+  the number has to be read against. Every prior datum carried several repairs
+  against at most one miss. This align returned ZERO findings on an amendment
+  carrying a false claim — one the amendment itself flagged as "probed rather than
+  assumed": delta (13) asserted `docs/footprint.md` and `docs/value.md` are not
+  staled by the cut. build found it false and regenerated both inside the landing
+  commit, absorbing it rather than round-tripping it.
+  **The miss is the SECOND instance of the intra-document class, one iteration after
+  the first**, which is why it is recorded as a class rather than an incident. The
+  amendment's stated reasoning was true and irrelevant — footprint excludes `bin/`
+  scripts, correctly — while the trigger that actually fired is the one
+  `docs/site-architecture.md` lists immediately beside it, a `templates/` markdown
+  edit, and delta (12) of the SAME amendment makes one. Both halves sat inside the
+  document under audit, one delta apart. A pass that verifies each delta's citations
+  in isolation cannot see that; only reading the deltas against each other can. The
+  first instance is the `declaration-install-and-stage-helper-cuts` counter above,
+  where a DoD over-generalized its own delta. Whether align owes a cross-delta pass
+  distinct from its per-delta citation pass is queue work the port-only run
+  forecloses; `align-checklist-fanout-calibration` owns the open split and now
+  carries this date on its `recurrence:` line.
+  **THE CONFOUND IS STATED BEFORE THE NUMBER IS SPENT.** This align also left no
+  granted journal — the fifth firing of
+  `stage-journal-absence-caught-only-downstream`, recovered only by resuming the
+  finished session — and the 2026-09-02 datum above rules that a cheap reading from
+  a session which skipped a granted artifact reads as work-not-done rather than as a
+  cheaper tier. Both facts hold here again, so this point cannot be spent as tier
+  vindication, and the cost reading and the work reading point opposite ways for the
+  second time in the pairing's history.
+  **WHAT IT DOES TO THE AUDIT-DEPTH CANDIDATE — the second point that datum asked
+  for, firing against the candidate's MEASURABILITY rather than its content.** The
+  only evidence for this align's depth is its own claim of an exhaustive
+  delta-by-delta pass over every measured claim, line citation and quote, and the
+  artifact that would have grounded that claim was not written while the work was
+  done. A replacement variable readable only from a self-report, in exactly the
+  sessions that skip the artifact backing the report, is not yet a cell; what it
+  needs first is an artifact-grounded measure. The candidate is neither promoted nor
+  withdrawn.
+  The stated revert signal did not fire: one build stamp, one validate stamp, no
+  re-entry. **No tier reversal is proposed.**
 
 scope, `spec`, and close stay on Opus, their generative and verificational
 judgment being what justifies the tier. Re-judge every tier when the harness
