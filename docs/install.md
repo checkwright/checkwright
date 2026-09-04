@@ -235,7 +235,7 @@ curl -fsSL -o "$cw/checkwright-X.Y.Z.tgz.sha256" \
 ( cd "$cw" && sha256sum -c checkwright-X.Y.Z.tgz.sha256 && tar -xzf checkwright-X.Y.Z.tgz )
 
 bash "$cw/package/bin/checkwright.sh" init  # from your repository root
-bash gate-sdk/bin/install-hooks.sh          # opt this clone into the generated hook
+bash gate-sdk/bin/run-gates.sh --install-hooks   # opt this clone into the generated hook
 bash gate-sdk/bin/run-gates.sh              # the battery, green on what was just vendored
 ```
 
@@ -364,7 +364,7 @@ your repo root and wire it in:
 3. Point the kit at your layout through its external configuration — consumers
    never edit vendored kit files, so configuration always lives outside them.
 4. Opt each clone into the generated pre-commit hook with
-   `bash gate-sdk/bin/install-hooks.sh`.
+   `bash gate-sdk/bin/run-gates.sh --install-hooks`.
 
 Where a kit ships adoptable skills, take each as a binding shim by default — a
 one-line directive that references the vendored template, so a re-vendor reaches
@@ -423,7 +423,7 @@ byte-comparison. Installing points your clone at the hooks directory, so both
 hooks are what you are reviewing; everything this section says of the
 pre-commit hook holds of the commit-msg one.
 
-**What installing it changes in your clone.** `gate-sdk/bin/install-hooks.sh`
+**What installing it changes in your clone.** `run-gates.sh --install-hooks`
 has three effects, and an audit of what the script touches wants all three:
 
 - `core.hooksPath` is repointed at the kit's hooks directory. That config write

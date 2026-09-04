@@ -161,7 +161,7 @@ fn claim(root: &Path, rel: &str, recorded: &Recorded, force: bool) -> Result<Cla
 }
 
 #[cfg(unix)]
-fn make_executable(file: &Path) -> Result<(), String> {
+pub fn make_executable(file: &Path) -> Result<(), String> {
     use std::os::unix::fs::PermissionsExt;
     let mut perms = std::fs::metadata(file)
         .map_err(|e| format!("cannot stat {}: {}", file.display(), e))?
@@ -174,7 +174,7 @@ fn make_executable(file: &Path) -> Result<(), String> {
 // spec: installer/README.md §The install boundary — the executable bit is set where the platform
 // has one, so the Windows half of the boundary needs no branch of its own in either bootstrap.
 #[cfg(not(unix))]
-fn make_executable(_file: &Path) -> Result<(), String> {
+pub fn make_executable(_file: &Path) -> Result<(), String> {
     Ok(())
 }
 

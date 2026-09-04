@@ -180,7 +180,7 @@ a single file is written:
 It writes the selected profile's kit directories, a `gates.list` seeded with
 each kit's starting gates, the config seam files those kits need, and the
 manifest. Then it makes **one commit** naming the profile and the version, and
-prints the two commands that finish the setup — `gate-sdk/bin/install-hooks.sh`
+prints the two commands that finish the setup — `run-gates.sh --install-hooks`
 to opt this clone into the generated hook, and `gate-sdk/bin/run-gates.sh` to
 run the battery.
 

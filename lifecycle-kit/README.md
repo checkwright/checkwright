@@ -90,7 +90,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    §Multi-operator semantics) and a `merge=union` line for the committed gap
    inbox (its append-only bullets must survive a concurrent merge — SPEC.md §The
    committed gap inbox) — and registers the keep-ours driver in your clone's git
-   config (per-clone, the `install-hooks.sh` opt-in class; the git-native union
+   config (per-clone, the `--install-hooks` opt-in class; the git-native union
    driver needs no such step). `check-merge-attrs` (step 1) holds the block in
    parity with the derived supersede and union sets.
 

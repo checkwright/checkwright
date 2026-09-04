@@ -1,6 +1,6 @@
 # gate-sdk CI backstop — the server-side enforcement tier (gate-sdk/SPEC.md
 # §Enforcement tiers). The local pre-commit hook is opt-in and bypassable by
-# design (`git commit --no-verify`, or a clone that never ran install-hooks.sh);
+# design (`git commit --no-verify`, or a clone that never ran --install-hooks);
 # this workflow is the authoritative outer backstop that closes both gaps on
 # every push and pull request.
 #

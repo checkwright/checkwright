@@ -2284,7 +2284,8 @@ arms below it, and the bridged `Arm::Run` members that are neither —
 §bin/install-lifecycle.sh, its 2026-09-03 member), `--usage-verdict`
 (delegation-kit/SPEC.md §usage-verdict), `--wait-probe`
 (delegation-kit/SPEC.md §bin/wait-probe), `--enter-stage`
-(lifecycle-kit/SPEC.md §bin/enter-stage.sh) and evidence-kit's `--run-validate`
+(lifecycle-kit/SPEC.md §bin/enter-stage.sh), `--install-hooks` (§install-hooks)
+and evidence-kit's `--run-validate`
 and `--diff-baseline` (evidence-kit/SPEC.md §bin/run-validate.sh and
 §bin/diff-baseline.sh, its 2026-09-04 pair) — and the class
 they form is named here because a
@@ -2840,6 +2841,23 @@ with the family** and is recorded because a reader would otherwise assume the
 forced rather than chosen — and therefore no named line and no paragraph in the
 front-end's `--help`. Its usage lives at its own shape refusal instead
 (§The bin/-tool contract).
+
+**`--install-hooks` is the sixth, and the one whose 1 belongs to *another
+member*** (§install-hooks). Its three-state contract is 0 wired and verified,
+1 `check-identity`'s own finding surfacing through it, 2 no hooks dir or an
+uninterpretable manifest — so the status it must carry is not even its own
+verdict, which is the sharpest form of the family test: an emitting arm would
+collapse a gate's finding into the opt-in's misuse code and report a wrong
+identity mapping as a broken install. **It is also the class's second member to
+resolve another member through the registry and dispatch it**, `--enter-stage`'s
+pre-flight being the first. The amendment that landed it claimed a first — an
+in-process `.gate` dispatch with no spawn at all — and that is corrected rather
+than merged: §run-gates refuses in-process dispatch of a member on the
+declared-knob discipline, and the refusal is not ceremony here, an in-process
+call having no child environment in which to scope the callee's knobs. What the
+member does add to the class is the obligation that follows: **a dispatching arm
+declares its callee's knobs beside its own**, because it can only pass down what
+it was itself handed.
 
 **`--run-validate`'s spawned-program set is the class's widest, and the first that
 is a *roster* rather than a seam or two.** `--usage-verdict` spawns one consumer
@@ -10265,7 +10283,8 @@ static hooks honest across a kit-set change.
 
 ### install-hooks
 
-One-time per-clone opt-in: sets `core.hooksPath → <hooks-dir>` (and
+`bash gate-sdk/bin/run-gates.sh --install-hooks` is the one-time per-clone
+opt-in: it sets `core.hooksPath → <hooks-dir>` (and
 `blame.ignoreRevsFile` when `.git-blame-ignore-revs` exists). The wiring is
 hooks-dir granular, so it enables every generated hook (`pre-commit` and, when
 present, `commit-msg`) with no per-hook step. Refuses to point at a nonexistent
@@ -10274,20 +10293,81 @@ apply-and-verify rung, runs `check-identity` once immediately after enabling
 `core.hooksPath` (resolved through the registry, so a consumer shadow wins):
 the fresh clone learns of a wrong-identity or wrong-remote mapping before its
 first commit — the moment the push-identity half is cheapest to fix — and the
-gate's exit status surfaces through this script's.
+gate's exit status surfaces through this arm's.
 
-**The rung reaches the gate through `gate_command`, never by interpreting the
+**It is a bridged `Arm::Run` with its own front-end `case` arm**, because the
+contract is three-state and every code is load-bearing: 0 wired and verified,
+**1** `check-identity`'s own finding, 2 no hooks dir or an uninterpretable
+manifest. `Arm::Emit` can never return 1, so the family is forced rather than
+chosen (§The non-gate arm), and it emits no document besides. **It declines the
+`--install <op>` family** despite the name collision — the first place a reader
+looks — on that family's own terms: `--install` is deliberately unbridged
+because its caller is the installer bootstrap, which may not be assumed to be a
+POSIX shell, so every value it needs arrives as argv. This member resolves its
+hooks dir and its check-dir roster from kit config, so it cannot live there.
+
+**The rung reaches the gate through the registry, never by interpreting the
 resolved declaration path, and the reason is worth the sentence: a descriptor
 interprets to success.** Running `bash` on a `.gate` file — a data file whose
 whole content is comment lines — exits **0**, so once its member ported, a rung
 spelled that way would not crash but *pass*, retiring the opt-in verification it
 exists to perform with no diagnostic anywhere. A crash would have been the better
-failure, and no gate would have caught either: this is a direct shell-out from a
+failure, and no gate would have caught either: it was a direct shell-out from a
 non-gate script, outside every reader a port's enumeration covers.
-`gate_command` resolves the invocation argv for either spelling and fails closed
-on an absent binary. Its **status 1** — the member resolves nowhere — stays a
-silent skip, which a consumer without this gate is entitled to; any other refusal
-fails the opt-in rather than skipping it.
+
+**The resolution is a directory walk at run time, and that is the half a port
+must not simplify away.** The arm builds the check-dir roster — the gates dir
+first, then each kit root's `checks/` — and resolves `check-identity` against it
+consumer-first, `.sh` beating `.gate` within a dir (§lib/gate.sh). Calling the
+crate's own compiled member by name instead would resolve *this binary's*
+`check-identity` and silently stop honouring a consumer's shadow, which is a
+**narrowing of an extension point** rather than of the port. What it found
+decides what happens next, and the three branches are the contract:
+
+- **a `.gate` declaration** — this binary is **re-exec'd as a child** on that
+  member's name, carrying exactly the knob set that member's registry entry
+  declares. The child is not an optimisation to be removed: §run-gates refuses
+  in-process dispatch of a member on the declared-knob discipline, and an
+  in-process call here structurally cannot honour it, there being no child
+  environment to scope. A dispatching arm is therefore handed what it passes
+  down — this arm declares its callee's knobs beside its own, and a crate unit
+  test holds that tail against the callee's own entry so the copy cannot rot.
+- **a `.sh` declaration** — a consumer shadow, **spawned** with its two streams
+  in the caller's terminal, because that file is the consumer's rule and this
+  arm is not entitled to substitute its own.
+- **no declaration in any dir** — a silent skip at the wiring's own status,
+  which a consumer without this gate is entitled to; anything else that cannot
+  be dispatched fails the opt-in rather than being waved through.
+
+**Nothing about this is novel and the amendment that landed it claimed
+otherwise, so the correction is recorded**: `--enter-stage`'s own pre-flight
+already resolves another member through the registry and re-execs the binary for
+a `.gate`, and this member is a second instance of that shape with a different
+callee, not a first of anything.
+
+**`cd "$(git rev-parse --show-toplevel)"` retires rather than porting**, and the
+ground is the front-end's rather than the arm's: `run-gates.sh` itself refuses
+outside a repository and cds to the toplevel before the exec, so the arm always
+runs where a repo-relative hooks dir resolves. Reached some other way the arm
+still degrades soft — the two `git config` writes report their failure on stderr
+rather than crashing, the shape the sibling per-clone installer already rules
+for its own driver step — but through the shipped front-end that case is
+unreachable.
+
+**Two steps are convenience rather than assertion and stay that way.** The
+per-entry `chmod +x` over the hooks dir cannot repair a wrong *committed* mode
+(§check-hook-exec-bit owns that), so one entry failing to chmod does not fail
+the opt-in. The `Active hooks:` listing is the opt-in's receipt — the only place
+a session sees which hooks the wiring just enabled — so its exact shape and its
+sorted order are preserved.
+
+**The member takes no positional**, so the argv-shape split binds trivially: the
+`--` escape and the free-text refusal have nothing to bind on, and only the
+option half is live, an unrecognized flag being a refusal that prints usage at
+exit 2. Its `-h`/`--help` retires to the front-end, which for this member is a
+real destination rather than a formality — it holds its own `case` arm, so it
+earns a named line and a paragraph in `run-gates.sh --help`, where an `--emit-`
+member gets neither (§The bin/-tool contract).
 
 ### build-native
 
@@ -14277,11 +14357,14 @@ manifest at `tier=precommit` (a `git config` change to the mapping is not
 diff-visible — nor is a CLI account switch, whose hosts file is machine-global,
 outside the tree and never stages, so no coupling could name it either — so the
 whole-tree `run-gates.sh` battery is the real backstop for
-the commit-identity half), and `install-hooks.sh` runs the gate once at opt-in
+the commit-identity half), and `--install-hooks` runs the gate once at opt-in
 to cover the push-identity half (no pre-push hook is added — gate-sdk generates
 only the pre-commit hook, and the setup rung plus the precommit tier already
-cover the surface). That rung reaches the gate through `gate_command` rather
-than by interpreting the resolved declaration path (§install-hooks).
+cover the surface). That rung resolves the gate through the **registry** rather
+than by interpreting the resolved declaration path, and dispatches what it found
+three ways — this binary re-exec'd as a child for a `.gate`, a consumer `.sh`
+shadow spawned as the consumer's own rule, an unresolvable member skipped
+(§install-hooks).
 
 **The clone's actuals are redirected by knob, and the `[manifest]` positional and
 `--fixture <dir>` arm are retired.** The positional overrode
@@ -14414,7 +14497,7 @@ Invariant: every tracked file in the hooks dir (`GATE_SDK_HOOKS_DIR`, default
 *index* mode `100755`. The index is the checked surface because it is what a
 fresh clone receives: git silently skips a non-executable hook, so a
 `pre-commit` committed at mode `100644` disables the entire gate battery for
-every clone — a catastrophe-class, invisible failure — and `install-hooks.sh`'s
+every clone — a catastrophe-class, invisible failure — and `--install-hooks`'
 per-clone `chmod` cannot repair a wrong committed mode. One `git ls-files -s`
 reads the mode a clone would get, sidestepping the worktree bit entirely. A
 non-repo cwd is fail-closed (exit 2); a hooks dir with no tracked files, or an
@@ -15917,7 +16000,7 @@ other member's.
 The CI backstop template — the server-side outer tier of §Enforcement tiers,
 copied out to a consumer's `.github/workflows/gates.yml`. It closes the two
 gaps the local hook cannot by construction: a `--no-verify` commit, and a clone
-that never ran `install-hooks.sh`. Trigger is push + pull_request on the
+that never ran `--install-hooks`. Trigger is push + pull_request on the
 consumer's default branch (a fill-in — the template ships `main` and says so);
 step one is `run-gates.sh` (the full battery); step two is a fail-closed
 placeholder the consumer replaces with its own fixture/guard-test runners (an

@@ -14,6 +14,7 @@ pub mod file_gap;
 pub mod file_survey;
 pub mod footprint;
 pub mod graph;
+pub mod install_hooks;
 pub mod install_lifecycle;
 pub mod kfric;
 pub mod kpi;
@@ -483,6 +484,14 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         Arm::Run(install_lifecycle::run),
         install_lifecycle::KNOBS,
     ),
+    // spec: gate-sdk/SPEC.md §install-hooks — an `Arm::Run` because `check-identity`'s 1 surfaces
+    // through this member's own status; it also declines the `--install <op>` family, whose
+    // unbridged contract could resolve neither of the two knobs this one reads from kit config
+    (
+        "--install-hooks",
+        Arm::Run(install_hooks::run),
+        install_hooks::KNOBS,
+    ),
     // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — an `Arm::Run` because the exit contract
     // is three-state and every code is load-bearing: 0 a stamp or a reported no-op, 1 a refusal,
     // 2 a usage or configuration error, and the state machine reads that difference.
@@ -516,6 +525,32 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         diff_baseline::KNOBS,
     ),
 ];
+
+// spec: gate-sdk/SPEC.md §run-gates — the child's declared knob environment, filtered out of the
+// bridged set the dispatching arm itself received: the declared-knob discipline an in-process
+// dispatch cannot keep. Shared by every arm that dispatches a member, never copied per caller.
+pub fn child_knobs(declared: &[&str]) -> Vec<(String, String)> {
+    let mut out: Vec<(String, String)> = Vec::new();
+    for d in declared {
+        match d.strip_suffix('*') {
+            Some(stem) => {
+                let want = format!("GATE_SDK_KNOB_{}", stem);
+                for (k, v) in std::env::vars() {
+                    if k.starts_with(&want) {
+                        out.push((k, v));
+                    }
+                }
+            }
+            None => {
+                let want = format!("GATE_SDK_KNOB_{}", d);
+                if let Ok(v) = std::env::var(&want) {
+                    out.push((want, v));
+                }
+            }
+        }
+    }
+    out
+}
 
 pub fn lookup(arm: &str) -> Option<&'static Arm> {
     BRIDGED_ARMS

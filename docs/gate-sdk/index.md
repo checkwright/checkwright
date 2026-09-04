@@ -28,7 +28,7 @@ external, so an upgrade replaces the directory losslessly.
 ```bash
 bash gate-sdk/bin/run-gates.sh                       # run the full battery
 bash gate-sdk/bin/run-gate-tests.sh gate-sdk/gate-tests gate-sdk/checks
-bash gate-sdk/bin/install-hooks.sh                   # opt this clone into the hook
+bash gate-sdk/bin/run-gates.sh --install-hooks       # opt this clone into the hook
 ```
 
 ## Contracts

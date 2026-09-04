@@ -30,7 +30,7 @@ honest:
   fresh scratch consumer, runs each vendored kit's `smoke/` installer, and
   asserts the battery is green under zero config (then red on each kit's crafted
   violation). Each kit ships a `smoke/` directory to join the party.
-- `bin/gen-pre-commit.sh` + `bin/install-hooks.sh` — the `pre-commit` and
+- `bin/gen-pre-commit.sh` + the `--install-hooks` arm — the `pre-commit` and
   `commit-msg` hooks *generated* from per-gate `# graph:` coupling manifests
   (`tier=precommit` vs `tier=commit-msg`); adding a gate to a hook is
   manifest-only, so hook membership cannot drift.
@@ -80,7 +80,7 @@ bash gate-sdk/bin/gen-pre-commit.sh --write                       # generate the
 bash gate-sdk/bin/run-gates.sh --emit graph > scripts/CHECK-GRAPH.html   # the coupling graph
 bash gate-sdk/bin/run-gates.sh --emit enforcement-map > docs/enforcement.md # the enforcement map (regenerate on any class-registry change)
 bash gate-sdk/bin/run-gates.sh --emit port-blockers --tree        # the port report over the tracked shell tree
-bash gate-sdk/bin/install-hooks.sh                                # opt in this clone
+bash gate-sdk/bin/run-gates.sh --install-hooks                    # opt in this clone
 
 bash gate-sdk/bin/run-gates.sh                                    # the full battery
 bash gate-sdk/bin/run-gates.sh --only check-graph                 # one gate's verdict

@@ -411,6 +411,6 @@ else
 fi
 
 printf '\nnext:\n'
-printf '  bash gate-sdk/bin/install-hooks.sh   # opt this clone into the generated pre-commit hook\n'
+printf '  bash gate-sdk/bin/run-gates.sh --install-hooks   # opt this clone into the generated pre-commit hook\n'
 printf '  bash gate-sdk/bin/run-gates.sh       # the battery, green on what was just vendored\n'
 exit 0

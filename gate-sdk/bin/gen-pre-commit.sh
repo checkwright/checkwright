@@ -155,7 +155,7 @@ emit() {
 # below, then regenerate. check-graph asserts this file equals --emit. Each gate
 # prints its own per-finding + `help:` lines before this hook reports the failure.
 #
-# Install (opt-in, per clone):   bash gate-sdk/bin/install-hooks.sh
+# Install (opt-in, per clone):   bash gate-sdk/bin/run-gates.sh --install-hooks
 # Bypass once (use sparingly):   git commit --no-verify
 #
 # This is the *triggered subset* of the gates.list battery: every check here
@@ -239,7 +239,7 @@ emit_commit_msg() {
 # --emit-commit-msg. git feeds the prospective message file as $1; each gate
 # prints its own per-finding + `help:` lines before this hook reports failure.
 #
-# Install (opt-in, per clone):   bash gate-sdk/bin/install-hooks.sh
+# Install (opt-in, per clone):   bash gate-sdk/bin/run-gates.sh --install-hooks
 # Bypass once (use sparingly):   git commit --no-verify
 set -euo pipefail
 

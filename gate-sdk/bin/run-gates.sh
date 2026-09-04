@@ -30,6 +30,7 @@ usage: run-gates.sh [gates-dir]                run every registered gate
        run-gates.sh --lesson-sink <tag>        route a lesson body on stdin to its sink
        run-gates.sh --upgrade-smoke            prove the FROM->TO kit upgrade in scratch
        run-gates.sh --install-lifecycle [file] install the lifecycle resident surfaces
+       run-gates.sh --install-hooks            wire this clone's core.hooksPath (per-clone opt-in)
        run-gates.sh --enter-stage <stage>      stamp a stage entry (or --rename an iteration)
        run-gates.sh --wait-probe <sub> [args]  the wait-primitive probe: 'sweep' is the reproducer
        run-gates.sh --run-validate             run the codified validate spine over the roster
@@ -77,6 +78,14 @@ usage: run-gates.sh [gates-dir]                run every registered gate
           config. The optional positional is the agent file to write into,
           overriding LIFECYCLE_KIT_AGENT_FILE. Idempotent; exit 2 when the agent
           file is absent or a marker pair is malformed, and unavailable is 2.
+  --install-hooks  points this clone's core.hooksPath at the generated hooks dir,
+          sets blame.ignoreRevsFile where that file exists, makes the hooks
+          executable and runs check-identity once so a fresh clone learns of a
+          wrong-identity mapping before its first commit. The gate is resolved
+          through the registry, so a consumer shadow still wins; a consumer
+          without it is skipped. Takes no argument. Exit 0 wired and verified,
+          1 the identity gate's own finding, 2 no hooks dir or an
+          uninterpretable manifest; unavailable is 2.
   --enter-stage  appends the invocation stamp that IS a stage transition, after
           running the entry pre-flight; `--simulate` runs everything up to the
           write and writes nothing, and `--rename <name>` renames the iteration
@@ -221,6 +230,13 @@ case "${1-}" in
     --install-lifecycle)
         shift
         exec_arm --install-lifecycle "$@"
+        ;;
+    # spec: gate-sdk/SPEC.md §install-hooks — a bridged arm outside the `--emit-` family: it
+    # propagates check-identity's 1, which an emitting arm collapses. Unavailable is exit 2 because
+    # a silent 0 would let a fresh clone believe its hooks and its identity were both wired
+    --install-hooks)
+        shift
+        exec_arm --install-hooks "$@"
         ;;
     # spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — a bridged arm outside the `--emit-` family:
     # its contract is a three-state exit status rather than a document, and unavailable is 2 because

@@ -763,7 +763,7 @@ per-checkout scratch — friction logs — never merges and needs no rule.)
 **`.gitattributes` — the rule mechanized.** Each supersede-set path carries
 `merge=iteration-scoped`; the driver definition (`git config
 merge.iteration-scoped.driver true` — keep ours) is per-clone config installed by
-the `--install-lifecycle` arm beside its registration block (the `install-hooks.sh`
+the `--install-lifecycle` arm beside its registration block (the `--install-hooks`
 opt-in class). Honest limit: on a clone without the driver installed the
 attribute is inert and the file conflicts normally — the rule above then governs
 the hand resolution, so the uninstalled path degrades to judgment, never to
@@ -2940,7 +2940,7 @@ substrate. Unlike the agent file, the arm legitimately **mints
 authored) — two adjacent file writes with opposite absent-file dispositions, which
 is precisely the shape a port unifies by accident. **The driver-config step**
 registers the keep-ours driver — `git
-config merge.iteration-scoped.driver true` — per-clone (the `install-hooks.sh`
+config merge.iteration-scoped.driver true` — per-clone (the `--install-hooks`
 opt-in class); a non-repo cwd degrades to a printed skip, never a hard failure,
 leaving the `.gitattributes` attribute inert until a clone installs the driver.
 The skip goes to **stderr** and the two action lines to **stdout**, and that split

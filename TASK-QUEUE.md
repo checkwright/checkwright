@@ -12,38 +12,6 @@
 
 ## New Features
 
-- **hooks-opt-in-port-cut** [spec: SPEC-hooks-cut.md] — port `gate-sdk/bin/install-hooks.sh` (59)
-  to the bridged `--install-hooks` arm, the one owed file declaring gate-sdk/SPEC.md
-  §install-hooks. It settles one section and does not discharge the kit.
-  **Selection ground and host: as the three cuts above**, not restated.
-  **DROP-FIRST: if build finds the window tighter than the (unmeasured, structural) reasoning
-  assumed, THIS batch parks and the other three land unchanged.** A build session holds that
-  permission in writing and does not escalate for it. The ground is the cuts' **own facts** rather
-  than gate-sdk/SPEC.md's no-joint-proof paragraph, which is written over registry gates with
-  descriptors and fixture pairs and reaches this batch only by analogy: this cut shares no twin,
-  no library, no kit and no gate with the other three, so parking it strands nothing they created.
-  The same test on `baseline-diff-port-cut` returns the opposite answer, which is why the two
-  constraints are written as a pair.
-  **One ground of the packaging ruling is RETRACTED:** that this cut's design work was already
-  landed in-crate. That holds for the per-clone-opt-in class
-  (`native/src/emit/install_lifecycle.rs:87-101`) and fails for the apply-and-verify rung, whose
-  registry resolution is a seam ruling of its own — an in-process dispatch by name would stop
-  honouring the consumer shadow §install-hooks asserts. The cut stays on the two grounds that
-  survive and never depended on it being cheap: lines-per-iteration is what ends the run, and
-  amendment count is retired as align's scale proxy.
-  **THE ITERATION'S PACKAGING NOTE, carried on one entry rather than four.** These four are
-  per-cut units reaching `## Done`, and `native-gate-port-remaining-corpus` is deliberately not
-  promoted. The departure from the host pattern is ruled rather than forgotten: canon-kit/SPEC.md
-  §Merging an amendment carves the demotion branch for an entry whose deliverable is a **corpus**,
-  and a per-cut entry's deliverable is its section's owed files, which its cut finishes — so Done
-  is the correct terminal move here. It also leaves the corpus entry's roadmap tag unmoved,
-  where a promote-and-demote would round-trip a tag a generated public projection reads.
-  **Minting two further hosts was REFUSED**: that is the fission
-  `record-stamp-encoding-compression` names as permanent queue structure, and this boundary is the
-  THIRD witness of that wall, recorded on that entry rather than here.
-  ruled: hooks-opt-in-port-cut lead 2026-09-04 own-authority
-  Filed 2026-09-04 by spec; its amendment and this entry landed together.
-
 ## Technical Debt
 
 ## Deferred
@@ -9850,5 +9818,6 @@
 - evidence-spine-port-cut
 - baseline-diff-port-cut
 - trend-reporter-port-cut
+- hooks-opt-in-port-cut
 
 ## Lessons Learned

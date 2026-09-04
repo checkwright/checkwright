@@ -141,7 +141,7 @@ bash demo/run-demo.sh                                                           
 ```
 <!-- battery-roster:end -->
 
-`bash gate-sdk/bin/install-hooks.sh` opts this clone into the generated
+`bash gate-sdk/bin/run-gates.sh --install-hooks` opts this clone into the generated
 pre-commit and commit-msg hooks. The repo also runs lifecycle-kit's own iteration state
 machine — [`TASK-QUEUE.md`](TASK-QUEUE.md) carries the iteration header, one
 iteration per hardening or roadmap unit.

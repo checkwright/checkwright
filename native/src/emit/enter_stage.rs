@@ -1241,26 +1241,7 @@ fn preflight_gate(name: &str, queue: &str, state: &str) -> Result<GateRun, Strin
 // the bridged set this arm itself received: a member receives the GATE_SDK_KNOB_* variables its
 // own registry entry declares and no others, which is what keeps the declared-knob discipline
 fn child_knobs(declared: &[&str]) -> Vec<(String, String)> {
-    let mut out: Vec<(String, String)> = Vec::new();
-    for d in declared {
-        match d.strip_suffix('*') {
-            Some(stem) => {
-                let want = format!("GATE_SDK_KNOB_{}", stem);
-                for (k, v) in std::env::vars() {
-                    if k.starts_with(&want) {
-                        out.push((k, v));
-                    }
-                }
-            }
-            None => {
-                let want = format!("GATE_SDK_KNOB_{}", d);
-                if let Ok(v) = std::env::var(&want) {
-                    out.push((want, v));
-                }
-            }
-        }
-    }
-    out
+    super::child_knobs(declared)
 }
 
 struct PreflightOut {

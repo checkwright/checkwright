@@ -29,7 +29,7 @@ body:
       options:
         - checkwright doctor
         - checkwright init
-        - bash gate-sdk/bin/install-hooks.sh
+        - bash gate-sdk/bin/run-gates.sh --install-hooks
         - bash gate-sdk/bin/run-gates.sh (the first battery)
         - Another step — name it in the output below
     validations:

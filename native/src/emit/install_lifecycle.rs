@@ -85,7 +85,7 @@ fn install(args: &[String]) -> Result<(), String> {
 }
 
 // spec: lifecycle-kit/SPEC.md §bin/install-lifecycle.sh — the driver-config step is the
-// `install-hooks.sh` per-clone opt-in class: a non-repo cwd degrades to a printed skip on stderr
+// `--install-hooks` per-clone opt-in class: a non-repo cwd degrades to a printed skip on stderr
 // at exit 0, never a hard failure, because the recorded honest limit depends on it failing soft
 fn register_driver() {
     let inside = proc::run("git", &["rev-parse", "--git-dir"])

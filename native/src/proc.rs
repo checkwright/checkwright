@@ -542,6 +542,18 @@ pub enum Sink {
 // whose output is a captured *artifact* rather than a value this process reads, so it is written
 // through as the child produces it. `Err` stays a spawn failure alone, `run`'s rule.
 pub fn run_to(program: &str, args: &[&str], sink: &Sink) -> Result<i32, String> {
+    run_to_env(program, args, &[], sink)
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — `run_to` with the child's own declared knob environment
+// added, the shape a member dispatching another member owes: the callee is a child rather than an
+// in-process call precisely so it reads the knobs its own registry entry declares.
+pub fn run_to_env(
+    program: &str,
+    args: &[&str],
+    env: &[(String, String)],
+    sink: &Sink,
+) -> Result<i32, String> {
     #[cfg(test)]
     recorder::note(program);
     let spawn_err = |e: std::io::Error| {
@@ -552,6 +564,9 @@ pub fn run_to(program: &str, args: &[&str], sink: &Sink) -> Result<i32, String> 
     };
     let mut cmd = Command::new(program);
     cmd.args(args);
+    for (k, v) in env {
+        cmd.env(k, v);
+    }
     if let Sink::File(path) = sink {
         let out = std::fs::File::create(path).map_err(spawn_err)?;
         let err = out.try_clone().map_err(spawn_err)?;
