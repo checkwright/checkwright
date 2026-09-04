@@ -8455,8 +8455,8 @@
   legible and moves the KPI's denominator; grading each row against the allowlist's own matching
   rule is most accurate and duplicates that rule; a guard-kit/SPEC.md note is cheapest, buys least.
   **Cost while deferred:** one re-triage of the same unretireable rows per close, on the surface a
-  close reads to decide where friction is — and the top row by a wide margin is one of them, so the
-  ranking's most prominent signal is the one no reader can act on.
+  close reads to decide where friction is; the top row is one of them, and GROWING — `cat >>` read
+  26x above and 50x of 152 calls at the 2026-09-05 close, which found this entry: not a recurrence.
   recurrence: prompt-ranking-ungrantable-shape-class 2026-08-28 2026-09-03
   **THIRD MEASUREMENT, 2026-09-03, drained at scope on the same dedup sweep** — a gap bullet that
   again re-derived the three-arms-all-wrong finding without finding this entry, naming the FIRST of
@@ -9951,10 +9951,5 @@
 - **scratch-auto-allow-no-decoration-steer** [design-pending] — Chained writes lose the steer.
 
 ## Done
-
-- evidence-spine-port-cut
-- baseline-diff-port-cut
-- trend-reporter-port-cut
-- hooks-opt-in-port-cut
 
 ## Lessons Learned
