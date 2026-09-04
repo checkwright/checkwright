@@ -104,9 +104,18 @@ contract binds a tool taking **no** positionals, and this cut must not be read a
 answering it: the port makes the question moot for this one file by moving usage to
 the front-end, and rules nothing about the seventeen.
 
+**A census note is owed at build, and this member is one of the four that move it**
+— probed, `run-validate.sh` is on the census (`git ls-files '*/bin/*.sh' | xargs
+grep -L -- '--help'` names it alongside the other three cut members). The entry's
+own derivation is not reproducible as written: it states 20 paths / 17 shipped
+tools measured 2026-09-04, while the obvious spelling of its own command returns
+19 at this HEAD, three of them fixtures, so 16 shipped. The pattern is unstated,
+so the difference is unattributable rather than a proven staleness; build
+reproduces the census with the entry's own pattern before moving the number.
+
 ### (3) The declared knob roster, and the two prefix families it carries
 
-The arm declares twelve names {design-bearing}:
+The arm declares thirteen names {design-bearing}:
 
 `EVIDENCE_KIT_SUITES`, `EVIDENCE_KIT_RUN_*`, `EVIDENCE_KIT_PARSER`,
 `EVIDENCE_KIT_PARSER_*`, `EVIDENCE_KIT_BASELINE_FILE`,
@@ -164,6 +173,26 @@ exactly **two** — this file (`:91`, `:89`, `:99`) and `bin/diff-baseline.sh`
 (`:30`, `:40`, `:41`). Every other hit in the tree is `lib/evidence.sh`'s own
 dispatch or one of the library's gate-tests sourcing it directly to test the
 adapter. No third production caller exists anywhere.
+
+**The cut also empties the caller set of the two twins already compiled before this
+iteration, and that closes a duplication rather than opening one.** `ek_lock_read`
+and `ek_pid_alive` (already compiled at `native/src/evidence.rs:73`/`:132`) have
+exactly **one** production caller in the whole tree today — this file, at `:32`,
+`:48` and `:52` — probed the same way as the five above; `bin/diff-baseline.sh`
+calls neither. `evidence-kit/gate-tests/evidence-lib-parity.test.sh` exists to hold
+the shell and compiled forms of these two to their classification parity, and its
+own header states why: "`bin/run-validate.sh` still calls both..., so the caller set
+does not empty and the duplication is permanent — which is criterion 6's *unless*
+clause". This cut removes that one caller, so the premise the test's own comment
+states goes false the moment it lands. §The non-gate arm's parity-arm-retirement
+rule — "caller is the second holder, so the arm retires with it", already the
+ground the sibling cut cites for its own three twins' library tests — applies here
+on the same terms: with no production caller left in either substrate, the shell
+forms of `ek_lock_read` and `ek_pid_alive` retire from `lib/evidence.sh`, and
+`evidence-lib-parity.test.sh` retires with them, in this cut's own deleting commit.
+Nothing needs re-pointing in its place — unlike delta (10)'s two behavioral suites,
+this one has no surviving subject to re-point at, because both forms of the thing it
+compared are about to have zero production callers on the shell side.
 
 **The class ruling does not foreclose this, and the licence is written into the
 library's own header rather than inferred.** `evidence-kit/lib/evidence.sh:3` rules
@@ -505,9 +534,11 @@ condition rather than its subject** — binding because delta (12) *narrows* a c
   exempt. Not monotone under a narrowing in principle, since its corpus reaches
   `*.rs`; delta (9) moves six directives into that corpus, so the gate is re-run and
   not inspected.
-- `check-measured-claim` — its red condition on `tree-shell-owed` is a **value
-  disagreement**, not a count, so a narrowing that moves the value reds it. Delta (14)
-  regenerates in the landing commit for exactly that reason.
+- `check-measured-claim` — reds only on a bound `measured:` marker whose oracle value
+  disagrees with it; it has no arm that scans an unbound key. Delta (14) probes that no
+  tracked `.md` binds `tree-shell-owed` behind such a marker, so this gate has no claim
+  to check here and stays green — the staleness delta (14) regenerates is the baked
+  hook, caught by `check-graph`, not this gate.
 
 ## Existing sections updated
 
@@ -522,7 +553,13 @@ condition rather than its subject** — binding because delta (12) *narrows* a c
   to the arm; the batch file's scratch claim joins the destructor (delta 7).
 - **`evidence-kit/SPEC.md §lib/evidence.sh`** — the adapter roster gains a sentence
   naming which five now have compiled twins and which shell forms survive on which
-  caller (delta 4).
+  caller; the shell forms of `ek_lock_read` and `ek_pid_alive`, already compiled
+  before this iteration, are removed as their last production caller leaves
+  (delta 4).
+- **`evidence-kit/gate-tests/evidence-lib-parity.test.sh`** — retired in the deleting
+  commit: its own header states its existence rests on `bin/run-validate.sh` keeping
+  the shell/compiled duplication of `ek_lock_read`/`ek_pid_alive` alive, and this cut
+  is what ends that (delta 4).
 - **`evidence-kit/SPEC.md §Layout and configuration`** — the two prefix families are
   named as declared knobs, and the parser seam's survival is stated where the knob
   is defined (deltas 3, 5).
@@ -567,7 +604,9 @@ condition rather than its subject** — binding because delta (12) *narrows* a c
 - [ ] **Both-substrates comparison bought before the delete** — delta (11)'s
       procedure run in the deleting session, with both implementations present.
 - [ ] **Removals propagated** — every surface in delta (12) edited, the two settings
-      grants deleted in the same commit as the file, and every spec grepped for names
-      this change retired.
-- [ ] **Gaps filed** — cross-component gaps discovered during the work filed as debt
-      tasks; a build-time causal gap is resolved that session, not deferred.
+      grants deleted in the same commit as the file, `evidence-lib-parity.test.sh` and
+      the now-uncalled shell forms of `ek_lock_read`/`ek_pid_alive` retired per
+      delta (4), and every spec grepped for names this change retired.
+- [ ] **Gaps filed** — the unreproducible help-arm census derivation (delta 2, shared
+      with the other three cuts of this iteration) filed to the gap inbox; a
+      build-time causal gap is resolved that session, not deferred.

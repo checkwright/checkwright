@@ -334,13 +334,25 @@ whether the edit is forced or voluntary.
 
 **The silent set, fixed by hand because nothing reds:**
 `delegation-kit/SPEC.md`'s prose mentions at `:2231`, `:2389`, `:2412`, `:2488` and
-their `docs/` mirrors; `drift-kit/SPEC.md:666,1064` and its mirror, which cite the
-reporter by role rather than by path; `scripts/delegation-config.sh:14`, a `# spec:`
-comment naming the file; `usage-tests/trend-history.log:1`, the fixture's own header
-comment; `TASK-QUEUE.md`'s bodies, which the manifest set excludes; and
-`.workflow/survey-record.md`, a captured finding no gate cross-checks. The frozen
-`docs/posts/2026-07-19-checkwright-v0-9-0.md` is **not** edited — a dated post
-records what the tree was.
+their `docs/` mirrors; `delegation-kit/README.md:89` (bare-name prose, "`usage-trend`
+reads that log...") and its mirror `docs/delegation-kit/README.md:94`;
+`drift-kit/SPEC.md:666,1064` and its mirror, which cite the reporter by role rather
+than by path; `scripts/delegation-config.sh:14`, a `# spec:` comment naming the file;
+`usage-tests/trend-history.log:1`, the fixture's own header comment; `TASK-QUEUE.md`'s
+bodies, which the manifest set excludes; and `.workflow/survey-record.md`, a captured
+finding no gate cross-checks. The frozen `docs/posts/2026-07-19-checkwright-v0-9-0.md`
+is **not** edited — a dated post records what the tree was.
+
+**`delegation-kit/README.md:101-104` and its mirror `docs/delegation-kit/README.md:106`
+are re-spelled rather than merely re-pathed, and the finding is theirs regardless of
+this cut.** They read "the `usage-verdict` decision table and the `usage-trend`
+assertions... retired into the gate binary's crate test lane... and spawn the two
+shell subjects (SPEC §Testing)". Probed against `native/src/usage_tests.rs`: the
+verdict-table test (`:246`) reads a data fixture (`:262`) and spawns nothing, and
+`:561` was already, before this cut, the crate's **only** remaining `kit(...)`-resolved
+shell-script invocation (delta 9) — so "the two shell subjects" is inaccurate **today**,
+not only after this port. After this cut the count is zero, per delta (9)'s own
+sentence that this member retires the pattern outright. Rewritten to say so.
 
 **`.claude/settings.json:48`** carries exactly one grant naming this path,
 `Bash(bash delegation-kit/bin/usage-trend.sh)` — probed rather than assumed, as
@@ -361,8 +373,8 @@ Deleting one owed `.sh` moves `scripts/measured-claims.sh`'s `tree-shell-owed` k
 `scripts/git-hooks/pre-commit` (`:369`) {mechanical}. That hook, `commit-msg` and
 `docs/check-graph.html` regenerate in the landing commit; the SPEC and README edits
 stale their `docs/` mirrors and the crate change stales the binary. `check-graph`,
-`check-docs-mirror-fresh`, `check-gate-binary-fresh` and `check-measured-claim` are
-the reds, all discharged in the landing commit
+`check-docs-mirror-fresh` and `check-gate-binary-fresh` are the reds, all discharged
+in the landing commit
 (docs/site-architecture.md §Generated projections and their freshness gates).
 
 **Two keys that do not move, probed rather than assumed:** this member is not a
@@ -425,8 +437,10 @@ record, emitted only when `resets_7d` rides with it.
   re-run rather than inspected.
 - `check-crate-arms` — reds when the crate's lint or test arm fails. Delta (9)
   rewrites a test inside that arm, so it is re-run by construction.
-- `check-measured-claim` — reds on a **value disagreement** for `tree-shell-owed`, so
-  the narrowing reds it and delta (12) regenerates.
+- `check-measured-claim` — reds only on a bound `measured:` marker whose oracle value
+  disagrees with it; no marker binds `tree-shell-owed` (delta (12)'s probe), so it has
+  no claim to check here and stays green. `check-graph` is what catches the moved
+  value, via the baked hook.
 - `check-settings-pins` — reds on a settings key whose pinned value has drifted. Its
   subject is the pinned key set rather than the grant list, so removing a grant line
   does not reach it; re-run rather than reasoned about, because the file is edited.
@@ -452,8 +466,9 @@ record, emitted only when `resets_7d` rides with it.
   and spawns it" sentence is replaced by the in-process form; the crate's last
   literal `kit(...)` shell-script invocation is recorded as retired; the
   both-substrates discharge gains this member (deltas 9, 10).
-- **`delegation-kit/README.md`** — the fenced invocation at `:83` re-spelled
-  (delta 11).
+- **`delegation-kit/README.md`** — the fenced invocation at `:83` re-spelled, the
+  bare-name mention at `:89` re-spelled, and `:101-104`'s "spawn the two shell
+  subjects" sentence rewritten to state zero (delta 11).
 - **`native/src/usage_tests.rs`** — `:561` and `:563` replaced by the in-process
   call; the knob-poisoning discipline retained; three cases added for delta (4)'s
   behaviours (delta 9).

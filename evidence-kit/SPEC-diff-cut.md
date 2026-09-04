@@ -77,7 +77,7 @@ exit contract above, and stating that explicitly matters because the natural rea
 
 ### (3) The declared knob roster
 
-The arm declares six names {design-bearing}: `EVIDENCE_KIT_BASELINE_FILE`,
+The arm declares five names {design-bearing}: `EVIDENCE_KIT_BASELINE_FILE`,
 `EVIDENCE_KIT_SKIP_FILE`, `EVIDENCE_KIT_TMP_DIR`, `EVIDENCE_KIT_PARSER` and
 `EVIDENCE_KIT_PARSER_*`.
 
@@ -326,12 +326,17 @@ Deleting one owed `.sh` moves `scripts/measured-claims.sh`'s `tree-shell-owed` k
 `scripts/git-hooks/pre-commit` (`:369`) {mechanical}. That hook, `commit-msg` and
 `docs/check-graph.html` regenerate in the landing commit; the SPEC and README edits
 stale their on-site mirrors and the crate change stales the binary. `check-graph`,
-`check-docs-mirror-fresh`, `check-gate-binary-fresh` and `check-measured-claim` are
-the reds, all discharged in the landing commit
+`check-docs-mirror-fresh` and `check-gate-binary-fresh` are the reds, all discharged
+in the landing commit
 (docs/site-architecture.md §Generated projections and their freshness gates).
 
-`ported-gate-members` and `gate-substrates` do **not** move: this cut registers no
-gate and adds no `.gate` descriptor.
+**Two keys that do not move, probed rather than assumed:** `ported-gate-members` and
+`gate-substrates` do **not** move — this cut registers no gate and adds no `.gate`
+descriptor. **And no `measured:` marker binds `tree-shell-owed` in any tracked
+`.md`** — probed; the live markers are `ported-gate-members=108` at
+`docs/install.md:212` and `gate-substrates=native` at four sites — so
+`check-measured-claim` stays green from the marker side and the staleness is the
+baked hook alone.
 
 ## Producers and consumers
 
@@ -375,8 +380,10 @@ so the assertions keep a named subject.
   for this file today, so the narrowing can only leave it zero.
 - `check-comment-tier` — corpus reaches `*.rs`; three directives move into it, so it
   is re-run rather than inspected.
-- `check-measured-claim` — reds on a **value disagreement** for `tree-shell-owed`, so
-  the narrowing reds it by construction and delta (12) regenerates.
+- `check-measured-claim` — reds only on a bound `measured:` marker whose oracle value
+  disagrees with it; no marker binds `tree-shell-owed` (delta (12)'s probe), so it has
+  no claim to check here and stays green. `check-graph` is what catches the moved
+  value, via the baked hook.
 - `check-evidence-lib-parity` / `--evidence-lib-parity` — its red condition is a
   **disagreement between two holders**, so removing one holder does not red it, it
   **empties** it. §The non-gate arm rules that shape: a parity arm's caller is its

@@ -268,7 +268,15 @@ The roster is probed and split by what a gate catches {mechanical}.
 `:15774`; `installer/lib/init.sh:414`;
 `.github/ISSUE_TEMPLATE/install-failure.yml:32`;
 `gate-sdk/templates/gates-workflow.yml:3`; and `TASK-QUEUE.md:814`, which the
-manifest set excludes.
+manifest set excludes. **A second kit's SPEC also names the class, missed by a
+first pass scoped to gate-sdk's own prose**: `lifecycle-kit/SPEC.md:761` and
+`:2938` both cite "the `install-hooks.sh` opt-in class" as the precedent for its
+own per-clone driver-config step, and `docs/lifecycle-kit/SPEC.md:766`,`:2943` are
+their mirrors — all four re-spelled to "the `--install-hooks` opt-in class".
+**A crate comment carries the same phrase and is re-spelled with it**:
+`native/src/emit/install_lifecycle.rs:88`, the very citation delta (4) reads to
+establish the class-convergence precedent — left as prose commentary, not a
+directive, so no gate catches a stale spelling there either.
 
 **`gate-sdk/SPEC.md §install-hooks` itself** is rewritten as the arm's section per
 deltas (2) through (6). The heading **stays**: three other sections of this SPEC cite
@@ -319,8 +327,8 @@ twice over, since delta (8) also edits the hook template itself. The regen is
 `bash gate-sdk/bin/gen-pre-commit.sh --write` then
 `bash gate-sdk/bin/run-gates.sh --emit graph > docs/check-graph.html`; the SPEC and
 README edits stale their `docs/` mirrors and the crate change stales the binary.
-`check-graph`, `check-docs-mirror-fresh`, `check-gate-binary-fresh` and
-`check-measured-claim` are the reds, all discharged in the landing commit.
+`check-graph`, `check-docs-mirror-fresh` and `check-gate-binary-fresh` are the reds,
+all discharged in the landing commit.
 
 **Two keys that do not move, probed rather than assumed:** this member is not a
 `gates.list` entry, so the registry-scoped loop at `measured-claims.sh:19-23` never
@@ -397,8 +405,10 @@ which it wrote before, and no new file, record format or field.
   it.
 - `check-comment-tier` — corpus reaches `*.rs`; the four directives move into it, so
   it is re-run rather than inspected.
-- `check-measured-claim` — reds on a **value disagreement** for `tree-shell-owed`, so
-  the narrowing reds it by construction and delta (10) regenerates.
+- `check-measured-claim` — reds only on a bound `measured:` marker whose oracle value
+  disagrees with it; no marker binds `tree-shell-owed` (delta (10)'s probe), so it has
+  no claim to check here and stays green. `check-graph` is what catches the moved
+  value, via the baked hook.
 - `check-install-claim` — reds on a **zero count** of install-primary declarations,
   which is exactly the non-monotone shape a narrowing can flip. Probed and cleared:
   its singleton is about the distribution transport and its couples set does not
@@ -411,8 +421,14 @@ which it wrote before, and no new file, record format or field.
   and its three branches, the retained steps, and the no-positional argv reading
   (deltas 2, 3, 4, 5, 6). The heading stays.
 - **`gate-sdk/SPEC.md §The non-gate arm`** — the class roster gains
-  `--install-hooks`, recorded as the first member that **resolves another member
-  through the registry**, and as the instance where an in-process call by name was
+  `--install-hooks`, recorded **not** as the first member to resolve another gate
+  through the registry — `--enter-stage`'s own preflight already does, though its
+  `.gate` branch always spawns a child (re-execs the binary itself), and
+  `check-docs-kit-parity` already calls a wrapped gate's module in-process, though
+  at a fixed compile-time target with no directory walk — but as the first to
+  combine the two: a **runtime**, directory-walk resolution (so a consumer `.sh`
+  shadow can still win) whose `.gate` branch is dispatched **in-process with no
+  spawn at all**. It is also the instance where an in-process call by name was
   refused to keep a consumer shadow winning (deltas 2, 4).
 - **`gate-sdk/SPEC.md §check-identity`** — its sentence that `install-hooks.sh` runs
   the gate at opt-in is re-spelled to the arm, and the "reaches the gate through
@@ -433,6 +449,10 @@ which it wrote before, and no new file, record format or field.
 - **`CLAUDE.md`** — the per-clone opt-in line at `:61` (delta 8).
 - **`README.md`** — the mention at `:144` (delta 8).
 - **`lifecycle-kit/README.md:93`** — the mention (delta 8).
+- **`lifecycle-kit/SPEC.md:761,2938`** and their `docs/` mirror — "the
+  `install-hooks.sh` opt-in class" re-spelled to the arm's name (delta 8).
+- **`native/src/emit/install_lifecycle.rs:88`** — the comment citing the same class
+  phrase re-spelled (delta 8).
 - **`docs/install.md`** — the fenced invocation at `:238` and the prose at `:367`
   and `:426` (delta 8).
 - **`docs/gate-sdk/index.md:31`** — the fenced invocation (delta 8).
