@@ -9155,48 +9155,48 @@
   is escalated rather than closed by this session.
 
 - **lead-tier-split-premise-unamended** [design-pending] — `lifecycle-kit/templates/lead.md`
-  §Economics rests its *Split the lead where the tail dominates* bullet on a premise seven
+  §Economics rests its *Split the lead where the tail dominates* bullet on a premise EIGHT
   consecutive iterations have now measured false, and the template still ships it unqualified.
-  **The trigger is the binding's own and it has fired seven times.** `.claude/commands/lead.md` set
-  the criterion — count the escalations a lead ruled ALONE by reading a governed surface; near
-  zero, the premise holds; consistently several, the template's bullet is what needs amending and
-  not this repo's tier — and named the threshold at a third such iteration. Measured 5, 4,
-  several, 4, 5, and now **SEVEN at `parser-and-enum-adapter-cuts-with-graph-hotfix`**: the
-  iteration's kind and composition against the port-only run; the hotfix envelope ruled narrow on
-  derivable grounds; `check-docs-cmd` reframed from a symmetric coin-flip to an asymmetric choice
-  by reading all four sites, which spec conceded corrected its load-bearing point; build's tiering
-  and its two-batch split off the amendments' own labels; resuming batch 2 after an API 529 rather
-  than committing its staged work; and deferring validate's comment-tier question to validate
-  rather than reverting it. One relayed operator ruling beside them. On COST the premise held
-  again: the lead's priced share read 10.7% at the fourth point.
+  **The trigger is the binding's own.** `.claude/commands/lead.md` set the criterion — count the
+  escalations a lead ruled ALONE by reading a governed surface; near zero, the premise holds;
+  consistently several, the template's bullet needs amending and not this repo's tier — and named
+  the threshold at a third such iteration. Measured 5, 4, several, 4, 5, 7, 7, and now **8**. This
+  entry is the governed surface for that figure, which is why a dispatch relaying a different one
+  (four, at the seventh firing) is reconciled here rather than silently.
   **The two axes separate, which is what makes this an amendment rather than a tier flip.** On
-  COST the premise holds but its FALL REVERSED at the seventh firing (`scan-prompts-cut`,
-  2026-09-04): supervision read 14.8% of an 85.00 iteration, series 14, 9.2, 9.7, 14.8, on a
-  ruled-alone count of SEVEN again. On CHARACTER it fails every time: a routing-only lead would be
-  cheaper still and would have RELAYED the rulings this one made — not a lead the protocol asks for.
-  **The counter-evidence, recorded because the entry is weaker without it, and it is now FOUR
-  instances of ONE shape — a claim verified at one surface and read as covering a wider one.** A
-  `.gate` manifest line and `main.rs`'s dispatch table read as "verified both halves myself" when
-  the predicate was never run; two crate functions called pre-existing off a `git log -- <files>`
-  read were that session's own code; and a lead OVERRODE a fact the session had supplied, ruling
-  "promote the two hosts" where scope's report had already cited the surface saying promotion is
-  /spec's — scope ran the gate rather than complying, and compliance would have committed a red.
-  At this iteration the lead reported three more and RETRACTED the worst in full: an instruction
-  to stamp five `recurrence:` dates on a threshold COUNT no session had judged, which would have
-  frozen five false dated attestations; the clause was read without opening the SPEC section it
-  points into, and scope refused it with grounds. The other two are an imprecise relay of align's
-  spawn finding that dropped its "in their own gate modules" qualifier, and a four-surface host
-  survey reported complete where scope found a fifth. **None nets against the ruled-alone count**,
-  which measures whether an escalation was answered off a governed surface and never whether the
-  grounds under that answer were probed, inferred, or overridden.
-  **A count discrepancy, resolved at this surface.** The dispatching lead relayed the trigger as
-  having fired on FOUR consecutive iterations; this entry enumerates seven by name and is the
-  governed surface, so seven is the figure. Stated rather than silently reconciled.
+  COST the premise holds, and the priced supervision share reads 14, 9.2, 9.7, 14.8, 9.5 — the
+  fall reversed at the seventh firing (`scan-prompts-cut`, 14.8% of an 85.00 iteration) and
+  returned to its band at the eighth (9.5% of a 94.94 iteration, an upper bound: the meter ran
+  mid-close with the denominator still growing). On CHARACTER it fails every time: a routing-only
+  lead would be cheaper still and would have RELAYED the rulings this one made — not a lead the
+  protocol asks for.
+  **The eighth firing, `wait-probe-cut-and-stage-journal-absence` 2026-09-04, adds a CHARACTER
+  datum the ruled-alone count structurally cannot see**, and it is the first reading a close took
+  from the lead's own journal rather than from a summary of it. Four rulings at scope and four at
+  spec, each read where it was recorded and with its grounds; FOUR of the eight replaced the
+  escalating session's stated ground or frame rather than answering the question as put. Beside
+  them the lead logged one error (a from-memory file count, corrected at zero cost by the
+  receiving session's own probe) and one item it classified itself as a NEAR-MISS: a risk it read
+  as notional, FLAGGED for verification rather than asserted safe, which align then found real. A
+  routing-only lead produces neither the ruling nor the flag, and the flag is this axis's sharpest
+  instance — the lead's own reading was WRONG and the protocol still paid, which no count of
+  correct rulings can evidence.
+  **The counter-evidence, recorded because the entry is weaker without it, and it is now SEVEN
+  instances of ONE shape — a claim verified at one surface and read as covering a wider one.**
+  Three are the founding set (a `.gate` line and a dispatch table read as "verified both halves"
+  with the predicate never run; two crate functions called pre-existing off a `git log` read;
+  a lead overriding a fact the session had supplied, where compliance would have committed a red);
+  three more were self-reported at the seventh firing; and the one that matters most is the
+  RETRACTION — an instruction to stamp five `recurrence:` dates on a threshold COUNT no session
+  had judged, which would have frozen five false dated attestations, read without opening the SPEC
+  section the clause points into, refused by scope with grounds and then withdrawn in full.
+  **None nets against the ruled-alone count**, which measures whether an escalation was answered
+  off a governed surface, never whether the grounds under that answer were probed or overridden.
   **Why `[design-pending]`:** the deliverable is a kit template's own design rationale, and the
   shape is unruled — qualify the bullet's premise, split it into a cost limb and a character limb,
   or replace it with the discriminator the binding already uses. Which one is a doctrine call.
   **Cost while deferred:** every consumer vendoring lifecycle-kit reads a premise this repo has
-  measured false seven times, and each future lead re-derives the same finding against a template
+  measured false eight times, and each future lead re-derives the same finding against a template
   that never records it — the binding's evidence is local while the false claim is shipped.
   **DISTINCT from `economics-posture-binding-stale`**, whose subject is the local shim restating a
   ruling it should cite; this one is the vendored TEMPLATE's own premise being wrong.
