@@ -560,7 +560,14 @@ later session reads, and reading it alone would make the iteration that takes th
 non-compliant; the specific ruling governs the general bar, both being the operator's and of one
 date, and the entry is the exception's home rather than a roster kept here — a roster would be the
 maintained copy derivation-first refuses. Discharge: this paragraph is deleted with the one it
-qualifies, and this second member goes earlier, when that entry's promotion lands.
+qualifies, and this second member goes earlier — at the **close** of the iteration that took the
+exception, never at its promotion. **The scheduling clause said promotion and that was mis-set —
+corrected 2026-09-04 by the lead on its own authority, at the promotion it would have fired on.**
+An exception is not spent when it is taken; it is spent when the iteration that took it is over.
+Retiring it at promotion would leave every stage still ahead reading the general bar with no
+carve-out beside it, which is the exact misreading this sentence exists to prevent — so the clause
+would have defeated the paragraph it discharges. Nothing operator-class is touched and no ruling is
+reversed: what moves is the date a lead-authored schedule fires.
 
 **The run's ORDERING — not its existence — is reopenable at a later consult, and one ground is
 already on the record: ruled 2026-09-03 by the operator, lead-relayed from an in-session prompt.**

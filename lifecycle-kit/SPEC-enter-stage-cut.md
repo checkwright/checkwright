@@ -484,9 +484,9 @@ that its refusal names the sanctioned writer.
 in the file this cut deletes, and the amendment rules each rather than leaving a
 build session to infer one from the rewrite {design-bearing}:
 
-- **`enter-stage-flag-position-silently-ignored`** (`:511`) and
-  **`enter-stage-arg-position-silent-drop`** (`:2822`, which its own body marks
-  "DISTINCT from" the former at `:567`) — both are argv-grammar defects of the
+- **`enter-stage-flag-position-silently-ignored`** (`:562`) and
+  **`enter-stage-arg-position-silent-drop`** (`:2873`, which its own body marks
+  "DISTINCT from" the former at `:618`) — both are argv-grammar defects of the
   shell parser. They are **carried forward, not fixed here**: the port preserves
   the argv grammar by delta (2), so both defects survive the seam intact and their
   entries stay live against the arm. Fixing either inside a port cut would change a
@@ -496,15 +496,25 @@ build session to infer one from the rewrite {design-bearing}:
   a refusal's `help:` line, unchanged by the substrate and carried forward on the
   same ground.
 - **`enter-stage-simulate-no-write-fixture`** (icebox, `:9711`, cited again at
-  `:2853` and `:6506`) — this one is **discharged by delta (12)**: the
-  both-substrates comparison asserts, on every refusal path of all seven harnesses,
-  that nothing was written, which is the fixture that entry asks for. The build
-  commit moves it to `## Done` and says so; it is the only one of the four the cut
-  closes, and closing it is a consequence of the comparison rather than a fix
-  aimed at it.
+  `:2904` and `:6557`) — **stays iceboxed, and delta (12) does not discharge it.**
+  The tempting reading is the other one and it is refused here rather than left for
+  build to take: delta (12)'s comparison does assert, on every refusal path of all
+  seven harnesses, that nothing was written — but it is **bought once, before the
+  delete**, which its own heading says. **A one-shot parity comparison is not a
+  fixture.** The entry's whole text is "Guard present, **unpinned by a fixture**",
+  which asks for something that runs *again*; the comparison is consumed by the
+  delete and leaves the guard exactly as unpinned the day after as it is today.
+  Moving the entry to `## Done` on that ground would record work as done that was
+  not done.
+  **The door this cut does open is narrow and is stated so build can walk through
+  it deliberately.** If build lands a **standing** no-write assertion on the
+  refusal paths — a test in the ported crate's own suite that runs in the battery,
+  not the one-off comparison — the entry is discharged and build moves it, naming
+  the test that pins it. Absent that test it stays iceboxed and joins the other
+  three as carried forward.
 
 **Two queue lines cite hard line numbers inside the deleted file** and dangle
-whatever else happens: `:6007` names `enter-stage.sh:339` and `:9670` names
+whatever else happens: `:6058` names `enter-stage.sh:339` and `:9670` names
 `:469,:499`. Both are repointed at the section rather than at a line, since a line
 citation into a compiled module is the same defect one substrate later.
 

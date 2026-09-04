@@ -129,14 +129,28 @@ one a real-target, ungranted write to a gitignored scratch path
 `guard-kit/lib/guard.sh:865`'s `[[ "$op" == '>>' ]] || return 0`.
 
 **The residue's answer is a create-side auto-allow under rule 17's whole clause
-set, and its precedent is one rule away.** Rule 16 already auto-allows
-`: > file` truncation of a gitignored target, so "destroying the prior content of
-a scratch file is cheap" is a ruling this ruleset has already made; what rule 17
-adds is a leading command from `GUARD_KIT_APPEND_BINS` and a heredoc body, neither
-of which changes the target's disposability. The grant therefore extends to `>`
-**only** where every other clause holds — gitignored target, roster-leading
-command, single statement, not backgrounded, no live substitution — and the
-`>>`-only test is replaced by a per-target gitignore test that was already there.
+set, and the ground is a composition rather than a precedent.** The weaker form of
+this argument — that rule 16 already auto-allows `: > file` truncation of a
+gitignored target (`guard-kit/lib/guard.sh:789-803`), so "destroying the prior
+content of a scratch file is cheap" is a ruling already made — is an **analogy**,
+and an analogy is what a later reader reopens a widening on. The stronger form is
+that `cat > f` on a gitignored target is **already reachable today in two
+auto-allowed steps**: `: > f` under rule 16, then `cat >> f` under rule 17 as
+delta (2) leaves it. So this delta grants in one prompt what the ruleset already
+grants in two, and **the increment is one permission decision, not one
+capability**.
+
+**The harm case was looked for rather than argued away.** The shape that would
+refuse this widening is a session clobbering a live resume journal or a `.run`
+liveness record under `.tmp/` — and that is already open under rule 16 today,
+unchanged by this delta, since `: > .tmp/<key>.run` is granted as it stands. A
+widening that opens no door the ruleset does not already hold open is a
+convenience change, and it is admitted as one.
+
+The grant therefore extends to `>` **only** where every other clause holds —
+gitignored target, roster-leading command, single statement, not backgrounded, no
+live substitution — and the `>>`-only test is replaced by a per-target gitignore
+test that was already there.
 
 **This is a separate delta and not folded into (2) because the grounds differ.**
 Delta (2) narrows a decline that was over-wide against its own stated reason;
@@ -329,12 +343,15 @@ and the align stamp is demanded at the next entry on that ground.
   cap it is already at (delta 9).
 - `TRAJECTORY.md` §The closed rulings — the sentence recording
   `file-authoring-act-ungoverned` as the port-only run's second exception member
-  names its own discharge, "this second member goes earlier, when that entry's
-  promotion lands". This promotion is that event. The retirement is **not** a
-  reversal — retiring a spent ruling is not reversing one, and the ruling schedules
-  its own retirement — but it is a write to the ruling record, so it is landed on
-  the lead's answer rather than on this session's reading of a scheduling clause
-  (delta 9).
+  carried a discharge clause reading "goes earlier, when that entry's promotion
+  lands". **That clause was mis-set and is corrected rather than fired** — ruled
+  2026-09-04 by the lead on its own authority, at the promotion it would have
+  fired on. Firing at promotion leaves align, build, validate and close each
+  reading the general bar with no carve-out beside it, which is the misreading the
+  sentence was written to prevent, so the clause would have defeated the paragraph
+  it discharges. The retirement moves to **this iteration's close**. No ruling is
+  reversed and nothing operator-class is touched: what moves is the date a
+  lead-authored schedule fires (delta 9).
 - The generated projections this amendment stales — the on-site `guard-kit/SPEC.md`
   mirror, and the `ROADMAP.md` block only if a `[roadmap:]` tag moves, which it
   does not. Rostered with their triggers in `docs/site-architecture.md`
@@ -376,8 +393,9 @@ and the align stamp is demanded at the next entry on that ground.
       measures 94 columns, and the entry returns to Deferred with the carrier
       obligation intact and compressed against a re-measured fifty-line cap
       (delta 9).
-- [ ] **The TRAJECTORY retirement was landed on a ruling, not on a reading** — the
-      second-member sentence is retired only once the lead answers, and the answer
-      is recorded before the edit (delta 9).
+- [ ] **The TRAJECTORY second member is NOT retired by this work** — its corrected
+      schedule fires at this iteration's close, so a build or validate session that
+      retires it has fired a clause early; the surface is left as the correction
+      leaves it (delta 9).
 - [ ] **Gaps filed** — cross-component gaps discovered during the work filed as
       debt tasks (a build-time causal gap is resolved that session, not deferred).
