@@ -505,24 +505,21 @@
   `consumer-smoke-contract-port` left no validate journal, and the
   predecessor-journal assertion refused close's entry. The assertion works —
   that is not the finding. The finding is WHEN it fires.
-  **Precisely stated, because the gap bullet overstated it and is corrected
-  here.** The bullet said the assertion "fired at the LAST stage instead" of
-  the predicted second stage. Not so: it was EVALUATED at spec, align, build
-  and validate and PASSED each time, those four journals all existing. Close
-  is the first REFUSAL, not the first firing, and the config comment's
-  prediction was about evaluation and was correct.
-  **What the refusal cost.** The close session took the documented escape —
-  writing the stand-in itself and stating plainly that validate left none —
-  rather than forcing the entry, so the absence is recorded. But a stand-in
-  written by a session that did not do the work can only point at durable
-  artifacts: the stamp, two commits, the evidence manifest, 24 parsed suite
-  rows. It cannot carry validate's reasoning, which is the one thing a journal
-  exists for, and which is now permanently lost for that iteration.
-  **Candidate shapes, none costed**: have the entry tool WRITE a skeleton
-  journal at its own stamp so the artifact exists from the stage's first
-  moment and the session fills it; or assert the journal at the stage's OWN
-  exit, where the session that owes it is still live and can be told; or
-  accept the escape and rely on the successor's honesty.
+  **Precisely stated, the gap bullet's "fired at the LAST stage" being wrong:** it was
+  EVALUATED at spec, align, build and validate and PASSED each time, those four
+  journals all existing, so close is the first REFUSAL and not the first firing — and
+  the config comment's prediction was about evaluation, and was correct.
+  **What the refusal cost.** The close took the documented escape — writing the
+  stand-in itself and stating that validate left none — rather than forcing the entry,
+  so the absence is recorded. But a stand-in written by a session that did not do the
+  work can only point at durable artifacts (the stamp, two commits, the manifest, 24
+  parsed suite rows); it cannot carry validate's reasoning, permanently lost there.
+  **Candidate shapes, none costed**: have the entry tool WRITE a skeleton journal at
+  its own stamp so the artifact exists from the stage's first moment; or assert the
+  journal at the stage's OWN exit, where the owing session is still live; or have the
+  returning REPORT assert the path it wrote, moving detection to the lead's acceptance
+  rather than the next entry gate — a delegation-kit or agent-definition change and not
+  a lifecycle one, added 2026-09-04; or accept the escape and trust the successor.
   **DISTINCT from the boundary keep-list entries**, which own the wipe's reach
   over journals that EXIST. This entry's subject is a journal never written at
   all, which no wipe rule reaches.
@@ -540,12 +537,15 @@
   — `bin/enter-stage.sh` refuses a real entry on the same branch. What survives
   is this entry's own subject, the firing point, unchanged.
   **Two more 2026-09-02 (`test-runner-and-upgrade-cuts-with-liveness-attribution`):
-  align AND validate both left none in one iteration — both on the sonnet stage
-  tier, both reporting a complete stage, both holding an explicit grant. Two in one
-  iteration is a rate, not a scatter; align's session was gone before close looked.**
+  align AND validate both left none in one iteration — sonnet tier, complete reports,
+  explicit grants. A rate, not a scatter; align's session was gone before close looked.
+  A FIFTH 2026-09-04 (`usage-verdict-cut`) at align, recovered from the still-live
+  session as 194 reconstructed lines: two iterations in three, so the mechanism catches
+  it every time and nothing prevents it. That one PAIRED with a zero-findings audit —
+  the confound reading is the align-watch's, recorded there rather than restated here.**
   **THRESHOLD: DECLINED ON THE RUN, NOT ON MERIT, 2026-09-03 and again 2026-09-04 — one of five.**
   ruled: stage-journal-absence-caught-only-downstream lead 2026-09-03 2026-09-04 own-authority
-  recurrence: stage-journal-absence-caught-only-downstream 2026-08-31 2026-09-02
+  recurrence: stage-journal-absence-caught-only-downstream 2026-08-31 2026-09-02 2026-09-04
   Filed 2026-08-30 by close from the gap inbox, with the bullet's own
   overstatement corrected at the drain.
 
@@ -1217,10 +1217,12 @@
   script's **internal** variable spelling where the public knob is the contract
   name. Found by the config-seam-hardening close audit of the
   `internal-identifier-restatement` roster class, and fixed there: seven sites in
-  delegation-kit/SPEC.md named locals of `bin/usage-verdict.sh` that exist only as
-  assignments from their `DELEGATION_KIT_`-prefixed env knobs, while the same
-  doc's §Layout roster had the prefixed spelling right — prose-vs-roster drift
-  *within one file*.
+  delegation-kit/SPEC.md named locals of the then-shipped `bin/usage-verdict.sh`
+  which existed only as assignments from their `DELEGATION_KIT_`-prefixed env
+  knobs, while the same doc's §Layout roster had the prefixed spelling right —
+  prose-vs-roster drift *within one file*. That script left the tree at the
+  2026-09-04 port cut, so the founding instance is no longer readable; the class
+  and its live corpus below are what carry this entry.
   **Cost while deferred:** the fix is a rename away from rotting — renaming the
   local in the script silently falsifies the prose, and only the roster class's
   audit cadence catches it, at iteration granularity.
@@ -3461,7 +3463,7 @@
   again, at five for five.** Every build batch found its amendment's stated *tree behaviour*
   wrong while its *ruling* was right — batch 4 carried three in one amendment, one of which
   would have refused the exact command its own rule exists to grant, each settled by one probe.
-  recurrence: align-checklist-fanout-calibration 2026-08-23
+  recurrence: align-checklist-fanout-calibration 2026-08-23 2026-09-04
   **Cost while deferred:** align keeps returning a clean verdict that build then falsifies, so
   the stage's signal value decays toward zero while its cost does not — and a zero-divergence
   pass is read as evidence the amendments were right.
@@ -9542,6 +9544,35 @@
   Filed 2026-09-04 to the gap inbox at scope; promoted here after →fix failed on the operator-class
   ruling and →icebox failed on the live per-cut-selection trigger.
 
+- **build-native-bootstrap-port-disposition-unruled** [design-pending] — the port oracle scores the
+  crate's own build script takeable while a port would put that script inside the binary it builds,
+  and no governed sentence rules either way.
+  **Probed at this drain rather than argued.** `gate-sdk/bin/build-native.sh` is 110 lines, carries
+  no `# no-port:` (`grep -c` returns 0), and its owning section gate-sdk/SPEC.md §build-native
+  states **no port disposition at all** — so a stated-contract composer scores it takeable off the
+  only surface it reads.
+  **The circularity is compiled, not inferred.** `native/src/gates/gate_binary_fresh.rs` and
+  `crate_arms.rs` name this script as the remedy for the crate's own staleness in a **string
+  constant inside the crate**, and CLAUDE.md makes `bash gate-sdk/bin/build-native.sh` a
+  commit-time obligation the battery does not discharge. A ported script would be the authoritative
+  rebuild-yourself step for its own staleness check, which cannot hold.
+  **SAME GROUND AS `run-gates-front-end-cut-legality-unruled`, READ TOGETHER RATHER THAN MERGED.**
+  That entry owns the three-way disposition and the ruling that the `# no-port:` limb subtracts
+  from the 2026-08-28 completion predicate and is therefore operator-class; none of it is restated
+  here. What is distinct is the *ground* for that limb — there, one branch its owning section rules
+  must survive; here, a self-reference compiled into the artifact being ported, which is a stronger
+  bootstrap cause and a separate argument for a consult to weigh. A consult reaching one should
+  reach both, and neither is composable without it.
+  **CONSULT-CLASS, and that is a ruling rather than this entry's own claim.**
+  ruled: build-native-bootstrap-port-disposition-unruled lead 2026-09-04 own-authority
+  **DISTINCT from `single-gate-front-end-form-unruled`**, whose subject is which front-end FORM
+  `scripts/gate-exec.sh` should take, not whether a file may be declared out of the predicate.
+  **Cost while deferred:** every future cut selection re-derives this contradiction at survey cost
+  — this iteration's scope did, and paid for it — and the first composer that does not stop scores
+  110 lines takeable and composes a cut that puts the crate's build command inside the crate.
+  Filed at scope 2026-09-04 to the gap inbox and promoted at that iteration's close: →fix failed on
+  the operator-class ruling, →icebox on the same live per-cut trigger that promoted its sibling.
+
 - **cut-boundary-section-legality-unruled** [design-pending] — two governing sections are unusable
   as port-cut boundaries for reasons their owner docs do not settle, so a composer has to guess
   whether either is a legal boundary at all.
@@ -9634,6 +9665,37 @@
   Filed 2026-09-04 by close, from the lead's three-instance observation plus two more found in the
   gap drain's own re-verification pass.
 
+- **assertion-strength-exit-header-reach** [design-pending] — `check-assertion-strength` now
+  reaches NOTHING, and whether widening it buys enforcement or ceremony is the open question.
+  **Measured at this drain, re-run rather than carried:** `ASSERTION-STRENGTH: clean (104
+  script(s) scanned; 0 call(s) to a script with a declared exit contract)`, against 2 calls at the
+  pre-cut HEAD. The gate is correct and its own design is reporting honestly — reach is opt-in and
+  the gate widens it for no one — but a gate reaching nothing enforces nothing while holding a
+  battery slot.
+  **The condition, precisely.** The tree's only surviving `# exit:` declarer is
+  `delegation-kit/bin/usage-trend.sh`, which names its codes in prose with no uppercase token and
+  so yields an empty map. The two live calls were against `usage-verdict.sh`'s `PAUSE`→1 /
+  `STALE`→2; that file left the tree at the port cut, and its callers in
+  `delegation-kit/smoke/install.sh` now name the front-end, which is not the own-kit-bin shape the
+  gate resolves.
+  **Three candidate widenings, and their prices are the design work.** (a) Widen callee resolution
+  to reach a compiled arm — needs the arm's exit contract published on a surface the gate can read,
+  so it mints a name and a producer: a gate-sdk unit of its own, taken deliberately and never
+  inside a port cut. (b) Leave a `# exit:` header behind in a stub shell file — REFUSED, it keeps a
+  gate green by keeping a dead file, the exact shape the port exists to end. (c) Give
+  `usage-trend.sh` an uppercase-token header — one line against a still-owed shell file, restoring
+  a nonzero map, but it widens a DECLARATION rather than the gate and its value is unmeasured. (a)
+  and (b) are costed at gate-sdk/SPEC.md §check-assertion-strength; (c) is not.
+  **The value question is unchanged and is still the open part**, and a legitimate outcome of the
+  design pass is "not worth it" plus a widened honest limit in that section saying why.
+  **Why it left the icebox.** It was evicted as *wider header reach may be ceremony* — low,
+  non-rotting, no live trigger. The reach going to zero IS that trigger: the question stopped being
+  whether to widen a narrow gate and became whether to keep an inert one.
+  **Cost while deferred:** a battery slot spent on a gate that can red on nothing, and every reader
+  of the SPEC's honest limit re-derives the adoption-vs-inherent distinction, as this close did.
+  Filed 2026-07-20 by the `verdict-reader-honesty` close; iceboxed later; restored to Deferred
+  2026-09-04 at the gap drain on the zero-reach condition build filed at the landing.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
@@ -9653,7 +9715,6 @@
 - **hermetic-bin-roster-config** [design-pending] — Pinning coverage needs a consumer roster seam.
 - **split-posture-waiver-writer** [design-pending] — A lead-issued waiver stamp has no writer.
 - **supervisor-verification-attestation** [design-pending] — The verification duty is unattested.
-- **assertion-strength-exit-header-reach** [design-pending] — Wider header reach may be ceremony.
 - **gate-spec-claim-assertion-parity** [design-pending] — Ruled a human-audit class, not gateable.
 - **scope-amendment-authoring-gate** [design-pending] — Scope can do spec's job and stay green.
 - **evidence-journal-hash-chain** [design-pending] — Tamper-evidence wanted only by a hosted rung.
