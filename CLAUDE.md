@@ -61,9 +61,8 @@ The pre-commit hook is **generated** — never hand-edit
 Per-clone opt-in: `bash gate-sdk/bin/install-hooks.sh`. Every generated
 projection, that hook included, is rostered with its trigger and regen command
 in [docs/site-architecture.md](docs/site-architecture.md) §Generated
-projections and their freshness gates, which also carries the full fan-out a
-new gate stales; each
-freshness gate prints its own command on red.
+projections and their freshness gates, which also carries the full fan-out a new
+gate stales; each freshness gate prints its own command on red.
 
 New gates here are **born native** — a Rust module plus a `.gate` descriptor;
 shell needs a cause from the live exception classes, stated in the gate's
