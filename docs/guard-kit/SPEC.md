@@ -35,8 +35,8 @@ conventions without depending on its registry.
    fall-through — exactly the set of commands whose decision was made out of
    band — is appended to the friction log. That decision is invisible to the
    agent whichever way it went, so this log is the only record.
-2. **Close time** — `bin/scan-prompts.sh` filters the log against the
-   committed allowlist and ranks what survives (§scan-prompts states the
+2. **Close time** — `run-gates.sh --emit scan-prompts` filters the log against
+   the committed allowlist and ranks what survives (§scan-prompts states the
    local-overlay upper bound), grouped by command
    pattern. Each recurring pattern is resolved by the **triage criterion**
    (below); `bin/compare-settings-allow.sh` lists the local-overlay entries
@@ -174,11 +174,13 @@ Primitives a consumer guard composes; each emits the harness's
   following it.
 - `guard_split_compound <skeleton>` — the compound splitter: emits one segment
   per line, splitting on the harness's statement separators (`;`, `&&`, `||`,
-  `|`). Also not a hook primitive — the single implementation every consumer
-  that reasons *per segment* shares (rules 8/12/14/15/17/18/19/20/22, the read-compound
-  carve-out of rules 9/10, and scan-prompts' `allowed()`), so the harness's
+  `|`). Also not a hook primitive — the single implementation every **shell**
+  consumer that reasons *per segment* shares (rules 8/12/14/15/17/18/19/20/22 and
+  the read-compound carve-out of rules 9/10), so the harness's
   per-segment matching surface is modelled in exactly one place **on this
-  substrate**. Across both substrates it is modelled in **two** places, and what
+  substrate**. Across both substrates it is modelled in **two** places — the
+  `scan-prompts` ranker's grant test reasons per segment through the compiled
+  twin rather than through this function — and what
   prevents the drift between them is the comparator below rather than
   uniqueness. Fed a `guard_skeleton` view, so a separator inside a quoted
   argument is never mistaken for a statement break. **What it models is the
@@ -1349,6 +1351,18 @@ while that disposition stands: the binary holds the ranker, and what holds the
 primitives it is composed from is a compiled twin of each, kept equal to the
 shell original by `--guard-lib-parity`.
 
+**What a consumer on an artifact-less host loses, which is narrow and is not
+nothing.** This section carries **no gate** — the kit registers none — so no
+`gates.list` row is omitted and the omitted-member roster an artifact-free
+install declares does not move at all (gate-sdk/SPEC.md §The port-candidate
+criteria, criterion 5). What such a consumer loses is one advisory ranking:
+step 1 of the five in `templates/close-triage.md`. **The friction loop itself
+does not move** — the guard still blocks, steers and logs, the log still
+accrues, the triage criterion is still this section's, `compare-settings-allow`
+still runs, and the step's other four items are untouched. So the honest
+statement is that such a consumer triages an **unranked** log by reading it,
+which is worse than ranking it and is not the same as losing the loop.
+
 **The two settings documents are parsed by the arm itself**, so the ranking
 carries no external-program dependency an absent parser could take. That closes
 a silent inflation and not merely a dependency: a settings read delegated to an
@@ -1358,7 +1372,29 @@ plausible, entirely wrong number at exit 0 for a KPI to record as a trend.
 **The claim is bounded to this reader and says nothing wider**: `lib/guard.sh`,
 `bin/compare-settings-allow.sh`, `bin/run-guard-tests.sh` and `smoke/install.sh`
 all still shell to `jq`, and this member never joined the battery, so the
-battery's own program floor moves by nothing at all.
+battery's own program floor moves by nothing at all. **The arm's spawned-program
+set is empty**, which is stated here because nothing mechanical records it: a
+bridged-arm row carries no requirement element and `--needs` answers for
+registry members only (gate-sdk/SPEC.md §The non-gate arm). The ranking needs no
+`jq`, `sed`, `grep`, `sort`, `wc` or `tr`, so no absent program can change what
+it reports.
+
+**What crosses into the binary and what stays the consumer's**, stated because
+a compiled arm holds its literals inside the shipped artifact rather than in a
+file the consumer vendors and reads.
+Three command vocabularies travel with the ranker: the harness's built-in
+read-only `git` and `docker` auto-allows, and the common multi-command binaries
+the key sub-keys on. The first is harness behaviour and the second is
+shell-substrate knowledge, so both pass §The generic ruleset's own test — they
+admit nothing a project owns — and stay **kit literals that mint no knob**. What
+they cost is portability rather than privacy, and the cost does not turn on the
+substrate: a second harness with a different built-in set would force a
+configurable slot whether the set sat in shell or in the binary, so the port
+neither pays it nor pre-pays it. **The allowlist itself never crosses.** The arm
+reads a consumer's own `permissions.allow[]` through `GUARD_KIT_SETTINGS` and
+`GUARD_KIT_SETTINGS_LOCAL` and ships no default allow entry of any kind, so the
+mechanism is the kit's and the vocabulary stays the consumer's file — the shape
+§compare-settings-allow's empty-by-default probe roster already holds.
 
 **What "prompting" names in this tool's output.** The word is the tool's shipped
 vocabulary and stays as it is; what it counts is the set of calls **nothing in the
@@ -1729,7 +1765,6 @@ close-surface: .workflow/prompt-friction.log advisory reclaim=: > .workflow/prom
 ```
 guard-kit/
   lib/guard.sh              # primitives + generic ruleset functions
-  bin/scan-prompts.sh
   bin/compare-settings-allow.sh
   bin/scratch-run.sh        # echo-then-exec runner for scratch scripts
   bin/run-guard-tests.sh    # decision-table runner, narrowed to bash-guard with the escalation-guard port

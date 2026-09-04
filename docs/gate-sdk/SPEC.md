@@ -4396,7 +4396,13 @@ could not see six command-line arguments — and names
 line count hides it; that member was then the **cheapest by line count** of the
 cut that took it, so the second cut attests what the first found. Cost behind a
 **spawned** tool is invisible to the column on the same terms (the
-spawn-invisibility rule below). So the count is one input beside the criterion
+spawn-invisibility rule below). A third class is cost behind **composition**: a
+file whose behaviour is composed out of a permanently-shell library's primitives
+owes a compiled twin of each *and* criterion 6's machine-held comparator, and
+none of that is in the column, the twins being lines of a file the cut does not
+take. Attested on guard-kit's ranker, whose column saw a single-file port and
+whose real cut was that file plus three twins, a parity arm and a harness. So
+the count is one input beside the criterion
 columns and the session's own reading, never the answer: a session that reads
 the column as an answer stops looking for the cost the column cannot see.
 

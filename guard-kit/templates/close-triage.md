@@ -2,7 +2,8 @@
 permission-friction loop a habit, not a one-off cleanup. Splice this in place
 of lifecycle-kit's `tooling-friction triage` placeholder (close skill, step 2).
 
-1. **Rank what nothing granted.** Run `bash guard-kit/bin/scan-prompts.sh` — it
+1. **Rank what nothing granted.** Run
+   `bash gate-sdk/bin/run-gates.sh --emit scan-prompts` — it
    filters the friction log against the committed allowlist and the harness's
    built-in read-only auto-allows, then ranks the survivors by command pattern.
 2. **Resolve each recurring pattern by the triage criterion** — never default
