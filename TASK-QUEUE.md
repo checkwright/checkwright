@@ -9225,9 +9225,9 @@
   is escalated rather than closed by this session.
 
 - **lead-tier-split-premise-unamended** [design-pending] — `lifecycle-kit/templates/lead.md`
-  §Economics rests its *Split the lead where the tail dominates* bullet on a premise six
+  §Economics rests its *Split the lead where the tail dominates* bullet on a premise seven
   consecutive iterations have now measured false, and the template still ships it unqualified.
-  **The trigger is the binding's own and it has fired six times.** `.claude/commands/lead.md` set
+  **The trigger is the binding's own and it has fired seven times.** `.claude/commands/lead.md` set
   the criterion — count the escalations a lead ruled ALONE by reading a governed surface; near
   zero, the premise holds; consistently several, the template's bullet is what needs amending and
   not this repo's tier — and named the threshold at a third such iteration. Measured 5, 4,
@@ -9240,10 +9240,10 @@
   rather than reverting it. One relayed operator ruling beside them. On COST the premise held
   again: the lead's priced share read 10.7% at the fourth point.
   **The two axes separate, which is what makes this an amendment rather than a tier flip.** On
-  COST the split premise holds and strengthens — the lead's share fell 14% -> 9.2% -> 9.7%, so the
-  lead's turns really are the cheap tail in dollars. On CHARACTER it fails every time: a
-  routing-only lead would be cheaper still and would have RELAYED the rulings this one made. The
-  template describes a lead the escalation protocol does not ask for.
+  COST the premise holds but its FALL REVERSED at the seventh firing (`scan-prompts-cut`,
+  2026-09-04): supervision read 14.8% of an 85.00 iteration, series 14, 9.2, 9.7, 14.8, on a
+  ruled-alone count of SEVEN again. On CHARACTER it fails every time: a routing-only lead would be
+  cheaper still and would have RELAYED the rulings this one made — not a lead the protocol asks for.
   **The counter-evidence, recorded because the entry is weaker without it, and it is now FOUR
   instances of ONE shape — a claim verified at one surface and read as covering a wider one.** A
   `.gate` manifest line and `main.rs`'s dispatch table read as "verified both halves myself" when
@@ -9260,13 +9260,13 @@
   which measures whether an escalation was answered off a governed surface and never whether the
   grounds under that answer were probed, inferred, or overridden.
   **A count discrepancy, resolved at this surface.** The dispatching lead relayed the trigger as
-  having fired on FOUR consecutive iterations; this entry enumerates six by name and is the
-  governed surface, so six is the figure. Stated rather than silently reconciled.
+  having fired on FOUR consecutive iterations; this entry enumerates seven by name and is the
+  governed surface, so seven is the figure. Stated rather than silently reconciled.
   **Why `[design-pending]`:** the deliverable is a kit template's own design rationale, and the
   shape is unruled — qualify the bullet's premise, split it into a cost limb and a character limb,
   or replace it with the discriminator the binding already uses. Which one is a doctrine call.
   **Cost while deferred:** every consumer vendoring lifecycle-kit reads a premise this repo has
-  measured false six times, and each future lead re-derives the same finding against a template
+  measured false seven times, and each future lead re-derives the same finding against a template
   that never records it — the binding's evidence is local while the false claim is shipped.
   **DISTINCT from `economics-posture-binding-stale`**, whose subject is the local shim restating a
   ruling it should cite; this one is the vendored TEMPLATE's own premise being wrong.
@@ -9274,7 +9274,7 @@
   close — amending a kit template is non-port design work the port-only run forecloses, and filing
   is not the `promote` that ruling bars, `## Deferred` being no active section.
   ruled: lead-tier-split-premise-unamended lead 2026-09-02 own-authority
-  recurrence: lead-tier-split-premise-unamended 2026-09-03
+  recurrence: lead-tier-split-premise-unamended 2026-09-03 2026-09-04
 
 - **crate-interpreter-resolution-residue** [design-pending] — the crate spawns the bare program
   name `bash` at twenty sites the `check-graph` hotfix deliberately left alone, and each reaches
@@ -9641,6 +9641,7 @@
   the way in and on the way back out. The removed body is recoverable from
   the evicting commit (`git log -p -S'<slug>' -- TASK-QUEUE.md`).
 
+- **turn-end-refusal-used-as-a-busy-wait** [design-pending] — Sessions busy-wait via the stop hook.
 - **non-gate-arm-roster-hand-maintained** [design-pending] — The arm class's flag list is ungated.
 - **craft-rule-step-has-no-reader** [design-pending] — A broken stage-rules knob reds nothing.
 - **runtime-dir-two-tier-detector** [design-pending] — No two-tier proof for file-pattern ignores.

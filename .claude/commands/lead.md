@@ -354,6 +354,36 @@ credit the count itself carries.
   counter is recorded against align for it. **No tier reversal is proposed**;
   what a later judge inherits is a third matched-count point and one counter
   correctly declined at its source.
+  **Measured again 2026-09-04 at `scan-prompts-cut`: `cr=27742025` — rank 64 of
+  65 ascending (second highest), 2.85x a bare-sonnet median of 9741627, against
+  a family max of 29650027.** An `align+fanout` row exists at `cr=16575513`; the
+  two are read apart and never summed.
+  **THE AMENDMENT COUNT IS RETIRED AS THE SCALE PROXY — ruled 2026-09-04 by the
+  lead on its own authority.** The cell predicted near-median or below with all
+  three levers favourable: ONE amendment, the lightest count on record; journal
+  present as granted; dispatch present. It missed by 2.85x, the sharpest miss
+  this watch has recorded, and the failure is in the INDEPENDENT VARIABLE rather
+  than in the dispatch term. Two grounds. (1) The three matched points above
+  already record a 2.7x spread at FIXED count=3 — ranks 6, 46 and 53 — so the
+  proxy was known weak; this point puts count=1, the lightest cell, at rank 64 of
+  65, so the count spans nearly the whole range at every value it takes and
+  carries no information. That retires it rather than reweighting it.
+  (2) Treating dispatch as additive rather than substitutive is DECLINED WITH
+  CAUSE: the `session-id-and-env-probe-cuts` point above filled the missing cell
+  of a designed 2x2 and put journalled + no dispatch at +17.1%, within 9% of
+  journalled + three dispatches at +29.6%. One iteration where both rows are high
+  does not overturn a designed comparison, and patching the dispatch term aims
+  the instrument at the variable that comparison already cleared.
+  **What the evidence points at, as a candidate and NOT promoted on one point:
+  AUDIT DEPTH.** This align independently re-verified essentially every
+  `file:line` citation in a 761-line amendment across eight or more files, then
+  also dispatched a worktree-isolated sweep. One amendment was never a measure of
+  that. Candidate replacement variable: citations-verified, or surfaces-read; it
+  needs a second point before it becomes the cell.
+  **What a later judge inherits:** the watch was scoring its predictions against
+  a proxy that does not track the work, so every confirmation above is
+  under-powered rather than wrong — read them as weaker evidence, not as void.
+  The revert signal did not fire, and **no tier reversal is proposed**.
 
 scope, `spec`, and close stay on Opus, their generative and verificational
 judgment being what justifies the tier. Re-judge every tier when the harness
