@@ -1400,7 +1400,7 @@
   `.metric/stage-economics-log.txt` in fact holds five `spec` rows covering five
   distinct iterations, all recovered *after* their boundary truncations. So the
   data this entry prescribes reading **exists**, and the named blocker is being
-  retired inside `stage-economics-honesty` rather than repaired. Two carry-overs
+  retired inside `stage-economics-attribution-honesty` rather than repaired. Two carry-overs
   before the re-run is worth anything: (1) wait for that iteration to land, since
   the figures this review reads are exactly the ones
   `stage-economics-attribution-honesty` is correcting — re-running against
@@ -1408,7 +1408,7 @@
   iterations` threshold this entry leaves unset still needs a value, and five
   recorded iterations is the number now on the table.
   **Carry-over (1) discharged 2026-08-01 by the undirected scope survey:**
-  `stage-economics-honesty` has landed, attribution fix included, so the rows are
+  `stage-economics-attribution-honesty` has landed, attribution fix included, so the rows are
   no longer mis-attributed and this entry is **pickable with nothing left
   blocking it**. Only carry-over (2) — the unset `≥N` — stands.
   **Cost while deferred:** one queue line; the backlog-aging review re-raises it
@@ -1436,7 +1436,7 @@
   **One design blocker remains; the first two are answered.** Both the
   uninstrumented metric and the mis-attributed rows are **discharged** — a price
   table exists, the meter prices instead of reporting `cost=n/a`, and
-  `stage-economics-honesty` landed the one-transcript-one-row attribution fix on
+  `stage-economics-attribution-honesty` landed the one-transcript-one-row attribution fix on
   2026-08-01, so this task is **unblocked** and self-labelled Debt below. What
   stands: the metric must be **net delivered-work cost** — price-weighted tokens
   + rework round-trips + the supervisor's by-eye gate-diff burden + escalation
@@ -7143,8 +7143,8 @@
   caused none.
   **The filing bullet's premise FELL at the drain, and the corrected one is narrower.** The bullet
   claimed `scan-prompts.sh` splits compounds for the allowlist filter and not for the key — an
-  internal inconsistency. `pattern_of` DOES split: it reads
-  `guard_split_compound "$skel" | head -1`, and taking segment 1 is a deliberate rule rather than
+  internal inconsistency. The keying DOES split: `ranking_key` takes segment 1 of
+  `guard::split_compound` (`native/src/emit/scan_prompts.rs`), a deliberate rule rather than
   an oversight. guard-kit/SPEC.md §scan-prompts states why: pulling a redirect from anywhere in the
   line would key `mkdir -p .tmp && cat > x` as `mkdir >` and attribute a write to a command that
   performs none. The residual is therefore not "split the line" but **which** segment to key.
@@ -7168,9 +7168,9 @@
   mis-files them onto `mkdir`, a low row nobody triages, so the effect is an under-count on the
   write class rather than a wrong steer. It grows with the journal-writing discipline the method
   mandates, which is what makes it worth carrying rather than iceboxing.
-  Filed 2026-08-24 to the gap inbox by spec; drained 2026-08-24 at this iteration's close, which
-  re-read `pattern_of` at HEAD, found the filing premise superseded by work landed after it, and
-  re-measured the residual.
+  Filed 2026-08-24 to the gap inbox by spec; drained 2026-08-24 at that iteration's close, which
+  re-read the keying at HEAD, found the filing premise superseded by work landed after it, and
+  re-measured the residual; re-grounded 2026-09-04 when the shell `pattern_of` it cited was deleted.
 
 - **file-authoring-act-ungoverned** [design-pending] — writing a file has no steer, no grant and no
   owner, so authoring one costs an out-of-band permission decision every time.
@@ -9491,11 +9491,147 @@
   **Why `[design-pending]`:** the gate's predicate is the design question. A date-plus-`ruled`
   pattern and a `TRAJECTORY.md` literal are both easy to spell and both reach past the class if
   spelled naively, and the sweep's own edits are what calibrate the fixture pair.
+  **A THIRD SHAPE, and it is that predicate's sharpest test — inlined here rather than filed
+  separately.** gate-sdk/SPEC.md §The non-gate arm groups its class roster into landing-date cohorts
+  (`its 2026-08-31 members`, `its 2026-09-01 ones`, `its 2026-09-03 ones`, at :2193, :2196, :2209),
+  and the member added at the scan-prompts-cut build went in **undated** per the ruling — so the
+  roster now mixes three dated cohorts with one undated member. A cohort label is neither a `ruled`
+  stamp nor a TRAJECTORY.md pointer, so the two-pattern predicate above misses it entirely, yet it
+  publishes this project's landing history as a reading aid. WHETHER THE 2026-09-03 RULING REACHES A
+  COHORT LABEL IS UNSETTLED AND IS NOT SETTLED HERE: if it does, the three tags retire and the
+  roster becomes a plain enumeration; if not, the carve-out needs stating so the next member added
+  knows which shape to take. Either answer calibrates the fixture pair, which is what puts the
+  question inside this entry's design question rather than beside it in a new one.
   **Cost while deferred:** every published kit SPEC and every adopter's vendored copy carries
   private ruling history as mechanism, and pointers a consumer cannot follow — a payload-facing and
   front-door claim, so product-class outright.
   ruled: kit-spec-provenance-seam-sweep operator 2026-09-03 consult
-  Surfaced 2026-09-03 in the consult that closed the provenance-seam ruling; drained here.
+  Surfaced 2026-09-03 in the consult that closed the provenance-seam ruling; drained here; the third
+  shape above added 2026-09-04 at the scan-prompts-cut close drain.
+
+- **run-gates-front-end-cut-legality-unruled** [design-pending] — the port oracle's fourth-largest
+  owed file is scored takeable by a stated-contract composer while its own owning section rules that
+  half of it must survive, and choosing among the three ways out is operator-class.
+  **Probed at the 2026-09-04 close drain rather than argued.** `gate-sdk/bin/run-gates.sh` is 407
+  lines, carries no `# no-port:`, and `--emit port-blockers --tree` reads it `owed lines=407`. Its
+  owning section is gate-sdk/SPEC.md §run-gates, whose paragraph *"The front-end keeps a shell
+  dispatch loop for one branch"* rules that the loop STAYS for the binary-less omit-and-declare
+  install — *"This is the one duplication the port carries, it is admitted on criterion 6's unless
+  clause"*. The section states **no port disposition at all**, so nothing contradicts the oracle's
+  row on the surface a composer reads, and the file scores takeable.
+  **This is the trap doctrine-kit's install-doctrine notice was written against, reproduced on a
+  file four times larger** — that notice records *"the file reads owed with no declared cause, which
+  is exactly what a stated-contract composer scores as takeable"*.
+  **Three dispositions, differing in what they cost.** (i) It ports down to a thin
+  exec-and-fallback stub and stays owed until then. (ii) It earns a `# no-port:` on a bootstrap
+  ground, which **subtracts 407 lines from the 2026-08-28 completion predicate**. (iii) It is
+  genuinely takeable and the duplication survives inside the ported file.
+  **Why `[design-pending]`, and why no cut was composed on it:** (ii) is operator-class — the
+  completion predicate admits no contributor-side subtraction — so no stage session can pick among
+  the three, and picking wrongly is not recoverable by a later cut.
+  **DISTINCT from `native-gate-port-remaining-corpus`**, whose subject is which cut comes next
+  rather than whether this file is a legal cut at all. **DISTINCT from
+  `binary-less-dispatch-loop-retirement`**, whose body was re-read in place at this drain: it
+  schedules the loop's RETIREMENT at zero `.sh` members and prices its roughly 180 duplicated
+  dispatch lines, and says nothing about the front-end's own port disposition.
+  **Cost while deferred:** every future cut selection re-reads this file and re-derives the same
+  contradiction at survey cost, and the first composer that does not stop scores it takeable and
+  composes a cut whose own owning section refuses half of it.
+  ruled: run-gates-front-end-cut-legality-unruled lead 2026-09-04 own-authority
+  Filed 2026-09-04 to the gap inbox at scope; promoted here after →fix failed on the operator-class
+  ruling and →icebox failed on the live per-cut-selection trigger.
+
+- **cut-boundary-section-legality-unruled** [design-pending] — two governing sections are unusable
+  as port-cut boundaries for reasons their owner docs do not settle, so a composer has to guess
+  whether either is a legal boundary at all.
+  **(1) A stated cause that does not reach its whole group.** context-kit/SPEC.md:1297 declares
+  §Testing *"blocked as a whole by index-tests/toolfloor-cases.sh, which exercises
+  lib/toolfloor.sh's floor predicate"*. Three owed files sit in that group —
+  `smoke/agents-md.sh` 139, `bin/run-index-tests.sh` 95,
+  `index-tests/toolfloor-cases.sh` 49 — and the stated cause reaches
+  only the last two. Verified at the drain: `grep -c agents-md context-kit/bin/run-index-tests.sh`
+  returns **0**, and that file's own header calls it *"a standalone validate suite"*. So either "as
+  a whole" governs and 139 lines stay owed behind a cause that does not touch them, or the
+  2026-09-03 outer-bound-never-minimum ruling licenses cutting the standalone member alone.
+  **(2) An always-loaded manifest section as a cut boundary.** CLAUDE.md §Housekeeping is the
+  `# spec:` section of three owed files sharing no subject — `scripts/pack-installer.sh` 196,
+  `demo/run-demo.sh` 96, `installer/bin/checkwright.sh` 53, the last installer-gated and
+  unreachable. Averaging grounds across unrelated subjects is what the composer's own text refuses,
+  yet §Housekeeping is not a kit SPEC section and nothing states whether a stated-contract composer
+  may select an always-loaded manifest's section at all.
+  **Why `[design-pending]`:** both are ambiguities the governing specs do not resolve, where only
+  precedent would decide — and spec-over-precedent forbids deciding them on precedent. Scope read
+  (1)'s "as a whole" as governing and took no cut; (2) was left uncomposed.
+  **DISTINCT from `native-gate-port-remaining-corpus`**, which owns which cut comes next. **DISTINCT
+  from `run-gates-front-end-cut-legality-unruled`**, whose subject is one file whose owning section
+  contradicts the oracle, not a section's fitness as a boundary.
+  **Cost while deferred:** 484 owed lines are unreachable to any composer that respects the stated
+  contract, and each scope re-derives both ambiguities from scratch — this iteration's did, at
+  survey cost, and took no cut either way.
+  Filed 2026-09-04 to the gap inbox at scope; promoted here after →fix failed (neither is a stage
+  session's to settle) and →icebox failed on the live per-cut-selection trigger.
+
+- **bin-tool-help-arm-absent-tree-wide** [design-pending] — seventeen shipped `bin/` tools across
+  nine kits answer `-h`/`--help` with something other than usage on stdout at exit 0, and one of
+  them runs a multi-minute meter instead.
+  **Measured at the 2026-09-04 close drain, statically and then behaviourally.**
+  `git ls-files '*/bin/*.sh' | xargs grep -L` for a help arm returns 20 paths, three of them gate
+  fixtures; the remaining **17** are shipped tools. Three were probed live: `scratch-run.sh --help`
+  answers `scratch-run: no such script: --help` at exit 2; `compare-settings-allow.sh --help` prints
+  usage on **stderr** at exit 2, which is the unrecognized-option refusal branch and not a help arm;
+  and `drift-kit/bin/stage-economics.sh --help` **ignores the argument entirely and runs the full
+  meter** — the discoverability cost the contract was written about, paid at this very drain.
+  **Why they survived, and it is not "no gate reads the contract".** That is ruled and deliberate
+  (gate-sdk/SPEC.md §The bin/-tool contract), and the ruling names its own substitute in the same
+  breath — *"Each member's coverage follows it"*, behavioral coverage in `smoke/`, on the
+  `enter-stage.sh --simulate` precedent. gate-sdk, lifecycle-kit and drift-kit smokes each carry it;
+  **guard-kit's `smoke/install.sh` is 26 lines and carries none**, for three `bin/` tools. The gap
+  is the kits that never took the ruled substitute, not a missing scanner.
+  **Why `[design-pending]`: the contract's own scope is the design question.** §The bin/-tool
+  contract states its three behaviors under a free-text-positional rule, yet
+  `lifecycle-kit/bin/enter-stage.sh`'s own note reads the HELP half as binding on a
+  membership-validated tool too. Whether it binds on a tool taking **no** positionals — which is
+  most of the seventeen, `stage-economics.sh` included — is unstated, and the answer sets the corpus
+  before any member is fixed.
+  **Cost while deferred:** one wrong answer instead of usage per session that probes a tool for its
+  modes, and the attested shapes are silently-wrong (a meter run) rather than merely unhelpful.
+  Every one of the seventeen is also owed to the port, so a cut can apply the split per member —
+  but only once the scope question is answered, since it decides which members owe an arm.
+  Filed 2026-09-04 to the gap inbox at spec as a guard-kit-local two-tool finding; WIDENED at this
+  drain from 2 tools to 17 and from "no gate" to "no smoke coverage", after →fix failed on the
+  unsettled scope question and →icebox failed on the live per-session trigger.
+
+- **line-range-citation-stales-inside-its-own-iteration** [design-pending] — a `<path>:<N>-<M>`
+  citation is true when written and false a commit later, and the wrong number outlives the right
+  claim because nothing rereads it.
+  **Five instances in one iteration, which is what makes it a class rather than three notes.**
+  Recorded at the 2026-09-04 close because the sixth was found while re-verifying the fifth. Spec
+  cited a range it then refined; the lead cited a clause one line narrow; build batch 1 cited a
+  range its own commit had staled by about 30 lines; a gap bullet cited
+  `gate-sdk/SPEC.md:8701-8714`, whose paragraph now sits at **8763-8777** — and
+  `git show <scope-rev>:gate-sdk/SPEC.md` proves the range was **exact at authorship**, staled 62
+  lines by this same iteration's later commits; another cited `:795-797` for a ruling that is at
+  `:808`. **Every one of the five claims was TRUE. Only the numbers were wrong**, which is why no
+  reader caught them and why review does not.
+  **The dangerous sub-class is self-inflicted and same-iteration.** Two of the five were staled by
+  commits of the very iteration that wrote them, so "cite carefully" cannot reach them: the citation
+  was correct, and a later sibling commit in the same unit moved the target.
+  **Why `[design-pending]`: the predicate is decidable but its cost is not measured.** A
+  shifted-but-in-range citation is invisible to any static scan, yet blame settles it — a citation
+  is suspect exactly when some line of its cited range has a newer blame commit than the line
+  carrying the citation. Whether that runs inside a pre-commit battery over this corpus, and what
+  its false-positive rate is against a reflowed file, are both unmeasured. The cheap partial (flag
+  `<M>` past the target's line count) catches only the grossest form and is not obviously worth its
+  own gate.
+  **DISTINCT from the whole `citation-liveness-family-convergence` family**, whose four gate-touch
+  points all decide *resolves-to-nothing* — a filename, a section title, a slug, a script path. Here
+  the target resolves perfectly; the offset is what is wrong, so no member of that family's
+  predicate reaches it and it must not be averaged into their sizing.
+  **Cost while deferred:** every stale range spends one reader's re-derivation, and the readers are
+  the sessions the method sends to a cited range first — a promoting scope, a build reading its
+  amendment. It grows with SPEC size and with in-iteration SPEC editing, both of which are rising.
+  Filed 2026-09-04 by close, from the lead's three-instance observation plus two more found in the
+  gap drain's own re-verification pass.
 
 ## Icebox
 

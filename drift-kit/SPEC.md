@@ -264,6 +264,17 @@ Lead:
   measuring code survives in the binary, the witness does not, and the row
   reports a number for a consumer that has no friction log, no allowlist reader
   and no guard.
+  **That degrade is reachable in-crate only, and the limit is measured rather than inferred.**
+  Probed by moving `lib/guard.sh` aside on an otherwise-intact tree: `--emit drift-report` never
+  reaches a KPI member at all, because the front-end resolves the arm's declared-knob union first
+  and `gate_command` refuses the whole environment at exit 2 — *declares knob `GUARD_KIT_LOG`, but
+  `<root>/guard-kit/lib` defines no such knob*. So through the shipped front-end the witness above
+  is unreachable by the path that would exercise it, and only a caller resolving its own environment
+  meets it. **The refusal is deliberately not softened to reach it.** A kit's absence quietly
+  dropping members is the fail-closed-to-fail-open trade, taken on the one tree with no other
+  signal, and the smallness of that diff would not be a mitigation. What the witness still buys is
+  the case it was written for: a cut that deletes a guard-kit `bin/` tool while the library stays
+  resolves normally and degrades correctly.
 - **kpi-always-loaded** — the standing per-session surface: level and
   since-baseline delta via context-kit's `always-loaded.sh` meter.
 - **kpi-settings-local** — entry count of the untracked local permission
