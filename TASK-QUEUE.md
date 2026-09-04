@@ -888,6 +888,7 @@
   **The attesting residue was cleared** once this entry held the evidence: reproducing it costs
   `mkdir -p .tmp/x/y && touch .tmp/x/y/.gitkeep` plus a boundary run, so keeping two vendored kit
   payload copies alive across every future boundary bought nothing the entry does not state.
+  recurrence: boundary-wipe-preserve-basename-reach 2026-09-04
   **Cost while deferred:** scratch accumulates across iteration boundaries without bound while the
   one mechanism chartered to reclaim it reports success — the boundary reset's own claim is false
   in exactly the case a consumer is most likely to hit.
@@ -9642,8 +9643,57 @@
   "no named event waiting to promote it" test fails here, and the machinery-class default
   (TRAJECTORY.md, 2026-08-30) is defeated on the tier's own eligibility rule rather than ignored.
   **NOT ASSERTED:** nobody has measured how much of a row's body a later judge actually uses.
+  **Second data point, 2026-09-04 at the next scope, re-measured there rather than forecast** —
+  the sentence above stays as the dated attestation it is. `wc -c` now reads **280394** bytes,
+  still 11 lines: plus 10002 over one close, ABOVE the roughly 7KB the cost line forecasts, so
+  that forecast is understated rather than generous. The Read tool refused the file at its cap
+  again and the mandated review again ran on hand-built substring probes.
+  **And this bears on WHICH of the three shapes is right, which is why it is not just a bigger
+  number.** Those 10KB are one close's appends to FIVE rows that came due at once, and they came
+  due because that iteration deleted a shell file and recorded a ruling. So a row's append size is
+  driven by ITERATION SHAPE rather than by the row — which means capping a row per close, the
+  third shape, would truncate hardest in exactly the case the roster exists for.
   Surfaced 2026-09-04 in the gap inbox by the `usage-verdict-cut` close's own later steps and
   drained at the next iteration's scope entry, which is why its disposition is dated after it.
+- **upgrade-smoke-producer-leaks-worktrees-on-signal** [design-pending] — the upgrade-smoke arm
+  removes its worktrees on its own exit paths and traps no signal, so a run killed from outside
+  leaks every checkout it created.
+  **The producer is in-crate and its cleanup is `Drop`.** `native/src/emit/upgrade_smoke.rs`
+  declares `impl Drop for Scratch` (:65-78) over a `worktrees: Vec<String>`, and its own comment
+  at :56-57 says the shell form's `trap` is what that `Drop` replaces. Rust runs no destructor on
+  SIGTERM or SIGKILL, so the claimed equivalence holds on every ordinary exit and fails on exactly
+  the case a trap exists for. `gate-sdk/lib/consumer-smoke.sh` carries no `trap` at all — only
+  `mktemp -d` at :42.
+  **Re-verified at the drain rather than taken on the filer's word**, which is what the filing
+  bullet itself asked for: a grep for `trap` and `signal` over both surfaces establishes it, and
+  the two orphans the filing close reaped were stranded by a self-imposed timeout SIGTERM.
+  **Not free residue.** `lifecycle-kit/bin/enter-stage.sh:469,:499` REFUSE an iteration-boundary
+  entry behind any linked worktree, writing nothing, while :509,:519 make the same scan a
+  mid-iteration advisory — so one killed run converts into a blocked boundary for whoever arrives
+  next, which is why the filing close met it only as a warning.
+  **DISTINCT from every open worktree entry, checked rather than asserted.**
+  `worktree-lock-pid-is-not-agent-liveness`, `worktree-lock-start-time-guard-untaken` and
+  `worktree-cleanliness-assertion-scopes-to-checkout` are all about the DETECTOR's judgment, and
+  `upgrade-smoke-refuses-inside-a-worktree` is about running INSIDE one. This is the PRODUCER
+  never cleaning up. It re-files none of them and adds no recurrence date to any.
+  **Why `[design-pending]`, and it is why this is not fix-shaped.** `native/src/` carries no
+  signal handling anywhere and `native/Cargo.toml:14-16` lists one dependency, `serde_json` — so a
+  SIGTERM trap costs either a new dependency or raw unsafe `sigaction`, and the crate's dependency
+  BAR is engineering judgment gate-sdk/SPEC.md owns (TRAJECTORY.md's 2026-08-14 ruling removes the
+  prohibition, never the bar). Two further undecided shapes: whether cleanup belongs to the
+  producer at all rather than to a reaper the boundary check already implies, and whether the
+  consumer-smoke library owes the same trap.
+  **Deferred rather than active BY RULING, not by ranking.** The port-only run bars an
+  active-section promotion and expressly does not bar a Deferred filing (TRAJECTORY.md's two
+  paragraphs at §PRIORITY DIRECTIVE); the icebox tier cannot take it either, because it blocks an
+  iteration-boundary entry and the machinery-class default is conjunctive.
+  ruled: upgrade-smoke-producer-leaks-worktrees-on-signal operator 2026-09-04 lead-relay
+  ruled: upgrade-smoke-producer-leaks-worktrees-on-signal lead 2026-09-04 own-authority
+  **Cost while deferred:** every externally killed validate spine converts one lost run into a
+  refused iteration boundary for the next session, and the remedy is a two-`--force` reap that
+  session has to be told about.
+  Surfaced 2026-09-04 by the close of `wait-probe-cut-and-stage-journal-absence`; drained
+  2026-09-04 at this iteration's scope entry, the boundary having carried it.
 
 ## Icebox
 
