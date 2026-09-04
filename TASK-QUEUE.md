@@ -7104,11 +7104,10 @@
 
 - **file-authoring-act-ungoverned** [design-pending] — writing a file has no steer, no grant and no
   owner, so authoring one costs an out-of-band permission decision every time.
-  **It is the largest single class in the ranking, measured at the drain.** On the live 438-line
-  friction log `cat >>` is 36 and `cat >` is 5 — **41 of 185** prompting calls, the top two rows by
-  a wide margin. The filing bullet measured the pre-landing form of the same thing (19 of 19
-  `cat`-led lines); the write-shape axis landed this iteration is what makes the class legible as a
-  class rather than an argument about one.
+  **It is the largest single class in the ranking**, and its dated series lives once, in the ruling
+  paragraph below. What the first measurement established is that this is a CLASS rather than an
+  argument about one row, and the write-shape axis landed beside it is what made it legible as one
+  — the filing bullet could only measure the pre-landing form, 19 of 19 `cat`-led lines.
   **What the mandated alternatives do NOT cover, which is the whole gap.**
   `guard-kit/bin/scratch-run.sh` governs EXECUTING a scratch script and `git commit -F` governs
   CONSUMING a message file. Both act on a file that already exists. Nothing governs bringing one
@@ -7126,12 +7125,33 @@
   self-served shape, but it is a wide behavioural change with a named collision: it must not fire on
   the `>>`-under-scratch shape rule 17 already auto-allows, which is the shape the mandated
   resume-journal write itself uses.
+  **SCOPED BY OPERATOR RULING — promote at the next iteration.** The ground ruled on is the
+  2026-09-04 close re-measurement: the class went from 41 of 185 prompting calls to **56 of 139**,
+  22 per cent to 40 per cent, the strongest standing friction signal in the pool. **The ruling
+  carries a consequence to record rather than leave a later reader to infer: it REOPENS the
+  port-only run for a second non-port unit**, the first having been that iteration's stage-journal
+  unit. **And the re-costing is part of the ruling, not a caveat beside it** — the three shapes
+  above were costed BEFORE the unit that doubled the number, so the promoting scope re-costs them
+  and inherits nothing. The doubling's cause is that unit: it made a journal write a mandatory last
+  step in all six stage templates, and the journal appends are most of the class.
+  ruled: file-authoring-act-ungoverned operator 2026-09-04 lead-relay
+  **A PREPARED SETTINGS DIFF AWAITS OUT-OF-BAND OPERATOR APPLICATION**, recorded here under
+  TRAJECTORY.md §The closed rulings (2026-08-22), which lets a stage session derive a diff and
+  state its grounds and ends its remit there. Six committed `permissions.allow` entries:
+  `Bash(date *)`, `Bash(find *)`, `Bash(git merge-base *)`, `Bash(git config *)`, `Bash(mkdir *)`,
+  and `Bash(: > .workflow/subagent-stop-liveness.log)`. SECURITY GROUNDS: the first five are
+  read-only or scratch-creating, take no path outside the tree that a `*` does not already reach in
+  a sibling grant, and each ranked in the live friction log; the sixth is a fixed literal whose two
+  sibling reclaim paths are already granted, so its absence is an asymmetry rather than a decision.
+  **These do NOT fix this entry's own class** and are not offered as doing so — a heredoc write is
+  composition no glob can match. They ride the same operator application, and this entry is the
+  queue's carrier for the prepared-diff obligation, which is the only reason they are here.
   **Cost while deferred:** one out-of-band decision per authored file, paid by the sessions doing
   the most durable recording, and invisible to every gate — the friction log is advisory, so nothing
   reds however far the class grows.
   Filed 2026-08-24 to the gap inbox by spec, as the surviving half of a split its sibling recorded;
-  drained 2026-08-24 at this close, which confirmed the act half is recorded nowhere at HEAD and
-  re-measured the class against the live log.
+  drained 2026-08-24 at that close, which confirmed the act half is recorded nowhere at HEAD; scoped
+  2026-09-04 at close on the operator ruling above.
 
 - **expansion-rule-backtick-blind** [design-pending] — guard rule 6 blocks the modern
   command-substitution spelling and passes the archaic one, so a session that meets the block learns
@@ -9108,36 +9128,36 @@
   **The trigger is the binding's own.** `.claude/commands/lead.md` set the criterion — count the
   escalations a lead ruled ALONE by reading a governed surface; near zero, the premise holds;
   consistently several, the template's bullet needs amending and not this repo's tier — and named
-  the threshold at a third such iteration. Measured 5, 4, several, 4, 5, 7, 7, and now **8**. This
-  entry is the governed surface for that figure, which is why a dispatch relaying a different one
-  (four, at the seventh firing) is reconciled here rather than silently.
+  the threshold at a third such iteration. Measured 5, 4, several, 4, 5, 7, 7, and now **8**, and
+  THIS ENTRY is the governed surface for that figure whenever a dispatch relays a different one.
   **The two axes separate, which is what makes this an amendment rather than a tier flip.** On
   COST the premise holds, and the priced supervision share reads 14, 9.2, 9.7, 14.8, 9.5 — the
-  fall reversed at the seventh firing (`scan-prompts-cut`, 14.8% of an 85.00 iteration) and
-  returned to its band at the eighth (9.5% of a 94.94 iteration, an upper bound: the meter ran
-  mid-close with the denominator still growing). On CHARACTER it fails every time: a routing-only
-  lead would be cheaper still and would have RELAYED the rulings this one made — not a lead the
+  seventh firing's reversal did not hold and the eighth returned to band (9.5% of a 94.94
+  iteration, an upper bound: the meter ran mid-close with the denominator still growing). On
+  CHARACTER it fails every time: a routing-only lead would be cheaper still, would have RELAYED
+  the rulings this one made and would have raised none of the flags below — not a lead the
   protocol asks for.
   **The eighth firing, `wait-probe-cut-and-stage-journal-absence` 2026-09-04, adds a CHARACTER
   datum the ruled-alone count structurally cannot see**, and it is the first reading a close took
   from the lead's own journal rather than from a summary of it. Four rulings at scope and four at
   spec, each read where it was recorded and with its grounds; FOUR of the eight replaced the
   escalating session's stated ground or frame rather than answering the question as put. Beside
-  them the lead logged one error (a from-memory file count, corrected at zero cost by the
-  receiving session's own probe) and one item it classified itself as a NEAR-MISS: a risk it read
-  as notional, FLAGGED for verification rather than asserted safe, which align then found real. A
-  routing-only lead produces neither the ruling nor the flag, and the flag is this axis's sharpest
-  instance — the lead's own reading was WRONG and the protocol still paid, which no count of
+  them the lead logged one item it classified ITSELF as a near-miss: a risk read as notional and
+  FLAGGED for verification rather than asserted safe, which align then found real — the axis's
+  sharpest instance, because the lead was WRONG and the protocol still paid, which no count of
   correct rulings can evidence.
-  **The counter-evidence, recorded because the entry is weaker without it, and it is now SEVEN
+  **The counter-evidence, recorded because the entry is weaker without it, and it is now EIGHT
   instances of ONE shape — a claim verified at one surface and read as covering a wider one.**
   Three are the founding set (a `.gate` line and a dispatch table read as "verified both halves"
-  with the predicate never run; two crate functions called pre-existing off a `git log` read;
-  a lead overriding a fact the session had supplied, where compliance would have committed a red);
-  three more were self-reported at the seventh firing; and the one that matters most is the
-  RETRACTION — an instruction to stamp five `recurrence:` dates on a threshold COUNT no session
-  had judged, which would have frozen five false dated attestations, read without opening the SPEC
-  section the clause points into, refused by scope with grounds and then withdrawn in full.
+  with the predicate never run; two crate functions called pre-existing off a `git log` read; a
+  lead overriding a fact the session supplied, where compliance would have committed a red); three
+  more were self-reported at the seventh firing; and the eighth is an `align+fanout` metric row
+  asserted to close off align's self-description and falsified by a `grep -c` returning zero. The
+  lead's own tally is THREE from-memory assertions this iteration, each caught by a receiving
+  session at zero cost; two are attestable here — that row, and the "~40 live files" figure
+  corrected to 56 at scope. The sharpest single instance stays the RETRACTION: five `recurrence:`
+  dates ordered onto a threshold COUNT no session had judged, which would have frozen five false
+  dated attestations, refused by scope with grounds and withdrawn in full.
   **None nets against the ruled-alone count**, which measures whether an escalation was answered
   off a governed surface, never whether the grounds under that answer were probed or overridden.
   **Why `[design-pending]`:** the deliverable is a kit template's own design rationale, and the
@@ -9715,7 +9735,5 @@
 - **friction-key-segment-selection-unruled** [design-pending] — Which segment to key is unruled.
 
 ## Done
-
-- dated-measurement-restatement-class
 
 ## Lessons Learned
