@@ -1,1 +1,21 @@
 # contract: evidence-manifest v1
+usage-verdict-cut gates sha256=8c6b438a7213a75458c4dadb53c98edb20836c100d75a94fc660011de18dd5c6 pass=108 fail=0 ignore=0 verdict=clean 2026-09-04
+usage-verdict-cut gate_sdk sha256=609796bbb425b41b9d5a5ae0143afb40812c8f979b46a47195a10bc86c2daf93 pass=1 fail=0 ignore=0 verdict=clean 2026-09-04
+usage-verdict-cut canon_kit sha256=9d3cf3ab0a1425a5996fd26152019ba03a3e0f5fa5ad31aa0e4a19901b8acb5a pass=1 fail=0 ignore=0 verdict=clean 2026-09-04
+usage-verdict-cut context_kit sha256=a72a655fbdc2336af37022b95846efa73ffc06864ae2241f7ed48d2867d96cc0 pass=1 fail=0 ignore=0 verdict=clean 2026-09-04
+usage-verdict-cut delegation_kit sha256=6d5af78679d3b30bda016b7d6cdeab840c0fc2bde80bfe4ecaad54b15446f963 pass=1 fail=0 ignore=0 verdict=clean 2026-09-04
+usage-verdict-cut doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-09-04
+usage-verdict-cut evidence_kit sha256=ae2a2f19285bce1b8d4b6490f91bce3d998afb05553e102569916c62cec919c4 pass=1 fail=0 ignore=0 verdict=clean 2026-09-04
+usage-verdict-cut guard_kit sha256=8745aafc1908d64352c326c2e02750ea926728f29f9e0eb3ef0e3a036d029497 pass=1 fail=0 ignore=0 verdict=clean 2026-09-04
+usage-verdict-cut lifecycle_kit sha256=55c0d3e68939b68858a225f53ce20889d8b17a92d840705f272968912d2427c3 pass=1 fail=0 ignore=0 verdict=clean 2026-09-04
+usage-verdict-cut queue_kit sha256=bd337719dfff15f492ae94d8e8662663a8917b65edd4b3bfcfdd20f1790ba39b pass=1 fail=0 ignore=0 verdict=clean 2026-09-04
+usage-verdict-cut site_kit sha256=07f7139ea31865677de58ea44b43f7c98ae6c40c8f3fe57e8975e8d65794be35 pass=1 fail=0 ignore=0 verdict=clean 2026-09-04
+usage-verdict-cut scripts sha256=f302eab3cefcc19e12fac91459be10fb1b4c8f02dd63cef5ad040f4deb8dc259 pass=1 fail=0 ignore=0 verdict=clean 2026-09-04
+usage-verdict-cut guard_tests sha256=00a4ff054b6b31ce5d150b2f791cf35f1047cb2d371b9d6676ba7544335a44ee pass=1 fail=0 ignore=0 verdict=clean 2026-09-04
+usage-verdict-cut demo sha256=f6ed85813f81a93cdb97eb34129b03fddd57d423571ce6b85617ad5a2613644e pass=1 fail=0 ignore=0 verdict=clean 2026-09-04
+usage-verdict-cut installer_smoke sha256=a91e823e544ce3950aab974809286604bf27d30150fd9e287294a9b4c5dc8e04 pass=4 fail=1 ignore=0 verdict=clean 2026-09-04
+usage-verdict-cut consumer_smoke sha256=eda0f2a6a3884cfc3884c9ae6e3e0a3aed7ffc6781483a1edf5ee7866f1d0592 pass=1 fail=0 ignore=0 verdict=clean 2026-09-04
+usage-verdict-cut upgrade sha256=9b7cb7ba514a75933b019cfc65f6ad0b0856e41e8e59d692cc395a2761051122 pass=1 fail=0 ignore=0 verdict=clean 2026-09-04
+usage-verdict-cut agents_md_smoke sha256=a1c5e6c0d24692f7cb092c74f88e404e1a2ea4a6093523ca03a5f4a9c262d1aa pass=1 fail=0 ignore=0 verdict=clean 2026-09-04
+usage-verdict-cut index_tests sha256=e14e152466dc5be0296b1e20575bf3d587e1e0a127e7c63ad57671dbcaeaddb8 pass=1 fail=0 ignore=0 verdict=clean 2026-09-04
+usage-verdict-cut native_crate sha256=8f3b46a37d751d0a88a15edffa7babc4bb3e1277f867e38f4bc3ae31b62f1d94 pass=1 fail=0 ignore=0 verdict=clean 2026-09-04
