@@ -128,48 +128,8 @@ fn stages_lib_parity(args: &[String]) -> i32 {
     }
 }
 
-fn evidence_lib_parity(args: &[String]) -> i32 {
-    let usage = "  usage: checkwright-gates --evidence-lib-parity lock <file>... | --evidence-lib-parity pid <pid>...";
-    match args.first().map(String::as_str) {
-        Some("lock") => {
-            for f in &args[1..] {
-                match evidence::lock_read(std::path::Path::new(f)) {
-                    evidence::LockRead::Absent => println!("lock\t{}\tabsent", f),
-                    evidence::LockRead::Corrupt => println!("lock\t{}\tcorrupt", f),
-                    evidence::LockRead::Held { pid, run_key } => {
-                        println!("lock\t{}\theld\t{}\t{}", f, pid, run_key)
-                    }
-                }
-            }
-            0
-        }
-        Some("pid") => {
-            for p in &args[1..] {
-                match evidence::pid_alive(p) {
-                    Ok(true) => println!("pid\t{}\talive", p),
-                    Ok(false) => println!("pid\t{}\tdead", p),
-                    Err(evidence::PidProbe::PsAbsent) => {
-                        eprintln!("checkwright-gates: ps not found on PATH — the pid probe could not answer; treating as failure (not clean)");
-                        return 2;
-                    }
-                    Err(evidence::PidProbe::Spawn(e)) => {
-                        eprintln!("checkwright-gates: {}", e);
-                        return 2;
-                    }
-                }
-            }
-            0
-        }
-        _ => {
-            eprintln!("checkwright-gates: --evidence-lib-parity needs a mode — the classification could not be reported; treating as failure (not clean)");
-            eprintln!("{}", usage);
-            2
-        }
-    }
-}
-
 // spec: context-kit/SPEC.md §bin/env-probe — the floor predicate's second holder reporting its
-// *classification* over a canned corpus, `--evidence-lib-parity`'s own rule: the parse's four
+// *classification* over a canned corpus, `--queue-parity`'s own rule: the parse's four
 // fields and the verdict's own words, never a rendered profile line.
 fn toolfloor_parity(args: &[String]) -> i32 {
     let usage = "  usage: checkwright-gates --toolfloor-parity parse <element>... | --toolfloor-parity check <element> <banner>...";
@@ -304,7 +264,7 @@ fn main() {
         Some(a) => a.as_str(),
         None => {
             eprintln!("checkwright-gates: no subcommand given");
-            eprintln!("  usage: checkwright-gates --list | --reads <gate-name> | --needs <gate-name> | --knobs <gate-name> | --source-stamp | --queue-parity <queue-file> | --evidence-lib-parity lock <file>... | --evidence-lib-parity pid <pid>... | --toolfloor-parity <mode> <arg>... | --guard-lib-parity <mode> <arg>... | --install <op> [--<key> <value>]... | --run [--gates-dir <dir>] [--only <name>... | --for <path>...] | --hook <member> | --emit-<arm> | <gate-name> [args...]");
+            eprintln!("  usage: checkwright-gates --list | --reads <gate-name> | --needs <gate-name> | --knobs <gate-name> | --source-stamp | --queue-parity <queue-file> | --toolfloor-parity <mode> <arg>... | --guard-lib-parity <mode> <arg>... | --install <op> [--<key> <value>]... | --run [--gates-dir <dir>] [--only <name>... | --for <path>...] | --hook <member> | --emit-<arm> | <gate-name> [args...]");
             eprintln!("  bridged arms: {}", emit::arms().join(", "));
             exit(2);
         }
@@ -357,13 +317,6 @@ fn main() {
             println!("{}", rec);
         }
         exit(0);
-    }
-
-    // spec: evidence-kit/SPEC.md §lib/evidence.sh — the standing oracle criterion 6's *unless*
-    // clause owes: this module's classification of one canned corpus, for the harness holding it
-    // against `ek_lock_read` and `ek_pid_alive`. A top-level flag, like the arms around it.
-    if first == "--evidence-lib-parity" {
-        exit(evidence_lib_parity(&argv[1..]));
     }
 
     // spec: context-kit/SPEC.md §bin/env-probe — the standing oracle criterion 6's *unless* clause

@@ -7,7 +7,7 @@ whole-tree.
 
 **suites** — run the full gate battery and every kit's fixture suite as
 CLAUDE.md §This repo is governed by its own kits lists them. Record the
-evidence with the codified spine: `bash evidence-kit/bin/run-validate.sh` runs
+evidence with the codified spine: `bash gate-sdk/bin/run-gates.sh --run-validate` runs
 each configured suite — including the end-to-end consumer smoke exercised as a
 downstream consumer would (gate-sdk/SPEC.md §Consumer smoke) — diffs the
 baseline slice, and appends one `verdict=clean` line per suite to

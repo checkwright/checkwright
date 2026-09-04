@@ -14,7 +14,12 @@ source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # evidence-kit/
 CHECKS="$DIR/checks"
-RV="$DIR/bin/run-validate.sh"
+# spec: evidence-kit/SPEC.md §bin/run-validate.sh — the writer is driven through the front end
+# rather than by a path: it is the bridged `--run-validate` arm, and the front end is what
+# resolves its declared knob roster. The binary needs no pin here — the preamble above already
+# exports GATE_SDK_NATIVE_BIN absolute, which is what survives the front end's cd to each
+# scratch tree's own toplevel, where the knob's repo-relative default would name nothing.
+FE="$(cd "$DIR/../gate-sdk/bin" && pwd)/run-gates.sh"
 
 fails=0
 tmp="$(mktemp -d)"
@@ -25,8 +30,12 @@ trap cleanup EXIT
 sleep 60 &
 live=$!
 
+# spec: evidence-kit/SPEC.md §bin/run-validate.sh — each scratch tree is its own git toplevel,
+# because the front end refuses outside a repository and resolves every relative knob against the
+# toplevel it lands on: nested inside one, a run would read the enclosing tree and still exit 0.
 mk_tree() {
     rm -rf "$1"; mkdir -p "$1/.workflow" "$1/scripts" "$1/.tmp"
+    ( cd "$1" && git init -q . ) >/dev/null 2>&1
     printf '# baseline\ngreen green pass\n' >"$1/.workflow/validate-baseline.txt"
     printf '# contract: evidence-manifest v1\n' >"$1/.workflow/validate-evidence.txt"
     printf "EVIDENCE_KIT_SUITES=(green)\nEVIDENCE_KIT_PARSER=exit-code\nEVIDENCE_KIT_RUN_ID=lock-test\nEVIDENCE_KIT_RUN_green='%s'\n" \
@@ -34,7 +43,7 @@ mk_tree() {
 }
 # test-hermetic pins EVIDENCE_KIT_CONFIG_FILE to a shared empty file, so each
 # scratch tree names its own config rather than relying on the cwd lookup.
-_rv() { ( cd "$1" && EVIDENCE_KIT_CONFIG_FILE=scripts/evidence-config.sh bash "$RV" 2>&1 ); }
+_rv() { ( cd "$1" && EVIDENCE_KIT_CONFIG_FILE=scripts/evidence-config.sh bash "$FE" --run-validate 2>&1 ); }
 
 # A — the reader reds on a PID the test owns. The fixture pair's bad case can
 #     only reach for PID 1, so the live-PID verdict is pinned here against a
@@ -129,7 +138,7 @@ fi
 #     more common outcome is the live-holder refusal arm C already pins.
 mk_tree "$tmp/e"
 printf "EVIDENCE_KIT_LOCK_FILE='no-such-dir/run-validate.lock'\n" >>"$tmp/e/scripts/evidence-config.sh"
-out="$(timeout 30 bash -c "cd '$tmp/e' && EVIDENCE_KIT_CONFIG_FILE=scripts/evidence-config.sh bash '$RV' 2>&1")"; rc=$?
+out="$(timeout 30 bash -c "cd '$tmp/e' && EVIDENCE_KIT_CONFIG_FILE=scripts/evidence-config.sh bash '$FE' --run-validate 2>&1")"; rc=$?
 if [[ "$rc" -eq 124 ]] || [[ "$out" != *"refusing to start rather than retrying"* ]]; then
     echo "  FAIL: the reclaim is not bounded to one retry (rc=$rc): $out"; fails=$((fails + 1))
 fi

@@ -41,7 +41,24 @@ Knobs, this repo's surface names as defaults:
   captured log to `<scenario> <pass|fail|ignore>` lines; default `exit-code`.
 - `EVIDENCE_KIT_PARSER_<suite>` — a per-suite parser override with the same
   value grammar; default unset, an unset suite falling through to the global
-  knob. The name mirrors the `EVIDENCE_KIT_RUN_<suite>` convention. Suite
+  knob — and an override resolving *empty* falls through too, which is the
+  library's `:-` form rather than an accident of it. The name mirrors the
+  `EVIDENCE_KIT_RUN_<suite>` convention, and the two are the kit's **two prefix
+  families**: both cross the config bridge as declared families rather than as
+  enumerated names, resolved inside this kit's already-sourced subshell so a
+  consumer config's loop-declared variables are in scope. A family is a
+  *resolution set, never a roster* — the suite roster is `EVIDENCE_KIT_SUITES`
+  and the family answers *what is this suite's value* — because a reader
+  enumerating the run family instead would publish `EVIDENCE_KIT_RUN_ID` as a
+  suite. That overlap is pre-existing rather than port-introduced: a suite
+  literally named `ID` collides with the run-id knob in either substrate, and the
+  port preserves the collision rather than resolving it, resolving it being a
+  behaviour widening a faithful port may not take on its own authority.
+  **A value naming neither bundled adapter stays a consumer command the tools
+  word-split and spawn**, in the compiled substrate exactly as in the shell one:
+  compiling the two shipped adapters in would privilege them over a consumer's
+  own and make the shipped `--emit-parse-*` arms unreachable through the path
+  documented here. Suite
   granularity is a floor, not a ceiling: a suite whose runner reports per-case
   results carries a parser that says so, while its siblings keep the global
   adapter. This repo dogfoods it on the `gates` suite — the value
@@ -97,7 +114,7 @@ Knobs, this repo's surface names as defaults:
   an arm, so the clause is written beside the clean line in the driver too.
   The fail-closed arm follows the same rule and is one case tighter than a
   zero-roster test: **fewer than two headers cannot yield an arm and a marker**, so
-  a header shape the derivation cannot read is exit 2, with `run-validate`'s
+  a header shape the derivation cannot read is exit 2, with `--run-validate`'s
   produced-no-result guard behind it reporting the run failure it is.
   **The suite's fail-fast shape is what makes per-arm rows assert rather than
   narrate, and it is the non-obvious half.** The smoke exits at its first
@@ -148,8 +165,7 @@ left unset, then validation. It also owns the shared adapters — `ek_suite_cmd`
 (a suite's configured run command, `EVIDENCE_KIT_RUN_<suite>`), `ek_parser_for`
 (the per-suite parser resolution, detailed below), `ek_parse` (the
 parser dispatch), `ek_diff` (the per-scenario baseline diff, §bin/diff-baseline.sh),
-`ek_data_lines`, the `ek_pid_alive` / `ek_lock_read` lock adapters
-(§The producer-liveness lock), and the self-contained `ek_queue_iteration` / `ek_run_key`
+`ek_data_lines`, and the self-contained `ek_queue_iteration` / `ek_run_key`
 header readers plus the `ek_state_stage` cursor reader that let the kit read
 lifecycle state without a lifecycle-kit dependency. The two axes come from two
 surfaces: the queue header names the iteration, the state file's **last data
@@ -163,7 +179,30 @@ gate-sdk vendored beside it.
 bridge's sole resolver for the `EVIDENCE_KIT_*` knobs — gate-sdk/SPEC.md §The
 kit-library port disposition rules the class and gate-sdk/SPEC.md §lib/gate.sh
 states the ground. The adapters listed above ride the same file and are not
-themselves the ground.
+themselves the ground; the header says so in as many words, which is the licence
+for the compiled twins below.
+
+**Five of the adapters have compiled twins in `native/src/evidence.rs`, and the
+library's shell forms survive on their own callers.** `ek_run_key`,
+`ek_suite_cmd`, `ek_parser_for`, `ek_parse` and `ek_diff` were paid there by the
+`--run-validate` port (§bin/run-validate.sh), joining `ek_data_lines`,
+`ek_queue_iteration` and `ek_state_stage`, which the kit's gates already held
+twice. The class ruling does not foreclose this and the file is not narrowed by
+it: the ruling names the *file* as the config bridge's sole resolver and says in
+the same breath that the parser adapters beside those defaults are a separate
+question it does not reach.
+
+**Two adapters left this file entirely when their last shell caller did, and the
+disposition is the rule rather than a judgment.** `ek_pid_alive` and
+`ek_lock_read` had compiled twins from the day §check-producer-liveness ported,
+and criterion 6's *unless* clause admitted the duplication only because
+`bin/run-validate.sh` still called both. Porting that script emptied their
+production caller set, so both shell forms retired with it — and the parity
+harness that had held the two implementations equal retired with them, because a
+comparison with one holder can only skip (gate-sdk/SPEC.md §The non-gate arm:
+*a parity arm's caller is the second holder, so the arm retires with it*). The
+compiled forms are unchanged and remain the readers §The producer-liveness lock
+names.
 
 The parser adapters map a captured log — and, for `exit-code`, the suite's exit
 status — to `<scenario> <pass|fail|ignore>` lines: `libtest` reads per-test
@@ -187,10 +226,10 @@ right answer and the rows follow a run as §Baseline manifest requires.
 
 Which adapter a suite gets is resolved by `ek_parser_for <suite>`
 (`EVIDENCE_KIT_PARSER_<suite>`, else the global `EVIDENCE_KIT_PARSER`), and the
-dispatch lives inside `ek_parse` — so both spine callers, `run-validate` and
+dispatch lives inside `ek_parse` — so both spine callers, `--run-validate` and
 `diff-baseline`, inherit per-suite parsing with no edit of their own. The
 resolution is a named helper rather than private to `ek_parse` because
-`run-validate`'s produced-no-result diagnostic must name the *effective* parser:
+`--run-validate`'s produced-no-result diagnostic must name the *effective* parser:
 naming the global while an override produced the empty result would misreport
 exactly the guard the per-gate baseline leans on.
 
@@ -223,28 +262,20 @@ fall-through, and `ek_diff`'s absent-from-baseline triple. The triple's `ignore`
 edge carries a test of its own — the narrow side is the half a later session
 widens by accident, so it is pinned by an assertion rather than by prose alone.
 
-**Two of these adapters are held twice and gated as such.** `ek_pid_alive` and
-`ek_lock_read` have compiled twins in `native/src/evidence.rs` since
-§check-producer-liveness ported, and `bin/run-validate.sh` keeps calling both —
-so the caller set does not empty and criterion 6's *unless* clause admits the
-duplication rather than the deletion disposition (gate-sdk/SPEC.md §The
-port-candidate criteria). What holds them equal is
-`gate-tests/evidence-lib-parity.test.sh`, which drives one canned corpus through
-each holder and compares *classification*, never a derived literal: the shell
-side answers in exit codes and one stdout line, the crate in an enum, and a
-comparison of representations would fail on a difference that is not a
-disagreement. The binary's side is reached through the non-gate
-`--evidence-lib-parity` arm, a top-level flag outside `--list`'s roster for the
-reason the arms beside it are. No committed expected file — a maintained golden
-would be a third copy to drift, and the failure this exists to catch is one side
-edited without the other.
-
-**The shape has adopters outside this kit, and nothing about the rule changes
-for them.** context-kit's floor predicate took it when its env-probe member
-ported (context-kit/SPEC.md §bin/env-probe), reusing the *shape* — a canned
-corpus, classification compared, no committed golden — rather than any part of
-this kit's mechanism. Recorded so a reader meeting the second lane does not read
-it as a second copy of this rule; the rule has one home, and this is it.
+**The parity shape this file gave the methodology outlives the lane that carried
+it, and that is why the rule is recorded here rather than in the harness.** While
+`ek_pid_alive` and `ek_lock_read` were held twice, the comparison drove one canned
+corpus through each holder and compared *classification*, never a derived literal:
+the shell side answered in exit codes and one stdout line, the crate in an enum,
+and a comparison of representations would fail on a difference that is not a
+disagreement. No committed expected file — a maintained golden would be a third
+copy to drift, and the failure the comparison exists to catch is one side edited
+without the other. context-kit's floor predicate took the same shape when its
+env-probe member ported (context-kit/SPEC.md §bin/env-probe), reusing it rather
+than any part of this kit's mechanism. Recorded so a reader meeting the second
+lane does not read it as a second copy of the rule; the rule has one home, and
+this is it — and it has outlived its first instance, which is the evidence that
+the placement was right.
 
 ### Baseline manifest
 
@@ -321,10 +352,14 @@ counts. The iteration key scopes the line so the boundary-truncate knob can
 clear the manifest at the start of the next iteration.
 
 **The spine touches this file only after its last suite has run**, and that is
-contract rather than implementation detail. `run-validate` accumulates its rows
-under the tmp dir and folds them in as a single write, dropping this iteration's
-prior line for each suite the run covered and re-appending the batch in
-configured-suite order.
+contract rather than implementation detail. The `--run-validate` arm accumulates
+its rows in a batch file under the tmp dir and folds them in as a single write,
+dropping this iteration's prior line for each suite the run covered and
+re-appending the batch in configured-suite order. The write **publishes by
+rename**, which is what makes the torn read §The producer-liveness lock calls
+unreachable actually unreachable; and the batch file is claimed by the same
+destructor the lock is, so an aborted run leaves no orphan under the scratch
+dir.
 
 What that buys is a suite free to sit anywhere in the roster even when its own
 precondition is a clean worktree. A spine writing per suite dirties the tree
@@ -395,7 +430,7 @@ honest TTL, and a long run is precisely the case the lock exists for, so a TTL
 tuned short enough to reclaim a crashed run promptly is guaranteed to declare a
 healthy long run dead — restoring the false-green the lock removes.
 
-`ek_pid_alive` is the one predicate all three readers share, and its two legs are
+The liveness predicate is the one all three readers share, and its two legs are
 a ruling rather than belt-and-braces. `kill -0` is the cheap same-uid answer, but
 it conflates *no such process* with *not yours*: against a producer running under
 another uid it reports the live process as dead, which is a false **free**
@@ -405,12 +440,20 @@ evidence of existence means held. Reading `/proc` to confirm process *identity*
 is rejected separately: it is unportable, and the OS-reach objective makes a
 Linux-only predicate a cost rather than a refinement.
 
+**Where `ps` is absent the predicate cannot answer, and every reader — the
+writer's own claim included — refuses rather than reads free.** That is the same
+direction the two legs exist for: without the fallback, a process that exists but
+cannot be signalled is indistinguishable from one that is gone, so treating the
+unanswerable case as free would restore exactly the false-free reading the second
+leg was added to close. The refusal takes the guards' exit 2 wherever the reader
+has one.
+
 **PID reuse is a named, accepted residual.** A recycled PID yields a false
 *held* reading, which refuses a stage entry that could have proceeded — a
 fail-closed direction costing one file deletion to clear, against a defect that
 would otherwise cost the next session an evidence file changing underneath it.
 The same direction reaches the writer's own refusal, which reads the identical
-predicate: a recycled PID makes `run-validate` over-refuse by the same
+predicate: a recycled PID makes `--run-validate` over-refuse by the same
 mechanism. One cause, one direction, one clearance — a restated instance of the
 residual, not a second one to weigh.
 
@@ -436,17 +479,18 @@ overwrote. The claim's success *is* the check, so there is no interval between
 them to lose.
 
 **The release is conditional — remove only if the lock is still ours.** The
-`EXIT` trap compares the recorded PID against the running shell's and removes
-nothing on a mismatch. An unconditional `rm -f` reproduces this artifact's own
+writer compares the recorded PID against its own and removes nothing on a
+mismatch; the shell form spelled that as an `EXIT` trap and the compiled form as
+a destructor, and the property is the comparison rather than either mechanism. An unconditional `rm -f` reproduces this artifact's own
 defect inside its own mechanism: the lock is single-holder, so with an
 unconditional claim *and* an unconditional release whichever producer exits
 first deletes the survivor's lock, after which a preflight reads free with a
 producer still live. Atomicity does not make the condition redundant, and the
 residual it closes is **not** the `EXIT`-trap race it first suggests: a trap runs
 synchronously as part of its process's own exit and completes before that
-process reads as dead, and the one exception — `SIGKILL` — skips the trap
+process reads as dead, and the one exception — `SIGKILL` — skips the release
 entirely rather than deferring it. So a producer correctly identified as stale
-cannot later run its trap. The case that remains is a lock removed by some path
+cannot later run its release. The case that remains is a lock removed by some path
 *other than* the reclaim below — an operator deleting an apparently-stuck lock,
 or a future code path: producer A is still alive and unaware, producer B claims
 the freed slot, and A's unconditional release would delete B's live lock.
@@ -454,9 +498,12 @@ Atomicity is what makes "still ours" *answerable*; conditional release is what
 acts on the answer.
 
 The reclaim path a runtime artifact owes is three layers, and all three are
-asserted: the `EXIT` trap, which covers every exit path the spine has; the
-readers' PID-liveness predicate, which makes a leaked file inert; and the
-consumer's scratch-boundary wipe, which removes it. No close-surface declaration
+asserted: the writer's destructor, which covers every exit path the spine has;
+the readers' PID-liveness predicate, which makes a leaked file inert; and the
+consumer's scratch-boundary wipe, which removes it. The one honest limit is
+unchanged by the substrate: a destructor does not run on a `SIGKILL` and neither
+did the trap, and the residual is inert for exactly the reason the second and
+third layers exist. No close-surface declaration
 is owed — that obligation attaches to capture-tier members of the workflow
 directory, and this lock lives in the scratch tier.
 
@@ -486,21 +533,93 @@ non-zero suite exit verbatim. A log with no parseable result is a run failure,
 not an empty diff. Not a gate — a `bin/` tool exercised end-to-end in `smoke/`,
 with the lock's own behavior pinned by `gate-tests/producer-lock.test.sh`.
 
+**It is the bridged arm `--run-validate`**, reached through
+`bash gate-sdk/bin/run-gates.sh --run-validate` and dispatched to
+`native/src/emit/run_validate.rs`. The heading keeps the tool's old file name
+because two sibling sections cite it and the tool's identity did not move; what
+moved is the substrate.
+
+**The spelling is its own rather than `--emit-`, and the exit contract forces it
+without appeal to taste.** The `--emit-` family maps onto `exit(0)` for a
+document and `exit(2)` for a failure, so it can never return 1 — and this tool's
+contract is **three-state**: exit 1 when a suite records `new-failures`, the
+verdict, and the guards' exit 2 when the run cannot start at all. An `--emit-`
+spelling would rewrite the verdict to the refusal code by construction, making *a
+suite regressed* indistinguishable from *the run could not start* on the one tool
+whose entire product is that distinction, and nothing in the battery would report
+it (gate-sdk/SPEC.md §The bin/-tool contract; §The non-gate arm owns the family
+test and this member's placement in the class).
+
+**It takes no positional argument at all** — its whole input is the bridged
+`EVIDENCE_KIT_*` environment — so the argv-shape refusal and the `--` escape have
+no free text to bind on and the `-h`/`--help` arm lives in the front-end, as it
+does for every member of the class. Stated rather than skipped, because the open
+question of whether that contract binds a tool taking **no** positionals is not
+answered here: the port makes the question moot for this one member by moving
+usage to the front-end, and rules nothing about the rest of the corpus.
+
+**The declared knob roster is thirteen names** — `EVIDENCE_KIT_SUITES`,
+`EVIDENCE_KIT_RUN_*`, `EVIDENCE_KIT_PARSER`, `EVIDENCE_KIT_PARSER_*`,
+`EVIDENCE_KIT_BASELINE_FILE`, `EVIDENCE_KIT_MANIFEST_FILE`,
+`EVIDENCE_KIT_SKIP_FILE`, `EVIDENCE_KIT_QUEUE_FILE`, `EVIDENCE_KIT_STATE_FILE`,
+`EVIDENCE_KIT_TMP_DIR`, `EVIDENCE_KIT_LOCK_FILE`, `EVIDENCE_KIT_RUN_ID` and
+`EVIDENCE_KIT_PRE_HOOK` — and it is a **bridged** roster rather than a set of
+hardcoded flags because every one of those values is defined and defaulted in
+§lib/evidence.sh, the config bridge's sole resolver: a hardcoded flag would
+resolve platform defaults and silently ignore every consumer override. Two of the
+names are prefix families, and this member is the crate's first declaration of
+`EVIDENCE_KIT_PARSER_*` (gate-sdk/SPEC.md §The non-gate arm).
+
+**Two consumer seams survive the port unnarrowed, and neither is an
+implementation detail.** A `EVIDENCE_KIT_PARSER_<suite>` value that names neither
+bundled adapter is a consumer command the arm still word-splits and **spawns**
+against the log, exactly as the shell library does — compiling the two shipped
+adapters' behaviour in and short-circuiting the spawn would silently privilege
+them over a consumer's own and make the shipped `--emit-parse-*` arms unreachable
+through the path their own section documents. `EVIDENCE_KIT_PRE_HOOK` is
+word-split by the same design, and a failing pre-hook aborts the run at exit 2
+with no evidence appended — an ordering that is contract rather than
+implementation, because it is what keeps a refused run from writing a line.
+So the arm's spawned-program set is the consumer's roster and not the arm's:
+`bash`, each suite's own run command, and whatever the parser and pre-hook values
+name.
+
+**`sha256sum` leaves the spawn set and `ps` does not.** The per-suite log's digest
+is computed in-crate (`native/src/sha256.rs`), whose hex encoding is
+byte-compatible with `sha256sum`'s first field — verified in the porting session
+rather than assumed, because every manifest line already written carries the shell
+form's digest and a divergence would silently supersede real history. `ps` stays,
+reached through the pid predicate's second leg, and §The producer-liveness lock
+rules that leg the content of the rule rather than incidental spelling
+(gate-sdk/SPEC.md §The port-candidate criteria, criterion 7).
+
 **The claim's placement is asserted, not left to the implementer**: after the
-preflight guards and the scratch `mkdir` — a run that refuses to start must not
-claim — and before the batch file is created, so no evidence work happens
-outside the lock's cover. Release is the `EXIT` trap, conditional on the record
-still being ours (§The producer-liveness lock owns both properties and the
-reasons they are load-bearing). A trap rather than a tail line, because the
-script exits from many guard and fail-closed sites besides its terminal exit, and
-a tail-line release would leak the lock on every failure path — the population
-that matters most, since a crashed run is exactly when a stale lock appears. The
-idiom precedent is `gate-sdk/bin/run-gates.sh --enter-stage`, which claims temp
-files under a scratch dir and reclaims them on every exit path. That arm is
-compiled, so it spells the idiom as a destructor (`impl Drop for Scratch`,
-`native/src/emit/enter_stage.rs`) rather than as a trap; what the precedent
-carries across substrates is the reclaim-on-every-path property, not the
-mechanism.
+preflight guards and the scratch directory's creation — a run that refuses to
+start must not claim — and before the batch file is created, so no evidence work
+happens outside the lock's cover. Release is a destructor, `impl Drop`,
+conditional on the record still being ours (§The producer-liveness lock owns both
+properties and the reasons they are load-bearing). A destructor rather than a
+tail line, because the arm returns from many guard and fail-closed sites besides
+its terminal one, and a tail-line release would leak the lock on every failure
+path — the population that matters most, since a crashed run is exactly when a
+stale lock appears. The precedent is `--enter-stage`'s `impl Drop for Scratch`
+(`native/src/emit/enter_stage.rs`), which claims temp files under a scratch dir
+and reclaims them on every exit path; the shell form spelled the same property as
+an `EXIT` trap, and what the precedent carries across substrates is the
+reclaim-on-every-path property, not the mechanism. The **batch file joins that
+same destructor**, which closes a leak the shell form had: a run that died between
+the last suite and the fold skipped its `rm` and left the batch behind.
+
+**The front-end resolves the tree, so a caller in a scratch directory owes two
+things the shell form did not need.** `bin/run-gates.sh` changes to the git
+toplevel and refuses outside a repository, and it resolves the binary through
+`GATE_SDK_NATIVE_BIN`, whose default is repo-relative. A harness driving this arm
+against a scratch tree therefore makes that tree its own toplevel (`git init`) and
+crosses an **absolute** `GATE_SDK_NATIVE_BIN`; a tree that is merely a
+subdirectory of a repository resolves every relative knob against the *enclosing*
+tree while still exiting 0, which is the failure this sentence exists to prevent.
+`gate-tests/producer-lock.test.sh` and `smoke/install.sh` are the two in-tree
+harnesses that do it.
 
 **It refuses to start while a live lock is held**, and the refusal falls out of
 the atomic claim rather than being a second mechanism: the claim either succeeds
@@ -517,7 +636,10 @@ This is why the tool has **two** non-zero exits with different meanings: exit 1
 when a suite records `new-failures` — the verdict — and the guards' exit 2 when
 the run cannot start at all, which a held or unclaimable lock now joins. The
 refusal is a start-time verdict about the world, not a result, so it takes the
-guards' code and not the verdict's.
+guards' code and not the verdict's. The lock cannot be classified at all where
+`ps` is absent, and that reading is the guards' code too: a holder that cannot be
+read as free must not be reclaimed, which is the readers' own disposition applied
+to the writer.
 
 The reason a producer that never enters a stage is worth guarding is that the
 entry-side reader cannot see it: a session can run this tool without entering a
@@ -537,7 +659,7 @@ per-scenario, so a regression and a recovery cannot net to zero. It reads the
 skip side-channel (`EVIDENCE_KIT_SKIP_FILE`, truncated per run) to demote a
 self-skipped scenario from pass first, so a self-skip cannot masquerade as a
 pass. The shared diff (`ek_diff`) returns non-zero the moment a new failure
-fires, which is also how run-validate derives its verdict.
+fires, which is also how `--run-validate` derives its verdict.
 
 **Each argument group is `<suite> <logfile> [<status>]`, and the status is
 optional only where the parser can do without it.** A log-parsing suite derives
@@ -552,7 +674,7 @@ comparison must say so instead of returning the answer that costs nothing.
 
 The optional third token is unambiguous rather than heuristic: a suite name
 suffixes `EVIDENCE_KIT_RUN_<suite>`, so it is a shell identifier and can never
-be all digits, and a status can never be anything else. `run-validate.sh` does
+be all digits, and a status can never be anything else. `--run-validate` does
 not go through this path — it holds each suite's status directly at the point it
 ran it, and passes it to `ek_parse` itself.
 
@@ -717,7 +839,7 @@ Two assertions over the suite set versus the roster set:
 
 Each finding names the suite (A) or the command and its line (B), and the doc.
 A suite with no `EVIDENCE_KIT_RUN_<suite>` configured has no documented
-invocation to compare and is passed over: `bin/run-validate.sh` already exits 2
+invocation to compare and is passed over: `--run-validate` already exits 2
 on it, and reporting it here would send the reader to the doc to fix a config
 bug.
 
@@ -792,8 +914,8 @@ contract, unchanged. Stated here because a reader deciding what they may point
 this gate at reads this section, and because it is what lets that rule add a
 second reader without adding a gate.
 
-**`ek_pid_alive` now has a named caller outside the `.run` path entirely, and it
-is recorded here rather than only where it is used.**
+**The pid predicate now has a named caller outside the `.run` path entirely, and
+it is recorded here rather than only where it is used.**
 `gate-sdk/bin/run-gates.sh --enter-stage` classifies a linked git worktree as live or
 orphaned by extracting the holding process's pid from the worktree's git **lock
 reason** and calling this predicate on it (lifecycle-kit/SPEC.md
@@ -856,7 +978,7 @@ suffixes.
 reason is structural rather than a matter of taste. Its subject is a transition —
 *is a producer in flight right now* — where every battery member's subject is
 tree state. A consumer whose validate roster includes its own gate battery (this
-repo's does: the `gates` suite *is* the battery) would have `run-validate` invoke
+repo's does: the `gates` suite *is* the battery) would have `--run-validate` invoke
 this gate while holding the lock it just claimed, reddening every validate run
 against its own record. The kit therefore ships the gate registered nowhere and
 wired at the entry, which is also the honest reading of its argument mode: it
@@ -864,7 +986,7 @@ takes the lock path because its caller is a stage entry, not a whole-tree sweep.
 
 The fixture pair carries the two static verdicts — a dead PID and a live one.
 Its `bad/` case names PID 1, the one PID a checked-in fixture can assert the
-liveness of on every platform, which is exactly what `ek_pid_alive`'s `ps -p`
+liveness of on every platform, which is exactly what the predicate's `ps -p`
 leg makes reliable: under `kill -0` alone, an unprivileged run reads init as
 dead and the case would silently invert. Everything the pair cannot hold — a
 live PID the test itself owns, the unparseable-lock exit, and the writer-side
@@ -880,7 +1002,7 @@ reach as init. The unit test carries all four plus the suffix bound.
 **`.gate`-dispatched since `shell-gate-tail-port`**, declared at
 `evidence-kit/checks/check-producer-liveness.gate` with its rule in
 `native/src/gates/producer_liveness.rs` and the two library readers it shares
-with `bin/run-validate.sh` in `native/src/evidence.rs`. Like
+with the `--run-validate` arm in `native/src/evidence.rs`. Like
 §check-surface-duplication it ported on the directive's scope rather than the
 registry oracle's — the port arm's two registry arms walk `gates.list` and
 this member is in none — so the port moved no number of theirs, and the fixture
@@ -894,18 +1016,18 @@ this repo names it through the gate-resolving front end rather than by a literal
 port. That clause stops being a warning and becomes a discharged one.
 
 **It is the tail's fifth wrapper, and the requirement lives in the library rather
-than in the gate's own text.** `ek_pid_alive` tries the `kill -0` builtin and
+than in the gate's own text.** The pid predicate tries the `kill -0` builtin and
 falls back to `ps -p`, and `ps` is not on `GATE_SDK_PROGRAM_FLOOR`. Neither the
 gate's declaration text nor a registry walk could have reported that, which is
 why the compiled form declares it explicitly: `ps` for the fallback leg, and
 `bash` — on the floor, so uncounted — because the builtin has no `std` spelling
 and this crate carries no `libc`, so the compiled form reaches the *same* builtin
 through `bash -c` rather than minting a second off-floor dependency on
-`/bin/kill`. `ek_lock_read` spawns nothing.
+`/bin/kill`. The lock reader spawns nothing.
 
 **The absent-`ps` refusal is a deliberate divergence from the shell form, not
-parity with it, and asserting that is the point.** `ek_pid_alive` discards
-`ps`'s 127 into its boolean and reports *not alive*, so the shell form prints a
+parity with it, and asserting that is the point.** The shell `ek_pid_alive`
+discarded `ps`'s 127 into its boolean and reported *not alive*, so it printed a
 clean line — the *clean because the program was missing* vacuity
 gate-sdk/SPEC.md §Fail-closed contract exists to close. The port refuses at exit
 2 instead, on the fallback leg only, because a `kill -0` that answers never
@@ -930,19 +1052,24 @@ the divergence above** — the two dead-PID arms and the all-dead set arm under 
 scrubbed `PATH`. The arm carries no bound: this member's corpus is lock records,
 so the restored `.sh` probe sits outside the corpus it probes.
 
-**Criterion 6's *unless* clause binds on two helpers, not one.** The port creates
-a dual implementation of `ek_pid_alive` **and** of `ek_lock_read`, both with live
-shell consumers after it: `bin/run-validate.sh` calls the reader twice and the
-predicate once. The caller set does not empty, so the deletion disposition is
-unavailable and what discharges the criterion is a **standing cross-substrate
-comparison** in this kit's fixture lane —
-`gate-tests/evidence-lib-parity.test.sh`, one canned corpus of lock records and
-PID strings fed to both holders, classifications compared byte for byte, with the
-corpus's own branch coverage asserted so an agreement over nothing cannot pass
-for a hold. A parity proof taken once at port time satisfies criterion 2 and
-never this one; it expires at the next edit to either side. The lane's
-discriminating case is **PID 1**, which `kill -0` alone reads as dead: if that
-row ever reads `dead`, the `ps` fallback has been dropped on one side.
+**Criterion 6's *unless* clause bound on two helpers rather than one, and then
+stopped binding at all — which is the whole disposition and worth keeping as a
+sequence.** This port created a dual implementation of `ek_pid_alive` **and** of
+`ek_lock_read`, both with a live shell consumer after it: `bin/run-validate.sh`
+called the reader twice and the predicate once, so the caller set did not empty,
+the deletion disposition was unavailable, and what discharged the criterion was a
+**standing cross-substrate comparison** in this kit's fixture lane — one canned
+corpus of lock records and PID strings fed to both holders, classifications
+compared byte for byte, with the corpus's own branch coverage asserted so an
+agreement over nothing could not pass for a hold. Its discriminating case was
+**PID 1**, which `kill -0` alone reads as dead. Porting `bin/run-validate.sh`
+(§bin/run-validate.sh) then removed that one consumer, so the shell forms retired
+and the lane retired with them: a comparison with one holder can only skip, and an
+arm that can only skip is unreachable code (gate-sdk/SPEC.md §The non-gate arm).
+The reading to carry forward is that the *unless* clause is a statement about a
+caller set at a moment, not a permanent classification — a later port of an
+unrelated member can discharge it by emptying the set, and the standing comparison
+retires the day it does.
 
 ## lifecycle-kit integration
 
@@ -972,10 +1099,10 @@ rather than a path and the manifest after it
 `…/check-evidence-manifest.sh` entry falls into once the gate is ported),
 so assertion (A)'s close-entry green-block check fires *before* the
 stamp is written — the missing evidence becomes a refusal at the entry (pointing
-at run-validate) instead of a self-referential deadlock at pre-commit, where the
+at `--run-validate`) instead of a self-referential deadlock at pre-commit, where the
 `gates` suite that would produce the evidence re-runs this same red gate
 against the already-stamped cursor. Belt-and-braces behind the validate
-skill's run-validate wiring, not a replacement for it; for a consumer that
+skill's `--run-validate` wiring, not a replacement for it; for a consumer that
 wires it, assertion (A)'s enforcement point moves one step earlier, from
 commit to entry.
 
@@ -987,7 +1114,7 @@ all: a literal path would have worked right up to the port and broken at it).
 `close=` is the case the
 gate was filed for — a lead dispatching close into a still-running producer —
 and `validate=` was the second, a second validate batch entering while a first
-batch's `run-validate` is live. **Both were chosen when the subject was one
+batch's `--run-validate` is live. **Both were chosen when the subject was one
 producer with one lock.** The subject is now any recorded producer, and any
 stage can leave one: a stage that ended its turn on a backgrounded `gh run
 watch` leaves a record no lock-pointed entry names, so the aim was one path wide
@@ -998,7 +1125,7 @@ wires is still config, not asserted kit behavior.
 **The lock-pointed entries stay beside the set entries rather than being
 replaced by them**, and the reason is the suffix rule above rather than caution.
 Set mode reads `*.run`; `EVIDENCE_KIT_LOCK_FILE` keeps `.lock`, so the
-directory pass **cannot see run-validate's own lock**. Replacing the two entries
+directory pass **cannot see `--run-validate`'s own lock**. Replacing the two entries
 would have traded the coverage the set mode adds for the coverage the lock
 entries already had, which is not the widening this wiring is. A consumer whose
 producer publishes a lock keeps that lock's entry and adds the directory.
@@ -1027,14 +1154,14 @@ evidence line proves the green result once the suites have run.
 
 ## Producers and consumers
 
-- **Evidence line** — produced by `run-validate.sh` per suite verdict; consumed
+- **Evidence line** — produced by `--run-validate` per suite verdict; consumed
   by `check-evidence-manifest` (A/B/C), by close-stage entry via that gate, and,
   forward, by the hosted-attestation payload. Every field has a reader there:
   iteration (A/C scoping), suite + verdict + counts (A's green-block test),
   sha256 (audit pinning of the producing log), date (A's stamp-ordering floor).
 - **Suite roster** (`EVIDENCE_KIT_SUITES` + `EVIDENCE_KIT_RUN_<suite>`) —
   produced by consumer config, wholly or in part derived there; consumed by
-  `run-validate.sh` (what to run), by `check-evidence-manifest` (A's green
+  `--run-validate` (what to run), by `check-evidence-manifest` (A's green
   block), by `check-battery-roster` (the doc-parity compare), and — behind a
   `declare -p` probe, so evidence-kit stays optional — by gate-sdk's
   enforcement-map emitter. Every one of them reads it by sourcing the config
@@ -1044,14 +1171,14 @@ evidence line proves the green result once the suites have run.
   config bridge sources this kit's library to resolve `EVIDENCE_KIT_SUITES` and
   the `EVIDENCE_KIT_RUN_` family, so the derivation loop still runs in bash and
   nothing re-parses the file (gate-sdk/SPEC.md §lib/gate.sh).
-- **Producer-liveness lock** — produced by `run-validate.sh` at the claim point,
+- **Producer-liveness lock** — produced by `--run-validate` at the claim point,
   which sits on the ordinary path (the validate stage runs it, and it is the only
   writer of the manifest); its enabling config carries a default in the loader, so
   it resolves in every deployed configuration rather than only under a test
   harness. Consumed by `check-producer-liveness` through the entry-preflight hook
   and, inheriting it with no extra wiring, by that hook's read-only simulate mode.
   Both fields have named readers at named transitions: `pid` at three — the gate
-  at the stage-entry transition, `run-validate` at run start on a failed claim
+  at the stage-entry transition, `--run-validate` at run start on a failed claim
   (the refusal), and its `EXIT` trap at release, compared against the running
   shell to answer *is this still ours*; `run key` at the two transitions where a
   refusal line is composed, whose reader is the operator standing at that refusal
@@ -1065,7 +1192,7 @@ evidence line proves the green result once the suites have run.
   consumed by `diff-baseline.sh`. An absent file means no skips.
 - **Per-suite parser override** — produced by consumer config
   (`EVIDENCE_KIT_PARSER_<suite>`); read by `ek_parser_for`, and so by the
-  `ek_parse` dispatch and `run-validate`'s effective-parser diagnostic, reaching
+  `ek_parse` dispatch and `--run-validate`'s effective-parser diagnostic, reaching
   both spine tools.
 - **Scenario line** — produced by the resolved parser from the captured log;
   consumed by `ek_diff` (the per-scenario diff) and by the evidence line's

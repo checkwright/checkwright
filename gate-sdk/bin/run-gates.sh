@@ -32,6 +32,7 @@ usage: run-gates.sh [gates-dir]                run every registered gate
        run-gates.sh --install-lifecycle [file] install the lifecycle resident surfaces
        run-gates.sh --enter-stage <stage>      stamp a stage entry (or --rename an iteration)
        run-gates.sh --wait-probe <sub> [args]  the wait-primitive probe: 'sweep' is the reproducer
+       run-gates.sh --run-validate             run the codified validate spine over the roster
        run-gates.sh -h | --help                this text, on stdout, exit 0
 
   --only  runs the named members in registry order whatever order they were
@@ -90,6 +91,16 @@ usage: run-gates.sh [gates-dir]                run every registered gate
           subcommand, 1 for `report` with no trials recorded, 2 on misuse;
           unavailable is 2. Hand-invoked, wired into no tier, and `sweep`
           sleeps for its declared durations.
+  --run-validate  claims the producer-liveness lock, then runs each configured
+          suite foreground, parses it, diffs the baseline slice per-scenario and
+          folds one evidence line per suite into the tracked manifest after the
+          whole roster has run. Takes no argument: the whole input is the
+          bridged EVIDENCE_KIT_* environment. Exit 0 every suite clean, 1 a
+          suite recorded new-failures, 2 the run could not start (no suites, no
+          run key, absent manifest, a held or unclaimable lock, a missing suite
+          command, a failing pre-hook, a parser producing no result is 1);
+          unavailable is 2, because a caller that read a silent 0 would believe
+          a run it never got had passed.
   --      ends option processing, so a gates-dir spelled with a leading dash
           is still reachable.
 
@@ -214,6 +225,13 @@ case "${1-}" in
     --wait-probe)
         shift
         exec_arm --wait-probe "$@"
+        ;;
+    # spec: evidence-kit/SPEC.md §bin/run-validate.sh — a bridged arm outside the `--emit-` family:
+    # its three-state exit status an emitting arm collapses to {0, 2}, rewriting the verdict to the
+    # refusal code. Unavailable is 2: a silent 0 would read as a run that passed
+    --run-validate)
+        shift
+        exec_arm --run-validate "$@"
         ;;
     --for)
         shift

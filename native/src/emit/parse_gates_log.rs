@@ -63,7 +63,7 @@ mod tests {
     }
 
     // spec: evidence-kit/SPEC.md §Layout and configuration — a log with no tails yields no
-    // output, which run-validate's produced-no-result guard reads as the run failure it is
+    // output, which --run-validate's produced-no-result guard reads as the run failure it is
     #[test]
     fn a_log_with_no_tails_yields_no_output() {
         let dir = std::env::temp_dir().join("cw-parse-gates-log-notail");

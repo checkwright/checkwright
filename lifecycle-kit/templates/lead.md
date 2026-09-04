@@ -80,7 +80,7 @@ is a fact about an *artifact*, and no artifact distinguishes "finished" from
 "still writing". The attested failure is exactly that gap: a lead confirmed the
 validate stage's commit had landed with complete evidence, the tree clean, the
 battery green and a simulated close entry cleared — then dispatched close into a
-still-running `run-validate`. Every check passed mid-write, because the producer
+still-running validate spine. Every check passed mid-write, because the producer
 commits its evidence and keeps going, so the terminal commit existing is fully
 compatible with the process still executing.
 

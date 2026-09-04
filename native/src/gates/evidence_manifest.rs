@@ -63,7 +63,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
     if !Path::new(&manifest).is_file() {
         println!("EVIDENCE-MANIFEST: manifest not found: {}", manifest);
-        println!("  help: seed it with a '# contract: {}' header; run-validate appends one line per suite", evidence::MANIFEST_CONTRACT);
+        println!("  help: seed it with a '# contract: {}' header; --run-validate appends one line per suite", evidence::MANIFEST_CONTRACT);
         return Ok(1);
     }
     let mtext = read_or_empty(&manifest);
@@ -73,7 +73,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
             "EVIDENCE-MANIFEST: first line is not the versioned wire-format header '{}' in {}",
             want_header, manifest
         );
-        println!("  help: the manifest's first line declares the wire contract the attestation payload is versioned by; run-validate never rewrites it, and the iteration-boundary truncation preserves it");
+        println!("  help: the manifest's first line declares the wire contract the attestation payload is versioned by; --run-validate never rewrites it, and the iteration-boundary truncation preserves it");
         return Ok(1);
     }
 
@@ -175,7 +175,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // assertion C: a validate stamp demands ≥1 evidence line, re-armed only once the cursor has
     // advanced past validate (the entry stamp precedes the suites)
     if have_validate && stage != "validate" && !have_line_for_iter {
-        errors.push(format!("iteration '{}' has a validate stamp but no evidence line — validate ran and recorded nothing (run evidence-kit/bin/run-validate.sh)", iter));
+        errors.push(format!("iteration '{}' has a validate stamp but no evidence line — validate ran and recorded nothing (run bash gate-sdk/bin/run-gates.sh --run-validate)", iter));
     }
 
     // assertion A: a close-entry cursor requires the full green block — every configured suite a
@@ -206,7 +206,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         for e in &errors {
             println!("  {}", e);
         }
-        println!("  help: record a run-validate evidence line per suite before the close entry is stamped; the entry stamp proves invocation, the evidence line proves the green result");
+        println!("  help: record a --run-validate evidence line per suite before the close entry is stamped; the entry stamp proves invocation, the evidence line proves the green result");
         return Ok(1);
     }
     println!("EVIDENCE-MANIFEST: clean (grammar + close-entry/stamp-coupling hold for '{}' at stage '{}' in {})", iter, stage, manifest);

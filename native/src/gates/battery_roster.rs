@@ -142,7 +142,7 @@ fn inner(args: &[String]) -> Result<i32, String> {
     }
 
     // spec: evidence-kit/SPEC.md §check-battery-roster — a suite with no EVIDENCE_KIT_RUN_<suite>
-    // has no documented invocation to compare; run-validate already refuses it, so reporting it
+    // has no documented invocation to compare; --run-validate already refuses it, so reporting it
     // here would send the reader to the doc to fix a config bug
     let family = walk::knob_prefix("EVIDENCE_KIT_RUN_");
     let mut suite_of: Vec<(String, String)> = Vec::new();

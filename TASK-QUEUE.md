@@ -12,24 +12,6 @@
 
 ## New Features
 
-- **evidence-spine-port-cut** [spec: SPEC-spine-cut.md] — port `evidence-kit/bin/run-validate.sh`
-  (124) to the bridged `--run-validate` arm, the one owed file declaring
-  evidence-kit/SPEC.md §bin/run-validate.sh.
-  **Selection ground: the OWED column of `--emit port-blockers --tree`** — 98 scanned, 64
-  `no-port`, 0 held, 34 owed at HEAD 5d759cc2. Never the registry `--group` read, which trails
-  zero groups and does not answer for the tree remainder (gate-sdk/SPEC.md §port-blockers).
-  **Host: `native-gate-port-remaining-corpus`**, whose stated-contract composer and five rulings
-  select this cut. This entry is the cut's own unit and reaches `## Done` at build; the corpus
-  entry stays Deferred and is deliberately not promoted — the packaging note is on
-  `hooks-opt-in-port-cut` rather than repeated here.
-  **It pays FIVE compiled twins, not three:** `ek_run_key`, `ek_suite_cmd`, `ek_parser_for`,
-  `ek_parse` and `ek_diff` into `native/src/evidence.rs`, which already carries 5 of the kit's 10
-  primitives. Three are consumed by `baseline-diff-port-cut`, two are this cut's alone. That is a
-  between-cuts economy and never a section pairing: the two sections are separate `###` headings
-  and neither amendment claims a shared proof.
-  ruled: evidence-spine-port-cut lead 2026-09-04 own-authority
-  Filed 2026-09-04 by spec, minted and promoted in one motion with its amendment.
-
 - **baseline-diff-port-cut** [spec: SPEC-diff-cut.md] — port `evidence-kit/bin/diff-baseline.sh`
   (53) to the bridged `--diff-baseline` arm, the one owed file declaring
   evidence-kit/SPEC.md §bin/diff-baseline.sh. With its sibling it takes evidence-kit's owed
@@ -9887,5 +9869,7 @@
 - **scratch-auto-allow-no-decoration-steer** [design-pending] — Chained writes lose the steer.
 
 ## Done
+
+- evidence-spine-port-cut
 
 ## Lessons Learned

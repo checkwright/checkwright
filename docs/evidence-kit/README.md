@@ -16,8 +16,8 @@ scenario coverage), `check-evidence-manifest` (manifest grammar and, where
 lifecycle drives the tree, close-entry green block + validate-stamp coupling),
 `check-battery-roster` (the runner doc's battery block against the suite roster)
 and `check-producer-liveness` (no stage entry while the producer is still
-running). The `bin/` tools that drive it: `run-validate.sh` (the codified spine
-that runs the suites and records evidence) and `diff-baseline.sh` (the
+running). The tools that drive it: the bridged `--run-validate` arm (the codified
+spine that runs the suites and records evidence) and `diff-baseline.sh` (the
 situational runtime diff). See [SPEC.md](SPEC.md) for the full contracts.
 
 ## Install
@@ -54,7 +54,7 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
    and the `EVIDENCE_KIT_PARSER` adapter (`exit-code` for a whole-suite pass/fail,
    `libtest` for per-test result logs, or your own log-parsing command).
 
-4. Record evidence at validate — run `bash evidence-kit/bin/run-validate.sh`; it
+4. Record evidence at validate — run `bash gate-sdk/bin/run-gates.sh --run-validate`; it
    runs each suite, diffs the baseline, and records one evidence line per suite —
    written to the manifest in a single fold once the whole roster has run, so a
    suite needing a clean worktree may sit anywhere in it.
@@ -68,9 +68,9 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
    through a name-resolving front end rather than a path
    (`<stage>=<front end> check-producer-liveness <lock-file>`; SPEC.md
    §check-evidence-manifest owns why a preflight entry names the gate),
-   at whichever stage entries must not begin while `run-validate`
+   at whichever stage entries must not begin while `--run-validate`
    is still running. It asks whether a producer is in flight, not whether the
-   tree is consistent, so a battery that `run-validate` itself invokes would red
+   tree is consistent, so a battery that `--run-validate` itself invokes would red
    every run against that run's own lock. See SPEC.md §check-producer-liveness.
 
 ## Test

@@ -23,7 +23,7 @@ mkdir -p .workflow
 bash "$SDK/bin/gen-pre-commit.sh" --write >/dev/null
 bash "$SDK/bin/run-gates.sh" --emit graph > scripts/CHECK-GRAPH.html
 
-# spec: evidence-kit/SPEC.md §bin/run-validate.sh — exercise run-validate end-to-end (advisory tool, no fixture pair): a one-suite exit-code run appends a clean evidence line.
+# spec: evidence-kit/SPEC.md §bin/run-validate.sh — exercise the validate spine end-to-end (advisory tool, no fixture pair): a one-suite exit-code run appends a clean evidence line.
 es="$PWD/.tmp/run-validate-smoke"
 rm -rf "$es"; mkdir -p "$es/.workflow" "$es/scripts" "$es/.tmp"
 printf '# baseline\ngreen green pass\nuntouched_tree untouched_tree pass\nmulti a pass\nmulti b pass\n' > "$es/.workflow/validate-baseline.txt"
@@ -41,7 +41,11 @@ EVIDENCE_KIT_RUN_untouched_tree='bash scripts/untouched-tree.sh'
 EVIDENCE_KIT_RUN_multi='true'
 EVIDENCE_KIT_PARSER_multi='bash scripts/multi-parser.sh'
 EOF
-( cd "$es" && GATE_SDK_GATES_DIR=scripts bash "$SMOKE_KIT_ROOT/bin/run-validate.sh" >/dev/null )
+# spec: evidence-kit/SPEC.md §bin/run-validate.sh — the spine is the bridged `--run-validate` arm, so this scratch tree becomes its own git toplevel (the front end refuses outside a repository and resolves every relative knob against the toplevel it lands on) and the binary this consumer was given crosses absolute, its repo-relative default naming nothing inside the new toplevel.
+( cd "$es" && git init -q . ) >/dev/null 2>&1
+spine_bin="$PWD/$( ( source "$SDK/lib/gate.sh"; gate_native_bin ) )"
+( cd "$es" && GATE_SDK_GATES_DIR=scripts GATE_SDK_NATIVE_BIN="$spine_bin" \
+    bash "$SDK/bin/run-gates.sh" --run-validate >/dev/null )
 grep -qE '^smoke green sha256=[0-9a-f]{64} pass=1 fail=0 ignore=0 verdict=clean ' \
     "$es/.workflow/validate-evidence.txt" \
     || { echo "smoke(run-validate): clean evidence line not appended" >&2; exit 1; }

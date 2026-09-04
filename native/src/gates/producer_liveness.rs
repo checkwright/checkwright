@@ -126,7 +126,7 @@ fn path_mode(lock: &str) -> i32 {
                 "{}: {}: the evidence producer for run key '{}' is still running (pid {})",
                 NAME, lock, run_key, pid
             );
-            println!("  help: wait for that run-validate to finish — it is still writing the evidence manifest, so anything read now can change underneath you; if pid {} is gone, the lock is stale and deleting {} clears it", pid, lock);
+            println!("  help: wait for that --run-validate run to finish — it is still writing the evidence manifest, so anything read now can change underneath you; if pid {} is gone, the lock is stale and deleting {} clears it", pid, lock);
             1
         }
         Ok(Verdict::Dead { pid, run_key }) => {

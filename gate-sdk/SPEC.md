@@ -2223,7 +2223,7 @@ re-deciding, and only the operator reopens a closed ruling.
 The binary is a multi-call binary whose *gate* subcommands are dispatched by
 name out of `gates::REGISTRY`. It also carries arms that are **not** gates —
 `--list`, `--reads`, `--needs`, `--knobs`, `--source-stamp`, `--queue-parity`,
-`--evidence-lib-parity`, `--toolfloor-parity`, `--guard-lib-parity` and
+`--toolfloor-parity`, `--guard-lib-parity` and
 `--install`, plus the
 `--emit-` family the bridged-arm table keys (`--emit-queue-counts` and
 `--emit-queue-edges` are its 2026-08-31 members; `--emit-md-index`,
@@ -2250,8 +2250,9 @@ arms below it, and the bridged `Arm::Run` members that are neither —
 (§upgrade-smoke), `--install-lifecycle` (lifecycle-kit/SPEC.md
 §bin/install-lifecycle.sh, its 2026-09-03 member), `--usage-verdict`
 (delegation-kit/SPEC.md §usage-verdict), `--wait-probe`
-(delegation-kit/SPEC.md §bin/wait-probe) and `--enter-stage`
-(lifecycle-kit/SPEC.md §bin/enter-stage.sh) — and the class
+(delegation-kit/SPEC.md §bin/wait-probe), `--enter-stage`
+(lifecycle-kit/SPEC.md §bin/enter-stage.sh) and `--run-validate`
+(evidence-kit/SPEC.md §bin/run-validate.sh, its 2026-09-04 member) — and the class
 they form is named here because a
 session arriving with a new non-gate thing to port has no other way to learn
 that one exists or what it costs. Each arm's own `spec:` comment explains that
@@ -2289,9 +2290,9 @@ A **non-gate arm** is specified by three properties:
   arm has to name the caller that reads its output and the transition where it
   is read, or it is dead weight. Every member above satisfies this —
   `--source-stamp` is read by §check-gate-binary-fresh, `--queue-parity`,
-  `--evidence-lib-parity`, `--toolfloor-parity` and `--guard-lib-parity` by their
-  parity harnesses (the third holding context-kit's floor predicate to
-  `lib/toolfloor.sh`, whose shell caller is the installer's `doctor`; the fourth
+  `--toolfloor-parity` and `--guard-lib-parity` by their
+  parity harnesses (the second holding context-kit's floor predicate to
+  `lib/toolfloor.sh`, whose shell caller is the installer's `doctor`; the third
   holding guard-kit's splitter, normalizer and redirect scan to `lib/guard.sh`,
   whose callers are rules inside that same file — so it is the member whose
   second holder cannot empty even in principle, the property
@@ -2301,7 +2302,15 @@ A **non-gate arm** is specified by three properties:
   `--declaration-parity` left this roster in the 2026-09-03 cut that deleted the
   shell form it compared against (§lib/declaration.sh), because one holder cannot
   be held equal to itself and an arm whose harness can only skip is exactly the
-  unreachable code this property refuses. **The same rule read forward refuses a
+  unreachable code this property refuses. **`--evidence-lib-parity` left it on
+  2026-09-04 by the other door, and the pair is worth reading together**: nothing
+  deleted the shell forms of `ek_lock_read` and `ek_pid_alive` *in order to*
+  retire the arm — porting `bin/run-validate.sh` emptied their production caller
+  set as a side effect (evidence-kit/SPEC.md §bin/run-validate.sh), and the arm's
+  own harness said in its header that the caller was why it existed. So the
+  retirement is read off the caller census rather than off the deleting edit, and
+  a session porting a member should ask which *other* helpers' caller sets its cut
+  empties before it counts what it removed. **The same rule read forward refuses a
   parity arm the cut would have had to mint**: the 2026-09-03 evidence-kit parser
   cut deleted *both* shell holders it ported, so a parity arm for either could only
   ever skip, and what stands in its place is a one-time line-for-line comparison
@@ -2762,6 +2771,36 @@ plain bridged `Arm::Run` like the two above. Its spawned-program set is
 `bash -c` alone, and only where `DELEGATION_KIT_REFRESH_CMD` is non-empty: that
 knob *is* a command seam, so its launcher survives the port by the reasoning that
 kept `curl` external under `--usage-poll`.
+
+**`--run-validate` is the fourth, and the one whose collapse would be silent**
+(evidence-kit/SPEC.md §bin/run-validate.sh). Its contract is 0 clean, 1 a suite
+recorded `new-failures`, 2 the run could not start — and unlike the three above,
+the distinction the 1 carries is not one signal among several but the member's
+*whole product*: an `--emit-` spelling would make *a suite regressed*
+indistinguishable from *the run could not start*, on the one tool that exists to
+tell those apart, and nothing in the battery would report it. Its callers are a
+stage template, the lead template, a command shim and a kit smoke, each reading
+the exit status alone.
+
+**Its spawned-program set is the class's widest, and the first that is a
+*roster* rather than a seam or two.** `--usage-verdict` spawns one consumer
+command and `--emit-env-probe` probes a configured tool list; this member spawns
+`bash`, whatever the configured parser and pre-hook commands name, **and each
+suite's own run command** — which in this tree includes `cargo`
+(`scripts/evidence-config.sh`). The set is therefore a consumer's configuration
+rather than a property of the arm, and it is recorded in prose because a
+`BRIDGED_ARMS` row carries no requirement element and `--needs` answers about
+registry members only. Not a first on the axis a reader might expect: the wait
+probe already spawns its own subject under measurement (§The port-candidate
+criteria, criterion 7).
+
+**It is also the first member to declare *two* prefix families at once** —
+`EVIDENCE_KIT_RUN_*` and `EVIDENCE_KIT_PARSER_*`, the second of which this member
+mints the crate's first declaration of. Probed rather than assumed: every other
+family declaration in the crate is a single one. The families cost the arm no new
+mechanism, `_gate_knob_prefix_emit` resolving each inside the owning kit's
+already-sourced subshell, and a prefix matching nothing is an empty family that
+passes — which is what lets a consumer configure one family and not the other.
 
 **The test's *emitting* side is thin on worked instances and gains one at
 `--emit-stage-rules`** (doctrine-kit/SPEC.md §stage-rules, 2026-09-03). Read the
@@ -3697,6 +3736,14 @@ that answers each is the one whose corpus matches its question.
    road, enumerate the shell callers of every helper the ported member touches,
    because the disposition turns on whether *that* set empties.
 
+   **And that set emptied, which is why this instance is a closed record rather
+   than a live lane.** The 2026-09-04 spine cut ported the one script that called
+   both helpers, so the shell forms and the harness went with it and
+   `--evidence-lib-parity` retired (§The non-gate arm). Kept here because the
+   procedural lesson is what the instance was *for*: the amendment that scoped the
+   pid predicate alone would have left the reader dual undischarged, and the same
+   caller-set reading is what later told this instance it was over.
+
    **The floor predicate is the fourth instance, and it is the first whose
    surviving shell consumer sits *behind the install boundary* rather than in the
    battery.** `context-kit/lib/toolfloor.sh`'s `tool_floor_parse` and
@@ -3869,7 +3916,17 @@ that answers each is the one whose corpus matches its question.
      that separates them is the constructed scenario run **per program and for the
      set** (§Fail-closed contract). Its third ordering: the corpus-presence branch
      precedes the program probe, so a tree with no crate is clean with no cargo
-     installed.
+     installed. **The fourth is `--run-validate`, and it is the instance where one
+     off-floor program *leaves* and a second stays** (evidence-kit/SPEC.md
+     §bin/run-validate.sh). The shell spine spawned `sha256sum`, which the crate
+     already answers in `native/src/sha256.rs`, so that dependency is gone; `ps`
+     is reached transitively through the pid predicate's second leg and stays,
+     because §The producer-liveness lock rules that leg the *content* of the rule
+     — `kill -0` conflates *no such process* with *not yours* and must never
+     produce a false **free** reading. The honest reading is that the member never
+     cleared this criterion and does not clear it now: what the port bought is
+     that the surviving dependency is visible in a declared prose set instead of
+     sitting unregistered in a `bin/` script.
    - **The program is incidental spelling.** A text utility the rule uses to
      assemble, split or order a string the port re-expresses in the target
      language — `paste -sd, -` is `.join(",")`, and the verdict is identical
@@ -4506,7 +4563,16 @@ file whose behaviour is composed out of a permanently-shell library's primitives
 owes a compiled twin of each *and* criterion 6's machine-held comparator, and
 none of that is in the column, the twins being lines of a file the cut does not
 take. Attested on guard-kit's ranker, whose column saw a single-file port and
-whose real cut was that file plus three twins, a parity arm and a harness. A
+whose real cut was that file plus three twins, a parity arm and a harness. **The
+second instance reads the axis in the opposite direction and is the one that
+prices a *batch*:** evidence-kit's validate spine (evidence-kit/SPEC.md
+§bin/run-validate.sh) showed a 124-line column whose real cut was that file plus
+**five** twins — and three of the five are consumed by the sibling cut on
+§bin/diff-baseline.sh, so the composition cost is amortized across two units and
+the column can no more show that than it can show the twins. What the pair adds
+to the ranker's lesson is that composition cost is not always a member's alone:
+where two owed files compose over the same library, the order they are taken in
+is itself a price, and taking the consumer first pays the twins twice. A
 **fourth** is cost the column cannot see because it sits in *another kit's gate*:
 delegation-kit's verdict tool read as a 144-line singleton under-filling its
 window, and what the column could not show was that its `# exit:` header was
@@ -9440,7 +9506,7 @@ invoker's cwd (above) and builds its own sandbox trees off exactly this knob's
 relative default; a process-wide export replaces every one of those sandboxes
 with the invoker's live scratch, which is how
 `evidence-kit/gate-tests/producer-lock.test.sh` — whose scratch trees each own a
-`.tmp/run-validate.lock` — comes to contend with a real `run-validate` producer
+`.tmp/run-validate.lock` — comes to contend with a real `--run-validate` producer
 running in the same tree. Trading a write into the corpus for a write into live
 state is not a fix. Within the pair loop the pin stays one-directional: an
 already-absolute value passes through, and a case config naming its own scratch

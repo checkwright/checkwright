@@ -530,6 +530,37 @@ pub enum Stderr {
     Discard,
 }
 
+// spec: gate-sdk/SPEC.md §Fail-closed contract — where an *uncaptured* child's two streams go, the
+// one shape the capturing spawns above cannot carry: `Inherit` is a consumer hook running in the
+// caller's own terminal and `File` is `>"$log" 2>&1`, one description both handles dup onto.
+pub enum Sink {
+    Inherit,
+    File(std::path::PathBuf),
+}
+
+// spec: evidence-kit/SPEC.md §bin/run-validate.sh — the spine's own spawn: a configured command
+// whose output is a captured *artifact* rather than a value this process reads, so it is written
+// through as the child produces it. `Err` stays a spawn failure alone, `run`'s rule.
+pub fn run_to(program: &str, args: &[&str], sink: &Sink) -> Result<i32, String> {
+    #[cfg(test)]
+    recorder::note(program);
+    let spawn_err = |e: std::io::Error| {
+        format!(
+            "cannot run {}: {} — the check could not run; treating as failure (not clean)",
+            program, e
+        )
+    };
+    let mut cmd = Command::new(program);
+    cmd.args(args);
+    if let Sink::File(path) = sink {
+        let out = std::fs::File::create(path).map_err(spawn_err)?;
+        let err = out.try_clone().map_err(spawn_err)?;
+        cmd.stdout(std::process::Stdio::from(out))
+            .stderr(std::process::Stdio::from(err));
+    }
+    cmd.status().map(|s| exit_code(&s)).map_err(spawn_err)
+}
+
 // spec: gate-sdk/SPEC.md §Fail-closed contract — the spawn recorder unit test A observes
 // through, on the shape walk.rs's read recorder already has. Test-scoped deliberately: a
 // production recorder would be state with no reader, and it is unreachable from a gate module.

@@ -1666,7 +1666,7 @@ the composition this section describes — four profiles × install + battery +
 value arm, the binary-less leg, four packs, an npm install and one release build
 of the crate — the whole smoke took **272 seconds**. The 2026-08-09 measurement
 it replaces was 227 over a composition with one arm fewer, taken twice
-independently inside a full `evidence-kit/bin/run-validate.sh` whose 24 suites
+independently inside a full `--run-validate` run whose 24 suites
 finished in about 536.
 So it fits one ordinary foreground invocation and needs no session-window
 planning, and the clean worktree it holds is held for minutes rather than for a

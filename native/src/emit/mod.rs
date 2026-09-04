@@ -30,6 +30,7 @@ pub mod queue_index;
 pub mod scan_prompts;
 pub mod stage_rules;
 pub mod roadmap;
+pub mod run_validate;
 pub mod session_id;
 pub mod trajectory;
 pub mod upgrade_smoke;
@@ -487,6 +488,14 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         "--wait-probe",
         Arm::Run(wait_probe::run),
         wait_probe::KNOBS,
+    ),
+    // spec: evidence-kit/SPEC.md §bin/run-validate.sh — an `Arm::Run` because the contract is
+    // three-state and the difference is the member's whole product: the `--emit-` collapse makes
+    // *a suite regressed* indistinguishable from *the run could not start*
+    (
+        "--run-validate",
+        Arm::Run(run_validate::run),
+        run_validate::KNOBS,
     ),
 ];
 
