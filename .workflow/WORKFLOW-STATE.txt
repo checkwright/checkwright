@@ -10,3 +10,4 @@ wait-probe-cut-and-stage-journal-absence align adb2bdc8 2026-09-04 b412963c
 wait-probe-cut-and-stage-journal-absence build a13bf6c0 2026-09-04 5074ff24
 wait-probe-cut-and-stage-journal-absence build a18acc1b 2026-09-04 d229c4b8
 wait-probe-cut-and-stage-journal-absence validate a0c5a977 2026-09-04 2805ab54
+wait-probe-cut-and-stage-journal-absence close a4b5036e 2026-09-04 360853e8
