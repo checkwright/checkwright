@@ -1,1 +1,21 @@
 # contract: evidence-manifest v1
+evidence-runner-trend-and-install-hooks-cuts gates sha256=f0e864d20cfe6f55f96172ea1670456e9374915c55af28b656c6daae1342ed2c pass=108 fail=0 ignore=0 verdict=clean 2026-09-05
+evidence-runner-trend-and-install-hooks-cuts gate_sdk sha256=485d6084712585611a0084632d12a2e63293583c135bfa1628c52f390e2cd828 pass=1 fail=0 ignore=0 verdict=clean 2026-09-05
+evidence-runner-trend-and-install-hooks-cuts canon_kit sha256=9d3cf3ab0a1425a5996fd26152019ba03a3e0f5fa5ad31aa0e4a19901b8acb5a pass=1 fail=0 ignore=0 verdict=clean 2026-09-05
+evidence-runner-trend-and-install-hooks-cuts context_kit sha256=a72a655fbdc2336af37022b95846efa73ffc06864ae2241f7ed48d2867d96cc0 pass=1 fail=0 ignore=0 verdict=clean 2026-09-05
+evidence-runner-trend-and-install-hooks-cuts delegation_kit sha256=6d5af78679d3b30bda016b7d6cdeab840c0fc2bde80bfe4ecaad54b15446f963 pass=1 fail=0 ignore=0 verdict=clean 2026-09-05
+evidence-runner-trend-and-install-hooks-cuts doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-09-05
+evidence-runner-trend-and-install-hooks-cuts evidence_kit sha256=06d2902068dbfe98d4c3d9f8df5841d8dbaed25098350883f4cd5f74d0f96437 pass=0 fail=1 ignore=0 verdict=new-failures 2026-09-05
+evidence-runner-trend-and-install-hooks-cuts guard_kit sha256=8745aafc1908d64352c326c2e02750ea926728f29f9e0eb3ef0e3a036d029497 pass=1 fail=0 ignore=0 verdict=clean 2026-09-05
+evidence-runner-trend-and-install-hooks-cuts lifecycle_kit sha256=5563780fe661af1b34ae1cff37c89221a31b113d8d975f4b4630b66bb0c4a50e pass=1 fail=0 ignore=0 verdict=clean 2026-09-05
+evidence-runner-trend-and-install-hooks-cuts queue_kit sha256=bd337719dfff15f492ae94d8e8662663a8917b65edd4b3bfcfdd20f1790ba39b pass=1 fail=0 ignore=0 verdict=clean 2026-09-05
+evidence-runner-trend-and-install-hooks-cuts site_kit sha256=07f7139ea31865677de58ea44b43f7c98ae6c40c8f3fe57e8975e8d65794be35 pass=1 fail=0 ignore=0 verdict=clean 2026-09-05
+evidence-runner-trend-and-install-hooks-cuts scripts sha256=f302eab3cefcc19e12fac91459be10fb1b4c8f02dd63cef5ad040f4deb8dc259 pass=1 fail=0 ignore=0 verdict=clean 2026-09-05
+evidence-runner-trend-and-install-hooks-cuts guard_tests sha256=ec9e4732f5a48d8f828776b25ea5eb17fb9089d4efcea531f3a0ef5a625e3965 pass=1 fail=0 ignore=0 verdict=clean 2026-09-05
+evidence-runner-trend-and-install-hooks-cuts demo sha256=5c30850fcac295ef481a954a89809ec84180d077f5715685a65c00293a30d5fc pass=1 fail=0 ignore=0 verdict=clean 2026-09-05
+evidence-runner-trend-and-install-hooks-cuts installer_smoke sha256=3d272fa2ced9bb6528d216c8b8d3a6e6930b10cf233d4ddc5ee5da8b3cc6078f pass=4 fail=1 ignore=0 verdict=clean 2026-09-05
+evidence-runner-trend-and-install-hooks-cuts consumer_smoke sha256=20fd8ec888d12cac11da872bb6625f7f4bb4144c392f641c09aeccd19a494bae pass=1 fail=0 ignore=0 verdict=clean 2026-09-05
+evidence-runner-trend-and-install-hooks-cuts upgrade sha256=217d8e880720fe2ee12cf807aaa154bd42141498e58d9b86d6becc2aefb58682 pass=1 fail=0 ignore=0 verdict=clean 2026-09-05
+evidence-runner-trend-and-install-hooks-cuts agents_md_smoke sha256=670adf9f46bd576df74a81da20fa42e7fb858fa8c3473bd1b7d8b427f4da9a29 pass=1 fail=0 ignore=0 verdict=clean 2026-09-05
+evidence-runner-trend-and-install-hooks-cuts index_tests sha256=e14e152466dc5be0296b1e20575bf3d587e1e0a127e7c63ad57671dbcaeaddb8 pass=1 fail=0 ignore=0 verdict=clean 2026-09-05
+evidence-runner-trend-and-install-hooks-cuts native_crate sha256=2f77b74052bcf839c02411ae90c265c36a8a1b8bf5e42aa0402da2f53557ce98 pass=1 fail=0 ignore=0 verdict=clean 2026-09-05
