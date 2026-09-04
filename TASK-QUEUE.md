@@ -3419,45 +3419,45 @@
 - **align-checklist-fanout-calibration** [design-pending] — align converges at zero divergence
   while build finds the defects it should have caught.
   **Read this entry as calibration, not as the revert signal.** The standing align tiering ruling
-  names one live revert trigger: *a missed spec defect surfacing as a build round-trip*. It did
-  **not** fire this iteration — every defect was fixed in-envelope by the build session that
-  found it, none round-tripped, and nothing here is grounds to revert the tier. Conflating the
-  two is the specific misreading this entry exists to prevent.
-  **What did happen, `native-cohort-activation`.** Align passed all four amendments at zero
-  divergence. The four build batches then found **ten** real defects. Six were fan-out and roster
-  misses of one shape: a section a change touched that the amendment's "Existing sections updated"
-  roster failed to name, or a reader-facing surface still asserting a predicate the change
-  retired — twice in the release note itself, which is the front door.
-  **Most were catchable two ways**, and neither is a judgment call: grep the unit slug tree-wide,
-  and read each delta against its own **DoD** rather than against its "what this keeps" list. The
-  second is the sharper one — a "keeps" list is the author's claim about what a change does not
-  touch, so align reading it as a boundary inherits the exact blind spot that produced the miss.
-  **Why `[design-pending]`:** a mechanical fan-out check over an amendment's roster is a real
-  candidate and was filed and merged as `amendment-update-target-coverage`, now retired, so the open
-  question is the split — how much is a checklist edit to align's template, how much a gate, and
-  whether a "keeps" list should keep its standing as an input at all.
-  **A second, separate failure class, recorded beside this one rather than folded in.** That
-  iteration's validate session — also Sonnet — ended its turn on running work in order to wait,
-  which its dispatch policy forbids; corrected in-flight, it recovered fully by re-verifying
-  rather than assuming. A **protocol** miss, not a judgment one, belonging to the dispatch-policy
-  surface; kept adjacent as tier-calibration evidence, kept distinct because neither fix helps
-  the other.
-  **Second reading, `consumer-cohort-completion-and-wait-enforcement` (2026-08-15) — and it does
-  not repeat the first.** Align ran on Sonnet, found **five real defects** and escalated nothing
-  spurious, so the zero-divergence shape above did not recur. What did happen is the other half:
-  **three amendment claims were falsified by probes at build** — delta 8's knob arithmetic, delta
-  6's substantive half (which would have reddened the battery on **every** invocation had it
-  shipped), and a second fail-closed hole.
-  **Both facts, stated honestly, because they point opposite ways.** The revert signal **as
-  defined** — a missed spec defect surfacing as a **build round-trip** — did **not** fire: build
-  absorbed all three in-session. And three spec defects nonetheless reached build, one of them
-  battery-reddening. Whether an in-session absorption counts against the tier is a **tier
-  judgment**, the lead's and the operator's, and it IS this entry's calibration: the trigger is
-  defined on the round-trip, and this is the case where the two readings come apart.
-  **Third reading, `leak-guard-and-assertion-meta-gate-port` (2026-08-23): the second reading
-  again, at five for five.** Every build batch found its amendment's stated *tree behaviour*
-  wrong while its *ruling* was right — batch 4 carried three in one amendment, one of which
-  would have refused the exact command its own rule exists to grant, each settled by one probe.
+  names one live revert trigger, a missed spec defect surfacing as a build ROUND-TRIP; nothing here
+  is grounds to revert the tier, and conflating the two is the misreading this entry prevents.
+  **First reading, `native-cohort-activation`.** Align passed all four amendments at zero
+  divergence; the four build batches then found **ten** real defects. Six were one shape — a section
+  a change touched that the amendment's update roster failed to name, or a reader-facing surface
+  still asserting a retired predicate, twice in the release note, which is the front door. **That
+  half is ANSWERED and needs no re-arguing:** the mechanical fan-out check over an amendment's
+  roster was filed, merged and retired as `amendment-update-target-coverage`. **Why
+  `[design-pending]` is what REMAINS of the split** — how much is a checklist edit to align's
+  template, how much a further gate, and whether a "keeps" list keeps standing as an input at all.
+  That last is the sharp one: a "keeps" list is the author's claim about what a change does not
+  touch, so align reading it as a boundary inherits the blind spot that produced the miss.
+  A **protocol** miss sits beside it rather than folded in: that iteration's validate ended a turn
+  on running work in order to wait, corrected in-flight and fully recovered by re-verifying. It
+  belongs to the dispatch-policy surface, and neither fix helps the other.
+  **Second reading, `consumer-cohort-completion-and-wait-enforcement` — the other half.** Align
+  found **five real defects** and escalated nothing spurious, so zero divergence did not recur;
+  three amendment claims were nonetheless falsified by **probes** at build, one of which would have
+  reddened the battery on every invocation. **Third reading,
+  `leak-guard-and-assertion-meta-gate-port`: the same at five for five** — every batch found its
+  amendment's stated tree *behaviour* wrong while its *ruling* was right, each settled by one probe.
+  **The two point opposite ways and the entry keeps both.** The revert signal AS DEFINED — a missed
+  spec defect surfacing as a build ROUND-TRIP — has never fired, build absorbing every one
+  in-session. Whether in-session absorption counts against the tier is the judgment this calibrates.
+  **FOURTH READING, 2026-09-05, and it is the COST half at its maximum.** Bare `align` reads
+  cr=32.0M / 7.96 — the HIGHEST bare-align cache-read in the log, against a recent median near 11M
+  and a prior maximum of 27.7M; its one background sweep bills separately at 6.1M and is not summed
+  in. Scored against no scale proxy, amendment count having been retired as one on 2026-09-04. The
+  verdict was NOT zero-divergence — eight in-envelope repairs, zero escalations — so this reading
+  cuts AGAINST the first reading's thesis while sharpening the cost field below. Its best find was
+  CROSS-amendment and no per-amendment pass could have reached it: all four amendments falsely
+  claimed a `check-measured-claim` red on `tree-shell-owed`, three contradicting themselves in
+  their own text.
+  **THE COUNTER, whose excuse is recorded as TESTABLE rather than settled.** Four design-bearing
+  amendment claims survived align and died at build. Declined as a miss on one ground — each needed
+  EXECUTION to falsify (a running both-substrates comparison, a crafted tie-input cargo test, a
+  bridge refusal), build's instrument and not align's. That ground is falsifiable, and the next
+  reading tests it: the first align that passes a claim it could have falsified by READING spends
+  the excuse, and this sentence exists so a later session cannot re-spend it.
   recurrence: align-checklist-fanout-calibration 2026-08-23 2026-09-04
   ruled: align-checklist-fanout-calibration lead 2026-09-04 own-authority
   **Cost while deferred:** align keeps returning a clean verdict that build then falsifies, so
@@ -9125,41 +9125,41 @@
   is escalated rather than closed by this session.
 
 - **lead-tier-split-premise-unamended** [design-pending] — `lifecycle-kit/templates/lead.md`
-  §Economics rests its *Split the lead where the tail dominates* bullet on a premise EIGHT
+  §Economics rests its *Split the lead where the tail dominates* bullet on a premise NINE
   consecutive iterations have now measured false, and the template still ships it unqualified.
   **The trigger is the binding's own.** `.claude/commands/lead.md` set the criterion — count the
   escalations a lead ruled ALONE by reading a governed surface; near zero, the premise holds;
   consistently several, the template's bullet needs amending and not this repo's tier — and named
-  the threshold at a third such iteration. Measured 5, 4, several, 4, 5, 7, 7, and now **8**, and
-  THIS ENTRY is the governed surface for that figure whenever a dispatch relays a different one.
+  the threshold at a third such iteration. Measured 5, 4, several, 4, 5, 7, 7, 8, and now **12**,
+  and THIS ENTRY is the governed surface for that figure whenever a dispatch relays a different one.
   **The two axes separate, which is what makes this an amendment rather than a tier flip.** On
-  COST the premise holds, and the priced supervision share reads 14, 9.2, 9.7, 14.8, 9.5 — the
-  seventh firing's reversal did not hold and the eighth returned to band (9.5% of a 94.94
-  iteration, an upper bound: the meter ran mid-close with the denominator still growing). On
+  COST the premise holds, and the priced supervision share reads 14, 9.2, 9.7, 14.8, 9.5, 4.3 —
+  every reading an upper bound, the meter running mid-close with the denominator still growing. On
   CHARACTER it fails every time: a routing-only lead would be cheaper still, would have RELAYED
   the rulings this one made and would have raised none of the flags below — not a lead the
   protocol asks for.
-  **The eighth firing, `wait-probe-cut-and-stage-journal-absence` 2026-09-04, adds a CHARACTER
-  datum the ruled-alone count structurally cannot see**, and it is the first reading a close took
-  from the lead's own journal rather than from a summary of it. Four rulings at scope and four at
-  spec, each read where it was recorded and with its grounds; FOUR of the eight replaced the
-  escalating session's stated ground or frame rather than answering the question as put. Beside
-  them the lead logged one item it classified ITSELF as a near-miss: a risk read as notional and
-  FLAGGED for verification rather than asserted safe, which align then found real — the axis's
-  sharpest instance, because the lead was WRONG and the protocol still paid, which no count of
-  correct rulings can evidence.
-  **The counter-evidence, recorded because the entry is weaker without it, and it is now EIGHT
-  instances of ONE shape — a claim verified at one surface and read as covering a wider one.**
-  Three are the founding set (a `.gate` line and a dispatch table read as "verified both halves"
-  with the predicate never run; two crate functions called pre-existing off a `git log` read; a
-  lead overriding a fact the session supplied, where compliance would have committed a red); three
-  more were self-reported at the seventh firing; and the eighth is an `align+fanout` metric row
-  asserted to close off align's self-description and falsified by a `grep -c` returning zero. The
-  lead's own tally is THREE from-memory assertions this iteration, each caught by a receiving
-  session at zero cost; two are attestable here — that row, and the "~40 live files" figure
-  corrected to 56 at scope. The sharpest single instance stays the RETRACTION: five `recurrence:`
-  dates ordered onto a threshold COUNT no session had judged, which would have frozen five false
-  dated attestations, refused by scope with grounds and withdrawn in full.
+  **The eighth firing added a CHARACTER datum the ruled-alone count structurally cannot see**, and
+  it was the first reading taken from the lead's own journal rather than from a summary: four of
+  its eight rulings replaced the escalating session's stated ground rather than answering as put,
+  and beside them the lead logged a self-classified near-miss — a risk FLAGGED for verification
+  rather than asserted safe, which align then found real, the axis's sharpest instance because the
+  lead was WRONG and the protocol still paid, which no count of correct rulings can evidence.
+  **NINTH FIRING, 2026-09-05: the axes move apart harder than at any prior reading.** Twelve ruled
+  alone, the highest yet, three replacing the escalating session's stated GROUND rather than
+  accepting it — the cut selection, the packaging, the majority-idiom claim below. Against that,
+  4.3 % of a 170.19 iteration, the lowest yet: cheapest lead on record, most rulings on record.
+  **Four of this lead's own premises were REFUSED by stage sessions, and they DO NOT NET against
+  the twelve** — the count credits settling a question at a governed surface, and a refused premise
+  is that same faculty failing; netting would hide both facts to report neither.
+  **The counter-evidence, kept because the entry is weaker without it, and it is now NINE instances
+  of ONE shape — a claim verified at one surface and read as covering a wider one.** Eight are the
+  lead's own: three founding, three self-reported at the seventh firing, a metric row falsified by
+  a `grep -c` returning zero at the eighth, and the RETRACTION that stays the sharpest — five
+  `recurrence:` dates ordered onto a threshold COUNT no session had judged, refused by scope with
+  grounds and withdrawn in full before it froze five false dated attestations. **The ninth WIDENS
+  the shape past the lead**, which this entry did not previously know: a STAGE session carried an
+  11-of-16 "majority idiom" off a sibling entry's PATH-knob survey onto the BRIDGED-knob class,
+  where it reads 0 of 189 on the bridged form and 4 of 189 on any knob.
   **None nets against the ruled-alone count**, which measures whether an escalation was answered
   off a governed surface, never whether the grounds under that answer were probed or overridden.
   **Why `[design-pending]`:** the deliverable is a kit template's own design rationale, and the
