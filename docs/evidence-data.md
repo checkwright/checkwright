@@ -136,3 +136,4 @@
 | usage-verdict-cut | sc sp a b v c | 3f/0d | 1 · ≤0d | 20s 1✗ | 108 |
 | wait-probe-cut-and-stage-journal-absence | sc sp a b v c | 3f/0d | 2 · ≤0d | 20s 1✗ | 108 |
 | enter-stage-cut-and-file-authoring-act | sc sp a b v c | 3f/0d | 2 · ≤0d | 20s 1✗ | 108 |
+| evidence-runner-trend-and-install-hooks-cuts | sc sp a b v c | 5f/1d | 4 · ≤1d | 28s 3✗ | 108 |

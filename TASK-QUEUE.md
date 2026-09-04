@@ -58,9 +58,10 @@
   outside it: a file that rides the bridge's flat `lib/*.sh` glob while resolving no bridged knob,
   and a file one directory deeper that the glob never reaches. Both are **owed, not undecided** —
   each already carries a sentence in its own SPEC section naming this entry.
-  **The members still owed, measured 2026-09-03 at build against `--emit port-blockers --tree`:**
-  `gate-sdk/lib/inject.sh` (80), `gate-sdk/lib/test-hermetic.sh` (37),
-  `context-kit/lib/toolfloor.sh` (58).
+  **The members still owed** — the roster is durable, the sizes are not, so read those off
+  `--emit port-blockers --tree`: `gate-sdk/lib/inject.sh`, `gate-sdk/lib/test-hermetic.sh`,
+  `context-kit/lib/toolfloor.sh`. Measured 2026-09-03 at build they read 80 / 37 / 58;
+  `test-hermetic.sh` reached 52 by the 2026-09-05 close, on no work of this entry's.
   **Three of the original six are DISCHARGED.** Two are `context-kit/lib/pub-lang/{rust,ts}.sh`,
   the bundled members `native-gate-port-remaining-corpus`' ruling (1) positively sent in-crate;
   they waited on the resolver that finds them, and 2026-09-01's `SPEC-index-cut` port of
@@ -6853,6 +6854,17 @@
   `GATE_SDK_TMP_DIR` or `GATE_SDK_WORKFLOW_DIR` silently converts a test sandbox into live-state
   access, which reads as a mystery red in an unrelated kit's suite rather than a configuration
   fact.
+  **THE PREDICTED EXPOSURE FIRED, 2026-09-05, and it widens fix shape 2 rather than this entry.**
+  The cost field above said "nothing is red today"; this iteration produced the red — a bespoke
+  test's isolation defeated by ambient env it did not own, reaching `--run-validate`'s verdict.
+  The mechanism was a different knob class (a bridged `GATE_SDK_KNOB_*` scalar inherited from a
+  sibling arm, not an absolute path knob from an operator export), so the instance is filed as its
+  own entry, `run-validate-child-env-knob-leak`. What it changes HERE is the fork: shape 2 —
+  widening `gate-sdk/lib/test-hermetic.sh` to neutralize the knobs — now covers two knob classes
+  rather than one, while shape 1's per-test pinning covers only whichever class each author
+  anticipated. The choice was made on 7 one-line edits against one bootstrap change; it should be
+  re-made on that.
+  recurrence: bespoke-test-path-knob-pinning 2026-09-05
   Filed 2026-08-23 by validate; the close drain re-ran the survey oracle and got 16/11/7 with the
   same seven names.
 
@@ -9401,7 +9413,11 @@
   owed file is scored takeable by a stated-contract composer while its own owning section rules that
   half of it must survive, and choosing among the three ways out is operator-class.
   **Probed at the 2026-09-04 close drain rather than argued.** `gate-sdk/bin/run-gates.sh` is 407
-  lines, carries no `# no-port:`, and `--emit port-blockers --tree` reads it `owed lines=407`. Its
+  lines, carries no `# no-port:`, and `--emit port-blockers --tree` reads it `owed lines=407`.
+  **That figure and the 421 below are dated readings, not the file's size — take that off the
+  oracle.** This is the port's only owed member that GROWS, a dispatch branch per bridged arm: 407
+  at that close, 421 at that scope, 503 at the 2026-09-05 close, the last bought by this
+  iteration's own `--install-hooks` cut, so a pinned digit sizes a cut against a moved file. Its
   owning section is gate-sdk/SPEC.md §run-gates, whose paragraph *"The front-end keeps a shell
   dispatch loop for one branch"* rules that the loop STAYS for the binary-less omit-and-declare
   install — *"This is the one duplication the port carries, it is admitted on criterion 6's unless
@@ -9412,7 +9428,9 @@
   is exactly what a stated-contract composer scores as takeable"*.
   **Three dispositions, differing in what they cost.** (i) It ports down to a thin
   exec-and-fallback stub and stays owed until then. (ii) It earns a `# no-port:` on a bootstrap
-  ground, which **subtracts 407 lines from the 2026-08-28 completion predicate**. (iii) It is
+  ground, which **subtracts the whole file from the 2026-08-28 completion predicate** — a
+  subtraction that GROWS with the file rather than staying at the 407 read when this was
+  written, which is what makes deferring the choice cost more each iteration. (iii) It is
   genuinely takeable and the duplication survives inside the ported file.
   **Why `[design-pending]`, and why no cut was composed on it:** (ii) is operator-class — the
   completion predicate admits no contributor-side subtraction — so no stage session can pick among
@@ -9509,12 +9527,26 @@
   Filed 2026-09-04 to the gap inbox at scope; promoted here after →fix failed (neither is a stage
   session's to settle) and →icebox failed on the live per-cut-selection trigger.
 
-- **bin-tool-help-arm-absent-tree-wide** [design-pending] — seventeen shipped `bin/` tools across
-  nine kits answer `-h`/`--help` with something other than usage on stdout at exit 0, and one of
-  them runs a multi-minute meter instead.
-  **Measured at the 2026-09-04 close drain, statically and then behaviourally.**
-  `git ls-files '*/bin/*.sh' | xargs grep -L` for a help arm returns 20 paths, three of them gate
-  fixtures; the remaining **17** are shipped tools. Three were probed live: `scratch-run.sh --help`
+- **bin-tool-help-arm-absent-tree-wide** [design-pending] — twelve of the fourteen shipped `bin/`
+  tools, across five kits, answer `-h`/`--help` with something other than usage on stdout at
+  exit 0, and one of them runs a multi-minute meter instead.
+  **THE CENSUS IS DERIVABLE AND THIS IS ITS COMMAND**, stated on the entry because a count whose
+  oracle is unstated is unmaintainable by anyone but its author — which is what made the previous
+  figure irreproducible below. Run
+  `git ls-files '*/bin/*.sh' | grep -v '/gate-tests/' | xargs grep -L -- '--help'`; it returned
+  **12** of 14 shipped tools at the 2026-09-05 close drain. Dropping the `grep -v` re-admits the
+  three gate fixtures the census excludes, which is where the older 3-fixture subtraction came
+  from. The proxy is static and a **lower bound** — a file merely mentioning `--help` in a comment
+  counts as having an arm — but it was checked exact at this reading: the only two shipped tools
+  that match, `gate-sdk/bin/run-gates.sh` and `installer/bin/checkwright.sh`, each carry a real
+  `-h | --help)` dispatch branch.
+  **The prior 20-paths / 17-shipped figure retires as UNATTRIBUTABLE, not as drift.** Re-run at
+  that figure's own rev the command above returns 19 / 3 fixtures / 16 shipped, so the gap was
+  never a moved tree — the 2026-09-04 measurement did not state its pattern and no later session
+  could reproduce it. This iteration's four port cuts then deleted four shipped `bin/` tools, and
+  16 → 12 accounts for exactly those four. The "nine kits" of that same figure retires with it:
+  the twelve sit in five (context-kit, doctrine-kit, drift-kit, gate-sdk, guard-kit).
+  **Measured behaviourally, 2026-09-04.** Three were probed live: `scratch-run.sh --help`
   answers `scratch-run: no such script: --help` at exit 2; `compare-settings-allow.sh --help` prints
   usage on **stderr** at exit 2, which is the unrecognized-option refusal branch and not a help arm;
   and `drift-kit/bin/stage-economics.sh --help` **ignores the argument entirely and runs the full
@@ -9533,11 +9565,17 @@
   before any member is fixed.
   **Cost while deferred:** one wrong answer instead of usage per session that probes a tool for its
   modes, and the attested shapes are silently-wrong (a meter run) rather than merely unhelpful.
-  Every one of the seventeen is also owed to the port, so a cut can apply the split per member —
-  but only once the scope question is answered, since it decides which members owe an arm.
-  Filed 2026-09-04 to the gap inbox at spec as a guard-kit-local two-tool finding; WIDENED at this
-  drain from 2 tools to 17 and from "no gate" to "no smoke coverage", after →fix failed on the
-  unsettled scope question and →icebox failed on the live per-session trigger.
+  **Ten of the twelve are also owed to the port**, so a cut can apply the split per member — but
+  only once the scope question is answered, since it decides which members owe an arm. The other
+  two, `gate-sdk/bin/gen-pre-commit.sh` and `gate-sdk/bin/run-consumer-smoke.sh`, are declared
+  `no-port` and will never ride a cut, so their arm has no cut to ride and needs its own. That
+  split was invisible while the census had no stated command, which is the second thing the
+  command above buys.
+  Filed 2026-09-04 to the gap inbox at spec as a guard-kit-local two-tool finding; WIDENED at that
+  drain from 2 tools to a tree-wide census and from "no gate" to "no smoke coverage", after →fix
+  failed on the unsettled scope question and →icebox failed on the live per-session trigger.
+  Census command and count landed 2026-09-05 by close, on the lead's ruling that a close moving
+  the number without landing its measurement pattern reproduces the defect one iteration later.
 
 - **line-range-citation-stales-inside-its-own-iteration** [design-pending] — a `<path>:<N>-<M>`
   citation is true when written and false a commit later, and the wrong number outlives the right
@@ -9721,6 +9759,105 @@
   **Cost while deferred:** one bash spawn per iteration-boundary worktree row, and a divergence
   invisible once green, since nothing compares the two interpreters.
   Filed 2026-09-04 to the gap inbox by build; drained 2026-09-04 at this iteration's close.
+
+- **scratch-run-port-blocker-unrecorded** [design-pending] — the third operator-class port blocker
+  is the only one with no queue entry, so every boundary re-derives it from a SPEC.
+  **The asymmetry is exact and probed.** `guard-kit/bin/scratch-run.sh` reads `owed` at
+  `--emit port-blockers --tree` and its only blocker is operator-class — as with both sibling
+  blockers named below, and unlike them it has no entry. guard-kit/SPEC.md prices re-implementing
+  the runner on another substrate as a permission ADDITION rather than a migration: the grant is
+  an allowlist entry naming a fixed path, a permission set is matched rather than versioned, and
+  the work stalls at whatever session cannot apply it. Every OTHER takeable member clears this,
+  because the wildcard grant on the `run-gates` front end already covers every bridged arm and
+  their port is a pure grant REMOVAL; this grant names its own fixed path by design and cannot
+  ride the front-end grant.
+  **The settings carve-out does not reach it.** `native-gate-port-remaining-corpus`' ruling (2)
+  covers grant REMOVALS a ruled cut forces. This is an addition, and TRAJECTORY.md's 2026-08-22
+  ruling makes a permission-settings edit operator-class.
+  **DISTINCT from `run-gates-front-end-cut-legality-unruled` and from
+  `build-native-bootstrap-port-disposition-unruled`, and not a re-filing of either.** Those own a
+  named file's UNRULED disposition and each already exists as an entry; this owns the ABSENCE of
+  an entry for a third file whose disposition is not unruled at all — it is ruled BLOCKED and
+  simply unrecorded. Fixing either of those leaves this untouched.
+  **Cost while deferred:** one SPEC read per scope boundary, attested rather than predicted —
+  three consecutive scope sessions re-derived it, the 2026-09-03 boundary calling it "one
+  contested file the prior survey did not name" and the two after it re-reading the same SPEC.
+  →fix failed because an absent entry has no in-place surface that resolves it, and parity with
+  the two sibling blockers — each its own entry — is what the fix has to reach; →icebox failed on
+  the live per-boundary trigger. Machinery-class: its only demand witness is this repo's own port
+  accounting.
+  Filed 2026-09-04 to the gap inbox at scope; promoted 2026-09-05 by close.
+
+- **installer-printed-followup-commands-uncovered** [design-pending] — `init` prints two commands
+  an adopter is told to run next, and no gate in either substrate checks that either resolves.
+  **Probed rather than assumed.** `installer/lib/init.sh` prints both with `printf` and runs
+  neither; `installer/README.md` narrates the same pair. `installer/consumer-smoke/` carries zero
+  references to either arm, so nothing exercises the printed strings, and `check-docs-cmd` cannot
+  reach them either — its subject is a FENCED invoked repo-relative `.sh` path and these are
+  format strings in shell source, not fences.
+  **The exposure is concrete and this iteration moved one of the two.** The hooks cut renamed the
+  opt-in behind one of the printed commands; the cut re-spelled both strings by hand and they are
+  correct today. What is uncovered is the NEXT such move — an adopter follows a command that no
+  longer exists, at the moment they are least able to diagnose it: first install, fresh clone.
+  **DISTINCT from the `check-docs-cmd` fence-scope wording fixed in gate-sdk/SPEC.md §The port
+  candidate criteria's dispatch table at this same close, and not a re-filing of it.** That was a
+  claim about UNFENCED MARKDOWN reading as coverage; this is a printed command inside INSTALLER
+  SHELL SOURCE that no gate's corpus reaches in any form. Rewording the claim settles nothing
+  here, and covering a printf string needs a different oracle.
+  **The fix, named so the entry is takeable:** one assertion in the consumer smoke that each
+  command `init` printed resolves against the payload it just installed — the smoke already
+  captures `init`'s output, so the assertion is short.
+  →fix failed on where the fix has to live: the consumer smoke is an 853-line acceptance harness
+  that builds the crate, packs a tarball and installs it per profile, so adding to it needs a
+  validate re-run this close cannot buy, and that suite already carries a held-constant red.
+  →icebox failed on the live trigger — first-install is the one path with no operator watching.
+  **Cost while deferred:** zero until a printed arm is renamed, then one adopter's failed install
+  with no oracle between the rename and them.
+  Filed 2026-09-05 to the gap inbox at build; promoted 2026-09-05 by close.
+
+- **run-validate-child-env-knob-leak** [design-pending] — `--run-validate` passes its whole ambient
+  `GATE_SDK_KNOB_*` family down to every suite child, and the crate's own battery arm already
+  rules the opposite discipline one section over.
+  **The instance was patched; the class is live, and an impact test run naively reads it dead.**
+  `native/src/emit/run_validate.rs`'s `spawn()` lets every bridged env var survive into a suite
+  child by ordinary OS inheritance — the arm needs the knob in its own env to read
+  `EVIDENCE_KIT_SUITES`, and nothing strips it before spawning. That poisoned
+  `check-evidence-baseline.test.sh`'s case H, whose whole subject is knob-ABSENCE: the case
+  strips its own constructed argv element and the ambient one answered in its place, so a
+  fail-closed assertion silently resolved the real roster instead of erroring. Fixed 2026-09-05 by
+  unsetting that one knob in that one subshell, which MASKS the leak and closes nothing — the
+  class stays live for any future fail-closed-on-absent-knob assertion under `--run-validate`, in
+  any suite in any kit. The symptom is gone by construction, so absence of a red is not evidence
+  about this entry.
+  **THE STRUCTURAL FIX IS NOT NEW DESIGN — the discipline is already ruled, one arm over.**
+  gate-sdk/SPEC.md §run-gates states of the battery's own child dispatch that the arm *strips
+  every inherited `GATE_SDK_KNOB_*` from a child and re-adds only the ones that member's registry
+  entry declares*, and gives the ground: one shared environment means a member reading a knob it
+  never declared would succeed, which is the bridge's does-not-define refusal failing in the
+  direction nothing catches. `run_validate.rs` is a second compiled arm spawning children and does
+  not follow it. So the work is applying a stated discipline to a second arm, not inventing one —
+  with the re-add half empty, a validate suite being a consumer-configured command that has no
+  registry entry to declare anything.
+  **The unknown that shape carried is DISCHARGED at this drain.** No configured suite relies on
+  inheriting an ambient `GATE_SDK_KNOB_*` value: every configured suite command is a fresh
+  front-end or `cargo test` invocation that re-derives its knobs from config, and a tree-wide grep
+  for readers of that family finds only gate-tests that set their own.
+  **Why it was not taken at the drain.** The structural fix was refused for this run on the
+  port-only directive rather than on merit, and close is still that run, so taking it here would
+  reverse a recorded ruling rather than apply one.
+  **The missing check class, per the gap-generalization rule:** a scan asserting that every crate
+  arm which spawns a child strips the inherited bridged family before invoking it — buildable over
+  `native/src/` and cheap, the strip having one spelling.
+  **DISTINCT from `bespoke-test-path-knob-pinning`** — the same theme, ambient env leaking into a
+  bespoke test that assumes its own knob absent, on a different mechanism (the `GATE_SDK_KNOB_*`
+  bridged scalars, not the `GATE_SDK_TMP_DIR` / `GATE_SDK_WORKFLOW_DIR` path knobs) and a
+  different exposed test, not among that entry's enumerated seven.
+  **Cost while deferred:** every future bridged-arm port that spawns children re-buys this
+  debugging, and the next occurrence presents as a fail-closed assertion silently passing rather
+  than as a red — the expensive direction.
+  →fix failed on the recorded refusal above; →icebox failed on the live per-port trigger.
+  Filed 2026-09-05 to the gap inbox at validate and amended there the same day; promoted
+  2026-09-05 by close.
 
 ## Icebox
 
