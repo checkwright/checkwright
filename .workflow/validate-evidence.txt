@@ -1,1 +1,21 @@
 # contract: evidence-manifest v1
+scan-prompts-cut gates sha256=90042112f29b14ae472a0f5f6f6df06fba5061390a1c6dda522954a9142cd61a pass=108 fail=0 ignore=0 verdict=clean 2026-09-04
+scan-prompts-cut gate_sdk sha256=609796bbb425b41b9d5a5ae0143afb40812c8f979b46a47195a10bc86c2daf93 pass=1 fail=0 ignore=0 verdict=clean 2026-09-04
+scan-prompts-cut canon_kit sha256=9d3cf3ab0a1425a5996fd26152019ba03a3e0f5fa5ad31aa0e4a19901b8acb5a pass=1 fail=0 ignore=0 verdict=clean 2026-09-04
+scan-prompts-cut context_kit sha256=a72a655fbdc2336af37022b95846efa73ffc06864ae2241f7ed48d2867d96cc0 pass=1 fail=0 ignore=0 verdict=clean 2026-09-04
+scan-prompts-cut delegation_kit sha256=6d5af78679d3b30bda016b7d6cdeab840c0fc2bde80bfe4ecaad54b15446f963 pass=1 fail=0 ignore=0 verdict=clean 2026-09-04
+scan-prompts-cut doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-09-04
+scan-prompts-cut evidence_kit sha256=ae2a2f19285bce1b8d4b6490f91bce3d998afb05553e102569916c62cec919c4 pass=1 fail=0 ignore=0 verdict=clean 2026-09-04
+scan-prompts-cut guard_kit sha256=8745aafc1908d64352c326c2e02750ea926728f29f9e0eb3ef0e3a036d029497 pass=1 fail=0 ignore=0 verdict=clean 2026-09-04
+scan-prompts-cut lifecycle_kit sha256=55c0d3e68939b68858a225f53ce20889d8b17a92d840705f272968912d2427c3 pass=1 fail=0 ignore=0 verdict=clean 2026-09-04
+scan-prompts-cut queue_kit sha256=bd337719dfff15f492ae94d8e8662663a8917b65edd4b3bfcfdd20f1790ba39b pass=1 fail=0 ignore=0 verdict=clean 2026-09-04
+scan-prompts-cut site_kit sha256=07f7139ea31865677de58ea44b43f7c98ae6c40c8f3fe57e8975e8d65794be35 pass=1 fail=0 ignore=0 verdict=clean 2026-09-04
+scan-prompts-cut scripts sha256=f302eab3cefcc19e12fac91459be10fb1b4c8f02dd63cef5ad040f4deb8dc259 pass=1 fail=0 ignore=0 verdict=clean 2026-09-04
+scan-prompts-cut guard_tests sha256=00a4ff054b6b31ce5d150b2f791cf35f1047cb2d371b9d6676ba7544335a44ee pass=1 fail=0 ignore=0 verdict=clean 2026-09-04
+scan-prompts-cut demo sha256=bacfd4448ffdc712bda4ad4d9a468cf3c3a86045548b5eb9dd2675094bae7807 pass=1 fail=0 ignore=0 verdict=clean 2026-09-04
+scan-prompts-cut installer_smoke sha256=5da3842aebf3e93c05f72ec52d9c9a82360cccd530403cb757721c8bdba5d5f3 pass=4 fail=1 ignore=0 verdict=clean 2026-09-04
+scan-prompts-cut consumer_smoke sha256=8f744057e668fc2e27319a5d102ad5153e3ed3c90fb6434fae351558fc38e61c pass=1 fail=0 ignore=0 verdict=clean 2026-09-04
+scan-prompts-cut upgrade sha256=e841f81a895e9ee2228334ef1cbbed7e3f90bc8c289becbd75fe5874df1dc5b2 pass=1 fail=0 ignore=0 verdict=clean 2026-09-04
+scan-prompts-cut agents_md_smoke sha256=4cdde2134db674f729c3318c1e0c033b33b2cadcd21084c22f47dce0d12fc579 pass=1 fail=0 ignore=0 verdict=clean 2026-09-04
+scan-prompts-cut index_tests sha256=e14e152466dc5be0296b1e20575bf3d587e1e0a127e7c63ad57671dbcaeaddb8 pass=1 fail=0 ignore=0 verdict=clean 2026-09-04
+scan-prompts-cut native_crate sha256=54300f035d1b266c6e9cd15d8fab5afdd780e0511ac05d4c04bccd5577fddb6c pass=1 fail=0 ignore=0 verdict=clean 2026-09-04
