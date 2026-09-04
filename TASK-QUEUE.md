@@ -7307,58 +7307,6 @@
   2026-08-24 by close from its own surface triage rather than from the gap inbox, after an
   owner grep over the queue found the class unowned; both SPEC halves were read first-hand.
 
-- **dated-measurement-restatement-class** [design-pending] — whether a DATED measurement of a
-  live file's line spans is inside the internal-identifier-restatement class or outside it.
-  **The instance that forced the question, named rather than re-filed:**
-  `powershell-installer-surface` restated live internal line RANGES of `installer/lib/init.sh` plus
-  per-file counts for four siblings; the fifteenth `internal-identifier-restatement` sweep judged it
-  LOW-MEDIUM and filed the call rather than taking it. That entry stays live and unchanged.
-  **Why it generalises past one entry:** the ruling reaches every "measured at <date>" paragraph in
-  the pool, so the sweep escalated rather than editing one entry. The borderline it weighed — exact
-  dated figures against a line RANGE, the most rot-prone shape the class takes — is what the
-  2026-09-03 ruling below resolves in both.
-  **A DONE-EXIT CANDIDATE FOR CLOSE, RECORDED 2026-09-04 AT SCOPE AS A READING AND NOT A
-  DISPOSITION.** Scope re-read the entry and found its own text already says the design ground is
-  retired, leaving mechanical citation repair; the Done exit is close's under the 2026-08-23 ruling
-  and this entry is held on a procedural decision, so scope recorded the reading rather than taking
-  it. Close meets this as a candidate instead of re-deriving it a seventh time.
-  **The founding instance is gone and the shape came straight back — 2026-08-25, second instance.**
-  The `install-relocation-boundary-and-first-cut` merge rewrote `powershell-installer-surface`
-  wholesale, replacing those spans and counts with a rev-pinned ~22-row table of that file's
-  internal functions in execution order — HARDER, not easier, and closer to the class's own "call
-  chain or roster" language; as that amendment's deliverable, narrowing it re-scopes landed work.
-  **Third instance 2026-08-29, and the first where the rot was OBSERVED rather than predicted.**
-  `installer-graph-artifact-literal` carried two `installer/lib/init.sh` line numbers "exact,
-  re-verified at the drain"; both had moved, the defect still live at both and only the numbers
-  wrong — a re-verified span rotted inside eight days with no edit, so the cost line is no forecast.
-  recurrence: dated-measurement-restatement-class 2026-08-25 2026-08-29 2026-09-02
-  **AT THRESHOLD, DECLINED SEVEN TIMES — 2026-08-30, twice 2026-08-31, 2026-09-01, 2026-09-02,
-  2026-09-03, 2026-09-04; TWO were the OPERATOR's: 09-02 in a three-entry batch that took a sibling,
-  and 09-04 because this entry stands at THREE recurrences, where the routing clause ends lead
-  discretion.** First: machinery-class by default, no unit set reaching it. The six since, on the
-  RUN and not the merits — the run forecloses a non-port unit while the oracle reads owed at all.
-  **THE 2026-09-02 RECURRENCE FALSIFIES THE CARVE-OUT'S PREMISE, that a date names an iteration:**
-  two closes fell on one calendar day, so a count stamped with its own date read clean past a sweep
-  while the oracle had already moved. Its slug-beside-the-date shape is REFUSED: the operator ruled
-  2026-09-01 that the direction is compression, not addition (`record-stamp-encoding-compression`).
-  **THE BOUNDARY QUESTION IS ANSWERED BY A CLOSED RULING, RECORDED AS GROUNDS RATHER THAN TAKEN AS
-  A DISPOSITION — lead-verified 2026-09-03**, which also retires the `[design-pending]` ground that
-  stood here (an authoring question about the roster row). lifecycle-kit/SPEC.md §The committed gap
-  inbox's *a dated attestation freezes the claim, never the locator* answers it in BOTH directions:
-  the dated measurement is history immune to drift, while "a literal position in prose is the
-  de-literalization defect whatever date sits beside it" — so a span is OUTSIDE as a claim, INSIDE
-  as an anchor, and an anchor whose sentence holds while its line moved is de-literalization,
-  fix-shaped at a drain, never pendency. That reaches this entry's own forcing instance.
-  **The entry does not move on it**: the sixth decline was the first with the answer in hand.
-  ruled: dated-measurement-restatement-class lead 2026-08-30 2026-08-31 own-authority
-  ruled: dated-measurement-restatement-class lead 2026-09-01 2026-09-03 own-authority
-  ruled: dated-measurement-restatement-class operator 2026-09-04 lead-relay
-  **Cost while deferred:** the figures rot silently on the entry that sizes an unbought port, so a
-  reader prices work off numbers nothing re-checks and every sweep re-spends the same judgment.
-  Surfaced 2026-08-24 at the `port-remainder-disposition-and-worktree-reclamation` close's
-  internal-identifier-restatement sweep and filed to the gap inbox there; drained and promoted
-  2026-08-24 at this scope.
-
 - **precondition-gate-direction-blindness** [design-pending] — `check-queue-prose-precondition`
   reds an entry whose prose says the entry IS the blocker, and three of the four remedies it
   prints are false for that shape.
@@ -9767,5 +9715,7 @@
 - **friction-key-segment-selection-unruled** [design-pending] — Which segment to key is unruled.
 
 ## Done
+
+- dated-measurement-restatement-class
 
 ## Lessons Learned
