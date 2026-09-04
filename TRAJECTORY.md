@@ -534,6 +534,26 @@ the port then re-litigates. Discharge event: the oracle's owed count reads zero,
 the run is over and this paragraph is deleted; the triage sentence above it is the sequence and
 stays.
 
+**`promotes nothing` means no ACTIVE-section entry; a Deferred filing is not barred — ruled
+2026-09-04 by the operator, lead-relayed from an in-session prompt.** The clause above reads
+literally as a bar on the drain's `promote` disposition itself, and lifecycle-kit/SPEC.md §The
+committed gap inbox defines that disposition as exactly a deferred `[design-pending]` filing — so
+the literal text bars the motion, which is what makes the qualification operator-class rather than
+a session's however good its grounds. **What carries it is the run's own purpose and not the
+drain's tiering:** a Deferred entry consumes no iteration, so it yields nothing to non-port work,
+which is the whole of what the run exists to prevent. A bullet that neither a fix nor the icebox
+tier can take has nowhere else to go, and dropping it is the attrition every rule here refuses.
+**TWO CLOSES REACHED THIS READING INDEPENDENTLY BEFORE IT WAS RULED**, on the same operator-class
+blocker and the same icebox-eligibility failure: `run-gates-front-end-cut-legality-unruled` at the
+close of `scan-prompts-cut`, and `build-native-bootstrap-port-disposition-unruled` at the close of
+`usage-verdict-cut`, which flagged the reading rather than resting on it. Both stand. That two
+sessions converged unaided is why this is recorded rather than left to a third to re-derive.
+**THE RUN IS NOT WEAKENED, stated because that is the reading to guard against.** No yield is
+created, the ruled composer's selection is untouched, the exception set is still the
+operator-ruled hotfix alone, and the discharge event is unchanged. An **active-section** promotion
+stays barred — that is the motion which would consume an iteration, and it is the one the clause
+above is about. Discharge: this paragraph is deleted with the one it qualifies.
+
 **The run's ORDERING — not its existence — is reopenable at a later consult, and one ground is
 already on the record: ruled 2026-09-03 by the operator, lead-relayed from an in-session prompt.**
 Nothing reopens now, and the iteration that raised it proceeded under the run unchanged; what the
