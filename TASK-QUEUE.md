@@ -12,6 +12,86 @@
 
 ## New Features
 
+- **evidence-spine-port-cut** [spec: SPEC-spine-cut.md] — port `evidence-kit/bin/run-validate.sh`
+  (124) to the bridged `--run-validate` arm, the one owed file declaring
+  evidence-kit/SPEC.md §bin/run-validate.sh.
+  **Selection ground: the OWED column of `--emit port-blockers --tree`** — 98 scanned, 64
+  `no-port`, 0 held, 34 owed at HEAD 5d759cc2. Never the registry `--group` read, which trails
+  zero groups and does not answer for the tree remainder (gate-sdk/SPEC.md §port-blockers).
+  **Host: `native-gate-port-remaining-corpus`**, whose stated-contract composer and five rulings
+  select this cut. This entry is the cut's own unit and reaches `## Done` at build; the corpus
+  entry stays Deferred and is deliberately not promoted — the packaging note is on
+  `hooks-opt-in-port-cut` rather than repeated here.
+  **It pays FIVE compiled twins, not three:** `ek_run_key`, `ek_suite_cmd`, `ek_parser_for`,
+  `ek_parse` and `ek_diff` into `native/src/evidence.rs`, which already carries 5 of the kit's 10
+  primitives. Three are consumed by `baseline-diff-port-cut`, two are this cut's alone. That is a
+  between-cuts economy and never a section pairing: the two sections are separate `###` headings
+  and neither amendment claims a shared proof.
+  ruled: evidence-spine-port-cut lead 2026-09-04 own-authority
+  Filed 2026-09-04 by spec, minted and promoted in one motion with its amendment.
+
+- **baseline-diff-port-cut** [spec: SPEC-diff-cut.md] — port `evidence-kit/bin/diff-baseline.sh`
+  (53) to the bridged `--diff-baseline` arm, the one owed file declaring
+  evidence-kit/SPEC.md §bin/diff-baseline.sh. With its sibling it takes evidence-kit's owed
+  column to zero.
+  **Selection ground and host: the sibling spine cut's**, not restated.
+  **BUILD-HELD CONSTRAINT — this cut is NOT droppable once `evidence-spine-port-cut` has landed;
+  drop both or neither.** Probed: the three shared twins have exactly two production callers,
+  `run-validate.sh` and `diff-baseline.sh`, and no third — so this is the commit that removes the
+  shell forms from `lib/evidence.sh` and re-points the library's two gate-test suites. The sibling
+  landing alone therefore leaves a live double implementation of the parser and the diff, which is
+  the duplication the port exists to delete. Re-ordering is refused with it: taken first, this cut
+  would pay the three twins at the sibling's price and lose the amortization the pairing is for.
+  ruled: baseline-diff-port-cut lead 2026-09-04 own-authority
+  Filed 2026-09-04 by spec, minted and promoted with its amendment in one motion.
+
+- **trend-reporter-port-cut** [spec: SPEC-trend-cut.md] — port `delegation-kit/bin/usage-trend.sh`
+  (120) to the bridged `--emit-usage-trend` arm, the one owed file declaring
+  delegation-kit/SPEC.md §Trend reporter. It takes delegation-kit's `bin/` column to zero.
+  **Selection ground and host: as the two evidence-kit cuts above**, not restated.
+  **It is the batch's only `Arm::Emit`, and the exit contract settles that rather than taste:**
+  the tool declares 0 report emitted, 2 fail-closed and NEVER 1, which is that family verbatim, so
+  the member needs no new front-end `case` arm. It is the exact inverse of `--usage-verdict`'s
+  `Arm::Run` ruling one table row away, where the presence of a 1 forced the other answer.
+  **It forecloses one option of a live deferred entry and owes that entry a note in the same
+  commit:** `assertion-strength-exit-header-reach`'s option (c) requires this file to still be
+  shell. The gate's reach was already zero before this cut, so the port narrows a design space
+  rather than a verdict.
+  ruled: trend-reporter-port-cut lead 2026-09-04 own-authority
+  Filed 2026-09-04 by spec, minted with its amendment and promoted in the same commit.
+
+- **hooks-opt-in-port-cut** [spec: SPEC-hooks-cut.md] — port `gate-sdk/bin/install-hooks.sh` (59)
+  to the bridged `--install-hooks` arm, the one owed file declaring gate-sdk/SPEC.md
+  §install-hooks. It settles one section and does not discharge the kit.
+  **Selection ground and host: as the three cuts above**, not restated.
+  **DROP-FIRST: if build finds the window tighter than the (unmeasured, structural) reasoning
+  assumed, THIS batch parks and the other three land unchanged.** A build session holds that
+  permission in writing and does not escalate for it. The ground is the cuts' **own facts** rather
+  than gate-sdk/SPEC.md's no-joint-proof paragraph, which is written over registry gates with
+  descriptors and fixture pairs and reaches this batch only by analogy: this cut shares no twin,
+  no library, no kit and no gate with the other three, so parking it strands nothing they created.
+  The same test on `baseline-diff-port-cut` returns the opposite answer, which is why the two
+  constraints are written as a pair.
+  **One ground of the packaging ruling is RETRACTED:** that this cut's design work was already
+  landed in-crate. That holds for the per-clone-opt-in class
+  (`native/src/emit/install_lifecycle.rs:87-101`) and fails for the apply-and-verify rung, whose
+  registry resolution is a seam ruling of its own — an in-process dispatch by name would stop
+  honouring the consumer shadow §install-hooks asserts. The cut stays on the two grounds that
+  survive and never depended on it being cheap: lines-per-iteration is what ends the run, and
+  amendment count is retired as align's scale proxy.
+  **THE ITERATION'S PACKAGING NOTE, carried on one entry rather than four.** These four are
+  per-cut units reaching `## Done`, and `native-gate-port-remaining-corpus` is deliberately not
+  promoted. The departure from the host pattern is ruled rather than forgotten: canon-kit/SPEC.md
+  §Merging an amendment carves the demotion branch for an entry whose deliverable is a **corpus**,
+  and a per-cut entry's deliverable is its section's owed files, which its cut finishes — so Done
+  is the correct terminal move here. It also leaves the corpus entry's roadmap tag unmoved,
+  where a promote-and-demote would round-trip a tag a generated public projection reads.
+  **Minting two further hosts was REFUSED**: that is the fission
+  `record-stamp-encoding-compression` names as permanent queue structure, and this boundary is the
+  THIRD witness of that wall, recorded on that entry rather than here.
+  ruled: hooks-opt-in-port-cut lead 2026-09-04 own-authority
+  Filed 2026-09-04 by spec; its amendment and this entry landed together.
+
 ## Technical Debt
 
 ## Deferred
@@ -9037,11 +9117,13 @@
   tidiness argument: `QUEUE_KIT_WRAP_BUDGET=100` and `QUEUE_KIT_ENTRY_LINE_CAP=50`
   (`queue-kit/lib/queue.sh:37,39`) bound columns and lines separately, so a shorter stamp frees
   columns directly and freed columns let prose reflow into fewer lines.
-  **The column axis is WITNESSED TWICE, both measured, neither projected.** 2026-09-01: `/spec` was
-  blocked outright because `native-gate-port-remaining-corpus`'s lead line could not hold two
-  `spec:` refs under 100 columns — over by two at any legal naming — and the lead ruled around it.
-  2026-09-03: the same wall forced MINTING a second host, `drift-kit-bin-port-residue`, so the port
-  corpus fissions into per-directory hosts for an encoding reason, as permanent queue structure.
+  **The column axis is WITNESSED THREE TIMES, all measured, none projected.** 2026-09-01: `/spec`
+  blocked outright — `native-gate-port-remaining-corpus`'s lead line could not hold two `spec:`
+  refs under 100 columns, over by two at any legal naming, and the lead ruled around it.
+  2026-09-03: the same wall forced MINTING a second host, `drift-kit-bin-port-residue`, fissioning
+  the port corpus into per-directory hosts for an encoding reason, as permanent queue structure.
+  2026-09-04: FOUR cuts want four refs against a 66-column base that holds ONE — two shortest
+  legal refs measure 117. Two more hosts REFUSED; four per-cut Done-bound entries taken instead.
   **The gain is the ENCODING, not the list, and the entry says so because the format already has
   the list.** queue-kit/SPEC.md:440-442 already defines
   `recurrence: <slug> <YYYY-MM-DD> [<YYYY-MM-DD>…]`, multiple dates on one line today.
