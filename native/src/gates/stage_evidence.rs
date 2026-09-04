@@ -160,7 +160,7 @@ fn provenance(
 
     let mut permitted: Vec<String> = vec![rel_state.clone()];
     // spec: lifecycle-kit/SPEC.md §check-stage-evidence — the exemption's predicate is the paths
-    // bin/enter-stage.sh itself writes at this entry, so the valve ledger rides at ANY stage:
+    // --enter-stage itself writes at this entry, so the valve ledger rides at ANY stage:
     // its scoping is membership, a non-admitting entry leaving the ledger unstaged
     let valve = walk::knob_scalar("LIFECYCLE_KIT_PREFLIGHT_VALVE_FILE")?;
     if !valve.is_empty() {
@@ -176,7 +176,7 @@ fn provenance(
     }
     for p in &staged {
         if !permitted.contains(p) {
-            out.push(format!("the commit introducing a stamp also stages '{}' — a stamp commit carries only the paths bin/enter-stage.sh writes at that entry, which here are {}, so the mark cannot be back-dated into a work commit: {}", p, permitted.join(" "), state));
+            out.push(format!("the commit introducing a stamp also stages '{}' — a stamp commit carries only the paths --enter-stage writes at that entry, which here are {}, so the mark cannot be back-dated into a work commit: {}", p, permitted.join(" "), state));
         }
     }
     Ok(out)
@@ -346,7 +346,7 @@ pub fn run(args: &[String]) -> i32 {
             for e in &v {
                 println!("  {}", e);
             }
-            println!("  help: re-run the stage skill's first step (bash lifecycle-kit/bin/enter-stage.sh <stage>) — it appends a fresh stamp at the current HEAD, which is a same-stage re-entry and in contract; then commit that stamp on its own (lifecycle-kit/SPEC.md §check-stage-evidence)");
+            println!("  help: re-run the stage skill's first step (bash gate-sdk/bin/run-gates.sh --enter-stage <stage>) — it appends a fresh stamp at the current HEAD, which is a same-stage re-entry and in contract; then commit that stamp on its own (lifecycle-kit/SPEC.md §check-stage-evidence)");
             return 1;
         }
         Ok(_) => {}

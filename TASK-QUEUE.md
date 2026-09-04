@@ -12,57 +12,6 @@
 
 ## New Features
 
-- **native-gate-port-remaining-corpus** [spec: SPEC-enter-stage-cut.md] [roadmap: now/reliability]
-  — the whole battery onto the binary, and the shell surface down to its residue.
-  roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
-  It DEMOTES at build, never `## Done` — canon-kit/SPEC.md §Merging an amendment's corpus branch.
-  **Operator-ruled 2026-08-09: complete the port, ASAP** — that ruling, its grounds, its scope,
-  both install paths and the tail are [TRAJECTORY.md](TRAJECTORY.md) §PRIORITY DIRECTIVE's, not
-  restated; this entry is the work, bootstrap design included, inheriting gate-sdk/SPEC.md
-  §Porting a gate to the binary substrate and §Consumer payload. **Each closed cut's record —
-  members, counts, holds, grounds, price — lives in the contract section that cut selected**, so
-  this entry states only what remains (drift-kit/SPEC.md §The KPI plugin contract, gate-sdk/SPEC.md
-  §Consumer smoke, *The port disposition*).
-  **THE COMPOSER DOES NOT REACH THE TREE REMAINDER** — the registry arm answers for the battery,
-  only `--tree` is the predicate, and both arms are run. That two-axis misreading, the rise in owed
-  on a landing shell file, and the bounds are gate-sdk/SPEC.md §port-blockers'.
-  **THE COMPOSER IS RULED 2026-08-28: select the next cut by STATED CONTRACT** — the owed
-  files behind one specification section, ported behind the one amendment that section needs. Size-
-  and kit-ordered composers stay refused. **IT CONSTRAINS SELECTION, NOT ITERATION PACKAGING —
-  ruled 2026-08-30 (operator, lead-relay):** the clauses above say what makes ONE cut well-formed;
-  how many an iteration holds is owned elsewhere. Refused with it — three cohorts as ONE cut, which
-  fails this ruling's own words (*one* section, *the one* amendment) and averages the grounds all
-  three entries forbid, shared setup being logistics; and one cut per iteration, an over-read
-  paying three iteration floors for no added decision quality.
-  **(1) A CUT NARROWS THE PORT, NEVER AN EXTENSION POINT.** Where a kit ships a consumer-facing
-  plugin or config seam, that seam's resolution, direct execution and env contract survive and only
-  the bundled members move in-crate; the ground is the porting kit's OWN governed surfaces plus
-  CLAUDE.md §The provenance seam, never analogy — worked at drift-kit/SPEC.md §The extensibility
-  contract. **(2) SETTINGS GRANTS, RULED 2026-08-29 (operator, lead-relay):** removing a permission
-  grant whose target a RULED PORT CUT DELETES is OUTSIDE the 2026-08-22 bar — a pure narrowing
-  forced by the cut — and build removes the dead lines IN THE SAME COMMIT AS THE DELETE, the window
-  the requirement exists to close. The bar stands unchanged for every other permission-settings
-  edit: a carve-out for one class. Scope is the files THAT COMMIT deletes, never a path prefix —
-  probe the count, never assume it, the attested probe having quadrupled one kit's.
-  **(3) A SECTION IS A CUT'S OUTER BOUND, NOT ITS MINIMUM; (4) A CONSUMER PLUGIN ON A SEAM IS OWED
-  — ruling (1) reaches the seam alone, both 2026-09-03 (operator, lead-relay); (5) SIZING FILLS
-  WITHIN THAT BOUND, 2026-09-04 (lead) — singletons under-fill lawfully, no host minted, widths stay
-  per-cut, size arm permanently spent — gate-sdk/SPEC.md §Porting a gate to the binary substrate.**
-  ruled: native-gate-port-remaining-corpus lead 2026-08-28 2026-08-29 2026-08-31 own-authority
-  ruled: native-gate-port-remaining-corpus operator 2026-08-28 2026-08-29 2026-08-30 lead-relay
-  ruled: native-gate-port-remaining-corpus operator 2026-09-03 lead-relay
-  **Cost while deferred:** large and known — the **owed** remainder (the trailer's own arm, never
-  the unported count) plus the runners and the install-lifecycle layer. Not a single-iteration
-  delta; criterion relaxation is closed at gate-sdk/SPEC.md §The port-candidate criteria, an
-  ordering signal and never an eligibility screen. `gate-battery-result-cache` is the one battery
-  entry unsubsumed; `powershell-installer-surface` is the sequence's last member.
-  **NO YIELD AT ALL until `--tree` reads zero owed — the port-only run, ruled 2026-08-31
-  (operator, consult); TRAJECTORY.md §PRIORITY DIRECTIVE owns it.** It SUBSUMES rather than
-  repeals the 2026-08-29 four-yield rule: with no yield available there is none to escalate.
-  ruled: native-gate-port-remaining-corpus operator 2026-08-31 consult
-  ruled: native-gate-port-remaining-corpus lead 2026-09-01 2026-09-03 2026-09-04 own-authority
-  Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close; cohorts ruled at scope 2026-08-11/12.
-
 - **file-authoring-act-ungoverned** [spec: SPEC-file-authoring-act.md] — writing a file has no
   steer, no grant and no owner, so authoring one costs an out-of-band permission decision
   every time.
@@ -210,6 +159,57 @@
   Filed 2026-09-03 by spec, minted and promoted in one motion as the second cut's host on the
   ruling above; the column budget that forced it is filed as a recurrence of
   `record-stamp-encoding-compression`, the entry that owns the encoding, not this one.
+
+- **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
+  — the whole battery onto the binary, and the shell surface down to its residue.
+  roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
+  It DEMOTES at build, never `## Done` — canon-kit/SPEC.md §Merging an amendment's corpus branch.
+  **Operator-ruled 2026-08-09: complete the port, ASAP** — that ruling, its grounds, its scope,
+  both install paths and the tail are [TRAJECTORY.md](TRAJECTORY.md) §PRIORITY DIRECTIVE's, not
+  restated; this entry is the work, bootstrap design included, inheriting gate-sdk/SPEC.md
+  §Porting a gate to the binary substrate and §Consumer payload. **Each closed cut's record —
+  members, counts, holds, grounds, price — lives in the contract section that cut selected**, so
+  this entry states only what remains (drift-kit/SPEC.md §The KPI plugin contract, gate-sdk/SPEC.md
+  §Consumer smoke, *The port disposition*).
+  **THE COMPOSER DOES NOT REACH THE TREE REMAINDER** — the registry arm answers for the battery,
+  only `--tree` is the predicate, and both arms are run. That two-axis misreading, the rise in owed
+  on a landing shell file, and the bounds are gate-sdk/SPEC.md §port-blockers'.
+  **THE COMPOSER IS RULED 2026-08-28: select the next cut by STATED CONTRACT** — the owed
+  files behind one specification section, ported behind the one amendment that section needs. Size-
+  and kit-ordered composers stay refused. **IT CONSTRAINS SELECTION, NOT ITERATION PACKAGING —
+  ruled 2026-08-30 (operator, lead-relay):** the clauses above say what makes ONE cut well-formed;
+  how many an iteration holds is owned elsewhere. Refused with it — three cohorts as ONE cut, which
+  fails this ruling's own words (*one* section, *the one* amendment) and averages the grounds all
+  three entries forbid, shared setup being logistics; and one cut per iteration, an over-read
+  paying three iteration floors for no added decision quality.
+  **(1) A CUT NARROWS THE PORT, NEVER AN EXTENSION POINT.** Where a kit ships a consumer-facing
+  plugin or config seam, that seam's resolution, direct execution and env contract survive and only
+  the bundled members move in-crate; the ground is the porting kit's OWN governed surfaces plus
+  CLAUDE.md §The provenance seam, never analogy — worked at drift-kit/SPEC.md §The extensibility
+  contract. **(2) SETTINGS GRANTS, RULED 2026-08-29 (operator, lead-relay):** removing a permission
+  grant whose target a RULED PORT CUT DELETES is OUTSIDE the 2026-08-22 bar — a pure narrowing
+  forced by the cut — and build removes the dead lines IN THE SAME COMMIT AS THE DELETE, the window
+  the requirement exists to close. The bar stands unchanged for every other permission-settings
+  edit: a carve-out for one class. Scope is the files THAT COMMIT deletes, never a path prefix —
+  probe the count, never assume it, the attested probe having quadrupled one kit's.
+  **(3) A SECTION IS A CUT'S OUTER BOUND, NOT ITS MINIMUM; (4) A CONSUMER PLUGIN ON A SEAM IS OWED
+  — ruling (1) reaches the seam alone, both 2026-09-03 (operator, lead-relay); (5) SIZING FILLS
+  WITHIN THAT BOUND, 2026-09-04 (lead) — singletons under-fill lawfully, no host minted, widths stay
+  per-cut, size arm permanently spent — gate-sdk/SPEC.md §Porting a gate to the binary substrate.**
+  ruled: native-gate-port-remaining-corpus lead 2026-08-28 2026-08-29 2026-08-31 own-authority
+  ruled: native-gate-port-remaining-corpus operator 2026-08-28 2026-08-29 2026-08-30 lead-relay
+  ruled: native-gate-port-remaining-corpus operator 2026-09-03 lead-relay
+  **Cost while deferred:** large and known — the **owed** remainder (the trailer's own arm, never
+  the unported count) plus the runners and the install-lifecycle layer. Not a single-iteration
+  delta; criterion relaxation is closed at gate-sdk/SPEC.md §The port-candidate criteria, an
+  ordering signal and never an eligibility screen. `gate-battery-result-cache` is the one battery
+  entry unsubsumed; `powershell-installer-surface` is the sequence's last member.
+  **NO YIELD AT ALL until `--tree` reads zero owed — the port-only run, ruled 2026-08-31
+  (operator, consult); TRAJECTORY.md §PRIORITY DIRECTIVE owns it.** It SUBSUMES rather than
+  repeals the 2026-08-29 four-yield rule: with no yield available there is none to escalate.
+  ruled: native-gate-port-remaining-corpus operator 2026-08-31 consult
+  ruled: native-gate-port-remaining-corpus lead 2026-09-01 2026-09-03 2026-09-04 own-authority
+  Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close; cohorts ruled at scope 2026-08-11/12.
 
 - **kit-knob-consumer-adapter-convention** [design-pending] — whether a kit may ship
   a knob whose only working configuration requires the consumer to author an adapter, and whether
@@ -914,7 +914,7 @@
 - **boundary-wipe-preserve-basename-reach** [design-pending] — the iteration-boundary scratch wipe
   matches its preserve list by **basename at any depth**, so one nested `.gitkeep` makes a whole
   scratch tree immortal and the wipe still reports success.
-  `lifecycle-kit/bin/enter-stage.sh`'s boundary block runs
+  `gate-sdk/bin/run-gates.sh --enter-stage`'s boundary block runs
   `find "$tmpdir" -mindepth 1 -depth ! -name .gitkeep [! -name <preserve>…] -print -delete`.
   `! -name` is unanchored, so a `.gitkeep` at any depth survives, its parent's delete then fails
   as non-empty, and every ancestor up to the scratch root survives with it.
@@ -1745,7 +1745,7 @@
   dispatches scope undirected"). The directive slot presupposes the decision to
   open has already been made and is silent on who makes it; re-verified at this
   close, the file contains no authorization word at all, and
-  `lifecycle-kit/bin/enter-stage.sh` carries no floor either — its first-stage
+  `gate-sdk/bin/run-gates.sh --enter-stage` carries no floor either — its first-stage
   branch differs only in stamping `—` for the iteration name.
   **The live instance.** The operator said "fix all" about four outstanding
   release defects, two of them edits to governed surfaces; the lead read that as
@@ -2873,8 +2873,9 @@
 - **enter-stage-arg-position-silent-drop** [design-pending] — `--simulate` after the stage
   is silently dropped, and the read-only preflight runs the destructive reset instead.
   recurrence: enter-stage-arg-position-silent-drop 2026-08-07
-  `bin/enter-stage.sh` parses the flag positionally — it tests `$1` for `--simulate` and
-  shifts — so `enter-stage.sh scope --simulate` leaves `$1` as the stage, never sets the
+  the `--enter-stage` arm parses the flag positionally — it tests the first argument for
+  `--simulate` and shifts — so `--enter-stage scope --simulate` leaves the stage in
+  place, never sets the
   simulate bit, and treats the flag as a trailing argument nothing reads. Nothing refuses
   the extra argument and nothing in the output says the flag was ignored.
   **Why this one argument's position is not an ordinary usage nit.** The dropped token is
@@ -6055,7 +6056,7 @@
   **Why it is a class and not a slip.** Every artifact-level check a later session could run —
   stamp present, tree clean, gates green — returns exactly what a finished validate returns. The
   cursor has one source, the last stamp, and the stamp is written at stage *entry*
-  (`lifecycle-kit/bin/enter-stage.sh:339` appends it), so the cursor cannot separate
+  (lifecycle-kit/SPEC.md §bin/enter-stage.sh's stamp append), so the cursor cannot separate
   entered-and-abandoned from entered-and-completed. Re-verified at the drain: no exit-stamp
   concept exists anywhere in lifecycle-kit. The only signal separating the two here was a
   completion notification held by the dispatching lead and by nothing durable.
@@ -7709,7 +7710,8 @@
   a producer makes its own exit condition unsatisfiable, and blocks every concurrent session's
   commits while it spins.
   **Attested live 2026-08-26.** This iteration's validate session backgrounded
-  `until bash lifecycle-kit/bin/enter-stage.sh --simulate validate; do sleep 15; done` and, per the
+  `until bash gate-sdk/bin/run-gates.sh --enter-stage --simulate validate;
+  do sleep 15; done` and, per the
   standing launch-liveness rule, wrote `.tmp/validate-entry-wait.run` naming its own pid. This repo
   wires `check-producer-liveness .tmp` as a validate entry pre-flight, so the poll refused on the
   record the poll itself had written; the only thing still blocking the loop was the loop.
@@ -7740,7 +7742,7 @@
 - **enter-stage-refusal-help-contradicts-its-guard** [design-pending] — the entry tool's refusal
   offers "perform the stamp by hand" as the deliberate override, and three other surfaces say that
   is exactly what must not happen.
-  `lifecycle-kit/bin/enter-stage.sh`'s `HELP_PREFLIGHT` string is printed under BOTH pre-flight
+  The `--enter-stage` arm's `HELP_PREFLIGHT` string is printed under BOTH pre-flight
   refusals — the built-in `check-stage-entry` one and every `LIFECYCLE_KIT_ENTRY_PREFLIGHT` one —
   and it reads "resolve the finding above, or (to override deliberately) perform the stamp by
   hand."
@@ -8914,7 +8916,7 @@
   **Measured 2026-08-29 at this close.** `.workflow/survey-record.md` carries **45 blank lines**
   between its contract header and its first block, which sits at line 47 of 94 — half the file is
   the residue of evicted blocks. The record is green under its own gate, so nothing surfaces it.
-  **The mechanism, read at the source.** `lifecycle-kit/bin/enter-stage.sh`'s truncation walks the
+  **The mechanism, read at the source.** The `--enter-stage` arm's truncation walks the
   header run printing blanks and comment lines until the first data line sets its drop flag; the
   newline that separates the header from the first surviving block is therefore carried across the
   boundary and a fresh one is added when the next iteration's first block is appended.
@@ -9538,7 +9540,7 @@
   is the kits that never took the ruled substitute, not a missing scanner.
   **Why `[design-pending]`: the contract's own scope is the design question.** §The bin/-tool
   contract states its three behaviors under a free-text-positional rule, yet
-  `lifecycle-kit/bin/enter-stage.sh`'s own note reads the HELP half as binding on a
+  `gate-sdk/bin/run-gates.sh --enter-stage`'s own note reads the HELP half as binding on a
   membership-validated tool too. Whether it binds on a tool taking **no** positionals — which is
   most of the seventeen, `stage-economics.sh` included — is unstated, and the answer sets the corpus
   before any member is fixed.
@@ -9667,8 +9669,9 @@
   **Re-verified at the drain rather than taken on the filer's word**, which is what the filing
   bullet itself asked for: a grep for `trap` and `signal` over both surfaces establishes it, and
   the two orphans the filing close reaped were stranded by a self-imposed timeout SIGTERM.
-  **Not free residue.** `lifecycle-kit/bin/enter-stage.sh:469,:499` REFUSE an iteration-boundary
-  entry behind any linked worktree, writing nothing, while :509,:519 make the same scan a
+  **Not free residue.** The `--enter-stage` arm's boundary refusal
+  (lifecycle-kit/SPEC.md §bin/enter-stage.sh) REFUSES an iteration-boundary
+  entry behind any linked worktree, writing nothing, while away from the boundary the same scan is a
   mid-iteration advisory — so one killed run converts into a blocked boundary for whoever arrives
   next, which is why the filing close met it only as a warning.
   **DISTINCT from every open worktree entry, checked rather than asserted.**

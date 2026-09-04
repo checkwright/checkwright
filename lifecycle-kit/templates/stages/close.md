@@ -2,8 +2,8 @@ The `close` stage of an iteration. Harvest lessons, housekeep, optionally
 merge. Exit condition: Done and Lessons Learned sections cleared (harvestable
 lessons promoted first).
 
-**First step — stamp evidence.** Run lifecycle-kit's `bin/enter-stage.sh
-close`: it appends `<iteration> close <session-id> <date> <head>` to
+**First step — stamp evidence.** Run the lifecycle arm,
+`bash gate-sdk/bin/run-gates.sh --enter-stage close`: it appends `<iteration> close <session-id> <date> <head>` to
 `.workflow/WORKFLOW-STATE.txt` (required by `check-stage-evidence`; the stamp
 proves invocation, not faithful execution), reading `<session-id>` from
 the `--emit-session-id` arm
@@ -224,7 +224,7 @@ session.
    moment the write happens, which is why the mechanism has to be a stage step.
 
 **Last step — the resume journal.** This stage's exit artifact is the resume
-journal `enter-stage.sh` named at the stamp; its path is a derivation
+journal the `--enter-stage` arm named at the stamp; its path is a derivation
 (lifecycle-kit/SPEC.md §The state machine) and its contract is
 delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps.
 Append `DONE` as the file's last line before you report.

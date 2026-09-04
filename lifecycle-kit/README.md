@@ -12,7 +12,7 @@ its skill, fail the commit.
 Why: a stateless agent session doesn't reliably re-read process prose. So the
 process state lives in two files a gate can read, and every stage skill stamps
 its invocation as its first step (mechanized by
-`bin/enter-stage.sh <stage>`, so the misformat-prone hand ritual is one
+`bash gate-sdk/bin/run-gates.sh --enter-stage <stage>`, so the misformat-prone hand ritual is one
 command). That stamp *is* the stage transition — there is no second copy of
 the cursor to keep in sync, and stage motion writes no queue at all.
 `check-stage-evidence` verifies the stamp file's grammar and that every stamp
@@ -98,7 +98,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    `bash gate-sdk/bin/run-gates.sh --hook workflow-state-guard` as a
    `PreToolUse(Write|Edit)` hook (guard-kit's `templates/settings-hooks.json`
    carries the block). It refuses an agent write to the stage-stamp file, whose
-   only sanctioned writer is `bin/enter-stage.sh` — the gates that would catch a
+   only sanctioned writer is the `--enter-stage` arm — the gates that would catch a
    hand-stamp all fire at commit, and an uncommitted one moves the cursor for a
    whole session (SPEC.md §check-stage-evidence). Requires guard-kit vendored.
 
@@ -114,7 +114,7 @@ by design.
 ## Use
 
 ```bash
-bash lifecycle-kit/bin/enter-stage.sh <stage>          # stamp a stage entry (the transition itself)
+bash gate-sdk/bin/run-gates.sh --enter-stage <stage>          # stamp a stage entry (the transition itself)
 bash gate-sdk/bin/run-gates.sh --install-lifecycle    # (re)write the registration and merge-attribute blocks
 bash gate-sdk/bin/run-gates.sh --emit file-gap "<gap>"   # route a work-shaped finding to the gap inbox
 bash gate-sdk/bin/run-gates.sh --emit file-survey "<question>" "<corpus>" "<oracle>" "<edges>" "<finding>"
@@ -123,12 +123,12 @@ bash gate-sdk/bin/run-gates.sh --emit session-id                       # the can
 ```
 
 `--emit session-id` is [SPEC.md](SPEC.md) §bin/session-id.sh's derivation order,
-which `enter-stage.sh` reads for you: reach for it directly only where a session
+which `--enter-stage` reads for you: reach for it directly only where a session
 writes an id itself, as `templates/lead.md`'s session-role marker step does. It
 takes no argument and resolves no knob. **The front-end route reads the cwd
 `bin/run-gates.sh` cds to** — the git toplevel — so a caller standing elsewhere
 whose sessions dir is the cwd-slugged default invokes the binary's
-`--emit-session-id` arm directly instead, which is what `enter-stage.sh` does.
+`--emit-session-id` arm directly instead, which is what `--enter-stage` does.
 
 The two survey arms are the capture and citation affordances of
 [SPEC.md](SPEC.md) §The survey record, reached through gate-sdk's battery

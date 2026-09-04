@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
-# spec: lifecycle-kit/SPEC.md §The survey record — the two enter-stage.sh halves end-to-end through a sandboxed entry: an ordinary stage entry prints the record's headings and never its findings, and the iteration-boundary entry truncates the record to its contract header, names it in the truncated set, and does not refuse on a non-empty record the way the gap inbox one line above does
+# spec: lifecycle-kit/SPEC.md §The survey record — the two --enter-stage halves end-to-end through a sandboxed entry: an ordinary stage entry prints the record's headings and never its findings, and the iteration-boundary entry truncates the record to its contract header, names it in the truncated set, and does not refuse on a non-empty record the way the gap inbox one line above does
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
-DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # lifecycle-kit/
-ENTER="$DIR/bin/enter-stage.sh"
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the second sanctioned caller: this harness
+# drives the arm from a non-git sandbox cwd, which bin/run-gates.sh refuses by design (it cds to
+# the git toplevel and a `mktemp -d` is no repository), so it resolves the binary and the bridged
+# environment through gate_arm_run rather than through that front-end.
 SANDBOX="$(mktemp -d)"
 trap 'rm -rf "$SANDBOX"' EXIT
 
@@ -57,9 +59,9 @@ EOF
 }
 
 run_enter() {  # $1=sandbox subdir  $2=stage
-    ( cd "$1" && env GATE_SDK_TMP_DIR=scratch \
-                     LIFECYCLE_KIT_SESSION_ID=deadbeef02 \
-                     bash "$ENTER" "$2" 2>&1 )
+    ( cd "$1" && gate_env GATE_SDK_TMP_DIR=scratch \
+                          LIFECYCLE_KIT_SESSION_ID=deadbeef02 \
+        && gate_arm_run --enter-stage "$2" 2>&1 )
 }
 
 # --- an ordinary stage entry: the read trigger prints questions, never findings ---

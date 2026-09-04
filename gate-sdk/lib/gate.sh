@@ -324,6 +324,13 @@ _gate_knob_prefix_emit() {
         [[ "$_gkp_n" == "$prefix"* ]] && _gkp_names+=("$_gkp_n")
     done < <(compgen -v | sort)
     for _gkp_n in ${_gkp_names[@]+"${_gkp_names[@]}"}; do
+        # spec: gate-sdk/SPEC.md §lib/gate.sh — the family arm takes the scalar arm's associative branch rather than expanding the map: `${map[*]}` yields an associative array's *values* with its keys destroyed, so a keyed knob crossing under a family declaration would arrive unreadable by knob_map while every element-shape refusal below still passed it
+        if [[ "$(declare -p "$_gkp_n" 2>/dev/null)" =~ ^declare[[:space:]]+-[a-zA-Z]*A ]]; then
+            local _gkp_a
+            _gkp_a="$(_gate_knob_pairs "$_gkp_n")" || return 2
+            printf '%s\tGATE_SDK_KNOB_%s=%s\n' "$idx" "$_gkp_n" "$_gkp_a"
+            continue
+        fi
         local -n _gkp_val="$_gkp_n"
         for _gkp_e in "${_gkp_val[@]+"${_gkp_val[@]}"}"; do
             case "$_gkp_e" in

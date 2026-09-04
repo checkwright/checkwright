@@ -4,8 +4,8 @@ NEW failures against a committed baseline" over bare "all pass", which is
 unsatisfiable while any suite is tracked-red on a deferred blocker; each
 held-constant red line carries the live task slug that blocks it>*.
 
-**First step — stamp evidence.** Run lifecycle-kit's `bin/enter-stage.sh
-validate`: it appends `<iteration> validate <session-id> <date> <head>` to
+**First step — stamp evidence.** Run the lifecycle arm,
+`bash gate-sdk/bin/run-gates.sh --enter-stage validate`: it appends `<iteration> validate <session-id> <date> <head>` to
 `.workflow/WORKFLOW-STATE.txt` (required by `check-stage-evidence`; the stamp
 proves invocation, not faithful execution), reading `<session-id>` from
 the `--emit-session-id` arm
@@ -86,7 +86,7 @@ failure: lifecycle-kit/SPEC.md §bin/enter-stage.sh. With no ledger configured
 there is no valve, and an accepted red stops here as it always did.
 
 **Last step — the resume journal.** This stage's exit artifact is the resume
-journal `enter-stage.sh` named at the stamp; its path is a derivation
+journal the `--enter-stage` arm named at the stamp; its path is a derivation
 (lifecycle-kit/SPEC.md §The state machine) and its contract is
 delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps.
 Append `DONE` as the file's last line before you report.

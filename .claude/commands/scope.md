@@ -8,7 +8,7 @@ content, what becomes consumer config.
 
 **evidence-reset** — nothing to reset by hand here:
 `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` (`scripts/lifecycle-config.sh`) lists
-`.workflow/validate-evidence.txt`, so `enter-stage.sh scope` truncates it —
+`.workflow/validate-evidence.txt`, so `--enter-stage scope` truncates it —
 together with the lesson-evidence file — in the same stamp commit. Wipe
 `.tmp/`'s files at this boundary — **except** the session-role marker
 (`.tmp/session-role`), which a live dispatching lead's session-context hook

@@ -1,7 +1,7 @@
 The **iteration lead** — a live session that dispatches an iteration's stage
 sessions and answers their escalations, so a blocked stage resumes in place
 rather than restarting. It is **not a stage skill**: it invokes no
-`enter-stage.sh`, stamps no evidence, moves no cursor, and joins no stage
+`--enter-stage`, stamps no evidence, moves no cursor, and joins no stage
 roster. Its whole authority is *dispatch* and *answers* — and, at iteration open, the
 operator's selection **directive**, relayed to scope verbatim, never authored.
 
@@ -106,9 +106,9 @@ the lead wants good news.
 
 The lead never hand-derives prior-stage completeness — reading WORKFLOW-STATE
 or the git log to decide whether a dispatch may proceed re-derives what the
-machinery already rules on. It dispatches and trusts `enter-stage.sh`'s
+machinery already rules on. It dispatches and trusts `--enter-stage`'s
 fail-closed refusal (relayed in the stage session's report), and it gates every
-dispatch cheaply first with `enter-stage.sh --simulate <next stage>`
+dispatch cheaply first with `--enter-stage --simulate <next stage>`
 (lifecycle-kit/SPEC.md §bin/enter-stage.sh) — oracle-first made concrete.
 
 **That read is a step rather than one of two options, and the ground is what it
@@ -364,7 +364,7 @@ ruling classes are stated.>*
 
 The lead writes **no** lifecycle state — no WORKFLOW-STATE stamps, no queue
 writes, no evidence files. Every stamp originates in the stage session via
-`enter-stage.sh` (lifecycle-kit/SPEC.md §The state machine). Lead-does-stamping
+`--enter-stage` (lifecycle-kit/SPEC.md §The state machine). Lead-does-stamping
 is ruled out, not merely omitted: it breaks this invariant, and under the
 `stage` posture of `LIFECYCLE_KIT_SESSION_BOUNDARY` a lead stamp is exactly the
 self-reported skip `check-stage-evidence` exists to catch.
@@ -446,7 +446,7 @@ consequences:
   every assignment when the harness model roster churns.
 - **An intra-stage batch split is the lead's to own.** When a stage's work
   splits into batches, those batches are **N sibling stage sessions the lead
-  dispatches and verifies** — each entering through `enter-stage.sh` as a
+  dispatches and verifies** — each entering through `--enter-stage` as a
   same-stage re-entry (lifecycle-kit/SPEC.md §The state machine: N sessions may
   enter one stage, each leaving its own stamp and the cursor staying put). A stage session **never dispatches a sibling stage session**: a stage
   that sub-dispatches its own batches nests a second supervisor at the lead's

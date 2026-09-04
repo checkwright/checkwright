@@ -217,7 +217,7 @@ pub fn run(args: &[String]) -> i32 {
         for f in &findings {
             println!("{}", f);
         }
-        println!("  help: a boundary-truncated surface is emptied by the next enter-stage.sh boundary reset, so the");
+        println!("  help: a boundary-truncated surface is emptied by the next --enter-stage boundary reset, so the");
         println!("        pointer resolves to nothing one iteration after it is written. Inline the finding instead —");
         println!("        bash gate-sdk/bin/run-gates.sh --emit cite-survey \"<heading-substring>\" emits the block's");
         println!("        heading and all five witness fields, which is what keeps it re-usable rather than");

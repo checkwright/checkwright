@@ -1,5 +1,5 @@
 The `consult` skill — an operator strategy session whose conclusions leave the
-transcript. Not an iteration stage: it invokes no `enter-stage.sh`, stamps no
+transcript. Not an iteration stage: it invokes no `--enter-stage`, stamps no
 `WORKFLOW-STATE.txt`, and holds no cursor, so it may run before an iteration
 opens, between stages, or across an iteration boundary. Exit condition:
 every ruling the operator closed in the session has landed in a governed

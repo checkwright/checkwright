@@ -19,7 +19,8 @@ file, and the bidirectional rule reds any `[spec:]` ref resolving to no file, so
 a skipped `spec` cannot ship a feature without its amendment (the same
 procedural-plus-one-gated-backstop shape as the audit stage's own trigger).
 
-**First step — stamp evidence.** Run lifecycle-kit's `bin/enter-stage.sh spec`:
+**First step — stamp evidence.** Run the lifecycle arm,
+`bash gate-sdk/bin/run-gates.sh --enter-stage spec`:
 it appends `<iteration> spec <session-id> <date> <head>` to
 `.workflow/WORKFLOW-STATE.txt` (required by `check-stage-evidence`; the stamp
 proves invocation, not faithful execution), reading `<session-id>` from
@@ -106,7 +107,7 @@ cross-component amendment should say so rather than let the downstream entry
 discover it.
 
 **Last step — the resume journal.** This stage's exit artifact is the resume
-journal `enter-stage.sh` named at the stamp; its path is a derivation
+journal the `--enter-stage` arm named at the stamp; its path is a derivation
 (lifecycle-kit/SPEC.md §The state machine) and its contract is
 delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps.
 Append `DONE` as the file's last line before you report.

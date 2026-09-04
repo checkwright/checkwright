@@ -26,7 +26,6 @@
       "Bash(bash gate-sdk/bin/install-hooks.sh)",
       "Bash(bash gate-sdk/bin/build-native.sh)",
       "Bash(bash gate-sdk/bin/build-native.sh *)",
-      "Bash(bash lifecycle-kit/bin/enter-stage.sh *)",
       "Bash(bash context-kit/bin/always-loaded.sh)",
       "Bash(bash context-kit/bin/always-loaded.sh *)",
       "Bash(bash context-kit/bin/run-index-tests.sh)",

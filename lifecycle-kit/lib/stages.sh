@@ -139,7 +139,7 @@ lifecycle_stage_known() {
     return 1
 }
 
-# spec: lifecycle-kit/SPEC.md §Multi-operator semantics — the iteration-scoped supersede set: exactly the surfaces enter-stage.sh truncates at the iteration boundary (the state file, the two kit-owned built-ins, and every LIFECYCLE_KIT_BOUNDARY_TRUNCATE member). Derived here so the installer's .gitattributes block and check-merge-attrs's parity check read one set and cannot drift.
+# spec: lifecycle-kit/SPEC.md §Multi-operator semantics — the iteration-scoped supersede set: exactly the surfaces --enter-stage truncates at the iteration boundary (the state file, the two kit-owned built-ins, and every LIFECYCLE_KIT_BOUNDARY_TRUNCATE member). Derived here so the installer's .gitattributes block and check-merge-attrs's parity check read one set and cannot drift.
 lifecycle_supersede_set() {
     printf '%s\n' "$LIFECYCLE_KIT_STATE_FILE" "$LIFECYCLE_KIT_LESSON_EVIDENCE_FILE" "$LIFECYCLE_KIT_SURVEY_RECORD_FILE"
     local m

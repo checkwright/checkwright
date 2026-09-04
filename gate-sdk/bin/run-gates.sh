@@ -30,6 +30,7 @@ usage: run-gates.sh [gates-dir]                run every registered gate
        run-gates.sh --lesson-sink <tag>        route a lesson body on stdin to its sink
        run-gates.sh --upgrade-smoke            prove the FROM->TO kit upgrade in scratch
        run-gates.sh --install-lifecycle [file] install the lifecycle resident surfaces
+       run-gates.sh --enter-stage <stage>      stamp a stage entry (or --rename an iteration)
        run-gates.sh --wait-probe <sub> [args]  the wait-primitive probe: 'sweep' is the reproducer
        run-gates.sh -h | --help                this text, on stdout, exit 0
 
@@ -74,6 +75,14 @@ usage: run-gates.sh [gates-dir]                run every registered gate
           config. The optional positional is the agent file to write into,
           overriding LIFECYCLE_KIT_AGENT_FILE. Idempotent; exit 2 when the agent
           file is absent or a marker pair is malformed, and unavailable is 2.
+  --enter-stage  appends the invocation stamp that IS a stage transition, after
+          running the entry pre-flight; `--simulate` runs everything up to the
+          write and writes nothing, and `--rename <name>` renames the iteration
+          across the queue header and column 1 of every stamp. Exit 0 a stamp or
+          a reported no-op, 1 a refusal, 2 a usage or configuration error;
+          unavailable is 2, because the caller is a stage session's first step
+          whose failure must be visible and a silent 0 would let a session
+          believe it had stamped.
   --wait-probe  stands known-duration producers up and measures candidate wait
           forms against them, one trial line per run. The subcommand is an
           operand: produce, waiter, arm-local, record, report, sweep — the
@@ -191,6 +200,13 @@ case "${1-}" in
     --install-lifecycle)
         shift
         exec_arm --install-lifecycle "$@"
+        ;;
+    # spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — a bridged arm outside the `--emit-` family:
+    # its contract is a three-state exit status rather than a document, and unavailable is 2 because
+    # its caller is a stage session's first step whose failure must be visible
+    --enter-stage)
+        shift
+        exec_arm --enter-stage "$@"
         ;;
     # spec: delegation-kit/SPEC.md §bin/wait-probe — a bridged arm outside the `--emit-` family, on
     # its three-state exit status. Unavailable keeps exit 2 because the caller is a session reading

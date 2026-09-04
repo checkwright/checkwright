@@ -3,8 +3,10 @@
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
-DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # lifecycle-kit/
-ENTER="$DIR/bin/enter-stage.sh"
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the second sanctioned caller: this harness
+# drives the arm from a non-git sandbox cwd, which bin/run-gates.sh refuses by design (it cds to
+# the git toplevel and a `mktemp -d` is no repository), so it resolves the binary and the bridged
+# environment through gate_arm_run rather than through that front-end.
 SANDBOX="$(mktemp -d)"
 trap 'rm -rf "$SANDBOX"' EXIT
 
@@ -50,10 +52,10 @@ git_seed() {  # $1=sandbox subdir; seeds and turns it into a real checkout with 
 
 run_enter() {  # $1=sandbox subdir  $2...=enter-stage argv
     local sb="$1"; shift
-    ( cd "$sb" && env LIFECYCLE_KIT_CONFIG_FILE="$sb/lifecycle-config.sh" \
-                      GATE_SDK_TMP_DIR=scratch \
-                      LIFECYCLE_KIT_SESSION_ID=deadbeef01 \
-                      bash "$ENTER" "$@" 2>&1 )
+    ( cd "$sb" && gate_env LIFECYCLE_KIT_CONFIG_FILE="$sb/lifecycle-config.sh" \
+                           GATE_SDK_TMP_DIR=scratch \
+                           LIFECYCLE_KIT_SESSION_ID=deadbeef01 \
+        && gate_arm_run --enter-stage "$@" 2>&1 )
 }
 
 state_of() { cat "$1/.workflow/WORKFLOW-STATE.txt"; }
@@ -79,10 +81,10 @@ grep -qF '.claude/worktrees/agent-01' <<<"$out" || note sim-path "the simulate r
 [[ "$(state_of "$wt")" == "$before" ]]          || note sim-nowrite "--simulate wrote to the state file"
 
 # --- the knob turns it off, and the same entry then proceeds ---
-out="$( cd "$wt" && env LIFECYCLE_KIT_CONFIG_FILE="$wt/lifecycle-config.sh" \
-                        GATE_SDK_TMP_DIR=scratch LIFECYCLE_KIT_SESSION_ID=deadbeef01 \
-                        LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK=0 \
-                        bash "$ENTER" --simulate scope 2>&1 )"; rc=$?
+out="$( cd "$wt" && gate_env LIFECYCLE_KIT_CONFIG_FILE="$wt/lifecycle-config.sh" \
+                             GATE_SDK_TMP_DIR=scratch LIFECYCLE_KIT_SESSION_ID=deadbeef01 \
+                             LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK=0 \
+        && gate_arm_run --enter-stage --simulate scope 2>&1 )"; rc=$?
 [[ "$rc" -eq 0 ]] || note knob-off "the knob at 0 still refused: $out"
 
 # --- a NON-boundary entry ignores the worktree entirely ---
@@ -98,11 +100,11 @@ DEAD_PID=2147483646   # never a live process; the same probe value producer_live
 
 run_classified() {  # $1=sandbox  $2=pattern  $3...=argv
     local sb="$1" re="$2"; shift 2
-    ( cd "$sb" && env LIFECYCLE_KIT_CONFIG_FILE="$sb/lifecycle-config.sh" \
-                      GATE_SDK_TMP_DIR=scratch \
-                      LIFECYCLE_KIT_SESSION_ID=deadbeef01 \
-                      LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE="$re" \
-                      bash "$ENTER" "$@" 2>&1 )
+    ( cd "$sb" && gate_env LIFECYCLE_KIT_CONFIG_FILE="$sb/lifecycle-config.sh" \
+                           GATE_SDK_TMP_DIR=scratch \
+                           LIFECYCLE_KIT_SESSION_ID=deadbeef01 \
+                           LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE="$re" \
+        && gate_arm_run --enter-stage "$@" 2>&1 )
 }
 
 seed_wt() {  # $1=name -> echoes the sandbox path with one linked worktree at .claude/worktrees/agent-01

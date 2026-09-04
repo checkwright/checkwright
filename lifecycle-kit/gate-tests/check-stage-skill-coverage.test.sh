@@ -22,7 +22,7 @@ seed() {  # $1=sandbox-dir; the default stage roster, every skill carrying the c
     local sb="$1" s
     mkdir -p "$sb/commands"
     for s in scope align build validate close; do
-        printf '# %s\n`bash lifecycle-kit/bin/enter-stage.sh %s`\n\nLast step (%s).\n' \
+        printf '# %s\n`bash gate-sdk/bin/run-gates.sh --enter-stage %s`\n\nLast step (%s).\n' \
             "$s" "$s" "$CITE" >"$sb/commands/$s.md"
     done
 }
@@ -45,7 +45,7 @@ check_case "missing-skill" "$f" 1 "no skill for stage: close"
 
 # --- reverse: a retired stage's orphan skill is a dead entry point ---
 r="$SANDBOX/reverse"; seed "$r"
-printf '# polish\n`bash lifecycle-kit/bin/enter-stage.sh polish`\n' >"$r/commands/polish.md"
+printf '# polish\n`bash gate-sdk/bin/run-gates.sh --enter-stage polish`\n' >"$r/commands/polish.md"
 check_case "orphan-skill" "$r" 1 "not a lifecycle stage"
 
 # --- a non-stage skill invoking nothing is not flagged by either direction ---

@@ -202,7 +202,7 @@ git -C "$r" add -A
 repo_case "purity-boundary-exemption-is-first-stage-only" "$r" 1 "also stages 'TASK-QUEUE.md'"
 
 # N3 — the valve ledger is exempt at ANY stage, which is the predicate the exemption always had
-#      stated as itself: bin/enter-stage.sh writes the ledger and the stamp in one motion at an
+#      stated as itself: --enter-stage writes the ledger and the stamp in one motion at an
 #      admitting entry, and that entry is never the first stage's. The stage restriction rides
 #      membership — a non-admitting entry leaves the ledger unstaged — so no stage name gates it.
 r="$(repo_new valve-ledger)"

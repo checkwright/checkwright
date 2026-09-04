@@ -111,7 +111,7 @@ pub fn live_slug(queue_text: &str, prose: &str) -> Option<String> {
 
 // spec: lifecycle-kit/SPEC.md §lib/stages.sh — the closing-stage predicate, composed here from the
 // cursor and the last configured stage; the hoisting's by-construction guarantee holds inside each
-// substrate and not across them until `bin/enter-stage.sh` ports.
+// substrate and not across them until `--enter-stage` ports.
 fn cursor() -> Result<(String, bool), String> {
     let (state, _) = super::file_survey::anchored("LIFECYCLE_KIT_STATE_FILE")?;
     let text = std::fs::read(state)

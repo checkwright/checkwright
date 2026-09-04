@@ -240,6 +240,17 @@ before resolving them. That sentence states **shape and mechanism and never
 dialect** — which spelling a root arrives in, and who owes the conversion, is
 §The path-dialect contract below.
 
+**That `cd` refuses outside a repository, and the refusal is why a bridged arm may
+have a second caller.** `bin/run-gates.sh` exits 2 with `not inside a git
+repository` when the toplevel does not resolve, so an arm whose contract includes
+running in a non-git directory is unreachable through the front-end. Widening the
+`cd` conditionally is **ruled out**: it would weaken, for one arm's benefit, the
+precondition every gate in the battery rests on. The sanctioned answer is the
+second caller — a harness resolving the binary and the bridged environment itself
+and invoking the arm directly (§The non-gate arm) — which costs one helper and
+nothing outside the harnesses that need it. `--enter-stage` is the worked instance
+(lifecycle-kit/SPEC.md §bin/enter-stage.sh).
+
 `lib/gate.sh` auto-sources the consumer config seam on load, so every gate sees
 the same knob resolution, whether it sources the library itself or is dispatched
 through it as a `.gate` member: `GATE_SDK_CONFIG_FILE` when
@@ -2238,8 +2249,9 @@ arms below it, and the bridged `Arm::Run` members that are neither —
 `--lesson-sink` (queue-kit/SPEC.md §The lesson-sink arm), `--upgrade-smoke`
 (§upgrade-smoke), `--install-lifecycle` (lifecycle-kit/SPEC.md
 §bin/install-lifecycle.sh, its 2026-09-03 member), `--usage-verdict`
-(delegation-kit/SPEC.md §usage-verdict) and `--wait-probe`
-(delegation-kit/SPEC.md §bin/wait-probe), its 2026-09-04 pair — and the class
+(delegation-kit/SPEC.md §usage-verdict), `--wait-probe`
+(delegation-kit/SPEC.md §bin/wait-probe) and `--enter-stage`
+(lifecycle-kit/SPEC.md §bin/enter-stage.sh) — and the class
 they form is named here because a
 session arriving with a new non-gate thing to port has no other way to learn
 that one exists or what it costs. Each arm's own `spec:` comment explains that
@@ -2672,6 +2684,27 @@ already-sourced subshell (§lib/gate.sh) — the shell contract moved rather tha
 re-implemented, on `--emit-enforcement-map`'s `EVIDENCE_KIT_RUN_*` precedent.
 Recorded because both mechanisms answer "the roster is not knowable here" and
 only one answers "the roster is the namespace".
+
+**`--enter-stage` is the family's third instance and the first where the family is
+a whole kit's namespace** rather than a sub-family inside one (lifecycle-kit/SPEC.md
+§bin/enter-stage.sh). It is the sentinel's case in miniature and not the
+sentinel's: that arm carries no `--gates-dir` in its grammar and dispatches two
+**named** gates in one kit, so the registry sentinel would expand to nothing while
+the family answers exactly. It is also the class's first member with **two
+sanctioned callers** — a session through the front-end, and a hermetic harness
+reaching the binary directly because the front-end refuses outside a git
+repository and the harness runs in a non-git sandbox. That second caller is a
+*caller* in good standing rather than a second entry point into the emission path,
+which is the distinction this section draws.
+
+**A declared roster must carry what an arm bridges *onward*, not only what it
+reads itself.** A dispatching arm builds its child's environment by **filtering
+the set it was handed**, so a knob the child declares and the parent does not is
+unreachable to the child however faithfully the child declares it — the filter
+resolves nothing. Stated because the natural reading is the other one, and because
+its failure mode is silent at authoring time and total at run time: the child
+fail-closes on a knob nobody withheld deliberately. `--enter-stage`'s roster
+carries three names outside its own family for exactly this reason.
 
 **Most of what that port needed was already in the crate**, which was the other
 half of why the route was recordable ahead of it. `registry.rs` owns the registry
@@ -4876,7 +4909,7 @@ callers**, and that is the transferable part. Five cohorts deleted a
 fixture harness and that harness has resolved substrate-agnostically since the
 first cohort. lifecycle-kit is the first kit whose **scenario runners**, whose own
 **`bin/`** and whose own **`smoke/`** name their gates by script path — including
-`bin/enter-stage.sh`, the stamp mechanism every stage entry in a consumer running
+`--enter-stage`, the stamp mechanism every stage entry in a consumer running
 the lifecycle goes through. Sizing such a cohort as N gate ports and meeting the
 callers at implementation time is exactly the failure criterion 7 exists to
 prevent, so a selector reaching a kit that ships `bin/` or `smoke/` enumerates the
@@ -8329,8 +8362,23 @@ Resolution, per declared knob:
   silently serialized its **values**, in hash order, losing the keys. The
   documented limit was therefore prose-only, and nothing stopped a consumer from
   porting such a gate and receiving a quietly wrong environment. The keyed arm
-  removes the hazard **by construction** — the shape is now taken rather than
-  fallen through — which is why no separate guard is added for it.
+  removes the hazard where the knob is named outright — the shape is taken rather
+  than fallen through.
+
+  **It did not remove it from the *prefix-family* arm, and "by construction" was
+  the wrong claim to make about a second code path.** The family arm resolves its
+  matches through the same nameref expansion the named arm abandoned, so a keyed
+  knob crossing under a family declaration kept serializing its values with the
+  keys destroyed — passing every element-shape refusal on the way, since tab-joined
+  values are well-formed. It survived two live family members because neither owned
+  a keyed knob; the first arm to declare a whole kit's namespace brought one with
+  it. Both arms now take the same keyed branch, and the correction ships with the
+  oracle its absence explains: `gate-tests/knob-family-parity.test.sh` holds the
+  two arms **against each other** over a keyed, an indexed, a scalar and both empty
+  knobs, rather than against either one's output. The lesson is recorded with the
+  fix — a serialization claimed correct *by construction* owes an executed
+  comparison wherever a second code path can reach the same value, because the
+  failure is silent on both sides of the wire.
 
   **The tab refusal is discharged upstream for a consumer-supplied ERE**, which is
   worth recording rather than re-checking per port. A POSIX ERE legitimately may

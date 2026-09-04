@@ -6,6 +6,7 @@ pub mod close_surfaces;
 pub mod docs_mirror;
 pub mod drift_report;
 pub mod enforcement_map;
+pub mod enter_stage;
 pub mod enum_sets;
 pub mod env_probe;
 pub mod file_gap;
@@ -69,8 +70,6 @@ pub fn self_repo_prefix(reference: &str) -> String {
 
 // spec: context-kit/SPEC.md §Index-first reading — the index walk both index arms share, sited
 // here on `self_repo_prefix`'s reading: one traversal-exclusion set, so one copy of the walk.
-// spec: context-kit/SPEC.md §Index-first reading — the targets, spelled as given because the
-// empty-case message names them back.
 pub fn targets(args: &[String]) -> Result<Vec<String>, String> {
     if args.is_empty() {
         return Ok(vec![match crate::walk::toplevel_opt()? {
@@ -390,18 +389,16 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         session_id::KNOBS,
     ),
     // spec: canon-kit/SPEC.md §check-prose-enum — the bundled enum-set emitter, an `Arm::Emit`:
-    // the contract is a document and every failure is already exit 2
-    // spec: gate-sdk/SPEC.md §The non-gate arm — a **two-kit** declared roster, resolved a slice
-    // at a time by the partitioning bridge; it may never gain either enum-set knob
+    // the contract is a document and every failure is already exit 2 spec: gate-sdk/SPEC.md §The
+    // non-gate arm — a **two-kit** declared roster, resolved a slice at a time by the
     (
         "--emit-enum-sets",
         Arm::Emit(enum_sets::emit),
         enum_sets::KNOBS,
     ),
     // spec: evidence-kit/SPEC.md §Layout and configuration — the two parser adapters, reached as
-    // the *value* of `EVIDENCE_KIT_PARSER_<suite>` rather than as a named adapter
-    // spec: gate-sdk/SPEC.md §The non-gate arm — both rosters are empty of the
-    // `--emit-md-section` kind, not the `--emit-session-id` kind
+    // the *value* of `EVIDENCE_KIT_PARSER_<suite>` rather than as a named adapter spec: gate-
+    // sdk/SPEC.md §The non-gate arm — both rosters are empty of the `--emit-md-section` kind, not
     (
         "--emit-parse-gates-log",
         Arm::Emit(parse_gates_log::emit),
@@ -474,6 +471,14 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         "--install-lifecycle",
         Arm::Run(install_lifecycle::run),
         install_lifecycle::KNOBS,
+    ),
+    // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — an `Arm::Run` because the exit contract
+    // is three-state and every code is load-bearing: 0 a stamp or a reported no-op, 1 a refusal,
+    // 2 a usage or configuration error, and the state machine reads that difference.
+    (
+        "--enter-stage",
+        Arm::Run(enter_stage::run),
+        enter_stage::KNOBS,
     ),
     // spec: delegation-kit/SPEC.md §bin/wait-probe — an `Arm::Run` because its exit contract is
     // three-state: `report` returns 1 on an empty evidence file, an honest empty reading an emitting

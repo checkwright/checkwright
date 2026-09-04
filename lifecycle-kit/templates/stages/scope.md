@@ -7,8 +7,8 @@ them. Exit condition: *<exit-condition: your scope exit
 condition — e.g. no design-pending tag left in the active queue; your
 amendment-readiness gate green>*.
 
-**First step — reset + stamp evidence.** Run lifecycle-kit's
-`bin/enter-stage.sh scope`. `scope` is the iteration boundary, so the tool
+**First step — reset + stamp evidence.** Run the lifecycle arm
+`bash gate-sdk/bin/run-gates.sh --enter-stage scope`. `scope` is the iteration boundary, so the tool
 *resets* the evidence file: it truncates `.workflow/WORKFLOW-STATE.txt` back
 to its header (dropping the prior iteration's stamps — git history is the
 permanent audit trail; the gates only ever read the current iteration), stamps
@@ -151,7 +151,7 @@ splitting an entry is safe only against that total: a split scatters an entry's
 weight across siblings, and the sum is what puts it back together.
 
 When done, **set the iteration name without waiting for confirmation** and
-inform the user: run `bash lifecycle-kit/bin/enter-stage.sh --rename <name>`,
+inform the user: run `bash gate-sdk/bin/run-gates.sh --enter-stage --rename <name>`,
 which writes both surfaces — the queue header and column 1 of every stamp — in
 one motion and names them for the one commit they ride in. Never edit either by
 hand: `check-stage-evidence` requires every stamp's iteration to match the
@@ -180,7 +180,7 @@ lead-less or harness-less consumer; point at the consumer's documented
 start sequence by citation, never restating its steps here>*.
 
 **Last step — the resume journal.** This stage's exit artifact is the resume
-journal `enter-stage.sh` named at the stamp; its path is a derivation
+journal the `--enter-stage` arm named at the stamp; its path is a derivation
 (lifecycle-kit/SPEC.md §The state machine) and its contract is
 delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps.
 Append `DONE` as the file's last line before you report.

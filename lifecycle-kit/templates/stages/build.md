@@ -23,8 +23,8 @@ stamp or an explicit `<iter> align-waived <session> <date> <head>` waiver line,
 written **only on the user's explicit ruling** — never self-issued by this
 entering session.
 
-**First step — stamp evidence.** Run lifecycle-kit's
-`bin/enter-stage.sh build`: it appends `<iteration> build <session-id> <date> <head>`
+**First step — stamp evidence.** Run the lifecycle arm
+`bash gate-sdk/bin/run-gates.sh --enter-stage build`: it appends `<iteration> build <session-id> <date> <head>`
 to `.workflow/WORKFLOW-STATE.txt` (required by `check-stage-evidence`; the
 stamp proves invocation, not faithful execution), reading `<session-id>` from
 the `--emit-session-id` arm
@@ -45,7 +45,7 @@ summary would lossily erode the approved plan and re-derived premises. Prefer
 a session reset at a task boundary; reach for mid-task summarization only as
 a fallback before a commit, never as the routine per-task reset.
 
-**Every session still stamps** — re-run `bin/enter-stage.sh build` each
+**Every session still stamps** — re-run `bash gate-sdk/bin/run-gates.sh --enter-stage build` each
 session: it appends a fresh `<iter> build <session-id> <date> <head>` line with this
 session's id, so WORKFLOW-STATE keeps the per-session audit trail
 (`check-stage-evidence` tolerates multiple `build` stamps). A sibling stamp
@@ -104,7 +104,7 @@ deployment-faithfully before the stage exits; a green battery is tree-correct,
 not artifact-correct (Oracle-first).
 
 **Last step — the resume journal.** This stage's exit artifact is the resume
-journal `enter-stage.sh` named at the stamp; its path is a derivation
+journal the `--enter-stage` arm named at the stamp; its path is a derivation
 (lifecycle-kit/SPEC.md §The state machine) and its contract is
 delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps.
 Append `DONE` as the file's last line before you report.

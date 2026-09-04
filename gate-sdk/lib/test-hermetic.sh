@@ -23,6 +23,21 @@ gate_env() {  # $1.. = NAME=VALUE — a case's environment, applied in the calle
     return 0
 }
 
+# spec: gate-sdk/SPEC.md §The non-gate arm — the arm counterpart of gate_run below: invoke a bridged arm through its declared dispatch rather than through bin/run-gates.sh. That front-end cds to the git toplevel and refuses outside a repository, and a hermetic harness drives its subject from a non-git sandbox cwd, so the harness resolves the binary and the bridged environment itself — the sanctioned second caller, not a second entry point into the emission path. A bridged environment the config bridge refuses to build is exit 2, the verdict the dispatcher gives it, which is also how a malformed consumer config keeps reaching the caller as a configuration error.
+gate_arm_run() {  # $1=arm flag  $2.. = the arm's own argv
+    local _ar_arm="$1"
+    shift
+    local _ar_bin _ar_env
+    local -a _ar_elems=()
+    # shellcheck source=./gate.sh
+    source "$GATE_SDK_TEST_LIB_DIR/gate.sh"
+    _ar_bin="$(gate_native_bin)"
+    [[ -x "$_ar_bin" ]] || return 2
+    _ar_env="$(gate_knob_env "$_ar_arm" "$@")" || return 2
+    [[ -n "$_ar_env" ]] && mapfile -t _ar_elems <<<"$_ar_env"
+    env ${_ar_elems[@]+"${_ar_elems[@]}"} "$_ar_bin" "$_ar_arm" "$@"
+}
+
 gate_run() {  # $1=gate-name  $2=checks-dir (absolute)  $3.. = gate args
     local _gr_gate="$1" _gr_dir="$2"
     shift 2

@@ -3,8 +3,10 @@
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
-DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # lifecycle-kit/
-ENTER="$DIR/bin/enter-stage.sh"
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the second sanctioned caller: this harness
+# drives the arm from a non-git sandbox cwd, which bin/run-gates.sh refuses by design (it cds to
+# the git toplevel and a `mktemp -d` is no repository), so it resolves the binary and the bridged
+# environment through gate_arm_run rather than through that front-end.
 SANDBOX="$(mktemp -d)"
 trap 'rm -rf "$SANDBOX"' EXIT
 
@@ -40,7 +42,7 @@ EOF
 
 run_rename() {  # $1=sandbox subdir, rest = argv after the tool name
     local sb="$1"; shift
-    ( cd "$sb" && env GATE_SDK_TMP_DIR="$sb/scratch" bash "$ENTER" "$@" 2>&1 )
+    ( cd "$sb" && gate_env GATE_SDK_TMP_DIR="$sb/scratch" && gate_arm_run --enter-stage "$@" 2>&1 )
 }
 
 fields_2_to_nf() { awk '/^---[[:space:]]*$/ { f = 1; next } f && NF { s = ""; for (i = 2; i <= NF; i++) s = s (i > 2 ? " " : "") $i; print s }' "$1"; }

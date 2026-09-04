@@ -39,7 +39,7 @@ Two governed surfaces, carrying **one axis each**:
   It carries the *fast* axis too: **the last data line's `<stage>` token is the
   cursor** — the single source for "which stage is this iteration in".
 
-  `<head>` is the abbreviated commit `bin/enter-stage.sh` read at the instant
+  `<head>` is the abbreviated commit `--enter-stage` read at the instant
   it wrote the stamp, or the literal `none` where it found no git work tree and
   no commit to name. It is **required**, and `none` is a value rather than an
   omission: a permanently optional field is a permanent disarm switch for the
@@ -220,7 +220,7 @@ them here.
 The **deterministic half** of that first step — read the iteration from the
 header, read the id from the `--emit-session-id` arm, append the stamp — is
 mechanized by
-`bin/enter-stage.sh <stage>`, the same
+`bash gate-sdk/bin/run-gates.sh --enter-stage <stage>`, the same
 writer/asserter split as `gen-pre-commit.sh` ↔ `check-graph`: the skill
 invokes it, **judgment stays in the skill** (what the stage means, its exit
 condition, when to enter it at all), and the stage gates stay the independent
@@ -233,12 +233,12 @@ valve's contract several sections away: an entry the one-shot pre-flight valve
 admitted rewrites the valve ledger in the same motion as the stamp, so the two
 commit together and the purity assertion exempts exactly that path
 (§bin/enter-stage.sh, §check-stage-evidence). And **never with `--no-verify`**:
-`enter-stage.sh` refuses to write
+`--enter-stage` refuses to write
 while `check-stage-entry` is red, so the hook a bypass skips is exactly the
 battery that would confirm the stamp just written. A stage entry is never the
 one-off-with-cause that a bypass is reserved for.
 
-The first stage is the iteration boundary: `enter-stage.sh` *truncates* the
+The first stage is the iteration boundary: `--enter-stage` *truncates* the
 evidence file back to its header (git history is the permanent audit trail;
 the gates only read the current iteration) and stamps under the
 unnamed-iteration sentinel `—`, rewritten to the real name when the stage
@@ -272,7 +272,7 @@ see §check-stage-evidence).
 
 **Same-stage re-entry (N sibling sessions per stage).** Entering the
 currently-stamped stage from a *new* session is legal and appends a fresh
-stamp: `enter-stage.sh`'s idempotence guard keys on the full
+stamp: `--enter-stage`'s idempotence guard keys on the full
 `(iteration, stage, session-id, head)` tuple, so only the *same* session
 re-entering **at the same commit** is a no-op — a re-entry after `HEAD` moved
 appends a fresh stamp carrying the new head, which is what makes re-running the
@@ -291,7 +291,7 @@ no once-per-stage write left to make idempotent.
 with a live *lead* session (§templates/lead.md) that dispatches its stage
 sessions and answers their escalations so a blocked stage resumes in place
 rather than restarting. The lead writes no state: every stamp
-originates in a stage session through `enter-stage.sh`, exactly as above, so the
+originates in a stage session through `--enter-stage`, exactly as above, so the
 stamp protocol stays the only iteration state and a lead crash costs
 nothing the tracked surfaces do not already hold. The lead is a boundary skill,
 not a stage — it stamps nothing and joins no stage set, so the coverage gate
@@ -343,7 +343,7 @@ one about which command is safe *once it is*.
 
 The stages walk `scope → align → build → validate → close` in order by
 default; the gate-legal shapes for leaving that walk are specified here, not
-improvised. Each composes mechanism the kit already owns — `enter-stage.sh`'s
+improvised. Each composes mechanism the kit already owns — `--enter-stage`'s
 boundary reset, canon-kit's amendment pairing, queue-kit's tag algebra — so
 **no new tooling, state, stamp grammar, or tag is introduced**, and a
 harness-less consumer keeps every shape. `check-stage-entry` and the stamp
@@ -366,7 +366,7 @@ regardless, since a demoted entry stays a live queue task).
 explicitly — demote it (ritual above) or carry it (it stays active with its
 amendment and the next iteration adopts it); sink or delete every Lessons entry
 under the existing disposition rules (the first-stage entry refuses a non-empty
-Lessons section, so this is already forced). Then the next `enter-stage.sh
+Lessons section, so this is already forced). Then the next `--enter-stage
 scope` *is* the abandon: scope has no mandatory predecessor, so the entry is
 gate-legal from any stage, and the boundary reset drops the dead iteration's
 stamps exactly as it drops a closed one's (git history is the permanent audit
@@ -581,7 +581,7 @@ the clause's reader is a human or agent rather than a gate.
   `iteration`, that cross-stage distinctness check alone is skipped —
   attribution still rides the stamps, and every other assertion holds. The
   loader validates the value alongside its machine checks and exits 2 on
-  anything else. `enter-stage.sh` does not read it — stamping is
+  anything else. `--enter-stage` does not read it — stamping is
   posture-independent; `templates/lead.md` consumes it as the inline-run
   posture prose.
 - `LIFECYCLE_KIT_LESSON_EVIDENCE_FILE` — the kit-owned lesson-disposition stamp
@@ -591,12 +591,12 @@ the clause's reader is a human or agent rather than a gate.
   (§The committed gap inbox); default
   `${GATE_SDK_WORKFLOW_DIR:-.workflow}/gap-inbox.md`, written by the `--emit-file-gap` arm,
   its `merge=union` attribute verified by `check-merge-attrs`, drained by the
-  close skill and read for emptiness by `bin/enter-stage.sh`'s boundary refusal.
+  close skill and read for emptiness by `--enter-stage`'s boundary refusal.
 - `LIFECYCLE_KIT_SURVEY_RECORD_FILE` — the committed per-iteration survey record
   (§The survey record); default
   `${GATE_SDK_WORKFLOW_DIR:-.workflow}/survey-record.md`, written by the
   `--emit file-survey` arm, asserted by `check-survey-record`, its headings
-  printed and its body truncated by `bin/enter-stage.sh` (a kit-owned boundary built-in,
+  printed and its body truncated by `--enter-stage` (a kit-owned boundary built-in,
   so it does not ride `LIFECYCLE_KIT_BOUNDARY_TRUNCATE`), and its
   `merge=iteration-scoped` attribute verified by `check-merge-attrs`. One knob,
   and no second one for the grammar, the witness commands, or an opt-out — each
@@ -734,7 +734,7 @@ own, where git already provides the isolation).
 resolve wholesale to the *arriving* (checked-out) iteration's version — the other
 side's content is per-iteration scratch the boundary doctrine already declares
 dead (git history is the permanent audit trail). The supersede set is **derived,
-never maintained**: it is exactly what `bin/enter-stage.sh` truncates at the
+never maintained**: it is exactly what `--enter-stage` truncates at the
 iteration boundary — `LIFECYCLE_KIT_STATE_FILE`,
 `LIFECYCLE_KIT_LESSON_EVIDENCE_FILE`, `LIFECYCLE_KIT_SURVEY_RECORD_FILE`, and
 the `LIFECYCLE_KIT_BOUNDARY_TRUNCATE`
@@ -779,7 +779,7 @@ filing) land on the discoverer's own branch and reconcile at merge.
 
 **Causal-completeness core: no new state surface.** The design adds no stamp
 grammar, no queue tag, no evidence file. Every existing producer/consumer pair
-(`enter-stage.sh`, the stage gates, the drift report) keeps working per-branch
+(`--enter-stage`, the stage gates, the drift report) keeps working per-branch
 unmodified. The two added surfaces each have a named reader at a named
 transition: the `merge=iteration-scoped` lines are read by git's merge machinery
 at a merge and by `check-merge-attrs` at pre-commit; the `merge.iteration-scoped`
@@ -844,7 +844,7 @@ contract, not the writer.
 **Taking that port did not discharge this section, and the residue is written
 rather than implied.** Three implementations carry this section's contract and
 only one of them is in-crate. The capture affordance above is compiled.
-`bin/enter-stage.sh` still holds the **iteration-boundary gap-inbox check** and
+`--enter-stage` still holds the **iteration-boundary gap-inbox check** and
 its close-skipped/post-close discriminator (§bin/enter-stage.sh), and it ports in
 a cut of its own. `lib/stages.sh` still holds this surface's union-merge
 membership (§Multi-operator semantics), and it is **permanently shell** under the
@@ -872,7 +872,7 @@ but it may legitimately be *written* in the entry shape (`- **slug** [tag] —
 prose`), so a grammar-only scan would resolve a live lesson as a queue entry and
 ask the filer about something that is not one. The `## Lessons Learned`
 literal is fixed spelling rather than config (queue-kit/SPEC.md §The tag algebra),
-and this kit already carries it — `bin/enter-stage.sh`'s boundary refusal and
+and this kit already carries it — `--enter-stage`'s boundary refusal and
 `check-lesson-disposition` both scan it.
 The done exclusion is the substantive half: a finding that recurs *after* its fix
 landed is a new defect, not a recurrence, and files as one. Resolution is
@@ -955,7 +955,7 @@ with no marker field. It is refused on evidence, on four independent grounds.
   there is no close-stamp commit to anchor on, so the git predicate degenerates
   into "is there a close stamp?" — which is the cursor read, obtained from a file
   the tool already holds open.
-- **It would be `bin/enter-stage.sh`'s first `git` invocation.** That tool shells
+- **It would be `--enter-stage`'s first `git` invocation.** That tool shells
   out to git nowhere: every decision it takes is a read of the queue and the
   state file. Adding history-dependence to the state machine's only writer makes
   the entry decision non-hermetic, and the branch's fixture would have to
@@ -1079,7 +1079,7 @@ concurrent merge must survive. The installer emits the line and
 `check-merge-attrs` verifies it (§bin/install-lifecycle.sh, §check-merge-attrs).
 
 **The boundary check: one detector, two dispositions.**
-`bin/enter-stage.sh`'s first-stage (iteration-boundary) entry is unchanged in
+`--enter-stage`'s first-stage (iteration-boundary) entry is unchanged in
 **detection** — it still fires on any `- ` bullet in the inbox — and
 **discriminates** on which of two dispositions it takes, because the drain and
 the filing window do not coincide.
@@ -1530,7 +1530,7 @@ them**, so the section is not discharged and that is written here rather than
 left to be inferred. The two that moved are the affordances above, each of which
 declared this section in its own `# spec:` header. The two that did not are
 reachable by no stated-contract cut selecting on this section, because each
-declares a different one: `bin/enter-stage.sh` carries this section's **read
+declares a different one: `--enter-stage` carries this section's **read
 trigger** — the entry report that prints the record's headings and never its
 findings — together with the boundary truncation below, and declares
 §bin/enter-stage.sh, so it ports in a different cut; `lib/stages.sh` carries
@@ -1548,7 +1548,7 @@ carries one clause of another section's contract.
 not the surface**, which is the whole of the port's residual here. The raw append
 is already ruled the sanctioned fallback, `check-survey-record` is already
 compiled and stays the assertion, and the read trigger and the boundary
-truncation live in `bin/enter-stage.sh`, which the paragraph above shows stays
+truncation live in `--enter-stage`, which the paragraph above shows stays
 shell. So such a consumer still files surveys by hand, still has them asserted,
 still has them printed at every stage entry and still has them truncated at the
 boundary; what it goes without is one convenience and one witness hint.
@@ -1600,13 +1600,13 @@ residue nobody owes a disposition for.
 `--emit file-survey` through the battery front-end (the raw append the sanctioned
 fallback); the knob default makes the channel live everywhere the kit is vendored, so the deployed
 configuration that must be set is none. Consumer: the next stage session, at its
-`bin/enter-stage.sh` entry — which prints the record's headings, the questions
+`--enter-stage` entry — which prints the record's headings, the questions
 and never the findings — and at the moment it is about to dispatch a survey,
 where the witness applies. Each field's reader at its transition: `corpus` and
 `rev` by the consuming session's `git diff` at the pre-dispatch check, `oracle`
 by the same session at the same transition to re-run, `finding` by that session
 only *after* the witness holds (which is why the entry report prints headings and
-not findings), the `## ` heading by `bin/enter-stage.sh` at every stage entry and
+not findings), the `## ` heading by `--enter-stage` at every stage entry and
 by `check-survey-record` at commit time as the block delimiter. Third reader, at
 the iteration boundary: the first-stage truncate, which reads the surface as a
 whole and discards it.
@@ -1740,14 +1740,37 @@ held `checks/<name>.sh` path, and the payoff has now been collected **twice**:
 each already named the gate. Two attestations rather than one exception, which
 is the stronger claim this rule was written to earn.
 
-The rest exercise `bin/` tools, which are advisory tooling with no gate to
-dispatch and so have nothing to say about reach.
+The rest exercise advisory tooling with no gate to dispatch, and so have nothing
+to say about reach — but since the enter-stage cut they do have something to say
+about **caller**: the seven that drive `--enter-stage` reach the binary and its
+bridged environment directly rather than through gate-sdk's front-end, because
+that front-end refuses outside a git repository and these harnesses run in a
+non-git `mktemp -d` by design. That is the arm's sanctioned second caller
+(§bin/enter-stage.sh), not a bypass, and it is spelled once in
+`gate_arm_run <arm> <argv>` rather than seven times.
+
+**A ported non-gate member owes a both-substrates comparison, and this kit's was
+bought over those same seven harnesses.** With both implementations present, each
+harness ran against each, and a byte-level driver compared them per case over
+twin sandboxes: the exit status, stdout and stderr byte for byte including every
+`help:` line and every simulate prefix, every written file, every unwritten file
+on each refusal path, and the wiped set over a scratch tree seeded with a nested
+preserved basename. Two columns are compared by **shape** rather than by value and
+saying so is the honest half — `<head>` is read live and `<session-id>` is derived,
+so each case either pins them or accepts a short sha, eight hex characters or the
+literal `none`. Because this repo is itself a consumer with a real queue, a second
+comparison was available that the previous cut could not buy: a `--simulate` of
+**every configured stage** on the live tree under both implementations,
+`--simulate` writing nothing by contract. Two differences survived and are named
+rather than hidden: the usage text's program word, which is the one spelling a
+port re-teaches, and the wiped set's report *order*, which moves from `find`'s
+readdir order to a sorted walk — the set identical, the order now deterministic.
 
 `gate-tests/gap-inbox-route.test.sh` is one of those, and it is named because it
 closes a hole rather than adding coverage to a covered path: the
 iteration-boundary gap-inbox check had **no fixture at all**, so both its refusal
 and its recovery text were unpinned while being the thing an entering session
-acts on. It drives `bin/enter-stage.sh` against a sandboxed queue, state file and
+acts on. It drives `--enter-stage` against a sandboxed queue, state file and
 inbox — the harness `gate-tests/boundary-scratch-wipe.test.sh` established — and
 pins the branch both ways: the close-skipped case refuses with the drain recovery
 and writes nothing, the post-close case stamps and carries the bullets with its
@@ -1773,7 +1796,7 @@ states the ground. `LIFECYCLE_KIT_PREDECESSOR` crosses the bridge from here as
 the tree's live keyed-knob instance, which is this member's sharpest form of it.
 
 `lifecycle_current_stage <state-file>` is the **cursor derivation**: the last
-data line's `<stage>` token, the read `bin/enter-stage.sh` already performed
+data line's `<stage>` token, the read `--enter-stage` already performed
 inline, hoisted so every lifecycle reader shares one definition of "current
 stage". It prints empty and returns *success* for both no-cursor shapes (§The
 state machine) — an absent file and a file with no data line — because "no
@@ -1792,12 +1815,12 @@ of `LIFECYCLE_KIT_STAGES`, failure otherwise — including for both no-cursor
 shapes, since a cursor that does not exist has not reached anything. It is
 hoisted rather than spelled at each site because its **two callers must agree by
 construction**: the `--emit-file-gap` arm reads it for the capture-time warning
-that tells a filer which consequence they are buying, and `bin/enter-stage.sh`
+that tells a filer which consequence they are buying, and `--enter-stage`
 reads it at the iteration-boundary gap-inbox check to choose between refusing and
 admitting (§The committed gap inbox). **Since that arm ported, the guarantee
 holds inside each substrate and is lost across them** — the crate composes the
 same test from `stages::current_stage` and the last `LIFECYCLE_KIT_STAGES`
-element, so the two agree by lookalike until `bin/enter-stage.sh` ports, at which
+element, so the two agree by lookalike until `--enter-stage` ports, at which
 point the hoisting's original guarantee returns without further work. A filer warned that "none is left to drain
 it" is warned by the very test that later admits the bullet, rather than by a
 lookalike that can drift from it. **No knob is minted and none is possible**: the
@@ -1813,7 +1836,7 @@ writer/asserter shape for the merge-attribute surface: `lifecycle_supersede_set`
 prints the derived iteration-scoped supersede set (the state file, the two
 kit-owned built-ins — the lesson-evidence file and the survey record — and each
 `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` member: exactly
-what `bin/enter-stage.sh` truncates at the boundary); `lifecycle_union_set`
+what `--enter-stage` truncates at the boundary); `lifecycle_union_set`
 prints the derived union-merge set (the gap inbox — §The committed gap inbox);
 and `lifecycle_merge_attrs_block` renders the supersede set as
 `<path> merge=iteration-scoped` lines and the union set as `<path> merge=union`
@@ -1850,7 +1873,7 @@ derivation**:
 `LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN` with `<stage>` expanded, hoisted here for
 the same reason the cursor is — three readers must name one file or the
 assertion checks a path nobody was asked to write. Its readers are
-`bin/enter-stage.sh` at the entry assertion, a dispatching supervisor deriving
+`--enter-stage` at the entry assertion, a dispatching supervisor deriving
 the path it grants, and the dispatched stage session deriving where to write
 (§The state machine).
 
@@ -1879,7 +1902,7 @@ return non-zero on a routine non-match, run as a bare command, aborts every
 a consumer with a pattern configured being unable to re-emit its own derived
 surfaces, silently and at exit 1 — that caller was `bin/install-lifecycle.sh`,
 which ported on 2026-09-03, and no surviving shell sourcer in this tree
-(`bin/enter-stage.sh`) runs under `set -e`. The contract binds
+(`--enter-stage`) runs under `set -e`. The contract binds
 the next one that does, which is why it is stated as a property of the loader
 rather than as a note about one caller.
 Exercised in `smoke/` with a pattern actually set, the empty default never
@@ -1904,6 +1927,27 @@ retriever at any of its members, and `check-stage-evidence`. So a consumer addin
 `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` member gets citation enforcement over it with no
 second roster to keep in step. Values and adapters only, never
 gate structure (gate-sdk's `lib/gate.sh` rule).
+
+**This library stays shell by declared cause, and since the enter-stage cut it
+owes a parity harness.** It is the config bridge's sole resolver for the
+`LIFECYCLE_KIT_*` family, so a crate-side resolver would be a second producer of a
+value gate-sdk rules has exactly one — which is why the port takes its readers and
+leaves the library. The cut is what makes the comparator owed rather than merely
+absent: it moved **every in-tree caller** of the six readers this library shares
+with the crate — the header parse and its iteration extraction, the cursor read,
+the stage-membership test, the journal-path derivation, the journal-written
+predicate and the opening-line mark — onto the crate's side of a seam with nothing
+comparing across it. The opening-line shape is the sharpest case, because
+§bin/enter-stage.sh rules that writer and reader share one spelling of it *so
+writer and reader cannot drift*, and after the cut the writer is compiled and the
+reader is not. `gate-tests/stages-lib-parity.test.sh` is that comparator: one
+canned corpus classified by both spellings and compared directly, with no
+committed golden — a maintained expected file would be a third copy to drift, and
+the failure the harness exists to catch is one side edited without the other. It
+additionally closes the two halves over each other, asserting that a journal the
+**compiled** opener wrote reads as unwritten to the **shell** predicate until a
+session appends to it, which is the whole discrimination the entry assertion rests
+on.
 
 ### bin/session-id.sh
 
@@ -1965,8 +2009,8 @@ the first 8 characters:
    correctness break, unchanged from the prior trusting behavior). An absent dir
    or transcript exits 2.
 
-Invoked internally by `enter-stage.sh` for the `<session-id>` field; the stage
-skills reach it through `enter-stage.sh` rather than calling it themselves. The
+Invoked internally by `--enter-stage` for the `<session-id>` field; the stage
+skills reach it through `--enter-stage` rather than calling it themselves. The
 one session that calls it directly is a lead writing its own session-role marker
 (§templates/lead.md), which the front-end route serves.
 
@@ -1993,7 +2037,7 @@ shell driver held inline moves into the owning kit's library in the same cut*
 does not bind here: its ground is a **declared** knob resolving empty through the
 bridge, and this arm declares none.
 
-**The process cwd is an input to source 3, so `enter-stage.sh` reaches the binary
+**The process cwd is an input to source 3, so `--enter-stage` reaches the binary
 directly rather than through the front-end.** `bin/run-gates.sh` cds to the git
 toplevel before dispatch (gate-sdk/SPEC.md §run-gates), which would change the
 sessions-dir slug under any other cwd and turn a non-repository cwd from working
@@ -2009,7 +2053,7 @@ in `PWD` where `std::env::current_dir()` returns the physical one, so the arm
 reads `PWD` where it is set and the crate's crosser answers otherwise.
 
 **The caller's absent-binary refusal is the port's one added surface.**
-`enter-stage.sh` reads the id before it dispatches any gate, so nothing else in
+`--enter-stage` reads the id before it dispatches any gate, so nothing else in
 that run would have reported an unbuilt binary first; it checks `gate_native_bin`
 is executable and refuses with the build command, in the shape §lib/gate.sh's own
 two readers use. Neither the derivation nor either exit status moved otherwise —
@@ -2044,7 +2088,7 @@ should become bridged or be redocumented is filed to the committed gap inbox
 rather than ruled here. It outlives the port in either direction.
 
 Two facts a session taking this cut should not re-derive. Its sole production
-caller is `bin/enter-stage.sh`, which resolves the id internally — but the kit's
+caller is `--enter-stage`, which resolves the id internally — but the kit's
 own stage templates and `templates/lead.md` name this helper as the id's source
 and one of them **invokes it directly**, so a port edits kit `templates/*.md` and
 stales whatever projection reads them. And it is the one member of that iteration's
@@ -2054,9 +2098,64 @@ settings-grant carve-out on `native-gate-port-remaining-corpus` is exercised
 
 ### bin/enter-stage.sh
 
-The deterministic writer for a stage transition: `enter-stage.sh <stage>`
-appends the invocation stamp, reading the `--emit-session-id` arm for
-the id — never an argument, so the no-hand-picking rule rides into the tool.
+The deterministic writer for a stage transition: `bash gate-sdk/bin/run-gates.sh --enter-stage <stage>`
+appends the invocation stamp, deriving the session id in process by the
+`--emit-session-id` derivation — never an argument, so the no-hand-picking rule
+rides into the tool.
+
+**It is a bridged `Arm::Run`, and the variant is the exit contract.** The
+grammar is `--enter-stage [--simulate] <stage>` or
+`--enter-stage [--simulate] --rename <name>`: `--simulate` and `--rename` ride as
+operands, so the argument grammar is the one this tool always had and only the
+program word changed. `Arm::Run` rather than `Arm::Emit` because the exit status
+is **three-state and every code is load-bearing** — 0 a stamp or a reported
+no-op, **1 a refusal** (the entry pre-flight, a `LIFECYCLE_KIT_ENTRY_PREFLIGHT`
+command, the predecessor-journal assertion, and each of the boundary refusals),
+2 a usage or configuration error. An emitting arm collapses to `{0, 2}` and would
+rewrite every refusal to the misuse code, which is precisely the distinction the
+stage templates' *on a refusal, do not force the entry* rests on: a session
+cannot follow that advice if a refusal is indistinguishable from a typo. The
+status survives the front-end because it `exec`s the binary, so the arm's status
+*becomes* the front-end's; an absent or unbuildable binary is exit 2, joining
+the arms whose verdict a session reads rather than the decline-with-0 posture of
+a harness-integration arm.
+
+**The declared roster is the prefix family `LIFECYCLE_KIT_*`, plus three names
+outside it.** The family is a derivation rather than a transcription: this arm
+resolves its own knobs *and* bridges the declared rosters of the two gates it
+dispatches, and a transcribed union of the three drifts the first time either
+gate gains a knob. The three names beside it are there because **the config
+bridge carries only what an arm declares** — a child receives a filtered view of
+its parent's bridged environment, never a freshly resolved one, so a knob this
+arm hands onward must be on this arm's own roster. `GATE_PRUNE_DIRS` is
+`check-stage-entry`'s, `GATE_KIT_ROOTS_HERE` locates the `checks/` directories the
+two pre-flight members resolve in, and `GATE_SDK_TMP_DIR` is the scratch dir that
+is the temp state file's home, the boundary wipe's subject and the resume
+journal's parent.
+
+**Two callers are sanctioned, and the second one is not a convenience.** A stage
+session reaches the arm through `bash gate-sdk/bin/run-gates.sh`; a hermetic test
+harness resolves the binary and the bridged environment itself and invokes the arm
+directly. The front-end `cd`s to the git toplevel and **refuses outside a
+repository**, while the harnesses that drive this tool end to end run in a non-git
+`mktemp -d` — and one of them asserts, as a named case, that a non-git tree skips
+the linked-worktree check rather than failing on it. Routing every caller through
+the front-end would convert a supported non-git invocation into a configuration
+error, which is a behaviour change no gate in the battery would report. Widening
+the front-end's `cd` was refused on its blast radius: gate-sdk/SPEC.md rules that
+every entry point resolves repo-root-relative paths from the toplevel, and a
+conditional `cd` would weaken the precondition the whole battery rests on to suit
+one arm's harness. gate-sdk/SPEC.md §The non-gate arm sanctions a *caller*
+reaching the binary and forbids only a second entry point into the emission path.
+
+**The process cwd is an input, and the port widened it in one direction.** At the
+repository root — every stage session's case — the cwd already equals the
+toplevel, so the session-id derivation is byte-identical and nothing moves. From a
+subdirectory it succeeds, deriving the id off the toplevel slug, which is the
+project directory transcripts are keyed on — a widening in the safe direction,
+and the sentence gate-sdk/SPEC.md rules about every entry point rather than a
+licence this arm invents. Through the second caller no `cd` happens at
+all, so a harness's sandbox cwd is untouched.
 It is the **sole production writer of `<head>`** (§The state machine), read as
 `git rev-parse --short HEAD` in the state file's own work tree at the instant of
 the append, and `none` where that yields nothing — so the field is produced by
@@ -2237,13 +2336,29 @@ as a pattern matching everything, which is what keeps the default additive.
 
 **Liveness is `ek_pid_alive` and never a second predicate** — the probe the
 `.run` path already uses, so how liveness is decided stays settled in one place
-(evidence-kit/SPEC.md §check-producer-liveness). The dependency is **bought by
-the knob**: `bin/enter-stage.sh` sources evidence-kit's library only when the
-pattern is non-empty, so a consumer that configures none owes no second vendored
-kit, and the hard `gate-sdk` dependency stated below gains no sibling for
-everyone. A pattern set with that library unreachable is exit 2 — the same
-fail-closed direction §lib/stages.sh takes on a malformed pattern, and never a
-silent everything-unclassified.
+(evidence-kit/SPEC.md §check-producer-liveness). The predicate is **linked rather
+than sourced**: the compiled twin carries the same pid grammar and the same
+fail-closed reading of an unanswerable probe, so the classification table crosses
+unchanged. What changed with the port is the *shape* of the dependency, and the
+change is a narrowing. The conditional source this arm used to perform — reaching
+for evidence-kit's library only when the lock pattern was non-empty, so an
+unconfigured consumer owed no second vendored kit — has no counterpart here, and
+neither does the exit-2 arm for a configured pattern with that library
+unreachable: that refusal has no cause it could fire on.
+
+**The lock pattern is consumer configuration, so it is *interpreted* and never
+transported.** The crate's own ERE engine reports a whole-match span and carries
+**no capture group at all** (gate-sdk/SPEC.md §The POSIX ERE matcher sizes it that
+way deliberately), while this classification turns on the *captured* pid. The
+match is therefore delegated to `bash` — the same reach the liveness predicate
+makes for `kill -0`, and on the program floor by the same ruling — which makes the
+dialect the incumbent one **by construction** rather than by comparison, since
+bash's `=~` is the matcher this tool used before the port and a port may not
+change a verdict across the seam. **The honest limit is stated with it:** this
+path now holds two ERE interpreters that can disagree, and their agreement is
+asserted at the cut rather than enforced afterward. That a pattern declares
+exactly one capture group is §lib/stages.sh's fail-closed config check, so the
+classifier is never reached with a pattern whose capture cannot be read.
 
 **One capture group and not two.** The start-time field is matched and
 deliberately not captured. Parity is the first ground — the `.run` record grammar
@@ -2692,20 +2807,53 @@ re-runs its entry step safely. It reads the `lib/stages.sh` knobs
 `LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN`, `LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE`,
 `LIFECYCLE_KIT_ENTRY_PREFLIGHT`, and `LIFECYCLE_KIT_PREFLIGHT_VALVE_FILE`).
 
-**This tool depends on `gate-sdk/lib/gate.sh`, and the dependency is stated
-rather than absorbed.** It is sourced at load — from `GATE_SDK_ROOT`, defaulting
-to the sibling `../gate-sdk` — not inside the one arm that dispatches a gate,
-because a missing library that surfaces halfway through a rename is worse than
-one that surfaces before the tool does anything. The dependency is precedented
-inside the kit, where every `checks/` member sources exactly that library, but it
-is new in `bin/`: a tree that vendored lifecycle-kit without gate-sdk cannot run
-the stamp writer at all. The alternative — a second
-dispatch resolver written into `bin/` — is the duplicate the shared substrate
-exists to remove, so the dependency is taken. Advisory tooling,
-not a gate: no fixture pair is owed; it is exercised end-to-end in
-`smoke/install.sh` — including the boundary require-check scenarios (a member
+**The pre-flight gates this arm names are dispatched as child processes, never called in
+process.** Both arms name a gate and never a substrate: the member is resolved
+across the kit `checks/` directories, a `.sh` before a `.gate` in each, and a
+`.gate` becomes the argv `<binary> <name>` prefixed by the subset of this arm's
+bridged environment that the member's own registry entry declares. A member that
+resolves nowhere is exit 2 with the dispatcher's own diagnostic, never an entry
+pre-flighted by a check that did not run. The in-process call is refused where the
+compiled dispatcher already refuses it — on the declared-knob discipline, fault
+isolation and the surviving `.sh` members — so the arm spawns even though both
+gates live inside the same binary and the direct call would be free. **The
+resolution set is the kit's own `checks/` directories and not the consumer's gates
+directory**, which is the incumbent behaviour restated rather than widened: these
+two members are declared by this kit alone, and a `.sh` beside a `.gate` in the
+same directory still shadows it.
+
+**This arm depends on gate-sdk, and the dependency is stated rather than
+absorbed.** It is a bridged arm: it is reached through gate-sdk's front-end, its
+knobs are resolved by gate-sdk's config bridge, and it dispatches through
+gate-sdk's resolver. A tree that vendored lifecycle-kit without gate-sdk cannot
+run the stamp writer at all — and, since the port, cannot run stage motion by any
+other path either. **That is the honest cost of this cut and it is stated rather
+than discovered.** An absent binary was already fatal to this tool, which needed
+the session-id derivation and refused with a build instruction; what is new is
+that stage motion now has **no shell path at all**, so a consumer whose platform
+carries no artifact loses the ability to enter a stage, cross an iteration
+boundary or rename an iteration. The loss is total but it is also loud and
+immediate: the front-end's unavailable diagnostic names the build command, and the
+failure lands at the session's first step rather than midway through work. The
+alternative — a second dispatch resolver written in shell — is the duplicate the
+shared substrate exists to remove, so the dependency is taken.
+
+**This section records the cut.** `bin/enter-stage.sh` was the one owed file
+declaring this section, and taking it discharges the section **with no shell
+residue left in the kit at all** — the kit's other shell members (`lib/stages.sh`,
+the two `smoke/` members, the config template) are each `no-port` by declared
+cause, so `lifecycle-kit/bin/` is gone rather than merely lighter. The heading
+stays `bin/enter-stage.sh` deliberately: roughly eighty pointers inside the
+governed manifest set are backstopped by `check-kit-ref-liveness`, and at least
+six citations outside it have no gate behind them at all, so a rename would take
+half the pointer corpus stale silently.
+
+Advisory tooling, not a gate: no fixture pair is owed; it is exercised end-to-end
+in `smoke/install.sh` — including the boundary require-check scenarios (a member
 naming the closing iteration passes; a member missing the line, a member absent
-from disk, and a never-named closing iteration each take their branch).
+from disk, and a never-named closing iteration each take their branch) — and in
+`gate-tests/`, whose seven hermetic harnesses drive the arm through its second
+caller from a non-git sandbox.
 
 ### bin/install-lifecycle.sh
 
@@ -2990,7 +3138,7 @@ agreement, not a bystander to it.
 
 The gate's one no-cursor ruling: a state file that exists but carries **no
 stamp** is a red, with the same shape as the missing-file message. The
-window is legitimate *inside* `enter-stage.sh`'s boundary reset, which stamps
+window is legitimate *inside* `--enter-stage`'s boundary reset, which stamps
 in the same motion; by commit time an unstamped file means no stage was ever
 invoked, which is precisely what this gate exists to reject — and with the
 stage axis off the header, nothing else would have caught it (an empty file
@@ -3044,7 +3192,7 @@ contract.
 
 A stamp is **newly introduced** when no data line in `HEAD`'s version of the
 state file carries the same `<session-id> <head>` pair. Identity is that pair
-rather than the whole line because `bin/enter-stage.sh --rename` rewrites
+rather than the whole line because `--enter-stage --rename` rewrites
 column 1 of every data line and must not read as re-introducing all of them.
 **The migration clause** applies that same reasoning to the one other bulk
 rewrite this format has: a `HEAD`-version data line carrying only **four**
@@ -3102,7 +3250,7 @@ staged path set must contain **only**:
   the **first stage**'s stamp only, because the iteration-boundary reset
   legitimately writes all of them in one motion (§bin/enter-stage.sh).
 
-**The set is one predicate, stated as itself: the paths `bin/enter-stage.sh`
+**The set is one predicate, stated as itself: the paths `--enter-stage`
 writes at *this* entry.** Every member above derives from that and none is
 minted. The boundary-reset members are scoped to the first stage because the
 boundary reset is the only entry that writes them; the valve ledger is scoped to
@@ -3123,7 +3271,7 @@ set's second bullet rather than a weakening of the rule.
 **The concurrent-session false fire is real and its remedy is cheap.** Where a
 repo shares its git index between sessions, a sibling committing between a
 stamp's write and its commit moves `HEAD` and reds the stamp. The remedy is to
-re-run `bin/enter-stage.sh`, which appends a fresh stamp at the current `HEAD` —
+re-run `--enter-stage`, which appends a fresh stamp at the current `HEAD` —
 a same-stage re-entry, in-contract, and cheaper than any weakening that would
 admit the case the assertion exists to catch. The tool's idempotence guard reads
 the head for exactly this reason (§The state machine).
@@ -3137,7 +3285,7 @@ the full green block.
 
 **The one ordering case neither assertion above reaches**, and it is structural
 rather than a gap in their design: a session that does its work, commits it, and
-only *then* runs `bin/enter-stage.sh`. The stamp legitimately records the
+only *then* runs `--enter-stage`. The stamp legitimately records the
 post-work `HEAD`, the stamp commit is pure, both assertions pass — and the work
 still preceded the mark. The interval between stage X-1's stamp and stage X's
 holds X-1's legitimate work and X's illegitimate pre-stamp work, and nothing in
@@ -3165,7 +3313,7 @@ session that hand-edits the state file and simply never commits moves the stage
 cursor for its entire life and is caught by nothing. Content-based detection
 narrows this and does not close it: the `<head>` field makes a hand-written stamp
 name the `HEAD` it claims to have been taken at, so it is not byte-identical to
-`bin/enter-stage.sh`'s for free — but a hand that reads `git rev-parse --short
+`--enter-stage`'s for free — but a hand that reads `git rev-parse --short
 HEAD` writes an identical line, and a stamp that is never committed is never
 checked at all.
 
@@ -3174,7 +3322,7 @@ The `workflow-state-guard` harness-integration arm
 that window an agent tooling actually passes through. It is a
 `PreToolUse(Write|Edit)` hook (register it on the alternation matcher; guard-kit's
 wiring template carries the block) that refuses a write whose target **resolves**
-to the state file, naming `bin/enter-stage.sh` as the sanctioned writer. Resolved,
+to the state file, naming `--enter-stage` as the sanctioned writer. Resolved,
 not textual: an absolute path, a `./` prefix and a route through a symlinked
 directory are one file, and a textual comparison catches only the spelling it was
 written against. It resolves the path and advises or blocks through the same
@@ -3207,7 +3355,7 @@ positional fields one to three. That is why the `<head>` field appended in
 unstated so the next grammar change knows this reader was checked and cleared
 rather than overlooked. An empty
 cursor is unreachable by construction here and stays a hard parse error rather
-than a disarm: `enter-stage.sh` hands the gate a temp state file that always
+than a disarm: `--enter-stage` hands the gate a temp state file that always
 carries the candidate stamp, and at commit time the entry commit stages that
 same stamp. It owns three assertions, (A)
 prerequisite-stamp ordering — for an entered stage X the file carries a
@@ -3315,11 +3463,11 @@ Invariant: the configured stage set and the skills dir (`LIFECYCLE_KIT_SKILLS_DI
 default `.claude/commands`; override with the first argument) cover each other,
 **three directions**. Forward: every `LIFECYCLE_KIT_STAGES` member has a `<stage>.md`
 skill file — a stage with no skill cannot be entered. Reverse: every skill file
-that invokes `enter-stage.sh` names a live stage in the token it passes. The
-`enter-stage.sh` invocation is the mechanical marker separating a stage skill
+that invokes `--enter-stage` names a live stage in the token it passes. The
+`--enter-stage` invocation is the mechanical marker separating a stage skill
 from an ordinary one, so a retired stage's orphan skill (its `.md` still
 invoking a now-unknown stage) reddens without false-flagging a non-stage skill
-like `/agent-execution`, which never invokes `enter-stage.sh`. A skills dir that
+like `/agent-execution`, which never invokes `--enter-stage`. A skills dir that
 does not exist is fail-closed (exit 2).
 
 Third: every configured stage's **executed surface** carries the resume-journal
@@ -3367,7 +3515,7 @@ file that exists and (b) binds exactly that template's slot set: an unbound slot
 is red, an orphan binding naming no slot is red. A skill with no directive is
 not read, so a copy-and-specialize skill carrying no such line is untouched —
 the same directive-as-selector mechanism `check-stage-skill-coverage` uses on
-`enter-stage.sh`. A bound skill need not be a stage skill: `/agent-execution`
+`--enter-stage`. A bound skill need not be a stage skill: `/agent-execution`
 binds a delegation-kit template, which the gate accepts unchanged (the resolved
 template path may point at any kit). Template slots are the `*<slot-name: …>*` opening
 tokens; a shim's bindings are the `**slot-name** —` lead lines under
@@ -3709,7 +3857,7 @@ compel a filer to answer the advisory, and the judgment itself is the drain's
 
 The stage-skill templates (`scope`/`align`/`build`/`validate`/`close`) carry
 the generic stage spine — the stamp first step (performed by invoking
-`enter-stage.sh <stage>` and stating in one line what it does), each stage's
+`bash gate-sdk/bin/run-gates.sh --enter-stage <stage>` and stating in one line what it does), each stage's
 trigger/ordering rules, its stage-local doctrine, and the **resume-journal last
 step** — with **named slots** where the consumer's rule content goes. The
 templates are the owned surface: this section states the contract a consumer
@@ -3748,7 +3896,7 @@ Alongside the default-roster templates the kit ships **`spec.md`**, an optional
 out from `scope` on a roster that carries a dedicated authoring stage (the
 ontology: scope bounds the units, the authoring stage authors the amendments,
 the audit stage independently verifies them). It is a full stage (it invokes
-`enter-stage.sh` and stamps), **trigger-gated exactly like the audit stage**: it
+`--enter-stage` and stamps), **trigger-gated exactly like the audit stage**: it
 runs only when an iteration promotes a feature to author, it **appends** rather
 than resets (only the first stage resets the evidence file), and it takes `scope`
 as its predecessor without being named any stage's mandatory predecessor
@@ -3909,7 +4057,7 @@ silence is not a disposition. The `release-policy` slot carries the consumer's
 procedure and criteria by citation, the disposition-evidence path, and any
 boundary-only sub-procedure such as a major-only deprecation sweep; a consumer
 with no release process binds a plain `none`-every-iteration line. The
-disposition line's mechanical reader is `enter-stage.sh`'s boundary require-check
+disposition line's mechanical reader is `--enter-stage`'s boundary require-check
 (§bin/enter-stage.sh, `LIFECYCLE_KIT_BOUNDARY_REQUIRE`) when a consumer wires the
 file into that knob.
 
@@ -3917,7 +4065,7 @@ file into that knob.
 
 A **boundary skill**, not a stage — which is why it sits at `templates/` root
 beside `lead.md` rather than among the stage templates: it invokes no
-`enter-stage.sh` and stamps no state, so `check-stage-skill-coverage` never reads
+`--enter-stage` and stamps no state, so `check-stage-skill-coverage` never reads
 it (it governs only the configured stage set). It is the deprecation disposition
 walk at a major — invoked from
 close's release-disposition step when the derived bump is a major — forcing every
@@ -3935,7 +4083,7 @@ may, through `evidence-gate`).
 ### templates/upgrade.md
 
 `upgrade.md` is a **boundary skill** too, at `templates/` root rather than among
-the stage templates: it invokes no `enter-stage.sh` and stamps no state, so
+the stage templates: it invokes no `--enter-stage` and stamps no state, so
 `check-stage-skill-coverage` never reads it. It is the phase-B disposition walk a consumer runs when moving
 their vendored kits from one release to the next — the judgment half of the
 two-phase upgrade contract whose deterministic half (the wholesale kit-sync) and
@@ -3961,7 +4109,7 @@ The **iteration lead** template — an optional live session that dispatches an
 iteration's stage sessions and answers their escalations, closing the
 restart-cost of a stage that would otherwise stop and surface to the user cold
 (§The state machine). Like `release-sweep.md` it is a **boundary skill, not a
-stage**: it invokes no `enter-stage.sh` and joins no stage set, so
+stage**: it invokes no `--enter-stage` and joins no stage set, so
 `check-stage-skill-coverage` never reads it. Like release-sweep it carries
 named slots, so it adopts the binding-shim grammar (§templates/stages/) — a
 consumer copies-and-specializes it or binds it through a thin shim, and
@@ -4012,7 +4160,7 @@ session), and
 the stamps-authoritative invariant carried from §The state machine as the
 design's load-bearing rule — with its two corollaries: the lead never
 hand-derives prior-stage completeness from WORKFLOW-STATE or the git log (it
-dispatches and trusts `enter-stage.sh`'s fail-closed refusal, or gates an
+dispatches and trusts `--enter-stage`'s fail-closed refusal, or gates an
 expensive dispatch with `--simulate`, and reads that same drain-entry verdict
 **before** declaring a stage's batches complete rather than after,
 §bin/enter-stage.sh), and a ruling
@@ -4058,7 +4206,7 @@ per prompt), and whether the consumer wires the optional escalation-shape guard
 
 The **operator strategy session** template, and a **boundary skill** of the class
 §Layout and configuration enumerates: like `lead.md` it invokes no
-`enter-stage.sh`, stamps nothing, and joins no stage set, so
+`--enter-stage`, stamps nothing, and joins no stage set, so
 `check-stage-skill-coverage` never reads it. The classification is what makes it
 cost no new mechanism. A consultation may run before an iteration opens, between
 stages, or across an iteration boundary, and a template with no cursor is at odds

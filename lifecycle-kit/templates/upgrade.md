@@ -1,6 +1,6 @@
 The `upgrade` skill — the phase-B disposition walk for a consumer moving their
 vendored kits from one release to the next. Not an iteration stage: it invokes
-no `enter-stage.sh`, stamps no `WORKFLOW-STATE.txt`, and runs in any session at
+no `--enter-stage`, stamps no `WORKFLOW-STATE.txt`, and runs in any session at
 an upgrade. Phase A (the deterministic wholesale kit-sync) and this phase-B walk
 are the two halves of the upgrade contract — the install guide §The upgrade
 contract owns the shape, and `bash gate-sdk/bin/run-gates.sh --upgrade-smoke`

@@ -3,8 +3,8 @@ The `align` (spec-alignment) stage of an iteration. Cross-spec audit, then
 battery>* as one gate. Exit condition: no unresolved conflicts or terminology
 drift.
 
-**First step — stamp evidence.** Run lifecycle-kit's `bin/enter-stage.sh
-align`: it appends `<iteration> align <session-id> <date> <head>` to
+**First step — stamp evidence.** Run the lifecycle arm,
+`bash gate-sdk/bin/run-gates.sh --enter-stage align`: it appends `<iteration> align <session-id> <date> <head>` to
 `.workflow/WORKFLOW-STATE.txt` (required by `check-stage-evidence`; the stamp
 proves invocation, not faithful execution), reading `<session-id>` from
 the `--emit-session-id` arm
@@ -98,7 +98,7 @@ audit is that gate's first real run — the drift it surfaces is a backfill
 worklist to land before build, not a reason the gate is wrong.
 
 **Last step — the resume journal.** This stage's exit artifact is the resume
-journal `enter-stage.sh` named at the stamp; its path is a derivation
+journal the `--enter-stage` arm named at the stamp; its path is a derivation
 (lifecycle-kit/SPEC.md §The state machine) and its contract is
 delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps.
 Append `DONE` as the file's last line before you report.

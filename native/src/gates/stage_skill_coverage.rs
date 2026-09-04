@@ -16,17 +16,17 @@ fn normalized(text: &str) -> String {
     text.split_whitespace().collect::<Vec<&str>>().join(" ")
 }
 
-// spec: lifecycle-kit/SPEC.md §check-stage-skill-coverage — the shell form's
-// `enter-stage\.sh[[:space:]]+[a-z][a-z-]*`: a gate-owned literal shape, so it is matched
-// directly rather than compiled, and the invoked stage is the token after the run of spaces
+// spec: lifecycle-kit/SPEC.md §check-stage-skill-coverage — `--enter-
+// stage[[:space:]]+[a-z][a-z-]*`: a gate-owned literal shape, so it is matched directly rather
+// than compiled, and the invoked stage is the token after the run of spaces.
 fn invoked_stages(text: &str) -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
     for line in text.lines() {
         let b = line.as_bytes();
         let mut from = 0usize;
-        while let Some(rel) = line[from..].find("enter-stage.sh") {
+        while let Some(rel) = line[from..].find("--enter-stage") {
             let at = from + rel;
-            let mut i = at + "enter-stage.sh".len();
+            let mut i = at + "--enter-stage".len();
             let start_ws = i;
             while i < b.len() && (b[i] == b' ' || b[i] == b'\t') {
                 i += 1;
@@ -38,7 +38,7 @@ fn invoked_stages(text: &str) -> Vec<String> {
                 }
                 out.push(line[s..i].to_string());
             }
-            from = at + "enter-stage.sh".len();
+            from = at + "--enter-stage".len();
         }
     }
     out.sort();
@@ -104,7 +104,7 @@ pub fn run(args: &[String]) -> i32 {
         for n in invoked_stages(&text) {
             if !stages::stage_known(&stage_set, &n) {
                 orphan.push(format!(
-                    "{} invokes enter-stage.sh '{}', not a lifecycle stage",
+                    "{} invokes --enter-stage '{}', not a lifecycle stage",
                     base, n
                 ));
             }
@@ -177,14 +177,14 @@ mod tests {
     #[test]
     fn only_a_lowercase_token_after_a_run_of_spaces_is_an_invoked_stage() {
         assert_eq!(
-            invoked_stages("run enter-stage.sh build now\nenter-stage.sh  align\n"),
+            invoked_stages("run --enter-stage build now\n--enter-stage  align\n"),
             vec!["align".to_string(), "build".to_string()]
         );
-        assert!(invoked_stages("enter-stage.sh").is_empty());
-        assert!(invoked_stages("enter-stage.sh 9lives").is_empty());
-        assert!(invoked_stages("enter-stage.shbuild").is_empty());
+        assert!(invoked_stages("--enter-stage").is_empty());
+        assert!(invoked_stages("--enter-stage 9lives").is_empty());
+        assert!(invoked_stages("--enter-stagebuild").is_empty());
         assert_eq!(
-            invoked_stages("enter-stage.sh build\nenter-stage.sh build\n"),
+            invoked_stages("--enter-stage build\n--enter-stage build\n"),
             vec!["build".to_string()]
         );
     }

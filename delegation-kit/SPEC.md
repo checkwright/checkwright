@@ -1897,7 +1897,7 @@ consumer's own repair is the predicate that reads past the opening line
 
 **Lifetime — why retention rather than an eager deletion chore.** Cleanup is
 the consumer's own scratch reset at its next work-unit boundary, a mechanism
-the consumer already owns (here, `enter-stage.sh`'s boundary wipe of `.tmp/` at
+the consumer already owns (here, `--enter-stage`'s boundary wipe of `.tmp/` at
 the next scope entry — lifecycle-kit/SPEC.md §bin/enter-stage.sh). Two things
 break when the supervisor deletes on its own schedule instead, and both appear
 only once a dispatched agent is **resumable** rather than one-shot: a resumed

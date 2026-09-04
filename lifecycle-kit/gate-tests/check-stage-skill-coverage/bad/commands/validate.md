@@ -1,2 +1,2 @@
 # validate
-`bash lifecycle-kit/bin/enter-stage.sh validate`
+`bash gate-sdk/bin/run-gates.sh --enter-stage validate`

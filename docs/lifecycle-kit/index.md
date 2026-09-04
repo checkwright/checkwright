@@ -25,7 +25,7 @@ external configuration you point the kit at.
 ## Quick start
 
 ```bash
-bash lifecycle-kit/bin/enter-stage.sh <stage>        # stamp the stage entry, committed
+bash gate-sdk/bin/run-gates.sh --enter-stage <stage>        # stamp the stage entry, committed
 bash gate-sdk/bin/run-gate-tests.sh lifecycle-kit/gate-tests lifecycle-kit/checks
 ```
 

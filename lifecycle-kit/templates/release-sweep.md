@@ -1,5 +1,5 @@
 The `release-sweep` skill — the deprecation disposition walk at a major
-release boundary. Not an iteration stage: it invokes no `enter-stage.sh`, stamps
+release boundary. Not an iteration stage: it invokes no `--enter-stage`, stamps
 no `WORKFLOW-STATE.txt`, and can run in any session at a major. Exit condition:
 every deprecation marker in the tree has a disposition line stamped for this
 release, and the marked surfaces reflect the dispositions taken.

@@ -47,7 +47,87 @@ fn no_such_gate(name: &str) -> ! {
 
 // spec: evidence-kit/SPEC.md §lib/evidence.sh — the arm reports *classification* and never an
 // internal representation, `--queue-parity`'s own rule: the two holders share no data shape, so a
-// comparison of derived literals would fail on a difference that is not a disagreement
+// comparison of derived literals would fail on a difference that is not a disagreement spec
+fn stages_lib_parity(args: &[String]) -> i32 {
+    let usage = "  usage: checkwright-gates --stages-lib-parity iter <file>... | cursor <file>... \
+| known <name>... | journal <stage>... | written <file>... | mark | open <file>";
+    let sub = args.first().map(String::as_str);
+    let rest = if args.is_empty() { &args[0..0] } else { &args[1..] };
+    match sub {
+        Some("iter") => {
+            for f in rest {
+                let text = std::fs::read_to_string(f).unwrap_or_default();
+                let hdr = stages::header(&text).unwrap_or("");
+                println!("iter\t{}\t{}", f, stages::header_iter(hdr));
+            }
+            0
+        }
+        Some("cursor") => {
+            for f in rest {
+                let text = std::fs::read_to_string(f).unwrap_or_default();
+                println!("cursor\t{}\t{}", f, stages::current_stage(&text));
+            }
+            0
+        }
+        Some("known") => {
+            let set = match stages::stages() {
+                Ok(s) => s,
+                Err(e) => {
+                    eprintln!("checkwright-gates: {}", e);
+                    return 2;
+                }
+            };
+            for n in rest {
+                println!("known\t{}\t{}", n, stages::stage_known(&set, n));
+            }
+            0
+        }
+        Some("journal") => {
+            let pattern = match walk::knob_scalar("LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN") {
+                Ok(p) => p,
+                Err(e) => {
+                    eprintln!("checkwright-gates: {}", e);
+                    return 2;
+                }
+            };
+            for s in rest {
+                println!("journal\t{}\t{}", s, emit::enter_stage::journal_path(&pattern, s));
+            }
+            0
+        }
+        Some("written") => {
+            for f in rest {
+                println!("written\t{}\t{}", f, emit::enter_stage::journal_written(f));
+            }
+            0
+        }
+        Some("mark") => {
+            println!("mark\t{}", emit::enter_stage::JOURNAL_MARK);
+            0
+        }
+        // spec: lifecycle-kit/SPEC.md §lib/stages.sh — the compiled writer, so the harness holds
+        // the shell predicate against the opener's own bytes rather than a lookalike of them
+        Some("open") => {
+            let Some(path) = rest.first() else {
+                eprintln!("checkwright-gates: --stages-lib-parity open needs a path");
+                return 2;
+            };
+            match emit::enter_stage::journal_open(path, "build", "it", "aaaa", "2026-06-01", "none") {
+                Ok(()) => 0,
+                Err(e) => {
+                    eprintln!("checkwright-gates: {}", e);
+                    2
+                }
+            }
+        }
+        _ => {
+            eprintln!("checkwright-gates: --stages-lib-parity needs a subcommand — the comparison could not run; treating as failure (not clean)");
+            eprintln!("{}", usage);
+            2
+        }
+    }
+}
+
 fn evidence_lib_parity(args: &[String]) -> i32 {
     let usage = "  usage: checkwright-gates --evidence-lib-parity lock <file>... | --evidence-lib-parity pid <pid>...";
     match args.first().map(String::as_str) {
@@ -230,10 +310,9 @@ fn main() {
         }
     };
 
-    // spec: gate-sdk/SPEC.md §check-gate-binary-fresh — the baked stamp's only reader.
-    // A top-level flag, never a registry member: check-gate-substrate-parity assertion B
-    // equates the descriptor set with the `--list` roster, so a stamp arm inside that
-    // roster would read as a subcommand nothing declares.
+    // spec: gate-sdk/SPEC.md §check-gate-binary-fresh — the baked stamp's only reader. A top-
+    // level flag, never a registry member: check-gate-substrate-parity assertion B equates the
+    // descriptor set with the `--list` roster, so a stamp arm inside that roster would read as a
     if first == "--source-stamp" {
         println!("{}", env!("CHECKWRIGHT_SOURCE_STAMP"));
         exit(0);
@@ -250,10 +329,7 @@ fn main() {
     }
 
     // spec: queue-kit/SPEC.md §lib/queue.sh — the introspection arm the shell/compiled parity
-    // harness reads: this module's classification of one queue file, one record per line. A
-    // top-level flag rather than a subcommand, for the reason the three around it are:
-    // check-gate-substrate-parity assertion B reds a subcommand no descriptor dispatches to,
-    // and no gate dispatches here (gate-sdk/SPEC.md §check-gate-substrate-parity).
+    // harness reads: this module's classification of one queue file, one record per line.
     if first == "--queue-parity" {
         let file = match argv.get(1) {
             Some(f) => f.as_str(),
@@ -297,6 +373,12 @@ fn main() {
         exit(toolfloor_parity(&argv[1..]));
     }
 
+    // spec: lifecycle-kit/SPEC.md §lib/stages.sh — the standing oracle criterion 6's *unless*
+    // clause owes a comparator wherever a library stays shell while its readers compile.
+    if first == "--stages-lib-parity" {
+        exit(stages_lib_parity(&argv[1..]));
+    }
+
     // spec: guard-kit/SPEC.md §scan-prompts — a hardcoded top-level flag, measured rather than
     // assumed: table membership turns on whether the arm resolves a `GUARD_KIT_*` knob, and all
     // three modes resolve none. A top-level flag, like the arms around it.
@@ -306,8 +388,6 @@ fn main() {
 
     // spec: installer/README.md §The install boundary — the install seam both bootstraps call,
     // resolved here before the registry lookup and absent from `--list` like the arms around it.
-    // spec: gate-sdk/SPEC.md §The non-gate arm — hardcoded, never bridged: the caller may not be
-    // assumed to be a POSIX shell, so every value arrives as argv and the arm reads no knob.
     if first == "--install" {
         exit(install::run(&argv[1..]));
     }
@@ -368,9 +448,7 @@ fn main() {
 
     // spec: gate-sdk/SPEC.md §lib/gate.sh — one line per declared knob name and nothing else;
     // gate_command reads this to decide which GATE_SDK_KNOB_* elements to resolve into the
-    // emitted argv. A top-level flag, outside `--list`'s roster for the reason `--reads` and
-    // `--source-stamp` are: check-gate-substrate-parity assertion B equates the descriptor set
-    // with that roster, so a flag inside it would read as a subcommand nothing declares.
+    // emitted argv.
     if first == "--knobs" {
         let name = match argv.get(1) {
             Some(n) => n.as_str(),

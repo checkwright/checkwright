@@ -83,7 +83,7 @@ bash "$SDK/bin/run-gates.sh" --install-lifecycle >/dev/null
 bash "$SDK/bin/gen-pre-commit.sh" --write >/dev/null
 bash "$SDK/bin/run-gates.sh" --emit graph > scripts/CHECK-GRAPH.html
 
-# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — exercise enter-stage end-to-end under .tmp (advisory tool, no fixture pair)
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — exercise the --enter-stage arm end-to-end under .tmp (advisory tooling, no fixture pair). The knob paths are absolute, so the front-end's cd to the git toplevel leaves every one of them resolving where this smoke put it.
 es="$PWD/.tmp/enter-stage-smoke"
 rm -rf "$es"; mkdir -p "$es/.workflow" "$es/sessions" "$es/tmp"
 : > "$es/sessions/aabbccdd-0000-0000-0000-000000000000.jsonl"
@@ -112,7 +112,7 @@ es_run() {
     LIFECYCLE_KIT_STATE_FILE="$es/.workflow/WORKFLOW-STATE.txt" \
     LIFECYCLE_KIT_SESSIONS_DIR="$es/sessions" \
     GATE_SDK_TMP_DIR="$es/tmp" \
-    bash "$SMOKE_KIT_ROOT/bin/enter-stage.sh" "$@"
+    bash "$SDK/bin/run-gates.sh" --enter-stage "$@"
 }
 esq="$es/TASK-QUEUE.md"; ess="$es/.workflow/WORKFLOW-STATE.txt"; d="$(date +%F)"
 
@@ -177,7 +177,7 @@ es_pf_run() {
     LIFECYCLE_KIT_SESSIONS_DIR="$es/sessions" \
     GATE_SDK_TMP_DIR="$es/tmp" \
     LIFECYCLE_KIT_CONFIG_FILE="$es/stages.sh" \
-    bash "$SMOKE_KIT_ROOT/bin/enter-stage.sh" "$@"
+    bash "$SDK/bin/run-gates.sh" --enter-stage "$@"
 }
 
 cp "$esq" "$es/q.before"; cp "$ess" "$es/s.before"
@@ -222,7 +222,7 @@ es_valve_run() {
     LIFECYCLE_KIT_SESSIONS_DIR="$es/sessions" \
     GATE_SDK_TMP_DIR="$es/tmp" \
     LIFECYCLE_KIT_CONFIG_FILE="$es/valve-stages.sh" \
-    bash "$SMOKE_KIT_ROOT/bin/enter-stage.sh" "$@"
+    bash "$SDK/bin/run-gates.sh" --enter-stage "$@"
 }
 rm -f "$es/preflight-ok"
 cp "$ess" "$es/s.before"
@@ -244,13 +244,6 @@ printf '# contract: seeded\n- 2026-01-01 — a real bullet\n' > "$av/inbox.md"
 printf '# contract: seeded\n\n## 2026-01-01 scope — a seeded survey\n- corpus: x\n- oracle: y\n- rev: z\n- finding: w\n' > "$av/record.md"
 cp "$av/inbox.md" "$av/inbox.before"; cp "$av/record.md" "$av/record.before"
 
-av_run() {
-    local tool="$1"; shift
-    env LIFECYCLE_KIT_GAP_INBOX_FILE="$av/inbox.md" \
-        LIFECYCLE_KIT_SURVEY_RECORD_FILE="$av/record.md" \
-        bash "$SMOKE_KIT_ROOT/bin/$tool" "$@"
-}
-
 emit_run() {
     local arm="$1"; shift
     env LIFECYCLE_KIT_GAP_INBOX_FILE="$av/inbox.md" \
@@ -258,14 +251,12 @@ emit_run() {
         bash "$SDK/bin/run-gates.sh" --emit "$arm" "$@"
 }
 
-# spec: gate-sdk/SPEC.md §The non-gate arm — the help half belongs to the substrate, so the loop narrows to the members still on this side of the port rather than disappearing: enter-stage.sh is the surviving bin/ member and file-gap.sh's two cases retired with its port to --emit-file-gap
-for t in enter-stage.sh; do
-    out="$(av_run "$t" --help 2>/dev/null)" \
-        || { echo "smoke(argv): $t --help should exit 0" >&2; exit 1; }
+# spec: gate-sdk/SPEC.md §The bin/-tool contract — the help half is still owed, and it is now owed by an arm rather than by a bin/ member: the per-tool loop this replaces held exactly one member, and the enter-stage port emptied it (file-gap.sh's two cases had already retired with its own port). Asserted through the front-end that now carries the arm, so what is covered is the reachable spelling rather than a script that no longer exists.
+for h in --help -h; do
+    out="$(es_run "$h" 2>/dev/null)" \
+        || { echo "smoke(argv): --enter-stage $h should exit 0" >&2; exit 1; }
     grep -q '^usage: ' <<<"$out" \
-        || { echo "smoke(argv): $t --help wrote no usage to stdout: $out" >&2; exit 1; }
-    out="$(av_run "$t" -h 2>/dev/null)" || { echo "smoke(argv): $t -h should exit 0" >&2; exit 1; }
-    grep -q '^usage: ' <<<"$out" || { echo "smoke(argv): $t -h wrote no usage to stdout" >&2; exit 1; }
+        || { echo "smoke(argv): --enter-stage $h wrote no usage to stdout: $out" >&2; exit 1; }
 done
 
 # spec: lifecycle-kit/SPEC.md §The committed gap inbox — the discriminating half of the capture arm's argv contract, the seam a crate unit test cannot see: the front-end resolves --emit file-gap, a leading-dash prose is still exit 2 through the bridge, and the inbox is byte-unchanged after the refusal (a test reading exit codes alone passes the bug). The grammar cases are pinned in the ported module's own #[cfg(test)] tests, where check-crate-arms runs them.
@@ -402,7 +393,7 @@ br_run() {
     LIFECYCLE_KIT_SESSIONS_DIR="$es/sessions" \
     GATE_SDK_TMP_DIR="$es/tmp" \
     LIFECYCLE_KIT_CONFIG_FILE="$br/stages.sh" \
-    bash "$SMOKE_KIT_ROOT/bin/enter-stage.sh" "$@"
+    bash "$SDK/bin/run-gates.sh" --enter-stage "$@"
 }
 
 write_br_fixture closing-iter                                            # (a) member missing the closing-iteration line → refuse
@@ -464,7 +455,7 @@ gp_run() {
     LIFECYCLE_KIT_SESSIONS_DIR="$es/sessions" \
     GATE_SDK_TMP_DIR="$es/tmp" \
     LIFECYCLE_KIT_CONFIG_FILE="$gp/stages.sh" \
-    bash "$SMOKE_KIT_ROOT/bin/enter-stage.sh" "$@"
+    bash "$SDK/bin/run-gates.sh" --enter-stage "$@"
 }
 printf '# contract: gap inbox\n- 2026-07-17 — an untriaged gap bullet\n' > "$gpi"   # (a) close-skipped + non-empty inbox → refuse, nothing written
 cp "$gpq" "$gp/q.before"; cp "$gps" "$gp/s.before"

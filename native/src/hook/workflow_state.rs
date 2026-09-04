@@ -1,5 +1,5 @@
 // spec: lifecycle-kit/SPEC.md §check-stage-entry — the PreToolUse(Write|Edit) member: the stage
-// stamp is bin/enter-stage.sh's to write, and every gate that would catch a hand-stamp fires only
+// stamp is the `--enter-stage` arm's to write, and every gate that would catch a hand-stamp fires only
 // at commit, so an uncommitted hand-stamp is otherwise never seen at all.
 use crate::hook;
 use crate::walk;
@@ -32,7 +32,7 @@ pub fn run(payload: Option<&Value>) -> i32 {
 
 fn degraded() -> i32 {
     hook::advise(&format!(
-        "{}: the hook payload or the state-file path could not be read, so the direct-edit rule for the lifecycle state file could not be enforced on this call. That file has one sanctioned writer, lifecycle-kit bin/enter-stage.sh.",
+        "{}: the hook payload or the state-file path could not be read, so the direct-edit rule for the lifecycle state file could not be enforced on this call. That file has one sanctioned writer, lifecycle-kit's `--enter-stage` arm.",
         NAME
     ))
 }
@@ -63,7 +63,7 @@ fn resolve(p: &str) -> PathBuf {
 
 fn blocked(state_file: &str) -> String {
     format!(
-        "{} is written by lifecycle-kit's bin/enter-stage.sh, never by hand — run 'bash lifecycle-kit/bin/enter-stage.sh <stage>' to stamp, or 'bash lifecycle-kit/bin/enter-stage.sh --rename <name>' to rename the iteration (it rewrites the queue header and column 1 of every stamp in one motion, proving columns 2 through NF unchanged). The stamp *is* the stage transition, so a hand-written line moves the cursor for every reader for the rest of the session, and every gate that would catch it fires only at commit: an uncommitted hand-stamp is never seen at all. If enter-stage refuses, that refusal is a gate verdict to resolve at its source, not to write around.",
+        "{} is written by lifecycle-kit's --enter-stage arm, never by hand — run 'bash gate-sdk/bin/run-gates.sh --enter-stage <stage>' to stamp, or 'bash gate-sdk/bin/run-gates.sh --enter-stage --rename <name>' to rename the iteration (it rewrites the queue header and column 1 of every stamp in one motion, proving columns 2 through NF unchanged). The stamp *is* the stage transition, so a hand-written line moves the cursor for every reader for the rest of the session, and every gate that would catch it fires only at commit: an uncommitted hand-stamp is never seen at all. If enter-stage refuses, that refusal is a gate verdict to resolve at its source, not to write around.",
         state_file
     )
 }

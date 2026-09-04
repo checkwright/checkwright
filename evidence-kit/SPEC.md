@@ -490,7 +490,7 @@ reasons they are load-bearing). A trap rather than a tail line, because the
 script exits from many guard and fail-closed sites besides its terminal exit, and
 a tail-line release would leak the lock on every failure path — the population
 that matters most, since a crashed run is exactly when a stale lock appears. The
-idiom precedent is `lifecycle-kit/bin/enter-stage.sh`, which claims temp files
+idiom precedent is `gate-sdk/bin/run-gates.sh --enter-stage`, which claims temp files
 under a scratch dir with an `EXIT` trap.
 
 **It refuses to start while a live lock is held**, and the refusal falls out of
@@ -785,7 +785,7 @@ second reader without adding a gate.
 
 **`ek_pid_alive` now has a named caller outside the `.run` path entirely, and it
 is recorded here rather than only where it is used.**
-`lifecycle-kit/bin/enter-stage.sh` classifies a linked git worktree as live or
+`gate-sdk/bin/run-gates.sh --enter-stage` classifies a linked git worktree as live or
 orphaned by extracting the holding process's pid from the worktree's git **lock
 reason** and calling this predicate on it (lifecycle-kit/SPEC.md
 §bin/enter-stage.sh). The record it reads is git's, not this kit's grammar — so
@@ -935,7 +935,7 @@ Integration is two generic knobs on lifecycle-kit's side of the seam, each
 naming no evidence surface in the kit — the coupling lives entirely in the
 consumer's config and this gate's optional assertions.
 
-`LIFECYCLE_KIT_BOUNDARY_TRUNCATE` lists the files `bin/enter-stage.sh` truncates back
+`LIFECYCLE_KIT_BOUNDARY_TRUNCATE` lists the files `--enter-stage` truncates back
 to their `# contract:` header at the iteration boundary, exactly as it already
 resets the state file. A consumer sets it to the evidence manifest, so a new
 iteration starts with a manifest carrying only its contract header — which is
@@ -945,7 +945,7 @@ truncation.
 `LIFECYCLE_KIT_ENTRY_PREFLIGHT` carries **both** of this kit's entry-side gates,
 at the stage keys the two paragraphs below name — a count here would be a second
 one, and it would be a kit SPEC counting a consumer's config array at that.
-`bin/enter-stage.sh` runs each matching entry
+`--enter-stage` runs each matching entry
 against the candidate temp state file (the prospective stamp appended) and the
 live queue, appending that `<queue> <state>` argv to whatever the entry names, and
 a non-zero exit refuses the entry with nothing written.
@@ -1056,6 +1056,6 @@ evidence line proves the green result once the suites have run.
   consumed by `ek_diff` (the per-scenario diff) and by the evidence line's
   `pass=`/`fail=`/`ignore=` counts. Per-gate granularity changes the line's
   population, not its shape, so those readers are unchanged.
-- **Truncation** — produced by `enter-stage.sh` at the scope boundary reading
+- **Truncation** — produced by `--enter-stage` at the scope boundary reading
   `LIFECYCLE_KIT_BOUNDARY_TRUNCATE`; consumed by assertion (B)'s foreign-iteration
   test, which is what makes skipping it visible.
