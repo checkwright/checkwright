@@ -12,57 +12,6 @@
 
 ## New Features
 
-- **file-authoring-act-ungoverned** [spec: SPEC-file-authoring-act.md] — writing a file has no
-  steer, no grant and no owner, so authoring one costs an out-of-band permission decision
-  every time.
-  **It is the largest single class in the ranking**, and its dated series lives once, in the ruling
-  paragraph below. What the first measurement established is that this is a CLASS rather than an
-  argument about one row, and the write-shape axis landed beside it is what made it legible as one
-  — the filing bullet could only measure the pre-landing form, 19 of 19 `cat`-led lines.
-  **What the mandated alternatives do NOT cover, which is the whole gap.**
-  `guard-kit/bin/scratch-run.sh` governs EXECUTING a scratch script and `git commit -F` governs
-  CONSUMING a message file. Both act on a file that already exists. Nothing governs bringing one
-  into being, and the sessions paying hardest are the ones the method requires to write most:
-  resume journals, scratch scripts, commit messages.
-  **This is the disposition half of a two-half finding whose instrument half landed.**
-  `prompt-ranking-command-word-shape-blind` made the row READ correctly and deliberately left the
-  act ungoverned; guard-kit/SPEC.md §scan-prompts carries the instrument half and says nothing about
-  governing the act, so without this entry that half has no home at all. Adds that unit no
-  recurrence date and re-files none of it.
-  **Why it needed design, and one of its three shapes is not a stage session's to take.** A
-  committed permission grant is a settings edit and therefore **operator-class** under
-  TRAJECTORY.md §The closed rulings (2026-08-22) — this entry files it and does not land it. A
-  stated habit is not a mechanism. A guard steer onto the Write tool is buildable and is the only
-  self-served shape, but it is a wide behavioural change with a named collision: it must not fire on
-  the `>>`-under-scratch shape rule 17 already auto-allows, which is the shape the mandated
-  resume-journal write itself uses.
-  **SCOPED BY OPERATOR RULING — promote at the next iteration.** The ground ruled on is the
-  2026-09-04 close re-measurement: the class went from 41 of 185 prompting calls to **56 of 139**,
-  22 per cent to 40 per cent, the strongest standing friction signal in the pool. **The ruling
-  carries a consequence to record rather than leave a later reader to infer: it REOPENS the
-  port-only run for a second non-port unit**, the first having been that iteration's stage-journal
-  unit. **And the re-costing is part of the ruling, not a caveat beside it** — the three shapes
-  above were costed BEFORE the unit that doubled the number, so the promoting scope re-costs them
-  and inherits nothing. The doubling's cause is that unit: it made a journal write a mandatory last
-  step in all six stage templates, and the journal appends are most of the class.
-  ruled: file-authoring-act-ungoverned operator 2026-09-04 lead-relay
-  **A PREPARED SETTINGS DIFF AWAITS OUT-OF-BAND OPERATOR APPLICATION**, recorded here under
-  TRAJECTORY.md §The closed rulings (2026-08-22), which lets a stage session derive a diff and
-  state its grounds and ends its remit there. Six committed `permissions.allow` entries:
-  `Bash(date *)`, `Bash(find *)`, `Bash(git merge-base *)`, `Bash(git config *)`, `Bash(mkdir *)`,
-  and `Bash(: > .workflow/subagent-stop-liveness.log)`. SECURITY GROUNDS: the first five are
-  read-only or scratch-creating, take no path outside the tree that a `*` does not already reach in
-  a sibling grant, and each ranked in the live friction log; the sixth is a fixed literal whose two
-  sibling reclaim paths are already granted, so its absence is an asymmetry rather than a decision.
-  **These do NOT fix this entry's own class** and are not offered as doing so — a heredoc write is
-  composition no glob can match. They ride the same operator application, and this entry is the
-  queue's carrier for the prepared-diff obligation, which is the only reason they are here.
-  **Cost while deferred:** one out-of-band decision per authored file, paid by the sessions doing
-  the most durable recording, and invisible to every gate — the friction log is advisory, so nothing
-  reds however far the class grows.
-  Filed 2026-08-24 to the gap inbox by spec, as the surviving half of a split its sibling recorded;
-  drained 2026-08-24 at that close, which confirmed the act half is recorded nowhere at HEAD; scoped
-  2026-09-04 at close on the operator ruling above.
 ## Technical Debt
 
 ## Deferred
@@ -7154,6 +7103,53 @@
   as a silent KPI undercount on exactly the entries the project has already judged most recurrent.
   Filed 2026-08-24 to the gap inbox by that same close, from its recurrence-stamp attempt;
   promoted 2026-08-24 at this iteration's scope intake, with the window measured above.
+
+- **file-authoring-act-ungoverned** [design-pending] — the file-authoring writes no glob can reach,
+  and a prepared settings diff no stage session may apply.
+  **What landed 2026-09-04 and what did not.** Guard rule 17 was narrowed and widened in one unit:
+  its substitution decline moved onto the `hdq` view, so the quoted-delimiter heredoc body every
+  journal append spells its slugs in stops defeating the grant; and its `>>`-only test went, so a
+  create to a gitignored target is granted where truncate-then-append already granted it in two
+  calls. Measured at that build: sixteen of sixteen locatable journal appends carried a backtick,
+  and the class was about half of every prompting call in the snapshot. The record is
+  guard-kit/SPEC.md §The generic ruleset rules 16 and 17 and §scan-prompts, not restated here.
+  **WHAT KEEPS THIS ENTRY ALIVE IS TWO THINGS, and neither is design this project can self-serve.**
+  **(1) A PREPARED SETTINGS DIFF AWAITS OUT-OF-BAND OPERATOR APPLICATION**, recorded here under
+  TRAJECTORY.md §The closed rulings (2026-08-22), which lets a stage session derive a diff and
+  state its grounds and ends its remit there. Six committed `permissions.allow` entries:
+  `Bash(date *)`, `Bash(find *)`, `Bash(git merge-base *)`, `Bash(git config *)`, `Bash(mkdir *)`,
+  and `Bash(: > .workflow/subagent-stop-liveness.log)`. SECURITY GROUNDS: the first five are
+  read-only or scratch-creating, take no path outside the tree that a `*` does not already reach in
+  a sibling grant, and each ranked in the live friction log; the sixth is a fixed literal whose two
+  sibling reclaim paths are already granted, so its absence is an asymmetry rather than a decision.
+  **These do NOT fix this entry's own class** and are not offered as doing so. They ride the same
+  operator application, and this entry is the queue's carrier for that obligation — which is why the
+  2026-09-04 build DEMOTED it rather than moving it to `## Done`, where a bare slug would have taken
+  every tag and the obligation with them.
+  **(2) THE RESIDUE THE LANDED GRANT DOES NOT REACH:** a write to a path OUTSIDE the gitignored
+  scratch set — a heredoc to a tracked file, a commit-message file, a scratch script under another
+  root. Rule 17 declines every one on its target test, by design. The Write-tool steer was RECORDED
+  AS REFUSED-FOR-NOW at that build: the landed deltas removed its subject, and a steer firing on
+  writes the same commit had just granted is a rule arguing with its neighbour. Two facts were
+  bought so a later session need not re-buy them — `.claude/settings.json` already carries a
+  `Write|Edit` `PreToolUse` matcher, so a Write-side rule needs no new matcher shape; and a steer is
+  not a distinct primitive, `guard_block` being stderr plus exit 2 for a block and a steer alike.
+  A stated habit was the shape filed beside those two and it stays refused: it is not a mechanism.
+  ruled: file-authoring-act-ungoverned operator 2026-09-04 lead-relay
+  **The operator ruling that scoped it, and its dated series, which lives once and here.** The class
+  read 41 of 185 prompting calls, then 56 of 139 at the 2026-09-04 close — 22 per cent to 40 per
+  cent — then 48 across 22 patterns on the mid-iteration snapshot the promoting spec measured afresh
+  under the ruling's re-costing rider. The ruling REOPENED the port-only run for a second non-port
+  unit. **A later reading of this class will fall for a reason other than fewer writes**: a granted
+  call never reaches the friction log, so widening rule 17 shrank the log's own corpus.
+  guard-kit/SPEC.md §scan-prompts carries that caveat, and a close attributing the drop to fewer
+  writes is reading the instrument's own boundary as a result.
+  **Cost while deferred:** one out-of-band decision per file authored outside the scratch set, plus
+  the six ungranted entries above, and invisible to every gate — the friction log is advisory, so
+  nothing reds however far the residue grows.
+  Filed 2026-08-24 to the gap inbox by spec, as the surviving half of a split its sibling recorded;
+  drained 2026-08-24 at that close; scoped 2026-09-04 at close; promoted, built and demoted on
+  2026-09-04 within one iteration.
 
 - **expansion-rule-backtick-blind** [design-pending] — guard rule 6 blocks the modern
   command-substitution spelling and passes the archaic one, so a session that meets the block learns

@@ -836,10 +836,11 @@ _guard_only_heredoc_residue() {
 }
 
 guard_rule_append_scratch() {
-    local raw="$1" s
-    # spec: guard-kit/SPEC.md §The guard framework — the raw-command carve-out every auto-allow rule takes; rule 6 blocks three of the four substitution spellings and exits 2 first, but not the output-process-substitution one, and a grant may not rest on a coverage claim that is only mostly true
-    grep -qE '\$\(|<\(|>\(' <<<"$raw" && return 0
-    case "$raw" in *'`'*) return 0 ;; esac
+    local raw="$1" s live
+    # spec: guard-kit/SPEC.md §The generic ruleset — rule 17 clause (d): the substitution and backtick declines run on the 'hdq' view rather than the raw command, because a quoted-delimiter heredoc body cannot substitute (rule 6's own ground, one rule over) while every other region can — rule 6 blocks three of the four substitution spellings and exits 2 first, but not the output-process-substitution one, and a grant may not rest on a coverage claim that is only mostly true
+    live="$(guard_skeleton "$raw" hdq)"
+    grep -qE '\$\(|<\(|>\(' <<<"$live" && return 0
+    case "$live" in *'`'*) return 0 ;; esac
     s="$(guard_skeleton "$raw" sq dq hd)"
     _guard_shell_backgrounds "$s" && return 0
     _guard_only_heredoc_residue "$s" || return 0
@@ -853,16 +854,15 @@ guard_rule_append_scratch() {
     done
     [[ "$on_roster" == 1 ]] || return 0
 
-    local pair op tgt
+    local pair tgt
     local -a targets=()
     while IFS= read -r pair; do
         [[ -z "$pair" ]] && continue
         pair="${pair#"${pair%%[!0-9]*}"}"
-        if [[ "$pair" == '>>'* ]]; then op='>>'; tgt="${pair#>>}"; else op='>'; tgt="${pair#>}"; fi
+        if [[ "$pair" == '>>'* ]]; then tgt="${pair#>>}"; else tgt="${pair#>}"; fi
         tgt="${tgt#"${tgt%%[![:space:]]*}"}"
         case "$tgt" in /dev/null | '&'[0-9-]*) continue ;; esac
         case "$tgt" in *[\"\']*) return 0 ;; esac
-        [[ "$op" == '>>' ]] || return 0
         targets+=("$tgt")
     done < <(_guard_redirect_pairs "$s")
     [[ "${#targets[@]}" -ge 1 ]] || return 0
@@ -870,7 +870,7 @@ guard_rule_append_scratch() {
     for tgt in "${targets[@]}"; do
         git check-ignore --quiet -- "$tgt" || return 0
     done
-    guard_allow "append to gitignored scratch (${GUARD_NAME:-guard} auto-allow)"
+    guard_allow "write to gitignored scratch (${GUARD_NAME:-guard} auto-allow)"
 }
 
 guard_rule_ro_pipeline() {

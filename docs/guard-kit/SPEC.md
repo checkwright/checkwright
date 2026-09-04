@@ -242,7 +242,7 @@ stays live, which is the conservative direction. And the normalizer models **quo
 shell semantics**: a construct that survives its scan and is not one of the three
 classes is treated as live, the fail-toward-matching direction and the one a
 guard should err in. That bound is why the command/process-substitution and
-backtick tests in rules 9, 10, 11, 12, 13, 14, 15, 17, 18 and 21 read the **raw**
+backtick tests in rules 9, 10, 11, 12, 13, 14, 15, 18, 19 and 22 read the **raw**
 command rather than
 a skeleton and must keep doing so — a `"$(…)"` inside double quotes still
 executes, so a rule that declared `dq` inert for *that* test would hand an
@@ -252,6 +252,15 @@ rule bodies, not from memory**: it named rules that carry no raw test and
 omitted rules that do until it was re-read against them, which is the same
 drift the number-bearing cross-references below take and the reason each is
 re-derived rather than carried.
+
+**Rule 17 is the one member that left the roster, and the exception is the bound
+above rather than a hole in it.** Its decline reads the `hdq` view: every region
+that can substitute stays live, and the only region blanked is a
+quoted-delimiter heredoc body, which the shell guarantees cannot. So the rule
+still sees every substitution the roster's members see, and stops declining on
+the one region where the spelling is inert — the same asymmetry rule 6 already
+draws for `hdq` against `dq`, applied to a backtick instead of a `$`. A rule
+declining on `hd` here *would* be a hole, which is why the mode is `hdq`.
 
 **Rule 12 is the one rule that reaches its verdict off the raw command, and the
 exception is forced rather than chosen.** Its predicate is *the pattern literal
@@ -833,7 +842,12 @@ that harness exists would be designing against no case.
     file must still take that decision. The `git` subprocess is gated behind the rare
     `:`-redirect match; expansions (rule 6) and brace forms (rule 7) are
     already blocked, so a surviving target is a literal path.
-17. **Auto-allow an append-only write to a gitignored target** — the mandated
+    **This ruling is what rule 17's create case rests on**, and the pointer is
+    here so the two are not read as independent grants of the same thing: once
+    truncating a gitignored target is granted here and appending to one is
+    granted there, creating one is the composition of the two and not a third
+    decision. A reader narrowing *this* rule narrows that one with it.
+17. **Auto-allow a write to a gitignored target** — the mandated
     resume-journal append that
     delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps
     obliges is a redirect, and the harness checks a redirect
@@ -843,21 +857,29 @@ that harness exists would be designing against no case.
     - **(0) Not a backgrounded launch.** A statement-ending `&` refuses before
       any other clause is read: a backgrounded append is rule 15's subject, and
       granting it here would bless a launch the liveness-record rule is about.
-    - **(a) Append-only.** Every redirect operator is `>>` (an fd prefix
-      allowed: `2>>`); a single truncating `>` **anywhere** refuses. This clause
-      carries the append-only split — a mistyped redirect must not be able to
-      destroy a journal — and it is the one no settings rule can express, since a
-      redirect-target check is a **file-write** check and cannot tell `>>` from
-      `>`. That is why the grant is a hook rather than an anchored `Edit` rule,
-      which would reach the target correctly and grant the truncating form with it.
+    - **(a) Either write operator, `>>` or `>`** (an fd prefix allowed: `2>>`,
+      `2>`). Neither refuses; what bounds the grant is (b)'s target test and
+      (c)'s emitter bound, never the operator. **The create half rests on rule 16
+      as a composition, not as an analogy to it**: `: > <gitignored>` is granted
+      there and `<roster emitter> >> <gitignored>` is granted here, so
+      `<roster emitter> > <gitignored>` is what two standing grants already reach
+      in two calls, and admitting it adds one permission decision rather than one
+      capability. Stated as a composition because an analogy — *truncating scratch
+      is cheap, so creating it is too* — is what a later reader reopens a widening
+      on. **The honest cost**: no clause now protects a scratch file's prior
+      content from a mistyped redirect, so a live resume journal or a `.run`
+      liveness record is clobberable in one call. That door is already open —
+      rule 16 grants `: > <that same path>` unchanged — so this widens
+      convenience and not reach, and is admitted as a convenience widening.
     - **(b) Every target gitignored**, on rule 16's exact `git check-ignore
       --quiet --` predicate and its exact subprocess, gated behind the same
       rarity: `git` is reached only once (a) and (c) have already matched.
     - **(c) The leading command emits to stdout and nothing else**, and the
       command is one statement. The roster is `GUARD_KIT_APPEND_BINS`.
     - **(d) Conservative decline on anything unmodelled** — a command or process
-      substitution or a backtick anywhere in the **raw** command, or a redirect
-      target that survives normalization carrying a quote. Declares `sq dq hd`.
+      substitution or a backtick anywhere in the **`hdq` view**, or a redirect
+      target that survives normalization carrying a quote. Declares `sq dq hd`
+      for its structural tests and `hdq` for this one.
 
     **Why (c) is the clause the safety argument rests on.** A
     `permissionDecision: allow` blesses the whole call, so a rule keyed on the
@@ -869,11 +891,18 @@ that harness exists would be designing against no case.
     target is the whole of what the call can touch. `tee` is deliberately **off**
     the roster despite being the obvious fourth member — it takes a path
     **argument**, so `tee -a <tracked file>` writes a tracked file with no
-    redirect at all and (a) and (b) never see it. The honest limit is the mirror
+    redirect at all and (b) never sees it. The honest limit is the mirror
     of the one rule 18 carries for `GUARD_KIT_RO_BINS`, reached from the writing
     side rather than the reading side: the grant is exactly as safe as the
     roster's stdout-only property, which the rule asserts of the roster and
     cannot verify of a member.
+    **(c) is also the clause no settings rule can express, and it is the whole of
+    why this grant is a hook.** Clauses (a) and (b) both turn on the redirect
+    target, and an anchored file-write rule over the ignored paths reaches a
+    target correctly. What such a rule cannot do is bound the **emitter**, so a
+    settings-only spelling grants `rm -rf .tmp/../.git > .tmp/j.md` on the target
+    alone. Recorded plainly because the target clauses read like the hard part
+    and are not: drop (c) and the grant is expressible in settings and unsafe.
     **One statement is one segment plus its own heredoc residue, never one
     segment.** `guard_split_compound` emits per **line** and `guard_skeleton`'s
     `hd` class leaves a heredoc's body placeholder and terminator on lines of
@@ -883,20 +912,35 @@ that harness exists would be designing against no case.
     exactly the residue the first segment's own openers produce — which still
     refuses a second statement on a line of its own (`printf x >> .tmp/j.md`,
     newline, `rm -rf …`), the hazard the one-statement bound is for.
-    **Two inert targets are exempt from (a) and (b)**, and the carve-out is
+    **Two inert targets are exempt from (b)**, and the carve-out is
     precedented rather than invented: `/dev/null` and an fd-dup (`&1`, `&2`) are
-    what rule 18 already treats as targets that are not files. Neither is a file
-    the append-only split protects and neither is a path `git check-ignore` can
-    answer about. Every **other** target takes both tests, and at least one such
-    target must exist — a call redirecting only to inert targets has no append to
-    grant. Seeing an fd-dup at all takes this rule's own operator-and-target
+    what rule 18 already treats as targets that are not files. Neither is a path
+    `git check-ignore` can answer about. Every **other** target takes that test,
+    and at least one such target must exist — a call redirecting only to inert
+    targets has no write to grant. Seeing an fd-dup at all takes this rule's own
+    operator-and-target
     scan, because `_guard_redirect_targets`' target class excludes `&` and drops
     an fd-dup target entirely.
-    **The raw-command arm is not redundant with rule 6**, and that was measured
+    **(d)'s substitution arm is not redundant with rule 6**, and that was measured
     rather than assumed: rule 6 blocks `${…}`, `$(…)`, `<(…)` and `$NAME` and
     exits 2 first, but **not** `>(…)`, which does run its command. An auto-allow
-    may not rest on a coverage claim that is only mostly true, so this rule takes
-    the same full raw-command decline rule 18 takes.
+    may not rest on a coverage claim that is only mostly true, so the decline
+    stays, and only its *subject* is narrowed from the raw command to the `hdq`
+    view.
+    **The `hdq` narrowing is rule 6's own ruling applied one rule over, not a new
+    one.** Rule 6 already declares that a double-quoted `"$x"` still expands so
+    `dq` stays live, while a **quoted-delimiter** heredoc body cannot — which is
+    what `hdq` names. A backtick inside `<<'EOF'` is inert by the identical
+    argument that makes `$x` inert there, so testing it against the raw command
+    declines on a region that cannot expand. The reasoning at the head of this
+    clause survives untouched; what does not survive is applying it where the
+    spelling has no way to substitute. **The asymmetry is deliberate and `hdq` is
+    not `hd`**: an **unquoted** delimiter (`<<EOF`) leaves the body live, so a
+    backtick there is a real substitution and the decline still fires. Stated
+    because `hd` is the mode most of the neighbouring rules take and reaching for
+    it here would silently grant a body that can run a command. Nothing else
+    distinguishes the two spellings at the grant boundary, so the two fixture rows
+    that assert it (§Testing) are the whole holder of the narrowing's bound.
     **Placed immediately after rule 16 and before rule 18**, and the position is
     load-bearing rather than tidy: placing it after the decorated-allowlist rule
     would be wrong because that rule blocks a bare allow entry decorated by a
@@ -1016,10 +1060,13 @@ that harness exists would be designing against no case.
       writes only to stdout.
     - **(e) Conservative decline on anything unmodelled** — a command or process
       substitution or a backtick anywhere in the **raw** command, and a quote
-      surviving normalization. The auto-allow band's shared carve-out, adopted
+      surviving normalization. The auto-allow band's carve-out, adopted
       unchanged rather than reasoned about afresh; the quote half is taken in
       rule 18's blanket spelling rather than rule 17's per-target one, which is
-      the stricter of the two and therefore the safe direction for a grant.
+      the stricter of the two and therefore the safe direction for a grant. The
+      band is **not** unanimous on the *subject*: rule 17 takes the same tests
+      against the `hdq` view, and this rule keeps the raw command because its own
+      grant has no heredoc in it to narrow onto.
 
     **Two forms this rule deliberately does not grant, stated so the silence is
     not read as an oversight.** Coverage of the measured class is not the target;
@@ -1442,6 +1489,14 @@ attribute a write to a command that performs none. Reading both from one segment
 makes the key internally consistent by construction. *Which* segment should be
 keyed when the friction-bearing one is not the first is a separate axis — which
 segment, not which shape — and is not settled here.
+**That limit has now bitten twice, and the second instance is recorded rather
+than left as a stated risk.** A later sweep of the same log found **two genuine
+writes hidden under a leading `mkdir`** — real, ungranted, write-shaped calls
+that no write-suffixed key could see, because the key reads the first segment
+only. So the first-segment choice is right about *consistency* and wrong about
+*coverage*, and the ranking under-counts the write class by however many such
+calls a corpus holds. The disposition is unchanged and is not re-decided here:
+the segment-selection axis is the one that owns it.
 
 **No parser is minted for the redirect**, and the composition is stated because
 the obvious spelling is the wrong one. The detection reuses
@@ -1490,15 +1545,29 @@ recorded with it.** Decomposed across the same live ranking: `awk` and `grep`
 were reads throughout, `python3 -` was inline heredoc execution and already
 two-token, `git` is already subcommand-keyed so its reads and writes already
 occupied separate rows, and `sed` was absent because rule 8 blocks its read and
-in-place forms upstream of the log. `echo`/`printf`'s near-absence is only
-*partly* structural, and the boundary is stated rather than overclaimed: rule 17
-matches the `>>` arm only and, on a match, `guard_allow` exits the hook directly,
-so an **append** through a roster emitter can never reach the log under any key —
-a structural guarantee. A **create** redirect (`echo foo > .tmp/x`) matches no
-auto-allow rule, falls through like any other command, and keys as `echo >` the
-day one is run. The honest reading is that the axis is **general and currently
+in-place forms upstream of the log. `echo`/`printf`'s near-absence is
+structural for a reason worth naming precisely: on a rule 17 match `guard_allow`
+exits the hook directly, so a granted write through a roster emitter can never
+reach the log under any key. A write to a **gitignored** target — create or
+append alike, since rule 17 grants both — is therefore invisible here by
+construction. What still keys as `echo >` or `cat >` is a write rule 17 declines:
+a tracked target, an emitter off the roster, a live substitution, a second
+statement. The honest reading is that the axis is **general and currently
 near-single-instance**, and a later reader deciding whether to extend or retire
 it needs to know the bite was measured rather than assumed.
+
+**This instrument cannot size the population its neighbouring rules already
+admit, and that is a property of the grant boundary rather than a gap in the
+sweep.** `guard_log_fallthrough` runs only after every rule has declined
+(rule 24), so a granted call is never a log line. Two consequences a reader of
+this ranking has to carry. First, a question of the form *how often does the
+shape rule 17 grants actually occur* has **no answer in this log** — a zero here
+is zero by design, not zero by finding, and any sizing of that population needs a
+different instrument. Second, **a reading that drops after a grant widens has not
+measured fewer writes**: widening `guard_allow`'s admitted set shrinks this log's
+own corpus, so the class's next reading falls for a reason other than the
+behaviour changing. A close attributing such a drop to fewer writes would be
+reading the instrument's own boundary as a result.
 
 `--count` emits the compact `<patterns>/<occurrences>` prompting token
 (overlay-covered excluded, so a counting reader reads true); an explicit file
@@ -1837,7 +1906,8 @@ Knobs (this repo's layout as defaults):
 - `GUARD_KIT_RO_BINS` — read-only pipeline roster (rule 18); default the
   grep/head/cat/find/jq family, plus `xargs`, whose membership is qualified by
   rule 18's discriminator rather than granting on the leads-with test alone.
-- `GUARD_KIT_APPEND_BINS` — the emitter roster of the append grant (rule 17);
+- `GUARD_KIT_APPEND_BINS` — the emitter roster of rule 17's write grant, which
+  covers the create case as well as the append the name was minted for;
   default `(cat printf echo)`. A knob rather than a kit literal on
   `GUARD_KIT_RO_BINS`'s reasoning: a consumer whose mandated write rides a
   different emitter shadows the array instead of forking the rule, and three

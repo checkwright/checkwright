@@ -28,7 +28,10 @@ block	python3 @ROOT@/tools/report.py
 fallthrough	python3 /other/repo/tools/report.py
 fallthrough	printf '%s' 'the path @ROOT@/tools/report.py is steered'
 fallthrough	printf '%s' "the path @ROOT@/tools/report.py is steered"
-fallthrough	cat <<'EOF' > .tmp/note.md@NL@the path @ROOT@/tools/report.py is steered@NL@EOF
+#          The heredoc row lands on `allow` rather than `fallthrough` because
+#          rule 17's create grant reaches it fourteen rules later; a rule-5
+#          regression would still read `block`, which is what this row asserts.
+allow	cat <<'EOF' > .tmp/note.md@NL@the path @ROOT@/tools/report.py is steered@NL@EOF
 
 # rule 6 — shell expansion / assignment; single-quoted $ stays literal.
 #          'sq' only: a double-quoted "$x" expands, and so does an
@@ -39,7 +42,7 @@ fallthrough	awk '$1' data.txt
 # 'hdq': an unquoted delimiter expands, so its body stays live; a quoted one
 # cannot expand, and the shell is what guarantees that — so its body is inert
 block	cat <<EOF > .tmp/n.md@NL@value is $(date)@NL@EOF
-fallthrough	cat <<'EOF' > .tmp/n.md@NL@value is $(date)@NL@EOF
+allow	cat <<'EOF' > .tmp/n.md@NL@value is $(date)@NL@EOF
 # reaches rule 21's advisory, which is the correct verdict for a commit -F; the
 # point is that rule 6 no longer blocks it before rule 21 is ever consulted
 advise	git commit -F - <<'MSG'@NL@names a $(cmd) in the body@NL@MSG
@@ -55,7 +58,7 @@ block	mkdir -p a/{b,c}
 fallthrough	awk '{print $1}'
 fallthrough	find . -exec grep foo '{}' +
 allow	grep -rnE "^[a-z]{2,}" src
-fallthrough	cat <<'EOF' > .tmp/note.md@NL@a brace {a,b} in prose@NL@EOF
+allow	cat <<'EOF' > .tmp/note.md@NL@a brace {a,b} in prose@NL@EOF
 block	cat <<'EOF' > a/{b,c}/note.md@NL@prose@NL@EOF
 
 # rule 8 — sed reading or rewriting a file directly; a piped-into sed is a filter
@@ -142,21 +145,34 @@ fallthrough	bash worker.sh & printf 'pid=1 run=worker\n' > .tmp/worker.run
 allow	: > scratch.txt
 fallthrough	: > tracked.txt
 
-# rule 17 — append-only write to gitignored targets auto-allowed. The four
-#           clauses each get their refusing case, because each is what keeps the
-#           grant from blessing something the redirect alone would: (a) a single
-#           truncating `>` anywhere, (b) a target outside the ignore set, (c) a
-#           leading command that writes somewhere other than its stdout, and the
-#           single-statement half of (c) — a second statement on a line of its
-#           own, which is what the heredoc residue must never be confused with.
+# rule 17 — a write to gitignored targets auto-allowed, create and append alike.
+#           The clauses each get their refusing case, because each is what keeps
+#           the grant from blessing something the redirect alone would: (b) a
+#           target outside the ignore set, (c) a leading command that writes
+#           somewhere other than its stdout, and the single-statement half of
+#           (c) — a second statement on a line of its own, which is what the
+#           heredoc residue must never be confused with.
 #           Targets are relative, as rules 3 and 16's are: the runner drives the
 #           guard from inside the sandbox, and an `@ROOT@`-absolute target would
 #           meet rule 5's repo-root-prefix block nine rules earlier.
 allow	cat >> .tmp/journal.md <<'EOF'@NL@line@NL@EOF
-fallthrough	cat > .tmp/journal.md <<'EOF'@NL@line@NL@EOF
+allow	cat > .tmp/journal.md <<'EOF'@NL@line@NL@EOF
 fallthrough	cat >> tracked.md <<'EOF'@NL@line@NL@EOF
 fallthrough	rm -rf .tmp/x >> .tmp/journal.md
 fallthrough	printf x >> .tmp/journal.md@NL@rm -rf .tmp/x
+# (d)'s region test is `hdq`, not the raw command: a backtick in a QUOTED
+# delimiter's body cannot substitute, so the grant reaches the shape the mandated
+# journal append is always spelled in; an UNQUOTED delimiter leaves the body live
+# and the decline still fires. Nothing else distinguishes the two at the grant
+# boundary, so these two rows are the whole holder of the asymmetry.
+allow	cat >> .tmp/journal.md <<'EOF'@NL@a `slug` in prose@NL@EOF
+fallthrough	cat >> .tmp/journal.md <<EOF@NL@a `slug` in prose@NL@EOF
+# the create half rests on rule 16: `: > f` and then `cat >> f` are each already
+# granted, so a create adds one permission decision and no capability. Every
+# other clause still holds — a tracked target refuses on the per-target ignore
+# test the append case takes, which is the row that would catch an over-wide grant
+allow	printf 'x' > .tmp/note.txt
+fallthrough	cat > tracked.md <<'EOF'@NL@line@NL@EOF
 # the two inert targets are exempt from (a) and (b): neither is a file the
 # append-only split protects, and neither is a path git check-ignore can answer
 allow	printf 'x@NL@' >> .tmp/journal.md 2>/dev/null
