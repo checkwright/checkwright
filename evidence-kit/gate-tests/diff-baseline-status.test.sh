@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
-# Behavioral test of bin/diff-baseline.sh's status handling — the one thing no
-# gate fixture pair can hold, because the tool is a situational bin rather than a
+# Behavioral test of the --diff-baseline arm's status handling and argv shape — the one thing no
+# gate fixture pair can hold, because the tool is a situational arm rather than a
 # registered gate, and because what is under test is an argument grammar plus a
 # refusal rather than a verdict over a tree.
+#
+# spec: evidence-kit/SPEC.md §bin/diff-baseline.sh — driven through the front end since the
+# 2026-09-04 port, which is also where the `-h`/`--help` arm now lives; cases G, H and I are the
+# three behaviours the port ADDS, so they are asserted rather than carried over.
 #
 # The defect it pins: the tool used to hand ek_parse a hardcoded 0, so an
 # exit-code suite reported pass for every log it was ever handed and the tool
@@ -14,7 +18,7 @@ set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # evidence-kit/
-BIN="$DIR/bin/diff-baseline.sh"
+FE="$(cd "$DIR/../gate-sdk/bin" && pwd)/run-gates.sh"
 
 fails=0
 tmp="$(mktemp -d)"
@@ -33,7 +37,7 @@ _run() {
         EVIDENCE_KIT_BASELINE_FILE="$tmp/base.txt" \
         EVIDENCE_KIT_SKIP_FILE="$tmp/skip.txt" \
         EVIDENCE_KIT_TMP_DIR="$tmp/scratch" \
-        bash "$BIN" "$@" 2>&1
+        bash "$FE" --diff-baseline "$@" 2>&1
     printf 'rc=%s\n' "$?"
 }
 
@@ -84,14 +88,41 @@ out="$(env -u EVIDENCE_KIT_CONFIG_FILE \
         EVIDENCE_KIT_BASELINE_FILE="$tmp/base.txt" \
         EVIDENCE_KIT_SKIP_FILE="$tmp/skip.txt" \
         EVIDENCE_KIT_TMP_DIR="$tmp/scratch" \
-        bash "$BIN" greensuite "$tmp/log" 2>&1; printf 'rc=%s\n' "$?")"
+        bash "$FE" --diff-baseline greensuite "$tmp/log" 2>&1; printf 'rc=%s\n' "$?")"
 if ! grep -q '^diff-baseline: clean' <<<"$out" || ! grep -qx 'rc=0' <<<"$out"; then
     echo "  FAIL: a log-parsing suite must still accept the statusless pair form: $out"; fails=$((fails + 1))
+fi
+
+# G — the front end owns the help arm: usage on STDOUT at exit 0, and it names this member. The
+#     shell form had no help branch at all, so this is an addition rather than a preserved shape.
+out="$(bash "$FE" --help 2>/dev/null; printf 'rc=%s\n' "$?")"
+if ! grep -q -- '--diff-baseline' <<<"$out" || ! grep -qx 'rc=0' <<<"$out"; then
+    echo "  FAIL: the front-end help arm must print usage naming --diff-baseline on stdout at exit 0: $out"; fails=$((fails + 1))
+fi
+
+# H — a positional beginning with a dash is REFUSED by name. The defect this closes is the sharpest
+#     one the port fixes: the shell form absorbed `--help` as a suite name, matched no baseline row,
+#     and printed `clean` at exit 0 — a wrong verdict read by a CI check mark rather than a session.
+out="$(_run --help "$tmp/log")"
+if ! grep -q 'unrecognized option: --help' <<<"$out" || ! grep -qx 'rc=2' <<<"$out"; then
+    echo "  FAIL: a dash-led positional must be refused by name at exit 2, never absorbed as a suite: $out"; fails=$((fails + 1))
+fi
+if grep -q '^diff-baseline: clean' <<<"$out"; then
+    echo "  FAIL: a mistyped invocation reported CLEAN — the exact false green the shape refusal exists against: $out"; fails=$((fails + 1))
+fi
+
+# I — `--` ends option processing, which is what keeps the refusal a fix rather than a capability
+#     loss: a suite legitimately named with a leading dash is still reachable as free text.
+#     The escape's product is that the token reaches the group parser AS A SUITE NAME, so the
+#     assertion is the finding line naming it; the verdict that follows is the fail-closed rule's.
+out="$(_run -- -dashsuite "$tmp/log" 1)"
+if grep -q 'unrecognized option' <<<"$out" || ! grep -qx 'new-failure -dashsuite -dashsuite' <<<"$out"; then
+    echo "  FAIL: the -- separator must admit a dash-led suite name as free text: $out"; fails=$((fails + 1))
 fi
 
 if [[ "$fails" -gt 0 ]]; then
     echo "diff-baseline-status.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "diff-baseline-status.test: ok (exit-code suite refuses without a status; status drives new-failure, baselined-fail and recovery; group parsing is unambiguous; the pair form survives for log-parsing suites)"
+echo "diff-baseline-status.test: ok (exit-code suite refuses without a status; status drives new-failure, baselined-fail and recovery; group parsing is unambiguous; the pair form survives for log-parsing suites; the help arm is the front end's, a dash-led positional is refused by name, and -- admits one as free text)"
 exit 0

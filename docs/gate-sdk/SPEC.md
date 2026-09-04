@@ -846,6 +846,18 @@ non-reading; the harm is the second instance's exactly — a non-reading dressed
 reading — reached from a third direction, and the reason a port may not fold a
 status even where the collapse would happen to satisfy a documented sentence.
 
+**`--diff-baseline` is the clause's fourth reader instance, and the first whose
+absorbed argument yields a *clean verdict* rather than a wrong one**
+(evidence-kit/SPEC.md §bin/diff-baseline.sh). The shell tool absorbed a first
+argument of `--help` as a **suite name**; that suite matches no baseline row, and
+the baseline's fail-closed rule keys on `fail` alone, so an observed set with no
+rows and no observed `fail` produces **no findings and exit 0**. A typo'd
+invocation therefore printed `diff-baseline: clean` and returned success. It is
+the second instance's shape — a non-reading dressed as a reading — and worse in
+one respect: the reader is not a session that might notice the wording, it is a
+CI step whose only output is a check mark. The port added all three behaviours,
+the clause working forward again.
+
 **No gate reads this rule, and that is ruled rather than deferred.**
 §check-exec-bit's corpus is the whole `*/bin/*.sh` set, and a gate over it could
 assert only the weak static shape — does the file contain a `--help` branch —
@@ -2256,8 +2268,9 @@ arms below it, and the bridged `Arm::Run` members that are neither —
 §bin/install-lifecycle.sh, its 2026-09-03 member), `--usage-verdict`
 (delegation-kit/SPEC.md §usage-verdict), `--wait-probe`
 (delegation-kit/SPEC.md §bin/wait-probe), `--enter-stage`
-(lifecycle-kit/SPEC.md §bin/enter-stage.sh) and `--run-validate`
-(evidence-kit/SPEC.md §bin/run-validate.sh, its 2026-09-04 member) — and the class
+(lifecycle-kit/SPEC.md §bin/enter-stage.sh) and evidence-kit's `--run-validate`
+and `--diff-baseline` (evidence-kit/SPEC.md §bin/run-validate.sh and
+§bin/diff-baseline.sh, its 2026-09-04 pair) — and the class
 they form is named here because a
 session arriving with a new non-gate thing to port has no other way to learn
 that one exists or what it costs. Each arm's own `spec:` comment explains that
@@ -2787,8 +2800,16 @@ tell those apart, and nothing in the battery would report it. Its callers are a
 stage template, the lead template, a command shim and a kit smoke, each reading
 the exit status alone.
 
-**Its spawned-program set is the class's widest, and the first that is a
-*roster* rather than a seam or two.** `--usage-verdict` spawns one consumer
+**`--diff-baseline` is the fifth, and it is the member that shows the family test
+is the *exit contract* and not the document test.** That member genuinely emits a
+report on stdout — `new-failure` and `recovery` lines and a summary — so the
+natural read of "it prints findings" is that `--emit-` fits. It does not: 1 is
+its verdict and 2 its misuse code, and its one functional caller is a CI leg that
+reads nothing but the status. Recorded because it is the only member so far whose
+family choice a reader could get wrong from the output alone.
+
+**`--run-validate`'s spawned-program set is the class's widest, and the first that
+is a *roster* rather than a seam or two.** `--usage-verdict` spawns one consumer
 command and `--emit-env-probe` probes a configured tool list; this member spawns
 `bash`, whatever the configured parser and pre-hook commands name, **and each
 suite's own run command** — which in this tree includes `cargo`

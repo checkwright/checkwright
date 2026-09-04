@@ -33,6 +33,7 @@ usage: run-gates.sh [gates-dir]                run every registered gate
        run-gates.sh --enter-stage <stage>      stamp a stage entry (or --rename an iteration)
        run-gates.sh --wait-probe <sub> [args]  the wait-primitive probe: 'sweep' is the reproducer
        run-gates.sh --run-validate             run the codified validate spine over the roster
+       run-gates.sh --diff-baseline <group>... diff captured logs against the baseline slice
        run-gates.sh -h | --help                this text, on stdout, exit 0
 
   --only  runs the named members in registry order whatever order they were
@@ -101,6 +102,15 @@ usage: run-gates.sh [gates-dir]                run every registered gate
           command, a failing pre-hook, a parser producing no result is 1);
           unavailable is 2, because a caller that read a silent 0 would believe
           a run it never got had passed.
+  --diff-baseline  parses each captured log named on argv and diffs it against
+          the baseline's suite slice per-scenario, printing `new-failure` and
+          `recovery` findings. Each argument group is `<suite> <logfile>
+          [<status>]`, repeated; an `exit-code` suite must carry its status or
+          the tool refuses rather than assuming success. A positional beginning
+          with a dash is a refusal, and `--` ends option processing. Exit 0
+          clean, 1 new failures against the baseline, 2 misuse or an unreadable
+          log; unavailable is 2, its one functional caller being a CI leg that
+          reads nothing but the status.
   --      ends option processing, so a gates-dir spelled with a leading dash
           is still reachable.
 
@@ -232,6 +242,13 @@ case "${1-}" in
     --run-validate)
         shift
         exec_arm --run-validate "$@"
+        ;;
+    # spec: evidence-kit/SPEC.md §bin/diff-baseline.sh — a bridged arm outside the `--emit-` family
+    # although it prints findings: the exclusion is the exit contract, 1 being its verdict, and its
+    # one functional caller is a CI leg whose only output is a check mark
+    --diff-baseline)
+        shift
+        exec_arm --diff-baseline "$@"
         ;;
     --for)
         shift

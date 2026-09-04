@@ -161,11 +161,9 @@ Knobs, this repo's surface names as defaults:
 ### lib/evidence.sh
 
 The sourced config loader: consumer config first, kit defaults fill what it
-left unset, then validation. It also owns the shared adapters — `ek_suite_cmd`
-(a suite's configured run command, `EVIDENCE_KIT_RUN_<suite>`), `ek_parser_for`
-(the per-suite parser resolution, detailed below), `ek_parse` (the
-parser dispatch), `ek_diff` (the per-scenario baseline diff, §bin/diff-baseline.sh),
-`ek_data_lines`, and the self-contained `ek_queue_iteration` / `ek_run_key`
+left unset, then validation. Its remaining adapters are `ek_suite_cmd`
+(a suite's configured run command, `EVIDENCE_KIT_RUN_<suite>`), `ek_data_lines`,
+and the self-contained `ek_queue_iteration` / `ek_run_key`
 header readers plus the `ek_state_stage` cursor reader that let the kit read
 lifecycle state without a lifecycle-kit dependency. The two axes come from two
 surfaces: the queue header names the iteration, the state file's **last data
@@ -182,15 +180,26 @@ states the ground. The adapters listed above ride the same file and are not
 themselves the ground; the header says so in as many words, which is the licence
 for the compiled twins below.
 
-**Five of the adapters have compiled twins in `native/src/evidence.rs`, and the
-library's shell forms survive on their own callers.** `ek_run_key`,
+**Every adapter this library ever held now has a compiled twin in
+`native/src/evidence.rs`, and three of them live there alone.** `ek_run_key`,
 `ek_suite_cmd`, `ek_parser_for`, `ek_parse` and `ek_diff` were paid there by the
 `--run-validate` port (§bin/run-validate.sh), joining `ek_data_lines`,
 `ek_queue_iteration` and `ek_state_stage`, which the kit's gates already held
-twice. The class ruling does not foreclose this and the file is not narrowed by
-it: the ruling names the *file* as the config bridge's sole resolver and says in
+twice. The class ruling does not foreclose this and the *file* is not narrowed by
+it: the ruling names the file as the config bridge's sole resolver and says in
 the same breath that the parser adapters beside those defaults are a separate
-question it does not reach.
+question it does not reach — which is the licence, stated in the library's own
+header, for taking them.
+
+**The parser resolution, the parser dispatch and the per-scenario diff are the
+three that retired, and the sequence is what makes it lawful rather than a
+judgment.** `ek_parser_for`, `ek_parse` and `ek_diff` had exactly two production
+callers, `bin/run-validate.sh` and `bin/diff-baseline.sh`, and no third — probed
+rather than reasoned. The spine cut ported the first and left the duplication
+live; the diff cut ported the second and the caller set emptied, so the shell
+forms came out in that cut's own commit. That is the whole content of the
+between-cuts economy: the sibling creates a duplication and this cut ends it,
+which is also why the two were not droppable independently.
 
 **Two adapters left this file entirely when their last shell caller did, and the
 disposition is the rule rather than a judgment.** `ek_pid_alive` and
@@ -224,11 +233,11 @@ and this sentence is the trigger that re-opens it:** the day a suite's test name
 stop churning, so that a baseline row survives an iteration, `libtest` is the
 right answer and the rows follow a run as §Baseline manifest requires.
 
-Which adapter a suite gets is resolved by `ek_parser_for <suite>`
+Which adapter a suite gets is resolved by the per-suite resolution
 (`EVIDENCE_KIT_PARSER_<suite>`, else the global `EVIDENCE_KIT_PARSER`), and the
-dispatch lives inside `ek_parse` — so both spine callers, `--run-validate` and
-`diff-baseline`, inherit per-suite parsing with no edit of their own. The
-resolution is a named helper rather than private to `ek_parse` because
+dispatch sits behind it — so both callers, `--run-validate` and
+`--diff-baseline`, inherit per-suite parsing with no edit of their own. The
+resolution is a named helper rather than private to the dispatch because
 `--run-validate`'s produced-no-result diagnostic must name the *effective* parser:
 naming the global while an override produced the empty result would misreport
 exactly the guard the per-gate baseline leans on.
@@ -256,9 +265,18 @@ mechanism kept off the compiled substrate while the port's own count reads as
 discharged. Naming the convention is the deliverable of a queued entry and is
 ruled there, not by a port cut passing through.
 
-Neither adapter is a gate, so the library's branches are covered by
-`gate-tests/evidence-lib.test.sh`: the per-suite dispatch with its global
-fall-through, and `ek_diff`'s absent-from-baseline triple. The triple's `ignore`
+Neither adapter is a gate, so their branches are covered by
+`gate-tests/evidence-lib.test.sh` — re-pointed at the compiled twins through the
+front-end rather than deleted when the shell forms went, because what those
+assertions are *about* survived the substrate change and belongs to the surviving
+implementation. This repo's own wiring of the knob has a second suite,
+`scripts/gate-tests/evidence-parser-values.test.sh`, re-pointed the same way: it
+drives the *configured value* rather than a hardcoded arm, so it is what would
+notice a port that deleted a value's target. Both read the dispatch's answer out
+of `--diff-baseline`'s findings against a fixture baseline, which is what a caller
+can observe: a scenario the parser failed to produce reds as an absent row. What
+they cover is the per-suite dispatch with its global fall-through, and the
+absent-from-baseline triple. The triple's `ignore`
 edge carries a test of its own — the narrow side is the half a later session
 widens by accident, so it is pinned by an assertion rather than by prose alone.
 
@@ -290,6 +308,14 @@ when status is `fail` or `ignore` and forbidden when `pass`; each slug resolves
 to a live queue task (the queue-file knob) or a configured permanent marker.
 Tooling never writes it — a promotion (a held-constant red recovering to pass)
 is a human commit, which is what keeps the baseline honest.
+
+**The fail-closed rule keys on `fail` alone, and one consequence of that reads
+back onto a tool's argument grammar rather than onto this file.** An observed set
+carrying no baseline rows and no observed `fail` produces **no findings and exit
+0** — the honest answer for a suite nobody has baselined yet, and a *wrong* one
+for a suite name that was never a suite. That is the ground for the argv-shape
+refusal §bin/diff-baseline.sh states: a mistyped suite is indistinguishable from
+an unbaselined one at this layer, so it has to be caught at the argument.
 
 **A row is a claim about one scenario, and a suite's scenarios come from its
 parser.** What the row asserts is that *that scenario* is held at the recorded
@@ -658,7 +684,7 @@ rule, which keys on `fail` alone). The split is
 per-scenario, so a regression and a recovery cannot net to zero. It reads the
 skip side-channel (`EVIDENCE_KIT_SKIP_FILE`, truncated per run) to demote a
 self-skipped scenario from pass first, so a self-skip cannot masquerade as a
-pass. The shared diff (`ek_diff`) returns non-zero the moment a new failure
+pass. The shared diff returns non-zero the moment a new failure
 fires, which is also how `--run-validate` derives its verdict.
 
 **Each argument group is `<suite> <logfile> [<status>]`, and the status is
@@ -676,7 +702,58 @@ The optional third token is unambiguous rather than heuristic: a suite name
 suffixes `EVIDENCE_KIT_RUN_<suite>`, so it is a shell identifier and can never
 be all digits, and a status can never be anything else. `--run-validate` does
 not go through this path — it holds each suite's status directly at the point it
-ran it, and passes it to `ek_parse` itself.
+ran it, and passes it to the parser dispatch itself.
+
+**It is the bridged arm `--diff-baseline`**, reached through
+`bash gate-sdk/bin/run-gates.sh --diff-baseline` and dispatched to
+`native/src/emit/diff_baseline.rs`. The heading keeps the tool's old file name
+because the compiled diff's own directive and two sibling sections cite it, and
+deleting a heading dangles those where deleting only the script dangles nothing. With its
+sibling landed this cut takes evidence-kit's owed port column to **zero** — the
+first kit in the corpus to reach it on a `bin/` column — and the kit ships no
+`bin/` directory at all.
+
+**It is an `Arm::Run` although it prints a report, and the ground is worth
+stating because the natural read of "it emits findings" is that `--emit-` fits.**
+The exclusion is the **exit contract**, not the document test: the emitting
+family collapses to `{0, 2}` and 1 is this tool's verdict — *NEW failures against
+the baseline* — while 2 is its refusal, a bad argument shape, an unreadable log,
+or an `exit-code` suite named without its status. Collapsed, a real regression
+would be indistinguishable from *the tool was called wrong*, on a tool whose one
+functional caller is a CI leg that reads nothing but the status.
+
+**The declared knob roster is five names** — `EVIDENCE_KIT_BASELINE_FILE`,
+`EVIDENCE_KIT_SKIP_FILE`, `EVIDENCE_KIT_TMP_DIR`, `EVIDENCE_KIT_PARSER` and the
+`EVIDENCE_KIT_PARSER_*` family — all bridged, on the same forced-family test its
+sibling states. **It declares no suite roster and needs none**: this tool's
+suites arrive on argv, one group at a time, which is exactly what distinguishes
+it from the spine.
+
+**The argv-shape half of §The bin/-tool contract binds here, and the port ADDS
+all three behaviours rather than preserving them.** The shell form validated
+**arity alone**: a first argument of `--help` was absorbed as a *suite name*,
+carried into the parser resolution, and the run proceeded against whatever the
+second argument was. Because §Baseline manifest's fail-closed rule keys on `fail`
+alone, an observed set with no baseline rows and no observed `fail` yields **no
+findings and exit 0** — so a typo'd invocation printed `diff-baseline: clean` and
+the CI leg that reads its status went green. The compiled arm therefore refuses a
+positional beginning with `-` that is not a recognized option (usage on stderr,
+exit 2), takes `--` as the escape that admits one as free text, and leaves the
+`-h`/`--help` arm to the front-end where the class already keeps usage.
+
+**The two orderings that interact, because the naive one breaks the
+disambiguation.** The shape refusal is applied to a positional **before** the
+group parser consumes it, so `-x` in a suite slot is refused rather than resolved
+as a parser name; the all-digit test stays **inside** the group, because a status
+is not free text and a leading `-` cannot appear in it. Getting that order wrong
+would make a negative-looking token refuse where a well-formed group was meant.
+
+**The skip channel's reader crosses and its producer is outside this tree.** The
+demotion of an observed `pass` to `skip` happens before the pass/fail branch, so
+a self-skipped scenario cannot masquerade as a pass; but **no tracked file writes
+the skip file** — probed, not assumed — because §Layout and configuration rules
+it produced by a *consumer harness* that self-skips a scenario. The port neither
+gains nor loses a producer.
 
 ### check-evidence-baseline
 
@@ -1186,16 +1263,16 @@ evidence line proves the green result once the suites have run.
   readers' liveness predicate making a leak inert, and by the consumer's
   scratch-boundary wipe.
 - **Baseline line** — produced by human commits (initial seed, promotions);
-  consumed by `diff-baseline.sh` (the per-scenario diff) and
+  consumed by `--diff-baseline` (the per-scenario diff) and
   `check-evidence-baseline` (grammar, liveness, coverage).
 - **Skip record** — produced by a consumer harness that self-skips a scenario;
-  consumed by `diff-baseline.sh`. An absent file means no skips.
+  consumed by `--diff-baseline`. An absent file means no skips.
 - **Per-suite parser override** — produced by consumer config
-  (`EVIDENCE_KIT_PARSER_<suite>`); read by `ek_parser_for`, and so by the
-  `ek_parse` dispatch and `--run-validate`'s effective-parser diagnostic, reaching
+  (`EVIDENCE_KIT_PARSER_<suite>`); read by the per-suite parser resolution, and so
+  by the parser dispatch and `--run-validate`'s effective-parser diagnostic, reaching
   both spine tools.
 - **Scenario line** — produced by the resolved parser from the captured log;
-  consumed by `ek_diff` (the per-scenario diff) and by the evidence line's
+  consumed by the per-scenario diff and by the evidence line's
   `pass=`/`fail=`/`ignore=` counts. Per-gate granularity changes the line's
   population, not its shape, so those readers are unchanged.
 - **Truncation** — produced by `--enter-stage` at the scope boundary reading

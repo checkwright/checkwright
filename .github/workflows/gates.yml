@@ -100,7 +100,7 @@ jobs:
       # names no gates` — a ruled outcome held in .workflow/validate-baseline.txt
       # against `binary-less-dispatch-loop-retirement`, not a defect this leg may
       # clear. So the suite's status is captured rather than obeyed, and the
-      # verdict comes from diff-baseline.sh, which reds only where the observed
+      # verdict comes from --diff-baseline, which reds only where the observed
       # result *deviates* from that record. Reading this step as a plain smoke run
       # would misread both what it asserts and what a red here means.
       #
@@ -131,7 +131,14 @@ jobs:
           rc="${PIPESTATUS[0]}"
           set -e
           echo "installer_smoke exited $rc; the verdict below is the baseline diff, not that status"
-          bash evidence-kit/bin/diff-baseline.sh installer_smoke "$log" "$rc"
+          # The verdict is the bridged `--diff-baseline` arm, and the binary it needs is built by
+          # the smoke's OWN first arm above (installer/consumer-smoke/run-smoke.sh, `build (the
+          # host gate binary the main payload carries)`) on this runner's preinstalled cargo — not
+          # by the `gates` job, which is a separate job with a separate workspace. The residual is
+          # named rather than discovered on a watched push: a smoke that blocks BEFORE that arm
+          # leaves no binary, and this line then reports the missing binary instead of a per-arm
+          # baseline diff. Both are red and the tee'd log above still says which arm broke.
+          bash gate-sdk/bin/run-gates.sh --diff-baseline installer_smoke "$log" "$rc"
 
   # The native Windows sibling, and the first thing this repository has ever run
   # on a non-Linux host. Its product is the log: whether the crate builds and the

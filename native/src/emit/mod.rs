@@ -3,6 +3,7 @@
 // comparator calling `emit()`, a stage step, a gate reaching it in process.
 pub mod cite_survey;
 pub mod close_surfaces;
+pub mod diff_baseline;
 pub mod docs_mirror;
 pub mod drift_report;
 pub mod enforcement_map;
@@ -496,6 +497,14 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         "--run-validate",
         Arm::Run(run_validate::run),
         run_validate::KNOBS,
+    ),
+    // spec: evidence-kit/SPEC.md §bin/diff-baseline.sh — an `Arm::Run` although it does emit
+    // findings on stdout, which is why the ground is stated: the family is excluded by the exit
+    // contract, 1 being "NEW failures" and 2 the misuse code, not by the document test
+    (
+        "--diff-baseline",
+        Arm::Run(diff_baseline::run),
+        diff_baseline::KNOBS,
     ),
 ];
 

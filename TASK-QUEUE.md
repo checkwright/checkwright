@@ -12,21 +12,6 @@
 
 ## New Features
 
-- **baseline-diff-port-cut** [spec: SPEC-diff-cut.md] — port `evidence-kit/bin/diff-baseline.sh`
-  (53) to the bridged `--diff-baseline` arm, the one owed file declaring
-  evidence-kit/SPEC.md §bin/diff-baseline.sh. With its sibling it takes evidence-kit's owed
-  column to zero.
-  **Selection ground and host: the sibling spine cut's**, not restated.
-  **BUILD-HELD CONSTRAINT — this cut is NOT droppable once `evidence-spine-port-cut` has landed;
-  drop both or neither.** Probed: the three shared twins have exactly two production callers,
-  `run-validate.sh` and `diff-baseline.sh`, and no third — so this is the commit that removes the
-  shell forms from `lib/evidence.sh` and re-points the library's two gate-test suites. The sibling
-  landing alone therefore leaves a live double implementation of the parser and the diff, which is
-  the duplication the port exists to delete. Re-ordering is refused with it: taken first, this cut
-  would pay the three twins at the sibling's price and lose the amortization the pairing is for.
-  ruled: baseline-diff-port-cut lead 2026-09-04 own-authority
-  Filed 2026-09-04 by spec, minted and promoted with its amendment in one motion.
-
 - **trend-reporter-port-cut** [spec: SPEC-trend-cut.md] — port `delegation-kit/bin/usage-trend.sh`
   (120) to the bridged `--emit-usage-trend` arm, the one owed file declaring
   delegation-kit/SPEC.md §Trend reporter. It takes delegation-kit's `bin/` column to zero.
@@ -9871,5 +9856,6 @@
 ## Done
 
 - evidence-spine-port-cut
+- baseline-diff-port-cut
 
 ## Lessons Learned
