@@ -109,11 +109,14 @@ transcribed union of the three is a maintained copy that drifts the first time
 either gate gains a knob.
 
 **Probed rather than assumed.** `native/src/gates/mod.rs:972-1028` gives
-`check-stage-entry` ten declared names and `check-stage-evidence` eleven, and
-**every one is `LIFECYCLE_KIT_*`** — including the associative
-`LIFECYCLE_KIT_PREDECESSOR` and two scan-scoped `(".", KNOB)` rows. So one family
-covers all three sets exactly, with nothing outside it and nothing inside it
-unused by somebody.
+`check-stage-entry` thirteen declared names and `check-stage-evidence` eleven,
+and **all but one are `LIFECYCLE_KIT_*`** — including the associative
+`LIFECYCLE_KIT_PREDECESSOR` and two scan-scoped `(".", KNOB)` rows. The one
+exception is `check-stage-entry`'s own `GATE_PRUNE_DIRS`, resolved at that
+gate's own child dispatch (`runner.rs`'s `child_knobs`, delta 6) rather than
+through this arm's bridged environment, so it costs the family claim nothing
+this arm itself must carry. So one family covers what the arm needs to bridge,
+with nothing outside it and nothing inside it unused by somebody.
 
 **The bridge already carries the family and the array shapes.** `gate-sdk/lib/gate.sh:241`
 rules that "the trailing `*` selects the prefix family", resolved by `compgen`
@@ -484,14 +487,15 @@ that its refusal names the sanctioned writer.
 in the file this cut deletes, and the amendment rules each rather than leaving a
 build session to infer one from the rewrite {design-bearing}:
 
-- **`enter-stage-flag-position-silently-ignored`** (`:562`) and
-  **`enter-stage-arg-position-silent-drop`** (`:2873`, which its own body marks
-  "DISTINCT from" the former at `:618`) — both are argv-grammar defects of the
-  shell parser. They are **carried forward, not fixed here**: the port preserves
-  the argv grammar by delta (2), so both defects survive the seam intact and their
-  entries stay live against the arm. Fixing either inside a port cut would change a
-  verdict across the seam, which is the discipline the whole corpus runs on. Each
-  entry's body is repointed at the arm in the deleting commit.
+- **`enter-stage-flag-position-silently-ignored`** (`:562`, whose own body marks
+  itself "DISTINCT from every entry about what the entry gate ASSERTS") and
+  **`enter-stage-arg-position-silent-drop`** (`:2873`) — both are argv-grammar
+  defects of the shell parser. They are **carried forward, not fixed here**: the
+  port preserves the argv grammar by delta (2), so both defects survive the seam
+  intact and their entries stay live against the arm. Fixing either inside a
+  port cut would change a verdict across the seam, which is the discipline the
+  whole corpus runs on. Each entry's body is repointed at the arm in the
+  deleting commit.
 - **`enter-stage-refusal-help-contradicts-its-guard`** (`:7740`) — a text defect in
   a refusal's `help:` line, unchanged by the substrate and carried forward on the
   same ground.
@@ -716,21 +720,21 @@ never a hand-picked subset:
 - `check-docs-cmd` — reds on a fenced invoked repo-relative `.sh` path that **does
   not resolve**, so its verdict is *not* monotone under this narrowing: removing
   the file **adds** a violation at every fenced invocation of it. Cleared by delta
-  (15), in the same commit, not by inspection.
+  (17), in the same commit, not by inspection.
 - `check-spec-pointer` — reds on a `<path>.md §<heading>` citation that does not
   resolve. Non-monotone **if the section heading goes**, and it does not: delta
-  (15) keeps `### bin/enter-stage.sh`, which is what keeps every citing surface
+  (17) keeps `### bin/enter-stage.sh`, which is what keeps every citing surface
   green. Named because the natural reading of "the file is deleted" takes the
   section with it.
 - `check-settings-paths` — reds on a permission grant naming a path that does not
   exist, so the delete **adds** a violation rather than removing one. Non-monotone;
-  cleared by delta (16) in the same commit.
+  cleared by delta (18) in the same commit.
 - `check-measured-claim` — `tree-shell-owed` moves 35 → 34; the reader that moves
-  is the baked hook invocation, cleared by delta (17). Whether any tracked `.md`
+  is the baked hook invocation, cleared by delta (19). Whether any tracked `.md`
   binds that key behind a `measured:` marker is checked rather than assumed.
 - `check-graph` / `check-docs-mirror-fresh` / `check-gate-binary-fresh` — red on a
   stale hook, artifact, mirror or binary, non-monotone for the same baked-value
-  reason. Cleared by delta (17).
+  reason. Cleared by delta (19).
 - `check-comment-tier` — monotone in the `.sh` set and **gaining** in the `.rs`
   set: the file's `# spec:` directives become an obligation on the new module
   rather than a risk, and each lands on the construct it directed. Two must survive
@@ -800,12 +804,12 @@ recommends the audit stage next.
   survey record — each names this tool's invocation and each moves to the arm's
   spelling; the survey record's read-trigger paragraph additionally loses the
   sentence that this is "the survey record's surviving shell half", which the cut
-  makes false (deltas 9, 15).
+  makes false (deltas 9, 17).
 - `lifecycle-kit/SPEC.md §templates/stages/` — the first-step invocation every
   stage template carries, and the valve-arming obligation that names the tool
-  (delta 15).
+  (delta 17).
 - `lifecycle-kit/templates/` — all six stage templates, `lead.md` and `consult.md`,
-  whose `--simulate` step is the mode's designed consumer (delta 15).
+  whose `--simulate` step is the mode's designed consumer (delta 17).
 - `gate-sdk/SPEC.md §The non-gate arm` — the class roster gains `--enter-stage`,
   recorded as the first member with **two sanctioned callers** and the first to
   declare a whole kit's **prefix family** rather than a sub-family; the paragraph
@@ -816,20 +820,20 @@ recommends the audit stage next.
   second caller rather than by widening the cd (delta 4).
 - `gate-sdk/bin/run-gates.sh` — the new `case` arm and its `usage()` line (delta 2).
 - `.claude/settings.json` — the grant naming the deleted path removed in the
-  deleting commit under ruling (2)'s carve-out; no grant added (delta 16).
+  deleting commit under ruling (2)'s carve-out; no grant added (delta 18).
 - `scripts/lifecycle-config.sh` — its `# spec:` comment about the entry-preflight
   argv's missing interpreter word survives verbatim, the behaviour being preserved;
   named because a reader assumes a compiled spawn changes it (delta 7).
 - `CLAUDE.md`, `README.md`, `docs/orchestration.md` — the backticked invocations,
-  none of which any gate reaches (delta 15).
+  none of which any gate reaches (delta 17).
 - `TASK-QUEUE.md`, the `native-gate-port-remaining-corpus` entry — moved from
   `## Deferred` to `## New Features` with `[design-pending]` swapped for this
   amendment's `[spec:]` ref; it **demotes** at build and never reaches `## Done`,
-  which its own body already rules (delta 18).
+  which its own body already rules (delta 20).
 - The generated projections this cut stales — the on-site SPEC, README and page
   mirrors, the generated `pre-commit`/`commit-msg` hooks, `docs/check-graph.html`,
   and the gate binary itself. All are rostered with their triggers and regen
-  commands in `docs/site-architecture.md` §Generated projections (delta 17).
+  commands in `docs/site-architecture.md` §Generated projections (delta 19).
 
 ## Definition of Done
 
@@ -883,17 +887,17 @@ recommends the audit stage next.
       (delta 14).
 - [ ] **Removals propagated** — grepped every spec, template, README, skill,
       command, settings file, gate-test, smoke script and committed workflow
-      surface for the deleted path; the silent set of delta (15) is fixed by hand
+      surface for the deleted path; the silent set of delta (17) is fixed by hand
       and nothing dangles.
 - [ ] **The section heading survived** — `check-spec-pointer` is green and every
-      citation of §bin/enter-stage.sh still resolves (delta 15).
+      citation of §bin/enter-stage.sh still resolves (delta 17).
 - [ ] **The settings narrowing was probed, not assumed** — the grant count removed
-      is the count that commit's deletes produce, and no grant was added (delta 16).
+      is the count that commit's deletes produce, and no grant was added (delta 18).
 - [ ] **The regeneration fan-out is discharged in the landing commit** — the
       generated hooks, the graph artifact, the SPEC/README/page mirrors, and the
-      gate binary (delta 17).
+      gate binary (delta 19).
 - [ ] **The promotion and the demotion both fit** — the promoted lead line
       measures 98 columns, and the entry returns to Deferred at build with no line
-      added against a re-measured cap (delta 18).
+      added against a re-measured cap (delta 20).
 - [ ] **Gaps filed** — cross-component gaps discovered during the work filed as
       debt tasks (a build-time causal gap is resolved that session, not deferred).

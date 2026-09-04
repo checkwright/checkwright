@@ -178,7 +178,7 @@ Two facts are recorded so a later session reaching for it does not re-buy them:
   alike; the only difference is whether the corrective sentence names a
   replacement tool or says "run it yourself with `!<command>`". `guard_advise()`
   (`:86-89`) is `additionalContext` at exit 0 and never blocks; `guard_allow()`
-  (`:91-101`) is `permissionDecision: "allow"` at exit 0.
+  (`:91-95`) is `permissionDecision: "allow"` at exit 0.
 
 **What refusing it costs, stated rather than omitted**: a composition no glob can
 match — a heredoc write to a path outside scratch, say — stays ungoverned, and
@@ -273,7 +273,7 @@ operator set of one existing clause, both inside `guard_rule_append_scratch`.
   config is the hook wiring at `.claude/settings.json:126-158`, which is live in
   this tree and is a consumer surface the kit names no path for.
 - **Consumer of the grant** — the harness, reading `permissionDecision: "allow"`
-  on stdout at exit 0 from `guard_allow` (`guard-kit/lib/guard.sh:91-101`). This is
+  on stdout at exit 0 from `guard_allow` (`guard-kit/lib/guard.sh:91-95`). This is
   the only reader of the decision and the transition is the tool call's admission.
 - **Consumer of the *absence* of a grant** — `guard_log_fallthrough`
   (`guard-kit/lib/guard.sh:103-106`), called from `scripts/bash-guard.sh:39`,
