@@ -16,6 +16,39 @@
 
 ## Deferred
 
+- **measured-marker-cannot-sit-mid-paragraph** [design-pending] — `check-measured-claim` binds its
+  marker to the line above the claim, so a claim standing mid-paragraph can carry no marker and
+  goes stale unwatched; TRAJECTORY.md's port figures are the attested instance.
+  **The staleness is attested, not predicted.** The ordering paragraph read "thirty-five owed
+  files" and "28.6 per cent" while a sibling sentence in the same file, edited the same iteration,
+  had already moved to 34. A hand sweep at the 2026-09-04 close caught it; no gate did.
+  **The oracle already exists**, which is what makes this a contract question and not a build:
+  `scripts/measured-claims.sh` emits `tree-shell-owed` off `--emit port-blockers --tree`, and
+  `CANON_KIT_MEASURED_SURFACE_GLOBS` reaches TRAJECTORY.md through `CANON_KIT_MANIFEST_FILES` — yet
+  the file carries ZERO `measured:` markers.
+  **THE DESIGN QUESTION.** canon-kit/SPEC.md §check-measured-claim binds the marker as a full-line
+  HTML comment on the line immediately above the claim, and every shipped instance sits above a
+  bullet or a paragraph. This claim is MID-PARAGRAPH: inserting the comment there splits the
+  rendered paragraph, and hoisting it to the paragraph's top attaches it to a sentence about
+  reopenability rather than to the count. Neither placement is available without a contract change,
+  which is why the fix is not a marker add.
+  **THE SECOND HALF, which a blanket marking policy would lose.** Most TRAJECTORY.md figures are
+  deliberately FROZEN dated attestations, so marking by figure would fight that file's own rule
+  that a dated attestation freezes the claim. The discriminator is a paragraph that self-declares
+  as corrected where it stands at each later reading — which this one does in its own text and its
+  neighbours do not. A sweep keyed on the figure rather than on that declaration is wrong.
+  **Cost while deferred:** low as a carry — a stale port figure in the ruling record misleads the
+  next session sizing a cut, and only a hand sweep finds it.
+  **NOT icebox-eligible, and the ground is the witness discriminator rather than the carry.**
+  TRAJECTORY.md's own instance is machinery-class, but the contract limit is canon-kit's and ships:
+  an adopter whose governed prose carries a mid-paragraph measured claim receives a gate that
+  silently does not reach it, and a gate's verdict is a product witness under TRAJECTORY.md's
+  2026-08-30 discriminator. The one-line tier would also drop the second half above, which is the
+  half a later ruling turns on.
+  Filed 2026-09-04 by the close of `enter-stage-cut-and-file-authoring-act` into the gap inbox,
+  which no stage of that iteration could drain; carried into this iteration's scope intake and
+  promoted here, so the record is late and says so.
+
 - **kit-library-port-residue** [design-pending]
   — the kit `lib/*.sh` members the 2026-08-30 class ruling deliberately leaves owed, filed
   rather than absorbed at its boundary. **What the ruling settled and what it did not.**
@@ -7387,6 +7420,11 @@
   **Cost while deferred:** low and diagnostic — a fixture run against a stale binary tells its
   reader the gate does not exist, pointing at a registration fix instead of at
   `bash gate-sdk/bin/build-native.sh`.
+  **The authority named on the Filed line below is ITSELF A FILED QUESTION — read it there rather
+  than re-deriving it:** `pre-grammar-disposition-authority-ambiguity` owns whether an ungrammared
+  disposition naming an operator CLASS and a LEAD ruler is read as one or the other, and the
+  operator ruled 2026-09-03 that the ambiguity is FILED rather than settled. This entry's own
+  deferral turns on neither reading, so a drain meeting this row disposes of it without escalating.
   Filed 2026-08-24 by build while landing the exit-class unit; DISPOSITIONED BY OPERATOR-CLASS
   RULING at the 2026-08-25 close — the lead ruled it STAYS DEFERRED on CLAUDE.md's
   scope-gated-intake rule, and directed it be promoted as a filing rather than started as work.
@@ -9764,6 +9802,7 @@
 - **worktree-cleanliness-assertion-scopes-to-checkout** [design-pending] — Reds on foreign dirt.
 - **release-record-retired-knob** [design-pending] — A removal's basis may not name its own knob.
 - **friction-key-segment-selection-unruled** [design-pending] — Which segment to key is unruled.
+- **scratch-auto-allow-no-decoration-steer** [design-pending] — Chained writes lose the steer.
 
 ## Done
 
