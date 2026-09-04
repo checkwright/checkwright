@@ -580,10 +580,27 @@ the two operator-class blockers that hold the front end and the crate's build sc
 lawful cut; the two were already on record as needing one consult between them, and this joins the
 ordering question to them rather than scheduling a second sitting. The acting session is not
 imminent, which is why the schedule is recorded here in the moment it was made rather than carried
-in a thread. The two blockers hold 546 owed lines of their own, on top of the install boundary's
-1237. Discharge event, unchanged: the consult that weighs it, at which point this paragraph is
-deleted whichever way that consult goes — or the paragraph above it retires
-and takes this with it.
+in a thread. The two blockers hold 562 owed lines of their own, on top of the install boundary's
+1237.
+
+**Three further limbs joined the same sitting — ruled 2026-09-04 by the operator, lead-relayed from
+an in-session prompt.** A scope survey composing that boundary's cut found each of them holding owed
+lines behind a question no composer may decide, and one sitting takes all three rather than three
+answered one at a time as each boundary rediscovers them.
+`cut-boundary-section-legality-unruled` is the first: two governing sections are unusable as cut
+boundaries for reasons their owner docs do not settle, and that entry's own cost field records the
+re-derivation being paid at every scope. The second and third sit in **one sentence** —
+gate-sdk/SPEC.md §Porting a gate to the binary substrate's per-file port-or-declared-cause clause,
+which has now produced three ports and two standoffs. `scripts/producer-liveness-reader.sh` is one:
+three surfaces disagree over whether `DELEGATION_KIT_LIVENESS_CMD` holds any consumer command or a
+path the compiled stop hook runs under bash, and which governs decides whether that file can port at
+all. `scripts/gate-exec.sh` is the other, its blocker mis-attributed to a downstream form question
+until that survey read the clause. Six limbs hold **1048** owed lines between them — counting
+`cut-boundary`'s installer-gated member once, under the install boundary rather than twice — which
+with the install boundary's own 1237 puts **2285 of the oracle's 4261**, near enough four lines in
+seven, beyond the reach of any lawful cut. Discharge event, unchanged: the consult that weighs it,
+at which point this paragraph is deleted whichever way that consult goes — or the paragraph above it
+retires and takes this with it.
 
 **A sequence remainder of one is not a finished port, and reading it as one is the misreading
 this paragraph exists to stop — operator-ruled 2026-08-25.** The completion predicate is the one
