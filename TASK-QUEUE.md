@@ -8339,38 +8339,6 @@
   ruled: observation-predicate-entry-cannot-drain-in-its-own-iteration lead 2026-09-04 own-authority
   Filed 2026-08-27 by the lead at build, promoted 2026-08-27 by close.
 
-- **site-health-probe-no-retry-on-transient** [design-pending] — the scheduled site probe files a
-  GitHub issue on a single non-200, so one transient edge response costs a maintainer triage.
-  **Observed, not projected.** Issue #4 was opened 2026-08-27 17:39Z reporting that the v0.19.0
-  release-body URL answered `503`. Re-probed at this boundary sweep: `200` on three consecutive
-  requests, with the apex answering `200` between them. Nothing was broken at any point a human
-  could have looked. The issue is closed with cause and is deliberately not re-used as this
-  entry's tracker.
-  **The mechanism, read rather than assumed.** `.github/workflows/site-health.yml:207` probes each
-  apex URL found in a Release body with one `curl -sS -m 20` and appends a failure on the first
-  non-200. Neither that arm nor the apex, `www`, HTTP-redirect and alt-domain arms above it
-  (`:74`, `:78`, `:85`, `:92`) retries anything; the workflow contains no retry, backoff or
-  confirm step at all. So every arm is one sample against a CDN.
-  **Why this class is worth an entry rather than a shrug.** The workflow's whole product is an
-  issue nobody asked for, opened while nobody is watching. A blocking gate's false positive is
-  argued down once by the session it blocks; an unattended prober's false positive is triaged by
-  whoever next reads the tracker, and the project's own threat model ranks exactly this — a wrong
-  red converting enforcement into distrust — as a top threat.
-  **Why `[design-pending]`:** confirm-before-filing is not one obvious change. Retrying inside the
-  arm hides a genuine flap the probe arguably exists to report; a second scheduled confirm run
-  before filing splits the verdict across runs and needs somewhere to hold the first; a
-  fail-count threshold across consecutive scheduled runs needs state the workflow does not have.
-  Which of the three is right turns on whether a flap is a finding, and that is unruled.
-  **DISTINCT from every gate entry in this pool**: the site-health workflow is not a battery gate,
-  runs on a schedule against a live host rather than a tree, and is out of a precommit gate's
-  reach by construction — the tier split its own `:216` comment already argues.
-  **Cost while deferred:** low per incident and unbounded in count — each transient edge response
-  spends one maintainer triage, and the arm cannot distinguish the one outage worth reporting from
-  the blips, so the tracker's signal degrades in exactly the direction that makes a real red
-  ignorable. Surfaced 2026-08-27 by GitHub issue #4.
-  Filed 2026-08-27 by scope at the GitHub boundary sweep, the issue dispositioned closed-with-cause
-  in the same pass.
-
 - **boundary-sweep-github-write-skips-identity-step** [design-pending] — the account-selection step
   is bound to push work, and the boundary sweep writes to GitHub without it.
   **It fired at this boundary, and the detection was luck of ordering.** The sweep posted its
@@ -9733,6 +9701,7 @@
   the evicting commit (`git log -p -S'<slug>' -- TASK-QUEUE.md`).
 
 - **turn-end-refusal-used-as-a-busy-wait** [design-pending] — Sessions busy-wait via the stop hook.
+- **site-health-probe-no-retry-on-transient** [design-pending] — A single non-200 files an issue.
 - **non-gate-arm-roster-hand-maintained** [design-pending] — The arm class's flag list is ungated.
 - **craft-rule-step-has-no-reader** [design-pending] — A broken stage-rules knob reds nothing.
 - **runtime-dir-two-tier-detector** [design-pending] — No two-tier proof for file-pattern ignores.
