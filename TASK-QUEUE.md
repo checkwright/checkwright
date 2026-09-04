@@ -12,6 +12,108 @@
 
 ## New Features
 
+- **native-gate-port-remaining-corpus** [spec: SPEC-enter-stage-cut.md] [roadmap: now/reliability]
+  — the whole battery onto the binary, and the shell surface down to its residue.
+  roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
+  It DEMOTES at build, never `## Done` — canon-kit/SPEC.md §Merging an amendment's corpus branch.
+  **Operator-ruled 2026-08-09: complete the port, ASAP** — that ruling, its grounds, its scope,
+  both install paths and the tail are [TRAJECTORY.md](TRAJECTORY.md) §PRIORITY DIRECTIVE's, not
+  restated; this entry is the work, bootstrap design included, inheriting gate-sdk/SPEC.md
+  §Porting a gate to the binary substrate and §Consumer payload. **Each closed cut's record —
+  members, counts, holds, grounds, price — lives in the contract section that cut selected**, so
+  this entry states only what remains (drift-kit/SPEC.md §The KPI plugin contract, gate-sdk/SPEC.md
+  §Consumer smoke, *The port disposition*).
+  **THE COMPOSER DOES NOT REACH THE TREE REMAINDER** — the registry arm answers for the battery,
+  only `--tree` is the predicate, and both arms are run. That two-axis misreading, the rise in owed
+  on a landing shell file, and the bounds are gate-sdk/SPEC.md §port-blockers'.
+  **THE COMPOSER IS RULED 2026-08-28: select the next cut by STATED CONTRACT** — the owed
+  files behind one specification section, ported behind the one amendment that section needs. Size-
+  and kit-ordered composers stay refused. **IT CONSTRAINS SELECTION, NOT ITERATION PACKAGING —
+  ruled 2026-08-30 (operator, lead-relay):** the clauses above say what makes ONE cut well-formed;
+  how many an iteration holds is owned elsewhere. Refused with it — three cohorts as ONE cut, which
+  fails this ruling's own words (*one* section, *the one* amendment) and averages the grounds all
+  three entries forbid, shared setup being logistics; and one cut per iteration, an over-read
+  paying three iteration floors for no added decision quality.
+  **(1) A CUT NARROWS THE PORT, NEVER AN EXTENSION POINT.** Where a kit ships a consumer-facing
+  plugin or config seam, that seam's resolution, direct execution and env contract survive and only
+  the bundled members move in-crate; the ground is the porting kit's OWN governed surfaces plus
+  CLAUDE.md §The provenance seam, never analogy — worked at drift-kit/SPEC.md §The extensibility
+  contract. **(2) SETTINGS GRANTS, RULED 2026-08-29 (operator, lead-relay):** removing a permission
+  grant whose target a RULED PORT CUT DELETES is OUTSIDE the 2026-08-22 bar — a pure narrowing
+  forced by the cut — and build removes the dead lines IN THE SAME COMMIT AS THE DELETE, the window
+  the requirement exists to close. The bar stands unchanged for every other permission-settings
+  edit: a carve-out for one class. Scope is the files THAT COMMIT deletes, never a path prefix —
+  probe the count, never assume it, the attested probe having quadrupled one kit's.
+  **(3) A SECTION IS A CUT'S OUTER BOUND, NOT ITS MINIMUM; (4) A CONSUMER PLUGIN ON A SEAM IS OWED
+  — ruling (1) reaches the seam alone, both 2026-09-03 (operator, lead-relay); (5) SIZING FILLS
+  WITHIN THAT BOUND, 2026-09-04 (lead) — singletons under-fill lawfully, no host minted, widths stay
+  per-cut, size arm permanently spent — gate-sdk/SPEC.md §Porting a gate to the binary substrate.**
+  ruled: native-gate-port-remaining-corpus lead 2026-08-28 2026-08-29 2026-08-31 own-authority
+  ruled: native-gate-port-remaining-corpus operator 2026-08-28 2026-08-29 2026-08-30 lead-relay
+  ruled: native-gate-port-remaining-corpus operator 2026-09-03 lead-relay
+  **Cost while deferred:** large and known — the **owed** remainder (the trailer's own arm, never
+  the unported count) plus the runners and the install-lifecycle layer. Not a single-iteration
+  delta; criterion relaxation is closed at gate-sdk/SPEC.md §The port-candidate criteria, an
+  ordering signal and never an eligibility screen. `gate-battery-result-cache` is the one battery
+  entry unsubsumed; `powershell-installer-surface` is the sequence's last member.
+  **NO YIELD AT ALL until `--tree` reads zero owed — the port-only run, ruled 2026-08-31
+  (operator, consult); TRAJECTORY.md §PRIORITY DIRECTIVE owns it.** It SUBSUMES rather than
+  repeals the 2026-08-29 four-yield rule: with no yield available there is none to escalate.
+  ruled: native-gate-port-remaining-corpus operator 2026-08-31 consult
+  ruled: native-gate-port-remaining-corpus lead 2026-09-01 2026-09-03 2026-09-04 own-authority
+  Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close; cohorts ruled at scope 2026-08-11/12.
+
+- **file-authoring-act-ungoverned** [spec: SPEC-file-authoring-act.md] — writing a file has no
+  steer, no grant and no owner, so authoring one costs an out-of-band permission decision
+  every time.
+  **It is the largest single class in the ranking**, and its dated series lives once, in the ruling
+  paragraph below. What the first measurement established is that this is a CLASS rather than an
+  argument about one row, and the write-shape axis landed beside it is what made it legible as one
+  — the filing bullet could only measure the pre-landing form, 19 of 19 `cat`-led lines.
+  **What the mandated alternatives do NOT cover, which is the whole gap.**
+  `guard-kit/bin/scratch-run.sh` governs EXECUTING a scratch script and `git commit -F` governs
+  CONSUMING a message file. Both act on a file that already exists. Nothing governs bringing one
+  into being, and the sessions paying hardest are the ones the method requires to write most:
+  resume journals, scratch scripts, commit messages.
+  **This is the disposition half of a two-half finding whose instrument half landed.**
+  `prompt-ranking-command-word-shape-blind` made the row READ correctly and deliberately left the
+  act ungoverned; guard-kit/SPEC.md §scan-prompts carries the instrument half and says nothing about
+  governing the act, so without this entry that half has no home at all. Adds that unit no
+  recurrence date and re-files none of it.
+  **Why it needed design, and one of its three shapes is not a stage session's to take.** A
+  committed permission grant is a settings edit and therefore **operator-class** under
+  TRAJECTORY.md §The closed rulings (2026-08-22) — this entry files it and does not land it. A
+  stated habit is not a mechanism. A guard steer onto the Write tool is buildable and is the only
+  self-served shape, but it is a wide behavioural change with a named collision: it must not fire on
+  the `>>`-under-scratch shape rule 17 already auto-allows, which is the shape the mandated
+  resume-journal write itself uses.
+  **SCOPED BY OPERATOR RULING — promote at the next iteration.** The ground ruled on is the
+  2026-09-04 close re-measurement: the class went from 41 of 185 prompting calls to **56 of 139**,
+  22 per cent to 40 per cent, the strongest standing friction signal in the pool. **The ruling
+  carries a consequence to record rather than leave a later reader to infer: it REOPENS the
+  port-only run for a second non-port unit**, the first having been that iteration's stage-journal
+  unit. **And the re-costing is part of the ruling, not a caveat beside it** — the three shapes
+  above were costed BEFORE the unit that doubled the number, so the promoting scope re-costs them
+  and inherits nothing. The doubling's cause is that unit: it made a journal write a mandatory last
+  step in all six stage templates, and the journal appends are most of the class.
+  ruled: file-authoring-act-ungoverned operator 2026-09-04 lead-relay
+  **A PREPARED SETTINGS DIFF AWAITS OUT-OF-BAND OPERATOR APPLICATION**, recorded here under
+  TRAJECTORY.md §The closed rulings (2026-08-22), which lets a stage session derive a diff and
+  state its grounds and ends its remit there. Six committed `permissions.allow` entries:
+  `Bash(date *)`, `Bash(find *)`, `Bash(git merge-base *)`, `Bash(git config *)`, `Bash(mkdir *)`,
+  and `Bash(: > .workflow/subagent-stop-liveness.log)`. SECURITY GROUNDS: the first five are
+  read-only or scratch-creating, take no path outside the tree that a `*` does not already reach in
+  a sibling grant, and each ranked in the live friction log; the sixth is a fixed literal whose two
+  sibling reclaim paths are already granted, so its absence is an asymmetry rather than a decision.
+  **These do NOT fix this entry's own class** and are not offered as doing so — a heredoc write is
+  composition no glob can match. They ride the same operator application, and this entry is the
+  queue's carrier for the prepared-diff obligation, which is the only reason they are here.
+  **Cost while deferred:** one out-of-band decision per authored file, paid by the sessions doing
+  the most durable recording, and invisible to every gate — the friction log is advisory, so nothing
+  reds however far the class grows.
+  Filed 2026-08-24 to the gap inbox by spec, as the surviving half of a split its sibling recorded;
+  drained 2026-08-24 at that close, which confirmed the act half is recorded nowhere at HEAD; scoped
+  2026-09-04 at close on the operator ruling above.
 ## Technical Debt
 
 ## Deferred
@@ -108,57 +210,6 @@
   Filed 2026-09-03 by spec, minted and promoted in one motion as the second cut's host on the
   ruling above; the column budget that forced it is filed as a recurrence of
   `record-stamp-encoding-compression`, the entry that owns the encoding, not this one.
-
-- **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
-  — the whole battery onto the binary, and the shell surface down to its residue.
-  roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
-  It DEMOTES at build, never `## Done` — canon-kit/SPEC.md §Merging an amendment's corpus branch.
-  **Operator-ruled 2026-08-09: complete the port, ASAP** — that ruling, its grounds, its scope,
-  both install paths and the tail are [TRAJECTORY.md](TRAJECTORY.md) §PRIORITY DIRECTIVE's, not
-  restated; this entry is the work, bootstrap design included, inheriting gate-sdk/SPEC.md
-  §Porting a gate to the binary substrate and §Consumer payload. **Each closed cut's record —
-  members, counts, holds, grounds, price — lives in the contract section that cut selected**, so
-  this entry states only what remains (drift-kit/SPEC.md §The KPI plugin contract, gate-sdk/SPEC.md
-  §Consumer smoke, *The port disposition*).
-  **THE COMPOSER DOES NOT REACH THE TREE REMAINDER** — the registry arm answers for the battery,
-  only `--tree` is the predicate, and both arms are run. That two-axis misreading, the rise in owed
-  on a landing shell file, and the bounds are gate-sdk/SPEC.md §port-blockers'.
-  **THE COMPOSER IS RULED 2026-08-28: select the next cut by STATED CONTRACT** — the owed
-  files behind one specification section, ported behind the one amendment that section needs. Size-
-  and kit-ordered composers stay refused. **IT CONSTRAINS SELECTION, NOT ITERATION PACKAGING —
-  ruled 2026-08-30 (operator, lead-relay):** the clauses above say what makes ONE cut well-formed;
-  how many an iteration holds is owned elsewhere. Refused with it — three cohorts as ONE cut, which
-  fails this ruling's own words (*one* section, *the one* amendment) and averages the grounds all
-  three entries forbid, shared setup being logistics; and one cut per iteration, an over-read
-  paying three iteration floors for no added decision quality.
-  **(1) A CUT NARROWS THE PORT, NEVER AN EXTENSION POINT.** Where a kit ships a consumer-facing
-  plugin or config seam, that seam's resolution, direct execution and env contract survive and only
-  the bundled members move in-crate; the ground is the porting kit's OWN governed surfaces plus
-  CLAUDE.md §The provenance seam, never analogy — worked at drift-kit/SPEC.md §The extensibility
-  contract. **(2) SETTINGS GRANTS, RULED 2026-08-29 (operator, lead-relay):** removing a permission
-  grant whose target a RULED PORT CUT DELETES is OUTSIDE the 2026-08-22 bar — a pure narrowing
-  forced by the cut — and build removes the dead lines IN THE SAME COMMIT AS THE DELETE, the window
-  the requirement exists to close. The bar stands unchanged for every other permission-settings
-  edit: a carve-out for one class. Scope is the files THAT COMMIT deletes, never a path prefix —
-  probe the count, never assume it, the attested probe having quadrupled one kit's.
-  **(3) A SECTION IS A CUT'S OUTER BOUND, NOT ITS MINIMUM; (4) A CONSUMER PLUGIN ON A SEAM IS OWED
-  — ruling (1) reaches the seam alone, both 2026-09-03 (operator, lead-relay); (5) SIZING FILLS
-  WITHIN THAT BOUND, 2026-09-04 (lead) — singletons under-fill lawfully, no host minted, widths stay
-  per-cut, size arm permanently spent — gate-sdk/SPEC.md §Porting a gate to the binary substrate.**
-  ruled: native-gate-port-remaining-corpus lead 2026-08-28 2026-08-29 2026-08-31 own-authority
-  ruled: native-gate-port-remaining-corpus operator 2026-08-28 2026-08-29 2026-08-30 lead-relay
-  ruled: native-gate-port-remaining-corpus operator 2026-09-03 lead-relay
-  **Cost while deferred:** large and known — the **owed** remainder (the trailer's own arm, never
-  the unported count) plus the runners and the install-lifecycle layer. Not a single-iteration
-  delta; criterion relaxation is closed at gate-sdk/SPEC.md §The port-candidate criteria, an
-  ordering signal and never an eligibility screen. `gate-battery-result-cache` is the one battery
-  entry unsubsumed; `powershell-installer-surface` is the sequence's last member.
-  **NO YIELD AT ALL until `--tree` reads zero owed — the port-only run, ruled 2026-08-31
-  (operator, consult); TRAJECTORY.md §PRIORITY DIRECTIVE owns it.** It SUBSUMES rather than
-  repeals the 2026-08-29 four-yield rule: with no yield available there is none to escalate.
-  ruled: native-gate-port-remaining-corpus operator 2026-08-31 consult
-  ruled: native-gate-port-remaining-corpus lead 2026-09-01 2026-09-03 2026-09-04 own-authority
-  Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close; cohorts ruled at scope 2026-08-11/12.
 
 - **kit-knob-consumer-adapter-convention** [design-pending] — whether a kit may ship
   a knob whose only working configuration requires the consumer to author an adapter, and whether
@@ -7102,57 +7153,6 @@
   as a silent KPI undercount on exactly the entries the project has already judged most recurrent.
   Filed 2026-08-24 to the gap inbox by that same close, from its recurrence-stamp attempt;
   promoted 2026-08-24 at this iteration's scope intake, with the window measured above.
-
-- **file-authoring-act-ungoverned** [design-pending] — writing a file has no steer, no grant and no
-  owner, so authoring one costs an out-of-band permission decision every time.
-  **It is the largest single class in the ranking**, and its dated series lives once, in the ruling
-  paragraph below. What the first measurement established is that this is a CLASS rather than an
-  argument about one row, and the write-shape axis landed beside it is what made it legible as one
-  — the filing bullet could only measure the pre-landing form, 19 of 19 `cat`-led lines.
-  **What the mandated alternatives do NOT cover, which is the whole gap.**
-  `guard-kit/bin/scratch-run.sh` governs EXECUTING a scratch script and `git commit -F` governs
-  CONSUMING a message file. Both act on a file that already exists. Nothing governs bringing one
-  into being, and the sessions paying hardest are the ones the method requires to write most:
-  resume journals, scratch scripts, commit messages.
-  **This is the disposition half of a two-half finding whose instrument half landed.**
-  `prompt-ranking-command-word-shape-blind` made the row READ correctly and deliberately left the
-  act ungoverned; guard-kit/SPEC.md §scan-prompts carries the instrument half and says nothing about
-  governing the act, so without this entry that half has no home at all. Adds that unit no
-  recurrence date and re-files none of it.
-  **Why `[design-pending]`, and one of its three shapes is not a stage session's to take.** A
-  committed permission grant is a settings edit and therefore **operator-class** under
-  TRAJECTORY.md §The closed rulings (2026-08-22) — this entry files it and does not land it. A
-  stated habit is not a mechanism. A guard steer onto the Write tool is buildable and is the only
-  self-served shape, but it is a wide behavioural change with a named collision: it must not fire on
-  the `>>`-under-scratch shape rule 17 already auto-allows, which is the shape the mandated
-  resume-journal write itself uses.
-  **SCOPED BY OPERATOR RULING — promote at the next iteration.** The ground ruled on is the
-  2026-09-04 close re-measurement: the class went from 41 of 185 prompting calls to **56 of 139**,
-  22 per cent to 40 per cent, the strongest standing friction signal in the pool. **The ruling
-  carries a consequence to record rather than leave a later reader to infer: it REOPENS the
-  port-only run for a second non-port unit**, the first having been that iteration's stage-journal
-  unit. **And the re-costing is part of the ruling, not a caveat beside it** — the three shapes
-  above were costed BEFORE the unit that doubled the number, so the promoting scope re-costs them
-  and inherits nothing. The doubling's cause is that unit: it made a journal write a mandatory last
-  step in all six stage templates, and the journal appends are most of the class.
-  ruled: file-authoring-act-ungoverned operator 2026-09-04 lead-relay
-  **A PREPARED SETTINGS DIFF AWAITS OUT-OF-BAND OPERATOR APPLICATION**, recorded here under
-  TRAJECTORY.md §The closed rulings (2026-08-22), which lets a stage session derive a diff and
-  state its grounds and ends its remit there. Six committed `permissions.allow` entries:
-  `Bash(date *)`, `Bash(find *)`, `Bash(git merge-base *)`, `Bash(git config *)`, `Bash(mkdir *)`,
-  and `Bash(: > .workflow/subagent-stop-liveness.log)`. SECURITY GROUNDS: the first five are
-  read-only or scratch-creating, take no path outside the tree that a `*` does not already reach in
-  a sibling grant, and each ranked in the live friction log; the sixth is a fixed literal whose two
-  sibling reclaim paths are already granted, so its absence is an asymmetry rather than a decision.
-  **These do NOT fix this entry's own class** and are not offered as doing so — a heredoc write is
-  composition no glob can match. They ride the same operator application, and this entry is the
-  queue's carrier for the prepared-diff obligation, which is the only reason they are here.
-  **Cost while deferred:** one out-of-band decision per authored file, paid by the sessions doing
-  the most durable recording, and invisible to every gate — the friction log is advisory, so nothing
-  reds however far the class grows.
-  Filed 2026-08-24 to the gap inbox by spec, as the surviving half of a split its sibling recorded;
-  drained 2026-08-24 at that close, which confirmed the act half is recorded nowhere at HEAD; scoped
-  2026-09-04 at close on the operator ruling above.
 
 - **expansion-rule-backtick-blind** [design-pending] — guard rule 6 blocks the modern
   command-substitution spelling and passes the archaic one, so a session that meets the block learns
