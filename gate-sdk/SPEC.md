@@ -8903,6 +8903,15 @@ which is the precedent the runner's own arm is built on. Everything the argument
 grammar below specifies is the front-end's; everything the output contract
 specifies is the arm's.
 
+**The front-end requires a checkout and the arm does not, which decides who may
+call what.** Resolving the repo root is the front-end's first act and it refuses
+with exit 2 outside one, so a bridged arm whose work happens *outside* a
+checkout — a hermetic `mktemp` sandbox — is unreachable through
+`bin/run-gates.sh` however correct its argv, and the refusal reads as a broken
+invocation rather than as a boundary. Such a caller reaches the binary through
+`gate_native_bin`, the same binary-level path a substrate-parity harness takes
+(§check-gate-substrate-parity).
+
 **The front-end keeps a shell dispatch loop for one branch, and the branch is
 criterion 5's.** A host the payload carries no verified artifact for is an
 *omit-and-declare* install (installer/README.md §The gate binary): its
