@@ -5,3 +5,4 @@
 ---
 
 usage-verdict-cut scope ae215f26 2026-09-04 07b275af
+usage-verdict-cut spec a9d4381c 2026-09-04 992bb2b9
