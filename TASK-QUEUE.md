@@ -12,6 +12,108 @@
 
 ## New Features
 
+- **native-gate-port-remaining-corpus** [roadmap: now/reliability] [spec: SPEC-wait-probe-cut.md]
+  — the whole battery onto the binary, and the shell surface down to its residue.
+  roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
+  It DEMOTES at build, never `## Done` — canon-kit/SPEC.md §Merging an amendment's corpus branch.
+  **Operator-ruled 2026-08-09: complete the port, ASAP** — that ruling, its grounds, its scope,
+  both install paths and the tail are [TRAJECTORY.md](TRAJECTORY.md) §PRIORITY DIRECTIVE's, not
+  restated; this entry is the work, bootstrap design included, inheriting gate-sdk/SPEC.md
+  §Porting a gate to the binary substrate and §Consumer payload. **Each closed cut's record —
+  members, counts, holds, grounds, price — lives in the contract section that cut selected**, so
+  this entry states only what remains (drift-kit/SPEC.md §The KPI plugin contract, gate-sdk/SPEC.md
+  §Consumer smoke, *The port disposition*).
+  **THE COMPOSER DOES NOT REACH THE TREE REMAINDER** — the registry arm answers for the battery,
+  only `--tree` is the predicate, and both arms are run. That two-axis misreading, the rise in owed
+  on a landing shell file, and the bounds are gate-sdk/SPEC.md §port-blockers'.
+  **THE COMPOSER IS RULED 2026-08-28: select the next cut by STATED CONTRACT** — the owed
+  files behind one specification section, ported behind the one amendment that section needs. Size-
+  and kit-ordered composers stay refused. **IT CONSTRAINS SELECTION, NOT ITERATION PACKAGING —
+  ruled 2026-08-30 (operator, lead-relay):** the clauses above say what makes ONE cut well-formed;
+  how many an iteration holds is owned elsewhere. Refused with it — three cohorts as ONE cut, which
+  fails this ruling's own words (*one* section, *the one* amendment) and averages the grounds all
+  three entries forbid, shared setup being logistics; and one cut per iteration, an over-read
+  paying three iteration floors for no added decision quality.
+  **(1) A CUT NARROWS THE PORT, NEVER AN EXTENSION POINT.** Where a kit ships a consumer-facing
+  plugin or config seam, that seam's resolution, direct execution and env contract survive and only
+  the bundled members move in-crate; the ground is the porting kit's OWN governed surfaces plus
+  CLAUDE.md §The provenance seam, never analogy — worked at drift-kit/SPEC.md §The extensibility
+  contract. **(2) SETTINGS GRANTS, RULED 2026-08-29 (operator, lead-relay):** removing a permission
+  grant whose target a RULED PORT CUT DELETES is OUTSIDE the 2026-08-22 bar — a pure narrowing
+  forced by the cut — and build removes the dead lines IN THE SAME COMMIT AS THE DELETE, the window
+  the requirement exists to close. The bar stands unchanged for every other permission-settings
+  edit: a carve-out for one class. Scope is the files THAT COMMIT deletes, never a path prefix —
+  probe the count, never assume it, the attested probe having quadrupled one kit's.
+  **(3) A SECTION IS A CUT'S OUTER BOUND, NOT ITS MINIMUM; (4) A CONSUMER PLUGIN ON A SEAM IS OWED
+  — ruling (1) reaches the seam alone, both 2026-09-03 (operator, lead-relay); (5) SIZING FILLS
+  WITHIN THAT BOUND, 2026-09-04 (lead) — singletons under-fill lawfully, no host minted, widths stay
+  per-cut, size arm permanently spent — gate-sdk/SPEC.md §Porting a gate to the binary substrate.**
+  ruled: native-gate-port-remaining-corpus lead 2026-08-28 2026-08-29 2026-08-31 own-authority
+  ruled: native-gate-port-remaining-corpus operator 2026-08-28 2026-08-29 2026-08-30 lead-relay
+  ruled: native-gate-port-remaining-corpus operator 2026-09-03 lead-relay
+  **Cost while deferred:** large and known — the **owed** remainder (the trailer's own arm, never
+  the unported count) plus the runners and the install-lifecycle layer. Not a single-iteration
+  delta; criterion relaxation is closed at gate-sdk/SPEC.md §The port-candidate criteria, an
+  ordering signal and never an eligibility screen. `gate-battery-result-cache` is the one battery
+  entry unsubsumed; `powershell-installer-surface` is the sequence's last member.
+  **NO YIELD AT ALL until `--tree` reads zero owed — the port-only run, ruled 2026-08-31
+  (operator, consult); TRAJECTORY.md §PRIORITY DIRECTIVE owns it.** It SUBSUMES rather than
+  repeals the 2026-08-29 four-yield rule: with no yield available there is none to escalate.
+  ruled: native-gate-port-remaining-corpus operator 2026-08-31 consult
+  ruled: native-gate-port-remaining-corpus lead 2026-09-01 2026-09-03 2026-09-04 own-authority
+  Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close; cohorts ruled at scope 2026-08-11/12.
+
+- **stage-journal-absence-caught-only-downstream** [spec: SPEC-stage-journal.md] — a stage
+  session can complete, stamp and commit a full evidence spine while leaving
+  no resume journal at all, and the only thing that notices is the NEXT
+  stage's entry, by which time the session that owed it is gone.
+  **PROMOTED INTO THIS ITERATION BY THE OPERATOR 2026-09-04, lead-relayed: the port-only
+  run is reopened for this ONE non-port unit, which only the operator may do.** No yield is
+  created for anything else and the run is not otherwise weakened. Declined twice before on
+  the run and not on merit (2026-09-03, 2026-09-04), then promoted when the third
+  recurrence below crossed the routing clause `threshold-recurrence-routing-residency`
+  carries, which ends lead discretion at two. **The SECTION MOVE WAS NOT SCOPE'S, and that
+  was probed rather than assumed** — `check-amendment-queue` reds an unpromoted tag left in
+  an active section, so spec made the move with the amendment, which is what promoting a
+  feature entry IS (canon-kit/SPEC.md §The amendment lifecycle, the bidirectional rule).
+  ruled: stage-journal-absence-caught-only-downstream operator 2026-09-04 lead-relay
+  **Attested 2026-08-30 at this close.** The validate session of
+  `consumer-smoke-contract-port` left no validate journal, and the
+  predecessor-journal assertion refused close's entry. The assertion works —
+  that is not the finding. The finding is WHEN it fires: it was EVALUATED at spec,
+  align, build and validate and PASSED each time, so close is the first REFUSAL and not
+  the first firing, the gap bullet's "fired at the LAST stage" was wrong, and the config
+  comment's prediction, being about evaluation, was correct.
+  **What the refusal cost.** The close took the documented escape — writing the stand-in
+  itself and stating that validate left none — rather than forcing the entry, so the
+  absence is recorded. But a stand-in written by a session that did not do the work can
+  only point at durable artifacts; it cannot carry validate's reasoning, lost there.
+  **The four candidate shapes are COSTED AND RULED in the amendment**, which also carries
+  the three refusals and their grounds; the shape taken is the entry tool opening the
+  journal at its own stamp plus the obligation landing on the stage templates, which
+  carried it on no surface at all. The unit stays a LIFECYCLE one: the shape that would
+  have moved it to delegation-kit is the refused report-assertion one.
+  **DISTINCT from the boundary keep-list entries**, which own the wipe's reach over
+  journals that EXIST; this entry's subject is a journal never written at all.
+  **Cost while deferred:** one iteration's stage reasoning is lost per firing, and the
+  loss is discovered by the one session structurally unable to make it good.
+  **Second occurrence 2026-08-31 (`harness-hook-arm-port`) re-priced the cost downward:**
+  align left none, build's entry refused, and the journal was recovered from the
+  still-resumable align session — so the permanent loss above holds only where the owing
+  session is gone. Two questions the gap bullet raised were falsified at the drain: the
+  obligation is **already** the stage's, not the dispatch's (lifecycle-kit/SPEC.md §The
+  state machine, in those words), and the assertion is **not** `--simulate`-only.
+  **Two more 2026-09-02 (`test-runner-and-upgrade-cuts-with-liveness-attribution`): align
+  AND validate both left none in one iteration — sonnet tier, complete reports, explicit
+  grants. A rate, not a scatter; align's session was gone before close looked. A FIFTH
+  2026-09-04 (`usage-verdict-cut`) at align, recovered live as 194 reconstructed lines:
+  two iterations in three. Its zero-findings pairing is the align-watch's.**
+  **THRESHOLD: DECLINED ON THE RUN, NOT ON MERIT, 2026-09-03 and again 2026-09-04 — one of five.**
+  ruled: stage-journal-absence-caught-only-downstream lead 2026-09-03 2026-09-04 own-authority
+  recurrence: stage-journal-absence-caught-only-downstream 2026-08-31 2026-09-02 2026-09-04
+  Filed 2026-08-30 by close from the gap inbox, with the bullet's own
+  overstatement corrected at the drain.
+
 ## Technical Debt
 
 ## Deferred
@@ -108,57 +210,6 @@
   Filed 2026-09-03 by spec, minted and promoted in one motion as the second cut's host on the
   ruling above; the column budget that forced it is filed as a recurrence of
   `record-stamp-encoding-compression`, the entry that owns the encoding, not this one.
-
-- **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
-  — the whole battery onto the binary, and the shell surface down to its residue.
-  roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
-  It DEMOTES at build, never `## Done` — canon-kit/SPEC.md §Merging an amendment's corpus branch.
-  **Operator-ruled 2026-08-09: complete the port, ASAP** — that ruling, its grounds, its scope,
-  both install paths and the tail are [TRAJECTORY.md](TRAJECTORY.md) §PRIORITY DIRECTIVE's, not
-  restated; this entry is the work, bootstrap design included, inheriting gate-sdk/SPEC.md
-  §Porting a gate to the binary substrate and §Consumer payload. **Each closed cut's record —
-  members, counts, holds, grounds, price — lives in the contract section that cut selected**, so
-  this entry states only what remains (drift-kit/SPEC.md §The KPI plugin contract, gate-sdk/SPEC.md
-  §Consumer smoke, *The port disposition*).
-  **THE COMPOSER DOES NOT REACH THE TREE REMAINDER** — the registry arm answers for the battery,
-  only `--tree` is the predicate, and both arms are run. That two-axis misreading, the rise in owed
-  on a landing shell file, and the bounds are gate-sdk/SPEC.md §port-blockers'.
-  **THE COMPOSER IS RULED 2026-08-28: select the next cut by STATED CONTRACT** — the owed
-  files behind one specification section, ported behind the one amendment that section needs. Size-
-  and kit-ordered composers stay refused. **IT CONSTRAINS SELECTION, NOT ITERATION PACKAGING —
-  ruled 2026-08-30 (operator, lead-relay):** the clauses above say what makes ONE cut well-formed;
-  how many an iteration holds is owned elsewhere. Refused with it — three cohorts as ONE cut, which
-  fails this ruling's own words (*one* section, *the one* amendment) and averages the grounds all
-  three entries forbid, shared setup being logistics; and one cut per iteration, an over-read
-  paying three iteration floors for no added decision quality.
-  **(1) A CUT NARROWS THE PORT, NEVER AN EXTENSION POINT.** Where a kit ships a consumer-facing
-  plugin or config seam, that seam's resolution, direct execution and env contract survive and only
-  the bundled members move in-crate; the ground is the porting kit's OWN governed surfaces plus
-  CLAUDE.md §The provenance seam, never analogy — worked at drift-kit/SPEC.md §The extensibility
-  contract. **(2) SETTINGS GRANTS, RULED 2026-08-29 (operator, lead-relay):** removing a permission
-  grant whose target a RULED PORT CUT DELETES is OUTSIDE the 2026-08-22 bar — a pure narrowing
-  forced by the cut — and build removes the dead lines IN THE SAME COMMIT AS THE DELETE, the window
-  the requirement exists to close. The bar stands unchanged for every other permission-settings
-  edit: a carve-out for one class. Scope is the files THAT COMMIT deletes, never a path prefix —
-  probe the count, never assume it, the attested probe having quadrupled one kit's.
-  **(3) A SECTION IS A CUT'S OUTER BOUND, NOT ITS MINIMUM; (4) A CONSUMER PLUGIN ON A SEAM IS OWED
-  — ruling (1) reaches the seam alone, both 2026-09-03 (operator, lead-relay); (5) SIZING FILLS
-  WITHIN THAT BOUND, 2026-09-04 (lead) — singletons under-fill lawfully, no host minted, widths stay
-  per-cut, size arm permanently spent — gate-sdk/SPEC.md §Porting a gate to the binary substrate.**
-  ruled: native-gate-port-remaining-corpus lead 2026-08-28 2026-08-29 2026-08-31 own-authority
-  ruled: native-gate-port-remaining-corpus operator 2026-08-28 2026-08-29 2026-08-30 lead-relay
-  ruled: native-gate-port-remaining-corpus operator 2026-09-03 lead-relay
-  **Cost while deferred:** large and known — the **owed** remainder (the trailer's own arm, never
-  the unported count) plus the runners and the install-lifecycle layer. Not a single-iteration
-  delta; criterion relaxation is closed at gate-sdk/SPEC.md §The port-candidate criteria, an
-  ordering signal and never an eligibility screen. `gate-battery-result-cache` is the one battery
-  entry unsubsumed; `powershell-installer-surface` is the sequence's last member.
-  **NO YIELD AT ALL until `--tree` reads zero owed — the port-only run, ruled 2026-08-31
-  (operator, consult); TRAJECTORY.md §PRIORITY DIRECTIVE owns it.** It SUBSUMES rather than
-  repeals the 2026-08-29 four-yield rule: with no yield available there is none to escalate.
-  ruled: native-gate-port-remaining-corpus operator 2026-08-31 consult
-  ruled: native-gate-port-remaining-corpus lead 2026-09-01 2026-09-03 2026-09-04 own-authority
-  Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close; cohorts ruled at scope 2026-08-11/12.
 
 - **kit-knob-consumer-adapter-convention** [design-pending] — whether a kit may ship
   a knob whose only working configuration requires the consumer to author an adapter, and whether
@@ -503,58 +554,6 @@
   attestations.
   Filed 2026-08-30 by close from the gap inbox; the config line was re-read at
   the drain.
-
-- **stage-journal-absence-caught-only-downstream** [design-pending] — a stage
-  session can complete, stamp and commit a full evidence spine while leaving
-  no resume journal at all, and the only thing that notices is the NEXT
-  stage's entry, by which time the session that owed it is gone.
-  **PROMOTED INTO THIS ITERATION BY THE OPERATOR 2026-09-04, lead-relayed: the port-only
-  run is reopened for this ONE non-port unit, which only the operator may do.** No yield is
-  created for anything else and the run is not otherwise weakened. Declined twice before on
-  the run and not on merit (2026-09-03, 2026-09-04), then promoted when the third
-  recurrence below crossed the routing clause `threshold-recurrence-routing-residency`
-  carries, which ends lead discretion at two. **The SECTION MOVE IS NOT SCOPE'S, and that
-  was probed rather than assumed** — `check-amendment-queue` reds on `[design-pending]` in
-  an active section, so spec makes the move with the amendment, which is what promoting a
-  feature entry IS (canon-kit/SPEC.md §The amendment lifecycle, the bidirectional rule).
-  ruled: stage-journal-absence-caught-only-downstream operator 2026-09-04 lead-relay
-  **Attested 2026-08-30 at this close.** The validate session of
-  `consumer-smoke-contract-port` left no validate journal, and the
-  predecessor-journal assertion refused close's entry. The assertion works —
-  that is not the finding. The finding is WHEN it fires: it was EVALUATED at spec,
-  align, build and validate and PASSED each time, so close is the first REFUSAL and not
-  the first firing, the gap bullet's "fired at the LAST stage" was wrong, and the config
-  comment's prediction, being about evaluation, was correct.
-  **What the refusal cost.** The close took the documented escape — writing the stand-in
-  itself and stating that validate left none — rather than forcing the entry, so the
-  absence is recorded. But a stand-in written by a session that did not do the work can
-  only point at durable artifacts; it cannot carry validate's reasoning, lost there.
-  **Candidate shapes, none costed**: have the entry tool WRITE a skeleton journal at
-  its own stamp so the artifact exists from the stage's first moment; or assert the
-  journal at the stage's OWN exit, where the owing session is still live; or have the
-  returning REPORT assert the path it wrote, moving detection to the lead's acceptance
-  rather than the next entry gate — a delegation-kit or agent-definition change and not
-  a lifecycle one, added 2026-09-04; or accept the escape and trust the successor.
-  **DISTINCT from the boundary keep-list entries**, which own the wipe's reach over
-  journals that EXIST; this entry's subject is a journal never written at all.
-  **Cost while deferred:** one iteration's stage reasoning is lost per firing, and the
-  loss is discovered by the one session structurally unable to make it good.
-  **Second occurrence 2026-08-31 (`harness-hook-arm-port`) re-priced the cost downward:**
-  align left none, build's entry refused, and the journal was recovered from the
-  still-resumable align session — so the permanent loss above holds only where the owing
-  session is gone. Two questions the gap bullet raised were falsified at the drain: the
-  obligation is **already** the stage's, not the dispatch's (lifecycle-kit/SPEC.md §The
-  state machine, in those words), and the assertion is **not** `--simulate`-only.
-  **Two more 2026-09-02 (`test-runner-and-upgrade-cuts-with-liveness-attribution`): align
-  AND validate both left none in one iteration — sonnet tier, complete reports, explicit
-  grants. A rate, not a scatter; align's session was gone before close looked. A FIFTH
-  2026-09-04 (`usage-verdict-cut`) at align, recovered live as 194 reconstructed lines:
-  two iterations in three. Its zero-findings pairing is the align-watch's.**
-  **THRESHOLD: DECLINED ON THE RUN, NOT ON MERIT, 2026-09-03 and again 2026-09-04 — one of five.**
-  ruled: stage-journal-absence-caught-only-downstream lead 2026-09-03 2026-09-04 own-authority
-  recurrence: stage-journal-absence-caught-only-downstream 2026-08-31 2026-09-02 2026-09-04
-  Filed 2026-08-30 by close from the gap inbox, with the bullet's own
-  overstatement corrected at the drain.
 
 - **enter-stage-flag-position-silently-ignored** [design-pending] — the entry
   tool's read-only mode is recognised only as the first positional argument,
