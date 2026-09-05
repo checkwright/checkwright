@@ -6,3 +6,4 @@
 
 drift-meter-pair-and-scratch-run-cuts scope abb47fb5 2026-09-05 738a492c
 drift-meter-pair-and-scratch-run-cuts spec a48a0260 2026-09-05 e97c9710
+drift-meter-pair-and-scratch-run-cuts align a3fbaee5 2026-09-05 3399d357
