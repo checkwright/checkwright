@@ -9160,13 +9160,15 @@
   while the diagnostic's `init` on the FULL profile did not. Whether the two are one defect or two
   is not settled by anything printed.
   **It blinded the round's instrument, which is how it was found.** The manifest diagnostic that
-  round bought printed none of the five things it exists to print — no `want`, no `got`, neither
+  round bought printed none of the five things it existed to print — no `want`, no `got`, neither
   `git hash-object` run, no `core.autocrlf` origin, no `git check-attr` output — because it bailed
   at its own early guard before reaching a `checkwright.lock`. NO CAUSE IS CLAIMED HERE for the
   477-of-477 manifest mismatch; this entry owns the staging defect alone.
-  **Two forks, and they are not the same work.** Standing the diagnostic up on the starter profile
-  the smoke actually uses buys the next cause read; batching the staging call so no host's
-  `ARG_MAX` is the ceiling repairs the install path itself. Only the second is this entry's.
+  **Two forks, and they are not the same work. THE FIRST IS DISCHARGED 2026-09-05 at build** —
+  `windows-leg-manifest-cause-read` moved the report into the smoke's own manifest arm, which runs
+  inside whichever profile failed, and DELETED the `read one manifest disagreement in place` step
+  the bullets above cite; that deletion repairs no part of this entry, which still owns batching
+  the staging call so no host's `ARG_MAX` is the ceiling. Only the second was ever this entry's.
   **Cost while deferred:** a native-Windows adopter on the full profile cannot install, and the
   named adopter behind TRAJECTORY.md's 2026-08-26 Windows ruling is exactly that population — an
   install-path claim witnesses it, so it is product-class outright.

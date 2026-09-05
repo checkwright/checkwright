@@ -1161,6 +1161,20 @@ toolchain contract asserts, its object hash is content-addressed and stable, so
 the manifest's integrity story stays inside the toolchain that contract already
 covers.
 
+**It is a *filtered* `git hash-object`, and that is the definition rather than a
+spelling.** `lock_hash` calls the command with no `--no-filters`, so the value it
+records is the hash of the content *after* whatever `text`/`eol` attribute and
+`core.autocrlf` setting the path's own attribute chain selects. Moving the call
+to `--no-filters` would therefore not be a spelling fix. A filtered hash and a
+raw hash disagree about exactly one population — an adopter whose edit is a
+line-ending change — so the switch decides that `init` now notices such an edit
+and refuses to overwrite it, which is a behavior change to the non-destructive
+re-run on **every** platform and belongs to a unit scoped to it. It was
+**refused 2026-09-05 by the lead** as a repair for the native Windows leg's
+manifest disagreement (§The consumer smoke), on that ground and on one more: a
+repair guessed at a mechanism no probe reproduces is a guess whatever else it
+is, and a cause read carries no authority to change what a `files` hash means.
+
 **Two hash families, answering two questions, each stated where it is used.**
 The rule above is scoped to `files`, and the `artifact` digest is deliberately
 outside it — not because the two describe different files, but because they ask
@@ -1271,6 +1285,143 @@ first apart from the typo, so the green is the defect being gone rather than the
 scan having narrowed, and a profile green on the first run must still be green
 on the second. The arm restores the consumer to the commit it found, so the
 reversal below still runs against the tree `init` wrote.
+
+**A disagreeing manifest arm reports what it found, in place, before it fails.**
+On the failure path only, the arm prints a bounded fact set about the
+disagreement and then fails exactly as it always did. It has to be the arm and
+not a step beside it: this script mktemps its scratch under `trap cleanup EXIT`
+and `fail` exits 1, so the consumer whose manifest disagreed is torn down before
+anything later could open its `checkwright.lock`. The standing alternative was a
+CI step standing up a *second* consumer by the same route — a duplicate of this
+install path, maintained in YAML, unrunnable locally and free to drift from the
+check it diagnoses, which it did twice (below). The arm already holds the
+failing state, so removing the duplication beats maintaining it. On a green leg
+none of this runs and the arm prints the `manifest: N file(s) agree with the
+tree` line it always printed.
+
+**It samples at most two paths, and neither is chosen by arrival.** The first
+disagreeing path is one, because it is what a reader would have opened anyway.
+The other is the **artifact's `files` row** — §The manifest's ordinary row for
+the binary, recorded with the same `git hash-object` hash every entry carries —
+whenever the manifest records an `artifact` key and that row is in the
+disagreeing set. First-come alone is not a sample but an accident, and here the
+accident has a direction: round 12's first disagreeing path was a `.md`, so a
+report keyed on it would have shown the end-of-line-shaped case and never the
+one that kills it. The artifact row is the discriminating case precisely because
+git classifies its blob binary and converts a binary blob under no
+configuration. Where the payload carries no artifact — the binary-less leg
+installs exactly such a payload — the second sample is absent and the report
+says so rather than printing a blank, and so are the other two ways it can fail
+to resolve: a manifest recording an artifact no config seam names a path for,
+and an artifact row that is not in the disagreeing set.
+
+**Four hashes per sampled path, and the truth table that reads them.** Each is
+labelled, printed plain and rendered byte-exactly beside it, with the call that
+produced it and that call's standard error:
+
+- **`want`** — `files[P]` out of the consumer's `checkwright.lock`: what `init`
+  recorded.
+- **`got`** — `git hash-object -- "$C/P"` from the smoke's own current
+  directory: the failing read, spelled exactly as the arm spells it.
+- **`own`** — `git -C "$C" hash-object -- "P"`: the same command in the
+  repository context `lock_hash` runs in, which is the only thing the two call
+  sites differ by.
+- **`raw`** — `git hash-object --no-filters -- "$C/P"`: the file's bytes with
+  the attribute mechanism removed. `--no-filters` ignores attributes entirely,
+  so this value depends on no repository, which is what makes it the fixed point
+  the other three are measured against.
+
+Two values cannot separate *one side filtered* from *the bytes changed*; four
+can, and the reading rule lives here rather than with whoever reads the log next:
+
+| observation | reading |
+| --- | --- |
+| `want == own == raw` and `got != raw` | the read side's context applies a filter the write side's does not; the defect is at `run-smoke.sh`'s call site and the two-call-site narrowing is confirmed |
+| `want == own == got` and all differ from `raw` | both contexts filter identically, so the hashes agree and the arm could not have failed on this path — the disagreement is in the comparison, not in the hashing |
+| `own == got == raw` and `want != raw` | the bytes on disk are not the bytes `init` hashed; the porcelain below and the artifact control say which |
+| any of the four is not 40 lowercase hex | the value is not a hash — a stray byte, a truncation or a refusal; the byte rendering shows which and the captured standard error names the refusal |
+
+The byte rendering is not decoration and not optional: a value carrying a
+trailing carriage return compares unequal and *prints* equal, and no other line
+in the report can see it.
+
+Once per failing profile, and outside the per-path block because each is a fact
+about the run rather than about a path, the report also prints the consumer's
+`git status --porcelain` and `git log -1 --stat`, truncated — the direct witness
+for the third row, since a worktree that has diverged from what `init` committed
+is the one shape that explains a disagreement set containing a binary;
+`core.autocrlf`, `core.eol` and `core.safecrlf` **with their origins** in both
+repositories — the mechanism behind the first row, where a value alone would not
+say which file set it; and `git check-attr -a` for each sampled path in both
+repositories, the other half of that mechanism, since an attribute reaches a
+path the config does not. Nothing is printed for completeness: every value has a
+reader in the table above or in the sentence that introduces it.
+
+*The smoke-repository half of that attribute lookup answers only when the
+consumer lives inside the smoke's own repository — and it never does, because
+the consumer is created under `INSTALLER_SMOKE_TMP_DIR`.* git refuses the lookup
+outright for a path outside the repository it is asked, so the report prints that
+refusal labelled as a refusal rather than as an attribute report, and the
+refusal is itself the reading: the path's attribute chain is reachable from the
+consumer alone.
+
+**The artifact digest is a filter-free control on the content question.** When
+the manifest records an `artifact` key, the report recomputes the artifact's
+SHA-256 from the tree — through `lib/common/digest.sh`, which owns which hasher
+this host has — and prints it beside the recorded `artifact.digest`. It costs
+nothing new and settles the content question outright, because SHA-256 over the
+file is taken by no git filter and in no repository context: equal digests mean
+the artifact's bytes are exactly the bytes `init` published, so a `files`-row
+disagreement on that same path is not a content change, and it cannot be an
+end-of-line conversion either, because git converts no blob it classifies
+binary. Both surviving content hypotheses die on one line. It is a **control**,
+so a matching digest is not free to be read as an assertion about any other
+path: it speaks for the artifact alone.
+
+*The honest limit, stated rather than gated.* The report is failure-path code
+and the only host that executes it is the host that fails, so no green run
+exercises it and no fixture pair can. What holds it is shape rather than
+coverage: it is a straight-line sequence of prints with no branch that can
+change the arm's verdict, and the `fail` that follows is the one that stood
+before it. A report that cannot alter the verdict is one a stale line can only
+make less useful, never wrong-acting. It carries no knob for the same class of
+reason: a report enabled by a configuration no CI job sets is the dead-producer
+shape, and the one host that needs this one is the host nobody is standing at.
+
+**What the native Windows leg has measured so far.** That leg is
+`continue-on-error` and reports rather than judges; these are its findings as of
+round 12 (run `33782234328`, head `32f73806`), recorded here because they are
+what the next rider of the leg would otherwise re-buy:
+
+- All 477 entries read `manifest hash disagrees with the tree` and none read
+  `manifest names a file that is not there` — those are the arm's two branches,
+  so the failure is genuinely a hash disagreement rather than a missing path.
+- `scripts/checkwright-gates.exe` is in the disagreeing set. Every hypothesis
+  turning on end-of-line conversion has to survive that, and none does.
+- The run carries zero `fatal` lines, so a per-path refusal is evidence-against
+  rather than open — but the arm never printed `got`, so it is not closed
+  either, which is what the byte rendering above settles.
+- The host facts: `core.autocrlf false`, `core.symlinks true`, `core.longpaths`
+  unset, `core.filemode false`, an empty porcelain on a fresh checkout, git
+  2.55.0.windows.5, bash 5.3.15, and the failing profile is `starter` — the
+  profile that vendors one kit and writes a 477-entry manifest. The consumer's
+  own battery passed, `All 11 gates passed`, immediately before the manifest arm
+  failed.
+
+*Why the CI diagnostic that used to stand beside this leg is gone.* A
+`read one manifest disagreement in place` step stood up its own consumer and
+printed none of the five things it existed to print, twice, each time for a
+reason the arm cannot have. It installed at `--profile full` where the smoke's
+failing check is on `starter`, so it reproduced a different run; and the full
+profile is what met `init-vendor-staging-argv-overflow` — `git` refusing an
+over-wide argv while staging the vendored set — so it bailed at its own early
+guard. The arm inherits the right profile by construction, running inside
+whichever profile failed, so there is no profile to select and none to get
+wrong. **Deleting that step repairs no part of the overflow and must not be read
+as repairing it**: `init-vendor-staging-argv-overflow` owns one `git`
+invocation's argv width, a native-Windows adopter on the full profile still
+cannot install, and that entry stands untouched. What the deletion removes is
+this leg's *dependence* on the full profile, not the defect.
 
 **The payload every profile installs carries a real gate binary**, because the
 value claim is a claim about the product an adopter receives. The smoke compiles

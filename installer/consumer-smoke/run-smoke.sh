@@ -95,6 +95,9 @@ source "$PKG_ROOT/lib/common/lock.sh"
 # spec: installer/README.md §The gate binary — which members an omission covers is derived from the payload, so the arm asserting the record reads that derivation out of the installed package rather than carrying a second copy of it
 # shellcheck source=../lib/common/recipe.sh
 source "$PKG_ROOT/lib/common/recipe.sh"
+# spec: installer/README.md §The consumer smoke — the manifest arm's failure report recomputes the artifact's SHA-256 as its content control, and which hasher this host has is a question digest.sh already owns, so the report asks it there rather than growing a second answer
+# shellcheck source=../lib/common/digest.sh
+source "$PKG_ROOT/lib/common/digest.sh"
 # spec: installer/README.md §The manifest — the two seam paths every verb asks the resolver for, spelled once from the installer's own GATES_DIR constant rather than at each call site: a literal here would be a second copy of the consumer layout the module already owns
 SEAM_FILES=("$GATES_DIR/gates.list" "$GATES_DIR/gate-sdk-config.sh")
 mapfile -t PAYLOAD_KITS < <(profile_payload_kits "$PKG_ROOT")
@@ -160,12 +163,107 @@ consumer() {   # $1 = profile -> a fresh scratch consumer repo, echoed
     printf '%s' "$c"
 }
 
+# spec: installer/README.md §The consumer smoke — one value of the manifest report's four-hash block: the plain value, the same value rendered byte-exactly because a hash carrying a trailing carriage return compares unequal and prints equal and no other line can see it, the call that produced it rather than a hand-written description of the call, and that call's standard error so a refusal is named instead of showing as an empty value
+hash_probe() {   # $1 = label, $2.. = the command whose stdout is the value
+    local label="$1"; shift
+    local val err e="$SCRATCH/manifest-report.err"
+    val="$("$@" 2>"$e")"
+    err="$(<"$e")"
+    printf '    %-4s %s\n' "$label" "${val:-<empty>}"
+    printf '         bytes  %s\n' "$(printf '%q' "$val")"
+    printf '         call   %s\n' "$*"
+    [[ -z "$err" ]] || printf '         stderr %s\n' "$err"
+}
+
+# spec: installer/README.md §The consumer smoke — one attribute lookup of the manifest report, printed as three distinguishable outcomes rather than one blob: the attributes a repository reports, git's refusal where the path is outside the repository asked and no attribute chain is reachable from it, and a clean silence where the path simply carries none
+attr_probe() {   # $1 = the repository to ask, $2 = which repository that is, $3 = the path as that repository spells it
+    local out err e="$SCRATCH/manifest-report.err"
+    out="$(git -C "$1" check-attr -a -- "$3" 2>"$e")"
+    err="$(<"$e")"
+    printf '    %s, %s:\n' "$3" "$2"
+    [[ -z "$out" ]] || printf '%s\n' "$out"
+    [[ -z "$err" ]] || printf '      refused: %s\n' "$err"
+    [[ -n "$out" || -n "$err" ]] || printf '      <no attribute reported>\n'
+}
+
+# spec: installer/README.md §The consumer smoke — the manifest arm's failure report, in the arm because this script mktemps its scratch under a cleanup trap and nothing after the run can open the disagreeing consumer; it is a straight-line sequence of prints with no branch that can change the verdict the caller goes on to fail with, and every value it prints has a named reader in that section's truth table
+manifest_report() {   # $1 = profile, $2 = consumer dir, $3 = its manifest, $4 = mismatch count, $5 = checked count, $6.. = the hash-disagreeing paths in the order the loop found them
+    local profile="$1" C="$2" LOCK="$3" mismatch="$4" checked="$5"; shift 5
+    local -a bad=("$@") samples=()
+    local target digest_want art seam p r out found
+
+    printf '  == manifest report: %s, %s of %s entries disagree ==\n' "$profile" "$mismatch" "$checked"
+    printf '  read the four hashes below against the truth table in installer/README.md §The consumer smoke\n'
+    if [[ ${#bad[@]} -eq 0 ]]; then
+        printf '  every disagreement is a path the manifest names and the tree does not hold, so there is no hash to compare\n'
+        return 0
+    fi
+    samples=("${bad[0]}")
+
+    target="$(jq -r '.artifact.target // ""' "$LOCK")"
+    art=""
+    if [[ -n "$target" ]]; then
+        seam="$(lock_own_file "$LOCK" "$GATES_DIR/gate-sdk-config.sh")"
+        [[ -n "$seam" && -f "$C/$seam" ]] \
+            && art="$(sed -n 's/^GATE_SDK_NATIVE_BIN=//p' "$C/$seam" | head -n1)"
+    fi
+    if [[ -z "$target" ]]; then
+        printf '  the manifest records no artifact key, so the discriminating binary sample is absent from this payload\n'
+    elif [[ -z "$art" ]]; then
+        printf '  the manifest records artifact %s but no config seam names its path, so the binary sample is unresolved\n' "$target"
+    else
+        found=""
+        for p in "${bad[@]}"; do [[ "$p" == "$art" ]] && { found=y; break; }; done
+        if [[ -z "$found" ]]; then
+            printf '  the artifact row %s is not in the disagreeing set, so the sample is the first path alone\n' "$art"
+        elif [[ "$art" == "${bad[0]}" ]]; then
+            printf '  the artifact row %s is also the first disagreeing path, so the two samples coincide\n' "$art"
+        else
+            samples+=("$art")
+        fi
+    fi
+
+    for p in "${samples[@]}"; do
+        printf '  -- %s\n' "$p"
+        hash_probe want jq -r --arg p "$p" '(.files // {})[$p] // ""' "$LOCK"
+        hash_probe got git hash-object -- "$C/$p"
+        hash_probe own git -C "$C" hash-object -- "$p"
+        hash_probe raw git hash-object --no-filters -- "$C/$p"
+    done
+
+    printf '  -- the consumer worktree, the witness for a tree that has diverged from what init committed\n'
+    git -C "$C" status --porcelain 2>&1 | head -n 40
+    git -C "$C" log -1 --stat 2>&1 | head -n 40
+    printf '  -- core.autocrlf, core.eol and core.safecrlf with their origins, in both repositories\n'
+    for r in "$C" "$REPO"; do
+        printf '    in %s\n' "$r"
+        out="$(git -C "$r" config --list --show-origin 2>&1 | grep -iE 'core\.(autocrlf|eol|safecrlf)=')"
+        printf '%s\n' "${out:-      <none of the three is set>}"
+    done
+    printf '  -- git check-attr -a for each sampled path, in both repositories, since an attribute reaches a path the config does not\n'
+    for p in "${samples[@]}"; do
+        attr_probe "$C" "in the consumer" "$p"
+        attr_probe "$REPO" "in the smoke repository" "$C/$p"
+    done
+
+    if [[ -n "$target" && -n "$art" && -f "$C/$art" ]]; then
+        digest_want="$(jq -r '.artifact.digest // ""' "$LOCK")"
+        printf '  -- the artifact digest, a control on the content question alone: SHA-256 is taken by no git filter and in no repository context\n'
+        printf '    subject    %s (%s)\n' "$art" "$target"
+        printf '    recorded   %s\n' "$digest_want"
+        printf '    recomputed %s\n' "$(digest_of "$C/$art")"
+        printf '    equal means the artifact bytes are exactly the bytes init published, which speaks for this path and no other\n'
+    fi
+    return 0
+}
+
 # spec: installer/README.md §The consumer smoke — one encoding of the post-conditions, read by both transports, so the two arms cannot drift into asserting different things about the same install; ENTRY is the invocation of the installed entry point and RUN_PATH the PATH every step runs under, which is what lets the download arm mask node/npm without a second copy of the assertions
 # spec: installer/README.md §The gate binary — the expected battery outcome is a PARAMETER of this
 # shared helper rather than a branch inside it: every covered-platform leg passes the green
 # expectation it asserts today, and the binary-less leg passes the refusal its install actually earns
 assert_install() {   # $1 = profile, $2 = scratch consumer dir, $3 = battery expectation: green | unavailable
     local profile="$1" C="$2" battery_want="$3" out rc before after LOCK mismatch checked path want got target seam bin list k m line omitted want_omitted n_omitted
+    local -a bad_hash=()
 
     out="$( cd "$C" && PATH="$RUN_PATH" "${ENTRY[@]}" init --profile "$profile" 2>&1 )" \
         || { printf '%s\n' "$out" >&2; fail "init failed for the $profile profile"; }
@@ -213,8 +311,12 @@ assert_install() {   # $1 = profile, $2 = scratch consumer dir, $3 = battery exp
         checked=$((checked + 1))
         [[ -f "$C/$path" ]] || { echo "  manifest names a file that is not there: $path"; mismatch=$((mismatch + 1)); continue; }
         got="$(git hash-object -- "$C/$path")"
-        [[ "$got" == "$want" ]] || { echo "  manifest hash disagrees with the tree: $path"; mismatch=$((mismatch + 1)); }
+        [[ "$got" == "$want" ]] \
+            || { echo "  manifest hash disagrees with the tree: $path"; mismatch=$((mismatch + 1)); bad_hash+=("$path"); }
     done < <(jq -r '.files | to_entries[] | "\(.key)\t\(.value)"' "$LOCK")
+    # spec: installer/README.md §The consumer smoke — the report runs while the disagreeing consumer is still on disk and immediately before the fail that stands today, so a leg that reds here says what it found rather than only how many
+    [[ "$mismatch" -eq 0 ]] \
+        || manifest_report "$profile" "$C" "$LOCK" "$mismatch" "$checked" ${bad_hash[@]+"${bad_hash[@]}"}
     [[ "$mismatch" -eq 0 ]] || fail "$profile: $mismatch of $checked manifest entries disagree with the tree"
     [[ "$checked" -gt 0 ]] || fail "$profile: the manifest records no file"
     mapfile -t lock_kits < <(jq -r '.kits[]' "$LOCK")
