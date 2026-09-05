@@ -9808,7 +9808,4 @@
 
 ## Done
 
-- ruling-line-icebox-grammar-conflict
-- ruled-line-width-ceiling
-
 ## Lessons Learned
