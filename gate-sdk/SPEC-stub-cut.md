@@ -116,6 +116,18 @@ and `--only` consumes every remaining token as a member name
 The capability being moved is real: `scripts/gate-exec.sh` resolved a gate name and
 invoked it *with* arguments, and the operator ruled the caller now lives here.
 
+**This cut is therefore a hard, one-directional precondition of its sibling, and
+that ordering constraint is stated here rather than only on the queue entries and
+the sibling's own amendment.** `preflight-front-end-cut` is not landable before this
+delta lands. Landing the sibling first does not merely cost the six entries whose
+argument has no knob fallback — it **refuses every stage entry in the repo**,
+because `--enter-stage` appends `<queue> <state>` to every pre-flight entry's argv
+(`native/src/emit/enter_stage.rs:1260-1263`) and, with no `--` channel to carry that
+pair past selection, `--only` reads the appended tokens as unregistered gate names
+on all nine entries, not the six the escalation was raised about. Stated on this
+side too, so a build session landing this cut does not need the sibling amendment
+in hand to know why the order is not interchangeable.
+
 **The alternative the escalation recommended was refused, and its premise was the
 error.** Widening `check-producer-liveness` to read both corpora with no positional
 contradicts `evidence-kit/SPEC.md:1045-1049` — *"The two modes are told apart by the
@@ -218,9 +230,22 @@ this delta is the mechanism {design-bearing}. The leg is
 
 **The assertion that must invert, and the assertion that must not.** The leg reaches the
 battery through the shared `assert_install()` (`:164-260`), whose lines `:171-175` run
-the battery and require exit 0 **and** the literal `All N gates passed`. On a
-binary-less install that is now exit **2** and `run-gates: <list> names no gates` on
-stderr. The **disclosure** half is untouched and becomes the leg's whole point:
+the battery and require exit 0 **and** the literal `All N gates passed`. Today, with the
+loop still in the tree, that is exit **2** and `run-gates: <list> names no gates` on
+stderr — the shell's own line 326 check, since the leg's install genuinely ships no
+artifact and the loop is what runs in its place. **After delta (3) that producer is
+gone**, and the message the re-scoped assertion must actually check for is delta (4)'s —
+`exec_arm`'s absent-binary diagnostic, naming `bash gate-sdk/bin/build-native.sh` — because
+post-cut there is no longer a shell-side registry read to fail on: dispatch is
+unconditional (`exec_arm` on argv unchanged, delta 2's Producer), and its own
+"is absent or not executable" check (`:150-153`, kept by delta 4) is what a binary the
+install never packed hits first. `run-gates: <list> names no gates` remains a real
+message post-cut, but only as `native/src/runner.rs:424-428`'s, reachable exclusively
+through a *running* binary handed an empty registry — a different producer requiring a
+different precondition than this leg has. The exit code is unchanged at **2** either
+way, since `ARM_UNAVAILABLE_STATUS` (delta 4) is the same value the loop's own refusal
+used; what changes under delta (3) is the stderr text the leg's re-authored assertion
+must match. The **disclosure** half is untouched and becomes the leg's whole point:
 `BARE_OMITTED > 0` (`:397-398`), fed by the independently-derived expected omission set
 at `:243-254`, still holds — what changes is its meaning, from *some members lost* to
 *every member lost*.
