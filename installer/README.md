@@ -1319,8 +1319,14 @@ and an artifact row that is not in the disagreeing set.
 labelled, printed plain and rendered byte-exactly beside it, with the call that
 produced it and that call's standard error:
 
-- **`want`** — `files[P]` out of the consumer's `checkwright.lock`: what `init`
-  recorded.
+- **`want`** — `files[P]` as the arm's own loop holds it: the value
+  `IFS=$'\t' read -r path want` gave it off the manifest stream, which is the
+  value the failing comparison actually used. It is deliberately **not** re-read
+  through a second channel, for the same reason `got` is spelled exactly as the
+  arm spells it — a value that reaches the comparison mangled and re-reads clean
+  is invisible to a report that asks again, and that is not a hypothetical: the
+  first form of this report re-read it, and saw nothing on a leg where every
+  entry disagreed.
 - **`got`** — `git hash-object -- "$C/P"` from the smoke's own current
   directory: the failing read, spelled exactly as the arm spells it.
 - **`own`** — `git -C "$C" hash-object -- "P"`: the same command in the
@@ -1389,24 +1395,50 @@ reason: a report enabled by a configuration no CI job sets is the dead-producer
 shape, and the one host that needs this one is the host nobody is standing at.
 
 **What the native Windows leg has measured so far.** That leg is
-`continue-on-error` and reports rather than judges; these are its findings as of
-round 12 (run `33782234328`, head `32f73806`), recorded here because they are
-what the next rider of the leg would otherwise re-buy:
+`continue-on-error` and reports rather than judges; these are its findings,
+recorded here because they are what the next rider of the leg would otherwise
+re-buy. Rounds 12 (run `33782234328`, head `32f73806`) and 13 (run
+`33963571906`, head `c4850072`, the first round the report above ran on) both
+fail at `starter: 477 of 477 manifest entries disagree with the tree`:
 
 - All 477 entries read `manifest hash disagrees with the tree` and none read
   `manifest names a file that is not there` — those are the arm's two branches,
   so the failure is genuinely a hash disagreement rather than a missing path.
-- `scripts/checkwright-gates.exe` is in the disagreeing set. Every hypothesis
-  turning on end-of-line conversion has to survive that, and none does.
-- The run carries zero `fatal` lines, so a per-path refusal is evidence-against
-  rather than open — but the arm never printed `got`, so it is not closed
-  either, which is what the byte rendering above settles.
-- The host facts: `core.autocrlf false`, `core.symlinks true`, `core.longpaths`
-  unset, `core.filemode false`, an empty porcelain on a fresh checkout, git
-  2.55.0.windows.5, bash 5.3.15, and the failing profile is `starter` — the
-  profile that vendors one kit and writes a 477-entry manifest. The consumer's
-  own battery passed, `All 11 gates passed`, immediately before the manifest arm
-  failed.
+  It also means every recorded path exists, since the existence test is what the
+  other branch reports.
+- `scripts/checkwright-gates.exe` is in the disagreeing set, and round 13
+  sampled it as the artifact row.
+- **Round 13's four values came back identical on both samples** — the `.md`
+  and the `.exe` — every one a clean 40-hex with nothing in its byte rendering.
+  `got == own` retires the process-context asymmetry that was this leg's
+  standing narrowing; `raw` equal to the rest retires every end-of-line
+  hypothesis about the file's content; and the artifact control read
+  `recorded` and `recomputed` equal, so the binary's bytes are exactly the bytes
+  `init` published.
+- **The consumer's `git status --porcelain` printed nothing**, so the tree holds
+  what `init` committed, and neither round carries a `fatal` line from any hash
+  call, so no per-path refusal is open.
+- Both rounds read `core.autocrlf` as `true` in the system gitconfig and `false`
+  in the user's — the same two origins in the consumer and in the checkout, so
+  the effective value is `false` on both sides — with `core.eol` and
+  `core.safecrlf` unset and no attribute reported for either sampled path.
+- The other host facts: `core.symlinks true`, `core.longpaths` unset,
+  `core.filemode false`, git 2.55.0.windows.5, bash 5.3.15, and the failing
+  profile is `starter` — the profile that vendors one kit and writes a 477-entry
+  manifest. The consumer's own battery passed, `All 11 gates passed`,
+  immediately before the manifest arm failed.
+
+*What round 13 therefore establishes, and what it does not.* The recorded value,
+the tree's bytes and every git context all agree, so the disagreement is **in
+the comparison and not in the hashing** — the table's second row, in its
+strongest form. That leaves exactly one locus: the value the arm's loop held in
+`want`. Round 13's report could not show it, because that first form re-read
+`want` through a second channel instead of printing the one the comparison used;
+the bullet above is the correction, and it is what makes the next round decisive
+under the table's fourth row rather than its second. No mechanism is claimed
+here beyond that: a line terminator surviving `read`, which strips `\n` alone,
+is consistent with every printed line and with the count, but it is a candidate
+and not a reading.
 
 *Why the CI diagnostic that used to stand beside this leg is gone.* A
 `read one manifest disagreement in place` step stood up its own consumer and

@@ -57,6 +57,28 @@
   TRAJECTORY.md:275's sequencing sentence, not on leverage; envelope unchanged at the 2026-08-30 cap
   above. The four-cut test-harness alternative is HELD as the NEXT iteration on this scope's
   committed census — NO RE-SURVEY OWED.
+  **ROUND 13 IS THE CAUSE READ — run `33963571906`, head `c4850072`, the first round with the
+  report inside the arm. THE MECHANISM IS NOT NAMED; THE SITE IS.** The leg still exits 1 at
+  `starter: 477 of 477`. The measured facts are installer/README.md §The consumer smoke's, not
+  restated here. **FOUR HYPOTHESES RETIRED, each by a printed line.** (1) The process-context
+  asymmetry this entry has carried since round 12 — `want`/`got` being one command in two
+  contexts — DIES: `got` and `own` printed the same 40-hex value on both samples. (2) Every
+  end-of-line hypothesis about content DIES: `raw` (`--no-filters`) equals the other three, on the
+  `.exe` as well as the `.md`, with autocrlf effectively `false` from identical origins in both
+  repositories and no attribute on either path. (3) "The bytes on disk are not the bytes `init`
+  hashed" DIES: the consumer's porcelain printed NOTHING and the artifact control's `recorded` and
+  `recomputed` SHA-256 are equal. (4) An errored `got` DIES: no `fatal` from any hash call.
+  **WHAT SURVIVES IS ONE SITE.** The recorded value, the tree's bytes and every git context agree,
+  so the disagreement is IN THE COMPARISON, not in the hashing — and the only value left is the one
+  the arm's loop held in `want`, which reaches it through `IFS=$'\t' read -r path want` off a
+  process substitution. **THE ROUND'S OWN INSTRUMENT GAP, corrected in the same build:** that first
+  report RE-READ `want` through a second channel instead of printing the value the comparison used,
+  which is exactly why its byte rendering — whose stated purpose is to see a carriage return no
+  other line can — saw nothing. `want` is now the held value; the next round is decisive under the
+  truth table's FOURTH row rather than its second, at no extra push.
+  **NO REPAIR IS STARTED and none is guessed.** A terminator surviving `read` (which strips `\n`
+  alone) is consistent with every printed line and reproduces the count signature in a local probe,
+  but it is a candidate, not a reading — and this leg's own method ruling is cause-read-first.
   ruled: platform-support-ci-matrix operator 2026-08-27 2026-08-30 2026-08-31 2026-09-03 lead-relay
   ruled: platform-support-ci-matrix operator 2026-08-31 2026-09-05 consult
   ruled: platform-support-ci-matrix lead 2026-08-30 2026-09-01 2026-09-05 own-authority

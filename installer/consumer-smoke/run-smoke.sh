@@ -187,10 +187,10 @@ attr_probe() {   # $1 = the repository to ask, $2 = which repository that is, $3
 }
 
 # spec: installer/README.md §The consumer smoke — the manifest arm's failure report, in the arm because this script mktemps its scratch under a cleanup trap and nothing after the run can open the disagreeing consumer; it is a straight-line sequence of prints with no branch that can change the verdict the caller goes on to fail with, and every value it prints has a named reader in that section's truth table
-manifest_report() {   # $1 = profile, $2 = consumer dir, $3 = its manifest, $4 = mismatch count, $5 = checked count, $6.. = the hash-disagreeing paths in the order the loop found them
+manifest_report() {   # $1 = profile, $2 = consumer dir, $3 = its manifest, $4 = mismatch count, $5 = checked count, $6.. = one '<path><TAB><the want the loop held>' per hash disagreement, in the order the loop found them
     local profile="$1" C="$2" LOCK="$3" mismatch="$4" checked="$5"; shift 5
     local -a bad=("$@") samples=()
-    local target digest_want art seam p r out found
+    local target digest_want art seam entry p w r out found
 
     printf '  == manifest report: %s, %s of %s entries disagree ==\n' "$profile" "$mismatch" "$checked"
     printf '  read the four hashes below against the truth table in installer/README.md §The consumer smoke\n'
@@ -213,19 +213,22 @@ manifest_report() {   # $1 = profile, $2 = consumer dir, $3 = its manifest, $4 =
         printf '  the manifest records artifact %s but no config seam names its path, so the binary sample is unresolved\n' "$target"
     else
         found=""
-        for p in "${bad[@]}"; do [[ "$p" == "$art" ]] && { found=y; break; }; done
+        for entry in "${bad[@]}"; do [[ "${entry%%$'\t'*}" == "$art" ]] && { found="$entry"; break; }; done
         if [[ -z "$found" ]]; then
             printf '  the artifact row %s is not in the disagreeing set, so the sample is the first path alone\n' "$art"
-        elif [[ "$art" == "${bad[0]}" ]]; then
+        elif [[ "$art" == "${bad[0]%%$'\t'*}" ]]; then
             printf '  the artifact row %s is also the first disagreeing path, so the two samples coincide\n' "$art"
         else
-            samples+=("$art")
+            samples+=("$found")
         fi
     fi
 
-    for p in "${samples[@]}"; do
+    for entry in "${samples[@]}"; do
+        p="${entry%%$'\t'*}"; w="${entry#*$'\t'}"
         printf '  -- %s\n' "$p"
-        hash_probe want jq -r --arg p "$p" '(.files // {})[$p] // ""' "$LOCK"
+        printf '    %-4s %s\n' "want" "${w:-<empty>}"
+        printf '         bytes  %s\n' "$(printf '%q' "$w")"
+        printf '         call   read off the arm own jq stream of .files, which is the value the failing comparison used and not a second read of it\n'
         hash_probe got git hash-object -- "$C/$p"
         hash_probe own git -C "$C" hash-object -- "$p"
         hash_probe raw git hash-object --no-filters -- "$C/$p"
@@ -241,7 +244,8 @@ manifest_report() {   # $1 = profile, $2 = consumer dir, $3 = its manifest, $4 =
         printf '%s\n' "${out:-      <none of the three is set>}"
     done
     printf '  -- git check-attr -a for each sampled path, in both repositories, since an attribute reaches a path the config does not\n'
-    for p in "${samples[@]}"; do
+    for entry in "${samples[@]}"; do
+        p="${entry%%$'\t'*}"
         attr_probe "$C" "in the consumer" "$p"
         attr_probe "$REPO" "in the smoke repository" "$C/$p"
     done
@@ -312,7 +316,7 @@ assert_install() {   # $1 = profile, $2 = scratch consumer dir, $3 = battery exp
         [[ -f "$C/$path" ]] || { echo "  manifest names a file that is not there: $path"; mismatch=$((mismatch + 1)); continue; }
         got="$(git hash-object -- "$C/$path")"
         [[ "$got" == "$want" ]] \
-            || { echo "  manifest hash disagrees with the tree: $path"; mismatch=$((mismatch + 1)); bad_hash+=("$path"); }
+            || { echo "  manifest hash disagrees with the tree: $path"; mismatch=$((mismatch + 1)); bad_hash+=("$path"$'\t'"$want"); }
     done < <(jq -r '.files | to_entries[] | "\(.key)\t\(.value)"' "$LOCK")
     # spec: installer/README.md §The consumer smoke — the report runs while the disagreeing consumer is still on disk and immediately before the fail that stands today, so a leg that reds here says what it found rather than only how many
     [[ "$mismatch" -eq 0 ]] \
