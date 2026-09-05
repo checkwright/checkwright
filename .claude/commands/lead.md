@@ -21,7 +21,7 @@ One iteration is one point; do not flip on it either way.
 
 **Every reading is the entry's, not this file's.** The cost series, the ruled-alone
 counts, the counters and the refused premises live on
-`lead-tier-split-premise-unamended`; close records each iteration's reading there,
+`lead-split-posture-limb-unjudged`; close records each iteration's reading there,
 and this file carries no datum.
 
 - **`validate`** — the lead dispatches it with a `model: sonnet` override.

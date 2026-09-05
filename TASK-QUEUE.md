@@ -12,63 +12,6 @@
 
 ## New Features
 
-- **lead-tier-split-premise-unamended** [spec: SPEC-lead-tier-split.md]
-  — `lifecycle-kit/templates/lead.md`
-  §Economics rests its *Split the lead where the tail dominates* bullet on a premise TWELVE
-  consecutive iterations have now measured false, and the template still ships it unqualified.
-  **The trigger is the binding's own.** `.claude/commands/lead.md` set the criterion — count the
-  escalations a lead ruled ALONE off a governed surface; near zero, the premise holds; consistently
-  several, the template's bullet needs amending and not this repo's tier — with the threshold at a
-  third such iteration, ANSWERED at eleven. Measured 5, 4, several, 4, 5, 7, 7, 8, 12, 5, 3, now
-  **5**; THIS ENTRY is the governed surface for it whenever a dispatch relays one.
-  **The two axes separate, which makes this an amendment rather than a tier flip.** On COST the
-  premise holds; on CHARACTER it fails every time — a routing-only lead would be cheaper, would have
-  RELAYED these rulings, and would have raised none of the flags below.
-  **THE COST SERIES IS DERIVED, 2026-09-05, REPLACING THE ACCRETED ONE**, which ANSWERS why this
-  entry and the binding disagreed: every earlier point was a mid-close unlowered ceiling. From the
-  completed meter, supervision over priced spend, last six lead iterations: **11.7, 8.7, 8.2, 4.9,
-  4.4, 9.1**.
-  **THE CHARACTER DATUM THE COUNT CANNOT SEE**, from the eighth firing: the lead FLAGGED a risk
-  rather than asserting it safe and align found it real — the lead WRONG and the protocol still
-  paying, which no count of correct rulings evidences. The ninth: four of the lead's OWN premises.
-  **THE TENTH FIRING'S RESIDUE, the rest answered by the series:** three of its five rulings
-  replaced the escalating session's stated ground, and it carried two defects — align MISSING A
-  LIVE BLOCKER (the near-miss class on MECHANISM REACHABILITY) and a LEAD-SIDE `DONE` placement.
-  **THE ELEVENTH AND TWELFTH ARE ANSWERED BY THE SERIES TOO and take no paragraph** — three then
-  five ruled alone, one routed to the operator, neither cost point taken (the mid-close ceiling).
-  Two facts survive them: BOTH COUNTERS stayed CLEAN, so the nine below stayed nine; and the ALIGN
-  WATCH has a GAP — align never fired at the twelfth, so no bare-align datum exists for it.
-  **The counter-evidence is NINE instances of ONE shape — a claim verified at one surface and read
-  as covering a wider one.** Eight are the lead's own, sharpest five `recurrence:` dates ordered
-  onto an unjudged threshold COUNT; the ninth WIDENS it onto a STAGE session's carry. **Neither it
-  nor a refused premise NETS against the count**, which measures whether an escalation was answered
-  off a governed surface, never whether its grounds held; netting reports neither fact.
-  **THE SHAPE IS RULED — limbs, not a qualification and not a replacement**
-  (`SPEC-lead-tier-split.md` delta 1). What fails is not the claim but the ENUMERATION:
-  "concentrates judgment-tier spend
-  where it pays: scope itself, plus one oracle turn per forwarded intent question" names two
-  judgment-bearing classes and omits a third, the turns a lead rules ALONE off a governed surface,
-  which the split converts into relays. The cost limb keeps its text; a character limb states the
-  trade; and the counting METHOD promotes into the template as generic mechanism while the
-  threshold, the series and every stamp stay where they are. The lead-in is deliberately unchanged
-  — two shims cite it verbatim by title and nothing gates a citation to a bullet name.
-  **Cost while deferred:** every consumer vendoring lifecycle-kit reads a premise this repo has
-  measured false nine times, and each future lead re-derives the same finding against a template
-  that never records it — the binding's evidence is local while the false claim is shipped.
-  **DISTINCT from `economics-posture-binding-stale`**, whose subject is the local shim restating a
-  ruling it should cite; this one is the vendored TEMPLATE's own premise being wrong.
-  **THAT DEFERRAL IS SPENT AND THIS ENTRY JOINS `test-harness-cut-seam-sweep`.** It was taken under
-  the port-only run, superseded the same day by the port-first ruling, which legislates threshold
-  members itself as product-class with a live trigger — a ground that did not exist when this was
-  declined. Reading the supersession is `lead, own-authority 2026-09-05`; the join is the
-  operator's, 2026-09-05, through an interactive prompt in the lead session, relayed and not ruled
-  there, against a scope recommendation to hold and with the proposed-once clause's permanence cost
-  stated. The pool's highest recurrence at three, which `kpi-incident-recurrence` reports
-  independently of this entry.
-  Captured 2026-09-02 by close; lead-declined 2026-09-02 and 09-04; deferred 2026-09-05
-  (operator, lead-relay) on a ground since superseded.
-  recurrence: lead-tier-split-premise-unamended 2026-09-03 2026-09-04 2026-09-05
-
 
 ## Technical Debt
 
@@ -8957,6 +8900,44 @@
   single-date spelling here rests on lifecycle-kit's `(slug, date)` idempotence and the ambiguity
   is escalated rather than closed by this session.
 
+- **lead-split-posture-limb-unjudged** [design-pending] — this repo runs the Split posture and has
+  never judged which of the two limbs its own posture sits on. The template
+  (`lifecycle-kit/templates/lead.md` §Economics) now states both limbs and the method for taking
+  the reading; what stays local is the threshold, in `.claude/commands/lead.md`, and every reading,
+  which is this entry's. **The deliverable that made the template wrong is DISCHARGED** — the
+  premise is amended and `lead-tier-split-premise-unamended` is Done. What survives it is the
+  standing measurement, which the landing did not moot: nothing about the amendment makes the next
+  iteration's count unnecessary. Split from that slug `lead, own-authority 2026-09-05`, relayed to
+  the build session that found the store the Done move would have destroyed.
+  **THE COUNT SERIES, escalations the lead ruled ALONE off a governed surface, twelve points and
+  OPEN** — close appends each iteration's reading here: 5, 4, several, 4, 5, 7, 7, 8, 12, 5, 3, 5.
+  The threshold is a third such iteration and is ANSWERED; one iteration is one point and the
+  posture does not flip on one either way.
+  **THE COST SERIES, supervision over priced spend, last six lead iterations: 11.7, 8.7, 8.2, 4.9,
+  4.4, 9.1. DERIVED 2026-09-05, REPLACING AN ACCRETED ONE** — every earlier point was a mid-close
+  unlowered ceiling, which is why this entry and the binding once disagreed. That correction was
+  bought from a meter run over six iterations and is not re-derivable from prose.
+  **THE COUNTER-EVIDENCE IS NINE INSTANCES OF ONE SHAPE — a claim verified at one surface and read
+  as covering a wider one.** Eight are the lead's own; the ninth widens the shape onto a stage
+  session's carry. **NEITHER a counter nor a refused premise NETS against the count**, which
+  measures whether an escalation was answered off a governed surface and never whether its grounds
+  held; netting reports neither fact. Both counters stayed clean across the eleventh and twelfth,
+  so the nine stayed nine.
+  **THE ALIGN WATCH HAS A GAP:** align never fired at the twelfth, so no bare-align datum exists
+  for it, and the `cr` column of the bare `align` rows is where that trend is read.
+  **Cost while deferred:** the posture is run unjudged, so a tier assignment that is wrong on the
+  character limb costs every iteration and shows up as nothing — the count is the only instrument
+  that reports it, and an unread instrument is indistinguishable from a healthy one. The cost
+  series' 2026-09-05 correction also decays: re-deriving it means re-running the meter over six
+  iterations that keep receding.
+  **NO `recurrence:` LINE, and the omission is deliberate** — the three dated re-filings belonged to
+  the discharged deliverable, not to this premise, which has been surfaced once. Carrying them
+  would state a recurrence that did not happen and would re-arm the once-only proposal ground
+  TRAJECTORY.md's port-first ruling burns for a threshold member, on a fresh slug the burn does not
+  reach. The deferred-age clock is preserved by `Surfaced` instead, which is what carries it.
+  Surfaced 2026-09-02. Filed 2026-09-05 by build, splitting the measurement half off the amendment
+  it was riding.
+
 - **crate-interpreter-resolution-residue** [design-pending] — the crate spawns the bare program
   name `bash` at twenty sites the `check-graph` hotfix deliberately left alone, and each reaches
   System32's WSL launcher on a native Windows host exactly as that one did.
@@ -9849,5 +9830,6 @@
 - guard-tests-runner-port-cut
 - agents-md-smoke-port-cut
 - cardinal-notation-splits-gate-reach
+- lead-tier-split-premise-unamended
 
 ## Lessons Learned
