@@ -9780,6 +9780,7 @@
 - **done-slug-commit-naming-gate** [design-pending] — Done-moving commits need not name their slug.
 - **enter-stage-simulate-no-write-fixture** [design-pending] — Guard present, unpinned by a fixture.
 - **stage-lag-disambiguation** [design-pending] — Hook over-firing is accepted, not a defect.
+- **metric-dir-admission-unstated** [design-pending] — Ad-hoc scripts persist in .metric/.
 - **stage-economics-smoke-jq-arm-dormant** [design-pending] — Its jq-absent arm never runs anywhere.
 - **hermetic-bin-roster-config** [design-pending] — Pinning coverage needs a consumer roster seam.
 - **split-posture-waiver-writer** [design-pending] — A lead-issued waiver stamp has no writer.
