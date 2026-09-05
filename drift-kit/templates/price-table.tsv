@@ -1,4 +1,4 @@
-# price-table.tsv — consumer config for bin/stage-economics.sh (drift-kit/SPEC.md §The stage-economics meter).
+# price-table.tsv — consumer config for the --emit stage-economics arm (drift-kit/SPEC.md §The stage-economics meter).
 # Copy this beside your gates dir (default scripts/price-table.tsv, DRIFT_KIT_PRICE_TABLE) and
 # replace the placeholder rows with YOUR model roster. The per-token prices are public facts, but
 # the roster of models you run is yours — a kit literal enumerating it would publish it (the

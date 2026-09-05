@@ -62,7 +62,7 @@ declare -p DRIFT_KIT_STAGES &>/dev/null || DRIFT_KIT_STAGES=(scope align build v
 : "${DRIFT_KIT_SUPERVISION_LABEL:=supervision}"
 : "${DRIFT_KIT_FANOUT_SUFFIX:=+fanout}"
 
-# spec: drift-kit/SPEC.md §Bundled KPIs — kpi-price-table-age and bin/stage-economics.sh read one table; resolving the default here makes this library its single producer, which is what the substrate move converts the former in-substrate restatement into rather than a cross-substrate one.
+# spec: drift-kit/SPEC.md §Bundled KPIs — kpi-price-table-age and the stage-economics arm read one table; resolving the default here makes this library its single producer, which is what the substrate move converts the former in-substrate restatement into rather than a cross-substrate one.
 : "${DRIFT_KIT_PRICE_TABLE:=${GATE_SDK_GATES_DIR:-scripts}/price-table.tsv}"
 
 # spec: drift-kit/SPEC.md §The KPI plugin contract — DRIFT_KIT_KPI_DIRS is the extension point's first resolution tier and is consumer-first by construction: the adopter's own gates dir, before any kit's members.

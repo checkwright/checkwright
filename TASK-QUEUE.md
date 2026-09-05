@@ -99,40 +99,6 @@
   ruled: kit-library-port-residue operator 2026-09-03 lead-relay
   Filed 2026-08-30 by build, at the landing of the kit-library class ruling.
 
-- **drift-kit-bin-port-residue** [design-pending] — drift-kit's owed `bin/` members,
-  hosted together because the port corpus needed a SECOND queue entry and for no stronger reason.
-  **The ground is a column budget, not a class ruling, and this entry says so rather than letting
-  its name imply otherwise.** `native-gate-port-remaining-corpus`'s lead line cannot carry two
-  amendment refs — measured 2026-09-03 at spec: a 66-column base, two minimal refs 102, the real
-  pair 116, against `QUEUE_KIT_WRAP_BUDGET=100` (`queue-kit/lib/queue.sh:37`) — so a two-cut
-  iteration needs two hosts and this is the second. `kit-library-port-residue` was refused as that
-  host on its own lead sentence, which scopes it to the `lib/*.sh` members a class ruling left
-  owed; the owner text outranks any hosting practice.
-  **What it does NOT license, stated because the name reads like a carve-out.** No class ruling
-  puts a kit's `bin/` members in a cohort. `kit-library-port-residue` warns that the discriminator
-  is CONTENT, NOT DIRECTORY, and that warning is inherited here: this entry minted no disposition
-  for any member, settled no sequencing, and grounds no future cut on directory membership.
-  **THE CORPUS IS EMPTY, measured 2026-09-05 against `--emit port-blockers --tree`.** All three
-  members are delivered: `bin/kfric.sh` (60) 2026-09-03 as `--emit-kfric`, and
-  `bin/overhead-meter.sh` (105) and `bin/stage-economics.sh` (464) 2026-09-05 as
-  `--emit-overhead-meter` and
-  `--emit-stage-economics`, on the shared `native/src/sessions.rs` the operator's 2026-09-05 seam
-  ruling required. drift-kit now has **no `bin/` directory at all**, and each declaring section
-  carries its own port-owed residue paragraph, so no later cut is sequenced against any of them.
-  **The terminal move is OPEN and is the lead's, not this session's.** `SPEC-economics-cut.md`'s
-  DoD ruled a DEMOTION and build executed it rather than reversing a ruled line; but
-  canon-kit/SPEC.md §Merging an amendment conditions that branch on *one increment* of a corpus,
-  and this was the last, so its stated ground — *a Done move asserts a finished deliverable that is
-  not finished* — no longer holds. Escalated at the landing commit; a Done move is one edit.
-  **Cost while deferred:** an exhausted corpus sitting in the design-pending pool is a false open
-  item that the deferred-age reading counts and a later scope re-reads.
-  ruled: drift-kit-bin-port-residue operator 2026-09-05 consult
-  ruled: drift-kit-bin-port-residue lead 2026-09-03 2026-09-05 own-authority
-  Filed 2026-09-03 by spec, minted and promoted in one motion as the second cut's host on the
-  ruling above; the column budget that forced it is filed as a recurrence of
-  `record-stamp-encoding-compression`, the entry that owns the encoding, not this one.
-  Demoted 2026-09-05 by build with its corpus emptied.
-
 - **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
   — the whole battery onto the binary, and the shell surface down to its residue.
   roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
@@ -777,8 +743,8 @@
   **Why it is genuinely weaker than a data-loss finding:** reaching a destructive script needs a
   second precondition the allowlist cannot evidence — a hostile script must already exist at a
   matching path. `scripts/bash-guard.sh` also blocks `bash .tmp/…` outright, closing the one path a
-  session may write to freely, and routes it through `scratch-run.sh`, which resolves the real path
-  and refuses anything outside the scratch dir.
+  session may write to freely, and routes it through the `--scratch-run` arm, which resolves the
+  real path and refuses anything outside the scratch dir.
   **Why [design-pending]:** whether "destructive form" covers a code-execution class at all is a
   question about the 2026-08-20 ruling's own scope, and only the operator may widen it. The
   engineering question — whether these globs can be re-spelled without breaking the battery they
@@ -3233,9 +3199,13 @@
 
 - **stage-economics-log-key-session-collision** [design-pending] — two sessions in one
   (iteration, stage) overwrite each other in the trend log.
-  `drift-kit/bin/stage-economics.sh`'s `log_line` dedups on the `<iteration> <stage> <model>`
+  the `--emit stage-economics` arm's row writer dedups on the `<iteration> <stage> <model>`
   triple, so a batch-split stage — several sessions stamped into the same pair — appends twice
   and the second silently replaces the first, under-reporting that stage by a whole session.
+  **The defect survived the 2026-09-05 port unchanged**, which is a fact rather than an
+  assumption: the port's parity harness reproduced the shell form's trend log byte for byte
+  across eight fixture sets, and the ported writer filters the same triple. Only the path in
+  this entry moved.
   The session id is written as a same-line field, never into the key.
   **Found by exercising the meter against the real sessions directory**, not by reading it:
   one iteration's build stage had run as two sessions and only one row survived. The fan-out
@@ -4052,7 +4022,7 @@
   **redundant**, **too broad**, and **not content-pinned**, the last with a full procedure — an
   entry naming a *script path* rather than a fixed command grants whatever that file says at
   run time, and a path under the gitignored scratch dir is rewritable by any session, so the
-  run routes through `bin/scratch-run.sh` and the direct-path grant is removed.
+  run routes through the `--scratch-run` arm and the direct-path grant is removed.
   `guard-kit/bin/compare-settings-allow.sh` builds only `redundant` and `too_broad`; it has no
   content-pin arm and prints no such section, so that disposition is hand-executed every close
   against an unbounded surface, with the template's own wording ("Read the shape, not the
@@ -9288,55 +9258,54 @@
   Surfaced 2026-09-03 in the consult that closed the provenance-seam ruling; drained here; the third
   shape above added 2026-09-04 at the scan-prompts-cut close drain.
 
-- **bin-tool-help-arm-absent-tree-wide** [design-pending] — twelve of the fourteen shipped `bin/`
-  tools, across five kits, answer `-h`/`--help` with something other than usage on stdout at
-  exit 0, and one of them runs a multi-minute meter instead.
+- **bin-tool-help-arm-absent-tree-wide** [design-pending] — nine of the eleven shipped `bin/`
+  tools, across four kits, answer `-h`/`--help` with something other than usage on stdout at
+  exit 0.
   **THE CENSUS IS DERIVABLE AND THIS IS ITS COMMAND**, stated on the entry because a count whose
-  oracle is unstated is unmaintainable by anyone but its author — which is what made the previous
-  figure irreproducible below. Run
-  `git ls-files '*/bin/*.sh' | grep -v '/gate-tests/' | xargs grep -L -- '--help'`; it returned
-  **12** of 14 shipped tools at the 2026-09-05 close drain. Dropping the `grep -v` re-admits the
-  three gate fixtures the census excludes, which is where the older 3-fixture subtraction came
-  from. The proxy is static and a **lower bound** — a file merely mentioning `--help` in a comment
-  counts as having an arm — but it was checked exact at this reading: the only two shipped tools
-  that match, `gate-sdk/bin/run-gates.sh` and `installer/bin/checkwright.sh`, each carry a real
-  `-h | --help)` dispatch branch.
-  **The prior 20-paths / 17-shipped figure retires as UNATTRIBUTABLE, not as drift.** Re-run at
-  that figure's own rev the command above returns 19 / 3 fixtures / 16 shipped, so the gap was
-  never a moved tree — the 2026-09-04 measurement did not state its pattern and no later session
-  could reproduce it. This iteration's four port cuts then deleted four shipped `bin/` tools, and
-  16 → 12 accounts for exactly those four. The "nine kits" of that same figure retires with it:
-  the twelve sit in five (context-kit, doctrine-kit, drift-kit, gate-sdk, guard-kit).
-  **Measured behaviourally, 2026-09-04.** Three were probed live: `scratch-run.sh --help`
-  answers `scratch-run: no such script: --help` at exit 2; `compare-settings-allow.sh --help` prints
-  usage on **stderr** at exit 2, which is the unrecognized-option refusal branch and not a help arm;
-  and `drift-kit/bin/stage-economics.sh --help` **ignores the argument entirely and runs the full
-  meter** — the discoverability cost the contract was written about, paid at this very drain.
+  oracle is unstated is unmaintainable by anyone but its author. Run
+  `git ls-files '*/bin/*.sh' | grep -v '/gate-tests/' | xargs grep -L -- '--help'`; it returns
+  **9** of 11 shipped tools, re-derived 2026-09-05 at the meter-pair build, whose three cuts
+  deleted three more shipped tools. Dropping the `grep -v` re-admits the three gate fixtures the
+  census excludes. The proxy is static and a **lower bound** — a file merely mentioning `--help`
+  in a comment counts as having an arm — but it was checked exact at this reading: the only two
+  matching tools, `gate-sdk/bin/run-gates.sh` and `installer/bin/checkwright.sh`, each carry a
+  real `-h | --help)` dispatch branch. The nine sit in **four** kits — context-kit, doctrine-kit,
+  gate-sdk, guard-kit — drift-kit having left the corpus entirely when the meter pair's port took
+  its last `bin/` member and the directory with it.
+  **Every earlier figure on this entry is superseded by that command and none is restated**, which
+  is the whole reason the command is here: a 2026-09-04 measurement stated no pattern and no later
+  session could reproduce it: re-derive rather than compare a bare number.
+  **Measured behaviourally, 2026-09-04, and two of the three probes have since left the corpus.**
+  `scratch-run.sh --help` answered `scratch-run: no such script: --help` at exit 2;
+  `compare-settings-allow.sh --help` prints usage on **stderr** at exit 2, the unrecognized-option
+  refusal branch and not a help arm; `stage-economics.sh --help` **ignored the argument entirely
+  and ran the full meter**. The first and third were ported to bridged arms 2026-09-05 and their
+  shell paths deleted, so **only the middle probe is still live**; the other two stay as the
+  attested shapes the design question is about, never as current instances.
   **Why they survived, and it is not "no gate reads the contract".** That is ruled and deliberate
   (gate-sdk/SPEC.md §The bin/-tool contract), and the ruling names its own substitute in the same
   breath — *"Each member's coverage follows it"*, behavioral coverage in `smoke/`, on the
   `enter-stage.sh --simulate` precedent. gate-sdk, lifecycle-kit and drift-kit smokes each carry it;
-  **guard-kit's `smoke/install.sh` is 26 lines and carries none**, for three `bin/` tools. The gap
+  **guard-kit's `smoke/install.sh` is 26 lines and carries none**, for two `bin/` tools. The gap
   is the kits that never took the ruled substitute, not a missing scanner.
   **Why `[design-pending]`: the contract's own scope is the design question.** §The bin/-tool
   contract states its three behaviors under a free-text-positional rule, yet
   `gate-sdk/bin/run-gates.sh --enter-stage`'s own note reads the HELP half as binding on a
   membership-validated tool too. Whether it binds on a tool taking **no** positionals — which is
-  most of the seventeen, `stage-economics.sh` included — is unstated, and the answer sets the corpus
-  before any member is fixed.
+  most of the census — is unstated, and the answer sets the corpus before any member is fixed.
   **Cost while deferred:** one wrong answer instead of usage per session that probes a tool for its
-  modes, and the attested shapes are silently-wrong (a meter run) rather than merely unhelpful.
-  **Ten of the twelve are also owed to the port**, so a cut can apply the split per member — but
-  only once the scope question is answered, since it decides which members owe an arm. The other
-  two, `gate-sdk/bin/gen-pre-commit.sh` and `gate-sdk/bin/run-consumer-smoke.sh`, are declared
+  modes, and the attested shapes are silently-wrong rather than merely unhelpful.
+  **Six of the nine are also owed to the port**, so a cut can apply the split per member — but only
+  once the scope question is answered, since it decides which members owe an arm. The other three,
+  `gate-sdk/bin/build-native.sh`, `gen-pre-commit.sh` and `run-consumer-smoke.sh`, are declared
   `no-port` and will never ride a cut, so their arm has no cut to ride and needs its own. That
-  split was invisible while the census had no stated command, which is the second thing the
-  command above buys.
+  split re-derives off the census command joined with `--emit port-blockers --tree`.
   Filed 2026-09-04 to the gap inbox at spec as a guard-kit-local two-tool finding; WIDENED at that
   drain from 2 tools to a tree-wide census and from "no gate" to "no smoke coverage", after →fix
   failed on the unsettled scope question and →icebox failed on the live per-session trigger.
   Census command and count landed 2026-09-05 by close, on the lead's ruling that a close moving
-  the number without landing its measurement pattern reproduces the defect one iteration later.
+  the number without landing its measurement pattern reproduces the defect one iteration later;
+  both re-derived 2026-09-05 by build when its own cuts moved the corpus.
 
 - **line-range-citation-stales-inside-its-own-iteration** [design-pending] — a `<path>:<N>-<M>`
   citation is true when written and false a commit later, and the wrong number outlives the right
@@ -9756,6 +9725,7 @@
 
 ## Done
 
+- drift-kit-bin-port-residue
 - overhead-meter-measures-the-lead
 - scratch-run-port-blocker-unrecorded
 

@@ -1,4 +1,4 @@
-# price-table.tsv — consumer config for bin/stage-economics.sh (drift-kit/SPEC.md §The stage-economics meter).
+# price-table.tsv — consumer config for the --emit stage-economics arm (drift-kit/SPEC.md §The stage-economics meter).
 # Columns are USD per single token (a $/MTok price / 1,000,000), tab-separated.
 # One row per model id as it appears in a transcript's message.model.
 #
