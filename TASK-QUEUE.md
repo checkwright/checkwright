@@ -140,8 +140,11 @@
   reach before either cut can be composed at all.
   **THE SEAM IS RULED 2026-09-05 (operator, consult): both meters adopt the stage-economics
   derivation, in-crate once** — drift-kit/SPEC.md §The overhead meter. Both members are takeable.
+  **COMPOSED AS THIS ITERATION'S TWO CUTS — ruled 2026-09-05 (lead, own-authority):** both members
+  ride `drift-meter-pair-and-scratch-run-cuts`, 569 lines inside a 350-650 window. **For spec:** the
+  464 UNDERSTATES its width — stamps ⋈ transcripts ⋈ price table — as `run-gates.sh`'s 503 did.
   ruled: drift-kit-bin-port-residue operator 2026-09-05 consult
-  ruled: drift-kit-bin-port-residue lead 2026-09-03 own-authority
+  ruled: drift-kit-bin-port-residue lead 2026-09-03 2026-09-05 own-authority
   Filed 2026-09-03 by spec, minted and promoted in one motion as the second cut's host on the
   ruling above; the column budget that forced it is filed as a recurrence of
   `record-stamp-encoding-compression`, the entry that owns the encoding, not this one.
@@ -9620,6 +9623,9 @@
   unmeasured. And "droppable" is cheap to not-take and dear to drop: a drop at build discards
   spec's authored delta and align's audit of it, and the out-of-band grant above makes this the
   member most likely to be dropped. Build having room is not licence to add.
+  **TAKEN AS `drift-meter-pair-and-scratch-run-cuts`' THIRD CUT — ruled 2026-09-05 (lead,
+  own-authority), superseding the deferral above on its own stated ground:** that ground was a cut
+  already at the window's top at 668; this one reads 619, so it has lapsed and the 50 lines ride.
   ruled: scratch-run-port-blocker-unrecorded lead 2026-09-05 own-authority
   ruled: scratch-run-port-blocker-unrecorded operator 2026-09-05 consult
   Filed 2026-09-04 to the gap inbox at scope; promoted 2026-09-05 by close.
