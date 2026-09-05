@@ -499,84 +499,31 @@ the finding re-occurred, read off the filed prose rather than derived from it
 and hand-read; an entry with no declaration is simply an entry that has not
 recurred.
 
-A **ruling recorded onto the entry it rules** carries a further declaration on
-the same pattern, `ruled: <slug> <authority> <YYYY-MM-DD> <channel>` — one
-indented body line naming the entry's own slug, then the authority that ruled,
-the date it was taken, and a keyword naming how the authorization reached the
-recording session. One line per ruling, appended and never rewritten; rulings
-sharing an authority and a channel share a line on the `recurrence:` model, and
-a ruling that shares neither takes a counted second one.
-**"Never rewritten" is a test about content and not about bytes**, and stating
-it is owed because the clause beside it forecloses the literal reading: a ruling
-that shares an authority and a channel with one already recorded *joins that
-line*, which rewrites it, so byte immutability cannot be what the phrase means.
-**A rewrite is sanctioned iff every ruling recorded before it is still recorded
-after it, with its authority, its date and its channel.** Retroactively
-canonicalizing already-valid separate lines into the shared form therefore
-appends rather than rewrites, while a consolidation that drops or merges any one
-of those three fields is exactly what the clause forbids — the test is what a
-session under line-budget pressure applies, the first canonicalization being an
-instance of it rather than the permission itself (operator-ruled 2026-09-03,
-verified on that instance: every prior ruling survived with all three fields).
-**Where such a line sits carries no meaning**, and that follows from the first
-field rather than standing as a second permission: the declaration names the
-entry's own slug, so it is entry-scoped, and moving one across paragraph blocks
-re-attributes nothing. It is a declaration
-rather than a tag on the same further-tag test `recurrence:` clears — its
-readers scan a line of its own and it marks no move across a pending/ready
-boundary — so `check-tag-lead-line` does not govern it and it cannot collide
-with the bracket scans. The date form is `recurrence:`'s, so one date grammar
-serves the file.
-
-**`<authority>` is required and has no default, and that requirement is the
-whole of the grammar.** Every other way a queue entry records an authorization
-states only *how* one arrived, so a ruling a party took on its own authority and
-one it relayed from elsewhere are written identically. The expensive direction is
-the second: a ruling recorded as coming from the authority a later session may
-not overrule alone freezes a decision that should have stayed re-rulable, and it
-freezes it silently. A party's own ruling is therefore written naming that party,
-never left unmarked — an absence reads as *nobody claims this*, and
-gate-sdk/SPEC.md §check-gate-fail-closed carries a worked instance of what
-repairing a misattribution after the fact costs. `<channel>` is a **keyword and
-not a sentence**, for the reason `[gate-exempt:]`'s reason keyword is one:
-`check-queue-wrap`'s budget is the line's ceiling and free prose reaches it
-immediately, while the full account of how a ruling arrived has its reader in the
-entry body already.
-
-**The authority vocabulary is the consumer's and no kit enumerates it.**
-Governance roles are a project's own vocabulary, and a kit literal spelling them
-would ship one project's posture as everyone's — the provenance seam. The kit
-ships the **slot**: position, requiredness, one line, self-naming. Which
-authorities exist is named on the consumer's own always-loaded surface, where a
-session already learns its governance roles. **No knob is minted**, because no
-kit mechanism reads the values, and a knob whose only reader is
-`check-knob-citation` is a knob that should not exist.
-
-**Presence is deliberately ungated, and the residual bound is stated here rather
-than left to be inferred.** No gate asserts that an entry claiming a ruling
-carries the declaration. Its one machine reader is §check-queue-entry-budget's
-discount, so a malformed line is simply not discounted — a soft, self-correcting
-consequence rather than a red. A presence gate would demand a declaration on
-every entry already carrying ruling vocabulary, and for the older ones the
-provenance is **unrecoverable**: the recording session's transcript is gone, so
-the only way to make such a gate green is to *invent* the fact it audits, which
-is the precise failure the declaration exists to prevent. Grandfathering by date
-would instead leave a permanent unexplained boundary in the file. `recurrence:`
-has no presence gate either, on the compatible ground that a declaration written
+`recurrence:` has no presence gate, on the ground that a declaration written
 under judgment is not one a scanner can demand — which is also why the grammar
-lands with **no retrofit**: existing entries are not back-filled.
+landed with **no retrofit**: existing entries are not back-filled.
 
-**What the line does and does not buy, stated because a claim without its bound
-is the defect this declaration repairs.** It is still the relaying party's own
-word about a channel the tracked record cannot reach, so it **raises the cost**
-of inventing a ruling and does **not** make an invented one detectable. No
-governed surface may state it as verification. What it closes is the direction
-the unstructured practice missed: an unattributed ruling stops being
-indistinguishable from one taken at the highest authority, and a party ruling on
-its own authority gains a first-class way to record that rather than an absence.
-Its reader is the **auditing** one — a security review, a later session, or an
-operator reading the tracked record at the moment a recorded ruling is relied on
-or re-ruled.
+**A ruling's provenance is stated inline beside the ruling's content, never as
+a declaration line.** Who ruled, when, and through what channel are three facts
+the sentence recording the ruling already carries —
+`ruled <date> (<authority>, <channel>)` — and a party's own ruling names that
+party rather than going unmarked, because an absence otherwise reads as the highest authority and
+freezes a decision that should have stayed re-rulable. The authority vocabulary
+is the consumer's, named on its own always-loaded surface; the kit enumerates
+none. A `ruled: <slug> <authority> <date> <channel>` declaration grammar once
+shipped beside `recurrence:` and is **retired**: its only machine reader was
+§check-queue-entry-budget's own discount, the body already carried the same
+three facts inline, and the discount being one line per grammar meant every
+further ruling spent a counted line of a capped entry on a restatement — a
+second content tier growing against the record it duplicated. The lead token
+is refused by §check-queue-entry-budget assertion (D) so the grammar is not
+re-minted from habit; the inline form costs nothing and has the same reader,
+the auditing one — a later session or an operator at the moment a recorded
+ruling is relied on or re-ruled. What the inline statement buys is unchanged
+by the form: it is the relaying party's own word about a channel the tracked
+record cannot reach, so it raises the cost of inventing a ruling and does not
+make an invented one detectable, and no governed surface may state it as
+verification.
 
 Two tags ride **Lessons Learned** entries — a lesson is a top-level bullet
 under the fixed-spelling `## Lessons Learned` heading, and the `queue-index` arm
@@ -1469,7 +1416,7 @@ assertions:
   the `queue-index` arm's `--extent` yields, so the range the gate measures is the
   range an eviction deletes. Its **count** is that extent less **at most one line
   of each declaration grammar the queue format defines** (§The tag algebra) —
-  today `recurrence:` and `ruled:`, and any later grammar by construction rather
+  today `recurrence:` alone, and any later grammar by construction rather
   than by a further edit here. Extent and count differ by those discounted lines
   and by nothing else, at most one per grammar, which is what
   keeps the equality above a statement about the *range* while the cap binds the
@@ -1486,6 +1433,11 @@ assertions:
   membership in the tier is itself the cost declaration (low, non-rotting, no
   live trigger). The requirement binds exactly where the section does not
   already imply the answer.
+- **(D) Retired grammar absent.** No body line in a deferred or icebox entry is
+  led by the retired `ruled:` token (§The tag algebra): a ruling's provenance is
+  stated inline, and a declaration line restating it is the second tier the
+  retirement removed. Refused rather than merely uncounted because the grammar's
+  inducer was habit, and habit re-mints a spelling the record still shows.
 
 Calibration: `QUEUE_KIT_ENTRY_LINE_CAP` defaults to `50`. The cap's job is to
 keep compression from regrowing rather than to force the initial cut, so it is
@@ -1559,8 +1511,8 @@ already in the tree rather than invented here: a judged `recurrence:` date and
 the grounds it is read from, which must land in the commit the judging session is
 already making because that commit is the audit artifact (lifecycle-kit/SPEC.md
 §The committed gap inbox); and a ruling recorded onto the entry it rules — its
-content under the recording-in-the-moment rule below, and its `ruled:`
-declaration in that same commit under lifecycle-kit/SPEC.md §The state machine. Its **producers** are the sessions those
+content, with its inline provenance, under the recording-in-the-moment rule
+below and in that same commit under lifecycle-kit/SPEC.md §The state machine. Its **producers** are the sessions those
 two contracts already bind — any session that judges a recurrence, the gap-inbox
 drain being its mechanized instance, and any session recording a
 ruling — both running today with no new trigger, no new field and nothing to

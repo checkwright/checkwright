@@ -35,7 +35,11 @@ fn is_iso_date(tok: &str) -> bool {
 // spec: queue-kit/SPEC.md §check-queue-entry-budget — at most one line of EACH declaration
 // grammar the queue format defines is discounted, each matched by its own grammar: lead token,
 // slug, then at least one ISO date past the slug, with no entry-boundary or self-slug condition
-const DECLARATIONS: [(&str, usize); 2] = [("recurrence:", 3), ("ruled:", 5)];
+const DECLARATIONS: [(&str, usize); 1] = [("recurrence:", 3)];
+
+// spec: queue-kit/SPEC.md §check-queue-entry-budget — assertion (D): a body line led by a
+// retired declaration token is refused, provenance being stated inline
+const RETIRED: [&str; 1] = ["ruled:"];
 
 fn declaration(line: &str) -> Option<usize> {
     let f: Vec<&str> = line.split_whitespace().collect();
@@ -110,7 +114,7 @@ pub fn run(args: &[String]) -> i32 {
         }
     };
 
-    let (mut size, mut cost, mut shape) = (Vec::new(), Vec::new(), Vec::new());
+    let (mut size, mut cost, mut shape, mut retired) = (Vec::new(), Vec::new(), Vec::new(), Vec::new());
     // spec: queue-kit/SPEC.md §check-queue-entry-budget — headroom is the size
     // assertion's own count one subtraction away, collected for every closed
     // Deferred entry regardless of cap outcome and surfaced only on the clean path
@@ -228,6 +232,12 @@ pub fn run(args: &[String]) -> i32 {
         }
 
         if !open.is_empty() && !line.trim().is_empty() {
+            if let Some(tok) = line.split_whitespace().next() {
+                if RETIRED.contains(&tok) {
+                    let slug = open.last().map(|o| o.slug.clone()).unwrap_or_default();
+                    retired.push(format!("{}:{}: {} — retired declaration grammar {}", file, fnr, slug, tok));
+                }
+            }
             let decl = declaration(line).map_or(0, |i| 1u32 << i);
             for o in open.iter_mut() {
                 o.nb += 1;
@@ -243,7 +253,7 @@ pub fn run(args: &[String]) -> i32 {
     bound = last + 1;
     close_to!(all);
 
-    if !size.is_empty() || !cost.is_empty() || !shape.is_empty() {
+    if !size.is_empty() || !cost.is_empty() || !shape.is_empty() || !retired.is_empty() {
         println!("check-queue-entry-budget: deferred-pool entry budget violation(s):");
         println!();
         if !size.is_empty() {
@@ -264,6 +274,13 @@ pub fn run(args: &[String]) -> i32 {
             println!("icebox entry carrying a body (the tier's whole purpose is minimum residency;");
             println!("membership in it is itself the cost declaration):");
             for x in &shape {
+                println!("  {}", x);
+            }
+        }
+        if !retired.is_empty() {
+            println!("retired declaration line (state who ruled, when and through what channel");
+            println!("inline beside the ruling's content, then delete the line):");
+            for x in &retired {
                 println!("  {}", x);
             }
         }

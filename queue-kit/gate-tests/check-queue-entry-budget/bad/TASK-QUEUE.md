@@ -37,12 +37,10 @@
   **Cost while deferred:** low.
   Filed 2026-01-04 by scope.
 
-- **theta-idea** [design-pending] — two rulings on one entry and one further
-  excess line: the discount is one line per *grammar*, so the second `ruled:`
-  line is counted like any other and an entry taking many rulings still pays
-  for them.
+- **theta-idea** [design-pending] — a retired declaration line: the entry is
+  within the cap, and the line is refused on its lead token alone, whatever
+  follows it.
   ruled: theta-idea operator 2026-01-05 relay
-  ruled: theta-idea lead 2026-01-06 own-authority
   **Cost while deferred:** low.
 
 ## Icebox

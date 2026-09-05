@@ -52,9 +52,6 @@
   is a candidate, not a reading. **AND THE NEXT ROUND IS ALREADY BOUGHT:** `gates` runs
   `install-smoke-windows` on every master push under no `if:` gating, so close's push runs the
   corrected instrument at no extra cost — verified against the workflow file at build, not inferred.
-  ruled: platform-support-ci-matrix operator 2026-08-27 2026-08-30 2026-08-31 2026-09-03 lead-relay
-  ruled: platform-support-ci-matrix operator 2026-08-31 2026-09-05 consult
-  ruled: platform-support-ci-matrix lead 2026-08-30 2026-09-01 2026-09-05 own-authority
   Filed 2026-07-26 by scope, split from `platform-support-contract`; Linux split 08-25, macOS 08-26;
   promoted/deferred 08-25 through 09-05; rounds 6-13 ran 08-31 to 09-05, 8-11 identical to 7.
   **DEMOTED 2026-09-05 AT BUILD, and the demotion IS the settled outcome rather than a shortfall.**
@@ -66,6 +63,8 @@
   shape's known legibility price (`observation-predicate-entry-cannot-drain-in-its-own-iteration`,
   fourth shape). The four-cut test-harness alternative is HELD as the NEXT iteration on this
   scope's census — NO RE-SURVEY OWED.
+  Also ruled: operator 2026-08-27 and 2026-08-31 (lead-relay), 2026-08-31 (consult); lead
+  2026-09-01 (own-authority).
 
 - **measured-marker-cannot-sit-mid-paragraph** [design-pending] — `check-measured-claim` binds its
   marker to the line above the claim, so a claim standing mid-paragraph can carry no marker and
@@ -146,8 +145,6 @@
   **Cost while deferred:** low and non-recurring — the ground is stated and each member's sequencing
   is written into its own SPEC section, so no future cut re-argues the class. What is owed is the
   work, not the argument.
-  ruled: kit-library-port-residue lead 2026-09-01 2026-09-02 2026-09-03 own-authority
-  ruled: kit-library-port-residue operator 2026-09-03 lead-relay
   Filed 2026-08-30 by build, at the landing of the kit-library class ruling.
 
 - **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
@@ -187,19 +184,14 @@
   **(6) A TAXING MEMBER ORDERS INSIDE THE BUDGET ARM, NEVER THE BLOCKER-RETIRING OVERRIDE, AND
   THAT ARM'S PRECONDITION IS A `--group` VERDICT THE COMPOSING STAGE RUNS, 2026-09-05 (lead)** —
   both owned by gate-sdk/SPEC.md §The first cohort.
-  ruled: native-gate-port-remaining-corpus lead 2026-08-28 2026-08-29 2026-08-31 own-authority
-  ruled: native-gate-port-remaining-corpus operator 2026-08-28 2026-08-29 2026-08-30 lead-relay
-  ruled: native-gate-port-remaining-corpus operator 2026-09-03 2026-09-05 lead-relay
   **Cost while deferred:** large and known — the **owed** remainder, the runners, the install-
   lifecycle layer; relaxation is closed at §The port-candidate criteria, `gate-battery-result-cache`
   unsubsumed. **THE PORT-FIRST RUN, ruled 2026-09-05 (operator, consult), supersedes the 2026-08-31
   port-only run: a port cut leads every iteration while the composer reaches one, and deferred units
   fill the window's remainder on three grounds, port-critical (inside the cut it unblocks, else its
   own iteration), same-surface, product-class — TRAJECTORY.md §PRIORITY DIRECTIVE owns them.**
-  ruled: native-gate-port-remaining-corpus operator 2026-08-31 2026-09-05 consult
-  ruled: native-gate-port-remaining-corpus lead 2026-09-01 2026-09-03 2026-09-04 own-authority
-  ruled: native-gate-port-remaining-corpus lead 2026-09-05 own-authority
   Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close; cohorts ruled at scope 2026-08-11/12.
+  Also ruled: lead 2026-09-01 (own-authority).
 
 - **kit-knob-consumer-adapter-convention** [design-pending] — whether a kit may ship
   a knob whose only working configuration requires the consumer to author an adapter, and whether
@@ -243,8 +235,6 @@
   **The delegation instance LEAVES the class 2026-09-05 (operator, consult):** the liveness hook
   reaches its gate through its own executable, so the knob is an override over a working default
   (delegation-kit/SPEC.md §The turn-end liveness hook); the question survives on the parser knobs.
-  ruled: kit-knob-consumer-adapter-convention operator 2026-09-05 consult
-  ruled: kit-knob-consumer-adapter-convention lead 2026-09-03 own-authority
   Filed 2026-08-24 to the gap inbox by build in two bullets, the second correcting the first's
   repair premise as measured-false; promoted 2026-08-24 at
   `shell-gate-tail-port-and-completion-oracle`'s close, whose drain confirmed the reader, its
@@ -314,7 +304,6 @@
   discriminator.
   **PORT-CRITICAL, INSIDE-THE-CUT SHAPE — RULED 2026-09-05 (operator, consult):** it rides the
   `test-hermetic.sh` cut it blocks, TRAJECTORY.md §PRIORITY DIRECTIVE.
-  ruled: hermetic-bin-suffix-pin-placement operator 2026-09-05 consult
 
 - **path-dialect-clauses-unenforced** [design-pending] — the two clauses gate-sdk/SPEC.md §The
   path-dialect contract gained 2026-08-30 are held by review alone, and neither is shaped like the
@@ -379,7 +368,6 @@
   **Cost while deferred:** low, and it compounds — each close under the new order files new
   intake correctly while the measured backlog keeps its old shape, so the `qnet` the ruling's
   discharge event reads stays flattered by nothing this unit would have retired.
-  ruled: drain-order-retroactive-debt-sweep operator 2026-08-30 consult
   Filed 2026-08-30 by the consult session, operator-directed.
 
 - **declaration-shape-outside-header-unreadable** [design-pending] — a
@@ -617,7 +605,6 @@
   **PORT-CRITICAL, OWN-ITERATION SHAPE — RULED 2026-09-05 (operator, consult):** a lawful
   iteration under the port-only run, TRAJECTORY.md §PRIORITY DIRECTIVE; the `find -printf` fix
   rides inside it.
-  ruled: macos-install-smoke-ci-leg operator 2026-09-05 consult
   Filed 2026-08-26 by build, split from `platform-support-ci-matrix` under an operator ruling.
 
 - **powershell-installer-surface** [design-pending] — a native Windows install path. **Both
@@ -3452,13 +3439,11 @@
   reading tests it: the first align that passes a claim it could have falsified by READING spends
   the excuse, and this sentence exists so a later session cannot re-spend it.
   recurrence: align-checklist-fanout-calibration 2026-08-23 2026-09-04
-  ruled: align-checklist-fanout-calibration lead 2026-09-04 own-authority
   **Cost while deferred:** align keeps returning a clean verdict that build then falsifies, so
   the stage's signal value decays toward zero while its cost does not — and a zero-divergence
   pass is read as evidence the amendments were right.
   **THRESHOLD ROUTING 2026-09-04, RULED 2026-09-05 (operator, lead-relay): stays deferred under
   the port-only run, not on merit; a further judged recurrence is stamped, never re-escalated.**
-  ruled: align-checklist-fanout-calibration operator 2026-09-05 lead-relay
   Filed 2026-08-07 by close, from the lead's per-batch tiering watch.
 
 - **release-runbook-identity-diagnosis** [design-pending] — where the which-account-is-active
@@ -4166,8 +4151,6 @@
   the manifest corpus a count's enforceability turns on a spelling choice no author is told
   about. Both failures are silent — the gate runs, reports clean, and never saw the claim.
   **THRESHOLD 2026-09-03/04, RULED 2026-09-05 to wait under the run: (c) waits with (a) and (b).**
-  ruled: cardinal-notation-splits-gate-reach lead 2026-09-03 2026-09-04 own-authority
-  ruled: cardinal-notation-splits-gate-reach operator 2026-09-05 lead-relay
   recurrence: cardinal-notation-splits-gate-reach 2026-08-19 2026-09-02
   **THE 2026-09-02 RECURRENCE SHARPENS (b), re-derived independently rather than read off here.** A
   maintained total in a live queue entry rotted unseen against that entry's own recorded facts — but
@@ -4176,6 +4159,7 @@
   `internal-identifier-restatement`, un-gateable by that row's own reasoning.
   Filed 2026-08-12 by close, from an operator observation; the "no reason exists" premise was
   falsified by probing the count gate's own matcher rather than by grepping for a style rule.
+  Also ruled on cardinal-notation-splits-gate-reach: lead 2026-09-04 (own-authority).
 
 - **headroom-check-ordering-unruled** [design-pending] — nothing says *when* a capped surface's
   headroom is read, and reading it first lets a resource limit quietly perform a judgment.
@@ -6244,7 +6228,6 @@
   itself the triage act TRAJECTORY.md §PRIORITY DIRECTIVE schedules for after the port — "retires
   what a landed unit or a closed ruling has mooted" — so it pre-empts the triage rather than
   anticipating it, and the deliverable stands either way.
-  ruled: iteration-scoping-clause-date-ambiguity lead 2026-09-03 own-authority
   **DISTINCT from `deferred-entry-time-deixis-rot`** (relative deixis — "this iteration" — silently
   re-pointing as the header moves) **and from `deferred-entry-defer-date-unasserted`** (a
   provenance date malformed or absent). Both are a date stale or missing; this is a date that is
@@ -7047,7 +7030,6 @@
   `Write|Edit` `PreToolUse` matcher, so a Write-side rule needs no new matcher shape; and a steer is
   not a distinct primitive, `guard_block` being stderr plus exit 2 for a block and a steer alike.
   A stated habit was the shape filed beside those two and it stays refused: it is not a mechanism.
-  ruled: file-authoring-act-ungoverned operator 2026-09-04 lead-relay
   **The operator ruling that scoped it, and its dated series, which lives once and here.** The class
   read 41 of 185 prompting calls, then 56 of 139 at the 2026-09-04 close — 22 per cent to 40 per
   cent — then 48 across 22 patterns on the mid-iteration snapshot the promoting spec measured afresh
@@ -7599,7 +7581,6 @@
   **Cost while deferred:** the expensive half of the pool's largest measured exit dies at every
   first-stage entry that finds it uncarried, and re-buying it costs a full deferred-pool sweep plus
   a read of four gate sources — the re-derivation the survey record exists to prevent.
-  ruled: citation-liveness-family-convergence lead 2026-08-30 own-authority
   Filed 2026-08-25 by close, draining the gap inbox; survey bought at that iteration's scope.
 
 - **init-vendoring-assumes-gnu-findutils** [design-pending] — `checkwright init` enumerates each
@@ -7806,14 +7787,9 @@
   **the attesting instance is spent and the gap is not** — the discount still fires unchecked on
   the next one. It was not a width problem: the conforming form is 85 columns against
   `check-queue-wrap`'s 100.
-  **THE FORMAT NOW DEFINES TWO DECLARATION GRAMMARS AND THIS ENTRY IS WIDENED TO BOTH, 2026-08-27
-  at close.** `ruled: <slug> <authority> <YYYY-MM-DD> <channel>` shipped 2026-08-26 at `aba1e2d5`
-  with the identical property — a stated shape, no validating gate, and a budget discount as its
-  only reader — so a malformed `ruled:` line is simply not discounted. That is the SOFT consequence
-  its own amendment deliberately chose for PRESENCE; grammar validity is a different axis and that
-  amendment rules nothing about it. The deliverable is therefore **every declaration grammar the
-  tag algebra defines**, not `recurrence:` alone, and a gate shaped to one of the two would leave
-  the other in exactly this position.
+  **Widened 2026-08-27 to the `ruled:` grammar and NARROWED BACK 2026-09-05 when that grammar was
+  retired** (queue-kit/SPEC.md §The tag algebra): `recurrence:` is again the format's only
+  declaration grammar, and the deliverable is a validator for it alone.
   **The only reader is a discount heuristic, not a checker.**
   `native/src/gates/queue_entry_budget.rs`'s `declaration()` tests the `recurrence:` lead token,
   then a minimum field count, then an ISO date past the slug. The slugless line satisfies all
@@ -8252,16 +8228,13 @@
   carried out on the close push, which the ruling above already establishes costs no push of its
   own. This CORRECTS the recorded wedge's reach; it re-attests nothing, so no `recurrence:` date
   joins, and a later reader must not count it as an instance.
-  ruled: observation-predicate-entry-cannot-drain-in-its-own-iteration lead 2026-09-01 own-authority
   **Cost while deferred:** every entry of this shape either overruns its push budget or
   defers, and the deferral is invisible until the close that cannot drain it.
   recurrence: observation-predicate-entry-cannot-drain-in-its-own-iteration 2026-08-31 2026-09-01
   **REACHED THRESHOLD 2026-09-01; declined on the run, never on merit; OPERATOR-RULED 2026-09-05
-  (lead-relay) TO STAY DEFERRED under the run — recorded as prose because this slug's
-  `ruled: … operator <date> lead-relay` line runs 101 columns against the 100 wrap floor.** The
-  2026-09-02 batch DID reach the operator, who took `subagent-liveness-log-unattributed-refusal` as
-  the run's exception and left this deferred; 2026-09-03/04 were a lead's. No re-escalation is owed.
-  ruled: observation-predicate-entry-cannot-drain-in-its-own-iteration lead 2026-09-04 own-authority
+  (lead-relay) TO STAY DEFERRED under the run.** The 2026-09-02 batch DID reach the operator, who
+  took `subagent-liveness-log-unattributed-refusal` as the run's exception and left this deferred;
+  2026-09-01, 2026-09-03 and 2026-09-04 were a lead's (own-authority). No re-escalation is owed.
   Filed 2026-08-27 by the lead at build, promoted 2026-08-27 by close.
 
 - **boundary-sweep-github-write-skips-identity-step** [design-pending] — the account-selection step
@@ -8282,7 +8255,6 @@
   spells its cadence per-write. The clause it turns on is the one the incident taught — a write
   needing no write permission succeeds silently under the wrong account, so two of the three lanes'
   dispositions would have failed invisibly.
-  ruled: boundary-sweep-github-write-skips-identity-step operator 2026-08-27 lead-relay
   **What survives, and it is two things.** First, the runbook-side binding: the private ops runbook
   still states its step for release and push work in its own prose, so the two tiers now disagree
   about the trigger and the narrower one is the one a reader reaches by following the pointer.
@@ -8340,8 +8312,6 @@
   journal-append affordance the convention could route through — is the SECOND sibling's by that
   same paragraph, being a behaviour change rather than a ranking one.
   **THRESHOLD 2026-09-03, twice declined on the run; RULED 2026-09-05 to wait, not re-escalated.**
-  ruled: prompt-ranking-ungrantable-shape-class lead 2026-09-03 2026-09-04 own-authority
-  ruled: prompt-ranking-ungrantable-shape-class operator 2026-09-05 lead-relay
   **SECOND MEASUREMENT, 2026-08-28 at `port-oracle-and-composer-ruling`'s close**, arriving as a gap
   bullet that re-derived this diagnosis without finding this entry, and drained here on a dedup
   sweep rather than promoted. A different head, the same class:
@@ -8352,6 +8322,7 @@
   ungrantable rows from a redirect-shaped *tail* to the *head*, sizing the ranking's bulk.
   Filed 2026-08-27 to the gap inbox by the windows-artifact-proof close, which paid the cost;
   promoted 2026-08-27 by the next scope, at the boundary that could legally run the drain.
+  Also ruled on prompt-ranking-ungrantable-shape-class: lead 2026-09-04 (own-authority).
 
 - **artifact-substitution-remedy-has-no-end-to-end-arm** [design-pending] — the remedy
   `artifact-digest-mismatch-remedy-inert` shipped — `init` rewriting a gate binary whose bytes no
@@ -8681,7 +8652,6 @@
   with their reasoning evicted — the failure the "why (b) was never available" text on
   `native-gate-port-remaining-corpus` exists to prevent, and that text is itself one of the lines
   that consumed the last of an entry's budget.
-  ruled: ruling-accretion-outgrows-the-entry-cap operator 2026-08-30 lead-relay
   Filed 2026-08-29 to the gap inbox by the lead, raised by scope at this boundary and declined
   there; landed in this section 2026-08-29 by close, the measurement re-run over the live pool
   rather than carried from the bullet; dropped from the unit set 2026-08-30 by spec, which read the
@@ -8897,8 +8867,6 @@
   **That reading is DOUBLY STALE as of 2026-09-01 and both halves are corrected here:** an instance
   HAS occurred (below), and the ambiguity now has a ruled resolution path, so what remains is not an
   undetermined meaning but an unbuilt encoding — `record-stamp-encoding-compression` owns it.
-  ruled: same-day-recurrence-date-multiplicity lead 2026-08-30 own-authority
-  ruled: same-day-recurrence-date-multiplicity operator 2026-09-01 lead-relay
   Filed 2026-08-30 at scope by lead ruling, from the recurrence pre-emption census recorded at
   `.workflow/survey-record.md`; both readings recorded rather than one picked, the ambiguity not
   being a stage's or a lead's to close by fiat. **First live instance 2026-09-01**, at this close's
@@ -8954,7 +8922,6 @@
   **Cost while deferred:** low and bounded, and it is the cost of the thing it replaces — every
   entry that needs discrimination keeps buying it with text against a budget that already blocked
   one stage this iteration.
-  ruled: record-stamp-encoding-compression operator 2026-09-01 lead-relay
   recurrence: record-stamp-encoding-compression 2026-09-03
   Filed 2026-09-01 by close under CLAUDE.md §Housekeeping's operator-directed exception, staged and
   committed in one motion. FILED AND NOT BUILT: the port-only run forecloses building it while
@@ -8992,7 +8959,6 @@
   — name the channel in the oracle-first rule as a non-oracle, or leave it to session judgment —
   so picking one is a doctrine call rather than a defect repair.
   recurrence: editor-diagnostic-unruled 2026-09-01
-  ruled: editor-diagnostic-unruled lead 2026-09-01 own-authority
   Filed 2026-09-01 at scope's boundary drain and born in the icebox; re-tiered the same day by
   close on instances 3 and 4, which postdate the eviction. Both fell on one calendar day, so the
   single-date spelling here rests on lifecycle-kit's `(slug, date)` idempotence and the ambiguity
@@ -9046,8 +9012,6 @@
   ruling it should cite; this one is the vendored TEMPLATE's own premise being wrong.
   Captured 2026-09-02 by close; lead-declined 2026-09-02 and 09-04 on the run; RULED 2026-09-05 to
   stay deferred — amending a kit template is non-port design work the run forecloses.
-  ruled: lead-tier-split-premise-unamended lead 2026-09-02 2026-09-04 own-authority
-  ruled: lead-tier-split-premise-unamended operator 2026-09-05 lead-relay
   recurrence: lead-tier-split-premise-unamended 2026-09-03 2026-09-04 2026-09-05
 
 - **crate-interpreter-resolution-residue** [design-pending] — the crate spawns the bare program
@@ -9079,7 +9043,6 @@
   witnesses this, so it sits on the product side of the 2026-08-30 discriminator rather than
   taking that ruling's machinery default.
   Filed at spec and re-filed at build 2026-09-03; drained here with the count re-verified.
-  ruled: crate-interpreter-resolution-residue lead 2026-09-03 own-authority
 
 - **docs-cmd-invariant-inline-scope-imprecise** [design-pending] — `check-docs-cmd`'s invariant
   sentence promises that inline-backticked `.sh` paths are scanned while its own assertion (A)
@@ -9110,7 +9073,6 @@
   between `check-md-refs` and `check-spec-pointer`; this is `.sh` paths and the precision of one
   gate's own invariant sentence.
   Filed at spec 2026-09-03 and reframed the same day on the lead's four-site read; drained here.
-  ruled: docs-cmd-invariant-inline-scope-imprecise lead 2026-09-03 own-authority
 
 - **registry-needs-conflates-requirement-and-spawn** [design-pending] — the crate's registry
   declares a member's HOST REQUIREMENT while the test guarding it compares that declaration
@@ -9140,32 +9102,6 @@
   **DISTINCT from `crate-interpreter-resolution-residue`**, whose deliverable is the spawn sites
   themselves; this is the declaration grammar every registry member shares.
   Filed at spec 2026-09-03; drained here with the disagreement re-read at the source.
-
-- **ruling-line-icebox-grammar-conflict** [design-pending] — the ruling-record line and the icebox
-  tier's one-line grammar cannot both be satisfied, and the gate refuses the pair rather than
-  arbitrating it.
-  **MEASURED, not reasoned.** CLAUDE.md obliges a session landing a ruling to write
-  `ruled: <slug> <authority> <date> <channel>` on the entry in the same commit; queue-kit/SPEC.md
-  §The icebox tier rules an icebox entry the lead line and nothing else; and
-  `check-queue-entry-budget` assertion B REFUSED the pair at the 2026-09-03 close, which wrote the
-  line, ran the gate and got `icebox entry carrying a body ... an icebox entry is exactly one`.
-  **The workaround drops the field the grammar calls load-bearing.** That close carried the ruling
-  in the lead line's prose, which seats authority and date at 98 columns and loses the CHANNEL —
-  the field §The tag algebra calls the whole of the grammar, because it is what separates an
-  own-authority ruling from a relayed one.
-  **The specs read together LOOK like they admit the line**, which is why this was reasoned wrong
-  until the oracle corrected it: the icebox tier's own text says recovery is mandatory before any
-  ruling on the entry, so the tier plainly contemplates rulings on iceboxed entries.
-  **Why `[design-pending]`:** the two candidate shapes differ in what they promise. A
-  declaration-line discount in assertion B's icebox arm (assertion A already carries one for the
-  deferred tier) keeps the full grammar at the cost of a second exception; an explicit icebox
-  clause in the ruling-record grammar names the lead-line prose form and states what it drops.
-  **Cost while deferred:** every ruling on an iceboxed entry lands channel-less, so a later reader
-  cannot tell an own-authority ruling from a relay on exactly the tier whose entries carry no body
-  to say so — a shipped gate's verdict witnesses it, so the 2026-08-30 witness discriminator puts
-  it product-side.
-  Surfaced 2026-09-03 at `capture-and-meter-cuts-with-windows-manifest-diagnostic`'s close; drained
-  here at the boundary after it.
 
 - **init-vendor-staging-argv-overflow** [design-pending] — `installer/lib/init.sh` stages the whole
   vendored file set as one `git` argv, and on a host with a low `ARG_MAX` that is E2BIG, so a
@@ -9217,15 +9153,15 @@
   marks a decision a later session may not reverse alone, and does so silently — this is that harm
   attested, on an entry predating the grammar that would have prevented it.
   **Why `[design-pending]`:** the two candidate shapes differ in reach. Asking the operator to
-  settle this one entry's provenance and stamping a `ruled:` line fixes one instance; sweeping
-  pre-grammar Filed-line dispositions for the same double-naming and stating in queue-kit/SPEC.md
-  §The tag algebra how an ungrammared historical disposition is read answers the class.
+  settle this one entry's provenance and restating it inline fixes one instance; sweeping
+  Filed-line dispositions for the same double-naming and stating in queue-kit/SPEC.md §The tag
+  algebra how a double-named disposition is read answers the class — and with the `ruled:` grammar
+  retired, the inline form is the only form, so the class is every entry's.
   **Cost while deferred:** nothing is blocked — the entry stays deferred on either reading — but
   every drain that meets it re-derives the same question and keeps it conservatively.
   **DISTINCT from `gate-command-status-conflation-third-caller`** and NOT a re-filing of it: that
   entry's subject is a `gate_command` exit-status conflation in `gate-sdk/bin/run-gate-tests.sh`;
   this is the AUTHORITY NAMED ON ITS Filed LINE. Fixing either leaves the other untouched.
-  ruled: pre-grammar-disposition-authority-ambiguity operator 2026-09-03 consult
   Surfaced 2026-09-03 by the lead of `capture-and-meter-cuts-with-windows-manifest-diagnostic`
   after its close stamped; drained here, its channel asked rather than assumed and answered
   2026-09-04.
@@ -9246,7 +9182,6 @@
   **Cost while deferred:** every sizing session judges the window's width off the overhead meter
   and its own reading instead of reading a figure, which is the state the sizing ruling names and
   declines to leave.
-  ruled: kpi-cost-per-unit operator 2026-09-03 consult
   Surfaced 2026-09-03 in the consult that closed the build-window sizing ruling; drained here.
 
 - **kit-spec-provenance-seam-sweep** [design-pending] — kit SPECs ride the installer payload and the
@@ -9294,7 +9229,6 @@
   iteration, both landed by cuts that were not editing provenance.
   **DIRECTED 2026-09-05 (operator, consult) AS THE NEXT ITERATION'S JOINED UNIT beside the
   test-harness cut** — same-surface and product-class under the port-first run; scope sizes it.
-  ruled: kit-spec-provenance-seam-sweep operator 2026-09-03 2026-09-05 consult
   Surfaced 2026-09-03 in the consult that closed the provenance-seam ruling; drained here; the third
   shape above added 2026-09-04 at the scan-prompts-cut close drain.
 
@@ -9492,8 +9426,6 @@
   active-section promotion and expressly does not bar a Deferred filing (TRAJECTORY.md's two
   paragraphs at §PRIORITY DIRECTIVE); the icebox tier cannot take it either, because it blocks an
   iteration-boundary entry and the machinery-class default is conjunctive.
-  ruled: upgrade-smoke-producer-leaks-worktrees-on-signal operator 2026-09-04 lead-relay
-  ruled: upgrade-smoke-producer-leaks-worktrees-on-signal lead 2026-09-04 own-authority
   **Cost while deferred:** every externally killed validate spine converts one lost run into a
   refused iteration boundary for the next session, and the remedy is a two-`--force` reap that
   session has to be told about.
@@ -9603,8 +9535,6 @@
   **IT DOES NOT RIDE `front-end-stub-and-gate-caller-cuts` — ruled 2026-09-05 (lead), probed.** That
   cut ports no child-spawning arm: the spawn site is in-crate already at `run_validate.rs:346`, and
   the front-end's shell loop RETIRES rather than porting — a retirement is no port. Stays deferred.
-  ruled: run-validate-child-env-knob-leak lead 2026-09-05 own-authority
-  ruled: run-validate-child-env-knob-leak operator 2026-09-05 consult
   Filed 2026-09-05 to the gap inbox at validate and amended there the same day; promoted
   2026-09-05 by close.
 
@@ -9875,8 +9805,10 @@
 - **release-record-retired-knob** [design-pending] — A removal's basis may not name its own knob.
 - **friction-key-segment-selection-unruled** [design-pending] — Which segment to key is unruled.
 - **scratch-auto-allow-no-decoration-steer** [design-pending] — Chained writes lose the steer.
-- **ruled-line-width-ceiling** [design-pending] — A 61-char slug's ruled: line measures 101.
 
 ## Done
+
+- ruling-line-icebox-grammar-conflict
+- ruled-line-width-ceiling
 
 ## Lessons Learned

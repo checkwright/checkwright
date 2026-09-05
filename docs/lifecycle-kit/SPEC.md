@@ -202,12 +202,12 @@ amendment-merge commit, and the closing dispositions. Stage motion never
 touches it.
 
 **A stage session landing a ruling writes its provenance in the same commit as
-the ruling's content.** The queue's `ruled:` declaration (queue-kit/SPEC.md
-§The tag algebra) names who ruled, when, and through what channel; this section
-owns *when* the session writes it, because the session is the party whose commit
-is the audit artifact. Not afterwards, and not in a later pass: the relay that
-carried the ruling is transport, never a store, so a ruling landed without its
-declaration has already lost the only party who could attest it, and the next
+the ruling's content.** The provenance — who ruled, when, and through what
+channel — is stated inline beside the ruling (queue-kit/SPEC.md §The tag
+algebra); this section owns *when* the session writes it, because the session is
+the party whose commit is the audit artifact. Not afterwards, and not in a later
+pass: the relay that carried the ruling is transport, never a store, so a ruling
+landed without its provenance has already lost the only party who could attest it, and the next
 session has no way to tell a relayed ruling from an invented one. Where the
 relaying party stated no authority, the session **asks** rather than defaulting
 to the higher one — reading an authority into a silence is the invention the

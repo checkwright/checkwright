@@ -163,13 +163,13 @@ load behind that trigger, so they are not resident here.
   ruling is closed, so escalate rather than reverse one, and retiring a spent
   ruling is not reversing it.
 - **The ruling authorities are `operator` and `lead`** — the kit ships the slot,
-  never the vocabulary. A session landing a ruling in the queue writes
-  `ruled: <slug> <authority> <YYYY-MM-DD> <channel>` on the entry in the same
-  commit as the ruling's content, spelling a lead's own ruling
-  `lead <date> own-authority` rather than leaving it unmarked; a relay states
-  both facts, and where it did not, ask rather than assume the operator
-  (queue-kit/SPEC.md §The tag algebra owns the grammar, lifecycle-kit/SPEC.md
-  §The state machine the timing). Existing entries are not back-filled.
+  never the vocabulary. A session landing a ruling in the queue states who
+  ruled, when and through what channel inline beside the ruling's content, in
+  the same commit — a lead's own ruling as `lead, own-authority`, never
+  unmarked; a relay states both facts, and where it did not, ask rather than
+  assume the operator. Never as a `ruled:` declaration line, which is retired
+  (queue-kit/SPEC.md §The tag algebra owns the form, lifecycle-kit/SPEC.md
+  §The state machine the timing).
 - `docs/` is the public GitHub-Pages site (served from `docs/` on master via its
   `CNAME`), repo-root-governed, no owning kit; its chrome, page-authoring rules,
   generated projections and docs gate roster live in the load-triggered

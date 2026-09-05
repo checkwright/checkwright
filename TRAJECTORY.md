@@ -466,6 +466,15 @@ whose class accreted two sites while it waited; scope sizes it against the windo
 by kit. Discharge event: that unit lands and the gate is green, at which point this paragraph is
 deleted.
 
+**The queue's `ruled:` declaration line is retired; a ruling's provenance is stated inline —
+ruled 2026-09-05 by the operator in consult.** Mechanism at queue-kit/SPEC.md §The tag algebra and
+§check-queue-entry-budget assertion (D). The ground: the line had no reader but the budget gate's
+own one-line discount, the entry body already carried authority, date and channel inline, and on
+the host entry five of six such lines were counted against the cap that had just forced a
+compression — provenance restated in a second tier, displacing the task it annotated. Refused:
+keeping the line as an audit record, which no auditor reads in preference to the sentence beside
+it; and a validity gate for it, which would have gated a grammar worth deleting.
+
 **A stated cause reaches only the members it names, and an always-loaded manifest is never a
 cut boundary — ruled 2026-09-05 by the operator in consult.** Mechanism at gate-sdk/SPEC.md
 §Porting a gate to the binary substrate, beside the outer-bound ruling it extends. Refused: the
