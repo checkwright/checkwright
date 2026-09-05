@@ -129,7 +129,7 @@ bash gate-sdk/bin/run-gate-tests.sh evidence-kit/gate-tests evidence-kit/checks 
 bash gate-sdk/bin/run-gate-tests.sh site-kit/gate-tests site-kit/checks             # site-kit fixtures
 bash gate-sdk/bin/run-gate-tests.sh doctrine-kit/gate-tests doctrine-kit/checks     # doctrine-kit fixtures
 bash gate-sdk/bin/run-gate-tests.sh scripts/gate-tests                              # consumer-gate fixtures
-bash gate-sdk/bin/run-gate-tests.sh guard-kit/gate-tests                            # guard-kit bin unit tests
+bash gate-sdk/bin/run-gate-tests.sh guard-kit/gate-tests                            # guard-kit bespoke + seam suites
 bash guard-kit/bin/run-guard-tests.sh                                               # guard-kit decision table
 bash context-kit/bin/run-index-tests.sh                                             # context-kit index tools
 cargo test --release --manifest-path native/Cargo.toml                              # native crate unit tests
