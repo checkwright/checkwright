@@ -14,85 +14,6 @@
 
 ## Technical Debt
 
-- **kit-spec-provenance-seam-sweep-remainder** — ten kit SPECs still carry this project's ruling
-  provenance, plus the seam gate that can only go green once the last of them is swept.
-  **THIS ITERATION TAKES THE context-kit + guard-kit SLICE ONLY — `lead, own-authority`,
-  2026-09-06, derivable rather than escalated:** TRAJECTORY.md §PRIORITY DIRECTIVE says in terms
-  that scope sizes this unit against the window and MAY SPLIT IT BY KIT, so the split needs no
-  waiver. Those two kits are exactly the surfaces this iteration's port cuts already edit, which is
-  the port-first run's same-surface joining ground with the ceremony already paid.
-  **IT DEMOTES BACK TO `## Deferred` AT CLOSE, never to `## Done`** — the deliverable is a corpus
-  and eight kits plus the gate remain, so the next cut re-promotes with its own amendment
-  (canon-kit/SPEC.md §Merging an amendment). A session meeting this active and unfinished is
-  reading the split working.
-  **THE GATE IS NOT IN THIS SLICE and the sweep ships ungated in the interim.** Enforcement-first
-  wants the sweep and its gate in one unit; the by-kit split defers rather than dissolves that
-  objection, and the gate attaches to the LAST kit's landing because it cannot go green before then.
-  **THE GATE MUST ENCODE ONE SANCTIONED EXEMPTION when it is built**, recorded here because this
-  entry owns the gate: gate-sdk/SPEC.md §The decisions this substrate already closed is carved out
-  (`lead, own-authority 2026-09-05`) — TRAJECTORY.md positively ASSIGNS it that ownership, so its
-  dated stamps are sanctioned rather than in violation, and a gate that does not know this reds on a
-  section the ruling record blesses. The exemption retires only if
-  `provenance-ownership-recording-rule-assigns-into-kit-specs` lands first.
-  **SIZE THIS SLICE BY FIXING THE PREDICATE, NOT BY RE-RUNNING THE SCAN.** Three successive
-  re-measures of the parent missed: 87 sites across 6 SPECs, then 246 lines across 11, then ≈87-92
-  sites over gate-sdk alone. Every one used a `ruled`-near-a-date scan, which matches ordinary prose
-  and misses every stamp spelled without the word — plus an AUTHORITY-ATTRIBUTED-BUT-UNDATED
-  subclass no date-bearing scan reaches. The per-kit rank ordering (context-kit 3, guard-kit 6) is
-  kept ONLY as an ordering and is not a count to build against.
-  **Two things carry from the parent and must not be re-derived.** The predicate is harder than the
-  parent originally sized it — guard-kit's spelling is `operator ruled (<date>, <channel>)` and
-  drift-kit's is a date in a trailing parenthetical, so any fixture pair owes those shapes. And
-  drift-kit and guard-kit are now the SOLE home of two rulings TRAJECTORY.md retired as spent, so
-  the strip must MOVE those grounds rather than delete them — which reaches guard-kit in this slice.
-  **The parent's discriminator and its move-versus-delete test carry here unchanged**: attribution
-  decides the voice, and TRAJECTORY.md's own recording rule decides move versus delete.
-  **THE POINTER CLASS IS THE GATE'S TOO and is answered for EVERY kit SPEC at once or not at all** —
-  `CLAUDE.md §The provenance seam` citations resolve in this tree and in no vendoring consumer's.
-  Measured rather than estimated: 17 across five kit SPECs (gate-sdk 10, guard-kit 4,
-  canon-kit/delegation-kit/lifecycle-kit 1 each). Outside the ruled discriminator, so the gate must
-  encode whichever way it goes; guard-kit's four are reachable in this slice.
-  **Debt, not a feature, for this slice:** stripping provenance prose adds no governed name. The
-  gate is the feature and it is not here.
-  **DISCHARGE CONSEQUENCE:** TRAJECTORY.md's directive paragraph discharges on "that unit lands and
-  the gate is green", and the gate is this entry's — so that paragraph survives until THIS entry
-  lands whole, not until this slice does.
-  **THE context-kit + guard-kit SLICE IS LANDED** (2026-09-06 build). Both SPECs now carry zero
-  dates, zero TRAJECTORY.md pointers, zero queue slugs and zero authority stamps.
-  **THE PREDICATE WAS NOT RE-AUTHORED, AND THE NEXT KIT MUST NOT RE-AUTHOR IT EITHER** — it is the
-  parent half's merged amendment, recovered whole with
-  `git show d190c2f6^:gate-sdk/SPEC-seam-sweep.md` (deltas 1-3). That recovery is the answer to
-  this entry's SIZE-BY-FIXING-THE-PREDICATE instruction; a fourth re-measure is not.
-  **48 CANDIDATE SITES CENSUSED, 14 SWEPT, AND THE GAP IS THE FINDING.** The deciding rule is that
-  amendment's delta-1 COROLLARY — undated narrative naming NO authority, date or internal
-  identifier is engineering prose and is NOT swept, the test being the identifier and never the
-  tense — which cleared 25 sites a blanket sweep would have destroyed.
-  **A5 EVENT DEIXIS, NOT UNDATED AUTHORITY, IS WHAT THE THREE PRIOR SCANS MISSED:** 39 of 48 sites,
-  against three undated-authority sites of which two also carried a date. A corpus can be dense
-  with provenance and nearly free of authority attribution, so a predicate built only to add the
-  undated-authority subclass to a date scan MISSES AGAIN. Fixing the ordering claim with it: the
-  per-kit rank ordering held qualitatively (guard-kit above context-kit) and was worthless
-  quantitatively, 7 swept sites each.
-  **THE NINE POINTER-CLASS SITES ARE DELIBERATELY UNSWEPT** — guard-kit 4, context-kit 5 counting
-  the `docs/`- and `BRIEF.local.md`-class — on a fact neither half of the split had recorded: THE
-  PARENT HALF DID NOT ANSWER IT EITHER. `d190c2f6` filed "whether an owner-doc pointer a consumer's
-  own tree cannot resolve belongs to the pointer class tree-wide" UNANSWERED and shipped gate-sdk
-  with all ten of its citations standing. Answering it for one kit would breach *at once or not at
-  all*, would leave the corpus inconsistent in the direction that makes the gate harder to write,
-  and would SET an envelope this slice carries no amendment to set. A derivation, not a ruling —
-  open for the lead or the operator to close either way when the last kit lands with the gate.
-  **NO SITE IN EITHER FILE WAS SOLE-HOME.** The move-versus-delete warning resolved at
-  §scratch-run's retired consumer opt-out (guard-kit's half of the pair) to *do not delete the
-  paragraph*: its engineering ground stays in place restated impersonally, and the spent stamp went
-  to git history, which is what delta 3's own test directs — migrating a finished ruling back into
-  the ruling record is what that record's doctrine forbids. drift-kit's half is untouched and its
-  bounding clauses still owe the same treatment.
-  **REMAINING: EIGHT KIT SPECS PLUS THE GATE** — canon, delegation, doctrine, drift, evidence,
-  lifecycle, queue, site.
-  Filed 2026-09-05 at scope with the gate-sdk-boundary split that created it; its parent slug
-  retired 2026-09-05 with the gate-sdk half landed. Promoted here 2026-09-06 on the operator's
-  2026-09-05 direction, still live and half-discharged, at the by-kit slice the lead sized.
-
 ## Deferred
 
 - **platform-support-ci-matrix** [design-pending] [roadmap: next/reliability]
@@ -9210,6 +9131,55 @@
   and its own reading instead of reading a figure, which is the state the sizing ruling names and
   declines to leave.
   Surfaced 2026-09-03 in the consult that closed the build-window sizing ruling; drained here.
+
+- **kit-spec-provenance-seam-sweep-remainder** [design-pending] — EIGHT kit SPECs still carry this
+  project's ruling provenance, plus the seam gate that can only go green once the last is swept.
+  gate-sdk landed with the parent split; context-kit and guard-kit landed 2026-09-06, 14 sites.
+  **DEMOTED AT BUILD, NOT AT CLOSE — `lead, own-authority`, 2026-09-06, relayed in-session.** The
+  superseded clause said close performs it; it cannot — validate is entered before close and
+  `check-stage-entry` assertion B refuses a validate entry on a non-empty active queue, so waiting
+  for close makes the by-kit split structurally impossible. The drain-residue marker is scoped to a
+  unit whose remaining half IS drain-stage work, so it does not reach this one. Only the stage
+  moved, and the superseded clause carried no attribution: no reversal. **IT BELONGS IN THE
+  `Deferred` SECTION AND NEVER IN `Done`** — the deliverable is a corpus, so the next cut
+  re-promotes with its own amendment (canon-kit/SPEC.md §Merging an amendment). A by-kit slice needs
+  no waiver — TRAJECTORY.md §PRIORITY DIRECTIVE says scope may split it by kit.
+  **DO NOT RE-AUTHOR THE PREDICATE OR RE-RUN THE SCAN — RECOVER IT** from the parent half's merged
+  amendment, `git show d190c2f6^:gate-sdk/SPEC-seam-sweep.md`: delta 1 is the discriminator (the
+  seam decides the VOICE, never the content — a ground carried with an authority, a date, a channel
+  or an internal identifier is swept; an undated engineering ground naming none of those STAYS),
+  delta 2 the taxonomy, delta 3 the move-versus-delete test. Delta 1's COROLLARY is the sizing lever
+  — the test is the IDENTIFIER, never the tense — and delta 2 excludes a dated MEASUREMENT, whose
+  date is its freeze and must survive. **WHAT THE FAILING SCANS MISSED IS EVENT DEIXIS, NOT UNDATED
+  AUTHORITY:** 39 of 48 candidate sites over the swept slice, against 3 undated-authority sites, 2
+  of them dated. A date scan plus that subclass MISSES AGAIN — neither sees queue slugs, cut
+  ordinals or port chronology. The parent's rank order — lifecycle, delegation, queue, canon,
+  doctrine, drift, site, evidence — held qualitatively and failed quantitatively, at 7 swept sites
+  per kit against ranks 3 and 6, so it orders and never counts.
+  **MOVE-VERSUS-DELETE IS ANSWERED, NO SWEPT SITE WAS SOLE-HOME, AND drift-kit IS LAST TO OWE IT.**
+  At guard-kit §scratch-run's retired consumer opt-out it resolved to *do not delete the paragraph*:
+  the ground stays restated impersonally and the spent stamp goes to git history, migrating a
+  finished ruling back into the record being what its doctrine forbids. drift-kit's half of that
+  spent pair is untouched, owes exactly that, and owes its spelling's fixture shape — a
+  trailing-parenthetical date. **THE POINTER CLASS IS OPEN, answered for EVERY kit SPEC at once or
+  not at all** — `CLAUDE.md §The provenance seam` citations resolve in this tree and in no vendoring
+  consumer's: 17 across five kit SPECs (gate-sdk 10, guard-kit 4,
+  canon-kit/delegation-kit/lifecycle-kit 1 each), plus a `docs/`- and `BRIEF.local.md`-class the
+  same question reaches. ALL still stand, deliberately: the parent filed it unanswered and shipped
+  its ten intact; the slice left its nine likewise. A derivation, not a ruling, open for the lead or
+  operator; outside the ruled discriminator, so the gate encodes whichever way it goes.
+  **THE GATE IS UNBUILT and every landed sweep ships ungated meanwhile**: the split defers rather
+  than dissolves enforcement-first's one-unit objection. **IT MUST ENCODE ONE SANCTIONED
+  EXEMPTION:** gate-sdk/SPEC.md §The decisions this substrate already closed is carved out (`lead,
+  own-authority 2026-09-05`) — TRAJECTORY.md positively ASSIGNS it that ownership, so a gate blind
+  to it reds on a section the ruling record blesses; it retires only if
+  `provenance-ownership-recording-rule-assigns-into-kit-specs` lands first. **DISCHARGE:**
+  TRAJECTORY.md's directive paragraph discharges on "that unit lands and the gate is green", so it
+  survives until THIS entry lands WHOLE. **Cost while deferred:** eight published kit SPECs and
+  every adopter's vendored copy carry private ruling history as mechanism and pointers a consumer
+  cannot follow; product-class and accreting — two new sites landed in one iteration from cuts not
+  editing provenance. Filed 2026-09-05 at scope with the split that created it; promoted and demoted
+  2026-09-06.
 
 - **provenance-ownership-recording-rule-assigns-into-kit-specs** [design-pending]
   — TRAJECTORY.md's recording rule does not merely permit the provenance class the seam sweep
