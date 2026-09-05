@@ -6792,57 +6792,6 @@
   Filed 2026-08-23 by build; drained at that iteration's close, which confirmed no gate reads
   the block.
 
-- **binary-less-dispatch-loop-retirement** [design-pending] —
-  `run-gates.sh`'s binary-less dispatch loop and `installer/consumer-smoke`'s binary-less
-  green-battery assertion both retire at zero contract cost once no `.sh` member is left, and
-  nothing today schedules that retirement.
-  **Distinct from its blocker, verified at the drain.** `shell-gate-tail-port`'s body was re-read
-  in place: it names the six registered shell gates, the two unregistered kit-shipped ones, the
-  wrapper shape each port takes and the dependency-declaration design question — and says nothing
-  about this cleanup. So the retirement is the follow-up its landing *enables*, not a re-filing of
-  the port itself.
-  **Why it is sequenced and not open.** The loop stays by a 2026-08-23 ruling because criterion
-  5's stranded-platform branch still needs it while any `.sh`-dispatched member exists. At zero
-  `.sh` members a binary-less consumer has no gates at all, so the branch the loop serves has
-  nothing left to serve, and the smoke assertion it backs asserts an empty battery.
-  **THE CONDITION HAS ARRIVED, AND THE ENTRY IS RE-SCOPED — LEAD-RULED 2026-08-24 as
-  `shell-gate-tail-port`'s criterion-5 price, filed rather than taken at the cut because it
-  changes what an adopter is TOLD they receive.** **The measurement**, taken from clean checkouts
-  of both sides reached by path: pre-unit the binary-less leg exits 0 declaring 24 omitted
-  members; post-unit it FAILS on `run-gates: scripts/gates.list names no gates`. The prose
-  profile's seeded roster is 26 members on both sides — 24 `.gate` plus exactly two `.sh`,
-  `check-install-disposition` and `check-shellcheck`, which were the entire battery a binary-less
-  adopter still had. Residual 24-of-26 to 26-of-26. **Not profile-specific:** no `.sh` gate
-  declaration exists anywhere after that unit, so every profile's artifact-free install seeds an
-  empty registry, and the leg's own re-scoping clause ("re-scope it on the profile whose roster
-  criterion the binary-gated class empties") has **no profile left to be re-scoped onto** — itself
-  part of what this unit must repair.
-  **The shape.** The leg's assertion moves from "the battery is green on the consumer init just
-  made" to "the registry declares its omissions and, where nothing survives, says so".
-  **What must NOT change, and it is why the obvious small fix is refused:** `run-gates`' "names no
-  gates" at exit 2 stays a **refusal**. It exists to stop a vacuous pass, and turning a
-  fail-closed into a fail-open on the one tree with no other signal is the worst trade available
-  — the smallness of that diff is not a mitigation. The work is in what the LEG asserts and what
-  `init` tells the adopter, never in relaxing the runner.
-  **Open questions the unit owes:** whether an all-omitted install should still be called an
-  install or should refuse at `init` with its own message; what `doctor` reports for it; and
-  whether the leg keeps a non-zero omission count as its completeness assertion now that the
-  count is the whole roster.
-  **Cost while deferred:** an adopter on an uncovered platform installs successfully, receives a
-  `gates.list` that declares every omission honestly, and then finds the battery cannot run — the
-  disclosure is correct and the experience is a broken install. Held visible meanwhile by the
-  `installer_smoke binary-less-leg fail binary-less-dispatch-loop-retirement` row in
-  `.workflow/validate-baseline.txt`, which validate writes, per criterion 5's own UNPAID-price
-  mechanism. The loop's own carry is unchanged and secondary — roughly 180 duplicated dispatch
-  lines in `run-gates.sh`, held honest by an executed byte-comparison against the `--run` arm
-  (`gate-sdk/gate-tests/run-arm-contract.test.sh`), so it is gated duplication rather than drift.
-  **Ruled 2026-09-05: folds into the `run-gates.sh` cut** — gate-sdk/SPEC.md §run-gates owns it.
-  ruled: binary-less-dispatch-loop-retirement operator 2026-09-05 consult
-  Filed 2026-08-23 by build; drained at that iteration's close, which re-read the blocker's body
-  to confirm the two deliverables are distinct; re-scoped 2026-08-24 at
-  `shell-gate-tail-port-and-completion-oracle`'s close, whose drain re-ran the leg and confirmed
-  the ruled empty-registry outcome on a clean tree.
-
 - **bespoke-test-path-knob-pinning** [design-pending] — a bespoke gate-test's cwd sandbox is
   isolated only while `GATE_SDK_TMP_DIR` and `GATE_SDK_WORKFLOW_DIR` happen to hold relative
   values in the invoker's environment, which is an ambient default rather than anything the test
@@ -7103,57 +7052,6 @@
   Filed 2026-08-24 to the gap inbox by build and again by the lead; promoted 2026-08-24 at
   `shell-gate-tail-port-and-completion-oracle`'s close, which judged the merge question the second
   filing put to it.
-
-- **single-gate-front-end-form-unruled** [design-pending] — the tree mandates one front end for a
-  single-gate run and grants a different one, and which form it reinforces is unruled.
-  **RE-VERIFIED AGAIN 2026-08-28 at close's drain, and the intake's own measurement is now FALSE:
-  the grant horn was TAKEN.** `.claude/settings.json` names `scripts/gate-exec.sh` in **two** forms,
-  bare and argument, added 2026-08-27 by `dc37d003` on an operator ruling out of the previous
-  close's proposal. The intake's "**zero** naming it in any form" and its `Bash(` count both date
-  from 2026-08-24 and neither reproduces. `bash gate-sdk/bin/run-gates.sh *` is granted too and
-  covers `--only <gate>`, so BOTH forms are now granted and the fork is no longer grant-vs-no-grant.
-  **The mandate's scope is NARROWER than the filing bullet claimed, corrected here.**
-  evidence-kit/SPEC.md §check-evidence-manifest binds the **pre-flight caller** —
-  `LIFECYCLE_KIT_ENTRY_PREFLIGHT` execs with no interpreter word, so a `.gate` descriptor cannot
-  ride the exec bit and the discharge is a consumer-side front end resolving a gate *name* through
-  `gate_command`. It does not rule that every evidence entry reaches a gate through that front end.
-  The tension survives the correction: the roster the front end serves is the consumer's whole
-  pre-flight set, so a session obeying it hand-runs an ungranted path.
-  **Why `[design-pending]`, restated on what survives the grant landing.** The reinforcement
-  question is untouched: the granted front end is still one the port may retire —
-  `scripts/gate-exec.sh` is **29** lines and the oracle's `--tree` arm carries it `owed` (the intake
-  attributed that reading to the script itself, which resolves a gate *name* and invokes no oracle
-  at all; corrected here). Steering onto `run-gates.sh --only` stays landable in guard-kit today.
-  What the grant removed is only the operator-class barrier; which form the tree reinforces is
-  still unruled, still uncosted, and still decided by the port disposition of the front end.
-  **DISTINCT from `guard-steer-grant-mismatch`**, a steer whose target nothing grants: no guard
-  rule steers to `gate-exec.sh` at all, the mandate living in a kit SPEC. **DISTINCT from
-  `overlay-only-oracle-grants-uncommitted`**, whose four oracles are granted in an untracked
-  overlay rather than nowhere, and whose question is which surface carries a grant all parties
-  agree is wanted. **DISTINCT from `crate-toolchain-grant-uncommitted`**, ruled toward pruning.
-  **Cost while deferred, and the grant landing CUT it.** The filing cost — an out-of-band decision
-  per single-gate run — is paid off; what remains is that the tree now grants two front ends for
-  one act and reinforces neither, so a session picks by habit and a later port retiring one strands
-  a committed grant nobody attributes.
-  **RULED 2026-09-05 (operator, consult): the form is `run-gates.sh --only <gate>`.** The
-  pre-flight roster re-points to it and `scripts/gate-exec.sh` leaves the tree —
-  evidence-kit/SPEC.md §check-evidence-manifest owns it. Answered; the grant on the deleted
-  path drops with the cut under ruling (2).
-  **THE RE-POINT'S REACH IS NINE ENTRIES, NOT TWO GRANTS — ruled 2026-09-05 (lead), probed.**
-  `scripts/lifecycle-config.sh:16-24` routes NINE `LIFECYCLE_KIT_ENTRY_PREFLIGHT` entries through
-  the deleted path — one `check-evidence-manifest`, eight `check-producer-liveness` — and
-  `scripts/producer-liveness-reader.sh` execs it too. The binding constraint is that file's own
-  `# spec:` at line 14: `--enter-stage` execs the configured argv **with no interpreter word**, so
-  a `.gate` descriptor cannot serve and the replacement stays executable and directly exec-able.
-  **The settings grants are NOT out-of-band; reading them as operator-class was the error corrected
-  here.** Ruling (2) on `native-gate-port-remaining-corpus` puts a grant whose target a ruled cut
-  DELETES outside the 2026-08-22 bar and obliges build to drop the dead lines IN THE SAME COMMIT AS
-  THE DELETE — that class exactly, so delta 3 has no out-of-band step; probe the count, per (2).
-  ruled: single-gate-front-end-form-unruled lead 2026-09-05 own-authority
-  ruled: single-gate-front-end-form-unruled operator 2026-09-05 consult
-  Filed 2026-08-24 to the gap inbox by `shell-gate-tail-port-and-completion-oracle`'s close, from
-  its prompt-friction triage; promoted 2026-08-24 at that iteration's scope intake; three carried
-  measurements re-verified and corrected 2026-08-28 at close's drain.
 
 - **promotion-commitment-stamp-latency** [design-pending] — between a promotion commitment and the
   boundary that pays it, an at-ceiling entry accrues firings only prose can hold.
@@ -9452,123 +9350,6 @@
   Surfaced 2026-09-03 in the consult that closed the provenance-seam ruling; drained here; the third
   shape above added 2026-09-04 at the scan-prompts-cut close drain.
 
-- **run-gates-front-end-cut-legality-unruled** [design-pending] — the port oracle's fourth-largest
-  owed file is scored takeable by a stated-contract composer while its own owning section rules that
-  half of it must survive, and choosing among the three ways out is operator-class.
-  **Probed at the 2026-09-04 close drain rather than argued.** `gate-sdk/bin/run-gates.sh` is 407
-  lines, carries no `# no-port:`, and `--emit port-blockers --tree` reads it `owed lines=407`.
-  **That figure and the 421 below are dated readings, not the file's size — take that off the
-  oracle.** This is the port's only owed member that GROWS, a dispatch branch per bridged arm: 407
-  at that close, 421 at that scope, 503 at the 2026-09-05 close, the last bought by this
-  iteration's own `--install-hooks` cut, so a pinned digit sizes a cut against a moved file. Its
-  owning section is gate-sdk/SPEC.md §run-gates, whose paragraph *"The front-end keeps a shell
-  dispatch loop for one branch"* rules that the loop STAYS for the binary-less omit-and-declare
-  install — *"This is the one duplication the port carries, it is admitted on criterion 6's unless
-  clause"*. The section states **no port disposition at all**, so nothing contradicts the oracle's
-  row on the surface a composer reads, and the file scores takeable.
-  **This is the trap doctrine-kit's install-doctrine notice was written against, reproduced on a
-  file four times larger** — that notice records *"the file reads owed with no declared cause, which
-  is exactly what a stated-contract composer scores as takeable"*.
-  **Three dispositions, differing in what they cost.** (i) It ports down to a thin
-  exec-and-fallback stub and stays owed until then. (ii) It earns a `# no-port:` on a bootstrap
-  ground, which **subtracts the whole file from the 2026-08-28 completion predicate** — a
-  subtraction that GROWS with the file rather than staying at the 407 read when this was
-  written, which is what makes deferring the choice cost more each iteration. (iii) It is
-  genuinely takeable and the duplication survives inside the ported file.
-  **Why `[design-pending]`, and why no cut was composed on it:** (ii) is operator-class — the
-  completion predicate admits no contributor-side subtraction — so no stage session can pick among
-  the three, and picking wrongly is not recoverable by a later cut.
-  **DISTINCT from `native-gate-port-remaining-corpus`**, whose subject is which cut comes next
-  rather than whether this file is a legal cut at all. **DISTINCT from
-  `binary-less-dispatch-loop-retirement`**, whose body was re-read in place at this drain: it
-  schedules the loop's RETIREMENT at zero `.sh` members and prices its roughly 180 duplicated
-  dispatch lines, and says nothing about the front-end's own port disposition.
-  **Cost while deferred:** every future cut selection re-reads this file and re-derives the same
-  contradiction at survey cost, and the first composer that does not stop scores it takeable and
-  composes a cut whose own owning section refuses half of it.
-  **RULED 2026-09-05 (operator, consult): disposition (i).** The per-arm dispatch moves in-crate,
-  the binary-less loop RETIRES with the cut (its zero-`.sh` condition arrived 2026-08-24 and
-  `binary-less-dispatch-loop-retirement` folds into this cut), and the stub that remains
-  declares on the config-seam cause `lib/gate.sh` carries — gate-sdk/SPEC.md §run-gates owns
-  the mechanism, TRAJECTORY.md §The closed rulings the refusals of (ii) and (iii). The entry is
-  answered; what is left is the cut, hosted by `native-gate-port-remaining-corpus`.
-  ruled: run-gates-front-end-cut-legality-unruled operator 2026-09-05 consult
-  ruled: run-gates-front-end-cut-legality-unruled lead 2026-09-04 own-authority
-  ruled: run-gates-front-end-cut-legality-unruled operator 2026-09-04 lead-relay
-  Filed 2026-09-04 to the gap inbox at scope; promoted here after →fix failed on the operator-class
-  ruling and →icebox failed on the live per-cut-selection trigger.
-
-- **build-native-bootstrap-port-disposition-unruled** [design-pending] — the port oracle scores the
-  crate's own build script takeable while a port would put that script inside the binary it builds,
-  and no governed sentence rules either way.
-  **Probed at this drain rather than argued.** `gate-sdk/bin/build-native.sh` is 110 lines, carries
-  no `# no-port:` (`grep -c` returns 0), and its owning section gate-sdk/SPEC.md §build-native
-  states **no port disposition at all** — so a stated-contract composer scores it takeable off the
-  only surface it reads.
-  **The circularity is compiled, not inferred.** `native/src/gates/gate_binary_fresh.rs` and
-  `crate_arms.rs` name this script as the remedy for the crate's own staleness in a **string
-  constant inside the crate**, and CLAUDE.md makes `bash gate-sdk/bin/build-native.sh` a
-  commit-time obligation the battery does not discharge. A ported script would be the authoritative
-  rebuild-yourself step for its own staleness check, which cannot hold.
-  **SAME GROUND AS `run-gates-front-end-cut-legality-unruled`, READ TOGETHER RATHER THAN MERGED.**
-  That entry owns the three-way disposition and the ruling that the `# no-port:` limb subtracts
-  from the 2026-08-28 completion predicate and is therefore operator-class; none of it is restated
-  here. What is distinct is the *ground* for that limb — there, one branch its owning section rules
-  must survive; here, a self-reference compiled into the artifact being ported, which is a stronger
-  bootstrap cause and a separate argument for a consult to weigh. A consult reaching one should
-  reach both, and neither is composable without it.
-  **RULED 2026-09-05 (operator, consult): DECLARED, on a per-file bootstrap cause** — a fresh
-  clone has no binary to run the first build with, the install bootstrap's irreducible met on the
-  contributor side; gate-sdk/SPEC.md §build-native states the cause the `# no-port:` cites, and
-  it is per-file, never a class. The entry is answered; the one-line declaration rides the next
-  cut under `native-gate-port-remaining-corpus`.
-  ruled: build-native-bootstrap-port-disposition-unruled operator 2026-09-05 consult
-  ruled: build-native-bootstrap-port-disposition-unruled lead 2026-09-04 own-authority
-  ruled: build-native-bootstrap-port-disposition-unruled operator 2026-09-04 lead-relay
-  **DISTINCT from `single-gate-front-end-form-unruled`**, whose subject is which front-end FORM
-  `scripts/gate-exec.sh` should take, not whether a file may be declared out of the predicate.
-  **Cost while deferred:** every future cut selection re-derives this contradiction at survey cost
-  — this iteration's scope did, and paid for it — and the first composer that does not stop scores
-  110 lines takeable and composes a cut that puts the crate's build command inside the crate.
-  Filed at scope 2026-09-04 to the gap inbox and promoted at that iteration's close: →fix failed on
-  the operator-class ruling, →icebox on the same live per-cut trigger that promoted its sibling.
-
-- **cut-boundary-section-legality-unruled** [design-pending] — two governing sections are unusable
-  as port-cut boundaries for reasons their owner docs do not settle, so a composer has to guess
-  whether either is a legal boundary at all.
-  **(1) A stated cause that does not reach its whole group.** context-kit/SPEC.md:1297 declares
-  §Testing *"blocked as a whole by index-tests/toolfloor-cases.sh, which exercises
-  lib/toolfloor.sh's floor predicate"*. Three owed files sit in that group —
-  `smoke/agents-md.sh` 139, `bin/run-index-tests.sh` 95,
-  `index-tests/toolfloor-cases.sh` 49 — and the stated cause reaches
-  only the last two. Verified at the drain: `grep -c agents-md context-kit/bin/run-index-tests.sh`
-  returns **0**, and that file's own header calls it *"a standalone validate suite"*. So either "as
-  a whole" governs and 139 lines stay owed behind a cause that does not touch them, or the
-  2026-09-03 outer-bound-never-minimum ruling licenses cutting the standalone member alone.
-  **(2) An always-loaded manifest section as a cut boundary.** CLAUDE.md §Housekeeping is the
-  `# spec:` section of three owed files sharing no subject — `scripts/pack-installer.sh` 196,
-  `demo/run-demo.sh` 96, `installer/bin/checkwright.sh` 53, the last installer-gated and
-  unreachable. Averaging grounds across unrelated subjects is what the composer's own text refuses,
-  yet §Housekeeping is not a kit SPEC section and nothing states whether a stated-contract composer
-  may select an always-loaded manifest's section at all.
-  **Why `[design-pending]`:** both are ambiguities the governing specs do not resolve, where only
-  precedent would decide — and spec-over-precedent forbids deciding them on precedent. Scope read
-  (1)'s "as a whole" as governing and took no cut; (2) was left uncomposed.
-  **DISTINCT from `native-gate-port-remaining-corpus`**, which owns which cut comes next. **DISTINCT
-  from `run-gates-front-end-cut-legality-unruled`**, whose subject is one file whose owning section
-  contradicts the oracle, not a section's fitness as a boundary.
-  **Cost while deferred:** 484 owed lines are unreachable to any composer that respects the stated
-  contract, and each scope re-derives both ambiguities from scratch — this iteration's did, at
-  survey cost, and took no cut either way.
-  **BOTH RULED 2026-09-05 (operator, consult).** (1) A stated cause reaches only the members it
-  names: `smoke/agents-md.sh` is takeable, and context-kit/SPEC.md §Testing is corrected in
-  place. (2) An always-loaded manifest is never a cut boundary: a `# spec:` pointing at
-  CLAUDE.md is mis-homed, and each of the three files re-homes at its owning doc and cuts as a
-  singleton — gate-sdk/SPEC.md §Porting a gate to the binary substrate owns both. Answered.
-  ruled: cut-boundary-section-legality-unruled operator 2026-09-05 consult
-  Filed 2026-09-04 to the gap inbox at scope; promoted here after →fix failed (neither is a stage
-  session's to settle) and →icebox failed on the live per-cut-selection trigger.
-
 - **bin-tool-help-arm-absent-tree-wide** [design-pending] — twelve of the fourteen shipped `bin/`
   tools, across five kits, answer `-h`/`--help` with something other than usage on stdout at
   exit 0, and one of them runs a multi-minute meter instead.
@@ -10081,5 +9862,10 @@
 - run-gates-stub-cut
 - liveness-reader-cut
 - preflight-front-end-cut
+- binary-less-dispatch-loop-retirement
+- run-gates-front-end-cut-legality-unruled
+- build-native-bootstrap-port-disposition-unruled
+- single-gate-front-end-form-unruled
+- cut-boundary-section-legality-unruled
 
 ## Lessons Learned
