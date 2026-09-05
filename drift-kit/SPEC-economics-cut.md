@@ -33,7 +33,7 @@ an exhaustive grep of `native/src/**/*.rs`:
 | what the join needs | the shell's cost | what exists in-crate |
 | --- | --- | --- |
 | a JSONL transcript reader | one `jq` filter, `:71-76` | **nothing.** `json.rs` is a jq-*path* compiler over an already-parsed `Value` with no parse entry point and it never opens a file; `usage_trend.rs` parses a space-separated `key=value` text log, not JSONL; `footprint.rs` measures markdown bytes |
-| assistant-turn usage extraction, last-usage-per-message-id dedup, per-model fold | one `awk` block, `:77-82` | **nothing.** The only `input_tokens`/`cache_read` string anywhere in the crate is a hook-payload test fixture at `hook/stop_liveness.rs:282`, never opened |
+| assistant-turn usage extraction, last-usage-per-message-id dedup, per-model fold | one `awk` block, `:77-82` | **nothing.** `grep -rn 'input_tokens\|cache_read' native/src` returns zero hits crate-wide — no reader, fixture or otherwise, touches either field name today |
 | the committed-history stamp harvest | `git log … -p -U0` piped to one `sed`, `:126-127` | **partly** — `emit/trajectory.rs` holds a *private inline* `Git` reader (`:26-45`) and `added_stamp` (`:107`), but the format is `COMMIT %H`, the filter demands a configured stage name, and it discards the session-id the join is keyed on |
 | the price table and its arithmetic | one `while read` and one `awk` `BEGIN`, `:91-103` | **nothing.** No TSV parser; f64 parse/format precedent exists but no pricing |
 | the `.meta.json` parent walk | one `jq` over a glob plus a bash walk, `:327-361` | **nothing.** No `parentAgentId` reader, no sibling-record resolution |
@@ -51,7 +51,9 @@ and each subsystem is its own delta below so a batch can be cut along it.
 `bin/stage-economics.sh` reads `owed lines=464` and is the **only** owed file whose `# spec:`
 pointer binds `## The stage-economics meter` {mechanical}. Its reach and its section bound
 coincide, and no second section is rewritten by construction — with the one stated exception every
-cut moves, gate-sdk/SPEC.md §The port disposition's owed-corpus prose.
+budget batch moves, gate-sdk/SPEC.md §The first cohort's *a budget batch records only findings*
+rule (its own worked instance is `§run-gates`' stub cut, the precedent this cut's finding below
+follows).
 
 **Together with `SPEC-overhead-cut.md` it discharges the kit**, which is worth stating because it
 changes what the section owes: after both, drift-kit holds no owed file, and this section gains the
@@ -61,19 +63,24 @@ owed set is empty and no later cut is sequenced against it. Neither cut can make
 ### (2) The meter adopts the shared derivation and writes no second copy
 
 {design-bearing} The 2026-09-05 ruling names *this* meter's derivation as the one both adopt, and
-the sibling cut extracts it to `native/src/sessions.rs` with three public items: `normalize`,
-`sessions_dir`, and `resolve`. This cut **reads them** and deletes its own
-`normalize8` (`:45-48`), `sessions_dir` (`:34-43`) and the two-tier scan inside `find_transcript`
-(`:52-64`).
+the sibling cut extracts it to `native/src/sessions.rs` with three public items (`normalize`,
+`sessions_dir`, `resolve`) and one private helper, `candidate_globs(dir: &str) -> [String; 2]`,
+that `resolve`'s widened branch walks and this delta's own new function shares rather than
+restates. This cut **reads all four** and deletes its own `normalize8` (`:45-48`), `sessions_dir`
+(`:34-43`) and the two-tier scan inside `find_transcript` (`:52-64`).
 
 **What this member needs beyond `resolve`, and why it is not a second derivation.** `resolve`
 answers *which transcript is this session's*; the join asks the inverse, *which transcript does
 this `session8` name*. That is a lookup over the same two-tier candidate set, and it is spelled as
-one function beside the others in `sessions.rs` — `pub fn find(i: &Inputs, session8: &str) ->
-Option<String>` — applying `normalize` to each candidate basename and keeping the newest match,
-exactly as `:57-61` does. It shares the candidate glob with `resolve` rather than restating it,
-which is the property that makes it one derivation and not two: **a change to the tier layout
-moves one glob.**
+a **fourth** function this delta adds beside the sibling's three — `pub fn find(i: &Inputs,
+session8: &str) -> Option<String>` — walking `sessions::candidate_globs(&sessions_dir(i))`,
+applying `normalize` to each candidate basename, filtering to matches, and keeping the newest,
+exactly as `:57-61` does. It shares the candidate glob with `resolve` **by calling the sibling's
+own private helper**, not by an unstated assumption about `resolve`'s internals — the property
+that makes it one derivation and not two: **a change to the tier layout moves one glob,** because
+both functions read it from the same source. `find` is this cut's own addition to the shared
+module, landing *after* the sibling's delta 2 (which must exist first for `find` to have
+`candidate_globs` to call), never a precondition of it.
 
 **The raw-prefix trap is preserved and stated**, because it is the failure the shell's own comment
 at `:50-51` was written against: this repo's stage sessions are subagent transcripts named
@@ -214,10 +221,33 @@ date}`; gate-sdk/SPEC.md §The non-gate arm records spawned programs in prose, a
 {design-bearing} gate-sdk/SPEC.md §The non-gate arm's forced-family test decides the family: the
 meter resolves seven knobs — `DRIFT_KIT_METRIC_DIR`, `DRIFT_KIT_STAGE_ECONOMICS_LOG`,
 `DRIFT_KIT_PRICE_TABLE`, `DRIFT_KIT_STATE_FILE`, `DRIFT_KIT_SESSIONS_DIR`,
-`DRIFT_KIT_SUPERVISION_LABEL`, `DRIFT_KIT_FANOUT_SUFFIX` — every one defined and defaulted in
-`lib/drift.sh`, so a hardcoded top-level flag would resolve platform defaults and ignore every
-consumer override. It joins `BRIDGED_ARMS` as `--emit-stage-economics`, reached as
-`run-gates.sh --emit stage-economics`, declaring exactly those seven.
+`DRIFT_KIT_SUPERVISION_LABEL`, `DRIFT_KIT_FANOUT_SUFFIX` — so a hardcoded top-level flag would
+resolve platform defaults and ignore every consumer override. **Only two of the seven,
+`DRIFT_KIT_METRIC_DIR` and `DRIFT_KIT_PRICE_TABLE`, are actually defined and defaulted in
+`lib/drift.sh` today** (`lib/drift.sh:51,58`, checked by reading the file whole — 61 lines). The
+other five are currently defaulted only inline, inside `bin/stage-economics.sh` itself (`:28,
+30-32`), the file this cut deletes — and `gate-sdk/lib/gate.sh:42`'s own `# spec:` rule is exact
+about the consequence of shipping that as-is: *a knob the owning kit's library does not define is
+the bridge's undeclared-knob refusal, so a compiled member declaring it would fail-close on every
+invocation*. One of the five, `DRIFT_KIT_SESSIONS_DIR`, is the sibling cut's to close (its own
+delta 4 adds the empty-default line, landing first per this amendment's own ordering rule) — this
+cut does not re-add it. **The remaining four are this delta's own obligation**, closed with four
+literal-default lines in `lib/drift.sh`, each mirroring the value the deleted script computes
+today and matching the shape the adjacent `DRIFT_KIT_OVERHEAD_LOG` bullet already takes
+(`lib/drift.sh:55`):
+
+- `: "${DRIFT_KIT_STAGE_ECONOMICS_LOG:=$DRIFT_KIT_METRIC_DIR/stage-economics-log.txt}"`
+- `: "${DRIFT_KIT_STATE_FILE:=${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt}"` — the same
+  `${GATE_SDK_WORKFLOW_DIR:-.workflow}` composition `DRIFT_KIT_TRAJECTORY_SURFACES` already uses
+  (`lib/drift.sh:38-39`).
+- `: "${DRIFT_KIT_SUPERVISION_LABEL:=supervision}"`
+- `: "${DRIFT_KIT_FANOUT_SUFFIX:=+fanout}"`
+
+None of these is a new knob or a new default *value* — each name and value already governs the
+shell tool's behavior today; what moves is only the default's resolution site, from the deleted
+script into the config bridge's one sourced library, which is the same relocation §Layout already
+records for `DRIFT_KIT_PRICE_TABLE`. It joins `BRIDGED_ARMS` as `--emit-stage-economics`, reached
+as `run-gates.sh --emit stage-economics`, declaring exactly those seven.
 
 **`Arm::Emit`, on the variant's own test.** The meter is advisory: exit is always 0, so no `1` is
 load-bearing and the `{0, 2}` collapse at `native/src/main.rs:485-495` costs nothing. It returns the
@@ -239,12 +269,14 @@ positional.
 {mechanical} `drift-kit/smoke/install.sh` is this meter's behavioural oracle across six fixture
 sets — the flat join, price-table-absent, the hermetic fake-history repo proving history ∪ live,
 the two-stamp attribution fixture, the nested-tier supervision fixture and the three-level fan-out
-fixture with its two degradation assertions. Its seven direct invocations (`:366`, `:388`, `:410`,
-`:436`, `:464`, `:527`, and the jq-less arm at `:392`) re-point from
-`bash "$SMOKE_KIT_ROOT/bin/stage-economics.sh"` onto `bash "$DRIFT_ARM" --emit stage-economics`,
-`$DRIFT_ARM` being the handle the file defines at `:34`. **Every assertion survives unchanged
-except the one delta 7 deletes**, and §Testing names each of them; a build session re-greps
-before editing rather than working from this list, because the suite decides.
+fixture with its two degradation assertions. Its **five** direct invocations (`:366`, `:410`,
+`:436`, `:464`, `:527`) re-point from `bash "$SMOKE_KIT_ROOT/bin/stage-economics.sh"` onto
+`bash "$DRIFT_ARM" --emit stage-economics`, `$DRIFT_ARM` being the handle the file defines at
+`:34`. `:388` and `:392` are assertion lines against the price-table-absent invocation's output,
+not invocations themselves — `:392` is the jq-less assertion delta 7 deletes, named there rather
+than double-counted here. **Every assertion survives unchanged except that one**, and §Testing
+names each of them; a build session re-greps before editing rather than working from this list,
+because the suite decides.
 
 `.claude/settings.json:19` and `:20` — `"Bash(bash drift-kit/bin/stage-economics.sh)"` and its
 wildcard form — name a path this cut deletes and drop **in the same commit as the delete**, inside
@@ -266,9 +298,10 @@ shared module, and gives one shared owner to a git read that had two. The survey
 
 - **The session derivation.** Producer before: this script's own `normalize8`, `sessions_dir` and
   `find_transcript`. Producer after: `native/src/sessions.rs`, shared with `--emit-session-id` and
-  `--emit-overhead-meter` (delta 2). Consumer: this arm, resolving `DRIFT_KIT_SESSIONS_DIR` and
-  handing the value in on `Inputs`. Enabling config: unchanged, the knob ships with a working
-  default.
+  `--emit-overhead-meter` (delta 2), gaining `find` as this cut's own addition to it. Consumer:
+  this arm, resolving `DRIFT_KIT_SESSIONS_DIR` and handing the value in on `Inputs`. Enabling
+  config: the default *value* is unchanged, but its bridge-visibility is the sibling cut's own
+  delta 4 fix, landing first — this arm inherits it rather than re-adding it.
 - **The committed-history read.** Producer before: two — this script's `git log … -p -U0` piped to
   `sed`, and `emit/trajectory.rs`'s private `Git` reader. Producer after: one shared reader
   yielding `(commit, added_line)` (delta 4). Consumers: `emit/trajectory.rs`, which keeps its
@@ -328,17 +361,26 @@ it); delta 9 keeps it pointed at the same grammar.
   a reader of the log will look.
 - `drift-kit/SPEC.md` §The stage-economics meter — gains its **port-owed residue paragraph**, and
   with the sibling's it records that drift-kit's owed column is empty (delta 1).
-- `drift-kit/SPEC.md` §Layout and configuration, the `DRIFT_KIT_STATE_FILE` and
-  `DRIFT_KIT_SESSIONS_DIR` bullets (`:1223-1228`, `:1292-1297`) — both carry the *re-derives with
+- `drift-kit/SPEC.md` §Layout and configuration, the `DRIFT_KIT_SESSIONS_DIR` and
+  `DRIFT_KIT_STATE_FILE` bullets (`:1223-1228`, `:1292-1297`) — both carry the *re-derives with
   its own knob rather than importing a sibling kit's bin contract* parenthetical, and both stay
   true: the knobs remain drift-kit's and the sharing is below the config layer (delta 2). The
-  sibling amendment owns the `DRIFT_KIT_SESSIONS_DIR` bullet's edit; this one names it so the two
-  do not both rewrite it.
+  sibling amendment owns the `DRIFT_KIT_SESSIONS_DIR` bullet's edit (its delta 4 adds the
+  bridge-visible empty default); this one names it so the two do not both rewrite it. The
+  `DRIFT_KIT_STATE_FILE` bullet is this cut's own to edit: its stated default is not yet
+  bridge-visible either, and delta 8 adds the literal-default line that makes it so, alongside the
+  three other knobs delta 8 closes the same gap for.
 - `drift-kit/SPEC.md` §Layout and configuration, the `DRIFT_KIT_PRICE_TABLE` bullet (`:1265-1273`)
   — *two sites compute this default, not three: `lib/drift.sh` for every bridge reader, and the
   standalone meter* collapses to one when the standalone meter stops being standalone (deltas 5, 8).
   The bullet already records the same collapse happening to the KPI's restatement and now completes
   it.
+- `drift-kit/SPEC.md` §Layout and configuration, the `DRIFT_KIT_STAGE_ECONOMICS_LOG`,
+  `DRIFT_KIT_SUPERVISION_LABEL` and `DRIFT_KIT_FANOUT_SUFFIX` bullets (`:1262-1264`, `:1274-1280`,
+  `:1281-1287`) — none currently states where its default is computed; each gains the one clause
+  the `DRIFT_KIT_OVERHEAD_LOG` bullet already carries (drift-kit/SPEC.md:1229-1235), naming
+  `lib/drift.sh` as the resolver now that the standalone script it was computed inside is gone
+  (delta 8).
 - `drift-kit/SPEC.md` §Testing, the stage-economics fixture paragraphs (`:1344-1391`) — every
   fixture is driven through the arm (delta 9) and the jq-less assertion is deleted (delta 7); no
   other assertion changes and the section says so.
@@ -346,11 +388,19 @@ it); delta 9 keeps it pointed at the same grammar.
 - `gate-sdk/SPEC.md` §The non-gate arm — the `--emit-` family roster gains `--emit-stage-economics`
   with its dated attribution, and the spawned-program prose records that this member spawns `git`
   and `date` and no interpreter (deltas 7, 8).
-- `gate-sdk/SPEC.md` §The port disposition — the owed-corpus prose this cut moves by one file
-  (all deltas). This cut's finding, per §The first cohort: an owed line count prices a shell file's
-  *text*, not its *reach*, and the gap is widest where the shell bought whole subsystems from
-  spawned interpreters — the census table above is the shape of that gap and the way to measure it
-  before composing.
+- `drift-kit/README.md` — its `bash drift-kit/bin/stage-economics.sh` usage example (`## Use`) and
+  the two prose mentions of the script by path re-point onto the arm form, the same edit class
+  delta 9 already makes for the smoke; missed by neither survey's grep in isolation but named here
+  because the sibling cut's audit found the identical gap for its own README example.
+- `gate-sdk/SPEC.md` §The first cohort — under its own rule, *a budget batch adds a section only
+  where it has a finding to record*, this cut adds one paragraph beside the sibling's, in the shape
+  its worked instance (`§run-gates`' stub cut) already took: an owed line count prices a shell
+  file's *text*, not its *reach*, and the gap is widest where the shell bought whole subsystems
+  from spawned interpreters — the census table above is the shape of that gap and the way to
+  measure it before composing (all deltas motivate it). This corrects the amendment's own earlier
+  citation of "§The port disposition" for this finding: that heading (`gate-sdk/SPEC.md:7979`,
+  nested under §Consumer smoke) is a differently-scoped, already-occupied section and is not this
+  cut's to edit.
 - `lifecycle-kit/SPEC.md` §The state machine — **no rule changes**; named as a target because the
   port must be re-read against it to confirm the read-only consumption still holds, and a target
   named only to be confirmed is cheaper than one discovered at build (delta 4).
@@ -368,7 +418,15 @@ it); delta 9 keeps it pointed at the same grammar.
       `check-crate-arms`, `bash gate-sdk/bin/build-native.sh` run, and the tree re-grepped for
       `stage-economics.sh` before the cut is called done.
 - [ ] **The sibling landed first** — `native/src/sessions.rs` exists with `normalize`,
-      `sessions_dir`, `resolve` and `find` before this cut's delta 2 is written against it.
+      `sessions_dir`, `resolve` and the private `candidate_globs` helper before this cut's delta 2
+      is written against it. `find` is **not** part of that precondition — it is this cut's own
+      delta 2 that adds `find` to the module, and no amendment other than this one ever creates it.
+- [ ] **The bridge resolves the meter's five non-sibling knobs rather than fail-closing on them** —
+      `lib/drift.sh` gains the four literal-default lines delta 8 specifies for
+      `DRIFT_KIT_STAGE_ECONOMICS_LOG`, `DRIFT_KIT_STATE_FILE`, `DRIFT_KIT_SUPERVISION_LABEL` and
+      `DRIFT_KIT_FANOUT_SUFFIX` (the fifth, `DRIFT_KIT_SESSIONS_DIR`, is the sibling's), and a bare
+      `run-gates.sh --emit stage-economics` invocation with every one of the seven knobs unset is
+      exercised, since that is the invocation the gap would have broken.
 - [ ] **Pricing parity is verified, not assumed** — the four terms summed in the shell's order, and
       a fixture cost compared against the shell form's output before the shell form is deleted.
 - [ ] **`trajectory.rs` is unchanged in behavior** — its own tests pass against the shared reader,

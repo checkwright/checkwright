@@ -45,7 +45,9 @@ amendments that disagree about the derivation is the failure this ordering exist
 `bin/overhead-meter.sh` reads `owed lines=105` and is the **only** owed file whose `# spec:`
 pointer binds `## The overhead meter` {mechanical}. Its reach and its section bound therefore
 coincide, and no second section is rewritten by construction — with the one stated exception every
-cut moves, gate-sdk/SPEC.md §The port disposition's owed-corpus prose.
+budget batch moves, gate-sdk/SPEC.md §The first cohort's *a budget batch records only findings*
+rule (its own worked instance is `§run-gates`' stub cut, the precedent this cut's finding below
+follows).
 
 **It does not discharge drift-kit**, and the amendment says so because the kit's owed column is
 short enough that a reader would assume otherwise. `bin/stage-economics.sh` (464) leaves it in the
@@ -85,22 +87,35 @@ kit-owned derivation that more than one arm reads — `toolfloor.rs`, `guard.rs`
 **The interface the extraction must expose, and why `derive` alone does not serve.**
 `derive` returns a normalized **id**; the overhead meter needs the **transcript path** that id was
 derived from, and the sibling cut needs a `session8 → path` resolver. So the module exposes three
-items and `derive` is re-expressed on top of them:
+public items, one private helper the sibling's lookup shares, and `derive` is re-expressed on top
+of them:
 
 - `pub fn normalize(id: &str) -> String` — the shared key, unchanged from `session_id.rs:29`.
 - `pub fn sessions_dir(i: &Inputs) -> String` — unchanged from `:47`, still taking the dir as a
   field so each kit resolves its own knob and hands the answer in.
 - `pub fn resolve(i: &Inputs) -> Result<String, String>` — the delegation-aware **path**
-  resolution now inside `derive` at `:88-126`, returning the path rather than the key.
+  resolution folding in `derive`'s current `:81-126`: its two early returns (an explicit
+  `session_id`, or a bare `harness_id` with no child flag — `:82-87`, outside the narrower
+  `:88-126` range a first read reaches for) return `basename`-free, since a bare id already has no
+  `/` or `.jsonl` suffix and `normalize(basename(x)) == normalize(x)` for one; the delegation-aware
+  scan (`:88-126`) is the rest. `resolve` returns the winning **path** in every branch rather than
+  the normalized key, which is the one behavior change from `derive`'s body.
+- `fn candidate_globs(dir: &str) -> [String; 2]` (private) — the two literal patterns `resolve`'s
+  widened branch already walks, `{dir}/*.jsonl` and `{dir}/*/subagents/*.jsonl` (`:104-105` in the
+  pre-extraction form), lifted out so a second caller can enumerate the same tier layout without
+  restating the two strings. This is the seam the sibling cut's `find` needs and is named here
+  because a reader auditing that cut needs to find it *in this one*: `find` answers "which
+  transcript does this `session8` name" by walking the same two patterns with its own predicate,
+  never its own copy of them, which is what makes the tier layout one glob rather than two.
 
-`derive` becomes `normalize(basename(resolve(i)?))`, which is what it already computes at
-`:125-126`; its behavior, its two refusal messages and its `emit` wrapper are unchanged, and
+`derive` becomes `normalize(basename(resolve(i)?))`, which is what it already computes at its own
+tail; its behavior, its two refusal messages and its `emit` wrapper are unchanged, and
 `--emit-session-id`'s contract (lifecycle-kit/SPEC.md §bin/session-id.sh) is untouched. A build
 session verifies that by the module's existing `#[cfg(test)]` tests rather than by inspection.
 
 **The contract owner does not move with the code, and that is the seam this delta holds.**
 lifecycle-kit/SPEC.md §bin/session-id.sh keeps ownership of the derivation's *contract* — it
-already owns the phrase "the shared normalization" — and both drift sections **cite** it rather
+already owns the phrase "the same normalization" — and both drift sections **cite** it rather
 than restating it. drift-kit keeps its **own knobs**: `DRIFT_KIT_SESSIONS_DIR` resolves the dir and
 is handed to `Inputs.sessions_dir`. So drift-kit/SPEC.md §Layout and configuration's standing
 sentence — *drift-kit re-derives with its own knob rather than importing a sibling kit's bin
@@ -164,7 +179,20 @@ would be a second thing to stale.
 preference does: *the family choice is forced for any tool that needs configuration at all*, since
 a hardcoded top-level flag *resolves platform defaults and silently ignores every consumer
 override*. The meter resolves `DRIFT_KIT_SESSIONS_DIR`, `DRIFT_KIT_METRIC_DIR` and
-`DRIFT_KIT_OVERHEAD_LOG`, every one of them defined and defaulted in `lib/drift.sh`. So it is a
+`DRIFT_KIT_OVERHEAD_LOG`. **Only the latter two are defined and defaulted in `lib/drift.sh` today,
+and this cut must close that gap rather than assume it closed.** `DRIFT_KIT_SESSIONS_DIR` is
+currently computed only inline, inside the standalone script's own `sessions_dir()` function
+(`:31-40`); `lib/drift.sh` — read whole, 61 lines — carries no line for it. That costs the shell form
+nothing, since a standalone script needs no bridge, but a compiled arm does:
+`gate-sdk/lib/gate.sh:42`'s own `# spec:` states the rule this cut must satisfy — *a knob the owning
+kit's library does not define is the bridge's undeclared-knob refusal, so a compiled member
+declaring [it] would fail-close on every invocation* — and a bare invocation with no override set is
+this meter's primary, intended use, so an unclosed gap fails the common case, not an edge one.
+**Delta 4 therefore adds one line to `lib/drift.sh`**: `: "${DRIFT_KIT_SESSIONS_DIR:=}"`, the same
+empty-default shape `DRIFT_KIT_ICEBOX_SECTION` already takes (`lib/drift.sh:54`) — declared so
+`declare -p` finds it, computing nothing itself, because the computed fallback
+(`<config-home>/projects/<cwd-slug>`) already lives in `sessions.rs::sessions_dir` (delta 2) and a
+second copy in shell would be exactly the divergence this cut exists to avoid. So the arm is a
 **bridged-arm table** member, spelled `--emit-overhead-meter` and reached through the front end as
 `run-gates.sh --emit overhead-meter`.
 
@@ -236,8 +264,9 @@ substrate permanently (§Testing). Its two direct invocations — `:197` and `:2
 `$DRIFT_ARM` being the front-end handle the file already defines at `:34` and already uses for
 `--emit kfric` at `:594`. **Every assertion in those blocks survives unchanged** — the log-line
 grammar, the task-line exclusion, `gate` a proper subset of `gov`, `pct` as the rounded governance
-share, the replace-on-re-measure probe, and the writer/reader-divergence assertion at `:244-245`
-that runs meter and KPI under one `DRIFT_KIT_METRIC_DIR` override.
+share, the replace-on-re-measure probe, and the writer/reader-divergence assertion spanning `:244`
+(the writer, re-pointed here), `:248` (the reader, `kpi-overhead`) and `:251` (the divergence check
+itself) that runs meter and KPI under one `DRIFT_KIT_METRIC_DIR` override.
 
 `.claude/settings.json:18`, `"Bash(bash drift-kit/bin/overhead-meter.sh)"`, names a path this cut
 deletes and drops **in the same commit as the delete**. That is inside
@@ -261,9 +290,13 @@ component set**: every tracked file was grepped for `overhead-meter`, for `sessi
 - **Producer, before:** two independent resolvers — `overhead-meter.sh:31-53` (flat glob, newest
   wins, no delegation branch) and `native/src/emit/session_id.rs:47-126` (delegation-aware,
   two-tier).
-- **Producer, after:** one, `native/src/sessions.rs`, holding `normalize`, `sessions_dir` and
-  `resolve`. Its enabling config is not new and is not test-only: `DRIFT_KIT_SESSIONS_DIR` and
-  `LIFECYCLE_KIT_SESSIONS_DIR` both ship with working defaults today, and neither default changes.
+- **Producer, after:** one, `native/src/sessions.rs`, holding `normalize`, `sessions_dir`, `resolve`
+  and the private `candidate_globs` helper the sibling cut's lookup shares. Its enabling config is
+  not new: `DRIFT_KIT_SESSIONS_DIR` and `LIFECYCLE_KIT_SESSIONS_DIR` both compute the same default
+  value today, and neither default *value* changes — but `DRIFT_KIT_SESSIONS_DIR`'s default is
+  currently computed inline in the standalone script rather than bridge-visible, which delta 4
+  closes with one empty-default line in `lib/drift.sh`; `LIFECYCLE_KIT_SESSIONS_DIR` needs no such
+  line, already being resolved through `session_id.rs`'s existing, unmodified arm.
 - **Consumers, named:** `emit::session_id::derive` (unchanged behavior, re-expressed on `resolve`),
   the new `--emit-overhead-meter` arm, and — after the sibling cut — `--emit-stage-economics`.
   Each consumer resolves its **own** kit's sessions-dir knob and passes the value in on `Inputs`;
@@ -295,6 +328,7 @@ rule reaches a field nothing reads at all. Recorded because the rule invites the
 | the `/economics` skill | `drift-kit/templates/economics.md` | it chains the two meters; re-point both, and cut 2 owes the sibling half |
 | this kit's smoke | `drift-kit/smoke/install.sh:197,244` | delta 7 |
 | the settings grant | `.claude/settings.json:18` | delta 7, removal |
+| the kit's own usage doc | `drift-kit/README.md:75` | its `bash drift-kit/bin/overhead-meter.sh` example line re-points onto the arm form, the same edit class delta 7 already makes for the smoke |
 | `kpi-overhead` | `native/src/emit/kpi/overhead.rs:55` | **nothing** — it reads `ctx.overhead_log`, resolved through the bridge; the writer moving substrate does not reach it |
 
 **The one reader that is not a caller, and it must be checked rather than assumed.**
@@ -320,8 +354,11 @@ stage stamp itself.
   owed set is empty and that no later cut is sequenced against it.
 - `drift-kit/SPEC.md` §Layout and configuration, the `DRIFT_KIT_SESSIONS_DIR` bullet (`:1223-1228`)
   — its parenthetical *drift-kit re-derives with its own knob rather than importing a sibling kit's
-  bin contract* stays true and gains the one clause delta 2 owes it: the knob is still drift's,
-  and the derivation below it is now shared in-crate (delta 2).
+  bin contract* stays true and gains two clauses: the knob is still drift's, and the derivation
+  below it is now shared in-crate (delta 2); and the default gains a second resolver, `lib/drift.sh`
+  declaring it empty so the bridge can find it, the computed fallback staying in-crate (delta 4) —
+  the same "two resolvers, both named" shape the adjacent `DRIFT_KIT_OVERHEAD_LOG` bullet already
+  uses.
 - `drift-kit/SPEC.md` §Layout and configuration, the `DRIFT_KIT_OVERHEAD_LOG` bullet (`:1229-1235`)
   — *two resolvers compute this default — the meter, which is a standalone tool, and `lib/drift.sh`*
   is falsified by the port: a bridged arm reads what `lib/drift.sh` resolved, so the pair collapses
@@ -335,13 +372,17 @@ stage stamp itself.
   where its contract is stated (delta 2). No rule of that section changes.
 - `gate-sdk/SPEC.md` §The non-gate arm — the `--emit-` family roster gains `--emit-overhead-meter`
   with its dated attribution, the shape every prior member took (delta 4).
-- `gate-sdk/SPEC.md` §The port disposition — the owed-corpus prose this cut moves by one file
-  (all deltas). Per §The first cohort a budget batch records only findings, and this cut's finding
-  is delta 2's: where a port is told to carry a derivation in-crate once, look for it in-crate
-  first — the second copy this cut avoided was one an unexamined reading would have written.
+- `gate-sdk/SPEC.md` §The first cohort — under its own rule, *a budget batch adds a section only
+  where it has a finding to record*, this cut adds one paragraph, in the shape its worked instance
+  (`§run-gates`' stub cut) already took: delta 2's finding, that where a port is told to carry a
+  derivation in-crate once, look for it in-crate first — the second copy this cut avoided was one
+  an unexamined reading would have written (all deltas motivate it, delta 2 is its subject). This
+  corrects the amendment's own earlier citation of "§The port disposition" for this finding: that
+  heading (`gate-sdk/SPEC.md:7979`, nested under §Consumer smoke) is a differently-scoped,
+  already-occupied section and is not this cut's to edit.
 
 <!-- update-target-exempt: the file is deleted whole by this cut, so its own `# spec:` lines survive in no delta's scope -->
-- `drift-kit/bin/overhead-meter.sh` — the file and its four `# spec:` pointers, removed with it.
+- `drift-kit/bin/overhead-meter.sh` — the file and its three `# spec:` pointers, removed with it.
 
 ## Definition of Done
 
@@ -353,6 +394,10 @@ stage stamp itself.
       the tree re-grepped for `overhead-meter.sh` before the cut is called done.
 - [ ] **`derive` is unchanged and proved so** — `emit/session_id.rs`'s existing `#[cfg(test)]` tests
       pass against the re-expressed form, and `enter_stage.rs:432`'s stamp is unaffected.
+- [ ] **The bridge resolves `DRIFT_KIT_SESSIONS_DIR` rather than fail-closing on it** —
+      `lib/drift.sh` gains the empty-default line delta 4 specifies, and a bare
+      `run-gates.sh --emit overhead-meter` invocation with the knob unset is exercised (not just a
+      run with it exported), since that is the invocation the gap would have broken.
 - [ ] **The grant removal lands in the deleting commit** — `.claude/settings.json:18`, under ruling
       (2)'s 2026-08-29 base and guard-kit/SPEC.md:1323-1324, with no addition owed.
 - [ ] **Merged with no information lost** — each addition integrated into its proper canonical-spec

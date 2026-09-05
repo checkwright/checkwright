@@ -57,8 +57,9 @@ TRAJECTORY.md's ruling record.
 
 `bin/scratch-run.sh` reads `owed lines=50` and is the **only** owed file whose `# spec:` pointers
 bind `## scratch-run` {mechanical}. Its reach and its section bound coincide, and no second section
-is rewritten by construction — with the one stated exception every cut moves, gate-sdk/SPEC.md
-§The port disposition's owed-corpus prose.
+is rewritten by construction — with the one stated exception every budget batch moves,
+gate-sdk/SPEC.md §The first cohort's *a budget batch records only findings* rule (its own worked
+instance is `§run-gates`' stub cut, the precedent this cut's finding below follows).
 
 **It does not discharge guard-kit**, and the amendment says so because a 50-line member reads like
 a whole-kit finish. The kit's owed column keeps `bin/compare-settings-allow.sh` (115) and
@@ -195,6 +196,15 @@ consult pre-authorization on `scratch-run-port-blocker-unrecorded`, and the out-
 approval relayed the same day. Both are re-scoped by the operator's own later ruling, and are
 recorded as **the operator's re-scoping** rather than as this session's judgment.
 
+**"Recorded where it stands" means replaced, not annotated, on `TRAJECTORY.md`'s own side of this
+— its rule at `:56-59` forbids leaving a superseded sentence beside its corrector.**
+`TASK-QUEUE.md`'s matching entry already carries an append-then-annotate pair (a PRE-AUTHORIZED
+bullet and a SUPERSEDED bullet beside it) — correct for that file, under queue-kit's own
+convention, and already landed in the current tree — but that is not a shape to copy onto
+`TRAJECTORY.md`, whose entire 2026-09-05 scratch-runner paragraph a build session rewrites in
+place. See the "Existing sections updated" entry below for the rule citation and the full scope of
+what changes.
+
 ### (7) The tests split on the kfric precedent — unit cases in-crate, seam cases through the bridge
 
 {mechanical} `guard-kit/gate-tests/scratch-run.test.sh` is this member's oracle, run by gate-sdk's
@@ -305,14 +315,30 @@ whose reader is the session that just tripped the rule, at the transition where 
   one (deltas 2, 6).
 - `gate-sdk/SPEC.md` §The crate's crosser — its two-caller statement about `walk::canonicalize`
   becomes three, and the third's ground is recorded with it (delta 3).
-- `gate-sdk/SPEC.md` §The port disposition — the owed-corpus prose this cut moves by one file (all
-  deltas). This cut's finding, per §The first cohort: a member priced as blocked by a *permission*
-  cost should have that cost re-derived against the forced family before it is composed, because
-  the family decides the command string and the command string decides whether any grant is owed.
+- `gate-sdk/SPEC.md` §The first cohort — under its own rule, *a budget batch adds a section only
+  where it has a finding to record*, this cut adds one paragraph beside the sibling pair's, in the
+  shape its worked instance (`§run-gates`' stub cut) already took: a member priced as blocked by a
+  *permission* cost should have that cost re-derived against the forced family before it is
+  composed, because the family decides the command string and the command string decides whether
+  any grant is owed (all deltas motivate it, delta 5 is its subject). This corrects the amendment's
+  own earlier citation of "§The port disposition" for this finding: that heading
+  (`gate-sdk/SPEC.md:7979`, nested under §Consumer smoke) is a differently-scoped, already-occupied
+  section and is not this cut's to edit.
 - `TRAJECTORY.md` §The closed rulings — its 2026-09-05 paragraph *the scratch runner's port is
-  pre-authorized: build prepares the grant addition, the operator applies it* is re-scoped by the
-  operator's later ruling the same day and is recorded as superseded, with nothing owed (delta 6).
-  Named as a target rather than edited at authoring time, because the ruling record is not this
+  pre-authorized: build prepares the grant addition, the operator applies it* is **replaced in
+  place**, never appended to: TRAJECTORY.md's own completion-time rule (`:56-59`) is explicit that
+  *a fact that has aged is corrected where it stands... a superseded sentence is never left standing
+  beside the sentence that corrects it*, so a build session must rewrite the whole paragraph (its
+  substance is entirely superseded, not only its lead sentence — the grant diff, the operator
+  applying it out of band, and the shell path staying live in the meantime are all moot under the
+  removal-only disposition) to state the current fact and delete the rest, rather than copying the
+  append-then-annotate idiom `TASK-QUEUE.md`'s own `scratch-run-port-blocker-unrecorded` entry uses
+  for its own PRE-AUTHORIZED/SUPERSEDED bullet pair — that idiom is queue-kit's own convention for a
+  ruled entry and is not TRAJECTORY.md's, whose rule this delta names precisely so a build session
+  does not import the wrong one. The `TASK-QUEUE.md` side of this correction is **already done** in
+  the current tree — the entry already carries both the original bullet and its superseding one —
+  so only the `TRAJECTORY.md` paragraph remains outstanding, and delta 6's own DoD line is scoped
+  to that one target, named as a target rather than edited at authoring time, because the ruling record is not this
   stage's to rewrite unaudited.
 
 ## Definition of Done
@@ -332,8 +358,10 @@ whose reader is the session that just tripped the rule, at the transition where 
 - [ ] **The grant removal lands in the deleting commit** — `.claude/settings.json:32`, under ruling
       (2)'s 2026-08-29 base and guard-kit/SPEC.md:1323-1324, with no addition owed and the
       2026-09-05 widening not construed.
-- [ ] **Both superseded pre-authorizations are disposed of** — on the entry and in TRAJECTORY.md,
-      as the operator's own re-scoping rather than as a session's judgment.
+- [ ] **Both superseded pre-authorizations are disposed of** — the `TASK-QUEUE.md` entry side is
+      **already done** in the current tree (checked, not assumed); only `TRAJECTORY.md`'s paragraph
+      remains, replaced in place per its own completion-time rule (`:56-59`), never appended to, as
+      the operator's own re-scoping rather than as a session's judgment.
 - [ ] **Merged with no information lost** — each addition integrated into its proper canonical-spec
       section (not appended); §scratch-run reads as one document to a reader who never saw this
       amendment, with the retired opt-out preserved as a stated, ruled cost.
