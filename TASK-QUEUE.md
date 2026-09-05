@@ -184,18 +184,18 @@
   — ruling (1) reaches the seam alone, both 2026-09-03 (operator, lead-relay); (5) SIZING FILLS
   WITHIN THAT BOUND, 2026-09-04 (lead) — singletons under-fill lawfully, no host minted, widths stay
   per-cut, size arm permanently spent — gate-sdk/SPEC.md §Porting a gate to the binary substrate.**
-  **(6) PORT-CRITICAL UNITS RIDE THE RUN, 2026-09-05 (operator, consult)** — an entry whose
-  discharge is an owed file's stated precondition rides inside that cut, else is its own iteration
-  (TRAJECTORY.md §PRIORITY DIRECTIVE). **(7) A TAXING MEMBER ORDERS INSIDE THE BUDGET ARM, NEVER
-  THE BLOCKER-RETIRING OVERRIDE, AND THAT ARM'S PRECONDITION IS A `--group` VERDICT THE COMPOSING
-  STAGE RUNS, 2026-09-05 (lead)** — both owned by gate-sdk/SPEC.md §The first cohort.
+  **(6) A TAXING MEMBER ORDERS INSIDE THE BUDGET ARM, NEVER THE BLOCKER-RETIRING OVERRIDE, AND
+  THAT ARM'S PRECONDITION IS A `--group` VERDICT THE COMPOSING STAGE RUNS, 2026-09-05 (lead)** —
+  both owned by gate-sdk/SPEC.md §The first cohort.
   ruled: native-gate-port-remaining-corpus lead 2026-08-28 2026-08-29 2026-08-31 own-authority
   ruled: native-gate-port-remaining-corpus operator 2026-08-28 2026-08-29 2026-08-30 lead-relay
   ruled: native-gate-port-remaining-corpus operator 2026-09-03 2026-09-05 lead-relay
   **Cost while deferred:** large and known — the **owed** remainder, the runners, the install-
   lifecycle layer; relaxation is closed at §The port-candidate criteria, `gate-battery-result-cache`
-  unsubsumed. **NO YIELD AT ALL until `--tree` reads zero owed — the port-only run, ruled 2026-08-31
-  (operator, consult); TRAJECTORY.md §PRIORITY DIRECTIVE owns it**, subsuming the four-yield rule.
+  unsubsumed. **THE PORT-FIRST RUN, ruled 2026-09-05 (operator, consult), supersedes the 2026-08-31
+  port-only run: a port cut leads every iteration while the composer reaches one, and deferred units
+  fill the window's remainder on three grounds, port-critical (inside the cut it unblocks, else its
+  own iteration), same-surface, product-class — TRAJECTORY.md §PRIORITY DIRECTIVE owns them.**
   ruled: native-gate-port-remaining-corpus operator 2026-08-31 2026-09-05 consult
   ruled: native-gate-port-remaining-corpus lead 2026-09-01 2026-09-03 2026-09-04 own-authority
   ruled: native-gate-port-remaining-corpus lead 2026-09-05 own-authority
@@ -9292,7 +9292,9 @@
   private ruling history as mechanism, and pointers a consumer cannot follow — a payload-facing and
   front-door claim, so product-class outright. Accreting, now measured: two new sites in one
   iteration, both landed by cuts that were not editing provenance.
-  ruled: kit-spec-provenance-seam-sweep operator 2026-09-03 consult
+  **DIRECTED 2026-09-05 (operator, consult) AS THE NEXT ITERATION'S JOINED UNIT beside the
+  test-harness cut** — same-surface and product-class under the port-first run; scope sizes it.
+  ruled: kit-spec-provenance-seam-sweep operator 2026-09-03 2026-09-05 consult
   Surfaced 2026-09-03 in the consult that closed the provenance-seam ruling; drained here; the third
   shape above added 2026-09-04 at the scan-prompts-cut close drain.
 

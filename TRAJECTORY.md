@@ -439,11 +439,10 @@ window closed each of the four weeks before this ruling between 77 and 97 %, so 
 window and not the iteration count. Two alternatives were refused with it. A per-iteration
 **unit-count target** (ten or twelve units) measures nothing the window measures and nothing the
 record supports: no KPI reads units per iteration or cost per unit, and the one wide cut on record —
-eight members in one iteration — was the cheapest per member and the dearest in total. And
-**interleaving deferred units with cuts** to fill the window is the port-only run's own refused
-alternative below, and is not reopened by this ruling: the width is bought inside the cut. The
-cost-per-unit meter that would let the next sizing be read rather than judged is queue work filed
-from this consult.
+eight members in one iteration — was the cheapest per member and the dearest in total. The width
+is bought inside the cut first; what fills the window's remainder is the port-first run's below.
+The cost-per-unit meter that would let the next sizing be read rather than judged is queue work
+filed from this consult.
 
 **A kit SPEC carries mechanism only; this project's provenance never ships — ruled 2026-09-03 by
 the operator in consult.** A dated operator stamp (`ruled <date> by the operator`), a pointer into
@@ -459,8 +458,13 @@ the ruling *into* the kit SPEC with its date and its refusals, so the SPEC becam
 and this file the index — the seam's content classes named vocabulary and never provenance, and no
 gate held it. The alternative refused: leaving the class in place as design rationale, which
 publishes private history as mechanism and ships pointers a consumer cannot follow. The sweep and
-the gate that holds the seam afterwards are one queue unit, filed from this consult; discharge
-event: that unit lands and the gate is green, at which point this paragraph is deleted.
+the gate that holds the seam afterwards are one queue unit, filed from this consult —
+`kit-spec-provenance-seam-sweep`, **directed 2026-09-05 by the operator in consult as the next
+iteration's joined unit beside the test-harness cut**, on the port-first run's same-surface ground
+(gate-sdk/SPEC.md hosts two of the four cuts and most of the class) and as a product-class entry
+whose class accreted two sites while it waited; scope sizes it against the window and may split it
+by kit. Discharge event: that unit lands and the gate is green, at which point this paragraph is
+deleted.
 
 **A stated cause reaches only the members it names, and an always-loaded manifest is never a
 cut boundary — ruled 2026-09-05 by the operator in consult.** Mechanism at gate-sdk/SPEC.md
@@ -528,86 +532,54 @@ kit-source vendoring, manifest and lock I/O, registry and queue seeding, the com
 conditional install logic not yet behind the invoke. After the port: **one deferred-pool triage
 iteration**, then `companion-toolkit-profile`.
 
-**The port-only run — ruled 2026-08-31 by the operator in consult, on a measured rate.** The
-2026-08-31 survey record measured the track since the predicate landed: roughly one iteration in
-three shipped a port, the rest bought the Windows leg, repairs and rulings, and the largest class
-of the owed column had not moved a line. So until `--tree` reads zero owed, every iteration is a
-port cut selected by the ruled composer — no yield, which supersedes the four-yield count on
-`native-gate-port-remaining-corpus` — and close's drain takes fix, icebox and wontfix but
-**promotes nothing**; the one exception is the operator-ruled hotfix CLAUDE.md §Delivery doctrine
-already admits. The alternative refused is interleaving backlog units with cuts, which is the
-measured rate itself. **The pool is answered after the port, not during it, and as triage rather
-than as work**: one iteration that iceboxes by class, retires what a landed unit or a closed ruling
-has mooted, and keeps the product-witnessed and `[roadmap:]`-tagged remainder — most of the pool
-argues from a delivery process that the port changes under it, so working it earlier buys entries
-the port then re-litigates. Discharge event: the oracle's owed count reads zero, at which point
-the run is over and this paragraph is deleted; the triage sentence above it is the sequence and
-stays.
-
-**`promotes nothing` means no ACTIVE-section entry; a Deferred filing is not barred — ruled
-2026-09-04 by the operator, lead-relayed from an in-session prompt.** The clause above reads
-literally as a bar on the drain's `promote` disposition itself, and lifecycle-kit/SPEC.md §The
-committed gap inbox defines that disposition as exactly a deferred `[design-pending]` filing — so
-the literal text bars the motion, which is what makes the qualification operator-class rather than
-a session's however good its grounds. **What carries it is the run's own purpose and not the
-drain's tiering:** a Deferred entry consumes no iteration, so it yields nothing to non-port work,
-which is the whole of what the run exists to prevent. A bullet that neither a fix nor the icebox
-tier can take has nowhere else to go, and dropping it is the attrition every rule here refuses.
-**THE RUN IS NOT WEAKENED, stated because that is the reading to guard against.** No yield is
-created, the ruled composer's selection is untouched, and the discharge event is unchanged. An
-**active-section** promotion stays barred — that is the motion which would consume an iteration,
-and it is the one the clause above is about. Discharge: this paragraph is deleted with the one it
-qualifies.
-
-**A deferred entry at recurrence threshold with no port-critical shape stays deferred under the run
-— ruled 2026-09-05 by the operator, lead-relayed from an in-session prompt on a consulted
-recommendation.** The threshold rule (lifecycle-kit/templates/stages/scope.md, the pre-emption
-rule) puts a counted recurrence in front of the authority scope escalates to, and under the run
-that authority can decline or relay but never grant — so every iteration since 2026-09-02 re-bought
-the same escalation for a set the operator had already answered on that date (one of three taken
-as the run's exception, two left deferred), each member standing at the entry cap, each decline
-sentence costing a compression. Under this ruling scope lists the threshold set in its journal and
-escalates only a **new** member reaching the threshold; a further judged recurrence is stamped onto
-the entry's `recurrence:` declaration and not re-escalated; no per-iteration `ruled:` stamp and no
-decline prose is owed on those entries. The rule itself is not amended: its purpose — the collision
-reaches someone — is met, and `.claude/agents/stage-session.md`'s ruling roster already relays an
-operator-class question. Four alternatives were refused. **A hotfix grant** for any member: none is
-an impacting failure, and a grant would let a recurrence count buy the exception, the second intake
-path the rule's own text refuses. **A kit-template amendment** to that clause: lawful later as a
-Deferred filing, refused now because the consumer roster already says relay, so the kit would
-restate consumer content. **Leaving the per-iteration lead decline in place**: pure waste after the
-first relay, the cost this ruling exists to stop. **Icebox or wontfix for any member now**: not
-taken and close's to take on the tier's own criteria; `prompt-ranking-ungrantable-shape-class`
-would round-trip on its live per-close trigger. THE RUN IS NOT WEAKENED: no yield is created, the
-composer's selection and the discharge event are untouched. Discharge: this paragraph is deleted
-with the run paragraph it qualifies, when the oracle's owed count reads zero.
-
-**Port-critical units are lawful under the run, in two shapes — ruled 2026-09-05 by the
-operator in consult, on a measured column.** The consult the 2026-09-03 ordering paragraph
-scheduled sat on this date and weighed its six limbs together; that paragraph and the two that
-joined limbs to it are retired here, their discharge event met. The measure that carried the
-ruling: the oracle read thirty owed files, 3956 lines, of which the ruled composer could reach
-four files and 473 lines — twelve per cent — while the install boundary and its transitive
-sequencing (`context-kit/lib/toolfloor.sh`, its index tests, doctrine-kit's installer and
-`gate-sdk/lib/inject.sh`) held 1713 lines behind two CI legs no cut can buy, and the five
-unruled dispositions ruled below held a further 1668. **The rule:** a deferred entry is
-*port-critical* when its discharge is the stated precondition of an owed file's cut — the
-test is the owning section's own sequencing sentence, never a session's judgment of usefulness.
-A port-critical entry takes one of two shapes and no third: it rides **inside** the cut it
-unblocks when it fits the build window (the hermetic suffix pin, the bridged-family strip in a
-second spawning arm), or it is its **own iteration** only when
-it cannot (the Windows leg's manifest cause-read, the macOS leg). Every other deferred entry
-stays barred exactly as the port-only run bars it; the run's existence, its composer, its
-discharge event and its no-promote clause are untouched. Two alternatives were refused. **A
-dedicated relief iteration** pays a full scope, close and supervision floor — near three fifths
-of an iteration's spend on the 2026-09-03 measure — for members that each fit inside a cut,
-mixes two multi-round remote-oracle legs with one-line fixes under one unit set, and reopens the
-post-port triage the run defers on purpose. **Leaving the run unchanged** takes the 473
-reachable lines and then stalls at eighty-eight per cent of the column unreachable, with the
-legs landing by no route at all. Discharge event: the install boundary's precondition is met —
-`native/targets.list` carries every supported platform — at which point the own-iteration
-shape has no member left and this paragraph retires; the inside-the-cut shape is the
-build-window ruling's ordinary content and needs no record of its own.
+**The port-first run — ruled 2026-09-05 by the operator in consult, superseding the 2026-08-31
+port-only run and the three paragraphs that qualified it.** The port stays the track's top
+priority, and every iteration carries a port cut while the ruled composer can reach one: the cut
+is selected first, sized to fill the build window, and never displaced by a joined unit. What
+changes is what fills the window beside it. The port-only run barred every other deferred entry
+until the oracle read zero owed, and its measured outcome is what retires it: sixteen of the
+seventeen iterations since it was ruled shipped a cut, the owed column fell to 23 files and 2679
+lines — 1722 behind the install boundary and two remote-oracle CI legs no cut can buy, 956
+reachable, four fifths of those in one section family — while the deferred pool rose from 283 to
+292 and the icebox from 52 to 84. Its last iteration bought one cause read at full ceremony, six
+stage sessions and a resume for one deferred entry that returned to Deferred, at a governance
+share the overhead meter read between 64 and 75 per cent across the run's ten sessions. That is
+the run buying the single-unit iteration the kit's own composition test refuses, and the ruling
+record accreting an exception paragraph every time a session hit the bar — three in five days.
+Quality and efficiency are both the project's objectives; a priority is not a licence to spend
+the second on the first. **The rule:** scope composes the iteration under
+lifecycle-kit/templates/stages/scope.md's economic composition test, which the port-only run had
+overridden — the port cut first, then deferred entries filling the window's remainder, and the
+whole window when the reachable column is empty or the port's next act is an own-iteration leg. A
+joined unit qualifies on one of three grounds, each an existing class and none a new classifier,
+ordered so when the window cannot hold every candidate: **port-critical** — its discharge is the
+stated precondition of an owed file's cut, the test being the owning section's own sequencing
+sentence and never a session's judgment of usefulness; it rides inside the cut it unblocks when it
+fits (the hermetic suffix pin was the instance) and is its own iteration only when it cannot (the
+Windows and macOS legs); **same-surface** — it edits a kit or SPEC section the cut edits, so the
+ceremony and the context are already paid; or **product-class with a live trigger** by the
+2026-08-30 witness discriminator, which `[roadmap:]`-tagged entries and entries at the recurrence
+threshold satisfy — a threshold member is proposed once under this ground, never re-escalated as a
+set already answered. Close's drain runs its 2026-08-30 disposition order unqualified — fix,
+icebox, promote last — so `promotes nothing` retires with the run; machinery-class findings stay
+icebox-by-default under the ruling above, untouched. **Refused:** continuing the port-only run,
+whose reachable column is one more window, after which every iteration is an own-iteration leg or
+another exception paragraph; a dedicated relief iteration, which pays a full ceremony floor for
+units that each fit beside a cut; and a per-iteration meta-work ratio, refused again on the
+2026-08-30 grounds. **The health triad this ruling is scored on, stated
+by the operator with it:** a healthy project shows a decreasing queue, instruction surfaces that
+get better and cheaper, and falling governance overhead, and on 2026-09-05 every one of the three
+read the opposite way. Each has an owner already — `kpi-queue-net-delta`'s `qnet`,
+`kpi-always-loaded` against `.workflow/always-loaded-baseline.txt`, and `kpi-overhead`'s share — so
+close states all three in the drain's commit message beside the `qnet` fragment it already writes,
+with the cause when one moves the wrong way, and the next consult reads them against this ruling's
+expectation: qnet at or below zero, the always-loaded surface flat or shrinking, the share falling.
+An enforcing gate stays refused on the 2026-08-30 grounds; the shape is reopened if none of the
+three has moved over five closes. **The pool is still
+triaged after the port, as one iteration** that iceboxes by class and retires what a landed unit
+or a closed ruling has mooted; joining units under the grounds above is work on the pool, not that
+triage. Discharge event: the oracle's owed count reads zero, at which point the port-cut-first
+clause is spent and this paragraph is deleted; the composition test is the kit's and stays.
 
 **A sequence remainder of one is not a finished port, and reading it as one is the misreading
 this paragraph exists to stop — operator-ruled 2026-08-25.** The completion predicate is the one

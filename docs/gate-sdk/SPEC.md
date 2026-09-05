@@ -10860,9 +10860,9 @@ close or a lead boundary wants — requires the process to run with its cwd
 **inside** that tree, typically a linked worktree. Run from a modified main
 checkout it silently reports the modified tree's numbers, and those numbers look
 entirely plausible: nothing in the trailer says which tree was scanned. Stated
-because the completion predicate of the port-only run is this count, so a
-measurement attributed to the wrong tree is the one error here that misreports
-whether the run is over.
+because a port's completion predicate is this count, so a measurement attributed
+to the wrong tree is the one error here that misreports whether the port is
+over.
 
 **Two corpora, and confusing them is the failure this tool is now shaped
 against.** The registry arms speak for the **battery** — what `gates.list`
