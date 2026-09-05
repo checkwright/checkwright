@@ -162,7 +162,7 @@ that records those sets, `--needs` answering about registry members only.
 gate-sdk/SPEC.md §Porting a gate to the binary substrate still states **in the present tense**
 that context-kit/SPEC.md §Testing "declares its own group *blocked as a whole*"
 {mechanical}. context-kit/SPEC.md:1310-1318 no longer does: the 2026-09-05 correction landed
-in the owner doc and was never back-ported to the illustrative passage sitting fourteen lines
+in the owner doc and was never back-ported to the illustrative passage sitting twenty-four lines
 above the corollary that names the same correction (`:2173-2187`, *a stated cause reaches only
 the members it names*). So one file states, twenty-five lines apart, both that the group is
 declared blocked whole and that the owner doc corrects its own over-declaration.

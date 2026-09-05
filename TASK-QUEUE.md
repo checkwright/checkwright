@@ -170,7 +170,7 @@
 
 - **lead-tier-split-premise-unamended** [spec: SPEC-lead-tier-split.md]
   — `lifecycle-kit/templates/lead.md`
-  §Economics rests its *Split the lead where the tail dominates* bullet on a premise TEN
+  §Economics rests its *Split the lead where the tail dominates* bullet on a premise TWELVE
   consecutive iterations have now measured false, and the template still ships it unqualified.
   **The trigger is the binding's own.** `.claude/commands/lead.md` set the criterion — count the
   escalations a lead ruled ALONE off a governed surface; near zero, the premise holds; consistently

@@ -91,12 +91,23 @@ judgment per site:
 **The one class deliberately excluded from all five: a dated *measurement*.** §The decisions
 this substrate already closed says of its own figures that they are "a dated measurement, not
 a live claim … a recount is a step toward re-deciding"; the same shape recurs at the cohort
-selection-evidence lines, at the build-timing benchmark, and at the `cargo fmt` divergence
-count. A frozen measurement is not a ruling stamp and TRAJECTORY.md's own text treats it as a
-separate class. These stay, dates and all, and the merged section says so — because a sweep
-that removes a date a later reader is instructed **not** to refresh converts a frozen
-attestation into a live-looking claim, which is a defect the sweep would introduce rather than
-remove.
+selection-evidence lines and at the `cargo fmt` divergence count. A frozen measurement is not a
+ruling stamp and TRAJECTORY.md's own text treats it as a separate class. These stay, dates and
+all, and the merged section says so — because a sweep that removes a date a later reader is
+instructed **not** to refresh converts a frozen attestation into a live-looking claim, which is
+a defect the sweep would introduce rather than remove.
+
+**The build-timing benchmark is not this shape, checked here rather than assumed
+{design-bearing}.** Its own text says the opposite of frozen — "Re-measure rather than
+re-derive: the number moves with the module count and with any dependency the crate takes"
+(`:10093-10094`) — so grouping it with the instructed-not-to-refresh class would misstate what
+its own sentence tells the reader, and the merged section must not say it. It stays anyway, on
+a narrower ground: its date names a measurement, never an authority, a TRAJECTORY.md pointer or
+a cohort, so none of classes (a) through (e) reaches it and it was never a sweep candidate in
+the first place. What the same paragraph *does* carry, and delta 1's corollary *does* reach, is
+*the settings cohort* — an internal identifier a consumer cannot resolve — swept to what it
+denoted (the dependency the crate took on) rather than left standing beside a measurement the
+reader is told to keep re-running.
 
 ### (3) Move versus delete is decided per site, by TRAJECTORY.md's own discharge test
 
