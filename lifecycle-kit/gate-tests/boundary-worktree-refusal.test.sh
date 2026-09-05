@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the iteration-boundary linked-worktree refusal end-to-end through a sandboxed enter-stage on a real git checkout: a boundary entry with a linked worktree present refuses and writes nothing, --simulate relays the same refusal, the same tree with the worktree reaped enters cleanly, LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK=0 turns it off, a non-git tree skips the check rather than failing on it; and the liveness classification: each of the four class readings, the empty-knob default that classifies nothing, the loss report on a residue path, the mid-iteration advisory that reports orphans without refusing, and a malformed pattern refused as config
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the iteration-boundary linked-worktree refusal end-to-end through a sandboxed enter-stage on a real git checkout: a boundary entry with a linked worktree present refuses and writes nothing, --simulate relays the same refusal, the same tree with the worktree reaped enters cleanly, LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK=0 turns it off, a non-git tree skips the check rather than failing on it; and the liveness classification: each of the four class readings, the empty-knob default that classifies nothing, the loss report on a residue path and on a live one, the live class's loss-gated reap remedy in place of a wait on a pid that does not establish a holder, the mid-iteration advisory that reports orphans without refusing, and a malformed pattern refused as config
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
@@ -114,14 +114,19 @@ seed_wt() {  # $1=name -> echoes the sandbox path with one linked worktree at .c
     echo "$sb"
 }
 
-# locked, reason matches, captured pid alive -> live: named with its pid, told to wait, never offered --force
+# locked, reason matches, captured pid alive -> live: the line names the locking pid and carries the
+# loss report; the guidance denies that the pid establishes a holder and gives the loss-gated reap
+# instead of a bare wait; a force-removal is still never offered here
 sb="$(seed_wt class-live)"
 git -C "$sb" worktree lock --reason "testharness (pid $$)" "$sb/.claude/worktrees/agent-01"
 out="$(run_classified "$sb" "$RE" scope)"; rc=$?
 [[ "$rc" -eq 1 ]] || note live-status "want exit 1 with a live worktree, got $rc -- $out"
 grep -qE '^live +.*agent-01' <<<"$out" || note live-class "a live worktree was not classified live: $out"
-grep -qF "held by pid $$" <<<"$out"    || note live-pid "the live line does not name the holding pid: $out"
-grep -qF 'wait for the named pid' <<<"$out" || note live-remedy "the live class was not told to wait: $out"
+grep -qF "names pid $$" <<<"$out"      || note live-pid "the live line does not name the locking pid: $out"
+grep -qF 'removal is lossless' <<<"$out" || note live-loss "the live line carries no loss report: $out"
+grep -qF 'NOT evidence' <<<"$out"      || note live-signal "the live guidance still reads the pid as holder liveness: $out"
+grep -qF "git worktree unlock <path>" <<<"$out" || note live-remedy "the live class was given no reap remedy: $out"
+grep -qF 'wait for the named pid' <<<"$out" && note live-wait "the live class was told to wait on the pid: $out"
 grep -qF -- '--force --force' <<<"$out"     && note live-force "the live class was offered a force-remove: $out"
 
 # locked, reason matches, captured pid dead -> orphaned: --force --force named here and only here
@@ -205,5 +210,5 @@ out="$(run_enter "$nogit" --simulate scope)"; rc=$?
 [[ "$rc" -eq 0 ]] || note nogit "a non-git tree failed the worktree check instead of skipping it: $out"
 
 [[ "$fails" -eq 0 ]] || { echo "boundary-worktree-refusal.test: $fails assertion(s) failed"; exit 1; }
-echo "boundary-worktree-refusal.test: clean (the boundary refuses on a linked worktree and writes nothing, --simulate relays it, the knob disables it, a reaped tree passes, a non-git tree skips; four class readings, the empty-knob default, the loss report, the mid-iteration advisory live and orphaned, and two malformed patterns refused as config)"
+echo "boundary-worktree-refusal.test: clean (the boundary refuses on a linked worktree and writes nothing, --simulate relays it, the knob disables it, a reaped tree passes, a non-git tree skips; four class readings, the empty-knob default, the loss report on both a residue and a live path, the live class's loss-gated remedy, the mid-iteration advisory live and orphaned, and two malformed patterns refused as config)"
 exit 0

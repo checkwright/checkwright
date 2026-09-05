@@ -14,63 +14,6 @@
 
 ## Technical Debt
 
-- **worktree-lock-pid-is-not-agent-liveness** — a linked worktree's lock reason names the harness
-  PROCESS rather than the agent that created it, so reading that pid for liveness always answers
-  "still in use" and the iteration-boundary refusal looks unclearable.
-  **THE ENVELOPE IS RULED AND IT IS SHAPES ONE AND TWO ONLY — operator, 2026-09-06, through an
-  interactive prompt in the lead session; the lead relayed it and did not rule it.** Shape one:
-  have the boundary refusal name the reap remedy on the branch that actually fires. Shape two:
-  state in delegation-kit's isolation bullet that a lock reason's pid is the harness's and is NOT
-  an agent liveness signal, that bullet being where a session learns to reap both halves.
-  **SHAPE THREE IS OUT OF ENVELOPE and the entry stays open on it** — asserting the reap at the
-  dispatching session's own turn end is not this unit's work, however well the record supports it.
-  A session meeting this entry re-opens neither: one and two are ruled in, three is ruled out.
-  **What shape one actually costs, because "landed" is half true.** `--enter-stage` already names
-  the reap remedy for the ORPHANED class. The classifier routes on captured-pid liveness and the
-  host pid is always alive, so every real case reaches the LIVE branch instead, whose help says
-  "wait for the named pid to return … Do not remove it and do not force it". The tool therefore
-  forbids the correct action. Shape one is finishing that reach, not starting it.
-  **Debt, not a feature: no governed name is added** — a help string, its SPEC section, the
-  delegation-kit template bullet, the existing boundary-refusal fixture, and the docs mirrors.
-  **The pid is the top-level `claude` process's, not the dispatching session's, and it is CONSTANT
-  across the run — THRICE attested rather than argued.** 2026-08-27: three read-only sweeps all
-  carried a pid a different session had recorded hours earlier. 2026-09-05 and 2026-09-06: worktree
-  dispatches from one scope session again carried one identical host-CLI pid, one of them started
-  the previous day, so the pid is constant across an iteration boundary too.
-  **Why it traps a compliant session.** delegation-kit's protocol teaches a session to distrust
-  pattern matching and trust a recorded PID's liveness, so a session meeting a locked worktree does
-  the sanctioned thing, reads a live pid, and concludes it is in use. It is not. The refusal then
-  meets a session with no lawful remedy — the shape that has invited an agent to invent one.
-  **The remedy is cheap and was exercised**: unlock, remove, delete the branch — no force — after
-  verifying the worktree clean and carrying nothing past its base. The lock's pid gates none of it.
-  **The failure direction is a DEADLOCK, not a conservative refusal.** The error-direction argument
-  — a reused pid classifies live, and live refuses rather than authorising a removal — holds only
-  where the captured pid belongs to the holder. Here it belongs to a process alive as long as the
-  entering session is, so "wait for the named pid" returns only when that session exits.
-  **A shape probing the AGENT ID is coupled to another entry, and that is why it is not shape one.**
-  The lock reason carries the id verbatim (`claude agent agent-<id> (pid <n> start <n>)`), but
-  `LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE` matches it with `[^ ]+` without CAPTURING it and the reader
-  hardcodes group one, so it waits on `ere-matcher-capture-groups-unowned`.
-  **A one-off force-reap over the live-class guidance was operator-ruled at the 2026-09-05 boundary
-  and again at 2026-09-06, both relayed by the lead rather than ruled by it**, each on verified
-  grounds — host-CLI pid, clean tree, HEAD already an ancestor of master, so each reap was lossless.
-  Neither settles the classifier, which is what this entry owns.
-  **DISTINCT from delegation-kit's reap-both-halves rule**, which says WHAT to delete and is silent
-  on how to judge whether deleting is safe.
-  **FOURTH SIGHTING 2026-09-06, and it is the evidence that RANKED the shapes.** The orphan was
-  minted at the prior iteration's SPEC stage and survived align, three build sessions, validate and
-  close without any of six sessions noticing; only the boundary refusal surfaced it. Those five
-  later sessions had no reason to look, and the party who knew what the worktree was for was gone
-  six sessions before the refusal fired — shape three's own argument, made by the record, and
-  recorded here because the shape it argues for is deferred rather than refuted.
-  recurrence: worktree-lock-pid-is-not-agent-liveness 2026-09-05 2026-09-06
-  Filed 2026-08-27 by the lead at scope, promoted 2026-08-27 by close draining the gap inbox.
-  Re-fired 2026-09-05 at the `windows-leg-manifest-cause-read` close's boundary; drained again
-  2026-09-06 at scope from the lead's judged fourth-sighting bullet, which took it to the recurrence
-  threshold. Promoted here 2026-09-06 as a threshold member under the port-first run's
-  product-class ground — the class ruled `lead, own-authority` on the 2026-08-30 discriminator's
-  counterfactual-witness clause, the envelope ruled by the operator as above.
-
 - **kit-spec-provenance-seam-sweep-remainder** — ten kit SPECs still carry this project's ruling
   provenance, plus the seam gate that can only go green once the last of them is swept.
   **THIS ITERATION TAKES THE context-kit + guard-kit SLICE ONLY — `lead, own-authority`,
@@ -10095,5 +10038,6 @@
 
 - always-loaded-meter-port-cut
 - settings-allow-port-cut
+- worktree-lock-pid-is-not-agent-liveness
 
 ## Lessons Learned

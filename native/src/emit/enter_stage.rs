@@ -760,7 +760,12 @@ fn stamp(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, String> {
                 match r.class {
                     Class::Live => {
                         live += 1;
-                        lines.push(format!("live         {} — held by pid {}", r.path, r.pid));
+                        lines.push(format!(
+                            "live         {} — lock reason names pid {}; {}",
+                            r.path,
+                            r.pid,
+                            worktree_loss(&r.path, &r.head)
+                        ));
                     }
                     Class::Orphaned => {
                         orphaned += 1;
@@ -798,9 +803,20 @@ fn stamp(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, String> {
             say.body(&lines.join("\n"));
             if live > 0 {
                 say.help(&format!(
-                    "a live worktree's holder is still working: wait for the named pid to return, \
-                     then re-run enter-stage {}. Do not remove it and do not force it — the reap \
-                     advice below is for the other classes.",
+                    "a live reading says the pid in the lock reason is alive; it is NOT evidence \
+                     that an agent still holds this path. Where a harness locks with the pid of \
+                     the process supervising its agents, that pid outlives every one of them and \
+                     stays alive for as long as this session does, so waiting for it never \
+                     returns. Establish the holder from the dispatch you know is in flight, never \
+                     from the pid: with one in flight, wait for that child and re-run enter-stage \
+                     {}. With none, the path is residue — where the loss report beside it says \
+                     removal is lossless, reap it with 'git worktree unlock <path>' then 'git \
+                     worktree remove <path>' with NO force (an unforced remove refuses on its own \
+                     if the path holds modified or untracked files) and delete the branch ref it \
+                     leaves behind. Read that loss gate literally: git's refusal covers the dirty \
+                     half only, so a clean path whose branch carries commits removes without a \
+                     complaint and the branch delete then takes those commits with it. A path the \
+                     report does not call lossless: leave it standing and surface it.",
                     stage
                 ));
             }

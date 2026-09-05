@@ -2307,8 +2307,8 @@ failing on it.
 **Each linked worktree carries a liveness class, and the signal is git's own
 rather than one this kit invents.** A worktree held by a live process is
 `locked`, and `git worktree list --porcelain` prints that lock's **reason** —
-which, for at least one harness, is a liveness record naming the holder's **pid**
-and its process **start time**; the same string sits on disk at
+which, for at least one harness, is a liveness record naming a **pid** and that
+process's **start time**; the same string sits on disk at
 `.git/worktrees/<name>/locked`. Measured rather than assumed, and re-measured at
 each stage that rested on it: the start field equals that process's own
 `/proc/<pid>/stat` field 22, so the reason carries a PID-reuse guard rather than
@@ -2320,7 +2320,11 @@ mechanism now has one, and nothing about the signal is minted here.
 **The reason's format is consumer vocabulary, taking the same disposition the
 residue directory takes one paragraph up.**
 `LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE` is a POSIX ERE with exactly one capture
-group, matched against a lock reason, the group being the holder's pid; the
+group, matched against a lock reason, the group being the pid that consumer's
+harness writes there — **which this kit does not take for the holder's**. A
+harness may lock with the pid of the process *supervising* its agents rather
+than an agent's own, and no property of the reason distinguishes the two, so the
+class is a statement about the captured pid and never about the holder. The
 kit's default is **empty**, so an unconfigured consumer classifies nothing and
 sees exactly the behaviour above. The kit ships the mechanism — read the
 porcelain, apply the pattern, probe the pid — and the consumer ships the
@@ -2369,19 +2373,50 @@ deliberately not captured. Parity is the first ground — the `.run` record gram
 carries no start-time guard either, so capturing one here would make the worktree
 path stricter than the record path for no stated reason — and the error direction
 is the decisive one: a stranded worktree whose pid has been reused classifies
-**live**, and a live classification refuses and says *wait*, never authorising a
-removal. Dropping the guard errs toward refusing, which is the direction a
+**live**, and a live classification refuses, authorising nothing by itself.
+Dropping the guard errs toward refusing, which is the direction a
 fail-closed boundary wants. That safety is a function of what **reads** the
 class, so the strengthening is filed rather than banked — the moment anything
 reaps on the classification instead of printing it, the argument inverts.
+
+**That error-direction ground holds only while the captured pid is the
+holder's**, and it is stated with the condition because the condition is
+falsifiable and does fail: a pattern can match a reason whose pid names the
+process *supervising* a harness's agents, and then every locked path reads
+**live** for as long as the entering session runs, so *errs toward refusing*
+reads *refuses until the reader gives up*. The classification is untouched by
+this — pid reuse still errs live, still the wanted direction — and so is the
+capture-group decision, since a start-time guard would not tell a supervisor's
+pid from a holder's either. What it bounds is the **reading** of a live class,
+which is why that class's guidance above is a loss-gated remedy rather than a
+wait. A boundary can be fail-closed against losing work and wide open to
+deadlock at once, and only the first of those is bought by refusing.
 
 **The refusal set does not narrow; the class changes the remedy.** Both classes
 still refuse — a live worktree because an in-flight dispatch must not straddle
 the boundary, an orphaned one because residue must be cleared before it is
 crossed — and the refusal prints one line per path carrying its class:
 
-- **live** — the holding pid is named and the guidance is *wait, then re-enter*.
-  A force-removal is actively wrong here and is not offered.
+- **live** — the pid the lock reason names is printed beside the loss report,
+  and the guidance leads with what a live reading does **not** establish: that
+  an agent still holds the path. Where the configured pattern captures the pid
+  of a process supervising a harness's agents rather than an agent's own, that
+  pid outlives every child and stays alive for as long as the entering session,
+  so a bare *wait for the named pid* terminates only when the session that is
+  waiting exits — a deadlock wearing a conservative refusal's clothes, and the
+  reason this class's guidance is not that sentence. The holder is established
+  from the dispatch the session knows is in flight; where none is, the path is
+  residue and takes the same loss-gated reap the other classes take — **unlock,
+  then an unforced `remove`, then the branch ref**. A force-removal is still
+  actively wrong here and is still not offered, and the two halves of the guard
+  are stated apart because they are not the same guard: an unforced `remove`
+  refuses on its own on a modified or untracked file, which is git's and needs
+  no classification, while a *clean* worktree whose branch carries commits
+  removes silently and the branch delete then takes those commits — so the
+  commit half is carried by the loss report alone, which is why this class's
+  remedy is gated on that report saying **lossless** rather than on the absence
+  of a git complaint. Measured rather than reasoned: the unforced remove exits 0
+  on that clean-but-unmerged path.
 - **orphaned** — the holder is gone, so the lock states a fact that has become
   false. This is the class force-removal exists for and it is named only here.
   Git requires **`--force` twice** to remove a *locked* worktree; once suffices
@@ -2400,7 +2435,8 @@ anything*. What was missing at every attested firing was in any case not a reap
 but anything that *told* a session there was residue.
 
 **The loss question is answered mechanically rather than left to the session.**
-For every non-live path the refusal reports two facts read at the moment of
+For every path — the live class included, since its guidance turns on the same
+two facts — the refusal reports two facts read at the moment of
 refusal — whether the worktree's tree is dirty, and how many commits its `HEAD`
 carries that are unreachable from the main checkout's `HEAD` — and says so
 plainly when a path is clean **and** commitless, the case where removal is

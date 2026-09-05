@@ -182,7 +182,18 @@ drift: do not delete it on sight, and when either rule changes here, propagate.
   (lifecycle-kit/SPEC.md §bin/enter-stage.sh). Reap **both** halves: `git
   worktree remove` clears the directory and leaves the agent's branch ref
   standing, so delete that ref in the same motion, or the refusal clears while
-  the refs accrete unseen.
+  the refs accrete unseen. **And the pid in a worktree's lock reason is the
+  harness's, not an agent liveness signal.** Where a harness locks the tree it
+  writes its own supervising process's pid there, not the dispatched agent's:
+  that process is alive for as long as your session is and carries the same pid
+  across every dispatch and across an iteration boundary, so probing it answers
+  *still in use* for a tree nobody holds. This is the one place the protocol's
+  own instinct — distrust a pattern match, trust a recorded pid's liveness —
+  reads a record that does not mean what that instinct assumes, which is why
+  the rule is written beside the reap rather than left to be re-derived. Judge
+  the tree by what it carries, a clean `git status --porcelain` inside it and
+  nothing past its base, and by whether you know a dispatch is in flight; never
+  by that pid.
   **(3) An isolated child sees only committed state.** Untracked and gitignored
   files are in no commit, so no base ref reaches them and naming a rev does not
   help. **A sweep whose corpus includes an untracked surface is not delegable to
