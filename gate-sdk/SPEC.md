@@ -4526,6 +4526,22 @@ the budget arm is reachable **only** when a `bash
 gate-sdk/bin/run-gates.sh --emit port-blockers --group` run reports no takeable group — so its
 precondition is a verdict from the instrument this section already names for the
 size arm, never a session's reading of the tree.
+
+**A member that *taxes* later cuts is not a blocker, and the override does not
+reach it.** The distinction is one word of the arm's own text — *queued behind*.
+A blocker **prevents** later members: until it is retired they cannot be taken at
+all, which is what makes retiring it worth more than the size it carries. A file
+that merely **grows** with each later cut — a front end gaining a dispatch branch
+per ported arm is the shape — prevents nothing; every one of those cuts is
+takeable today and simply costs more, and more again next time. That is a real
+and often decisive reason to order such a member early, and it is an **ordering
+rationale inside the budget arm**, never the override. Recording it as the
+override is the error worth naming, because a selection is sound either way while
+the *ground* becomes the precedent a later selector reasons from — and a
+precedent that reads "dearer later" as "blocking" empties the override of the
+property it selects on. Where the two are hard to tell apart, the run decides:
+the budget arm's precondition above is a verdict, and a member the instrument
+still reports takeable was never queued behind anything.
 **The size arm is now permanently exhausted rather than exhausted at a cut, and
 that is a property of the rule rather than a reading of one remainder.** A
 `--group` run over the owed members partitions them into groups of exactly one,

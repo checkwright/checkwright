@@ -152,49 +152,49 @@
   It DEMOTES at build, never `## Done` — canon-kit/SPEC.md §Merging an amendment's corpus branch.
   **Operator-ruled 2026-08-09: complete the port, ASAP** — that ruling, its grounds, its scope,
   both install paths and the tail are [TRAJECTORY.md](TRAJECTORY.md) §PRIORITY DIRECTIVE's, not
-  restated; this entry is the work, bootstrap design included, inheriting gate-sdk/SPEC.md
-  §Porting a gate to the binary substrate and §Consumer payload. **Each closed cut's record —
-  members, counts, holds, grounds, price — lives in the contract section that cut selected**, so
-  this entry states only what remains (drift-kit/SPEC.md §The KPI plugin contract, gate-sdk/SPEC.md
-  §Consumer smoke, *The port disposition*).
+  restated; this entry is the work, bootstrap design included, inheriting gate-sdk/SPEC.md §Porting
+  a gate to the binary substrate and §Consumer payload. **Each closed cut's record — members,
+  counts, holds, grounds, price — lives in the contract section that cut selected**, so this entry
+  states only what remains (drift-kit/SPEC.md §The KPI plugin contract, gate-sdk/SPEC.md §Consumer
+  smoke, *The port disposition*).
   **THE COMPOSER DOES NOT REACH THE TREE REMAINDER** — the registry arm answers for the battery,
-  only `--tree` is the predicate, and both arms are run. That two-axis misreading, the rise in owed
-  on a landing shell file, and the bounds are gate-sdk/SPEC.md §port-blockers'.
-  **THE COMPOSER IS RULED 2026-08-28: select the next cut by STATED CONTRACT** — the owed
-  files behind one specification section, ported behind the one amendment that section needs. Size-
-  and kit-ordered composers stay refused. **IT CONSTRAINS SELECTION, NOT ITERATION PACKAGING —
-  ruled 2026-08-30 (operator, lead-relay):** the clauses above say what makes ONE cut well-formed;
-  how many an iteration holds is owned elsewhere. Refused with it — three cohorts as ONE cut, which
-  fails this ruling's own words (*one* section, *the one* amendment) and averages the grounds all
-  three entries forbid, shared setup being logistics; and one cut per iteration, an over-read
-  paying three iteration floors for no added decision quality.
-  **(1) A CUT NARROWS THE PORT, NEVER AN EXTENSION POINT.** Where a kit ships a consumer-facing
-  plugin or config seam, that seam's resolution, direct execution and env contract survive and only
-  the bundled members move in-crate; the ground is the porting kit's OWN governed surfaces plus
-  CLAUDE.md §The provenance seam, never analogy — worked at drift-kit/SPEC.md §The extensibility
-  contract. **(2) SETTINGS GRANTS, RULED 2026-08-29 (operator, lead-relay):** removing a permission
-  grant whose target a RULED PORT CUT DELETES is OUTSIDE the 2026-08-22 bar — a pure narrowing
-  forced by the cut — and build removes the dead lines IN THE SAME COMMIT AS THE DELETE, the window
-  the requirement exists to close. The bar stands unchanged for every other permission-settings
-  edit: a carve-out for one class. Scope is the files THAT COMMIT deletes, never a path prefix —
-  probe the count, never assume it, the attested probe having quadrupled one kit's.
+  only `--tree` is the predicate, both are run; that misreading and the bounds are §port-blockers'.
+  **THE COMPOSER IS RULED 2026-08-28: select the next cut by STATED CONTRACT** — the owed files
+  behind one specification section, ported behind the one amendment that section needs; size- and
+  kit-ordered composers stay refused. **IT CONSTRAINS SELECTION, NOT ITERATION PACKAGING, 2026-08-30
+  (operator, lead-relay):** those clauses make ONE cut well-formed; how many an iteration holds is
+  owned elsewhere. Refused with it — three cohorts as ONE cut (failing *one* section / *the one*
+  amendment, and averaging grounds all three entries forbid, shared setup being logistics); and one
+  cut per iteration, an over-read paying three iteration floors for no added decision quality.
+  **(1) A CUT NARROWS THE PORT, NEVER AN EXTENSION POINT** — a consumer-facing plugin or config
+  seam keeps its resolution, direct execution and env contract, only bundled members move in-crate;
+  ground and worked case at drift-kit/SPEC.md §The extensibility contract, never analogy.
+  **(2) SETTINGS GRANTS, RULED 2026-08-29 (operator, lead-relay):** removing a grant whose target a
+  RULED PORT CUT DELETES is OUTSIDE the 2026-08-22 bar — a pure narrowing — and build drops the dead
+  lines IN THE SAME COMMIT AS THE DELETE. Scope is the files THAT COMMIT deletes, never a path
+  prefix — probe the count, one kit's quadrupled. **WIDENED 2026-09-05 (operator, in-session prompt,
+  lead-relayed): build EDITS `.claude/settings.json` ITSELF, in-cut, NO confirmation, no out-of-band
+  step** — scoped to DECOMMISSIONING BASH GATES, never a licence over that file; every settings edit
+  outside that scope stays operator-class under 2026-08-22.
   **(3) A SECTION IS A CUT'S OUTER BOUND, NOT ITS MINIMUM; (4) A CONSUMER PLUGIN ON A SEAM IS OWED
   — ruling (1) reaches the seam alone, both 2026-09-03 (operator, lead-relay); (5) SIZING FILLS
   WITHIN THAT BOUND, 2026-09-04 (lead) — singletons under-fill lawfully, no host minted, widths stay
   per-cut, size arm permanently spent — gate-sdk/SPEC.md §Porting a gate to the binary substrate.**
   **(6) PORT-CRITICAL UNITS RIDE THE RUN, 2026-09-05 (operator, consult)** — an entry whose
-  discharge is an owed file's stated precondition rides inside the cut it unblocks, or is its own
-  iteration only when it cannot fit; TRAJECTORY.md §PRIORITY DIRECTIVE owns the test.
+  discharge is an owed file's stated precondition rides inside that cut, else is its own iteration
+  (TRAJECTORY.md §PRIORITY DIRECTIVE). **(7) A TAXING MEMBER ORDERS INSIDE THE BUDGET ARM, NEVER
+  THE BLOCKER-RETIRING OVERRIDE, AND THAT ARM'S PRECONDITION IS A `--group` VERDICT THE COMPOSING
+  STAGE RUNS, 2026-09-05 (lead)** — both owned by gate-sdk/SPEC.md §The first cohort.
   ruled: native-gate-port-remaining-corpus lead 2026-08-28 2026-08-29 2026-08-31 own-authority
   ruled: native-gate-port-remaining-corpus operator 2026-08-28 2026-08-29 2026-08-30 lead-relay
-  ruled: native-gate-port-remaining-corpus operator 2026-09-03 lead-relay
-  **Cost while deferred:** large and known — the **owed** remainder (the trailer's own arm, never
-  the unported count) plus the runners and the install-lifecycle layer; criterion relaxation is
-  closed at gate-sdk/SPEC.md §The port-candidate criteria; `gate-battery-result-cache` unsubsumed.
-  **NO YIELD AT ALL until `--tree` reads zero owed — the port-only run, ruled 2026-08-31
+  ruled: native-gate-port-remaining-corpus operator 2026-09-03 2026-09-05 lead-relay
+  **Cost while deferred:** large and known — the **owed** remainder, the runners, the install-
+  lifecycle layer; relaxation is closed at §The port-candidate criteria, `gate-battery-result-cache`
+  unsubsumed. **NO YIELD AT ALL until `--tree` reads zero owed — the port-only run, ruled 2026-08-31
   (operator, consult); TRAJECTORY.md §PRIORITY DIRECTIVE owns it**, subsuming the four-yield rule.
   ruled: native-gate-port-remaining-corpus operator 2026-08-31 2026-09-05 consult
   ruled: native-gate-port-remaining-corpus lead 2026-09-01 2026-09-03 2026-09-04 own-authority
+  ruled: native-gate-port-remaining-corpus lead 2026-09-05 own-authority
   Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close; cohorts ruled at scope 2026-08-11/12.
 
 - **kit-knob-consumer-adapter-convention** [design-pending] — whether a kit may ship
@@ -7139,6 +7139,17 @@
   pre-flight roster re-points to it and `scripts/gate-exec.sh` leaves the tree —
   evidence-kit/SPEC.md §check-evidence-manifest owns it. Answered; the grant on the deleted
   path drops with the cut under ruling (2).
+  **THE RE-POINT'S REACH IS NINE ENTRIES, NOT TWO GRANTS — ruled 2026-09-05 (lead), probed.**
+  `scripts/lifecycle-config.sh:16-24` routes NINE `LIFECYCLE_KIT_ENTRY_PREFLIGHT` entries through
+  the deleted path — one `check-evidence-manifest`, eight `check-producer-liveness` — and
+  `scripts/producer-liveness-reader.sh` execs it too. The binding constraint is that file's own
+  `# spec:` at line 14: `--enter-stage` execs the configured argv **with no interpreter word**, so
+  a `.gate` descriptor cannot serve and the replacement stays executable and directly exec-able.
+  **The settings grants are NOT out-of-band; reading them as operator-class was the error corrected
+  here.** Ruling (2) on `native-gate-port-remaining-corpus` puts a grant whose target a ruled cut
+  DELETES outside the 2026-08-22 bar and obliges build to drop the dead lines IN THE SAME COMMIT AS
+  THE DELETE — that class exactly, so delta 3 has no out-of-band step; probe the count, per (2).
+  ruled: single-gate-front-end-form-unruled lead 2026-09-05 own-authority
   ruled: single-gate-front-end-form-unruled operator 2026-09-05 consult
   Filed 2026-08-24 to the gap inbox by `shell-gate-tail-port-and-completion-oracle`'s close, from
   its prompt-friction triage; promoted 2026-08-24 at that iteration's scope intake; three carried
@@ -9813,6 +9824,14 @@
   grant in place and records the one-line grant diff HERE; the operator applies it out of band
   and the shell path works until then. The 2026-08-22 bar is untouched — TRAJECTORY.md §The
   closed rulings.
+  **NOT CARRIED BY `front-end-stub-and-gate-caller-cuts`, not even as a droppable stretch — ruled
+  2026-09-05 (lead, own-authority); it is the NEXT cut's.** Two grounds. The cut is already at the
+  top of the measured 350-650 build window before its own understatement is priced (17 arms of
+  dispatch the owed column cannot show), so 50 more owed lines widen a cut whose true width is
+  unmeasured. And "droppable" is cheap to not-take and dear to drop: a drop at build discards
+  spec's authored delta and align's audit of it, and the out-of-band grant above makes this the
+  member most likely to be dropped. Build having room is not licence to add.
+  ruled: scratch-run-port-blocker-unrecorded lead 2026-09-05 own-authority
   ruled: scratch-run-port-blocker-unrecorded operator 2026-09-05 consult
   Filed 2026-09-04 to the gap inbox at scope; promoted 2026-09-05 by close.
 
@@ -9886,6 +9905,10 @@
   →fix failed on the recorded refusal above; →icebox failed on the live per-port trigger.
   **PORT-CRITICAL, INSIDE-THE-CUT SHAPE — RULED 2026-09-05 (operator, consult):** the strip
   lands inside the next cut that ports a child-spawning arm, TRAJECTORY.md §PRIORITY DIRECTIVE.
+  **IT DOES NOT RIDE `front-end-stub-and-gate-caller-cuts` — ruled 2026-09-05 (lead), probed.** That
+  cut ports no child-spawning arm: the spawn site is in-crate already at `run_validate.rs:346`, and
+  the front-end's shell loop RETIRES rather than porting — a retirement is no port. Stays deferred.
+  ruled: run-validate-child-env-knob-leak lead 2026-09-05 own-authority
   ruled: run-validate-child-env-knob-leak operator 2026-09-05 consult
   Filed 2026-09-05 to the gap inbox at validate and amended there the same day; promoted
   2026-09-05 by close.
