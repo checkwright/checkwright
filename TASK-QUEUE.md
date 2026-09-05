@@ -40,89 +40,6 @@
   as a whole, twenty-five lines above the corollary recording the correction.
   Filed 2026-09-05 by spec, fourth of the four per-cut units.
 
-- **kit-spec-provenance-seam-sweep** [spec: SPEC-seam-sweep.md]
-  [precondition-ok: carve-out-replaces-the-blocker] — kit SPECs ride the installer payload and the
-  public site whole, yet carry this project's ruling provenance, which resolves to nothing in a
-  consumer tree and reads there as mechanism.
-  **THE 2026-09-03 MEASURE IS STALE BY A FACTOR OF THREE — re-measured 2026-09-05 at scope and
-  corrected here, not left for the next session to re-buy.** It read 37 stamps and 50 TRAJECTORY.md
-  pointers across SIX kit SPECs; a wider pattern reads **246 candidate lines across ELEVEN**:
-  gate-sdk 157, lifecycle-kit 30, delegation-kit 18, queue-kit 16, guard-kit 6, canon-kit 6,
-  doctrine-kit 3, context-kit 3, drift-kit 3, site-kit 2, evidence-kit 2. A second, cruder pattern
-  in the lead session agreed on shape if not digits. **gate-sdk alone is 64 % of the class**, which
-  is where the split below cuts.
-  **THAT PREDICATE IS ITSELF DISCREDITED — censused whole at spec 2026-09-05 and corrected here.**
-  `grep -icE 'ruled|operator ruling|TRAJECTORY.md'` matches ordinary engineering prose far more
-  often than a stamp and misses every stamp spelled without the word ("Ratified by the operator").
-  Over gate-sdk the defensible union of dated authority stamps and TRAJECTORY.md pointers is
-  **≈87-92 SITES**, and the LINES a literal sweep touches is **≈300-400** — twice the 157, because
-  157 measured neither quantity. The class also has a subclass the predicate cannot see:
-  AUTHORITY-ATTRIBUTED BUT UNDATED (`:5556`, `:6619`, `:6777`); the date was never what made it
-  provenance. **The remainder's ~89 rests on the same discredited predicate and needs its own
-  measure** — stated on that entry, not left to be inherited.
-  **The deliverable after the split is two-part** — the gate is the remainder's: strip each site to
-  the undated rule with its engineering grounds, and MOVE to TRAJECTORY.md any grounds not already
-  there, so nothing is lost rather than relocated.
-  **THE DISCRIMINATOR IS RULED and it reconciles two owner docs that appeared to disagree**
-  (`SPEC-seam-sweep.md` delta 1). CLAUDE.md's seam bars "a refused alternative's grounds"; canon-kit
-  §Merging an amendment step 2 makes the spec's prose design rationale's PERMANENT home. They
-  reconcile on ATTRIBUTION: the seam decides the VOICE, never the content — a ground carried with
-  an authority, a date, a channel or an internal identifier is swept to the impersonal form, and
-  an undated engineering ground naming none of those STAYS. Corollary that bounds the unit:
-  undated narrative naming an identifier a consumer cannot resolve (a cohort slug, a numbered
-  batch, a queue slug) IS swept, on the same pointer-a-consumer-cannot-follow ground.
-  **MOVE-VERSUS-DELETE is TRAJECTORY.md's own, :52-55** — "a ruling whose subject is finished is
-  deleted outright", so a spent cohort-selection stamp is DELETED, never migrated into a file whose
-  own doctrine forbids keeping finished rulings. Applied per site.
-  **A DATED MEASUREMENT IS NOT SWEPT.** A frozen attestation a reader is told not to refresh loses
-  its freeze if the date goes, which would be a defect the sweep INTRODUCED.
-  **ONE SECTION IS CARVED OUT — ruled `lead, own-authority 2026-09-05` on an escalation from
-  spec, and the carve-out STANDS.** TRAJECTORY.md:118-130 positively ASSIGNS ownership of two
-  closed rulings to gate-sdk/SPEC.md §The decisions this substrate already closed ("which owns
-  them because the component that depends on them must be readable alone"), and that section
-  states the arrangement from the other side. Sweeping it reverses a recorded ruling, which is
-  operator-class however well-grounded. **The ruling's ground is that a recorded ruling stands
-  by default, so declining to reverse is the ANSWER and not a deferral of one**; it was not
-  taken to the operator because nothing in the finding argues for spending their
-  reconsideration. The real fix is TRAJECTORY.md's RECORDING RULE, filed as
-  `provenance-ownership-recording-rule-assigns-into-kit-specs` and not started.
-  **How the class arrived, recorded so the fix aims at its cause.** TRAJECTORY.md's recording rule
-  sends a ruling with a canonical home to that home by pointer, and sessions read that as licence to
-  write the ruling INTO the kit SPEC with its date and refusals — so the SPEC became the ruling's
-  home and TRAJECTORY.md the index, while the seam's content classes named vocabulary and never
-  provenance, and no gate held it.
-  **THE COHORT-LABEL QUESTION IS ANSWERED — the labels RETIRE and the roster becomes a plain
-  enumeration** (`SPEC-seam-sweep.md` delta 4, ruled on CLAUDE.md's own words: the seam names the
-  class "this project's provenance" first and three instances of it after, so the list is
-  instances and not a closure). Three measurements settled it rather than argument: nine
-  foundational members and six `Arm::Run` members carry NO date, so the labelling was never
-  systematic; one label reads `its 2026-09-04 one` while grouping TWO members; and the roster
-  enumerates cleanly grouped by owning kit, which is the grouping every other sentence uses. The
-  carve-out alternative is refused — it would have to say why a landing date is mechanism here
-  and provenance everywhere else. This iteration's four port cuts add their members UNDATED for
-  the same reason. Its consequence for the gate's
-  fixture pair is the remainder's.
-  **The drift-kit and guard-kit sites accreted 2026-09-05, are the SOLE home of two rulings
-  TRAJECTORY.md retired as spent, and are the REMAINDER's** — recorded here only so the split does
-  not read as having lost them.
-  **Cost while deferred:** every published kit SPEC and every adopter's vendored copy carries
-  private ruling history as mechanism, and pointers a consumer cannot follow — payload-facing and
-  front-door, so product-class outright, and accreting at two new sites in one iteration.
-  **DIRECTED 2026-09-05 (operator, consult) AS THE NEXT ITERATION'S JOINED UNIT beside the
-  test-harness cut** — same-surface and product-class under the port-first run; scope sizes it.
-  **SPLIT AT THE gate-sdk BOUNDARY, ruled 2026-09-05 `lead, own-authority` on the re-measure
-  above**, exercising the permission the directive itself grants ("scope sizes it against the
-  window and may split it by kit"), so it re-scopes nothing. THIS ENTRY IS NOW gate-sdk/SPEC.md
-  ONLY — 157 of the 246 lines, one SPEC and one docs mirror rather than eleven of each. **The
-  remaining ten SPECs and THE GATE are `kit-spec-provenance-seam-sweep-remainder`**, filed with
-  this ruling so the split's other half has an owner rather than living in a journal.
-  **CONSEQUENCE, stated because it looks routine and is not:** the directive paragraph at
-  TRAJECTORY.md discharges on "that unit lands AND THE GATE IS GREEN". Under the split the gate
-  lands with the remainder, so the discharge does NOT fire this iteration and that paragraph is
-  NOT deleted at this close.
-  Surfaced 2026-09-03 in the consult that closed the provenance-seam ruling; drained here; the third
-  shape above added 2026-09-04 at the scan-prompts-cut close drain.
-
 - **lead-tier-split-premise-unamended** [spec: SPEC-lead-tier-split.md]
   — `lifecycle-kit/templates/lead.md`
   §Economics rests its *Split the lead where the tail dominates* bullet on a premise TWELVE
@@ -10024,5 +9941,6 @@
 - gate-tests-runner-port-cut
 - test-hermetic-port-cut
 - hermetic-bin-suffix-pin-placement
+- kit-spec-provenance-seam-sweep
 
 ## Lessons Learned
