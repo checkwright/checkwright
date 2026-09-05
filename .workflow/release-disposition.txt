@@ -1,4 +1,3 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
-front-end-stub-and-gate-caller-cuts release deferred:v0.26.0 — bump re-derived minor (the liveness hook default-reader behavior change plus the --only sole-name widening make a declaration section non-empty), no major (check-deprecation-task green; the two deleted shell files are this repo consumer config, never in the packed payload); no cadence trigger fired: elapsed-time dormant under channel preview per the 2026-08-31 operator ruling, no security or supply-chain fix in the batch, no operator direction, and the launch readiness gate is unmet
