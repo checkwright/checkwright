@@ -194,8 +194,23 @@ fn parse_wants(spec: &str) -> Result<guard::Wants, String> {
 // owes for the three twinned primitives: this module's classification of one canned corpus,
 // reported as classification and never as an internal representation, `--queue-parity`'s own rule.
 fn guard_lib_parity(args: &[String]) -> i32 {
-    let usage = "  usage: checkwright-gates --guard-lib-parity split <cmd>... | --guard-lib-parity skeleton <wants> <cmd>... | --guard-lib-parity redirect <cmd>...";
+    let usage = "  usage: checkwright-gates --guard-lib-parity split <cmd>... | --guard-lib-parity skeleton <wants> <cmd>... | --guard-lib-parity redirect <cmd>... | --guard-lib-parity allow-match <string> <glob>...";
     match args.first().map(String::as_str) {
+        // spec: guard-kit/SPEC.md §The guard framework — `guard_allow_match`'s twin, reported as
+        // classification over (string, glob) pairs. The shell holder cannot empty: rule 20 calls it
+        // from inside the same permanently-shell file, so this is criterion 6's *unless* clause.
+        Some("allow-match") => {
+            let mut rest = args[1..].iter();
+            let Some(s) = rest.next() else {
+                eprintln!("checkwright-gates: --guard-lib-parity allow-match needs a string and at least one glob — the classification could not be reported; treating as failure (not clean)");
+                eprintln!("{}", usage);
+                return 2;
+            };
+            for glob in rest {
+                println!("allow-match\t{}\t{}\t{}", s, glob, guard::allow_match(s, glob));
+            }
+            0
+        }
         Some("split") => {
             for c in &args[1..] {
                 for (i, seg) in guard::split_compound(c).iter().enumerate() {

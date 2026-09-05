@@ -78,6 +78,19 @@ trap 'rm -f "$cfg" "$shadowcfg"; rm -rf "$shadowdir"' EXIT
 check always-loaded "$EXPECTED/always-loaded.txt" \
     env "CONTEXT_KIT_CONFIG_FILE=$cfg" bash "$BIN/always-loaded.sh"
 
+# spec: context-kit/SPEC.md §The always-loaded meter — the mode operand is drawn from a closed set and one outside it is refused: no golden holds this, because the assertion is the exit status and the stream the usage went to, not a document. A typo of --update-baseline that fell through to the bare reading would print an ordinary meter line at exit 0 while writing no baseline at all
+if [[ "$UPDATE" -eq 0 ]]; then
+    refusal="$(env "CONTEXT_KIT_CONFIG_FILE=$cfg" bash "$RUN_GATES" --emit always-loaded --growht 2>&1 >/dev/null)"
+    rrc=$?
+    stray="$(env "CONTEXT_KIT_CONFIG_FILE=$cfg" bash "$RUN_GATES" --emit always-loaded --growht 2>/dev/null)"
+    if [[ "$rrc" -eq 2 && "$refusal" == *"usage:"* && "$refusal" == *"--growht"* && -z "$stray" ]]; then
+        pass=$((pass + 1))
+    else
+        echo "  FAIL: always-loaded-refusal — expected exit 2 with the usage block on stderr and nothing on stdout; got exit $rrc, stderr: $refusal, stdout: $stray"
+        fail=$((fail + 1))
+    fi
+fi
+
 echo
 if [[ "$UPDATE" -eq 1 ]]; then
     echo "INDEX-TESTS: goldens rewritten"
@@ -88,8 +101,8 @@ if [[ "$harness" -gt 0 ]]; then
     exit 2
 fi
 if [[ "$fail" -gt 0 ]]; then
-    echo "INDEX-TESTS: $fail of $((pass + fail)) tool(s) differ from golden"
+    echo "INDEX-TESTS: $fail of $((pass + fail)) check(s) failed"
     exit 1
 fi
-echo "INDEX-TESTS: clean ($pass tools match golden)"
+echo "INDEX-TESTS: clean ($pass checks: the goldens match and the meter refuses an unrecognized mode)"
 exit 0

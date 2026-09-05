@@ -143,7 +143,11 @@ Primitives a consumer guard composes; each emits the harness's
   idiom (`Bash(printf:*)` ≡ any `printf …`) normalized to a trailing `*`. Not a
   hook primitive — a shared helper, one implementation behind
   compare-settings-allow's redundancy detection and rule 20's silent-grant
-  guard so the two never drift.
+  guard so the two never drift. It carries a **compiled twin**, `guard::allow_match`
+  in `native/src/guard.rs`, which is the crate's single holder: both compiled members
+  that compute this predicate — the `scan-prompts` ranker's grant test and the
+  `compare-settings-allow` arm — call it and neither spells it inline, so an edit
+  cannot change one member's verdicts while the other's stay right.
 - `guard_skeleton <cmd> <inert-class>…` — the context-aware normalizer, and the
   only place a rule learns what part of a command is live. It returns the command
   with every region of the named inert classes replaced by a placeholder token,
@@ -188,9 +192,10 @@ Primitives a consumer guard composes; each emits the harness's
   every consumer reads lines, so a newline already present in the input is
   already a boundary before the substitution runs.
 
-**Three of these primitives are held twice, and a machine holds them equal.**
+**Four of these primitives are held twice, and a machine holds them equal.**
 `guard_split_compound`, `guard_skeleton` and `_guard_redirect_pairs` — the set
-`bin/`'s prompt ranker is composed from — each carry a compiled twin in the gate
+`bin/`'s prompt ranker is composed from — and `guard_allow_match`, the settings-allow
+match core, each carry a compiled twin in the gate
 binary, while this library itself stays shell. That is admissible only because
 the duplication is machine-held, which is the *unless* clause of gate-sdk's
 port-candidate criterion 6, and the machine is
@@ -200,17 +205,29 @@ committed expected file, since a maintained golden would be a third copy to
 drift and the failure it exists to catch is one side edited without the other.
 The compiled side answers through `--guard-lib-parity <mode> <arg>...`, one mode
 per twinned predicate. The library's two `no-port` grounds do not reach the
-three: none of them resolves a knob — each is a pure function of its arguments —
-and the third is an `_`-prefixed internal helper rather than the documented
+four: none of them resolves a knob — each is a pure function of its arguments —
+and `_guard_redirect_pairs` is an `_`-prefixed internal helper rather than the
+documented
 `guard_*` surface a consumer composes rules from, so it is specified with the
 ranker that calls it (§scan-prompts) rather than in the roster above.
 
+**`allow-match`'s corpus is scoped to the shapes a permission rule can carry**,
+rather than to arbitrary globs, and it is a cross product of strings against globs
+rather than paired cases: the harness `:*` idiom in both positions — rewritten in
+the glob, left literal in the string — a bare trailing `*`, an interior `*`, a `?`,
+bracket classes plain, negated and ranged, and literals with no metacharacter at
+all, the last because a rule string is compared as a pattern and a consumer's
+literal must not acquire one.
+
 **The duplication is permanent rather than transitional**, which is what makes
 the machine-held disposition the right one instead of a concession: the shell
-caller set for the three cannot empty, their live callers being rules
-8/12/14/15/17/18/19/20/22 and the read-compound carve-out of rules 9/10, which
-are themselves functions in this same permanently-shell file. So the comparator
+caller set for the four cannot empty. For the first three the live callers are rules
+8/12/14/15/17/18/19/20/22 and the read-compound carve-out of rules 9/10; for
+`guard_allow_match` it is rule 20's silent-grant guard — and all of them are
+functions in this same permanently-shell file. So the comparator
 does not retire either, and the arm it answers on is durable by construction.
+This is what distinguishes these four modes from `--declaration-parity`, retired
+when its second holder went.
 
 **Placeholder, never deletion, and this is a correctness point rather than
 taste.** Deleting an inert span **fuses adjacent tokens**: a pattern glued to its
@@ -1712,7 +1729,61 @@ mutates (the operator prunes). It is the detector, not the policy: a
 non-redundant local entry can still be one-off junk worth pruning by
 judgment.
 
-The tool asks a **second question over the same two files**: which local entries
+**The advisory is the `--emit-compare-settings-allow` bridged arm, and both halves
+of that are forced rather than chosen.** It is a **table member** on the
+forced-family test at its sharpest, the shape `--emit-scan-prompts` already holds:
+all four declared knobs — `GUARD_KIT_SETTINGS`, `GUARD_KIT_SETTINGS_LOCAL`,
+`GUARD_KIT_BREADTH_PROBES` and `GUARD_KIT_BREADTH_DECLARED` — are defined and
+defaulted in `lib/guard.sh`, the bridge's sole resolver for them, so a hardcoded
+top-level flag would resolve not a stale default but **no input path at all** and
+the arm would be unable to name the two files it compares. The same fact makes the
+member unresolvable in a tree that does not vendor guard-kit, which is a refusal
+with a message rather than a defect. It is an **`Arm::Emit`** because every report
+path already returns 0 — the no-overlay path, the empty-probe-set path and every
+path that finds candidates, this being an advisory that never renders a verdict —
+and the one non-zero path is the operand refusal at exit 2, so the `{0, 2}`
+collapse discards nothing the member carried. **`--count` does not make it an
+`Arm::Run`**: that mode answers two integers on stdout, which is
+`--emit-queue-index extent`'s reading of the family — a member may be a *query*
+tool rather than a generator — and its status carries no distinction the collapse
+would lose.
+
+**Two of the four knobs are arrays and neither needs new mechanism.**
+`GUARD_KIT_BREADTH_PROBES` is an indexed array and `GUARD_KIT_BREADTH_DECLARED` an
+associative one; the bridge derives the scalar/keyed arm from `declare -p` and the
+crate reads them as a list and a map respectively. The keyed knob is the one worth
+naming: the bridge's family arm takes the scalar arm's associative branch, because
+a value-only crossing destroys the keys — and this member's whole declaration
+contract is the **key**, so such a crossing would silence nothing and report
+nothing while passing every element-shape check.
+
+**The member spawns no external program at all — an empty set, the first in its
+class.** Both allow lists are read in-crate rather than through `jq`, which is
+what keeps an unreadable allowlist from reading as an empty one on a machine that
+merely lacks a tool. The scope of that claim is this member, not the kit: rule 20
+still runs `jq` for its own allowlist read, so guard-kit's floor is unchanged.
+
+**The read distinguishes unreadable from absent, and that is a deliberate
+behaviour change.** An **absent** file is honestly zero entries, as before. An
+unparseable or unreadable **local overlay** takes the existing no-overlay path —
+the header and `no <path> — nothing to compare`, or `0 0` under `--count` — because
+an unreadable overlay is not an overlay that grants nothing. An unparseable
+**committed** file is a **refusal** with the path named, exit 2: reading it as
+empty would print *no redundant local entries*, a clean line the document does not
+support, over every local entry a committed glob may already grant.
+
+**An operand outside the closed set is refused, and its usage lives here.** The
+one operand is `--count`; anything else prints
+`usage: --emit compare-settings-allow [--count]` on stderr at exit 2, `--help`
+included. An `--emit-` member gets no front-end `case` arm — `--emit <name>`
+composes its flag, which is also why the spelling is forced — so it has no named
+help line to retire to, and the usage lives at the member's own shape refusal
+(gate-sdk/SPEC.md §The bin/-tool contract). The member is not a *reader instance*
+of that contract and does not claim to be: its one operand is drawn from a closed
+set, so validating membership already validates shape and the free-text trigger
+never fires.
+
+The advisory asks a **second question over the same two files**: which local entries
 are *too broad*. Redundancy asks whether a committed glob already grants a local
 entry; breadth asks whether a local glob would auto-allow a command the consumer
 called bad. Both are one call to `guard_allow_match` — the breadth question
@@ -1908,7 +1979,7 @@ guard-kit/
   gate-tests/compare-settings-allow.test.sh  # bespoke unit test, run by gate-sdk's runner
   gate-tests/git-mutation-under-producer.test.sh  # bespoke unit test, run by gate-sdk's runner
   gate-tests/guard-read-path.test.sh  # bespoke unit test, run by gate-sdk's runner
-  gate-tests/guard-lib-parity.test.sh # holds lib/guard.sh's three twinned primitives to their compiled counterparts
+  gate-tests/guard-lib-parity.test.sh # holds lib/guard.sh's four twinned primitives to their compiled counterparts
   templates/bash-guard.sh   # consumer copy: generic rules on, marked
                             #   consumer-rules section
   templates/guard-config.sh
@@ -2208,9 +2279,32 @@ reason and **not** in the narrowing set; an all-declared over-broad set printing
 the declared section, no narrowing section and no false clean line; `--count`'s
 breadth number excluding the declared entry; and an exactness case — a declaration
 differing from the local entry by one character leaves that entry in the narrowing
-set, which is the assertion that the lookup never became a glob match. It drives the tool through
-`GUARD_KIT_CONFIG_FILE` pointed at a sandbox config, so the consumer's own probe
-array cannot leak into the fixture.
+set, which is the assertion that the lookup never became a glob match. It drives the arm
+through the battery runner's `--emit` front-end, with `GUARD_KIT_CONFIG_FILE` pointed
+at a sandbox config and `GUARD_KIT_SETTINGS`/`GUARD_KIT_SETTINGS_LOCAL` set in the
+environment beside it, so the consumer's own probe array cannot leak into the fixture:
+a config-file selector is read by the bridge *before* it sources the owning kit's
+library rather than arriving after resolution.
+
+**It carries no `jq` precondition, and that is the mirror image of the one
+`--run-guard-tests` keeps.** That refusal stands because its subject spawns `jq`;
+this subject spawns none — the arm reads both allow lists in-crate and the sandbox
+JSON is written with `printf` — so a precondition here would refuse a runnable suite
+on a machine that needs the tool for nothing this suite does, which is a false
+dividend in the other direction.
+
+**The unit/seam split `--scratch-run` and the kfric port took is refused here, on the
+split's own discriminator.** That split moved pure functions over inputs into
+`#[cfg(test)]` tests and kept at the seam the cases that need the front end, the
+bridge and a real child process. Every case in this suite is the second kind: each
+asserts the *report* rendered from four knobs a sandbox config supplies, and the two
+that look like unit cases are not — the exactness case asserts that the declaration
+lookup never became a glob match, which is only observable as an entry staying in the
+narrowing section, and `--count`'s breadth number excluding a declared entry is a
+property of the partition as rendered. Nothing is left over to move, so the split
+would produce an empty half. The one predicate that *is* a pure function is
+`guard_allow_match`, and it moves instead to the parity harness below, where its
+second holder is what makes it worth pinning.
 
 A shipped tool that is not a hook takes neither lane, and the `--scratch-run`
 arm (§scratch-run) **splits** on the kfric port's precedent. Its **seam** cases
@@ -2251,7 +2345,7 @@ a command a `cases.tsv` row can carry.
 `gate-tests/guard-lib-parity.test.sh` takes the same lane on a third structural
 ground: it asserts nothing about *one* implementation's decision, so no
 `decision <TAB> command` row could express it. It compares **two**
-implementations of the three twinned primitives over one canned corpus (§The
+implementations of the four twinned primitives over one canned corpus each (§The
 guard framework), which is why it is a separate file from `scan-prompts.test.sh`
 rather than cases added to it — that suite asserts one implementation's *output
 shape*, and the two questions do not share an oracle. It does not retire, because

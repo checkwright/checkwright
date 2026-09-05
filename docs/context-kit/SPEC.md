@@ -599,7 +599,7 @@ nothing unbidden.
 
 ## The always-loaded meter
 
-`bin/always-loaded.sh` measures the standing surface: the summed line
+The meter measures the standing surface: the summed line
 count of the configured surface files (default `CLAUDE.md`) plus the
 steady-state hook body, approximated by the configured hook-body command
 (default: queue-kit's `queue-index` arm through the battery runner's `--emit`
@@ -609,15 +609,64 @@ so self-measurement would recurse and inflate.
 
 The meter lives here, not in drift-kit's collator, because the *metric* is
 context economics and the *report* is drift reporting — drift-kit's
-`kpi-always-loaded` consumes this script for its row instead of re-embedding
-the measurement.
+`kpi-always-loaded` consumes this measurement for its row instead of re-embedding
+it.
+
+**It is the `--emit-always-loaded` bridged arm, and both halves of that are forced
+rather than chosen.** It is a **table member** because it resolves four consumer
+knobs — `CONTEXT_KIT_SURFACES`, `CONTEXT_KIT_HOOK_CMD`, `CONTEXT_KIT_BASELINE_FILE`
+and `CONTEXT_KIT_GROWTH_PATHS` — which a hardcoded top-level flag would receive none
+of, the difference between working and appearing to. `GATE_SDK_WORKFLOW_DIR` and
+`GATE_SDK_GATES_DIR` are deliberately **not** declared: §lib/context.sh already rides
+them into the baseline path's and the hook command's own resolved values, so
+declaring either would resolve one fact twice. It is an **`Arm::Emit`** because the
+whole failure grammar is already that variant's collapse — every mode returns 0 and
+the one non-zero path is exit 2 — so `{0, 2}` discards nothing the member carried;
+`--emit-usage-trend` is the sibling admitted on exactly that ground.
+
+**The measurement is a library function the arm wraps, not the arm itself** —
+§bin/footprint's split, and this is its second instance in the kit. The function
+returns the figures (surface total, hook total, the combined total, and the baseline
+row's total and commit where one resolves); the arm renders the three modes over
+them, and `kpi-always-loaded` reads the same figures in process. That is what ended
+the undeclared cross-kit output contract the KPI used to keep, parsing the rendered
+line back apart for a leading total and a marked delta.
+
+**The three modes arrive as operands, never composed into the flag** —
+`--emit always-loaded`, `--emit always-loaded --growth`,
+`--emit always-loaded --update-baseline` — the shape `--hook` and `--wait-probe`
+already carry for their own subcommand words. Composing three flag spellings is
+refused for the reason that shape exists: three spellings would be three rows
+publishing one knob roster, and the front-end's grammar would carry a second copy of
+a decision the bridged-arm table already holds.
+
+**An operand outside that closed set is a refusal**: usage on stderr, exit 2,
+`--help` included. The ground is the harm rather than an argument-shape rule —
+`--update-baseline` is a **close-stage act**, and a silent fall-through to the bare
+reading prints an ordinary-looking meter line at exit 0 while writing no baseline at
+all, after which the session commits a close whose baseline was never rewritten and
+the next iteration's brevity pass reacts to a delta measured from the wrong commit. A
+refusal is what makes that state unreachable, and there is no third disposition
+available to an operand dispatch.
+
+**The hook body stays spawned, through `bash -c`, and calling `queue-index`
+in-process is refused.** The knob is a **command seam**, not an implementation
+detail: its whole contract is that a consumer names *their* hook body, and the
+default merely happens to name this project's own arm. An in-process shortcut would
+measure the wrong thing for every consumer whose hook body is not queue-kit's,
+silently and at exit 0 — and the committed witness is exactly such a consumer, the
+index-test case driving this member with `CONTEXT_KIT_HOOK_CMD="cat <file>"`, which a
+port that special-cased the default would keep green while breaking the seam the
+golden exists to prove.
 
 - **Default invocation** prints one line: total, per-part breakdown, and
   the delta against the baseline when one exists.
 - **`--update-baseline`** rewrites the baseline file — a close-stage act,
   because the brevity pass reacts to the *delta*, not the level (close is
   net-additive by design; only growth since the iteration started is
-  actionable).
+  actionable). The write is checked and a failure names the path at exit 2, the
+  refusal shape gate-sdk/SPEC.md §The non-gate arm rules for this class: a
+  confirmation line reporting a rewrite that did not happen is worse than none.
 - **`--growth`** prints the brevity pass's other worklist: a header with the
   count of files that grew and their net lines, then one row per governed
   prose file whose net line growth since the baseline commit is positive,
@@ -684,7 +733,9 @@ across the config bridge before invoking it.
 The emission is a **library function** the arm wraps rather than the arm itself,
 which is what lets §check-footprint-fresh call it in-process and the value
 rollup consume its per-kit figures as data rather than re-parsing the rendered
-page.
+page. That split is the **kit's** shape rather than this member's: §The
+always-loaded meter takes it too, and for the same reason — a sibling reader that
+would otherwise parse a rendered line back apart.
 
 **The advisory bare mode did not survive the port**, and its loss is the ported
 script's deletion rather than a separate decision: the shell emitter printed a
@@ -1187,6 +1238,29 @@ and it is load-bearing rather than tidy — the bridge resolves a declared knob 
 sourcing exactly this library and **exits 2 on a knob it does not define**, so a
 default left beside the compiled reader would refuse the whole arm.
 
+**`CONTEXT_KIT_HOOK_CMD`'s default moved here on the same rule**, out of the meter
+that held it inline, in the same cut that made the meter an arm — the declaration
+and the default are one change, because a default left beside a compiled reader is
+sourced by nothing and resolves *empty*, which the reader takes as an unset knob
+rather than as an error. The failure would be silent. All three of its properties
+moved with it and none was re-derived: the two candidates stay consumer-first
+(`${GATE_SDK_GATES_DIR:-scripts}/run-gates.sh`, then the sibling kit's
+`bin/run-gates.sh`), `-f` stays the resolution predicate, and the empty string
+stays the unresolvable answer — which is what the meter's `hook 0` branch reads
+and what a consumer vendoring context-kit without a battery front-end depends on.
+The test is on **set-ness** (`-z "${CONTEXT_KIT_HOOK_CMD+x}"`), never on
+emptiness: set-but-empty is a deliberate override and is preserved as one.
+
+**The sibling candidate is de-absolutized against the invoking directory before it
+is stored**, and that is the repo-relative rule above binding on it. The bridge
+sources this library by its absolute kit path, so the candidate composed from the
+library's own location resolves absolute — and the rule binds because the value is a
+*bridged* default, which is what a knob becomes as soon as a compiled member declares
+it. The composed path therefore has a leading working-directory prefix stripped where
+one is present, leaving the shape `<kit>/../gate-sdk/bin/run-gates.sh` and only its
+absoluteness behind. A kit vendored outside the invoking tree has no repo-relative
+spelling, and there the absolute answer is the honest one.
+
 - `CONTEXT_KIT_SURFACES` — array of always-loaded files; default
   `("CLAUDE.md")`. The measured surface is agent-file-name-agnostic: a consumer
   whose harness reads `AGENTS.md` (or any other always-loaded agent file) sets
@@ -1215,7 +1289,8 @@ default left beside the compiled reader would refuse the whole arm.
 - `CONTEXT_KIT_HOOK_CMD` — command whose output line count approximates
   the steady-state hook body; default queue-kit's
   `run-gates.sh --emit queue-index --collapse-deferred` when resolvable, else empty
-  (surfaces only).
+  (surfaces only), supplied by §lib/context.sh — the documented default and the
+  supplying site are one string.
 - `CONTEXT_KIT_DRIFT_REPORT` — the **`--emit` arm name** of the consumer's
   drift report, not a path: the hook runs
   `run-gates.sh --emit <name> --trend` for the brief's drift line; default

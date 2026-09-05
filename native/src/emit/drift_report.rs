@@ -17,6 +17,12 @@ pub const KNOBS: &[&str] = &[
     "GUARD_KIT_LOG",
     "GUARD_KIT_SETTINGS",
     "GUARD_KIT_SETTINGS_LOCAL",
+    // spec: drift-kit/SPEC.md §Bundled KPIs — what `kpi-always-loaded` reads in process, which a
+    // spawned child used to resolve for itself; `CONTEXT_KIT_GROWTH_PATHS` is deliberately absent,
+    // the row reading the bare mode only.
+    "CONTEXT_KIT_SURFACES",
+    "CONTEXT_KIT_HOOK_CMD",
+    "CONTEXT_KIT_BASELINE_FILE",
 ];
 
 // spec: drift-kit/SPEC.md §The KPI plugin contract — the two array knobs the wire format cannot

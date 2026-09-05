@@ -99,13 +99,13 @@ fn read_allow(path: &str) -> Vec<String> {
         .unwrap_or_default()
 }
 
-// spec: guard-kit/SPEC.md §scan-prompts — a settings glob is a bash pattern, and `:*` is the
-// harness's own spelling of a trailing wildcard, so it is rewritten before the match rather than
-// matched literally.
+// spec: guard-kit/SPEC.md §scan-prompts — the match core is `guard::allow_match`, spelled nowhere
+// here: this member and `--emit-compare-settings-allow` compute the same predicate, so one holder
+// is what keeps an edit from changing one member's verdicts while the other's stay right.
 fn granted_by(c: &str, pats: &[String]) -> bool {
     pats.iter()
         .filter(|p| !p.is_empty())
-        .any(|p| walk::glob_match(&p.replace(":*", "*"), c))
+        .any(|p| guard::allow_match(c, p))
 }
 
 // spec: guard-kit/SPEC.md §scan-prompts — one segment granted by the committed allowlist, a

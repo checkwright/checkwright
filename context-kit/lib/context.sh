@@ -42,6 +42,22 @@ declare -p CONTEXT_KIT_SURFACES >/dev/null 2>&1 || CONTEXT_KIT_SURFACES=("CLAUDE
 declare -p CONTEXT_KIT_GROWTH_PATHS >/dev/null 2>&1 || CONTEXT_KIT_GROWTH_PATHS=("*.md")
 [[ -v CONTEXT_KIT_BASELINE_FILE ]] || CONTEXT_KIT_BASELINE_FILE="${GATE_SDK_WORKFLOW_DIR:-.workflow}/always-loaded-baseline.txt"
 
+# spec: context-kit/SPEC.md §lib/context.sh — the hook-body command's default: the battery runner's --emit front-end resolved consumer-first over two candidates, the -f existence test as the predicate, and the empty string where neither resolves, which is the meter's hook=0 branch and a consumer vendoring context-kit without a front-end. The test is on set-ness, never on emptiness: set-but-empty is a deliberate override. It lives here rather than beside the compiled reader because the bridge resolves a declared knob by sourcing exactly one kit's library, so a default left with the reader is sourced by nothing and resolves empty — an unset knob rather than an error.
+# spec: context-kit/SPEC.md §lib/context.sh — the sibling candidate is de-absolutized against the invoking directory before it is stored, because the bridge sources this library by its absolute path and the value is a *bridged* default the moment a compiled member declares the knob: the repo-relative rule above binds on it, where it did not bind on the same expression computed inside a shell tool
+if [[ -z "${CONTEXT_KIT_HOOK_CMD+x}" ]]; then
+    CONTEXT_KIT_HOOK_CMD=""
+    _ck_kit="${BASH_SOURCE[0]%/lib/*}"
+    _ck_kit="${_ck_kit#"$PWD"/}"
+    for _ck_qi in "${GATE_SDK_GATES_DIR:-scripts}/run-gates.sh" \
+                  "$_ck_kit/../gate-sdk/bin/run-gates.sh"; do
+        if [[ -f "$_ck_qi" ]]; then
+            CONTEXT_KIT_HOOK_CMD="bash $_ck_qi --emit queue-index --collapse-deferred"
+            break
+        fi
+    done
+    unset _ck_qi _ck_kit
+fi
+
 [[ -v CONTEXT_KIT_ENV_PROFILE_FILE ]] || CONTEXT_KIT_ENV_PROFILE_FILE="ENV.local.md"
 
 # spec: context-kit/SPEC.md §Index-first reading — the kit's one traversal-exclusion set, matched on the leaf basename; the default is the union of the two literals the index tools carried privately plus the worktrees leaf, and .tmp / gate-tests are deliberately absent

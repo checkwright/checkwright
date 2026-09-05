@@ -8,6 +8,13 @@ use crate::ere::{Ere, EreError};
 // vendored, which is how `kpi-prompt-friction` witnesses the kit (drift-kit/SPEC.md §Bundled KPIs).
 pub const LIB: &str = "lib/guard.sh";
 
+// spec: guard-kit/SPEC.md §The guard framework — `guard_allow_match`: `[[ "$s" == ${glob//:\*/\*} ]]`,
+// the settings-allow match core. One compiled holder, because two compiled members now depend on
+// it and an edit to one inline copy would change one member's verdicts while the other's stay right.
+pub fn allow_match(s: &str, glob: &str) -> bool {
+    crate::walk::glob_match(&glob.replace(":*", "*"), s)
+}
+
 // spec: guard-kit/SPEC.md §The guard framework — `guard_split_compound`: one segment per line,
 // split on the harness's statement separators. `||` and `&&` are tested before `|`, which is the
 // leftmost-longest alternation the shell holder's `sed -E` gives for free and a scanner must spell.

@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-# Cross-implementation parity for the three primitives guard-kit holds twice after the
-# scan-prompts cut: `guard_split_compound`, `guard_skeleton` and `_guard_redirect_pairs` in
-# guard-kit/lib/guard.sh, and their compiled counterparts in native/src/guard.rs. The library
+# Cross-implementation parity for the four primitives guard-kit holds twice: `guard_split_compound`,
+# `guard_skeleton` and `_guard_redirect_pairs` after the scan-prompts cut, and `guard_allow_match`
+# after the settings-allow cut — in guard-kit/lib/guard.sh, and their compiled counterparts in
+# native/src/guard.rs. The library
 # is permanently shell on two grounds that reach neither the knob-resolution nor the
 # consumer-surface question for these three, and its shell caller set cannot empty — the rules
 # that call them are functions in the same file — so the duplication is permanent and this is
@@ -87,6 +88,35 @@ CORPUS=(
 # reaches, so agreeing with `sq,dq` over the same corpus is what shows the class inert.
 WANTS=(- sq dq sq,dq sq,dq,hd)
 
+# `guard_allow_match`'s corpus is scoped to the shapes a **permission rule** can carry rather than
+# to arbitrary globs, and it is a cross product rather than paired cases: the harness `:*` idiom in
+# both positions, a bare trailing `*`, an interior `*`, a `?`, bracket classes plain, negated and
+# ranged, and literals with no metacharacter at all — the last because a rule string is compared as
+# a pattern and a consumer's literal must not acquire one.
+ALLOW_STRINGS=(
+    "Bash(git status)"
+    "Bash(git status --short)"
+    "Bash(git statuz)"
+    "Bash(gh repo delete)"
+    "Bash(git:*)"
+    "a"
+    ""
+)
+ALLOW_GLOBS=(
+    "Bash(git status:*)"
+    "Bash(git status)"
+    "Bash(git*)"
+    "Bash(*status*)"
+    "Bash(git statu?)"
+    "Bash(git statu[sz])"
+    "Bash(git statu[!s])"
+    "Bash([a-z]it status)"
+    "Bash(git[:]*)"
+    "*"
+    ":*"
+    "a"
+)
+
 shell_side() {
     (
         # shellcheck source=../lib/guard.sh
@@ -114,18 +144,28 @@ shell_side() {
                 i=$((i + 1))
             done < <(_guard_redirect_pairs "$c")
         done
+        local s g r
+        for s in "${ALLOW_STRINGS[@]}"; do
+            for g in "${ALLOW_GLOBS[@]}"; do
+                if guard_allow_match "$s" "$g"; then r=true; else r=false; fi
+                printf 'allow-match\t%s\t%s\t%s\n' "$s" "$g" "$r"
+            done
+        done
     )
 }
 
 # The compiled side is reached through the same binary a dispatched gate reaches, and the arm
 # reports classification rather than an internal representation — `--queue-parity`'s own rule.
 native_side() {
-    local w
+    local w s
     "$BIN" --guard-lib-parity split "${CORPUS[@]}" || return $?
     for w in "${WANTS[@]}"; do
         "$BIN" --guard-lib-parity skeleton "$w" "${CORPUS[@]}" || return $?
     done
-    "$BIN" --guard-lib-parity redirect "${CORPUS[@]}"
+    "$BIN" --guard-lib-parity redirect "${CORPUS[@]}" || return $?
+    for s in "${ALLOW_STRINGS[@]}"; do
+        "$BIN" --guard-lib-parity allow-match "$s" "${ALLOW_GLOBS[@]}" || return $?
+    done
 }
 
 checks=$((checks + 1))
@@ -168,6 +208,29 @@ have "redirect-descriptorless" "^redirect${T}sort -rn >> out.txt${T}0${T}>> out.
 have "redirect-descriptor"     "^redirect${T}cmd 1>>log 2>&-${T}1${T}2>&-\$"
 have "redirect-fd-dup"         "^redirect${T}cmd 2>&1${T}0${T}2>&1\$"
 
+# The allow-match rows are asserted as whole lines rather than as patterns: every shape in the
+# corpus is a glob metacharacter, so an ERE over it would be escaping noise around the one thing
+# the assertion is for.
+have_line() {   # $1=label $2=exact line
+    checks=$((checks + 1))
+    grep -qxF -- "$2" <<<"$a" || {
+        echo "  FAIL [$1]: the corpus no longer exercises this branch"
+        fails=$((fails + 1))
+    }
+}
+# The `:*` idiom is rewritten in the GLOB and left literal in the STRING: the first row is true
+# only because the rewrite happened, and the second only because it did not.
+have_line "allow-match-colon-star-glob"   "allow-match${T}Bash(git status --short)${T}Bash(git status:*)${T}true"
+have_line "allow-match-colon-star-string" "allow-match${T}Bash(git:*)${T}Bash(git[:]*)${T}true"
+have_line "allow-match-literal-exact"     "allow-match${T}Bash(git status --short)${T}Bash(git status)${T}false"
+have_line "allow-match-literal-no-meta"   "allow-match${T}a${T}a${T}true"
+have_line "allow-match-trailing-star"     "allow-match${T}Bash(gh repo delete)${T}Bash(git*)${T}false"
+have_line "allow-match-interior-star"     "allow-match${T}Bash(git status)${T}Bash(*status*)${T}true"
+have_line "allow-match-question"          "allow-match${T}Bash(git status)${T}Bash(git statu?)${T}true"
+have_line "allow-match-bracket"           "allow-match${T}Bash(git statuz)${T}Bash(git statu[sz])${T}true"
+have_line "allow-match-bracket-negated"   "allow-match${T}Bash(git status)${T}Bash(git statu[!s])${T}false"
+have_line "allow-match-bracket-range"     "allow-match${T}Bash(git status)${T}Bash([a-z]it status)${T}true"
+
 # `hd` is inert on a newline-free command, and this is what says so rather than the comment
 # above: the same corpus under `sq,dq` and under `sq,dq,hd` classifies identically, so the
 # branch the compiled twin omits is one no friction-log line can reach.
@@ -199,5 +262,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "guard-lib-parity.test: $fails of $checks assertion(s) failed"
     exit 1
 fi
-echo "guard-lib-parity.test: ok ($checks assertions; guard_split_compound, guard_skeleton and _guard_redirect_pairs held to their compiled twins over ${#CORPUS[@]} log-line shapes and ${#WANTS[@]} inert-class lists)"
+echo "guard-lib-parity.test: ok ($checks assertions; guard_split_compound, guard_skeleton, _guard_redirect_pairs and guard_allow_match held to their compiled twins over ${#CORPUS[@]} log-line shapes, ${#WANTS[@]} inert-class lists and ${#ALLOW_STRINGS[@]}x${#ALLOW_GLOBS[@]} permission-rule pairs)"
 exit 0

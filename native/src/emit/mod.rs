@@ -2,8 +2,10 @@
 // registration and no fixture pair, and owes a named caller instead: a regen command, a
 // comparator calling `emit()`, a stage step, a gate reaching it in process.
 pub mod agents_md_smoke;
+pub mod always_loaded;
 pub mod cite_survey;
 pub mod close_surfaces;
+pub mod compare_settings_allow;
 pub mod csmoke;
 pub mod diff_baseline;
 pub mod docs_mirror;
@@ -351,6 +353,22 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         "--emit-scan-prompts",
         Arm::Emit(scan_prompts::emit),
         scan_prompts::KNOBS,
+    ),
+    // spec: guard-kit/SPEC.md §compare-settings-allow — the settings-allow advisory, a table
+    // member on the forced-family test at its sharpest: all four knobs live in `lib/guard.sh`, so a
+    // hardcoded flag would resolve no input path at all and could not name the files it compares.
+    (
+        "--emit-compare-settings-allow",
+        Arm::Emit(compare_settings_allow::emit),
+        compare_settings_allow::KNOBS,
+    ),
+    // spec: context-kit/SPEC.md §The always-loaded meter — the context meter, a table member
+    // because it resolves four consumer knobs a hardcoded top-level flag would receive none of;
+    // its three modes arrive as operands, the shape `--hook` and `--wait-probe` already carry.
+    (
+        "--emit-always-loaded",
+        Arm::Emit(always_loaded::emit),
+        always_loaded::KNOBS,
     ),
     // spec: lifecycle-kit/SPEC.md §The survey record — the capture affordance, whose free-text
     // argv keeps the shape refusal and the `--` escape across the port while its help arm retires

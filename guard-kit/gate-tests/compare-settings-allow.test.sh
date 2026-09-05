@@ -5,9 +5,13 @@ source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" || exit 2
 ROOT="$(pwd -P)"
-CMP="guard-kit/bin/compare-settings-allow.sh"
-[[ -x "$CMP" ]] || { echo "compare-settings-allow.test: tool not found: $CMP"; exit 2; }
-command -v jq >/dev/null 2>&1 || { echo "compare-settings-allow.test: jq not found on PATH"; exit 2; }
+# The subject is the bridged arm, reached through the front-end that resolves its four declared
+# knobs; a bare binary invocation would resolve none of them. No `jq` precondition rides along:
+# the arm reads both allow lists in-crate, and the sandbox JSON below is written with printf, so
+# refusing a runnable suite on a machine that no longer needs the tool would be a false dividend.
+CMP="gate-sdk/bin/run-gates.sh"
+CMP_ARM=(--emit compare-settings-allow)
+[[ -f "$CMP" ]] || { echo "compare-settings-allow.test: front-end not found: $CMP"; exit 2; }
 
 sb="$(mktemp -d)"
 trap 'rm -rf "$sb"' EXIT
@@ -24,7 +28,7 @@ run() {
     local overlay="$1" cfg="$2"; shift 2
     GUARD_KIT_CONFIG_FILE="$cfg" \
     GUARD_KIT_SETTINGS="$sb/.claude/settings.json" \
-    GUARD_KIT_SETTINGS_LOCAL="$overlay" bash "$CMP" "$@"
+    GUARD_KIT_SETTINGS_LOCAL="$overlay" bash "$CMP" "${CMP_ARM[@]}" "$@"
 }
 
 printf '%s\n' '{ "permissions": { "allow": ["Bash(git *)"] } }' > "$sb/broad.json"

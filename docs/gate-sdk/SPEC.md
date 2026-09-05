@@ -2467,6 +2467,13 @@ change**, and it belongs beside that worst case for the same reason: `uname`,
 `date`, `sort`, and every element of a roster the consumer may shadow, since
 `PROBE_SET` lives in a file rather than in the crate (context-kit/SPEC.md
 §bin/env-probe).
+**`--emit-always-loaded` is the second such member**, and its changeable element
+is a whole command rather than a roster entry: `bash`, plus `git` for the
+`--growth` mode's `diff --numstat` and the `--update-baseline` mode's `rev-parse`,
+plus whatever program the consumer's `CONTEXT_KIT_HOOK_CMD` names — the knob being
+a command seam the port deliberately keeps spawned (context-kit/SPEC.md §The
+always-loaded meter). `--needs` answers about registry members only and a bridged
+arm is not one, which is why both sets are recorded here.
 **`--agents-md-smoke` shares `--upgrade-smoke`'s shape and not its weight**, and
 is named beside it because both reach `lib/consumer-smoke.sh` by spawning: `bash`,
 `git`, `mktemp`, and through the vendoring whatever `csmoke_vendor_and_install`

@@ -281,7 +281,16 @@ Lead:
   the case it was written for: a cut that deletes a guard-kit `bin/` tool while the library stays
   resolves normally and degrades correctly.
 - **kpi-always-loaded** — the standing per-session surface: level and
-  since-baseline delta via context-kit's `always-loaded.sh` meter.
+  since-baseline delta from context-kit's meter, read **in process** as figures.
+  The row spawned the meter and parsed its rendered line back apart until the
+  meter became an arm; that parse was an undeclared cross-kit output contract, and
+  the split into a measurement function the arm renders over is what ended it
+  (context-kit/SPEC.md §The always-loaded meter). Its presence witness is
+  `lib/context.sh` — the library, never the surface the measurement reads, the same
+  shape `kpi-prompt-friction` takes — so a later cut deleting a `bin/` tool cannot
+  make the row report *absent* everywhere. `--emit-drift-report` declares the three
+  `CONTEXT_KIT_*` knobs the in-process read needs: while the row spawned a child,
+  that child sourced `lib/context.sh` and resolved its own.
 - **kpi-settings-local** — entry count of the untracked local permission
   overlay (`.claude/settings.local.json` allow/deny/ask, via `jq`); the
   notice signal for guard-kit's close-stage prune/promote step.
