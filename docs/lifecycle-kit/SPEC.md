@@ -4163,7 +4163,13 @@ is relayed, carved out of the derivable-from-the-governed-surfaces routing rule
 because a session holding contrary evidence reads the surface carrying the ruling
 as stale rather than as closed, the split-channel design (routine narration to the
 resume journal, escalations to the message channel), the compact economics —
-the split-where-the-tail-dominates rule, the unified posture's handoff compact,
+the split-where-the-tail-dominates rule in **two limbs**, its cost limb and a
+character limb naming what the enumeration of judgment-bearing turns omits (the
+escalations a lead rules alone off a governed surface, which the routing rule
+converts into relays) so that the posture reads as a trade rather than a pure
+saving, carrying the generic **method** by which a consumer decides which limb
+its own posture is under while the threshold and every count taken stay the
+consumer's, the unified posture's handoff compact,
 and operator-suggested compacts at the acceptance
 boundaries that pay under the cold-wakes-times-compressible-residue rule —
 with the dispatch-granularity rule (the roster derived from every unit the

@@ -15,13 +15,9 @@ receipt.** The template's stated premise for splitting — what it takes the lea
 turns to be, and why they should therefore stop paying judgment-tier prices — is
 the template's own §Economics (*Split the lead where the tail dominates*).
 
-**The discriminator stays here, because setting it is what this binding
-contributed:** read the escalations of an iteration and count how many the lead
-ruled *alone by reading a governed surface*. Near zero, the premise holds and the
-tier is overpaying; consistently several, the premise is wrong and the template's
-§Economics *Split the lead where the tail dominates* bullet is what needs
-amending, not this repo's tier. One iteration is one point; do not flip on it
-either way.
+**The method is the template's** — §Economics' character limb states how the
+count is taken. **What is set here is the threshold:** a third such iteration.
+One iteration is one point; do not flip on it either way.
 
 **Every reading is the entry's, not this file's.** The cost series, the ruled-alone
 counts, the counters and the refused premises live on

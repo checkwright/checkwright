@@ -469,6 +469,21 @@ consequences:
   oracle is cold: escalations arrive on the stages' schedule, so the TTL
   arithmetic that leaves a lead nearly always cold (above) applies to the
   oracle unchanged.
+  **That enumeration is incomplete, and the omission is what makes the split a
+  trade rather than a pure saving.** A lead's turn set also holds the
+  escalations it rules **alone off a governed surface** — neither scope nor a
+  forwarded question. Splitting does not make those cheaper; it converts them
+  into **relays**, because the routing rule (§The escalation protocol) sends an
+  intent-class question to the oracle or the operator as its first move and
+  answers off a governed surface only as the fallback. The saving is therefore
+  bought with a change in what the lead *does*, not only in what it costs, and a
+  consumer picking a posture measures that trade rather than assuming it away.
+  **How to measure it:** over one iteration, count the escalations the lead
+  ruled alone by reading a governed surface. Near zero and the tail premise
+  covers the whole turn set; consistently several and this limb is live for that
+  posture. The threshold that turns such a count into a decision, and every
+  count taken, are the consumer's — the ruling-config slot's, never this
+  template's.
 - **Compact at handoff (unified posture).** After the promotion commit lands the amendments and
   queue entries, and before the first dispatch, `/compact` the lead's context
   with an instruction that **keeps** per-amendment rationale, rejected

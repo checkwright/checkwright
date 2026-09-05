@@ -80,7 +80,11 @@ moment it was written.
 The lead is a role a session *becomes*, not a stage it runs — and running no
 lead is equally valid. The recommended shape is the **split posture**: the
 lead rides a cheap routing tier and only the judgment-heavy work pays premium
-prices. To drive an iteration under it:
+prices. It is a trade rather than a pure saving: a routing-tier lead relays a
+class of question a judgment-tier one would settle itself, and
+[the lead template](https://github.com/checkwright/checkwright/blob/master/lifecycle-kit/templates/lead.md#economics-batch-and-compact-where-it-pays)
+§Economics states the trade and how to measure it for your own posture. To drive
+an iteration under it:
 
 1. **`/lead` in a fresh session on the routing tier.** The lead role writes no
    lifecycle state of its own; every stamp and commit stays in the stage
