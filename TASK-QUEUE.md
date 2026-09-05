@@ -12,85 +12,60 @@
 
 ## New Features
 
-- **platform-support-ci-matrix** [spec: SPEC-manifest-report.md] [roadmap: next/reliability]
+## Technical Debt
+
+## Deferred
+
+- **platform-support-ci-matrix** [design-pending] [roadmap: next/reliability]
   [precondition-ok: run-observed]
-  — a CI leg that PRODUCES AND EXERCISES a Windows gate-binary artifact, which is
-  gate-sdk/SPEC.md §Consumer payload's join condition for `x86_64-pc-windows-msvc`.
-  **The slug is deliberately NOT renamed**, `powershell-installer-surface` citing it by name. The
-  fork, the ordering and WSL-as-interim are TRAJECTORY.md's; macOS is `macos-install-smoke-ci-leg`.
+  — a CI leg that PRODUCES AND EXERCISES a Windows gate-binary artifact, gate-sdk/SPEC.md §Consumer
+  payload's join for `x86_64-pc-windows-msvc`; slug NOT renamed (`powershell-installer-surface`).
   roadmap-summary: A CI install-smoke leg per supported platform, or an honest label.
-  **PRODUCED AND EXERCISED ARE BOTH DISCHARGED** — round 5 (`33298006656`, head `fb9ed980`) built,
-  packed, installed and ran the battery through `checkwright-gates.exe`; blockers 5 and 6 MEASURED.
-  **THE OPERATOR'S 2026-08-30 RULING, whose red-cause limb has now fired:** on green, drop
+  **BOTH HALVES DISCHARGED** at round 5 (`33298006656`, `fb9ed980`); blockers 5 and 6 MEASURED.
+  **THE 2026-08-30 OPERATOR RULING, red-cause limb now fired twice:** on green, drop
   `continue-on-error` on the job comment's own trigger and STOP, the `targets.list` join being
   separately measured work; on a red cause, file and defer without looping, which is what the
-  one-to-two push budget protects. **Both consequences stay UNEXECUTED on an OBSERVED ground**,
-  per `install-smoke-windows`' own comment: both wait on a first-observed-green run.
-  **The join half is more than a line edit, measured:** `native/targets.list:43-48` owns it — the
-  smoke builds from its host and refuses a foreign roster; steering or a cross-build.
+  one-to-two push budget protects. **Both consequences stay UNEXECUTED on an OBSERVED ground**, per
+  `install-smoke-windows`' own comment: both wait on a first-observed-green run. **The join half is
+  more than a line edit, measured:** `native/targets.list:43-48` — the smoke builds from its host
+  and refuses a foreign roster, so it wants steering or a cross-build.
   **Cost while deferred:** the one adopter class with a named days-to-weeks adoption window has no
   working install path on Windows; `powershell-installer-surface` stays sequenced behind this; and
-  installer/README.md §The install boundary holds every `installer/lib` and `installer/bin` file
-  owed behind this leg and the macOS one — 1246 lines, re-read off the oracle 2026-09-05 at scope.
-  **ROUND 7 NAMED THE CAUSE, rounds 8-11 repeated it, round 12 ANSWERED it** — `graph.rs` spawned
-  a BARE `bash` into a NATIVE Windows process, so a Win32 PATH search found WSL's launcher ahead of
-  Git's `usr/bin`. THE METHOD READING THAT OUTLIVES IT: round 6's two guessed repairs could never
-  have landed, the unguarded command being in the GATE and not the generator's prologue — so
-  cause-read-first is the instrument's case, round 12 the first repair built on a read cause.
-  **THE REPAIR WAS RULED 2026-09-03 an operator-directed hotfix, minimal and one commit, AND ROUND
-  12 VERIFIES IT AT THE REMOTE ORACLE:** run `33782234328`, head `32f73806`, `battery: All 11 gates
-  passed` against round 11's `1 of 11 gates FAILED: check-graph`. **The LEG still exits 1, at a
-  strictly later stage the battery was masking:** `477 of 477 manifest entries disagree with tree`.
-  **THE TWO 2026-09-03 GAP BULLETS DRAIN HERE**, filed by
-  `parser-and-enum-adapter-cuts-with-graph-hotfix`'s close and its lead. **They NARROW and claim NO
-  CAUSE.** A binary is in the mismatch set and that same `.exe` produced the job's green battery, so
-  content transform mangled it. `want` and `got` are the IDENTICAL command — `lock_hash` is
-  `git hash-object --` and the smoke's check spells the same — so there is no second hashing
-  algorithm and the only asymmetry left is the process context each runs in. And round 12's log
-  carries ZERO `fatal` lines (probed 2026-09-03 at scope), killing the errored-`got` branch and
-  leaving two VALID, DIFFERENT hashes over one byte-stream. The next act is a cause read; its facts
-  need a Windows host; 2026-09-03 spent a round — the diagnostic bailed before any comparison.
-  **DEMOTED 2026-09-01 AT BUILD**, a recurrence rather than a tail — a NEW iteration on a FRESH
-  amendment; the wedge is `observation-predicate-entry-cannot-drain-in-its-own-iteration`'s, so SPEC
-  settles this iteration's definition of done and close never argues it. **SELECTED AS THIS
-  ITERATION'S UNIT, port-critical own-iteration shape — ruled 2026-09-05 (lead, own-authority)** on
-  TRAJECTORY.md:275's sequencing sentence, not on leverage; envelope unchanged at the 2026-08-30 cap
-  above. The four-cut test-harness alternative is HELD as the NEXT iteration on this scope's
-  committed census — NO RE-SURVEY OWED.
-  **ROUND 13 IS THE CAUSE READ — run `33963571906`, head `c4850072`, the first round with the
-  report inside the arm. THE MECHANISM IS NOT NAMED; THE SITE IS.** The leg still exits 1 at
-  `starter: 477 of 477`. The measured facts are installer/README.md §The consumer smoke's, not
-  restated here. **FOUR HYPOTHESES RETIRED, each by a printed line.** (1) The process-context
-  asymmetry this entry has carried since round 12 — `want`/`got` being one command in two
-  contexts — DIES: `got` and `own` printed the same 40-hex value on both samples. (2) Every
-  end-of-line hypothesis about content DIES: `raw` (`--no-filters`) equals the other three, on the
-  `.exe` as well as the `.md`, with autocrlf effectively `false` from identical origins in both
-  repositories and no attribute on either path. (3) "The bytes on disk are not the bytes `init`
-  hashed" DIES: the consumer's porcelain printed NOTHING and the artifact control's `recorded` and
-  `recomputed` SHA-256 are equal. (4) An errored `got` DIES: no `fatal` from any hash call.
-  **WHAT SURVIVES IS ONE SITE.** The recorded value, the tree's bytes and every git context agree,
-  so the disagreement is IN THE COMPARISON, not in the hashing — and the only value left is the one
-  the arm's loop held in `want`, which reaches it through `IFS=$'\t' read -r path want` off a
-  process substitution. **THE ROUND'S OWN INSTRUMENT GAP, corrected in the same build:** that first
-  report RE-READ `want` through a second channel instead of printing the value the comparison used,
-  which is exactly why its byte rendering — whose stated purpose is to see a carriage return no
-  other line can — saw nothing. `want` is now the held value; the next round is decisive under the
-  truth table's FOURTH row rather than its second, at no extra push.
-  **NO REPAIR IS STARTED and none is guessed.** A terminator surviving `read` (which strips `\n`
-  alone) is consistent with every printed line and reproduces the count signature in a local probe,
-  but it is a candidate, not a reading — and this leg's own method ruling is cause-read-first.
+  installer/README.md §The install boundary holds every `installer/lib`/`installer/bin` file owed
+  behind this leg and the macOS one — 1246 lines, re-read off the oracle 2026-09-05 at scope.
+  **ROUNDS 6-12 ARE ANSWERED** — round 7's `graph.rs` defect, repaired under an operator-directed
+  hotfix and verified at the remote oracle by round 12 (`33782234328`, head `32f73806`). THE READING
+  THAT OUTLIVES THEM: round 6's two guessed repairs could never have landed, so cause-read-first is
+  the instrument's case, vindicated again by round 13.
+  **ROUND 13 IS THE CAUSE READ — run `33963571906`, head `c4850072`, the first round with the report
+  inside the arm; still exits 1 at `starter: 477 of 477`. THE MECHANISM IS NOT NAMED; THE SITE IS.**
+  **installer/README.md §The consumer smoke OWNS the record** — every value, every host fact, and
+  the line retiring each hypothesis — cited, not restated. FOUR RETIRED THERE: the process-context
+  asymmetry (also what the two 2026-09-03 gap bullets held, so they drain here REFUTED rather than
+  merely spent); every end-of-line hypothesis about content; "the bytes on disk are not the bytes
+  `init` hashed"; and an errored `got`. **WHAT SURVIVES IS ONE SITE:** all four values agree, so the
+  disagreement is IN THE COMPARISON and not in the hashing, and the only value left unread is the
+  one the arm's loop held in `want` — which is also **THE ROUND'S OWN INSTRUMENT GAP, corrected in
+  the same build**: the first report RE-READ `want` instead of printing what the comparison used, so
+  its byte rendering saw nothing. `want` is now the held value and the next round is decisive under
+  that section's truth table's FOURTH row. **NO REPAIR IS STARTED** — a terminator surviving `read`
+  is a candidate, not a reading. **AND THE NEXT ROUND IS ALREADY BOUGHT:** `gates` runs
+  `install-smoke-windows` on every master push under no `if:` gating, so close's push runs the
+  corrected instrument at no extra cost — verified against the workflow file at build, not inferred.
   ruled: platform-support-ci-matrix operator 2026-08-27 2026-08-30 2026-08-31 2026-09-03 lead-relay
   ruled: platform-support-ci-matrix operator 2026-08-31 2026-09-05 consult
   ruled: platform-support-ci-matrix lead 2026-08-30 2026-09-01 2026-09-05 own-authority
   Filed 2026-07-26 by scope, split from `platform-support-contract`; Linux split 08-25, macOS 08-26;
-  promoted/deferred 08-25 through 09-01; rounds 6-12 ran 08-31 to 09-03, 8-11 identical to 7.
-  **PROMOTED 2026-09-05 at spec on `SPEC-manifest-report.md`, which SETTLES THIS ITERATION'S
-  DEFINITION OF DONE** — a reading rather than a green leg, and the entry deferring again at close
-  is that amendment's settled outcome rather than a shortfall. Do not re-derive it here.
-
-## Technical Debt
-
-## Deferred
+  promoted/deferred 08-25 through 09-05; rounds 6-13 ran 08-31 to 09-05, 8-11 identical to 7.
+  **DEMOTED 2026-09-05 AT BUILD, and the demotion IS the settled outcome rather than a shortfall.**
+  Ruled `lead 2026-09-05 own-authority` ON THE MACHINERY: `lifecycle-kit/lib/stages.sh:29` defaults
+  the drain stage to `validate`, so simulating that entry refuses while this one sits active and
+  close is two stages the far side of it. `SPEC-manifest-report.md` merged into installer/README.md
+  and was DELETED in the same commit — what the bidirectional pairing requires of both halves — and
+  the spec pointer drops with it. **READ THIS AS LANDED-BUT-UNOBSERVABLE, NOT UNSTARTED** — this
+  shape's known legibility price (`observation-predicate-entry-cannot-drain-in-its-own-iteration`,
+  fourth shape). The four-cut test-harness alternative is HELD as the NEXT iteration on this
+  scope's census — NO RE-SURVEY OWED.
 
 - **measured-marker-cannot-sit-mid-paragraph** [design-pending] — `check-measured-claim` binds its
   marker to the line above the claim, so a claim standing mid-paragraph can carry no marker and
