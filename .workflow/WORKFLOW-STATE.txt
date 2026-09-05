@@ -8,3 +8,4 @@ front-end-stub-and-gate-caller-cuts scope a0fa10e5 2026-09-05 156576c0
 front-end-stub-and-gate-caller-cuts spec a136aa0f 2026-09-05 2bf2f204
 front-end-stub-and-gate-caller-cuts spec a136aa0f 2026-09-05 dff0f83e
 front-end-stub-and-gate-caller-cuts align afaa240d 2026-09-05 96112c82
+front-end-stub-and-gate-caller-cuts build a88c701c 2026-09-05 a9c80961
