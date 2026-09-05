@@ -8108,15 +8108,12 @@
   reason names the harness PROCESS rather than the agent that created the worktree, so
   reading that pid for liveness always answers "still in use" and the iteration-boundary
   refusal on a linked worktree looks unclearable.
-  **Re-verified live at this close, and the premise sharpened rather than taken on the
-  bullet's word.** The filed bullet called the pid "the dispatching harness session's". It is
-  not the dispatching *session's*: it is the top-level `claude` process's, and the identical
-  value appears for every worktree that any session in the run creates. This close dispatched
-  three read-only sweeps and all three lock reasons carried the same pid the lead had
-  recorded hours earlier from `scope`'s fan-out under a different session, with
-  `ps -o pid,etime` showing one `claude` process alive for the whole run. So the signal is
-  not merely indirect — it is CONSTANT across the run and carries no information about any
-  agent at all.
+  **The pid is the top-level `claude` process's, not the dispatching session's, and it is
+  CONSTANT across the run — twice attested rather than argued.** 2026-08-27: three read-only
+  sweeps all carried the pid a different session had recorded hours earlier, with one `claude`
+  process alive throughout. 2026-09-05: two worktree dispatches from one scope session again
+  carried one identical pid, which was the host CLI. The signal carries no information about
+  any agent at all.
   **Why it traps a compliant session.** delegation-kit's protocol teaches a session to
   distrust pattern matching and to trust a recorded PID's liveness, so a session meeting a
   locked worktree does exactly the sanctioned thing, reads a live pid, and concludes the
@@ -8126,6 +8123,22 @@
   **The remedy is cheap and was exercised**: unlock, then remove, then delete the branch, no
   force needed, after verifying the worktree clean and carrying no commits past its base.
   Nothing about the lock's pid gates that.
+  **The failure direction is a DEADLOCK, not a conservative refusal, and that is the sharpening
+  the third sighting adds.** The spec's error-direction argument — a reused pid classifies live,
+  and live refuses rather than authorising a removal — holds only where the captured pid belongs
+  to the holder. Here it belongs to a process guaranteed alive for as long as the entering
+  session runs, so "wait for the named pid to return" is unsatisfiable by construction: the pid
+  returns only when the session that needs to cross the boundary exits.
+  **The lock reason carries the harness's AGENT ID verbatim beside that pid**
+  (`claude agent agent-<id> (pid <n> start <n>)`), so the first candidate shape has a real field
+  to read rather than a hoped-for one — probe the agent id against the harness's running-agent
+  roster instead of probing the pid.
+  **A force-reap over the live-class guidance was ruled at the 2026-09-05 boundary by the
+  operator, through an interactive prompt in the lead session, which relayed rather than ruled
+  it** — on verified grounds: the captured pid was the host CLI itself, no agent session was
+  running, and the worktree's tree was clean with its HEAD already an ancestor of master, so the
+  reap was lossless. A one-off disposition of one worktree; it settles nothing about the
+  classifier, which is what this entry still owns.
   **Why `[design-pending]`:** three uncosted shapes — have the boundary refusal name that
   remedy so the message is not a dead end; state in delegation-kit's isolation bullet that a
   lock reason's pid is the harness's and is not a liveness signal for the agent, that bullet
@@ -8136,7 +8149,10 @@
   silent on how to judge whether deleting is safe.
   **Cost while deferred:** every boundary crossing behind an orphaned worktree is a session
   reasoning correctly to a false conclusion, and its only honest fallback is to ask.
+  recurrence: worktree-lock-pid-is-not-agent-liveness 2026-09-05
   Filed 2026-08-27 by the lead at scope, promoted 2026-08-27 by close draining the gap inbox.
+  Re-fired 2026-09-05 at the `windows-leg-manifest-cause-read` close's boundary, where it
+  REFUSED the scope entry outright; that bullet is drained here into this entry.
 
 - **exe-suffix-single-spelling-unenforced** [design-pending] — gate-sdk/SPEC.md §lib/gate.sh
   asserts that `gate_exe_suffix` is the executable suffix's single owner and that no other
@@ -9391,6 +9407,12 @@
   due because that iteration deleted a shell file and recorded a ruling. So a row's append size is
   driven by ITERATION SHAPE rather than by the row — which means capping a row per close, the
   third shape, would truncate hardest in exactly the case the roster exists for.
+  **The FIRST shape has now been run by accident, and it lost a mandatory field — measured
+  2026-09-05.** A close compressed the `internal-identifier-restatement` row from 72073 to 2588
+  characters and the header-mandated `due:` field went with the prose, leaving the row's due-ness
+  unreadable until the same close restored it (the field sits 43311 characters into the row at
+  `b2cedcd3`). So "compact each row" is not safe unattended: a compression pass reads an accreted
+  row as prose, and the roster's grammar is graded by nothing.
   Surfaced 2026-09-04 in the gap inbox by the `usage-verdict-cut` close's own later steps and
   drained at the next iteration's scope entry, which is why its disposition is dated after it.
 - **upgrade-smoke-producer-leaks-worktrees-on-signal** [design-pending] — the upgrade-smoke arm
@@ -9722,6 +9744,8 @@
   the way in and on the way back out. The removed body is recoverable from
   the evicting commit (`git log -p -S'<slug>' -- TASK-QUEUE.md`).
 
+- **audit-roster-grammar-ungated** [design-pending] — Row fields ungraded; waits on the format.
+- **inline-source-literal-ungateable** [design-pending] — Fence-only oracle; no rename pending.
 - **turn-end-refusal-used-as-a-busy-wait** [design-pending] — Sessions busy-wait via the stop hook.
 - **site-health-probe-no-retry-on-transient** [design-pending] — A single non-200 files an issue.
 - **non-gate-arm-roster-hand-maintained** [design-pending] — The arm class's flag list is ungated.
