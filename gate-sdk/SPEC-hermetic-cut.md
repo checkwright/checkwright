@@ -22,13 +22,29 @@ discharges that wait rather than reopening it.
 `--emit port-blockers --tree` — *89 file(s) scanned, 66 declared no-port, 0 temporarily held,
 23 owed* — where this file reads `owed lines=52`.
 
-**This cut's disposition is a declaration and not a port, and that is the one thing in this
-amendment a reader should check before build acts on it.** The cut still subtracts the file
-from `--tree`'s owed column, which is the completion predicate's own arithmetic
-(§The kit-library port disposition: the arm "reclassifies each member `owed` → `no-port`, so
-the completion predicate TRAJECTORY.md states over that arm's owed count subtracts them"), so
-the port's progress metric is unaffected. What differs from its three sibling cuts is the
-*character* of the delivery, and delta 2 states the ground in full rather than assuming it.
+**This cut's disposition is a declaration and not a port — ruled `lead, own-authority
+2026-09-05` on an escalation from this stage, and ruled to be the *ordinary* application of
+the rule rather than an exception to it.** The escalation had labelled it envelope-class; the
+governing section says otherwise in its own words. §The port-candidate criteria opens "these
+seven are an engineering roster and an ordering signal, **never an eligibility screen**" —
+the directive ports the whole corpus, so no criterion excludes anything — and for a plain
+tracked file the `--tree` predicate "asks a different and much smaller question of each file:
+**is there a stated disposition**". A `# no-port:` declaration *is* a stated disposition, its
+cause is free text naming whatever surface carries the reason rather than a pick from a closed
+roster, and §The non-gate arm already records a harness file taking exactly this route.
+
+**So the cut still subtracts the file from `--tree`'s owed column**, which is the completion
+predicate's own arithmetic (§The kit-library port disposition: the arm "reclassifies each
+member `owed` → `no-port`, so the completion predicate TRAJECTORY.md states over that arm's
+owed count subtracts them"). What differs from its three sibling cuts is the *character* of
+the delivery, which delta 5 requires be stated wherever the cut's size is recorded.
+
+**Two alternatives were refused with the ruling.** Leaving the file **owed and undeclared** is
+refused because a file left owed for a reason that no longer exists is a false entry in the
+oracle. **Moving the environment pinning into the ported runner** is refused because narrowing
+`check-test-hermetic` to runner-spawned tests would trade a contract that holds for a
+standalone `bash <name>.test.sh` for one that does not — a real loss bought for a bookkeeping
+win. Both grounds are delta 2's and are recorded there in full.
 
 ## What changes
 
@@ -91,9 +107,12 @@ needs its own ground, exactly as `context-kit/lib/pub-lang/`'s extractors did.
   states: "`env` cannot invoke a shell function and — more to the point — a bridged knob is
   resolved when the **argv** is built, so an override set around the binary would arrive after
   the value it was meant to change had already been read". Measured this session over the
-  tracked tree: **92 of 94 `gate-tests/*.test.sh` source this library**, 58 call `gate_run`,
-  33 `gate_env`, 7 `gate_arm_run` and 6 `gate_native_bin` through it. There is no in-crate arm
-  that a `source` line can name.
+  tracked tree, **with the corpus named because two defensible denominators exist**: of the
+  **94** files matching `*/gate-tests/*.test.sh`, **92** source this library — 58 calling
+  `gate_run`, 33 `gate_env`, 7 `gate_arm_run` and 6 `gate_native_bin` through it. The wider
+  `*.test.sh` corpus tree-wide is larger and is **not** this figure's denominator; naming which
+  is what stops a later re-derivation reading as a contradiction and buying a second census.
+  There is no in-crate arm that a `source` line can name.
 - **What the two composing functions compose is the bridge itself.** `gate_run` calls
   `gate_command` and `gate_arm_run` calls `gate_native_bin` and `gate_knob_env`, all from
   `lib/gate.sh` — which §The kit-library port disposition calls "the second producer squared"
@@ -153,6 +172,30 @@ delta 2's ground and ending "Structural, not a sizing judgment" — the sentence
 declaration in this tree ends on, which is what stops a later reader re-opening a declared
 file as a sizing question.
 
+**The cause states the ground itself and never points at where the ground was argued.** It
+names the sourcing callers with their corpus and the fact that a binary arm cannot be sourced
+into bash, in the header's own words. A cause that pointed at an amendment would resolve to
+nothing the moment merge step 3 deletes this file, and a cause that pointed at a ruling's
+channel would cross the provenance seam into a shipped payload file — so the free-text form
+the criteria allow is used for what it is for, an engineering ground a reader of the file
+alone can apply.
+
+### (5) The cut's asserted character is corrected wherever its size is recorded
+
+Three ports and one declaration, not four ports {mechanical}. Scope's composition recorded
+this cut as *4 sections / 4 files / **480 lines***, and that figure is an **owed-column**
+total which stays correct in its own arithmetic — `--tree` subtracts a declared member exactly
+as it subtracts a ported one. What it does not say, and what would read as a ported total in
+front of close, is that the delivery is **428 ported lines and 52 declared**.
+
+**So every surface carrying the cut's size says which.** `.workflow/survey-record.md`'s
+composition block is corrected in place at spec, in the same commit as this ruling; the
+per-cut entry says it on its own lead paragraph; and §The port disposition's owed-corpus prose
+records the member as declared rather than ported when this cut merges. Stated as a delta
+rather than left to the commit message because a filed figure that fails a later re-measure is
+the failure mode this iteration has already met more than once, and the correction is cheap
+only while someone is looking at it.
+
 ## Producers and consumers
 
 **No new state, event or interface is introduced.** This cut removes a producer and adds a
@@ -205,7 +248,11 @@ reader's RED condition is enumerated rather than its subject.**
   rather than annotated; the declaration's two-limb ground stated with its three refused
   alternatives and its reopening condition (deltas 1 and 2).
 - **gate-sdk/SPEC.md §The port disposition** — the owed-corpus prose every cut moves; gate-sdk's
-  owed column after this cut and its sibling (delta 4).
+  owed column after this cut and its sibling, recording this member as **declared** rather than
+  ported (deltas 4 and 5).
+- **`.workflow/survey-record.md`** — scope's composition block, whose *480 lines* is an
+  owed-column figure and is annotated as such rather than left to read as a ported total
+  (delta 5).
 - **gate-sdk/SPEC.md §The kit-library port disposition** — its honest-limit paragraph names
   the libraries "that ride the glob resolving nothing" as owed still, "each for its own reason,
   and each names the entry that owns its port in its own section"; this member leaves that set

@@ -29,18 +29,32 @@
 - **test-hermetic-port-cut** [spec: SPEC-hermetic-cut.md] — settle
   `gate-sdk/lib/test-hermetic.sh` (52), the file gate-sdk/SPEC.md §lib/test-hermetic.sh calls
   **deliberately not declared**.
-  **The disposition is a DECLARATION, not a port, and the cut says so on its lead line.** The
-  file's API is three shell functions 92 of 94 bespoke tests source; a binary arm cannot be
-  sourced into bash. What kept it undeclarable was a second `GATE_SDK_NATIVE_BIN` default, and
-  removing that is the same edit that fixes the defect — resolve through `gate_native_bin` and
-  absolutize, the shape `bin/run-gate-tests.sh:24-28` already uses. `--tree` reclassifies
-  `owed` → `no-port`, so the completion predicate's arithmetic is unchanged.
+  **THIS CUT DELIVERS 428 PORTED LINES AND 52 DECLARED, not four ports** — stated on the lead
+  paragraph because scope's composition recorded the four-file cut as 480 lines, which is an
+  OWED-COLUMN figure (`--tree` subtracts a declared member exactly as a ported one) and reads
+  as a ported total if left unqualified. The survey record's block is corrected in place.
+  **The disposition is a DECLARATION, ruled `lead, own-authority 2026-09-05` on an escalation
+  from spec — and ruled to be the ORDINARY application of the rule, not an exception.** The
+  escalation had called it envelope-class; gate-sdk/SPEC.md §The port-candidate criteria says
+  otherwise in its own words — the seven are "an engineering roster and an ordering signal,
+  NEVER an eligibility screen", and for a plain tracked file the `--tree` predicate asks only
+  "is there a stated disposition". A `# no-port:` cause is free text naming the surface that
+  carries the reason, not a pick from a closed roster.
+  The ground: the file's API is three shell functions that **92 of the 94 files matching
+  `*/gate-tests/*.test.sh`** source — corpus named, because the wider tree-wide `.test.sh` count
+  is larger and a bare "92 of 94" re-derived against it reads as a contradiction — and a binary
+  arm cannot be sourced into bash. What kept it undeclarable was a second `GATE_SDK_NATIVE_BIN`
+  default, and removing that is the same edit that fixes the defect: resolve through
+  `gate_native_bin` and absolutize, the shape `bin/run-gate-tests.sh:24-28` already uses.
+  **Two alternatives refused with the ruling:** leaving it owed and undeclared, because a file
+  owed for a reason that no longer exists is a false entry in the oracle; and moving the env
+  pinning into the ported runner, because narrowing `check-test-hermetic` to runner-spawned
+  tests trades a contract that holds for a standalone `bash <name>.test.sh` for one that does
+  not — a real loss for a bookkeeping win.
   **`hermetic-bin-suffix-pin-placement` RIDES INSIDE THIS CUT** under
   `native-gate-port-remaining-corpus`' ruling (6) and the operator's 2026-09-05 ruling that it
   blocks nothing; its whole deliverable is this amendment's delta 1 and it reaches Done with it.
   `kit-library-port-residue` loses the member as a **delivery**, not an unblocking.
-  **ESCALATED AT AUTHORING, unresolved when this entry landed:** the port→declaration change is
-  a narrowing of the cut's asserted behavior, so it went to the lead rather than being absorbed.
   Filed 2026-09-05 by spec as a per-cut feature unit.
 
 - **guard-tests-runner-port-cut** [spec: SPEC-guard-tests-cut.md] — port
@@ -72,7 +86,7 @@
   Filed 2026-09-05 by spec, fourth of the four per-cut units.
 
 - **kit-spec-provenance-seam-sweep** [spec: SPEC-seam-sweep.md]
-  — kit SPECs ride the installer payload and the
+  [precondition-ok: carve-out-replaces-the-blocker] — kit SPECs ride the installer payload and the
   public site whole, yet carry this project's ruling provenance, which resolves to nothing in a
   consumer tree and reads there as mechanism.
   **THE 2026-09-03 MEASURE IS STALE BY A FACTOR OF THREE — re-measured 2026-09-05 at scope and
@@ -107,12 +121,16 @@
   own doctrine forbids keeping finished rulings. Applied per site.
   **A DATED MEASUREMENT IS NOT SWEPT.** A frozen attestation a reader is told not to refresh loses
   its freeze if the date goes, which would be a defect the sweep INTRODUCED.
-  **ONE SECTION IS CARVED OUT AND ESCALATED, not absorbed:** TRAJECTORY.md:118-130 positively
-  ASSIGNS ownership of two closed rulings to gate-sdk/SPEC.md §The decisions this substrate already
-  closed ("which owns them because the component that depends on them must be readable alone"), and
-  that section states the arrangement from the other side. Sweeping it reverses a recorded ruling,
-  which is operator-class however well-grounded. Escalated to the lead at spec, unresolved when
-  this entry landed.
+  **ONE SECTION IS CARVED OUT — ruled `lead, own-authority 2026-09-05` on an escalation from
+  spec, and the carve-out STANDS.** TRAJECTORY.md:118-130 positively ASSIGNS ownership of two
+  closed rulings to gate-sdk/SPEC.md §The decisions this substrate already closed ("which owns
+  them because the component that depends on them must be readable alone"), and that section
+  states the arrangement from the other side. Sweeping it reverses a recorded ruling, which is
+  operator-class however well-grounded. **The ruling's ground is that a recorded ruling stands
+  by default, so declining to reverse is the ANSWER and not a deferral of one**; it was not
+  taken to the operator because nothing in the finding argues for spending their
+  reconsideration. The real fix is TRAJECTORY.md's RECORDING RULE, filed as
+  `provenance-ownership-recording-rule-assigns-into-kit-specs` and not started.
   **How the class arrived, recorded so the fix aims at its cause.** TRAJECTORY.md's recording rule
   sends a ruling with a canonical home to that home by pointer, and sessions read that as licence to
   write the ruling INTO the kit SPEC with its date and refusals — so the SPEC became the ruling's
@@ -9372,14 +9390,26 @@
   **Filed 2026-09-05 at scope with the split that created it** (`lead, own-authority`, under the
   permission the operator's directive grants), so the remainder has an owner instead of existing
   only in a scope journal — a split whose second half is unfiled is a dropped unit.
-  **THE ~89 IS UNSOUND AND THIS ENTRY IS UNSIZED.** It came from the same predicate the parent's
-  own whole-file census discredited at spec 2026-09-05 — it matches ordinary prose and misses
-  every stamp spelled without the word. Over gate-sdk it read 157 where the defensible union is
-  ≈87-92 sites and ≈300-400 lines touched. Its per-kit split (lifecycle-kit 30, delegation-kit 18,
-  queue-kit 16, guard-kit 6, canon-kit 6, doctrine-kit 3, context-kit 3, drift-kit 3, site-kit 2,
-  evidence-kit 2) is kept ONLY as a rank ordering. Ten SPECs and ten docs mirrors, against one.
+  **THE ~89 IS UNSOUND AND THIS ENTRY IS UNSIZED — and THE PREDICATE ITSELF IS WHAT KEEPS
+  FAILING, which is the part that decides how to size it next.** Three successive re-measures
+  have now missed: 87 sites across 6 SPECs filed, 246 lines across 11 measured, then ≈87-92
+  sites and ≈300-400 lines measured again over gate-sdk alone. Every one used a `ruled`-near-a-
+  date scan, which matches ordinary prose ("the rule", "reads as a rule") and misses every stamp
+  spelled without the word ("Ratified by the operator"). **So the next session sizes this by
+  FIXING THE PREDICATE, not by running the same scan a fourth time** — the class has at least
+  four spellings plus an AUTHORITY-ATTRIBUTED-BUT-UNDATED subclass no date-bearing scan reaches.
+  The per-kit split (lifecycle-kit 30, delegation-kit 18, queue-kit 16, guard-kit 6, canon-kit 6,
+  doctrine-kit 3, context-kit 3, drift-kit 3, site-kit 2, evidence-kit 2) is kept ONLY as a rank
+  ordering. Ten SPECs and ten docs mirrors, against the parent's one.
   **The parent's discriminator and its move-versus-delete test carry here unchanged** and are not
   re-derived: attribution decides the voice, and TRAJECTORY.md:52-55 decides move versus delete.
+  **THE GATE MUST ENCODE ONE SANCTIONED EXEMPTION, and it is recorded HERE because this entry
+  owns the gate.** gate-sdk/SPEC.md §The decisions this substrate already closed is carved out
+  of the parent's sweep (`lead, own-authority 2026-09-05`): TRAJECTORY.md:118-130 positively
+  assigns it that ownership, so its dated stamps are sanctioned rather than in violation. A gate
+  that does not know this goes green in development and reds on a section the ruling record
+  blesses. The exemption retires only if
+  `provenance-ownership-recording-rule-assigns-into-kit-specs` lands first.
   **THE GATE IS THIS ENTRY'S, AND THAT IS THE WHOLE POINT OF FILING IT.** Enforcement-first wants
   the sweep and its gate in one unit; the split defers rather than dissolves that objection, so the
   gate attaches here as the last kit's landing and the parent ships swept-but-ungated in the
@@ -9398,6 +9428,40 @@
   SPECs and every adopter's vendored copy of them carry private ruling history as mechanism, and
   pointers a consumer cannot follow. Product-class, and accreting: two new sites landed in one
   iteration, both from cuts that were not editing provenance.
+
+- **provenance-ownership-recording-rule-assigns-into-kit-specs** [design-pending]
+  — TRAJECTORY.md's recording rule does not merely permit the provenance class the seam sweep
+  removes; at least once it POSITIVELY ASSIGNS a closed ruling's ownership to a kit SPEC, which
+  is the class's stated cause rather than one of its instances.
+  **The attested instance, read verbatim at spec 2026-09-05.** TRAJECTORY.md:118-130 records
+  the Rust-versus-Go refusal and the bash-portability-floor costing as "recorded at
+  gate-sdk/SPEC.md §The decisions this substrate already closed, **which owns them because the
+  component that depends on them must be readable alone**", and gate-sdk/SPEC.md:2251-2253
+  states the arrangement from the other side. It is a deliberate, reasoned, two-sided
+  assignment — not drift.
+  **The general rule behind it is TRAJECTORY.md:43-47:** "a ruling whose mechanism already has
+  a canonical home is registered here with a pointer to that home rather than restated". That
+  is one-owner-per-fact applied to rulings, and it is right about mechanism; what it does not
+  say is that a ruling's DATE, AUTHORITY and REFUSAL GROUNDS may not follow the mechanism into
+  a payload-facing file. Sessions read the silence as licence, which
+  `kit-spec-provenance-seam-sweep` records as how the whole class arrived.
+  **Why `[design-pending]`:** the shape is a doctrine call with at least three candidates — the
+  rule gains a clause splitting mechanism from provenance; or a kit SPEC may host a ruling's
+  mechanism while TRAJECTORY.md keeps its stamp; or the readable-alone objection is answered
+  some third way, since it is a real one and a blanket ban would leave a component's dependants
+  unable to read it alone. All three touch what a kit SPEC may contain.
+  **OPERATOR-CLASS WHEN WORKED, and that is why this is filed rather than started.** Reversing
+  the 118-130 assignment reverses a recorded ruling; and the rule reaches the provenance seam
+  itself, which is a privacy boundary before it is a design one. Filed under scope-gated intake;
+  a session picking it up escalates before editing TRAJECTORY.md's rule.
+  **Cost while deferred:** the class's cause stays live, so a swept kit SPEC re-accretes at the
+  next cut that records a ruling with a canonical home — measured once already, two new sites in
+  one iteration from cuts that were not editing provenance. It also holds one carve-out open:
+  gate-sdk/SPEC.md §The decisions this substrate already closed cannot be swept while this
+  stands, so the seam gate must ship an exemption for it (recorded on
+  `kit-spec-provenance-seam-sweep-remainder`, which owns the gate).
+  Filed 2026-09-05 by spec, on the lead's ruling (`lead, own-authority 2026-09-05`) that the
+  carve-out stands and its real fix is the recording rule.
 
 - **bin-tool-help-arm-absent-tree-wide** [design-pending] — nine of the eleven shipped `bin/`
   tools, across four kits, answer `-h`/`--help` with something other than usage on stdout at

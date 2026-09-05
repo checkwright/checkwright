@@ -159,17 +159,30 @@ depends on them must be readable alone**". The gate-sdk section states the same 
 from the other side: "The project-wide register of closed rulings is TRAJECTORY.md, which
 points here for these two rather than restating them."
 
-**Sweeping that section therefore reverses a recorded ruling**, which is operator-class
-however well-grounded the finding, so it is escalated and not absorbed. What the sweep would
-have to change is not the section but TRAJECTORY.md's recording rule — the same rule the
-entry's own *how the class arrived* paragraph names as the class's cause — and that is a
-decision about the ruling record, not about a kit SPEC.
+**Sweeping that section would reverse a recorded ruling**, which is operator-class however
+well-grounded the finding. Escalated at authoring and **ruled `lead, own-authority
+2026-09-05`: the carve-out stands.** The ruling's ground is that the default is that a
+recorded ruling stands — so declining to reverse is the *answer*, not a deferral of one — and
+that nothing in the finding argues for spending the operator's reconsideration.
+
+**What the sweep would have to change is not the section but TRAJECTORY.md's recording rule**
+— the same rule the entry's own *how the class arrived* paragraph names as the class's cause.
+That is filed as a costed Deferred entry rather than started, under scope-gated intake, and it
+wants an operator at the point someone works it because it reaches the provenance seam itself.
 
 **The carve-out is written into the merged section rather than left implicit**, so a later
 reader meeting an otherwise-swept file does not read the survivor as a miss: the section keeps
 a sentence saying that its two dated rulings are held here **by TRAJECTORY.md's own
 assignment** and that the assignment, not this section, is what a future sweep must move
 first.
+
+**The consequence that lands on someone else if it is left here: the seam gate must encode
+this exemption.** The gate left this window with `kit-spec-provenance-seam-sweep-remainder`,
+so a session building it against a swept tree would find one section still carrying dated
+authority stamps that the ruling record sanctions — and a gate that goes green in development
+and reds on a sanctioned section is worse than no gate. The obligation is therefore recorded
+**on the remainder entry, which owns the gate**, and not only here: a carve-out visible only
+in the parent's amendment is invisible to the session that builds the enforcement.
 
 ### (6) The docs mirror and the payload are the reason this ships without its gate
 
@@ -247,10 +260,14 @@ point 5 binds and each reader's RED condition is enumerated rather than its subj
   `since <cohort-slug>` citations, replaced by what each slug denoted (delta 2, class d).
 - **TRAJECTORY.md** — the migrated grounds, under delta 3's test; and **not**
   §The closed rulings' assignment paragraph, which delta 5 escalates rather than edits.
-- **TASK-QUEUE.md `kit-spec-provenance-seam-sweep`** — the corrected census and predicate; and
-  **`kit-spec-provenance-seam-sweep-remainder`**, whose ~89-line sizing rests on the same
-  discredited predicate and is marked as needing its own measure rather than silently
-  inherited (all deltas).
+- **TASK-QUEUE.md `kit-spec-provenance-seam-sweep`** — the corrected census and predicate (all
+  deltas); and **`kit-spec-provenance-seam-sweep-remainder`**, which owns the gate, carrying
+  two things this amendment cannot hold for it: the ~89-line sizing marked **unsized** because
+  the *predicate itself* is what keeps failing, and the delta 5 carve-out the gate must encode
+  (delta 5).
+- **TASK-QUEUE.md, a new Deferred entry** for TRAJECTORY.md's recording rule — the class's
+  stated cause, filed rather than started under scope-gated intake, operator-class when worked
+  (delta 5).
 - <!-- update-target-exempt: a generated projection with its own freshness gate and regen command, rostered in docs/site-architecture.md §Generated projections and their freshness gates; delta 6 names it and no delta owns its content, which is derived byte-for-byte from the source this amendment edits --> the `docs/` mirror of gate-sdk/SPEC.md, plus `docs/footprint.md` and `docs/value.md`'s rollup block.
 
 ## Definition of Done
