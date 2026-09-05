@@ -3565,9 +3565,9 @@
   **Cost while deferred:** align keeps returning a clean verdict that build then falsifies, so
   the stage's signal value decays toward zero while its cost does not — and a zero-divergence
   pass is read as evidence the amendments were right.
-  **FIRST THRESHOLD ROUTING 2026-09-04: stays deferred on the port-only run, not on merit.**
-  Never ruled at all before that date — measured three times, routed never — and at a count
-  of two it is lead discretion, the routing clause ending that discretion AT two, not before.
+  **THRESHOLD ROUTING 2026-09-04, RULED 2026-09-05 (operator, lead-relay): stays deferred under
+  the port-only run, not on merit; a further judged recurrence is stamped, never re-escalated.**
+  ruled: align-checklist-fanout-calibration operator 2026-09-05 lead-relay
   Filed 2026-08-07 by close, from the lead's per-batch tiering watch.
 
 - **release-runbook-identity-diagnosis** [design-pending] — where the which-account-is-active
@@ -4274,9 +4274,9 @@
   **Cost while deferred:** every count written in the queue is unreachable by any oracle, and in
   the manifest corpus a count's enforceability turns on a spelling choice no author is told
   about. Both failures are silent — the gate runs, reports clean, and never saw the claim.
-  **THRESHOLD: DECLINED ON THE RUN AND NOT ON MERIT, 2026-09-03 and again 2026-09-04** — mechanical
-  (c) waits with the two design calls, one of five put up as a batch both times, weighed not taken.
+  **THRESHOLD 2026-09-03/04, RULED 2026-09-05 to wait under the run: (c) waits with (a) and (b).**
   ruled: cardinal-notation-splits-gate-reach lead 2026-09-03 2026-09-04 own-authority
+  ruled: cardinal-notation-splits-gate-reach operator 2026-09-05 lead-relay
   recurrence: cardinal-notation-splits-gate-reach 2026-08-19 2026-09-02
   **THE 2026-09-02 RECURRENCE SHARPENS (b), re-derived independently rather than read off here.** A
   maintained total in a live queue entry rotted unseen against that entry's own recorded facts — but
@@ -8508,11 +8508,11 @@
   **Cost while deferred:** every entry of this shape either overruns its push budget or
   defers, and the deferral is invisible until the close that cannot drain it.
   recurrence: observation-predicate-entry-cannot-drain-in-its-own-iteration 2026-08-31 2026-09-01
-  **REACHED THRESHOLD 2026-09-01; FOUR DECLINES ON THE RUN AND NOT ON MERIT, THE FIRST THAT DAY.**
-  The port-only run forecloses a non-port unit while the oracle reads owed, and no yield exists.
-  **The 2026-09-02 decline DID reach the operator:** scope put all three threshold entries up as
-  one batch, the operator took `subagent-liveness-log-unattributed-refusal` as the run's exception
-  and left this deferred; 2026-09-03 and 2026-09-04 are a lead's, one of five batched each time.
+  **REACHED THRESHOLD 2026-09-01; declined on the run, never on merit; OPERATOR-RULED 2026-09-05
+  (lead-relay) TO STAY DEFERRED under the run — recorded as prose because this slug's
+  `ruled: … operator <date> lead-relay` line runs 101 columns against the 100 wrap floor.** The
+  2026-09-02 batch DID reach the operator, who took `subagent-liveness-log-unattributed-refusal` as
+  the run's exception and left this deferred; 2026-09-03/04 were a lead's. No re-escalation is owed.
   ruled: observation-predicate-entry-cannot-drain-in-its-own-iteration lead 2026-09-04 own-authority
   Filed 2026-08-27 by the lead at build, promoted 2026-08-27 by close.
 
@@ -8589,9 +8589,9 @@
   append, the same close-triage refusal text as grounds. Its one novel half — a bare-command
   journal-append affordance the convention could route through — is the SECOND sibling's by that
   same paragraph, being a behaviour change rather than a ranking one.
-  **REACHED THRESHOLD 2026-09-03, DECLINED THAT DAY AND AGAIN 2026-09-04, ON THE RUN NOT ON MERIT**
-  — the run forecloses a non-port unit while the oracle reads owed. Weighed and not taken, twice.
+  **THRESHOLD 2026-09-03, twice declined on the run; RULED 2026-09-05 to wait, not re-escalated.**
   ruled: prompt-ranking-ungrantable-shape-class lead 2026-09-03 2026-09-04 own-authority
+  ruled: prompt-ranking-ungrantable-shape-class operator 2026-09-05 lead-relay
   **SECOND MEASUREMENT, 2026-08-28 at `port-oracle-and-composer-ruling`'s close**, arriving as a gap
   bullet that re-derived this diagnosis without finding this entry, and drained here on a dedup
   sweep rather than promoted. A different head, the same class:
@@ -9294,10 +9294,10 @@
   that never records it — the binding's evidence is local while the false claim is shipped.
   **DISTINCT from `economics-posture-binding-stale`**, whose subject is the local shim restating a
   ruling it should cite; this one is the vendored TEMPLATE's own premise being wrong.
-  Captured 2026-09-02 by close; ruled filed-not-performed by the lead that day, at this close, and
-  again 2026-09-04 at scope, one of five batched — amending a kit template is non-port design work
-  the run forecloses; filing is not the `promote` it bars, `## Deferred` being no active section.
+  Captured 2026-09-02 by close; lead-declined 2026-09-02 and 09-04 on the run; RULED 2026-09-05 to
+  stay deferred — amending a kit template is non-port design work the run forecloses.
   ruled: lead-tier-split-premise-unamended lead 2026-09-02 2026-09-04 own-authority
+  ruled: lead-tier-split-premise-unamended operator 2026-09-05 lead-relay
   recurrence: lead-tier-split-premise-unamended 2026-09-03 2026-09-04
 
 - **crate-interpreter-resolution-residue** [design-pending] — the crate spawns the bare program

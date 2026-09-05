@@ -602,6 +602,29 @@ created, the ruled composer's selection is untouched, and the discharge event is
 and it is the one the clause above is about. Discharge: this paragraph is deleted with the one it
 qualifies.
 
+**A deferred entry at recurrence threshold with no port-critical shape stays deferred under the run
+— ruled 2026-09-05 by the operator, lead-relayed from an in-session prompt on a consulted
+recommendation.** The threshold rule (lifecycle-kit/templates/stages/scope.md, the pre-emption
+rule) puts a counted recurrence in front of the authority scope escalates to, and under the run
+that authority can decline or relay but never grant — so every iteration since 2026-09-02 re-bought
+the same escalation for a set the operator had already answered on that date (one of three taken
+as the run's exception, two left deferred), each member standing at the entry cap, each decline
+sentence costing a compression. Under this ruling scope lists the threshold set in its journal and
+escalates only a **new** member reaching the threshold; a further judged recurrence is stamped onto
+the entry's `recurrence:` declaration and not re-escalated; no per-iteration `ruled:` stamp and no
+decline prose is owed on those entries. The rule itself is not amended: its purpose — the collision
+reaches someone — is met, and `.claude/agents/stage-session.md`'s ruling roster already relays an
+operator-class question. Four alternatives were refused. **A hotfix grant** for any member: none is
+an impacting failure, and a grant would let a recurrence count buy the exception, the second intake
+path the rule's own text refuses. **A kit-template amendment** to that clause: lawful later as a
+Deferred filing, refused now because the consumer roster already says relay, so the kit would
+restate consumer content. **Leaving the per-iteration lead decline in place**: pure waste after the
+first relay, the cost this ruling exists to stop. **Icebox or wontfix for any member now**: not
+taken and close's to take on the tier's own criteria; `prompt-ranking-ungrantable-shape-class`
+would round-trip on its live per-close trigger. THE RUN IS NOT WEAKENED: no yield is created, the
+composer's selection and the discharge event are untouched. Discharge: this paragraph is deleted
+with the run paragraph it qualifies, when the oracle's owed count reads zero.
+
 **Port-critical units are lawful under the run, in two shapes — ruled 2026-09-05 by the
 operator in consult, on a measured column.** The consult the 2026-09-03 ordering paragraph
 scheduled sat on this date and weighed its six limbs together; that paragraph and the two that
