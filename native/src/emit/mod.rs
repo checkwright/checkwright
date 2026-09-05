@@ -618,9 +618,29 @@ fn registered_members(args: &[String]) -> Vec<String> {
     else {
         return Vec::new();
     };
-    match std::fs::read_to_string(crate::registry::list_path(dir)) {
+    let mut members = match std::fs::read_to_string(crate::registry::list_path(dir)) {
         Ok(t) => crate::registry::members(&t),
         Err(_) => Vec::new(),
+    };
+    // spec: gate-sdk/SPEC.md §run-gates — the sentinel's scope tracks `--only`'s sole-name
+    // widening: scope and selection answer the same question, so a widened member's knobs resolve
+    // instead of the bridge under-reporting and the member refusing on a knob it was configured for
+    if let Some(sole) = sole_only_name(args) {
+        if !members.contains(&sole) {
+            members.push(sole);
+        }
+    }
+    members
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — the name `--only` would select alone: names run from `--only`
+// to the `--` that ends the list or to the end of argv, and only a list of exactly one answers
+fn sole_only_name(args: &[String]) -> Option<String> {
+    let i = args.iter().position(|a| a == "--only")?;
+    let names: Vec<&String> = args[i + 1..].iter().take_while(|a| *a != "--").collect();
+    match names.as_slice() {
+        [one] => Some((*one).clone()),
+        _ => None,
     }
 }
 

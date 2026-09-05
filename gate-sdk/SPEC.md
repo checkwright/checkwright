@@ -1008,10 +1008,13 @@ exists and could not be built. **So a caller captures `gate_command`'s status �
 a command substitution, never a process substitution** — and branches on it:
 status 1 is the resolves-in-no-check-dir refusal it may name itself, and any
 other non-zero status is a failure `gate_command` has already named on stderr and
-is propagated without a second, contradicting sentence. This repo's front end
-`scripts/gate-exec.sh` takes that shape, and its obligation is
-evidence-kit/SPEC.md §check-evidence-manifest's. `gate-sdk/bin/run-gates.sh` took
-it too until the stub cut left it calling no `gate_command` at all (§run-gates).
+is propagated without a second, contradicting sentence. **No caller in this tree
+takes that shape any more**, which is why the rule is stated against the helper
+rather than against an exemplar: `gate-sdk/bin/run-gates.sh` took it until the
+stub cut left it calling no `gate_command` at all (§run-gates), and this repo's
+pre-flight front end took it until it was deleted onto that arm. The obligation
+itself is unchanged and binds the next caller written; where it is discharged for
+the pre-flight roster is evidence-kit/SPEC.md §check-evidence-manifest's.
 
 **The wrapper contract: a member whose rule *is* an external program refuses with
 its own message, at the shell form's own point in the order.** Criterion 7's
@@ -2202,9 +2205,19 @@ and narrowing nothing (evidence-kit/SPEC.md §Layout and configuration);
 `scripts/enum-sets.sh` went in-crate the same day as `--emit-enum-sets`, re-pointing
 `CANON_KIT_ENUM_SETS_CMD` on the same terms (canon-kit/SPEC.md §check-prose-enum).
 
+**The other two left by a different disposition, and the difference is worth the
+sentence.** `scripts/producer-liveness-reader.sh` and `scripts/gate-exec.sh` went
+on **2026-09-05** with no in-crate arm minted for either: each was an adapter
+whose whole body was a resolution and a dispatch, so what replaced it was a
+surface that already existed — the liveness hook's default became the running
+executable itself, and the pre-flight roster re-pointed onto the battery
+front-end's `--only` form. Deleted-and-re-pointed rather than ported, and the
+knobs they were the values of still take any consumer command, so the reading
+below is untouched either way.
+
 So the 2026-08-28 literal
 predicate (TRAJECTORY.md §The closed rulings) governs these files unopposed, and
-each takes a per-file port or a per-file declared cause on its own ground — a
+each took a per-file port or a per-file declared cause on its own ground — a
 front end's need for the shell bridge, a reader's worktree resolution — never on
 ruling (1). Corroboration rather than ground, since it predates ruling (1) and
 answers the provenance-seam question instead: the 2026-08-25 `scripts/`
@@ -9535,13 +9548,59 @@ Selection is **set-shaped and registry-ordered**: the named set is intersected
 with the registry and run in registry order rather than argv order, so two names
 give the same transcript whichever way they were typed and the run reads as a
 narrower bare run; duplicates collapse silently, because the argument is a set.
-**An unregistered name is a refusal, exit 2, naming both the name and the
-registry path.** That is the one place `--only` deliberately diverges from
-`--for`, and the divergence is the point: an ungoverned path is a fact about the
-tree, so the path-keyed selector notes it and exits 0, whereas a *name* is a
-claim about the registry and a wrong one is a typo or a stale memory — exiting 0
-there would print `All 0 gates passed.`, the vacuous green the summary line
-exists to make impossible. A `mode=staged` member receives **no** positional
+**A name resolving in neither the registry nor a check dir is a refusal, exit 2,
+naming both the name and the registry path.** That is the one place `--only`
+deliberately diverges from `--for`, and the divergence is the point: an
+ungoverned path is a fact about the tree, so the path-keyed selector notes it and
+exits 0, whereas a *name* is a claim about a **declared gate** and a wrong one is
+a typo or a stale memory — exiting 0 there would print `All 0 gates passed.`, the
+vacuous green the summary line exists to make impossible.
+
+**Registry membership is that claim's common case and not its definition, and a
+sole name is resolved against the check dirs when the registry does not hold
+it.** A `--only` naming exactly one member the registry omits is selected if any
+check dir declares it, and runs identically — same resolution order, same
+`GATE_SDK_KNOB_*` bridge, same dispatch. The vacuous green the refusal exists
+against is unreachable through this door, which is what makes it a widening of
+the rule rather than a hole in it: a declared member runs and the count is one,
+while a typo resolves nowhere and still takes exit 2 with the message above. What
+it serves is the class a registry deliberately excludes — a member wired at a
+consumer's **entry hook** rather than into a battery, whose whole reason for
+being unregistered is that a bare run must never reach it (evidence-kit/SPEC.md
+§check-producer-liveness states one). Before this, such a member was reachable
+only through a consumer's own resolver front end, so the front end this tool
+replaces could not be replaced.
+
+**The widening is sole-name-only.** With two or more names the registry
+intersection stands unchanged and an unregistered name among them refuses. That
+bound is not a second axis: `--only` already discriminates on cardinality for the
+`--` channel below, and *set-shaped and registry-ordered* has no meaning for a
+member with no registry position — a mixed selection would need an ordering rule
+invented for a case nothing asks for. Every pre-flight entry names one gate,
+which is the case that exists.
+
+**The declared-knob union tracks the widening, and it has to — measured, not
+assumed.** The `--run` arm's bridged reads are scoped by the registry sentinel
+(§The non-gate arm), so a widened member's knobs went unresolved and it refused
+on an unset knob it was configured for: the selector reached a member the bridge
+did not. Scope and selection answer the same question and are therefore derived
+from the same rule, the sole `--only` name joining the sentinel's member set.
+Naming a member the registry omits costs nothing when it is not a compiled gate —
+the per-gate knob roster is the filter, and a `.sh` member takes no bridge at all.
+Worth stating because the failure is silent in the direction that matters: a
+member reached without its bridge does not fail to run, it runs mis-configured.
+
+**It reaches an `install: never` member in a vendored tree, and that is the
+intended reach rather than an accident to bound.** The disposition governs
+**auto-registration** (§The install disposition), while the descriptor rides the
+payload like any other member — so in a consumer tree such a gate is declared and
+unregistered, exactly the shape this widening addresses. That is the point: a
+`never` member is one an adopter wires deliberately, and a front end that could
+not reach it would ship a capability that works only in the tree that wrote it.
+Nothing about `never` weakens, because it promises absence from a **bare run** and
+a sole explicit name is the opposite of one.
+
+A `mode=staged` member receives **no** positional
 arguments under `--only` unless the caller passes some through the channel below,
 which is the bare-run behavior rather than the hook's: `--for` hands such a member
 its matching paths because it *has* paths, and `--only` names gates, so a member

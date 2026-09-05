@@ -18,7 +18,7 @@ const TOOL: &str = "run-gates";
 // stderr body of an unrecognized-option refusal, per §The bin/-tool contract. It lives beside the
 // arm table it describes, because it grows by a paragraph per bridged arm.
 pub const USAGE: &str = r#"usage: run-gates.sh [gates-dir]                run every registered gate
-       run-gates.sh --only <name> [<name>...]  run only the named registered gates
+       run-gates.sh --only <name> [<name>...]  run only the named gates
        run-gates.sh --only <name> -- <arg>...  run one named gate, forwarding <arg>...
        run-gates.sh --for <path> [<path>...]   run only gates coupling to those paths
        run-gates.sh --emit <arm> [args...]     dispatch a ported non-gate emitter arm
@@ -37,7 +37,10 @@ pub const USAGE: &str = r#"usage: run-gates.sh [gates-dir]                run ev
        run-gates.sh -h | --help                this text, on stdout, exit 0
 
   --only  runs the named members in registry order whatever order they were
-          typed; duplicates collapse, and an unregistered name is a refusal.
+          typed; duplicates collapse. A name unknown to the registry is a
+          refusal, except that a *sole* name is also looked up in the check
+          dirs and selected if a gate declares it there; a name found in
+          neither is the refusal.
           The [gates-dir] positional is unavailable in this form — point
           GATE_SDK_GATES_DIR at another registry instead. A `--` separator ends
           the name list and forwards every remaining argument to the selected
@@ -388,14 +391,25 @@ fn select_for(
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — `--only` selection: set-shaped and registry-ordered, so two
-// names give one transcript whichever way they were typed; an unregistered name is a refusal
-// because a name is a claim about the registry, never a fact about the tree
+// names give one transcript whichever way they were typed; a *sole* name the registry omits
+// resolves against the check dirs, and a name resolving nowhere is the refusal
 fn select_only(
     members: &[String],
     list: &str,
+    resolve_dirs: &[String],
     only: &[String],
     forwarded: Option<&[String]>,
 ) -> Result<Vec<Selected>, i32> {
+    if only.len() == 1 && !members.iter().any(|m| m == &only[0]) {
+        if registry::resolve(&only[0], resolve_dirs).is_none() {
+            eprintln!("{}: --only: '{}' is not registered in {}", TOOL, only[0], list);
+            return Err(2);
+        }
+        return Ok(vec![Selected {
+            name: only[0].clone(),
+            args: forwarded.unwrap_or(&[]).to_vec(),
+        }]);
+    }
     for n in only {
         if !members.iter().any(|m| m == n) {
             eprintln!("{}: --only: '{}' is not registered in {}", TOOL, n, list);
@@ -417,7 +431,7 @@ fn select_only(
             picked.iter().map(|m| m.as_str()).collect::<Vec<_>>().join(" ")
         );
         eprintln!(
-            "  help: name exactly one registered gate before the '--'; broadcasting one argument vector across a selection is refused, not narrowed"
+            "  help: name exactly one gate before the '--'; broadcasting one argument vector across a selection is refused, not narrowed"
         );
         return Err(2);
     }
@@ -663,7 +677,7 @@ pub fn run(args: &[String]) -> i32 {
     let resolve_dirs = registry::resolve_dirs(&gates_dir, &kit_roots);
 
     let selected: Vec<Selected> = if !parsed.only.is_empty() {
-        match select_only(&members, &list, &parsed.only, parsed.only_args.as_deref()) {
+        match select_only(&members, &list, &resolve_dirs, &parsed.only, parsed.only_args.as_deref()) {
             Ok(s) => s,
             Err(c) => return c,
         }

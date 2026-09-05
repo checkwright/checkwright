@@ -837,22 +837,43 @@ word**, so a literal `…/check-evidence-manifest.sh` entry rides the exec bit. 
 non-zero exit refuses the entry, and the `close` stage cannot be entered at all
 — by a caller no gate enumerates, since a Point-5 reader enumeration covers
 gates and an ordinary shell-out is outside every one of them. The discharge is a
-**consumer-side front-end** that resolves a gate *name* through `gate_command`
-(this repo's `scripts/gate-exec.sh`) — deliberately not teaching lifecycle-kit
+front end that resolves a gate *name* — deliberately not teaching lifecycle-kit
 to resolve a name in that knob, which would be a kit-contract change. The
 front-end is wired for the consumer's whole pre-flight roster rather than for
 the one member that forced it: an entry still naming a path is the same trap
 armed for the next port, and re-pointing a still-shell member costs nothing
-because `gate_command` resolves it to exactly the path the entry held.
+because the same resolution finds exactly the path the entry held.
 
-**The front end's port disposition: the battery front-end's `--only <gate>` form
-is the pre-flight front end, and a consumer-side resolver script leaves the tree
-with the surface it drives.** `run-gates.sh --only` resolves the same name through
-the same `gate_command` and already carries the resolution-failure obligation
-below, so a second front end re-implements it for nothing; every pre-flight entry
-re-points to `<front-end> --only <gate>` and the resolver script is deleted. The
-knob is still not taught to resolve a name — the entry names the front end and
-the gate, and the exec-bit rule above is unchanged.
+**The front end is the battery front-end's `--only <gate>` form, and a
+consumer-side resolver script buys nothing beside it.** `run-gates.sh --only`
+resolves the same name through the same check dirs and already carries the
+resolution-failure obligation below, so a second front end re-implements it for
+nothing; every pre-flight entry names `<front-end> --only <gate>`. The knob is
+still not taught to resolve a name — the entry names the front end and the gate,
+and the exec-bit rule above is unchanged, `run-gates.sh` riding its own exec bit
+as any entry's first token must.
+
+**Each entry's argument rides that form through a `--` separator, and the
+separator is mandatory on every entry rather than an option on the ones carrying
+a corpus.** `--enter-stage` appends `<queue>` and `<state>` to every entry's argv
+and `--only` would consume each appended token as a gate name, so an entry
+spelled without `--` refuses whether or not its own argument was load-bearing.
+The grammar, its single-member bound and the sole-name resolution an entry naming
+an unregistered gate rides are gate-sdk/SPEC.md §run-gates', cited rather than
+restated. The trailing `<queue> <state>` lands inside the forwarded argv, which is
+where it already landed: `check-producer-liveness` ignores every argument past the
+first and `check-evidence-manifest` reads argument 0 through its knob accessor, so
+no reader changes.
+
+**A pre-flight roster reaches a gate by *declaration*, and that is a different
+claim from battery membership — the distinction is load-bearing here and was
+bought the hard way.** The entry-hook gates this repo wires are deliberately
+absent from `gates.list` (§check-producer-liveness rules why: a registered
+liveness gate reds every validate run against that run's own lock), so a selector
+that resolved only registry members could not express the roster at all. That is
+the ground for §run-gates' sole-name widening, and it is stated here because the
+pre-flight caller is the reason the widening exists rather than a beneficiary of
+it.
 
 **Owning the front end means owning what it does with a resolution failure it
 did not cause.** `gate_command` has two failure signals and they are told apart
@@ -862,14 +883,24 @@ harness error such as a `.gate` member whose binary is absent. Both hand the
 caller an empty argv, so a front end that calls through a **process
 substitution** sees only emptiness and reports *resolves in none of* over a gate
 that resolved perfectly well and merely could not be built. The obligation is
-therefore on the front end and not on the pre-flight entry that reaches it: call
-`gate_command` through a **command substitution**, keep its status, name the
+therefore on the front end and not on the pre-flight entry that reaches it: keep
+the resolver's status rather than reading its argv for emptiness, name the
 resolves-in-no-check-dir case itself, and on any other non-zero status propagate
 the refusal **without adding a second sentence** — the reason is already on
 stderr, and the second sentence is the one the reader acts on. A front end that
 adds it turns a *build the binary* problem into a *this gate does not exist*
 problem for every caller of the roster at once, which is why this is stated where
 the front end is owned rather than left to each consumer to rediscover.
+
+**The `--only` arm discharges it, verified rather than relayed.** The two signals
+are kept apart in the crate exactly as the rule requires: a member resolving
+nowhere is reported as *listed in … but resolves in none of*, and a member that
+resolved and could not be run as *dispatch harness error, exit 2*. One difference
+is real and is not load-bearing at this caller, stated so a reader does not go
+looking for a regression: a bash front end calling `gate_command` exits **2** on a
+resolution failure, where the `--only` run exits with the aggregate's non-zero
+status. The pre-flight caller reads zero versus non-zero and nothing else, so both
+refuse the entry identically.
 
 **The data-line helper is `ek_data_lines`' own primitive, and the crate carries
 a same-named one that is a different rule.** `ek_data_lines` filters comment and
@@ -1069,6 +1100,10 @@ this gate while holding the lock it just claimed, reddening every validate run
 against its own record. The kit therefore ships the gate registered nowhere and
 wired at the entry, which is also the honest reading of its argument mode: it
 takes the lock path because its caller is a stage entry, not a whole-tree sweep.
+Registered nowhere is what an entry-hook caller has to be able to name, so the
+battery front-end's `--only` resolves a sole name against the check dirs rather
+than the registry alone (gate-sdk/SPEC.md §run-gates) — otherwise this gate's own
+design would put it beyond every front end a consumer could reach it with.
 
 The fixture pair carries the two static verdicts — a dead PID and a live one.
 Its `bad/` case names PID 1, the one PID a checked-in fixture can assert the

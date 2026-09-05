@@ -12,29 +12,6 @@
 
 ## New Features
 
-- **preflight-front-end-cut** [spec: SPEC-preflight-cut.md] — delete `scripts/gate-exec.sh` (29)
-  and re-point the nine `LIFECYCLE_KIT_ENTRY_PREFLIGHT` entries onto `run-gates.sh --only`, the
-  one owed file behind evidence-kit/SPEC.md §check-evidence-manifest.
-  **Selection ground, host and packaging: as the two cuts above**, not restated.
-  **BUILD-HELD ORDERING — it is NOT landable before `run-gates-stub-cut`'s argv channel.** Landing
-  it first does not degrade the roster, it REFUSES EVERY STAGE ENTRY IN THE REPO.
-  **THE NAIVE RE-POINT IS BROKEN ON ALL NINE ENTRIES, NOT SIX — probed at spec, escalated, and
-  ruled 2026-09-05 (lead) toward the argv channel rather than a knob.** `--only` forwards no argv
-  (`native/src/runner.rs:69-72`), and `--enter-stage` APPENDS `<queue> <state>` to every entry
-  (`native/src/emit/enter_stage.rs:1260-1263`), which `--only` then reads as two unregistered gate
-  names. So the `--` separator is mandatory even on the one entry whose knob default matches its
-  positional. All nine entries stay nine; no knob minted; no gate behavior changed.
-  **THE WIDENING OF `check-producer-liveness` WAS REFUSED and the refusal is recorded on the
-  amendment**, on evidence-kit/SPEC.md:1045-1049 (the two modes are told apart by the argument
-  being a directory), :1051-1056 (the `.run`/`.lock` split is load-bearing) and :1206-1212 (the
-  lock entries stay beside the set entries) — and because it is out of this cut's section bound.
-  **The two `.claude/settings.json` grants at :23-24 drop in the landing commit** under
-  `native-gate-port-remaining-corpus` ruling (2) as widened 2026-09-05; no grant is added, :12
-  already covering the form.
-  ruled: preflight-front-end-cut lead 2026-09-05 own-authority
-  Filed 2026-09-05 by spec, minted with its amendment and promoted in the same commit, after the
-  lead ruled the argv channel this cut consumes.
-
 ## Technical Debt
 
 ## Deferred
@@ -10064,5 +10041,6 @@
 - build-native-bootstrap-declaration
 - run-gates-stub-cut
 - liveness-reader-cut
+- preflight-front-end-cut
 
 ## Lessons Learned

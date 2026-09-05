@@ -2,7 +2,7 @@
 # spec: gate-sdk/SPEC.md §run-gates — end-to-end lock-in for the runner's *contract* over a
 # hermetic scratch registry: the argv refusals, the arm's output contract (the exact green phrase,
 # each FAIL tail, the declared-omission line staying off the summary line), the `--only` argv
-# channel and its single-member bound, and the determinism the worker pool owes.
+# channel with its single-member bound and sole-name widening, and the pool's determinism.
 # Run by run-gate-tests.sh.
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
@@ -142,6 +142,33 @@ assert_rc  only-no-argv "$rc" 0
 assert_has only-no-argv 'g_args saw: ' "$out"
 assert_has only-no-argv 'All 2 gates passed.' "$out"
 
+# ---- the sole-name widening ----------------------------------------------------
+# spec: gate-sdk/SPEC.md §run-gates — a sole name the registry omits is selected when a check dir
+# declares it, two or more keep the registry intersection, and a name declared nowhere still
+# refuses: the pre-flight roster is the caller, and its gates are unregistered by design.
+{ printf '#!/usr/bin/env bash\n'
+  printf '# graph: couples=cfg dir=one valve=none tier=precommit trigger=*\n'
+  printf 'echo "g_unreg saw: $*"\n'
+} > "$scratch/g_unreg.sh"
+chmod +x "$scratch/g_unreg.sh"
+{ echo g_args; echo g_pass; } > "$scratch/gates.list"
+
+out="$(GATE_SDK_VERBOSE=1 merged --only g_unreg -- alpha)"; rc=$?
+assert_rc  only-widened "$rc" 0
+assert_has only-widened 'g_unreg saw: alpha' "$out"
+assert_has only-widened 'All 1 gates passed.' "$out"
+
+# a sole name declared nowhere keeps the refusal, unchanged in text
+out="$(merged --only g_absent)"; rc=$?
+assert_rc  only-widened-absent "$rc" 2
+assert_has only-widened-absent "run-gates: --only: 'g_absent' is not registered in $scratch/gates.list" "$out"
+
+# the widening is sole-name-only: with a second name the registry intersection stands
+out="$(merged --only g_unreg g_pass)"; rc=$?
+assert_rc  only-widened-bound "$rc" 2
+assert_has only-widened-bound "run-gates: --only: 'g_unreg' is not registered in $scratch/gates.list" "$out"
+assert_absent only-widened-bound 'g_unreg saw:' "$out"
+
 [[ "$fails" -eq 0 ]] || { echo "run-arm-contract.test: $fails assertion(s) failed"; exit 1; }
-echo "run-arm-contract.test: clean (the three FAIL tails, the exact green phrase, the omission line beside the summary and not in it, the four argv refusals, the --only argv channel forwarded on a single-member selection and refused on a two-member one, and two default runs and a serial run byte-identical)"
+echo "run-arm-contract.test: clean (the three FAIL tails, the exact green phrase, the omission line beside the summary and not in it, the four argv refusals, the --only argv channel forwarded on a single-member selection and refused on a two-member one, the sole-name widening selected/refused/bounded, and two default runs and a serial run byte-identical)"
 exit 0
