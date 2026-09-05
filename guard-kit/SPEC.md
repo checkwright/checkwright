@@ -381,9 +381,9 @@ grounds because both are live.** The declaration sits in its own header and
   of `templates/bash-guard.sh`, composed from the primitives above; the `kit
   owning the rule ships the guard` pattern just stated is every other consumer
   doing the same through the `GUARD_KIT_LIB` indirection. Porting this library
-  would delete that extension point, which `native-gate-port-remaining-corpus`'
-  ruling (1) refuses — *a cut narrows the port, never an extension point* — on a
-  seam whose interface is a set of shell functions.
+  would delete that extension point, which the general rule that *a cut narrows
+  the port, never an extension point* refuses, on a seam whose interface is a set
+  of shell functions.
 
 **What reopens it:** the first ground dissolves if this kit's knobs stop crossing
 the bridge, or if gate-sdk/SPEC.md §lib/gate.sh ever admits a second bridge
@@ -824,10 +824,9 @@ that harness exists would be designing against no case.
     this chokepoint — so a block's false-fire population is every short-lived
     backgrounded call in the tree, and this ruleset's established direction is to
     bias toward passing. Rule 14 departs from that direction on an attested record
-    of failure; this rule has none to depart on: both attested firings
-    (2026-08-19 and 2026-08-21, the second self-disclosed) produced no orphan, so
-    the harm is latent and a block is not warranted by a latent harm when the
-    reminder is what was missing. The harm already has a block — rule 14 refuses
+    of failure; this rule has none to depart on: both attested firings produced
+    no orphan, so the harm is latent and a block is not warranted by a latent
+    harm when the reminder is what was missing. The harm already has a block — rule 14 refuses
     the mutation — and this rule covers the **omission** that hides it, one step
     upstream, where a second refusal buys a second stop rather than a second
     catch. Both firings were a session that *knew* the rule and forgot it at the
@@ -1341,11 +1340,11 @@ wherever the battery front end is, and a consumer cannot decline scratch
 execution without declining the battery. What a consumer loses is the ability to
 **separate** the two decisions; what is unchanged is the compensating control
 itself, which lives in the code and never lived in the grant. This is a **taken
-cost, not a discovery**: the operator ruled the removal-only shape with this
-retirement named in the question (2026-09-05). It does **not** establish that a
-port may retire a consumer guarantee whenever a family rule forces its hand —
-the retirement was escalated rather than decided in the cut, and a later cut
-proposing another owes its own escalation.
+cost, not a discovery**: the removal-only shape was taken with this retirement
+named in the question. It does **not** establish that a port may retire a
+consumer guarantee whenever a family rule forces its hand — retiring one is an
+escalation rather than a decision inside the cut, and a later cut proposing
+another owes its own.
 
 **Scratch execution is bash-only, and the runner's hardcoded interpreter is the
 statement of that rule rather than an unexamined default.** Executing a program
@@ -1369,7 +1368,7 @@ structural fact stands; what it prices does not.** A permission set is matched,
 not versioned, so a *relocated* arm is a different command string and the old
 entry cannot become the new one without a window where neither runs. What this
 section used to conclude from that — *and that is what prices the work* — the
-2026-09-05 port falsified. Under gate-sdk/SPEC.md §The non-gate arm's
+port to a bridged arm falsified. Under gate-sdk/SPEC.md §The non-gate arm's
 forced-family test the runner is a **bridged** arm, so its new command string is
 the battery **front end's**, which a consumer's front-end grant already buys
 whole: any addition owed is that grant, bought once for every bridged arm, and
@@ -1442,9 +1441,8 @@ settings, never a kit literal.
 either in-crate — `native/src/emit/scratch_run.rs` and its `BRIDGED_ARMS` row —
 or declared `# no-port:` (`lib/guard.sh`, which composes rule 23's steer). The
 seam cases stay in `gate-tests/scratch-run.test.sh`, on the shell substrate by
-their own nature. `bin/scratch-run.sh` was the one owed surface and the
-2026-09-05 cut took it, so **no later port cut is sequenced against this
-section**.
+their own nature. `bin/scratch-run.sh` was the one owed surface and its port took
+it, so **no later port cut is sequenced against this section**.
 
 ## scan-prompts
 
@@ -2226,9 +2224,9 @@ only under `cargo test`, which needs a Rust toolchain, while the shipped
 artifact per declared target precisely so an adopter with no toolchain has a
 working battery. Moving this runner into a crate test would narrow the set of
 adopters who can run guard-kit's decision table from *everyone with the binary*
-to *everyone with cargo* — a reach narrowing taken inside a port, which
-`native-gate-port-remaining-corpus`' ruling (1) refuses in its own domain and
-which nothing here licenses. **The discriminator, so the two roads stay
+to *everyone with cargo* — a reach narrowing taken inside a port, which the rule
+that a cut narrows the port refuses in its own domain and which nothing here
+licenses. **The discriminator, so the two roads stay
 distinguishable:** a crate test is the right home when the member's **subject**
 is in-crate, which the escalation guard's is; an arm is the right home when the
 subject is a spawned shell surface the payload ships, which `bash-guard.sh` is.

@@ -263,7 +263,7 @@ Steps, in order:
    stage's craft-rule pointer block, so a stage session is reminded of the
    craft rules bearing on it before the matching action. The step runs the
    resolved command with the stage appended and carries **no `-f` existence
-   guard**, the drift line's own 2026-08-29 shape: a path test on a command
+   guard**, the drift line's own shape: a path test on a command
    passes for nothing. Silently absent
    when the emitter is unset or the stage routes no rules (doctrine-kit owns
    the emitter and its tag grammar; the seam is this optional step, the
@@ -462,8 +462,8 @@ The constrained members and what forces each:
   earlier `4.0` was a fail-open: `env-probe` reported `ok` on a 4.2 box the
   battery would fail with an obscure syntax error.
 - `awk::GNU` — no version floor, one implementation constraint, whose last live
-  holder the eighth port cut retired; narrowing the element is filed as
-  `interpreter-floor-gawk-residue-empty` (gate-sdk/SPEC.md §check-gate-assertions).
+  holder has since been retired; narrowing the element is owed rather than taken
+  (gate-sdk/SPEC.md §check-gate-assertions).
 - `sort::coreutils` — no version floor, one implementation constraint, and one
   member standing for a whole package family: GNU coreutils is forced by
   `realpath --relative-to` and its `-m` form (gate-sdk's shared gate library and
@@ -508,7 +508,7 @@ The constrained members and what forces each:
   graph actually require, not whatever rustc a given box happens to carry; pinning
   the latter would be exactly the aspiration this section's rule forbids. Runtime is
   unaffected: git remains the sole runtime dependency of a ported gate, shelled out
-  rather than embedded (TRAJECTORY.md §The closed rulings owns that constraint).
+  rather than embedded.
 Every other member is a bare name — no construct in the battery forces a version
 on it (the `jq` usage is 1.5-era throughout), so none is pinned.
 
@@ -908,9 +908,9 @@ consumer config surface, taken openly and refusing loudly outside the subset —
 the silent mis-scan the ERE cohort's foreclosure forbids, which binds *sizing an
 implementation* to one consumer's usage while the documented grammar stays wider.
 The knob's whole documented job is naming a settings key, which a path expression
-expresses in full. Operator-ruled 2026-08-14, with a filter crate (`jaq`) priced
-against it and declined; a later reader must not reopen it on the observation that
-such a crate exists, because that observation is what the ruling was made against.
+expresses in full. A filter crate (`jaq`) was priced against the narrowing and
+declined; the observation that such a crate exists is not a ground to reopen it,
+being the observation the narrowing was decided against.
 
 **The right-hand side is a JSON value, and the comparison is structural** — the
 `jq -c` *rendering* is not the contract. A byte-rendering contract is unachievable
@@ -1159,9 +1159,8 @@ silence here is not an undecided class. `lib/toolfloor.sh` rides the config
 bridge's `lib/*.sh` glob and resolves no bridged knob (`PROBE_SET` carries no kit
 prefix); what sequences it is that its roster is read on the **installer** path
 and by `check-install-toolchain`'s parity assertion, so it moves behind the
-installer's own behind-invoke relocation, whose live entry is
-`powershell-installer-surface`. The entry that owns its port is
-`kit-library-port-residue`. The `lib/pub-lang/` extractors that sat beside it are
+installer's own behind-invoke relocation and is sequenced there rather than in
+this section. The `lib/pub-lang/` extractors that sat beside it are
 **discharged**: they were the bundled members of the registry `pub-index`
 resolves, and they moved in-crate behind the surviving seam in the cut that
 ported that resolver (§Index-first reading).
@@ -1294,8 +1293,8 @@ spelling, and there the absolute answer is the honest one.
   drift report, not a path: the hook runs
   `run-gates.sh --emit <name> --trend` for the brief's drift line; default
   empty (the line is omitted), and this repo's own copy sets `drift-report`.
-  **It was a script path until 2026-08-29**, and the change is called out
-  because the guard changed with it: a `-f` existence test on an arm name
+  **It was a script path in an earlier revision of this kit**, and the change is
+  called out because the guard changed with it: a `-f` existence test on an arm name
   passes for nothing, so a hook that kept testing the value as a path would
   have dropped the drift line with no red anywhere. A consumer whose config
   still holds the old path degrades to no drift line, which is the same
@@ -1305,7 +1304,7 @@ spelling, and there the absolute answer is the honest one.
   appended for the brief's craft-rule block, and carries no `-f` guard. Default
   empty (the block is omitted); this repo's own copy sets doctrine-kit's
   `--emit stage-rules` invocation (doctrine-kit/SPEC.md §stage-rules).
-  **It was a path to a bash script until 2026-09-03**, widened when that emitter
+  **It was a path to a bash script in an earlier revision**, widened when that emitter
   ported to a compiled arm — a command a consumer can still point anywhere,
   which is what porting a knob's *value* leaves intact. The honest limit, stated
   because the migration is not free for everyone: a consumer whose config holds a
@@ -1358,8 +1357,8 @@ spelling, and there the absolute answer is the honest one.
   check-memory-off scans; default the current project's dir under the operator's
   home, `$HOME/.claude/projects/<slug>/memory`, where `<slug>` is the project's
   absolute path with every `/` and `.` folded to `-` (the harness's own
-  encoding). A knob because the layout moves (the plugin-marketplace ruling:
-  design against the live layout, keep it config).
+  encoding). A knob because the layout moves: design against the live layout,
+  keep it config.
 
 The hook template itself is consumer-edited rather than knob-driven (the
 guard-kit guard precedent): its variation points are layout judgment,

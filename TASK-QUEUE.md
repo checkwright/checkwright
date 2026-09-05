@@ -57,6 +57,38 @@
   **DISCHARGE CONSEQUENCE:** TRAJECTORY.md's directive paragraph discharges on "that unit lands and
   the gate is green", and the gate is this entry's — so that paragraph survives until THIS entry
   lands whole, not until this slice does.
+  **THE context-kit + guard-kit SLICE IS LANDED** (2026-09-06 build). Both SPECs now carry zero
+  dates, zero TRAJECTORY.md pointers, zero queue slugs and zero authority stamps.
+  **THE PREDICATE WAS NOT RE-AUTHORED, AND THE NEXT KIT MUST NOT RE-AUTHOR IT EITHER** — it is the
+  parent half's merged amendment, recovered whole with
+  `git show d190c2f6^:gate-sdk/SPEC-seam-sweep.md` (deltas 1-3). That recovery is the answer to
+  this entry's SIZE-BY-FIXING-THE-PREDICATE instruction; a fourth re-measure is not.
+  **48 CANDIDATE SITES CENSUSED, 14 SWEPT, AND THE GAP IS THE FINDING.** The deciding rule is that
+  amendment's delta-1 COROLLARY — undated narrative naming NO authority, date or internal
+  identifier is engineering prose and is NOT swept, the test being the identifier and never the
+  tense — which cleared 25 sites a blanket sweep would have destroyed.
+  **A5 EVENT DEIXIS, NOT UNDATED AUTHORITY, IS WHAT THE THREE PRIOR SCANS MISSED:** 39 of 48 sites,
+  against three undated-authority sites of which two also carried a date. A corpus can be dense
+  with provenance and nearly free of authority attribution, so a predicate built only to add the
+  undated-authority subclass to a date scan MISSES AGAIN. Fixing the ordering claim with it: the
+  per-kit rank ordering held qualitatively (guard-kit above context-kit) and was worthless
+  quantitatively, 7 swept sites each.
+  **THE NINE POINTER-CLASS SITES ARE DELIBERATELY UNSWEPT** — guard-kit 4, context-kit 5 counting
+  the `docs/`- and `BRIEF.local.md`-class — on a fact neither half of the split had recorded: THE
+  PARENT HALF DID NOT ANSWER IT EITHER. `d190c2f6` filed "whether an owner-doc pointer a consumer's
+  own tree cannot resolve belongs to the pointer class tree-wide" UNANSWERED and shipped gate-sdk
+  with all ten of its citations standing. Answering it for one kit would breach *at once or not at
+  all*, would leave the corpus inconsistent in the direction that makes the gate harder to write,
+  and would SET an envelope this slice carries no amendment to set. A derivation, not a ruling —
+  open for the lead or the operator to close either way when the last kit lands with the gate.
+  **NO SITE IN EITHER FILE WAS SOLE-HOME.** The move-versus-delete warning resolved at
+  §scratch-run's retired consumer opt-out (guard-kit's half of the pair) to *do not delete the
+  paragraph*: its engineering ground stays in place restated impersonally, and the spent stamp went
+  to git history, which is what delta 3's own test directs — migrating a finished ruling back into
+  the ruling record is what that record's doctrine forbids. drift-kit's half is untouched and its
+  bounding clauses still owe the same treatment.
+  **REMAINING: EIGHT KIT SPECS PLUS THE GATE** — canon, delegation, doctrine, drift, evidence,
+  lifecycle, queue, site.
   Filed 2026-09-05 at scope with the gate-sdk-boundary split that created it; its parent slug
   retired 2026-09-05 with the gate-sdk half landed. Promoted here 2026-09-06 on the operator's
   2026-09-05 direction, still live and half-discharged, at the by-kit slice the lead sized.
