@@ -207,11 +207,11 @@
   same cut: the kit template dropped a default that pointed at nothing (a path present in no tree
   reads as a shipped capability and is none), the knob kept its contract exactly — a path run with
   the scratch dir as its only argument — and this repo named its own reader
-  `scripts/producer-liveness-reader.sh`, reaching the gate by name through `scripts/gate-exec.sh`.
-  Proved by negative control at `scripts/gate-tests/subagent-stop-reader.test.sh`, which fails
-  with exactly `verdict=unavailable` against the dead default.
+  `scripts/producer-liveness-reader.sh`, reaching the gate through `scripts/gate-exec.sh`. BOTH
+  scripts left the tree 2026-09-05, and the negative control at
+  `scripts/gate-tests/subagent-stop-reader.test.sh` now asserts `unresolved`, never `unavailable`.
   **The capture log priced the loss and then verified the repair, read at close.**
-  `.workflow/subagent-stop-liveness.log` carries **77** `verdict=unavailable` firings, every one
+  `.workflow/subagent-stop-liveness.log` carried **77** `verdict=unavailable` firings, every one
   inside a single 46-minute window between the port that deleted the path and the repair, and
   **zero** after it. So the degradation was real, bounded, silent except for that field, and is
   closed — which is what makes the surviving question a convention question rather than a defect.
@@ -220,10 +220,10 @@
   descriptor, and discharged it with a CONSUMER-SIDE front end resolving the gate name, explicitly
   refusing to teach the kit's knob to resolve a name as "a kit-contract change". Two kits, two
   consumers, one shape, invented twice.
-  **Why this needed design:** naming the convention is a cross-kit envelope change and it collides
-  with the provenance seam — a kit template cannot name this repo's `scripts/gate-exec.sh`, the
-  front end evidence-kit/SPEC.md §check-evidence-manifest rules an entry must reach a gate
-  through, so any default is a seam question before it is an ergonomics one.
+  **Why this needed design:** naming the convention is a cross-kit envelope change. The seam
+  INSTANCE it was argued on is spent — `scripts/gate-exec.sh` left the tree 2026-09-05 and its
+  successor `run-gates.sh --only` is kit-shipped, so a template could name that one — while the
+  question survives on the parser knobs, where any default is still a seam call first.
   **Cost while deferred:** low and adoption-shaped — every consumer configuring such a knob
   rediscovers the adapter shape from scratch, and a consumer that does not gets honest degradation
   rather than a break, which is why nothing forces the issue.
@@ -4088,7 +4088,7 @@
   which sharpens the deliverable rather than adding a second one. The overlay carries
   `Bash(native/target/release/checkwright-gates *)` — a path-naming grant over a gitignored,
   session-writable file, exactly the shape. The template's remedy (route through the sanctioned
-  runner, drop the direct grant) does not apply: `scripts/gate-exec.sh` resolves **gates** and
+  runner, drop the direct grant) does not apply: the front end resolves **gates** and
   reaches none of the binary's non-gate arms, so dropping the grant would push the tree's own
   live deliverable back behind a prompt. The instance was kept and the judgment stated. What that
   shows is that "names a writable path" is too coarse a predicate on its own — the artifact here
@@ -6990,13 +6990,13 @@
   which `pack-installer.sh` then vendors, breaking `checkwright init` at `git add` and reddening
   `installer_smoke` for the WRONG reason — which is what masked a ruled scenario at this
   iteration's validate and cost a diagnosis.
-  **The baseline row is NOT re-attributed to this entry, ruled 2026-08-24 and recorded so the
-  next validate does not re-litigate it.** `.workflow/validate-baseline.txt`'s `installer_smoke`
-  row keeps `binary-less-dispatch-loop-retirement`: that slug is the standing unpaid price the row
-  exists to hold visible, and this one is a transient masking cause stacked on top of it — exactly
+  **The baseline row was NOT re-attributed to this entry, ruled 2026-08-24 and recorded so the
+  next validate does not re-litigate it.** While the loop was shell, that `installer_smoke` row
+  kept `binary-less-dispatch-loop-retirement` as the standing unpaid price it held visible, and
+  this one was a transient masking cause stacked on top of it — exactly
   the split evidence-kit/SPEC.md §Baseline manifest now rules generally, which is where the ruling
   was landed rather than left as this instance's precedent. This entry's cost line above is where
-  the masking diagnosis belongs, and it stays here.
+  the masking diagnosis belongs. The loop has since retired and that row now reads pass.
   Filed 2026-08-24 to the gap inbox by validate, with an explicit distinct declaration; promoted
   2026-08-24 at `shell-gate-tail-port-and-completion-oracle`'s close, which deleted the
   regenerated instance in the same commit; the attribution question its recurrence put to

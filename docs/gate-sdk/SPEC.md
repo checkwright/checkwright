@@ -9221,8 +9221,9 @@ second source: `--emit-<name>` is what `.gate` dispatch and every hermetic
 `gate_native_bin` caller already use (§check-gate-substrate-parity), and a table
 edited twice per arm is the per-arm growth this cut deleted, relocated rather
 than removed. Leaving the composition in the front-end is refused because it is
-the whole of what grew — seventeen `case` arms existed to compose seventeen arm
-names. **One asymmetry is admitted rather than hidden**: the crate now accepts
+the whole of what grew — the front end carried one `case` arm per bridged arm and
+composing that arm's name was the branch's only content, so the table grew by a
+branch every time an arm was bridged. **One asymmetry is admitted rather than hidden**: the crate now accepts
 `--emit graph` and `--emit-graph` as the same arm, and an alias is a cost. It is
 taken because the front-end spelling is what every human caller, workflow file
 and settings grant in every consumer tree already types, and because the alias
@@ -9234,7 +9235,7 @@ precisely the path where the binary is absent or not executable — the branch t
 prints the build remedy naming `bash gate-sdk/bin/build-native.sh` — so a property
 the binary would have to be running to report is unavailable exactly when it is
 needed. The stub holds it as a two-name test on the leading token, `--hook` and
-`--statusline` taking the fail-open `0`, not as a seventeen-arm table. **It is a
+`--statusline` taking the fail-open `0`, not as a per-arm table. **It is a
 second source and this section says so rather than claiming otherwise**: each
 arm's contract prose states its own unavailable status and nothing holds the two
 halves in lockstep. What bounds the exposure is that the shell half is two names
@@ -9674,7 +9675,7 @@ plainly is. The consequence is stated rather than left to be discovered: `-h` an
 tree with no binary, and they now reach the binary like every other arm — on a
 binary-less tree they get the absent-binary diagnostic, which names the build
 command, at the unavailable status instead of the usage text at 0. **That trade
-is taken deliberately**: a usage text listing seventeen arms none of which can run
+is taken deliberately**: a usage text listing every arm, none of which can run,
 is a worse answer than one line naming the one command that makes them run.
 `--help`'s status where the binary is present is unchanged at 0.
 

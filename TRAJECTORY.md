@@ -462,20 +462,6 @@ publishes private history as mechanism and ships pointers a consumer cannot foll
 the gate that holds the seam afterwards are one queue unit, filed from this consult; discharge
 event: that unit lands and the gate is green, at which point this paragraph is deleted.
 
-**The battery front-end ports to a stub and its binary-less loop retires; the crate's build
-script is declared on a bootstrap cause — ruled 2026-09-05 by the operator in consult.** The
-mechanism is gate-sdk/SPEC.md §run-gates and §build-native. Two alternatives were refused for
-`gate-sdk/bin/run-gates.sh`: porting it whole with the shell loop surviving inside the ported
-file, which keeps a duplication whose only served branch — the omit-and-declare install — has
-had nothing to dispatch since the battery's last shell gate left; and a `# no-port:` on the whole
-file, a subtraction that grows by a dispatch branch per bridged arm. The loop's retirement
-condition, zero `.sh` members, arrived 2026-08-24 and was held on the queue as
-`binary-less-dispatch-loop-retirement`; it lands inside this cut rather than as a unit of its
-own. For `gate-sdk/bin/build-native.sh` the refused alternative is porting it: a fresh clone
-has no binary to run the build with, which is the install bootstrap's irreducible met on the
-contributor side, and a per-file cause naming it is not the contributor-side *class* the
-2026-08-28 predicate refuses.
-
 **A stated cause reaches only the members it names, and an always-loaded manifest is never a
 cut boundary — ruled 2026-09-05 by the operator in consult.** Mechanism at gate-sdk/SPEC.md
 §Porting a gate to the binary substrate, beside the outer-bound ruling it extends. Refused: the
@@ -485,17 +471,6 @@ subject as one cut under CLAUDE.md §Housekeeping, which is averaging grounds un
 that owns no mechanism. Re-homing a `# spec:` that points at a manifest is a defect correction
 and not the re-homing the 2026-09-03 ruling refused, which was a re-pointing away from a SPEC
 section that already owned the file.
-
-**The turn-end liveness hook reaches its gate through its own executable; the pre-flight front
-end is the battery front-end's `--only` form — ruled 2026-09-05 by the operator in consult.**
-Mechanism at delegation-kit/SPEC.md §The turn-end liveness hook and evidence-kit/SPEC.md
-§check-evidence-manifest. The *no default reader* rule was written while the gate was a
-descriptor a bash front end dispatched; with the gate and the hook compiled into one binary the
-front end is the binary itself, so the worktree-absence problem this repo's reader solved is
-gone rather than ported. Refused: porting the reader as a spawned arm, which carries the
-resolution hack into the crate; and per-file `# no-port:` causes on both scripts, a bash-spawn
-contract and a consumer front end, which subtract fifty-five lines for a contract the binary
-retires. `single-gate-front-end-form-unruled` closes with it.
 
 **Both drift-kit meters adopt the stage-economics session-key derivation — ruled 2026-09-05 by
 the operator in consult.** Mechanism at drift-kit/SPEC.md §The overhead meter. Refused: porting
@@ -591,11 +566,6 @@ a session's however good its grounds. **What carries it is the run's own purpose
 drain's tiering:** a Deferred entry consumes no iteration, so it yields nothing to non-port work,
 which is the whole of what the run exists to prevent. A bullet that neither a fix nor the icebox
 tier can take has nowhere else to go, and dropping it is the attrition every rule here refuses.
-**TWO CLOSES REACHED THIS READING INDEPENDENTLY BEFORE IT WAS RULED**, on the same operator-class
-blocker and the same icebox-eligibility failure: `run-gates-front-end-cut-legality-unruled` at the
-close of `scan-prompts-cut`, and `build-native-bootstrap-port-disposition-unruled` at the close of
-`usage-verdict-cut`, which flagged the reading rather than resting on it. Both stand. That two
-sessions converged unaided is why this is recorded rather than left to a third to re-derive.
 **THE RUN IS NOT WEAKENED, stated because that is the reading to guard against.** No yield is
 created, the ruled composer's selection is untouched, and the discharge event is unchanged. An
 **active-section** promotion stays barred — that is the motion which would consume an iteration,
