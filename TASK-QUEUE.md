@@ -995,54 +995,54 @@
 
 - **gap-inbox-commit-ownership** [design-pending] — the filing session commits its own bullet, and
   what is left is landing that rule where a filer reads it. Until then a filed bullet reaches the
-  next iteration uncommitted and is carried by whichever session happens to stage next. The tag
-  marks deferred-section membership, which `check-amendment-queue` holds over every entry here; the
-  SHAPE is ruled below and is no longer the pending part.
-  **Re-tiered out of the icebox 2026-08-19 on a falsified premise, by the lead rather than the
-  operator because the entry's own cost field decides it:** icebox membership asserts "no named
-  event is waiting to promote it", and a named event had occurred.
-  **The firing, probed rather than inferred.** The capture affordance appends and never commits — no
-  `git` invocation in it, before or after its port. `git log -- .workflow/gap-inbox.md` shows one
-  close's third bullet left in the working tree and carried into history by the NEXT iteration's
-  scope stamp.
-  **The distinction the firing turns on:** committing a bullet is **not** its disposition — the
-  drain contract (lifecycle-kit/SPEC.md §The committed gap inbox) gives a bullet exactly one,
-  promoted, fixed inline or discarded with cause, and none of them is "committed". A surface named
-  *the committed gap inbox* whose filer never commits is the gap in one phrase.
-  **THE SHAPE IS RULED AND THE TAG IS SPENT — 2026-09-06 by the operator, through an interactive
-  prompt in the lead session, relayed by the lead rather than ruled by it: a session that files a
-  gap-inbox bullet COMMITS IT ITSELF, at the first moment the git index is free of stage-session
-  work**, on the stated ground that an uncommitted gap-inbox is prone to be lost. That selects the
-  second shape (oblige the filing session) and refutes the third (rule the carry legitimate). The
-  first — have `--emit file-gap` commit its own bullet — is left unruled, and the ruling's own
-  index-free precondition argues against it, since a capture affordance cannot judge whether an
-  index is free. **The precondition is NEW material rather than a restatement:** the standing
-  objection to shape one was index contention, and the ruling answers that objection with a timing
-  test instead of by rejecting committing.
+  next iteration uncommitted and is carried by whichever session happens to stage next.
+  **THE `[design-pending]` TAG IS NOT STALE AND CANNOT BE: it is section membership, not design
+  pendency, and `check-amendment-queue` couples it BOTH WAYS** — a deferred entry lacking it reds,
+  an active entry carrying it reds. Every entry here wears it, so it discriminates nothing, and the
+  only way to drop it is to promote: the decision itself. Probed 2026-09-06 by taking the red.
+  **The distinction the gap turns on:** committing a bullet is not its disposition — the drain
+  contract (lifecycle-kit/SPEC.md §The committed gap inbox) gives a bullet exactly one, promoted,
+  fixed inline or discarded, and none is "committed". A surface named *the committed gap inbox*
+  whose filer never commits is the gap in one phrase; the affordance makes no `git` call.
+  **THE SHAPE IS RULED — 2026-09-06 by the operator, through an interactive prompt in the lead
+  session, relayed by the lead rather than ruled by it: a session that files a gap-inbox bullet
+  COMMITS IT ITSELF, at the first moment the git index is free of stage-session work**, on the
+  ground that an uncommitted gap-inbox is prone to be lost. That selects the second shape and
+  refutes the third. The first — `--emit file-gap` committing its own bullet — is unruled, and the
+  index-free precondition argues against it since a capture affordance cannot judge index freeness.
+  **That precondition is NEW material:** the standing objection to shape one was index contention,
+  and the ruling answers it with a timing test rather than by rejecting committing.
   **THE DELIVERABLE, with its target named.** `lifecycle-kit/templates/lead.md` says every
-  lifecycle-state write happens in the stage session and never in the lead, while the same
-  template's §Stamps are authoritative sanctions the lead writing this surface with `--emit
-  file-gap` and its own enumeration omits commits — so a lead reading the prohibition literally
-  writes the bullet and does not commit it. One clause carving a gap-inbox commit out of that
-  prohibition with its precondition, plus the shape selection in lifecycle-kit/SPEC.md. Debt.
-  **Cost while deferred:** low per instance and silent — a bullet outside git until some later
-  session notices, invisible to `git log`, lost outright if the tree is reset; it is also the one
-  class the inbox's own merge=union answer cannot cover, union protecting a committed surface only.
-  **Corrected 2026-09-01 by measurement rather than by a re-filing:** an uncommitted bullet aborted
-  `run-validate.sh` after 16 of 22 suites ran clean, through the unscoped predicate
+  lifecycle-state write happens in the stage session and never in the lead, while its own §Stamps
+  are authoritative sanctions the lead writing this surface with `--emit file-gap` and omits commits
+  from its enumeration — so a lead reading the prohibition literally writes the bullet and does not
+  commit it. One clause carving that commit out of the prohibition with its precondition, plus the
+  shape selection in lifecycle-kit/SPEC.md. Debt: no governed name added.
+  **Cost while deferred:** low per instance and mostly silent — a bullet outside git until some
+  later session notices, lost outright if the tree is reset, and the one class the inbox's
+  merge=union answer cannot cover. **Corrected 2026-09-01 by measurement:** one such bullet aborted
+  `run-validate.sh` after 16 of 22 suites ran clean, through the predicate
   `pack-step-dirty-tree-predicate-unscoped` owns — loud there, silent everywhere else.
-  **RECURRENCE JUDGED 2026-08-31 by close, on three attested firings inside one iteration:** build
-  batches A, B and C each carried a lead-filed bullet into history on a dispatch-prompt instruction
-  and none dispositioned it — the third shape running in production, failing SILENTLY the moment a
-  dispatch omits the line. That evidence is what the 2026-09-06 ruling answers.
-  **FIRED AGAIN 2026-09-06** at the iteration-open boundary, in the same shape: the lead filed a
-  bullet with `--emit file-gap` and left it uncommitted for this scope session's stamp to carry.
-  That firing is what carried the ruling above.
+  **FIVE ATTESTED FIRINGS, all ANSWERED by the ruling above and kept only as its evidence base.**
+  2026-08-18 re-tiered this entry out of the icebox; three inside one iteration, judged a recurrence
+  2026-08-31, were the third shape running in production and failing silently whenever a dispatch
+  omitted its instruction line; 2026-09-06 took it to threshold and carried the ruling.
+  **AT THRESHOLD AND DELIBERATELY NOT PROMOTED — `lead, own-authority` 2026-09-06, off the
+  port-first run's own text.** Its third joining ground is *product-class with a live trigger*,
+  which roadmap-tagged and threshold entries are named as satisfying: the relative clause attaches
+  to the TRIGGER, never to the class, so threshold membership supplies a trigger and not a class.
+  This entry is MACHINERY-class and the counterfactual clause does not rescue it — `--enter-stage`
+  reads the inbox from the WORKING TREE, so an uncommitted bullet still counts and no gate verdict,
+  install path or payload goes wrong. Machinery findings stay icebox-by-default.
+  **A same-surface argument was made for it and was WRONG; recorded because the error recurs.**
+  Ground 2 is "it edits a kit or SPEC section THE CUT edits", and the adjacency claimed was to a
+  JOINED unit, not the cut. Read that way the ground is transitive, and a window growing by
+  transitive closure is what the composition test exists to stop. **Nothing is lost by waiting:**
+  the ruling is durable here and operative now whenever the doc clause lands, and the entry returns
+  by the conserved route with its shape already selected.
   recurrence: gap-inbox-commit-ownership 2026-08-31 2026-09-06
-  Filed 2026-07-25 by close draining its own gap inbox, and born in the icebox rather than demoted
-  to it — `git log -S` over the slug returns that one commit, which is the whole of its history
-  before this move. Fired 2026-08-18 and re-tiered 2026-08-19 by the scope session the
-  uncommitted bullet reached, which is also the session that carried it into history.
+  Filed 2026-07-25 by close draining its own gap inbox, born in the icebox rather than demoted to
+  it — `git log -S` over the slug returns that one commit, the whole of its history before the move.
 
 - **crate-test-cwd-process-global-race** [design-pending] — the crate's test guard covers the knob
   environment and nothing else, while a second process-global is written by a test and read by
