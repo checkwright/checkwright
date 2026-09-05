@@ -67,7 +67,11 @@ corrected, not a fact newly discovered.
 - `lib/` — one file per verb; the dispatcher's roster is this directory.
 - `lib/common/` — modules the verbs share. The dispatcher's roster is the
   `*.sh` files directly under `lib/`, and that glob does not descend, so a
-  shared module cannot be advertised as a verb.
+  shared module cannot be advertised as a verb. **What decides whether one of
+  these is reachable at an installed `PKG_ROOT` is `package.json`'s `files`
+  roster, not this directory** — a helper sourced from the consumer smoke
+  resolves only because `lib/` is on that roster, so a module added here is
+  shipped by that entry and by nothing in this layout.
 - `payload/` — the vendored kit source, assembled at pack time from the
   repository's own kit roots. It exists in the published tarball only, never in
   the source tree, so no second copy of any kit is checked in.
@@ -1174,6 +1178,14 @@ re-run on **every** platform and belongs to a unit scoped to it. It was
 manifest disagreement (§The consumer smoke), on that ground and on one more: a
 repair guessed at a mechanism no probe reproduces is a guess whatever else it
 is, and a cause read carries no authority to change what a `files` hash means.
+
+**The command has two call sites and they do not run from the same working
+directory**, which is the first thing a cause read reaches for and which no
+surface owned. `lock_hash` writes the recorded value; the consumer smoke's
+comparison value is hashed from its own scratch root (§The consumer smoke).
+Neither passes `--no-filters`. Whether that difference is what a disagreement
+measures is not settled here — §The consumer smoke's three-way probe exists to
+answer it — but a reader holding two values is holding two invocations, not one.
 
 **Two hash families, answering two questions, each stated where it is used.**
 The rule above is scoped to `files`, and the `artifact` digest is deliberately

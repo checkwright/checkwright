@@ -9005,34 +9005,34 @@
   escalations a lead ruled ALONE by reading a governed surface; near zero, the premise holds;
   consistently several, the template's bullet needs amending and not this repo's tier — and named
   the threshold at a third such iteration — ANSWERED at eleven. Measured 5, 4, several, 4, 5, 7, 7,
-  8, 12, 5, now **3**; THIS ENTRY is the governed surface for it whenever a dispatch relays another.
+  8, 12, 5, 3, now **5**; THIS ENTRY is the governed surface for it whenever a dispatch relays one.
   **The two axes separate, which makes this an amendment rather than a tier flip.** On COST the
   premise holds; on CHARACTER it fails every time — a routing-only lead would be cheaper, would
   have RELAYED these rulings and would have raised none of the flags below.
   **THE COST SERIES IS DERIVED, 2026-09-05, REPLACING THE ACCRETED ONE**, which ANSWERS why this
-  entry and the binding disagreed: every earlier point was read mid-close and was a ceiling nobody
-  lowered, on differently-ceilinged iterations — the binding's 8.8 % ceiling HELD at 8.7, its
-  14.8 % read 11.7. From the completed meter, supervision over whole priced spend, last six
-  lead-posture iterations: **11.7, 8.7, 8.2, 4.9, 4.4, 9.1**.
+  entry and the binding disagreed: every earlier point was read mid-close and was an unlowered
+  ceiling. From the completed meter, supervision over whole priced spend, last six lead-posture
+  iterations: **11.7, 8.7, 8.2, 4.9, 4.4, 9.1**.
   **THE CHARACTER DATUM THE COUNT CANNOT SEE**, from the eighth firing: the lead FLAGGED a risk
   rather than asserting it safe and align found it real — the lead WRONG and the protocol still
   paying, which no count of correct rulings evidences. The ninth: four of the lead's OWN premises.
   **TENTH FIRING, 2026-09-05.** FIVE ruled alone, at least three replacing the escalating session's
   stated ground; cost 9.1 % of a 111.35 iteration. Two defects: align MISSED A LIVE BLOCKER (the
-  ruled `--only` re-point unreachable for eight of nine pre-flight entries, one command enough to
-  show it — the near-miss class on MECHANISM REACHABILITY), plus a LEAD-SIDE `DONE`-placement one.
-  **ELEVENTH FIRING, 2026-09-05 at this close: THREE ruled alone, one routed to the operator** —
-  still "consistently several", falsifying the routing-only premise; a further point on the
-  standing finding, not a new one and not a tier reversal. **Its cost point is deliberately NOT
-  taken**: a close reading its own iteration is the mid-close ceiling above. **The align reading is
-  cr=26.2M bare-family off a CHANGED SUBSTRATE** — the first taken from `--emit stage-economics`,
-  whose port this iteration was, de-confounded by build's byte-identical sixteen-comparison parity
-  proof; no prediction is scored. **BOTH COUNTERS CLEAN** — no journal omitted, nothing declined,
-  so the nine below stays nine, recorded because a watch logging only confirmations is not one.
+  near-miss class on MECHANISM REACHABILITY), plus a LEAD-SIDE `DONE`-placement one.
+  **ELEVENTH FIRING, 2026-09-05: THREE ruled alone, one routed to the operator** — still
+  "consistently several". Its cost point was deliberately NOT taken (the mid-close ceiling above);
+  its align reading, cr=26.2M bare-family, came off a CHANGED SUBSTRATE and scored no prediction.
+  BOTH COUNTERS CLEAN, so the nine below stayed nine.
+  **TWELFTH FIRING, 2026-09-05 at this close: FIVE ruled alone, none routed to the operator** — the
+  unit-set selection off TRAJECTORY.md's sequencing sentence, the DoD's stage off
+  `lifecycle-kit/lib/stages.sh:29`, the `want` correction off the delta's own text, the
+  `--no-filters` refusal off the entry's cause-read-first record, and one exclusion off the
+  port-only run's bar. Still "consistently several"; cost point not taken, same ceiling.
+  **THE ALIGN WATCH TAKES NO POINT, recorded rather than left silent:** align DID NOT RUN this
+  iteration, its trigger never fired, so there is no bare-align datum and the series carries a gap.
   **The counter-evidence is NINE instances of ONE shape — a claim verified at one surface and read
-  as covering a wider one.** Eight are the lead's own, the sharpest being five `recurrence:` dates
-  ordered onto a threshold COUNT no session had judged, refused by scope before it froze five false
-  attestations. The ninth WIDENS the shape past the lead, onto a STAGE session's cross-class carry.
+  as covering a wider one.** Eight are the lead's own, the sharpest five `recurrence:` dates ordered
+  onto a threshold COUNT no session had judged. The ninth WIDENS it onto a STAGE session's carry.
   **Neither the counter-evidence nor a refused premise NETS against the count**, which measures
   whether an escalation was answered off a governed surface, never whether the grounds under that
   answer held; netting would hide both facts to report neither.
