@@ -9206,50 +9206,80 @@
 - **kit-spec-provenance-seam-sweep** [design-pending] — kit SPECs ride the installer payload and the
   public site whole, yet carry this project's ruling provenance, which resolves to nothing in a
   consumer tree and reads there as mechanism.
-  **The measure, taken 2026-09-03.** Thirty-seven dated `ruled 2026-…` operator stamps and fifty
-  TRAJECTORY.md pointers across six kit SPECs — gate-sdk 24 and 43, lifecycle-kit 6 and 1,
-  queue-kit 4 and 0, delegation-kit 1 and 3, context-kit 1 and 1, doctrine-kit 1 and 1.
-  **The deliverable is three-part.** Strip each site to the undated rule with its engineering
-  grounds; move to TRAJECTORY.md any grounds not already there, so nothing is lost rather than
-  relocated; and land a gate holding kit SPECs free of dated operator stamps and TRAJECTORY.md
-  pointers — the seam class CLAUDE.md §The provenance seam (never cross it) now names.
-  **How the class arrived, recorded so the fix aims at its cause.** TRAJECTORY.md's own recording
-  rule sends a ruling with a canonical home to that home by pointer, and sessions read that as
-  licence to write the ruling INTO the kit SPEC with its date and its refusals — so the SPEC became
-  the ruling's home and TRAJECTORY.md the index, while the seam's content classes named vocabulary
-  and never provenance, and no gate held it.
-  **Why `[design-pending]`:** the gate's predicate is the design question. A date-plus-`ruled`
-  pattern and a `TRAJECTORY.md` literal are both easy to spell and both reach past the class if
-  spelled naively, and the sweep's own edits are what calibrate the fixture pair.
-  **A THIRD SHAPE, and it is that predicate's sharpest test — inlined here rather than filed
-  separately.** gate-sdk/SPEC.md §The non-gate arm groups its class roster into landing-date cohorts
-  (`its 2026-08-31 members`, `its 2026-09-01 ones`, `its 2026-09-03 ones`, at :2193, :2196, :2209),
-  and the member added at the scan-prompts-cut build went in **undated** per the ruling — so the
-  roster now mixes three dated cohorts with one undated member. A cohort label is neither a `ruled`
-  stamp nor a TRAJECTORY.md pointer, so the two-pattern predicate above misses it entirely, yet it
-  publishes this project's landing history as a reading aid. WHETHER THE 2026-09-03 RULING REACHES A
-  COHORT LABEL IS UNSETTLED AND IS NOT SETTLED HERE: if it does, the three tags retire and the
-  roster becomes a plain enumeration; if not, the carve-out needs stating so the next member added
-  knows which shape to take. Either answer calibrates the fixture pair, which is what puts the
-  question inside this entry's design question rather than beside it in a new one.
-  **The class ACCRETED after the measure, 2026-09-05, into two kits the six-kit count does not
-  list.** The meter pair's cut landed a dated operator stamp with its refused alternative at
-  `drift-kit/SPEC.md` §The overhead meter, and the scratch-run cut another at `guard-kit/SPEC.md`
-  §scratch-run. **The second is a calibration datum for the fixture pair, bought for one grep
-  rather than a sweep:** a naive `ruled`-near-a-date pattern finds the drift-kit site and MISSES
-  the guard-kit one, whose date sits in a trailing parenthetical outside any short window — the
-  reach-past-the-class failure this entry predicts of a naive predicate, now witnessed.
-  **The same close RETIRED both rulings from TRAJECTORY.md** as spent under its own completion-time
-  contract, so those two kit SPECs are now the SOLE home of their grounds: the deliverable's
-  move-what-is-not-already-there step reaches them, and a strip without that move loses them.
+  **THE 2026-09-03 MEASURE IS STALE BY A FACTOR OF THREE — re-measured 2026-09-05 at scope and
+  corrected here, not left for the next session to re-buy.** It read 37 stamps and 50 TRAJECTORY.md
+  pointers across SIX kit SPECs; a wider pattern reads **246 candidate lines across ELEVEN**:
+  gate-sdk 157, lifecycle-kit 30, delegation-kit 18, queue-kit 16, guard-kit 6, canon-kit 6,
+  doctrine-kit 3, context-kit 3, drift-kit 3, site-kit 2, evidence-kit 2. A second, cruder pattern
+  in the lead session agreed on shape if not digits. **gate-sdk alone is 64 % of the class**, which
+  is where the split below cuts.
+  **The deliverable after the split is two-part** — the gate is the remainder's: strip each site to
+  the undated rule with its engineering grounds, and MOVE to TRAJECTORY.md any grounds not already
+  there, so nothing is lost rather than relocated.
+  **How the class arrived, recorded so the fix aims at its cause.** TRAJECTORY.md's recording rule
+  sends a ruling with a canonical home to that home by pointer, and sessions read that as licence to
+  write the ruling INTO the kit SPEC with its date and refusals — so the SPEC became the ruling's
+  home and TRAJECTORY.md the index, while the seam's content classes named vocabulary and never
+  provenance, and no gate held it.
+  **Why `[design-pending]` AFTER THE SPLIT — the gate's predicate goes with the gate, and what is
+  left here is one question this entry must answer to sweep at all.** gate-sdk/SPEC.md §The non-gate
+  arm groups its class roster into landing-date cohorts (`its 2026-08-31 members`, `its 2026-09-01
+  ones`, `its 2026-09-03 ones`, at :2193, :2196, :2209) while the member added at the
+  scan-prompts-cut build went in undated, so the roster mixes three dated cohorts with one undated
+  member. A cohort label is neither a `ruled` stamp nor a TRAJECTORY.md pointer, yet it publishes
+  this project's landing history as a reading aid. WHETHER THE 2026-09-03 RULING REACHES A COHORT
+  LABEL IS UNSETTLED: if it does, the three tags retire and the roster becomes a plain enumeration;
+  if not, the carve-out needs stating so the next member added knows which shape to take. That
+  question is IN this entry because the roster is in gate-sdk; its consequence for the gate's
+  fixture pair is the remainder's.
+  **The drift-kit and guard-kit sites accreted 2026-09-05, are the SOLE home of two rulings
+  TRAJECTORY.md retired as spent, and are the REMAINDER's** — recorded here only so the split does
+  not read as having lost them.
   **Cost while deferred:** every published kit SPEC and every adopter's vendored copy carries
-  private ruling history as mechanism, and pointers a consumer cannot follow — a payload-facing and
-  front-door claim, so product-class outright. Accreting, now measured: two new sites in one
-  iteration, both landed by cuts that were not editing provenance.
+  private ruling history as mechanism, and pointers a consumer cannot follow — payload-facing and
+  front-door, so product-class outright, and accreting at two new sites in one iteration.
   **DIRECTED 2026-09-05 (operator, consult) AS THE NEXT ITERATION'S JOINED UNIT beside the
   test-harness cut** — same-surface and product-class under the port-first run; scope sizes it.
+  **SPLIT AT THE gate-sdk BOUNDARY, ruled 2026-09-05 `lead, own-authority` on the re-measure
+  above**, exercising the permission the directive itself grants ("scope sizes it against the
+  window and may split it by kit"), so it re-scopes nothing. THIS ENTRY IS NOW gate-sdk/SPEC.md
+  ONLY — 157 of the 246 lines, one SPEC and one docs mirror rather than eleven of each. **The
+  remaining ten SPECs and THE GATE are `kit-spec-provenance-seam-sweep-remainder`**, filed with
+  this ruling so the split's other half has an owner rather than living in a journal.
+  **CONSEQUENCE, stated because it looks routine and is not:** the directive paragraph at
+  TRAJECTORY.md discharges on "that unit lands AND THE GATE IS GREEN". Under the split the gate
+  lands with the remainder, so the discharge does NOT fire this iteration and that paragraph is
+  NOT deleted at this close.
   Surfaced 2026-09-03 in the consult that closed the provenance-seam ruling; drained here; the third
   shape above added 2026-09-04 at the scan-prompts-cut close drain.
+
+- **kit-spec-provenance-seam-sweep-remainder** [design-pending] — the other half of the
+  gate-sdk-boundary split, and THE HOME OF THE GATE: ten kit SPECs still carrying this project's
+  ruling provenance, plus the seam gate that can only go green once the last of them is swept.
+  **Filed 2026-09-05 at scope with the split that created it** (`lead, own-authority`, under the
+  permission the operator's directive grants), so the remainder has an owner instead of existing
+  only in a scope journal — a split whose second half is unfiled is a dropped unit.
+  **Sized off the same re-measure, not re-derived:** ~89 candidate lines across lifecycle-kit 30,
+  delegation-kit 18, queue-kit 16, guard-kit 6, canon-kit 6, doctrine-kit 3, context-kit 3,
+  drift-kit 3, site-kit 2, evidence-kit 2. Ten SPECs and ten docs mirrors, against the parent's one.
+  **THE GATE IS THIS ENTRY'S, AND THAT IS THE WHOLE POINT OF FILING IT.** Enforcement-first wants
+  the sweep and its gate in one unit; the split defers rather than dissolves that objection, so the
+  gate attaches here as the last kit's landing and the parent ships swept-but-ungated in the
+  interim. A session meeting a stripped gate-sdk/SPEC.md and no gate should read that as the split
+  working, not as an omission.
+  **Two things carry from the parent and must not be re-derived.** The predicate is HARDER than the
+  parent entry originally sized it — a naive `ruled`-near-a-date scan misses both the drift-kit and
+  guard-kit sites, whose spellings are `operator ruled (<date>, <channel>)` and a date in a
+  trailing parenthetical — so the fixture pair owes those shapes. And drift-kit and guard-kit are
+  now the SOLE home of two rulings TRAJECTORY.md retired as spent, so the strip must MOVE those
+  grounds rather than delete them.
+  **DISCHARGE CONSEQUENCE:** TRAJECTORY.md's directive paragraph discharges on "that unit lands and
+  the gate is green", and the gate is here — so that paragraph survives until THIS entry lands, not
+  until its parent does.
+  **Cost while deferred:** the parent's cost line, at 36 % of its magnitude — ten published kit
+  SPECs and every adopter's vendored copy of them carry private ruling history as mechanism, and
+  pointers a consumer cannot follow. Product-class, and accreting: two new sites landed in one
+  iteration, both from cuts that were not editing provenance.
 
 - **bin-tool-help-arm-absent-tree-wide** [design-pending] — nine of the eleven shipped `bin/`
   tools, across four kits, answer `-h`/`--help` with something other than usage on stdout at
@@ -9798,6 +9828,7 @@
   the evicting commit (`git log -p -S'<slug>' -- TASK-QUEUE.md`).
 
 - **audit-roster-grammar-ungated** [design-pending] — Row fields ungraded; waits on the format.
+- **icebox-drops-a-bought-census** [design-pending] — No dormant home for a measured payload.
 - **inline-source-literal-ungateable** [design-pending] — Fence-only oracle; no rename pending.
 - **turn-end-refusal-used-as-a-busy-wait** [design-pending] — Sessions busy-wait via the stop hook.
 - **site-health-probe-no-retry-on-transient** [design-pending] — A single non-200 files an issue.
