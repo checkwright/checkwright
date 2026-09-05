@@ -12,7 +12,67 @@
 
 ## New Features
 
+- **run-gates-stub-cut** [spec: SPEC-stub-cut.md] — port `gate-sdk/bin/run-gates.sh` (503)
+  down to the stub gate-sdk/SPEC.md §run-gates names, the one owed file declaring that section.
+  **Selection ground: the OWED column of `--emit port-blockers --tree`** — 94 scanned, 64
+  `no-port`, 0 held, 30 owed at HEAD `2bf2f204`. Never the registry `--group` read, which answers
+  for the battery and not for the tree (gate-sdk/SPEC.md §port-blockers).
+  **The budget arm's precondition was RUN at spec, not inherited:** `--emit port-blockers --group`
+  trails 108 scanned, 0 groups, 108 already ported, 0 still owed, **0 takeable at this cut** — no
+  takeable group, so the arm composes. This file orders early INSIDE that arm because it grows by
+  a branch per bridged arm; that is ruling (7)'s taxing-member case and never the blocker-retiring
+  override, whose text turns on *queued behind* (gate-sdk/SPEC.md §The first cohort).
+  **Host: `native-gate-port-remaining-corpus`**, whose stated-contract composer selects it and
+  whose ruling (2) puts this cut's settings-grant edits in-cut. This entry is the cut's own unit
+  and reaches `## Done` at build; the corpus entry stays Deferred and is deliberately not
+  promoted — a `[spec:]` ref is lead-line-scoped and one host holds one ref.
+  **IT CARRIES `binary-less-dispatch-loop-retirement` WHOLE**, per that entry's own 2026-09-05
+  operator ruling: the loop, the installer's binary-less leg re-scope, and the nine
+  `.workflow/validate-baseline.txt` rows are deltas of this amendment, not a sibling unit. Close
+  retires that entry against this cut rather than draining it.
+  **Two behavior changes are ruled in the amendment and neither is incidental:** `--help` on a
+  binary-less tree gets the build remedy instead of the usage text, and the crate's argv parser
+  gains the front-end spelling as one alias step so argv passes verbatim.
+  ruled: run-gates-stub-cut lead 2026-09-05 own-authority
+  Filed 2026-09-05 by spec, minted and promoted in one motion with its amendment.
+
+- **liveness-reader-cut** [spec: SPEC-liveness-reader-cut.md] — delete
+  `scripts/producer-liveness-reader.sh` (26) and make the compiled gate the hook's default reader,
+  the one owed file behind delegation-kit/SPEC.md §The turn-end liveness hook.
+  **Selection ground, host and packaging: `run-gates-stub-cut`'s**, not restated.
+  **BUILD-HELD ORDERING — the crate default lands BEFORE the deletion, in the same commit.**
+  Probed rather than assumed: `native/src/hook/stop_liveness.rs:177-184` still returns `None` on
+  an empty knob and still spawns with a `bash` interpreter word, its own comment saying the reader
+  *"stays external and stays spawned … not of this cut"*. Deleting the script while relying on the
+  kit default reproduces the attested regression exactly — 77 `verdict=unavailable` firings in one
+  46-minute window under a green battery, recorded on `kit-knob-consumer-adapter-convention`.
+  **It invalidates a shipped smoke scenario and that is measured, not projected:**
+  `delegation-kit/smoke/install.sh:63-81` buys its allowing arm by emptying the knob over a
+  `pid=1` record; under a working default that firing reads `red` and refuses at exit 2.
+  ruled: liveness-reader-cut lead 2026-09-05 own-authority
+  Filed 2026-09-05 by spec, minted with its amendment and promoted in the same commit.
+
 ## Technical Debt
+
+- **build-native-bootstrap-declaration** — add the one `# no-port:` header line
+  `gate-sdk/bin/build-native.sh` (110) is already ruled to carry, closing a gap between landed
+  prose and the tracked file.
+  **DEBT AND NOT A FEATURE, on canon-kit/SPEC.md §The amendment lifecycle's own litmus: it fixes
+  behavior to an EXISTING spec and needs no amendment.** gate-sdk/SPEC.md:10539-10548 §build-native
+  already carries *"The port disposition: declared, on a per-file bootstrap cause"* and ends *"So
+  this file takes `# no-port:` citing this paragraph"* — probed, the file carries no `# no-port:`
+  line at all, only `# spec:` pointers. No contract changes and no design ruling is left; the
+  operator ruled it 2026-09-05 in consult on `build-native-bootstrap-port-disposition-unruled`.
+  **Work class: {mechanical}** — one header line, then the oracle. Stated here because the lead
+  tiers batches off that label and a debt entry carries no amendment to hold it.
+  **The cause is per-file, never a class** — §build-native's own words, *"nothing else in `bin/`
+  may cite it"*. House style is a SPEC pointer plus a condensed restatement, matching the register
+  at `gate-sdk/lib/gate.sh:3` and `installer/consumer-smoke/run-smoke.sh:3`.
+  **It subtracts 110 lines from the completion predicate**, which is why it was operator-class and
+  why the ruling had to precede it. Nothing gates on the file's path, which is unchanged.
+  ruled: build-native-bootstrap-declaration lead 2026-09-05 own-authority
+  Promoted 2026-09-05 by spec from `build-native-bootstrap-port-disposition-unruled`'s answered
+  ruling; that entry keeps the ruling and this one is the work.
 
 ## Deferred
 
