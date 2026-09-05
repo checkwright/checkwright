@@ -8,3 +8,4 @@ windows-leg-manifest-cause-read scope aabf8948 2026-09-05 ceb304ba
 windows-leg-manifest-cause-read spec a2448137 2026-09-05 a5b9a63d
 windows-leg-manifest-cause-read build a2d8e1f3 2026-09-05 8d488757
 windows-leg-manifest-cause-read validate ae190f74 2026-09-05 54a37eae
+windows-leg-manifest-cause-read close abff80b7 2026-09-05 5faf8489
