@@ -4,4 +4,4 @@
 
 ---
 
-— scope a6003d04 2026-09-05 c2a1ce8e
+test-harness-cut-seam-sweep scope a6003d04 2026-09-05 c2a1ce8e
