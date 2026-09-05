@@ -802,6 +802,24 @@
   **Why `[design-pending]`:** the three are not variants of one fix — a template edit, a new gate,
   and a deletion that removes a real aid — and choosing needs the counter-case this iteration did
   not supply: an amendment whose roster was RIGHT and whose reader was thereby spared the sweep.
+  **THE COUNTER-CASE IS NOW OVERDUE AND THE POOL WENT THE OTHER WAY — FOUR FOR FOUR in a second
+  iteration**, which is the datum the `[design-pending]` fork was waiting on and it arrived
+  falsifying, not supplying, the sparing case. `test-harness-cut-seam-sweep`: batch A's gate-tests
+  amendment named three callers and missed the CI workflow and its shipped template; batch B's
+  guard-tests amendment claimed one caller "verified this session over the tracked tree" against an
+  EXECUTABLE CI step plus six prose sites, and its agents-md amendment predicted two docs pages
+  needed no edit when both named the deleted path; batch C's cardinal-reach DoD asserted "grepped
+  every spec, config and gate source; nothing dangles" against eight live references. **The battery
+  caught every one and reading caught none** — so of the three candidates the two that reach an
+  ORACLE (the build-stage re-sweep line, the idiom grep) are now separated from the third by
+  evidence rather than by taste, and a session picking this up starts there.
+  **AND THE DOC SIDE IS THE SAME MISS.** This close's `internal-identifier-restatement` and
+  `capability-liveness-after-descope` sweeps independently found five present-tense prose sites
+  naming the three shell files this iteration deleted, four of them in files the landing unit had
+  itself opened and edited. Grammatical position predicts them: every repaired occurrence sat in
+  subject or object position, every missed one in an appositive, an attributive modifier or a
+  coordinated list member. A roster derived by grep would have caught all five.
+  recurrence: amendment-reader-roster-undercount 2026-09-05
   **Cost while deferred:** a spec session pays for a census the build session must buy again, and
   the roster's authority runs inversely to its accuracy.
   Filed 2026-08-21 by build into the gap inbox; promoted at `graph-port-and-config-seam`'s close.
@@ -2038,7 +2056,7 @@
   many living per-feature specs does not fit at any knob setting.
   **The discharge pattern already exists in-tree.** docs/positioning.md §The tiered
   compatibility claim says "This is tested, not asserted" and cites context-kit's
-  `smoke/agents-md.sh`. That is the shape the three claims below owe.
+  `--agents-md-smoke` arm. That is the shape the three claims below owe.
   **Seam re-verified clean:** no tracked file names an external spec toolkit.
   **Intake provenance:** never declined or costed — the opportunities half of the
   same operator-commissioned external review whose *weaknesses* half was filed
@@ -4090,7 +4108,8 @@
   same confidence, no diff that distinguishes them, and no gate that reds. Every other defect
   this queue tracks leaves *something* — a stale figure, a vacuous fixture, an absent entry.
   This one leaves a well-argued disposition that happens to coincide with what fitted.
-  **Worked instance from this close.** `cardinal-notation-splits-gate-reach` was ruled its own
+  **Worked instance from this close.** `cardinal-notation-splits-gate-reach` (since landed and
+  retired 2026-09-05) was ruled its own
   entry rather than grounds on the entry that has since shipped as `check-measured-claim`, which
   stood at exactly 50 lines, so the grounds ruling would have required compressing peer prose.
   Had the headroom been read first, the ruling that avoided the compression would also have been the
@@ -8353,6 +8372,22 @@
   from the running. Distinct also from `icebox-eviction-line-budget-squeeze`, the one-liner's line
   budget at the moment of writing an eviction, and from `close-eviction-refiles-without-checking`,
   close re-filing a duplicate entry — both downstream of this row.
+  **THREE LIVE INSTANCES AT THE 2026-09-05 DRAIN, and the newest is a MEASUREMENT STORE rather
+  than a ruling.** `candidate-list-anchors-a-sweep-obligation` is the third: it carries an explicit
+  **Why not icebox** paragraph naming a live recurring trigger, and the worklist ranked it anyway.
+  `lead-split-posture-limb-unjudged` carries a thirteen-point series close appends to each
+  iteration. Two of the three narrowing conditions are already met — no roadmap tag, no live
+  slug, no dated `recurrence:` (and its own paragraph argues that omission is correct rather than an
+  oversight). Its ONLY protection is that its cost field opens in prose, so one author tidying that
+  opener to a class word compresses thirteen iterations of measurement into one line. The 2026-08-31
+  ruling bars re-authoring an opener to UNBLOCK an eviction; nothing bars the same edit made for
+  tidiness, which is the hole. A `not-icebox-eligible:` declaration — candidate (a) above, verbatim
+  — closes it, so this instance sharpens the fork rather than widening the entry.
+  **The filer's premise FELL at this drain.** The bullet held that the class-word gate
+  queue-kit:248 names was "filed 2026-08-23 into the gap inbox and still undrained". It was drained
+  the same day: `deferred-cost-class-opener-vocabulary` owns it, promoted 2026-08-23 at that scope
+  intake. The gate is owed, not unfiled.
+  recurrence: icebox-standing-ineligibility-unrecordable 2026-09-05
   **Cost while deferred:** low and recurring — one re-read of a forty-nine-line entry at every
   close, forever, plus the risk that a session in a hurry evicts against a ruling it did not read to
   the bottom. queue-kit/SPEC.md §The queue-index arm rules both worklist filters deliberately
@@ -8909,10 +8944,21 @@
   standing measurement, which the landing did not moot: nothing about the amendment makes the next
   iteration's count unnecessary. Split from that slug `lead, own-authority 2026-09-05`, relayed to
   the build session that found the store the Done move would have destroyed.
-  **THE COUNT SERIES, escalations the lead ruled ALONE off a governed surface, twelve points and
-  OPEN** — close appends each iteration's reading here: 5, 4, several, 4, 5, 7, 7, 8, 12, 5, 3, 5.
+  **THE COUNT SERIES, escalations the lead ruled ALONE off a governed surface, thirteen points and
+  OPEN** — close appends each iteration's reading: 5, 4, several, 4, 5, 7, 7, 8, 12, 5, 3, 5, 7.
   The threshold is a third such iteration and is ANSWERED; one iteration is one point and the
-  posture does not flip on one either way.
+  posture does not flip on one either way. The thirteenth is SEVEN — validate was handed a stale
+  six, flagged the disagreement rather than picking a number, and was right to.
+  **CHARACTER THE COUNT CANNOT SEE, recorded because by design the count cannot.** Two of the seven
+  are not ordinary readings. One RULED THE LEAD WRONG: instructed to carry three `recurrence:` dates
+  onto this slug, the filing batch refused and held — they are re-filings of the discharged premise
+  (queue-kit:442), and TRAJECTORY.md:578-581 makes "entries at the recurrence threshold" a
+  product-class joining ground and then BURNS it for the member, so carrying them would hand a fresh
+  slug an unburned proposal on a closed ground through a line reading as bookkeeping; the stated
+  purpose, the deferred-age clock, reads off `Surfaced` (queue-kit:57-59). One ruled WHERE THIS
+  SERIES LIVES, so it is a datum for the series it preserved. Both point one way, measured THREE
+  times this iteration: a lead instruction is not a governed surface, and batches A, B and C each
+  checked one against a governed surface and were right.
   **THE COST SERIES, supervision over priced spend, last six lead iterations: 11.7, 8.7, 8.2, 4.9,
   4.4, 9.1. DERIVED 2026-09-05, REPLACING AN ACCRETED ONE** — every earlier point was a mid-close
   unlowered ceiling, which is why this entry and the binding once disagreed. That correction was
@@ -8988,6 +9034,15 @@
   re-verified by grep at this drain, the sharpest of them — `canon-kit/SPEC.md`'s own invoked
   `bash scripts/enum-sets.sh` — is gone, and what survives in `gate-sdk/SPEC.md` is a dated
   history paragraph naming the deleted scripts deliberately. This is the gate-precision half alone.
+  **THE POSITIVE CASE LIMB (a) WAS WAITING FOR ARRIVED 2026-09-05, and it does not settle the
+  fork.** Two independent close audits (`internal-identifier-restatement`,
+  `capability-liveness-after-descope`) each found the SAME five present-tense inline-backticked
+  `.sh` paths in published kit SPECs, naming three files that iteration deleted; a third sweep's
+  corpus-wide existence probe returned 38 non-resolvers over 68 literals. Every one is inline, so
+  assertion (A) saw none of them and `check-docs-cmd` stayed green throughout. That is
+  enforcement-first's case measured rather than argued. What keeps the fork open is the SAME
+  probe's other column: its non-resolvers are dominated by legitimate past-tense port narrative,
+  dated release posts and explicit placeholders — exactly the false-positive surface (b) prices.
   **Why `[design-pending]`:** choosing between (a) and (b) is a doctrine call between
   enforcement-first and a stated calibration, not a coding one.
   **Cost while deferred:** an invoked `.sh` path in inline backticks stales silently across the
@@ -9148,6 +9203,11 @@
   **DISCHARGE CONSEQUENCE:** TRAJECTORY.md's directive paragraph discharges on "that unit lands and
   the gate is green", and the gate is here — so that paragraph survives until THIS entry lands, not
   until its parent does.
+  **THE POINTER CLASS IS THIS GATE'S TOO, and it is answered for EVERY kit SPEC at once or not at
+  all** — `CLAUDE.md §The provenance seam` citations resolve in this tree and in no vendoring
+  consumer's. Measured at this drain rather than estimated: 17 across five kit SPECs (gate-sdk 10,
+  guard-kit 4, canon-kit/delegation-kit/lifecycle-kit 1 each), correcting a filed "eight, in
+  gate-sdk". Outside the ruled discriminator, so the gate must encode whichever way it goes.
   **Cost while deferred:** the parent's cost line, at 36 % of its magnitude — ten published kit
   SPECs and every adopter's vendored copy of them carry private ruling history as mechanism, and
   pointers a consumer cannot follow. Product-class, and accreting: two new sites landed in one
@@ -9168,7 +9228,8 @@
   is one-owner-per-fact applied to rulings, and it is right about mechanism; what it does not
   say is that a ruling's DATE, AUTHORITY and REFUSAL GROUNDS may not follow the mechanism into
   a payload-facing file. Sessions read the silence as licence, which
-  `kit-spec-provenance-seam-sweep` records as how the whole class arrived.
+  `kit-spec-provenance-seam-sweep` recorded as how the whole class arrived; that slug retired
+  2026-09-05 and `kit-spec-provenance-seam-sweep-remainder` is the surviving surface.
   **Why `[design-pending]`:** the shape is a doctrine call with at least three candidates — the
   rule gains a clause splitting mechanism from provenance; or a kit SPEC may host a ruling's
   mechanism while TRAJECTORY.md keeps its stamp; or the readable-alone objection is answered
@@ -9608,7 +9669,9 @@
   into a stage whose contract is a sweep, which the port run produces at each propagation step.
   **Cost while deferred:** low per instance, and it rests on the stage session over-delivering; the
   cost lands when one does not, and the miss is silent because a list reads as coverage.
-  Captured 2026-09-05 by close, relayed by the lead as a lesson about its own dispatch shape.
+  Filed 2026-09-05 by close, relayed by the lead as a lesson about its own dispatch shape.
+  (`Captured` was the original verb; the defer-date reader takes `Surfaced`/`Filed` only, so the
+  entry read as undated and the age filter never reached it — corrected at the 2026-09-05 drain.)
   Deferred, never promoted — the port-only run holds the active sections shut
   (TRAJECTORY.md §PRIORITY DIRECTIVE); a Deferred filing is what its qualification leaves open.
 
@@ -9697,7 +9760,7 @@
   inline and the older co-located ones were not. The pool's two densest hosts,
   `platform-support-ci-matrix` and `native-gate-port-remaining-corpus`, are the two largest
   instances. Two elements go, not one — usually the channel, but on `kpi-cost-per-unit` and
-  `kit-spec-provenance-seam-sweep` it is the authority.
+  `kit-spec-provenance-seam-sweep` (retired 2026-09-05) it is the authority.
   **Three classifications were spot-verified by hand**, so the numbers stand on reads rather than a
   sweep's word: the 27-slug count off the diff, `kit-library-port-residue` (its two surviving
   "operator ruling" mentions are a different subject), and `align-checklist-fanout-calibration`
@@ -9724,6 +9787,89 @@
   wrong conclusion it produced the first time.
   Filed 2026-09-05 at scope as a defect; re-characterized the same session on the operator's
   correction, relayed by the lead, before any repair was attempted.
+
+- **kit-spec-seam-content-half-unswept** [design-pending] — the provenance seam has two halves and
+  the sweep that ran carried a discriminator for only one, so gate-sdk/SPEC.md is swept of private
+  VOICE and unswept of private CONTENT.
+  **The discriminator that ran was ATTRIBUTION** — an authority, a date, a channel, an internal
+  identifier — which by construction cannot see a block that attributes nothing. CLAUDE.md §The
+  provenance seam bars "private rule content" as well: term lists, coupling vocabularies, product
+  constant sets, and a consumer's configuration where a kit literal should be optional config.
+  **TWO INSTANCES, both re-verified live at HEAD by this drain rather than carried from the
+  filing.** (1) gate-sdk/SPEC.md:2058-2078 documents THIS REPO'S QUEUE PRACTICE as gate-sdk
+  mechanism — which entry a cut rides, the scoping stage's promote and the entry's own build-stage
+  demotion, lead-line amendment-tag arithmetic against `check-queue-wrap`'s column budget, and a
+  `git log -S` re-derivation — and survived the sweep fully de-attributed. It is a content-tier
+  fault independently of the seam: queue practice is queue-kit's subject, not gate-sdk's. (2)
+  gate-sdk/SPEC.md:5398-5401 enumerates six literal `couples=` values of this consumer
+  (`scripts/git-hooks/*`, `.claude/agents/*.md`, two delegation-kit files, `CLAUDE.md` plus
+  `doctrine-kit/DOCTRINE.md`, `.workflow/*,.gitignore`) inside a kit SPEC.
+  **Why `[design-pending]` rather than a sweep:** each instance has a real defence and they differ.
+  The queue-practice block exists because only half of it was derivable, so deleting it re-buys a
+  `git log -S` at every cut; the `couples=` list is a RECORD of one past batch's derivation, so
+  de-literalizing it destroys the thing it is for. Whether either is "private rule content" at all
+  is the seam question, and answering it SETS an envelope rather than applying one.
+  **DISTINCT from `kit-spec-provenance-seam-sweep-remainder`**, whose corpus is the ten OTHER kit
+  SPECs under the attribution discriminator; this is the already-swept SPEC under the other
+  discriminator, and the two overlap in neither corpus nor test.
+  **Cost while deferred:** the seam is a privacy boundary before it is a design one and this repo
+  is public — a kit literal carrying a consumer's configuration publishes it, and every adopter
+  vendors the copy. Product-class.
+  Surfaced 2026-09-05 by build batch A's provenance census, which flagged both and deliberately
+  edited neither; drained here with both instances re-verified live.
+
+- **amendment-census-claim-unrun** [design-pending] — an amendment asserts a COUNT about the tree
+  and derives it by reading, while a shipped oracle that produces the same number goes unrun.
+  **The instance, and it is a disagreement rather than a slip.** Two of `test-harness-cut-seam-
+  sweep`'s amendments asserted per-kit owed enumerations that
+  `run-gates.sh --emit port-blockers --tree` refutes. Both were composed off SPEC section
+  membership; the align survey filed the SAME iteration was composed off `--tree`; nothing
+  reconciled the two, and build batch B corrected both amendments in place against the oracle.
+  **Two derivations of one number coexisted in one iteration and neither knew of the other**, which
+  is why this is not "the author miscounted". The oracle exists, ships, and is cheap.
+  **Candidate deliverables, unruled:** a spec-stage obligation that every count an amendment
+  asserts names the command that produced it; or a gate over amendment bodies that reds an
+  unattributed numeral; or a rule that an amendment states no count at all and cites the oracle.
+  **Why `[design-pending]`:** the second is the enforcement-first answer and also the one whose
+  false-positive surface is unbounded — amendment prose is full of legitimate numerals — so
+  choosing needs a decidable predicate nobody has proposed.
+  **DISTINCT from `amendment-reader-roster-undercount`**, whose subject is a ROSTER used as a work
+  list and whose failure is a missed edit; this is a NUMBER asserted about the tree, whose failure
+  is a false statement in a merged amendment with no edit implied either way.
+  **Cost while deferred:** low and bounded — one in-place correction per amendment carrying a
+  count, paid by the build batch that trips over it, and the battery never sees it. What is not
+  bounded is that an amendment is align's evidence, so a wrong count is audited AS evidence.
+  Surfaced 2026-09-05 by build batch C, which filed it rather than acting in-batch; drained here.
+
+- **stop-liveness-stub-spawn-flake** [design-pending] — `check-crate-arms` reds intermittently
+  because the `hook::stop_liveness` tests write a reader stub and immediately exec it inside a
+  multithreaded test process, and a spawn that loses that race is scored as `allow`.
+  **MEASURED AT THIS DRAIN, and the filing's icebox ground FELL.** Five consecutive full `cargo
+  test` runs over the 595-test crate: TWO failed, on TWO DIFFERENT tests —
+  `each_reader_exit_class_takes_its_own_verdict_arm` (`native/src/hook/stop_liveness.rs:433`,
+  `left: 0 right: 2` on the `red` case) and `unresolved_allows_once_the_harness_is_already_-
+  continuing`. So the subject is the MODULE's stub pattern rather than one test, and the rate is
+  about two in five full runs rather than "once".
+  **`check-crate-arms` is in `scripts/gates.list` and CI runs the whole battery**
+  (`.github/workflows/gates.yml`), so "blocks no stage entry and no push" — the 2026-08-30
+  icebox-by-default ground the filing claimed — is false as written. It threatens every commit and
+  every watched push. Mitigation while deferred is a workflow re-run, which costs no push.
+  **The shipped path is RULED CORRECT and is not the defect.** `read_liveness` maps a spawn error
+  to `None` (`Err(_) => None`) and `fire` maps `None` to `unavailable` → `allow` → exit 0, which is
+  exactly the observed `left: 0`; the source states the ground, that a spawn which never started is
+  `unavailable` and not `error`. The fault is a TEST manufacturing a spawn that cannot start.
+  **The mechanism is a HYPOTHESIS and is carried openly rather than as a finding:** write-then-exec
+  of a fresh executable inside a forking multithreaded process is the classic `ETXTBSY` race, and
+  `Scratch::stub` does exactly that. It was not isolated, and no cheap command distinguishes
+  `ETXTBSY` from any other spawn failure, because the error is discarded at `Err(_)`.
+  **Why `[design-pending]`:** the fork is real. A test-side retry weakens the assertion the test
+  exists to make; a shipped-side retry on a transient spawn error is a behaviour change to a
+  refusing hook and owes an amendment; and the discard at `Err(_)` is what makes either
+  undiagnosable, so a third candidate is to carry the spawn error into the record first.
+  **Cost while deferred:** two in five full crate runs red on a commit-time obligation, which
+  teaches the one lesson this tree can least afford — that a red arm may be re-run, not fixed.
+  Surfaced 2026-09-05 by build batches B (an unnamed red, never reproduced) and C (the named test);
+  drained here with both merged, the rate measured and the icebox ground refuted.
 
 ## Icebox
 

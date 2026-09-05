@@ -140,3 +140,4 @@
 | front-end-stub-and-gate-caller-cuts | sc sp a b v c | 5f/0d | 3 · ≤0d | 20s clean | 108 |
 | drift-meter-pair-and-scratch-run-cuts | sc sp a b v c | 5f/0d | 3 · ≤0d | 20s clean | 108 |
 | windows-leg-manifest-cause-read | sc sp · b v c | 2f/1d | 1 · ≤0d | 20s clean | 108 |
+| test-harness-cut-seam-sweep | sc sp a b v c | 10f/0d | 7 · ≤0d | 20s clean | 108 |

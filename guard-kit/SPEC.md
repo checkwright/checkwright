@@ -1482,7 +1482,7 @@ external program fails *open* when the program is absent — the allowlist reads
 empty, every logged command reads as prompting, and the ranking reports a large,
 plausible, entirely wrong number at exit 0 for a KPI to record as a trend.
 **The claim is bounded to this reader and says nothing wider**: `lib/guard.sh`,
-`bin/compare-settings-allow.sh`, `bin/run-guard-tests.sh` and `smoke/install.sh`
+`bin/compare-settings-allow.sh` and `smoke/install.sh`
 all still shell to `jq`, and this member never joined the battery, so the
 battery's own program floor moves by nothing at all. **The arm's spawned-program
 set is empty**, which is stated here because nothing mechanical records it: a

@@ -7715,7 +7715,7 @@ caller wants a different one. `upgrade-smoke` is that caller: it runs two refs'
 vendored shell against one scratch consumer, and under the old resolution both got
 the *invoking* tree's binary — so FROM's shell ran against TO's binary and the
 mismatch was reported as a broken tag (§upgrade-smoke). `run-consumer-smoke.sh`
-and context-kit's `smoke/agents-md.sh` pass the invoking repo and behave exactly
+and context-kit's AGENTS.md smoke pass the invoking repo and behave exactly
 as they did. Whether a binary is wanted at all is `csmoke_gate_descriptors`,
 factored out of the placement so a caller that must *produce* one can ask the same
 question a step earlier rather than keep a second copy of the predicate.
@@ -8107,8 +8107,9 @@ only the files answering to this section, and the class is wider than that: the
 §Testing and drift-kit/SPEC.md §Testing are the same shape and take the same
 disposition because legs 2 and 3 hold of them, not because this section reaches
 them. Each declares in its own header and its own SPEC section says so.
-`context-kit/smoke/agents-md.sh` is **not** a member — it is a validate-suite
-driver rather than an install or violation recipe, and it stays owed.
+context-kit's AGENTS.md smoke is **not** a member — it is a validate-suite
+driver rather than an install or violation recipe, and it was owed on that
+ground until it ported (context-kit/SPEC.md §Testing).
 
 **The honest limit, stated because this ruling does not answer it.** The smoke
 corpus is a worked, cleartext catalogue of exactly what reddens each gate, and it
@@ -14972,7 +14973,7 @@ is not executable" cannot read as "a descriptor is not covered": the descriptor
 is data — a manifest and directives, never sourced and never run — and an
 executable one invites a reader to run a file carrying no interpreter line. The
 first class is by-path-invoked kit scripts — gate-sdk's runner
-(`run-gates.sh`), guard-kit's decision-table runner (`run-guard-tests.sh`), and lifecycle-kit's
+(`run-gates.sh`), guard-kit's `bin/compare-settings-allow.sh`, and lifecycle-kit's
 entry preflight all invoke kit scripts **by path**, and a shebang'd `bin/` tool
 is by-convention path-invocable — so a script committed `100644` degrades
 silently in a fresh clone: a KPI plugin to `n/a (plugin failed)`, a

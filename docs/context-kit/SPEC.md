@@ -1192,7 +1192,7 @@ default left beside the compiled reader would refuse the whole arm.
   whose harness reads `AGENTS.md` (or any other always-loaded agent file) sets
   this to that file and the meter, the footprint, and `check-brevity` all follow
   — no kit mechanism resolves the agent file by literal. The
-  `smoke/agents-md.sh` adapter smoke exercises exactly that: an `AGENTS.md`
+  AGENTS.md adapter smoke (§Testing) exercises exactly that: an `AGENTS.md`
   scratch consumer whose battery is green and whose meter and footprint measure
   `AGENTS.md`.
 - `CONTEXT_KIT_PUB_LANGS` — array naming the `pub-index` extractors to enable;
