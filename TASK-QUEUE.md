@@ -9066,48 +9066,48 @@
   is escalated rather than closed by this session.
 
 - **lead-tier-split-premise-unamended** [design-pending] — `lifecycle-kit/templates/lead.md`
-  §Economics rests its *Split the lead where the tail dominates* bullet on a premise NINE
+  §Economics rests its *Split the lead where the tail dominates* bullet on a premise TEN
   consecutive iterations have now measured false, and the template still ships it unqualified.
   **The trigger is the binding's own.** `.claude/commands/lead.md` set the criterion — count the
   escalations a lead ruled ALONE by reading a governed surface; near zero, the premise holds;
   consistently several, the template's bullet needs amending and not this repo's tier — and named
-  the threshold at a third such iteration. Measured 5, 4, several, 4, 5, 7, 7, 8, and now **12**,
+  the threshold at a third such iteration. Measured 5, 4, several, 4, 5, 7, 7, 8, 12, now **5**,
   and THIS ENTRY is the governed surface for that figure whenever a dispatch relays a different one.
-  **The two axes separate, which is what makes this an amendment rather than a tier flip.** On
-  COST the premise holds, and the priced supervision share reads 14, 9.2, 9.7, 14.8, 9.5, 4.3 —
-  every reading an upper bound, the meter running mid-close with the denominator still growing. On
-  CHARACTER it fails every time: a routing-only lead would be cheaper still, would have RELAYED
-  the rulings this one made and would have raised none of the flags below — not a lead the
-  protocol asks for.
-  **The eighth firing added a CHARACTER datum the ruled-alone count structurally cannot see**, and
-  it was the first reading taken from the lead's own journal rather than from a summary: four of
-  its eight rulings replaced the escalating session's stated ground rather than answering as put,
-  and beside them the lead logged a self-classified near-miss — a risk FLAGGED for verification
-  rather than asserted safe, which align then found real, the axis's sharpest instance because the
-  lead was WRONG and the protocol still paid, which no count of correct rulings can evidence.
-  **NINTH FIRING, 2026-09-05: the axes move apart harder than at any prior reading.** Twelve ruled
-  alone, the highest yet, three replacing the escalating session's stated GROUND rather than
-  accepting it — the cut selection, the packaging, the majority-idiom claim below. Against that,
-  4.3 % of a 170.19 iteration, the lowest yet: cheapest lead on record, most rulings on record.
-  **Four of this lead's own premises were REFUSED by stage sessions, and they DO NOT NET against
-  the twelve** — the count credits settling a question at a governed surface, and a refused premise
-  is that same faculty failing; netting would hide both facts to report neither.
-  **The counter-evidence, kept because the entry is weaker without it, and it is now NINE instances
-  of ONE shape — a claim verified at one surface and read as covering a wider one.** Eight are the
-  lead's own: three founding, three self-reported at the seventh firing, a metric row falsified by
-  a `grep -c` returning zero at the eighth, and the RETRACTION that stays the sharpest — five
-  `recurrence:` dates ordered onto a threshold COUNT no session had judged, refused by scope with
-  grounds and withdrawn in full before it froze five false dated attestations. **The ninth WIDENS
-  the shape past the lead**, which this entry did not previously know: a STAGE session carried an
-  11-of-16 "majority idiom" off a sibling entry's PATH-knob survey onto the BRIDGED-knob class,
-  where it reads 0 of 189 on the bridged form and 4 of 189 on any knob.
-  **None nets against the ruled-alone count**, which measures whether an escalation was answered
-  off a governed surface, never whether the grounds under that answer were probed or overridden.
-  **Why `[design-pending]`:** the deliverable is a kit template's own design rationale, and the
-  shape is unruled — qualify the bullet's premise, split it into a cost limb and a character limb,
-  or replace it with the discriminator the binding already uses. Which one is a doctrine call.
+  **The two axes separate, which makes this an amendment rather than a tier flip.** On COST the
+  premise holds; on CHARACTER it fails every time — a routing-only lead would be cheaper, would
+  have RELAYED these rulings and would have raised none of the flags below.
+  **THE COST SERIES IS DERIVED, 2026-09-05, REPLACING THE ACCRETED ONE — which ANSWERS why this
+  entry and the binding disagreed at the fifth point.** Each earlier point was read mid-close, so
+  each was a ceiling nobody lowered, and the two surfaces had ceilinged different iterations.
+  Re-derived from the completed meter, supervision over the iteration's whole priced spend, last
+  six lead-posture iterations: **11.7, 8.7, 8.2, 4.9, 4.4, 9.1**. The binding's 8.8 % ceiling on
+  `usage-verdict-cut` HELD at 8.7; its 14.8 % at `scan-prompts-cut` read 11.7 — a smaller spike.
+  **THE CHARACTER DATUM THE COUNT STRUCTURALLY CANNOT SEE**, from the eighth firing: the lead
+  logged a self-classified near-miss, a risk FLAGGED for verification rather than asserted safe,
+  which align then found real — the lead WRONG and the protocol still paying, which no count of
+  correct rulings can evidence. The ninth added four of that lead's OWN refused premises.
+  **TENTH FIRING, 2026-09-05 at this close.** FIVE ruled alone, at least three replacing the
+  escalating session's stated ground; cost 9.1 % of a 111.35 iteration. Both counters land here.
+  ALIGN MISSED A LIVE BLOCKER: the ruled `--only` re-point was unreachable for eight of nine
+  pre-flight entries, one command would have shown it, and it was reachable at consult, spec and
+  align before build found it — the near-miss class firing on MECHANISM REACHABILITY, not a stale
+  path. And a LEAD-SIDE defect: batch 1 was told to write `DONE` at its batch's end, `DONE` means
+  something only as the journal's LAST line, and two batches appended under it before batch 2
+  removed it on correction.
+  **The counter-evidence is NINE instances of ONE shape — a claim verified at one surface and read
+  as covering a wider one.** Eight are the lead's own, the sharpest being five `recurrence:` dates
+  ordered onto a threshold COUNT no session had judged, refused by scope and withdrawn before it
+  froze five false dated attestations. The ninth WIDENS the shape past the lead: a STAGE session
+  carried an 11-of-16 majority-idiom claim off a sibling's PATH-knob survey onto the BRIDGED-knob
+  class, where it reads 0 of 189.
+  **Neither the counter-evidence nor a refused premise NETS against the count**, which measures
+  whether an escalation was answered off a governed surface, never whether the grounds under that
+  answer held; netting would hide both facts to report neither.
+  **Why `[design-pending]`:** the deliverable is a kit template's own design rationale and the
+  shape is unruled — qualify the premise, split it into cost and character limbs, or replace it
+  with the discriminator the binding already uses. Which one is a doctrine call.
   **Cost while deferred:** every consumer vendoring lifecycle-kit reads a premise this repo has
-  measured false eight times, and each future lead re-derives the same finding against a template
+  measured false nine times, and each future lead re-derives the same finding against a template
   that never records it — the binding's evidence is local while the false claim is shipped.
   **DISTINCT from `economics-posture-binding-stale`**, whose subject is the local shim restating a
   ruling it should cite; this one is the vendored TEMPLATE's own premise being wrong.
@@ -9115,7 +9115,7 @@
   stay deferred — amending a kit template is non-port design work the run forecloses.
   ruled: lead-tier-split-premise-unamended lead 2026-09-02 2026-09-04 own-authority
   ruled: lead-tier-split-premise-unamended operator 2026-09-05 lead-relay
-  recurrence: lead-tier-split-premise-unamended 2026-09-03 2026-09-04
+  recurrence: lead-tier-split-premise-unamended 2026-09-03 2026-09-04 2026-09-05
 
 - **crate-interpreter-resolution-residue** [design-pending] — the crate spawns the bare program
   name `bash` at twenty sites the `check-graph` hotfix deliberately left alone, and each reaches
