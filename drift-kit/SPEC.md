@@ -712,7 +712,7 @@ advisory exit-0 posture.
 
 ## The stage-economics meter
 
-`bin/stage-economics.sh` answers the one question no built-in surface prices:
+`--emit stage-economics` answers the one question no built-in surface prices:
 **real spend by lifecycle stage × model × iteration**. The overhead meter
 measures governance-versus-task *bytes* and delegation-kit's usage-trend the
 rate-window *percentage*; neither converts a stage's token draw into money. This
@@ -742,9 +742,22 @@ priced cost, never the account the tokens billed to.
    `DRIFT_KIT_STATE_FILE` (§Layout and configuration), defaulting to the same
    state-file path the trajectory extractor already reads — and read as
    **history ∪ live**: that path's *committed history* (added lines in its diff
-   across history, the technique §The published-evidence extractor already uses)
-   unioned with its *current content*, so a `/scope` boundary truncation of the
-   live file destroys no economics. Union rather than replacement because
+   across history) unioned with its *current content*, so a `/scope` boundary
+   truncation of the live file destroys no economics.
+   **The git read has one owner and the field parse has two, deliberately.** The
+   `-p -U0` diff form and the `+`-prefix convention are a coupling that must not
+   have a second producer — a change there breaks both readers silently and in the
+   same way, which is the second producer criterion 6 of
+   gate-sdk/SPEC.md §The port-candidate criteria refuses. So
+   `native/src/history.rs` owns the invocation and yields
+   `(commit, added_line)` pairs, with the `+++ b/…` file header excluded there
+   rather than in each parse. The **field selection** is *not* shared: §The
+   published-evidence extractor wants `(iteration, stage)` filtered against its
+   configured stage roster, and this meter wants `(iteration, stage, session8)`
+   with **no roster filter at all**, because a stamp whose stage is outside the
+   roster still carries real spend. Folding them into one parser would give this
+   meter a roster dependency it must not acquire; a consumer that does not want
+   the commit discards it. Union rather than replacement because
    replacement blinds the meter to a stage that has stamped but not yet committed
    — precisely the in-flight stage whose economics are being read — and rather
    than fallback because the live file is almost always present and almost always
@@ -774,12 +787,20 @@ priced cost, never the account the tokens billed to.
    **same normalization** to each candidate basename and matching — not by a raw
    filename prefix: this repo's stage sessions are subagent transcripts named
    `agent-<hex>.jsonl` whose stamp is `<hex>` truncated to 8 chars, so a raw
-   prefix match against the `agent-` prefix would select nothing. Candidates are
+   prefix match against the `agent-` prefix would select nothing. The lookup
+   normalizes each *candidate*, never the pattern, which is what keeps that trap
+   shut. Candidates are
    two-tiered, because a subagent transcript is not a sibling of its lead's: a
    lead session sits directly under the sessions dir, while the sessions it
    dispatches sit two levels deep under `<lead-session-id>/subagents/`. The scan
    globs both tiers, so a stage session dispatched by a live lead is found on the
-   nested tier and a stage run without one on the flat tier. The tool sums
+   nested tier and a stage run without one on the flat tier.
+   **The normalization, the sessions-dir default and the two-tier scan are the
+   shared derivation's, not this meter's** (§The overhead meter): this lookup
+   answers the *inverse* of that resolver's question — which transcript does this
+   `session8` name — and it walks the resolver's own candidate globs rather than a
+   copy of them, so a change to the tier layout moves **one** glob. The
+   under-count bound below walks the same globs for the same reason. The tool sums
    the matched session's assistant-turn usage into four token categories —
    `input`, `output`, `cache_read`, `cache_creation` — per model id seen on those
    turns. A streaming transcript repeats a message id across lines (input/cache
@@ -804,8 +825,13 @@ priced cost, never the account the tokens billed to.
    stamp is a stage's *first* step, so
    everything after the final stamp is that stage's; the honest limit is that the
    yielded stages under-report, which is why the caveat names them and makes the
-   residue countable rather than invisible. Parsing the transcript
-   needs `jq`; its absence degrades to a token-less notice rather than a failure.
+   residue countable rather than invisible. The transcript reader is **in-crate**:
+   a line the parser cannot read is skipped rather than fatal, which is `jq -rc`'s
+   own behavior under the pipeline it replaced, and a transcript with no
+   assistant-turn usage keeps its named skip line. The arm spawns `git` and `date`
+   and no interpreter, so the interpreter-absent degradation this input once
+   carried has no branch left to enter and is not documented as one: a documented
+   degradation that can never fire is worse than none.
 3. **Price table** — a consumer-supplied data file mapping model id → per-token
    price for each of the four categories. This is **consumer config, never a kit
    literal** (the provenance seam, the `check-graph`/`graph-vocab` pattern): the
@@ -830,7 +856,9 @@ priced cost, never the account the tokens billed to.
 **Degradation.** An absent live state file is a notice and the run continues to
 the history arm — committed history can carry stamps for a file absent from the
 working tree — and the 0-exit "nothing to read" notice fires only when *both*
-sources yield no stamps. A price table that is absent, or that has no row for a
+sources yield no stamps; a git read that did not succeed yields no history, which
+is what the shell form's discarded stderr meant. Every branch below is unchanged
+by the port. A price table that is absent, or that has no row for a
 model the transcripts name, degrades that model's cost cell to `n/a` and the tool emits the
 token counts alone — the same degradation contract the trajectory extractor
 applies to an unreadable surface (§Bundled KPIs / §Layout and configuration). Cost
@@ -860,6 +888,16 @@ blind spot is the whole of what drift-kit can do alone — attributing a
 continuation would need the *stamp* side to record it, which is lifecycle-kit's
 contract and no part of this meter's read-only consumption of it.
 
+**This section's port-owed set is empty, and with §The overhead meter's the
+kit's is too.** Every surface declaring this section is now either in-crate —
+`native/src/emit/stage_economics.rs`, its `BRIDGED_ARMS` row, the shared
+`native/src/sessions.rs` and `native/src/history.rs` — or declared `# no-port:`
+(`smoke/install.sh`, this meter's behavioural oracle across six fixture sets).
+`bin/stage-economics.sh` was the one owed surface and the 2026-09-05 cut took it,
+so **no later port cut is sequenced against this section**. drift-kit now holds
+no owed file and no `bin/` directory at all; neither cut of the pair could make
+that claim alone.
+
 **The trend log.** One line is appended per `(iteration, stage, model)` triple to
 `DRIFT_KIT_STAGE_ECONOMICS_LOG`, grammar:
 
@@ -879,7 +917,11 @@ re-measuring a triple replaces its line rather than double-counting, exactly as
 the overhead meter dedups on `session8`. That key is also what makes the
 history ∪ live read safe with no added mechanism: a history arm re-derives rows
 already logged, and re-derivation replaces a triple's line rather than
-double-counting it. Any per-model sub-breakdown beyond these
+double-counting it. **Per-model row order is deterministic**, where the shell
+form's array iteration was unspecified and a session touching two models could
+emit its rows in a different order between runs: no row's *identity* depends on
+the order either way, the dedup key being the triple, but the emission's does and
+the port fixes it at first-appearance order. Any per-model sub-breakdown beyond these
 fields stays on stdout at measurement time; a log field with no reader is a field
 removed. Field readers: the `/economics` narrative reads `cost` and the four token
 fields (`cr` headline); the operator reads `cost` close-over-close; the deferred
@@ -1079,7 +1121,6 @@ subtree to a row whose `<stage>` value is the **anchor's stage-or-role with
   | one transcript's meta record | that transcript takes no fan-out row and stays in the under-count bound; counted in the unresolved notice |
   | `parentAgentId` naming an agent with no transcript | same — counted, never guessed |
   | a cycle or an over-long chain | same — the walk is bounded and the transcript counted |
-  | `jq` absent | already fatal to the whole join upstream; the fan-out pass never runs |
   | the price table absent or missing a model row | the row's `cost` degrades to `n/a` and raises the existing incomplete-pricing caveat, exactly as a stage row's does |
 
 - **No new field.** The four token fields, `cost`, and `date` carry a fan-out row
@@ -1107,7 +1148,7 @@ subtree to a row whose `<stage>` value is the **anchor's stage-or-role with
 ## The `/economics` skill
 
 `/economics` is the customer-facing post-iteration narrative: run at close, it
-chains `--emit overhead-meter` → `bin/stage-economics.sh` into one report
+chains `--emit overhead-meter` → `--emit stage-economics` into one report
 answering "what did this iteration cost, where, and was the model posture worth
 it". `stage-economics` is the sole cost-attribution surface — it prices
 per-transcript, per-stage, per-model token draw (the token SSOT), while
@@ -1207,7 +1248,6 @@ library and nothing else.
 ```
 drift-kit/
   lib/drift.sh                   # sourced knob resolution; the config bridge sources it
-  bin/stage-economics.sh         # the stage × model × iteration spend pricer
   templates/drift-config.sh
   templates/kpis.list            # the shipped registry: every bundled KPI (consumer copies + prunes)
   templates/kpi-deprecated-surface.sh   # example toolchain-shaped KPI (§Out of scope)
@@ -1313,26 +1353,28 @@ Knobs (this repo's layout as defaults):
   contract (alongside `DRIFT_KIT_SESSIONS_DIR` and `DRIFT_KIT_STATE_FILE`).
 - `DRIFT_KIT_STAGE_ECONOMICS_LOG` — the stage-economics append trend log; default
   `$DRIFT_KIT_METRIC_DIR/stage-economics-log.txt` (gitignored; the meter
-  `mkdir -p`s the dirname).
+  `mkdir -p`s the dirname), resolved in `lib/drift.sh` now that the standalone
+  script it was computed inside is gone.
 - `DRIFT_KIT_PRICE_TABLE` — the consumer-owned model→price roster the
   stage-economics meter prices through and `kpi-price-table-age` ages; default
   `${GATE_SDK_GATES_DIR:-scripts}/price-table.tsv` (beside `graph-vocab.sh`, the
   consumer-config precedent). Absent, cost degrades to `n/a` and tokens still report.
-  Two sites compute this default, not three: `lib/drift.sh` for every bridge
-  reader, and the standalone meter. The KPI's own restatement went with the port —
-  a compiled member reads what the bridge resolved, so the substrate move
-  *removed* a duplicate here rather than converting one into a cross-substrate
-  pair, which is the outcome that was priced as a hazard.
+  **One** site computes this default, `lib/drift.sh`, for every bridge reader.
+  The KPI's own restatement went with its port, and the standalone meter's went
+  with this one — a compiled member reads what the bridge resolved, so each
+  substrate move *removed* a duplicate here rather than converting one into a
+  cross-substrate pair, which is the outcome that was priced as a hazard.
 - `DRIFT_KIT_SUPERVISION_LABEL` — the reserved value the stage-economics meter
   writes into the trend log's `<stage>` column for a lead's own burn
   (§The stage-economics meter, the reserved `supervision` value); default
-  `supervision`. A consumer whose
+  `supervision`, resolved in `lib/drift.sh`. A consumer whose
   lifecycle roster already carries that word renames it here; a stamp naming the
   label collides and suppresses the rows for that run rather than blending two
   meanings into one column value.
 - `DRIFT_KIT_FANOUT_SUFFIX` — the suffix the stage-economics meter appends to an
   anchor's stage-or-role value to name its dispatched subtree's row
-  (§The stage-economics meter, the fan-out row); default `+fanout`. The default is
+  (§The stage-economics meter, the fan-out row); default `+fanout`, resolved in
+  `lib/drift.sh`. The default is
   collision-proof by construction (`+` is outside the stamp's stage alphabet); an
   override that a stamped stage name ends in collides and suppresses the fan-out
   rows for that run. Deliberately the *only* new knob: a meta-filename or
@@ -1346,7 +1388,13 @@ Knobs (this repo's layout as defaults):
   meter, history ∪ live); default `${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt` (the
   same default the trajectory extractor's surface list computes — drift-kit
   re-derives with its own knob rather than importing a sibling kit's bin contract,
-  the established `DRIFT_KIT_SESSIONS_DIR` precedent).
+  the established `DRIFT_KIT_SESSIONS_DIR` precedent), resolved in `lib/drift.sh`
+  so the config bridge's `declare -p` can find it: the reader is a compiled arm,
+  and a knob no kit library defines is the bridge's undeclared-knob refusal. The
+  parenthetical above stays true and is not in tension with the shared in-crate
+  derivation §The stage-economics meter reads — the knob is still drift-kit's, and
+  the sharing happens below the config layer, where it has already resolved to a
+  value.
 
 Per-KPI couplings (which meter, which log, which scan flag) are the
 plugins' own headers, not knobs — a consumer retargeting one edits its copy
@@ -1395,8 +1443,8 @@ KPI under one `DRIFT_KIT_METRIC_DIR` override with no explicit
 `DRIFT_KIT_OVERHEAD_LOG` and asserts the reader finds the log the writer
 wrote — the surviving divergence surface the namespace export cannot guard:
 writer and reader computing *defaults* independently. The stage-economics meter
-is likewise fixture-driven: `smoke/install.sh` drives the join over a synthetic
-fixture set — a small WORKFLOW-STATE stamp file, a synthetic transcript carrying
+is likewise fixture-driven: `smoke/install.sh` drives the join **through its
+arm** over a synthetic fixture set — a small WORKFLOW-STATE stamp file, a synthetic transcript carrying
 usage records for the stamped `session8`, and a placeholder price table — and
 asserts the emitted trend line's fields (the `<iteration> <stage> <model>`
 grouping and the `in`/`out`/`cr`/`cw`/`cost` values), that a re-measure replaces
@@ -1442,6 +1490,13 @@ the grandchild's meta record moves it back into the under-count bound and raises
 the counted unresolved notice while every row the pass does not own stays
 byte-identical, and deleting the whole meta layer emits zero fan-out rows plus the
 single notice with — again — every other row byte-identical.
+**No fixture is conditioned on an interpreter being installed.** The suite used
+to skip every stage-economics assertion where `jq` was absent, which post-port
+would be a false clean over a member that spawns no interpreter at all: the guard
+retired with the dependency, along with the one assertion that read the
+now-unreachable interpreter-absent notice. That is the same rule the retired
+degradation itself falls under — a branch that can never fire is deleted, not
+kept — applied one level up, to the test that guarded it.
 `kpi-price-table-age` is fixture-stable in the same way — it reads two
 dates out of a file the fixture writes — so `smoke/install.sh` drives it over
 purpose-built tables and asserts the age row, the `price <N>d` trend fragment,

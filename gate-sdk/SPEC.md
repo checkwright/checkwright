@@ -2316,8 +2316,12 @@ the argv-shape split below governs —
 its 2026-09-03 ones; and `--emit-scan-prompts`, guard-kit's friction-log ranker
 (guard-kit/SPEC.md §scan-prompts), and `--emit-usage-trend`, delegation-kit's
 footprint trend reporter (delegation-kit/SPEC.md §Trend reporter), its
-2026-09-04 one; and `--emit-overhead-meter`, drift-kit's governance-overhead
-byte-proxy meter (drift-kit/SPEC.md §The overhead meter), its 2026-09-05 one), the
+2026-09-04 one; and drift-kit's two meters, `--emit-overhead-meter`, the
+governance-overhead byte proxy (drift-kit/SPEC.md §The overhead meter), and
+`--emit-stage-economics`, the stage × model × iteration spend pricer
+(drift-kit/SPEC.md §The stage-economics meter) — which spawns `git` and `date`
+and no interpreter, the shell form's `jq`, `awk` and `sed` all leaving with it —
+its 2026-09-05 pair), the
 **harness-integration**
 arms below it, and the bridged `Arm::Run` members that are neither —
 `--lesson-sink` (queue-kit/SPEC.md §The lesson-sink arm), `--upgrade-smoke`
@@ -4832,6 +4836,18 @@ for every bridged arm — so a blocker written against a *relocated-path* assump
 evaporates, and what the port actually forces is a **removal**. Recorded because
 the assumption is invisible: the blocker reads as a fact about the tool when it is
 a fact about a shape the family rule does not produce.
+
+**The fifth finding is a sizing rule, and it is the one an owed-line column
+cannot give you.** An owed line count prices a shell file's **text**, not its
+**reach**, and the gap is widest exactly where the shell bought whole subsystems
+from spawned interpreters — a JSON reader, an aggregation with dedup, a history
+harvest, an arithmetic table, a sibling-record walk are each a few lines under
+`jq`, `awk`, `git` and `sort`, and each is a real structure in the port. So
+before composing such a member, take a **census of what the crate already holds**
+for each subsystem the file buys, and let that decomposition — not the line
+count — be the batch's cut. The census is also the batch boundary: a member that
+decomposes into named subsystems can be split along them, where one priced by its
+text cannot be split at all.
 
 **The arm names no remainder, which is what keeps it kit content.** It is stated
 generically — no gate names, no member roster, no count of any tree's remaining
@@ -14822,7 +14838,7 @@ is not executable" cannot read as "a descriptor is not covered": the descriptor
 is data — a manifest and directives, never sourced and never run — and an
 executable one invites a reader to run a file carrying no interpreter line. The
 first class is by-path-invoked kit scripts — gate-sdk's runner
-(`run-gates.sh`), drift-kit's stage-economics meter (`stage-economics.sh`), and lifecycle-kit's
+(`run-gates.sh`), guard-kit's decision-table runner (`run-guard-tests.sh`), and lifecycle-kit's
 entry preflight all invoke kit scripts **by path**, and a shebang'd `bin/` tool
 is by-convention path-invocable — so a script committed `100644` degrades
 silently in a fresh clone: a KPI plugin to `n/a (plugin failed)`, a

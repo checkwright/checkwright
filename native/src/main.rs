@@ -11,6 +11,7 @@ mod evidence;
 mod fresh;
 mod gates;
 mod guard;
+mod history;
 mod hook;
 mod install;
 mod json;

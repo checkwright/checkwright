@@ -56,6 +56,12 @@ declare -p DRIFT_KIT_STAGES &>/dev/null || DRIFT_KIT_STAGES=(scope align build v
 : "${DRIFT_KIT_SESSIONS_DIR:=}"
 : "${DRIFT_KIT_OVERHEAD_LOG:=$DRIFT_KIT_METRIC_DIR/overhead-log.txt}"
 
+# spec: drift-kit/SPEC.md §Layout and configuration — the stage-economics meter's four remaining knobs, resolved here rather than inline in the tool that used to hold them: that tool is a compiled arm now, and the config bridge finds a default only through `declare -p`, so a value defaulted at a use site is its undeclared-knob refusal on every invocation. Neither the names nor the values are new — each already governed the shell tool's behavior; what moves is the default's resolution site, which is the same relocation §Layout records for DRIFT_KIT_PRICE_TABLE.
+: "${DRIFT_KIT_STAGE_ECONOMICS_LOG:=$DRIFT_KIT_METRIC_DIR/stage-economics-log.txt}"
+: "${DRIFT_KIT_STATE_FILE:=${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt}"
+: "${DRIFT_KIT_SUPERVISION_LABEL:=supervision}"
+: "${DRIFT_KIT_FANOUT_SUFFIX:=+fanout}"
+
 # spec: drift-kit/SPEC.md §Bundled KPIs — kpi-price-table-age and bin/stage-economics.sh read one table; resolving the default here makes this library its single producer, which is what the substrate move converts the former in-substrate restatement into rather than a cross-substrate one.
 : "${DRIFT_KIT_PRICE_TABLE:=${GATE_SDK_GATES_DIR:-scripts}/price-table.tsv}"
 

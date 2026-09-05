@@ -363,7 +363,7 @@ econ() {   # $1 = price-table path (a missing path exercises the degradation)
     DRIFT_KIT_SESSIONS_DIR="$sedir" \
     DRIFT_KIT_PRICE_TABLE="$1" \
     DRIFT_KIT_STAGE_ECONOMICS_LOG="$selog" \
-    bash "$SMOKE_KIT_ROOT/bin/stage-economics.sh"
+    bash "$DRIFT_ARM" --emit stage-economics
 }
 
 set +e
@@ -371,221 +371,217 @@ eout="$(econ "$work/se-prices.tsv" 2>&1)"; erc=$?
 set -e
 [[ "$erc" -eq 0 ]] || fail "stage-economics exited $erc (advisory tool must exit 0)"
 
-if command -v jq >/dev/null 2>&1; then
-    [[ -s "$selog" ]] || fail "stage-economics wrote no trend line"
-    [[ "$(grep -c '' "$selog")" -eq 1 ]] || fail "stage-economics log has more than one line for one (iteration,stage,model) triple"
-    seln="$(cat "$selog")"
-    grep -qE '^[0-9-]+ smoke build test-model in=14 out=11 cr=150 cw=30 cost=606\.[0-9]+$' <<<"$seln" \
-        || fail "trend line does not match the documented grammar/values: $seln"
+[[ -s "$selog" ]] || fail "stage-economics wrote no trend line"
+[[ "$(grep -c '' "$selog")" -eq 1 ]] || fail "stage-economics log has more than one line for one (iteration,stage,model) triple"
+seln="$(cat "$selog")"
+grep -qE '^[0-9-]+ smoke build test-model in=14 out=11 cr=150 cw=30 cost=606\.[0-9]+$' <<<"$seln" \
+    || fail "trend line does not match the documented grammar/values: $seln"
 
-    econ "$work/se-prices.tsv" >/dev/null   # re-measure replaces the triple's line, never doubles it
-    [[ "$(grep -c '' "$selog")" -eq 1 ]] || fail "re-measure double-counted the triple (dedup broken)"
+econ "$work/se-prices.tsv" >/dev/null   # re-measure replaces the triple's line, never doubles it
+[[ "$(grep -c '' "$selog")" -eq 1 ]] || fail "re-measure double-counted the triple (dedup broken)"
 
-    : > "$selog"
-    set +e
-    dout="$(econ "$work/no-such-price-table.tsv")"; drc=$?
-    set -e
-    [[ "$drc" -eq 0 ]] || fail "stage-economics (price table absent) exited $drc"
-    grep -q 'cost=n/a' "$selog" || fail "absent price table did not degrade the cost cell to n/a"
-    grep -q 'incomplete' <<<"$dout" || fail "degraded run did not carry the incomplete-pricing caveat"
-else
-    grep -q 'jq not found' <<<"$eout" || fail "stage-economics without jq must emit its degradation notice"
-fi
+: > "$selog"
+set +e
+dout="$(econ "$work/no-such-price-table.tsv")"; drc=$?
+set -e
+[[ "$drc" -eq 0 ]] || fail "stage-economics (price table absent) exited $drc"
+grep -q 'cost=n/a' "$selog" || fail "absent price table did not degrade the cost cell to n/a"
+grep -q 'incomplete' <<<"$dout" || fail "degraded run did not carry the incomplete-pricing caveat"
 
 # spec: drift-kit/SPEC.md §Testing — history ∪ live over the trajectory extractor's
 # fake-history repo, whose live state file already carries only beta's stamp.
-if command -v jq >/dev/null 2>&1; then
-    hdir="$work/hist-sessions"; mkdir -p "$hdir"
-    for sid in s2 s4; do
-        cat > "$hdir/$sid.jsonl" <<'EOF'
+hdir="$work/hist-sessions"; mkdir -p "$hdir"
+for sid in s2 s4; do
+    cat > "$hdir/$sid.jsonl" <<'EOF'
 {"type":"assistant","message":{"id":"m1","model":"test-model","usage":{"input_tokens":1,"output_tokens":1,"cache_read_input_tokens":1,"cache_creation_input_tokens":1}}}
 EOF
-    done
-    hlog="$work/hist-log.txt"
-    set +e
-    hout="$( cd "$trepo" && DRIFT_KIT_STATE_FILE=".workflow/WORKFLOW-STATE.txt" \
-        DRIFT_KIT_SESSIONS_DIR="$hdir" \
-        DRIFT_KIT_PRICE_TABLE="$work/se-prices.tsv" \
-        DRIFT_KIT_STAGE_ECONOMICS_LOG="$hlog" \
-        bash "$SMOKE_KIT_ROOT/bin/stage-economics.sh" 2>&1 )"; hrc=$?
-    set -e
-    [[ "$hrc" -eq 0 ]] || fail "stage-economics over fake history exited $hrc (advisory tool must exit 0)"
-    grep -q '^alpha build s2 ' "$trepo/.workflow/WORKFLOW-STATE.txt" \
-        && fail "fake-history premise broken: alpha's stamp is still in the live state file"
-    grep -q ' alpha build test-model ' "$hlog" \
-        || fail "a stamp surviving only in committed history did not price (truncation immunity lost)"
-    grep -q ' beta scope test-model ' "$hlog" \
-        || fail "the live file's stamp did not price (the union dropped its live arm)"
-fi
+done
+hlog="$work/hist-log.txt"
+set +e
+# spec: gate-sdk/SPEC.md §The non-gate arm — the binary knob is absolutised for the same reason
+# the trajectory arm's own fake-history run does: after the cd, a repo-relative default resolves
+# to nothing in the throwaway repo.
+hout="$( cd "$trepo" && GATE_SDK_NATIVE_BIN="$TRAJ_BIN" \
+    DRIFT_KIT_STATE_FILE=".workflow/WORKFLOW-STATE.txt" \
+    DRIFT_KIT_SESSIONS_DIR="$hdir" \
+    DRIFT_KIT_PRICE_TABLE="$work/se-prices.tsv" \
+    DRIFT_KIT_STAGE_ECONOMICS_LOG="$hlog" \
+    bash "$DRIFT_ARM" --emit stage-economics 2>&1 )"; hrc=$?
+set -e
+[[ "$hrc" -eq 0 ]] || fail "stage-economics over fake history exited $hrc (advisory tool must exit 0)"
+grep -q '^alpha build s2 ' "$trepo/.workflow/WORKFLOW-STATE.txt" \
+    && fail "fake-history premise broken: alpha's stamp is still in the live state file"
+grep -q ' alpha build test-model ' "$hlog" \
+    || fail "a stamp surviving only in committed history did not price (truncation immunity lost)"
+grep -q ' beta scope test-model ' "$hlog" \
+    || fail "the live file's stamp did not price (the union dropped its live arm)"
 
 # spec: drift-kit/SPEC.md §The stage-economics meter — the attribution invariant over its own fixture
 # set: one session bearing two stamps bills once (its last), and a transcript matching no stamp is
 # counted as the under-count bound. Its own sessions dir, state file, and log — the flat fixture set's
 # log is asserted to hold exactly one line, so a second row there would red that assertion, not this one.
-if command -v jq >/dev/null 2>&1; then
-    dbldir="$work/dbl-sessions"; mkdir -p "$dbldir"
-    cp "$sedir/agent-sess1234deadbeef.jsonl" "$dbldir/agent-sess1234deadbeef.jsonl"
-    cp "$sedir/agent-sess1234deadbeef.jsonl" "$dbldir/orphan9876.jsonl"
-    printf 'smoke scope sess1234 2025-01-01 none\nsmoke build sess1234 2025-01-01 none\n' > "$work/dbl-state.txt"
-    dbllog="$work/dbl-log.txt"
-    set +e
-    dblout="$( DRIFT_KIT_STATE_FILE="$work/dbl-state.txt" \
-        DRIFT_KIT_SESSIONS_DIR="$dbldir" \
-        DRIFT_KIT_PRICE_TABLE="$work/se-prices.tsv" \
-        DRIFT_KIT_STAGE_ECONOMICS_LOG="$dbllog" \
-        bash "$SMOKE_KIT_ROOT/bin/stage-economics.sh" 2>&1 )"; dblrc=$?
-    set -e
-    [[ "$dblrc" -eq 0 ]] || fail "stage-economics over the two-stamp fixture exited $dblrc"
-    [[ "$(grep -c '' "$dbllog")" -eq 1 ]] \
-        || fail "one session with two stamps billed more than one row (the over-count defect is back)"
-    grep -q ' smoke build test-model ' "$dbllog" \
-        || fail "the two-stamp session was not attributed to its last stamp"
-    grep -q 'yielded (no row): smoke scope' <<<"$dblout" \
-        || fail "the collapsed stamp was not named in the caveat (a silent collapse is not an honest one)"
-    grep -q '1 transcript(s) in the sessions dir match no stamp' <<<"$dblout" \
-        || fail "the unstamped-transcript bound did not report the orphan transcript"
+dbldir="$work/dbl-sessions"; mkdir -p "$dbldir"
+cp "$sedir/agent-sess1234deadbeef.jsonl" "$dbldir/agent-sess1234deadbeef.jsonl"
+cp "$sedir/agent-sess1234deadbeef.jsonl" "$dbldir/orphan9876.jsonl"
+printf 'smoke scope sess1234 2025-01-01 none\nsmoke build sess1234 2025-01-01 none\n' > "$work/dbl-state.txt"
+dbllog="$work/dbl-log.txt"
+set +e
+dblout="$( DRIFT_KIT_STATE_FILE="$work/dbl-state.txt" \
+    DRIFT_KIT_SESSIONS_DIR="$dbldir" \
+    DRIFT_KIT_PRICE_TABLE="$work/se-prices.tsv" \
+    DRIFT_KIT_STAGE_ECONOMICS_LOG="$dbllog" \
+    bash "$DRIFT_ARM" --emit stage-economics 2>&1 )"; dblrc=$?
+set -e
+[[ "$dblrc" -eq 0 ]] || fail "stage-economics over the two-stamp fixture exited $dblrc"
+[[ "$(grep -c '' "$dbllog")" -eq 1 ]] \
+    || fail "one session with two stamps billed more than one row (the over-count defect is back)"
+grep -q ' smoke build test-model ' "$dbllog" \
+    || fail "the two-stamp session was not attributed to its last stamp"
+grep -q 'yielded (no row): smoke scope' <<<"$dblout" \
+    || fail "the collapsed stamp was not named in the caveat (a silent collapse is not an honest one)"
+grep -q '1 transcript(s) in the sessions dir match no stamp' <<<"$dblout" \
+    || fail "the unstamped-transcript bound did not report the orphan transcript"
 
 # spec: drift-kit/SPEC.md §The stage-economics meter — the supervision row, derived from the nested transcript
 # tier: a dispatched stage session sits under <lead>/subagents/ while its lead sits flat beside it,
 # so the lead is named by the path and needs no stamp. Its own dir/state/log, same reason as above.
-    supdir="$work/sup-sessions"; mkdir -p "$supdir/lead0001dead/subagents"
-    cp "$sedir/agent-sess1234deadbeef.jsonl" "$supdir/lead0001dead/subagents/agent-supa1234feed.jsonl"
-    cat > "$supdir/lead0001dead.jsonl" <<'EOF'
+supdir="$work/sup-sessions"; mkdir -p "$supdir/lead0001dead/subagents"
+cp "$sedir/agent-sess1234deadbeef.jsonl" "$supdir/lead0001dead/subagents/agent-supa1234feed.jsonl"
+cat > "$supdir/lead0001dead.jsonl" <<'EOF'
 {"type":"assistant","message":{"id":"L1","model":"test-model","usage":{"input_tokens":2,"output_tokens":3,"cache_read_input_tokens":4,"cache_creation_input_tokens":5}}}
 EOF
-    printf 'supiter build supa1234 2025-01-01 none\n' > "$work/sup-state.txt"
-    suplog="$work/sup-log.txt"
-    sup() {   # $1 = supervision label
-        DRIFT_KIT_STATE_FILE="$work/sup-state.txt" \
-        DRIFT_KIT_SESSIONS_DIR="$supdir" \
-        DRIFT_KIT_PRICE_TABLE="$work/se-prices.tsv" \
-        DRIFT_KIT_STAGE_ECONOMICS_LOG="$suplog" \
-        DRIFT_KIT_SUPERVISION_LABEL="$1" \
-        bash "$SMOKE_KIT_ROOT/bin/stage-economics.sh" 2>&1
-    }
-    set +e
-    supout="$(sup supervision)"; suprc=$?
-    set -e
-    [[ "$suprc" -eq 0 ]] || fail "stage-economics over the nested-tier fixture exited $suprc"
-    [[ "$(grep -c ' supiter supervision test-model ' "$suplog")" -eq 1 ]] \
-        || fail "the nested-tier fixture did not yield exactly one supervision row: $supout"
-    grep -qE ' supiter supervision test-model in=2 out=3 cr=4 cw=5 cost=40\.[0-9]+$' "$suplog" \
-        || fail "the supervision row does not carry the lead transcript's own usage"
-    grep -q ' supiter build test-model ' "$suplog" \
-        || fail "the dispatched stage session lost its own row to the supervision derivation"
+printf 'supiter build supa1234 2025-01-01 none\n' > "$work/sup-state.txt"
+suplog="$work/sup-log.txt"
+sup() {   # $1 = supervision label
+    DRIFT_KIT_STATE_FILE="$work/sup-state.txt" \
+    DRIFT_KIT_SESSIONS_DIR="$supdir" \
+    DRIFT_KIT_PRICE_TABLE="$work/se-prices.tsv" \
+    DRIFT_KIT_STAGE_ECONOMICS_LOG="$suplog" \
+    DRIFT_KIT_SUPERVISION_LABEL="$1" \
+    bash "$DRIFT_ARM" --emit stage-economics 2>&1
+}
+set +e
+supout="$(sup supervision)"; suprc=$?
+set -e
+[[ "$suprc" -eq 0 ]] || fail "stage-economics over the nested-tier fixture exited $suprc"
+[[ "$(grep -c ' supiter supervision test-model ' "$suplog")" -eq 1 ]] \
+    || fail "the nested-tier fixture did not yield exactly one supervision row: $supout"
+grep -qE ' supiter supervision test-model in=2 out=3 cr=4 cw=5 cost=40\.[0-9]+$' "$suplog" \
+    || fail "the supervision row does not carry the lead transcript's own usage"
+grep -q ' supiter build test-model ' "$suplog" \
+    || fail "the dispatched stage session lost its own row to the supervision derivation"
 
-    : > "$suplog"
-    sup lead-burn >/dev/null
-    grep -q ' supiter lead-burn test-model ' "$suplog" \
-        || fail "DRIFT_KIT_SUPERVISION_LABEL did not name the row (the label is not a literal)"
+: > "$suplog"
+sup lead-burn >/dev/null
+grep -q ' supiter lead-burn test-model ' "$suplog" \
+    || fail "DRIFT_KIT_SUPERVISION_LABEL did not name the row (the label is not a literal)"
 
-    : > "$suplog"
-    printf 'supiter build supa1234 2025-01-01 none\nsupiter supervision nolead12 2025-01-01 none\n' > "$work/sup-state.txt"
-    set +e
-    colout="$(sup supervision)"
-    set -e
-    grep -q 'colliding with DRIFT_KIT_SUPERVISION_LABEL' <<<"$colout" \
-        || fail "a stamp naming the label did not raise the collision notice"
-    [[ "$(grep -c ' supiter supervision ' "$suplog")" -eq 0 ]] \
-        || fail "the collision did not suppress the supervision row"
+: > "$suplog"
+printf 'supiter build supa1234 2025-01-01 none\nsupiter supervision nolead12 2025-01-01 none\n' > "$work/sup-state.txt"
+set +e
+colout="$(sup supervision)"
+set -e
+grep -q 'colliding with DRIFT_KIT_SUPERVISION_LABEL' <<<"$colout" \
+    || fail "a stamp naming the label did not raise the collision notice"
+[[ "$(grep -c ' supiter supervision ' "$suplog")" -eq 0 ]] \
+    || fail "the collision did not suppress the supervision row"
 
 # spec: drift-kit/SPEC.md §Testing — the fan-out fixture: a three-level tree flat in one subagents dir,
 # whose grandchild is what makes the walk testable. Its own dir/state/log, same reason as above.
-    fodir="$work/fo-sessions"; mkdir -p "$fodir/folead0001dead/subagents"
-    fosub="$fodir/folead0001dead/subagents"
-    cat > "$fodir/folead0001dead.jsonl" <<'EOF'
+fodir="$work/fo-sessions"; mkdir -p "$fodir/folead0001dead/subagents"
+fosub="$fodir/folead0001dead/subagents"
+cat > "$fodir/folead0001dead.jsonl" <<'EOF'
 {"type":"assistant","message":{"id":"L1","model":"test-model","usage":{"input_tokens":2,"output_tokens":3,"cache_read_input_tokens":4,"cache_creation_input_tokens":5}}}
 EOF
-    cat > "$fosub/agent-fostage1feed.jsonl" <<'EOF'
+cat > "$fosub/agent-fostage1feed.jsonl" <<'EOF'
 {"type":"assistant","message":{"id":"S1","model":"test-model","usage":{"input_tokens":10,"output_tokens":20,"cache_read_input_tokens":30,"cache_creation_input_tokens":40}}}
 EOF
-    cat > "$fosub/agent-fochild2feed.jsonl" <<'EOF'
+cat > "$fosub/agent-fochild2feed.jsonl" <<'EOF'
 {"type":"assistant","message":{"id":"C1","model":"test-model","usage":{"input_tokens":1,"output_tokens":2,"cache_read_input_tokens":3,"cache_creation_input_tokens":4}}}
 EOF
-    cat > "$fosub/agent-fogrand3feed.jsonl" <<'EOF'
+cat > "$fosub/agent-fogrand3feed.jsonl" <<'EOF'
 {"type":"assistant","message":{"id":"G1","model":"test-model","usage":{"input_tokens":100,"output_tokens":200,"cache_read_input_tokens":300,"cache_creation_input_tokens":400}}}
 EOF
-    # spec: drift-kit/SPEC.md §Testing — the fixture's second same-stage session: no usage of its own, so
-    # it anchors without emitting a row and its child must fold rather than replace the first anchor's.
-    printf '{"type":"user","message":{"role":"user","content":"no usage here"}}\n' > "$fosub/agent-fostage4feed.jsonl"
-    cat > "$fosub/agent-fochild5feed.jsonl" <<'EOF'
+# spec: drift-kit/SPEC.md §Testing — the fixture's second same-stage session: no usage of its own, so
+# it anchors without emitting a row and its child must fold rather than replace the first anchor's.
+printf '{"type":"user","message":{"role":"user","content":"no usage here"}}\n' > "$fosub/agent-fostage4feed.jsonl"
+cat > "$fosub/agent-fochild5feed.jsonl" <<'EOF'
 {"type":"assistant","message":{"id":"C5","model":"test-model","usage":{"input_tokens":1000,"output_tokens":2000,"cache_read_input_tokens":3000,"cache_creation_input_tokens":4000}}}
 EOF
-    printf '{"agentType":"stage-session","spawnDepth":1}\n' > "$fosub/agent-fostage1feed.meta.json"
-    printf '{"agentType":"Explore","parentAgentId":"fostage1feed","spawnDepth":2}\n' > "$fosub/agent-fochild2feed.meta.json"
-    printf '{"agentType":"fork","isFork":true,"parentAgentId":"fochild2feed","spawnDepth":3}\n' > "$fosub/agent-fogrand3feed.meta.json"
-    printf '{"agentType":"stage-session","spawnDepth":1}\n' > "$fosub/agent-fostage4feed.meta.json"
-    printf '{"agentType":"Explore","parentAgentId":"fostage4feed","spawnDepth":2}\n' > "$fosub/agent-fochild5feed.meta.json"
-    printf 'foiter build fostage1 2025-01-01 none\nfoiter build fostage4 2025-01-01 none\n' > "$work/fo-state.txt"
-    folog="$work/fo-log.txt"
-    fan() {   # $1 = fan-out suffix
-        DRIFT_KIT_STATE_FILE="$work/fo-state.txt" \
-        DRIFT_KIT_SESSIONS_DIR="$fodir" \
-        DRIFT_KIT_PRICE_TABLE="$work/se-prices.tsv" \
-        DRIFT_KIT_STAGE_ECONOMICS_LOG="$folog" \
-        DRIFT_KIT_FANOUT_SUFFIX="$1" \
-        bash "$SMOKE_KIT_ROOT/bin/stage-economics.sh" 2>&1
-    }
-    set +e
-    foout="$(fan '+fanout')"; forc=$?
-    set -e
-    [[ "$forc" -eq 0 ]] || fail "stage-economics over the fan-out fixture exited $forc"
-    [[ "$(grep -c ' foiter build+fanout test-model ' "$folog")" -eq 1 ]] \
-        || fail "the three-level fixture did not yield exactly one fan-out row: $foout"
-    grep -qE ' foiter build\+fanout test-model in=1101 out=2202 cr=3303 cw=4404 cost=33030\.[0-9]+$' "$folog" \
-        || fail "the fan-out row is not the sum over the whole subtree — a walk that stopped at depth 2, or two anchors racing under the dedup key instead of folding: $(cat "$folog")"
-    grep -q ' foiter build+fanout 2 anchors ' <<<"$foout" \
-        || fail "two anchors sharing one (iteration, stage) did not fold into one row: $foout"
-    grep -qE ' foiter build test-model in=10 out=20 cr=30 cw=40 cost=300\.[0-9]+$' "$folog" \
-        || fail "the stage row lost its own usage to the subtree (the fold this row exists to refuse): $(cat "$folog")"
-    grep -q 'resolved no anchor' <<<"$foout" \
-        && fail "an intact meta layer must resolve every dispatched transcript: $foout"
-    grep -q 'match no stamp and resolved no anchor' <<<"$foout" \
-        && fail "the unstamped bound still counts transcripts the fan-out pass attributed: $foout"
+printf '{"agentType":"stage-session","spawnDepth":1}\n' > "$fosub/agent-fostage1feed.meta.json"
+printf '{"agentType":"Explore","parentAgentId":"fostage1feed","spawnDepth":2}\n' > "$fosub/agent-fochild2feed.meta.json"
+printf '{"agentType":"fork","isFork":true,"parentAgentId":"fochild2feed","spawnDepth":3}\n' > "$fosub/agent-fogrand3feed.meta.json"
+printf '{"agentType":"stage-session","spawnDepth":1}\n' > "$fosub/agent-fostage4feed.meta.json"
+printf '{"agentType":"Explore","parentAgentId":"fostage4feed","spawnDepth":2}\n' > "$fosub/agent-fochild5feed.meta.json"
+printf 'foiter build fostage1 2025-01-01 none\nfoiter build fostage4 2025-01-01 none\n' > "$work/fo-state.txt"
+folog="$work/fo-log.txt"
+fan() {   # $1 = fan-out suffix
+    DRIFT_KIT_STATE_FILE="$work/fo-state.txt" \
+    DRIFT_KIT_SESSIONS_DIR="$fodir" \
+    DRIFT_KIT_PRICE_TABLE="$work/se-prices.tsv" \
+    DRIFT_KIT_STAGE_ECONOMICS_LOG="$folog" \
+    DRIFT_KIT_FANOUT_SUFFIX="$1" \
+    bash "$DRIFT_ARM" --emit stage-economics 2>&1
+}
+set +e
+foout="$(fan '+fanout')"; forc=$?
+set -e
+[[ "$forc" -eq 0 ]] || fail "stage-economics over the fan-out fixture exited $forc"
+[[ "$(grep -c ' foiter build+fanout test-model ' "$folog")" -eq 1 ]] \
+    || fail "the three-level fixture did not yield exactly one fan-out row: $foout"
+grep -qE ' foiter build\+fanout test-model in=1101 out=2202 cr=3303 cw=4404 cost=33030\.[0-9]+$' "$folog" \
+    || fail "the fan-out row is not the sum over the whole subtree — a walk that stopped at depth 2, or two anchors racing under the dedup key instead of folding: $(cat "$folog")"
+grep -q ' foiter build+fanout 2 anchors ' <<<"$foout" \
+    || fail "two anchors sharing one (iteration, stage) did not fold into one row: $foout"
+grep -qE ' foiter build test-model in=10 out=20 cr=30 cw=40 cost=300\.[0-9]+$' "$folog" \
+    || fail "the stage row lost its own usage to the subtree (the fold this row exists to refuse): $(cat "$folog")"
+grep -q 'resolved no anchor' <<<"$foout" \
+    && fail "an intact meta layer must resolve every dispatched transcript: $foout"
+grep -q 'match no stamp and resolved no anchor' <<<"$foout" \
+    && fail "the unstamped bound still counts transcripts the fan-out pass attributed: $foout"
 
-    : > "$folog"
-    fan '-subtree' >/dev/null
-    grep -q ' foiter build-subtree test-model ' "$folog" \
-        || fail "DRIFT_KIT_FANOUT_SUFFIX did not name the row (the suffix is not a literal)"
+: > "$folog"
+fan '-subtree' >/dev/null
+grep -q ' foiter build-subtree test-model ' "$folog" \
+    || fail "DRIFT_KIT_FANOUT_SUFFIX did not name the row (the suffix is not a literal)"
 
-    : > "$folog"
-    printf 'foiter build fostage1 2025-01-01 none\nfoiter build fostage4 2025-01-01 none\nfoiter build+fanout nostage1 2025-01-01 none\n' > "$work/fo-state.txt"
-    focol="$(fan '+fanout')"
-    grep -q 'colliding with DRIFT_KIT_FANOUT_SUFFIX' <<<"$focol" \
-        || fail "a stamp whose stage ends in the suffix did not raise the collision notice"
-    [[ "$(grep -c 'build+fanout test-model' "$folog")" -eq 0 ]] \
-        || fail "the collision did not suppress the fan-out row"
-    printf 'foiter build fostage1 2025-01-01 none\nfoiter build fostage4 2025-01-01 none\n' > "$work/fo-state.txt"
+: > "$folog"
+printf 'foiter build fostage1 2025-01-01 none\nfoiter build fostage4 2025-01-01 none\nfoiter build+fanout nostage1 2025-01-01 none\n' > "$work/fo-state.txt"
+focol="$(fan '+fanout')"
+grep -q 'colliding with DRIFT_KIT_FANOUT_SUFFIX' <<<"$focol" \
+    || fail "a stamp whose stage ends in the suffix did not raise the collision notice"
+[[ "$(grep -c 'build+fanout test-model' "$folog")" -eq 0 ]] \
+    || fail "the collision did not suppress the fan-out row"
+printf 'foiter build fostage1 2025-01-01 none\nfoiter build fostage4 2025-01-01 none\n' > "$work/fo-state.txt"
 
-    # spec: drift-kit/SPEC.md §Testing — the fan-out fixture's two degradation assertions, neither of
-    # which may be dropped for brevity: they are what make the coupling's bound testable, not asserted.
-    : > "$folog"; fan '+fanout' >/dev/null
-    grep -v 'build+fanout' "$folog" | sort > "$work/fo-intact.txt"
-    rm -f "$fosub/agent-fogrand3feed.meta.json"
-    : > "$folog"
-    fodeg="$(fan '+fanout')"
-    grep -q '1 dispatched transcript(s) resolved no anchor' <<<"$fodeg" \
-        || fail "a missing meta record must raise the counted unresolved notice: $fodeg"
-    grep -q '1 transcript(s) in the sessions dir match no stamp and resolved no anchor' <<<"$fodeg" \
-        || fail "an unresolved transcript must fall back into the unstamped bound: $fodeg"
-    grep -qE ' foiter build\+fanout test-model in=1001 out=2002 cr=3003 cw=4004 ' "$folog" \
-        || fail "the degraded run must still price every resolvable transcript, never guess the unresolved one: $(cat "$folog")"
-    grep -v 'build+fanout' "$folog" | sort > "$work/fo-degraded.txt"
-    diff -q "$work/fo-intact.txt" "$work/fo-degraded.txt" >/dev/null \
-        || fail "a degraded fan-out pass changed a row it does not own: $(diff "$work/fo-intact.txt" "$work/fo-degraded.txt")"
+# spec: drift-kit/SPEC.md §Testing — the fan-out fixture's two degradation assertions, neither of
+# which may be dropped for brevity: they are what make the coupling's bound testable, not asserted.
+: > "$folog"; fan '+fanout' >/dev/null
+grep -v 'build+fanout' "$folog" | sort > "$work/fo-intact.txt"
+rm -f "$fosub/agent-fogrand3feed.meta.json"
+: > "$folog"
+fodeg="$(fan '+fanout')"
+grep -q '1 dispatched transcript(s) resolved no anchor' <<<"$fodeg" \
+    || fail "a missing meta record must raise the counted unresolved notice: $fodeg"
+grep -q '1 transcript(s) in the sessions dir match no stamp and resolved no anchor' <<<"$fodeg" \
+    || fail "an unresolved transcript must fall back into the unstamped bound: $fodeg"
+grep -qE ' foiter build\+fanout test-model in=1001 out=2002 cr=3003 cw=4004 ' "$folog" \
+    || fail "the degraded run must still price every resolvable transcript, never guess the unresolved one: $(cat "$folog")"
+grep -v 'build+fanout' "$folog" | sort > "$work/fo-degraded.txt"
+diff -q "$work/fo-intact.txt" "$work/fo-degraded.txt" >/dev/null \
+    || fail "a degraded fan-out pass changed a row it does not own: $(diff "$work/fo-intact.txt" "$work/fo-degraded.txt")"
 
-    # spec: drift-kit/SPEC.md §Testing — the second arm: the whole meta layer gone.
-    rm -f "$fosub"/*.meta.json
-    : > "$folog"
-    fonone="$(fan '+fanout')"
-    grep -q 'no dispatch-attribution records beside the transcripts' <<<"$fonone" \
-        || fail "an absent meta layer must emit its single notice: $fonone"
-    [[ "$(grep -c 'build+fanout' "$folog")" -eq 0 ]] \
-        || fail "an absent meta layer must emit no fan-out row at all"
-    sort "$folog" > "$work/fo-nometa.txt"
-    diff -q "$work/fo-intact.txt" "$work/fo-nometa.txt" >/dev/null \
-        || fail "losing the meta layer changed a row it does not own: $(diff "$work/fo-intact.txt" "$work/fo-nometa.txt")"
-fi
+# spec: drift-kit/SPEC.md §Testing — the second arm: the whole meta layer gone.
+rm -f "$fosub"/*.meta.json
+: > "$folog"
+fonone="$(fan '+fanout')"
+grep -q 'no dispatch-attribution records beside the transcripts' <<<"$fonone" \
+    || fail "an absent meta layer must emit its single notice: $fonone"
+[[ "$(grep -c 'build+fanout' "$folog")" -eq 0 ]] \
+    || fail "an absent meta layer must emit no fan-out row at all"
+sort "$folog" > "$work/fo-nometa.txt"
+diff -q "$work/fo-intact.txt" "$work/fo-nometa.txt" >/dev/null \
+    || fail "losing the meta layer changed a row it does not own: $(diff "$work/fo-intact.txt" "$work/fo-nometa.txt")"
 
 # spec: drift-kit/SPEC.md §The knowledge-friction loop — the discriminating half of the capture arm's argv contract, the seam a crate unit test cannot see: the front-end resolves --emit kfric, a leading-dash field is still exit 2 in EITHER slot through the bridge, and the knowledge log is byte-unchanged after the refusal (a test reading exit codes alone passes the bug). The grammar cases are pinned in the ported module's own #[cfg(test)] tests, where check-crate-arms runs them; the -h/--help cases retired with the port, the help half belonging to the substrate.
 kflog="$work/kfric-argv.log"

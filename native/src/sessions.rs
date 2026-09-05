@@ -145,3 +145,50 @@ pub fn resolve(i: &Inputs) -> Result<String, String> {
     };
     Ok(path)
 }
+
+// spec: drift-kit/SPEC.md §The stage-economics meter — the inverse lookup: which transcript does
+// this `session8` name. It walks the same `candidate_globs` `resolve` does — never its own copy of
+// the two patterns — normalizes each candidate's basename with `key`, and keeps the newest match.
+// spec: drift-kit/SPEC.md §The stage-economics meter — the raw-prefix trap the shell's own comment
+// was written against: a stage session's transcript is named `agent-<hex>.jsonl` while its stamp is
+// `<hex>` truncated, so the *candidate* is normalized and never the pattern.
+pub fn find(i: &Inputs, session8: &str) -> Option<String> {
+    let dir = sessions_dir(i);
+    if !std::path::Path::new(&dir).is_dir() {
+        return None;
+    }
+    let mut newest: Option<(String, SystemTime)> = None;
+    for g in candidate_globs(&dir) {
+        for f in crate::walk::glob_entries(&g) {
+            if key(&f) != session8 {
+                continue;
+            }
+            let Ok(meta) = std::fs::metadata(&f) else {
+                continue;
+            };
+            let when = meta.modified().unwrap_or(SystemTime::UNIX_EPOCH);
+            let replace = match &newest {
+                Some((_, best)) => when > *best,
+                None => true,
+            };
+            if replace {
+                newest = Some((f, when));
+            }
+        }
+    }
+    newest.map(|(p, _)| p)
+}
+
+// spec: drift-kit/SPEC.md §The stage-economics meter — the whole two-tier transcript population,
+// which the under-count bound walks. A third reader of `candidate_globs` rather than a third copy
+// of the two patterns, which is what *one glob, not two* has to mean to be true.
+pub fn every_transcript(i: &Inputs) -> Vec<String> {
+    let dir = sessions_dir(i);
+    if !std::path::Path::new(&dir).is_dir() {
+        return Vec::new();
+    }
+    candidate_globs(&dir)
+        .iter()
+        .flat_map(|g| crate::walk::glob_entries(g))
+        .collect()
+}

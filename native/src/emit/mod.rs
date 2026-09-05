@@ -31,6 +31,7 @@ pub mod queue_counts;
 pub mod queue_edges;
 pub mod queue_index;
 pub mod scan_prompts;
+pub mod stage_economics;
 pub mod stage_rules;
 pub mod roadmap;
 pub mod run_validate;
@@ -378,6 +379,14 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         "--emit-overhead-meter",
         Arm::Emit(overhead_meter::emit),
         overhead_meter::KNOBS,
+    ),
+    // spec: drift-kit/SPEC.md §The stage-economics meter — an `Arm::Emit` on the variant's own
+    // test: the meter is advisory and exit is always 0, so no `1` is load-bearing. Its roster is
+    // the meter's own seven knobs, every one of them defined in drift-kit's `lib/drift.sh`.
+    (
+        "--emit-stage-economics",
+        Arm::Emit(stage_economics::emit),
+        stage_economics::KNOBS,
     ),
     // spec: lifecycle-kit/SPEC.md §The survey record — the citation affordance: it derives no stage
     // and stamps no rev, so its sibling's state-file knob is deliberately off this roster.

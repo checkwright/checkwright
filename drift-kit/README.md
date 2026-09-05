@@ -73,7 +73,7 @@ bash gate-sdk/bin/run-gates.sh --emit drift-report          # full report: lead/
 bash gate-sdk/bin/run-gates.sh --emit drift-report --trend  # one compact line (fragments joined with ·)
 bash gate-sdk/bin/run-gates.sh --emit trajectory   # governed-trajectory table (one row per closed iteration)
 bash gate-sdk/bin/run-gates.sh --emit overhead-meter   # governance-vs-task byte proxy for this session's transcript
-bash drift-kit/bin/stage-economics.sh         # real spend by stage × model × iteration (stamps ⋈ transcripts ⋈ price table)
+bash gate-sdk/bin/run-gates.sh --emit stage-economics  # real spend by stage × model × iteration (stamps ⋈ transcripts ⋈ price table)
 ```
 
 `--emit overhead-meter` is the overhead meter (drift-kit/SPEC.md §The overhead
@@ -89,7 +89,7 @@ emits one row per closed iteration — stages run, commit shape, amendment
 latency, validate attestations, gate-roster growth — for a consumer to pin
 behind a freshness gate.
 
-`bin/stage-economics.sh` is the stage-economics meter (drift-kit/SPEC.md §The
+`--emit stage-economics` is the stage-economics meter (drift-kit/SPEC.md §The
 stage-economics meter): it prices real spend by lifecycle stage × model ×
 iteration by joining WORKFLOW-STATE stamps to their session transcripts to a
 consumer-supplied price table, keeping the cache-read burn lever visible

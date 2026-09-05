@@ -13,7 +13,7 @@ output into one narrative — do not paste the raw tool dumps:
 1. **Governance overhead** — `bash gate-sdk/bin/run-gates.sh --emit overhead-meter` on the
    closing session (drift-kit/SPEC.md §The overhead meter): the governance-versus-task
    byte proxy for this session.
-2. **Stage economics** — `bash drift-kit/bin/stage-economics.sh` (drift-kit/SPEC.md
+2. **Stage economics** — `bash gate-sdk/bin/run-gates.sh --emit stage-economics` (drift-kit/SPEC.md
    §The stage-economics meter): real spend by stage × model × iteration, priced
    through the consumer price table. `cr` (cache-read) is the headline burn field —
    accumulated-context cache-read, not model choice, is the dominant draw, so lead

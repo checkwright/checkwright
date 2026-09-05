@@ -1,7 +1,7 @@
 // spec: drift-kit/SPEC.md §The published-evidence extractor — the governed-trajectory table, a
 // pure function of committed history. The stage roster and the evidence-surface pair are the
 // consumer's vocabulary and cross the config bridge; not one stage name is written here.
-use crate::proc;
+use crate::history::Git;
 use crate::walk;
 use std::collections::{HashMap, HashSet};
 
@@ -23,26 +23,6 @@ fn toplevel() -> String {
         .unwrap_or_else(|_| ".".to_string())
 }
 
-struct Git {
-    top: String,
-}
-
-impl Git {
-    // spec: gate-sdk/SPEC.md §Fail-closed contract — a git read that did not succeed yields no
-    // stdout, and every caller here treats that as "this history is not there", which is the
-    // extractor's own reading: it is advisory and exits 0 whatever git says.
-    fn read(&self, args: &[&str]) -> Option<String> {
-        let mut argv: Vec<&str> = vec!["-C", &self.top];
-        argv.extend_from_slice(args);
-        proc::run("git", &argv)
-            .ok()
-            .and_then(|c| c.stdout().map(|o| String::from_utf8_lossy(o).into_owned()))
-    }
-
-    fn has(&self, args: &[&str]) -> bool {
-        self.read(args).is_some()
-    }
-}
 
 // spec: drift-kit/SPEC.md §The published-evidence extractor — each stage's slot label is its
 // shortest prefix unique among the roster; header legend and cells read this one map so they
@@ -138,25 +118,8 @@ fn harvest_stamps(
     if !git.has(&["cat-file", "-e", &format!("HEAD:{}", state_file)]) {
         return;
     }
-    let log = match git.read(&[
-        "log",
-        "--reverse",
-        "--format=COMMIT %H",
-        "-p",
-        "-U0",
-        "--",
-        state_file,
-    ]) {
-        Some(l) => l,
-        None => return,
-    };
-    let mut commit = String::new();
-    for line in log.lines() {
-        if let Some(h) = line.strip_prefix("COMMIT ") {
-            commit = h.to_string();
-            continue;
-        }
-        let (iter, stage) = match added_stamp(line, stages) {
+    for (commit, line) in crate::history::added_lines(git, state_file) {
+        let (iter, stage) = match added_stamp(&line, stages) {
             Some(v) => v,
             None => continue,
         };
