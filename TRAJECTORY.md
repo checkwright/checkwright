@@ -466,6 +466,15 @@ whose class accreted two sites while it waited; scope sizes it against the windo
 by kit. Discharge event: that unit lands and the gate is green, at which point this paragraph is
 deleted.
 
+**No governed file is exempt from brevity; the close pass walks every file that grew — ruled
+2026-09-05 by the operator in consult.** The close-stage brevity pass had measured `CLAUDE.md` alone
+and exempted on-demand files by its own text, so it reported green through a month in which the
+queue, the ruling record and the kit SPECs multiplied while `CLAUDE.md` grew seven lines. The
+exemption was never the operator's. Mechanism: context-kit/SPEC.md §The always-loaded meter's
+`--growth` arm and §The close-stage brevity pass; doctrine-kit/DOCTRINE.md rule 5 states the
+principle. Refused: a gate reddening a close on net growth, on the 2026-08-30 grounds that the exits
+are judgments; the figure is stated at every close and read at the consult.
+
 **The queue's `ruled:` declaration line is retired; a ruling's provenance is stated inline —
 ruled 2026-09-05 by the operator in consult.** Mechanism at queue-kit/SPEC.md §The tag algebra and
 §check-queue-entry-budget assertion (D). The ground: the line had no reader but the budget gate's
@@ -579,10 +588,11 @@ units that each fit beside a cut; and a per-iteration meta-work ratio, refused a
 by the operator with it:** a healthy project shows a decreasing queue, instruction surfaces that
 get better and cheaper, and falling governance overhead, and on 2026-09-05 every one of the three
 read the opposite way. Each has an owner already — `kpi-queue-net-delta`'s `qnet`,
-`kpi-always-loaded` against `.workflow/always-loaded-baseline.txt`, and `kpi-overhead`'s share — so
-close states all three in the drain's commit message beside the `qnet` fragment it already writes,
-with the cause when one moves the wrong way, and the next consult reads them against this ruling's
-expectation: qnet at or below zero, the always-loaded surface flat or shrinking, the share falling.
+the always-loaded meter's delta and its `--growth` arm over every governed prose file, and
+`kpi-overhead`'s share — so close states all three in the drain's commit message beside the `qnet`
+fragment it already writes, with the cause when one moves the wrong way, and the next consult reads
+them against this ruling's expectation: qnet at or below zero, governed prose flat or shrinking,
+the share falling.
 An enforcing gate stays refused on the 2026-08-30 grounds; the shape is reopened if none of the
 three has moved over five closes. **The pool is still
 triaged after the port, as one iteration** that iceboxes by class and retires what a landed unit

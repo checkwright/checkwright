@@ -39,6 +39,7 @@ unset _ck_cfg
 
 declare -p CONTEXT_KIT_SURFACES >/dev/null 2>&1 || CONTEXT_KIT_SURFACES=("CLAUDE.md")
 
+declare -p CONTEXT_KIT_GROWTH_PATHS >/dev/null 2>&1 || CONTEXT_KIT_GROWTH_PATHS=("*.md")
 [[ -v CONTEXT_KIT_BASELINE_FILE ]] || CONTEXT_KIT_BASELINE_FILE="${GATE_SDK_WORKFLOW_DIR:-.workflow}/always-loaded-baseline.txt"
 
 [[ -v CONTEXT_KIT_ENV_PROFILE_FILE ]] || CONTEXT_KIT_ENV_PROFILE_FILE="ENV.local.md"

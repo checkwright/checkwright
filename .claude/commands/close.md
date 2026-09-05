@@ -18,8 +18,8 @@ gate-sdk/bin/run-gates.sh --lesson-sink <tag>`, which resolves the sink from the
 the `--emit overhead-meter` arm, whose invocation and byte-proxy contract
 drift-kit/SPEC.md §The overhead meter owns: it logs the governance-vs-task
 proportion, the per-session producer feeding `kpi-overhead`. The drain's commit
-message states the health triad beside its `qnet` fragment — `qnet`,
-`kpi-always-loaded` against its baseline, and `kpi-overhead`'s share — with the
+message states the health triad beside its `qnet` fragment — `qnet`, the
+always-loaded delta with the `--growth` figure, and `kpi-overhead`'s share — with the
 cause when one moves the wrong way (TRAJECTORY.md §PRIORITY DIRECTIVE, the
 port-first run). The roster step above already names which surfaces to read; what
 this binding adds is the procedure each row routes to — the prompt-friction row

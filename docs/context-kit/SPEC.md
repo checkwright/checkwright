@@ -618,6 +618,14 @@ the measurement.
   because the brevity pass reacts to the *delta*, not the level (close is
   net-additive by design; only growth since the iteration started is
   actionable).
+- **`--growth`** prints the brevity pass's other worklist: a header with the
+  count of files that grew and their net lines, then one row per governed
+  prose file whose net line growth since the baseline commit is positive,
+  largest first, over the pathspecs in `CONTEXT_KIT_GROWTH_PATHS`. It is
+  derived from git against the commit the baseline already records, so it
+  adds no second baseline; a baseline commit git cannot resolve prints a
+  one-line notice and exits clean. Separate from the bare invocation because
+  `kpi-always-loaded` reads that as one line.
 - **Baseline file** (`${GATE_SDK_WORKFLOW_DIR:-.workflow}/`
   `always-loaded-baseline.txt`, committed): a `# contract:` header
   pointing here, then one data line
@@ -718,14 +726,17 @@ consumer's `gates.list` (this repo's included).
 
 `templates/close-brevity.md` is the recurring close-stage step a consumer
 splices into its close skill (the guard-kit `close-triage.md` pattern).
-The procedure: run `always-loaded.sh`; walk the growth since baseline
-asking two distinct questions — staleness (*is it still true?*) and
-brevity (*is each block worth its standing per-session token cost?*);
-resolve by rewording or deleting, never by annotating (outdated context
+The procedure: run `always-loaded.sh`, then `always-loaded.sh --growth`; walk
+the always-loaded delta and every file the growth list names, asking two
+distinct questions — staleness (*is it still true?*) and brevity (*is each
+block worth its cost at every read?*); resolve by rewording or deleting, never
+by annotating (outdated context
 <!-- manifest-temporal-exempt: names the "formerly…" note as the anti-pattern this pass forbids, not written as narration -->
-goes to git history, not to a "formerly…" note); on-demand files (SPECs,
-handbooks) are exempt — their cost is paid only when opened; finish with
-`always-loaded.sh --update-baseline` and commit the baseline.
+goes to git history, not to a "formerly…" note); **no file is exempt** — an
+on-demand doc pays at every open, and a SPEC a stage opens each iteration is
+always-loaded in effect, the always-loaded tier being only the one that pays
+most often; finish with `always-loaded.sh --update-baseline` and commit the
+baseline.
 
 The lexical share of this narration judgment — a fixed set of `formerly…`-class
 markers in the manifest set — is a blocking gate
@@ -1246,6 +1257,9 @@ default left beside the compiled reader would refuse the whole arm.
   default `${GATE_SDK_TMP_DIR:-.tmp}/session-role` (gitignored scratch).
 - `CONTEXT_KIT_BASELINE_FILE` — default
   `${GATE_SDK_WORKFLOW_DIR:-.workflow}/always-loaded-baseline.txt`.
+- `CONTEXT_KIT_GROWTH_PATHS` — array of git pathspecs the meter's `--growth`
+  arm measures; default `("*.md")`. A consumer excludes generated mirrors and
+  fixture copies here, since a copy's growth is its source's.
 - `CONTEXT_KIT_BREVITY_FILE` — default `CLAUDE.md`.
 - `CONTEXT_KIT_BREVITY_SECTION` — heading of the budgeted bullet section;
   default `## Shared conventions`.

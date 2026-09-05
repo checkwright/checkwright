@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
 # spec: context-kit/SPEC.md §The always-loaded meter — standing per-session surface vs committed baseline
-# usage: always-loaded.sh [--update-baseline]   (bare: total/per-part/delta; --update-baseline: rewrite it)
+# usage: always-loaded.sh [--update-baseline|--growth]   (bare: total/per-part/delta; --update-baseline: rewrite it; --growth: per-file net growth of every governed prose file since the baseline commit)
 set -uo pipefail
 
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" 2>/dev/null || { echo "always-loaded: cannot enter repo root" >&2; exit 2; }
 
-UPDATE=0
+UPDATE=0; GROWTH=0
 [[ "${1:-}" == "--update-baseline" ]] && UPDATE=1
+[[ "${1:-}" == "--growth" ]] && GROWTH=1
 
 # shellcheck source=../lib/context.sh
 source "$KIT/lib/context.sh"
@@ -46,6 +47,21 @@ base_total=""; base_commit=""; base_extra=""
 if [[ -f "$CONTEXT_KIT_BASELINE_FILE" ]]; then
     read -r base_total _ base_commit base_extra < <(
         grep -vE '^[[:space:]]*(#|$)' "$CONTEXT_KIT_BASELINE_FILE" 2>/dev/null | head -1)
+fi
+
+# spec: context-kit/SPEC.md §The always-loaded meter — the growth arm: no governed file is exempt from the brevity pass, so the worklist is every file that grew net since the baseline commit, largest first
+if [[ "$GROWTH" -eq 1 ]]; then
+    if [[ -z "$base_commit" ]] || ! git rev-parse -q --verify "$base_commit^{commit}" >/dev/null 2>&1; then
+        echo "growth: no resolvable baseline commit in $CONTEXT_KIT_BASELINE_FILE"
+        exit 0
+    fi
+    rows="$(git diff --numstat "$base_commit" -- "${CONTEXT_KIT_GROWTH_PATHS[@]}" 2>/dev/null \
+        | awk -F'\t' '$1 != "-" && $1 - $2 > 0 { printf "%d\t%s\n", $1 - $2, $3 }' | sort -rn)"
+    n=0; net=0
+    while IFS=$'\t' read -r d f; do [[ -n "$f" ]] || continue; n=$(( n + 1 )); net=$(( net + d )); done <<<"$rows"
+    echo "growth since ${base_commit:0:8}: $n file(s) grew, +$net net line(s)"
+    [[ -n "$rows" ]] && printf '%s\n' "$rows" | awk -F'\t' '{ printf "  +%d\t%s\n", $1, $2 }'
+    exit 0
 fi
 
 if [[ "$UPDATE" -eq 1 ]]; then

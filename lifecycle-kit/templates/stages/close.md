@@ -200,13 +200,14 @@ session.
    citation, the disposition-evidence path, and any boundary-only sub-procedures
    (e.g. a major-only deprecation sweep); or a plain "no release process — every
    iteration stamps none" line for a consumer without one.>*
-9. **Brevity pass on the always-loaded surfaces** — run this **last**, after
+9. **Brevity pass on every governed prose file** — run this **last**, after
    every surface-mutating step above. Scope by principle, not a fixed list:
-   every surface injected into each agent session. Staleness asks *is it
-   still true?*; brevity asks *is each block worth its standing per-session
-   token cost?* — reword/delete over annotating; outdated context goes to git
-   history. On-demand files (specs, this skill) are exempt — their cost is
-   paid only when opened.
+   every surface injected into each agent session, and every file that grew
+   since the last close. Staleness asks *is it still true?*; brevity asks *is
+   each block worth its cost at every read?* — reword/delete over annotating;
+   outdated context goes to git history. No file is exempt: an on-demand file
+   pays at every open, and one a stage opens each iteration is always-loaded in
+   effect.
 10. **Optionally merge** — an iteration can close without merging if validate
    is incomplete or a follow-up iteration is planned.
 11. **The push precondition — select the writing identity, immediately before

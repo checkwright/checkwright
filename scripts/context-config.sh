@@ -13,3 +13,7 @@ CONTEXT_KIT_PRUNE_DIRS=(.git node_modules target dist build worktrees)
 # comment-tier-exempt: gate-sdk lives at gate-sdk/bin/ in this monorepo, so name the front-end explicitly rather than lean on the default gates-dir probe
 # shellcheck disable=SC2034  # consumed by context-kit/bin/always-loaded.sh after sourcing
 CONTEXT_KIT_HOOK_CMD="bash gate-sdk/bin/run-gates.sh --emit queue-index --collapse-deferred"
+
+# comment-tier-exempt: docs/ is the generated SPEC mirror and gate-tests/ holds fixtures — both are copies, so their growth is the source's, counted once at the source
+# shellcheck disable=SC2034  # consumed by context-kit/bin/always-loaded.sh --growth after sourcing
+CONTEXT_KIT_GROWTH_PATHS=('*.md' ':(exclude)docs/' ':(exclude)*/gate-tests/')

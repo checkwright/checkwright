@@ -115,6 +115,9 @@ link — an application of the load-trigger residency rule to the doctrine itsel
    *Under agent work:* the always-loaded file is read in full at every session
    start, so every line spent restating a mechanism is context tax on every
    task; a one-line pointer pays once and loads the detail only when needed.
+   No tier is free: an on-demand doc pays at every open, and one a stage opens
+   each iteration is always-loaded in effect, so brevity binds every governed
+   file and the close pass walks each one that grew.
    *Enforced by:* the brevity budget in
    [context-kit/SPEC.md](../context-kit/SPEC.md) §The brevity gate.
    *Digest:* one line per rule here; the mechanism behind the pointer.
