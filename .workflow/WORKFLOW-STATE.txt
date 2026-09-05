@@ -5,3 +5,4 @@
 ---
 
 always-loaded-cut-and-seam-slice scope aa443aef 2026-09-06 8e71a32d
+always-loaded-cut-and-seam-slice spec aac04354 2026-09-06 d3a27036
