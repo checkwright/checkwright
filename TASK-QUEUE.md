@@ -1126,7 +1126,7 @@
   and `uninstall` verbs, specified at installer/README.md §update and
   §uninstall — sequence against those rather than duplicating them.
   **Negative result — the tarball channel's economics do not transfer here.**
-  `release-tarball-delivery-channel` is cheap for a structural reason that is
+  The retired `release-tarball-delivery-channel` was cheap for a structural reason that is
   absent from this rung: `.github/workflows/publish.yml`'s `pack` job already
   assembles and stamps one tarball and uploads it as the run's artifact, so a
   new channel is a sibling job that `needs: pack` and consumes that artifact.

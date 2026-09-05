@@ -37,9 +37,9 @@ Internal work lands as **direct commits to master and never rides a pull
 request** — the PR channel is inbound-only, for external contributors. A master
 push is verified against the remote oracle: watch the `gates` workflow
 to green (`gh run watch`) before calling the push done — and **budget one to two
-pushes per iteration**. A run already finished is read for free with
-`gh run view <id> --log`, so a cause read over an observed round buys no push;
-a round is owed only when the facts wanted were never printed. Commits accumulate locally and ride a single watched push
+pushes per iteration**. A finished run is read for free with
+`gh run view <id> --log`, so a cause read over an observed round buys no push —
+a new round is owed only when the facts wanted were never printed. Commits accumulate locally and ride a single watched push
 at close; a release tag earns the second run (`publish`). Every push also costs a
 `pages-build-deployment`, so drip-pushing re-buys one push's information at N
 times the wall-clock. Never hand-dispatch `site-health` — it runs on a schedule.
