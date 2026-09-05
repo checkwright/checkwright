@@ -54,7 +54,7 @@ hook approximation and the session-context template also expect
    gates dir, edit its `[EDIT ME]` sections (layout judgment, not mechanism),
    and merge `templates/settings-sessionstart.json` into `.claude/settings.json`.
 
-3. Set the baseline — `bash context-kit/bin/always-loaded.sh --update-baseline`
+3. Set the baseline — `bash gate-sdk/bin/run-gates.sh --emit always-loaded --update-baseline`
    and commit `.workflow/always-loaded-baseline.txt`.
 
 4. Seed your env profile — `bash gate-sdk/bin/run-gates.sh --emit env-probe`
@@ -74,8 +74,8 @@ hook approximation and the session-context template also expect
 bash gate-sdk/bin/run-gates.sh --emit md-index [paths…]            # markdown heading index + first sentences
 bash gate-sdk/bin/run-gates.sh --emit md-section <file> <heading>  # print one section by heading
 bash gate-sdk/bin/run-gates.sh --emit pub-index [paths…]           # public API surface (per-language extractors; ships rust, ts)
-bash context-kit/bin/always-loaded.sh               # standing surface vs baseline (one line)
-bash context-kit/bin/always-loaded.sh --update-baseline   # a close-stage act
+bash gate-sdk/bin/run-gates.sh --emit always-loaded                 # standing surface vs baseline (one line)
+bash gate-sdk/bin/run-gates.sh --emit always-loaded --update-baseline   # a close-stage act
 bash gate-sdk/bin/run-gates.sh --emit footprint     # per-kit token footprint (the committed page)
 bash gate-sdk/bin/run-gates.sh --emit env-probe     # re-probe the local machine profile (ENV.local.md)
 ```

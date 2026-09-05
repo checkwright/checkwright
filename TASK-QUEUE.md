@@ -12,52 +12,6 @@
 
 ## New Features
 
-- **always-loaded-meter-port-cut** [spec: SPEC-always-loaded-cut.md] — port
-  `context-kit/bin/always-loaded.sh` (85) to the bridged `--emit-always-loaded` `Arm::Emit`.
-  The stated-contract cut behind context-kit/SPEC.md §The always-loaded meter, which declares this
-  file "correctly homed, behind nothing, and takeable as a singleton". **Cut A of the A+B pair the
-  operator ruled 2026-09-06 through an interactive prompt in the lead session, relayed by the lead
-  and not ruled by it; `demo/run-demo.sh` (C) is OUT and is next window's cut.**
-  **It does NOT discharge context-kit** — `bin/run-index-tests.sh` (95),
-  `index-tests/toolfloor-cases.sh` (49) and `lib/toolfloor.sh` (58) stay owed behind §Testing's
-  behind-invoke sequencing and take no `# port-until:`.
-  **Two design rulings the entry carries because a build session will reach for the opposite of
-  each.** The hook-body command STAYS SPAWNED: `CONTEXT_KIT_HOOK_CMD` is a consumer command seam,
-  so calling `queue_index::emit` in-process would measure the wrong thing for every consumer whose
-  hook body is not queue-kit's, silently at exit 0. And the measurement becomes a LIBRARY FUNCTION
-  the arm wraps (§bin/footprint's shape), so `kpi-always-loaded` reads its figures in process
-  instead of re-parsing the rendered line — which retires two prose parsers, moves the presence
-  witness to `lib/context.sh`, and obliges `--emit-drift-report` to declare the three
-  `CONTEXT_KIT_` knobs the KPI now reads itself.
-  `CONTEXT_KIT_HOOK_CMD`'s default moves from the deleted script into `lib/context.sh` in the same
-  commit — the bridge's `declare -p` read cannot find a default beside a compiled reader.
-  Reaches `## Done` at build: its deliverable is one section's owed file and this cut finishes it,
-  so the corpus-demotion branch does not reach it.
-  Filed 2026-09-06 by spec as a per-cut feature unit, under the packaging ruling gate-sdk/SPEC.md
-  §Porting a gate to the binary substrate states — two refs cannot pair with one host.
-
-- **settings-allow-port-cut** [spec: SPEC-settings-allow-cut.md] — port
-  `guard-kit/bin/compare-settings-allow.sh` (115) to the bridged
-  `--emit-compare-settings-allow` `Arm::Emit`.
-  The stated-contract cut behind guard-kit/SPEC.md §compare-settings-allow, the file §Testing named
-  as "what stays owed to guard-kit … takeable as a singleton on its own". **Cut B of the same
-  operator-ruled A+B pair, 2026-09-06, lead-relayed and not lead-ruled.**
-  **IT EMPTIES GUARD-KIT'S OWED COLUMN OUTRIGHT** — `lib/guard.sh` and `templates/bash-guard.sh`
-  carry `# no-port:` on grounds this cut reopens neither, so after it the kit has no owed file.
-  **The centre is the match core, not the report.** `guard_allow_match` is the whole of what this
-  member computes, and a compiled twin ALREADY EXISTS unheld, inline in `scan_prompts.rs`'s
-  `granted_by`. The port does not create the second holder; it makes a second compiled member
-  depend on it. So the predicate is EXTRACTED to `native/src/guard.rs`, `granted_by` is re-pointed
-  at it, and `--guard-lib-parity` gains a fourth mode — criterion 6's *unless* clause, the shell
-  holder being uncleanable while rule 20 calls it from the same file.
-  `jq` leaves this member entirely (`serde_json`, no new dependency, an EMPTY spawned-program set),
-  and the bespoke suite's `jq` precondition is DROPPED rather than carried — the inverse of the
-  `--run-guard-tests` cut, whose subject still spawned one. The unreadable-versus-absent
-  distinction is drawn in the same edit: a malformed committed settings file stops reading as an
-  empty allowlist at exit 0.
-  Reaches `## Done` at build on the same ground as its sibling.
-  Filed 2026-09-06 by spec as the second per-cut feature unit.
-
 ## Technical Debt
 
 - **worktree-lock-pid-is-not-agent-liveness** — a linked worktree's lock reason names the harness
@@ -10138,5 +10092,8 @@
 - **scratch-auto-allow-no-decoration-steer** [design-pending] — Chained writes lose the steer.
 
 ## Done
+
+- always-loaded-meter-port-cut
+- settings-allow-port-cut
 
 ## Lessons Learned

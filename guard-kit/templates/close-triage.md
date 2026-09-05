@@ -24,8 +24,8 @@ of lifecycle-kit's `tooling-friction triage` placeholder (close skill, step 2).
 3. **Review the wakeup log** if the wakeup-guard is wired: read
    `.workflow/wakeup-attempts.log`, act on any surfaced intent, then delete it.
 4. **Prune and narrow the local overlay.** Run
-   `bash guard-kit/bin/compare-settings-allow.sh` — it reports two sets, and
-   each has its own disposition.
+   `bash gate-sdk/bin/run-gates.sh --emit compare-settings-allow` — it reports
+   two sets, and each has its own disposition.
    - **Redundant**: remove every listed `settings.local.json` entry (a committed
      glob already grants it).
    - **Too broad**: for every entry the report lists as a *narrowing candidate*,

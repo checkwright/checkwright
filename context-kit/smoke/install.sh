@@ -58,7 +58,7 @@ if bash gate-sdk/bin/run-gates.sh --emit queue-index >/dev/null 2>&1 \
     exit 1
 fi
 
-bash "$SMOKE_KIT_ROOT/bin/always-loaded.sh" --update-baseline >/dev/null
+bash "$SDK/bin/run-gates.sh" --emit always-loaded --update-baseline >/dev/null
 if [[ ! -f .workflow/always-loaded-baseline.txt ]]; then
     echo "context-kit/smoke/install.sh: always-loaded --update-baseline wrote no baseline" >&2
     exit 1

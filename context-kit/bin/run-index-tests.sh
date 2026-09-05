@@ -6,7 +6,6 @@ set -uo pipefail
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CORPUS="$KIT/index-tests/corpus"
 EXPECTED="$KIT/index-tests/expected"
-BIN="$KIT/bin"
 # spec: context-kit/SPEC.md §Testing — the three index tools are arms of the gate binary, reached
 # through the battery runner's --emit front-end: it resolves the bridged environment the arms
 # declare, which a bare binary invocation would not
@@ -76,7 +75,7 @@ trap 'rm -f "$cfg" "$shadowcfg"; rm -rf "$shadowdir"' EXIT
     echo "CONTEXT_KIT_BASELINE_FILE=\"$CORPUS/baseline.txt\""
 } > "$cfg"
 check always-loaded "$EXPECTED/always-loaded.txt" \
-    env "CONTEXT_KIT_CONFIG_FILE=$cfg" bash "$BIN/always-loaded.sh"
+    env "CONTEXT_KIT_CONFIG_FILE=$cfg" bash "$RUN_GATES" --emit always-loaded
 
 # spec: context-kit/SPEC.md §The always-loaded meter — the mode operand is drawn from a closed set and one outside it is refused: no golden holds this, because the assertion is the exit status and the stream the usage went to, not a document. A typo of --update-baseline that fell through to the bare reading would print an ordinary meter line at exit 0 while writing no baseline at all
 if [[ "$UPDATE" -eq 0 ]]; then

@@ -65,7 +65,7 @@ project's vocabulary, not the kit's.
 ```bash
 bash gate-sdk/bin/run-gates.sh --emit scan-prompts          # rank what nothing granted, filtered by the allowlist
 bash gate-sdk/bin/run-gates.sh --emit scan-prompts --count  # <patterns>/<occurrences> token (drift KPI)
-bash guard-kit/bin/compare-settings-allow.sh        # local-overlay entries a committed glob already grants, and those a probe proves too broad
+bash gate-sdk/bin/run-gates.sh --emit compare-settings-allow  # local-overlay entries a committed glob already grants, and those a probe proves too broad
 ```
 
 `--emit scan-prompts` takes an optional log path, which overrides `GUARD_KIT_LOG`

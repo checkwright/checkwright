@@ -2311,6 +2311,8 @@ two survey-record affordances; `--emit-stage-rules`,
 doctrine-kit's craft-rule router, `--emit-session-id`, lifecycle-kit's stamp-id
 derivation (lifecycle-kit/SPEC.md §bin/session-id.sh), `--emit-env-probe`,
 context-kit's machine-profile derivation (context-kit/SPEC.md §bin/env-probe),
+`--emit-always-loaded`, context-kit's standing-context meter (context-kit/SPEC.md
+§The always-loaded meter),
 `--emit-parse-gates-log` and `--emit-parse-smoke-log`, the two parser
 adapters an `EVIDENCE_KIT_PARSER_<suite>` value may name
 (evidence-kit/SPEC.md §Layout and configuration), and `--emit-enum-sets`,
@@ -2321,7 +2323,9 @@ inbox), and `--emit-kfric`, drift-kit's knowledge-friction capture affordance
 (drift-kit/SPEC.md §The knowledge-friction loop) — both free-text capture members
 the argv-shape split below governs —
 and `--emit-scan-prompts`, guard-kit's friction-log ranker
-(guard-kit/SPEC.md §scan-prompts), and `--emit-usage-trend`, delegation-kit's
+(guard-kit/SPEC.md §scan-prompts), and `--emit-compare-settings-allow`,
+guard-kit's settings-allowlist comparator (guard-kit/SPEC.md
+§compare-settings-allow), and `--emit-usage-trend`, delegation-kit's
 footprint trend reporter (delegation-kit/SPEC.md §Trend reporter); and
 drift-kit's two meters, `--emit-overhead-meter`, the
 governance-overhead byte proxy (drift-kit/SPEC.md §The overhead meter), and
@@ -2469,6 +2473,11 @@ plus whatever program the consumer's `CONTEXT_KIT_HOOK_CMD` names — the knob b
 a command seam the port deliberately keeps spawned (context-kit/SPEC.md §The
 always-loaded meter). `--needs` answers about registry members only and a bridged
 arm is not one, which is why both sets are recorded here.
+**`--emit-compare-settings-allow` is the class's first member with an empty
+set**, stated beside the worst case above so a reader sizing the class meets
+both ends of it: the shell form's last `jq` spawn on this path is gone, the
+allow lists are read with `serde_json`, and no program is spawned at all
+(guard-kit/SPEC.md §compare-settings-allow).
 **`--agents-md-smoke` shares `--upgrade-smoke`'s shape and not its weight**, and
 is named beside it because both reach `lib/consumer-smoke.sh` by spawning: `bash`,
 `git`, `mktemp`, and through the vendoring whatever `csmoke_vendor_and_install`
@@ -14975,7 +14984,7 @@ is not executable" cannot read as "a descriptor is not covered": the descriptor
 is data — a manifest and directives, never sourced and never run — and an
 executable one invites a reader to run a file carrying no interpreter line. The
 first class is by-path-invoked kit scripts — gate-sdk's runner
-(`run-gates.sh`), guard-kit's `bin/compare-settings-allow.sh`, and lifecycle-kit's
+(`run-gates.sh`), context-kit's `bin/run-index-tests.sh`, and lifecycle-kit's
 entry preflight all invoke kit scripts **by path**, and a shebang'd `bin/` tool
 is by-convention path-invocable — so a script committed `100644` degrades
 silently in a fresh clone: a KPI plugin to `n/a (plugin failed)`, a

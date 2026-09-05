@@ -777,8 +777,8 @@ consumer's `gates.list` (this repo's included).
 
 `templates/close-brevity.md` is the recurring close-stage step a consumer
 splices into its close skill (the guard-kit `close-triage.md` pattern).
-The procedure: run `always-loaded.sh`, then `always-loaded.sh --growth`; walk
-the always-loaded delta and every file the growth list names, asking two
+The procedure: run `--emit always-loaded`, then `--emit always-loaded --growth`;
+walk the always-loaded delta and every file the growth list names, asking two
 distinct questions — staleness (*is it still true?*) and brevity (*is each
 block worth its cost at every read?*); resolve by rewording or deleting, never
 by annotating (outdated context
@@ -786,7 +786,7 @@ by annotating (outdated context
 goes to git history, not to a "formerly…" note); **no file is exempt** — an
 on-demand doc pays at every open, and a SPEC a stage opens each iteration is
 always-loaded in effect, the always-loaded tier being only the one that pays
-most often; finish with `always-loaded.sh --update-baseline` and commit the
+most often; finish with `--emit always-loaded --update-baseline` and commit the
 baseline.
 
 The lexical share of this narration judgment — a fixed set of `formerly…`-class
@@ -1129,7 +1129,6 @@ no bare collection total.
 context-kit/
   lib/context.sh                 # sourced config loader + the kit's knob defaults; the config bridge sources it
   lib/toolfloor.sh               # sourceable owner: the probe roster + the floor predicate
-  bin/always-loaded.sh
   bin/run-index-tests.sh         # expected-output runner for the index-first tools
   checks/check-brevity.gate      # hermetic, binary-dispatched: the budgeted section's over-budget pointer bullets
   checks/check-settings-pins.gate  # hermetic, binary-dispatched: pins hold against the settings file
@@ -1169,7 +1168,7 @@ ported that resolver (§Index-first reading).
 
 The install also seeds the committed baseline the footprint contract holds
 (§The consumer footprint): after wiring the hook it runs
-`always-loaded.sh --update-baseline` once to write
+`run-gates.sh --emit always-loaded --update-baseline` once to write
 `always-loaded-baseline.txt`, and `smoke/install.sh` asserts that step by
 running the meter and checking the baseline lands. Install also seeds the local
 env profile — `run-gates.sh --emit env-probe` writes the first `ENV.local.md`
@@ -1395,10 +1394,13 @@ is the worked case: it declared the same section, sourced neither the runner nor
 the library, and its own header called it a standalone validate suite, so it was
 unblocked on its own ground and has since cut as this section's remainder
 (gate-sdk/SPEC.md §Porting a gate to the binary substrate — a stated cause reaches
-only the members it names). What the cut left owed to context-kit is those two
-members, `lib/toolfloor.sh` behind the same relocation, and `bin/always-loaded.sh`
-(§The always-loaded meter) — correctly homed, behind nothing, and takeable as a
-singleton whenever a cut wants it.
+only the members it names). `bin/always-loaded.sh` (§The always-loaded meter) was
+a different section's owed file, correctly homed and takeable as a singleton on
+its own, and it has since cut too — its golden is the arm's parity oracle, held
+byte-for-byte over an unedited expectation file (below). What stays owed to
+context-kit after both cuts is the two sequenced members named above and
+`lib/toolfloor.sh` behind the same installer relocation — three files, and no
+fourth.
 The floor predicate rides the same runner rather than a fixture pair —
 it is a sourced function, not a gate: `index-tests/toolfloor-cases.sh` sources
 `lib/toolfloor.sh` and prints one line per (element, banner) pair, so the closed
@@ -1448,7 +1450,8 @@ into the gates dir, hook wiring into the harness settings), runs the hook
 end-to-end asserting it exits zero (and, when queue-kit is co-vendored,
 emits the queue index — the installer assumes only gate-sdk, so the queue
 integration is exercised only alongside queue-kit), and runs
-`always-loaded.sh --update-baseline` asserting the baseline file appears.
+`run-gates.sh --emit always-loaded --update-baseline` asserting the baseline
+file appears.
 `smoke/violation.sh` crafts an over-budget pointered bullet in the scratch
 consumer's brevity file and asserts the battery reddens via
 `check-brevity`. It inserts the bullet inside the budgeted section rather than
@@ -1474,7 +1477,7 @@ mechanics (gate-sdk/SPEC.md §Consumer smoke), converts its agent file from
 `CLAUDE.md` to `AGENTS.md`, sets the agent-file knobs in the consumer's config
 seams (`GATE_SDK_AGENT_FILE`, `LIFECYCLE_KIT_AGENT_FILE`, `DOCTRINE_KIT_AGENT_FILE`,
 `CANON_KIT_MANIFEST_FILES`, `CONTEXT_KIT_SURFACES`, `CONTEXT_KIT_BREVITY_FILE`),
-then asserts the battery is green, `always-loaded.sh` and the footprint emitter
+then asserts the battery is green, `--emit always-loaded` and the footprint emitter
 measure the `AGENTS.md` surface, and `check-root-tiering`'s built-in allowlist accepts
 `AGENTS.md` at root while rejecting a stray second agent file. It is a standalone
 harness — not driven by `run-consumer-smoke.sh`, which asserts the kit defaults

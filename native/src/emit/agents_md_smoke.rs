@@ -373,7 +373,7 @@ fn always_loaded_measures_the_agent_file(consumer: &str) -> Result<(), Outcome> 
         .matches('\n')
         .count();
     let done = spawn(
-        r#"cd "$1" && exec bash context-kit/bin/always-loaded.sh"#,
+        r#"cd "$1" && exec bash gate-sdk/bin/run-gates.sh --emit always-loaded"#,
         &[consumer],
     )?;
     let out = String::from_utf8_lossy(done.stdout()).into_owned();

@@ -34,9 +34,9 @@ conventions without depending on its registry.
    the committed allowlist and ranks what survives (§scan-prompts states the
    local-overlay upper bound), grouped by command
    pattern. Each recurring pattern is resolved by the **triage criterion**
-   (below); `bin/compare-settings-allow.sh` lists the local-overlay entries
-   a committed glob already grants (the prune set) and those a declared probe
-   proves too broad (the narrowing set). Then the
+   (below); `--emit-compare-settings-allow` (§compare-settings-allow) lists the
+   local-overlay entries a committed glob already grants (the prune set) and
+   those a declared probe proves too broad (the narrowing set). Then the
    log is cleared — its named reclaim path.
 3. **Steady state** — friction low and justified: the committed
    `settings.json` carries every durable pattern (reviewable, shared), the
@@ -1498,9 +1498,10 @@ a silent inflation and not merely a dependency: a settings read delegated to an
 external program fails *open* when the program is absent — the allowlist reads
 empty, every logged command reads as prompting, and the ranking reports a large,
 plausible, entirely wrong number at exit 0 for a KPI to record as a trend.
-**The claim is bounded to this reader and says nothing wider**: `lib/guard.sh`,
-`bin/compare-settings-allow.sh` and `smoke/install.sh`
-all still shell to `jq`, and this member never joined the battery, so the
+**The claim is bounded to this reader and says nothing wider**: `lib/guard.sh`
+and `smoke/install.sh`
+still shell to `jq` — rule 20's own allowlist read and the settings-merge in the
+install recipe — and this member never joined the battery, so the
 battery's own program floor moves by nothing at all. **The arm's spawned-program
 set is empty**, which is stated here because nothing mechanical records it: a
 bridged-arm row carries no requirement element and `--needs` answers for
@@ -1970,7 +1971,6 @@ close-surface: .workflow/prompt-friction.log advisory reclaim=: > .workflow/prom
 ```
 guard-kit/
   lib/guard.sh              # primitives + generic ruleset functions
-  bin/compare-settings-allow.sh
   guard-tests/cases.tsv     # expected-decision <TAB> command
   guard-tests/escalation-cases.tsv  # expected-decision <TAB> to <TAB> message; read by the crate test that replaced this runner's escalation lane
   guard-tests/background-cases.tsv  # expected-decision <TAB> run_in_background <TAB> command
@@ -2233,14 +2233,21 @@ distinguishable:** a crate test is the right home when the member's **subject**
 is in-crate, which the escalation guard's is; an arm is the right home when the
 subject is a spawned shell surface the payload ships, which `bash-guard.sh` is.
 
-**The cut empties this section's owed set and not the kit's**, and the
-difference earns a sentence because a kit whose owed column shrinks to one reads
-as discharged. `bin/run-guard-tests.sh` was §Testing's one owed file, so the cut
-and the section coincide; `lib/guard.sh` and `templates/bash-guard.sh` carry
-`# no-port:` on the two independent grounds §The guard framework states. What
-stays owed to guard-kit is `bin/compare-settings-allow.sh`
+**The `run-guard-tests` cut emptied this section's owed set and not the kit's**,
+and the difference earned a sentence because a kit whose owed column shrinks to
+one reads as discharged. `bin/run-guard-tests.sh` was §Testing's one owed file,
+so that cut and the section coincided; `lib/guard.sh` and `templates/bash-guard.sh`
+carry `# no-port:` on the two independent grounds §The guard framework states.
+What stayed owed to guard-kit was `bin/compare-settings-allow.sh`
 (§compare-settings-allow) — a different section, correctly homed, and takeable as
-a singleton on its own rather than behind anything this cut moved.
+a singleton on its own rather than behind anything that cut moved.
+
+**The `compare-settings-allow` cut empties guard-kit's owed column outright, for
+the second time and the last.** That file was the only member left, and it ports
+to the `--emit-compare-settings-allow` arm above, carrying an `owed` reading
+nowhere. `lib/guard.sh` and `templates/bash-guard.sh` still carry `# no-port:` on
+the same two grounds, reopened by neither cut. Guard-kit has no owed file at
+all.
 
 A **third** table, `guard-tests/background-cases.tsv`
 (`<decision> <TAB> <run_in_background> <TAB> <command>`), extends that same

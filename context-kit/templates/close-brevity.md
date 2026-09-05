@@ -4,7 +4,8 @@ guard-kit `close-triage.md` pattern). It reacts to the meter's *delta*, not
 its level: close is net-additive by design, so only growth since the iteration
 baseline is actionable.
 
-1. **Measure the delta, then the growth.** Run `bash context-kit/bin/always-loaded.sh`
+1. **Measure the delta, then the growth.** Run
+   `bash gate-sdk/bin/run-gates.sh --emit always-loaded`
    — it prints the total, the per-part split, and the delta against the committed
    baseline. Then run it with `--growth`: every governed prose file that grew net
    since the baseline commit, largest first. Both lists are the worklist.
@@ -26,8 +27,9 @@ baseline is actionable.
    list names with the same two questions, and state the growth figure in the
    close commit beside the delta.
 5. **Re-baseline and commit.** Finish with
-   `bash context-kit/bin/always-loaded.sh --update-baseline` and commit the
-   baseline file, so next iteration's delta and growth measure from this close.
+   `bash gate-sdk/bin/run-gates.sh --emit always-loaded --update-baseline` and
+   commit the baseline file, so next iteration's delta and growth measure from
+   this close.
 
 Goal: every governed prose file grows only where the growth earns its cost, and
 every session pays for context that is still true and still terse.
