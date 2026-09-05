@@ -3411,9 +3411,6 @@
   template, how much a further gate, and whether a "keeps" list keeps standing as an input at all.
   That last is the sharp one: a "keeps" list is the author's claim about what a change does not
   touch, so align reading it as a boundary inherits the blind spot that produced the miss.
-  A **protocol** miss sits beside it rather than folded in: that iteration's validate ended a turn
-  on running work in order to wait, corrected in-flight and fully recovered by re-verifying. It
-  belongs to the dispatch-policy surface, and neither fix helps the other.
   **Second reading, `consumer-cohort-completion-and-wait-enforcement` — the other half.** Align
   found **five real defects** and escalated nothing spurious, so zero divergence did not recur;
   three amendment claims were nonetheless falsified by **probes** at build, one of which would have
@@ -3442,8 +3439,12 @@
   **Cost while deferred:** align keeps returning a clean verdict that build then falsifies, so
   the stage's signal value decays toward zero while its cost does not — and a zero-divergence
   pass is read as evidence the amendments were right.
-  **THRESHOLD ROUTING 2026-09-04, RULED 2026-09-05 (operator, lead-relay): stays deferred under
-  the port-only run, not on merit; a further judged recurrence is stamped, never re-escalated.**
+  **THRESHOLD ROUTING 2026-09-04 (lead, own-authority); deferred 2026-09-05 (operator, lead-relay)
+  under the port-only run. THAT GROUND IS SPENT** — the port-first ruling superseded that run the
+  same day and legislates threshold members itself, so the deferral now rests on the successor
+  rule: MACHINERY-class by the 2026-08-30 discriminator (its demand witness is this repo's own
+  align stage), which meets none of the three joining grounds. Re-composed at scope 2026-09-05,
+  `lead, own-authority`.
   Filed 2026-08-07 by close, from the lead's per-batch tiering watch.
 
 - **release-runbook-identity-diagnosis** [design-pending] — where the which-account-is-active
@@ -4114,43 +4115,43 @@
   enforceable depends on how it is spelled and how large it is, and the queue sits outside the
   scanning corpus entirely; the truncated probe below is a `probe-evidence-sufficiency` sub-case.
   **The premise that prompted this is falsified, and that is the finding.** A cardinal grammar
-  **ships, and is not future work**: canon-kit/SPEC.md §check-manifest-count documents *"digit
-  sequences and the spelled `two`…`twelve`, case-insensitive; `one` is deliberately outside it"*,
-  implemented as `SPEC_COUNT_CARDINAL_RE` in canon-kit/lib/spec.sh. The sweep that costed shipped
-  code as future work searched the **right** term and `grep -rn … | head -10` cut the output before
-  canon-kit was reached. **Truncated, not mis-queried.**
-  **Discontinuity 1, magnitude.** The word branch stops at `twelve`; the digit branch (`[0-9]+`)
-  does not, so `13 gates` is matched and `thirteen gates` is not. The SPEC states the ceiling
-  without justifying it; conventional English style is the likely reason and is **unrecorded**, so
-  no reader can tell a deliberate ceiling from an unfinished list, or decide whether to extend it.
-  **Discontinuity 2, corpus.** `CANON_KIT_MANIFEST_FILES` does not include `TASK-QUEUE.md`, so
-  none of this reaches the queue. Its 206 spelled numerals from *three* through *fifty*
-  (counted independently here, matching the filer) are outside every count gate, at any
-  magnitude, in either notation.
-  **The worked example is a sibling entry's own edit.** `spec-measured-count-gate` moved from
-  "Twelve instances" to "Thirteen instances": in the manifest corpus that one word would have moved
-  the claim from **inside** the matcher's reach to **outside** it. It happened in the queue, which
-  no count gate scans, so nothing could have caught it — the two discontinuities composing.
-  **DISTINCT from `spec-measured-count-gate`, now `check-measured-claim`, and not folded into it
-  as grounds.** That entry's thesis was that measured counts **go stale** because nothing derives
-  them; this is that notation and corpus decide whether an oracle **reaches** a claim at all. A
-  count can be current and unreachable, or stale and reachable, so neither closes the other. What is
-  true and kept: a digits convention is a genuine **precondition** that makes that entry's gate
-  cheaper to build, since matching a digit run is trivial where matching spelled compounds is
-  not. Recorded here rather than lost — but a precondition is not the same defect.
-  **Compaction is the weak half and is stated as weak:** ~9 lines file-wide against a 100-column
-  wrap, a fraction of one entry. Real, and not the reason to act. **The framing that decides it:**
-  `TASK-QUEUE.md` reads like prose but is a gated data surface with a line cap, a wrap gate, a tag
-  grammar and slug liveness, so a human style guide optimizes it for a reader it does not have.
-  **Deliverable, and why `[design-pending]` — three separable calls, and only one is mechanical.**
-  (a) Is the `twelve` ceiling deliberate? Record the reason or extend the table. (b) Should
-  `TASK-QUEUE.md` join the manifest corpus? That is a widening with its own false-positive
-  surface, and the entry-cap and wrap gates already treat the file as data. (c) Should the queue
+  **ships and is not future work** — canon-kit/SPEC.md §check-manifest-count states the ceiling and
+  `SPEC_COUNT_CARDINAL_RE` in canon-kit/lib/spec.sh implements it. The sweep that costed shipped
+  code as future work searched the right term and had its output cut before canon-kit was reached:
+  **truncated, not mis-queried.**
+  **Discontinuity 1, magnitude.** The word branch stops at `twelve` while the digit branch
+  (`[0-9]+`) does not, so `13 gates` matches and `thirteen gates` does not. The SPEC states the
+  ceiling without justifying it, so no reader can tell a deliberate ceiling from an unfinished list.
+  **Discontinuity 2, corpus.** `CANON_KIT_MANIFEST_FILES` omits `TASK-QUEUE.md`, so its 206 spelled
+  numerals from *three* through *fifty* (counted independently here, matching the filer) sit outside
+  every count gate, at any magnitude, in either notation.
+  **The worked example is a sibling's own edit.** `spec-measured-count-gate` moved from "Twelve
+  instances" to "Thirteen": in the manifest corpus that one word moves the claim from INSIDE the
+  matcher's reach to OUTSIDE it, and it happened in the queue, which no count gate scans — the two
+  discontinuities composing.
+  **DISTINCT from `spec-measured-count-gate`, now `check-measured-claim`.** That entry's thesis is
+  that measured counts go STALE; this one is that notation and corpus decide whether an oracle
+  REACHES a claim at all, and a count can be current-and-unreachable or stale-and-reachable, so
+  neither closes the other. Kept from it: a digits convention is a genuine precondition that makes
+  that gate cheaper, matching a digit run being trivial where spelled compounds are not.
+  **Compaction is ANSWERED as the weak half, ~9 lines file-wide, and is not why to act. What
+  decides it:** `TASK-QUEUE.md` reads like prose but is a gated data surface with a line cap, a
+  wrap gate, a tag grammar and slug liveness — a style guide optimizing for a reader it lacks.
+  **Deliverable, and why `[design-pending]` — three separable calls, one mechanical.** (a) Is the
+  `twelve` ceiling deliberate? Record the reason or extend the table. (b) Should `TASK-QUEUE.md`
+  join the manifest corpus — a widening with its own false-positive surface? (c) Should the queue
   adopt digits as convention? **(c) is mechanical and can land alone; (a) and (b) are design.**
   **Cost while deferred:** every count written in the queue is unreachable by any oracle, and in
   the manifest corpus a count's enforceability turns on a spelling choice no author is told
   about. Both failures are silent — the gate runs, reports clean, and never saw the claim.
-  **THRESHOLD 2026-09-03/04, RULED 2026-09-05 to wait under the run: (c) waits with (a) and (b).**
+  **THRESHOLD 2026-09-03/04; deferred 2026-09-05 (operator, lead-relay). THAT GROUND IS SPENT AND
+  THIS ENTRY JOINS `test-harness-cut-seam-sweep`** — it was taken under the port-only run,
+  superseded the same day by the port-first ruling, which legislates threshold members itself as
+  product-class with a live trigger, a ground that did not exist when this was declined. Reading
+  the supersession is `lead, own-authority 2026-09-05`; the join is the operator's, 2026-09-05,
+  through an interactive prompt in the lead session, relayed and not ruled there, against a scope
+  recommendation to hold. Product-class on limb (a): canon-kit's ceiling ships, so it decides a
+  consumer's manifest verdicts wherever the fix lands.
   recurrence: cardinal-notation-splits-gate-reach 2026-08-19 2026-09-02
   **THE 2026-09-02 RECURRENCE SHARPENS (b), re-derived independently rather than read off here.** A
   maintained total in a live queue entry rotted unseen against that entry's own recorded facts — but
@@ -8213,9 +8214,8 @@
   gate sits UPSTREAM of the push that would justify the drain: the close push produces the
   observation the entry needed in order to be drained before that push was permitted. This is
   a standing property of the state machine, not a quirk of `windows-artifact-proof`.
-  **What this iteration paid to discover it:** three pushes rather than the budgeted one to two, by
-  operator ruling — rounds 3 and 4 plus close. The headline entry still did not complete: it was
-  deferred with its PRODUCED half discharged.
+  **What this iteration paid to discover it:** three pushes against a budgeted one to two, by
+  operator ruling, and the headline entry still deferred with its PRODUCED half discharged.
   **Why `[design-pending]`:** no shape is costed and each candidate costs something real — a
   two-iteration protocol for these entries, a standing extra push, or splitting each into
   a produce half and an observe half at scope.
@@ -8224,11 +8224,10 @@
   `platform-support-ci-matrix` (`lead 2026-08-30 own-authority`, landed 08-31) so it could enter
   validate. Its price is legibility: the grammar cannot mark a unit landed-but-unobservable, so
   a demoted entry reads as unstarted and the next rider of this shape re-buys the same wedge.
-  **RECURRENCE JUDGED 2026-08-31 by close, and it is a sharper datum than the instance.**
-  `platform-support-ci-matrix` carried the `precondition-ok: run-observed` tag whose spelling THIS
-  entry's lead line uses, and was undrainable from the moment it entered the unit set. So the miss
-  is FILING-VISIBILITY, not analysis: the composition was written down and deferred three days
-  earlier, and an entry of the named shape was promoted anyway. Sharpening would not have helped.
+  **RECURRENCE JUDGED 2026-08-31 by close, a sharper datum than the instance.**
+  `platform-support-ci-matrix` carried the `precondition-ok: run-observed` tag this entry's lead
+  line uses and was undrainable from the moment it entered the unit set, so the miss is
+  FILING-VISIBILITY rather than analysis and sharpening would not have helped.
   **Machinery-class, but NOT icebox-class by default**: TRAJECTORY.md's 2026-08-30 discriminator is
   conjunctive and the second conjunct fails — this DID block validate's entry until a lead cleared.
   **THE FOUR SHAPES ALL ADDRESS THE DRAIN SIDE; A FIFTH FOR THE RECORD SIDE HAD ITS PREMISE
@@ -8248,7 +8247,11 @@
   defers, and the deferral is invisible until the close that cannot drain it.
   recurrence: observation-predicate-entry-cannot-drain-in-its-own-iteration 2026-08-31 2026-09-01
   **REACHED THRESHOLD 2026-09-01; declined on the run, never on merit; OPERATOR-RULED 2026-09-05
-  (lead-relay) TO STAY DEFERRED under the run.** The 2026-09-02 batch DID reach the operator, who
+  (lead-relay) TO STAY DEFERRED under the run. THAT GROUND IS SPENT** — the port-first ruling
+  superseded the run the same day and legislates threshold members itself, so the deferral rests on
+  the successor rule: MACHINERY-class by the 2026-08-30 discriminator, which meets none of the
+  port-first run's three joining grounds. Re-composed 2026-09-05 at scope, `lead, own-authority`.
+  The 2026-09-02 batch DID reach the operator, who
   took `subagent-liveness-log-unattributed-refusal` as the run's exception and left this deferred;
   2026-09-01, 2026-09-03 and 2026-09-04 were a lead's (own-authority). No re-escalation is owed.
   Filed 2026-08-27 by the lead at build, promoted 2026-08-27 by close.
@@ -8298,11 +8301,10 @@
   tuning complaint: a `Bash(...)` entry matches a bare command, so any chaining, redirect or
   expansion breaks the match and the call is decided out of band whatever the allowlist holds.
   **All three of the triage's dispositions are wrong for these rows.** An allowlist entry cannot
-  reach them. A guard steer exists for the read shapes already, and the write shapes are mostly
-  legitimate journal and scratch appends with no better spelling. A recorded habit change leaves
-  the row ranking identically next close, because the shape and not the habit is what falls
-  through. The honest disposition is a fourth the ranking does not offer: structurally ungrantable,
-  and retired from the actionable set.
+  reach them; a guard steer already covers the read shapes while the write shapes are legitimate
+  journal and scratch appends; and a habit change leaves the row ranking identically, the shape
+  and not the habit being what falls through. The honest disposition is a fourth the ranking does
+  not offer: structurally ungrantable, retired from the actionable set.
   **DISTINCT from `friction-key-segment-selection-unruled`**, whose axis is *which* segment of a
   compound is keyed: that entry would change which name a row files under and would leave every
   one of these rows ranking. DISTINCT from `file-authoring-act-ungoverned`, which owns whether the
@@ -8320,14 +8322,15 @@
   the head across four samples while the SHAPE never moves: grading rows by the matching rule chases
   that, partitioning by shape is what the samples buy. Found at the triage step: not a recurrence.
   recurrence: prompt-ranking-ungrantable-shape-class 2026-08-28 2026-09-03
-  **THIRD MEASUREMENT, 2026-09-03, drained at scope on the same dedup sweep** — a gap bullet that
-  again re-derived the three-arms-all-wrong finding without finding this entry, naming the FIRST of
-  the two DISTINCT siblings above and missing the entry that owns the class. Same head as the
-  first: `cat >>` top by over twice the next pattern, every call a journal or scratch heredoc
-  append, the same close-triage refusal text as grounds. Its one novel half — a bare-command
-  journal-append affordance the convention could route through — is the SECOND sibling's by that
-  same paragraph, being a behaviour change rather than a ranking one.
-  **THRESHOLD 2026-09-03, twice declined on the run; RULED 2026-09-05 to wait, not re-escalated.**
+  **THIRD MEASUREMENT, 2026-09-03, ANSWERED by the fourth and kept only for what it adds:** a gap
+  bullet re-derived the three-arms-all-wrong finding without finding this entry, naming the first
+  DISTINCT sibling and missing the owner. Its one novel half — a bare-command journal-append
+  affordance — is the SECOND sibling's, being a behaviour change rather than a ranking one.
+  **THRESHOLD 2026-09-03, twice declined (lead, own-authority); deferred 2026-09-05 (operator,
+  lead-relay) under the port-only run. THAT GROUND IS SPENT** — the port-first ruling superseded
+  that run the same day, so the deferral rests on its successor rule instead: MACHINERY-class by
+  the 2026-08-30 discriminator (the demand witness is this repo's own close-time triage), meeting
+  none of the three joining grounds. Re-composed at scope 2026-09-05, `lead, own-authority`.
   **SECOND MEASUREMENT, 2026-08-28 at `port-oracle-and-composer-ruling`'s close**, arriving as a gap
   bullet that re-derived this diagnosis without finding this entry, and drained here on a dedup
   sweep rather than promoted. A different head, the same class:
@@ -8984,50 +8987,50 @@
   §Economics rests its *Split the lead where the tail dominates* bullet on a premise TEN
   consecutive iterations have now measured false, and the template still ships it unqualified.
   **The trigger is the binding's own.** `.claude/commands/lead.md` set the criterion — count the
-  escalations a lead ruled ALONE by reading a governed surface; near zero, the premise holds;
-  consistently several, the template's bullet needs amending and not this repo's tier — and named
-  the threshold at a third such iteration — ANSWERED at eleven. Measured 5, 4, several, 4, 5, 7, 7,
-  8, 12, 5, 3, now **5**; THIS ENTRY is the governed surface for it whenever a dispatch relays one.
+  escalations a lead ruled ALONE off a governed surface; near zero, the premise holds; consistently
+  several, the template's bullet needs amending and not this repo's tier — with the threshold at a
+  third such iteration, ANSWERED at eleven. Measured 5, 4, several, 4, 5, 7, 7, 8, 12, 5, 3, now
+  **5**; THIS ENTRY is the governed surface for it whenever a dispatch relays one.
   **The two axes separate, which makes this an amendment rather than a tier flip.** On COST the
-  premise holds; on CHARACTER it fails every time — a routing-only lead would be cheaper, would
-  have RELAYED these rulings and would have raised none of the flags below.
+  premise holds; on CHARACTER it fails every time — a routing-only lead would be cheaper, would have
+  RELAYED these rulings, and would have raised none of the flags below.
   **THE COST SERIES IS DERIVED, 2026-09-05, REPLACING THE ACCRETED ONE**, which ANSWERS why this
-  entry and the binding disagreed: every earlier point was read mid-close and was an unlowered
-  ceiling. From the completed meter, supervision over whole priced spend, last six lead-posture
-  iterations: **11.7, 8.7, 8.2, 4.9, 4.4, 9.1**.
+  entry and the binding disagreed: every earlier point was a mid-close unlowered ceiling. From the
+  completed meter, supervision over priced spend, last six lead iterations: **11.7, 8.7, 8.2, 4.9,
+  4.4, 9.1**.
   **THE CHARACTER DATUM THE COUNT CANNOT SEE**, from the eighth firing: the lead FLAGGED a risk
   rather than asserting it safe and align found it real — the lead WRONG and the protocol still
   paying, which no count of correct rulings evidences. The ninth: four of the lead's OWN premises.
-  **TENTH FIRING, 2026-09-05.** FIVE ruled alone, at least three replacing the escalating session's
-  stated ground; cost 9.1 % of a 111.35 iteration. Two defects: align MISSED A LIVE BLOCKER (the
-  near-miss class on MECHANISM REACHABILITY), plus a LEAD-SIDE `DONE`-placement one.
-  **ELEVENTH FIRING, 2026-09-05: THREE ruled alone, one routed to the operator** — still
-  "consistently several". Its cost point was deliberately NOT taken (the mid-close ceiling above);
-  its align reading, cr=26.2M bare-family, came off a CHANGED SUBSTRATE and scored no prediction.
-  BOTH COUNTERS CLEAN, so the nine below stayed nine.
-  **TWELFTH FIRING, 2026-09-05 at this close: FIVE ruled alone, none routed to the operator** — the
-  unit-set selection off TRAJECTORY.md's sequencing sentence, the DoD's stage off
-  `lifecycle-kit/lib/stages.sh:29`, the `want` correction off the delta's own text, the
-  `--no-filters` refusal off the entry's cause-read-first record, and one exclusion off the
-  port-only run's bar. Still "consistently several"; cost point not taken, same ceiling.
-  **THE ALIGN WATCH TAKES NO POINT, recorded rather than left silent:** align DID NOT RUN this
-  iteration, its trigger never fired, so there is no bare-align datum and the series carries a gap.
+  **THE TENTH FIRING'S RESIDUE, the rest answered by the series:** three of its five rulings
+  replaced the escalating session's stated ground, and it carried two defects — align MISSING A
+  LIVE BLOCKER (the near-miss class on MECHANISM REACHABILITY) and a LEAD-SIDE `DONE` placement.
+  **THE ELEVENTH AND TWELFTH ARE ANSWERED BY THE SERIES TOO and take no paragraph** — three then
+  five ruled alone, one routed to the operator, neither cost point taken (the mid-close ceiling).
+  Two facts survive them: BOTH COUNTERS stayed CLEAN, so the nine below stayed nine; and the ALIGN
+  WATCH has a GAP — align never fired at the twelfth, so no bare-align datum exists for it.
   **The counter-evidence is NINE instances of ONE shape — a claim verified at one surface and read
-  as covering a wider one.** Eight are the lead's own, the sharpest five `recurrence:` dates ordered
-  onto a threshold COUNT no session had judged. The ninth WIDENS it onto a STAGE session's carry.
-  **Neither the counter-evidence nor a refused premise NETS against the count**, which measures
-  whether an escalation was answered off a governed surface, never whether the grounds under that
-  answer held; netting would hide both facts to report neither.
-  **Why `[design-pending]`:** the deliverable is a kit template's own design rationale and the
-  shape is unruled — qualify the premise, split it into cost and character limbs, or replace it
-  with the discriminator the binding already uses. Which one is a doctrine call.
+  as covering a wider one.** Eight are the lead's own, sharpest five `recurrence:` dates ordered
+  onto an unjudged threshold COUNT; the ninth WIDENS it onto a STAGE session's carry. **Neither it
+  nor a refused premise NETS against the count**, which measures whether an escalation was answered
+  off a governed surface, never whether its grounds held; netting reports neither fact.
+  **Why `[design-pending]`:** the deliverable is a kit template's own design rationale and the shape
+  is unruled — qualify the premise, split it into cost and character limbs, or replace it with the
+  discriminator the binding already uses. A doctrine call.
   **Cost while deferred:** every consumer vendoring lifecycle-kit reads a premise this repo has
   measured false nine times, and each future lead re-derives the same finding against a template
   that never records it — the binding's evidence is local while the false claim is shipped.
   **DISTINCT from `economics-posture-binding-stale`**, whose subject is the local shim restating a
   ruling it should cite; this one is the vendored TEMPLATE's own premise being wrong.
-  Captured 2026-09-02 by close; lead-declined 2026-09-02 and 09-04 on the run; RULED 2026-09-05 to
-  stay deferred — amending a kit template is non-port design work the run forecloses.
+  **THAT DEFERRAL IS SPENT AND THIS ENTRY JOINS `test-harness-cut-seam-sweep`.** It was taken under
+  the port-only run, superseded the same day by the port-first ruling, which legislates threshold
+  members itself as product-class with a live trigger — a ground that did not exist when this was
+  declined. Reading the supersession is `lead, own-authority 2026-09-05`; the join is the
+  operator's, 2026-09-05, through an interactive prompt in the lead session, relayed and not ruled
+  there, against a scope recommendation to hold and with the proposed-once clause's permanence cost
+  stated. The pool's highest recurrence at three, which `kpi-incident-recurrence` reports
+  independently of this entry.
+  Captured 2026-09-02 by close; lead-declined 2026-09-02 and 09-04; deferred 2026-09-05
+  (operator, lead-relay) on a ground since superseded.
   recurrence: lead-tier-split-premise-unamended 2026-09-03 2026-09-04 2026-09-05
 
 - **crate-interpreter-resolution-residue** [design-pending] — the crate spawns the bare program
@@ -9736,44 +9739,55 @@
   same resume, and the defect surfaces only at the dispatch that the wrong stage refuses.
   Filed 2026-09-05 by close, routed by the lead as a finding neither spec nor build had filed.
 
-- **ruled-line-retirement-dropped-provenance** [design-pending] — retiring the `ruled:`
-  declaration line deleted 44 provenance assertions and relocated 2, on a premise that was
-  measured on one entry and is false for most of the pool.
+- **ruled-line-retirement-provenance-census** [design-pending] — the census of what retiring the
+  `ruled:` line removed, kept so a later session reads a bought measurement rather than re-deriving
+  it and reaching the wrong conclusion this entry's first draft did.
+  **READ THIS FIRST — THE DEFECT READING IS WRONG AND IS KEPT ONLY SO IT IS NOT REDRAWN.** Filed
+  2026-09-05 at scope as a provenance-loss defect; the operator corrected the premise the same day,
+  through an interactive prompt in the lead session, which relayed it and did not rule it. Verbatim
+  rather than paraphrased: *"/consult intentionally did a clean up from a situation that violated
+  numerous project directives. If you have a question on what it did and why, ask /consult."* So
+  `111e61a3` was a deliberate consult-session cleanup of directive-violating content and the
+  removals below are INTENDED. Its commit message corroborates that independently, recording seven
+  dates folded into their entries' prose — a folding pass ran and judged the remainder. The "why"
+  beyond that is `/consult`'s.
   **MEASURED 2026-09-05 at scope, every deleted line resolved to its (authority, date, channel)
   triples and every host entry read WHOLE at HEAD rather than through the diff hunk.** `111e61a3`
-  deleted 44 `ruled:` lines across 27 distinct slugs and added 2 inline replacements — 18
-  insertions against 86 deletions. Of the 27 slugs: **4 CLEAN**, **15 PARTIAL** (the date
-  survives, the authority and/or the channel is gone on at least one instance), **8 LOST** (at
-  least one ruling triple has NO textual trace, so a reader cannot tell the ruling happened).
-  **The retirement's own recorded premise** — the body already carried authority, date and
-  channel inline, so deleting the line loses nothing — holds for a minority. It was verified on
-  the host entry that forced the compression and generalised to the pool unmeasured.
-  **The failure has a SHAPE, which is why this is repairable rather than only regrettable.** It
-  concentrates on entries hosting SEVERAL rulings of one authority across different dates: only
-  the newest instance was restated inline and the older co-located ones were dropped outright
-  instead of folded in. The pool's two densest hosts, `platform-support-ci-matrix` and
-  `native-gate-port-remaining-corpus`, are both LOST for that reason.
-  **Two elements drop, not one.** Usually the channel; on `kpi-cost-per-unit` and
-  `kit-spec-provenance-seam-sweep` it is the AUTHORITY that is gone — a direction CLAUDE.md's own
-  worked example does not anticipate, so a session auditing for the anticipated failure misses it.
-  **NOT ONLY THIS TREE — the shipped rule is indicted too, which is the half that makes this
-  product-class under the 2026-08-30 witness discriminator.** queue-kit/SPEC.md's
-  inline-provenance rule rides the installer payload and the public site, and states no folding
-  obligation for an entry hosting several rulings — exactly the case that failed here 23 times in
-  27. An adopter following the rule as written reproduces the loss.
-  **Why `[design-pending]`:** the repair is one question and the rule is another. Restoring this
-  tree's 27 entries is bounded — every assertion is verbatim in `git show 111e61a3` — but several
-  hosts sit at or near the entry cap, so restoring provenance forces a compression judgment rather
-  than an insertion, which is the part no session should take by accident. And whether the tag
-  algebra gains a stated folding obligation, a gate over it, or only a worked example is unsettled.
-  **DISTINCT from `ruling-accretion-outgrows-the-entry-cap`**, whose subject is a body outgrowing
-  the cap; this one is a record that was deleted and never re-landed.
-  **Cost while deferred:** low today and rising — the assertions are one `git show` away now, and
-  every later edit to those 27 entries moves the text the restoration has to be woven into. Until
-  it is repaired, eight entries assert rulings a reader cannot attribute at all, on a queue whose
-  own doctrine is that the owner doc is ground truth.
-  Surfaced 2026-09-05 at this scope's boundary sweep, four commits after the retirement landed;
-  filed rather than repaired here under scope-gated intake.
+  deleted 44 `ruled:` lines across 27 slugs and added 2 inline replacements. Of the 27: **4 CLEAN**,
+  **15 PARTIAL** (date survives, authority and/or channel gone on at least one instance), **8 LOST**
+  (a ruling triple with NO textual trace, so a reader cannot tell the ruling happened).
+  **The removals have a SHAPE, and it is the census's durable half.** They concentrate on entries
+  hosting SEVERAL rulings of one authority across different dates: the newest instance was restated
+  inline and the older co-located ones were not. The pool's two densest hosts,
+  `platform-support-ci-matrix` and `native-gate-port-remaining-corpus`, are the two largest
+  instances. Two elements go, not one — usually the channel, but on `kpi-cost-per-unit` and
+  `kit-spec-provenance-seam-sweep` it is the authority.
+  **Three classifications were spot-verified by hand**, so the numbers stand on reads rather than a
+  sweep's word: the 27-slug count off the diff, `kit-library-port-residue` (its two surviving
+  "operator ruling" mentions are a different subject), and `align-checklist-fanout-calibration`
+  (correcting a believed-CLEAN assumption).
+  **WHAT IS LEFT TO DO, judged here rather than left implied: no repair, and one narrow unsettled
+  question.** No restoration is owed — the removals are ruled intended, and proposing to undo them
+  would be re-litigating a closed ruling. The residue is that CLAUDE.md's standing rule (a session
+  landing a ruling states authority, date and channel inline beside its content) is written for the
+  landing act, and whether it reaches RETROACTIVELY — rulings landed when the now-retired
+  declaration line WAS the compliant form — is stated in no governed surface. The eight are that
+  case. `/consult` owns the answer; this entry is not worth a consult session of its own and waits
+  to ride one bought for something else. **That reach is why `[design-pending]`, and it is the only
+  open question here.**
+  **A TIER TENSION, surfaced rather than resolved, for close to take.** With the defect reading
+  withdrawn this is MACHINERY-class (the demand witness is this repo's own queue) and blocks no
+  stage entry and no push, so the 2026-08-30 default points at the icebox. It is held in
+  `## Deferred` deliberately: the census IS the payload, the icebox's one-line grammar cannot carry
+  it, and a Done exit drops the slug out of the live namespace so the next session asking this
+  re-buys the whole measurement — the exact harm this re-characterization exists to prevent.
+  **DISTINCT from `ruling-accretion-outgrows-the-entry-cap`**, a body outgrowing the cap; this
+  records what a deliberate compression removed.
+  **Cost while deferred:** low and non-rotting — a bought measurement in the live namespace, read
+  rather than re-derived. Not carrying it costs one re-run of a 27-slug whole-entry census plus the
+  wrong conclusion it produced the first time.
+  Filed 2026-09-05 at scope as a defect; re-characterized the same session on the operator's
+  correction, relayed by the lead, before any repair was attempted.
 
 ## Icebox
 
@@ -9870,5 +9884,7 @@
 - **scratch-auto-allow-no-decoration-steer** [design-pending] — Chained writes lose the steer.
 
 ## Done
+
+- ruled-line-retirement-dropped-provenance
 
 ## Lessons Learned
