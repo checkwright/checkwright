@@ -9858,14 +9858,4 @@
 
 ## Done
 
-- build-native-bootstrap-declaration
-- run-gates-stub-cut
-- liveness-reader-cut
-- preflight-front-end-cut
-- binary-less-dispatch-loop-retirement
-- run-gates-front-end-cut-legality-unruled
-- build-native-bootstrap-port-disposition-unruled
-- single-gate-front-end-form-unruled
-- cut-boundary-section-legality-unruled
-
 ## Lessons Learned
