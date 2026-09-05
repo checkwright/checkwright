@@ -22,6 +22,7 @@ mod queue;
 mod registry;
 mod runner;
 mod section;
+mod sessions;
 mod sha256;
 mod spec;
 mod stages;

@@ -22,6 +22,7 @@ pub mod lesson_sink;
 pub mod md_index;
 pub mod md_section;
 pub mod parse_gates_log;
+pub mod overhead_meter;
 pub mod parse_smoke_log;
 pub mod port_blockers;
 pub mod pub_index;
@@ -368,6 +369,14 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         "--emit-kfric",
         Arm::Emit(kfric::emit),
         kfric::KNOBS,
+    ),
+    // spec: drift-kit/SPEC.md §The overhead meter — an `Arm::Emit` on the variant's own test: the
+    // meter is advisory and exit is always 0, so no `1` is load-bearing and the `{0, 2}` collapse
+    // costs nothing. `--emit-kfric`'s shape — a document returned, a line appended beside it.
+    (
+        "--emit-overhead-meter",
+        Arm::Emit(overhead_meter::emit),
+        overhead_meter::KNOBS,
     ),
     // spec: lifecycle-kit/SPEC.md §The survey record — the citation affordance: it derives no stage
     // and stamps no rev, so its sibling's state-file knob is deliberately off this roster.

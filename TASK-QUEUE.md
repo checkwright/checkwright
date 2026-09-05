@@ -12,7 +12,7 @@
 
 ## New Features
 
-- **drift-kit-bin-port-residue** [spec: SPEC-overhead-cut.md] [spec: SPEC-economics-cut.md]
+- **drift-kit-bin-port-residue** [spec: SPEC-economics-cut.md]
   — drift-kit's owed `bin/` members,
   hosted together because the port corpus needs a SECOND queue entry and for no stronger reason.
   **The ground is a column budget, not a class ruling, and this entry says so rather than letting
@@ -30,12 +30,11 @@
   `bin/kfric.sh` (60) — DELIVERED 2026-09-03 by this hosting's own amendment, ported as the
   `--emit-kfric` bridged arm; the section it declared has no owed surface left
   (drift-kit/SPEC.md §The knowledge-friction loop), so no later cut is sequenced against it.
-  `bin/overhead-meter.sh` (105) — BLOCKED, and not on size. drift-kit/SPEC.md §The overhead meter
-  rules its `session8` derivation's divergence from the sibling meter UNRULED and says a cut on
-  either meter meets that question rather than inheriting an answer; and
-  `overhead-meter-measures-the-lead` holds that the transcript resolver a faithful port would
-  carry forward measures the wrong session. Composed for this iteration and DROPPED at spec on
-  the lead's own envelope test, which admitted it only if its amendment matched kfric's shape.
+  `bin/overhead-meter.sh` (105) — DELIVERED 2026-09-05 by this hosting's own overhead-cut amendment,
+  ported as the `--emit-overhead-meter` bridged arm on the shared `native/src/sessions.rs` the same
+  cut extracted; the section it declared has no owed surface left (drift-kit/SPEC.md §The overhead
+  meter), so no later cut is sequenced against it. Its blocker — the UNRULED `session8` divergence,
+  and `overhead-meter-measures-the-lead`'s mis-attribution — is the closed record of why it sat.
   `bin/stage-economics.sh` (464) — **BLOCKED ON THE SAME SENTENCE, corrected in place 2026-09-04
   at scope; this line previously read "no ground read either way" and that was wrong.** The
   sibling-meter sentence above is written over BOTH meters — *a cut on **either** meter meets that
@@ -65,57 +64,6 @@
   ruling above; the column budget that forced it is filed as a recurrence of
   `record-stamp-encoding-compression`, the entry that owns the encoding, not this one.
   Re-promoted 2026-09-05 by spec, hosting both members' cuts on the two amendments above.
-
-- **overhead-meter-measures-the-lead** [spec: SPEC-overhead-cut.md]
-  — under a live lead the overhead meter
-  measures the supervising session, never the stage session its own binding names.
-  **Probed at close 2026-08-15, both halves.** The session-id derivation is
-  delegation-aware: with `CLAUDE_CODE_CHILD_SESSION` set it scans the lead's `subagents/` dir
-  alone and returned this close session's own id. `drift-kit/bin/overhead-meter.sh` resolves
-  "newest transcript" by a bare glob over the project dir with no such branch, and returned the
-  **lead's** id — twice, with a growing byte total, so it was tracking the live supervising
-  transcript rather than a stale one. Two tools, the same phrase, different answers.
-  **What it costs, and why it is not a rounding error.** drift-kit/SPEC.md §The overhead meter
-  names the producer as the consumer's close-stage binding, "invokes the meter on the closing
-  session". Under the lead-orchestrated posture this repo runs, that is exactly the case where
-  the meter cannot reach the closing session, so every close-stage row taken under a live lead is
-  the lead's own governance/task split filed under the lead's key. `kpi-overhead` reads `pct`,
-  `gate` and `total` off those rows, and the lead's shape — dispatch prompts, notifications,
-  little tool work — is not the shape a stage session has. The trend is not corrupt so much as
-  **measuring a different population than it names**, which is the harder failure to notice.
-  **Not a data-repair task.** Each logged row is a truthful measurement of a real session, keyed
-  by its own `session8`, so nothing needs deleting and re-measuring cannot fix it: the meter run
-  again from the same session resolves the same wrong transcript.
-  **DISTINCT from the mis-pick limit lifecycle-kit/SPEC.md §bin/session-id.sh already owns**,
-  and deliberately not folded into it: that limit is about the derivation's *fallback* picking a
-  just-finished subagent when the env uuid is absent, and it is documented at
-  `lifecycle-kit/templates/lead.md`. This is the opposite direction — the env uuid is present and
-  correct, one tool consults it and the other does not.
-  **Why it needed design, and what the ruling took:** the seam was the open call — drift-kit could
-  grow its own delegation-aware resolution (duplicating a derivation lifecycle-kit ships), or
-  take a transcript path from its caller so the close binding passes what it already knows, or
-  depend on lifecycle-kit's tool across a kit boundary that no kit dependency currently spans.
-  The third is the cheapest and the least obviously admissible, which is exactly why it wants a
-  ruling rather than a patch. Whether the lead's own overhead is separately *worth* measuring —
-  it may be, and the accidental rows are the only such data that exists — is a second question
-  this entry raises and does not answer.
-  **Cost while deferred:** an account-bearing trend under `.metric/` keeps accumulating rows
-  attributed to the wrong population, and every efficiency claim read off `kpi-overhead` while
-  the lead posture is live is a claim about supervision cost wearing a stage-session label.
-  **JUDGED RECURRENCE 2026-09-03 at the scope drain**, arriving as a gap bullet that re-derived
-  this diagnosis and asserted "DISTINCT from every live entry: no queue entry names the overhead
-  meter's session attribution" — false, and this entry is what it names. It adds one datum the
-  2026-08-15 probe did not have: the meter's own dedupe then rewrites the log against the resolved
-  id, so a mis-resolved run overwrites the row belonging to the OTHER session rather than merely
-  filing its own under the wrong key. The seam question above is unchanged and no entry is minted.
-  **RULED 2026-09-05 (operator, consult): the seam is the first shape** — the port carries the
-  delegation-aware derivation in-crate and both meters read it; drift-kit/SPEC.md §The overhead
-  meter. Discharged by the meters' port cut, and port-critical to it under TRAJECTORY.md (6).
-  ruled: overhead-meter-measures-the-lead operator 2026-09-05 consult
-  recurrence: overhead-meter-measures-the-lead 2026-09-03
-  Filed 2026-08-15 by close, probed while reconciling its own meter output against its own stage
-  stamp; scope-gated intake, so it is filed costed rather than fixed in flight.
-  Promoted 2026-09-05 by spec, riding inside the overhead meter's cut under ruling (6).
 
 - **scratch-run-port-blocker-unrecorded** [spec: SPEC-scratch-run-cut.md]
   — the third operator-class port blocker
@@ -9882,5 +9830,7 @@
 - **ruled-line-width-ceiling** [design-pending] — A 61-char slug's ruled: line measures 101.
 
 ## Done
+
+- overhead-meter-measures-the-lead
 
 ## Lessons Learned

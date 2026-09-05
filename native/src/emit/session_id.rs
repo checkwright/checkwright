@@ -1,129 +1,22 @@
 // spec: lifecycle-kit/SPEC.md §bin/session-id.sh — the canonical stamp id by the fixed source
-// order, first hit wins, every source ending in the same normalization.
+// order, first hit wins, every source ending in the same normalization. That section owns the
+// contract; `crate::sessions` holds the one implementation the drift meters read too.
 // spec: gate-sdk/SPEC.md §The non-gate arm — the roster is empty and must stay empty: neither
 // name this arm reads is defined in lifecycle-kit's `lib/stages.sh`, so a declared row would
 // fail-close through the config bridge's undeclared-knob refusal on every invocation.
-use std::time::SystemTime;
+use crate::sessions::{key, resolve, Inputs};
 
 pub const KNOBS: &[&str] = &[];
-
-// spec: lifecycle-kit/SPEC.md §bin/session-id.sh — every input the derivation order reads, taken
-// as a value so the rule is exercised without writing the process environment: two kit names, two
-// harness names, the config home, `HOME` and the cwd the sessions-dir default slugs.
-pub struct Inputs {
-    pub session_id: String,
-    pub harness_id: String,
-    pub child: String,
-    pub sessions_dir: String,
-    pub config_home: String,
-    pub home: String,
-    pub here: String,
-}
 
 fn var(name: &str) -> String {
     std::env::var(name).unwrap_or_default()
 }
 
-// spec: lifecycle-kit/SPEC.md §bin/session-id.sh — the shared normalization: strip a leading
-// `agent-` token if present, then take the first 8 characters.
-fn normalize(id: &str) -> String {
-    id.strip_prefix("agent-")
-        .unwrap_or(id)
-        .chars()
-        .take(8)
-        .collect()
-}
-
-// spec: lifecycle-kit/SPEC.md §bin/session-id.sh — the cwd slug: every non-alphanumeric character
-// mapped to `-`, which is `sed 's/[^a-zA-Z0-9]/-/g'` over the same string.
-fn slug(path: &str) -> String {
-    path.chars()
-        .map(|c| if c.is_ascii_alphanumeric() { c } else { '-' })
-        .collect()
-}
-
-// spec: lifecycle-kit/SPEC.md §bin/session-id.sh — source 3's sessions dir: the override, else
-// `<config-home>/projects/<cwd-slug>` with `$CLAUDE_CONFIG_DIR` or `~/.claude` as the home.
-fn sessions_dir(i: &Inputs) -> String {
-    if !i.sessions_dir.is_empty() {
-        return i.sessions_dir.clone();
-    }
-    let home = if i.config_home.is_empty() {
-        format!("{}/.claude", i.home)
-    } else {
-        i.config_home.clone()
-    };
-    format!("{}/projects/{}", home, slug(&i.here))
-}
-
-// spec: lifecycle-kit/SPEC.md §bin/session-id.sh — advance the candidate across one (possibly
-// empty) glob, keeping bash's own `-e` skip and its `-nt` replacement on a *strictly* newer
-// mtime, so a tie leaves the earlier glob-sorted candidate standing.
-fn pick(newest: &mut Option<(String, SystemTime)>, pattern: &str) {
-    for f in crate::walk::glob_entries(pattern) {
-        let Ok(meta) = std::fs::metadata(&f) else {
-            continue;
-        };
-        let when = meta.modified().unwrap_or(SystemTime::UNIX_EPOCH);
-        let replace = match newest {
-            Some((_, best)) => when > *best,
-            None => true,
-        };
-        if replace {
-            *newest = Some((f, when));
-        }
-    }
-}
-
-// spec: lifecycle-kit/SPEC.md §bin/session-id.sh — the derivation order and its exit-2 refusals.
-// The child-narrowed scan verifies the flag rather than trusting it: an empty narrowed scan with
-// a top-level transcript for the env uuid marks the flag spurious and falls back to source 2.
+// spec: lifecycle-kit/SPEC.md §bin/session-id.sh — the derivation order and its exit-2 refusals are
+// `resolve`'s; what this arm owes on top of them is the normalization every source ends in, which
+// `key` is over a resolved path and the identity over a bare id.
 pub fn derive(i: &Inputs) -> Result<String, String> {
-    if !i.session_id.is_empty() {
-        return Ok(normalize(&i.session_id));
-    }
-    if i.child.is_empty() && !i.harness_id.is_empty() {
-        return Ok(normalize(&i.harness_id));
-    }
-    let dir = sessions_dir(i);
-    if !std::path::Path::new(&dir).is_dir() {
-        return Err(format!(
-            "sessions dir not found: {}\n  help: set LIFECYCLE_KIT_SESSIONS_DIR to the agent \
-             transcript directory for this tree.",
-            dir
-        ));
-    }
-    let narrowed = !i.child.is_empty() && !i.harness_id.is_empty();
-    let mut newest: Option<(String, SystemTime)> = None;
-    if narrowed {
-        pick(
-            &mut newest,
-            &format!("{}/{}/subagents/*.jsonl", dir, i.harness_id),
-        );
-    } else {
-        pick(&mut newest, &format!("{}/*.jsonl", dir));
-        pick(&mut newest, &format!("{}/*/subagents/*.jsonl", dir));
-    }
-    let Some((path, _)) = newest else {
-        if narrowed {
-            let top = format!("{}/{}.jsonl", dir, i.harness_id);
-            if std::path::Path::new(&top).exists() {
-                return Ok(normalize(&i.harness_id));
-            }
-            return Err(format!(
-                "no subagent transcript under {}/{}/subagents and no top-level {}\n  help: \
-                 confirm this is the right sessions dir (LIFECYCLE_KIT_SESSIONS_DIR).",
-                dir, i.harness_id, top
-            ));
-        }
-        return Err(format!(
-            "no transcript (*.jsonl) under {}\n  help: confirm this is the right sessions dir \
-             (LIFECYCLE_KIT_SESSIONS_DIR).",
-            dir
-        ));
-    };
-    let base = path.rsplit('/').next().unwrap_or(&path);
-    Ok(normalize(base.strip_suffix(".jsonl").unwrap_or(base)))
+    Ok(key(&resolve(i)?))
 }
 
 // spec: lifecycle-kit/SPEC.md §bin/session-id.sh — the process cwd is an *input* to source 3's
@@ -151,6 +44,7 @@ pub fn emit(_args: &[String]) -> Result<String, String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::sessions::{normalize, sessions_dir};
     use std::path::Path;
 
     fn inputs(dir: &str) -> Inputs {

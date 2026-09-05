@@ -77,11 +77,11 @@ doc owned the fact (drift-kit/SPEC.md §The knowledge-friction loop). It shows
 bash gate-sdk/bin/run-gates.sh --emit drift-report          # full report: lead/lag rows under the honesty labels
 bash gate-sdk/bin/run-gates.sh --emit drift-report --trend  # one compact line (fragments joined with ·)
 bash gate-sdk/bin/run-gates.sh --emit trajectory   # governed-trajectory table (one row per closed iteration)
-bash drift-kit/bin/overhead-meter.sh          # governance-vs-task byte proxy for the newest session transcript
+bash gate-sdk/bin/run-gates.sh --emit overhead-meter   # governance-vs-task byte proxy for this session's transcript
 bash drift-kit/bin/stage-economics.sh         # real spend by stage × model × iteration (stamps ⋈ transcripts ⋈ price table)
 ```
 
-`bin/overhead-meter.sh` is the overhead meter (drift-kit/SPEC.md §The overhead
+`--emit overhead-meter` is the overhead meter (drift-kit/SPEC.md §The overhead
 meter): a byte-proxy over a session transcript that reports what fraction of the
 volume was governance versus task work, logging one line per session for
 `kpi-overhead` — the methodology's own cost, measured so efficiency claims cut

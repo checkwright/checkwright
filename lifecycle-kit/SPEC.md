@@ -1957,6 +1957,15 @@ table member (gate-sdk/SPEC.md §The non-gate arm), whose contract is a
 **document**: one normalized id on stdout and exit 0, or a diagnostic on stderr
 and exit 2.
 
+**This section owns the derivation's contract; the derivation itself lives in one
+shared crate module** (`native/src/sessions.rs`), which drift-kit's two meters
+read as well as this arm — one copy in-crate, on the operator's 2026-09-05 ruling
+(drift-kit/SPEC.md §The overhead meter). Nothing about the rules below changes:
+the module reads no environment at all, every input arriving as a value, so each
+consuming arm resolves **its own kit's** sessions-dir knob and hands the answer
+in. What is stated here rather than there is the *rule*; what lives there is the
+one implementation of it.
+
 The id derives by a fixed source order, first hit wins, every source ending in
 the same normalization — strip a leading `agent-` token if present, then take
 the first 8 characters:

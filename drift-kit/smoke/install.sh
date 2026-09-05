@@ -194,7 +194,7 @@ if grep -q '^| beta ' <<<"$traj"; then fail "trajectory emitted the in-flight (u
 # known category bytes in (smoke/overhead-fixture.jsonl), known percentages out.
 fixture="$SMOKE_KIT_ROOT/smoke/overhead-fixture.jsonl"
 ovlog="$work/ovh-log.txt"
-meter() { DRIFT_KIT_TMP_DIR="$work" DRIFT_KIT_OVERHEAD_LOG="$ovlog" bash "$SMOKE_KIT_ROOT/bin/overhead-meter.sh" "$fixture"; }
+meter() { DRIFT_KIT_OVERHEAD_LOG="$ovlog" bash "$DRIFT_ARM" --emit overhead-meter "$fixture"; }
 
 set +e
 mout="$(meter)"; mrc=$?
@@ -241,7 +241,7 @@ grep -q 'n/a' <<<"$kna" || fail "kpi-overhead did not degrade to a visible n/a r
 # DRIFT_KIT_METRIC_DIR override (no explicit OVERHEAD_LOG), writer and reader must
 # compute the same default log path, or a default drift splits them silently.
 mdir="$work/metric"
-DRIFT_KIT_METRIC_DIR="$mdir" bash "$SMOKE_KIT_ROOT/bin/overhead-meter.sh" "$fixture" >/dev/null \
+DRIFT_KIT_METRIC_DIR="$mdir" bash "$DRIFT_ARM" --emit overhead-meter "$fixture" >/dev/null \
     || fail "overhead-meter failed under a DRIFT_KIT_METRIC_DIR-only override"
 [[ -s "$mdir/overhead-log.txt" ]] || fail "writer did not resolve DRIFT_KIT_METRIC_DIR into its default log path"
 set +e

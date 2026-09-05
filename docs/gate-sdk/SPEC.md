@@ -2314,7 +2314,8 @@ the argv-shape split below governs —
 its 2026-09-03 ones; and `--emit-scan-prompts`, guard-kit's friction-log ranker
 (guard-kit/SPEC.md §scan-prompts), and `--emit-usage-trend`, delegation-kit's
 footprint trend reporter (delegation-kit/SPEC.md §Trend reporter), its
-2026-09-04 one), the
+2026-09-04 one; and `--emit-overhead-meter`, drift-kit's governance-overhead
+byte-proxy meter (drift-kit/SPEC.md §The overhead meter), its 2026-09-05 one), the
 **harness-integration**
 arms below it, and the bridged `Arm::Run` members that are neither —
 `--lesson-sink` (queue-kit/SPEC.md §The lesson-sink arm), `--upgrade-smoke`
@@ -4801,6 +4802,19 @@ that states the knob's contract, which is also the section a cut has to rewrite
 when the adapter goes. Recorded because a later selector reaching such a file
 would otherwise re-make the same wrong turn, and because the disposition and the
 prose edits then land in two different SPECs for no reason.
+
+**The third finding is a look-first rule, and it is worth a paragraph because the
+second copy it prevents is one an unexamined reading writes without noticing.**
+Where a ruling tells a port to *carry a derivation once*, look for that derivation
+**in-crate first**: a compiled tree that already holds a sibling tool usually
+holds most of the pieces, and the cheap-looking move — writing the derivation
+beside the new member because the existing one is private — reproduces exactly
+the divergence the ruling refused, relocated from two interpreters into two
+modules. The discharge is a **visibility and placement** change rather than a
+rewrite: promote the private items to a top-level module and leave the original
+holder a thin caller of it. Recorded because "carry it once" reads as new work
+until the crate is read, and a selector pricing such a member off its owed line
+count will price the wrong thing.
 
 **The arm names no remainder, which is what keeps it kit content.** It is stated
 generically — no gate names, no member roster, no count of any tree's remaining
@@ -14791,7 +14805,7 @@ is not executable" cannot read as "a descriptor is not covered": the descriptor
 is data — a manifest and directives, never sourced and never run — and an
 executable one invites a reader to run a file carrying no interpreter line. The
 first class is by-path-invoked kit scripts — gate-sdk's runner
-(`run-gates.sh`), drift-kit's overhead meter (`overhead-meter.sh`), and lifecycle-kit's
+(`run-gates.sh`), drift-kit's stage-economics meter (`stage-economics.sh`), and lifecycle-kit's
 entry preflight all invoke kit scripts **by path**, and a shebang'd `bin/` tool
 is by-convention path-invocable — so a script committed `100644` degrades
 silently in a fresh clone: a KPI plugin to `n/a (plugin failed)`, a

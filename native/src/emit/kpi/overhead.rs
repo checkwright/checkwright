@@ -58,7 +58,7 @@ pub fn run(ctx: &Ctx, trend: bool) -> Option<String> {
             return na(
                 "lead",
                 LABEL_GOV,
-                "no measurement yet — run bin/overhead-meter.sh",
+                "no measurement yet — run --emit overhead-meter",
                 trend,
             )
         }

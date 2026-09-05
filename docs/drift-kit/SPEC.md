@@ -299,7 +299,7 @@ Lead:
   across the recent window of sessions, carrying the session-count and
   reading-age caveats) and the gate-output share (`gate`/`total` — the axis the
   deferred economy levers target). `--trend` emits `ovh <pct>%`. Degrades
-  fail-visible to a "run bin/overhead-meter.sh" n/a row when the log is absent.
+  fail-visible to a "run --emit overhead-meter" n/a row when the log is absent.
 - **kpi-price-table-age** — two rows off the consumer price table
   (`DRIFT_KIT_PRICE_TABLE`, §The stage-economics meter input 3): the age in days
   of its `priced-as-of:` header, and the time to — or past — its optional
@@ -602,13 +602,28 @@ battery stays the outer backstop (gate-sdk/SPEC.md §Enforcement tiers).
 
 ## The overhead meter
 
-`bin/overhead-meter.sh [transcript.jsonl]` measures the methodology's own cost,
+`--emit overhead-meter [transcript.jsonl]` measures the methodology's own cost,
 so efficiency claims cut both ways: what fraction of a session's volume is
 governance (gate output, hook payloads, stage ritual, governed-doc reads)
-versus task work. A bare invocation resolves the newest transcript under
-`DRIFT_KIT_SESSIONS_DIR`; the tool is advisory by construction — exit is always
-0 and it never joins `gates.list`, and a missing transcript is a 0-exit notice,
-not a failure.
+versus task work. A bare invocation resolves **the transcript the invoking
+session is itself running in**, under `DRIFT_KIT_SESSIONS_DIR`: a delegated
+session resolves its own subagent transcript rather than its lead's, and every
+other session takes the two-tier scan whose newest candidate wins. The tool is
+advisory by construction — exit is always 0 and it never joins `gates.list`, and
+a missing transcript is a 0-exit notice, not a failure.
+
+**The series splits at 2026-09-05, and the log gains no field saying so.** Before
+that date the resolution was a flat-tier glob, so every logged key is a
+full-length id's first eight characters; after it the nested tier is in scope
+too, whose key is `normalize("agent-<hex>")`. The two populations are disjoint —
+no row is orphaned and no key collides — and the `date` field **already**
+partitions the series, so a reader splits on it. A field carrying the port date
+would have no reader (`kpi-overhead` reads `pct`, `gate`, `total` and field one
+as the date), and a log field with no reader is a field removed. One residual
+limit is stated rather than closed: `kpi-overhead` summarizes a trailing window,
+so for about that many measured sessions after the cut its average blends the two
+populations. The blend is finite and self-clearing, and a special case keyed on a
+date would be a second thing to stale.
 
 The measurement is a **byte-proxy at line granularity**, honesty first. Each
 JSONL transcript line is classified whole by a fixed marker table in the script
@@ -628,34 +643,63 @@ One line is appended per measured session to `DRIFT_KIT_OVERHEAD_LOG`, grammar
 `<date> <session8> total=<bytes> gov=<bytes> gate=<bytes> pct=<n>` where `pct`
 is the governance share. `session8` is the dedup key the meter reads on append
 — re-measuring a session replaces its line rather than double-counting it.
-**That key is derived differently from the sibling meter's, and the divergence is
-recorded here rather than reconciled.** This meter takes the transcript basename's
-first eight characters and scans one flat tier of the sessions directory; the
-stage-economics meter strips a leading `agent-` first and scans the subagent tier
-as well (§The stage-economics meter). So one subagent transcript keys differently in
-the two logs, and neither derivation is wrong on its own terms — this meter measures
-the session in front of it while that one joins stamps to transcripts. **The port
-adopts the stage-economics derivation for both meters**: strip a leading `agent-`,
-scan the subagent tier as well as the flat one, and resolve the session
-delegation-aware — under a dispatched session the env child-session id names the
-transcript, never the newest file in the project dir. One derivation, carried
-in-crate once and read by both arms, is what closes the divergence rather than
-recording it, and it is also what stops this meter measuring the supervising
-session under a live lead, which the flat-glob resolution did. The alternative,
-porting each meter with its own key, would make the divergence permanent in a
-log whose only readers are compiled. The
-per-category breakdown beyond `gate=` (hook, stage, governed-doc) stays on the
+**That key was once derived differently from the sibling meter's, and the closed
+divergence is kept here because a later reader asking why two meters ever keyed
+differently needs the answer.** Until the 2026-09-05 port this meter took the
+transcript basename's first eight characters and scanned one flat tier of the
+sessions directory, while the stage-economics meter stripped a leading `agent-`
+first and scanned the subagent tier as well (§The stage-economics meter) — so one
+subagent transcript keyed differently in the two logs, and neither derivation was
+wrong on its own terms. The operator ruled (2026-09-05, consult) that **the port
+adopts the stage-economics derivation for both meters**: strip a leading
+`agent-`, scan the subagent tier as well as the flat one, and resolve the session
+delegation-aware. The refused alternative — porting each meter with its own key —
+would have made the divergence permanent in a log whose only readers are
+compiled.
+
+**The one derivation lives in `native/src/sessions.rs`, and lifecycle-kit/SPEC.md
+§bin/session-id.sh keeps its contract.** The module is a promotion of what
+`--emit-session-id` already held, not a mint: a copy beside it would be the same
+divergence relocated from two shell scripts into two Rust modules. Every input
+arrives on a value struct, so **drift-kit still resolves its own knob** —
+`DRIFT_KIT_SESSIONS_DIR` — and hands the answer in; the sharing happens *below*
+the config layer, and post-port there is no `bin/` contract left to import, both
+tools being arms of one binary. The module exposes the normalization, the
+sessions-dir resolution, the delegation-aware `resolve` (which returns the
+winning **path**, so a caller needing the transcript does not re-glob for the id
+it was handed) and their composition `key`, over one private two-tier candidate
+glob that `resolve` and the sibling meter's `find` both walk — which is what
+makes the tier layout one glob rather than two. `key` is exposed rather than
+spelled at each of its three readers on §lib/gate.sh's own *exactly one place a
+value is computed*.
+
+The per-category breakdown beyond `gate=` (hook, stage, governed-doc) stays on the
 meter's stdout at measurement time; a log field with no reader is a field
 removed. Field readers: `kpi-overhead` reads `pct`, `gate`, and `total`
 (§Bundled KPIs), plus `date` for the reading-age caveat and the line count for
-the session-count caveat.
+the session-count caveat. `gov` is the one field with no *log* reader and is kept
+rather than removed: it is derivable-but-stated (`total - task`, and the sum of
+the four categories), and the field-removal rule reaches a field nothing reads at
+all.
 
 The producer of the log is the consumer's close-stage binding — this repo's
-`.claude/commands/close.md` invokes the meter on the closing session (consumer
-config, not a lifecycle-kit change) — and any session may invoke it ad hoc.
-Both knobs carry working defaults, so the enabling config ships on by default,
+`.claude/commands/close.md` invokes the arm on the closing session (consumer
+config, not a lifecycle-kit change) — and any session may invoke it ad hoc. All
+three knobs carry working defaults, so the enabling config ships on by default,
 and the sessions-dir default matches the harness layout this repo already reads
-for stage stamps.
+for stage stamps. `DRIFT_KIT_SESSIONS_DIR` is declared **empty** in `lib/drift.sh`
+and computed in-crate: the arm is compiled, and a knob the owning kit's library
+does not define is the config bridge's undeclared-knob refusal, which would
+fail-close the bare no-override invocation that is this meter's primary use.
+
+**This section's port-owed set is empty, and that is stated rather than left to
+be inferred.** Every surface declaring it is now either in-crate or declared
+`# no-port:`: `native/src/emit/overhead_meter.rs`, its `BRIDGED_ARMS` row in
+`native/src/emit/mod.rs`, the shared `native/src/sessions.rs`, and
+`smoke/install.sh`, whose own header declares `# no-port:` and which stays the
+meter's behavioural oracle permanently (§Testing). `bin/overhead-meter.sh` was
+the one owed surface and the 2026-09-05 cut took it, so **no later port cut is
+sequenced against this section**.
 
 The economy levers this meter exists to inform stay *behind* it: **commit-first**
 (the generated hook already runs and prints the coupled gates, so a separate
@@ -1068,7 +1112,7 @@ subtree to a row whose `<stage>` value is the **anchor's stage-or-role with
 ## The `/economics` skill
 
 `/economics` is the customer-facing post-iteration narrative: run at close, it
-chains `bin/overhead-meter.sh` → `bin/stage-economics.sh` into one report
+chains `--emit overhead-meter` → `bin/stage-economics.sh` into one report
 answering "what did this iteration cost, where, and was the model posture worth
 it". `stage-economics` is the sole cost-attribution surface — it prices
 per-transcript, per-stage, per-model token draw (the token SSOT), while
@@ -1168,7 +1212,6 @@ library and nothing else.
 ```
 drift-kit/
   lib/drift.sh                   # sourced knob resolution; the config bridge sources it
-  bin/overhead-meter.sh          # the governance-overhead byte-proxy meter
   bin/stage-economics.sh         # the stage × model × iteration spend pricer
   templates/drift-config.sh
   templates/kpis.list            # the shipped registry: every bundled KPI (consumer copies + prunes)
@@ -1230,14 +1273,23 @@ Knobs (this repo's layout as defaults):
   `${CLAUDE_CONFIG_DIR:-$HOME/.claude}/projects/<cwd-slug>`, where `<cwd-slug>`
   is the working directory with every non-alphanumeric replaced by `-` (the
   derivation lifecycle-kit's stage stamps already apply; drift-kit re-derives
-  with its own knob rather than importing a sibling kit's bin contract).
+  with its own knob rather than importing a sibling kit's bin contract). The
+  knob stays drift-kit's and the *derivation below it* is now shared in-crate
+  (§The overhead meter), which is consistent rather than in tension: the sharing
+  is below the config layer, where a knob has already been resolved to a value.
+  Two resolvers name it and only one computes — `lib/drift.sh` declares it
+  **empty** so the config bridge's `declare -p` can find it, and the computed
+  fallback above lives in `native/src/sessions.rs`. Empty means *derive it*,
+  never *no value*.
 - `DRIFT_KIT_OVERHEAD_LOG` — the overhead meter's append log; default
   `$DRIFT_KIT_METRIC_DIR/overhead-log.txt` (gitignored, so the private
   transcript's derived counts never enter version control; the meter
-  `mkdir -p`s the log's dirname). Two resolvers compute this default — the
-  meter, which is a standalone tool, and `lib/drift.sh`, through which the
-  collator and `kpi-overhead` both now read it — and the smoke's writer/reader
-  assertion holds them together (§Testing).
+  `mkdir -p`s the log's dirname). **One** resolver computes this default,
+  `lib/drift.sh`, through which the collator, `kpi-overhead` and the meter now
+  all read it: the second resolver was the meter's own, and it left with the
+  standalone script the port deleted — the same collapse §Layout records for
+  `DRIFT_KIT_PRICE_TABLE`. The smoke's writer/reader assertion keeps its subject
+  and holds the surviving pair together (§Testing).
 - `DRIFT_KIT_DONE_SECTION` / `DRIFT_KIT_DEFERRED_SECTION` — queue section
   headings the task-split and deferred-age KPIs scan; defaults `Done` /
   `Deferred` (queue-kit's).
@@ -1337,7 +1389,8 @@ fake-history repo — one closed, range-bounded iteration — and asserts the
 table parses, that iteration's row is emitted, and the in-flight iteration's
 is not. The overhead meter has a fixed classifier, so it *is* fixture-stable:
 `smoke/overhead-fixture.jsonl` carries known category bytes, and
-`smoke/install.sh` drives the meter over it and asserts the log-line grammar,
+`smoke/install.sh` drives the meter **through its arm** over it — every
+assertion below is unchanged by that re-pointing — and asserts the log-line grammar,
 that the task line is excluded from governance, that `gate` is a proper subset
 of `gov`, that `pct` is the rounded governance share, and that a re-measure
 replaces the session's line rather than doubling it; kpi-overhead is exercised

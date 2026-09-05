@@ -52,6 +52,8 @@ declare -p DRIFT_KIT_STAGES &>/dev/null || DRIFT_KIT_STAGES=(scope align build v
 : "${DRIFT_KIT_DONE_SECTION:=Done}"
 : "${DRIFT_KIT_DEFERRED_SECTION:=Deferred}"
 : "${DRIFT_KIT_ICEBOX_SECTION:=}"
+# spec: drift-kit/SPEC.md §Layout and configuration — DRIFT_KIT_SESSIONS_DIR is declared **empty** here so the config bridge's `declare -p` can find it: the meter that reads it is a compiled arm, and a knob no kit library defines is the bridge's undeclared-knob refusal on every invocation, which would break the bare no-override run that is the meter's primary use. It computes nothing itself — the `<config-home>/projects/<cwd-slug>` fallback lives in the crate's shared session derivation, and a second copy in shell would be exactly the divergence the meters' port removed. Empty means "derive it", never "no value" (the GATE_SDK_UPGRADE_FROM shape).
+: "${DRIFT_KIT_SESSIONS_DIR:=}"
 : "${DRIFT_KIT_OVERHEAD_LOG:=$DRIFT_KIT_METRIC_DIR/overhead-log.txt}"
 
 # spec: drift-kit/SPEC.md §Bundled KPIs — kpi-price-table-age and bin/stage-economics.sh read one table; resolving the default here makes this library its single producer, which is what the substrate move converts the former in-substrate restatement into rather than a cross-substrate one.

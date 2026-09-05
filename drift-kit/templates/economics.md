@@ -10,7 +10,7 @@ iteration just run: what did it cost, where did the cost land, and was the model
 posture worth it. Chain the two reporting tools in order, then read their
 output into one narrative — do not paste the raw tool dumps:
 
-1. **Governance overhead** — `bash drift-kit/bin/overhead-meter.sh` on the
+1. **Governance overhead** — `bash gate-sdk/bin/run-gates.sh --emit overhead-meter` on the
    closing session (drift-kit/SPEC.md §The overhead meter): the governance-versus-task
    byte proxy for this session.
 2. **Stage economics** — `bash drift-kit/bin/stage-economics.sh` (drift-kit/SPEC.md
