@@ -7,3 +7,4 @@
 test-harness-cut-seam-sweep scope a6003d04 2026-09-05 c2a1ce8e
 test-harness-cut-seam-sweep spec a00704a1 2026-09-05 46f4df2d
 test-harness-cut-seam-sweep align ac60b4ce 2026-09-05 f52cf984
+test-harness-cut-seam-sweep build a4a1ea69 2026-09-05 a29779e2
