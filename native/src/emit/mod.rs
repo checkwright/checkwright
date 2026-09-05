@@ -35,6 +35,7 @@ pub mod stage_economics;
 pub mod stage_rules;
 pub mod roadmap;
 pub mod run_gate_tests;
+pub mod run_guard_tests;
 pub mod run_validate;
 pub mod scratch_run;
 pub mod session_id;
@@ -559,6 +560,14 @@ pub const BRIDGED_ARMS: &[(&str, Arm, &[&str])] = &[
         "--run-gate-tests",
         Arm::Run(run_gate_tests::run),
         run_gate_tests::KNOBS,
+    ),
+    // spec: guard-kit/SPEC.md §Testing — an `Arm::Run` because the contract is a three-valued exit
+    // an emitting arm collapses, and a table member because the arm needs the vendored guard-kit
+    // root a hardcoded flag could not take from a consumer
+    (
+        "--run-guard-tests",
+        Arm::Run(run_guard_tests::run),
+        run_guard_tests::KNOBS,
     ),
 ];
 

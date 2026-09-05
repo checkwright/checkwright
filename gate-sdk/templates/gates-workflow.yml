@@ -57,4 +57,4 @@ jobs:
       # PLACEHOLDER — add one step per non-gate-tests runner your CLAUDE.md
       # names (a guard-test runner, a language test suite), e.g.
       #   - name: guard-kit decision table
-      #     run: bash guard-kit/bin/run-guard-tests.sh
+      #     run: bash gate-sdk/bin/run-gates.sh --run-guard-tests

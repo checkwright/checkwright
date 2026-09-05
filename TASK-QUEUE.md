@@ -12,19 +12,6 @@
 
 ## New Features
 
-- **guard-tests-runner-port-cut** [spec: SPEC-guard-tests-cut.md] — port
-  `guard-kit/bin/run-guard-tests.sh` (101) to the bridged `--run-guard-tests` `Arm::Run`.
-  **It empties guard-kit's owed column outright** — the only one of this iteration's four cuts
-  that discharges a kit. The subject does not move: `templates/bash-guard.sh` and `lib/guard.sh`
-  are both `# no-port:` and both stay spawned exactly as they are, so the port creates no
-  duplication at all. What moves is the harness — payload construction (in-crate `serde_json`,
-  not `jq`), the sandbox's five preconditions, the table parse, the classification ladder and
-  the accounting.
-  **The crate-test road is REFUSED on adopter reach**, not on taste: `escalation.rs` replaced
-  this runner's escalation lane with a `#[cfg(test)]` test, but a cargo test needs a toolchain
-  the shipped binary does not, so that road would narrow who can run the decision table.
-  Filed 2026-09-05 by spec, third of the four per-cut units.
-
 - **agents-md-smoke-port-cut** [spec: SPEC-agents-md-cut.md]
   [precondition-ok: owner-doc-rules-it-unblocked] — port
   `context-kit/smoke/agents-md.sh` (139) to the bridged `--agents-md-smoke` `Arm::Run`.
@@ -9942,5 +9929,6 @@
 - test-hermetic-port-cut
 - hermetic-bin-suffix-pin-placement
 - kit-spec-provenance-seam-sweep
+- guard-tests-runner-port-cut
 
 ## Lessons Learned

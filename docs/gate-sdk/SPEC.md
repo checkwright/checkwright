@@ -2345,7 +2345,8 @@ and `--diff-baseline` (evidence-kit/SPEC.md §bin/run-validate.sh and
 §bin/diff-baseline.sh), `--scratch-run`
 (guard-kit/SPEC.md §scratch-run — the class's first member
 whose port **removes** a grant naming its own path rather than relocating one)
-and `--run-gate-tests` (§run-gate-tests) —
+`--run-gate-tests` (§run-gate-tests)
+and `--run-guard-tests` (guard-kit/SPEC.md §Testing) —
 and the class
 they form is named here because a
 session arriving with a new non-gate thing to port has no other way to learn
@@ -2464,6 +2465,13 @@ change**, and it belongs beside that worst case for the same reason: `uname`,
 `date`, `sort`, and every element of a roster the consumer may shadow, since
 `PROBE_SET` lives in a file rather than in the crate (context-kit/SPEC.md
 §bin/env-probe).
+**`--run-guard-tests` is the class's first member whose set is split between the
+arm and the subject it spawns**, and stating it that way is what keeps the port's
+dividend honest: `bash`, `git` and `mktemp` are the arm's own — one `bash` per
+case to spawn the unchanged guard, the other two to build the sandbox — while
+`jq` is reached only *through* that subject, which reads the sandbox's allowlist
+with it. The arm stopped spawning `jq` for its own payload construction and still
+refuses without it, for that reason (guard-kit/SPEC.md §Testing).
 **`--wait-probe` is the class's first member whose *subject* rather than whose
 implementation fixes the set**, and it belongs beside those two because it is the
 one case where a smaller set would be the defect: `bash`, and through it `nohup`,

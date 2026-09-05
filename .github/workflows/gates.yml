@@ -68,7 +68,7 @@ jobs:
           done < <(gate_fixture_suites)
           exit $rc
       - name: guard-kit decision table
-        run: bash guard-kit/bin/run-guard-tests.sh
+        run: bash gate-sdk/bin/run-gates.sh --run-guard-tests
 
   # The activation path, exercised server-side. It is a job rather than a step in
   # `gates` because it asserts a different thing — that an adopter's install

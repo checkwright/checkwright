@@ -373,6 +373,15 @@ the bridge, or if gate-sdk/SPEC.md §lib/gate.sh ever admits a second bridge
 producer; the second dissolves if §Consumer rules stops composing a consumer's
 rules from these primitives. Both would have to go for the disposition to move.
 
+**Neither ground moved when the decision table's runner ported**, and the
+sentence is here because a reader meeting a ported runner beside an unported
+library will ask. §Testing's `--run-guard-tests` arm spawns
+`templates/bash-guard.sh`, which sources this library exactly as it always did,
+so the bridge still resolves every `GUARD_KIT_*` knob here and the extension
+point is still a set of shell functions a consumer's copy composes from. What
+the port moved is the harness around the subject; the subject and this library
+are what the two grounds are about.
+
 ## Consumer rules
 
 A consumer's project-specific block/steer/allow rules live in its copy of
@@ -1891,7 +1900,6 @@ close-surface: .workflow/prompt-friction.log advisory reclaim=: > .workflow/prom
 guard-kit/
   lib/guard.sh              # primitives + generic ruleset functions
   bin/compare-settings-allow.sh
-  bin/run-guard-tests.sh    # decision-table runner, narrowed to bash-guard with the escalation-guard port
   guard-tests/cases.tsv     # expected-decision <TAB> command
   guard-tests/escalation-cases.tsv  # expected-decision <TAB> to <TAB> message; read by the crate test that replaced this runner's escalation lane
   guard-tests/background-cases.tsv  # expected-decision <TAB> run_in_background <TAB> command
@@ -1998,13 +2006,94 @@ The gate contracts do not fit hooks (a guard speaks exit-2 + hook JSON, not
 `OK:`/`FAIL:` lines), so the kit ships its own decision-table runner
 instead of `gate-tests/`: `guard-tests/cases.tsv` pairs an expected
 decision (`block`/`advise`/`allow`/`rewrite`/`fallthrough`) with a command;
-`bin/run-guard-tests.sh` feeds each through the template guard as hook JSON
+the bridged `--run-guard-tests` arm feeds each through the template guard as
+hook JSON
 on stdin and asserts the exit code and output class, failing on any
 mismatch. Every generic rule carries at least one firing and one
 non-firing case (the fixture-pair discipline, transplanted). Two substitutions
 make a command expressible in one tab-separated cell: `@ROOT@` becomes the git
 sandbox root, and `@NL@` becomes a newline — without the second a heredoc case
 cannot be written at all, and the heredoc class would ship untested.
+
+**The member is an `Arm::Run` and a bridged-arm table row, and both are forced
+rather than chosen.** The contract is a three-valued exit — 0 clean, 1 one or
+more verdict mismatches, 2 a harness precondition it could not meet — and the
+verdict, not the report, is what the evidence-kit suite reads; an `Arm::Emit`
+collapses that to 0-or-2. It is a table member rather than a hardcoded top-level
+flag because it is **configured**: the arm needs to know where guard-kit is
+vendored, which is gate-sdk's knob crossing the bridge
+(gate-sdk/SPEC.md §The non-gate arm, *the family choice is forced for any tool
+that needs configuration at all*). The front-end needs no edit —
+`bin/run-gates.sh` hands every unrecognised leading `--<token>` to `exec_arm`.
+**The arm is unresolvable in a tree that does not vendor guard-kit**, which it
+shares with `--emit-scan-prompts` and which is a refusal with a message at
+exit 2, not a defect.
+
+**The declared roster is `GATE_KIT_ROOTS_HERE` and nothing else, and the two
+omissions are design content rather than an oversight.** `GUARD_KIT_LOG` is not
+declared because the arm **overrides** it: the paragraph below rules that any
+ad-hoc invocation must point it at a scratch path, and declaring the knob would
+resolve a consumer's *live* friction log into a synthetic run and invite exactly
+the pollution that rule exists to prevent — so the arm sets the child's value to
+a path inside its own sandbox. The guard's own `GUARD_KIT_*` knobs are not
+declared because the spawned child resolves them: `bash-guard.sh` sources
+`lib/guard.sh` through `GUARD_KIT_LIB`, and that library is their sole resolver
+(§The guard framework), so declaring them here would resolve them a second time
+for a child that resolves them anyway — the second producer criterion 6 refuses,
+reached by the back door.
+
+**What is under test does not move; only the harness does.** Each case is still
+fed through the **unchanged** `templates/bash-guard.sh`, spawned as
+`bash <guard-kit>/templates/bash-guard.sh` with `GUARD_KIT_LIB` and
+`GUARD_KIT_LOG` in its environment, its working directory set to the sandbox and
+the hook payload on its stdin — the same four inputs the shell harness supplied.
+Nothing about the guard's decision path is re-expressed in Rust, so the port
+creates no duplication at all: criterion 6's *unless* clause is satisfied in the
+absent form rather than argued around. What moved is the payload construction,
+the sandbox, the table parse, the classification and the accounting, each
+keeping its specified behavior:
+
+- **The payload** is built in-crate with `serde_json` rather than by a `jq -nc`
+  per case. Its two fields keep their named readers — `tool_input.command` read
+  by every generic rule through `lib/guard.sh`'s command splitter, and
+  `tool_input.run_in_background` read by rule 15's harness arm — and no field is
+  added.
+- **The two substitutions** apply to the command cell before the payload is
+  built, in the fixed order above: `@ROOT@` then `@NL@`.
+- **The table grammar** is tab-separated, a row whose first field is
+  empty-or-whitespace skipped and one whose first field opens `#` skipped, with
+  the last field taking the line's remainder as `IFS=$'\t' read -r` left it. The
+  tables stay **on disk** and are not transcribed into Rust literals, on the same
+  ground the escalation table's does below.
+- **The classification** is a five-way ladder in exit-code-then-substring order —
+  exit 2 → `block`; any other non-zero → `exit<rc>`; `"updatedInput"` present →
+  `rewrite`; `"additionalContext"` present → `advise`;
+  `"permissionDecision":"allow"` present → `allow`; empty output →
+  `fallthrough`; else `unknown`. The order is load-bearing and is transcribed
+  rather than re-derived: a rewrite payload may also carry an
+  `additionalContext`, and the ladder is what makes the first match win.
+- **The sandbox** is a `mktemp -d` tree carrying five preconditions, each a
+  case's precondition rather than scenery, so a harness that builds four of them
+  turns real rows green for the wrong reason: `git init`, the three-line
+  `.gitignore`, a tracked `tracked.md` beside an untracked `scratch.txt` (rule 22
+  splits on tracked versus not), a `.tmp/dead-producer.run` carrying a dead PID
+  beside a `.tmp/notes.txt` that is not a record (so every mutating-git row
+  asserts rule 14's decline arm rather than the vacuous absence of any record),
+  and a `.claude/settings.json` carrying the three-entry allowlist. A sandbox the
+  arm could not build is exit 2, the harness-precondition code — the shell form
+  would have cascaded it into verdict mismatches naming the wrong cause, which is
+  the same reasoning as the `jq` refusal below.
+
+**`jq` stays a precondition, and the honest statement of what the port removed
+is the point.** The arm refuses at exit 2 with `jq not found on PATH` before it
+builds a single payload, exactly as the shell harness did — because the
+**subject** still spawns `jq`: `lib/guard.sh` reads the allowlist out of
+`GUARD_KIT_SETTINGS` with it, and the sandbox ships a `settings.json` precisely
+so the allowlist rules are exercised. With `jq` absent those rules stop firing
+and the affected rows fail as verdict mismatches, a red naming the wrong cause.
+What the port genuinely removes is **one process per case**, the harness's own
+`jq -nc` payload build times the row count of both tables; stating it as *the
+port drops the `jq` dependency* would be false.
 
 **The runner drives each case from inside the sandbox**, which decides how a
 target is spelled and is stated because getting it wrong reads as a rule defect
@@ -2051,11 +2140,36 @@ discipline for the escalation advisory: a firing case (a headerless message to
 `main` → advise) and its non-firing pair (a fully shaped block, and a non-`main`
 recipient → fallthrough). **Its driver is the crate test, not this runner.**
 The escalation-guard is a binary arm, so its cases are read by the crate test
-under that member's own module, and `bin/run-guard-tests.sh` covers
+under that member's own module, and the `--run-guard-tests` arm covers
 `bash-guard.sh` alone — the one member of this kit that stays shell, because it
 is the extension point a consumer's own rules are written in.
 The table stayed on disk rather than becoming Rust literals: it is kit test data
 a reviewer reads, and a literal would trade that review for a recompile.
+
+**That precedent is a road as well as a member, and taking it for this table was
+refused on a ground that has nothing to do with taste.** A session sizing the
+decision table will reach for the escalation lane first — replace the driver
+with a `#[cfg(test)]` test reading `cases.tsv` off disk. But a crate test runs
+only under `cargo test`, which needs a Rust toolchain, while the shipped
+**binary** needs none: gate-sdk/SPEC.md §Consumer payload ships a prebuilt
+artifact per declared target precisely so an adopter with no toolchain has a
+working battery. Moving this runner into a crate test would narrow the set of
+adopters who can run guard-kit's decision table from *everyone with the binary*
+to *everyone with cargo* — a reach narrowing taken inside a port, which
+`native-gate-port-remaining-corpus`' ruling (1) refuses in its own domain and
+which nothing here licenses. **The discriminator, so the two roads stay
+distinguishable:** a crate test is the right home when the member's **subject**
+is in-crate, which the escalation guard's is; an arm is the right home when the
+subject is a spawned shell surface the payload ships, which `bash-guard.sh` is.
+
+**The cut empties this section's owed set and not the kit's**, and the
+difference earns a sentence because a kit whose owed column shrinks to one reads
+as discharged. `bin/run-guard-tests.sh` was §Testing's one owed file, so the cut
+and the section coincide; `lib/guard.sh` and `templates/bash-guard.sh` carry
+`# no-port:` on the two independent grounds §The guard framework states. What
+stays owed to guard-kit is `bin/compare-settings-allow.sh`
+(§compare-settings-allow) — a different section, correctly homed, and takeable as
+a singleton on its own rather than behind anything this cut moved.
 
 A **third** table, `guard-tests/background-cases.tsv`
 (`<decision> <TAB> <run_in_background> <TAB> <command>`), extends that same

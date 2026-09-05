@@ -82,5 +82,5 @@ because a bridged arm's usage lives here and in `run-gates.sh --help`.
 ## Test
 
 ```bash
-bash guard-kit/bin/run-guard-tests.sh               # decision-table over the generic ruleset
+bash gate-sdk/bin/run-gates.sh --run-guard-tests    # decision-table over the generic ruleset
 ```

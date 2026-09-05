@@ -25,7 +25,7 @@ harness's pre-tool hook. The ruleset and allowlists are external configuration.
 ## Quick start
 
 ```bash
-bash guard-kit/bin/run-guard-tests.sh                # exercise the decision table
+bash gate-sdk/bin/run-gates.sh --run-guard-tests     # exercise the decision table
 ```
 
 ## Contracts
