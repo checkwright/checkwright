@@ -12,6 +12,270 @@
 
 ## New Features
 
+- **gate-tests-runner-port-cut** [spec: SPEC-gate-tests-cut.md] — port
+  `gate-sdk/bin/run-gate-tests.sh` (188) to the bridged `--run-gate-tests` `Arm::Run`.
+  The stated-contract cut behind gate-sdk/SPEC.md §run-gate-tests, whose whole owed set is this
+  one file. **The design ruling is the road, not the arm:** the runner calls `gate_command` per
+  case, which is the ground `bin/run-consumer-smoke.sh` is declared `# no-port:` on, so the port
+  is lawful only on the **duplication-absent road** — a bash spawn sourcing `lib/gate.sh`
+  unchanged, the shape `--upgrade-smoke` already took. Re-points
+  `scripts/evidence-config.sh:10`, which composes EVERY per-kit fixture suite's run command.
+  Reaches `## Done` at build: its deliverable is one section's owed files and this cut finishes
+  them, so the corpus-demotion branch does not reach it.
+  Filed 2026-09-05 by spec as a per-cut feature unit, under the packaging ruling
+  gate-sdk/SPEC.md §Porting a gate to the binary substrate states — four refs cannot pair with
+  one host, and minting a host is refused.
+
+- **test-hermetic-port-cut** [spec: SPEC-hermetic-cut.md] — settle
+  `gate-sdk/lib/test-hermetic.sh` (52), the file gate-sdk/SPEC.md §lib/test-hermetic.sh calls
+  **deliberately not declared**.
+  **The disposition is a DECLARATION, not a port, and the cut says so on its lead line.** The
+  file's API is three shell functions 92 of 94 bespoke tests source; a binary arm cannot be
+  sourced into bash. What kept it undeclarable was a second `GATE_SDK_NATIVE_BIN` default, and
+  removing that is the same edit that fixes the defect — resolve through `gate_native_bin` and
+  absolutize, the shape `bin/run-gate-tests.sh:24-28` already uses. `--tree` reclassifies
+  `owed` → `no-port`, so the completion predicate's arithmetic is unchanged.
+  **`hermetic-bin-suffix-pin-placement` RIDES INSIDE THIS CUT** under
+  `native-gate-port-remaining-corpus`' ruling (6) and the operator's 2026-09-05 ruling that it
+  blocks nothing; its whole deliverable is this amendment's delta 1 and it reaches Done with it.
+  `kit-library-port-residue` loses the member as a **delivery**, not an unblocking.
+  **ESCALATED AT AUTHORING, unresolved when this entry landed:** the port→declaration change is
+  a narrowing of the cut's asserted behavior, so it went to the lead rather than being absorbed.
+  Filed 2026-09-05 by spec as a per-cut feature unit.
+
+- **guard-tests-runner-port-cut** [spec: SPEC-guard-tests-cut.md] — port
+  `guard-kit/bin/run-guard-tests.sh` (101) to the bridged `--run-guard-tests` `Arm::Run`.
+  **It empties guard-kit's owed column outright** — the only one of this iteration's four cuts
+  that discharges a kit. The subject does not move: `templates/bash-guard.sh` and `lib/guard.sh`
+  are both `# no-port:` and both stay spawned exactly as they are, so the port creates no
+  duplication at all. What moves is the harness — payload construction (in-crate `serde_json`,
+  not `jq`), the sandbox's five preconditions, the table parse, the classification ladder and
+  the accounting.
+  **The crate-test road is REFUSED on adopter reach**, not on taste: `escalation.rs` replaced
+  this runner's escalation lane with a `#[cfg(test)]` test, but a cargo test needs a toolchain
+  the shipped binary does not, so that road would narrow who can run the decision table.
+  Filed 2026-09-05 by spec, third of the four per-cut units.
+
+- **agents-md-smoke-port-cut** [spec: SPEC-agents-md-cut.md]
+  [precondition-ok: owner-doc-rules-it-unblocked] — port
+  `context-kit/smoke/agents-md.sh` (139) to the bridged `--agents-md-smoke` `Arm::Run`.
+  §Testing's **unblocked remainder**: the owner doc already rules that its behind-invoke
+  sequencing "reaches exactly those two members" and that this one is unblocked on its own
+  ground, so the two sequenced members stay owed and take no `# port-until:`.
+  Takes the same duplication-absent road, and the shared `csmoke()` spawn helper is **extracted**
+  from `upgrade_smoke.rs` rather than copied. Updates `gate-sdk/lib/consumer-smoke.sh`'s own
+  `# no-port:` header, which names this file in its live list of shell sourcers — false after the
+  cut.
+  **Carries the gate-sdk/SPEC.md:2149 staleness fix**, on the surface it already edits: that
+  passage still says in the present tense that context-kit §Testing declares its group blocked
+  as a whole, twenty-five lines above the corollary recording the correction.
+  Filed 2026-09-05 by spec, fourth of the four per-cut units.
+
+- **kit-spec-provenance-seam-sweep** [spec: SPEC-seam-sweep.md]
+  — kit SPECs ride the installer payload and the
+  public site whole, yet carry this project's ruling provenance, which resolves to nothing in a
+  consumer tree and reads there as mechanism.
+  **THE 2026-09-03 MEASURE IS STALE BY A FACTOR OF THREE — re-measured 2026-09-05 at scope and
+  corrected here, not left for the next session to re-buy.** It read 37 stamps and 50 TRAJECTORY.md
+  pointers across SIX kit SPECs; a wider pattern reads **246 candidate lines across ELEVEN**:
+  gate-sdk 157, lifecycle-kit 30, delegation-kit 18, queue-kit 16, guard-kit 6, canon-kit 6,
+  doctrine-kit 3, context-kit 3, drift-kit 3, site-kit 2, evidence-kit 2. A second, cruder pattern
+  in the lead session agreed on shape if not digits. **gate-sdk alone is 64 % of the class**, which
+  is where the split below cuts.
+  **THAT PREDICATE IS ITSELF DISCREDITED — censused whole at spec 2026-09-05 and corrected here.**
+  `grep -icE 'ruled|operator ruling|TRAJECTORY.md'` matches ordinary engineering prose far more
+  often than a stamp and misses every stamp spelled without the word ("Ratified by the operator").
+  Over gate-sdk the defensible union of dated authority stamps and TRAJECTORY.md pointers is
+  **≈87-92 SITES**, and the LINES a literal sweep touches is **≈300-400** — twice the 157, because
+  157 measured neither quantity. The class also has a subclass the predicate cannot see:
+  AUTHORITY-ATTRIBUTED BUT UNDATED (`:5556`, `:6619`, `:6777`); the date was never what made it
+  provenance. **The remainder's ~89 rests on the same discredited predicate and needs its own
+  measure** — stated on that entry, not left to be inherited.
+  **The deliverable after the split is two-part** — the gate is the remainder's: strip each site to
+  the undated rule with its engineering grounds, and MOVE to TRAJECTORY.md any grounds not already
+  there, so nothing is lost rather than relocated.
+  **THE DISCRIMINATOR IS RULED and it reconciles two owner docs that appeared to disagree**
+  (`SPEC-seam-sweep.md` delta 1). CLAUDE.md's seam bars "a refused alternative's grounds"; canon-kit
+  §Merging an amendment step 2 makes the spec's prose design rationale's PERMANENT home. They
+  reconcile on ATTRIBUTION: the seam decides the VOICE, never the content — a ground carried with
+  an authority, a date, a channel or an internal identifier is swept to the impersonal form, and
+  an undated engineering ground naming none of those STAYS. Corollary that bounds the unit:
+  undated narrative naming an identifier a consumer cannot resolve (a cohort slug, a numbered
+  batch, a queue slug) IS swept, on the same pointer-a-consumer-cannot-follow ground.
+  **MOVE-VERSUS-DELETE is TRAJECTORY.md's own, :52-55** — "a ruling whose subject is finished is
+  deleted outright", so a spent cohort-selection stamp is DELETED, never migrated into a file whose
+  own doctrine forbids keeping finished rulings. Applied per site.
+  **A DATED MEASUREMENT IS NOT SWEPT.** A frozen attestation a reader is told not to refresh loses
+  its freeze if the date goes, which would be a defect the sweep INTRODUCED.
+  **ONE SECTION IS CARVED OUT AND ESCALATED, not absorbed:** TRAJECTORY.md:118-130 positively
+  ASSIGNS ownership of two closed rulings to gate-sdk/SPEC.md §The decisions this substrate already
+  closed ("which owns them because the component that depends on them must be readable alone"), and
+  that section states the arrangement from the other side. Sweeping it reverses a recorded ruling,
+  which is operator-class however well-grounded. Escalated to the lead at spec, unresolved when
+  this entry landed.
+  **How the class arrived, recorded so the fix aims at its cause.** TRAJECTORY.md's recording rule
+  sends a ruling with a canonical home to that home by pointer, and sessions read that as licence to
+  write the ruling INTO the kit SPEC with its date and refusals — so the SPEC became the ruling's
+  home and TRAJECTORY.md the index, while the seam's content classes named vocabulary and never
+  provenance, and no gate held it.
+  **THE COHORT-LABEL QUESTION IS ANSWERED — the labels RETIRE and the roster becomes a plain
+  enumeration** (`SPEC-seam-sweep.md` delta 4, ruled on CLAUDE.md's own words: the seam names the
+  class "this project's provenance" first and three instances of it after, so the list is
+  instances and not a closure). Three measurements settled it rather than argument: nine
+  foundational members and six `Arm::Run` members carry NO date, so the labelling was never
+  systematic; one label reads `its 2026-09-04 one` while grouping TWO members; and the roster
+  enumerates cleanly grouped by owning kit, which is the grouping every other sentence uses. The
+  carve-out alternative is refused — it would have to say why a landing date is mechanism here
+  and provenance everywhere else. This iteration's four port cuts add their members UNDATED for
+  the same reason. Its consequence for the gate's
+  fixture pair is the remainder's.
+  **The drift-kit and guard-kit sites accreted 2026-09-05, are the SOLE home of two rulings
+  TRAJECTORY.md retired as spent, and are the REMAINDER's** — recorded here only so the split does
+  not read as having lost them.
+  **Cost while deferred:** every published kit SPEC and every adopter's vendored copy carries
+  private ruling history as mechanism, and pointers a consumer cannot follow — payload-facing and
+  front-door, so product-class outright, and accreting at two new sites in one iteration.
+  **DIRECTED 2026-09-05 (operator, consult) AS THE NEXT ITERATION'S JOINED UNIT beside the
+  test-harness cut** — same-surface and product-class under the port-first run; scope sizes it.
+  **SPLIT AT THE gate-sdk BOUNDARY, ruled 2026-09-05 `lead, own-authority` on the re-measure
+  above**, exercising the permission the directive itself grants ("scope sizes it against the
+  window and may split it by kit"), so it re-scopes nothing. THIS ENTRY IS NOW gate-sdk/SPEC.md
+  ONLY — 157 of the 246 lines, one SPEC and one docs mirror rather than eleven of each. **The
+  remaining ten SPECs and THE GATE are `kit-spec-provenance-seam-sweep-remainder`**, filed with
+  this ruling so the split's other half has an owner rather than living in a journal.
+  **CONSEQUENCE, stated because it looks routine and is not:** the directive paragraph at
+  TRAJECTORY.md discharges on "that unit lands AND THE GATE IS GREEN". Under the split the gate
+  lands with the remainder, so the discharge does NOT fire this iteration and that paragraph is
+  NOT deleted at this close.
+  Surfaced 2026-09-03 in the consult that closed the provenance-seam ruling; drained here; the third
+  shape above added 2026-09-04 at the scan-prompts-cut close drain.
+
+- **lead-tier-split-premise-unamended** [spec: SPEC-lead-tier-split.md]
+  — `lifecycle-kit/templates/lead.md`
+  §Economics rests its *Split the lead where the tail dominates* bullet on a premise TEN
+  consecutive iterations have now measured false, and the template still ships it unqualified.
+  **The trigger is the binding's own.** `.claude/commands/lead.md` set the criterion — count the
+  escalations a lead ruled ALONE off a governed surface; near zero, the premise holds; consistently
+  several, the template's bullet needs amending and not this repo's tier — with the threshold at a
+  third such iteration, ANSWERED at eleven. Measured 5, 4, several, 4, 5, 7, 7, 8, 12, 5, 3, now
+  **5**; THIS ENTRY is the governed surface for it whenever a dispatch relays one.
+  **The two axes separate, which makes this an amendment rather than a tier flip.** On COST the
+  premise holds; on CHARACTER it fails every time — a routing-only lead would be cheaper, would have
+  RELAYED these rulings, and would have raised none of the flags below.
+  **THE COST SERIES IS DERIVED, 2026-09-05, REPLACING THE ACCRETED ONE**, which ANSWERS why this
+  entry and the binding disagreed: every earlier point was a mid-close unlowered ceiling. From the
+  completed meter, supervision over priced spend, last six lead iterations: **11.7, 8.7, 8.2, 4.9,
+  4.4, 9.1**.
+  **THE CHARACTER DATUM THE COUNT CANNOT SEE**, from the eighth firing: the lead FLAGGED a risk
+  rather than asserting it safe and align found it real — the lead WRONG and the protocol still
+  paying, which no count of correct rulings evidences. The ninth: four of the lead's OWN premises.
+  **THE TENTH FIRING'S RESIDUE, the rest answered by the series:** three of its five rulings
+  replaced the escalating session's stated ground, and it carried two defects — align MISSING A
+  LIVE BLOCKER (the near-miss class on MECHANISM REACHABILITY) and a LEAD-SIDE `DONE` placement.
+  **THE ELEVENTH AND TWELFTH ARE ANSWERED BY THE SERIES TOO and take no paragraph** — three then
+  five ruled alone, one routed to the operator, neither cost point taken (the mid-close ceiling).
+  Two facts survive them: BOTH COUNTERS stayed CLEAN, so the nine below stayed nine; and the ALIGN
+  WATCH has a GAP — align never fired at the twelfth, so no bare-align datum exists for it.
+  **The counter-evidence is NINE instances of ONE shape — a claim verified at one surface and read
+  as covering a wider one.** Eight are the lead's own, sharpest five `recurrence:` dates ordered
+  onto an unjudged threshold COUNT; the ninth WIDENS it onto a STAGE session's carry. **Neither it
+  nor a refused premise NETS against the count**, which measures whether an escalation was answered
+  off a governed surface, never whether its grounds held; netting reports neither fact.
+  **THE SHAPE IS RULED — limbs, not a qualification and not a replacement**
+  (`SPEC-lead-tier-split.md` delta 1). What fails is not the claim but the ENUMERATION:
+  "concentrates judgment-tier spend
+  where it pays: scope itself, plus one oracle turn per forwarded intent question" names two
+  judgment-bearing classes and omits a third, the turns a lead rules ALONE off a governed surface,
+  which the split converts into relays. The cost limb keeps its text; a character limb states the
+  trade; and the counting METHOD promotes into the template as generic mechanism while the
+  threshold, the series and every stamp stay where they are. The lead-in is deliberately unchanged
+  — two shims cite it verbatim by title and nothing gates a citation to a bullet name.
+  **Cost while deferred:** every consumer vendoring lifecycle-kit reads a premise this repo has
+  measured false nine times, and each future lead re-derives the same finding against a template
+  that never records it — the binding's evidence is local while the false claim is shipped.
+  **DISTINCT from `economics-posture-binding-stale`**, whose subject is the local shim restating a
+  ruling it should cite; this one is the vendored TEMPLATE's own premise being wrong.
+  **THAT DEFERRAL IS SPENT AND THIS ENTRY JOINS `test-harness-cut-seam-sweep`.** It was taken under
+  the port-only run, superseded the same day by the port-first ruling, which legislates threshold
+  members itself as product-class with a live trigger — a ground that did not exist when this was
+  declined. Reading the supersession is `lead, own-authority 2026-09-05`; the join is the
+  operator's, 2026-09-05, through an interactive prompt in the lead session, relayed and not ruled
+  there, against a scope recommendation to hold and with the proposed-once clause's permanence cost
+  stated. The pool's highest recurrence at three, which `kpi-incident-recurrence` reports
+  independently of this entry.
+  Captured 2026-09-02 by close; lead-declined 2026-09-02 and 09-04; deferred 2026-09-05
+  (operator, lead-relay) on a ground since superseded.
+  recurrence: lead-tier-split-premise-unamended 2026-09-03 2026-09-04 2026-09-05
+
+- **cardinal-notation-splits-gate-reach** [spec: SPEC-cardinal-reach.md]
+  — whether a written count is
+  enforceable depends on how it is spelled and how large it is, and the queue sits outside the
+  scanning corpus entirely; the truncated probe below is a `probe-evidence-sufficiency` sub-case.
+  **The premise that prompted this is falsified, and that is the finding.** A cardinal grammar
+  **ships and is not future work** — canon-kit/SPEC.md §check-manifest-count states the ceiling and
+  `SPEC_COUNT_CARDINAL_RE` in canon-kit/lib/spec.sh implements it. The sweep that costed shipped
+  code as future work searched the right term and had its output cut before canon-kit was reached:
+  **truncated, not mis-queried.**
+  **Discontinuity 1, magnitude.** The word branch stops at `twelve` while the digit branch
+  (`[0-9]+`) does not, so `13 gates` matches and `thirteen gates` does not. The SPEC states the
+  ceiling without justifying it, so no reader can tell a deliberate ceiling from an unfinished list.
+  **Discontinuity 2, corpus.** `CANON_KIT_MANIFEST_FILES` omits `TASK-QUEUE.md`, so its 206 spelled
+  numerals from *three* through *fifty* (counted independently here, matching the filer) sit outside
+  every count gate, at any magnitude, in either notation.
+  **The worked example is a sibling's own edit.** `spec-measured-count-gate` moved from "Twelve
+  instances" to "Thirteen": in the manifest corpus that one word moves the claim from INSIDE the
+  matcher's reach to OUTSIDE it, and it happened in the queue, which no count gate scans — the two
+  discontinuities composing.
+  **DISTINCT from `spec-measured-count-gate`, now `check-measured-claim`.** That entry's thesis is
+  that measured counts go STALE; this one is that notation and corpus decide whether an oracle
+  REACHES a claim at all, and a count can be current-and-unreachable or stale-and-reachable, so
+  neither closes the other. Kept from it: a digits convention is a genuine precondition that makes
+  that gate cheaper, matching a digit run being trivial where spelled compounds are not.
+  **Compaction is ANSWERED as the weak half, ~9 lines file-wide, and is not why to act. What
+  decides it:** `TASK-QUEUE.md` reads like prose but is a gated data surface with a line cap, a
+  wrap gate, a tag grammar and slug liveness — a style guide optimizing for a reader it lacks.
+  **ALL THREE CALLS ARE ANSWERED** (`SPEC-cardinal-reach.md`), and two of this entry's own inputs
+  were CORRECTED by probing rather than inherited: the grammar lives in TWO places, and the shell
+  copy at `canon-kit/lib/spec.sh:241` has ZERO consumers tree-wide — dead code beside the one
+  executing holder, `native/src/spec.rs:712-714`; and `CANON_KIT_MEASURED_SURFACE_GLOBS` is
+  DERIVED from `CANON_KIT_MANIFEST_FILES`, so limb (b) reaches FOUR gates, not two.
+  (a) No reason is recorded anywhere (`git log -S twelve`, and the SPEC justifies excluding `one`
+  and not the ceiling): the word branch EXTENDS to the single-token cardinals — `two`…`twenty`
+  plus the tens — and the boundary gains its ground, that the grammar is token-based and every
+  larger cardinal is hyphenated or multi-word. Measured cost: **125** newly-reachable occurrences
+  in the manifest corpus, so the delta is RUN, never cleared by inspection, and 35 hyphenated
+  compounds stay unreachable as a STATED limit with a refused remedy.
+  (b) **NO to the manifest corpus** — a queue entry is a dated work record, line-capped, whose
+  counts frequently have no tree oracle to bind to, so the ban's own remedy would be unavailable.
+  `TASK-QUEUE.md` joins `CANON_KIT_MEASURED_SURFACE_GLOBS` instead: a marker is honored and
+  re-run, no bare cardinal is banned, and `check-unmarked-claim`'s one live class measures ZERO
+  matches here today.
+  (c) **DECLINED, ground recorded so it is not re-proposed:** (a) closes the notation half and
+  (b)'s answer leaves the queue with no cardinal ban, so a spelling choice in the queue decides
+  nothing; what remains is the ~9-line compaction this entry already calls the weak half. Its home
+  would have been queue-kit's in any case — that SPEC states no notation convention and six
+  `check-queue-*` members already own the surface.
+  **Cost while deferred:** every count written in the queue is unreachable by any oracle, and in
+  the manifest corpus a count's enforceability turns on a spelling choice no author is told
+  about. Both failures are silent — the gate runs, reports clean, and never saw the claim.
+  **THRESHOLD 2026-09-03/04; deferred 2026-09-05 (operator, lead-relay). THAT GROUND IS SPENT AND
+  THIS ENTRY JOINS `test-harness-cut-seam-sweep`** — it was taken under the port-only run,
+  superseded the same day by the port-first ruling, which legislates threshold members itself as
+  product-class with a live trigger, a ground that did not exist when this was declined. Reading
+  the supersession is `lead, own-authority 2026-09-05`; the join is the operator's, 2026-09-05,
+  through an interactive prompt in the lead session, relayed and not ruled there, against a scope
+  recommendation to hold. Product-class on limb (a): canon-kit's ceiling ships, so it decides a
+  consumer's manifest verdicts wherever the fix lands.
+  recurrence: cardinal-notation-splits-gate-reach 2026-08-19 2026-09-02
+  **THE 2026-09-02 RECURRENCE SHARPENS (b), re-derived independently rather than read off here.** A
+  maintained total in a live queue entry rotted unseen against that entry's own recorded facts — but
+  it counted CI rounds, no tree fact, so no `measured:` key binds it and widening the corpus reaches
+  the shape while leaving the oracle missing. Third shape: an audit-roster row beside
+  `internal-identifier-restatement`, un-gateable by that row's own reasoning.
+  Filed 2026-08-12 by close, from an operator observation; the "no reason exists" premise was
+  falsified by probing the count gate's own matcher rather than by grepping for a style rule.
+  Also ruled on cardinal-notation-splits-gate-reach: lead 2026-09-04 (own-authority).
+
 ## Technical Debt
 
 ## Deferred
@@ -4110,57 +4374,6 @@
   **view** is the deliverable, not a new collector.
   Filed 2026-08-12 by close, draining the operator-directed bullet the lead filed after a close
   question — intake by direction, not a finding gone looking for.
-
-- **cardinal-notation-splits-gate-reach** [design-pending] — whether a written count is
-  enforceable depends on how it is spelled and how large it is, and the queue sits outside the
-  scanning corpus entirely; the truncated probe below is a `probe-evidence-sufficiency` sub-case.
-  **The premise that prompted this is falsified, and that is the finding.** A cardinal grammar
-  **ships and is not future work** — canon-kit/SPEC.md §check-manifest-count states the ceiling and
-  `SPEC_COUNT_CARDINAL_RE` in canon-kit/lib/spec.sh implements it. The sweep that costed shipped
-  code as future work searched the right term and had its output cut before canon-kit was reached:
-  **truncated, not mis-queried.**
-  **Discontinuity 1, magnitude.** The word branch stops at `twelve` while the digit branch
-  (`[0-9]+`) does not, so `13 gates` matches and `thirteen gates` does not. The SPEC states the
-  ceiling without justifying it, so no reader can tell a deliberate ceiling from an unfinished list.
-  **Discontinuity 2, corpus.** `CANON_KIT_MANIFEST_FILES` omits `TASK-QUEUE.md`, so its 206 spelled
-  numerals from *three* through *fifty* (counted independently here, matching the filer) sit outside
-  every count gate, at any magnitude, in either notation.
-  **The worked example is a sibling's own edit.** `spec-measured-count-gate` moved from "Twelve
-  instances" to "Thirteen": in the manifest corpus that one word moves the claim from INSIDE the
-  matcher's reach to OUTSIDE it, and it happened in the queue, which no count gate scans — the two
-  discontinuities composing.
-  **DISTINCT from `spec-measured-count-gate`, now `check-measured-claim`.** That entry's thesis is
-  that measured counts go STALE; this one is that notation and corpus decide whether an oracle
-  REACHES a claim at all, and a count can be current-and-unreachable or stale-and-reachable, so
-  neither closes the other. Kept from it: a digits convention is a genuine precondition that makes
-  that gate cheaper, matching a digit run being trivial where spelled compounds are not.
-  **Compaction is ANSWERED as the weak half, ~9 lines file-wide, and is not why to act. What
-  decides it:** `TASK-QUEUE.md` reads like prose but is a gated data surface with a line cap, a
-  wrap gate, a tag grammar and slug liveness — a style guide optimizing for a reader it lacks.
-  **Deliverable, and why `[design-pending]` — three separable calls, one mechanical.** (a) Is the
-  `twelve` ceiling deliberate? Record the reason or extend the table. (b) Should `TASK-QUEUE.md`
-  join the manifest corpus — a widening with its own false-positive surface? (c) Should the queue
-  adopt digits as convention? **(c) is mechanical and can land alone; (a) and (b) are design.**
-  **Cost while deferred:** every count written in the queue is unreachable by any oracle, and in
-  the manifest corpus a count's enforceability turns on a spelling choice no author is told
-  about. Both failures are silent — the gate runs, reports clean, and never saw the claim.
-  **THRESHOLD 2026-09-03/04; deferred 2026-09-05 (operator, lead-relay). THAT GROUND IS SPENT AND
-  THIS ENTRY JOINS `test-harness-cut-seam-sweep`** — it was taken under the port-only run,
-  superseded the same day by the port-first ruling, which legislates threshold members itself as
-  product-class with a live trigger, a ground that did not exist when this was declined. Reading
-  the supersession is `lead, own-authority 2026-09-05`; the join is the operator's, 2026-09-05,
-  through an interactive prompt in the lead session, relayed and not ruled there, against a scope
-  recommendation to hold. Product-class on limb (a): canon-kit's ceiling ships, so it decides a
-  consumer's manifest verdicts wherever the fix lands.
-  recurrence: cardinal-notation-splits-gate-reach 2026-08-19 2026-09-02
-  **THE 2026-09-02 RECURRENCE SHARPENS (b), re-derived independently rather than read off here.** A
-  maintained total in a live queue entry rotted unseen against that entry's own recorded facts — but
-  it counted CI rounds, no tree fact, so no `measured:` key binds it and widening the corpus reaches
-  the shape while leaving the oracle missing. Third shape: an audit-roster row beside
-  `internal-identifier-restatement`, un-gateable by that row's own reasoning.
-  Filed 2026-08-12 by close, from an operator observation; the "no reason exists" premise was
-  falsified by probing the count gate's own matcher rather than by grepping for a style rule.
-  Also ruled on cardinal-notation-splits-gate-reach: lead 2026-09-04 (own-authority).
 
 - **headroom-check-ordering-unruled** [design-pending] — nothing says *when* a capped surface's
   headroom is read, and reading it first lets a resource limit quietly perform a judgment.
@@ -8983,56 +9196,6 @@
   single-date spelling here rests on lifecycle-kit's `(slug, date)` idempotence and the ambiguity
   is escalated rather than closed by this session.
 
-- **lead-tier-split-premise-unamended** [design-pending] — `lifecycle-kit/templates/lead.md`
-  §Economics rests its *Split the lead where the tail dominates* bullet on a premise TEN
-  consecutive iterations have now measured false, and the template still ships it unqualified.
-  **The trigger is the binding's own.** `.claude/commands/lead.md` set the criterion — count the
-  escalations a lead ruled ALONE off a governed surface; near zero, the premise holds; consistently
-  several, the template's bullet needs amending and not this repo's tier — with the threshold at a
-  third such iteration, ANSWERED at eleven. Measured 5, 4, several, 4, 5, 7, 7, 8, 12, 5, 3, now
-  **5**; THIS ENTRY is the governed surface for it whenever a dispatch relays one.
-  **The two axes separate, which makes this an amendment rather than a tier flip.** On COST the
-  premise holds; on CHARACTER it fails every time — a routing-only lead would be cheaper, would have
-  RELAYED these rulings, and would have raised none of the flags below.
-  **THE COST SERIES IS DERIVED, 2026-09-05, REPLACING THE ACCRETED ONE**, which ANSWERS why this
-  entry and the binding disagreed: every earlier point was a mid-close unlowered ceiling. From the
-  completed meter, supervision over priced spend, last six lead iterations: **11.7, 8.7, 8.2, 4.9,
-  4.4, 9.1**.
-  **THE CHARACTER DATUM THE COUNT CANNOT SEE**, from the eighth firing: the lead FLAGGED a risk
-  rather than asserting it safe and align found it real — the lead WRONG and the protocol still
-  paying, which no count of correct rulings evidences. The ninth: four of the lead's OWN premises.
-  **THE TENTH FIRING'S RESIDUE, the rest answered by the series:** three of its five rulings
-  replaced the escalating session's stated ground, and it carried two defects — align MISSING A
-  LIVE BLOCKER (the near-miss class on MECHANISM REACHABILITY) and a LEAD-SIDE `DONE` placement.
-  **THE ELEVENTH AND TWELFTH ARE ANSWERED BY THE SERIES TOO and take no paragraph** — three then
-  five ruled alone, one routed to the operator, neither cost point taken (the mid-close ceiling).
-  Two facts survive them: BOTH COUNTERS stayed CLEAN, so the nine below stayed nine; and the ALIGN
-  WATCH has a GAP — align never fired at the twelfth, so no bare-align datum exists for it.
-  **The counter-evidence is NINE instances of ONE shape — a claim verified at one surface and read
-  as covering a wider one.** Eight are the lead's own, sharpest five `recurrence:` dates ordered
-  onto an unjudged threshold COUNT; the ninth WIDENS it onto a STAGE session's carry. **Neither it
-  nor a refused premise NETS against the count**, which measures whether an escalation was answered
-  off a governed surface, never whether its grounds held; netting reports neither fact.
-  **Why `[design-pending]`:** the deliverable is a kit template's own design rationale and the shape
-  is unruled — qualify the premise, split it into cost and character limbs, or replace it with the
-  discriminator the binding already uses. A doctrine call.
-  **Cost while deferred:** every consumer vendoring lifecycle-kit reads a premise this repo has
-  measured false nine times, and each future lead re-derives the same finding against a template
-  that never records it — the binding's evidence is local while the false claim is shipped.
-  **DISTINCT from `economics-posture-binding-stale`**, whose subject is the local shim restating a
-  ruling it should cite; this one is the vendored TEMPLATE's own premise being wrong.
-  **THAT DEFERRAL IS SPENT AND THIS ENTRY JOINS `test-harness-cut-seam-sweep`.** It was taken under
-  the port-only run, superseded the same day by the port-first ruling, which legislates threshold
-  members itself as product-class with a live trigger — a ground that did not exist when this was
-  declined. Reading the supersession is `lead, own-authority 2026-09-05`; the join is the
-  operator's, 2026-09-05, through an interactive prompt in the lead session, relayed and not ruled
-  there, against a scope recommendation to hold and with the proposed-once clause's permanence cost
-  stated. The pool's highest recurrence at three, which `kpi-incident-recurrence` reports
-  independently of this entry.
-  Captured 2026-09-02 by close; lead-declined 2026-09-02 and 09-04; deferred 2026-09-05
-  (operator, lead-relay) on a ground since superseded.
-  recurrence: lead-tier-split-premise-unamended 2026-09-03 2026-09-04 2026-09-05
-
 - **crate-interpreter-resolution-residue** [design-pending] — the crate spawns the bare program
   name `bash` at twenty sites the `check-graph` hotfix deliberately left alone, and each reaches
   System32's WSL launcher on a native Windows host exactly as that one did.
@@ -9203,65 +9366,20 @@
   declines to leave.
   Surfaced 2026-09-03 in the consult that closed the build-window sizing ruling; drained here.
 
-- **kit-spec-provenance-seam-sweep** [design-pending] — kit SPECs ride the installer payload and the
-  public site whole, yet carry this project's ruling provenance, which resolves to nothing in a
-  consumer tree and reads there as mechanism.
-  **THE 2026-09-03 MEASURE IS STALE BY A FACTOR OF THREE — re-measured 2026-09-05 at scope and
-  corrected here, not left for the next session to re-buy.** It read 37 stamps and 50 TRAJECTORY.md
-  pointers across SIX kit SPECs; a wider pattern reads **246 candidate lines across ELEVEN**:
-  gate-sdk 157, lifecycle-kit 30, delegation-kit 18, queue-kit 16, guard-kit 6, canon-kit 6,
-  doctrine-kit 3, context-kit 3, drift-kit 3, site-kit 2, evidence-kit 2. A second, cruder pattern
-  in the lead session agreed on shape if not digits. **gate-sdk alone is 64 % of the class**, which
-  is where the split below cuts.
-  **The deliverable after the split is two-part** — the gate is the remainder's: strip each site to
-  the undated rule with its engineering grounds, and MOVE to TRAJECTORY.md any grounds not already
-  there, so nothing is lost rather than relocated.
-  **How the class arrived, recorded so the fix aims at its cause.** TRAJECTORY.md's recording rule
-  sends a ruling with a canonical home to that home by pointer, and sessions read that as licence to
-  write the ruling INTO the kit SPEC with its date and refusals — so the SPEC became the ruling's
-  home and TRAJECTORY.md the index, while the seam's content classes named vocabulary and never
-  provenance, and no gate held it.
-  **Why `[design-pending]` AFTER THE SPLIT — the gate's predicate goes with the gate, and what is
-  left here is one question this entry must answer to sweep at all.** gate-sdk/SPEC.md §The non-gate
-  arm groups its class roster into landing-date cohorts (`its 2026-08-31 members`, `its 2026-09-01
-  ones`, `its 2026-09-03 ones`, at :2193, :2196, :2209) while the member added at the
-  scan-prompts-cut build went in undated, so the roster mixes three dated cohorts with one undated
-  member. A cohort label is neither a `ruled` stamp nor a TRAJECTORY.md pointer, yet it publishes
-  this project's landing history as a reading aid. WHETHER THE 2026-09-03 RULING REACHES A COHORT
-  LABEL IS UNSETTLED: if it does, the three tags retire and the roster becomes a plain enumeration;
-  if not, the carve-out needs stating so the next member added knows which shape to take. That
-  question is IN this entry because the roster is in gate-sdk; its consequence for the gate's
-  fixture pair is the remainder's.
-  **The drift-kit and guard-kit sites accreted 2026-09-05, are the SOLE home of two rulings
-  TRAJECTORY.md retired as spent, and are the REMAINDER's** — recorded here only so the split does
-  not read as having lost them.
-  **Cost while deferred:** every published kit SPEC and every adopter's vendored copy carries
-  private ruling history as mechanism, and pointers a consumer cannot follow — payload-facing and
-  front-door, so product-class outright, and accreting at two new sites in one iteration.
-  **DIRECTED 2026-09-05 (operator, consult) AS THE NEXT ITERATION'S JOINED UNIT beside the
-  test-harness cut** — same-surface and product-class under the port-first run; scope sizes it.
-  **SPLIT AT THE gate-sdk BOUNDARY, ruled 2026-09-05 `lead, own-authority` on the re-measure
-  above**, exercising the permission the directive itself grants ("scope sizes it against the
-  window and may split it by kit"), so it re-scopes nothing. THIS ENTRY IS NOW gate-sdk/SPEC.md
-  ONLY — 157 of the 246 lines, one SPEC and one docs mirror rather than eleven of each. **The
-  remaining ten SPECs and THE GATE are `kit-spec-provenance-seam-sweep-remainder`**, filed with
-  this ruling so the split's other half has an owner rather than living in a journal.
-  **CONSEQUENCE, stated because it looks routine and is not:** the directive paragraph at
-  TRAJECTORY.md discharges on "that unit lands AND THE GATE IS GREEN". Under the split the gate
-  lands with the remainder, so the discharge does NOT fire this iteration and that paragraph is
-  NOT deleted at this close.
-  Surfaced 2026-09-03 in the consult that closed the provenance-seam ruling; drained here; the third
-  shape above added 2026-09-04 at the scan-prompts-cut close drain.
-
 - **kit-spec-provenance-seam-sweep-remainder** [design-pending] — the other half of the
   gate-sdk-boundary split, and THE HOME OF THE GATE: ten kit SPECs still carrying this project's
   ruling provenance, plus the seam gate that can only go green once the last of them is swept.
   **Filed 2026-09-05 at scope with the split that created it** (`lead, own-authority`, under the
   permission the operator's directive grants), so the remainder has an owner instead of existing
   only in a scope journal — a split whose second half is unfiled is a dropped unit.
-  **Sized off the same re-measure, not re-derived:** ~89 candidate lines across lifecycle-kit 30,
-  delegation-kit 18, queue-kit 16, guard-kit 6, canon-kit 6, doctrine-kit 3, context-kit 3,
-  drift-kit 3, site-kit 2, evidence-kit 2. Ten SPECs and ten docs mirrors, against the parent's one.
+  **THE ~89 IS UNSOUND AND THIS ENTRY IS UNSIZED.** It came from the same predicate the parent's
+  own whole-file census discredited at spec 2026-09-05 — it matches ordinary prose and misses
+  every stamp spelled without the word. Over gate-sdk it read 157 where the defensible union is
+  ≈87-92 sites and ≈300-400 lines touched. Its per-kit split (lifecycle-kit 30, delegation-kit 18,
+  queue-kit 16, guard-kit 6, canon-kit 6, doctrine-kit 3, context-kit 3, drift-kit 3, site-kit 2,
+  evidence-kit 2) is kept ONLY as a rank ordering. Ten SPECs and ten docs mirrors, against one.
+  **The parent's discriminator and its move-versus-delete test carry here unchanged** and are not
+  re-derived: attribution decides the voice, and TRAJECTORY.md:52-55 decides move versus delete.
   **THE GATE IS THIS ENTRY'S, AND THAT IS THE WHOLE POINT OF FILING IT.** Enforcement-first wants
   the sweep and its gate in one unit; the split defers rather than dissolves that objection, so the
   gate attaches here as the last kit's landing and the parent ships swept-but-ungated in the
