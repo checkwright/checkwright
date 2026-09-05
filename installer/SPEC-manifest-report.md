@@ -11,6 +11,18 @@ It buys a **reading**, not a repair and not a green leg. What this iteration
 commits to delivering is settled in §Definition of Done below, deliberately and
 at authoring time, so close is not left arguing it.
 
+**The seam, ruled: nothing here is kit mechanism, nothing is private rule
+content, and nothing becomes consumer config.** Every surface this amendment
+touches is this repo's own — `installer/consumer-smoke/run-smoke.sh` is the
+acceptance harness, declared `no-port`, carried by neither transport and
+received by no adopter; `.github/workflows/gates.yml` is this repo's CI;
+`installer/README.md` governs the installer, which is not a kit and must not
+become one. No kit gains a gate, a template or a knob. The one place a knob
+would have been natural — gating the failure report — is refused in
+§Producers and consumers on the ground that a report no deployed configuration
+enables is the dead-producer shape, so the report is unconditional on the
+failure path and there is no `<KIT>_<KNOB>` to name.
+
 ## What changes
 
 ### (1) The manifest arm reports its own disagreement, in place, before it fails
