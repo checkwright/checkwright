@@ -39,3 +39,7 @@ The pilot shipped with six gates before the registry existed.
 <!-- measured: gate-total=7 -->
 The registry holds 7 gates today — the sanctioned discharge, because the
 objection the ban encodes is answered by an oracle rather than suppressed.
+
+The boundary is the notation's, not a list's end: a hyphenated compound is
+multi-token, so twenty-one gates stays outside a single-token grammar's reach
+while its digit spelling does not. That limit is stated rather than closed.

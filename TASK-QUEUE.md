@@ -69,74 +69,6 @@
   (operator, lead-relay) on a ground since superseded.
   recurrence: lead-tier-split-premise-unamended 2026-09-03 2026-09-04 2026-09-05
 
-- **cardinal-notation-splits-gate-reach** [spec: SPEC-cardinal-reach.md]
-  — whether a written count is
-  enforceable depends on how it is spelled and how large it is, and the queue sits outside the
-  scanning corpus entirely; the truncated probe below is a `probe-evidence-sufficiency` sub-case.
-  **The premise that prompted this is falsified, and that is the finding.** A cardinal grammar
-  **ships and is not future work** — canon-kit/SPEC.md §check-manifest-count states the ceiling and
-  `SPEC_COUNT_CARDINAL_RE` in canon-kit/lib/spec.sh implements it. The sweep that costed shipped
-  code as future work searched the right term and had its output cut before canon-kit was reached:
-  **truncated, not mis-queried.**
-  **Discontinuity 1, magnitude.** The word branch stops at `twelve` while the digit branch
-  (`[0-9]+`) does not, so `13 gates` matches and `thirteen gates` does not. The SPEC states the
-  ceiling without justifying it, so no reader can tell a deliberate ceiling from an unfinished list.
-  **Discontinuity 2, corpus.** `CANON_KIT_MANIFEST_FILES` omits `TASK-QUEUE.md`, so its 206 spelled
-  numerals from *three* through *fifty* (counted independently here, matching the filer) sit outside
-  every count gate, at any magnitude, in either notation.
-  **The worked example is a sibling's own edit.** `spec-measured-count-gate` moved from "Twelve
-  instances" to "Thirteen": in the manifest corpus that one word moves the claim from INSIDE the
-  matcher's reach to OUTSIDE it, and it happened in the queue, which no count gate scans — the two
-  discontinuities composing.
-  **DISTINCT from `spec-measured-count-gate`, now `check-measured-claim`.** That entry's thesis is
-  that measured counts go STALE; this one is that notation and corpus decide whether an oracle
-  REACHES a claim at all, and a count can be current-and-unreachable or stale-and-reachable, so
-  neither closes the other. Kept from it: a digits convention is a genuine precondition that makes
-  that gate cheaper, matching a digit run being trivial where spelled compounds are not.
-  **Compaction is ANSWERED as the weak half, ~9 lines file-wide, and is not why to act. What
-  decides it:** `TASK-QUEUE.md` reads like prose but is a gated data surface with a line cap, a
-  wrap gate, a tag grammar and slug liveness — a style guide optimizing for a reader it lacks.
-  **ALL THREE CALLS ARE ANSWERED** (`SPEC-cardinal-reach.md`), and two of this entry's own inputs
-  were CORRECTED by probing rather than inherited: the grammar lives in TWO places, and the shell
-  copy at `canon-kit/lib/spec.sh:241` has ZERO consumers tree-wide — dead code beside the one
-  executing holder, `native/src/spec.rs:712-714`; and `CANON_KIT_MEASURED_SURFACE_GLOBS` is
-  DERIVED from `CANON_KIT_MANIFEST_FILES`, so limb (b) reaches FOUR gates, not two.
-  (a) No reason is recorded anywhere (`git log -S twelve`, and the SPEC justifies excluding `one`
-  and not the ceiling): the word branch EXTENDS to the single-token cardinals — `two`…`twenty`
-  plus the tens — and the boundary gains its ground, that the grammar is token-based and every
-  larger cardinal is hyphenated or multi-word. Measured cost: **125** newly-reachable occurrences
-  in the manifest corpus, so the delta is RUN, never cleared by inspection, and 35 hyphenated
-  compounds stay unreachable as a STATED limit with a refused remedy.
-  (b) **NO to the manifest corpus** — a queue entry is a dated work record, line-capped, whose
-  counts frequently have no tree oracle to bind to, so the ban's own remedy would be unavailable.
-  `TASK-QUEUE.md` joins `CANON_KIT_MEASURED_SURFACE_GLOBS` instead: a marker is honored and
-  re-run, no bare cardinal is banned, and `check-unmarked-claim`'s one live class measures ZERO
-  matches here today.
-  (c) **DECLINED, ground recorded so it is not re-proposed:** (a) closes the notation half and
-  (b)'s answer leaves the queue with no cardinal ban, so a spelling choice in the queue decides
-  nothing; what remains is the ~9-line compaction this entry already calls the weak half. Its home
-  would have been queue-kit's in any case — that SPEC states no notation convention and six
-  `check-queue-*` members already own the surface.
-  **Cost while deferred:** every count written in the queue is unreachable by any oracle, and in
-  the manifest corpus a count's enforceability turns on a spelling choice no author is told
-  about. Both failures are silent — the gate runs, reports clean, and never saw the claim.
-  **THRESHOLD 2026-09-03/04; deferred 2026-09-05 (operator, lead-relay). THAT GROUND IS SPENT AND
-  THIS ENTRY JOINS `test-harness-cut-seam-sweep`** — it was taken under the port-only run,
-  superseded the same day by the port-first ruling, which legislates threshold members itself as
-  product-class with a live trigger, a ground that did not exist when this was declined. Reading
-  the supersession is `lead, own-authority 2026-09-05`; the join is the operator's, 2026-09-05,
-  through an interactive prompt in the lead session, relayed and not ruled there, against a scope
-  recommendation to hold. Product-class on limb (a): canon-kit's ceiling ships, so it decides a
-  consumer's manifest verdicts wherever the fix lands.
-  recurrence: cardinal-notation-splits-gate-reach 2026-08-19 2026-09-02
-  **THE 2026-09-02 RECURRENCE SHARPENS (b), re-derived independently rather than read off here.** A
-  maintained total in a live queue entry rotted unseen against that entry's own recorded facts — but
-  it counted CI rounds, no tree fact, so no `measured:` key binds it and widening the corpus reaches
-  the shape while leaving the oracle missing. Third shape: an audit-roster row beside
-  `internal-identifier-restatement`, un-gateable by that row's own reasoning.
-  Filed 2026-08-12 by close, from an operator observation; the "no reason exists" premise was
-  falsified by probing the count gate's own matcher rather than by grepping for a style rule.
-  Also ruled on cardinal-notation-splits-gate-reach: lead 2026-09-04 (own-authority).
 
 ## Technical Debt
 
@@ -9916,5 +9848,6 @@
 - kit-spec-provenance-seam-sweep
 - guard-tests-runner-port-cut
 - agents-md-smoke-port-cut
+- cardinal-notation-splits-gate-reach
 
 ## Lessons Learned

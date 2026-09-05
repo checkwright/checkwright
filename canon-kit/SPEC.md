@@ -430,8 +430,21 @@ the class ruling at gate-sdk/SPEC.md §The config-seam port disposition. Knobs:
   together or not at all. What a project measures is that project's vocabulary,
   so no key ships as a kit literal (the provenance seam). This repo sets
   `bash scripts/measured-claims.sh` and the `CANON_KIT_MANIFEST_FILES` globs plus
-  `.claude/commands/*.md` — the shims the manifest set omits and the prose surface
-  excludes on a copy-shape ownership this rule is not covered by. The surface knob
+  `.claude/commands/*.md` and `TASK-QUEUE.md` — the shims the manifest set omits and
+  the prose surface
+  excludes on a copy-shape ownership this rule is not covered by, and the work
+  queue, which takes the marker without taking the manifest tier's bare-cardinal
+  ban (§check-manifest-count).
+  **Deriving this knob from the manifest array is the common shape, and it makes a
+  manifest widening wider than it looks:** the readers of *both* knobs move at
+  once, so a consumer widening `CANON_KIT_MANIFEST_FILES` widens this knob's pair
+  as well as the manifest pair it named. A manifest widening also owes a `# graph:`
+  coupling edit that a widening of this knob does not — the measured pair couples
+  markdown broadly and reaches any `.md` surface, while the manifest pair couples a
+  narrower manifest-shaped set, so widening the manifest array without widening
+  those gates' coupling manifests ships a knob whose gate never triggers on the
+  file it was widened for, and the miss surfaces only in a full-battery run.
+  The surface knob
   has a **second reader**, `check-unmarked-claim`, which shares it rather than
   forking a knob of its own: the pair composes over one corpus
   (§check-unmarked-claim), and the recorded cost is that a consumer cannot scan
@@ -615,7 +628,12 @@ states the ground.
   disposition reaches only helpers no section does
   (gate-sdk/SPEC.md §The port-candidate criteria, criterion 6).
   Read the two together and the rule is legible: an emptied caller set removes an
-  **unnamed** helper and leaves a documented one standing.
+  **unnamed** helper and leaves a documented one standing — **provided its twin
+  duplicates no value**. Where a twin spells a *literal* both forms must agree on
+  with no machine holding them equal, the documented-surface bound yields and the
+  shell form goes: that is the shape criterion 6 exists against, and it is why the
+  count grammar has one holder where the manifest finder keeps two. Duplicating a
+  finder the bridge feeds is safe; duplicating a literal is the defect.
   The two implementations of the manifest finder are held together by the config
   bridge rather than by a copied default: every knob either reads crosses it as
   a resolved value, so there is exactly one place each is computed
@@ -662,7 +680,8 @@ states the ground.
   residue met twice rather than a new class. The tab a POSIX ERE may legitimately carry
   cannot reach the bridge: `spec_claim_vocabulary` below rejects a line with an
   extra tab before the value is ever serialized.
-- **The count adapter** the restated-total gates share, so a consumer's
+- **The count adapter** the restated-total gates share — **compiled only**
+  (`native/src/spec.rs`), by the literal-duplication rule above — so a consumer's
   `CANON_KIT_COUNT_COLLECTIONS` vocabulary enters once and every such gate
   matches the same total shapes — including a total whose cardinal and noun
   straddle a prose wrap, reported at the cardinal's physical line. **That
@@ -1036,17 +1055,34 @@ two READMEs and a SPEC), caught only by close-stage review.
 The scanned set is the shared manifest-set finder (§lib/spec.sh) —
 canonical specs, `README.md`, `CLAUDE.md`; amendments excluded, fenced blocks
 skipped, an inline-code cardinal a meta-reference (so this section may name its
-own examples). Both the grammar and the matcher come from the shared count
-adapter, and the prose walk is the shared manifest-prose driver (§lib/spec.sh),
-so this gate, its `check-prose-enum` sibling, and its comment-tier cousin
+own examples). The grammar and the matcher have **one holder**, the compiled
+count adapter, and the prose walk is the shared manifest-prose driver
+(§lib/spec.sh), so this gate, its `check-prose-enum` sibling, and its
+comment-tier cousin
 read one vocabulary and one exemption behavior, and a total wrapped across a
 prose break is caught and reported at its first physical line; a blank line, a
 fence, and a `manifest-count-exempt:` site each end the paragraph — an exempted
-line cannot join its neighbours into a total. The cardinal
-grammar is digit sequences and the spelled
-`two`…`twelve`, case-insensitive; `one` is deliberately outside it — singleton and
-cardinality-rule idioms ("one owner per fact", "one iteration per kit") are
-invariants, not totals. Collection nouns are `CANON_KIT_COUNT_COLLECTIONS`
+line cannot join its neighbours into a total.
+
+**The cardinal grammar is stated as a rule, and the list is the matcher's.**
+Digit sequences, unbounded, plus every cardinal English spells as a **single
+token**, case-insensitive — the words themselves owned by `native/src/spec.rs`
+and cited here rather than transcribed, a transcription being a second copy that
+drifts the next time the boundary moves. Both ends of the range are rules a
+reader can apply to a spelling the table does not contain. `one` is deliberately
+outside it — singleton and cardinality-rule idioms ("one owner per fact", "one
+iteration per kit") are invariants, not totals. The upper end is the
+**notation's** rather than a place a list happened to stop: the matcher reads a
+word between word boundaries, and every cardinal past the single-token range is a
+hyphenated or multi-word construction no single-token pattern can reach.
+**That residue is a stated limit, not a closed one** — a hyphenated compound
+stays unreachable where its digit spelling does not, so the discontinuity is
+narrowed rather than removed. A compound grammar is **refused**: it would have to
+tell a quantifying compound from the far commoner partitive and ordinal prose the
+same tokens appear in, and that distinction's false-positive surface is worse
+than the hole it closes.
+
+Collection nouns are `CANON_KIT_COUNT_COLLECTIONS`
 (default the plurals the kits themselves grow: `gates`, `meta-gates`, `checks`,
 `kits`, `stages`, `rules`, `KPIs`) — the one place consumer vocabulary enters,
 and it enters as config.
@@ -1186,8 +1222,11 @@ no marker names is touched by no arm at all.
   failure being closed.
 
 Arm C's cardinal grammar is §check-manifest-count's, read as a value: a digit run
-or a spelled `two`…`twelve` normalized to digits, so a marker's `12` and a
-sentence's "twelve" are one cardinal rather than two. The claim a marker binds is
+or a single-token spelled cardinal normalized to digits, so a marker's `12` and a
+sentence's "twelve" are one cardinal rather than two. Widening that grammar
+strictly **shrinks** arm C's violation set, because its red condition is a marker
+cardinal *absent from* its bound claim and a spelling the matcher cannot reach
+reads as absent. The claim a marker binds is
 the paragraph below it, ending at a blank line, a fence, a second marker or the
 end of file. **The authoring contract arm C prices:** a bound claim carrying more
 than one distinct cardinal is ambiguous, and the gate fails closed rather than
@@ -1348,7 +1387,10 @@ one pressures into a marker is a claim that one then re-measures, and holding th
 over one corpus is what makes that handoff total. The cost of sharing is stated
 rather than hidden: a consumer wanting claim classes over a *different* surface
 than its measured claims cannot express that, and the split is available later
-behind an attested need.
+behind an attested need. Sharing also means this gate's corpus widens whenever
+that knob does, without a decision of its own — so a widening is **re-run** here
+rather than reasoned about, a declared class being free to match a surface nobody
+widened it for.
 
 **The roster is consumer config and the seam here is sharper than its siblings'.**
 Every class id and every pattern arrives through `CANON_KIT_CLAIM_CLASSES_CMD`
@@ -1809,7 +1851,7 @@ genuinely-local fact neither tier owns, and exempting a restatement rather
 than deleting it is itself the defect — a long roster (a `usage:` option
 list, a header) restructures into directive-anchored short paragraphs or
 trims, never launders prose past the cap. The count-shape override reads the
-shared count adapter (§lib/spec.sh) rather than a second grammar, so it
+shared count adapter (§check-manifest-count) rather than a second grammar, so it
 inherits that gate's carve-outs unchanged: a comparator bound or a `per`-phrase
 in a directive is a rule and not a total, a partitive proportion exempts both
 its cardinals, and a cardinal in inline code is a meta-reference — which is why
@@ -2614,3 +2656,14 @@ surface is one of the enforced tiering surfaces. A `check-root-tiering` is a
 pure consumer-filename allowlist with no mechanism residue. Global-constant
 literal gates (the pagination-literal pattern) are per-constant rule content.
 Diagram/spec annotation couplings are unclaimed, a later kit's scope.
+
+**A numeral-notation convention for a work queue is refused, on two grounds
+worth recording so it is not re-proposed as an easy win.** Its motivation is that
+notation decides reach — but the single-token grammar (§check-manifest-count)
+settles the notation half inside the manifest corpus, and a work queue takes the
+`measured:` marker without taking the bare-cardinal ban, so a spelling choice
+there decides nothing a gate reads. What is left is compaction, which is a style
+preference and not an invariant. The second ground is ownership: a queue's
+notation is the queue kit's to rule, and landing one here would put a queue
+convention in the manifest kit — the shape the topology rules above exist to
+prevent.

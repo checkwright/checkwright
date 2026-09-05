@@ -13,3 +13,6 @@ the next append, as does the battery's gates 1-42.
 
 A prose wrap hides the same pin from a per-line scan: this suite ships two
 governed gates today, its cardinal and noun straddling the line break.
+
+Above the old eleven-word ceiling the single-token cardinals reach too: the
+suite carries seventeen gates, and the roster names ninety rules.

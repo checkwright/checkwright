@@ -276,7 +276,7 @@ mod tests {
     fn two_distinct_cardinals_are_what_the_ambiguity_close_counts() {
         assert_eq!(
             distinct_cardinals("thirteen instances across five iterations"),
-            vec!["5"]
+            vec!["13", "5"]
         );
         assert_eq!(distinct_cardinals("17 of 102 gates"), vec!["17", "102"]);
     }

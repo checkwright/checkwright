@@ -69,11 +69,11 @@ CANON_KIT_PAYLOAD_CLAIMS_CMD="bash scripts/payload-claims.sh"
 # shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing
 CANON_KIT_PAYLOAD_CLAIM_EXCLUDE=("docs/posts/*")
 
-# comment-tier-exempt: this repo's measured-claim oracle and the surface its markers are read from — the keys and the facts behind them are consumer config for the same provenance-seam reason the transport and payload vocabularies are, and the surface is the governed manifest set widened by the stage-skill shims, which carry governed prose no other surface reaches (the prose surface excludes them by an ownership decision about copy shape, which is not the ownership this gate's rule needs)
+# comment-tier-exempt: this repo's measured-claim oracle and the surface its markers are read from — the keys and the facts behind them are consumer config for the same provenance-seam reason the transport and payload vocabularies are, and the surface is the governed manifest set widened by the stage-skill shims, which carry governed prose no other surface reaches (the prose surface excludes them by an ownership decision about copy shape, which is not the ownership this gate's rule needs), and by the work queue, which takes the marker without taking the manifest tier's bare-cardinal ban (canon-kit/SPEC.md §check-manifest-count)
 # shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing
 CANON_KIT_MEASURED_CLAIMS_CMD="bash scripts/measured-claims.sh"
 # shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing
-CANON_KIT_MEASURED_SURFACE_GLOBS=("${CANON_KIT_MANIFEST_FILES[@]}" ".claude/commands/*.md")
+CANON_KIT_MEASURED_SURFACE_GLOBS=("${CANON_KIT_MANIFEST_FILES[@]}" ".claude/commands/*.md" "TASK-QUEUE.md")
 
 # comment-tier-exempt: this repo's claim-class roster — the classes are consumer config for the same provenance-seam reason the transport, payload and measured vocabularies above are, and more sharply: the roster spells this project's own positioning vocabulary, so a kit literal carrying it would publish it and canon-kit/SPEC.md would match its own class while describing it; the scanned surface is CANON_KIT_MEASURED_SURFACE_GLOBS above rather than a second knob, since every site the class reaches already falls inside it
 # shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing

@@ -707,10 +707,36 @@ fn lstrip_space(b: &[u8]) -> &[u8] {
     &b[i..]
 }
 
-// spec: canon-kit/SPEC.md §lib/spec.sh — the cardinal alternation `SPEC_COUNT_CARDINAL_RE`
-// fixes for the count grammar below
-const CARDINAL_WORDS: &[&str] = &[
-    "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve",
+// spec: canon-kit/SPEC.md §check-manifest-count — the sole holder of the word branch, which is
+// why that section states the single-token rule and cites this table for the list. Each word
+// carries its own value: the tens are not consecutive, so position arithmetic would misread them
+const CARDINAL_WORDS: &[(&str, u32)] = &[
+    ("two", 2),
+    ("three", 3),
+    ("four", 4),
+    ("five", 5),
+    ("six", 6),
+    ("seven", 7),
+    ("eight", 8),
+    ("nine", 9),
+    ("ten", 10),
+    ("eleven", 11),
+    ("twelve", 12),
+    ("thirteen", 13),
+    ("fourteen", 14),
+    ("fifteen", 15),
+    ("sixteen", 16),
+    ("seventeen", 17),
+    ("eighteen", 18),
+    ("nineteen", 19),
+    ("twenty", 20),
+    ("thirty", 30),
+    ("forty", 40),
+    ("fifty", 50),
+    ("sixty", 60),
+    ("seventy", 70),
+    ("eighty", 80),
+    ("ninety", 90),
 ];
 
 // spec: canon-kit/SPEC.md §check-measured-claim — the same alternation read as a value, so
@@ -719,8 +745,8 @@ const CARDINAL_WORDS: &[&str] = &[
 pub fn cardinal_word_value(w: &str) -> Option<String> {
     CARDINAL_WORDS
         .iter()
-        .position(|c| *c == w)
-        .map(|i| (i + 2).to_string())
+        .find(|(c, _)| *c == w)
+        .map(|(_, v)| v.to_string())
 }
 
 // spec: canon-kit/SPEC.md §check-measured-claim — the marker's opening literal, shared by the
@@ -763,9 +789,9 @@ impl CountGrammar {
         })
     }
 
-    // spec: canon-kit/SPEC.md §check-manifest-count — `sk_count_hit`: the quantifier shape
-    // first, then the range shape; a cardinal inside inline code is a meta-reference and is
-    // blanked before either runs.
+    // spec: canon-kit/SPEC.md §check-manifest-count — the quantifier shape first, then the
+    // range shape; a cardinal inside inline code is a meta-reference and is blanked before
+    // either runs.
     pub fn hit(&self, text: &str) -> Option<String> {
         // spec: canon-kit/SPEC.md §check-manifest-count — byte-wise because awk's
         // substr/tolower are; a char-wise port shifts every offset on a multi-byte glyph
@@ -777,8 +803,8 @@ impl CountGrammar {
         self.span(&low, &scan, false)
     }
 
-    // spec: canon-kit/SPEC.md §check-manifest-count — `_sk_span`: leftmost-longest, then
-    // the boundary rule, then the exemptions
+    // spec: canon-kit/SPEC.md §check-manifest-count — leftmost-longest, then the boundary
+    // rule, then the exemptions
     fn span(&self, lb: &[u8], scan: &[u8], quantifier: bool) -> Option<String> {
         let mut start = 0usize;
         while start < lb.len() {
@@ -855,8 +881,8 @@ impl CountGrammar {
         false
     }
 
-    // spec: canon-kit/SPEC.md §check-manifest-count — `spec_count_quantifier_re`, whose
-    // wedge groups are optional, so bare adjacency is this shape's zero-wedge case
+    // spec: canon-kit/SPEC.md §check-manifest-count — the quantifier shape, whose wedge groups
+    // are optional, so bare adjacency is this shape's zero-wedge case
     fn match_quantifier(&self, b: &[u8], i: usize) -> Option<usize> {
         let mut best: Option<usize> = None;
         for c_end in cardinal_ends(b, i) {
@@ -883,7 +909,7 @@ impl CountGrammar {
         }
     }
 
-    // spec: canon-kit/SPEC.md §check-manifest-count — `spec_count_range_re`
+    // spec: canon-kit/SPEC.md §check-manifest-count — the noun-then-range shape
     fn match_range(&self, b: &[u8], i: usize) -> Option<usize> {
         let mut best: Option<usize> = None;
         for n in &self.nouns {
@@ -917,7 +943,7 @@ fn class_ends(b: &[u8], i: usize, f: impl Fn(u8) -> bool) -> Vec<usize> {
 
 fn cardinal_ends(b: &[u8], i: usize) -> Vec<usize> {
     let mut out: Vec<usize> = class_ends(b, i, |c| c.is_ascii_digit());
-    for w in CARDINAL_WORDS {
+    for (w, _) in CARDINAL_WORDS {
         if b[i..].starts_with(w.as_bytes()) {
             out.push(i + w.len());
         }
@@ -945,7 +971,7 @@ fn trimmed_space_end_ends_with(prefix: &[u8], lit: &[u8]) -> bool {
 }
 
 // spec: canon-kit/SPEC.md §check-manifest-count — a threshold, not a total: the comparator
-// prefix `_sk_span` exempts
+// prefix the span scan exempts
 fn ends_with_comparator(prefix: &[u8]) -> bool {
     let t = trim_space_end(prefix);
     const LITS: &[&str] = &[
@@ -1044,7 +1070,7 @@ pub fn strip_inline_code(b: &[u8]) -> Vec<u8> {
     out
 }
 
-// spec: canon-kit/SPEC.md §check-manifest-count — `sk_para_wrapped`: the first total whose
+// spec: canon-kit/SPEC.md §check-manifest-count — the first total whose
 // span crosses a line boundary, reported at the span's first physical line. A same-line
 // span returns nothing, because the per-line scan already owns it.
 pub fn para_wrapped(g: &CountGrammar, para: &Para) -> Option<(usize, String)> {
@@ -1217,3 +1243,22 @@ fn delimited(b: &[u8], d: u8, nonempty: bool) -> Option<(usize, usize)> {
     }
     Some((open + 1, open + 1 + close))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // spec: canon-kit/SPEC.md §check-manifest-count — the tens are not consecutive with the
+    // teens, so this is the case position arithmetic over the word list would silently misread
+    #[test]
+    fn cardinal_values_follow_the_table_not_the_index() {
+        assert_eq!(cardinal_word_value("two").as_deref(), Some("2"));
+        assert_eq!(cardinal_word_value("twelve").as_deref(), Some("12"));
+        assert_eq!(cardinal_word_value("twenty").as_deref(), Some("20"));
+        assert_eq!(cardinal_word_value("thirty").as_deref(), Some("30"));
+        assert_eq!(cardinal_word_value("ninety").as_deref(), Some("90"));
+        assert_eq!(cardinal_word_value("one"), None);
+        assert_eq!(cardinal_word_value("hundred"), None);
+    }
+}
+
