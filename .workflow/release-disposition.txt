@@ -1,4 +1,3 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
-drift-meter-pair-and-scratch-run-cuts release deferred:v0.26.0 — minor floor, unchanged by this batch: probed for a decommission and found none (zero live deprecation markers, check-deprecation-task clean), the three deleted shell members are ports whose spelling a note reconciles, and the retired scratch-run opt-out is a behavior change the pre-1.0 qualifier lets ride a minor; elapsed-time is dormant under the 2026-08-31 ruling while the channel reads preview, and no security, operator or audience trigger fired.
